@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Launcher
 {
@@ -31,89 +32,71 @@ namespace Jondo.Unity.Launcher
 
         public static void Initialize()
         {
-            string scrollsPath = @"C:\Jondo\map_dump_scrolls.csv";
-            string infosPath = @"C:\Jondo\map_dump_infos.csv";
-
-            if (!File.Exists(scrollsPath) || !File.Exists(infosPath))
-            {
-                Console.WriteLine("[MapManager] Warning: map_dump_scrolls.csv or map_dump_infos.csv not found! Map database will be empty until the client is launched once with the JondoFix mod.");
-                return;
-            }
-
             try
             {
                 Maps.Clear();
                 ScrollActions.Clear();
 
-                // 1. Load Infos
-                int infoCount = 0;
-                var infoLines = File.ReadLines(infosPath);
-                foreach (var line in infoLines.Skip(1))
+                using (var connection = new SqliteConnection(DatabaseManager.WorldConnectionString))
                 {
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    var parts = line.Split(',');
-                    if (parts.Length >= 5)
+                    connection.Open();
+
+                    // 1. Load Positions
+                    var infoCommand = connection.CreateCommand();
+                    infoCommand.CommandText = "SELECT MapId, PosX, PosY, SubAreaId, Outdoor, Name FROM MapPositions;";
+                    int infoCount = 0;
+                    using (var reader = infoCommand.ExecuteReader())
                     {
-                        if (long.TryParse(parts[0], out long mapId) &&
-                            int.TryParse(parts[1], out int posX) &&
-                            int.TryParse(parts[2], out int posY) &&
-                            int.TryParse(parts[3], out int subAreaId) &&
-                            bool.TryParse(parts[4], out bool outdoor))
+                        while (reader.Read())
                         {
+                            long mapId = reader.GetInt64(0);
+                            int subAreaId = reader.GetInt32(3);
                             if (subAreaId == 444)
                             {
                                 subAreaId = 20663;
                             }
-                            string name = parts.Length > 5 ? parts[5] : "";
                             var info = new MapInfo
                             {
                                 MapId = mapId,
-                                PosX = posX,
-                                PosY = posY,
+                                PosX = reader.GetInt32(1),
+                                PosY = reader.GetInt32(2),
                                 SubAreaId = subAreaId,
-                                Outdoor = outdoor,
-                                Name = name
+                                Outdoor = reader.GetInt32(4) == 1,
+                                Name = reader.IsDBNull(5) ? "" : reader.GetString(5)
                             };
                             Maps[mapId] = info;
                             infoCount++;
                         }
                     }
-                }
-                Console.WriteLine($"[MapManager] Loaded {infoCount} map info records successfully.");
+                    Console.WriteLine($"[MapManager] Loaded {infoCount} map info records from database successfully.");
 
-                // 2. Load Scrolls
-                int scrollCount = 0;
-                var scrollLines = File.ReadLines(scrollsPath);
-                foreach (var line in scrollLines.Skip(1))
-                {
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    var parts = line.Split(',');
-                    if (parts.Length >= 5)
+                    // 2. Load Scrolls
+                    var scrollCommand = connection.CreateCommand();
+                    scrollCommand.CommandText = "SELECT MapId, RightMapId, BottomMapId, LeftMapId, TopMapId FROM MapScrolls;";
+                    int scrollCount = 0;
+                    using (var reader = scrollCommand.ExecuteReader())
                     {
-                        if (long.TryParse(parts[0], out long mapId) &&
-                            long.TryParse(parts[1], out long rightMapId) &&
-                            long.TryParse(parts[2], out long bottomMapId) &&
-                            long.TryParse(parts[3], out long leftMapId) &&
-                            long.TryParse(parts[4], out long topMapId))
+                        while (reader.Read())
                         {
+                            long mapId = reader.GetInt64(0);
                             var action = new MapScrollAction
                             {
                                 MapId = mapId,
-                                RightMapId = rightMapId,
-                                BottomMapId = bottomMapId,
-                                LeftMapId = leftMapId,
-                                TopMapId = topMapId
+                                RightMapId = reader.GetInt64(1),
+                                BottomMapId = reader.GetInt64(2),
+                                LeftMapId = reader.GetInt64(3),
+                                TopMapId = reader.GetInt64(4)
                             };
                             ScrollActions[mapId] = action;
                             scrollCount++;
                         }
                     }
+                    Console.WriteLine($"[MapManager] Loaded {scrollCount} map scroll action records from database successfully.");
                 }
-                Console.WriteLine($"[MapManager] Loaded {scrollCount} map scroll action records successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MapManager] Error loading map CSVs: {ex.Message}");
+                Console.WriteLine($"[MapManager] Error loading maps from database: {ex.Message}");
             }
         }
 

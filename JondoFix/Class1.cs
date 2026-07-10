@@ -6,6 +6,8 @@ using Il2CppZaap_CSharp_Client;
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Collections.Generic;
+using System.Text.Json;
 using Il2CppCore.DataCenter;
 using Il2CppCore.DataCenter.Metadata.World;
 
@@ -20,9 +22,63 @@ namespace JondoFix
         public static Il2CppSystem.Net.Security.RemoteCertificateValidationCallback BypassedCallback { get; private set; }
         public static Il2CppMono.Security.Interface.MonoRemoteCertificateValidationCallback BypassedMonoCallback { get; private set; }
         private static bool hasDumped = false;
+        public static readonly Dictionary<int, int> ItemNameIdToGid = new Dictionary<int, int>();
+
+        private static void LoadItemNames()
+        {
+            try
+            {
+                string path = @"C:\Jondo\dofus3_data\items.json";
+                if (!File.Exists(path))
+                {
+                    MelonLogger.Warning($"[JondoFix] items.json not found at {path}!");
+                    return;
+                }
+
+                string content = File.ReadAllText(path);
+                using (var doc = JsonDocument.Parse(content))
+                {
+                    var root = doc.RootElement;
+                    if (root.TryGetProperty("references", out var references))
+                    {
+                        if (references.TryGetProperty("RefIds", out var refIds))
+                        {
+                            foreach (var item in refIds.EnumerateArray())
+                            {
+                                if (item.TryGetProperty("type", out var type))
+                                {
+                                    if (type.TryGetProperty("class", out var cls))
+                                    {
+                                        string clsName = cls.GetString();
+                                        if (clsName == "ItemData" || clsName == "WeaponData")
+                                        {
+                                            if (item.TryGetProperty("data", out var data))
+                                            {
+                                                if (data.TryGetProperty("id", out var idField) && data.TryGetProperty("nameId", out var nameIdField))
+                                                {
+                                                    int id = idField.GetInt32();
+                                                    int nameId = nameIdField.GetInt32();
+                                                    ItemNameIdToGid[nameId] = id;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                MelonLogger.Msg($"[JondoFix] Loaded {ItemNameIdToGid.Count} item name mappings successfully.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[JondoFix] Error loading item names: {ex.Message}");
+            }
+        }
 
         public override void OnInitializeMelon()
         {
+            LoadItemNames();
             UseLocalRedirect = IsEmulatorActive();
             LoggerInstance.Msg("====================================================");
             LoggerInstance.Msg("  JONDO REDIRECTOR & FIX");
@@ -962,6 +1018,28 @@ namespace JondoFix
         {
             __result = JondoFixMod.BypassedCallback;
             return false; // Skip original getter
+        }
+    }
+
+    [HarmonyPatch(typeof(Il2CppCore.Localization.Utils.LocalizationAccessor), "TryGetLocalization", new Type[] { typeof(int), typeof(string) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Out })]
+    public class TryGetLocalizationPatch
+    {
+        public static void Postfix(int key, ref string localization, bool __result)
+        {
+            try
+            {
+                if (__result && !string.IsNullOrEmpty(localization))
+                {
+                    if (JondoFixMod.ItemNameIdToGid.TryGetValue(key, out int gid))
+                    {
+                        localization = $"{localization} [{gid}]";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[JondoFix] Error in TryGetLocalization Postfix: {ex.Message}");
+            }
         }
     }
 }

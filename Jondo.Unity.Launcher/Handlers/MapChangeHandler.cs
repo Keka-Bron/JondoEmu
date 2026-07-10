@@ -55,19 +55,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
                         GameState.CellId = spawnCellId;
                         GameState.MapId = requestedMapId;
-                        DatabaseManager.SaveCharacterStatsAndPosition(
-                            GameState.CharacterId,
-                            GameState.CharacterRemainingPoints,
-                            GameState.StatVitality,
-                            GameState.StatWisdom,
-                            GameState.StatStrength,
-                            GameState.StatIntelligence,
-                            GameState.StatChance,
-                            GameState.StatAgility,
-                            GameState.MapId,
-                            GameState.CellId,
-                            GameState.Orientation
-                        );
+                        DatabaseManager.SaveCurrentCharacter();
                         LogDebug($"[Map Change] Saved updated map, cell (CellId={spawnCellId}), and orientation ({GameState.Orientation}) to database.");
 
                         // Natively build and send joh (CurrentMapMessage)
@@ -120,19 +108,7 @@ namespace Jondo.Unity.Launcher.Handlers
                         GameState.MapId = mapId; // Update MapId from client movement request to prevent desynchronization
                         GameState.Orientation = orientation;
                         Console.WriteLine($"[Movement] Updated GameState.CellId to: {lastCell}, GameState.MapId to: {mapId}, and GameState.Orientation to: {orientation}");
-                        DatabaseManager.SaveCharacterStatsAndPosition(
-                            GameState.CharacterId,
-                            GameState.CharacterRemainingPoints,
-                            GameState.StatVitality,
-                            GameState.StatWisdom,
-                            GameState.StatStrength,
-                            GameState.StatIntelligence,
-                            GameState.StatChance,
-                            GameState.StatAgility,
-                            mapId, // Use mapId from movement message directly
-                            GameState.CellId,
-                            GameState.Orientation
-                        );
+                        DatabaseManager.SaveCurrentCharacter();
                         Console.WriteLine("[Movement] Saved updated cell, map, and orientation to database.");
                     }
 

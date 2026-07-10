@@ -18,6 +18,7 @@ namespace Jondo.Unity.Launcher
         public static long MapId { get; set; } = 0;
         public static int CellId { get; set; } = 0;
         public static int Orientation { get; set; } = 1;
+        public static long Kamas { get; set; } = 0;
 
         // Characteristics / Capital
         public static int CharacterRemainingPoints { get; set; } = 5;
@@ -127,6 +128,7 @@ namespace Jondo.Unity.Launcher
         public int ItemId { get; set; }
         public int Quantity { get; set; }
         public int Position { get; set; } // Equipment slot or inventory position
+        public Dictionary<int, int> Effects { get; set; } = new Dictionary<int, int>();
     }
 
     public class EquippedItemInfo

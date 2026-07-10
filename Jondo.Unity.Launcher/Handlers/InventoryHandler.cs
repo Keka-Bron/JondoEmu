@@ -9,6 +9,13 @@ using Jondo.Unity.Launcher.Network;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
+    /// <summary>
+    /// Handles item inventory operations:
+    /// - Equip / unequip / move items (isi)
+    /// - Character visual appearance updates
+    ///
+    /// Stats computation (kri, isf, bonuses) lives in StatsHandler.
+    /// </summary>
     public static class InventoryHandler
     {
         private static readonly Dictionary<int, int> ItemGidToSkinId = new Dictionary<int, int>
@@ -25,95 +32,90 @@ namespace Jondo.Unity.Launcher.Handlers
             byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/isi");
             if (inner != null)
             {
-                long itemUid = 0;
-                int newPosition = 63; // Default unequipped slot
+                long itemUid    = 0;
+                int  newPosition = 0; // Protobuf default: 0 = amulet slot (client omits field when value is 0)
+                int  quantity    = 1;
                 try
                 {
                     int pos = 0;
                     while (pos < inner.Length)
                     {
-                        uint tag = NetworkEnvelope.ReadVarInt(inner, ref pos);
-                        int wireType = (int)(tag & 7);
-                        int fieldNum = (int)(tag >> 3);
+                        uint tag      = NetworkEnvelope.ReadVarInt(inner, ref pos);
+                        int  wireType = (int)(tag & 7);
+                        int  fieldNum = (int)(tag >> 3);
                         if (fieldNum == 1 && wireType == 0)
-                        {
-                            itemUid = (long)NetworkEnvelope.ReadVarInt64(inner, ref pos);
-                        }
+                            itemUid     = (long)NetworkEnvelope.ReadVarInt64(inner, ref pos);
+                        else if (fieldNum == 2 && wireType == 0)
+                            quantity    = (int)NetworkEnvelope.ReadVarInt(inner, ref pos);
                         else if (fieldNum == 3 && wireType == 0)
-                        {
                             newPosition = (int)NetworkEnvelope.ReadVarInt(inner, ref pos);
-                        }
                         else
-                        {
                             NetworkEnvelope.SkipField(inner, wireType, ref pos);
-                        }
                     }
                 }
                 catch { }
 
-                LogDebug($"[Inventory] Client requested to equip/move Item UID {itemUid} to position {newPosition}");
-                
-                // 1. Process equipment change in memory (updates stats)
+                LogDebug($"[Inventory] Client requested to equip/move Item UID {itemUid} (qty {quantity}) to position {newPosition}");
+
+                // 1. Process equipment change in memory (updates equipped cache)
                 ProcessEquipmentChange(itemUid, newPosition);
 
-                // 2. Build and send iry (ObjectMovementMessage) to confirm the move
+                // 2. Confirm move with iry (ObjectMovementMessage)
                 byte[] iryPacket = BuildIryPacket(itemUid, newPosition);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, iryPacket);
-                LogDebug($"[Inventory] Sent iry (ObjectMovement) for Item UID {itemUid} to position {newPosition}.");
+                LogDebug($"[Inventory] Sent iry for Item UID {itemUid} → position {newPosition}");
 
-                // 3. Send luy (InventoryTransactionFinishedMessage) to commit transaction in client UI
+                // 3. Commit transaction in client UI (luy)
                 byte[] luyPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/luy", Array.Empty<byte>());
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, luyPacket);
-                LogDebug("[Inventory] Sent luy (InventoryTransactionFinishedMessage) to client.");
+                LogDebug("[Inventory] Sent luy (InventoryTransactionFinished)");
 
-                // 4. Send hhf and hhh shortcut bar content packets
-                byte[] hhfPacket = BuildHhfPacket();
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, hhfPacket);
-                byte[] hhhPacket = BuildHhhPacket();
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, hhhPacket);
-                LogDebug("[Inventory] Sent hhf and hhh (ShortcutBar) to client.");
+                // 4. Shortcut bar content packets (hhf / hhh)
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildHhfPacket());
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildHhhPacket());
+                LogDebug("[Inventory] Sent hhf and hhh (ShortcutBar)");
 
-                // 5. Update character appearance in memory and get updated look bytes
+                // 5. Update character appearance
                 byte[]? lookBytes = UpdateCharacterLook();
 
                 if (lookBytes != null)
                 {
-                    // 6. Send luq (UpdateSelfLookMessage) to update the local player avatar in inventory
-                    byte[] luqPacket = BuildLuqPacket(lookBytes);
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, luqPacket);
-                    LogDebug("[Inventory] Sent luq (UpdateSelfLookMessage) to client.");
+                    // 6. luq (UpdateSelfLookMessage) — updates local avatar in inventory panel
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildLuqPacket(lookBytes));
+                    LogDebug("[Inventory] Sent luq (UpdateSelfLookMessage)");
                 }
 
-                // 7. Send isf (InventoryWeightMessage)
-                byte[] isfPacket = BuildIsfPacket();
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, isfPacket);
-                LogDebug("[Inventory] Sent isf (InventoryWeightMessage) to client.");
+                // 7. isf (InventoryWeightMessage)
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, StatsHandler.BuildIsfPacket());
+                LogDebug("[Inventory] Sent isf (InventoryWeightMessage)");
 
                 if (lookBytes != null)
                 {
-                    // 8. Send kku (ActorLookMessage) to update the character look in the world
-                    byte[] kkuPacket = BuildKkuPacket(lookBytes, GameState.CharacterId);
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, kkuPacket);
-                    LogDebug("[Inventory] Sent kku (ActorLookMessage) to client.");
+                    // 8. kku (ActorLookMessage) — updates character look in the world
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKkuPacket(lookBytes, GameState.CharacterId));
+                    LogDebug("[Inventory] Sent kku (ActorLookMessage)");
                 }
 
-                // 9. Build and send updated stats (kri) to update the client UI
-                byte[]? updatedKri = BuildUpdatedKriPacket();
+                // 9. kri (CharacterStatsListMessage) – reflects equipment stat bonuses
+                byte[]? updatedKri = StatsHandler.BuildUpdatedKriPacket();
                 if (updatedKri != null)
                 {
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, updatedKri);
-                    LogDebug("[Inventory] Sent updated stats (kri) to client.");
+                    LogDebug("[Inventory] Sent kri (updated stats)");
+
+                    // 9.5. krd (StatsUpgradeResultMessage) – force UI redraw on characteristics panel
+                    var emptyKrd = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/krd", new byte[0]);
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, emptyKrd);
+                    LogDebug("[Inventory] Sent empty krd (UI redraw trigger)");
                 }
 
-                // 10. Send kns (InventoryTransactionCompletion / KnockAck) to finalize the redraw cycle
-                byte[] knsPacket = BuildKnsPacket();
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, knsPacket);
-                LogDebug("[Inventory] Sent kns (InventoryTransactionCompletion) to client.");
-
-                // We still call BuildUpdatedImdPacket to keep the server's originalImdPayload updated and consistent
-                CharacterSelectionHandler.BuildUpdatedImdPacket(itemUid, newPosition);
+                // 10. kns (InventoryTransactionCompletion) – finalizes the redraw cycle
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKnsPacket());
+                LogDebug("[Inventory] Sent kns (InventoryTransactionCompletion)");
             }
         }
+
+        // ─── Equipment ──────────────────────────────────────────────────────────────
 
         private static void ProcessEquipmentChange(long itemUid, int newPosition)
         {
@@ -127,13 +129,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (newPosition >= 0 && newPosition < 63)
                 {
                     var equipped = new EquippedItemInfo { Slot = newPosition };
-                    if (CharacterSelectionHandler.ItemStatsByGid.TryGetValue(item.ItemId, out var stats))
-                    {
-                        foreach (var kvp in stats)
-                        {
-                            equipped.Stats[kvp.Key] = kvp.Value;
-                        }
-                    }
+                    foreach (var kvp in item.Effects)
+                        equipped.Stats[kvp.Key] = kvp.Value;
                     GameState.SetEquippedItem(itemUid, equipped);
                 }
                 else
@@ -143,44 +140,18 @@ namespace Jondo.Unity.Launcher.Handlers
             }
         }
 
+        // ─── Appearance ─────────────────────────────────────────────────────────────
+
         private static byte[]? UpdateCharacterLook()
         {
-            if (GameState.PlayerActorDetails == null)
-            {
-                LogDebug("[-] Warning: PlayerActorDetails is null. Cannot update character look.");
-                return null;
-            }
+            if (GameState.LookBytes == null || GameState.LookBytes.Length == 0)
+                GameState.LookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
 
             try
             {
-                var detailsMsg = ProtoMessage.Parse(GameState.PlayerActorDetails);
-                var gbfoField = detailsMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                if (gbfoField == null)
-                {
-                    LogDebug("[-] Warning: gbfo field (Field 2) not found in PlayerActorDetails.");
-                    return null;
-                }
+                var lookMsg = ProtoMessage.Parse(GameState.LookBytes);
 
-                var gbfoMsg = ProtoMessage.Parse(gbfoField.BytesValue);
-                var gbewField = gbfoMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                if (gbewField == null)
-                {
-                    LogDebug("[-] Warning: gbew field (Field 2) not found in gbfo message.");
-                    return null;
-                }
-
-                // gbewField.BytesValue is the wrapper message (Gbew)
-                var wrapperMsg = ProtoMessage.Parse(gbewField.BytesValue);
-                var entityLookField = wrapperMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                if (entityLookField == null)
-                {
-                    LogDebug("[-] Warning: EntityLook field (Field 2) not found in gbew wrapper.");
-                    return null;
-                }
-
-                var lookMsg = ProtoMessage.Parse(entityLookField.BytesValue);
-                
-                // 1. Extract existing skins from lookMsg (Field 2 of EntityLook)
+                // 1. Extract current skins (Field 2 of EntityLook)
                 var allSkins = new List<int>();
                 foreach (var field in lookMsg.Fields)
                 {
@@ -190,9 +161,7 @@ namespace Jondo.Unity.Launcher.Handlers
                         {
                             int subPos = 0;
                             while (subPos < field.BytesValue.Length)
-                            {
                                 allSkins.Add((int)ReadVarIntFromBytes(field.BytesValue, ref subPos));
-                            }
                         }
                         else if (field.WireType == 0) // unpacked
                         {
@@ -201,64 +170,109 @@ namespace Jondo.Unity.Launcher.Handlers
                     }
                 }
 
-                // 2. Filter/remove old equipment skins
+                // 2. Remove old equipment skins
                 var equipmentSkins = new HashSet<int>(ItemGidToSkinId.Values);
-                var updatedSkins = allSkins.Where(s => !equipmentSkins.Contains(s)).ToList();
+                var updatedSkins   = allSkins.Where(s => !equipmentSkins.Contains(s)).ToList();
 
                 // 3. Add skins of currently equipped items
                 foreach (var equippedItem in GameState.GetEquippedItemsCopy())
                 {
-                    long uid = equippedItem.Key;
-                    var playerItem = GameState.GetInventoryItem(uid);
-                    if (playerItem != null)
+                    var playerItem = GameState.GetInventoryItem(equippedItem.Key);
+                    if (playerItem != null && ItemGidToSkinId.TryGetValue(playerItem.ItemId, out int skinId))
                     {
-                        if (ItemGidToSkinId.TryGetValue(playerItem.ItemId, out int skinId))
-                        {
-                            if (!updatedSkins.Contains(skinId))
-                            {
-                                updatedSkins.Add(skinId);
-                            }
-                        }
+                        if (!updatedSkins.Contains(skinId))
+                            updatedSkins.Add(skinId);
                     }
                 }
 
-                // 4. Update skins field in lookMsg (EntityLook)
+                // 4. Rebuild skins field in EntityLook
                 lookMsg.Fields.RemoveAll(f => f.FieldNumber == 2);
                 using (var msSkins = new MemoryStream())
                 {
                     foreach (int skin in updatedSkins)
-                    {
                         ProtoMessage.WriteVarInt(msSkins, (ulong)skin);
-                    }
-                    lookMsg.Fields.Add(new ProtoField
-                    {
-                        FieldNumber = 2,
-                        WireType = 2,
-                        BytesValue = msSkins.ToArray()
-                    });
+                    lookMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = msSkins.ToArray() });
                 }
 
                 byte[] entityLookBytes = lookMsg.ToByteArray();
+                GameState.LookBytes = entityLookBytes;
 
-                // 5. Update EntityLook in wrapperMsg and write back to PlayerActorDetails
-                entityLookField.BytesValue = entityLookBytes;
-                gbewField.BytesValue = wrapperMsg.ToByteArray();
-                gbfoField.BytesValue = gbfoMsg.ToByteArray();
-                GameState.PlayerActorDetails = detailsMsg.ToByteArray();
-                
-                LogDebug($"[Appearance] Updated character look schema-freely. Total skins: {updatedSkins.Count}.");
+                // 5. Reconstruct actor details cleanly
+                GameState.PlayerActorDetails = DatabaseManager.ReconstructActorDetails(GameState.LookBytes, GameState.CharacterName);
 
+                LogDebug($"[Appearance] Updated character look. Total skins: {updatedSkins.Count}");
                 DatabaseManager.SaveCharacterLook(GameState.CharacterId, entityLookBytes);
-                LogDebug("[Appearance] Saved updated character look to database.");
+                LogDebug("[Appearance] Saved updated look to database.");
 
                 return entityLookBytes;
             }
             catch (Exception ex)
             {
-                LogDebug($"[-] Error in UpdateCharacterLook schema-freely: {ex.Message}");
+                LogDebug($"[-] Error in UpdateCharacterLook: {ex.Message}");
                 return null;
             }
         }
+
+        // ─── Packet builders ────────────────────────────────────────────────────────
+
+        private static byte[] BuildIryPacket(long itemUid, int position)
+        {
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+            output.WriteTag((uint)((1 << 3) | 0)); output.WriteInt64(itemUid);  // Field 1: UID
+            output.WriteTag((uint)((2 << 3) | 0)); output.WriteInt32(position); // Field 2: position
+            output.Flush();
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/iry", ms.ToArray());
+        }
+
+        private static byte[] BuildLuqPacket(byte[] lookBytes)
+        {
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+            output.WriteTag((uint)((2 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(lookBytes));     // Field 2: EntityLook
+            output.WriteTag((uint)((3 << 3) | 2)); output.WriteString(Guid.NewGuid().ToString());          // Field 3: session UUID
+            output.Flush();
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/luq", ms.ToArray());
+        }
+
+        private static byte[] BuildKkuPacket(byte[] lookBytes, long characterId)
+        {
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+            output.WriteTag((uint)((1 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(lookBytes)); // Field 1: EntityLook
+            output.WriteTag((uint)((2 << 3) | 0)); output.WriteInt64(characterId);                    // Field 2: Character ID
+            output.Flush();
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kku", ms.ToArray());
+        }
+
+        private static byte[] BuildHhfPacket()
+        {
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+            output.WriteTag((uint)((1 << 3) | 0)); output.WriteInt32(2); // HGZ_EBYW shortcut bar state
+            output.Flush();
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hhf", ms.ToArray());
+        }
+
+        private static byte[] BuildHhhPacket()
+        {
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+            output.WriteTag((uint)((1 << 3) | 0)); output.WriteInt32(2); // HGZ_EBYW shortcut bar state
+            output.Flush();
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hhh", ms.ToArray());
+        }
+
+        private static byte[] BuildKnsPacket()
+        {
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+            output.WriteTag((uint)((1 << 3) | 0)); output.WriteBool(true);
+            output.Flush();
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kns", ms.ToArray());
+        }
+
+        // ─── Utilities ──────────────────────────────────────────────────────────────
 
         private static ulong ReadVarIntFromBytes(byte[] data, ref int pos)
         {
@@ -274,213 +288,6 @@ namespace Jondo.Unity.Launcher.Handlers
             return value;
         }
 
-        private static byte[] BuildIryPacket(long itemUid, int position)
-        {
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-            
-            // Tag 1 (wire type 0): Item UID
-            output.WriteTag((uint)((1 << 3) | 0));
-            output.WriteInt64(itemUid);
-
-            // Tag 2 (wire type 0): Position
-            output.WriteTag((uint)((2 << 3) | 0));
-            output.WriteInt32(position);
-
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/iry", ms.ToArray());
-        }
-
-        private static byte[] BuildLuqPacket(byte[] lookBytes)
-        {
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-            
-            // Tag 2 (wire type 2): EntityLook (lkr)
-            output.WriteTag((uint)((2 << 3) | 2));
-            output.WriteBytes(ByteString.CopyFrom(lookBytes));
-
-            // Tag 3 (wire type 2): UUID string to identify this session/look update
-            output.WriteTag((uint)((3 << 3) | 2));
-            output.WriteString(Guid.NewGuid().ToString());
-
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/luq", ms.ToArray());
-        }
-
-        private static byte[] BuildKkuPacket(byte[] lookBytes, long characterId)
-        {
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-            
-            // Tag 1 (wire type 2): EntityLook
-            output.WriteTag((uint)((1 << 3) | 2));
-            output.WriteBytes(ByteString.CopyFrom(lookBytes));
-
-            // Tag 2 (wire type 0): Character ID
-            output.WriteTag((uint)((2 << 3) | 0));
-            output.WriteInt64(characterId);
-
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kku", ms.ToArray());
-        }
-
-        private static byte[] BuildHhfPacket()
-        {
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-            output.WriteTag((uint)((1 << 3) | 0));
-            output.WriteInt32(2); // Value 2 (HGZ_EBYW) to match Dofus 3.6 shortcut bar state
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hhf", ms.ToArray());
-        }
-
-        private static byte[] BuildHhhPacket()
-        {
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-            output.WriteTag((uint)((1 << 3) | 0));
-            output.WriteInt32(2); // Value 2 (HGZ_EBYW) to match Dofus 3.6 shortcut bar state
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hhh", ms.ToArray());
-        }
-
-        private static byte[] BuildIsfPacket()
-        {
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-            
-            // Tag 1 (wire type 0): Current Weight
-            output.WriteTag((uint)((1 << 3) | 0));
-            output.WriteInt32(9);
-
-            // Tag 2 (wire type 0): Max Weight
-            output.WriteTag((uint)((2 << 3) | 0));
-            output.WriteInt32(1000);
-
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/isf", ms.ToArray());
-        }
-
-        private static byte[] BuildKnsPacket()
-        {
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-            output.WriteTag((uint)((1 << 3) | 0));
-            output.WriteBool(true);
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kns", ms.ToArray());
-        }
-
-        public static byte[]? BuildUpdatedKriPacket()
-        {
-            if (CharacterSelectionHandler.originalKriPayload == null)
-            {
-                Console.WriteLine("[-] Error: originalKriPayload is null!");
-                return null;
-            }
-
-            try
-            {
-                var rootMsg = ProtoMessage.Parse(CharacterSelectionHandler.originalKriPayload);
-                var rootField = rootMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 2);
-                if (rootField == null) return null;
-
-                var wrapperMsg = ProtoMessage.Parse(rootField.BytesValue);
-                var wrapperField = wrapperMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
-                if (wrapperField == null) return null;
-
-                var anyMsg = ProtoMessage.Parse(wrapperField.BytesValue);
-                var anyValueField = anyMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                if (anyValueField == null) return null;
-
-                var kriMsg = ProtoMessage.Parse(anyValueField.BytesValue);
-                var larField = kriMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
-                if (larField == null) return null;
-
-                var larMsg = ProtoMessage.Parse(larField.BytesValue);
-
-                // Patch remaining points (capital)
-                var remainingField = larMsg.Fields.FirstOrDefault(f => f.FieldNumber == 7 && f.WireType == 0);
-                if (remainingField != null)
-                {
-                    remainingField.VarIntValue = (long)GameState.CharacterRemainingPoints;
-                }
-
-                // Patch statistics by mapping stats IDs in fields
-                foreach (var field in larMsg.Fields)
-                {
-                    if (field.FieldNumber == 3 && field.WireType == 2)
-                    {
-                        var statMsg = ProtoMessage.Parse(field.BytesValue);
-                        var statIdField = statMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0);
-                        if (statIdField != null)
-                        {
-                            int statId = (int)statIdField.VarIntValue;
-                            int databaseBaseVal = 0;
-
-                            if (statId == 11) databaseBaseVal = GameState.StatVitality;
-                            else if (statId == 12) databaseBaseVal = GameState.StatWisdom;
-                            else if (statId == 10) databaseBaseVal = GameState.StatStrength;
-                            else if (statId == 15) databaseBaseVal = GameState.StatIntelligence;
-                            else if (statId == 13) databaseBaseVal = GameState.StatChance;
-                            else if (statId == 14) databaseBaseVal = GameState.StatAgility;
-                            else continue;
-
-                            // Calculate equipped item bonuses for this stat ID
-                            int equipmentBonus = 0;
-                            foreach (var equipped in GameState.GetEquippedItemsCopy().Values)
-                            {
-                                if (equipped.Stats.TryGetValue(statId, out int bonus))
-                                {
-                                    equipmentBonus += bonus;
-                                }
-                            }
-
-                            // Patch base value (Field 2)
-                            var baseValField = statMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 0);
-                            if (baseValField != null)
-                            {
-                                baseValField.VarIntValue = (long)databaseBaseVal;
-                            }
-                            else
-                            {
-                                statMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = (long)databaseBaseVal });
-                            }
-                            
-                            // Patch equipment/objects value (Field 4)
-                            var objValField = statMsg.Fields.FirstOrDefault(f => f.FieldNumber == 4 && f.WireType == 0);
-                            if (objValField != null)
-                            {
-                                objValField.VarIntValue = (long)equipmentBonus;
-                            }
-                            else
-                            {
-                                statMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = (long)equipmentBonus });
-                            }
-                            
-                            field.BytesValue = statMsg.ToByteArray();
-                        }
-                    }
-                }
-
-                anyValueField.BytesValue = kriMsg.ToByteArray();
-                wrapperField.BytesValue = anyMsg.ToByteArray();
-                rootField.BytesValue = wrapperMsg.ToByteArray();
-
-                CharacterSelectionHandler.originalKriPayload = rootMsg.ToByteArray();
-                return CharacterSelectionHandler.originalKriPayload;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[-] Error building updated kri: {ex.Message}");
-                return null;
-            }
-        }
-
-        private static void LogDebug(string msg)
-        {
-            Program.LogDebug(msg);
-        }
+        private static void LogDebug(string msg) => Program.LogDebug(msg);
     }
 }

@@ -100,7 +100,7 @@ namespace Jondo.Unity.Launcher.Network
                 else if (payloadStr.Contains("type.ankama.com/ksl"))
                 {
                     // Character selection and database synchronization
-                    CharacterSelectionHandler.HandleCharacterSelectionRequest();
+                    CharacterSelectionHandler.HandleCharacterSelectionRequest(payload);
 
                     // Stream database-synchronized world entering packets
                     Console.WriteLine("[Game Node] Streaming database-synchronized world entering packets...");
@@ -128,11 +128,15 @@ namespace Jondo.Unity.Launcher.Network
                             byte[] packetPayload = new byte[length];
                             ms.Read(packetPayload, 0, length);
 
-                            // A. Patch InventoryContentMessage (icw) dynamically
-                            byte[] targetImdBytes = Encoding.UTF8.GetBytes("type.ankama.com/icw");
-                            if (NetworkEnvelope.ContainsSequence(packetPayload, targetImdBytes) && CharacterSelectionHandler.originalImdPayload != null)
+                            // A. Replace the real inventory frame (irm) with one built entirely
+                            // from the database inventory — the captured frame is discarded.
+                            // icw is NOT the inventory (its official payload carries guild territory data)
+                            // and streams through untouched.
+                            byte[] targetIrmBytes = Encoding.UTF8.GetBytes("type.ankama.com/irm");
+                            if (NetworkEnvelope.ContainsSequence(packetPayload, targetIrmBytes))
                             {
-                                packetPayload = CharacterSelectionHandler.originalImdPayload;
+                                packetPayload = NetworkEnvelope.BuildGameNodePacket(
+                                    "type.ankama.com/irm", CharacterSelectionHandler.BuildDynamicIrmPayload());
                                 lenBytes.Clear();
                                 ulong ulen = (ulong)packetPayload.Length;
                                 while (true)
@@ -142,7 +146,7 @@ namespace Jondo.Unity.Launcher.Network
                                     if (ulen > 0) lenBytes.Add((byte)(b | 0x80));
                                     else { lenBytes.Add(b); break; }
                                 }
-                                Program.LogDebug("[Game Node] Intercepted and streamed synchronized icw packet.");
+                                Program.LogDebug("[Game Node] Intercepted and streamed database-synchronized irm (inventory) packet.");
                             }
 
                             // B. Patch CurrentMapMessage (joh) dynamically
@@ -183,7 +187,7 @@ namespace Jondo.Unity.Launcher.Network
                             byte[] targetKriBytes = Encoding.UTF8.GetBytes("type.ankama.com/kri");
                             if (NetworkEnvelope.ContainsSequence(packetPayload, targetKriBytes))
                             {
-                                byte[]? updatedKri = InventoryHandler.BuildUpdatedKriPacket();
+                                byte[]? updatedKri = StatsHandler.BuildUpdatedKriPacket();
                                 if (updatedKri != null)
                                 {
                                     packetPayload = updatedKri;
@@ -241,6 +245,7 @@ namespace Jondo.Unity.Launcher.Network
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIcgMessage());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIboMessage());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildHmjMessage());
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildBvrMessage());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildLxsMessage());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildHnqMessage());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildKsvMessage());
@@ -310,7 +315,7 @@ namespace Jondo.Unity.Launcher.Network
                     }
                     
                     // Dynamically send character's real stats (kri)
-                    byte[]? updatedKri = InventoryHandler.BuildUpdatedKriPacket();
+                    byte[]? updatedKri = StatsHandler.BuildUpdatedKriPacket();
                     if (updatedKri != null)
                     {
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, updatedKri);
@@ -408,13 +413,25 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await InventoryHandler.HandleItemMovementRequest(stream, payload);
                 }
+                else if (payloadStr.Contains("type.ankama.com/ilr"))
+                {
+                    await NpcHandler.HandleNpcGenericActionRequest(stream, payload);
+                }
+                else if (payloadStr.Contains("type.ankama.com/lxh"))
+                {
+                    await NpcHandler.HandleLeaveDialogRequest(stream);
+                }
+                else if (payloadStr.Contains("type.ankama.com/kjl"))
+                {
+                    await NpcHandler.HandleNpcDialogReply(stream, payload);
+                }
                 else if (payloadStr.Contains("type.ankama.com/krc"))
                 {
-                    await HandleStatsUpgradeRequest(stream, payload);
+                    await StatsHandler.HandleStatsUpgradeRequest(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
                 {
-                    await HandleChatMessage(stream, payload);
+                    await ChatHandler.HandleChatMessage(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/itn"))
                 {
@@ -457,172 +474,6 @@ namespace Jondo.Unity.Launcher.Network
                 if (payload == null) break;
                 payloadStr = Encoding.UTF8.GetString(payload);
             }
-        }
-
-        private static async Task HandleStatsUpgradeRequest(NetworkStream stream, byte[] payload)
-        {
-            Console.WriteLine("[Game Node] Received Stats Upgrade Request (krc)");
-            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/krc");
-            int addVitality = 0;
-            int addWisdom = 0;
-            int addStrength = 0;
-            int addIntelligence = 0;
-            int addChance = 0;
-            int addAgility = 0;
-            
-            if (inner != null)
-            {
-                try
-                {
-                    int pos = 0;
-                    while (pos < inner.Length)
-                    {
-                        uint tag = NetworkEnvelope.ReadVarInt(inner, ref pos);
-                        int wireType = (int)(tag & 7);
-                        int fieldNum = (int)(tag >> 3);
-                        if (wireType == 0)
-                        {
-                            int val = (int)NetworkEnvelope.ReadVarInt(inner, ref pos);
-                            if (fieldNum == 1) addVitality = val;
-                            else if (fieldNum == 2) addWisdom = val;
-                            else if (fieldNum == 3) addStrength = val;
-                            else if (fieldNum == 4) addIntelligence = val;
-                            else if (fieldNum == 5) addChance = val;
-                            else if (fieldNum == 6) addAgility = val;
-                        }
-                        else
-                        {
-                            NetworkEnvelope.SkipField(inner, wireType, ref pos);
-                        }
-                    }
-                }
-                catch { }
-            }
-            
-            int totalAllocated = addVitality + addWisdom + addStrength + addIntelligence + addChance + addAgility;
-            int capitalSpent = addVitality * 1 + addWisdom * 3 + addStrength * 1 + addIntelligence * 1 + addChance * 1 + addAgility * 1;
-            Console.WriteLine($"[Stats] Allocated points: {totalAllocated} (Vit: {addVitality}, Wis: {addWisdom}, Str: {addStrength}, Int: {addIntelligence}, Cha: {addChance}, Agi: {addAgility}) - Capital Spent: {capitalSpent}");
-            
-            GameState.StatVitality += addVitality;
-            GameState.StatWisdom += addWisdom;
-            GameState.StatStrength += addStrength;
-            GameState.StatIntelligence += addIntelligence;
-            GameState.StatChance += addChance;
-            GameState.StatAgility += addAgility;
-            GameState.CharacterRemainingPoints = Math.Max(0, GameState.CharacterRemainingPoints - capitalSpent);
-            Console.WriteLine($"[Stats] New Stats - Vit: {GameState.StatVitality}, Wis: {GameState.StatWisdom}, Str: {GameState.StatStrength}, Int: {GameState.StatIntelligence}, Cha: {GameState.StatChance}, Agi: {GameState.StatAgility}");
-            Console.WriteLine($"[Stats] Remaining points: {GameState.CharacterRemainingPoints}");
-            
-            DatabaseManager.SaveCharacterStatsAndPosition(
-                GameState.CharacterId,
-                GameState.CharacterRemainingPoints,
-                GameState.StatVitality,
-                GameState.StatWisdom,
-                GameState.StatStrength,
-                GameState.StatIntelligence,
-                GameState.StatChance,
-                GameState.StatAgility,
-                GameState.MapId,
-                GameState.CellId,
-                GameState.Orientation
-            );
-            Console.WriteLine("[Stats] Saved updated stats and remaining points to database.");
-            
-            byte[] resultPacket = BuildStatsUpgradeResultPacket(GameState.CharacterRemainingPoints);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, resultPacket);
-            Console.WriteLine($"[Stats] Sent Stats Upgrade Result (krb) with {GameState.CharacterRemainingPoints} remaining points.");
-
-            // Send updated Character Stats List (kri)
-            byte[]? updatedKri = InventoryHandler.BuildUpdatedKriPacket();
-            if (updatedKri != null)
-            {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, updatedKri);
-                Console.WriteLine("[Stats] Sent updated Character Stats List (kri).");
-            }
-        }
-
-        private static async Task HandleChatMessage(NetworkStream stream, byte[] payload)
-        {
-            Console.WriteLine("[Game Node] Received Chat Message (kqn)");
-            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/kqn");
-            string? msgText = ExtractStringFieldFromPayload(inner, 3);
-            if (!string.IsNullOrEmpty(msgText))
-            {
-                Console.WriteLine($"[Chat] {GameState.CharacterName}: {msgText}");
-                byte[] echoPacket = BuildChatBroadcastPacket(msgText, GameState.CharacterName, 0);
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, echoPacket);
-                Console.WriteLine("[Chat] Echoed chat message back to client.");
-            }
-        }
-
-        private static string? ExtractStringFieldFromPayload(byte[]? innerPayload, int targetTag)
-        {
-            if (innerPayload == null) return null;
-            try
-            {
-                int pos = 0;
-                while (pos < innerPayload.Length)
-                {
-                    uint tag = NetworkEnvelope.ReadVarInt(innerPayload, ref pos);
-                    int wireType = (int)(tag & 7);
-                    int fieldNum = (int)(tag >> 3);
-                    if (fieldNum == targetTag && wireType == 2)
-                    {
-                        int len = (int)NetworkEnvelope.ReadVarInt(innerPayload, ref pos);
-                        if (pos + len <= innerPayload.Length)
-                        {
-                            return Encoding.UTF8.GetString(innerPayload, pos, len);
-                        }
-                    }
-                    else
-                    {
-                        NetworkEnvelope.SkipField(innerPayload, wireType, ref pos);
-                    }
-                }
-            }
-            catch { }
-            return null;
-        }
-
-        private static byte[] BuildChatBroadcastPacket(string messageText, string senderName, int channel = 0)
-        {
-            using var kqpMs = new MemoryStream();
-            {
-                var output = new CodedOutputStream(kqpMs);
-                
-                long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                output.WriteTag((uint)((4 << 3) | 0)); // Field 4, VarInt
-                output.WriteInt64(timestamp);
-                
-                output.WriteTag((uint)((7 << 3) | 0)); // Field 7, VarInt
-                output.WriteInt64(GameState.CharacterId); // Actor ID
-                
-                output.WriteTag((uint)((8 << 3) | 0)); // Field 8, VarInt
-                output.WriteInt32(channel);
-                
-                output.WriteTag((uint)((9 << 3) | 2)); // Field 9, LengthDelimited
-                output.WriteString(messageText);
-                
-                output.WriteTag((uint)((10 << 3) | 2)); // Field 10, LengthDelimited
-                output.WriteString(senderName);
-                
-                output.Flush();
-            }
-            byte[] kqpBytes = kqpMs.ToArray();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kqp", kqpBytes);
-        }
-
-        private static byte[] BuildStatsUpgradeResultPacket(int remainingPoints)
-        {
-            using var krbMs = new MemoryStream();
-            {
-                var output = new CodedOutputStream(krbMs);
-                output.WriteTag((uint)((1 << 3) | 0)); // Field 1, VarInt
-                output.WriteInt32(remainingPoints);
-                output.Flush();
-            }
-            byte[] krbBytes = krbMs.ToArray();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/krb", krbBytes);
         }
 
         private static byte[] PatchJpvEnteringPacket(byte[] packetBytes)

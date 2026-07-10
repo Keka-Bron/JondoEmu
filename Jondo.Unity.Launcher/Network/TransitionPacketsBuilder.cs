@@ -94,6 +94,13 @@ namespace Jondo.Unity.Launcher.Network
             return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kqo", ms.ToArray());
         }
 
+        public static byte[] BuildBvrMessage()
+        {
+            var bvrMsg = new ProtoMessage();
+            bvrMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = GameState.Kamas });
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/bvr", bvrMsg.ToByteArray());
+        }
+
         public static byte[] BuildHhqMessage()
         {
             using var ms = new MemoryStream();

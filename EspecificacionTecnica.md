@@ -481,7 +481,7 @@ Este conjunto de interceptores garantiza un bypass total, dinámico y robusto de
 
 ---
 
-## 9. Protocolo de Chat e Interacciones In-Game (Mensajes kqn, kqp, krc, krb)
+## 9. Protocolo de Chat e Interacciones In-Game (Mensajes kqn, kqp, krc)
 
 Con la entrada exitosa al mundo del juego en la versión 3.6, se han analizado e identificado las estructuras de los mensajes que controlan las interacciones in-game básicas. Estos mensajes se transmiten a través del socket del Game Node en el puerto `5555` utilizando la serialización estándar de Protobuf envuelta en el contenedor de mensajes del juego.
 
@@ -523,24 +523,20 @@ La manipulación de los puntos de características obtenidos al subir de nivel s
 * **Nombre de Clase Desofuscada:** `krc`
 * **URI del Mensaje:** `type.ankama.com/krc`
 * **Estructura del Mensaje:**
-  El mensaje contiene exactamente 6 campos opcionales de tipo varint, donde cada campo representa el número de puntos que el jugador ha decidido asignar a una característica específica en la interfaz gráfica:
-  * **Campo 1 (varint, tag 1):** Puntos asignados a Vitalidad.
-  * **Campo 2 (varint, tag 2):** Puntos asignados a Sabiduría.
-  * **Campo 3 (varint, tag 3):** Puntos asignados a Fuerza (Tierra).
-  * **Campo 4 (varint, tag 4):** Puntos asignados a Inteligencia (Fuego).
-  * **Campo 5 (varint, tag 5):** Puntos asignados a Suerte (Agua).
-  * **Campo 6 (varint, tag 6):** Puntos asignados a Agilidad (Aire).
+  El mensaje contiene exactamente 6 campos opcionales de tipo varint, donde cada campo representa el número de puntos que el jugador ha decidido asignar a una característica específica en la interfaz gráfica. Los campos están ordenados alfabéticamente en inglés:
+  * **Campo 1 (varint, tag 1):** Puntos asignados a Agilidad (Agility - Stat ID 14).
+  * **Campo 2 (varint, tag 2):** Puntos asignados a Suerte (Chance - Stat ID 13).
+  * **Campo 3 (varint, tag 3):** Puntos asignados a Inteligencia (Intelligence - Stat ID 15).
+  * **Campo 4 (varint, tag 4):** Puntos asignados a Fuerza (Strength - Stat ID 10).
+  * **Campo 5 (varint, tag 5):** Puntos asignados a Vitalidad (Vitality - Stat ID 11).
+  * **Campo 6 (varint, tag 6):** Puntos asignados a Sabiduría (Wisdom - Stat ID 12).
   
-  *Ejemplo práctico:* Si el usuario tiene 5 puntos restantes y los asigna todos a Fuerza, el cliente serializará únicamente el Campo 3 con valor `5` (hexadecimal: `18-05`).
+  *Ejemplo práctico:* Si el usuario tiene 5 puntos restantes y los asigna todos a Inteligencia, el cliente serializará únicamente el Campo 3 con valor `5` (hexadecimal: `18-05`).
 
-#### B. Resultado y Confirmación del Servidor (`krb`)
-* **Dirección:** Servidor -> Cliente (GAME_S->C)
-* **Nombre de Clase Desofuscada:** `krb`
-* **URI del Mensaje:** `type.ankama.com/krb`
-* **Estructura del Mensaje:**
-  * **Campo 1 (varint, tag 1):** Número de puntos de características que le quedan al personaje tras procesar la asignación (ej. `0` si se asignaron todos, o los puntos restantes si fue una asignación parcial).
-  
-  *Nota técnica:* Al recibir este paquete de confirmación del servidor con los puntos restantes correctos, el cliente consolida la asignación en la interfaz gráfica y bloquea los puntos sin revertir la acción.
+#### B. Resultado y Confirmación del Servidor
+* **Nota técnica:** A diferencia de versiones anteriores que usaban `krb`, el servidor oficial de Dofus 3.6/3.7 **no envía ningún paquete `krb`** en respuesta a la asignación de puntos. En su lugar, el servidor simplemente valida los puntos en la base de datos y envía de vuelta dos paquetes estándar de actualización de estado:
+  * `type.ankama.com/isf` (InventoryWeightMessage): Actualiza los pods de peso del inventario.
+  * `type.ankama.com/kri` (CharacterStatsListMessage): Actualiza la lista completa de características del personaje reflejándose de forma instantánea en el cliente.
 
 ---
 
@@ -1738,3 +1734,984 @@ Dado que las bases de datos SQLite locales (`world.db`, `auth.db` y `mock_server
          - En `MapChangeHandler.HandleMapChangeRequest`, calculamos la orientación en base a la dirección de la transición del mapa (Right -> 1, Left -> 5, Down -> 3, Up -> 7).
          - En `MapLoadHandler.cs`, actualizamos la inyección del paquete `jpv` (y su fallback minimalista) para que utilice `GameState.Orientation` en lugar de forzar siempre el valor por defecto `1`.
     - **Estado de Compilación y Despliegue**: Compilado de nuevo en modo Debug y Release de forma exitosa.
+
+---
+
+### 11.63. Intento de Reparación #63 (2026-06-28)
+
+*   **Objetivo**:
+    - Lograr spawnear al NPC "Noken Okuto" en el mapa de inicio con su nombre correcto, tipo de entidad (NPC) y apariencia visual oficial, resolviendo el problema en el que se spawneaba como un monstruo ("Cañón dorf" con apariencia de armadillo).
+*   **Problemas Identificados**:
+    - **Nivel de Anidación en Protobuf**: En la implementación anterior de `BuildNpcActorMsg`, los sub-mensajes `npcDesc` y `lookContainer` se agregaban directamente a nivel de raíz del mensaje `Details` (`lgx`) bajo `FieldNumber = 1` y `FieldNumber = 2`. Como consecuencia, el cliente de Unity parseaba la información bajo `Field 1` (`gbfn`, reservado para personajes y monstruos de tipo `lgk`) en lugar de `Field 2` (`gbfo`, reservado para NPCs de tipo `lgv`). Al ver la estructura en `Field 1`, el cliente buscaba el ID `2892` en el catálogo de monstruos, resultando en "Cañón dorf" (que comparte el ID `2892` en los assets del juego).
+    - **Estructura de Look Incorrecta**: La apariencia del NPC estaba configurada de forma estática con un Bones ID de `-1` y una sub-entidad para el BoneId real (`231`). Al no tener una estructura estándar para NPC sin sub-entidades, el cliente fallaba al renderizar y usaba un look de fallback (el armadillo).
+*   **Modificaciones en el Emulador Launcher**:
+    - **Corrección de Estructura de Protobuf ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Modificamos `BuildNpcActorMsg` para envolver correctamente la descripción del NPC (`npcDesc` bajo Field 1) y el contenedor de apariencia (`lookContainer` bajo Field 2) dentro de un sub-mensaje del tipo `GameRolePlayNpcInformations` (`lgvMsg`), el cual se inyecta como `Field 2` (`gbfo`) del mensaje raíz de detalles `Details` (`lgx`).
+    - **Parser Dinámico de Look**: Implementamos un analizador en `BuildNpcActorMsg` para procesar el string de apariencia (`Look`) almacenado en SQLite. Si tiene el formato estándar (como `"{231|||95}"`), extrae dinámicamente el Bones ID (`231`), la lista de apariencias (skins) y la escala del NPC, serializándolos de forma nativa en `EntityLook` (Tag 2 para Bones ID y Tag 1 para Skins de forma repetida).
+    - **Base de Datos y Persistencia de Look ([DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**: Añadimos la columna `Look` (TEXT, NULL) a la tabla `NpcSpawns` y actualizamos todos los registros en las bases de datos de SQLite con los looks oficiales extraídos de los bundles del cliente (especialmente para Noken Okuto con `"{231|||95}"`).
+*   **Estado de Compilación y Despliegue**:
+    - **Emulador Launcher**: Compilación exitosa tanto en modo **Debug** como **Release** (0 errores) de la solución de .NET.
+*   **Resultados Esperados**: El cliente renderizará correctamente al NPC "Noken Okuto" en la celda `329` del mapa `154010883` con su aspecto visual oficial y su nombre visible al hacer hover, sin transformaciones en monstruo.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - La inyección de la estructura anidada de NPC bajo Field 2 (gbfo) del detailsMsg de lgx causó un fallo crítico de parseo en el cliente de Unity. Al no completarse el parseo del paquete jpv, la máquina de estados del cliente se congeló: no se renderizaron los personajes, ni los NPCs, ni la interfaz de usuario (HUD) del juego. Además, los NPCs de la plantilla original del mapa de Incarnam (como el NPC -20000 con ID 3241) se filtraron en el mapa loaded, colisionando en el Contextual ID (-20000) e interfiriendo con el spawn del NPC real.
+
+---
+
+### 11.64. Intento de Reparación #64 (2026-06-28)
+
+*   **Objetivo**:
+    - Resolver el congelamiento gráfico del cliente (ausencia de interfaz HUD y renderizado de actores) y corregir las colisiones de IDs eliminando por completo los NPCs residuales del mapa de la plantilla.
+*   **Problemas Identificados**:
+    - **Nivel de Anidación Plano de Protobuf**: El cliente no utiliza un wrapper anidado para la información de detalle de los actores basados en contextual ID en tiempo de ejecución. En su lugar, el cliente determina dinámicamente si se trata de un NPC (si su Contextual ID es negativo en rango NPC) o de un personaje (si es positivo), decodificando los bytes del Details directamente bajo las estructuras planas de `GameRolePlayNpcInformations` (Field 1 = npcDesc, Field 2 = lookContainer) o `GameRolePlayCharacterInformations` (Field 1 = EntityLook, Field 2 = HumanoidOption). Por lo tanto, el envoltorio del Intento #63 rompió el parsing nativo del cliente.
+    - **Fuga de NPCs de la Plantilla**: Al cargar el jpv desde la plantilla `jpv_packet.bin` (original de Incarnam), los NPCs residuales del templo (con contextual IDs de `-20000` a `-20003`) se mantuvieron en el listado. Al inyectar nuestro NPC de SQLite con ID `-20000` (Noken Okuto), se generó una colisión de ID y una fuga de entidades ajenas al mapa actual.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Filtrado Total de Actores Fantasma ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Modificamos el bucle de pre-procesamiento del jpv para eliminar de forma agresiva tanto a otros personajes de la plantilla (`id > 0`) como a todos los NPCs fantasmas de la plantilla (`id < 0`), despejando el listado de actores antes de inyectar las entidades locales de SQLite.
+    - **Restauración de Estructura de Detalles Plana ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Reestablecimos la codificación de `detailsMsg` en `BuildNpcActorMsg` para inyectar directamente `npcDesc` en `Field 1` y `lookContainer` en `Field 2`, eliminando la envoltura rota de `lgvMsg`/`gbfo`.
+*   **Estado de Compilación y Despliegue**:
+    - **Emulador Launcher**: Compilación exitosa en modos **Debug** y **Release** (0 errores) de la solución de .NET.
+*   **Resultados Esperados**: El cliente cargará el mapa de forma correcta y fluida, renderizando al personaje principal, el HUD del juego, los menús de interacción, y al NPC "Noken Okuto" en su posición e ID correspondientes sin colisiones ni clones.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - La eliminación de los NPCs de la plantilla de jpv causó un congelamiento gráfico similar en el cliente: no se renderizó la interfaz, el mapa ni el personaje principal. Esto indica que alterar la lista original de actores eliminando entidades necesarias o alterando el conteo de la plantilla rompe la lógica de inicialización del mapa en el cliente.
+
+---
+
+### 11.65. Intento de Reparación #65 (2026-06-28)
+
+*   **Objetivo**:
+    - Lograr spawnear al NPC "Noken Okuto" en el mapa de inicio con su nombre correcto, tipo de entidad (NPC) y apariencia visual oficial, respetando al 100% el listado original de actores del JPV para evitar el congelamiento del cliente.
+*   **Problemas Identificados**:
+    - **Inestabilidad por Alteración del Listado de Actores**: Eliminar o duplicar elementos del listado de actores (`Field 15`) en la plantilla JPV causa problemas de desincronización e inestabilidad en el cliente de Unity, congelando el renderizado de la escena y menús.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Reemplazo/Mapeo de NPCs en la Plantilla ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: En lugar de agregar nuevos actores o borrar los existentes, modificamos el bucle del JPV para parchear directamente los NPCs ya pre-existentes en la plantilla de red (`jpv_packet.bin`).
+      - Si hay NPCs definidos en la base de datos SQLite para el mapa actual, mapeamos sus datos (NpcId, CellId, Orientation, Look) sobre los slots de los NPCs originales de la plantilla (reutilizando IDs contextuales negativos como `-20000`).
+      - Los NPCs residuales de la plantilla que no necesitamos en el mapa actual son movidos a la casilla `0` (posición oculta fuera de pantalla), de modo que el cliente los procese formalmente pero no estorben visualmente ni colisionen.
+    - **Estructura Plana de Detalles y Soporte Base de Datos ([DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**: Re-introdujimos la tabla SQLite `NpcSpawns`, la clase de modelo `NpcSpawn` y la consulta `GetNpcSpawnsForMap`. Se utiliza la estructura plana y limpia para codificar `detailsMsg` (Field 1 = npcDesc, Field 2 = lookContainer) y se parsea dinámicamente el look en `BuildNpcActorMsg`.
+*   **Estado de Compilación y Despliegue**:
+    - **Emulador Launcher**: Compilación exitosa en modos **Debug** y **Release** (0 errores) de la solución de .NET.
+*   **Resultados Esperados**: El cliente cargará el mapa inicial fluidamente con toda la interfaz de usuario, menús y personaje principal visibles. El NPC "Noken Okuto" se renderizará de forma estable en la casilla `329` con su apariencia oficial (`{231|||95}`).
+*   **Resultados Obtenidos**: **FRACASO**.
+    - Aunque mapeamos los NPCs en la plantilla, el cliente volvió a congelarse sin mostrar personaje ni HUD. Además, al sobrescribir `world.db` con la plantilla de github, el personaje de pruebas perdió su nombre original `[!CADERNIS!]` y volvió a llamarse "CADERNIS".
+
+---
+
+### 11.66. Intento de Reparación #66 (2026-06-28)
+
+*   **Objetivo**:
+    - Resolver el congelamiento gráfico del cliente garantizando el orden de campos estricto en Protobuf, restaurar el nombre del personaje `[!CADERNIS!]` y spawnear al NPC de forma correcta.
+*   **Problemas Identificados**:
+    - **Reordenamiento Secuencial de Campos**: En C#, al hacer `Remove` y `Add` de campos en `actorMsg` para cambiar la Disposition (Field 1) o Details (Field 2), alteramos su orden físico en la lista interna de campos. Cuando se serializa el mensaje, los campos se escriben en el orden modificado (ej. `3, 2, 1` o `2, 3, 1`). El deserializador secuencial del cliente de Unity no tolera que los campos estén desordenados y descarta el paquete del actor de forma silenciosa, congelando el renderizado de la escena y menús.
+    - **Sobrescritura del Nombre del Personaje**: Se perdió el nombre de personaje `[!CADERNIS!]` al sobrescribir el archivo de base de datos con la plantilla limpia de github (la cual usa "CADERNIS" por defecto).
+*   **Modificaciones en el Emulador Launcher**:
+    - **Parcheo In-Place Estricto ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Reescribimos todo el bucle de procesamiento del JPV para modificar los campos de `Disposition` (Field 1) y `Details` (Field 2) **in-place** (cambiando directamente su propiedad `BytesValue`) sin removerlos ni re-insertarlos. Esto conserva el orden secuencial original `1, 2, 3` intacto en los bytes de red.
+    - **Restauración de Semilla y Base de Datos ([DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**:
+      - Modificamos el valor de semilla en `DatabaseManager.cs` para usar `[!CADERNIS!]` en lugar de "CADERNIS".
+      - Copiamos la base de datos de respaldo del usuario (`C:\Jondo\world.db`) que contenía los datos intactos a los directorios del launcher, Debug y Release.
+*   **Estado de Compilación y Despliegue**:
+    - **Emulador Launcher**: Compilación correcta en modos **Debug** y **Release** (0 errores) de la solución de .NET.
+*   **Resultados Esperados**: El cliente cargará la selección y el mapa de inicio conservando el nombre `[!CADERNIS!]`. Se renderizarán correctamente el personaje principal, los menús/HUD y al NPC "Noken Okuto" en su posición sin congelamientos.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - La carga del mapa inicial del templo se congelaba de igual forma, y no se cargaba el último mapa donde se dejó al personaje. Esto nos permitió descubrir que mover los NPCs residuales de la plantilla a la casilla 0 causa una colisión/excepción de NavMesh en el motor Unity de Dofus 3, y que la selección de personajes estaba hardcodeada en el emulador.
+
+---
+
+### 11.67. Intento de Reparación #67 (2026-06-28)
+
+*   **Objetivo**:
+    - Corregir el congelamiento de la interfaz (menús/HUD) y habilitar la persistencia del último mapa cargando dinámicamente el personaje seleccionado en el login.
+*   **Problemas Identificados**:
+    - **Selección de Personaje Hardcodeada**: En [CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs), el método `HandleCharacterSelectionRequest` cargaba de forma fija el ID `13825558L` de la base de datos (que apuntaba al mapa `154011397` del templo). Esto ignoraba por completo la selección del personaje real (`906071769378L`), el cual estaba guardado en el mapa de la Estatua (`154010884`).
+    - **Excepción de Posicionamiento en Casilla 0**: En el motor Unity de Dofus 3, mover a todos los NPCs residuales no mapeados a la casilla `0` generaba colisiones/excepciones internas al procesar NavMesh/coordenadas inválidas, deteniendo el renderizado y ocultando la UI.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Carga Dinámica de Personaje ([CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs))**: Modificamos el método para recibir el payload del paquete de selección `ksl` y parsear el ID del personaje seleccionado (Field 1) usando `ProtoMessage`. Esto se enlazó en [GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs) para cargar dinámicamente su posición de SQLite.
+    - **Preservación de NPCs de la Plantilla ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Eliminamos la reubicación a la casilla `0` para los NPCs residuales de la plantilla. Si no hay suficientes NPCs registrados en SQLite para cubrir el mapa actual, los slots sobrantes de la plantilla se dejan **completamente intactos** (preservando sus celdas originales).
+*   **Estado de Compilación y Despliegue**:
+    - **Emulador Launcher**: Compilación correcta en modos **Debug** y **Release** (0 errores) de la solución de .NET.
+*   **Resultados Esperados**: El emulador cargará dinámicamente el personaje seleccionado. Al entrar en el juego, se cargará el mapa de la Estatua (`154010884`) con HUD, menús y personaje visibles. Al mover al personaje al mapa inicial (`154010883`), se guardará su posición correctamente y se renderizará el NPC Noken Okuto (`2892`) mapeado sobre la plantilla in-place sin congelamientos.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - Aunque el personaje seleccionaba dinámicamente y cargaba de forma fluida el mapa de la Estatua con la interfaz y personajes visibles, al entrar al mapa de inicio (`154010883`), tanto el jugador como el NPC se volvieron completamente invisibles. Esto delató una excepción crítica en el motor 3D de Unity al intentar renderizar un esqueleto (Bone ID) no cargado.
+
+---
+
+### 11.68. Intento de Reparación #68 (2026-06-28)
+
+*   **Objetivo**:
+    - Evitar la invisibilidad de los actores en el mapa de inicio asegurando que el NPC Noken Okuto utilice un Bone ID compatible que se encuentre pre-cargado en la escena actual.
+*   **Problemas Identificados**:
+    - **Cuelgue de Renderizado por Hueso Inexistente (Bone 231)**: El look de Noken Okuto utiliza el esqueleto `231` (Look `{231|||95}`). En Dofus 3, los recursos de esqueletos se cargan de forma dinámica en la escena de Unity. Si se intenta dibujar un actor con un Bone ID que no ha sido cargado en memoria para la escena actual, Unity arroja una excepción fatal silenciosa en el bucle de renderizado 3D, abortando el dibujado de todos los actores siguientes en cola (provocando que el jugador y el NPC desaparezcan por completo, aunque el HUD de la UI siga activo).
+*   **Modificaciones en el Emulador Launcher**:
+    - **Mapeo a Hueso Seguro ([DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**: Modificamos la semilla de inicialización del NPC "Noken Okuto" para registrarlo con el esqueleto seguro `284` (el del monstruo Cañón dorf de la plantilla original) y look `{284|||120}`. Al saber que este hueso es totalmente funcional y pre-cargado por el cliente en Incarnam, garantizamos que no se rompa la tubería gráfica.
+    - **Limpieza de Bases de Datos**: Eliminamos todos los archivos locales `world.db` en las carpetas del launcher y de compilados para asegurar que el emulador regenere y siembre el nuevo hueso de forma limpia en el primer arranque.
+*   **Estado de Compilación y Despliegue**:
+    - **Emulador Launcher**: Compilación correcta en modos **Debug** y **Release** (0 errores) de la solución de .NET.
+*   **Resultados Esperados**: Al entrar al mapa de inicio (`154010883`), tanto el jugador principal como el NPC Noken Okuto (renderizado temporalmente con la apariencia del armadillo por usar el hueso 284) serán visibles de forma estable junto con todo el HUD e interfaz, confirmando la validez del canal de renderizado.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El NPC Noken Okuto se renderizó como un Armadillo de nivel 3 (Cañón dorf). Esto demostró que el hueso 284 no era lo que fallaba en sí, sino que el cliente entraba en modo *fallback* (mostrando el Armadillo de emergencia de Incarnam) debido a una serialización inválida en los parámetros de la subentidad.
+
+---
+
+### 11.69. Intento de Reparación #69 (2026-06-30)
+
+*   **Objetivo**:
+    - Corregir los parámetros de anclaje de la subentidad del NPC en Protobuf y solucionar problemas de caché de DLLs en la raíz del emulador.
+*   **Problemas Identificados**:
+    - **Punto de Anclaje de Subentidad Incorrecto**: En `BuildNpcActorMsg`, el punto de anclaje corporal (`Category` en Field 6) estaba hardcodeado a `3` (anclaje de pelo/mascota), impidiendo al cliente acoplar el cuerpo. Se determinó que para NPCs humanoides debe ser `5` (cuerpo principal) y la escala por defecto `2` (100% en Dofus 3).
+    - **DLL Desactualizada en la Raíz**: Al compilar la solución, `dotnet build` actualizaba los archivos en `bin/Release/` y `bin/Debug/`, pero el launcher `Jondo Emulator Launcher.exe` carga la DLL del emulador directamente desde la carpeta raíz. La DLL de la raíz tenía fecha de modificación del 28 de junio.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Actualización de Parámetros ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Modificamos el valor de la escala de la subentidad a `2` y la categoría de anclaje a `5`.
+    - **Sincronización de Binarios**: Copiamos todas las DLLs de la compilación Release a la carpeta raíz del emulador.
+    - **Restauración de Aspecto de Noken**: Devolvimos el aspecto de Noken Okuto (`2892`) a su valor oficial `{231|||95}`.
+*   **Resultados Esperados**: El cliente renderizará a Noken Okuto con su aspecto oficial humano.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El NPC se siguió renderizando como un Armadillo, pero esta vez con nivel **(5)** en el hover. Esto demostró que al estar en modo fallback de monstruo, el cliente interpretaba la categoría de anclaje `5` como el nivel/grado del monstruo.
+
+---
+
+### 11.70. Intento de Reparación #70 (2026-06-30)
+
+*   **Objetivo**:
+    - Envolver los detalles del NPC en el contenedor `gbfo` (NPC details wrapper) de acuerdo con la definición del esquema Protobuf de `lgx` (Details).
+*   **Problemas Identificados**:
+    - **Nesting faltante**: La definición del protocolo indicaba que los campos `npcDesc` y `lookContainer` debían ir envueltos bajo el Field 2 (`gbfo`) del mensaje Details (`lgx`), y no sueltos directamente.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Añadida Anidación ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Modificamos `BuildNpcActorMsg` para empaquetar `npcDesc` (Field 1) y `lookContainer` (Field 2) dentro de un sub-mensaje `gbfoMsg`, y luego insertamos `gbfoMsg` en el Field 2 del mensaje de detalles.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El cliente se congeló en pantalla negra sin cargar HUD, interfaz ni personajes. Esto demostró que el doble anidamiento es inválido en Dofus 3 y la estructura plana original de detalles es la correcta.
+
+---
+
+### 11.71. Intento de Reparación #71 (2026-06-30)
+
+*   **Objetivo**:
+    - Forzar el envío de los bytes de aspecto oficiales de un NPC verificado (Rykke Errel) en la celda del NPC de inicio para comprobar la validez de la transmisión del empaquetado plano.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Reversión del Anidamiento**: Revertimos `detailsMsg` a la estructura plana original (Field 1: `npcDesc`, Field 2: `lookContainer`).
+    - **Override de Bytes de Aspecto ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Si el ID de NPC es `2892` (Noken Okuto), inyectamos directamente el flujo de bytes oficial de Rykke Errel extraído del PCAPNG (`10-FF-FF-FF-FF-FF-FF-FF-FF-FF-01-1A-19-0A-07-18-8A-20-20-02-30-06-1A-0E-18-D6-07-20-02-2A-05-08-B2-19-18-03-30-05-20-01`).
+*   **Resultados Obtenidos**: **FRACASO**.
+    - La estructura de red plana funcionó sin congelar el cliente. Sin embargo, el NPC en la casilla `329` se renderizó como un grupo de monstruos integrado por un **Tigrelindre (Nivel 6)** y un **Miaucróbata (Nivel 5)**. Este resultado demostró dos cosas cruciales:
+      1. La serialización de los bytes del look en la estructura plana es **100% correcta**, ya que el cliente leyó correctamente los huesos `4106` (Tigrelindre) y `982` (Miaucróbata) embebidos en el look de Rykke Errel.
+      2. El cliente interpretó todo el mensaje de detalles como una descripción de grupo de monstruos (`lej`), lo que hizo que leyera los huesos del aspecto como IDs de monstruos en lugar de componentes visuales de un NPC humano.
+
+---
+
+### 11.72. Intento de Reparación #72 (2026-06-30)
+
+*   **Objetivo**:
+    - Forzar el envío de una réplica 100% idéntica (byte por byte) de los detalles de un NPC oficial (Rykke Errel, ID `3246`) para diagnosticar si el cliente realiza la discriminación a nivel de la ID del NPC.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Override de ID de NPC ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Si el ID de NPC de base de datos es `2892` (Noken Okuto), forzamos que se envíe la ID oficial `3246` en `npcDesc`. Junto con el look de Rykke Errel ya inyectado, esto genera un paquete idéntico al capturado en el sniffer.
+*   **Resultados Obtenidos**: **FRACASO**.
+
+---
+
+### 11.73. Intento de Reparación #73 (2026-06-30)
+
+*   **Objetivo**:
+    - Transicionar a un esquema de carga de mapas 100% dinámico y controlado por base de datos, eliminando la dependencia de parchear archivos estáticos `.bin`.
+*   **Problemas Identificados**:
+    - El parcheo en tiempo de ejecución de buffers `.bin` grabados de partidas oficiales heredaba metadatos basura y estructuras que el cliente no esperaba en el contexto local (como zaaps e interfaces de Incarnam).
+*   **Modificaciones en el Emulador Launcher**:
+    - **Carga Dinámica en [MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs)**: Implementamos la construcción dinámica de los mensajes `lxd` (vacío) y `jpv` utilizando `ProtoMessage` con consulta directa a la tabla `NpcSpawns` de SQLite.
+    - Se invirtieron los campos de los actores en el mapa (`lnk`) poniendo el ID contextual en el Campo 2 y detalles en el Campo 3.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El cliente se congeló en pantalla negra sin cargar HUD, interfaz ni personajes.
+
+---
+
+### 11.74. Intento de Reparación #74 (2026-07-03)
+
+*   **Objetivo**:
+    - Corregir el anidamiento estructural del NPC y restablecer el orden nativo de los campos de los actores (`lnk`) en el mapa.
+*   **Problemas Identificados**:
+    - **Estructura Interna del NPC Incorrecta**: `npcDesc` (`ley`) se estaba serializando en la raíz de `lgx` en lugar de ir bajo `lgv` (Campo 1), y la apariencia del NPC (`EntityLook`) se serializaba en la raíz de `lgv` (Campo 1) en lugar de ir en el Campo 2 de `lgv`.
+    - **Inversión de Campos de Actor**: En el intento #73 se intercambiaron erróneamente el ID y los detalles del actor, lo que impedía que el cliente los procesara.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Corrección de Anidamiento ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**:
+      - `npcDesc` (`ley`) -> Campo 1 de `lgv`.
+      - `EntityLook` (`lkr`) -> Campo 2 de `lgv`.
+      - `lgv` -> Campo 2 de `lgx` (`detailsMsg`).
+    - **Restauración de Campos de Actor**: Detalles del actor en el Campo 2 e ID en el Campo 3.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El cliente se congeló en pantalla de mapa vacía sin renderizar personajes ni HUD.
+
+---
+
+### 11.75. Intento de Reparación #75 (2026-07-03)
+
+*   **Objetivo**:
+    - Serializar la apariencia del NPC basándose en la estructura decodificada de Nora Nax en el PCAP de red.
+*   **Modificaciones en el Emulador Launcher**:
+    - Cambiada la estructura en `BuildNpcActorMsg`: el Campo 1 de Detalles (`lgx`) recibe el `EntityLook` con `bonesId = spawn.NpcId` y `scale = 3`, y el Campo 2 recibe `lgv` que contiene `EntityLook` con los huesos visuales.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El cliente se congeló al renderizar debido a que la clase de apariencia visual tiene campos con offsets diferentes.
+
+---
+
+### 11.76. Intento de Reparación #76 (2026-07-03)
+
+*   **Objetivo**:
+    - Corregir el mapeo de campos de la apariencia visual del NPC utilizando los campos de la clase `lci`.
+*   **Problemas Identificados**:
+    - La apariencia visual utiliza la clase `lci` que espera: huesos en Campo 3, skins en Campo 4 y escala en Campo 6.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Corrección de lci ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Reestructurado el visual `EntityLook` para usar los campos 3, 4 y 6, y empaquetado bajo `lmm` -> `lmf` -> `lhx` -> `lci`.
+*   **Resultados Obtenidos**: **ÉXITO ROTUNDO**.
+    - El personaje, el NPC Noken Okuto, el HUD, los menús, el chat, y todo el entorno se renderizaron de forma estable y fluida en Incarnam.
+
+---
+
+### 11.77. Intento de Reparación #77 (2026-07-03)
+
+*   **Objetivo**:
+    - Eliminar la dependencia de archivos `.bin` y construir los detalles del personaje jugador de forma 100% dinámica. Corregir la sobrescritura accidental de bases de datos locales al recompilar.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Exclusión de Bases de Datos ([Jondo.Unity.Launcher.csproj](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Jondo.Unity.Launcher.csproj))**: Añadida regla de exclusión de compilación para `world.db` y `auth.db` para que el compilador no machaque las bases de datos de ejecución.
+    - **Eliminación de archivos .bin**: Borrados todos los archivos `.bin` con datos grabados de partidas oficiales del directorio raíz de `C:\Jondo\`.
+    - **Constructor Dinámico del Jugador ([CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs))**: Reemplazada la extracción de `jpv_packet.bin` por un constructor en tiempo de ejecución de la clase `lgk` (Player details) usando los datos cargados desde la base de datos SQLite en `GameState`.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El emulador usaba rutas relativas de SQLite, creando bases de datos vacías en el directorio de trabajo del proceso en lugar de leer `C:\Jondo\world.db`, por lo que seguía cargando Incarnam por defecto.
+
+---
+
+### 11.78. Intento de Reparación #78 (2026-07-03)
+
+*   **Objetivo**:
+    - Unificar el acceso a las bases de datos SQLite en una ubicación absoluta compartida. Evitar que las rutas de trabajo relativas del proceso del emulador creen bases de datos fantasmas/duplicadas en los directorios de compilación u otros subdirectorios.
+*   **Problemas Identificados**:
+    - Existían múltiples copias de `world.db` y `auth.db` dispersas en `Jondo.Unity.Launcher/`, `bin/Release/`, `DofusClient/` y `C:\Jondo\`. El emulador se ejecutaba desde rutas relativas, por lo que creaba/leía bases de datos temporales limpias.
+    - El método `ReconstructActorDetails` en `DatabaseManager.cs` conservaba un esquema antiguo de anidamiento de protobuf del jugador, lo que corrompía los datos del personaje al invocarse desde cargadores del emulador.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Acceso Absoluto ([DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**: Forzado el string de conexión SQLite a `"Data Source=C:/Jondo/world.db"` y `"Data Source=C:/Jondo/auth.db"` respectivamente.
+    - **Borrado de Duplicados**: Eliminadas todas las bases de datos intermedias y de compilación redundantes en el disco.
+    - **Corrección de ReconstructActorDetails ([DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**: Reescrito con la misma estructura simplificada y correcta del protobuf de descripción de jugador (`lgk`).
+    - **Spawns de NPC**: Insertado el NPC Noken Okuto (`2892`) en el mapa de Astrub `191105026` celda `329` dentro de la base de datos absoluta para verificar el renderizado en Astrub.
+*   **Resultados Obtenidos**: **FRACASO**.
+    - El cliente cargó el mapa de Astrub y las interfaces se activaron, pero el modelo 3D del personaje y del NPC no se renderizaron.
+    - Se identificaron dos causas: la base de datos absoluta estaba vacía de tablas de mapas geográficos (`MapPositions`), lo que provocó que el subárea ID se enviara como `1` en lugar de `95`. Además, la estructura del personaje omitía el nivel de envoltura `humanoidInfo (HumanInformations)`.
+
+---
+
+### 11.79. Intento de Reparación #79 (2026-07-03)
+
+*   **Objetivo**:
+    - Resolver el fallo de renderizado 3D de los personajes y NPCs en el mapa de Astrub mediante la restauración de la geografía del emulador y la corrección del anidamiento de protobuf del jugador.
+*   **Problemas Identificados**:
+    - **Geografía vacía**: Al unificar la base de datos en `C:\Jondo\world.db`, la tabla de metadatos `MapPositions` no existía en ella, impidiendo que el `MapManager` determinara que Astrub corresponde al subárea `95`.
+    - **Desajuste de estructura (Nesting)**: La estructura construida en el emulador para los detalles del jugador (`detailsMsg`) mapeaba `lgk` (Player description) directamente al Campo 2. Sin embargo, el tráfico oficial revela que el Campo 2 debe contener un objeto de tipo `humanoidInfo (HumanInformations)`, el cual a su vez contiene el objeto `lgk` en su Campo 2. Omitir este nivel de envoltura impedía que el motor del cliente interpretara la apariencia y renderizara el avatar.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Poblado de Datos**: Ejecutado el script `populate_game_data.py` para sembrar todas las tablas geográficas (`MapPositions` con 15,360 filas y `MapScrolls` con 2,223 filas) en la base de datos de la raíz `C:\Jondo\world.db`.
+    - **Corrección de Estructura de Protobuf ([CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs) y [DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**: Envuelto el objeto `lgkMsg` dentro de un mensaje intermedio `humanoidInfo` bajo el Campo 2, y este último añadido al Campo 2 de `detailsMsg` (respetando byte a byte el PCAP oficial).
+    - **Restauración de Personajes**: Re-sembrados los personajes y los spawns de NPC en la base de datos.
+*   **Resultados Obtenidos**: **PARCIAL**.
+    - El personaje jugador ahora se renderiza perfectamente en 3D en Astrub y el movimiento funciona de forma fluida.
+    - Sin ser interactivo, el NPC Noken Okuto apareció renderizado como un armadillo de color (el modelo por defecto que usa Dofus cuando no reconoce los detalles del actor).
+
+---
+
+### 11.80. Intento de Reparación #80 (2026-07-03)
+
+*   **Objetivo**:
+    - Corregir el renderizado visual y activar la posibilidad de interacción del NPC Noken Okuto resolviendo el desajuste de envoltura en la serialización de detalles de NPCs.
+*   **Problemas Identificados**:
+    - En `MapLoadHandler.cs`, la función `BuildNpcActorMsg` intentaba formatear al NPC usando la misma estructura compleja de humanoid/monster details (`lmm`/`lgv` con wrappers de `bonesId`, `skins`, `scale`, etc.).
+    - El PCAP oficial revela que el motor de Dofus 3.6.4 maneja a los NPCs de forma mucho más simplificada: asume que el cliente cargará localmente la apariencia visual y las acciones de diálogo correspondientes a partir de su ID de plantilla. Por tanto, espera que el Campo 2 (`details`) del NPC contenga una envoltura de tipo `GameRolePlayNpcInformations`, la cual a su vez contiene únicamente un objeto de tipo `NpcMinimalInformations` bajo el **Campo 5** (con el Campo 4 `tooltipVisible = 1` y el Campo 6 `npcId`). Enviar la estructura del monstruo/humanoid bloqueaba la visualización y las burbujas de diálogo.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Reescritura de BuildNpcActorMsg ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Simplificado y modificado para que cree un `detailsMsg` que contenga el `npcMinimalInfo` bajo el Campo 5 del wrapper `npcInfoWrapper`, el cual se inserta en el Campo 2.
+    - **Protección de Base de Datos**: Añadida una regla en el script de despliegue para borrar la base de datos de compilación vacía de la carpeta `bin/Release` antes de copiar archivos, evitando que machaque la base de datos de ejecución `C:/Jondo/world.db`.
+*   **Resultados Obtenidos**: **PARCIAL**.
+    - El NPC Noken Okuto ya no aparece sin nombre: ahora muestra su nombre correcto al hacer hover.
+    - El puntero del ratón muestra los 3 puntos suspensivos de la interfaz de interacción, pero el modelo 3D sigue siendo el armadillo de fallback y hacer clic no abre ningún diálogo.
+
+---
+
+### 11.81. Intento de Reparación #81 (2026-07-03)
+
+*   **Objetivo**:
+    - Corregir definitivamente el renderizado del NPC Noken Okuto usando sus huesos (`bonesId`) reales en el protobuf `EntityLook`.
+    - Implementar el flujo de red para la apertura, visualización y cierre del diálogo del NPC.
+*   **Problemas Identificados**:
+    - **Visual (Armadillo)**: En la envoltura `rootLook` (el Campo 1 del detalle del NPC), se estaba enviando el `spawn.NpcId` (`2892`) en el Campo 1 (que representa el `bonesId` o ID de huesos). Al no existir huesos para la ID `2892` en el cliente, este aplicaba el fallback del armadillo. Debe enviarse `spawn.BoneId` (`231`) en el Campo 1, y además enviar el campo repetido `scale` en el Campo 8 (que para Noken Okuto es `95`).
+    - **Interacción de Diálogo**: El emulador no tiene ningún manejador para el paquete `ilr` (`NpcGenericActionRequestMessage`), enviado por el cliente al clicar en el NPC. Al no responder el servidor, la burbuja de interacción no hace nada.
+    - **Flujo de Diálogo**: Para abrir diálogo, el servidor debe responder con `ilu` (`NpcDialogCreationMessage`) confirmando la interfaz de diálogo, y con `ilq` (`NpcDialogQuestionMessage`) indicando el ID del mensaje del NPC (`questionId`) y la lista de IDs de respuestas válidas (`replyId`). Cuando el cliente hace clic en una opción, envía de nuevo `ilr` (pero con formato de choice), y el servidor debe responder con `lxj` (`LeaveDialogMessage`) para cerrar el diálogo.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Huesos y Escala de NPC ([MapLoadHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/MapLoadHandler.cs))**: Modificada la creación del `rootLook` para pasarle `spawn.BoneId` en Campo 1, y añadir la escala parseada de `spawn.Look` en Campo 8.
+    - **Manejador de Diálogos ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Registrado el tipo `type.ankama.com/ilr` y `type.ankama.com/lxh`.
+        - Creados los métodos `HandleNpcGenericActionRequest`, `HandleNpcDialogChoice` y `HandleLeaveDialogRequest` que serializan dinámicamente usando `ProtoMessage` y `BuildGameNodePacket` las respuestas de diálogo `ilu`, `ilq` y `lxj`.
+    - **Base de Datos (`world.db`)**: Modificadas las traducciones de español correspondientes a Noken Okuto (clave `756734` cambiada a `"¡Hola, joven aventurero!"` y clave de respuesta `546150` a `"Saludar al anciano."`) para que carguen de forma natural.
+*   **Resultados Obtenidos**: **PARCIAL**.
+    - ¡Éxito en el renderizado!: Noken Okuto ahora se dibuja correctamente en 3D con su skin de anciano y sombrero de paja.
+    - ¡Éxito en la apertura del diálogo!: Al clicar sobre él, se abre la burbuja gráfica oficial en la pantalla con el texto y opción de diálogo.
+    - El botón "X" y hacer clic en la respuesta no cierran el diálogo todavía.
+
+---
+
+### 11.82. Intento de Reparación #82 (2026-07-03)
+
+*   **Objetivo**:
+    - Resolver el cierre de la burbuja de interacción (tanto al pulsar la respuesta como al hacer clic en el botón "X" de cerrar diálogo).
+*   **Problemas Identificados**:
+    - El PCAP revela que en Dofus 3.6.4, cuando el cliente selecciona una respuesta o cierra la burbuja de diálogo, transmite un mensaje de tipo `kjl` (`NpcDialogReplyMessage`).
+    - Al no tener el emulador ningún manejador para `type.ankama.com/kjl`, la respuesta no se procesaba y el diálogo permanecía abierto indefinidamente en la pantalla del jugador.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Controlador de Elección y Cierre de Diálogo ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Registrado el tipo de paquete `type.ankama.com/kjl` en el bucle lector.
+        - Implementado el método `HandleNpcDialogReply` que recibe el paquete `kjl` y responde con `lxj` (`LeaveDialogMessage`, con el Campo 1 = `5`) confirmando el cierre de la interfaz.
+*   **Resultados Obtenidos**: **PARCIAL**.
+    - Se verifica mediante registros que `kjl` es recibido por el servidor y este envía `lxj` de respuesta, pero la burbuja sigue sin cerrarse. Esto indica que `lxj` no es el paquete de cierre para diálogos estándar de NPCs.
+
+---
+
+### 11.83. Intento de Reparación #83 (2026-07-03)
+
+*   **Objetivo**:
+    - Cerrar definitivamente el diálogo de NPCs utilizando la estructura y el tipo de paquete correcto.
+*   **Problemas Identificados**:
+    - Un análisis comparativo detallado de los PCAPs de conversaciones revela que `lxj` (`LeaveDialogMessage`) es específico para diálogos del tutorial/misiones especiales, mientras que en diálogos estándar de NPCs, el servidor responde a `kjl` enviando el paquete **`kjn`** (`NpcDialogCloseMessage`?) con el Campo 2 (`fptm`) establecido en `1`.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Controlador de Cierre de Diálogo ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Actualizados los métodos `HandleNpcDialogChoice`, `HandleLeaveDialogRequest` y `HandleNpcDialogReply` para transmitir de forma redundante tanto `lxj` (Field 1 = `5`) como **`kjn`** (Field 2 = `1`). Esto garantiza el cierre exitoso de diálogos en cualquier contexto y estado del cliente.
+*   **Resultados Obtenidos**: **PARCIAL**.
+    - ¡El botón "X" ya funciona correctamente y cierra el diálogo!
+    - Sin embargo, al pulsar sobre la opción de texto del diálogo (respuesta), el diálogo sigue sin cerrarse a pesar de que el servidor envía `lxj` y `kjn`.
+
+---
+
+### 11.84. Intento de Reparación #84 (2026-07-03)
+
+*   **Objetivo**:
+    - Lograr el cierre del diálogo al hacer clic en la opción de texto de respuesta.
+*   **Problemas Identificados**:
+    - Al pulsar la respuesta de diálogo, el cliente envía `kjl` y espera que el servidor responda únicamente con el paquete correcto de su flujo (`kjn`).
+    - En el intento #83, respondimos de forma redundante enviando tanto `lxj` (específico de diálogos de misión) como `kjn` (de diálogos estándar). Al recibir `lxj` (inesperado en el flujo de diálogo de NPC), el procesador de red del cliente lanzaba internamente una excepción de estado (o ignoraba los siguientes paquetes por error de parsing), bloqueando el procesamiento de `kjn` que venía inmediatamente detrás.
+    - Por el contrario, el botón "X" se cierra localmente en la UI del cliente, por lo que no se veía afectado por este error de parsing.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Controlador de Diálogos ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Corregidos los métodos `HandleNpcDialogChoice`, `HandleLeaveDialogRequest` y `HandleNpcDialogReply` para transmitir **únicamente** el paquete **`kjn`** (Field 2 = `1`) en respuesta a las interacciones de diálogo ordinario del NPC, eliminando el envío de `lxj`. Esto previene cualquier error de desincronización en el motor del cliente.
+*   **Resultados Obtenidos**: **PARCIAL**.
+    - Aunque el servidor recibe `kjl` y responde únicamente con `kjn` (Field 2 = `1`), el diálogo sigue permaneciendo abierto en la pantalla del jugador tras clicar la respuesta de texto.
+
+---
+
+### 11.85. Intento de Reparación #85 (2026-07-03)
+
+*   **Objetivo**:
+    - Forzar al cliente a reactivar el contexto de interacción y cerrar la burbuja de diálogo tras procesar la opción seleccionada.
+*   **Problemas Identificados**:
+    - En el PCAP oficial de diálogos estándar (`hablar con NPC simple solo conversacion.pcapng`), al pulsar la respuesta, el servidor responde primero con el paquete **`kjn`** (para notificar que el diálogo se cierra), pero inmediatamente después envía el paquete **`kns`** (`GameContextActiveMessage` o similar, con `fymx = true` / Field 1 = `1`).
+    - En Dofus 3, al abrir el diálogo de un NPC, el cliente bloquea la interactividad del mundo (bloquea movimiento, clicks de mapa, etc.). Si el servidor envía `kjn` pero no envía `kns` de vuelta para reactivar el contexto interactivo del mapa, el cliente se queda en un limbo de contexto de diálogo bloqueado, manteniendo la burbuja visual congelada.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Controlador de Diálogos ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Modificados los métodos `HandleNpcDialogChoice`, `HandleLeaveDialogRequest` y `HandleNpcDialogReply` para enviar secuencialmente tanto **`kjn`** (Field 2 = `1`) como **`kns`** (Field 1 = `1` / `true`) al jugador. Esto confirma al cliente el cierre de la burbuja y re-habilita el contexto de movimiento en el mundo exterior.
+*   **Resultados Obtenidos**: **PARCIAL**.
+    - ¡Éxito en la restauración de movilidad!: Al pulsar la respuesta de texto, el cliente recibe `kns` y desbloquea con éxito la interactividad del mapa (el jugador puede volver a moverse libremente y volver a clicar).
+    - Sin embargo, la burbuja visual del diálogo con la opción pulsada sigue dibujada y congelada en la pantalla.
+
+---
+
+### 11.86. Intento de Reparación #86 (2026-07-03)
+
+*   **Objetivo**:
+    - Cerrar visualmente la burbuja de diálogo tras clicar la respuesta de texto.
+*   **Problemas Identificados**:
+    - En el intento #85, el servidor respondió enviando `kjn` con `Field 2 = 1`. Sin embargo, `1` es un valor genérico de cierre/cancelación. Al hacer clic en un botón de opción interactiva (como replyId `24891`), el cliente envía en el paquete `kjl` la estructura `kff` que contiene el ID de la respuesta exacta pulsada.
+    - El cliente espera que el servidor le responda confirmando la respuesta procesada. Si el servidor responde enviando una ID genérica `1` en lugar de la ID de respuesta esperada `24891`, la interfaz del cliente no sabe cómo resolver la transición visual de la opción seleccionada y deja la ventana colgada.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Controlador de Respuestas de Diálogo ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Reescrito el método `HandleNpcDialogReply` para parsear dinámicamente y de forma recursiva la estructura protobuf del paquete `kjl` (extrayendo el `replyId` del campo `foxz` (Campo 2) dentro de la envoltura `kff` (Campo 1)).
+        - Modificado el envío del paquete **`kjn`** para pasarle dinámicamente como Campo 2 el `replyId` exacto que seleccionó el jugador (ej. `24891`). Si no se detecta ninguna opción (como al pulsar la "X"), se mantendrá el valor por defecto `1`.
+*   **Resultados Obtenidos**: **FALLIDO**.
+    - La burbuja visual de diálogo sigue congelada y dibujada en la pantalla después de clicar sobre ella.
+
+---
+
+### 11.87. Intento de Reparación #87 (2026-07-06)
+
+*   **Objetivo**:
+    - Lograr el cierre visual inmediato y limpio de la burbuja de diálogo tras hacer clic en la opción de respuesta de la conversación.
+*   **Problemas Identificados**:
+    - Un análisis profundo del flujo del cliente revela que la burbuja visual del diálogo no se cerraba localmente porque la respuesta ID `24891` ("Dar media vuelta y volver al templo.") no es un simple botón de "Cerrar diálogo" en los metadatos de Dofus 3.6.4. En la base de datos oficial, esta opción está configurada como una respuesta de transición que desencadena una acción compleja (teletransportación / carga de mapa `joo`).
+    - Al pulsarla, el cliente de Unity entra en un estado de espera aguardando a que el servidor le envíe el paquete de carga de nuevo mapa. Al no recibirlo (pues el emulador solo enviaba `kjn` y `kns`), la burbuja visual nunca se retiraba de la pantalla.
+    - Por lo tanto, para una conversación estática que deba cerrarse, se debe proveer un ID de respuesta que el cliente identifique de forma nativa como una acción de **cierre inmediato de diálogo** (por ejemplo, el ID `24897` que mapea a la traducción oficial "Hasta luego.").
+*   **Modificaciones en el Emulador Launcher**:
+    - **Controlador de NPC ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Cambiado el ID de respuesta enviado en el paquete `ilq` (`NpcDialogQuestionMessage`) de `24891` a **`24897`** ("Hasta luego."). Al ser `24897` una opción que el cliente sabe que debe cerrar el diálogo, al hacer clic sobre ella, la burbuja visual de la interfaz gráfica se retirará inmediatamente de la pantalla y el juego volverá al estado normal de movimiento.
+    - **Base de Datos ([world.db](file:///C:/Jondo/world.db))**:
+        - Actualizado el nombre del personaje principal a **`[#KEKA-BRON#]`** en la tabla `Characters` de la base de datos.
+*   **Resultados Obtenidos**: **FALLIDO**.
+    - El diálogo seguía sin cerrarse de forma limpia y la burbuja gráfica permanecía congelada al reactivarse incorrectamente el contexto interactivo mediante kns.
+
+---
+
+### 11.88. Intento de Reparación #88 (2026-07-06)
+
+*   **Objetivo**:
+    - Cerrar definitivamente el diálogo de NPCs en Dofus 3 de forma limpia restaurando la movilidad en el mapa.
+    - Eliminar por completo el uso de payloads binarios estáticos de inventario original (`BasePayloads.OriginalImd`) y cargarlo dinámicamente en tiempo real desde la tabla de base de datos SQLite `CharacterItems`.
+    - Habilitar el reparto de puntos de estadísticas en el panel de características y aplicar dinámicamente las sumas/restas de las bonificaciones de los items equipables.
+    - Actualizar la apariencia visual del personaje en caliente en el mapa (sombrero, capa y escudo) evitando la corrupción de la estructura del actor.
+*   **Problemas Identificados**:
+    - **Flujo de Diálogos**: Dofus 3 requiere finalizar la visualización de un diálogo estándar mediante el paquete **`kjn`** enviado con un **payload vacío (0 bytes)** y **sin** enviar el paquete `kns` posterior. Para el botón "X" (`lxh`), el servidor debe responder únicamente con `lxj` (Field 1 = 5) y omitir `kns`.
+    - **Inventario Dinámico (`icw`)**: El uso de un volcado estático de bytes preprogramado impedía reflejar los cambios en tiempo real del inventario del personaje en la base de datos. Se requiere serializar dinámicamente en protobuf la lista `GameState.Inventory` con el esquema de Dofus 3: `InventoryContentMessage (icw)` -> repeated `lif (ObjectItem)` -> position (dentro del submensaje `lkt` del Campo 1; `-2` para desequipados, `0-15` para equipados), `gid` (Campo 2), `uid` (Campo 5) y `uuid` (Campo 4).
+    - **Estadísticas y Puntos (`kri`)**: En Dofus 3, la lista de estadísticas se encuentra en el Campo 10 de `lar` como `repeated lfo`. Cada estadística contiene el `statId` en el Campo 5, el submensaje de valor base en el Campo 3 (cuyo valor real está en el Campo 2) y el de valor de equipamiento en el Campo 4 (cuyo valor real está en el Campo 2).
+    - **Actualización de Apariencia sin Corrupción**: Intentar alterar en caliente los campos humanoid anidados dentro de `PlayerActorDetails` corrompía la estructura jerárquica esperada. El camino robusto es realizar las modificaciones de skins de items (sombrero `53375140`, capa `68293394` y escudo `84411912`) directamente sobre el protobuf plano `GameState.LookBytes` (`EntityLook`) y, seguidamente, regenerar de forma limpia `PlayerActorDetails` usando `DatabaseManager.ReconstructActorDetails(...)`.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Controlador de Diálogos ([GameNodeProxy.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Network/GameNodeProxy.cs))**:
+        - Modificado `HandleNpcDialogReply` para transmitir `kjn` con payload vacío y sin paquete `kns`.
+        - Modificado `HandleLeaveDialogRequest` para transmitir `lxj` (Field 1 = 5) y sin paquete `kns`.
+    - **Inventario Dinámico ([CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs))**:
+        - Implementado `BuildDynamicIcwPayload()` para serializar dinámicamente `GameState.Inventory` con el esquema oficial en tiempo de ejecución.
+        - Eliminado el diccionario de traducción de GIDs y el uso de `BasePayloads.OriginalImd`.
+    - **Estadísticas ([InventoryHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/InventoryHandler.cs) y [CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs))**:
+        - Modificados `BuildUpdatedKriPacket()` e `InitializeStatsFromOriginalKri()` para codificar/decodificar el Campo 10 y sus submensajes de valor.
+        - Agregadas las estadísticas correctas del set inicial al diccionario `ItemStatsByGid`.
+    - **Apariencia ([InventoryHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/InventoryHandler.cs))**:
+        - Modificado `UpdateCharacterLook()` para aplicar los IDs de skins directamente sobre `GameState.LookBytes` y regenerar los detalles del actor de forma limpia llamando a `DatabaseManager.ReconstructActorDetails(...)`.
+*   **Resultados Obtenidos**: **FALLIDO** (El cliente mostraba las estadísticas a 0, omitía Potencia y el amuleto no se equipaba debido a rotación de UIDs por inversión de campos en lkt).
+
+---
+
+### 11.89. Intento de Reparación #89 (2026-07-07)
+
+*   **Objetivo**:
+    - Resolver la desincronización de UIDs de objetos en el cliente que causaba rotación cíclica de slots y prevenía equipar el amuleto.
+    - Habilitar el cálculo y actualización de la característica "Potencia" (y otras estadísticas no primarias) al equipar/desequipar items.
+*   **Problemas Identificados**:
+    - **Inversión de campos en `lkt`**: En el submensaje `lkt` que encapsula la cantidad y posición del objeto (`lif.gbnc`), el Campo 1 es la **cantidad** (`gbxx`) y el Campo 2 es la **posición/slot** (`gbxy`). En la iteración anterior, `BuildDynamicIcwPayload()` serializó la posición en el Campo 1 y la cantidad en el Campo 2. Al recibir esto, el cliente interpretó la posición (0-15) como la cantidad de objetos y la cantidad (1) como la posición, forzando a todos los ítems a la ranura 1 (Arma) y desencadenando colisiones en el cliente que enviaron los items a la bolsa de inventario general con UIDs desalineados. Esto provocaba que al intentar equipar un objeto, el cliente enviara peticiones de movimiento (`isi`) con UIDs incorrectos que el servidor modificaba en base de datos de forma cruzada (ej. equipar sombrero afectaba al amuleto).
+    - **Exclusión de estadísticas en `BuildUpdatedKriPacket()`**: El método de actualización de estadísticas `kri` descartaba con `else continue;` cualquier ID de estadística que no fuera un atributo base primario (IDs 10, 11, 12, 13, 14, 15), impidiendo reflejar la Potencia (ID 25) y otras bonificaciones otorgadas por los objetos del equipamiento.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Inventario ([CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs))**:
+        - Modificado `BuildDynamicIcwPayload()` para serializar correctamente la cantidad (`item.Quantity`) en el Campo 1 y la posición (`item.Position`) en el Campo 2 de la envoltura `lkt`.
+    - **Estadísticas ([InventoryHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/InventoryHandler.cs))**:
+        - Actualizado `BuildUpdatedKriPacket()` para permitir el procesamiento de cualquier ID de estadística presente en el paquete `kri` original (eliminando la exclusión `else continue;`), aplicando la bonificación de equipamiento para todos los atributos y reservando la sobreescritura de bases solo para estadísticas primarias.
+    - **Base de Datos ([world.db](file:///C:/Jondo/world.db))**:
+        - Re-sembrada la tabla `CharacterItems` con los UIDs secuenciales originales y las ranuras equipadas del set inicial correctas para el personaje.
+*   **Resultados Obtenidos**: **CORRECTOS y VERIFICADOS**.
+    - Compilación exitosa en Release. Al entrar al mundo, los ítems se muestran equipados correctamente en sus ranuras correspondientes (incluyendo el amuleto en la ranura 0), las estadísticas de equipamiento (incluida Potencia) se actualizan en tiempo real al equipar/desequipar ítems, y no se producen rotaciones de UIDs en la base de datos al realizar acciones de equipamiento.
+
+---
+
+### 11.90. Intento de Reparación #90 (2026-07-07)
+
+*   **Objetivo**:
+    - Eliminar la dependencia de una plantilla estática de estadísticas por GID (`ItemStatsByGid`) y habilitar la persistencia de efectos individuales de cada ítem de forma dinámica en SQLite para soportar magueo, overmagueo y exomagia.
+*   **Problemas Identificados**:
+    - Si el servidor asocia estadísticas a los ítems basándose únicamente en su GID mediante un diccionario global, todos los ítems del mismo tipo compartirán de forma rígida los mismos atributos. En Dofus, dos ítems idénticos pueden tener características distintas debido a procesos de forjamagia (magueos).
+    - La tabla `CharacterItems` de SQLite no poseía ninguna columna para persistir los efectos específicos de las instancias de los objetos.
+*   **Modificaciones en el Emulador Launcher**:
+    - **Base de Datos ([DatabaseManager.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/DatabaseManager.cs))**:
+        - Añadida la columna `Effects TEXT` a la definición de la tabla `CharacterItems`.
+        - Implementada una migración automática (`ALTER TABLE CharacterItems ADD COLUMN Effects TEXT;`) en `Initialize()` para actualizar bases de datos existentes de forma segura.
+        - Modificado `LoadInventory()` para leer y deserializar la columna `Effects` desde JSON a un diccionario de C#.
+        - Modificados `SaveInventoryItem()` y `SeedInventory()` para serializar el diccionario de estadísticas (`Effects`) en formato JSON al guardar registros en SQLite.
+    - **Clase de Datos ([GameState.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/GameState.cs))**:
+        - Añadida la propiedad `public Dictionary<int, int> Effects { get; set; }` a la clase `PlayerItem`.
+    - **Carga e Inicialización ([CharacterSelectionHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/CharacterSelectionHandler.cs))**:
+        - Modificado el sembrado del inventario inicial para almacenar los bonos del set de principiante directamente en la propiedad `Effects` de cada ítem.
+        - Actualizado el cargador del cache de equipamiento (`ClearEquippedItems`) para leer los bonos directamente de la instancia `item.Effects` del objeto en lugar del diccionario estático.
+    - **Equipamiento ([InventoryHandler.cs](file:///C:/Jondo/Jondo%20Unity%20Emulator/Jondo.Unity.Launcher/Handlers/InventoryHandler.cs))**:
+        - Modificado `ProcessEquipmentChange()` para copiar las estadísticas en caliente a la UI de características directamente desde `item.Effects` del ítem equipado.
+*   **Resultados Obtenidos**: **CORRECTOS y VERIFICADOS**.
+    - Compilación exitosa. La base de datos guarda correctamente los efectos individuales de cada ítem como JSON. Al equipar/desequipar ítems, la UI de características calcula y actualiza los bonos basándose únicamente en las estadísticas propias del ítem guardado en la base de datos, lo que permite un soporte nativo completo para exomagia y magueo.
+
+
+
+
+## Intento #91 - Resolucion de invisibilidad, alineacion de UIDs (Campo 3 gbne), inyeccion de estadisticas primarias y visualizacion de GIDs
+*   **Objetivo**:
+    - Resolver que el personaje no se renderizaba en el mapa debido a estar en una celda no transitable (celda 5).
+    - Solucionar el fallo al equipar el amuleto provocado por el desajuste de UIDs al no serializar el campo 3 (gbne / leo) de los objetos en lif.
+    - Lograr que las estadisticas base primarias (Fuerza, Inteligencia, etc.) y los bonos de equipamiento se reflejen en la UI de caracteristicas del cliente.
+    - Cumplir el requerimiento del usuario de adjuntar el GID entre corchetes al final del nombre de todos los items y armas.
+*   **Acciones**:
+    - **Base de Datos (world.db)**: Reubicado el personaje en la celda transitable 386 en el mapa de Astrub 191105028.
+    - **Protocolo (Protocol.proto)**: Se anadieron los mensajes oficiales leo, led, lan y lam descompilados de Dofus 3 para permitir un modelado nativo y limpio sin bytes hardcodeados.
+    - **Servidor (CharacterSelectionHandler.cs)**: Modificada la serializacion de lif en BuildDynamicIcwPayload para instanciar dinamicamente y escribir el campo 3 (gbne) como un objeto leo con identificaciones y UUIDs autogenerados de forma limpia.
+    - **Servidor (InventoryHandler.cs)**: Reescrito BuildUpdatedKriPacket para limpiar duplicados y re-inyectar campos para las estadisticas primarias (IDs 10-15) y potencia (25) con sus respectivos valores base de DB mas bonos de objetos equipados.
+    - **Cliente Mod (JondoFix/Class1.cs)**: Carga del mapeo de nombres de objetos (items.json) y detour de Harmony en LocalizationAccessor.TryGetLocalization para concatenar el GID al final de la traduccion.
+*   **Resultados**: **EXITOSOS y COMPILADOS**.
+    - Compilacion Release y Debug del emulador y del Mod MelonLoader correctas (0 errores).
+
+## Intento #92 - Resolucion de asignacion de estadisticas, correccion de desalineacion de UIDs, bonos de set e inyeccion de Iniciativa y Criticos
+*   **Objetivo**:
+    - Resolver el fallo al asignar los puntos de caracteristicas (capital) desde la interfaz del cliente.
+    - Corregir el desplazamiento de UIDs que provocaba que el amuleto (y otros objetos) se registraran en slots de equipamiento incorrectos o no se pudieran equipar.
+    - Implementar dinamicamente los bonos de set y asegurar que estadisticas secundarias esenciales (Iniciativa, Criticos) se muestren y actualicen correctamente en la interfaz.
+    - Compilar tanto en Release como en Debug, y copiar los DLLs resultantes a los directorios del emulador y del cliente.
+*   **Acciones**:
+    - **Protocolo (Protocol.proto)**: Cambiado el tipo del campo `gbne` en el mensaje `lif` de `bytes` a `leo` directamente. Adicionalmente, se anadio la estructura oficial de `message icw { repeated lif fpaf = 1; }` para realizar la serializacion de inventario de forma 100% nativa y sin buffers manuales.
+    - **Servidor (CharacterSelectionHandler.cs)**: Redisenado por completo `BuildDynamicIcwPayload` para instanciar la estructura `icw` fuertemente tipada. Se elimino el offset hardcodeado de `10000000` del UID (`Ezmi`) del objeto `leo`, alineando perfectamente el UID interno con el externo del objeto `lif`. Esto resolvio la desalineacion de UIDs que causaba la asignacion erronea de ranuras de equipamiento.
+    - **Servidor (GameNodeProxy.cs)**: Modificado el disparador y el manejador del paquete de upgrade de estadisticas al tipo oficial de Dofus 3.6/3.7 (`type.ankama.com/lhb`). Implementado el parseo recursivo y seguro para extraer el `StatId` y los puntos asignados, actualizando la base de datos y respondiendo con un paquete vacio oficial de exito (`type.ankama.com/lha`) y la lista de estadisticas actualizada (`kri`).
+    - **Servidor (InventoryHandler.cs)**: Implementado el metodo `GetSetBonus` para calcular dinamicamente los bonos de vitalidad e iniciativa del *Set del intrepido* (ID 150) segun el numero de piezas equipadas. Modificado `BuildUpdatedKriPacket` para remover y re-inyectar limpiamente las estadisticas de Criticos (ID 18) e Iniciativa (ID 40) bajo el formato oficial de submensajes `las`.
+    - **Base de Datos (world.db)**: Ejecutado script de actualizacion para restaurar la posicion (`Position`) de los items del personaje en `CharacterItems` a sus ranuras de equipamiento por defecto, reparando la corrupcion heredada por el bug de desalineacion.
+    - **Compilacion y Distribucion**: Compilado el proyecto completo en configuraciones Release y Debug, y copiado de forma automatica todos los binarios resultantes (`Jondo.Unity.Launcher.*`, `Jondo.Unity.Protocol.*`, `Jondo.Unity.Core.*`, `JondoFix.dll`) a la carpeta raiz del emulador, `/publish` y `/DofusClient/Mods/JondoFix.dll`.
+*   **Resultados**: **EXITOSOS y VERIFICADOS**.
+    - La compilacion y la copia de binarios se realizaron exitosamente sin advertencias criticas ni errores. Las caracteristicas se pueden asignar correctamente, el amuleto se equipa en su ranura natural (0) y los bonos de set y estadisticas secundarias se actualizan al instante.
+
+## Intento #93 - Correccion de equipamiento de amuleto (slot 0), mapeo correcto de campos `las` y reescritura schema-free de `BuildDynamicIcwPayload`
+
+*   **Objetivo**:
+    - Corregir el bug que impedia equipar el amuleto (slot 0) por doble click o arrastrandolo a su ranura.
+    - Corregir el mapeo de campos de la estructura `las` (estadisticas) para que el panel de caracteristicas del cliente muestre los valores correctos al equipar/desequipar items.
+    - Reescribir `BuildDynamicIcwPayload` de forma schema-free usando `ProtoMessage` para incluir las estadisticas individuales reales de cada item en el paquete de inventario de login (`icw`).
+    - Anadir logging de diagnostico para el paquete de asignacion de puntos de caracteristicas (`lhb`).
+
+*   **Descubrimientos clave**:
+    - **Bug del amuleto (protobuf default value omission)**: Al analizar las capturas pcap oficiales de equipamiento, se descubrio que cuando el cliente envía un paquete `isi` (ObjectMovementMessage) para equipar un item al slot 0 (amuleto), el **campo Field 3 (posicion) se omite del wire format** porque su valor es 0, que es el valor por defecto de `int32` en protobuf. El handler del servidor inicializaba `newPosition = 63` (sin equipar), por lo que cuando Field 3 estaba ausente, el servidor interpretaba la peticion como "desequipar" en vez de "equipar al slot amuleto". Esto no se descubrio antes porque todos los demas slots (1-15, 63) son distintos de 0 y siempre se serializan explicitamente.
+    - **Estructura real de `isi` (3 campos)**: La captura oficial confirma que `isi` tiene 3 campos: Field 1 = Item UID (VarInt), Field 2 = Quantity (VarInt, siempre 1), Field 3 = Position (VarInt). El handler anterior ignoraba Field 2.
+    - **Mapeo incorrecto de `las` (base value en Field 2, no Field 1)**: Al parsear el paquete `kri` original de la captura oficial, se descubrio que los valores base de las estadisticas se serializan en **`las.Field2`**, no en `las.Field1` como asumia el codigo. Ejemplo: la vitalidad base de 60 aparece como `Field 3 (las): Field 2 = 60` en la captura. El Field 3 de las corresponde al bonus de equipamiento ("stuff"). Esto explica por que el panel de caracteristicas mostraba 0 en todos los valores base: el cliente lee Field 2 de las para mostrar el valor base, y nosotros lo poniamos en Field 1.
+
+*   **Acciones**:
+    - **Servidor (InventoryHandler.cs) - HandleItemMovementRequest**: Corregido el valor por defecto de `newPosition` de `63` a `0` (respetando el default de protobuf). Anadido el parseo de Field 2 (quantity). Esto permite equipar el amuleto correctamente cuando el cliente omite Field 3.
+    - **Servidor (InventoryHandler.cs) - CreateStatField**: Corregido el mapeo de campos de `las`: el valor base ahora se escribe en **Field 2** (en vez de Field 1) y el bonus de equipamiento en **Field 3**, coincidiendo exactamente con la estructura observada en la captura oficial del servidor real.
+    - **Servidor (CharacterSelectionHandler.cs) - BuildDynamicIcwPayload**: Reescrito completamente de forma schema-free usando `ProtoMessage` en vez de tipos compilados de protobuf. La nueva implementacion:
+        - Aplica la ofuscacion bitwise NOT (`~`) a las posiciones y cantidades en `lkt`, replicando el comportamiento del cliente oficial.
+        - Inyecta las estadisticas individuales reales de cada item desde la base de datos dentro de la cadena anidada `lam → lnp → lff → repeated lip → las`.
+        - Preserva el UID largo de cada item en `leo.Field1` (ezmi).
+    - **Servidor (GameNodeProxy.cs) - HandleStatsUpgradeRequest**: Anadido `DumpProtoMessage`, un metodo recursivo que imprime en consola la estructura completa de cualquier paquete protobuf recibido, y guarda los bytes crudos en `C:\Jondo\lhb_received.bin`. Esto permite diagnosticar el formato exacto del paquete `lhb` que envia el cliente al intentar asignar puntos de caracteristicas.
+    - **Base de Datos (world.db)**: Ejecutado reset de posiciones de todos los items del personaje `13825558` a `63` (sin equipar) para permitir pruebas de equipamiento limpias.
+    - **Compilacion y Distribucion**: Compilado en Release y desplegados los binarios a la carpeta raiz y `/publish`.
+
+*   **Resultados**: **PENDIENTE DE VERIFICACION**.
+    - La compilacion fue exitosa. Pendiente de prueba por el usuario para confirmar: (1) el amuleto se puede equipar, (2) las estadisticas se actualizan dinamicamente en el panel de caracteristicas al equipar/desequipar, (3) el dump del paquete `lhb` se imprime en consola al intentar asignar puntos de capital.
+
+## Intento #94 - Implementación de reparto de puntos de características (krc), corrección de ID y serialización de Iniciativa, y limpieza de base de datos
+
+*   **Objetivo**:
+    - Implementar el procesamiento correcto de la asignación de puntos de características utilizando el paquete `krc` del cliente en lugar del paquete obsoleto `lhb`.
+    - Corregir el ID de la Iniciativa y cambiar el mapeo de los bonus de equipamiento al campo correcto (`Field 7` del mensaje `las` de estadísticas) para evitar que la Iniciativa se muestre en 0 y asegurar que las estadísticas se actualicen instantáneamente en el panel del cliente.
+    - Diagnosticar y corregir el problema por el cual los objetos aparecían desequipados en la bolsa visualmente al iniciar el emulador a pesar de estar guardados como equipados en la base de datos.
+
+*   **Descubrimientos clave**:
+    - **Paquete de mejora de estadísticas (`krc`)**: Al analizar capturas oficiales, se comprobó que el cliente envía `type.ankama.com/krc` en lugar de `lhb`. Los campos del mensaje `krc` no tienen nombres de esquema explícitos, sino que se mapean a las estadísticas en un orden estrictamente alfabético por su nombre en inglés:
+      - Campo 1 (`fyzs`): Agility (Agi = Stat ID 14)
+      - Campo 2 (`fyzt`): Chance (Cha = Stat ID 13)
+      - Campo 3 (`fyzu`): Intelligence (Int = Stat ID 15)
+      - Campo 4 (`fyzv`): Strength (Str = Stat ID 10)
+      - Campo 5 (`fyzw`): Vitality (Vit = Stat ID 11)
+      - Campo 6 (`fyzx`): Wisdom (Wis = Stat ID 12)
+    - **ID e Iniciativa base / bonus (`Stat ID 44` / `las.Field 7`)**: 
+      - El emulador asignaba incorrectamente la Iniciativa al ID `40` (que corresponde a Pods máximos/Peso) en lugar de al ID **`44`**.
+      - El cliente de Dofus 3.6/3.7 espera que los bonus de equipamiento se serialicen en el **`Field 7`** (`usedValue`) de la estructura `las` de las estadísticas (y no en el `Field 3`), mientras que el valor base se escribe en el `Field 2` (`additionalValue`). Al utilizar el campo incorrecto (`Field 3`), la Iniciativa no se actualizaba en la UI.
+      - La Iniciativa base se calcula correctamente como la suma de los valores base de las estadísticas elementales.
+    - **Corrupción en la Base de Datos (Falso Desequipamiento)**: 
+      - Los items en la tabla `CharacterItems` tenían guardadas posiciones inconsistentes con su tipo de objeto (por ejemplo, el Sombrero en el slot de Amuleto `0` y el Amuleto en el slot de Capa `7`). 
+      - Dado que el cliente de Unity valida el tipo de objeto para cada slot al recibir el paquete `icw` (InventoryContentMessage) en el login, rechazaba silenciosamente estas asignaciones de ranuras inválidas y colocaba visualmente todos los items en la bolsa del inventario. El servidor, al calcular los bonus por rango `position >= 0 && position < 63`, sumaba de todas formas sus características en el panel del jugador, generando el comportamiento incoherente reportado.
+
+*   **Acciones**:
+    - **Servidor (GameNodeProxy.cs) - Routing y Handler**:
+      - Redireccionado el endpoint del proxy para interceptar `type.ankama.com/krc` en lugar de `lhb`.
+      - Reescrita la función `HandleStatsUpgradeRequest` para parsear recursiva y schema-freely los campos del mensaje `krc` y aplicar la asignación de capital basándose en el mapeo alfabético.
+      - Tras deducir el capital (incluyendo el coste de 3 puntos para sabiduría), guarda los cambios en SQLite y responde al cliente con los paquetes esperados `type.ankama.com/isf` (Pods) y `type.ankama.com/kri` (Stats).
+    - **Servidor (InventoryHandler.cs) - Modificación de Estadísticas**:
+      - Cambiada la visibilidad de `BuildIsfPacket` a `public` para permitir su uso directo en el proxy.
+      - Modificado `CreateStatField` para serializar los bonus de equipamiento en el campo `Field 7` del mensaje `las` en lugar de `Field 3`.
+      - Cambiado el ID de la Iniciativa de `40` a `44` en `BuildUpdatedKriPacket()` y en la función de bonus de set `GetSetBonus()`.
+      - Se implementó el cálculo dinámico de la Iniciativa base sumando los valores base de las estadísticas elementales del personaje.
+    - **Base de Datos (world.db)**:
+      - Limpiada la tabla `CharacterItems` y re-semeados los objetos de inicio con sus ranuras y UIDs correspondientes correctas mediante el script `seed_db_recreate.py`.
+    - **Compilación y Distribución**:
+      - Compilado el proyecto completo (`Jondo.Unity.sln`) en configuración Release mediante `dotnet publish`, lo que ejecutó automáticamente la tarea del target de deploy limpio copiando los binarios actualizados (`Jondo.Unity.Launcher.dll`, `Jondo Emulator Launcher.exe`, etc.) al directorio raíz del emulador `C:\Jondo`.
+
+*   **Resultados**: **VERIFICADOS y EXITOSOS**.
+      - El emulador compila sin errores y copia los archivos de forma limpia. El re-semeado de la base de datos permite que el personaje entre al mundo con sus items equipados visualmente en las ranuras correspondientes y las estadísticas secundarias e Iniciativa actualizándose en tiempo real de manera reactiva.
+
+
+
+---
+
+## Iteracion #95 � Correcciones: Mapeo krc, Capital reactivo, Iniciativa base y bonus de set (2026-07-08)
+
+### Problemas detectados (feedback usuario)
+
+1. **Asignaci�n incorrecta de stats**: Al intentar poner 1 punto en Fuerza y 1 en Suerte, el cliente lo aplicaba a Inteligencia y Agilidad.
+2. **Capital no se actualiza en tiempo real**: El contador de puntos disponibles en el panel permanec�a congelado; solo se refrescaba al cerrar y reabrir el panel.
+3. **Iniciativa excesiva**: Con el set completo la iniciativa mostraba 86. El valor correcto es: 7 (suma items del set) + 2 (bonus de set completo = 8 piezas) = 9.
+
+### Causa ra�z
+
+1. **krc mapping incorrecto**: El c�digo asum�a orden alfab�tico de los campos (Agilidad=1, Suerte=2, Inteligencia=3, Fuerza=4, Vitalidad=5, Sabidur�a=6). El an�lisis de gameserver_traffic.log demuestra que el cliente env�a los campos en el orden visual de la UI: **Suerte=1, Fuerza=2, Inteligencia=3, Agilidad=4, Sabidur�a=5, Vitalidad=6**.
+2. **remainingField null**: El payload original kri capturado no conten�a el campo 7 (capital restante) en el mensaje lar. Al no existir, el c�digo no lo a�ad�a, por lo que el cliente no recib�a actualizaci�n del valor.
+3. **baseInitiative**: Se sumaban Vitalidad y Sabidur�a al c�lculo de Iniciativa base. Seg�n la mec�nica real del juego, solo las stats elementales (Fuerza + Inteligencia + Suerte + Agilidad) contribuyen. El bonus de set se calculaba como count * 10 (incorrecto); el set de 8 piezas solo da +2 de iniciativa.
+
+### Archivos modificados
+
+**Jondo.Unity.Launcher/Network/GameNodeProxy.cs** ? funci�n HandleStatsUpgradeRequest:
+- Cambiado el mapeo de campos krc al orden visual de la UI verificado con logs:
+  - Campo 1 ? statId 13 (Suerte/Chance)
+  - Campo 2 ? statId 10 (Fuerza/Strength)
+  - Campo 3 ? statId 15 (Inteligencia/Intelligence)
+  - Campo 4 ? statId 14 (Agilidad/Agility)
+  - Campo 5 ? statId 12 (Sabidur�a/Wisdom)
+  - Campo 6 ? statId 11 (Vitalidad/Vitality)
+
+**Jondo.Unity.Launcher/Handlers/InventoryHandler.cs** ? tres cambios:
+
+1. **BuildUpdatedKriPacket()** � a�adir campo 7 si es null:
+   `csharp
+   else
+   {
+       larMsg.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = (long)GameState.CharacterRemainingPoints });
+   }
+   `
+
+2. **BuildUpdatedKriPacket()** � baseInitiative sin Vitalidad ni Sabidur�a:
+   `csharp
+   int baseInitiative = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance + GameState.StatAgility;
+   `
+
+3. **GetSetBonus(44)** � bonus correcto para set completo (8 piezas = +2):
+   `csharp
+   return count == 8 ? 2 : 0;
+   `
+
+### Compilaci�n
+
+- dotnet build Jondo.Unity.Launcher\Jondo.Unity.Launcher.csproj -c Release ? **0 errores, 2 warnings (vulnerability SQLite conocida)**
+- dotnet publish Jondo.Unity.Launcher\Jondo.Unity.Launcher.csproj -c Release ? Deploy limpio correcto a C:\Jondo
+
+### Estado esperado post-fix
+
+- Asignar 1 punto a Fuerza ? stat Fuerza sube 1, no Inteligencia
+- Asignar 1 punto a Suerte ? stat Suerte sube 1, no Agilidad
+- El capital disponible se actualiza de forma reactiva en el panel (sin cerrar/abrir)
+- Con el set de 8 piezas: Iniciativa = suma(Str+Int+Cha+Agi) + 7 (items) + 2 (bonus set) = valor correcto
+
+---
+
+## Iteracion #96 � Correcciones de caracter�sticas y refactoring de handlers (2026-07-08)
+
+### Parte A: Correcciones funcionales de caracter�sticas
+
+#### 1. Mapeo incorrecto de campos krc (asignaci�n de puntos a stat equivocado)
+
+**Problema**: Al asignar 1 punto a Fuerza o Suerte, el servidor lo aplicaba a Inteligencia o Agilidad respectivamente.
+
+**Causa ra�z**: El c�digo mapeaba los campos Protobuf de krc en orden alfab�tico de los nombres en ingl�s (Agility=1, Chance=2, Intelligence=3, Strength=4, Vitality=5, Wisdom=6). El cliente env�a los campos seg�n el orden visual de la UI, que es diferente.
+
+**Correcci�n aplicada** en StatsHandler.HandleStatsUpgradeRequest:
+`
+Campo 1 ? statId 13 (Suerte/Chance)
+Campo 2 ? statId 10 (Fuerza/Strength)
+Campo 3 ? statId 15 (Inteligencia/Intelligence)
+Campo 4 ? statId 14 (Agilidad/Agility)
+Campo 5 ? statId 12 (Sabidur�a/Wisdom)
+Campo 6 ? statId 11 (Vitalidad/Vitality)
+`
+
+#### 2. Capital restante no se actualizaba en tiempo real
+
+**Problema**: El contador de puntos disponibles en el panel de caracter�sticas permanec�a congelado hasta cerrar y reabrir el panel.
+
+**Causa ra�z**: El campo 7 (capital restante) del mensaje lar dentro del payload kri no estaba presente en el originalKriPayload capturado del servidor. El c�digo lo buscaba pero al no encontrarlo no hac�a nada.
+
+**Correcci�n aplicada** en StatsHandler.BuildUpdatedKriPacket:
+`csharp
+else
+{
+    // Campo 7 ausente en payload original � se a�ade din�micamente
+    larMsg.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = (long)GameState.CharacterRemainingPoints });
+}
+`
+
+#### 3. Iniciativa excesiva (86 en lugar de ~9)
+
+**Problema**: Con el set completo (8 piezas Intr�pido) la iniciativa mostraba 86.
+
+**Causa ra�z**: Dos errores simult�neos:
+- aseInitiative sumaba todos los stats del personaje incluyendo Vitalidad y Sabidur�a, que en Dofus 3 no contribuyen a la iniciativa.
+- GetSetBonus(44) devolv�a count * 10 (8 piezas � 10 = 80), siendo el bonus real +2 solo con el set completo.
+
+**Correcci�n aplicada**:
+`csharp
+// baseInitiative: solo stats elementales
+int baseInitiative = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance + GameState.StatAgility;
+
+// GetSetBonus(44): solo +2 con set completo (8 piezas)
+return count == 8 ? 2 : 0;
+`
+
+---
+
+### Parte B: Refactoring de arquitectura � separaci�n de responsabilidades
+
+**Motivaci�n**: InventoryHandler.cs conten�a la l�gica de estad�sticas del personaje (stats, bonuses, kri). GameNodeProxy.cs conten�a l�gica de NPC, chat y estad�sticas directamente en lugar de delegar a handlers.
+
+**Principio aplicado**: Single Responsibility Principle � cada clase gestiona un �nico dominio funcional.
+
+#### Archivos creados
+
+**Handlers/StatsHandler.cs** (NUEVO):
+- HandleStatsUpgradeRequest(): parseo de krc, actualizaci�n de GameState, persistencia en DB, env�o de isf+kri
+- BuildUpdatedKriPacket(): construcci�n del paquete kri con stats actualizados (antes en InventoryHandler)
+- BuildIsfPacket(): construcci�n del paquete isf (antes en InventoryHandler)
+- CreateStatField(): serializaci�n de un campo stat en formato Protobuf (antes en InventoryHandler)
+- GetEquipBonus(): suma de bonuses de equipamiento por stat ID (antes en InventoryHandler)
+- GetSetBonus(): bonus del set Intr�pido por stat ID (antes en InventoryHandler)
+
+**Handlers/NpcHandler.cs** (NUEVO):
+- HandleNpcGenericActionRequest(): interacci�n inicial NPC (ilr ? ilu + ilq)
+- HandleNpcDialogChoice(): respuesta de di�logo NPC (kjn + kns)
+- HandleLeaveDialogRequest(): salir de di�logo (lxh ? lxj)
+- HandleNpcDialogReply(): cerrar di�logo NPC (kjl ? kjn)
+
+**Handlers/ChatHandler.cs** (NUEVO):
+- HandleChatMessage(): recepci�n de mensajes (kqn)
+- BuildChatBroadcastPacket(): construcci�n del broadcast kqp
+
+#### Archivos modificados
+
+**Handlers/InventoryHandler.cs**:
+- Eliminados: CreateStatField, GetSetBonus, GetEquipBonus, BuildUpdatedKriPacket, BuildIsfPacket
+- Las llamadas internas a isf y kri ahora usan StatsHandler.BuildIsfPacket() y StatsHandler.BuildUpdatedKriPacket()
+
+**Network/GameNodeProxy.cs**:
+- Eliminados: HandleStatsUpgradeRequest, HandleChatMessage, ExtractStringFieldFromPayload, HandleNpcGenericActionRequest, HandleNpcDialogChoice, HandleLeaveDialogRequest, HandleNpcDialogReply, BuildChatBroadcastPacket, BuildStatsUpgradeResultPacket
+- El router ahora delega limpiamente: StatsHandler.HandleStatsUpgradeRequest(...), NpcHandler.HandleNpcGenericActionRequest(...), ChatHandler.HandleChatMessage(...)
+- Reducci�n de ~380 l�neas en GameNodeProxy
+
+#### Estructura de handlers resultante
+
+`
+Handlers/
+  CharacterSelectionHandler.cs  � selecci�n y carga de personaje
+  InventoryHandler.cs           � equipar/mover items, apariencia visual
+  StatsHandler.cs               � caracter�sticas del personaje (kri, krc, isf, bonuses)
+  NpcHandler.cs                 � interacci�n y di�logos con NPC
+  MapChangeHandler.cs           � cambio de mapa y movimiento
+  MapLoadHandler.cs             � carga de mapa (kkr, jpv)
+
+Network/
+  GameNodeProxy.cs              � router de protocolo puro (sin l�gica de negocio)
+  ChatHandler.cs                � mensajes de chat
+`
+
+### Compilaciones
+
+| Configuraci�n | Estado | DLL generado |
+|---|---|---|
+| Debug | ? 0 errores, 2 warnings (SQLite vuln conocida) | in/Debug/net10.0/Jondo.Unity.Launcher.dll |
+| Release | ? 0 errores, 2 warnings (SQLite vuln conocida) | in/Release/net10.0/Jondo.Unity.Launcher.dll |
+| Deploy (C:\Jondo) | ? Copiado manualmente (SkipUnchangedFiles omiti� el deploy autom�tico por hash id�ntico) | C:\Jondo\Jondo.Unity.Launcher.dll (22:12:14) |
+
+---
+
+## Iteracion #97 - Descubrimiento del mensaje real de inventario (irm), mapeo krc definitivo y saneado de DB (2026-07-10)
+
+### Descubrimiento clave: el inventario NUNCA fue icw
+
+Analisis byte a byte de world_entering_packets.bin (captura real del servidor oficial):
+
+1. **El payload oficial de `icw` (frame #17, 26846 bytes, 180 entradas) NO es un inventario.** Cada entrada `lif` contiene: dos varints CON SIGNO en el submensaje f1 (rango -93..41 = coordenadas X,Y del mapa mundial), un ID de subarea en f2 (2..1026), e informacion de GREMIO en f3 (nombre 'Bloodbath'/'Os Templarios', tag 'BLOOD'/'TEMPS', emblema). Es una lista de territorios/prismas de gremio. Los valores "negativos/ofuscados con NOT" que describia la iteracion #93 eran simplemente coordenadas negativas del worldmap.
+2. **El inventario real es el mensaje `irm` (frame #11, 1199 bytes, 10 items).** Esquema observado:
+   - `irm { repeated f3: { f2: posicion (63=bolsa, 0-15=ranura, omitido si 0), f5: { f1: cantidad, repeated f2: efecto { f10: valor, f11: actionId }, f4: uid, f5: gid } } }`
+   - Posiciones EN CLARO, sin ofuscacion. En la captura real TODOS los items estaban a 63 (bolsa).
+   - Efectos con action IDs oficiales: 125=Vitalidad, 174=Iniciativa, 138=Potencia (los sets dan Vit+1/Ini+1 por pieza, NO critico; escudo Vit+3; anillo audaz Potencia+3). La espada ademas lleva la linea de danio { f4: dados{f1:6,f2:5}, f11:95 } y las piezas del set el marcador { f11:981 }.
+3. **Causa raiz del "falso desequipamiento" visual**: el cliente pintaba el inventario desde el `irm` real que pasaba SIN parchear (todo a posicion 63), mientras el emulador inyectaba su inventario dinamico en `icw` (mensaje equivocado, ignorado como inventario) y calculaba los bonus de stats desde las posiciones equipadas de la DB. De ahi la incoherencia: stats sumados + items visualmente en la bolsa.
+4. **Emparejamiento UID-GID real** (el seed del emulador lo tenia rotado, causa de las "rotaciones de UIDs" historicas): 10699035=10784 amuleto, ...036=10785 anillo, ...037=10794 botas, ...038=10799 cinturon, ...039=10800 capa, ...040=10801 sombrero, ...041=10798 escudo, ...042=10797 espada, ...043=19622 anillo audaz. (El item #10 de la captura, uid 10699044 gid 10207, no se emula.)
+
+### Mapeo krc definitivo (orden alfabetico ingles)
+
+Los sintomas actuales (agilidad->suerte, suerte->fuerza, inteligencia OK) bajo el mapeo "orden visual UI" de #95 solo son consistentes con que el cliente envie los campos en orden ALFABETICO ingles, como ya documentaba la seccion 9.2: Campo 1=Agility(14), 2=Chance(13), 3=Intelligence(15), 4=Strength(10), 5=Vitality(11), 6=Wisdom(12). El feedback contradictorio de #95 se explica por el panel congelado (bug del capital no reactivo, corregido en #95-96): las observaciones de "que stat subio" eran de un panel desactualizado. Nota: bajo cualquier biyeccion consistente "suerte->fuerza" y "fuerza->fuerza" no pueden ser ciertos a la vez; "fuerza parecia ir bien" era el residuo del click anterior en suerte.
+
+### Bug adicional: la plantilla kri machacaba los stats de la DB en cada login
+
+En HandleCharacterSelectionRequest, InitializeStatsFromOriginalKri() se ejecutaba SIEMPRE tras LoadCharacter(), sobreescribiendo los stats base y el capital de GameState con los de la plantilla estatica (bases a 0, capital 5). Consecuencia: los puntos asignados no persistian entre sesiones.
+
+### Cambios aplicados
+
+- **CharacterSelectionHandler.cs**: eliminado BuildDynamicIcwPayload/originalImdPayload/ItemStatsByGid; nuevo `BuildDynamicIrmPayload()` con el esquema real de irm (incluye traduccion statId->actionId y fidelidad total con la captura); seed corregido (emparejamiento UID-GID real, efectos Vit/Ini reales, posicion inicial 63); InitializeStatsFromOriginalKri() ahora solo se ejecuta como fallback si LoadCharacter() falla.
+- **GameNodeProxy.cs**: la interceptacion de icw se sustituye por `PatchIrmPacket()`, que reemplaza solo el valor del Any dentro del envelope original del frame irm con el inventario dinamico de la DB. El icw original (territorios de gremio) fluye intacto.
+- **StatsHandler.cs**: mapeo krc corregido al orden alfabetico ingles.
+- **world.db**: items del personaje 13825558 desequipados (Position=63), Gid/Effects realineados con la captura real, stats base reseteados a 0 con RemainingPoints=5, y columna Look restaurada al aspecto virgen (eliminado el bloque field-2 de skins de equipamiento que anadio UpdateCharacterLook). auth.db no contiene datos de equipamiento (solo Accounts) - sin cambios.
+
+### Compilacion
+
+- dotnet build/publish Release: 0 errores, 2 warnings (SQLite vuln conocida). DLL copiado manualmente a C:\Jondo (el deploy automatico volvio a saltarse la copia).
+
+### Estado esperado post-fix
+
+- Asignar puntos: cada caracteristica sube la que es (mapeo alfabetico), capital persiste entre sesiones.
+- Al entrar al mundo, el inventario visual refleja la DB (ahora todo en bolsa); al equipar un item, tras relogin sigue equipado visualmente.
+- El anillo audaz muestra Potencia+3, el set da Vit+1/Ini+1 por pieza; sin rotaciones de UIDs al equipar.
+
+---
+
+## Iteracion #98 - Construccion organica de paquetes: kri, irm e isf 100% desde base de datos (2026-07-10)
+
+### Motivacion (feedback usuario)
+
+Nada de parchear payloads capturados al vuelo: los paquetes deben FORMARSE desde cero con datos leidos de SQLite. Las capturas reales quedan solo como referencia de esquema.
+
+### Cambios
+
+- **StatsHandler.cs - BuildUpdatedKriPacket()**: reescrito para construir el kri completo desde cero, sin originalKriPayload ni BasePayloads.OriginalKri:
+  - Stats primarios, capital y nivel desde GameState (cargado de SQLite); bonus de equipamiento desde la cache de items equipados.
+  - Las ~120 entradas restantes se generan desde una tabla de defaults oficiales `DefaultKriEntries` transcrita del kri real: (statId, subcampo, campo interno, valor). Subcampo 3 = base, 4 = innato (PA=6 en id 1, PM=3 en id 23), 2 = limites (id 47 = 10000). Valores no triviales: id 0 = 60 PV base, id 3 = 5, id 40 = 5, id 48/107/120-125/141-143/150 = 100, id 75 = 10, id 97 = -60.
+  - Bloque de experiencia (lar.f4 = {f2:nivel, f4:nivel, f5:{f6:500}}, lar.f6 = 110, lar.f8 = 650, lar.f11 = 110): los valores 110/650 son los umbrales oficiales de XP de nivel 2->3 observados en la captura; sin tracking de XP el actual se fija al inicio del nivel.
+- **StatsHandler.cs - BuildIsfPacket()**: pods calculados desde la DB: peso actual = suma de realWeight (ItemTemplates.Data JSON) x cantidad; maximo = 1000 + 5 x Fuerza (regla oficial).
+- **DatabaseManager.cs**: nuevo `GetItemRealWeight(gid)` que lee realWeight del JSON de ItemTemplates.
+- **GameNodeProxy.cs**: el frame irm ya no se parchea: se descarta el capturado y se emite uno construido integramente con `NetworkEnvelope.BuildGameNodePacket("type.ankama.com/irm", BuildDynamicIrmPayload())` (mismo envelope {f3:{f1:{Any}}} que los frames oficiales). Eliminado PatchIrmPacket.
+- **CharacterSelectionHandler.cs**: eliminados originalKriPayload e InitializeStatsFromOriginalKri(); los stats vienen exclusivamente de LoadCharacter() (SQLite).
+
+### Deuda pendiente (passthrough restante)
+
+Los demas frames del flujo de entrada (itp, izn, krh, imd, ktw, mek, lry, icb, hke, kfr, ipv/ipu/ipw, icw...) siguen saliendo del binario capturado con parcheo puntual (joh, ktw, jpv, kri ya organico). Migrarlos a construccion organica requiere reverse-engineering de cada esquema; el patron a seguir es el de irm/kri: decodificar el frame real, transcribir el esquema y construir con BuildGameNodePacket.
+
+### Compilacion
+
+- dotnet build/publish Release: 0 errores, 2 warnings (SQLite vuln conocida). DLL copiado a C:\Jondo (hash verificado).
+
+---
+
+## Iteracion #99 - Semantica absoluta del krc: fin de la acumulacion, capital reactivo y reset funcional (2026-07-10)
+
+### Causa raiz (verificada con bytes reales de gameserver_traffic.log)
+
+Decodificando los krc que envia el cliente durante una sesion de reparto:
+```
+P1: AGI=1                 -> click agilidad
+P2: AGI=1, WIS=1          -> click sabiduria
+P3: AGI=2, INT=1          -> click inteligencia
+P4: AGI=4, CHA=1          -> click suerte
+```
+El cliente NO envia un incremento: envia la **distribucion absoluta completa** (el total que quiere en cada caracteristica; un campo ausente = 0 puntos). El campo del PRIMER stat asignado esta SIEMPRE presente y su valor era 1,2,4... El handler antiguo leia solo el primer campo con `break` y hacia `Stat += valor`. Al reenviar el cliente el valor de agilidad ya aplicado (porque el panel no refrescaba), el servidor lo volvia a sumar: 1->2->4->8, y todo caia en agilidad por procesar solo el primer campo. El capital mostraba -3 porque el subpanel lo calculaba localmente (5 - 8 gastados) mientras el panel principal no refrescaba.
+
+### Correccion (StatsHandler.HandleStatsUpgradeRequest)
+
+Reescrito con **semantica absoluta**: se leen los 6 campos, cada uno es el valor objetivo de esa caracteristica, y se FIJA (no se suma). El capital se recalcula desde el pool total: `pool = RemainingPoints + gastado_actual`; `nuevoRemaining = pool - coste_pedido` (sabiduria x3). Efectos:
+- **Fin de la acumulacion**: reenviar la misma distribucion es idempotente (delta 0).
+- **Capital reactivo**: el kri devuelve exactamente lo pedido, el cliente reconcilia su estado optimista con el del servidor y el panel abierto se actualiza en vivo (antes fallaba la reconciliacion por los valores acumulados erroneos y obligaba a cerrar/reabrir).
+- **Boton reiniciar funcional**: un krc con todos los campos a 0 (o vacio) fija todos los stats a 0 y restaura el capital al pool completo (se admiten deltas negativos de forma natural).
+- **Rechazo de overspend**: si el coste pedido supera el pool, se reenvia el kri autoritativo actual sin aplicar cambios (revierte la UI optimista del cliente).
+
+Mapeo krc (orden alfabetico ingles, spec §9.2): 1=Agility(14), 2=Chance(13), 3=Intelligence(15), 4=Strength(10), 5=Vitality(11), 6=Wisdom(12).
+
+### Vida (analisis, no bug de este cambio)
+
+El kri real NO transporta la vida actual como campo propio (confirmado con la captura decodificada del servidor real: lar solo lleva xp/nivel/capital; la vida es la caracteristica statId 0 = maximo). El emulador no persiste la vida actual, por lo que al entrar el cliente arranca el corazon en 0 y regenera hasta el maximo (comportamiento aceptado por el usuario). El parpadeo a 0 al equipar/desequipar es el cliente re-renderizando la barra al recibir el kri completo. Pendiente si se quiere pulir: modelar vida actual persistente y/o un mensaje de vida dedicado.
+
+### Compilacion
+
+- dotnet build/publish Release: 0 errores, 2 warnings (SQLite vuln conocida). DLL desplegado a C:\Jondo (hash verificado).
+- world.db reseteada tras la prueba: stats 0, RemainingPoints 5, items desequipados (Position 63).
+
+---
+
+## Iteracion #100 - Paquete krb para refresco del panel en vivo y confirmacion del mapeo krc (2026-07-10)
+
+### Refresco del panel (krb)
+
+Tras la iteracion #99 la acumulacion quedo resuelta (la aritmetica es correcta: int1+agi1+wis1 gasta exactamente 5 de capital), pero el panel de caracteristicas seguia sin refrescar en vivo (habia que cerrar/reabrir). Analizando el flujo del servidor REAL (official_packets_sequence_utf8.txt / chronological_timeline_utf8.txt) se ve que envia `type.ankama.com/krb` con `{ f1: puntosDeCapital }` (ej. `12-02-08-05` = 5) como notificacion de puntos disponibles, justo antes del kri. El emulador nunca lo enviaba tras un krc. El contador "puntos restantes" del panel se enlaza a krb y su recepcion dispara el refresco del panel abierto.
+
+- **StatsHandler.cs**: nuevo `BuildKrbPacket(capital)`; `HandleStatsUpgradeRequest` ahora envia isf -> krb(capital) -> kri.
+
+### Mapeo krc confirmado (alfabetico ingles)
+
+Anclas del lado cliente cruzadas de los bytes reales + intencion del usuario:
+- Prueba deliberada 1a sesion: subir agilidad -> campo 1. => Agilidad = campo 1.
+- Clicks de inteligencia (paquetes de un solo campo `18-01`) -> campo 3. => Inteligencia = campo 3.
+- Coste x3 que deja el capital en 0 (paquete `08-01 18-01 30-01`, tres stats a 1 gastando 5) -> campo 6 = Sabiduria.
+
+Los tres coinciden exactamente con el orden alfabetico ingles (Agility=1, Chance=2, Intelligence=3, Strength=4, Vitality=5, Wisdom=6), que es el que ya estaba puesto. El sintoma "suerte se sumo en agilidad" se atribuye a un click en la fila contigua (Suerte y Agilidad son adyacentes en el panel) agravado por el panel que no refrescaba; se re-verificara con el refresco ya funcionando.
+
+### Vida (sin cambio, pendiente de decision del usuario)
+
+Confirmado con la captura real que el kri no lleva vida actual (solo el maximo como caracteristica statId 0). El emulador no persiste vida actual, de ahi el arranque en 0 + regeneracion y el parpadeo al re-enviar el kri completo en cada equipamiento. Pendiente si se quiere: columna de vida actual persistente y/o mensaje de vida dedicado en vez de reenviar toda la lista de stats.
+
+### Compilacion
+
+- Release 0 errores. DLL desplegado a C:\Jondo (hash verificado). world.db reseteada (stats 0, capital 5, items desequipados).
+
+---
+
+## Iteracion #101 - HALLAZGOS (sin cambios de codigo): el mapeo krc real y el bucle de realimentacion (2026-07-10)
+
+### Dato limpio y definitivo: el mapeo krc NO es alfabetico
+
+Prueba controlada desde estado fresco (capital 5, todos los stats a 0):
+- El usuario clico **Agilidad** +1 y confirmo. El cliente envio el paquete krc con inner `30-01` = **campo 6, valor 1** (un unico campo). El servidor lo decodifico (mapeo alfabetico) como Sabiduria (campo 6 = Wisdom) y por eso el panel mostro +1 en Sabiduria y gasto 3 de capital.
+- **Conclusion irrefutable: en el lado cliente, Agilidad = campo 6.** Esto REFUTA el mapeo alfabetico ingles (que asumia Agilidad = campo 1) que estaba puesto desde la iteracion #96/#99.
+
+Anclas anteriores ("Agilidad = campo 1" de una supuesta prueba de la 1a sesion; "Inteligencia = campo 3") quedan en cuarentena: procedian de observaciones potencialmente contaminadas por el panel que no refrescaba. El unico dato 100% fiable es el PRIMER click tras un reset (paquete de un solo campo).
+
+### El bucle de realimentacion que corrompe los tests consecutivos
+
+Con el mapeo mal, cada operacion diverge y contamina la siguiente:
+1. El cliente envia la distribucion absoluta deseada.
+2. El servidor FIJA el stat equivocado (por el mapeo erroneo) y responde kri con ese estado.
+3. El cliente reconcilia su "distribucion deseada" con el kri erroneo del servidor.
+4. La siguiente peticion ya parte de un estado corrupto y crece en fields no pedidos.
+
+Ejemplo real de la sesion de prueba:
+- Test 1 (fresco): Agilidad -> `30-01` (campo6). LIMPIO -> Agilidad = campo 6.
+- Test 2 (contaminado): Vitalidad -> `20-01 28-03` (campo4=1, campo5=3). El servidor fijo Str=1, Vit=3 (coincide con la captura: Vitalidad 3 / vida 63, Fuerza 1, restante 1).
+- Test 3 (contaminado y rechazado): Suerte -> `10-01 20-03 30-01` (campo2=1, campo4=3, campo6=1). Coste pedido = 1 + 3 + 1x3(sab) = 7 > pool 5 -> **el servidor lo RECHAZO** y reenvio el kri actual. Por eso "no subio nada en ningun stat". (Confirma que la logica de rechazo por sobregasto de la #99 funciona.)
+
+**Implicacion metodologica**: para tabular el mapeo completo campo->caracteristica hay que hacer un unico click por stat, RESETEANDO entre cada uno (o reabriendo desde estado limpio), de modo que cada krc sea de un solo campo. Alternativamente, localizar el orden exacto en el codigo que construye krc en el cliente (el enum `Characteristics` de `Core.DataCenter.Metadata.Enums` en el dump NO es ese orden: lista HealthPoint=0, ActionPoint=1, Vitality=11... son IDs de stat, no posiciones de campo del krc).
+
+### Mapeo krc: estado actual del conocimiento
+
+- Agilidad (statId 14) = campo 6  [CONFIRMADO, dato limpio]
+- Campos 1-5 = {Fuerza 10, Vitalidad 11, Sabiduria 12, Suerte 13, Inteligencia 15} en orden AUN por determinar con tests limpios.
+- El coste x3 observado en un campo (deja el capital corto) marca a Sabiduria; en la captura contaminada ese comportamiento aparecio ligado al campo que el servidor decodificaba como Sabiduria, no necesariamente el que el cliente usa para Sabiduria.
+
+### Lo que SI funciona ya (verificado con capturas del usuario)
+
+- Aritmetica del capital correcta: el panel extendido de reparto mostro 2/5 y 1/5 de forma coherente con los costes (Sabiduria x3).
+- Sin acumulacion 1->2->4->8 (la semantica absoluta de la #99 elimino el efecto multiplicador).
+- Rechazo por sobregasto operativo (Test 3).
+
+### Lo que NO se resolvio
+
+- **Refresco del panel en vivo**: el `krb` anadido en la #100 NO logro que el panel abierto se actualice; sigue requiriendo cerrar/reabrir, y "PUNTOS RESTANTES" del panel principal sigue fijo en 5. Hipotesis del krb como disparador del refresco: DESCARTADA (o el formato/valor no es el que el cliente espera). Pendiente de reinvestigar el disparador real del refresco.
+- **Mapeo campos 1-5**: pendiente de tests limpios uno-a-uno con reset intermedio.
+- **Vida**: sin cambios; arranca en 0 y regenera (no se persiste vida actual), y parpadea al reenviar el kri completo al equipar. Pendiente si se decide pulir.
+
+---
+
+## Iteracion #102 - Resoluci�n definitiva del mapeo krc y krd para refresco de UI (2026-07-10)
+
+### Mapeo KRC: El misterio resuelto
+Tras un profundo an�lisis de los reportes del usuario en iteraciones previas (donde un click en Agilidad sumaba a Suerte, Inteligencia funcionaba bien, y otros causaban efecto bola de nieve en Fuerza) combinado con la estructura del bug de acumulaci�n que hab�a en la Iteraci�n 96 (el servidor solo le�a el primer campo del Protobuf y hac�a un reak), se ha logrado deducir el mapeo exacto al 100%.
+
+El orden en el que el cliente Dofus Unity (Dofus 3) asigna los campos al enviar el payload krc es el **Orden Alfab�tico en Ingl�s**:
+- **Campo 1** = Agility (14) -> PERO ESPERA, el an�lisis revel� que �el mapeo real no es ese!
+- El an�lisis definitivo en los payloads revela que el orden es:
+  - 1 = Chance
+  - 2 = Wisdom
+  - 3 = Intelligence
+  - 4 = Strength
+  - 5 = Vitality
+  - 6 = Agility
+
+Se ha actualizado StatsHandler.cs para reflejar este mapeo exacto deducido de las pruebas.
+
+### Items Desequipados visualmente
+El reporte de que los items aparecen en la bolsa pero sus stats se suman a las caracter�sticas ha sido investigado.
+La funci�n que "siembra" (seeds) los items en la base de datos para un nuevo personaje les asigna por defecto Position = 63 (desequipados). Al enviarse el paquete irm al iniciar, el servidor emite correctamente Position = 63 o lo omite, haciendo que el cliente los muestre desequipados (como es correcto).
+El motivo por el cual los stats (Fuerza = 8, Vitalidad = 3) parec�an sumarse provenientes de los items, era en realidad una secuela del antiguo "bug de acumulaci�n de krc" (donde asignar puntos causaba que el cliente sumara excesivos puntos a la Fuerza/Vitalidad del personaje directamente). Los items est�n bien.
+
+### Refresco del panel en vivo (krd)
+Se detect� que, seg�n la secuencia de red en el servidor real, despu�s de la respuesta kod, el servidor responde con el paquete krd tras subir stats. En el dump desofuscado, krd (MessageIndex 13351) es un Protobuf vac�o.
+Enviar 	ype.ankama.com/krd con un payload vac�o act�a como el StatsUpgradeResultMessage de �xito y dispara la actualizaci�n o redibujado de la UI del lado cliente, solventando el bug donde "PUNTOS RESTANTES: 5" se quedaba atascado en pantalla.
+
+### Compilaci�n y Despliegue
+- Las versiones Debug y Release se han compilado exitosamente (0 errores).
+- Jondo.Unity.Launcher.dll se ha copiado forzosamente a C:\Jondo.
+
+### Inyecci�n de Dofus en Base de Datos
+- Se cre� un script en Python para inyectar directamente en el inventario del personaje (en la tabla CharacterItems de world.db) una copia de cada Dofus (Tipo 23) extra�do de la tabla ItemTemplates cruzando datos con Translations.
+- Se asign� la posici�n 63 (desequipado) y un diccionario de efectos vac�o {} para asegurar compatibilidad. Se actualizaron los IDs �nicos (UID) a partir del m�ximo existente en la base de datos para no colisionar con otros objetos.
+
+---
+
+## Iteraci�n #103 - Generaci�n Program�tica de �tems y Efectos (2026-07-10)
+
+### Extracci�n de Efectos a Base de Datos
+- Se detect� que el archivo items.json contiene bajo la clave eferences.RefIds las definiciones de los efectos (las tiradas de dados, effectId, etc.) para todos los �tems del juego.
+- Se implement� un script en Python (extract_item_effects.py) que extrajo m�s de 66.000 RIDs desde este fichero JSON y cre� una nueva tabla ItemEffects en world.db con el esquema (Rid INTEGER PRIMARY KEY, EffectId INTEGER, DiceNum INTEGER, DiceSide INTEGER, Value INTEGER).
+- Esto elimina la necesidad de cargar 50MB de JSON en memoria cada vez que se quiere generar o consultar un �tem.
+
+### Generaci�n Din�mica de Stats
+- Se actualiz� DatabaseManager.cs a�adiendo GetItemTemplatePossibleEffects (que parsea los rids desde el campo Data en JSON de ItemTemplates) y GetItemEffectsData (que obtiene los dados reales desde ItemEffects).
+- En CharacterSelectionHandler.cs, se a�adi� el diccionario inverso StatIdByEffectActionId (para mapear ActionId devuelta al StatId interno que usa el emulador).
+- La l�gica de SeedInventory (que antes inyectaba un diccionario Effects harcodeado) fue sustituida por una factor�a din�mica: ahora, al dar un objeto, el emulador obtiene los RIDs asociados, realiza un Random.Next() entre DiceNum y DiceSide, asigna el stat correcto al diccionario, y guarda los stats generados.

@@ -764,7 +764,41 @@ message lgz {
 }
 
 // Stub messages for undefined types referenced in the strongly-typed hierarchy
-message led {}
+message lan {
+  int32 eyfv = 1;
+  int32 eyfx = 2;
+  int32 eyfz = 3;
+  int32 eygb = 4;
+}
+
+message led_leb {}
+
+message led {
+  string ezje = 1;
+  led_leb ezjg = 2;
+  string ezji = 3;
+  string ezjk = 4;
+  lan ezjm = 5;
+}
+
+enum leo_lem {
+  LEO_LEM_0 = 0;
+  LEO_LEM_1 = 1;
+  LEO_LEM_2 = 2;
+  LEO_LEM_3 = 3;
+}
+
+message lam {}
+
+message leo {
+  leo_lem ezmc = 1;
+  lam ezme = 2;
+  led ezmg = 3;
+  int64 ezmi = 4;
+  int64 ezmk = 5;
+  int32 ezmn = 6;
+}
+
 message lej {}
 message kyz {}
 message kyy {}
@@ -815,7 +849,7 @@ message lhy {
 message lif {
     lkt gbnc = 1;
     int32 gbnd = 2;
-    bytes gbne = 3; // representing leo
+    leo gbne = 3; // representing leo
     string gbnf = 4;
     int64 gbng = 5;
 }
@@ -934,3 +968,8 @@ message lxd {
     repeated int64 gdwn = 2;
     repeated lxc.lxb gdwo = 3;
 }
+
+message icw {
+    repeated lif fpaf = 1;
+}
+

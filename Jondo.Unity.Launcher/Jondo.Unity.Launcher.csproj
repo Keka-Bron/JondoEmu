@@ -22,6 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="world.db" />
+    <Content Remove="auth.db" />
+    <None Update="world.db" CopyToOutputDirectory="Never" />
+    <None Update="auth.db" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj" />
   </ItemGroup>
 

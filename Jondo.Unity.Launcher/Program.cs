@@ -32,9 +32,7 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[+] Initializing Map Manager...");
             MapManager.Initialize();
 
-            // 2. Dynamically seed active player details from template
-            Console.WriteLine("[+] Seeding character look template from base payloads...");
-            CharacterSelectionHandler.ExtractPlayerActorDetailsFromTemplate(BasePayloads.WorldEnteringPackets);
+
 
             // 3. Start Emulation Servers
             Console.WriteLine("[+] Starting services...");
@@ -129,19 +127,7 @@ namespace Jondo.Unity.Launcher
                         }
                         GameState.MapId = mapId;
                         GameState.CellId = cellId;
-                        DatabaseManager.SaveCharacterStatsAndPosition(
-                            GameState.CharacterId,
-                            GameState.CharacterRemainingPoints,
-                            GameState.StatVitality,
-                            GameState.StatWisdom,
-                            GameState.StatStrength,
-                            GameState.StatIntelligence,
-                            GameState.StatChance,
-                            GameState.StatAgility,
-                            GameState.MapId,
-                            GameState.CellId,
-                            GameState.Orientation
-                        );
+                        DatabaseManager.SaveCurrentCharacter();
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"[Teleport] Character teleported to Map {mapId}, Cell {cellId}. Saved to database.");
                         Console.ResetColor();

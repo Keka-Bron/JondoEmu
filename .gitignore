@@ -24,3 +24,8 @@ packages/
 ## Ignore OS files
 .DS_Store
 Thumbs.db
+
+*.dll
+*.pdb
+*.exe
+*.db
