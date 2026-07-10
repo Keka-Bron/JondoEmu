@@ -96,7 +96,7 @@ By default, the official Dofus client tries to connect to the official Ankama se
 If you wish to make modifications to the emulator or the client mod:
 
 ### Compiling the Emulator
-You can open the **`Jondo.Unity.sln`** solution in Visual Studio 2022 or build it directly from your terminal with:
+You can open the **`Jondo.Unity.sln`** solution in Visual Studio 2022 or higher, or build it directly from your terminal with:
 ```bash
 dotnet build -c Release
 ```
