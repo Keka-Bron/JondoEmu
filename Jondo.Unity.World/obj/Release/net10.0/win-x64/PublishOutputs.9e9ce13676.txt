@@ -1,0 +1,4 @@
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\win-x64\publish\Jondo.Unity.World.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\win-x64\publish\Jondo.Unity.Core.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\win-x64\publish\Jondo.Unity.Protocol.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\win-x64\publish\Jondo.Unity.World.exe

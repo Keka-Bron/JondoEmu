@@ -1,0 +1,10 @@
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Auth.exe
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Auth.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Auth.deps.json
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Auth.runtimeconfig.json
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Auth.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Google.Protobuf.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Core.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Protocol.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Core.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Auth\bin\Release\net10.0\publish\Jondo.Unity.Protocol.pdb

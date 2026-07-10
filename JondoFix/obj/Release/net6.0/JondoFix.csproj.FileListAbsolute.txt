@@ -1,0 +1,25 @@
+C:\Jondo\JondoFix\obj\Release\net6.0\JondoFix.csproj.AssemblyReference.cache
+C:\Jondo\JondoFix\obj\Release\net6.0\JondoFix.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jondo\JondoFix\obj\Release\net6.0\JondoFix.AssemblyInfoInputs.cache
+C:\Jondo\JondoFix\obj\Release\net6.0\JondoFix.AssemblyInfo.cs
+C:\Jondo\JondoFix\obj\Release\net6.0\JondoFix.csproj.CoreCompileInputs.cache
+C:\Jondo\JondoFix\bin\Release\net6.0\JondoFix.deps.json
+C:\Jondo\JondoFix\bin\Release\net6.0\JondoFix.dll
+C:\Jondo\JondoFix\bin\Release\net6.0\JondoFix.pdb
+C:\Jondo\JondoFix\obj\Release\net6.0\JondoFix.dll
+C:\Jondo\JondoFix\obj\Release\net6.0\refint\JondoFix.dll
+C:\Jondo\JondoFix\obj\Release\net6.0\JondoFix.pdb
+C:\Jondo\JondoFix\obj\Release\net6.0\ref\JondoFix.dll
+C:\Jondo\Jondo Unity Emulator\JondoFix\bin\Release\net6.0\JondoFix.deps.json
+C:\Jondo\Jondo Unity Emulator\JondoFix\bin\Release\net6.0\JondoFix.dll
+C:\Jondo\Jondo Unity Emulator\JondoFix\bin\Release\net6.0\JondoFix.pdb
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.csproj.AssemblyReference.cache
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.AssemblyInfoInputs.cache
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.AssemblyInfo.cs
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.csproj.CoreCompileInputs.cache
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.sourcelink.json
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.dll
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\refint\JondoFix.dll
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\JondoFix.pdb
+C:\Jondo\Jondo Unity Emulator\JondoFix\obj\Release\net6.0\ref\JondoFix.dll

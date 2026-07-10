@@ -1,0 +1,15 @@
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Debug\net10.0\Jondo.Unity.Parser.exe
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Debug\net10.0\Jondo.Unity.Parser.deps.json
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Debug\net10.0\Jondo.Unity.Parser.runtimeconfig.json
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Debug\net10.0\Jondo.Unity.Parser.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Debug\net10.0\Jondo.Unity.Parser.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.AssemblyInfoInputs.cache
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.AssemblyInfo.cs
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.csproj.CoreCompileInputs.cache
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\refint\Jondo.Unity.Parser.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.genruntimeconfig.cache
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\ref\Jondo.Unity.Parser.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\obj\Debug\net10.0\Jondo.Unity.Parser.sourcelink.json

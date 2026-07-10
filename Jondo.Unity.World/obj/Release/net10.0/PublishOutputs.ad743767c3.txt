@@ -1,0 +1,10 @@
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.World.exe
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.World.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.World.deps.json
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.World.runtimeconfig.json
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.World.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Google.Protobuf.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.Core.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.Protocol.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.Core.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.World\bin\Release\net10.0\publish\Jondo.Unity.Protocol.pdb

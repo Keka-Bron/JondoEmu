@@ -1,0 +1,6 @@
+C:\Jondo\Jondo.Unity.Protocol.dll
+C:\Jondo\Jondo.Unity.Protocol.pdb
+C:\Jondo\Google.Protobuf.dll
+C:\Jondo\Jondo.Unity.Core.dll
+C:\Jondo\Jondo.Unity.Core.pdb
+C:\Jondo\Jondo.Unity.Protocol.deps.json

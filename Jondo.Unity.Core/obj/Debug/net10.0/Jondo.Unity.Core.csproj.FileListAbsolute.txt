@@ -1,0 +1,12 @@
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\bin\Debug\net10.0\Jondo.Unity.Core.deps.json
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\bin\Debug\net10.0\Jondo.Unity.Core.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\bin\Debug\net10.0\Jondo.Unity.Core.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\Jondo.Unity.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\Jondo.Unity.Core.AssemblyInfoInputs.cache
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\Jondo.Unity.Core.AssemblyInfo.cs
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\Jondo.Unity.Core.csproj.CoreCompileInputs.cache
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\Jondo.Unity.Core.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\refint\Jondo.Unity.Core.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\Jondo.Unity.Core.pdb
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\ref\Jondo.Unity.Core.dll
+C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Core\obj\Debug\net10.0\Jondo.Unity.Core.sourcelink.json
