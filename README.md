@@ -108,3 +108,8 @@ The client mod can be compiled with:
 dotnet build JondoFix/JondoFix.csproj -c Release
 ```
 The resulting DLL file will be generated at `JondoFix/bin/Release/net6.0/JondoFix.dll`.
+
+<img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/1af6569e-0fef-4c8d-8ede-512aec40aabb" />
+<img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/bc56cc4c-8c56-4208-8863-76fbe7251f1d" />
+<img width="2560" height="1510" alt="image" src="https://github.com/user-attachments/assets/f7bec8df-4aa2-4718-ad73-6229a3207d78" />
+<img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/46ae56c8-d94f-47a0-830d-de68834d94e7" />
