@@ -9,6 +9,7 @@ This repository contains the complete architecture of the **Jondo** local emulat
 - [x] **Server Selection & Character Selection**
 - [x] **World Loading (World / Game Node)**
 - [x] **Character Spawn & Name Hover**
+- [x] **Suscription bypass - Infinite VIP suscription**
 - [x] **Movement, Map Change, Map Loading, Adjacent Maps**
 - [x] **Last Cell and Map Persistence** in Database
 - [x] **Inventory System:** Item spawning, equipping and unequipping items works well.
