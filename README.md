@@ -2,27 +2,31 @@
 
 This repository contains the complete architecture of the **Jondo** local emulator designed for the Unity client of Dofus (version 3.6.4.3), as well as the **JondoFix** client mod for MelonLoader.
 
-## 📊 Emulation Status
+## 🚀 Emulation Status
 
-### ✅ Completed / Emulated Features
+### ✅ Completed / Working Features
 - [x] **Client-Server-Authentication Emulation** (Zaap, HAAPI, Connection Server)
-- [x] **Server Selection**
-- [x] **Character Selection**
+- [x] **Server Selection & Character Selection**
 - [x] **World Loading (World / Game Node)**
-- [x] **Character Spawn**
-- [x] **Character Name Hover**
-- [x] **Movement**
+- [x] **Character Spawn & Name Hover**
+- [x] **Movement, Map Change, Map Loading, Adjacent Maps**
 - [x] **Last Cell and Map Persistence** in Database
-- [x] **Map Change**
-- [x] **Map Loading**
-- [x] **Adjacent Maps Calculation**
+- [x] **Inventory System:** Item spawning, equipping and unequipping items works well.
+- [x] **Character Stats:** Characteristic assignment is mostly debugged.
+- [x] **NPCs:** Spawns, looks, and dialogues are implemented *(Note: Needs a slight fix on closing dialogues properly. NPC buyers/sellers haven't been tested yet).*
 
-### 🚧 Work In Progress (WIP)
-- [ ] **Inventory System**
-- [ ] **Character Stats (Characteristics)**
-- [ ] **NPCs spawns and Dialogues**
-- [ ] **Fights**
-- [ ] **Monster Spawns**
+### 🚧 Work In Progress (WIP) / Basic Implementation
+- [ ] **Commands:** `.level` and `.kamas` are present but working roughly (working on it).
+
+### ❌ Missing Features
+- [ ] **Zaaps**
+- [ ] **Monsters:** Spawns, Mobs management, and Monster AI.
+- [ ] **Fights:** PVM and PVP combat system.
+- [ ] **Kolossium system**
+- [ ] **Jobs (Oficios)**
+- [ ] **Achievements (Logros)**
+- [ ] **Ornaments and Titles**
+- [ ] **Guilds (Gremios)**
 
 ---
 
