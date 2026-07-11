@@ -110,6 +110,17 @@ namespace Jondo.Unity.Launcher.Handlers
                             npcContextId--;
                         }
 
+                        // C. Add Aggressive Mobs
+                        var mobs = Managers.MobSpawnManager.GetMobsForMap(mapIdToLoad);
+                        foreach (var mob in mobs)
+                        {
+                            if (mob.Members.Count > 0)
+                            {
+                                var mobActorMsg = BuildMobGroupActorMsg(mob);
+                                jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = mobActorMsg.ToByteArray() });
+                            }
+                        }
+
                         byte[] jpvBytes = jpvMsg.ToByteArray();
                         byte[] jpvPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/jpv", jpvBytes);
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, jpvPacket);
@@ -199,6 +210,54 @@ namespace Jondo.Unity.Launcher.Handlers
             actorMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lfjMsg.ToByteArray() });
             actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detailsMsg.ToByteArray() });
             actorMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = contextualId });
+
+            return actorMsg;
+        }
+
+        private static ProtoMessage BuildMobGroupActorMsg(Managers.MobSpawnManager.MobGroup mob)
+        {
+            var mainMob = mob.Members[0].Monster;
+
+            // 1. Build Disposition (LFJ)
+            var lfjMsg = new ProtoMessage();
+            lfjMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = mob.CellId });
+            lfjMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 3 }); // Random orientation
+
+            // 2. Build root EntityLook (lkr)
+            var rootLook = new ProtoMessage();
+            int defaultBone = 1; // Default bone
+            int npcScale = 100;
+            if (!string.IsNullOrEmpty(mainMob.Look) && mainMob.Look.Contains("|"))
+            {
+                var parts = mainMob.Look.Trim('{', '}').Split('|');
+                if (parts.Length > 0 && int.TryParse(parts[0], out int b)) defaultBone = b;
+                if (parts.Length > 3 && int.TryParse(parts[3], out int sc)) npcScale = sc;
+            }
+            
+            rootLook.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = defaultBone });
+            rootLook.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 }); // Field 3: constant 3
+            rootLook.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = new byte[] { (byte)npcScale } });
+
+            // 3. Build npcMinimalInfo (matching PCAP: Field 4 = tooltipVisible, Field 6 = npcId)
+            // Using NPC structure for now so they render correctly, using the monster's generic ID as NPC ID
+            var npcMinimalInfo = new ProtoMessage();
+            npcMinimalInfo.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 }); // tooltipVisible
+            npcMinimalInfo.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = mainMob.Id }); 
+
+            // 4. Build npcInfoWrapper -> Field 5: npcMinimalInfo
+            var npcInfoWrapper = new ProtoMessage();
+            npcInfoWrapper.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 2, BytesValue = npcMinimalInfo.ToByteArray() });
+
+            // 5. Build detailsMsg (lni) -> Field 1: root EntityLook, Field 2: npcInfoWrapper
+            var detailsMsg = new ProtoMessage();
+            detailsMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = rootLook.ToByteArray() });
+            detailsMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = npcInfoWrapper.ToByteArray() });
+
+            // 6. Build root ActorMsg (lnk)
+            var actorMsg = new ProtoMessage();
+            actorMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lfjMsg.ToByteArray() });
+            actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detailsMsg.ToByteArray() });
+            actorMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = mob.MobId }); // contextual ID
 
             return actorMsg;
         }

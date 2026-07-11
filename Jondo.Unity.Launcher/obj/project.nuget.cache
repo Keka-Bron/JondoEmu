@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "BnLXai1OgKc=",
+  "dgSpecHash": "OUK/iiyUmGA=",
   "success": true,
   "projectFilePath": "C:\\Jondo\\Jondo Unity Emulator\\Jondo.Unity.Launcher\\Jondo.Unity.Launcher.csproj",
   "expectedPackageFiles": [
@@ -13,9 +13,22 @@
     "C:\\Users\\Santiago\\.nuget\\packages\\sqlitepclraw.core\\2.1.11\\sqlitepclraw.core.2.1.11.nupkg.sha512",
     "C:\\Users\\Santiago\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.11\\sqlitepclraw.lib.e_sqlite3.2.1.11.nupkg.sha512",
     "C:\\Users\\Santiago\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.1.11\\sqlitepclraw.provider.e_sqlite3.2.1.11.nupkg.sha512",
-    "C:\\Users\\Santiago\\.nuget\\packages\\system.net.http.winhttphandler\\10.0.0\\system.net.http.winhttphandler.10.0.0.nupkg.sha512"
+    "C:\\Users\\Santiago\\.nuget\\packages\\system.net.http.winhttphandler\\10.0.0\\system.net.http.winhttphandler.10.0.0.nupkg.sha512",
+    "C:\\Users\\Santiago\\.nuget\\packages\\system.text.json\\10.0.9\\system.text.json.10.0.9.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference System.Text.Json no se eliminará. Considere la posibilidad de quitar este paquete de las dependencias, ya que es probable que no sea necesario.",
+      "projectPath": "C:\\Jondo\\Jondo Unity Emulator\\Jondo.Unity.Launcher\\Jondo.Unity.Launcher.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Jondo\\Jondo Unity Emulator\\Jondo.Unity.Launcher\\Jondo.Unity.Launcher.csproj",
+      "libraryId": "System.Text.Json",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
     {
       "code": "NU1903",
       "level": "Warning",

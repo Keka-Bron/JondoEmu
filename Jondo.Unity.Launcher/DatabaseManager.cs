@@ -173,6 +173,29 @@ namespace Jondo.Unity.Launcher
                     seedNpc.ExecuteNonQuery();
                 }
 
+                // 4. Initialize Monsters tables
+                var createMonsters = worldConnection.CreateCommand();
+                createMonsters.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS Monsters (
+                        Id INTEGER PRIMARY KEY,
+                        NameId INTEGER,
+                        Look TEXT,
+                        Grades TEXT
+                    );
+                    CREATE TABLE IF NOT EXISTS Subareas (
+                        Id INTEGER PRIMARY KEY,
+                        Monsters TEXT
+                    );
+                    CREATE TABLE IF NOT EXISTS MapSubareas (
+                        MapId INTEGER PRIMARY KEY,
+                        SubAreaId INTEGER
+                    );
+                ";
+                createMonsters.ExecuteNonQuery();
+
+                // 5. Populate Monsters and Subareas from JSON if empty
+                PopulateMonstersFromJSON(worldConnection);
+
                 if (count == 0)
                 {
                     Console.WriteLine("[SQLite] Seeded default character CADERNIS.");
@@ -540,6 +563,65 @@ namespace Jondo.Unity.Launcher
             return bytes;
         }
 
+        public static void GiveAllLevel200Items(long characterId)
+        {
+            using var connection = new SqliteConnection(WorldConnectionString);
+            connection.Open();
+
+            // First check if already given
+            var checkCmd = connection.CreateCommand();
+            checkCmd.CommandText = "SELECT COUNT(*) FROM CharacterItems WHERE CharacterId = $id AND ItemGid = 21081;"; // Examples
+            checkCmd.Parameters.AddWithValue("$id", characterId);
+            long count = (long)checkCmd.ExecuteScalar();
+            if (count > 0) return;
+
+            Console.WriteLine($"[SQLite] Giving all level 200 items to Character {characterId}...");
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT Id, PossibleEffects FROM ItemTemplates WHERE Level = 200;";
+            var itemsToAdd = new List<(int id, string effects)>();
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id = reader.GetInt32(0);
+                    string effects = reader.IsDBNull(1) ? "[]" : reader.GetString(1);
+                    itemsToAdd.Add((id, effects));
+                }
+            }
+
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                var insertCmd = connection.CreateCommand();
+                insertCmd.Transaction = transaction;
+                insertCmd.CommandText = @"
+                    INSERT INTO CharacterItems (CharacterId, ItemGid, Position, Quantity, Effects)
+                    VALUES ($charId, $gid, 63, 1, $effects);
+                ";
+                insertCmd.Parameters.Add("$charId", SqliteType.Integer);
+                insertCmd.Parameters.Add("$gid", SqliteType.Integer);
+                insertCmd.Parameters.Add("$effects", SqliteType.Text);
+
+                foreach (var item in itemsToAdd)
+                {
+                    insertCmd.Parameters["$charId"].Value = characterId;
+                    insertCmd.Parameters["$gid"].Value = item.id;
+                    insertCmd.Parameters["$effects"].Value = item.effects;
+                    insertCmd.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+                Console.WriteLine($"[SQLite] Successfully added {itemsToAdd.Count} level 200 items.");
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                Console.WriteLine($"[SQLite] Error adding level 200 items: {ex.Message}");
+            }
+        }
+
         public static byte[] ReconstructActorDetails(byte[] lookBytes, string name)
         {
             try
@@ -743,6 +825,114 @@ namespace Jondo.Unity.Launcher
                 Console.WriteLine($"[-] Error fetching ItemEffectsData: {ex.Message}");
             }
             return results;
+        }
+        public static void PopulateMonstersFromJSON(SqliteConnection connection)
+        {
+            var checkCmd = connection.CreateCommand();
+            checkCmd.CommandText = "SELECT COUNT(*) FROM Monsters;";
+            long count = (long)checkCmd.ExecuteScalar();
+            if (count > 0) return; // Already populated
+
+            Console.WriteLine("[SQLite] Populating Monsters, Subareas, and MapSubareas from JSON. This may take a moment...");
+            
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                // Monsters
+                string monstersPath = @"..\dofus3_data\monsters.json";
+                if (File.Exists(monstersPath))
+                {
+                    using var fs = new FileStream(monstersPath, FileMode.Open, FileAccess.Read);
+                    var doc = System.Text.Json.JsonDocument.Parse(fs);
+                    var mValuesArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_values").GetProperty("Array");
+                    var mKeysArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_keys").GetProperty("Array");
+                    
+                    var insertCmd = connection.CreateCommand();
+                    insertCmd.Transaction = transaction;
+                    insertCmd.CommandText = "INSERT INTO Monsters (Id, NameId, Look, Grades) VALUES ($id, $nameId, $look, $grades);";
+                    insertCmd.Parameters.Add("$id", SqliteType.Integer);
+                    insertCmd.Parameters.Add("$nameId", SqliteType.Integer);
+                    insertCmd.Parameters.Add("$look", SqliteType.Text);
+                    insertCmd.Parameters.Add("$grades", SqliteType.Text);
+
+                    for(int i = 0; i < mKeysArr.GetArrayLength(); i++)
+                    {
+                        var monsterId = mKeysArr[i].GetInt32();
+                        var data = mValuesArr[i].GetProperty("data");
+                        int nameId = data.TryGetProperty("nameId", out var nid) ? nid.GetInt32() : 0;
+                        string look = data.TryGetProperty("look", out var lk) ? lk.GetString() : "";
+                        string grades = data.TryGetProperty("grades", out var gr) ? gr.GetRawText() : "[]";
+
+                        insertCmd.Parameters["$id"].Value = monsterId;
+                        insertCmd.Parameters["$nameId"].Value = nameId;
+                        insertCmd.Parameters["$look"].Value = look ?? "";
+                        insertCmd.Parameters["$grades"].Value = grades;
+                        insertCmd.ExecuteNonQuery();
+                    }
+                }
+
+                // Subareas
+                string subareasPath = @"..\dofus3_data\subareas.json";
+                if (File.Exists(subareasPath))
+                {
+                    using var fs = new FileStream(subareasPath, FileMode.Open, FileAccess.Read);
+                    var doc = System.Text.Json.JsonDocument.Parse(fs);
+                    var mValuesArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_values").GetProperty("Array");
+                    var mKeysArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_keys").GetProperty("Array");
+                    
+                    var insertCmd = connection.CreateCommand();
+                    insertCmd.Transaction = transaction;
+                    insertCmd.CommandText = "INSERT INTO Subareas (Id, Monsters) VALUES ($id, $monsters);";
+                    insertCmd.Parameters.Add("$id", SqliteType.Integer);
+                    insertCmd.Parameters.Add("$monsters", SqliteType.Text);
+
+                    for(int i = 0; i < mKeysArr.GetArrayLength(); i++)
+                    {
+                        var subAreaId = mKeysArr[i].GetInt32();
+                        var data = mValuesArr[i].GetProperty("data");
+                        string monsters = data.TryGetProperty("monsters", out var mst) ? mst.GetRawText() : "[]";
+
+                        insertCmd.Parameters["$id"].Value = subAreaId;
+                        insertCmd.Parameters["$monsters"].Value = monsters;
+                        insertCmd.ExecuteNonQuery();
+                    }
+                }
+
+                // MapSubareas
+                string mapsPath = @"..\dofus3_data\maps_information.json";
+                if (File.Exists(mapsPath))
+                {
+                    using var fs = new FileStream(mapsPath, FileMode.Open, FileAccess.Read);
+                    var doc = System.Text.Json.JsonDocument.Parse(fs);
+                    var mValuesArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_values").GetProperty("Array");
+                    var mKeysArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_keys").GetProperty("Array");
+                    
+                    var insertCmd = connection.CreateCommand();
+                    insertCmd.Transaction = transaction;
+                    insertCmd.CommandText = "INSERT INTO MapSubareas (MapId, SubAreaId) VALUES ($id, $subid);";
+                    insertCmd.Parameters.Add("$id", SqliteType.Integer);
+                    insertCmd.Parameters.Add("$subid", SqliteType.Integer);
+
+                    for(int i = 0; i < mKeysArr.GetArrayLength(); i++)
+                    {
+                        long mapId = mKeysArr[i].GetInt64();
+                        var data = mValuesArr[i].GetProperty("data");
+                        int subAreaId = data.TryGetProperty("subAreaId", out var sid) ? sid.GetInt32() : 0;
+
+                        insertCmd.Parameters["$id"].Value = mapId;
+                        insertCmd.Parameters["$subid"].Value = subAreaId;
+                        insertCmd.ExecuteNonQuery();
+                    }
+                }
+
+                transaction.Commit();
+                Console.WriteLine("[SQLite] Successfully populated JSON data.");
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                Console.WriteLine($"[-] Error populating from JSON: {ex.Message}");
+            }
         }
     }
 }

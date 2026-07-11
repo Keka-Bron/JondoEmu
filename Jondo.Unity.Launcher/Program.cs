@@ -29,6 +29,9 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[+] Initializing Database...");
             DatabaseManager.Initialize();
 
+            Console.WriteLine("[+] Initializing MobSpawnManager...");
+            Managers.MobSpawnManager.InitializeAndSpawnAll();
+
             Console.WriteLine("[+] Initializing Map Manager...");
             MapManager.Initialize();
 

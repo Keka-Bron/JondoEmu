@@ -51,8 +51,8 @@ namespace Jondo.Unity.Launcher.Handlers
                             case 1: wantAgility      = val; break;
                             case 2: wantStrength     = val; break;
                             case 3: wantIntelligence = val; break;
-                            case 4: wantWisdom       = val; break;
-                            case 5: wantChance       = val; break;
+                            case 4: wantChance       = val; break;
+                            case 5: wantWisdom       = val; break;
                             case 6: wantVitality     = val; break;
                         }
                     }
@@ -170,7 +170,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         /// <summary>Stats whose values are computed from the database/GameState;
         /// every other entry uses the official defaults below.</summary>
-        private static readonly HashSet<int> DynamicStatIds = new HashSet<int> { 10, 11, 12, 13, 14, 15, 18, 25, 44 };
+        private static readonly HashSet<int> DynamicStatIds = new HashSet<int> { 10, 11, 12, 13, 14, 15, 17, 18, 44 };
 
         /// <summary>
         /// Default stat entries reproduced verbatim from the official level-2 kri:
@@ -262,7 +262,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 larMsg.Fields.Add(CreateStatField(15, GameState.StatIntelligence, GetEquipBonus(15))); // Inteligencia
                 larMsg.Fields.Add(CreateStatField(13, GameState.StatChance,       GetEquipBonus(13))); // Suerte
                 larMsg.Fields.Add(CreateStatField(14, GameState.StatAgility,      GetEquipBonus(14))); // Agilidad
-                larMsg.Fields.Add(CreateStatField(25, 0,                          GetEquipBonus(25))); // Potencia
+                larMsg.Fields.Add(CreateStatField(17, 0,                          GetEquipBonus(17))); // Potencia
                 larMsg.Fields.Add(CreateStatField(18, 0,                          GetEquipBonus(18))); // Crítico
 
                 // Initiative base = only elemental stats (Str+Int+Cha+Agi). Vitality and Wisdom do NOT count.
@@ -348,7 +348,7 @@ namespace Jondo.Unity.Launcher.Handlers
             { 15, 126 }, // Inteligencia
             { 16, 112 }, // Daños
             { 18, 115 }, // Crítico
-            { 25, 138 }, // Potencia
+            { 17, 138 }, // Potencia
             { 44, 174 }, // Iniciativa
         };
 

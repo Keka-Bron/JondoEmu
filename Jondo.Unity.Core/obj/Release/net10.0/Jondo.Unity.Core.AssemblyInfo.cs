@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Jondo.Unity.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+efde91944d5684d6707007abfb33c5165eb0e8f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bee19a36e273a3e1eb76089dc4fee04cd7510d88")]
 [assembly: System.Reflection.AssemblyProductAttribute("Jondo.Unity.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Jondo.Unity.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

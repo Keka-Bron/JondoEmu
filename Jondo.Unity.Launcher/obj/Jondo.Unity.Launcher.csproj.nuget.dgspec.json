@@ -406,6 +406,10 @@
             "Microsoft.Data.Sqlite": {
               "target": "Package",
               "version": "[10.0.9, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[10.0.9, )"
             }
           },
           "imports": [
