@@ -193,9 +193,6 @@ namespace Jondo.Unity.Launcher
                 ";
                 createMonsters.ExecuteNonQuery();
 
-                // 5. Populate Monsters and Subareas from JSON if empty
-                PopulateMonstersFromJSON(worldConnection);
-
                 if (count == 0)
                 {
                     Console.WriteLine("[SQLite] Seeded default character CADERNIS.");

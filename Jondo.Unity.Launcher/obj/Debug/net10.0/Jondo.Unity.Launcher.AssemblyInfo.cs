@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Jondo.Unity.Launcher")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bee19a36e273a3e1eb76089dc4fee04cd7510d88")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+23735aec922a903db6f356d149afc2f570489094")]
 [assembly: System.Reflection.AssemblyProductAttribute("Jondo.Unity.Launcher")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Jondo.Unity.Launcher")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

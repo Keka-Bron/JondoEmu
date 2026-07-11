@@ -274,8 +274,6 @@ namespace Jondo.Unity.Launcher.Handlers
                 Program.LogDebug($"[Stats Init] Character {characterIdToLoad} not found in database — stats keep in-memory defaults.");
             }
 
-            DatabaseManager.GiveAllLevel200Items(characterIdToLoad);
-            
             var dbInventory = DatabaseManager.LoadInventory(characterIdToLoad);
             if (dbInventory.Count == 0)
             {

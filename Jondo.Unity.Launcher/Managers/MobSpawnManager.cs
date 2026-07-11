@@ -35,13 +35,11 @@ namespace Jondo.Unity.Launcher.Managers
         }
 
         private static Dictionary<int, MonsterData> _monsters = new Dictionary<int, MonsterData>();
-        private static Dictionary<int, List<int>> _subareas = new Dictionary<int, List<int>>();
-        private static Dictionary<long, int> _mapSubareas = new Dictionary<long, int>();
         private static Dictionary<long, List<MobGroup>> _mapMobs = new Dictionary<long, List<MobGroup>>();
 
         public static void InitializeAndSpawnAll()
         {
-            Console.WriteLine("[MobSpawnManager] Loading data from SQLite and spawning mobs...");
+            Console.WriteLine("[MobSpawnManager] Loading data from SQLite...");
             
             using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
             connection.Open();
@@ -74,88 +72,52 @@ namespace Jondo.Unity.Launcher.Managers
                 }
             }
 
-            // Load Subareas
-            var cmdSubareas = connection.CreateCommand();
-            cmdSubareas.CommandText = "SELECT Id, Monsters FROM Subareas;";
-            using (var reader = cmdSubareas.ExecuteReader())
+            // Load MapMobs
+            var cmdMapMobs = connection.CreateCommand();
+            cmdMapMobs.CommandText = "SELECT MapId, MobId, CellId, MembersJson FROM MapMobs;";
+            int count = 0;
+            using (var reader = cmdMapMobs.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    var id = reader.GetInt32(0);
-                    var list = new List<int>();
-                    string monstersJson = reader.GetString(1);
+                    long mapId = reader.GetInt64(0);
+                    long mobId = reader.GetInt64(1);
+                    int cellId = reader.GetInt32(2);
+                    string membersJson = reader.GetString(3);
+
+                    var group = new MobGroup {
+                        MobId = mobId,
+                        CellId = cellId
+                    };
+
                     try {
-                        using var doc = System.Text.Json.JsonDocument.Parse(monstersJson);
+                        using var doc = System.Text.Json.JsonDocument.Parse(membersJson);
                         if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
                         {
                             foreach(var m in doc.RootElement.EnumerateArray()) {
-                                list.Add(m.GetInt32());
+                                int mId = m.GetProperty("id").GetInt32();
+                                int grade = m.GetProperty("grade").GetInt32();
+                                int level = m.GetProperty("level").GetInt32();
+
+                                if (_monsters.TryGetValue(mId, out var mData)) {
+                                    group.Members.Add(new MobMember {
+                                        Monster = mData,
+                                        GradeIndex = grade,
+                                        Level = level
+                                    });
+                                }
                             }
                         }
                     } catch {}
-                    _subareas[id] = list;
+
+                    if (!_mapMobs.ContainsKey(mapId))
+                        _mapMobs[mapId] = new List<MobGroup>();
+                    _mapMobs[mapId].Add(group);
+                    count++;
                 }
             }
 
-            // Load MapSubareas
-            var cmdMapSubareas = connection.CreateCommand();
-            cmdMapSubareas.CommandText = "SELECT MapId, SubAreaId FROM MapSubareas;";
-            using (var reader = cmdMapSubareas.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    _mapSubareas[reader.GetInt64(0)] = reader.GetInt32(1);
-                }
-            }
-
-            // Spawn mobs
-            long currentMobId = -1000000;
-            Random rand = new Random();
-
-            foreach(var kvp in _mapSubareas)
-            {
-                long mapId = kvp.Key;
-                int subAreaId = kvp.Value;
-
-                if (!_subareas.TryGetValue(subAreaId, out var allowedMonsters) || allowedMonsters.Count == 0)
-                    continue;
-
-                var validMonsters = allowedMonsters.Where(id => _monsters.ContainsKey(id)).ToList();
-                if (validMonsters.Count == 0) continue;
-
-                int numMobs = rand.Next(1, 5); // 1 to 4 mobs
-                var mobs = new List<MobGroup>();
-
-                for(int i = 0; i < numMobs; i++)
-                {
-                    int groupSize = rand.Next(1, 9); // 1 to 8 monsters
-                    var mob = new MobGroup {
-                        MobId = currentMobId--,
-                        CellId = rand.Next(50, 450)
-                    };
-
-                    for(int m = 0; m < groupSize; m++)
-                    {
-                        int monsterId = validMonsters[rand.Next(validMonsters.Count)];
-                        var mData = _monsters[monsterId];
-                        int gradeIdx = 0;
-                        int lvl = 1;
-                        if (mData.Grades.Count > 0) {
-                            gradeIdx = rand.Next(mData.Grades.Count);
-                            lvl = mData.Grades[gradeIdx].Level;
-                        }
-                        mob.Members.Add(new MobMember {
-                            Monster = mData,
-                            GradeIndex = gradeIdx,
-                            Level = lvl
-                        });
-                    }
-                    mobs.Add(mob);
-                }
-                _mapMobs[mapId] = mobs;
-            }
-
-            Console.WriteLine($"[MobSpawnManager] Spawned {Math.Abs(currentMobId + 1000000)} mobs across {_mapMobs.Count} maps.");
+            Console.WriteLine($"[MobSpawnManager] Loaded {count} mobs across {_mapMobs.Count} maps.");
         }
 
         public static List<MobGroup> GetMobsForMap(long mapId)
