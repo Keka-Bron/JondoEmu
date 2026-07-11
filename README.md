@@ -23,6 +23,7 @@ This repository contains the complete architecture of the **Jondo** local emulat
 - [ ] **Zaaps**
 - [ ] **Monsters:** Spawns, Mobs management, and Monster AI.
 - [ ] **Fights:** PVM and PVP combat system.
+- [ ] **Spells**
 - [ ] **Kolossium system**
 - [ ] **Jobs (Oficios)**
 - [ ] **Achievements (Logros)**
