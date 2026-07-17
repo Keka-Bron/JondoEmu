@@ -42,7 +42,7 @@ namespace Jondo.Unity.Launcher.Network
         public static byte[] BuildHnkMessage() => BuildSingleVarIntMessage("type.ankama.com/hnk", 2);
         public static byte[] BuildKkpMessage() => BuildEmptyMessage("type.ankama.com/kkp");
         public static byte[] BuildKkmMessage() => BuildEmptyMessage("type.ankama.com/kkm");
-        public static byte[] BuildKrbMessage() => BuildSingleVarIntMessage("type.ankama.com/krb", 5);
+        public static byte[] BuildKrbMessage() => BuildSingleVarIntMessage("type.ankama.com/krb", GameState.CharacterRemainingPoints);
         public static byte[] BuildIlcMessage()
         {
             byte[] payload = new byte[] {

@@ -31,9 +31,8 @@ namespace Jondo.Unity.Launcher.Handlers
             // to the requested value and recompute the capital from the total pool — this is
             // self-correcting (re-sending the same distribution is a no-op) and lets the reset
             // button work (all-zero request restores every point).
-            //
-            // The definitive empirical mapping (Visual Order / Alphabetical Spanish):
-            //   1=Agilidad(14) 2=Fuerza(10) 3=Inteligencia(15) 4=Sabiduria(12) 5=Suerte(13) 6=Vitalidad(11)
+            // The definitive empirical mapping (Dofus 3.6+):
+            //   1=Agilidad(14) 2=Fuerza(10) 3=Inteligencia(15) 4=Vitalidad(11) 5=Sabiduria(12) 6=Suerte(13)
             int wantAgility = 0, wantChance = 0, wantIntelligence = 0, wantStrength = 0, wantVitality = 0, wantWisdom = 0;
 
             if (inner != null)
@@ -51,9 +50,9 @@ namespace Jondo.Unity.Launcher.Handlers
                             case 1: wantAgility      = val; break;
                             case 2: wantStrength     = val; break;
                             case 3: wantIntelligence = val; break;
-                            case 4: wantChance       = val; break;
+                            case 4: wantVitality     = val; break;
                             case 5: wantWisdom       = val; break;
-                            case 6: wantVitality     = val; break;
+                            case 6: wantChance       = val; break;
                         }
                     }
                 }
@@ -69,9 +68,9 @@ namespace Jondo.Unity.Launcher.Handlers
                              + GameState.StatAgility + GameState.StatVitality + GameState.StatWisdom * WisdomCost;
             int capitalPool  = GameState.CharacterRemainingPoints + alreadySpent;
 
-            int requestedCost = wantStrength + wantIntelligence + wantChance + wantAgility + wantVitality + wantWisdom * WisdomCost;
+            int requestedCost = wantStrength + wantIntelligence + wantChance + wantAgility + wantVitality + wantWisdom;
 
-            Console.WriteLine($"[Stats] Requested — Str:{wantStrength} Int:{wantIntelligence} Cha:{wantChance} Agi:{wantAgility} Vit:{wantVitality} Wis:{wantWisdom} (cost {requestedCost} / pool {capitalPool})");
+            Console.WriteLine($"[Stats] Requested — Str:{wantStrength} Int:{wantIntelligence} Cha:{wantChance} Agi:{wantAgility} Vit:{wantVitality} Wis:{wantWisdom / WisdomCost} (cost {requestedCost} / pool {capitalPool})");
 
             if (requestedCost < 0 || requestedCost > capitalPool)
             {
@@ -89,7 +88,7 @@ namespace Jondo.Unity.Launcher.Handlers
             GameState.StatChance       = wantChance;
             GameState.StatAgility      = wantAgility;
             GameState.StatVitality     = wantVitality;
-            GameState.StatWisdom       = wantWisdom;
+            GameState.StatWisdom       = wantWisdom / WisdomCost;
             GameState.CharacterRemainingPoints = capitalPool - requestedCost;
 
             Console.WriteLine($"[Stats] New — Vit:{GameState.StatVitality} Wis:{GameState.StatWisdom} Str:{GameState.StatStrength} Int:{GameState.StatIntelligence} Cha:{GameState.StatChance} Agi:{GameState.StatAgility}");
@@ -240,6 +239,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 levelMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 2, BytesValue = xpDetail.ToByteArray() });
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = levelMsg.ToByteArray() });
 
+                larMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.CharacterRemainingPoints });
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = XpLevelFloor });  // XP inicio del nivel
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = GameState.CharacterRemainingPoints });
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 0, VarIntValue = XpNextLevel });   // XP del siguiente nivel

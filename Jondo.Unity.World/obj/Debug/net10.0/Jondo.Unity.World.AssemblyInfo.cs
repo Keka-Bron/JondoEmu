@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Jondo.Unity.World")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f44ffd0d1ad58590a9ed398847d44db0e0614e7c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be4927116047ab45bf8ce7449c8d347678ec47a4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Jondo.Unity.World")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Jondo.Unity.World")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

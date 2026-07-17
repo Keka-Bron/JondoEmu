@@ -2715,3 +2715,81 @@ Enviar 	ype.ankama.com/krd con un payload vacío actúa como el StatsUpgradeResult
 - Se actualizó DatabaseManager.cs añadiendo GetItemTemplatePossibleEffects (que parsea los rids desde el campo Data en JSON de ItemTemplates) y GetItemEffectsData (que obtiene los dados reales desde ItemEffects).
 - En CharacterSelectionHandler.cs, se añadió el diccionario inverso StatIdByEffectActionId (para mapear ActionId devuelta al StatId interno que usa el emulador).
 - La lógica de SeedInventory (que antes inyectaba un diccionario Effects harcodeado) fue sustituida por una factoría dinámica: ahora, al dar un objeto, el emulador obtiene los RIDs asociados, realiza un Random.Next() entre DiceNum y DiceSide, asigna el stat correcto al diccionario, y guarda los stats generados.
+
+---
+
+## Iteracion #104 - Migracion de generacion dinamica a poblado estatico en Base de Datos (2026-07-11)
+
+### Desacoplamiento de la generacion de datos en Runtime
+- El emulador padecia un problema arquitectonico donde procesos computacionalmente costosos (como parseo de miles de monstruos en formato JSON y el despliegue aleatorio de mobs en los 15,000 mapas del juego) bloqueaban el inicio del servidor durante mucho tiempo.
+- Ademas, en el momento de seleccionar el personaje, se ejecutaba en vivo una inyeccion dinamica para asignar items de nivel 200, provocando posibles caidas de conexion.
+
+### Creacion del DatabaseSeeder
+- Se ha desarrollado un proyecto C# independiente Jondo.Unity.DatabaseSeeder encargado de pre-procesar y volcar de manera rigida todo el estado del mundo hacia world.db.
+- Monstruos y Subareas: Analiza monsters.json y subareas.json para llenar tablas estaticas.
+- Mobs por mapa: Ejecuta los algoritmos de aleatorizacion fuera de linea, generando entre 1 y 4 grupos (mobs) de monstruos por mapa. Esto genero de forma persistente 32,137 mobs mapeados en la tabla MapMobs, guardando su serializacion JSON y celdas para su despliegue inmediato por el emulador.
+- Items nivel 200: Volco directamente los templates nivel 200 hacia la tabla CharacterItems vinculados al personaje, normalizando el esquema de identificadores (Gid).
+
+### Refactorizacion del Emulador
+- Se eliminaron todos los metodos dinamicos (PopulateMonstersFromJSON, GiveAllLevel200Items).
+- MobSpawnManager.cs fue rescrito completamente: ahora simplemente realiza una consulta SELECT y lee los Mobs desde la base de datos SQLite directamente hacia la memoria de la RAM en unos escasos milisegundos.
+- Con esta separacion, el ciclo de vida del emulador se ha vuelto ligero y exclusivamente 'lector', como se espera de un servidor robusto.
+
+---
+
+## Iteracion #105 - Estructura de Protobuf fallida para Mobs y limitaciones de Walkability (2026-07-12)
+
+### Resultados de la Inyeccion de Mobs (Fallida)
+- **Objetivo**: Renderizar correctamente los grupos de monstruos (MobGroups) a traves del frame jpv. Anteriormente se usaban estructuras NpcMinimalInfo que renderizaban al lider del Mob como si fuera un mercader solitario (NPC).
+- **Accion Tomada**: Se implemento la estructura GroupMonsterStaticInformations mapeando las propiedades mainCreatureLightInfos y underlings a los campos protobuf extraidos por de-compilacion (lgi, lgf, lgg).
+- **Problema**: El cliente de Dofus Unity ignoro silenciosamente el mensaje completo de Mobs, lo cual hizo que *no apareciera absolutamente ningun monstruo en el cliente*.
+- **Causa Raiz Probable**: Discrepancia grave en la interpretacion de los tipos (ej: strings versus VarInts para genericId, o un orden de los encadenamientos lgx incompatibles con lo que la maquina de estados del motor de Unity espera). El schema extraido con un dump estatico de Il2Cpp (Protocol.proto) es insuficiente sin contexto dinamico. 
+
+### Limitacion Tecnologica (Walkability de Mapas)
+- Se intento programar un algoritmo predictivo para que, al transicionar hacia un nuevo mapa en sus bordes, el jugador cayese siempre en una casilla navegable y no encima de obstaculos.
+- **Bloqueo**: Las mallas binarias que contienen los bitflags de navegabilidad (archivos .dlm del cliente) no han sido extraidas, desencriptadas ni volcadas a la base de datos del emulador. El servidor es matematicamente incapaz de ver los obstaculos.
+- **Workaround actual**: Se devolvio el calculo estricto a MapChangeHandler.cs. Si el jugador se queda bloqueado, debe forzar su re-localizacion manual mediante el comando /teleport {mapId} 344 en la consola y reloguear.
+
+## Plan para la Iteracion #106
+1. **Recuperacion de Trazas Reales**: La unica forma infalible de construir un MobGroup valido en Dofus Unity es analizar un volcado binario real jpv que contenga mobs capturado desde el servidor oficial.
+2. **Despliegue Experimental**: Buscar en los archivos .bin pre-existentes (como los volcados del sniffer localizados en C:\Jondo) y extraer el frame jpv, aislando un MobGroup y aplicando ingenieria inversa a su topologia exacta de Protobuf usando protoc --decode_raw.
+3. **Replicacion 1:1**: Trascribir esa topologia 1:1 en el MapLoadHandler.cs para el BuildMobGroupActorMsg para garantizar una construccion organica que el cliente jamas pueda rechazar.
+
+### Iteración: Fix Mob Contextual IDs y Estructura
+- **Objetivo**: Solucionar el crasheo del cliente (redirección al menú) al spawnear mobs.
+- **Diagnóstico**: A partir del PCAP del tutorial de Dofus 3, se comprobó que los mobs/NPCs utilizan Contextual IDs negativos (ej. -20000). Al utilizar IDs positivos, el cliente intentaba decodificar el paquete de Mob (GameRolePlayGroupMonsterInformations) asumiendo que era un Player (GameRolePlayCharacterInformations), lo que provocaba un fallo fatal de Protobuf debido a que el campo 8 para players es un Account Tag (String) mientras que para mobs es el struct GroupMonsterStaticInformations.
+- **Solución**: Se ha modificado \MapLoadHandler.cs\ para asegurar que \mob.MobId\ se asigne con valor negativo en el Contextual ID del \ctorMsg\.
+- **Resultado Esperado**: El cliente de Dofus Unity debería poder deserializar correctamente a los monstruos en los mapas como MobGroups reales (con sus respectivos underlings y apariencias) en lugar de crashear el proceso de carga de mapa.
+- **Estado**: Lista para validación por parte del usuario.
+
+---
+
+## Iteracion #106 - Resolucion Definitiva del Mapeo de Caracteristicas y Aritmetica de Sabiduria (2026-07-17)
+
+### 1. Sincronizacion del Panel de Caracteristicas Izquierdo
+- **Problema**: El panel izquierdo de caracteristicas (la barra lateral) mostraba "Puntos restantes: 5" de forma estatica, ignorando el capital real de la base de datos (195), a pesar de que el panel de reparto detallado mostraba el valor correcto.
+- **Solucion**:
+  - Se descubrio que la barra lateral lee los puntos restantes del campo 5 (`eyhc` / `gabp`) del submensaje `lar` del paquete `kri` (`CharacterStatsListMessage`), mientras que el modal de reparto usa el campo 7 (`eyhg`).
+  - Se modifico `BuildUpdatedKriPacket()` en `StatsHandler.cs` para inyectar `GameState.CharacterRemainingPoints` en ambos campos (5 y 7).
+  - Se corrigio un valor estatico harcodeado en `5` dentro de `TransitionPacketsBuilder.BuildKrbMessage()` que se enviaba al iniciar sesion.
+
+### 2. Mapeo Definitivo de Red (StatsUpgradeRequest)
+- **Problema**: El switch original causaba colisiones y mapeos incorrectos (ej. clics en Agilidad subian Suerte, clics en Vitalidad subian Fuerza/Sabiduria, etc.).
+- **Diagnostico**: Al analizar los bytes binarios crudos (`KRC-RAW`) recibidos por el servidor, se comprobo la estructura definitiva y rotada del protocolo del cliente Dofus 3.6+:
+  * **Campo 1** -> Agilidad (Agilidad)
+  * **Campo 2** -> Fuerza (Fuerza)
+  * **Campo 3** -> Inteligencia (Inteligencia)
+  * **Campo 4** -> Vitalidad (Vitalidad)
+  * **Campo 5** -> Sabiduria (Sabiduria)
+  * **Campo 6** -> Suerte (Suerte)
+- **Implementacion**: Se actualizo el switch de decodificacion en `StatsHandler.cs` para enlazar estos campos de red con sus correspondientes variables de base de datos de manera precisa.
+
+### 3. Aritmetica y Escalado de Sabiduria
+- **Problema**: Al subir 4 puntos de Sabiduria, se descontaba el coste real (12 puntos de capital) pero el personaje ganaba 12 puntos de Sabiduria en lugar de 4.
+- **Diagnostico**: El cliente de Dofus 3 no envia la cantidad neta de caracteristicas que se desea aumentar, sino los **puntos de capital gastados** en cada estadistica. En el caso de la Sabiduria (cuyo coste es 3), al asignar 4 puntos de caracteristica, el cliente envia `12` en el paquete. El servidor recibia `12` y erroneamente lo guardaba como el valor final de Sabiduria, cobrando luego en el coste $wantWisdom * 3 = 36$ de capital.
+- **Solucion**:
+  - Se modifico `requestedCost` para sumar de manera directa los valores del payload (`wantStrength + wantIntelligence + wantChance + wantAgility + wantVitality + wantWisdom`), puesto que ya vienen expresados en coste de capital.
+  - Al guardar la Sabiduria, se divide el valor recibido entre el coste real (`WisdomCost = 3`): `GameState.StatWisdom = wantWisdom / WisdomCost;` (ej. `12 / 3 = 4`).
+
+### 4. Compilacion y Despliegue Multi-Entorno
+- **Accion**: Se detecto que el depurador de VS Code ejecuta el servidor desde la carpeta `bin/Debug/net10.0`, mientras que otras ejecuciones se realizan desde la raiz (`c:\Jondo`). Se compilo el proyecto en ambas configuraciones (Debug y Release) y se desplegaron los archivos actualizados correspondientes para garantizar que los cambios esten activos en cualquier entorno de prueba.

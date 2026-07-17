@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Jondo.Unity.Protocol")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+23735aec922a903db6f356d149afc2f570489094")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be4927116047ab45bf8ce7449c8d347678ec47a4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Jondo.Unity.Protocol")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Jondo.Unity.Protocol")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

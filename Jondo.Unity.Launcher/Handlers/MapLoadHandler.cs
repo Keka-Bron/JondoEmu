@@ -112,14 +112,17 @@ namespace Jondo.Unity.Launcher.Handlers
 
                         // C. Add Aggressive Mobs
                         var mobs = Managers.MobSpawnManager.GetMobsForMap(mapIdToLoad);
+                        int spawnedMobs = 0;
                         foreach (var mob in mobs)
                         {
                             if (mob.Members.Count > 0)
                             {
                                 var mobActorMsg = BuildMobGroupActorMsg(mob);
                                 jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = mobActorMsg.ToByteArray() });
+                                spawnedMobs++;
                             }
                         }
+                        LogDebug($"[Game Node] Spawned {spawnedMobs} mobs on Map {mapIdToLoad}");
 
                         byte[] jpvBytes = jpvMsg.ToByteArray();
                         byte[] jpvPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/jpv", jpvBytes);
@@ -227,9 +230,10 @@ namespace Jondo.Unity.Launcher.Handlers
             var rootLook = new ProtoMessage();
             int defaultBone = 1; // Default bone
             int npcScale = 100;
-            if (!string.IsNullOrEmpty(mainMob.Look) && mainMob.Look.Contains("|"))
+            if (!string.IsNullOrEmpty(mainMob.Look))
             {
-                var parts = mainMob.Look.Trim('{', '}').Split('|');
+                var inner = mainMob.Look.Trim('{', '}');
+                var parts = inner.Split('|');
                 if (parts.Length > 0 && int.TryParse(parts[0], out int b)) defaultBone = b;
                 if (parts.Length > 3 && int.TryParse(parts[3], out int sc)) npcScale = sc;
             }
@@ -238,26 +242,38 @@ namespace Jondo.Unity.Launcher.Handlers
             rootLook.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 }); // Field 3: constant 3
             rootLook.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = new byte[] { (byte)npcScale } });
 
-            // 3. Build npcMinimalInfo (matching PCAP: Field 4 = tooltipVisible, Field 6 = npcId)
-            // Using NPC structure for now so they render correctly, using the monster's generic ID as NPC ID
-            var npcMinimalInfo = new ProtoMessage();
-            npcMinimalInfo.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 }); // tooltipVisible
-            npcMinimalInfo.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = mainMob.Id }); 
+            // 3. Build GroupMonsterStaticInformations (lgi - Field 8 of lgk)
+            var lgiMsg = new ProtoMessage();
+            
+            // Main Creature (lgf -> Field 1 of lgi)
+            var mainCreature = new ProtoMessage();
+            mainCreature.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes(mainMob.Id.ToString()) }); 
+            mainCreature.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = mob.Members[0].GradeIndex });
+            lgiMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = mainCreature.ToByteArray() });
 
-            // 4. Build npcInfoWrapper -> Field 5: npcMinimalInfo
-            var npcInfoWrapper = new ProtoMessage();
-            npcInfoWrapper.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 2, BytesValue = npcMinimalInfo.ToByteArray() });
+            // Underlings (lgg -> Field 2 of lgi, Repeated)
+            for (int i = 1; i < mob.Members.Count; i++)
+            {
+                var underling = new ProtoMessage();
+                underling.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes(mob.Members[i].Monster.Id.ToString()) });
+                underling.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = mob.Members[i].GradeIndex });
+                lgiMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = underling.ToByteArray() });
+            }
 
-            // 5. Build detailsMsg (lni) -> Field 1: root EntityLook, Field 2: npcInfoWrapper
-            var detailsMsg = new ProtoMessage();
-            detailsMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = rootLook.ToByteArray() });
-            detailsMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = npcInfoWrapper.ToByteArray() });
+            // 4. Build lgk (Actor Info Wrapper)
+            var lgkMsg = new ProtoMessage();
+            lgkMsg.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = lgiMsg.ToByteArray() });
 
-            // 6. Build root ActorMsg (lnk)
+            // 5. Build lgx (Info Wrapper) -> Field 1: lgk, Field 2: rootLook
+            var lgxMsg = new ProtoMessage();
+            lgxMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lgkMsg.ToByteArray() });
+            lgxMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = rootLook.ToByteArray() });
+
+            // 6. Build lgz (Root Actor)
             var actorMsg = new ProtoMessage();
-            actorMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lfjMsg.ToByteArray() });
-            actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detailsMsg.ToByteArray() });
-            actorMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = mob.MobId }); // contextual ID
+            actorMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lfjMsg.ToByteArray() }); // Disposition
+            actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = lgxMsg.ToByteArray() }); // Info Wrapper
+            actorMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = -mob.MobId }); // Contextual ID
 
             return actorMsg;
         }
