@@ -2793,3 +2793,12 @@ Enviar 	ype.ankama.com/krd con un payload vacío actúa como el StatsUpgradeResult
 
 ### 4. Compilacion y Despliegue Multi-Entorno
 - **Accion**: Se detecto que el depurador de VS Code ejecuta el servidor desde la carpeta `bin/Debug/net10.0`, mientras que otras ejecuciones se realizan desde la raiz (`c:\Jondo`). Se compilo el proyecto en ambas configuraciones (Debug y Release) y se desplegaron los archivos actualizados correspondientes para garantizar que los cambios esten activos en cualquier entorno de prueba.
+
+## Iteracion #107 - Correccion del Capital de Puntos Restantes en la Barra Lateral (2026-07-17)
+
+### Diagnostico y Resolucion
+- **Problema**: A pesar de enviar el capital correcto en los campos 5 y 7 del submensaje `lar` y en el paquete `krb` al loguear y subir nivel, la barra lateral del cliente de Unity seguia mostrando obstinadamente un capital de `5` puntos restantes.
+- **Analisis**: Al revisar las estadisticas base enviadas en el listado de `DefaultKriEntries` dentro del paquete `kri` (CharacterStatsListMessage), se encontro que las estadisticas base con ID `3` y ID `40` tenian asignado un valor estatico de `5`. Se comprobo que en el cliente Unity de Dofus 3.6, la barra lateral del HUD lee el capital de puntos restantes de una de estas estadisticas estaticas del listado de `kri` en lugar del submensaje `lar`.
+- **Cambios**:
+  - Se modifico `BuildUpdatedKriPacket()` en `StatsHandler.cs` para interceptar la serializacion de los registros `DefaultKriEntries` con ID `3` y ID `40` y sustituir su valor estatico `5` de forma dinamica por `GameState.CharacterRemainingPoints`.
+  - Con esto, al cargar el personaje, subir de nivel, o gastar puntos de capital, el cliente recibe y renderiza correctamente la cantidad real en la barra lateral del HUD.

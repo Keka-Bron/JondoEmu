@@ -13,7 +13,7 @@ This repository contains the complete architecture of the **Jondo** local emulat
 - [x] **Movement, Map Change, Map Loading, Adjacent Maps**
 - [x] **Last Cell and Map Persistence** in Database
 - [x] **Inventory System:** Item spawning, equipping and unequipping items works well.
-- [x] **Character Stats:** Characteristic assignment is fully functional.
+- [x] **Character Stats:** Characteristic assignment is fully functional (all stats map correctly, capital calculation is dynamic, and remaining points synchronize perfectly between all client panels, including the left sidebar HUD).
 - [x] **NPCs:** Spawns, looks, and dialogues are implemented *(Note: Needs a slight fix on closing dialogues properly. NPC buyers/sellers haven't been tested yet).*
 
 ### 🚧 Work In Progress (WIP) / Basic Implementation

@@ -248,7 +248,12 @@ namespace Jondo.Unity.Launcher.Handlers
                 foreach (var e in DefaultKriEntries)
                 {
                     if (DynamicStatIds.Contains(e.StatId)) continue;
-                    larMsg.Fields.Add(CreateRawStatEntry(e.StatId, e.SubField, e.InnerField, e.Value));
+                    long val = e.Value;
+                    if (e.StatId == 3 || e.StatId == 40)
+                    {
+                        val = GameState.CharacterRemainingPoints;
+                    }
+                    larMsg.Fields.Add(CreateRawStatEntry(e.StatId, e.SubField, e.InnerField, val));
                 }
 
                 // Dynamic stats from database-backed GameState + equipment bonuses
