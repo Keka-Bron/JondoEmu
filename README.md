@@ -15,13 +15,19 @@ This repository contains the complete architecture of the **Jondo** local emulat
 - [x] **Inventory System:** Item spawning, equipping and unequipping items works well.
 - [x] **Character Stats:** Characteristic assignment is fully functional (all stats map correctly, capital calculation is dynamic, and remaining points synchronize perfectly between all client panels, including the left sidebar HUD).
 - [x] **NPCs:** Spawns, looks, and dialogues are implemented *(Note: Needs a slight fix on closing dialogues properly. NPC buyers/sellers haven't been tested yet).*
+- [x] **Monsters & Mobs System (100% Complete):**
+  - **Dynamic Map Spawning & Respawner**: Automatic population and maintenance of 2 to 4 mob groups per map.
+  - **Level & Grade Management**: Correct levels, grades, and experience calculation.
+  - **3D Looks & Skeleton System (`lkr`)**: Native Protobuf bone models, custom scales, and textures for monsters, quest monsters, and archmonsters.
+  - **Multi-Monster Groups**: Complete support for groups of 1 to 8 monsters per mob.
+  - **Spatial Radius 2 Cell Validation (`GetInnerWalkableCells`)**: Strict grid validation preventing mob spawns on non-walkable decorations, walls, house windows, or Zaap pillars.
+  - **Quest Monsters & Archmonsters**: Full database mapping for special quest mobs and archmonsters.
 
 ### 🚧 Work In Progress (WIP) / Basic Implementation
 - [ ] **Commands:** `.level` and `.kamas` are present but working roughly (working on it).
 
 ### ❌ Missing Features
 - [ ] **Zaaps**
-- [ ] **Monsters:** Spawns, Mobs management, and Monster AI.
 - [ ] **Fights:** PVM and PVP combat system.
 - [ ] **Spells**
 - [ ] **Kolossium system**

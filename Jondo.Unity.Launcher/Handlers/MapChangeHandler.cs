@@ -43,7 +43,7 @@ namespace Jondo.Unity.Launcher.Handlers
                             else if (newMapInfo.PosY < oldMapInfo.PosY) direction = "Up";
                         }
                         
-                        int spawnCellId = GetTransitionSpawnCell(GameState.CellId, direction);
+                        int spawnCellId = GetTransitionSpawnCell(requestedMapId, GameState.CellId, direction);
                         LogDebug($"[Map Change] Transition direction: {direction} | Last Cell: {GameState.CellId} | New Spawn Cell: {spawnCellId}");
                         
                         int newOrientation = GameState.Orientation;
@@ -149,28 +149,35 @@ namespace Jondo.Unity.Launcher.Handlers
             Console.WriteLine("[Game Node] Sent dynamically generated joq (Movement Validation)");
         }
 
-        private static int GetTransitionSpawnCell(int lastCellId, string direction)
+        private static int GetTransitionSpawnCell(long targetMapId, int lastCellId, string direction)
         {
             int row = lastCellId / 14;
             int col = lastCellId % 14;
+
+            if (row < 10) row = 10;
+            if (row > 26) row = 26;
+            if (col < 4) col = 4;
+            if (col > 9) col = 9;
             
+            int rawCell = lastCellId;
             if (direction == "Right")
             {
-                return row * 14;
+                rawCell = row * 14 + 2;
             }
             else if (direction == "Left")
             {
-                return row * 14 + 13;
+                rawCell = row * 14 + 11;
             }
             else if (direction == "Down")
             {
-                return col;
+                rawCell = 8 * 14 + col;
             }
             else if (direction == "Up")
             {
-                return 39 * 14 + col;
+                rawCell = 28 * 14 + col;
             }
-            return lastCellId;
+
+            return MapManager.GetNearestWalkableCell(targetMapId, rawCell);
         }
 
         private static void LogDebug(string msg)

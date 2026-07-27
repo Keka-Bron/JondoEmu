@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Jondo.Unity.DatabaseSeeder")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+23735aec922a903db6f356d149afc2f570489094")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ded5fd53d990e1e30fcfa23df5baece46e7e7cc8")]
 [assembly: System.Reflection.AssemblyProductAttribute("Jondo.Unity.DatabaseSeeder")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Jondo.Unity.DatabaseSeeder")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

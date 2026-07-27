@@ -173,7 +173,7 @@ namespace Jondo.Unity.Launcher
                     seedNpc.ExecuteNonQuery();
                 }
 
-                // 4. Initialize Monsters tables
+                // 4. Initialize Monsters and MapMobs tables
                 var createMonsters = worldConnection.CreateCommand();
                 createMonsters.CommandText = @"
                     CREATE TABLE IF NOT EXISTS Monsters (
@@ -190,8 +190,18 @@ namespace Jondo.Unity.Launcher
                         MapId INTEGER PRIMARY KEY,
                         SubAreaId INTEGER
                     );
+                    CREATE TABLE IF NOT EXISTS MapMobs (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        MapId INTEGER NOT NULL,
+                        MobId INTEGER NOT NULL,
+                        CellId INTEGER NOT NULL,
+                        MembersJson TEXT NOT NULL
+                    );
                 ";
                 createMonsters.ExecuteNonQuery();
+
+                // 5. Ensure Monsters & Mobs are seeded from JSON if missing
+                EnsureMobsSeeded(worldConnection);
 
                 if (count == 0)
                 {
@@ -209,10 +219,279 @@ namespace Jondo.Unity.Launcher
                             Console.WriteLine("[SQLite] Migration: Updated character name to 'CADERNIS'.");
                         }
                     }
+
+                    // Migration: Unstick character from CellId 116
+                    using (var updateCellCmd = worldConnection.CreateCommand())
+                    {
+                        updateCellCmd.CommandText = "UPDATE Characters SET CellId = 320 WHERE CellId = 116 OR CellId <= 0;";
+                        int cellAffected = updateCellCmd.ExecuteNonQuery();
+                        if (cellAffected > 0)
+                        {
+                            Console.WriteLine("[SQLite] Migration: Unstuck character, moved to Cell 320.");
+                        }
+                    }
                 }
             }
 
             Console.WriteLine("[SQLite] Databases initialized successfully.");
+        }
+
+        public static void EnsureMobsSeeded(SqliteConnection connection)
+        {
+            var checkCmd = connection.CreateCommand();
+            checkCmd.CommandText = "SELECT COUNT(*) FROM MapMobs;";
+            long count = (long)checkCmd.ExecuteScalar();
+            if (count > 0) return;
+
+            Console.WriteLine("[DatabaseManager] Auto-seeding Monsters, Subareas, MapSubareas, and MapMobs from JSON...");
+
+            string basePath = @"C:\Jondo\dofus3_data";
+            if (!Directory.Exists(basePath))
+            {
+                basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "dofus3_data");
+            }
+
+            if (!Directory.Exists(basePath))
+            {
+                Console.WriteLine($"[DatabaseManager] Warning: JSON directory not found at {basePath}. Skipping auto-seeding.");
+                return;
+            }
+
+            var checkMonsters = connection.CreateCommand();
+            checkMonsters.CommandText = "SELECT COUNT(*) FROM Monsters;";
+            long mCount = (long)checkMonsters.ExecuteScalar();
+            if (mCount == 0)
+            {
+                using var transaction = connection.BeginTransaction();
+                try
+                {
+                    string monstersPath = Path.Combine(basePath, "monsters.json");
+                    if (File.Exists(monstersPath))
+                    {
+                        using var fs = new FileStream(monstersPath, FileMode.Open, FileAccess.Read);
+                        using var doc = System.Text.Json.JsonDocument.Parse(fs);
+                        var refsArr = doc.RootElement.GetProperty("references").GetProperty("RefIds");
+                        var insertCmd = connection.CreateCommand();
+                        insertCmd.Transaction = transaction;
+                        insertCmd.CommandText = "INSERT OR REPLACE INTO Monsters (Id, NameId, Look, Grades) VALUES ($id, $nameId, $look, $grades);";
+                        insertCmd.Parameters.Add("$id", Microsoft.Data.Sqlite.SqliteType.Integer);
+                        insertCmd.Parameters.Add("$nameId", Microsoft.Data.Sqlite.SqliteType.Integer);
+                        insertCmd.Parameters.Add("$look", Microsoft.Data.Sqlite.SqliteType.Text);
+                        insertCmd.Parameters.Add("$grades", Microsoft.Data.Sqlite.SqliteType.Text);
+                        int countM = 0;
+                        for (int i = 0; i < refsArr.GetArrayLength(); i++)
+                        {
+                            if (!refsArr[i].TryGetProperty("data", out var data)) continue;
+                            int monsterId = data.TryGetProperty("id", out var mid) ? mid.GetInt32() : 0;
+                            if (monsterId == 0) continue;
+                            int nameId = data.TryGetProperty("nameId", out var nid) ? nid.GetInt32() : 0;
+                            string look = data.TryGetProperty("look", out var lk) ? lk.GetString() ?? "" : "";
+                            string grades = data.TryGetProperty("grades", out var gr) ? gr.GetRawText() : "[]";
+                            insertCmd.Parameters["$id"].Value = monsterId;
+                            insertCmd.Parameters["$nameId"].Value = nameId;
+                            insertCmd.Parameters["$look"].Value = look;
+                            insertCmd.Parameters["$grades"].Value = grades;
+                            insertCmd.ExecuteNonQuery();
+                            countM++;
+                        }
+                        Console.WriteLine($"[DatabaseManager] Inserted {countM} monsters into DB.");
+                    }
+
+                    string subareasPath = Path.Combine(basePath, "subareas.json");
+                    if (File.Exists(subareasPath))
+                    {
+                        using var fs = new FileStream(subareasPath, FileMode.Open, FileAccess.Read);
+                        using var doc = System.Text.Json.JsonDocument.Parse(fs);
+                        var refsArr = doc.RootElement.GetProperty("references").GetProperty("RefIds");
+                        var insertCmd = connection.CreateCommand();
+                        insertCmd.Transaction = transaction;
+                        insertCmd.CommandText = "INSERT OR REPLACE INTO Subareas (Id, Monsters) VALUES ($id, $monsters);";
+                        insertCmd.Parameters.Add("$id", Microsoft.Data.Sqlite.SqliteType.Integer);
+                        insertCmd.Parameters.Add("$monsters", Microsoft.Data.Sqlite.SqliteType.Text);
+                        for (int i = 0; i < refsArr.GetArrayLength(); i++)
+                        {
+                            if (!refsArr[i].TryGetProperty("data", out var data)) continue;
+                            int subAreaId = data.TryGetProperty("id", out var sid) ? sid.GetInt32() : 0;
+                            if (subAreaId == 0) continue;
+                            string monsters = data.TryGetProperty("monsters", out var mst) ? mst.GetRawText() : "[]";
+                            insertCmd.Parameters["$id"].Value = subAreaId;
+                            insertCmd.Parameters["$monsters"].Value = monsters;
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    string mapsPath = Path.Combine(basePath, "maps_information.json");
+                    if (File.Exists(mapsPath))
+                    {
+                        using var fs = new FileStream(mapsPath, FileMode.Open, FileAccess.Read);
+                        using var doc = System.Text.Json.JsonDocument.Parse(fs);
+                        var refsArr = doc.RootElement.GetProperty("references").GetProperty("RefIds");
+                        var insertCmd = connection.CreateCommand();
+                        insertCmd.Transaction = transaction;
+                        insertCmd.CommandText = "INSERT OR REPLACE INTO MapSubareas (MapId, SubAreaId) VALUES ($id, $subid);";
+                        insertCmd.Parameters.Add("$id", Microsoft.Data.Sqlite.SqliteType.Integer);
+                        insertCmd.Parameters.Add("$subid", Microsoft.Data.Sqlite.SqliteType.Integer);
+                        for (int i = 0; i < refsArr.GetArrayLength(); i++)
+                        {
+                            if (!refsArr[i].TryGetProperty("data", out var data)) continue;
+                            long mapId = data.TryGetProperty("id", out var mid) ? mid.GetInt64() : 0;
+                            if (mapId == 0) continue;
+                            int subAreaId = data.TryGetProperty("subAreaId", out var sid) ? sid.GetInt32() : 0;
+                            insertCmd.Parameters["$id"].Value = mapId;
+                            insertCmd.Parameters["$subid"].Value = subAreaId;
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine("[DatabaseManager] Error seeding JSON data: " + ex.Message);
+                }
+            }
+
+            PopulateMapMobs(connection);
+        }
+
+        private static void PopulateMapMobs(SqliteConnection connection)
+        {
+            var monsters = new Dictionary<int, Managers.MobSpawnManager.MonsterData>();
+            var subareas = new Dictionary<int, List<int>>();
+            var mapSubareas = new Dictionary<long, int>();
+
+            var cmdMonsters = connection.CreateCommand();
+            cmdMonsters.CommandText = "SELECT Id, NameId, Look, Grades FROM Monsters;";
+            using (var reader = cmdMonsters.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    var data = new Managers.MobSpawnManager.MonsterData
+                    {
+                        Id = reader.GetInt32(0),
+                        NameId = reader.GetInt32(1),
+                        Look = reader.GetString(2)
+                    };
+                    string gradesJson = reader.GetString(3);
+                    try
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(gradesJson);
+                        var root = doc.RootElement;
+                        if (root.ValueKind == System.Text.Json.JsonValueKind.Object && root.TryGetProperty("Array", out var arrProp))
+                        {
+                            root = arrProp;
+                        }
+                        if (root.ValueKind == System.Text.Json.JsonValueKind.Array)
+                        {
+                            foreach (var g in root.EnumerateArray())
+                            {
+                                int lvl = g.TryGetProperty("level", out var l) ? l.GetInt32() : 1;
+                                data.Grades.Add(new Managers.MobSpawnManager.MonsterGrade { Level = lvl });
+                            }
+                        }
+                    }
+                    catch { }
+                    monsters[data.Id] = data;
+                }
+            }
+
+            var cmdSubareas = connection.CreateCommand();
+            cmdSubareas.CommandText = "SELECT Id, Monsters FROM Subareas;";
+            using (var reader = cmdSubareas.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    var id = reader.GetInt32(0);
+                    var list = new List<int>();
+                    string monstersJson = reader.GetString(1);
+                    try
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(monstersJson);
+                        if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                        {
+                            foreach (var m in doc.RootElement.EnumerateArray()) list.Add(m.GetInt32());
+                        }
+                        else if (doc.RootElement.TryGetProperty("Array", out var arrProp))
+                        {
+                            foreach (var m in arrProp.EnumerateArray()) list.Add(m.GetInt32());
+                        }
+                    }
+                    catch { }
+                    subareas[id] = list;
+                }
+            }
+
+            var cmdMapSubareas = connection.CreateCommand();
+            cmdMapSubareas.CommandText = "SELECT MapId, SubAreaId FROM MapSubareas;";
+            using (var reader = cmdMapSubareas.ExecuteReader())
+            {
+                while (reader.Read()) mapSubareas[reader.GetInt64(0)] = reader.GetInt32(1);
+            }
+
+            long currentMobId = -1000000;
+            Random rand = new Random();
+
+            using var transaction = connection.BeginTransaction();
+            var insertCmd = connection.CreateCommand();
+            insertCmd.Transaction = transaction;
+            insertCmd.CommandText = "INSERT INTO MapMobs (MapId, MobId, CellId, MembersJson) VALUES ($mapId, $mobId, $cellId, $json);";
+            insertCmd.Parameters.Add("$mapId", Microsoft.Data.Sqlite.SqliteType.Integer);
+            insertCmd.Parameters.Add("$mobId", Microsoft.Data.Sqlite.SqliteType.Integer);
+            insertCmd.Parameters.Add("$cellId", Microsoft.Data.Sqlite.SqliteType.Integer);
+            insertCmd.Parameters.Add("$json", Microsoft.Data.Sqlite.SqliteType.Text);
+
+            int totalSpawns = 0;
+            foreach (var kvp in mapSubareas)
+            {
+                long mapId = kvp.Key;
+                int subAreaId = kvp.Value;
+
+                if (!subareas.TryGetValue(subAreaId, out var allowedMonsters) || allowedMonsters.Count == 0) continue;
+                var validMonsters = allowedMonsters.Where(id => monsters.ContainsKey(id) && id != 494).ToList();
+                if (validMonsters.Count == 0) validMonsters = allowedMonsters.Where(id => monsters.ContainsKey(id)).ToList();
+                if (validMonsters.Count == 0) continue;
+
+                int numMobs = rand.Next(2, 5); // 2 to 4 groups
+                var validCells = Managers.MobSpawnManager.GetInnerWalkableCells(mapId);
+                var usedCells = new HashSet<int>();
+
+                for (int i = 0; i < numMobs; i++)
+                {
+                    int groupSize = rand.Next(1, 9); // 1 to 8 members (official Dofus range)
+                    int cellId = validCells[rand.Next(validCells.Count)];
+                    while (usedCells.Contains(cellId) && usedCells.Count < validCells.Count)
+                    {
+                        cellId = validCells[rand.Next(validCells.Count)];
+                    }
+                    usedCells.Add(cellId);
+
+                    long mobId = currentMobId--;
+
+                    var members = new List<object>();
+                    for (int m = 0; m < groupSize; m++)
+                    {
+                        int monsterId = validMonsters[rand.Next(validMonsters.Count)];
+                        var mData = monsters[monsterId];
+                        int gradeIdx = 0;
+                        int lvl = 1;
+                        if (mData.Grades.Count > 0)
+                        {
+                            gradeIdx = rand.Next(mData.Grades.Count);
+                            lvl = mData.Grades[gradeIdx].Level;
+                        }
+                        members.Add(new { id = monsterId, grade = gradeIdx, level = lvl });
+                    }
+
+                    insertCmd.Parameters["$mapId"].Value = mapId;
+                    insertCmd.Parameters["$mobId"].Value = mobId;
+                    insertCmd.Parameters["$cellId"].Value = cellId;
+                    insertCmd.Parameters["$json"].Value = System.Text.Json.JsonSerializer.Serialize(members);
+                    insertCmd.ExecuteNonQuery();
+                    totalSpawns++;
+                }
+            }
+            transaction.Commit();
+            Console.WriteLine($"[DatabaseManager] Successfully auto-seeded {totalSpawns} mobs into MapMobs table.");
         }
 
         // --- Auth Operations ---

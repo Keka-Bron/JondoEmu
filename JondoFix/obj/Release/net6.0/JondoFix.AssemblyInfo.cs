@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JondoFix")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+efde91944d5684d6707007abfb33c5165eb0e8f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ded5fd53d990e1e30fcfa23df5baece46e7e7cc8")]
 [assembly: System.Reflection.AssemblyProductAttribute("JondoFix")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JondoFix")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

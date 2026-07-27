@@ -29,6 +29,7 @@ namespace Jondo.Unity.Launcher
     {
         public static Dictionary<long, MapInfo> Maps = new Dictionary<long, MapInfo>();
         public static Dictionary<long, MapScrollAction> ScrollActions = new Dictionary<long, MapScrollAction>();
+        public static Dictionary<long, List<int>> WalkableCells = new Dictionary<long, List<int>>();
 
         public static void Initialize()
         {
@@ -36,6 +37,37 @@ namespace Jondo.Unity.Launcher
             {
                 Maps.Clear();
                 ScrollActions.Clear();
+                WalkableCells.Clear();
+
+                string walkableJsonPath = @"C:\Jondo\map_walkable_cells.json";
+                if (File.Exists(walkableJsonPath))
+                {
+                    try
+                    {
+                        string json = File.ReadAllText(walkableJsonPath);
+                        using var doc = System.Text.Json.JsonDocument.Parse(json);
+                        foreach (var prop in doc.RootElement.EnumerateObject())
+                        {
+                            if (long.TryParse(prop.Name, out long mId))
+                            {
+                                var cellList = new List<int>();
+                                foreach (var elem in prop.Value.EnumerateArray())
+                                {
+                                    cellList.Add(elem.GetInt32());
+                                }
+                                if (cellList.Count > 0)
+                                {
+                                    WalkableCells[mId] = cellList;
+                                }
+                            }
+                        }
+                        Console.WriteLine($"[MapManager] Loaded walkable cell data for {WalkableCells.Count} maps from map_walkable_cells.json.");
+                    }
+                    catch (Exception wex)
+                    {
+                        Console.WriteLine($"[MapManager] Error loading map_walkable_cells.json: {wex.Message}");
+                    }
+                }
 
                 using (var connection = new SqliteConnection(DatabaseManager.WorldConnectionString))
                 {
@@ -116,6 +148,46 @@ namespace Jondo.Unity.Launcher
                 return action;
             }
             return null;
+        }
+
+        public static bool IsCellWalkable(long mapId, int cellId)
+        {
+            if (WalkableCells.TryGetValue(mapId, out var cells))
+            {
+                return cells.Contains(cellId);
+            }
+            return true;
+        }
+
+        public static int GetNearestWalkableCell(long mapId, int targetCellId)
+        {
+            if (!WalkableCells.TryGetValue(mapId, out var cells) || cells.Count == 0)
+            {
+                return targetCellId;
+            }
+            if (cells.Contains(targetCellId))
+            {
+                return targetCellId;
+            }
+
+            int targetRow = targetCellId / 14;
+            int targetCol = targetCellId % 14;
+
+            int bestCell = cells[0];
+            double minDistance = double.MaxValue;
+
+            foreach (var cell in cells)
+            {
+                int r = cell / 14;
+                int c = cell % 14;
+                double dist = Math.Pow(r - targetRow, 2) + Math.Pow(c - targetCol, 2);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    bestCell = cell;
+                }
+            }
+            return bestCell;
         }
     }
 }
