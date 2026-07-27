@@ -25,10 +25,10 @@ This repository contains the complete architecture of the **Jondo** local emulat
 
 ### 🚧 Work In Progress (WIP) / Basic Implementation
 - [ ] **Commands:** `.level` and `.kamas` are present but working roughly (working on it).
+- [ ] **Fights:** PVM and PVP combat system.
 
 ### ❌ Missing Features
 - [ ] **Zaaps**
-- [ ] **Fights:** PVM and PVP combat system.
 - [ ] **Spells**
 - [ ] **Kolossium system**
 - [ ] **Jobs (Oficios)**
