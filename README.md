@@ -27,7 +27,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.4.3)** written 
   - **Tactical Arenas**: Each roleplay map resolves to its corresponding tactical combat arena based on zone offsets.
   - **Context Transitions**: Clean switching between Roleplay and Tactical Combat states, restoring world state upon fight completion.
   - **Placement Phase**: Red (monsters) and blue (players) placement tiles with dynamic cell swapping before clicking *Ready*.
-  - **Isometric Grid Geometry (`MapGeometry`)**: 4-neighbor isometric grid geometry calculated using a pre-computed $O(1)$ BFS distance matrix (Even deltas: `-28, -15, -14, -1, +1, +13, +14, +28`; Odd deltas: `-28, -14, -13, -1, +1, +14, +15, +28`).
+  - **Isometric Grid Geometry (`MapGeometry`)**: 4-neighbor isometric grid geometry calculated using a pre-computed $O(1)$ BFS distance matrix.
   - **Line of Sight (LoS)**: LoS obstacle validation extracted for 17,222 maps, tracing segments between cell centers.
   - **Turn Protocol & Timers**: Turn handshake, 30-second turn timers with automatic pass, and AP/MP replenishment.
   - **Movement**: Cell-by-cell path expansion and Movement Point (MP) deductions.
