@@ -1,6 +1,6 @@
-# Jondo Unity Emulator — Dofus 3.6 Server
-
 High-performance server emulator for **Dofus 3 Unity (Client 3.6.4.3)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a functional PvM combat engine.
+
+> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.4.3**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes.
 
 ---
 
@@ -94,7 +94,9 @@ The emulator uses two **SQLite** databases for local persistence:
 
 ---
 
-### Step 2: Configure the Dofus Client (MelonLoader & JondoFix)
+### Step 2: Configure the Dofus Client (Version 3.6.4.3 Only)
+
+> ⚠️ **Note**: Ensure you are targeting a **Dofus 3.6.4.3** client build. The emulator is **not compatible** with the latest client updates.
 
 By default, the official Dofus client connects to official Ankama servers and verifies SSL/TLS security certificates. To redirect traffic locally, use **MelonLoader** and the **JondoFix** mod.
 
