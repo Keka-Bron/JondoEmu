@@ -1,6 +1,6 @@
 High-performance server emulator for **Dofus 3 Unity (Client 3.6.4.3)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a functional PvM combat engine.
 
-> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.4.3**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes.
+> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.4.3**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes. The emulator will be migrated to the last version once a MVP product is achieved.
 
 ---
 
@@ -36,6 +36,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.4.3)** written 
   - **Fight Resolution & Progression**: Victory/defeat screens, experience progression (1,889 levels), official loot drops, level ups, and monster group respawns.
 
 ### 🚧 Work In Progress (WIP) / Basic Implementation
+- [ ] **Migration to last Dofus Client version - Protocol migration**
 - [ ] **Commands:** `.level` and `.kamas` are present but working roughly (working on it).
 - [ ] **Partial Combat Mechanics:**
   - Pushback trajectory (calculates destination cell, omits collision damage & pushback animation).
