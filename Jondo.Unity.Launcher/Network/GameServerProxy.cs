@@ -25,7 +25,7 @@ namespace Jondo.Unity.Launcher.Network
             _tcpListener.Start();
 
             Console.WriteLine($"[+] Emulating Game Server on TCP port {port} (Binary Protocol)");
-            Console.WriteLine($"[+] Game Server logs will be saved to C:\\Jondo\\gameserver_traffic.log");
+            Console.WriteLine($"[+] Game Server logs will be saved to {Paths.TrafficLog}");
 
             _ = Task.Run(async () =>
             {
@@ -197,7 +197,7 @@ namespace Jondo.Unity.Launcher.Network
             string logLine = $"[{DateTime.Now:HH:mm:ss.fff}] {direction} ({length} bytes)\nHex: {hex}\nStr: {str}\n--------------------------------------------------\n";
             try
             {
-                File.AppendAllText(@"C:\Jondo\gameserver_traffic.log", logLine);
+                File.AppendAllText(Paths.TrafficLog, logLine);
             }
             catch { }
         }

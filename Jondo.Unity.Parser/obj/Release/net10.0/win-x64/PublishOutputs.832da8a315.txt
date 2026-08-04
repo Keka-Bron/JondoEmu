@@ -1,2 +1,0 @@
-C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Release\net10.0\win-x64\publish\Jondo.Unity.Parser.pdb
-C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Release\net10.0\win-x64\publish\Jondo.Unity.Parser.exe

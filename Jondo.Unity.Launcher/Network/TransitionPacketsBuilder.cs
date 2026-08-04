@@ -634,22 +634,124 @@ namespace Jondo.Unity.Launcher.Network
             return list;
         }
 
+        /// <summary>
+        /// hmd = LIBRO DE HECHIZOS: los que el personaje tiene aprendidos. Es lo que decide si un
+        /// hechizo se puede lanzar; la barra de accesos directos (itp) solo decide dónde se dibuja.
+        ///
+        /// Aquí había cuatro hechizos escritos en bytes crudos —32426, 32435, 32443 y 32455—, que
+        /// resultan ser los cuatro de nivel mínimo 1 del Ocra, los del personaje de la captura.
+        /// De ahí venía que en combate solo esos cuatro se pudieran lanzar y el resto salieran
+        /// oscurecidos por mucho que la barra los mostrara: estaban en la barra pero no en el libro.
+        ///
+        /// Estructura, idéntica a la lista de hechizos del combate (jvn):
+        ///   hmd { f1 = 1,
+        ///         f3 { f3 = 2, f4 = 1 },                 &lt;- el arma, sin identificador
+        ///         f3 { f1 = hechizo, f3 = 1, f4 = 1 } }  &lt;- uno por hechizo
+        /// </summary>
         public static byte[] BuildHmdMessage()
         {
-            byte[] payload = new byte[] {
-                0x08, 0x01, 0x1A, 0x04, 0x18, 0x02, 0x20, 0x01, 0x1A, 0x08, 0x08, 0xBB, 0xFD, 0x01, 0x18, 0x01, 0x20, 0x01, 0x1A, 0x08, 0x08, 0xAA, 0xFD, 0x01, 0x18, 0x01, 0x20, 0x01, 0x1A, 0x08, 0x08, 0xB3, 0xFD, 0x01, 0x18, 0x01, 0x20, 0x01, 0x1A, 0x08, 0x08, 0xC7, 0xFD, 0x01, 0x18, 0x01, 0x20, 0x01
-            };
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hmd", payload);
+            var spells = DatabaseManager.GetPlayerAvailableSpells(GameState.Breed, GameState.CharacterLevel);
+
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+
+            output.WriteTag((uint)((1 << 3) | 0));
+            output.WriteInt32(1);
+
+            void Entrada(int? spellId)
+            {
+                using var eMs = new MemoryStream();
+                var e = new CodedOutputStream(eMs);
+                if (spellId.HasValue)
+                {
+                    e.WriteTag((uint)((1 << 3) | 0));
+                    e.WriteInt32(spellId.Value);
+                }
+                e.WriteTag((uint)((3 << 3) | 0));
+                e.WriteInt32(spellId.HasValue ? 1 : 2);   // 1 = hechizo, 2 = arma
+                e.WriteTag((uint)((4 << 3) | 0));
+                e.WriteInt32(1);
+                e.Flush();
+                output.WriteTag((uint)((3 << 3) | 2));
+                output.WriteBytes(ByteString.CopyFrom(eMs.ToArray()));
+            }
+
+            Entrada(null);
+            foreach (int id in spells) Entrada(id);
+
+            output.Flush();
+
+            Program.LogDebug($"[TransitionPackets] Libro de hechizos (hmd) con {spells.Count} hechizo(s) " +
+                             $"para la raza {GameState.Breed} a nivel {GameState.CharacterLevel}.");
+
+            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hmd", ms.ToArray());
         }
 
+        /// <summary>
+        /// Barra de accesos directos de hechizos (itp). Es la que se ve en roleplay y durante la
+        /// colocación previa al combate.
+        ///
+        /// Aquí había cuatro identificadores escritos a mano —32426, 32435, 32443 y 32455—, que
+        /// son los que tenía en su barra el personaje de la captura de referencia. Por eso el
+        /// jugador veía siempre cuatro hechizos fuera de combate por muy alto que fuera su nivel,
+        /// mientras que dentro del combate (donde manda el jvn) salían todos.
+        ///
+        /// Estructura: itp { f1 = tipo de barra, f2 repetido { f3 = ranura, f4 { f1 = hechizo } } }.
+        /// La primera entrada va sin ranura y con f4 vacío, igual que en la captura.
+        /// </summary>
         public static byte[][] BuildItpList()
         {
-            byte[] itp1 = new byte[] {
-                0x08, 0x01, 0x12, 0x02, 0x22, 0x00, 0x12, 0x08, 0x18, 0x01, 0x22, 0x04, 0x08, 0xAA, 0xFD, 0x01, 0x12, 0x08, 0x18, 0x02, 0x22, 0x04, 0x08, 0xB3, 0xFD, 0x01, 0x12, 0x08, 0x18, 0x03, 0x22, 0x04, 0x08, 0xBB, 0xFD, 0x01, 0x12, 0x08, 0x18, 0x04, 0x22, 0x04, 0x08, 0xC7, 0xFD, 0x01
-            };
+            var spells = DatabaseManager.GetPlayerAvailableSpells(GameState.Breed, GameState.CharacterLevel);
+
+            using var ms = new MemoryStream();
+            var output = new CodedOutputStream(ms);
+
+            output.WriteTag((uint)((1 << 3) | 0));
+            output.WriteInt32(1);
+
+            using (var emptyMs = new MemoryStream())
+            {
+                var emptyOut = new CodedOutputStream(emptyMs);
+                emptyOut.WriteTag((uint)((4 << 3) | 2));
+                emptyOut.WriteBytes(ByteString.Empty);
+                emptyOut.Flush();
+                output.WriteTag((uint)((2 << 3) | 2));
+                output.WriteBytes(ByteString.CopyFrom(emptyMs.ToArray()));
+            }
+
+            int slot = 1;
+            foreach (int spellId in spells)
+            {
+                using var slotMs = new MemoryStream();
+                var slotOut = new CodedOutputStream(slotMs);
+
+                slotOut.WriteTag((uint)((3 << 3) | 0));
+                slotOut.WriteInt32(slot++);
+
+                using (var spellMs = new MemoryStream())
+                {
+                    var spellOut = new CodedOutputStream(spellMs);
+                    spellOut.WriteTag((uint)((1 << 3) | 0));
+                    spellOut.WriteInt32(spellId);
+                    spellOut.Flush();
+                    slotOut.WriteTag((uint)((4 << 3) | 2));
+                    slotOut.WriteBytes(ByteString.CopyFrom(spellMs.ToArray()));
+                }
+
+                slotOut.Flush();
+                output.WriteTag((uint)((2 << 3) | 2));
+                output.WriteBytes(ByteString.CopyFrom(slotMs.ToArray()));
+            }
+
+            output.Flush();
+            byte[] itpSpells = ms.ToArray();
+
+            Program.LogDebug($"[TransitionPackets] Barra de hechizos con {spells.Count} hechizo(s) " +
+                             $"para la raza {GameState.Breed} a nivel {GameState.CharacterLevel}.");
+
             return new byte[][] {
-                NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", itp1),
-                NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", itp1),
+                NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", itpSpells),
+                NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", itpSpells),
                 NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", Array.Empty<byte>())
             };
         }

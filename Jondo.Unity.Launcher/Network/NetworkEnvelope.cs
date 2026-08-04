@@ -9,6 +9,15 @@ namespace Jondo.Unity.Launcher.Network
     {
         public static byte[] BuildGameNodePacket(string typeUrl, byte[] payload)
         {
+            // Validate opcode length (Phase 0 - DIAGNOSTICO_COMBATE)
+            string opcode = typeUrl.StartsWith("type.ankama.com/") ? typeUrl.Substring("type.ankama.com/".Length) : typeUrl;
+            if (opcode.Length != 3)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"[WARN] INVALID OPCODE LENGTH: '{opcode}' in '{typeUrl}' (length {opcode.Length} != 3). Dofus 3 opcodes MUST be 3 characters!");
+                Console.ResetColor();
+            }
+
             // 1. Build Any-like msg (Field 1: string typeUrl, Field 2: bytes payload)
             using var anyMs = new MemoryStream();
             {
@@ -245,21 +254,27 @@ namespace Jondo.Unity.Launcher.Network
         {
             try
             {
-                // The client frame (fullFrame) has the length prefix stripped.
-                // It is a root message. Field 1 (tag 0x0a) contains the Envelope.
                 int pos = 0;
-                byte[]? envelopeBytes = null;
+                byte[]? innerBytes = null;
+                bool isServer = false;
                 while (pos < fullFrame.Length)
                 {
                     uint tag = ReadVarInt(fullFrame, ref pos);
                     int wireType = (int)(tag & 7);
                     int fieldNum = (int)(tag >> 3);
-                    if (fieldNum == 1 && wireType == 2)
+                    if (fieldNum == 3 && wireType == 2)
                     {
                         uint len = ReadVarInt(fullFrame, ref pos);
-                        envelopeBytes = new byte[len];
-                        Array.Copy(fullFrame, pos, envelopeBytes, 0, len);
-                        pos += (int)len;
+                        innerBytes = new byte[len];
+                        Array.Copy(fullFrame, pos, innerBytes, 0, len);
+                        isServer = true;
+                        break;
+                    }
+                    else if (fieldNum == 1 && wireType == 2)
+                    {
+                        uint len = ReadVarInt(fullFrame, ref pos);
+                        innerBytes = new byte[len];
+                        Array.Copy(fullFrame, pos, innerBytes, 0, len);
                         break;
                     }
                     else
@@ -268,33 +283,30 @@ namespace Jondo.Unity.Launcher.Network
                     }
                 }
 
-                if (envelopeBytes == null) return null;
+                if (innerBytes == null) return null;
 
-                // Inside the Envelope: Field 2 (tag 0x12) is the Any message.
                 pos = 0;
                 byte[]? anyBytes = null;
-                while (pos < envelopeBytes.Length)
+                while (pos < innerBytes.Length)
                 {
-                    uint tag = ReadVarInt(envelopeBytes, ref pos);
+                    uint tag = ReadVarInt(innerBytes, ref pos);
                     int wireType = (int)(tag & 7);
                     int fieldNum = (int)(tag >> 3);
-                    if (fieldNum == 2 && wireType == 2)
+                    if ((isServer ? (fieldNum == 1) : (fieldNum == 2)) && wireType == 2)
                     {
-                        uint len = ReadVarInt(envelopeBytes, ref pos);
+                        uint len = ReadVarInt(innerBytes, ref pos);
                         anyBytes = new byte[len];
-                        Array.Copy(envelopeBytes, pos, anyBytes, 0, len);
-                        pos += (int)len;
+                        Array.Copy(innerBytes, pos, anyBytes, 0, len);
                         break;
                     }
                     else
                     {
-                        SkipField(envelopeBytes, wireType, ref pos);
+                        SkipField(innerBytes, wireType, ref pos);
                     }
                 }
 
                 if (anyBytes == null) return null;
 
-                // Inside the Any message: Field 1 (tag 0x0a) is typeUrl (string).
                 pos = 0;
                 while (pos < anyBytes.Length)
                 {
@@ -435,7 +447,7 @@ namespace Jondo.Unity.Launcher.Network
                 if (File.Exists(path)) return path;
             }
 
-            path = Path.Combine(@"C:\Jondo", filename);
+            path = Paths.Resolve(filename);
             if (File.Exists(path)) return path;
 
             return filename;

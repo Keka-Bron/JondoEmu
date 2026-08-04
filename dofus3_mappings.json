@@ -1,0 +1,381 @@
+{
+    "type.ankama.com/knx": {
+        "name": "AuthTokenRequest",
+        "fields": {}
+    },
+    "type.ankama.com/kof": {
+        "name": "ProtocolAccepted",
+        "fields": {}
+    },
+    "type.ankama.com/lor": {
+        "name": "TimeMessage",
+        "fields": {}
+    },
+    "type.ankama.com/hnp": {
+        "name": "SystemConfiguration",
+        "fields": {}
+    },
+    "type.ankama.com/knr": {
+        "name": "BreedListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/mfa": {
+        "name": "FeatureStatus",
+        "fields": {}
+    },
+    "type.ankama.com/mez": {
+        "name": "ServerSeasonInfo",
+        "fields": {}
+    },
+    "type.ankama.com/hnv": {
+        "name": "ServerOptionalFeatures",
+        "fields": {}
+    },
+    "type.ankama.com/kpc": {
+        "name": "PingRequest",
+        "fields": {}
+    },
+    "type.ankama.com/kos": {
+        "name": "ServerSelectionStatus",
+        "fields": {}
+    },
+    "type.ankama.com/klp": {
+        "name": "CharacterListEmpty",
+        "fields": {}
+    },
+    "type.ankama.com/ksx": {
+        "name": "CharacterListRequest",
+        "fields": {}
+    },
+    "type.ankama.com/kpa": {
+        "name": "CharacterListRequest",
+        "fields": {}
+    },
+    "type.ankama.com/mes": {
+        "name": "MessageWrapper",
+        "fields": {}
+    },
+    "type.ankama.com/knv": {
+        "name": "UiLayoutMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ksq": {
+        "name": "CharacterListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/jrf": {
+        "name": "WorldReady",
+        "fields": {}
+    },
+    "type.ankama.com/ksl": {
+        "name": "CharacterSelectionRequest",
+        "fields": {}
+    },
+    "type.ankama.com/kri": {
+        "name": "CharacterStatsListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/itp": {
+        "name": "ShortcutBarContentMessage",
+        "fields": {}
+    },
+    "type.ankama.com/izn": {
+        "name": "ChatChannelsListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/krh": {
+        "name": "ClientReadyForPackets",
+        "fields": {}
+    },
+    "type.ankama.com/imd": {
+        "name": "InventoryWeightMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ktw": {
+        "name": "CharacterSelectedSuccessMessage",
+        "fields": {}
+    },
+    "type.ankama.com/mek": {
+        "name": "SpellListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/lry": {
+        "name": "QuestListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/icb": {
+        "name": "CharacterStatsListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/irm": {
+        "name": "MapActorsListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/hke": {
+        "name": "ServerWelcomeMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kfr": {
+        "name": "EmoteListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ipv": {
+        "name": "MapComplementaryInformationsData",
+        "fields": {}
+    },
+    "type.ankama.com/ipu": {
+        "name": "MapInteractiveElements",
+        "fields": {}
+    },
+    "type.ankama.com/ipw": {
+        "name": "MapStatedElements",
+        "fields": {}
+    },
+    "type.ankama.com/icw": {
+        "name": "InventoryContentMessage",
+        "fields": {}
+    },
+    "type.ankama.com/loy": {
+        "name": "WorldLoadAck",
+        "fields": {}
+    },
+    "type.ankama.com/lok": {
+        "name": "SelectedServerData",
+        "fields": {}
+    },
+    "type.ankama.com/jdj": {
+        "name": "ServerDateMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kqo": {
+        "name": "ChatChannelsReadMessage",
+        "fields": {}
+    },
+    "type.ankama.com/hhq": {
+        "name": "SocialGroupPackets",
+        "fields": {}
+    },
+    "type.ankama.com/hml": {
+        "name": "SocialPreferences",
+        "fields": {}
+    },
+    "type.ankama.com/isf": {
+        "name": "QuestListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/lol": {
+        "name": "NotificationListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/icg": {
+        "name": "InventoryWeightMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ibo": {
+        "name": "ShortcutBarContentMessage",
+        "fields": {}
+    },
+    "type.ankama.com/hmj": {
+        "name": "SocialGroupStatus",
+        "fields": {}
+    },
+    "type.ankama.com/lxs": {
+        "name": "AlignmentSubAreaUpdate",
+        "fields": {}
+    },
+    "type.ankama.com/hnq": {
+        "name": "SpouseStatusMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ksv": {
+        "name": "CharacterCapabilitiesMessage",
+        "fields": {}
+    },
+    "type.ankama.com/lou": {
+        "name": "ServerAccessStatus",
+        "fields": {}
+    },
+    "type.ankama.com/iya": {
+        "name": "FeatureStatusMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kdx": {
+        "name": "AccountCapabilitiesMessage",
+        "fields": {}
+    },
+    "type.ankama.com/izh": {
+        "name": "AlmanaxDateMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ity": {
+        "name": "ExpMultiplierMessage",
+        "fields": {}
+    },
+    "type.ankama.com/koj": {
+        "name": "HavenBagStatusMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kyj": {
+        "name": "ArenaRankInfosMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ktj": {
+        "name": "ExpGainDetails",
+        "fields": {}
+    },
+    "type.ankama.com/ltk": {
+        "name": "TitleListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/lvk": {
+        "name": "OrnamentListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/lwb": {
+        "name": "EmoteListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/luy": {
+        "name": "JobDescriptionMessage",
+        "fields": {}
+    },
+    "type.ankama.com/hhf": {
+        "name": "SocialGroupRights",
+        "fields": {}
+    },
+    "type.ankama.com/hhh": {
+        "name": "SocialGroupDetails",
+        "fields": {}
+    },
+    "type.ankama.com/luq": {
+        "name": "JobCrafterDirectorySettings",
+        "fields": {}
+    },
+    "type.ankama.com/hhi": {
+        "name": "SocialGroupAlliance",
+        "fields": {}
+    },
+    "type.ankama.com/idf": {
+        "name": "InventoryPreview",
+        "fields": {}
+    },
+    "type.ankama.com/izu": {
+        "name": "QuestStepProgress",
+        "fields": {}
+    },
+    "type.ankama.com/kkn": {
+        "name": "MapLoadCompleted",
+        "fields": {}
+    },
+    "type.ankama.com/kkp": {
+        "name": "SocialStatusMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kkm": {
+        "name": "SocialOptionsMessage",
+        "fields": {}
+    },
+    "type.ankama.com/krb": {
+        "name": "CharacterRemainingPoints",
+        "fields": {}
+    },
+    "type.ankama.com/ilc": {
+        "name": "ServerSettingsMessage",
+        "fields": {}
+    },
+    "type.ankama.com/joh": {
+        "name": "CurrentMapMessage",
+        "fields": {
+            "fumx": "map_id"
+        }
+    },
+    "type.ankama.com/hmd": {
+        "name": "InventoryWeightMessage",
+        "fields": {}
+    },
+    "type.ankama.com/lpj": {
+        "name": "SecondaryReadySignal",
+        "fields": {}
+    },
+    "type.ankama.com/lpe": {
+        "name": "SecondaryReadyConfirm",
+        "fields": {}
+    },
+    "type.ankama.com/hmv": {
+        "name": "ChatChannelsListRequest",
+        "fields": {}
+    },
+    "type.ankama.com/hnk": {
+        "name": "ChatChannelsListMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kqm": {
+        "name": "ChatChannelConfigMessage",
+        "fields": {}
+    },
+    "type.ankama.com/ibt": {
+        "name": "GameReadyTrigger",
+        "fields": {}
+    },
+    "type.ankama.com/ith": {
+        "name": "FullCharacterStatsMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kkr": {
+        "name": "MapComplementaryInfoRequest",
+        "fields": {}
+    },
+    "type.ankama.com/lxd": {
+        "name": "MapComplementaryInfo",
+        "fields": {}
+    },
+    "type.ankama.com/jpv": {
+        "name": "MapActorsShowMessage",
+        "fields": {}
+    },
+    "type.ankama.com/kns": {
+        "name": "KnockAck / Heartbeat",
+        "fields": {}
+    },
+    "type.ankama.com/kod": {
+        "name": "HeartbeatRequest",
+        "fields": {}
+    },
+    "type.ankama.com/joi": {
+        "name": "PlayerMovementRequest",
+        "fields": {
+            "funb": "map_id",
+            "fune": "path_list"
+        }
+    },
+    "type.ankama.com/jpp": {
+        "name": "PlayerMovementConfirm",
+        "fields": {}
+    },
+    "type.ankama.com/jos": {
+        "name": "MapChangeRequest",
+        "fields": {
+            "fuou": "destination_map_id"
+        }
+    },
+    "type.ankama.com/isi": {
+        "name": "ItemMovementRequest",
+        "fields": {}
+    },
+    "type.ankama.com/iry": {
+        "name": "ItemMovementConfirm",
+        "fields": {}
+    },
+    "type.ankama.com/krc": {
+        "name": "StatsUpgradeRequest",
+        "fields": {}
+    },
+    "type.ankama.com/kqn": {
+        "name": "ChatSendRequest",
+        "fields": {}
+    },
+    "type.ankama.com/kqp": {
+        "name": "ChatBroadcastMessage",
+        "fields": {}
+    }
+}

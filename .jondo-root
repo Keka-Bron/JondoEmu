@@ -1,0 +1,8 @@
+Marcador de la raíz de datos del emulador Jondo.
+
+Paths.cs busca este fichero subiendo desde el directorio del ensamblado, de forma que el
+emulador encuentra sus datos (world.db, auth.db, map_walkable_cells.json, dofus3_data\...)
+tanto si se ejecuta el despliegue de esta carpeta como con `dotnet run` desde bin\Debug.
+
+No lo borres ni lo muevas. Si algún día quieres cambiar la raíz de datos, mueve este fichero
+junto con world.db y el resto de datos.

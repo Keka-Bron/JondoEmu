@@ -20,6 +20,52 @@ namespace Jondo.Unity.Launcher.Handlers
         // Capital cost per allocated point. Wisdom costs 3, every other primary costs 1.
         private const int WisdomCost = 3;
 
+        // ─── Modelo de coste de características ────────────────────────────────────
+        //
+        // El coste NO es plano: en Dofus sube por tramos. Verificado contra la interfaz del
+        // cliente con el personaje real (nivel 50): Suerte 120 cuesta 140 (los primeros 100 a 1
+        // y los 20 siguientes a 2), Sabiduría 25 cuesta 75 (3 cada uno) y el resto va a 1.
+        // Con el modelo plano anterior el servidor calculaba 300 donde el cliente calculaba 320,
+        // y como además deducía el capital de las stats en vez del nivel, el panel acababa
+        // mostrando "-75 / 245" y el botón de reiniciar no podía cuadrar nunca.
+
+        /// <summary>Capital total de puntos según el nivel: 5 por nivel a partir del 1.</summary>
+        public static int TotalCapitalForLevel(int level) => Math.Max(0, (level - 1) * 5);
+
+        /// <summary>Umbrales de los tramos para las cuatro características elementales.</summary>
+        private static readonly (int Upto, int Cost)[] ElementalTiers =
+        {
+            (100, 1), (200, 2), (300, 3), (400, 4), (int.MaxValue, 5)
+        };
+
+        /// <summary>Coste acumulado de subir una característica elemental hasta 'points'.</summary>
+        private static int ElementalCost(int points)
+        {
+            if (points <= 0) return 0;
+            int cost = 0, done = 0;
+            foreach (var (upto, unit) in ElementalTiers)
+            {
+                if (done >= points) break;
+                int inThisTier = Math.Min(points, upto) - done;
+                if (inThisTier <= 0) continue;
+                cost += inThisTier * unit;
+                done += inThisTier;
+            }
+            return cost;
+        }
+
+        /// <summary>Coste total de una distribución completa.</summary>
+        public static int ComputeDistributionCost(int strength, int intelligence, int chance,
+                                                  int agility, int vitality, int wisdom)
+        {
+            return ElementalCost(strength)
+                 + ElementalCost(intelligence)
+                 + ElementalCost(chance)
+                 + ElementalCost(agility)
+                 + Math.Max(0, vitality)               // vitalidad siempre a 1
+                 + Math.Max(0, wisdom) * WisdomCost;   // sabiduría siempre a 3
+        }
+
         public static async Task HandleStatsUpgradeRequest(NetworkStream stream, byte[] payload)
         {
             Console.WriteLine("[Game Node] Received Stats Upgrade Request (krc)");
@@ -62,15 +108,19 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
             }
 
-            // Total capital pool = points still available + points already spent on the current allocation.
-            // (Breed base for primaries is 0 at these levels, so the stored stat value equals the allocation.)
-            int alreadySpent = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance
-                             + GameState.StatAgility + GameState.StatVitality + GameState.StatWisdom * WisdomCost;
-            int capitalPool  = GameState.CharacterRemainingPoints + alreadySpent;
+            // El capital total sale del NIVEL, no de las stats actuales: así es imposible que una
+            // distribución previa incoherente contamine el cálculo (era el origen del "-75 / 245").
+            int capitalPool = TotalCapitalForLevel(GameState.CharacterLevel);
 
-            int requestedCost = wantStrength + wantIntelligence + wantChance + wantAgility + wantVitality + wantWisdom;
+            // Sabiduría llega multiplicada por su coste desde el cliente; la normalizamos a puntos.
+            int wantWisdomPoints = wantWisdom / WisdomCost;
 
-            Console.WriteLine($"[Stats] Requested — Str:{wantStrength} Int:{wantIntelligence} Cha:{wantChance} Agi:{wantAgility} Vit:{wantVitality} Wis:{wantWisdom / WisdomCost} (cost {requestedCost} / pool {capitalPool})");
+            int requestedCost = ComputeDistributionCost(wantStrength, wantIntelligence, wantChance,
+                                                        wantAgility, wantVitality, wantWisdomPoints);
+
+            Console.WriteLine($"[Stats] Requested — Str:{wantStrength} Int:{wantIntelligence} Cha:{wantChance} " +
+                              $"Agi:{wantAgility} Vit:{wantVitality} Wis:{wantWisdomPoints} " +
+                              $"(coste {requestedCost} / capital {capitalPool} nivel {GameState.CharacterLevel})");
 
             if (requestedCost < 0 || requestedCost > capitalPool)
             {
@@ -88,7 +138,7 @@ namespace Jondo.Unity.Launcher.Handlers
             GameState.StatChance       = wantChance;
             GameState.StatAgility      = wantAgility;
             GameState.StatVitality     = wantVitality;
-            GameState.StatWisdom       = wantWisdom / WisdomCost;
+            GameState.StatWisdom       = wantWisdomPoints;
             GameState.CharacterRemainingPoints = capitalPool - requestedCost;
 
             Console.WriteLine($"[Stats] New — Vit:{GameState.StatVitality} Wis:{GameState.StatWisdom} Str:{GameState.StatStrength} Int:{GameState.StatIntelligence} Cha:{GameState.StatChance} Agi:{GameState.StatAgility}");
@@ -213,9 +263,11 @@ namespace Jondo.Unity.Launcher.Handlers
             (158, 3, 2, 0), (200, 3, 2, 0),
         };
 
-        // XP thresholds of the official Dofus curve for the only supported level for now (2).
-        private const long XpLevelFloor = 110;
-        private const long XpNextLevel  = 650;
+        // Los umbrales de experiencia salen de la tabla real del cliente (character_xp.json).
+        // Antes estaban fijos a 110 y 650, que son los del nivel 2: la barra de experiencia de un
+        // personaje de nivel 50 mostraba la ventana de un novato.
+        private static long XpLevelFloor => ExperienceTable.LevelFloor(GameState.CharacterLevel);
+        private static long XpNextLevel  => ExperienceTable.NextLevelFloor(GameState.CharacterLevel);
 
         /// <summary>
         /// Builds the complete kri (CharacterStatsListMessage) frame from scratch:
@@ -243,7 +295,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = XpLevelFloor });  // XP inicio del nivel
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = GameState.CharacterRemainingPoints });
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 0, VarIntValue = XpNextLevel });   // XP del siguiente nivel
-                larMsg.Fields.Add(new ProtoField { FieldNumber = 11, WireType = 0, VarIntValue = XpLevelFloor }); // XP actual (sin tracking de XP)
+                larMsg.Fields.Add(new ProtoField { FieldNumber = 11, WireType = 0, VarIntValue = GameState.Experience }); // XP acumulada
 
                 foreach (var e in DefaultKriEntries)
                 {
@@ -267,7 +319,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 larMsg.Fields.Add(CreateStatField(15, GameState.StatIntelligence, GetEquipBonus(15))); // Inteligencia
                 larMsg.Fields.Add(CreateStatField(13, GameState.StatChance,       GetEquipBonus(13))); // Suerte
                 larMsg.Fields.Add(CreateStatField(14, GameState.StatAgility,      GetEquipBonus(14))); // Agilidad
-                larMsg.Fields.Add(CreateStatField(17, 0,                          GetEquipBonus(17))); // Potencia
+                larMsg.Fields.Add(CreateStatField(25, 0,                          GetEquipBonus(25))); // Potencia
                 larMsg.Fields.Add(CreateStatField(18, 0,                          GetEquipBonus(18))); // Crítico
 
                 // Initiative base = only elemental stats (Str+Int+Cha+Agi). Vitality and Wisdom do NOT count.
@@ -353,7 +405,11 @@ namespace Jondo.Unity.Launcher.Handlers
             { 15, 126 }, // Inteligencia
             { 16, 112 }, // Daños
             { 18, 115 }, // Crítico
-            { 17, 138 }, // Potencia
+            // La potencia es la característica 25, no la 17. Lo dice la propia tabla de efectos
+            // del cliente: el efecto 138 ("potencia (daños generales)") apunta a la 25. Con el 17
+            // los +80 del Dofus Púrpura viajaban en una característica que el cliente no pinta,
+            // así que la ficha mostraba Potencia 0.
+            { 25, 138 }, // Potencia
             { 44, 174 }, // Iniciativa
         };
 
@@ -371,6 +427,17 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             bonus += GetSetBonus(statId);
             return bonus;
+        }
+
+        /// <summary>
+        /// Single authoritative source of truth for player's Max HP,
+        /// including base level HP, allocated Vitality, and equipment/set bonuses.
+        /// </summary>
+        public static int GetPlayerMaxHp()
+        {
+            int baseHp = 50 + (GameState.CharacterLevel * 5) + GameState.StatVitality;
+            int equipHp = GetEquipBonus(11) + GetEquipBonus(0);
+            return baseHp + equipHp;
         }
 
         /// <summary>

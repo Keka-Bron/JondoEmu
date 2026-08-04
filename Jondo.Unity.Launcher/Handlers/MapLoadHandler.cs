@@ -11,6 +11,12 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         public static async Task HandleMapLoadRequest(NetworkStream stream, byte[] payload)
         {
+            if (GameState.IsInFight)
+            {
+                await FightHandler.HandleFightMapLoad(stream);
+                return;
+            }
+
             LogDebug("[Game Node] Received Map Complementary Info Request (kkr) [Initial Map Load]");
             byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/kkr");
             if (inner == null)

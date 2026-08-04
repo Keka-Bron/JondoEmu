@@ -40,7 +40,7 @@ namespace Jondo.Protocol
                 string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
-                    LogTrafficEnriched("Cliente -> Servidor", typeUrl, payload.Length);
+                    LogTrafficEnriched("Cliente -> Servidor", typeUrl, payload);
                 }
             }
             catch { }
@@ -74,8 +74,9 @@ namespace Jondo.Protocol
                 string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
-                    LogTrafficEnriched("Servidor -> Cliente", typeUrl, payload.Length);
+                    LogTrafficEnriched("Servidor -> Cliente", typeUrl, payload);
                 }
+                Jondo.Unity.Launcher.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
             }
             catch { }
             
@@ -98,8 +99,9 @@ namespace Jondo.Protocol
                 string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
-                    LogTrafficEnriched("Servidor -> Cliente", typeUrl, payload.Length);
+                    LogTrafficEnriched("Servidor -> Cliente", typeUrl, payload);
                 }
+                Jondo.Unity.Launcher.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
             }
             catch { }
             
@@ -107,8 +109,9 @@ namespace Jondo.Protocol
             await stream.WriteAsync(payload, 0, payload.Length);
         }
 
-        private static void LogTrafficEnriched(string direction, string typeUrl, int length)
+        private static void LogTrafficEnriched(string direction, string typeUrl, byte[] payload)
         {
+            int length = payload.Length;
             var meta = GetPacketMetadata(typeUrl);
             
             // Choose color for direction
@@ -135,7 +138,7 @@ namespace Jondo.Protocol
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write($"[{meta.Context}] ");
                 
-                Console.ForegroundColor = taskColor;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write($"[{meta.Task}] ");
                 
                 Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -143,6 +146,30 @@ namespace Jondo.Protocol
                 
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine(meta.Description);
+
+                string shortType = typeUrl.Replace("type.ankama.com/", "").Trim();
+                bool isPing = shortType == "kod" || shortType == "kns" || shortType == "kpc" || shortType == "jgv";
+
+                if (!isPing)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    string hexStr = BitConverter.ToString(payload);
+                    if (hexStr.Length > 160) hexStr = hexStr.Substring(0, 160) + "... [truncated]";
+                    Console.WriteLine($"   📦 Hex Payload: {hexStr}");
+
+                    try
+                    {
+                        var protoTree = Jondo.Unity.Launcher.Network.ProtoMessage.Parse(payload);
+                        string treeDump = protoTree.DumpFieldsToString("      ", maxLines: 12);
+                        if (!string.IsNullOrWhiteSpace(treeDump))
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            Console.WriteLine("   🌳 Protobuf Payload Tree:");
+                            Console.WriteLine(treeDump);
+                        }
+                    }
+                    catch { }
+                }
                 
                 Console.ResetColor();
             }

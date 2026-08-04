@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using MelonLoader;
 using HarmonyLib;
 using Il2CppThrift.Transport;
@@ -24,11 +24,51 @@ namespace JondoFix
         private static bool hasDumped = false;
         public static readonly Dictionary<int, int> ItemNameIdToGid = new Dictionary<int, int>();
 
+        /// <summary>
+        /// Emulator data root as seen from INSIDE the game process.
+        ///
+        /// AppContext.BaseDirectory is useless here: it points at the client folder, not the
+        /// emulator's. We derive it by going one level up from the game directory
+        /// (...\DofusClient\..\Jondo Unity Emulator) and fall back to the legacy path.
+        /// </summary>
+        private static string _emulatorRoot;
+        public static string EmulatorRoot
+        {
+            get
+            {
+                if (_emulatorRoot != null) return _emulatorRoot;
+                try
+                {
+                    string gameDir = AppDomain.CurrentDomain.BaseDirectory;
+                    string candidate = Path.GetFullPath(Path.Combine(gameDir, "..", "Jondo Unity Emulator"));
+                    if (Directory.Exists(candidate))
+                    {
+                        _emulatorRoot = candidate;
+                        return _emulatorRoot;
+                    }
+                }
+                catch { }
+                _emulatorRoot = @"C:\Jondo";
+                return _emulatorRoot;
+            }
+        }
+
+        /// <summary>Resolves a data file: new root first, legacy path as fallback.</summary>
+        private static string DataFile(string relative)
+        {
+            string preferred = Path.Combine(EmulatorRoot, relative);
+            if (File.Exists(preferred) || Directory.Exists(Path.GetDirectoryName(preferred) ?? ""))
+            {
+                return preferred;
+            }
+            return Path.Combine(@"C:\Jondo", relative);
+        }
+
         private static void LoadItemNames()
         {
             try
             {
-                string path = @"C:\Jondo\dofus3_data\items.json";
+                string path = DataFile(@"dofus3_data\items.json");
                 if (!File.Exists(path))
                 {
                     MelonLogger.Warning($"[JondoFix] items.json not found at {path}!");
@@ -343,9 +383,9 @@ namespace JondoFix
                             LoggerInstance.Msg("[JondoFix] Metadata loaded in memory. Checking if dump is needed...");
                             
                             bool forceDump = false;
-                            bool filesExist = File.Exists(@"C:\Jondo\map_dump_coordinates.csv") && 
-                                              File.Exists(@"C:\Jondo\map_dump_scrolls.csv") && 
-                                              File.Exists(@"C:\Jondo\map_dump_infos.csv");
+                            bool filesExist = File.Exists(DataFile("map_dump_coordinates.csv")) && 
+                                              File.Exists(DataFile("map_dump_scrolls.csv")) && 
+                                              File.Exists(DataFile("map_dump_infos.csv"));
 
                             if (!filesExist || forceDump)
                             {
@@ -378,10 +418,10 @@ namespace JondoFix
                 MelonLogger.Msg($"[JondoFix] Infos count: {infos.Count}");
 
                 // Create C:\Jondo directory if it doesn't exist
-                Directory.CreateDirectory(@"C:\Jondo");
+                Directory.CreateDirectory(EmulatorRoot);
 
                 // 1. Dump Coordinates
-                using (var writer = new StreamWriter(@"C:\Jondo\map_dump_coordinates.csv"))
+                using (var writer = new StreamWriter(DataFile("map_dump_coordinates.csv")))
                 {
                     writer.WriteLine("compressedCoords,x,y,mapIds");
                     for (int i = 0; i < coords.Count; i++)
@@ -402,7 +442,7 @@ namespace JondoFix
                 MelonLogger.Msg("[JondoFix] Wrote map_dump_coordinates.csv successfully.");
 
                 // 2. Dump Scrolls
-                using (var writer = new StreamWriter(@"C:\Jondo\map_dump_scrolls.csv"))
+                using (var writer = new StreamWriter(DataFile("map_dump_scrolls.csv")))
                 {
                     writer.WriteLine("mapId,rightMapId,bottomMapId,leftMapId,topMapId");
                     for (int i = 0; i < scrolls.Count; i++)
@@ -414,7 +454,7 @@ namespace JondoFix
                 MelonLogger.Msg("[JondoFix] Wrote map_dump_scrolls.csv successfully.");
 
                 // 3. Dump Infos
-                using (var writer = new StreamWriter(@"C:\Jondo\map_dump_infos.csv"))
+                using (var writer = new StreamWriter(DataFile("map_dump_infos.csv")))
                 {
                     writer.WriteLine("mapId,posX,posY,subAreaId,outdoor,name");
                     for (int i = 0; i < infos.Count; i++)

@@ -7,21 +7,28 @@ namespace Jondo.Unity.Launcher
     {
         // Player Identity
         public static long CharacterId { get; set; } = 13825558L;
-        public static string CharacterName { get; set; } = "CADERNIS";
-        public static int CharacterLevel { get; set; } = 2;
-        public static int Breed { get; set; } = 8;
+        public static string CharacterName { get; set; } = "[#KEKA-BRON#]";
+        public static int CharacterLevel { get; set; } = 40;
+        public static int Breed { get; set; } = 9;
         public static int Sex { get; set; } = 1;
         public static byte[] PlayerActorDetails { get; set; } = null;
         public static byte[] LookBytes { get; set; } = null;
 
         // Positioning
-        public static long MapId { get; set; } = 0;
-        public static int CellId { get; set; } = 0;
+        public static long MapId { get; set; } = 154010883L;
+        public static int CellId { get; set; } = 280;
         public static int Orientation { get; set; } = 1;
-        public static long Kamas { get; set; } = 0;
+        public static long Kamas { get; set; } = 50000;
+
+        /// <summary>Experiencia ACUMULADA del personaje, no la del nivel actual.</summary>
+        public static long Experience { get; set; }
+
+        // Combat State
+        public static bool IsInFight { get; set; } = false;
+        public static long CurrentFightMobId { get; set; } = 0;
 
         // Characteristics / Capital
-        public static int CharacterRemainingPoints { get; set; } = 5;
+        public static int CharacterRemainingPoints { get; set; } = 195;
         public static int StatVitality { get; set; } = 0;
         public static int StatWisdom { get; set; } = 0;
         public static int StatStrength { get; set; } = 0;

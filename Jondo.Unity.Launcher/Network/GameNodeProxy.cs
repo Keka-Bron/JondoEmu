@@ -393,13 +393,24 @@ namespace Jondo.Unity.Launcher.Network
                         Console.WriteLine("[Game Node] Received duplicate ibt from client. Ignored.");
                     }
                 }
-                else if (payloadStr.Contains("type.ankama.com/kkr"))
+                else if (payloadStr.Contains("type.ankama.com/kkr") || payloadStr.Contains("type.ankama.com/jqf") || payloadStr.Contains("type.ankama.com/igx"))
                 {
                     await MapLoadHandler.HandleMapLoadRequest(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/joi"))
                 {
-                    await MapChangeHandler.HandleMovementRequest(stream, payload);
+                    // OJO: esta rama y la de mensajes de combate (más abajo) compiten por 'joi'.
+                    // Al ser una cadena if/else-if, la primera que coincide gana. En combate el
+                    // movimiento lo tiene que resolver FightHandler (expande el camino, gasta PM
+                    // y emite jud/joo/jvm/juc); si se dejaba caer aquí, el jugador se teletransportaba.
+                    if (GameState.IsInFight)
+                    {
+                        await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
+                    }
+                    else
+                    {
+                        await MapChangeHandler.HandleMovementRequest(stream, payload);
+                    }
                 }
                 else if (payloadStr.Contains("type.ankama.com/jos"))
                 {
@@ -428,6 +439,10 @@ namespace Jondo.Unity.Launcher.Network
                 else if (payloadStr.Contains("type.ankama.com/krc"))
                 {
                     await StatsHandler.HandleStatsUpgradeRequest(stream, payload);
+                }
+                else if (payloadStr.Contains("type.ankama.com/jxx") || payloadStr.Contains("type.ankama.com/jyk") || payloadStr.Contains("type.ankama.com/jyz") || payloadStr.Contains("type.ankama.com/joi") || payloadStr.Contains("type.ankama.com/jza") || payloadStr.Contains("type.ankama.com/jwe") || payloadStr.Contains("type.ankama.com/jrb") || payloadStr.Contains("type.ankama.com/jub") || payloadStr.Contains("type.ankama.com/jxw") || payloadStr.Contains("type.ankama.com/hoy"))
+                {
+                    await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
                 {
@@ -466,7 +481,23 @@ namespace Jondo.Unity.Launcher.Network
                     }
                     else
                     {
-                        Console.WriteLine($"[Game Node] Unknown payload received: {payloadStr}");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"\n======================================================================");
+                        Console.WriteLine($"[Game Node] 🔍 UNHANDLED CLIENT PACKET DETECTED: {payloadStr.Replace("\n", " ").Replace("\r", "")}");
+                        Console.WriteLine($"======================================================================");
+                        try
+                        {
+                            var parsedMsg = ProtoMessage.Parse(payload);
+                            Console.WriteLine(parsedMsg.DumpFieldsToString("  "));
+                        }
+                        catch
+                        {
+                            string hex = BitConverter.ToString(payload).Replace("-", " ");
+                            if (hex.Length > 120) hex = hex.Substring(0, 120) + "...";
+                            Console.WriteLine($"  Raw Hex[{payload.Length} B]: {hex}");
+                        }
+                        Console.WriteLine($"======================================================================\n");
+                        Console.ResetColor();
                     }
                 }
 

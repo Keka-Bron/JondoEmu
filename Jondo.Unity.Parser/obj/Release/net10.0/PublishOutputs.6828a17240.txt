@@ -1,5 +1,0 @@
-C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Release\net10.0\publish\Jondo.Unity.Parser.exe
-C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Release\net10.0\publish\Jondo.Unity.Parser.dll
-C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Release\net10.0\publish\Jondo.Unity.Parser.deps.json
-C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Release\net10.0\publish\Jondo.Unity.Parser.runtimeconfig.json
-C:\Jondo\Jondo Unity Emulator\Jondo.Unity.Parser\bin\Release\net10.0\publish\Jondo.Unity.Parser.pdb

@@ -142,62 +142,97 @@ namespace Jondo.Unity.Launcher.Managers
             return mobs;
         }
 
+        private static List<int> GetSpawnableMonsterIds()
+        {
+            var pioIds = new List<int> { 491, 492, 493, 463, 2341, 2342, 2343, 2344, 2345, 2347 };
+            var available = pioIds.Where(id => _monsters.ContainsKey(id)).ToList();
+            return available.Count > 0 ? available : _monsters.Keys.Take(20).ToList();
+        }
+
+        private static MobGroup? BuildRandomGroup(long mapId, List<int> availableMonsters, List<int> validCells, HashSet<int> usedCells)
+        {
+            if (availableMonsters.Count == 0 || validCells.Count == 0) return null;
+
+            int cellId = validCells[_rand.Next(validCells.Count)];
+            int intentos = 0;
+            while (usedCells.Contains(cellId) && intentos++ < validCells.Count)
+            {
+                cellId = validCells[_rand.Next(validCells.Count)];
+            }
+            if (usedCells.Contains(cellId)) return null;
+            usedCells.Add(cellId);
+
+            var group = new MobGroup
+            {
+                MobId = _nextDynamicMobId--,
+                CellId = cellId
+            };
+
+            int groupSize = _rand.Next(1, 9); // de 1 a 8 monstruos, como en Dofus
+            for (int m = 0; m < groupSize; m++)
+            {
+                int monsterId = availableMonsters[_rand.Next(availableMonsters.Count)];
+                var mData = _monsters[monsterId];
+                int gradeIdx = 0;
+                int lvl = 1;
+                if (mData.Grades.Count > 0)
+                {
+                    gradeIdx = _rand.Next(mData.Grades.Count);
+                    lvl = mData.Grades[gradeIdx].Level;
+                }
+
+                group.Members.Add(new MobMember
+                {
+                    Monster = mData,
+                    GradeIndex = gradeIdx,
+                    Level = lvl
+                });
+            }
+
+            return group;
+        }
+
         private static List<MobGroup> GenerateDynamicMobsForMap(long mapId)
         {
             var result = new List<MobGroup>();
             if (_monsters.Count == 0) return result;
 
-            var pioIds = new List<int> { 491, 492, 493, 463, 2341, 2342, 2343, 2344, 2345, 2347 };
-            var availableMonsters = pioIds.Where(id => _monsters.ContainsKey(id)).ToList();
-            if (availableMonsters.Count == 0)
-            {
-                availableMonsters = _monsters.Keys.Take(20).ToList();
-            }
-
+            var availableMonsters = GetSpawnableMonsterIds();
             var validCells = GetInnerWalkableCells(mapId);
-
-            int numMobs = _rand.Next(2, 5); // 2 to 4 groups per map
             var usedCells = new HashSet<int>();
 
+            int numMobs = _rand.Next(2, 5); // de 2 a 4 grupos por mapa
             for (int i = 0; i < numMobs; i++)
             {
-                int groupSize = _rand.Next(1, 9); // 1 to 8 monsters per group (Dofus standard!)
-                int cellId = validCells[_rand.Next(validCells.Count)];
-                while (usedCells.Contains(cellId) && usedCells.Count < validCells.Count)
-                {
-                    cellId = validCells[_rand.Next(validCells.Count)];
-                }
-                usedCells.Add(cellId);
-
-                var group = new MobGroup
-                {
-                    MobId = _nextDynamicMobId--,
-                    CellId = cellId
-                };
-
-                for (int m = 0; m < groupSize; m++)
-                {
-                    int monsterId = availableMonsters[_rand.Next(availableMonsters.Count)];
-                    var mData = _monsters[monsterId];
-                    int gradeIdx = 0;
-                    int lvl = 1;
-                    if (mData.Grades.Count > 0)
-                    {
-                        gradeIdx = _rand.Next(mData.Grades.Count);
-                        lvl = mData.Grades[gradeIdx].Level;
-                    }
-
-                    group.Members.Add(new MobMember
-                    {
-                        Monster = mData,
-                        GradeIndex = gradeIdx,
-                        Level = lvl
-                    });
-                }
-                result.Add(group);
+                var g = BuildRandomGroup(mapId, availableMonsters, validCells, usedCells);
+                if (g != null) result.Add(g);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Repone un grupo de monstruos en el mapa después de que el jugador haya derrotado a
+        /// otro. No toca los que ya están: solo añade uno nuevo en una casilla libre, con el
+        /// mismo generador que se usa al poblar un mapa por primera vez.
+        /// Devuelve null si no había hueco.
+        /// </summary>
+        public static MobGroup? RespawnOneGroup(long mapId)
+        {
+            if (_monsters.Count == 0) return null;
+
+            if (!_mapMobs.TryGetValue(mapId, out var mobs))
+            {
+                mobs = new List<MobGroup>();
+                _mapMobs[mapId] = mobs;
+            }
+
+            var usedCells = new HashSet<int>(mobs.Select(m => m.CellId));
+            var group = BuildRandomGroup(mapId, GetSpawnableMonsterIds(), GetInnerWalkableCells(mapId), usedCells);
+            if (group == null) return null;
+
+            mobs.Add(group);
+            return group;
         }
 
         public static List<int> GetInnerWalkableCells(long mapId)
@@ -244,6 +279,48 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             return innerCells.Count > 0 ? innerCells : cells;
+        }
+
+        /// <summary>
+        /// Returns the MobGroup occupying the specified cell on the given map, or null if no mob is there.
+        /// Uses a proximity check (±1 cell) to account for pathfinding rounding.
+        /// </summary>
+        public static MobGroup? GetMobAtCell(long mapId, int cellId)
+        {
+            if (!_mapMobs.TryGetValue(mapId, out var mobs)) return null;
+            // Exact match first
+            var exact = mobs.FirstOrDefault(m => m.CellId == cellId);
+            if (exact != null) return exact;
+            // Proximity check: adjacent cells (±1, ±14)
+            return mobs.FirstOrDefault(m =>
+                Math.Abs(m.CellId - cellId) == 1 ||
+                Math.Abs(m.CellId - cellId) == 14);
+        }
+
+        /// <summary>
+        /// Removes a mob group from the map after it is defeated in combat.
+        /// </summary>
+        public static void RemoveMobGroup(long mapId, long mobId)
+        {
+            if (_mapMobs.TryGetValue(mapId, out var mobs))
+            {
+                mobs.RemoveAll(m => m.MobId == mobId);
+            }
+        }
+
+        public static MobGroup? GetMobGroupById(long mobId)
+        {
+            foreach (var list in _mapMobs.Values)
+            {
+                var found = list.FirstOrDefault(m => m.MobId == mobId);
+                if (found != null) return found;
+            }
+            return null;
+        }
+
+        public static MonsterData? GetMonsterData(int monsterId)
+        {
+            return _monsters.TryGetValue(monsterId, out var data) ? data : null;
         }
     }
 }

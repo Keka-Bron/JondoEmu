@@ -25,15 +25,24 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("======================================================================");
             Console.ResetColor();
 
+            // 0. Resolved data paths. Everything the emulator needs now lives inside its own
+            //    folder; the root is derived from the assembly location, not hardcoded.
+            Paths.LogResolvedPaths();
+
             // 1. Initialize Database and Map Manager
             Console.WriteLine("[+] Initializing Database...");
             DatabaseManager.Initialize();
+            RegressionGuardTests.Run();
 
             Console.WriteLine("[+] Initializing MobSpawnManager...");
             Managers.MobSpawnManager.InitializeAndSpawnAll();
 
             Console.WriteLine("[+] Initializing Map Manager...");
             MapManager.Initialize();
+            ExperienceTable.Initialize();
+
+            Console.WriteLine("[+] Registering Fight Packet Handlers...");
+            Handlers.FightHandler.RegisterHandlers();
 
 
 
@@ -61,7 +70,7 @@ namespace Jondo.Unity.Launcher
             Console.ResetColor();
 
             // 4. Automatically launch Dofus Client if present with injected environment variables
-            string clientPath = @"C:\Jondo\DofusClient\Dofus.exe";
+            string clientPath = Path.Combine(Paths.ClientDir, "Dofus.exe");
             if (File.Exists(clientPath))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -164,7 +173,7 @@ namespace Jondo.Unity.Launcher
             {
                 try
                 {
-                    File.AppendAllText(@"C:\Jondo\emulator_debug.log", line + "\r\n");
+                    File.AppendAllText(Paths.DebugLog, line + "\r\n");
                 }
                 catch { }
             }

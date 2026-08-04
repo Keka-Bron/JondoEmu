@@ -1,3 +1,0 @@
-C:\Jondo\Jondo.Unity.Core.dll
-C:\Jondo\Jondo.Unity.Core.deps.json
-C:\Jondo\Jondo.Unity.Core.pdb

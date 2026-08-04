@@ -132,5 +132,75 @@ namespace Jondo.Unity.Launcher.Network
             }
             stream.WriteByte((byte)value);
         }
+
+        public string DumpFieldsToString(string indent = "  ", int maxLines = 15)
+        {
+            var sb = new System.Text.StringBuilder();
+            int lineCount = 0;
+            DumpFieldsRecursive(sb, indent, ref lineCount, maxLines);
+            return sb.ToString();
+        }
+
+        private void DumpFieldsRecursive(System.Text.StringBuilder sb, string indent, ref int lineCount, int maxLines)
+        {
+            foreach (var field in Fields)
+            {
+                if (lineCount >= maxLines)
+                {
+                    sb.AppendLine($"{indent}... [Truncated remaining fields]");
+                    return;
+                }
+
+                sb.Append($"{indent}Tag #{field.FieldNumber} (Type {field.WireType}): ");
+                lineCount++;
+
+                if (field.WireType == 0)
+                {
+                    sb.AppendLine($"VarInt = {field.VarIntValue}");
+                }
+                else if (field.WireType == 2)
+                {
+                    bool parsedSub = false;
+                    if (field.BytesValue.Length > 0 && field.BytesValue.Length < 2000)
+                    {
+                        try
+                        {
+                            var sub = Parse(field.BytesValue);
+                            if (sub.Fields.Count > 0)
+                            {
+                                sb.AppendLine($"SubMessage ({field.BytesValue.Length} B) [{sub.Fields.Count} fields]:");
+                                sub.DumpFieldsRecursive(sb, indent + "    ", ref lineCount, maxLines);
+                                parsedSub = true;
+                            }
+                        }
+                        catch { }
+                    }
+
+                    if (!parsedSub)
+                    {
+                        string text = System.Text.Encoding.UTF8.GetString(field.BytesValue);
+                        bool isPrintable = text.Length > 0 && text.All(c => !char.IsControl(c) || c == '\n' || c == '\r' || c == '\t');
+                        if (isPrintable)
+                        {
+                            sb.AppendLine($"String = \"{text}\"");
+                        }
+                        else
+                        {
+                            string hex = BitConverter.ToString(field.BytesValue).Replace("-", " ");
+                            if (hex.Length > 40) hex = hex.Substring(0, 40) + "...";
+                            sb.AppendLine($"Bytes[{field.BytesValue.Length}] = {hex}");
+                        }
+                    }
+                }
+                else if (field.WireType == 1)
+                {
+                    sb.AppendLine($"Fixed64 = {field.Fixed64Value}");
+                }
+                else if (field.WireType == 5)
+                {
+                    sb.AppendLine($"Fixed32 = {field.Fixed32Value}");
+                }
+            }
+        }
     }
 }

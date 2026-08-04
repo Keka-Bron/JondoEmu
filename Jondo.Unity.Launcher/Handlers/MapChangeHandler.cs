@@ -79,6 +79,16 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task HandleMovementRequest(NetworkStream stream, byte[] payload)
         {
+            if (GameState.IsInFight)
+            {
+                // El movimiento en combate lo enruta GameNodeProxy directamente a FightHandler.
+                // Si se llega aquí es que el enrutado ha cambiado y el movimiento de combate
+                // acabaría tratándose como movimiento de roleplay (teletransporte, sin gasto de PM).
+                Program.LogDebug("[Movement][WARN] joi de combate ha llegado a MapChangeHandler. " +
+                                 "Revisa el enrutado de GameNodeProxy: debe ir a FightHandler.");
+                return;
+            }
+
             LogDebug("[Movement] Received GameMapMovementRequestMessage (joi)");
             byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/joi");
             if (inner != null)
@@ -124,6 +134,19 @@ namespace Jondo.Unity.Launcher.Handlers
                     byte[] jooPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/joo", jooBytes);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, jooPacket);
                     Console.WriteLine($"[Movement] Sent native joo (Movement Broadcast) for Character {GameState.CharacterId}");
+
+                    // Mob Collision Detection: Check if the destination cell has a mob group
+                    if (!GameState.IsInFight && lastCell > 0)
+                    {
+                        var mob = Managers.MobSpawnManager.GetMobAtCell(mapId, lastCell);
+                        if (mob != null)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Magenta;
+                            Console.WriteLine($"[FIGHT!] Player collided with Mob Group #{mob.MobId} at cell {mob.CellId} on map {mapId}! Initiating PVM combat...");
+                            Console.ResetColor();
+                            await FightHandler.InitiateFightFromMobCollision(stream, mob, mapId);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

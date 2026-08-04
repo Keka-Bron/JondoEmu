@@ -1,7 +1,36 @@
-# Ignored files
+# Compilación
+[Bb]in/
+[Oo]bj/
+publish/
+runtimes/
+*.dll
+*.pdb
+*.exe
+*.deps.json
+*.runtimeconfig.json
+
+# Base de datos: se distribuye comprimida (world.zip). Descomprimir tras clonar.
+world.db
+world.db-shm
+world.db-wal
+
+# Registros
+*.log
+
+# Capturas de red y volcados de trabajo
+*.pcapng
+scratch_*
+*_old.cs
+
+# Datos extraídos del cliente (se regeneran con tools/)
+dofus3_data/
+Dofus3 Defuscated Data/
+DofusClient/
+
+# Entornos de desarrollo
 .vs/
+.idea/
+.vscode/
+__pycache__/
 *.user
 *.suo
-packages/
-.idea/
-.DS_Store

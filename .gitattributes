@@ -1,4 +1,2 @@
-Dofus3[[:space:]]Defuscated[[:space:]]Data/script.json filter=lfs diff=lfs merge=lfs -text
-Dofus3[[:space:]]Defuscated[[:space:]]Data/il2cpp.h filter=lfs diff=lfs merge=lfs -text
-Dofus3[[:space:]]Defuscated[[:space:]]Data/dump.cs filter=lfs diff=lfs merge=lfs -text
-Dofus3[[:space:]]Defuscated[[:space:]]Data/Dofus3[[:space:]]Defuscated[[:space:]]Datadump.cs filter=lfs diff=lfs merge=lfs -text
+# Auto detect text files and perform LF normalization
+* text=auto
