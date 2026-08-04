@@ -120,11 +120,7 @@ By default, the official Dofus client connects to official Ankama servers and ve
 ---
 
 <img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/1af6569e-0fef-4c8d-8ede-512aec40aabb" />
-<img width="2560" height="1510" alt="image" src="https://github.com/user-attachments/assets/f7bec8df-4aa2-4718-ad73-6229a3207d78" />
-<img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/46ae56c8-d94f-47a0-830d-de68834d94e7" />
-<img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/0c64cfd4-4f00-4147-85d4-56d341e2f4fc" />
 <img width="2558" height="1500" alt="image" src="https://github.com/user-attachments/assets/3fc9ca8c-11b2-4c97-b459-bf4b63849b4a" />
-<img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/fec53113-e5b5-4bca-84de-487322db3201" />
 <img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/c1bd7344-c7d2-44cb-86c1-844b85e41659" />
 <img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/2a13f071-9d3f-4010-a4a5-cdef517b36bb" />
 <img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/f66ea136-3185-4222-a413-431a37964346" />
