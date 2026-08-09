@@ -83,7 +83,7 @@ The emulator uses two **SQLite** databases for local persistence:
    ```powershell
    powershell Expand-Archive -Path world.zip -DestinationPath . -Force
    ```
-3. Build the solution using Visual Studio 2022 / .NET 10 SDK or via command line:
+3. Build the solution using Visual Studio 2022 or newer / .NET 10 SDK or via command line:
    ```bash
    dotnet build Jondo.Unity.sln -c Release
    ```
@@ -101,7 +101,7 @@ The emulator uses two **SQLite** databases for local persistence:
 By default, the official Dofus client connects to official Ankama servers and verifies SSL/TLS security certificates. To redirect traffic locally, use **MelonLoader** and the **JondoFix** mod.
 
 #### 1. Install MelonLoader
-1. Download the **MelonLoader** installer (version `0.6.x` or compatible with .NET 6) from its official repository: [MelonLoader Releases](https://github.com/LavaGang/MelonLoader/releases).
+1. Download the **MelonLoader** installer (version `0.6.x` or newer, or compatible with .NET 6) from its official repository: [MelonLoader Releases](https://github.com/LavaGang/MelonLoader/releases).
 2. Run the installer and select the executable file of the Dofus client (`Dofus.exe`).
 3. Set runtime auto-detection (**IL2CPP** / **.NET 6**) and click **Install**.
 
