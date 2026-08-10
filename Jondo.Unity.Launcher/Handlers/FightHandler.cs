@@ -2272,7 +2272,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (loot.Count > 0)
             {
                 await WriteFrameAsync(stream, BuildGameNodePacket(
-                    "type.ankama.com/irm", CharacterSelectionHandler.BuildDynamicIrmPayload()));
+                    "type.ankama.com/irm", CharacterSelectionHandlerOld.BuildDynamicIrmPayload()));
                 Program.LogDebug($"[FightHandler] Inventario reenviado con {loot.Count} objeto(s) de botín.");
             }
 

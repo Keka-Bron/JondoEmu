@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <!-- Reference all assemblies in MelonLoader net6 folder -->
-    <Reference Include="C:\Jondo\DofusClient\MelonLoader\net6\*.dll">
+    <Reference Include="C:\Program Files\Games\Dofus\Dofus-3.6\DofusClient\MelonLoader\net6\*.dll">
       <Private>false</Private>
     </Reference>
     <!-- Reference all compiled Il2Cpp assemblies -->
-    <Reference Include="C:\Jondo\DofusClient\MelonLoader\Il2CppAssemblies\*.dll">
+    <Reference Include="C:\Program Files\Games\Dofus\Dofus-3.6\DofusClient\MelonLoader\Il2CppAssemblies\*.dll">
       <Private>false</Private>
     </Reference>
   </ItemGroup>

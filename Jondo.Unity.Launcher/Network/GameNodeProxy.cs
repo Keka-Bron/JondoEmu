@@ -88,19 +88,42 @@ namespace Jondo.Unity.Launcher.Network
             {
                 GameServerProxy.LogTraffic("GAME_C->S", payload, payload.Length);
 
-                if (!isAuthenticated && (payloadStr.Contains("type.ankama.com/hmt") || payloadStr.Contains("type.ankama.com/ise") || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx")))
+                if (!isAuthenticated && (payloadStr.Contains("type.ankama.com/kqz")))
                 {
+                    Console.WriteLine("[Game Node] Authentication packet detected.");
                     isAuthenticated = true;
-                    await CharacterSelectionHandler.HandleAuthRequest(stream, payload, payloadStr);
+                    await CharacterSelectionHandler.HandleGameNodeAuth361010(stream,payload,payloadStr);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jto") || payloadStr.Contains("type.ankama.com/kpc") || payloadStr.Contains("type.ankama.com/ksx") || payloadStr.Contains("type.ankama.com/kpa"))
+
+                else if (payloadStr.Contains("type.ankama.com/kvc"))
                 {
-                    await CharacterSelectionHandler.HandleCharacterListRequest(stream, payload, payloadStr);
+                    Console.WriteLine(
+                        "[Game Node] Received kvc [3.6.10.10]"
+                    );
+
+                    // kvc est vide.
+                    // Rien à répondre immédiatement.
+                }
+                else if (payloadStr.Contains("type.ankama.com/krv"))
+                {
+                    Console.WriteLine("[Game Node] Received krv [3.6.10.10]");
+                    await CharacterSelectionHandler.HandleCharacterList361010(stream);
+                }
+                else if (!isAuthenticated && (payloadStr.Contains("type.ankama.com/hmt") || payloadStr.Contains("type.ankama.com/ise") || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx")))
+                {
+                    Console.WriteLine("[Game Node] Authentication packet detected.");
+                    isAuthenticated = true;
+                    await CharacterSelectionHandlerOld.HandleAuthRequest(stream, payload, payloadStr);
+                }
+                else if (payloadStr.Contains("type.ankama.com/jto") || payloadStr.Contains("type.ankama.com/kpc") || payloadStr.Contains("type.ankama.com/ksx") || payloadStr.Contains("type.ankama.com/kpa") || payloadStr.Contains("type.ankama.com/krt"))
+                {
+                    Console.WriteLine("[Game Node] Character list request detected.");
+                    await CharacterSelectionHandlerOld.HandleCharacterListRequest(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/ksl"))
                 {
                     // Character selection and database synchronization
-                    CharacterSelectionHandler.HandleCharacterSelectionRequest(payload);
+                    CharacterSelectionHandlerOld.HandleCharacterSelectionRequest(payload);
 
                     // Stream database-synchronized world entering packets
                     Console.WriteLine("[Game Node] Streaming database-synchronized world entering packets...");
@@ -136,7 +159,7 @@ namespace Jondo.Unity.Launcher.Network
                             if (NetworkEnvelope.ContainsSequence(packetPayload, targetIrmBytes))
                             {
                                 packetPayload = NetworkEnvelope.BuildGameNodePacket(
-                                    "type.ankama.com/irm", CharacterSelectionHandler.BuildDynamicIrmPayload());
+                                    "type.ankama.com/irm", CharacterSelectionHandlerOld.BuildDynamicIrmPayload());
                                 lenBytes.Clear();
                                 ulong ulen = (ulong)packetPayload.Length;
                                 while (true)
