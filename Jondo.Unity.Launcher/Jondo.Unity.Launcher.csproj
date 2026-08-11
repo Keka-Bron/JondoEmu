@@ -63,4 +63,10 @@
     <Error Condition="'$(FullOutDir)' == '$(FullRootDir)' Or '$(FullOutDir)' == '$(FullRootDir)\'" Text="[Error de Compilación] No compiles directamente en el directorio raíz del emulador. Esto contamina la carpeta con cientos de archivos de .NET. Compila en la ruta por defecto (bin/) y el publish se encargará del deploy limpio." />
   </Target>
 
+	<ItemGroup>
+		<None Include="Data\breed_dump.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 </Project>

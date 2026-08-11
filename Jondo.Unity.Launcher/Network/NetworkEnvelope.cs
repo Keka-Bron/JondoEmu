@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using Google.Protobuf;
 
@@ -451,6 +452,125 @@ namespace Jondo.Unity.Launcher.Network
             if (File.Exists(path)) return path;
 
             return filename;
+        }
+
+        public static byte[]? ExtractAnyPayloadByType361010(byte[] packet,string expectedTypeUrl)
+        {
+            try
+            {
+                var root = ProtoMessage.Parse(packet);
+
+                return FindAnyPayloadRecursive361010(
+                    root,
+                    expectedTypeUrl,
+                    0
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"[Game Node] Any extraction error: {ex.Message}"
+                );
+
+                return null;
+            }
+        }
+
+        private static byte[]? FindAnyPayloadRecursive361010(
+            ProtoMessage message,
+            string expectedTypeUrl,
+            int depth)
+        {
+            // Protection contre une récursion foireuse
+            if (depth > 8)
+                return null;
+
+            /*
+             * Cherche d'abord si CE message est directement un google.protobuf.Any :
+             *
+             * field1 = type_url
+             * field2 = value
+             */
+
+            var typeField =
+                message.Fields.FirstOrDefault(
+                    f => f.FieldNumber == 1 &&
+                         f.WireType == 2
+                );
+
+            var valueField =
+                message.Fields.FirstOrDefault(
+                    f => f.FieldNumber == 2 &&
+                         f.WireType == 2
+                );
+
+            if (typeField != null &&
+                valueField != null)
+            {
+                try
+                {
+                    string typeUrl =
+                        Encoding.UTF8.GetString(
+                            typeField.BytesValue
+                        );
+
+                    if (typeUrl == expectedTypeUrl)
+                    {
+                        Console.WriteLine(
+                            $"[Game Node] Found Any {typeUrl}, " +
+                            $"inner={valueField.BytesValue.Length} B"
+                        );
+
+                        return valueField.BytesValue;
+                    }
+                }
+                catch
+                {
+                    // Ce field1 n'était simplement pas une string.
+                }
+            }
+
+            /*
+             * Sinon on descend dans tous les fields protobuf
+             * length-delimited.
+             */
+
+            foreach (
+                var field in message.Fields.Where(
+                    f => f.WireType == 2 &&
+                         f.BytesValue != null &&
+                         f.BytesValue.Length > 0
+                )
+            )
+            {
+                try
+                {
+                    var child =
+                        ProtoMessage.Parse(
+                            field.BytesValue
+                        );
+
+                    var found =
+                        FindAnyPayloadRecursive361010(
+                            child,
+                            expectedTypeUrl,
+                            depth + 1
+                        );
+
+                    if (found != null)
+                        return found;
+                }
+                catch
+                {
+                    /*
+                     * Normal :
+                     * certains wire type 2 sont des strings
+                     * ou des bytes quelconques et non des protobuf.
+                     */
+                }
+            }
+
+            return null;
         }
     }
 }

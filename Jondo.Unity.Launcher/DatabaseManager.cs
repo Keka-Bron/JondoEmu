@@ -338,17 +338,6 @@ namespace Jondo.Unity.Launcher
                             Console.WriteLine("[SQLite] Migration: Unstuck character, moved to Cell 320.");
                         }
                     }
-
-                    // Migration: Ensure character Breed is 9 (Cra/Ocra)
-                    using (var updateBreedCmd = worldConnection.CreateCommand())
-                    {
-                        updateBreedCmd.CommandText = "UPDATE Characters SET Breed = 9 WHERE Id = 13825558 AND Breed <> 9;";
-                        int breedAffected = updateBreedCmd.ExecuteNonQuery();
-                        if (breedAffected > 0)
-                        {
-                            Console.WriteLine("[SQLite] Migration: Updated character Breed to 9 (Ocra).");
-                        }
-                    }
                 }
             }
             // Migration: Add Spells column to Monsters table if missing
@@ -2122,7 +2111,161 @@ namespace Jondo.Unity.Launcher
             }
             return spells;
         }
+        public static long CreateCharacter361010(long accountId,string name,int breed,int sex,string lookHex)
+        {
+            using var connection =
+                new SqliteConnection(
+                    WorldConnectionString
+                );
 
+            connection.Open();
+
+            /*
+             * ID simple pour notre serveur local :
+             * MAX(Id) + 1
+             */
+
+            long newId;
+
+            using (
+                var idCommand =
+                    connection.CreateCommand()
+            )
+            {
+                idCommand.CommandText =
+                    "SELECT COALESCE(MAX(Id), 13825558) + 1 FROM Characters;";
+
+                newId =
+                    Convert.ToInt64(
+                        idCommand.ExecuteScalar()
+                    );
+            }
+
+            /*
+             * Empêcher les doublons de nom.
+             */
+
+            using (
+                var check =
+                    connection.CreateCommand()
+            )
+            {
+                check.CommandText =
+                    "SELECT COUNT(*) FROM Characters WHERE LOWER(Name) = LOWER($name);";
+
+                check.Parameters.AddWithValue(
+                    "$name",
+                    name
+                );
+
+                long count =
+                    Convert.ToInt64(
+                        check.ExecuteScalar()
+                    );
+
+                if (count > 0)
+                {
+                    Console.WriteLine(
+                        $"[SQLite] Character name already exists: {name}"
+                    );
+
+                    return 0;
+                }
+            }
+
+            using (
+                var command =
+                    connection.CreateCommand()
+            )
+            {
+                command.CommandText = @"
+            INSERT INTO Characters
+            (
+                Id,
+                AccountId,
+                Name,
+                Breed,
+                Sex,
+                Level,
+                MapId,
+                CellId,
+                RemainingPoints,
+                Vitality,
+                Wisdom,
+                Strength,
+                Intelligence,
+                Chance,
+                Agility,
+                Look,
+                Orientation,
+                Kamas,
+                Experience
+            )
+            VALUES
+            (
+                $id,
+                $accountId,
+                $name,
+                $breed,
+                $sex,
+                1,
+                154010884,
+                315,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                $look,
+                1,
+                0,
+                0
+            );
+        ";
+
+                command.Parameters.AddWithValue(
+                    "$id",
+                    newId
+                );
+
+                command.Parameters.AddWithValue(
+                    "$accountId",
+                    accountId
+                );
+
+                command.Parameters.AddWithValue(
+                    "$name",
+                    name
+                );
+
+                command.Parameters.AddWithValue(
+                    "$breed",
+                    breed
+                );
+
+                command.Parameters.AddWithValue(
+                    "$sex",
+                    sex
+                );
+
+                command.Parameters.AddWithValue(
+                    "$look",
+                    lookHex
+                );
+
+                command.ExecuteNonQuery();
+            }
+
+            Console.WriteLine(
+                $"[SQLite] Created character: " +
+                $"{name}, ID={newId}, " +
+                $"Breed={breed}, Sex={sex}"
+            );
+
+            return newId;
+        }
         /// <summary>
         /// Minimum character level at which a spell unlocks, per SpellLevels.
         /// Devuelve 1 si no consta, para no ocultar hechizos por falta de datos.
@@ -2183,6 +2326,8 @@ namespace Jondo.Unity.Launcher
         /// <summary>Probabilidad en tanto por ciento para el grado del monstruo.</summary>
         public double PercentDrop { get; set; }
     }
+
+
 
     public class SpellCombatData
     {
@@ -2251,4 +2396,6 @@ namespace Jondo.Unity.Launcher
         public int Value { get; set; }
         public int Duration { get; set; }
     }
-}
+
+    
+    }

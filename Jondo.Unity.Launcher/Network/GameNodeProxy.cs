@@ -109,6 +109,50 @@ namespace Jondo.Unity.Launcher.Network
                     Console.WriteLine("[Game Node] Received krv [3.6.10.10]");
                     await CharacterSelectionHandler.HandleCharacterList361010(stream);
                 }
+                else if (payloadStr.Contains("type.ankama.com/kvw"))
+                {
+                    Console.WriteLine("[Game Node] Character selected (kvw) [3.6.10.10]");
+                    await CharacterSelectionHandler.HandleCharacterSelect361010(stream,payload);
+                }
+                else if (payloadStr.Contains("type.ankama.com/kvz"))
+                {
+                    Console.WriteLine(
+                        "[Game Node] Character creation request detected (kvz)."
+                    );
+
+                    byte[]? innerPayload =
+                        NetworkEnvelope.ExtractAnyPayloadByType361010(
+                            payload,
+                            "type.ankama.com/kvz"
+                        );
+
+                    if (innerPayload == null)
+                    {
+                        Console.WriteLine(
+                            "[Game Node] ERROR: kvz Any payload introuvable."
+                        );
+
+                        Console.WriteLine(
+                            $"[Game Node] Raw packet ({payload.Length} B): " +
+                            Convert.ToHexString(payload)
+                        );
+
+                        return;
+                    }
+
+                    Console.WriteLine(
+                        $"[Game Node] kvz inner payload extracted: " +
+                        $"{innerPayload.Length} B"
+                    );
+
+                    await CharacterSelectionHandler
+                        .HandleCreateCharacter361010(
+                            stream,
+                            innerPayload
+                        );
+
+                    return;
+                }
                 else if (!isAuthenticated && (payloadStr.Contains("type.ankama.com/hmt") || payloadStr.Contains("type.ankama.com/ise") || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx")))
                 {
                     Console.WriteLine("[Game Node] Authentication packet detected.");

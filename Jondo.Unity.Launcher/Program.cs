@@ -1,9 +1,10 @@
+using Jondo.Unity.Launcher.Data;
+using Jondo.Unity.Launcher.Handlers;
+using Jondo.Unity.Launcher.Network;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Network;
-using Jondo.Unity.Launcher.Handlers;
 
 namespace Jondo.Unity.Launcher
 {
@@ -44,7 +45,16 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[+] Registering Fight Packet Handlers...");
             Handlers.FightHandler.RegisterHandlers();
 
+            string breedDumpPath =
+                Path.Combine(
+                    AppContext.BaseDirectory,
+                    "Data",
+                    "breed_dump.txt"
+                );
 
+            BreedAppearanceDatabase.Load(
+                breedDumpPath
+            );
 
             // 3. Start Emulation Servers
             Console.WriteLine("[+] Starting services...");
