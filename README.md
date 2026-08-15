@@ -19,7 +19,8 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** writte
 - [x] **Haven Bags:** Every haven bag works, including chests and lottery machines.
 - [x] **Zaaps/Zaapis** Every zaap/zaapi works.
 - [x] **Character Stats:** Characteristic assignment is fully functional (all stats map correctly, capital calculation is dynamic, and remaining points synchronize perfectly between all client panels, including the left sidebar HUD).
-- [x] Spells and spells variants
+- [x] **Spells and spells variants**
+- [ ] **Auto-pilot**: fully functional with double click on the minimap or selecting 'travel to' option
 - [x] **NPCs:** Spawns, 3D looks, and dialogue trees.
 - [x] **Monsters & Mobs System (100% Complete):**
   - **Dynamic Map Spawning & Respawner**: Automatic population and maintenance of 2 to 4 mob groups per map.
@@ -132,9 +133,5 @@ By default, the official Dofus client connects to official Ankama servers and ve
 <img width="910" height="929" alt="image" src="https://github.com/user-attachments/assets/00b35bbe-7356-41d0-ba9a-d079fbc7165f" />
 <img width="2559" height="1493" alt="image" src="https://github.com/user-attachments/assets/cb75bca8-358d-4153-a2e6-955c10be92f9" />
 <img width="2559" height="1511" alt="image" src="https://github.com/user-attachments/assets/38c437da-d881-4d64-b2b4-0348c789a9a3" />
-
-
-
-
-
-
+<img width="2559" height="1503" alt="image" src="https://github.com/user-attachments/assets/95591e2a-f99d-4f66-b8f5-1f0c24ccf548" />
+<img width="2559" height="1480" alt="image" src="https://github.com/user-attachments/assets/4d17a777-6839-4ed0-9aac-38768159e4ac" />
