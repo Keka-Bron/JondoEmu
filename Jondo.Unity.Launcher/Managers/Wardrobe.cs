@@ -45,8 +45,10 @@ namespace Jondo.Unity.Launcher.Managers
                         PRIMARY KEY (CharacterId, Slot));";
                 command.ExecuteNonQuery();
 
-                // El ojo de mostrar/ocultar de la ventana. Se añade aparte porque la tabla ya
-                // existía sin él en las instalaciones de antes.
+                // El ojo de mostrar/ocultar de la ventana: se puede llevar una prenda puesta y que
+                // no se dibuje. Va aparte de quitarla, porque al volver a enseñarla sigue ahí. Se
+                // añade con un ALTER porque la tabla ya existía sin él en las instalaciones de
+                // antes.
                 try
                 {
                     var añadir = connection.CreateCommand();
