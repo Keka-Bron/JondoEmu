@@ -1,6 +1,6 @@
 High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a functional PvM combat engine.
 
-> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.10.10 (mid August 2026)**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes. **Dofus 3 Client Version 3.6.4.3 LINK**: uploading soon
+> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.10.10 (mid August 2026)**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes.
 ---
 
 ## 🚀 Emulation Status
