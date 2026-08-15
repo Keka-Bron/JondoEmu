@@ -240,6 +240,33 @@ namespace Jondo.Unity.Launcher.UI
         /// Hand-drawn speaker. GDI+ will not render the 🔊/🔇 emoji of the web launcher in color,
         /// so they are replaced by an equivalent vector icon.
         /// </summary>
+        /// <summary>
+        /// Una carpeta abierta, para el botón que elige dónde está el cliente. Dibujada a mano como
+        /// el resto de iconos: la ventana no carga ninguna imagen que no esté en launcher_assets.
+        /// </summary>
+        public static void DrawFolder(Graphics g, Rectangle r, Color color)
+        {
+            var previousSmoothing = g.SmoothingMode;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            using var brush = new SolidBrush(color);
+            float x = r.X, y = r.Y, w = r.Width, h = r.Height;
+
+            // La pestaña de arriba a la izquierda y el cuerpo, como una carpeta de toda la vida.
+            g.FillRectangle(brush, x, y + h * 0.16f, w * 0.42f, h * 0.16f);
+            using (var cuerpo = new GraphicsPath())
+            {
+                float top = y + h * 0.28f;
+                cuerpo.AddLine(x, top, x + w, top);
+                cuerpo.AddLine(x + w, top, x + w * 0.88f, y + h * 0.86f);
+                cuerpo.AddLine(x + w * 0.88f, y + h * 0.86f, x + w * 0.12f, y + h * 0.86f);
+                cuerpo.CloseFigure();
+                g.FillPath(brush, cuerpo);
+            }
+
+            g.SmoothingMode = previousSmoothing;
+        }
+
         public static void DrawSpeaker(Graphics g, Rectangle r, Color color, bool muted)
         {
             var previousSmoothing = g.SmoothingMode;

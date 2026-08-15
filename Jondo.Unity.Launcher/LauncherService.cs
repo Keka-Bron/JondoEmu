@@ -121,10 +121,14 @@ namespace Jondo.Unity.Launcher
                     accountId = HaapiServer.ActiveAccount?.Id ?? 1;
                 }
 
-                string clientPath = Path.Combine(Paths.ClientDir, "Dofus.exe");
-                if (!File.Exists(clientPath))
+                string clientPath = ResolveClient();
+                if (clientPath.Length == 0)
                 {
-                    return new Result { Success = false, Message = "Could not find the Dofus.exe executable in the client folder." };
+                    return new Result
+                    {
+                        Success = false,
+                        Message = "No se encuentra Dofus.exe. Elige dónde está con el botón de la ruta del cliente."
+                    };
                 }
 
                 string hash = Guid.NewGuid().ToString();
@@ -143,7 +147,8 @@ namespace Jondo.Unity.Launcher
                     $"-force-d3d11 -screen-fullscreen 0 -screen-width {area.Width} -screen-height {area.Height} " +
                     "--melonloader.hideconsole --melonloader.disablestartscreen " +
                     $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId 1 --hash {hash} " +
-                    $"--canLogin true --langCode es --autoConnectType 1 --connectionPort 5555";
+                    $"--canLogin true --langCode {UI.LauncherTexts.Code(UI.LauncherPreferences.Language)} " +
+                    "--autoConnectType 1 --connectionPort 5555";
 
                 var startInfo = new System.Diagnostics.ProcessStartInfo
                 {
@@ -168,6 +173,22 @@ namespace Jondo.Unity.Launcher
             {
                 return new Result { Success = false, Message = $"Error starting the client: {ex.Message}" };
             }
+        }
+
+        /// <summary>
+        /// Dónde está el Dofus.exe, o cadena vacía si no aparece.
+        ///
+        /// Manda lo que se haya elegido a mano, porque el cliente no tiene por qué estar junto al
+        /// emulador: quien lo tenga en otro disco lo señala una vez y se acabó. Si no hay nada
+        /// elegido —o lo elegido ya no existe— se busca donde se ha buscado siempre, al lado.
+        /// </summary>
+        public static string ResolveClient()
+        {
+            string elegido = UI.LauncherPreferences.ClientExecutable;
+            if (elegido.Length > 0) return elegido;
+
+            string alLado = Path.Combine(Paths.ClientDir, "Dofus.exe");
+            return File.Exists(alLado) ? alLado : "";
         }
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]

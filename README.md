@@ -38,7 +38,13 @@ Double-click **`Jondo Emulator Launcher.exe`**. On the first run it unpacks `dat
 Account: keka
 Password: test
 
-The emulator expects the client to sit next to it, in a `Cliente 3.6.10.10` folder beside the emulator folder.
+By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.10` folder beside
+the emulator folder. If yours lives somewhere else — another drive, another name — click the path
+row under the play button and point it at your `Dofus.exe`. The choice is remembered, and if the
+client later moves the launcher says so instead of failing silently.
+
+The **ES / EN / FR** buttons in the top bar set the language of the launcher *and* of the game: the
+client is started with that `--langCode`. The path row shows which one is in effect.
 
 ---
 

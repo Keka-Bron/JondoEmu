@@ -155,50 +155,14 @@ namespace Jondo.Unity.Launcher.UI
             _ => "es"
         };
 
-        private static string PreferencesPath
-        {
-            get
-            {
-                string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo");
-                return Path.Combine(folder, "lanzador.cfg");
-            }
-        }
+        // Las preferencias las guarda LauncherPreferences. Esto se queda como atajo porque lo
+        // llaman desde varios sitios, pero el fichero lo lleva él: escribir aquí con WriteAllText,
+        // como se hacía antes, borraba de paso la ruta del cliente que guarda la otra opción.
 
         /// <summary>Recovers the language chosen last time; Spanish by default.</summary>
-        public static Language LoadLanguage()
-        {
-            try
-            {
-                string path = PreferencesPath;
-                if (!File.Exists(path)) return Language.Es;
-
-                foreach (string line in File.ReadAllLines(path))
-                {
-                    if (!line.StartsWith("idioma=", StringComparison.OrdinalIgnoreCase)) continue;
-                    string value = line.Substring(7).Trim().ToLowerInvariant();
-                    return value switch
-                    {
-                        "en" => Language.En,
-                        "fr" => Language.Fr,
-                        _ => Language.Es
-                    };
-                }
-            }
-            catch { }
-            return Language.Es;
-        }
+        public static Language LoadLanguage() => LauncherPreferences.Language;
 
         /// <summary>Stores the chosen language for the next time the launcher is opened.</summary>
-        public static void SaveLanguage(Language language)
-        {
-            try
-            {
-                string path = PreferencesPath;
-                string? folder = Path.GetDirectoryName(path);
-                if (!string.IsNullOrEmpty(folder) && !Directory.Exists(folder)) Directory.CreateDirectory(folder);
-                File.WriteAllText(path, "idioma=" + Code(language) + Environment.NewLine);
-            }
-            catch { }
-        }
+        public static void SaveLanguage(Language language) => LauncherPreferences.Language = language;
     }
 }

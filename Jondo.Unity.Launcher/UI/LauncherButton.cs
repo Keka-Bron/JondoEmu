@@ -12,7 +12,8 @@ namespace Jondo.Unity.Launcher.UI
         None,
         Speaker,
         Flag,
-        CheckBox
+        CheckBox,
+        Folder
     }
 
     /// <summary>
@@ -145,6 +146,7 @@ namespace Jondo.Unity.Launcher.UI
 
                 if (Icon == ButtonIcon.Speaker) LauncherTheme.DrawSpeaker(g, iconArea, text, IconMuted);
                 else if (Icon == ButtonIcon.Flag) LauncherTheme.DrawFlag(g, iconArea, FlagCode);
+                else if (Icon == ButtonIcon.Folder) LauncherTheme.DrawFolder(g, iconArea, text);
                 else DrawCheckBox(g, iconArea, text);
 
                 content = new Rectangle(iconArea.Right + 5, offset, Width - (iconArea.Right + 5) - 6, Height);

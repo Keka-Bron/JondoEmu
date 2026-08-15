@@ -88,6 +88,8 @@ namespace Jondo.Unity.Launcher.UI
         private readonly LauncherButton _btnPlay = new();
         private readonly LinkLabel _lnkLogOut = new();
 
+        private readonly LauncherButton _btnClientPath = new();
+
         private readonly StatusIndicator _statusIndicator = new();
 
         private readonly LauncherPanel _consolePanel = new();
@@ -269,9 +271,78 @@ namespace Jondo.Unity.Launcher.UI
             _lnkLogOut.LinkClicked += (s, e) => SignOut();
             _card.Controls.Add(_lnkLogOut);
 
+            // Dónde está el cliente. Se enseña siempre, con sesión iniciada o sin ella, porque es
+            // justo lo que hay que arreglar antes de poder jugar si el juego no está al lado.
+            _btnClientPath.Icon = ButtonIcon.Folder;
+            _btnClientPath.Font = LauncherTheme.CreateFont(9.5f);
+            _btnClientPath.BackgroundTop = _btnClientPath.BackgroundBottom = Color.FromArgb(150, 30, 18, 10);
+            _btnClientPath.BackgroundTopHighlight = _btnClientPath.BackgroundBottomHighlight = Color.FromArgb(190, 52, 32, 18);
+            _btnClientPath.BackgroundTopActive = _btnClientPath.BackgroundBottomActive = Color.FromArgb(190, 52, 32, 18);
+            _btnClientPath.BorderColor = LauncherTheme.BorderBrown;
+            _btnClientPath.BorderColorHighlight = LauncherTheme.LightGold;
+            _btnClientPath.BorderColorActive = LauncherTheme.LightGold;
+            _btnClientPath.CornerRadius = 4;
+            _btnClientPath.Click += (s, e) => ChooseClient();
+            _card.Controls.Add(_btnClientPath);
+
             // Service status.
             _statusIndicator.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
             _card.Controls.Add(_statusIndicator);
+
+            RefreshClientPath();
+        }
+
+        /// <summary>
+        /// Enseña qué Dofus.exe se va a lanzar y con qué idioma. En rojo cuando no hay ninguno, que
+        /// es el único caso en el que el botón de jugar no puede funcionar.
+        /// </summary>
+        private void RefreshClientPath()
+        {
+            string ruta = LauncherService.ResolveClient();
+            string guardada = LauncherPreferences.ClientExecutableRaw;
+            string idioma = LauncherTexts.Code(_language).ToUpperInvariant();
+
+            if (ruta.Length == 0)
+            {
+                _btnClientPath.Text = guardada.Length > 0
+                    ? "Dofus.exe ya no está donde se dejó — elige dónde está"
+                    : "No se encuentra Dofus.exe — elige dónde está";
+                _btnClientPath.TextColor = _btnClientPath.TextColorHighlight =
+                    _btnClientPath.TextColorActive = Color.FromArgb(236, 120, 96);
+            }
+            else
+            {
+                _btnClientPath.Text = Recortar(ruta) + "   ·   " + idioma;
+                _btnClientPath.TextColor = LauncherTheme.Gold;
+                _btnClientPath.TextColorHighlight = _btnClientPath.TextColorActive = Color.White;
+            }
+        }
+
+        /// <summary>Rutas largas por el medio, que el final es lo que identifica al fichero.</summary>
+        private static string Recortar(string ruta)
+        {
+            const int tope = 46;
+            if (ruta.Length <= tope) return ruta;
+            return ruta.Substring(0, 12) + "…" + ruta.Substring(ruta.Length - (tope - 13));
+        }
+
+        private void ChooseClient()
+        {
+            using var dialogo = new OpenFileDialog
+            {
+                Title = "¿Dónde está el cliente de Dofus?",
+                Filter = "Dofus.exe|Dofus.exe|Ejecutables (*.exe)|*.exe",
+                CheckFileExists = true,
+            };
+
+            string actual = LauncherService.ResolveClient();
+            if (actual.Length > 0) dialogo.InitialDirectory = Path.GetDirectoryName(actual);
+
+            if (dialogo.ShowDialog(this) != DialogResult.OK) return;
+
+            LauncherPreferences.ClientExecutable = dialogo.FileName;
+            RefreshClientPath();
+            RebuildLayout();
         }
 
         private void ConfigureLanguageButton(LauncherButton button, string code, Language language)
@@ -670,7 +741,9 @@ namespace Jondo.Unity.Launcher.UI
                 y += Px(16);
             }
 
-            y += Px(18);
+            y += Px(14);
+            _btnClientPath.SetBounds(padding, y, inner, Px(26));
+            y += Px(26) + Px(10);
             _statusIndicator.SetBounds(padding, y, inner, Px(16));
             y += Px(16) + padding;
 
@@ -737,6 +810,10 @@ namespace Jondo.Unity.Launcher.UI
             _btnEs.Active = _language == Language.Es;
             _btnEn.Active = _language == Language.En;
             _btnFr.Active = _language == Language.Fr;
+
+            // El idioma manda también sobre el juego: es el --langCode con el que arranca. Por eso
+            // la fila de la ruta lo enseña, para que no haya que adivinar en qué idioma va a abrir.
+            RefreshClientPath();
 
             _loginTab.Text = _texts.LoginTab;
             _registerTab.Text = _texts.RegisterTab;
