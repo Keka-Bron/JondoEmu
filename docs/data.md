@@ -44,6 +44,7 @@ nothing — they are working references, and `.gitignore` keeps them local.
 | `cosmetics.json` | 80,437 | The cosmetic catalogue: 12 item types, 2,420 items, 182 appearance entries | `Cosmetics` via `Paths.CosmeticsJson` | from the client dump; `completar_cosmeticos.py` patches the gaps |
 | `world_etapa1_tras_elegir_personaje.bin` | 64,510 | World entry block 1, after the character is picked: 322 frames, 42 opcodes | `WorldEntry` via `Paths.WorldStageAfterCharacter` | carved from the capture, then `sanear_world.py` |
 | `heads.json` | 56,345 | 638 character heads (id → skin, breed, gender) and the 38 defaults, one per breed and sex | `HeadTable` via `Paths.HeadsJson` | `extract_heads.py` |
+| `equipment_skins.json` | 11,079 | The look of **real** gear, not cosmetics: 286 skins (116 hats, 90 capes, 79 shields), 98 pets, 22 mounts. Measured by equipping items one at a time, not through the appearance window. Nothing reads it yet — it is what a cosmetic would have to *replace* instead of append. See `appearances.md` §17 | nothing yet | `extraer_equipo_real.py --guardar` |
 | `dungeons.json` | 51,371 | 187 dungeons: rooms, entrance map, exit map, level bands | `DungeonManager` via `Paths.DungeonsJson` | `extract_dungeons.py` |
 | `character_xp.json` | 38,990 | 1,889 levels → accumulated experience | `ExperienceTable` via `Paths.CharacterXpJson` | `extract_character_xp.py` |
 | `mounts.json` | 35,924 | 520 mounts, indexed by the certificate item that grants them: bones, colors, scale | `Mounts` via `Paths.MountsJson` | `extract_monturas.py` |

@@ -653,7 +653,7 @@ players would not.
 
 | behaviour | real server | here | why |
 |---|---|---|---|
-| garment skin | **replaces** the equipped item's skin | **appends** to the skin list | the real item's own skin was never measured, so there is nothing to remove. Identical on screen as long as nothing is worn underneath. |
+| garment skin | **replaces** the equipped item's skin | **appends** to the skin list | the emulator does not yet do the removal. The real items' skins are now measured — see section 17 — so this can be closed; until it is, the result is identical on screen as long as nothing is worn underneath. |
 | `hhy` | only what the account owns | the whole catalogue (539 + 167) | a single-player emulator with nothing unlocked has nothing to show |
 | aura | also a sub-entity at binding point 6 in `kmb` | `lym` id only | not implemented; see section 15 |
 | `hie` / `hii` | pushed alongside look updates, always `{ f1: 2 }` (129 and 131 occurrences, never any other value) | pushed on equip and unequip (`EquipmentHandler`), not on an appearance save | constant with no established meaning. Copied where a capture shows them, not guessed at elsewhere. |
@@ -672,7 +672,69 @@ measured garments first, then round-robin by type so the bag holds some of every
 
 ---
 
-## 17. Repeating the measurement
+## 17. The real items' own skins
+
+Everything above is about cosmetics. The pieces they cover — an ordinary hat, cape or shield — have
+skins of their own, and until now those were the missing half: the emulator appends a cosmetic skin
+instead of replacing the real one because it had nothing to replace.
+
+They are measured now, by a different route. Cosmetics are read through the appearance window, which
+previews without owning. Real gear cannot be previewed, so it has to be **equipped**, and that is a
+different exchange:
+
+```
+C→S  iuk { f1: 1, f2: uid, f3: slot }     equip this item
+S→C  ivq { f1: uid, f2: slot }            the item moved into that slot
+S→C  lxc                                  and here is the new look
+```
+
+Everything needed sits in the server's own stream, so no cross-direction pairing is involved: an
+`ivq` into a slot below 63 (63 is the bag) names the item, and the next `lxc` carries the result.
+Diff that look against the previous one and the added skin belongs to that item. The `uid` is
+translated to an item id through the session's inventory, where each entry reads
+`f3 { f1: slot, f5 { f1: item, f4: uid } }`.
+
+The source is a set of captures taken on a tournament server, where gear is free, equipping 433
+items one at a time. **429 resolved, 99.1 %:**
+
+| | resolved | what changes |
+|---|---:|---|
+| Hats (type 16) | 116 | one skin on the character |
+| Capes (type 17) | 90 | one skin |
+| Shields (type 82) | 79 | one skin |
+| Pets | 98 | sub-entity bones at binding point 1 |
+| Mounts and petmounts | 22 | root bones |
+
+The result is in `datos/equipment_skins.json`, same shape as the cosmetic table: `skins`, `mounts`,
+`pets`. Four shields did not move the look at all and are left out rather than guessed at.
+
+**Two checks, one of them decisive.** The 286 items carrying a skin produced **286 distinct skins** —
+a clean one-to-one map, no collisions to explain away.
+
+Better than that, 46 skin values appear in *both* tables, and every pair is the same object twice:
+
+| skin | cosmetic | real item |
+|---:|---|---|
+| 5631 | Escudo **destrozado** del Monte Puaj | Escudo del Monte Puaj |
+| 53 | Escudo de Sidimote **Abollado** | Escudo de Sidimote |
+| 52 | El Corazón Partido **y Rompido** | El Corazón Partido |
+| 45 | Escudo del Báwbawo **Explotado** | Escudo del Báwbawo |
+
+The cosmetic versions are the battered variants of real shields, and they carry the real shield's
+skin. Those two tables were measured by different methods, in different sessions, on different
+servers, against different characters — and they agree on 46 values. That is the strongest
+confirmation either table has.
+
+A cross-check against the older `sin apariencias equipar…` captures was attempted and came back
+**inconclusive**, not confirming: those captures barely contain the `ivq` → `lxc` pattern, and the
+one match carries a whole look rather than a difference. It is recorded here so nobody repeats it
+expecting an answer.
+
+Regenerate with `py tools/extraer_equipo_real.py --guardar`.
+
+---
+
+## 18. Repeating the measurement
 
 The method is the point of this document. To extend the table to a family that is not covered, or to
 redo it on a newer client version:
