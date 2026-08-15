@@ -16,18 +16,18 @@ namespace Jondo.Unity.Launcher
         public static void Initialize()
         {
             Console.WriteLine("[SQLite] Initializing databases...");
-            
+
             // 1. Initialize auth.db
             using (var authConnection = new SqliteConnection(AuthConnectionString))
             {
                 authConnection.Open();
-                
+
                 using (var pragmaCmd = authConnection.CreateCommand())
                 {
                     pragmaCmd.CommandText = "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;";
                     pragmaCmd.ExecuteNonQuery();
                 }
-                
+
                 var createAccounts = authConnection.CreateCommand();
                 createAccounts.CommandText = @"
                     CREATE TABLE IF NOT EXISTS Accounts (
@@ -489,8 +489,6 @@ namespace Jondo.Unity.Launcher
                             Console.WriteLine("[SQLite] Migration: Unstuck character, moved to Cell 320.");
                         }
                     }
-                }
-            }
 
                     // Migration: Ensure character Breed is 9 (Cra)
                     using (var updateBreedCmd = worldConnection.CreateCommand())
@@ -796,7 +794,150 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine($"[DatabaseManager] Successfully auto-seeded {totalSpawns} mobs into MapMobs table.");
         }
 
-        // --- Auth Operations ---
+        // --- Auth Operations & Security (Anti-SQL Injection & Anti-DDoS) ---
+
+        public class DbAccount
+        {
+            public long Id { get; set; }
+            public string Login { get; set; } = "";
+            public string Nickname { get; set; } = "";
+        }
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (int attempts, DateTime lockTime)> _ipLockouts
+            = new System.Collections.Concurrent.ConcurrentDictionary<string, (int attempts, DateTime lockTime)>();
+
+        public static bool ValidateAccountCredentials(string login, string password, string clientIp, out DbAccount? account, out string errorMessage)
+        {
+            account = null;
+            errorMessage = "";
+
+            // 1. Anti-DDoS Lockout check
+            if (_ipLockouts.TryGetValue(clientIp, out var lockData))
+            {
+                if (lockData.attempts >= 5)
+                {
+                    double remainingSeconds = 60 - (DateTime.UtcNow - lockData.lockTime).TotalSeconds;
+                    if (remainingSeconds > 0)
+                    {
+                        errorMessage = $"[Anti-DDoS] Too many failed attempts. Temporarily locked out for {Math.Ceiling(remainingSeconds)} s.";
+                        return false;
+                    }
+                    else
+                    {
+                        _ipLockouts.TryRemove(clientIp, out _);
+                    }
+                }
+            }
+
+            // 2. Anti-SQL Injection & Input Sanitization
+            login = (login ?? "").Trim().ToLowerInvariant();
+            password = (password ?? "").Trim();
+
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
+            {
+                errorMessage = "Please enter a username and a password.";
+                return false;
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(login, @"^[a-zA-Z0-9_@.-]{3,32}$"))
+            {
+                errorMessage = "The username contains invalid characters or has the wrong length (3-32 characters).";
+                RecordFailedAttempt(clientIp);
+                return false;
+            }
+
+            // 3. Parametrized Query against auth.db
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, Login, Nickname FROM Accounts WHERE LOWER(Login) = $login AND Password = $pass;";
+                command.Parameters.AddWithValue("$login", login);
+                command.Parameters.AddWithValue("$pass", password);
+
+                using var reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    account = new DbAccount
+                    {
+                        Id = reader.GetInt64(0),
+                        Login = reader.GetString(1),
+                        Nickname = reader.GetString(2)
+                    };
+                    _ipLockouts.TryRemove(clientIp, out _);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager Error] Authentication error: {ex.Message}");
+            }
+
+            RecordFailedAttempt(clientIp);
+            errorMessage = "Wrong username or password.";
+            return false;
+        }
+
+        public static bool RegisterNewAccount(string login, string password, string nickname, string clientIp, out string errorMessage)
+        {
+            errorMessage = "";
+
+            login = (login ?? "").Trim().ToLowerInvariant();
+            password = (password ?? "").Trim();
+            nickname = (nickname ?? "").Trim();
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(login, @"^[a-zA-Z0-9_@.-]{3,32}$"))
+            {
+                errorMessage = "The username may only contain letters, digits and the characters _ @ . - (3-32 characters).";
+                return false;
+            }
+
+            if (password.Length < 3 || password.Length > 32)
+            {
+                errorMessage = "The password must be between 3 and 32 characters long.";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(nickname)) nickname = login;
+
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+
+                var checkCmd = connection.CreateCommand();
+                checkCmd.CommandText = "SELECT COUNT(*) FROM Accounts WHERE LOWER(Login) = $login;";
+                checkCmd.Parameters.AddWithValue("$login", login);
+                if ((long)(checkCmd.ExecuteScalar() ?? 0L) > 0)
+                {
+                    errorMessage = "That username is already registered.";
+                    return false;
+                }
+
+                var insertCmd = connection.CreateCommand();
+                insertCmd.CommandText = "INSERT INTO Accounts (Login, Password, Nickname) VALUES ($login, $pass, $nick);";
+                insertCmd.Parameters.AddWithValue("$login", login);
+                insertCmd.Parameters.AddWithValue("$pass", password);
+                insertCmd.Parameters.AddWithValue("$nick", nickname);
+                insertCmd.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error registering the account: {ex.Message}";
+                return false;
+            }
+        }
+
+        private static void RecordFailedAttempt(string clientIp)
+        {
+            _ipLockouts.AddOrUpdate(clientIp,
+                (1, DateTime.UtcNow),
+                (key, old) => (old.attempts + 1, DateTime.UtcNow));
+        }
 
         public static void SetGameToken(long accountId, string token)
         {
@@ -1251,17 +1392,17 @@ namespace Jondo.Unity.Launcher
                 GameState.StatAgility = reader.GetInt32(10);
                 GameState.Breed = reader.GetInt32(12);
                 GameState.Sex = reader.GetInt32(13);
-                
+
                 string lookHex = reader.GetString(11);
                 byte[] lookBytes = ConvertHexStringToByteArray(lookHex);
                 GameState.LookBytes = lookBytes;
-                
+
                 // Reconstruct PlayerActorDetails (detailsMsg with look and humanoid name)
                 // detailsMsg has: Field 1 (Look), Field 2 (HumanoidMsg)
                 // HumanoidMsg has: Field 2 (HumanInformationsMsg)
                 // HumanInformationsMsg has: Field 3 (Name)
                 GameState.PlayerActorDetails = ReconstructActorDetails(lookBytes, GameState.CharacterName);
-                
+
                 Console.WriteLine($"[SQLite] Successfully loaded character: {GameState.CharacterName} (Level {GameState.CharacterLevel})");
                 return true;
             }
@@ -1780,16 +1921,16 @@ namespace Jondo.Unity.Launcher
             try
             {
                 var statsMsg = new Network.ProtoMessage();
-                
+
                 // Field 1: breed & sex wrapper
                 var breedSexMsg = new Network.ProtoMessage();
                 breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.Breed > 0 ? GameState.Breed : 8 });
                 breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.Sex });
                 statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 1, WireType = 2, BytesValue = breedSexMsg.ToByteArray() });
-                
+
                 // Field 2: Level
                 statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel > 0 ? GameState.CharacterLevel : 2 });
-                
+
                 // Field 4: AccountId (using default 188940901L)
                 statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 188940901L });
 
@@ -1951,11 +2092,11 @@ namespace Jondo.Unity.Launcher
             {
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
-                
+
                 var parameters = string.Join(",", rids.Select((_, i) => $"$p{i}"));
                 var command = connection.CreateCommand();
                 command.CommandText = $"SELECT EffectId, DiceNum, DiceSide, Value FROM ItemEffects WHERE Rid IN ({parameters})";
-                
+
                 for (int i = 0; i < rids.Count; i++)
                 {
                     command.Parameters.AddWithValue($"$p{i}", rids[i]);
@@ -2004,7 +2145,7 @@ namespace Jondo.Unity.Launcher
             if (count > 0) return; // Already populated
 
             Console.WriteLine("[SQLite] Populating Monsters, Subareas, and MapSubareas from JSON. This may take a moment...");
-            
+
             using var transaction = connection.BeginTransaction();
             try
             {
@@ -2093,14 +2234,14 @@ namespace Jondo.Unity.Launcher
                     var doc = System.Text.Json.JsonDocument.Parse(fs);
                     var mValuesArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_values").GetProperty("Array");
                     var mKeysArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_keys").GetProperty("Array");
-                    
+
                     var insertCmd = connection.CreateCommand();
                     insertCmd.Transaction = transaction;
                     insertCmd.CommandText = "INSERT OR REPLACE INTO Subareas (Id, Monsters) VALUES ($id, $monsters);";
                     insertCmd.Parameters.Add("$id", SqliteType.Integer);
                     insertCmd.Parameters.Add("$monsters", SqliteType.Text);
 
-                    for(int i = 0; i < mKeysArr.GetArrayLength(); i++)
+                    for (int i = 0; i < mKeysArr.GetArrayLength(); i++)
                     {
                         var subAreaId = mKeysArr[i].GetInt32();
                         var data = mValuesArr[i].GetProperty("data");
@@ -2120,14 +2261,14 @@ namespace Jondo.Unity.Launcher
                     var doc = System.Text.Json.JsonDocument.Parse(fs);
                     var mValuesArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_values").GetProperty("Array");
                     var mKeysArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_keys").GetProperty("Array");
-                    
+
                     var insertCmd = connection.CreateCommand();
                     insertCmd.Transaction = transaction;
                     insertCmd.CommandText = "INSERT OR REPLACE INTO MapSubareas (MapId, SubAreaId) VALUES ($id, $subid);";
                     insertCmd.Parameters.Add("$id", SqliteType.Integer);
                     insertCmd.Parameters.Add("$subid", SqliteType.Integer);
 
-                    for(int i = 0; i < mKeysArr.GetArrayLength(); i++)
+                    for (int i = 0; i < mKeysArr.GetArrayLength(); i++)
                     {
                         long mapId = mKeysArr[i].GetInt64();
                         var data = mValuesArr[i].GetProperty("data");
@@ -2842,161 +2983,7 @@ namespace Jondo.Unity.Launcher
             }
             return spells;
         }
-        public static long CreateCharacter361010(long accountId,string name,int breed,int sex,string lookHex)
-        {
-            using var connection =
-                new SqliteConnection(
-                    WorldConnectionString
-                );
 
-            connection.Open();
-
-            /*
-             * ID simple pour notre serveur local :
-             * MAX(Id) + 1
-             */
-
-            long newId;
-
-            using (
-                var idCommand =
-                    connection.CreateCommand()
-            )
-            {
-                idCommand.CommandText =
-                    "SELECT COALESCE(MAX(Id), 13825558) + 1 FROM Characters;";
-
-                newId =
-                    Convert.ToInt64(
-                        idCommand.ExecuteScalar()
-                    );
-            }
-
-            /*
-             * Empêcher les doublons de nom.
-             */
-
-            using (
-                var check =
-                    connection.CreateCommand()
-            )
-            {
-                check.CommandText =
-                    "SELECT COUNT(*) FROM Characters WHERE LOWER(Name) = LOWER($name);";
-
-                check.Parameters.AddWithValue(
-                    "$name",
-                    name
-                );
-
-                long count =
-                    Convert.ToInt64(
-                        check.ExecuteScalar()
-                    );
-
-                if (count > 0)
-                {
-                    Console.WriteLine(
-                        $"[SQLite] Character name already exists: {name}"
-                    );
-
-                    return 0;
-                }
-            }
-
-            using (
-                var command =
-                    connection.CreateCommand()
-            )
-            {
-                command.CommandText = @"
-            INSERT INTO Characters
-            (
-                Id,
-                AccountId,
-                Name,
-                Breed,
-                Sex,
-                Level,
-                MapId,
-                CellId,
-                RemainingPoints,
-                Vitality,
-                Wisdom,
-                Strength,
-                Intelligence,
-                Chance,
-                Agility,
-                Look,
-                Orientation,
-                Kamas,
-                Experience
-            )
-            VALUES
-            (
-                $id,
-                $accountId,
-                $name,
-                $breed,
-                $sex,
-                1,
-                154010884,
-                315,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                $look,
-                1,
-                0,
-                0
-            );
-        ";
-
-                command.Parameters.AddWithValue(
-                    "$id",
-                    newId
-                );
-
-                command.Parameters.AddWithValue(
-                    "$accountId",
-                    accountId
-                );
-
-                command.Parameters.AddWithValue(
-                    "$name",
-                    name
-                );
-
-                command.Parameters.AddWithValue(
-                    "$breed",
-                    breed
-                );
-
-                command.Parameters.AddWithValue(
-                    "$sex",
-                    sex
-                );
-
-                command.Parameters.AddWithValue(
-                    "$look",
-                    lookHex
-                );
-
-                command.ExecuteNonQuery();
-            }
-
-            Console.WriteLine(
-                $"[SQLite] Created character: " +
-                $"{name}, ID={newId}, " +
-                $"Breed={breed}, Sex={sex}"
-            );
-
-            return newId;
-        }
         /// <summary>
         /// Minimum character level at which a spell unlocks, per SpellLevels.
         /// Returns 1 when there is no record, so that missing data does not hide spells.
@@ -3057,8 +3044,6 @@ namespace Jondo.Unity.Launcher
         /// <summary>Drop chance, as a percentage, for the monster's grade.</summary>
         public double PercentDrop { get; set; }
     }
-
-
 
     public class SpellCombatData
     {
@@ -3127,6 +3112,4 @@ namespace Jondo.Unity.Launcher
         public int Value { get; set; }
         public int Duration { get; set; }
     }
-
-    
-    }
+}
