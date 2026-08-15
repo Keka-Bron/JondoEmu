@@ -135,7 +135,7 @@ Details worth knowing:
   - **Radius-2 cell validation** (`GetInnerWalkableCells`) so mobs never spawn on decorations, walls, house windows or zaap pillars.
 - [x] **187 dungeons** with their **763 rooms**, entrance and exit.
 
-### ⚔️ PvM Combat (functional core engine)
+### ⚔️ PvM Combat (STILL MIGRATING FROM v 3.6.4.3 - CURRENTLY DISABLED FOR SAFETY)
 - [x] **Tactical arenas** — each roleplay map resolves to its combat arena by zone offset.
 - [x] **Context transitions** — clean switching between roleplay and tactical combat, restoring world state when the fight ends.
 - [x] **Placement phase** — red and blue placement tiles with cell swapping before *Ready*.
