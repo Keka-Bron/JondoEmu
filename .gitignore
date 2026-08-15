@@ -56,6 +56,10 @@ datos/map_neighbours.json
 # referencia y mezcla cosas que ya no valen, así que se queda en local y no se publica. Lo que
 # sirve para consultar está en los demás documentos de docs/.
 docs/EspecificacionTecnica.md
+# Y este no es documentación de Jondo: es el README de UnityInspectorStandalone, una herramienta
+# externa que se usó para inspeccionar el cliente en tiempo de ejecución. Se queda en local como
+# referencia de trabajo, pero en el repositorio solo despista.
+docs/UnityInspectorReadme.md
 out.txt
 mock_server.db
 *_old.cs
