@@ -15,6 +15,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** writte
 - [x] **Last Cell and Map Persistence** in Database
 - [x] **Inventory System:** Item spawning, equipping/unequipping, item bags, and persistent storage.
 - [x] **Cosmetics/Appereances:** Every cosmetic works with persistent storage.
+- [x] **Titles & Ornaments** Fully functional.
 - [x] **Haven Bags:** Every haven bag works, including chests and lottery machines.
 - [x] **Zaaps/Zaapis** Every zaap/zaapi works.
 - [x] **Character Stats:** Characteristic assignment is fully functional (all stats map correctly, capital calculation is dynamic, and remaining points synchronize perfectly between all client panels, including the left sidebar HUD).
@@ -26,6 +27,8 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** writte
   - **Multi-Monster Groups**: Complete support for groups of 1 to 8 monsters per mob.
   - **Spatial Radius 2 Cell Validation (`GetInnerWalkableCells`)**: Strict grid validation preventing mob spawns on non-walkable decorations, walls, house windows, or Zaap pillars.
   - **Quest Monsters & Archmonsters**: Full database mapping for special quest mobs and archmonsters.
+
+### 🚧 Work In Progress (WIP) / Basic Implementation
 - [x] **PvM Combat System (Functional Core Engine):**
   - **Tactical Arenas**: Each roleplay map resolves to its corresponding tactical combat arena based on zone offsets.
   - **Context Transitions**: Clean switching between Roleplay and Tactical Combat states, restoring world state upon fight completion.
@@ -37,9 +40,6 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** writte
   - **Spells & Elemental Damage**: Level-based spell querying (AP cost, range, LoS, per-turn/per-target limits), elemental damage calculations (stats, equipment power, target resistances), and critical hit rolls.
   - **Active Monster AI**: Intelligent target selection (lowest HP, HP %, isolation, distance), ranged attacks, minimal-MP BFS pathing, and flee behavior when HP falls below 30%.
   - **Fight Resolution & Progression**: Victory/defeat screens, experience progression (1,889 levels), official loot drops, level ups, and monster group respawns.
-
-### 🚧 Work In Progress (WIP) / Basic Implementation
-- [ ] **Migration to last Dofus Client version - Protocol migration**
 - [ ] **Commands:** `.level` and `.kamas` are present but working roughly (working on it).
 - [ ] **Partial Combat Mechanics:**
   - Pushback trajectory (calculates destination cell, omits collision damage & pushback animation).
@@ -48,12 +48,10 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** writte
   - Inventory Kamas (persists & displays on victory screen, requires UI tab refresh).
 
 ### ❌ Missing Features
-- [ ] Zaaps
 - [ ] Kolossium System & PvP Combat
 - [ ] Advanced Combat Features (AP/MP dodge rolls, area-of-effect spell shapes, summons, shields, lock & dodge in melee)
 - [ ] Professions (Jobs)
 - [ ] Achievements
-- [ ] Titles & Ornaments
 - [ ] Guilds
 
 ---
