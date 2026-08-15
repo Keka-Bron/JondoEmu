@@ -16,9 +16,11 @@ Download it from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/do
 
 The official client talks to Ankama's servers and checks their SSL certificates. **JondoFix**, a MelonLoader mod, redirects it to your machine instead. It comes already built in this repository.
 
-1. Download the **MelonLoader** installer (`0.6.x` or newer, .NET 6 compatible) from [its releases page](https://github.com/LavaGang/MelonLoader/releases).
+1. Download the **MelonLoader** installer from [its releases page](https://github.com/LavaGang/MelonLoader/releases). Use **0.7.x** — **0.6.x is known to fail here**, and the setup this repository is tested against runs **0.7.3**.
 2. Run it, select your `Dofus.exe`, leave runtime detection on **IL2CPP / .NET 6**, and install.
-3. Copy **`JondoFix/JondoFix.dll`** from this repository into the **`Mods/`** folder of your Dofus installation.
+3. Copy **`JondoFix/JondoFix.dll`** from this repository into the **`Mods/`** folder of your Dofus installation, next to `Dofus.exe`. MelonLoader creates that folder the first time the game starts; if it is not there yet, just create it yourself.
+
+> The mod ships **already compiled** and is the exact binary in use — you never need to build it. `JondoFix/` also carries its source, in case you want to read or change it.
 
 What JondoFix does:
 * **Network redirection** — intercepts sockets, Named Pipes and DNS queries and sends them to `localhost` (ports `8888`, `5555`, `15881`, `6337`).
