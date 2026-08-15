@@ -27,7 +27,10 @@ What JondoFix does:
 
 ### Step 3 — Run it
 
-Double-click **`Jondo Emulator Launcher.exe`**. On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Create your account in the launcher, press play, and start the Dofus client.
+Double-click **`Jondo Emulator Launcher.exe`**. On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Create your account in the launcher, press play, and start the Dofus client, or use the test account as follows:
+
+Account: keka
+Password: test
 
 The emulator expects the client to sit next to it, in a `Cliente 3.6.10.10` folder beside the emulator folder.
 
