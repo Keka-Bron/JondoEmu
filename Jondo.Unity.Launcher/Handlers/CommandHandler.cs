@@ -39,7 +39,7 @@ namespace Jondo.Unity.Launcher.Handlers
                             // Send Chat message as feedback
                             var csmMsg = new ProtoMessage();
                             csmMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 0 });
-                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes($"[INFO] Kamas actualizadas a {GameState.Kamas}.") });
+                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes($"[INFO] Kamas updated to {GameState.Kamas}.") });
                             csmMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 0 }); // Timestamp
                             csmMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes("") }); // Fingerprint
                             byte[] csmPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/csm", csmMsg.ToByteArray());

@@ -20,7 +20,7 @@ namespace Jondo.Unity.Launcher
         public static int Orientation { get; set; } = 1;
         public static long Kamas { get; set; } = 50000;
 
-        /// <summary>Experiencia ACUMULADA del personaje, no la del nivel actual.</summary>
+        /// <summary>The character's ACCUMULATED experience, not the current level's.</summary>
         public static long Experience { get; set; }
 
         // Combat State

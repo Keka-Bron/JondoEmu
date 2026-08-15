@@ -9,7 +9,7 @@ namespace Jondo.Unity.Launcher.Network
     {
         public static byte[] BuildGameNodePacket(string typeUrl, byte[] payload)
         {
-            // Validate opcode length (Phase 0 - DIAGNOSTICO_COMBATE)
+            // Validate opcode length (Phase 0 - COMBAT_DIAGNOSTICS)
             string opcode = typeUrl.StartsWith("type.ankama.com/") ? typeUrl.Substring("type.ankama.com/".Length) : typeUrl;
             if (opcode.Length != 3)
             {

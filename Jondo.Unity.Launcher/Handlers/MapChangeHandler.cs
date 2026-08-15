@@ -81,11 +81,11 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             if (GameState.IsInFight)
             {
-                // El movimiento en combate lo enruta GameNodeProxy directamente a FightHandler.
-                // Si se llega aquí es que el enrutado ha cambiado y el movimiento de combate
-                // acabaría tratándose como movimiento de roleplay (teletransporte, sin gasto de PM).
-                Program.LogDebug("[Movement][WARN] joi de combate ha llegado a MapChangeHandler. " +
-                                 "Revisa el enrutado de GameNodeProxy: debe ir a FightHandler.");
+                // GameNodeProxy routes combat movement straight to FightHandler. Getting here means
+                // the routing has changed and combat movement would end up being handled as
+                // roleplay movement (a teleport, with no MP spent).
+                Program.LogDebug("[Movement][WARN] A combat joi reached MapChangeHandler. " +
+                                 "Check the GameNodeProxy routing: it must go to FightHandler.");
                 return;
             }
 

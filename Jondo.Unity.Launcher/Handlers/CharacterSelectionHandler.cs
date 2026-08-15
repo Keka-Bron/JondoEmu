@@ -14,34 +14,34 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         /// <summary>
         /// Effect action IDs used inside irm effect entries (f11), keyed by internal stat ID.
-        /// Observed in the official capture: 125=Vitalidad, 174=Iniciativa, 138=Potencia.
+        /// Observed in the official capture: 125=Vitality, 174=Initiative, 138=Power.
         /// </summary>
         private static readonly Dictionary<int, int> EffectActionIdByStatId = new Dictionary<int, int>
         {
             { 1, 111 },  // AP
             { 2, 128 },  // MP
-            { 10, 118 }, // Fuerza
-            { 11, 125 }, // Vitalidad
-            { 12, 124 }, // Sabiduría
-            { 13, 123 }, // Suerte
-            { 14, 119 }, // Agilidad
-            { 15, 126 }, // Inteligencia
-            { 16, 112 }, // Daños
-            { 18, 115 }, // Crítico
-            { 25, 138 }, // Potencia
-            { 44, 174 }, // Iniciativa
+            { 10, 118 }, // Strength
+            { 11, 125 }, // Vitality
+            { 12, 124 }, // Wisdom
+            { 13, 123 }, // Chance
+            { 14, 119 }, // Agility
+            { 15, 126 }, // Intelligence
+            { 16, 112 }, // Damage
+            { 18, 115 }, // Critical
+            { 25, 138 }, // Power
+            { 44, 174 }, // Initiative
         };
 
         private static readonly Dictionary<int, int> StatIdByEffectActionId = EffectActionIdByStatId.ToDictionary(k => k.Value, v => v.Key);
 
-        private static readonly HashSet<int> IntrepidoSetGids = new HashSet<int> { 10784, 10785, 10794, 10797, 10798, 10799, 10800, 10801 };
+        private static readonly HashSet<int> IntrepidSetGids = new HashSet<int> { 10784, 10785, 10794, 10797, 10798, 10799, 10800, 10801 };
 
         /// <summary>
         /// Builds the real inventory message (irm) payload from GameState.Inventory.
         /// Schema observed in the official world-entering capture (frame #11):
-        ///   irm { repeated f3: { f2: position (63 = bolsa, 0-15 = ranura equipada, omitido si 0),
-        ///                        f5: { f1: cantidad,
-        ///                              repeated f2: efecto { f10: valor, f11: actionId },
+        ///   irm { repeated f3: { f2: position (63 = bag, 0-15 = equipped slot, omitted when 0),
+        ///                        f5: { f1: quantity,
+        ///                              repeated f2: effect { f10: value, f11: actionId },
         ///                              f4: uid, f5: gid } } }
         /// NOTE: the former target "icw" is NOT the inventory — the official icw payload carries
         /// guild territory data (coordinates + guild emblems) and must stream through untouched.
@@ -79,8 +79,8 @@ namespace Jondo.Unity.Launcher.Handlers
                     detailMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = dmgMsg.ToByteArray() });
                 }
 
-                // Marker effect present on every intrépido set piece in the official capture (f11=981, no value)
-                if (IntrepidoSetGids.Contains(item.ItemId))
+                // Marker effect present on every Intrepid set piece in the official capture (f11=981, no value)
+                if (IntrepidSetGids.Contains(item.ItemId))
                 {
                     var markerMsg = new ProtoMessage();
                     markerMsg.Fields.Add(new ProtoField { FieldNumber = 11, WireType = 0, VarIntValue = 981 });
@@ -138,7 +138,13 @@ namespace Jondo.Unity.Launcher.Handlers
             }
         }
 
-        public static async Task HandleCharacterListRequest(NetworkStream stream, byte[] payload, string payloadStr)
+        /// <summary>
+        /// Character list requests from older client builds.
+        ///
+        /// In 3.6.10.10 the list is no longer requested this way: it arrives inside the welcome
+        /// burst as soon as the client presents its ticket. This is kept for the old opcodes.
+        /// </summary>
+        public static async Task HandleCharacterListRequest(NetworkStream stream, byte[] payload, string payloadStr, long accountId, int serverId)
         {
             if (payloadStr.Contains("type.ankama.com/kpc"))
             {
@@ -155,12 +161,12 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 Console.WriteLine("[Game Node] Received Character List Request (kpa) [3.6] - Sending Character List");
                 
-                var dbChars = DatabaseManager.GetCharactersByAccountId(188940901);
-                string activeCharName = "CADERNIS";
-                long activeCharId = 13825558L;
-                int level = 2;
-                string lookHex = "080118032218A28B9B0FCBE5F615A4E1B91992A6C820888CA028F5B7CB342A035BE410420134320220013809";
-                
+                var dbChars = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
+                string activeCharName = "";
+                long activeCharId = 0;
+                int level = 1;
+                string lookHex = "";
+
                 if (dbChars.Count > 0)
                 {
                     activeCharName = dbChars[0].Name;
@@ -199,30 +205,55 @@ namespace Jondo.Unity.Launcher.Handlers
             }
         }
 
-        public static void HandleCharacterSelectionRequest(byte[] kslPayload)
+        /// <summary>
+        /// Character selection. The id comes in field 1 of the message, inside the wrapper
+        /// (kvw in 3.6.10.10, ksl in older builds).
+        ///
+        /// Returns false if the character does not exist or does not belong to the session's
+        /// account. There used to be a default id: when the message carried none, the same
+        /// character was always loaded, so any account ended up playing with it.
+        /// </summary>
+        public static bool HandleCharacterSelectionRequest(byte[] framePayload, long accountId)
         {
-            Console.WriteLine("[Game Node] Received Character Selection Request (ksl) [3.6]");
-            
-            long characterIdToLoad = 13825558L;
+            long characterIdToLoad = 0;
             try
             {
-                if (kslPayload != null && kslPayload.Length > 0)
+                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, "kvw")
+                                    ?? ConnectionProtocol.ReadPayload(framePayload, "ksl")
+                                    ?? ConnectionProtocol.ReadPayload(framePayload, "kvl");
+                if (selection != null && selection.Length > 0)
                 {
-                    var kslMsg = ProtoMessage.Parse(kslPayload);
-                    var charIdField = kslMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0);
-                    if (charIdField != null)
-                    {
-                        characterIdToLoad = charIdField.VarIntValue;
-                        Program.LogDebug($"[Game Node] Selected character ID parsed from ksl: {characterIdToLoad}");
-                    }
+                    var msg = ProtoMessage.Parse(selection);
+                    var charIdField = msg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0);
+                    if (charIdField != null) characterIdToLoad = charIdField.VarIntValue;
                 }
             }
             catch (Exception ex)
             {
-                Program.LogDebug($"[-] Error parsing character ID from ksl packet: {ex.Message}");
+                Program.LogDebug($"[-] Error reading the character id: {ex.Message}");
             }
-            
+
+            if (characterIdToLoad <= 0)
+            {
+                Console.WriteLine("[Game Node] The character selection carried no character id.");
+                return false;
+            }
+
+            if (accountId > 0 && !DatabaseManager.CharacterBelongsToAccount(characterIdToLoad, accountId))
+            {
+                Console.WriteLine($"[Game Node] Character {characterIdToLoad} does not belong to " +
+                                  $"account {accountId}.");
+                return false;
+            }
+
+            Console.WriteLine($"[Game Node] Selected character {characterIdToLoad}.");
             bool dbCharacterLoaded = DatabaseManager.LoadCharacter(characterIdToLoad);
+            if (!dbCharacterLoaded)
+            {
+                Console.WriteLine($"[Game Node] Could not load character {characterIdToLoad}.");
+                return false;
+            }
+            DatabaseManager.TouchLastConnection(characterIdToLoad);
 
             try
             {
@@ -235,7 +266,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 
                 statsMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel });
                 
-                statsMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 188940901L });
+                statsMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = accountId });
 
                 var alignMsg = new ProtoMessage();
                 alignMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = 1 });
@@ -320,6 +351,8 @@ namespace Jondo.Unity.Launcher.Handlers
                     GameState.SetEquippedItem(item.Uid, equipped);
                 }
             }
+
+            return true;
         }
 
         private static byte[] BuildKsqPacket(string characterName, long characterId, int level)
@@ -402,5 +435,10 @@ namespace Jondo.Unity.Launcher.Handlers
 
             return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/ksq", ksqBytes);
         }
+
+        // The character list (kvi) is now built by ConnectionProtocol.BuildCharactersList.
+        // The version that used to live here could not work: it put the character id where the
+        // level goes, the level inside the look block and the account id where the character id
+        // goes, on top of wrapping the message in the wrong root field.
     }
 }

@@ -17,11 +17,11 @@ namespace Jondo.Unity.World.Fights
             int baseDamage,
             ElementType element,
             int statValue,           // E.g. Strength for Earth, Intelligence for Fire
-            int power,               // General Power / Potencia
-            int flatElementDamage,   // Daños elementales fijos
-            int flatDamage,          // Daños fijos generales
-            int targetResPct,        // Resistencias % del objetivo
-            int targetFlatRes,       // Resistencias fijas del objetivo
+            int power,               // General Power
+            int flatElementDamage,   // Flat elemental damage
+            int flatDamage,          // General flat damage
+            int targetResPct,        // Target resistance %
+            int targetFlatRes,       // Target flat resistance
             bool isCritical = false,
             double critBonusMultiplier = 1.25)
         {

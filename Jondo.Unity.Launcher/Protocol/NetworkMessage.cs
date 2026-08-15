@@ -40,7 +40,7 @@ namespace Jondo.Protocol
                 string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
-                    LogTrafficEnriched("Cliente -> Servidor", typeUrl, payload);
+                    LogTrafficEnriched("Client -> Server", typeUrl, payload);
                 }
             }
             catch { }
@@ -74,7 +74,7 @@ namespace Jondo.Protocol
                 string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
-                    LogTrafficEnriched("Servidor -> Cliente", typeUrl, payload);
+                    LogTrafficEnriched("Server -> Client", typeUrl, payload);
                 }
                 Jondo.Unity.Launcher.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
             }
@@ -99,7 +99,7 @@ namespace Jondo.Protocol
                 string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
-                    LogTrafficEnriched("Servidor -> Cliente", typeUrl, payload);
+                    LogTrafficEnriched("Server -> Client", typeUrl, payload);
                 }
                 Jondo.Unity.Launcher.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
             }
@@ -115,17 +115,17 @@ namespace Jondo.Protocol
             var meta = GetPacketMetadata(typeUrl);
             
             // Choose color for direction
-            ConsoleColor dirColor = direction.Contains("Cliente") ? ConsoleColor.Cyan : ConsoleColor.Green;
-            
+            ConsoleColor dirColor = direction.Contains("Client") ? ConsoleColor.Cyan : ConsoleColor.Green;
+
             // Choose color for categories to make it visual
             ConsoleColor taskColor = ConsoleColor.Gray;
-            if (meta.Task == "Personaje") taskColor = ConsoleColor.Yellow;
+            if (meta.Task == "Character") taskColor = ConsoleColor.Yellow;
             else if (meta.Task == "Interfaces") taskColor = ConsoleColor.Magenta;
-            else if (meta.Task == "Inventario") taskColor = ConsoleColor.DarkYellow;
-            else if (meta.Task == "Mapa") taskColor = ConsoleColor.Blue;
+            else if (meta.Task == "Inventory") taskColor = ConsoleColor.DarkYellow;
+            else if (meta.Task == "Map") taskColor = ConsoleColor.Blue;
             else if (meta.Task == "Chat") taskColor = ConsoleColor.Red;
-            else if (meta.Task == "Conexión") taskColor = ConsoleColor.DarkCyan;
-            else if (meta.Task == "Sincronización") taskColor = ConsoleColor.DarkGreen;
+            else if (meta.Task == "Connection") taskColor = ConsoleColor.DarkCyan;
+            else if (meta.Task == "Sync") taskColor = ConsoleColor.DarkGreen;
 
             lock (Console.Out)
             {
@@ -181,112 +181,112 @@ namespace Jondo.Protocol
 
             switch (uri)
             {
-                // === Context: Lista de Servidores ===
-                case "knx": return ("Lista de Servidores", "Conexión", "AuthTokenRequest (Solicitud de autenticación de token)");
-                case "kof": return ("Lista de Servidores", "Conexión", "ProtocolAccepted (Protocolo de red aceptado)");
-                case "lor": return ("Lista de Servidores", "Sincronización", "TimeMessage (Sincronización horaria del servidor)");
-                case "hnp": return ("Lista de Servidores", "Sincronización", "SystemConfiguration (Configuración de variables del juego)");
-                case "knr": return ("Lista de Servidores", "Sincronización", "BreedListMessage (Lista de razas de personajes activas)");
-                case "mfa": return ("Lista de Servidores", "Conexión", "FeatureStatus (Estado de características de la cuenta)");
-                case "mez": return ("Lista de Servidores", "Conexión", "ServerSeasonInfo (Temporada del servidor activo)");
-                case "hnv": return ("Lista de Servidores", "Conexión", "ServerOptionalFeatures (Funcionalidades opcionales)");
-                case "kpc": return ("Lista de Servidores", "Conexión", "PingRequest (Validación de latencia y sesión)");
-                case "kos": return ("Lista de Servidores", "Conexión", "ServerSelectionStatus (Estado de conexión del servidor)");
+                // === Context: Server List ===
+                case "knx": return ("Server List", "Connection", "AuthTokenRequest (Token authentication request)");
+                case "kof": return ("Server List", "Connection", "ProtocolAccepted (Network protocol accepted)");
+                case "lor": return ("Server List", "Sync", "TimeMessage (Server clock synchronization)");
+                case "hnp": return ("Server List", "Sync", "SystemConfiguration (Game variable configuration)");
+                case "knr": return ("Server List", "Sync", "BreedListMessage (List of enabled character breeds)");
+                case "mfa": return ("Server List", "Connection", "FeatureStatus (Account feature status)");
+                case "mez": return ("Server List", "Connection", "ServerSeasonInfo (Season of the active server)");
+                case "hnv": return ("Server List", "Connection", "ServerOptionalFeatures (Optional features)");
+                case "kpc": return ("Server List", "Connection", "PingRequest (Latency and session check)");
+                case "kos": return ("Server List", "Connection", "ServerSelectionStatus (Server connection status)");
 
-                // === Context: Elegir Personaje ===
-                case "klp": return ("Elegir Personaje", "Interfaces", "CharacterListEmpty (Lista de personajes vacía inicial)");
-                case "ksx": return ("Elegir Personaje", "Interfaces", "CharacterListRequest (Petición de personajes - fase 1)");
-                case "kpa": return ("Elegir Personaje", "Interfaces", "CharacterListRequest (Petición de personajes - fase 2)");
-                case "mes": return ("Elegir Personaje", "Interfaces", "MessageWrapper (Wrapper contenedor de interfaz)");
-                case "knv": return ("Elegir Personaje", "Interfaces", "UiLayoutMessage (Metadatos de la interfaz de selección)");
-                case "ksq": return ("Elegir Personaje", "Personaje", "CharacterListMessage (Lista detallada de personajes con Bruxa)");
-                case "jrf": return ("Elegir Personaje", "Sincronización", "WorldReady (Señal de mundo listo para simulación)");
-                case "ksl": return ("Elegir Personaje", "Personaje", "CharacterSelectionRequest (Petición para entrar al mundo)");
+                // === Context: Character Selection ===
+                case "klp": return ("Character Selection", "Interfaces", "CharacterListEmpty (Initial empty character list)");
+                case "ksx": return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 1)");
+                case "kpa": return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 2)");
+                case "mes": return ("Character Selection", "Interfaces", "MessageWrapper (UI container wrapper)");
+                case "knv": return ("Character Selection", "Interfaces", "UiLayoutMessage (Metadata of the selection UI)");
+                case "ksq": return ("Character Selection", "Character", "CharacterListMessage (Detailed character list)");
+                case "jrf": return ("Character Selection", "Sync", "WorldReady (Signal that the world is ready to simulate)");
+                case "ksl": return ("Character Selection", "Character", "CharacterSelectionRequest (Request to enter the world)");
 
-                // === Context: Carga del Mundo ===
-                case "kri": return ("Carga del Mundo", "Personaje", "CharacterStatsListMessage (Estadísticas y características completas)");
-                case "itp": return ("Carga del Mundo", "Interfaces", "ShortcutBarContentMessage (Atajos de teclado y barras de interfaz)");
-                case "izn": return ("Carga del Mundo", "Interfaces", "ChatChannelsListMessage (Inicialización de canales de chat locales)");
-                case "krh": return ("Carga del Mundo", "Sincronización", "ClientReadyForPackets (Ack de preparación del cliente)");
-                case "imd": return ("Carga del Mundo", "Inventario", "InventoryWeightMessage (Inicialización básica del peso de inventario)");
-                case "ktw": return ("Carga del Mundo", "Personaje", "CharacterSelectedSuccessMessage (Spawn del personaje en el pedestal)");
-                case "mek": return ("Carga del Mundo", "Interfaces", "SpellListMessage (Libro de hechizos del personaje)");
-                case "lry": return ("Carga del Mundo", "Interfaces", "QuestListMessage (Lista de misiones activas y diario)");
-                case "icb": return ("Carga del Mundo", "Personaje", "CharacterStatsListMessage (Estado de combate y stats base)");
-                case "irm": return ("Carga del Mundo", "Personaje", "MapActorsListMessage (Spawns iniciales de NPCs y mobs del mapa)");
-                case "hke": return ("Carga del Mundo", "Interfaces", "ServerWelcomeMessage (Mensaje de bienvenida y noticias del día)");
-                case "kfr": return ("Carga del Mundo", "Personaje", "EmoteListMessage (Emotes y animaciones desbloqueadas)");
-                case "ipv": return ("Carga del Mundo", "Mapa", "MapComplementaryInformationsData (Interactivos de celdas)");
-                case "ipu": return ("Carga del Mundo", "Mapa", "MapInteractiveElements (Puertas y triggers activos)");
-                case "ipw": return ("Carga del Mundo", "Mapa", "MapStatedElements (Estado visual de elementos interactivos)");
-                case "icw": return ("Carga del Mundo", "Inventario", "InventoryContentMessage (Inventario completo - 180 objetos)");
-                case "loy": return ("Carga del Mundo", "Sincronización", "WorldLoadAck (Ack de carga de mapa exitosa por el cliente)");
-                case "lok": return ("Carga del Mundo", "Sincronización", "SelectedServerData (Metadatos de sesión del servidor)");
-                case "jdj": return ("Carga del Mundo", "Sincronización", "ServerDateMessage (Sincronización de fecha del servidor)");
+                // === Context: World Loading ===
+                case "kri": return ("World Loading", "Character", "CharacterStatsListMessage (Full stats and characteristics)");
+                case "itp": return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Keyboard shortcuts and UI bars)");
+                case "izn": return ("World Loading", "Interfaces", "ChatChannelsListMessage (Initialization of the local chat channels)");
+                case "krh": return ("World Loading", "Sync", "ClientReadyForPackets (Ack that the client is ready)");
+                case "imd": return ("World Loading", "Inventory", "InventoryWeightMessage (Basic initialization of the inventory weight)");
+                case "ktw": return ("World Loading", "Character", "CharacterSelectedSuccessMessage (Character spawn on the pedestal)");
+                case "mek": return ("World Loading", "Interfaces", "SpellListMessage (The character's spell book)");
+                case "lry": return ("World Loading", "Interfaces", "QuestListMessage (Active quest list and journal)");
+                case "icb": return ("World Loading", "Character", "CharacterStatsListMessage (Combat state and base stats)");
+                case "irm": return ("World Loading", "Character", "MapActorsListMessage (Initial NPC and mob spawns of the map)");
+                case "hke": return ("World Loading", "Interfaces", "ServerWelcomeMessage (Welcome message and news of the day)");
+                case "kfr": return ("World Loading", "Character", "EmoteListMessage (Unlocked emotes and animations)");
+                case "ipv": return ("World Loading", "Map", "MapComplementaryInformationsData (Cell interactives)");
+                case "ipu": return ("World Loading", "Map", "MapInteractiveElements (Active doors and triggers)");
+                case "ipw": return ("World Loading", "Map", "MapStatedElements (Visual state of the interactive elements)");
+                case "icw": return ("World Loading", "Inventory", "InventoryContentMessage (Full inventory - 180 items)");
+                case "loy": return ("World Loading", "Sync", "WorldLoadAck (Client ack of a successful map load)");
+                case "lok": return ("World Loading", "Sync", "SelectedServerData (Server session metadata)");
+                case "jdj": return ("World Loading", "Sync", "ServerDateMessage (Server date synchronization)");
 
-                // === Context: Carga del Mundo - 33 Packets Transition Burst ===
-                case "kqo": return ("Carga del Mundo", "Interfaces", "ChatChannelsReadMessage (Canales de chat para lectura)");
-                case "hhq": return ("Carga del Mundo", "Interfaces", "SocialGroupPackets (Información de gremio y alianzas)");
-                case "hml": return ("Carga del Mundo", "Interfaces", "SocialPreferences (Ajustes sociales del jugador)");
-                case "isf": return ("Carga del Mundo", "Sincronización", "QuestListMessage (Notificación de misiones activas)");
-                case "lol": return ("Carga del Mundo", "Interfaces", "NotificationListMessage (Notificaciones de misiones)");
-                case "icg": return ("Carga del Mundo", "Inventario", "InventoryWeightMessage (Pods de carga del inventario)");
-                case "ibo": return ("Carga del Mundo", "Interfaces", "ShortcutBarContentMessage (Barra de hechizos rápidos)");
-                case "hmj": return ("Carga del Mundo", "Interfaces", "SocialGroupStatus (Estado de gremio del jugador)");
-                case "lxs": return ("Carga del Mundo", "Sincronización", "AlignmentSubAreaUpdate (PvP y alineamiento de zona)");
-                case "hnq": return ("Carga del Mundo", "Sincronización", "SpouseStatusMessage (Estado civil / matrimonio)");
-                case "ksv": return ("Carga del Mundo", "Personaje", "CharacterCapabilitiesMessage (Límites de stats y capacidad)");
-                case "lou": return ("Carga del Mundo", "Conexión", "ServerAccessStatus (Estado de accesibilidad del servidor)");
-                case "iya": return ("Carga del Mundo", "Sincronización", "FeatureStatusMessage (Características experimentales activas)");
-                case "kdx": return ("Carga del Mundo", "Conexión", "AccountCapabilitiesMessage (Derechos globales de la cuenta)");
-                case "izh": return ("Carga del Mundo", "Sincronización", "AlmanaxDateMessage (Día y bonus activo del almanax)");
-                case "ity": return ("Carga del Mundo", "Sincronización", "ExpMultiplierMessage (Multiplicadores de experiencia globales)");
-                case "koj": return ("Carga del Mundo", "Mapa", "HavenBagStatusMessage (Datos de merkasako o casa propia)");
-                case "kyj": return ("Carga del Mundo", "Sincronización", "ArenaRankInfosMessage (Información de liga de Koliseo)");
-                case "ktj": return ("Carga del Mundo", "Personaje", "ExpGainDetails (Detalles del capital de experiencia acumulado)");
-                case "ltk": return ("Carga del Mundo", "Interfaces", "TitleListMessage (Títulos honoríficos disponibles)");
-                case "lvk": return ("Carga del Mundo", "Interfaces", "OrnamentListMessage (Ornamentos gráficos disponibles)");
-                case "lwb": return ("Carga del Mundo", "Personaje", "EmoteListMessage (Emoticonos desbloqueados)");
-                case "luy": return ("Carga del Mundo", "Inventario", "JobDescriptionMessage (Lista de oficios aprendidos)");
-                case "hhf": return ("Carga del Mundo", "Interfaces", "SocialGroupRights (Derechos asignados en gremio)");
-                case "hhh": return ("Carga del Mundo", "Interfaces", "SocialGroupDetails (Ficha descriptiva del gremio)");
-                case "luq": return ("Carga del Mundo", "Interfaces", "JobCrafterDirectorySettings (Ajustes de visibilidad de oficios)");
-                case "hhi": return ("Carga del Mundo", "Interfaces", "SocialGroupAlliance (Ficha de la alianza)");
-                case "idf": return ("Carga del Mundo", "Inventario", "InventoryPreview (Previsualización rápida de objetos)");
-                case "izu": return ("Carga del Mundo", "Sincronización", "QuestStepProgress (Avance actual de misiones)");
+                // === Context: World Loading - 33 Packets Transition Burst ===
+                case "kqo": return ("World Loading", "Interfaces", "ChatChannelsReadMessage (Chat channels open for reading)");
+                case "hhq": return ("World Loading", "Interfaces", "SocialGroupPackets (Guild and alliance information)");
+                case "hml": return ("World Loading", "Interfaces", "SocialPreferences (The player's social settings)");
+                case "isf": return ("World Loading", "Sync", "QuestListMessage (Notification of the active quests)");
+                case "lol": return ("World Loading", "Interfaces", "NotificationListMessage (Quest notifications)");
+                case "icg": return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
+                case "ibo": return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Quick spell bar)");
+                case "hmj": return ("World Loading", "Interfaces", "SocialGroupStatus (The player's guild status)");
+                case "lxs": return ("World Loading", "Sync", "AlignmentSubAreaUpdate (PvP and sub-area alignment)");
+                case "hnq": return ("World Loading", "Sync", "SpouseStatusMessage (Marital status / marriage)");
+                case "ksv": return ("World Loading", "Character", "CharacterCapabilitiesMessage (Stat caps and capabilities)");
+                case "lou": return ("World Loading", "Connection", "ServerAccessStatus (Server accessibility status)");
+                case "iya": return ("World Loading", "Sync", "FeatureStatusMessage (Active experimental features)");
+                case "kdx": return ("World Loading", "Connection", "AccountCapabilitiesMessage (Global account rights)");
+                case "izh": return ("World Loading", "Sync", "AlmanaxDateMessage (Almanax day and active bonus)");
+                case "ity": return ("World Loading", "Sync", "ExpMultiplierMessage (Global experience multipliers)");
+                case "koj": return ("World Loading", "Map", "HavenBagStatusMessage (Haven bag or player house data)");
+                case "kyj": return ("World Loading", "Sync", "ArenaRankInfosMessage (Kolossium league information)");
+                case "ktj": return ("World Loading", "Character", "ExpGainDetails (Details of the accumulated experience pool)");
+                case "ltk": return ("World Loading", "Interfaces", "TitleListMessage (Available honorific titles)");
+                case "lvk": return ("World Loading", "Interfaces", "OrnamentListMessage (Available graphical ornaments)");
+                case "lwb": return ("World Loading", "Character", "EmoteListMessage (Unlocked emoticons)");
+                case "luy": return ("World Loading", "Inventory", "JobDescriptionMessage (List of learned jobs)");
+                case "hhf": return ("World Loading", "Interfaces", "SocialGroupRights (Rights granted within the guild)");
+                case "hhh": return ("World Loading", "Interfaces", "SocialGroupDetails (Descriptive sheet of the guild)");
+                case "luq": return ("World Loading", "Interfaces", "JobCrafterDirectorySettings (Job directory visibility settings)");
+                case "hhi": return ("World Loading", "Interfaces", "SocialGroupAlliance (Sheet of the alliance)");
+                case "idf": return ("World Loading", "Inventory", "InventoryPreview (Quick preview of the items)");
+                case "izu": return ("World Loading", "Sync", "QuestStepProgress (Current quest progress)");
 
-                // === Context: Carga del Mundo - kkn Burst ===
-                case "kkn": return ("Carga del Mundo", "Sincronización", "MapLoadCompleted (Notificación de carga gráfica concluida)");
-                case "kkp": return ("Carga del Mundo", "Interfaces", "SocialStatusMessage (Configuración de estado social en línea)");
-                case "kkm": return ("Carga del Mundo", "Interfaces", "SocialOptionsMessage (Ajustes de notificaciones de amigos)");
-                case "krb": return ("Carga del Mundo", "Personaje", "CharacterRemainingPoints (Puntos de stats restantes confirmados)");
-                case "ilc": return ("Carga del Mundo", "Sincronización", "ServerSettingsMessage (Ajustes regional del servidor)");
-                case "joh": return ("Carga del Mundo", "Mapa", "CurrentMapMessage (Confirmación del Map ID a cargar en escena)");
-                case "hmd": return ("Carga del Mundo", "Inventario", "InventoryWeightMessage (Pods de carga del inventario)");
-                case "lpj": return ("Carga del Mundo", "Sincronización", "SecondaryReadySignal (Señal de hilos secundarios listos)");
-                case "lpe": return ("Carga del Mundo", "Sincronización", "SecondaryReadyConfirm (Ack de hilos secundarios listos)");
-                case "hmv": return ("Carga del Mundo", "Chat", "ChatChannelsListRequest (Petición de canales de chat)");
-                case "hnk": return ("Carga del Mundo", "Chat", "ChatChannelsListMessage (Canales de chat disponibles)");
-                case "kqm": return ("Carga del Mundo", "Chat", "ChatChannelConfigMessage (Configuración y color del canal de chat)");
-                case "ibt": return ("Carga del Mundo", "Sincronización", "GameReadyTrigger (Petición para dar el control de juego)");
-                case "ith": return ("Carga del Mundo", "Personaje", "FullCharacterStatsMessage (Ficha masiva de estadísticas)");
+                // === Context: World Loading - kkn Burst ===
+                case "kkn": return ("World Loading", "Sync", "MapLoadCompleted (Notification that the graphics load finished)");
+                case "kkp": return ("World Loading", "Interfaces", "SocialStatusMessage (Configuration of the online social status)");
+                case "kkm": return ("World Loading", "Interfaces", "SocialOptionsMessage (Friend notification settings)");
+                case "krb": return ("World Loading", "Character", "CharacterRemainingPoints (Confirmed remaining stat points)");
+                case "ilc": return ("World Loading", "Sync", "ServerSettingsMessage (Regional settings of the server)");
+                case "joh": return ("World Loading", "Map", "CurrentMapMessage (Confirms the Map ID to load into the scene)");
+                case "hmd": return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
+                case "lpj": return ("World Loading", "Sync", "SecondaryReadySignal (Signal that the secondary threads are ready)");
+                case "lpe": return ("World Loading", "Sync", "SecondaryReadyConfirm (Ack that the secondary threads are ready)");
+                case "hmv": return ("World Loading", "Chat", "ChatChannelsListRequest (Request for the chat channels)");
+                case "hnk": return ("World Loading", "Chat", "ChatChannelsListMessage (Available chat channels)");
+                case "kqm": return ("World Loading", "Chat", "ChatChannelConfigMessage (Configuration and colour of the chat channel)");
+                case "ibt": return ("World Loading", "Sync", "GameReadyTrigger (Request to hand over control of the game)");
+                case "ith": return ("World Loading", "Character", "FullCharacterStatsMessage (Bulk stats sheet)");
 
-                // === Context: En el Juego ===
-                case "kkr": return ("En el Juego", "Mapa", "MapComplementaryInfoRequest (Petición de actores e interactivos)");
-                case "lxd": return ("En el Juego", "Mapa", "MapComplementaryInfo (Wrapper de interactivos, celdas y clima)");
-                case "jpv": return ("En el Juego", "Personaje", "MapActorsShowMessage (Spawns de personajes en el mapa actual)");
-                case "kns": return ("En el Juego", "Sincronización", "KnockAck / Heartbeat (Latido de sincronización / Pong)");
-                case "kod": return ("En el Juego", "Sincronización", "HeartbeatRequest (Latido de sincronización / Ping)");
-                case "joi": return ("En el Juego", "Personaje", "PlayerMovementRequest (Petición de movimiento por celdas)");
-                case "jpp": return ("En el Juego", "Personaje", "PlayerMovementConfirm (Confirmación de celda de destino alcanzada)");
-                case "jos": return ("En el Juego", "Mapa", "MapChangeRequest (Petición para cruzar la frontera del mapa)");
-                case "isi": return ("En el Juego", "Inventario", "ItemMovementRequest (Petición para equipar/mover un objeto)");
-                case "iry": return ("En el Juego", "Inventario", "ItemMovementConfirm (Confirmación de equipación de objeto)");
-                case "krc": return ("En el Juego", "Personaje", "StatsUpgradeRequest (Petición para asignar puntos a estadísticas)");
-                case "kqn": return ("En el Juego", "Chat", "ChatSendRequest (Envío de mensaje de chat escrito por el jugador)");
-                case "kqp": return ("En el Juego", "Chat", "ChatBroadcastMessage (Difusión de mensaje de chat en el canal)");
+                // === Context: In Game ===
+                case "kkr": return ("In Game", "Map", "MapComplementaryInfoRequest (Request for actors and interactives)");
+                case "lxd": return ("In Game", "Map", "MapComplementaryInfo (Wrapper for interactives, cells and weather)");
+                case "jpv": return ("In Game", "Character", "MapActorsShowMessage (Character spawns on the current map)");
+                case "kns": return ("In Game", "Sync", "KnockAck / Heartbeat (Sync heartbeat / Pong)");
+                case "kod": return ("In Game", "Sync", "HeartbeatRequest (Sync heartbeat / Ping)");
+                case "joi": return ("In Game", "Character", "PlayerMovementRequest (Cell-by-cell movement request)");
+                case "jpp": return ("In Game", "Character", "PlayerMovementConfirm (Confirms the destination cell was reached)");
+                case "jos": return ("In Game", "Map", "MapChangeRequest (Request to cross the map boundary)");
+                case "isi": return ("In Game", "Inventory", "ItemMovementRequest (Request to equip/move an item)");
+                case "iry": return ("In Game", "Inventory", "ItemMovementConfirm (Confirmation that the item was equipped)");
+                case "krc": return ("In Game", "Character", "StatsUpgradeRequest (Request to assign points to stats)");
+                case "kqn": return ("In Game", "Chat", "ChatSendRequest (Sending a chat message typed by the player)");
+                case "kqp": return ("In Game", "Chat", "ChatBroadcastMessage (Broadcast of a chat message on the channel)");
 
-                default: return ("En el Juego", "Desconocido", $"Mensaje de utilidad ({uri})");
+                default: return ("In Game", "Unknown", $"Utility message ({uri})");
             }
         }
     }
