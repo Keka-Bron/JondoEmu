@@ -6,6 +6,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** writte
 ## 🚀 Emulation Status
 
 ### ✅ Completed / Working Features
+- [x] **Custom Multilanguage Launcher**
 - [x] **Client-Server-Authentication Emulation** (Zaap, HAAPI, Connection Server with infinite VIP subscription bypass)
 - [x] **Server Selection & Character Selection**
 - [x] **World Loading (World / Game Node)**
@@ -121,6 +122,7 @@ By default, the official Dofus client connects to official Ankama servers and ve
 * **Environment Configuration**: Injects required environment variables (`ZAAP_PORT`, `ZAAP_HASH`, etc.).
 
 ---
+<img width="2550" height="1501" alt="image" src="https://github.com/user-attachments/assets/74b1d19c-3bfe-40f8-9c74-e82f4647173a" />
 <img width="2559" height="1497" alt="image" src="https://github.com/user-attachments/assets/7a25c7b3-9372-4ea0-af3d-d3eb1e217a17" />
 <img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/1af6569e-0fef-4c8d-8ede-512aec40aabb" />
 <img width="2558" height="1500" alt="image" src="https://github.com/user-attachments/assets/3fc9ca8c-11b2-4c97-b459-bf4b63849b4a" />
