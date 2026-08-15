@@ -1,6 +1,6 @@
-High-performance server emulator for **Dofus 3 Unity (Client 3.6.4.3)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a functional PvM combat engine.
+High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a functional PvM combat engine.
 
-> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.4.3**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes. The emulator will be migrated to the last version once a MVP product is achieved. **Dofus 3 Client Version 3.6.4.3 LINK**: https://www.swisstransfer.com/d/cf829157-fd95-4add-8dbc-9b3e03b9dff3
+> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.10.10 (mid August 2026)**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes. **Dofus 3 Client Version 3.6.4.3 LINK**: uploading soon
 ---
 
 ## 🚀 Emulation Status
@@ -13,6 +13,9 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.4.3)** written 
 - [x] **Movement, Map Change, Map Loading, Adjacent Maps**
 - [x] **Last Cell and Map Persistence** in Database
 - [x] **Inventory System:** Item spawning, equipping/unequipping, item bags, and persistent storage.
+- [x] **Cosmetics/Appereances:** Every cosmetic works with persistent storage.
+- [x] **Haven Bags:** Every haven bag works, including chests and lottery machines.
+- [x] **Zaaps/Zaapis** Every zaap/zaapi works.
 - [x] **Character Stats:** Characteristic assignment is fully functional (all stats map correctly, capital calculation is dynamic, and remaining points synchronize perfectly between all client panels, including the left sidebar HUD).
 - [x] **NPCs:** Spawns, 3D looks, and dialogue trees.
 - [x] **Monsters & Mobs System (100% Complete):**
@@ -118,7 +121,7 @@ By default, the official Dofus client connects to official Ankama servers and ve
 * **Environment Configuration**: Injects required environment variables (`ZAAP_PORT`, `ZAAP_HASH`, etc.).
 
 ---
-
+<img width="2559" height="1497" alt="image" src="https://github.com/user-attachments/assets/7a25c7b3-9372-4ea0-af3d-d3eb1e217a17" />
 <img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/1af6569e-0fef-4c8d-8ede-512aec40aabb" />
 <img width="2558" height="1500" alt="image" src="https://github.com/user-attachments/assets/3fc9ca8c-11b2-4c97-b459-bf4b63849b4a" />
 <img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/c1bd7344-c7d2-44cb-86c1-844b85e41659" />
