@@ -51,6 +51,11 @@ datos/effects.json
 datos/map_neighbours.json
 
 # ─── Restos de versiones anteriores ─────────────────────────────────────────
+# La especificación técnica es una crónica de 3.893 líneas de cómo se fue descubriendo cada cosa,
+# arrastrada desde la versión 3.6.4.3. Tiene valor para quien la escribió, pero no es una
+# referencia y mezcla cosas que ya no valen, así que se queda en local y no se publica. Lo que
+# sirve para consultar está en los demás documentos de docs/.
+docs/EspecificacionTecnica.md
 out.txt
 mock_server.db
 *_old.cs
