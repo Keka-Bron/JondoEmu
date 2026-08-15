@@ -19,6 +19,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** writte
 - [x] **Haven Bags:** Every haven bag works, including chests and lottery machines.
 - [x] **Zaaps/Zaapis** Every zaap/zaapi works.
 - [x] **Character Stats:** Characteristic assignment is fully functional (all stats map correctly, capital calculation is dynamic, and remaining points synchronize perfectly between all client panels, including the left sidebar HUD).
+- [x] Spells and spells variants
 - [x] **NPCs:** Spawns, 3D looks, and dialogue trees.
 - [x] **Monsters & Mobs System (100% Complete):**
   - **Dynamic Map Spawning & Respawner**: Automatic population and maintenance of 2 to 4 mob groups per map.
@@ -121,9 +122,19 @@ By default, the official Dofus client connects to official Ankama servers and ve
 
 ---
 <img width="2550" height="1501" alt="image" src="https://github.com/user-attachments/assets/74b1d19c-3bfe-40f8-9c74-e82f4647173a" />
-<img width="2559" height="1497" alt="image" src="https://github.com/user-attachments/assets/7a25c7b3-9372-4ea0-af3d-d3eb1e217a17" />
-<img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/1af6569e-0fef-4c8d-8ede-512aec40aabb" />
-<img width="2558" height="1500" alt="image" src="https://github.com/user-attachments/assets/3fc9ca8c-11b2-4c97-b459-bf4b63849b4a" />
-<img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/c1bd7344-c7d2-44cb-86c1-844b85e41659" />
-<img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/2a13f071-9d3f-4010-a4a5-cdef517b36bb" />
-<img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/f66ea136-3185-4222-a413-431a37964346" />
+<img width="2559" height="1506" alt="image" src="https://github.com/user-attachments/assets/521bef24-6b19-4061-bc5b-37a178e91163" />
+<img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/0f06761a-7dcf-481e-b045-02efce31c58e" />
+<img width="2559" height="1488" alt="image" src="https://github.com/user-attachments/assets/aa2249c3-699d-4137-aeef-96fc2278fcf2" />
+<img width="2559" height="1497" alt="image" src="https://github.com/user-attachments/assets/33829fde-d8f1-4b5e-a3f1-11e34fd8c4ca" />
+<img width="2559" height="1493" alt="image" src="https://github.com/user-attachments/assets/86a0b6e6-ea31-45a3-b381-4ba4fcc6b043" />
+<img width="2559" height="1503" alt="image" src="https://github.com/user-attachments/assets/7c2aec0c-85a5-497b-9e1f-db4b77697605" />
+<img width="2559" height="1508" alt="image" src="https://github.com/user-attachments/assets/cb587972-a7c5-42cd-a1e2-c1567cecccc8" />
+<img width="910" height="929" alt="image" src="https://github.com/user-attachments/assets/00b35bbe-7356-41d0-ba9a-d079fbc7165f" />
+<img width="2559" height="1493" alt="image" src="https://github.com/user-attachments/assets/cb75bca8-358d-4153-a2e6-955c10be92f9" />
+<img width="2559" height="1511" alt="image" src="https://github.com/user-attachments/assets/38c437da-d881-4d64-b2b4-0348c789a9a3" />
+
+
+
+
+
+
