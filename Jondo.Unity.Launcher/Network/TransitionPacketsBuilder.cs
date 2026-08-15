@@ -635,18 +635,18 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// hmd = LIBRO DE HECHIZOS: los que el personaje tiene aprendidos. Es lo que decide si un
-        /// hechizo se puede lanzar; la barra de accesos directos (itp) solo decide dónde se dibuja.
+        /// hmd = SPELL BOOK: the spells the character has learned. This is what decides whether a
+        /// spell can be cast; the shortcut bar (itp) only decides where it is drawn.
         ///
-        /// Aquí había cuatro hechizos escritos en bytes crudos —32426, 32435, 32443 y 32455—, que
-        /// resultan ser los cuatro de nivel mínimo 1 del Ocra, los del personaje de la captura.
-        /// De ahí venía que en combate solo esos cuatro se pudieran lanzar y el resto salieran
-        /// oscurecidos por mucho que la barra los mostrara: estaban en la barra pero no en el libro.
+        /// This used to be four spells written as raw bytes -32426, 32435, 32443 and 32455-, which
+        /// turn out to be the four minimum-level-1 Cra spells, the ones of the captured character.
+        /// That is why in a fight only those four could be cast and the rest came out greyed out no
+        /// matter what the bar showed: they were in the bar but not in the book.
         ///
-        /// Estructura, idéntica a la lista de hechizos del combate (jvn):
+        /// Layout, identical to the fight spell list (jvn):
         ///   hmd { f1 = 1,
-        ///         f3 { f3 = 2, f4 = 1 },                 &lt;- el arma, sin identificador
-        ///         f3 { f1 = hechizo, f3 = 1, f4 = 1 } }  &lt;- uno por hechizo
+        ///         f3 { f3 = 2, f4 = 1 },               &lt;- the weapon, with no id
+        ///         f3 { f1 = spell, f3 = 1, f4 = 1 } }  &lt;- one per spell
         /// </summary>
         public static byte[] BuildHmdMessage()
         {
@@ -658,7 +658,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteTag((uint)((1 << 3) | 0));
             output.WriteInt32(1);
 
-            void Entrada(int? spellId)
+            void Entry(int? spellId)
             {
                 using var eMs = new MemoryStream();
                 var e = new CodedOutputStream(eMs);
@@ -668,7 +668,7 @@ namespace Jondo.Unity.Launcher.Network
                     e.WriteInt32(spellId.Value);
                 }
                 e.WriteTag((uint)((3 << 3) | 0));
-                e.WriteInt32(spellId.HasValue ? 1 : 2);   // 1 = hechizo, 2 = arma
+                e.WriteInt32(spellId.HasValue ? 1 : 2);   // 1 = spell, 2 = weapon
                 e.WriteTag((uint)((4 << 3) | 0));
                 e.WriteInt32(1);
                 e.Flush();
@@ -676,28 +676,28 @@ namespace Jondo.Unity.Launcher.Network
                 output.WriteBytes(ByteString.CopyFrom(eMs.ToArray()));
             }
 
-            Entrada(null);
-            foreach (int id in spells) Entrada(id);
+            Entry(null);
+            foreach (int id in spells) Entry(id);
 
             output.Flush();
 
-            Program.LogDebug($"[TransitionPackets] Libro de hechizos (hmd) con {spells.Count} hechizo(s) " +
-                             $"para la raza {GameState.Breed} a nivel {GameState.CharacterLevel}.");
+            Program.LogDebug($"[TransitionPackets] Spell book (hmd) with {spells.Count} spell(s) " +
+                             $"for breed {GameState.Breed} at level {GameState.CharacterLevel}.");
 
             return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hmd", ms.ToArray());
         }
 
         /// <summary>
-        /// Barra de accesos directos de hechizos (itp). Es la que se ve en roleplay y durante la
-        /// colocación previa al combate.
+        /// Spell shortcut bar (itp). This is the one shown in roleplay mode and during the
+        /// placement phase before a fight.
         ///
-        /// Aquí había cuatro identificadores escritos a mano —32426, 32435, 32443 y 32455—, que
-        /// son los que tenía en su barra el personaje de la captura de referencia. Por eso el
-        /// jugador veía siempre cuatro hechizos fuera de combate por muy alto que fuera su nivel,
-        /// mientras que dentro del combate (donde manda el jvn) salían todos.
+        /// This used to be four hand-written ids -32426, 32435, 32443 and 32455-, the ones the
+        /// character of the reference capture had on its bar. That is why the player always saw
+        /// four spells outside of a fight no matter how high the level, while inside the fight
+        /// (where jvn rules) all of them showed up.
         ///
-        /// Estructura: itp { f1 = tipo de barra, f2 repetido { f3 = ranura, f4 { f1 = hechizo } } }.
-        /// La primera entrada va sin ranura y con f4 vacío, igual que en la captura.
+        /// Layout: itp { f1 = bar type, repeated f2 { f3 = slot, f4 { f1 = spell } } }.
+        /// The first entry carries no slot and an empty f4, just like in the capture.
         /// </summary>
         public static byte[][] BuildItpList()
         {
@@ -746,8 +746,8 @@ namespace Jondo.Unity.Launcher.Network
             output.Flush();
             byte[] itpSpells = ms.ToArray();
 
-            Program.LogDebug($"[TransitionPackets] Barra de hechizos con {spells.Count} hechizo(s) " +
-                             $"para la raza {GameState.Breed} a nivel {GameState.CharacterLevel}.");
+            Program.LogDebug($"[TransitionPackets] Spell bar with {spells.Count} spell(s) " +
+                             $"for breed {GameState.Breed} at level {GameState.CharacterLevel}.");
 
             return new byte[][] {
                 NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", itpSpells),

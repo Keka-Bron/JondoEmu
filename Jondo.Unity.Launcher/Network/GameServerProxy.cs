@@ -9,10 +9,23 @@ using Jondo.Unity.Launcher;
 
 namespace Jondo.Unity.Launcher.Network
 {
+    /// <summary>
+    /// Port 5555. Two different protocols come through it, and which one it is gets decided by
+    /// the first frame of each connection:
+    ///
+    ///   - Connection server: bare messages. The client authenticates with the account token,
+    ///     receives the server list, picks one and receives a ticket.
+    ///   - Game server: messages wrapped in type.ankama.com. The client presents the ticket
+    ///     (kqz) and from there the session carries on in GameNodeProxy, which answers with
+    ///     the character list and then with the world entry, all over the same connection.
+    ///
+    /// The client opens a fresh connection for each phase, which is why one port serves both.
+    /// </summary>
     public static class GameServerProxy
     {
         private static TcpListener? _tcpListener;
         private static bool _isRunning;
+        public static bool IsRunning => _isRunning;
         private static CancellationTokenSource? _cts;
 
         public static void Start(int port)
@@ -63,17 +76,17 @@ namespace Jondo.Unity.Launcher.Network
                     Console.WriteLine($"[+] Client connected to Game Server ({client.Client.RemoteEndPoint})");
                     var clientStream = client.GetStream();
 
-                    // Read first frame to detect protocol
                     byte[] firstPayload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(clientStream);
                     if (firstPayload == null) return;
 
                     LogTraffic("C->S", firstPayload, firstPayload.Length);
                     string firstPayloadStr = Encoding.UTF8.GetString(firstPayload);
 
-                    if (firstPayloadStr.Contains("type.ankama.com/"))
+                    if (firstPayloadStr.Contains(ConnectionProtocol.UriPrefix))
                     {
+                        // Game phase. It starts with kqz (the ticket) and carries on with
+                        // character selection and world entry over this same connection.
                         Console.WriteLine("[+] Detected Game Node protocol on port 5555!");
-                        // Hand off to GameNodeProxy
                         await GameNodeProxy.HandleGameNodeSessionAsync(clientStream, firstPayload, firstPayloadStr);
                     }
                     else
@@ -92,6 +105,12 @@ namespace Jondo.Unity.Launcher.Network
         private static async Task HandleConnectionServerSessionAsync(NetworkStream clientStream, byte[] firstPayload)
         {
             byte[] payload = firstPayload;
+
+            // The account is resolved when the token is presented and remembered for the rest
+            // of the connection, because the server-selection message no longer carries it.
+            long accountId = 0;
+            string lang = "0";
+
             while (_isRunning)
             {
                 try
@@ -99,49 +118,64 @@ namespace Jondo.Unity.Launcher.Network
                     var req = Jondo.Protocol.GameMessage.Parser.ParseFrom(payload);
                     if (req.Auth != null)
                     {
+                        if (!string.IsNullOrEmpty(req.Auth.Lang)) lang = req.Auth.Lang;
+
                         if (req.Auth.Ticket != null)
                         {
-                            Console.WriteLine($"[Game Server] Received Auth: Token={req.Auth.Ticket.TokenData.Token}");
+                            accountId = ResolveAccount(req.Auth.Ticket.TokenData?.Token);
+                            if (accountId <= 0)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("[Connection Server] Could not identify the account from the " +
+                                                  "token. Closing the connection.");
+                                Console.ResetColor();
+                                return;
+                            }
 
-                            var authAccepted = GetModifiedAuthAcceptedMessage();
-
-                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(clientStream, authAccepted);
-                            Console.WriteLine("[Game Server] Sent Auth Accepted and ServersList!");
+                            byte[] accepted = BuildAuthenticationAccepted(accountId, lang);
+                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(clientStream, accepted);
                         }
                         else if (req.Auth.SelectedServer != null)
                         {
                             int selectedServerId = req.Auth.SelectedServer.ServerId;
-                            Console.WriteLine($"[Game Server] Client selected server ID: {selectedServerId}");
 
-                            // Port 5555 twice varint bytes: 5555 (0xB3, 0x2B), 5555 (0xB3, 0x2B)
-                            var portsBytes = Google.Protobuf.ByteString.CopyFrom(new byte[] { 0xB3, 0x2B, 0xB3, 0x2B });
-
-                            var selectResponse = new Jondo.Protocol.GameMessage
+                            if (accountId <= 0)
                             {
-                                AuthResult = new Jondo.Protocol.AuthenticationTicketResultMessage
-                                {
-                                    Lang = "1",
-                                    SelectedServer = new Jondo.Protocol.SelectedServerData
-                                    {
-                                        Info = new Jondo.Protocol.ServerHostInfo
-                                        {
-                                            Ticket = Guid.NewGuid().ToString("N"),
-                                            Address = "127.0.0.1",
-                                            Ports = portsBytes
-                                        }
-                                    }
-                                }
-                            };
+                                Console.WriteLine("[Connection Server] Server selection with no identified " +
+                                                  "account. Closing the connection.");
+                                return;
+                            }
 
-                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(clientStream, selectResponse);
-                            Console.WriteLine($"[Game Server] Sent SelectedServerData redirecting to dofus2-ga-talkasha.ankama-games.com:5555");
-                            return; // Close Connection Server session immediately to prevent client timeout/deadlock
+                            // Closed servers still show up in the list but do not accept players.
+                            // We check it here as well, in case the client lets it through.
+                            if (!DatabaseManager.IsServerJoinable(selectedServerId))
+                            {
+                                Console.WriteLine($"[Connection Server] Server {selectedServerId} is not " +
+                                                  "accepting connections. No ticket issued.");
+                                return;
+                            }
+
+                            // The ticket is single-use and binds the next connection to this
+                            // account and this server. Without it, the game session would have
+                            // no idea who it is serving.
+                            var ticket = SessionRegistry.Issue(accountId, selectedServerId);
+
+                            byte[] response = ConnectionProtocol.BuildServerSelected(
+                                lang, ticket.Value, "127.0.0.1", Program.gamePort, Program.gamePort);
+
+                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(clientStream, response);
+                            Console.WriteLine($"[Connection Server] Account {accountId} is joining server " +
+                                              $"{selectedServerId}. Ticket issued; the client will reconnect " +
+                                              $"to port {Program.gamePort}.");
+
+                            // The client closes this connection and opens another one with the ticket.
+                            return;
                         }
                     }
                 }
                 catch (Exception protoEx)
                 {
-                    Program.LogDebug($"[Game Server] Handled ancillary/probing packet: {protoEx.Message}");
+                    Program.LogDebug($"[Connection Server] Unrecognized frame: {protoEx.Message}");
                 }
 
                 payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(clientStream);
@@ -151,44 +185,91 @@ namespace Jondo.Unity.Launcher.Network
             Console.WriteLine("[-] Connection Server session closed.");
         }
 
-        private static Jondo.Protocol.GameMessage GetModifiedAuthAcceptedMessage()
+        /// <summary>
+        /// Resolves the account from the game token the client presents. The token is issued by
+        /// the launcher on login and stored on the account.
+        /// </summary>
+        private static long ResolveAccount(string? token)
         {
-            string hex = "92-03-12-8F-03-0A-01-30-1A-89-03-0A-86-03-08-E5-84-8C-5A-12-05-42-72-75-78-61-1A-04-34-36-31-37-22-DC-02-0A-07-0A-03-08-A7-02-10-01-0A-0B-0A-07-08-8E-07-10-01-18-04-10-03-0A-35-0A-05-08-A2-02-18-01-1A-2C-0A-05-42-72-75-78-61-10-08-18-01-20-02-2A-1D-32-30-32-36-2D-30-36-2D-32-32-54-32-33-3A-34-35-3A-30-31-2E-34-30-38-2B-30-32-3A-30-30-0A-0B-0A-07-08-91-07-10-01-18-04-10-03-0A-0B-0A-07-08-93-07-10-01-18-04-10-03-0A-07-0A-05-08-DF-02-18-03-0A-0B-0A-07-08-95-07-10-01-18-04-10-03-0A-09-0A-05-08-E3-02-18-02-10-01-0A-07-0A-05-08-A5-02-18-01-0A-07-0A-05-08-A6-02-18-01-0A-09-0A-05-08-E2-02-18-02-10-01-0A-07-0A-05-08-DE-02-18-03-0A-07-0A-05-08-A4-02-18-01-0A-0B-0A-07-08-94-07-10-01-18-04-10-03-0A-09-0A-05-08-E1-02-18-02-10-01-0A-0B-0A-07-08-92-07-10-01-18-04-10-03-0A-0B-0A-07-08-8D-07-10-01-18-04-10-03-0A-0B-0A-07-08-8F-07-10-01-18-04-10-03-0A-0B-0A-07-08-90-07-10-01-18-04-10-03-0A-06-0A-04-08-63-18-04-0A-0B-0A-07-08-96-07-10-01-18-04-10-03-0A-07-0A-05-08-E0-02-18-03-0A-08-0A-04-08-32-18-05-10-01-0A-07-0A-05-08-A3-02-18-01-12-02-10-05-12-04-08-01-10-05-12-04-08-02-10-05-12-04-08-03-10-05-12-04-08-04-10-05-12-04-08-05-10-05-12-04-08-06-10-05-2A-11-31-39-37-30-2D-30-31-2D-30-31-54-30-30-3A-30-30-5A-32-00";
-            byte[] hexBytes = NetworkEnvelope.ConvertHexStringToByteArray(hex);
-            byte[] protoPayload = new byte[hexBytes.Length - 2];
-            Array.Copy(hexBytes, 2, protoPayload, 0, protoPayload.Length);
-            var msg = Jondo.Protocol.GameMessage.Parser.ParseFrom(protoPayload);
-
-            var dbChars = DatabaseManager.GetCharactersByAccountId(188940901);
-
-            // Rename Bruxa to [#CADERNIS#] in all servers and character lists, keeping the original structure intact to prevent client UI crashes
-            if (msg.AuthResult?.Result?.Accepted != null)
+            if (!string.IsNullOrWhiteSpace(token))
             {
-                var accepted = msg.AuthResult.Result.Accepted;
-                accepted.AccountName = "CADERNIS";
-                accepted.AccountTag = "2026";
-                accepted.SubscriptionEndDate = "2035-01-01T00:00:00Z";
-                if (accepted.Servers != null)
+                long byToken = DatabaseManager.GetAccountIdByToken(token);
+                if (byToken > 0)
                 {
-                    foreach (var sInfo in accepted.Servers.Servers)
-                    {
-                        if (sInfo.Characters != null && dbChars.Count > 0)
-                        {
-                            var dbChar = dbChars[0];
-                            if (sInfo.Characters.Count > 0)
-                            {
-                                var firstChar = sInfo.Characters[0];
-                                firstChar.Name = dbChar.Name;
-                                firstChar.Level = dbChar.Level;
-                                firstChar.Breed = dbChar.Breed;
-                                firstChar.Gender = dbChar.Sex;
-                            }
-                        }
-                    }
+                    Console.WriteLine($"[Connection Server] Token recognized: account {byToken}.");
+                    return byToken;
                 }
+                Console.WriteLine("[Connection Server] The presented token does not match any account.");
             }
-            return msg;
+
+            // Fallback: the account that just logged in on the launcher. Useful when the client
+            // starts up without going through token issuance.
+            long active = HaapiServer.ActiveAccount?.Id ?? 0;
+            if (active > 0)
+            {
+                Console.WriteLine($"[Connection Server] Falling back to the launcher's active account: {active}.");
+            }
+            return active;
         }
+
+        /// <summary>
+        /// Builds the authentication response from the servers in the database and the account's
+        /// real characters, each one hanging off its own server.
+        /// </summary>
+        private static byte[] BuildAuthenticationAccepted(long accountId, string lang)
+        {
+            var account = DatabaseManager.GetAccountById(accountId);
+            string nickname = account?.Nickname ?? HaapiServer.ActiveAccount?.Nickname ?? "Jondo";
+
+            var servers = DatabaseManager.GetServers();
+            var characters = DatabaseManager.GetCharactersByAccountId(accountId);
+
+            byte[] message = ConnectionProtocol.BuildAuthenticationAccepted(
+                lang,
+                accountId,
+                nickname,
+                BuildAccountTag(accountId),
+                SubscriptionEndDate,
+                servers,
+                characters);
+
+            Console.WriteLine($"[Connection Server] Account {accountId} ({nickname}): " +
+                              $"{servers.Count} server(s), {characters.Count} character(s).");
+            foreach (var server in servers)
+            {
+                int onThisServer = 0;
+                foreach (var c in characters)
+                {
+                    if (c.ServerId == server.Id) onThisServer++;
+                }
+                Console.WriteLine($"    server {server.Id} ({server.Name}): {onThisServer} character(s)");
+            }
+
+            return message;
+        }
+
+        /// <summary>
+        /// Tag shown next to the nickname in the UI. It is derived from the account id so that
+        /// it stays stable across sessions.
+        /// </summary>
+        private static string BuildAccountTag(long accountId) => (accountId % 10000).ToString("D4");
+
+        /// <summary>
+        /// Fin del abono. Aquí no caduca nunca, pero el FORMATO importa.
+        ///
+        /// Iba como "2099-01-01T00:00:00Z", con Z, y el servidor real la manda con desplazamiento
+        /// numérico: 25 caracteres, "####-##-##T##:##:##+##:##". Es el mismo tropiezo que ya nos
+        /// costó la pantalla de selección de servidor con la fecha de última conexión — el cliente
+        /// no traga la Z, se queda sin fecha de abono y trata la cuenta como si no lo tuviera. Una
+        /// cuenta sin abono tiene un solo hueco de personaje, y de ahí venía el botón de crear
+        /// personaje apagado diciendo que ya estaba lleno.
+        ///
+        /// El patrón está leído de una captura real de la pantalla de creación de personaje, donde
+        /// esa cuenta tenía cuatro personajes de cinco y el botón activo.
+        /// </summary>
+        private static string SubscriptionEndDate =>
+            new DateTimeOffset(2099, 1, 1, 0, 0, 0, DateTimeOffset.Now.Offset)
+                .ToString("yyyy-MM-ddTHH:mm:sszzz");
 
         public static void LogTraffic(string direction, byte[] data, int length)
         {

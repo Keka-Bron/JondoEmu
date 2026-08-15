@@ -1,36 +1,73 @@
-# Compilación
+# Lo que se publica es lo justo para ejecutar el emulador sin recompilarlo: el .exe de la raíz,
+# datos/ con lo que lee, launcher_assets/, docs/ y el código fuente. Todo lo demás fuera.
+
+# ─── Compilación ────────────────────────────────────────────────────────────
 [Bb]in/
 [Oo]bj/
 publish/
 runtimes/
-*.dll
 *.pdb
-*.exe
 *.deps.json
 *.runtimeconfig.json
+# Las dll van dentro del .exe de un solo fichero; ninguna suelta.
+*.dll
 
-# Base de datos: se distribuye comprimida (world.zip). Descomprimir tras clonar.
-world.db
-world.db-shm
-world.db-wal
+# ─── Bases de datos ─────────────────────────────────────────────────────────
+# world.db son 240 MB: se distribuye comprimida en datos/world.zip y el emulador la extrae sola
+# la primera vez. auth.db la crea él con su cuenta de prueba.
+bases/
+*.db
+*.db-shm
+*.db-wal
 
-# Registros
-*.log
-
-# Capturas de red y volcados de trabajo
-*.pcapng
-scratch_*
-*_old.cs
-
-# Datos extraídos del cliente (se regeneran con tools/)
+# ─── Datos extraídos del cliente ────────────────────────────────────────────
+# 436 MB de volcado en crudo. No hace falta para ejecutar: lo que el emulador lee ya está en
+# datos/, y lo genera tools/ a partir de esta carpeta.
 dofus3_data/
 Dofus3 Defuscated Data/
 DofusClient/
 
-# Entornos de desarrollo
+# ─── Herramientas ───────────────────────────────────────────────────────────
+# Los scripts de Python generan los json de datos/ y auditan el tráfico. No se necesitan para
+# ejecutar el emulador.
+tools/
+*.py
+__pycache__/
+
+# ─── Registros y capturas ───────────────────────────────────────────────────
+# Nunca. Llevan nombres de cuentas reales.
+logs/
+*.log
+*.csv
+*.pcapng
+*.hex
+
+# ─── Datos que el emulador no lee ───────────────────────────────────────────
+# Están en el disco por referencia, pero Paths no los resuelve.
+datos/world_entering_3_6_10_10.bin
+datos/characteristics.json
+datos/dofus3_mappings.json
+datos/effects.json
+datos/map_neighbours.json
+
+# ─── Restos de versiones anteriores ─────────────────────────────────────────
+# La especificación técnica es una crónica de 3.893 líneas de cómo se fue descubriendo cada cosa,
+# arrastrada desde la versión 3.6.4.3. Tiene valor para quien la escribió, pero no es una
+# referencia y mezcla cosas que ya no valen, así que se queda en local y no se publica. Lo que
+# sirve para consultar está en los demás documentos de docs/.
+docs/EspecificacionTecnica.md
+# Y este no es documentación de Jondo: es el README de UnityInspectorStandalone, una herramienta
+# externa que se usó para inspeccionar el cliente en tiempo de ejecución. Se queda en local como
+# referencia de trabajo, pero en el repositorio solo despista.
+docs/UnityInspectorReadme.md
+out.txt
+mock_server.db
+*_old.cs
+scratch_*
+
+# ─── Entornos de desarrollo ─────────────────────────────────────────────────
 .vs/
 .idea/
 .vscode/
-__pycache__/
 *.user
 *.suo

@@ -1,0 +1,3089 @@
+{
+ "1": {
+  "name": "Corte del Jalató Real",
+  "minLevel": 20,
+  "optimalLevel": 30,
+  "difficulty": 2,
+  "entrance": 120063489,
+  "exit": 120063489,
+  "rooms": [
+   121373185,
+   121374209,
+   121375233,
+   121373187,
+   121374211
+  ],
+  "bosses": [
+   147
+  ]
+ },
+ "3": {
+  "name": "Biblioteca del Maestro Cuerbok",
+  "minLevel": 100,
+  "optimalLevel": 110,
+  "difficulty": 3,
+  "entrance": 158334976,
+  "exit": 158334976,
+  "rooms": [
+   159125512,
+   159124488,
+   159121666
+  ],
+  "bosses": [
+   289
+  ]
+ },
+ "4": {
+  "name": "Centro del Laberinto del Minotauroro",
+  "minLevel": 110,
+  "optimalLevel": 120,
+  "difficulty": 2,
+  "entrance": 34473220,
+  "exit": 34476294,
+  "rooms": [
+   34473476,
+   34473474
+  ],
+  "bosses": [
+   121
+  ]
+ },
+ "6": {
+  "name": "Antro del Dragocerdo",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 2,
+  "entrance": 72221696,
+  "exit": 72221696,
+  "rooms": [
+   72355840,
+   72356864,
+   72357888,
+   72358912,
+   72359936,
+   72360960,
+   72361984,
+   72359170,
+   72358146,
+   72352768,
+   72353792,
+   72351744,
+   72354816
+  ],
+  "bosses": [
+   113
+  ]
+ },
+ "7": {
+  "name": "Antro de Cocabulia",
+  "minLevel": 110,
+  "optimalLevel": 120,
+  "difficulty": 2,
+  "entrance": 198967296,
+  "exit": 86248450,
+  "rooms": [
+   198968320,
+   198969344,
+   198970368,
+   198971392,
+   198972416
+  ],
+  "bosses": [
+   854
+  ]
+ },
+ "8": {
+  "name": "Granero del Girasol Hambriento",
+  "minLevel": 10,
+  "optimalLevel": 20,
+  "difficulty": 2,
+  "entrance": 192937992,
+  "exit": 192937992,
+  "rooms": [
+   190448640,
+   190317568,
+   190318592,
+   190449664,
+   190316544
+  ],
+  "bosses": [
+   799
+  ]
+ },
+ "9": {
+  "name": "Territorio Ancestral",
+  "minLevel": 80,
+  "optimalLevel": 90,
+  "difficulty": 3,
+  "entrance": 147851777,
+  "exit": 147851777,
+  "rooms": [
+   149684224,
+   149685248,
+   149686272,
+   149687296,
+   149688320
+  ],
+  "bosses": [
+   173
+  ]
+ },
+ "10": {
+  "name": "Claro del Roble Blando",
+  "minLevel": 130,
+  "optimalLevel": 140,
+  "difficulty": 3,
+  "entrance": 149422080,
+  "exit": 149422080,
+  "rooms": [
+   149423104,
+   149424128,
+   149425152,
+   149426176,
+   149427200
+  ],
+  "bosses": [
+   257
+  ]
+ },
+ "11": {
+  "name": "Enclave de los Blops",
+  "minLevel": 50,
+  "optimalLevel": 60,
+  "difficulty": 1,
+  "entrance": 166985728,
+  "exit": 166985728,
+  "rooms": [
+   166990848,
+   166985730,
+   166986754,
+   166987778,
+   166988802,
+   166989826,
+   166986752,
+   166987776,
+   166988800,
+   166989824
+  ],
+  "bosses": [
+   1184,
+   1186,
+   1187,
+   1185
+  ]
+ },
+ "13": {
+  "name": "Mazmorra de los Bworks",
+  "minLevel": 40,
+  "optimalLevel": 50,
+  "difficulty": 2,
+  "entrance": 104862211,
+  "exit": 104862211,
+  "rooms": [
+   104599041,
+   104599043,
+   104595969,
+   104596993,
+   104598017,
+   104595971,
+   104596995
+  ],
+  "bosses": [
+   792
+  ]
+ },
+ "14": {
+  "name": "Cueva de Bworker",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 2,
+  "entrance": 172493057,
+  "exit": 172493057,
+  "rooms": [
+   104333825,
+   104334849,
+   104335873,
+   104336897,
+   104333827
+  ],
+  "bosses": [
+   478
+  ]
+ },
+ "15": {
+  "name": "Guarida del Maxilubo",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 4,
+  "entrance": 171706891,
+  "exit": 171706891,
+  "rooms": [
+   155719680,
+   155715584,
+   155716610,
+   155717632,
+   155713536,
+   155714560,
+   155716608,
+   155718656
+  ],
+  "bosses": [
+   232
+  ]
+ },
+ "17": {
+  "name": "Madriguera del Wey Wabbit",
+  "minLevel": 70,
+  "optimalLevel": 80,
+  "difficulty": 2,
+  "entrance": 106694158,
+  "exit": 68420613,
+  "rooms": [
+   116654593,
+   116655617,
+   116656641,
+   116657665,
+   116654595
+  ],
+  "bosses": [
+   3460
+  ]
+ },
+ "18": {
+  "name": "Picos Rocosos de los Crujidores",
+  "minLevel": 60,
+  "optimalLevel": 70,
+  "difficulty": 3,
+  "entrance": 185861634,
+  "exit": 185861634,
+  "rooms": [
+   106958848,
+   106959872,
+   106955776,
+   106956800,
+   106957824,
+   106960896,
+   106959874,
+   106957826,
+   106957828,
+   106954752
+  ],
+  "bosses": [
+   669
+  ]
+ },
+ "19": {
+  "name": "Castillo de Arena",
+  "minLevel": 10,
+  "optimalLevel": 20,
+  "difficulty": 1,
+  "entrance": 190056961,
+  "exit": 190056961,
+  "rooms": [
+   193726464,
+   193727488,
+   193728512,
+   193729536,
+   193727490,
+   193725440
+  ],
+  "bosses": [
+   928
+  ]
+ },
+ "21": {
+  "name": "Mazmorra de los Herreros",
+  "minLevel": 40,
+  "optimalLevel": 50,
+  "difficulty": 2,
+  "entrance": 88086786,
+  "exit": 88086786,
+  "rooms": [
+   87295489,
+   87296513,
+   87297537,
+   87294467,
+   87295491,
+   87296515,
+   87294469,
+   87295493,
+   87296517,
+   87294471,
+   87297541,
+   87294465
+  ],
+  "bosses": [
+   252
+  ]
+ },
+ "22": {
+  "name": "Templo del Gran Ugah",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 3,
+  "entrance": 181146624,
+  "exit": 181146624,
+  "rooms": [
+   182327297,
+   182326273,
+   182325249,
+   182324225,
+   182323201,
+   182323203,
+   182322177,
+   182322179,
+   182190081,
+   182191105,
+   182192129
+  ],
+  "bosses": [
+   1159
+  ]
+ },
+ "24": {
+  "name": "La Gelexta Dimensión",
+  "minLevel": 50,
+  "optimalLevel": 60,
+  "difficulty": 2,
+  "entrance": 88084997,
+  "exit": 88084997,
+  "rooms": [
+   98566661,
+   98567685,
+   98568709,
+   98566663,
+   98567687,
+   98568705,
+   98566657,
+   98567681,
+   98566659,
+   98567683,
+   98568707
+  ],
+  "bosses": [
+   58,
+   430,
+   86,
+   85
+  ]
+ },
+ "25": {
+  "name": "Gruta Grut'Hesqua",
+  "minLevel": 40,
+  "optimalLevel": 50,
+  "difficulty": 2,
+  "entrance": 161295,
+  "exit": 161295,
+  "rooms": [
+   5244416,
+   5242883,
+   5244419,
+   5242886,
+   5243139
+  ],
+  "bosses": [
+   1027
+  ]
+ },
+ "27": {
+  "name": "Pueblo Kaníbola",
+  "minLevel": 50,
+  "optimalLevel": 60,
+  "difficulty": 1,
+  "entrance": 156499971,
+  "exit": 156499971,
+  "rooms": [
+   157549568,
+   157550592,
+   157551616,
+   157552640,
+   157548544
+  ],
+  "bosses": [
+   2960
+  ]
+ },
+ "28": {
+  "name": "Canopea del Kimbo",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 4,
+  "entrance": 25693696,
+  "exit": 25693696,
+  "rooms": [
+   21497856,
+   21499904,
+   21496834,
+   21497858,
+   21495808
+  ],
+  "bosses": [
+   1045
+  ]
+ },
+ "30": {
+  "name": "Cueva del Trankitronko",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 3,
+  "entrance": 139784,
+  "exit": 139265,
+  "rooms": [
+   107218944,
+   107219968,
+   107220992,
+   107222016,
+   107223040,
+   107224064,
+   107217920,
+   107225088,
+   107226112,
+   107227136,
+   107228160,
+   107216896
+  ],
+  "bosses": [
+   670
+  ]
+ },
+ "31": {
+  "name": "Antro del Kralamar Gigante",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 4,
+  "entrance": 162056,
+  "exit": 162056,
+  "rooms": [
+   26739712,
+   26740736,
+   26738688
+  ],
+  "bosses": [
+   423
+  ]
+ },
+ "32": {
+  "name": "Nido de Kwoknan",
+  "minLevel": 40,
+  "optimalLevel": 50,
+  "difficulty": 3,
+  "entrance": 185861122,
+  "exit": 185861122,
+  "rooms": [
+   64750592,
+   64751616,
+   64752640,
+   64753664,
+   64749568
+  ],
+  "bosses": [
+   2995
+  ]
+ },
+ "33": {
+  "name": "Mazmorra de las Larvas",
+  "minLevel": 40,
+  "optimalLevel": 50,
+  "difficulty": 1,
+  "entrance": 96993793,
+  "exit": 185862148,
+  "rooms": [
+   96994817,
+   96995841,
+   96996865,
+   96997889,
+   96997891,
+   96998913,
+   96998915,
+   96993797,
+   96994821,
+   96995845,
+   96996869,
+   96996871,
+   96997893,
+   96997895,
+   96998917
+  ],
+  "bosses": [
+   457
+  ]
+ },
+ "34": {
+  "name": "Mansión Encantada",
+  "minLevel": 30,
+  "optimalLevel": 40,
+  "difficulty": 2,
+  "entrance": 139723265,
+  "exit": 139723265,
+  "rooms": [
+   163581440,
+   163582464,
+   163579392,
+   163580416,
+   163578368
+  ],
+  "bosses": [
+   2975
+  ]
+ },
+ "35": {
+  "name": "Laboratorio de Brumen Tinctorias",
+  "minLevel": 60,
+  "optimalLevel": 70,
+  "difficulty": 1,
+  "entrance": 177079296,
+  "exit": 177079296,
+  "rooms": [
+   176950272,
+   176951296,
+   176948224,
+   176949248,
+   176947200
+  ],
+  "bosses": [
+   3100
+  ]
+ },
+ "36": {
+  "name": "Mazmorra de Nawidad",
+  "minLevel": 40,
+  "optimalLevel": 50,
+  "difficulty": 2,
+  "entrance": 66061569,
+  "exit": 66061569,
+  "rooms": [
+   66586112,
+   66587136,
+   66588160,
+   66589184,
+   66585088
+  ],
+  "bosses": [
+   1179
+  ]
+ },
+ "37": {
+  "name": "Cueva de Nawidad",
+  "minLevel": 100,
+  "optimalLevel": 110,
+  "difficulty": 2,
+  "entrance": 66192641,
+  "exit": 66192641,
+  "rooms": [
+   66847744,
+   66848768,
+   66849792,
+   66850816,
+   66846720
+  ],
+  "bosses": [
+   1194
+  ]
+ },
+ "38": {
+  "name": "Casa de Chanta Klaus",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 3,
+  "entrance": 66060545,
+  "exit": 66060545,
+  "rooms": [
+   66323456,
+   66324480,
+   66325504,
+   66326528,
+   66322432
+  ],
+  "bosses": [
+   872
+  ]
+ },
+ "39": {
+  "name": "Cala del Arca de Otomai",
+  "minLevel": 60,
+  "optimalLevel": 70,
+  "difficulty": 3,
+  "entrance": 22546944,
+  "exit": 22546944,
+  "rooms": [
+   22283264,
+   22282242,
+   22283266,
+   22284290,
+   22282240
+  ],
+  "bosses": [
+   1051
+  ]
+ },
+ "41": {
+  "name": "Boca del Rasgabola",
+  "minLevel": 100,
+  "optimalLevel": 110,
+  "difficulty": 3,
+  "entrance": 89916416,
+  "exit": 89916416,
+  "rooms": [
+   22806530,
+   22807554,
+   22808578,
+   22809602,
+   22808576
+  ],
+  "bosses": [
+   1071
+  ]
+ },
+ "42": {
+  "name": "Despensa de la Rata Blanca",
+  "minLevel": 100,
+  "optimalLevel": 110,
+  "difficulty": 1,
+  "entrance": 216402698,
+  "exit": 218632194,
+  "rooms": [
+   218632192,
+   218631168,
+   218630144,
+   218629120,
+   218628096
+  ],
+  "bosses": [
+   940
+  ]
+ },
+ "43": {
+  "name": "Raratonera de la Rata Negra",
+  "minLevel": 100,
+  "optimalLevel": 110,
+  "difficulty": 2,
+  "entrance": 216927751,
+  "exit": 218894338,
+  "rooms": [
+   218894336,
+   218891264,
+   218892288,
+   218893312,
+   218890240
+  ],
+  "bosses": [
+   939
+  ]
+ },
+ "44": {
+  "name": "Guarida de Sfinter Cell",
+  "minLevel": 140,
+  "optimalLevel": 150,
+  "difficulty": 3,
+  "entrance": 101714451,
+  "exit": 101714451,
+  "rooms": [
+   102760961,
+   102761985,
+   102763009,
+   102764033,
+   102760963
+  ],
+  "bosses": [
+   943
+  ]
+ },
+ "45": {
+  "name": "Mazmorra de los Escarahojas",
+  "minLevel": 30,
+  "optimalLevel": 40,
+  "difficulty": 2,
+  "entrance": 88080387,
+  "exit": 88080899,
+  "rooms": [
+   94110720,
+   94111744,
+   94112768,
+   94113792,
+   94114816,
+   94115840,
+   94109696,
+   94111746
+  ],
+  "bosses": [
+   797
+  ]
+ },
+ "46": {
+  "name": "Guarida de Skonk",
+  "minLevel": 110,
+  "optimalLevel": 120,
+  "difficulty": 3,
+  "entrance": 63310595,
+  "exit": 63310595,
+  "rooms": [
+   107486208,
+   107483136,
+   107485184,
+   107479040,
+   107480064,
+   107481088,
+   107482112,
+   107484160
+  ],
+  "bosses": [
+   780
+  ]
+ },
+ "47": {
+  "name": "Mazmorra de los Esqueletos",
+  "minLevel": 30,
+  "optimalLevel": 40,
+  "difficulty": 1,
+  "entrance": 87032320,
+  "exit": 82314753,
+  "rooms": [
+   87032322,
+   87033346,
+   87033344,
+   87035394,
+   87034368,
+   87035392
+  ],
+  "bosses": [
+   3238
+  ]
+ },
+ "48": {
+  "name": "Mazmorra de los Tofus",
+  "minLevel": 30,
+  "optimalLevel": 40,
+  "difficulty": 2,
+  "entrance": 96338944,
+  "exit": 88082705,
+  "rooms": [
+   96206852,
+   96338946,
+   96206850,
+   96206848,
+   96207874,
+   96208898,
+   96209922
+  ],
+  "bosses": [
+   800
+  ]
+ },
+ "49": {
+  "name": "Antro del Blop Multicolor Real",
+  "minLevel": 110,
+  "optimalLevel": 120,
+  "difficulty": 3,
+  "entrance": 166985728,
+  "exit": 166985728,
+  "rooms": [
+   166990850
+  ],
+  "bosses": [
+   1188
+  ]
+ },
+ "50": {
+  "name": "Tofullinero Real",
+  "minLevel": 110,
+  "optimalLevel": 120,
+  "difficulty": 2,
+  "entrance": 96338944,
+  "exit": 10231814,
+  "rooms": [
+   96209926,
+   96207876,
+   96206854,
+   96207878,
+   96208902,
+   96338948,
+   96338950
+  ],
+  "bosses": [
+   382
+  ]
+ },
+ "51": {
+  "name": "Laboratorio del Tynril",
+  "minLevel": 130,
+  "optimalLevel": 140,
+  "difficulty": 3,
+  "entrance": 63964672,
+  "exit": 63964672,
+  "rooms": [
+   89391106,
+   89394178,
+   89392130,
+   89391104,
+   89392128
+  ],
+  "bosses": [
+   1087,
+   1072,
+   1085,
+   1086
+  ]
+ },
+ "52": {
+  "name": "Castillo del Wey Wabbit",
+  "minLevel": 50,
+  "optimalLevel": 60,
+  "difficulty": 3,
+  "entrance": 99614979,
+  "exit": 99614979,
+  "rooms": [
+   116392450,
+   116392448,
+   116393472,
+   116394496,
+   116395520
+  ],
+  "bosses": [
+   180
+  ]
+ },
+ "53": {
+  "name": "Sala del Minotot",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 2,
+  "entrance": 34473476,
+  "exit": 34476294,
+  "rooms": [
+   34472450
+  ],
+  "bosses": [
+   827
+  ]
+ },
+ "54": {
+  "name": "Invernáculo de Jalamut Real",
+  "minLevel": 110,
+  "optimalLevel": 120,
+  "difficulty": 2,
+  "entrance": 54176049,
+  "exit": 54175024,
+  "rooms": [
+   55050242,
+   55052290,
+   55052288,
+   55050240,
+   55053312
+  ],
+  "bosses": [
+   2854
+  ]
+ },
+ "55": {
+  "name": "Excavación de Morsagüino Real",
+  "minLevel": 130,
+  "optimalLevel": 140,
+  "difficulty": 1,
+  "entrance": 55836672,
+  "exit": 55836672,
+  "rooms": [
+   56099840,
+   56100864,
+   56101888,
+   56102912,
+   56098816
+  ],
+  "bosses": [
+   2848
+  ]
+ },
+ "56": {
+  "name": "Restos del Roca Negra",
+  "minLevel": 140,
+  "optimalLevel": 150,
+  "difficulty": 1,
+  "entrance": 54163796,
+  "exit": 54165334,
+  "rooms": [
+   56360960,
+   56361984,
+   56363008,
+   56364032,
+   56365056
+  ],
+  "bosses": [
+   2877
+  ]
+ },
+ "57": {
+  "name": "Hipogeo del Obsidiantre",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 2,
+  "entrance": 56890883,
+  "exit": 54170450,
+  "rooms": [
+   57279745,
+   57149697,
+   57151233,
+   57152769,
+   57154305,
+   57155841,
+   57148161
+  ],
+  "bosses": [
+   2924
+  ]
+ },
+ "58": {
+  "name": "Guarida de los Gélifux",
+  "minLevel": 160,
+  "optimalLevel": 170,
+  "difficulty": 2,
+  "entrance": 59510784,
+  "exit": 60031488,
+  "rooms": [
+   59517186,
+   59516928,
+   59517952,
+   59518976,
+   59511808,
+   59515138,
+   59516162,
+   59512832,
+   59513856,
+   59514880,
+   59515904
+  ],
+  "bosses": [
+   2967,
+   3234
+  ]
+ },
+ "59": {
+  "name": "Antro del Cil",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 3,
+  "entrance": 60036612,
+  "exit": 60036612,
+  "rooms": [
+   62916608,
+   62917632,
+   62918656,
+   62919680,
+   62915584
+  ],
+  "bosses": [
+   2968
+  ]
+ },
+ "60": {
+  "name": "Cavernas de Tejossus",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 1,
+  "entrance": 54164293,
+  "exit": 54164807,
+  "rooms": [
+   61867008,
+   61868032,
+   61868034,
+   61868036,
+   61998084,
+   61998082,
+   61998338,
+   61998340,
+   61865984
+  ],
+  "bosses": [
+   2986,
+   2992
+  ]
+ },
+ "61": {
+  "name": "Antecámara de los Golosotes",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 3,
+  "entrance": 62129672,
+  "exit": 54165323,
+  "rooms": [
+   62131720,
+   62132744,
+   62133768,
+   62134792,
+   62130696,
+   62135816
+  ],
+  "bosses": [
+   2864
+  ]
+ },
+ "62": {
+  "name": "Mazmorra de la Mina de Kéfriho",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 2,
+  "entrance": 54159661,
+  "exit": 54159661,
+  "rooms": [
+   57935617,
+   57936641,
+   57937665,
+   57938689,
+   57934593
+  ],
+  "bosses": [
+   2942
+  ]
+ },
+ "66": {
+  "name": "Huerto de Haluín",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 1,
+  "entrance": 101187584,
+  "exit": 101187584,
+  "rooms": [
+   101191680,
+   101192704,
+   101193728,
+   101188608,
+   101189632,
+   101190656
+  ],
+  "bosses": [
+   3306
+  ]
+ },
+ "67": {
+  "name": "Transportador de Sylargh",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 1,
+  "entrance": 108793118,
+  "exit": 108793118,
+  "rooms": [
+   110101506,
+   110102528,
+   110100480,
+   110101504,
+   110103552,
+   110100482
+  ],
+  "bosses": [
+   3409
+  ]
+ },
+ "68": {
+  "name": "Sala Privada de Klim",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 1,
+  "entrance": 108925717,
+  "exit": 108925717,
+  "rooms": [
+   110365696,
+   110362624,
+   110363648,
+   110364672,
+   110362626,
+   110363650
+  ],
+  "bosses": [
+   3384
+  ]
+ },
+ "69": {
+  "name": "Forjafría de Mizz Frizz",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 2,
+  "entrance": 108927238,
+  "exit": 108927238,
+  "rooms": [
+   109838849,
+   109839873,
+   109840897,
+   109841921,
+   109840899
+  ],
+  "bosses": [
+   3391
+  ]
+ },
+ "70": {
+  "name": "Laboratorio de Nileza",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 2,
+  "entrance": 108794630,
+  "exit": 108794630,
+  "rooms": [
+   109576705,
+   109577729,
+   109578753,
+   109579777,
+   109576707
+  ],
+  "bosses": [
+   3397
+  ]
+ },
+ "71": {
+  "name": "Mazmorra del Conde Kontatrás",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 112460048,
+  "exit": 112460048,
+  "rooms": [
+   112201987,
+   112203265,
+   112203269,
+   112203271,
+   112203521,
+   112204545,
+   112204289,
+   112204293,
+   112204295,
+   112198145,
+   112199169,
+   112200193,
+   112201217,
+   112202241,
+   112203523
+  ],
+  "bosses": [
+   3416
+  ]
+ },
+ "72": {
+  "name": "Teatro de Dramak",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 5,
+  "entrance": 117965057,
+  "exit": 117965057,
+  "rooms": [
+   118231040,
+   118229250,
+   118229252,
+   118226944,
+   118227968,
+   118228992,
+   118230016
+  ],
+  "bosses": [
+   3476
+  ]
+ },
+ "73": {
+  "name": "Acuadomo de Merkator",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 1,
+  "entrance": 117706767,
+  "exit": 117706767,
+  "rooms": [
+   119276033,
+   119277057,
+   119278081,
+   119276035,
+   119277059
+  ],
+  "bosses": [
+   3534
+  ]
+ },
+ "74": {
+  "name": "Pirámide de Sombra",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 2,
+  "entrance": 121636870,
+  "exit": 121636870,
+  "rooms": [
+   123210752,
+   123211776,
+   123207680,
+   123208704,
+   123209728,
+   123212800
+  ],
+  "bosses": [
+   3564
+  ]
+ },
+ "75": {
+  "name": "Gruta de Kanígrula",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 4,
+  "entrance": 125829633,
+  "exit": 125829633,
+  "rooms": [
+   125830657,
+   125831681,
+   125829635,
+   125830659,
+   125831683
+  ],
+  "bosses": [
+   3556
+  ]
+ },
+ "76": {
+  "name": "Palacio del Rey Nidas",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 1,
+  "entrance": 129499136,
+  "exit": 129236992,
+  "rooms": [
+   129500160
+  ],
+  "bosses": [
+   3648
+  ]
+ },
+ "77": {
+  "name": "Fábrica de Malefíscof",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 2,
+  "entrance": 130285568,
+  "exit": 129368578,
+  "rooms": [
+   130286592
+  ],
+  "bosses": [
+   3652
+  ]
+ },
+ "79": {
+  "name": "Galería de Perfósil",
+  "minLevel": 140,
+  "optimalLevel": 150,
+  "difficulty": 2,
+  "entrance": 130547712,
+  "exit": 129238529,
+  "rooms": [
+   130548736
+  ],
+  "bosses": [
+   3651
+  ]
+ },
+ "80": {
+  "name": "Pajarera de Thor Pestruz",
+  "minLevel": 120,
+  "optimalLevel": 130,
+  "difficulty": 4,
+  "entrance": 133171202,
+  "exit": 133171202,
+  "rooms": [
+   132910080,
+   132911104,
+   132907008,
+   132908032,
+   132909056
+  ],
+  "bosses": [
+   3618
+  ]
+ },
+ "81": {
+  "name": "Ring del Capitán Eskarlata",
+  "minLevel": 120,
+  "optimalLevel": 130,
+  "difficulty": 2,
+  "entrance": 136577024,
+  "exit": 134221826,
+  "rooms": [
+   136578048
+  ],
+  "bosses": [
+   3753
+  ]
+ },
+ "82": {
+  "name": "Cueva de Toxoliat",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 3,
+  "entrance": 136839168,
+  "exit": 135269891,
+  "rooms": [
+   136840192
+  ],
+  "bosses": [
+   3752
+  ]
+ },
+ "83": {
+  "name": "Trono de la Corte Tenebrosa",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 136056074,
+  "exit": 136056074,
+  "rooms": [
+   137102336,
+   137101312
+  ],
+  "bosses": [
+   3726
+  ]
+ },
+ "84": {
+  "name": "Vientre de la Ballena",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 140641537,
+  "exit": 140641537,
+  "rooms": [
+   140776448,
+   140773376,
+   140771328,
+   140772352,
+   140774400,
+   140775424
+  ],
+  "bosses": [
+   3828
+  ]
+ },
+ "85": {
+  "name": "Megalito de Fraktal",
+  "minLevel": 110,
+  "optimalLevel": 120,
+  "difficulty": 4,
+  "entrance": 144969990,
+  "exit": 144969990,
+  "rooms": [
+   143138823
+  ],
+  "bosses": [
+   3852
+  ]
+ },
+ "86": {
+  "name": "Relojarium de XLII",
+  "minLevel": 160,
+  "optimalLevel": 170,
+  "difficulty": 2,
+  "entrance": 144707846,
+  "exit": 144707846,
+  "rooms": [
+   143917569
+  ],
+  "bosses": [
+   3849
+  ]
+ },
+ "87": {
+  "name": "Ojo de Vórtex",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 144445702,
+  "exit": 144445702,
+  "rooms": [
+   143393281
+  ],
+  "bosses": [
+   3835
+  ]
+ },
+ "88": {
+  "name": "Escondrijo de Blatarata",
+  "minLevel": 30,
+  "optimalLevel": 40,
+  "difficulty": 3,
+  "entrance": 146676736,
+  "exit": 103549440,
+  "rooms": [
+   146672640,
+   146672898,
+   146675712,
+   146674688,
+   146673664,
+   146671616,
+   146670592
+  ],
+  "bosses": [
+   3945
+  ]
+ },
+ "89": {
+  "name": "Guarida de Lasoberaña",
+  "minLevel": 80,
+  "optimalLevel": 90,
+  "difficulty": 4,
+  "entrance": 149159936,
+  "exit": 147853312,
+  "rooms": [
+   149160960,
+   149161984,
+   149163008,
+   149164032,
+   149165056
+  ],
+  "bosses": [
+   3996
+  ]
+ },
+ "90": {
+  "name": "Cripta de Chadalid",
+  "minLevel": 1,
+  "optimalLevel": 10,
+  "difficulty": 1,
+  "entrance": 153881600,
+  "exit": 153881600,
+  "rooms": [
+   152829952,
+   152830976,
+   152832000,
+   152833024,
+   152834048
+  ],
+  "bosses": [
+   4051
+  ]
+ },
+ "91": {
+  "name": "Navío de Le Chuko",
+  "minLevel": 80,
+  "optimalLevel": 90,
+  "difficulty": 2,
+  "entrance": 158078976,
+  "exit": 158078976,
+  "rooms": [
+   157024256,
+   157025280,
+   157026304,
+   157027328,
+   157028352
+  ],
+  "bosses": [
+   230
+  ]
+ },
+ "92": {
+  "name": "Árbol de Moon",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 3,
+  "entrance": 156499968,
+  "exit": 156499968,
+  "rooms": [
+   157290496,
+   157286400,
+   157287424,
+   157288448,
+   157289472
+  ],
+  "bosses": [
+   226
+  ]
+ },
+ "93": {
+  "name": "Miausoleo de Piojoporojo",
+  "minLevel": 100,
+  "optimalLevel": 110,
+  "difficulty": 3,
+  "entrance": 161742848,
+  "exit": 161744896,
+  "rooms": [
+   161743872
+  ],
+  "bosses": [
+   4278
+  ]
+ },
+ "94": {
+  "name": "Plataforma de Ush",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 3,
+  "entrance": 160960771,
+  "exit": 162006016,
+  "rooms": [
+   162004992
+  ],
+  "bosses": [
+   4264
+  ]
+ },
+ "95": {
+  "name": "Reto de Miauvizor",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 160565248,
+  "exit": 160432128,
+  "rooms": [
+   160564224
+  ],
+  "bosses": [
+   4263
+  ]
+ },
+ "96": {
+  "name": "Templo Maldito de Araknas",
+  "minLevel": 176,
+  "optimalLevel": 186,
+  "difficulty": 3,
+  "entrance": 182452224,
+  "exit": 172757504,
+  "rooms": [
+   182453248,
+   182456320,
+   182454272,
+   182455296
+  ],
+  "bosses": []
+ },
+ "97": {
+  "name": "Nave del Capitán Meno",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 2,
+  "entrance": 169084930,
+  "exit": 169084930,
+  "rooms": [
+   169869312,
+   169870336,
+   169871360,
+   169872384,
+   169873408
+  ],
+  "bosses": [
+   4460
+  ]
+ },
+ "98": {
+  "name": "Templo de Kutulú",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 168560640,
+  "exit": 168560640,
+  "rooms": [
+   169345024,
+   169346048,
+   169347072,
+   169348096,
+   169349120
+  ],
+  "bosses": [
+   4453
+  ]
+ },
+ "99": {
+  "name": "Palacio de Dientinea",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 1,
+  "entrance": 168820736,
+  "exit": 168820736,
+  "rooms": [
+   169607168,
+   169608192,
+   169609216,
+   169610240,
+   169611264
+  ],
+  "bosses": [
+   4444
+  ]
+ },
+ "100": {
+  "name": "Cementerio de los Mastodontes",
+  "minLevel": 70,
+  "optimalLevel": 80,
+  "difficulty": 2,
+  "entrance": 173280513,
+  "exit": 173280513,
+  "rooms": [
+   174326272,
+   174327296,
+   174328320,
+   174329344,
+   174330368
+  ],
+  "bosses": [
+   4621
+  ]
+ },
+ "101": {
+  "name": "Caverna de El Piko",
+  "minLevel": 120,
+  "optimalLevel": 130,
+  "difficulty": 1,
+  "entrance": 173540352,
+  "exit": 173540352,
+  "rooms": [
+   174067200,
+   174068736,
+   174070272,
+   174064128,
+   174065664
+  ],
+  "bosses": [
+   4609
+  ]
+ },
+ "102": {
+  "name": "Tripas de Anelidón",
+  "minLevel": 160,
+  "optimalLevel": 170,
+  "difficulty": 5,
+  "entrance": 174850048,
+  "exit": 174850048,
+  "rooms": [
+   175902208,
+   176030208,
+   175899136,
+   175900160,
+   175901184
+  ],
+  "bosses": [
+   4726
+  ]
+ },
+ "103": {
+  "name": "Cámara de Tal Kasha",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 175637504,
+  "exit": 175637504,
+  "rooms": [
+   176160768,
+   176161792,
+   176162816,
+   176163840,
+   176164864
+  ],
+  "bosses": [
+   4744
+  ]
+ },
+ "104": {
+  "name": "Campamento del Conde Razof",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 4,
+  "entrance": 179438082,
+  "exit": 179438082,
+  "rooms": [
+   179572736,
+   179568640,
+   179569664,
+   179570688,
+   179571712
+  ],
+  "bosses": [
+   4803
+  ]
+ },
+ "105": {
+  "name": "Carpa de los Magik Riktus",
+  "minLevel": 80,
+  "optimalLevel": 90,
+  "difficulty": 3,
+  "entrance": 181797888,
+  "exit": 181797888,
+  "rooms": [
+   181670912,
+   181665792,
+   181666816,
+   181667840,
+   181668864,
+   181669888
+  ],
+  "bosses": [
+   4860
+  ]
+ },
+ "106": {
+  "name": "Mansión de Kuatropatas",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 2,
+  "entrance": 179831808,
+  "exit": 179831808,
+  "rooms": [
+   182714368,
+   182715392,
+   182716416,
+   182717440,
+   182718464
+  ],
+  "bosses": [
+   4882
+  ]
+ },
+ "107": {
+  "name": "Mirador de Ilyzaelle",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 183501836,
+  "exit": 183501836,
+  "rooms": [
+   184688385,
+   184687361,
+   184686337,
+   184690945,
+   184689921
+  ],
+  "bosses": [
+   4967
+  ]
+ },
+ "108": {
+  "name": "Torre de Bethel",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 186384896,
+  "exit": 186384896,
+  "rooms": [
+   187432960,
+   187433984,
+   187435008,
+   187436032,
+   187437056
+  ],
+  "bosses": [
+   5110
+  ]
+ },
+ "109": {
+  "name": "Torre de Solar",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 183108098,
+  "exit": 183108098,
+  "rooms": [
+   187957506,
+   187957508,
+   187957248,
+   187957510,
+   187957512
+  ],
+  "bosses": [
+   5100
+  ]
+ },
+ "110": {
+  "name": "Cervecería del Rey Dazahk",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 2,
+  "entrance": 194779138,
+  "exit": 194779138,
+  "rooms": [
+   195035136,
+   195036160,
+   195037184,
+   195038208,
+   195039232
+  ],
+  "bosses": [
+   5319
+  ]
+ },
+ "111": {
+  "name": "Templo del Dios Kao",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 197133314,
+  "exit": 197133314,
+  "rooms": [
+   197660672,
+   197659648,
+   197658624,
+   197657600,
+   197656576
+  ],
+  "bosses": [
+   5666
+  ]
+ },
+ "112": {
+  "name": "Crocantería",
+  "minLevel": 120,
+  "optimalLevel": 130,
+  "difficulty": 4,
+  "entrance": 197526528,
+  "exit": 197526528,
+  "rooms": [
+   197394432,
+   197395456,
+   197396480,
+   197397504,
+   197398528
+  ],
+  "bosses": [
+   5664
+  ]
+ },
+ "113": {
+  "name": "Fundición de los Waddictos",
+  "minLevel": 50,
+  "optimalLevel": 60,
+  "difficulty": 1,
+  "entrance": 196346371,
+  "exit": 196346371,
+  "rooms": [
+   106430464,
+   106431488,
+   106432512,
+   106433536,
+   106434560
+  ],
+  "bosses": [
+   5653
+  ]
+ },
+ "114": {
+  "name": "Santuario de Torkelonia",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 197918722,
+  "exit": 197918722,
+  "rooms": [
+   198705152,
+   198706176,
+   198707200,
+   198708224,
+   198709248
+  ],
+  "bosses": [
+   5806
+  ]
+ },
+ "115": {
+  "name": "Guarida de Karnozor",
+  "minLevel": 90,
+  "optimalLevel": 100,
+  "difficulty": 2,
+  "entrance": 84411905,
+  "exit": 199495682,
+  "rooms": [
+   199491584,
+   199492608,
+   199493632,
+   199494656,
+   199495680
+  ],
+  "bosses": [
+   5819
+  ]
+ },
+ "116": {
+  "name": "Prueba de Dragenerys",
+  "minLevel": 60,
+  "optimalLevel": 70,
+  "difficulty": 2,
+  "entrance": 84411397,
+  "exit": 84411397,
+  "rooms": [
+   199753728,
+   199754752,
+   199755776,
+   199756800,
+   199757824
+  ],
+  "bosses": [
+   5823
+  ]
+ },
+ "117": {
+  "name": "Árbol de Muerte",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 201328640,
+  "exit": 201328640,
+  "rooms": [
+   202637312,
+   202638336,
+   202639360,
+   202640384,
+   202641408
+  ],
+  "bosses": [
+   6026
+  ]
+ },
+ "118": {
+  "name": "Cadenas de la Tiranía",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 5,
+  "entrance": 202115584,
+  "exit": 202115584,
+  "rooms": [
+   203161600,
+   203162624,
+   203163648,
+   203164672,
+   203165696
+  ],
+  "bosses": [
+   5955
+  ]
+ },
+ "119": {
+  "name": "Sentencia de la Balanza",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 201851392,
+  "exit": 201851392,
+  "rooms": [
+   203423744,
+   203424768,
+   203425792,
+   203426816,
+   203427840
+  ],
+  "bosses": [
+   5990
+  ]
+ },
+ "120": {
+  "name": "Trono de Sangre",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 2,
+  "entrance": 201591809,
+  "exit": 201591809,
+  "rooms": [
+   202375168,
+   202376192,
+   202377216,
+   202378240,
+   202379264
+  ],
+  "bosses": [
+   6014
+  ]
+ },
+ "121": {
+  "name": "Tormenta del Selocalipsis",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 3,
+  "entrance": 204604416,
+  "exit": 204604416,
+  "rooms": [
+   204472320,
+   204473344,
+   204474368,
+   204475392,
+   204476416
+  ],
+  "bosses": [
+   6014,
+   5955,
+   5990,
+   6026
+  ]
+ },
+ "122": {
+  "name": "Dojo del Viento",
+  "minLevel": 130,
+  "optimalLevel": 140,
+  "difficulty": 2,
+  "entrance": 209191685,
+  "exit": 209191685,
+  "rooms": [
+   207880192,
+   207881216,
+   207882240,
+   207883264,
+   207884288
+  ],
+  "bosses": [
+   6204,
+   6212
+  ]
+ },
+ "123": {
+  "name": "Valle de la Dama del Agua",
+  "minLevel": 120,
+  "optimalLevel": 130,
+  "difficulty": 2,
+  "entrance": 204999425,
+  "exit": 204999425,
+  "rooms": [
+   208142336,
+   208143360,
+   208144384,
+   208145408,
+   208146432
+  ],
+  "bosses": [
+   6256
+  ]
+ },
+ "124": {
+  "name": "Fábrica de Fux Artificiales",
+  "minLevel": 130,
+  "optimalLevel": 140,
+  "difficulty": 5,
+  "entrance": 206177797,
+  "exit": 206177797,
+  "rooms": [
+   208404480,
+   208405504,
+   208406528,
+   208407552,
+   208408576
+  ],
+  "bosses": [
+   6249
+  ]
+ },
+ "125": {
+  "name": "Bambusería de Kodámade",
+  "minLevel": 100,
+  "optimalLevel": 110,
+  "difficulty": 2,
+  "entrance": 205521925,
+  "exit": 205521925,
+  "rooms": [
+   208666624,
+   208667648,
+   208668672,
+   208669696,
+   208670720
+  ],
+  "bosses": [
+   6326
+  ]
+ },
+ "126": {
+  "name": "Taller de Tanukui San",
+  "minLevel": 120,
+  "optimalLevel": 130,
+  "difficulty": 3,
+  "entrance": 205260802,
+  "exit": 205260802,
+  "rooms": [
+   208928768,
+   208929792,
+   208930816,
+   208931840,
+   208932864
+  ],
+  "bosses": [
+   6218
+  ]
+ },
+ "131": {
+  "name": "Casa de los Espíritus",
+  "minLevel": 160,
+  "optimalLevel": 170,
+  "difficulty": 4,
+  "entrance": 207095299,
+  "exit": 207095299,
+  "rooms": [
+   210239488,
+   210240512,
+   210241536,
+   210242560,
+   210243584
+  ],
+  "bosses": [
+   6394
+  ]
+ },
+ "132": {
+  "name": "Tumba del Shogun Tofugawa",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 4,
+  "entrance": 206832641,
+  "exit": 206832641,
+  "rooms": [
+   209977344,
+   209978368,
+   209979392,
+   209980416,
+   209981440
+  ],
+  "bosses": [
+   6388
+  ]
+ },
+ "133": {
+  "name": "Memoria de Orukam",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 210633732,
+  "exit": 211552256,
+  "rooms": [
+   211551232,
+   211550208
+  ],
+  "bosses": [
+   6472
+  ]
+ },
+ "134": {
+  "name": "Recuerdo de Imagiro",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 210765572,
+  "exit": 211552256,
+  "rooms": [
+   211813376,
+   211812352
+  ],
+  "bosses": [
+   6478
+  ]
+ },
+ "135": {
+  "name": "Ritual de Kabaal",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 5,
+  "entrance": 214961664,
+  "exit": 214961664,
+  "rooms": [
+   215482368,
+   215483392,
+   215484416,
+   215485440,
+   215486464
+  ],
+  "bosses": [
+   6654
+  ]
+ },
+ "136": {
+  "name": "Batalla de la Aurora Púrpura",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 5,
+  "entrance": 219939328,
+  "exit": 219939328,
+  "rooms": [
+   220463104,
+   220464128,
+   220465152,
+   220466176,
+   220467200
+  ],
+  "bosses": [
+   6792
+  ]
+ },
+ "138": {
+  "name": "Akademia de los Goblins",
+  "minLevel": 30,
+  "optimalLevel": 40,
+  "difficulty": 2,
+  "entrance": 104071939,
+  "exit": 104071939,
+  "rooms": [
+   221774336,
+   221775360,
+   221776384,
+   221777408,
+   221778432
+  ],
+  "bosses": [
+   6903
+  ]
+ },
+ "139": {
+  "name": "Túmulo del Largo Sueño",
+  "minLevel": 140,
+  "optimalLevel": 150,
+  "difficulty": 4,
+  "entrance": 221250562,
+  "exit": 221250562,
+  "rooms": [
+   220725761,
+   220726785,
+   220727809,
+   220728833,
+   220729857
+  ],
+  "bosses": [
+   107
+  ]
+ },
+ "140": {
+  "name": "Cámara de los Maleficios",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 4,
+  "entrance": 224660233,
+  "exit": 223875074,
+  "rooms": [
+   223870976,
+   223872000,
+   223873024,
+   223874048,
+   223875072
+  ],
+  "bosses": [
+   7210
+  ]
+ },
+ "141": {
+  "name": "Bastión de los Martilloseco",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 5,
+  "entrance": 225313792,
+  "exit": 225185794,
+  "rooms": [
+   225181696,
+   225182720,
+   225183744,
+   225184768,
+   225185792
+  ],
+  "bosses": [
+   7219
+  ]
+ },
+ "142": {
+  "name": "Refugio Silvestre",
+  "minLevel": 40,
+  "optimalLevel": 50,
+  "difficulty": 2,
+  "entrance": 223350028,
+  "exit": 224137218,
+  "rooms": [
+   224133120,
+   224134144,
+   224135168,
+   224136192,
+   224137216
+  ],
+  "bosses": [
+   7197
+  ]
+ },
+ "143": {
+  "name": "Expedición - Tofullinero Real",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600129,
+   239601153
+  ],
+  "bosses": []
+ },
+ "144": {
+  "name": "Expedición - Corte del Jalató Real",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   232784389,
+   232785413
+  ],
+  "bosses": []
+ },
+ "145": {
+  "name": "Expedición - Claro del Roble Blando",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239605249,
+   239606273
+  ],
+  "bosses": []
+ },
+ "146": {
+  "name": "Expedición - Mazmorra de los Herreros",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239607809,
+   239608833
+  ],
+  "bosses": []
+ },
+ "147": {
+  "name": "Expedición - Antro de Cocabulia",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600132,
+   239601156
+  ],
+  "bosses": []
+ },
+ "148": {
+  "name": "Expedición - Centro del Laberinto del Minotauroro",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239603716
+  ],
+  "bosses": []
+ },
+ "149": {
+  "name": "Expedición - Biblioteca del Maestro Cuerbok",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239605252,
+   239606276
+  ],
+  "bosses": []
+ },
+ "150": {
+  "name": "Expedición - Granero del Girasol Hambriento",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239607812,
+   239608836
+  ],
+  "bosses": []
+ },
+ "151": {
+  "name": "Expedición - Antro del Blop Multicolor Real",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239601159
+  ],
+  "bosses": []
+ },
+ "152": {
+  "name": "Expedición - Raratonera de la Rata Negra",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239603719
+  ],
+  "bosses": []
+ },
+ "153": {
+  "name": "Expedición - Mazmorra de los Bworks",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239606279,
+   239605255
+  ],
+  "bosses": []
+ },
+ "154": {
+  "name": "Expedición - Picos Rocosos de los Crujidores",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239607815,
+   239608839
+  ],
+  "bosses": []
+ },
+ "155": {
+  "name": "Expedición - Despensa de la Rata Blanca",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600138,
+   239601162
+  ],
+  "bosses": []
+ },
+ "156": {
+  "name": "Expedición - Guarida del Maxilubo",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239603722
+  ],
+  "bosses": []
+ },
+ "157": {
+  "name": "Expedición - Mazmorra de los Esqueletos",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   232786435,
+   232787459
+  ],
+  "bosses": []
+ },
+ "158": {
+  "name": "Expedición - Cueva del Trankitronko",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239608842
+  ],
+  "bosses": []
+ },
+ "159": {
+  "name": "Expedición - Árbol de Moon",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600141,
+   239601165
+  ],
+  "bosses": []
+ },
+ "160": {
+  "name": "Expedición - Castillo de Arena",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239602701,
+   239603725
+  ],
+  "bosses": []
+ },
+ "161": {
+  "name": "Expedición - Mazmorra de los Escarahojas",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239606285
+  ],
+  "bosses": []
+ },
+ "162": {
+  "name": "Expedición - Antro del Dragocerdo",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239608845
+  ],
+  "bosses": []
+ },
+ "163": {
+  "name": "Puesto de Control del Bzupervibzor",
+  "minLevel": 160,
+  "optimalLevel": 170,
+  "difficulty": 3,
+  "entrance": 235668239,
+  "exit": 235668239,
+  "rooms": [
+   236978176
+  ],
+  "bosses": [
+   8052
+  ]
+ },
+ "164": {
+  "name": "Coto del Venerable",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 2,
+  "entrance": 235147011,
+  "exit": 235147011,
+  "rooms": [
+   236454912
+  ],
+  "bosses": [
+   8047
+  ]
+ },
+ "165": {
+  "name": "Altar de la Despedazadora",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 5,
+  "entrance": 235405571,
+  "exit": 235405571,
+  "rooms": [
+   236717056
+  ],
+  "bosses": [
+   8037
+  ]
+ },
+ "166": {
+  "name": "Expedición de Audacia - Cueva de Bworker",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600145,
+   239601169
+  ],
+  "bosses": []
+ },
+ "167": {
+  "name": "Expedición de Audacia - Sala de Minotot",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239603729
+  ],
+  "bosses": []
+ },
+ "168": {
+  "name": "Expedición de Audacia - Mazmorra de la Mina de Kéfriho",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239605265,
+   239606289
+  ],
+  "bosses": []
+ },
+ "169": {
+  "name": "Expedición de Audacia - Sala Privada de Klim",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239607825,
+   239608849
+  ],
+  "bosses": []
+ },
+ "170": {
+  "name": "Expedición de Audacia - Forjafría de Mizz Frizz",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600148,
+   239601172
+  ],
+  "bosses": []
+ },
+ "171": {
+  "name": "Expedición de Audacia - Mazmorra del Conde Kontatrás",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239602708,
+   239603732
+  ],
+  "bosses": []
+ },
+ "172": {
+  "name": "Expedición de Audacia - Acuadomo de Merkator",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239605268,
+   239606292
+  ],
+  "bosses": []
+ },
+ "173": {
+  "name": "Expedición de Audacia - Pirámide de Sombra",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239607837,
+   239608861
+  ],
+  "bosses": []
+ },
+ "174": {
+  "name": "Expedición de Audacia - Gruta de Kanígrula",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239607828,
+   239608852
+  ],
+  "bosses": []
+ },
+ "175": {
+  "name": "Expedición de Audacia - Galería de Perfósil",
+  "minLevel": 140,
+  "optimalLevel": 150,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239601175
+  ],
+  "bosses": []
+ },
+ "176": {
+  "name": "Expedición de Audacia - Cueva de Toxoliat",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239603735
+  ],
+  "bosses": []
+ },
+ "177": {
+  "name": "Expedición de Audacia - Vientre de la Ballena",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239605271,
+   239606295
+  ],
+  "bosses": []
+ },
+ "178": {
+  "name": "Expedición de Audacia - Relojarium de XLII",
+  "minLevel": 160,
+  "optimalLevel": 170,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239608855
+  ],
+  "bosses": []
+ },
+ "179": {
+  "name": "Expedición de Audacia - Nave del Capitán Meno",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600154,
+   239601178
+  ],
+  "bosses": []
+ },
+ "180": {
+  "name": "Expedición de Audacia - Templo de Kutulú",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239602714,
+   239603738
+  ],
+  "bosses": []
+ },
+ "181": {
+  "name": "Expedición de Audacia - Palacio de Dientinea",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239605274,
+   239606298
+  ],
+  "bosses": []
+ },
+ "182": {
+  "name": "Expedición de Audacia - Mirador de Ilyzaelle",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239607834,
+   239608858
+  ],
+  "bosses": []
+ },
+ "183": {
+  "name": "Expedición de Audacia - Torre de Solar",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239600157,
+   239601181
+  ],
+  "bosses": []
+ },
+ "184": {
+  "name": "Expedición de Audacia - Cervecería del Rey Dazahk",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239602717,
+   239603741
+  ],
+  "bosses": []
+ },
+ "185": {
+  "name": "Expedición de Audacia - Trono de Sangre",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239605277,
+   239606301
+  ],
+  "bosses": []
+ },
+ "186": {
+  "name": "Expedición de Bravura - Cueva de Bworker",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239610897,
+   239611921
+  ],
+  "bosses": []
+ },
+ "187": {
+  "name": "Expedición de Bravura - Trono de Sangre",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239616029,
+   239617053
+  ],
+  "bosses": []
+ },
+ "188": {
+  "name": "Expedición de Bravura - Cervecería del Rey Dazahk",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239613469,
+   239614493
+  ],
+  "bosses": []
+ },
+ "189": {
+  "name": "Expedición de Bravura - Torre de Solar",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239610909,
+   239611933
+  ],
+  "bosses": []
+ },
+ "190": {
+  "name": "Expedición de Bravura - Mirador de Ilyzaelle",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239618586,
+   239619610
+  ],
+  "bosses": []
+ },
+ "191": {
+  "name": "Expedición de Bravura - Palacio de Dientinea",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239616026,
+   239617050
+  ],
+  "bosses": []
+ },
+ "192": {
+  "name": "Expedición de Bravura - Templo de Kutulú",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239613466,
+   239614490
+  ],
+  "bosses": []
+ },
+ "193": {
+  "name": "Expedición de Bravura - Nave del Capitán Meno",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239610906,
+   239611930
+  ],
+  "bosses": []
+ },
+ "194": {
+  "name": "Expedición de Bravura - Relojarium de XLII",
+  "minLevel": 160,
+  "optimalLevel": 170,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239619607
+  ],
+  "bosses": []
+ },
+ "195": {
+  "name": "Expedición de Bravura - Vientre de la Ballena",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239616023,
+   239617047
+  ],
+  "bosses": []
+ },
+ "196": {
+  "name": "Expedición de Bravura - Cueva de Toxoliat",
+  "minLevel": 170,
+  "optimalLevel": 180,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239614487
+  ],
+  "bosses": []
+ },
+ "197": {
+  "name": "Expedición de Bravura - Galería de Perfósil",
+  "minLevel": 140,
+  "optimalLevel": 150,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239611927
+  ],
+  "bosses": []
+ },
+ "198": {
+  "name": "Expedición de Bravura - Gruta de Kanígrula",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239618580,
+   239619604
+  ],
+  "bosses": []
+ },
+ "199": {
+  "name": "Expedición de Bravura - Pirámide de Sombra",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239618589,
+   239619613
+  ],
+  "bosses": []
+ },
+ "200": {
+  "name": "Expedición de Bravura - Acuadomo de Merkator",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239616020,
+   239617044
+  ],
+  "bosses": []
+ },
+ "201": {
+  "name": "Expedición de Bravura - Mazmorra del Conde Kontatrás",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239613460,
+   239614484
+  ],
+  "bosses": []
+ },
+ "202": {
+  "name": "Expedición de Bravura - Forjafría de Mizz Frizz",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239610900,
+   239611924
+  ],
+  "bosses": []
+ },
+ "203": {
+  "name": "Expedición de Bravura - Sala Privada de Klim",
+  "minLevel": 190,
+  "optimalLevel": 200,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239618577,
+   239619601
+  ],
+  "bosses": []
+ },
+ "204": {
+  "name": "Expedición de Bravura - Mazmorra de la Mina de Kéfriho",
+  "minLevel": 180,
+  "optimalLevel": 190,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239616017,
+   239617041
+  ],
+  "bosses": []
+ },
+ "205": {
+  "name": "Expedición de Bravura - Sala de Minotot",
+  "minLevel": 150,
+  "optimalLevel": 160,
+  "difficulty": 0,
+  "entrance": 239611914,
+  "exit": 239611914,
+  "rooms": [
+   239614481
+  ],
+  "bosses": []
+ }
+}

@@ -27,7 +27,10 @@ namespace Jondo.Unity.Launcher.Network
         public Task<string> auth_getGameToken(string gameSession, int gameId, CancellationToken cancellationToken = default)
         {
             Console.WriteLine($"[Thrift] auth_getGameToken(gameSession: {gameSession}, gameId: {gameId})");
-            return Task.FromResult(Guid.NewGuid().ToString());
+            long accId = HaapiServer.ActiveAccount?.Id ?? 1;
+            string token = Guid.NewGuid().ToString("N");
+            DatabaseManager.SetGameToken(accId, token);
+            return Task.FromResult(token);
         }
 
         public Task<string> settings_get(string gameSession, string key, CancellationToken cancellationToken = default)
@@ -42,8 +45,11 @@ namespace Jondo.Unity.Launcher.Network
         public Task<string> userInfo_get(string gameSession, CancellationToken cancellationToken = default)
         {
             Console.WriteLine($"[Thrift] userInfo_get(gameSession: {gameSession})");
-            string dummyJson = "{\"id\":188940901,\"type\":\"ANKAMA\",\"login\":\"jondo@emulator.com\",\"nickname\":\"CADERNIS\",\"firstname\":\"Jondo\",\"lastname\":\"User\",\"nicknameWithTag\":\"CADERNIS#2026\",\"tag\":\"2026\",\"security\":[\"SHIELD\"],\"addedDate\":\"2026-06-21T22:51:08+02:00\",\"locked\":\"0\",\"parentEmailStatus\":null,\"avatar\":\"https://avatar.ankama.com/users/188940901.png\",\"isGuest\":false,\"isErrored\":false,\"needRefresh\":true,\"isMain\":true,\"active\":true,\"acceptedTermsVersion\":14,\"all\":{\"CGU\":\"14\"},\"gameList\":[{\"isFreeToPlay\":false,\"isFormerSubscriber\":false,\"isSubscribed\":true,\"totalPlayTime\":4065,\"endOfSubscribe\":\"2035-01-01T00:00:00Z\",\"id\":1}]}";
-            return Task.FromResult(dummyJson);
+            long accId = HaapiServer.ActiveAccount?.Id ?? 1;
+            string login = HaapiServer.ActiveAccount?.Login ?? "jondo@emulator.com";
+            string nick = HaapiServer.ActiveAccount?.Nickname ?? "Jondo";
+            string json = $"{{\"id\":{accId},\"type\":\"ANKAMA\",\"login\":\"{login}\",\"nickname\":\"{nick}\",\"firstname\":\"{nick}\",\"lastname\":\"User\",\"nicknameWithTag\":\"{nick}#2026\",\"tag\":\"2026\",\"security\":[\"SHIELD\"],\"addedDate\":\"2026-06-21T22:51:08+02:00\",\"locked\":\"0\",\"parentEmailStatus\":null,\"avatar\":\"https://avatar.ankama.com/users/{accId}.png\",\"isGuest\":false,\"isErrored\":false,\"needRefresh\":true,\"isMain\":true,\"active\":true,\"acceptedTermsVersion\":14,\"all\":{{\"CGU\":\"14\"}},\"gameList\":[{{\"isFreeToPlay\":false,\"isFormerSubscriber\":false,\"isSubscribed\":true,\"totalPlayTime\":4065,\"endOfSubscribe\":\"2035-01-01T00:00:00Z\",\"id\":1}}]}}";
+            return Task.FromResult(json);
         }
 
         public Task<string> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default)
@@ -128,6 +134,7 @@ namespace Jondo.Unity.Launcher.Network
     {
         private static TcpListener? _tcpListener;
         private static bool _isRunning;
+        public static bool IsRunning => _isRunning;
         private static CancellationTokenSource? _cts;
 
         public static void Start(int port)

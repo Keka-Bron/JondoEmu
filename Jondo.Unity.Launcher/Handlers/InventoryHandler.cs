@@ -20,10 +20,10 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         private static readonly Dictionary<int, int> ItemGidToSkinId = new Dictionary<int, int>
         {
-            { 10801, 53375140 },  // Sombrero de papel
-            { 10800, 68293394 },  // Capa de papel
-            { 10798, 84411912 },  // Escudo de papel
-            { 10797, 110287861 }  // Espada de papel
+            { 10801, 53375140 },  // Paper Hat
+            { 10800, 68293394 },  // Paper Cape
+            { 10798, 84411912 },  // Paper Shield
+            { 10797, 110287861 }  // Paper Sword
         };
 
         public static async Task HandleItemMovementRequest(NetworkStream stream, byte[] payload)

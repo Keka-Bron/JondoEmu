@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
@@ -40,11 +40,11 @@ namespace Jondo.Unity.Launcher
                 ";
                 createAccounts.ExecuteNonQuery();
 
-                // Seed default account if empty
+                // Seed the built-in test accounts if the table is empty (credentials below)
                 var seedAccount = authConnection.CreateCommand();
                 seedAccount.CommandText = @"
-                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname)
-                    VALUES (188940901, 'jondo@emulator.com', 'password123', 'Jondo');
+                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname) VALUES (188940901, 'keka', 'test', 'Keka');
+                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname) VALUES (188940902, 'dragonlord', 'test', 'DragonLord');
                 ";
                 seedAccount.ExecuteNonQuery();
             }
@@ -137,17 +137,17 @@ namespace Jondo.Unity.Launcher
                     // Column already exists, ignore
                 }
 
-                // Migración: la columna de experiencia acumulada del personaje.
+                // Migration: the character's accumulated experience column.
                 try
                 {
                     var addXpCmd = worldConnection.CreateCommand();
                     addXpCmd.CommandText = "ALTER TABLE Characters ADD COLUMN Experience INTEGER NOT NULL DEFAULT 0;";
                     addXpCmd.ExecuteNonQuery();
-                    Console.WriteLine("[SQLite] Migración: añadida la columna Experience a Characters.");
+                    Console.WriteLine("[SQLite] Migration: Added Experience column to Characters table.");
                 }
                 catch (Microsoft.Data.Sqlite.SqliteException)
                 {
-                    // Ya existe.
+                    // Already exists.
                 }
 
                 // Migration: Ensure Kamas column exists
@@ -161,6 +161,114 @@ namespace Jondo.Unity.Launcher
                 catch (Microsoft.Data.Sqlite.SqliteException)
                 {
                     // Column already exists, ignore
+                }
+
+                // Servers table. Until now the list came from a fixed binary template, so there
+                // was no way to tell which character lived on which server.
+                //
+                //   Type     what the protocol sends in the server list. It groups servers by
+                //            category; the values come from the real capture.
+                //   Status   what is advertised over HTTP, and what decides the server's colour
+                //            on the selection screen.
+                //   Joinable whether the server accepts connections. Checked here too, not only
+                //            on the client.
+                var createServers = worldConnection.CreateCommand();
+                createServers.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS Servers (
+                        Id INTEGER PRIMARY KEY,
+                        Name TEXT NOT NULL,
+                        Type INTEGER NOT NULL DEFAULT 1,
+                        Status INTEGER NOT NULL DEFAULT 3,
+                        Joinable INTEGER NOT NULL DEFAULT 0,
+                        IsDefault INTEGER NOT NULL DEFAULT 0
+                    );
+                ";
+                createServers.ExecuteNonQuery();
+
+                foreach (string column in new[]
+                         {
+                             "Type INTEGER NOT NULL DEFAULT 1",
+                             "Status INTEGER NOT NULL DEFAULT 3",
+                             "Joinable INTEGER NOT NULL DEFAULT 0"
+                         })
+                {
+                    try
+                    {
+                        var addCmd = worldConnection.CreateCommand();
+                        addCmd.CommandText = $"ALTER TABLE Servers ADD COLUMN {column};";
+                        addCmd.ExecuteNonQuery();
+                    }
+                    catch (Microsoft.Data.Sqlite.SqliteException)
+                    {
+                        // Already exists.
+                    }
+                }
+
+                SeedServers(worldConnection);
+
+                // Migration: which server each character belongs to.
+                try
+                {
+                    var addServerCmd = worldConnection.CreateCommand();
+                    addServerCmd.CommandText =
+                        $"ALTER TABLE Characters ADD COLUMN ServerId INTEGER NOT NULL DEFAULT {DefaultServerId};";
+                    addServerCmd.ExecuteNonQuery();
+                    Console.WriteLine("[SQLite] Migration: Added ServerId column to Characters table.");
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException)
+                {
+                    // Already exists.
+                }
+
+                // Migration: last connection, shown per server on the character list.
+                try
+                {
+                    var addLastConnCmd = worldConnection.CreateCommand();
+                    addLastConnCmd.CommandText = "ALTER TABLE Characters ADD COLUMN LastConnection TEXT;";
+                    addLastConnCmd.ExecuteNonQuery();
+                    Console.WriteLine("[SQLite] Migration: Added LastConnection column to Characters table.");
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException)
+                {
+                    // Already exists.
+                }
+
+                // Migration: head chosen at creation. Its skin travels in the look, and a
+                // character without it is drawn with no face.
+                try
+                {
+                    var addHeadCmd = worldConnection.CreateCommand();
+                    addHeadCmd.CommandText = "ALTER TABLE Characters ADD COLUMN HeadId INTEGER;";
+                    addHeadCmd.ExecuteNonQuery();
+                    Console.WriteLine("[SQLite] Migration: Added HeadId column to Characters table.");
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException)
+                {
+                    // Already exists.
+                }
+
+                FillMissingHeads(worldConnection);
+
+                // A character with no date leaves the server-selection screen empty, so no row is
+                // allowed to stay without one. This covers the characters that already existed
+                // when the column was added.
+                try
+                {
+                    var fillLastConn = worldConnection.CreateCommand();
+                    fillLastConn.CommandText =
+                        "UPDATE Characters SET LastConnection = $now " +
+                        "WHERE LastConnection IS NULL OR LastConnection = '';";
+                    fillLastConn.Parameters.AddWithValue("$now",
+                        DateTimeOffset.Now.ToString(Network.ConnectionProtocol.ConnectionDateFormat));
+                    int filled = fillLastConn.ExecuteNonQuery();
+                    if (filled > 0)
+                    {
+                        Console.WriteLine($"[SQLite] Migration: filled in the last connection of {filled} character(s).");
+                    }
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException ex)
+                {
+                    Console.WriteLine($"[SQLite] Could not fill in the last connection: {ex.Message}");
                 }
 
                 var createItems = worldConnection.CreateCommand();
@@ -189,6 +297,32 @@ namespace Jondo.Unity.Launcher
                 {
                     // Column already exists, ignore
                 }
+
+                // Cuál de cada pareja de hechizo lleva el personaje. Es lo único de los hechizos
+                // que no sale de los datos del cliente: las parejas y los niveles son suyos, pero
+                // la elección es del jugador y tiene que sobrevivir de una sesión a la siguiente.
+                var createSpellChoices = worldConnection.CreateCommand();
+                createSpellChoices.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterSpellChoices (
+                        CharacterId INTEGER NOT NULL,
+                        PairId INTEGER NOT NULL,
+                        SpellId INTEGER NOT NULL,
+                        PRIMARY KEY (CharacterId, PairId)
+                    );
+                ";
+                createSpellChoices.ExecuteNonQuery();
+
+                // Y en qué hueco de la barra puso cada hechizo, por lo mismo.
+                var createSpellBar = worldConnection.CreateCommand();
+                createSpellBar.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterSpellBar (
+                        CharacterId INTEGER NOT NULL,
+                        Slot INTEGER NOT NULL,
+                        SpellId INTEGER NOT NULL,
+                        PRIMARY KEY (CharacterId, Slot)
+                    );
+                ";
+                createSpellBar.ExecuteNonQuery();
 
                 // Seed default character if empty
                 var checkChar = worldConnection.CreateCommand();
@@ -238,6 +372,23 @@ namespace Jondo.Unity.Launcher
                         LeftMapId INTEGER NOT NULL DEFAULT 0,
                         TopMapId INTEGER NOT NULL DEFAULT 0
                     );
+                    CREATE TABLE IF NOT EXISTS Dungeons (
+                        Id INTEGER PRIMARY KEY,
+                        Name TEXT,
+                        MinLevel INTEGER NOT NULL DEFAULT 1,
+                        OptimalLevel INTEGER NOT NULL DEFAULT 1,
+                        Difficulty INTEGER NOT NULL DEFAULT 0,
+                        EntranceMapId INTEGER NOT NULL DEFAULT 0,
+                        ExitMapId INTEGER NOT NULL DEFAULT 0,
+                        Bosses TEXT
+                    );
+                    CREATE TABLE IF NOT EXISTS DungeonRooms (
+                        DungeonId INTEGER NOT NULL,
+                        Position INTEGER NOT NULL,
+                        MapId INTEGER NOT NULL,
+                        PRIMARY KEY (DungeonId, Position)
+                    );
+                    CREATE INDEX IF NOT EXISTS idx_dungeon_rooms_map ON DungeonRooms(MapId);
                 ";
                 createNpcSpawns.ExecuteNonQuery();
 
@@ -313,18 +464,18 @@ namespace Jondo.Unity.Launcher
 
                 if (count == 0)
                 {
-                    Console.WriteLine("[SQLite] Seeded default character CADERNIS.");
+                    Console.WriteLine("[SQLite] Seeded the default character.");
                 }
                 else
                 {
-                    // Migration: Update name if it is "[#CADERNIS#]" or "#CADERNIS#"
+                    // Migration: strip the leftover bracket/hash markers from the seeded name
                     using (var updateCmd = worldConnection.CreateCommand())
                     {
                         updateCmd.CommandText = "UPDATE Characters SET Name = 'CADERNIS' WHERE Name = '[#CADERNIS#]' OR Name = '#CADERNIS#';";
                         int affected = updateCmd.ExecuteNonQuery();
                         if (affected > 0)
                         {
-                            Console.WriteLine("[SQLite] Migration: Updated character name to 'CADERNIS'.");
+                            Console.WriteLine("[SQLite] Migration: Normalized the seeded character name.");
                         }
                     }
 
@@ -336,6 +487,19 @@ namespace Jondo.Unity.Launcher
                         if (cellAffected > 0)
                         {
                             Console.WriteLine("[SQLite] Migration: Unstuck character, moved to Cell 320.");
+                        }
+                    }
+                }
+            }
+
+                    // Migration: Ensure character Breed is 9 (Cra)
+                    using (var updateBreedCmd = worldConnection.CreateCommand())
+                    {
+                        updateBreedCmd.CommandText = "UPDATE Characters SET Breed = 9 WHERE Id = 13825558 AND Breed <> 9;";
+                        int breedAffected = updateBreedCmd.ExecuteNonQuery();
+                        if (breedAffected > 0)
+                        {
+                            Console.WriteLine("[SQLite] Migration: Updated character Breed to 9 (Cra).");
                         }
                     }
                 }
@@ -665,6 +829,36 @@ namespace Jondo.Unity.Launcher
             return (long)command.ExecuteScalar() > 0;
         }
 
+        public static DbAccount? GetAccountById(long accountId)
+        {
+            if (accountId <= 0) return null;
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, Login, Nickname FROM Accounts WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", accountId);
+
+                using var reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new DbAccount
+                    {
+                        Id = reader.GetInt64(0),
+                        Login = reader.GetString(1),
+                        Nickname = reader.GetString(2)
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Error reading account {accountId}: {ex.Message}");
+            }
+            return null;
+        }
+
         public static long GetAccountIdByToken(string token)
         {
             using var connection = new SqliteConnection(AuthConnectionString);
@@ -677,27 +871,188 @@ namespace Jondo.Unity.Launcher
             return result != null ? (long)result : 0;
         }
 
+        // --- Servers ---
+
+        /// <summary>
+        /// The server the emulated world lives on. The client resolves each server's name and
+        /// artwork by id against its own data, so we use one it already knows about.
+        /// </summary>
+        public const int DefaultServerId = 290;
+
+        /// <summary>Where a character starts, and where one goes back to if it ends up nowhere.
+        /// The same values the Characters table gives a new row.</summary>
+        public const long StartingMap = 154010884L;
+        public const int StartingCell = 315;
+
+        /// <summary>Status advertised over HTTP for a server that can be joined.</summary>
+        public const int ServerStatusOnline = 3;
+
+        /// <summary>
+        /// Status of a server that shows up in the list but does not accept connections. This is
+        /// the most likely value according to the classic Dofus enum, where 3 means online; it
+        /// could not be verified against a capture because that traffic is encrypted. If the
+        /// client does not render it as expected, change it with an UPDATE on the Servers table.
+        /// </summary>
+        public const int ServerStatusNoJoin = 4;
+
+        public class DbServer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = "";
+            /// <summary>Server category, exactly as it travels in the protocol's server list.</summary>
+            public int Type { get; set; } = 1;
+            /// <summary>Status advertised over HTTP; decides the colour on the selection screen.</summary>
+            public int Status { get; set; } = ServerStatusOnline;
+            /// <summary>Whether it accepts connections. Checked here, not only on the client.</summary>
+            public bool Joinable { get; set; }
+            public bool IsDefault { get; set; }
+        }
+
+        /// <summary>
+        /// The servers on offer. Only one of them is open: the rest show up in the list but
+        /// cannot be joined, so the screen looks populated without promising worlds that do not
+        /// exist. The ids and their category come from the real capture; the client resolves
+        /// each server's name against its own data.
+        /// </summary>
+        private static void SeedServers(SqliteConnection connection)
+        {
+            // (id, category)
+            var closed = new (int Id, int Type)[]
+            {
+                (291, 1), (292, 1), (293, 1), (294, 1), (295, 0),
+                (350, 3), (351, 3), (352, 3),
+                (353, 2), (354, 2), (355, 2),
+                (99, 4), (50, 5)
+            };
+
+            var open = connection.CreateCommand();
+            open.CommandText =
+                "INSERT OR IGNORE INTO Servers (Id, Name, Type, Status, Joinable, IsDefault) " +
+                "VALUES ($id, $name, 1, $status, 1, 1);";
+            open.Parameters.AddWithValue("$id", DefaultServerId);
+            open.Parameters.AddWithValue("$name", DefaultServerName);
+            open.Parameters.AddWithValue("$status", ServerStatusOnline);
+            open.ExecuteNonQuery();
+
+            foreach (var (id, type) in closed)
+            {
+                var cmd = connection.CreateCommand();
+                cmd.CommandText =
+                    "INSERT OR IGNORE INTO Servers (Id, Name, Type, Status, Joinable, IsDefault) " +
+                    "VALUES ($id, $name, $type, $status, 0, 0);";
+                cmd.Parameters.AddWithValue("$id", id);
+                cmd.Parameters.AddWithValue("$name", "Server " + id);
+                cmd.Parameters.AddWithValue("$type", type);
+                cmd.Parameters.AddWithValue("$status", ServerStatusNoJoin);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>Name of the open server. Only used by the emulator's own logs.</summary>
+        public const string DefaultServerName = "Tal Kasha";
+
+        public static List<DbServer> GetServers()
+        {
+            var list = new List<DbServer>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT Id, Name, Type, Status, Joinable, IsDefault FROM Servers ORDER BY IsDefault DESC, Id;";
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(new DbServer
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        Type = reader.GetInt32(2),
+                        Status = reader.GetInt32(3),
+                        Joinable = reader.GetInt32(4) != 0,
+                        IsDefault = reader.GetInt32(5) != 0
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Error reading the server list: {ex.Message}");
+            }
+
+            // With no table (an old database) we at least offer the open server, which is where
+            // the migration left every character.
+            if (list.Count == 0)
+            {
+                list.Add(new DbServer
+                {
+                    Id = DefaultServerId,
+                    Name = DefaultServerName,
+                    Type = 1,
+                    Status = ServerStatusOnline,
+                    Joinable = true,
+                    IsDefault = true
+                });
+            }
+            return list;
+        }
+
+        /// <summary>Checks that a server exists and accepts connections.</summary>
+        public static bool IsServerJoinable(int serverId)
+        {
+            foreach (var server in GetServers())
+            {
+                if (server.Id == serverId) return server.Joinable;
+            }
+            return false;
+        }
+
         // --- Character Operations ---
 
         public class DbCharacter
         {
             public long Id { get; set; }
+            public long AccountId { get; set; }
+            public int ServerId { get; set; } = DefaultServerId;
             public string Name { get; set; }
             public int Breed { get; set; }
             public int Sex { get; set; }
             public int Level { get; set; }
             public string LookHex { get; set; }
+            /// <summary>ISO date of the last connection, empty if the character never logged in.</summary>
+            public string LastConnection { get; set; } = "";
+            /// <summary>Head chosen at creation. Its skin is part of the look.</summary>
+            public int HeadId { get; set; }
         }
 
-        public static List<DbCharacter> GetCharactersByAccountId(long accountId)
+        /// <summary>
+        /// The characters on an account. If a server is given, only the ones on that server.
+        ///
+        /// There is no fallback of any kind: if the account has no characters, the list comes
+        /// back empty. The fallback that used to be here returned another account's characters
+        /// whenever the query found nothing, which with several accounts meant showing one
+        /// player the characters of another.
+        /// </summary>
+        public static List<DbCharacter> GetCharactersByAccountId(long accountId, int serverId = 0)
         {
             var list = new List<DbCharacter>();
+            if (accountId <= 0) return list;
+
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = "SELECT Id, Name, Breed, Sex, Level, Look FROM Characters WHERE AccountId = $accId;";
+            command.CommandText =
+                "SELECT Id, Name, Breed, Sex, Level, Look, " +
+                "COALESCE(ServerId, $defaultServer), COALESCE(LastConnection, ''), " +
+                "COALESCE(HeadId, 0) " +
+                "FROM Characters WHERE AccountId = $accId" +
+                (serverId > 0 ? " AND COALESCE(ServerId, $defaultServer) = $serverId" : "") +
+                " ORDER BY Id;";
             command.Parameters.AddWithValue("$accId", accountId);
+            command.Parameters.AddWithValue("$defaultServer", DefaultServerId);
+            if (serverId > 0) command.Parameters.AddWithValue("$serverId", serverId);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -705,14 +1060,142 @@ namespace Jondo.Unity.Launcher
                 list.Add(new DbCharacter
                 {
                     Id = reader.GetInt64(0),
+                    AccountId = accountId,
                     Name = reader.GetString(1),
                     Breed = reader.GetInt32(2),
                     Sex = reader.GetInt32(3),
                     Level = reader.GetInt32(4),
-                    LookHex = reader.GetString(5)
+                    LookHex = reader.GetString(5),
+                    ServerId = reader.GetInt32(6),
+                    LastConnection = reader.GetString(7),
+                    HeadId = reader.GetInt32(8)
                 });
             }
+
             return list;
+        }
+
+        /// <summary>One character by id, or null when there is no such character.</summary>
+        public static DbCharacter? GetCharacterById(long characterId)
+        {
+            if (characterId <= 0) return null;
+
+            using var connection = new SqliteConnection(WorldConnectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+                "SELECT Id, AccountId, Name, Breed, Sex, Level, Look, " +
+                "COALESCE(ServerId, $defaultServer), COALESCE(LastConnection, ''), " +
+                "COALESCE(HeadId, 0) " +
+                "FROM Characters WHERE Id = $id;";
+            command.Parameters.AddWithValue("$id", characterId);
+            command.Parameters.AddWithValue("$defaultServer", DefaultServerId);
+
+            using var reader = command.ExecuteReader();
+            if (!reader.Read()) return null;
+
+            return new DbCharacter
+            {
+                Id = reader.GetInt64(0),
+                AccountId = reader.GetInt64(1),
+                Name = reader.GetString(2),
+                Breed = reader.GetInt32(3),
+                Sex = reader.GetInt32(4),
+                Level = reader.GetInt32(5),
+                LookHex = reader.GetString(6),
+                ServerId = reader.GetInt32(7),
+                LastConnection = reader.GetString(8),
+                HeadId = reader.GetInt32(9)
+            };
+        }
+
+        /// <summary>
+        /// Gives a head to the characters that have none. They predate the column, so the one
+        /// their player picked is not recorded anywhere: each gets the first head the creation
+        /// screen offers for its breed and sex, which is what the real client defaults to.
+        /// </summary>
+        private static void FillMissingHeads(SqliteConnection connection)
+        {
+            try
+            {
+                var pending = new List<(long Id, int Breed, int Sex)>();
+
+                var query = connection.CreateCommand();
+                query.CommandText =
+                    "SELECT Id, Breed, Sex FROM Characters WHERE HeadId IS NULL OR HeadId = 0;";
+                using (var reader = query.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        pending.Add((reader.GetInt64(0), reader.GetInt32(1), reader.GetInt32(2)));
+                    }
+                }
+
+                int assigned = 0;
+                foreach (var (id, breed, sex) in pending)
+                {
+                    int headId = Managers.HeadTable.DefaultHeadId(breed, sex);
+                    if (headId <= 0) continue;
+
+                    var update = connection.CreateCommand();
+                    update.CommandText = "UPDATE Characters SET HeadId = $head WHERE Id = $id;";
+                    update.Parameters.AddWithValue("$head", headId);
+                    update.Parameters.AddWithValue("$id", id);
+                    update.ExecuteNonQuery();
+                    assigned++;
+                }
+
+                if (assigned > 0)
+                {
+                    Console.WriteLine($"[SQLite] Migration: assigned a head to {assigned} character(s).");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not assign the missing heads: {ex.Message}");
+            }
+        }
+
+        /// <summary>Records when a character last entered the world.</summary>
+        public static void TouchLastConnection(long characterId)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Characters SET LastConnection = $now WHERE Id = $id;";
+                command.Parameters.AddWithValue("$now",
+                    DateTimeOffset.Now.ToString(Network.ConnectionProtocol.ConnectionDateFormat));
+                command.Parameters.AddWithValue("$id", characterId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Could not update the last connection: {ex.Message}");
+            }
+        }
+
+        /// <summary>Checks that a character really does belong to the account asking for it.</summary>
+        public static bool CharacterBelongsToAccount(long characterId, long accountId)
+        {
+            if (characterId <= 0 || accountId <= 0) return false;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM Characters WHERE Id = $id AND AccountId = $accId;";
+                command.Parameters.AddWithValue("$id", characterId);
+                command.Parameters.AddWithValue("$accId", accountId);
+                return Convert.ToInt64(command.ExecuteScalar() ?? 0L) > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Error checking character ownership: {ex.Message}");
+                return false;
+            }
         }
 
         public static bool LoadCharacter(long characterId)
@@ -737,14 +1220,28 @@ namespace Jondo.Unity.Launcher
                 // Load actual position from the database
                 GameState.MapId = reader.GetInt64(2);
                 GameState.CellId = reader.GetInt32(3);
+
+                // A map the world data does not know is a map the client cannot load either: it
+                // gets the jru, finds nothing, and the character never appears anywhere. It should
+                // not be possible to be standing on one, but a character that got there once stays
+                // there for good, so it is worth catching on the way in.
+                if (MapManager.GetMapInfo(GameState.MapId) == null && MapManager.Maps.Count > 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"[SQLite] {GameState.CharacterName} is on map {GameState.MapId}, " +
+                                      "which is not in the world data. Sending it back to the start.");
+                    Console.ResetColor();
+                    GameState.MapId = StartingMap;
+                    GameState.CellId = StartingCell;
+                }
                 GameState.Orientation = reader.IsDBNull(14) ? 1 : reader.GetInt32(14);
                 GameState.Kamas = reader.IsDBNull(15) ? 0 : reader.GetInt64(15);
 
-                // Si el personaje viene de antes de que existiera la columna, se le da la
-                // experiencia mínima que corresponde a su nivel para que la barra no salga vacía.
-                long xpGuardada = reader.IsDBNull(16) ? 0 : reader.GetInt64(16);
-                long sueloNivel = ExperienceTable.LevelFloor(GameState.CharacterLevel);
-                GameState.Experience = Math.Max(xpGuardada, sueloNivel);
+                // If the character predates the column, give it the minimum experience that
+                // matches its level so the bar does not show up empty.
+                long storedXp = reader.IsDBNull(16) ? 0 : reader.GetInt64(16);
+                long levelFloor = ExperienceTable.LevelFloor(GameState.CharacterLevel);
+                GameState.Experience = Math.Max(storedXp, levelFloor);
                 GameState.CharacterRemainingPoints = reader.GetInt32(4);
                 GameState.StatVitality = reader.GetInt32(5);
                 GameState.StatWisdom = reader.GetInt32(6);
@@ -883,6 +1380,241 @@ namespace Jondo.Unity.Launcher
             command.Parameters.AddWithValue("$pos", item.Position);
             command.Parameters.AddWithValue("$effects", jsonEffects);
             command.ExecuteNonQuery();
+        }
+
+        /// <summary>¿Hay ya alguien con ese nombre? Los nombres son únicos en todo el servidor.</summary>
+        public static bool CharacterNameTaken(string name)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM Characters WHERE Name = $n COLLATE NOCASE;";
+                command.Parameters.AddWithValue("$n", name);
+                return command.ExecuteScalar() is long n && n > 0;
+            }
+            catch { return false; }
+        }
+
+        /// <summary>
+        /// Crea un personaje con lo que trae puesto de fábrica: nivel 1, el conjunto del aventurero
+        /// equipado, un millón de kamas y las características que dan los pergaminos.
+        ///
+        /// El identificador se saca del mayor que haya más uno. Los uid de sus objetos salen de un
+        /// rango propio por personaje, para que no choquen con los de nadie.
+        /// </summary>
+        public static long CreateCharacter(long accountId, int serverId, string name, int breed,
+                                           int sex, int headId, IReadOnlyList<long> colors,
+                                           long mapId, int level, long kamas, int stat,
+                                           IReadOnlyList<(int Gid, int Slot)> starterSet)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var siguiente = connection.CreateCommand();
+                siguiente.CommandText = "SELECT IFNULL(MAX(Id), 1000000) + 1 FROM Characters;";
+                long id = siguiente.ExecuteScalar() is long max ? max : 1000001;
+
+                // La casilla: al lado del zaap, no encima.
+                var zaap = Managers.Interactives.ZaapOf(mapId);
+                int cell = MapManager.GetNearestWalkableCell(mapId, zaap.Cell);
+
+                // Los colores que el cliente manda a -1 son "los de la raza"; se guardan vacíos y
+                // BreedLookTable pone los suyos.
+                var propios = new List<long>();
+                foreach (long c in colors) if (c >= 0) propios.Add(c);
+                byte[] look = Managers.BreedLookTable.BuildLook(breed, sex, headId,
+                                                               propios.Count > 0 ? propios : null);
+
+                using var transaction = connection.BeginTransaction();
+
+                var insertar = connection.CreateCommand();
+                insertar.CommandText = @"
+                    INSERT INTO Characters
+                        (Id, AccountId, Name, Breed, Sex, Level, MapId, CellId, RemainingPoints,
+                         Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look,
+                         Orientation, Kamas)
+                    VALUES ($id, $acc, $name, $breed, $sex, $level, $map, $cell, 0,
+                            $stat, $stat, $stat, $stat, $stat, $stat, $look, 1, $kamas);";
+                insertar.Parameters.AddWithValue("$id", id);
+                insertar.Parameters.AddWithValue("$acc", accountId);
+                insertar.Parameters.AddWithValue("$name", name);
+                insertar.Parameters.AddWithValue("$breed", breed);
+                insertar.Parameters.AddWithValue("$sex", sex);
+                insertar.Parameters.AddWithValue("$level", level);
+                insertar.Parameters.AddWithValue("$map", mapId);
+                insertar.Parameters.AddWithValue("$cell", cell);
+                insertar.Parameters.AddWithValue("$stat", stat);
+                // En hexadecimal, que es como la guardan los que ya estaban. En base64 el cargador
+                // se atraganta: "Additional non-parsable characters are at the end of the string".
+                insertar.Parameters.AddWithValue("$look", Convert.ToHexString(look));
+                insertar.Parameters.AddWithValue("$kamas", kamas);
+                insertar.ExecuteNonQuery();
+
+                SetServerAndHead(connection, id, serverId, headId);
+
+                long uid = id * 1000;
+                foreach (var (gid, slot) in starterSet)
+                {
+                    var objeto = connection.CreateCommand();
+                    objeto.CommandText = "INSERT INTO CharacterItems " +
+                                         "(CharacterId, Uid, Gid, Quantity, Position, Effects) " +
+                                         "VALUES ($id, $uid, $gid, 1, $pos, $e);";
+                    objeto.Parameters.AddWithValue("$id", id);
+                    objeto.Parameters.AddWithValue("$uid", uid++);
+                    objeto.Parameters.AddWithValue("$gid", gid);
+                    objeto.Parameters.AddWithValue("$pos", slot);
+                    objeto.Parameters.AddWithValue("$e", EffectsOfTemplate(connection, gid));
+                    objeto.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+                return id;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se pudo crear el personaje: {ex.Message}");
+                return 0;
+            }
+        }
+
+        /// <summary>El servidor y la cara, que sí tienen columna propia.</summary>
+        private static void SetServerAndHead(SqliteConnection connection, long characterId,
+                                             int serverId, int headId)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = "UPDATE Characters SET ServerId = $s, HeadId = $h WHERE Id = $id;";
+            command.Parameters.AddWithValue("$s", serverId);
+            command.Parameters.AddWithValue("$h", headId);
+            command.Parameters.AddWithValue("$id", characterId);
+            command.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Los efectos de fábrica de una plantilla, en la forma que guarda CharacterItems.
+        ///
+        /// No están sueltos: la plantilla trae en su Data una lista de `rid` y cada uno apunta a una
+        /// fila de ItemEffects con el efecto, el valor y el par de dados. Sin esto, el conjunto del
+        /// aventurero saldría sin una sola característica.
+        ///
+        /// Del sombrero de aventurero salen 118 (fuerza), 126 (inteligencia), 119 (agilidad) y 123
+        /// (suerte), los cuatro con dado 5, que es "de 1 a 5". Se le da el máximo, que es lo que un
+        /// objeto de estreno debería llevar.
+        /// </summary>
+        private static string EffectsOfTemplate(SqliteConnection connection, int gid)
+        {
+            try
+            {
+                var leer = connection.CreateCommand();
+                leer.CommandText = "SELECT Data FROM ItemTemplates WHERE Id = $gid;";
+                leer.Parameters.AddWithValue("$gid", gid);
+                if (leer.ExecuteScalar() is not string data) return "[]";
+
+                using var doc = System.Text.Json.JsonDocument.Parse(data);
+                if (!doc.RootElement.TryGetProperty("possibleEffects", out var posibles)) return "[]";
+                if (!posibles.TryGetProperty("Array", out var lista)) return "[]";
+
+                var salida = new List<string>();
+                foreach (var entrada in lista.EnumerateArray())
+                {
+                    if (!entrada.TryGetProperty("rid", out var rid)) continue;
+
+                    var efecto = connection.CreateCommand();
+                    efecto.CommandText = "SELECT EffectId, DiceNum, DiceSide, Value FROM ItemEffects " +
+                                         "WHERE Rid = $rid;";
+                    efecto.Parameters.AddWithValue("$rid", rid.GetInt64());
+
+                    using var reader = efecto.ExecuteReader();
+                    if (!reader.Read()) continue;
+
+                    int id = reader.GetInt32(0);
+                    int diceNum = reader.GetInt32(1);
+                    int diceSide = reader.GetInt32(2);
+                    int value = reader.GetInt32(3);
+                    if (id == 0) continue;
+
+                    // El valor de estreno: el tope del dado si lo hay, y si no, el fijo.
+                    int fijo = value != 0 ? value : (diceSide != 0 ? diceSide : diceNum);
+                    salida.Add($"[{id},{fijo},0,0]");
+                }
+                return salida.Count > 0 ? "[" + string.Join(",", salida) + "]" : "[]";
+            }
+            catch { }
+            return "[]";
+        }
+
+        /// <summary>
+        /// Mete un objeto nuevo en el inventario de alguien. Lo usa la lotería del merkasako, que es
+        /// lo único que fabrica objetos de la nada.
+        /// </summary>
+        public static bool InsertCharacterItem(long uid, long characterId, int gid, int quantity,
+                                               int position, string? effects)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "INSERT INTO CharacterItems " +
+                                      "(CharacterId, Uid, Gid, Quantity, Position, Effects) " +
+                                      "VALUES ($id, $uid, $gid, $n, $pos, $e);";
+                command.Parameters.AddWithValue("$id", characterId);
+                command.Parameters.AddWithValue("$uid", uid);
+                command.Parameters.AddWithValue("$gid", gid);
+                command.Parameters.AddWithValue("$n", Math.Max(1, quantity));
+                command.Parameters.AddWithValue("$pos", position);
+                command.Parameters.AddWithValue("$e", (object?)effects ?? DBNull.Value);
+                command.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se pudo crear el objeto {uid}: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Destruye un objeto del inventario, entero o por unidades. Devuelve si se ha hecho algo.
+        /// </summary>
+        public static bool DestroyCharacterItem(long characterId, long uid, int quantity)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var leer = connection.CreateCommand();
+                leer.CommandText = "SELECT Quantity FROM CharacterItems WHERE Uid = $uid AND CharacterId = $id;";
+                leer.Parameters.AddWithValue("$uid", uid);
+                leer.Parameters.AddWithValue("$id", characterId);
+                if (leer.ExecuteScalar() is not long tiene) return false;
+
+                var command = connection.CreateCommand();
+                if (quantity <= 0 || quantity >= tiene)
+                {
+                    command.CommandText = "DELETE FROM CharacterItems WHERE Uid = $uid AND CharacterId = $id;";
+                }
+                else
+                {
+                    command.CommandText = "UPDATE CharacterItems SET Quantity = Quantity - $n " +
+                                          "WHERE Uid = $uid AND CharacterId = $id;";
+                    command.Parameters.AddWithValue("$n", quantity);
+                }
+                command.Parameters.AddWithValue("$uid", uid);
+                command.Parameters.AddWithValue("$id", characterId);
+                return command.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se pudo destruir el objeto {uid}: {ex.Message}");
+                return false;
+            }
         }
 
         public static void SaveItemPosition(long uid, int position)
@@ -1655,16 +2387,16 @@ namespace Jondo.Unity.Launcher
             }
             catch { }
 
-            // La columna Monsters.Spells está vacía para los 5134 monstruos: el importador nunca la
-            // rellenó. Los hechizos sí están en MonsterTemplates.Data, junto con el grado que le
-            // corresponde a cada uno. Sin esto la IA se quedaba sin hechizos y recurría a uno
-            // inventado de alcance 6, así que ningún monstruo necesitaba moverse jamás.
+            // The Monsters.Spells column is empty for all 5134 monsters: the importer never filled
+            // it in. The spells are in MonsterTemplates.Data though, along with the grade that
+            // applies to each one. Without this the AI ended up with no spells and fell back to a
+            // made-up one with range 6, so no monster ever had a reason to move.
             //
             //   spells      : {"Array":[626, 4195]}
             //   spellGrades : {"Array":["3,11;3,12;...", "1,11;1,12;..."]}
             //
-            // spellGrades[i] describe el hechizo spells[i]: una entrada "grado,nivel" por cada
-            // grado del monstruo, separadas por ';'.
+            // spellGrades[i] describes the spell spells[i]: one "grade,level" entry per monster
+            // grade, separated by ';'.
             if (stats.SpellIds.Count == 0)
             {
                 try
@@ -1719,14 +2451,14 @@ namespace Jondo.Unity.Launcher
 
             if (stats.SpellIds.Count == 0)
             {
-                Program.LogDebug($"[DatabaseManager] WARN: el monstruo {monsterId} no tiene hechizos ni en Monsters ni en MonsterTemplates.");
+                Program.LogDebug($"[DatabaseManager] WARN: monster {monsterId} has no spells in Monsters nor in MonsterTemplates.");
             }
 
             return stats;
         }
 
-        // Catálogo de efectos (tabla Effects, importada de data_assets_effectsdataroot). Dice qué
-        // característica toca cada effectId; sin él no se puede aplicar nada que no sea daño.
+        // Effect catalogue (Effects table, imported from data_assets_effectsdataroot). It says
+        // which characteristic each effectId touches; without it nothing but damage can be applied.
         private static Dictionary<int, int>? _effectCharacteristics;
 
         private static int GetEffectCharacteristic(int effectId)
@@ -1739,17 +2471,17 @@ namespace Jondo.Unity.Launcher
                     using var conn = new SqliteConnection(WorldConnectionString);
                     conn.Open();
                     using var cmd = conn.CreateCommand();
-                    // Sin filtrar por UseInFight: esa columna vale 0 justo para los efectos que
-                    // nos interesan (el 1079 que quita PA y el 116 que quita alcance) y solo 31
-                    // filas de toda la tabla la tienen a 1, así que no significa "se usa en
-                    // combate". Con el filtro puesto, la Flecha Helada nunca retiraba los 2 PA.
+                    // No filtering by UseInFight: that column is 0 for exactly the effects we care
+                    // about (1079, which removes AP, and 116, which removes range) and only 31
+                    // rows in the whole table have it set to 1, so it does not mean "used in
+                    // combat". With the filter in place, Frozen Arrow never took the 2 AP away.
                     cmd.CommandText = "SELECT Id, Characteristic FROM Effects WHERE Characteristic > 0;";
                     using var rd = cmd.ExecuteReader();
                     while (rd.Read()) map[rd.GetInt32(0)] = rd.IsDBNull(1) ? 0 : rd.GetInt32(1);
                 }
                 catch (Exception ex)
                 {
-                    Program.LogDebug($"[DatabaseManager] No se pudo cargar la tabla Effects: {ex.Message}");
+                    Program.LogDebug($"[DatabaseManager] Could not load the Effects table: {ex.Message}");
                 }
                 _effectCharacteristics = map;
             }
@@ -1757,26 +2489,25 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// El arma equipada, expresada como si fuera un hechizo, para que el golpe con arma pase
-        /// por el mismo camino que un lanzamiento normal.
+        /// The equipped weapon, expressed as if it were a spell, so that a weapon hit goes down
+        /// the same path as a regular cast.
         ///
-        /// El coste en PA y el alcance salen de la ficha del objeto; el daño, de los efectos que
-        /// tiene tirados ese ejemplar concreto. Los efectos 91-95 (robo) y 96-100 (daño) llevan su
-        /// elemento en la propia tabla de efectos del cliente, así que no hace falta ninguna
-        /// correspondencia escrita a mano.
+        /// AP cost and range come from the item template; damage comes from the effects rolled on
+        /// that particular instance. Effects 91-95 (steal) and 96-100 (damage) carry their element
+        /// in the client's own effect table, so no hand-written mapping is needed.
         /// </summary>
         public static SpellCombatData? GetEquippedWeaponAsSpell(long characterId)
         {
-            const int RanuraArma = 1;
-            var arma = LoadInventory(characterId).FirstOrDefault(i => i.Position == RanuraArma);
-            if (arma == null) return null;
+            const int WeaponSlot = 1;
+            var weapon = LoadInventory(characterId).FirstOrDefault(i => i.Position == WeaponSlot);
+            if (weapon == null) return null;
 
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
 
             var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT Data FROM ItemTemplates WHERE Id = $id;";
-            cmd.Parameters.AddWithValue("$id", arma.ItemId);
+            cmd.Parameters.AddWithValue("$id", weapon.ItemId);
             string? json = cmd.ExecuteScalar() as string;
             if (string.IsNullOrEmpty(json)) return null;
 
@@ -1803,8 +2534,8 @@ namespace Jondo.Unity.Launcher
             }
             catch { }
 
-            // Daño del ejemplar equipado. Cada efecto trae su elemento en la tabla Effects.
-            foreach (var kv in arma.Effects)
+            // Damage of the equipped instance. Every effect carries its element in the Effects table.
+            foreach (var kv in weapon.Effects)
             {
                 if (kv.Key < 91 || kv.Key > 100 || kv.Value <= 0) continue;
 
@@ -1824,15 +2555,15 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Hechizos que el personaje tiene disponibles a su nivel.
+        /// The spells the character has available at its level.
         ///
-        /// SpellVariants.SpellIdsJson viene INTERCALADO: hechizo base, su variante, hechizo base,
-        /// su variante... (comprobado con las traducciones: 'Flecha Helada' (base), 'Flecha
-        /// Acosante' (variante), 'Flecha de Pelea' (base)...). Nos quedamos con los de índice par
-        /// y filtramos por el nivel mínimo de cada hechizo.
+        /// SpellVariants.SpellIdsJson comes INTERLEAVED: base spell, its variant, base spell, its
+        /// variant... (checked against the localized spell names, which alternate between a base
+        /// arrow spell and its variant). We keep the even indices and filter by each spell's
+        /// minimum level.
         ///
-        /// La usan tanto el jvn de combate como la barra de accesos directos de roleplay, para
-        /// que el jugador vea la misma lista en los dos sitios.
+        /// Both the combat jvn and the roleplay shortcut bar use this, so the player sees the
+        /// same list in either place.
         /// </summary>
         public static List<int> GetPlayerAvailableSpells(int breedId, int level)
         {
@@ -1843,15 +2574,15 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Tabla de botín de un monstruo, ya resuelta para el grado indicado.
+        /// A monster's loot table, already resolved for the given grade.
         ///
-        /// Sale de MonsterTemplates.Data → drops[], donde cada entrada trae el objeto y su
-        /// probabilidad por grado (percentDropForGrade1..5). Ejemplo del Capiorico Rojo:
-        /// pluma de pío rojo al 100 %, semillas de sésamo al 18 %, bolsita de limones al 3 %.
+        /// It comes from MonsterTemplates.Data → drops[], where every entry carries the item and
+        /// its per-grade probability (percentDropForGrade1..5). Taking the Red Piwi as an example:
+        /// red piwi feather at 100 %, sesame seeds at 18 %, pouch of lemons at 3 %.
         ///
-        /// Se descartan las entradas con criterios (`hasCriterions`), porque son condicionales
-        /// —de misión o de logro— y su lenguaje de criterios ("Qo=13820&amp;PO!19649&amp;…") no está
-        /// implementado. Es preferible no soltarlas a soltarlas siempre.
+        /// Entries with criteria (`hasCriterions`) are discarded, because they are conditional
+        /// — quest or achievement drops — and their criteria language ("Qo=13820&amp;PO!19649&amp;…") is
+        /// not implemented. Never dropping them is preferable to always dropping them.
         /// </summary>
         public static List<MonsterDrop> GetMonsterDrops(int monsterId, int gradeIndex)
         {
@@ -1873,7 +2604,7 @@ namespace Jondo.Unity.Launcher
                     dropsProp.TryGetProperty("Array", out var inner)) dropsProp = inner;
                 if (dropsProp.ValueKind != System.Text.Json.JsonValueKind.Array) return drops;
 
-                // percentDropForGrade1..5; los grados por encima del quinto reutilizan el último.
+                // percentDropForGrade1..5; grades above the fifth reuse the last one.
                 string percentKey = "percentDropForGrade" + Math.Clamp(gradeIndex + 1, 1, 5);
 
                 foreach (var e in dropsProp.EnumerateArray())
@@ -1891,14 +2622,14 @@ namespace Jondo.Unity.Launcher
             }
             catch (Exception ex)
             {
-                Program.LogDebug($"[DatabaseManager] Error leyendo el botín del monstruo {monsterId}: {ex.Message}");
+                Program.LogDebug($"[DatabaseManager] Error reading the loot table of monster {monsterId}: {ex.Message}");
             }
             return drops;
         }
 
         /// <summary>
-        /// Mete un objeto en el inventario. Si ya hay uno del mismo tipo suelto en la bolsa, suma
-        /// a esa pila en vez de crear otra entrada. Devuelve el objeto resultante.
+        /// Puts an item into the inventory. If one of the same kind is already loose in the bag,
+        /// it adds to that stack instead of creating another entry. Returns the resulting item.
         /// </summary>
         public static PlayerItem AddItemToInventory(long characterId, int itemGid, int quantity)
         {
@@ -1966,8 +2697,8 @@ namespace Jondo.Unity.Launcher
                 CriticalHitProbability = reader.IsDBNull(9) ? 0 : reader.GetInt32(9)
             };
 
-            // Daño del golpe crítico. Viene en su propia lista de efectos: la Flecha Helada hace
-            // 12-14 de agua normal y 15-17 en crítico, con el mismo -2 PA.
+            // Critical hit damage. It comes in its own effect list: Frozen Arrow does 12-14 water
+            // normally and 15-17 on a critical, with the same -2 AP.
             try
             {
                 string critJson = reader.IsDBNull(10) ? "" : reader.GetString(10);
@@ -2004,65 +2735,65 @@ namespace Jondo.Unity.Launcher
                             data.BaseDamageMin = e.TryGetProperty("diceNum", out var dn) ? dn.GetInt32() : 5;
                             data.BaseDamageMax = e.TryGetProperty("diceSide", out var ds) ? ds.GetInt32() : 10;
 
-                            // El elemento viene dado en el propio efecto (effectElement). Es el
-                            // mismo número que el cliente espera en el paquete de daño: el hechizo
-                            // 13425 trae effectElement=2 y la captura oficial manda f25.f1=2.
-                            // El switch por effectId solo se usa si falta el campo.
+                            // The element is given by the effect itself (effectElement). It is the
+                            // same number the client expects in the damage packet: spell 13425
+                            // carries effectElement=2 and the official capture sends f25.f1=2.
+                            // The switch on effectId is only used when the field is missing.
                             data.Element = e.TryGetProperty("effectElement", out var ee)
                                 ? ee.GetInt32()
                                 : effectId switch
                                 {
-                                    96 => 3,  // Agua
-                                    97 => 1,  // Tierra
-                                    98 => 4,  // Aire
-                                    99 => 2,  // Fuego
+                                    96 => 3,  // Water
+                                    97 => 1,  // Earth
+                                    98 => 4,  // Air
+                                    99 => 2,  // Fire
                                     100 => 0, // Neutral
                                     _ => 0
                                 };
-                            continue; // seguimos recorriendo: un hechizo puede dañar y además empujar
+                            continue; // keep going: a spell can deal damage and push as well
                         }
 
                         int dice = e.TryGetProperty("diceNum", out var dnum) ? dnum.GetInt32() : 0;
                         int dur = e.TryGetProperty("duration", out var dur0) ? dur0.GetInt32() : 0;
 
-                        // 5 = empujar, 6 = atraer; las casillas van en diceNum.
-                        // La Flecha de Retroceso (32426) es 98 (aire 15-17) + 5 (empuje de 2).
+                        // 5 = push, 6 = pull; the number of cells travels in diceNum.
+                        // Repelling Arrow (32426) is 98 (air 15-17) + 5 (push of 2).
                         if (effectId == 5 || effectId == 6)
                         {
                             if (dice > 0) data.PushDistance = effectId == 5 ? dice : -dice;
                             continue;
                         }
 
-                        // Efecto 293: sube el daño base de un hechizo concreto durante unos turnos
-                        // ("Flecha Helada: +4 de daños básicos - 3 turnos"). El hechizo afectado
-                        // viaja en diceNum, la bonificación en value y los turnos en duration.
+                        // Effect 293: raises the base damage of one specific spell for a few turns
+                        // ("Frozen Arrow: +4 base damage - 3 turns"). The affected spell travels
+                        // in diceNum, the bonus in value and the turns in duration.
                         if (effectId == 293)
                         {
-                            int hechizoAfectado = dice;
-                            int bonif = e.TryGetProperty("value", out var val293) ? val293.GetInt32() : 0;
-                            if (hechizoAfectado > 0 && bonif != 0)
+                            int affectedSpellId = dice;
+                            int bonus = e.TryGetProperty("value", out var val293) ? val293.GetInt32() : 0;
+                            if (affectedSpellId > 0 && bonus != 0)
                             {
                                 data.DamageBuffs.Add(new SpellDamageBuff
                                 {
-                                    SpellId = hechizoAfectado,
-                                    Bonus = bonif,
+                                    SpellId = affectedSpellId,
+                                    Bonus = bonus,
                                     Duration = dur > 0 ? dur : 1
                                 });
                             }
                             continue;
                         }
 
-                        // Cualquier otro efecto que toque una característica del objetivo. La
-                        // característica sale del catálogo de efectos del cliente, no de una
-                        // lista escrita a mano: el 1079 de la Flecha Helada quita PA
-                        // (característica 1) y el 116 del pío quita alcance (característica 19).
-                        int carac = GetEffectCharacteristic(effectId);
-                        if (carac > 0 && dice != 0)
+                        // Any other effect that touches a characteristic of the target. The
+                        // characteristic comes from the client's effect catalogue, not from a
+                        // hand-written list: Frozen Arrow's 1079 removes AP (characteristic 1)
+                        // and the piwi's 116 removes range (characteristic 19).
+                        int characteristic = GetEffectCharacteristic(effectId);
+                        if (characteristic > 0 && dice != 0)
                         {
                             data.StatEffects.Add(new SpellStatEffect
                             {
                                 EffectId = effectId,
-                                Characteristic = carac,
+                                Characteristic = characteristic,
                                 Value = -dice,
                                 Duration = dur
                             });
@@ -2102,11 +2833,11 @@ namespace Jondo.Unity.Launcher
 
             if (spells.Count == 0)
             {
-                // Sin respaldo inventado: si la raza no tiene hechizos en la base de datos es un
-                // problema de datos y hay que verlo, no taparlo con ids de otra clase.
+                // No made-up fallback: if the breed has no spells in the database that is a data
+                // problem and it has to be visible, not papered over with another class's ids.
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[DatabaseManager][WARN] La raza {breedId} no tiene hechizos en SpellVariants. " +
-                                  "El personaje se quedara sin hechizos en combate.");
+                Console.WriteLine($"[DatabaseManager][WARN] Breed {breedId} has no spells in SpellVariants. " +
+                                  "The character will end up with no spells in combat.");
                 Console.ResetColor();
             }
             return spells;
@@ -2268,7 +2999,7 @@ namespace Jondo.Unity.Launcher
         }
         /// <summary>
         /// Minimum character level at which a spell unlocks, per SpellLevels.
-        /// Devuelve 1 si no consta, para no ocultar hechizos por falta de datos.
+        /// Returns 1 when there is no record, so that missing data does not hide spells.
         /// </summary>
         public static int GetSpellMinPlayerLevel(int spellId)
         {
@@ -2287,7 +3018,7 @@ namespace Jondo.Unity.Launcher
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[DatabaseManager] Error leyendo MinPlayerLevel del hechizo {spellId}: {ex.Message}");
+                Console.WriteLine($"[DatabaseManager] Error reading MinPlayerLevel of spell {spellId}: {ex.Message}");
             }
             return 1;
         }
@@ -2316,14 +3047,14 @@ namespace Jondo.Unity.Launcher
         public int GradeXp { get; set; } = 100;
         public List<int> SpellIds { get; set; } = new List<int>();
 
-        /// <summary>Grado (nivel) de cada hechizo del monstruo, indexado por id de hechizo.</summary>
+        /// <summary>Grade (level) of each of the monster's spells, keyed by spell id.</summary>
         public Dictionary<int, int> SpellGrades { get; set; } = new Dictionary<int, int>();
     }
 
     public class MonsterDrop
     {
         public int ObjectId { get; set; }
-        /// <summary>Probabilidad en tanto por ciento para el grado del monstruo.</summary>
+        /// <summary>Drop chance, as a percentage, for the monster's grade.</summary>
         public double PercentDrop { get; set; }
     }
 
@@ -2340,25 +3071,25 @@ namespace Jondo.Unity.Launcher
         public int BaseDamageMax { get; set; } = 10;
         public int BaseDamage => (BaseDamageMin + BaseDamageMax) / 2;
         public int EffectUid { get; set; } = 41870;
-        public int Element { get; set; } = 0; // 0=Neutral, 1=Tierra, 2=Fuego, 3=Agua, 4=Aire
+        public int Element { get; set; } = 0; // 0=Neutral, 1=Earth, 2=Fire, 3=Water, 4=Air
 
         /// <summary>
-        /// Si el hechizo exige línea de visión (castTestLos en los datos del cliente).
+        /// Whether the spell requires line of sight (castTestLos in the client's data).
         /// </summary>
         public bool NeedsLineOfSight { get; set; } = true;
 
-        /// <summary>Solo se puede lanzar en línea recta.</summary>
+        /// <summary>Can only be cast in a straight line.</summary>
         public bool CastInLine { get; set; }
 
         public int MaxCastPerTurn { get; set; }
 
-        /// <summary>Lanzamientos permitidos por turno sobre un MISMO objetivo. 0 = sin límite.</summary>
+        /// <summary>Casts allowed per turn on the SAME target. 0 = no limit.</summary>
         public int MaxCastPerTarget { get; set; }
 
         /// <summary>
-        /// Probabilidad base de golpe crítico, en tanto por ciento. Se le suma el crítico que dé
-        /// el equipo: la Flecha Helada trae 10 y el Dofus Turquesa otros 10, de ahí el 20 % que
-        /// muestra la descripción del hechizo.
+        /// Base critical hit chance, as a percentage. The critical granted by the equipment is
+        /// added on top: Frozen Arrow brings 10 and the Turquoise Dofus another 10, which is
+        /// where the 20 % shown in the spell description comes from.
         /// </summary>
         public int CriticalHitProbability { get; set; }
 
@@ -2366,26 +3097,26 @@ namespace Jondo.Unity.Launcher
         public int CriticalDamageMax { get; set; }
         public bool HasCriticalDamage => CriticalDamageMin > 0 || CriticalDamageMax > 0;
 
-        /// <summary>Casillas de desplazamiento: positivo empuja, negativo atrae. 0 = no mueve.</summary>
+        /// <summary>Cells of displacement: positive pushes, negative pulls. 0 = does not move.</summary>
         public int PushDistance { get; set; }
 
         /// <summary>
-        /// Efectos que modifican una característica del objetivo (quitar PA, quitar alcance,
-        /// bonificaciones...). Cada uno trae ya la característica que le corresponde según el
-        /// catálogo de efectos del cliente.
+        /// Effects that modify a characteristic of the target (removing AP, removing range,
+        /// bonuses...). Each one already carries the characteristic it maps to according to the
+        /// client's effect catalogue.
         /// </summary>
         public List<SpellStatEffect> StatEffects { get; set; } = new List<SpellStatEffect>();
 
-        /// <summary>Bonificaciones de daño base que este hechizo deja puestas al lanzarlo.</summary>
+        /// <summary>Base damage bonuses that this spell leaves in place once cast.</summary>
         public List<SpellDamageBuff> DamageBuffs { get; set; } = new List<SpellDamageBuff>();
     }
 
     public class SpellDamageBuff
     {
-        /// <summary>Hechizo cuyo daño base sube.</summary>
+        /// <summary>The spell whose base damage goes up.</summary>
         public int SpellId { get; set; }
         public int Bonus { get; set; }
-        /// <summary>Turnos que dura desde que se pone.</summary>
+        /// <summary>How many turns it lasts from the moment it is applied.</summary>
         public int Duration { get; set; } = 1;
     }
 

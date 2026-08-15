@@ -56,8 +56,19 @@ namespace Jondo.Unity.Launcher.Network
             var req = ctx.Request;
             var resp = ctx.Response;
             string path = req.Url?.AbsolutePath ?? "/";
+            string clientIp = req.RemoteEndPoint.Address.ToString();
+            if (path != "/")
+            {
+                Console.WriteLine($"[HAAPI] {req.HttpMethod} {path} from {clientIp}");
+            }
 
-            Console.WriteLine($"[HAAPI] {req.HttpMethod} {path}");
+            // The launcher is no longer a web page: it is the native window in the UI folder. All
+            // that is left here are the icons, which a stray request still asks for.
+            if (path == "/favicon.ico" || path == "/icon.ico")
+            {
+                await ServeLauncherStaticFileAsync(path, resp);
+                return;
+            }
 
             // Read request body if present
             string body = "";
@@ -65,8 +76,12 @@ namespace Jondo.Unity.Launcher.Network
             {
                 using var reader = new StreamReader(req.InputStream, req.ContentEncoding);
                 body = await reader.ReadToEndAsync();
-                if (body.Length > 0) Console.WriteLine($"[HAAPI]  body: {body}");
+                if (body.Length > 0 && body.Length < 1000) Console.WriteLine($"[HAAPI]  body: {body}");
             }
+
+            // The /api/login, /api/register, /api/launch, /api/status and /api/logs routes used
+            // to live here. Only the web launcher called them; the native window talks to
+            // LauncherService directly, so they were dead weight with an open door on them.
 
             try
             {
@@ -76,7 +91,6 @@ namespace Jondo.Unity.Launcher.Network
                 resp.ContentType = "application/json; charset=utf-8";
                 resp.ContentLength64 = buf.Length;
                 
-                // Allow the game to talk to us without CORS issues
                 resp.AddHeader("Access-Control-Allow-Origin", "*");
                 resp.AddHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, apikey");
                 await resp.OutputStream.WriteAsync(buf, 0, buf.Length);
@@ -98,6 +112,41 @@ namespace Jondo.Unity.Launcher.Network
             {
                 resp.OutputStream.Close();
             }
+        }
+
+        private static async Task ServeLauncherStaticFileAsync(string path, HttpListenerResponse resp)
+        {
+            string assetsDir = Path.Combine(Paths.Root, "launcher_assets");
+            string filename = Path.GetFileName(path);
+            string filePath = Path.Combine(assetsDir, filename);
+            if (!File.Exists(filePath) && (filename == "favicon.ico" || filename == "icon.ico"))
+            {
+                filePath = Path.Combine(assetsDir, "favicon.ico");
+            }
+
+            if (File.Exists(filePath))
+            {
+                byte[] fileBytes = await File.ReadAllBytesAsync(filePath);
+                resp.StatusCode = 200;
+                string ext = Path.GetExtension(filePath).ToLowerInvariant();
+                resp.ContentType = ext switch
+                {
+                    ".html" => "text/html; charset=utf-8",
+                    ".png" => "image/png",
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".css" => "text/css",
+                    ".js" => "application/javascript",
+                    _ => "application/octet-stream"
+                };
+                resp.ContentLength64 = fileBytes.Length;
+                resp.AddHeader("Access-Control-Allow-Origin", "*");
+                await resp.OutputStream.WriteAsync(fileBytes, 0, fileBytes.Length);
+            }
+            else
+            {
+                resp.StatusCode = 404;
+            }
+            resp.OutputStream.Close();
         }
 
         private static string RouteHaapi(string path, string method, string body)
@@ -124,7 +173,6 @@ namespace Jondo.Unity.Launcher.Network
 
             // Return a tolerant empty JSON response for any other unhandled endpoint
             // (e.g. telemetries like SendEvent) to prevent client-side promise rejection crashes.
-            Console.WriteLine($"[HAAPI Warning] Unhandled endpoint requested: {method} {path}. Returning empty JSON response for safety.");
             return "{}";
         }
 
@@ -156,6 +204,8 @@ namespace Jondo.Unity.Launcher.Network
             }
         }";
 
+        public static DatabaseManager.DbAccount? ActiveAccount { get; set; }
+
         private static string TokenResponse() => System.Text.Json.JsonSerializer.Serialize(new
         {
             token = "eb95866f-8625-47bf-a7ea-3c3ad71bac1d",
@@ -163,44 +213,75 @@ namespace Jondo.Unity.Launcher.Network
             expiration = "2035-01-01T00:00:00Z"
         });
 
-        private static string AccountResponse() => @"{
-            ""id"": 188940901,
-            ""login"": ""jondo@emulator.com"",
-            ""nickname"": ""Jondo"",
-            ""tag"": ""2026"",
-            ""security"": [],
-            ""added_date"": ""2026-06-22T00:00:00Z"",
-            ""locked"": false,
-            ""parental_control"": false,
-            ""avatar"": ""0"",
-            ""fb_id"": null,
-            ""anonymous"": false,
-            ""steam_id"": null,
-            ""google_id"": null,
-            ""apple_id"": null,
-            ""email"": ""jondo@emulator.com"",
-            ""lang"": ""es"",
-            ""country"": ""ES"",
-            ""pioneer"": false
-        }";
+        private static string AccountResponse()
+        {
+            long accId = ActiveAccount?.Id ?? 1;
+            string login = ActiveAccount?.Login ?? "jondo@emulator.com";
+            string nick = ActiveAccount?.Nickname ?? "Jondo";
 
-        private static string GameServerListResponse() => @"{
-            ""servers"": [{
-                ""id"": 401,
-                ""name"": ""Tal Kasha"",
-                ""type"": 1,
-                ""status"": 3,
-                ""completion"": 1,
-                ""is_mono"": false,
-                ""characters"": 1,
-                ""date"": ""2026-06-22T00:00:00Z""
-            }]
-        }";
+            return $@"{{
+                ""id"": {accId},
+                ""login"": ""{login}"",
+                ""nickname"": ""{nick}"",
+                ""tag"": ""2026"",
+                ""security"": [],
+                ""added_date"": ""2026-06-22T00:00:00Z"",
+                ""locked"": false,
+                ""parental_control"": false,
+                ""avatar"": ""0"",
+                ""fb_id"": null,
+                ""anonymous"": false,
+                ""steam_id"": null,
+                ""google_id"": null,
+                ""apple_id"": null,
+                ""email"": ""{login}@emulator.com"",
+                ""lang"": ""es"",
+                ""country"": ""ES"",
+                ""pioneer"": false
+            }}";
+        }
+
+        /// <summary>
+        /// Server list over HTTP. It comes from the same table as the protocol one, so that both
+        /// say the same thing: this one used to advertise a server the other did not even have.
+        /// The status here is what decides how each server is drawn on the selection screen; only
+        /// the open one is reported as online.
+        /// </summary>
+        private static string GameServerListResponse()
+        {
+            long accId = ActiveAccount?.Id ?? 0;
+            var characters = DatabaseManager.GetCharactersByAccountId(accId);
+
+            var servers = new List<object>();
+            foreach (var server in DatabaseManager.GetServers())
+            {
+                int charactersOnServer = 0;
+                foreach (var c in characters)
+                {
+                    if (c.ServerId == server.Id) charactersOnServer++;
+                }
+
+                servers.Add(new
+                {
+                    id = server.Id,
+                    name = server.Name,
+                    type = server.Type,
+                    status = server.Status,
+                    completion = 1,
+                    is_mono = false,
+                    characters = charactersOnServer,
+                    date = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+                });
+            }
+
+            return System.Text.Json.JsonSerializer.Serialize(new { servers });
+        }
 
         private static string GameTokenResponse()
         {
+            long accId = ActiveAccount?.Id ?? 1;
             string token = Guid.NewGuid().ToString("N");
-            DatabaseManager.SetGameToken(188940901, token);
+            DatabaseManager.SetGameToken(accId, token);
 
             return System.Text.Json.JsonSerializer.Serialize(new
             {

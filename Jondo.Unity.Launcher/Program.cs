@@ -1,10 +1,9 @@
-using Jondo.Unity.Launcher.Data;
-using Jondo.Unity.Launcher.Handlers;
-using Jondo.Unity.Launcher.Network;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Launcher.Handlers;
 
 namespace Jondo.Unity.Launcher
 {
@@ -19,6 +18,7 @@ namespace Jondo.Unity.Launcher
 
         static async Task Main(string[] args)
         {
+            ConsoleLogBuffer.Initialize();
             try { Console.Clear(); } catch { }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("======================================================================");
@@ -33,7 +33,6 @@ namespace Jondo.Unity.Launcher
             // 1. Initialize Database and Map Manager
             Console.WriteLine("[+] Initializing Database...");
             DatabaseManager.Initialize();
-            RegressionGuardTests.Run();
 
             Console.WriteLine("[+] Initializing MobSpawnManager...");
             Managers.MobSpawnManager.InitializeAndSpawnAll();
@@ -41,20 +40,31 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[+] Initializing Map Manager...");
             MapManager.Initialize();
             ExperienceTable.Initialize();
+            Managers.SpellTable.Initialize();
+            Managers.BreedStatCost.Initialize();
+            Managers.DungeonManager.Initialize();
+            Managers.EffectTable.Initialize();
+            Managers.ItemSets.Initialize();
+            Managers.EffectFields.Initialize();
+            Managers.Interactives.Initialize();
+            Managers.HavenBagStore.Initialize();
+            Managers.Wardrobe.Initialize();
+            Managers.Titles.Initialize();
+            Managers.Cosmetics.Initialize();
+            Managers.Merkasako.Initialize();
+            Managers.Mounts.Initialize();
 
             Console.WriteLine("[+] Registering Fight Packet Handlers...");
             Handlers.FightHandler.RegisterHandlers();
 
-            string breedDumpPath =
-                Path.Combine(
-                    AppContext.BaseDirectory,
-                    "Data",
-                    "breed_dump.txt"
-                );
+            Console.WriteLine("[+] Loading the world entry blocks...");
+            WorldEntry.Initialize();
 
-            BreedAppearanceDatabase.Load(
-                breedDumpPath
-            );
+            // After the blocks and not before: part of what the check compares against the capture
+            // is read out of them, the characteristic containers among it.
+            RegressionGuardTests.Run();
+
+
 
             // 3. Start Emulation Servers
             Console.WriteLine("[+] Starting services...");
@@ -79,100 +89,76 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("Type /help for a list of developer commands.\n");
             Console.ResetColor();
 
-            // 4. Automatically launch Dofus Client if present with injected environment variables
-            string clientPath = Path.Combine(Paths.ClientDir, "Dofus.exe");
-            if (File.Exists(clientPath))
+            // 4. Native launcher window (WinForms). The web interface used to be opened in a
+            //    browser with --app; now it is a desktop window that calls LauncherService
+            //    directly, without going through HTTP.
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => StopServices();
+            Console.CancelKeyPress += (s, e) =>
+            {
+                e.Cancel = true;
+                RequestShutdown("Ctrl+C");
+            };
+
+            try
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"[+] Launching Dofus Client from: {clientPath}...");
+                Console.WriteLine("[+] Opening the launcher window...");
                 Console.ResetColor();
-                try
-                {
-                    string hash = Guid.NewGuid().ToString();
-                    string argsStr = $"-force-d3d11 --port {port} --gameName dofus --gameRelease dofus3 --instanceId 1 --hash {hash} --canLogin true --langCode es --autoConnectType 1 --connectionPort {gamePort}";
 
-                    var startInfo = new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = clientPath,
-                        Arguments = argsStr,
-                        WorkingDirectory = Path.GetDirectoryName(clientPath) ?? "",
-                        UseShellExecute = false
-                    };
-
-                    startInfo.Environment["ZAAP_PORT"] = port.ToString();
-                    startInfo.Environment["ZAAP_HASH"] = hash;
-                    startInfo.Environment["ZAAP_GAME"] = "dofus";
-                    startInfo.Environment["ZAAP_RELEASE"] = "dofus3";
-                    startInfo.Environment["ZAAP_INSTANCE_ID"] = "1";
-                    startInfo.Environment["ZAAP_CAN_AUTH"] = "true";
-
-                    System.Diagnostics.Process.Start(startInfo);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[-] Failed to start Dofus Client: {ex.Message}");
-                }
+                UI.LauncherWindow.OpenOnDedicatedThread();
             }
-
-            // 5. Interactive Console Command Loop
-            bool running = true;
-            while (running)
+            catch (Exception ex)
             {
-                Console.Write("jondo> ");
-                string? input = Console.ReadLine()?.Trim();
-                if (string.IsNullOrEmpty(input)) continue;
-
-                string[] tokens = input.Split(' ');
-                string cmd = tokens[0].ToLower();
-
-                switch (cmd)
-                {
-                    case "/help":
-                        Console.WriteLine("Available commands:");
-                        Console.WriteLine("  /status                    - Displays active character identity and stats.");
-                        Console.WriteLine("  /teleport <mapId> <cellId> - Updates character position (saves to database).");
-                        Console.WriteLine("  /exit or /quit             - Shuts down all servers and exits.");
-                        break;
-
-                    case "/status":
-                        Console.WriteLine($"Active Character: {GameState.CharacterName} (ID: {GameState.CharacterId})");
-                        Console.WriteLine($"Level: {GameState.CharacterLevel} | Breed: {GameState.Breed} | Sex: {GameState.Sex}");
-                        Console.WriteLine($"Position: Map ID {GameState.MapId} | Cell ID {GameState.CellId}");
-                        Console.WriteLine($"Characteristics: Points={GameState.CharacterRemainingPoints} | Vit={GameState.StatVitality} | Str={GameState.StatStrength} | Int={GameState.StatIntelligence} | Agi={GameState.StatAgility} | Wis={GameState.StatWisdom} | Cha={GameState.StatChance}");
-                        break;
-
-                    case "/teleport":
-                        if (tokens.Length < 3 || !long.TryParse(tokens[1], out long mapId) || !int.TryParse(tokens[2], out int cellId))
-                        {
-                            Console.WriteLine("Usage: /teleport <mapId> <cellId>");
-                            break;
-                        }
-                        GameState.MapId = mapId;
-                        GameState.CellId = cellId;
-                        DatabaseManager.SaveCurrentCharacter();
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"[Teleport] Character teleported to Map {mapId}, Cell {cellId}. Saved to database.");
-                        Console.ResetColor();
-                        break;
-
-                    case "/exit":
-                    case "/quit":
-                        Console.WriteLine("[+] Shutting down servers...");
-                        HaapiServer.Stop();
-                        ZaapServer.Stop();
-                        GameServerProxy.Stop();
-                        GameNodeProxy.Stop();
-                        ChatServer.Stop();
-                        running = false;
-                        break;
-
-                    default:
-                        Console.WriteLine("Unknown command. Type /help for assistance.");
-                        break;
-                }
+                // Without the window there is no way to close the emulator, and the process would
+                // stay alive in the background with nothing visible. Better to shut it down.
+                Console.WriteLine($"[-] Could not open the launcher window: {ex.Message}");
+                RequestShutdown("the launcher window could not be opened");
             }
 
-            Console.WriteLine("[+] Shutdown complete. Goodbye!");
+            // 5. The process lives as long as the window does. Closing it stops everything.
+            Console.WriteLine("[+] All servers initialized and operational. Launcher UI active.");
+
+            await _shutdown.Task;
+
+            StopServices();
+
+            // Safety net: if something gets stuck and the process does not end on its own, force
+            // the exit. It used to have to be killed by hand from the task manager.
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                Console.WriteLine("[!] The graceful shutdown did not finish in time. Forcing the exit.");
+                Environment.Exit(0);
+            });
+        }
+
+        private static readonly TaskCompletionSource _shutdown =
+            new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        private static int _shutdownRequested;
+        private static int _servicesStopped;
+
+        /// <summary>
+        /// Requests a graceful shutdown of the emulator. The launcher window calls it when closing.
+        /// It is idempotent: it does not matter how many times it is called.
+        /// </summary>
+        public static void RequestShutdown(string reason)
+        {
+            if (Interlocked.Exchange(ref _shutdownRequested, 1) != 0) return;
+            Console.WriteLine($"[+] Shutting down the emulator ({reason})...");
+            _shutdown.TrySetResult();
+        }
+
+        private static void StopServices()
+        {
+            if (Interlocked.Exchange(ref _servicesStopped, 1) != 0) return;
+            Console.WriteLine("[+] Stopping services...");
+            try { HaapiServer.Stop(); } catch { }
+            try { ZaapServer.Stop(); } catch { }
+            try { GameServerProxy.Stop(); } catch { }
+            try { GameNodeProxy.Stop(); } catch { }
+            try { ChatServer.Stop(); } catch { }
+            Console.WriteLine("[+] Services stopped.");
         }
 
         public static void LogDebug(string message)

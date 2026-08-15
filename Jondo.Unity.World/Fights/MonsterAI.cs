@@ -13,21 +13,21 @@ namespace Jondo.Unity.World.Fights
         public int SpellId { get; set; }
         public int DamageDealt { get; set; }
 
-        /// <summary>Cuántas veces se lanza el hechizo en este turno.</summary>
+        /// <summary>How many times the spell is cast during this turn.</summary>
         public int CastCount { get; set; }
 
         /// <summary>
-        /// Casilla desde la que se lanza. Hace falta para el registro: cuando el monstruo ataca y
-        /// luego huye, su CellId ya es el de destino y la traza daba distancias falsas.
+        /// The cell the spell is cast from. Needed for logging: when the monster attacks and then
+        /// flees, its CellId is already the destination one and the trace reported bogus distances.
         /// </summary>
         public int CastFromCell { get; set; } = -1;
 
         /// <summary>
-        /// Si el hechizo se lanzó ANTES de moverse. Pasa cuando el monstruo ya tenía al objetivo
-        /// a tiro y luego huye (por debajo del 30 % de vida). Sin esto, FightHandler mandaba
-        /// siempre el movimiento primero y el lanzamiento después, de modo que en pantalla —y en
-        /// los registros— parecía que el bicho había disparado desde la casilla a la que huyó:
-        /// atacaba legalmente a 6 casillas, escapaba a 10 y el ataque se veía a 10.
+        /// Whether the spell was cast BEFORE moving. This happens when the monster already had the
+        /// target in range and then flees (below 30% HP). Without this, FightHandler always sent
+        /// the movement first and the cast afterwards, so on screen -- and in the logs -- it looked
+        /// as if the creature had fired from the cell it fled to: it attacked legally at 6 cells,
+        /// escaped to 10, and the attack appeared to happen at 10.
         /// </summary>
         public bool CastBeforeMove { get; set; }
     }
@@ -45,7 +45,7 @@ namespace Jondo.Unity.World.Fights
             public int Element { get; set; } = 0;
             public int MaxCastPerTurn { get; set; } = 2;
 
-            /// <summary>Si el hechizo exige línea de visión sobre el objetivo.</summary>
+            /// <summary>Whether the spell requires line of sight to the target.</summary>
             public bool NeedsLineOfSight { get; set; } = true;
         }
 
@@ -71,17 +71,17 @@ namespace Jondo.Unity.World.Fights
                 }
             }
 
-            // Sin hechizo inventado de reserva. Antes había aquí uno de alcance 1-6 y daño
-            // 8+nivel/2, que es la razón real de que los monstruos no se movieran nunca: con
-            // seis casillas de alcance siempre tenían al objetivo a tiro desde su posición de
-            // salida. Si un monstruo no tiene hechizos utilizables, se queda quieto y pasa turno.
+            // No made-up fallback spell. There used to be one here with range 1-6 and damage
+            // 8+level/2, and that is the real reason monsters never moved: with six cells of
+            // range they always had the target in reach from their starting position. If a
+            // monster has no usable spell, it stays put and passes the turn.
             if (availableSpells.Count == 0)
             {
                 return result;
             }
 
-            // Primero los de más alcance efectivo por PA, para que el monstruo elija el hechizo
-            // que puede lanzar sin moverse antes que el cuerpo a cuerpo.
+            // Best effective range per AP first, so the monster picks the spell it can cast
+            // without moving over the melee one.
             availableSpells = availableSpells
                 .OrderByDescending(s => (s.BaseDamageMin + s.BaseDamageMax) / 2)
                 .ToList();
@@ -171,9 +171,9 @@ namespace Jondo.Unity.World.Fights
         private static Fighter EvaluateBestTarget(Fighter monster, List<Fighter> players, List<Fighter> allFighters)
         {
             return players
-                .OrderBy(p => p.CurrentHP) // Rematar (lowest absolute HP)
-                .ThenBy(p => (double)p.CurrentHP / p.MaxHP) // Herido (lowest HP %)
-                .ThenBy(p => CountAlliesNear(p, allFighters)) // Target aislado
+                .OrderBy(p => p.CurrentHP) // Finish off (lowest absolute HP)
+                .ThenBy(p => (double)p.CurrentHP / p.MaxHP) // Wounded (lowest HP %)
+                .ThenBy(p => CountAlliesNear(p, allFighters)) // Isolated target
                 .ThenBy(p => MapGeometry.Distance(monster.CellId, p.CellId))
                 .FirstOrDefault();
         }
@@ -184,9 +184,9 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Repite el mismo hechizo mientras al monstruo le queden PA y no supere el límite de
-        /// lanzamientos por turno. Antes lanzaba una sola vez y pasaba turno con los PA a medias:
-        /// el pío, con 4 PA y un hechizo de 2, se dejaba la mitad del turno sin usar.
+        /// Repeats the same spell while the monster has AP left and stays under the per-turn cast
+        /// limit. It used to cast only once and end the turn with AP to spare: the piou, with 4 AP
+        /// and a 2 AP spell, wasted half of its turn.
         /// </summary>
         private static int RepeatCasts(Fighter monster, Fighter target, List<AISpellData> spells,
                                        HashSet<int> losBlockers, int spellId)
@@ -195,11 +195,11 @@ namespace Jondo.Unity.World.Fights
             if (spell == null) return 0;
 
             int extra = 0;
-            int limite = spell.MaxCastPerTurn > 0 ? spell.MaxCastPerTurn : int.MaxValue;
-            while (extra + 1 < limite && monster.CurrentAP >= spell.APCost && target.IsAlive)
+            int limit = spell.MaxCastPerTurn > 0 ? spell.MaxCastPerTurn : int.MaxValue;
+            while (extra + 1 < limit && monster.CurrentAP >= spell.APCost && target.IsAlive)
             {
-                var repetido = TryCastBestSpell(monster, target, new List<AISpellData> { spell }, losBlockers);
-                if (repetido.SpellId == 0) break;
+                var repeated = TryCastBestSpell(monster, target, new List<AISpellData> { spell }, losBlockers);
+                if (repeated.SpellId == 0) break;
                 extra++;
             }
             return extra;
@@ -214,8 +214,8 @@ namespace Jondo.Unity.World.Fights
             {
                 if (dist >= spell.MinRange && dist <= spell.MaxRange && monster.CurrentAP >= spell.APCost)
                 {
-                    // Un hechizo que exige línea de visión no atraviesa muros. Esto es lo que
-                    // hacía que el pío disparase desde el otro lado del murete de la arena.
+                    // A spell that requires line of sight does not go through walls. This is what
+                    // made the piou fire from the far side of the arena's low wall.
                     if (spell.NeedsLineOfSight &&
                         !MapGeometry.HasLineOfSight(monster.CellId, target.CellId, losBlockers))
                     {
@@ -226,9 +226,10 @@ namespace Jondo.Unity.World.Fights
                     int statVal = monster.GetStatForElement(elem);
                     int targetResPct = target.GetResPctForElement(elem);
 
-                    // Solo una estimación para decidir; quien aplica el daño de verdad y manda los
-                    // paquetes es FightHandler.ApplySpellEffectsAsync, el mismo camino que usa el
-                    // jugador. Antes se restaba aquí la vida y luego se volvía a calcular fuera.
+                    // Just an estimate to make the decision; the real damage is applied and the
+                    // packets are sent by FightHandler.ApplySpellEffectsAsync, the same path the
+                    // player goes through. HP used to be subtracted here and then recomputed
+                    // outside.
                     int damage = DamageCalculator.CalculateDamage(
                         baseDamage: baseDmg,
                         element: elem,
@@ -251,9 +252,9 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Casilla desde la que el monstruo puede lanzar gastando los mínimos PM. Se comprueba el
-        /// alcance Y la línea de visión: sin lo segundo el monstruo se plantaba detrás de un muro
-        /// y disparaba igual.
+        /// The cell the monster can cast from while spending the fewest MP. Both range AND line of
+        /// sight are checked: without the latter the monster would park itself behind a wall and
+        /// fire anyway.
         /// </summary>
         private static int FindBestTacticalCell(Fighter monster, Fighter target, List<AISpellData> spells,
                                                 HashSet<int> walkable, HashSet<int> occupied, HashSet<int> losBlockers)

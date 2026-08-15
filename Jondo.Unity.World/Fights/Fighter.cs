@@ -25,7 +25,7 @@ namespace Jondo.Unity.World.Fights
         public int CurrentMP { get; set; }
         public int Initiative { get; set; }
 
-        /// <summary>Experiencia que da este luchador al morir (gradeXp de su ficha).</summary>
+        /// <summary>Experience this fighter awards on death (gradeXp from its record).</summary>
         public int XpReward { get; set; }
 
         // Elemental Stats
@@ -35,7 +35,7 @@ namespace Jondo.Unity.World.Fights
         public int Agility { get; set; }
         public int Power { get; set; }
 
-        /// <summary>Puntos de crítico que aporta el equipo, sumados a los del propio hechizo.</summary>
+        /// <summary>Critical points granted by the equipment, added on top of the spell's own.</summary>
         public int CriticalBonus { get; set; }
 
         // Resistances (% and Flat)
@@ -51,16 +51,16 @@ namespace Jondo.Unity.World.Fights
         // Spells available to this fighter
         public List<int> SpellIds { get; set; } = new List<int>();
 
-        /// <summary>Grado de cada hechizo (los monstruos no siempre lo tienen al nivel 1).</summary>
+        /// <summary>Grade of each spell (monsters do not always have it at level 1).</summary>
         public Dictionary<int, int> SpellGrades { get; set; } = new Dictionary<int, int>();
 
         public int AccumulatedMpLoss { get; set; } = 0;
         public int AccumulatedApLoss { get; set; } = 0;
 
         /// <summary>
-        /// Bonificación temporal al daño base de un hechizo concreto, con la ronda en la que
-        /// caduca. La Flecha Helada, por ejemplo, se deja +4 de daño básico durante 3 turnos, y
-        /// volver a lanzarla renueva el plazo en vez de acumular otra vez (acumulación máxima 1).
+        /// Temporary bonus to the base damage of a specific spell, together with the round it
+        /// expires on. Frozen Arrow, for instance, leaves +4 base damage for 3 turns, and recasting
+        /// it refreshes the deadline instead of stacking again (max stack 1).
         /// </summary>
         public Dictionary<int, (int Bonus, int ExpiresRound)> SpellDamageBuffs { get; }
             = new Dictionary<int, (int, int)>();

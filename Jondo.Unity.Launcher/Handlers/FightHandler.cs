@@ -21,9 +21,9 @@ namespace Jondo.Unity.Launcher.Handlers
         private static ConcurrentDictionary<long, FightInstance> _activeFights = new ConcurrentDictionary<long, FightInstance>();
         private static long _nextFightId = 1000;
 
-        /// <summary>Duración del turno en décimas de segundo, tal y como viaja en jut.f1 y jyf.f2.</summary>
+        /// <summary>Turn duration in tenths of a second, exactly as it travels in jut.f1 and jyf.f2.</summary>
         public const int TurnDurationDeciseconds = 300;
-        /// <summary>La misma duración en milisegundos, para el temporizador del servidor.</summary>
+        /// <summary>The same duration in milliseconds, for the server-side timer.</summary>
         private const int TurnDurationMs = TurnDurationDeciseconds * 100;
 
         public static void RegisterHandlers()
@@ -60,27 +60,27 @@ namespace Jondo.Unity.Launcher.Handlers
                 TeamId = 0,
                 CellId = fight.BluePlacementCells.FirstOrDefault(),
                 Level = GameState.CharacterLevel > 0 ? GameState.CharacterLevel : 40,
-                // Misma fuente que el jxx que se le manda al cliente. Antes había aquí una fórmula
-                // propia que solo miraba la vitalidad BASE: el servidor creía que el personaje
-                // tenía 305 PdV mientras el cliente mostraba 514, porque los objetos equipados
-                // (el Dofus Esmeralda da +200) solo se sumaban en un lado. Resultado: el personaje
-                // moría "de fondo" en 8 turnos con la barra de vida intacta en pantalla.
+                // Same source as the jxx we send to the client. There used to be a custom formula
+                // here that only looked at BASE vitality: the server believed the character had
+                // 305 HP while the client displayed 514, because equipped items (the Emerald
+                // Dofus gives +200) were only added on one side. The result: the character died
+                // "in the background" after 8 turns with a full health bar on screen.
                 MaxHP = StatsHandler.GetPlayerMaxHp(),
                 MaxAP = 6,
                 MaxMP = 3,
-                // Misma iniciativa que enseña la ficha del personaje: características elementales
-                // más lo que aporte el equipo. La fórmula que había aquí (100 + nivel + todas las
-                // características) se inventaba el número y, sobre todo, ignoraba los objetos: con
-                // el Dofus de pesadilla puesto (+1000 de iniciativa) el pío seguía jugando antes.
+                // Same initiative the character sheet shows: elemental characteristics plus
+                // whatever the gear contributes. The formula that used to be here (100 + level +
+                // every characteristic) made the number up and, above all, ignored items: with the
+                // Nightmare Dofus equipped (+1000 initiative) the piwi still played first.
                 Initiative = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance
                              + GameState.StatAgility + StatsHandler.GetEquipBonus(44),
                 Strength = GameState.StatStrength + StatsHandler.GetEquipBonus(10),
                 Intelligence = GameState.StatIntelligence + StatsHandler.GetEquipBonus(15),
                 Chance = GameState.StatChance + StatsHandler.GetEquipBonus(13),
                 Agility = GameState.StatAgility + StatsHandler.GetEquipBonus(14),
-                // Potencia del equipo (característica 25). Entra directamente en el cálculo de daño.
+                // Power from the gear (characteristic 25). It feeds straight into damage.
                 Power = StatsHandler.GetEquipBonus(25),
-                // Crítico del equipo (característica 18): el Dofus Turquesa da +10.
+                // Critical hit from the gear (characteristic 18): the Turquoise Dofus gives +10.
                 CriticalBonus = StatsHandler.GetEquipBonus(18),
                 LookBoneId = 744,
                 IsMonster = false
@@ -146,8 +146,8 @@ namespace Jondo.Unity.Launcher.Handlers
                     LookBoneId = boneId,
                     SpellIds = dbStats?.SpellIds ?? new List<int>(),
                     SpellGrades = dbStats?.SpellGrades ?? new Dictionary<int, int>(),
-                    // gradeXp de la ficha del monstruo: la experiencia que da al morir, la misma
-                    // que el cliente enseña al pasar el ratón por encima del grupo.
+                    // gradeXp from the monster template: the experience it awards on death, the
+                    // same figure the client shows when hovering over the group.
                     XpReward = dbStats?.GradeXp ?? 0
                 };
                 monsterFighter.CurrentHP = monsterFighter.MaxHP;
@@ -167,7 +167,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             // =========================================================================
-            // RÁFAGA 1 (Disparada inmediatamente por colisión / jpp)
+            // BURST 1 (Fired immediately on collision / jpp)
             // Sequence: joq, jpf, kkq, kkp, kkm, kri, joh, lor, krp, lsy, kkz
             // =========================================================================
             // 1. joq (Movement validation - empty opcode)
@@ -177,16 +177,16 @@ namespace Jondo.Unity.Launcher.Handlers
             byte[] jpfPacket = BuildJpfPacket(fight.DefenderLeaderId);
             await WriteFrameAsync(stream, jpfPacket);
 
-            // 3. kkq: identifica el grupo de mobs contra el que se pelea.
+            // 3. kkq: identifies the mob group being fought.
             var kkqMsg = new ProtoMessage();
             kkqMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = fight.DefenderLeaderId });
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/kkq", kkqMsg.ToByteArray()));
 
-            // 4. kkp: destruye el contexto actual (mensaje vacío).
+            // 4. kkp: destroys the current context (empty message).
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/kkp", Array.Empty<byte>()));
 
-            // 5. kkm: crea el contexto nuevo. 1 = combate; roleplay es 0 y por eso al terminar la
-            // pelea este mismo mensaje va vacío.
+            // 5. kkm: creates the new context. 1 = fight; roleplay is 0, which is why this very
+            // same message goes out empty once the fight is over.
             var kkmMsg = new ProtoMessage();
             kkmMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 1 });
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/kkm", kkmMsg.ToByteArray()));
@@ -222,10 +222,10 @@ namespace Jondo.Unity.Launcher.Handlers
             // 11. kkz (Player placement position)
             byte[] kkzPlayer = BuildKkzPacket(playerFighter.CellId, playerFighter.Id, 3);
             await WriteFrameAsync(stream, kkzPlayer);
-            Program.LogDebug("[FightHandler] RÁFAGA 1 sent successfully.");
+            Program.LogDebug("[FightHandler] BURST 1 sent successfully.");
 
             // =========================================================================
-            // RÁFAGA 2 (Inmediatamente después de la Ráfaga 1)
+            // BURST 2 (Immediately after Burst 1)
             // Sequence: jyf (player team), jyf (monster team), kkz (player), kkz (monsters)
             // =========================================================================
             // 1. jyf #1 & #2
@@ -242,7 +242,7 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 await WriteFrameAsync(stream, BuildKkzPacket(m.CellId, m.Id, 7));
             }
-            Program.LogDebug("[FightHandler] RÁFAGA 2 sent successfully. Waiting for client kkr request...");
+            Program.LogDebug("[FightHandler] BURST 2 sent successfully. Waiting for client kkr request...");
 
             // 4. Schedule 45s preparation timeout to auto-start Turn 1
             long currentFightId = fight.FightId;
@@ -265,7 +265,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         /// <summary>
         /// Responds to map load request (kkr / jqf) from the client during fight setup.
-        /// Sends RÁFAGA 3 containing igs, jya, jyj, jxx, jyi, jyf, jyk, jxe, jwo, jox.
+        /// Sends BURST 3 containing igs, jya, jyj, jxx, jyi, jyf, jyk, jxe, jwo, jox.
         /// </summary>
         public static async Task HandleFightMapLoad(NetworkStream stream)
         {
@@ -279,10 +279,10 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
             fight.HasLoadedMap = true;
-            Program.LogDebug("[FightHandler] Responding to fight map request (kkr) with RAFAGA 3...");
+            Program.LogDebug("[FightHandler] Responding to fight map request (kkr) with BURST 3...");
 
             // =========================================================================
-            // RÁFAGA 3 (Disparada por el kkr del cliente)
+            // BURST 3 (Fired by the client's kkr)
             // Sequence: igs, jya, jyj, jxx (all), jyi, jyf, jykjxe, jwo, jox
             // =========================================================================
             // 1. igs (GameFightComplementaryInformationsDataMessage with subarea & placement positions)
@@ -342,7 +342,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // 10. jox (GameFightTurnStartMessage for placement phase - f1=450, f2.f1=-3, f2.f2=-2)
             await SendPlacementTurnStart(stream, fight);
-            Program.LogDebug("[FightHandler] RÁFAGA 3 sent successfully. Client in placement phase (45s).");
+            Program.LogDebug("[FightHandler] BURST 3 sent successfully. Client in placement phase (45s).");
         }
 
         private static async Task ResendFightMapBurst3(NetworkStream stream, FightInstance fight)
@@ -624,11 +624,11 @@ namespace Jondo.Unity.Launcher.Handlers
             await Task.CompletedTask;
         }
 
-        // NOTA: aquí vivía HandleCombatMovementRequest, una versión antigua del movimiento de
-        // combate que reenviaba el camino comprimido del cliente sin expandirlo y añadía un kkz
-        // que forzaba la posición. Eso provocaba el teletransporte. Se ha eliminado para que no
-        // vuelva a competir con HandleCombatMoveRequest (los nombres se diferenciaban en una
-        // sola letra y el enrutado escogía el equivocado).
+        // NOTE: HandleCombatMovementRequest used to live here, an old version of combat movement
+        // that echoed the client's compressed path back without expanding it and tacked on a kkz
+        // that forced the position. That is what caused the teleporting. It was removed so it can
+        // no longer compete with HandleCombatMoveRequest (the two names differed by a single
+        // letter and the routing kept picking the wrong one).
 
         private static async Task HandleTurnReady(NetworkStream stream, byte[] payload)
         {
@@ -702,22 +702,22 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             var jvnMsg = new ProtoMessage();
 
-            // Misma lista que la barra de accesos directos de roleplay.
-            // TODO: cuando exista persistencia de "qué variante ha elegido el jugador", leerla en
-            // GetPlayerAvailableSpells en vez de asumir siempre la base.
+            // Same list as the roleplay shortcut bar.
+            // TODO: once "which variant the player picked" is persisted, read it in
+            // GetPlayerAvailableSpells instead of always assuming the base one.
             var spellList = DatabaseManager.GetPlayerAvailableSpells(GameState.Breed, GameState.CharacterLevel);
 
-            Program.LogDebug($"[FightHandler] jvn: {spellList.Count} hechizos disponibles a nivel " +
-                             $"{GameState.CharacterLevel} para la raza {GameState.Breed}: " +
+            Program.LogDebug($"[FightHandler] jvn: {spellList.Count} spells available at level " +
+                             $"{GameState.CharacterLevel} for breed {GameState.Breed}: " +
                              string.Join(", ", spellList));
 
-            // Primera entrada: el ARMA. Va sin identificador de hechizo y con f3 = 2 (los hechizos
-            // llevan f3 = 1). Faltaba, y por eso al entrar en combate desaparecía el icono de la
-            // espada de la barra: el jvn rehace la barra y la dejaba sin la casilla del arma.
-            var armaSub = new ProtoMessage();
-            armaSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 2 });
-            armaSub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
-            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = armaSub.ToByteArray() });
+            // First entry: the WEAPON. It carries no spell id and uses f3 = 2 (spells use f3 = 1).
+            // It was missing, and that is why the sword icon vanished from the bar on entering a
+            // fight: jvn rebuilds the bar and was leaving it without the weapon slot.
+            var weaponSub = new ProtoMessage();
+            weaponSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 2 });
+            weaponSub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
+            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = weaponSub.ToByteArray() });
             foreach (var spellId in spellList)
             {
                 var sSub = new ProtoMessage();
@@ -730,10 +730,10 @@ namespace Jondo.Unity.Launcher.Handlers
             jvnMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.CharacterId });
             jvnMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.CharacterId });
 
-            // Ranura 0 vacía, como en la captura oficial y en el itp: es la que ocupa el arma.
-            var ranuraArma = new ProtoMessage();
-            ranuraArma.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = Array.Empty<byte>() });
-            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = ranuraArma.ToByteArray() });
+            // Slot 0 left empty, just like the official capture and the itp: that is the weapon slot.
+            var weaponSlot = new ProtoMessage();
+            weaponSlot.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = Array.Empty<byte>() });
+            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = weaponSlot.ToByteArray() });
 
             int slot = 1;
             foreach (var spellId in spellList)
@@ -793,12 +793,13 @@ namespace Jondo.Unity.Launcher.Handlers
 
             ResetTurnCastCounters();
 
-            // Refresco de puntos al empezar el turno. Fighter.StartTurn() ya restaura PA/PM en el
-            // servidor; esto se lo cuenta al cliente. Con delta 0 el bloque de valor queda reducido
-            // al máximo, que es como la captura oficial expresa "puntos al máximo".
+            // Point refresh at the start of the turn. Fighter.StartTurn() already restores AP/MP on
+            // the server side; this tells the client about it. With a delta of 0 the value block
+            // collapses down to just the maximum, which is how the official capture expresses
+            // "points back to full".
             //
-            // Va envuelto en jud/juc: el motor de secuencias del cliente descarta los cambios de
-            // característica que llegan sueltos, fuera de una secuencia abierta.
+            // It goes wrapped in jud/juc: the client's sequence engine discards characteristic
+            // changes that arrive loose, outside an open sequence.
             await WriteFrameAsync(stream, BuildJud(4, current.Id));
             await WriteFrameAsync(stream, BuildJud(3, current.Id));
             await WriteFrameAsync(stream, BuildJvmPacket(current.Id, 1, 0, current.MaxAP));
@@ -810,7 +811,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jwl", Array.Empty<byte>()));
             Program.LogDebug($"[FightHandler] Sent jut & jwl (Turn Started & Playable) for Fighter #{current.Id} " +
-                              $"(PA {current.CurrentAP}/{current.MaxAP}, PM {current.CurrentMP}/{current.MaxMP}).");
+                              $"(AP {current.CurrentAP}/{current.MaxAP}, MP {current.CurrentMP}/{current.MaxMP}).");
 
             if (current.IsMonster)
             {
@@ -823,10 +824,10 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Arranca el temporizador de turno. jut.f1 = 300 solo le dice al cliente cuántas décimas
-        /// de segundo dura el turno; hacer cumplir el plazo es responsabilidad del servidor. Sin
-        /// esto, al agotarse el tiempo el contador del cliente seguía bajando en negativo y el
-        /// turno no pasaba nunca.
+        /// Starts the turn timer. jut.f1 = 300 only tells the client how many tenths of a second
+        /// the turn lasts; enforcing the deadline is the server's job. Without this, once the time
+        /// ran out the client's counter just kept ticking down into negatives and the turn never
+        /// passed.
         /// </summary>
         private static void StartTurnTimer(NetworkStream stream, FightInstance fight, Fighter fighter)
         {
@@ -847,16 +848,16 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
                 catch (OperationCanceledException)
                 {
-                    return; // el jugador pasó turno a tiempo
+                    return; // the player passed the turn in time
                 }
 
-                // Solo forzamos el fin si seguimos exactamente en el mismo turno.
+                // Only force the end if we are still on exactly the same turn.
                 var f = GetCurrentFight();
                 if (f == null || f.FightId != fightId) return;
                 if (f.State != FightState.Ongoing) return;
                 if (f.CurrentFighter == null || f.CurrentFighter.Id != fighterId) return;
                 if (f.RoundNumber != round) return;
-                Program.LogDebug($"[FightHandler] ⏰ Se agotó el turno del luchador #{fighterId}. Pasando turno automáticamente.");
+                Program.LogDebug($"[FightHandler] ⏰ Fighter #{fighterId} ran out of time. Passing the turn automatically.");
 
                 try
                 {
@@ -864,7 +865,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
                 catch (Exception ex)
                 {
-                    Program.LogDebug($"[FightHandler] Error al forzar el fin de turno: {ex.Message}");
+                    Program.LogDebug($"[FightHandler] Error while forcing the end of the turn: {ex.Message}");
                 }
             });
         }
@@ -874,7 +875,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var fight = GetCurrentFight();
             if (fight == null) return;
 
-            // El turno acaba: cancela el temporizador para que no fuerce un segundo fin de turno.
+            // The turn is over: cancel the timer so it cannot force a second end of turn.
             fight.CancelTurnTimer();
 
             var jwkMsg = new ProtoMessage();
@@ -944,12 +945,12 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Construye el joo (difusión de movimiento) tal y como lo emite el servidor oficial:
-        ///   joo { f1 = fighterId, f2 = &lt;camino EMPAQUETADO&gt;, f5 = orientación final }
-        /// El campo 2 es un packed repeated int32: los varints de celda van concatenados SIN
-        /// etiqueta. Escribirlos como campos etiquetados (08 xx 08 xx ...) corrompe el camino,
-        /// porque el cliente interpreta el 0x08 como un número de celda más.
-        /// Verificado contra la captura: f2 = ac03 ab03 b803 c603 ... para [428,427,440,454,...].
+        /// Builds the joo (movement broadcast) exactly as the official server emits it:
+        ///   joo { f1 = fighterId, f2 = &lt;PACKED path&gt;, f5 = final orientation }
+        /// Field 2 is a packed repeated int32: the cell varints are concatenated WITHOUT tags.
+        /// Writing them as tagged fields (08 xx 08 xx ...) corrupts the path, because the client
+        /// reads the 0x08 as just another cell number.
+        /// Verified against the capture: f2 = ac03 ab03 b803 c603 ... for [428,427,440,454,...].
         /// </summary>
         public static byte[] BuildJooMovementPacket(long fighterId, List<int> pathCells, int orientation = 3)
         {
@@ -968,14 +969,14 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Variación de una característica de combate (PA = 1, PM = 23, vida = 19).
+        /// Variation of a combat characteristic (AP = 1, MP = 23, health = 19).
         ///
-        /// Los tres campos del bloque de valor son OPCIONALES y el cliente distingue "presente con
-        /// valor cero" de "ausente". La captura oficial lo deja claro: durante el turno manda
-        /// {f2 = -pérdida acumulada, f4 = máximo, f8 = pérdida}, pero al restablecer los puntos
-        /// manda ÚNICAMENTE {f4 = máximo}. Escribir "f2 = 0" no es lo mismo que omitirlo: el
-        /// cliente lo lee como "aplica una variación de cero" y deja el contador donde estaba.
-        /// Por eso los PA/PM seguían a cero al volver a tocarte el turno.
+        /// The three fields of the value block are OPTIONAL, and the client tells "present with a
+        /// value of zero" apart from "absent". The official capture makes it plain: during the turn
+        /// it sends {f2 = -accumulated loss, f4 = maximum, f8 = loss}, but when the points are
+        /// restored it sends ONLY {f4 = maximum}. Writing "f2 = 0" is not the same as leaving it
+        /// out: the client reads it as "apply a variation of zero" and leaves the counter where it
+        /// was. That is why AP/MP stayed at zero when your turn came round again.
         /// </summary>
         public static byte[] BuildJvmPacket(long fighterId, int statId, int accumulatedDelta, int maxStatValue)
         {
@@ -1006,10 +1007,10 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Acción "lanzar hechizo" (f13 = 300). f5 identifica el hechizo con DOS ids: f1 es la fila
-        /// de SpellLevels (el nivel concreto) y f4 el id del hechizo. Antes f1 iba fijo a 41870,
-        /// que es el nivel 1 de Flecha Mágica: cualquier otro hechizo llegaba al cliente con un
-        /// nivel que no le correspondía.
+        /// "Cast spell" action (f13 = 300). f5 identifies the spell with TWO ids: f1 is the
+        /// SpellLevels row (the specific level) and f4 the spell id. f1 used to be hardcoded to
+        /// 41870, which is level 1 of Magic Arrow: every other spell reached the client carrying a
+        /// level that did not belong to it.
         /// </summary>
         public static byte[] BuildJtxSpellCastPacket(long casterId, int targetCell, long spellId, int spellLevelId, long targetId, int launchIndex)
         {
@@ -1017,9 +1018,9 @@ namespace Jondo.Unity.Launcher.Handlers
             f5Sub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = spellLevelId > 0 ? spellLevelId : spellId });
             f5Sub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = spellId });
 
-            // f7 solo lleva lanzador e índice de lanzamiento. Aquí había un relleno de 13 bytes a
-            // cero en un campo 1 que no existe en el mensaje real; bastaba con eso para que el
-            // cliente descartara la acción entera y no se viera ninguna animación.
+            // f7 only carries the caster and the cast index. There used to be 13 bytes of zero
+            // padding here, in a field 1 that does not exist in the real message; that alone was
+            // enough for the client to drop the whole action and show no animation at all.
             var f7Sub = new ProtoMessage();
             f7Sub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = casterId });
             f7Sub.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = launchIndex });
@@ -1040,14 +1041,14 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Acción "pérdida de puntos de vida" (f13 = 99). El daño viaja en f25, NO en f6.
+        /// "Life point loss" action (f13 = 99). The damage travels in f25, NOT in f6.
         ///
-        /// Dentro de f25 el daño es el campo 5 y el elemento el campo 1 — no al revés. Estaban
-        /// intercambiados, así que el cliente pintaba y aplicaba siempre el valor fijo que
-        /// llevaba el campo 5 (un 7) mientras el servidor descontaba la vida de verdad: la barra
-        /// del monstruo bajaba de 7 en 7 y el combate se acababa de golpe con el bicho aún lleno
-        /// en pantalla. La captura oficial lo confirma dos veces: el hechizo 13425 hace 7-9 de
-        /// daño de fuego y manda f1=2 (fuego) con f5=7 (la tirada).
+        /// Inside f25 the damage is field 5 and the element is field 1 — not the other way round.
+        /// They were swapped, so the client always drew and applied the fixed value that field 5
+        /// happened to carry (a 7) while the server subtracted the real health: the monster's bar
+        /// went down 7 at a time and the fight ended all of a sudden with the creature still at
+        /// full health on screen. The official capture confirms it twice: spell 13425 deals 7-9
+        /// fire damage and sends f1=2 (fire) with f5=7 (the roll).
         /// </summary>
         public static byte[] BuildJtxDamagePacket(long casterId, long targetId, int damageDealt, int elementId)
         {
@@ -1065,9 +1066,9 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Acción "luchador abatido" (f13 = 103). Sin ella el cliente nunca da por muerto a nadie:
-        /// el monstruo se quedaba de pie y la pantalla de fin de combate contaba cero enemigos
-        /// derrotados. En la captura oficial va justo detrás del golpe que mata (trama 313).
+        /// "Fighter killed" action (f13 = 103). Without it the client never considers anyone dead:
+        /// the monster stayed on its feet and the end-of-fight screen counted zero enemies
+        /// defeated. In the official capture it comes right after the killing blow (frame 313).
         /// </summary>
         public static byte[] BuildJtxDeathPacket(long killerId, long deadFighterId)
         {
@@ -1083,16 +1084,16 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Acción "pérdida de puntos de acción" (f13 = 102) usada tras lanzar un hechizo. Es la que
-        /// dibuja el "-N PA" flotante sobre el lanzador; el jvm solo actualiza el contador.
+        /// "Action point loss" action (f13 = 102) used after casting a spell. This is the one that
+        /// draws the floating "-N AP" over the caster; jvm only updates the counter.
         /// </summary>
         /// <summary>
-        /// Acción de pérdida de puntos: 102 para los PA y 129 para los PM. Es la que dibuja el
-        /// "-N" flotante sobre el luchador y la que escribe la línea en el registro de combate;
-        /// el jvm solo mueve el contador, sin avisar de nada.
+        /// Point loss action: 102 for AP and 129 for MP. This is the one that draws the floating
+        /// "-N" over the fighter and writes the line into the combat log; jvm only moves the
+        /// counter, without announcing anything.
         ///
-        /// <paramref name="victimId"/> y <paramref name="casterId"/> coinciden cuando el gasto es
-        /// propio (lanzar un hechizo) y difieren cuando alguien te lo retira.
+        /// <paramref name="victimId"/> and <paramref name="casterId"/> match when the cost is
+        /// self-inflicted (casting a spell) and differ when someone else strips the points off you.
         /// </summary>
         public static byte[] BuildJtxPointLossPacket(long victimId, long casterId, int amount, bool isMp = false)
         {
@@ -1111,9 +1112,9 @@ namespace Jondo.Unity.Launcher.Handlers
         public static byte[] BuildJtxApLossPacket(long casterId, int apLost)
             => BuildJtxPointLossPacket(casterId, casterId, apLost);
 
-        // Aquí había un jvm de "variación de vida" con la característica 19. No hacía nada: la
-        // barra de vida la mueve el propio jtx de daño, y la 19 no es la vida. Se retira en vez
-        // de dejar un mensaje inventado circulando.
+        // There used to be a "life variation" jvm here on characteristic 19. It did nothing: the
+        // health bar is moved by the damage jtx itself, and 19 is not health. It is removed rather
+        // than leaving a made-up message in circulation.
 
         private static byte[] BuildJud(int kind, long fighterId)
         {
@@ -1133,13 +1134,13 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Lanzamientos de cada hechizo en el turno en curso, por hechizo y por objetivo. El
-        /// cliente lee ese número del propio paquete de lanzamiento (f7.f5) y lo compara con el
-        /// límite del hechizo para pintarlo gris.
+        /// Casts of each spell during the current turn, per spell and per target. The client reads
+        /// that number straight from the cast packet (f7.f5) and compares it against the spell's
+        /// limit to grey the icon out.
         ///
-        /// Antes había aquí un único contador global que no se reiniciaba nunca: al tercer o
-        /// cuarto lanzamiento del combate el cliente ya creía haber agotado los 3 lanzamientos
-        /// por turno de la Flecha Helada y la deshabilitaba, aunque fuera el primero del turno.
+        /// There used to be a single global counter here that was never reset: by the third or
+        /// fourth cast of the fight the client already believed Frozen Arrow's 3 casts per turn
+        /// were spent and disabled it, even when it was the first cast of that turn.
         /// </summary>
         private static readonly Dictionary<long, int> _castsThisTurn = new Dictionary<long, int>();
         private static readonly Dictionary<(long Spell, long Target), int> _castsPerTargetThisTurn
@@ -1166,9 +1167,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 var inner = ExtractMessagePayload(payload, "type.ankama.com/jub");
                 if (inner != null)
                 {
-                    // Por NÚMERO de campo, no por posición: el golpe con arma llega como
-                    // { f2 = casilla } sin campo 1, y leyendo por posición se tomaba la casilla
-                    // como identificador de hechizo y se rechazaba la petición entera.
+                    // By field NUMBER, not by position: a weapon hit arrives as { f2 = cell }
+                    // with no field 1, and reading by position took the cell as the spell id and
+                    // rejected the whole request.
                     var jubMsg = ProtoMessage.Parse(inner);
                     foreach (var f in jubMsg.Fields)
                     {
@@ -1182,21 +1183,21 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (targetCell < 0)
             {
-                Program.LogDebug("[FightHandler] Petición de lanzamiento sin casilla de destino; se descarta.");
+                Program.LogDebug("[FightHandler] Cast request with no target cell; discarding it.");
                 return;
             }
 
-            // Sin identificador de hechizo = golpe con el ARMA equipada. El cliente lo manda así,
-            // solo con la casilla, y hasta ahora se rechazaba por completo.
-            bool esArma = spellId <= 0;
-            var spellData = esArma
+            // No spell id = a hit with the equipped WEAPON. That is exactly how the client sends
+            // it, with the cell alone, and until now it was rejected outright.
+            bool isWeapon = spellId <= 0;
+            var spellData = isWeapon
                 ? DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId)
                 : DatabaseManager.GetSpellCombatData((int)spellId, current.Level);
 
             if (spellData == null)
             {
-                Program.LogDebug(esArma
-                    ? "[FightHandler] Golpe con arma rechazado: no hay arma equipada con daño."
+                Program.LogDebug(isWeapon
+                    ? "[FightHandler] Weapon hit rejected: no equipped weapon deals damage."
                     : $"[FightHandler] Rejected spell cast: spell {spellId} data not found in DB.");
                 return;
             }
@@ -1217,18 +1218,18 @@ namespace Jondo.Unity.Launcher.Handlers
             if (spellData.NeedsLineOfSight &&
                 !MapGeometry.HasLineOfSight(current.CellId, targetCell, MapManager.GetLosBlockers(fight.ArenaMapId)))
             {
-                Program.LogDebug($"[FightHandler] Hechizo {spellId} sin línea de visión de {current.CellId} a {targetCell}.");
+                Program.LogDebug($"[FightHandler] Spell {spellId} has no line of sight from {current.CellId} to {targetCell}.");
                 return;
             }
 
             var target = fight.Team1.FirstOrDefault(m => m.IsAlive && (m.CellId == targetCell || MapGeometry.Distance(m.CellId, targetCell) <= 1));
             long targetId = target != null ? target.Id : -1;
 
-            // Límites de lanzamiento, tal como los declara el hechizo en la base de datos.
+            // Cast limits, exactly as the spell declares them in the database.
             _castsThisTurn.TryGetValue(spellId, out int castsDone);
             if (spellData.MaxCastPerTurn > 0 && castsDone >= spellData.MaxCastPerTurn)
             {
-                Program.LogDebug($"[FightHandler] Hechizo {spellId} agotado este turno ({castsDone}/{spellData.MaxCastPerTurn}).");
+                Program.LogDebug($"[FightHandler] Spell {spellId} already spent this turn ({castsDone}/{spellData.MaxCastPerTurn}).");
                 return;
             }
 
@@ -1236,7 +1237,7 @@ namespace Jondo.Unity.Launcher.Handlers
             _castsPerTargetThisTurn.TryGetValue(perTargetKey, out int castsOnTarget);
             if (targetId != -1 && spellData.MaxCastPerTarget > 0 && castsOnTarget >= spellData.MaxCastPerTarget)
             {
-                Program.LogDebug($"[FightHandler] Hechizo {spellId} agotado sobre ese objetivo ({castsOnTarget}/{spellData.MaxCastPerTarget}).");
+                Program.LogDebug($"[FightHandler] Spell {spellId} already spent on that target ({castsOnTarget}/{spellData.MaxCastPerTarget}).");
                 return;
             }
 
@@ -1247,20 +1248,20 @@ namespace Jondo.Unity.Launcher.Handlers
             _castsThisTurn[spellId] = castsDone;
             if (targetId != -1) _castsPerTargetThisTurn[perTargetKey] = castsOnTarget + 1;
 
-            Program.LogDebug($"[FightHandler] {(esArma ? "Golpe con arma" : $"Player cast spell {spellId}")} " +
-                             $"en la casilla {targetCell} (gasta {spellData.APCost} PA, quedan {current.CurrentAP}, " +
-                             $"lanzamiento {castsDone}" +
-                             $"{(spellData.MaxCastPerTurn > 0 ? "/" + spellData.MaxCastPerTurn : "")} del turno).");
+            Program.LogDebug($"[FightHandler] {(isWeapon ? "Weapon hit" : $"Player cast spell {spellId}")} " +
+                             $"on cell {targetCell} (costs {spellData.APCost} AP, {current.CurrentAP} left, " +
+                             $"cast {castsDone}" +
+                             $"{(spellData.MaxCastPerTurn > 0 ? "/" + spellData.MaxCastPerTurn : "")} of the turn).");
 
-            // Secuencia calcada de la captura oficial (trama 254):
-            //   jud(4) · jtx(300 lanzamiento) · jud(3) · jvm(PA) · juc(3) · jtx(102 pérdida de PA)
-            //   · jtx(99 daño) · juc(4)
+            // Sequence traced from the official capture (frame 254):
+            //   jud(4) -> jtx(300 cast) -> jud(3) -> jvm(AP) -> juc(3) -> jtx(102 AP loss)
+            //   -> jtx(99 damage) -> juc(4)
             //
-            // Para el golpe con arma no se manda el jtx de lanzamiento: no tengo ninguna captura
-            // de un ataque con arma y no sé cómo codifica el cliente esa acción. Se manda solo el
-            // gasto de PA y el daño, que sí están comprobados. Faltará la animación del espadazo.
+            // The cast jtx is not sent for a weapon hit: there is no capture of a weapon attack
+            // and it is unknown how the client encodes that action. Only the AP cost and the
+            // damage go out, which are both verified. The sword swing animation will be missing.
             await WriteFrameAsync(stream, BuildJud(4, current.Id));
-            if (!esArma)
+            if (!isWeapon)
             {
                 await WriteFrameAsync(stream, BuildJtxSpellCastPacket(current.Id, targetCell, spellId, spellData.SpellLevelId, targetId, castsDone));
             }
@@ -1285,19 +1286,19 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Aplica TODOS los efectos de un hechizo sobre un objetivo y se los cuenta al cliente.
-        /// La usan por igual los lanzamientos del jugador y los de los monstruos, para que un pío
-        /// que quita alcance haga exactamente lo mismo que si lo hiciera el personaje.
+        /// Applies EVERY effect of a spell to a target and reports them to the client. Player
+        /// casts and monster casts both go through it, so that a piwi stripping range does exactly
+        /// what the character would do with the same spell.
         ///
-        /// Cubre daño (por elemento), desplazamiento (empujar/atraer) y cualquier efecto que
-        /// modifique una característica. Ese último grupo sale del catálogo de efectos importado
-        /// del cliente: no hay ninguna lista de efectos escrita a mano.
+        /// Covers damage (per element), displacement (push/pull) and any effect that modifies a
+        /// characteristic. That last group comes from the effect catalogue imported from the
+        /// client: there is no hand-written list of effects anywhere.
         ///
-        /// Lo que todavía NO hace: la tirada de esquiva. En Dofus quitar PA o PM se resuelve
-        /// comparando la "retirada" del lanzador con la "esquiva" del objetivo, y la retirada del
-        /// personaje no se está calculando desde el equipo, así que de momento el efecto se
-        /// aplica entero. La estructura ya está preparada para meter la tirada cuando se lea ese
-        /// dato del equipo.
+        /// What it still does NOT do: the dodge roll. In Dofus, stripping AP or MP is resolved by
+        /// pitting the caster's "withdrawal" against the target's "dodge", and the character's
+        /// withdrawal is not being computed from the gear, so for now the effect is applied in
+        /// full. The structure is already in place to add the roll once that value is read from
+        /// the gear.
         /// </summary>
         private static async Task<int> ApplySpellEffectsAsync(
             NetworkStream stream, FightInstance fight, Fighter caster, SpellCombatData spell, Fighter target)
@@ -1308,23 +1309,23 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 var element = (ElementType)spell.Element;
 
-                // Golpe crítico: probabilidad del hechizo más el crítico que aporte el equipo. En
-                // crítico el daño NO se multiplica, se usa el rango crítico que trae el propio
-                // hechizo (la Flecha Helada pasa de 12-14 a 15-17).
-                int probCritica = spell.CriticalHitProbability + caster.CriticalBonus;
-                bool esCritico = spell.HasCriticalDamage && probCritica > 0 && _lootRandom.Next(100) < probCritica;
+                // Critical hit: the spell's own probability plus whatever critical the gear adds.
+                // On a critical the damage is NOT multiplied; the critical range carried by the
+                // spell itself is used instead (Frozen Arrow goes from 12-14 to 15-17).
+                int criticalChance = spell.CriticalHitProbability + caster.CriticalBonus;
+                bool isCritical = spell.HasCriticalDamage && criticalChance > 0 && _lootRandom.Next(100) < criticalChance;
 
-                int minBase = esCritico ? spell.CriticalDamageMin : spell.BaseDamageMin;
-                int maxBase = esCritico ? spell.CriticalDamageMax : spell.BaseDamageMax;
+                int minBase = isCritical ? spell.CriticalDamageMin : spell.BaseDamageMin;
+                int maxBase = isCritical ? spell.CriticalDamageMax : spell.BaseDamageMax;
 
-                // Bonificación de daño base que el propio hechizo se dejó puesta en un lanzamiento
-                // anterior (efecto 293). Suma al daño BASE, antes de multiplicar por la
-                // característica: la Flecha Helada pasa de 12-14 a 16-18 en el segundo lanzamiento.
-                int bonoBase = caster.GetSpellDamageBonus((int)spell.SpellId, fight.RoundNumber);
-                int danoBase = ((minBase + maxBase) / 2) + bonoBase;
+                // Base damage bonus the spell left on itself during an earlier cast (effect 293).
+                // It adds to the BASE damage, before multiplying by the characteristic: Frozen
+                // Arrow goes from 12-14 to 16-18 on the second cast.
+                int baseBonus = caster.GetSpellDamageBonus((int)spell.SpellId, fight.RoundNumber);
+                int baseDamageRoll = ((minBase + maxBase) / 2) + baseBonus;
 
                 damageDealt = DamageCalculator.CalculateDamage(
-                    baseDamage: danoBase,
+                    baseDamage: baseDamageRoll,
                     element: element,
                     statValue: caster.GetStatForElement(element),
                     power: caster.Power,
@@ -1334,73 +1335,72 @@ namespace Jondo.Unity.Launcher.Handlers
                     targetFlatRes: 0);
 
                 target.TakeDamage(damageDealt);
-                Program.LogDebug($"[FightHandler] {caster.Name} hace {damageDealt} de daño a {target.Name} " +
-                                 $"(elemento {spell.Element}, base {danoBase}" +
-                                 $"{(bonoBase != 0 ? $" incluyendo +{bonoBase} del efecto" : "")}" +
-                                 $"{(esCritico ? $", CRÍTICO al {probCritica} %" : "")}). " +
-                                 $"Vida: {target.CurrentHP}/{target.MaxHP}");
+                Program.LogDebug($"[FightHandler] {caster.Name} deals {damageDealt} damage to {target.Name} " +
+                                 $"(element {spell.Element}, base {baseDamageRoll}" +
+                                 $"{(baseBonus != 0 ? $" including +{baseBonus} from the effect" : "")}" +
+                                 $"{(isCritical ? $", CRITICAL at {criticalChance} %" : "")}). " +
+                                 $"HP: {target.CurrentHP}/{target.MaxHP}");
 
                 await WriteFrameAsync(stream, BuildJtxDamagePacket(caster.Id, target.Id, damageDealt, spell.Element));
 
                 if (!target.IsAlive)
                 {
                     await WriteFrameAsync(stream, BuildJtxDeathPacket(caster.Id, target.Id));
-                    Program.LogDebug($"[FightHandler] {target.Name} ha caído.");
+                    Program.LogDebug($"[FightHandler] {target.Name} has fallen.");
                 }
             }
 
-            // Bonificaciones que el hechizo deja puestas sobre el LANZADOR para próximos usos.
-            // Volver a lanzarlo renueva el plazo en vez de sumar otra vez: la acumulación máxima
-            // de la Flecha Helada es 1.
+            // Bonuses the spell leaves on the CASTER for later uses. Casting it again refreshes
+            // the duration instead of stacking a second time: Frozen Arrow's maximum stack is 1.
             foreach (var buff in spell.DamageBuffs)
             {
                 caster.ApplySpellDamageBuff(buff.SpellId, buff.Bonus, buff.Duration, fight.RoundNumber);
-                Program.LogDebug($"[FightHandler]   {caster.Name} gana +{buff.Bonus} de daño base en el hechizo " +
-                                 $"{buff.SpellId} durante {buff.Duration} turno(s).");
+                Program.LogDebug($"[FightHandler]   {caster.Name} gains +{buff.Bonus} base damage on spell " +
+                                 $"{buff.SpellId} for {buff.Duration} turn(s).");
             }
 
-            // Efectos sobre características: quitar PA (efecto 1079 de la Flecha Helada),
-            // quitar alcance (efecto 116, el que lleva el pío), etc.
+            // Characteristic effects: AP removal (effect 1079 of Frozen Arrow), range removal
+            // (effect 116, the one the piwi carries), and so on.
             foreach (var se in spell.StatEffects)
             {
                 if (se.Characteristic == 1)
                 {
-                    int perdidos = Math.Min(Math.Abs(se.Value), target.CurrentAP);
-                    if (perdidos <= 0) continue;
-                    target.CurrentAP -= perdidos;
-                    target.AccumulatedApLoss += perdidos;
+                    int lost = Math.Min(Math.Abs(se.Value), target.CurrentAP);
+                    if (lost <= 0) continue;
+                    target.CurrentAP -= lost;
+                    target.AccumulatedApLoss += lost;
                     await WriteFrameAsync(stream, BuildJud(3, target.Id));
                     await WriteFrameAsync(stream, BuildJvmPacket(target.Id, 1, -target.AccumulatedApLoss, target.MaxAP));
                     await WriteFrameAsync(stream, BuildJuc(3, target.Id));
-                    await WriteFrameAsync(stream, BuildJtxPointLossPacket(target.Id, caster.Id, perdidos));
-                    Program.LogDebug($"[FightHandler]   efecto {se.EffectId}: -{perdidos} PA a {target.Name}.");
+                    await WriteFrameAsync(stream, BuildJtxPointLossPacket(target.Id, caster.Id, lost));
+                    Program.LogDebug($"[FightHandler]   effect {se.EffectId}: -{lost} AP on {target.Name}.");
                 }
                 else if (se.Characteristic == 23)
                 {
-                    int perdidos = Math.Min(Math.Abs(se.Value), target.CurrentMP);
-                    if (perdidos <= 0) continue;
-                    target.CurrentMP -= perdidos;
-                    target.AccumulatedMpLoss += perdidos;
+                    int lost = Math.Min(Math.Abs(se.Value), target.CurrentMP);
+                    if (lost <= 0) continue;
+                    target.CurrentMP -= lost;
+                    target.AccumulatedMpLoss += lost;
                     await WriteFrameAsync(stream, BuildJud(3, target.Id));
                     await WriteFrameAsync(stream, BuildJvmPacket(target.Id, 23, -target.AccumulatedMpLoss, target.MaxMP));
                     await WriteFrameAsync(stream, BuildJuc(3, target.Id));
-                    await WriteFrameAsync(stream, BuildJtxPointLossPacket(target.Id, caster.Id, perdidos, isMp: true));
-                    Program.LogDebug($"[FightHandler]   efecto {se.EffectId}: -{perdidos} PM a {target.Name}.");
+                    await WriteFrameAsync(stream, BuildJtxPointLossPacket(target.Id, caster.Id, lost, isMp: true));
+                    Program.LogDebug($"[FightHandler]   effect {se.EffectId}: -{lost} MP on {target.Name}.");
                 }
                 else
                 {
-                    // Resto de características (alcance, potencia, resistencias...): el cliente
-                    // solo necesita la variación; el servidor todavía no las usa en sus cálculos.
+                    // Every other characteristic (range, power, resistances...): the client only
+                    // needs the variation; the server does not use them in its own maths yet.
                     await WriteFrameAsync(stream, BuildJud(3, target.Id));
                     await WriteFrameAsync(stream, BuildJvmPacket(target.Id, se.Characteristic, se.Value, 0));
                     await WriteFrameAsync(stream, BuildJuc(3, target.Id));
-                    Program.LogDebug($"[FightHandler]   efecto {se.EffectId}: {se.Value} en la característica {se.Characteristic} de {target.Name}.");
+                    Program.LogDebug($"[FightHandler]   effect {se.EffectId}: {se.Value} on characteristic {se.Characteristic} of {target.Name}.");
                 }
             }
 
-            // Desplazamiento. Sin captura de un empuje real, se reutiliza el mismo joo que mueve
-            // a un luchador por un camino: la animación no será la de un empujón, pero el
-            // monstruo acaba en la casilla correcta y ya no se queda clavado en el sitio.
+            // Displacement. With no capture of a real push, the same joo that walks a fighter
+            // along a path is reused: the animation will not be a shove, but the monster ends up
+            // on the right cell instead of staying nailed to the spot.
             if (spell.PushDistance != 0 && target.IsAlive)
             {
                 var walkable = MapManager.GetFightWalkable(fight.ArenaMapId);
@@ -1414,8 +1414,8 @@ namespace Jondo.Unity.Launcher.Handlers
                     await WriteFrameAsync(stream, BuildJud(3, target.Id));
                     await WriteFrameAsync(stream, BuildJooMovementPacket(target.Id, pushPath));
                     await WriteFrameAsync(stream, BuildJuc(3, target.Id));
-                    Program.LogDebug($"[FightHandler]   desplazamiento: {target.Name} va a la casilla {target.CellId} " +
-                                     $"({pushPath.Count - 1} de {Math.Abs(spell.PushDistance)} casillas).");
+                    Program.LogDebug($"[FightHandler]   displacement: {target.Name} moves to cell {target.CellId} " +
+                                     $"({pushPath.Count - 1} of {Math.Abs(spell.PushDistance)} cells).");
                 }
             }
 
@@ -1464,9 +1464,9 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (vertices.Count == 0) return;
 
-            // Transitabilidad de COMBATE, no la de map_walkable_cells.json: aquella recorta los
-            // bordes del mapa (se generó para colocar mobs en roleplay) y dejaba fuera el anillo
-            // exterior de la arena, por el que sí se puede andar peleando.
+            // COMBAT walkability, not the one in map_walkable_cells.json: that one trims the map
+            // borders (it was generated to place mobs in roleplay) and left out the arena's outer
+            // ring, which you can perfectly well walk on during a fight.
             var arenaWalkable = MapManager.GetFightWalkable(fight.ArenaMapId);
             var expandedPath = MapGeometry.ExpandPath(vertices, arenaWalkable);
 
@@ -1532,7 +1532,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 arenaWalkable,
                 (spellId) =>
                 {
-                    // El grado del hechizo lo fija la ficha del monstruo (spellGrades), no su nivel.
+                    // The spell grade comes from the monster's own sheet (spellGrades), not from its level.
                     int grade = monster.SpellGrades.TryGetValue(spellId, out var g) ? g : 1;
                     var sData = DatabaseManager.GetSpellCombatData(spellId, grade);
                     if (sData == null) return null;
@@ -1552,9 +1552,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 losBlockers
             );
 
-            // El orden importa: si el monstruo atacó y DESPUÉS huyó, hay que mandarlo así. Al
-            // revés, el cliente dibuja el disparo desde la casilla de huida y parece que ha
-            // atacado desde mucho más lejos de lo que permite su hechizo.
+            // Order matters: if the monster attacked and THEN fled, that is the order it has to be
+            // sent in. The other way round, the client draws the shot from the escape cell and it
+            // looks as if the monster attacked from much farther away than its spell allows.
             if (turnResult.CastBeforeMove)
             {
                 if (await SendMonsterCastAsync(stream, fight, monster, turnResult)) return;
@@ -1573,7 +1573,7 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             if (turnResult.PathCells.Count <= 1) return;
 
-            Program.LogDebug($"[FightHandler] El monstruo #{monster.Id} recorre {turnResult.PathCells.Count - 1} casilla(s) hasta la {monster.CellId}.");
+            Program.LogDebug($"[FightHandler] Monster #{monster.Id} walks {turnResult.PathCells.Count - 1} cell(s) to cell {monster.CellId}.");
 
             await WriteFrameAsync(stream, BuildJud(4, monster.Id));
             await WriteFrameAsync(stream, BuildJooMovementPacket(monster.Id, turnResult.PathCells));
@@ -1583,7 +1583,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await WriteFrameAsync(stream, BuildJuc(4, monster.Id));
         }
 
-        /// <summary>Devuelve true si el combate ha terminado y ya se ha notificado.</summary>
+        /// <summary>Returns true if the fight is over and has already been reported.</summary>
         private static async Task<bool> SendMonsterCastAsync(
             NetworkStream stream, FightInstance fight, Fighter monster, MonsterTurnResult turnResult)
         {
@@ -1594,19 +1594,19 @@ namespace Jondo.Unity.Launcher.Handlers
             var monSpell = DatabaseManager.GetSpellCombatData(turnResult.SpellId, grade);
             if (target == null || monSpell == null) return false;
 
-            // La casilla desde la que se lanzó, no la actual: si el monstruo atacó y luego huyó,
-            // su CellId ya es el de destino.
-            int desde = turnResult.CastFromCell >= 0 ? turnResult.CastFromCell : monster.CellId;
-            int d = MapGeometry.Distance(desde, target.CellId);
-            int veces = Math.Max(1, turnResult.CastCount);
-            Program.LogDebug($"[FightHandler] El monstruo #{monster.Id} lanza el hechizo {turnResult.SpellId} " +
-                             $"{veces} vez/veces sobre {target.Name} desde la casilla {desde} " +
-                             $"(distancia {d}, alcance {monSpell.MinRange}-{monSpell.MaxRange}).");
+            // The cell the spell was cast FROM, not the current one: if the monster attacked and
+            // then fled, its CellId is already the destination.
+            int fromCell = turnResult.CastFromCell >= 0 ? turnResult.CastFromCell : monster.CellId;
+            int d = MapGeometry.Distance(fromCell, target.CellId);
+            int castCount = Math.Max(1, turnResult.CastCount);
+            Program.LogDebug($"[FightHandler] Monster #{monster.Id} casts spell {turnResult.SpellId} " +
+                             $"{castCount} time(s) on {target.Name} from cell {fromCell} " +
+                             $"(distance {d}, range {monSpell.MinRange}-{monSpell.MaxRange}).");
 
-            // Exactamente la misma secuencia que el lanzamiento del jugador, incluido el reparto
-            // de efectos: así un monstruo que empuja o quita PA hace lo mismo que haría el
-            // personaje con ese hechizo.
-            for (int i = 1; i <= veces; i++)
+            // Exactly the same sequence as a player cast, effect application included: that way a
+            // monster that pushes or strips AP does the same thing the character would do with
+            // that spell.
+            for (int i = 1; i <= castCount; i++)
             {
                 await WriteFrameAsync(stream, BuildJud(4, monster.Id));
                 await WriteFrameAsync(stream, BuildJtxSpellCastPacket(monster.Id, turnResult.TargetCellId, turnResult.SpellId, monSpell.SpellLevelId, target.Id, i));
@@ -1907,13 +1907,13 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             else
             {
-                // Bloque f9: la ficha del JUGADOR (nombre y nivel). Es el equivalente del f7 que
-                // usan los monstruos, y sin él el cliente muestra "???" y "Niv. 0" al pasar el ratón.
-                // Estructura decodificada de la captura (jugador Fortellon, nivel 2):
+                // Block f9: the PLAYER's sheet (name and level). It is the counterpart of the f7
+                // monsters use, and without it the client shows "???" and "Lv. 0" on mouse over.
+                // Structure decoded from the capture (a level 2 character):
                 //   f9 { f3 { f2 = 1 },
-                //        f4 { f2 = <raza>, f3 = 3, f4 = 1, f5 { f2 = <nivel>, f4 = 3 } },
+                //        f4 { f2 = <breed>, f3 = 3, f4 = 1, f5 { f2 = <level>, f4 = 3 } },
                 //        f6 = -1,
-                //        f7 = "<nombre>" }        <- 9 bytes = "Fortellon"
+                //        f7 = "<name>" }          <- the character name as raw UTF-8 bytes
                 var f9Level = new ProtoMessage();
                 f9Level.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fighter.Level });
                 f9Level.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 3 });
@@ -2016,15 +2016,15 @@ namespace Jondo.Unity.Launcher.Handlers
         private static readonly Random _lootRandom = new Random();
 
         /// <summary>
-        /// Tira el botín de todos los monstruos derrotados y lo mete en el inventario.
+        /// Rolls the loot of every defeated monster and puts it into the inventory.
         ///
-        /// Cada monstruo tiene su propia tabla en MonsterTemplates.drops, con una probabilidad
-        /// por grado. El Capiorico Rojo, por ejemplo, suelta pluma de pío rojo al 100 %, semillas
-        /// de sésamo al 18 % y bolsita de limones al 3 %.
+        /// Each monster has its own table in MonsterTemplates.drops, with one probability per
+        /// grade. The red piwi chief, for instance, drops a red piwi feather at 100 %, sesame
+        /// seeds at 18 % and a pouch of lemons at 3 %.
         ///
-        /// Lo que NO se aplica todavía: la prospección. En el juego real la probabilidad se
-        /// multiplica por la PP del personaje dividida entre 100, pero la prospección del equipo
-        /// no se está calculando, así que se usa el porcentaje base (equivale a 100 de PP).
+        /// What is NOT applied yet: prospecting. In the real game the probability is multiplied by
+        /// the character's prospecting divided by 100, but prospecting from the gear is not being
+        /// computed, so the base percentage is used (equivalent to 100 prospecting).
         /// </summary>
         private static Dictionary<int, int> RollFightLoot(FightInstance fight)
         {
@@ -2044,7 +2044,7 @@ namespace Jondo.Unity.Launcher.Handlers
             foreach (var kv in loot)
             {
                 DatabaseManager.AddItemToInventory(GameState.CharacterId, kv.Key, kv.Value);
-                Program.LogDebug($"[FightHandler] Botín: objeto {kv.Key} x{kv.Value} al inventario.");
+                Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
             }
 
             if (loot.Count > 0)
@@ -2057,49 +2057,49 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static async Task SendFightEnd(NetworkStream stream, FightInstance fight)
         {
-            // Experiencia REAL de cada monstruo derrotado (gradeXp de su ficha), no una fórmula
-            // inventada. Es la misma cifra que el cliente enseña al pasar el ratón por el grupo.
+            // The REAL experience of each defeated monster (gradeXp from its sheet), not a made-up
+            // formula. It is the same figure the client shows when hovering over the group.
             //
-            // Lo que NO se aplica: el ajuste por diferencia de nivel entre el grupo y el
-            // personaje, ni el reparto entre varios miembros del equipo. Con un solo jugador y
-            // sin fórmula contrastada, se entrega la experiencia base.
+            // What is NOT applied: the adjustment for the level gap between the group and the
+            // character, nor the split across several team members. With a single player and no
+            // verified formula, the base experience is handed out as is.
             long totalXP = (fight.WinnerTeamId == 0) ? fight.Team1.Sum(m => (long)m.XpReward) : 0;
             int totalKamas = fight.Team1.Sum(m => 10 + (m.Level * 5));
 
-            int levelAntes = GameState.CharacterLevel;
+            int previousLevel = GameState.CharacterLevel;
             if (totalXP > 0)
             {
                 GameState.Experience += totalXP;
-                int levelNuevo = ExperienceTable.LevelForXp(GameState.Experience);
-                if (levelNuevo > GameState.CharacterLevel)
+                int newLevel = ExperienceTable.LevelForXp(GameState.Experience);
+                if (newLevel > GameState.CharacterLevel)
                 {
-                    // 5 puntos de característica por nivel, igual que en TotalCapitalForLevel.
-                    int niveles = levelNuevo - GameState.CharacterLevel;
-                    GameState.CharacterRemainingPoints += niveles * 5;
-                    GameState.CharacterLevel = levelNuevo;
-                    Program.LogDebug($"[FightHandler] ¡Subida de nivel! {levelAntes} -> {levelNuevo} " +
-                                     $"(+{niveles * 5} puntos de característica).");
+                    // 5 characteristic points per level, same as in TotalCapitalForLevel.
+                    int levelsGained = newLevel - GameState.CharacterLevel;
+                    GameState.CharacterRemainingPoints += levelsGained * 5;
+                    GameState.CharacterLevel = newLevel;
+                    Program.LogDebug($"[FightHandler] Level up! {previousLevel} -> {newLevel} " +
+                                     $"(+{levelsGained * 5} characteristic points).");
                 }
                 DatabaseManager.SaveCurrentCharacter();
-                Program.LogDebug($"[FightHandler] +{totalXP} de experiencia (total {GameState.Experience}, " +
-                                 $"nivel {GameState.CharacterLevel}: de {ExperienceTable.LevelFloor(GameState.CharacterLevel)} " +
-                                 $"a {ExperienceTable.NextLevelFloor(GameState.CharacterLevel)}).");
+                Program.LogDebug($"[FightHandler] +{totalXP} experience (total {GameState.Experience}, " +
+                                 $"level {GameState.CharacterLevel}: from {ExperienceTable.LevelFloor(GameState.CharacterLevel)} " +
+                                 $"to {ExperienceTable.NextLevelFloor(GameState.CharacterLevel)}).");
             }
 
-            // jwf = pantalla de fin de combate. El campo 1 es REPETIDO y de tipo mensaje: una
-            // entrada por luchador. Antes se mandaba un simple varint con el equipo ganador, así
-            // que el cliente no conseguía ni descodificar el mensaje y no aparecía ninguna pantalla.
+            // jwf = the end-of-fight screen. Field 1 is REPEATED and of message type: one entry
+            // per fighter. It used to be sent as a plain varint holding the winning team, so the
+            // client could not even decode the message and no screen showed up at all.
             //
-            // Estructura tomada de la captura oficial (trama 334):
-            //   f1 { f1 { f1: 1, f2 { f1{f3=idObjeto, f4=cantidad}…, f3 = kamas } }   <- botín
-            //        f3 { f4: 1, f5 = idLuchador }
-            //        f4: 2 }                                                          <- ganador
-            //   f1 { f1: {}, f3 { f4: 1, f5 = idLuchador } }                          <- perdedor
+            // Structure taken from the official capture (frame 334):
+            //   f1 { f1 { f1: 1, f2 { f1{f3=itemId, f4=quantity}..., f3 = kamas } }   <- loot
+            //        f3 { f4: 1, f5 = fighterId }
+            //        f4: 2 }                                                          <- winner
+            //   f1 { f1: {}, f3 { f4: 1, f5 = fighterId } }                           <- loser
             //   f2: -1
             //
-            // Queda fuera el bloque f3.f9 de progreso de experiencia: la captura solo da una
-            // muestra y no permite saber qué es cada número, así que se omite en vez de rellenarlo
-            // a ojo. Es un campo opcional; la pantalla sale igual, sin la barra de experiencia.
+            // The f3.f9 experience progress block is left out: the capture gives a single sample
+            // and does not let us tell what each number means, so it is omitted instead of being
+            // filled in by eye. It is optional; the screen still shows up, minus the XP bar.
             var loot = (fight.WinnerTeamId == 0) ? RollFightLoot(fight) : new Dictionary<int, int>();
 
             var lootMsg = new ProtoMessage();
@@ -2111,10 +2111,11 @@ namespace Jondo.Unity.Launcher.Handlers
                 lootMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = itemEntry.ToByteArray() });
             }
 
-            // Las kamas van en el campo 1 del envoltorio del botín, no en el 3 del bloque interior.
-            // La prueba es directa: ahí iba un 1 fijo copiado de la captura y la pantalla de fin de
-            // combate mostraba "kamas 1" tras un combate que dio 65. El campo 3 (3273 en la captura
-            // oficial) es el valor estimado del botín, que además el cliente calcula por su cuenta.
+            // The kamas go in field 1 of the loot wrapper, not in field 3 of the inner block. The
+            // proof is direct: a fixed 1 copied from the capture used to sit there and the
+            // end-of-fight screen showed "kamas 1" after a fight that paid 65. Field 3 (3273 in
+            // the official capture) is the estimated value of the loot, which the client works
+            // out on its own anyway.
             var lootWrap = new ProtoMessage();
             lootWrap.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = totalKamas });
             lootWrap.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = lootMsg.ToByteArray() });
@@ -2128,47 +2129,47 @@ namespace Jondo.Unity.Launcher.Handlers
                 fighterResult.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
                 fighterResult.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = f.Id });
 
-                // Bloque de progreso de experiencia, solo para el personaje del jugador.
+                // Experience progress block, for the player's character only.
                 //
-                // Estructura deducida de tres capturas con el personaje a niveles 1, 2 y 3, y
-                // contrastada con la tabla de experiencia del cliente:
-                //   f4 = experiencia con la que empieza el nivel actual (se omite si es 0)
-                //   f6 = experiencia a la que se sube al nivel siguiente
-                //   f7 = experiencia acumulada ahora mismo (se omite si es 0)
-                //   f9 = experiencia ganada en este combate (se omite si es 0)
-                //   f1, f2, f3, f5, f8 = 1 en las tres capturas
-                // y, un nivel más arriba, f2 = el nivel del personaje.
-                // Comprobación: a nivel 3 la captura manda f4=650 y f6=1500, que son exactamente
-                // los umbrales de los niveles 3 y 4 de la tabla del cliente.
+                // Structure deduced from three captures with the character at levels 1, 2 and 3,
+                // and cross-checked against the client's experience table:
+                //   f4 = experience the current level starts at (omitted when 0)
+                //   f6 = experience at which the next level is reached
+                //   f7 = experience accumulated right now (omitted when 0)
+                //   f9 = experience gained in this fight (omitted when 0)
+                //   f1, f2, f3, f5, f8 = 1 in all three captures
+                // and, one level up, f2 = the character's level.
+                // Check: at level 3 the capture sends f4=650 and f6=1500, which are exactly the
+                // thresholds of levels 3 and 4 in the client's table.
                 if (!f.IsMonster)
                 {
-                    long suelo = ExperienceTable.LevelFloor(GameState.CharacterLevel);
-                    long siguiente = ExperienceTable.NextLevelFloor(GameState.CharacterLevel);
+                    long levelFloor = ExperienceTable.LevelFloor(GameState.CharacterLevel);
+                    long nextLevelFloor = ExperienceTable.NextLevelFloor(GameState.CharacterLevel);
 
-                    var xpDetalle = new ProtoMessage();
-                    xpDetalle.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 1 });
-                    xpDetalle.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 1 });
-                    xpDetalle.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 1 });
-                    if (suelo > 0)
-                        xpDetalle.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = suelo });
-                    xpDetalle.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 1 });
-                    xpDetalle.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = siguiente });
+                    var xpDetail = new ProtoMessage();
+                    xpDetail.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 1 });
+                    xpDetail.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 1 });
+                    xpDetail.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 1 });
+                    if (levelFloor > 0)
+                        xpDetail.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = levelFloor });
+                    xpDetail.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 1 });
+                    xpDetail.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = nextLevelFloor });
                     if (GameState.Experience > 0)
-                        xpDetalle.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = GameState.Experience });
+                        xpDetail.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = GameState.Experience });
                     if (totalXP > 0)
                     {
-                        xpDetalle.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 0, VarIntValue = 1 });
-                        xpDetalle.Fields.Add(new ProtoField { FieldNumber = 9, WireType = 0, VarIntValue = totalXP });
+                        xpDetail.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 0, VarIntValue = 1 });
+                        xpDetail.Fields.Add(new ProtoField { FieldNumber = 9, WireType = 0, VarIntValue = totalXP });
                     }
 
                     var xpWrap = new ProtoMessage();
-                    xpWrap.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = xpDetalle.ToByteArray() });
+                    xpWrap.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = xpDetail.ToByteArray() });
 
-                    var xpBloque = new ProtoMessage();
-                    xpBloque.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = xpWrap.ToByteArray() });
-                    xpBloque.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel });
+                    var xpBlock = new ProtoMessage();
+                    xpBlock.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = xpWrap.ToByteArray() });
+                    xpBlock.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel });
 
-                    fighterResult.Fields.Add(new ProtoField { FieldNumber = 9, WireType = 2, BytesValue = xpBloque.ToByteArray() });
+                    fighterResult.Fields.Add(new ProtoField { FieldNumber = 9, WireType = 2, BytesValue = xpBlock.ToByteArray() });
                 }
 
                 var entry = new ProtoMessage();
@@ -2188,7 +2189,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             jwfMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = -1 });
 
-            // krh = experiencia ganada. En las dos capturas va justo delante del jwf.
+            // krh = experience gained. In both captures it comes right before the jwf.
             var krhMsg = new ProtoMessage();
             if (totalXP > 0)
             {
@@ -2198,23 +2199,23 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jwf", jwfMsg.ToByteArray()));
 
-            // El juo que se enviaba aquí ({f1 = xp, f2 = kamas}) tampoco se parecía al real, cuyo
-            // campo 1 es un submensaje. Se elimina en lugar de sustituirlo por otra invención: un
-            // mensaje mal formado es peor que ninguno.
+            // The juo that used to be sent here ({f1 = xp, f2 = kamas}) did not look like the real
+            // one either, whose field 1 is a submessage. It is dropped instead of replaced by
+            // another invention: a malformed message is worse than no message at all.
 
             if (fight.WinnerTeamId == 0)
             {
                 MobSpawnManager.RemoveMobGroup(fight.RoleplayMapId, GameState.CurrentFightMobId);
                 Program.LogDebug($"[FightHandler] Mob group #{GameState.CurrentFightMobId} removed from map {fight.RoleplayMapId}.");
 
-                // Se repone el grupo derrotado con otro generado al azar, sin tocar los que
-                // quedan en el mapa. Va antes del kkr sintetizado de más abajo, para que el jpv
-                // que se le manda al cliente ya lo incluya.
-                var repuesto = MobSpawnManager.RespawnOneGroup(fight.RoleplayMapId);
-                if (repuesto != null)
+                // The defeated group is replaced with a freshly randomized one, leaving the groups
+                // still on the map alone. It runs before the synthesized kkr further down, so that
+                // the jpv sent to the client already includes it.
+                var respawned = MobSpawnManager.RespawnOneGroup(fight.RoleplayMapId);
+                if (respawned != null)
                 {
-                    Program.LogDebug($"[FightHandler] Repuesto el grupo #{repuesto.MobId} en la casilla " +
-                                     $"{repuesto.CellId} con {repuesto.Members.Count} monstruo(s).");
+                    Program.LogDebug($"[FightHandler] Respawned group #{respawned.MobId} on cell " +
+                                     $"{respawned.CellId} with {respawned.Members.Count} monster(s).");
                 }
             }
 
@@ -2222,15 +2223,15 @@ namespace Jondo.Unity.Launcher.Handlers
             GameState.CurrentFightMobId = 0;
             _activeFights.TryRemove(fight.FightId, out _);
 
-            // Vuelta a roleplay, calcada de la captura oficial (tramas 336-339):
-            //   lxs · kkp · kkm · krb · joh · lor
+            // Back to roleplay, traced from the official capture (frames 336-339):
+            //   lxs -> kkp -> kkm -> krb -> joh -> lor
             //
-            // Lo que había aquí era jpf + kkq(0) + joh, y ninguno de los dos primeros sirve para
-            // eso: kkq identifica al grupo de mobs y jpf abre el contexto de pelea. Los mensajes
-            // que de verdad sacan al cliente del combate son kkp (destruir contexto) y kkm
-            // (crear el nuevo; vacío = roleplay). Al no mandarlos, el cliente se quedaba dentro
-            // del contexto de combate: de ahí que siguieran en pantalla el contador de turnos y
-            // el temporizador después de cerrar la pantalla de victoria.
+            // What used to be here was jpf + kkq(0) + joh, and neither of the first two does that
+            // job: kkq identifies the mob group and jpf opens the fight context. The messages that
+            // really pull the client out of the fight are kkp (destroy context) and kkm (create
+            // the new one; empty = roleplay). Without them the client stayed inside the fight
+            // context, which is why the turn counter and the timer were still on screen after
+            // closing the victory panel.
             await WriteFrameAsync(stream, TransitionPacketsBuilder.BuildLxsMessage());
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/kkp", Array.Empty<byte>()));
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/kkm", Array.Empty<byte>()));
@@ -2245,17 +2246,17 @@ namespace Jondo.Unity.Launcher.Handlers
             lorRp.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() });
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/lor", lorRp.ToByteArray()));
 
-            // Repoblar el mapa de roleplay. Con joh a secas el cliente se quedaba en un mapa vacío,
-            // sin jugador, NPCs ni grupos de mobs: falta el ciclo kkr -> jpv. Lo provocamos nosotros
-            // sintetizando el kkr en vez de esperar a que el cliente lo pida.
+            // Repopulate the roleplay map. With joh alone the client was left on an empty map, with
+            // no player, no NPCs and no mob groups: the kkr -> jpv cycle is missing. We trigger it
+            // ourselves by synthesizing the kkr instead of waiting for the client to ask for it.
             GameState.MapId = fight.RoleplayMapId;
             var kkrSynth = new ProtoMessage();
             kkrSynth.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = fight.RoleplayMapId });
             byte[] kkrPacket = BuildGameNodePacket("type.ankama.com/kkr", kkrSynth.ToByteArray());
             await MapLoadHandler.HandleMapLoadRequest(stream, kkrPacket);
 
-            // Las kamas ganadas. Se guardan en el personaje y se le manda al cliente el bvr
-            // (KamasUpdateMessage); sin él la bolsa seguía marcando lo de antes del combate.
+            // The kamas won. They are saved on the character and a bvr (KamasUpdateMessage) is sent
+            // to the client; without it the purse kept showing the pre-fight amount.
             if (fight.WinnerTeamId == 0 && totalKamas > 0)
             {
                 GameState.Kamas += totalKamas;
@@ -2267,39 +2268,39 @@ namespace Jondo.Unity.Launcher.Handlers
                 Program.LogDebug($"[FightHandler] +{totalKamas} kamas (total {GameState.Kamas}).");
             }
 
-            // Con botín nuevo hay que reenviar el inventario entero: si no, los objetos están en
-            // la base de datos pero el cliente sigue mostrando la bolsa de antes del combate.
+            // With new loot the whole inventory has to be resent: otherwise the items are in the
+            // database but the client keeps showing the bag it had before the fight.
             if (loot.Count > 0)
             {
                 await WriteFrameAsync(stream, BuildGameNodePacket(
-                    "type.ankama.com/irm", CharacterSelectionHandlerOld.BuildDynamicIrmPayload()));
-                Program.LogDebug($"[FightHandler] Inventario reenviado con {loot.Count} objeto(s) de botín.");
+                    "type.ankama.com/irm", CharacterSelectionHandler.BuildDynamicIrmPayload()));
+                Program.LogDebug($"[FightHandler] Inventory resent with {loot.Count} looted item(s).");
             }
 
-            // Ficha de características. El cliente sale del combate con los contadores que tenía
-            // el luchador al morir el último enemigo: por eso se veía 0 de vida, 3 PA y 0 PM ya en
-            // roleplay. La captura oficial también reenvía el kri al terminar la pelea.
+            // Characteristics sheet. The client leaves the fight carrying the counters the fighter
+            // had when the last enemy died: that is why it showed 0 HP, 3 AP and 0 MP once back in
+            // roleplay. The official capture also resends the kri when the fight ends.
             byte[]? kriEnd = StatsHandler.BuildUpdatedKriPacket();
             if (kriEnd != null)
             {
                 await WriteFrameAsync(stream, kriEnd);
-                Program.LogDebug("[FightHandler] Reenviada la ficha de características (kri) al volver a roleplay.");
+                Program.LogDebug("[FightHandler] Characteristics sheet (kri) resent on the way back to roleplay.");
             }
 
-            // Al subir de nivel se rehace la barra de hechizos: puede haber alguno nuevo que ya
-            // cumpla el nivel mínimo. El cliente saca la pantalla de subida de nivel él solo, al
-            // ver en el kri un nivel más alto que el que tenía.
-            if (GameState.CharacterLevel > levelAntes)
+            // On level up the spell bar is rebuilt: there may be a new spell that now meets the
+            // minimum level. The client pops the level-up screen by itself as soon as it sees a
+            // higher level in the kri than the one it had.
+            if (GameState.CharacterLevel > previousLevel)
             {
                 await WriteFrameAsync(stream, TransitionPacketsBuilder.BuildHmdMessage());
                 foreach (var itp in TransitionPacketsBuilder.BuildItpList())
                 {
                     await WriteFrameAsync(stream, itp);
                 }
-                Program.LogDebug($"[FightHandler] Libro y barra de hechizos rehechos tras subir al nivel {GameState.CharacterLevel}.");
+                Program.LogDebug($"[FightHandler] Spell book and spell bar rebuilt after reaching level {GameState.CharacterLevel}.");
             }
 
-            Program.LogDebug($"[FightHandler] Fight #{fight.FightId} ended! Restored Roleplay Map {fight.RoleplayMapId}. Winner: Team {fight.WinnerTeamId}. Rewards: {totalXP} XP, {totalKamas} Kamas, {loot.Count} objeto(s).");
+            Program.LogDebug($"[FightHandler] Fight #{fight.FightId} ended! Restored Roleplay Map {fight.RoleplayMapId}. Winner: Team {fight.WinnerTeamId}. Rewards: {totalXP} XP, {totalKamas} Kamas, {loot.Count} item(s).");
         }
 
         // =========================================================================

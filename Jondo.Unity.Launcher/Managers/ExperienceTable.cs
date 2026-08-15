@@ -6,13 +6,13 @@ using System.Linq;
 namespace Jondo.Unity.Launcher
 {
     /// <summary>
-    /// Tabla de experiencia del personaje: cuánta experiencia acumulada hace falta para alcanzar
-    /// cada nivel. Sale de los bundles del cliente
-    /// (data_assets_characterxpmappingsdataroot.asset.bundle) mediante extract_character_xp.py.
+    /// Character experience table: how much accumulated experience is needed to reach each level.
+    /// It comes from the client bundles
+    /// (data_assets_characterxpmappingsdataroot.asset.bundle) through extract_character_xp.py.
     ///
-    /// Los primeros valores cuadran con lo que ya estaba escrito a mano en el kri —nivel 2 = 110
-    /// y nivel 3 = 650— y con la captura oficial de fin de combate, que para un personaje de
-    /// nivel 3 manda 650 como suelo del nivel y 1500 como umbral del siguiente.
+    /// The first values line up with what was already hardcoded in the kri -- level 2 = 110 and
+    /// level 3 = 650 -- and with the official end-of-fight capture, which for a level 3 character
+    /// sends 650 as the floor of the level and 1500 as the threshold for the next one.
     /// </summary>
     public static class ExperienceTable
     {
@@ -29,8 +29,8 @@ namespace Jondo.Unity.Launcher
 
             if (!File.Exists(path))
             {
-                Console.WriteLine($"[ExperienceTable] AVISO: no se encuentra {path}. " +
-                                  "La experiencia no se podrá calcular; ejecuta extract_character_xp.py.");
+                Console.WriteLine($"[ExperienceTable] WARNING: {path} not found. " +
+                                  "Experience cannot be computed; run extract_character_xp.py.");
                 return;
             }
 
@@ -45,15 +45,15 @@ namespace Jondo.Unity.Launcher
                     }
                 }
                 _maxLevel = _floors.Count > 0 ? _floors.Keys.Max() : 1;
-                Console.WriteLine($"[ExperienceTable] Tabla de experiencia cargada: {_floors.Count} niveles (hasta el {_maxLevel}).");
+                Console.WriteLine($"[ExperienceTable] Experience table loaded: {_floors.Count} levels (up to {_maxLevel}).");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ExperienceTable] Error leyendo {path}: {ex.Message}");
+                Console.WriteLine($"[ExperienceTable] Error reading {path}: {ex.Message}");
             }
         }
 
-        /// <summary>Experiencia acumulada con la que empieza el nivel indicado.</summary>
+        /// <summary>Accumulated experience the given level starts at.</summary>
         public static long LevelFloor(int level)
         {
             if (_floors.Count == 0) return 0;
@@ -61,7 +61,7 @@ namespace Jondo.Unity.Launcher
             return level <= 1 ? 0 : _floors[Math.Min(level, _maxLevel)];
         }
 
-        /// <summary>Experiencia acumulada a la que se sube al nivel siguiente.</summary>
+        /// <summary>Accumulated experience at which the next level is reached.</summary>
         public static long NextLevelFloor(int level)
         {
             if (_floors.Count == 0) return 0;
@@ -70,7 +70,7 @@ namespace Jondo.Unity.Launcher
             return LevelFloor(next);
         }
 
-        /// <summary>Nivel que corresponde a una experiencia acumulada.</summary>
+        /// <summary>The level that a given amount of accumulated experience corresponds to.</summary>
         public static int LevelForXp(long experience)
         {
             if (_floors.Count == 0) return 1;

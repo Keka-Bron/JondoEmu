@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MelonLoader;
 using HarmonyLib;
 using Il2CppThrift.Transport;
@@ -239,55 +239,50 @@ namespace JondoFix
             {
                 var harmony = new HarmonyLib.Harmony("com.jondo.fix.late");
                 
-                var bcnnMethod = typeof(Il2Cpp.eud).GetMethod("bcnn", new Type[] { typeof(Il2Cpp.ku), typeof(bool) });
-                if (bcnnMethod != null)
+                Type eudType = null;
+                try
                 {
-                    var prefix = typeof(EudBcnnPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    var finalizer = typeof(EudBcnnPatch).GetMethod("Finalizer", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    harmony.Patch(bcnnMethod, prefix: new HarmonyMethod(prefix), finalizer: new HarmonyMethod(finalizer));
-                    LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix and finalizer patches to eud (CartographyManager).bcnn!");
+                    eudType = System.AppDomain.CurrentDomain.GetAssemblies()
+                        .SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } })
+                        .FirstOrDefault(t => t.Name == "eud" || t.Name == "CartographyManager");
                 }
-                else
-                {
-                    LoggerInstance.Error("[JondoFix] Failed to find method eud (CartographyManager).bcnn via reflection!");
-                }
+                catch { }
 
-                var bckuMethod = typeof(Il2Cpp.eud).GetMethod("bcku", new Type[] { });
-                if (bckuMethod != null)
+                if (eudType != null)
                 {
-                    var prefix = typeof(EudBckuPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    var finalizer = typeof(EudBckuPatch).GetMethod("Finalizer", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    harmony.Patch(bckuMethod, prefix: new HarmonyMethod(prefix), finalizer: new HarmonyMethod(finalizer));
-                    LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix and finalizer patches to eud (CartographyManager).bcku!");
-                }
-                else
-                {
-                    LoggerInstance.Error("[JondoFix] Failed to find method eud (CartographyManager).bcku via reflection!");
-                }
+                    var bcnnMethod = eudType.GetMethods().FirstOrDefault(m => m.Name == "bcnn");
+                    if (bcnnMethod != null)
+                    {
+                        var prefix = typeof(EudBcnnPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        var finalizer = typeof(EudBcnnPatch).GetMethod("Finalizer", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        harmony.Patch(bcnnMethod, prefix: new HarmonyMethod(prefix), finalizer: new HarmonyMethod(finalizer));
+                        LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix and finalizer patches to CartographyManager.bcnn!");
+                    }
 
-                var bckpMethod = typeof(Il2Cpp.eud).GetMethods()
-                    .FirstOrDefault(m => m.Name == "bckp" && m.GetParameters().Length == 1);
-                if (bckpMethod != null)
-                {
-                    var prefix = typeof(EudBckpPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    harmony.Patch(bckpMethod, prefix: new HarmonyMethod(prefix));
-                    LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix patch to eud (CartographyManager).bckp!");
-                }
-                else
-                {
-                    LoggerInstance.Error("[JondoFix] Failed to find method eud (CartographyManager).bckp via reflection scan!");
-                }
+                    var bckuMethod = eudType.GetMethod("bcku", new Type[] { });
+                    if (bckuMethod != null)
+                    {
+                        var prefix = typeof(EudBckuPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        var finalizer = typeof(EudBckuPatch).GetMethod("Finalizer", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        harmony.Patch(bckuMethod, prefix: new HarmonyMethod(prefix), finalizer: new HarmonyMethod(finalizer));
+                        LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix and finalizer patches to CartographyManager.bcku!");
+                    }
 
-                var bcohMethod = typeof(Il2Cpp.eud).GetMethod("bcoh", new Type[] { typeof(Il2CppSystem.Collections.Generic.Dictionary<UnityEngine.Vector2, Il2Cpp.epo>) });
-                if (bcohMethod != null)
-                {
-                    var prefix = typeof(EudBcohPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    harmony.Patch(bcohMethod, prefix: new HarmonyMethod(prefix));
-                    LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix patch to eud (CartographyManager).bcoh!");
-                }
-                else
-                {
-                    LoggerInstance.Error("[JondoFix] Failed to find method eud (CartographyManager).bcoh via reflection!");
+                    var bckpMethod = eudType.GetMethods().FirstOrDefault(m => m.Name == "bckp");
+                    if (bckpMethod != null)
+                    {
+                        var prefix = typeof(EudBckpPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        harmony.Patch(bckpMethod, prefix: new HarmonyMethod(prefix));
+                        LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix patch to CartographyManager.bckp!");
+                    }
+
+                    var bcohMethod = eudType.GetMethods().FirstOrDefault(m => m.Name == "bcoh");
+                    if (bcohMethod != null)
+                    {
+                        var prefix = typeof(EudBcohPatch).GetMethod("Prefix", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        harmony.Patch(bcohMethod, prefix: new HarmonyMethod(prefix));
+                        LoggerInstance.Msg("[JondoFix] Successfully applied dynamic prefix patch to CartographyManager.bcoh!");
+                    }
                 }
 
                 // Dynamically patch SslStream constructors to bypass SSL validations
@@ -823,104 +818,18 @@ namespace JondoFix
 
     public class EudBckuPatch
     {
-        public static bool Prefix(Il2Cpp.eud __instance)
+        public static bool Prefix(Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase __instance)
         {
             if (__instance == null || __instance.Pointer == IntPtr.Zero) return true;
-            try
-            {
-                MelonLogger.Msg("[JondoFix] eud (CartographyManager).bcku: Starting deep diagnostics...");
-
-                // Helper local function to check nullity
-                bool IsNull(Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase obj) => obj == null || obj.Pointer == IntPtr.Zero;
-
-                // 1. Diagnose public properties
-                MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: dqyj (Dictionary<long, ku (Quest)>) is {(IsNull(__instance.dqyj) ? "NULL" : "NOT NULL (Count: " + __instance.dqyj.Count + ")")}");
-                MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: dqyh (Dictionary<int, Dictionary<string, esm (CartographyArea)>>) is {(IsNull(__instance.dqyh) ? "NULL" : "NOT NULL (Count: " + __instance.dqyh.Count + ")")}");
-                MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: dqyi (List<gv (QuestObjective)>) is {(IsNull(__instance.dqyi) ? "NULL" : "NOT NULL (Count: " + __instance.dqyi.Count + ")")}");
-                MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: dqwn (WorldMapData) is {(IsNull(__instance.dqwn) ? "NULL" : "NOT NULL")}");
-                MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: dqwp (esh (WorldMap)) is {(IsNull(__instance.dqwp) ? "NULL" : "NOT NULL")}");
-                MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: dqwi (Dictionary<euh, bool>) is {(IsNull(__instance.dqwi) ? "NULL" : "NOT NULL")}");
-
-                // 2. Diagnose private fields via reflection
-                var privateFields = new string[] { "drac", "drad", "drae", "draf", "drag", "drai", "draj", "drak", "drao" };
-                foreach (var fieldName in privateFields)
-                {
-                    var fieldInfo = typeof(Il2Cpp.eud).GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    if (fieldInfo != null)
-                    {
-                        var val = fieldInfo.GetValue(__instance);
-                        bool isNullVal = val == null;
-                        if (!isNullVal && val is Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase il2cppObj)
-                        {
-                            isNullVal = il2cppObj.Pointer == IntPtr.Zero;
-                        }
-                        MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: Private field '{fieldName}' is {(isNullVal ? "NULL" : "NOT NULL")}");
-                    }
-                    else
-                    {
-                        MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: Private field '{fieldName}' NOT FOUND via reflection");
-                    }
-                }
-
-                // 3. Diagnose and clean active quests (dqyj) to prevent NullReferenceException on null quest metadata
-                if (!IsNull(__instance.dqyj))
-                {
-                    int nullValues = 0;
-                    int nullDckz = 0;
-                    int nullDclc = 0;
-                    
-                    var keys = __instance.dqyj.Keys;
-                    foreach (var key in keys)
-                    {
-                        var kuVal = __instance.dqyj[key];
-                        if (IsNull(kuVal))
-                        {
-                            nullValues++;
-                            continue;
-                        }
-                        
-                        if (IsNull(kuVal.dckz)) nullDckz++;
-                        if (IsNull(kuVal.dclc)) nullDclc++;
-                    }
-                    
-                    MelonLogger.Msg($"[JondoFix] eud (CartographyManager).bcku: dqyj (Dictionary<long, ku (Quest)>) elements diagnostic: Total={keys.Count}, NullValues={nullValues}, Null_dckz (ks)={nullDckz}, Null_dclc (me)={nullDclc}");
-                    if (nullValues > 0 || nullDckz > 0 || nullDclc > 0)
-                    {
-                        MelonLogger.Msg("[JondoFix] eud.bcku: Detected null values/nested metadata. Clearing active quests to prevent crash.");
-                        __instance.dqyj.Clear();
-                    }
-                }
-
-                // 4. Proactive initialization of null collections
-                if (IsNull(__instance.dqyj))
-                {
-                    MelonLogger.Msg("[JondoFix] eud (CartographyManager).bcku: dqyj (Dictionary<long, ku (Quest)>) is null. Initializing new Dictionary<long, ku (Quest)>...");
-                    __instance.dqyj = new Il2CppSystem.Collections.Generic.Dictionary<long, Il2Cpp.ku>();
-                }
-                if (IsNull(__instance.dqyh))
-                {
-                    MelonLogger.Msg("[JondoFix] eud (CartographyManager).bcku: dqyh (Dictionary<int, Dictionary<string, esm (CartographyArea)>>) is null. Initializing new Dictionary<int, Dictionary<string, esm (CartographyArea)>>...");
-                    __instance.dqyh = new Il2CppSystem.Collections.Generic.Dictionary<int, Il2CppSystem.Collections.Generic.Dictionary<string, Il2Cpp.esm>>();
-                }
-                if (IsNull(__instance.dqyi))
-                {
-                    MelonLogger.Msg("[JondoFix] eud (CartographyManager).bcku: dqyi (List<gv (QuestObjective)>) is null. Initializing new List<gv (QuestObjective)>...");
-                    __instance.dqyi = new Il2CppSystem.Collections.Generic.List<Il2Cpp.gv>();
-                }
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Msg($"[JondoFix] Error in eud (CartographyManager).bcku Prefix: {ex.Message}\n{ex.StackTrace}");
-            }
-            return true; // Always run the original method
+            return true;
         }
 
         public static Exception Finalizer(Exception __exception)
         {
             if (__exception != null)
             {
-                MelonLogger.Msg($"[JondoFix] Suppressed exception in eud (CartographyManager).bcku: {__exception.Message}");
-                return null; // Return null to suppress the exception
+                MelonLogger.Msg($"[JondoFix] Suppressed exception in CartographyManager.bcku: {__exception.Message}");
+                return null;
             }
             return null;
         }
@@ -1042,9 +951,9 @@ namespace JondoFix
 
     public class EudBcohPatch
     {
-        public static bool Prefix(Il2Cpp.eud __instance, Il2CppSystem.Object a)
+        public static bool Prefix(Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase __instance, Il2CppSystem.Object a)
         {
-            MelonLogger.Msg("[JondoFix] eud (CartographyManager).bcoh called. Skipping execution to prevent NullReferenceException crash.");
+            MelonLogger.Msg("[JondoFix] CartographyManager.bcoh called. Skipping execution to prevent NullReferenceException crash.");
             return false; // Skip the original method completely!
         }
     }

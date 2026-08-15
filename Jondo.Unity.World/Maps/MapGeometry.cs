@@ -5,27 +5,26 @@ using System.Linq;
 namespace Jondo.Unity.World.Maps
 {
     /// <summary>
-    /// Geometría de la rejilla isométrica de Dofus para COMBATE.
+    /// Geometry of the Dofus isometric grid, for COMBAT.
     ///
-    /// El mapa son 560 casillas numeradas por "media fila" de 14. Cada casilla tiene cuatro
-    /// vecinas de verdad —las que comparten arista— y a esas es a las que se puede dar un paso
-    /// de 1 PM. En números de casilla eso son:
+    /// A map is 560 cells numbered in "half rows" of 14. Every cell has exactly four real
+    /// neighbors -- the ones sharing an edge -- and those are the only cells a single MP step
+    /// can reach. Expressed as cell numbers:
     ///
-    ///     fila par   (celda/14 par) :  -15, -14, +13, +14
-    ///     fila impar                 :  -14, -13, +14, +15
+    ///     even row   (cell/14 even) :  -15, -14, +13, +14
+    ///     odd row                   :  -14, -13, +14, +15
     ///
-    /// Los desplazamientos +1 y +28 NO son un paso: son dos. +1 equivale a (+14) seguido de
-    /// (-13), y +28 a dos veces (+14). Antes se trataban como vecinas directas —ocho vecinas en
-    /// vez de cuatro—, y de ahí salían tres fallos a la vez: los monstruos recorrían el doble de
-    /// casillas de las que les permitían sus PM, se movían en diagonal, y el alcance de los
-    /// hechizos se quedaba corto. En la partida analizada el pío atacó desde una distancia real
-    /// de 10 con un hechizo de alcance 6, porque la métrica de ocho vecinas la contaba como 6.
+    /// The +1 and +28 offsets are NOT one step: they are two. +1 is (+14) followed by (-13),
+    /// and +28 is (+14) twice. They used to be treated as direct neighbors -- eight neighbors
+    /// instead of four -- and that produced three bugs at once: monsters walked twice as many
+    /// cells as their MP allowed, they moved diagonally, and spell range came up short. In the
+    /// session that was analyzed, the piou attacked from a real distance of 10 with a range-6
+    /// spell, because the eight-neighbor metric scored that distance as 6.
     ///
-    /// Convertidas a coordenadas (x, y), las cuatro vecinas son (x±1, y) y (x, y±1), así que la
-    /// distancia de combate es simplemente |dx| + |dy|. Es la misma que usa Dofus para el alcance
-    /// de los hechizos.
+    /// Converted to (x, y) coordinates, the four neighbors are (x±1, y) and (x, y±1), so combat
+    /// distance is simply |dx| + |dy|. That is the very metric Dofus uses for spell range.
     ///
-    /// Nota: en roleplay sí se permiten los ocho sentidos. Esta clase solo la usa el combate.
+    /// Note: roleplay does allow all eight directions. This class is used by combat only.
     /// </summary>
     public static class MapGeometry
     {
@@ -73,13 +72,13 @@ namespace Jondo.Unity.World.Maps
         public static int PointToCell(int x, int y)
             => CellByPoint.TryGetValue((x, y), out int c) ? c : -1;
 
-        /// <summary>Las cuatro casillas a un paso (1 PM). Nunca en diagonal.</summary>
+        /// <summary>The four cells one step (1 MP) away. Never diagonal.</summary>
         public static IEnumerable<int> GetNeighbors(int cell)
             => IsValid(cell) ? Neighbors[cell] : Array.Empty<int>();
 
         /// <summary>
-        /// Distancia de combate: número mínimo de pasos sin contar obstáculos. Es la que usa el
-        /// juego para el alcance de los hechizos.
+        /// Combat distance: the minimum number of steps, ignoring obstacles. This is what the
+        /// game uses for spell range.
         /// </summary>
         public static int Distance(int cellA, int cellB)
         {
@@ -88,13 +87,13 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
-        /// ¿Hay línea de visión entre dos casillas? Recorre el segmento que une sus centros y
-        /// falla si atraviesa alguna casilla marcada como opaca. Los extremos no cuentan: el
-        /// lanzador y el objetivo nunca se tapan a sí mismos.
+        /// Is there line of sight between two cells? Walks the segment joining their centers and
+        /// fails if it crosses any cell flagged as opaque. The endpoints do not count: caster and
+        /// target never block themselves.
         ///
-        /// <paramref name="blockers"/> sale de map_fight_cells.json, del campo `los` de los datos
-        /// de mapa del cliente. Si no hay datos para ese mapa se da por buena la visión, que es
-        /// preferible a bloquear disparos legítimos.
+        /// <paramref name="blockers"/> comes from map_fight_cells.json, from the `los` field of
+        /// the client map data. When there is no data for that map, sight is assumed clear, which
+        /// is preferable to blocking legitimate casts.
         /// </summary>
         public static bool HasLineOfSight(int fromCell, int toCell, HashSet<int> blockers)
         {
@@ -108,10 +107,11 @@ namespace Jondo.Unity.World.Maps
             int steps = Math.Abs(dx) + Math.Abs(dy);
             if (steps <= 1) return true;
 
-            // Se recorre el segmento en `steps` tramos y en cada punto intermedio se mira qué
-            // casillas lo tocan. Cuando el punto cae justo en una arista o esquina hay más de una
-            // candidata, y basta con que UNA deje pasar: así una fila de obstáculos corta la
-            // visión, pero un obstáculo suelto no tapa el hueco que tiene al lado.
+            // The segment is walked in `steps` sections and at every intermediate point we look
+            // at which cells touch it. When the point lands exactly on an edge or a corner there
+            // is more than one candidate, and it is enough for ONE of them to be clear: that way
+            // a row of obstacles blocks sight, but a lone obstacle does not close the gap beside
+            // it.
             for (int i = 1; i < steps; i++)
             {
                 double px = x0 + (double)dx * i / steps;
@@ -140,10 +140,10 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
-        /// Casillas por las que pasa un objetivo empujado (o atraído, con distancia negativa).
-        /// El desplazamiento sigue la recta que va del lanzador al objetivo y se detiene en el
-        /// primer obstáculo. Devuelve el recorrido empezando por la casilla actual del objetivo;
-        /// si no se puede mover, devuelve solo esa.
+        /// Cells travelled through by a pushed target (or a pulled one, with a negative distance).
+        /// The displacement follows the straight line from caster to target and stops at the first
+        /// obstacle. Returns the path starting at the target's current cell; if it cannot move,
+        /// that cell is the only entry.
         /// </summary>
         public static List<int> ComputePush(int casterCell, int targetCell, int distance,
                                             HashSet<int> walkable, HashSet<int> occupied)
@@ -155,7 +155,7 @@ namespace Jondo.Unity.World.Maps
             int dx = PointX[targetCell] - PointX[casterCell];
             int dy = PointY[targetCell] - PointY[casterCell];
 
-            // Un solo sentido de los cuatro: el del eje que más separa a los dos.
+            // A single direction out of the four: the axis along which the two are furthest apart.
             int stepX = 0, stepY = 0;
             if (Math.Abs(dx) >= Math.Abs(dy)) stepX = Math.Sign(dx);
             else stepY = Math.Sign(dy);
@@ -225,9 +225,9 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
-        /// Convierte la lista de vértices que manda el cliente (solo los cambios de dirección) en
-        /// el camino casilla a casilla. Cada tramo se resuelve por el camino más corto real, así
-        /// que un vértice que esté a dos pasos consume dos PM y no uno.
+        /// Turns the list of vertices sent by the client (direction changes only) into the
+        /// cell-by-cell path. Each leg is resolved through the real shortest path, so a vertex
+        /// that is two steps away costs two MP and not one.
         /// </summary>
         public static List<int> ExpandPath(List<int> vertices, HashSet<int> walkableCells = null)
         {
@@ -248,8 +248,8 @@ namespace Jondo.Unity.World.Maps
                 }
                 else if (fromCell != toCell)
                 {
-                    // Sin camino transitable: probamos otra vez ignorando la transitabilidad para
-                    // no dejar al luchador clavado en el sitio.
+                    // No walkable path: try again ignoring walkability so the fighter is not left
+                    // stuck in place.
                     var raw = FindShortestPath(fromCell, toCell);
                     if (raw.Count > 1) fullPath.AddRange(raw.Skip(1));
                     else fullPath.Add(toCell);
@@ -261,7 +261,7 @@ namespace Jondo.Unity.World.Maps
 
         private static void RunSelfTest()
         {
-            // Pasos reales de combate observados en la partida del 4-8-2026 (deltas +14 y +15).
+            // Real combat steps observed in the 2026-08-04 session (deltas +14 and +15).
             int[][] combatSteps =
             {
                 new[] { 189, 204, 218, 233, 247, 261 },
@@ -274,21 +274,21 @@ namespace Jondo.Unity.World.Maps
                 {
                     int d = Distance(path[i], path[i + 1]);
                     if (d != 1)
-                        throw new Exception($"[MapGeometry] Distance({path[i]}, {path[i + 1]}) = {d}, se esperaba 1.");
+                        throw new Exception($"[MapGeometry] Distance({path[i]}, {path[i + 1]}) = {d}, expected 1.");
                 }
             }
 
-            // Las diagonales valen dos pasos, no uno.
+            // Diagonals are worth two steps, not one.
             foreach (var (a, b) in new[] { (100, 101), (100, 99), (100, 128), (100, 72) })
             {
                 if (Distance(a, b) != 2)
-                    throw new Exception($"[MapGeometry] Distance({a}, {b}) = {Distance(a, b)}, se esperaba 2 (diagonal).");
+                    throw new Exception($"[MapGeometry] Distance({a}, {b}) = {Distance(a, b)}, expected 2 (diagonal).");
             }
 
             for (int cell = 0; cell < MaxCells; cell++)
             {
                 if (Neighbors[cell].Length > 4)
-                    throw new Exception($"[MapGeometry] la casilla {cell} tiene {Neighbors[cell].Length} vecinas; el máximo es 4.");
+                    throw new Exception($"[MapGeometry] cell {cell} has {Neighbors[cell].Length} neighbors; the maximum is 4.");
             }
         }
     }

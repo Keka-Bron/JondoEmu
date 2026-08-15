@@ -32,10 +32,10 @@ namespace Jondo.Unity.Launcher
         public static Dictionary<long, MapScrollAction> ScrollActions = new Dictionary<long, MapScrollAction>();
         public static Dictionary<long, List<int>> WalkableCells = new Dictionary<long, List<int>>();
 
-        /// <summary>Casillas pisables en combate (mov=1 y nonWalkableDuringFight=0).</summary>
+        /// <summary>Cells that can be walked on during a fight (mov=1 and nonWalkableDuringFight=0).</summary>
         public static Dictionary<long, HashSet<int>> FightWalkableCells = new Dictionary<long, HashSet<int>>();
 
-        /// <summary>Casillas opacas (los=0): cortan la línea de visión de los hechizos.</summary>
+        /// <summary>Opaque cells (los=0): they break the line of sight of spells.</summary>
         public static Dictionary<long, HashSet<int>> LosBlockingCells = new Dictionary<long, HashSet<int>>();
 
         public static void Initialize()
@@ -48,10 +48,10 @@ namespace Jondo.Unity.Launcher
                 FightWalkableCells.Clear();
                 LosBlockingCells.Clear();
 
-                // Datos de combate. map_walkable_cells.json no sirve aquí: recorta los bordes del
-                // mapa a propósito para colocar mobs en roleplay, y además no dice nada de qué
-                // casillas tapan la visión. Este otro fichero sale del mismo sitio (los bundles
-                // del cliente) pero conserva el mapa entero y trae el campo `los`.
+                // Fight data. map_walkable_cells.json is no use here: it trims the map borders on
+                // purpose so that mobs can be placed in roleplay, and on top of that it says
+                // nothing about which cells block sight. This other file comes from the same place
+                // (the client bundles) but keeps the whole map and carries the `los` field.
                 string fightJsonPath = Paths.FightCellsJson;
                 if (File.Exists(fightJsonPath))
                 {
@@ -75,16 +75,16 @@ namespace Jondo.Unity.Launcher
                                 if (set.Count > 0) LosBlockingCells[mId] = set;
                             }
                         }
-                        Console.WriteLine($"[MapManager] Datos de combate cargados para {FightWalkableCells.Count} mapas ({LosBlockingCells.Count} con casillas opacas).");
+                        Console.WriteLine($"[MapManager] Loaded fight data for {FightWalkableCells.Count} maps ({LosBlockingCells.Count} with opaque cells).");
                     }
                     catch (Exception fex)
                     {
-                        Console.WriteLine($"[MapManager] Error cargando map_fight_cells.json: {fex.Message}");
+                        Console.WriteLine($"[MapManager] Error loading map_fight_cells.json: {fex.Message}");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"[MapManager] AVISO: no existe {fightJsonPath}. Sin línea de visión ni transitabilidad de combate.");
+                    Console.WriteLine($"[MapManager] WARNING: {fightJsonPath} does not exist. No line of sight and no fight walkability.");
                 }
 
                 string walkableJsonPath = Paths.WalkableCellsJson;
@@ -209,12 +209,12 @@ namespace Jondo.Unity.Launcher
         {
             if (!Maps.TryGetValue(roleplayMapId, out var info)) return roleplayMapId;
 
-            // NO devolver aquí el mapa de roleplay para mapas exteriores: la captura de referencia
-            // demuestra lo contrario. El combate de Incarnam (-2,-3) —un mapa EXTERIOR con
-            // coordenadas reales, 154010883— se libró en la arena 153891076. Prueba: 6 de 6
-            // posiciones de luchadores son transitables en la arena y 0 de 6 en el mapa de
-            // roleplay. Con la salida anticipada, todos los combates al aire libre se quedaban
-            // en el mapa de roleplay: sin arena y, por tanto, sin cambio de escena ni música.
+            // Do NOT return the roleplay map here for outdoor maps: the reference capture proves
+            // the opposite. The Incarnam fight at (-2,-3) -- an OUTDOOR map with real coordinates,
+            // 154010883 -- was fought in arena 153891076. Proof: 6 out of 6 fighter positions are
+            // walkable in the arena and 0 out of 6 in the roleplay map. With the early return,
+            // every open-air fight stayed on the roleplay map: no arena and therefore no scene
+            // change and no music.
 
             var arenas = Maps.Values
                 .Where(m => m.SubAreaId == info.SubAreaId
@@ -241,14 +241,14 @@ namespace Jondo.Unity.Launcher
 
             if (arenas.Count == 0) return roleplayMapId;
 
-            // Emparejamiento por desplazamiento fijo del id. No hay una regla única para todo el
-            // juego, pero dentro de cada zona el id de la arena es el del mapa de roleplay más un
-            // desplazamiento pequeño y constante. Verificado con datos reales:
-            //   Ciudad de Astrub (y=-18): 191102978→191102984, 191104002→191104008,
-            //                             191105026→191105032, 191106050→191106056   (+6)
-            //   Mapas del tutorial                                                    (+4)
-            // Probamos los desplazamientos pequeños en orden y nos quedamos con el primero que
-            // caiga en una arena válida de la misma subárea.
+            // Pairing by a fixed id offset. There is no single rule for the whole game, but within
+            // a given zone the arena id is the roleplay map id plus a small, constant offset.
+            // Verified against real data:
+            //   Astrub City (y=-18): 191102978 -> 191102984, 191104002 -> 191104008,
+            //                        191105026 -> 191105032, 191106050 -> 191106056   (+6)
+            //   Tutorial maps                                                          (+4)
+            // We try the small offsets in order and keep the first one that lands on a valid arena
+            // in the same subarea.
             foreach (int delta in new[] { 4, 6, 2, 8, 10, 12, 14, 16 })
             {
                 if (arenas.Contains(roleplayMapId + delta))
@@ -257,12 +257,12 @@ namespace Jondo.Unity.Launcher
                 }
             }
 
-            // Sin desplazamiento reconocible: reparto determinista para que al menos el mismo
-            // mapa use siempre la misma arena.
+            // No recognizable offset: deterministic assignment so that at least the same map
+            // always ends up using the same arena.
             return arenas[(int)(Math.Abs(roleplayMapId) % arenas.Count)];
         }
 
-        /// <summary>Casillas pisables en combate; si no hay datos, cae en las de roleplay.</summary>
+        /// <summary>Cells walkable during a fight; falls back to the roleplay ones when there is no data.</summary>
         public static HashSet<int> GetFightWalkable(long mapId)
         {
             if (FightWalkableCells.TryGetValue(mapId, out var set)) return set;
@@ -270,7 +270,7 @@ namespace Jondo.Unity.Launcher
             return null;
         }
 
-        /// <summary>Casillas que cortan la línea de visión; vacío si el mapa no tiene ninguna.</summary>
+        /// <summary>Cells that break the line of sight; empty if the map has none.</summary>
         public static HashSet<int> GetLosBlockers(long mapId)
             => LosBlockingCells.TryGetValue(mapId, out var set) ? set : null;
 

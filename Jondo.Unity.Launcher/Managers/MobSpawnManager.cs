@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System.Linq;
@@ -24,6 +24,9 @@ namespace Jondo.Unity.Launcher.Managers
         {
             public MonsterData Monster { get; set; }
             public int GradeIndex { get; set; }
+
+            /// <summary>Cuántos grados acepta el cliente: del 1 al 5, ni uno más.</summary>
+            public const int MaxGradesPerMonster = 5;
             public int Level { get; set; }
         }
 
@@ -82,9 +85,14 @@ namespace Jondo.Unity.Launcher.Managers
             _mapMobs.Clear();
 
             // Load MapMobs from SQLite database
+            // Who is an archmonster and where each one belongs. It has to be known before the
+            // groups are read, because they are thinned as they come in.
+            Archimonsters.Initialize(connection);
+
             var cmdMapMobs = connection.CreateCommand();
-            cmdMapMobs.CommandText = "SELECT MapId, MobId, CellId, MembersJson FROM MapMobs;";
+            cmdMapMobs.CommandText = "SELECT MapId, MobId, CellId, MembersJson FROM MapMobs ORDER BY MapId, MobId;";
             int count = 0;
+            int archmonsters = 0;
             using (var reader = cmdMapMobs.ExecuteReader())
             {
                 while (reader.Read())
@@ -103,16 +111,33 @@ namespace Jondo.Unity.Launcher.Managers
                         using var doc = System.Text.Json.JsonDocument.Parse(membersJson);
                         if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
                         {
+                            var ids = new List<int>();
+                            var grades = new List<int>();
+                            var levels = new List<int>();
                             foreach(var m in doc.RootElement.EnumerateArray()) {
-                                int mId = m.GetProperty("id").GetInt32();
-                                int grade = m.GetProperty("grade").GetInt32();
-                                int level = m.GetProperty("level").GetInt32();
+                                ids.Add(m.GetProperty("id").GetInt32());
+                                grades.Add(m.GetProperty("grade").GetInt32());
+                                levels.Add(m.GetProperty("level").GetInt32());
+                            }
 
-                                if (_monsters.TryGetValue(mId, out var mData)) {
+                            // The database ships four groups in ten holding an archmonster, up to
+                            // eight in one group. This thins them to the rules — one per group,
+                            // one per map, one in ten, and one of each per zone — swapping the
+                            // ones that do not stay for the ordinary monster they are the rare
+                            // version of, so the group keeps its size.
+                            if (Archimonsters.Thin(mapId, mobId, ids) != 0) archmonsters++;
+
+                            for (int i = 0; i < ids.Count; i++) {
+                                if (_monsters.TryGetValue(ids[i], out var mData)) {
+                                    // Lo mismo que arriba: la base de datos guarda grados que el
+                                    // cliente no acepta, y hay que recortarlos aquí también.
+                                    int grade = Math.Clamp(grades[i], 0, MobMember.MaxGradesPerMonster - 1);
                                     group.Members.Add(new MobMember {
                                         Monster = mData,
                                         GradeIndex = grade,
-                                        Level = level
+                                        Level = grade == grades[i] || grade >= mData.Grades.Count
+                                            ? levels[i]
+                                            : mData.Grades[grade].Level
                                     });
                                 }
                             }
@@ -127,6 +152,8 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             Console.WriteLine($"[MobSpawnManager] Loaded {count} persistent mobs across {_mapMobs.Count} maps from database.");
+            Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
+                              $"({100.0 * archmonsters / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
         }
 
         private static long _nextDynamicMobId = -2000000;
@@ -142,20 +169,58 @@ namespace Jondo.Unity.Launcher.Managers
             return mobs;
         }
 
-        private static List<int> GetSpawnableMonsterIds()
+        /// <summary>
+        /// Qué monstruos pueden salir en un mapa que no tiene grupos escritos.
+        ///
+        /// Los de su zona, y nadie más. Antes esto devolvía una lista fija de pios —491, 492, 493,
+        /// 463 y los 234x— para cualquier mapa del mundo, así que al pie de la torre de la clepsidra
+        /// de Frigost, que no tiene grupos en la tabla, salían pios de Astrub. Y dentro del
+        /// merkasako también.
+        ///
+        /// La zona se sabe por la subzona del mapa, y lo que vive en ella por los grupos que sí
+        /// están escritos en los otros mapas de esa misma subzona: 12.907 mapas los tienen, así que
+        /// casi siempre hay de dónde sacarlo. Si no lo hay, no sale nadie, que es mejor que sacar a
+        /// quien no toca.
+        /// </summary>
+        private static List<int> GetSpawnableMonsterIds(long mapId)
         {
-            var pioIds = new List<int> { 491, 492, 493, 463, 2341, 2342, 2343, 2344, 2345, 2347 };
-            var available = pioIds.Where(id => _monsters.ContainsKey(id)).ToList();
-            return available.Count > 0 ? available : _monsters.Keys.Take(20).ToList();
+            var map = MapManager.GetMapInfo(mapId);
+            if (map == null) return new List<int>();
+
+            if (_bySubArea.TryGetValue(map.SubAreaId, out var vecinos)) return vecinos;
+
+            var salida = new List<int>();
+            foreach (var otro in _mapMobs)
+            {
+                var suyo = MapManager.GetMapInfo(otro.Key);
+                if (suyo == null || suyo.SubAreaId != map.SubAreaId) continue;
+
+                foreach (var grupo in otro.Value)
+                {
+                    foreach (var miembro in grupo.Members)
+                    {
+                        if (miembro.Monster != null && !salida.Contains(miembro.Monster.Id))
+                        {
+                            salida.Add(miembro.Monster.Id);
+                        }
+                    }
+                }
+            }
+
+            _bySubArea[map.SubAreaId] = salida;
+            return salida;
         }
+
+        /// <summary>Los monstruos de cada subzona, que se calculan una vez y se guardan.</summary>
+        private static readonly Dictionary<int, List<int>> _bySubArea = new Dictionary<int, List<int>>();
 
         private static MobGroup? BuildRandomGroup(long mapId, List<int> availableMonsters, List<int> validCells, HashSet<int> usedCells)
         {
             if (availableMonsters.Count == 0 || validCells.Count == 0) return null;
 
             int cellId = validCells[_rand.Next(validCells.Count)];
-            int intentos = 0;
-            while (usedCells.Contains(cellId) && intentos++ < validCells.Count)
+            int attempts = 0;
+            while (usedCells.Contains(cellId) && attempts++ < validCells.Count)
             {
                 cellId = validCells[_rand.Next(validCells.Count)];
             }
@@ -168,7 +233,7 @@ namespace Jondo.Unity.Launcher.Managers
                 CellId = cellId
             };
 
-            int groupSize = _rand.Next(1, 9); // de 1 a 8 monstruos, como en Dofus
+            int groupSize = _rand.Next(1, 9); // 1 to 8 monsters, just like in Dofus
             for (int m = 0; m < groupSize; m++)
             {
                 int monsterId = availableMonsters[_rand.Next(availableMonsters.Count)];
@@ -177,7 +242,12 @@ namespace Jondo.Unity.Launcher.Managers
                 int lvl = 1;
                 if (mData.Grades.Count > 0)
                 {
-                    gradeIdx = _rand.Next(mData.Grades.Count);
+                    // Solo los cinco primeros. El grado que viaja al cliente va de 1 a 5 y ningún
+                    // monstruo de las capturas reales pasa de ahí, pero nuestros datos traen
+                    // monstruos con seis, diez y hasta veinte grados. Elegir uno de los de más
+                    // arriba mandaba un grado que el cliente no sabe resolver, y ese grupo se
+                    // quedaba sin información al pasarle el ratón.
+                    gradeIdx = _rand.Next(Math.Min(mData.Grades.Count, MobMember.MaxGradesPerMonster));
                     lvl = mData.Grades[gradeIdx].Level;
                 }
 
@@ -197,11 +267,14 @@ namespace Jondo.Unity.Launcher.Managers
             var result = new List<MobGroup>();
             if (_monsters.Count == 0) return result;
 
-            var availableMonsters = GetSpawnableMonsterIds();
+            // En el merkasako no se pelea con nadie: es la casa de uno.
+            if (Merkasako.IsHavenBag(mapId)) return result;
+
+            var availableMonsters = GetSpawnableMonsterIds(mapId);
             var validCells = GetInnerWalkableCells(mapId);
             var usedCells = new HashSet<int>();
 
-            int numMobs = _rand.Next(2, 5); // de 2 a 4 grupos por mapa
+            int numMobs = _rand.Next(2, 5); // 2 to 4 groups per map
             for (int i = 0; i < numMobs; i++)
             {
                 var g = BuildRandomGroup(mapId, availableMonsters, validCells, usedCells);
@@ -212,10 +285,10 @@ namespace Jondo.Unity.Launcher.Managers
         }
 
         /// <summary>
-        /// Repone un grupo de monstruos en el mapa después de que el jugador haya derrotado a
-        /// otro. No toca los que ya están: solo añade uno nuevo en una casilla libre, con el
-        /// mismo generador que se usa al poblar un mapa por primera vez.
-        /// Devuelve null si no había hueco.
+        /// Restocks one monster group on the map after the player has defeated another one. It
+        /// leaves the existing groups untouched: it only adds a new one on a free cell, using the
+        /// same generator that populates a map for the first time.
+        /// Returns null if there was no room left.
         /// </summary>
         public static MobGroup? RespawnOneGroup(long mapId)
         {
@@ -228,7 +301,7 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             var usedCells = new HashSet<int>(mobs.Select(m => m.CellId));
-            var group = BuildRandomGroup(mapId, GetSpawnableMonsterIds(), GetInnerWalkableCells(mapId), usedCells);
+            var group = BuildRandomGroup(mapId, GetSpawnableMonsterIds(mapId), GetInnerWalkableCells(mapId), usedCells);
             if (group == null) return null;
 
             mobs.Add(group);
@@ -324,3 +397,4 @@ namespace Jondo.Unity.Launcher.Managers
         }
     }
 }
+
