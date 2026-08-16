@@ -169,6 +169,7 @@ Details worth knowing:
 
 ### ❌ Not implemented
 - [ ] Kolossium and PvP combat
+- [ ] Multiplayer Account System
 - [ ] Advanced combat features (AP/MP dodge rolls, area-of-effect spell shapes, summons, shields, lock and dodge in melee)
 - [ ] Professions
 - [ ] Achievements
