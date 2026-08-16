@@ -38,7 +38,7 @@ namespace Jondo.Unity.Launcher.Handlers
         private static readonly HashSet<int> IntrepidoSetGids = new HashSet<int> { 10784, 10785, 10794, 10797, 10798, 10799, 10800, 10801 };
 
         /// <summary>
-        /// Builds the real inventory message (irm) payload from GameState.Inventory.
+        /// Builds the real inventory message (irm) payload from Jondo.Unity.Launcher.Network.SessionContext.State.Inventory.
         /// Schema observed in the official world-entering capture (frame #11):
         ///   irm { repeated f3: { f2: position (63 = bolsa, 0-15 = ranura equipada, omitido si 0),
         ///                        f5: { f1: cantidad,
@@ -51,7 +51,7 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             var irmMsg = new ProtoMessage();
 
-            foreach (var item in GameState.GetInventoryCopy())
+            foreach (var item in Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryCopy())
             {
                 var detailMsg = new ProtoMessage();
 
@@ -101,7 +101,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             // Field 4 is kamas
-            irmMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.Kamas });
+            irmMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Kamas });
 
             return irmMsg.ToByteArray();
         }
@@ -259,11 +259,11 @@ namespace Jondo.Unity.Launcher.Handlers
                 var statsMsg = new ProtoMessage();
                 
                 var breedSexMsg = new ProtoMessage();
-                breedSexMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.Breed });
-                breedSexMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.Sex });
+                breedSexMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Breed });
+                breedSexMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Sex });
                 statsMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = breedSexMsg.ToByteArray() });
                 
-                statsMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel });
+                statsMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel });
                 
                 statsMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 188940901L });
 
@@ -275,20 +275,20 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 var lgkMsg = new ProtoMessage();
                 lgkMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = statsMsg.ToByteArray() });
-                lgkMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes(GameState.CharacterName) });
+                lgkMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName) });
 
                 var humanoidInfo = new ProtoMessage();
                 humanoidInfo.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = lgkMsg.ToByteArray() });
 
                 var detailsMsg = new ProtoMessage();
-                if (GameState.LookBytes != null && GameState.LookBytes.Length > 0)
+                if (Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes != null && Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes.Length > 0)
                 {
-                    detailsMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = GameState.LookBytes });
+                    detailsMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes });
                 }
                 detailsMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = humanoidInfo.ToByteArray() });
 
-                GameState.PlayerActorDetails = detailsMsg.ToByteArray();
-                Program.LogDebug($"[Game Node] Dynamically built GameState.PlayerActorDetails from DB (name: {GameState.CharacterName}, breed: {GameState.Breed}, level: {GameState.CharacterLevel}, length: {GameState.PlayerActorDetails.Length} bytes).");
+                Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails = detailsMsg.ToByteArray();
+                Program.LogDebug($"[Game Node] Dynamically built Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails from DB (name: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName}, breed: {Jondo.Unity.Launcher.Network.SessionContext.State.Breed}, level: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}, length: {Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails.Length} bytes).");
             }
             catch (Exception ex)
             {
@@ -297,7 +297,7 @@ namespace Jondo.Unity.Launcher.Handlers
             
             if (dbCharacterLoaded)
             {
-                Program.LogDebug($"[Stats Init] Stats loaded from database for {GameState.CharacterName} (capital: {GameState.CharacterRemainingPoints}).");
+                Program.LogDebug($"[Stats Init] Stats loaded from database for {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName} (capital: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints}).");
             }
             else
             {
@@ -328,17 +328,17 @@ namespace Jondo.Unity.Launcher.Handlers
                     defaultItems.Add(item);
                 }
 
-                GameState.SetInventory(defaultItems);
+                Jondo.Unity.Launcher.Network.SessionContext.State.SetInventory(defaultItems);
                 DatabaseManager.SeedInventory(characterIdToLoad, defaultItems);
             }
             else
             {
                 Program.LogDebug($"[Inventory Load] Loaded {dbInventory.Count} items from database. Setting as active inventory.");
-                GameState.SetInventory(dbInventory);
+                Jondo.Unity.Launcher.Network.SessionContext.State.SetInventory(dbInventory);
             }
 
-            GameState.ClearEquippedItems();
-            foreach (var item in GameState.GetInventoryCopy())
+            Jondo.Unity.Launcher.Network.SessionContext.State.ClearEquippedItems();
+            foreach (var item in Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryCopy())
             {
                 if (item.Position >= 0 && item.Position < 63)
                 {
@@ -347,7 +347,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     {
                         equipped.Stats[kvp.Key] = kvp.Value;
                     }
-                    GameState.SetEquippedItem(item.Uid, equipped);
+                    Jondo.Unity.Launcher.Network.SessionContext.State.SetEquippedItem(item.Uid, equipped);
                 }
             }
         }
@@ -360,11 +360,11 @@ namespace Jondo.Unity.Launcher.Handlers
                 var output = new CodedOutputStream(detailsMs);
                 byte[] lookBytes = NetworkEnvelope.ConvertHexStringToByteArray("12-26-08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
                 
-                if (GameState.PlayerActorDetails != null)
+                if (Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails != null)
                 {
                     try
                     {
-                        var detailsMsg = ProtoMessage.Parse(GameState.PlayerActorDetails);
+                        var detailsMsg = ProtoMessage.Parse(Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails);
                         var gbfoField = detailsMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
                         if (gbfoField != null)
                         {
@@ -463,9 +463,9 @@ namespace Jondo.Unity.Launcher.Handlers
             // Get character
             // ---------------------------------------------------------
 
-            long characterId = GameState.CharacterId;
-            string characterName = GameState.CharacterName ?? "CADERNIS";
-            int characterLevel = GameState.CharacterLevel;
+            long characterId = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
+            string characterName = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName ?? "CADERNIS";
+            int characterLevel = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
 
             if (characterId <= 0)
                 characterId = 13825558L;

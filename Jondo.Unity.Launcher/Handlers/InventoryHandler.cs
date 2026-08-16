@@ -92,7 +92,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (lookBytes != null)
                 {
                     // 8. kku (ActorLookMessage) — updates character look in the world
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKkuPacket(lookBytes, GameState.CharacterId));
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKkuPacket(lookBytes, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
                     LogDebug("[Inventory] Sent kku (ActorLookMessage)");
                 }
 
@@ -119,7 +119,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static void ProcessEquipmentChange(long itemUid, int newPosition)
         {
-            var item = GameState.GetInventoryItem(itemUid);
+            var item = Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryItem(itemUid);
             if (item != null)
             {
                 item.Position = newPosition;
@@ -131,11 +131,11 @@ namespace Jondo.Unity.Launcher.Handlers
                     var equipped = new EquippedItemInfo { Slot = newPosition };
                     foreach (var kvp in item.Effects)
                         equipped.Stats[kvp.Key] = kvp.Value;
-                    GameState.SetEquippedItem(itemUid, equipped);
+                    Jondo.Unity.Launcher.Network.SessionContext.State.SetEquippedItem(itemUid, equipped);
                 }
                 else
                 {
-                    GameState.RemoveEquippedItem(itemUid);
+                    Jondo.Unity.Launcher.Network.SessionContext.State.RemoveEquippedItem(itemUid);
                 }
             }
         }
@@ -144,12 +144,12 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static byte[]? UpdateCharacterLook()
         {
-            if (GameState.LookBytes == null || GameState.LookBytes.Length == 0)
-                GameState.LookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
+            if (Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes == null || Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes.Length == 0)
+                Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
 
             try
             {
-                var lookMsg = ProtoMessage.Parse(GameState.LookBytes);
+                var lookMsg = ProtoMessage.Parse(Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes);
 
                 // 1. Extract current skins (Field 2 of EntityLook)
                 var allSkins = new List<int>();
@@ -175,9 +175,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 var updatedSkins   = allSkins.Where(s => !equipmentSkins.Contains(s)).ToList();
 
                 // 3. Add skins of currently equipped items
-                foreach (var equippedItem in GameState.GetEquippedItemsCopy())
+                foreach (var equippedItem in Jondo.Unity.Launcher.Network.SessionContext.State.GetEquippedItemsCopy())
                 {
-                    var playerItem = GameState.GetInventoryItem(equippedItem.Key);
+                    var playerItem = Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryItem(equippedItem.Key);
                     if (playerItem != null && ItemGidToSkinId.TryGetValue(playerItem.ItemId, out int skinId))
                     {
                         if (!updatedSkins.Contains(skinId))
@@ -195,13 +195,13 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
 
                 byte[] entityLookBytes = lookMsg.ToByteArray();
-                GameState.LookBytes = entityLookBytes;
+                Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes = entityLookBytes;
 
                 // 5. Reconstruct actor details cleanly
-                GameState.PlayerActorDetails = DatabaseManager.ReconstructActorDetails(GameState.LookBytes, GameState.CharacterName);
+                Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails = DatabaseManager.ReconstructActorDetails(Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName);
 
                 LogDebug($"[Appearance] Updated character look. Total skins: {updatedSkins.Count}");
-                DatabaseManager.SaveCharacterLook(GameState.CharacterId, entityLookBytes);
+                DatabaseManager.SaveCharacterLook(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, entityLookBytes);
                 LogDebug("[Appearance] Saved updated look to database.");
 
                 return entityLookBytes;

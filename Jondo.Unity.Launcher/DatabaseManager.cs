@@ -1355,55 +1355,55 @@ namespace Jondo.Unity.Launcher
             using var reader = command.ExecuteReader();
             if (reader.Read())
             {
-                GameState.CharacterId = characterId;
-                GameState.CharacterName = reader.GetString(0);
-                GameState.CharacterLevel = reader.GetInt32(1);
+                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId = characterId;
+                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName = reader.GetString(0);
+                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel = reader.GetInt32(1);
                 // Load actual position from the database
-                GameState.MapId = reader.GetInt64(2);
-                GameState.CellId = reader.GetInt32(3);
+                Jondo.Unity.Launcher.Network.SessionContext.State.MapId = reader.GetInt64(2);
+                Jondo.Unity.Launcher.Network.SessionContext.State.CellId = reader.GetInt32(3);
 
                 // A map the world data does not know is a map the client cannot load either: it
                 // gets the jru, finds nothing, and the character never appears anywhere. It should
                 // not be possible to be standing on one, but a character that got there once stays
                 // there for good, so it is worth catching on the way in.
-                if (MapManager.GetMapInfo(GameState.MapId) == null && MapManager.Maps.Count > 0)
+                if (MapManager.GetMapInfo(Jondo.Unity.Launcher.Network.SessionContext.State.MapId) == null && MapManager.Maps.Count > 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"[SQLite] {GameState.CharacterName} is on map {GameState.MapId}, " +
+                    Console.WriteLine($"[SQLite] {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName} is on map {Jondo.Unity.Launcher.Network.SessionContext.State.MapId}, " +
                                       "which is not in the world data. Sending it back to the start.");
                     Console.ResetColor();
-                    GameState.MapId = StartingMap;
-                    GameState.CellId = StartingCell;
+                    Jondo.Unity.Launcher.Network.SessionContext.State.MapId = StartingMap;
+                    Jondo.Unity.Launcher.Network.SessionContext.State.CellId = StartingCell;
                 }
-                GameState.Orientation = reader.IsDBNull(14) ? 1 : reader.GetInt32(14);
-                GameState.Kamas = reader.IsDBNull(15) ? 0 : reader.GetInt64(15);
+                Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = reader.IsDBNull(14) ? 1 : reader.GetInt32(14);
+                Jondo.Unity.Launcher.Network.SessionContext.State.Kamas = reader.IsDBNull(15) ? 0 : reader.GetInt64(15);
 
                 // If the character predates the column, give it the minimum experience that
                 // matches its level so the bar does not show up empty.
                 long storedXp = reader.IsDBNull(16) ? 0 : reader.GetInt64(16);
-                long levelFloor = ExperienceTable.LevelFloor(GameState.CharacterLevel);
-                GameState.Experience = Math.Max(storedXp, levelFloor);
-                GameState.CharacterRemainingPoints = reader.GetInt32(4);
-                GameState.StatVitality = reader.GetInt32(5);
-                GameState.StatWisdom = reader.GetInt32(6);
-                GameState.StatStrength = reader.GetInt32(7);
-                GameState.StatIntelligence = reader.GetInt32(8);
-                GameState.StatChance = reader.GetInt32(9);
-                GameState.StatAgility = reader.GetInt32(10);
-                GameState.Breed = reader.GetInt32(12);
-                GameState.Sex = reader.GetInt32(13);
+                long levelFloor = ExperienceTable.LevelFloor(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
+                Jondo.Unity.Launcher.Network.SessionContext.State.Experience = Math.Max(storedXp, levelFloor);
+                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = reader.GetInt32(4);
+                Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality = reader.GetInt32(5);
+                Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom = reader.GetInt32(6);
+                Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength = reader.GetInt32(7);
+                Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence = reader.GetInt32(8);
+                Jondo.Unity.Launcher.Network.SessionContext.State.StatChance = reader.GetInt32(9);
+                Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility = reader.GetInt32(10);
+                Jondo.Unity.Launcher.Network.SessionContext.State.Breed = reader.GetInt32(12);
+                Jondo.Unity.Launcher.Network.SessionContext.State.Sex = reader.GetInt32(13);
 
                 string lookHex = reader.GetString(11);
                 byte[] lookBytes = ConvertHexStringToByteArray(lookHex);
-                GameState.LookBytes = lookBytes;
+                Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes = lookBytes;
 
                 // Reconstruct PlayerActorDetails (detailsMsg with look and humanoid name)
                 // detailsMsg has: Field 1 (Look), Field 2 (HumanoidMsg)
                 // HumanoidMsg has: Field 2 (HumanInformationsMsg)
                 // HumanInformationsMsg has: Field 3 (Name)
-                GameState.PlayerActorDetails = ReconstructActorDetails(lookBytes, GameState.CharacterName);
+                Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails = ReconstructActorDetails(lookBytes, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName);
 
-                Console.WriteLine($"[SQLite] Successfully loaded character: {GameState.CharacterName} (Level {GameState.CharacterLevel})");
+                Console.WriteLine($"[SQLite] Successfully loaded character: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName} (Level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel})");
                 return true;
             }
             return false;
@@ -1423,20 +1423,20 @@ namespace Jondo.Unity.Launcher
                     Level = $lvl, Kamas = $kamas, Experience = $xp
                 WHERE Id = $charId;
             ";
-            command.Parameters.AddWithValue("$charId", GameState.CharacterId);
-            command.Parameters.AddWithValue("$mapId", GameState.MapId);
-            command.Parameters.AddWithValue("$cellId", GameState.CellId);
-            command.Parameters.AddWithValue("$orientation", GameState.Orientation);
-            command.Parameters.AddWithValue("$pts", GameState.CharacterRemainingPoints);
-            command.Parameters.AddWithValue("$vit", GameState.StatVitality);
-            command.Parameters.AddWithValue("$wis", GameState.StatWisdom);
-            command.Parameters.AddWithValue("$str", GameState.StatStrength);
-            command.Parameters.AddWithValue("$int", GameState.StatIntelligence);
-            command.Parameters.AddWithValue("$cha", GameState.StatChance);
-            command.Parameters.AddWithValue("$agi", GameState.StatAgility);
-            command.Parameters.AddWithValue("$lvl", GameState.CharacterLevel);
-            command.Parameters.AddWithValue("$kamas", GameState.Kamas);
-            command.Parameters.AddWithValue("$xp", GameState.Experience);
+            command.Parameters.AddWithValue("$charId", Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            command.Parameters.AddWithValue("$mapId", Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
+            command.Parameters.AddWithValue("$cellId", Jondo.Unity.Launcher.Network.SessionContext.State.CellId);
+            command.Parameters.AddWithValue("$orientation", Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+            command.Parameters.AddWithValue("$pts", Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints);
+            command.Parameters.AddWithValue("$vit", Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality);
+            command.Parameters.AddWithValue("$wis", Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom);
+            command.Parameters.AddWithValue("$str", Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength);
+            command.Parameters.AddWithValue("$int", Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence);
+            command.Parameters.AddWithValue("$cha", Jondo.Unity.Launcher.Network.SessionContext.State.StatChance);
+            command.Parameters.AddWithValue("$agi", Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility);
+            command.Parameters.AddWithValue("$lvl", Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
+            command.Parameters.AddWithValue("$kamas", Jondo.Unity.Launcher.Network.SessionContext.State.Kamas);
+            command.Parameters.AddWithValue("$xp", Jondo.Unity.Launcher.Network.SessionContext.State.Experience);
             command.ExecuteNonQuery();
         }
 
@@ -1924,12 +1924,12 @@ namespace Jondo.Unity.Launcher
 
                 // Field 1: breed & sex wrapper
                 var breedSexMsg = new Network.ProtoMessage();
-                breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.Breed > 0 ? GameState.Breed : 8 });
-                breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.Sex });
+                breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Breed > 0 ? Jondo.Unity.Launcher.Network.SessionContext.State.Breed : 8 });
+                breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Sex });
                 statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 1, WireType = 2, BytesValue = breedSexMsg.ToByteArray() });
 
                 // Field 2: Level
-                statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel > 0 ? GameState.CharacterLevel : 2 });
+                statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel > 0 ? Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel : 2 });
 
                 // Field 4: AccountId (using default 188940901L)
                 statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 188940901L });

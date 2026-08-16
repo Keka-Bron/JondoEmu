@@ -556,7 +556,7 @@ namespace Jondo.Unity.Launcher.Network
             // And in place of the characteristics of the capture, the ones of this character.
             await EnviarAsync(stream, ConnectionProtocol.Push("kub", ConnectionProtocol.BuildCharacteristics()));
             Console.WriteLine($"[World] Characteristics sent for {character.Name}: level " +
-                              $"{GameState.CharacterLevel}, {GameState.Kamas} kamas.");
+                              $"{Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}, {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas} kamas.");
 
             Console.WriteLine($"[World] Block 1 sent: {sent} messages, {rewritten} rewritten for " +
                               $"{character.Name}.");

@@ -89,18 +89,18 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("iun",
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
 
             // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
             // recargar el mapa. Son dos mensajes y hacen falta los dos: el jsn redibuja al muñeco
             // del mapa y el lxc actualiza el de la ficha. En la captura salen en este orden, entre
             // los tres de arriba y el peso.
-            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             if (character != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
-                        character, GameState.CellId, GameState.Orientation, accountId)));
+                        character, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation, accountId)));
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push("lxc", ConnectionProtocol.BuildLookChanged(character)));

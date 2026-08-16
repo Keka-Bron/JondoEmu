@@ -45,7 +45,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>El estado completo de la ventana.</summary>
         public static async Task SendStateAsync(NetworkStream stream, byte[] frame)
         {
-            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             if (character == null) return;
 
             await PreviewAsync(stream);
@@ -77,7 +77,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            Wardrobe.Wear(GameState.CharacterId, slot, VariantUid(gid, variant), gid);
+            Wardrobe.Wear(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, slot, VariantUid(gid, variant), gid);
 
             await PreviewAsync(stream);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -101,7 +101,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 else if (f.FieldNumber == 3) slot = (int)f.VarIntValue;
             }
 
-            long who = GameState.CharacterId;
+            long who = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
             if (gid == 0)
             {
                 Wardrobe.TakeOff(who, slot);
@@ -145,7 +145,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 if (slot >= 0)
                 {
-                    Wardrobe.SetHidden(GameState.CharacterId, slot, ocultar);
+                    Wardrobe.SetHidden(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, slot, ocultar);
                     Console.WriteLine($"[Apariencias] Hueco {slot} {(ocultar ? "oculto" : "a la vista")}.");
                 }
             }
@@ -186,7 +186,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         private static async Task PreviewAsync(NetworkStream stream)
         {
-            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             if (character == null) return;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

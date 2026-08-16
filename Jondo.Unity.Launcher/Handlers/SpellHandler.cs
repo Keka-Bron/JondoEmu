@@ -42,7 +42,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            int level = GameState.CharacterLevel;
+            int level = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
             int grade = SpellTable.GradeFor(wanted, level);
             if (grade == 0)
             {

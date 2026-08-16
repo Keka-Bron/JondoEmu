@@ -38,8 +38,8 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId, long mobContextId = 0)
         {
             _activeFights.Clear();
-            GameState.IsInFight = true;
-            GameState.CurrentFightMobId = mobGroup.MobId;
+            Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight = true;
+            Jondo.Unity.Launcher.Network.SessionContext.State.CurrentFightMobId = mobGroup.MobId;
 
             long fightId = System.Threading.Interlocked.Increment(ref _nextFightId);
             long arenaMapId = MapManager.ResolveArenaMapId(mapId);
@@ -52,14 +52,14 @@ namespace Jondo.Unity.Launcher.Handlers
             var walkableCells = MobSpawnManager.GetInnerWalkableCells(arenaMapId);
             fight.GeneratePlacementCells(walkableCells);
 
-            // Build Player Fighter from GameState (Fighter ID = player CharacterId)
+            // Build Player Fighter from the current session (Fighter ID = player CharacterId)
             var playerFighter = new Fighter
             {
-                Id = GameState.CharacterId,
-                Name = GameState.CharacterName,
+                Id = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId,
+                Name = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName,
                 TeamId = 0,
                 CellId = fight.BluePlacementCells.FirstOrDefault(),
-                Level = GameState.CharacterLevel > 0 ? GameState.CharacterLevel : 40,
+                Level = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel > 0 ? Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel : 40,
                 // Same source as the jxx we send to the client. There used to be a custom formula
                 // here that only looked at BASE vitality: the server believed the character had
                 // 305 HP while the client displayed 514, because equipped items (the Emerald
@@ -72,12 +72,12 @@ namespace Jondo.Unity.Launcher.Handlers
                 // whatever the gear contributes. The formula that used to be here (100 + level +
                 // every characteristic) made the number up and, above all, ignored items: with the
                 // Nightmare Dofus equipped (+1000 initiative) the piwi still played first.
-                Initiative = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance
-                             + GameState.StatAgility + StatsHandler.GetEquipBonus(44),
-                Strength = GameState.StatStrength + StatsHandler.GetEquipBonus(10),
-                Intelligence = GameState.StatIntelligence + StatsHandler.GetEquipBonus(15),
-                Chance = GameState.StatChance + StatsHandler.GetEquipBonus(13),
-                Agility = GameState.StatAgility + StatsHandler.GetEquipBonus(14),
+                Initiative = Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength + Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence + Jondo.Unity.Launcher.Network.SessionContext.State.StatChance
+                             + Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility + StatsHandler.GetEquipBonus(44),
+                Strength = Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength + StatsHandler.GetEquipBonus(10),
+                Intelligence = Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence + StatsHandler.GetEquipBonus(15),
+                Chance = Jondo.Unity.Launcher.Network.SessionContext.State.StatChance + StatsHandler.GetEquipBonus(13),
+                Agility = Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility + StatsHandler.GetEquipBonus(14),
                 // Power from the gear (characteristic 25). It feeds straight into damage.
                 Power = StatsHandler.GetEquipBonus(25),
                 // Critical hit from the gear (characteristic 18): the Turquoise Dofus gives +10.
@@ -553,14 +553,14 @@ namespace Jondo.Unity.Launcher.Handlers
             var fight = GetCurrentFight();
             if (fight == null)
             {
-                var mobs = MobSpawnManager.GetMobsForMap(GameState.MapId);
+                var mobs = MobSpawnManager.GetMobsForMap(Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
                 var mobGroup = (mobContextId != 0) 
                     ? (mobs.FirstOrDefault(m => m.MobId == mobContextId) ?? MobSpawnManager.GetMobGroupById(mobContextId) ?? mobs.FirstOrDefault())
                     : mobs.FirstOrDefault();
 
                 if (mobGroup != null)
                 {
-                    await InitiateFightFromMobCollision(stream, mobGroup, GameState.MapId, mobContextId);
+                    await InitiateFightFromMobCollision(stream, mobGroup, Jondo.Unity.Launcher.Network.SessionContext.State.MapId, mobContextId);
                     return;
                 }
             }
@@ -571,7 +571,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 await WriteFrameAsync(stream, BuildJpfPacket(fight.DefenderLeaderId));
                 
                 var johMsg = new ProtoMessage();
-                johMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.MapId });
+                johMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.MapId });
                 await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/joh", johMsg.ToByteArray()));
 
                 foreach (var p in BuildPlacementPossiblePositionsPackets(fight))
@@ -611,11 +611,11 @@ namespace Jondo.Unity.Launcher.Handlers
                             return;
                         }
 
-                        fight.ChangePlacementCell(GameState.CharacterId, newCell);
+                        fight.ChangePlacementCell(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, newCell);
                         Program.LogDebug($"[FightHandler] Changed player placement cell to {newCell}.");
 
                         // Reply with kkz ack
-                        byte[] ack = BuildKkzPacket(newCell, GameState.CharacterId, 3);
+                        byte[] ack = BuildKkzPacket(newCell, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, 3);
                         await WriteFrameAsync(stream, ack);
                     }
                 }
@@ -636,7 +636,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (fight == null) return;
 
             Program.LogDebug("[FightHandler] Player clicked READY (jza / F1).");
-            bool allReady = fight.SetFighterReady(GameState.CharacterId);
+            bool allReady = fight.SetFighterReady(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
 
             if (allReady)
             {
@@ -646,12 +646,12 @@ namespace Jondo.Unity.Launcher.Handlers
                 // 1. jys (GameFightPreparationStartedMessage)
                 var jysMsg = new ProtoMessage();
                 jysMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 1 });
-                jysMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterId });
+                jysMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
                 await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jys", jysMsg.ToByteArray()));
 
                 // 2. jwu (f3 = playerId)
                 var jwu1 = new ProtoMessage();
-                jwu1.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.CharacterId });
+                jwu1.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
                 await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jwu", jwu1.ToByteArray()));
 
                 // 3. lsy (empty)
@@ -677,7 +677,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // 9. jud (sequence start)
                 var jud1 = new ProtoMessage();
                 jud1.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 8 });
-                jud1.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterId });
+                jud1.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
                 await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jud", jud1.ToByteArray()));
 
                 // 10. jwm (FighterResyncMessage)
@@ -686,7 +686,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // 11. juc (sequence end)
                 var juc1 = new ProtoMessage();
                 juc1.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 8 });
-                juc1.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterId });
+                juc1.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
                 juc1.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 });
                 await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/juc", juc1.ToByteArray()));
 
@@ -705,10 +705,10 @@ namespace Jondo.Unity.Launcher.Handlers
             // Same list as the roleplay shortcut bar.
             // TODO: once "which variant the player picked" is persisted, read it in
             // GetPlayerAvailableSpells instead of always assuming the base one.
-            var spellList = DatabaseManager.GetPlayerAvailableSpells(GameState.Breed, GameState.CharacterLevel);
+            var spellList = DatabaseManager.GetPlayerAvailableSpells(Jondo.Unity.Launcher.Network.SessionContext.State.Breed, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
 
             Program.LogDebug($"[FightHandler] jvn: {spellList.Count} spells available at level " +
-                             $"{GameState.CharacterLevel} for breed {GameState.Breed}: " +
+                             $"{Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel} for breed {Jondo.Unity.Launcher.Network.SessionContext.State.Breed}: " +
                              string.Join(", ", spellList));
 
             // First entry: the WEAPON. It carries no spell id and uses f3 = 2 (spells use f3 = 1).
@@ -727,8 +727,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 jvnMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = sSub.ToByteArray() });
             }
 
-            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.CharacterId });
-            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.CharacterId });
+            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
+            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
 
             // Slot 0 left empty, just like the official capture and the itp: that is the weapon slot.
             var weaponSlot = new ProtoMessage();
@@ -750,7 +750,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             byte[] env = BuildGameNodePacket("type.ankama.com/jvn", jvnMsg.ToByteArray());
             await WriteFrameAsync(stream, env);
-            Program.LogDebug($"[FightHandler] Sent jvn (SpellListMessage) with {spellList.Count} spells for Breed {GameState.Breed}.");
+            Program.LogDebug($"[FightHandler] Sent jvn (SpellListMessage) with {spellList.Count} spells for Breed {Jondo.Unity.Launcher.Network.SessionContext.State.Breed}.");
         }
 
         public static async Task SendFighterResync(NetworkStream stream, FightInstance fight)
@@ -1191,7 +1191,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // it, with the cell alone, and until now it was rejected outright.
             bool isWeapon = spellId <= 0;
             var spellData = isWeapon
-                ? DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId)
+                ? DatabaseManager.GetEquippedWeaponAsSpell(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)
                 : DatabaseManager.GetSpellCombatData((int)spellId, current.Level);
 
             if (spellData == null)
@@ -1427,7 +1427,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var fight = GetCurrentFight();
             if (fight == null) return;
             var current = fight.CurrentFighter;
-            if (current == null || current.Id != GameState.CharacterId) return;
+            if (current == null || current.Id != Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId) return;
 
             var inner = ExtractMessagePayload(payload, "type.ankama.com/jyz");
             if (inner == null) inner = ExtractMessagePayload(payload, "type.ankama.com/joi");
@@ -1642,7 +1642,7 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             int subAreaId = 450;
             var fight = GetCurrentFight();
-            long mId = fight != null ? fight.RoleplayMapId : GameState.MapId;
+            long mId = fight != null ? fight.RoleplayMapId : Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
             if (MapManager.Maps.TryGetValue(mId, out var mInfo) && mInfo.SubAreaId != 0)
             {
                 subAreaId = mInfo.SubAreaId;
@@ -1720,11 +1720,11 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             var list = new List<byte[]>();
 
-            byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(GameState.CharacterName);
+            byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName);
 
             var lookBreedSub = new ProtoMessage();
             lookBreedSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = nameBytes });
-            lookBreedSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.Breed });
+            lookBreedSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Breed });
 
             var memberSub = new ProtoMessage();
             memberSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fight.ChallengerLeaderId });
@@ -1874,7 +1874,7 @@ namespace Jondo.Unity.Launcher.Handlers
             else AddSimpleVal(null, fighter.MaxHP);
 
             // 23. 11 (Vitality: player bonus; monster empty)
-            if (!fighter.IsMonster) AddBaseBonusVal(11, 0, GameState.StatVitality + StatsHandler.GetEquipBonus(11));
+            if (!fighter.IsMonster) AddBaseBonusVal(11, 0, Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality + StatsHandler.GetEquipBonus(11));
             else AddStatEntry(11, new ProtoMessage());
 
             // 25. 97 (empty)
@@ -1919,7 +1919,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 f9Level.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 3 });
 
                 var f9Breed = new ProtoMessage();
-                f9Breed.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.Breed });
+                f9Breed.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Breed });
                 f9Breed.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 });
                 f9Breed.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
                 f9Breed.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 2, BytesValue = f9Level.ToByteArray() });
@@ -1935,7 +1935,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 {
                     FieldNumber = 7,
                     WireType = 2,
-                    BytesValue = System.Text.Encoding.UTF8.GetBytes(fighter.Name ?? GameState.CharacterName ?? "")
+                    BytesValue = System.Text.Encoding.UTF8.GetBytes(fighter.Name ?? Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName ?? "")
                 });
 
                 fighterSub3.Fields.Add(new ProtoField { FieldNumber = 9, WireType = 2, BytesValue = f9.ToByteArray() });
@@ -1946,8 +1946,8 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (!fighter.IsMonster)
             {
-                byte[] playerLookBytes = (GameState.LookBytes != null && GameState.LookBytes.Length > 0)
-                    ? GameState.LookBytes
+                byte[] playerLookBytes = (Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes != null && Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes.Length > 0)
+                    ? Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes
                     : NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
                 entityDetails.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerLookBytes });
             }
@@ -2043,13 +2043,13 @@ namespace Jondo.Unity.Launcher.Handlers
 
             foreach (var kv in loot)
             {
-                DatabaseManager.AddItemToInventory(GameState.CharacterId, kv.Key, kv.Value);
+                DatabaseManager.AddItemToInventory(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, kv.Key, kv.Value);
                 Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
             }
 
             if (loot.Count > 0)
             {
-                GameState.SetInventory(DatabaseManager.LoadInventory(GameState.CharacterId));
+                Jondo.Unity.Launcher.Network.SessionContext.State.SetInventory(DatabaseManager.LoadInventory(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
             }
 
             return loot;
@@ -2066,24 +2066,24 @@ namespace Jondo.Unity.Launcher.Handlers
             long totalXP = (fight.WinnerTeamId == 0) ? fight.Team1.Sum(m => (long)m.XpReward) : 0;
             int totalKamas = fight.Team1.Sum(m => 10 + (m.Level * 5));
 
-            int previousLevel = GameState.CharacterLevel;
+            int previousLevel = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
             if (totalXP > 0)
             {
-                GameState.Experience += totalXP;
-                int newLevel = ExperienceTable.LevelForXp(GameState.Experience);
-                if (newLevel > GameState.CharacterLevel)
+                Jondo.Unity.Launcher.Network.SessionContext.State.Experience += totalXP;
+                int newLevel = ExperienceTable.LevelForXp(Jondo.Unity.Launcher.Network.SessionContext.State.Experience);
+                if (newLevel > Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel)
                 {
                     // 5 characteristic points per level, same as in TotalCapitalForLevel.
-                    int levelsGained = newLevel - GameState.CharacterLevel;
-                    GameState.CharacterRemainingPoints += levelsGained * 5;
-                    GameState.CharacterLevel = newLevel;
+                    int levelsGained = newLevel - Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
+                    Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints += levelsGained * 5;
+                    Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel = newLevel;
                     Program.LogDebug($"[FightHandler] Level up! {previousLevel} -> {newLevel} " +
                                      $"(+{levelsGained * 5} characteristic points).");
                 }
                 DatabaseManager.SaveCurrentCharacter();
-                Program.LogDebug($"[FightHandler] +{totalXP} experience (total {GameState.Experience}, " +
-                                 $"level {GameState.CharacterLevel}: from {ExperienceTable.LevelFloor(GameState.CharacterLevel)} " +
-                                 $"to {ExperienceTable.NextLevelFloor(GameState.CharacterLevel)}).");
+                Program.LogDebug($"[FightHandler] +{totalXP} experience (total {Jondo.Unity.Launcher.Network.SessionContext.State.Experience}, " +
+                                 $"level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}: from {ExperienceTable.LevelFloor(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel)} " +
+                                 $"to {ExperienceTable.NextLevelFloor(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel)}).");
             }
 
             // jwf = the end-of-fight screen. Field 1 is REPEATED and of message type: one entry
@@ -2143,8 +2143,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 // thresholds of levels 3 and 4 in the client's table.
                 if (!f.IsMonster)
                 {
-                    long levelFloor = ExperienceTable.LevelFloor(GameState.CharacterLevel);
-                    long nextLevelFloor = ExperienceTable.NextLevelFloor(GameState.CharacterLevel);
+                    long levelFloor = ExperienceTable.LevelFloor(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
+                    long nextLevelFloor = ExperienceTable.NextLevelFloor(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
 
                     var xpDetail = new ProtoMessage();
                     xpDetail.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 1 });
@@ -2154,8 +2154,8 @@ namespace Jondo.Unity.Launcher.Handlers
                         xpDetail.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = levelFloor });
                     xpDetail.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 1 });
                     xpDetail.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = nextLevelFloor });
-                    if (GameState.Experience > 0)
-                        xpDetail.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = GameState.Experience });
+                    if (Jondo.Unity.Launcher.Network.SessionContext.State.Experience > 0)
+                        xpDetail.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Experience });
                     if (totalXP > 0)
                     {
                         xpDetail.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 0, VarIntValue = 1 });
@@ -2167,7 +2167,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
                     var xpBlock = new ProtoMessage();
                     xpBlock.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = xpWrap.ToByteArray() });
-                    xpBlock.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel });
+                    xpBlock.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel });
 
                     fighterResult.Fields.Add(new ProtoField { FieldNumber = 9, WireType = 2, BytesValue = xpBlock.ToByteArray() });
                 }
@@ -2205,8 +2205,8 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (fight.WinnerTeamId == 0)
             {
-                MobSpawnManager.RemoveMobGroup(fight.RoleplayMapId, GameState.CurrentFightMobId);
-                Program.LogDebug($"[FightHandler] Mob group #{GameState.CurrentFightMobId} removed from map {fight.RoleplayMapId}.");
+                MobSpawnManager.RemoveMobGroup(fight.RoleplayMapId, Jondo.Unity.Launcher.Network.SessionContext.State.CurrentFightMobId);
+                Program.LogDebug($"[FightHandler] Mob group #{Jondo.Unity.Launcher.Network.SessionContext.State.CurrentFightMobId} removed from map {fight.RoleplayMapId}.");
 
                 // The defeated group is replaced with a freshly randomized one, leaving the groups
                 // still on the map alone. It runs before the synthesized kkr further down, so that
@@ -2219,8 +2219,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
             }
 
-            GameState.IsInFight = false;
-            GameState.CurrentFightMobId = 0;
+            Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight = false;
+            Jondo.Unity.Launcher.Network.SessionContext.State.CurrentFightMobId = 0;
             _activeFights.TryRemove(fight.FightId, out _);
 
             // Back to roleplay, traced from the official capture (frames 336-339):
@@ -2249,7 +2249,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Repopulate the roleplay map. With joh alone the client was left on an empty map, with
             // no player, no NPCs and no mob groups: the kkr -> jpv cycle is missing. We trigger it
             // ourselves by synthesizing the kkr instead of waiting for the client to ask for it.
-            GameState.MapId = fight.RoleplayMapId;
+            Jondo.Unity.Launcher.Network.SessionContext.State.MapId = fight.RoleplayMapId;
             var kkrSynth = new ProtoMessage();
             kkrSynth.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = fight.RoleplayMapId });
             byte[] kkrPacket = BuildGameNodePacket("type.ankama.com/kkr", kkrSynth.ToByteArray());
@@ -2259,13 +2259,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // to the client; without it the purse kept showing the pre-fight amount.
             if (fight.WinnerTeamId == 0 && totalKamas > 0)
             {
-                GameState.Kamas += totalKamas;
+                Jondo.Unity.Launcher.Network.SessionContext.State.Kamas += totalKamas;
                 DatabaseManager.SaveCurrentCharacter();
 
                 var bvrMsg = new ProtoMessage();
-                bvrMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = GameState.Kamas });
+                bvrMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Kamas });
                 await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/bvr", bvrMsg.ToByteArray()));
-                Program.LogDebug($"[FightHandler] +{totalKamas} kamas (total {GameState.Kamas}).");
+                Program.LogDebug($"[FightHandler] +{totalKamas} kamas (total {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas}).");
             }
 
             // With new loot the whole inventory has to be resent: otherwise the items are in the
@@ -2290,14 +2290,14 @@ namespace Jondo.Unity.Launcher.Handlers
             // On level up the spell bar is rebuilt: there may be a new spell that now meets the
             // minimum level. The client pops the level-up screen by itself as soon as it sees a
             // higher level in the kri than the one it had.
-            if (GameState.CharacterLevel > previousLevel)
+            if (Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel > previousLevel)
             {
                 await WriteFrameAsync(stream, TransitionPacketsBuilder.BuildHmdMessage());
                 foreach (var itp in TransitionPacketsBuilder.BuildItpList())
                 {
                     await WriteFrameAsync(stream, itp);
                 }
-                Program.LogDebug($"[FightHandler] Spell book and spell bar rebuilt after reaching level {GameState.CharacterLevel}.");
+                Program.LogDebug($"[FightHandler] Spell book and spell bar rebuilt after reaching level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}.");
             }
 
             Program.LogDebug($"[FightHandler] Fight #{fight.FightId} ended! Restored Roleplay Map {fight.RoleplayMapId}. Winner: Team {fight.WinnerTeamId}. Rewards: {totalXP} XP, {totalKamas} Kamas, {loot.Count} item(s).");

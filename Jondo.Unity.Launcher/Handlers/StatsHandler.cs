@@ -110,7 +110,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // The total capital comes from the LEVEL, not from the current stats: that way an
             // inconsistent earlier distribution cannot poison the maths (the source of "-75 / 245").
-            int capitalPool = TotalCapitalForLevel(GameState.CharacterLevel);
+            int capitalPool = TotalCapitalForLevel(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
 
             // Wisdom arrives from the client already multiplied by its cost; normalize it to points.
             int wantWisdomPoints = wantWisdom / WisdomCost;
@@ -120,7 +120,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             Console.WriteLine($"[Stats] Requested — Str:{wantStrength} Int:{wantIntelligence} Cha:{wantChance} " +
                               $"Agi:{wantAgility} Vit:{wantVitality} Wis:{wantWisdomPoints} " +
-                              $"(cost {requestedCost} / capital {capitalPool} level {GameState.CharacterLevel})");
+                              $"(cost {requestedCost} / capital {capitalPool} level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel})");
 
             if (requestedCost < 0 || requestedCost > capitalPool)
             {
@@ -133,16 +133,16 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            GameState.StatStrength     = wantStrength;
-            GameState.StatIntelligence = wantIntelligence;
-            GameState.StatChance       = wantChance;
-            GameState.StatAgility      = wantAgility;
-            GameState.StatVitality     = wantVitality;
-            GameState.StatWisdom       = wantWisdomPoints;
-            GameState.CharacterRemainingPoints = capitalPool - requestedCost;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength     = wantStrength;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence = wantIntelligence;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatChance       = wantChance;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility      = wantAgility;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality     = wantVitality;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom       = wantWisdomPoints;
+            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = capitalPool - requestedCost;
 
-            Console.WriteLine($"[Stats] New — Vit:{GameState.StatVitality} Wis:{GameState.StatWisdom} Str:{GameState.StatStrength} Int:{GameState.StatIntelligence} Cha:{GameState.StatChance} Agi:{GameState.StatAgility}");
-            Console.WriteLine($"[Stats] Remaining capital: {GameState.CharacterRemainingPoints}");
+            Console.WriteLine($"[Stats] New — Vit:{Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality} Wis:{Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom} Str:{Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength} Int:{Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence} Cha:{Jondo.Unity.Launcher.Network.SessionContext.State.StatChance} Agi:{Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility}");
+            Console.WriteLine($"[Stats] Remaining capital: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints}");
 
             DatabaseManager.SaveCurrentCharacter();
             Console.WriteLine("[Stats] Saved updated stats to database.");
@@ -156,9 +156,9 @@ namespace Jondo.Unity.Launcher.Handlers
             // whenever the stats-points pool changes; the client's characteristics panel binds
             // its "remaining points" counter to it and refreshes the open panel on receipt. Without
             // it, the panel only updated when closed and reopened.
-            byte[] krbPacket = BuildKrbPacket(GameState.CharacterRemainingPoints);
+            byte[] krbPacket = BuildKrbPacket(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, krbPacket);
-            Console.WriteLine($"[Stats] Sent krb (available capital = {GameState.CharacterRemainingPoints}).");
+            Console.WriteLine($"[Stats] Sent krb (available capital = {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints}).");
 
             // 3. Send the StatsUpgradeResultMessage (krd) to confirm the operation and trigger UI refresh
             byte[] krdPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/krd", Array.Empty<byte>());
@@ -197,10 +197,10 @@ namespace Jondo.Unity.Launcher.Handlers
         public static byte[] BuildIsfPacket()
         {
             int currentWeight = 0;
-            foreach (var item in GameState.GetInventoryCopy())
+            foreach (var item in Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryCopy())
                 currentWeight += DatabaseManager.GetItemRealWeight(item.ItemId) * item.Quantity;
 
-            int maxWeight = 1000 + GameState.StatStrength * 5;
+            int maxWeight = 1000 + Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength * 5;
 
             using var ms = new MemoryStream();
             var output = new CodedOutputStream(ms);
@@ -217,7 +217,7 @@ namespace Jondo.Unity.Launcher.Handlers
             return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/isf", ms.ToArray());
         }
 
-        /// <summary>Stats whose values are computed from the database/GameState;
+        /// <summary>Stats whose values are computed from the database/session state;
         /// every other entry uses the official defaults below.</summary>
         private static readonly HashSet<int> DynamicStatIds = new HashSet<int> { 10, 11, 12, 13, 14, 15, 17, 18, 44 };
 
@@ -266,12 +266,12 @@ namespace Jondo.Unity.Launcher.Handlers
         // The experience thresholds come from the client's own table (character_xp.json).
         // They used to be hardcoded to 110 and 650, which are the level-2 ones: the experience bar
         // of a level-50 character showed a beginner's window.
-        private static long XpLevelFloor => ExperienceTable.LevelFloor(GameState.CharacterLevel);
-        private static long XpNextLevel  => ExperienceTable.NextLevelFloor(GameState.CharacterLevel);
+        private static long XpLevelFloor => ExperienceTable.LevelFloor(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
+        private static long XpNextLevel  => ExperienceTable.NextLevelFloor(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
 
         /// <summary>
         /// Builds the complete kri (CharacterStatsListMessage) frame from scratch:
-        /// primary stats and capital come from GameState (loaded from SQLite), equipment
+        /// primary stats and capital come from the session state (loaded from SQLite), equipment
         /// bonuses from the equipped-items cache, and the remaining entries reproduce
         /// the official defaults. No captured payload is reused.
         /// Also used by InventoryHandler and GameNodeProxy after equipment changes/login.
@@ -286,16 +286,16 @@ namespace Jondo.Unity.Launcher.Handlers
                 var xpDetail = new ProtoMessage();
                 xpDetail.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = 500 });
                 var levelMsg = new ProtoMessage();
-                levelMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterLevel });
-                levelMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.CharacterLevel });
+                levelMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel });
+                levelMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel });
                 levelMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 2, BytesValue = xpDetail.ToByteArray() });
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = levelMsg.ToByteArray() });
 
-                larMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.CharacterRemainingPoints });
+                larMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints });
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = XpLevelFloor });  // XP at the start of the level
-                larMsg.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = GameState.CharacterRemainingPoints });
+                larMsg.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints });
                 larMsg.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 0, VarIntValue = XpNextLevel });   // XP needed for the next level
-                larMsg.Fields.Add(new ProtoField { FieldNumber = 11, WireType = 0, VarIntValue = GameState.Experience }); // Accumulated XP
+                larMsg.Fields.Add(new ProtoField { FieldNumber = 11, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Experience }); // Accumulated XP
 
                 foreach (var e in DefaultKriEntries)
                 {
@@ -303,27 +303,27 @@ namespace Jondo.Unity.Launcher.Handlers
                     long val = e.Value;
                     if (e.StatId == 3 || e.StatId == 40)
                     {
-                        val = GameState.CharacterRemainingPoints;
+                        val = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints;
                     }
                     larMsg.Fields.Add(CreateRawStatEntry(e.StatId, e.SubField, e.InnerField, val));
                 }
 
-                // Dynamic stats from database-backed GameState + equipment bonuses
-                int baseHp = 50 + (GameState.CharacterLevel * 5);
+                // Dynamic stats from database-backed session state + equipment bonuses
+                int baseHp = 50 + (Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel * 5);
                 larMsg.Fields.Add(CreateStatField(0, baseHp,                      GetEquipBonus(0)));  // Base HP
                 larMsg.Fields.Add(CreateInnateStatField(1, 6,                     GetEquipBonus(1)));  // AP
                 larMsg.Fields.Add(CreateInnateStatField(23, 3,                    GetEquipBonus(23))); // MP
-                larMsg.Fields.Add(CreateStatField(11, GameState.StatVitality,     GetEquipBonus(11))); // Vitality
-                larMsg.Fields.Add(CreateStatField(12, GameState.StatWisdom,       GetEquipBonus(12))); // Wisdom
-                larMsg.Fields.Add(CreateStatField(10, GameState.StatStrength,     GetEquipBonus(10))); // Strength
-                larMsg.Fields.Add(CreateStatField(15, GameState.StatIntelligence, GetEquipBonus(15))); // Intelligence
-                larMsg.Fields.Add(CreateStatField(13, GameState.StatChance,       GetEquipBonus(13))); // Chance
-                larMsg.Fields.Add(CreateStatField(14, GameState.StatAgility,      GetEquipBonus(14))); // Agility
+                larMsg.Fields.Add(CreateStatField(11, Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality,     GetEquipBonus(11))); // Vitality
+                larMsg.Fields.Add(CreateStatField(12, Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom,       GetEquipBonus(12))); // Wisdom
+                larMsg.Fields.Add(CreateStatField(10, Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength,     GetEquipBonus(10))); // Strength
+                larMsg.Fields.Add(CreateStatField(15, Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence, GetEquipBonus(15))); // Intelligence
+                larMsg.Fields.Add(CreateStatField(13, Jondo.Unity.Launcher.Network.SessionContext.State.StatChance,       GetEquipBonus(13))); // Chance
+                larMsg.Fields.Add(CreateStatField(14, Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility,      GetEquipBonus(14))); // Agility
                 larMsg.Fields.Add(CreateStatField(25, 0,                          GetEquipBonus(25))); // Power
                 larMsg.Fields.Add(CreateStatField(18, 0,                          GetEquipBonus(18))); // Critical
 
                 // Initiative base = only elemental stats (Str+Int+Cha+Agi). Vitality and Wisdom do NOT count.
-                int baseInitiative = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance + GameState.StatAgility;
+                int baseInitiative = Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength + Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence + Jondo.Unity.Launcher.Network.SessionContext.State.StatChance + Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility;
                 larMsg.Fields.Add(CreateStatField(44, baseInitiative, GetEquipBonus(44)));             // Initiative
 
                 var kriMsg = new ProtoMessage();
@@ -419,7 +419,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Map the generic statId to the specific effect ActionId used in the DB
             int effectId = EffectActionIdByStatId.TryGetValue(statId, out int mapped) ? mapped : statId;
 
-            foreach (var equipped in GameState.GetEquippedItemsCopy().Values)
+            foreach (var equipped in Jondo.Unity.Launcher.Network.SessionContext.State.GetEquippedItemsCopy().Values)
             {
                 if (equipped.Stats.TryGetValue(effectId, out int b))
                     bonus += b;
@@ -434,7 +434,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static int GetPlayerMaxHp()
         {
-            int baseHp = 50 + (GameState.CharacterLevel * 5) + GameState.StatVitality;
+            int baseHp = 50 + (Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel * 5) + Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality;
             int equipHp = GetEquipBonus(11) + GetEquipBonus(0);
             return baseHp + equipHp;
         }
@@ -448,13 +448,13 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         private static int GetSetBonus(int statId)
         {
-            var equippedItems  = GameState.GetEquippedItemsCopy();
+            var equippedItems  = Jondo.Unity.Launcher.Network.SessionContext.State.GetEquippedItemsCopy();
             var intrepidGids  = new HashSet<int> { 10801, 10800, 10798, 10797, 10784, 10785, 10799, 10794 };
             int count = 0;
 
             foreach (var uid in equippedItems.Keys)
             {
-                var item = GameState.GetInventoryItem(uid);
+                var item = Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryItem(uid);
                 if (item != null && intrepidGids.Contains(item.ItemId))
                     count++;
             }

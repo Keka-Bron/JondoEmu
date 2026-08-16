@@ -11,7 +11,7 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         public static async Task HandleMapLoadRequest(NetworkStream stream, byte[] payload)
         {
-            if (GameState.IsInFight)
+            if (Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight)
             {
                 await FightHandler.HandleFightMapLoad(stream);
                 return;
@@ -46,14 +46,14 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
                 catch { }
 
-                long mapIdToLoad = requestedMapId > 0 ? requestedMapId : GameState.MapId;
+                long mapIdToLoad = requestedMapId > 0 ? requestedMapId : Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
                 if (mapIdToLoad > 0)
                 {
                     LogDebug($"[Game Node] Client requested map complementary info for Map ID: {mapIdToLoad} (extracted: {requestedMapId})");
-                    GameState.MapId = mapIdToLoad;
+                    Jondo.Unity.Launcher.Network.SessionContext.State.MapId = mapIdToLoad;
 
-                    int spawnCellId = MapManager.GetNearestWalkableCell(mapIdToLoad, GameState.CellId > 0 ? GameState.CellId : 344);
-                    GameState.CellId = spawnCellId;
+                    int spawnCellId = MapManager.GetNearestWalkableCell(mapIdToLoad, Jondo.Unity.Launcher.Network.SessionContext.State.CellId > 0 ? Jondo.Unity.Launcher.Network.SessionContext.State.CellId : 344);
+                    Jondo.Unity.Launcher.Network.SessionContext.State.CellId = spawnCellId;
                     var mapInfo = MapManager.GetMapInfo(mapIdToLoad);
                     int subAreaId = mapInfo != null ? mapInfo.SubAreaId : 1;
                     if (subAreaId == 444)
@@ -90,17 +90,17 @@ namespace Jondo.Unity.Launcher.Handlers
                         // Disposition (Field 1)
                         var playerDisp = new ProtoMessage();
                         playerDisp.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = spawnCellId });
-                        playerDisp.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.Orientation });
+                        playerDisp.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Orientation });
                         playerActor.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerDisp.ToByteArray() });
 
                         // Details (Field 2)
-                        if (GameState.PlayerActorDetails != null)
+                        if (Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails != null)
                         {
-                            playerActor.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = GameState.PlayerActorDetails });
+                            playerActor.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails });
                         }
 
                         // Contextual ID (Field 3)
-                        playerActor.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.CharacterId });
+                        playerActor.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
 
                         jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = playerActor.ToByteArray() });
                         int totalActors = 1;

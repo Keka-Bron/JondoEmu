@@ -24,28 +24,28 @@ namespace Jondo.Unity.Launcher.Handlers
                         if (parts.Length < 2) return;
                         if (long.TryParse(parts[1], out long kamasAmount))
                         {
-                            long newKamas = GameState.Kamas + kamasAmount;
+                            long newKamas = Jondo.Unity.Launcher.Network.SessionContext.State.Kamas + kamasAmount;
                             if (newKamas < 0) newKamas = 0;
                             
-                            GameState.Kamas = newKamas;
+                            Jondo.Unity.Launcher.Network.SessionContext.State.Kamas = newKamas;
                             DatabaseManager.SaveCurrentCharacter();
 
                             // Send KamasUpdateMessage (bvr)
                             var bvrMsg = new ProtoMessage();
-                            bvrMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = GameState.Kamas });
+                            bvrMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Kamas });
                             byte[] bvrPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/bvr", bvrMsg.ToByteArray());
                             await NetworkMessage.WriteFrameAsync(stream, bvrPacket);
                             
                             // Send Chat message as feedback
                             var csmMsg = new ProtoMessage();
                             csmMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 0 });
-                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes($"[INFO] Kamas updated to {GameState.Kamas}.") });
+                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes($"[INFO] Kamas updated to {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas}.") });
                             csmMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 0 }); // Timestamp
                             csmMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes("") }); // Fingerprint
                             byte[] csmPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/csm", csmMsg.ToByteArray());
                             await NetworkMessage.WriteFrameAsync(stream, csmPacket);
                             
-                            Console.WriteLine($"[CommandHandler] Updated Kamas to {GameState.Kamas}");
+                            Console.WriteLine($"[CommandHandler] Updated Kamas to {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas}");
                         }
                         break;
 
@@ -56,13 +56,13 @@ namespace Jondo.Unity.Launcher.Handlers
                             if (newLevel < 1) newLevel = 1;
                             if (newLevel > 200) newLevel = 200;
 
-                            int oldLevel = GameState.CharacterLevel;
-                            GameState.CharacterLevel = newLevel;
+                            int oldLevel = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
+                            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel = newLevel;
                             
                             // Recalculate remaining points based on level
-                            int alreadySpent = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance + GameState.StatAgility + GameState.StatVitality + GameState.StatWisdom * 3;
-                            GameState.CharacterRemainingPoints = ((newLevel - 1) * 5) - alreadySpent;
-                            if (GameState.CharacterRemainingPoints < 0) GameState.CharacterRemainingPoints = 0;
+                            int alreadySpent = Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength + Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence + Jondo.Unity.Launcher.Network.SessionContext.State.StatChance + Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility + Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality + Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom * 3;
+                            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = ((newLevel - 1) * 5) - alreadySpent;
+                            if (Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints < 0) Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = 0;
 
                             DatabaseManager.SaveCurrentCharacter();
 
@@ -73,7 +73,7 @@ namespace Jondo.Unity.Launcher.Handlers
                             }
 
                             // Update stats panel remaining points
-                            byte[] krbPacket = StatsHandler.BuildKrbPacket(GameState.CharacterRemainingPoints);
+                            byte[] krbPacket = StatsHandler.BuildKrbPacket(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints);
                             await NetworkMessage.WriteFrameAsync(stream, krbPacket);
 
                             var emptyKrd = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/krd", new byte[0]);
@@ -87,7 +87,7 @@ namespace Jondo.Unity.Launcher.Handlers
                             var levelUpPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/bcy", bcyMsg.ToByteArray());
                             await NetworkMessage.WriteFrameAsync(stream, levelUpPacket);
 
-                            Console.WriteLine($"[CommandHandler] Updated Level to {GameState.CharacterLevel}");
+                            Console.WriteLine($"[CommandHandler] Updated Level to {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}");
                         }
                         break;
                 }

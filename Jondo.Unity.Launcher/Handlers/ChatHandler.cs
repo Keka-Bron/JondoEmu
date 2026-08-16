@@ -29,10 +29,12 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
                 else
                 {
-                    Console.WriteLine($"[Chat] {GameState.CharacterName}: {msgText}");
-                    byte[] echoPacket = BuildChatBroadcastPacket(msgText, GameState.CharacterName, channel: 0);
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, echoPacket);
-                    Console.WriteLine("[Chat] Echoed chat message back to client.");
+                    Console.WriteLine($"[Chat] {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName}: {msgText}");
+                    byte[] echoPacket = BuildChatBroadcastPacket(msgText, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName, channel: 0);
+                    int delivered = await SessionRegistry.BroadcastToMapAsync(
+                        SessionContext.State.MapId, echoPacket);
+                    Console.WriteLine($"[Chat] Broadcast delivered to {delivered} session(s) on map " +
+                                      $"{SessionContext.State.MapId}.");
                 }
             }
         }
@@ -49,7 +51,7 @@ namespace Jondo.Unity.Launcher.Handlers
             output.WriteInt64(timestamp);
 
             output.WriteTag((uint)((7  << 3) | 0)); // Field 7:  actor ID
-            output.WriteInt64(GameState.CharacterId);
+            output.WriteInt64(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
 
             output.WriteTag((uint)((8  << 3) | 0)); // Field 8:  channel
             output.WriteInt32(channel);
