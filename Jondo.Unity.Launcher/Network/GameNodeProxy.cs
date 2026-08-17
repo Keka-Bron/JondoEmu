@@ -330,11 +330,18 @@ namespace Jondo.Unity.Launcher.Network
 
                         if (text.Length > 0)
                         {
-                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                                ConnectionProtocol.Push("kti",
-                                    ConnectionProtocol.BuildChatLine(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName,
-                                        Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, sessionAccountId, text, channel)));
-                            Console.WriteLine($"[Chat] channel {channel}: {text}");
+                            if (text.StartsWith(".", StringComparison.Ordinal))
+                            {
+                                await CommandHandler.HandleCommand(stream, text);
+                            }
+                            else
+                            {
+                                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                                    ConnectionProtocol.Push("kti",
+                                        ConnectionProtocol.BuildChatLine(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName,
+                                            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, sessionAccountId, text, channel)));
+                                Console.WriteLine($"[Chat] channel {channel}: {text}");
+                            }
                         }
                     }
                 }

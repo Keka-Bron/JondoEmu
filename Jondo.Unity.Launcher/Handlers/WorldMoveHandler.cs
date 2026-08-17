@@ -218,6 +218,67 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
+        /// Teleports the current character to an arbitrary known roleplay map. The destination
+        /// cell is selected from the map's walkable-cell data, as close to its centre as possible.
+        /// Returns that cell, or null when the map cannot safely receive the character.
+        /// </summary>
+        public static async Task<int?> TeleportAsync(NetworkStream stream, long targetMapId)
+        {
+            if (targetMapId <= 0 || MapManager.GetMapInfo(targetMapId) == null) return null;
+
+            IReadOnlyCollection<int> walkable;
+            if (MapManager.WalkableCells.TryGetValue(targetMapId, out var roleplayCells) &&
+                roleplayCells.Count > 0)
+            {
+                walkable = roleplayCells;
+            }
+            else
+            {
+                var fightCells = MapManager.GetFightWalkable(targetMapId);
+                if (fightCells == null || fightCells.Count == 0) return null;
+                walkable = fightCells;
+            }
+
+            const int centreCell = 280;
+            int centreRow = centreCell / 14;
+            int centreColumn = centreCell % 14;
+            int arrival = -1;
+            int bestDistance = int.MaxValue;
+            foreach (int cell in walkable)
+            {
+                int row = cell / 14;
+                int column = cell % 14;
+                int distance = ((row - centreRow) * (row - centreRow)) +
+                               ((column - centreColumn) * (column - centreColumn));
+                if (distance >= bestDistance) continue;
+                bestDistance = distance;
+                arrival = cell;
+            }
+            if (arrival < 0) return null;
+
+            long oldMapId = SessionContext.State.MapId;
+            SessionContext.State.MapId = targetMapId;
+            SessionContext.State.CellId = arrival;
+            DatabaseManager.SaveCurrentCharacter();
+
+            // Same map-change sequence as a normal border crossing. After jru the client answers
+            // with jrh, and GameNodeProxy sends the actors and interactive elements of the map.
+            byte[] actorLeft = ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId);
+            await SessionContext.Current.SendAsync(actorLeft);
+            await SessionRegistry.BroadcastToMapAsync(oldMapId, actorLeft, SessionContext.Current.Id);
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildLoadMap(targetMapId));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildMapClock());
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildMapDiscovered(targetMapId));
+
+            Console.WriteLine($"[Move] Teleport: map {oldMapId} -> {targetMapId}, " +
+                              $"arrival cell {arrival}. Waiting for jrh.");
+            return arrival;
+        }
+
+        /// <summary>
         /// Which way the character is leaving.
         ///
         /// The map id in jqk is a GUESS, not an instruction. The client works it out by arithmetic

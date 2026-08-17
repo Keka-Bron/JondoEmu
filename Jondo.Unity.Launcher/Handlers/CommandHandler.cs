@@ -2,6 +2,7 @@ using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Protocol;
+using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
 
 namespace Jondo.Unity.Launcher.Handlers
@@ -20,82 +21,106 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 switch (cmd)
                 {
-                    case ".kamas":
-                        if (parts.Length < 2) return;
-                        if (long.TryParse(parts[1], out long kamasAmount))
-                        {
-                            long newKamas = Jondo.Unity.Launcher.Network.SessionContext.State.Kamas + kamasAmount;
-                            if (newKamas < 0) newKamas = 0;
-                            
-                            Jondo.Unity.Launcher.Network.SessionContext.State.Kamas = newKamas;
-                            DatabaseManager.SaveCurrentCharacter();
+                    case ".help":
+                        await SendFeedbackAsync(stream,
+                            "Commandes: .help, .kamas <montant>, .level <1-200>, .tp <MapId>.");
+                        break;
 
-                            // Send KamasUpdateMessage (bvr)
-                            var bvrMsg = new ProtoMessage();
-                            bvrMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Kamas });
-                            byte[] bvrPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/bvr", bvrMsg.ToByteArray());
-                            await NetworkMessage.WriteFrameAsync(stream, bvrPacket);
-                            
-                            // Send Chat message as feedback
-                            var csmMsg = new ProtoMessage();
-                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 0 });
-                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes($"[INFO] Kamas updated to {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas}.") });
-                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 0 }); // Timestamp
-                            csmMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes("") }); // Fingerprint
-                            byte[] csmPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/csm", csmMsg.ToByteArray());
-                            await NetworkMessage.WriteFrameAsync(stream, csmPacket);
-                            
-                            Console.WriteLine($"[CommandHandler] Updated Kamas to {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas}");
+                    case ".kamas":
+                        if (parts.Length != 2 || !long.TryParse(parts[1], out long kamasAmount))
+                        {
+                            await SendFeedbackAsync(stream, "Utilisation: .kamas <montant>");
+                            break;
                         }
+
+                        long currentKamas = SessionContext.State.Kamas;
+                        long newKamas;
+                        try { newKamas = checked(currentKamas + kamasAmount); }
+                        catch (OverflowException) { newKamas = kamasAmount > 0 ? long.MaxValue : 0; }
+
+                        SessionContext.State.Kamas = Math.Max(0, newKamas);
+                        DatabaseManager.SaveCurrentCharacter();
+
+                        // Current 3.6 protocol: ivf updates the purse and kub refreshes the sheet.
+                        await NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(SessionContext.State.Kamas)));
+                        await SendCharacteristicsAsync(stream);
+                        await SendFeedbackAsync(stream, $"Kamas: {SessionContext.State.Kamas}.");
+                        Console.WriteLine($"[CommandHandler] Updated Kamas to {SessionContext.State.Kamas}");
                         break;
 
                     case ".level":
-                        if (parts.Length < 2) return;
-                        if (int.TryParse(parts[1], out int newLevel))
+                        if (parts.Length != 2 || !int.TryParse(parts[1], out int newLevel) ||
+                            newLevel is < 1 or > 200)
                         {
-                            if (newLevel < 1) newLevel = 1;
-                            if (newLevel > 200) newLevel = 200;
-
-                            int oldLevel = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
-                            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel = newLevel;
-                            
-                            // Recalculate remaining points based on level
-                            int alreadySpent = Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength + Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence + Jondo.Unity.Launcher.Network.SessionContext.State.StatChance + Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility + Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality + Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom * 3;
-                            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = ((newLevel - 1) * 5) - alreadySpent;
-                            if (Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints < 0) Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = 0;
-
-                            DatabaseManager.SaveCurrentCharacter();
-
-                            var updatedKri = StatsHandler.BuildUpdatedKriPacket();
-                            if (updatedKri != null)
-                            {
-                                await NetworkMessage.WriteFrameAsync(stream, updatedKri);
-                            }
-
-                            // Update stats panel remaining points
-                            byte[] krbPacket = StatsHandler.BuildKrbPacket(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints);
-                            await NetworkMessage.WriteFrameAsync(stream, krbPacket);
-
-                            var emptyKrd = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/krd", new byte[0]);
-                            await NetworkMessage.WriteFrameAsync(stream, emptyKrd);
-
-                            var bcyMsg = new ProtoMessage();
-                            bcyMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = newLevel });
-                            bcyMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = oldLevel });
-                            bcyMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 5 * (newLevel - oldLevel) });
-                            bcyMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 5 * (newLevel - oldLevel) });
-                            var levelUpPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/bcy", bcyMsg.ToByteArray());
-                            await NetworkMessage.WriteFrameAsync(stream, levelUpPacket);
-
-                            Console.WriteLine($"[CommandHandler] Updated Level to {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}");
+                            await SendFeedbackAsync(stream, "Utilisation: .level <1-200>");
+                            break;
                         }
+
+                        int oldLevel = Math.Clamp(SessionContext.State.CharacterLevel, 1, 200);
+                        int spentCapital = Math.Max(0,
+                            ((oldLevel - 1) * 5) - SessionContext.State.CharacterRemainingPoints);
+
+                        SessionContext.State.CharacterLevel = newLevel;
+                        SessionContext.State.CharacterRemainingPoints = Math.Max(0,
+                            ((newLevel - 1) * 5) - spentCapital);
+                        SessionContext.State.Experience = ExperienceTable.LevelFloor(newLevel);
+                        DatabaseManager.SaveCurrentCharacter();
+
+                        // kub is the live 3.6 characteristics packet. The previous bcy/krb/krd
+                        // sequence belongs to the retired protocol and is ignored by this client.
+                        await SendCharacteristicsAsync(stream);
+                        await SendFeedbackAsync(stream,
+                            $"Niveau: {oldLevel} -> {newLevel} ({SessionContext.State.CharacterRemainingPoints} points disponibles).");
+                        Console.WriteLine($"[CommandHandler] Updated Level to {newLevel}");
+                        break;
+
+                    case ".tp":
+                        if (parts.Length != 2 || !long.TryParse(parts[1], out long targetMapId) ||
+                            targetMapId <= 0)
+                        {
+                            await SendFeedbackAsync(stream, "Utilisation: .tp <MapId>");
+                            break;
+                        }
+
+                        if (SessionContext.State.IsInFight)
+                        {
+                            await SendFeedbackAsync(stream, "Impossible de se teleporter pendant un combat.");
+                            break;
+                        }
+
+                        int? arrivalCell = await WorldMoveHandler.TeleportAsync(stream, targetMapId);
+                        if (!arrivalCell.HasValue)
+                        {
+                            await SendFeedbackAsync(stream,
+                                $"Teleportation impossible: la map {targetMapId} est inconnue ou sans cellule marchable.");
+                            break;
+                        }
+
+                        Console.WriteLine($"[CommandHandler] Teleported to map {targetMapId}, cell {arrivalCell.Value}");
+                        break;
+
+                    default:
+                        await SendFeedbackAsync(stream,
+                            $"Commande inconnue: {cmd}. Tapez .help pour voir la liste.");
                         break;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[CommandHandler] Error processing command: {ex.Message}");
+                await SendFeedbackAsync(stream, "La commande a echoue. Consultez la console du serveur.");
             }
+        }
+
+        private static Task SendCharacteristicsAsync(NetworkStream stream) =>
+            NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("kub", ConnectionProtocol.BuildCharacteristics()));
+
+        private static Task SendFeedbackAsync(NetworkStream stream, string text)
+        {
+            byte[] line = ConnectionProtocol.BuildChatLine("Commandes", 0, 0, text, 0);
+            return NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push("kti", line));
         }
     }
 }
