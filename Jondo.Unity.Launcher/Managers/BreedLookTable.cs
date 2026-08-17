@@ -166,7 +166,7 @@ namespace Jondo.Unity.Launcher.Managers
             bool montado = mount != null && huesosRaiz != 0;
 
             var colores = ColorsFor(breedId, sex, customColors);
-            var cuerpo = BuildBodyLook(breedId, sex, headId, customColors, montado, prendas);
+            var cuerpo = BuildBodyLook(breedId, sex, headId, customColors, montado, prendas, quien);
 
             // A pie la raíz es el propio personaje, así que la mascota se le cuelga a él.
             if (!montado)
@@ -220,9 +220,16 @@ namespace Jondo.Unity.Launcher.Managers
         /// El aspecto del propio personaje, sin montura ni mascota. Devuelve el constructor a medio
         /// hacer y no los bytes, porque a pie hay que colgarle todavía la mascota.
         /// </summary>
+        /// <param name="quien">
+        /// De quién es el cuerpo. Hace falta para el TAMAÑO: el f5 es un multiplicador y lo que
+        /// declara la raza —entre 43 y 55 según raza y sexo— es su cien por cien, así que el
+        /// porcentaje que guarda <see cref="CharacterSize"/> se aplica sobre eso y no sustituye al
+        /// número. Cero significa "nadie en concreto" y entonces se dibuja al tamaño de la raza.
+        /// </param>
         private static Pb BuildBodyLook(int breedId, int sex, int headId,
                                         IReadOnlyList<long>? customColors, bool riding,
-                                        IReadOnlyList<Wardrobe.Worn>? appearance = null)
+                                        IReadOnlyList<Wardrobe.Worn>? appearance = null,
+                                        long quien = 0)
         {
             var baseLook = Get(breedId, sex);
             var pb = Pb.New();
@@ -235,7 +242,10 @@ namespace Jondo.Unity.Launcher.Managers
             // el normal. En la captura se ve el mismo personaje con huesos 1 a pie y 2 encima del
             // dragopavo.
             pb.Var(3, riding ? Mounts.RiderBones : (baseLook?.Bones ?? 1));
-            if (baseLook != null && baseLook.Scales.Count > 0) pb.Packed(5, baseLook.Scales);
+            if (baseLook != null && baseLook.Scales.Count > 0)
+            {
+                pb.Packed(5, CharacterSize.Applied(baseLook.Scales, quien));
+            }
 
             var skins = new List<long>();
             if (baseLook != null) skins.AddRange(baseLook.Skins);

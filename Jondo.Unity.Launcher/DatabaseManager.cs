@@ -247,6 +247,21 @@ namespace Jondo.Unity.Launcher
                     // Already exists.
                 }
 
+                // Migración: lo que mide el personaje, en tanto por ciento de lo que mide su raza.
+                // Cien es el tamaño de siempre, así que los que ya existían no cambian de aspecto
+                // al aparecer la columna.
+                try
+                {
+                    var addSizeCmd = worldConnection.CreateCommand();
+                    addSizeCmd.CommandText = "ALTER TABLE Characters ADD COLUMN Size INTEGER NOT NULL DEFAULT 100;";
+                    addSizeCmd.ExecuteNonQuery();
+                    Console.WriteLine("[SQLite] Migration: Added Size column to Characters table.");
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException)
+                {
+                    // Already exists.
+                }
+
                 FillMissingHeads(worldConnection);
 
                 // A character with no date leaves the server-selection screen empty, so no row is
@@ -389,6 +404,21 @@ namespace Jondo.Unity.Launcher
                         PRIMARY KEY (DungeonId, Position)
                     );
                     CREATE INDEX IF NOT EXISTS idx_dungeon_rooms_map ON DungeonRooms(MapId);
+
+                    /* Los índices de los hechizos, que NO son un adorno: son la diferencia entre
+                       un combate fluido y uno a trompicones.
+
+                       SpellLevels tiene 34.823 filas y sus dos columnas de efectos suman 67 MB de
+                       texto, casi dos kilobytes por fila. La clave primaria es Id, pero TODAS las
+                       consultas del combate buscan por SpellId —los efectos de un hechizo, su
+                       grado, su coste, sus recargas—, así que cada una recorría la tabla entera:
+                       medido, 37 milisegundos por consulta y cuatro consultas por lanzamiento.
+                       Eso es el parón de entre 47 y 138 milisegundos que se notaba al lanzar.
+
+                       Con el índice, la misma consulta pasa de SCAN a SEARCH y baja a cuatro
+                       milésimas de milisegundo. Crearlos cuesta 92 milisegundos una sola vez. */
+                    CREATE INDEX IF NOT EXISTS idx_spelllevels_hechizo ON SpellLevels(SpellId, Grade);
+                    CREATE INDEX IF NOT EXISTS idx_spelllevels_nivel ON SpellLevels(SpellId, MinPlayerLevel);
                 ";
                 createNpcSpawns.ExecuteNonQuery();
 
@@ -1475,21 +1505,43 @@ namespace Jondo.Unity.Launcher
                     Position = reader.GetInt32(3)
                 };
 
+                // Los efectos se guardan como los manda el cliente, una lista de listas:
+                // [[efecto, valor, dado, cara], ...]. Aquí se leían como si fueran un diccionario
+                // {"138": 80}, que es OTRA cosa: System.Text.Json se atragantaba, el catch se
+                // tragaba la excepción y TODOS los objetos se quedaban sin efectos. Con eso, la
+                // suma del equipo valía cero para todo —potencia, daños, fuerza, crítico, PA y
+                // PM—, y de ahí que el personaje peleara con 6 PA y 3 PM y pegase como si fuera
+                // desnudo, mientras el panel del cliente sí enseñaba los objetos bien, porque ése
+                // los lee por otro lado (Managers.Equipment.ParseEffects).
+                //
+                // Se lee con ese mismo parser, que es el que ya sabía la forma buena. La forma
+                // vieja de diccionario se sigue admitiendo por si quedó algo guardado así.
                 string jsonEffects = reader.IsDBNull(4) ? "" : reader.GetString(4);
+                item.RawEffects = jsonEffects;
                 if (!string.IsNullOrEmpty(jsonEffects))
                 {
-                    try
+                    var parsed = Managers.Equipment.ParseEffects(jsonEffects);
+                    if (parsed.Count > 0)
                     {
-                        var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<int, int>>(jsonEffects);
-                        if (dict != null)
+                        foreach (var effect in parsed)
                         {
-                            foreach (var kvp in dict)
-                            {
-                                item.Effects[kvp.Key] = kvp.Value;
-                            }
+                            // Un objeto puede repetir efecto; se suman, no se pisan.
+                            item.Effects.TryGetValue(effect.Effect, out int already);
+                            item.Effects[effect.Effect] = already + (int)effect.Value;
                         }
                     }
-                    catch (Exception) { }
+                    else
+                    {
+                        try
+                        {
+                            var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<int, int>>(jsonEffects);
+                            if (dict != null)
+                            {
+                                foreach (var kvp in dict) item.Effects[kvp.Key] = kvp.Value;
+                            }
+                        }
+                        catch (Exception) { }
+                    }
                 }
 
                 list.Add(item);
@@ -1497,12 +1549,28 @@ namespace Jondo.Unity.Launcher
             return list;
         }
 
+        /// <summary>
+        /// Los efectos de un objeto listos para guardar, en la forma que espera todo el mundo:
+        /// [[efecto, valor, dado, cara], ...].
+        ///
+        /// Si el objeto vino de la base se devuelven tal cual llegaron, sin recomponerlos, para no
+        /// perder los dados por el camino. Sólo se arma la lista cuando el objeto es nuevo.
+        /// </summary>
+        private static string EffectsForStorage(PlayerItem item)
+        {
+            if (!string.IsNullOrEmpty(item.RawEffects)) return item.RawEffects;
+
+            var lista = new List<int[]>();
+            foreach (var kvp in item.Effects) lista.Add(new[] { kvp.Key, kvp.Value, 0, 0 });
+            return System.Text.Json.JsonSerializer.Serialize(lista);
+        }
+
         public static void SaveInventoryItem(long characterId, PlayerItem item)
         {
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
 
-            string jsonEffects = System.Text.Json.JsonSerializer.Serialize(item.Effects);
+            string jsonEffects = EffectsForStorage(item);
 
             var command = connection.CreateCommand();
             command.CommandText = @"
@@ -1819,7 +1887,7 @@ namespace Jondo.Unity.Launcher
 
                 foreach (var item in items)
                 {
-                    string jsonEffects = System.Text.Json.JsonSerializer.Serialize(item.Effects);
+                    string jsonEffects = EffectsForStorage(item);
                     var command = connection.CreateCommand();
                     command.Transaction = transaction;
                     command.CommandText = @"
@@ -2602,6 +2670,213 @@ namespace Jondo.Unity.Launcher
         // which characteristic each effectId touches; without it nothing but damage can be applied.
         private static Dictionary<int, int>? _effectCharacteristics;
 
+        /// <summary>
+        /// De cada efecto, qué característica toca y con qué signo, según el catálogo del cliente.
+        ///
+        /// El signo sale de la DESCRIPCIÓN, no del BonusType. Parece más basto y es al revés: el
+        /// BonusType no es de fiar. El 1079, que es el que roba PA —"-#1 a -#2 PA"—, lo tiene a
+        /// CERO, igual que el 101; con esa regla Flecha Helada no robaba nada. La descripción, en
+        /// cambio, es la plantilla con la que el propio cliente escribe el efecto en pantalla, y
+        /// los que restan empiezan todos por un guion: el 1079, el 116 del alcance y el 169 de los
+        /// PM.
+        ///
+        /// Y se dejan fuera los de categoría 2, que son los del ARMA: el 101 apunta a los puntos de
+        /// acción, pero es lo que cuesta pegar con ella, no puntos que se ganen.
+        /// </summary>
+        public static (int Characteristic, int Sign) EffectMeta(int effectId)
+        {
+            LoadEffectCatalogue();
+            return _effectMeta!.TryGetValue(effectId, out var meta) ? meta : (0, 0);
+        }
+
+        private static Dictionary<int, (int Characteristic, int Sign)>? _effectMeta;
+
+        /// <summary>
+        /// La FAMILIA de un efecto: su categoría y si es un bono, tal cual los declara el catálogo
+        /// del cliente.
+        ///
+        /// Con estos dos números el cliente decide si un embrujo se pinta en el panel de efectos o
+        /// si es maquinaria interna que no se enseña. Van en su propio diccionario, sin filtrar por
+        /// característica, porque los que hacen falta aquí —el 950 que pone un estado, el 792 que
+        /// encadena hechizos, el 293 de los daños básicos— no tienen característica propia.
+        /// </summary>
+        public static (int Category, int Boost) EffectFamily(int effectId)
+        {
+            if (_effectFamily == null)
+            {
+                var mapa = new Dictionary<int, (int, int)>();
+                try
+                {
+                    using var conn = new SqliteConnection(WorldConnectionString);
+                    conn.Open();
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = "SELECT Id, Category, Boost FROM Effects;";
+                    using var rd = cmd.ExecuteReader();
+                    while (rd.Read())
+                    {
+                        mapa[rd.GetInt32(0)] = (rd.IsDBNull(1) ? 0 : rd.GetInt32(1),
+                                                rd.IsDBNull(2) ? 0 : rd.GetInt32(2));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[DatabaseManager] No se pudo leer la familia de los efectos: {ex.Message}");
+                }
+                _effectFamily = mapa;
+            }
+            return _effectFamily.TryGetValue(effectId, out var familia) ? familia : (0, 0);
+        }
+
+        private static Dictionary<int, (int Category, int Boost)>? _effectFamily;
+
+        /// <summary>
+        /// De qué elemento pega un efecto, según el catálogo: 0 neutral, 1 tierra, 2 fuego, 3 agua
+        /// y 4 aire. Menos uno cuando el efecto no pega de ningún elemento.
+        /// </summary>
+        public static int EffectElement(int effectId)
+        {
+            if (_effectElement == null)
+            {
+                var mapa = new Dictionary<int, int>();
+                try
+                {
+                    using var conn = new SqliteConnection(WorldConnectionString);
+                    conn.Open();
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = "SELECT Id, ElementId FROM Effects;";
+                    using var rd = cmd.ExecuteReader();
+                    while (rd.Read()) mapa[rd.GetInt32(0)] = rd.IsDBNull(1) ? -1 : rd.GetInt32(1);
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[DatabaseManager] No se pudo leer el elemento de los efectos: {ex.Message}");
+                }
+                _effectElement = mapa;
+            }
+            return _effectElement.TryGetValue(effectId, out int elemento) ? elemento : -1;
+        }
+
+        private static Dictionary<int, int>? _effectElement;
+
+        /// <summary>La categoría de los efectos que describen el arma, no al personaje.</summary>
+        private const int WeaponEffectCategory = 2;
+
+        // ─── Los que ROBAN puntos ───────────────────────────────────────────────
+
+        private static Dictionary<int, int>? _roboDePuntos;
+
+        /// <summary>
+        /// Qué característica roba un efecto de robo, o cero si no roba nada.
+        ///
+        /// Son una familia aparte y por eso se les hace un hueco: los cuatro —77 y 441 de puntos
+        /// de movimiento, 84 y 440 de puntos de acción— llevan <c>Characteristic = 0</c> y
+        /// <c>Category = 2</c> en la tabla, así que se los comían los dos filtros del catálogo
+        /// general y no llegaban nunca al motor. El resultado en pantalla era que Flecha
+        /// Inmovilizadora, en vez de quitarle un punto de movimiento al pío, le colgaba un
+        /// embrujo llamado literalmente "Roba 1 PM" que no hacía nada.
+        ///
+        /// Cuál roban lo dice su propia descripción, que es de donde el catálogo ya saca el signo
+        /// de los demás: "Roba #1 a #2 PM" contra "Roba #1 a #2 PA". No hay lista escrita a mano.
+        /// </summary>
+        public static int RoboDePuntos(int effectId)
+        {
+            if (_roboDePuntos == null)
+            {
+                var mapa = new Dictionary<int, int>();
+                try
+                {
+                    using var conn = new SqliteConnection(WorldConnectionString);
+                    conn.Open();
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = "SELECT Id, Description FROM Effects " +
+                                      "WHERE Description LIKE 'Roba %';";
+                    using var rd = cmd.ExecuteReader();
+                    while (rd.Read())
+                    {
+                        string texto = rd.IsDBNull(1) ? "" : rd.GetString(1).TrimEnd();
+                        if (texto.EndsWith("PM", StringComparison.Ordinal))
+                            mapa[rd.GetInt32(0)] = MovementPointsCharacteristic;
+                        else if (texto.EndsWith("PA", StringComparison.Ordinal))
+                            mapa[rd.GetInt32(0)] = ActionPointsCharacteristic;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[DatabaseManager] No se pudieron leer los robos de puntos: {ex.Message}");
+                }
+                _roboDePuntos = mapa;
+            }
+            return _roboDePuntos.TryGetValue(effectId, out int cual) ? cual : 0;
+        }
+
+        private const int ActionPointsCharacteristic = 1;
+        private const int MovementPointsCharacteristic = 23;
+
+        // ─── Los que MULTIPLICAN ────────────────────────────────────────────────
+
+        private static HashSet<int>? _multiplicadores;
+
+        /// <summary>
+        /// Si un efecto multiplica en vez de sumar.
+        /// </summary>
+        /// <remarks>
+        /// Se reconocen por su descripción, que es de la forma "… x#1%": el 1163 es "Daños
+        /// sufridos x#1%" y el 1159 "Curas recibidas x#1%". Ninguno tiene característica en el
+        /// catálogo, porque el cliente los resuelve por su número, y por eso no encajan en el
+        /// camino corriente del motor.
+        /// </remarks>
+        public static bool EsMultiplicador(int effectId)
+        {
+            if (_multiplicadores == null)
+            {
+                var lista = new HashSet<int>();
+                try
+                {
+                    using var conn = new SqliteConnection(WorldConnectionString);
+                    conn.Open();
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = "SELECT Id FROM Effects WHERE Description LIKE '% x#1%';";
+                    using var rd = cmd.ExecuteReader();
+                    while (rd.Read()) lista.Add(rd.GetInt32(0));
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[DatabaseManager] No se pudieron leer los multiplicadores: {ex.Message}");
+                }
+                _multiplicadores = lista;
+            }
+            return _multiplicadores.Contains(effectId);
+        }
+
+        private static void LoadEffectCatalogue()
+        {
+            if (_effectMeta != null) return;
+            var meta = new Dictionary<int, (int, int)>();
+            try
+            {
+                using var conn = new SqliteConnection(WorldConnectionString);
+                conn.Open();
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT Id, Characteristic, Category, Description FROM Effects " +
+                                  "WHERE Characteristic > 0;";
+                using var rd = cmd.ExecuteReader();
+                while (rd.Read())
+                {
+                    int category = rd.IsDBNull(2) ? 0 : rd.GetInt32(2);
+                    if (category == WeaponEffectCategory) continue;
+
+                    string description = rd.IsDBNull(3) ? "" : rd.GetString(3);
+                    int sign = description.TrimStart().StartsWith("-") ? -1 : 1;
+                    meta[rd.GetInt32(0)] = (rd.GetInt32(1), sign);
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[DatabaseManager] No se pudo leer el catálogo de efectos: {ex.Message}");
+            }
+            _effectMeta = meta;
+        }
+
         private static int GetEffectCharacteristic(int effectId)
         {
             if (_effectCharacteristics == null)
@@ -3008,6 +3283,74 @@ namespace Jondo.Unity.Launcher
                 Console.WriteLine($"[DatabaseManager] Error reading MinPlayerLevel of spell {spellId}: {ex.Message}");
             }
             return 1;
+        }
+
+        /// <summary>
+        /// El mapa donde están los vendedores: el que más NPC tiene colocados.
+        ///
+        /// Se busca en vez de escribirse a pelo. Hoy gana el Pueblo de Amakna (88212759) con 52
+        /// filas en NpcSpawns contra una sola del siguiente, así que no hay empate que deshacer;
+        /// pero si mañana se puebla otro mapa, el que salga de aquí será el bueno sin que haya que
+        /// tocar el comando. Devuelve (0, 0) cuando no hay ningún NPC colocado.
+        /// </summary>
+        public static (long MapId, int Npcs) GetMapWithMostNpcSpawns()
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT MapId, COUNT(*) AS c FROM NpcSpawns " +
+                    "GROUP BY MapId ORDER BY c DESC, MapId ASC LIMIT 1;";
+
+                using var reader = command.ExecuteReader();
+                if (reader.Read()) return (reader.GetInt64(0), reader.GetInt32(1));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se pudo buscar el mapa con más NPC: {ex.Message}");
+            }
+            return (0, 0);
+        }
+
+        /// <summary>
+        /// El nombre de una subzona, en el idioma del cliente.
+        ///
+        /// Va en dos saltos, igual que los nombres de hechizo: SubAreaTemplates guarda un JSON con
+        /// un nameId dentro, y ese nameId es la clave de Translations. Sale vacío cuando no hay
+        /// traducción, y quien llame decidirá qué enseñar en su lugar.
+        /// </summary>
+        public static string GetSubAreaName(int subAreaId)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Data FROM SubAreaTemplates WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", subAreaId);
+
+                string? data = command.ExecuteScalar() as string;
+                if (string.IsNullOrEmpty(data)) return "";
+
+                using var doc = System.Text.Json.JsonDocument.Parse(data);
+                if (!doc.RootElement.TryGetProperty("nameId", out var nameId)) return "";
+
+                var translation = connection.CreateCommand();
+                translation.CommandText = "SELECT Text FROM Translations WHERE Key = $key;";
+                translation.Parameters.AddWithValue("$key", nameId.GetInt64().ToString());
+
+                return translation.ExecuteScalar() as string ?? "";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se pudo leer el nombre de la subzona " +
+                                  $"{subAreaId}: {ex.Message}");
+                return "";
+            }
         }
     }
 

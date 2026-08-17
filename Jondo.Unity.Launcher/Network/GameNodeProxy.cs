@@ -16,6 +16,11 @@ namespace Jondo.Unity.Launcher.Network
         private static TcpListener? _tcpListener;
         private static bool _isRunning;
 
+        /// <summary>
+        /// La cuenta de la sesión, apuntada aparte porque el bloque del mapa se manda desde un
+        /// método que no ve las variables locales del bucle y necesita la cuenta para el actor.
+        /// </summary>
+        private static long _sessionAccountId;
         private static CancellationTokenSource? _cts;
 
         public static void Start(int port)
@@ -80,12 +85,6 @@ namespace Jondo.Unity.Launcher.Network
 
         public static async Task HandleGameNodeSessionAsync(NetworkStream stream, byte[] firstPayload, string firstPayloadStr)
         {
-            var session = new GameSession(stream);
-            using var sessionScope = SessionContext.Push(session);
-            SessionRegistry.Register(session);
-
-            try
-            {
             byte[] payload = firstPayload;
             string payloadStr = firstPayloadStr;
             bool isAuthenticated = false;
@@ -99,6 +98,10 @@ namespace Jondo.Unity.Launcher.Network
             // presents in kqz. Without this the character list would be the same for everyone.
             long sessionAccountId = 0;
             int sessionServerId = 0;
+
+            // El bloque del mapa se manda desde un sitio que no ve las variables de arriba, y
+            // necesita la cuenta para el actor. Se apunta aquí al resolverse el ticket.
+            _sessionAccountId = 0;
 
             if (payloadStr.Contains("type.ankama.com/lqu") || payloadStr.Contains("type.ankama.com/hoy") || payloadStr.Contains("type.ankama.com/hmt") || payloadStr.Contains("type.ankama.com/knx"))
             {
@@ -119,7 +122,7 @@ namespace Jondo.Unity.Launcher.Network
                     isAuthenticated = true;
                     if (HandleTicketPresentation(payload, ref sessionAccountId, ref sessionServerId))
                     {
-                        session.BindAccount(sessionAccountId, sessionServerId);
+                        _sessionAccountId = sessionAccountId;
                         var characters = DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId);
                         foreach (byte[] frame in ConnectionProtocol.BuildWelcomeBurst(characters))
                         {
@@ -148,8 +151,9 @@ namespace Jondo.Unity.Launcher.Network
                     // handled the same: the client decides which of the two screens it lands on.
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push("kqr", BuildKqrPayload()));
-                    await AnnounceDepartureAsync(session);
-                    Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight = false;
+                    // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
+                    // el de arena es de instancia y quedarse ahí es quedarse encerrado.
+                    FightHandler.LeaveFight();
                     hasSentMapBlock = false;
                     Console.WriteLine("[Game Node] Client is going back: sent kqr and released the session.");
                 }
@@ -195,16 +199,14 @@ namespace Jondo.Unity.Launcher.Network
                     // Block 1 of the world entry, replayed from the 3.6.10.10 capture with the
                     // identity rebuilt from the database. The real server stops here and waits
                     // for the client to confirm with lqc before sending anything else.
-                    var chosen = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+                    var chosen = DatabaseManager.GetCharacterById(GameState.CharacterId);
                     if (chosen == null)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"[Game Node] Character {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId} is not in the database.");
+                        Console.WriteLine($"[Game Node] Character {GameState.CharacterId} is not in the database.");
                         Console.ResetColor();
                         return;
                     }
-
-                    session.EnterWorld();
 
                     // A fresh entry into the world: the map block is owed again, and the
                     // inventory is read from the database for this character.
@@ -220,37 +222,39 @@ namespace Jondo.Unity.Launcher.Network
                     // for it would leave the client without the catalogues for no reason.
                     await WorldEntry.SendAfterConfirmAsync(stream, chosen);
                 }
+                else if ((payloadStr.Contains("type.ankama.com/jrh")
+                          || payloadStr.Contains("type.ankama.com/kmv"))
+                         && FightHandler.PendingPreparation() != null)
+                {
+                    // En combate, quien está en el mapa no se manda con un jss: son las jxg de la
+                    // preparación, y sólo cuando el cliente las pide. Ese es el orden de la
+                    // captura, y mandarlas antes del cambio de mapa hace que las descarte.
+                    //
+                    // Y las pide con kmv, no con jrh. Al cargar un mapa normal el cliente manda los
+                    // dos, así que enganchar el jrh bastaba ahí; pero al entrar en combate manda
+                    // ijm y kmv y nada más, y kmv estaba en la lista de mensajes que se ignoran sin
+                    // decir nada. Por eso el combate salía en el registro del servidor y en pantalla
+                    // no pasaba nada.
+                    await FightHandler.SendPreparationAsync(stream, FightHandler.PendingPreparation()!);
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.BuildActorsComplete());
+                }
                 else if (payloadStr.Contains("type.ankama.com/jrh"))
                 {
+                    // Peleando, el mapa ya está puesto: mandarle el jss del mapa de superficie lo
+                    // sacaría del combate.
+                    if (GameState.IsInFight) continue;
+
                     // The client asks who is on the map. Without an answer it draws an empty map:
                     // no avatar, no NPCs, no monsters.
-                    var here = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+                    var here = DatabaseManager.GetCharacterById(GameState.CharacterId);
                     if (here != null)
                     {
                         byte[] actors = ConnectionProtocol.Push("jss",
-                            ConnectionProtocol.BuildMapActors(Jondo.Unity.Launcher.Network.SessionContext.State.MapId, here,
-                                                              Jondo.Unity.Launcher.Network.SessionContext.State.CellId, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation,
+                            ConnectionProtocol.BuildMapActors(GameState.MapId, here,
+                                                              GameState.CellId, GameState.Orientation,
                                                               sessionAccountId));
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, actors);
-
-                        // Populate both sides: the arriving client learns about players already
-                        // present, and those players learn about the new arrival.
-                        foreach (var other in SessionRegistry.OnMap(SessionContext.State.MapId))
-                        {
-                            if (other.Id == session.Id) continue;
-                            var otherCharacter = DatabaseManager.GetCharacterById(other.State.CharacterId);
-                            if (otherCharacter == null) continue;
-                            await session.SendAsync(ConnectionProtocol.Push("jsn",
-                                ConnectionProtocol.BuildActorRefreshed(otherCharacter,
-                                    other.State.CellId, other.State.Orientation, other.AccountId)));
-                        }
-
-                        await SessionRegistry.BroadcastToMapAsync(
-                            SessionContext.State.MapId,
-                            ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
-                                here, SessionContext.State.CellId, SessionContext.State.Orientation,
-                                sessionAccountId)),
-                            session.Id);
 
                         // And straight behind it, the mark that says there are no more actors. In
                         // every capture that loads a map lva comes immediately after jss, and
@@ -258,7 +262,7 @@ namespace Jondo.Unity.Launcher.Network
                         // it asks again with knm, kno and kny and goes round once more.
                         // Dentro del merkasako van además los muebles y los permisos, que en la
                         // captura salen entre el jss y el lva.
-                        if (Managers.Merkasako.IsHavenBag(Jondo.Unity.Launcher.Network.SessionContext.State.MapId))
+                        if (Managers.Merkasako.IsHavenBag(GameState.MapId))
                         {
                             await MerkasakoHandler.SendFurnitureAsync(stream);
                         }
@@ -267,8 +271,8 @@ namespace Jondo.Unity.Launcher.Network
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                             ConnectionProtocol.BuildActorsComplete());
 
-                        Console.WriteLine($"[Game Node] Actors of map {Jondo.Unity.Launcher.Network.SessionContext.State.MapId} sent: " +
-                                          $"{here.Name} on cell {Jondo.Unity.Launcher.Network.SessionContext.State.CellId}.");
+                        Console.WriteLine($"[Game Node] Actors of map {GameState.MapId} sent: " +
+                                          $"{here.Name} on cell {GameState.CellId}.");
                     }
                 }
                 else if (payloadStr.Contains("type.ankama.com/lqc"))
@@ -289,7 +293,11 @@ namespace Jondo.Unity.Launcher.Network
                 // an earlier version of the protocol and this client never sends them.
                 else if (payloadStr.Contains("type.ankama.com/jrw"))
                 {
-                    await WorldMoveHandler.ConfirmMovementAsync(stream, payload);
+                    // Andar es el mismo mensaje dentro y fuera del combate. Peleando lo resuelve el
+                    // manejador de combate, que además gasta puntos de movimiento; si cayera aquí,
+                    // el personaje se movería por el tablero gratis y sin avisar a nadie.
+                    if (GameState.IsInFight) await FightHandler.WalkAsync(stream, payload);
+                    else await WorldMoveHandler.ConfirmMovementAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/jqi"))
                 {
@@ -328,20 +336,20 @@ namespace Jondo.Unity.Launcher.Network
                             else if (f.FieldNumber == 3 && f.WireType == 0) channel = (int)f.VarIntValue;
                         }
 
-                        if (text.Length > 0)
+                        // Los comandos de administración se escriben por aquí, por cualquier canal,
+                        // y NO se publican: si el manejador los reconoce, la línea se queda en el
+                        // servidor y nunca llega a salir por el chat. Vale para todos los canales
+                        // porque lo que decide no es el canal, es el texto.
+                        bool consumed = text.Length > 0 &&
+                            await CommandHandler.TryHandleAsync(stream, text, channel, sessionAccountId);
+
+                        if (text.Length > 0 && !consumed)
                         {
-                            if (text.StartsWith(".", StringComparison.Ordinal))
-                            {
-                                await CommandHandler.HandleCommand(stream, text);
-                            }
-                            else
-                            {
-                                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                                    ConnectionProtocol.Push("kti",
-                                        ConnectionProtocol.BuildChatLine(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName,
-                                            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, sessionAccountId, text, channel)));
-                                Console.WriteLine($"[Chat] channel {channel}: {text}");
-                            }
+                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                                ConnectionProtocol.Push("kti",
+                                    ConnectionProtocol.BuildChatLine(GameState.CharacterName,
+                                        GameState.CharacterId, sessionAccountId, text, channel)));
+                            Console.WriteLine($"[Chat] channel {channel}: {text}");
                         }
                     }
                 }
@@ -438,8 +446,14 @@ namespace Jondo.Unity.Launcher.Network
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
                     // El botón de cerrar del diálogo. Va vacío y espera respuesta: khd si lo que
-                    // está abierto es el cofre, kld si es la lista del zaap.
+                    // está abierto es el cofre o la tienda de un NPC, kld si es la lista del zaap.
+                    //
+                    // El cliente manda el kla DOS veces seguidas al cerrar una tienda, con menos de
+                    // un milisegundo entre medias, y el servidor real contesta un solo khd. Como el
+                    // primero ya deja la tienda cerrada, el segundo cae en el zaap y se va con un
+                    // kld que el cliente ignora, igual que hoy.
                     if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
+                    else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
                     else await ZaapTravelHandler.CloseAsync(stream);
                 }
                 else if (payloadStr.Contains("type.ankama.com/hjc"))
@@ -516,13 +530,13 @@ namespace Jondo.Unity.Launcher.Network
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIlcMessage());
                     
                     // Patch joh dynamically with character's map ID
-                    byte[] patchedJoh = PatchJohPacket(TransitionPacketsBuilder.BuildJohMessage(), Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
+                    byte[] patchedJoh = PatchJohPacket(TransitionPacketsBuilder.BuildJohMessage(), GameState.MapId);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, patchedJoh);
                     
                     int subAreaId = 1;
                     try
                     {
-                        var mapInfo = MapManager.GetMapInfo(Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
+                        var mapInfo = MapManager.GetMapInfo(GameState.MapId);
                         if (mapInfo != null)
                         {
                             subAreaId = mapInfo.SubAreaId;
@@ -564,7 +578,7 @@ namespace Jondo.Unity.Launcher.Network
                     int subAreaId = 1;
                     try
                     {
-                        var mapInfo = MapManager.GetMapInfo(Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
+                        var mapInfo = MapManager.GetMapInfo(GameState.MapId);
                         if (mapInfo != null)
                         {
                             subAreaId = mapInfo.SubAreaId;
@@ -592,7 +606,7 @@ namespace Jondo.Unity.Launcher.Network
                         int subAreaId = 1;
                         try
                         {
-                            var mapInfo = MapManager.GetMapInfo(Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
+                            var mapInfo = MapManager.GetMapInfo(GameState.MapId);
                             if (mapInfo != null)
                             {
                                 subAreaId = mapInfo.SubAreaId;
@@ -625,7 +639,7 @@ namespace Jondo.Unity.Launcher.Network
                     // Since this is an if/else-if chain, the first match wins. During a fight the
                     // movement must be resolved by FightHandler (it expands the path, spends MP and
                     // emits jud/joo/jvm/juc); if it fell through to here, the player teleported.
-                    if (Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight)
+                    if (GameState.IsInFight)
                     {
                         await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                     }
@@ -646,29 +660,45 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await InventoryHandler.HandleItemMovementRequest(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/ilr"))
+                else if (payloadStr.Contains("type.ankama.com/iov"))
                 {
-                    await NpcHandler.HandleNpcGenericActionRequest(stream, payload);
+                    // Ha clicado un NPC: según la acción, se le abre la tienda o el diálogo.
+                    await NpcHandler.InteractAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lxh"))
+                else if (payloadStr.Contains("type.ankama.com/ioy"))
                 {
-                    await NpcHandler.HandleLeaveDialogRequest(stream);
+                    // Ha elegido una respuesta del diálogo.
+                    await NpcHandler.ReplyAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kjl"))
+                else if (payloadStr.Contains("type.ankama.com/kea"))
                 {
-                    await NpcHandler.HandleNpcDialogReply(stream, payload);
+                    // Comprarle algo al NPC que tiene la tienda abierta.
+                    await NpcHandler.BuyAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/krc"))
                 {
                     await StatsHandler.HandleStatsUpgradeRequest(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jxx") || payloadStr.Contains("type.ankama.com/jyk") || payloadStr.Contains("type.ankama.com/jyz") || payloadStr.Contains("type.ankama.com/joi") || payloadStr.Contains("type.ankama.com/jza") || payloadStr.Contains("type.ankama.com/jwe") || payloadStr.Contains("type.ankama.com/jrb") || payloadStr.Contains("type.ankama.com/jub") || payloadStr.Contains("type.ankama.com/jxw") || payloadStr.Contains("type.ankama.com/hoy"))
+                else if (payloadStr.Contains("type.ankama.com/hqa"))
                 {
+                    // Atacar a un grupo de monstruos. Es lo que manda el cliente de verdad al
+                    // lanzar un combate: lleva el id contextual del grupo.
+                    await FightHandler.AttackAsync(stream, payload);
+                }
+                else if (payloadStr.Contains("type.ankama.com/jzy") || payloadStr.Contains("type.ankama.com/kaq")
+                         || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
+                         || payloadStr.Contains("type.ankama.com/jwh")
+                         || payloadStr.Contains("type.ankama.com/jti")
+                         || payloadStr.Contains("type.ankama.com/hoy"))
+                {
+                    // Colocarse, declararse listo y las opciones del combate. Los demás que había
+                    // aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la 3.6.10.10 o
+                    // los manda el servidor, no el cliente.
                     await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
                 {
-                    await ChatHandler.HandleChatMessage(stream, payload);
+                    await ChatHandler.HandleChatMessage(stream, payload, sessionAccountId);
                 }
                 else if (payloadStr.Contains("type.ankama.com/itn"))
                 {
@@ -731,25 +761,6 @@ namespace Jondo.Unity.Launcher.Network
                 if (payload == null) break;
                 payloadStr = Encoding.UTF8.GetString(payload);
             }
-            }
-            finally
-            {
-                await AnnounceDepartureAsync(session);
-                SessionRegistry.Unregister(session);
-                Console.WriteLine($"[Game Node] Session {session.Id} disconnected " +
-                                  $"({SessionRegistry.ConnectedCount} active).");
-            }
-        }
-
-        private static async Task AnnounceDepartureAsync(GameSession session)
-        {
-            if (!session.IsInWorld) return;
-
-            long mapId = session.MapId;
-            long characterId = session.CharacterId;
-            session.LeaveWorld();
-            await SessionRegistry.BroadcastToMapAsync(
-                mapId, ConnectionProtocol.BuildActorLeft(characterId), session.Id);
         }
 
         /// <summary>
@@ -763,15 +774,15 @@ namespace Jondo.Unity.Launcher.Network
         {
             if (alreadySent) return false;
 
-            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (character == null) return false;
 
             Console.WriteLine($"[Game Node] Sending the map block ({reason}).");
-            await WorldEntry.SendMapAsync(stream, character, Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
+            await WorldEntry.SendMapAsync(stream, character, GameState.MapId);
 
             // Y lo que uno tiene de adorno, que el servidor real manda una sola vez, aquí: los
             // títulos y ornamentos disponibles, y cuál lleva puesto.
-            await WardrobeHandler.SendOwnedAsync(stream, SessionContext.Current.AccountId);
+            await WardrobeHandler.SendOwnedAsync(stream, _sessionAccountId);
             return true;
         }
 
@@ -920,22 +931,22 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     var actorMsg = ProtoMessage.Parse(actorField.BytesValue);
                     var contextualIdField = actorMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 0);
-                    if (contextualIdField != null && (contextualIdField.VarIntValue == Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId || contextualIdField.VarIntValue == 13825558L || contextualIdField.VarIntValue == 906071769378L || contextualIdField.VarIntValue == 670668947750L))
+                    if (contextualIdField != null && (contextualIdField.VarIntValue == GameState.CharacterId || contextualIdField.VarIntValue == 13825558L || contextualIdField.VarIntValue == 906071769378L || contextualIdField.VarIntValue == 670668947750L))
                     {
                         // 1. Update ContextualId to player ID
-                        contextualIdField.VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
+                        contextualIdField.VarIntValue = GameState.CharacterId;
 
                         // 2. Overwrite Details with our patched PlayerActorDetails
                         var origDetailsField = actorMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
                         if (origDetailsField != null) actorMsg.Fields.Remove(origDetailsField);
                         
-                        if (Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails != null)
+                        if (GameState.PlayerActorDetails != null)
                         {
-                            actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails });
+                            actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = GameState.PlayerActorDetails });
                         }
                         
                         actorField.BytesValue = actorMsg.ToByteArray();
-                        Program.LogDebug($"[Game Node] Patched player actor name and ID inside entering jpv: ID={Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId}");
+                        Program.LogDebug($"[Game Node] Patched player actor name and ID inside entering jpv: ID={GameState.CharacterId}");
                     }
                 }
                 
@@ -1026,12 +1037,12 @@ namespace Jondo.Unity.Launcher.Network
                         var idField = characterBaseInfoMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 0);
                         if (idField != null)
                         {
-                            idField.VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
-                            Program.LogDebug($"[KTW Patch] Patched character ID to: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId}");
+                            idField.VarIntValue = GameState.CharacterId;
+                            Program.LogDebug($"[KTW Patch] Patched character ID to: {GameState.CharacterId}");
                         }
                         else
                         {
-                            characterBaseInfoMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
+                            characterBaseInfoMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterId });
                         }
                         
                         // 2. Patch details (Field 1)
@@ -1049,24 +1060,24 @@ namespace Jondo.Unity.Launcher.Network
                             var nameField = detailsMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 2);
                             if (nameField != null)
                             {
-                                nameField.BytesValue = Encoding.UTF8.GetBytes(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName);
-                                Program.LogDebug($"[KTW Patch] Patched character name to: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName}");
+                                nameField.BytesValue = Encoding.UTF8.GetBytes(GameState.CharacterName);
+                                Program.LogDebug($"[KTW Patch] Patched character name to: {GameState.CharacterName}");
                             }
                             else
                             {
-                                detailsMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = Encoding.UTF8.GetBytes(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName) });
+                                detailsMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = Encoding.UTF8.GetBytes(GameState.CharacterName) });
                             }
                             
                             // Patch character level (Field 6)
                             var levelField = detailsMsg.Fields.FirstOrDefault(f => f.FieldNumber == 6 && f.WireType == 0);
                             if (levelField != null)
                             {
-                                levelField.VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
-                                Program.LogDebug($"[KTW Patch] Patched character level to: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}");
+                                levelField.VarIntValue = GameState.CharacterLevel;
+                                Program.LogDebug($"[KTW Patch] Patched character level to: {GameState.CharacterLevel}");
                             }
                             else
                             {
-                                detailsMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel });
+                                detailsMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = GameState.CharacterLevel });
                             }
                             
                             // Patch entityLook (Field 2)
@@ -1080,9 +1091,9 @@ namespace Jondo.Unity.Launcher.Network
                                     
                                     byte[] defaultLookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
                                     byte[] entityLookBytes = defaultLookBytes;
-                                    if (Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes != null && Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes.Length > 0)
+                                    if (GameState.LookBytes != null && GameState.LookBytes.Length > 0)
                                     {
-                                        entityLookBytes = Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes;
+                                        entityLookBytes = GameState.LookBytes;
                                     }
 
                                     if (entityLookField != null)

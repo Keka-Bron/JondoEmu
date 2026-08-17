@@ -53,6 +53,8 @@ namespace Jondo.Unity.Launcher
             Managers.Cosmetics.Initialize();
             Managers.Merkasako.Initialize();
             Managers.Mounts.Initialize();
+            Managers.Npcs.Initialize();
+            Managers.NpcShops.Initialize();
 
             Console.WriteLine("[+] Registering Fight Packet Handlers...");
             Handlers.FightHandler.RegisterHandlers();

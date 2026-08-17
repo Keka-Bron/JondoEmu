@@ -229,7 +229,8 @@ namespace Jondo.Unity.World.Maps
         /// cell-by-cell path. Each leg is resolved through the real shortest path, so a vertex
         /// that is two steps away costs two MP and not one.
         /// </summary>
-        public static List<int> ExpandPath(List<int> vertices, HashSet<int> walkableCells = null)
+        public static List<int> ExpandPath(List<int> vertices, HashSet<int> walkableCells = null,
+                                           HashSet<int> occupiedCells = null)
         {
             if (vertices == null || vertices.Count == 0) return new List<int>();
             if (vertices.Count == 1) return new List<int> { vertices[0] };
@@ -241,7 +242,9 @@ namespace Jondo.Unity.World.Maps
                 int fromCell = vertices[i];
                 int toCell = vertices[i + 1];
 
-                var stepPath = FindShortestPath(fromCell, toCell, walkableCells);
+                // Las casillas ocupadas también cortan: sin pasarlas, el camino atraviesa a los
+                // demás combatientes y además sale más corto de lo que de verdad se anda.
+                var stepPath = FindShortestPath(fromCell, toCell, walkableCells, occupiedCells);
                 if (stepPath.Count > 1)
                 {
                     fullPath.AddRange(stepPath.Skip(1));

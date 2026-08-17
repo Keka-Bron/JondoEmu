@@ -11,7 +11,7 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         public static async Task HandleMapLoadRequest(NetworkStream stream, byte[] payload)
         {
-            if (Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight)
+            if (GameState.IsInFight)
             {
                 await FightHandler.HandleFightMapLoad(stream);
                 return;
@@ -46,14 +46,14 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
                 catch { }
 
-                long mapIdToLoad = requestedMapId > 0 ? requestedMapId : Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
+                long mapIdToLoad = requestedMapId > 0 ? requestedMapId : GameState.MapId;
                 if (mapIdToLoad > 0)
                 {
                     LogDebug($"[Game Node] Client requested map complementary info for Map ID: {mapIdToLoad} (extracted: {requestedMapId})");
-                    Jondo.Unity.Launcher.Network.SessionContext.State.MapId = mapIdToLoad;
+                    GameState.MapId = mapIdToLoad;
 
-                    int spawnCellId = MapManager.GetNearestWalkableCell(mapIdToLoad, Jondo.Unity.Launcher.Network.SessionContext.State.CellId > 0 ? Jondo.Unity.Launcher.Network.SessionContext.State.CellId : 344);
-                    Jondo.Unity.Launcher.Network.SessionContext.State.CellId = spawnCellId;
+                    int spawnCellId = MapManager.GetNearestWalkableCell(mapIdToLoad, GameState.CellId > 0 ? GameState.CellId : 344);
+                    GameState.CellId = spawnCellId;
                     var mapInfo = MapManager.GetMapInfo(mapIdToLoad);
                     int subAreaId = mapInfo != null ? mapInfo.SubAreaId : 1;
                     if (subAreaId == 444)
@@ -90,17 +90,36 @@ namespace Jondo.Unity.Launcher.Handlers
                         // Disposition (Field 1)
                         var playerDisp = new ProtoMessage();
                         playerDisp.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = spawnCellId });
-                        playerDisp.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.Orientation });
+                        playerDisp.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.Orientation });
                         playerActor.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerDisp.ToByteArray() });
 
                         // Details (Field 2)
-                        if (Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails != null)
+                        //
+                        // El aspecto se REHACE aquí, no se coge el que se guardó al entrar. El de
+                        // GameState.PlayerActorDetails sale de la columna Characters.Look, que es
+                        // un aspecto del protocolo VIEJO y que además está congelado desde el
+                        // inicio de sesión: no lleva la montura, ni la ropa que uno se haya puesto
+                        // después. Por eso al equiparse una Mulagua se veía montado —eso lo manda
+                        // el jsn de equipar— y al cambiar de mapa volvía a aparecer a pie.
+                        //
+                        // BuildLook es el mismo que usa el jss, que sí sabe de monturas y de
+                        // apariencias.
+                        var quien = DatabaseManager.GetCharacterById(GameState.CharacterId);
+                        byte[] aspecto = quien != null
+                            ? Managers.BreedLookTable.BuildLook(quien.Breed, quien.Sex, quien.HeadId,
+                                                                null, quien.Id)
+                            : GameState.LookBytes;
+                        byte[] detalles = aspecto != null && aspecto.Length > 0
+                            ? DatabaseManager.ReconstructActorDetails(aspecto, GameState.CharacterName)
+                            : GameState.PlayerActorDetails;
+
+                        if (detalles != null)
                         {
-                            playerActor.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails });
+                            playerActor.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detalles });
                         }
 
                         // Contextual ID (Field 3)
-                        playerActor.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId });
+                        playerActor.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.CharacterId });
 
                         jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = playerActor.ToByteArray() });
                         int totalActors = 1;
@@ -218,7 +237,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     npcScale = sc;
                 }
             }
-            rootLook.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = new byte[] { (byte)npcScale } }); // Field 8: scale (packed VarInt)
+            rootLook.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = EscalaEmpaquetada(npcScale) }); // Field 8: scale (packed VarInt)
 
             // 3. Build npcMinimalInfo (matching PCAP: Field 4 = tooltipVisible, Field 6 = npcId)
             var npcMinimalInfo = new ProtoMessage();
@@ -270,7 +289,7 @@ namespace Jondo.Unity.Launcher.Handlers
             rootLook.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 });
             if (npcScale != 100)
             {
-                rootLook.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = new byte[] { (byte)npcScale } });
+                rootLook.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = EscalaEmpaquetada(npcScale) });
             }
 
             // 3. Build Mob Members List (Field 2 of Details)
@@ -364,6 +383,26 @@ namespace Jondo.Unity.Launcher.Handlers
         private static void LogDebug(string msg)
         {
             Program.LogDebug(msg);
+        }
+
+        /// <summary>
+        /// La escala como lista empaquetada de varints, que es lo que espera el cliente.
+        ///
+        /// Escribirla como un byte suelto sólo funciona por debajo de 128: la montaña de kamas va a
+        /// 200 y eso deja un varint a medias que revienta el parseo del mensaje entero. Lo mismo le
+        /// pasaba a los cincuenta y dos NPCs de Astrub cuando iban inflados.
+        /// </summary>
+        private static byte[] EscalaEmpaquetada(int escala)
+        {
+            var fuera = new System.Collections.Generic.List<byte>();
+            uint valor = (uint)escala;
+            while (valor >= 0x80)
+            {
+                fuera.Add((byte)((valor & 0x7F) | 0x80));
+                valor >>= 7;
+            }
+            fuera.Add((byte)valor);
+            return fuera.ToArray();
         }
     }
 }
