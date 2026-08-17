@@ -92,11 +92,11 @@ namespace Jondo.Unity.Launcher.Handlers
                 Apply(field, wanted.TryGetValue(field, out int points) ? points : 0);
             }
 
-            GameState.CharacterRemainingPoints = capital - asked;
+            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = capital - asked;
             DatabaseManager.SaveCurrentCharacter();
 
             Console.WriteLine($"[Stats] {asked} of {capital} points spent; " +
-                              $"{GameState.CharacterRemainingPoints} left.");
+                              $"{Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints} left.");
             await AnswerAsync(stream);
         }
 
@@ -105,7 +105,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// worked out rather than stored, so that a character that levels up gets its points
         /// without anything having to remember to hand them over.
         /// </summary>
-        private static int Capital() => 5 * Math.Max(0, GameState.CharacterLevel - 1);
+        private static int Capital() => 5 * Math.Max(0, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel - 1);
 
         /// <summary>
         /// Gives every point back. What a character has to spend over its life is five a level
@@ -118,16 +118,16 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task ResetAsync(NetworkStream stream)
         {
-            GameState.StatVitality = 0;
-            GameState.StatWisdom = 0;
-            GameState.StatStrength = 0;
-            GameState.StatIntelligence = 0;
-            GameState.StatChance = 0;
-            GameState.StatAgility = 0;
-            GameState.CharacterRemainingPoints = Capital();
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality = 0;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom = 0;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength = 0;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence = 0;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatChance = 0;
+            Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility = 0;
+            Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints = Capital();
             DatabaseManager.SaveCurrentCharacter();
 
-            Console.WriteLine($"[Stats] Characteristics reset: {GameState.CharacterRemainingPoints} points to spend.");
+            Console.WriteLine($"[Stats] Characteristics reset: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints} points to spend.");
             await AnswerAsync(stream);
         }
 
@@ -147,7 +147,7 @@ namespace Jondo.Unity.Launcher.Handlers
         ///
         /// What it is CARRYING goes out as zero, because nothing here weighs the inventory yet.
         /// </summary>
-        private static long Pods() => 1000 + 5L * GameState.StatStrength;
+        private static long Pods() => 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength;
 
         /// <summary>
         /// Sets a characteristic to whatever <paramref name="points"/> buys, counting from zero.
@@ -168,7 +168,7 @@ namespace Jondo.Unity.Launcher.Handlers
             int value = 0, paid = 0;
             while (paid < points)
             {
-                int price = Managers.BreedStatCost.PriceOf(GameState.Breed, characteristic, value);
+                int price = Managers.BreedStatCost.PriceOf(Jondo.Unity.Launcher.Network.SessionContext.State.Breed, characteristic, value);
                 if (price <= 0 || paid + price > points) break;
                 paid += price;
                 value++;
@@ -191,12 +191,12 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             switch (kumField)
             {
-                case FieldVitality: GameState.StatVitality = value; break;
-                case FieldWisdom: GameState.StatWisdom = value; break;
-                case FieldStrength: GameState.StatStrength = value; break;
-                case FieldIntelligence: GameState.StatIntelligence = value; break;
-                case FieldChance: GameState.StatChance = value; break;
-                case FieldAgility: GameState.StatAgility = value; break;
+                case FieldVitality: Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality = value; break;
+                case FieldWisdom: Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom = value; break;
+                case FieldStrength: Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength = value; break;
+                case FieldIntelligence: Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence = value; break;
+                case FieldChance: Jondo.Unity.Launcher.Network.SessionContext.State.StatChance = value; break;
+                case FieldAgility: Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility = value; break;
             }
         }
     }

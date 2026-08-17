@@ -54,6 +54,13 @@ and how they are spread over **562** sub-areas.
 *Go there* when something in the world is not where it should be: a map that will not load, a
 monster inside a wall, a zaap that leads nowhere.
 
+**`sessions.md`** — Multiple connected accounts and map broadcasts.
+Why the former static player state could only support one client, how `GameSession`, `SessionState`,
+`SessionContext` and the concurrent `SessionRegistry` divide ownership now, how a socket is bound to
+an account and character, and how targeted sends and map broadcasts stay frame-safe.
+*Go there* when adding a handler that reads player state, when sending an event to nearby players,
+or when debugging cross-account state leaks.
+
 **`data.md`** — Where each number comes from.
 The **27** files in `datos/` (22 json, 4 bin and `world.zip`), the **31** tables in
 `bases/world.db`, and which of the **22** Python scripts in `tools/` builds each one. Most come out

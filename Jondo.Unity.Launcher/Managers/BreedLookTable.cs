@@ -142,7 +142,7 @@ namespace Jondo.Unity.Launcher.Managers
             // selección; sin él, por el que está jugando.
             var mount = characterId != 0 ? Mounts.RiddenBy(characterId) : Mounts.Ridden();
 
-            long quien = characterId != 0 ? characterId : GameState.CharacterId;
+            long quien = characterId != 0 ? characterId : Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
             var prendas = Wardrobe.AppearanceOf(quien);
 
             // Montado, la raíz es la montura; una MASCOTURA o una MONTURA DE APARIENCIA mandan

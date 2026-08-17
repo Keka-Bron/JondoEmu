@@ -25,16 +25,13 @@ namespace Jondo.Unity.Launcher.Handlers
     /// </summary>
     public static class WardrobeHandler
     {
-        /// <summary>Lo elegido en la ventana, que todavía no se ha aplicado.</summary>
-        private static int _draftTitle;
-        private static int _draftOrnament;
-        private static bool _draftLoaded;
-
         private static void EnsureDraft()
         {
-            if (_draftLoaded) return;
-            (_draftTitle, _draftOrnament) = Wardrobe.Of(GameState.CharacterId);
-            _draftLoaded = true;
+            if (SessionContext.State.IsWardrobeDraftLoaded) return;
+            var draft = Wardrobe.Of(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            SessionContext.State.WardrobeDraftTitle = draft.Title;
+            SessionContext.State.WardrobeDraftOrnament = draft.Ornament;
+            SessionContext.State.IsWardrobeDraftLoaded = true;
         }
 
         /// <summary>El cliente elige un título en la ventana. Solo toca el borrador.</summary>
@@ -58,7 +55,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            _draftTitle = title;
+            SessionContext.State.WardrobeDraftTitle = title;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer("lxa", Pb.New().Var(2, 1).Build(),
                                           ConnectionProtocol.RequestId(frame)));
@@ -85,7 +82,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            _draftOrnament = ornament;
+            SessionContext.State.WardrobeDraftOrnament = ornament;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer("lyv", Pb.New().Var(1, 1).Build(),
                                           ConnectionProtocol.RequestId(frame)));
@@ -96,9 +93,9 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             EnsureDraft();
 
-            long who = GameState.CharacterId;
-            Wardrobe.SaveTitle(who, _draftTitle);
-            Wardrobe.SaveOrnament(who, _draftOrnament);
+            long who = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
+            Wardrobe.SaveTitle(who, SessionContext.State.WardrobeDraftTitle);
+            Wardrobe.SaveOrnament(who, SessionContext.State.WardrobeDraftOrnament);
 
             await AnnounceAsync(stream, accountId);
 
@@ -106,7 +103,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Answer("lyu", Pb.New().Var(1, 1).Build(),
                                           ConnectionProtocol.RequestId(frame)));
 
-            Console.WriteLine($"[Apariencias] Guardado: título {_draftTitle}, ornamento {_draftOrnament}.");
+            Console.WriteLine($"[Apariencias] Guardado: título {SessionContext.State.WardrobeDraftTitle}, " +
+                              $"ornamento {SessionContext.State.WardrobeDraftOrnament}.");
         }
 
         /// <summary>
@@ -115,19 +113,19 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task AnnounceAsync(NetworkStream stream, long accountId)
         {
-            var (title, ornament) = Wardrobe.Of(GameState.CharacterId);
+            var (title, ornament) = Wardrobe.Of(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("hid", ConnectionProtocol.BuildTitleUpdated(title)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("hif", ConnectionProtocol.BuildOrnamentUpdated(ornament)));
 
-            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             if (character == null) return;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
-                    character, GameState.CellId, GameState.Orientation, accountId)));
+                    character, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation, accountId)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("lxc", ConnectionProtocol.BuildLookChanged(character)));
         }
@@ -141,7 +139,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // Los conjuntos del vestuario. Sin esto la ventana de cosméticos suena pero no llega a
             // dibujarse: el cliente no tiene ningún conjunto que enseñar y se cae.
-            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             if (character != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

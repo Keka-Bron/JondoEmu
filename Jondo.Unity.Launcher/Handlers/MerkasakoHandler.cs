@@ -27,9 +27,6 @@ namespace Jondo.Unity.Launcher.Handlers
     public static class MerkasakoHandler
     {
         /// <summary>Los muebles que van llegando mientras el modo de colocar está abierto.</summary>
-        private static readonly List<HavenBagStore.Furniture> _pending = new List<HavenBagStore.Furniture>();
-        private static bool _editing;
-
         /// <summary>
         /// El botón y la tecla H, que es un mensaje distinto del de cambiar de decorado:
         ///
@@ -41,7 +38,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task EnterFromOutsideAsync(NetworkStream stream, byte[] payload)
         {
             if (ConnectionProtocol.ReadPayload(payload, "jbn") == null) return;
-            await GoToThemeAsync(stream, HavenBagStore.ThemeOf(GameState.CharacterId));
+            await GoToThemeAsync(stream, HavenBagStore.ThemeOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
         }
 
         /// <summary>Cambiarse de decorado desde dentro.</summary>
@@ -75,17 +72,17 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            HavenBagStore.SaveTheme(GameState.CharacterId, Merkasako.ThemeOfMap(target));
+            HavenBagStore.SaveTheme(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, Merkasako.ThemeOfMap(target));
 
-            GameState.MapId = target;
+            Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
 
             // Al lado del zaap, que es donde deja a uno el juego al entrar.
             var zaap = Merkasako.ZaapOf(target);
-            GameState.CellId = MapManager.GetNearestWalkableCell(target, zaap.Cell);
+            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(target, zaap.Cell);
             DatabaseManager.SaveCurrentCharacter();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorLeft(GameState.CharacterId));
+                ConnectionProtocol.BuildActorLeft(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -94,7 +91,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.BuildMapDiscovered(target));
 
             Console.WriteLine($"[Merkasako] Decorado {Merkasako.ThemeOfMap(target)} -> mapa {target}, " +
-                              $"casilla {GameState.CellId} (zaap en la {zaap.Cell}).");
+                              $"casilla {Jondo.Unity.Launcher.Network.SessionContext.State.CellId} (zaap en la {zaap.Cell}).");
         }
 
         // ─── El modo de colocar muebles ─────────────────────────────────────────
@@ -102,8 +99,8 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>El cliente abre el menú de gestión. Contesta un jbm vacío y ya le deja colocar.</summary>
         public static async Task OpenEditorAsync(NetworkStream stream)
         {
-            _editing = true;
-            _pending.Clear();
+            SessionContext.State.IsHavenBagEditing = true;
+            SessionContext.State.PendingHavenBagFurniture.Clear();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("jbm"));
@@ -135,7 +132,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // sabría dibujarlo y la habitación quedaría con un hueco invisible que bloquea.
                 if (typeId == 0 || !Merkasako.IsFurniture(typeId)) continue;
 
-                _pending.Add(new HavenBagStore.Furniture
+                SessionContext.State.PendingHavenBagFurniture.Add(new HavenBagStore.Furniture
                 {
                     Cell = cell,
                     TypeId = typeId,
@@ -150,17 +147,17 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task CloseEditorAsync(NetworkStream stream)
         {
-            long who = GameState.CharacterId;
-            int theme = Merkasako.ThemeOfMap(GameState.MapId);
+            long who = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
+            int theme = Merkasako.ThemeOfMap(Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
 
-            if (_editing)
+            if (SessionContext.State.IsHavenBagEditing)
             {
-                HavenBagStore.SaveFurniture(who, theme, _pending);
-                Console.WriteLine($"[Merkasako] Decorado {theme}: {_pending.Count} mueble(s) guardados.");
+                HavenBagStore.SaveFurniture(who, theme, SessionContext.State.PendingHavenBagFurniture);
+                Console.WriteLine($"[Merkasako] Decorado {theme}: {SessionContext.State.PendingHavenBagFurniture.Count} mueble(s) guardados.");
             }
 
-            _editing = false;
-            _pending.Clear();
+            SessionContext.State.IsHavenBagEditing = false;
+            SessionContext.State.PendingHavenBagFurniture.Clear();
 
             await SendFurnitureAsync(stream);
 
@@ -174,8 +171,8 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task SendFurnitureAsync(NetworkStream stream)
         {
-            var pieces = HavenBagStore.FurnitureOf(GameState.CharacterId,
-                                                   Merkasako.ThemeOfMap(GameState.MapId));
+            var pieces = HavenBagStore.FurnitureOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId,
+                                                   Merkasako.ThemeOfMap(Jondo.Unity.Launcher.Network.SessionContext.State.MapId));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("jbu", ConnectionProtocol.BuildHavenBagFurniture(pieces)));
