@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -29,6 +32,52 @@ namespace Jondo.Unity.Launcher.Network
 
         private static readonly ConcurrentDictionary<string, Ticket> _tickets
             = new ConcurrentDictionary<string, Ticket>(StringComparer.OrdinalIgnoreCase);
+
+        private static readonly ConcurrentDictionary<Guid, GameSession> _sessions
+            = new ConcurrentDictionary<Guid, GameSession>();
+
+        public static int ConnectedCount => _sessions.Count;
+
+        public static bool Register(GameSession session) => _sessions.TryAdd(session.Id, session);
+
+        public static bool Unregister(GameSession session) => _sessions.TryRemove(session.Id, out _);
+
+        public static bool TryGet(Guid sessionId, out GameSession? session)
+            => _sessions.TryGetValue(sessionId, out session);
+
+        public static GameSession? FindByCharacter(long characterId)
+            => _sessions.Values.FirstOrDefault(s => s.CharacterId == characterId);
+
+        /// <summary>Returns a stable snapshot; callers never enumerate a mutable registry.</summary>
+        public static IReadOnlyList<GameSession> OnMap(long mapId)
+            => _sessions.Values
+                .Where(s => s.IsInWorld && s.MapId == mapId)
+                .ToArray();
+
+        /// <summary>Sends one packet to every connected character on a map.</summary>
+        public static async Task<int> BroadcastToMapAsync(long mapId, byte[] packet,
+                                                           Guid? exceptSessionId = null)
+        {
+            var targets = OnMap(mapId)
+                .Where(s => !exceptSessionId.HasValue || s.Id != exceptSessionId.Value)
+                .ToArray();
+
+            var results = await Task.WhenAll(targets.Select(async target =>
+            {
+                try
+                {
+                    await target.SendAsync(packet);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Unregister(target);
+                    Program.LogDebug($"[Sessions] Send to {target.Id} failed: {ex.Message}");
+                    return false;
+                }
+            }));
+            return results.Count(delivered => delivered);
+        }
 
         /// <summary>Creates a new ticket for a specific account and server.</summary>
         public static Ticket Issue(long accountId, int serverId)

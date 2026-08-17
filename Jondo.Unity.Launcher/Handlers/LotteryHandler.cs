@@ -33,9 +33,9 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("iwn", ConnectionProtocol.BuildElementInUse(
-                    elementId, Lottery.Skill, GameState.CharacterId)));
+                    elementId, Lottery.Skill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
-            var prize = Lottery.Draw(GameState.CharacterId);
+            var prize = Lottery.Draw(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             if (prize == null)
             {
                 Console.WriteLine("[Lotería] La tirada no ha dado nada.");
@@ -55,7 +55,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("iun",
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
         }
     }
 }

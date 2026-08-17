@@ -30,9 +30,7 @@ namespace Jondo.Unity.Launcher.Handlers
     public static class ChestHandler
     {
         /// <summary>El cofre que está abierto, para no atender un kcr con el cofre cerrado.</summary>
-        private static bool _open;
-
-        public static bool IsOpen => _open;
+        public static bool IsOpen => SessionContext.State.IsChestOpen;
 
         /// <summary>¿El elemento que ha clicado es el cofre de este mapa?</summary>
         public static bool IsChest(long mapId, int elementId)
@@ -43,16 +41,16 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task OpenAsync(NetworkStream stream, int elementId)
         {
-            _open = true;
+            SessionContext.State.IsChestOpen = true;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("iwn", ConnectionProtocol.BuildElementInUse(
-                    elementId, Merkasako.ChestSkill, GameState.CharacterId)));
+                    elementId, Merkasako.ChestSkill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("kci", ConnectionProtocol.BuildStorageOpened()));
 
-            var content = HavenBagStore.ChestOf(GameState.CharacterId);
+            var content = HavenBagStore.ChestOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("iwb", ConnectionProtocol.BuildStorageContent(content)));
 
@@ -61,7 +59,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task CloseAsync(NetworkStream stream)
         {
-            _open = false;
+            SessionContext.State.IsChestOpen = false;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("khd", ConnectionProtocol.BuildStorageClosed()));
         }
@@ -69,7 +67,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task MoveAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? kcr = ConnectionProtocol.ReadPayload(payload, "kcr");
-            if (kcr == null || !_open) return;
+            if (kcr == null || !SessionContext.State.IsChestOpen) return;
 
             long uid = 0;
             int quantity = 0;
@@ -84,7 +82,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             if (uid == 0) return;
 
-            long who = GameState.CharacterId;
+            long who = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
             bool enElCofre = HavenBagStore.Holds(who, uid);
 
             if (enElCofre)
@@ -100,7 +98,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("iun",
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
         }
 
         /// <summary>
@@ -145,11 +143,11 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static HavenBagStore.StoredItem? BuscarDondeEsta(long uid)
         {
-            foreach (var item in HavenBagStore.ChestOf(GameState.CharacterId))
+            foreach (var item in HavenBagStore.ChestOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId))
             {
                 if (item.Uid == uid) return item;
             }
-            return HavenBagStore.FromInventory(GameState.CharacterId, uid);
+            return HavenBagStore.FromInventory(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, uid);
         }
     }
 }

@@ -70,8 +70,9 @@ namespace Jondo.Unity.Launcher.Handlers
             var (cells, facing) = Remember(payload);
             if (cells.Count == 0) return;
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorMoved(GameState.CharacterId, cells, facing));
+            byte[] moved = ConnectionProtocol.BuildActorMoved(
+                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, cells, facing);
+            await SessionRegistry.BroadcastToMapAsync(SessionContext.State.MapId, moved);
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         private static (List<long> Cells, int Facing) Remember(byte[] payload)
         {
-            var nothing = (new List<long>(), GameState.Orientation);
+            var nothing = (new List<long>(), Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
 
             byte[]? jrw = ConnectionProtocol.ReadPayload(payload, "jrw");
             if (jrw == null || jrw.Length == 0) return nothing;
@@ -97,11 +98,11 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (steps.Count == 0) return nothing;
 
-            if (mapId > 0 && mapId != GameState.MapId)
+            if (mapId > 0 && mapId != Jondo.Unity.Launcher.Network.SessionContext.State.MapId)
             {
                 // The client believes it is on another map. Trusting it here would let a stray
                 // message move the character anywhere, so it is only logged.
-                Console.WriteLine($"[Move] jrw says map {mapId} and the session says {GameState.MapId}. Ignored.");
+                Console.WriteLine($"[Move] jrw says map {mapId} and the session says {Jondo.Unity.Launcher.Network.SessionContext.State.MapId}. Ignored.");
                 return nothing;
             }
 
@@ -114,11 +115,11 @@ namespace Jondo.Unity.Launcher.Handlers
             int cell = (int)(last & 0xFFF);
             int facing = (int)(last >> 12);
 
-            GameState.CellId = cell;
-            if (facing >= 0 && facing <= 7) GameState.Orientation = facing;
+            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = cell;
+            if (facing >= 0 && facing <= 7) Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = facing;
             DatabaseManager.SaveCurrentCharacter();
 
-            return (cells, GameState.Orientation);
+            return (cells, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
         }
 
         private static List<long> Unpack(byte[] packed)
@@ -171,12 +172,12 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             if (asked <= 0) return;
 
-            Way way = WayOut(GameState.MapId, GameState.CellId, asked);
-            long target = Neighbour(GameState.MapId, way, asked);
+            Way way = WayOut(Jondo.Unity.Launcher.Network.SessionContext.State.MapId, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, asked);
+            long target = Neighbour(Jondo.Unity.Launcher.Network.SessionContext.State.MapId, way, asked);
 
-            if (target <= 0 || target == GameState.MapId)
+            if (target <= 0 || target == Jondo.Unity.Launcher.Network.SessionContext.State.MapId)
             {
-                Console.WriteLine($"[Move] There is no map {way} of {GameState.MapId}. " +
+                Console.WriteLine($"[Move] There is no map {way} of {Jondo.Unity.Launcher.Network.SessionContext.State.MapId}. " +
                                   $"The client asked for {asked} and stays where it is.");
                 return;
             }
@@ -190,18 +191,21 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            int arrival = Landing(target, GameState.CellId, way);
+            int arrival = Landing(target, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, way);
+            long oldMapId = SessionContext.State.MapId;
 
-            GameState.MapId = target;
-            GameState.CellId = arrival;
-            GameState.Orientation = FacingFor(way, GameState.Orientation);
+            Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
+            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = arrival;
+            Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = FacingFor(way, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
             DatabaseManager.SaveCurrentCharacter();
 
             // Exactly the five the capture sends, in the same order. jsd first: the character is
             // leaving the map it was on, and the client has to be told before it is told to load
             // another one.
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorLeft(GameState.CharacterId));
+            byte[] actorLeft = ConnectionProtocol.BuildActorLeft(
+                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            await SessionContext.Current.SendAsync(actorLeft);
+            await SessionRegistry.BroadcastToMapAsync(oldMapId, actorLeft, SessionContext.Current.Id);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -210,7 +214,68 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.BuildMapDiscovered(target));
 
             Console.WriteLine($"[Move] Map change {way}: {target}, arriving on cell {arrival} " +
-                              $"facing {GameState.Orientation}. Waiting for jrh.");
+                              $"facing {Jondo.Unity.Launcher.Network.SessionContext.State.Orientation}. Waiting for jrh.");
+        }
+
+        /// <summary>
+        /// Teleports the current character to an arbitrary known roleplay map. The destination
+        /// cell is selected from the map's walkable-cell data, as close to its centre as possible.
+        /// Returns that cell, or null when the map cannot safely receive the character.
+        /// </summary>
+        public static async Task<int?> TeleportAsync(NetworkStream stream, long targetMapId)
+        {
+            if (targetMapId <= 0 || MapManager.GetMapInfo(targetMapId) == null) return null;
+
+            IReadOnlyCollection<int> walkable;
+            if (MapManager.WalkableCells.TryGetValue(targetMapId, out var roleplayCells) &&
+                roleplayCells.Count > 0)
+            {
+                walkable = roleplayCells;
+            }
+            else
+            {
+                var fightCells = MapManager.GetFightWalkable(targetMapId);
+                if (fightCells == null || fightCells.Count == 0) return null;
+                walkable = fightCells;
+            }
+
+            const int centreCell = 280;
+            int centreRow = centreCell / 14;
+            int centreColumn = centreCell % 14;
+            int arrival = -1;
+            int bestDistance = int.MaxValue;
+            foreach (int cell in walkable)
+            {
+                int row = cell / 14;
+                int column = cell % 14;
+                int distance = ((row - centreRow) * (row - centreRow)) +
+                               ((column - centreColumn) * (column - centreColumn));
+                if (distance >= bestDistance) continue;
+                bestDistance = distance;
+                arrival = cell;
+            }
+            if (arrival < 0) return null;
+
+            long oldMapId = SessionContext.State.MapId;
+            SessionContext.State.MapId = targetMapId;
+            SessionContext.State.CellId = arrival;
+            DatabaseManager.SaveCurrentCharacter();
+
+            // Same map-change sequence as a normal border crossing. After jru the client answers
+            // with jrh, and GameNodeProxy sends the actors and interactive elements of the map.
+            byte[] actorLeft = ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId);
+            await SessionContext.Current.SendAsync(actorLeft);
+            await SessionRegistry.BroadcastToMapAsync(oldMapId, actorLeft, SessionContext.Current.Id);
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildLoadMap(targetMapId));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildMapClock());
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildMapDiscovered(targetMapId));
+
+            Console.WriteLine($"[Move] Teleport: map {oldMapId} -> {targetMapId}, " +
+                              $"arrival cell {arrival}. Waiting for jrh.");
+            return arrival;
         }
 
         /// <summary>

@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 
@@ -7,6 +9,9 @@ namespace Jondo.Protocol
 {
     public static class NetworkMessage
     {
+        private static readonly ConditionalWeakTable<Stream, SemaphoreSlim> WriteLocks
+            = new ConditionalWeakTable<Stream, SemaphoreSlim>();
+
         public static async Task<byte[]> ReadFrameAsync(Stream stream)
         {
             // Read VarInt length
@@ -80,7 +85,7 @@ namespace Jondo.Protocol
             }
             catch { }
             
-            await stream.WriteAsync(buf, 0, buf.Length);
+            await WriteSerializedAsync(stream, buf);
         }
 
         public static async Task WriteFrameAsync(Stream stream, byte[] payload)
@@ -105,8 +110,24 @@ namespace Jondo.Protocol
             }
             catch { }
             
-            await stream.WriteAsync(lenBytes, 0, lenBytes.Length);
-            await stream.WriteAsync(payload, 0, payload.Length);
+            byte[] frame = new byte[lenBytes.Length + payload.Length];
+            Buffer.BlockCopy(lenBytes, 0, frame, 0, lenBytes.Length);
+            Buffer.BlockCopy(payload, 0, frame, lenBytes.Length, payload.Length);
+            await WriteSerializedAsync(stream, frame);
+        }
+
+        private static async Task WriteSerializedAsync(Stream stream, byte[] frame)
+        {
+            var gate = WriteLocks.GetValue(stream, _ => new SemaphoreSlim(1, 1));
+            await gate.WaitAsync();
+            try
+            {
+                await stream.WriteAsync(frame, 0, frame.Length);
+            }
+            finally
+            {
+                gate.Release();
+            }
         }
 
         private static void LogTrafficEnriched(string direction, string typeUrl, byte[] payload)

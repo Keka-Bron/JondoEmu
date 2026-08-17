@@ -23,9 +23,10 @@ namespace Jondo.Unity.Launcher.Handlers
 
                     if (requestedMapId > 0)
                     {
+                        long oldMapId = SessionContext.State.MapId;
                         LogDebug($"[Map Change] Client requested map transition to Map ID: {requestedMapId}");
                         
-                        if (requestedMapId == GameState.MapId)
+                        if (requestedMapId == Jondo.Unity.Launcher.Network.SessionContext.State.MapId)
                         {
                             LogDebug("[Map Change] Requested Map ID matches current Map ID. Ignoring transition.");
                             return;
@@ -33,7 +34,7 @@ namespace Jondo.Unity.Launcher.Handlers
                         
                         // Calculate spawn cell on the new map based on transition direction
                         string direction = "Right"; // fallback
-                        var oldMapInfo = MapManager.GetMapInfo(GameState.MapId);
+                        var oldMapInfo = MapManager.GetMapInfo(Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
                         var newMapInfo = MapManager.GetMapInfo(requestedMapId);
                         if (oldMapInfo != null && newMapInfo != null)
                         {
@@ -43,20 +44,20 @@ namespace Jondo.Unity.Launcher.Handlers
                             else if (newMapInfo.PosY < oldMapInfo.PosY) direction = "Up";
                         }
                         
-                        int spawnCellId = GetTransitionSpawnCell(requestedMapId, GameState.CellId, direction);
-                        LogDebug($"[Map Change] Transition direction: {direction} | Last Cell: {GameState.CellId} | New Spawn Cell: {spawnCellId}");
+                        int spawnCellId = GetTransitionSpawnCell(requestedMapId, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, direction);
+                        LogDebug($"[Map Change] Transition direction: {direction} | Last Cell: {Jondo.Unity.Launcher.Network.SessionContext.State.CellId} | New Spawn Cell: {spawnCellId}");
                         
-                        int newOrientation = GameState.Orientation;
+                        int newOrientation = Jondo.Unity.Launcher.Network.SessionContext.State.Orientation;
                         if (direction == "Right") newOrientation = 1;
                         else if (direction == "Left") newOrientation = 5;
                         else if (direction == "Down") newOrientation = 3;
                         else if (direction == "Up") newOrientation = 7;
-                        GameState.Orientation = newOrientation;
+                        Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = newOrientation;
 
-                        GameState.CellId = spawnCellId;
-                        GameState.MapId = requestedMapId;
+                        Jondo.Unity.Launcher.Network.SessionContext.State.CellId = spawnCellId;
+                        Jondo.Unity.Launcher.Network.SessionContext.State.MapId = requestedMapId;
                         DatabaseManager.SaveCurrentCharacter();
-                        LogDebug($"[Map Change] Saved updated map, cell (CellId={spawnCellId}), and orientation ({GameState.Orientation}) to database.");
+                        LogDebug($"[Map Change] Saved updated map, cell (CellId={spawnCellId}), and orientation ({Jondo.Unity.Launcher.Network.SessionContext.State.Orientation}) to database.");
 
                         // Natively build and send joh (CurrentMapMessage)
                         var johMsg = new Jondo.Unity.Protocol.Messages.joh
@@ -67,6 +68,10 @@ namespace Jondo.Unity.Launcher.Handlers
                         byte[] johPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/joh", johBytes);
                         
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, johPacket);
+                        await SessionRegistry.BroadcastToMapAsync(
+                            oldMapId,
+                            ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId),
+                            SessionContext.Current.Id);
                         LogDebug($"[Map Change] Sent native joh (CurrentMapMessage) for Map ID: {requestedMapId}");
                     }
                 }
@@ -79,7 +84,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task HandleMovementRequest(NetworkStream stream, byte[] payload)
         {
-            if (GameState.IsInFight)
+            if (Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight)
             {
                 // GameNodeProxy routes combat movement straight to FightHandler. Getting here means
                 // the routing has changed and combat movement would end up being handled as
@@ -101,7 +106,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     var pathList = joiMsg.Fune;
 
                     int lastCell = 0;
-                    int orientation = GameState.Orientation;
+                    int orientation = Jondo.Unity.Launcher.Network.SessionContext.State.Orientation;
                     if (pathList.Count > 0)
                     {
                         lastCell = pathList[^1] % 4096;
@@ -114,10 +119,10 @@ namespace Jondo.Unity.Launcher.Handlers
 
                     if (lastCell > 0)
                     {
-                        GameState.CellId = lastCell;
-                        GameState.MapId = mapId; // Update MapId from client movement request to prevent desynchronization
-                        GameState.Orientation = orientation;
-                        Console.WriteLine($"[Movement] Updated GameState.CellId to: {lastCell}, GameState.MapId to: {mapId}, and GameState.Orientation to: {orientation}");
+                        Jondo.Unity.Launcher.Network.SessionContext.State.CellId = lastCell;
+                        Jondo.Unity.Launcher.Network.SessionContext.State.MapId = mapId; // Update MapId from client movement request to prevent desynchronization
+                        Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = orientation;
+                        Console.WriteLine($"[Movement] Updated Jondo.Unity.Launcher.Network.SessionContext.State.CellId to: {lastCell}, Jondo.Unity.Launcher.Network.SessionContext.State.MapId to: {mapId}, and Jondo.Unity.Launcher.Network.SessionContext.State.Orientation to: {orientation}");
                         DatabaseManager.SaveCurrentCharacter();
                         Console.WriteLine("[Movement] Saved updated cell, map, and orientation to database.");
                     }
@@ -125,18 +130,18 @@ namespace Jondo.Unity.Launcher.Handlers
                     // Build and send joo (Movement Broadcast) natively using compiled class
                     var jooMsg = new Jondo.Unity.Protocol.Messages.joo
                     {
-                        Funv = GameState.CharacterId,
+                        Funv = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId,
                         Funz = 2
                     };
                     jooMsg.Funw.AddRange(pathList);
 
                     byte[] jooBytes = jooMsg.ToByteArray();
                     byte[] jooPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/joo", jooBytes);
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, jooPacket);
-                    Console.WriteLine($"[Movement] Sent native joo (Movement Broadcast) for Character {GameState.CharacterId}");
+                    int delivered = await SessionRegistry.BroadcastToMapAsync(mapId, jooPacket);
+                    Console.WriteLine($"[Movement] Broadcast joo for Character {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId} to {delivered} session(s)");
 
                     // Mob Collision Detection: Check if the destination cell has a mob group
-                    if (!GameState.IsInFight && lastCell > 0)
+                    if (!Jondo.Unity.Launcher.Network.SessionContext.State.IsInFight && lastCell > 0)
                     {
                         var mob = Managers.MobSpawnManager.GetMobAtCell(mapId, lastCell);
                         if (mob != null)
