@@ -140,18 +140,5 @@ namespace Jondo.Unity.Launcher
         }
     }
 
-    public class PlayerItem
-    {
-        public long Uid { get; set; }
-        public int ItemId { get; set; }
-        public int Quantity { get; set; }
-        public int Position { get; set; } // Equipment slot or inventory position
-        public Dictionary<int, int> Effects { get; set; } = new Dictionary<int, int>();
-    }
-
-    public class EquippedItemInfo
-    {
-        public int Slot { get; set; }
-        public Dictionary<int, int> Stats { get; } = new Dictionary<int, int>();
-    }
+    // PlayerItem y EquippedItemInfo viven en GameState.cs: la copia de aqui perdia RawEffects.
 }

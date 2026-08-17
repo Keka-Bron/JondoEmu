@@ -23,6 +23,13 @@ namespace Jondo.Unity.Launcher.Network
         private static long _sessionAccountId;
         private static CancellationTokenSource? _cts;
 
+        /// <summary>
+        /// Las conexiones vivas ahora mismo, una por cliente. Es lo que permite mandarle algo a
+        /// uno concreto o a todos los de un mapa sin pasar el socket de mano en mano.
+        /// </summary>
+        public static readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, GameSession>
+            SesionesVivas = new System.Collections.Concurrent.ConcurrentDictionary<Guid, GameSession>();
+
         public static void Start(int port)
         {
             if (_isRunning) return;
@@ -70,11 +77,37 @@ namespace Jondo.Unity.Launcher.Network
                     Console.WriteLine($"[+] Client connected to Game Node! ({client.Client.RemoteEndPoint})");
                     var stream = client.GetStream();
 
-                    byte[] payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream);
-                    if (payload == null) return;
+                    // La sesión de ESTA conexión, atada al hilo antes de leer nada.
+                    //
+                    // Sin esto no funcionaba nada: hay 295 sitios que piden SessionContext.State y
+                    // no había ni un solo Push en todo el proyecto, así que el primero que pedía
+                    // el estado se llevaba una excepción por delante y la conexión se cerraba. Es
+                    // el "No game session is bound to the current async flow" que salía nada más
+                    // elegir personaje.
+                    //
+                    // Va aquí y envolviendo el bucle entero porque AsyncLocal se hereda hacia
+                    // dentro: todo lo que se espere desde este punto ve la misma sesión sin que
+                    // haya que pasarla a mano por doscientas firmas.
+                    var sesion = new GameSession(stream);
+                    SesionesVivas[sesion.Id] = sesion;
 
-                    string payloadStr = Encoding.UTF8.GetString(payload);
-                    await HandleGameNodeSessionAsync(stream, payload, payloadStr);
+                    try
+                    {
+                        using (SessionContext.Push(sesion))
+                        {
+                            byte[] payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream);
+                            if (payload == null) return;
+
+                            string payloadStr = Encoding.UTF8.GetString(payload);
+                            await HandleGameNodeSessionAsync(stream, payload, payloadStr);
+                        }
+                    }
+                    finally
+                    {
+                        SesionesVivas.TryRemove(sesion.Id, out _);
+                        Console.WriteLine($"[Game Node] Session {sesion.Id} closed; " +
+                                          $"{SesionesVivas.Count} still connected.");
+                    }
                 }
                 catch (Exception e)
                 {
