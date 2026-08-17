@@ -311,8 +311,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 // Dynamic stats from database-backed GameState + equipment bonuses
                 int baseHp = 50 + (GameState.CharacterLevel * 5);
                 larMsg.Fields.Add(CreateStatField(0, baseHp,                      GetEquipBonus(0)));  // Base HP
-                larMsg.Fields.Add(CreateInnateStatField(1, 6,                     GetEquipBonus(1)));  // AP
-                larMsg.Fields.Add(CreateInnateStatField(23, 3,                    GetEquipBonus(23))); // MP
+                larMsg.Fields.Add(CreateInnateStatField(1, PlayerInnateAp(),       GetEquipBonus(1)));  // AP
+                larMsg.Fields.Add(CreateInnateStatField(23, PlayerBaseMp,          GetEquipBonus(23))); // MP
                 larMsg.Fields.Add(CreateStatField(11, GameState.StatVitality,     GetEquipBonus(11))); // Vitality
                 larMsg.Fields.Add(CreateStatField(12, GameState.StatWisdom,       GetEquipBonus(12))); // Wisdom
                 larMsg.Fields.Add(CreateStatField(10, GameState.StatStrength,     GetEquipBonus(10))); // Strength
@@ -412,17 +412,37 @@ namespace Jondo.Unity.Launcher.Handlers
             { 44, 174 }, // Initiative
         };
 
-        /// <summary>Returns the total equipment bonus for a given stat ID, including set bonus.</summary>
+        /// <summary>
+        /// Lo que el equipo suma a una característica.
+        ///
+        /// Se cuenta POR CARACTERÍSTICA y CON SIGNO, no por un único efecto. Antes se traducía la
+        /// característica a un solo número de efecto —los PM al 128— y se sumaba ése y nada más,
+        /// así que se perdían dos cosas: los efectos que RESTAN, como el 169 del Collar de
+        /// Gargandias, que quita un PM, y cualquier otro efecto que toque la misma característica.
+        /// Con el 169 fuera de la cuenta salían 6 PM donde el cliente pinta 5.
+        ///
+        /// Quién toca qué y con qué signo lo dice el catálogo del cliente (tabla Effects,
+        /// Characteristic y BonusType), no una lista escrita aquí. El signo cero es importante: el
+        /// efecto 101 apunta a los PA pero es lo que cuesta el arma, y no se cuenta.
+        ///
+        /// Comprobado contra la ficha entera de un personaje: fuerza 468, inteligencia 170, suerte
+        /// 150, agilidad 70, sabiduría 425, prospección 150, vida 4803, 10 PA y 5 PM.
+        /// </summary>
         public static int GetEquipBonus(int statId)
         {
             int bonus = 0;
-            // Map the generic statId to the specific effect ActionId used in the DB
-            int effectId = EffectActionIdByStatId.TryGetValue(statId, out int mapped) ? mapped : statId;
+            // El efecto con el que se traducía antes, que se sigue admitiendo para las
+            // características que el catálogo no sepa colocar.
+            int legacyEffect = EffectActionIdByStatId.TryGetValue(statId, out int mapped) ? mapped : statId;
 
             foreach (var equipped in GameState.GetEquippedItemsCopy().Values)
             {
-                if (equipped.Stats.TryGetValue(effectId, out int b))
-                    bonus += b;
+                foreach (var (effectId, value) in equipped.Stats)
+                {
+                    var (characteristic, sign) = DatabaseManager.EffectMeta(effectId);
+                    if (characteristic == statId && sign != 0) bonus += value * sign;
+                    else if (characteristic == 0 && effectId == legacyEffect) bonus += value;
+                }
             }
             bonus += GetSetBonus(statId);
             return bonus;
@@ -438,6 +458,39 @@ namespace Jondo.Unity.Launcher.Handlers
             int equipHp = GetEquipBonus(11) + GetEquipBonus(0);
             return baseHp + equipHp;
         }
+
+        /// <summary>Los puntos de acción y de movimiento con los que nace todo el mundo.</summary>
+        public const int PlayerBaseAp = 6;
+        public const int PlayerBaseMp = 3;
+
+        /// <summary>El nivel al que se gana el séptimo punto de acción.</summary>
+        public const int LevelForSeventhAp = 100;
+
+        /// <summary>
+        /// Los puntos de acción de nacimiento, que son seis hasta el nivel 100 y siete a partir de
+        /// ahí.
+        ///
+        /// No es un número escogido a ojo: es el único que cuadra. Del equipo de este personaje
+        /// salen +3 de PA —el Collar de Gargandias da 2 y el Dofus Ocre 1, y eso está comprobado
+        /// contra los efectos canónicos del cliente, resolviendo las referencias de
+        /// ItemTemplates.possibleEffects contra la tabla ItemEffects— y su ficha pinta 10. Con base
+        /// seis saldrían nueve.
+        /// </summary>
+        public static int PlayerInnateAp()
+            => PlayerBaseAp + (GameState.CharacterLevel >= LevelForSeventhAp ? 1 : 0);
+
+        /// <summary>
+        /// Los puntos de acción del personaje, base más equipo (característica 1).
+        ///
+        /// Existe por lo mismo que GetPlayerMaxHp: la ficha que ve el jugador y la que usa el
+        /// combate tienen que salir del MISMO sitio. El combate se los ponía a 6 y a 3 a pelo,
+        /// así que un personaje con +4 PA y +2 PM de equipo veía 10 y 5 en pantalla y peleaba con
+        /// 6 y 3.
+        /// </summary>
+        public static int GetPlayerMaxAp() => PlayerInnateAp() + GetEquipBonus(1);
+
+        /// <summary>Los puntos de movimiento del personaje, base más equipo (característica 23).</summary>
+        public static int GetPlayerMaxMp() => PlayerBaseMp + GetEquipBonus(23);
 
         /// <summary>
         /// Returns the set bonus for a given stat ID based on how many Intrepid set pieces are equipped.

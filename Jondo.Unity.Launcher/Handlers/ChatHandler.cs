@@ -15,7 +15,8 @@ namespace Jondo.Unity.Launcher.Handlers
     /// </summary>
     public static class ChatHandler
     {
-        public static async Task HandleChatMessage(NetworkStream stream, byte[] payload)
+        public static async Task HandleChatMessage(NetworkStream stream, byte[] payload,
+                                                   long accountId = 0)
         {
             Console.WriteLine("[Game Node] Received Chat Message (kqn)");
             byte[]? inner   = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/kqn");
@@ -23,17 +24,19 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (!string.IsNullOrEmpty(msgText))
             {
-                if (msgText.StartsWith("."))
+                // Un comando NO se publica: se atiende y ahí se acaba, sin eco. Si se dejara caer
+                // al eco, un ".kamas 10000" saldría escrito en la pestaña donde se escribió y lo
+                // vería todo el mundo. Solo se traga los que existen; una línea que empiece por
+                // punto y no sea ninguno sigue su camino como cualquier otra.
+                if (await CommandHandler.TryHandleAsync(stream, msgText, channel: 0, accountId: accountId))
                 {
-                    await CommandHandler.HandleCommand(stream, msgText);
+                    return;
                 }
-                else
-                {
-                    Console.WriteLine($"[Chat] {GameState.CharacterName}: {msgText}");
-                    byte[] echoPacket = BuildChatBroadcastPacket(msgText, GameState.CharacterName, channel: 0);
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, echoPacket);
-                    Console.WriteLine("[Chat] Echoed chat message back to client.");
-                }
+
+                Console.WriteLine($"[Chat] {GameState.CharacterName}: {msgText}");
+                byte[] echoPacket = BuildChatBroadcastPacket(msgText, GameState.CharacterName, channel: 0);
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, echoPacket);
+                Console.WriteLine("[Chat] Echoed chat message back to client.");
             }
         }
 

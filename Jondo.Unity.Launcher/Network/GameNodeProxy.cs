@@ -151,7 +151,9 @@ namespace Jondo.Unity.Launcher.Network
                     // handled the same: the client decides which of the two screens it lands on.
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push("kqr", BuildKqrPayload()));
-                    GameState.IsInFight = false;
+                    // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
+                    // el de arena es de instancia y quedarse ahí es quedarse encerrado.
+                    FightHandler.LeaveFight();
                     hasSentMapBlock = false;
                     Console.WriteLine("[Game Node] Client is going back: sent kqr and released the session.");
                 }
@@ -220,8 +222,29 @@ namespace Jondo.Unity.Launcher.Network
                     // for it would leave the client without the catalogues for no reason.
                     await WorldEntry.SendAfterConfirmAsync(stream, chosen);
                 }
+                else if ((payloadStr.Contains("type.ankama.com/jrh")
+                          || payloadStr.Contains("type.ankama.com/kmv"))
+                         && FightHandler.PendingPreparation() != null)
+                {
+                    // En combate, quien está en el mapa no se manda con un jss: son las jxg de la
+                    // preparación, y sólo cuando el cliente las pide. Ese es el orden de la
+                    // captura, y mandarlas antes del cambio de mapa hace que las descarte.
+                    //
+                    // Y las pide con kmv, no con jrh. Al cargar un mapa normal el cliente manda los
+                    // dos, así que enganchar el jrh bastaba ahí; pero al entrar en combate manda
+                    // ijm y kmv y nada más, y kmv estaba en la lista de mensajes que se ignoran sin
+                    // decir nada. Por eso el combate salía en el registro del servidor y en pantalla
+                    // no pasaba nada.
+                    await FightHandler.SendPreparationAsync(stream, FightHandler.PendingPreparation()!);
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.BuildActorsComplete());
+                }
                 else if (payloadStr.Contains("type.ankama.com/jrh"))
                 {
+                    // Peleando, el mapa ya está puesto: mandarle el jss del mapa de superficie lo
+                    // sacaría del combate.
+                    if (GameState.IsInFight) continue;
+
                     // The client asks who is on the map. Without an answer it draws an empty map:
                     // no avatar, no NPCs, no monsters.
                     var here = DatabaseManager.GetCharacterById(GameState.CharacterId);
@@ -270,7 +293,11 @@ namespace Jondo.Unity.Launcher.Network
                 // an earlier version of the protocol and this client never sends them.
                 else if (payloadStr.Contains("type.ankama.com/jrw"))
                 {
-                    await WorldMoveHandler.ConfirmMovementAsync(stream, payload);
+                    // Andar es el mismo mensaje dentro y fuera del combate. Peleando lo resuelve el
+                    // manejador de combate, que además gasta puntos de movimiento; si cayera aquí,
+                    // el personaje se movería por el tablero gratis y sin avisar a nadie.
+                    if (GameState.IsInFight) await FightHandler.WalkAsync(stream, payload);
+                    else await WorldMoveHandler.ConfirmMovementAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/jqi"))
                 {
@@ -309,7 +336,14 @@ namespace Jondo.Unity.Launcher.Network
                             else if (f.FieldNumber == 3 && f.WireType == 0) channel = (int)f.VarIntValue;
                         }
 
-                        if (text.Length > 0)
+                        // Los comandos de administración se escriben por aquí, por cualquier canal,
+                        // y NO se publican: si el manejador los reconoce, la línea se queda en el
+                        // servidor y nunca llega a salir por el chat. Vale para todos los canales
+                        // porque lo que decide no es el canal, es el texto.
+                        bool consumed = text.Length > 0 &&
+                            await CommandHandler.TryHandleAsync(stream, text, channel, sessionAccountId);
+
+                        if (text.Length > 0 && !consumed)
                         {
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                                 ConnectionProtocol.Push("kti",
@@ -412,8 +446,14 @@ namespace Jondo.Unity.Launcher.Network
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
                     // El botón de cerrar del diálogo. Va vacío y espera respuesta: khd si lo que
-                    // está abierto es el cofre, kld si es la lista del zaap.
+                    // está abierto es el cofre o la tienda de un NPC, kld si es la lista del zaap.
+                    //
+                    // El cliente manda el kla DOS veces seguidas al cerrar una tienda, con menos de
+                    // un milisegundo entre medias, y el servidor real contesta un solo khd. Como el
+                    // primero ya deja la tienda cerrada, el segundo cae en el zaap y se va con un
+                    // kld que el cliente ignora, igual que hoy.
                     if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
+                    else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
                     else await ZaapTravelHandler.CloseAsync(stream);
                 }
                 else if (payloadStr.Contains("type.ankama.com/hjc"))
@@ -620,29 +660,45 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await InventoryHandler.HandleItemMovementRequest(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/ilr"))
+                else if (payloadStr.Contains("type.ankama.com/iov"))
                 {
-                    await NpcHandler.HandleNpcGenericActionRequest(stream, payload);
+                    // Ha clicado un NPC: según la acción, se le abre la tienda o el diálogo.
+                    await NpcHandler.InteractAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lxh"))
+                else if (payloadStr.Contains("type.ankama.com/ioy"))
                 {
-                    await NpcHandler.HandleLeaveDialogRequest(stream);
+                    // Ha elegido una respuesta del diálogo.
+                    await NpcHandler.ReplyAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kjl"))
+                else if (payloadStr.Contains("type.ankama.com/kea"))
                 {
-                    await NpcHandler.HandleNpcDialogReply(stream, payload);
+                    // Comprarle algo al NPC que tiene la tienda abierta.
+                    await NpcHandler.BuyAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/krc"))
                 {
                     await StatsHandler.HandleStatsUpgradeRequest(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jxx") || payloadStr.Contains("type.ankama.com/jyk") || payloadStr.Contains("type.ankama.com/jyz") || payloadStr.Contains("type.ankama.com/joi") || payloadStr.Contains("type.ankama.com/jza") || payloadStr.Contains("type.ankama.com/jwe") || payloadStr.Contains("type.ankama.com/jrb") || payloadStr.Contains("type.ankama.com/jub") || payloadStr.Contains("type.ankama.com/jxw") || payloadStr.Contains("type.ankama.com/hoy"))
+                else if (payloadStr.Contains("type.ankama.com/hqa"))
                 {
+                    // Atacar a un grupo de monstruos. Es lo que manda el cliente de verdad al
+                    // lanzar un combate: lleva el id contextual del grupo.
+                    await FightHandler.AttackAsync(stream, payload);
+                }
+                else if (payloadStr.Contains("type.ankama.com/jzy") || payloadStr.Contains("type.ankama.com/kaq")
+                         || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
+                         || payloadStr.Contains("type.ankama.com/jwh")
+                         || payloadStr.Contains("type.ankama.com/jti")
+                         || payloadStr.Contains("type.ankama.com/hoy"))
+                {
+                    // Colocarse, declararse listo y las opciones del combate. Los demás que había
+                    // aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la 3.6.10.10 o
+                    // los manda el servidor, no el cliente.
                     await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
                 {
-                    await ChatHandler.HandleChatMessage(stream, payload);
+                    await ChatHandler.HandleChatMessage(stream, payload, sessionAccountId);
                 }
                 else if (payloadStr.Contains("type.ankama.com/itn"))
                 {

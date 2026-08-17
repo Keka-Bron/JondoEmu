@@ -90,6 +90,9 @@ namespace Jondo.Unity.Launcher
         // El aspecto de cada montura, indexado por el objeto que la da. Lo genera
         // extract_monturas.py de los bundles del cliente.
         public static string MountsJson => Resolve("mounts.json");
+        // Qué vende cada NPC de tienda y a qué precio, medido del servidor de torneos con
+        // tools/extraer_tiendas.py.
+        public static string NpcShopsJson => Resolve("npc_shops.json");
         // Las parejas de hechizo base/variante, una por cada hueco de la barra. Del volcado del
         // cliente; el personaje lleva uno de cada pareja, no los dos.
         public static string SpellVariantsJson

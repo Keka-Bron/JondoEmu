@@ -14,6 +14,139 @@ namespace Jondo.Unity.Launcher.Network
     /// </summary>
     public static class ConnectionProtocolSelfTest
     {
+        /// <summary>
+        /// Los mensajes de la preparación del combate, contra los bytes de verdad.
+        ///
+        /// Esto no comprueba la forma a ojo: compara byte a byte con lo que mandó el servidor real
+        /// en la captura *combate contra poutch nivel 50…*, con las mismas casillas, el mismo
+        /// combatiente y el mismo mapa que salen ahí. Si un constructor cambia de campo o de orden,
+        /// aquí se ve; en el cliente lo único que se vería es un combate que no arranca.
+        /// </summary>
+        private static void CheckFightPreparation(List<string> failures)
+        {
+            const long fighter = 302677754146L;   // el personaje de la captura
+            const long mapId = 99222029L;
+
+            long[] blue = { 285, 273, 317, 373, 413, 411, 368, 312, 271, 288, 298, 302, 382, 386, 397, 400 };
+            long[] red = { 270, 260, 303, 387, 428, 425, 381, 297, 257, 274, 284, 289, 396, 401, 410, 414 };
+
+            Same(failures, "kba",
+                 "0a440a209d029102bd02f5029d039b03f002b8028f02a002aa02ae02fe0282038d0390031220"
+                 + "8e028402af028303ac03a903fd02a902810292029c02a1028c0391039a039e03",
+                 FightProtocol.BuildPlacementCells(blue, red));
+
+            Same(failures, "jzu",
+                 "12091a0710a28280c8e708120d1a0b10ffffffffffffffffff01",
+                 FightProtocol.BuildTeams(new[] { fighter, FightProtocol.Nobody }));
+
+            // Y con cuatro monstruos son CINCO bloques, cada uno con su propio negativo, que es lo
+            // que desmonta la lectura de "un bloque por equipo".
+            Same(failures, "jzu (cuatro monstruos)",
+                 "12091a0710a28280c8e708120d1a0b10ffffffffffffffffff01120d1a0b10feffffffffffffffff01"
+                 + "120d1a0b10fdffffffffffffffff01120d1a0b10fcffffffffffffffff01",
+                 FightProtocol.BuildTeams(new[] { fighter, -1L, -2L, -3L, -4L }));
+
+            Same(failures, "jrk", "100a1a00208d84a82f", FightProtocol.BuildFightMap(mapId));
+
+            Same(failures, "kmp", "0801", FightProtocol.BuildFightMapComing());
+
+            // La jxg entera son cientos de bytes de ficha, así que aquí se comprueba el
+            // ENVOLTORIO, que es donde estaba el fallo: todo va dentro de un f2, y dentro de él la
+            // casilla en f1, el cuerpo en f2 y quién es en f3. Sin ese f2 de fuera el cliente pinta
+            // el tablero y ni un solo combatiente encima.
+            byte[] fighterMsg = FightProtocol.BuildFighter(
+                270, 1, -1, new[] { (1, 6L, 0L) }, new byte[] { 0x10, 0x03 },
+                FightProtocol.MonsterIdentity(3, 494, 50), isMonster: true);
+            var outer = ProtoMessage.Parse(fighterMsg).Fields;
+            if (outer.Count != 1 || outer[0].FieldNumber != 2 || outer[0].WireType != 2)
+            {
+                failures.Add("jxg: lo de dentro tiene que ir envuelto en un único f2");
+            }
+            else
+            {
+                var inner = ProtoMessage.Parse(outer[0].BytesValue).Fields;
+                bool where = inner.Exists(f => f.FieldNumber == 1 && f.WireType == 2);
+                bool body = inner.Exists(f => f.FieldNumber == 2 && f.WireType == 2);
+                bool who = inner.Exists(f => f.FieldNumber == 3 && f.WireType == 0);
+                if (!where || !body || !who)
+                {
+                    failures.Add("jxg: dentro del f2 faltan la casilla (f1), el cuerpo (f2) o quién es (f3)");
+                }
+            }
+
+            Same(failures, "kah", "08a28280c8e7081801", FightProtocol.BuildReadyAck(fighter));
+
+            // Un lanzamiento, byte a byte. Lo que importa aquí es el f7 de dentro: el hechizo va
+            // en DOS números, el 25188 (el hechizo) y el 63926 (su grado), y el f8 vale uno y no
+            // es el hechizo. Cuando esto se mandaba mal, el cliente pintaba un puñetazo.
+            Same(failures, "jwe (lanzar un hechizo)",
+                 "18a28280c8e7083a1f10a28280c8e708220720a28280c8e708308f023a0810e4c40118b6f303"
+                 + "400170ac02",
+                 FightProtocol.BuildAction(
+                     fighter, FightProtocol.Cast,
+                     FightProtocol.CastAt(fighter, 0, 271, 25188, 63926, critical: false),
+                     FightProtocol.CastDetail));
+
+            // Colocarse: la casilla que se deja va con -1 y la que se ocupa, con quién la ocupa.
+            Same(failures, "kmk",
+                 "1210088e02100118ffffffffffffffffff01120c088f02100518a28280c8e708",
+                 FightProtocol.BuildFightersPlaced(new[]
+                 {
+                     (270, 1, FightProtocol.Nobody),
+                     (271, 5, fighter),
+                 }));
+
+            CheckFightResults(failures, fighter);
+        }
+
+        /// <summary>
+        /// La pantalla de fin de combate (jyg), contra los 86 bytes de la victoria del poutch.
+        ///
+        /// El personaje de la captura está en el nivel 354 con 23.793.534.387 de experiencia y no
+        /// gana nada en ese combate; el poutch, muerto, va sin ficha. Los dos números que el
+        /// mensaje no lleva —lo que pide el nivel 354 y lo que pide el 355— los pone la tabla del
+        /// cliente, así que esto comprueba de paso que la tabla está cargada y cuadra.
+        /// </summary>
+        private static void CheckFightResults(List<string> failures, long fighter)
+        {
+            if (!ExperienceTable.IsLoaded) ExperienceTable.Initialize();
+            if (!ExperienceTable.IsLoaded)
+            {
+                failures.Add("jyg: no se puede comprobar, falta la tabla de experiencia " +
+                             "(character_xp.json)");
+                return;
+            }
+
+            var results = new List<FightProtocol.FightResult>
+            {
+                new FightProtocol.FightResult
+                {
+                    Fighter = fighter,
+                    Winner = true,
+                    Level = 354,
+                    Xp = 23793534387L,
+                    XpGained = 0,
+                    Spoils = new FightProtocol.Spoils(),
+                },
+                new FightProtocol.FightResult { Fighter = FightProtocol.Nobody },
+            };
+
+            Same(failures, "jyg (fin de combate)",
+                 "123212001a2c08a28280c8e70812210a1c121a109e88dc93591801200128b38bd2d15830eeaaada558"
+                 + "4001480110e20218012002121112001a0d08ffffffffffffffffff01180120cdb303"
+                 + "40ffffffffffffffffff01",
+                 FightProtocol.BuildFightResults(results, durationMs: 55757));
+        }
+
+        private static void Same(List<string> failures, string opcode, string expected, byte[] got)
+        {
+            string mine = Convert.ToHexString(got).ToLowerInvariant();
+            if (mine != expected)
+            {
+                failures.Add($"{opcode} does not match the capture:\n        capture: {expected}\n        ours:    {mine}");
+            }
+        }
+
         public static void Run()
         {
             var failures = new List<string>();
@@ -23,6 +156,7 @@ namespace Jondo.Unity.Launcher.Network
             CheckServerSelection(failures);
             CheckEnvelope(failures);
             CheckWorldMessages(failures);
+            CheckFightPreparation(failures);
 
             if (failures.Count > 0)
             {

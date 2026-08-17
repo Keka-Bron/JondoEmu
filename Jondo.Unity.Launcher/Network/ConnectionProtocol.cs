@@ -740,6 +740,8 @@ namespace Jondo.Unity.Launcher.Network
                     .Var(3, group.MobId));
             }
 
+            AddNpcs(jss, mapId);
+
             // Behind the actors, which is where the capture puts it.
             var where = MapManager.GetMapInfo(mapId);
             if (where != null) jss.VarIfNotZero(6, where.SubAreaId);
@@ -747,6 +749,59 @@ namespace Jondo.Unity.Launcher.Network
             AddInteractiveElements(jss, mapId);
 
             return jss.Build();
+        }
+
+        /// <summary>
+        /// Los NPCs del mapa.
+        ///
+        /// Van con la misma envoltura que el jugador y que los grupos de monstruos, y lo único que
+        /// los distingue es que dentro de f2.f1 aparece el f7 —el jugador usa el f5 y un grupo de
+        /// monstruos el f4—:
+        ///
+        ///   f1 { f1: casilla, f2: orientación }
+        ///   f2 { f1 { f7 { f3: género, f5: plantilla } }
+        ///        f3 { f1: colores, f2: 3, f3: huesos, f5: escalas, f6: pieles } }
+        ///   f3: id contextual, negativo
+        ///
+        /// El nombre no se manda: el cliente lo saca de sus datos a partir de la plantilla. Y el
+        /// bloque de aspecto es la cadena Look de NpcTemplates troceada, comprobado en los
+        /// cincuenta y seis NPCs de la captura sin una sola discrepancia.
+        ///
+        /// Ojo con la escala: el f5 es una lista EMPAQUETADA de varints, no un byte suelto. Una
+        /// escala de 200 son dos bytes (c8 01), y escribir el 0xC8 a pelo deja un varint a medias
+        /// que revienta el parseo del jss entero en el cliente —con él, el mapa se queda sin
+        /// dibujar del todo, ni NPCs ni monstruos ni personaje—.
+        /// </summary>
+        private const int NpcFemale = 1;
+
+        private static void AddNpcs(Pb jss, long mapId)
+        {
+            foreach (var npc in Managers.Npcs.Of(mapId))
+            {
+                var look = Pb.New();
+                if (npc.Colors.Length > 0) look.Packed(1, npc.Colors);
+                look.Var(2, LookKind);
+                look.VarIfNotZero(3, npc.Bones);
+                if (npc.Scales.Length > 0) look.Packed(5, npc.Scales);
+                if (npc.Skins.Length > 0) look.Packed(6, npc.Skins);
+
+                // El género sólo viaja cuando vale 1. Comprobado en las cincuenta y seis plantillas
+                // de la captura: las veinte con género 1 lo mandan, las treinta y cinco con género
+                // 0 lo omiten —eso es proto3— y la única con género 2, que es la montaña de kamas,
+                // tampoco manda nada. O sea que el campo no es el género de la plantilla tal cual,
+                // sino que sólo se pone cuando es exactamente 1.
+                var template = Managers.Npcs.TemplateOf(npc.NpcId);
+                bool female = template != null && template.Gender == NpcFemale;
+
+                jss.Msg(5, Pb.New()
+                    .Msg(1, Pb.New().Var(1, npc.Cell).VarIfNotZero(2, npc.Orientation))
+                    .Msg(2, Pb.New()
+                        .Msg(1, Pb.New().Msg(7, Pb.New()
+                            .VarIfNotZero(3, female ? NpcFemale : 0)
+                            .Var(5, npc.NpcId)))
+                        .Msg(3, look))
+                    .Var(3, npc.ContextualId));
+            }
         }
 
         /// <summary>
@@ -861,14 +916,49 @@ namespace Jondo.Unity.Launcher.Network
         /// holding somebody else's spells. Both the list and the grades come from the client's own
         /// data through <see cref="SpellTable"/>; only the breed and the level are ours.
         /// </summary>
+        /// <summary>
+        /// De dónde sale el hechizo: 1 los de la clase, 2 los que no lo son —el cuerpo a cuerpo,
+        /// los de objeto, los de montura—.
+        /// </summary>
+        private const int OrigenQueNoEsDeClase = 2;
+
+        /// <summary>
+        /// El cuerpo a cuerpo es el HECHIZO CERO, y no hay que inventárselo: está en la base como
+        /// <c>SpellTemplates.Id 0</c>, con el nombre 64658 —"Puñetazo"— y un único grado, el
+        /// <c>SpellLevels.Id 10461</c>, de 3 PA y alcance 1.
+        ///
+        /// El servidor real lo manda como una entrada más de la lista de hechizos, con el número
+        /// omitido —proto3 no escribe los ceros— y el origen a 2: los bytes son <c>08 01 20 02</c>.
+        /// Está en las nueve capturas que traen un hms, desde el personaje de nivel 1 del tutorial
+        /// hasta el de nivel 200. Sin ella el cliente no tiene ficha que poner en la casilla del
+        /// arma: fuera de combate no la dibuja, y en combate la dibuja pero sin nada que lanzar
+        /// —de ahí que saliera apagada y con el texto de objeto sin resolver, con las filas de
+        /// "[QUANTITÉ EN INVENTAIRE]" y "[Valeurs théoriques]"—.
+        /// </summary>
+        private const int GradoDelCuerpoACuerpo = 1;
+
         public static byte[] BuildSpellList(int breed, int level)
         {
             var hms = Pb.New();
+
+            hms.Msg(1, Pb.New().Var(1, GradoDelCuerpoACuerpo).Var(4, OrigenQueNoEsDeClase));
+
             foreach (var spell in SpellTable.KnownFor(breed, level, Managers.SpellChoices.Chosen))
             {
                 hms.Msg(1, Pb.New().Var(1, spell.Grade).Var(3, spell.SpellId).Var(4, 1));
             }
-            return hms.Build();
+
+            // El f2 suelto del final, que es el mismo tipo de descuido que tuvo la barra de
+            // hechizos con su itg: va detrás de la lista, parece un hueco más y sin él vale cero.
+            //
+            // Está en las NUEVE capturas que traen un hms, desde el personaje de nivel 1 del
+            // tutorial hasta el de nivel 200, y no salía en ninguno de los 138 que ha mandado este
+            // emulador. Lo que se sospecha que apaga es la previsualización de daños: el cliente
+            // lleva dentro un interruptor que se llama isDamagePreviewEnabled, y el texto de ayuda
+            // del propio juego describe con una sola frase las dos mitades que faltaban —el daño
+            // estimado y el desplazamiento—. No está demostrado que sea éste el interruptor; lo que
+            // sí está medido es que el servidor real lo manda siempre y nosotros nunca.
+            return hms.Var(2, 1).Build();
         }
 
         /// <summary>
@@ -907,7 +997,10 @@ namespace Jondo.Unity.Launcher.Network
 
             // Y lo que el jugador todavía no ha colocado se reparte por los huecos libres, que es
             // lo que hace el juego con un personaje recién hecho.
-            int next = 0;
+            //
+            // Empezando por el UNO: el hueco cero es donde el cliente dibuja el arma, y en 37 de
+            // las 51 barras de las capturas va vacío por eso mismo.
+            int next = 1;
             foreach (var spell in known)
             {
                 if (taken.Contains(spell.SpellId)) continue;
@@ -920,13 +1013,30 @@ namespace Jondo.Unity.Launcher.Network
             placed.Sort((a, b) => a.Slot.CompareTo(b.Slot));
             Managers.SpellChoices.RememberBar(placed);
 
+            // El cuerpo a cuerpo va en el primer hueco libre, con el hechizo CERO. Su entrada es
+            // un f6 presente y vacío —los bytes 0a 02 32 00—, que es como proto3 escribe el cero.
+            // Está en las 13 barras de jugador de las capturas, incluida la del personaje del
+            // tutorial, que no lleva ni un objeto: la casilla es la del puño y va siempre.
+            var ocupados = new HashSet<int>();
+            foreach (var (slot, _) in placed) ocupados.Add(slot);
+            int hueco = 0;
+            while (ocupados.Contains(hueco)) hueco++;
+
             var itg = Pb.New();
+            bool puesto = false;
             foreach (var (slot, spellId) in placed)
             {
+                if (!puesto && hueco < slot)
+                {
+                    itg.Msg(1, Pb.New().VarIfNotZero(2, hueco).EmptyMsg(6));
+                    puesto = true;
+                }
                 itg.Msg(1, Pb.New()
                     .VarIfNotZero(2, slot)
                     .Msg(6, Pb.New().Var(2, spellId)));
             }
+            if (!puesto) itg.Msg(1, Pb.New().VarIfNotZero(2, hueco).EmptyMsg(6));
+
             return itg.Var(2, SpellBar).Build();
         }
 
@@ -1220,9 +1330,127 @@ namespace Jondo.Unity.Launcher.Network
         /// antes del jss, y como respuesta al kla vacío que manda el botón de cerrar— así que el
         /// f1 es una razón fija y no algo que haya que calcular.
         /// </summary>
-        public static byte[] BuildDialogClosed() => Pb.New().Var(1, DialogCloseReason).Build();
+        public static byte[] BuildDialogClosed(int reason = DialogCloseReason)
+            => Pb.New().Var(1, reason).Build();
 
         private const int DialogCloseReason = 10;
+
+        /// <summary>
+        /// La razón con la que se cierra el diálogo de un NPC, que no es la del zaap.
+        ///
+        /// En la captura del servidor de torneos el kld que cierra la conversación con la montaña
+        /// de kamas lleva f1: 1, y sale las cuatro veces —tanto al aceptar como al rechazar—. El 10
+        /// es el del zaap y hay un 5 midiendo otra ventana, así que son razones distintas de cierre
+        /// y no un valor fijo; la regla que las separa no está descifrada.
+        /// </summary>
+        public const int NpcDialogCloseReason = 1;
+
+        // ─── World: NPCs, their dialogue and their shops ────────────────────────
+
+        /// <summary>
+        /// El servidor abre la ventana de diálogo (ioc). Sólo devuelve a quién se le está hablando
+        /// y dónde; no lleva ni f1 ni f2 ni f3.
+        ///
+        ///   f4: mapa      f5: id contextual del NPC
+        /// </summary>
+        public static byte[] BuildNpcDialog(long mapId, long contextualId)
+            => Pb.New().Var(4, mapId).Var(5, contextualId).Build();
+
+        /// <summary>
+        /// La pregunta y sus respuestas (ios).
+        ///
+        ///   f1: id del mensaje
+        ///   f2 (repetido) { f1: id de respuesta, f3 (repetido) { f1: id de efecto } }
+        ///
+        /// El f3 de cada respuesta es lo que la respuesta promete: en la montaña de kamas la que
+        /// paga anuncia los efectos 194 ("+#1{{~1~2 a }}#2 kamas"), 193 y 351, y la que rechaza va
+        /// sin ninguno. Aquí se manda sin f3, que es como viaja la respuesta de rechazo en la
+        /// captura: se pierde el iconito del premio y nada más. Los ids de efecto no están en
+        /// NpcTemplates, así que ponerlos sería inventárselos.
+        /// </summary>
+        public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies)
+        {
+            var ios = Pb.New().Var(1, messageId);
+            foreach (long reply in replies)
+            {
+                ios.Msg(2, Pb.New().Var(1, reply));
+            }
+            return ios.Build();
+        }
+
+        /// <summary>
+        /// El catálogo entero de una tienda (kbd), de una sola vez.
+        ///
+        ///   f1 (repetido) { f1: objeto
+        ///                   f3 { f2: precio, f3: -1, f4: criterio }
+        ///                   f4 (repetido): un efecto, con el id en f11 }
+        ///   f2: el mismo id contextual que pidió el iov
+        ///
+        /// No está paginado: en la captura hay cincuenta y seis iov de tienda y cincuenta y seis
+        /// kbd, uno a uno, y el mayor son 26.902 bytes con 444 entradas. Como no hay ni un caso de
+        /// dos kbd para una misma tienda, tampoco hay prueba de que el cliente sepa juntarlos, así
+        /// que el reparto en vendedores pequeños que hace el servidor real es también lo seguro.
+        ///
+        /// El f3.f3 vale -1 en las 6.106 entradas medidas. Se manda igual aunque no se sepa qué
+        /// significa exactamente: lo único seguro es que el cliente lo recibe siempre así.
+        ///
+        /// El criterio de texto —"(SC=3|Sc=3500)" en el servidor de torneos— NO se manda. El SC=3
+        /// es "servidor de torneo" y el propio servidor lo valida: las catorce entradas con el
+        /// criterio más duro dieron error 243 al comprarlas. Aquí no somos un servidor de torneo, y
+        /// hay doce entradas medidas que viajan sin criterio ninguno, así que se omite.
+        /// </summary>
+        public static byte[] BuildShop(long contextualId, IEnumerable<int> gids)
+        {
+            var kbd = Pb.New();
+            foreach (int gid in gids)
+            {
+                var entry = Pb.New()
+                    .Var(1, gid)
+                    .Msg(3, Pb.New()
+                        .VarIfNotZero(2, Managers.NpcShops.PriceOf(gid))
+                        .Var(3, ShopUnlimited));
+
+                foreach (var effect in Managers.Equipment.ParseEffects(Managers.NpcShops.EffectsOf(gid)))
+                {
+                    var value = EffectEntry(effect);
+                    if (value != null) entry.Msg(4, value);
+                }
+
+                kbd.Msg(1, entry);
+            }
+            return kbd.Var(2, contextualId).Build();
+        }
+
+        /// <summary>Las existencias de la tienda. Constante en las 6.106 entradas de la captura.</summary>
+        private const int ShopUnlimited = -1;
+
+        /// <summary>
+        /// La tienda se ha cerrado (khd). El f3 vale 11 en las cincuenta y seis de la captura.
+        /// </summary>
+        public static byte[] BuildShopClosed() => Pb.New().Var(3, ShopClosedKind).Build();
+
+        private const int ShopClosedKind = 11;
+
+        /// <summary>
+        /// Una línea del sistema en el chat (lqn).
+        ///
+        ///   f2: qué mensaje       f4 (repetido): sus parámetros, como cadenas
+        ///
+        /// El 45 es el de la montaña de kamas, con la cifra ingresada, y el 252 el de una compra
+        /// hecha, con objeto, uid, cantidad y lo pagado.
+        /// </summary>
+        public static byte[] BuildSystemMessage(int messageId, params string[] parameters)
+        {
+            var lqn = Pb.New().Var(2, messageId);
+            foreach (string parameter in parameters) lqn.Str(4, parameter);
+            return lqn.Build();
+        }
+
+        /// <summary>El mensaje de "has recibido kamas", con la cifra como parámetro.</summary>
+        public const int KamasReceivedMessage = 45;
+
+        /// <summary>El de "comprado": objeto, uid, cantidad y precio.</summary>
+        public const int PurchaseMessage = 252;
 
         // ─── World: changing map ────────────────────────────────────────────────
 

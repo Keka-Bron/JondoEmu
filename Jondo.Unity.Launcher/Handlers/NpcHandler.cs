@@ -1,184 +1,345 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
-using Google.Protobuf;
+using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
     /// <summary>
-    /// Handles all NPC interaction logic:
-    /// - Generic NPC action requests (ilr)
-    /// - NPC dialog choice responses
-    /// - Leave dialog requests (lxh)
-    /// - NPC dialog reply/close (kjl)
+    /// Hablar con un NPC y comprarle.
+    ///
+    /// Todo esto está medido de la captura del servidor de torneos, donde hay cincuenta y un
+    /// vendedores repartidos por siete mapas y la montaña de kamas. Son cuatro opcodes para la
+    /// tienda y cuatro para el diálogo, y el servidor contesta siempre por EMPUJE, sin emparejar
+    /// ids de petición:
+    ///
+    ///   cliente  iov { f1: acción, f2: mapa, f3: id contextual }   ha clicado al NPC
+    ///
+    ///   si la acción es 1 u 11 (comprar):
+    ///   servidor kbd { f1 (repetido): el catálogo entero, f2: id contextual }
+    ///   cliente  kea { f1: objeto, f2: cantidad }                  comprar
+    ///   servidor lqn, ivf, iua, iun, kdg, ivf, iun
+    ///   cliente  kla (vacío)                                       cerrar
+    ///   servidor khd { f3: 11 }
+    ///
+    ///   si la acción es 3 (hablar):
+    ///   servidor ioc { f4: mapa, f5: id contextual }
+    ///   servidor ios { f1: pregunta, f2 (repetido): las respuestas }
+    ///   cliente  ioy { f1: la respuesta elegida }
+    ///   servidor kld { f1: 1 }  y lo que dé esa respuesta
+    ///
+    /// El f1 del iov no es un tipo de mensaje: es el id de acción de la plantilla del NPC, el mismo
+    /// número que sale en su actions[]. Cuadra en los sesenta y cinco iov de la captura. Un NPC que
+    /// no declare la acción ni siquiera la ofrece en el menú.
     /// </summary>
+    /// <remarks>
+    /// Lo que había aquí antes era de la 3.6.4.3 y usaba ilr, ilu, ilq, kjl, kjn, lxh y kns. Ni uno
+    /// de esos siete opcodes aparece una sola vez en la captura de la 3.6.10.10.
+    /// </remarks>
     public static class NpcHandler
     {
-        public static async Task HandleNpcGenericActionRequest(NetworkStream stream, byte[] payload)
+        /// <summary>Qué NPC tiene la tienda abierta ahora mismo, o cero.</summary>
+        private static long _openShop;
+
+        /// <summary>Qué vendedor es, para saber si vende lo que el cliente pide.</summary>
+        private static int _openShopNpc;
+
+        public static bool IsShopOpen => _openShop != 0;
+
+        /// <summary>
+        /// Desde dónde se numeran los objetos comprados.
+        ///
+        /// Cada cosa que fabrica objetos tiene su tramo: 900.000.000 el inventario de prueba,
+        /// 950.000.000 la lotería del merkasako y 960.000.000 las apariencias regaladas. Ese último
+        /// tramo lo BORRA entero dotar_apariencias.py cada vez que se relanza, así que lo comprado
+        /// no puede caer ahí o desaparecería sin avisar.
+        /// </summary>
+        private const long FirstUid = 970000000L;
+
+        /// <summary>
+        /// Lo que da la montaña de kamas.
+        ///
+        /// La cifra no está en ningún dato del cliente ni en la plantilla del NPC: es una constante
+        /// del servidor. En la captura se cobró tres veces y las tres subió exactamente lo mismo,
+        /// de cero a 50.000.000, de 49.999.998 a 99.999.998 y de ahí a 149.999.998.
+        /// </summary>
+        private const long KamasMountainReward = 50_000_000L;
+
+        /// <summary>
+        /// La respuesta que paga. La 70285 es "Hacerte con esos millones de kamas que no sirven a
+        /// nadie" y la 70286, la de al lado, se marcha sin cobrar: el servidor contesta el kld y
+        /// nada más.
+        /// </summary>
+        private const long KamasMountainReply = 70285;
+
+        /// <summary>
+        /// El cliente ha clicado un NPC (iov). Según la acción, se le abre la tienda o el diálogo.
+        /// </summary>
+        public static async Task InteractAsync(NetworkStream stream, byte[] payload)
         {
-            LogDebug("[Game Node] Received NPC Generic Action Request (ilr)");
-            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/ilr");
-            if (inner == null) return;
+            byte[]? iov = ConnectionProtocol.ReadPayload(payload, "iov");
+            if (iov == null) return;
 
-            // Distinguish between initial NPC interaction and dialog choice reply
-            int posTemp = 0;
-            if (inner.Length > 0)
+            long action = 0, mapId = 0, contextualId = 0;
+            foreach (var field in ProtoMessage.Parse(iov).Fields)
             {
-                uint firstTag  = NetworkEnvelope.ReadVarInt(inner, ref posTemp);
-                uint firstWire = firstTag & 7;
-                if (firstWire == 2)
-                {
-                    // Dialogue choice ilr — user picked an option in a dialog
-                    await HandleNpcDialogChoice(stream);
-                    return;
-                }
+                if (field.WireType != 0) continue;
+                if (field.FieldNumber == 1) action = field.VarIntValue;
+                else if (field.FieldNumber == 2) mapId = field.VarIntValue;
+                else if (field.FieldNumber == 3) contextualId = field.VarIntValue;
             }
 
-            long mapId           = 0;
-            int  actionId        = 0;
-            long npcContextualId = 0;
-
-            try
+            var npc = Npcs.Find(mapId, contextualId);
+            if (npc == null)
             {
-                int pos = 0;
-                while (pos < inner.Length)
-                {
-                    uint tag      = NetworkEnvelope.ReadVarInt(inner, ref pos);
-                    uint fieldNum = tag >> 3;
-                    uint wireType = tag & 7;
-
-                    if (fieldNum == 1 && wireType == 0)
-                        mapId = (long)NetworkEnvelope.ReadVarInt64(inner, ref pos);
-                    else if (fieldNum == 2 && wireType == 0)
-                        actionId = (int)NetworkEnvelope.ReadVarInt(inner, ref pos);
-                    else if (fieldNum == 3 && wireType == 0)
-                        npcContextualId = (long)NetworkEnvelope.ReadVarInt64(inner, ref pos);
-                    else
-                        NetworkEnvelope.SkipField(inner, (int)wireType, ref pos);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogDebug($"[NPC] Error parsing ilr: {ex.Message}");
+                Console.WriteLine($"[NPC] El cliente clica el {contextualId} del mapa {mapId}, " +
+                                  "que aquí no es nadie.");
                 return;
             }
 
-            LogDebug($"[NPC] Interaction: NPC={npcContextualId}, Action={actionId}, Map={mapId}");
-
-            // 1. NpcDialogCreationMessage (ilu) — Field 2: npcContextualId, Field 3: mapId
-            var iluMsg = new ProtoMessage();
-            iluMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = npcContextualId });
-            iluMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = mapId });
-
-            byte[] iluPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/ilu", iluMsg.ToByteArray());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, iluPacket);
-            LogDebug("[NPC] Sent NpcDialogCreationMessage (ilu)");
-
-            // 2. NpcDialogQuestionMessage (ilq)
-            // Field 1 (repeated choice): replyId=24897 → "Hasta luego." (close option)
-            // Field 2: questionId=20776
-            var choiceMsg = new ProtoMessage();
-            choiceMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 24897 });
-
-            var ilqMsg = new ProtoMessage();
-            ilqMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = choiceMsg.ToByteArray() });
-            ilqMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 20776 });
-
-            byte[] ilqPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/ilq", ilqMsg.ToByteArray());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ilqPacket);
-            LogDebug("[NPC] Sent NpcDialogQuestionMessage (ilq)");
-        }
-
-        public static async Task HandleNpcDialogChoice(NetworkStream stream)
-        {
-            LogDebug("[Game Node] Received NPC Dialog Choice (ilr)");
-
-            // 1. NpcDialogCloseMessage (kjn) — Field 2: 1
-            var kjnMsg = new ProtoMessage();
-            kjnMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 1 });
-            byte[] kjnPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kjn", kjnMsg.ToByteArray());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, kjnPacket);
-            LogDebug("[NPC] Sent NpcDialogCloseMessage (kjn)");
-
-            // 2. kns — Field 1: true (restores interactivity context)
-            var knsMsg = new ProtoMessage();
-            knsMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 1 });
-            byte[] knsPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kns", knsMsg.ToByteArray());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, knsPacket);
-            LogDebug("[NPC] Sent kns to restore context");
-        }
-
-        public static async Task HandleLeaveDialogRequest(NetworkStream stream)
-        {
-            LogDebug("[Game Node] Received Leave Dialog Request (lxh)");
-
-            // LeaveDialogMessage (lxj) — Field 1: 5 (closing dialog)
-            byte[] lxjPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/lxj", new byte[] { 0x08, 0x05 });
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, lxjPacket);
-            LogDebug("[NPC] Sent LeaveDialogMessage (lxj)");
-        }
-
-        public static async Task HandleNpcDialogReply(NetworkStream stream, byte[] payload)
-        {
-            LogDebug("[Game Node] Received NPC Dialog Reply / Close (kjl)");
-            byte[]? inner  = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/kjl");
-            long   replyId = 1; // default: close
-
-            if (inner != null)
+            if (action == Npcs.Trade || action == Npcs.TradeCosmetics)
             {
-                try
-                {
-                    // Parse kjl → Field 1 is kff bytes → Field 2 of kff is replyId
-                    int pos = 0;
-                    byte[]? kffBytes = null;
-                    while (pos < inner.Length)
-                    {
-                        uint tag      = NetworkEnvelope.ReadVarInt(inner, ref pos);
-                        int  wireType = (int)(tag & 7);
-                        int  fieldNum = (int)(tag >> 3);
-                        if (fieldNum == 1 && wireType == 2)
-                        {
-                            uint length = NetworkEnvelope.ReadVarInt(inner, ref pos);
-                            kffBytes = new byte[length];
-                            Array.Copy(inner, pos, kffBytes, 0, (int)length);
-                            break;
-                        }
-                        else NetworkEnvelope.SkipField(inner, wireType, ref pos);
-                    }
-
-                    if (kffBytes != null)
-                    {
-                        int pos2 = 0;
-                        while (pos2 < kffBytes.Length)
-                        {
-                            uint tag      = NetworkEnvelope.ReadVarInt(kffBytes, ref pos2);
-                            int  wireType = (int)(tag & 7);
-                            int  fieldNum = (int)(tag >> 3);
-                            if (fieldNum == 2 && wireType == 0)
-                            {
-                                replyId = (long)NetworkEnvelope.ReadVarInt64(kffBytes, ref pos2);
-                                break;
-                            }
-                            else NetworkEnvelope.SkipField(kffBytes, wireType, ref pos2);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogDebug($"[NPC] Error parsing kjl: {ex.Message}");
-                }
+                await OpenShopAsync(stream, npc);
+                return;
             }
 
-            LogDebug($"[NPC] Parsed replyId from kjl: {replyId}");
+            if (action == Npcs.Talk)
+            {
+                await OpenDialogAsync(stream, npc, mapId);
+                return;
+            }
 
-            // NpcDialogCloseMessage (kjn) — empty payload to finalize dialogue visual state
-            byte[] kjnPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kjn", Array.Empty<byte>());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, kjnPacket);
-            LogDebug("[NPC] Sent NpcDialogCloseMessage (kjn) to close dialog");
+            Console.WriteLine($"[NPC] Acción {action} sobre el NPC {npc.NpcId}, que no está hecha.");
         }
 
-        private static void LogDebug(string msg) => Program.LogDebug(msg);
+        /// <summary>El catálogo entero, de una sola vez, que es como lo manda el servidor real.</summary>
+        private static async Task OpenShopAsync(NetworkStream stream, Npcs.Spawn npc)
+        {
+            var catalogue = NpcShops.CatalogueOf(npc.NpcId);
+            if (catalogue.Count == 0)
+            {
+                Console.WriteLine($"[NPC] El {npc.NpcId} tiene acción de tienda pero no vende nada.");
+                return;
+            }
+
+            _openShop = npc.ContextualId;
+            _openShopNpc = npc.NpcId;
+
+            byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue);
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("kbd", kbd));
+
+            Console.WriteLine($"[NPC] Tienda del {npc.NpcId}: {catalogue.Count} objetos, " +
+                              $"{kbd.Length} bytes.");
+        }
+
+        /// <summary>La ventana de diálogo y su pregunta, sacadas de la plantilla del NPC.</summary>
+        private static async Task OpenDialogAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
+        {
+            var template = Npcs.TemplateOf(npc.NpcId);
+            if (template == null || template.DialogMessageId == 0)
+            {
+                Console.WriteLine($"[NPC] El {npc.NpcId} no tiene diálogo en su plantilla.");
+                return;
+            }
+
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("ioc", ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("ios", ConnectionProtocol.BuildNpcQuestion(
+                    template.DialogMessageId, template.Replies)));
+
+            Console.WriteLine($"[NPC] Diálogo del {npc.NpcId}: pregunta {template.DialogMessageId}, " +
+                              $"{template.Replies.Length} respuestas.");
+        }
+
+        /// <summary>
+        /// El jugador ha elegido una respuesta (ioy).
+        ///
+        /// El diálogo se cierra siempre, se acepte o se rechace: el kld sale las cuatro veces de la
+        /// captura y va DELANTE de los kamas.
+        /// </summary>
+        public static async Task ReplyAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? ioy = ConnectionProtocol.ReadPayload(payload, "ioy");
+            if (ioy == null) return;
+
+            long reply = 0;
+            foreach (var field in ProtoMessage.Parse(ioy).Fields)
+            {
+                if (field.FieldNumber == 1 && field.WireType == 0) reply = field.VarIntValue;
+            }
+
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("kld", ConnectionProtocol.BuildDialogClosed(
+                    ConnectionProtocol.NpcDialogCloseReason)));
+
+            if (reply != KamasMountainReply)
+            {
+                Console.WriteLine($"[NPC] Respuesta {reply}: no da nada.");
+                return;
+            }
+
+            GameState.Kamas += KamasMountainReward;
+            DatabaseManager.SaveCurrentCharacter();
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(GameState.Kamas)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("lqn", ConnectionProtocol.BuildSystemMessage(
+                    ConnectionProtocol.KamasReceivedMessage, KamasMountainReward.ToString())));
+
+            Console.WriteLine($"[NPC] La montaña de kamas paga {KamasMountainReward}; " +
+                              $"ahora tiene {GameState.Kamas}.");
+        }
+
+        /// <summary>
+        /// Comprar (kea). El cliente manda sólo el objeto y la cantidad: el precio lo pone el
+        /// servidor, que es el que mandó el catálogo.
+        /// </summary>
+        public static async Task BuyAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? kea = ConnectionProtocol.ReadPayload(payload, "kea");
+            if (kea == null) return;
+
+            int gid = 0;
+            long quantity = 1;
+            foreach (var field in ProtoMessage.Parse(kea).Fields)
+            {
+                if (field.WireType != 0) continue;
+                if (field.FieldNumber == 1) gid = (int)field.VarIntValue;
+                else if (field.FieldNumber == 2) quantity = field.VarIntValue;
+            }
+
+            if (gid == 0 || quantity <= 0) return;
+
+            if (_openShop == 0)
+            {
+                Console.WriteLine($"[NPC] Compra del objeto {gid} sin tienda abierta.");
+                return;
+            }
+
+            // Que el vendedor que está abierto lo tenga de verdad: el catálogo lo mandamos nosotros,
+            // así que pedir otra cosa no es una compra válida.
+            bool onSale = false;
+            foreach (int sold in NpcShops.CatalogueOf(_openShopNpc))
+            {
+                if (sold == gid) { onSale = true; break; }
+            }
+            if (!onSale)
+            {
+                Console.WriteLine($"[NPC] El vendedor {_openShopNpc} no vende el objeto {gid}.");
+                return;
+            }
+
+            long price = NpcShops.PriceOf(gid) * quantity;
+            if (GameState.Kamas < price)
+            {
+                Console.WriteLine($"[NPC] El objeto {gid} cuesta {price} y sólo hay {GameState.Kamas}.");
+                return;
+            }
+
+            long uid = NextUid();
+            string effects = NpcShops.EffectsOf(gid);
+
+            if (!DatabaseManager.InsertCharacterItem(uid, GameState.CharacterId, gid, (int)quantity,
+                                                     Equipment.Bag, effects))
+            {
+                Console.WriteLine($"[NPC] No se ha podido guardar el objeto {gid}.");
+                return;
+            }
+
+            Equipment.Add(uid, gid, (int)quantity, Equipment.Bag, effects);
+
+            GameState.Kamas -= price;
+            DatabaseManager.SaveCurrentCharacter();
+
+            var bought = new HavenBagStore.StoredItem
+            {
+                Uid = uid,
+                Gid = gid,
+                Quantity = (int)quantity,
+                Effects = effects,
+            };
+
+            // El orden es el medido, y las dos tandas de ivf/iun también: el servidor real las manda
+            // idénticas antes y después del kdg. Como las dos llevan el total y no un incremento,
+            // repetirlas no descuadra nada.
+            long capacity = 1000 + 5L * GameState.StatStrength;
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("lqn", ConnectionProtocol.BuildSystemMessage(
+                    ConnectionProtocol.PurchaseMessage,
+                    gid.ToString(), uid.ToString(), quantity.ToString(), price.ToString())));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(GameState.Kamas)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("iua", ConnectionProtocol.BuildItemArrived(3, bought)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("iun", ConnectionProtocol.BuildPods(0, capacity)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push("kdg"));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(GameState.Kamas)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("iun", ConnectionProtocol.BuildPods(0, capacity)));
+
+            Console.WriteLine($"[NPC] Comprado el objeto {gid} x{quantity} (uid {uid}) por {price}; " +
+                              $"quedan {GameState.Kamas} kamas.");
+        }
+
+        /// <summary>
+        /// El botón de cerrar de la tienda (kla vacío).
+        ///
+        /// El cliente lo manda DOS veces seguidas, separadas menos de un milisegundo, y el servidor
+        /// real contesta un solo khd. Por eso se cierra a la primera y la segunda se cae sola: al
+        /// no haber ya tienda abierta, GameNodeProxy la lleva al zaap y ése tampoco tiene nada
+        /// abierto.
+        /// </summary>
+        public static async Task CloseShopAsync(NetworkStream stream)
+        {
+            _openShop = 0;
+            _openShopNpc = 0;
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("khd", ConnectionProtocol.BuildShopClosed()));
+        }
+
+        /// <summary>Al cambiar de mapa no queda nada abierto.</summary>
+        public static void Forget()
+        {
+            _openShop = 0;
+            _openShopNpc = 0;
+        }
+
+        private static long NextUid()
+        {
+            try
+            {
+                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
+                    DatabaseManager.WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT MAX(Uid) FROM CharacterItems WHERE Uid >= $desde;";
+                command.Parameters.AddWithValue("$desde", FirstUid);
+
+                object? result = command.ExecuteScalar();
+                if (result is long max && max >= FirstUid) return max + 1;
+            }
+            catch { }
+            return FirstUid;
+        }
     }
 }

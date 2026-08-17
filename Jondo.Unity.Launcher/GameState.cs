@@ -136,6 +136,15 @@ namespace Jondo.Unity.Launcher
         public int Quantity { get; set; }
         public int Position { get; set; } // Equipment slot or inventory position
         public Dictionary<int, int> Effects { get; set; } = new Dictionary<int, int>();
+
+        /// <summary>
+        /// Los efectos tal cual estaban guardados, [[efecto, valor, dado, cara], ...].
+        ///
+        /// Se conserva para devolverlos a la base sin tocar. El diccionario de arriba sólo se
+        /// queda con el efecto y su valor, y volver a escribir eso perdería los dados —el daño de
+        /// las armas, sin ir más lejos— en cuanto el objeto se guardase por cualquier motivo.
+        /// </summary>
+        public string RawEffects { get; set; } = "";
     }
 
     public class EquippedItemInfo

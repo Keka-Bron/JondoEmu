@@ -38,6 +38,20 @@ namespace Jondo.Unity.World.Fights
         public long RoleplayMapId { get; set; }
         public long ArenaMapId { get; set; }
 
+        /// <summary>
+        /// Cuándo empezó a pelearse de verdad, para saber lo que ha durado: la pantalla de fin de
+        /// combate lo enseña arriba a la derecha y sin esto salía 00:00.
+        /// </summary>
+        public DateTime StartedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// El número que le toca al siguiente embrujo. Es del COMBATE, no de cada luchador: en la
+        /// captura los del jugador y los del monstruo van en la misma serie, y es el número con el
+        /// que luego se quita cada uno.
+        /// </summary>
+        private int _ultimoEmbrujo;
+        public int SiguienteEmbrujo() => ++_ultimoEmbrujo;
+
         public CancellationTokenSource PlacementTimerCts { get; set; }
         public CancellationTokenSource TurnTimerCts { get; set; }
 
@@ -125,9 +139,85 @@ namespace Jondo.Unity.World.Fights
             UpdateTurnOrder();
         }
 
+        /// <summary>
+        /// El siguiente identificador libre para un invocado.
+        ///
+        /// Los combatientes que no son jugadores llevan número negativo y se reparten de uno en
+        /// uno: en las capturas del Ocra los pious son -1 y -2 y la primera baliza sale con el -3,
+        /// la segunda con el -4, y así. Se mira lo que ya hay para no pisar a nadie.
+        /// </summary>
+        public long SiguienteIdDeInvocado()
+        {
+            long menor = 0;
+            foreach (var f in Team0) if (f.Id < menor) menor = f.Id;
+            foreach (var f in Team1) if (f.Id < menor) menor = f.Id;
+            return menor - 1;
+        }
+
+        /// <summary>
+        /// Mete un invocado en el combate, en el bando del que lo invoca, y rehace el orden de
+        /// turnos para que le toque jugar.
+        /// </summary>
+        public void Invocar(Fighter invocado, Fighter dueno)
+        {
+            invocado.Invocador = dueno.Id;
+            invocado.TeamId = dueno.TeamId;
+            (dueno.TeamId == 0 ? Team0 : Team1).Add(invocado);
+
+            // El que está jugando ahora mismo sigue jugando: se rehace la lista pero se conserva
+            // a quién le toca, que si no el turno se le va al de al lado en mitad de una acción.
+            var jugando = CurrentFighter;
+            TurnOrder = BuildAlternatingTurnOrder();
+            if (jugando != null && TurnOrder.Contains(jugando))
+            {
+                CurrentTurnIndex = TurnOrder.IndexOf(jugando);
+            }
+        }
+
+        /// <summary>
+        /// Los invocados a los que se les ha acabado el tiempo en esta ronda. El efecto 141 les
+        /// cuelga la cuenta atrás al nacer y aquí se cobra.
+        /// </summary>
+        public List<Fighter> InvocadosQueSeDeshacen(int ronda)
+        {
+            var fuera = new List<Fighter>();
+            foreach (var f in Team0) if (SeDeshace(f, ronda)) fuera.Add(f);
+            foreach (var f in Team1) if (SeDeshace(f, ronda)) fuera.Add(f);
+            return fuera;
+        }
+
+        private static bool SeDeshace(Fighter f, int ronda)
+            => f.EsInvocado && f.IsAlive && f.MuereEnRonda >= 0 && ronda >= f.MuereEnRonda;
+
         public void UpdateTurnOrder()
         {
             TurnOrder = BuildAlternatingTurnOrder();
+        }
+
+        /// <summary>
+        /// Un bando en orden de juego: los de siempre por iniciativa, y detrás de cada uno los que
+        /// haya invocado, en el orden en que los sacó.
+        ///
+        /// Los invocados que no juegan turno se quedan fuera de la lista, pero siguen estando en
+        /// el combate: se les puede pegar y cuentan para el tablero.
+        /// </summary>
+        private static List<List<Fighter>> Agrupar(List<Fighter> bando)
+        {
+            var salida = new List<List<Fighter>>();
+            foreach (var quien in bando.Where(f => f.IsAlive && !f.EsInvocado)
+                                       .OrderByDescending(f => f.Initiative))
+            {
+                var grupo = new List<Fighter> { quien };
+                foreach (var suyo in bando)
+                {
+                    if (suyo.IsAlive && suyo.EsInvocado && suyo.JuegaTurno && suyo.Invocador == quien.Id)
+                    {
+                        grupo.Add(suyo);
+                    }
+                }
+                salida.Add(grupo);
+            }
+            return salida;
         }
 
         public bool SetFighterReady(long fighterId)
@@ -158,6 +248,7 @@ namespace Jondo.Unity.World.Fights
         {
             CancelPlacementTimer();
             State = FightState.Ongoing;
+            StartedAt = DateTime.UtcNow;
             if (TurnOrder.Count == 0)
             {
                 TurnOrder = BuildAlternatingTurnOrder();
@@ -172,27 +263,33 @@ namespace Jondo.Unity.World.Fights
 
         public List<Fighter> BuildAlternatingTurnOrder()
         {
-            var team0Sorted = Team0.Where(f => f.IsAlive).OrderByDescending(f => f.Initiative).ToList();
-            var team1Sorted = Team1.Where(f => f.IsAlive).OrderByDescending(f => f.Initiative).ToList();
+            // Los invocados NO se ordenan por iniciativa: van pegados a quien los puso, y sólo los
+            // que tengan algo que hacer al empezar su turno. Es lo que se ve en las capturas, con
+            // la Baliza de Supervivencia jugando siempre justo detrás de su Ocra.
+            // Se intercalan GRUPOS, no combatientes sueltos: cada grupo es uno de los de siempre
+            // con sus invocados detrás. Intercalando de uno en uno, la baliza se separaba de su
+            // Ocra y jugaba después del monstruo, cuando en la captura va inmediatamente detrás.
+            var team0Sorted = Agrupar(Team0);
+            var team1Sorted = Agrupar(Team1);
 
             var result = new List<Fighter>();
             int maxCount = Math.Max(team0Sorted.Count, team1Sorted.Count);
 
-            int team0BestInit = team0Sorted.FirstOrDefault()?.Initiative ?? 0;
-            int team1BestInit = team1Sorted.FirstOrDefault()?.Initiative ?? 0;
+            int team0BestInit = team0Sorted.FirstOrDefault()?[0].Initiative ?? 0;
+            int team1BestInit = team1Sorted.FirstOrDefault()?[0].Initiative ?? 0;
             bool team0First = team0BestInit >= team1BestInit;
 
             for (int i = 0; i < maxCount; i++)
             {
                 if (team0First)
                 {
-                    if (i < team0Sorted.Count) result.Add(team0Sorted[i]);
-                    if (i < team1Sorted.Count) result.Add(team1Sorted[i]);
+                    if (i < team0Sorted.Count) result.AddRange(team0Sorted[i]);
+                    if (i < team1Sorted.Count) result.AddRange(team1Sorted[i]);
                 }
                 else
                 {
-                    if (i < team1Sorted.Count) result.Add(team1Sorted[i]);
-                    if (i < team0Sorted.Count) result.Add(team0Sorted[i]);
+                    if (i < team1Sorted.Count) result.AddRange(team1Sorted[i]);
+                    if (i < team0Sorted.Count) result.AddRange(team0Sorted[i]);
                 }
             }
             return result;
@@ -250,8 +347,11 @@ namespace Jondo.Unity.World.Fights
 
         public void CheckFightEnd()
         {
-            bool team0Alive = Team0.Any(f => f.IsAlive);
-            bool team1Alive = Team1.Any(f => f.IsAlive);
+            // Los invocados NO cuentan para saber si un bando sigue en pie: matar la baliza del
+            // rival no gana un combate. Cuando el que las puso se muere se le caen todas en el
+            // acto, así que en la práctica esto es un cinturón además de los tirantes.
+            bool team0Alive = Team0.Any(f => f.IsAlive && !f.EsInvocado);
+            bool team1Alive = Team1.Any(f => f.IsAlive && !f.EsInvocado);
 
             if (!team1Alive)
             {
