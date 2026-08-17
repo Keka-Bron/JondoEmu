@@ -1,4 +1,4 @@
-High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a functional PvM combat engine.
+High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a playable PvM combat engine with a data-driven spell effect system.
 
 > ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.10.10 (mid August 2026)**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes.
 
@@ -147,30 +147,88 @@ Details worth knowing:
   - **Radius-2 cell validation** (`GetInnerWalkableCells`) so mobs never spawn on decorations, walls, house windows or zaap pillars.
 - [x] **187 dungeons** with their **763 rooms**, entrance and exit.
 
-### ⚔️ PvM Combat (STILL MIGRATING FROM v 3.6.4.3 - CURRENTLY DISABLED FOR SAFETY)
+### ⚔️ PvM Combat
+Playable. The migration from 3.6.4.3 is done and fights are no longer gated.
+
 - [x] **Tactical arenas** — each roleplay map resolves to its combat arena by zone offset.
 - [x] **Context transitions** — clean switching between roleplay and tactical combat, restoring world state when the fight ends.
 - [x] **Placement phase** — red and blue placement tiles with cell swapping before *Ready*.
 - [x] **Isometric grid geometry** (`MapGeometry`) using a pre-computed $O(1)$ BFS distance matrix.
 - [x] **Line of sight** — obstacle validation extracted for **17,222 maps**, tracing segments between cell centres.
 - [x] **Turn protocol and timers** — handshake, 30-second turns with automatic pass, AP/MP replenishment.
-- [x] **Movement** — cell-by-cell path expansion with MP deduction.
-- [x] **Spells and elemental damage** — level-based querying (AP cost, range, LoS, per-turn and per-target limits), damage from stats, equipment power and target resistances, and critical rolls.
+- [x] **Movement** — cell-by-cell path expansion, MP charged per tile, and collision against occupied cells.
 - [x] **Active monster AI** — target selection by lowest HP, HP percentage, isolation and distance; ranged attacks; minimal-MP BFS pathing; and fleeing below 30% HP.
 - [x] **Fight resolution and progression** — victory and defeat screens, experience over **1,889 levels**, official loot drops, level ups and group respawns.
 
+### ✨ Spell effect engine
+One engine for all eighteen classes, driven entirely by client data. There is not a single spell
+written by hand: everything comes out of `SpellLevels.EffectsJson` and the `Effects` catalogue.
+
+- [x] **Effects, triggers and target masks** read from the spell itself — `I` on cast, `TB` at turn
+      start, `TE` at turn end, `DBE` when hit, `CCMPARR` per tile walked. `a` are allies, `A` are
+      enemies, `g` are summons, and `E<n>` / `e<n>` gate on a state.
+- [x] **States** need no code: effect 950 sets a number, 951 clears it, and the masks do the rest.
+- [x] **Area shapes** from `zoneDescr` — point, circle, cross, line, diamond, square and whole-map,
+      with the per-tile damage falloff each spell declares (10% per tile, capped at four steps, on
+      the spells that carry it).
+- [x] **Displacement** — push, pull, step back and step forward, with the direction taken from the
+      centre of the area, stopping at walls, holes and other fighters.
+- [x] **Criticals** — rolled against the spell's own probability plus the character's, using the
+      spell's separate critical effect list (Frozen Arrow goes from 21-24 to 25-29).
+- [x] **Point steal**, life steal, erosion of maximum HP, and damage-taken multipliers.
+- [x] **Buff panel** — every effect reaches the client's *Effects* window with its icon, value,
+      remaining rounds and dispellable flag; buffs expire on their round and are retracted.
+- [x] **Cooldowns and cast limits** — per turn, per target, minimum interval and initial cooldown.
+- [x] **Summons** — real fighters, not buffs: their own sheet, a place in the turn carousel next to
+      their owner, their own behaviour spell, a lifetime, and they all fall when their summoner
+      dies. Weighted random picks the variant (80% Arakna / 20% Greater Arakna), and the summon cap
+      comes from the character's own characteristic.
+- [x] **Item attitudes** — the six Dofus and the trophies grant their spell through effect 1175 and
+      hook into the same triggers.
+
+Everything above was measured against real packet captures and is covered by an offline harness
+that compares the emulator's bytes against the capture's, packet by packet.
+
+### 🏹 Class status
+The engine is shared, so every class gets whatever its spells happen to use. Only the **Cra** has
+been driven against real captures spell by spell; the rest are untested and listed for honesty.
+
+| Class | Spells with every effect applied |
+|---|---:|
+| **Cra** (tested against 37 captures) | **17 / 44** |
+| Enutrof | 26 / 44 |
+| Osamodas | 21 / 44 |
+| Feca, Iop | 20 / 44 |
+| Pandawa, Eliotrope | 19 / 44 |
+| Sacrier | 18 / 44 |
+| Sram, Zobal | 15 / 44 |
+| Ecaflip, Rogue | 11 / 44 |
+| Steamer | 5 / 44 |
+| Sadida, Ouginak | 4 / 44 |
+| Eniripsa | 2 / 44 |
+| Huppermage | 1 / 44 |
+| Xelor | 0 / 44 |
+
+A spell counts only when **all** of its effects resolve. The gaps are concentrated in a handful of
+effect families — glyphs and traps, appearance changes, spell-effect removal — so they close in
+blocks rather than one spell at a time.
+
 ### 🚧 Work in progress
-- [ ] **Commands** — `.level` and `.kamas` exist but are rough.
-- [ ] **Partial combat mechanics**:
-  - Pushback trajectory (destination cell is calculated; collision damage and the pushback animation are not).
-  - Weapon strikes (damage and AP cost apply; the slash animation does not).
-  - Stat reductions (stats drop; the fighter debuff widget does not show).
-  - Inventory kamas (persist and show on the victory screen; the UI tab needs a refresh).
+- [ ] **Combat stat panel** — buffs feed the damage formula correctly, but the character sheet and
+      the damage preview still show the pre-buff numbers: the per-characteristic sheet packet is
+      measured and not yet emitted.
+- [ ] **Glyphs and traps** (effects 400, 401, 1091) — the board entity exists for summons; these
+      reuse it but are not wired.
+- [ ] **Appearance-changing spells** — the transform payload is an opaque blob that has not been
+      decoded, so the Cra's Sentinel works but does not change its look.
+- [ ] **Commands** — `.teleport`, `.kamas`, `.shop`, `.size` and `.level` work; `.level` does not
+      refresh the in-fight spell bar.
+- [ ] **Weapon strikes** — damage and AP cost apply; the slash animation does not.
 
 ### ❌ Not implemented
 - [ ] Kolossium and PvP combat
 - [ ] Multiplayer Account System
-- [ ] Advanced combat features (AP/MP dodge rolls, area-of-effect spell shapes, summons, shields, lock and dodge in melee)
+- [ ] AP/MP dodge rolls, shields, lock and tackle in melee
 - [ ] Professions
 - [ ] Achievements
 - [ ] Guilds
@@ -184,9 +242,16 @@ Details worth knowing:
   * **`Jondo.Unity.Core`** — core networking infrastructure and TCP servers.
   * **`Jondo.Unity.Auth`** — authentication and HAAPI service handlers.
   * **`Jondo.Unity.Protocol`** — protocol buffers, constants and message definitions.
-  * **`Jondo.Unity.World`** — game node / world logic, combat engine (`FightInstance`), isometric geometry (`MapGeometry`) and monster AI.
+  * **`Jondo.Unity.World`** — game node / world logic, combat engine (`FightInstance`), buffs and
+    states (`Embrujo`), area shapes and displacement (`Zona`), isometric geometry (`MapGeometry`)
+    and monster AI.
 * **`JondoFix`** — the MelonLoader client mod, source plus the compiled `JondoFix.dll`.
-* **`docs/EspecificacionTecnica.md`** — protocol specification, network architecture, ports and iteration logs.
+* **`docs/fight.md`** — how a fight is put together on the wire, opcode by opcode.
+* **`docs/multijugador.md`** — the plan for multi-session and multiplayer support.
+
+The spell effect engine lives in `Jondo.Unity.Launcher/Managers`: `EfectosDeHechizo` reads the
+spell data, `MotorDeEfectos` turns it into things that happen to somebody, and `Invocaciones`
+builds summoned fighters from the monster templates.
 
 ---
 
