@@ -188,6 +188,58 @@ namespace Jondo.Unity.Launcher.Network
                     }
                 }
             }
+
+            // Y si los bloques no traen ningún kub —que es lo que pasa: ninguno de los tres lo
+            // lleva—, la lista sale del fichero medido.
+            AprenderDelFichero();
+        }
+
+        /// <summary>
+        /// La lista de características y su hueco, sacada de las capturas.
+        ///
+        /// Los tres bloques de datos/ NO contienen ni un kub, así que lo de arriba se quedaba
+        /// siempre con la lista vacía y la ficha caía en la de emergencia: seis características
+        /// más las primarias, veinticinco en total en vez de ciento veinte. El personaje aparecía
+        /// sin crítico, sin potencia, sin alcance, sin placaje, sin huida, sin esquivas, sin daños
+        /// elementales y sin resistencias, porque esas entradas sencillamente no viajaban.
+        ///
+        /// No se notaba porque el panel bueno lo pinta la reproducción de los bloques al entrar al
+        /// mundo, y este constructor apenas se usaba. Al empezar a mandarlo también al acabar un
+        /// combate, pasó a pisar la ficha buena.
+        ///
+        /// El fichero lo genera tools/extraer_caracteristicas_kub.py de los 672 kub reales que hay
+        /// en las capturas. El hueco de cada una importa: tres van en el f2 —29, 47 y 96—, dos en
+        /// el f5 —los puntos de acción y de movimiento— y las 115 restantes en el f4. Mandar una
+        /// en el hueco que no le toca hace que el cliente reviente y pierda la ficha entera.
+        /// </summary>
+        private static void AprenderDelFichero()
+        {
+            try
+            {
+                string ruta = System.IO.Path.Combine("datos", "caracteristicas_kub.json");
+                if (!System.IO.File.Exists(ruta))
+                {
+                    Console.WriteLine("[World] No está datos/caracteristicas_kub.json: la ficha de " +
+                                      "características saldrá corta.");
+                    return;
+                }
+
+                using var doc = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(ruta));
+                foreach (var entrada in doc.RootElement.EnumerateArray())
+                {
+                    int id = entrada.GetProperty("id").GetInt32();
+                    int hueco = entrada.GetProperty("hueco").GetInt32();
+                    if (!_characteristicIds.Contains(id)) _characteristicIds.Add(id);
+                    _containers[id] = hueco;
+                }
+
+                Console.WriteLine($"[World] {_characteristicIds.Count} características leídas de " +
+                                  $"datos/caracteristicas_kub.json.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[World] No se pudo leer la lista de características: {ex.Message}");
+            }
         }
 
         /// <summary>

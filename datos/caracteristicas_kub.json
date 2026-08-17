@@ -1,0 +1,602 @@
+[
+ {
+  "id": 0,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 1,
+  "hueco": 5,
+  "veces": 672
+ },
+ {
+  "id": 3,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 5,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 10,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 11,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 12,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 13,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 14,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 15,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 16,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 17,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 18,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 19,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 20,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 21,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 22,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 23,
+  "hueco": 5,
+  "veces": 672
+ },
+ {
+  "id": 24,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 25,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 26,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 27,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 28,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 29,
+  "hueco": 2,
+  "veces": 672
+ },
+ {
+  "id": 30,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 31,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 32,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 33,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 34,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 35,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 36,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 37,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 39,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 40,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 41,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 42,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 43,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 44,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 45,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 46,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 47,
+  "hueco": 2,
+  "veces": 672
+ },
+ {
+  "id": 48,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 49,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 50,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 51,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 52,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 53,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 54,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 55,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 56,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 57,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 58,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 69,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 70,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 71,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 72,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 74,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 75,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 76,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 77,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 78,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 79,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 80,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 81,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 82,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 83,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 84,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 85,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 86,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 87,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 88,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 89,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 90,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 91,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 92,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 93,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 94,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 95,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 96,
+  "hueco": 2,
+  "veces": 672
+ },
+ {
+  "id": 97,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 98,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 99,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 100,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 101,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 102,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 103,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 104,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 105,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 106,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 107,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 108,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 109,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 110,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 120,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 121,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 122,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 123,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 124,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 125,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 126,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 127,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 128,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 129,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 130,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 131,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 132,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 133,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 134,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 135,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 136,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 137,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 138,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 139,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 140,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 141,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 142,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 143,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 150,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 158,
+  "hueco": 4,
+  "veces": 672
+ },
+ {
+  "id": 200,
+  "hueco": 4,
+  "veces": 672
+ }
+]
