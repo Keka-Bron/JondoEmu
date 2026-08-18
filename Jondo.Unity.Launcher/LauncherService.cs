@@ -121,7 +121,7 @@ namespace Jondo.Unity.Launcher
                     return new Result
                     {
                         Success = false,
-                        Message = "La session de ce compte a expiré. Reconnecte ce compte avant de lancer le jeu."
+                        Message = UI.LauncherTexts.Current.SessionExpiredError
                     };
                 }
 
@@ -185,7 +185,7 @@ namespace Jondo.Unity.Launcher
                 if (client == null)
                 {
                     ClientLaunchRegistry.Remove(launch);
-                    return new Result { Success = false, Message = "Le processus Dofus n'a pas pu démarrer." };
+                    return new Result { Success = false, Message = UI.LauncherTexts.Current.ClientStartFailed };
                 }
 
                 client.EnableRaisingEvents = true;

@@ -72,6 +72,30 @@ namespace Jondo.Unity.Launcher.Handlers
                             oldMapId,
                             ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId),
                             SessionContext.Current.Id);
+
+                        // Y que los del mapa NUEVO le vean llegar.
+                        //
+                        // Faltaba: al cambiar de mapa salía el jsd hacia el mapa viejo y nada hacia
+                        // el nuevo. El que llega sí ve a los que ya estaban —su jss y su jpv los
+                        // traen— pero ellos a él no, hasta que recargaran el mapa. Es el mismo
+                        // aviso que ya se manda al entrar al mundo, y va detrás del joh para que
+                        // el que llega esté ya contado en el mapa nuevo.
+                        var quienLlega = DatabaseManager.GetCharacterById(SessionContext.State.CharacterId);
+                        if (quienLlega != null)
+                        {
+                            int avisados = await SessionRegistry.BroadcastToMapAsync(
+                                requestedMapId,
+                                ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
+                                    quienLlega, spawnCellId, newOrientation,
+                                    SessionContext.Current.AccountId)),
+                                SessionContext.Current.Id);
+                            if (avisados > 0)
+                            {
+                                LogDebug($"[Map Change] {quienLlega.Name} llega al mapa {requestedMapId}; " +
+                                         $"avisados {avisados} jugador(es) que ya estaban allí.");
+                            }
+                        }
+
                         LogDebug($"[Map Change] Sent native joh (CurrentMapMessage) for Map ID: {requestedMapId}");
                     }
                 }

@@ -19,7 +19,12 @@ namespace Jondo.Unity.Launcher.Network
             public long AccountId { get; init; }
             public string Hash { get; init; } = "";
             public string LauncherToken { get; init; } = "";
-            public string Language { get; init; } = "fr";
+
+            /// <summary>
+            /// El idioma con el que arranca este cliente. Por defecto el del lanzador, que es
+            /// español salvo que se cambie: aquí ponía "fr" a pelo.
+            /// </summary>
+            public string Language { get; init; } = "es";
             public DateTime CreatedAtUtc { get; init; }
         }
 
@@ -40,10 +45,11 @@ namespace Jondo.Unity.Launcher.Network
 
             lock (RegistrationGate)
             {
+                // Los avisos, en el idioma que tenga puesto el lanzador. Estaban en francés fijo.
                 if (ByAccount.ContainsKey(accountId))
-                    throw new InvalidOperationException("Ce compte possède déjà un client actif.");
+                    throw new InvalidOperationException(UI.LauncherTexts.Current.AccountAlreadyRunning);
                 if (ByAccount.Count >= MaximumClients)
-                    throw new InvalidOperationException("La limite de 8 clients actifs est atteinte.");
+                    throw new InvalidOperationException(UI.LauncherTexts.Current.MaxClientsError);
 
                 var launch = new Launch
                 {

@@ -60,6 +60,14 @@ namespace Jondo.Unity.Launcher.UI
         public string AutoScroll { get; init; } = "";
         public string GenericError { get; init; } = "";
 
+        // Los avisos de lanzar un cliente. Estaban escritos en francés dentro de LauncherService y
+        // de ClientLaunchRegistry, así que salían en francés con el lanzador puesto en español o en
+        // inglés. Aquí es donde vive el idioma.
+        public string SessionExpiredError { get; init; } = "";
+        public string ClientStartFailed { get; init; } = "";
+        public string AccountAlreadyRunning { get; init; } = "";
+        public string MaxClientsError { get; init; } = "";
+
         private static readonly Dictionary<Language, LauncherTexts> Catalog = new()
         {
             [Language.Es] = new LauncherTexts
@@ -103,7 +111,11 @@ namespace Jondo.Unity.Launcher.UI
                 NewUsernamePlaceholder = "3-32 caracteres",
                 NicknamePlaceholder = "Apodo",
                 AutoScroll = "Auto-Scroll",
-                GenericError = "Error."
+                GenericError = "Error.",
+                SessionExpiredError = "La sesión de esta cuenta ha caducado. Vuelve a conectarla antes de jugar.",
+                ClientStartFailed = "No se ha podido arrancar el cliente de Dofus.",
+                AccountAlreadyRunning = "Esta cuenta ya tiene un cliente abierto.",
+                MaxClientsError = "Ya hay 8 clientes abiertos, que es el máximo."
             },
             [Language.En] = new LauncherTexts
             {
@@ -146,7 +158,11 @@ namespace Jondo.Unity.Launcher.UI
                 NewUsernamePlaceholder = "3-32 characters",
                 NicknamePlaceholder = "Nickname",
                 AutoScroll = "Auto-Scroll",
-                GenericError = "Error."
+                GenericError = "Error.",
+                SessionExpiredError = "This account's session has expired. Log it in again before playing.",
+                ClientStartFailed = "The Dofus client could not be started.",
+                AccountAlreadyRunning = "This account already has a client running.",
+                MaxClientsError = "There are already 8 clients running, which is the maximum."
             },
             [Language.Fr] = new LauncherTexts
             {
@@ -189,11 +205,18 @@ namespace Jondo.Unity.Launcher.UI
                 NewUsernamePlaceholder = "3-32 caractères",
                 NicknamePlaceholder = "Pseudo",
                 AutoScroll = "Auto-Scroll",
-                GenericError = "Erreur."
+                GenericError = "Erreur.",
+                SessionExpiredError = "La session de ce compte a expiré. Reconnecte-le avant de jouer.",
+                ClientStartFailed = "Le client Dofus n'a pas pu démarrer.",
+                AccountAlreadyRunning = "Ce compte possède déjà un client actif.",
+                MaxClientsError = "Il y a déjà 8 clients actifs, ce qui est le maximum."
             }
         };
 
         public static LauncherTexts Get(Language language) => Catalog[language];
+
+        /// <summary>Los textos en el idioma que el lanzador tenga puesto ahora mismo.</summary>
+        public static LauncherTexts Current => Get(LauncherPreferences.Language);
 
         /// <summary>Two-letter language code, used to draw the flag.</summary>
         public static string Code(Language language) => language switch
