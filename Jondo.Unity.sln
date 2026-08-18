@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Parser", "Jondo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.World", "Jondo.Unity.World\Jondo.Unity.World.csproj", "{F8CDF0CA-AFC6-4D48-9CAE-3EECABED3506}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Contrato", "Jondo.Unity.Contrato\Jondo.Unity.Contrato.csproj", "{E2235E7D-8C4F-43BE-9A83-1E4FFDCB31B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Contract", "Jondo.Unity.Contract\Jondo.Unity.Contract.csproj", "{E2235E7D-8C4F-43BE-9A83-1E4FFDCB31B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Lanzador", "Jondo.Unity.Lanzador\Jondo.Unity.Lanzador.csproj", "{4906C20A-F84D-4960-BA85-C298EBB9483A}"
 EndProject
