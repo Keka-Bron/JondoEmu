@@ -2,11 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- Lleva tambien el ASPECTO compartido: la paleta y el logo. Los dos ejecutables pintan
+         igual porque pintan con lo mismo, no porque alguien copie los colores a mano. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <!-- Lo poco que el servidor y el lanzador tienen que saber el uno del otro. Ni base de datos,
          ni protocolo, ni ventanas: rutas de fichero y el contrato del canal de mando. Es la unica
          pieza que viaja en los DOS ejecutables, asi que cuanto menos tenga, mejor. -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
 
 </Project>

@@ -124,6 +124,15 @@ namespace Jondo.Unity.Launcher.UI
             set => Escribir(ClaveServidor, (value ?? "").Trim());
         }
 
+        /// <summary>
+        /// Los textos en el idioma que tenga puesto el lanzador.
+        ///
+        /// Vive aquí y no en LauncherTexts porque el catálogo lo comparten el lanzador y el
+        /// servidor, y cada uno recuerda su idioma por su cuenta: pueden estar en máquinas
+        /// distintas y de personas distintas.
+        /// </summary>
+        public static LauncherTexts Textos => LauncherTexts.Get(Language);
+
         /// <summary>Si el servidor es el de esta máquina, que es lo que decide si se puede arrancar.</summary>
         public static bool ServerIsLocal
         {

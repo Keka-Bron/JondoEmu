@@ -107,8 +107,8 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private static string MensajeDeSilencio(Network.ClienteDeControl.Respuesta respuesta)
             => respuesta.Llego && respuesta.Codigo == 403
-                ? UI.LauncherTexts.Current.ControlRechazado
-                : UI.LauncherTexts.Current.ServidorSinResponder;
+                ? UI.LauncherPreferences.Textos.ControlRechazado
+                : UI.LauncherPreferences.Textos.ServidorSinResponder;
 
         /// <summary>Crea una cuenta nueva con su apodo. La escribe el servidor, no el lanzador.</summary>
         public static Result RegisterAccount(string username, string password, string nickname, string clientIp)
@@ -129,7 +129,7 @@ namespace Jondo.Unity.Launcher
             {
                 Success = bien,
                 Message = bien
-                    ? UI.LauncherTexts.Current.AccountCreated
+                    ? UI.LauncherPreferences.Textos.AccountCreated
                     : (cuerpo.Value.TryGetProperty("motivo", out var m) ? (m.GetString() ?? "") : ""),
             };
         }
@@ -163,10 +163,10 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private static string EnCristiano(string codigo) => codigo switch
         {
-            Contrato.MotivoSesionCaducada => UI.LauncherTexts.Current.SessionExpiredError,
-            Contrato.MotivoCuentaYaAbierta => UI.LauncherTexts.Current.AccountAlreadyRunning,
-            Contrato.MotivoTopeDeClientes => UI.LauncherTexts.Current.MaxClientsError,
-            _ => codigo.Length > 0 ? codigo : UI.LauncherTexts.Current.GenericError,
+            Contrato.MotivoSesionCaducada => UI.LauncherPreferences.Textos.SessionExpiredError,
+            Contrato.MotivoCuentaYaAbierta => UI.LauncherPreferences.Textos.AccountAlreadyRunning,
+            Contrato.MotivoTopeDeClientes => UI.LauncherPreferences.Textos.MaxClientsError,
+            _ => codigo.Length > 0 ? codigo : UI.LauncherPreferences.Textos.GenericError,
         };
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Jondo.Unity.Launcher
                     return new Result
                     {
                         Success = false,
-                        Message = UI.LauncherTexts.Current.ClientNotFound
+                        Message = UI.LauncherPreferences.Textos.ClientNotFound
                     };
                 }
 
@@ -201,7 +201,7 @@ namespace Jondo.Unity.Launcher
                     return new Result
                     {
                         Success = false,
-                        Message = UI.LauncherTexts.Current.ServidorSinResponder
+                        Message = UI.LauncherPreferences.Textos.ServidorSinResponder
                     };
                 }
 
@@ -271,7 +271,7 @@ namespace Jondo.Unity.Launcher
                 if (client == null)
                 {
                     Devolver(accountId);
-                    return new Result { Success = false, Message = UI.LauncherTexts.Current.ClientStartFailed };
+                    return new Result { Success = false, Message = UI.LauncherPreferences.Textos.ClientStartFailed };
                 }
 
                 // Cuando el cliente se cierre hay que decírselo al servidor, que es quien lleva la

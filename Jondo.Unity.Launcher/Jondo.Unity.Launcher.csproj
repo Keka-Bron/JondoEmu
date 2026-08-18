@@ -14,9 +14,9 @@
   <PropertyGroup>
     <!-- EL SERVIDOR. Una consola, no una ventana: desde que el lanzador es otro ejecutable, aqui
          dentro no queda ni una linea de WinForms. -->
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <AssemblyName>Jondo Servidor</AssemblyName>
+    <AssemblyName>Jondo Server</AssemblyName>
     <RootNamespace>Jondo.Unity.Launcher</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>

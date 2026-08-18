@@ -119,7 +119,7 @@ namespace Jondo.Unity.Launcher.UI
 
         public LauncherWindow()
         {
-            _language = LauncherTexts.LoadLanguage();
+            _language = LauncherPreferences.Language;
             _texts = LauncherTexts.Get(_language);
             foreach (var saved in LauncherPreferences.LoadAccounts())
             {
@@ -890,7 +890,7 @@ namespace Jondo.Unity.Launcher.UI
             if (_language == language) return;
             _language = language;
             _texts = LauncherTexts.Get(language);
-            LauncherTexts.SaveLanguage(language);
+            LauncherPreferences.Language = language;
             ApplyLanguage();
             RebuildLayout();
         }

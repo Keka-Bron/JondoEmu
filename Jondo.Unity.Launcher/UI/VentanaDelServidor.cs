@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -12,149 +11,184 @@ namespace Jondo.Unity.Launcher.UI
     /// La cara del servidor.
     ///
     /// El registro se veía en el lanzador, que era el mismo proceso. Desde que son dos, el registro
-    /// es del servidor y se ve aquí: quien lleva el servidor lo tiene delante sin depender de que
-    /// haya un lanzador abierto, y el lanzador que se reparte a los jugadores se queda sin ninguna
-    /// forma de leer la consola de nadie.
+    /// es del servidor y se ve aquí: quien lo lleva lo tiene delante sin depender de que haya un
+    /// lanzador abierto, y el lanzador que se reparte a los jugadores se queda sin ninguna forma de
+    /// leerle la consola a nadie.
     ///
-    /// Todo lo que se pinta sale de lo que el servidor ya sabe: no hay ninguna cuenta inventada
-    /// para rellenar el panel. Lo que no se sepa medir, no se enseña.
+    /// Pinta con <see cref="LauncherTheme"/> y con <see cref="LauncherLogo"/>, que viven en el
+    /// contrato y comparten los dos ejecutables: se parecen porque pintan con lo MISMO, no porque
+    /// alguien haya copiado los colores de un sitio a otro.
+    ///
+    /// Todo lo que se enseña sale de lo que el servidor ya sabe. Nada inventado para rellenar.
     /// </summary>
-    internal sealed class VentanaDelServidor : Form
+    internal sealed class VentanaDelServidor : Form, IVentanaConFondo
     {
-        // ─── Colores ────────────────────────────────────────────────────────────────────────
-        //
-        // Sacados del fondo para que la ventana no parezca dos cosas pegadas: el turquesa de los
-        // cristales del Wakfu y el ámbar del atardecer.
+        private Image? _foto;
+        private Bitmap? _fondoCompuesto;
 
-        private static readonly Color Turquesa = Color.FromArgb(64, 224, 208);
-        private static readonly Color Ambar = Color.FromArgb(255, 176, 74);
-        private static readonly Color Tinta = Color.FromArgb(12, 18, 28);
-        private static readonly Color Velo = Color.FromArgb(178, 10, 15, 24);
-        private static readonly Color Texto = Color.FromArgb(226, 236, 246);
-        private static readonly Color Apagado = Color.FromArgb(138, 152, 168);
+        /// <summary>El fondo ya compuesto, para que los paneles se recorten su trozo.</summary>
+        public Image? ComposedBackground => _fondoCompuesto;
 
-        private Image? _fondo;
-        private readonly Panel _lienzo;
+        private readonly PanelSinParpadeo _cifras;
         private readonly RichTextBox _registro;
-        private readonly Panel _cifras;
+        private readonly LauncherLogo _logo;
         private readonly System.Windows.Forms.Timer _reloj;
         private readonly CheckBox _seguir;
         private readonly Button _parar;
+        private readonly Button _limpiar;
+        private readonly List<Button> _idiomas = new();
 
         private long _ultimaLinea;
         private readonly DateTime _arranque = DateTime.UtcNow;
-        private readonly Process _yo = Process.GetCurrentProcess();
 
-        /// <summary>Cada cifra que se enseña, con su etiqueta y de dónde sale.</summary>
+        private Language _idioma = PreferenciasDelServidor.Language;
+        private LauncherTexts _textos = LauncherTexts.Get(PreferenciasDelServidor.Language);
+
+        private readonly float _escala;
+        private int E(int px) => (int)Math.Round(px * _escala);
+        private Font Letra(float cuerpo, FontStyle estilo = FontStyle.Regular)
+            => new Font(LauncherTheme.TitleFamily, cuerpo * _escala, estilo);
+        private Font Mono(float cuerpo) => new Font(LauncherTheme.MonoFamily, cuerpo * _escala);
+
+        /// <summary>
+        /// Un panel que no parpadea al repintarse.
+        ///
+        /// Las cifras se refrescan cada segundo y daban un pestañeo en cada una: un Panel normal
+        /// borra el fondo y luego dibuja, y entre las dos cosas se ve el hueco. Con doble búfer se
+        /// compone fuera de pantalla y se vuelca de una vez.
+        /// </summary>
+        private sealed class PanelSinParpadeo : Panel
+        {
+            public PanelSinParpadeo()
+            {
+                SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint |
+                         ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
+                UpdateStyles();
+            }
+        }
+
+        /// <summary>Cada cifra: su etiqueta, de dónde sale y de qué color va.</summary>
         private sealed class Cifra
         {
-            public string Etiqueta = "";
+            public Func<LauncherTexts, string> Etiqueta = _ => "";
             public Func<string> Valor = () => "";
-            public Color Tono = Turquesa;
+            public Color Tono = LauncherTheme.LightGold;
             public string Ultimo = "";
         }
 
         private readonly List<Cifra> _lista = new();
 
-        /// <summary>Cuánto hay que multiplicar los píxeles: 1 al 100%, 2 al 200%.</summary>
-        private readonly float _escala;
-
-        private int E(int px) => (int)Math.Round(px * _escala);
-        private Size Escalada(int ancho, int alto) => new Size(E(ancho), E(alto));
-        private Font Letra(float cuerpo, FontStyle estilo = FontStyle.Regular, string familia = "Segoe UI")
-            => new Font(familia, cuerpo * _escala, estilo);
-
         public VentanaDelServidor()
         {
-            Text = "Jondo — Servidor";
-            StartPosition = FormStartPosition.CenterScreen;
-
-            // Todo lo que se dibuja a mano va multiplicado por esto.
-            //
-            // La primera versión salía descuadrada en una pantalla al 200%: las cajas de las cifras
-            // se pisaban unas a otras y el título se metía encima. Los tamaños en píxeles y los
-            // cuerpos de letra hay que escalarlos a mano, porque el dibujo es propio y WinForms no
-            // escala lo que uno pinta en un Paint.
             _escala = DeviceDpi / 96f;
 
-            MinimumSize = Escalada(980, 620);
-            Size = Escalada(1180, 720);
-            BackColor = Tinta;
-            ForeColor = Texto;
+            Text = "Jondo Server";
+            StartPosition = FormStartPosition.CenterScreen;
+            MinimumSize = new Size(E(900), E(560));
+            Size = new Size(E(1280), E(760));
+            // Maximizada, que es como se quiere ver un servidor: de un vistazo y sin colocarla.
+            WindowState = FormWindowState.Maximized;
+            BackColor = LauncherTheme.Background;
+            ForeColor = LauncherTheme.BaseText;
             DoubleBuffered = true;
             TryCargarIcono();
-            _fondo = CargarFondo();
+            _foto = LauncherTheme.LoadImage("servidor_fondo.jpg") ?? LauncherTheme.LoadImage("bg.jpg");
 
-            _lienzo = new Panel { Dock = DockStyle.Fill, BackColor = Color.Transparent };
-            _lienzo.Paint += PintarFondo;
-            Controls.Add(_lienzo);
+            _logo = new LauncherLogo
+            {
+                Primera = "JONDO",
+                Segunda = "SERVER",
+                BackColor = Color.Transparent,
+                Height = E(92),
+                Dock = DockStyle.Top,
+            };
 
-            // ─── El orden importa ───────────────────────────────────────────────────────────
-            //
-            // WinForms acopla de delante hacia atrás, así que el panel que rellena (Fill) tiene que
-            // ir DETRÁS de los que se pegan a un borde (Top, Bottom). Estaba al revés —el Fill
-            // traído al frente— y se quedaba con toda la ventana: la fila de cifras existía, tenía
-            // su manejador de Paint puesto, y no se dibujaba nunca porque le quedaban cero píxeles.
-            // No daba ningún error; simplemente no estaba.
-            var caja = new Panel { Dock = DockStyle.Fill, BackColor = Color.Transparent, Padding = new Padding(E(18), E(4), E(18), E(16)) };
-            _lienzo.Controls.Add(caja);
-
-            _cifras = new Panel { Dock = DockStyle.Top, Height = E(152), BackColor = Color.Transparent };
+            _cifras = new PanelSinParpadeo
+            {
+                Dock = DockStyle.Top,
+                Height = E(102),
+                BackColor = Color.Transparent,
+            };
             _cifras.Paint += PintarCifras;
-            _lienzo.Controls.Add(_cifras);
-            _cifras.BringToFront();
-
             DefinirCifras();
 
-            var barra = new Panel { Dock = DockStyle.Bottom, Height = E(46), BackColor = Color.Transparent };
-            caja.Controls.Add(barra);
+            var caja = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent,
+                Padding = new Padding(E(22), E(4), E(22), E(14)),
+            };
+
+            var barra = new Panel { Dock = DockStyle.Bottom, Height = E(44), BackColor = Color.Transparent };
 
             _registro = new RichTextBox
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(8, 12, 20),
-                ForeColor = Texto,
+                BackColor = LauncherTheme.ConsoleBackground,
+                ForeColor = LauncherTheme.LogNormal,
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
-                Font = Letra(9f, FontStyle.Regular, "Consolas"),
+                Font = Mono(9.5f),
                 WordWrap = false,
                 ScrollBars = RichTextBoxScrollBars.Both,
                 DetectUrls = false,
             };
+
             caja.Controls.Add(_registro);
-            _registro.SendToBack();   // el Fill, detrás de la barra de abajo
+            caja.Controls.Add(barra);
+            _registro.SendToBack();
+
+            // El orden importa: WinForms acopla de delante hacia atrás, así que el que rellena va
+            // DETRÁS de los que se pegan a un borde. Al revés, el Fill se queda con toda la ventana
+            // y a los demás les tocan cero píxeles, sin dar ningún error.
+            Controls.Add(caja);
+            Controls.Add(_cifras);
+            Controls.Add(_logo);
 
             _seguir = new CheckBox
             {
-                Text = "Seguir el final",
                 Checked = true,
-                ForeColor = Apagado,
+                ForeColor = LauncherTheme.MutedGold,
                 BackColor = Color.Transparent,
                 AutoSize = true,
-                Location = new Point(E(2), E(14)),
+                Font = Letra(8.5f),
+                Location = new Point(E(2), E(13)),
             };
             barra.Controls.Add(_seguir);
 
-            var limpiar = Boton("Limpiar", Apagado);
-            limpiar.Click += (s, e) => _registro.Clear();
-            barra.Controls.Add(limpiar);
+            foreach (var cual in new[] { Language.Es, Language.En, Language.Fr })
+            {
+                var boton = Boton(LauncherTexts.Code(cual).ToUpperInvariant(), LauncherTheme.MutedGold, E(46));
+                var elegido = cual;
+                boton.Click += (s, e) => CambiarIdioma(elegido);
+                _idiomas.Add(boton);
+                barra.Controls.Add(boton);
+            }
 
-            _parar = Boton("Detener el servidor", Color.FromArgb(232, 96, 96));
+            _limpiar = Boton("", LauncherTheme.SoftGold);
+            _limpiar.Click += (s, e) => _registro.Clear();
+            barra.Controls.Add(_limpiar);
+
+            _parar = Boton("", LauncherTheme.Red);
             _parar.Click += PararloTodo;
             barra.Controls.Add(_parar);
 
-            // Los botones a la derecha, colocados a mano. Va en un método y se llama también al
-            // final del constructor: enganchado sólo al Resize, la primera vez no se ejecutaba y
-            // los botones salían encima de la casilla de la izquierda.
             void Colocar()
             {
-                _parar.Location = new Point(barra.Width - _parar.Width - E(2), E(8));
-                limpiar.Location = new Point(_parar.Left - limpiar.Width - E(10), E(8));
+                _parar.Location = new Point(barra.Width - _parar.Width - E(2), E(7));
+                _limpiar.Location = new Point(_parar.Left - _limpiar.Width - E(10), E(7));
+                int x = _seguir.Right + E(18);
+                foreach (var boton in _idiomas)
+                {
+                    boton.Location = new Point(x, E(7));
+                    x += boton.Width + E(6);
+                }
             }
             barra.Resize += (s, e) => Colocar();
+
+            AplicarIdioma();
             Colocar();
 
-            // ─── El latido ──────────────────────────────────────────────────────────────────
             _reloj = new System.Windows.Forms.Timer { Interval = 1000 };
             _reloj.Tick += (s, e) => Refrescar();
             _reloj.Start();
@@ -162,35 +196,66 @@ namespace Jondo.Unity.Launcher.UI
             Refrescar();
         }
 
+        // ─── Idioma ─────────────────────────────────────────────────────────────────────────
+
+        private void CambiarIdioma(Language cual)
+        {
+            if (cual == _idioma) return;
+            _idioma = cual;
+            PreferenciasDelServidor.Language = cual;
+            _textos = LauncherTexts.Get(cual);
+            AplicarIdioma();
+            _cifras.Invalidate();
+        }
+
+        private void AplicarIdioma()
+        {
+            _seguir.Text = _textos.AutoScroll;
+            _limpiar.Text = _textos.ClearButton;
+            _parar.Text = _textos.StopServer;
+            Redimensionar(_limpiar);
+            Redimensionar(_parar);
+
+            for (int i = 0; i < _idiomas.Count; i++)
+            {
+                var cual = (Language)i;
+                _idiomas[i].ForeColor = cual == _idioma ? LauncherTheme.LightGold : LauncherTheme.MutedGold;
+                _idiomas[i].FlatAppearance.BorderColor = cual == _idioma
+                    ? LauncherTheme.GoldBorder : LauncherTheme.BorderBrown;
+            }
+        }
+
+        private void Redimensionar(Button boton)
+            => boton.Width = TextRenderer.MeasureText(boton.Text, boton.Font).Width + E(28);
+
         // ─── Las cifras ─────────────────────────────────────────────────────────────────────
 
         private void DefinirCifras()
         {
-            // Cada una sale de algo que el servidor sabe de verdad. Los jugadores conectados son
-            // las sesiones vivas del puerto de juego, no los clientes lanzados: un cliente puede
-            // estar abierto sin haber llegado a entrar.
+            // Los jugadores son las sesiones vivas del puerto de juego, no los clientes lanzados:
+            // un cliente puede estar abierto sin haber llegado a entrar al mundo.
             _lista.Add(new Cifra
             {
-                Etiqueta = "JUGADORES",
-                Tono = Turquesa,
+                Etiqueta = t => t.StatPlayers,
+                Tono = LauncherTheme.OnlineGreen,
                 Valor = () => Network.GameNodeProxy.SesionesVivas.Count.ToString(),
             });
             _lista.Add(new Cifra
             {
-                Etiqueta = "CLIENTES",
-                Tono = Turquesa,
+                Etiqueta = t => t.StatClients,
+                Tono = LauncherTheme.LightGold,
                 Valor = () => $"{Network.ClientLaunchRegistry.ActiveCount}/{Network.ClientLaunchRegistry.MaximumClients}",
             });
             _lista.Add(new Cifra
             {
-                Etiqueta = "COMBATES",
-                Tono = Ambar,
+                Etiqueta = t => t.StatFights,
+                Tono = LauncherTheme.LightGold,
                 Valor = () => Handlers.FightHandler.CombatesEnCurso.ToString(),
             });
             _lista.Add(new Cifra
             {
-                Etiqueta = "MAPAS",
-                Tono = Ambar,
+                Etiqueta = t => t.StatMaps,
+                Tono = LauncherTheme.SoftGold,
                 Valor = () =>
                 {
                     var mapas = new HashSet<long>();
@@ -203,20 +268,20 @@ namespace Jondo.Unity.Launcher.UI
             });
             _lista.Add(new Cifra
             {
-                Etiqueta = "MEMORIA",
-                Tono = Apagado,
+                Etiqueta = t => t.StatMemory,
+                Tono = LauncherTheme.MutedGold,
                 Valor = () => $"{GC.GetTotalMemory(false) / (1024 * 1024)} MB",
             });
             _lista.Add(new Cifra
             {
-                Etiqueta = "TIEMPO",
-                Tono = Apagado,
+                Etiqueta = t => t.StatUptime,
+                Tono = LauncherTheme.MutedGold,
                 Valor = () =>
                 {
                     var va = DateTime.UtcNow - _arranque;
-                    return va.TotalHours >= 1
-                        ? $"{(int)va.TotalHours}h {va.Minutes:00}m"
-                        : $"{va.Minutes}m {va.Seconds:00}s";
+                    return va.TotalDays >= 1 ? $"{(int)va.TotalDays}d {va.Hours}h"
+                         : va.TotalHours >= 1 ? $"{(int)va.TotalHours}h {va.Minutes:00}m"
+                         : $"{va.Minutes}m {va.Seconds:00}s";
                 },
             });
         }
@@ -225,80 +290,76 @@ namespace Jondo.Unity.Launcher.UI
 
         private void PintarCifras(object? sender, PaintEventArgs e)
         {
-            // Un Paint que revienta no se ve: la fila se queda en blanco y no hay ni un mensaje.
-            // Pasó, y costó más de lo que debería averiguar por qué.
+            // Un Paint que revienta no se ve: la fila se queda en blanco y no hay ni un aviso.
             try { PintarCifrasDeVerdad(e.Graphics); }
             catch (Exception ex)
             {
-                if (!_yaAvise)
-                {
-                    _yaAvise = true;
-                    Console.WriteLine($"[Servidor] La fila de cifras no se ha podido pintar: {ex}");
-                }
+                if (_yaAvise) return;
+                _yaAvise = true;
+                Console.WriteLine($"[Servidor] La fila de cifras no se ha podido pintar: {ex}");
             }
         }
 
         private void PintarCifrasDeVerdad(Graphics g)
         {
+            RecortarFondo(g, _cifras);
+
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            int margen = E(18);
-            int hueco = E(12);
-            int ancho = Math.Max(E(120), (_cifras.Width - margen * 2 - hueco * (_lista.Count - 1)) / _lista.Count);
-            int alto = E(86);
-            int y = E(46);
+            int margen = E(22);
+            int hueco = E(10);
+            int alto = E(78);
+            int y = E(8);
+            int ancho = Math.Max(E(90), (_cifras.Width - margen * 2 - hueco * (_lista.Count - 1)) / _lista.Count);
 
-            // El título, y detrás la versión. Se mide en vez de suponer un ancho: con "JONDO" a
-            // 13 puntos y la escala de la pantalla encima, el hueco fijo que había aquí hacía que
-            // se pisaran las dos cadenas.
-            using var titulo = Letra(13f, FontStyle.Bold);
-            using var sub = Letra(8f);
-            g.DrawString("JONDO", titulo, new SolidBrush(Ambar), margen, E(2));
-            float tras = margen + g.MeasureString("JONDO", titulo).Width + E(8);
-            g.DrawString("servidor  ·  " + Contrato.Version, sub, new SolidBrush(Apagado), tras, E(9));
+            using var fEtiqueta = Letra(7.5f, FontStyle.Bold);
+            using var pincelEtiqueta = new SolidBrush(LauncherTheme.MutedGold);
+            using var relleno = new SolidBrush(LauncherTheme.CardFill);
+            using var borde = new Pen(LauncherTheme.BorderBrown, Math.Max(1f, _escala));
+            using var dentro = new StringFormat(StringFormatFlags.NoWrap)
+            {
+                Trimming = StringTrimming.EllipsisCharacter,
+            };
 
             for (int i = 0; i < _lista.Count; i++)
             {
                 var cifra = _lista[i];
                 var caja = new Rectangle(margen + i * (ancho + hueco), y, ancho, alto);
-                using var fondo = new SolidBrush(Color.FromArgb(170, 6, 10, 18));
-                using var camino = Redondeado(caja, E(10));
-                g.FillPath(fondo, camino);
-                using var borde = new Pen(Color.FromArgb(60, cifra.Tono), 1f);
+
+                using var camino = Redondeado(caja, E(8));
+                g.FillPath(relleno, camino);
                 g.DrawPath(borde, camino);
 
-                // Cada texto dentro de su rectángulo, con puntos suspensivos si no cabe.
-                //
-                // El intento anterior era guardar y restaurar el Clip del Graphics, y se llevó por
-                // delante el Paint entero: la fila de cifras dejó de dibujarse del todo. Con un
-                // rectángulo y un StringFormat el recorte lo hace GDI+ y no hay estado que
-                // restaurar.
-                using var dentro = new StringFormat(StringFormatFlags.NoWrap)
-                {
-                    Trimming = StringTrimming.EllipsisCharacter,
-                };
-
-                using var fEtiqueta = Letra(7.5f, FontStyle.Bold);
-                using var pincelEtiqueta = new SolidBrush(Apagado);
-                // El alto del rectángulo, MEDIDO. Poniéndolo a ojo, GDI+ recortaba los glifos por
-                // arriba y por abajo: se veía media letra.
-                g.DrawString(cifra.Etiqueta, fEtiqueta, pincelEtiqueta,
-                             new RectangleF(caja.X + E(11), caja.Y + E(10), caja.Width - E(18),
+                g.DrawString(cifra.Etiqueta(_textos), fEtiqueta, pincelEtiqueta,
+                             new RectangleF(caja.X + E(10), caja.Y + E(9), caja.Width - E(16),
                                             fEtiqueta.GetHeight(g) + 2), dentro);
 
-                using var fValor = Letra(15f, FontStyle.Bold);
-                using var pincelValor = new SolidBrush(cifra.Tono);
-                g.DrawString(cifra.Ultimo, fValor, pincelValor,
-                             new RectangleF(caja.X + E(9), caja.Y + E(30), caja.Width - E(14),
-                                            fValor.GetHeight(g) + 2), dentro);
+                // El cuerpo de la cifra se ajusta al ancho que haya: con la ventana maximizada
+                // caben grandes, y estrechándola no se salen ni acaban en puntos suspensivos.
+                float cuerpo = 17f;
+                var fValor = Letra(cuerpo, FontStyle.Bold);
+                while (cuerpo > 9f && g.MeasureString(cifra.Ultimo, fValor).Width > caja.Width - E(20))
+                {
+                    fValor.Dispose();
+                    cuerpo -= 1f;
+                    fValor = Letra(cuerpo, FontStyle.Bold);
+                }
+
+                using (fValor)
+                using (var pincelValor = new SolidBrush(cifra.Tono))
+                {
+                    g.DrawString(cifra.Ultimo, fValor, pincelValor,
+                                 new RectangleF(caja.X + E(10), caja.Y + E(30), caja.Width - E(16),
+                                                fValor.GetHeight(g) + 2), dentro);
+                }
             }
         }
 
         private static GraphicsPath Redondeado(Rectangle r, int radio)
         {
             var camino = new GraphicsPath();
-            int d = radio * 2;
+            int d = Math.Max(2, radio * 2);
             camino.AddArc(r.X, r.Y, d, d, 180, 90);
             camino.AddArc(r.Right - d, r.Y, d, d, 270, 90);
             camino.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
@@ -309,45 +370,67 @@ namespace Jondo.Unity.Launcher.UI
 
         // ─── El fondo ───────────────────────────────────────────────────────────────────────
 
-        private static Image? CargarFondo()
+        /// <summary>
+        /// Compone el fondo: la foto recortada como haría un background-size: cover.
+        ///
+        /// Se compone UNA vez por tamaño y se guarda, en vez de escalar la imagen en cada
+        /// repintado. Es lo que hace el lanzador y es lo que evita que la ventana vaya a tirones.
+        /// </summary>
+        private void ComponerFondo()
         {
-            foreach (string nombre in new[] { "servidor_fondo.jpg", "servidor_fondo.png" })
+            int ancho = Math.Max(1, ClientSize.Width);
+            int alto = Math.Max(1, ClientSize.Height);
+            if (_fondoCompuesto != null && _fondoCompuesto.Width == ancho && _fondoCompuesto.Height == alto) return;
+
+            _fondoCompuesto?.Dispose();
+            _fondoCompuesto = new Bitmap(ancho, alto);
+
+            using var g = Graphics.FromImage(_fondoCompuesto);
+            g.Clear(LauncherTheme.Background);
+
+            if (_foto != null)
             {
-                try
-                {
-                    string ruta = Path.Combine(Paths.Root, "launcher_assets", nombre);
-                    if (File.Exists(ruta)) return Image.FromFile(ruta);
-                }
-                catch { }
+                float factor = Math.Max((float)ancho / _foto.Width, (float)alto / _foto.Height);
+                int anchoFoto = (int)Math.Ceiling(_foto.Width * factor);
+                int altoFoto = (int)Math.Ceiling(_foto.Height * factor);
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(_foto, (ancho - anchoFoto) / 2, (alto - altoFoto) / 2, anchoFoto, altoFoto);
             }
-            return null;   // sin imagen se pinta un degradado; la ventana no depende de ella
+
+            // Un velo MUY suave, sólo el necesario para que se lea lo de encima. El primer intento
+            // llevaba uno tan oscuro que la foto no se veía: parecía un fondo negro y punto.
+            using var velo = new SolidBrush(Color.FromArgb(84, 8, 4, 2));
+            g.FillRectangle(velo, 0, 0, ancho, alto);
         }
 
-        private void PintarFondo(object? sender, PaintEventArgs e)
+        /// <summary>Le da a un panel transparente el trozo de fondo que le toca.</summary>
+        private void RecortarFondo(Graphics g, Control panel)
         {
-            var g = e.Graphics;
-            var todo = _lienzo.ClientRectangle;
-            if (todo.Width <= 0 || todo.Height <= 0) return;
+            ComponerFondo();
+            if (_fondoCompuesto == null) { g.Clear(LauncherTheme.Background); return; }
 
-            if (_fondo != null)
-            {
-                // Se cubre la ventana sin deformar la imagen: se escala por el lado que falte y se
-                // recorta lo que sobre, como un fondo de escritorio.
-                float escala = Math.Max((float)todo.Width / _fondo.Width, (float)todo.Height / _fondo.Height);
-                int ancho = (int)(_fondo.Width * escala);
-                int alto = (int)(_fondo.Height * escala);
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.DrawImage(_fondo, (todo.Width - ancho) / 2, (todo.Height - alto) / 2, ancho, alto);
-            }
-            else
-            {
-                using var degradado = new LinearGradientBrush(todo, Color.FromArgb(18, 30, 46), Tinta, 60f);
-                g.FillRectangle(degradado, todo);
-            }
+            var recorte = Rectangle.Intersect(
+                new Rectangle(panel.Location.X, panel.Location.Y, panel.Width, panel.Height),
+                new Rectangle(0, 0, _fondoCompuesto.Width, _fondoCompuesto.Height));
 
-            // Un velo encima, porque encima va texto y sobre un atardecer no se lee.
-            using var velo = new SolidBrush(Velo);
-            g.FillRectangle(velo, todo);
+            g.Clear(LauncherTheme.Background);
+            if (recorte.Width <= 0 || recorte.Height <= 0) return;
+            g.DrawImage(_fondoCompuesto, new Rectangle(0, 0, recorte.Width, recorte.Height),
+                        recorte, GraphicsUnit.Pixel);
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            ComponerFondo();
+            if (_fondoCompuesto != null) e.Graphics.DrawImageUnscaled(_fondoCompuesto, 0, 0);
+            else base.OnPaintBackground(e);
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            ComponerFondo();
+            Invalidate(true);
         }
 
         // ─── El latido ──────────────────────────────────────────────────────────────────────
@@ -362,24 +445,19 @@ namespace Jondo.Unity.Launcher.UI
                 catch { ahora = "—"; }
                 if (ahora != cifra.Ultimo) { cifra.Ultimo = ahora; cambio = true; }
             }
+            // Sólo se repinta si algo ha cambiado, y el panel va con doble búfer: así no parpadea.
             if (cambio) _cifras.Invalidate();
 
             TraerRegistro();
         }
 
-        /// <summary>
-        /// Las líneas nuevas de la consola.
-        ///
-        /// Salen del mismo buffer que ya intercepta Console.Out, así que se ve exactamente lo que
-        /// escribe el servidor, sin tocar ni una línea de lo que ya escribía.
-        /// </summary>
         private void TraerRegistro()
         {
             string json;
             try { json = ConsoleLogBuffer.GetLogsJson(_ultimaLinea); }
             catch { return; }
 
-            List<(long Id, string Hora, string Texto)> nuevas = new();
+            var nuevas = new List<(long Id, string Hora, string Texto)>();
             try
             {
                 using var doc = System.Text.Json.JsonDocument.Parse(json);
@@ -402,7 +480,6 @@ namespace Jondo.Unity.Launcher.UI
                 Escribir(hora, texto);
             }
 
-            // Que no crezca sin fin: una ventana abierta una semana no puede guardar la semana.
             if (_registro.Lines.Length > 4000)
             {
                 _registro.Select(0, _registro.GetFirstCharIndexFromLine(1500));
@@ -421,7 +498,7 @@ namespace Jondo.Unity.Launcher.UI
             _registro.SelectionStart = _registro.TextLength;
             _registro.SelectionLength = 0;
 
-            _registro.SelectionColor = Color.FromArgb(96, 110, 128);
+            _registro.SelectionColor = LauncherTheme.LogTime;
             _registro.AppendText(hora.Length > 0 ? hora + "  " : "");
 
             _registro.SelectionColor = ColorDe(texto);
@@ -429,75 +506,68 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         /// <summary>
-        /// De qué color va cada línea. Se mira lo que ya escribe el servidor, sin inventarse
-        /// ningún formato nuevo: los prefijos entre corchetes que lleva usando siempre.
+        /// El color de cada línea, con la misma paleta de consola que el lanzador y mirando los
+        /// mismos prefijos entre corchetes que el servidor lleva escribiendo desde siempre.
         /// </summary>
         private static Color ColorDe(string linea)
         {
             if (linea.Contains("[!]") || linea.Contains("Error") || linea.Contains("error"))
-                return Color.FromArgb(240, 120, 120);
-            if (linea.Contains("Rechazad") || linea.Contains("rechazad"))
-                return Color.FromArgb(240, 180, 110);
-            if (linea.Contains("[Combate]") || linea.Contains("[FightHandler]"))
-                return Ambar;
-            if (linea.Contains("[Control]") || linea.Contains("[Comandos]"))
-                return Turquesa;
-            if (linea.Contains("[Game Node]") || linea.Contains("[Connection Server]"))
-                return Color.FromArgb(150, 200, 230);
-            if (linea.Contains("[DatabaseManager]") || linea.Contains("[World]") || linea.Contains("[+]"))
-                return Color.FromArgb(150, 170, 190);
-            return Texto;
+                return LauncherTheme.LogError;
+            if (linea.Contains("Rechazad") || linea.Contains("rechazad")) return LauncherTheme.Red;
+            if (linea.Contains("[HAAPI]")) return LauncherTheme.LogHaapi;
+            if (linea.Contains("[Zaap")) return LauncherTheme.LogZaap;
+            if (linea.Contains("[+]")) return LauncherTheme.LogSuccess;
+            if (linea.Contains("[Combate]") || linea.Contains("[FightHandler]")) return LauncherTheme.LogServer;
+            if (linea.Contains("[Control]") || linea.Contains("[Comandos]")) return LauncherTheme.HighlightText;
+            return LauncherTheme.LogNormal;
         }
 
         // ─── Botones ────────────────────────────────────────────────────────────────────────
 
-        private Button Boton(string texto, Color tono)
+        private Button Boton(string texto, Color tono, int ancho = 0)
         {
-            var letra = Letra(9f, FontStyle.Bold);
+            var letra = Letra(8.5f, FontStyle.Bold);
             var boton = new Button
             {
                 Text = texto,
                 AutoSize = false,
-                Size = new Size(TextRenderer.MeasureText(texto, letra).Width + E(30), E(30)),
+                Height = E(30),
+                Width = ancho > 0 ? ancho : TextRenderer.MeasureText(texto, letra).Width + E(28),
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(16, 22, 32),
+                BackColor = LauncherTheme.FieldBackground,
                 ForeColor = tono,
                 Font = letra,
                 Cursor = Cursors.Hand,
             };
-            boton.FlatAppearance.BorderColor = Color.FromArgb(70, tono);
-            boton.FlatAppearance.MouseOverBackColor = Color.FromArgb(28, 38, 52);
+            boton.FlatAppearance.BorderColor = LauncherTheme.BorderBrown;
+            boton.FlatAppearance.MouseOverBackColor = LauncherTheme.LightBrown;
             return boton;
         }
 
         private void PararloTodo(object? sender, EventArgs e)
         {
-            var seguro = MessageBox.Show(
-                "Se va a parar el servidor. Los jugadores que estén dentro perderán la conexión.\n\n¿Seguro?",
-                "Jondo — Servidor", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
-            if (seguro != DialogResult.Yes) return;
-
+            if (!Confirmar()) return;
             _parar.Enabled = false;
-            _parar.Text = "Parando...";
             Program.RequestShutdown("botón de la ventana del servidor");
+        }
+
+        private bool Confirmar()
+        {
+            int dentro = Network.GameNodeProxy.SesionesVivas.Count;
+            string aviso = dentro > 0
+                ? string.Format(_textos.StopServerWithPlayers, dentro)
+                : _textos.StopServerConfirm;
+            return MessageBox.Show(aviso, "Jondo Server", MessageBoxButtons.YesNo,
+                                   MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            // Cerrar la ventana del servidor SÍ para el servidor: es su ventana, no la de otro.
-            // Pero se pregunta, porque puede haber gente jugando y una X es fácil de dar sin querer.
+            // Cerrar esta ventana SÍ para el servidor: es su ventana. Pero se pregunta, porque
+            // puede haber gente jugando y una X es fácil de dar sin querer.
             if (e.CloseReason == CloseReason.UserClosing && !Program.ApagandoYa)
             {
-                int dentro = Network.GameNodeProxy.SesionesVivas.Count;
-                string aviso = dentro > 0
-                    ? $"Hay {dentro} jugador(es) conectado(s) y perderán la conexión.\n\n¿Parar el servidor?"
-                    : "¿Parar el servidor?";
-                if (MessageBox.Show(aviso, "Jondo — Servidor", MessageBoxButtons.YesNo,
-                                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
-                {
-                    e.Cancel = true;
-                    return;
-                }
+                if (!Confirmar()) { e.Cancel = true; return; }
                 Program.RequestShutdown("ventana del servidor cerrada");
             }
 
@@ -509,18 +579,16 @@ namespace Jondo.Unity.Launcher.UI
         {
             try
             {
-                string ruta = Path.Combine(Paths.Root, "launcher_assets", "favicon.ico");
+                string ruta = Path.Combine(LauncherTheme.AssetsFolder, "favicon.ico");
                 if (File.Exists(ruta)) Icon = new Icon(ruta);
             }
             catch { }
         }
 
         /// <summary>Abre la ventana en su propio hilo, para que no estorbe a los servicios.</summary>
-        public static VentanaDelServidor? Abrir()
+        public static void Abrir()
         {
-            VentanaDelServidor? ventana = null;
             var lista = new System.Threading.ManualResetEventSlim(false);
-
             var hilo = new System.Threading.Thread(() =>
             {
                 try
@@ -528,7 +596,7 @@ namespace Jondo.Unity.Launcher.UI
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     try { Application.SetHighDpiMode(HighDpiMode.SystemAware); } catch { }
-                    ventana = new VentanaDelServidor();
+                    var ventana = new VentanaDelServidor();
                     lista.Set();
                     Application.Run(ventana);
                 }
@@ -545,7 +613,6 @@ namespace Jondo.Unity.Launcher.UI
             hilo.SetApartmentState(System.Threading.ApartmentState.STA);
             hilo.Start();
             lista.Wait(TimeSpan.FromSeconds(10));
-            return ventana;
         }
     }
 }

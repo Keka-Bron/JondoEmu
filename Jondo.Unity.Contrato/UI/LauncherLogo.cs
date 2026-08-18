@@ -16,10 +16,11 @@ namespace Jondo.Unity.Launcher.UI
     /// Se pinta sobre el fondo recortado de la ventana, igual que los paneles, para que el dibujo
     /// de detrás se vea a través de los huecos de las letras.
     /// </summary>
-    internal sealed class LauncherLogo : Panel
+    public sealed class LauncherLogo : Panel
     {
-        private const string Primera = "JONDO";
-        private const string Segunda = "EMU";
+        /// <summary>Las dos palabras del rotulo. El lanzador pone JONDO EMU y el servidor JONDO SERVER.</summary>
+        public string Primera { get; set; } = "JONDO";
+        public string Segunda { get; set; } = "EMU";
 
         /// <summary>Cuánto se arquea el rótulo, en grados de giro de la primera y la última letra.</summary>
         private const float Arco = 7f;
@@ -43,12 +44,13 @@ namespace Jondo.Unity.Launcher.UI
         /// </summary>
         private void PintarFondo(Graphics g)
         {
-            var ventana = FindForm() as LauncherWindow;
+            var ventana = FindForm() as IVentanaConFondo;
             var fondo = ventana?.ComposedBackground;
-            if (ventana == null || fondo == null) { g.Clear(LauncherTheme.Background); return; }
+            var control = ventana as Control;
+            if (control == null || fondo == null) { g.Clear(LauncherTheme.Background); return; }
 
             Point origen;
-            try { origen = ventana.PointToClient(PointToScreen(Point.Empty)); }
+            try { origen = control.PointToClient(PointToScreen(Point.Empty)); }
             catch { g.Clear(LauncherTheme.Background); return; }
 
             var recorte = Rectangle.Intersect(new Rectangle(origen.X, origen.Y, Width, Height),

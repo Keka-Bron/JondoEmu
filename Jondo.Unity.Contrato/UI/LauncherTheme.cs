@@ -15,7 +15,7 @@ namespace Jondo.Unity.Launcher.UI
     /// (launcher_assets/index.html), translated into GDI+ colors and measurements so that the
     /// native window is recognizable as the very same launcher.
     /// </summary>
-    internal static class LauncherTheme
+    public static class LauncherTheme
     {
         // ─── Colors ─────────────────────────────────────────────────────────────
         /// <summary>Window background color (#0d0603), visible when the image is missing.</summary>

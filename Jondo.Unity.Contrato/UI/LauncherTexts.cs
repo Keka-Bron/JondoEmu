@@ -5,7 +5,7 @@ using System.IO;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>Languages offered by the selector in the top bar.</summary>
-    internal enum Language
+    public enum Language
     {
         Es,
         En,
@@ -17,7 +17,7 @@ namespace Jondo.Unity.Launcher.UI
     /// index.html), plus the chosen language, which is remembered across sessions the way
     /// localStorage used to.
     /// </summary>
-    internal sealed class LauncherTexts
+    public sealed class LauncherTexts
     {
         public string LoginTab { get; init; } = "";
         public string RegisterTab { get; init; } = "";
@@ -72,6 +72,18 @@ namespace Jondo.Unity.Launcher.UI
         public string ServidorSinResponder { get; init; } = "";
         public string ControlRechazado { get; init; } = "";
 
+        // La ventana del servidor. El lanzador no las usa, pero el catalogo es uno solo: asi los
+        // dos hablan los mismos tres idiomas sin dos tablas que se desincronizan.
+        public string StatPlayers { get; init; } = "";
+        public string StatClients { get; init; } = "";
+        public string StatFights { get; init; } = "";
+        public string StatMaps { get; init; } = "";
+        public string StatMemory { get; init; } = "";
+        public string StatUptime { get; init; } = "";
+        public string StopServer { get; init; } = "";
+        public string StopServerConfirm { get; init; } = "";
+        public string StopServerWithPlayers { get; init; } = "";
+
         private static readonly Dictionary<Language, LauncherTexts> Catalog = new()
         {
             [Language.Es] = new LauncherTexts
@@ -123,7 +135,16 @@ namespace Jondo.Unity.Launcher.UI
                 ClientNotFound = "No se encuentra Dofus.exe. Elige dónde está con el botón de la ruta del cliente.",
                 AccountCreated = "Cuenta creada.",
                 ServidorSinResponder = "El servidor no responde. Espera a que termine de arrancar o vuelve a abrirlo.",
-                ControlRechazado = "El servidor ha rearrancado. Cierra el lanzador y vuelve a abrirlo."
+                ControlRechazado = "El servidor ha rearrancado. Cierra el lanzador y vuelve a abrirlo.",
+                StatPlayers = "JUGADORES",
+                StatClients = "CLIENTES",
+                StatFights = "COMBATES",
+                StatMaps = "MAPAS",
+                StatMemory = "MEMORIA",
+                StatUptime = "EN MARCHA",
+                StopServer = "DETENER EL SERVIDOR",
+                StopServerConfirm = "¿Parar el servidor?",
+                StopServerWithPlayers = "Hay {0} jugador(es) conectado(s) y perderán la conexión.\n\n¿Parar el servidor?"
             },
             [Language.En] = new LauncherTexts
             {
@@ -174,7 +195,16 @@ namespace Jondo.Unity.Launcher.UI
                 ClientNotFound = "Dofus.exe was not found. Point at it with the client path button.",
                 AccountCreated = "Account created.",
                 ServidorSinResponder = "The server is not responding. Wait for it to finish starting, or open it again.",
-                ControlRechazado = "The server has restarted. Close the launcher and open it again."
+                ControlRechazado = "The server has restarted. Close the launcher and open it again.",
+                StatPlayers = "PLAYERS",
+                StatClients = "CLIENTS",
+                StatFights = "FIGHTS",
+                StatMaps = "MAPS",
+                StatMemory = "MEMORY",
+                StatUptime = "UPTIME",
+                StopServer = "STOP THE SERVER",
+                StopServerConfirm = "Stop the server?",
+                StopServerWithPlayers = "{0} player(s) are connected and will lose their connection.\n\nStop the server?"
             },
             [Language.Fr] = new LauncherTexts
             {
@@ -225,14 +255,21 @@ namespace Jondo.Unity.Launcher.UI
                 ClientNotFound = "Dofus.exe est introuvable. Indique son emplacement avec le bouton du chemin du client.",
                 AccountCreated = "Compte créé.",
                 ServidorSinResponder = "Le serveur ne répond pas. Attends la fin du démarrage ou relance-le.",
-                ControlRechazado = "Le serveur a redémarré. Ferme le lanceur et rouvre-le."
+                ControlRechazado = "Le serveur a redémarré. Ferme le lanceur et rouvre-le.",
+                StatPlayers = "JOUEURS",
+                StatClients = "CLIENTS",
+                StatFights = "COMBATS",
+                StatMaps = "CARTES",
+                StatMemory = "MÉMOIRE",
+                StatUptime = "EN LIGNE",
+                StopServer = "ARRÊTER LE SERVEUR",
+                StopServerConfirm = "Arrêter le serveur ?",
+                StopServerWithPlayers = "{0} joueur(s) sont connectés et perdront leur connexion.\n\nArrêter le serveur ?"
             }
         };
 
         public static LauncherTexts Get(Language language) => Catalog[language];
 
-        /// <summary>Los textos en el idioma que el lanzador tenga puesto ahora mismo.</summary>
-        public static LauncherTexts Current => Get(LauncherPreferences.Language);
 
         /// <summary>Two-letter language code, used to draw the flag.</summary>
         public static string Code(Language language) => language switch
@@ -246,10 +283,5 @@ namespace Jondo.Unity.Launcher.UI
         // llaman desde varios sitios, pero el fichero lo lleva él: escribir aquí con WriteAllText,
         // como se hacía antes, borraba de paso la ruta del cliente que guarda la otra opción.
 
-        /// <summary>Recovers the language chosen last time; Spanish by default.</summary>
-        public static Language LoadLanguage() => LauncherPreferences.Language;
-
-        /// <summary>Stores the chosen language for the next time the launcher is opened.</summary>
-        public static void SaveLanguage(Language language) => LauncherPreferences.Language = language;
     }
 }

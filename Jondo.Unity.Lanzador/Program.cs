@@ -21,7 +21,7 @@ namespace Jondo.Unity.Launcher
     internal static class Program
     {
         /// <summary>Cómo se llama el ejecutable del servidor, que vive al lado.</summary>
-        public const string EjecutableDelServidor = "Jondo Servidor.exe";
+        public const string EjecutableDelServidor = "Jondo Server.exe";
 
         [STAThread]
         private static async Task Main()
