@@ -66,6 +66,13 @@ namespace Jondo.Unity.Launcher.Handlers
             var walkableCells = MobSpawnManager.GetInnerWalkableCells(arenaMapId);
             fight.GeneratePlacementCells(walkableCells);
 
+            // Las cuatro elementales COMPLETAS: lo que el jugador se ha puesto de puntos más lo que
+            // le dé el equipo. Se calculan aquí arriba porque la iniciativa las necesita enteras.
+            int fuerza = GameState.StatStrength + StatsHandler.GetEquipBonus(10);
+            int inteligencia = GameState.StatIntelligence + StatsHandler.GetEquipBonus(15);
+            int suerte = GameState.StatChance + StatsHandler.GetEquipBonus(13);
+            int agilidad = GameState.StatAgility + StatsHandler.GetEquipBonus(14);
+
             // Build Player Fighter from GameState (Fighter ID = player CharacterId)
             var playerFighter = new Fighter
             {
@@ -85,16 +92,24 @@ namespace Jondo.Unity.Launcher.Handlers
                 // con +4 PA y +2 PM de equipo veía 10 y 5 en pantalla y luego peleaba con 6 y 3.
                 MaxAP = StatsHandler.GetPlayerMaxAp(),
                 MaxMP = StatsHandler.GetPlayerMaxMp(),
-                // Same initiative the character sheet shows: elemental characteristics plus
-                // whatever the gear contributes. The formula that used to be here (100 + level +
-                // every characteristic) made the number up and, above all, ignored items: with the
-                // Nightmare Dofus equipped (+1000 initiative) the piwi still played first.
-                Initiative = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance
-                             + GameState.StatAgility + StatsHandler.GetEquipBonus(44),
-                Strength = GameState.StatStrength + StatsHandler.GetEquipBonus(10),
-                Intelligence = GameState.StatIntelligence + StatsHandler.GetEquipBonus(15),
-                Chance = GameState.StatChance + StatsHandler.GetEquipBonus(13),
-                Agility = GameState.StatAgility + StatsHandler.GetEquipBonus(14),
+                // La misma iniciativa que enseña la ficha, y del mismo sitio.
+                //
+                // Sumaba sólo los puntos INVERTIDOS y el bonus de la característica 44, así que las
+                // elementales que da el equipo no entraban. Y son casi todas: en el personaje de
+                // pruebas el equipo pone +730 de fuerza y +760 de agilidad, y ninguno de los dos
+                // contaba. Enfrente, un monstruo SÍ suma sus cinco características de la base, así
+                // que Pioch el Arenil sacaba más iniciativa que un nivel 200 y jugaba primero.
+                // Medido en el registro: combate #1002, nueve combatientes, «primero -8», que es
+                // justo el último del carrusel.
+                //
+                // El comentario que había aquí decía exactamente esto —que ignorar los objetos
+                // hacía que el pío jugara primero— y arreglaba sólo la mitad: metió el bonus de
+                // iniciativa y se dejó las cuatro elementales.
+                Initiative = StatsHandler.GetPlayerInitiative(),
+                Strength = fuerza,
+                Intelligence = inteligencia,
+                Chance = suerte,
+                Agility = agilidad,
                 // Power from the gear (characteristic 25). It feeds straight into damage.
                 Power = StatsHandler.GetEquipBonus(25),
                 // Critical hit from the gear (characteristic 18): the Turquoise Dofus gives +10.
@@ -4321,8 +4336,15 @@ namespace Jondo.Unity.Launcher.Handlers
             AddStatEntry(79, new ProtoMessage());
             AddStatEntry(78, new ProtoMessage());
 
-            // 21. 44 (Initiative: player base 5 bonus 12; monster empty)
-            if (!fighter.IsMonster) AddBaseBonusVal(44, 5, 12);
+            // 21. 44, la iniciativa. Estaba a base 5 y bonus 12, que son los números del personaje
+            // de la captura. Va la del combatiente, partida igual que en la ficha de roleplay: lo
+            // invertido en la base y lo del equipo en el bonus. El monstruo lo manda vacío, que es
+            // lo que hace la captura.
+            //
+            // Sale del GameState de ESTA sesión, como todo lo demás de este método: con varios
+            // jugadores en un combate habrá que sacarlo del propio combatiente.
+            if (!fighter.IsMonster) AddBaseBonusVal(44, StatsHandler.IniciativaInvertida(),
+                                                        StatsHandler.IniciativaDelEquipo());
             else AddStatEntry(44, new ProtoMessage());
 
             // 22. STATID 0 = LIFE POINTS / MAX HP! (statId = null -> omitted f5)

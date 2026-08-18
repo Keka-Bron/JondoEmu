@@ -322,9 +322,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 larMsg.Fields.Add(CreateStatField(25, 0,                          GetEquipBonus(25))); // Power
                 larMsg.Fields.Add(CreateStatField(18, 0,                          GetEquipBonus(18))); // Critical
 
-                // Initiative base = only elemental stats (Str+Int+Cha+Agi). Vitality and Wisdom do NOT count.
-                int baseInitiative = GameState.StatStrength + GameState.StatIntelligence + GameState.StatChance + GameState.StatAgility;
-                larMsg.Fields.Add(CreateStatField(44, baseInitiative, GetEquipBonus(44)));             // Initiative
+                larMsg.Fields.Add(CreateStatField(44, IniciativaInvertida(), IniciativaDelEquipo())); // Initiative
 
                 var kriMsg = new ProtoMessage();
                 kriMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = larMsg.ToByteArray() });
@@ -491,6 +489,33 @@ namespace Jondo.Unity.Launcher.Handlers
 
         /// <summary>Los puntos de movimiento del personaje, base más equipo (característica 23).</summary>
         public static int GetPlayerMaxMp() => PlayerBaseMp + GetEquipBonus(23);
+
+        /// <summary>Lo que el jugador se ha puesto de puntos en las cuatro elementales.</summary>
+        public static int IniciativaInvertida()
+            => GameState.StatStrength + GameState.StatIntelligence
+             + GameState.StatChance + GameState.StatAgility;
+
+        /// <summary>
+        /// Lo que el equipo le suma a la iniciativa: las CUATRO elementales de los objetos y además
+        /// la característica 44, la iniciativa propiamente dicha.
+        ///
+        /// Las elementales del equipo faltaban, y son casi todo: en el personaje de pruebas el
+        /// equipo pone +730 de fuerza y +760 de agilidad. Sin ellas, un nivel 200 sacaba menos
+        /// iniciativa que un pío de nivel 14 —el monstruo sí suma las cinco características que
+        /// trae de la base— y el bicho jugaba primero.
+        /// </summary>
+        public static int IniciativaDelEquipo()
+            => GetEquipBonus(10) + GetEquipBonus(15) + GetEquipBonus(13)
+             + GetEquipBonus(14) + GetEquipBonus(44);
+
+        /// <summary>
+        /// La iniciativa del personaje, que es la que decide quién empieza el combate. Ni la
+        /// vitalidad ni la sabiduría cuentan.
+        ///
+        /// Existe por lo mismo que <see cref="GetPlayerMaxHp"/>: la ficha que ve el jugador y el
+        /// reparto de turnos tienen que salir del MISMO sitio.
+        /// </summary>
+        public static int GetPlayerInitiative() => IniciativaInvertida() + IniciativaDelEquipo();
 
         /// <summary>
         /// Returns the set bonus for a given stat ID based on how many Intrepid set pieces are equipped.
