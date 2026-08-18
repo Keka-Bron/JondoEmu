@@ -113,20 +113,26 @@ namespace Jondo.Unity.Launcher.UI
             _cifras.Paint += PintarCifras;
             DefinirCifras();
 
-            // La consola NO rellena la ventana: se pega abajo y ocupa poco más de la mitad.
+            // La consola va a la DERECHA, no abajo.
             //
-            // Llenándolo todo tapaba el fondo entero y la ventana era una consola con un borde de
-            // adorno. Dejándole sitio se ve el dibujo, que es de lo que iba esto. El alto sale de
-            // una proporción y no de un número fijo, para que valga igual maximizada en un portátil
-            // que en un monitor grande.
+            // Abajo y a todo lo ancho partía el dibujo por la mitad y le cortaba las piernas al
+            // personaje. En una columna a la derecha el dibujo se ve entero y el registro sigue
+            // cabiendo: es más estrecho pero mucho más alto, que para leer líneas de log viene
+            // mejor. El ancho es una proporción del de la ventana, no un número fijo.
             _caja = new Panel
             {
-                Dock = DockStyle.Bottom,
+                Dock = DockStyle.Right,
                 BackColor = Color.Transparent,
-                Padding = new Padding(E(26), E(10), E(26), E(12)),
+                Padding = new Padding(E(10), E(14), E(22), E(10)),
             };
 
-            var barra = new Panel { Dock = DockStyle.Bottom, Height = E(40), BackColor = Color.Transparent };
+            var barra = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = E(40),
+                BackColor = Color.Transparent,
+                Padding = new Padding(E(22), 0, E(22), 0),
+            };
 
             _registro = new RichTextBox
             {
@@ -135,21 +141,21 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.LogNormal,
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
-                Font = Mono(7f),
+                Font = Mono(5.5f),
                 WordWrap = false,
                 ScrollBars = RichTextBoxScrollBars.Both,
                 DetectUrls = false,
             };
 
             _caja.Controls.Add(_registro);
-            _caja.Controls.Add(barra);
-            _registro.SendToBack();
             _caja.Paint += PintarCaja;
 
-            // El orden importa: WinForms acopla de delante hacia atrás, así que el que rellena va
-            // DETRÁS de los que se pegan a un borde. Al revés, el Fill se queda con toda la ventana
-            // y a los demás les tocan cero píxeles, sin dar ningún error.
+            // El orden importa: WinForms acopla de DELANTE hacia atrás, o sea al revés del orden en
+            // que se añaden. Así que esto se lee de abajo arriba: primero el rótulo se lleva su
+            // franja de arriba, luego las cifras la suya, luego la barra de botones la de abajo, y
+            // lo que queda es donde se coloca la columna de la consola.
             Controls.Add(_caja);
+            Controls.Add(barra);
             Controls.Add(_cifras);
             Controls.Add(_logo);
 
@@ -458,8 +464,8 @@ namespace Jondo.Unity.Launcher.UI
             // not set" en el registro-.
             if (_caja == null) return;
 
-            int alto = (int)(ClientSize.Height * 0.54f);
-            _caja.Height = Math.Max(E(200), Math.Min(alto, ClientSize.Height - E(220)));
+            int ancho = (int)(ClientSize.Width * 0.36f);
+            _caja.Width = Math.Max(E(360), Math.Min(ancho, ClientSize.Width - E(420)));
         }
 
         /// <summary>
@@ -477,7 +483,7 @@ namespace Jondo.Unity.Launcher.UI
             var dentro = new Rectangle(
                 _caja.Padding.Left - E(2), _caja.Padding.Top - E(2),
                 _caja.Width - _caja.Padding.Horizontal + E(4),
-                _caja.Height - _caja.Padding.Vertical - _caja.Controls[1].Height + E(4));
+                _caja.Height - _caja.Padding.Vertical + E(4));
 
             if (dentro.Width <= 0 || dentro.Height <= 0) return;
             using var camino = Redondeado(dentro, E(6));
