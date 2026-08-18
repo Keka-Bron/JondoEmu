@@ -638,7 +638,16 @@ namespace Jondo.Unity.Launcher.UI
 
             if (dentro.Width <= 0 || dentro.Height <= 0) return;
             using var camino = Redondeado(dentro, E(6));
-            using var borde = new Pen(LauncherTheme.BorderBrown, Math.Max(1f, _escala));
+
+            // La consola tiene que ser una PIEZA, no un rectángulo de texto flotando.
+            //
+            // Aquí sólo se dibujaba una raya marrón fina, y por el hueco entre esa raya y la caja
+            // de texto se veía el dibujo del fondo: el área donde se escribe quedaba del mismo
+            // color que todo lo demás y no se sabía dónde empezaba. Un relleno oscuro y traslúcido
+            // —el mismo de la consola del lanzador— la separa del fondo sin taparlo, y el borde
+            // dorado le pone el marco que el marrón no llegaba a marcar.
+            using (var relleno = new SolidBrush(LauncherTheme.ConsoleFill)) g.FillPath(relleno, camino);
+            using var borde = new Pen(LauncherTheme.GoldBorder, Math.Max(2f, E(2)));
             g.DrawPath(borde, camino);
         }
 

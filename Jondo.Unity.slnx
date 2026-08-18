@@ -1,6 +1,8 @@
 <Solution>
   <Project Path="Jondo.Unity.Auth/Jondo.Unity.Auth.csproj" />
+  <Project Path="Jondo.Unity.Contrato/Jondo.Unity.Contrato.csproj" />
   <Project Path="Jondo.Unity.Core/Jondo.Unity.Core.csproj" />
+  <Project Path="Jondo.Unity.Lanzador/Jondo.Unity.Lanzador.csproj" />
   <Project Path="Jondo.Unity.Launcher/Jondo.Unity.Launcher.csproj" />
   <Project Path="Jondo.Unity.Parser/Jondo.Unity.Parser.csproj" />
   <Project Path="Jondo.Unity.Protocol/Jondo.Unity.Protocol.csproj" />

@@ -5,7 +5,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -15,9 +14,14 @@ namespace Jondo.Unity.Launcher.UI
     /// Main window of the emulator launcher.
     ///
     /// Rebuilds in WinForms the interface that used to be a web page served by HaapiServer and
-    /// opened in a browser: the access card on the left (login and register tabs, the
-    /// "ready to play" panel and the service status) and the server event console docked on the
-    /// right, all of it over the background artwork, with music.
+    /// opened in a browser: the access card (login and register tabs, the "ready to play" panel
+    /// and the service status) over the background artwork, with music.
+    ///
+    /// El registro de eventos del servidor ya no está aquí. Vivía en una consola pegada a la
+    /// derecha, de cuando el servidor iba dentro de este mismo ejecutable; ahora el servidor es
+    /// otro programa con su propia ventana y el registro se ve allí, que es donde se produce. El
+    /// lanzador se reparte a los jugadores, y a un jugador el registro del servidor no le sirve
+    /// de nada —ni debería verlo.
     ///
     /// Unlike the web version, there are no HTTP requests here: every action calls
     /// <see cref="LauncherService"/> directly, which is the very same logic still serving the
@@ -29,7 +33,6 @@ namespace Jondo.Unity.Launcher.UI
         private const int SideMargin = 50;
         private const int VerticalMargin = 35;
         private const int CardWidth = 350;
-        private const int ConsoleWidth = 440;
         private const int BarHeight = 40;
         private const int InnerPadding = 20;
         private const int CardRadius = 12;
@@ -49,7 +52,6 @@ namespace Jondo.Unity.Launcher.UI
         private bool _serverOnline;
         private bool _registerMode;
         private bool _authenticated;
-        private long _lastLogId;
         private float _scale = 1f;
         private Language _language;
         private LauncherTexts _texts;
@@ -107,15 +109,7 @@ namespace Jondo.Unity.Launcher.UI
 
         private readonly StatusIndicator _statusIndicator = new();
 
-        private readonly LauncherPanel _consolePanel = new();
-        private readonly LauncherPanel _consoleHeader = new();
-        private readonly Label _lblConsoleTitle = new();
-        private readonly LauncherButton _chkAutoScroll = new();
-        private readonly LauncherButton _btnClear = new();
-        private readonly RichTextBox _console = new();
-
         private readonly System.Windows.Forms.Timer _statusTimer = new();
-        private readonly System.Windows.Forms.Timer _logsTimer = new();
 
         public LauncherWindow()
         {
@@ -150,12 +144,9 @@ namespace Jondo.Unity.Launcher.UI
             _backgroundImage = LauncherTheme.LoadImage("bg.jpg");
 
             BuildCard();
-            BuildConsole();
 
             _statusTimer.Interval = 2000;
             _statusTimer.Tick += (s, e) => CheckStatus();
-            _logsTimer.Interval = 500;
-            _logsTimer.Tick += (s, e) => RefreshLogs();
         }
 
         /// <summary>Background image, already scaled and vignetted, that the panels cut out of.</summary>
@@ -494,62 +485,6 @@ namespace Jondo.Unity.Launcher.UI
             _card.Controls.Add(button);
         }
 
-        private void BuildConsole()
-        {
-            _consolePanel.Layers.Add(LauncherTheme.ConsoleFill);
-            _consolePanel.CornerRadius = CardRadius;
-            _consolePanel.BorderColor = LauncherTheme.GoldBorder;
-            _consolePanel.BorderWidth = 2;
-            Controls.Add(_consolePanel);
-
-            _consoleHeader.Layers.Add(LauncherTheme.ConsoleFill);
-            _consoleHeader.Layers.Add(LauncherTheme.BarFill);
-            _consoleHeader.CornerRadius = CardRadius - 2;
-            _consoleHeader.TopCornersOnly = true;
-            _consoleHeader.BottomLine = LauncherTheme.LightBrown;
-            _consolePanel.Controls.Add(_consoleHeader);
-
-            _lblConsoleTitle.BackColor = Color.Transparent;
-            _lblConsoleTitle.ForeColor = LauncherTheme.HighlightText;
-            _lblConsoleTitle.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
-            _lblConsoleTitle.TextAlign = ContentAlignment.MiddleLeft;
-            _lblConsoleTitle.AutoSize = false;
-            _consoleHeader.Controls.Add(_lblConsoleTitle);
-
-            _chkAutoScroll.Icon = ButtonIcon.CheckBox;
-            _chkAutoScroll.Font = LauncherTheme.CreateFont(11f);
-            _chkAutoScroll.BackgroundTop = _chkAutoScroll.BackgroundBottom = Color.Transparent;
-            _chkAutoScroll.BackgroundTopHighlight = _chkAutoScroll.BackgroundBottomHighlight = Color.Transparent;
-            _chkAutoScroll.BorderColor = Color.Transparent;
-            _chkAutoScroll.BorderWidth = 0;
-            _chkAutoScroll.TextColor = LauncherTheme.Gold;
-            _chkAutoScroll.TextColorHighlight = Color.White;
-            _chkAutoScroll.Click += (s, e) => _chkAutoScroll.Active = !_chkAutoScroll.Active;
-            _consoleHeader.Controls.Add(_chkAutoScroll);
-
-            _btnClear.Font = LauncherTheme.CreateFont(11f);
-            _btnClear.BackgroundTop = _btnClear.BackgroundBottom = Color.FromArgb(204, 45, 25, 15);
-            _btnClear.BackgroundTopHighlight = _btnClear.BackgroundBottomHighlight = LauncherTheme.LightBrown;
-            _btnClear.BorderColor = LauncherTheme.BorderBrown;
-            _btnClear.BorderColorHighlight = LauncherTheme.LightGold;
-            _btnClear.TextColor = LauncherTheme.SoftGold;
-            _btnClear.TextColorHighlight = Color.White;
-            _btnClear.CornerRadius = 3;
-            _btnClear.Click += (s, e) => ClearConsole();
-            _consoleHeader.Controls.Add(_btnClear);
-
-            _console.BorderStyle = BorderStyle.None;
-            _console.BackColor = LauncherTheme.ConsoleBackground;
-            _console.ForeColor = LauncherTheme.LogNormal;
-            _console.Font = LauncherTheme.CreateMonoFont(11f);
-            _console.ReadOnly = true;
-            _console.WordWrap = true;
-            _console.ScrollBars = RichTextBoxScrollBars.Vertical;
-            _console.DetectUrls = false;
-            _console.TabStop = false;
-            _consolePanel.Controls.Add(_console);
-        }
-
         // ═══════════════════════════════════════════════════════════════════════
         //  Lifecycle and layout
         // ═══════════════════════════════════════════════════════════════════════
@@ -575,9 +510,7 @@ namespace Jondo.Unity.Launcher.UI
             UpdateMusicButton();
 
             CheckStatus();
-            RefreshLogs();
             _statusTimer.Start();
-            _logsTimer.Start();
 
             BringToFrontOnOpen();
         }
@@ -619,7 +552,6 @@ namespace Jondo.Unity.Launcher.UI
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             _statusTimer.Stop();
-            _logsTimer.Stop();
             _music?.Dispose();
             base.OnFormClosed(e);
         }
@@ -681,7 +613,7 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Converts a measurement in CSS pixels into real screen pixels.</summary>
         private int Px(float pixels) => (int)Math.Round(pixels * _scale);
 
-        /// <summary>Places the access card and the console keeping the original layout.</summary>
+        /// <summary>Places the access card keeping the original layout.</summary>
         private void RebuildLayout()
         {
             if (ClientSize.Width <= 0 || ClientSize.Height <= 0) return;
@@ -689,11 +621,6 @@ namespace Jondo.Unity.Launcher.UI
 
             int marginX = Px(SideMargin);
             int marginY = Px(VerticalMargin);
-
-            int consoleWidth = Math.Min(Px(ConsoleWidth), Math.Max(Px(240), ClientSize.Width / 2));
-            int consoleHeight = Math.Max(Px(200), ClientSize.Height - marginY * 2);
-            _consolePanel.SetBounds(ClientSize.Width - marginX - consoleWidth, marginY, consoleWidth, consoleHeight);
-            LayOutConsole();
 
             int cardWidth = Px(CardWidth);
             int cardHeight = LayOutCard(cardWidth);
@@ -714,36 +641,8 @@ namespace Jondo.Unity.Launcher.UI
             ResumeLayout();
             _logo.Invalidate();
             _card.Invalidate(true);
-            _consolePanel.Invalidate(true);
         }
 
-        private void LayOutConsole()
-        {
-            int width = _consolePanel.Width;
-            int height = _consolePanel.Height;
-            int border = 2;
-            int headerHeight = Px(BarHeight);
-
-            _consoleHeader.SetBounds(border, border, width - border * 2, headerHeight);
-
-            int margin = Px(18);
-            int clearWidth = MeasureButton(_btnClear, Px(16));
-            int autoScrollWidth = MeasureButton(_chkAutoScroll, Px(24));
-            int controlHeight = Px(22);
-            int controlY = (headerHeight - controlHeight) / 2;
-
-            _btnClear.SetBounds(_consoleHeader.Width - margin - clearWidth, controlY, clearWidth, controlHeight);
-            _chkAutoScroll.SetBounds(_btnClear.Left - Px(10) - autoScrollWidth, controlY, autoScrollWidth, controlHeight);
-            _lblConsoleTitle.SetBounds(margin, 0, Math.Max(Px(40), _chkAutoScroll.Left - margin - Px(8)), headerHeight);
-
-            int sideMargin = Px(16);
-            int topMargin = Px(14);
-            _console.SetBounds(sideMargin, border + headerHeight + topMargin,
-                               Math.Max(Px(60), width - sideMargin * 2),
-                               Math.Max(Px(60), height - border - headerHeight - topMargin * 2));
-        }
-
-        /// <summary>Lays out the card contents from top to bottom and returns its total height.</summary>
         private int LayOutCard(int width)
         {
             int padding = Px(InnerPadding);
@@ -935,10 +834,6 @@ namespace Jondo.Unity.Launcher.UI
             _lblSubscription.Text = string.Format(_texts.TeamSummaryFormat, selected,
                                                   LauncherService.ActiveCount);
             _lblWelcome.Text = string.Format(_texts.TeamTitle, _teamAccounts.Count);
-
-            _lblConsoleTitle.Text = _texts.ConsoleTitle;
-            _btnClear.Text = _texts.ClearButton;
-            _chkAutoScroll.Text = _texts.AutoScroll;
 
             UpdateMusicButton();
             UpdateStatusIndicator();
@@ -1286,115 +1181,6 @@ namespace Jondo.Unity.Launcher.UI
             else _music.Play();
 
             UpdateMusicButton();
-        }
-
-        // ═══════════════════════════════════════════════════════════════════════
-        //  Event console
-        // ═══════════════════════════════════════════════════════════════════════
-
-        private const int WM_SETREDRAW = 0x000B;
-        private const int EM_GETSCROLLPOS = 0x04DD;
-        private const int EM_SETSCROLLPOS = 0x04DE;
-        private const int MaxLines = 200;
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr window, int message, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr window, int message, IntPtr wParam, ref Point point);
-
-        private void RefreshLogs()
-        {
-            IReadOnlyList<LauncherService.LogEntry> entries;
-            try
-            {
-                entries = LauncherService.GetLogs(_lastLogId);
-            }
-            catch
-            {
-                return;
-            }
-            if (entries.Count == 0) return;
-
-            bool auto = _chkAutoScroll.Active;
-            IntPtr handle = _console.Handle;
-            var scrollPos = new Point();
-            SendMessage(handle, EM_GETSCROLLPOS, IntPtr.Zero, ref scrollPos);
-            int selectionStart = _console.SelectionStart;
-            int selectionLength = _console.SelectionLength;
-
-            SendMessage(handle, WM_SETREDRAW, IntPtr.Zero, IntPtr.Zero);
-            try
-            {
-                using var timeFont = LauncherTheme.CreateMonoFont(10f);
-                foreach (var entry in entries)
-                {
-                    _lastLogId = Math.Max(_lastLogId, entry.Id);
-                    AppendText($"[{entry.Time}]  ", LauncherTheme.LogTime, timeFont);
-                    AppendText(entry.Message + Environment.NewLine, LineColor(entry.Message), _console.Font);
-                }
-                TrimConsole();
-
-                if (!auto)
-                {
-                    _console.SelectionStart = Math.Min(selectionStart, _console.TextLength);
-                    _console.SelectionLength = Math.Max(0, Math.Min(selectionLength, _console.TextLength - _console.SelectionStart));
-                    SendMessage(handle, EM_SETSCROLLPOS, IntPtr.Zero, ref scrollPos);
-                }
-            }
-            finally
-            {
-                SendMessage(handle, WM_SETREDRAW, (IntPtr)1, IntPtr.Zero);
-                _console.Invalidate();
-            }
-
-            if (auto)
-            {
-                _console.SelectionStart = _console.TextLength;
-                _console.SelectionLength = 0;
-                _console.ScrollToCaret();
-            }
-        }
-
-        private void AppendText(string text, Color color, Font font)
-        {
-            _console.SelectionStart = _console.TextLength;
-            _console.SelectionLength = 0;
-            _console.SelectionColor = color;
-            _console.SelectionFont = font;
-            _console.AppendText(text);
-        }
-
-        /// <summary>Same color classification as the .log-* classes of the web interface.</summary>
-        private static Color LineColor(string message)
-        {
-            if (message.Contains("[HAAPI]")) return LauncherTheme.LogHaapi;
-            if (message.Contains("[Zaap]") || message.Contains("[Thrift]")) return LauncherTheme.LogZaap;
-            if (message.Contains("[+]") || message.Contains("ONLINE")) return LauncherTheme.LogSuccess;
-            if (message.Contains("[-]")) return LauncherTheme.LogError;
-            if (message.Contains("[DatabaseManager]") || message.Contains("[World]")) return LauncherTheme.LogServer;
-            if (message.Contains("[Anti-DDoS]") || message.Contains("Error")) return LauncherTheme.LogError;
-            return LauncherTheme.LogNormal;
-        }
-
-        /// <summary>Keeps the console down to the last 200 lines, as the web version did.</summary>
-        private void TrimConsole()
-        {
-            int total = _console.Lines.Length;
-            if (total <= MaxLines) return;
-
-            int cut = _console.GetFirstCharIndexFromLine(total - MaxLines);
-            if (cut <= 0) return;
-
-            _console.ReadOnly = false;
-            _console.Select(0, cut);
-            _console.SelectedText = "";
-            _console.ReadOnly = true;
-        }
-
-        private void ClearConsole()
-        {
-            _console.Clear();
         }
 
         // ═══════════════════════════════════════════════════════════════════════

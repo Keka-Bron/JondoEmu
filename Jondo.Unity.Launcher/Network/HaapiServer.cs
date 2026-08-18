@@ -51,13 +51,26 @@ namespace Jondo.Unity.Launcher.Network
             _listener = null;
         }
 
+        /// <summary>
+        /// El latido del lanzador: «¿estás ahí?» y «¿quién tiene cliente abierto?».
+        ///
+        /// La ventana del lanzador lo pregunta cada dos segundos, y cada vuelta escribía cuatro
+        /// líneas —la petición y el cuerpo, por dos rutas—. Eso son ciento veinte líneas por
+        /// minuto que no cuentan nada, y ahora que el registro sólo se ve en el servidor entierran
+        /// lo que sí importa: quién entra, qué mapa se carga, qué pelea empieza. Se atienden
+        /// exactamente igual; simplemente no se anotan.
+        /// </summary>
+        private static bool EsLatido(string path)
+            => path == Contrato.Prefijo + "estado" || path == Contrato.Prefijo + "activos";
+
         private static async Task HandleHaapiRequestAsync(HttpListenerContext ctx)
         {
             var req = ctx.Request;
             var resp = ctx.Response;
             string path = req.Url?.AbsolutePath ?? "/";
             string clientIp = req.RemoteEndPoint.Address.ToString();
-            if (path != "/")
+            bool latido = EsLatido(path);
+            if (path != "/" && !latido)
             {
                 Console.WriteLine($"[HAAPI] {req.HttpMethod} {path} from {clientIp}");
             }
@@ -76,7 +89,7 @@ namespace Jondo.Unity.Launcher.Network
             {
                 using var reader = new StreamReader(req.InputStream, req.ContentEncoding);
                 body = await reader.ReadToEndAsync();
-                if (body.Length > 0 && body.Length < 1000) Console.WriteLine($"[HAAPI]  body: {body}");
+                if (body.Length > 0 && body.Length < 1000 && !latido) Console.WriteLine($"[HAAPI]  body: {body}");
             }
 
             // Las rutas de mando del lanzador. Estuvieron aquí, se borraron al pasar a la ventana

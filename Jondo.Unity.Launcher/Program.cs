@@ -114,8 +114,12 @@ namespace Jondo.Unity.Launcher
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\n[+] ALL EMULATION SERVICES ONLINE AND READY!");
-            Console.WriteLine("Type /help for a list of developer commands.\n");
             Console.ResetColor();
+
+            // Aquí también se invitaba a escribir /help. No hay dónde: esto es un WinExe sin
+            // consola y nadie lee la entrada estándar —no queda un solo Console.ReadLine en el
+            // servidor—. Los comandos de verdad son los del chat del juego, y los reparte
+            // CommandHandler según el rol de quien los escribe.
 
             AppDomain.CurrentDomain.ProcessExit += (s, e) => StopServices();
             Console.CancelKeyPress += (s, e) =>
@@ -139,8 +143,10 @@ namespace Jondo.Unity.Launcher
             // las cosas pasen.
             UI.VentanaDelServidor.Abrir();
 
-            Console.WriteLine("[+] El servidor está en marcha. Ctrl+C para pararlo, o el botón de la ventana.");
-            Console.WriteLine("[+] Cerrar el lanzador YA NO apaga esto.\n");
+            // Aquí se anunciaba «el servidor está en marcha, Ctrl+C para pararlo» y «cerrar el
+            // lanzador ya no apaga esto». Eran avisos para quien miraba una consola de texto:
+            // ahora hay una ventana con un botón de parar, y lo que el registro tiene que contar
+            // es lo que pasa en el servidor, no cómo se maneja.
 
             await _shutdown.Task;
             await barrendero.DisposeAsync();

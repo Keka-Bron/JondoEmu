@@ -47,14 +47,6 @@ namespace Jondo.Unity.Launcher
             public string Version { get; set; } = LauncherService.Version;
         }
 
-        /// <summary>A single line of the server event log.</summary>
-        public sealed class LogEntry
-        {
-            public long Id { get; set; }
-            public string Time { get; set; } = "";
-            public string Message { get; set; } = "";
-        }
-
         // ─── Operations ─────────────────────────────────────────────────────────
 
         /// <summary>
@@ -424,62 +416,6 @@ namespace Jondo.Unity.Launcher
                 ServicesListening = cuerpo.Value.GetProperty("servicios").GetBoolean(),
                 Version = cuerpo.Value.TryGetProperty("version", out var v) ? (v.GetString() ?? Version) : Version,
             };
-        }
-
-        /// <summary>
-        /// Returns the console lines newer than the given id, already deserialized, so that the
-        /// native window does not have to talk over HTTP with its own process.
-        /// </summary>
-        public static IReadOnlyList<LogEntry> GetLogs(long sinceId)
-        {
-            var entries = new List<LogEntry>();
-            try
-            {
-                // Por el canal, no leyendo logs/emulator_console.log. El fichero no reconstruye las
-                // entradas ni sus números de secuencia —sólo existen en memoria— y la ventana los
-                // usa para pedir nada más lo nuevo.
-                var pedido = ClienteDeControl.Pedir("registro", new { desde = sinceId });
-                if (!pedido.Bien) return entries;
-
-                using var doc = System.Text.Json.JsonDocument.Parse(pedido.Json);
-                if (!doc.RootElement.TryGetProperty("logs", out var list)) return entries;
-
-                foreach (var element in list.EnumerateArray())
-                {
-                    // Each line is read on its own. One that cannot be read must not carry off the
-                    // ones behind it: the window only moves its cursor as far as what it is given,
-                    // so a line that always fails would be asked for again for ever and the console
-                    // would sit there frozen. Better to lose the line and keep going.
-                    long entryId = 0;
-                    try
-                    {
-                        entryId = element.TryGetProperty("id", out var id) ? id.GetInt64() : 0;
-                        entries.Add(new LogEntry
-                        {
-                            Id = entryId,
-                            Time = element.TryGetProperty("time", out var time) ? time.GetString() ?? "" : "",
-                            Message = element.TryGetProperty("msg", out var msg) ? msg.GetString() ?? "" : ""
-                        });
-                    }
-                    catch
-                    {
-                        if (entryId > 0)
-                        {
-                            entries.Add(new LogEntry
-                            {
-                                Id = entryId,
-                                Time = "",
-                                Message = "[log] a line could not be read and was dropped."
-                            });
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                // A failure while reading the buffer must not take the UI down: it is retried on the next cycle.
-            }
-            return entries;
         }
 
     }

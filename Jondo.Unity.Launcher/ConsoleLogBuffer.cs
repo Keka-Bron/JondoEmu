@@ -101,7 +101,7 @@ namespace Jondo.Unity.Launcher
         /// Escaping only the quote, the backslash and the newline was not enough, and it cost a
         /// whole session of blind debugging. The packet dump prints the bytes of the message, and
         /// any byte under 0x20 that survives as a character is illegal raw inside a JSON string.
-        /// The document then failed to parse, LauncherService.GetLogs swallowed the exception and
+        /// The document then failed to parse, the reader swallowed the exception and
         /// returned nothing, and since the window only moves its cursor forward when it is given
         /// entries, it asked for the same broken batch for ever. The console froze on the first
         /// game packet and never moved again.

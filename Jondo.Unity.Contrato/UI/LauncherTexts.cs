@@ -50,7 +50,6 @@ namespace Jondo.Unity.Launcher.UI
         public string AccountCreatedMessage { get; init; } = "";
         public string DialogAccept { get; init; } = "Aceptar";
         public string ClientStartedMessage { get; init; } = "";
-        public string ConsoleTitle { get; init; } = "";
         public string ClearButton { get; init; } = "";
         public string MusicOn { get; init; } = "";
         public string MusicOff { get; init; } = "";
@@ -134,7 +133,6 @@ namespace Jondo.Unity.Launcher.UI
                 AccountCreatedMessage = "¡Cuenta creada exitosamente! Ya puedes iniciar sesión.",
                 DialogAccept = "ACEPTAR",
                 ClientStartedMessage = "¡Cliente iniciado exitosamente!",
-                ConsoleTitle = "REGISTRO DE EVENTOS DEL SERVIDOR",
                 ClearButton = "LIMPIAR",
                 MusicOn = "MÚSICA: ON",
                 MusicOff = "MÚSICA: OFF",
@@ -207,7 +205,6 @@ namespace Jondo.Unity.Launcher.UI
                 AccountCreatedMessage = "Account created successfully! You can now log in.",
                 DialogAccept = "ACCEPT",
                 ClientStartedMessage = "Game client started successfully!",
-                ConsoleTitle = "SERVER EVENT LOGS",
                 ClearButton = "CLEAR",
                 MusicOn = "MUSIC: ON",
                 MusicOff = "MUSIC: OFF",
@@ -280,7 +277,6 @@ namespace Jondo.Unity.Launcher.UI
                 AccountCreatedMessage = "Compte créé avec succès! Vous pouvez maintenant vous connecter.",
                 DialogAccept = "ACCEPTER",
                 ClientStartedMessage = "Client de jeu démarré avec succès!",
-                ConsoleTitle = "JOURNAL DU SERVEUR",
                 ClearButton = "EFFACER",
                 MusicOn = "MUSIQUE: ON",
                 MusicOff = "MUSIQUE: OFF",
