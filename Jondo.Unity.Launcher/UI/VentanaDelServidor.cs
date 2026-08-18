@@ -29,6 +29,7 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>El fondo ya compuesto, para que los paneles se recorten su trozo.</summary>
         public Image? ComposedBackground => _fondoCompuesto;
 
+        private readonly Panel _caja;
         private readonly PanelSinParpadeo _cifras;
         private readonly RichTextBox _registro;
         private readonly LauncherLogo _logo;
@@ -112,14 +113,20 @@ namespace Jondo.Unity.Launcher.UI
             _cifras.Paint += PintarCifras;
             DefinirCifras();
 
-            var caja = new Panel
+            // La consola NO rellena la ventana: se pega abajo y ocupa poco más de la mitad.
+            //
+            // Llenándolo todo tapaba el fondo entero y la ventana era una consola con un borde de
+            // adorno. Dejándole sitio se ve el dibujo, que es de lo que iba esto. El alto sale de
+            // una proporción y no de un número fijo, para que valga igual maximizada en un portátil
+            // que en un monitor grande.
+            _caja = new Panel
             {
-                Dock = DockStyle.Fill,
+                Dock = DockStyle.Bottom,
                 BackColor = Color.Transparent,
-                Padding = new Padding(E(22), E(4), E(22), E(14)),
+                Padding = new Padding(E(26), E(10), E(26), E(12)),
             };
 
-            var barra = new Panel { Dock = DockStyle.Bottom, Height = E(44), BackColor = Color.Transparent };
+            var barra = new Panel { Dock = DockStyle.Bottom, Height = E(40), BackColor = Color.Transparent };
 
             _registro = new RichTextBox
             {
@@ -128,20 +135,21 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.LogNormal,
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
-                Font = Mono(9.5f),
+                Font = Mono(7f),
                 WordWrap = false,
                 ScrollBars = RichTextBoxScrollBars.Both,
                 DetectUrls = false,
             };
 
-            caja.Controls.Add(_registro);
-            caja.Controls.Add(barra);
+            _caja.Controls.Add(_registro);
+            _caja.Controls.Add(barra);
             _registro.SendToBack();
+            _caja.Paint += PintarCaja;
 
             // El orden importa: WinForms acopla de delante hacia atrás, así que el que rellena va
             // DETRÁS de los que se pegan a un borde. Al revés, el Fill se queda con toda la ventana
             // y a los demás les tocan cero píxeles, sin dar ningún error.
-            Controls.Add(caja);
+            Controls.Add(_caja);
             Controls.Add(_cifras);
             Controls.Add(_logo);
 
@@ -187,6 +195,7 @@ namespace Jondo.Unity.Launcher.UI
             barra.Resize += (s, e) => Colocar();
 
             AplicarIdioma();
+            AjustarConsola();
             Colocar();
 
             _reloj = new System.Windows.Forms.Timer { Interval = 1000 };
@@ -429,8 +438,51 @@ namespace Jondo.Unity.Launcher.UI
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+            AjustarConsola();
             ComponerFondo();
             Invalidate(true);
+        }
+
+        /// <summary>
+        /// Cuánto ocupa la consola: poco más de la mitad de la ventana, no toda.
+        ///
+        /// Es una proporción y no un alto fijo para que quede igual de bien maximizada en un
+        /// portátil que en un monitor grande. Y con un mínimo, para que estrechando la ventana no
+        /// se quede en dos líneas.
+        /// </summary>
+        private void AjustarConsola()
+        {
+            // Puede llegar antes de tiempo: poner WindowState = Maximized en el constructor ya
+            // dispara un OnResize, y en ese momento todavía no hay panel que ajustar. Sin esta
+            // línea la ventana ni se abría -y el fallo salía como un escueto "Object reference
+            // not set" en el registro-.
+            if (_caja == null) return;
+
+            int alto = (int)(ClientSize.Height * 0.54f);
+            _caja.Height = Math.Max(E(200), Math.Min(alto, ClientSize.Height - E(220)));
+        }
+
+        /// <summary>
+        /// El fondo detrás de la consola, y un marco alrededor.
+        ///
+        /// El marco no es adorno: el cuadro de texto es opaco —WinForms no sabe hacerlo
+        /// translúcido— así que sin un borde parecería un agujero negro pegado encima del dibujo.
+        /// </summary>
+        private void PintarCaja(object? sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            RecortarFondo(g, _caja);
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            var dentro = new Rectangle(
+                _caja.Padding.Left - E(2), _caja.Padding.Top - E(2),
+                _caja.Width - _caja.Padding.Horizontal + E(4),
+                _caja.Height - _caja.Padding.Vertical - _caja.Controls[1].Height + E(4));
+
+            if (dentro.Width <= 0 || dentro.Height <= 0) return;
+            using var camino = Redondeado(dentro, E(6));
+            using var borde = new Pen(LauncherTheme.BorderBrown, Math.Max(1f, _escala));
+            g.DrawPath(borde, camino);
         }
 
         // ─── El latido ──────────────────────────────────────────────────────────────────────
