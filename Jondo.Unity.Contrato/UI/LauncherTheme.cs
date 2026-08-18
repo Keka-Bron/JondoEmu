@@ -48,6 +48,8 @@ namespace Jondo.Unity.Launcher.UI
         public static readonly Color SoftGold = Color.FromArgb(230, 194, 128);    // #e6c280
         public static readonly Color MutedGold = Color.FromArgb(184, 152, 101);  // #b89865
         public static readonly Color LightBrown = Color.FromArgb(89, 60, 29);    // #593c1d
+        /// <summary>Para lo que se enseña pero no cambia: se lee sin robar atención.</summary>
+        public static readonly Color LightBrownText = Color.FromArgb(150, 126, 92);
         public static readonly Color BorderBrown = Color.FromArgb(122, 83, 40);   // #7a5328
         public static readonly Color BaseText = Color.FromArgb(255, 243, 214);   // #fff3d6
         public static readonly Color CardText = Color.FromArgb(255, 243, 204);// #fff3cc

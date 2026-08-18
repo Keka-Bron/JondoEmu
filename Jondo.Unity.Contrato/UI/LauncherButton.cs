@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>Optional icon shown next to a button's text.</summary>
-    internal enum ButtonIcon
+    public enum ButtonIcon
     {
         None,
         Speaker,
@@ -20,7 +20,7 @@ namespace Jondo.Unity.Launcher.UI
     /// Hand-drawn button. It covers every style of the web interface (.btn-action, .tab-btn,
     /// .music-btn, .lang-btn and .btn-clear) by configuring colors, corner radius and active state.
     /// </summary>
-    internal sealed class LauncherButton : Control
+    public sealed class LauncherButton : Control
     {
         public Color BackgroundTop { get; set; } = Color.FromArgb(204, 35, 20, 12);
         public Color BackgroundBottom { get; set; } = Color.FromArgb(204, 35, 20, 12);

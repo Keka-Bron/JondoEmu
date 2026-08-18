@@ -31,16 +31,18 @@ namespace Jondo.Unity.Launcher.UI
 
         private readonly Panel _caja;
         private readonly PanelSinParpadeo _cifras;
+        private readonly PanelSinParpadeo _cifrasDerecha;
         private readonly RichTextBox _registro;
         private readonly LauncherLogo _logo;
         private readonly System.Windows.Forms.Timer _reloj;
         private readonly CheckBox _seguir;
-        private readonly Button _parar;
-        private readonly Button _limpiar;
-        private readonly List<Button> _idiomas = new();
+        private readonly LauncherButton _parar;
+        private readonly LauncherButton _limpiar;
+        private readonly List<LauncherButton> _idiomas = new();
 
         private long _ultimaLinea;
         private readonly DateTime _arranque = DateTime.UtcNow;
+        private readonly System.Diagnostics.Process _yo = System.Diagnostics.Process.GetCurrentProcess();
 
         private Language _idioma = PreferenciasDelServidor.Language;
         private LauncherTexts _textos = LauncherTexts.Get(PreferenciasDelServidor.Language);
@@ -75,6 +77,9 @@ namespace Jondo.Unity.Launcher.UI
             public Func<string> Valor = () => "";
             public Color Tono = LauncherTheme.LightGold;
             public string Ultimo = "";
+
+            /// <summary>Si es la cabecera de un bloque en vez de un dato.</summary>
+            public bool EsGrupo;
         }
 
         private readonly List<Cifra> _lista = new();
@@ -104,13 +109,27 @@ namespace Jondo.Unity.Launcher.UI
                 Dock = DockStyle.Top,
             };
 
+            // Los indicadores en DOS columnas, una a cada lado del dibujo.
+            //
+            // Todos juntos en una sola columna quedaban apelotonados, y arriba en fila tapaban la
+            // parte de arriba del dibujo. Repartidos a los lados, cada bloque respira y el
+            // personaje se queda en medio, que es de lo que iba tener un fondo.
             _cifras = new PanelSinParpadeo
             {
-                Dock = DockStyle.Top,
-                Height = E(102),
+                Dock = DockStyle.Left,
+                Width = 0,   // lo pone AjustarConsola
                 BackColor = Color.Transparent,
             };
-            _cifras.Paint += PintarCifras;
+            _cifras.Paint += (s, e) => ConRed(e.Graphics, _cifras, 0, 2);
+
+            _cifrasDerecha = new PanelSinParpadeo
+            {
+                Dock = DockStyle.Right,
+                Width = 0,
+                BackColor = Color.Transparent,
+            };
+            _cifrasDerecha.Paint += (s, e) => ConRed(e.Graphics, _cifrasDerecha, 2, 2);
+
             DefinirCifras();
 
             // La consola va a la DERECHA, no abajo.
@@ -141,9 +160,12 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.LogNormal,
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
-                Font = Mono(5.5f),
-                WordWrap = false,
-                ScrollBars = RichTextBoxScrollBars.Both,
+                // Con la consola en columna estrecha, las lineas largas obligaban a hacer scroll
+                // horizontal para leerlas enteras, que en un registro es inservible. Se parten y
+                // se acabo la barra de abajo.
+                Font = Mono(6f),
+                WordWrap = true,
+                ScrollBars = RichTextBoxScrollBars.Vertical,
                 DetectUrls = false,
             };
 
@@ -154,9 +176,16 @@ namespace Jondo.Unity.Launcher.UI
             // que se añaden. Así que esto se lee de abajo arriba: primero el rótulo se lleva su
             // franja de arriba, luego las cifras la suya, luego la barra de botones la de abajo, y
             // lo que queda es donde se coloca la columna de la consola.
+            // Se lee de abajo arriba: el rótulo coge su franja de arriba, la barra la de abajo, la
+            // consola la columna de la derecha del todo, y las cifras la columna que queda a su
+            // izquierda. En medio queda el dibujo.
+            // Se lee de abajo arriba: el rótulo coge su franja de arriba, la barra la de abajo, la
+            // consola la columna de la derecha del todo, las cifras de máquina la que queda a su
+            // izquierda, y las de mundo el borde izquierdo. En medio queda el dibujo.
+            Controls.Add(_cifras);
+            Controls.Add(_cifrasDerecha);
             Controls.Add(_caja);
             Controls.Add(barra);
-            Controls.Add(_cifras);
             Controls.Add(_logo);
 
             _seguir = new CheckBox
@@ -165,7 +194,7 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.MutedGold,
                 BackColor = Color.Transparent,
                 AutoSize = true,
-                Font = Letra(8.5f),
+                Font = LauncherTheme.CreateFont(11f * _escala),
                 Location = new Point(E(2), E(13)),
             };
             barra.Controls.Add(_seguir);
@@ -221,6 +250,7 @@ namespace Jondo.Unity.Launcher.UI
             _textos = LauncherTexts.Get(cual);
             AplicarIdioma();
             _cifras.Invalidate();
+            _cifrasDerecha.Invalidate();
         }
 
         private void AplicarIdioma()
@@ -234,140 +264,252 @@ namespace Jondo.Unity.Launcher.UI
             for (int i = 0; i < _idiomas.Count; i++)
             {
                 var cual = (Language)i;
-                _idiomas[i].ForeColor = cual == _idioma ? LauncherTheme.LightGold : LauncherTheme.MutedGold;
-                _idiomas[i].FlatAppearance.BorderColor = cual == _idioma
+                _idiomas[i].TextColor = cual == _idioma ? LauncherTheme.LightGold : LauncherTheme.MutedGold;
+                _idiomas[i].Active = cual == _idioma;
+                _idiomas[i].BorderColor = cual == _idioma
                     ? LauncherTheme.GoldBorder : LauncherTheme.BorderBrown;
             }
         }
 
-        private void Redimensionar(Button boton)
-            => boton.Width = TextRenderer.MeasureText(boton.Text, boton.Font).Width + E(28);
+        private void Redimensionar(LauncherButton boton)
+            => boton.Width = TextRenderer.MeasureText(boton.Text, boton.Font).Width + E(34);
 
         // ─── Las cifras ─────────────────────────────────────────────────────────────────────
 
+        /// <summary>
+        /// Qué se enseña, en su orden y agrupado.
+        ///
+        /// Agrupadas y en columna, no en una fila apretada arriba: así caben las que hacen falta
+        /// para llevar un servidor —tráfico, CPU, hilos— y se leen de un vistazo por bloques.
+        ///
+        /// Todas salen de algo que el servidor sabe de verdad. Ninguna está puesta para rellenar:
+        /// si no se puede medir, no se enseña.
+        /// </summary>
         private void DefinirCifras()
         {
-            // Los jugadores son las sesiones vivas del puerto de juego, no los clientes lanzados:
-            // un cliente puede estar abierto sin haber llegado a entrar al mundo.
-            _lista.Add(new Cifra
+            Grupo(t => t.GroupWorld);
+
+            // Conectados es el número de sockets de juego vivos. "En el mundo" son los que además
+            // han llegado a entrar a un mapa: entre una cosa y otra hay unos segundos de carga, y
+            // con un cliente atascado la diferencia se queda ahí y se ve.
+            Cifra_(t => t.StatPlayers, LauncherTheme.OnlineGreen,
+                   () => Network.GameNodeProxy.SesionesVivas.Count.ToString());
+            Cifra_(t => t.StatInWorld, LauncherTheme.DotGreen, () =>
             {
-                Etiqueta = t => t.StatPlayers,
-                Tono = LauncherTheme.OnlineGreen,
-                Valor = () => Network.GameNodeProxy.SesionesVivas.Count.ToString(),
+                int dentro = 0;
+                foreach (var s in Network.GameNodeProxy.SesionesVivas.Values) if (s.IsInWorld) dentro++;
+                return dentro.ToString();
             });
-            _lista.Add(new Cifra
+            Cifra_(t => t.StatFights, LauncherTheme.Red,
+                   () => Handlers.FightHandler.CombatesEnCurso.ToString());
+            Cifra_(t => t.StatMaps, LauncherTheme.LogHaapi, () =>
             {
-                Etiqueta = t => t.StatClients,
-                Tono = LauncherTheme.LightGold,
-                Valor = () => $"{Network.ClientLaunchRegistry.ActiveCount}/{Network.ClientLaunchRegistry.MaximumClients}",
-            });
-            _lista.Add(new Cifra
-            {
-                Etiqueta = t => t.StatFights,
-                Tono = LauncherTheme.LightGold,
-                Valor = () => Handlers.FightHandler.CombatesEnCurso.ToString(),
-            });
-            _lista.Add(new Cifra
-            {
-                Etiqueta = t => t.StatMaps,
-                Tono = LauncherTheme.SoftGold,
-                Valor = () =>
+                var mapas = new HashSet<long>();
+                foreach (var s in Network.GameNodeProxy.SesionesVivas.Values)
                 {
-                    var mapas = new HashSet<long>();
-                    foreach (var sesion in Network.GameNodeProxy.SesionesVivas.Values)
-                    {
-                        if (sesion.IsInWorld) mapas.Add(sesion.MapId);
-                    }
-                    return mapas.Count.ToString();
-                },
+                    if (s.IsInWorld) mapas.Add(s.MapId);
+                }
+                return mapas.Count.ToString();
             });
-            _lista.Add(new Cifra
+            Cifra_(t => t.StatClients, LauncherTheme.LightGold,
+                   () => $"{Network.ClientLaunchRegistry.ActiveCount}/{Network.ClientLaunchRegistry.MaximumClients}");
+
+            Grupo(t => t.GroupNetwork);
+
+            // Lo que ha pasado por los sockets desde que arrancó, y a qué ritmo va ahora. El ritmo
+            // es lo que dice si el servidor está haciendo algo: los totales sólo dicen que hizo.
+            Cifra_(t => t.StatSent, LauncherTheme.LogSuccess,
+                   () => $"{Bonito(Jondo.Protocol.NetworkMessage.BytesFuera)}  " +
+                         $"({Miles(Jondo.Protocol.NetworkMessage.PaquetesFuera)})");
+            Cifra_(t => t.StatReceived, LauncherTheme.LogZaap,
+                   () => $"{Bonito(Jondo.Protocol.NetworkMessage.BytesDentro)}  " +
+                         $"({Miles(Jondo.Protocol.NetworkMessage.PaquetesDentro)})");
+            Cifra_(t => t.StatRate, LauncherTheme.LightGold, () => $"{_porSegundo:0.0} KB/s");
+
+            Grupo(t => t.GroupMachine);
+
+            Cifra_(t => t.StatCpu, LauncherTheme.LogHaapi, () => $"{_cpu:0.0} %");
+            Cifra_(t => t.StatMemory, LauncherTheme.SoftGold, () =>
             {
-                Etiqueta = t => t.StatMemory,
-                Tono = LauncherTheme.MutedGold,
-                Valor = () => $"{GC.GetTotalMemory(false) / (1024 * 1024)} MB",
+                _yo.Refresh();
+                return Bonito(_yo.WorkingSet64);
             });
-            _lista.Add(new Cifra
+            Cifra_(t => t.StatThreads, LauncherTheme.LogZaap, () =>
             {
-                Etiqueta = t => t.StatUptime,
-                Tono = LauncherTheme.MutedGold,
-                Valor = () =>
-                {
-                    var va = DateTime.UtcNow - _arranque;
-                    return va.TotalDays >= 1 ? $"{(int)va.TotalDays}d {va.Hours}h"
-                         : va.TotalHours >= 1 ? $"{(int)va.TotalHours}h {va.Minutes:00}m"
-                         : $"{va.Minutes}m {va.Seconds:00}s";
-                },
+                _yo.Refresh();
+                return _yo.Threads.Count.ToString();
             });
+            Cifra_(t => t.StatUptime, LauncherTheme.OnlineGreen, () =>
+            {
+                var va = DateTime.UtcNow - _arranque;
+                return va.TotalDays >= 1 ? $"{(int)va.TotalDays}d {va.Hours}h"
+                     : va.TotalHours >= 1 ? $"{(int)va.TotalHours}h {va.Minutes:00}m"
+                     : $"{va.Minutes}m {va.Seconds:00}s";
+            });
+
+            Grupo(t => t.GroupLoaded);
+
+            // Esto no cambia en toda la ejecución, pero dice de un vistazo si el mundo se cargó
+            // entero o si algo se quedó a medias, que es lo primero que uno quiere saber.
+            Cifra_(t => t.StatWorldMaps, LauncherTheme.SoftGold,
+                   () => Miles(Managers.MobSpawnManager.MapasConGrupos));
+            Cifra_(t => t.StatWorldGroups, LauncherTheme.MutedGold,
+                   () => Miles(Managers.MobSpawnManager.TotalGrupos));
+            Cifra_(t => t.StatWorldNpcs, LauncherTheme.HighlightText,
+                   () => Miles(Managers.Npcs.Count));
+        }
+
+        private void Grupo(Func<LauncherTexts, string> titulo)
+            => _lista.Add(new Cifra { Etiqueta = titulo, EsGrupo = true });
+
+        private void Cifra_(Func<LauncherTexts, string> etiqueta, Color tono, Func<string> valor)
+            => _lista.Add(new Cifra { Etiqueta = etiqueta, Tono = tono, Valor = valor });
+
+        private static string Bonito(long bytes)
+            => bytes >= 1024L * 1024 * 1024 ? $"{bytes / (1024.0 * 1024 * 1024):0.0} GB"
+             : bytes >= 1024L * 1024 ? $"{bytes / (1024.0 * 1024):0} MB"
+             : bytes >= 1024 ? $"{bytes / 1024.0:0} KB"
+             : $"{bytes} B";
+
+        private static string Miles(long cuantos) => cuantos.ToString("N0");
+
+        // ─── CPU y ritmo, que hay que medirlos entre dos momentos ───────────────────────────
+
+        private TimeSpan _cpuAntes;
+        private DateTime _cuandoAntes = DateTime.UtcNow;
+        private long _bytesAntes;
+        private double _cpu;
+        private double _porSegundo;
+
+        private void MedirRitmos()
+        {
+            try
+            {
+                _yo.Refresh();
+                var ahora = DateTime.UtcNow;
+                double segundos = (ahora - _cuandoAntes).TotalSeconds;
+                if (segundos <= 0) return;
+
+                var cpuAhora = _yo.TotalProcessorTime;
+                // Entre todos los núcleos: si no, un servidor usando un núcleo entero de ocho
+                // marcaría 100% y parecería que está ahogado cuando le sobran siete.
+                _cpu = (cpuAhora - _cpuAntes).TotalSeconds / segundos / Environment.ProcessorCount * 100.0;
+                _cpuAntes = cpuAhora;
+
+                long bytesAhora = Jondo.Protocol.NetworkMessage.BytesFuera +
+                                  Jondo.Protocol.NetworkMessage.BytesDentro;
+                _porSegundo = (bytesAhora - _bytesAntes) / 1024.0 / segundos;
+                _bytesAntes = bytesAhora;
+
+                _cuandoAntes = ahora;
+            }
+            catch { }
         }
 
         private bool _yaAvise;
 
-        private void PintarCifras(object? sender, PaintEventArgs e)
+        /// <summary>
+        /// Envuelve el pintado de una columna. Un Paint que revienta no se ve: la columna se queda
+        /// en blanco y no hay ni un aviso. Ya pasó una vez y costó más de lo que debería.
+        /// </summary>
+        private void ConRed(Graphics g, Control panel, int desde, int cuantos)
         {
-            // Un Paint que revienta no se ve: la fila se queda en blanco y no hay ni un aviso.
-            try { PintarCifrasDeVerdad(e.Graphics); }
+            try { PintarColumna(g, panel, desde, cuantos); }
             catch (Exception ex)
             {
                 if (_yaAvise) return;
                 _yaAvise = true;
-                Console.WriteLine($"[Servidor] La fila de cifras no se ha podido pintar: {ex}");
+                Console.WriteLine($"[Servidor] Una columna de cifras no se ha podido pintar: {ex}");
             }
         }
 
-        private void PintarCifrasDeVerdad(Graphics g)
+        /// <summary>
+        /// La columna de cifras: una tarjeta por bloque y dentro una línea por dato.
+        ///
+        /// La primera versión era una fila de tarjetas apretadas arriba. Cabían seis y ya iban
+        /// justas; en columna caben las quince que hacen falta para llevar un servidor, y agrupadas
+        /// se leen por bloques en vez de como una ristra.
+        /// </summary>
+        private void PintarColumna(Graphics g, Control panel, int desdeGrupo, int cuantosGrupos)
         {
-            RecortarFondo(g, _cifras);
+            RecortarFondo(g, panel);
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            int margen = E(22);
-            int hueco = E(10);
-            int alto = E(78);
-            int y = E(8);
-            int ancho = Math.Max(E(90), (_cifras.Width - margen * 2 - hueco * (_lista.Count - 1)) / _lista.Count);
+            int margen = E(12);
+            int ancho = panel.Width - margen * 2;
+            if (ancho <= 0) return;
 
-            using var fEtiqueta = Letra(7.5f, FontStyle.Bold);
+            using var fGrupo = LauncherTheme.CreateFont(10f * _escala, FontStyle.Bold);
+            using var fEtiqueta = LauncherTheme.CreateFont(9.5f * _escala);
+            using var fValor = LauncherTheme.CreateFont(12.5f * _escala, FontStyle.Bold);
+            using var pincelGrupo = new SolidBrush(LauncherTheme.SoftGold);
             using var pincelEtiqueta = new SolidBrush(LauncherTheme.MutedGold);
             using var relleno = new SolidBrush(LauncherTheme.CardFill);
             using var borde = new Pen(LauncherTheme.BorderBrown, Math.Max(1f, _escala));
-            using var dentro = new StringFormat(StringFormatFlags.NoWrap)
+            using var izquierda = new StringFormat(StringFormatFlags.NoWrap)
             {
                 Trimming = StringTrimming.EllipsisCharacter,
             };
+            using var derecha = new StringFormat(StringFormatFlags.NoWrap)
+            {
+                Trimming = StringTrimming.EllipsisCharacter,
+                Alignment = StringAlignment.Far,
+            };
 
+            int altoLinea = E(21);
+            int y = E(6);
+
+            // Se pintan sólo los bloques que le tocan a ESTA columna: la de la izquierda lleva los
+            // dos primeros y la de la derecha los dos siguientes.
+            int vistos = -1;
             for (int i = 0; i < _lista.Count; i++)
             {
-                var cifra = _lista[i];
-                var caja = new Rectangle(margen + i * (ancho + hueco), y, ancho, alto);
+                if (!_lista[i].EsGrupo) continue;
+                vistos++;
+                if (vistos < desdeGrupo) continue;
+                if (vistos >= desdeGrupo + cuantosGrupos) break;
 
-                using var camino = Redondeado(caja, E(8));
-                g.FillPath(relleno, camino);
-                g.DrawPath(borde, camino);
+                int cuantas = 0;
+                for (int j = i + 1; j < _lista.Count && !_lista[j].EsGrupo; j++) cuantas++;
 
-                g.DrawString(cifra.Etiqueta(_textos), fEtiqueta, pincelEtiqueta,
-                             new RectangleF(caja.X + E(10), caja.Y + E(9), caja.Width - E(16),
-                                            fEtiqueta.GetHeight(g) + 2), dentro);
+                int altoCaja = E(20) + cuantas * altoLinea + E(8);
+                var caja = new Rectangle(margen, y, ancho, altoCaja);
+                if (caja.Bottom > panel.Height) break;
 
-                // El cuerpo de la cifra se ajusta al ancho que haya: con la ventana maximizada
-                // caben grandes, y estrechándola no se salen ni acaban en puntos suspensivos.
-                float cuerpo = 17f;
-                var fValor = Letra(cuerpo, FontStyle.Bold);
-                while (cuerpo > 9f && g.MeasureString(cifra.Ultimo, fValor).Width > caja.Width - E(20))
+                using (var camino = Redondeado(caja, E(7)))
                 {
-                    fValor.Dispose();
-                    cuerpo -= 1f;
-                    fValor = Letra(cuerpo, FontStyle.Bold);
+                    g.FillPath(relleno, camino);
+                    g.DrawPath(borde, camino);
                 }
 
-                using (fValor)
-                using (var pincelValor = new SolidBrush(cifra.Tono))
+                g.DrawString(_lista[i].Etiqueta(_textos), fGrupo, pincelGrupo,
+                             new RectangleF(caja.X + E(10), caja.Y + E(5), caja.Width - E(20),
+                                            fGrupo.GetHeight(g) + 2), izquierda);
+
+                int linea = caja.Y + E(22);
+                for (int j = i + 1; j < _lista.Count && !_lista[j].EsGrupo; j++)
                 {
+                    var cifra = _lista[j];
+                    var hueco = new RectangleF(caja.X + E(10), linea, caja.Width - E(20), altoLinea);
+
+                    // Los dos ocupan el ANCHO ENTERO, uno pegado a la izquierda y el otro a la
+                    // derecha, en vez de repartirse la línea en dos mitades. Con mitades, una
+                    // etiqueta como "JUGADORES" no cabía en la suya y salía cortada aunque
+                    // sobrara sitio de sobra al lado, porque el hueco del valor estaba vacío.
+                    g.DrawString(cifra.Etiqueta(_textos), fEtiqueta, pincelEtiqueta,
+                                 new RectangleF(hueco.X, hueco.Y + E(3), hueco.Width,
+                                                fEtiqueta.GetHeight(g) + 2), izquierda);
+
+                    using var pincelValor = new SolidBrush(cifra.Tono);
                     g.DrawString(cifra.Ultimo, fValor, pincelValor,
-                                 new RectangleF(caja.X + E(10), caja.Y + E(30), caja.Width - E(16),
-                                                fValor.GetHeight(g) + 2), dentro);
+                                 new RectangleF(hueco.X, hueco.Y, hueco.Width,
+                                                fValor.GetHeight(g) + 2), derecha);
+                    linea += altoLinea;
                 }
+
+                y = caja.Bottom + E(8);
             }
         }
 
@@ -464,8 +606,11 @@ namespace Jondo.Unity.Launcher.UI
             // not set" en el registro-.
             if (_caja == null) return;
 
-            int ancho = (int)(ClientSize.Width * 0.36f);
-            _caja.Width = Math.Max(E(360), Math.Min(ancho, ClientSize.Width - E(420)));
+            int ancho = (int)(ClientSize.Width * 0.25f);
+            _caja.Width = Math.Max(E(300), Math.Min(ancho, ClientSize.Width - E(900)));
+            int columna = Math.Max(E(270), (int)(ClientSize.Width * 0.165f));
+            if (_cifras != null) _cifras.Width = columna;
+            if (_cifrasDerecha != null) _cifrasDerecha.Width = columna;
         }
 
         /// <summary>
@@ -495,16 +640,19 @@ namespace Jondo.Unity.Launcher.UI
 
         private void Refrescar()
         {
+            MedirRitmos();
+
             bool cambio = false;
             foreach (var cifra in _lista)
             {
+                if (cifra.EsGrupo) continue;
                 string ahora;
                 try { ahora = cifra.Valor(); }
                 catch { ahora = "—"; }
                 if (ahora != cifra.Ultimo) { cifra.Ultimo = ahora; cambio = true; }
             }
             // Sólo se repinta si algo ha cambiado, y el panel va con doble búfer: así no parpadea.
-            if (cambio) _cifras.Invalidate();
+            if (cambio) { _cifras.Invalidate(); _cifrasDerecha.Invalidate(); }
 
             TraerRegistro();
         }
@@ -582,23 +730,35 @@ namespace Jondo.Unity.Launcher.UI
 
         // ─── Botones ────────────────────────────────────────────────────────────────────────
 
-        private Button Boton(string texto, Color tono, int ancho = 0)
+        /// <summary>
+        /// Un botón con el estilo del lanzador.
+        ///
+        /// Antes eran <see cref="Button"/> de WinForms en plano, con su rectángulo y su letra del
+        /// sistema: al lado del resto de la ventana cantaban muchísimo. LauncherButton es el mismo
+        /// control que usa el lanzador —degradado, esquinas redondeadas, letra espaciada— y ahora
+        /// vive en el contrato para que lo puedan usar los dos.
+        /// </summary>
+        private LauncherButton Boton(string texto, Color tono, int ancho = 0)
         {
-            var letra = Letra(8.5f, FontStyle.Bold);
-            var boton = new Button
+            var boton = new LauncherButton
             {
                 Text = texto,
-                AutoSize = false,
+                Font = LauncherTheme.CreateFont(11f * _escala, FontStyle.Bold),
                 Height = E(30),
-                Width = ancho > 0 ? ancho : TextRenderer.MeasureText(texto, letra).Width + E(28),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = LauncherTheme.FieldBackground,
-                ForeColor = tono,
-                Font = letra,
+                Width = ancho > 0 ? ancho : E(120),
+                LetterSpacing = 1f,
+                CornerRadius = E(5),
+                BackgroundTop = Color.FromArgb(200, 34, 21, 12),
+                BackgroundBottom = Color.FromArgb(200, 22, 13, 8),
+                BackgroundTopHighlight = LauncherTheme.LightBrown,
+                BackgroundBottomHighlight = Color.FromArgb(130, 75, 35),
+                BorderColor = LauncherTheme.BorderBrown,
+                BorderColorHighlight = LauncherTheme.GoldBorder,
+                TextColor = tono,
+                TextColorHighlight = Color.White,
+                TextShadow = true,
                 Cursor = Cursors.Hand,
             };
-            boton.FlatAppearance.BorderColor = LauncherTheme.BorderBrown;
-            boton.FlatAppearance.MouseOverBackColor = LauncherTheme.LightBrown;
             return boton;
         }
 
@@ -637,8 +797,13 @@ namespace Jondo.Unity.Launcher.UI
         {
             try
             {
-                string ruta = Path.Combine(LauncherTheme.AssetsFolder, "favicon.ico");
-                if (File.Exists(ruta)) Icon = new Icon(ruta);
+                // El del servidor es el mismo huevo del lanzador pero en azul claro, para
+                // distinguir de un vistazo las dos ventanas en la barra de tareas.
+                foreach (string nombre in new[] { "icono_servidor.ico", "favicon.ico" })
+                {
+                    string ruta = Path.Combine(LauncherTheme.AssetsFolder, nombre);
+                    if (File.Exists(ruta)) { Icon = new Icon(ruta); return; }
+                }
             }
             catch { }
         }

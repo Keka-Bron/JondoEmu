@@ -448,6 +448,26 @@ namespace Jondo.Unity.Launcher.Managers
             }
         }
 
+        /// <summary>Cuantos grupos de monstruos hay puestos en todo el mundo. Lo pinta el servidor.</summary>
+        public static int TotalGrupos
+        {
+            get
+            {
+                lock (_candado)
+                {
+                    int total = 0;
+                    foreach (var lista in _mapMobs.Values) total += lista.Count;
+                    return total;
+                }
+            }
+        }
+
+        /// <summary>En cuantos mapas hay grupos puestos.</summary>
+        public static int MapasConGrupos
+        {
+            get { lock (_candado) { return _mapMobs.Count; } }
+        }
+
         public static MonsterData? GetMonsterData(int monsterId)
         {
             return _monsters.TryGetValue(monsterId, out var data) ? data : null;

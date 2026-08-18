@@ -20,7 +20,7 @@
     <RootNamespace>Jondo.Unity.Launcher</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>icono_servidor.ico</ApplicationIcon>
     <!-- Un solo fichero: las doce dll (Google.Protobuf, Thrift, Sqlite y compania) se meten dentro
          del .exe, y la nativa e_sqlite3.dll tambien. Sigue dependiendo del runtime de .NET 10. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>

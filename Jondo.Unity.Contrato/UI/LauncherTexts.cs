@@ -84,6 +84,21 @@ namespace Jondo.Unity.Launcher.UI
         public string StopServerConfirm { get; init; } = "";
         public string StopServerWithPlayers { get; init; } = "";
 
+        // Los bloques de la columna de cifras del servidor, y las cifras nuevas.
+        public string GroupWorld { get; init; } = "";
+        public string GroupNetwork { get; init; } = "";
+        public string GroupMachine { get; init; } = "";
+        public string GroupLoaded { get; init; } = "";
+        public string StatInWorld { get; init; } = "";
+        public string StatSent { get; init; } = "";
+        public string StatReceived { get; init; } = "";
+        public string StatRate { get; init; } = "";
+        public string StatCpu { get; init; } = "";
+        public string StatThreads { get; init; } = "";
+        public string StatWorldMaps { get; init; } = "";
+        public string StatWorldGroups { get; init; } = "";
+        public string StatWorldNpcs { get; init; } = "";
+
         private static readonly Dictionary<Language, LauncherTexts> Catalog = new()
         {
             [Language.Es] = new LauncherTexts
@@ -144,7 +159,20 @@ namespace Jondo.Unity.Launcher.UI
                 StatUptime = "EN MARCHA",
                 StopServer = "DETENER EL SERVIDOR",
                 StopServerConfirm = "¿Parar el servidor?",
-                StopServerWithPlayers = "Hay {0} jugador(es) conectado(s) y perderán la conexión.\n\n¿Parar el servidor?"
+                StopServerWithPlayers = "Hay {0} jugador(es) conectado(s) y perderán la conexión.\n\n¿Parar el servidor?",
+                GroupWorld = "MUNDO",
+                GroupNetwork = "RED",
+                GroupMachine = "MÁQUINA",
+                GroupLoaded = "CARGADO",
+                StatInWorld = "En el mapa",
+                StatSent = "Enviado",
+                StatReceived = "Recibido",
+                StatRate = "Ahora mismo",
+                StatCpu = "CPU",
+                StatThreads = "Hilos",
+                StatWorldMaps = "Mapas",
+                StatWorldGroups = "Grupos",
+                StatWorldNpcs = "NPCs"
             },
             [Language.En] = new LauncherTexts
             {
@@ -204,7 +232,20 @@ namespace Jondo.Unity.Launcher.UI
                 StatUptime = "UPTIME",
                 StopServer = "STOP THE SERVER",
                 StopServerConfirm = "Stop the server?",
-                StopServerWithPlayers = "{0} player(s) are connected and will lose their connection.\n\nStop the server?"
+                StopServerWithPlayers = "{0} player(s) are connected and will lose their connection.\n\nStop the server?",
+                GroupWorld = "WORLD",
+                GroupNetwork = "NETWORK",
+                GroupMachine = "MACHINE",
+                GroupLoaded = "LOADED",
+                StatInWorld = "On a map",
+                StatSent = "Sent",
+                StatReceived = "Received",
+                StatRate = "Right now",
+                StatCpu = "CPU",
+                StatThreads = "Threads",
+                StatWorldMaps = "Maps",
+                StatWorldGroups = "Groups",
+                StatWorldNpcs = "NPCs"
             },
             [Language.Fr] = new LauncherTexts
             {
@@ -264,7 +305,20 @@ namespace Jondo.Unity.Launcher.UI
                 StatUptime = "EN LIGNE",
                 StopServer = "ARRÊTER LE SERVEUR",
                 StopServerConfirm = "Arrêter le serveur ?",
-                StopServerWithPlayers = "{0} joueur(s) sont connectés et perdront leur connexion.\n\nArrêter le serveur ?"
+                StopServerWithPlayers = "{0} joueur(s) sont connectés et perdront leur connexion.\n\nArrêter le serveur ?",
+                GroupWorld = "MONDE",
+                GroupNetwork = "RÉSEAU",
+                GroupMachine = "MACHINE",
+                GroupLoaded = "CHARGÉ",
+                StatInWorld = "Sur une carte",
+                StatSent = "Envoyé",
+                StatReceived = "Reçu",
+                StatRate = "En ce moment",
+                StatCpu = "CPU",
+                StatThreads = "Threads",
+                StatWorldMaps = "Cartes",
+                StatWorldGroups = "Groupes",
+                StatWorldNpcs = "PNJ"
             }
         };
 

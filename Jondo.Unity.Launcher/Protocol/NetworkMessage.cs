@@ -38,7 +38,9 @@ namespace Jondo.Protocol
                 if (read == 0) return null; // End of stream prematurely
                 totalRead += read;
             }
-            
+
+            ApuntarEntrada(totalRead);
+
             // Log packet
             try
             {
@@ -124,6 +126,26 @@ namespace Jondo.Protocol
             return WriteSerializedAsync(stream, frame);
         }
 
+        // ─── El tráfico que pasa por aquí ────────────────────────────────────────────────────
+        //
+        // Dos pares de contadores: paquetes y bytes, de salida y de entrada. Los pinta la ventana
+        // del servidor, y son la forma más directa de ver de un vistazo si está pasando algo o si
+        // el servidor está mudo. Van con Interlocked porque los tocan todos los sockets a la vez.
+
+        private static long _paquetesFuera, _bytesFuera, _paquetesDentro, _bytesDentro;
+
+        public static long PaquetesFuera => Interlocked.Read(ref _paquetesFuera);
+        public static long BytesFuera => Interlocked.Read(ref _bytesFuera);
+        public static long PaquetesDentro => Interlocked.Read(ref _paquetesDentro);
+        public static long BytesDentro => Interlocked.Read(ref _bytesDentro);
+
+        /// <summary>Lo que acaba de llegar por un socket. Lo llama quien lee tramas.</summary>
+        public static void ApuntarEntrada(int bytes)
+        {
+            Interlocked.Increment(ref _paquetesDentro);
+            Interlocked.Add(ref _bytesDentro, bytes);
+        }
+
         private static async Task WriteSerializedAsync(Stream stream, byte[] frame)
         {
             var gate = WriteLocks.GetValue(stream, _ => new SemaphoreSlim(1, 1));
@@ -131,6 +153,8 @@ namespace Jondo.Protocol
             try
             {
                 await stream.WriteAsync(frame, 0, frame.Length);
+                Interlocked.Increment(ref _paquetesFuera);
+                Interlocked.Add(ref _bytesFuera, frame.Length);
             }
             finally
             {
