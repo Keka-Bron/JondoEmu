@@ -44,7 +44,10 @@ namespace Jondo.Unity.Launcher.Network
         {
             lock (SessionGate)
             {
-                if (_sessions.Count >= ClientLaunchRegistry.MaximumClients) return false;
+                // La capacidad del SERVIDOR, que no tiene nada que ver con cuántos clientes abre una
+                // persona. Aquí ponía el tope del lanzador multicuenta -ocho- y por eso el servidor
+                // entero rechazaba la novena conexión, viniera del ordenador que viniera.
+                if (_sessions.Count >= Contrato.ClientesEnTotal) return false;
                 return _sessions.TryAdd(session.Id, session);
             }
         }

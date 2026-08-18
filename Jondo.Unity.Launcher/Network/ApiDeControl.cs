@@ -64,7 +64,8 @@ namespace Jondo.Unity.Launcher.Network
         /// Contesta una petición de mando. Devuelve null si la ruta no es de aquí, para que el
         /// HAAPI siga con lo suyo.
         /// </summary>
-        public static Respuesta? Responder(string ruta, string metodo, string cuerpo, string? secreto)
+        public static Respuesta? Responder(string ruta, string metodo, string cuerpo, string? secreto,
+                                           string ip = "")
         {
             if (!ruta.StartsWith(Prefijo, StringComparison.Ordinal)) return null;
 
@@ -84,7 +85,7 @@ namespace Jondo.Unity.Launcher.Network
                     // cualquier jugador hace con su propia cuenta.
                     case Prefijo + "activos": return ConSesion(cuerpo, _ => Activos());
                     case Prefijo + "recordar-token": return RecordarToken(cuerpo);
-                    case Prefijo + "lanzamiento": return ConSesion(cuerpo, cuenta => Lanzamiento(cuerpo, cuenta));
+                    case Prefijo + "lanzamiento": return ConSesion(cuerpo, cuenta => Lanzamiento(cuerpo, cuenta, ip));
                     case Prefijo + "fin-de-lanzamiento":
                         return ConSesion(cuerpo, cuenta => FinDeLanzamiento(cuenta));
 
@@ -173,7 +174,8 @@ namespace Jondo.Unity.Launcher.Network
             var cuentas = new List<long>(ClientLaunchRegistry.ActiveAccounts);
             return Bien(new
             {
-                maximo = ClientLaunchRegistry.MaximumClients,
+                maximo = Contrato.ClientesPorIp,
+                capacidad = Contrato.ClientesEnTotal,
                 cuantos = cuentas.Count,
                 cuentas,
             });
@@ -250,7 +252,7 @@ namespace Jondo.Unity.Launcher.Network
         /// en memoria que luego lee el Zaap. Con dos procesos, el lanzador apuntaba en su memoria y
         /// el Zaap miraba en la suya. Ahora lo reparte quien lo va a comprobar.
         /// </summary>
-        private static Respuesta Lanzamiento(string cuerpo, long cuenta)
+        private static Respuesta Lanzamiento(string cuerpo, long cuenta, string ip)
         {
             string token = Texto(cuerpo, "token");
             string idioma = Texto(cuerpo, "idioma");
@@ -258,7 +260,7 @@ namespace Jondo.Unity.Launcher.Network
 
             try
             {
-                var lanzamiento = ClientLaunchRegistry.Register(cuenta, token, Guid.NewGuid().ToString("N"), idioma);
+                var lanzamiento = ClientLaunchRegistry.Register(cuenta, token, Guid.NewGuid().ToString("N"), idioma, ip);
                 return Bien(new
                 {
                     bien = true,

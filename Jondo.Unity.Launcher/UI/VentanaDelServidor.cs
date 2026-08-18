@@ -293,7 +293,7 @@ namespace Jondo.Unity.Launcher.UI
             // han llegado a entrar a un mapa: entre una cosa y otra hay unos segundos de carga, y
             // con un cliente atascado la diferencia se queda ahí y se ve.
             Cifra_(t => t.StatPlayers, LauncherTheme.OnlineGreen,
-                   () => Network.GameNodeProxy.SesionesVivas.Count.ToString());
+                   () => $"{Network.GameNodeProxy.SesionesVivas.Count}/{Contrato.ClientesEnTotal}");
             Cifra_(t => t.StatInWorld, LauncherTheme.DotGreen, () =>
             {
                 int dentro = 0;
@@ -312,7 +312,7 @@ namespace Jondo.Unity.Launcher.UI
                 return mapas.Count.ToString();
             });
             Cifra_(t => t.StatClients, LauncherTheme.LightGold,
-                   () => $"{Network.ClientLaunchRegistry.ActiveCount}/{Network.ClientLaunchRegistry.MaximumClients}");
+                   () => Network.ClientLaunchRegistry.ActiveCount.ToString());
 
             Grupo(t => t.GroupNetwork);
 
@@ -443,7 +443,11 @@ namespace Jondo.Unity.Launcher.UI
 
             using var fGrupo = LauncherTheme.CreateFont(10f * _escala, FontStyle.Bold);
             using var fEtiqueta = LauncherTheme.CreateFont(9.5f * _escala);
-            using var fValor = LauncherTheme.CreateFont(12.5f * _escala, FontStyle.Bold);
+            // El valor va del MISMO tamaño que su etiqueta, sólo que en negrita y con color. Iba
+            // tres puntos más grande y en bloques como el de RED —donde el valor es "0,0 KB/s" y
+            // no un número corto— la línea quedaba descuadrada: la palabra pequeña y el dato
+            // enorme al lado, sin ninguna razón.
+            using var fValor = LauncherTheme.CreateFont(9.5f * _escala, FontStyle.Bold);
             using var pincelGrupo = new SolidBrush(LauncherTheme.SoftGold);
             using var pincelEtiqueta = new SolidBrush(LauncherTheme.MutedGold);
             using var relleno = new SolidBrush(LauncherTheme.CardFill);
@@ -503,8 +507,10 @@ namespace Jondo.Unity.Launcher.UI
                                                 fEtiqueta.GetHeight(g) + 2), izquierda);
 
                     using var pincelValor = new SolidBrush(cifra.Tono);
+                    // A la misma altura que la etiqueta: con el mismo cuerpo, si uno arranca tres
+                    // píxeles más arriba que el otro se nota que están descolocados.
                     g.DrawString(cifra.Ultimo, fValor, pincelValor,
-                                 new RectangleF(hueco.X, hueco.Y, hueco.Width,
+                                 new RectangleF(hueco.X, hueco.Y + E(3), hueco.Width,
                                                 fValor.GetHeight(g) + 2), derecha);
                     linea += altoLinea;
                 }

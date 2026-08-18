@@ -36,6 +36,25 @@ namespace Jondo.Unity.Launcher
         /// <summary>El prefijo de todas las rutas de mando.</summary>
         public const string Prefijo = "/api/";
 
+        // ─── Cuántos caben ──────────────────────────────────────────────────────────────────
+        //
+        // Son DOS cosas distintas y durante un tiempo fueron el mismo número, que es lo que hacía
+        // que el servidor entero no admitiera más de ocho conexiones:
+        //
+        //   * cuántos clientes puede tener abiertos UNA persona a la vez. Ocho, que es lo que cabe
+        //     en un grupo de Dofus, y es de donde salió el número: del lanzador multicuenta.
+        //   * cuántos jugadores admite el servidor EN TOTAL, que no tiene nada que ver con lo
+        //     anterior y que antes valía ocho por accidente de compartir constante.
+        //
+        // El primero se cuenta por dirección: quien juega con varias cuentas lo hace desde su
+        // ordenador, así que la IP es lo que agrupa a una misma persona.
+
+        /// <summary>Clientes que puede tener abiertos a la vez una misma dirección.</summary>
+        public const int ClientesPorIp = 8;
+
+        /// <summary>Jugadores conectados que admite el servidor en total.</summary>
+        public const int ClientesEnTotal = 500;
+
         /// <summary>La cabecera por la que viaja el secreto.</summary>
         public const string Cabecera = "X-Jondo-Control";
 

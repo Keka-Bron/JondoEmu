@@ -12,7 +12,11 @@ namespace Jondo.Unity.Launcher.Network
     /// </summary>
     public static class ClientLaunchRegistry
     {
-        public const int MaximumClients = 8;
+        /// <summary>
+        /// Clientes que puede tener abiertos a la vez UNA misma dirección. Ocho, que es lo que cabe
+        /// en un grupo de Dofus. NO es la capacidad del servidor: esa es Contrato.ClientesEnTotal.
+        /// </summary>
+        public const int MaximumClients = Contrato.ClientesPorIp;
         public sealed class Launch
         {
             public int InstanceId { get; init; }
@@ -25,6 +29,9 @@ namespace Jondo.Unity.Launcher.Network
             /// español salvo que se cambie: aquí ponía "fr" a pelo.
             /// </summary>
             public string Language { get; init; } = "es";
+
+            /// <summary>Desde dónde se lanzó. Agrupa los clientes de una misma persona.</summary>
+            public string Ip { get; init; } = "";
             public DateTime CreatedAtUtc { get; init; }
         }
 
@@ -38,10 +45,13 @@ namespace Jondo.Unity.Launcher.Network
         private static readonly object RegistrationGate = new();
         private static int _nextInstanceId;
 
-        public static Launch Register(long accountId, string launcherToken, string hash, string language)
+        public static Launch Register(long accountId, string launcherToken, string hash, string language,
+                                      string ip = "")
         {
             if (accountId <= 0) throw new ArgumentOutOfRangeException(nameof(accountId));
             if (string.IsNullOrWhiteSpace(hash)) throw new ArgumentException("A launch hash is required.", nameof(hash));
+
+            string deDonde = string.IsNullOrWhiteSpace(ip) ? Contrato.LocalIp : ip.Trim();
 
             lock (RegistrationGate)
             {
@@ -53,7 +63,19 @@ namespace Jondo.Unity.Launcher.Network
                 // tenga una ventana delante decide en qué idioma se lo cuenta a la persona.
                 if (ByAccount.ContainsKey(accountId))
                     throw new InvalidOperationException(Contrato.MotivoCuentaYaAbierta);
-                if (ByAccount.Count >= MaximumClients)
+
+                // El tope de ocho es POR DIRECCIÓN, no del servidor entero.
+                //
+                // Contaba ByAccount.Count, o sea todos los clientes de todo el mundo: con el
+                // servidor en una máquina y los jugadores en otras, el noveno cliente del servidor
+                // se rechazaba aunque fuera el primero de esa persona. El ocho viene del grupo de
+                // Dofus y es de una persona, no del servidor.
+                int suyos = 0;
+                foreach (var otro in ByAccount.Values)
+                {
+                    if (string.Equals(otro.Ip, deDonde, StringComparison.OrdinalIgnoreCase)) suyos++;
+                }
+                if (suyos >= Contrato.ClientesPorIp)
                     throw new InvalidOperationException(Contrato.MotivoTopeDeClientes);
 
                 var launch = new Launch
@@ -63,6 +85,7 @@ namespace Jondo.Unity.Launcher.Network
                     Hash = hash,
                     LauncherToken = launcherToken ?? "",
                     Language = string.IsNullOrWhiteSpace(language) ? "fr" : language,
+                    Ip = deDonde,
                     CreatedAtUtc = DateTime.UtcNow
                 };
                 ByHash[hash] = launch;
@@ -197,13 +220,21 @@ namespace Jondo.Unity.Launcher.Network
             var launches = new List<Launch>();
             try
             {
-                for (int i = 0; i < MaximumClients; i++)
-                    launches.Add(Register(1000 + i, "", Guid.NewGuid().ToString("N"), "fr"));
+                // Los ocho desde la MISMA direccion, que es lo que agrupa a una persona.
+                const string mismaCasa = "10.0.0.7";
+                for (int i = 0; i < Contrato.ClientesPorIp; i++)
+                    launches.Add(Register(1000 + i, "", Guid.NewGuid().ToString("N"), "fr", mismaCasa));
 
                 bool rejected = false;
-                try { Register(9999, "", Guid.NewGuid().ToString("N"), "fr"); }
+                try { Register(9999, "", Guid.NewGuid().ToString("N"), "fr", mismaCasa); }
                 catch (InvalidOperationException) { rejected = true; }
                 if (!rejected) throw new InvalidOperationException("The ninth game client was not rejected.");
+
+                // Pero desde OTRA direccion si entra: el tope es de una persona, no del servidor.
+                // Cuando eran la misma constante, este noveno cliente se rechazaba tambien, y con
+                // el servidor en otra maquina eso dejaba el mundo en ocho jugadores como mucho.
+                var deFuera = Register(8888, "", Guid.NewGuid().ToString("N"), "fr", "10.0.0.99");
+                launches.Add(deFuera);
             }
             finally
             {
