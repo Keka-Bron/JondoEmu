@@ -31,11 +31,12 @@ namespace Jondo.Unity.Launcher.Network
         public static void Start(int port)
         {
             if (_isRunning) return;
-            _isRunning = true;
             _cts = new CancellationTokenSource();
 
+            // Igual que en el Zaap: la bandera, después del bind. Si no, IsRunning miente.
             _tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             _tcpListener.Start();
+            _isRunning = true;
 
             Console.WriteLine($"[+] Emulating Game Server on TCP port {port} (Binary Protocol)");
             Console.WriteLine($"[+] Game Server logs will be saved to {Paths.TrafficLog}");

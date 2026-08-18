@@ -131,7 +131,7 @@ namespace Jondo.Unity.Launcher.UI
                     Token = saved.Token,
                     Selected = saved.Selected
                 });
-                Network.ClientLaunchRegistry.RegisterToken(saved.AccountId, saved.Token);
+                LauncherService.RememberSession(saved.AccountId, saved.Token);
             }
             _authenticated = _teamAccounts.Count > 0;
 
@@ -933,7 +933,7 @@ namespace Jondo.Unity.Launcher.UI
                 ? _texts.DeselectAll
                 : _texts.SelectAll;
             _lblSubscription.Text = string.Format(_texts.TeamSummaryFormat, selected,
-                                                  Network.ClientLaunchRegistry.ActiveCount);
+                                                  LauncherService.ActiveCount);
             _lblWelcome.Text = string.Format(_texts.TeamTitle, _teamAccounts.Count);
 
             _lblConsoleTitle.Text = _texts.ConsoleTitle;
@@ -1068,7 +1068,7 @@ namespace Jondo.Unity.Launcher.UI
                     Margin = new Padding(0, 0, 0, Px(4)),
                     Height = Px(28),
                     Text = $"{account.Nickname}  ·  #{account.AccountId}" +
-                           (Network.ClientLaunchRegistry.IsActive(account.AccountId) ? "   ● " + _texts.InGame : "")
+                           (LauncherService.IsActive(account.AccountId) ? "   ● " + _texts.InGame : "")
                 };
                 row.Click += (s, e) =>
                 {
@@ -1084,7 +1084,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         private string ActiveAccountsSignature()
-            => string.Join(",", _teamAccounts.Where(a => Network.ClientLaunchRegistry.IsActive(a.AccountId))
+            => string.Join(",", _teamAccounts.Where(a => LauncherService.IsActive(a.AccountId))
                                              .Select(a => a.AccountId));
 
         private void SizeAccountRows(int width)
@@ -1098,7 +1098,7 @@ namespace Jondo.Unity.Launcher.UI
             int selected = _teamAccounts.Count(a => a.Selected);
             _lblWelcome.Text = string.Format(_texts.TeamTitle, _teamAccounts.Count);
             _lblSubscription.Text = string.Format(_texts.TeamSummaryFormat, selected,
-                                                  Network.ClientLaunchRegistry.ActiveCount);
+                                                  LauncherService.ActiveCount);
             _btnPlay.Text = string.Format(_texts.LaunchSelected, selected);
             _btnSelectAll.Text = selected == _teamAccounts.Count && selected > 0
                 ? _texts.DeselectAll
@@ -1118,7 +1118,7 @@ namespace Jondo.Unity.Launcher.UI
         private void RemoveSelectedAccounts()
         {
             int removed = _teamAccounts.RemoveAll(a => a.Selected &&
-                !Network.ClientLaunchRegistry.IsActive(a.AccountId));
+                !LauncherService.IsActive(a.AccountId));
             if (removed == 0)
             {
                 ShowAlert("Aucun compte sélectionné inactif ne peut être supprimé.");
@@ -1171,7 +1171,7 @@ namespace Jondo.Unity.Launcher.UI
             _token = result.Token;
             _account = string.IsNullOrEmpty(result.Nickname) ? username : result.Nickname;
             int existing = _teamAccounts.FindIndex(a => a.AccountId == result.AccountId);
-            if (existing < 0 && _teamAccounts.Count >= Network.ClientLaunchRegistry.MaximumClients)
+            if (existing < 0 && _teamAccounts.Count >= LauncherService.MaximumClients)
             {
                 ShowAlert(_texts.MaxAccountsError);
                 return;
@@ -1239,7 +1239,7 @@ namespace Jondo.Unity.Launcher.UI
             {
                 foreach (var account in selected)
                 {
-                    if (Network.ClientLaunchRegistry.IsActive(account.AccountId)) continue;
+                    if (LauncherService.IsActive(account.AccountId)) continue;
                     var result = LauncherService.LaunchClient(account.Token);
                     if (!result.Success) failures.Add(account.Nickname + " : " + result.Message);
                 }
@@ -1264,7 +1264,7 @@ namespace Jondo.Unity.Launcher.UI
 
         private void SignOut()
         {
-            if (_teamAccounts.Count >= Network.ClientLaunchRegistry.MaximumClients)
+            if (_teamAccounts.Count >= LauncherService.MaximumClients)
             {
                 ShowAlert(_texts.MaxAccountsError);
                 return;
@@ -1469,9 +1469,12 @@ namespace Jondo.Unity.Launcher.UI
                     Console.WriteLine($"[-] Launcher window error: {ex.Message}");
                 }
 
-                // Closing the window shuts down the whole emulator. We ask for a graceful shutdown
-                // instead of killing the process outright, so the servers release their ports and
-                // nothing is left running in the background.
+                // Cerrar la ventana ya NO apaga el emulador: sólo termina el proceso del lanzador.
+                // El servidor es otro proceso y sigue con lo suyo, con los jugadores que tenga
+                // dentro. Para pararlo está el botón de detener, que se lo pide por el canal.
+                //
+                // Aquí estaba el cable: este RequestShutdown completaba el TaskCompletionSource de
+                // Program, y de ahí salía el StopServices que cerraba los cinco puertos.
                 Program.RequestShutdown("launcher window closed");
             })
             {

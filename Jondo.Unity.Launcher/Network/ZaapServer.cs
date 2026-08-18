@@ -155,11 +155,15 @@ namespace Jondo.Unity.Launcher.Network
         public static void Start(int port)
         {
             if (_isRunning) return;
-            _isRunning = true;
             _cts = new CancellationTokenSource();
 
+            // La bandera se levanta DESPUÉS de que el puerto esté cogido de verdad. Estaba antes,
+            // así que si el bind fallaba —el caso normal cuando ya hay otro servidor arriba—
+            // IsRunning decía que sí y el semáforo del lanzador pintaba «en línea» con el listener
+            // muerto. Con un solo proceso no se notaba porque el fallo mataba el emulador entero.
             _tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             _tcpListener.Start();
+            _isRunning = true;
 
             Console.WriteLine($"[+] Emulating Ankama Zaap Server on TCP port {port} (auto-detect Thrift/WebSocket)");
 

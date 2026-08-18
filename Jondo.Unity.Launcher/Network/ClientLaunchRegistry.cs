@@ -45,11 +45,16 @@ namespace Jondo.Unity.Launcher.Network
 
             lock (RegistrationGate)
             {
-                // Los avisos, en el idioma que tenga puesto el lanzador. Estaban en francés fijo.
+                // Los dos rechazos viajan como CÓDIGO, no como frase.
+                //
+                // Estaban en francés escrito a pelo; luego pasaron por el catálogo de textos del
+                // lanzador, y eso dejaba a un trozo de servidor leyendo las preferencias de idioma
+                // del usuario en %APPDATA%. Un servidor no traduce: dice qué ha pasado y quien
+                // tenga una ventana delante decide en qué idioma se lo cuenta a la persona.
                 if (ByAccount.ContainsKey(accountId))
-                    throw new InvalidOperationException(UI.LauncherTexts.Current.AccountAlreadyRunning);
+                    throw new InvalidOperationException(ApiDeControl.MotivoCuentaYaAbierta);
                 if (ByAccount.Count >= MaximumClients)
-                    throw new InvalidOperationException(UI.LauncherTexts.Current.MaxClientsError);
+                    throw new InvalidOperationException(ApiDeControl.MotivoTopeDeClientes);
 
                 var launch = new Launch
                 {
@@ -111,6 +116,54 @@ namespace Jondo.Unity.Launcher.Network
             {
                 if (ReferenceEquals(pair.Value, launch)) ByGameSession.TryRemove(pair.Key, out _);
             }
+        }
+
+        /// <summary>
+        /// Quita el lanzamiento de una cuenta sin tener el objeto delante.
+        ///
+        /// Hace falta desde que el lanzador es otro proceso: el que ve morir el proceso del cliente
+        /// es él, y por el cable sólo puede mandar el número de la cuenta.
+        /// </summary>
+        public static void RemoveByAccount(long accountId)
+        {
+            if (ByAccount.TryGetValue(accountId, out var launch)) Remove(launch);
+        }
+
+        /// <summary>Las cuentas que tienen un cliente abierto ahora mismo.</summary>
+        public static IReadOnlyCollection<long> ActiveAccounts => ByAccount.Keys.ToArray();
+
+        /// <summary>
+        /// Suelta los lanzamientos que se quedaron colgados: los que se registraron hace rato y
+        /// nunca llegaron a conectar al servidor de juego.
+        ///
+        /// Sin esto, un cliente que arranca y muere antes de llegar al 5555 —o un lanzador que se
+        /// cierra en mal momento— deja la cuenta marcada como ocupada para siempre, y Register la
+        /// rechaza cada vez. El CreatedAtUtc llevaba puesto desde el principio y no lo leía nadie.
+        /// </summary>
+        public static int SoltarLosCaducados(TimeSpan cuanto)
+        {
+            int soltados = 0;
+            var ahora = DateTime.UtcNow;
+            foreach (var pair in ByAccount)
+            {
+                var launch = pair.Value;
+                if (ahora - launch.CreatedAtUtc < cuanto) continue;
+
+                // Si ya está jugando de verdad no se toca: tiene sesión de juego abierta.
+                bool jugando = false;
+                foreach (var suya in ByGameSession)
+                {
+                    if (ReferenceEquals(suya.Value, launch)) { jugando = true; break; }
+                }
+                if (jugando) continue;
+
+                Remove(launch);
+                soltados++;
+                Console.WriteLine($"[Lanzamientos] La cuenta {launch.AccountId} llevaba " +
+                                  $"{(ahora - launch.CreatedAtUtc).TotalMinutes:0} min anotada sin llegar a " +
+                                  "conectar. Se suelta.");
+            }
+            return soltados;
         }
 
         /// <summary>Regression guard for the exact failure mode of the old active-account field.</summary>

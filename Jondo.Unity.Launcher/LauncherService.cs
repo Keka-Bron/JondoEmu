@@ -63,48 +63,102 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static SignInResult SignIn(string username, string password, string clientIp)
         {
-            try
+            var respuesta = ClienteDeControl.Pedir("entrar", new
             {
-                if (DatabaseManager.ValidateAccountCredentials(username, password, clientIp, out var account, out string error) && account != null)
+                usuario = username,
+                clave = password,
+                ip = clientIp.Length > 0 ? clientIp : LocalIp,
+            });
+
+            var cuerpo = respuesta.Cuerpo();
+            if (cuerpo == null)
+            {
+                return new SignInResult { Success = false, Message = MensajeDeSilencio(respuesta) };
+            }
+
+            if (!cuerpo.Value.GetProperty("bien").GetBoolean())
+            {
+                return new SignInResult
                 {
-                    string token = Guid.NewGuid().ToString("N");
-                    DatabaseManager.SetGameToken(account.Id, token);
-                    ClientLaunchRegistry.RegisterToken(account.Id, token);
-
-                    return new SignInResult
-                    {
-                        Success = true,
-                        Token = token,
-                        Nickname = account.Nickname,
-                        AccountId = account.Id
-                    };
-                }
-
-                return new SignInResult { Success = false, Message = error };
+                    Success = false,
+                    Message = cuerpo.Value.TryGetProperty("motivo", out var m) ? (m.GetString() ?? "") : "",
+                };
             }
-            catch (Exception ex)
+
+            return new SignInResult
             {
-                return new SignInResult { Success = false, Message = $"Error processing the request: {ex.Message}" };
-            }
+                Success = true,
+                Token = cuerpo.Value.GetProperty("token").GetString() ?? "",
+                Nickname = cuerpo.Value.GetProperty("apodo").GetString() ?? "",
+                AccountId = cuerpo.Value.GetProperty("cuenta").GetInt64(),
+            };
         }
 
-        /// <summary>Creates a new account with its nickname.</summary>
+        /// <summary>
+        /// Lo que se le dice al usuario cuando el servidor no ha contestado.
+        ///
+        /// Se distingue el silencio —no hay nadie escuchando— del rechazo por el secreto, porque
+        /// son dos averías distintas y la segunda se arregla rearrancando el lanzador.
+        /// </summary>
+        private static string MensajeDeSilencio(Network.ClienteDeControl.Respuesta respuesta)
+            => respuesta.Llego && respuesta.Codigo == 403
+                ? UI.LauncherTexts.Current.ControlRechazado
+                : UI.LauncherTexts.Current.ServidorSinResponder;
+
+        /// <summary>Crea una cuenta nueva con su apodo. La escribe el servidor, no el lanzador.</summary>
         public static Result RegisterAccount(string username, string password, string nickname, string clientIp)
         {
-            try
+            var respuesta = ClienteDeControl.Pedir("crear-cuenta", new
             {
-                if (DatabaseManager.RegisterNewAccount(username, password, nickname, clientIp, out string error))
-                {
-                    return new Result { Success = true, Message = "Account created successfully." };
-                }
+                usuario = username,
+                clave = password,
+                apodo = nickname,
+                ip = clientIp.Length > 0 ? clientIp : LocalIp,
+            });
 
-                return new Result { Success = false, Message = error };
-            }
-            catch (Exception ex)
+            var cuerpo = respuesta.Cuerpo();
+            if (cuerpo == null) return new Result { Success = false, Message = MensajeDeSilencio(respuesta) };
+
+            bool bien = cuerpo.Value.GetProperty("bien").GetBoolean();
+            return new Result
             {
-                return new Result { Success = false, Message = $"Error registering the account: {ex.Message}" };
-            }
+                Success = bien,
+                Message = bien
+                    ? UI.LauncherTexts.Current.AccountCreated
+                    : (cuerpo.Value.TryGetProperty("motivo", out var m) ? (m.GetString() ?? "") : ""),
+            };
         }
+
+        /// <summary>
+        /// Vuelve a dar por buena una sesión que el lanzador tenía guardada de la vez anterior.
+        ///
+        /// El servidor sólo la acepta si el token sigue estando en la base a nombre de esa cuenta:
+        /// el lanzador no puede decir que es quien le apetezca.
+        /// </summary>
+        public static bool RememberSession(long accountId, string token)
+        {
+            var cuerpo = ClienteDeControl.Pedir("recordar-token",
+                new { cuenta = accountId, token }).Cuerpo();
+            return cuerpo != null && cuerpo.Value.GetProperty("bien").GetBoolean();
+        }
+
+        /// <summary>Le pide al servidor que se apague. Es la única forma ordenada de pararlo.</summary>
+        public static bool StopServer() => ClienteDeControl.Pedir("apagar").Bien;
+
+        /// <summary>
+        /// El código que manda el servidor, dicho en el idioma del lanzador.
+        ///
+        /// Ésta es la frontera: el servidor dice QUÉ ha pasado y aquí se decide CÓMO contarlo. Antes
+        /// el servidor construía la frase, y para eso tenía que leer las preferencias de idioma del
+        /// usuario desde %APPDATA%; un servidor no debería saber que existe un escritorio.
+        /// </summary>
+        private static string EnCristiano(string codigo) => codigo switch
+        {
+            ApiDeControl.MotivoSesionCaducada => UI.LauncherTexts.Current.SessionExpiredError,
+            ApiDeControl.MotivoCuentaYaAbierta => UI.LauncherTexts.Current.AccountAlreadyRunning,
+            ApiDeControl.MotivoTopeDeClientes => UI.LauncherTexts.Current.MaxClientsError,
+            _ => codigo.Length > 0 ? codigo : UI.LauncherTexts.Current.GenericError,
+        };
 
         /// <summary>
         /// Starts the Dofus client executable, pointing it at the local emulator.
@@ -115,29 +169,52 @@ namespace Jondo.Unity.Launcher
         {
             try
             {
-                long accountId = ClientLaunchRegistry.ResolveToken(token);
-                if (accountId <= 0)
-                {
-                    return new Result
-                    {
-                        Success = false,
-                        Message = UI.LauncherTexts.Current.SessionExpiredError
-                    };
-                }
-
                 string clientPath = ResolveClient();
                 if (clientPath.Length == 0)
                 {
                     return new Result
                     {
                         Success = false,
-                        Message = "No se encuentra Dofus.exe. Elige dónde está con el botón de la ruta del cliente."
+                        Message = UI.LauncherTexts.Current.ClientNotFound
                     };
                 }
 
-                string hash = Guid.NewGuid().ToString("N");
+                // ANTES de nada, que el servidor esté contestando de verdad.
+                //
+                // No es paranoia: el mod del cliente decide una sola vez, al inicializarse, si
+                // redirige al emulador, y lo decide sondeando el 8888 con 100 ms de paciencia
+                // (JondoFix/Class1.cs:471). Si en ese instante no hay nadie, el cliente NO da
+                // ningún error: se conecta a los servidores de Ankama. Con un solo proceso esto no
+                // podía pasar porque los servicios estaban levantados antes de que existiera la
+                // ventana; ahora sí puede, así que se comprueba.
+                if (!ClienteDeControl.ServidorVivo())
+                {
+                    return new Result
+                    {
+                        Success = false,
+                        Message = UI.LauncherTexts.Current.ServidorSinResponder
+                    };
+                }
+
                 string language = UI.LauncherTexts.Code(UI.LauncherPreferences.Language);
-                var launch = ClientLaunchRegistry.Register(accountId, token ?? "", hash, language);
+
+                // El arranque lo reparte el servidor: él pone el instanceId y el hash, y él los va
+                // a comprobar cuando el cliente se presente al Zaap. Antes se los inventaba el
+                // lanzador y los apuntaba en un diccionario de su propia memoria; ese era el nudo
+                // que hacía imposible separar los procesos.
+                var respuesta = ClienteDeControl.Pedir("lanzamiento", new { token = token ?? "", idioma = language });
+                var cuerpo = respuesta.Cuerpo();
+                if (cuerpo == null) return new Result { Success = false, Message = MensajeDeSilencio(respuesta) };
+
+                if (!cuerpo.Value.GetProperty("bien").GetBoolean())
+                {
+                    string motivo = cuerpo.Value.TryGetProperty("motivo", out var m) ? (m.GetString() ?? "") : "";
+                    return new Result { Success = false, Message = EnCristiano(motivo) };
+                }
+
+                long accountId = cuerpo.Value.GetProperty("cuenta").GetInt64();
+                int instanceId = cuerpo.Value.GetProperty("instancia").GetInt32();
+                string hash = cuerpo.Value.GetProperty("hash").GetString() ?? "";
 
                 // Unity is told the size up front. Maximizing afterwards is not enough on its own:
                 // the client rebuilds its window when it moves between screens (server choice,
@@ -152,7 +229,7 @@ namespace Jondo.Unity.Launcher
                 string arguments =
                     $"-force-d3d11 -screen-fullscreen 0 -screen-width {area.Width} -screen-height {area.Height} " +
                     "--melonloader.hideconsole --melonloader.disablestartscreen " +
-                    $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId {launch.InstanceId} --hash {hash} " +
+                    $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId {instanceId} --hash {hash} " +
                     $"--canLogin true --langCode {language} " +
                     "--autoConnectType 1 --connectionPort 5555";
 
@@ -168,7 +245,7 @@ namespace Jondo.Unity.Launcher
                 startInfo.Environment["ZAAP_HASH"] = hash;
                 startInfo.Environment["ZAAP_GAME"] = "dofus";
                 startInfo.Environment["ZAAP_RELEASE"] = "dofus3";
-                startInfo.Environment["ZAAP_INSTANCE_ID"] = launch.InstanceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                startInfo.Environment["ZAAP_INSTANCE_ID"] = instanceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 startInfo.Environment["ZAAP_CAN_AUTH"] = "true";
 
                 System.Diagnostics.Process? client;
@@ -178,20 +255,24 @@ namespace Jondo.Unity.Launcher
                 }
                 catch
                 {
-                    ClientLaunchRegistry.Remove(launch);
+                    Devolver(accountId);
                     throw;
                 }
 
                 if (client == null)
                 {
-                    ClientLaunchRegistry.Remove(launch);
+                    Devolver(accountId);
                     return new Result { Success = false, Message = UI.LauncherTexts.Current.ClientStartFailed };
                 }
 
+                // Cuando el cliente se cierre hay que decírselo al servidor, que es quien lleva la
+                // cuenta de quién está jugando. Y aunque este aviso se pierda —porque se cierre el
+                // lanzador antes— el servidor tiene dos redes debajo: la baja de la sesión de juego
+                // y la caducidad de los lanzamientos que nunca llegaron a conectar.
                 client.EnableRaisingEvents = true;
-                client.Exited += (s, e) => ClientLaunchRegistry.Remove(launch);
+                client.Exited += (s, e) => Devolver(accountId);
                 MaximizeWhenReady(client);
-                Console.WriteLine($"[Launcher] Client {launch.InstanceId} launched for account {accountId} (PID {client.Id}).");
+                Console.WriteLine($"[Launcher] Client {instanceId} launched for account {accountId} (PID {client.Id}).");
                 return new Result { Success = true };
             }
             catch (Exception ex)
@@ -263,20 +344,76 @@ namespace Jondo.Unity.Launcher
             });
         }
 
+        /// <summary>Le dice al servidor que el cliente de esa cuenta ya no está.</summary>
+        private static void Devolver(long accountId)
+        {
+            try { ClienteDeControl.Pedir("fin-de-lanzamiento", new { cuenta = accountId }); }
+            catch { }
+        }
+
+        // ─── Quién está jugando ─────────────────────────────────────────────────
+        //
+        // La ventana lo pregunta muchas veces mientras se repinta —el punto de "En juego" de cada
+        // fila, el contador del equipo, si un botón se puede pulsar— y no puede irse por el cable
+        // en cada una. Se guarda lo que dijo el servidor en el último sondeo de estado, que es cada
+        // dos segundos, y las lecturas van contra eso.
+
+        private static volatile System.Collections.Generic.HashSet<long> _jugando = new();
+        private static volatile int _tope = 8;
+
+        /// <summary>Cuántos clientes admite el servidor a la vez.</summary>
+        public static int MaximumClients => _tope;
+
+        /// <summary>Si esa cuenta tiene un cliente abierto, según el último sondeo.</summary>
+        public static bool IsActive(long accountId) => _jugando.Contains(accountId);
+
+        /// <summary>Cuántas cuentas están jugando, según el último sondeo.</summary>
+        public static int ActiveCount => _jugando.Count;
+
+        private static void RefrescarQuienJuega()
+        {
+            var cuerpo = ClienteDeControl.Pedir("activos").Cuerpo();
+            if (cuerpo == null)
+            {
+                // Sin servidor no hay nadie jugando, y sobre todo: no dejar la lista de antes, que
+                // haría que la ventana siguiera pintando cuentas "en juego" de una sesión muerta.
+                _jugando = new System.Collections.Generic.HashSet<long>();
+                return;
+            }
+
+            var vistas = new System.Collections.Generic.HashSet<long>();
+            if (cuerpo.Value.TryGetProperty("cuentas", out var lista))
+            {
+                foreach (var una in lista.EnumerateArray()) vistas.Add(una.GetInt64());
+            }
+            _jugando = vistas;
+            if (cuerpo.Value.TryGetProperty("maximo", out var maximo)) _tope = maximo.GetInt32();
+        }
+
         /// <summary>
-        /// Checks that the databases exist and that the game servers are listening.
+        /// Si el servidor está en pie, y de paso quién está jugando.
+        ///
+        /// Miraba dos banderas estáticas —ZaapServer.IsRunning y GameServerProxy.IsRunning— que son
+        /// del proceso que las levantó. En el lanzador valdrían false siempre y el semáforo diría
+        /// "fuera de línea" con el servidor perfectamente vivo.
         /// </summary>
         public static ServicesStatus GetStatus()
         {
-            bool databaseOk = File.Exists(Paths.AuthDb) && File.Exists(Paths.WorldDb);
-            bool listening = ZaapServer.IsRunning && GameServerProxy.IsRunning;
+            var cuerpo = ClienteDeControl.Pedir("estado").Cuerpo();
+            if (cuerpo == null)
+            {
+                _jugando = new System.Collections.Generic.HashSet<long>();
+                return new ServicesStatus { Online = false, DatabaseOk = false, ServicesListening = false };
+            }
+
+            RefrescarQuienJuega();
 
             return new ServicesStatus
             {
-                DatabaseOk = databaseOk,
-                ServicesListening = listening,
-                Online = databaseOk && listening,
-                Version = Version
+                Online = cuerpo.Value.GetProperty("enLinea").GetBoolean(),
+                DatabaseOk = cuerpo.Value.GetProperty("base_").GetBoolean(),
+                ServicesListening = cuerpo.Value.GetProperty("servicios").GetBoolean(),
+                Version = cuerpo.Value.TryGetProperty("version", out var v) ? (v.GetString() ?? Version) : Version,
             };
         }
 
@@ -289,7 +426,13 @@ namespace Jondo.Unity.Launcher
             var entries = new List<LogEntry>();
             try
             {
-                using var doc = System.Text.Json.JsonDocument.Parse(ConsoleLogBuffer.GetLogsJson(sinceId));
+                // Por el canal, no leyendo logs/emulator_console.log. El fichero no reconstruye las
+                // entradas ni sus números de secuencia —sólo existen en memoria— y la ventana los
+                // usa para pedir nada más lo nuevo.
+                var pedido = ClienteDeControl.Pedir("registro", new { desde = sinceId });
+                if (!pedido.Bien) return entries;
+
+                using var doc = System.Text.Json.JsonDocument.Parse(pedido.Json);
                 if (!doc.RootElement.TryGetProperty("logs", out var list)) return entries;
 
                 foreach (var element in list.EnumerateArray())

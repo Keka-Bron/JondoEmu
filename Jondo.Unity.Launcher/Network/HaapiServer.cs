@@ -79,9 +79,21 @@ namespace Jondo.Unity.Launcher.Network
                 if (body.Length > 0 && body.Length < 1000) Console.WriteLine($"[HAAPI]  body: {body}");
             }
 
-            // The /api/login, /api/register, /api/launch, /api/status and /api/logs routes used
-            // to live here. Only the web launcher called them; the native window talks to
-            // LauncherService directly, so they were dead weight with an open door on them.
+            // Las rutas de mando del lanzador. Estuvieron aquí, se borraron al pasar a la ventana
+            // nativa —"peso muerto con una puerta abierta encima"— y vuelven ahora que el lanzador
+            // es otro proceso y no puede llamar a nadie por memoria. La puerta ya no está abierta:
+            // sin el secreto que el servidor deja escrito al arrancar, esto contesta 403.
+            var deControl = ApiDeControl.Responder(path, req.HttpMethod, body, req.Headers[ApiDeControl.Cabecera]);
+            if (deControl != null)
+            {
+                byte[] cuerpo = System.Text.Encoding.UTF8.GetBytes(deControl.Value.Json);
+                resp.StatusCode = deControl.Value.Codigo;
+                resp.ContentType = "application/json; charset=utf-8";
+                resp.ContentLength64 = cuerpo.Length;
+                await resp.OutputStream.WriteAsync(cuerpo, 0, cuerpo.Length);
+                resp.Close();
+                return;
+            }
 
             try
             {

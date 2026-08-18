@@ -67,6 +67,10 @@ namespace Jondo.Unity.Launcher.UI
         public string ClientStartFailed { get; init; } = "";
         public string AccountAlreadyRunning { get; init; } = "";
         public string MaxClientsError { get; init; } = "";
+        public string ClientNotFound { get; init; } = "";
+        public string AccountCreated { get; init; } = "";
+        public string ServidorSinResponder { get; init; } = "";
+        public string ControlRechazado { get; init; } = "";
 
         private static readonly Dictionary<Language, LauncherTexts> Catalog = new()
         {
@@ -115,7 +119,11 @@ namespace Jondo.Unity.Launcher.UI
                 SessionExpiredError = "La sesión de esta cuenta ha caducado. Vuelve a conectarla antes de jugar.",
                 ClientStartFailed = "No se ha podido arrancar el cliente de Dofus.",
                 AccountAlreadyRunning = "Esta cuenta ya tiene un cliente abierto.",
-                MaxClientsError = "Ya hay 8 clientes abiertos, que es el máximo."
+                MaxClientsError = "Ya hay 8 clientes abiertos, que es el máximo.",
+                ClientNotFound = "No se encuentra Dofus.exe. Elige dónde está con el botón de la ruta del cliente.",
+                AccountCreated = "Cuenta creada.",
+                ServidorSinResponder = "El servidor no responde. Espera a que termine de arrancar o vuelve a abrirlo.",
+                ControlRechazado = "El servidor ha rearrancado. Cierra el lanzador y vuelve a abrirlo."
             },
             [Language.En] = new LauncherTexts
             {
@@ -162,7 +170,11 @@ namespace Jondo.Unity.Launcher.UI
                 SessionExpiredError = "This account's session has expired. Log it in again before playing.",
                 ClientStartFailed = "The Dofus client could not be started.",
                 AccountAlreadyRunning = "This account already has a client running.",
-                MaxClientsError = "There are already 8 clients running, which is the maximum."
+                MaxClientsError = "There are already 8 clients running, which is the maximum.",
+                ClientNotFound = "Dofus.exe was not found. Point at it with the client path button.",
+                AccountCreated = "Account created.",
+                ServidorSinResponder = "The server is not responding. Wait for it to finish starting, or open it again.",
+                ControlRechazado = "The server has restarted. Close the launcher and open it again."
             },
             [Language.Fr] = new LauncherTexts
             {
@@ -209,7 +221,11 @@ namespace Jondo.Unity.Launcher.UI
                 SessionExpiredError = "La session de ce compte a expiré. Reconnecte-le avant de jouer.",
                 ClientStartFailed = "Le client Dofus n'a pas pu démarrer.",
                 AccountAlreadyRunning = "Ce compte possède déjà un client actif.",
-                MaxClientsError = "Il y a déjà 8 clients actifs, ce qui est le maximum."
+                MaxClientsError = "Il y a déjà 8 clients actifs, ce qui est le maximum.",
+                ClientNotFound = "Dofus.exe est introuvable. Indique son emplacement avec le bouton du chemin du client.",
+                AccountCreated = "Compte créé.",
+                ServidorSinResponder = "Le serveur ne répond pas. Attends la fin du démarrage ou relance-le.",
+                ControlRechazado = "Le serveur a redémarré. Ferme le lanceur et rouvre-le."
             }
         };
 
