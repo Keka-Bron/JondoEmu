@@ -13,7 +13,7 @@ namespace Jondo.Unity.Launcher.Managers
     /// identificador del efecto. Sin esas tres no se puede hacer nada de lo que hacen los dofus ni
     /// los boosts, así que aquí se conserva la entrada entera.
     /// </summary>
-    public sealed class EfectoDeHechizo
+    public sealed class SpellEffect
     {
         public int EffectId { get; init; }
         public int EffectUid { get; init; }
@@ -88,23 +88,23 @@ namespace Jondo.Unity.Launcher.Managers
     /// Se cachea por (hechizo, grado) porque durante un combate se piden muchas veces y la tabla no
     /// cambia mientras el servidor está levantado.
     /// </summary>
-    public static class EfectosDeHechizo
+    public static class SpellEffects
     {
-        private static readonly Dictionary<(int, int), List<EfectoDeHechizo>> _cache
-            = new Dictionary<(int, int), List<EfectoDeHechizo>>();
+        private static readonly Dictionary<(int, int), List<SpellEffect>> _cache
+            = new Dictionary<(int, int), List<SpellEffect>>();
 
-        private static readonly Dictionary<(int, int), List<EfectoDeHechizo>> _criticos
-            = new Dictionary<(int, int), List<EfectoDeHechizo>>();
+        private static readonly Dictionary<(int, int), List<SpellEffect>> _criticos
+            = new Dictionary<(int, int), List<SpellEffect>>();
 
         private static readonly object _candado = new object();
 
-        public static IReadOnlyList<EfectoDeHechizo> De(int hechizo, int grado)
+        public static IReadOnlyList<SpellEffect> De(int hechizo, int grado)
             => Leer(hechizo, grado).Normales;
 
-        public static IReadOnlyList<EfectoDeHechizo> Criticos(int hechizo, int grado)
+        public static IReadOnlyList<SpellEffect> Criticos(int hechizo, int grado)
             => Leer(hechizo, grado).Criticos;
 
-        private static (List<EfectoDeHechizo> Normales, List<EfectoDeHechizo> Criticos)
+        private static (List<SpellEffect> Normales, List<SpellEffect> Criticos)
             Leer(int hechizo, int grado)
         {
             var clave = (hechizo, Math.Max(1, grado));
@@ -112,8 +112,8 @@ namespace Jondo.Unity.Launcher.Managers
             {
                 if (_cache.TryGetValue(clave, out var ya)) return (ya, _criticos[clave]);
 
-                var normales = new List<EfectoDeHechizo>();
-                var criticos = new List<EfectoDeHechizo>();
+                var normales = new List<SpellEffect>();
+                var criticos = new List<SpellEffect>();
                 try
                 {
                     using var conexion = new SqliteConnection(DatabaseManager.WorldConnectionString);
@@ -145,7 +145,7 @@ namespace Jondo.Unity.Launcher.Managers
             }
         }
 
-        private static void Parsear(string json, List<EfectoDeHechizo> donde)
+        private static void Parsear(string json, List<SpellEffect> donde)
         {
             if (string.IsNullOrEmpty(json)) return;
             try
@@ -167,7 +167,7 @@ namespace Jondo.Unity.Launcher.Managers
                         tope = Entero(z, "maxDamageDecreaseApplyCount");
                     }
 
-                    donde.Add(new EfectoDeHechizo
+                    donde.Add(new SpellEffect
                     {
                         EffectId = Entero(e, "effectId"),
                         EffectUid = Entero(e, "effectUid"),

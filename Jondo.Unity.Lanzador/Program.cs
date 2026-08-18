@@ -26,7 +26,7 @@ namespace Jondo.Unity.Launcher
         [STAThread]
         private static async Task Main()
         {
-            if (!Contrato.CogerElSitio("JondoEmuLanzador"))
+            if (!Contract.CogerElSitio("JondoEmuLanzador"))
             {
                 try
                 {
@@ -49,7 +49,7 @@ namespace Jondo.Unity.Launcher
             }
             finally
             {
-                Contrato.SoltarElSitio();
+                Contract.SoltarElSitio();
             }
         }
 
@@ -63,7 +63,7 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private static async Task AsegurarQueHayServidor()
         {
-            if (Network.ClienteDeControl.ServidorVivo())
+            if (Network.ControlClient.ServidorVivo())
             {
                 Console.WriteLine("[Lanzador] Hay un servidor en marcha; me engancho a él.");
                 return;
@@ -100,7 +100,7 @@ namespace Jondo.Unity.Launcher
 
             // Con paciencia: el servidor lee la base, los managers y los mapas antes de abrir un
             // solo puerto, y eso son varios segundos en frío.
-            if (!await Task.Run(() => Network.ClienteDeControl.EsperarAlServidor(TimeSpan.FromSeconds(90))))
+            if (!await Task.Run(() => Network.ControlClient.EsperarAlServidor(TimeSpan.FromSeconds(90))))
             {
                 Console.WriteLine("[Lanzador] El servidor no ha llegado a contestar.");
             }

@@ -175,7 +175,7 @@ namespace Jondo.Unity.World.Fights
         /// <summary>
         /// Lo que lleva puesto encima: embrujos, estados y las actitudes que le dan sus objetos.
         /// </summary>
-        public Embrujos Embrujos { get; } = new Embrujos();
+        public Buffs Buffs { get; } = new Buffs();
 
         /// <summary>
         /// Si le han pegado desde su turno anterior. Lo mira el disparador "DBE" de las actitudes,

@@ -27,10 +27,10 @@ namespace Jondo.Unity.Launcher.Network
     /// llama a la base y al registro de lanzamientos, y devuelve texto. Los mensajes para el
     /// usuario NO se traducen aquí —viajan como código— porque el idioma es del lanzador.
     /// </summary>
-    public static class ApiDeControl
+    public static class ControlApi
     {
         /// <summary>Las rutas y la cabecera salen del contrato, que es lo que comparten los dos.</summary>
-        public const string Prefijo = Contrato.Prefijo;
+        public const string Prefijo = Contract.Prefijo;
 
         // ─── El secreto ─────────────────────────────────────────────────────────────────────
         //
@@ -40,9 +40,9 @@ namespace Jondo.Unity.Launcher.Network
         private static string _secreto = "";
 
         /// <summary>Reparte un secreto nuevo y lo deja escrito. Lo llama el servidor al arrancar.</summary>
-        public static void NuevoSecreto() => _secreto = Contrato.NuevoSecreto();
+        public static void NuevoSecreto() => _secreto = Contract.NuevoSecreto();
 
-        private static bool Autorizada(string? traido) => Contrato.MismoSecreto(traido, _secreto);
+        private static bool Autorizada(string? traido) => Contract.MismoSecreto(traido, _secreto);
 
         // ─── Las respuestas ─────────────────────────────────────────────────────────────────
 
@@ -160,7 +160,7 @@ namespace Jondo.Unity.Launcher.Network
             enLinea = ServiciosEnPie() && BaseEnPie(),
             base_ = BaseEnPie(),
             servicios = ServiciosEnPie(),
-            version = Contrato.Version,
+            version = Contract.Version,
             proceso = Environment.ProcessId,
         });
 
@@ -174,8 +174,8 @@ namespace Jondo.Unity.Launcher.Network
             var cuentas = new List<long>(ClientLaunchRegistry.ActiveAccounts);
             return Bien(new
             {
-                maximo = Contrato.ClientesPorIp,
-                capacidad = Contrato.ClientesEnTotal,
+                maximo = Contract.ClientesPorIp,
+                capacidad = Contract.ClientesEnTotal,
                 cuantos = cuentas.Count,
                 cuentas,
             });
@@ -193,7 +193,7 @@ namespace Jondo.Unity.Launcher.Network
             string usuario = Texto(cuerpo, "usuario");
             string clave = Texto(cuerpo, "clave");
             string ip = Texto(cuerpo, "ip");
-            if (ip.Length == 0) ip = Contrato.LocalIp;
+            if (ip.Length == 0) ip = Contract.LocalIp;
 
             if (!DatabaseManager.ValidateAccountCredentials(usuario, clave, ip, out var cuenta, out string fallo)
                 || cuenta == null)
@@ -221,7 +221,7 @@ namespace Jondo.Unity.Launcher.Network
             string clave = Texto(cuerpo, "clave");
             string apodo = Texto(cuerpo, "apodo");
             string ip = Texto(cuerpo, "ip");
-            if (ip.Length == 0) ip = Contrato.LocalIp;
+            if (ip.Length == 0) ip = Contract.LocalIp;
 
             bool bien = DatabaseManager.RegisterNewAccount(usuario, clave, apodo, ip, out string fallo);
             return Bien(new { bien, motivo = fallo });

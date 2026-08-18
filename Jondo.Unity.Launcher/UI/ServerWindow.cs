@@ -21,7 +21,7 @@ namespace Jondo.Unity.Launcher.UI
     ///
     /// Todo lo que se enseña sale de lo que el servidor ya sabe. Nada inventado para rellenar.
     /// </summary>
-    internal sealed class VentanaDelServidor : Form, IVentanaConFondo
+    internal sealed class ServerWindow : Form, IBackgroundWindow
     {
         private Image? _foto;
         private Bitmap? _fondoCompuesto;
@@ -30,8 +30,8 @@ namespace Jondo.Unity.Launcher.UI
         public Image? ComposedBackground => _fondoCompuesto;
 
         private readonly Panel _caja;
-        private readonly PanelSinParpadeo _cifras;
-        private readonly PanelSinParpadeo _cifrasDerecha;
+        private readonly FlickerFreePanel _cifras;
+        private readonly FlickerFreePanel _cifrasDerecha;
         private readonly RichTextBox _registro;
         private readonly LauncherLogo _logo;
         private readonly System.Windows.Forms.Timer _reloj;
@@ -44,8 +44,8 @@ namespace Jondo.Unity.Launcher.UI
         private readonly DateTime _arranque = DateTime.UtcNow;
         private readonly System.Diagnostics.Process _yo = System.Diagnostics.Process.GetCurrentProcess();
 
-        private Language _idioma = PreferenciasDelServidor.Language;
-        private LauncherTexts _textos = LauncherTexts.Get(PreferenciasDelServidor.Language);
+        private Language _idioma = ServerPreferences.Language;
+        private LauncherTexts _textos = LauncherTexts.Get(ServerPreferences.Language);
 
         private readonly float _escala;
         private int E(int px) => (int)Math.Round(px * _escala);
@@ -60,9 +60,9 @@ namespace Jondo.Unity.Launcher.UI
         /// borra el fondo y luego dibuja, y entre las dos cosas se ve el hueco. Con doble búfer se
         /// compone fuera de pantalla y se vuelca de una vez.
         /// </summary>
-        private sealed class PanelSinParpadeo : Panel
+        private sealed class FlickerFreePanel : Panel
         {
-            public PanelSinParpadeo()
+            public FlickerFreePanel()
             {
                 SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint |
                          ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
@@ -71,7 +71,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         /// <summary>Cada cifra: su etiqueta, de dónde sale y de qué color va.</summary>
-        private sealed class Cifra
+        private sealed class Metric
         {
             public Func<LauncherTexts, string> Etiqueta = _ => "";
             public Func<string> Valor = () => "";
@@ -82,9 +82,9 @@ namespace Jondo.Unity.Launcher.UI
             public bool EsGrupo;
         }
 
-        private readonly List<Cifra> _lista = new();
+        private readonly List<Metric> _lista = new();
 
-        public VentanaDelServidor()
+        public ServerWindow()
         {
             _escala = DeviceDpi / 96f;
 
@@ -114,7 +114,7 @@ namespace Jondo.Unity.Launcher.UI
             // Todos juntos en una sola columna quedaban apelotonados, y arriba en fila tapaban la
             // parte de arriba del dibujo. Repartidos a los lados, cada bloque respira y el
             // personaje se queda en medio, que es de lo que iba tener un fondo.
-            _cifras = new PanelSinParpadeo
+            _cifras = new FlickerFreePanel
             {
                 Dock = DockStyle.Left,
                 Width = 0,   // lo pone AjustarConsola
@@ -122,7 +122,7 @@ namespace Jondo.Unity.Launcher.UI
             };
             _cifras.Paint += (s, e) => ConRed(e.Graphics, _cifras, 0, 2);
 
-            _cifrasDerecha = new PanelSinParpadeo
+            _cifrasDerecha = new FlickerFreePanel
             {
                 Dock = DockStyle.Right,
                 Width = 0,
@@ -246,7 +246,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             if (cual == _idioma) return;
             _idioma = cual;
-            PreferenciasDelServidor.Language = cual;
+            ServerPreferences.Language = cual;
             _textos = LauncherTexts.Get(cual);
             AplicarIdioma();
             _cifras.Invalidate();
@@ -293,7 +293,7 @@ namespace Jondo.Unity.Launcher.UI
             // han llegado a entrar a un mapa: entre una cosa y otra hay unos segundos de carga, y
             // con un cliente atascado la diferencia se queda ahí y se ve.
             Cifra_(t => t.StatPlayers, LauncherTheme.OnlineGreen,
-                   () => $"{Network.GameNodeProxy.SesionesVivas.Count}/{Contrato.ClientesEnTotal}");
+                   () => $"{Network.GameNodeProxy.SesionesVivas.Count}/{Contract.ClientesEnTotal}");
             Cifra_(t => t.StatInWorld, LauncherTheme.DotGreen, () =>
             {
                 int dentro = 0;
@@ -360,10 +360,10 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         private void Grupo(Func<LauncherTexts, string> titulo)
-            => _lista.Add(new Cifra { Etiqueta = titulo, EsGrupo = true });
+            => _lista.Add(new Metric { Etiqueta = titulo, EsGrupo = true });
 
         private void Cifra_(Func<LauncherTexts, string> etiqueta, Color tono, Func<string> valor)
-            => _lista.Add(new Cifra { Etiqueta = etiqueta, Tono = tono, Valor = valor });
+            => _lista.Add(new Metric { Etiqueta = etiqueta, Tono = tono, Valor = valor });
 
         private static string Bonito(long bytes)
             => bytes >= 1024L * 1024 * 1024 ? $"{bytes / (1024.0 * 1024 * 1024):0.0} GB"
@@ -834,7 +834,7 @@ namespace Jondo.Unity.Launcher.UI
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     try { Application.SetHighDpiMode(HighDpiMode.SystemAware); } catch { }
-                    var ventana = new VentanaDelServidor();
+                    var ventana = new ServerWindow();
                     lista.Set();
                     Application.Run(ventana);
                 }
@@ -845,7 +845,7 @@ namespace Jondo.Unity.Launcher.UI
                 }
             })
             {
-                Name = "VentanaDelServidor",
+                Name = "ServerWindow",
                 IsBackground = true,
             };
             hilo.SetApartmentState(System.Threading.ApartmentState.STA);

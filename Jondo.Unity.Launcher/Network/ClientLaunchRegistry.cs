@@ -14,9 +14,9 @@ namespace Jondo.Unity.Launcher.Network
     {
         /// <summary>
         /// Clientes que puede tener abiertos a la vez UNA misma dirección. Ocho, que es lo que cabe
-        /// en un grupo de Dofus. NO es la capacidad del servidor: esa es Contrato.ClientesEnTotal.
+        /// en un grupo de Dofus. NO es la capacidad del servidor: esa es Contract.ClientesEnTotal.
         /// </summary>
-        public const int MaximumClients = Contrato.ClientesPorIp;
+        public const int MaximumClients = Contract.ClientesPorIp;
         public sealed class Launch
         {
             public int InstanceId { get; init; }
@@ -51,7 +51,7 @@ namespace Jondo.Unity.Launcher.Network
             if (accountId <= 0) throw new ArgumentOutOfRangeException(nameof(accountId));
             if (string.IsNullOrWhiteSpace(hash)) throw new ArgumentException("A launch hash is required.", nameof(hash));
 
-            string deDonde = string.IsNullOrWhiteSpace(ip) ? Contrato.LocalIp : ip.Trim();
+            string deDonde = string.IsNullOrWhiteSpace(ip) ? Contract.LocalIp : ip.Trim();
 
             lock (RegistrationGate)
             {
@@ -62,7 +62,7 @@ namespace Jondo.Unity.Launcher.Network
                 // del usuario en %APPDATA%. Un servidor no traduce: dice qué ha pasado y quien
                 // tenga una ventana delante decide en qué idioma se lo cuenta a la persona.
                 if (ByAccount.ContainsKey(accountId))
-                    throw new InvalidOperationException(Contrato.MotivoCuentaYaAbierta);
+                    throw new InvalidOperationException(Contract.MotivoCuentaYaAbierta);
 
                 // El tope de ocho es POR DIRECCIÓN, no del servidor entero.
                 //
@@ -75,8 +75,8 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     if (string.Equals(otro.Ip, deDonde, StringComparison.OrdinalIgnoreCase)) suyos++;
                 }
-                if (suyos >= Contrato.ClientesPorIp)
-                    throw new InvalidOperationException(Contrato.MotivoTopeDeClientes);
+                if (suyos >= Contract.ClientesPorIp)
+                    throw new InvalidOperationException(Contract.MotivoTopeDeClientes);
 
                 var launch = new Launch
                 {
@@ -222,7 +222,7 @@ namespace Jondo.Unity.Launcher.Network
             {
                 // Los ocho desde la MISMA direccion, que es lo que agrupa a una persona.
                 const string mismaCasa = "10.0.0.7";
-                for (int i = 0; i < Contrato.ClientesPorIp; i++)
+                for (int i = 0; i < Contract.ClientesPorIp; i++)
                     launches.Add(Register(1000 + i, "", Guid.NewGuid().ToString("N"), "fr", mismaCasa));
 
                 bool rejected = false;

@@ -27,7 +27,7 @@ namespace Jondo.Unity.World.Maps
     /// Lo que no está medido NO se inventa: una forma desconocida devuelve la casilla apuntada y
     /// se anota, que es lo que hacía el emulador con todas.
     /// </summary>
-    public static class Zona
+    public static class Zone
     {
         public const int Punto = 'P';
         public const int Circulo = 'C';

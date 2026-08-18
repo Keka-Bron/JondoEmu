@@ -68,33 +68,13 @@ namespace Jondo.Unity.Launcher.Handlers
                         byte[] johPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/joh", johBytes);
                         
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, johPacket);
-                        await SessionRegistry.BroadcastToMapAsync(
-                            oldMapId,
-                            ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId),
-                            SessionContext.Current.Id);
 
-                        // Y que los del mapa NUEVO le vean llegar.
-                        //
-                        // Faltaba: al cambiar de mapa salía el jsd hacia el mapa viejo y nada hacia
-                        // el nuevo. El que llega sí ve a los que ya estaban —su jss y su jpv los
-                        // traen— pero ellos a él no, hasta que recargaran el mapa. Es el mismo
-                        // aviso que ya se manda al entrar al mundo, y va detrás del joh para que
-                        // el que llega esté ya contado en el mapa nuevo.
-                        var quienLlega = DatabaseManager.GetCharacterById(SessionContext.State.CharacterId);
-                        if (quienLlega != null)
-                        {
-                            int avisados = await SessionRegistry.BroadcastToMapAsync(
-                                requestedMapId,
-                                ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
-                                    quienLlega, spawnCellId, newOrientation,
-                                    SessionContext.Current.AccountId)),
-                                SessionContext.Current.Id);
-                            if (avisados > 0)
-                            {
-                                LogDebug($"[Map Change] {quienLlega.Name} llega al mapa {requestedMapId}; " +
-                                         $"avisados {avisados} jugador(es) que ya estaban allí.");
-                            }
-                        }
+                        // Los dos avisos —jsd al mapa que deja, jsn al que llega— los da la misma
+                        // pieza para los cuatro caminos que cambian de mapa. Aquí estaban escritos
+                        // a mano, y era la única de las cuatro que los daba: el zaap, el borde y
+                        // el .teleport se quedaron sin ellos y sólo se notaba jugando de dos en dos.
+                        // Va detrás del joh para que el que llega esté ya contado en el mapa nuevo.
+                        await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId);
 
                         LogDebug($"[Map Change] Sent native joh (CurrentMapMessage) for Map ID: {requestedMapId}");
                     }

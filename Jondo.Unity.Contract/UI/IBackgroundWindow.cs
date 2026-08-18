@@ -13,7 +13,7 @@ namespace Jondo.Unity.Launcher.UI
     /// Existe como interfaz, y no como una clase concreta, porque ahora hay DOS ventanas que lo
     /// hacen: la del lanzador y la del servidor. El logo se dibuja igual en las dos.
     /// </summary>
-    public interface IVentanaConFondo
+    public interface IBackgroundWindow
     {
         Image? ComposedBackground { get; }
     }

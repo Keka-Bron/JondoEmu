@@ -22,7 +22,7 @@ namespace Jondo.Unity.Launcher.Managers
     /// enganches 792 —"al empezar mi turno lanza mi grado 2"— más un 141 que la deshace. Es la
     /// misma maquinaria de las actitudes que regalan los dofus.
     /// </summary>
-    public sealed class Invocado
+    public sealed class Summon
     {
         public int Plantilla { get; init; }
         public int Grado { get; init; }
@@ -47,10 +47,10 @@ namespace Jondo.Unity.Launcher.Managers
         public int GradoDelHechizoPropio { get; init; }
     }
 
-    public static class Invocaciones
+    public static class Summons
     {
-        private static readonly Dictionary<(int, int), Invocado> _cache
-            = new Dictionary<(int, int), Invocado>();
+        private static readonly Dictionary<(int, int), Summon> _cache
+            = new Dictionary<(int, int), Summon>();
         private static readonly object _candado = new object();
 
         /// <summary>
@@ -102,17 +102,17 @@ namespace Jondo.Unity.Launcher.Managers
                                 _duraciones[id] = Entero(entrada.Value, "rondas");
                         }
                     }
-                    Program.LogDebug($"[Invocaciones] {_duraciones.Count} duración(es) medida(s).");
+                    Program.LogDebug($"[Summons] {_duraciones.Count} duración(es) medida(s).");
                 }
                 catch (Exception ex)
                 {
-                    Program.LogDebug($"[Invocaciones] No se pudo leer la tabla de duraciones: {ex.Message}");
+                    Program.LogDebug($"[Summons] No se pudo leer la tabla de duraciones: {ex.Message}");
                 }
             }
             return _duraciones.TryGetValue(plantilla, out int rondas) ? rondas : 0;
         }
 
-        public static Invocado De(int plantilla, int grado)
+        public static Summon De(int plantilla, int grado)
         {
             var clave = (plantilla, Math.Max(1, grado));
             lock (_candado)
@@ -124,7 +124,7 @@ namespace Jondo.Unity.Launcher.Managers
             }
         }
 
-        private static Invocado Leer(int plantilla, int grado)
+        private static Summon Leer(int plantilla, int grado)
         {
             try
             {
@@ -156,7 +156,7 @@ namespace Jondo.Unity.Launcher.Managers
                 int nivelDelHechizo = Entero(gr, "startingSpellId");
                 var (hechizo, gradoDelHechizo) = HechizoDe(conexion, nivelDelHechizo);
 
-                return new Invocado
+                return new Summon
                 {
                     Plantilla = plantilla,
                     Grado = grado,
@@ -178,7 +178,7 @@ namespace Jondo.Unity.Launcher.Managers
             }
             catch (Exception ex)
             {
-                Program.LogDebug($"[Invocaciones] No se pudo leer la plantilla {plantilla} " +
+                Program.LogDebug($"[Summons] No se pudo leer la plantilla {plantilla} " +
                                  $"grado {grado}: {ex.Message}");
                 return null;
             }

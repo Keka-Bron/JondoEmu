@@ -169,7 +169,7 @@ namespace Jondo.Unity.Launcher.Managers
             // apartarse por debajo del más bajo de todos ellos antes de dar el primero suyo, o el
             // primer grupo generado al vuelo se llevaría un número que ya está ocupado en otro
             // mapa —y entonces GetMobGroupById devolvería el equivocado—.
-            long menor = Actores.PrimerMonstruo;
+            long menor = ActorIds.PrimerMonstruo;
             foreach (var lista in _mapMobs.Values)
             {
                 foreach (var grupo in lista)
@@ -177,7 +177,7 @@ namespace Jondo.Unity.Launcher.Managers
                     if (grupo.MobId < menor) menor = grupo.MobId;
                 }
             }
-            Actores.ReservarMonstruosHasta(menor);
+            ActorIds.ReservarMonstruosHasta(menor);
 
             Console.WriteLine($"[MobSpawnManager] Loaded {count} persistent mobs across {_mapMobs.Count} maps from database.");
             Console.WriteLine($"[MobSpawnManager] Ids de grupo repartidos hasta el {menor}; " +
@@ -274,7 +274,7 @@ namespace Jondo.Unity.Launcher.Managers
 
             var group = new MobGroup
             {
-                MobId = Actores.NuevoMonstruo(),
+                MobId = ActorIds.NuevoMonstruo(),
                 CellId = cellId
             };
 

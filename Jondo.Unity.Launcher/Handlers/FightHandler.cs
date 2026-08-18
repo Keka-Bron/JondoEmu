@@ -152,13 +152,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // un "hechizo" por su efecto 1175, y ésos son los que hacen cosas al empezar el turno o
             // al recibir un golpe. De ahí sale, sin escribir nada suyo, el punto de acción del
             // Dofus Ocre.
-            playerFighter.Embrujos.Vaciar();
-            playerFighter.Embrujos.Actitudes.AddRange(
-                Managers.EfectosDeHechizo.ActitudesDelEquipo(GameState.CharacterId));
-            if (playerFighter.Embrujos.Actitudes.Count > 0)
+            playerFighter.Buffs.Vaciar();
+            playerFighter.Buffs.Actitudes.AddRange(
+                Managers.SpellEffects.ActitudesDelEquipo(GameState.CharacterId));
+            if (playerFighter.Buffs.Actitudes.Count > 0)
             {
                 Program.LogDebug($"[Combate] Actitudes del equipo: " +
-                                 string.Join(", ", playerFighter.Embrujos.Actitudes));
+                                 string.Join(", ", playerFighter.Buffs.Actitudes));
             }
 
             fight.AddPlayer(playerFighter);
@@ -574,7 +574,7 @@ namespace Jondo.Unity.Launcher.Handlers
         private static int ConBonos(Fighter quien, int caracteristica, int loQueYaTiene, int ronda)
         {
             if (caracteristica <= 0) return loQueYaTiene;
-            return loQueYaTiene + quien.Embrujos.De(caracteristica, ronda);
+            return loQueYaTiene + quien.Buffs.De(caracteristica, ronda);
         }
 
         /// <summary>La característica que alimenta cada elemento en la fórmula de daño.</summary>
@@ -1491,10 +1491,10 @@ namespace Jondo.Unity.Launcher.Handlers
             // jya, que es como el cliente los quita del panel: por su número, uno a uno.
             // TODOS los embrujos, no sólo los del que juega: los que el jugador le puso a un pío
             // se caen igual, y hasta ahora sólo se barría al que le empezaba el turno.
-            var caducados = new List<(Fighter Quien, Jondo.Unity.World.Fights.Embrujo Caido)>();
+            var caducados = new List<(Fighter Quien, Jondo.Unity.World.Fights.Buff Caido)>();
             foreach (var quien in TodosLosCombatientes(fight))
             {
-                foreach (var caido in quien.Embrujos.Barrer(fight.RoundNumber))
+                foreach (var caido in quien.Buffs.Barrer(fight.RoundNumber))
                 {
                     caducados.Add((quien, caido));
                 }
@@ -1536,7 +1536,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // Y ahora las actitudes de "principio de turno": aquí es donde el Dofus Ocre mira si le
             // han pegado desde su turno anterior.
-            await ActitudesAsync(stream, fight, fighter, Managers.MotorDeEfectos.AlEmpezarElTurno);
+            await ActitudesAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
             fighter.LeHanPegado = false;
 
             // El "ya puedes jugar" sólo va si el que juega es de los que maneja este cliente. En el
@@ -1711,7 +1711,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // tres casillas de golpe cuesta tres, no uno.
             for (int paso = 0; paso < steps; paso++)
             {
-                await EngancheAsync(stream, fight, walker, Managers.MotorDeEfectos.AlAndar);
+                await EngancheAsync(stream, fight, walker, Managers.EffectEngine.AlAndar);
             }
         }
 
@@ -1843,7 +1843,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Y lo que el hechizo deja puesto, que no es sólo daño: los PA que roba Flecha Helada,
             // sus tres turnos de daños básicos, el alcance de Disparos Lejanos...
             await AplicarEfectosAsync(stream, fight, caster, spell, grade, victim,
-                                      Managers.MotorDeEfectos.AlLanzar, cell, critico);
+                                      Managers.EffectEngine.AlLanzar, cell, critico);
 
             int cierre = fight.SiguienteAccion();
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
@@ -1871,7 +1871,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                                Fighter quienInvoca, int plantilla, int grado,
                                                int celdaApuntada)
         {
-            var receta = Managers.Invocaciones.De(plantilla, grado);
+            var receta = Managers.Summons.De(plantilla, grado);
             if (receta == null)
             {
                 Program.LogDebug($"[Combate] No hay plantilla {plantilla} grado {grado}; no se invoca.");
@@ -1917,10 +1917,10 @@ namespace Jondo.Unity.Launcher.Handlers
                 WaterResPct = receta.ResistenciaAgua,
                 AirResPct = receta.ResistenciaAire,
             };
-            invocado.MaxHP = Managers.Invocaciones.VidaDelInvocado(receta.Vida, quienInvoca.Level);
+            invocado.MaxHP = Managers.Summons.VidaDelInvocado(receta.Vida, quienInvoca.Level);
             invocado.CurrentHP = invocado.MaxHP;
 
-            int vive = Managers.Invocaciones.RondasQueVive(plantilla);
+            int vive = Managers.Summons.RondasQueVive(plantilla);
             invocado.MuereEnRonda = vive > 0 ? fight.RoundNumber + vive : -1;
 
             // ¿Le toca turno? Sólo si su hechizo tiene algo que hacer al empezarlo. La Baliza de
@@ -1949,10 +1949,10 @@ namespace Jondo.Unity.Launcher.Handlers
             // enganches y su cuenta atrás.
             if (receta.HechizoPropio != 0)
             {
-                invocado.Embrujos.Actitudes.Add(receta.HechizoPropio);
+                invocado.Buffs.Actitudes.Add(receta.HechizoPropio);
                 await AplicarEfectosAsync(stream, fight, invocado, receta.HechizoPropio,
                                           receta.GradoDelHechizoPropio,
-                                          invocado, Managers.MotorDeEfectos.AlLanzar, celda);
+                                          invocado, Managers.EffectEngine.AlLanzar, celda);
             }
         }
 
@@ -1974,15 +1974,15 @@ namespace Jondo.Unity.Launcher.Handlers
         /// hasta la ronda en la que caduca el embrujo que más dure de los que ha puesto, que es lo
         /// que decide hasta cuándo sigue vivo el hechizo.
         /// </summary>
-        private static void EngancharLoPendiente(List<Managers.Consecuencia> consecuencias,
+        private static void EngancharLoPendiente(List<Managers.Outcome> consecuencias,
                                                  int hechizo, int grado)
         {
             bool haySuspendidos = false;
-            foreach (var efecto in Managers.EfectosDeHechizo.De(hechizo, grado))
+            foreach (var efecto in Managers.SpellEffects.De(hechizo, grado))
             {
                 foreach (var d in efecto.Disparadores())
                 {
-                    if (!string.Equals(d, Managers.MotorDeEfectos.AlLanzar, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(d, Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase))
                     {
                         haySuspendidos = true;
                         break;
@@ -1995,8 +1995,8 @@ namespace Jondo.Unity.Launcher.Handlers
             var hasta = new Dictionary<Fighter, int>();
             foreach (var c in consecuencias)
             {
-                if (c.Embrujo == null || c.Sobre == null) continue;
-                int cuando = c.Embrujo.CaducaEnRonda;
+                if (c.Buff == null || c.Sobre == null) continue;
+                int cuando = c.Buff.CaducaEnRonda;
                 if (!hasta.TryGetValue(c.Sobre, out int ya) || cuando < 0 || (ya >= 0 && cuando > ya))
                 {
                     hasta[c.Sobre] = cuando;
@@ -2005,7 +2005,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             foreach (var (quien, cuando) in hasta)
             {
-                quien.Embrujos.Enganchar(hechizo, grado, cuando);
+                quien.Buffs.Enganchar(hechizo, grado, cuando);
             }
         }
 
@@ -2017,9 +2017,9 @@ namespace Jondo.Unity.Launcher.Handlers
                                                 Fighter quien, string disparador)
         {
             if (quien == null) return;
-            quien.Embrujos.BarrerEnganches(fight.RoundNumber);
+            quien.Buffs.BarrerEnganches(fight.RoundNumber);
 
-            foreach (var enganche in new List<Jondo.Unity.World.Fights.Embrujos.Enganche>(quien.Embrujos.Enganches))
+            foreach (var enganche in new List<Jondo.Unity.World.Fights.Buffs.ActiveSpell>(quien.Buffs.ActiveSpells))
             {
                 await AplicarEfectosAsync(stream, fight, quien, enganche.Hechizo, enganche.Grado,
                                           quien, disparador, quien.CellId);
@@ -2085,7 +2085,7 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 suyo += StatsHandler.GetEquipBonus(CaracteristicaDeInvocaciones);
             }
-            return Math.Max(0, suyo + quien.Embrujos.De(CaracteristicaDeInvocaciones, ronda));
+            return Math.Max(0, suyo + quien.Buffs.De(CaracteristicaDeInvocaciones, ronda));
         }
 
         /// <summary>Las que tiene ahora mismo en el tablero.</summary>
@@ -2106,11 +2106,11 @@ namespace Jondo.Unity.Launcher.Handlers
         private static bool TieneAlgoQueHacerAlEmpezar(int hechizo, int grado)
         {
             if (hechizo == 0) return false;
-            foreach (var efecto in Managers.EfectosDeHechizo.De(hechizo, Math.Max(1, grado)))
+            foreach (var efecto in Managers.SpellEffects.De(hechizo, Math.Max(1, grado)))
             {
                 foreach (var d in efecto.Disparadores())
                 {
-                    if (string.Equals(d, Managers.MotorDeEfectos.AlEmpezarElTurno,
+                    if (string.Equals(d, Managers.EffectEngine.AlEmpezarElTurno,
                                       StringComparison.OrdinalIgnoreCase)) return true;
                 }
             }
@@ -2162,10 +2162,10 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             if (hechizo == 0) return;
 
-            List<Managers.Consecuencia> consecuencias;
+            List<Managers.Outcome> consecuencias;
             try
             {
-                consecuencias = Managers.MotorDeEfectos.Resolver(fight, quienLanza, hechizo, grado,
+                consecuencias = Managers.EffectEngine.Resolver(fight, quienLanza, hechizo, grado,
                                                                  objetivo, disparador, fight.RoundNumber,
                                                                  hondo: 0,
                                                                  celdaApuntada: celdaApuntada,
@@ -2183,7 +2183,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // no es "al lanzar"— se deja apuntado sobre quien lo lleva, para poder dispararlo
             // cuando toque. Es lo que hace falta para el Centinela: sus bajadas de alcance sólo
             // ocurren al andar, y sin acordarse de que el hechizo sigue puesto no hay manera.
-            if (string.Equals(disparador, Managers.MotorDeEfectos.AlLanzar, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(disparador, Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase))
             {
                 EngancharLoPendiente(consecuencias, hechizo, grado);
             }
@@ -2241,7 +2241,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     // Por el cable, un desplazamiento viaja SIEMPRE como el 5 —alejarse— o el 6
                     // —acercarse—, aunque el efecto que lo provoque sea otro. Medido en Tiro de
                     // Repliegue, cuyo efecto es el 1041 ("Retrocede") y cuyo paquete lleva f14 = 5.
-                    int comoViaja = Jondo.Unity.World.Maps.Zona.SeAleja(
+                    int comoViaja = Jondo.Unity.World.Maps.Zone.SeAleja(
                         c.CasillaDesde, c.CasillaHasta, celdaApuntada, quienLanza.CellId)
                         ? Network.FightProtocol.Alejarse
                         : Network.FightProtocol.Acercarse;
@@ -2255,7 +2255,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     continue;
                 }
 
-                if (c.Embrujo == null) continue;
+                if (c.Buff == null) continue;
 
                 if (c.SoloParaElPanel)
                 {
@@ -2270,26 +2270,26 @@ namespace Jondo.Unity.Launcher.Handlers
                 int familia = Network.FightProtocol.FamiliaDelEmbrujo(c.Efecto.EffectId, categoria, boost);
 
                 // La ronda EN LA QUE SE CAE, no lo que le queda: así lo manda el servidor real.
-                int rondas = c.Embrujo.CaducaEnRonda;
+                int rondas = c.Buff.CaducaEnRonda;
 
                 foreach (var d in c.Efecto.Disparadores())
                 {
                     await WriteFrameAsync(stream, ConnectionProtocol.Push("jxm",
                         Network.FightProtocol.BuildBuff(
-                            c.Sobre.Id, quienLanza.Id, c.Embrujo.Numero, c.Efecto.EffectId,
+                            c.Sobre.Id, quienLanza.Id, c.Buff.Numero, c.Efecto.EffectId,
                             c.Efecto.EffectUid, c.Efecto.Value, c.Efecto.DiceNum, c.Efecto.DiceSide,
                             c.HechizoOrigen, d, rondas, c.Efecto.Dispellable, familia,
                             c.NivelOrigen, critico)));
                 }
 
-                Program.LogDebug($"[Combate] Embrujo {c.Embrujo.Numero} sobre {c.Sobre.Id}: efecto " +
+                Program.LogDebug($"[Combate] Buff {c.Buff.Numero} sobre {c.Sobre.Id}: efecto " +
                                  $"{c.Efecto.EffectId}" +
                                  (c.Caracteristica != 0 ? $", característica {c.Caracteristica} {c.Cuanto:+#;-#;0}" : "") +
-                                 (c.Embrujo.Estado != 0 ? $", estado {c.Embrujo.Estado}" : "") +
-                                 (c.Embrujo.HechizoAfectado != 0
-                                     ? $", {c.Embrujo.Sobre} {c.Embrujo.Cuanto:+#;-#;0} del hechizo {c.Embrujo.HechizoAfectado}"
+                                 (c.Buff.Estado != 0 ? $", estado {c.Buff.Estado}" : "") +
+                                 (c.Buff.HechizoAfectado != 0
+                                     ? $", {c.Buff.Sobre} {c.Buff.Cuanto:+#;-#;0} del hechizo {c.Buff.HechizoAfectado}"
                                      : "") +
-                                 $", hasta la ronda {c.Embrujo.CaducaEnRonda}.");
+                                 $", hasta la ronda {c.Buff.CaducaEnRonda}.");
             }
 
             foreach (var (quien, caracteristica) in fichas)
@@ -2330,10 +2330,10 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             foreach (var quien in fight.Team0)
             {
-                foreach (int actitud in quien.Embrujos.Actitudes)
+                foreach (int actitud in quien.Buffs.Actitudes)
                 {
-                    const int grado = Managers.MotorDeEfectos.GradoDelEnganche;
-                    var (_, nivelId, _) = Managers.EfectosDeHechizo.GradoDe(actitud, quien.Level);
+                    const int grado = Managers.EffectEngine.GradoDelEnganche;
+                    var (_, nivelId, _) = Managers.SpellEffects.GradoDe(actitud, quien.Level);
 
                     await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
                         Network.FightProtocol.BuildSequenceStart(quien.Id,
@@ -2347,16 +2347,16 @@ namespace Jondo.Unity.Launcher.Handlers
                             Network.FightProtocol.CastDetail)));
 
                     await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien,
-                                              Managers.MotorDeEfectos.AlLanzar);
+                                              Managers.EffectEngine.AlLanzar);
 
                     await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
                         Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
                                                                Network.FightProtocol.ActionSequence)));
                 }
 
-                if (quien.Embrujos.Actitudes.Count > 0)
+                if (quien.Buffs.Actitudes.Count > 0)
                 {
-                    Program.LogDebug($"[Combate] Cascada de {quien.Embrujos.Actitudes.Count} " +
+                    Program.LogDebug($"[Combate] Cascada de {quien.Buffs.Actitudes.Count} " +
                                      $"actitud(es) de {quien.Id} antes del primer turno.");
                 }
             }
@@ -2373,14 +2373,14 @@ namespace Jondo.Unity.Launcher.Handlers
         private static async Task ActitudesAsync(NetworkStream stream, FightInstance fight,
                                                  Fighter quien, string disparador)
         {
-            foreach (int actitud in quien.Embrujos.Actitudes)
+            foreach (int actitud in quien.Buffs.Actitudes)
             {
                 // El enganche de una actitud está SIEMPRE en su grado uno, no en el más alto que el
                 // personaje tenga abierto. Los tres grados del Amarillo Ocre son de nivel mínimo 1,
                 // así que preguntar por el grado del personaje devolvía el 3 —el que da el punto de
                 // acción— y allí no hay ningún disparador de principio de turno, con lo que la
                 // actitud no hacía nada. Los grados de dentro los dice el propio enganche.
-                const int grado = Managers.MotorDeEfectos.GradoDelEnganche;
+                const int grado = Managers.EffectEngine.GradoDelEnganche;
                 await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien, disparador);
 
                 // Y los grados que la actitud encadena, por su cuenta. Hace falta porque un grado
@@ -2388,9 +2388,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 // Ocre se lanza al empezar el turno y da el punto de acción en el acto, pero
                 // además lleva dentro un "quita el estado" con disparador de FIN de turno, y a ése
                 // hay que ir a buscarlo cuando el turno acaba.
-                foreach (var efecto in Managers.EfectosDeHechizo.De(actitud, grado))
+                foreach (var efecto in Managers.SpellEffects.De(actitud, grado))
                 {
-                    if (efecto.EffectId != Managers.MotorDeEfectos.EfectoQueLanzaHechizo) continue;
+                    if (efecto.EffectId != Managers.EffectEngine.EfectoQueLanzaHechizo) continue;
                     if (efecto.DiceNum <= 0) continue;
                     await AplicarEfectosAsync(stream, fight, quien, efecto.DiceNum,
                                               efecto.DiceSide > 0 ? efecto.DiceSide : 1,
@@ -2426,9 +2426,9 @@ namespace Jondo.Unity.Launcher.Handlers
             // Ahora se pregunta al motor qué golpes da este hechizo sobre este objetivo. Si no da
             // ninguno, aquí no se toca a nadie.
             var golpes = spell != 0
-                ? Managers.MotorDeEfectos.Golpes(fight, caster, spell, grade, target, celdaApuntada, critico)
+                ? Managers.EffectEngine.Golpes(fight, caster, spell, grade, target, celdaApuntada, critico)
                 : (target != null ? GolpeDelArma(caster, target)
-                                  : new List<(Managers.EfectoDeHechizo, int, Fighter, int)>());
+                                  : new List<(Managers.SpellEffect, int, Fighter, int)>());
             if (golpes.Count == 0) return;
 
             // El dado se tira UNA VEZ por efecto, no una por afectado: si un hechizo de "25 a 30"
@@ -2456,7 +2456,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// Antes se cogía el PROMEDIO, así que un hechizo de 25 a 30 pegaba siempre 27 y en el
         /// juego nunca se veía variar un golpe.
         /// </summary>
-        private static int TirarElDado(Managers.EfectoDeHechizo efecto)
+        private static int TirarElDado(Managers.SpellEffect efecto)
         {
             int minimo = efecto.DiceNum;
             int maximo = Math.Max(efecto.DiceNum, efecto.DiceSide);
@@ -2467,15 +2467,15 @@ namespace Jondo.Unity.Launcher.Handlers
         private static readonly Random _dado = new Random();
 
         /// <summary>El golpe del arma equipada, que sigue viniendo del resumen de siempre.</summary>
-        private static List<(Managers.EfectoDeHechizo Efecto, int Elemento, Fighter Sobre, int Lejos)>
+        private static List<(Managers.SpellEffect Efecto, int Elemento, Fighter Sobre, int Lejos)>
             GolpeDelArma(Fighter caster, Fighter target)
         {
-            var fuera = new List<(Managers.EfectoDeHechizo, int, Fighter, int)>();
+            var fuera = new List<(Managers.SpellEffect, int, Fighter, int)>();
             var arma = DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId);
             if (arma == null || (arma.BaseDamageMin <= 0 && arma.BaseDamageMax <= 0)) return fuera;
 
             // El arma pega a uno solo y a bocajarro, así que no hay distancia al centro que valga.
-            fuera.Add((new Managers.EfectoDeHechizo
+            fuera.Add((new Managers.SpellEffect
             {
                 EffectId = 0,
                 DiceNum = arma.BaseDamageMin,
@@ -2486,7 +2486,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static async Task UnGolpeAsync(NetworkStream stream, FightInstance fight,
                                                Fighter caster, int spell,
-                                               Managers.EfectoDeHechizo efecto, int elemento,
+                                               Managers.SpellEffect efecto, int elemento,
                                                Fighter target, int sacadoDelDado, int lejosDelCentro,
                                                bool critical)
         {
@@ -2507,7 +2507,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // no es el daño, es el TANTO POR CIENTO. Represalias lleva el efecto 1092, "daños
             // neutrales: 20% de los PdV erosionados del objetivo", y contra alguien intacto no
             // hace nada; contra uno al que se le han comido 300 de tope, hace 60.
-            if (Managers.MotorDeEfectos.PegaSegunLoErosionado(efecto.EffectId))
+            if (Managers.EffectEngine.PegaSegunLoErosionado(efecto.EffectId))
             {
                 baseDamage = target.VidaErosionada * sacadoDelDado / 100;
                 Program.LogDebug($"[Combate] El efecto {efecto.EffectId} pega el {sacadoDelDado}% de " +
@@ -2517,7 +2517,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Y lo que le hayan sumado a ESE hechizo por embrujo: el efecto 293, "+#3 de daños
             // básicos". Flecha Helada se lo pone a sí misma, así que la segunda vez que se lanza
             // pega más que la primera.
-            int deEmbrujo = caster.Embrujos.DelHechizo(spell, Jondo.Unity.World.Fights.SobreElHechizo.DanoBase, fight.RoundNumber);
+            int deEmbrujo = caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.DanoBase, fight.RoundNumber);
             if (deEmbrujo != 0)
             {
                 baseDamage += deEmbrujo;
@@ -2535,7 +2535,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // casilla de distancia se le quita el tanto por ciento que diga el hechizo. Se aplica
             // ANTES de las características y las resistencias, sobre los daños base, que es lo que
             // el efecto describe.
-            int enElBorde = Managers.MotorDeEfectos.ConLaCaidaDeLaZona(baseDamage, efecto, lejosDelCentro);
+            int enElBorde = Managers.EffectEngine.ConLaCaidaDeLaZona(baseDamage, efecto, lejosDelCentro);
             if (enElBorde != baseDamage)
             {
                 Program.LogDebug($"[Combate] {target.Id} está a {lejosDelCentro} casilla(s) del centro: " +
@@ -2566,7 +2566,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // Los MULTIPLICADORES de quien lo recibe: "daños sufridos x110%" es el efecto 1163, el
             // que pone Represalias. Van al final, sobre el daño ya calculado.
-            int multiplica = target.Embrujos.Multiplicador(DanoSufridoPorCiento, fight.RoundNumber);
+            int multiplica = target.Buffs.Multiplicador(DanoSufridoPorCiento, fight.RoundNumber);
             if (multiplica != 100)
             {
                 int antes = damage;
@@ -2590,7 +2590,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Se erosiona sobre el daño CALCULADO, no sobre el recortado: pegarle doscientos a uno
             // que tiene setenta de vida erosiona por doscientos.
             int porcientoDeErosion = target.Otra(Fighter.CaracteristicaDeErosion)
-                                   + target.Embrujos.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
+                                   + target.Buffs.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
             int erosionado = target.Erosionar(damage, porcientoDeErosion);
             if (erosionado > 0)
             {
@@ -2611,7 +2611,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (target.LeHanPegado)
             {
-                await ActitudesAsync(stream, fight, target, Managers.MotorDeEfectos.CuandoMePegan);
+                await ActitudesAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
             }
 
             Program.LogDebug($"[Combate] {aplicado} de daño a {target.Id} (calculado {damage}); " +
@@ -2751,7 +2751,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // alcance que quita el Picoteo, por ejemplo— no se aplicaban ni se anunciaban, y
                 // en el panel del jugador no aparecía nunca nada puesto por un bicho.
                 await AplicarEfectosAsync(stream, fight, monster, spell, monsterGrade, prey,
-                                          Managers.MotorDeEfectos.AlLanzar, prey.CellId);
+                                          Managers.EffectEngine.AlLanzar, prey.CellId);
 
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
@@ -3129,7 +3129,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Lo que las actitudes tengan que hacer al acabar el turno. Aquí es donde el Amarillo
             // Ocre se quita el estado de "me han pegado", para que el turno siguiente vuelva a
             // mirarlo limpio.
-            await ActitudesAsync(stream, fight, ending, Managers.MotorDeEfectos.AlAcabarElTurno);
+            await ActitudesAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jyt",
                 Network.FightProtocol.BuildTurnEnd(ending.Id)));

@@ -61,7 +61,7 @@ namespace Jondo.Unity.Launcher.Network
         /// exactamente igual; simplemente no se anotan.
         /// </summary>
         private static bool EsLatido(string path)
-            => path == Contrato.Prefijo + "estado" || path == Contrato.Prefijo + "activos";
+            => path == Contract.Prefijo + "estado" || path == Contract.Prefijo + "activos";
 
         private static async Task HandleHaapiRequestAsync(HttpListenerContext ctx)
         {
@@ -96,7 +96,7 @@ namespace Jondo.Unity.Launcher.Network
             // nativa —"peso muerto con una puerta abierta encima"— y vuelven ahora que el lanzador
             // es otro proceso y no puede llamar a nadie por memoria. La puerta ya no está abierta:
             // sin el secreto que el servidor deja escrito al arrancar, esto contesta 403.
-            var deControl = ApiDeControl.Responder(path, req.HttpMethod, body, req.Headers[Contrato.Cabecera], clientIp);
+            var deControl = ControlApi.Responder(path, req.HttpMethod, body, req.Headers[Contract.Cabecera], clientIp);
             if (deControl != null)
             {
                 byte[] cuerpo = System.Text.Encoding.UTF8.GetBytes(deControl.Value.Json);

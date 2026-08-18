@@ -208,7 +208,7 @@ namespace Jondo.Unity.Launcher.Handlers
             byte[] actorLeft = ConnectionProtocol.BuildActorLeft(
                 Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             await SessionContext.Current.SendAsync(actorLeft);
-            await SessionRegistry.BroadcastToMapAsync(oldMapId, actorLeft, SessionContext.Current.Id);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -268,7 +268,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // with jrh, and GameNodeProxy sends the actors and interactive elements of the map.
             byte[] actorLeft = ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId);
             await SessionContext.Current.SendAsync(actorLeft);
-            await SessionRegistry.BroadcastToMapAsync(oldMapId, actorLeft, SessionContext.Current.Id);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(targetMapId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

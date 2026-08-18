@@ -47,7 +47,7 @@ namespace Jondo.Unity.Launcher.Network
                 // La capacidad del SERVIDOR, que no tiene nada que ver con cuántos clientes abre una
                 // persona. Aquí ponía el tope del lanzador multicuenta -ocho- y por eso el servidor
                 // entero rechazaba la novena conexión, viniera del ordenador que viniera.
-                if (_sessions.Count >= Contrato.ClientesEnTotal) return false;
+                if (_sessions.Count >= Contract.ClientesEnTotal) return false;
                 return _sessions.TryAdd(session.Id, session);
             }
         }
@@ -89,6 +89,54 @@ namespace Jondo.Unity.Launcher.Network
                 }
             }));
             return results.Count(delivered => delivered);
+        }
+
+        /// <summary>
+        /// La mudanza de un personaje, contada a los dos mapas: al que deja, que se ha ido (jsd);
+        /// al que llega, que ha llegado (jsn).
+        ///
+        /// Hacía falta UNA sola pieza porque los caminos por los que un personaje cambia de mapa
+        /// son cuatro —el borde, el zaap, el .teleport y el mando de mapa— y cada uno avisaba a su
+        /// manera: el del borde mandaba el jsd al mapa viejo y nada al nuevo; el del zaap no
+        /// mandaba ninguno de los dos, sólo sacaba al personaje de su propia pantalla. De ahí lo
+        /// que se veía jugando: quien llegaba por el zaap veía a los que ya estaban —su lista de
+        /// actores se la trae entera— pero ellos a él no lo veían hasta recargar el mapa. Y al
+        /// revés igual: quien se iba por el zaap se quedaba de fantasma en la pantalla del otro.
+        ///
+        /// El aviso de llegada es el mismo jsn que ya se manda al entrar al mundo, así que el
+        /// cliente no distingue entre «acaba de conectarse» y «acaba de llegar»: dibuja al actor.
+        ///
+        /// Se llama DESPUÉS de mover el estado de la sesión al mapa nuevo, que es lo que decide a
+        /// quién le llega cada cosa: el que se muda ya no está en el mapa viejo y sí en el nuevo,
+        /// y en los dos casos se le excluye a él mismo, que de sus propios movimientos ya se
+        /// entera por otro lado.
+        /// </summary>
+        public static async Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien,
+                                                                            long mapaQueDeja)
+        {
+            if (quien == null || !quien.IsInWorld || quien.CharacterId <= 0) return (0, 0);
+
+            int seVa = 0;
+            if (mapaQueDeja > 0 && mapaQueDeja != quien.MapId)
+            {
+                seVa = await BroadcastToMapAsync(mapaQueDeja,
+                    ConnectionProtocol.BuildActorLeft(quien.CharacterId), quien.Id);
+            }
+
+            var ficha = DatabaseManager.GetCharacterById(quien.CharacterId);
+            if (ficha == null) return (seVa, 0);
+
+            int llega = await BroadcastToMapAsync(quien.MapId,
+                ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
+                    ficha, quien.State.CellId, quien.State.Orientation, quien.AccountId)),
+                quien.Id);
+
+            if (seVa > 0 || llega > 0)
+            {
+                Program.LogDebug($"[Mudanza] {ficha.Name}: {mapaQueDeja} -> {quien.MapId}. " +
+                                 $"Avisados {seVa} que deja y {llega} que se encuentra.");
+            }
+            return (seVa, llega);
         }
 
         /// <summary>Creates a new ticket for a specific account and server.</summary>

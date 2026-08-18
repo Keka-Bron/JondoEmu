@@ -16,7 +16,7 @@ namespace Jondo.Unity.Launcher.Network
     /// síncronas cuando eran métodos normales, y así no hay que reescribirla entera. Por eso el
     /// tiempo de espera es corto: con el servidor caído la ventana no se puede quedar pillada.
     /// </summary>
-    public static class ClienteDeControl
+    public static class ControlClient
     {
         /// <summary>Cuánto se espera a una respuesta antes de dar al servidor por no disponible.</summary>
         private static readonly TimeSpan Paciencia = TimeSpan.FromSeconds(4);
@@ -41,7 +41,7 @@ namespace Jondo.Unity.Launcher.Network
         /// local— y si no, la dirección que se haya puesto en el desplegable, que puede ser la de
         /// otro ordenador por Hamachi o la de una VPS.
         /// </summary>
-        public static string Base => $"http://{UI.LauncherPreferences.ServerHost}:{Contrato.Puerto}";
+        public static string Base => $"http://{UI.LauncherPreferences.ServerHost}:{Contract.Puerto}";
 
         /// <summary>Lo que ha contestado el servidor, o el silencio si no había nadie.</summary>
         public readonly struct Respuesta
@@ -73,12 +73,12 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static Respuesta Pedir(string verbo, object? cuerpo = null)
         {
-            if (_secreto.Length == 0) _secreto = Contrato.LeerSecreto();
+            if (_secreto.Length == 0) _secreto = Contract.LeerSecreto();
 
             var salida = Intentar(verbo, cuerpo);
             if (salida.Llego && salida.Codigo == 403)
             {
-                string releido = Contrato.LeerSecreto();
+                string releido = Contract.LeerSecreto();
                 if (releido.Length > 0 && releido != _secreto)
                 {
                     _secreto = releido;
@@ -93,11 +93,11 @@ namespace Jondo.Unity.Launcher.Network
             try
             {
                 string json = ConElToken(cuerpo);
-                using var peticion = new HttpRequestMessage(HttpMethod.Post, Base + Contrato.Prefijo + verbo)
+                using var peticion = new HttpRequestMessage(HttpMethod.Post, Base + Contract.Prefijo + verbo)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 };
-                if (_secreto.Length > 0) peticion.Headers.Add(Contrato.Cabecera, _secreto);
+                if (_secreto.Length > 0) peticion.Headers.Add(Contract.Cabecera, _secreto);
 
                 using var respuesta = Cliente.Send(peticion);
                 string texto = respuesta.Content.ReadAsStringAsync().GetAwaiter().GetResult();

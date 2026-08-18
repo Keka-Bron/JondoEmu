@@ -55,7 +55,7 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static SignInResult SignIn(string username, string password, string clientIp)
         {
-            var respuesta = ClienteDeControl.Pedir("entrar", new
+            var respuesta = ControlClient.Pedir("entrar", new
             {
                 usuario = username,
                 clave = password,
@@ -79,7 +79,7 @@ namespace Jondo.Unity.Launcher
 
             // La sesion queda puesta para todo lo que venga despues: es lo que dice quien pide
             // las cosas, y de lo que el servidor saca el rol.
-            Network.ClienteDeControl.Token = cuerpo.Value.GetProperty("token").GetString() ?? "";
+            Network.ControlClient.Token = cuerpo.Value.GetProperty("token").GetString() ?? "";
             EsAdministrador = cuerpo.Value.TryGetProperty("rol", out var rolDicho) && rolDicho.GetInt32() >= Roles.Administrador;
 
             return new SignInResult
@@ -97,7 +97,7 @@ namespace Jondo.Unity.Launcher
         /// Se distingue el silencio —no hay nadie escuchando— del rechazo por el secreto, porque
         /// son dos averías distintas y la segunda se arregla rearrancando el lanzador.
         /// </summary>
-        private static string MensajeDeSilencio(Network.ClienteDeControl.Respuesta respuesta)
+        private static string MensajeDeSilencio(Network.ControlClient.Respuesta respuesta)
             => respuesta.Llego && respuesta.Codigo == 403
                 ? UI.LauncherPreferences.Textos.ControlRechazado
                 : UI.LauncherPreferences.Textos.ServidorSinResponder;
@@ -105,7 +105,7 @@ namespace Jondo.Unity.Launcher
         /// <summary>Crea una cuenta nueva con su apodo. La escribe el servidor, no el lanzador.</summary>
         public static Result RegisterAccount(string username, string password, string nickname, string clientIp)
         {
-            var respuesta = ClienteDeControl.Pedir("crear-cuenta", new
+            var respuesta = ControlClient.Pedir("crear-cuenta", new
             {
                 usuario = username,
                 clave = password,
@@ -134,8 +134,8 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static bool RememberSession(long accountId, string token)
         {
-            Network.ClienteDeControl.Token = token ?? "";
-            var cuerpo = ClienteDeControl.Pedir("recordar-token",
+            Network.ControlClient.Token = token ?? "";
+            var cuerpo = ControlClient.Pedir("recordar-token",
                 new { cuenta = accountId, token }).Cuerpo();
             return cuerpo != null && cuerpo.Value.GetProperty("bien").GetBoolean();
         }
@@ -144,7 +144,7 @@ namespace Jondo.Unity.Launcher
         public static bool EsAdministrador { get; private set; }
 
         /// <summary>Le pide al servidor que se apague. Sólo funciona si la cuenta es administrador.</summary>
-        public static bool StopServer() => ClienteDeControl.Pedir("apagar").Bien;
+        public static bool StopServer() => ControlClient.Pedir("apagar").Bien;
 
         /// <summary>
         /// El código que manda el servidor, dicho en el idioma del lanzador.
@@ -155,9 +155,9 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private static string EnCristiano(string codigo) => codigo switch
         {
-            Contrato.MotivoSesionCaducada => UI.LauncherPreferences.Textos.SessionExpiredError,
-            Contrato.MotivoCuentaYaAbierta => UI.LauncherPreferences.Textos.AccountAlreadyRunning,
-            Contrato.MotivoTopeDeClientes => UI.LauncherPreferences.Textos.MaxClientsError,
+            Contract.MotivoSesionCaducada => UI.LauncherPreferences.Textos.SessionExpiredError,
+            Contract.MotivoCuentaYaAbierta => UI.LauncherPreferences.Textos.AccountAlreadyRunning,
+            Contract.MotivoTopeDeClientes => UI.LauncherPreferences.Textos.MaxClientsError,
             _ => codigo.Length > 0 ? codigo : UI.LauncherPreferences.Textos.GenericError,
         };
 
@@ -188,7 +188,7 @@ namespace Jondo.Unity.Launcher
                 // ningún error: se conecta a los servidores de Ankama. Con un solo proceso esto no
                 // podía pasar porque los servicios estaban levantados antes de que existiera la
                 // ventana; ahora sí puede, así que se comprueba.
-                if (!ClienteDeControl.ServidorVivo())
+                if (!ControlClient.ServidorVivo())
                 {
                     return new Result
                     {
@@ -203,7 +203,7 @@ namespace Jondo.Unity.Launcher
                 // a comprobar cuando el cliente se presente al Zaap. Antes se los inventaba el
                 // lanzador y los apuntaba en un diccionario de su propia memoria; ese era el nudo
                 // que hacía imposible separar los procesos.
-                var respuesta = ClienteDeControl.Pedir("lanzamiento", new { token = token ?? "", idioma = language });
+                var respuesta = ControlClient.Pedir("lanzamiento", new { token = token ?? "", idioma = language });
                 var cuerpo = respuesta.Cuerpo();
                 if (cuerpo == null) return new Result { Success = false, Message = MensajeDeSilencio(respuesta) };
 
@@ -348,7 +348,7 @@ namespace Jondo.Unity.Launcher
         /// <summary>Le dice al servidor que el cliente de esa cuenta ya no está.</summary>
         private static void Devolver(long accountId)
         {
-            try { ClienteDeControl.Pedir("fin-de-lanzamiento", new { cuenta = accountId }); }
+            try { ControlClient.Pedir("fin-de-lanzamiento", new { cuenta = accountId }); }
             catch { }
         }
 
@@ -373,7 +373,7 @@ namespace Jondo.Unity.Launcher
 
         private static void RefrescarQuienJuega()
         {
-            var cuerpo = ClienteDeControl.Pedir("activos").Cuerpo();
+            var cuerpo = ControlClient.Pedir("activos").Cuerpo();
             if (cuerpo == null)
             {
                 // Sin servidor no hay nadie jugando, y sobre todo: no dejar la lista de antes, que
@@ -400,7 +400,7 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static ServicesStatus GetStatus()
         {
-            var cuerpo = ClienteDeControl.Pedir("estado").Cuerpo();
+            var cuerpo = ControlClient.Pedir("estado").Cuerpo();
             if (cuerpo == null)
             {
                 _jugando = new System.Collections.Generic.HashSet<long>();

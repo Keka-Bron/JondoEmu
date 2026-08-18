@@ -28,7 +28,7 @@ namespace Jondo.Unity.Launcher
         {
             ConsoleLogBuffer.Initialize();
 
-            if (!Contrato.CogerElSitio("JondoEmuServidor"))
+            if (!Contract.CogerElSitio("JondoEmuServidor"))
             {
                 Console.WriteLine("[!] Ya hay un servidor de Jondo corriendo en esta sesión. Este se cierra.");
                 await Task.Delay(2500);
@@ -36,7 +36,7 @@ namespace Jondo.Unity.Launcher
             }
 
             try { await ArrancarTodoYEsperar(); }
-            finally { Contrato.SoltarElSitio(); }
+            finally { Contract.SoltarElSitio(); }
         }
 
         private static async Task ArrancarTodoYEsperar()
@@ -96,8 +96,8 @@ namespace Jondo.Unity.Launcher
             {
                 // La llave con la que el lanzador podrá hablarle a este servidor. Una por arranque:
                 // así un lanzador de una sesión anterior no se queda con llave de la de ahora.
-                ApiDeControl.NuevoSecreto();
-                Console.WriteLine($"[+] Llave del canal de mando en {Contrato.FicheroDelSecreto}");
+                ControlApi.NuevoSecreto();
+                Console.WriteLine($"[+] Llave del canal de mando en {Contract.FicheroDelSecreto}");
                 HaapiServer.Start(haapiPort);
                 ZaapServer.Start(port);
                 GameServerProxy.Start(gamePort);
@@ -141,7 +141,7 @@ namespace Jondo.Unity.Launcher
             // Y su ventana: el registro y las cifras. Si no se pudiera abrir —sin escritorio, por
             // ejemplo— el servidor sigue funcionando igual: la ventana es para mirar, no para que
             // las cosas pasen.
-            UI.VentanaDelServidor.Abrir();
+            UI.ServerWindow.Abrir();
 
             // Aquí se anunciaba «el servidor está en marcha, Ctrl+C para pararlo» y «cerrar el
             // lanzador ya no apaga esto». Eran avisos para quien miraba una consola de texto:

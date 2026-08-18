@@ -53,7 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jondo.Unity.Contrato\Jondo.Unity.Contrato.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj" />
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
   </ItemGroup>

@@ -44,7 +44,7 @@ namespace Jondo.Unity.Launcher.UI
         /// </summary>
         private void PintarFondo(Graphics g)
         {
-            var ventana = FindForm() as IVentanaConFondo;
+            var ventana = FindForm() as IBackgroundWindow;
             var fondo = ventana?.ComposedBackground;
             var control = ventana as Control;
             if (control == null || fondo == null) { g.Clear(LauncherTheme.Background); return; }

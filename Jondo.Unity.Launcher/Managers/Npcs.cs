@@ -117,7 +117,7 @@ namespace Jondo.Unity.Launcher.Managers
                         NpcId = reader.GetInt32(1),
                         Cell = reader.GetInt32(2),
                         Orientation = reader.GetInt32(3),
-                        ContextualId = Actores.NpcDelMapa(here.Count),
+                        ContextualId = ActorIds.NpcDelMapa(here.Count),
                         RawLook = reader.IsDBNull(4) ? "" : reader.GetString(4),
                         BoneId = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
                     };

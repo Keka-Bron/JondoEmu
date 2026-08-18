@@ -16,7 +16,7 @@ namespace Jondo.Unity.Launcher
     /// el servidor dice qué ha pasado. Todo lo que se le añada a este fichero acaba en el
     /// ordenador de todos los jugadores, así que conviene que sea poco.
     /// </summary>
-    public static class Contrato
+    public static class Contract
     {
         /// <summary>La versión que se publica en el estado.</summary>
         public const string Version = "3.6.10.10";

@@ -10,7 +10,7 @@ namespace Jondo.Unity.Launcher.UI
     /// distintas, y el idioma en el que quiere ver su consola quien lleva el servidor no tiene por
     /// qué ser el mismo en el que juega nadie.
     /// </summary>
-    internal static class PreferenciasDelServidor
+    internal static class ServerPreferences
     {
         private static string Fichero => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo", "servidor.cfg");

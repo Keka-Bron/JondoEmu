@@ -29,7 +29,7 @@ namespace Jondo.Unity.Launcher.Managers
     /// siempre saben en qué mapa está. Los monstruos, en cambio, se numeran una sola vez para todo
     /// el mundo, porque un grupo puede morir en un mapa y renacer en otro.
     /// </summary>
-    public static class Actores
+    public static class ActorIds
     {
         /// <summary>El primero que se le da a un NPC en cada mapa.</summary>
         public const long PrimerNpc = -20000;

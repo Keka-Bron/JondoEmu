@@ -119,7 +119,7 @@ namespace Jondo.Unity.Launcher.UI
             get
             {
                 string donde = Leer().TryGetValue(ClaveServidor, out string? v) ? v.Trim() : "";
-                return donde.Length == 0 ? Contrato.LocalIp : donde;
+                return donde.Length == 0 ? Contract.LocalIp : donde;
             }
             set => Escribir(ClaveServidor, (value ?? "").Trim());
         }
@@ -139,7 +139,7 @@ namespace Jondo.Unity.Launcher.UI
             get
             {
                 string donde = ServerHost;
-                return donde == Contrato.LocalIp || donde.Equals("localhost", StringComparison.OrdinalIgnoreCase);
+                return donde == Contract.LocalIp || donde.Equals("localhost", StringComparison.OrdinalIgnoreCase);
             }
         }
 

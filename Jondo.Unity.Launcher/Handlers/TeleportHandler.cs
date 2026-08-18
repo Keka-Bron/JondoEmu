@@ -51,9 +51,14 @@ namespace Jondo.Unity.Launcher.Handlers
                 return -1;
             }
 
+            long mapaQueDeja = GameState.MapId;
             GameState.MapId = mapId;
             GameState.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
             DatabaseManager.SaveCurrentCharacter();
+
+            // Los otros dos mapas implicados: del que sale y al que entra. Sin esto, teletransportarse
+            // dejaba un fantasma donde estaba y llegaba invisible a donde iba.
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildActorLeft(GameState.CharacterId));

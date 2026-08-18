@@ -13,7 +13,7 @@ namespace Jondo.Unity.World.Fights
     ///   293  "#1: +#3 de daños básicos"     280  "+#3 de alcance mínimo"
     ///   281  "#1: +#3 de alcance máximo"
     /// </summary>
-    public enum SobreElHechizo
+    public enum SpellAspect
     {
         Nada = 0,
         DanoBase = 293,
@@ -28,7 +28,7 @@ namespace Jondo.Unity.World.Fights
     /// entrada del <c>EffectsJson</c> del hechizo, y lo que significa el número de efecto lo dice
     /// la tabla <c>Effects</c> del cliente. Aquí sólo se guarda lo ya resuelto.
     /// </summary>
-    public sealed class Embrujo
+    public sealed class Buff
     {
         /// <summary>El número correlativo con el que viaja al cliente, empezando por uno.</summary>
         public int Numero { get; set; }
@@ -43,7 +43,7 @@ namespace Jondo.Unity.World.Fights
         public int Cuanto { get; set; }
 
         /// <summary>Si afecta a un hechizo concreto, cuál y de qué manera.</summary>
-        public SobreElHechizo Sobre { get; set; }
+        public SpellAspect Sobre { get; set; }
         public int HechizoAfectado { get; set; }
 
         /// <summary>El estado que pone o quita, si es de los que hacen eso.</summary>
@@ -72,9 +72,9 @@ namespace Jondo.Unity.World.Fights
     /// Va aparte del <see cref="Fighter"/> para que se pueda mirar de un vistazo qué hay puesto y
     /// quién lo puso, que es justo lo que el cliente pinta en el panel de embrujos.
     /// </summary>
-    public sealed class Embrujos
+    public sealed class Buffs
     {
-        private readonly List<Embrujo> _puestos = new List<Embrujo>();
+        private readonly List<Buff> _puestos = new List<Buff>();
         private readonly HashSet<int> _estados = new HashSet<int>();
 
         /// <summary>
@@ -96,10 +96,10 @@ namespace Jondo.Unity.World.Fights
         ///
         /// Es lo mismo que las actitudes de los objetos, pero con fecha de caducidad.
         /// </summary>
-        public List<Enganche> Enganches { get; } = new List<Enganche>();
+        public List<ActiveSpell> ActiveSpells { get; } = new List<ActiveSpell>();
 
         /// <summary>Un hechizo que sigue puesto y en qué grado, hasta que se caiga.</summary>
-        public sealed class Enganche
+        public sealed class ActiveSpell
         {
             public int Hechizo { get; set; }
             public int Grado { get; set; }
@@ -117,16 +117,16 @@ namespace Jondo.Unity.World.Fights
                 ya.CaducaEnRonda = caducaEnRonda;
                 return;
             }
-            Enganches.Add(new Enganche { Hechizo = hechizo, Grado = grado, CaducaEnRonda = caducaEnRonda });
+            ActiveSpells.Add(new ActiveSpell { Hechizo = hechizo, Grado = grado, CaducaEnRonda = caducaEnRonda });
         }
 
-        private Enganche _enganchesPorHechizo(int hechizo)
-            => Enganches.FirstOrDefault(e => e.Hechizo == hechizo);
+        private ActiveSpell _enganchesPorHechizo(int hechizo)
+            => ActiveSpells.FirstOrDefault(e => e.Hechizo == hechizo);
 
         /// <summary>Quita los enganches cumplidos.</summary>
-        public void BarrerEnganches(int ronda) => Enganches.RemoveAll(e => !e.Vivo(ronda));
+        public void BarrerEnganches(int ronda) => ActiveSpells.RemoveAll(e => !e.Vivo(ronda));
 
-        public IReadOnlyList<Embrujo> Puestos => _puestos;
+        public IReadOnlyList<Buff> Puestos => _puestos;
         public IReadOnlyCollection<int> Estados => _estados;
 
         public bool TieneEstado(int estado) => _estados.Contains(estado);
@@ -140,7 +140,7 @@ namespace Jondo.Unity.World.Fights
         /// captura los del jugador van del 19 al 25 y los del monstruo siguen del 26 al 32, misma
         /// serie.
         /// </summary>
-        public Embrujo Poner(Embrujo embrujo, Func<int> siguienteNumero)
+        public Buff Poner(Buff embrujo, Func<int> siguienteNumero)
         {
             // Un mismo efecto del mismo hechizo no se apila: se refresca. Es lo que hace Flecha
             // Helada al lanzarse dos veces seguidas, que renueva sus tres turnos en vez de sumar
@@ -209,7 +209,7 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>Lo que suman los embrujos a un hechizo concreto: daño base o alcance.</summary>
-        public int DelHechizo(int hechizo, SobreElHechizo que, int ronda)
+        public int DelHechizo(int hechizo, SpellAspect que, int ronda)
         {
             int total = 0;
             foreach (var e in _puestos)
@@ -220,7 +220,7 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>Se lleva los que ya han caducado y devuelve cuáles eran.</summary>
-        public List<Embrujo> Barrer(int ronda)
+        public List<Buff> Barrer(int ronda)
         {
             var caidos = _puestos.FindAll(e => !e.Vivo(ronda));
             _puestos.RemoveAll(e => !e.Vivo(ronda));

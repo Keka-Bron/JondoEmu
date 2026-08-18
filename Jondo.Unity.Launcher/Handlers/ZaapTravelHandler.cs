@@ -155,6 +155,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
+            long mapaQueDeja = Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
             Jondo.Unity.Launcher.Network.SessionContext.State.Kamas -= cost;
             Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
 
@@ -163,6 +164,9 @@ namespace Jondo.Unity.Launcher.Handlers
             Jondo.Unity.Launcher.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(
                 target, arrival.Count > 0 ? arrival[0].Cell : 0);
             DatabaseManager.SaveCurrentCharacter();
+
+            // Y que los dos mapas se enteren: el zaap no avisaba a ninguno.
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
 
             // El mismo orden que la captura: primero se saca al personaje del mapa que deja, luego
             // se le manda cargar el nuevo, y los kamas al final.

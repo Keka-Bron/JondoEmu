@@ -8,11 +8,11 @@ namespace Jondo.Unity.Launcher.Managers
     /// Lo que hay que hacer con un efecto ya resuelto: aplicarlo y contárselo al cliente.
     /// El motor decide QUÉ pasa; quien lo llama decide cómo se manda por el cable.
     /// </summary>
-    public sealed class Consecuencia
+    public sealed class Outcome
     {
         public Fighter Sobre { get; init; } = null!;
-        public EfectoDeHechizo Efecto { get; init; } = null!;
-        public Embrujo Embrujo { get; init; }
+        public SpellEffect Efecto { get; init; } = null!;
+        public Buff Buff { get; init; }
         public int HechizoOrigen { get; init; }
         public int NivelOrigen { get; init; }
 
@@ -73,7 +73,7 @@ namespace Jondo.Unity.Launcher.Managers
     ///                    lanza mi grado 3"; el grado 2 pone el estado 519 y el 3 da +1 PA si NO se
     ///                    tiene ese estado, +20 de huida si sí, y lo quita al acabar el turno.
     /// </summary>
-    public static class MotorDeEfectos
+    public static class EffectEngine
     {
         // Los números de efecto que el motor entiende de forma especial. El resto se resuelve por
         // su característica en el catálogo.
@@ -110,11 +110,11 @@ namespace Jondo.Unity.Launcher.Managers
         /// Si el hechizo no tiene ni un efecto de daño, no devuelve nada: Tiro de Repliegue sólo
         /// aparta al que lanza y no debe quitarle un solo punto de vida a nadie.
         /// </summary>
-        public static List<(EfectoDeHechizo Efecto, int Elemento, Fighter Sobre, int Lejos)> Golpes(
+        public static List<(SpellEffect Efecto, int Elemento, Fighter Sobre, int Lejos)> Golpes(
             FightInstance combate, Fighter quienLanza, int hechizo, int grado, Fighter objetivo,
             int celdaApuntada = -1, bool critico = false)
         {
-            var fuera = new List<(EfectoDeHechizo, int, Fighter, int)>();
+            var fuera = new List<(SpellEffect, int, Fighter, int)>();
             foreach (var efecto in EfectosDeLaTirada(hechizo, grado, critico))
             {
                 if (!EsDeDano(efecto.EffectId)) continue;
@@ -148,7 +148,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// La tirada del dado es UNA para todo el lanzamiento: si de "25 a 30" sale 26, en el
         /// centro entran 26 y a una casilla, el 90% de eso.
         /// </summary>
-        public static int ConLaCaidaDeLaZona(int dano, EfectoDeHechizo efecto, int lejos)
+        public static int ConLaCaidaDeLaZona(int dano, SpellEffect efecto, int lejos)
         {
             if (dano <= 0 || lejos <= 0 || efecto.PasoDeCaida <= 0) return dano;
 
@@ -230,12 +230,12 @@ namespace Jondo.Unity.Launcher.Managers
         /// <paramref name="disparador"/> filtra: al lanzar se piden los "I", al empezar el turno los
         /// "TB", y así. Los efectos con otro disparador se quedan quietos hasta que les toque.
         /// </summary>
-        public static List<Consecuencia> Resolver(FightInstance combate, Fighter quienLanza,
+        public static List<Outcome> Resolver(FightInstance combate, Fighter quienLanza,
                                                   int hechizo, int grado, Fighter objetivo,
                                                   string disparador, int ronda, int hondo = 0,
                                                   int celdaApuntada = -1, bool critico = false)
         {
-            var fuera = new List<Consecuencia>();
+            var fuera = new List<Outcome>();
             if (hondo > HondoMaximo) return fuera;
 
             var lista = EfectosDeLaTirada(hechizo, grado, critico);
@@ -312,7 +312,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// no distingue; con ellos se cae al objetivo del lanzamiento, que es lo razonable.
         /// </summary>
         private static IEnumerable<Fighter> AQuien(FightInstance combate, Fighter quienLanza,
-                                                   Fighter objetivo, EfectoDeHechizo efecto,
+                                                   Fighter objetivo, SpellEffect efecto,
                                                    int celdaApuntada = -1)
         {
             var mascara = efecto.TargetMask ?? "";
@@ -393,8 +393,8 @@ namespace Jondo.Unity.Launcher.Managers
             {
                 if (quien == null) continue;
                 bool vale = true;
-                foreach (int estado in pideEstado) if (!quien.Embrujos.TieneEstado(estado)) vale = false;
-                foreach (int estado in pideNoEstado) if (quien.Embrujos.TieneEstado(estado)) vale = false;
+                foreach (int estado in pideEstado) if (!quien.Buffs.TieneEstado(estado)) vale = false;
+                foreach (int estado in pideNoEstado) if (quien.Buffs.TieneEstado(estado)) vale = false;
                 if (vale) yield return quien;
             }
         }
@@ -406,7 +406,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// ninguna— se cae al objetivo de siempre, que es lo que se hacía antes de haber zonas.
         /// </summary>
         private static IEnumerable<Fighter> EnLaZona(FightInstance combate, Fighter quienLanza,
-                                                     Fighter objetivo, EfectoDeHechizo efecto,
+                                                     Fighter objetivo, SpellEffect efecto,
                                                      int celdaApuntada)
         {
             if (celdaApuntada < 0)
@@ -415,7 +415,7 @@ namespace Jondo.Unity.Launcher.Managers
                 yield break;
             }
 
-            var casillas = Jondo.Unity.World.Maps.Zona.Casillas(
+            var casillas = Jondo.Unity.World.Maps.Zone.Casillas(
                 efecto.Forma, efecto.Tamano, quienLanza.CellId, celdaApuntada);
             if (casillas.Count == 0)
             {
@@ -433,7 +433,7 @@ namespace Jondo.Unity.Launcher.Managers
 
         /// <summary>Si uno pisa la zona de un efecto.</summary>
         private static bool EstaEnLaZona(Fighter quien, FightInstance combate, Fighter objetivo,
-                                         EfectoDeHechizo efecto, int celdaApuntada)
+                                         SpellEffect efecto, int celdaApuntada)
         {
             foreach (var otro in EnLaZona(combate, quien, objetivo, efecto, celdaApuntada))
             {
@@ -448,8 +448,8 @@ namespace Jondo.Unity.Launcher.Managers
             foreach (var f in combate.Team1) yield return f;
         }
 
-        private static Consecuencia Aplicar(FightInstance combate, Fighter quienLanza, Fighter sobre,
-                                            int hechizo, int grado, EfectoDeHechizo efecto, int ronda,
+        private static Outcome Aplicar(FightInstance combate, Fighter quienLanza, Fighter sobre,
+                                            int hechizo, int grado, SpellEffect efecto, int ronda,
                                             int celdaApuntada = -1)
         {
             // El daño lo lleva quien ya lo llevaba; aquí no se toca.
@@ -484,13 +484,13 @@ namespace Jondo.Unity.Launcher.Managers
                 // la única frontera que quedaba era el borde de la retícula de 560 celdas, que es
                 // mucho mayor que el suelo de un mapa.
                 var pisables = MapManager.GetFightWalkable(combate.ArenaMapId);
-                int hasta = Jondo.Unity.World.Maps.Zona.Empujar(
+                int hasta = Jondo.Unity.World.Maps.Zone.Empujar(
                     celdaApuntada, quienLanza.CellId, desde, cuantas,
                     pisables: pisables, ocupadas: ocupadas);
 
                 if (hasta == desde) return null;
                 sobre.CellId = hasta;
-                return new Consecuencia
+                return new Outcome
                 {
                     Sobre = sobre, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
@@ -504,7 +504,7 @@ namespace Jondo.Unity.Launcher.Managers
                 // motor: hace falta repartir identificador, rehacer el orden de turnos y avisar
                 // al cliente, y eso es del que lleva el combate.
                 if (efecto.DiceNum <= 0) return null;
-                return new Consecuencia
+                return new Outcome
                 {
                     Sobre = sobre, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
@@ -518,7 +518,7 @@ namespace Jondo.Unity.Launcher.Managers
                 // actitudes: el grado 1 del Amarillo Ocre no hace nada por sí mismo, sólo dice
                 // cuándo lanzar sus grados 2 y 3.
                 if (efecto.DiceNum <= 0) return null;
-                return new Consecuencia
+                return new Outcome
                 {
                     Sobre = sobre,
                     Efecto = efecto,
@@ -533,17 +533,17 @@ namespace Jondo.Unity.Launcher.Managers
             {
                 int estado = efecto.Value != 0 ? efecto.Value : efecto.DiceNum;
                 if (estado == 0) return null;
-                if (efecto.EffectId == PonerEstado) sobre.Embrujos.PonerEstado(estado);
-                else sobre.Embrujos.QuitarEstado(estado);
+                if (efecto.EffectId == PonerEstado) sobre.Buffs.PonerEstado(estado);
+                else sobre.Buffs.QuitarEstado(estado);
 
-                return new Consecuencia
+                return new Outcome
                 {
                     Sobre = sobre,
                     Efecto = efecto,
                     HechizoOrigen = hechizo,
                     NivelOrigen = grado,
-                    Embrujo = efecto.EffectId == PonerEstado
-                        ? sobre.Embrujos.Poner(new Embrujo
+                    Buff = efecto.EffectId == PonerEstado
+                        ? sobre.Buffs.Poner(new Buff
                         {
                             EffectId = efecto.EffectId,
                             EffectUid = efecto.EffectUid,
@@ -560,13 +560,13 @@ namespace Jondo.Unity.Launcher.Managers
 
             // Los tres que afinan un hechizo concreto: daño básico y alcance. El hechizo va en el
             // dado y lo que se suma, en el valor.
-            if (Enum.IsDefined(typeof(SobreElHechizo), efecto.EffectId) && efecto.EffectId != 0)
+            if (Enum.IsDefined(typeof(SpellAspect), efecto.EffectId) && efecto.EffectId != 0)
             {
-                var que = (SobreElHechizo)efecto.EffectId;
+                var que = (SpellAspect)efecto.EffectId;
                 int cuanto = efecto.Value;
                 if (efecto.DiceNum <= 0 || cuanto == 0) return null;
 
-                var puesto = sobre.Embrujos.Poner(new Embrujo
+                var puesto = sobre.Buffs.Poner(new Buff
                 {
                     EffectId = efecto.EffectId,
                     EffectUid = efecto.EffectUid,
@@ -579,9 +579,9 @@ namespace Jondo.Unity.Launcher.Managers
                     Disparador = AlLanzar,
                     CaducaEnRonda = Caduca(efecto, ronda),
                 }, combate.SiguienteEmbrujo);
-                return new Consecuencia
+                return new Outcome
                 {
-                    Sobre = sobre, Efecto = efecto, Embrujo = puesto,
+                    Sobre = sobre, Efecto = efecto, Buff = puesto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
                 };
             }
@@ -603,7 +603,7 @@ namespace Jondo.Unity.Launcher.Managers
                 cuantos = Math.Min(cuantos, hay);
                 if (cuantos <= 0) return null;
 
-                var quitado = sobre.Embrujos.Poner(new Embrujo
+                var quitado = sobre.Buffs.Poner(new Buff
                 {
                     EffectId = efecto.EffectId,
                     EffectUid = efecto.EffectUid,
@@ -616,11 +616,11 @@ namespace Jondo.Unity.Launcher.Managers
                     CaducaEnRonda = Caduca(efecto, ronda),
                 }, combate.SiguienteEmbrujo);
 
-                return new Consecuencia
+                return new Outcome
                 {
                     Sobre = sobre,
                     Efecto = efecto,
-                    Embrujo = quitado,
+                    Buff = quitado,
                     Caracteristica = robado,
                     Cuanto = -cuantos,
                     HechizoOrigen = hechizo,
@@ -642,7 +642,7 @@ namespace Jondo.Unity.Launcher.Managers
                 if (puntos <= 0) return null;
 
                 sobre.CurrentHP += puntos;
-                return new Consecuencia
+                return new Outcome
                 {
                     Sobre = sobre, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
@@ -658,7 +658,7 @@ namespace Jondo.Unity.Launcher.Managers
                 int cuanto = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (cuanto <= 0) return null;
 
-                var puestoMult = sobre.Embrujos.Poner(new Embrujo
+                var puestoMult = sobre.Buffs.Poner(new Buff
                 {
                     EffectId = efecto.EffectId,
                     EffectUid = efecto.EffectUid,
@@ -671,9 +671,9 @@ namespace Jondo.Unity.Launcher.Managers
                     Apila = SeApila(efecto),
                 }, combate.SiguienteEmbrujo);
 
-                return new Consecuencia
+                return new Outcome
                 {
-                    Sobre = sobre, Efecto = efecto, Embrujo = puestoMult,
+                    Sobre = sobre, Efecto = efecto, Buff = puestoMult,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
                 };
             }
@@ -697,7 +697,7 @@ namespace Jondo.Unity.Launcher.Managers
             // Ahora el que no se sepa aplicar se anota y SE MANDA igual, con lo que trae puesto.
             bool soloPanel = caracteristica == 0 || signo == 0 || cantidad == 0;
 
-            var embrujo = sobre.Embrujos.Poner(new Embrujo
+            var embrujo = sobre.Buffs.Poner(new Buff
             {
                 EffectId = efecto.EffectId,
                 EffectUid = efecto.EffectUid,
@@ -711,11 +711,11 @@ namespace Jondo.Unity.Launcher.Managers
                 Apila = SeApila(efecto),
             }, combate.SiguienteEmbrujo);
 
-            return new Consecuencia
+            return new Outcome
             {
                 Sobre = sobre,
                 Efecto = efecto,
-                Embrujo = embrujo,
+                Buff = embrujo,
                 Caracteristica = soloPanel ? 0 : caracteristica,
                 Cuanto = soloPanel ? 0 : cantidad,
                 HechizoOrigen = hechizo,
@@ -732,11 +732,11 @@ namespace Jondo.Unity.Launcher.Managers
         /// de 25 a 29; Tiros Potentes da 250 de potencia y en crítico 300. Si la lista crítica
         /// viene vacía —hay hechizos que no la tienen— se usa la de siempre.
         /// </summary>
-        public static IReadOnlyList<EfectoDeHechizo> EfectosDeLaTirada(int hechizo, int grado, bool critico)
+        public static IReadOnlyList<SpellEffect> EfectosDeLaTirada(int hechizo, int grado, bool critico)
         {
-            if (!critico) return EfectosDeHechizo.De(hechizo, grado);
-            var criticos = EfectosDeHechizo.Criticos(hechizo, grado);
-            return criticos.Count > 0 ? criticos : EfectosDeHechizo.De(hechizo, grado);
+            if (!critico) return SpellEffects.De(hechizo, grado);
+            var criticos = SpellEffects.Criticos(hechizo, grado);
+            return criticos.Count > 0 ? criticos : SpellEffects.De(hechizo, grado);
         }
 
         /// <summary>
@@ -754,17 +754,17 @@ namespace Jondo.Unity.Launcher.Managers
         /// Contado sobre la base entera: hay 1.335 niveles de hechizo con efectos de este tipo, y
         /// en 1.129 de sus grupos la suma es exactamente cien.
         /// </summary>
-        private static HashSet<EfectoDeHechizo> Sortear(IReadOnlyList<EfectoDeHechizo> efectos)
+        private static HashSet<SpellEffect> Sortear(IReadOnlyList<SpellEffect> efectos)
         {
-            var fuera = new HashSet<EfectoDeHechizo>();
+            var fuera = new HashSet<SpellEffect>();
 
-            var porSorteo = new Dictionary<int, List<EfectoDeHechizo>>();
+            var porSorteo = new Dictionary<int, List<SpellEffect>>();
             foreach (var efecto in efectos)
             {
                 if (efecto.Probabilidad <= 0) continue;
                 if (!porSorteo.TryGetValue(efecto.Sorteo, out var lista))
                 {
-                    lista = new List<EfectoDeHechizo>();
+                    lista = new List<SpellEffect>();
                     porSorteo[efecto.Sorteo] = lista;
                 }
                 lista.Add(efecto);
@@ -780,7 +780,7 @@ namespace Jondo.Unity.Launcher.Managers
                     // Sale uno: se tira una vez y se recorre el reparto.
                     double tirada = SiguienteAzar() * suma;
                     double acumulado = 0;
-                    EfectoDeHechizo elegido = lista[lista.Count - 1];
+                    SpellEffect elegido = lista[lista.Count - 1];
                     foreach (var e in lista)
                     {
                         acumulado += e.Probabilidad;
@@ -815,7 +815,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// "al lanzar": el Centinela se come uno de alcance por paso, y tres pasos son tres menos.
         /// Lo que sí es de "al lanzar" se refresca, que es lo que hace Flecha Helada al repetirse.
         /// </summary>
-        private static bool SeApila(EfectoDeHechizo efecto)
+        private static bool SeApila(SpellEffect efecto)
         {
             foreach (var d in efecto.Disparadores())
             {
@@ -828,7 +828,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// En qué ronda se cae un efecto. Duración negativa quiere decir "mientras dure el
         /// combate"; cero, que es de un vistazo y no deja embrujo que dure.
         /// </summary>
-        private static int Caduca(EfectoDeHechizo efecto, int ronda)
+        private static int Caduca(SpellEffect efecto, int ronda)
             => efecto.Duration < 0 ? -1 : ronda + Math.Max(1, efecto.Duration);
     }
 }
