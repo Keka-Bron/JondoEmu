@@ -55,6 +55,25 @@ namespace Jondo.Unity.Launcher.Handlers
                 [".size"] = "Uso: .size <n> — 100 es el tamaño normal, por ejemplo .size 200",
             };
 
+        /// <summary>
+        /// Qué rol hace falta para cada comando.
+        ///
+        /// El reparto: moverse por el mundo es de moderador, porque es lo que hace falta para ir a
+        /// atender a alguien; tocar el personaje —kamas, nivel, tamaño— o abrirse una tienda es de
+        /// game master. Un comando que no esté en esta tabla se trata como de administrador, que es
+        /// el lado seguro por el que equivocarse: añadir uno nuevo y olvidarse de ponerle permiso
+        /// lo deja cerrado, no abierto.
+        /// </summary>
+        private static readonly Dictionary<string, int> HaceFalta =
+            new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                [".teleport"] = Roles.Moderador,
+                [".kamas"] = Roles.GameMaster,
+                [".level"] = Roles.GameMaster,
+                [".size"] = Roles.GameMaster,
+                [".shop"] = Roles.GameMaster,
+            };
+
         /// <summary>El nivel al que se acaba el juego normal; de ahí para arriba es Omega.</summary>
         private const int MaxNormalLevel = 200;
 
@@ -87,8 +106,29 @@ namespace Jondo.Unity.Launcher.Handlers
                 return false;
             }
 
+            // ¿Puede esta persona escribir este comando?
+            //
+            // Hasta ahora no lo comprobaba NADIE: cualquier jugador podía escribir ".kamas 10000"
+            // o ".level 200" y el servidor se lo daba. Se mira aquí, en el servidor, y contra la
+            // base, cada vez que se escribe el comando; no se guarda en la sesión, así que quitarle
+            // el rol a alguien tiene efecto en el acto.
+            //
+            // La cuenta sale de la sesión de este socket, no de nada que mande el cliente.
+            long quien = accountId > 0 ? accountId : Network.SessionContext.Current.AccountId;
+            int rol = DatabaseManager.GetAccountRole(quien);
+            int haceFalta = HaceFalta.TryGetValue(command, out int pide) ? pide : Roles.Administrador;
+
+            if (!Roles.AlMenos(rol, haceFalta))
+            {
+                Console.WriteLine($"[Comandos] La cuenta {quien} ({Roles.Nombre(rol)}) ha intentado " +
+                                  $"{command}, que es de {Roles.Nombre(haceFalta)}. Rechazado.");
+                await NotifyAsync(stream, $"No tienes permiso para usar {command}.", channel, accountId);
+                return true;   // se lo traga: ni se ejecuta ni se publica en el chat
+            }
+
             string rest = RestOf(text);
-            Console.WriteLine($"[Comandos] {command} {rest}".TrimEnd());
+            Console.WriteLine($"[Comandos] {command} {rest}".TrimEnd() +
+                              $"  (cuenta {quien}, {Roles.Nombre(rol)})");
 
             try
             {

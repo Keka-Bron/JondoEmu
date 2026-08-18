@@ -85,6 +85,11 @@ namespace Jondo.Unity.Launcher
                 };
             }
 
+            // La sesion queda puesta para todo lo que venga despues: es lo que dice quien pide
+            // las cosas, y de lo que el servidor saca el rol.
+            Network.ClienteDeControl.Token = cuerpo.Value.GetProperty("token").GetString() ?? "";
+            EsAdministrador = cuerpo.Value.TryGetProperty("rol", out var rolDicho) && rolDicho.GetInt32() >= Roles.Administrador;
+
             return new SignInResult
             {
                 Success = true,
@@ -137,12 +142,16 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static bool RememberSession(long accountId, string token)
         {
+            Network.ClienteDeControl.Token = token ?? "";
             var cuerpo = ClienteDeControl.Pedir("recordar-token",
                 new { cuenta = accountId, token }).Cuerpo();
             return cuerpo != null && cuerpo.Value.GetProperty("bien").GetBoolean();
         }
 
-        /// <summary>Le pide al servidor que se apague. Es la única forma ordenada de pararlo.</summary>
+        /// <summary>Si quien ha entrado es administrador. COSMÉTICO: quien decide es el servidor.</summary>
+        public static bool EsAdministrador { get; private set; }
+
+        /// <summary>Le pide al servidor que se apague. Sólo funciona si la cuenta es administrador.</summary>
         public static bool StopServer() => ClienteDeControl.Pedir("apagar").Bien;
 
         /// <summary>

@@ -68,25 +68,34 @@ namespace Jondo.Unity.Launcher.Network
         {
             if (!ruta.StartsWith(Prefijo, StringComparison.Ordinal)) return null;
 
-            if (!Autorizada(secreto))
-            {
-                Console.WriteLine($"[Control] Rechazada una petición a {ruta} sin el secreto bueno.");
-                return Mal(403, "secreto");
-            }
-
             try
             {
                 switch (ruta)
                 {
+                    // ─── Abiertas ───────────────────────────────────────────────────────────
+                    // Cualquiera puede llamarlas, porque hay que poder entrar antes de tener con
+                    // qué demostrar quién eres.
                     case Prefijo + "estado": return Estado();
-                    case Prefijo + "activos": return Activos();
-                    case Prefijo + "registro": return Registro(cuerpo);
                     case Prefijo + "entrar": return Entrar(cuerpo);
                     case Prefijo + "crear-cuenta": return CrearCuenta(cuerpo);
+
+                    // ─── Con sesión ─────────────────────────────────────────────────────────
+                    // Hace falta un token que la base reconozca. Da igual el rol: son cosas que
+                    // cualquier jugador hace con su propia cuenta.
+                    case Prefijo + "activos": return ConSesion(cuerpo, _ => Activos());
                     case Prefijo + "recordar-token": return RecordarToken(cuerpo);
-                    case Prefijo + "lanzamiento": return Lanzamiento(cuerpo);
-                    case Prefijo + "fin-de-lanzamiento": return FinDeLanzamiento(cuerpo);
-                    case Prefijo + "apagar": return Apagar();
+                    case Prefijo + "lanzamiento": return ConSesion(cuerpo, cuenta => Lanzamiento(cuerpo, cuenta));
+                    case Prefijo + "fin-de-lanzamiento":
+                        return ConSesion(cuerpo, cuenta => FinDeLanzamiento(cuenta));
+
+                    // ─── De administración ──────────────────────────────────────────────────
+                    // Mandan sobre el servidor, no sobre una cuenta. Rol 4 y se comprueba aquí,
+                    // en el servidor, cada vez. Que el lanzador enseñe o no el botón es cosmético:
+                    // el lanzador está en el ordenador del jugador y ahí no se confía en nada.
+                    case Prefijo + "registro": return ConRol(cuerpo, Roles.Administrador, _ => Registro(cuerpo));
+                    case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, _ => Apagar());
+                    case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador, _ => CambiarRol(cuerpo));
+
                     default: return Mal(404, "ruta");
                 }
             }
@@ -95,6 +104,48 @@ namespace Jondo.Unity.Launcher.Network
                 Console.WriteLine($"[Control] {ruta} ha reventado: {ex.Message}");
                 return Mal(500, ex.Message);
             }
+        }
+
+        // ─── Quién llama ────────────────────────────────────────────────────────────────────
+        //
+        // Antes esto lo guardaba un secreto que el servidor escribía en %APPDATA% y el lanzador
+        // leía de ahí. Servía mientras los dos estaban en la misma máquina, y deja de servir en
+        // cuanto el lanzador se reparte: en el ordenador de otro jugador ese fichero no existe.
+        //
+        // Ahora manda la CUENTA. El token que el lanzador ya tiene de haber entrado dice quién es,
+        // y la base dice qué puede hacer. Funciona igual en local que por Hamachi que contra una
+        // VPS, y no hay ningún secreto que repartir.
+
+        private static Respuesta ConSesion(string cuerpo, Func<long, Respuesta> hacer)
+        {
+            long cuenta = ClientLaunchRegistry.ResolveToken(Texto(cuerpo, "token"));
+            if (cuenta <= 0) return Mal(401, "sesion");
+            return hacer(cuenta);
+        }
+
+        private static Respuesta ConRol(string cuerpo, int haceFalta, Func<long, Respuesta> hacer)
+        {
+            long cuenta = ClientLaunchRegistry.ResolveToken(Texto(cuerpo, "token"));
+            if (cuenta <= 0) return Mal(401, "sesion");
+
+            int rol = DatabaseManager.GetAccountRole(cuenta);
+            if (!Roles.AlMenos(rol, haceFalta))
+            {
+                Console.WriteLine($"[Control] La cuenta {cuenta} ({Roles.Nombre(rol)}) ha intentado algo " +
+                                  $"de {Roles.Nombre(haceFalta)}. Rechazado.");
+                return Mal(403, "rol");
+            }
+            return hacer(cuenta);
+        }
+
+        /// <summary>Sube o baja el rol de una cuenta. Sólo un administrador llega aquí.</summary>
+        private static Respuesta CambiarRol(string cuerpo)
+        {
+            string quien = Texto(cuerpo, "cuenta");
+            int rol = (int)Numero(cuerpo, "rol");
+            bool bien = DatabaseManager.SetAccountRole(quien, rol, out int cuantas);
+            if (bien) Console.WriteLine($"[Control] {quien} pasa a {Roles.Nombre(rol)}.");
+            return Bien(new { bien, cuantas });
         }
 
         // ─── Cada verbo ─────────────────────────────────────────────────────────────────────
@@ -158,6 +209,7 @@ namespace Jondo.Unity.Launcher.Network
                 token,
                 apodo = cuenta.Nickname ?? "",
                 cuenta = cuenta.Id,
+                rol = cuenta.Role
             });
         }
 
@@ -198,14 +250,11 @@ namespace Jondo.Unity.Launcher.Network
         /// en memoria que luego lee el Zaap. Con dos procesos, el lanzador apuntaba en su memoria y
         /// el Zaap miraba en la suya. Ahora lo reparte quien lo va a comprobar.
         /// </summary>
-        private static Respuesta Lanzamiento(string cuerpo)
+        private static Respuesta Lanzamiento(string cuerpo, long cuenta)
         {
             string token = Texto(cuerpo, "token");
             string idioma = Texto(cuerpo, "idioma");
             if (idioma.Length == 0) idioma = "es";
-
-            long cuenta = ClientLaunchRegistry.ResolveToken(token);
-            if (cuenta <= 0) return Bien(new { bien = false, motivo = MotivoSesionCaducada });
 
             try
             {
@@ -228,9 +277,10 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>El lanzador avisa de que el cliente de esa cuenta se ha cerrado.</summary>
-        private static Respuesta FinDeLanzamiento(string cuerpo)
+        private static Respuesta FinDeLanzamiento(long cuenta)
         {
-            long cuenta = Numero(cuerpo, "cuenta");
+            // La cuenta sale del token, no del cuerpo: si viniera en el cuerpo, cualquiera podria
+            // echar del registro a la cuenta de otro con solo escribir su numero.
             if (cuenta > 0) ClientLaunchRegistry.RemoveByAccount(cuenta);
             return Bien(new { bien = true });
         }

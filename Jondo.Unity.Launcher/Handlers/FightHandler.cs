@@ -21,6 +21,9 @@ namespace Jondo.Unity.Launcher.Handlers
         private static ConcurrentDictionary<long, FightInstance> _activeFights = new ConcurrentDictionary<long, FightInstance>();
         private static long _nextFightId = 1000;
 
+        /// <summary>Cuantos combates hay abiertos ahora mismo. Lo pinta la ventana del servidor.</summary>
+        public static int CombatesEnCurso => _activeFights.Count;
+
         /// <summary>Turn duration in tenths of a second, exactly as it travels in jut.f1 and jyf.f2.</summary>
         public const int TurnDurationDeciseconds = 300;
         /// <summary>The same duration in milliseconds, for the server-side timer.</summary>

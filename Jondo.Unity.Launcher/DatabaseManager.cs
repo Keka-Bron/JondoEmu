@@ -35,18 +35,53 @@ namespace Jondo.Unity.Launcher
                         Login TEXT NOT NULL UNIQUE,
                         Password TEXT NOT NULL,
                         Nickname TEXT NOT NULL,
-                        GameToken TEXT
+                        GameToken TEXT,
+                        Role INTEGER NOT NULL DEFAULT 1
                     );
                 ";
                 createAccounts.ExecuteNonQuery();
 
+                // La columna Role, para las bases que ya existían antes de que hubiera roles.
+                //
+                // SQLite no tiene ADD COLUMN IF NOT EXISTS, así que se mira la tabla primero. Sin
+                // esto, quien ya tuviera su auth.db se quedaba sin poder entrar: todas las
+                // consultas de cuenta piden ya la columna.
+                bool tieneRol = false;
+                var mirar = authConnection.CreateCommand();
+                mirar.CommandText = "PRAGMA table_info(Accounts);";
+                using (var lector = mirar.ExecuteReader())
+                {
+                    while (lector.Read())
+                    {
+                        if (string.Equals(lector.GetString(1), "Role", StringComparison.OrdinalIgnoreCase))
+                        {
+                            tieneRol = true;
+                            break;
+                        }
+                    }
+                }
+                if (!tieneRol)
+                {
+                    var anadir = authConnection.CreateCommand();
+                    anadir.CommandText = "ALTER TABLE Accounts ADD COLUMN Role INTEGER NOT NULL DEFAULT 1;";
+                    anadir.ExecuteNonQuery();
+                    Console.WriteLine("[DatabaseManager] Columna Role añadida a Accounts; todos empiezan como jugador.");
+                }
+
                 // Seed the built-in test accounts if the table is empty (credentials below)
                 var seedAccount = authConnection.CreateCommand();
                 seedAccount.CommandText = @"
-                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname) VALUES (188940901, 'keka', 'test', 'Keka');
-                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname) VALUES (188940902, 'dragonlord', 'test', 'DragonLord');
+                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname, Role) VALUES (188940901, 'keka', 'test', 'Keka', 4);
+                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname, Role) VALUES (188940902, 'dragonlord', 'test', 'DragonLord', 4);
                 ";
                 seedAccount.ExecuteNonQuery();
+
+                // Y si esas dos cuentas ya existían de antes, se les pone el rol: son las de los
+                // dos que llevan el servidor. Al resto no se le toca nada.
+                var duenos = authConnection.CreateCommand();
+                duenos.CommandText = "UPDATE Accounts SET Role = 4 WHERE Login IN ('keka', 'dragonlord') AND Role < 4;";
+                int promovidos = duenos.ExecuteNonQuery();
+                if (promovidos > 0) Console.WriteLine($"[DatabaseManager] {promovidos} cuenta(s) puestas como administrador.");
             }
 
             // 2. Initialize world.db (Auto-extract from world.zip if missing or lacking ItemTemplates)
@@ -831,6 +866,9 @@ namespace Jondo.Unity.Launcher
             public long Id { get; set; }
             public string Login { get; set; } = "";
             public string Nickname { get; set; } = "";
+
+            /// <summary>Qué puede hacer esta cuenta. Ver <see cref="Roles"/>.</summary>
+            public int Role { get; set; } = Roles.PorDefecto;
         }
 
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (int attempts, DateTime lockTime)> _ipLockouts
@@ -883,7 +921,7 @@ namespace Jondo.Unity.Launcher
                 connection.Open();
 
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Login, Nickname FROM Accounts WHERE LOWER(Login) = $login AND Password = $pass;";
+                command.CommandText = "SELECT Id, Login, Nickname, Role FROM Accounts WHERE LOWER(Login) = $login AND Password = $pass;";
                 command.Parameters.AddWithValue("$login", login);
                 command.Parameters.AddWithValue("$pass", password);
 
@@ -894,7 +932,8 @@ namespace Jondo.Unity.Launcher
                     {
                         Id = reader.GetInt64(0),
                         Login = reader.GetString(1),
-                        Nickname = reader.GetString(2)
+                        Nickname = reader.GetString(2),
+                        Role = reader.IsDBNull(3) ? Roles.PorDefecto : reader.GetInt32(3),
                     };
                     _ipLockouts.TryRemove(clientIp, out _);
                     return true;
@@ -908,6 +947,58 @@ namespace Jondo.Unity.Launcher
             RecordFailedAttempt(clientIp);
             errorMessage = "Wrong username or password.";
             return false;
+        }
+
+        /// <summary>
+        /// Qué puede hacer esa cuenta.
+        ///
+        /// Se pregunta a la base cada vez, no se guarda en la sesión: así quitarle el rol a alguien
+        /// tiene efecto en el acto y no cuando le apetezca reconectar. Son cuentas, no millones de
+        /// filas, y la consulta va por clave primaria.
+        /// </summary>
+        public static int GetAccountRole(long accountId)
+        {
+            if (accountId <= 0) return Roles.PorDefecto;
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Role FROM Accounts WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", accountId);
+                object? valor = command.ExecuteScalar();
+                return valor == null || valor == DBNull.Value
+                    ? Roles.PorDefecto
+                    : Convert.ToInt32(valor);
+            }
+            catch (Exception ex)
+            {
+                // Si la base no contesta, el que menos puede. Nunca al revés.
+                Console.WriteLine($"[DatabaseManager] No se ha podido leer el rol de {accountId}: {ex.Message}");
+                return Roles.PorDefecto;
+            }
+        }
+
+        /// <summary>Cambia el rol de una cuenta por su nombre. Devuelve falso si no existe.</summary>
+        public static bool SetAccountRole(string login, int role, out int cuantas)
+        {
+            cuantas = 0;
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Accounts SET Role = $role WHERE LOWER(Login) = $login;";
+                command.Parameters.AddWithValue("$role", Math.Clamp(role, Roles.Jugador, Roles.Administrador));
+                command.Parameters.AddWithValue("$login", (login ?? "").Trim().ToLowerInvariant());
+                cuantas = command.ExecuteNonQuery();
+                return cuantas > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se ha podido cambiar el rol de {login}: {ex.Message}");
+                return false;
+            }
         }
 
         public static bool RegisterNewAccount(string login, string password, string nickname, string clientIp, out string errorMessage)

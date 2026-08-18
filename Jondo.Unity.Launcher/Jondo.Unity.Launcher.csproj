@@ -1,6 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- La ventana del servidor: el registro y las cifras. Es SU ventana, no la del lanzador. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <PropertyGroup>
     <!-- EL SERVIDOR. Una consola, no una ventana: desde que el lanzador es otro ejecutable, aqui
          dentro no queda ni una linea de WinForms. -->
     <OutputType>Exe</OutputType>

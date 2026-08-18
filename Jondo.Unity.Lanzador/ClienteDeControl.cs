@@ -26,6 +26,15 @@ namespace Jondo.Unity.Launcher.Network
         private static string _secreto = "";
 
         /// <summary>
+        /// La sesión con la que se habla, o cadena vacía si todavía no ha entrado nadie.
+        ///
+        /// Va en cada petición: desde que el servidor comprueba roles, es lo que dice QUIÉN pide
+        /// las cosas. Antes esto lo hacía un secreto de la máquina, que no sirve en cuanto el
+        /// lanzador está en el ordenador de otro.
+        /// </summary>
+        public static string Token { get; set; } = "";
+
+        /// <summary>
         /// A qué servidor se le habla.
         ///
         /// Sale de las preferencias, no de un literal: por defecto esta misma máquina —jugar en
@@ -83,7 +92,7 @@ namespace Jondo.Unity.Launcher.Network
         {
             try
             {
-                string json = cuerpo == null ? "{}" : JsonSerializer.Serialize(cuerpo);
+                string json = ConElToken(cuerpo);
                 using var peticion = new HttpRequestMessage(HttpMethod.Post, Base + Contrato.Prefijo + verbo)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
@@ -100,6 +109,40 @@ namespace Jondo.Unity.Launcher.Network
                 // gritos: es la situación normal mientras el servidor arranca.
                 return new Respuesta(false, 0, "");
             }
+        }
+
+        /// <summary>
+        /// El cuerpo de la petición, con el token de la sesión metido dentro.
+        ///
+        /// Se pone aquí y no en cada llamada para que no se pueda olvidar en ninguna: si falta, el
+        /// servidor contesta 401 y el lanzador se queda tonto sin decir por qué. Si quien llama ya
+        /// trae su propio token —el caso de arrancar un cliente de una cuenta concreta del
+        /// equipo— manda el suyo, que no tiene por qué ser el de la sesión de la ventana.
+        /// </summary>
+        private static string ConElToken(object? cuerpo)
+        {
+            var campos = new System.Collections.Generic.Dictionary<string, object?>();
+            if (cuerpo != null)
+            {
+                using var doc = JsonDocument.Parse(JsonSerializer.Serialize(cuerpo));
+                foreach (var campo in doc.RootElement.EnumerateObject())
+                {
+                    campos[campo.Name] = campo.Value.ValueKind switch
+                    {
+                        JsonValueKind.String => campo.Value.GetString(),
+                        JsonValueKind.Number => campo.Value.GetInt64(),
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        _ => campo.Value.ToString(),
+                    };
+                }
+            }
+
+            if (!campos.ContainsKey("token") || campos["token"] is not string suyo || suyo.Length == 0)
+            {
+                campos["token"] = Token;
+            }
+            return JsonSerializer.Serialize(campos);
         }
 
         /// <summary>

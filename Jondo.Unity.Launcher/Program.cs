@@ -134,7 +134,12 @@ namespace Jondo.Unity.Launcher
                 _ => { try { Network.ClientLaunchRegistry.SoltarLosCaducados(TimeSpan.FromMinutes(5)); } catch { } },
                 null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
-            Console.WriteLine("[+] El servidor está en marcha. Ctrl+C para pararlo, o el botón del lanzador.");
+            // Y su ventana: el registro y las cifras. Si no se pudiera abrir —sin escritorio, por
+            // ejemplo— el servidor sigue funcionando igual: la ventana es para mirar, no para que
+            // las cosas pasen.
+            UI.VentanaDelServidor.Abrir();
+
+            Console.WriteLine("[+] El servidor está en marcha. Ctrl+C para pararlo, o el botón de la ventana.");
             Console.WriteLine("[+] Cerrar el lanzador YA NO apaga esto.\n");
 
             await _shutdown.Task;
@@ -155,7 +160,10 @@ namespace Jondo.Unity.Launcher
         private static readonly TaskCompletionSource _shutdown =
             new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        private static int _shutdownRequested;
+        /// <summary>Si ya se ha pedido el apagado, para que la ventana no vuelva a preguntar.</summary>
+        public static bool ApagandoYa => _shutdownRequested != 0;
+
+    private static int _shutdownRequested;
         private static int _servicesStopped;
 
         /// <summary>
