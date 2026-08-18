@@ -40,6 +40,20 @@ namespace Jondo.Unity.Launcher.Managers
         private static Dictionary<int, MonsterData> _monsters = new Dictionary<int, MonsterData>();
         private static Dictionary<long, List<MobGroup>> _mapMobs = new Dictionary<long, List<MobGroup>>();
 
+        /// <summary>
+        /// El candado de los grupos por mapa.
+        ///
+        /// <see cref="_mapMobs"/> es un Dictionary pelado y se toca desde el hilo de cada jugador:
+        /// dos entrando a la vez a mapas sin grupos escritos hacían los dos un <c>_mapMobs[id] =</c>
+        /// sobre la misma tabla, que es como se rompe un Dictionary de verdad —bucle infinito
+        /// dentro del propio .NET, no una excepción—. Con un jugador no se notaba nunca.
+        ///
+        /// Esto NO es la fase de monstruos compartidos: sigue faltando marcar un grupo como
+        /// ocupado cuando ya está en un combate. Es sólo que el reparto de ids toca este mismo
+        /// diccionario y dejarlo sin candado sería empeorarlo.
+        /// </summary>
+        private static readonly object _candado = new object();
+
         public static void InitializeAndSpawnAll()
         {
             Console.WriteLine("[MobSpawnManager] Loading data from SQLite...");
@@ -151,22 +165,53 @@ namespace Jondo.Unity.Launcher.Managers
                 }
             }
 
+            // Los grupos escritos traen su id puesto desde la siembra. El repartidor tiene que
+            // apartarse por debajo del más bajo de todos ellos antes de dar el primero suyo, o el
+            // primer grupo generado al vuelo se llevaría un número que ya está ocupado en otro
+            // mapa —y entonces GetMobGroupById devolvería el equivocado—.
+            long menor = Actores.PrimerMonstruo;
+            foreach (var lista in _mapMobs.Values)
+            {
+                foreach (var grupo in lista)
+                {
+                    if (grupo.MobId < menor) menor = grupo.MobId;
+                }
+            }
+            Actores.ReservarMonstruosHasta(menor);
+
             Console.WriteLine($"[MobSpawnManager] Loaded {count} persistent mobs across {_mapMobs.Count} maps from database.");
+            Console.WriteLine($"[MobSpawnManager] Ids de grupo repartidos hasta el {menor}; " +
+                              "los que se generen al vuelo siguen por debajo.");
             Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
                               $"({100.0 * archmonsters / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
         }
 
-        private static long _nextDynamicMobId = -2000000;
         private static Random _rand = new Random();
 
+        /// <summary>
+        /// Los grupos de un mapa, en una lista APARTE.
+        ///
+        /// Devolvía la lista de dentro tal cual, y quien la recibía la recorría ya fuera del
+        /// candado: el jpv de una carga de mapa, el jss de una entrada, la búsqueda del grupo al
+        /// atacar. Mientras tanto, otro jugador que ganase su combate en ese mismo mapa hacía un
+        /// RemoveAll y un Add sobre esa misma lista, y el foreach del primero moría con un
+        /// «Collection was modified» que el try/catch de MapLoadHandler se traga sin decir nada:
+        /// el jpv no salía, y el jugador entraba a un mapa vacío —sin su personaje, sin NPCs y sin
+        /// monstruos— sin ningún error por ninguna parte.
+        ///
+        /// Los MobGroup de dentro siguen siendo los mismos objetos; lo que se copia es la lista.
+        /// </summary>
         public static List<MobGroup> GetMobsForMap(long mapId)
         {
-            if (_mapMobs.TryGetValue(mapId, out var mobs) && mobs.Count > 0)
-                return mobs;
+            lock (_candado)
+            {
+                if (_mapMobs.TryGetValue(mapId, out var mobs) && mobs.Count > 0)
+                    return new List<MobGroup>(mobs);
 
-            mobs = GenerateDynamicMobsForMap(mapId);
-            _mapMobs[mapId] = mobs;
-            return mobs;
+                mobs = GenerateDynamicMobsForMap(mapId);
+                _mapMobs[mapId] = mobs;
+                return new List<MobGroup>(mobs);
+            }
         }
 
         /// <summary>
@@ -229,7 +274,7 @@ namespace Jondo.Unity.Launcher.Managers
 
             var group = new MobGroup
             {
-                MobId = _nextDynamicMobId--,
+                MobId = Actores.NuevoMonstruo(),
                 CellId = cellId
             };
 
@@ -294,18 +339,21 @@ namespace Jondo.Unity.Launcher.Managers
         {
             if (_monsters.Count == 0) return null;
 
-            if (!_mapMobs.TryGetValue(mapId, out var mobs))
+            lock (_candado)
             {
-                mobs = new List<MobGroup>();
-                _mapMobs[mapId] = mobs;
+                if (!_mapMobs.TryGetValue(mapId, out var mobs))
+                {
+                    mobs = new List<MobGroup>();
+                    _mapMobs[mapId] = mobs;
+                }
+
+                var usedCells = new HashSet<int>(mobs.Select(m => m.CellId));
+                var group = BuildRandomGroup(mapId, GetSpawnableMonsterIds(mapId), GetInnerWalkableCells(mapId), usedCells);
+                if (group == null) return null;
+
+                mobs.Add(group);
+                return group;
             }
-
-            var usedCells = new HashSet<int>(mobs.Select(m => m.CellId));
-            var group = BuildRandomGroup(mapId, GetSpawnableMonsterIds(mapId), GetInnerWalkableCells(mapId), usedCells);
-            if (group == null) return null;
-
-            mobs.Add(group);
-            return group;
         }
 
         public static List<int> GetInnerWalkableCells(long mapId)
@@ -360,14 +408,17 @@ namespace Jondo.Unity.Launcher.Managers
         /// </summary>
         public static MobGroup? GetMobAtCell(long mapId, int cellId)
         {
-            if (!_mapMobs.TryGetValue(mapId, out var mobs)) return null;
-            // Exact match first
-            var exact = mobs.FirstOrDefault(m => m.CellId == cellId);
-            if (exact != null) return exact;
-            // Proximity check: adjacent cells (±1, ±14)
-            return mobs.FirstOrDefault(m =>
-                Math.Abs(m.CellId - cellId) == 1 ||
-                Math.Abs(m.CellId - cellId) == 14);
+            lock (_candado)
+            {
+                if (!_mapMobs.TryGetValue(mapId, out var mobs)) return null;
+                // Exact match first
+                var exact = mobs.FirstOrDefault(m => m.CellId == cellId);
+                if (exact != null) return exact;
+                // Proximity check: adjacent cells (±1, ±14)
+                return mobs.FirstOrDefault(m =>
+                    Math.Abs(m.CellId - cellId) == 1 ||
+                    Math.Abs(m.CellId - cellId) == 14);
+            }
         }
 
         /// <summary>
@@ -375,20 +426,26 @@ namespace Jondo.Unity.Launcher.Managers
         /// </summary>
         public static void RemoveMobGroup(long mapId, long mobId)
         {
-            if (_mapMobs.TryGetValue(mapId, out var mobs))
+            lock (_candado)
             {
-                mobs.RemoveAll(m => m.MobId == mobId);
+                if (_mapMobs.TryGetValue(mapId, out var mobs))
+                {
+                    mobs.RemoveAll(m => m.MobId == mobId);
+                }
             }
         }
 
         public static MobGroup? GetMobGroupById(long mobId)
         {
-            foreach (var list in _mapMobs.Values)
+            lock (_candado)
             {
-                var found = list.FirstOrDefault(m => m.MobId == mobId);
-                if (found != null) return found;
+                foreach (var list in _mapMobs.Values)
+                {
+                    var found = list.FirstOrDefault(m => m.MobId == mobId);
+                    if (found != null) return found;
+                }
+                return null;
             }
-            return null;
         }
 
         public static MonsterData? GetMonsterData(int monsterId)

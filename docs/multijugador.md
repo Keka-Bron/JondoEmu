@@ -53,10 +53,12 @@ El orden importa: cada bloqueo tapa al siguiente, así que arreglarlos en otro o
 
 Y dos que no están en esa cadena pero muerden igual:
 
-6. **Los identificadores de actor se recalculan en cada carga de mapa y por cliente.** Los NPCs
+6. ~~**Los identificadores de actor se recalculan en cada carga de mapa y por cliente.** Los NPCs
    empiezan en `-20000` y bajan (`Handlers/MapLoadHandler.cs:112`) y los monstruos siguen la cuenta
    desde donde la dejaron los NPCs (`:122`). Dos jugadores en el mismo mapa recibirían números
-   distintos para el mismo bicho, así que ningún aviso de "el mob X se ha movido" sería coherente.
+   distintos para el mismo bicho, así que ningún aviso de "el mob X se ha movido" sería
+   coherente.~~ Hecho, fase 4. Y era peor de lo que dice aquí: el mismo cliente ya recibía dos
+   números distintos para el mismo grupo, uno en el `jss` y otro en el `jpv`.
 7. **SQLite está en WAL (`DatabaseManager.cs:27` y `:98`) pero sin `busy_timeout`.** Con dos
    escritores, el segundo se lleva un `SQLITE_BUSY` inmediato en vez de esperar. Y el uid de objeto
    se saca con `SELECT MAX(Uid)` (`Handlers/NpcHandler.cs:326`), que es una carrera de manual.
@@ -145,7 +147,7 @@ tiene ningún campo mutable propio.
   hay.
 * El chat `kqp` deja de ser un eco (`Handlers/ChatHandler.cs:33`) y va al mapa o al canal.
 
-### Fase 4 — Identificadores de actor estables
+### Fase 4 — Identificadores de actor estables — HECHA
 
 Antes de tocar los monstruos hay que arreglar esto o nada cuadrará entre clientes.
 
@@ -153,6 +155,38 @@ Antes de tocar los monstruos hay que arreglar esto o nada cuadrará entre client
 * Los rangos, separados y sin solaparse: jugadores por su `CharacterId`, NPCs en un tramo, mobs en
   otro, invocaciones en otro.
 * Los mobs guardan su id en el `MobGroup`, no lo calculan en `MapLoadHandler`.
+
+Lo que había, y que resultó estar roto **ya con un jugador**: el cliente pide los dos mensajes de
+actores al cargar un mapa —el `jss` con el `jrh` y el `jpv` con el `kkr`— y los dos repartían
+números distintos para el mismo bicho. En el mapa de los NPCs de Amakna, medido: el `jss` daba a
+los dos grupos de monstruos el −1011567 y el −1011566, que son sus `MobId`, y el `jpv` les daba el
+−20052 y el −20053, porque los numeraba por su posición detrás de los 52 NPCs. El cliente devuelve
+el que le llegó el último, así que atacar caía en un `mobs.FirstOrDefault()` de
+`Handlers/FightHandler.cs` y el jugador peleaba contra otro grupo —y al ganar desaparecía del mapa
+ese otro—.
+
+Cómo queda:
+
+* `Managers/Actores.cs` es el único que reparte, con las bandas y con `EsJugador`/`EsNpc`/
+  `EsMonstruo`. Los monstruos se piden con `Interlocked`: el generador de un mapa vacío corre en el
+  hilo del jugador que llega, y dos llegando a la vez hacían el mismo `_id--`.
+* Al arrancar, `ReservarMonstruosHasta` baja el cursor por debajo del `MobId` más bajo que venga
+  escrito en la base, así que los grupos generados al vuelo no pisan a los sembrados. Antes eran
+  dos bandas fijas, −1000000 y −2000000, y con más de un millón de grupos sembrados se cruzaban.
+* El `jpv` sale de `MapLoadHandler.ConstruirJpv`, separado del envío para poder compararlo con el
+  `jss` en el banco de pruebas. Ya no calcula ningún id: el del grupo es su `MobId` y el del NPC es
+  el que le puso `Managers.Npcs` al arrancar.
+* Los NPCs se leían dos veces, y de las dos lecturas salían los ids: `Managers/Npcs.cs` con
+  `ORDER BY MapId, Id` y `DatabaseManager.GetNpcSpawnsForMap` **sin `ORDER BY` ninguno**. Que
+  coincidieran dependía del plan que eligiera SQLite. Ahora hay una sola lista, y de paso el
+  `jpv` se ahorra un recorrido entero de `NpcSpawns` en cada carga de mapa.
+* Fuera `PatchJpvEnteringPacket` de `Network/GameNodeProxy.cs`, que no llamaba nadie y llevaba tres
+  ids de personaje de las capturas escritos a mano.
+
+Y dos cosas de otras fases que se adelantaron porque estorbaban aquí: el `_mapMobs` de
+`MobSpawnManager` va con candado —es un `Dictionary` pelado que se toca desde el hilo de cada
+jugador— y el `_activeFights.Clear()` de `Handlers/FightHandler.cs:40` pasa a quitar sólo el
+combate del propio jugador. Lo demás de las fases 5 y 6 sigue sin tocar.
 
 ### Fase 5 — Monstruos compartidos
 

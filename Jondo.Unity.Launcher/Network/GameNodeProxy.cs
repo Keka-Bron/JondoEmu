@@ -967,47 +967,14 @@ namespace Jondo.Unity.Launcher.Network
                 .Build();
         }
 
-        private static byte[] PatchJpvEnteringPacket(byte[] packetBytes)
-        {
-            try
-            {
-                byte[]? payload = NetworkEnvelope.ExtractGameNodePayload(packetBytes);
-                if (payload == null) return packetBytes;
-
-                var jpvMsg = ProtoMessage.Parse(payload);
-                var actorFields = jpvMsg.Fields.Where(f => f.FieldNumber == 15 && f.WireType == 2).ToList();
-                
-                foreach (var actorField in actorFields)
-                {
-                    var actorMsg = ProtoMessage.Parse(actorField.BytesValue);
-                    var contextualIdField = actorMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 0);
-                    if (contextualIdField != null && (contextualIdField.VarIntValue == GameState.CharacterId || contextualIdField.VarIntValue == 13825558L || contextualIdField.VarIntValue == 906071769378L || contextualIdField.VarIntValue == 670668947750L))
-                    {
-                        // 1. Update ContextualId to player ID
-                        contextualIdField.VarIntValue = GameState.CharacterId;
-
-                        // 2. Overwrite Details with our patched PlayerActorDetails
-                        var origDetailsField = actorMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                        if (origDetailsField != null) actorMsg.Fields.Remove(origDetailsField);
-                        
-                        if (GameState.PlayerActorDetails != null)
-                        {
-                            actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = GameState.PlayerActorDetails });
-                        }
-                        
-                        actorField.BytesValue = actorMsg.ToByteArray();
-                        Program.LogDebug($"[Game Node] Patched player actor name and ID inside entering jpv: ID={GameState.CharacterId}");
-                    }
-                }
-                
-                return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/jpv", jpvMsg.ToByteArray());
-            }
-            catch (Exception ex)
-            {
-                Program.LogDebug("[-] Error patching entering jpv packet: " + ex.Message);
-                return packetBytes;
-            }
-        }
+        // Aquí vivía PatchJpvEnteringPacket, que abría el jpv que salía hacia el cliente, buscaba
+        // en él tres ids de personaje de las capturas con las que se arrancó el emulador, escritos
+        // a mano, y los cambiaba por el del jugador. Uno de los tres es de los que el guardia de
+        // RegressionGuardTests tiene prohibidos, así que ni se repiten aquí.
+        //
+        // No lo llamaba nadie: el jpv hace tiempo que se construye en MapLoadHandler con el id
+        // bueno desde el principio, así que no había nada que parchear. Fuera, junto con los tres
+        // números.
 
         private static byte[] PatchJohPacket(byte[] packetPayload, long mapId)
         {

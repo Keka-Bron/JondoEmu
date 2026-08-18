@@ -34,6 +34,12 @@ namespace Jondo.Unity.Launcher.Managers
             /// <summary>El negativo con el que el cliente se refiere a él dentro de este mapa.</summary>
             public long ContextualId;
 
+            /// <summary>El hueso de la columna BoneId, que es lo que usa el jpv de la carga de mapa.</summary>
+            public int BoneId;
+
+            /// <summary>El Look de la fila tal cual, sin la vuelta a la plantilla. Lo pide el jpv.</summary>
+            public string RawLook = "";
+
             /// <summary>El aspecto, ya troceado: "{5949|||200}".</summary>
             public long Bones;
             public long[] Skins = Array.Empty<long>();
@@ -67,9 +73,6 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>La tienda de apariencias, que en el cable se comporta igual que la normal.</summary>
         public const int TradeCosmetics = 11;
 
-        /// <summary>Desde dónde se empieza a numerar, que es lo que hace el servidor real.</summary>
-        private const long FirstContextualId = -20000;
-
         private static readonly Dictionary<long, List<Spawn>> _byMap = new();
         private static readonly Dictionary<int, Template> _templates = new();
 
@@ -95,7 +98,8 @@ namespace Jondo.Unity.Launcher.Managers
         private static void Read(SqliteConnection connection)
         {
             var spawns = connection.CreateCommand();
-            spawns.CommandText = "SELECT MapId, NpcId, CellId, Orientation, Look FROM NpcSpawns ORDER BY MapId, Id;";
+            spawns.CommandText =
+                "SELECT MapId, NpcId, CellId, Orientation, Look, BoneId FROM NpcSpawns ORDER BY MapId, Id;";
             using (var reader = spawns.ExecuteReader())
             {
                 while (reader.Read())
@@ -113,11 +117,13 @@ namespace Jondo.Unity.Launcher.Managers
                         NpcId = reader.GetInt32(1),
                         Cell = reader.GetInt32(2),
                         Orientation = reader.GetInt32(3),
-                        ContextualId = FirstContextualId - here.Count,
+                        ContextualId = Actores.NpcDelMapa(here.Count),
+                        RawLook = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                        BoneId = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
                     };
 
                     // El Look de la fila manda, y si viene vacío se usa el de la plantilla.
-                    ReadLook(reader.IsDBNull(4) ? "" : reader.GetString(4), spawn);
+                    ReadLook(spawn.RawLook, spawn);
                     here.Add(spawn);
                 }
             }
@@ -162,6 +168,9 @@ namespace Jondo.Unity.Launcher.Managers
             Console.WriteLine($"[NPCs] {Count} puestos en {_byMap.Count} mapas, " +
                               $"{_templates.Count} plantillas.");
         }
+
+        /// <summary>Los mapas que tienen algún NPC puesto.</summary>
+        public static IEnumerable<long> Maps => _byMap.Keys;
 
         public static IReadOnlyList<Spawn> Of(long mapId)
             => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();

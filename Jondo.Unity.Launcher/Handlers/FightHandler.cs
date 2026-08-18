@@ -37,7 +37,19 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId, long mobContextId = 0)
         {
-            _activeFights.Clear();
+            // Si a este jugador le quedaba un combate colgado de antes, se le quita el suyo y sólo
+            // el suyo. Aquí había un _activeFights.Clear(): empezar una pelea borraba las de TODOS
+            // los demás jugadores del servidor. El final normal de un combate ya lo quita solo
+            // (TryRemove más abajo, al mandar el resultado), así que esto es sólo la red por si
+            // alguno se quedó suelto.
+            long yo = GameState.CharacterId;
+            foreach (var par in _activeFights)
+            {
+                bool esSuyo = par.Value.Team0.Exists(f => f.Id == yo)
+                           || par.Value.Team1.Exists(f => f.Id == yo);
+                if (esSuyo) _activeFights.TryRemove(par.Key, out _);
+            }
+
             GameState.IsInFight = true;
             GameState.CurrentFightMobId = mobGroup.MobId;
 
@@ -45,8 +57,10 @@ namespace Jondo.Unity.Launcher.Handlers
             long arenaMapId = MapManager.ResolveArenaMapId(mapId);
             var fight = new FightInstance(fightId, mapId, arenaMapId);
 
-            // mobContextId is the roleplay mob group ID (e.g. -1030815 or -20003)
-            fight.DefenderLeaderId = (mobContextId != 0) ? mobContextId : mobGroup.MobId;
+            // El id contextual del grupo ES su MobId, el mismo que viaja en el jss y en el jpv y el
+            // mismo que el cliente devuelve al clicarlo. El parámetro mobContextId sobra desde que
+            // los dos paquetes reparten el mismo número; se queda por las llamadas de fuera.
+            fight.DefenderLeaderId = mobGroup.MobId;
 
             // Generate placement cells from arena map walkable cells
             var walkableCells = MobSpawnManager.GetInnerWalkableCells(arenaMapId);
@@ -1070,16 +1084,27 @@ namespace Jondo.Unity.Launcher.Handlers
             var fight = GetCurrentFight();
             if (fight == null)
             {
+                // El grupo que ha clicado el jugador, y sólo ése.
+                //
+                // Antes, si la búsqueda por id fallaba, se caía en un mobs.FirstOrDefault() y el
+                // jugador acababa peleando contra un grupo cualquiera del mapa: el primero de la
+                // lista. Y el que desaparecía del mapa al ganar era ese primero, no el que él había
+                // clicado. Con los ids ya cuadrados entre el jss y el jpv la búsqueda no debería
+                // fallar nunca; si falla, lo que hay que hacer es decirlo, no atacar a otro.
                 var mobs = MobSpawnManager.GetMobsForMap(GameState.MapId);
-                var mobGroup = (mobContextId != 0) 
-                    ? (mobs.FirstOrDefault(m => m.MobId == mobContextId) ?? MobSpawnManager.GetMobGroupById(mobContextId) ?? mobs.FirstOrDefault())
-                    : mobs.FirstOrDefault();
+                var mobGroup = mobContextId != 0
+                    ? (mobs.FirstOrDefault(m => m.MobId == mobContextId)
+                       ?? MobSpawnManager.GetMobGroupById(mobContextId))
+                    : null;
 
                 if (mobGroup != null)
                 {
                     await InitiateFightFromMobCollision(stream, mobGroup, GameState.MapId, mobContextId);
                     return;
                 }
+
+                Program.LogDebug($"[Combate] El cliente pide pelear con el {mobContextId} del mapa " +
+                                 $"{GameState.MapId}, que aquí no es ningún grupo. No se hace nada.");
             }
             else
             {
@@ -2925,6 +2950,30 @@ namespace Jondo.Unity.Launcher.Handlers
             // por eso el arreglo anterior no cambió nada.
             await WriteFrameAsync(stream, ConnectionProtocol.Push("kub",
                 ConnectionProtocol.BuildCharacteristics()));
+
+            // El grupo que se acaba de matar desaparece del mapa, y en su sitio sale otro.
+            //
+            // Esto estaba escrito en SendFightEnd, que no lo llama nadie: sus tres llamadores
+            // cuelgan de métodos que a su vez no llama nadie. El final que corre de verdad es éste,
+            // y no borraba el grupo. En el registro se ve limpio: doce combates ganados y CERO
+            // líneas de «removed from map», y el mismo grupo empezando tres combates seguidos
+            // dentro de la misma ejecución. O sea que al volver al mapa el grupo muerto seguía
+            // dibujado, con su mismo id, y se le podía volver a atacar: experiencia, kamas y botín
+            // infinitos sobre el mismo grupo.
+            if (won)
+            {
+                long muerto = GameState.CurrentFightMobId;
+                MobSpawnManager.RemoveMobGroup(fight.RoleplayMapId, muerto);
+                Program.LogDebug($"[Combate] El grupo #{muerto} desaparece del mapa {fight.RoleplayMapId}.");
+
+                var repuesto = MobSpawnManager.RespawnOneGroup(fight.RoleplayMapId);
+                if (repuesto != null)
+                {
+                    Program.LogDebug($"[Combate] Repuesto el grupo #{repuesto.MobId} en la casilla " +
+                                     $"{repuesto.CellId} con {repuesto.Members.Count} miembro(s).");
+                }
+            }
+            GameState.CurrentFightMobId = 0;
 
             // Y de vuelta al mapa de donde se salió, que el de arena es de instancia.
             long back = Network.SessionContext.State.RoleplayMapId != 0

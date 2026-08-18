@@ -70,106 +70,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     // 2. Send jpv (MapComplementaryInformationsDataMessage) - Dynamically built from DB
                     try
                     {
-                        var jpvMsg = new ProtoMessage();
-
-                        // Field 1: subAreaId (VarInt)
-                        jpvMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = subAreaId });
-
-                        // Field 4: mapId (VarInt)
-                        jpvMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = mapIdToLoad });
-
-                        // Field 12: subArea message wrapper (lkt)
-                        var lktMsg = new ProtoMessage();
-                        lktMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = subAreaId });
-                        jpvMsg.Fields.Add(new ProtoField { FieldNumber = 12, WireType = 2, BytesValue = lktMsg.ToByteArray() });
-
-                        // Field 15: All Map Actors (Polymorphic: Player, NPCs, Monster Groups)
-                        // A. Add Player Character Actor
-                        var playerActor = new ProtoMessage();
-                        
-                        // Disposition (Field 1)
-                        var playerDisp = new ProtoMessage();
-                        playerDisp.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = spawnCellId });
-                        playerDisp.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.Orientation });
-                        playerActor.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerDisp.ToByteArray() });
-
-                        // Details (Field 2)
-                        //
-                        // El aspecto se REHACE aquí, no se coge el que se guardó al entrar. El de
-                        // GameState.PlayerActorDetails sale de la columna Characters.Look, que es
-                        // un aspecto del protocolo VIEJO y que además está congelado desde el
-                        // inicio de sesión: no lleva la montura, ni la ropa que uno se haya puesto
-                        // después. Por eso al equiparse una Mulagua se veía montado —eso lo manda
-                        // el jsn de equipar— y al cambiar de mapa volvía a aparecer a pie.
-                        //
-                        // BuildLook es el mismo que usa el jss, que sí sabe de monturas y de
-                        // apariencias.
-                        var quien = DatabaseManager.GetCharacterById(GameState.CharacterId);
-                        byte[] aspecto = quien != null
-                            ? Managers.BreedLookTable.BuildLook(quien.Breed, quien.Sex, quien.HeadId,
-                                                                null, quien.Id)
-                            : GameState.LookBytes;
-                        byte[] detalles = aspecto != null && aspecto.Length > 0
-                            ? DatabaseManager.ReconstructActorDetails(aspecto, GameState.CharacterName)
-                            : GameState.PlayerActorDetails;
-
-                        if (detalles != null)
-                        {
-                            playerActor.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detalles });
-                        }
-
-                        // Contextual ID (Field 3)
-                        playerActor.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.CharacterId });
-
-                        jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = playerActor.ToByteArray() });
-                        int totalActors = 1;
-
-                        // B. Add Database NPC Spawns
-                        var spawns = DatabaseManager.GetNpcSpawnsForMap(mapIdToLoad);
-                        LogDebug($"[Game Node] Building dynamic jpv for Map ID: {mapIdToLoad} containing {spawns.Count} database NPCs.");
-
-                        long npcContextId = -20000;
-                        foreach (var spawn in spawns)
-                        {
-                            var npcActorMsg = BuildNpcActorMsg(spawn, npcContextId);
-                            jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = npcActorMsg.ToByteArray() });
-                            LogDebug($"[Game Node] Spawned NPC {spawn.NpcId} at Cell {spawn.CellId} with contextual ID {npcContextId}.");
-                            npcContextId--;
-                            totalActors++;
-                        }
-
-                        // C. Add Aggressive Mobs
-                        var mobs = Managers.MobSpawnManager.GetMobsForMap(mapIdToLoad);
-                        int spawnedMobs = 0;
-                        long mobContextId = npcContextId;
-
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"\n======================================================================");
-                        Console.WriteLine($"[MAP LOAD] Loaded Map ID: {mapIdToLoad} | Mobs on map: {mobs.Count}");
-                        
-                        foreach (var mob in mobs)
-                        {
-                            if (mob.Members.Count > 0)
-                            {
-                                byte[] mobBytes = BuildMobGroupActorMsgBytes(mob, mobContextId);
-                                jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = mobBytes });
-                                spawnedMobs++;
-                                totalActors++;
-
-                                Console.WriteLine($"  -> MobGroup #{mob.MobId} (ContextID {mobContextId}) at Cell {mob.CellId} ({mob.Members.Count} members):");
-                                mobContextId--;
-                                foreach (var member in mob.Members)
-                                {
-                                    Console.WriteLine($"     * Monster ID: {member.Monster.Id} | Grade: {member.GradeIndex} | Level: {member.Level}");
-                                }
-                            }
-                        }
-                        Console.WriteLine($"======================================================================\n");
-                        Console.ResetColor();
-
-                        LogDebug($"[Game Node] Spawned {spawnedMobs} mobs on Map {mapIdToLoad}. Total actors in jpv (Field 15): {totalActors}");
-                        
-                        byte[] jpvBytes = jpvMsg.ToByteArray();
+                        byte[] jpvBytes = ConstruirJpv(mapIdToLoad, spawnCellId, subAreaId).ToByteArray();
                         byte[] jpvPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/jpv", jpvBytes);
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, jpvPacket);
                         LogDebug($"[Game Node] Sent dynamic database-driven jpv for Map ID: {mapIdToLoad}, Cell: {spawnCellId}.");
@@ -200,6 +101,126 @@ namespace Jondo.Unity.Launcher.Handlers
             }
         }
 
+        /// <summary>
+        /// El jpv de un mapa: la subzona, el jugador, los NPCs y los grupos de monstruos.
+        ///
+        /// Está separado del envío a propósito, para que el banco de pruebas pueda construirlo sin
+        /// socket y comprobar que los ids que salen de aquí son EXACTAMENTE los mismos que salen
+        /// del jss. Que no lo fueran es lo que rompía el ataque: el jss daba a un grupo su MobId
+        /// —un -1000000 y bajando— y esto le daba el número que le tocara detrás de los NPCs del
+        /// mapa, porque los numeraba por su posición en la lista. En el mapa de los NPCs de Amakna,
+        /// medido: -1011567 en el jss y -20052 en el jpv, para el mismo grupo. El cliente se
+        /// quedaba con el último que le llegase y devolvía ése al clicar, y el servidor no
+        /// encontraba a nadie.
+        ///
+        /// Ahora ningún id se calcula aquí: el del grupo es su MobId y el del NPC es el que le puso
+        /// <see cref="Managers.Npcs"/> al arrancar. Numerar por posición además renumeraba a los de
+        /// detrás cada vez que moría un grupo.
+        /// </summary>
+        public static ProtoMessage ConstruirJpv(long mapId, int spawnCell, int subAreaId)
+        {
+            var jpvMsg = new ProtoMessage();
+
+            // Field 1: subAreaId (VarInt)
+            jpvMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = subAreaId });
+
+            // Field 4: mapId (VarInt)
+            jpvMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = mapId });
+
+            // Field 12: subArea message wrapper (lkt)
+            var lktMsg = new ProtoMessage();
+            lktMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = subAreaId });
+            jpvMsg.Fields.Add(new ProtoField { FieldNumber = 12, WireType = 2, BytesValue = lktMsg.ToByteArray() });
+
+            // Field 15: All Map Actors (Polymorphic: Player, NPCs, Monster Groups)
+            // A. Add Player Character Actor
+            var playerActor = new ProtoMessage();
+
+            // Disposition (Field 1)
+            var playerDisp = new ProtoMessage();
+            playerDisp.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = spawnCell });
+            playerDisp.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.Orientation });
+            playerActor.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerDisp.ToByteArray() });
+
+            // Details (Field 2)
+            //
+            // El aspecto se REHACE aquí, no se coge el que se guardó al entrar. El de
+            // GameState.PlayerActorDetails sale de la columna Characters.Look, que es un aspecto
+            // del protocolo VIEJO y que además está congelado desde el inicio de sesión: no lleva
+            // la montura, ni la ropa que uno se haya puesto después. Por eso al equiparse una
+            // Mulagua se veía montado —eso lo manda el jsn de equipar— y al cambiar de mapa volvía
+            // a aparecer a pie.
+            //
+            // BuildLook es el mismo que usa el jss, que sí sabe de monturas y de apariencias.
+            var quien = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            byte[] aspecto = quien != null
+                ? Managers.BreedLookTable.BuildLook(quien.Breed, quien.Sex, quien.HeadId,
+                                                    null, quien.Id)
+                : GameState.LookBytes;
+            byte[] detalles = aspecto != null && aspecto.Length > 0
+                ? DatabaseManager.ReconstructActorDetails(aspecto, GameState.CharacterName)
+                : GameState.PlayerActorDetails;
+
+            if (detalles != null)
+            {
+                playerActor.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detalles });
+            }
+
+            // Contextual ID (Field 3)
+            playerActor.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.CharacterId });
+
+            jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = playerActor.ToByteArray() });
+            int totalActors = 1;
+
+            // B. Los NPCs, con el id que ya llevan puesto desde el arranque.
+            //
+            // Salen de Managers.Npcs y no de una consulta propia: eran dos listas de las mismas
+            // filas, una ordenada por Id y la otra sin ORDER BY ninguno, y de ahí salían los ids.
+            // Que coincidieran era suerte del plan que eligiera SQLite. De paso se ahorra un
+            // recorrido entero de NpcSpawns en CADA carga de mapa.
+            var spawns = Managers.Npcs.Of(mapId);
+            LogDebug($"[Game Node] Building dynamic jpv for Map ID: {mapId} containing {spawns.Count} database NPCs.");
+
+            foreach (var spawn in spawns)
+            {
+                var npcActorMsg = BuildNpcActorMsg(spawn);
+                jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = npcActorMsg.ToByteArray() });
+                LogDebug($"[Game Node] Spawned NPC {spawn.NpcId} at Cell {spawn.Cell} with contextual ID {spawn.ContextualId}.");
+                totalActors++;
+            }
+
+            // C. Add Aggressive Mobs
+            var mobs = Managers.MobSpawnManager.GetMobsForMap(mapId);
+            int spawnedMobs = 0;
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"\n======================================================================");
+            Console.WriteLine($"[MAP LOAD] Loaded Map ID: {mapId} | Mobs on map: {mobs.Count}");
+
+            foreach (var mob in mobs)
+            {
+                if (mob.Members.Count > 0)
+                {
+                    byte[] mobBytes = BuildMobGroupActorMsgBytes(mob, mob.MobId);
+                    jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = mobBytes });
+                    spawnedMobs++;
+                    totalActors++;
+
+                    Console.WriteLine($"  -> MobGroup #{mob.MobId} at Cell {mob.CellId} ({mob.Members.Count} members):");
+                    foreach (var member in mob.Members)
+                    {
+                        Console.WriteLine($"     * Monster ID: {member.Monster.Id} | Grade: {member.GradeIndex} | Level: {member.Level}");
+                    }
+                }
+            }
+            Console.WriteLine($"======================================================================\n");
+            Console.ResetColor();
+
+            LogDebug($"[Game Node] Spawned {spawnedMobs} mobs on Map {mapId}. Total actors in jpv (Field 15): {totalActors}");
+
+            return jpvMsg;
+        }
+
         public static async Task HandleLoy(NetworkStream stream)
         {
             // Server must ACK with kmw (empty packet)
@@ -216,11 +237,11 @@ namespace Jondo.Unity.Launcher.Handlers
             LogDebug("[Game Node] Received lpj (secondary ready signal) - Sent jfc response.");
         }
 
-        private static ProtoMessage BuildNpcActorMsg(DatabaseManager.NpcSpawn spawn, long contextualId)
+        private static ProtoMessage BuildNpcActorMsg(Managers.Npcs.Spawn spawn)
         {
             // 1. Build Disposition (LFJ)
             var lfjMsg = new ProtoMessage();
-            lfjMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = spawn.CellId });
+            lfjMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = spawn.Cell });
             lfjMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = spawn.Orientation });
 
             // 2. Build root EntityLook (lkr)
@@ -229,9 +250,9 @@ namespace Jondo.Unity.Launcher.Handlers
             rootLook.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 }); // Field 3: constant 3
 
             int npcScale = 100;
-            if (!string.IsNullOrEmpty(spawn.Look) && spawn.Look.Contains("|"))
+            if (!string.IsNullOrEmpty(spawn.RawLook) && spawn.RawLook.Contains("|"))
             {
-                var parts = spawn.Look.Trim('{', '}').Split('|');
+                var parts = spawn.RawLook.Trim('{', '}').Split('|');
                 if (parts.Length > 3 && int.TryParse(parts[3], out int sc))
                 {
                     npcScale = sc;
@@ -257,11 +278,15 @@ namespace Jondo.Unity.Launcher.Handlers
             var actorMsg = new ProtoMessage();
             actorMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lfjMsg.ToByteArray() });
             actorMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detailsMsg.ToByteArray() });
-            actorMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = contextualId });
+            actorMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = spawn.ContextualId });
 
             return actorMsg;
         }
 
+        /// <summary>
+        /// El grupo de monstruos como actor del mapa. Su id contextual es su MobId, el mismo con el
+        /// que viaja en el jss y el mismo que el cliente devuelve al clicarlo para atacar.
+        /// </summary>
         private static byte[] BuildMobGroupActorMsgBytes(Managers.MobSpawnManager.MobGroup mob, long contextualId)
         {
             var mainMob = mob.Members[0].Monster;
@@ -276,7 +301,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (parts.Length > 3 && int.TryParse(parts[3], out int sc)) npcScale = sc;
             }
 
-            Console.WriteLine($"[MobSpawnManager] Mob #{mob.MobId} (ContextID {contextualId}) MainMonster ID={mainMob.Id}, Look='{mainMob.Look}', defaultBone={defaultBone}");
+            Console.WriteLine($"[MobSpawnManager] Mob #{mob.MobId} MainMonster ID={mainMob.Id}, Look='{mainMob.Look}', defaultBone={defaultBone}");
 
             // 1. Build Disposition (lfj)
             var lfjMsg = new ProtoMessage();
