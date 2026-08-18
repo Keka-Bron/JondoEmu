@@ -1,38 +1,34 @@
 # De un jugador a muchos
 
+> **Documento histórico.** El plan de sesiones de las primeras secciones ya está implementado y la
+> descripción autoritativa del código actual vive en `sessions.md`; el launcher de ocho cuentas se
+> documenta en `launcher.md`. Este fichero se conserva por el razonamiento de las fases que quedan,
+> sobre todo los combates realmente multijugador, pero sus afirmaciones sobre la ausencia de
+> `GameSession` o de broadcasts ya no describen el estado actual del proyecto.
+
 Plan para que el emulador aguante varias sesiones a la vez: varios clientes conectados, cada uno
 con su cuenta y su personaje, viéndose entre ellos en el mapa y compartiendo los monstruos; y un
 launcher desde el que abrir más de una cuenta.
 
-Está escrito a partir de lo que hay HOY en el código, no de lo que debería haber. Cada afirmación
-sobre el estado actual lleva su fichero y su línea. Lo que es opinión mía va marcado como tal.
+Se escribió a partir del estado del código anterior al refactor de sesiones. Las líneas y los
+diagnósticos de abajo son una fotografía histórica, no referencias vigentes.
 
 ---
 
 ## 0. Sobre `sessions.md`
 
-Hay un documento de un compañero, `sessions.md`, que describe un modelo de sesiones. Conviene
-decirlo antes de nada: **está escrito en pasado, como si el refactor ya estuviera hecho, y no lo
-está**. De sus quince afirmaciones sobre el código, sólo dos son ciertas, y las dos son anteriores
-a ese supuesto refactor:
-
-* el canje atómico del ticket (`Network/SessionRegistry.cs:53`, usado en `Network/GameNodeProxy.cs:887`);
-* la comprobación de que el personaje es de la cuenta (`Network/GameNodeProxy.cs:191`).
-
-No existen `GameSession`, `SessionState`, `SessionContext`, el registro de sesiones activas, el
-broadcast por mapa ni la serialización de escrituras por socket. `GameState` sigue siendo estático
-(`GameState.cs:6`) con unos 425 usos repartidos por 25 ficheros.
-
-Dicho eso, **el diagnóstico del documento es correcto** y su modelo de propiedad —una conexión, una
-sesión, un personaje— es el bueno. Lo que sigue lo toma como punto de partida y le añade las cuatro
-cosas que no cubre: monstruos compartidos, combates de varios, identificadores de actor estables y
-concurrencia real contra SQLite.
+`sessions.md` ya describe la implementación vigente: `GameSession`, `SessionState`,
+`SessionContext`, el registro activo, los broadcasts por mapa, la serialización por socket y la
+entrada real del puerto 5555. `launcher.md` completa la parte de procesos y cuentas. Lo que sigue
+explica por qué se eligió ese modelo y conserva el plan de los aspectos multijugador que todavía no
+están terminados.
 
 ---
 
-## 1. Lo que hoy lo impide, por orden de dependencia
+## 1. Lo que lo impedía al escribir el plan, por orden de dependencia
 
-El orden importa: cada bloqueo tapa al siguiente, así que arreglarlos en otro orden no sirve de nada.
+El orden importaba: cada bloqueo tapaba al siguiente. Varias entradas de esta lista ya están
+resueltas; consultar `sessions.md` para el estado actual.
 
 1. **`GameState` es estático.** `GameState.cs:6`, con identidad, posición, kamas, experiencia,
    características, inventario y equipo. En cuanto un segundo cliente elige personaje,
