@@ -25,8 +25,14 @@ namespace Jondo.Unity.Launcher.Network
 
         private static string _secreto = "";
 
-        /// <summary>A qué servidor. Hoy siempre el de esta máquina: el lanzador arranca el cliente.</summary>
-        public static string Base => $"http://127.0.0.1:{Program.haapiPort}";
+        /// <summary>
+        /// A qué servidor se le habla.
+        ///
+        /// Sale de las preferencias, no de un literal: por defecto esta misma máquina —jugar en
+        /// local— y si no, la dirección que se haya puesto en el desplegable, que puede ser la de
+        /// otro ordenador por Hamachi o la de una VPS.
+        /// </summary>
+        public static string Base => $"http://{UI.LauncherPreferences.ServerHost}:{Contrato.Puerto}";
 
         /// <summary>Lo que ha contestado el servidor, o el silencio si no había nadie.</summary>
         public readonly struct Respuesta
@@ -58,12 +64,12 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static Respuesta Pedir(string verbo, object? cuerpo = null)
         {
-            if (_secreto.Length == 0) _secreto = ApiDeControl.LeerSecreto();
+            if (_secreto.Length == 0) _secreto = Contrato.LeerSecreto();
 
             var salida = Intentar(verbo, cuerpo);
             if (salida.Llego && salida.Codigo == 403)
             {
-                string releido = ApiDeControl.LeerSecreto();
+                string releido = Contrato.LeerSecreto();
                 if (releido.Length > 0 && releido != _secreto)
                 {
                     _secreto = releido;
@@ -78,11 +84,11 @@ namespace Jondo.Unity.Launcher.Network
             try
             {
                 string json = cuerpo == null ? "{}" : JsonSerializer.Serialize(cuerpo);
-                using var peticion = new HttpRequestMessage(HttpMethod.Post, Base + ApiDeControl.Prefijo + verbo)
+                using var peticion = new HttpRequestMessage(HttpMethod.Post, Base + Contrato.Prefijo + verbo)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 };
-                if (_secreto.Length > 0) peticion.Headers.Add(ApiDeControl.Cabecera, _secreto);
+                if (_secreto.Length > 0) peticion.Headers.Add(Contrato.Cabecera, _secreto);
 
                 using var respuesta = Cliente.Send(peticion);
                 string texto = respuesta.Content.ReadAsStringAsync().GetAwaiter().GetResult();

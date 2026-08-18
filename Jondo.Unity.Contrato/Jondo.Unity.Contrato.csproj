@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <!-- Lo poco que el servidor y el lanzador tienen que saber el uno del otro. Ni base de datos,
+         ni protocolo, ni ventanas: rutas de fichero y el contrato del canal de mando. Es la unica
+         pieza que viaja en los DOS ejecutables, asi que cuanto menos tenga, mejor. -->
+  </PropertyGroup>
+
+</Project>

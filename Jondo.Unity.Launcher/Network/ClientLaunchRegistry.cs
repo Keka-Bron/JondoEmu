@@ -52,9 +52,9 @@ namespace Jondo.Unity.Launcher.Network
                 // del usuario en %APPDATA%. Un servidor no traduce: dice qué ha pasado y quien
                 // tenga una ventana delante decide en qué idioma se lo cuenta a la persona.
                 if (ByAccount.ContainsKey(accountId))
-                    throw new InvalidOperationException(ApiDeControl.MotivoCuentaYaAbierta);
+                    throw new InvalidOperationException(Contrato.MotivoCuentaYaAbierta);
                 if (ByAccount.Count >= MaximumClients)
-                    throw new InvalidOperationException(ApiDeControl.MotivoTopeDeClientes);
+                    throw new InvalidOperationException(Contrato.MotivoTopeDeClientes);
 
                 var launch = new Launch
                 {

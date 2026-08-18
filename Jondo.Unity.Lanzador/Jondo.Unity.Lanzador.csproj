@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>Jondo Emulator Launcher</AssemblyName>
+    <RootNamespace>Jondo.Unity.Launcher</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <ApplicationIcon>..\Jondo.Unity.Launcher\icon.ico</ApplicationIcon>
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);WFO1000</WarningsNotAsErrors>
+    <!-- ESTE es el que se reparte a los jugadores. Referencia el contrato y NADA MAS: ni base de
+         datos, ni mapas, ni manejadores de protocolo, ni catalogo de efectos. Un solo fichero,
+         igual que antes, para que quien se lo baje vea un .exe y no una carpeta de dll. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WinForms mete System.Windows.Forms y System.Drawing en los using implicitos. No los
+         queremos globales: el resto del emulador usa nombres como Timer, Point o Message que
+         chocarian. Los ficheros de UI declaran los suyos. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Contrato\Jondo.Unity.Contrato.csproj" />
+  </ItemGroup>
+
+  <Target Name="DesplegarLanzador" AfterTargets="Publish">
+    <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe" DestinationFiles="$(MSBuildProjectDirectory)\..\Jondo Emulator Launcher.exe" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    <Message Text="[Deploy] Lanzador en la raiz." Importance="high" />
+  </Target>
+
+</Project>

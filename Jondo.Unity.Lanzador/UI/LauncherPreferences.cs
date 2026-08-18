@@ -105,6 +105,35 @@ namespace Jondo.Unity.Launcher.UI
         public static string ClientExecutableRaw
             => Leer().TryGetValue(ClaveCliente, out string? v) ? v : "";
 
+        // ─── Dónde está el servidor ────────────────────────────────────────────
+        //
+        // Por defecto, esta misma máquina: el caso de jugar en local, que es el de siempre. La otra
+        // opción es escribir una dirección —la del ordenador de un amigo por Hamachi, o la de una
+        // VPS— y entonces el lanzador no arranca ningún servidor: se conecta al que haya allí.
+
+        private const string ClaveServidor = "servidor";
+
+        /// <summary>La dirección del servidor. Vacío o "127.0.0.1" significa aquí mismo.</summary>
+        public static string ServerHost
+        {
+            get
+            {
+                string donde = Leer().TryGetValue(ClaveServidor, out string? v) ? v.Trim() : "";
+                return donde.Length == 0 ? Contrato.LocalIp : donde;
+            }
+            set => Escribir(ClaveServidor, (value ?? "").Trim());
+        }
+
+        /// <summary>Si el servidor es el de esta máquina, que es lo que decide si se puede arrancar.</summary>
+        public static bool ServerIsLocal
+        {
+            get
+            {
+                string donde = ServerHost;
+                return donde == Contrato.LocalIp || donde.Equals("localhost", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         // ─── Équipe multicomptes ───────────────────────────────────────────────
 
         public static List<SavedAccount> LoadAccounts()

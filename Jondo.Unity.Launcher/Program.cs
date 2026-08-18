@@ -17,94 +17,26 @@ namespace Jondo.Unity.Launcher
         private static readonly object LogLock = new object();
 
         /// <summary>
-        /// Dos modos, un ejecutable.
+        /// El servidor. Sin ventanas: desde que el lanzador es otro ejecutable, aquí dentro no
+        /// queda ni una línea de WinForms.
         ///
-        /// Antes esto era una sola cosa: se arrancaban los cinco servicios y después se abría la
-        /// ventana, y la vida del proceso quedaba enchufada al ciclo de vida de un Form —cerrar la
-        /// ventana llamaba a RequestShutdown y se apagaba todo, con jugadores dentro—. Ahora el
-        /// servidor tiene vida propia y el lanzador es una ventana que va y viene.
+        /// Antes esto arrancaba los cinco servicios y después abría la ventana del lanzador, y la
+        /// vida del proceso quedaba enchufada al ciclo de vida de un Form: cerrar la ventana
+        /// llamaba a RequestShutdown y se apagaba todo, con los jugadores que hubiera dentro.
         /// </summary>
         static async Task Main(string[] args)
         {
-            if (Modo.EsServidor(args)) { await CorrerComoServidor(); return; }
-            await CorrerComoLanzador();
-        }
-
-        /// <summary>El servidor: los servicios, y nada de ventanas.</summary>
-        private static async Task CorrerComoServidor()
-        {
-            // La consola, antes que el buffer: el buffer se queda con el Console.Out de ese
-            // momento, así que si la consola llega después no se ve nada en ella.
-            Modo.AbrirConsola();
             ConsoleLogBuffer.Initialize();
 
-            if (!Modo.CogerElSitio(servidor: true))
+            if (!Contrato.CogerElSitio("JondoEmuServidor"))
             {
                 Console.WriteLine("[!] Ya hay un servidor de Jondo corriendo en esta sesión. Este se cierra.");
                 await Task.Delay(2500);
                 return;
             }
 
-            try
-            {
-                await ArrancarTodoYEsperar();
-            }
-            finally
-            {
-                Modo.SoltarElSitio();
-            }
-        }
-
-        /// <summary>
-        /// El lanzador: la ventana, y ningún servicio.
-        ///
-        /// Si no hay servidor, lo arranca él y espera a que conteste. Si ya lo había, se engancha al
-        /// que hay. Y al cerrarse no apaga nada.
-        /// </summary>
-        private static async Task CorrerComoLanzador()
-        {
-            ConsoleLogBuffer.Initialize();
-
-            if (!Modo.CogerElSitio(servidor: false))
-            {
-                try
-                {
-                    System.Windows.Forms.MessageBox.Show(
-                        "El lanzador de Jondo ya está abierto.", "Jondo",
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-                catch { }
-                return;
-            }
-
-            try
-            {
-                if (!Network.ClienteDeControl.ServidorVivo())
-                {
-                    Console.WriteLine("[Lanzador] No hay servidor escuchando; arrancando uno.");
-                    Modo.ArrancarServidor();
-
-                    // Con paciencia: el servidor lee la base, los diecisiete managers y los mapas
-                    // antes de abrir un solo puerto, y eso son varios segundos en frío.
-                    if (!Network.ClienteDeControl.EsperarAlServidor(TimeSpan.FromSeconds(90)))
-                    {
-                        Console.WriteLine("[Lanzador] El servidor no ha llegado a contestar.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("[Lanzador] Hay un servidor ya en marcha; me engancho a él.");
-                }
-
-                UI.LauncherWindow.OpenOnDedicatedThread();
-                await _shutdown.Task;
-                Console.WriteLine("[Lanzador] Ventana cerrada. El servidor sigue en marcha.");
-            }
-            finally
-            {
-                Modo.SoltarElSitio();
-            }
+            try { await ArrancarTodoYEsperar(); }
+            finally { Contrato.SoltarElSitio(); }
         }
 
         private static async Task ArrancarTodoYEsperar()
@@ -112,7 +44,7 @@ namespace Jondo.Unity.Launcher
             try { Console.Clear(); } catch { }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("======================================================================");
-            Console.WriteLine("                JONDO EMULATOR LAUNCHER (MODULAR C#)                  ");
+            Console.WriteLine("                        JONDO — SERVIDOR                             ");
             Console.WriteLine("======================================================================");
             Console.ResetColor();
 
@@ -165,6 +97,7 @@ namespace Jondo.Unity.Launcher
                 // La llave con la que el lanzador podrá hablarle a este servidor. Una por arranque:
                 // así un lanzador de una sesión anterior no se queda con llave de la de ahora.
                 ApiDeControl.NuevoSecreto();
+                Console.WriteLine($"[+] Llave del canal de mando en {Contrato.FicheroDelSecreto}");
                 HaapiServer.Start(haapiPort);
                 ZaapServer.Start(port);
                 GameServerProxy.Start(gamePort);

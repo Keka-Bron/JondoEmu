@@ -29,70 +29,20 @@ namespace Jondo.Unity.Launcher.Network
     /// </summary>
     public static class ApiDeControl
     {
-        /// <summary>El prefijo de todas las rutas de mando.</summary>
-        public const string Prefijo = "/api/";
-
-        /// <summary>La cabecera por la que viaja el secreto.</summary>
-        public const string Cabecera = "X-Jondo-Control";
+        /// <summary>Las rutas y la cabecera salen del contrato, que es lo que comparten los dos.</summary>
+        public const string Prefijo = Contrato.Prefijo;
 
         // ─── El secreto ─────────────────────────────────────────────────────────────────────
         //
-        // El 8888 está en localhost, pero en localhost está cualquier cosa que corra en la máquina,
-        // y por aquí se crean cuentas y se arrancan clientes. El comentario que dejó quien borró
-        // estas rutas hablaba de «una puerta abierta encima», y tenía razón.
-        //
-        // Así que el servidor se inventa un secreto al arrancar y lo escribe en un fichero del
-        // usuario; el lanzador lo lee de ahí y lo manda en cada petición. Nadie lo teclea y no sale
-        // de la máquina. Quien no lo traiga se lleva un 403 y no llega a tocar nada.
+        // Uno por arranque: así un lanzador de una sesión anterior no se queda con llave de la de
+        // ahora. Lo guarda el contrato, que es quien sabe dónde se escribe y quién lo lee.
 
         private static string _secreto = "";
 
-        /// <summary>Dónde vive el secreto: junto a las preferencias del lanzador, en el perfil.</summary>
-        public static string FicheroDelSecreto
-        {
-            get
-            {
-                string carpeta = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo");
-                return Path.Combine(carpeta, "control.secreto");
-            }
-        }
+        /// <summary>Reparte un secreto nuevo y lo deja escrito. Lo llama el servidor al arrancar.</summary>
+        public static void NuevoSecreto() => _secreto = Contrato.NuevoSecreto();
 
-        /// <summary>
-        /// Reparte un secreto nuevo y lo deja escrito. Lo llama el servidor al arrancar: uno por
-        /// arranque, para que un lanzador de una sesión anterior no siga teniendo llave.
-        /// </summary>
-        public static void NuevoSecreto()
-        {
-            _secreto = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(FicheroDelSecreto)!);
-                File.WriteAllText(FicheroDelSecreto, _secreto);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Control] No se ha podido escribir el secreto: {ex.Message}");
-            }
-        }
-
-        /// <summary>El secreto que dejó escrito el servidor, o cadena vacía si no hay ninguno.</summary>
-        public static string LeerSecreto()
-        {
-            try
-            {
-                return File.Exists(FicheroDelSecreto)
-                    ? File.ReadAllText(FicheroDelSecreto).Trim()
-                    : "";
-            }
-            catch { return ""; }
-        }
-
-        private static bool Autorizada(string? traido)
-            => _secreto.Length > 0 && traido != null &&
-               CryptographicOperations.FixedTimeEquals(
-                   System.Text.Encoding.UTF8.GetBytes(traido),
-                   System.Text.Encoding.UTF8.GetBytes(_secreto));
+        private static bool Autorizada(string? traido) => Contrato.MismoSecreto(traido, _secreto);
 
         // ─── Las respuestas ─────────────────────────────────────────────────────────────────
 
@@ -158,7 +108,7 @@ namespace Jondo.Unity.Launcher.Network
             enLinea = ServiciosEnPie() && BaseEnPie(),
             base_ = BaseEnPie(),
             servicios = ServiciosEnPie(),
-            version = LauncherService.Version,
+            version = Contrato.Version,
             proceso = Environment.ProcessId,
         });
 
@@ -190,7 +140,7 @@ namespace Jondo.Unity.Launcher.Network
             string usuario = Texto(cuerpo, "usuario");
             string clave = Texto(cuerpo, "clave");
             string ip = Texto(cuerpo, "ip");
-            if (ip.Length == 0) ip = LauncherService.LocalIp;
+            if (ip.Length == 0) ip = Contrato.LocalIp;
 
             if (!DatabaseManager.ValidateAccountCredentials(usuario, clave, ip, out var cuenta, out string fallo)
                 || cuenta == null)
@@ -217,7 +167,7 @@ namespace Jondo.Unity.Launcher.Network
             string clave = Texto(cuerpo, "clave");
             string apodo = Texto(cuerpo, "apodo");
             string ip = Texto(cuerpo, "ip");
-            if (ip.Length == 0) ip = LauncherService.LocalIp;
+            if (ip.Length == 0) ip = Contrato.LocalIp;
 
             bool bien = DatabaseManager.RegisterNewAccount(usuario, clave, apodo, ip, out string fallo);
             return Bien(new { bien, motivo = fallo });

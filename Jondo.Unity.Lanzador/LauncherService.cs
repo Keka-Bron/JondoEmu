@@ -154,9 +154,9 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private static string EnCristiano(string codigo) => codigo switch
         {
-            ApiDeControl.MotivoSesionCaducada => UI.LauncherTexts.Current.SessionExpiredError,
-            ApiDeControl.MotivoCuentaYaAbierta => UI.LauncherTexts.Current.AccountAlreadyRunning,
-            ApiDeControl.MotivoTopeDeClientes => UI.LauncherTexts.Current.MaxClientsError,
+            Contrato.MotivoSesionCaducada => UI.LauncherTexts.Current.SessionExpiredError,
+            Contrato.MotivoCuentaYaAbierta => UI.LauncherTexts.Current.AccountAlreadyRunning,
+            Contrato.MotivoTopeDeClientes => UI.LauncherTexts.Current.MaxClientsError,
             _ => codigo.Length > 0 ? codigo : UI.LauncherTexts.Current.GenericError,
         };
 
