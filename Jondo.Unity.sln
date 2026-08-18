@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Parser", "Jondo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.World", "Jondo.Unity.World\Jondo.Unity.World.csproj", "{F8CDF0CA-AFC6-4D48-9CAE-3EECABED3506}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Uplauncher", "Jondo.Unity.Uplauncher\Jondo.Unity.Uplauncher.csproj", "{68926146-A93A-4562-BACC-0CB09C17EFC7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,18 +97,6 @@ Global
 		{F8CDF0CA-AFC6-4D48-9CAE-3EECABED3506}.Release|x64.Build.0 = Release|Any CPU
 		{F8CDF0CA-AFC6-4D48-9CAE-3EECABED3506}.Release|x86.ActiveCfg = Release|Any CPU
 		{F8CDF0CA-AFC6-4D48-9CAE-3EECABED3506}.Release|x86.Build.0 = Release|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Debug|x64.Build.0 = Debug|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Debug|x86.Build.0 = Debug|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Release|x64.ActiveCfg = Release|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Release|x64.Build.0 = Release|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Release|x86.ActiveCfg = Release|Any CPU
-		{68926146-A93A-4562-BACC-0CB09C17EFC7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

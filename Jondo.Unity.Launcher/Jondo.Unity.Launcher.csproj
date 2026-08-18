@@ -89,10 +89,5 @@
     <Error Condition="'$(FullOutDir)' == '$(FullRootDir)' Or '$(FullOutDir)' == '$(FullRootDir)\'" Text="[Build Error] Do not build directly into the emulator root directory. That pollutes the folder with hundreds of .NET files. Build to the default path (bin/) and publish will take care of the clean deploy." />
   </Target>
 
-	<ItemGroup>
-		<None Include="Data\breed_dump.txt">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
 
 </Project>
