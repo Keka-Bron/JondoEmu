@@ -104,6 +104,23 @@ namespace Jondo.Unity.Launcher.Network
                     }
                     finally
                     {
+                        // Guardar al cerrar, que no se hacía en ninguna parte: hasta ahora el
+                        // personaje sólo se escribía cuando algo lo provocaba de paso, así que
+                        // cerrar el cliente sin más perdía la última posición y los kamas.
+                        if (sesion.State.CharacterId > 0)
+                        {
+                            try
+                            {
+                                using (SessionContext.Push(sesion)) DatabaseManager.SaveCurrentCharacter();
+                                Console.WriteLine($"[Game Node] {sesion.State.CharacterName} saved on the " +
+                                                  $"way out: map {sesion.State.MapId}, cell {sesion.State.CellId}.");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[Game Node] Could not save on disconnect: {ex.Message}");
+                            }
+                        }
+
                         SesionesVivas.TryRemove(sesion.Id, out _);
                         Console.WriteLine($"[Game Node] Session {sesion.Id} closed; " +
                                           $"{SesionesVivas.Count} still connected.");

@@ -3,130 +3,68 @@ using System.Collections.Generic;
 
 namespace Jondo.Unity.Launcher
 {
+    /// <summary>
+    /// El estado del personaje, para el código que todavía no se ha migrado a las sesiones.
+    ///
+    /// Ya NO guarda nada: cada propiedad reenvía a la sesión de la conexión actual. Es la fachada
+    /// que pedía docs/multijugador.md para poder migrar por ficheros en vez de cambiar 263 sitios
+    /// de golpe.
+    ///
+    /// Hasta ahora esta clase seguía teniendo campos propios CON VALORES POR DEFECTO. El refactor
+    /// de sesiones convirtió a todos los que escriben, pero no a todos los que leen, así que los
+    /// 263 accesos que quedaban recibían aquellos valores de hace meses: nivel 40, y el mapa
+    /// 154010883. De ahí que un personaje de nivel 200 guardado en Amakna apareciera en Incarnam
+    /// —el mapa por defecto de la línea 18— sin que nada avisara. Ninguno de los dos estados
+    /// estaba mal: es que había dos, y el código leía el que ya nadie mantenía.
+    ///
+    /// Lo que queda por hacer es sustituir los usos por SessionContext.State fichero a fichero;
+    /// mientras tanto, todo apunta al mismo sitio y no puede volver a descuadrarse.
+    /// </summary>
     public static class GameState
     {
-        // Player Identity
-        public static long CharacterId { get; set; } = 13825558L;
-        public static string CharacterName { get; set; } = "[#KEKA-BRON#]";
-        public static int CharacterLevel { get; set; } = 40;
-        public static int Breed { get; set; } = 9;
-        public static int Sex { get; set; } = 1;
-        public static byte[] PlayerActorDetails { get; set; } = null;
-        public static byte[] LookBytes { get; set; } = null;
+        private static SessionState S => Network.SessionContext.State;
 
-        // Positioning
-        public static long MapId { get; set; } = 154010883L;
-        public static int CellId { get; set; } = 280;
-        public static int Orientation { get; set; } = 1;
-        public static long Kamas { get; set; } = 50000;
+        // Quién es
+        public static long CharacterId { get => S.CharacterId; set => S.CharacterId = value; }
+        public static string CharacterName { get => S.CharacterName; set => S.CharacterName = value; }
+        public static int CharacterLevel { get => S.CharacterLevel; set => S.CharacterLevel = value; }
+        public static int Breed { get => S.Breed; set => S.Breed = value; }
+        public static int Sex { get => S.Sex; set => S.Sex = value; }
+        public static byte[]? PlayerActorDetails { get => S.PlayerActorDetails; set => S.PlayerActorDetails = value; }
+        public static byte[]? LookBytes { get => S.LookBytes; set => S.LookBytes = value; }
 
-        /// <summary>The character's ACCUMULATED experience, not the current level's.</summary>
-        public static long Experience { get; set; }
+        // Dónde está
+        public static long MapId { get => S.MapId; set => S.MapId = value; }
+        public static int CellId { get => S.CellId; set => S.CellId = value; }
+        public static int Orientation { get => S.Orientation; set => S.Orientation = value; }
+        public static long Kamas { get => S.Kamas; set => S.Kamas = value; }
 
-        // Combat State
-        public static bool IsInFight { get; set; } = false;
-        public static long CurrentFightMobId { get; set; } = 0;
+        /// <summary>La experiencia ACUMULADA, no la del nivel actual.</summary>
+        public static long Experience { get => S.Experience; set => S.Experience = value; }
 
-        // Characteristics / Capital
-        public static int CharacterRemainingPoints { get; set; } = 195;
-        public static int StatVitality { get; set; } = 0;
-        public static int StatWisdom { get; set; } = 0;
-        public static int StatStrength { get; set; } = 0;
-        public static int StatIntelligence { get; set; } = 0;
-        public static int StatChance { get; set; } = 0;
-        public static int StatAgility { get; set; } = 0;
+        // El combate
+        public static bool IsInFight { get => S.IsInFight; set => S.IsInFight = value; }
+        public static long CurrentFightMobId { get => S.CurrentFightMobId; set => S.CurrentFightMobId = value; }
 
-        // Thread-Safety Synchronization Lock
-        private static readonly object Lock = new object();
+        // Las características y el capital
+        public static int CharacterRemainingPoints { get => S.CharacterRemainingPoints; set => S.CharacterRemainingPoints = value; }
+        public static int StatVitality { get => S.StatVitality; set => S.StatVitality = value; }
+        public static int StatWisdom { get => S.StatWisdom; set => S.StatWisdom = value; }
+        public static int StatStrength { get => S.StatStrength; set => S.StatStrength = value; }
+        public static int StatIntelligence { get => S.StatIntelligence; set => S.StatIntelligence = value; }
+        public static int StatChance { get => S.StatChance; set => S.StatChance = value; }
+        public static int StatAgility { get => S.StatAgility; set => S.StatAgility = value; }
 
-        // Inventory / Items (Private Backing Fields)
-        private static readonly List<PlayerItem> _inventory = new List<PlayerItem>();
-
-        // Equipped Items Cache (Private Backing Fields)
-        private static readonly Dictionary<long, EquippedItemInfo> _equippedItems = new Dictionary<long, EquippedItemInfo>();
-
-        public static List<PlayerItem> GetInventoryCopy()
-        {
-            lock (Lock)
-            {
-                return new List<PlayerItem>(_inventory);
-            }
-        }
-
-        public static void SetInventory(List<PlayerItem> items)
-        {
-            lock (Lock)
-            {
-                _inventory.Clear();
-                _inventory.AddRange(items);
-            }
-        }
-
-        public static void AddInventoryItem(PlayerItem item)
-        {
-            lock (Lock)
-            {
-                _inventory.Add(item);
-            }
-        }
-
-        public static void ClearInventory()
-        {
-            lock (Lock)
-            {
-                _inventory.Clear();
-            }
-        }
-
-        public static PlayerItem? GetInventoryItem(long uid)
-        {
-            lock (Lock)
-            {
-                return _inventory.Find(i => i.Uid == uid);
-            }
-        }
-
-        public static Dictionary<long, EquippedItemInfo> GetEquippedItemsCopy()
-        {
-            lock (Lock)
-            {
-                var dict = new Dictionary<long, EquippedItemInfo>();
-                foreach (var kvp in _equippedItems)
-                {
-                    var info = new EquippedItemInfo { Slot = kvp.Value.Slot };
-                    foreach (var stat in kvp.Value.Stats)
-                    {
-                        info.Stats[stat.Key] = stat.Value;
-                    }
-                    dict[kvp.Key] = info;
-                }
-                return dict;
-            }
-        }
-
-        public static void SetEquippedItem(long uid, EquippedItemInfo info)
-        {
-            lock (Lock)
-            {
-                _equippedItems[uid] = info;
-            }
-        }
-
-        public static void RemoveEquippedItem(long uid)
-        {
-            lock (Lock)
-            {
-                _equippedItems.Remove(uid);
-            }
-        }
-
-        public static void ClearEquippedItems()
-        {
-            lock (Lock)
-            {
-                _equippedItems.Clear();
-            }
-        }
+        // El inventario y el equipo
+        public static List<PlayerItem> GetInventoryCopy() => S.GetInventoryCopy();
+        public static void SetInventory(List<PlayerItem> items) => S.SetInventory(items);
+        public static void AddInventoryItem(PlayerItem item) => S.AddInventoryItem(item);
+        public static void ClearInventory() => S.ClearInventory();
+        public static PlayerItem? GetInventoryItem(long uid) => S.GetInventoryItem(uid);
+        public static Dictionary<long, EquippedItemInfo> GetEquippedItemsCopy() => S.GetEquippedItemsCopy();
+        public static void SetEquippedItem(long uid, EquippedItemInfo info) => S.SetEquippedItem(uid, info);
+        public static void RemoveEquippedItem(long uid) => S.RemoveEquippedItem(uid);
+        public static void ClearEquippedItems() => S.ClearEquippedItems();
     }
 
     public class PlayerItem
@@ -134,7 +72,7 @@ namespace Jondo.Unity.Launcher
         public long Uid { get; set; }
         public int ItemId { get; set; }
         public int Quantity { get; set; }
-        public int Position { get; set; } // Equipment slot or inventory position
+        public int Position { get; set; }
         public Dictionary<int, int> Effects { get; set; } = new Dictionary<int, int>();
 
         /// <summary>
