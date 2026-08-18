@@ -116,6 +116,14 @@ namespace Jondo.Protocol
             await WriteSerializedAsync(stream, frame);
         }
 
+        // Use this for packets that already include their VarInt length prefix.
+        // Keeping these writes behind the same per-stream gate prevents two
+        // concurrent producers from interleaving bytes on a client socket.
+        public static Task WriteRawFrameAsync(Stream stream, byte[] frame)
+        {
+            return WriteSerializedAsync(stream, frame);
+        }
+
         private static async Task WriteSerializedAsync(Stream stream, byte[] frame)
         {
             var gate = WriteLocks.GetValue(stream, _ => new SemaphoreSlim(1, 1));

@@ -85,7 +85,8 @@ namespace Jondo.Unity.Launcher.Network
 
             try
             {
-                string json = RouteHaapi(path, req.HttpMethod, body);
+                long accountId = ResolveRequestAccount(req, body);
+                string json = RouteHaapi(path, req.HttpMethod, body, accountId);
                 byte[] buf = System.Text.Encoding.UTF8.GetBytes(json);
                 resp.StatusCode = 200;
                 resp.ContentType = "application/json; charset=utf-8";
@@ -149,7 +150,7 @@ namespace Jondo.Unity.Launcher.Network
             resp.OutputStream.Close();
         }
 
-        private static string RouteHaapi(string path, string method, string body)
+        private static string RouteHaapi(string path, string method, string body, long accountId)
         {
             if (method == "OPTIONS") return "{}";
 
@@ -157,16 +158,16 @@ namespace Jondo.Unity.Launcher.Network
                 return Dofus3ConfigResponse();
 
             if (method == "POST" && (path == "/json/Ankama/v5/Api/Connect" || path == "/json/Ankama/v5/Account/ApiKey" || path == "/json/Ankama/v5/Account/CreateApiKey"))
-                return TokenResponse();
+                return TokenResponse(accountId);
 
             if (method == "GET" && path.StartsWith("/json/Ankama/v5/Account/GetAccount"))
-                return AccountResponse();
+                return AccountResponse(accountId);
 
             if (method == "GET" && path == "/json/Ankama/v5/Game/ServerList")
-                return GameServerListResponse();
+                return GameServerListResponse(accountId);
 
             if (method == "POST" && path == "/json/Ankama/v5/Api/GameToken")
-                return GameTokenResponse();
+                return GameTokenResponse(accountId);
 
             if (method == "POST" && path == "/json/Ankama/v5/Game/SelectServer")
                 return SelectServerResponse();
@@ -204,20 +205,24 @@ namespace Jondo.Unity.Launcher.Network
             }
         }";
 
-        public static DatabaseManager.DbAccount? ActiveAccount { get; set; }
-
-        private static string TokenResponse() => System.Text.Json.JsonSerializer.Serialize(new
+        private static string TokenResponse(long accountId)
         {
-            token = "eb95866f-8625-47bf-a7ea-3c3ad71bac1d",
-            key = "eb95866f-8625-47bf-a7ea-3c3ad71bac1d",
-            expiration = "2035-01-01T00:00:00Z"
-        });
+            string token = Guid.NewGuid().ToString("N");
+            ClientLaunchRegistry.RegisterToken(accountId, token);
+            return System.Text.Json.JsonSerializer.Serialize(new
+            {
+                token,
+                key = token,
+                expiration = "2035-01-01T00:00:00Z"
+            });
+        }
 
-        private static string AccountResponse()
+        private static string AccountResponse(long accountId)
         {
-            long accId = ActiveAccount?.Id ?? 1;
-            string login = ActiveAccount?.Login ?? "jondo@emulator.com";
-            string nick = ActiveAccount?.Nickname ?? "Jondo";
+            var account = DatabaseManager.GetAccountById(accountId);
+            long accId = account?.Id ?? 0;
+            string login = account?.Login ?? "unknown";
+            string nick = account?.Nickname ?? "Jondo";
 
             return $@"{{
                 ""id"": {accId},
@@ -247,10 +252,9 @@ namespace Jondo.Unity.Launcher.Network
         /// The status here is what decides how each server is drawn on the selection screen; only
         /// the open one is reported as online.
         /// </summary>
-        private static string GameServerListResponse()
+        private static string GameServerListResponse(long accountId)
         {
-            long accId = ActiveAccount?.Id ?? 0;
-            var characters = DatabaseManager.GetCharactersByAccountId(accId);
+            var characters = DatabaseManager.GetCharactersByAccountId(accountId);
 
             var servers = new List<object>();
             foreach (var server in DatabaseManager.GetServers())
@@ -277,11 +281,12 @@ namespace Jondo.Unity.Launcher.Network
             return System.Text.Json.JsonSerializer.Serialize(new { servers });
         }
 
-        private static string GameTokenResponse()
+        private static string GameTokenResponse(long accountId)
         {
-            long accId = ActiveAccount?.Id ?? 1;
+            if (accountId <= 0) throw new InvalidOperationException("No account token was supplied to HAAPI.");
             string token = Guid.NewGuid().ToString("N");
-            DatabaseManager.SetGameToken(accId, token);
+            DatabaseManager.SetGameToken(accountId, token);
+            ClientLaunchRegistry.RegisterToken(accountId, token);
 
             return System.Text.Json.JsonSerializer.Serialize(new
             {
@@ -295,5 +300,44 @@ namespace Jondo.Unity.Launcher.Network
             token = Guid.NewGuid().ToString("N"),
             server = new { host = "127.0.0.1", port = 5555 }
         });
+
+        private static long ResolveRequestAccount(HttpListenerRequest request, string body)
+        {
+            var candidates = new List<string?>
+            {
+                request.Headers["Authorization"],
+                request.Headers["apikey"],
+                request.QueryString["token"],
+                request.QueryString["apikey"]
+            };
+
+            foreach (string? raw in candidates)
+            {
+                string candidate = raw?.Trim() ?? "";
+                if (candidate.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    candidate = candidate.Substring(7).Trim();
+                long accountId = ClientLaunchRegistry.ResolveToken(candidate);
+                if (accountId > 0) return accountId;
+            }
+
+            // Some HAAPI calls carry their token in a small JSON body rather than a header.
+            if (!string.IsNullOrWhiteSpace(body))
+            {
+                try
+                {
+                    using var document = System.Text.Json.JsonDocument.Parse(body);
+                    foreach (var property in document.RootElement.EnumerateObject())
+                    {
+                        if (property.Value.ValueKind != System.Text.Json.JsonValueKind.String) continue;
+                        if (!property.Name.Contains("token", StringComparison.OrdinalIgnoreCase) &&
+                            !property.Name.Contains("key", StringComparison.OrdinalIgnoreCase)) continue;
+                        long accountId = ClientLaunchRegistry.ResolveToken(property.Value.GetString());
+                        if (accountId > 0) return accountId;
+                    }
+                }
+                catch { }
+            }
+            return 0;
+        }
     }
 }

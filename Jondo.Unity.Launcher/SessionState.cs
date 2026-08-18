@@ -56,6 +56,16 @@ namespace Jondo.Unity.Launcher
         public int WardrobeDraftTitle { get; set; }
         public int WardrobeDraftOrnament { get; set; }
         public bool IsWardrobeDraftLoaded { get; set; }
+        public long OpenNpcShopId { get; set; }
+        public int OpenNpcShopNpcId { get; set; }
+
+        // Per-character manager caches. These must never be static: loading the second account
+        // would otherwise replace the first account's equipment, appearance and spell bar.
+        internal Dictionary<long, Managers.Equipment.Item> EquipmentItems { get; }
+            = new Dictionary<long, Managers.Equipment.Item>();
+        internal Dictionary<int, int> ChosenSpells { get; } = new Dictionary<int, int>();
+        internal Dictionary<int, int> SpellBar { get; } = new Dictionary<int, int>();
+        internal long SpellChoicesCharacterId { get; set; }
 
         // Thread-Safety Synchronization Lock
         private readonly object _lock = new object();

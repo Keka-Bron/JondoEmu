@@ -19,6 +19,16 @@ namespace Jondo.Unity.Launcher.UI
     {
         private const string ClaveIdioma = "idioma";
         private const string ClaveCliente = "cliente";
+        private const string ClaveCuentas = "cuentas";
+
+        internal sealed class SavedAccount
+        {
+            public long AccountId { get; set; }
+            public string Login { get; set; } = "";
+            public string Nickname { get; set; } = "";
+            public string Token { get; set; } = "";
+            public bool Selected { get; set; }
+        }
 
         public static string Path { get; } = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo", "lanzador.cfg");
@@ -94,5 +104,36 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Lo guardado tal cual, exista o no. Para poder avisar de que ya no está.</summary>
         public static string ClientExecutableRaw
             => Leer().TryGetValue(ClaveCliente, out string? v) ? v : "";
+
+        // ─── Équipe multicomptes ───────────────────────────────────────────────
+
+        public static List<SavedAccount> LoadAccounts()
+        {
+            try
+            {
+                if (!Leer().TryGetValue(ClaveCuentas, out string? encoded) ||
+                    string.IsNullOrWhiteSpace(encoded)) return new List<SavedAccount>();
+                string json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+                var valid = (System.Text.Json.JsonSerializer.Deserialize<List<SavedAccount>>(json)
+                             ?? new List<SavedAccount>())
+                    .FindAll(a => a.AccountId > 0 && !string.IsNullOrWhiteSpace(a.Token));
+                if (valid.Count > 8) valid.RemoveRange(8, valid.Count - 8);
+                return valid;
+            }
+            catch { return new List<SavedAccount>(); }
+        }
+
+        public static void SaveAccounts(IEnumerable<SavedAccount> accounts)
+        {
+            var safe = new List<SavedAccount>();
+            foreach (var account in accounts)
+            {
+                if (safe.Count == 8) break;
+                if (account.AccountId <= 0 || string.IsNullOrWhiteSpace(account.Token)) continue;
+                safe.Add(account);
+            }
+            string json = System.Text.Json.JsonSerializer.Serialize(safe);
+            Escribir(ClaveCuentas, Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json)));
+        }
     }
 }

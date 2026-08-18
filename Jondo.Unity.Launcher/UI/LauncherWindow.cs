@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -36,6 +37,15 @@ namespace Jondo.Unity.Launcher.UI
         // ─── State ──────────────────────────────────────────────────────────────
         private string _token = "";
         private string _account = "";
+        private sealed class TeamAccount
+        {
+            public long AccountId { get; init; }
+            public string Login { get; set; } = "";
+            public string Token { get; set; } = "";
+            public string Nickname { get; set; } = "";
+            public bool Selected { get; set; }
+        }
+        private readonly List<TeamAccount> _teamAccounts = new();
         private bool _serverOnline;
         private bool _registerMode;
         private bool _authenticated;
@@ -43,6 +53,7 @@ namespace Jondo.Unity.Launcher.UI
         private float _scale = 1f;
         private Language _language;
         private LauncherTexts _texts;
+        private string _activeAccountsSignature = "";
 
         // ─── Resources ──────────────────────────────────────────────────────────
         private Image? _backgroundImage;
@@ -86,7 +97,11 @@ namespace Jondo.Unity.Launcher.UI
         private readonly Label _lblWelcome = new();
         private readonly Label _lblSubscription = new();
         private readonly LauncherButton _btnPlay = new();
+        private readonly LauncherButton _btnSelectAll = new();
+        private readonly FlowLayoutPanel _accountsPanel = new();
         private readonly LinkLabel _lnkLogOut = new();
+        private readonly LinkLabel _lnkRemoveSelected = new();
+        private readonly LinkLabel _lnkBackToTeam = new();
 
         private readonly LauncherButton _btnClientPath = new();
 
@@ -106,6 +121,19 @@ namespace Jondo.Unity.Launcher.UI
         {
             _language = LauncherTexts.LoadLanguage();
             _texts = LauncherTexts.Get(_language);
+            foreach (var saved in LauncherPreferences.LoadAccounts())
+            {
+                _teamAccounts.Add(new TeamAccount
+                {
+                    AccountId = saved.AccountId,
+                    Login = saved.Login,
+                    Nickname = saved.Nickname,
+                    Token = saved.Token,
+                    Selected = saved.Selected
+                });
+                Network.ClientLaunchRegistry.RegisterToken(saved.AccountId, saved.Token);
+            }
+            _authenticated = _teamAccounts.Count > 0;
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
 
@@ -254,6 +282,21 @@ namespace Jondo.Unity.Launcher.UI
             _lblSubscription.AutoSize = false;
             _card.Controls.Add(_lblSubscription);
 
+            _accountsPanel.BackColor = Color.Transparent;
+            _accountsPanel.FlowDirection = FlowDirection.TopDown;
+            _accountsPanel.WrapContents = false;
+            _accountsPanel.AutoScroll = false;
+            _accountsPanel.Margin = Padding.Empty;
+            _accountsPanel.Padding = Padding.Empty;
+            _card.Controls.Add(_accountsPanel);
+
+            ConfigureActionButton(_btnSelectAll, LauncherTheme.PurpleTop, LauncherTheme.PurpleBottom,
+                                  LauncherTheme.PurpleBorder, LauncherTheme.PurpleTop, LauncherTheme.PurpleBottom);
+            _btnSelectAll.Font = LauncherTheme.CreateFont(10f, FontStyle.Bold);
+            _btnSelectAll.LetterSpacing = 0.5f;
+            _btnSelectAll.Enabled = true;
+            _btnSelectAll.Click += (s, e) => ToggleSelectAll();
+
             ConfigureActionButton(_btnPlay, LauncherTheme.GreenTop, LauncherTheme.GreenBottom, LauncherTheme.GreenBorder,
                                   LauncherTheme.GreenTopHover, LauncherTheme.GreenBottomHover);
             // The play button is only visible once logged in, so it starts out enabled.
@@ -270,6 +313,33 @@ namespace Jondo.Unity.Launcher.UI
             _lnkLogOut.AutoSize = false;
             _lnkLogOut.LinkClicked += (s, e) => SignOut();
             _card.Controls.Add(_lnkLogOut);
+
+            _lnkRemoveSelected.BackColor = Color.Transparent;
+            _lnkRemoveSelected.LinkColor = Color.FromArgb(210, 130, 110);
+            _lnkRemoveSelected.ActiveLinkColor = Color.White;
+            _lnkRemoveSelected.VisitedLinkColor = Color.FromArgb(210, 130, 110);
+            _lnkRemoveSelected.LinkBehavior = LinkBehavior.AlwaysUnderline;
+            _lnkRemoveSelected.Font = LauncherTheme.CreateFont(10f);
+            _lnkRemoveSelected.TextAlign = ContentAlignment.MiddleCenter;
+            _lnkRemoveSelected.AutoSize = false;
+            _lnkRemoveSelected.LinkClicked += (s, e) => RemoveSelectedAccounts();
+            _card.Controls.Add(_lnkRemoveSelected);
+
+            _lnkBackToTeam.BackColor = Color.Transparent;
+            _lnkBackToTeam.LinkColor = LauncherTheme.Gold;
+            _lnkBackToTeam.ActiveLinkColor = Color.White;
+            _lnkBackToTeam.VisitedLinkColor = LauncherTheme.Gold;
+            _lnkBackToTeam.LinkBehavior = LinkBehavior.AlwaysUnderline;
+            _lnkBackToTeam.Font = LauncherTheme.CreateFont(10f, FontStyle.Bold);
+            _lnkBackToTeam.TextAlign = ContentAlignment.MiddleCenter;
+            _lnkBackToTeam.AutoSize = false;
+            _lnkBackToTeam.LinkClicked += (s, e) =>
+            {
+                _authenticated = true;
+                HideAlert();
+                RebuildLayout();
+            };
+            _card.Controls.Add(_lnkBackToTeam);
 
             // Dónde está el cliente. Se enseña siempre, con sesión iniciada o sin ella, porque es
             // justo lo que hay que arreglar antes de poder jugar si el juego no está al lado.
@@ -290,6 +360,7 @@ namespace Jondo.Unity.Launcher.UI
             _card.Controls.Add(_statusIndicator);
 
             RefreshClientPath();
+            RefreshAccountRows();
         }
 
         /// <summary>
@@ -702,7 +773,9 @@ namespace Jondo.Unity.Launcher.UI
             _lblUsername.Visible = _fieldUsername.Visible = _lblPassword.Visible = _fieldPassword.Visible = _btnConnect.Visible = loginForm;
             _lblRegUsername.Visible = _fieldRegUsername.Visible = _lblRegPassword.Visible = _fieldRegPassword.Visible =
                 _lblRegNickname.Visible = _fieldRegNickname.Visible = _btnCreate.Visible = registerForm;
-            _lblWelcome.Visible = _lblSubscription.Visible = _btnPlay.Visible = _lnkLogOut.Visible = _authenticated;
+            _lblWelcome.Visible = _lblSubscription.Visible = _accountsPanel.Visible = _btnSelectAll.Visible =
+                _btnPlay.Visible = _lnkLogOut.Visible = _lnkRemoveSelected.Visible = _authenticated;
+            _lnkBackToTeam.Visible = showingAuth && _teamAccounts.Count > 0;
 
             if (showingAuth)
             {
@@ -728,16 +801,33 @@ namespace Jondo.Unity.Launcher.UI
                     _btnCreate.SetBounds(padding, y + Px(8), inner, Px(46));
                     y += Px(8) + Px(46);
                 }
+
+                if (_lnkBackToTeam.Visible)
+                {
+                    y += Px(10);
+                    _lnkBackToTeam.SetBounds(padding, y, inner, Px(18));
+                    y += Px(18);
+                }
             }
             else
             {
                 _lblWelcome.SetBounds(padding, y, inner, Px(24));
                 y += Px(24) + Px(10);
                 _lblSubscription.SetBounds(padding, y, inner, Px(16));
-                y += Px(16) + Px(18);
+                y += Px(16) + Px(10);
+
+                int accountsHeight = Math.Max(Px(34), _teamAccounts.Count * Px(32));
+                _accountsPanel.SetBounds(padding, y, inner, accountsHeight);
+                SizeAccountRows(inner);
+                y += accountsHeight + Px(8);
+
+                _btnSelectAll.SetBounds(padding, y, inner, Px(30));
+                y += Px(30) + Px(10);
                 _btnPlay.SetBounds(padding, y, inner, Px(46));
-                y += Px(46) + Px(14);
+                y += Px(46) + Px(10);
                 _lnkLogOut.SetBounds(padding, y, inner, Px(16));
+                y += Px(16) + Px(6);
+                _lnkRemoveSelected.SetBounds(padding, y, inner, Px(16));
                 y += Px(16);
             }
 
@@ -834,10 +924,17 @@ namespace Jondo.Unity.Launcher.UI
 
             _btnConnect.Text = _texts.ConnectButton;
             _btnCreate.Text = _texts.CreateButton;
-            _btnPlay.Text = _texts.PlayButton;
-            _lnkLogOut.Text = _texts.LogOutButton;
-            _lblSubscription.Text = _texts.Subscription;
-            _lblWelcome.Text = $"{_texts.Welcome} {_account.ToUpperInvariant()}!";
+            int selected = _teamAccounts.Count(a => a.Selected);
+            _btnPlay.Text = string.Format(_texts.LaunchSelected, selected);
+            _lnkLogOut.Text = _texts.AddAccountButton;
+            _lnkRemoveSelected.Text = _texts.RemoveSelected;
+            _lnkBackToTeam.Text = _texts.BackToTeam;
+            _btnSelectAll.Text = selected == _teamAccounts.Count && selected > 0
+                ? _texts.DeselectAll
+                : _texts.SelectAll;
+            _lblSubscription.Text = string.Format(_texts.TeamSummaryFormat, selected,
+                                                  Network.ClientLaunchRegistry.ActiveCount);
+            _lblWelcome.Text = string.Format(_texts.TeamTitle, _teamAccounts.Count);
 
             _lblConsoleTitle.Text = _texts.ConsoleTitle;
             _btnClear.Text = _texts.ClearButton;
@@ -845,6 +942,7 @@ namespace Jondo.Unity.Launcher.UI
 
             UpdateMusicButton();
             UpdateStatusIndicator();
+            RefreshAccountRows();
         }
 
         private void UpdateMusicButton()
@@ -930,6 +1028,119 @@ namespace Jondo.Unity.Launcher.UI
             _statusIndicator.Invalidate();
 
             _music?.KeepLooping();
+            if (_authenticated)
+            {
+                RefreshTeamSummary();
+                string signature = ActiveAccountsSignature();
+                if (signature != _activeAccountsSignature) RefreshAccountRows();
+            }
+        }
+
+        private void RefreshAccountRows()
+        {
+            while (_accountsPanel.Controls.Count > 0)
+            {
+                var control = _accountsPanel.Controls[0];
+                _accountsPanel.Controls.RemoveAt(0);
+                control.Dispose();
+            }
+
+            foreach (var account in _teamAccounts)
+            {
+                var row = new LauncherButton
+                {
+                    Icon = ButtonIcon.CheckBox,
+                    Active = account.Selected,
+                    Font = LauncherTheme.CreateFont(10.5f, FontStyle.Bold),
+                    BackgroundTop = Color.FromArgb(190, 32, 19, 11),
+                    BackgroundBottom = Color.FromArgb(190, 23, 13, 8),
+                    BackgroundTopHighlight = LauncherTheme.LightBrown,
+                    BackgroundBottomHighlight = Color.FromArgb(130, 75, 35),
+                    BackgroundTopActive = Color.FromArgb(210, 55, 37, 15),
+                    BackgroundBottomActive = Color.FromArgb(210, 35, 24, 10),
+                    BorderColor = LauncherTheme.BorderBrown,
+                    BorderColorHighlight = LauncherTheme.LightGold,
+                    BorderColorActive = LauncherTheme.Gold,
+                    TextColor = LauncherTheme.SoftGold,
+                    TextColorHighlight = Color.White,
+                    TextColorActive = Color.White,
+                    CornerRadius = 4,
+                    Margin = new Padding(0, 0, 0, Px(4)),
+                    Height = Px(28),
+                    Text = $"{account.Nickname}  ·  #{account.AccountId}" +
+                           (Network.ClientLaunchRegistry.IsActive(account.AccountId) ? "   ● " + _texts.InGame : "")
+                };
+                row.Click += (s, e) =>
+                {
+                    account.Selected = !account.Selected;
+                    PersistAccounts();
+                    RefreshTeamSummary();
+                    RefreshAccountRows();
+                };
+                _accountsPanel.Controls.Add(row);
+            }
+            SizeAccountRows(_accountsPanel.ClientSize.Width);
+            _activeAccountsSignature = ActiveAccountsSignature();
+        }
+
+        private string ActiveAccountsSignature()
+            => string.Join(",", _teamAccounts.Where(a => Network.ClientLaunchRegistry.IsActive(a.AccountId))
+                                             .Select(a => a.AccountId));
+
+        private void SizeAccountRows(int width)
+        {
+            int usable = Math.Max(Px(80), width - (_accountsPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0));
+            foreach (Control row in _accountsPanel.Controls) row.Width = usable;
+        }
+
+        private void RefreshTeamSummary()
+        {
+            int selected = _teamAccounts.Count(a => a.Selected);
+            _lblWelcome.Text = string.Format(_texts.TeamTitle, _teamAccounts.Count);
+            _lblSubscription.Text = string.Format(_texts.TeamSummaryFormat, selected,
+                                                  Network.ClientLaunchRegistry.ActiveCount);
+            _btnPlay.Text = string.Format(_texts.LaunchSelected, selected);
+            _btnSelectAll.Text = selected == _teamAccounts.Count && selected > 0
+                ? _texts.DeselectAll
+                : _texts.SelectAll;
+            _btnPlay.Enabled = _serverOnline && selected > 0;
+        }
+
+        private void ToggleSelectAll()
+        {
+            bool select = !_teamAccounts.All(a => a.Selected);
+            foreach (var account in _teamAccounts) account.Selected = select;
+            PersistAccounts();
+            RefreshTeamSummary();
+            RefreshAccountRows();
+        }
+
+        private void RemoveSelectedAccounts()
+        {
+            int removed = _teamAccounts.RemoveAll(a => a.Selected &&
+                !Network.ClientLaunchRegistry.IsActive(a.AccountId));
+            if (removed == 0)
+            {
+                ShowAlert("Aucun compte sélectionné inactif ne peut être supprimé.");
+                return;
+            }
+            PersistAccounts();
+            _authenticated = _teamAccounts.Count > 0;
+            RefreshTeamSummary();
+            RefreshAccountRows();
+            RebuildLayout();
+        }
+
+        private void PersistAccounts()
+        {
+            LauncherPreferences.SaveAccounts(_teamAccounts.Select(a => new LauncherPreferences.SavedAccount
+            {
+                AccountId = a.AccountId,
+                Login = a.Login,
+                Nickname = a.Nickname,
+                Token = a.Token,
+                Selected = a.Selected
+            }));
         }
 
         private void SignIn()
@@ -959,9 +1170,33 @@ namespace Jondo.Unity.Launcher.UI
 
             _token = result.Token;
             _account = string.IsNullOrEmpty(result.Nickname) ? username : result.Nickname;
+            int existing = _teamAccounts.FindIndex(a => a.AccountId == result.AccountId);
+            if (existing < 0 && _teamAccounts.Count >= Network.ClientLaunchRegistry.MaximumClients)
+            {
+                ShowAlert(_texts.MaxAccountsError);
+                return;
+            }
+
+            var profile = new TeamAccount
+            {
+                AccountId = result.AccountId,
+                Login = username,
+                Token = result.Token,
+                Nickname = _account,
+                Selected = true
+            };
+            if (existing >= 0)
+            {
+                profile.Selected = _teamAccounts[existing].Selected;
+                _teamAccounts[existing] = profile;
+            }
+            else _teamAccounts.Add(profile);
             _authenticated = true;
             _fieldPassword.Value = "";
-            _lblWelcome.Text = $"{_texts.Welcome} {_account.ToUpperInvariant()}!";
+            _fieldUsername.Value = "";
+            PersistAccounts();
+            RefreshTeamSummary();
+            RefreshAccountRows();
             RebuildLayout();
         }
 
@@ -991,12 +1226,27 @@ namespace Jondo.Unity.Launcher.UI
 
         private void LaunchGame()
         {
-            var result = LauncherService.LaunchClient(_token);
-            if (!result.Success)
+            var selected = _teamAccounts.Where(a => a.Selected).ToList();
+            if (selected.Count == 0)
             {
-                ShowAlert(result.Message);
+                ShowAlert(_texts.SelectAccountError);
                 return;
             }
+
+            var failures = new List<string>();
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                foreach (var account in selected)
+                {
+                    if (Network.ClientLaunchRegistry.IsActive(account.AccountId)) continue;
+                    var result = LauncherService.LaunchClient(account.Token);
+                    if (!result.Success) failures.Add(account.Nickname + " : " + result.Message);
+                }
+            }
+            finally { Cursor = Cursors.Default; }
+
+            if (failures.Count > 0) ShowAlert(string.Join(Environment.NewLine, failures));
 
             // Starting the client silences the launcher music.
             if (_music != null && _music.Playing)
@@ -1005,12 +1255,22 @@ namespace Jondo.Unity.Launcher.UI
                 UpdateMusicButton();
             }
 
+            RefreshTeamSummary();
+            RefreshAccountRows();
+
             // No confirmation popup here: the client window opening is confirmation enough, and a
             // modal dialog would just sit on top of the game waiting to be dismissed.
         }
 
         private void SignOut()
         {
+            if (_teamAccounts.Count >= Network.ClientLaunchRegistry.MaximumClients)
+            {
+                ShowAlert(_texts.MaxAccountsError);
+                return;
+            }
+
+            // Open the account form without discarding the profiles already stored in the team.
             _token = "";
             _account = "";
             _authenticated = false;

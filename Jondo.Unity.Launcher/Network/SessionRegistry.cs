@@ -38,7 +38,16 @@ namespace Jondo.Unity.Launcher.Network
 
         public static int ConnectedCount => _sessions.Count;
 
-        public static bool Register(GameSession session) => _sessions.TryAdd(session.Id, session);
+        private static readonly object SessionGate = new object();
+
+        public static bool Register(GameSession session)
+        {
+            lock (SessionGate)
+            {
+                if (_sessions.Count >= ClientLaunchRegistry.MaximumClients) return false;
+                return _sessions.TryAdd(session.Id, session);
+            }
+        }
 
         public static bool Unregister(GameSession session) => _sessions.TryRemove(session.Id, out _);
 

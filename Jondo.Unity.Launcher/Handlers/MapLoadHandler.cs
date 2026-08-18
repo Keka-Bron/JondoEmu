@@ -172,6 +172,21 @@ namespace Jondo.Unity.Launcher.Handlers
             jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = playerActor.ToByteArray() });
             int totalActors = 1;
 
+            foreach (var other in SessionRegistry.OnMap(mapId))
+            {
+                if (other.CharacterId <= 0 || other.CharacterId == GameState.CharacterId) continue;
+                var otherCharacter = DatabaseManager.GetCharacterById(other.CharacterId);
+                if (otherCharacter == null) continue;
+                jpvMsg.Fields.Add(new ProtoField
+                {
+                    FieldNumber = 15,
+                    WireType = 2,
+                    BytesValue = ConnectionProtocol.BuildPlayerActorBlock(
+                        otherCharacter, other.State.CellId, other.State.Orientation, other.AccountId)
+                });
+                totalActors++;
+            }
+
             // B. Los NPCs, con el id que ya llevan puesto desde el arranque.
             //
             // Salen de Managers.Npcs y no de una consulta propia: eran dos listas de las mismas
