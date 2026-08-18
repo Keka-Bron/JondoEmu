@@ -295,7 +295,26 @@ namespace Jondo.Unity.World.Fights
             return result;
         }
 
+        /// <summary>
+        /// La ronda en la que va ESTE combate.
+        ///
+        /// Vivía como un entero estático del manejador, uno para todo el servidor, así que dos
+        /// jugadores peleando a la vez compartían el contador: al pasar de ronda uno, el otro veía
+        /// caducar sus embrujos. Cada combate lleva el suyo.
+        /// </summary>
         public int RoundNumber { get; private set; } = 1;
+
+        /// <summary>
+        /// El número de acción, que es lo que el cliente acusa al cerrar cada secuencia. También
+        /// era único para todo el servidor, y el cliente de un jugador acusaba números que había
+        /// gastado el combate de otro.
+        /// </summary>
+        private int _ultimaAccion;
+        public int SiguienteAccion() => System.Threading.Interlocked.Increment(ref _ultimaAccion);
+
+        /// <summary>De dónde salió cada jugador al entrar en combate, para devolverlo ahí.</summary>
+        public Dictionary<long, (long Mapa, int Casilla)> DeDondeVenian { get; }
+            = new Dictionary<long, (long, int)>();
         public bool StartsNewRound { get; private set; } = false;
 
         public Fighter NextTurn()

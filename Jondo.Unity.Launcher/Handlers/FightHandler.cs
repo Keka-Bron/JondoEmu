@@ -219,8 +219,9 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // De dónde se salió, para poder volver. El mapa de combate es de instancia y no vale
             // como sitio donde dejar al personaje.
-            _roleplayMap = fight.RoleplayMapId;
-            _roleplayCell = fight.Team0.Count > 0 ? fight.Team0[0].CellId : 0;
+            var suyo = Network.SessionContext.State;
+            suyo.RoleplayMapId = fight.RoleplayMapId;
+            suyo.RoleplayCellId = fight.Team0.Count > 0 ? fight.Team0[0].CellId : 0;
 
             // Sin guardar el personaje: el mapa de combate es un mapa de instancia y dejarlo escrito
             // en la ficha lo devolvería ahí al volver a entrar, a un sitio del que no se sale.
@@ -269,8 +270,6 @@ namespace Jondo.Unity.Launcher.Handlers
         private const int PlacementTimeoutMs = 45000;
 
         /// <summary>De dónde salió el jugador al entrar en combate, para devolverlo ahí.</summary>
-        private static long _roleplayMap;
-        private static int _roleplayCell;
 
         /// <summary>
         /// Saca al personaje del combate y lo devuelve al mapa de superficie.
@@ -283,16 +282,28 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             _finPendiente = null;
             PararElReloj();
-            if (_roleplayMap == 0) return;
 
-            GameState.IsInFight = false;
-            GameState.MapId = _roleplayMap;
-            if (_roleplayCell != 0) GameState.CellId = _roleplayCell;
+            var suyo = Network.SessionContext.State;
+            if (suyo.RoleplayMapId == 0) return;
+
+            suyo.IsInFight = false;
+            suyo.MapId = suyo.RoleplayMapId;
+            if (suyo.RoleplayCellId != 0) suyo.CellId = suyo.RoleplayCellId;
             DatabaseManager.SaveCurrentCharacter();
 
-            _roleplayMap = 0;
-            _roleplayCell = 0;
-            _activeFights.Clear();
+            suyo.RoleplayMapId = 0;
+            suyo.RoleplayCellId = 0;
+
+            // SÓLO el combate de este jugador. Aquí había un _activeFights.Clear(), que se llevaba
+            // por delante los combates de todos los demás: al acabar uno el suyo, al resto se le
+            // evaporaba la pelea a media pantalla.
+            long quien = suyo.CharacterId;
+            foreach (var par in _activeFights)
+            {
+                bool esSuyo = par.Value.Team0.Exists(f => f.Id == quien)
+                           || par.Value.Team1.Exists(f => f.Id == quien);
+                if (esSuyo) _activeFights.TryRemove(par.Key, out _);
+            }
 
             Program.LogDebug("[Combate] Fuera del combate; el personaje vuelve al mapa de superficie.");
         }
@@ -528,10 +539,10 @@ namespace Jondo.Unity.Launcher.Handlers
         /// más, y como viven en el combatiente del combate y no en el personaje, al salir a
         /// roleplay no queda nada pegado.
         /// </summary>
-        private static int ConBonos(Fighter quien, int caracteristica, int loQueYaTiene = 0)
+        private static int ConBonos(Fighter quien, int caracteristica, int loQueYaTiene, int ronda)
         {
             if (caracteristica <= 0) return loQueYaTiene;
-            return loQueYaTiene + quien.Embrujos.De(caracteristica, _round);
+            return loQueYaTiene + quien.Embrujos.De(caracteristica, ronda);
         }
 
         /// <summary>La característica que alimenta cada elemento en la fórmula de daño.</summary>
@@ -1092,9 +1103,27 @@ namespace Jondo.Unity.Launcher.Handlers
             }
         }
 
+        /// <summary>
+        /// El combate en el que está EL JUGADOR DE ESTA CONEXIÓN.
+        ///
+        /// Devolvía <c>_activeFights.Values.FirstOrDefault()</c>, o sea el primer combate abierto
+        /// en todo el servidor. Con un solo jugador daba igual; con dos, los dos manejaban el
+        /// mismo combate: el segundo en entrar movía las fichas del primero.
+        ///
+        /// Ahora se busca por el personaje de la sesión. Si el jugador no está en ninguno, no hay
+        /// combate, que es lo correcto y antes tampoco pasaba.
+        /// </summary>
         private static FightInstance? GetCurrentFight()
         {
-            return _activeFights.Values.FirstOrDefault();
+            long quien = Network.SessionContext.State.CharacterId;
+            if (quien == 0) return null;
+
+            foreach (var combate in _activeFights.Values)
+            {
+                foreach (var f in combate.Team0) if (f.Id == quien) return combate;
+                foreach (var f in combate.Team1) if (f.Id == quien) return combate;
+            }
+            return null;
         }
 
         private static async Task HandlePlacementCellChangeRequest(NetworkStream stream, byte[] payload)
@@ -1180,8 +1209,6 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             fight.StartFight();
             fight.CancelPlacementTimer();
-            _round = FirstRound;
-            _nextAction = 1;
 
             var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             long me = GameState.CharacterId;
@@ -1274,7 +1301,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 Network.FightProtocol.BuildAllFighters(everyone)));
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                Network.FightProtocol.BuildSequenceEnd(NextAction(), me,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), me,
                                                        Network.FightProtocol.OpeningSequence)));
 
             Program.LogDebug($"[Combate] Empieza el combate #{fight.FightId}: " +
@@ -1287,13 +1314,6 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private const int FirstRound = 1;
 
-        /// <summary>En qué ronda va el combate. Sube cuando el último del orden cede el turno.</summary>
-        private static int _round = FirstRound;
-
-        /// <summary>El número de acción que cierra cada secuencia. Al cliente le vale con que suba.</summary>
-        private static int _nextAction = 1;
-
-        private static int NextAction() => System.Threading.Interlocked.Increment(ref _nextAction);
 
         /// <summary>
         /// "Confírmame" (jxh). El servidor lo manda antes de cada turno y se queda esperando el jwz
@@ -1357,7 +1377,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             long deQuien = quien.Id;
             long deQueCombate = fight.FightId;
-            int ronda = _round;
+            int ronda = fight.RoundNumber;
 
             _ = Task.Run(async () =>
             {
@@ -1376,7 +1396,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     var ahora = GetCurrentFight();
                     if (ahora == null || ahora.FightId != deQueCombate) return;
                     if (ahora.State != Jondo.Unity.World.Fights.FightState.Ongoing) return;
-                    if (ahora.CurrentFighter?.Id != deQuien || _round != ronda) return;
+                    if (ahora.CurrentFighter?.Id != deQuien || fight.RoundNumber != ronda) return;
 
                     Program.LogDebug($"[Combate] Se le acabó el tiempo a {deQuien}; se le pasa el turno.");
                     await PassTurnAsync(stream);
@@ -1408,12 +1428,12 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jzc",
                 Network.FightProtocol.BuildTurnStart(fighter.Id, duration,
-                                                     fight.CurrentTurnIndex, _round)));
+                                                     fight.CurrentTurnIndex, fight.RoundNumber)));
 
             // Los invocados a los que se les ha acabado el tiempo se deshacen aquí, al principio
             // del turno, que es cuando lo hace el servidor real: en la captura la baliza sale en
             // la ronda 28 y el "muere" llega al empezar el turno del jugador en la 30.
-            foreach (var gastado in fight.InvocadosQueSeDeshacen(_round))
+            foreach (var gastado in fight.InvocadosQueSeDeshacen(fight.RoundNumber))
             {
                 gastado.CurrentHP = 0;
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
@@ -1431,7 +1451,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var caducados = new List<(Fighter Quien, Jondo.Unity.World.Fights.Embrujo Caido)>();
             foreach (var quien in TodosLosCombatientes(fight))
             {
-                foreach (var caido in quien.Embrujos.Barrer(_round))
+                foreach (var caido in quien.Embrujos.Barrer(fight.RoundNumber))
                 {
                     caducados.Add((quien, caido));
                 }
@@ -1461,7 +1481,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
 
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                    Network.FightProtocol.BuildSequenceEnd(NextAction(), fighter.Id,
+                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
                                                            Network.FightProtocol.ActionSequence)));
 
                 Program.LogDebug($"[Combate] Se caen {caducados.Count} embrujo(s): " +
@@ -1469,7 +1489,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             fighter.StartTurn();
-            await GivePointsBackAsync(stream, fighter);
+            await GivePointsBackAsync(stream, fight, fighter);
 
             // Y ahora las actitudes de "principio de turno": aquí es donde el Dofus Ocre mira si le
             // han pegado desde su turno anterior.
@@ -1530,7 +1550,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// con 0 PA y 0 PM. Así que aquí van los máximos, que es lo que esta codificación quiere
         /// decir.
         /// </summary>
-        private static async Task GivePointsBackAsync(NetworkStream stream, Fighter fighter)
+        private static async Task GivePointsBackAsync(NetworkStream stream, FightInstance fight, Fighter fighter)
         {
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
                 Network.FightProtocol.BuildSequenceStart(fighter.Id,
@@ -1551,12 +1571,12 @@ namespace Jondo.Unity.Launcher.Handlers
                         (characteristic, value),
                     })));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                    Network.FightProtocol.BuildSequenceEnd(NextAction(), fighter.Id,
+                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
                                                            Network.FightProtocol.SheetSequence)));
             }
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                Network.FightProtocol.BuildSequenceEnd(NextAction(), fighter.Id,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
                                                        Network.FightProtocol.TurnSequence)));
         }
 
@@ -1637,7 +1657,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 })));
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                Network.FightProtocol.BuildSequenceEnd(NextAction(), walker.Id,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), walker.Id,
                                                        Network.FightProtocol.WalkSequence)));
 
             Program.LogDebug($"[Combate] Anda hasta la casilla {destination}: {steps} pasos, " +
@@ -1726,13 +1746,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // crítico propio, y el Ocra lleva 47; el cliente pinta 57% en su tooltip, que es
             // exactamente la suma. Antes esto estaba clavado a "false" y no salía un crítico ni
             // por casualidad.
-            int probabilidadCritico = limites.CriticoPropio + ConBonos(caster, CriticoCaracteristica);
+            int probabilidadCritico = limites.CriticoPropio + ConBonos(caster, CriticoCaracteristica, 0, fight.RoundNumber);
             bool critico = TirarCritico(probabilidadCritico);
             if (critico)
             {
                 Program.LogDebug($"[Combate] ¡CRÍTICO! con el hechizo {spell} " +
                                  $"({probabilidadCritico}% = {limites.CriticoPropio} del hechizo + " +
-                                 $"{ConBonos(caster, CriticoCaracteristica)} del personaje).");
+                                 $"{ConBonos(caster, CriticoCaracteristica, 0, fight.RoundNumber)} del personaje).");
             }
 
             caster.CurrentAP -= cost;
@@ -1766,7 +1786,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     (ActionPointsCharacteristic, (long)caster.CurrentAP),
                 })));
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                Network.FightProtocol.BuildSequenceEnd(NextAction(), caster.Id,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), caster.Id,
                                                        Network.FightProtocol.SheetSequence)));
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
@@ -1782,7 +1802,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await AplicarEfectosAsync(stream, fight, caster, spell, grade, victim,
                                       Managers.MotorDeEfectos.AlLanzar, cell, critico);
 
-            int cierre = NextAction();
+            int cierre = fight.SiguienteAccion();
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
                 Network.FightProtocol.BuildSequenceEnd(cierre, caster.Id,
                                                        Network.FightProtocol.ActionSequence)));
@@ -1817,7 +1837,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // Cuántas puede llevar a la vez: la característica 26, que el cliente pinta como
             // "Invocación" en el panel. Sale de la base más el equipo, como todo lo demás.
-            int tope = TopeDeInvocaciones(quienInvoca);
+            int tope = TopeDeInvocaciones(quienInvoca, fight.RoundNumber);
             int puestas = CuantasLleva(fight, quienInvoca);
             if (tope > 0 && puestas >= tope)
             {
@@ -1858,7 +1878,7 @@ namespace Jondo.Unity.Launcher.Handlers
             invocado.CurrentHP = invocado.MaxHP;
 
             int vive = Managers.Invocaciones.RondasQueVive(plantilla);
-            invocado.MuereEnRonda = vive > 0 ? _round + vive : -1;
+            invocado.MuereEnRonda = vive > 0 ? fight.RoundNumber + vive : -1;
 
             // ¿Le toca turno? Sólo si su hechizo tiene algo que hacer al empezarlo. La Baliza de
             // Supervivencia lo tiene —se cura sola— y la Táctica no, que sólo reacciona a lo que
@@ -1954,7 +1974,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                                 Fighter quien, string disparador)
         {
             if (quien == null) return;
-            quien.Embrujos.BarrerEnganches(_round);
+            quien.Embrujos.BarrerEnganches(fight.RoundNumber);
 
             foreach (var enganche in new List<Jondo.Unity.World.Fights.Embrujos.Enganche>(quien.Embrujos.Enganches))
             {
@@ -2015,14 +2035,14 @@ namespace Jondo.Unity.Launcher.Handlers
         /// equipo y los embrujos. Para el jugador sale de la ficha; para un monstruo, de lo que
         /// traiga su plantilla.
         /// </summary>
-        private static int TopeDeInvocaciones(Fighter quien)
+        private static int TopeDeInvocaciones(Fighter quien, int ronda)
         {
             int suyo = quien.Otra(CaracteristicaDeInvocaciones);
             if (!quien.IsMonster)
             {
                 suyo += StatsHandler.GetEquipBonus(CaracteristicaDeInvocaciones);
             }
-            return Math.Max(0, suyo + quien.Embrujos.De(CaracteristicaDeInvocaciones, _round));
+            return Math.Max(0, suyo + quien.Embrujos.De(CaracteristicaDeInvocaciones, ronda));
         }
 
         /// <summary>Las que tiene ahora mismo en el tablero.</summary>
@@ -2103,7 +2123,7 @@ namespace Jondo.Unity.Launcher.Handlers
             try
             {
                 consecuencias = Managers.MotorDeEfectos.Resolver(fight, quienLanza, hechizo, grado,
-                                                                 objetivo, disparador, _round,
+                                                                 objetivo, disparador, fight.RoundNumber,
                                                                  hondo: 0,
                                                                  celdaApuntada: celdaApuntada,
                                                                  critico: critico);
@@ -2240,7 +2260,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jxw",
                     Network.FightProtocol.BuildFighterSheet(quien, new[] { (caracteristica, valor) })));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                    Network.FightProtocol.BuildSequenceEnd(NextAction(), quien,
+                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien,
                                                            Network.FightProtocol.SheetSequence)));
             }
         }
@@ -2287,7 +2307,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                               Managers.MotorDeEfectos.AlLanzar);
 
                     await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                        Network.FightProtocol.BuildSequenceEnd(NextAction(), quien.Id,
+                        Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
                                                                Network.FightProtocol.ActionSequence)));
                 }
 
@@ -2454,7 +2474,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Y lo que le hayan sumado a ESE hechizo por embrujo: el efecto 293, "+#3 de daños
             // básicos". Flecha Helada se lo pone a sí misma, así que la segunda vez que se lanza
             // pega más que la primera.
-            int deEmbrujo = caster.Embrujos.DelHechizo(spell, Jondo.Unity.World.Fights.SobreElHechizo.DanoBase, _round);
+            int deEmbrujo = caster.Embrujos.DelHechizo(spell, Jondo.Unity.World.Fights.SobreElHechizo.DanoBase, fight.RoundNumber);
             if (deEmbrujo != 0)
             {
                 baseDamage += deEmbrujo;
@@ -2465,8 +2485,8 @@ namespace Jondo.Unity.Launcher.Handlers
             // Los daños fijos van al FINAL, sin multiplicar por la característica ni por la
             // potencia: los generales de la característica 16 más los del elemento con el que se
             // pega (88 a 92), y si el golpe sale crítico, además los daños críticos (86).
-            int flat = ConBonos(caster, DanoFijoCaracteristica, caster.FlatDamage)
-                     + (critical ? ConBonos(caster, DanoCriticoCaracteristica, caster.CriticalDamage) : 0);
+            int flat = ConBonos(caster, DanoFijoCaracteristica, caster.FlatDamage, fight.RoundNumber)
+                     + (critical ? ConBonos(caster, DanoCriticoCaracteristica, caster.CriticalDamage, fight.RoundNumber) : 0);
 
             // Y la caída de la zona: el que está en el centro se lleva el golpe entero y a cada
             // casilla de distancia se le quita el tanto por ciento que diga el hechizo. Se aplica
@@ -2488,8 +2508,8 @@ namespace Jondo.Unity.Launcher.Handlers
             // pergaminos y el equipo —que ya venían en el Fighter—, más lo que pongan los hechizos
             // mientras dure el combate.
             int elementoDelPersonaje = ConBonos(caster, CaracteristicaDelElemento(element),
-                                                caster.GetStatForElement(element));
-            int potencia = ConBonos(caster, PotenciaCaracteristica, caster.Power);
+                                                caster.GetStatForElement(element), fight.RoundNumber);
+            int potencia = ConBonos(caster, PotenciaCaracteristica, caster.Power, fight.RoundNumber);
 
             int damage = Jondo.Unity.World.Fights.DamageCalculator.CalculateDamage(
                 baseDamage: baseDamage,
@@ -2503,7 +2523,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // Los MULTIPLICADORES de quien lo recibe: "daños sufridos x110%" es el efecto 1163, el
             // que pone Represalias. Van al final, sobre el daño ya calculado.
-            int multiplica = target.Embrujos.Multiplicador(DanoSufridoPorCiento, _round);
+            int multiplica = target.Embrujos.Multiplicador(DanoSufridoPorCiento, fight.RoundNumber);
             if (multiplica != 100)
             {
                 int antes = damage;
@@ -2527,7 +2547,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Se erosiona sobre el daño CALCULADO, no sobre el recortado: pegarle doscientos a uno
             // que tiene setenta de vida erosiona por doscientos.
             int porcientoDeErosion = target.Otra(Fighter.CaracteristicaDeErosion)
-                                   + target.Embrujos.De(Fighter.CaracteristicaDeErosion, _round);
+                                   + target.Embrujos.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
             int erosionado = target.Erosionar(damage, porcientoDeErosion);
             if (erosionado > 0)
             {
@@ -2642,7 +2662,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                                           Network.FightProtocol.Spent(monster.Id, steps),
                                                           Network.FightProtocol.PointsDetail)));
                     await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                        Network.FightProtocol.BuildSequenceEnd(NextAction(), monster.Id,
+                        Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
                                                                Network.FightProtocol.WalkSequence)));
                     best = CellDistance(monster.CellId, prey.CellId);
                 }
@@ -2691,7 +2711,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                           Managers.MotorDeEfectos.AlLanzar, prey.CellId);
 
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                    Network.FightProtocol.BuildSequenceEnd(NextAction(), monster.Id,
+                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
                                                            Network.FightProtocol.ActionSequence)));
             }
 
@@ -2907,7 +2927,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.BuildCharacteristics()));
 
             // Y de vuelta al mapa de donde se salió, que el de arena es de instancia.
-            long back = _roleplayMap != 0 ? _roleplayMap : fight.RoleplayMapId;
+            long back = Network.SessionContext.State.RoleplayMapId != 0
+                ? Network.SessionContext.State.RoleplayMapId
+                : fight.RoleplayMapId;
             LeaveFight();
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push("kml"));
@@ -3062,7 +3084,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jxc",
                 Network.FightProtocol.BuildCooldowns(ending.Id, RecargasDe(ending))));
             await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
-                Network.FightProtocol.BuildSequenceEnd(NextAction(), ending.Id,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), ending.Id,
                                                        Network.FightProtocol.TurnEndSequence)));
 
             // Si con éste se cierra la vuelta, empieza ronda nueva y hay que decirlo: el jxz es lo
@@ -3072,10 +3094,12 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (wasLast)
             {
-                _round++;
+                // La ronda la sube fight.NextTurn() al dar la vuelta al orden; aqui solo se
+                // anuncia. Antes se subia ademas un contador estatico aparte, y eran dos numeros
+                // distintos siguiendose el uno al otro.
                 await WriteFrameAsync(stream, ConnectionProtocol.Push("jxz",
-                    Network.FightProtocol.BuildRound(_round)));
-                Program.LogDebug($"[Combate] Empieza la ronda {_round}.");
+                    Network.FightProtocol.BuildRound(fight.RoundNumber)));
+                Program.LogDebug($"[Combate] Empieza la ronda {fight.RoundNumber}.");
             }
 
             await AskToConfirmAsync(stream, fight);

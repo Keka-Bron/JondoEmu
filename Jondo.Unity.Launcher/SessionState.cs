@@ -26,6 +26,16 @@ namespace Jondo.Unity.Launcher
 
         // Combat State
         public bool IsInFight { get; set; }
+
+        /// <summary>
+        /// De dónde salió este jugador al entrar en combate, para devolverlo ahí al acabar.
+        ///
+        /// Eran dos estáticos del manejador de combate, uno para todo el servidor: el segundo que
+        /// entrara a pelear pisaba el sitio del primero, y al terminar los dos aparecían donde
+        /// estaba el último.
+        /// </summary>
+        public long RoleplayMapId { get; set; }
+        public int RoleplayCellId { get; set; }
         public long CurrentFightMobId { get; set; }
 
         // Characteristics / Capital
