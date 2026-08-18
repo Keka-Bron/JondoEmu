@@ -3,9 +3,10 @@
 How Jondo supports several game clients at the same time without sharing one character's state
 with another.
 
-This document describes the session model introduced in August 2026. It covers the connection on
-the game protocol (port 5555), after the connection server has issued a ticket. Authentication and
-the wire format are described separately in `NOTAS_MIGRACION_AUTH.md` and `protocol.md`.
+This document describes the session model introduced in August 2026. It covers the launcher-to-game
+identity chain, the game protocol on port 5555 and the socket/session lifecycle after the connection
+server issues a ticket. The team UI is described in `launcher.md`; authentication and framing are
+described separately in `NOTAS_MIGRACION_AUTH.md` and `protocol.md`.
 
 ---
 
@@ -19,7 +20,7 @@ character:
 - level, experience, characteristics and kamas;
 - inventory and equipped items;
 - fight state;
-- temporary UI state such as an open zaap or wardrobe draft.
+- temporary UI state such as an open zaap, NPC shop or wardrobe draft.
 
 That model works while exactly one client is connected. With two clients, loading the second
 character replaces the first character's values. A packet later handled for the first socket then
@@ -45,7 +46,19 @@ the ticket store do not belong to one player and therefore stay static.
 
 ## 2. The types involved
 
-### 2.1 `SessionState`
+### 2.1 `ClientLaunchRegistry`
+
+File: `Jondo.Unity.Launcher/Network/ClientLaunchRegistry.cs`
+
+This is the launcher-process registry, not the map-session registry. Every Dofus process receives
+its own `InstanceId`, random hash, account id, launcher token and language. The local Zaap service
+validates the `(InstanceId, Hash)` pair and creates a random `gameSession` that still resolves to
+that exact launch. There is no process-wide "last account" lookup.
+
+It enforces at most eight active Dofus processes and refuses to launch the same account twice. The
+entry is removed when the child process exits. See `launcher.md` for the full UI and identity flow.
+
+### 2.2 `SessionState`
 
 File: `Jondo.Unity.Launcher/SessionState.cs`
 
@@ -59,15 +72,16 @@ It owns:
 - experience and characteristics;
 - fight flags;
 - inventory and equipped-item caches;
-- session-local dialog state for zaaps, chests, the haven-bag editor and wardrobe drafts.
+- session-local dialog state for zaaps, chests, NPC shops, the haven-bag editor and wardrobe drafts;
+- session-owned equipment, spell-choice and spell-bar caches.
 
 Inventory and equipment operations retain an instance lock. The lock now protects one character's
 collections instead of serialising unrelated clients around one global collection.
 
-The old `GameState.cs` and its static class no longer exist. All former accesses resolve the state
-from the current session.
+`GameState.cs` still exists as a compatibility facade for legacy handlers, but stores no player
+fields. Every property forwards to `SessionContext.State`.
 
-### 2.2 `GameSession`
+### 2.3 `GameSession`
 
 File: `Jondo.Unity.Launcher/Network/GameSession.cs`
 
@@ -95,7 +109,7 @@ and a loaded character. These checks keep invalid partial sessions out of map-le
 `GameSession.SendAsync(packet)` is the standard primitive for sending one framed packet to one
 specific client.
 
-### 2.3 `SessionContext`
+### 2.4 `SessionContext`
 
 The current handler surface predates `GameSession`: most methods accept a `NetworkStream` and a
 payload, not a session. Changing every handler and every packet builder signature in one step would
@@ -117,13 +131,15 @@ SessionContext.State.MapId
 SessionContext.Current.AccountId
 ```
 
-Access without a bound game session throws immediately. This is intentional: silently falling back
-to shared defaults would recreate the original bug.
+Startup code, catalogue loaders and tests may run without a client and use the socketless fallback
+session named `Suelta`. A real game connection must never use it. Both game entry paths create a
+`GameSession`, and the dispatcher explicitly pushes the stream-owning session again before every
+packet. It also rejects a `GameSession` whose `Stream` is not the stream passed to the dispatcher.
 
 New APIs may accept `GameSession` explicitly. Existing APIs can be migrated gradually because both
 forms address the same session object.
 
-### 2.4 `SessionRegistry`
+### 2.5 `SessionRegistry`
 
 File: `Jondo.Unity.Launcher/Network/SessionRegistry.cs`
 
@@ -136,6 +152,9 @@ session UUID  -> active GameSession
 
 Both use `System.Collections.Concurrent.ConcurrentDictionary`. Tickets remain single-use and expire
 after five minutes. Active sessions remain registered until their socket loop ends.
+
+Registration is independently capped at eight game sockets. This protects the server even if a
+client reaches port 5555 without having been started by the native launcher.
 
 The public active-session operations are:
 
@@ -153,17 +172,31 @@ network writes.
 
 ## 3. Session lifecycle
 
-Implemented in `Jondo.Unity.Launcher/Network/GameNodeProxy.cs`.
+Implemented jointly by `Jondo.Unity.Launcher/Network/GameServerProxy.cs` and
+`Jondo.Unity.Launcher/Network/GameNodeProxy.cs`.
 
 ### 3.1 Connection and registration
 
-When the game-node protocol starts on a socket:
+The real client reaches the game through port 5555. `GameServerProxy` first distinguishes the bare
+connection-server protocol from wrapped `type.ankama.com/...` game messages. When the second,
+game-phase TCP connection arrives, `HandleBoundGameSessionAsync`:
 
-1. `GameNodeProxy` creates `new GameSession(stream)`.
-2. It binds the session to `SessionContext` for the whole asynchronous loop.
-3. It registers the session in `SessionRegistry`.
-4. A `finally` block always removes it when the loop exits, including exceptions and invalid
-   packets.
+1. creates `new GameSession(stream)`;
+2. registers it in `SessionRegistry` and `GameNodeProxy.SesionesVivas`;
+3. binds it to `SessionContext`;
+4. passes both the session and its owning stream to the game dispatcher;
+5. saves, broadcasts departure and unregisters it from a `finally` block.
+
+The dedicated game-node listener on port 5556 performs the same creation, registration and cleanup
+before calling the shared dispatcher.
+
+Inside `HandleGameNodeSessionAsync`, every loop iteration pushes the explicit session again before
+examining that packet. This prevents a real socket from falling through to the shared socketless
+fallback. The session/stream pair is validated when the dispatcher starts.
+
+This detail fixed the most serious multi-client failure: port 5555 previously called the dispatcher
+without creating a `GameSession`. Both clients therefore used `Suelta`, and the last character
+loaded supplied the identity, appearance and map for packets arriving on either socket.
 
 Registration happens before authentication so the registry accurately represents open game
 connections. Unauthenticated sessions cannot enter `OnMap`, because they are not `IsInWorld`.
@@ -186,19 +219,18 @@ The selected character id is checked against the session's account before loadin
 inventory loading write into `SessionContext.State`, which is the selecting session's state.
 
 After the character exists and has loaded successfully, `session.EnterWorld()` marks it as a map
-participant. Before that point it cannot receive chat, movement or actor broadcasts.
+participant. Before that point it cannot receive movement or actor broadcasts selected by
+`SessionRegistry.OnMap`.
 
 ### 3.4 Leaving and disconnecting
 
-Returning to character selection and losing the connection both call the same departure path:
+Returning to character selection and losing the connection both perform the same departure work:
 
 1. capture the current map and character id;
-2. set `IsInWorld` to false;
-3. broadcast the actor-left packet to the remaining sessions on the old map;
-4. unregister the session when the connection itself ends.
-
-Marking the session out of the world before broadcasting prevents it from being selected as a
-recipient and prevents later concurrent map broadcasts from targeting a departing client.
+2. broadcast actor-left to the remaining sessions, explicitly excluding the departing UUID;
+3. set `IsInWorld` to false;
+4. save with that session explicitly pushed;
+5. unregister the session when the connection itself ends.
 
 ---
 
@@ -235,8 +267,10 @@ length A, length B, payload A, payload B
 Different sockets still write concurrently. Only writes to the same socket are ordered. The weak
 table does not keep a closed stream alive.
 
-All code paths using `NetworkMessage.WriteFrameAsync`, including `GameSession.SendAsync`, share the
-same protection.
+`WriteFrameAsync` accepts a bare protobuf envelope and adds the VarInt length prefix. Captured data
+that already contains its prefix uses `WriteRawFrameAsync`. Both APIs share the same per-stream
+gate, including `GameSession.SendAsync`. Direct `NetworkStream.WriteAsync` is forbidden for framed
+game traffic because it bypasses that protection.
 
 ---
 
@@ -260,14 +294,13 @@ It works as follows:
 5. unregister a target whose send fails.
 
 The optional exclusion matters for packets already sent directly to the moving client, such as an
-actor leaving its old map. Chat and movement confirmations include the sender because the client
-expects to receive its own authoritative event.
+actor leaving its old map. Movement confirmations include the sender because the client expects to
+receive its own authoritative event.
 
 ### Current map broadcasts
 
 | Event | Packet | Recipients |
 |---|---|---|
-| Normal chat | `kqp` | Every in-world session on the sender's map, including sender |
 | Current movement protocol | `jsj` | Every in-world session on the map, including mover |
 | Legacy movement protocol | `joo` | Every in-world session on the map, including mover |
 | Map transition | `jsd` actor-left | Other sessions on the old map; mover receives its direct transition sequence |
@@ -312,10 +345,12 @@ Use these rules:
 2. Put persistent character data in the database and its live copy in `SessionState`.
 3. Put connection-only state in `GameSession` or `SessionState`.
 4. Keep immutable catalogues and genuinely server-wide registries shared.
-5. Use `session.SendAsync` for a known recipient.
-6. Use `BroadcastToMapAsync` for an event visible to nearby players.
-7. Decide explicitly whether the sender belongs in the audience.
-8. Do not call `NetworkStream.WriteAsync` directly for a framed game packet.
+5. Bind the stream-owning `GameSession` before legacy code reads `GameState`.
+6. Use `session.SendAsync` for a known recipient.
+7. Use `BroadcastToMapAsync` for an event visible to nearby players.
+8. Decide explicitly whether the sender belongs in the audience.
+9. Do not call `NetworkStream.WriteAsync` directly for a framed game packet.
+10. Pass `GameSession` explicitly to background work that outlives a packet scope.
 
 ### What may remain static
 
@@ -336,13 +371,16 @@ an intentional broadcast or shared-world rule, it belongs to a session.
 
 The implementation guarantees:
 
+- at most eight active launcher processes and eight registered game sockets;
 - one `SessionState` instance per game connection;
+- a validated `GameSession` / `NetworkStream` pair at dispatcher entry;
+- explicit session rebinding before every incoming game packet;
 - atomic ticket consumption;
 - thread-safe active-session registration and snapshots;
 - ordered, non-interleaved frame writes per socket;
 - concurrent delivery across different sockets;
 - removal of failed or disconnected recipients;
-- no C# dependency on the former global `GameState`.
+- a compatibility `GameState` facade with no player storage of its own.
 
 It does not make every property update transactional. Each socket loop normally handles that
 session's client packets sequentially. Collection operations that can be observed by other work
@@ -356,11 +394,15 @@ Long-running background jobs must never assume that a session context still exis
 
 ## 8. Validation
 
-The refactor was checked by:
+`RegressionGuardTests` checks:
 
-- searching the C# tree for the former `GameState` dependency;
-- checking the Git diff for whitespace errors;
-- compiling `Jondo.Unity.Launcher` and its project references on .NET 10.
+- isolation of two launcher accounts through distinct Zaap game sessions;
+- rejection of a ninth launcher client;
+- separation of equipment, spell choices, spell bars and dialog state between two sessions;
+- non-overlapping concurrent raw and dynamically framed writes to one stream.
+
+The project is also checked with `git diff --check` and compiled with its project references on
+.NET 10.
 
 The build completed with zero errors. The remaining warnings were unrelated package-audit/network
 warnings, an existing redundant `System.Text.Json` package reference, and an existing unused local
@@ -373,3 +415,7 @@ A useful runtime regression test is to connect two accounts on the same map and 
 3. movement and normal chat appear on both clients;
 4. changing map removes the actor only from the old map;
 5. disconnecting one client removes its actor without affecting the other session.
+
+When diagnosing a map mismatch, the movement log includes the socket-session UUID, character id,
+character name and session map. Distinct clients must also show distinct
+`[Game Server] Socket bound to session ...` lines on port 5555.

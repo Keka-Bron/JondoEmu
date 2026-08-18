@@ -61,6 +61,13 @@ an account and character, and how targeted sends and map broadcasts stay frame-s
 *Go there* when adding a handler that reads player state, when sending an event to nearby players,
 or when debugging cross-account state leaks.
 
+**`launcher.md`** — Native launcher and teams of up to eight accounts.
+How profiles and selections are persisted, how one process is launched per selected account, how
+`InstanceId`, launch hash, Zaap `gameSession`, game token and single-use ticket preserve identity,
+and where the independent process and socket limits are enforced.
+*Go there* when changing the team UI, the launch arguments, account-token resolution or the path
+from a launcher row to its game socket.
+
 **`data.md`** — Where each number comes from.
 The **27** files in `datos/` (22 json, 4 bin and `world.zip`), the **31** tables in
 `bases/world.db`, and which of the **22** Python scripts in `tools/` builds each one. Most come out

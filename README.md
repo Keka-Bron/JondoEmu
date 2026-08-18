@@ -33,7 +33,7 @@ What JondoFix does:
 
 ### Step 3 — Run it
 
-Double-click **`Jondo Emulator Launcher.exe`**. On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Create your account in the launcher, press play, and start the Dofus client, or use the test account as follows:
+Double-click **`Jondo Emulator Launcher.exe`**. On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, select one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once. Create your account in the launcher or use the test account as follows:
 
 Account: keka
 Password: test
@@ -71,6 +71,9 @@ Some folders are **not** in the repository because they are not needed to play, 
 ### 🖥️ Custom Launcher
 - [x] **Native WinForms interface**, drawn from code, with its own theme, artwork and background music.
 - [x] **Account creation and login** from the launcher itself, written straight to `auth.db`.
+- [x] **Persistent team of up to eight accounts** — add profiles once, select any subset or all of them, and launch one independent Dofus process per selected account.
+- [x] **Per-client identity chain** — unique instance id, launch hash, Zaap game session, game token, single-use connection ticket and socket-owned game session.
+- [x] **Independent lifecycle indicators** — selected profiles, active client processes and connected game sockets are tracked separately; closing one client does not alter the others.
 - [x] **Embedded server log** so you can watch traffic and errors without a console window.
 - [x] **Single-file deployment** — the twelve dependency DLLs travel inside the executable; the folder stays clean.
 - [x] **Multilanguage**.
@@ -227,7 +230,6 @@ blocks rather than one spell at a time.
 
 ### ❌ Not implemented
 - [ ] Kolossium and PvP combat
-- [ ] Multiplayer Account System
 - [ ] AP/MP dodge rolls, shields, lock and tackle in melee
 - [ ] Professions
 - [ ] Achievements
@@ -247,7 +249,9 @@ blocks rather than one spell at a time.
     and monster AI.
 * **`JondoFix`** — the MelonLoader client mod, source plus the compiled `JondoFix.dll`.
 * **`docs/fight.md`** — how a fight is put together on the wire, opcode by opcode.
-* **`docs/multijugador.md`** — the plan for multi-session and multiplayer support.
+* **`docs/launcher.md`** — native team UI and the identity flow for up to eight client processes.
+* **`docs/sessions.md`** — socket-owned game sessions, per-player state and map broadcasts.
+* **`docs/multijugador.md`** — historical migration plan and remaining multiplayer work.
 
 The spell effect engine lives in `Jondo.Unity.Launcher/Managers`: `EfectosDeHechizo` reads the
 spell data, `MotorDeEfectos` turns it into things that happen to somebody, and `Invocaciones`
