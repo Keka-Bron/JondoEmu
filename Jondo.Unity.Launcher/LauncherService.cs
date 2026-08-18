@@ -58,8 +58,8 @@ namespace Jondo.Unity.Launcher
         // ─── Operations ─────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Validates an account's credentials, generates its game token and makes it the active
-        /// account, so that the HAAPI responses the client asks for return its data.
+        /// Validates an account's credentials and generates a launcher token. There is
+        /// deliberately no process-wide "active account".
         /// </summary>
         public static SignInResult SignIn(string username, string password, string clientIp)
         {
@@ -67,9 +67,9 @@ namespace Jondo.Unity.Launcher
             {
                 if (DatabaseManager.ValidateAccountCredentials(username, password, clientIp, out var account, out string error) && account != null)
                 {
-                    HaapiServer.ActiveAccount = account;
                     string token = Guid.NewGuid().ToString("N");
                     DatabaseManager.SetGameToken(account.Id, token);
+                    ClientLaunchRegistry.RegisterToken(account.Id, token);
 
                     return new SignInResult
                     {
@@ -109,16 +109,20 @@ namespace Jondo.Unity.Launcher
         /// <summary>
         /// Starts the Dofus client executable, pointing it at the local emulator.
         /// The token identifies the account that has just logged in; if it is not recognized we
-        /// fall back to the active account.
+        /// reject the launch instead of silently using another account.
         /// </summary>
         public static Result LaunchClient(string token)
         {
             try
             {
-                long accountId = DatabaseManager.GetAccountIdByToken(token ?? "");
+                long accountId = ClientLaunchRegistry.ResolveToken(token);
                 if (accountId <= 0)
                 {
-                    accountId = HaapiServer.ActiveAccount?.Id ?? 1;
+                    return new Result
+                    {
+                        Success = false,
+                        Message = "La session de ce compte a expiré. Reconnecte ce compte avant de lancer le jeu."
+                    };
                 }
 
                 string clientPath = ResolveClient();
@@ -131,7 +135,9 @@ namespace Jondo.Unity.Launcher
                     };
                 }
 
-                string hash = Guid.NewGuid().ToString();
+                string hash = Guid.NewGuid().ToString("N");
+                string language = UI.LauncherTexts.Code(UI.LauncherPreferences.Language);
+                var launch = ClientLaunchRegistry.Register(accountId, token ?? "", hash, language);
 
                 // Unity is told the size up front. Maximizing afterwards is not enough on its own:
                 // the client rebuilds its window when it moves between screens (server choice,
@@ -146,8 +152,8 @@ namespace Jondo.Unity.Launcher
                 string arguments =
                     $"-force-d3d11 -screen-fullscreen 0 -screen-width {area.Width} -screen-height {area.Height} " +
                     "--melonloader.hideconsole --melonloader.disablestartscreen " +
-                    $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId 1 --hash {hash} " +
-                    $"--canLogin true --langCode {UI.LauncherTexts.Code(UI.LauncherPreferences.Language)} " +
+                    $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId {launch.InstanceId} --hash {hash} " +
+                    $"--canLogin true --langCode {language} " +
                     "--autoConnectType 1 --connectionPort 5555";
 
                 var startInfo = new System.Diagnostics.ProcessStartInfo
@@ -162,11 +168,30 @@ namespace Jondo.Unity.Launcher
                 startInfo.Environment["ZAAP_HASH"] = hash;
                 startInfo.Environment["ZAAP_GAME"] = "dofus";
                 startInfo.Environment["ZAAP_RELEASE"] = "dofus3";
-                startInfo.Environment["ZAAP_INSTANCE_ID"] = "1";
+                startInfo.Environment["ZAAP_INSTANCE_ID"] = launch.InstanceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 startInfo.Environment["ZAAP_CAN_AUTH"] = "true";
 
-                var client = System.Diagnostics.Process.Start(startInfo);
-                if (client != null) MaximizeWhenReady(client);
+                System.Diagnostics.Process? client;
+                try
+                {
+                    client = System.Diagnostics.Process.Start(startInfo);
+                }
+                catch
+                {
+                    ClientLaunchRegistry.Remove(launch);
+                    throw;
+                }
+
+                if (client == null)
+                {
+                    ClientLaunchRegistry.Remove(launch);
+                    return new Result { Success = false, Message = "Le processus Dofus n'a pas pu démarrer." };
+                }
+
+                client.EnableRaisingEvents = true;
+                client.Exited += (s, e) => ClientLaunchRegistry.Remove(launch);
+                MaximizeWhenReady(client);
+                Console.WriteLine($"[Launcher] Client {launch.InstanceId} launched for account {accountId} (PID {client.Id}).");
                 return new Result { Success = true };
             }
             catch (Exception ex)

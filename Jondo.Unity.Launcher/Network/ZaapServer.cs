@@ -21,15 +21,22 @@ namespace Jondo.Unity.Launcher.Network
         public Task<string> connect(string gameName, string releaseName, int instanceId, string hash, CancellationToken cancellationToken = default)
         {
             Console.WriteLine($"[Thrift] connect(gameName: {gameName}, releaseName: {releaseName}, instanceId: {instanceId}, hash: {hash})");
-            return Task.FromResult(hash);
+            if (!ClientLaunchRegistry.TryConnect(instanceId, hash, out string gameSession))
+                throw new TApplicationException(TApplicationException.ExceptionType.InternalError,
+                                                "Unknown launcher instance or invalid launch hash");
+            return Task.FromResult(gameSession);
         }
 
         public Task<string> auth_getGameToken(string gameSession, int gameId, CancellationToken cancellationToken = default)
         {
             Console.WriteLine($"[Thrift] auth_getGameToken(gameSession: {gameSession}, gameId: {gameId})");
-            long accId = HaapiServer.ActiveAccount?.Id ?? 1;
+            if (!ClientLaunchRegistry.TryGetByGameSession(gameSession, out var launch) || launch == null)
+                throw new TApplicationException(TApplicationException.ExceptionType.InternalError,
+                                                "Unknown or expired game session");
+            long accId = launch.AccountId;
             string token = Guid.NewGuid().ToString("N");
             DatabaseManager.SetGameToken(accId, token);
+            ClientLaunchRegistry.RegisterToken(accId, token);
             return Task.FromResult(token);
         }
 
@@ -37,7 +44,8 @@ namespace Jondo.Unity.Launcher.Network
         {
             Console.WriteLine($"[Thrift] settings_get(gameSession: {gameSession}, key: {key})");
             if (key == "autoConnectType") return Task.FromResult("0");
-            if (key == "language") return Task.FromResult("es");
+            if (key == "language" && ClientLaunchRegistry.TryGetByGameSession(gameSession, out var launch) && launch != null)
+                return Task.FromResult(launch.Language);
             if (key == "connectionPort") return Task.FromResult("5555");
             throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "Setting not found");
         }
@@ -45,9 +53,16 @@ namespace Jondo.Unity.Launcher.Network
         public Task<string> userInfo_get(string gameSession, CancellationToken cancellationToken = default)
         {
             Console.WriteLine($"[Thrift] userInfo_get(gameSession: {gameSession})");
-            long accId = HaapiServer.ActiveAccount?.Id ?? 1;
-            string login = HaapiServer.ActiveAccount?.Login ?? "jondo@emulator.com";
-            string nick = HaapiServer.ActiveAccount?.Nickname ?? "Jondo";
+            if (!ClientLaunchRegistry.TryGetByGameSession(gameSession, out var launch) || launch == null)
+                throw new TApplicationException(TApplicationException.ExceptionType.InternalError,
+                                                "Unknown or expired game session");
+            long accId = launch.AccountId;
+            var account = DatabaseManager.GetAccountById(accId);
+            if (account == null)
+                throw new TApplicationException(TApplicationException.ExceptionType.InternalError,
+                                                "Account no longer exists");
+            string login = account.Login;
+            string nick = account.Nickname;
             string json = $"{{\"id\":{accId},\"type\":\"ANKAMA\",\"login\":\"{login}\",\"nickname\":\"{nick}\",\"firstname\":\"{nick}\",\"lastname\":\"User\",\"nicknameWithTag\":\"{nick}#2026\",\"tag\":\"2026\",\"security\":[\"SHIELD\"],\"addedDate\":\"2026-06-21T22:51:08+02:00\",\"locked\":\"0\",\"parentEmailStatus\":null,\"avatar\":\"https://avatar.ankama.com/users/{accId}.png\",\"isGuest\":false,\"isErrored\":false,\"needRefresh\":true,\"isMain\":true,\"active\":true,\"acceptedTermsVersion\":14,\"all\":{{\"CGU\":\"14\"}},\"gameList\":[{{\"isFreeToPlay\":false,\"isFormerSubscriber\":false,\"isSubscribed\":true,\"totalPlayTime\":4065,\"endOfSubscribe\":\"2035-01-01T00:00:00Z\",\"id\":1}}]}}";
             return Task.FromResult(json);
         }

@@ -41,12 +41,20 @@ namespace Jondo.Unity.Launcher.Handlers
     public static class NpcHandler
     {
         /// <summary>Qué NPC tiene la tienda abierta ahora mismo, o cero.</summary>
-        private static long _openShop;
+        private static long OpenShop
+        {
+            get => SessionContext.State.OpenNpcShopId;
+            set => SessionContext.State.OpenNpcShopId = value;
+        }
 
         /// <summary>Qué vendedor es, para saber si vende lo que el cliente pide.</summary>
-        private static int _openShopNpc;
+        private static int OpenShopNpc
+        {
+            get => SessionContext.State.OpenNpcShopNpcId;
+            set => SessionContext.State.OpenNpcShopNpcId = value;
+        }
 
-        public static bool IsShopOpen => _openShop != 0;
+        public static bool IsShopOpen => OpenShop != 0;
 
         /// <summary>
         /// Desde dónde se numeran los objetos comprados.
@@ -124,8 +132,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            _openShop = npc.ContextualId;
-            _openShopNpc = npc.NpcId;
+            OpenShop = npc.ContextualId;
+            OpenShopNpc = npc.NpcId;
 
             byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -219,7 +227,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (gid == 0 || quantity <= 0) return;
 
-            if (_openShop == 0)
+            if (OpenShop == 0)
             {
                 Console.WriteLine($"[NPC] Compra del objeto {gid} sin tienda abierta.");
                 return;
@@ -228,13 +236,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // Que el vendedor que está abierto lo tenga de verdad: el catálogo lo mandamos nosotros,
             // así que pedir otra cosa no es una compra válida.
             bool onSale = false;
-            foreach (int sold in NpcShops.CatalogueOf(_openShopNpc))
+            foreach (int sold in NpcShops.CatalogueOf(OpenShopNpc))
             {
                 if (sold == gid) { onSale = true; break; }
             }
             if (!onSale)
             {
-                Console.WriteLine($"[NPC] El vendedor {_openShopNpc} no vende el objeto {gid}.");
+                Console.WriteLine($"[NPC] El vendedor {OpenShopNpc} no vende el objeto {gid}.");
                 return;
             }
 
@@ -309,8 +317,8 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task CloseShopAsync(NetworkStream stream)
         {
-            _openShop = 0;
-            _openShopNpc = 0;
+            OpenShop = 0;
+            OpenShopNpc = 0;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("khd", ConnectionProtocol.BuildShopClosed()));
@@ -319,8 +327,8 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>Al cambiar de mapa no queda nada abierto.</summary>
         public static void Forget()
         {
-            _openShop = 0;
-            _openShopNpc = 0;
+            OpenShop = 0;
+            OpenShopNpc = 0;
         }
 
         private static long NextUid()

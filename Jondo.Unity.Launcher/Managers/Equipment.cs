@@ -73,16 +73,16 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>Slots that count as being worn.</summary>
         public const int LastWornSlot = 15;
 
-        private static readonly Dictionary<long, Item> _byUid = new Dictionary<long, Item>();
+        private static Dictionary<long, Item> Items => SessionContext.State.EquipmentItems;
 
-        public static int Count => _byUid.Count;
-        public static System.Collections.Generic.IEnumerable<Item> All => _byUid.Values;
+        public static int Count => Items.Count;
+        public static System.Collections.Generic.IEnumerable<Item> All => Items.Values;
         public static int Worn
         {
             get
             {
                 int n = 0;
-                foreach (var item in _byUid.Values) if (IsWorn(item.Position)) n++;
+                foreach (var item in Items.Values) if (IsWorn(item.Position)) n++;
                 return n;
             }
         }
@@ -99,7 +99,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// </summary>
         public static void LoadFrom(long characterId)
         {
-            _byUid.Clear();
+            Items.Clear();
             try
             {
                 using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
@@ -124,7 +124,7 @@ namespace Jondo.Unity.Launcher.Managers
 
                     if (!reader.IsDBNull(4)) ReadEffects(reader.GetString(4), item);
 
-                    if (item.Uid != 0) _byUid[item.Uid] = item;
+                    if (item.Uid != 0) Items[item.Uid] = item;
                 }
 
                 var doubled = RepairDoubledSlots();
@@ -134,7 +134,7 @@ namespace Jondo.Unity.Launcher.Managers
                                       "con otro; se han devuelto a la bolsa.");
                 }
 
-                Console.WriteLine($"[Equipment] {_byUid.Count} items from the database, {Worn} worn.");
+                Console.WriteLine($"[Equipment] {Items.Count} items from the database, {Worn} worn.");
             }
             catch (Exception ex)
             {
@@ -200,7 +200,7 @@ namespace Jondo.Unity.Launcher.Managers
         {
             if (ivx == null || ivx.Length == 0) return;
 
-            if (_byUid.Count > 0) return;   // la base de datos manda sobre la captura
+            if (Items.Count > 0) return;   // la base de datos manda sobre la captura
             var found = new Dictionary<long, Item>();
             foreach (var entry in ProtoMessage.Parse(ivx).Fields)
             {
@@ -220,10 +220,10 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             if (found.Count == 0) return;
-            _byUid.Clear();
-            foreach (var pair in found) _byUid[pair.Key] = pair.Value;
+            Items.Clear();
+            foreach (var pair in found) Items[pair.Key] = pair.Value;
 
-            Console.WriteLine($"[Equipment] {_byUid.Count} items read from the inventory, " +
+            Console.WriteLine($"[Equipment] {Items.Count} items read from the inventory, " +
                               $"{Worn} of them worn.");
         }
 
@@ -270,13 +270,13 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>Moves an item, and says whether we knew about it at all.</summary>
         public static bool Move(long uid, int position)
         {
-            if (!_byUid.TryGetValue(uid, out var item)) return false;
+            if (!Items.TryGetValue(uid, out var item)) return false;
             item.Position = position;
             return true;
         }
 
         /// <summary>El objeto con ese identificador, si lo tenemos.</summary>
-        public static Item? ByUid(long uid) => _byUid.TryGetValue(uid, out var item) ? item : null;
+        public static Item? ByUid(long uid) => Items.TryGetValue(uid, out var item) ? item : null;
 
         /// <summary>
         /// Quita del inventario en memoria lo que se ha ido a otro sitio —al cofre del merkasako,
@@ -284,16 +284,16 @@ namespace Jondo.Unity.Launcher.Managers
         /// </summary>
         public static void Remove(long uid, int quantity)
         {
-            if (!_byUid.TryGetValue(uid, out var item)) return;
+            if (!Items.TryGetValue(uid, out var item)) return;
 
-            if (quantity <= 0 || quantity >= item.Quantity) _byUid.Remove(uid);
+            if (quantity <= 0 || quantity >= item.Quantity) Items.Remove(uid);
             else item.Quantity -= quantity;
         }
 
         /// <summary>Mete en el inventario en memoria algo que viene de fuera.</summary>
         public static Item Add(long uid, int template, int quantity, int position, string? effects)
         {
-            if (_byUid.TryGetValue(uid, out var existing))
+            if (Items.TryGetValue(uid, out var existing))
             {
                 existing.Quantity += Math.Max(1, quantity);
                 return existing;
@@ -308,7 +308,7 @@ namespace Jondo.Unity.Launcher.Managers
             };
             if (!string.IsNullOrEmpty(effects)) ReadEffects(effects, item);
 
-            _byUid[uid] = item;
+            Items[uid] = item;
             return item;
         }
 
@@ -328,7 +328,7 @@ namespace Jondo.Unity.Launcher.Managers
             var busy = new List<Item>();
             if (!IsWorn(position)) return busy;
 
-            foreach (var item in _byUid.Values)
+            foreach (var item in Items.Values)
             {
                 if (item.Position == position && item.Uid != exceptUid) busy.Add(item);
             }
@@ -348,7 +348,7 @@ namespace Jondo.Unity.Launcher.Managers
             var moved = new List<Item>();
             var taken = new HashSet<int>();
 
-            foreach (var item in _byUid.Values)
+            foreach (var item in Items.Values)
             {
                 if (!IsWorn(item.Position)) continue;
                 if (taken.Add(item.Position)) continue;
@@ -375,7 +375,7 @@ namespace Jondo.Unity.Launcher.Managers
             var total = new Dictionary<int, long>();
             var wornTemplates = new List<int>();
 
-            foreach (var item in _byUid.Values)
+            foreach (var item in Items.Values)
             {
                 if (!IsWorn(item.Position)) continue;
                 wornTemplates.Add(item.Template);

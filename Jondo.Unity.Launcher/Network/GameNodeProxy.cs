@@ -16,11 +16,6 @@ namespace Jondo.Unity.Launcher.Network
         private static TcpListener? _tcpListener;
         private static bool _isRunning;
 
-        /// <summary>
-        /// La cuenta de la sesión, apuntada aparte porque el bloque del mapa se manda desde un
-        /// método que no ve las variables locales del bucle y necesita la cuenta para el actor.
-        /// </summary>
-        private static long _sessionAccountId;
         private static CancellationTokenSource? _cts;
 
         /// <summary>
@@ -89,6 +84,11 @@ namespace Jondo.Unity.Launcher.Network
                     // dentro: todo lo que se espere desde este punto ve la misma sesión sin que
                     // haya que pasarla a mano por doscientas firmas.
                     var sesion = new GameSession(stream);
+                    if (!SessionRegistry.Register(sesion))
+                    {
+                        Console.WriteLine("[Game Node] Rejected connection: the 8-client limit is reached.");
+                        return;
+                    }
                     SesionesVivas[sesion.Id] = sesion;
 
                     try
@@ -99,11 +99,24 @@ namespace Jondo.Unity.Launcher.Network
                             if (payload == null) return;
 
                             string payloadStr = Encoding.UTF8.GetString(payload);
-                            await HandleGameNodeSessionAsync(stream, payload, payloadStr);
+                            await HandleGameNodeSessionAsync(sesion, stream, payload, payloadStr);
                         }
                     }
                     finally
                     {
+                        if (sesion.IsInWorld)
+                        {
+                            try
+                            {
+                                await SessionRegistry.BroadcastToMapAsync(
+                                    sesion.MapId,
+                                    ConnectionProtocol.BuildActorLeft(sesion.CharacterId),
+                                    sesion.Id);
+                            }
+                            catch { }
+                            sesion.LeaveWorld();
+                        }
+
                         // Guardar al cerrar, que no se hacía en ninguna parte: hasta ahora el
                         // personaje sólo se escribía cuando algo lo provocaba de paso, así que
                         // cerrar el cliente sin más perdía la última posición y los kamas.
@@ -122,6 +135,7 @@ namespace Jondo.Unity.Launcher.Network
                         }
 
                         SesionesVivas.TryRemove(sesion.Id, out _);
+                        SessionRegistry.Unregister(sesion);
                         Console.WriteLine($"[Game Node] Session {sesion.Id} closed; " +
                                           $"{SesionesVivas.Count} still connected.");
                     }
@@ -133,8 +147,12 @@ namespace Jondo.Unity.Launcher.Network
             }
         }
 
-        public static async Task HandleGameNodeSessionAsync(NetworkStream stream, byte[] firstPayload, string firstPayloadStr)
+        public static async Task HandleGameNodeSessionAsync(GameSession session, NetworkStream stream,
+                                                            byte[] firstPayload, string firstPayloadStr)
         {
+            if (!ReferenceEquals(session.Stream, stream))
+                throw new InvalidOperationException("The game stream does not belong to this session.");
+
             byte[] payload = firstPayload;
             string payloadStr = firstPayloadStr;
             bool isAuthenticated = false;
@@ -149,19 +167,22 @@ namespace Jondo.Unity.Launcher.Network
             long sessionAccountId = 0;
             int sessionServerId = 0;
 
-            // El bloque del mapa se manda desde un sitio que no ve las variables de arriba, y
-            // necesita la cuenta para el actor. Se apunta aquí al resolverse el ticket.
-            _sessionAccountId = 0;
-
             if (payloadStr.Contains("type.ankama.com/lqu") || payloadStr.Contains("type.ankama.com/hoy") || payloadStr.Contains("type.ankama.com/hmt") || payloadStr.Contains("type.ankama.com/knx"))
             {
                 byte[] hoyFrame = NetworkEnvelope.ConvertHexStringToByteArray("1D-1A-1B-0A-19-0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-68-6F-79-12-04-08-1E-10-01");
-                await stream.WriteAsync(hoyFrame, 0, hoyFrame.Length);
+                await Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, hoyFrame);
                 Console.WriteLine("[Game Node 3.6.10.10] Sent Game Server Hello (hoy)");
             }
 
             while (_isRunning)
             {
+                // Never trust a context inherited across the lifetime of a connection here.
+                // Several connections execute this loop concurrently, and every packet must be
+                // rebound from the GameSession that OWNS this exact NetworkStream before any
+                // GameState/SessionContext facade is read. This is deliberately repeated for
+                // every packet rather than relying on the outer connection scope.
+                using var packetSession = SessionContext.Push(session);
+
                 GameServerProxy.LogTraffic("GAME_C->S", payload, payload.Length);
 
                 if (payloadStr.Contains("type.ankama.com/kqz"))
@@ -172,7 +193,6 @@ namespace Jondo.Unity.Launcher.Network
                     isAuthenticated = true;
                     if (HandleTicketPresentation(payload, ref sessionAccountId, ref sessionServerId))
                     {
-                        _sessionAccountId = sessionAccountId;
                         var characters = DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId);
                         foreach (byte[] frame in ConnectionProtocol.BuildWelcomeBurst(characters))
                         {
@@ -204,6 +224,14 @@ namespace Jondo.Unity.Launcher.Network
                     // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
                     // el de arena es de instancia y quedarse ahí es quedarse encerrado.
                     FightHandler.LeaveFight();
+                    if (SessionContext.Current.IsInWorld)
+                    {
+                        await SessionRegistry.BroadcastToMapAsync(
+                            SessionContext.State.MapId,
+                            ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId),
+                            SessionContext.Current.Id);
+                        SessionContext.Current.LeaveWorld();
+                    }
                     hasSentMapBlock = false;
                     Console.WriteLine("[Game Node] Client is going back: sent kqr and released the session.");
                 }
@@ -263,6 +291,14 @@ namespace Jondo.Unity.Launcher.Network
                     hasSentMapBlock = false;
                     Managers.Equipment.LoadFrom(chosen.Id);
                     Managers.SpellChoices.LoadFrom(chosen.Id);
+
+                    SessionContext.Current.EnterWorld();
+                    await SessionRegistry.BroadcastToMapAsync(
+                        SessionContext.State.MapId,
+                        ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
+                            chosen, SessionContext.State.CellId, SessionContext.State.Orientation,
+                            SessionContext.Current.AccountId)),
+                        SessionContext.Current.Id);
 
                     await WorldEntry.SendAfterCharacterAsync(stream, chosen);
 
@@ -832,7 +868,7 @@ namespace Jondo.Unity.Launcher.Network
 
             // Y lo que uno tiene de adorno, que el servidor real manda una sola vez, aquí: los
             // títulos y ornamentos disponibles, y cuál lleva puesto.
-            await WardrobeHandler.SendOwnedAsync(stream, _sessionAccountId);
+            await WardrobeHandler.SendOwnedAsync(stream, SessionContext.Current.AccountId);
             return true;
         }
 
@@ -946,6 +982,7 @@ namespace Jondo.Unity.Launcher.Network
 
                 accountId = session.AccountId;
                 serverId = session.ServerId;
+                SessionContext.Current.BindAccount(accountId, serverId);
                 return true;
             }
             catch (Exception ex)

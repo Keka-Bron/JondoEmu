@@ -87,7 +87,7 @@ namespace Jondo.Unity.Launcher.Network
                         // Game phase. It starts with kqz (the ticket) and carries on with
                         // character selection and world entry over this same connection.
                         Console.WriteLine("[+] Detected Game Node protocol on port 5555!");
-                        await GameNodeProxy.HandleGameNodeSessionAsync(clientStream, firstPayload, firstPayloadStr);
+                        await HandleBoundGameSessionAsync(clientStream, firstPayload, firstPayloadStr);
                     }
                     else
                     {
@@ -99,6 +99,68 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     Console.WriteLine($"[-] Game TCP Connection Closed: {e.Message}");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Port 5555 is the route used by the real client for the game phase. It must create the
+        /// same socket-owned GameSession as the dedicated GameNode listener. Previously it called
+        /// the dispatcher directly, without a GameSession or SessionContext.Push; consequently
+        /// every client fell back to SessionContext's single shared "Suelta" state. The last
+        /// character loaded then became the identity/map/look seen while processing every socket.
+        /// </summary>
+        private static async Task HandleBoundGameSessionAsync(NetworkStream stream,
+                                                              byte[] firstPayload,
+                                                              string firstPayloadStr)
+        {
+            var session = new GameSession(stream);
+            if (!SessionRegistry.Register(session))
+            {
+                Console.WriteLine("[Game Server] Rejected game connection: the 8-client limit is reached.");
+                return;
+            }
+
+            GameNodeProxy.SesionesVivas[session.Id] = session;
+            Console.WriteLine($"[Game Server] Socket bound to session {session.Id}.");
+
+            try
+            {
+                using (SessionContext.Push(session))
+                {
+                    await GameNodeProxy.HandleGameNodeSessionAsync(
+                        session, stream, firstPayload, firstPayloadStr);
+                }
+            }
+            finally
+            {
+                if (session.IsInWorld)
+                {
+                    try
+                    {
+                        await SessionRegistry.BroadcastToMapAsync(
+                            session.MapId,
+                            ConnectionProtocol.BuildActorLeft(session.CharacterId),
+                            session.Id);
+                    }
+                    catch { }
+                    session.LeaveWorld();
+                }
+
+                if (session.State.CharacterId > 0)
+                {
+                    try
+                    {
+                        using (SessionContext.Push(session)) DatabaseManager.SaveCurrentCharacter();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Game Server] Could not save session {session.Id}: {ex.Message}");
+                    }
+                }
+
+                GameNodeProxy.SesionesVivas.TryRemove(session.Id, out _);
+                SessionRegistry.Unregister(session);
+                Console.WriteLine($"[Game Server] Session {session.Id} released.");
             }
         }
 
@@ -193,7 +255,7 @@ namespace Jondo.Unity.Launcher.Network
         {
             if (!string.IsNullOrWhiteSpace(token))
             {
-                long byToken = DatabaseManager.GetAccountIdByToken(token);
+                long byToken = ClientLaunchRegistry.ResolveToken(token);
                 if (byToken > 0)
                 {
                     Console.WriteLine($"[Connection Server] Token recognized: account {byToken}.");
@@ -202,14 +264,8 @@ namespace Jondo.Unity.Launcher.Network
                 Console.WriteLine("[Connection Server] The presented token does not match any account.");
             }
 
-            // Fallback: the account that just logged in on the launcher. Useful when the client
-            // starts up without going through token issuance.
-            long active = HaapiServer.ActiveAccount?.Id ?? 0;
-            if (active > 0)
-            {
-                Console.WriteLine($"[Connection Server] Falling back to the launcher's active account: {active}.");
-            }
-            return active;
+            // Never fall back to another launcher's account: an unidentified socket is rejected.
+            return 0;
         }
 
         /// <summary>
@@ -219,7 +275,7 @@ namespace Jondo.Unity.Launcher.Network
         private static byte[] BuildAuthenticationAccepted(long accountId, string lang)
         {
             var account = DatabaseManager.GetAccountById(accountId);
-            string nickname = account?.Nickname ?? HaapiServer.ActiveAccount?.Nickname ?? "Jondo";
+            string nickname = account?.Nickname ?? "Jondo";
 
             var servers = DatabaseManager.GetServers();
             var characters = DatabaseManager.GetCharactersByAccountId(accountId);

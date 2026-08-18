@@ -627,7 +627,7 @@ namespace Jondo.Unity.Launcher.Network
             Array.Copy(prefix, 0, frame, 0, prefix.Length);
             Array.Copy(message, 0, frame, prefix.Length, message.Length);
 
-            await stream.WriteAsync(frame, 0, frame.Length);
+            await Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, frame);
             GameServerProxy.LogTraffic("S->C", frame, frame.Length);
         }
 

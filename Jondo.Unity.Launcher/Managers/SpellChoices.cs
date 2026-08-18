@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
+using Jondo.Unity.Launcher.Network;
 
 namespace Jondo.Unity.Launcher.Managers
 {
@@ -15,21 +16,19 @@ namespace Jondo.Unity.Launcher.Managers
     public static class SpellChoices
     {
         /// <summary>pareja -> hechizo elegido.</summary>
-        private static readonly Dictionary<int, int> _chosen = new Dictionary<int, int>();
+        private static Dictionary<int, int> ChosenStore => SessionContext.State.ChosenSpells;
 
         /// <summary>hueco de la barra -> hechizo.</summary>
-        private static readonly Dictionary<int, int> _bar = new Dictionary<int, int>();
+        private static Dictionary<int, int> BarStore => SessionContext.State.SpellBar;
 
-        private static long _characterId;
-
-        public static IReadOnlyDictionary<int, int> Chosen => _chosen;
-        public static IReadOnlyDictionary<int, int> Bar => _bar;
+        public static IReadOnlyDictionary<int, int> Chosen => ChosenStore;
+        public static IReadOnlyDictionary<int, int> Bar => BarStore;
 
         public static void LoadFrom(long characterId)
         {
-            _characterId = characterId;
-            _chosen.Clear();
-            _bar.Clear();
+            SessionContext.State.SpellChoicesCharacterId = characterId;
+            ChosenStore.Clear();
+            BarStore.Clear();
 
             try
             {
@@ -41,7 +40,7 @@ namespace Jondo.Unity.Launcher.Managers
                 picks.Parameters.AddWithValue("$id", characterId);
                 using (var reader = picks.ExecuteReader())
                 {
-                    while (reader.Read()) _chosen[reader.GetInt32(0)] = reader.GetInt32(1);
+                    while (reader.Read()) ChosenStore[reader.GetInt32(0)] = reader.GetInt32(1);
                 }
 
                 var bar = connection.CreateCommand();
@@ -49,11 +48,11 @@ namespace Jondo.Unity.Launcher.Managers
                 bar.Parameters.AddWithValue("$id", characterId);
                 using (var reader = bar.ExecuteReader())
                 {
-                    while (reader.Read()) _bar[reader.GetInt32(0)] = reader.GetInt32(1);
+                    while (reader.Read()) BarStore[reader.GetInt32(0)] = reader.GetInt32(1);
                 }
 
-                Console.WriteLine($"[SpellChoices] {_chosen.Count} variantes elegidas y " +
-                                  $"{_bar.Count} huecos de barra guardados.");
+                Console.WriteLine($"[SpellChoices] {ChosenStore.Count} variantes elegidas y " +
+                                  $"{BarStore.Count} huecos de barra guardados.");
             }
             catch (Exception ex)
             {
@@ -70,7 +69,7 @@ namespace Jondo.Unity.Launcher.Managers
             var pair = SpellTable.PairOf(spellId);
             if (pair == null) return false;
 
-            _chosen[pair.Id] = spellId;
+            ChosenStore[pair.Id] = spellId;
             Write("INSERT INTO CharacterSpellChoices (CharacterId, PairId, SpellId) VALUES ($c, $p, $s) " +
                   "ON CONFLICT(CharacterId, PairId) DO UPDATE SET SpellId = $s;",
                   ("$p", pair.Id), ("$s", spellId));
@@ -81,7 +80,7 @@ namespace Jondo.Unity.Launcher.Managers
         public static List<int> SlotsHolding(int spellId)
         {
             var slots = new List<int>();
-            foreach (var pair in _bar)
+            foreach (var pair in BarStore)
             {
                 if (pair.Value == spellId) slots.Add(pair.Key);
             }
@@ -94,13 +93,13 @@ namespace Jondo.Unity.Launcher.Managers
         {
             if (spellId == 0)
             {
-                _bar.Remove(slot);
+                BarStore.Remove(slot);
                 Write("DELETE FROM CharacterSpellBar WHERE CharacterId = $c AND Slot = $t;",
                       ("$t", slot));
                 return;
             }
 
-            _bar[slot] = spellId;
+            BarStore[slot] = spellId;
             Write("INSERT INTO CharacterSpellBar (CharacterId, Slot, SpellId) VALUES ($c, $t, $s) " +
                   "ON CONFLICT(CharacterId, Slot) DO UPDATE SET SpellId = $s;",
                   ("$t", slot), ("$s", spellId));
@@ -113,20 +112,21 @@ namespace Jondo.Unity.Launcher.Managers
         /// </summary>
         public static void RememberBar(IEnumerable<(int Slot, int SpellId)> slots)
         {
-            if (_bar.Count > 0) return;
+            if (BarStore.Count > 0) return;
             foreach (var (slot, spellId) in slots) PutInBar(slot, spellId);
         }
 
         private static void Write(string sql, params (string Name, object Value)[] parameters)
         {
-            if (_characterId == 0) return;
+            long characterId = SessionContext.State.SpellChoicesCharacterId;
+            if (characterId == 0) return;
             try
             {
                 using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = sql;
-                command.Parameters.AddWithValue("$c", _characterId);
+                command.Parameters.AddWithValue("$c", characterId);
                 foreach (var (name, value) in parameters) command.Parameters.AddWithValue(name, value);
                 command.ExecuteNonQuery();
             }

@@ -679,6 +679,17 @@ namespace Jondo.Unity.Launcher.Network
 
             jss.Msg(5, PlayerActor(character, cell, facing, accountId));
 
+            // Other connected players already standing on this map. Each client keeps its own
+            // socket and state; only immutable snapshots are read while building this response.
+            foreach (var other in SessionRegistry.OnMap(mapId))
+            {
+                if (other.CharacterId <= 0 || other.CharacterId == character.Id) continue;
+                var otherCharacter = DatabaseManager.GetCharacterById(other.CharacterId);
+                if (otherCharacter == null) continue;
+                jss.Msg(5, PlayerActor(otherCharacter, other.State.CellId,
+                                      other.State.Orientation, other.AccountId));
+            }
+
             // The monster groups already placed by the spawner.
             //
             // The shape is not the obvious one, and getting it wrong is what kept the map empty.
@@ -1126,6 +1137,11 @@ namespace Jondo.Unity.Launcher.Network
                         character.Breed, character.Sex, character.HeadId, null, character.Id)))
                 .Var(3, character.Id);
         }
+
+        /// <summary>Serialized actor block used by map snapshots outside this protocol builder.</summary>
+        public static byte[] BuildPlayerActorBlock(DatabaseManager.DbCharacter character, int cell,
+                                                   int facing, long accountId)
+            => PlayerActor(character, cell, facing, accountId).Build();
 
         /// <summary>
         /// "Este actor ha cambiado" (jsn), que es lo que redibuja al personaje en el mapa.

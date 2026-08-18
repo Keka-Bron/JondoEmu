@@ -102,7 +102,10 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 // The client believes it is on another map. Trusting it here would let a stray
                 // message move the character anywhere, so it is only logged.
-                Console.WriteLine($"[Move] jrw says map {mapId} and the session says {Jondo.Unity.Launcher.Network.SessionContext.State.MapId}. Ignored.");
+                var current = SessionContext.Current;
+                Console.WriteLine($"[Move] jrw says map {mapId} but socket-session {current.Id} " +
+                                  $"is {current.State.CharacterName} ({current.CharacterId}) on " +
+                                  $"{current.State.MapId}. Ignored.");
                 return nothing;
             }
 
