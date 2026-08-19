@@ -16,7 +16,7 @@ namespace Jondo.Unity.Launcher.Handlers
     ///   C  jqi {}                             it reached the edge and wants out
     ///   S  jsq {}                             go ahead      <- on root field 3, not 1
     ///   C  jqk { f2: the map it wants }
-    ///   S  jsd { f2: who }                    take it off the old map
+    ///   S  jsd { f2: who, f3: por donde }    take it off the old map
     ///   S  jru { f2: the map }                load this one
     ///   S  lqu, lqn, hjk
     ///   C  kmv, jrh                           the map is loaded, who is on it
@@ -208,7 +208,8 @@ namespace Jondo.Unity.Launcher.Handlers
             byte[] actorLeft = ConnectionProtocol.BuildActorLeft(
                 Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             await SessionContext.Current.SendAsync(actorLeft);
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId,
+                Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

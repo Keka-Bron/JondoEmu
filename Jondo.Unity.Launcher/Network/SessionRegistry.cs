@@ -112,7 +112,8 @@ namespace Jondo.Unity.Launcher.Network
         /// entera por otro lado.
         /// </summary>
         public static async Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien,
-                                                                            long mapaQueDeja)
+                                                                            long mapaQueDeja,
+                                                                            int? porDonde = null)
         {
             if (quien == null || !quien.IsInWorld || quien.CharacterId <= 0) return (0, 0);
 
@@ -120,7 +121,7 @@ namespace Jondo.Unity.Launcher.Network
             if (mapaQueDeja > 0 && mapaQueDeja != quien.MapId)
             {
                 seVa = await BroadcastToMapAsync(mapaQueDeja,
-                    ConnectionProtocol.BuildActorLeft(quien.CharacterId), quien.Id);
+                    ConnectionProtocol.BuildActorLeft(quien.CharacterId, porDonde), quien.Id);
             }
 
             var ficha = DatabaseManager.GetCharacterById(quien.CharacterId);

@@ -74,7 +74,20 @@ namespace Jondo.Unity.Launcher.Handlers
                         // a mano, y era la única de las cuatro que los daba: el zaap, el borde y
                         // el .teleport se quedaron sin ellos y sólo se notaba jugando de dos en dos.
                         // Va detrás del joh para que el que llega esté ya contado en el mapa nuevo.
-                        await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId);
+                        //
+                        // La dirección que viaja en el jsd es la CARDINAL de las capturas —0
+                        // derecha, 2 abajo, 4 izquierda, 6 arriba—, no el newOrientation de aquí
+                        // arriba, que usa las impares (1/5/3/7). Las cuatro medidas están en la
+                        // cabecera de WorldMoveHandler, sacadas de las capturas de Movimiento.
+                        int haciaDonde = direction switch
+                        {
+                            "Right" => 0,
+                            "Down" => 2,
+                            "Left" => 4,
+                            "Up" => 6,
+                            _ => 0,
+                        };
+                        await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId, haciaDonde);
 
                         LogDebug($"[Map Change] Sent native joh (CurrentMapMessage) for Map ID: {requestedMapId}");
                     }

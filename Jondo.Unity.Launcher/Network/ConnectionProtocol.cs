@@ -1470,9 +1470,30 @@ namespace Jondo.Unity.Launcher.Network
 
         // ─── World: changing map ────────────────────────────────────────────────
 
-        /// <summary>Takes an actor off the map (jsd). Its own move to another map counts.</summary>
-        public static byte[] BuildActorLeft(long contextualId)
-            => Push("jsd", Pb.New().Var(2, contextualId).Build());
+        /// <summary>
+        /// Saca a un actor del mapa (jsd): quién se va y POR DÓNDE.
+        ///
+        /// El por dónde faltaba, y es lo que dejaba al personaje plantado en el borde en la
+        /// pantalla de los demás en vez de desaparecer. Le llegaba el aviso —está medido en el
+        /// registro del servidor— y el cliente no hacía nada con él.
+        ///
+        /// La captura de un grupo siguiendo al líder por mapas cercanos lo enseña claro, con
+        /// veinticinco de estos: el campo 3 sólo vale 2, 4 ó 6, que son las direcciones
+        /// cardinales de Dofus (0 derecha, 2 abajo, 4 izquierda, 6 arriba). El cliente saca al
+        /// muñeco andando hacia ese lado y entonces lo borra.
+        ///
+        ///   10 a282f0a6c408 18 06     quién, y se fue por arriba
+        ///   10 a282f0a6c408           quién, y ya está
+        ///
+        /// Los que van sin dirección son las salidas que no tienen ninguna: por el zaap uno no se
+        /// va hacia ningún lado, desaparece. Por eso es opcional.
+        /// </summary>
+        public static byte[] BuildActorLeft(long contextualId, int? porDonde = null)
+        {
+            var pb = Pb.New().Var(2, contextualId);
+            if (porDonde.HasValue) pb.Var(3, porDonde.Value);
+            return Push("jsd", pb.Build());
+        }
 
         /// <summary>"Load this map" (jru).</summary>
         public static byte[] BuildLoadMap(long mapId)
