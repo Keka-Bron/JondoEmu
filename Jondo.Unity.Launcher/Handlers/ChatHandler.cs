@@ -36,7 +36,20 @@ namespace Jondo.Unity.Launcher.Handlers
                 Console.WriteLine($"[Chat] {GameState.CharacterName}: {msgText}");
                 byte[] echoPacket = BuildChatBroadcastPacket(msgText, GameState.CharacterName, channel: 0);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, echoPacket);
-                Console.WriteLine("[Chat] Echoed chat message back to client.");
+
+                // Y a los demás, que de eso va un chat.
+                //
+                // Esto sólo se hacía eco: el mensaje volvía a quien lo escribía y ahí se acababa,
+                // así que dos jugadores en el mismo mapa hablaban cada uno con su propia pantalla.
+                // Se llamaba «broadcast» sin serlo, de cuando el servidor atendía a uno solo.
+                //
+                // El canal general de Dofus es el del MAPA: lo oye quien está delante, no el
+                // servidor entero. El paquete es el mismo para todos —lleva dentro el id y el
+                // nombre de quien habla—, así que se manda tal cual.
+                int oidos = await SessionRegistry.BroadcastToMapAsync(
+                    SessionContext.State.MapId, echoPacket, SessionContext.Current.Id);
+                Console.WriteLine($"[Chat] Repartido a {oidos} jugador(es) más en el mapa " +
+                                  $"{SessionContext.State.MapId}.");
             }
         }
 

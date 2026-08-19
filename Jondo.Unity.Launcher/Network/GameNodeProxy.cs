@@ -431,11 +431,25 @@ namespace Jondo.Unity.Launcher.Network
 
                         if (text.Length > 0 && !consumed)
                         {
-                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                                ConnectionProtocol.Push("kti",
-                                    ConnectionProtocol.BuildChatLine(GameState.CharacterName,
-                                        GameState.CharacterId, sessionAccountId, text, channel)));
-                            Console.WriteLine($"[Chat] channel {channel}: {text}");
+                            byte[] linea = ConnectionProtocol.Push("kti",
+                                ConnectionProtocol.BuildChatLine(GameState.CharacterName,
+                                    GameState.CharacterId, sessionAccountId, text, channel));
+                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, linea);
+
+                            // Y a los demás. Aquí se acababa: la línea volvía a quien la escribía y
+                            // nadie más la veía nunca, que con un solo jugador no se notaba.
+                            //
+                            // El canal general es el del MAPA, no el del servidor: lo oye quien
+                            // está delante. La línea es la misma para todos —lleva dentro el
+                            // nombre y el id de quien habla—, así que se reparte tal cual. Los
+                            // demás canales (comercio, reclutamiento) son de servidor entero y
+                            // todavía no se reparten.
+                            int oidos = channel == 0
+                                ? await SessionRegistry.BroadcastToMapAsync(
+                                      SessionContext.State.MapId, linea, SessionContext.Current.Id)
+                                : 0;
+                            Console.WriteLine($"[Chat] channel {channel}: {text}" +
+                                              (oidos > 0 ? $"   (oído por {oidos} más)" : ""));
                         }
                     }
                 }
