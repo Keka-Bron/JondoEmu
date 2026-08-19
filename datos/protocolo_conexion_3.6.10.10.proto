@@ -1,0 +1,365 @@
+syntax = "proto3";
+
+// Reconstruido de las clases del propio cliente por Jondo.Unity.ProtocolBuilder.
+// Origen: Ankama.Dofus.Protocol.Connection.dll
+//
+// Los nombres van rotados por Ankama; los números y los tipos son los de verdad.
+
+enum mhf {
+  fggi = 0;
+  fggj = 1;
+  fggk = 2;
+  fggl = 3;
+  fggm = 4;
+  fggn = 5;
+  fggo = 6;
+}
+
+enum mhg {
+  fggp = 0;
+  fggq = 1;
+  fggr = 2;
+  fggs = 3;
+}
+
+enum mhi {
+  fgha = 0;
+  fghb = 2;
+  fghc = 3;
+  fghd = 4;
+  fghe = 5;
+  fghf = 6;
+  fghg = 7;
+  fghh = 8;
+}
+
+enum mhk {
+  fghv = 0;
+  fghw = 2;
+  fghx = 3;
+  fghy = 4;
+  fghz = 5;
+  fgia = 6;
+  fgib = 7;
+}
+
+enum mhm {
+  fgio = 0;
+  fgip = 1;
+}
+
+enum mhr {
+  fgjd = 0;
+  fgje = 3;
+  fgjf = 4;
+}
+
+enum mhx {
+  fgkg = 0;
+  fgkh = 1;
+  fgki = 2;
+}
+
+enum mib {
+  fglp = 0;
+  fglq = 1;
+  fglr = 2;
+  fgls = 3;
+  fglt = 4;
+  fglu = 5;
+  fglv = 6;
+  fglw = 7;
+  fglx = 8;
+  fgly = 9;
+  fglz = 10;
+  fgma = 11;
+  fgmb = 12;
+  fgmc = 13;
+  fgmd = 14;
+}
+
+enum mii {
+  fgmy = 0;
+  fgmz = 1;
+  fgna = 2;
+}
+
+enum mij {
+  fgnb = 0;
+  fgnc = 1;
+  fgnd = 2;
+  fgne = 3;
+}
+
+enum mir {
+  fgok = 0;
+  fgol = 1;
+  fgom = 2;
+  fgon = 3;
+}
+
+enum miu {
+  fgox = 0;
+  fgoy = 1;
+}
+
+enum miy {
+  fgpl = 0;
+  fgpm = 2;
+  fgpn = 3;
+}
+
+enum mjd {
+  fgqk = 0;
+  fgql = 1;
+}
+
+enum mje {
+  fgqm = 0;
+  fgqn = 1;
+  fgqo = 2;
+  fgqp = 3;
+  fgqq = 4;
+  fgqr = 5;
+  fgqs = 6;
+  fgqt = 7;
+  fgqu = 8;
+  fgqv = 9;
+  fgqw = 10;
+  fgqx = 11;
+  fgqy = 12;
+  fgqz = 13;
+  fgra = 14;
+  fgrb = 15;
+  fgrc = 16;
+  fgrd = 17;
+  fgre = 18;
+}
+
+enum mji {
+  fgrt = 0;
+  fgru = 1;
+  fgrv = 2;
+}
+
+enum mjj {
+  fgrw = 0;
+  fgrx = 1;
+}
+
+enum mjq {
+  fgsy = 0;
+  fgsz = 1;
+  fgta = 2;
+}
+
+enum mjs {
+  fgtg = 0;
+  fgth = 1;
+  fgti = 2;
+  fgtj = 3;
+}
+
+message mhh {
+  mhj gfcd = 1;
+  mhl gfce = 2;
+  mhn gfcf = 3;
+}
+
+message mhj {
+  string gfck = 1;
+  mho gfcl = 2;
+  mhs gfcm = 3;
+  mih gfcn = 4;
+  mix gfco = 5;
+  mjc gfcp = 6;
+  mjh gfcq = 7;
+  mjp gfcr = 8;
+}
+
+message mhl {
+  string gfcw = 1;
+  mhp gfcx = 2;
+  mig gfcy = 3;
+  mim gfcz = 4;
+  miz gfda = 5;
+  mjo gfdb = 6;
+  mjw gfdc = 7;
+}
+
+message mhn {
+  mhq gfdh = 1;
+}
+
+message mho {
+}
+
+message mhp {
+}
+
+message mhq {
+  mit gfds = 1;
+}
+
+message mhs {
+  string gfdw = 1;
+  mhv gfdx = 3;
+  mhw gfdy = 4;
+  string gfdz = 5;
+}
+
+message mht {
+  int64 gfee = 1;
+  string gfef = 2;
+}
+
+message mhv {
+  string gfej = 1;
+  mht gfek = 2;
+}
+
+message mhw {
+  string gfeo = 1;
+}
+
+message mhy {
+  bool gfes = 1;
+  bool gfet = 2;
+  bool gfeu = 3;
+  bool gfev = 4;
+}
+
+message mia {
+  int64 gfez = 1;
+  string gffa = 2;
+  string gffb = 3;
+  miq gffc = 4;
+  string gffd = 5;
+  mhy gffe = 6;
+  int32 gfff = 7;
+  bool gffg = 8;
+  mja gffh = 9;
+}
+
+message mie {
+  mib gffm = 1;
+  string gffn = 2;
+  bool gffo = 3;
+}
+
+message mig {
+  mia gffu = 1;
+  mie gffv = 2;
+}
+
+message mih {
+  int32 gfga = 1;
+}
+
+message mik {
+  string gfge = 1;
+  string gfgf = 2;
+  repeated int32 gfgg = 3;
+}
+
+message mim {
+  mik gfgk = 1;
+  mij gfgl = 2;
+}
+
+message mio {
+  mhf gfgr = 1;
+  int32 gfgs = 2;
+}
+
+message miq {
+  repeated mit gfgw = 1;
+  repeated mio gfgx = 2;
+  bool gfgy = 3;
+}
+
+message mit {
+  miw gfhc = 1;
+  mir gfhd = 2;
+  repeated mjg gfhe = 3;
+}
+
+message miw {
+  int32 gfhi = 1;
+  miu gfhj = 2;
+  mhf gfhk = 3;
+}
+
+message mix {
+  int64 gfho = 1;
+}
+
+message miz {
+  mja gfhs = 2;
+  mjb gfht = 3;
+}
+
+message mja {
+  bool gfhy = 1;
+  int64 gfhz = 2;
+  string gfia = 3;
+  string gfib = 4;
+  miq gfic = 5;
+}
+
+message mjb {
+}
+
+message mjc {
+}
+
+message mjg {
+  string gfim = 1;
+  mje gfin = 2;
+  mjd gfio = 3;
+  int32 gfip = 4;
+  string gfiq = 5;
+}
+
+message mjh {
+}
+
+message mjk {
+  string gfix = 1;
+  string gfiy = 2;
+  repeated int32 gfiz = 3;
+}
+
+message mjm {
+  repeated mjk gfjd = 1;
+}
+
+message mjo {
+  mjm gfjh = 1;
+  mjj gfji = 2;
+}
+
+message mjp {
+  string gfjo = 1;
+  string gfjp = 2;
+}
+
+message mjr {
+  repeated int32 gfjt = 1;
+}
+
+message mju {
+  mjs gfjx = 1;
+}
+
+message mjw {
+  mjr gfkb = 1;
+  mju gfkc = 2;
+}
+
+message mjx {
+  string gfkh = 1;
+  string gfki = 2;
+  repeated int32 gfkj = 3;
+}
+
