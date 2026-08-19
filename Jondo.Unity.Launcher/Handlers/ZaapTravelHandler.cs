@@ -52,54 +52,15 @@ namespace Jondo.Unity.Launcher.Handlers
         /// El cliente ha clicado el zaap. Se le contesta que el elemento está en uso y se le manda
         /// la lista de destinos.
         /// </summary>
-        public static async Task UseAsync(NetworkStream stream, byte[] payload)
+        public static async Task OpenAsync(NetworkStream stream, Interactives.Element zaap, int skillId)
         {
-            byte[]? iwo = ConnectionProtocol.ReadPayload(payload, "iwo");
-            if (iwo == null) return;
-
-            // f1 es el identificador de la instancia de habilidad, que no nos hace falta: lo que
-            // el cliente espera de vuelta es el elemento, que va en f2.
-            int elementId = 0;
-            foreach (var field in ProtoMessage.Parse(iwo).Fields)
-            {
-                if (field.FieldNumber == 2 && field.WireType == 0) elementId = (int)field.VarIntValue;
-            }
-
             long here = Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
-
-            // El cofre y la lotería del merkasako se clican igual que el zaap, con el mismo iwo, así
-            // que lo primero es mirar si son ellos.
-            if (ChestHandler.IsChest(here, elementId))
-            {
-                await ChestHandler.OpenAsync(stream, elementId);
-                return;
-            }
-
-            if (Lottery.Is(here, elementId))
-            {
-                await LotteryHandler.DrawAsync(stream, elementId);
-                return;
-            }
-
-            var elements = Interactives.ZaapElements(here);
-
-            // Cuál de los declarados ha clicado. Si el cliente no manda elemento —proto3 se come el
-            // cero— vale el primero, que en un mapa normal es el único que hay.
-            var zaap = elements.Find(e => e.Id == elementId);
-            if (zaap.Id == 0 && elementId == 0 && elements.Count > 0) zaap = elements[0];
-
-            if (zaap.Id == 0)
-            {
-                Console.WriteLine($"[Zaap] El cliente usa el elemento {elementId} del mapa {here}, " +
-                                  "que no es el zaap. No se hace nada.");
-                return;
-            }
 
             SessionContext.State.OpenZaapMapId = here;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("iwn", ConnectionProtocol.BuildElementInUse(
-                    zaap.Id, Interactives.UseSkill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
+                    zaap.Id, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
             var destinations = Destinations(here);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

@@ -74,6 +74,7 @@ namespace Jondo.Unity.Launcher
             Managers.Titles.Initialize();
             Managers.Cosmetics.Initialize();
             Managers.Merkasako.Initialize();
+            Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
             Managers.Npcs.Initialize();
             Managers.NpcShops.Initialize();

@@ -70,6 +70,7 @@ namespace Jondo.Unity.Launcher.Managers
         public static int MapCount => _byMap.Count;
         public static int WaypointCount => _ordered.Count;
         public static IReadOnlyList<Waypoint> Waypoints => _ordered;
+        public static IEnumerable<long> MapIds => _byMap.Keys;
 
         public static void Initialize()
         {

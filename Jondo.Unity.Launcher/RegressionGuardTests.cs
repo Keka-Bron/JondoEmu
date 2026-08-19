@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -25,6 +26,7 @@ namespace Jondo.Unity.Launcher
             Network.ClientLaunchRegistry.AssertEightClientLimit();
             AssertPerSessionPlayerCaches();
             AssertSocketWritesAreSerialized();
+            AssertInteractiveRegistry();
 
             // OJO: esta parte no llega a correr nunca. Subir tres carpetas desde donde está el
             // binario y volver a bajar a "Jondo.Unity.Launcher" no da con el código fuente en
@@ -106,6 +108,52 @@ namespace Jondo.Unity.Launcher
 
             if (stream.OverlapDetected)
                 throw new InvalidOperationException("[RegressionGuard FAILED] Packet writes overlapped on one socket.");
+        }
+
+        private static void AssertInteractiveRegistry()
+        {
+            var expected = new HashSet<(long MapId, int ElementId)>();
+            foreach (long mapId in Managers.Interactives.MapIds)
+            {
+                foreach (var zaap in Managers.Interactives.ZaapElements(mapId))
+                    expected.Add((mapId, zaap.Id));
+
+                var chest = Managers.Merkasako.ChestOf(mapId);
+                if (chest.Id != 0) expected.Add((mapId, chest.Id));
+
+                var lottery = Managers.Lottery.Of(mapId);
+                if (lottery.Id != 0) expected.Add((mapId, lottery.Id));
+
+                foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
+                {
+                    foreach (var action in interactive.Actions)
+                    {
+                        if (!Managers.InteractiveRegistry.TryResolveUse(
+                                mapId, interactive.Element.Id, action.SkillInstanceId,
+                                out var resolved, out var resolvedAction) ||
+                            !ReferenceEquals(interactive, resolved) ||
+                            !ReferenceEquals(action, resolvedAction))
+                        {
+                            throw new InvalidOperationException(
+                                "[RegressionGuard FAILED] Interactive registry cannot resolve its own declaration.");
+                        }
+                    }
+
+                    if (Managers.InteractiveRegistry.TryResolveUse(
+                            mapId, interactive.Element.Id, int.MaxValue, out _, out _))
+                    {
+                        throw new InvalidOperationException(
+                            "[RegressionGuard FAILED] Interactive registry accepted a mismatched skill instance.");
+                    }
+                }
+            }
+
+            if (Managers.InteractiveRegistry.Count != expected.Count)
+            {
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] Expected {expected.Count} interactives, got " +
+                    $"{Managers.InteractiveRegistry.Count}.");
+            }
         }
 
         private sealed class OverlapDetectingStream : Stream
