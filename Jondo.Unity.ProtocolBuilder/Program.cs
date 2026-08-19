@@ -34,6 +34,8 @@ switch (args[0])
     case "volcar": return Volcar(args);
     case "mirar": return Mirar(args);
     case "proto": return Proto(args);
+    case "probar": return Probar(args);
+    case "emparejar": return Emparejar(args);
     default:
         Console.WriteLine($"No sé qué es «{args[0]}».");
         return 1;
@@ -134,6 +136,94 @@ static int Proto(string[] args)
     string salida = args.Length > 2 ? args[2] : "protocolo.proto";
     File.WriteAllText(salida, ProtoWriter.Write(mensajes, enums, Path.GetFileName(args[1])));
     Console.WriteLine($"  escrito en {salida}");
+
+    return 0;
+}
+
+static Matcher.Model Leer(string assembly)
+{
+    using var reader = new AssemblyReader(assembly);
+    return new Matcher.Model(ProtoWriter.Messages(reader), ProtoWriter.Enums(reader));
+}
+
+/// <summary>
+/// El techo del emparejador, medido contra sí mismo.
+///
+/// Se coge el protocolo de ahora, se le rotan los nombres como haría Ankama y se le pide que
+/// reconstruya la correspondencia. La respuesta correcta se conoce entera, así que sale un
+/// porcentaje exacto. No simula un parche de verdad —ahí también hay mensajes nuevos y campos
+/// añadidos— pero dice cuánto se puede esperar como mucho.
+/// </summary>
+static int Probar(string[] args)
+{
+    if (args.Length < 2) { Console.WriteLine("Uso: probar <dll>"); return 1; }
+
+    var uno = Leer(args[1]);
+    var (otro, verdad) = Shuffle.Rotate(uno);
+
+    var resultado = Matcher.Match(uno, otro);
+
+    int bien = 0, mal = 0;
+    foreach (var (from, to) in resultado.Pairs)
+    {
+        if (verdad.TryGetValue(from, out string? esperado) && esperado == to) bien++;
+        else mal++;
+    }
+
+    Console.WriteLine($"  {uno.Messages.Count:N0} mensajes, con los nombres barajados");
+    Console.WriteLine($"  emparejados bien : {bien:N0}  ({100.0 * bien / uno.Messages.Count:0.0} %)");
+    Console.WriteLine($"  emparejados MAL  : {mal:N0}");
+    Console.WriteLine($"  ambiguos         : {resultado.Ambiguous.Count:N0}");
+    Console.WriteLine($"  sin pareja       : {resultado.Alone.Count:N0}");
+    return 0;
+}
+
+/// <summary>Empareja dos versiones de verdad, la vieja y la nueva.</summary>
+static int Emparejar(string[] args)
+{
+    if (args.Length < 3)
+    {
+        Console.WriteLine("Uso: emparejar <dll version vieja> <dll version nueva> [salida.txt]");
+        return 1;
+    }
+
+    var vieja = Leer(args[1]);
+    var nueva = Leer(args[2]);
+
+    Console.WriteLine($"  vieja: {vieja.Messages.Count:N0} mensajes, {vieja.Enums.Count:N0} enumerados");
+    Console.WriteLine($"  nueva: {nueva.Messages.Count:N0} mensajes, {nueva.Enums.Count:N0} enumerados");
+
+    var resultado = Matcher.Match(vieja, nueva);
+
+    // Cuántos conservan el nombre: si Ankama no hubiera rotado nada, esto sería el 100% y el
+    // emparejador no haría falta. Sirve para saber a qué se enfrenta uno de verdad.
+    int iguales = resultado.Pairs.Count(p => p.Key == p.Value);
+
+    Console.WriteLine();
+    Console.WriteLine($"  emparejados : {resultado.Pairs.Count:N0} " +
+                      $"({100.0 * resultado.Pairs.Count / vieja.Messages.Count:0.0} % de los viejos)");
+    Console.WriteLine($"     de ellos, con el MISMO nombre en las dos: {iguales:N0}");
+    Console.WriteLine($"     o sea que cambiaron de nombre: {resultado.Pairs.Count - iguales:N0}");
+    Console.WriteLine($"  ambiguos    : {resultado.Ambiguous.Count:N0}   (más de un candidato con su forma)");
+    Console.WriteLine($"  sin pareja  : {resultado.Alone.Count:N0}   (ninguno con su forma: nuevos o retirados)");
+
+    if (args.Length > 3)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("# viejo -> nuevo");
+        foreach (var (from, to) in resultado.Pairs.OrderBy(p => p.Key, StringComparer.Ordinal))
+        {
+            sb.AppendLine($"{from} -> {to}{(from == to ? "   (igual)" : "")}");
+        }
+        sb.AppendLine();
+        sb.AppendLine("# sin pareja");
+        foreach (string name in resultado.Alone) sb.AppendLine(name);
+        sb.AppendLine();
+        sb.AppendLine("# ambiguos");
+        foreach (string name in resultado.Ambiguous) sb.AppendLine(name);
+        File.WriteAllText(args[3], sb.ToString());
+        Console.WriteLine($"  escrito en {args[3]}");
+    }
 
     return 0;
 }

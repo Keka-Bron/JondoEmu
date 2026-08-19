@@ -1,0 +1,2174 @@
+# viejo -> nuevo
+hee -> jlm
+heg -> jlo
+hez -> les
+hfu -> hgp
+hhs -> mah
+hht -> jsd
+hhx -> hqc
+hia -> krc
+hiq -> lyr
+his -> mcy
+hkk -> kda
+hkm -> lgd
+hmj -> lxk
+hmm -> jua
+hnt -> hfo
+hoa -> kif
+hog -> ind
+hoh -> ino
+hot -> jtr
+hpy -> izs
+hql -> jac
+hrd -> hsy
+hre -> hus
+hrf -> iyu
+hss -> hub
+hty -> kgb
+htz -> mfc
+hui -> iai
+hvl -> kdk
+hvs -> hvs   (igual)
+hxp -> hyx
+hxx -> hgc
+hya -> ibk
+hyj -> hju
+hym -> hwo
+hyq -> ich
+hys -> icj
+hzi -> mfy
+hzs -> jjj
+iaa -> hyr
+iay -> ibg
+ibc -> kcx
+icc -> irs
+icx -> jnc
+ied -> iha
+ifo -> ihw
+ifx -> iyk
+igk -> jnr
+igm -> mbl
+igv -> ltq
+ihp -> imu
+ihr -> inq
+iib -> lrt
+iig -> imr
+iik -> lgz
+ijd -> jwn
+ijv -> ktx
+ikg -> hoc
+ikr -> ikr   (igual)
+ikv -> lkz
+ili -> hyj
+imb -> lnb
+imj -> ipb
+imm -> lro
+iod -> iqu
+ioi -> hsa
+ipe -> ipz
+ipi -> imv
+ipm -> kbd
+ipr -> knc
+iqx -> ipp
+isk -> ikf
+isn -> kaw
+ivd -> iwq
+ivo -> hsn
+iwf -> juz
+iwp -> hhu
+iwq -> hzw
+iwv -> lco
+ixf -> lmo
+ixw -> ixd
+iyd -> jbu
+iyp -> jat
+iza -> kih
+izd -> jbg
+izk -> mae
+izo -> jar
+jce -> jet
+jdt -> jfz
+jdw -> jgb
+jdx -> jgc
+jea -> jgi
+jeb -> jgj
+jed -> jgl
+jee -> jgn
+jeg -> jgg
+jep -> jgs
+jer -> jgz
+jex -> ket
+jfk -> kns
+jfl -> mcn
+jfz -> ilb
+jgc -> lsz
+jgi -> hzg
+jgk -> isu
+jjq -> jve
+jkb -> jlw
+jkk -> jro
+jlj -> jnt
+jlq -> jko
+jlt -> jfm
+jlv -> jfo
+jnf -> ipv
+jni -> jnn
+jnv -> kil
+joi -> jhb
+joj -> jql
+jol -> jqn
+joo -> kcs
+jor -> jrr
+joz -> kqr
+jpz -> izz
+jqd -> kim
+jrd -> jor
+jsl -> lej
+jtk -> leb
+jtz -> jio
+juc -> jtv
+juv -> jan
+juz -> jzd
+jvb -> jzh
+jvc -> jzj
+jvd -> jzi
+jve -> jzk
+jvf -> kfw
+jwc -> ioo
+jwy -> kfx
+jxa -> kfz
+jxb -> jrw
+jya -> hqb
+jyi -> kba
+jzr -> jzw
+jzs -> lfu
+kah -> idz
+kan -> kid
+kap -> luy
+kbo -> ila
+kbv -> lmr
+kcd -> kjg
+kcx -> lcu
+kdb -> kde
+kdk -> kha
+ker -> lob
+kes -> hkm
+kfb -> jag
+khc -> kyb
+khz -> kkg
+kif -> kkk
+kij -> kgf
+kik -> ikw
+kjs -> klk
+kks -> isr
+kkv -> hmw
+kkw -> jxk
+knv -> kgw
+kol -> lvq
+koq -> kri
+kpm -> ksw
+kpo -> mby
+kps -> kss
+kpy -> ksn
+kqj -> lwd
+kqo -> ktn
+kqu -> kte
+krc -> kum
+krp -> kbj
+ksc -> klx
+ksd -> jbs
+ksg -> hvi
+ksh -> kvo
+ksp -> hgm
+kta -> hks
+kuo -> kmn
+kvv -> kvb
+kxm -> hlv
+lah -> lhp
+lai -> lhq
+lat -> kvq
+lav -> mgv
+lbc -> loi
+lbn -> ivv
+lbo -> lcs
+lbp -> lkt
+lbq -> ldk
+lbr -> jhw
+lcc -> jwh
+lcn -> hlz
+ldi -> iug
+ldk -> llz
+ldn -> lmc
+ldp -> lme
+ldr -> lmg
+leh -> ldr
+lfx -> lhi
+lfz -> iue
+lgx -> lpe
+lgz -> lpg
+lhf -> kyy
+lif -> lku
+lig -> kby
+lka -> kqv
+lkj -> lfg
+lkn -> hns
+lkt -> lfe
+lmk -> hev
+lnc -> lma
+lob -> ltu
+lok -> lqs
+lpf -> hrr
+lpo -> mgc
+lrk -> lkv
+lro -> lkx
+lrq -> ihh
+lrw -> lli
+lry -> lfd
+lsk -> ian
+lsn -> lst
+ltr -> mdr
+luf -> hpn
+lur -> joz
+lvh -> lxh
+lvt -> jmo
+lwv -> htu
+lww -> jvp
+lxl -> jhz
+lxp -> lld
+lxt -> mcz
+lyw -> ibv
+lzk -> lpl
+lzo -> kah
+mbc -> mak
+mbm -> lxu
+mdq -> jta
+mex -> mgr
+mez -> mgt
+
+# sin pareja
+hdl
+hdo
+hdp
+hds
+hdv
+hej
+hem
+hev
+hew
+hex
+hfb
+hfi
+hgi
+hhi
+hhl
+hhq
+hhr
+hhw
+hih
+hil
+hio
+hip
+hiu
+hix
+hiy
+hja
+hjc
+hjf
+hjk
+hjp
+hjw
+hjy
+hkn
+hkw
+hls
+hlw
+hlz
+hmd
+hmf
+hmo
+hmp
+hmr
+hmx
+hnf
+hnl
+hnp
+hod
+hok
+hom
+hon
+hos
+hpj
+hpu
+hqg
+hqi
+hqn
+hqs
+hqz
+hri
+hrp
+hrq
+hrw
+hrx
+hry
+hrz
+hse
+hsl
+hso
+hsp
+hsr
+hst
+hsx
+hti
+htq
+hts
+htu
+hue
+huq
+huv
+huz
+hvg
+hvn
+hvp
+hvy
+hwh
+hwi
+hwj
+hwl
+hwn
+hwo
+hwp
+hwr
+hxb
+hxd
+hxq
+hxr
+hxs
+hxw
+hyw
+hyz
+hzd
+hzg
+hzl
+hzm
+hzr
+hzy
+ias
+iav
+ibd
+ibg
+ibn
+ibr
+ibx
+icb
+icz
+idf
+idj
+idl
+idm
+ido
+iei
+ifh
+ifi
+ifp
+ifr
+ifu
+igd
+ige
+igf
+igh
+igs
+ihf
+ihj
+ihq
+ihx
+ihz
+iiz
+ikb
+ikd
+ike
+ikl
+ile
+ill
+ilq
+ilu
+imf
+imw
+imx
+ind
+ini
+ink
+inm
+inu
+ioa
+ioe
+ioh
+iol
+ion
+ioo
+iox
+ioz
+ipa
+ipc
+ipk
+ipx
+iqi
+iqk
+iqq
+iqt
+iqw
+irm
+irs
+iru
+irw
+ism
+itp
+its
+iub
+iuc
+ium
+iuq
+iuz
+ivi
+ivl
+ivq
+ivu
+iwk
+iwl
+iwn
+iwz
+ixe
+ixh
+ixk
+ixl
+ixp
+ixr
+ixs
+ixx
+ixz
+iya
+iym
+iyw
+izn
+jac
+jah
+jan
+jap
+jbh
+jbj
+jbk
+jbn
+jbz
+jcr
+jcz
+jda
+jdc
+jeu
+jev
+jfe
+jfg
+jfj
+jfn
+jfv
+jfx
+jga
+jgm
+jgn
+jgr
+jgt
+jgy
+jha
+jhd
+jhf
+jhn
+jhv
+jhz
+jig
+jio
+jiu
+jiy
+jjg
+jjn
+jjy
+jka
+jkg
+jkq
+jks
+jlp
+jlr
+jlw
+jmc
+jme
+jmj
+jmk
+jmw
+jna
+jnp
+jns
+jog
+jov
+jox
+jpe
+jpm
+jpv
+jpx
+jqc
+jqs
+jqv
+jqz
+jra
+jri
+jrk
+jro
+jrq
+jrs
+jry
+jrz
+jse
+jsh
+jsm
+jso
+jsv
+jsw
+jsx
+jsz
+jtb
+jtf
+jth
+jti
+jtj
+jtn
+jtp
+jtr
+jtx
+jty
+juh
+jun
+juo
+jut
+jux
+juy
+jva
+jvi
+jvl
+jvm
+jvn
+jvo
+jvw
+jvy
+jwa
+jwe
+jwf
+jwk
+jwo
+jwq
+jwt
+jwu
+jwv
+jww
+jxe
+jxs
+jyc
+jyd
+jyf
+jyj
+jyk
+jys
+jyt
+jyy
+jze
+jzq
+jzu
+jzz
+kai
+kaq
+kav
+kaw
+kba
+kbt
+kby
+kcb
+kcc
+kcn
+kcq
+kct
+kcz
+kde
+kdg
+kdm
+kdw
+ked
+kef
+kej
+kel
+ken
+kev
+kfc
+kfl
+kfp
+kfq
+kfv
+kga
+kgh
+kgl
+khf
+khu
+kia
+kit
+kiw
+kiy
+kjq
+kkb
+kkd
+kkf
+klc
+klk
+kmd
+kmf
+kmg
+kmk
+kmx
+kne
+kng
+knm
+kno
+koa
+koj
+kon
+kop
+koy
+kpa
+kpq
+kqd
+kqg
+kqk
+kqn
+kqp
+kqr
+krf
+krh
+krj
+krq
+krx
+krz
+ksi
+ktd
+kts
+kum
+kuq
+kvm
+kvn
+kvz
+kwd
+kwf
+kwg
+kwj
+kwl
+kwo
+kwr
+kws
+kwu
+kww
+kxc
+kxj
+kxv
+kxw
+kyh
+kyj
+kym
+kyr
+lad
+lag
+laj
+lar
+las
+lax
+laz
+lbi
+lbj
+lbk
+lbl
+lbs
+lbv
+lbw
+lby
+lca
+lcd
+lcf
+lci
+lcj
+lck
+lcr
+lct
+ldf
+ldl
+ldv
+ldx
+leb
+led
+lej
+lel
+leo
+ler
+leu
+ley
+lfc
+lff
+lfj
+lfk
+lfn
+lfo
+lfr
+lft
+lfv
+lgc
+lgi
+lgk
+lgq
+lgr
+lgv
+lhd
+lhg
+lhi
+lhj
+lhk
+lhp
+lhr
+lhs
+lhv
+lhx
+lhy
+lii
+lip
+lis
+liv
+lja
+ljd
+ljg
+lji
+ljj
+ljq
+ljs
+ljt
+ljv
+lke
+lkr
+lkw
+llc
+llh
+llj
+llm
+llo
+llr
+lls
+llv
+llw
+lly
+lmb
+lmf
+lmg
+lmi
+lmm
+lmp
+lms
+lmw
+lne
+lng
+lnk
+lnl
+lnn
+lnp
+lnr
+lnu
+lnw
+lny
+loe
+loq
+lpa
+lpl
+lpn
+lqi
+lqj
+lqm
+lqp
+lqq
+lqs
+lqu
+lrd
+lse
+lsf
+lsg
+lsp
+lsu
+ltd
+lte
+lth
+ltj
+ltk
+lto
+ltq
+lts
+ltu
+ltx
+lub
+luh
+lup
+luw
+lvc
+lvg
+lvk
+lvl
+lvo
+lvr
+lvw
+lwe
+lwg
+lwl
+lwp
+lwt
+lxd
+lxh
+lxv
+lye
+lyf
+lym
+lyp
+lyr
+lyu
+lza
+mab
+maf
+mao
+mau
+maw
+maz
+mbf
+mbr
+mcb
+mcd
+mcg
+mci
+mcu
+mcx
+mdd
+mdh
+mdk
+mdo
+mds
+mdw
+meb
+
+# ambiguos
+hdn
+hdt
+hdw
+hdy
+hdz
+hea
+heb
+hec
+hek
+hen
+hep
+heq
+her
+hes
+het
+hfa
+hfc
+hfd
+hfe
+hff
+hfh
+hfm
+hfr
+hfs
+hfv
+hfw
+hfx
+hfy
+hga
+hgd
+hgg
+hgj
+hgk
+hgl
+hgo
+hgp
+hgq
+hgr
+hgu
+hgx
+hha
+hhb
+hhc
+hhd
+hhe
+hhf
+hhg
+hhh
+hhm
+hhn
+hho
+hhp
+hhu
+hhv
+hhy
+hhz
+hib
+hic
+hif
+hii
+hik
+hin
+hir
+hit
+hiw
+hiz
+hjd
+hjh
+hjl
+hjn
+hjo
+hjr
+hjs
+hjt
+hju
+hjv
+hjz
+hka
+hkc
+hkd
+hke
+hkf
+hkg
+hkh
+hki
+hkj
+hkl
+hkq
+hkr
+hks
+hkv
+hky
+hlb
+hlc
+hld
+hlf
+hlg
+hlj
+hlk
+hlm
+hln
+hlo
+hlu
+hmc
+hme
+hmk
+hml
+hms
+hmt
+hmu
+hmv
+hmw
+hmy
+hmz
+hnc
+hng
+hnh
+hnk
+hnn
+hnq
+hnu
+hnv
+hnx
+hnz
+hob
+hoe
+hof
+hoi
+hol
+hop
+hou
+hov
+hoy
+hoz
+hpa
+hpl
+hpm
+hpp
+hpr
+hps
+hpv
+hpw
+hpx
+hqb
+hqe
+hqp
+hqu
+hrb
+hrc
+hrk
+hrl
+hrm
+hrt
+hsb
+hsc
+hsg
+hsi
+hsu
+hsv
+hsy
+htc
+hte
+htf
+htk
+htl
+hto
+htp
+hub
+hul
+hum
+hup
+hus
+hut
+huy
+hva
+hvb
+hvc
+hvd
+hvj
+hvk
+hvv
+hvw
+hwb
+hwc
+hwd
+hwq
+hwu
+hwv
+hwx
+hwy
+hwz
+hxg
+hxh
+hxk
+hxn
+hxo
+hxu
+hxv
+hxz
+hyb
+hye
+hyf
+hyi
+hyk
+hyl
+hyn
+hyy
+hzb
+hzc
+hze
+hzh
+hzo
+hzv
+hzw
+hzx
+iad
+iae
+iah
+iai
+iaj
+iam
+ian
+iap
+iar
+iau
+iax
+iaz
+iba
+ibb
+ibi
+ibj
+ibk
+ibl
+ibm
+ibo
+ibp
+ibs
+ibt
+ibu
+ibv
+ibw
+ibz
+ice
+icf
+icg
+ich
+ici
+icj
+ick
+icl
+icn
+icq
+ict
+icu
+icv
+icw
+idb
+idg
+idk
+idp
+idq
+idr
+idv
+idx
+idy
+idz
+iea
+ieb
+iec
+iee
+ief
+iej
+iek
+iem
+ien
+ieo
+ieq
+iet
+ieu
+iex
+iez
+ifa
+ifc
+ifd
+ife
+iff
+ifj
+ifk
+ifm
+ifn
+ifq
+ifs
+ift
+ify
+iga
+igb
+igc
+igg
+ign
+igo
+igp
+igq
+igr
+igt
+igx
+ihd
+ihe
+ihg
+ihh
+ihm
+ihs
+ihv
+ihw
+iia
+iic
+iif
+iih
+iii
+iij
+iil
+iim
+iin
+iiq
+iir
+iis
+iit
+iiu
+iiw
+ijc
+ije
+ijf
+ijg
+ijh
+ijj
+ijk
+ijl
+ijm
+ijp
+ijs
+ijt
+iju
+ijw
+ijx
+ijy
+ijz
+ikc
+ikj
+ikk
+ikm
+ikn
+iko
+iku
+ikx
+iky
+ila
+ilc
+ild
+ilf
+ilm
+ilo
+ilr
+ilv
+ily
+imd
+ime
+imi
+imk
+imp
+imq
+ims
+imu
+imv
+imz
+ina
+inf
+ing
+inh
+inl
+ino
+inp
+inr
+inv
+inw
+inx
+iob
+ioj
+ios
+iot
+iou
+iov
+iow
+ipf
+ipg
+iph
+ipl
+ipp
+ipq
+ipt
+ipu
+ipv
+ipw
+ipy
+iqd
+iqf
+iqg
+iql
+iqn
+iqu
+iqz
+ira
+irb
+irc
+irf
+irg
+irh
+iri
+irj
+irp
+irq
+irv
+irx
+iry
+irz
+isc
+isd
+ise
+isf
+isg
+ish
+isi
+isp
+isq
+isr
+iss
+isv
+isy
+isz
+ita
+itb
+itd
+ite
+itf
+ith
+iti
+itj
+itl
+itm
+itq
+itr
+itt
+itu
+itx
+ity
+iud
+iuf
+iug
+iuh
+iuj
+iuk
+iul
+iuo
+iut
+iuu
+iuv
+iuy
+iva
+ivb
+ivc
+ivf
+ivr
+ivs
+ivt
+ivw
+ivz
+iwc
+iwd
+iwe
+iws
+iwt
+iww
+iwx
+ixa
+ixc
+ixd
+ixi
+ixm
+ixt
+ixu
+ixv
+ixy
+iyb
+iye
+iyf
+iyg
+iyh
+iyj
+iyk
+iyl
+iys
+iyv
+iyy
+iyz
+izc
+izg
+izh
+izi
+izl
+izp
+izq
+izr
+izs
+izu
+izx
+izy
+izz
+jab
+jae
+jaj
+jal
+jao
+jar
+jau
+jav
+jaw
+jay
+jba
+jbc
+jbd
+jbe
+jbg
+jbl
+jbo
+jbp
+jbr
+jbt
+jbu
+jbw
+jbx
+jca
+jcb
+jcg
+jch
+jcj
+jcm
+jco
+jcp
+jct
+jcv
+jcw
+jcx
+jdf
+jdh
+jdi
+jdj
+jdk
+jdl
+jdm
+jdo
+jdp
+jdq
+jdr
+jdu
+jdv
+jej
+jel
+jem
+jes
+jet
+jfa
+jfb
+jfc
+jfd
+jfm
+jfo
+jfp
+jfq
+jfr
+jfs
+jft
+jfu
+jfw
+jgd
+jge
+jgg
+jgj
+jgo
+jgp
+jgq
+jgv
+jgw
+jhb
+jhg
+jhk
+jhl
+jho
+jhq
+jhs
+jhw
+jia
+jid
+jii
+jij
+jin
+jiq
+jit
+jiv
+jiw
+jix
+jiz
+jjb
+jjc
+jje
+jji
+jjj
+jjk
+jjl
+jjm
+jjp
+jjs
+jjt
+jjv
+jjw
+jjx
+jjz
+jkc
+jkd
+jkh
+jki
+jkj
+jkn
+jkr
+jku
+jkv
+jkw
+jkx
+jky
+jlb
+jlc
+jld
+jlf
+jli
+jln
+jlo
+jls
+jlz
+jmd
+jmf
+jmi
+jmn
+jmq
+jms
+jmt
+jmu
+jmz
+jnb
+jnj
+jnm
+jnr
+jnt
+jnx
+jny
+jnz
+joa
+joe
+jof
+joh
+jop
+joq
+jos
+jpb
+jpc
+jpd
+jpf
+jpg
+jpj
+jpp
+jps
+jpt
+jpw
+jqb
+jqe
+jqf
+jqh
+jqi
+jqp
+jqq
+jqt
+jqx
+jqy
+jrb
+jrc
+jrf
+jrl
+jrm
+jrn
+jrp
+jrt
+jru
+jsb
+jsd
+jsf
+jsg
+jsi
+jsp
+jsr
+jss
+jst
+jtc
+jtd
+jte
+jtl
+jtm
+jtq
+jtt
+jtu
+jtv
+jub
+jud
+jue
+juj
+jul
+jup
+juq
+jur
+jus
+juu
+jvg
+jvp
+jvq
+jvt
+jvu
+jwb
+jwg
+jwh
+jwj
+jwl
+jwm
+jwn
+jwp
+jwr
+jxc
+jxf
+jxi
+jxl
+jxm
+jxp
+jxq
+jxt
+jxu
+jxv
+jxw
+jxx
+jxz
+jyb
+jye
+jyg
+jyh
+jyl
+jym
+jyn
+jyo
+jyp
+jyv
+jyz
+jza
+jzc
+jzf
+jzi
+jzj
+jzo
+jzv
+jzw
+kaa
+kad
+kae
+kaj
+kak
+kal
+kam
+kao
+kar
+kas
+kax
+kay
+kaz
+kbb
+kbc
+kbd
+kbe
+kbg
+kbj
+kbk
+kbl
+kbm
+kbp
+kbq
+kbu
+kbw
+kbx
+kbz
+kcf
+kci
+kcl
+kcm
+kcp
+kcr
+kcs
+kcv
+kda
+kdd
+kdf
+kdh
+kdi
+kdj
+kdl
+kdn
+kdo
+kdp
+kdq
+kdu
+kdv
+kdx
+kdy
+kdz
+kea
+keb
+keg
+kem
+keq
+keu
+kex
+kfa
+kfd
+kfe
+kff
+kfg
+kfj
+kfm
+kfn
+kfo
+kfr
+kfw
+kfz
+kgc
+kgg
+kgm
+kgn
+kgp
+kgq
+kgs
+kgw
+kgx
+kha
+khi
+khj
+khk
+khm
+khn
+khp
+khq
+kht
+khw
+khx
+kic
+kid
+kih
+kin
+kiq
+kiv
+kiz
+kjc
+kje
+kjf
+kjh
+kjk
+kjl
+kjm
+kjn
+kjp
+kju
+kjv
+kjy
+kki
+kkm
+kkn
+kko
+kkp
+kkq
+kkr
+kkt
+kku
+kkx
+kky
+kkz
+kle
+klh
+kli
+kll
+klm
+kln
+klo
+klp
+klq
+klr
+kls
+klt
+klu
+klv
+klw
+klx
+klz
+kma
+kmc
+kmi
+kmj
+kml
+kmp
+kmq
+kms
+kmt
+kmw
+kmy
+kmz
+kna
+knb
+knc
+knh
+knj
+knk
+knl
+knp
+knr
+kns
+knt
+knu
+knw
+knx
+kod
+koe
+kof
+kok
+kos
+kot
+kou
+kov
+kox
+kpb
+kpc
+kpe
+kpf
+kpi
+kpj
+kpl
+kpn
+kpr
+kpt
+kpw
+kpx
+kpz
+kqa
+kql
+kqm
+kqy
+kqz
+kra
+krb
+krd
+kri
+krk
+krn
+kro
+krt
+krw
+ksl
+ksq
+ksr
+kss
+kst
+ksu
+ksv
+ksw
+ksx
+kte
+kth
+kti
+ktj
+ktm
+ktp
+ktr
+ktu
+ktw
+ktx
+ktz
+kua
+kud
+kue
+kuf
+kug
+kuh
+kui
+kuj
+kun
+kup
+kus
+kut
+kux
+kuz
+kva
+kvc
+kvd
+kvf
+kvg
+kvi
+kvj
+kvr
+kvw
+kvx
+kwa
+kwb
+kwh
+kwp
+kwq
+kwy
+kwz
+kxb
+kxe
+kxh
+kxo
+kxq
+kxr
+kxt
+kxz
+kyb
+kyg
+kyl
+kyo
+lae
+lam
+lan
+laq
+lbd
+lbe
+lbm
+lbz
+lce
+lcm
+lco
+lcq
+lcw
+lcz
+lda
+ldd
+lds
+ldt
+ldy
+ldz
+lea
+leg
+lek
+lep
+les
+lew
+lfb
+lfd
+lfe
+lfg
+lfh
+lfs
+lfu
+lfy
+lgf
+lgg
+lgp
+lgt
+lhe
+lhl
+lho
+lht
+lhw
+lhz
+lia
+lic
+lid
+lie
+lij
+lik
+lil
+lim
+lin
+liq
+lit
+liz
+ljc
+ljk
+ljl
+ljw
+ljz
+lkb
+lkh
+lki
+lkk
+lko
+lkp
+lks
+lle
+lll
+llp
+llt
+llz
+lmc
+lmd
+lmq
+lmz
+lnb
+lni
+lno
+log
+loh
+lol
+lom
+lon
+loo
+lop
+lor
+lot
+lou
+loy
+loz
+lpb
+lpe
+lpi
+lpj
+lpk
+lpp
+lpr
+lps
+lpt
+lpw
+lpx
+lqa
+lqb
+lqf
+lqg
+lqn
+lqo
+lqv
+lqw
+lqy
+lqz
+lra
+lrb
+lri
+lrj
+lrl
+lrm
+lrr
+lrs
+lrt
+lru
+lrz
+lsa
+lsc
+lsd
+lsh
+lsl
+lsm
+lsr
+lsv
+lsx
+lsy
+lta
+ltb
+ltg
+ltl
+ltp
+ltv
+luc
+lue
+lug
+lun
+luo
+luq
+lus
+lut
+luu
+luv
+luy
+luz
+lva
+lvb
+lvd
+lve
+lvi
+lvj
+lvp
+lvs
+lvz
+lwa
+lwb
+lwc
+lwd
+lwh
+lwi
+lwj
+lwk
+lwn
+lwq
+lwr
+lws
+lwu
+lwy
+lwz
+lxb
+lxf
+lxi
+lxj
+lxm
+lxs
+lxw
+lxx
+lxy
+lxz
+lya
+lyb
+lyc
+lyd
+lyg
+lyh
+lyi
+lyj
+lyk
+lyn
+lyo
+lys
+lzb
+lzc
+lzd
+lze
+lzf
+lzg
+lzh
+lzj
+lzl
+lzp
+lzq
+lzr
+lzs
+lzv
+lzw
+lzx
+lzz
+maa
+mac
+mad
+mae
+mag
+mah
+mai
+maj
+maq
+mar
+mas
+mat
+mbd
+mbe
+mbh
+mbi
+mbj
+mbk
+mbo
+mbp
+mbt
+mbu
+mbw
+mbz
+mce
+mcf
+mcj
+mcm
+mcp
+mcq
+mcr
+mct
+mcw
+mcz
+mda
+mdb
+mdc
+mdf
+mdg
+mdi
+mdm
+mdt
+mdu
+mdv
+mdy
+mdz
+mea
+mec
+med
+mee
+mef
+meh
+mei
+mej
+mek
+mep
+meq
+mer
+mes
+mev
+mew
+mfa
+mfb
