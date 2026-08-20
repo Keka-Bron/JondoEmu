@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Core", "Jondo.U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Protocol", "Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj", "{067E6248-BC90-4E0B-B5B2-9AB7BC84BF53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Launcher", "Jondo.Unity.Launcher\Jondo.Unity.Launcher.csproj", "{6A25F1A6-3EB9-4591-A45D-4B6957A767A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Server", "Jondo.Unity.Server\Jondo.Unity.Server.csproj", "{6A25F1A6-3EB9-4591-A45D-4B6957A767A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Parser", "Jondo.Unity.Parser\Jondo.Unity.Parser.csproj", "{1A1A0D71-C8BD-4704-B505-A23C4354B2BA}"
 EndProject
@@ -17,9 +17,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.World", "Jondo.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Contract", "Jondo.Unity.Contract\Jondo.Unity.Contract.csproj", "{E2235E7D-8C4F-43BE-9A83-1E4FFDCB31B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Lanzador", "Jondo.Unity.Lanzador\Jondo.Unity.Lanzador.csproj", "{4906C20A-F84D-4960-BA85-C298EBB9483A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Launcher", "Jondo.Unity.Launcher\Jondo.Unity.Launcher.csproj", "{4906C20A-F84D-4960-BA85-C298EBB9483A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.ProtocolBuilder", "Jondo.Unity.ProtocolBuilder\Jondo.Unity.ProtocolBuilder.csproj", "{9086F5B5-F1EA-4EEE-954B-ED43DDDDFB42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Reversing", "Jondo.Unity.Reversing\Jondo.Unity.Reversing.csproj", "{F0CE591A-F5C4-470B-A566-5212B58DA139}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Deobfuscator", "Jondo.Unity.Deobfuscator\Jondo.Unity.Deobfuscator.csproj", "{481AAE6A-8885-47F7-84C5-58A589391DCD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -139,6 +143,30 @@ Global
 		{9086F5B5-F1EA-4EEE-954B-ED43DDDDFB42}.Release|x64.Build.0 = Release|Any CPU
 		{9086F5B5-F1EA-4EEE-954B-ED43DDDDFB42}.Release|x86.ActiveCfg = Release|Any CPU
 		{9086F5B5-F1EA-4EEE-954B-ED43DDDDFB42}.Release|x86.Build.0 = Release|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Debug|x64.Build.0 = Debug|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Debug|x86.Build.0 = Debug|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Release|x64.ActiveCfg = Release|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Release|x64.Build.0 = Release|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Release|x86.ActiveCfg = Release|Any CPU
+		{F0CE591A-F5C4-470B-A566-5212B58DA139}.Release|x86.Build.0 = Release|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Debug|x64.Build.0 = Debug|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Debug|x86.Build.0 = Debug|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|x64.ActiveCfg = Release|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|x64.Build.0 = Release|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|x86.ActiveCfg = Release|Any CPU
+		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

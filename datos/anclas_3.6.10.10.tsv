@@ -1,0 +1,306 @@
+# Lo que se sabe de cada opcode de 3.6.10.10, y de dónde se sabe.
+#
+# El SIGNIFICADO está medido: sale de docs/opcodes.md, que se construyó cruzando el código del
+# emulador con 242 capturas del juego real. Un opcode con significado aquí es un opcode cuyo efecto
+# se ha visto pasar por el cable.
+#
+# El NOMBRE es una propuesta, no un dato. Ankama no publica los nombres del protocolo Unity; el de
+# esta columna es el que le corresponde por lo que hace, escrito al estilo de Dofus. Sirve para dos
+# cosas: para que el modelo de la etapa 4 tenga ejemplos resueltos con los que calibrar, y para
+# poder hablar de un mensaje sin decir «jsd». Vacío significa que el documento no establece qué
+# hace, y entonces no se inventa.
+#
+# columnas: opcode	dirección	nombre propuesto	significado	handler	forma
+kqz	C2S	AuthenticationTicketMessage	Presenta el ticket de un solo uso; vincula la sesion a una cuenta y a un servidor, y un ticket desconocido cierra la conexion.	GameNodeProxy.HandleTicketPresentation	f2: ticket
+krt	C2S		Llega junto con kqz; no espera nada de vuelta.	GameNodeProxy (empty branch)	-
+kra	S2C	AuthenticationTicketAcceptedMessage	Abre la rafaga de bienvenida.	ConnectionProtocol.BuildWelcomeBurst	empty
+lqu	S2C	BasicTimeMessage	Sincronizacion de reloj; se envia tambien en cada cambio de mapa.	BuildWelcomeBurst, BuildMapClock	f1: 120 (sync rate), f2: server clock, unix ms
+hoy	S2C	HelloGameMessage	Saludo del servidor de juego; f5 se omite a proposito porque no aparece en ninguna de las tres capturas de arranque.	ConnectionProtocol.BuildHoy	f1: 30, f2: 1, f3: 1, f6: language, f7: 200
+kqu	S2C	ServerOptionalFeaturesMessage	Funcionalidades habilitadas en el servidor, como ids opacos copiados de la captura. NO es una peticion de lista de personajes.	BuildWelcomeBurst	f1: packed [3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150]
+mgq	S2C			BuildWelcomeBurst	f1: 1, f2: 1, f3: 1
+mgt	S2C			BuildWelcomeBurst	f2: {} (empty submessage)
+hpd	S2C			BuildWelcomeBurst	f1: 1
+krs	S2C			BuildWelcomeBurst	empty
+mgz	S2C	ContentCatalogVersionMessage	Identificador del catalogo de contenido; opaco, el cliente solo lo compara consigo mismo.	BuildWelcomeBurst	f1: 304672615
+kqp	S2C		Se envia tres veces seguidas con tres cargas distintas; significado no establecido.	BuildWelcomeBurst	f1:1, f2:1 then f1:1 then empty
+kvi	S2C	CharactersListMessage	Los personajes de la cuenta en el servidor elegido.	BuildCharactersList	f1 (rep) { f1 { f2: name, f3: level, f4 { f2 { f3: sex } }, f6: look, f7: breed }, f2: characterId }
+kvd	S2C	CharactersListEndMessage	Cierra la lista de personajes; vacio, justo detras de kvi en la rafaga real. Candidato principal a la causa del boton de crear personaje muerto.	BuildWelcomeBurst	empty
+jtg	S2C	GiftsListMessage	Catalogo de regalos de la cuenta; se envia vacio porque nuestras cuentas no tienen ninguno.	BuildGiftCatalogue	f3 (rep) { f1 { f2: name, f3 {...item...}, f6 {...description...} }, f2: id }
+kqq	C2S	LogoutRequestMessage	El cliente vuelve a la pantalla de personaje o de servidor.	GameNodeProxy	-
+kqr	S2C	LogoutResultMessage	Respuesta a kqq; despues el cliente cierra la conexion el mismo y rehace el handshake.	GameNodeProxy.BuildKqrPayload	f1: session guid, f4: 1
+kvz	C2S	CharacterCreationRequestMessage	Crear un personaje.	CharacterCreationHandler.CreateAsync	read for name, breed, sex, look
+kvb	S2C	CharacterCreationResultMessage	Resultado de la creacion; vacio si va bien, f2 lleva el motivo del rechazo.	CharacterCreationHandler	empty, or f2: reason
+kvk	S2C	CharacterNameSuggestionSuccessMessage	Un nombre de personaje sugerido (el boton del dado).	CharacterCreationHandler.SuggestNameAsync	f1: name
+kvw	C2S	CharacterSelectionMessage	Seleccionar un personaje; el id se comprueba contra la cuenta de la sesion porque lo elige el cliente y no es de fiar.	CharacterSelectionHandler	read for character id
+kvl	C2S	CharacterFirstSelectionMessage	El mismo paso justo despues de una creacion con exito: el cliente envia kvl detras de kvi y entra al mundo sin pasar por la lista.	CharacterSelectionHandler	read for character id
+kva	S2C	CharacterSelectedSuccessMessage	Ya estas jugando con este personaje; sin el, el cliente se queda en la pantalla de personaje con el reloj de arena.	BuildCharacterSelectedSuccess	f1 { f1 { f1: details, f2: characterId } }
+kpa	C2S	CharactersListRequestMessage	Peticion de la lista de personajes; se despacha, pero solo se ve una vez en 242 capturas.	CharacterSelectionHandler.HandleCharacterListRequest	-
+lqc	C2S	GameContextCreateRequestMessage	Bloque 1 digerido: el servidor real espera esto antes de enviar el bloque 2.	GameNodeProxy	-
+jru	S2C	CurrentMapMessage	Carga este mapa; enviarlo dos veces hace que el cliente recargue el mundo en bucle.	BuildLoadMap, WorldEntry.SendMapAsync	f2: map id
+hjk	S2C		Viaja con jru en cada cambio de mapa.	BuildMapDiscovered	f1: packed [map id]
+jrh	C2S	MapInformationsRequestMessage	Quien esta en este mapa; sin respuesta el mapa se dibuja vacio, sin avatar, sin PNJs y sin monstruos.	GameNodeProxy	-
+jss	S2C	MapComplementaryInformationsDataMessage	Los actores del mapa; f6 (subarea) es obligatorio o el cliente revienta en MapInfoUI.SetInfoFromSubarea. El tipo de actor lo da el campo presente dentro de f2.f1: f5 jugador, f7 PNJ, f4 grupo de monstruos, con ids contextuales negativos para PNJs y grupos.	BuildMapActors	f2: map id, f6: subarea id, f5 (rep) { f1 { f1: cell, f2: facing }, f2 {...what it is...}, f3: contextual id }
+lva	S2C	MapLoadedMessage	Eso es todo el listado de actores; vacio, justo detras de jss. Sin el, el cliente nunca da el mapa por cargado, espera unos dos segundos y reintenta con knm, kno y kny.	BuildActorsComplete	empty
+kub	S2C	CharacterStatsListMessage	La hoja de personaje; el campo contenedor no es el mismo para cada caracteristica y equivocarlo mata la hoja entera con NullReferenceException. Se envia dos veces (con el personaje y con el mapa) y el cliente se queda con la segunda.	BuildCharacteristics, WorldEntry.ContainerOf	f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {...} } } - containers: f4 {f2: base, f3: parchments, f7: equipment} for most, f5 {f1: base, f5: bonus} for 1 and 23, f2 {f2: value} for 29, 47 and 96
+irq	S2C	JobExperienceMultiUpdateMessage	Los oficios; se conserva la lista de ids (es dato de juego) y se tira el progreso capturado: todos salen a nivel 1.	WorldEntry.ResetJobs	f1 (rep) { f1: job id, f3: level, f4/f5: experience }
+hms	S2C	SpellListMessage	Los hechizos que tiene el personaje, cada uno al grado que abre su nivel.	BuildSpellList	f1 (rep) { f1: grade, f3: spell id, f4: 1 }
+ivx	S2C	InventoryContentMessage	El inventario, construido desde la base de datos; el hueco se omite cuando es cero porque cero es el amuleto.	BuildInventory	f3 (rep) { f1: slot, f5 { f1: template, f2 (rep) {...value..., f11: effect}, f3: quantity, f4: uid } }
+itg	S2C	ShortcutBarContentMessage	Las barras de atajos; el servidor envia dos y nada dentro dice cual es cual: un hueco con hechizo lleva f6, uno con objeto lleva f9, y el f2 suelto del final es el tipo de barra (1 hechizos, ausente objetos).	BuildSpellBar, WorldEntry.Rebuilt	f1 (rep) { f2: slot, f6 { f2: spell id } }, f2: 1
+jrw	C2S	GameMapMovementRequestMessage	Caminar por un camino de casillas; cada paso empaqueta la orientacion en los bits altos de la casilla. El map id se comprueba contra la sesion y si no cuadra se ignora.	WorldMoveHandler.ConfirmMovementAsync	f1: map id, f2: packed path, each entry (facing << 12) | cell
+jsj	S2C	GameMapMovementMessage	El movimiento confirmado; saltarselo deja al actor con orientacion cero.	BuildActorMoved	f1: packed cells, f2: facing, f5: contextual id
+jqi	C2S	MapExitRequestMessage	Estoy en el borde, puedo salir.	WorldMoveHandler.AllowMapExitAsync	empty
+jsq	S2C_f3	MapExitAllowedMessage	Adelante; no lleva mas que el id de peticion repetido, en el campo raiz 3. Sin el, el cliente nunca envia jqk y el personaje se queda en el borde.	ConnectionProtocol.Answer	empty, id echoed
+jqk	C2S	ChangeMapMessage	El mapa al que quiere ir; la casilla y la orientacion de llegada se calculan del lado de salida (13 de casilla lateral, 532 en vertical), medido en las capturas.	WorldMoveHandler.ChangeMapAsync	f2: map id
+jsd	S2C	GameContextRemoveElementMessage	Quita un actor del mapa; su propio cambio de mapa cuenta.	BuildActorLeft	f2: contextual id
+iuk	C2S	ObjectSetPositionMessage	Mover un objeto a un hueco o de vuelta a la bolsa; la posicion cero es el amuleto, no la bolsa, y proto3 la omite.	EquipmentHandler.MoveAsync	f1: quantity, f2: uid, f3: position
+ivq	S2C	ObjectMovementMessage	Donde acabo un objeto; un hueco solo admite un objeto, lo que hubiera se expulsa antes a la bolsa con su propio ivq.	EquipmentHandler	f1: uid, f2: position
+lym	S2C		Lleva el aura en el flujo de apariencia (f1: id de aura, vacio si ninguna); en cada captura de equipar y desequipar lleva la constante 206, cuyo significado no esta establecido.	EquipmentHandler, AppearanceHandler.AuraAsync	f1: 206 on equip; f1: aura id or empty for the aura
+hie	S2C			EquipmentHandler	f1: 2
+hii	S2C			EquipmentHandler	f1: 2
+iun	S2C	InventoryWeightMessage	Los pods: peso llevado y capacidad. Identificado por aritmetica, cinco pods por punto de fuerza.	BuildPods	f1: carried, f3: capacity
+iuw	C2S	ObjectDeleteMessage	Destruir un objeto; el cliente no quita nada por su cuenta y sin respuesta el objeto se queda. Observado contra el cliente real en el log de trafico del emulador, no en el conjunto pcapng.	DestroyItemHandler.DestroyAsync	f2 { f2: uid, f3: quantity }
+ium	S2C	ObjectDeletedMessage	Un objeto sale de la bolsa.	BuildItemGone	f1: uid
+iua	S2C	ObjectAddedMessage	Un objeto llega a la bolsa, con todo: plantilla, efectos y cantidad.	BuildItemArrived (field 3)	f3 { f1: bag, f5 { f1: template, f2 (rep): effects, f3: quantity, f4: uid } }
+itd	S2C	StorageObjectUpdateMessage	Un objeto llega al cofre.	BuildItemArrived (field 1)	f1 { f1: bag, f5 { ... } }
+itc	S2C	StorageObjectRemoveMessage	Un objeto sale del cofre.	BuildItemGone	f1: uid
+kci	S2C	ExchangeStartedStorageMessage	El cofre se abre; los dos valores son constantes en la captura y el 100 parece el numero de huecos.	BuildStorageOpened	f1: 100, f3: 4
+iwb	S2C	StorageInventoryContentMessage	Lo que hay dentro del cofre; misma forma que el inventario, con la bolsa como posicion de todo.	BuildStorageContent	f1 (rep) { f1: 63, f5 { ... } }
+kcr	C2S	ExchangeObjectMoveMessage	Mover un objeto del cofre; la direccion no viaja, se deduce de donde esta el objeto. f1 llega como -1 cuando se arrastra la pila entera.	ChestHandler.MoveAsync	f1: quantity, f2: uid
+kla	C2S	LeaveDialogRequestMessage	El boton de cerrar el dialogo; vacio, y el cliente espera: la ventana no se cierra hasta que lo dice el servidor.	GameNodeProxy -> chest or zaap	empty
+khd	S2C	ExchangeLeaveMessage	El cofre se cerro.	BuildStorageClosed	f3: 11
+jbs	S2C	LotteryResultMessage	La respuesta de la maquina de loteria; de dos capturas, una con premio en f2 y otra rechazada con f3: 1.	BuildLotteryResult	f2: prize uid or f3: reason
+kum	C2S	StatsUpgradeRequestMessage	Gastar puntos de caracteristica; el valor es el total pagado, no un incremento, lo que hace el mensaje idempotente, y un total que no cabe se rechaza entero. Campos: 1 inteligencia, 2 suerte, 3 vitalidad, 4 sabiduria, 5 agilidad, 6 fuerza. Lleva id de peticion real (7 peticiones).	CharacteristicsHandler.SpendAsync	f1..f6: points spent in total on that characteristic
+kuh	C2S	StatsResetRequestMessage	Reiniciar caracteristicas; la captura no cobra nada por ello, asi que aqui tampoco se cobra.	CharacteristicsHandler.ResetAsync	empty
+hmt	C2S	SpellVariantActivationRequestMessage	Cambiar un hechizo por su variante, desde el panel o desde la barra.	SpellHandler.HandleVariantAsync	f1: wanted spell id
+iuq	S2C	ShortcutBarReplacedMessage	Uno por cada hueco de barra que tenia la mitad antigua del hechizo; se envia antes de hng.	BuildShortcutChanged	f2 { f2: slot, f6 { f2: spell id } }, f3: bar
+hng	S2C	SpellVariantActivationSuccessMessage	El hechizo nuevo y el grado que abre el nivel del personaje.	BuildSpellSwapped	f2: spell id, f3: grade
+itz	C2S	ShortcutBarAddRequestMessage	Editar un hueco de una barra de atajos; se escribe tambien en la base de datos o se pierde al salir.	GameNodeProxy.RememberShortcut	f2 { f2: slot, f6 { f2: spell id } }, f3: bar
+ivk	S2C	ShortcutBarRefreshMessage	El eco: la misma entrada que envio el cliente.	GameNodeProxy	identical to the itz payload
+iwo	C2S	InteractiveUseRequestMessage	Clic en un elemento interactivo; el zaap, el cofre y la loteria llegan todos por aqui.	ZaapTravelHandler.UseAsync	f1: skill instance uid, f2: element id
+iwn	S2C	InteractiveUsedMessage	Ese elemento esta en uso; f2 es el elemento, no la instancia de habilidad.	BuildElementInUse	f1: 1, f2: element id, f4: skill, f5: who
+hjj	S2C	TeleportDestinationsMessage	La lista de destinos del zaap; f6 casa con MapPositions en las 25 entradas de la captura y el destino donde ya estas viaja sin f2, o sea coste cero.	BuildZaapList	f2: map of the open zaap, f3 (rep) { f1: area level, f2: cost, f5: map, f6: subarea }
+hjc	C2S	TeleportRequestMessage	Destino elegido.	ZaapTravelHandler.TravelAsync	f3: destination map
+ivf	S2C	KamasUpdateMessage	Kamas que quedan despues de pagar.	BuildKamas	f1: kamas
+kld	S2C	LeaveDialogMessage	Cierra el dialogo; el cliente no cierra la ventana del zaap por si mismo. f1 es un motivo fijo, no algo que calcular.	BuildDialogClosed	f1: 10
+jbn	C2S	EnterHavenBagRequestMessage	El boton de la bolsa de viaje y la tecla H; lleva un personaje porque se puede visitar la de otro.	MerkasakoHandler.EnterFromOutsideAsync	f2: whose bag
+jbl	C2S	HavenBagThemeChangeRequestMessage	Cambiar el tema de la habitacion desde dentro.	MerkasakoHandler.ChangeThemeAsync	f1: theme
+jbv	C2S	HavenBagEditionStartRequestMessage	Abrir el modo de colocacion de muebles.	MerkasakoHandler.OpenEditorAsync	empty
+jbm	S2C	HavenBagEditionStartedMessage	Modo de colocacion confirmado.	MerkasakoHandler	empty
+jbg	C2S	HavenBagFurnituresUpdateRequestMessage	Una porcion de la habitacion; llega partido en tres seguidos y cada porcion lleva la habitacion entera, no un diff.	MerkasakoHandler.CollectFurniture	f2 (rep) { f1: cell, f2: furniture, f3: orientation }
+jbk	C2S		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	MerkasakoHandler.CloseEditorAsync	empty
+jav	C2S		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	MerkasakoHandler.CloseEditorAsync	empty
+jaw	C2S		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	MerkasakoHandler.CloseEditorAsync	empty
+jba	S2C	HavenBagEditionStoppedMessage	Modo de colocacion cerrado.	MerkasakoHandler	empty
+jbu	S2C	HavenBagFurnituresMessage	Los muebles de la habitacion, esperados detras del mapa; misma forma que jbg pero en f1 en vez de f2.	BuildHavenBagFurniture	f1 (rep) { f1: cell, f2: furniture, f3: orientation }
+jaz	S2C		Se envia con los muebles, entre jss y lva; significado no establecido.	MerkasakoHandler	empty
+lyk	C2S	AppearanceOpenRequestMessage	Abrir la ventana de apariencia; no tiene respuesta propia.	AppearanceHandler.OpenAsync	empty
+lyy	C2S	AppearanceStateRequestMessage	Pedir el estado de la ventana.	AppearanceHandler.SendStateAsync	f1: character uuid
+lxo	S2C_f3	AppearanceStateMessage	El estado de la ventana; f7 es el mismo uuid que lleva la vista previa lxc y f12 su mismo look, que es como el panel sabe que la respuesta es suya.	BuildAppearanceState	f1: 1, f3 { f3: when, f5: breed, f7: preview uuid, f8: 3, f10: title, f11: level, f12: look, f15: -1, f16: ornament, f17 (rep) { f1: slot, f2 { f2: garment } } }
+lys	C2S	AppearanceItemWearRequestMessage	Ponerse una prenda dejando que el servidor elija el hueco; acepta una variante, que es lo que usan los objetos vivos para imitar una prenda u otra.	AppearanceHandler.WearAsync	f1: item, f2: variant
+lwz	S2C_f3	AppearanceItemWornMessage	El hueco que eligio el servidor.	AppearanceHandler	f1: 1, f3: slot
+lyf	C2S	AppearanceSlotSetRequestMessage	Poner o vaciar un hueco concreto; sin variante, y sin objeto vacia el hueco.	AppearanceHandler.AssignAsync	f2: item, f3: slot
+lyj	S2C_f3	AppearanceSlotSetResultMessage	Acuse de recibo.	AppearanceHandler	f3: 1
+lxg	C2S	AppearanceSlotVisibilityRequestMessage	Mostrar u ocultar lo que hay en un hueco; con f3 puesto esa piel desaparece del siguiente lxc, la prenda no se quita, deja de dibujarse.	AppearanceHandler.ToggleAsync	f1: slot, f3: 1 to hide
+lxk	S2C_f3	AppearanceSlotVisibilityResultMessage	Acuse de recibo.	AppearanceHandler	f1: 1
+lxw	C2S	AppearanceAuraRequestMessage	El aura.	AppearanceHandler.AuraAsync	f2: aura
+lwx	S2C_f3	AppearanceAuraResultMessage	Acuse de recibo.	AppearanceHandler	f1: 1
+lxc	S2C	AppearancePreviewLookMessage	Tu aspecto ha cambiado: la vista previa del panel, que nadie mas ve. f1 es un uuid constante en la sesion y distinto por personaje; de donde lo aprende el cliente no se ha encontrado.	BuildLookChanged	f1: uuid, f2: the new look
+jsn	S2C	GameContextRefreshEntityLookMessage	Este actor ha cambiado: el bloque de actor entero, con casilla, id y el look nuevo. Es de lo que redibuja el cliente en el mapa.	BuildActorRefreshed	f1 { the actor block }
+lze	C2S	TitleSelectRequestMessage	Elegir un titulo; solo toca el borrador. Un mensaje vacio significa ninguno.	WardrobeHandler.ChooseTitleAsync	f1: title, or empty for none
+lxa	S2C_f3	TitleSelectResultMessage	Acuse de recibo.	WardrobeHandler	f2: 1
+lwm	C2S	OrnamentSelectRequestMessage	Elegir un ornamento; un mensaje vacio significa ninguno.	WardrobeHandler.ChooseOrnamentAsync	f2: ornament, or empty for none
+lyv	S2C_f3	OrnamentSelectResultMessage	Acuse de recibo.	WardrobeHandler	f1: 1
+lxs	C2S	AppearanceSaveRequestMessage	Guardar: aqui el borrador pasa a ser lo que se lleva puesto y el look llega al resto del mapa. El fichero de mapeos lo llama AlignmentSubAreaUpdate, y eso es falso.	WardrobeHandler.SaveAsync	empty
+lyu	S2C_f3	AppearanceSaveResultMessage	Guardado confirmado.	WardrobeHandler	f1: 1
+hid	S2C	TitleSelectedMessage	El titulo que se lleva ahora; vacio significa ninguno, no un cero dentro.	BuildTitleUpdated	f1: title, or empty
+hif	S2C	OrnamentSelectedMessage	El ornamento que se lleva ahora, con la misma regla.	BuildOrnamentUpdated	f1: ornament, or empty
+hhy	S2C	TitlesAndOrnamentsListMessage	Lo que la cuenta posee; el cliente ya tiene el catalogo entero y lo que no este en esta lista sale en gris. Se envia una vez al entrar al mundo. En el replay se sustituye por los de la cuenta que juega.	BuildTitlesOwned	f1: packed titles, f2: packed ornaments
+lyt	S2C	OutfitsListMessage	Los conjuntos guardados del guardarropa; obligatorio, sin el la ventana de cosmeticos suena y no se dibuja, muriendo en CosmeticUi.DisplayOutfit. En el replay se sustituye por los del personaje que juega.	BuildOutfits	f1 (rep): each saved outfit, f2: the one worn
+ktm	C2S	ChatClientMultiMessage	Una linea que escribio el jugador.	GameNodeProxy	f2: text, f3: channel
+kti	S2C	ChatServerMessage	La linea de vuelta. Canales: 0 general (omitido por ser cero), 1 equipo, 2 gremio, 3 alianza, 4 grupo, 5 comercio, 6 reclutamiento, y 9, 11, 16, 18, 19 para el resto.	BuildChatLine	f3: timestamp, f4: who, f5: character, f6: account, f7: text, f8: {}, f9: channel
+kqo	C2S	BasicPingMessage	El latido, cada cinco segundos mientras el cliente esta en el mundo; el mensaje de cliente mas frecuente, en 235 de los 242 ficheros. El fichero de mapeos lo llama ChatChannelsReadMessage, y eso es falso.	GameNodeProxy	-
+kqy	S2C	BasicPongMessage	La respuesta al latido, y nada mas; viaja en el campo raiz 1, no en el de respuesta.	BuildHeartbeatAnswer	f1: 1
+lxh	C2S	NpcDialogLeaveRequestMessage	Salir de un dialogo; el unico mensaje de PNJ que se observa enviar al cliente 3.6.10.10.	NpcHandler.HandleLeaveDialogRequest	empty
+lxj	S2C		Lo que el emulador responde a lxh; sin verificar, no aparece en ninguna de las 242 capturas.	NpcHandler	f1: 5
+jto	S2C		Lo envia el servidor y el cliente nunca; el emulador lo tiene en la rama de lista de personajes, a la que solo llega kpa. 7324 mensajes en 23 ficheros.	GameNodeProxy character-list branch	
+jwe	S2C		Lo envia el servidor pero el emulador lo usa como disparador de cliente. 9463 mensajes en 23 ficheros.	FightHandler dispatch	
+jxw	S2C		Lo envia el servidor pero el emulador lo usa como disparador de cliente. 4933 mensajes en 23 ficheros.	FightHandler dispatch	
+jya	S2C		Solo alcanzable desde el despacho de combate muerto. 3962 mensajes en 20 ficheros.	FightHandler emits it	
+jyj	S2C		Solo alcanzable desde el despacho de combate muerto. 178 mensajes en 21 ficheros.	FightHandler	
+jyg	S2C		Solo alcanzable desde el despacho de combate muerto. 36 mensajes en 22 ficheros.	FightHandler	
+krp	S2C		Solo alcanzable desde el despacho de combate muerto. 14 mensajes en 14 ficheros.	FightHandler	
+joq	S2C		Sus dos llamadores son rutas de 3.6.4.3. 1 mensaje en 1 fichero.	FightHandler, MapChangeHandler	
+jwm	C2S		Direccion invertida en el emulador: lo construye como mensaje de servidor pero lo envia el cliente. 7 mensajes en 1 fichero.	FightHandler builds it as a server message	
+hnk	S2C		El builder no se llama nunca; la rama hmv usa un payload crudo y hmv nunca llega. 243 mensajes en 9 ficheros.	TransitionPacketsBuilder.BuildHnkMessage	
+ilc	S2C		Solo se llama desde la rama kkn, que nunca llega. 5 mensajes en 3 ficheros.	BuildIlcMessage	
+isf	S2C		Solo alcanzable desde krc y desde isi, que no llegan nunca. 7 mensajes en 2 ficheros.	StatsHandler.BuildIsfPacket	
+hhf	S2C		Solo alcanzable desde isi, que nunca llega. 1 mensaje en 1 fichero.	InventoryHandler	
+kku	S2C		Solo alcanzable desde isi, que nunca llega. 2 mensajes en 2 ficheros.	InventoryHandler	
+luy	C2S		Lo envia el cliente (1 vez) pero el emulador lo construye como mensaje de servidor y el builder no se llama nunca. Lleva id de peticion real. El fichero de mapeos lo llama JobDescriptionMessage, y eso es falso.	InventoryHandler, BuildLuyMessage	
+kdx	C2S		Lo envia el cliente (10 veces en 1 fichero) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AccountCapabilitiesMessage, y eso es falso.	BuildKdxMessage	
+izh	C2S		Lo envia el cliente (8 veces en 7 ficheros) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AlmanaxDateMessage, y eso es falso.	BuildIzhMessage	
+izu	S2C		El builder no se llama nunca. 2 mensajes en 2 ficheros.	BuildIzuMessage	
+koj	S2C		Veinte cuentas Ankama con id, apodo y tag; se reconoce y se descarta por privacidad. El builder no se llama nunca. El fichero de mapeos lo llama HavenBagStatusMessage, y eso es falso. 28 mensajes en 7 ficheros.	BuildKojMessage, WorldEntry.NotReplayed	f2 { f2: account id, f4 { f1: nickname, f2: tag }, f5: 3 }
+itn	S2C		Lo envia el servidor pero el emulador lo usa como disparador de cliente y lo responde con itw, que no aparece en ninguna captura. 17 mensajes en 7 ficheros.	GameNodeProxy answers it with itw	
+ilr	S2C		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 2 mensajes en 1 fichero.	NpcHandler	
+kjl	S2C		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 1 mensaje en 1 fichero.	NpcHandler	
+kmu	S2C		Presente en 25 de las 31 carpetas de captura (399 mensajes, 90 ficheros). Nada establecido.		
+kmv	C2S		Llega con jrh en cada carga de mapa y no espera nada de vuelta; el emulador ya lo ignora en silencio. 727 mensajes, 88 ficheros.		
+iom	S2C		Las capturas muestran al SERVIDOR enviandolo (283 mensajes, 67 ficheros); OpcodeRegistry lo declara como MapInformationsRequest, nombre heredado y falso.	OpcodeRegistry (nombre heredado, falso)	
+kmb	S2C		Sale con jsn cuando se guarda un look; medidos 49 kmb estando montado y ninguno sin montura. No se envia: los cambios de look llegan igual por jsn. 172 mensajes, 62 ficheros.		
+lqg	S2C		Viaja con lqf (C2S) y lqt; los tres juntos aparecen en 54 ficheros de 19 carpetas. 77 mensajes, 56 ficheros.		
+lqt	S2C		Viaja con lqf (C2S) y lqg; los tres juntos aparecen en 54 ficheros de 19 carpetas. 76 mensajes, 55 ficheros.		
+lqn	S2C		Va entre lqu y hjk en cada cambio de mapa capturado; su unico campo vale 197 al entrar al mundo, 24 al cambiar de mapa y 470 tras un reinicio de caracteristicas, y no hay lectura que aguante. Deliberadamente no se envia. 213 mensajes, 53 ficheros.		
+hpm	S2C		Nada establecido. 103 mensajes, 35 ficheros.		
+izz	S2C		Nada establecido. 635 mensajes, 29 ficheros.		
+jtn	S2C		Combate; el opcode mas frecuente de todo el conjunto: 14728 mensajes en los 23 ficheros que contienen un combate.		
+jwi	S2C		Combate. 7324 mensajes, 23 ficheros.		
+jxm	S2C		Combate. 6556 mensajes, 23 ficheros.		
+jti	C2S		Combate. 1275 mensajes, 22 ficheros.		
+jxc	S2C		Combate. 739 mensajes, 23 ficheros.		
+jzc	S2C		Combate. 538 mensajes, 23 ficheros.		
+jxh	S2C		Combate. 514 mensajes, 23 ficheros.		
+jwz	C2S		Combate. 513 mensajes, 23 ficheros.		
+jyt	S2C		Combate. 503 mensajes, 20 ficheros.		
+jwh	C2S		Combate. 431 mensajes, 19 ficheros.		
+kmk	S2C		Combate. 264 mensajes, 22 ficheros.		
+jii	C2S		No implementado. Exclusivo de las capturas de gremio (Gremio); 21 mensajes.		
+jml	C2S		No implementado. Exclusivo de las capturas de gremio (Gremio); 14 mensajes.		
+jci	S2C		No implementado. Exclusivo de las capturas de gremio (Gremio); 10 mensajes.		
+jmf	S2C		No implementado. Exclusivo de las capturas de gremio (Gremio); 8 mensajes.		
+jlx	C2S		No implementado. Exclusivo de las capturas de gremio (Gremio); 8 mensajes.		
+hpu	C2S		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); 6 mensajes.		
+lux	C2S		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); lleva id de peticion real (5); 5 mensajes.		
+ltd	S2C_f3		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); es una respuesta y devuelve id de peticion real (5); 5 mensajes.		
+kwb	C2S		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); 5 mensajes.		
+jzw	S2C		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 12 mensajes.		
+jpx	S2C		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 8 mensajes.		
+jmu	C2S		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 8 mensajes.		
+jpr	C2S		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 5 mensajes.		
+kgl	S2C		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 12 mensajes.		
+kgp	S2C		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 9 mensajes.		
+kcu	S2C		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 4 mensajes.		
+hhk	S2C		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 4 mensajes.		
+iic	S2C_f3		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); es una respuesta y devuelve id de peticion real (17); 17 mensajes.		
+ify	C2S		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); lleva id de peticion real (17); 17 mensajes.		
+ija	S2C_f3		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); es una respuesta y devuelve id de peticion real (11); 11 mensajes.		
+igy	C2S		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); lleva id de peticion real (11); 11 mensajes.		
+izg	S2C		No implementado. Exclusivo de las capturas de Suenos Infinitos; 40 mensajes.		
+ixg	S2C		No implementado. Exclusivo de las capturas de Suenos Infinitos; 14 mensajes.		
+iyx	C2S		No implementado. Exclusivo de las capturas de Suenos Infinitos; 12 mensajes.		
+iyb	S2C		No implementado. Exclusivo de las capturas de Suenos Infinitos; 12 mensajes.		
+isv	S2C		No implementado. Exclusivo de las capturas de oficios (Oficios); 191 mensajes.		
+kdb	S2C		No implementado. Exclusivo de las capturas de oficios (Oficios); 114 mensajes.		
+kcj	C2S		No implementado. Exclusivo de las capturas de oficios (Oficios); 114 mensajes.		
+irl	C2S		No implementado. Exclusivo de las capturas de oficios (Oficios); 30 mensajes.		
+iej	S2C		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 38 mensajes.		
+hir	C2S		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 10 mensajes.		
+him	S2C		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 10 mensajes.		
+jqt	S2C		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 5 mensajes.		
+idz	S2C		No implementado. Exclusivo de las capturas de extras de conexion; 21 mensajes.		
+idw	C2S		No implementado. Exclusivo de las capturas de extras de conexion; 16 mensajes.		
+ieg	S2C		No implementado. Exclusivo de las capturas de extras de conexion; 12 mensajes.		
+kwd	C2S		No implementado. Exclusivo de las capturas de extras de conexion; 8 mensajes.		
+kia	S2C		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.		
+khv	C2S		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.		
+khu	S2C		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.		
+ket	S2C		No implementado. Exclusivo de las capturas de intercambio (Intercambio); 5 mensajes.		
+keq	S2C		No implementado. Exclusivo de las capturas de intercambio (Intercambio); 4 mensajes.		
+kfz	S2C		No implementado. Exclusivo de las capturas de intercambio (Intercambio); 3 mensajes.		
+ime	C2S		No implementado. Exclusivo de las capturas de grupos (Grupos); 2 mensajes.		
+imy	S2C		No implementado. Exclusivo de las capturas de grupos (Grupos); 1 mensajes.		
+jwj	S2C		No implementado. Exclusivo de las capturas de tienda (Tienda); 13 mensajes.		
+ipb	S2C		No implementado. Exclusivo de las capturas de tienda (Tienda); 7 mensajes.		
+ipa	C2S		No implementado. Exclusivo de las capturas de tienda (Tienda); 7 mensajes.		
+mgb			No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.		
+mfx			No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.		
+mfp			No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.		
+mfo			No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.		
+mff			No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.		
+mfe			No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.		
+lya	S2C		No implementado. Exclusivo de las capturas de extras de apariencia; 3 mensajes.		
+hih	S2C		No implementado. Exclusivo de las capturas de extras de apariencia; 2 mensajes.		
+hov	C2S		No implementado. Exclusivo de las capturas de emotes; 19 mensajes.		
+hoc	S2C		No implementado. Exclusivo de las capturas de emotes; 7 mensajes.		
+hor	C2S		No implementado. Exclusivo de las capturas de emotes; 2 mensajes.		
+hns	S2C		No implementado. Exclusivo de las capturas de emotes; 2 mensajes.		
+lqw	C2S		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.		
+lqq	S2C		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.		
+lqe	S2C		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.		
+jau	C2S		No implementado. Exclusivo de las capturas de bolsa de viaje (Merkasako); 2 mensajes.		
+kts	C2S		No implementado. Exclusivo de las capturas de caracteristicas (Caracteristicas); 2 mensajes.		
+hks	S2C		No implementado. Exclusivo de las capturas de alianzas (Alianzas); 1 mensajes.		
+jxs	S2C		No implementado. Exclusivo de las capturas de mazmorras (Mazmorras); 1 mensajes.		
+iuv	C2S		No implementado. Exclusivo de las capturas de Steamer; 1 mensajes.		
+kkn	C2S		Rama de 3.6.4.3: dispara la rafaga de inicializacion antigua (envia kkp, kkm, krb, ilc, joh, lor, kri, hmd, itp). No aparece en ninguna de las 242 capturas.	GameNodeProxy -> 3.6.4.3 initialisation burst	
+ibt	C2S		Rama de 3.6.4.3: rafaga final (envia icg x3, ith, klt, klp). No aparece en ninguna de las 242 capturas.	GameNodeProxy -> final burst	
+hmv	C2S		Rama de 3.6.4.3: envia hnk y la lista kqm. No aparece en ninguna de las 242 capturas.	GameNodeProxy	
+lpj	C2S		Rama de 3.6.4.3: envia lpe. No aparece en ninguna de las 242 capturas.	GameNodeProxy	
+loy	C2S		Rama de 3.6.4.3: envia tramas lok y jdj hardcodeadas. No aparece en ninguna de las 242 capturas.	GameNodeProxy	
+kod	C2S		El ping de 3.6.4.3, respondido con kns. Sustituido por kqo/kqy. No aparece en ninguna captura.	GameNodeProxy	
+jte	C2S		Se responde con una trama jto hardcodeada. No aparece en ninguna captura.	GameNodeProxy	
+kkr	C2S		Peticion de carga de mapa antigua (3.6.4.3). No aparece en ninguna captura.	MapLoadHandler	
+jos	C2S		Cambio de mapa antiguo (3.6.4.3), sustituido por jqk. No aparece en ninguna captura.	MapChangeHandler	
+jpp	C2S		Confirmacion de movimiento antigua (3.6.4.3), sustituida por jrw. No aparece en ninguna captura.	MapChangeHandler	
+isi	C2S		Movimiento de objeto antiguo (3.6.4.3), sustituido por iuk. No aparece en ninguna captura.	InventoryHandler	
+krc	C2S		Subida de caracteristicas antigua (3.6.4.3), sustituida por kum. No aparece en ninguna captura.	StatsHandler	
+kqn	C2S		Chat antiguo (3.6.4.3), sustituido por ktm. No aparece en ninguna captura.	ChatHandler	
+jxx	C2S		Despacho de combate antiguo (3.6.4.3). No aparece en ninguna captura.	FightHandler	
+kkp	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+kkm	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+krb	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+joh	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+lor	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+kri	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+hmd	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+itp	S2C		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama kkn)	
+icg	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama ibt)	
+ith	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama ibt)	
+klt	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama ibt)	
+klp	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama ibt)	
+kqm	S2C		La lista que envia la rama hmv de 3.6.4.3, junto con hnk. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama hmv)	
+lpe	S2C		Lo que envia la rama lpj de 3.6.4.3. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama lpj)	
+lok	S2C		Trama hardcodeada que envia la rama loy de 3.6.4.3. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama loy)	
+jdj	S2C		Trama hardcodeada que envia la rama loy de 3.6.4.3. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama loy)	
+kns	S2C		La respuesta al ping kod de 3.6.4.3. No aparece en ninguna de las 242 capturas.	GameNodeProxy	
+itw	S2C		Lo que GameNodeProxy responde a itn; no aparece en ninguna de las 242 capturas.	GameNodeProxy	
+knm	C2S		Junto con kno y kny es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.		
+kno	C2S		Junto con knm y kny es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.		
+kny	C2S		Junto con knm y kno es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.		
+kqg	S2C	ContactsListMessage	La lista de contactos de la cuenta grabada; se reconoce por opcode y se descarta. 28 mensajes.	WorldEntry.NotReplayed	
+jhe	S2C		El gremio de la cuenta grabada; se descarta. 7 mensajes.	WorldEntry.NotReplayed	
+jhh	S2C	GuildInformationsGeneralMessage	El gremio otra vez: fecha de fundacion, nivel y numero de miembros. Se descarta; mientras viajaba provocaba un NullReferenceException en el cliente. 18 mensajes.	WorldEntry.NotReplayed	
+jhk	S2C		El nombre del gremio, escrito. Se descarta; mientras viajaba provocaba un NullReferenceException en el cliente. 2 mensajes.	WorldEntry.NotReplayed	
+hol	S2C		Conyuge y gremio de la cuenta grabada; se descarta. 4 mensajes.	WorldEntry.NotReplayed	
+jgu	S2C	SpouseInformationsMessage	El conyuge, con su look; se descarta. 13 mensajes.	WorldEntry.NotReplayed	
+ihb	S2C		Catorce conjuntos guardados, cada uno con un look; se descarta. 7 mensajes.	WorldEntry.NotReplayed	
+ife	S2C		Alianzas, por nombre y tag; se descarta. 9 mensajes.	WorldEntry.NotReplayed	
+jjs	S2C		Un puesto de jugador en el mapa, con la cuenta detras; se descarta. 10 mensajes.	WorldEntry.NotReplayed	
+jaa	S2C		Lo mismo que jjs pero en su propio mensaje; se descarta. 5 mensajes.	WorldEntry.NotReplayed	
+imd	C2S		Lo envia el cliente (1 vez); el fichero datos/dofus3_mappings.json lo llama InventoryWeightMessage y eso es falso, un informe de peso seria push del servidor.		
+lqf	C2S		Es el opcode que mas usa id de peticion real: 76 peticiones. Viaja con lqg y lqt (76 en 55 ficheros).		
+krl	C2S		Lleva id de peticion real en 14 peticiones.		
+kro	C2S		Lleva id de peticion real en 14 peticiones. Ojo: la cadena kro tambien es una silaba del generador de nombres aleatorios de CharacterCreationHandler, colision que no es un opcode.		
+kxh	C2S		Lleva id de peticion real en 4 peticiones.		
+iio	C2S		Lleva id de peticion real en 3 peticiones.		
+iha	C2S		Lleva id de peticion real en 2 peticiones.		
+ihf	C2S		Lleva id de peticion real en 1 peticion.		
+ihs	C2S		Lleva id de peticion real en 1 peticion.		
+iin	C2S		Lleva id de peticion real en 1 peticion.		
+iiy	C2S		Lleva id de peticion real en 1 peticion.		
+lad	S2C_f3		Respuesta que devuelve un id de peticion real (4 respuestas).		
+ihq	S2C_f3		Respuesta que devuelve un id de peticion real (3 respuestas).		
+krv	C2S		El cliente lo envia justo tras la rafaga de bienvenida (9 veces en 8 ficheros) y lleva id de peticion real; el emulador deliberadamente no lo devuelve.		
+kvc	C2S		El cliente lo envia justo tras la rafaga de bienvenida (10 veces en 9 ficheros); el emulador deliberadamente no lo devuelve.		
+kmr	C2S		En la linea temporal de entrada al mundo, el servidor le contesta con 11 tramas, entre ellas jru (el mapa).		
+hou	S2C		Sale en la entrada al mundo, encabezando el grupo de once ktq y un lru.		
+ktq	S2C		Once seguidos en la entrada al mundo, detras de hou.		
+lru	S2C		Cierra ese grupo de la entrada al mundo (hou, once ktq, lru).		
+ieo	C2S		Cuatro seguidos en la entrada al mundo; el servidor contesta cuatro idu.		
+idu	S2C		La respuesta a ieo: cuatro seguidos en la entrada al mundo.		
+ivi	S2C		NO es el inventario: 9694 pares de id y valor, ids de 44 a 34352 y valores de cientos de millones; parece los contadores de estadisticas de la cuenta. Es la trama mas grande del bloque 3 (87878 B, el 97 % del fichero).		
+lzh	C2S		Va justo antes de kmv y jrh al final de la entrada al mundo; el servidor contesta lzl.		
+lzl	S2C		La respuesta a lzh en la entrada al mundo.		
+lvb	S2C		Va entre jss y lva en la entrada al mundo.		
+ktb			El mensaje privado (susurro): es un mensaje distinto de ktm y lleva su destinatario. No implementado. El documento no da direccion.		
+iqj			Lleva bloques de look: en los 73 bloques que se le miden, el campo f2 del look vale algo distinto de 3. El documento no da direccion.		

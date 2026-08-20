@@ -1,28 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- La ventana del servidor: el registro y las cifras. Es SU ventana, no la del lanzador. -->
-    <UseWindowsForms>true</UseWindowsForms>
-    <NoWarn>$(NoWarn);WFO1000</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Using Remove="System.Windows.Forms" />
-    <Using Remove="System.Drawing" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <!-- EL SERVIDOR. Una consola, no una ventana: desde que el lanzador es otro ejecutable, aqui
-         dentro no queda ni una linea de WinForms. -->
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <AssemblyName>Jondo Server</AssemblyName>
+    <AssemblyName>Jondo Emulator Launcher</AssemblyName>
     <RootNamespace>Jondo.Unity.Launcher</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
-    <ApplicationIcon>icono_servidor.ico</ApplicationIcon>
-    <!-- Un solo fichero: las doce dll (Google.Protobuf, Thrift, Sqlite y compania) se meten dentro
-         del .exe, y la nativa e_sqlite3.dll tambien. Sigue dependiendo del runtime de .NET 10. -->
+    <ApplicationIcon>..\Jondo.Unity.Server\icon.ico</ApplicationIcon>
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);WFO1000</WarningsNotAsErrors>
+    <!-- ESTE es el que se reparte a los jugadores. Referencia el contrato y NADA MAS: ni base de
+         datos, ni mapas, ni manejadores de protocolo, ni catalogo de efectos. Un solo fichero,
+         igual que antes, para que quien se lo baje vea un .exe y no una carpeta de dll. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
@@ -31,50 +22,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ApacheThrift" Version="0.23.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.35.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.81.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
-    <PackageReference Include="System.Text.Json" Version="10.0.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="Protocol\GameProtocol.proto" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="world.db" />
-    <Content Remove="auth.db" />
-    <None Update="world.db" CopyToOutputDirectory="Never" />
-    <None Update="auth.db" CopyToOutputDirectory="Never" />
+    <!-- WinForms mete System.Windows.Forms y System.Drawing en los using implicitos. No los
+         queremos globales: el resto del emulador usa nombres como Timer, Point o Message que
+         chocarian. Los ficheros de UI declaran los suyos. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
-    <ProjectReference Include="..\Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj" />
-    <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
   </ItemGroup>
 
-  <!-- Auto-deploy: a la raiz solo el .exe. Si quedaba alguna dll suelta de una publicacion
-       anterior, se borra para que la carpeta no se quede a medias. -->
-  <Target Name="DeployLauncher" AfterTargets="Publish">
-    <ItemGroup>
-      <SueltasDeAntes Include="$(MSBuildProjectDirectory)\..\Google.Protobuf.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Thrift.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Microsoft.Data.Sqlite.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.core.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.provider.e_sqlite3.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.batteries_v2.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\System.Net.Http.WinHttpHandler.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\e_sqlite3.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Core.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Core.pdb;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.pdb;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.World.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.World.pdb" />
-    </ItemGroup>
-    <Delete Files="@(SueltasDeAntes)" ContinueOnError="true" />
-    <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe" DestinationFiles="$(MSBuildProjectDirectory)\..\$(AssemblyName).exe" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
-    <Message Text="[Deploy] Servidor en la raiz." Importance="high" />
-  </Target>
-
-  <Target Name="ValidateOutputDirectory" BeforeTargets="BeforeBuild;BeforeRebuild">
-    <PropertyGroup>
-      <FullOutDir>$([System.IO.Path]::GetFullPath('$(OutDir)'))</FullOutDir>
-      <FullRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\'))</FullRootDir>
-    </PropertyGroup>
-    <Error Condition="'$(FullOutDir)' == '$(FullRootDir)' Or '$(FullOutDir)' == '$(FullRootDir)\'" Text="[Build Error] Do not build directly into the emulator root directory." />
+  <Target Name="DesplegarLauncher" AfterTargets="Publish">
+    <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe" DestinationFiles="$(MSBuildProjectDirectory)\..\Jondo Emulator Launcher.exe" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    <Message Text="[Deploy] Launcher en la raiz." Importance="high" />
   </Target>
 
 </Project>
