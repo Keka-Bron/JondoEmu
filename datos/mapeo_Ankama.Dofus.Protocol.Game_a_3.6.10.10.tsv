@@ -1,0 +1,1538 @@
+# Mapeo de Ankama.Dofus.Protocol.Game a 3.6.10.10.
+#
+# origen: estructura = lo resolvió el emparejador y no se equivoca;
+#         modelo     = había varios candidatos con la misma forma y eligió un LLM;
+#         duda       = hay candidatos y nadie ha elegido. NO usar sin mirarlo.
+#         retirado   = ni un solo candidato: o es nuevo, o ya no está.
+#
+# viejo	nuevo	origen	nombre	qué hace	lo usa el emulador
+hdn		duda			
+hdt		duda			
+hdw		duda			
+hdy		duda			
+hdz		duda			
+hea		duda			
+heb		duda			
+hec		duda			
+hee	jlm	estructura			
+heg	jlo	estructura			
+hek		duda			
+hen		duda			
+hep		duda			
+heq		duda			
+her		duda			
+hes		duda			
+het		duda			
+hez	les	estructura			
+hfa		duda			
+hfc		duda			
+hfd		duda			
+hfe		duda			
+hff		duda			
+hfh		duda			
+hfm		duda			
+hfr		duda			
+hfs		duda			
+hfu	hgp	estructura			
+hfv		duda			
+hfw		duda			
+hfx		duda			
+hfy		duda			
+hga		duda			
+hgd		duda			
+hgg		duda			
+hgj		duda			
+hgk		duda			
+hgl		duda			
+hgo		duda			
+hgp		duda			
+hgq		duda			
+hgr		duda			
+hgu		duda			
+hgx		duda			
+hha		duda			
+hhb		duda			
+hhc		duda			
+hhd		duda			
+hhe		duda			
+hhf		duda			sí
+hhg		duda			
+hhh		duda			sí
+hhm		duda			
+hhn		duda			
+hho		duda			
+hhp		duda			
+hhs	mah	estructura			
+hht	jsd	estructura			
+hhu		duda			
+hhv		duda			
+hhx	hqc	estructura			
+hhy		duda			sí
+hhz		duda			
+hia	krc	estructura			
+hib		duda			
+hic		duda			
+hif		duda			sí
+hii		duda			sí
+hik		duda			
+hin		duda			
+hiq	lyr	estructura			
+hir		duda			
+his	mcy	estructura			
+hit		duda			
+hiw		duda			
+hiz		duda			
+hjd		duda			
+hjh		duda			
+hjl		duda			
+hjn		duda			
+hjo		duda			
+hjr		duda			
+hjs		duda			
+hjt		duda			
+hju		duda			
+hjv		duda			
+hjz		duda			
+hka		duda			
+hkc		duda			
+hkd		duda			
+hke		duda			
+hkf		duda			
+hkg		duda			
+hkh		duda			
+hki		duda			
+hkj		duda			
+hkk	kda	estructura			
+hkl		duda			
+hkm	lgd	estructura			
+hkq		duda			
+hkr		duda			
+hks		duda			
+hkv		duda			
+hky		duda			
+hlb		duda			
+hlc		duda			
+hld		duda			
+hlf		duda			
+hlg		duda			
+hlj		duda			
+hlk		duda			
+hlm		duda			
+hln		duda			
+hlo		duda			
+hlu		duda			
+hmc		duda			
+hme		duda			
+hmj	lxk	estructura			sí
+hmk		duda			
+hml		duda			sí
+hmm	jua	estructura			
+hms		duda			sí
+hmt		duda			sí
+hmu		duda			
+hmv		duda			sí
+hmw		duda			
+hmz		duda			
+hnc		duda			
+hng		duda			sí
+hnh		duda			
+hnk		duda			sí
+hnn		duda			sí
+hnq		duda			sí
+hnt	hfo	estructura			
+hnu		duda			
+hnv		duda			sí
+hnx		duda			
+hnz		duda			
+hoa	kif	estructura			
+hob		duda			
+hoe		duda			
+hof		duda			
+hog	ind	estructura			
+hoh	ino	estructura			
+hoi		duda			
+hol		duda			sí
+hop		duda			
+hot	jtr	estructura			
+hou		duda			
+hoy		duda			sí
+hoz		duda			
+hpa		duda			
+hpl		duda			
+hpm		duda			
+hpp		duda			
+hpr		duda			
+hps		duda			
+hpv		duda			
+hpw		duda			
+hpx		duda			
+hpy	izs	estructura			
+hqb		duda			
+hqe		duda			
+hql	jac	estructura			
+hqp		duda			
+hqu		duda			
+hrb		duda			
+hrc		duda			
+hrd	hsy	estructura			
+hre	hus	estructura			
+hrf	iyu	estructura			
+hrk		duda			
+hrl		duda			
+hrm		duda			
+hrt		duda			
+hsb		duda			
+hsc		duda			
+hsg		duda			
+hsi		duda			
+hss	hub	estructura			
+hsu		duda			
+hsv		duda			
+htc		duda			
+hte		duda			
+htf		duda			
+htk		duda			
+htl		duda			
+hto		duda			
+htp		duda			
+hty	kgb	estructura			
+htz	mfc	estructura			
+hub		duda			
+hui	iai	estructura			
+hul		duda			
+hum		duda			
+hup		duda			
+hus		duda			
+hut		duda			
+huy		duda			
+hva		duda			
+hvb		duda			
+hvc		duda			
+hvd		duda			
+hvj		duda			
+hvk		duda			
+hvl	kdk	estructura			
+hvs	hvs	estructura			
+hvv		duda			
+hvw		duda			
+hwb		duda			
+hwc		duda			
+hwd		duda			
+hwq		duda			
+hwu		duda			
+hwv		duda			
+hwx		duda			
+hwy		duda			
+hwz		duda			
+hxg		duda			
+hxh		duda			
+hxk		duda			
+hxn		duda			
+hxo		duda			
+hxp	hyx	estructura			
+hxu		duda			
+hxv		duda			
+hxx	hgc	estructura			
+hxz		duda			
+hya	ibk	estructura			
+hyb		duda			
+hye		duda			
+hyf		duda			
+hyi		duda			
+hyj	hju	estructura			
+hyk		duda			
+hyl		duda			
+hym	hwo	estructura			
+hyn		duda			
+hyq	ich	estructura			
+hys	icj	estructura			
+hyy		duda			
+hzb		duda			
+hzc		duda			
+hze		duda			
+hzh		duda			
+hzi	mfy	estructura			
+hzo		duda			
+hzs	jjj	estructura			
+hzv		duda			
+hzw		duda			
+hzx		duda			
+iaa	hyr	estructura			
+iad		duda			
+iae		duda			
+iah		duda			
+iai		duda			
+iaj		duda			
+iam		duda			
+ian		duda			
+iap		duda			
+iar		duda			
+iau		duda			
+iax		duda			
+iay	ibg	estructura			
+iaz		duda			
+iba		duda			
+ibb		duda			
+ibc	kcx	estructura			
+ibi		duda			
+ibj		duda			
+ibk		duda			
+ibl		duda			
+ibm		duda			
+ibo		duda			sí
+ibp		duda			
+ibs		duda			
+ibt		duda			sí
+ibu		duda			
+ibv		duda			
+ibw		duda			
+ibz		duda			
+icc	irs	estructura			
+ice		duda			
+icf		duda			
+icg		duda			sí
+ich		duda			
+ici		duda			
+icj		duda			
+ick		duda			
+icl		duda			
+icn		duda			
+icq		duda			
+ict		duda			
+icu		duda			
+icv		duda			
+icw		duda			
+icx	jnc	estructura			
+idb		duda			
+idg		duda			
+idk		duda			
+idp		duda			
+idq		duda			
+idr		duda			
+idv		duda			
+idx		duda			
+idy		duda			
+idz		duda			
+iea		duda			
+ieb		duda			
+iec		duda			
+ied	iha	estructura			
+iee		duda			
+ief		duda			
+iej		duda			
+iek		duda			
+iem		duda			
+ien		duda			
+ieo		duda			
+ieq		duda			
+iet		duda			
+ieu		duda			
+iex		duda			
+iez		duda			
+ifa		duda			
+ifc		duda			
+ifd		duda			
+ife		duda			sí
+iff		duda			
+ifj		duda			
+ifk		duda			
+ifm		duda			
+ifn		duda			
+ifo	ihw	estructura			
+ifq		duda			
+ifs		duda			
+ift		duda			
+ifx	iyk	estructura			
+ify		duda			
+iga		duda			
+igb		duda			
+igc		duda			
+igg		duda			
+igk	jnr	estructura			
+igm	mbl	estructura			
+ign		duda			
+igo		duda			
+igp		duda			
+igq		duda			
+igr		duda			
+igt		duda			
+igv	ltq	estructura			
+igx		duda			sí
+ihd		duda			
+ihe		duda			
+ihg		duda			
+ihh		duda			
+ihm		duda			
+ihp	imu	estructura			
+ihr	inq	estructura			
+ihs		duda			
+ihv		duda			
+ihw		duda			
+iia		duda			
+iib	lrt	estructura			
+iic		duda			
+iif		duda			
+iig	imr	estructura			
+iih		duda			
+iii		duda			
+iij		duda			
+iik	lgz	estructura			
+iil		duda			
+iim		duda			
+iin		duda			
+iiq		duda			
+iir		duda			
+iis		duda			
+iit		duda			
+iiu		duda			
+iiw		duda			
+ijc		duda			
+ijd	jwn	estructura			
+ijf		duda			
+ijg		duda			
+ijh		duda			
+ijj		duda			
+ijk		duda			
+ijl		duda			
+ijm		duda			
+ijp		duda			
+ijs		duda			
+ijt		duda			
+iju		duda			
+ijv	ktx	estructura			
+ijw		duda			
+ijx		duda			
+ijy		duda			
+ijz		duda			
+ikc		duda			
+ikg	hoc	estructura			
+ikj		duda			
+ikk		duda			
+ikm		duda			
+iko		duda			
+ikr	ikr	estructura			
+iku		duda			
+ikv	lkz	estructura			
+ikx		duda			
+ila		duda			
+ilc		duda			sí
+ild		duda			
+ilf		duda			
+ili	hyj	estructura			
+ilm		duda			
+ilo		duda			
+ilr		duda			
+ilv		duda			
+ily		duda			
+imb	lnb	estructura			
+imd		duda			
+ime		duda			
+imi		duda			
+imj	ipb	estructura			
+imk		duda			
+imm	lro	estructura			
+imp		duda			
+imq		duda			
+ims		duda			
+imu		duda			
+imv		duda			
+imz		duda			
+ina		duda			
+inf		duda			
+ing		duda			
+inh		duda			
+inl		duda			
+ino		duda			
+inp		duda			
+inr		duda			
+inv		duda			
+inw		duda			
+inx		duda			
+iob		duda			
+iod	iqu	estructura			
+ioi	hsa	estructura			
+ioj		duda			
+ios		duda			sí
+iot		duda			
+iou		duda			
+iov		duda			sí
+iow		duda			
+ipe	ipz	estructura			
+ipf		duda			
+ipg		duda			
+iph		duda			
+ipi	imv	estructura			
+ipl		duda			
+ipm	kbd	estructura			
+ipp		duda			
+ipq		duda			
+ipr	knc	estructura			
+ipt		duda			
+ipu		duda			
+ipv		duda			
+ipw		duda			
+ipy		duda			
+iqd		duda			
+iqf		duda			
+iqg		duda			
+iql		duda			
+iqn		duda			
+iqu		duda			
+iqx	ipp	estructura			
+iqz		duda			
+ira		duda			
+irb		duda			
+irc		duda			
+irf		duda			
+irg		duda			
+irh		duda			
+iri		duda			
+irj		duda			
+irp		duda			
+irq		duda			sí
+irv		duda			
+irx		duda			
+iry		duda			sí
+irz		duda			
+isc		duda			
+isd		duda			
+ise		duda			sí
+isf		duda			sí
+isg		duda			
+ish		duda			
+isi		duda			sí
+isk	ikf	estructura			
+isn	kaw	estructura			
+isp		duda			
+isq		duda			
+isr		duda			
+isv		duda			
+isy		duda			
+isz		duda			
+ita		duda			
+itd		duda			sí
+ite		duda			
+itf		duda			
+ith		duda			sí
+iti		duda			
+itj		duda			
+itl		duda			
+itm		duda			
+itq		duda			
+itr		duda			sí
+itt		duda			
+itu		duda			
+itx		duda			
+ity		duda			sí
+iud		duda			
+iuf		duda			
+iug		duda			
+iuh		duda			
+iuj		duda			sí
+iuk		duda			sí
+iul		duda			
+iuo		duda			
+iut		duda			
+iuu		duda			
+iuv		duda			
+iuy		duda			
+ivb		duda			
+ivc		duda			
+ivd	iwq	estructura			
+ivf		duda			sí
+ivo	hsn	estructura			
+ivr		duda			
+ivs		duda			
+ivt		duda			
+ivw		duda			
+ivz		duda			
+iwc		duda			
+iwd		duda			
+iwe		duda			
+iwf	juz	estructura			
+iwp	hhu	estructura			
+iwq	hzw	estructura			
+iws		duda			
+iwt		duda			
+iwv	lco	estructura			
+iww		duda			
+iwx		duda			
+ixa		duda			
+ixc		duda			
+ixd		duda			
+ixf	lmo	estructura			
+ixi		duda			
+ixm		duda			
+ixt		duda			
+ixu		duda			
+ixv		duda			
+ixw	ixd	estructura			
+ixy		duda			
+iyb		duda			
+iyd	jbu	estructura			
+iye		duda			
+iyf		duda			
+iyg		duda			
+iyh		duda			
+iyj		duda			
+iyk		duda			
+iyl		duda			
+iyp	jat	estructura			
+iys		duda			
+iyv		duda			
+iyy		duda			
+iyz		duda			
+iza	kih	estructura			
+izc		duda			
+izd	jbg	estructura			
+izg		duda			
+izh		duda			sí
+izi		duda			
+izk	mae	estructura			
+izl		duda			
+izo	jar	estructura			
+izp		duda			
+izq		duda			
+izr		duda			
+izs		duda			
+izu		duda			sí
+izx		duda			
+izy		duda			
+izz		duda			
+jab		duda			
+jae		duda			
+jaj		duda			
+jal		duda			
+jao		duda			
+jar		duda			
+jau		duda			
+jav		duda			sí
+jaw		duda			sí
+jay		duda			
+jba		duda			sí
+jbc		duda			
+jbd		duda			
+jbe		duda			
+jbg		duda			sí
+jbl		duda			sí
+jbo		duda			
+jbp		duda			
+jbr		duda			
+jbt		duda			
+jbu		duda			sí
+jbw		duda			
+jbx		duda			
+jca		duda			
+jcb		duda			
+jce	jet	estructura			
+jcg		duda			
+jch		duda			
+jcj		duda			
+jcm		duda			
+jco		duda			
+jcp		duda			
+jct		duda			sí
+jcv		duda			
+jcw		duda			
+jcx		duda			
+jdf		duda			
+jdh		duda			
+jdi		duda			
+jdj		duda			sí
+jdk		duda			
+jdl		duda			
+jdm		duda			
+jdo		duda			
+jdp		duda			
+jdq		duda			
+jdr		duda			
+jdt	jfz	estructura			
+jdu		duda			
+jdv		duda			
+jdw	jgb	estructura			
+jdx	jgc	estructura			
+jea	jgi	estructura			
+jeb	jgj	estructura			
+jed	jgl	estructura			
+jee	jgn	estructura			
+jeg	jgg	estructura			
+jej		duda			
+jel		duda			
+jem		duda			
+jep	jgs	estructura			
+jer	jgz	estructura			
+jes		duda			
+jet		duda			
+jex	ket	estructura			
+jfa		duda			
+jfb		duda			
+jfc		duda			sí
+jfd		duda			
+jfk	kns	estructura			
+jfl	mcn	estructura			
+jfm		duda			
+jfo		duda			
+jfp		duda			
+jfq		duda			
+jfr		duda			
+jfs		duda			
+jft		duda			
+jfu		duda			
+jfw		duda			
+jfz	ilb	estructura			
+jgc	lsz	estructura			
+jgd		duda			
+jge		duda			
+jgg		duda			
+jgi	hzg	estructura			
+jgj		duda			
+jgk	isu	estructura			
+jgo		duda			
+jgp		duda			
+jgq		duda			
+jgv		duda			sí
+jgw		duda			
+jhb		duda			
+jhg		duda			
+jhk		duda			sí
+jhl		duda			
+jho		duda			
+jhq		duda			
+jhs		duda			
+jhw		duda			
+jia		duda			
+jid		duda			
+jii		duda			
+jij		duda			
+jin		duda			
+jiq		duda			
+jit		duda			
+jiv		duda			
+jiw		duda			
+jix		duda			
+jiz		duda			
+jjb		duda			
+jjc		duda			
+jje		duda			
+jji		duda			
+jjj		duda			
+jjk		duda			
+jjl		duda			
+jjm		duda			
+jjp		duda			
+jjq	jve	estructura			
+jjs		duda			sí
+jjt		duda			
+jjv		duda			
+jjw		duda			
+jjx		duda			
+jjz		duda			
+jkb	jlw	estructura			
+jkc		duda			
+jkd		duda			
+jkh		duda			
+jki		duda			
+jkj		duda			
+jkk	jro	estructura			
+jkn		duda			
+jkr		duda			
+jku		duda			
+jkv		duda			
+jkw		duda			
+jkx		duda			
+jky		duda			
+jlb		duda			
+jlc		duda			
+jld		duda			
+jlf		duda			
+jli		duda			
+jlj	jnt	estructura			
+jln		duda			
+jlo		duda			
+jlq	jko	estructura			
+jls		duda			
+jlt	jfm	estructura			
+jlv	jfo	estructura			
+jlz		duda			
+jmd		duda			
+jmf		duda			
+jmi		duda			
+jmn		duda			
+jmq		duda			
+jmt		duda			
+jmu		duda			
+jmz		duda			
+jnb		duda			
+jnf	ipv	estructura			
+jni	jnn	estructura			
+jnj		duda			
+jnm		duda			
+jnr		duda			
+jnt		duda			
+jnv	kil	estructura			
+jnx		duda			
+jny		duda			
+jnz		duda			
+joa		duda			
+joe		duda			
+jof		duda			
+joh		duda			sí
+joi	jhb	estructura			sí
+joj	jql	estructura			
+jol	jqn	estructura			
+joo	kcs	estructura			sí
+jop		duda			
+joq		duda			sí
+jor	jrr	estructura			
+jos		duda			sí
+joz	kqr	estructura			
+jpb		duda			
+jpc		duda			
+jpd		duda			
+jpf		duda			sí
+jpg		duda			
+jpj		duda			
+jpp		duda			sí
+jps		duda			
+jpt		duda			
+jpw		duda			
+jpz	izz	estructura			
+jqb		duda			
+jqd	kim	estructura			
+jqe		duda			
+jqf		duda			sí
+jqh		duda			
+jqi		duda			sí
+jqp		duda			
+jqq		duda			
+jqt		duda			
+jqx		duda			
+jqy		duda			
+jrb		duda			
+jrc		duda			
+jrd	jor	estructura			
+jrf		duda			sí
+jrm		duda			
+jrn		duda			
+jrp		duda			
+jrt		duda			
+jru		duda			sí
+jsb		duda			
+jsd		duda			sí
+jsf		duda			
+jsg		duda			
+jsl	lej	estructura			
+jsp		duda			
+jsr		duda			
+jss		duda			sí
+jst		duda			
+jtc		duda			
+jtd		duda			
+jte		duda			sí
+jtk	leb	estructura			sí
+jtl		duda			
+jtm		duda			sí
+jtq		duda			
+jtt		duda			
+jtu		duda			
+jtv		duda			
+jtz	jio	estructura			
+jub		duda			sí
+juc	jtv	estructura			sí
+jud		duda			sí
+jue		duda			
+juj		duda			
+jul		duda			
+jup		duda			
+juq		duda			
+jur		duda			
+jus		duda			
+juu		duda			sí
+juv	jan	estructura			
+juz	jzd	estructura			
+jvb	jzh	estructura			
+jvc	jzj	estructura			
+jvd	jzi	estructura			
+jve	jzk	estructura			
+jvf	kfw	estructura			
+jvg		duda			
+jvp		duda			
+jvt		duda			
+jvu		duda			
+jwb		duda			sí
+jwc	ioo	estructura			
+jwg		duda			
+jwh		duda			sí
+jwj		duda			
+jwl		duda			sí
+jwm		duda			sí
+jwn		duda			
+jwp		duda			
+jwr		duda			
+jwy	kfx	estructura			
+jxa	kfz	estructura			
+jxb	jrw	estructura			sí
+jxc		duda			sí
+jxf		duda			
+jxi		duda			
+jxl		duda			
+jxm		duda			sí
+jxp		duda			
+jxq		duda			
+jxt		duda			
+jxu		duda			
+jxv		duda			
+jxw		duda			sí
+jxx		duda			sí
+jxz		duda			sí
+jya	hqb	estructura			sí
+jyb		duda			
+jye		duda			
+jyg		duda			sí
+jyh		duda			
+jyi	kba	estructura			sí
+jyl		duda			
+jym		duda			
+jyn		duda			
+jyo		duda			
+jyp		duda			
+jyv		duda			
+jyz		duda			sí
+jza		duda			
+jzc		duda			sí
+jzf		duda			
+jzi		duda			
+jzj		duda			
+jzo		duda			
+jzr	jzw	estructura			
+jzs	lfu	estructura			
+jzv		duda			
+jzw		duda			
+kaa		duda			sí
+kad		duda			
+kae		duda			sí
+kah	idz	estructura			sí
+kaj		duda			
+kak		duda			
+kal		duda			
+kam		duda			sí
+kan	kid	estructura			
+kao		duda			
+kap	luy	estructura			
+kar		duda			
+kas		duda			
+kax		duda			
+kay		duda			
+kaz		duda			
+kbb		duda			
+kbc		duda			
+kbd		duda			sí
+kbe		duda			
+kbg		duda			
+kbj		duda			
+kbk		duda			
+kbl		duda			
+kbm		duda			
+kbo	ila	estructura			
+kbp		duda			
+kbq		duda			
+kbu		duda			
+kbv	lmr	estructura			
+kbw		duda			
+kbx		duda			
+kcd	kjg	estructura			
+kcf		duda			
+kci		duda			sí
+kcl		duda			
+kcm		duda			
+kcp		duda			
+kcr		duda			sí
+kcs		duda			
+kcv		duda			
+kcx	lcu	estructura			
+kda		duda			
+kdb	kde	estructura			
+kdd		duda			
+kdf		duda			
+kdh		duda			
+kdi		duda			
+kdj		duda			
+kdk	kha	estructura			
+kdl		duda			
+kdn		duda			
+kdo		duda			
+kdp		duda			
+kdq		duda			
+kdu		duda			
+kdv		duda			
+kdx		duda			sí
+kdy		duda			
+kdz		duda			
+kea		duda			sí
+keb		duda			
+keg		duda			
+kem		duda			
+keq		duda			
+ker	lob	estructura			
+kes	hkm	estructura			
+keu		duda			
+kex		duda			
+kfa		duda			
+kfb	jag	estructura			
+kfd		duda			
+kff		duda			
+kfg		duda			
+kfj		duda			
+kfm		duda			
+kfn		duda			
+kfo		duda			
+kfr		duda			
+kfw		duda			
+kfz		duda			
+kgc		duda			
+kgg		duda			
+kgm		duda			
+kgn		duda			
+kgp		duda			
+kgq		duda			
+kgs		duda			
+kgw		duda			
+kgx		duda			
+kha		duda			
+khc	kyb	estructura			
+khi		duda			
+khj		duda			
+khk		duda			
+khm		duda			
+khn		duda			
+khp		duda			
+khq		duda			
+kht		duda			
+khw		duda			
+khx		duda			
+khz	kkg	estructura			
+kic		duda			
+kid		duda			
+kif	kkk	estructura			
+kih		duda			
+kij	kgf	estructura			
+kik	ikw	estructura			
+kin		duda			
+kiq		duda			
+kiv		duda			
+kiz		duda			
+kjc		duda			
+kje		duda			
+kjf		duda			
+kjh		duda			
+kjk		duda			
+kjl		duda			
+kjm		duda			
+kjn		duda			
+kjp		duda			
+kjs	klk	estructura			
+kju		duda			
+kjv		duda			
+kjy		duda			
+kki		duda			
+kkm		duda			sí
+kkn		duda			sí
+kko		duda			
+kkp		duda			sí
+kkq		duda			
+kkr		duda			sí
+kks	isr	estructura			
+kkt		duda			
+kku		duda			sí
+kkv	hmw	estructura			
+kkw	jxk	estructura			
+kkx		duda			
+kky		duda			
+kkz		duda			sí
+kle		duda			
+klh		duda			
+kli		duda			
+kll		duda			
+klm		duda			
+kln		duda			
+klo		duda			sí
+klp		duda			sí
+klq		duda			
+klr		duda			
+kls		duda			
+klt		duda			sí
+klu		duda			
+klv		duda			
+klw		duda			sí
+klx		duda			
+klz		duda			
+kma		duda			
+kmc		duda			
+kmi		duda			
+kmj		duda			
+kml		duda			sí
+kmp		duda			sí
+kmq		duda			
+kms		duda			
+kmt		duda			sí
+kmw		duda			sí
+kmy		duda			
+kmz		duda			
+kna		duda			sí
+knb		duda			sí
+knc		duda			sí
+knh		duda			
+knj		duda			
+knk		duda			
+knl		duda			
+knp		duda			
+knr		duda			sí
+kns		duda			sí
+knt		duda			
+knu		duda			
+knv	kgw	estructura			sí
+knw		duda			
+kod		duda			sí
+koe		duda			
+kof		duda			sí
+kol	lvq	estructura			
+koq	kri	estructura			
+kos		duda			sí
+kot		duda			
+kou		duda			
+kov		duda			
+kox		duda			
+kpb		duda			
+kpc		duda			sí
+kpe		duda			
+kpf		duda			
+kpi		duda			
+kpj		duda			
+kpl		duda			
+kpm	ksw	estructura			
+kpn		duda			
+kpo	mby	estructura			
+kpr		duda			
+kps	kss	estructura			
+kpt		duda			
+kpw		duda			
+kpx		duda			
+kpy	ksn	estructura			
+kpz		duda			
+kqa		duda			
+kqj	lwd	estructura			
+kql		duda			
+kqm		duda			sí
+kqo	ktn	estructura			sí
+kqu	kte	estructura			sí
+kqy		duda			sí
+kqz		duda			sí
+kra		duda			sí
+krb		duda			sí
+krc	kum	estructura			sí
+krd		duda			sí
+kri		duda			sí
+krk		duda			
+krn		duda			
+kro		duda			
+krp	kbj	estructura			
+krt		duda			sí
+krw		duda			
+ksc	klx	estructura			
+ksd	jbs	estructura			
+ksg	hvi	estructura			
+ksh	kvo	estructura			
+ksl		duda			sí
+ksp	hgm	estructura			
+ksq		duda			sí
+ksr		duda			
+kss		duda			
+kst		duda			
+ksu		duda			
+ksv		duda			sí
+ksx		duda			sí
+kta	hks	estructura			
+kte		duda			
+kth		duda			
+kti		duda			sí
+ktj		duda			sí
+ktm		duda			sí
+ktp		duda			
+ktr		duda			
+ktu		duda			
+ktw		duda			
+ktx		duda			
+ktz		duda			
+kua		duda			
+kud		duda			
+kue		duda			
+kuf		duda			sí
+kug		duda			
+kuh		duda			sí
+kui		duda			
+kuj		duda			
+kun		duda			
+kuo	kmn	estructura			
+kup		duda			
+kus		duda			
+kut		duda			
+kux		duda			
+kuz		duda			
+kva		duda			sí
+kvc		duda			
+kvd		duda			sí
+kvf		duda			
+kvg		duda			
+kvi		duda			sí
+kvj		duda			
+kvr		duda			
+kvv	kvb	estructura			
+kvx		duda			
+kwa		duda			
+kwb		duda			
+kwh		duda			
+kwp		duda			
+kwy		duda			
+kwz		duda			
+kxb		duda			
+kxe		duda			
+kxh		duda			
+kxm	hlv	estructura			
+kxo		duda			
+kxq		duda			
+kxr		duda			
+kxt		duda			
+kxz		duda			
+kyb		duda			
+kyg		duda			
+kyl		duda			
+kyo		duda			
+lae		duda			
+lah	lhp	estructura			
+lai	lhq	estructura			
+lam		duda			
+lan		duda			
+laq		duda			
+lat	kvq	estructura			
+lav	mgv	estructura			
+lbc	loi	estructura			
+lbd		duda			
+lbe		duda			
+lbm		duda			
+lbn	ivv	estructura			
+lbo	lcs	estructura			
+lbp	lkt	estructura			
+lbq	ldk	estructura			
+lbr	jhw	estructura			
+lbz		duda			
+lcc	jwh	estructura			
+lce		duda			
+lcm		duda			
+lcn	hlz	estructura			
+lco		duda			
+lcq		duda			
+lcw		duda			
+lcz		duda			
+lda		duda			
+ldd		duda			
+ldi	iug	estructura			
+ldk	llz	estructura			
+ldn	lmc	estructura			
+ldp	lme	estructura			
+ldr	lmg	estructura			
+lds		duda			
+ldt		duda			sí
+ldy		duda			
+ldz		duda			
+lea		duda			
+leg		duda			
+leh	ldr	estructura			
+lek		duda			
+lep		duda			
+les		duda			
+lew		duda			
+lfb		duda			
+lfd		duda			
+lfe		duda			
+lfg		duda			
+lfh		duda			
+lfs		duda			
+lfu		duda			
+lfx	lhi	estructura			
+lfy		duda			
+lfz	iue	estructura			
+lgg		duda			
+lgp		duda			
+lgt		duda			
+lgx	lpe	estructura			
+lgz	lpg	estructura			
+lhe		duda			
+lhf	kyy	estructura			
+lhl		duda			
+lho		duda			
+lht		duda			
+lhw		duda			
+lhz		duda			
+lia		duda			
+lic		duda			
+lid		duda			
+lie		duda			
+lif	lku	estructura			
+lig	kby	estructura			
+lij		duda			
+lik		duda			
+lil		duda			
+lim		duda			
+lin		duda			
+liq		duda			
+liz		duda			
+ljc		duda			
+ljk		duda			
+ljl		duda			
+ljw		duda			
+lka	kqv	estructura			
+lkb		duda			
+lkh		duda			
+lki		duda			
+lkj	lfg	estructura			
+lkk		duda			
+lkn	hns	estructura			
+lko		duda			
+lkp		duda			
+lks		duda			
+lkt	lfe	estructura			
+lle		duda			
+lll		duda			
+llp		duda			
+llz		duda			
+lmc		duda			
+lmd		duda			
+lmk	hev	estructura			
+lmq		duda			
+lmz		duda			
+lnb		duda			
+lnc	lma	estructura			
+lni		duda			
+lno		duda			
+lob	ltu	estructura			
+log		duda			
+loh		duda			
+lok	lqs	estructura			sí
+lol		duda			sí
+lom		duda			
+lon		duda			
+lop		duda			
+lor		duda			sí
+lot		duda			
+lou		duda			sí
+loy		duda			sí
+loz		duda			
+lpb		duda			
+lpe		duda			sí
+lpf	hrr	estructura			
+lpi		duda			
+lpj		duda			sí
+lpk		duda			
+lpo	mgc	estructura			
+lpp		duda			
+lpr		duda			
+lps		duda			
+lpt		duda			
+lpw		duda			
+lpx		duda			
+lqa		duda			
+lqb		duda			
+lqf		duda			
+lqn		duda			sí
+lqo		duda			
+lqv		duda			
+lqw		duda			
+lqy		duda			
+lqz		duda			
+lra		duda			
+lrb		duda			
+lri		duda			
+lrj		duda			
+lrk	lkv	estructura			
+lrl		duda			
+lrm		duda			
+lro	lkx	estructura			
+lrq	ihh	estructura			
+lrr		duda			
+lrs		duda			
+lrt		duda			
+lru		duda			
+lrw	lli	estructura			
+lry	lfd	estructura			
+lrz		duda			
+lsa		duda			
+lsc		duda			
+lsd		duda			
+lsh		duda			
+lsk	ian	estructura			
+lsl		duda			
+lsm		duda			
+lsn	lst	estructura			
+lsr		duda			
+lsv		duda			
+lsx		duda			
+lsy		duda			sí
+lta		duda			
+ltb		duda			
+ltg		duda			
+ltl		duda			
+ltp		duda			
+ltr	mdr	estructura			
+ltv		duda			
+luc		duda			
+lue		duda			
+luf	hpn	estructura			
+lug		duda			
+lun		duda			
+luo		duda			
+luq		duda			sí
+lur	joz	estructura			
+lus		duda			
+lut		duda			
+luu		duda			
+luv		duda			
+luy		duda			sí
+luz		duda			
+lva		duda			sí
+lvb		duda			
+lvd		duda			
+lve		duda			
+lvh	lxh	estructura			
+lvi		duda			
+lvj		duda			
+lvp		duda			
+lvs		duda			
+lvt	jmo	estructura			
+lvz		duda			
+lwa		duda			
+lwb		duda			sí
+lwc		duda			
+lwd		duda			
+lwh		duda			
+lwi		duda			
+lwj		duda			
+lwk		duda			
+lwn		duda			
+lwq		duda			
+lwr		duda			
+lws		duda			
+lwu		duda			
+lwv	htu	estructura			
+lww	jvp	estructura			
+lwy		duda			
+lwz		duda			sí
+lxb		duda			
+lxf		duda			
+lxi		duda			sí
+lxj		duda			
+lxl	jhz	estructura			
+lxm		duda			
+lxp	lld	estructura			
+lxs		duda			sí
+lxt	mcz	estructura			
+lxw		duda			sí
+lxx		duda			
+lxy		duda			
+lxz		duda			
+lya		duda			
+lyb		duda			
+lyc		duda			
+lyd		duda			
+lyg		duda			
+lyh		duda			
+lyi		duda			
+lyj		duda			sí
+lyk		duda			sí
+lyn		duda			
+lyo		duda			
+lys		duda			sí
+lyw	ibv	estructura			
+lzb		duda			
+lzd		duda			
+lze		duda			sí
+lzf		duda			
+lzg		duda			
+lzh		duda			
+lzj		duda			
+lzk	lpl	estructura			
+lzl		duda			
+lzo	kah	estructura			
+lzp		duda			
+lzq		duda			
+lzr		duda			
+lzs		duda			
+lzv		duda			
+lzw		duda			
+lzx		duda			
+lzz		duda			
+maa		duda			
+mac		duda			
+mad		duda			
+mae		duda			
+mag		duda			
+mah		duda			
+mai		duda			
+maj		duda			
+maq		duda			
+mar		duda			
+mas		duda			
+mat		duda			
+mbc	mak	estructura			
+mbd		duda			
+mbe		duda			
+mbi		duda			
+mbj		duda			
+mbk		duda			
+mbm	lxu	estructura			
+mbo		duda			
+mbp		duda			
+mbt		duda			
+mbu		duda			
+mbw		duda			
+mbz		duda			
+mce		duda			
+mcf		duda			
+mcj		duda			
+mcm		duda			
+mcp		duda			
+mcq		duda			
+mcr		duda			
+mct		duda			
+mcw		duda			
+mcz		duda			
+mda		duda			
+mdb		duda			
+mdc		duda			
+mdf		duda			
+mdg		duda			
+mdi		duda			
+mdm		duda			
+mdq	jta	estructura			
+mdt		duda			
+mdu		duda			
+mdv		duda			
+mdy		duda			
+mdz		duda			
+mea		duda			
+mec		duda			
+med		duda			
+mee		duda			
+mef		duda			
+meh		duda			
+mei		duda			
+mej		duda			
+mek		duda			
+mep		duda			
+meq		duda			
+mer		duda			
+mes		duda			sí
+mev		duda			
+mex	mgr	estructura			
+mez	mgt	estructura			sí
+mfa		duda			sí
+mfb		duda			
