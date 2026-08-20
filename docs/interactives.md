@@ -88,14 +88,34 @@ registry.
 
 ### 2.3 Current registrations
 
-| Action kind | Element discovery | Type | Skill | Existing handler |
+| Action kind | Element discovery | Type | Skill | Handler |
 |---|---|---:|---:|---|
 | Zaap | Known zaap graphic, haven-bag zaap or explicit override | 16 | 114 | `ZaapTravelHandler` |
+| Zaap (vestige) | Graphic 74685 outside a haven bag | **359** | 114 | `ZaapTravelHandler` |
 | Chest | Graphic 12367 on a haven-bag map | 85 | 104 | `ChestHandler` |
 | Lottery | Graphic 51031 on a haven-bag map | -1 | 184 | `LotteryHandler` |
+| Zaapi | Graphics 70520/70521 (Bonta), 304418 (Brakmar) | 106 | 157 | `ZaapiTravelHandler` |
+| Bin | Graphics 8438, 46529, 63081, 260022 | 105 | 153 | `BinHandler` |
+| HouseDoor | Any of 37 graphics the captures declare type 300 | 300 | 84 | `HouseHandler` |
+| HouseExit | The chosen exit element of a house interior | 316 | 184 | `HouseHandler` |
 
-These values come from the existing 3.6 implementation and captures. The migration does not
-reinterpret them.
+Every one of those `(type, skill)` pairs is measured, not chosen: `tools/tipos_interactivos.py`
+cross-references the 304 packet captures against the client's element dump and yields
+`graphic → type` for 415 graphics. **1,990 elements are registered** at startup.
+
+Two of those rows deserve a note.
+
+**The vestige is not a zaap.** Graphic 74685 was declared type 16 for a long time and the
+captures say 359 — every single time it appears. It is the spot where a temporal anomaly
+surfaces, not a switched-off waypoint (see `world.md` 2.6). The exception is the five haven-bag
+decors that carry that graphic and no other: inside a bag it *is* the exit zaap, so it stays
+type 16 there. `Interactives.TypeOfZaap` draws exactly that line.
+
+**A house door is not just any door.** Type 300 is what carries the three dwelling skills —
+enter (84), access code (100) and put up for sale (98, or 108 when already listed). A building
+that is scenery comes as type −1 and cannot be clicked at all. Of the 40 graphics ever seen as
+type 300, Jondo uses the **37 that were *always* type 300**; the other three have shown a second
+type and stay out until a capture settles them.
 
 ---
 

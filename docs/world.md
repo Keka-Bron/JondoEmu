@@ -374,6 +374,80 @@ map; the zaapi list now sends nothing, which is what the real server does.
 
 ---
 
+## 2.7 Houses
+
+**1,437 doors on 553 maps**, every one of them enterable and every one of them ownerless.
+
+### What the client knows, and what it does not
+
+`HousesDataRoot` holds **261 houses**, and only six fields each: `typeId`, `defaultPrice`,
+`nameId`, `descriptionId`, `gfxId`, `roomCount`. Prices run from 1M to 60M — the dearest is
+*El palacio de los lagos*, 60,000,000 kamas and 15 rooms. `tools/extraer_casas.py` writes them to
+`datos/casas_3.6.10.10.json`, names resolved into Spanish, none missing.
+
+What is **not** there is which house sits behind which door, or which map is its inside. Checked
+three ways: `HouseData` has no map field of any kind; the 569 bundles under `Content/Map/Data`
+contain no field whose name mentions a house; and `doorCell` has **zero** occurrences in
+`global-metadata.dat`. Sister tables do carry it — `GuildHallsDataRoot` has a plain `mapId` — so
+this was removed from houses deliberately. The real server holds that link.
+
+### What the captures give
+
+| | element | type | skill |
+|---|---|---:|---:|
+| street door | 522653 | **300** | 84 enter · 100 access code · 98/108 sale |
+| inside door | 522411 | **316** | 184 |
+| house chest | 522477 | 85 | 104 open · 105 lock |
+
+Entering and leaving are **not the same message**, which is the part that is easy to get wrong:
+
+```
+enter   iwo { f1: skill, f2: element, f3: dwelling }   →  iwn  →  jqw { f1: interior map }
+leave   iwo { f1: skill, f2: element }                 →  iwn  →  jru { f2: street map }
+```
+
+The map travels in **field 1** of `jqw` and in **field 2** of `jru`. And the entering `iwo`
+carries a field that was not in the schema we had: **`f3` is the dwelling number**, because one
+door element serves several flats of the same building — eleven, in the capture.
+
+### The part Jondo decides
+
+Since the client cannot say where a door leads, Jondo assigns it, and says so out loud. An
+interior is a map at (0, 0) — interiors are not in the world, like haven bags — that has at least
+one clickable element, because the way out *is* an element and a map without elements is a
+prison. Each door then draws from the pool of **its own sub-area**, falling back to its **area**,
+and finally to the world:
+
+| pool used | doors |
+|---|---:|
+| its own sub-area | 929 |
+| its area | 309 |
+| anywhere | 199 |
+
+Assignment is by sorted index, so the same door always leads to the same interior, across
+restarts and across machines, with nothing stored. `tools/casas_mundo.py` writes
+`datos/casas_mundo_3.6.10.10.json`, and any entry can be corrected by hand.
+
+Of the 207 interiors in use, **29 have a real door** (graphic 44035, the one measured inside the
+Bonta house). The rest get their lowest-numbered element declared as the exit — that may well be
+a piece of furniture, and it is deliberate: a wardrobe you can leave through beats a house you
+cannot leave. You come out **through the door you went in by**, not through the first door that
+happens to lead there, which is what the session remembers it for.
+
+### Not done
+
+The house **plaque** is not sent. It is the sub-message the client calls `lnx` and it rides
+inside `jss` field 9: price in its `f7`, owner in its `f8`, and being for sale is not a boolean —
+it *is* carrying `f7`. Measured byte for byte: listing a house and delisting it differ by exactly
+five bytes, `38 a0 9c e3 09`. The problem is the ownerless case: across the 34 capture folders
+there are **1,276 plaques and all 1,276 have an owner**. Omitting `f8` is what the format implies
+but nothing measures it, and `jss` is the message the whole map hangs off. It waits for a
+capture.
+
+The house chest, the access code, and buying or selling are not done either.
+
+---
+
 ## 3. The haven bag (*merkasako*)
 
 The Spanish servers call the haven bag the **merkasako**, and so does the code

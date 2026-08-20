@@ -93,10 +93,27 @@ Some folders are **not** in the repository because they are not needed to play, 
 - [x] **Last cell and map persistence** in the database.
 - [x] **Auto-pilot** — double-click on the minimap or the *travel to* option.
 
-### 🌀 Zaaps and Zaapis
-- [x] **62 waypoints** mapped from the client data, with their map, cell and sub-area.
+### 🌀 Zaaps, Zaapis and Anomalies
+- [x] **62 waypoints** mapped from the client data, with their map, cell and sub-area, plus the three departure-only zaaps the waypoint table does not list (the guild reception room among them).
 - [x] **Travel between zaaps** with the real cost and destination list.
-- [x] **Zaapis** and the alliance-temple waypoint, which is a special case: the temple map has four interactive elements and only one of them is the waypoint, so it carries an explicit override (`datos/zaap_overrides.json`) instead of being guessed.
+- [x] **Discovered zaaps** announced on world entry. The client shows *nothing at all* without that list — it is `hjk`, 45 map ids packed into one message, and its absence is why the travel window used to read "No destination".
+- [x] **Zaapis** of Bonta (24 destinations) and Brakmar (21), flat 20 kamas. Their destination tables cannot be derived from client data — four of every six destinations have no zaapi of their own — so they were read off the captures.
+- [x] **The right window.** The `hjj` carries a root field that decides which window the client opens: 0 zaap, 1 zaapi, 3 boat. Measured across all twelve captured lists without exception.
+- [x] **Temporal anomalies**, the tab beside the zaap list: 16 of them, each with the real 120-minute countdown. The 15 "unactivated" waypoints turned out not to be switched-off zaaps but **vestiges**, type 359, where an anomaly surfaces — and from a vestige only anomalies are offered.
+- [x] The alliance-temple waypoint, a special case: the temple map has four interactive elements and only one is the waypoint, so it carries an explicit override (`datos/zaap_overrides.json`) instead of being guessed.
+
+### 🏘️ Houses
+- [x] **1,437 doors on 553 maps**, all enterable, all ownerless.
+- [x] **261 house models** extracted from the client — name, price, room count — from 1M kamas up to the 60M, 15-room *Palacio de los lagos*.
+- [x] **Entering and leaving**, which are different messages: you go in with `jqw` and come out with `jru`, and the map id sits in a different field in each. You come out through the door you went in by.
+- [ ] The house **plaque** — owner, price, for-sale — is not sent yet. Across 34 capture folders there are 1,276 plaques and every one has an owner, so what an ownerless house looks like on the wire is still unmeasured, and `jss` is not the message to guess in.
+- [ ] House chest, access code, buying and selling.
+
+> Which house sits behind which door is **not in the client** — checked three ways. Jondo assigns each door an interior deterministically from its own sub-area (929 doors), then its area (309), then anywhere (199), so a house at least belongs to its neighbourhood. It is written to `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
+
+### 🗑️ Bins
+- [x] **67 public bins in 63 maps**, recognised by their four graphics. They open, show empty and close.
+- [ ] Putting items in and taking them out: that needs a store per bin, and the haven-bag chest's switch would send them to your own house instead.
 
 ### 🏠 Haven Bags (Merkasako)
 - [x] **Entering and leaving** from the outside, and the haven bag's own zaap.
