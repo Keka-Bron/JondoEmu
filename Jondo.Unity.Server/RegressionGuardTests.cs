@@ -160,6 +160,22 @@ namespace Jondo.Unity.Launcher
 
         private static void AssertProfessionCatalog()
         {
+            // Los dumps de dofusdude son OPCIONALES a propósito: quien no los haya puesto en
+            // datos/JsonFromDofusDude/ arranca sin oficios —el propio importador lo permite y lo
+            // dice en el arranque—, así que aquí no hay catálogo que comprobar y no es ningún
+            // fallo. Comprobarlo igual y reventar el arranque era lo que mataba al servidor de
+            // entrada: la guardia exigía como obligatorios los datos que su propia importación
+            // declara opcionales.
+            //
+            // Con los dumps puestos, todo lo de abajo se exige igual: ahí un catálogo vacío o
+            // incoherente sí es una regresión de verdad.
+            if (!File.Exists(Paths.SkillsJson) || !File.Exists(Paths.RecipesJson))
+            {
+                Console.WriteLine("[RegressionGuard] Sin dumps de oficios en datos/JsonFromDofusDude; " +
+                                  "se omite la comprobación del catálogo (arranque sin oficios).");
+                return;
+            }
+
             if (Managers.JobManager.Count == 0 || Managers.SkillManager.Count == 0 ||
                 Managers.RecipeManager.Count == 0)
                 throw new InvalidOperationException(
