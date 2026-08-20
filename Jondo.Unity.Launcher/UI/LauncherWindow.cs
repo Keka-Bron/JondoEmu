@@ -71,6 +71,8 @@ namespace Jondo.Unity.Launcher.UI
         private const int LogoGap = 10;
         private readonly LauncherPanel _topBar = new();
         private readonly LauncherButton _btnMusic = new();
+        private readonly LauncherButton _btnZoomOut = new();
+        private readonly LauncherButton _btnZoomIn = new();
         private readonly LauncherButton _btnEs = new();
         private readonly LauncherButton _btnEn = new();
         private readonly LauncherButton _btnFr = new();
@@ -109,6 +111,17 @@ namespace Jondo.Unity.Launcher.UI
 
         private readonly StatusIndicator _statusIndicator = new();
 
+        // ─── Lo que no se ve hasta que se pasa el ratón ────────────────────────────────────
+        //
+        // Los botones de icono y letra —música, ampliación, idiomas— dicen lo que hacen cuando
+        // se les pasa por encima; y el de la ruta del cliente enseña la ruta ENTERA, que en el
+        // botón se recorta por el medio para que quepa.
+        private readonly System.Windows.Forms.ToolTip _tooltips = new();
+
+        // La versión del cliente al que este lanzador arranca, abajo a la derecha: discreta, del
+        // color de lo secundario, sólo para quien la busque.
+        private readonly Label _lblVersion = new();
+
         private readonly System.Windows.Forms.Timer _statusTimer = new();
 
         public LauncherWindow()
@@ -135,7 +148,10 @@ namespace Jondo.Unity.Launcher.UI
             BackColor = LauncherTheme.Background;
             ForeColor = LauncherTheme.BaseText;
             StartPosition = FormStartPosition.CenterScreen;
-            MinimumSize = new Size(1000, 660);
+            // El mínimo también escala: con la interfaz ampliada, un mínimo fijo de 96 dpi deja la
+            // ventana sin sitio para la tarjeta y los campos se salen por debajo.
+            _scale = LauncherTheme.UiZoom = LauncherPreferences.Zoom;
+            MinimumSize = new Size((int)(1000 * _scale), (int)(660 * _scale));
             WindowState = FormWindowState.Maximized;
             KeyPreview = true;
             Font = LauncherTheme.CreateFont(13f);
@@ -203,6 +219,20 @@ namespace Jondo.Unity.Launcher.UI
             _btnMusic.CornerRadius = 5;
             _btnMusic.Click += (s, e) => ToggleMusic();
             _topBar.Controls.Add(_btnMusic);
+            _tooltips.SetToolTip(_btnMusic, _texts.MusicTooltip);
+
+            // La ampliación, para pantallas de muchas pulgadas al 100% de escala, donde todo queda
+            // diminuto: un par de botones al lado de la música que suben y bajan el tamaño de la
+            // interfaz y lo dejan guardado para la próxima vez. El «A» hace de palabra: se entiende
+            // en los tres idiomas sin traducir nada.
+            ConfigureZoomButton(_btnZoomOut, "A–");
+            ConfigureZoomButton(_btnZoomIn, "A+");
+            _btnZoomOut.Click += (s, e) => ChangeZoom(-0.25f);
+            _btnZoomIn.Click += (s, e) => ChangeZoom(+0.25f);
+            _topBar.Controls.Add(_btnZoomOut);
+            _topBar.Controls.Add(_btnZoomIn);
+            _tooltips.SetToolTip(_btnZoomOut, _texts.ZoomTooltip);
+            _tooltips.SetToolTip(_btnZoomIn, _texts.ZoomTooltip);
 
             ConfigureLanguageButton(_btnEs, "es", Language.Es);
             ConfigureLanguageButton(_btnEn, "en", Language.En);
@@ -350,6 +380,14 @@ namespace Jondo.Unity.Launcher.UI
             _statusIndicator.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
             _card.Controls.Add(_statusIndicator);
 
+            // La versión, abajo a la derecha de la ventana entera.
+            _lblVersion.BackColor = Color.Transparent;
+            _lblVersion.ForeColor = LauncherTheme.LightBrownText;
+            _lblVersion.Font = LauncherTheme.CreateFont(9f);
+            _lblVersion.Text = "JONDO EMULATOR  ·  v" + Contract.Version;
+            _lblVersion.AutoSize = true;
+            Controls.Add(_lblVersion);
+
             RefreshClientPath();
             RefreshAccountRows();
         }
@@ -378,6 +416,10 @@ namespace Jondo.Unity.Launcher.UI
                 _btnClientPath.TextColor = LauncherTheme.Gold;
                 _btnClientPath.TextColorHighlight = _btnClientPath.TextColorActive = Color.White;
             }
+
+            // La ruta entera al pasar el ratón: el botón la recorta por el medio para caber, y la
+            // recortada no sirve para copiarla a ningún sitio.
+            _tooltips.SetToolTip(_btnClientPath, ruta.Length > 0 ? ruta : guardada);
         }
 
         /// <summary>Rutas largas por el medio, que el final es lo que identifica al fichero.</summary>
@@ -408,8 +450,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         private void ConfigureLanguageButton(LauncherButton button, string code, Language language)
-        {
-            button.Icon = ButtonIcon.Flag;
+        {            button.Icon = ButtonIcon.Flag;
             button.FlagCode = code;
             button.Text = code.ToUpperInvariant();
             button.Font = LauncherTheme.CreateFont(12f);
@@ -424,7 +465,82 @@ namespace Jondo.Unity.Launcher.UI
             button.TextColorActive = Color.White;
             button.CornerRadius = 4;
             button.Click += (s, e) => ChangeLanguage(language);
+            // Cada bandera dice su idioma en su propio idioma: es como uno encuentra el suyo.
+            _tooltips.SetToolTip(button, code.ToLowerInvariant() switch
+            {
+                "en" => "English",
+                "fr" => "Français",
+                _ => "Español",
+            });
             _topBar.Controls.Add(button);
+        }
+
+        /// <summary>Un botón de ampliar o reducir, con el mismo aire que el de la música.</summary>
+        private void ConfigureZoomButton(LauncherButton button, string texto)
+        {
+            button.Text = texto;
+            button.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
+            button.BackgroundTop = button.BackgroundBottom = Color.FromArgb(217, 45, 25, 12);
+            button.BackgroundTopHighlight = button.BackgroundBottomHighlight = Color.FromArgb(110, 70, 24);
+            button.BorderColor = LauncherTheme.Gold;
+            button.BorderColorHighlight = Color.White;
+            button.TextColor = LauncherTheme.LightGold;
+            button.TextColorHighlight = Color.White;
+            button.CornerRadius = 5;
+            button.Cursor = Cursors.Hand;
+        }
+
+        // ─── La ampliación ────────────────────────────────────────────────────────────────────
+        //
+        // Cambiar el tamaño en caliente no puede limitarse a recolocar: las letras se crearon con
+        // el ampliador de antes y hay que volver a crearlas con el de ahora. AplicarZoom repone
+        // cada fuente con el MISMO cuerpo con el que se configuró, y así los controles no heredan
+        // un tamaño viejo por haberse construido antes.
+
+        private void ChangeZoom(float paso)
+        {
+            float antes = LauncherTheme.UiZoom;
+            float despues = MathF.Max(0.5f, MathF.Min(3f, antes + paso));
+            if (MathF.Abs(despues - antes) < 0.01f) return;
+
+            LauncherTheme.UiZoom = despues;
+            LauncherPreferences.Zoom = despues;
+            _scale = DeviceDpi / 96f * despues;
+            MinimumSize = new Size((int)(1000 * _scale), (int)(660 * _scale));
+
+            AplicarZoom();
+            RebuildLayout();
+            RefreshAccountRows();
+            Invalidate(true);
+        }
+
+        /// <summary>Vuelve a poner cada fuente con el cuerpo con el que se configuró, al ampliador actual.</summary>
+        private void AplicarZoom()
+        {
+            Font = LauncherTheme.CreateFont(13f);
+
+            _btnMusic.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
+            ConfigureZoomButton(_btnZoomOut, "A–");
+            ConfigureZoomButton(_btnZoomIn, "A+");
+            _btnEs.Font = _btnEn.Font = _btnFr.Font = LauncherTheme.CreateFont(12f);
+
+            _lblAlert.Font = LauncherTheme.CreateFont(12f);
+            _loginTab.Font = LauncherTheme.CreateFont(12f, FontStyle.Bold);
+            _registerTab.Font = LauncherTheme.CreateFont(12f, FontStyle.Bold);
+            _lblUsername.Font = _lblPassword.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
+            _fieldUsername.Font = _fieldPassword.Font = LauncherTheme.CreateFont(13f);
+            _lblRegUsername.Font = _lblRegPassword.Font = _lblRegNickname.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
+            _fieldRegUsername.Font = _fieldRegPassword.Font = _fieldRegNickname.Font = LauncherTheme.CreateFont(13f);
+            _lblWelcome.Font = LauncherTheme.CreateFont(16f);
+            _lblSubscription.Font = LauncherTheme.CreateFont(12f);
+            _btnConnect.Font = _btnCreate.Font = LauncherTheme.CreateFont(16f, FontStyle.Bold);
+            _btnSelectAll.Font = LauncherTheme.CreateFont(10f, FontStyle.Bold);
+            _lnkLogOut.Font = LauncherTheme.CreateFont(11f);
+            _lnkRemoveSelected.Font = LauncherTheme.CreateFont(10f);
+            _lnkBackToTeam.Font = LauncherTheme.CreateFont(10f, FontStyle.Bold);
+            _btnClientPath.Font = LauncherTheme.CreateFont(9.5f);
+            _statusIndicator.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
+            _lblVersion.Font = LauncherTheme.CreateFont(9f);
         }
 
         private void ConfigureTab(LauncherButton tab, bool isRegister)
@@ -492,14 +608,14 @@ namespace Jondo.Unity.Launcher.UI
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-            _scale = DeviceDpi / 96f;
+            _scale = DeviceDpi / 96f * LauncherTheme.UiZoom;
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            _scale = DeviceDpi / 96f;
+            _scale = DeviceDpi / 96f * LauncherTheme.UiZoom;
             RebuildBackground();
             ApplyLanguage();
             RebuildLayout();
@@ -638,6 +754,11 @@ namespace Jondo.Unity.Launcher.UI
             _logo.SetBounds(marginX, y, cardWidth, logoHeight);
             _card.SetBounds(marginX, y + total - cardHeight, cardWidth, cardHeight);
 
+            // La versión, pegada a la esquina de abajo a la derecha.
+            _lblVersion.Location = new Point(
+                Math.Max(marginX, ClientSize.Width - _lblVersion.PreferredWidth - Px(24)),
+                ClientSize.Height - _lblVersion.PreferredHeight - Px(10));
+
             ResumeLayout();
             _logo.Invalidate();
             _card.Invalidate(true);
@@ -748,7 +869,12 @@ namespace Jondo.Unity.Launcher.UI
             int musicWidth = MeasureButton(_btnMusic, Px(34));
             _btnMusic.SetBounds(margin, buttonY, musicWidth, buttonHeight);
 
+            // Los de ampliar van justo detrás del de la música, con su mismo hueco entre botones.
             int gap = Px(6);
+            int zoomWidth = Px(34);
+            _btnZoomOut.SetBounds(margin + musicWidth + gap, buttonY, zoomWidth, buttonHeight);
+            _btnZoomIn.SetBounds(_btnZoomOut.Right + gap, buttonY, zoomWidth, buttonHeight);
+
             int widthEs = MeasureButton(_btnEs, Px(30));
             int widthEn = MeasureButton(_btnEn, Px(30));
             int widthFr = MeasureButton(_btnFr, Px(30));

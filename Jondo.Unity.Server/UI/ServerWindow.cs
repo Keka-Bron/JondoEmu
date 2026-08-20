@@ -38,7 +38,13 @@ namespace Jondo.Unity.Launcher.UI
         private readonly CheckBox _seguir;
         private readonly LauncherButton _parar;
         private readonly LauncherButton _limpiar;
+        private readonly LauncherButton _reducir;
+        private readonly LauncherButton _ampliar;
         private readonly List<LauncherButton> _idiomas = new();
+        private Panel? _barra;
+        private readonly TextBox _filtro = new();
+        private readonly Label _version = new();
+        private readonly System.Windows.Forms.ToolTip _pistas = new();
 
         private long _ultimaLinea;
         private readonly DateTime _arranque = DateTime.UtcNow;
@@ -47,11 +53,28 @@ namespace Jondo.Unity.Launcher.UI
         private Language _idioma = ServerPreferences.Language;
         private LauncherTexts _textos = LauncherTexts.Get(ServerPreferences.Language);
 
-        private readonly float _escala;
+        // ─── El escalado ──────────────────────────────────────────────────────────────────────
+        //
+        // Son DOS cosas multiplicadas y conviene no confundirlas:
+        //
+        //   * el dpi de la pantalla, que Windows escala solo y las letras —que van en puntos—
+        //     siguen solas: no hay que multiplicarlas por nada;
+        //   * el ampliador, para pantallas de muchas pulgadas con la escala al 100%, donde 96 dpi
+        //     deja la ventana diminuta y hace falta subirlo a mano.
+        //
+        // _escala lleva las dos y se usa para los PIXELES (E()). Las letras van por
+        // LauncherTheme.CreateFont, que ya mete el ampliador dentro; multiplicar un cuerpo por
+        // _escala y además dejarlo en puntos lo escalaba dos veces —la caja de «seguir el registro»
+        // y las cifras salían enormes en cuanto Windows pasaba del 100%—.
+        private float _escala;
+
         private int E(int px) => (int)Math.Round(px * _escala);
         private Font Letra(float cuerpo, FontStyle estilo = FontStyle.Regular)
-            => new Font(LauncherTheme.TitleFamily, cuerpo * _escala, estilo);
-        private Font Mono(float cuerpo) => new Font(LauncherTheme.MonoFamily, cuerpo * _escala);
+            => LauncherTheme.CreateFont(cuerpo, estilo);
+        private Font Mono(float cuerpo) => LauncherTheme.CreateMonoFont(cuerpo);
+
+        /// <summary>Recalcula el escalado: el dpi de la ventana por el ampliador guardado.</summary>
+        private float EscalaActual() => DeviceDpi / 96f * ServerPreferences.Zoom;
 
         /// <summary>
         /// Un panel que no parpadea al repintarse.
@@ -86,7 +109,8 @@ namespace Jondo.Unity.Launcher.UI
 
         public ServerWindow()
         {
-            _escala = DeviceDpi / 96f;
+            _escala = EscalaActual();
+            LauncherTheme.UiZoom = ServerPreferences.Zoom;
 
             Text = "Jondo Server";
             StartPosition = FormStartPosition.CenterScreen;
@@ -108,6 +132,18 @@ namespace Jondo.Unity.Launcher.UI
                 Height = E(92),
                 Dock = DockStyle.Top,
             };
+
+            // La versión del cliente al que el emulador habla, justo debajo del rótulo. Es la
+            // primera cosa que conviene ver en un emulador atado a una versión: sin ella, un
+            // «no conecta» puede ser cualquier cosa —y con ella, casi siempre es que el cliente
+            // no es el de esta versión.
+            _version.Text = "v" + Contract.Version;
+            _version.Dock = DockStyle.Top;
+            _version.Height = E(16);
+            _version.TextAlign = ContentAlignment.MiddleCenter;
+            _version.BackColor = Color.Transparent;
+            _version.ForeColor = LauncherTheme.MutedGold;
+            _version.Font = LauncherTheme.CreateFont(9f);
 
             // Los indicadores en DOS columnas, una a cada lado del dibujo.
             //
@@ -152,6 +188,7 @@ namespace Jondo.Unity.Launcher.UI
                 BackColor = Color.Transparent,
                 Padding = new Padding(E(22), 0, E(22), 0),
             };
+            _barra = barra;
 
             _registro = new RichTextBox
             {
@@ -186,6 +223,7 @@ namespace Jondo.Unity.Launcher.UI
             Controls.Add(_cifrasDerecha);
             Controls.Add(_caja);
             Controls.Add(barra);
+            Controls.Add(_version);
             Controls.Add(_logo);
 
             _seguir = new CheckBox
@@ -194,10 +232,20 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.MutedGold,
                 BackColor = Color.Transparent,
                 AutoSize = true,
-                Font = LauncherTheme.CreateFont(11f * _escala),
+                Font = LauncherTheme.CreateFont(11f),
                 Location = new Point(E(2), E(13)),
             };
             barra.Controls.Add(_seguir);
+
+            // El filtro del registro: con algo escrito, sólo entran en la consola las líneas que
+            // lo contengan. Para buscar un error entre el ruido de una sesión larga, que es lo
+            // que la consola entera no permite. Lo escrito no se pierde: sólo no se enseña.
+            _filtro.ForeColor = LauncherTheme.FieldText;
+            _filtro.BackColor = LauncherTheme.ConsoleBackground;
+            _filtro.BorderStyle = BorderStyle.FixedSingle;
+            _filtro.Font = LauncherTheme.CreateMonoFont(9.5f);
+            _filtro.Width = E(170);
+            barra.Controls.Add(_filtro);
 
             foreach (var cual in new[] { Language.Es, Language.En, Language.Fr })
             {
@@ -207,6 +255,16 @@ namespace Jondo.Unity.Launcher.UI
                 _idiomas.Add(boton);
                 barra.Controls.Add(boton);
             }
+
+            // La ampliación de la interfaz, con el mismo par de botones que el lanzador: para la
+            // ventana que se pasa el día mirándose en una pantalla de muchas pulgadas al 100%.
+            _reducir = Boton("A–", LauncherTheme.MutedGold, E(46));
+            _reducir.Click += (s, e) => CambiarZoom(-0.25f);
+            barra.Controls.Add(_reducir);
+
+            _ampliar = Boton("A+", LauncherTheme.MutedGold, E(46));
+            _ampliar.Click += (s, e) => CambiarZoom(+0.25f);
+            barra.Controls.Add(_ampliar);
 
             _limpiar = Boton("", LauncherTheme.SoftGold);
             _limpiar.Click += (s, e) => _registro.Clear();
@@ -220,12 +278,15 @@ namespace Jondo.Unity.Launcher.UI
             {
                 _parar.Location = new Point(barra.Width - _parar.Width - E(2), E(7));
                 _limpiar.Location = new Point(_parar.Left - _limpiar.Width - E(10), E(7));
-                int x = _seguir.Right + E(18);
+                _filtro.Location = new Point(_seguir.Right + E(18), E(9));
+                int x = _filtro.Right + E(14);
                 foreach (var boton in _idiomas)
                 {
                     boton.Location = new Point(x, E(7));
                     x += boton.Width + E(6);
                 }
+                _reducir.Location = new Point(x, E(7));
+                _ampliar.Location = new Point(x + _reducir.Width + E(6), E(7));
             }
             barra.Resize += (s, e) => Colocar();
 
@@ -261,6 +322,15 @@ namespace Jondo.Unity.Launcher.UI
             Redimensionar(_limpiar);
             Redimensionar(_parar);
 
+            // Las pistas emergentes: qué idioma es cada botón —dicho en su propio idioma, que es
+            // como uno reconoce el suyo—, el par de ampliación y el filtro del registro.
+            string[] nombres = { "Español", "English", "Français" };
+            for (int i = 0; i < _idiomas.Count && i < nombres.Length; i++)
+                _pistas.SetToolTip(_idiomas[i], nombres[i]);
+            _pistas.SetToolTip(_reducir, _textos.ZoomTooltip);
+            _pistas.SetToolTip(_ampliar, _textos.ZoomTooltip);
+            _pistas.SetToolTip(_filtro, _textos.LogFilterHint);
+
             for (int i = 0; i < _idiomas.Count; i++)
             {
                 var cual = (Language)i;
@@ -273,6 +343,54 @@ namespace Jondo.Unity.Launcher.UI
 
         private void Redimensionar(LauncherButton boton)
             => boton.Width = TextRenderer.MeasureText(boton.Text, boton.Font).Width + E(34);
+
+        // ─── La ampliación ────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Sube o baja el tamaño de la interfaz y lo aplica en el acto.
+        ///
+        /// No basta con recolocar: las fuentes se crearon con el ampliador de antes y hay que
+        /// rehacerlas con el de ahora, y lo mismo los altos que se clavaron en el constructor —la
+        /// barra de abajo, el rótulo de arriba—. Queda guardado en la preferencia del servidor para
+        /// el próximo arranque.
+        /// </summary>
+        private void CambiarZoom(float paso)
+        {
+            float antes = ServerPreferences.Zoom;
+            float despues = MathF.Max(0.5f, MathF.Min(3f, antes + paso));
+            if (MathF.Abs(despues - antes) < 0.01f) return;
+
+            ServerPreferences.Zoom = despues;
+            AplicarZoom();
+        }
+
+        private void AplicarZoom()
+        {
+            LauncherTheme.UiZoom = ServerPreferences.Zoom;
+            _escala = EscalaActual();
+            MinimumSize = new Size(E(900), E(560));
+
+            _registro.Font = Mono(6f);
+            _seguir.Font = LauncherTheme.CreateFont(11f);
+            if (_barra != null) _barra.Height = E(40);
+            _logo.Height = E(92);
+            _version.Height = E(16);
+            _version.Font = LauncherTheme.CreateFont(9f);
+            _filtro.Font = LauncherTheme.CreateMonoFont(9.5f);
+            _filtro.Width = E(170);
+
+            foreach (var boton in _idiomas) { boton.Height = E(30); boton.Width = E(46); }
+            _reducir.Height = E(30); _reducir.Width = E(46);
+            _ampliar.Height = E(30); _ampliar.Width = E(46);
+            _limpiar.Height = E(30);
+            _parar.Height = E(30);
+            Redimensionar(_limpiar);
+            Redimensionar(_parar);
+
+            AjustarConsola();
+            ComponerFondo();
+            Invalidate(true);
+        }
 
         // ─── Las cifras ─────────────────────────────────────────────────────────────────────
 
@@ -441,13 +559,13 @@ namespace Jondo.Unity.Launcher.UI
             int ancho = panel.Width - margen * 2;
             if (ancho <= 0) return;
 
-            using var fGrupo = LauncherTheme.CreateFont(10f * _escala, FontStyle.Bold);
-            using var fEtiqueta = LauncherTheme.CreateFont(9.5f * _escala);
+            using var fGrupo = LauncherTheme.CreateFont(10f, FontStyle.Bold);
+            using var fEtiqueta = LauncherTheme.CreateFont(9.5f);
             // El valor va del MISMO tamaño que su etiqueta, sólo que en negrita y con color. Iba
             // tres puntos más grande y en bloques como el de RED —donde el valor es "0,0 KB/s" y
             // no un número corto— la línea quedaba descuadrada: la palabra pequeña y el dato
             // enorme al lado, sin ninguna razón.
-            using var fValor = LauncherTheme.CreateFont(9.5f * _escala, FontStyle.Bold);
+            using var fValor = LauncherTheme.CreateFont(9.5f, FontStyle.Bold);
             using var pincelGrupo = new SolidBrush(LauncherTheme.SoftGold);
             using var pincelEtiqueta = new SolidBrush(LauncherTheme.MutedGold);
             using var relleno = new SolidBrush(LauncherTheme.CardFill);
@@ -695,9 +813,15 @@ namespace Jondo.Unity.Launcher.UI
 
             if (nuevas.Count == 0) return;
 
+            // El filtro del registro, si hay algo escrito: las líneas que no lo llevan no se
+            // enseñan, pero el cursor sí avanza — así, al quitar el filtro, lo que llega después
+            // sigue donde tiene que seguir y no se repite ni se salta nada.
+            string filtro = _filtro.Text.Trim();
+
             foreach (var (id, hora, texto) in nuevas)
             {
                 if (id > _ultimaLinea) _ultimaLinea = id;
+                if (filtro.Length > 0 && texto.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) < 0) continue;
                 Escribir(hora, texto);
             }
 
@@ -716,6 +840,12 @@ namespace Jondo.Unity.Launcher.UI
 
         private void Escribir(string hora, string texto)
         {
+            // El registro se escribe en español; si quien mira ha elegido inglés o francés, la
+            // línea se traduce AL ENSEÑARLA, no al escribirla: el fichero de disco se queda tal
+            // como lo escribió el servidor, que es el que se manda cuando alguien pregunta. Las
+            // líneas que ya estaban en pantalla conservan el idioma de cuando entraron.
+            texto = TraduccionRegistro.Traducir(texto, _idioma);
+
             _registro.SelectionStart = _registro.TextLength;
             _registro.SelectionLength = 0;
 
@@ -758,7 +888,7 @@ namespace Jondo.Unity.Launcher.UI
             var boton = new LauncherButton
             {
                 Text = texto,
-                Font = LauncherTheme.CreateFont(11f * _escala, FontStyle.Bold),
+                Font = LauncherTheme.CreateFont(11f, FontStyle.Bold),
                 Height = E(30),
                 Width = ancho > 0 ? ancho : E(120),
                 LetterSpacing = 1f,

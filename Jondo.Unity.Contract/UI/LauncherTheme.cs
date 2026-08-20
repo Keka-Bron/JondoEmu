@@ -124,11 +124,28 @@ namespace Jondo.Unity.Launcher.UI
 
         /// <summary>Creates a font from a size given in CSS pixels (1 px = 0.75 pt).</summary>
         public static Font CreateFont(float pixels, FontStyle style = FontStyle.Regular)
-            => new Font(TitleFamily, pixels * 0.75f, style, GraphicsUnit.Point);
+            => new Font(TitleFamily, pixels * 0.75f * UiZoom, style, GraphicsUnit.Point);
 
         /// <summary>Monospaced font of the event log, sized in CSS pixels.</summary>
         public static Font CreateMonoFont(float pixels, FontStyle style = FontStyle.Regular)
-            => new Font(MonoFamily, pixels * 0.75f, style, GraphicsUnit.Point);
+            => new Font(MonoFamily, pixels * 0.75f * UiZoom, style, GraphicsUnit.Point);
+
+        // ─── El tamaño de la interfaz ─────────────────────────────────────────────────────────
+        //
+        // Con una pantalla de muchas pulgadas al 100% de escala, Windows reporta 96 dpi y la
+        // interfaz se dibuja al tamaño de entonces, que en pixeles fisicos pequeñitos se queda
+        // minúscula. El ampliador es un multiplicador ENCIMA del escalado por dpi: quien lo necesita
+        // lo sube y quien no lo deja en 1. Lo aplican las dos ventanas —lanzador y servidor— cada
+        // una con su preferencia guardada, y de meterlo aquí se encargan los dos a la vez porque
+        // los dos pintan sus letras con estas dos fabricas.
+        private static float _uiZoom = 1f;
+
+        /// <summary>Cuánto se amplía la interfaz, además del escalado por dpi. 1 = sin ampliar.</summary>
+        public static float UiZoom
+        {
+            get => _uiZoom;
+            set => _uiZoom = MathF.Max(0.5f, MathF.Min(3f, value));
+        }
 
         // ─── Drawing helpers ────────────────────────────────────────────────────
 

@@ -339,6 +339,30 @@ namespace Jondo.Protocol
                 case Op.Krc: return ("In Game", "Character", "StatsUpgradeRequest (Request to assign points to stats)");
                 case "kqn": return ("In Game", "Chat", "ChatSendRequest (Sending a chat message typed by the player)");
                 case Op.Kqp: return ("In Game", "Chat", "ChatBroadcastMessage (Broadcast of a chat message on the channel)");
+                // El «puede cruzar» del borde del mapa. Lo empuja el propio emulador en cada salida
+                // (WorldMoveHandler, FightHandler), pero el clasificador no lo conocía y cada línea
+                // salía como [Unknown] —en un registro de una tarde, cinco—, con lo que parecía que
+                // viajaba algo sin identificar cuando era de lo más identificado que hay.
+                case "jsq": return ("In Game", "Map", "MapExitAllowed (Go ahead: the client may cross the border)");
+
+                // === Context: known 3.6.10.10 messages without an answer ===
+                //
+                // La tanda que este cliente manda al entrar al mundo y al entrar en combate.
+                // Identificados contra las notas del mapeo con el cliente real y las capturas; los
+                // que no tienen contestación medida se atienden en silencio en el GameNodeProxy.
+                case "kmr": return ("World Loading", "Sync", "WorldContentRequest (The client asks for the world; the real server replies with the map block)");
+                case "lzh": return ("World Loading", "Sync", "WorldEntryClosing (Last message of the world entry; answered with an empty lzl)");
+                case "lzl": return ("World Loading", "Sync", "WorldEntryClosingAnswer (Answer to lzh)");
+                case "ieo": return ("World Loading", "Sync", "ProgressRequest (One of the four the client sends on entry; answered with one idu each)");
+                case "idu": return ("World Loading", "Sync", "ProgressAnswer (Answer to ieo; contents not decoded)");
+                case "knm": return ("In Game", "Map", "ActorsRetry (Retransmission when lva never arrived; answered with the actors again)");
+                case "kno": return ("In Game", "Map", "ActorsRetry (Retransmission when lva never arrived; answered with the actors again)");
+                case "kny": return ("In Game", "Map", "ActorsRetry (Retransmission when lva never arrived; answered with the actors again)");
+                case "kvc": return ("World Loading", "Sync", "WelcomeFollowUp (Sent right after the welcome burst; deliberately not answered)");
+                case "krv": return ("World Loading", "Sync", "WelcomeFollowUp (Sent right after the welcome burst; deliberately not answered)");
+                case "jqe": return ("In Game", "Map", "CellEcho (A cell number, just before the jqi/jqk of a border; exact meaning not established)");
+                case "ijm": return ("In Game", "Fight", "FightEntry (Comes with kmv when entering a fight; kmv covers the flow)");
+                case "iul": return ("In Game", "Fight", "FightNotification (During fights; meaning not established)");
 
                 default: return ("In Game", "Unknown", $"Utility message ({uri})");
             }

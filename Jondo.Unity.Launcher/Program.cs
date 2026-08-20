@@ -51,6 +51,17 @@ namespace Jondo.Unity.Launcher
             {
                 Contract.SoltarElSitio();
             }
+
+            // Y aquí se termina, a propósito y como última cosa.
+            //
+            // Volver de Main no basta: la ventana ya está cerrada y su hilo era de fondo, pero el
+            // motor de audio (Media Foundation levanta hilos propios para la música, y no siempre
+            // los baja) o cualquier otro hilo nativo que haya quedado vivo mantiene el proceso
+            // abierto SIN ventana —sin nada que cerrar—, y la única forma de acabarlo era el
+            // Administrador de tareas. Este proceso es una hoja: cerrada su ventana no le queda
+            // nada que hacer, así que se apaga él mismo y con él cualquier hilo que haya quedado
+            // enganchado.
+            Environment.Exit(0);
         }
 
         /// <summary>

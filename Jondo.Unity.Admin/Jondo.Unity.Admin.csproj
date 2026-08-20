@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <AssemblyName>Jondo Admin</AssemblyName>
+    <RootNamespace>Jondo.Unity.Admin</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
+    <PackageReference Include="System.Text.Json" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Del contrato sale todo lo compartido: las rutas de las bases, los roles y el ASPECTO, que
+         es la paleta del lanzador. Pinta como el resto de Jondo porque pinta con lo mismo. -->
+    <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
+  </ItemGroup>
+
+  <!-- Auto-despliegue: a la raiz junto a los otros dos ejecutables, y en un solo fichero igual
+       que ellos, para quien lleva el emulador vea un .exe y no una carpeta. -->
+  <PropertyGroup>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <Target Name="DeployAdmin" AfterTargets="Publish">
+    <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe" DestinationFiles="$(MSBuildProjectDirectory)\..\Jondo Admin.exe" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    <Message Text="[Deploy] Admin en la raiz." Importance="high" />
+  </Target>
+
+</Project>

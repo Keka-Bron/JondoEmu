@@ -59,6 +59,13 @@ namespace Jondo.Unity.Launcher.UI
         public string AutoScroll { get; init; } = "";
         public string GenericError { get; init; } = "";
 
+        // Las pistas emergentes y el filtro del registro, que comparten el lanzador y la ventana
+        // del servidor. Van aquí y no escritas a mano en cada ventana para que existan en los tres
+        // idiomas de una vez.
+        public string MusicTooltip { get; init; } = "";
+        public string ZoomTooltip { get; init; } = "";
+        public string LogFilterHint { get; init; } = "";
+
         // Los avisos de lanzar un cliente. Estaban escritos en francés dentro de LauncherService y
         // de ClientLaunchRegistry, así que salían en francés con el lanzador puesto en español o en
         // inglés. Aquí es donde vive el idioma.
@@ -149,6 +156,9 @@ namespace Jondo.Unity.Launcher.UI
                 AccountCreated = "Cuenta creada.",
                 ServidorSinResponder = "El servidor no responde. Espera a que termine de arrancar o vuelve a abrirlo.",
                 ControlRechazado = "El servidor ha rearrancado. Cierra el lanzador y vuelve a abrirlo.",
+                MusicTooltip = "La música del lanzador",
+                ZoomTooltip = "El tamaño de la interfaz, para pantallas donde todo queda pequeño",
+                LogFilterHint = "Filtrar el registro: sólo se verán las líneas que contengan esto",
                 StatPlayers = "Jugadores",
                 StatClients = "Clientes",
                 StatFights = "Combates",
@@ -221,6 +231,9 @@ namespace Jondo.Unity.Launcher.UI
                 AccountCreated = "Account created.",
                 ServidorSinResponder = "The server is not responding. Wait for it to finish starting, or open it again.",
                 ControlRechazado = "The server has restarted. Close the launcher and open it again.",
+                MusicTooltip = "The launcher's music",
+                ZoomTooltip = "The interface size, for screens where everything looks small",
+                LogFilterHint = "Filter the log: only lines containing this will be shown",
                 StatPlayers = "Players",
                 StatClients = "Clients",
                 StatFights = "Fights",
@@ -293,6 +306,9 @@ namespace Jondo.Unity.Launcher.UI
                 AccountCreated = "Compte créé.",
                 ServidorSinResponder = "Le serveur ne répond pas. Attends la fin du démarrage ou relance-le.",
                 ControlRechazado = "Le serveur a redémarré. Ferme le lanceur et rouvre-le.",
+                MusicTooltip = "La musique du lanceur",
+                ZoomTooltip = "La taille de l'interface, pour les écrans où tout paraît petit",
+                LogFilterHint = "Filtrer le journal : seules les lignes contenant ceci s'afficheront",
                 StatPlayers = "Joueurs",
                 StatClients = "Clients",
                 StatFights = "Combats",

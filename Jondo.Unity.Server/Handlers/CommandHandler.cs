@@ -88,9 +88,19 @@ namespace Jondo.Unity.Launcher.Handlers
         /// Cierto también cuando el comando existe pero viene mal escrito: en ese caso lo que se
         /// hace es contestar cómo se escribe. Publicar un comando a medio escribir sería enseñarle
         /// a todo el mundo lo que el jugador quería hacer, que es justo lo que no puede pasar.
+        ///
+        /// Con <paramref name="saltarRol"/> se salta la comprobación de quién escribe. Lo usa el
+        /// panel de administración: allí quien manda ya se ha autenticado como administrador —el
+        /// rol más alto, por encima del que pide cualquier comando— contra el canal de mando, y el
+        /// comando se ejecuta sobre la cuenta de OTRO, cuyo rol no es el que decide. Por el chat,
+        /// que es el camino de siempre, nunca se salta.
         /// </summary>
+        public static Task<bool> TryHandleAsync(NetworkStream stream, string text,
+                                                int channel = 0, long accountId = 0)
+            => TryHandleAsync(stream, text, channel, accountId, saltarRol: false);
+
         public static async Task<bool> TryHandleAsync(NetworkStream stream, string text,
-                                                      int channel = 0, long accountId = 0)
+                                                      int channel, long accountId, bool saltarRol)
         {
             string? command = CommandOf(text);
             if (command == null) return false;
@@ -119,7 +129,7 @@ namespace Jondo.Unity.Launcher.Handlers
             int rol = DatabaseManager.GetAccountRole(quien);
             int haceFalta = HaceFalta.TryGetValue(command, out int pide) ? pide : Roles.Administrador;
 
-            if (!Roles.AlMenos(rol, haceFalta))
+            if (!saltarRol && !Roles.AlMenos(rol, haceFalta))
             {
                 Console.WriteLine($"[Comandos] La cuenta {quien} ({Roles.Nombre(rol)}) ha intentado " +
                                   $"{command}, que es de {Roles.Nombre(haceFalta)}. Rechazado.");

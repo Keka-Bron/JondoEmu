@@ -20,6 +20,7 @@ namespace Jondo.Unity.Launcher.UI
         private const string ClaveIdioma = "idioma";
         private const string ClaveCliente = "cliente";
         private const string ClaveCuentas = "cuentas";
+        private const string ClaveZoom = "zoom";
 
         internal sealed class SavedAccount
         {
@@ -80,6 +81,25 @@ namespace Jondo.Unity.Launcher.UI
                 }
                 : UI.Language.Es;
             set => Escribir(ClaveIdioma, LauncherTexts.Code(value));
+        }
+
+        // ─── El tamaño de la interfaz ─────────────────────────────────────────────────────────
+        //
+        // Para pantallas de muchas pulgadas con la escala de Windows al 100%, donde 96 dpi hace
+        // que todo quede diminuto. 1 es el tamaño de siempre.
+
+        /// <summary>La ampliación de la interfaz del lanzador. 1 = sin ampliar.</summary>
+        public static float Zoom
+        {
+            get
+            {
+                var valores = Leer();
+                if (!valores.TryGetValue(ClaveZoom, out string? v)) return 1f;
+                return float.TryParse(v, System.Globalization.CultureInfo.InvariantCulture, out float zoom)
+                    ? MathF.Max(0.5f, MathF.Min(3f, zoom))
+                    : 1f;
+            }
+            set => Escribir(ClaveZoom, value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture));
         }
 
         // ─── Dónde está el cliente ──────────────────────────────────────────────

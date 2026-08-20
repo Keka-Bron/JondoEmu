@@ -40,8 +40,13 @@ namespace Jondo.Unity.Launcher
             {
                 try
                 {
+                    // Con marca de orden de bytes. Sin ella el fichero es UTF-8 pelado y quien lo
+                    // abre —el Bloc de notas con la configuracion de fabrica, el visor que sea— lo
+                    // toma por ANSI y los simbolos de los volcados de paquetes se leen como
+                    // «ðŸ“¦»: el registro parece roto cuando lo escrito estaba bien.
                     File.AppendAllText(Path.Combine(Paths.LogsDir, "emulator_console.log"),
-                                       $"[{DateTime.Now:HH:mm:ss.fff}] {text}{Environment.NewLine}");
+                                       $"[{DateTime.Now:HH:mm:ss.fff}] {text}{Environment.NewLine}",
+                                       new UTF8Encoding(true));
                 }
                 catch { }
             }

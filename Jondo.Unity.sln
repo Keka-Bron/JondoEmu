@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Reversing", "Jo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Deobfuscator", "Jondo.Unity.Deobfuscator\Jondo.Unity.Deobfuscator.csproj", "{481AAE6A-8885-47F7-84C5-58A589391DCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Admin", "Jondo.Unity.Admin\Jondo.Unity.Admin.csproj", "{A962015B-551B-485E-BB8A-551CECBF6F21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +169,18 @@ Global
 		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|x64.Build.0 = Release|Any CPU
 		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|x86.ActiveCfg = Release|Any CPU
 		{481AAE6A-8885-47F7-84C5-58A589391DCD}.Release|x86.Build.0 = Release|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Debug|x64.Build.0 = Debug|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Debug|x86.Build.0 = Debug|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Release|x64.ActiveCfg = Release|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Release|x64.Build.0 = Release|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Release|x86.ActiveCfg = Release|Any CPU
+		{A962015B-551B-485E-BB8A-551CECBF6F21}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

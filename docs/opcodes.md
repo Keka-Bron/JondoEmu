@@ -512,6 +512,29 @@ capture files — a small, well-bounded exchange to decode.
 The **emote** group is the cheapest thing on this list: four opcodes and 30 messages in total, with
 `hov` (client to server, 19 occurrences in one capture) doing most of the talking.
 
+### 4.4 Twenty-six unhandled in one live session — decoded
+
+A full evening on the emulator (20:33–21:30, `logs/emulator_console.log`) produced 26 distinct
+opcodes in the `UNHANDLED CLIENT PACKET` dumps. They were crossed against the mapping notes in
+`datos/mapeo_3.6.10.10_a_DofusClient.tsv` and the rebuilt proto, and this is what came out. The
+four with measured answers are now implemented; the rest are recognised and silenced, so they no
+longer print as unhandled.
+
+| Opcode | Payload | Where it shows up | What the emulator does now |
+|---|---|---|---|
+| `kmr` | empty | Once, in the world-entry burst | The real server answers it with eleven frames including the `jru` of the map. Routed to the map block, guarded by the once-per-entry flag — a second `jru` is the world-reload loop. |
+| `lzh` | empty | Last of the world entry, before `kmv` and `jrh` | Answered with an empty `lzl`, as measured. |
+| `ieo` | one int (1869 measured) | Four in a row on world entry | Each answered with one `idu`; the four-for-four pairing is measured, the inside of the `idu` is not, so it goes out empty. |
+| `knm` `kno` `kny` | — | Two seconds after a map load that missed its `lva` | Given the actors and the `lva` again — the same answer the `jrh` gets, which is what the client is re-asking for. |
+| `kvc` `krv` | `krv` carries a 231-digit string | Right after the welcome burst, on going back to character selection | Deliberately not answered, as before; no longer dumped. |
+| `jqe` | one cell number (468, 213 measured) | Right before every `jqi`/`jqk` border crossing | Exact meaning not established; the cell state already travels in `jrw`. Silenced. |
+| `ijm` `iul` | `ijm` a bool, `iul` two ints | Entering a fight | `kmv` already carries the flow for `ijm`; `iul` has no measured answer. Silenced. |
+| `kwb` `kwd` `kaz` `koc` `jiy` `hom` `jha` `koe` `kpb` `jew` `hos` `lrd` `ivp` `kon` `ktn` `kus` `ktn` | mostly empty | The world-entry flood; `kwb` is fight-only, `kwd` connection-extras | No measured answer; already covered by the entry blocks. Silenced and named in the traffic log. |
+
+Nothing in this table was answered by guessing: the four live answers (`lzl`, `idu`, the `kmr` map
+block, the `knm`/`kno`/`kny` actors) are exactly what the mapping notes say the real server sends,
+and the rest are quiet because quiet is what the real server is to them.
+
 ---
 
 ## 5. Named in the code but never seen: the 106

@@ -97,7 +97,15 @@ namespace Jondo.Unity.Launcher.Network
                     case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, _ => Apagar());
                     case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador, _ => CambiarRol(cuerpo));
 
-                    default: return Mal(404, "ruta");
+                    // ─── El panel de administración ─────────────────────────────────────────
+                    //
+                    // Sus rutas cuelgan de admin/ y las atiende su propio puente, que comprueba el
+                    // rol igual que las de arriba. Se cae aquí —y no en un case— porque son varias
+                    // y viven en otro sitio.
+                    default:
+                        var admin = AdminBridge.Responder(ruta, cuerpo);
+                        if (admin != null) return admin;
+                        return Mal(404, "ruta");
                 }
             }
             catch (Exception ex)

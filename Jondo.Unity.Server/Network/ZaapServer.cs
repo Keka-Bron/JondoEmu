@@ -451,7 +451,17 @@ namespace Jondo.Unity.Launcher.Network
                     }
                     catch (Exception thriftEx)
                     {
-                        Console.WriteLine($"[Zaap] Thrift processing error: {thriftEx.GetType().Name}: {thriftEx.Message}");
+                        // Que el cliente se haya ido no es un error del Zaap: es el final normal de
+                        // toda conversación Thrift, y se registraba como tal —tres «Thrift processing
+                        // error» por sesión cerrada—, con lo que el registro enseñaba fallos donde no
+                        // los había y tapaba los de verdad. Se distingue por tipo y por mensaje: es lo
+                        // que trae la excepción cuando el otro lado corta.
+                        bool seHaIdo = thriftEx is TTransportException &&
+                                       thriftEx.Message.Contains("Remote side has closed", StringComparison.OrdinalIgnoreCase);
+                        if (seHaIdo)
+                            Console.WriteLine("[Zaap] El cliente ha cerrado la conexión Thrift.");
+                        else
+                            Console.WriteLine($"[Zaap] Thrift processing error: {thriftEx.GetType().Name}: {thriftEx.Message}");
                     }
                 }
             }

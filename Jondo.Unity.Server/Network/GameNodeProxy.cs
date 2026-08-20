@@ -332,35 +332,7 @@ namespace Jondo.Unity.Launcher.Network
                     // sacaría del combate.
                     if (GameState.IsInFight) continue;
 
-                    // The client asks who is on the map. Without an answer it draws an empty map:
-                    // no avatar, no NPCs, no monsters.
-                    var here = DatabaseManager.GetCharacterById(GameState.CharacterId);
-                    if (here != null)
-                    {
-                        byte[] actors = ConnectionProtocol.Push(Op.MapComplementaryInformationsDataMessage,
-                            ConnectionProtocol.BuildMapActors(GameState.MapId, here,
-                                                              GameState.CellId, GameState.Orientation,
-                                                              sessionAccountId));
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, actors);
-
-                        // And straight behind it, the mark that says there are no more actors. In
-                        // every capture that loads a map lva comes immediately after jss, and
-                        // without it the client never counts the map as loaded: two seconds later
-                        // it asks again with knm, kno and kny and goes round once more.
-                        // Dentro del merkasako van además los muebles y los permisos, que en la
-                        // captura salen entre el jss y el lva.
-                        if (Managers.Merkasako.IsHavenBag(GameState.MapId))
-                        {
-                            await MerkasakoHandler.SendFurnitureAsync(stream);
-                        }
-
-
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.BuildActorsComplete());
-
-                        Console.WriteLine($"[Game Node] Actors of map {GameState.MapId} sent: " +
-                                          $"{here.Name} on cell {GameState.CellId}.");
-                    }
+                    await SendActorsAndCompleteAsync(stream, "jrh");
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.GameContextCreateRequestMessage)))
                 {
@@ -375,6 +347,47 @@ namespace Jondo.Unity.Launcher.Network
                     // música en la pantalla de personajes.
                     Console.WriteLine("[Game Node] Client confirmed with lqc.");
                     if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, Op.GameContextCreateRequestMessage)) hasSentMapBlock = true;
+                }
+                else if (payloadStr.Contains("type.ankama.com/kmr"))
+                {
+                    // kmr es, según la captura, la petición de mapa de la entrada al mundo: el
+                    // servidor real le contesta con once tramas, entre ellas el jru del mapa
+                    // (mapeo_3.6.10.10_a_DofusClient.tsv). Nosotros ya se lo dimos en el lqc, así
+                    // que aquí sólo hace falta si el lqc no llegó a verse: el mismo bloque, con su
+                    // guarda de una vez, que reutiliza la de arriba. Sin guarda sería mandar dos
+                    // jru, y dos jru es el bucle de recargar el mundo.
+                    if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, "kmr")) hasSentMapBlock = true;
+                }
+                else if (payloadStr.Contains("type.ankama.com/lzh"))
+                {
+                    // El cierre de la entrada al mundo: va justo antes del kmv y el jrh, y el
+                    // servidor real le contesta un lzl vacío (mapeo_3.6.10.10_a_DofusClient.tsv).
+                    // El lzl lleva una lista dentro, pero en este punto de la conversación la
+                    // captura no le mete nada: se manda tal cual.
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push("lzl", Array.Empty<byte>()));
+                    Console.WriteLine("[Game Node] Answered lzh with an empty lzl.");
+                }
+                else if (payloadStr.Contains("type.ankama.com/ieo"))
+                {
+                    // Cuatro ieo seguidos en la entrada al mundo, y el servidor real contesta
+                    // cuatro idu, uno por cada ieo (mapeo_3.6.10.10_a_DofusClient.tsv). El ieo
+                    // lleva un número —un 1869 medido— y el idu una pareja mensaje/valor que no se
+                    // ha llegado a descifrar: se contesta vacío, que es el «nada que contar» de un
+                    // idu sin campos.
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push("idu", Array.Empty<byte>()));
+                }
+                else if (payloadStr.Contains("type.ankama.com/knm")
+                         || payloadStr.Contains("type.ankama.com/kno")
+                         || payloadStr.Contains("type.ankama.com/kny"))
+                {
+                    // knm, kno y kny son lo que reenvía el cliente a los dos segundos cuando no le
+                    // llegó el lva y no da el mapa por cargado (docs/opcodes.md). Se le da lo mismo
+                    // que se le da al jrh —los actores y detrás la marca de que ya no hay más—,
+                    // que es exactamente lo que le faltaba. En combate no: el mapa ya está y un jss
+                    // de superficie lo sacaría de la pelea.
+                    if (!GameState.IsInFight) await SendActorsAndCompleteAsync(stream, "reintento knm/kno/kny");
                 }
                 // ─── 3.6.10.10 world messages. The joi/jos/jpp branches further down belong to
                 // an earlier version of the protocol and this client never sends them.
@@ -824,7 +837,41 @@ namespace Jondo.Unity.Launcher.Network
                     // Clean and silence known client-side notification payloads that don't require responses
                     // (e.g. UI logs, almanax requests, heartbeats, recipes) to prevent console flooding.
                     string cleanPayload = payloadStr.Replace("?", "").Trim();
-                    if (cleanPayload.Contains(Op.Kmw) || cleanPayload.Contains("klw") || cleanPayload.Contains("knb") || 
+
+                    // Los descodificados de la tanda de la entrada al mundo y del combate: qué son
+                    // se sabe —de las notas del mapeo contra el cliente y de la propia captura—,
+                    // pero el servidor real no les contesta nada, y a ellos no hay que contestarles
+                    // nada. Sin esta lista, cada uno de estos llenaba el registro con su rótulo de
+                    // UNHANDLED, que es justo lo que no es: son conocidos.
+                    //
+                    //   kvc, krv   la pareja que va detrás de la ráfaga de bienvenida; el emulador
+                    //              deliberadamente no devuelve el krv aunque lleve id de petición
+                    //   kwb        sólo en las capturas de combate, sin implementar
+                    //   kwd        sólo en las capturas de extras de conexión, sin implementar
+                    //   kaz, koc   vacíos, sin contestación medida
+                    //   jiy        un número pequeño (un 3 medido); sin contestación medida
+                    //   hom, jha, koe, kpb, jew, hos, lrd, ivp, kon, ktn, kus
+                    //              la riada de la entrada al mundo: catálogos y ajustes que el
+                    //              cliente pide y que ya le llegaron por los bloques de entrada
+                    //   ijm, iul   el par de la entrada en combate: el kmv ya cubre el flujo
+                    //   jqe        un número de casilla, justo antes del jqi/jqk del borde; el
+                    //              estado de casilla ya lo lleva el jrw. Significado exacto sin
+                    //              establecer
+                    if (cleanPayload.Contains("type.ankama.com/kvc") || cleanPayload.Contains("type.ankama.com/krv") ||
+                        cleanPayload.Contains("type.ankama.com/kwb") || cleanPayload.Contains("type.ankama.com/kwd") ||
+                        cleanPayload.Contains("type.ankama.com/kaz") || cleanPayload.Contains("type.ankama.com/koc") ||
+                        cleanPayload.Contains("type.ankama.com/jiy") || cleanPayload.Contains("type.ankama.com/hom") ||
+                        cleanPayload.Contains("type.ankama.com/jha") || cleanPayload.Contains("type.ankama.com/koe") ||
+                        cleanPayload.Contains("type.ankama.com/kpb") || cleanPayload.Contains("type.ankama.com/jew") ||
+                        cleanPayload.Contains("type.ankama.com/hos") || cleanPayload.Contains("type.ankama.com/lrd") ||
+                        cleanPayload.Contains("type.ankama.com/ivp") || cleanPayload.Contains("type.ankama.com/kon") ||
+                        cleanPayload.Contains("type.ankama.com/ktn") || cleanPayload.Contains("type.ankama.com/kus") ||
+                        cleanPayload.Contains("type.ankama.com/ijm") || cleanPayload.Contains("type.ankama.com/iul") ||
+                        cleanPayload.Contains("type.ankama.com/jqe"))
+                    {
+                        // Conocidos y sin contestación: ni ruido en el registro.
+                    }
+                    else if (cleanPayload.Contains(Op.Kmw) || cleanPayload.Contains("klw") || cleanPayload.Contains("knb") ||
                         cleanPayload.Contains("klo") || cleanPayload.Contains("kmt") || cleanPayload.Contains(Op.Jgv) || 
                         cleanPayload.Contains(Op.Jct) || cleanPayload.Contains(Op.Jfc) || cleanPayload.Contains(Op.Kqk) || 
                         cleanPayload.Contains(Op.Itr) || cleanPayload.Contains(Op.Knc) || cleanPayload.Contains("kna") || 
@@ -862,6 +909,47 @@ namespace Jondo.Unity.Launcher.Network
                 if (payload == null) break;
                 payloadStr = Encoding.UTF8.GetString(payload);
             }
+        }
+
+        /// <summary>
+        /// <summary>
+        /// Los actores del mapa y detrás la marca de que ya no hay más.
+        ///
+        /// Es lo que pide el jrh al cargar cualquier mapa y también lo que piden los knm/kno/kny
+        /// cuando el lva se les perdió: la misma respuesta para los dos, de modo que el reintento
+        /// del cliente termina en el mismo sitio que la primera vez.
+        /// </summary>
+        private static async Task SendActorsAndCompleteAsync(NetworkStream stream, string razon)
+        {
+            long sessionAccountId = SessionContext.Current.AccountId;
+
+            // The client asks who is on the map. Without an answer it draws an empty map:
+            // no avatar, no NPCs, no monsters.
+            var here = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            if (here == null) return;
+
+            byte[] actors = ConnectionProtocol.Push(Op.MapComplementaryInformationsDataMessage,
+                ConnectionProtocol.BuildMapActors(GameState.MapId, here,
+                                                  GameState.CellId, GameState.Orientation,
+                                                  sessionAccountId));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, actors);
+
+            // And straight behind it, the mark that says there are no more actors. In
+            // every capture that loads a map lva comes immediately after jss, and
+            // without it the client never counts the map as loaded: two seconds later
+            // it asks again with knm, kno and kny and goes round once more.
+            // Dentro del merkasako van además los muebles y los permisos, que en la
+            // captura salen entre el jss y el lva.
+            if (Managers.Merkasako.IsHavenBag(GameState.MapId))
+            {
+                await MerkasakoHandler.SendFurnitureAsync(stream);
+            }
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildActorsComplete());
+
+            Console.WriteLine($"[Game Node] Actors of map {GameState.MapId} sent ({razon}): " +
+                              $"{here.Name} on cell {GameState.CellId}.");
         }
 
         /// <summary>
