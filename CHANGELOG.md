@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.6.10.10-admin.7] - 2026-08-20
+
+### Fixed
+- **The server and the launcher did not start anymore.** The startup self-check added with the professions update treated the professions catalogue as mandatory and crashed the whole server when it was empty — which it is whenever the optional dofusdude dump files are not present — so the server died before opening a single port, and the launcher then spent up to 90 seconds waiting for it before showing anything. The self-check now skips the professions part when the dumps are absent (the same graceful behaviour the importer itself already had, announced in the startup log) and still enforces it fully whenever the dumps are present. Verified: the server reaches "all services online" with its five ports listening, and the launcher attaches to it immediately.
+
 ## [3.6.10.10-admin.6] - 2026-08-20
 
 ### Added
