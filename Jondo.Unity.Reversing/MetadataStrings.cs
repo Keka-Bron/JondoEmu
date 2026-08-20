@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Jondo.Unity.ProtocolBuilder;
+namespace Jondo.Unity.Reversing;
 
 /// <summary>
 /// Las cadenas de texto que el cliente lleva dentro.

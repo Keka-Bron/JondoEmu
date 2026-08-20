@@ -1,4 +1,4 @@
-namespace Jondo.Unity.ProtocolBuilder;
+namespace Jondo.Unity.Reversing;
 
 /// <summary>
 /// Una versión de mentira: el mismo protocolo con los nombres rotados.

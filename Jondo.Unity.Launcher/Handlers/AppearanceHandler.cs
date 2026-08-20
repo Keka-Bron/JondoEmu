@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -51,7 +52,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await PreviewAsync(stream);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer("lxo",
+                ConnectionProtocol.Answer(Op.AppearanceStateMessage,
                     ConnectionProtocol.BuildAppearanceState(character, DraftIdOf(character.Id)),
                     ConnectionProtocol.RequestId(frame)));
         }
@@ -59,7 +60,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>Ponerse una prenda dejando que el servidor resuelva el hueco.</summary>
         public static async Task WearAsync(NetworkStream stream, byte[] frame)
         {
-            byte[]? lys = ConnectionProtocol.ReadPayload(frame, "lys");
+            byte[]? lys = ConnectionProtocol.ReadPayload(frame, Op.AppearanceItemWearRequestMessage);
             if (lys == null) return;
 
             int gid = 0, variant = 0;
@@ -81,7 +82,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await PreviewAsync(stream);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer("lwz", Pb.New().Var(1, 1).Var(3, slot).Build(),
+                ConnectionProtocol.Answer(Op.AppearanceItemWornMessage, Pb.New().Var(1, 1).Var(3, slot).Build(),
                                           ConnectionProtocol.RequestId(frame)));
 
             Console.WriteLine($"[Apariencias] Prenda {gid} (variante {variant}) al hueco {slot}.");
@@ -90,7 +91,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>Poner o quitar en un hueco concreto. Sin objeto, se vacía.</summary>
         public static async Task AssignAsync(NetworkStream stream, byte[] frame)
         {
-            byte[]? lyf = ConnectionProtocol.ReadPayload(frame, "lyf");
+            byte[]? lyf = ConnectionProtocol.ReadPayload(frame, Op.AppearanceSlotSetRequestMessage);
             if (lyf == null) return;
 
             int gid = 0, slot = 0;
@@ -115,7 +116,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await PreviewAsync(stream);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer("lyj", Pb.New().Var(3, 1).Build(),
+                ConnectionProtocol.Answer(Op.AppearanceSlotSetResultMessage, Pb.New().Var(3, 1).Build(),
                                           ConnectionProtocol.RequestId(frame)));
         }
 
@@ -131,7 +132,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task ToggleAsync(NetworkStream stream, byte[] frame)
         {
-            byte[]? lxg = ConnectionProtocol.ReadPayload(frame, "lxg");
+            byte[]? lxg = ConnectionProtocol.ReadPayload(frame, Op.AppearanceSlotVisibilityRequestMessage);
             if (lxg != null)
             {
                 int slot = -1;
@@ -152,14 +153,14 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await PreviewAsync(stream);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer("lxk", Pb.New().Var(1, 1).Build(),
+                ConnectionProtocol.Answer(Op.AppearanceSlotVisibilityResultMessage, Pb.New().Var(1, 1).Build(),
                                           ConnectionProtocol.RequestId(frame)));
         }
 
         /// <summary>El aura, que es una subentidad del enganche 6.</summary>
         public static async Task AuraAsync(NetworkStream stream, byte[] frame)
         {
-            byte[]? lxw = ConnectionProtocol.ReadPayload(frame, "lxw");
+            byte[]? lxw = ConnectionProtocol.ReadPayload(frame, Op.AppearanceAuraRequestMessage);
             int aura = 0;
             if (lxw != null)
             {
@@ -170,11 +171,11 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("lym",
+                ConnectionProtocol.Push(Op.Lym,
                     aura == 0 ? Array.Empty<byte>() : Pb.New().Var(1, aura).Build()));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer("lwx", Pb.New().Var(1, 1).Build(),
+                ConnectionProtocol.Answer(Op.AppearanceAuraResultMessage, Pb.New().Var(1, 1).Build(),
                                           ConnectionProtocol.RequestId(frame)));
 
             Console.WriteLine($"[Apariencias] Aura {aura}.");
@@ -190,7 +191,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (character == null) return;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("lxc", ConnectionProtocol.BuildLookChanged(character)));
+                ConnectionProtocol.Push(Op.AppearancePreviewLookMessage, ConnectionProtocol.BuildLookChanged(character)));
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace Jondo.Unity.Launcher.UI
     /// <see cref="LauncherService"/> directly, which is the very same logic still serving the
     /// /api/* routes.
     /// </summary>
-    internal sealed class LauncherWindow : Form
+    internal sealed class LauncherWindow : Form, IBackgroundWindow
     {
         // ─── Measurements taken from the original stylesheet (in CSS pixels) ────
         private const int SideMargin = 50;
@@ -150,7 +150,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         /// <summary>Background image, already scaled and vignetted, that the panels cut out of.</summary>
-        internal Bitmap? ComposedBackground => _composedBackground;
+        public Image? ComposedBackground => _composedBackground;
 
         // ═══════════════════════════════════════════════════════════════════════
         //  Building the interface

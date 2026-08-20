@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Protocol
 {
@@ -201,7 +202,7 @@ namespace Jondo.Protocol
                 Console.WriteLine(meta.Description);
 
                 string shortType = typeUrl.Replace("type.ankama.com/", "").Trim();
-                bool isPing = shortType == "kod" || shortType == "kns" || shortType == "kpc" || shortType == "jgv";
+                bool isPing = shortType == Op.Kod || shortType == Op.Kns || shortType == "kpc" || shortType == Op.Jgv;
 
                 if (!isPing)
                 {
@@ -236,108 +237,108 @@ namespace Jondo.Protocol
             {
                 // === Context: Server List ===
                 case "knx": return ("Server List", "Connection", "AuthTokenRequest (Token authentication request)");
-                case "kof": return ("Server List", "Connection", "ProtocolAccepted (Network protocol accepted)");
+                case Op.Kof: return ("Server List", "Connection", "ProtocolAccepted (Network protocol accepted)");
                 case "lor": return ("Server List", "Sync", "TimeMessage (Server clock synchronization)");
-                case "hnp": return ("Server List", "Sync", "SystemConfiguration (Game variable configuration)");
+                case Op.Hnp: return ("Server List", "Sync", "SystemConfiguration (Game variable configuration)");
                 case "knr": return ("Server List", "Sync", "BreedListMessage (List of enabled character breeds)");
-                case "mfa": return ("Server List", "Connection", "FeatureStatus (Account feature status)");
-                case "mez": return ("Server List", "Connection", "ServerSeasonInfo (Season of the active server)");
-                case "hnv": return ("Server List", "Connection", "ServerOptionalFeatures (Optional features)");
+                case Op.Mfa: return ("Server List", "Connection", "FeatureStatus (Account feature status)");
+                case Op.Mez: return ("Server List", "Connection", "ServerSeasonInfo (Season of the active server)");
+                case Op.Hnv: return ("Server List", "Connection", "ServerOptionalFeatures (Optional features)");
                 case "kpc": return ("Server List", "Connection", "PingRequest (Latency and session check)");
                 case "kos": return ("Server List", "Connection", "ServerSelectionStatus (Server connection status)");
 
                 // === Context: Character Selection ===
-                case "klp": return ("Character Selection", "Interfaces", "CharacterListEmpty (Initial empty character list)");
-                case "ksx": return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 1)");
-                case "kpa": return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 2)");
-                case "mes": return ("Character Selection", "Interfaces", "MessageWrapper (UI container wrapper)");
-                case "knv": return ("Character Selection", "Interfaces", "UiLayoutMessage (Metadata of the selection UI)");
+                case Op.Klp: return ("Character Selection", "Interfaces", "CharacterListEmpty (Initial empty character list)");
+                case Op.Ksx: return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 1)");
+                case Op.CharactersListRequestMessage: return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 2)");
+                case Op.Mes: return ("Character Selection", "Interfaces", "MessageWrapper (UI container wrapper)");
+                case Op.Knv: return ("Character Selection", "Interfaces", "UiLayoutMessage (Metadata of the selection UI)");
                 case "ksq": return ("Character Selection", "Character", "CharacterListMessage (Detailed character list)");
                 case "jrf": return ("Character Selection", "Sync", "WorldReady (Signal that the world is ready to simulate)");
-                case "ksl": return ("Character Selection", "Character", "CharacterSelectionRequest (Request to enter the world)");
+                case Op.Ksl: return ("Character Selection", "Character", "CharacterSelectionRequest (Request to enter the world)");
 
                 // === Context: World Loading ===
-                case "kri": return ("World Loading", "Character", "CharacterStatsListMessage (Full stats and characteristics)");
-                case "itp": return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Keyboard shortcuts and UI bars)");
+                case Op.Kri: return ("World Loading", "Character", "CharacterStatsListMessage (Full stats and characteristics)");
+                case Op.Itp: return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Keyboard shortcuts and UI bars)");
                 case "izn": return ("World Loading", "Interfaces", "ChatChannelsListMessage (Initialization of the local chat channels)");
-                case "krh": return ("World Loading", "Sync", "ClientReadyForPackets (Ack that the client is ready)");
-                case "imd": return ("World Loading", "Inventory", "InventoryWeightMessage (Basic initialization of the inventory weight)");
-                case "ktw": return ("World Loading", "Character", "CharacterSelectedSuccessMessage (Character spawn on the pedestal)");
+                case Op.Krh: return ("World Loading", "Sync", "ClientReadyForPackets (Ack that the client is ready)");
+                case Op.Imd: return ("World Loading", "Inventory", "InventoryWeightMessage (Basic initialization of the inventory weight)");
+                case Op.Ktw: return ("World Loading", "Character", "CharacterSelectedSuccessMessage (Character spawn on the pedestal)");
                 case "mek": return ("World Loading", "Interfaces", "SpellListMessage (The character's spell book)");
-                case "lry": return ("World Loading", "Interfaces", "QuestListMessage (Active quest list and journal)");
+                case Op.Lry: return ("World Loading", "Interfaces", "QuestListMessage (Active quest list and journal)");
                 case "icb": return ("World Loading", "Character", "CharacterStatsListMessage (Combat state and base stats)");
-                case "irm": return ("World Loading", "Character", "MapActorsListMessage (Initial NPC and mob spawns of the map)");
-                case "hke": return ("World Loading", "Interfaces", "ServerWelcomeMessage (Welcome message and news of the day)");
+                case Op.Irm: return ("World Loading", "Character", "MapActorsListMessage (Initial NPC and mob spawns of the map)");
+                case Op.Hke: return ("World Loading", "Interfaces", "ServerWelcomeMessage (Welcome message and news of the day)");
                 case "kfr": return ("World Loading", "Character", "EmoteListMessage (Unlocked emotes and animations)");
-                case "ipv": return ("World Loading", "Map", "MapComplementaryInformationsData (Cell interactives)");
+                case Op.Ipv: return ("World Loading", "Map", "MapComplementaryInformationsData (Cell interactives)");
                 case "ipu": return ("World Loading", "Map", "MapInteractiveElements (Active doors and triggers)");
-                case "ipw": return ("World Loading", "Map", "MapStatedElements (Visual state of the interactive elements)");
+                case Op.Ipw: return ("World Loading", "Map", "MapStatedElements (Visual state of the interactive elements)");
                 case "icw": return ("World Loading", "Inventory", "InventoryContentMessage (Full inventory - 180 items)");
-                case "loy": return ("World Loading", "Sync", "WorldLoadAck (Client ack of a successful map load)");
+                case Op.Loy: return ("World Loading", "Sync", "WorldLoadAck (Client ack of a successful map load)");
                 case "lok": return ("World Loading", "Sync", "SelectedServerData (Server session metadata)");
                 case "jdj": return ("World Loading", "Sync", "ServerDateMessage (Server date synchronization)");
 
                 // === Context: World Loading - 33 Packets Transition Burst ===
-                case "kqo": return ("World Loading", "Interfaces", "ChatChannelsReadMessage (Chat channels open for reading)");
-                case "hhq": return ("World Loading", "Interfaces", "SocialGroupPackets (Guild and alliance information)");
-                case "hml": return ("World Loading", "Interfaces", "SocialPreferences (The player's social settings)");
-                case "isf": return ("World Loading", "Sync", "QuestListMessage (Notification of the active quests)");
-                case "lol": return ("World Loading", "Interfaces", "NotificationListMessage (Quest notifications)");
+                case Op.BasicPingMessage: return ("World Loading", "Interfaces", "ChatChannelsReadMessage (Chat channels open for reading)");
+                case Op.Hhq: return ("World Loading", "Interfaces", "SocialGroupPackets (Guild and alliance information)");
+                case Op.Hml: return ("World Loading", "Interfaces", "SocialPreferences (The player's social settings)");
+                case Op.Isf: return ("World Loading", "Sync", "QuestListMessage (Notification of the active quests)");
+                case Op.Lol: return ("World Loading", "Interfaces", "NotificationListMessage (Quest notifications)");
                 case "icg": return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
-                case "ibo": return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Quick spell bar)");
-                case "hmj": return ("World Loading", "Interfaces", "SocialGroupStatus (The player's guild status)");
-                case "lxs": return ("World Loading", "Sync", "AlignmentSubAreaUpdate (PvP and sub-area alignment)");
+                case Op.Ibo: return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Quick spell bar)");
+                case Op.Hmj: return ("World Loading", "Interfaces", "SocialGroupStatus (The player's guild status)");
+                case Op.AppearanceSaveRequestMessage: return ("World Loading", "Sync", "AlignmentSubAreaUpdate (PvP and sub-area alignment)");
                 case "hnq": return ("World Loading", "Sync", "SpouseStatusMessage (Marital status / marriage)");
-                case "ksv": return ("World Loading", "Character", "CharacterCapabilitiesMessage (Stat caps and capabilities)");
-                case "lou": return ("World Loading", "Connection", "ServerAccessStatus (Server accessibility status)");
-                case "iya": return ("World Loading", "Sync", "FeatureStatusMessage (Active experimental features)");
-                case "kdx": return ("World Loading", "Connection", "AccountCapabilitiesMessage (Global account rights)");
-                case "izh": return ("World Loading", "Sync", "AlmanaxDateMessage (Almanax day and active bonus)");
+                case Op.Ksv: return ("World Loading", "Character", "CharacterCapabilitiesMessage (Stat caps and capabilities)");
+                case Op.Lou: return ("World Loading", "Connection", "ServerAccessStatus (Server accessibility status)");
+                case Op.Iya: return ("World Loading", "Sync", "FeatureStatusMessage (Active experimental features)");
+                case Op.Kdx: return ("World Loading", "Connection", "AccountCapabilitiesMessage (Global account rights)");
+                case Op.Izh: return ("World Loading", "Sync", "AlmanaxDateMessage (Almanax day and active bonus)");
                 case "ity": return ("World Loading", "Sync", "ExpMultiplierMessage (Global experience multipliers)");
-                case "koj": return ("World Loading", "Map", "HavenBagStatusMessage (Haven bag or player house data)");
+                case Op.Koj: return ("World Loading", "Map", "HavenBagStatusMessage (Haven bag or player house data)");
                 case "kyj": return ("World Loading", "Sync", "ArenaRankInfosMessage (Kolossium league information)");
                 case "ktj": return ("World Loading", "Character", "ExpGainDetails (Details of the accumulated experience pool)");
-                case "ltk": return ("World Loading", "Interfaces", "TitleListMessage (Available honorific titles)");
+                case Op.Ltk: return ("World Loading", "Interfaces", "TitleListMessage (Available honorific titles)");
                 case "lvk": return ("World Loading", "Interfaces", "OrnamentListMessage (Available graphical ornaments)");
-                case "lwb": return ("World Loading", "Character", "EmoteListMessage (Unlocked emoticons)");
-                case "luy": return ("World Loading", "Inventory", "JobDescriptionMessage (List of learned jobs)");
-                case "hhf": return ("World Loading", "Interfaces", "SocialGroupRights (Rights granted within the guild)");
-                case "hhh": return ("World Loading", "Interfaces", "SocialGroupDetails (Descriptive sheet of the guild)");
-                case "luq": return ("World Loading", "Interfaces", "JobCrafterDirectorySettings (Job directory visibility settings)");
+                case Op.Lwb: return ("World Loading", "Character", "EmoteListMessage (Unlocked emoticons)");
+                case Op.Luy: return ("World Loading", "Inventory", "JobDescriptionMessage (List of learned jobs)");
+                case Op.Hhf: return ("World Loading", "Interfaces", "SocialGroupRights (Rights granted within the guild)");
+                case Op.Hhh: return ("World Loading", "Interfaces", "SocialGroupDetails (Descriptive sheet of the guild)");
+                case Op.Luq: return ("World Loading", "Interfaces", "JobCrafterDirectorySettings (Job directory visibility settings)");
                 case "hhi": return ("World Loading", "Interfaces", "SocialGroupAlliance (Sheet of the alliance)");
-                case "idf": return ("World Loading", "Inventory", "InventoryPreview (Quick preview of the items)");
-                case "izu": return ("World Loading", "Sync", "QuestStepProgress (Current quest progress)");
+                case Op.Idf: return ("World Loading", "Inventory", "InventoryPreview (Quick preview of the items)");
+                case Op.Izu: return ("World Loading", "Sync", "QuestStepProgress (Current quest progress)");
 
                 // === Context: World Loading - kkn Burst ===
                 case "kkn": return ("World Loading", "Sync", "MapLoadCompleted (Notification that the graphics load finished)");
                 case "kkp": return ("World Loading", "Interfaces", "SocialStatusMessage (Configuration of the online social status)");
-                case "kkm": return ("World Loading", "Interfaces", "SocialOptionsMessage (Friend notification settings)");
+                case Op.Kkm: return ("World Loading", "Interfaces", "SocialOptionsMessage (Friend notification settings)");
                 case "krb": return ("World Loading", "Character", "CharacterRemainingPoints (Confirmed remaining stat points)");
-                case "ilc": return ("World Loading", "Sync", "ServerSettingsMessage (Regional settings of the server)");
-                case "joh": return ("World Loading", "Map", "CurrentMapMessage (Confirms the Map ID to load into the scene)");
-                case "hmd": return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
-                case "lpj": return ("World Loading", "Sync", "SecondaryReadySignal (Signal that the secondary threads are ready)");
-                case "lpe": return ("World Loading", "Sync", "SecondaryReadyConfirm (Ack that the secondary threads are ready)");
+                case Op.Ilc: return ("World Loading", "Sync", "ServerSettingsMessage (Regional settings of the server)");
+                case Op.Joh: return ("World Loading", "Map", "CurrentMapMessage (Confirms the Map ID to load into the scene)");
+                case Op.Hmd: return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
+                case Op.Lpj: return ("World Loading", "Sync", "SecondaryReadySignal (Signal that the secondary threads are ready)");
+                case Op.Lpe: return ("World Loading", "Sync", "SecondaryReadyConfirm (Ack that the secondary threads are ready)");
                 case "hmv": return ("World Loading", "Chat", "ChatChannelsListRequest (Request for the chat channels)");
-                case "hnk": return ("World Loading", "Chat", "ChatChannelsListMessage (Available chat channels)");
-                case "kqm": return ("World Loading", "Chat", "ChatChannelConfigMessage (Configuration and colour of the chat channel)");
+                case Op.Hnk: return ("World Loading", "Chat", "ChatChannelsListMessage (Available chat channels)");
+                case Op.Kqm: return ("World Loading", "Chat", "ChatChannelConfigMessage (Configuration and colour of the chat channel)");
                 case "ibt": return ("World Loading", "Sync", "GameReadyTrigger (Request to hand over control of the game)");
-                case "ith": return ("World Loading", "Character", "FullCharacterStatsMessage (Bulk stats sheet)");
+                case Op.Ith: return ("World Loading", "Character", "FullCharacterStatsMessage (Bulk stats sheet)");
 
                 // === Context: In Game ===
-                case "kkr": return ("In Game", "Map", "MapComplementaryInfoRequest (Request for actors and interactives)");
-                case "lxd": return ("In Game", "Map", "MapComplementaryInfo (Wrapper for interactives, cells and weather)");
-                case "jpv": return ("In Game", "Character", "MapActorsShowMessage (Character spawns on the current map)");
-                case "kns": return ("In Game", "Sync", "KnockAck / Heartbeat (Sync heartbeat / Pong)");
-                case "kod": return ("In Game", "Sync", "HeartbeatRequest (Sync heartbeat / Ping)");
+                case Op.Kkr: return ("In Game", "Map", "MapComplementaryInfoRequest (Request for actors and interactives)");
+                case Op.Lxd: return ("In Game", "Map", "MapComplementaryInfo (Wrapper for interactives, cells and weather)");
+                case Op.Jpv: return ("In Game", "Character", "MapActorsShowMessage (Character spawns on the current map)");
+                case Op.Kns: return ("In Game", "Sync", "KnockAck / Heartbeat (Sync heartbeat / Pong)");
+                case Op.Kod: return ("In Game", "Sync", "HeartbeatRequest (Sync heartbeat / Ping)");
                 case "joi": return ("In Game", "Character", "PlayerMovementRequest (Cell-by-cell movement request)");
                 case "jpp": return ("In Game", "Character", "PlayerMovementConfirm (Confirms the destination cell was reached)");
-                case "jos": return ("In Game", "Map", "MapChangeRequest (Request to cross the map boundary)");
-                case "isi": return ("In Game", "Inventory", "ItemMovementRequest (Request to equip/move an item)");
-                case "iry": return ("In Game", "Inventory", "ItemMovementConfirm (Confirmation that the item was equipped)");
-                case "krc": return ("In Game", "Character", "StatsUpgradeRequest (Request to assign points to stats)");
+                case Op.Jos: return ("In Game", "Map", "MapChangeRequest (Request to cross the map boundary)");
+                case Op.Isi: return ("In Game", "Inventory", "ItemMovementRequest (Request to equip/move an item)");
+                case Op.Iry: return ("In Game", "Inventory", "ItemMovementConfirm (Confirmation that the item was equipped)");
+                case Op.Krc: return ("In Game", "Character", "StatsUpgradeRequest (Request to assign points to stats)");
                 case "kqn": return ("In Game", "Chat", "ChatSendRequest (Sending a chat message typed by the player)");
-                case "kqp": return ("In Game", "Chat", "ChatBroadcastMessage (Broadcast of a chat message on the channel)");
+                case Op.Kqp: return ("In Game", "Chat", "ChatBroadcastMessage (Broadcast of a chat message on the channel)");
 
                 default: return ("In Game", "Unknown", $"Utility message ({uri})");
             }

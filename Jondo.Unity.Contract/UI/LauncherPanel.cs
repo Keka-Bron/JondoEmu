@@ -14,7 +14,7 @@ namespace Jondo.Unity.Launcher.UI
     /// behind it from the image already composed by the window and paints its color layers on top.
     /// That is how the glass effect over the background artwork is preserved.
     /// </summary>
-    internal class LauncherPanel : Panel
+    public class LauncherPanel : Panel
     {
         /// <summary>Color layers painted one over another on top of the background.</summary>
         public List<Color> Layers { get; } = new List<Color>();
@@ -102,16 +102,18 @@ namespace Jondo.Unity.Launcher.UI
         /// </summary>
         private void PaintClippedBackground(Graphics g)
         {
-            var window = FindForm() as LauncherWindow;
-            var background = window?.ComposedBackground;
-            if (window == null || background == null)
+            // El fondo se pide por la interfaz —para que sirva en las tres ventanas que ya hay— pero
+            // las coordenadas se piden al Form, que es quien las tiene. Son la misma instancia.
+            var form = FindForm();
+            var background = (form as IBackgroundWindow)?.ComposedBackground;
+            if (form == null || background == null)
             {
                 g.Clear(LauncherTheme.Background);
                 return;
             }
 
             Point origin;
-            try { origin = window.PointToClient(PointToScreen(Point.Empty)); }
+            try { origin = form.PointToClient(PointToScreen(Point.Empty)); }
             catch { g.Clear(LauncherTheme.Background); return; }
 
             var source = Rectangle.Intersect(new Rectangle(origin.X, origin.Y, Width, Height), new Rectangle(0, 0, background.Width, background.Height));

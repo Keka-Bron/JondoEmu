@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Jondo.Unity.Launcher.Managers;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -191,30 +192,30 @@ namespace Jondo.Unity.Launcher.Network
         {
             var burst = new List<byte[]>
             {
-                Push("kra"),
-                Push("lqu", Pb.New()
+                Push(Op.AuthenticationTicketAcceptedMessage),
+                Push(Op.BasicTimeMessage, Pb.New()
                     .Var(1, SyncRate)
                     .Var(2, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                     .Build()),
-                Push("hoy", BuildHoy()),
-                Push("kqu", Pb.New().Packed(1, ActiveFeatures).Build()),
-                Push("mgq", Pb.New().Var(1, 1).Var(2, 1).Var(3, 1).Build()),
-                Push("mgt", Pb.New().EmptyMsg(2).Build()),
-                Push("hpd", Pb.New().Var(1, 1).Build()),
-                Push("krs"),
-                Push("mgz", Pb.New().Var(1, CatalogMark).Build()),
-                Push("kqp", Pb.New().Var(1, 1).Var(2, 1).Build()),
-                Push("kqp", Pb.New().Var(1, 1).Build()),
-                Push("kqp"),
-                Push("kvi", BuildCharactersList(characters)),
+                Push(Op.HelloGameMessage, BuildHoy()),
+                Push(Op.ServerOptionalFeaturesMessage, Pb.New().Packed(1, ActiveFeatures).Build()),
+                Push(Op.Mgq, Pb.New().Var(1, 1).Var(2, 1).Var(3, 1).Build()),
+                Push(Op.Mgt, Pb.New().EmptyMsg(2).Build()),
+                Push(Op.Hpd, Pb.New().Var(1, 1).Build()),
+                Push(Op.Krs),
+                Push(Op.ContentCatalogVersionMessage, Pb.New().Var(1, CatalogMark).Build()),
+                Push(Op.Kqp, Pb.New().Var(1, 1).Var(2, 1).Build()),
+                Push(Op.Kqp, Pb.New().Var(1, 1).Build()),
+                Push(Op.Kqp),
+                Push(Op.CharactersListMessage, BuildCharactersList(characters)),
 
                 // kvd cierra la lista de personajes. Va vacío y justo detrás del kvi en la ráfaga
                 // real, y no lo mandábamos. Es el candidato a lo que tenía el botón de crear
                 // personaje apagado: el cliente recibía la lista y nada que dijera que ya está
                 // toda, así que la pantalla se quedaba a medio montar.
-                Push("kvd"),
+                Push(Op.CharactersListEndMessage),
 
-                Push("jtg", BuildGiftCatalogue())
+                Push(Op.GiftsListMessage, BuildGiftCatalogue())
             };
             return burst;
         }
@@ -622,7 +623,7 @@ namespace Jondo.Unity.Launcher.Network
         /// The frame this builds comes out byte for byte like the captured one:
         /// 1d 0a 1b 0a 19 0a 13 type.ankama.com/kqy 12 02 08 01.
         /// </summary>
-        public static byte[] BuildHeartbeatAnswer() => Push("kqy", Pb.New().Var(1, 1).Build());
+        public static byte[] BuildHeartbeatAnswer() => Push(Op.BasicPongMessage, Pb.New().Var(1, 1).Build());
 
         /// <summary>
         /// Closes a map load (lva). It carries nothing: it is the "that is every actor" mark.
@@ -632,7 +633,7 @@ namespace Jondo.Unity.Launcher.Network
         /// finishes loading the map: it waits about two seconds, asks again with knm, kno and kny,
         /// and starts over.
         /// </summary>
-        public static byte[] BuildActorsComplete() => Push("lva");
+        public static byte[] BuildActorsComplete() => Push(Op.MapLoadedMessage);
 
         // ─── World: actors on the map ───────────────────────────────────────────
 
@@ -1492,12 +1493,12 @@ namespace Jondo.Unity.Launcher.Network
         {
             var pb = Pb.New().Var(2, contextualId);
             if (porDonde.HasValue) pb.Var(3, porDonde.Value);
-            return Push("jsd", pb.Build());
+            return Push(Op.GameContextRemoveElementMessage, pb.Build());
         }
 
         /// <summary>"Load this map" (jru).</summary>
         public static byte[] BuildLoadMap(long mapId)
-            => Push("jru", Pb.New().Var(2, mapId).Build());
+            => Push(Op.CurrentMapMessage, Pb.New().Var(2, mapId).Build());
 
         /// <summary>
         /// The two that travel with jru on every map change of the capture: lqu, which carries a
@@ -1507,13 +1508,13 @@ namespace Jondo.Unity.Launcher.Network
         /// map, 470 after a characteristics reset), and inventing it is worse than leaving it out.
         /// </summary>
         public static byte[] BuildMapClock()
-            => Push("lqu", Pb.New()
+            => Push(Op.BasicTimeMessage, Pb.New()
                 .Var(1, 120)
                 .Var(2, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                 .Build());
 
         public static byte[] BuildMapDiscovered(long mapId)
-            => Push("hjk", Pb.New().Packed(1, new long[] { mapId }).Build());
+            => Push(Op.Hjk, Pb.New().Packed(1, new long[] { mapId }).Build());
 
         /// <summary>
         /// Movement along a map (jsj), which is what the server sends back to a jrw.
@@ -1523,7 +1524,7 @@ namespace Jondo.Unity.Launcher.Network
         ///   f5: whose movement it is
         /// </summary>
         public static byte[] BuildActorMoved(long contextualId, IEnumerable<long> cells, int facing)
-            => Push("jsj", Pb.New()
+            => Push(Op.GameMapMovementMessage, Pb.New()
                 .Packed(1, cells)
                 .VarIfNotZero(2, facing)
                 .Var(5, contextualId)

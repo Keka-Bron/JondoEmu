@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using Google.Protobuf;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher
 {
@@ -192,7 +193,7 @@ namespace Jondo.Unity.Launcher
                 if (data.Length > 100)
                 {
                     string ascii = System.Text.Encoding.ASCII.GetString(data, 0, Math.Min(data.Length, 100));
-                    if (ascii.Contains("type.ankama.com/kof"))
+                    if (ascii.Contains(Op.Uri(Op.Kof)))
                     {
                         targetData = data;
                         Console.WriteLine($"[+] Found target Game Node stream: {kvp.Key} ({data.Length} bytes)");

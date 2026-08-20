@@ -71,3 +71,17 @@ scratch_*
 .vscode/
 *.user
 *.suo
+
+# ─── Desofuscador ───────────────────────────────────────────────────────────
+# Las respuestas del modelo son caché: se pueden volver a pedir, ocupan un fichero por pregunta y
+# no dicen nada que no esté ya en datos/propuestas_*.tsv. Los expedientes son 2.169 ficheros que
+# «expediente --todos» regenera en un segundo a partir del índice.
+datos/respuestas/
+expedientes/
+
+# ─── Clientes bajados de la CDN ─────────────────────────────────────────────
+# Los manifiestos de Cytrus son 51 MB por versión y son caché pura: «protocolbuilder bajar» los
+# vuelve a traer, y verifica cada fichero contra su huella. Los clientes en sí son 183 MB por
+# versión y tampoco se publican: son de Ankama.
+datos/cytrus/
+clientes/

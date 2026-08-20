@@ -1,7 +1,7 @@
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 
-namespace Jondo.Unity.ProtocolBuilder;
+namespace Jondo.Unity.Reversing;
 
 /// <summary>
 /// El descriptor del protocolo, sacado del propio cliente.

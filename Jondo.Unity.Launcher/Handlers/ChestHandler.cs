@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -44,15 +45,15 @@ namespace Jondo.Unity.Launcher.Handlers
             SessionContext.State.IsChestOpen = true;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iwn", ConnectionProtocol.BuildElementInUse(
+                ConnectionProtocol.Push(Op.InteractiveUsedMessage, ConnectionProtocol.BuildElementInUse(
                     elementId, Merkasako.ChestSkill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kci", ConnectionProtocol.BuildStorageOpened()));
+                ConnectionProtocol.Push(Op.ExchangeStartedStorageMessage, ConnectionProtocol.BuildStorageOpened()));
 
             var content = HavenBagStore.ChestOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iwb", ConnectionProtocol.BuildStorageContent(content)));
+                ConnectionProtocol.Push(Op.StorageInventoryContentMessage, ConnectionProtocol.BuildStorageContent(content)));
 
             Console.WriteLine($"[Cofre] Abierto: {content.Count} objeto(s) dentro.");
         }
@@ -61,12 +62,12 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             SessionContext.State.IsChestOpen = false;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("khd", ConnectionProtocol.BuildStorageClosed()));
+                ConnectionProtocol.Push(Op.ExchangeLeaveMessage, ConnectionProtocol.BuildStorageClosed()));
         }
 
         public static async Task MoveAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? kcr = ConnectionProtocol.ReadPayload(payload, "kcr");
+            byte[]? kcr = ConnectionProtocol.ReadPayload(payload, Op.ExchangeObjectMoveMessage);
             if (kcr == null || !SessionContext.State.IsChestOpen) return;
 
             long uid = 0;
@@ -88,16 +89,16 @@ namespace Jondo.Unity.Launcher.Handlers
             if (enElCofre)
             {
                 if (!HavenBagStore.TakeOut(who, uid, quantity)) return;
-                await AnnounceAsync(stream, uid, ArrivesInBag, "itc", "sale del cofre");
+                await AnnounceAsync(stream, uid, ArrivesInBag, Op.StorageObjectRemoveMessage, "sale del cofre");
             }
             else
             {
                 if (!HavenBagStore.PutIn(who, uid, quantity)) return;
-                await AnnounceAsync(stream, uid, ArrivesInChest, "ium", "entra en el cofre");
+                await AnnounceAsync(stream, uid, ArrivesInChest, Op.ObjectDeletedMessage, "entra en el cofre");
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iun",
+                ConnectionProtocol.Push(Op.InventoryWeightMessage,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
         }
 
@@ -118,8 +119,8 @@ namespace Jondo.Unity.Launcher.Handlers
         /// El que llega va con todo —plantilla, efectos, cantidad—; el que se va, solo con su
         /// identificador.
         /// </summary>
-        public const string ArrivesInBag = "iua";
-        public const string ArrivesInChest = "itd";
+        public const string ArrivesInBag = Op.ObjectAddedMessage;
+        public const string ArrivesInChest = Op.StorageObjectUpdateMessage;
 
         /// <summary>El campo donde va el objeto en cada uno: f3 en el iua, f1 en el itd.</summary>
         public static int FieldOf(string opcode) => opcode == ArrivesInBag ? 3 : 1;

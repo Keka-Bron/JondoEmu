@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -77,7 +78,7 @@ namespace Jondo.Unity.Launcher.Handlers
             output.WriteString(senderName);
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kqp", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kqp), ms.ToArray());
         }
 
         // ─── Helpers ────────────────────────────────────────────────────────────────

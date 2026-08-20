@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -60,7 +61,7 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             string name = RandomName();
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kvk", Pb.New().Str(1, name).Build()));
+                ConnectionProtocol.Push(Op.CharacterNameSuggestionSuccessMessage, Pb.New().Str(1, name).Build()));
 
             Console.WriteLine($"[Personajes] Nombre sugerido: {name}");
         }
@@ -91,7 +92,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task CreateAsync(NetworkStream stream, byte[] payload, long accountId,
                                              int serverId)
         {
-            byte[]? kvz = ConnectionProtocol.ReadPayload(payload, "kvz");
+            byte[]? kvz = ConnectionProtocol.ReadPayload(payload, Op.CharacterCreationRequestMessage);
             if (kvz == null) return;
 
             string name = "";
@@ -135,11 +136,11 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // Que sí: el kvb va vacío. Con motivo dentro es que no.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kvb"));
+                ConnectionProtocol.Push(Op.CharacterCreationResultMessage));
 
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kvi", ConnectionProtocol.BuildCharactersList(characters)));
+                ConnectionProtocol.Push(Op.CharactersListMessage, ConnectionProtocol.BuildCharactersList(characters)));
 
             Console.WriteLine($"[Personajes] Creado {name} (id {id}), raza {breed}, en el zaap de " +
                               $"Astrub, con el conjunto del aventurero y {StartingKamas} kamas.");
@@ -152,7 +153,7 @@ namespace Jondo.Unity.Launcher.Handlers
         private static async Task RefuseAsync(NetworkStream stream, int reason)
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kvb", Pb.New().Var(2, reason).Build()));
+                ConnectionProtocol.Push(Op.CharacterCreationResultMessage, Pb.New().Var(2, reason).Build()));
         }
 
         /// <summary>Varints seguidos, que es como viajan los colores. El -1 es "el de la raza".</summary>

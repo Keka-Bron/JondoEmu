@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Jondo.Unity.ProtocolBuilder;
+namespace Jondo.Unity.Reversing;
 
 /// <summary>
 /// Los ensamblados del cliente, leídos sin ejecutar nada.

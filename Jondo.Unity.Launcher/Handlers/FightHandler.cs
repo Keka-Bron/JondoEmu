@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +13,7 @@ using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
 using static Jondo.Unity.Launcher.Network.NetworkEnvelope;
 using static Jondo.Protocol.NetworkMessage;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -268,10 +269,10 @@ namespace Jondo.Unity.Launcher.Handlers
             // "lo que viene es un mapa de combate". De eso depende todo lo demás, porque es lo que
             // hace que el cliente pida el combate con un ijm en vez de pedir un mapa corriente con
             // un jrh. Sin ella carga el tablero y se queda en modo mapa normal.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kmu",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmu,
                 Network.FightProtocol.BuildFightAgainst(fight.DefenderLeaderId)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kml"));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kmp",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kml));
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp,
                 Network.FightProtocol.BuildFightMapComing()));
 
             await WriteFrameAsync(stream, ConnectionProtocol.BuildLoadMap(fight.MapId));
@@ -381,12 +382,12 @@ namespace Jondo.Unity.Launcher.Handlers
             // combatientes que no están en ninguna casilla.
             foreach (var fighter in fight.Team0)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("kmk",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk,
                     Network.FightProtocol.BuildFighterPlaced(fighter.CellId, FacingOf(fight, fighter), fighter.Id)));
             }
             foreach (var fighter in fight.Team1)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("kmk",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk,
                     Network.FightProtocol.BuildFighterPlaced(fighter.CellId, FacingOf(fight, fighter), fighter.Id)));
             }
 
@@ -394,18 +395,18 @@ namespace Jondo.Unity.Launcher.Handlers
             // combate al que agarrar lo que viene detrás, y se le ve reventar en su propio registro
             // al llegarle el jwq, recorriendo una lista de combatientes que no existe. Con el mapa
             // táctico ya cargado y nada dibujado encima, que es justo lo que pasaba.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("ijq",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ijq,
                 Network.FightProtocol.BuildMapReady()));
 
             var monsters = fight.Team1.ConvertAll(f => (long)f.MonsterId);
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kam",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kam,
                 Network.FightProtocol.BuildFightAnnounced(
                     Network.FightProtocol.AgainstMonsters, fight.DefenderLeaderId, monsters,
                     fight.FightId, GameState.CharacterId)));
 
             // Con la cuenta atrás de la colocación, para que el reloj que el cliente enseña sea el
             // mismo que el que corre aquí.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kaa",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kaa,
                 Network.FightProtocol.BuildFightSummary(Network.FightProtocol.AgainstMonsters,
                                                         PlacementTimeoutMs / 100)));
 
@@ -416,7 +417,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                                         character.HeadId, null, character.Id)
                     : Array.Empty<byte>();
 
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jxg",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
                     Network.FightProtocol.BuildFighter(
                         fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter), look,
                         Network.FightProtocol.PlayerIdentity(character?.Breed ?? 0, fighter.Name,
@@ -428,7 +429,7 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 // Con su propio identificador negativo, no todos con el mismo: contra cuatro
                 // poutchs el servidor real reparte -1, -2, -3 y -4.
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jxg",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
                     Network.FightProtocol.BuildFighter(
                         fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
                         MonsterLook(fighter),
@@ -437,7 +438,7 @@ namespace Jondo.Unity.Launcher.Handlers
                         isMonster: true)));
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kba",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kba,
                 Network.FightProtocol.BuildPlacementCells(
                     fight.BluePlacementCells.ConvertAll(c => (long)c),
                     fight.RedPlacementCells.ConvertAll(c => (long)c))));
@@ -446,13 +447,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // combate y las cuatro opciones.
             foreach (var fighter in fight.Team0)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("kae",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kae,
                     Network.FightProtocol.BuildFighterInFight(fighter.Id, fight.FightId)));
             }
 
             foreach (int option in Network.FightProtocol.FightOptions)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("kau",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kau,
                     Network.FightProtocol.BuildFightOption(option, fight.FightId)));
             }
 
@@ -460,13 +461,13 @@ namespace Jondo.Unity.Launcher.Handlers
             foreach (var fighter in fight.Team0) everyone.Add(fighter.Id);
             foreach (var fighter in fight.Team1) everyone.Add(fighter.Id);
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jzu",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
                 Network.FightProtocol.BuildTeams(everyone)));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwq",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwq,
                 Network.FightProtocol.BuildPlacementDone()));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jrk",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk,
                 Network.FightProtocol.BuildFightMap(fight.MapId)));
 
             Program.LogDebug($"[Combate] Preparación del combate #{fight.FightId}: " +
@@ -784,7 +785,7 @@ namespace Jondo.Unity.Launcher.Handlers
             jygMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 0 });
             jygMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 450 });
             jygMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 4 });
-            await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jyg", jygMsg.ToByteArray()));
+            await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Jyg), jygMsg.ToByteArray()));
 
             // 2. jya (FightStarting)
             await SendFightStarting(stream, fight);
@@ -795,7 +796,7 @@ namespace Jondo.Unity.Launcher.Handlers
             jyjMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 4 });
             jyjMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 443 });
             jyjMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = 1 });
-            await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jyj", jyjMsg.ToByteArray()));
+            await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Jyj), jyjMsg.ToByteArray()));
 
             // 4. jxx (GameFightShowFighterMessage) for each fighter
             foreach (var f in fight.Team0.Concat(fight.Team1))
@@ -990,7 +991,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // se enseña ya. Así un cliente que no acuse no deja el combate colgado para siempre, y
             // no hace falta un temporizador escribiendo en el socket por su cuenta, que se
             // entrelazaría con lo que escribe este mismo hilo.
-            if (_finPendiente != null && !payloadStr.Contains("type.ankama.com/jti"))
+            if (_finPendiente != null && !payloadStr.Contains(Op.Uri(Op.Jti)))
             {
                 var colgado = _finPendiente.Value;
                 _finPendiente = null;
@@ -999,7 +1000,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             var fight = GetCurrentFight();
-            if (payloadStr.Contains("type.ankama.com/jzy"))
+            if (payloadStr.Contains(Op.Uri(Op.Jzy)))
             {
                 if (fight != null && fight.State == Jondo.Unity.World.Fights.FightState.Ongoing)
                 {
@@ -1010,7 +1011,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     await HandlePlacementCellChangeRequest(stream, payload);
                 }
             }
-            else if (payloadStr.Contains("type.ankama.com/kaq"))
+            else if (payloadStr.Contains(Op.Uri(Op.Kaq)))
             {
                 if (Network.FightProtocol.ReadReady(payload)) await HandleTurnReady(stream, payload);
             }
@@ -1024,23 +1025,23 @@ namespace Jondo.Unity.Launcher.Handlers
                 // Pasar turno. Va vacío.
                 await PassTurnAsync(stream);
             }
-            else if (payloadStr.Contains("type.ankama.com/jrw"))
+            else if (payloadStr.Contains(Op.Uri(Op.GameMapMovementRequestMessage)))
             {
                 // Andar. Es el mismo mensaje que fuera del combate; aquí gasta PM.
                 await WalkAsync(stream, payload);
             }
-            else if (payloadStr.Contains("type.ankama.com/jwh"))
+            else if (payloadStr.Contains(Op.Uri(Op.Jwh)))
             {
                 // Lanzar un hechizo, o pegar con el arma si no trae hechizo.
                 await CastAsync(stream, payload);
             }
-            else if (payloadStr.Contains("type.ankama.com/jti"))
+            else if (payloadStr.Contains(Op.Uri(Op.Jti)))
             {
                 // El acuse de cada secuencia cerrada. No lleva respuesta, pero es lo que destraba
                 // la pantalla de fin de combate cuando el último golpe la dejó esperando.
                 await AcuseAsync(stream, payload);
             }
-            else if (payloadStr.Contains("type.ankama.com/hoy"))
+            else if (payloadStr.Contains(Op.Uri(Op.HelloGameMessage)))
             {
                 await HandleFightOptionToggleRequest(stream, payload);
             }
@@ -1067,7 +1068,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jsq",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.MapExitAllowedMessage,
                 Network.FightProtocol.BuildFightAccepted()));
 
             await InitiateFightFromMobCollision(stream, group, here, groupId);
@@ -1132,7 +1133,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 
                 var johMsg = new ProtoMessage();
                 johMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.MapId });
-                await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/joh", johMsg.ToByteArray()));
+                await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Joh), johMsg.ToByteArray()));
 
                 foreach (var p in BuildPlacementPossiblePositionsPackets(fight))
                 {
@@ -1207,7 +1208,7 @@ namespace Jondo.Unity.Launcher.Handlers
             foreach (var other in fight.Team0) spots.Add((other.CellId, FacingOf(fight, other), other.Id));
             foreach (var other in fight.Team1) spots.Add((other.CellId, FacingOf(fight, other), other.Id));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kmk",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk,
                 Network.FightProtocol.BuildFightersPlaced(spots)));
 
             Program.LogDebug($"[Combate] El jugador se coloca en la casilla {newCell} (venía de la {oldCell}).");
@@ -1228,7 +1229,7 @@ namespace Jondo.Unity.Launcher.Handlers
             bool allReady = fight.SetFighterReady(GameState.CharacterId);
 
             // Enterado, que es lo único que contesta el servidor real al listo.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kah",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kah,
                 Network.FightProtocol.BuildReadyAck(GameState.CharacterId)));
 
             if (allReady) await StartFightAsync(stream, fight);
@@ -1256,7 +1257,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             long me = GameState.CharacterId;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kai",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kai,
                 Network.FightProtocol.BuildFightBegins()));
 
             // Los hechizos con los que se pelea son los MISMOS que el personaje tiene fuera del
@@ -1290,10 +1291,10 @@ namespace Jondo.Unity.Launcher.Handlers
             bar.Add((PrimerHuecoLibre(bar), Network.FightProtocol.HechizoCuerpoACuerpo));
             bar.Sort((a, b) => a.Slot.CompareTo(b.Slot));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jyy",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
                 Network.FightProtocol.BuildSpellBar(me, spells, bar)));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jxz",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz,
                 Network.FightProtocol.BuildRound(FirstRound)));
 
             // Los hechizos que NACEN con espera: el InitialCooldown de su grado. En la captura de
@@ -1309,10 +1310,10 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jxc",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                 Network.FightProtocol.BuildCooldowns(me, RecargasDe(yoMismo))));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(me, Network.FightProtocol.OpeningSequence)));
 
             // Las fichas completas de todos. Aquí es donde llegan la vida, el nivel y las
@@ -1340,10 +1341,10 @@ namespace Jondo.Unity.Launcher.Handlers
                     isMonster: true));
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jxb",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxb,
                 Network.FightProtocol.BuildAllFighters(everyone)));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), me,
                                                        Network.FightProtocol.OpeningSequence)));
 
@@ -1367,7 +1368,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var next = fight.CurrentFighter;
             if (next == null) return;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jxh",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxh,
                 Network.FightProtocol.BuildConfirmTurn(next.Id)));
         }
 
@@ -1469,7 +1470,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     ? Network.FightProtocol.MonsterTurnDeciseconds
                     : Network.FightProtocol.PlayerTurnDeciseconds;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jzc",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzc,
                 Network.FightProtocol.BuildTurnStart(fighter.Id, duration,
                                                      fight.CurrentTurnIndex, fight.RoundNumber)));
 
@@ -1479,7 +1480,7 @@ namespace Jondo.Unity.Launcher.Handlers
             foreach (var gastado in fight.InvocadosQueSeDeshacen(fight.RoundNumber))
             {
                 gastado.CurrentHP = 0;
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDeath(gastado.Id, gastado.Id)));
                 Program.LogDebug($"[Combate] Se deshace el invocado {gastado.Id} " +
                                  $"(le tocaba en la ronda {gastado.MuereEnRonda}).");
@@ -1508,22 +1509,22 @@ namespace Jondo.Unity.Launcher.Handlers
                 // el servidor y se quedaba pintado para siempre en el panel. Medido sobre las
                 // capturas: 5.091 de los 5.098 jya reales van dentro de una secuencia; de los
                 // nuestros, ninguno.
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                     Network.FightProtocol.BuildSequenceStart(fighter.Id,
                                                              Network.FightProtocol.ActionSequence)));
 
                 foreach (var (quien, caido) in caducados)
                 {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jya",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jya,
                         Network.FightProtocol.BuildBuffGone(quien.Id, caido.Numero)));
 
                     // Y el aviso gemelo: el servidor real manda además un jwe con el número de
                     // embrujo que se cae y de quién era.
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildBuffExpired(quien.Id, caido.Numero)));
                 }
 
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
                                                            Network.FightProtocol.ActionSequence)));
 
@@ -1543,7 +1544,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // turno de un monstruo ese paso no existe.
             if (!fighter.IsMonster)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jyj",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyj,
                     Network.FightProtocol.BuildYourTurn()));
             }
 
@@ -1595,7 +1596,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         private static async Task GivePointsBackAsync(NetworkStream stream, FightInstance fight, Fighter fighter)
         {
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(fighter.Id,
                                                          Network.FightProtocol.TurnSequence)));
 
@@ -1605,20 +1606,20 @@ namespace Jondo.Unity.Launcher.Handlers
                          (ActionPointsCharacteristic, (long)fighter.CurrentAP),
                      })
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                     Network.FightProtocol.BuildSequenceStart(fighter.Id,
                                                              Network.FightProtocol.SheetSequence)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jxw",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
                     Network.FightProtocol.BuildFighterSheet(fighter.Id, new[]
                     {
                         (characteristic, value),
                     })));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
                                                            Network.FightProtocol.SheetSequence)));
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
                                                        Network.FightProtocol.TurnSequence)));
         }
@@ -1681,25 +1682,25 @@ namespace Jondo.Unity.Launcher.Handlers
             walker.CellId = camino[camino.Count - 1];
             destination = walker.CellId;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(walker.Id,
                                                          Network.FightProtocol.WalkSequence)));
 
             await WriteFrameAsync(stream,
                 ConnectionProtocol.BuildActorMoved(walker.Id, path, facing));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildAction(walker.Id, Network.FightProtocol.Walked,
                                                   Network.FightProtocol.Spent(walker.Id, steps),
                                                   Network.FightProtocol.PointsDetail)));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jxw",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
                 Network.FightProtocol.BuildFighterSheet(walker.Id, new[]
                 {
                     (MovementPointsCharacteristic, (long)walker.CurrentMP),
                 })));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), walker.Id,
                                                        Network.FightProtocol.WalkSequence)));
 
@@ -1804,11 +1805,11 @@ namespace Jondo.Unity.Launcher.Handlers
             if (aQuien != 0) caster.LanzadosPorObjetivo[(spell, aQuien)] = sobreEse + 1;
             if (limites.Intervalo > 0) caster.Recarga[spell] = limites.Intervalo;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(caster.Id,
                                                          Network.FightProtocol.ActionSequence)));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildAction(
                     caster.Id,
                     spell == 0 ? Network.FightProtocol.WeaponCast : Network.FightProtocol.Cast,
@@ -1820,19 +1821,19 @@ namespace Jondo.Unity.Launcher.Handlers
                     Network.FightProtocol.CastDetail)));
 
             // La ficha va en su propia secuencia, como en la captura, no suelta en medio.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(caster.Id,
                                                          Network.FightProtocol.SheetSequence)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jxw",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
                 Network.FightProtocol.BuildFighterSheet(caster.Id, new[]
                 {
                     (ActionPointsCharacteristic, (long)caster.CurrentAP),
                 })));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), caster.Id,
                                                        Network.FightProtocol.SheetSequence)));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildAction(caster.Id,
                                                   Network.FightProtocol.SpentActionPoints,
                                                   Network.FightProtocol.Spent(caster.Id, cost),
@@ -1846,7 +1847,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                       Managers.EffectEngine.AlLanzar, cell, critico);
 
             int cierre = fight.SiguienteAccion();
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(cierre, caster.Id,
                                                        Network.FightProtocol.ActionSequence)));
 
@@ -1932,7 +1933,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             fight.Invocar(invocado, quienInvoca);
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildSummon(
                     quienInvoca.Id, invocado.Id, celda, FacingOf(fight, invocado),
                     receta.PlantillaDelAspecto, plantilla, grado, FullSheetOf(invocado))));
@@ -2052,7 +2053,7 @@ namespace Jondo.Unity.Launcher.Handlers
             foreach (var f in fight.Team0) if (f.IsAlive) todos.Add(f.Id);
             foreach (var f in fight.Team1) if (f.IsAlive) todos.Add(f.Id);
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jzu",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
                 Network.FightProtocol.BuildTeams(todos)));
         }
 
@@ -2221,7 +2222,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // Las curaciones.
                 if (c.Cura > 0)
                 {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildHeal(quienLanza.Id, c.Cura)));
                     Program.LogDebug($"[Combate] {quienLanza.Id} cura {c.Cura} a {c.Sobre.Id}; " +
                                      $"queda en {c.Sobre.CurrentHP}/{c.Sobre.MaxHP}.");
@@ -2246,7 +2247,7 @@ namespace Jondo.Unity.Launcher.Handlers
                         ? Network.FightProtocol.Alejarse
                         : Network.FightProtocol.Acercarse;
 
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildDisplacement(
                             quienLanza.Id, comoViaja, c.Sobre.Id,
                             c.CasillaDesde, c.CasillaHasta)));
@@ -2274,7 +2275,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 foreach (var d in c.Efecto.Disparadores())
                 {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jxm",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxm,
                         Network.FightProtocol.BuildBuff(
                             c.Sobre.Id, quienLanza.Id, c.Buff.Numero, c.Efecto.EffectId,
                             c.Efecto.EffectUid, c.Efecto.Value, c.Efecto.DiceNum, c.Efecto.DiceSide,
@@ -2298,11 +2299,11 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (ficha == null) continue;
                 long valor = caracteristica == ActionPointsCharacteristic ? ficha.CurrentAP : ficha.CurrentMP;
 
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                     Network.FightProtocol.BuildSequenceStart(quien, Network.FightProtocol.SheetSequence)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jxw",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
                     Network.FightProtocol.BuildFighterSheet(quien, new[] { (caracteristica, valor) })));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien,
                                                            Network.FightProtocol.SheetSequence)));
             }
@@ -2335,11 +2336,11 @@ namespace Jondo.Unity.Launcher.Handlers
                     const int grado = Managers.EffectEngine.GradoDelEnganche;
                     var (_, nivelId, _) = Managers.SpellEffects.GradoDe(actitud, quien.Level);
 
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                         Network.FightProtocol.BuildSequenceStart(quien.Id,
                                                                  Network.FightProtocol.ActionSequence)));
 
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildAction(
                             quien.Id, Network.FightProtocol.Cast,
                             Network.FightProtocol.CastAt(quien.Id, quien.Id, quien.CellId, actitud,
@@ -2349,7 +2350,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien,
                                               Managers.EffectEngine.AlLanzar);
 
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                         Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
                                                                Network.FightProtocol.ActionSequence)));
                 }
@@ -2605,7 +2606,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // El f14 es EL NÚMERO DE EFECTO, no un código de elemento: el 91 es robo de agua, el
             // 96 daños de agua, el 99 daños de fuego... Iba clavado al 91, así que todo golpe se
             // anunciaba como robo de agua fuera del elemento que fuera.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId,
                                                   target.Id, aplicado, elemento)));
 
@@ -2622,7 +2623,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // hacía que el bicho se cayera muerto antes de que se viera la animación.
             if (!target.IsAlive)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDeath(caster.Id, target.Id)));
                 Program.LogDebug($"[Combate] {target.Id} se queda sin vida.");
 
@@ -2651,7 +2652,7 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 invocado.CurrentHP = 0;
                 invocado.MuereEnRonda = -1;
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDeath(muerto.Id, invocado.Id)));
             }
 
@@ -2695,16 +2696,16 @@ namespace Jondo.Unity.Launcher.Handlers
                     monster.CurrentMP -= steps;
                     monster.CellId = destination;
 
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                         Network.FightProtocol.BuildSequenceStart(monster.Id,
                                                                  Network.FightProtocol.WalkSequence)));
                     await WriteFrameAsync(stream,
                         ConnectionProtocol.BuildActorMoved(monster.Id, path, FacingOf(fight, monster)));
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildAction(monster.Id, Network.FightProtocol.Walked,
                                                           Network.FightProtocol.Spent(monster.Id, steps),
                                                           Network.FightProtocol.PointsDetail)));
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                         Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
                                                                Network.FightProtocol.WalkSequence)));
                     best = CellDistance(monster.CellId, prey.CellId);
@@ -2729,16 +2730,16 @@ namespace Jondo.Unity.Launcher.Handlers
                 // Y su identificador, para que su lanzamiento también diga QUÉ se lanza.
                 int spellLevel = data.SpellLevelId;
 
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                     Network.FightProtocol.BuildSequenceStart(monster.Id,
                                                              Network.FightProtocol.ActionSequence)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildAction(
                         monster.Id, Network.FightProtocol.Cast,
                         Network.FightProtocol.CastAt(monster.Id, prey.Id, prey.CellId, spell,
                                                      spellLevel, critical: false),
                         Network.FightProtocol.CastDetail)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwe",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildAction(monster.Id,
                                                       Network.FightProtocol.SpentActionPoints,
                                                       Network.FightProtocol.Spent(monster.Id, data.APCost),
@@ -2753,7 +2754,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 await AplicarEfectosAsync(stream, fight, monster, spell, monsterGrade, prey,
                                           Managers.EffectEngine.AlLanzar, prey.CellId);
 
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
                                                            Network.FightProtocol.ActionSequence)));
             }
@@ -2950,9 +2951,9 @@ namespace Jondo.Unity.Launcher.Handlers
 
             int duration = (int)Math.Max(0, (DateTime.UtcNow - fight.StartedAt).TotalMilliseconds);
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kuf",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kuf,
                 Network.FightProtocol.BuildFightOver()));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jyg",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyg,
                 Network.FightProtocol.BuildFightResults(results, duration)));
 
             Program.LogDebug($"[Combate] Reparto: {xpGained} de experiencia (total {GameState.Experience}, " +
@@ -2966,7 +2967,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // y ése no existe: cero apariciones en las 295 capturas de todas las carpetas, contra
             // 672 de kub. O sea que el paquete salía de aquí y el cliente no lo recogía nunca, y
             // por eso el arreglo anterior no cambió nada.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kub",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage,
                 ConnectionProtocol.BuildCharacteristics()));
 
             // El grupo que se acaba de matar desaparece del mapa, y en su sitio sale otro.
@@ -2999,8 +3000,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 : fight.RoleplayMapId;
             LeaveFight();
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kml"));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kmp"));
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kml));
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp));
             await WriteFrameAsync(stream, ConnectionProtocol.BuildLoadMap(back));
             await WriteFrameAsync(stream, ConnectionProtocol.BuildMapClock());
 
@@ -3131,7 +3132,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // mirarlo limpio.
             await ActitudesAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jyt",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyt,
                 Network.FightProtocol.BuildTurnEnd(ending.Id)));
 
             // Las esperas bajan una ronda AL ACABAR el turno de su dueño, y el jxc de cierre ya
@@ -3145,12 +3146,12 @@ namespace Jondo.Unity.Launcher.Handlers
             ending.LanzadosEsteTurno.Clear();
             ending.LanzadosPorObjetivo.Clear();
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jto",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(ending.Id,
                                                          Network.FightProtocol.TurnEndSequence)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jxc",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                 Network.FightProtocol.BuildCooldowns(ending.Id, RecargasDe(ending))));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("jwi",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), ending.Id,
                                                        Network.FightProtocol.TurnEndSequence)));
 
@@ -3164,7 +3165,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // La ronda la sube fight.NextTurn() al dar la vuelta al orden; aqui solo se
                 // anuncia. Antes se subia ademas un contador estatico aparte, y eran dos numeros
                 // distintos siguiendose el uno al otro.
-                await WriteFrameAsync(stream, ConnectionProtocol.Push("jxz",
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz,
                     Network.FightProtocol.BuildRound(fight.RoundNumber)));
                 Program.LogDebug($"[Combate] Empieza la ronda {fight.RoundNumber}.");
             }
@@ -4241,7 +4242,7 @@ namespace Jondo.Unity.Launcher.Handlers
             msg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 4 });
             msg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = fight.DefenderLeaderId });
 
-            byte[] env = BuildGameNodePacket("type.ankama.com/jya", msg.ToByteArray());
+            byte[] env = BuildGameNodePacket(Op.Uri(Op.Jya), msg.ToByteArray());
             await WriteFrameAsync(stream, env);
             Program.LogDebug($"[FightHandler] Sent jya (FightStarting) for Challenger={fight.ChallengerLeaderId}, Defender={fight.DefenderLeaderId}.");
         }
@@ -4691,7 +4692,7 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 krhMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = totalXP });
             }
-            await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/krh", krhMsg.ToByteArray()));
+            await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Krh), krhMsg.ToByteArray()));
 
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jwf", jwfMsg.ToByteArray()));
 
@@ -4730,12 +4731,12 @@ namespace Jondo.Unity.Launcher.Handlers
             // closing the victory panel.
             await WriteFrameAsync(stream, TransitionPacketsBuilder.BuildLxsMessage());
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/kkp", Array.Empty<byte>()));
-            await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/kkm", Array.Empty<byte>()));
+            await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Kkm), Array.Empty<byte>()));
             await WriteFrameAsync(stream, TransitionPacketsBuilder.BuildKrbMessage());
 
             var johRp = new ProtoMessage();
             johRp.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fight.RoleplayMapId });
-            await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/joh", johRp.ToByteArray()));
+            await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Joh), johRp.ToByteArray()));
 
             var lorRp = new ProtoMessage();
             lorRp.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 120 });
@@ -4748,7 +4749,7 @@ namespace Jondo.Unity.Launcher.Handlers
             GameState.MapId = fight.RoleplayMapId;
             var kkrSynth = new ProtoMessage();
             kkrSynth.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = fight.RoleplayMapId });
-            byte[] kkrPacket = BuildGameNodePacket("type.ankama.com/kkr", kkrSynth.ToByteArray());
+            byte[] kkrPacket = BuildGameNodePacket(Op.Uri(Op.Kkr), kkrSynth.ToByteArray());
             await MapLoadHandler.HandleMapLoadRequest(stream, kkrPacket);
 
             // The kamas won. They are saved on the character and a bvr (KamasUpdateMessage) is sent
@@ -4769,7 +4770,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (loot.Count > 0)
             {
                 await WriteFrameAsync(stream, BuildGameNodePacket(
-                    "type.ankama.com/irm", CharacterSelectionHandler.BuildDynamicIrmPayload()));
+                    Op.Uri(Op.Irm), CharacterSelectionHandler.BuildDynamicIrmPayload()));
                 Program.LogDebug($"[FightHandler] Inventory resent with {loot.Count} looted item(s).");
             }
 
@@ -4779,7 +4780,7 @@ namespace Jondo.Unity.Launcher.Handlers
             //
             // Por kub, que es el opcode de la ficha en esta versión; el "kri" que había aquí no
             // sale ni una vez en las 295 capturas.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push("kub",
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage,
                 ConnectionProtocol.BuildCharacteristics()));
             Program.LogDebug("[FightHandler] Ficha del personaje reenviada al volver al mapa.");
 

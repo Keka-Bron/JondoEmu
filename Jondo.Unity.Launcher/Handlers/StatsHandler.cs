@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -69,7 +70,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task HandleStatsUpgradeRequest(NetworkStream stream, byte[] payload)
         {
             Console.WriteLine("[Game Node] Received Stats Upgrade Request (krc)");
-            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/krc");
+            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, Op.Uri(Op.Krc));
 
             // The client sends the FULL desired allocation, not a delta: each field is the
             // absolute number of points the player wants placed in that characteristic
@@ -214,7 +215,7 @@ namespace Jondo.Unity.Launcher.Handlers
             output.WriteInt32(maxWeight);
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/isf", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Isf), ms.ToArray());
         }
 
         /// <summary>Stats whose values are computed from the database/GameState;
@@ -327,7 +328,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 var kriMsg = new ProtoMessage();
                 kriMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = larMsg.ToByteArray() });
 
-                return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kri", kriMsg.ToByteArray());
+                return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kri), kriMsg.ToByteArray());
             }
             catch (Exception ex)
             {

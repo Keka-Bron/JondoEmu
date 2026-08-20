@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -87,7 +88,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task InteractAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? iov = ConnectionProtocol.ReadPayload(payload, "iov");
+            byte[]? iov = ConnectionProtocol.ReadPayload(payload, Op.Iov);
             if (iov == null) return;
 
             long action = 0, mapId = 0, contextualId = 0;
@@ -137,7 +138,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kbd", kbd));
+                ConnectionProtocol.Push(Op.Kbd, kbd));
 
             Console.WriteLine($"[NPC] Tienda del {npc.NpcId}: {catalogue.Count} objetos, " +
                               $"{kbd.Length} bytes.");
@@ -155,10 +156,10 @@ namespace Jondo.Unity.Launcher.Handlers
 
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ioc", ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
+                ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ios", ConnectionProtocol.BuildNpcQuestion(
+                ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(
                     template.DialogMessageId, template.Replies)));
 
             Console.WriteLine($"[NPC] Diálogo del {npc.NpcId}: pregunta {template.DialogMessageId}, " +
@@ -173,7 +174,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task ReplyAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? ioy = ConnectionProtocol.ReadPayload(payload, "ioy");
+            byte[]? ioy = ConnectionProtocol.ReadPayload(payload, Op.Ioy);
             if (ioy == null) return;
 
             long reply = 0;
@@ -184,7 +185,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kld", ConnectionProtocol.BuildDialogClosed(
+                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed(
                     ConnectionProtocol.NpcDialogCloseReason)));
 
             if (reply != KamasMountainReply)
@@ -197,10 +198,10 @@ namespace Jondo.Unity.Launcher.Handlers
             DatabaseManager.SaveCurrentCharacter();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(GameState.Kamas)));
+                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("lqn", ConnectionProtocol.BuildSystemMessage(
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                     ConnectionProtocol.KamasReceivedMessage, KamasMountainReward.ToString())));
 
             Console.WriteLine($"[NPC] La montaña de kamas paga {KamasMountainReward}; " +
@@ -213,7 +214,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task BuyAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? kea = ConnectionProtocol.ReadPayload(payload, "kea");
+            byte[]? kea = ConnectionProtocol.ReadPayload(payload, Op.Kea);
             if (kea == null) return;
 
             int gid = 0;
@@ -282,26 +283,26 @@ namespace Jondo.Unity.Launcher.Handlers
             long capacity = 1000 + 5L * GameState.StatStrength;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("lqn", ConnectionProtocol.BuildSystemMessage(
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                     ConnectionProtocol.PurchaseMessage,
                     gid.ToString(), uid.ToString(), quantity.ToString(), price.ToString())));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(GameState.Kamas)));
+                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iua", ConnectionProtocol.BuildItemArrived(3, bought)));
+                ConnectionProtocol.Push(Op.ObjectAddedMessage, ConnectionProtocol.BuildItemArrived(3, bought)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iun", ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.InventoryWeightMessage, ConnectionProtocol.BuildPods(0, capacity)));
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push("kdg"));
-
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(GameState.Kamas)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kdg));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iun", ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.InventoryWeightMessage, ConnectionProtocol.BuildPods(0, capacity)));
 
             Console.WriteLine($"[NPC] Comprado el objeto {gid} x{quantity} (uid {uid}) por {price}; " +
                               $"quedan {GameState.Kamas} kamas.");
@@ -321,7 +322,7 @@ namespace Jondo.Unity.Launcher.Handlers
             OpenShopNpc = 0;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("khd", ConnectionProtocol.BuildShopClosed()));
+                ConnectionProtocol.Push(Op.ExchangeLeaveMessage, ConnectionProtocol.BuildShopClosed()));
         }
 
         /// <summary>Al cambiar de mapa no queda nada abierto.</summary>

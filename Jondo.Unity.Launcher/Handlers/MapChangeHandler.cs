@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -12,7 +13,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task HandleMapChangeRequest(NetworkStream stream, byte[] payload)
         {
             LogDebug("[Map Change] Received Map Change Request (jos)");
-            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/jos");
+            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, Op.Uri(Op.Jos));
             if (inner != null)
             {
                 try
@@ -65,7 +66,7 @@ namespace Jondo.Unity.Launcher.Handlers
                             Fumx = requestedMapId // Field 2: Map ID
                         };
                         byte[] johBytes = johMsg.ToByteArray();
-                        byte[] johPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/joh", johBytes);
+                        byte[] johPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Joh), johBytes);
                         
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, johPacket);
 

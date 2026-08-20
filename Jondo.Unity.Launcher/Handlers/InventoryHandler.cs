@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -29,7 +30,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task HandleItemMovementRequest(NetworkStream stream, byte[] payload)
         {
             LogDebug("[Inventory] Received Item Movement Request (isi) [3.6]");
-            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/isi");
+            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, Op.Uri(Op.Isi));
             if (inner != null)
             {
                 long itemUid    = 0;
@@ -66,7 +67,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 LogDebug($"[Inventory] Sent iry for Item UID {itemUid} → position {newPosition}");
 
                 // 3. Commit transaction in client UI (luy)
-                byte[] luyPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/luy", Array.Empty<byte>());
+                byte[] luyPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Luy), Array.Empty<byte>());
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, luyPacket);
                 LogDebug("[Inventory] Sent luy (InventoryTransactionFinished)");
 
@@ -222,7 +223,7 @@ namespace Jondo.Unity.Launcher.Handlers
             output.WriteTag((uint)((1 << 3) | 0)); output.WriteInt64(itemUid);  // Field 1: UID
             output.WriteTag((uint)((2 << 3) | 0)); output.WriteInt32(position); // Field 2: position
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/iry", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Iry), ms.ToArray());
         }
 
         private static byte[] BuildLuqPacket(byte[] lookBytes)
@@ -232,7 +233,7 @@ namespace Jondo.Unity.Launcher.Handlers
             output.WriteTag((uint)((2 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(lookBytes));     // Field 2: EntityLook
             output.WriteTag((uint)((3 << 3) | 2)); output.WriteString(Guid.NewGuid().ToString());          // Field 3: session UUID
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/luq", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Luq), ms.ToArray());
         }
 
         private static byte[] BuildKkuPacket(byte[] lookBytes, long characterId)
@@ -242,7 +243,7 @@ namespace Jondo.Unity.Launcher.Handlers
             output.WriteTag((uint)((1 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(lookBytes)); // Field 1: EntityLook
             output.WriteTag((uint)((2 << 3) | 0)); output.WriteInt64(characterId);                    // Field 2: Character ID
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kku", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kku), ms.ToArray());
         }
 
         private static byte[] BuildHhfPacket()
@@ -251,7 +252,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var output = new CodedOutputStream(ms);
             output.WriteTag((uint)((1 << 3) | 0)); output.WriteInt32(2); // HGZ_EBYW shortcut bar state
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hhf", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Hhf), ms.ToArray());
         }
 
         private static byte[] BuildHhhPacket()
@@ -260,7 +261,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var output = new CodedOutputStream(ms);
             output.WriteTag((uint)((1 << 3) | 0)); output.WriteInt32(2); // HGZ_EBYW shortcut bar state
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hhh", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Hhh), ms.ToArray());
         }
 
         private static byte[] BuildKnsPacket()
@@ -269,7 +270,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var output = new CodedOutputStream(ms);
             output.WriteTag((uint)((1 << 3) | 0)); output.WriteBool(true);
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kns", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kns), ms.ToArray());
         }
 
         // ─── Utilities ──────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -30,12 +31,12 @@ namespace Jondo.Unity.Launcher.Network
             long[] blue = { 285, 273, 317, 373, 413, 411, 368, 312, 271, 288, 298, 302, 382, 386, 397, 400 };
             long[] red = { 270, 260, 303, 387, 428, 425, 381, 297, 257, 274, 284, 289, 396, 401, 410, 414 };
 
-            Same(failures, "kba",
+            Same(failures, Op.Kba,
                  "0a440a209d029102bd02f5029d039b03f002b8028f02a002aa02ae02fe0282038d0390031220"
                  + "8e028402af028303ac03a903fd02a902810292029c02a1028c0391039a039e03",
                  FightProtocol.BuildPlacementCells(blue, red));
 
-            Same(failures, "jzu",
+            Same(failures, Op.Jzu,
                  "12091a0710a28280c8e708120d1a0b10ffffffffffffffffff01",
                  FightProtocol.BuildTeams(new[] { fighter, FightProtocol.Nobody }));
 
@@ -46,9 +47,9 @@ namespace Jondo.Unity.Launcher.Network
                  + "120d1a0b10fdffffffffffffffff01120d1a0b10fcffffffffffffffff01",
                  FightProtocol.BuildTeams(new[] { fighter, -1L, -2L, -3L, -4L }));
 
-            Same(failures, "jrk", "100a1a00208d84a82f", FightProtocol.BuildFightMap(mapId));
+            Same(failures, Op.Jrk, "100a1a00208d84a82f", FightProtocol.BuildFightMap(mapId));
 
-            Same(failures, "kmp", "0801", FightProtocol.BuildFightMapComing());
+            Same(failures, Op.Kmp, "0801", FightProtocol.BuildFightMapComing());
 
             // La jxg entera son cientos de bytes de ficha, así que aquí se comprueba el
             // ENVOLTORIO, que es donde estaba el fallo: todo va dentro de un f2, y dentro de él la
@@ -74,7 +75,7 @@ namespace Jondo.Unity.Launcher.Network
                 }
             }
 
-            Same(failures, "kah", "08a28280c8e7081801", FightProtocol.BuildReadyAck(fighter));
+            Same(failures, Op.Kah, "08a28280c8e7081801", FightProtocol.BuildReadyAck(fighter));
 
             // Un lanzamiento, byte a byte. Lo que importa aquí es el f7 de dentro: el hechizo va
             // en DOS números, el 25188 (el hechizo) y el 63926 (su grado), y el f8 vale uno y no
@@ -88,7 +89,7 @@ namespace Jondo.Unity.Launcher.Network
                      FightProtocol.CastDetail));
 
             // Colocarse: la casilla que se deja va con -1 y la que se ocupa, con quién la ocupa.
-            Same(failures, "kmk",
+            Same(failures, Op.Kmk,
                  "1210088e02100118ffffffffffffffffff01120c088f02100518a28280c8e708",
                  FightProtocol.BuildFightersPlaced(new[]
                  {
@@ -353,7 +354,7 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>The messages pushed by the server travel in field 1 of the frame.</summary>
         private static void CheckEnvelope(List<string> failures)
         {
-            byte[] frame = ConnectionProtocol.Push("kvi", new byte[] { 0x08, 0x01 });
+            byte[] frame = ConnectionProtocol.Push(Op.CharactersListMessage, new byte[] { 0x08, 0x01 });
             var root = ProtoMessage.Parse(frame);
 
             var wrapper = Field(root, 1, 2);
@@ -363,7 +364,7 @@ namespace Jondo.Unity.Launcher.Network
             if (any == null) { failures.Add("envelope: the Any block is missing"); return; }
 
             var anyMsg = ProtoMessage.Parse(any.BytesValue);
-            if (Text(anyMsg, 1) != ConnectionProtocol.UriPrefix + "kvi")
+            if (Text(anyMsg, 1) != ConnectionProtocol.UriPrefix + Op.CharactersListMessage)
                 failures.Add("envelope: the type_url is not in f1 of the Any");
             if (Field(anyMsg, 2, 2) == null)
                 failures.Add("envelope: the payload is not in f2 of the Any");
@@ -405,7 +406,7 @@ namespace Jondo.Unity.Launcher.Network
             const string CapturedJsq =
                 "1a220a150a13747970652e616e6b616d612e636f6d2f6a737110ffffffffffffffffff01";
 
-            string jsq = Hex(ConnectionProtocol.Answer("jsq", null, -1));
+            string jsq = Hex(ConnectionProtocol.Answer(Op.MapExitAllowedMessage, null, -1));
             if (jsq != CapturedJsq)
                 failures.Add($"jsq: the answer to jqi does not match the capture ({jsq})");
 

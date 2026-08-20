@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -18,7 +19,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             LogDebug("[Game Node] Received Map Complementary Info Request (kkr) [Initial Map Load]");
-            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/kkr");
+            byte[]? inner = NetworkEnvelope.ExtractMessagePayload(payload, Op.Uri(Op.Kkr));
             if (inner == null)
             {
                 inner = NetworkEnvelope.ExtractMessagePayload(payload, "type.ankama.com/joi");
@@ -63,7 +64,7 @@ namespace Jondo.Unity.Launcher.Handlers
  
                     // 1. Send lxd (MapComplementaryInfo wrapper) - Dynamically instantiated empty lxd message
                     var emptyLxd = new Jondo.Unity.Protocol.Messages.lxd();
-                    byte[] lxdPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/lxd", emptyLxd.ToByteArray());
+                    byte[] lxdPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Lxd), emptyLxd.ToByteArray());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, lxdPacket);
                     LogDebug($"[Game Node] Sent dynamic empty lxd for Map ID: {mapIdToLoad}");
 
@@ -71,7 +72,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     try
                     {
                         byte[] jpvBytes = ConstruirJpv(mapIdToLoad, spawnCellId, subAreaId).ToByteArray();
-                        byte[] jpvPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/jpv", jpvBytes);
+                        byte[] jpvPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Jpv), jpvBytes);
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, jpvPacket);
                         LogDebug($"[Game Node] Sent dynamic database-driven jpv for Map ID: {mapIdToLoad}, Cell: {spawnCellId}.");
                     }
@@ -85,7 +86,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     lsyMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = (long)subAreaId });
                     lsyMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 45L });
                     byte[] lsyPayload = lsyMsg.ToByteArray();
-                    byte[] lsyPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/lsy", lsyPayload);
+                    byte[] lsyPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Lsy), lsyPayload);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, lsyPacket);
                     LogDebug($"[Game Node] Sent dynamic lsy containing SubArea ID: {subAreaId} (matches official capture).");
 
@@ -94,7 +95,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     {
                         Fymx = true
                     };
-                    byte[] knsPacket = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kns", knsMsg.ToByteArray());
+                    byte[] knsPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kns), knsMsg.ToByteArray());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, knsPacket);
                     LogDebug("[Game Node] Sent dynamically instantiated kns (Fymx = true).");
                 }

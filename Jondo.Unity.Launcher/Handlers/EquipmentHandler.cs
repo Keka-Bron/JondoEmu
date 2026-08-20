@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -34,7 +35,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task MoveAsync(NetworkStream stream, byte[] payload, long accountId = 0)
         {
-            byte[]? iuk = ConnectionProtocol.ReadPayload(payload, "iuk");
+            byte[]? iuk = ConnectionProtocol.ReadPayload(payload, Op.ObjectSetPositionMessage);
             if (iuk == null || iuk.Length == 0) return;
 
             // Position zero, not the bag. The amulet's slot IS zero, so proto3 leaves the field
@@ -62,7 +63,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push("ivq", Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
+                    ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
 
                 Console.WriteLine($"[Equipment] El hueco {position} lo ocupaba {evicted.Uid}; " +
                                   "a la bolsa.");
@@ -76,19 +77,19 @@ namespace Jondo.Unity.Launcher.Handlers
             bool known = Managers.Equipment.Move(uid, position);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ivq", Pb.New().Var(1, uid).Var(2, position).Build()));
+                ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, uid).Var(2, position).Build()));
 
             // The three of unknown meaning that travel with it, each with the value it carries in
             // every equip and unequip capture there is.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("lym", Pb.New().Var(1, 206).Build()));
+                ConnectionProtocol.Push(Op.Lym, Pb.New().Var(1, 206).Build()));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("hie", Pb.New().Var(1, 2).Build()));
+                ConnectionProtocol.Push(Op.Hie, Pb.New().Var(1, 2).Build()));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("hii", Pb.New().Var(1, 2).Build()));
+                ConnectionProtocol.Push(Op.Hii, Pb.New().Var(1, 2).Build()));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iun",
+                ConnectionProtocol.Push(Op.InventoryWeightMessage,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
 
             // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
@@ -99,11 +100,11 @@ namespace Jondo.Unity.Launcher.Handlers
             if (character != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
+                    ConnectionProtocol.Push(Op.GameContextRefreshEntityLookMessage, ConnectionProtocol.BuildActorRefreshed(
                         character, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation, accountId)));
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push("lxc", ConnectionProtocol.BuildLookChanged(character)));
+                    ConnectionProtocol.Push(Op.AppearancePreviewLookMessage, ConnectionProtocol.BuildLookChanged(character)));
             }
 
             // And the sheet, because what the item gives goes with it. Without this the numbers
@@ -111,7 +112,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (known)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push("kub", ConnectionProtocol.BuildCharacteristics()));
+                    ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
             }
 
             Console.WriteLine($"[Equipment] Item {uid} -> position {position}"

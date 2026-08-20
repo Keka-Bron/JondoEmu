@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -32,7 +33,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task DrawAsync(NetworkStream stream, int elementId)
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iwn", ConnectionProtocol.BuildElementInUse(
+                ConnectionProtocol.Push(Op.InteractiveUsedMessage, ConnectionProtocol.BuildElementInUse(
                     elementId, Lottery.Skill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
             var prize = Lottery.Draw(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
@@ -44,7 +45,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // Lo que la máquina contesta, con la forma de la captura.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("jbs", ConnectionProtocol.BuildLotteryResult(prize.Uid)));
+                ConnectionProtocol.Push(Op.LotteryResultMessage, ConnectionProtocol.BuildLotteryResult(prize.Uid)));
 
             // Y el premio a la BOLSA, que es el iua. El itd es el que mete en el cofre, y mandando
             // ése el objeto se creaba en la base de datos pero no aparecía por ninguna parte.
@@ -54,7 +55,7 @@ namespace Jondo.Unity.Launcher.Handlers
                         ChestHandler.FieldOf(ChestHandler.ArrivesInBag), prize)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iun",
+                ConnectionProtocol.Push(Op.InventoryWeightMessage,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
         }
     }

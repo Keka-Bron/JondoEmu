@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -62,7 +63,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static long ReadFightRequest(byte[] payload)
         {
-            byte[]? hqa = ConnectionProtocol.ReadPayload(payload, "hqa");
+            byte[]? hqa = ConnectionProtocol.ReadPayload(payload, Op.Hqa);
             if (hqa == null) return 0;
 
             foreach (var field in ProtoMessage.Parse(hqa).Fields)
@@ -477,7 +478,7 @@ namespace Jondo.Unity.Launcher.Network
             long mapId = 0;
             int facing = 0;
 
-            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, "jrw");
+            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, Op.GameMapMovementRequestMessage);
             if (jrw == null) return (0, corners, 0);
 
             foreach (var field in ProtoMessage.Parse(jrw).Fields)
@@ -522,7 +523,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static (int Cell, int Spell) ReadCast(byte[] payload)
         {
-            byte[]? jwh = ConnectionProtocol.ReadPayload(payload, "jwh");
+            byte[]? jwh = ConnectionProtocol.ReadPayload(payload, Op.Jwh);
             if (jwh == null) return (0, 0);
 
             int cell = 0, spell = 0;
@@ -660,7 +661,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static int ReadSequenceAck(byte[] payload)
         {
-            byte[]? jti = ConnectionProtocol.ReadPayload(payload, "jti");
+            byte[]? jti = ConnectionProtocol.ReadPayload(payload, Op.Jti);
             if (jti == null) return 0;
 
             foreach (var field in ProtoMessage.Parse(jti).Fields)
@@ -1176,7 +1177,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static (long Fighter, int Cell) ReadPlacementMove(byte[] payload)
         {
-            byte[]? jzy = ConnectionProtocol.ReadPayload(payload, "jzy");
+            byte[]? jzy = ConnectionProtocol.ReadPayload(payload, Op.Jzy);
             if (jzy == null) return (0, 0);
 
             long fighter = 0;
@@ -1228,7 +1229,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static bool ReadReady(byte[] payload)
         {
-            byte[]? kaq = ConnectionProtocol.ReadPayload(payload, "kaq");
+            byte[]? kaq = ConnectionProtocol.ReadPayload(payload, Op.Kaq);
             if (kaq == null) return false;
 
             foreach (var field in ProtoMessage.Parse(kaq).Fields)

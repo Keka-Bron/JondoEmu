@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Jondo.Protocol;
 using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -174,7 +175,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // zaap. Lleva la cifra ENTERA, no la diferencia, así que mandar los dos no descuadra
             // nada — el segundo dice lo mismo que el primero.
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(GameState.Kamas)));
+                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
             await NotifyAsync(stream,
                 $"Kamas: {GameState.Kamas} ({(GameState.Kamas - before >= 0 ? "+" : "")}" +
@@ -266,10 +267,10 @@ namespace Jondo.Unity.Launcher.Handlers
             // con su suelo y su techo, y los puntos que quedan. Es el mismo par de mensajes que
             // manda CharacteristicsHandler al repartir puntos.
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iun",
+                ConnectionProtocol.Push(Op.InventoryWeightMessage,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.StatStrength)));
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kub", ConnectionProtocol.BuildCharacteristics()));
+                ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
 
             string spellNote = await RefreshSpellsAsync(stream, before);
 
@@ -366,10 +367,10 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("hms",
+                ConnectionProtocol.Push(Op.SpellListMessage,
                     ConnectionProtocol.BuildSpellList(GameState.Breed, GameState.CharacterLevel)));
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("itg",
+                ConnectionProtocol.Push(Op.ShortcutBarContentMessage,
                     ConnectionProtocol.BuildSpellBar(GameState.Breed, GameState.CharacterLevel)));
 
             int opened = 0, closed = 0, moved = 0;
@@ -500,10 +501,10 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
+                ConnectionProtocol.Push(Op.GameContextRefreshEntityLookMessage, ConnectionProtocol.BuildActorRefreshed(
                     character, GameState.CellId, GameState.Orientation, accountId)));
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("lxc", ConnectionProtocol.BuildLookChanged(character)));
+                ConnectionProtocol.Push(Op.AppearancePreviewLookMessage, ConnectionProtocol.BuildLookChanged(character)));
 
             string capped = size != wanted
                 ? $" (se pidió {wanted}; el tope va de {CharacterSize.Minimum} a {CharacterSize.Maximum})"
@@ -523,7 +524,7 @@ namespace Jondo.Unity.Launcher.Handlers
         private static async Task NotifyAsync(NetworkStream stream, string text, int channel, long accountId)
         {
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kti", ConnectionProtocol.BuildChatLine(
+                ConnectionProtocol.Push(Op.ChatServerMessage, ConnectionProtocol.BuildChatLine(
                     GameState.CharacterName, GameState.CharacterId, accountId,
                     "[INFO] " + text, channel)));
         }

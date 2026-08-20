@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -84,7 +85,7 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             var nothing = (new List<long>(), Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
 
-            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, "jrw");
+            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, Op.GameMapMovementRequestMessage);
             if (jrw == null || jrw.Length == 0) return nothing;
 
             long mapId = 0;
@@ -158,14 +159,14 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             long request = ConnectionProtocol.RequestId(payload);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer("jsq", null, request));
+                ConnectionProtocol.Answer(Op.MapExitAllowedMessage, null, request));
         }
 
         // ─── jqk: take me to this map ───────────────────────────────────────────
 
         public static async Task ChangeMapAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? jqk = ConnectionProtocol.ReadPayload(payload, "jqk");
+            byte[]? jqk = ConnectionProtocol.ReadPayload(payload, Op.ChangeMapMessage);
             if (jqk == null || jqk.Length == 0) return;
 
             long asked = 0;

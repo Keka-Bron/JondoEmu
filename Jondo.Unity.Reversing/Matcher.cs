@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Jondo.Unity.ProtocolBuilder;
+namespace Jondo.Unity.Reversing;
 
 /// <summary>
 /// Emparejar el protocolo de una versión con el de la siguiente, cuando los nombres han cambiado.
@@ -43,7 +43,8 @@ public static class Matcher
     public sealed record Result(
         Dictionary<string, string> Pairs,
         List<string> Ambiguous,
-        List<string> Alone);
+        List<string> Alone,
+        Dictionary<string, List<string>> Candidates);
 
     /// <summary>Empareja los mensajes de las dos versiones.</summary>
     public static Result Match(Model a, Model b, int rounds = 5)
@@ -170,16 +171,40 @@ public static class Matcher
             }
         }
 
+        // ─── Los candidatos de cada duda ────────────────────────────────────────────────
+        //
+        // Antes esto sólo contaba cuántos quedaban sin resolver. Contarlos no sirve de nada: lo que
+        // hace falta es la LISTA de a quién se parecen, porque un mensaje ambiguo no es un misterio,
+        // es una elección entre tres o cinco. Con esa lista corta —y sólo con ella— tiene sentido
+        // preguntarle a un modelo cuál es; con los dos mil candidatos delante, no.
+        //
+        // Se descartan los que ya están cogidos por otra pareja: si el candidato tiene dueño, no es
+        // candidato.
         var ambiguous = new List<string>();
         var alone = new List<string>();
+        var candidates = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+
         foreach (var message in a.Messages)
         {
             if (pairs.ContainsKey(message.Name)) continue;
-            var mates = b.Messages.Where(m => signB[m.Name][0] == signA[message.Name][0]).ToList();
-            (mates.Count > 0 ? ambiguous : alone).Add(message.Name);
+
+            var mates = b.Messages
+                .Where(m => !takenB.Contains(m.Name) && signB[m.Name][0] == signA[message.Name][0])
+                .Select(m => m.Name)
+                .ToList();
+
+            if (mates.Count > 0)
+            {
+                ambiguous.Add(message.Name);
+                candidates[message.Name] = mates;
+            }
+            else
+            {
+                alone.Add(message.Name);
+            }
         }
 
-        return new Result(pairs, ambiguous, alone);
+        return new Result(pairs, ambiguous, alone, candidates);
     }
 
     /// <summary>
@@ -234,6 +259,17 @@ public static class Matcher
     }
 
     /// <summary>La huella de cada mensaje en cada ronda.</summary>
+    /// <summary>
+    /// La forma de cada mensaje sin mirar a los vecinos: la ronda 0 de la huella.
+    ///
+    /// Es lo que hay que contar para saber si entre dos versiones ha cambiado el PROTOCOLO o sólo
+    /// los nombres. Si las formas siguen ahí y lo que baila son los nombres, el emparejador debería
+    /// funcionar; si las formas también se han ido, es que el parche cambió los mensajes de verdad
+    /// y no hay nombre que valga.
+    /// </summary>
+    public static Dictionary<string, string> Shapes(Model model)
+        => Signatures(model, 0).ToDictionary(p => p.Key, p => p.Value[0], StringComparer.Ordinal);
+
     private static Dictionary<string, string[]> Signatures(Model model, int rounds)
     {
         var messages = model.Messages.ToDictionary(m => m.Name, StringComparer.Ordinal);

@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.IO;
 using Google.Protobuf;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -10,20 +11,20 @@ namespace Jondo.Unity.Launcher.Network
         // GROUP 1: Empty / Default Payload Messages (12 packets)
         // ==========================================
 
-        public static byte[] BuildHmlMessage() => BuildEmptyMessage("type.ankama.com/hml");
-        public static byte[] BuildLolMessage() => BuildEmptyMessage("type.ankama.com/lol");
-        public static byte[] BuildHmjMessage() => BuildEmptyMessage("type.ankama.com/hmj");
-        public static byte[] BuildLxsMessage() => BuildEmptyMessage("type.ankama.com/lxs");
-        public static byte[] BuildIyaMessage() => BuildEmptyMessage("type.ankama.com/iya");
+        public static byte[] BuildHmlMessage() => BuildEmptyMessage(Op.Uri(Op.Hml));
+        public static byte[] BuildLolMessage() => BuildEmptyMessage(Op.Uri(Op.Lol));
+        public static byte[] BuildHmjMessage() => BuildEmptyMessage(Op.Uri(Op.Hmj));
+        public static byte[] BuildLxsMessage() => BuildEmptyMessage(Op.Uri(Op.AppearanceSaveRequestMessage));
+        public static byte[] BuildIyaMessage() => BuildEmptyMessage(Op.Uri(Op.Iya));
         public static byte[] BuildItyMessage() => BuildEmptyMessage("type.ankama.com/ity");
         public static byte[] BuildKtjMessage() => BuildEmptyMessage("type.ankama.com/ktj");
         public static byte[] BuildLvkMessage() => BuildEmptyMessage("type.ankama.com/lvk");
-        public static byte[] BuildLuyMessage() => BuildEmptyMessage("type.ankama.com/luy");
+        public static byte[] BuildLuyMessage() => BuildEmptyMessage(Op.Uri(Op.Luy));
         public static byte[] BuildHhiMessage() => BuildEmptyMessage("type.ankama.com/hhi");
-        public static byte[] BuildIdfMessage() => BuildEmptyMessage("type.ankama.com/idf");
+        public static byte[] BuildIdfMessage() => BuildEmptyMessage(Op.Uri(Op.Idf));
         public static byte[] BuildJrfMessage() => BuildEmptyMessage("type.ankama.com/jrf");
         public static byte[] BuildKltMessage() => BuildEmptyMessage("type.ankama.com/klt");
-        public static byte[] BuildKlpMessage() => BuildEmptyMessage("type.ankama.com/klp");
+        public static byte[] BuildKlpMessage() => BuildEmptyMessage(Op.Uri(Op.Klp));
 
         private static byte[] BuildEmptyMessage(string typeUrl)
         {
@@ -34,21 +35,21 @@ namespace Jondo.Unity.Launcher.Network
         // GROUP 2: Simple Field Messages (12 packets)
         // ==========================================
 
-        public static byte[] BuildHhfMessage() => BuildSingleVarIntMessage("type.ankama.com/hhf", 2);
-        public static byte[] BuildHhhMessage() => BuildSingleVarIntMessage("type.ankama.com/hhh", 2);
-        public static byte[] BuildKsvMessage() => BuildSingleVarIntMessage("type.ankama.com/ksv", 12287);
-        public static byte[] BuildLouMessage() => BuildSingleVarIntMessage("type.ankama.com/lou", 312);
-        public static byte[] BuildKdxMessage() => BuildSingleVarIntMessage("type.ankama.com/kdx", 2000000);
-        public static byte[] BuildHnkMessage() => BuildSingleVarIntMessage("type.ankama.com/hnk", 2);
+        public static byte[] BuildHhfMessage() => BuildSingleVarIntMessage(Op.Uri(Op.Hhf), 2);
+        public static byte[] BuildHhhMessage() => BuildSingleVarIntMessage(Op.Uri(Op.Hhh), 2);
+        public static byte[] BuildKsvMessage() => BuildSingleVarIntMessage(Op.Uri(Op.Ksv), 12287);
+        public static byte[] BuildLouMessage() => BuildSingleVarIntMessage(Op.Uri(Op.Lou), 312);
+        public static byte[] BuildKdxMessage() => BuildSingleVarIntMessage(Op.Uri(Op.Kdx), 2000000);
+        public static byte[] BuildHnkMessage() => BuildSingleVarIntMessage(Op.Uri(Op.Hnk), 2);
         public static byte[] BuildKkpMessage() => BuildEmptyMessage("type.ankama.com/kkp");
-        public static byte[] BuildKkmMessage() => BuildEmptyMessage("type.ankama.com/kkm");
+        public static byte[] BuildKkmMessage() => BuildEmptyMessage(Op.Uri(Op.Kkm));
         public static byte[] BuildKrbMessage() => BuildSingleVarIntMessage("type.ankama.com/krb", Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints);
         public static byte[] BuildIlcMessage()
         {
             byte[] payload = new byte[] {
                 0x0A, 0x16, 0x0A, 0x0F, 0x10, 0xE0, 0xE3, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x1A, 0x02, 0xEA, 0x0C, 0x10, 0x86, 0x90, 0x90, 0x49
             };
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/ilc", payload);
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Ilc), payload);
         }
 
         public static byte[] BuildIzuMessage()
@@ -58,7 +59,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteTag((uint)((1 << 3) | 2));
             output.WriteString("6875369699");
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/izu", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Izu), ms.ToArray());
         }
 
         private static byte[] BuildSingleVarIntMessage(string typeUrl, int value)
@@ -91,7 +92,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteBytes(ByteString.CopyFrom(f3Ms.ToArray()));
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kqo", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.BasicPingMessage), ms.ToArray());
         }
 
         public static byte[] BuildBvrMessage()
@@ -108,7 +109,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteTag((uint)((2 << 3) | 2));
             output.WriteBytes(ByteString.CopyFrom(new byte[] { 0x83, 0x86, 0xb8, 0x49 }));
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hhq", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Hhq), ms.ToArray());
         }
 
         public static byte[] BuildIsfMessage()
@@ -120,7 +121,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteTag((uint)((2 << 3) | 0));
             output.WriteInt32(1017);
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/isf", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Isf), ms.ToArray());
         }
 
         public static byte[] BuildLok1Message()
@@ -158,7 +159,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteTag((uint)((2 << 3) | 0)); // Field 2, VarInt
             output.WriteInt64(Jondo.Unity.Launcher.Network.SessionContext.State.MapId > 0 ? Jondo.Unity.Launcher.Network.SessionContext.State.MapId : 154011397);
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/joh", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Joh), ms.ToArray());
         }
 
         public static byte[] BuildIzhMessage()
@@ -168,7 +169,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteTag((uint)((1 << 3) | 2));
             output.WriteBytes(ByteString.Empty);
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/izh", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Izh), ms.ToArray());
         }
 
         // ==========================================
@@ -315,7 +316,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteBytes(ByteString.CopyFrom(f1Ms.ToArray()));
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/ibo", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Ibo), ms.ToArray());
         }
 
         public static byte[] BuildKojMessage()
@@ -383,7 +384,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteBytes(ByteString.CopyFrom(f3Ms.ToArray()));
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/koj", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Koj), ms.ToArray());
         }
 
         public static byte[] BuildKyjMessage()
@@ -446,7 +447,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteBytes(ByteString.CopyFrom(f2Ms.ToArray()));
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/ltk", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Ltk), ms.ToArray());
         }
 
         public static byte[] BuildLwbMessage()
@@ -523,7 +524,7 @@ namespace Jondo.Unity.Launcher.Network
             }
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/lwb", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Lwb), ms.ToArray());
         }
 
         public static byte[] BuildLuqMessage()
@@ -562,7 +563,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteString(guid);
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/luq", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Luq), ms.ToArray());
         }
 
         // ==========================================
@@ -584,7 +585,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteBytes(ByteString.CopyFrom(f2Ms.ToArray()));
             output.Flush();
 
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/lpe", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Lpe), ms.ToArray());
         }
 
         public static byte[][] BuildKqmList(int subAreaId)
@@ -611,7 +612,7 @@ namespace Jondo.Unity.Launcher.Network
                     output.WriteInt32(data[1].Value);
                 }
                 output.Flush();
-                list[i] = NetworkEnvelope.BuildGameNodePacket("type.ankama.com/kqm", ms.ToArray());
+                list[i] = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kqm), ms.ToArray());
             }
             return list;
         }
@@ -684,7 +685,7 @@ namespace Jondo.Unity.Launcher.Network
             Program.LogDebug($"[TransitionPackets] Spell book (hmd) with {spells.Count} spell(s) " +
                              $"for breed {Jondo.Unity.Launcher.Network.SessionContext.State.Breed} at level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}.");
 
-            return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/hmd", ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Hmd), ms.ToArray());
         }
 
         /// <summary>
@@ -750,9 +751,9 @@ namespace Jondo.Unity.Launcher.Network
                              $"for breed {Jondo.Unity.Launcher.Network.SessionContext.State.Breed} at level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}.");
 
             return new byte[][] {
-                NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", itpSpells),
-                NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", itpSpells),
-                NetworkEnvelope.BuildGameNodePacket("type.ankama.com/itp", Array.Empty<byte>())
+                NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Itp), itpSpells),
+                NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Itp), itpSpells),
+                NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Itp), Array.Empty<byte>())
             };
         }
 

@@ -1,0 +1,1554 @@
+# Mapeo de 3.6.10.10 a 3.6.8.8.
+#
+# origen: estructura = lo resolvió el emparejador y no se equivoca;
+#         modelo     = había varios candidatos con la misma forma y eligió un LLM;
+#         duda       = hay candidatos y nadie ha elegido. NO usar sin mirarlo.
+#         retirado   = ni un solo candidato: o es nuevo, o ya no está.
+#
+# viejo	nuevo	origen	nombre	qué hace	lo usa el emulador
+hdw	hdz	estructura			
+hea		duda			
+hed		duda			
+hei		duda			
+hek		duda			
+hem		duda			
+hen		duda			
+her		duda			
+hfb		duda			
+hfd		duda			
+hfe	mdu	estructura			
+hff		duda			
+hfh		duda			
+hfi		duda			
+hfj		duda			
+hfp		duda			
+hfr		duda			
+hfs		duda			
+hfv		duda			
+hfw		duda			
+hfx		duda			
+hfy		duda			
+hfz		duda			
+hga		duda			
+hgb	lmd	estructura			
+hgc	mdp	estructura			
+hgg		duda			
+hgj		duda			
+hgm		duda			
+hgn		duda			
+hgp		duda			
+hgq		duda			
+hgr		duda			
+hgu		duda			
+hgv		duda			
+hgx		duda			
+hha		duda			
+hhd		duda			
+hhg		duda			
+hhh		duda			sí
+hhk		duda		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 4 mensajes.	
+hhn		duda			
+hhq	hnp	estructura			sí
+hhu		duda			
+hhv		duda			
+hhy		duda	TitlesAndOrnamentsListMessage	Lo que la cuenta posee; el cliente ya tiene el catalogo entero y lo que no este en esta lista sale en gris. Se envia una vez al entrar al mundo. En el replay se sustituye por los de la cuenta que juega.	sí
+hhz		duda			
+hic		duda			
+hid		duda	TitleSelectedMessage	El titulo que se lleva ahora; vacio significa ninguno, no un cero dentro.	sí
+hie		duda			sí
+hif		duda	OrnamentSelectedMessage	El ornamento que se lleva ahora, con la misma regla.	sí
+hig		duda			
+hih		duda		No implementado. Exclusivo de las capturas de extras de apariencia; 2 mensajes.	
+hii		duda			sí
+him		duda		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 10 mensajes.	
+hin		duda			
+hio		duda			
+hip		duda			
+hiq		duda			
+hit		duda			
+hiv		duda			
+hix		duda			
+hja	jpd	estructura			
+hjb		duda			
+hjc	hjx	estructura	TeleportRequestMessage	Destino elegido.	sí
+hje		duda			
+hjh		duda			
+hjk		duda		Viaja con jru en cada cambio de mapa.	sí
+hjl		duda			
+hjq		duda			
+hjt	mcy	estructura			
+hju	jtr	estructura			
+hjx		duda			
+hjy		duda			
+hjz		duda			
+hkb		duda			
+hkc		duda			
+hkd	hki	estructura			
+hke		duda			
+hkl		duda			
+hkp		duda			
+hks	hwg	estructura		No implementado. Exclusivo de las capturas de alianzas (Alianzas); 1 mensajes.	
+hkt		duda			
+hkx		duda			
+hla		duda			
+hlb		duda			
+hlc		duda			
+hld	lwp	estructura			
+hle		duda			
+hli		duda			
+hlm		duda			
+hln		duda			
+hlp		duda			
+hlr		duda			
+hls		duda			
+hlv	jfn	estructura			
+hlw		duda			
+hlx		duda			
+hma		duda			
+hmb		duda			
+hmc		duda			
+hmd		duda		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+hme		duda			
+hmh	hml	estructura			
+hmi		duda			
+hmj		duda			sí
+hmk		duda			
+hml		duda			sí
+hmo		duda			
+hmp		duda			
+hmq		duda			
+hmt		duda	SpellVariantActivationRequestMessage	Cambiar un hechizo por su variante, desde el panel o desde la barra.	sí
+hnc		duda			
+hnd		duda			
+hng		duda	SpellVariantActivationSuccessMessage	El hechizo nuevo y el grado que abre el nivel del personaje.	sí
+hnh		duda			
+hnn		duda			sí
+hnp		duda			sí
+hnt		duda			
+hnu		duda			
+hnv		duda			sí
+hnw		duda			
+hnz	jyw	estructura			
+hoc	jni	estructura		No implementado. Exclusivo de las capturas de emotes; 7 mensajes.	
+hoh		duda			
+hom		duda			
+hos		duda			
+hot		duda			
+hou		duda		Sale en la entrada al mundo, encabezando el grupo de once ktq y un lru.	
+hov		duda		No implementado. Exclusivo de las capturas de emotes; 19 mensajes.	
+hox		duda			
+hpb		duda			
+hpd		duda			sí
+hpf		duda			
+hph	jwq	estructura			
+hpl		duda			
+hpm		duda		Nada establecido. 103 mensajes, 35 ficheros.	
+hpo		duda			
+hpq		duda			
+hpr		duda			
+hps		duda			
+hpu		duda		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); 6 mensajes.	
+hpy		duda			
+hpz		duda			
+hqa		duda			sí
+hqc		duda			
+hqm		duda			
+hqp		duda			
+hqq		duda			
+hqs		duda			
+hqv		duda			
+hqw		duda			
+hqx		duda			
+hra		duda			
+hrf	hqz	estructura			
+hrh	hrb	estructura			
+hrj		duda			
+hrl		duda			
+hro		duda			
+hrr	lgv	estructura			
+hrz		duda			
+hsb		duda			
+hsc		duda			
+hsh		duda			
+hsk		duda			
+hsm		duda			
+hsu		duda			
+hsv		duda			
+hsz		duda			
+htd	hsf	estructura			
+htf		duda			
+hto	lbz	estructura			
+htp	hre	estructura			
+htu	ist	estructura			
+htw		duda			
+htz	huh	estructura			
+hua		duda			
+hub	hsj	estructura			
+huc		duda			
+hue		duda			
+hum		duda			
+hun		duda			
+hus	hsk	estructura			
+hut		duda			
+huu		duda			
+huz		duda			
+hvk		duda			
+hvs		duda			
+hvt		duda			
+hvw	hvw	estructura			
+hvx		duda			
+hwa	jox	estructura			
+hwb		duda			
+hwe		duda			
+hwf		duda			
+hwg		duda			
+hwh		duda			
+hwk		duda			
+hwv		duda			
+hwz		duda			
+hxd		duda			
+hxe	izl	estructura			
+hxg		duda			
+hxj		duda			
+hxp		duda			
+hxq		duda			
+hxr		duda			
+hxu		duda			
+hxx		duda			
+hyc		duda			
+hyk	idt	estructura			
+hym		duda			
+hyr		duda			
+hyt		duda			
+hzb		duda			
+hzc		duda			
+hzd		duda			
+hzg	hxf	estructura			
+hzh		duda			
+hzi		duda			
+hzj	jlb	estructura			
+hzk		duda			
+hzn	hzn	estructura			
+hzp		duda			
+hzq		duda			
+hzv		duda			
+hzx		duda			
+hzy		duda			
+iaf		duda			
+iag		duda			
+iaj		duda			
+iam		duda			
+ian	igb	estructura			
+iap		duda			
+iaq		duda			
+ias		duda			
+iau	iwb	estructura			
+iav		duda			
+iay		duda			
+iaz		duda			
+ibc		duda			
+ibf		duda			
+ibj	ikj	estructura			
+ibk	hxl	estructura			
+ibl		duda			
+ibp		duda			
+ibr		duda			
+ibs		duda			
+ibw		duda			
+ibz		duda			
+ice		duda			
+ich		duda			
+icj		duda			
+icm		duda			
+icn		duda			
+icp		duda			
+icq		duda			
+icr		duda			
+icu		duda			
+icx		duda			
+icz		duda			
+ide		duda			
+idf		duda			sí
+idi		duda			
+idl		duda			
+idm		duda			
+ido		duda			
+idp		duda			
+idt		duda			
+idu		duda		La respuesta a ieo: cuatro seguidos en la entrada al mundo.	
+idv		duda			
+idw		duda		No implementado. Exclusivo de las capturas de extras de conexion; 16 mensajes.	
+idz	lmv	estructura		No implementado. Exclusivo de las capturas de extras de conexion; 21 mensajes.	
+iea		duda			
+ieb		duda			
+iec		duda			
+ied		duda			
+iee		duda			
+ief		duda			
+ieg	idm	estructura		No implementado. Exclusivo de las capturas de extras de conexion; 12 mensajes.	
+ieh	ida	estructura			
+iei	idx	estructura			
+iej		duda		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 38 mensajes.	
+iek		duda			
+iel		duda			
+ieo		duda		Cuatro seguidos en la entrada al mundo; el servidor contesta cuatro idu.	
+iep		duda			
+ier		duda			
+iev		duda			
+iew		duda			
+iex		duda			
+iey		duda			
+iez		duda			
+ifa		duda			
+ifb		duda			
+ifd		duda			
+ife		duda		Alianzas, por nombre y tag; se descarta. 9 mensajes.	sí
+ifg		duda			
+ifj		duda			
+ifl		duda			
+ifm		duda			
+ifn		duda			
+ifp		duda			
+ifr		duda			
+ifu		duda			
+ifv		duda			
+ifw		duda			
+ify		duda		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); lleva id de peticion real (17); 17 mensajes.	
+ifz		duda			
+igc		duda			
+igf		duda			
+igi		duda			
+igk		duda			
+igl	hmr	estructura			
+ign		duda			
+igo		duda			
+igs		duda			sí
+igv		duda			
+ihc		duda			
+ihg		duda			
+ihh	lre	estructura			
+ihm	hse	estructura			
+ihq		duda		Respuesta que devuelve un id de peticion real (3 respuestas).	
+ihs		duda		Lleva id de peticion real en 1 peticion.	
+iht		duda			
+ihu		duda			
+iia		duda			
+iid	iiz	estructura			
+iie		duda			
+iih	ihw	estructura			
+iim		duda			
+iio		duda		Lleva id de peticion real en 3 peticiones.	
+iis		duda			
+iiv		duda			
+iix		duda			
+iiy		duda		Lleva id de peticion real en 1 peticion.	
+iiz		duda			
+ija		duda		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); es una respuesta y devuelve id de peticion real (11); 11 mensajes.	
+ijd		duda			
+ijg		duda			
+ijj	hqn	estructura			
+ijk		duda			
+ijl		duda			
+ijm		duda			
+ijn		duda			
+ijt		duda			
+ijx		duda			
+ijy		duda			
+ikb		duda			
+ike		duda			
+iki		duda			
+ikj		duda			
+ikn		duda			
+iko		duda			
+ikr		duda			
+iks		duda			
+ikt		duda			
+iku		duda			
+ilb	lpu	estructura			
+ilc		duda		Solo se llama desde la rama kkn, que nunca llega. 5 mensajes en 3 ficheros.	sí
+ild	ijj	estructura			
+ilf	ijl	estructura			
+ili		duda			
+ilj		duda			
+iln		duda			
+ilo		duda			
+ilr		duda		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 2 mensajes en 1 fichero.	
+ils		duda			
+ilv		duda			
+ilw	imn	estructura			
+ilx		duda			
+ima		duda			
+imd		duda		Lo envia el cliente (1 vez); el fichero datos/dofus3_mappings.json lo llama InventoryWeightMessage y eso es falso, un informe de peso seria push del servidor.	
+ime		duda		No implementado. Exclusivo de las capturas de grupos (Grupos); 2 mensajes.	
+imh		duda			
+imi		duda			
+imj		duda			
+imk		duda			
+imn		duda			
+imo		duda			
+imp		duda			
+imu	jqp	estructura			
+imv	irq	estructura			
+inb		duda			
+ind		duda			
+ine		duda			
+inh		duda			
+ink		duda			
+inn		duda			
+inp		duda			
+inq		duda			
+int		duda			
+inv		duda			
+inw		duda			
+inx	lgk	estructura			
+iny		duda			
+iof		duda			
+iog		duda			
+ioi	inn	estructura			
+iok	inp	estructura			
+iom	inr	estructura		Las capturas muestran al SERVIDOR enviandolo (283 mensajes, 67 ficheros); OpcodeRegistry lo declara como MapInformationsRequest, nombre heredado y falso.	
+ioo	hpr	estructura			
+iot		duda			
+iov		duda			sí
+ioy		duda			sí
+ipa		duda		No implementado. Exclusivo de las capturas de tienda (Tienda); 7 mensajes.	
+ipc		duda			
+ipd	kzk	estructura			
+ipe		duda			
+ipi		duda			
+ipj		duda			
+ipk		duda			
+ipm		duda			
+ipo		duda			
+ipq		duda			
+ipr		duda			
+ipt	hjr	estructura			
+ipv	ktb	estructura			
+ipw		duda			
+iqa		duda			
+iqc		duda			
+iqd		duda			
+iqg		duda			
+iqh		duda			
+iqj		duda		Lleva bloques de look: en los 73 bloques que se le miden, el campo f2 del look vale algo distinto de 3. El documento no da direccion.	
+iqk		duda			
+iql		duda			
+iqm		duda			
+iqn	lyy	estructura			
+iqq		duda			
+iqr		duda			
+iqt		duda			
+iqu	lnn	estructura			
+iqv		duda			
+iqw		duda			
+iqz	iyt	estructura			
+irb		duda			
+irc		duda			
+ird		duda			
+irg		duda			
+irh		duda			
+iri		duda			
+irj		duda			
+irl		duda		No implementado. Exclusivo de las capturas de oficios (Oficios); 30 mensajes.	
+irm	ike	estructura			sí
+iro		duda			
+irq		duda	JobExperienceMultiUpdateMessage	Los oficios; se conserva la lista de ids (es dato de juego) y se tira el progreso capturado: todos salen a nivel 1.	sí
+irs	ift	estructura			
+irt		duda			
+irv		duda			
+irw		duda			
+isa	hwm	estructura			
+isd		duda			
+isf		duda		Solo alcanzable desde krc y desde isi, que no llegan nunca. 7 mensajes en 2 ficheros.	sí
+isn		duda			
+isr	jso	estructura			
+iss		duda			
+ist		duda			
+isv		duda		No implementado. Exclusivo de las capturas de oficios (Oficios); 191 mensajes.	
+isw	llp	estructura			
+isx	hxw	estructura			
+isz	hxc	estructura			
+itd		duda	StorageObjectUpdateMessage	Un objeto llega al cofre.	sí
+ite		duda			
+itf		duda			
+itg		duda	ShortcutBarContentMessage	Las barras de atajos; el servidor envia dos y nada dentro dice cual es cual: un hueco con hechizo lleva f6, uno con objeto lleva f9, y el f2 suelto del final es el tipo de barra (1 hechizos, ausente objetos).	sí
+itj		duda			
+itk		duda			
+itl		duda			
+itm		duda			
+itn		duda		Lo envia el servidor pero el emulador lo usa como disparador de cliente y lo responde con itw, que no aparece en ninguna captura. 17 mensajes en 7 ficheros.	sí
+itp		duda		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+itq		duda			
+its	hkp	estructura			
+itv		duda			
+itw		duda		Lo que GameNodeProxy responde a itn; no aparece en ninguna de las 242 capturas.	sí
+itx		duda			
+itz		duda	ShortcutBarAddRequestMessage	Editar un hueco de una barra de atajos; se escribe tambien en la base de datos o se pierde al salir.	sí
+iua		duda	ObjectAddedMessage	Un objeto llega a la bolsa, con todo: plantilla, efectos y cantidad.	sí
+iub		duda			
+iue		duda			
+iuf		duda			
+iug	kgs	estructura			
+iuj		duda			sí
+iuk		duda	ObjectSetPositionMessage	Mover un objeto a un hueco o de vuelta a la bolsa; la posicion cero es el amuleto, no la bolsa, y proto3 la omite.	sí
+iul		duda			
+ium		duda	ObjectDeletedMessage	Un objeto sale de la bolsa.	sí
+iuq		duda	ShortcutBarReplacedMessage	Uno por cada hueco de barra que tenia la mitad antigua del hechizo; se envia antes de hng.	sí
+iur		duda			
+ius	ifk	estructura			
+iuu	igk	estructura			
+iuv		duda		No implementado. Exclusivo de las capturas de Steamer; 1 mensajes.	
+iuw		duda	ObjectDeleteMessage	Destruir un objeto; el cliente no quita nada por su cuenta y sin respuesta el objeto se queda. Observado contra el cliente real en el log de trafico del emulador, no en el conjunto pcapng.	sí
+iux		duda			
+iuy		duda			
+iuz		duda			
+ivc		duda			
+ive		duda			
+ivf		duda	KamasUpdateMessage	Kamas que quedan despues de pagar.	sí
+ivg		duda			
+ivi		duda		NO es el inventario: 9694 pares de id y valor, ids de 44 a 34352 y valores de cientos de millones; parece los contadores de estadisticas de la cuenta. Es la trama mas grande del bloque 3 (87878 B, el 97 % del fichero).	
+ivk		duda	ShortcutBarRefreshMessage	El eco: la misma entrada que envio el cliente.	sí
+ivl		duda			
+ivo		duda			
+ivp		duda			
+ivq		duda	ObjectMovementMessage	Donde acabo un objeto; un hueco solo admite un objeto, lo que hubiera se expulsa antes a la bolsa con su propio ivq.	sí
+ivr		duda			
+ivs		duda			
+ivt		duda			
+ivu		duda			
+ivv	jbo	estructura			
+iwb		duda	StorageInventoryContentMessage	Lo que hay dentro del cofre; misma forma que el inventario, con la bolsa como posicion de todo.	sí
+iwc		duda			
+iwd	iuh	estructura			
+iwf		duda			
+iwg		duda			
+iwi		duda			
+iwj		duda			
+iwm	ilk	estructura			
+iwo		duda	InteractiveUseRequestMessage	Clic en un elemento interactivo; el zaap, el cofre y la loteria llegan todos por aqui.	sí
+iwp		duda			
+iwt		duda			
+iww	lug	estructura			
+ixa		duda			
+ixc		duda			
+ixd	lul	estructura			
+ixf		duda			
+ixg		duda		No implementado. Exclusivo de las capturas de Suenos Infinitos; 14 mensajes.	
+ixh		duda			
+ixj	lpa	estructura			
+ixk		duda			
+ixm		duda			
+ixn		duda			
+ixq		duda			
+ixw		duda			
+ixx	iyi	estructura			
+iyb		duda		No implementado. Exclusivo de las capturas de Suenos Infinitos; 12 mensajes.	
+iyc		duda			
+iyd		duda			
+iyj		duda			
+iym		duda			
+iyu	hsx	estructura			
+iyx		duda		No implementado. Exclusivo de las capturas de Suenos Infinitos; 12 mensajes.	
+izh		duda		Lo envia el cliente (8 veces en 7 ficheros) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AlmanaxDateMessage, y eso es falso.	sí
+izi		duda			
+izj		duda			
+izo		duda			
+izq		duda			
+izr	iyq	estructura			
+izu	jve	estructura		El builder no se llama nunca. 2 mensajes en 2 ficheros.	sí
+izv		duda			
+izy		duda			
+izz	jcb	estructura		Nada establecido. 635 mensajes, 29 ficheros.	
+jaa		duda		Lo mismo que jjs pero en su propio mensaje; se descarta. 5 mensajes.	sí
+jab		duda			
+jac	ixs	estructura			
+jad		duda			
+jak	jsn	estructura			
+jal		duda			
+jam		duda			
+jao		duda			
+jaq		duda			
+jar		duda			
+jat		duda			
+jau		duda		No implementado. Exclusivo de las capturas de bolsa de viaje (Merkasako); 2 mensajes.	
+jav		duda		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	sí
+jaw		duda		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	sí
+jax		duda			
+jay		duda			
+jaz		duda		Se envia con los muebles, entre jss y lva; significado no establecido.	sí
+jba		duda	HavenBagEditionStoppedMessage	Modo de colocacion cerrado.	sí
+jbb		duda			
+jbd		duda			
+jbf		duda			
+jbh	kvu	estructura			
+jbk		duda		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	sí
+jbl		duda	HavenBagThemeChangeRequestMessage	Cambiar el tema de la habitacion desde dentro.	sí
+jbm		duda	HavenBagEditionStartedMessage	Modo de colocacion confirmado.	sí
+jbn		duda	EnterHavenBagRequestMessage	El boton de la bolsa de viaje y la tecla H; lleva un personaje porque se puede visitar la de otro.	sí
+jbo		duda			
+jbq	isj	estructura			
+jbs	kvq	estructura	LotteryResultMessage	La respuesta de la maquina de loteria; de dos capturas, una con premio en f2 y otra rechazada con f3: 1.	sí
+jbt		duda			
+jbu		duda	HavenBagFurnituresMessage	Los muebles de la habitacion, esperados detras del mapa; misma forma que jbg pero en f1 en vez de f2.	sí
+jbv		duda	HavenBagEditionStartRequestMessage	Abrir el modo de colocacion de muebles.	sí
+jbx		duda			
+jby		duda			
+jbz		duda			
+jca		duda			
+jcc		duda			
+jcf		duda			
+jck		duda			
+jcn		duda			
+jco		duda			
+jcs		duda			
+jct		duda			sí
+jcu		duda			
+jcz		duda			
+jdc		duda			
+jdh		duda			
+jdi		duda			
+jdk		duda			
+jdm		duda			
+jdp		duda			
+jds		duda			
+jeb		duda			
+jed		duda			
+jef		duda			
+jeg		duda			
+jej		duda			
+jem	ixu	estructura			
+jen		duda			
+jeq		duda			
+jeu		duda			
+jew		duda			
+jex		duda			
+jey		duda			
+jez		duda			
+jfb		duda			
+jfc		duda			sí
+jfd		duda			
+jff		duda			
+jfh		duda			
+jfi		duda			
+jfk		duda			
+jfl		duda			
+jfm	izt	estructura			
+jfo		duda			
+jfp		duda			
+jfr		duda			
+jfs		duda			
+jfv		duda			
+jfw		duda			
+jfy		duda			
+jfz	jfh	estructura			
+jga		duda			
+jgb	jfi	estructura			
+jgc	jfg	estructura			
+jgg		duda			
+jgi		duda			
+jgj		duda			
+jgl		duda			
+jgn		duda			
+jgo		duda			
+jgq		duda			
+jgr		duda			
+jgs		duda			
+jgu	jgl	estructura	SpouseInformationsMessage	El conyuge, con su look; se descarta. 13 mensajes.	sí
+jgv	irz	estructura			sí
+jgw		duda			
+jgx		duda			
+jgz		duda			
+jha		duda			
+jhb	hii	estructura			
+jhc		duda			
+jhd		duda			
+jhe		duda		El gremio de la cuenta grabada; se descarta. 7 mensajes.	sí
+jhf		duda			
+jhk		duda		El nombre del gremio, escrito. Se descarta; mientras viajaba provocaba un NullReferenceException en el cliente. 2 mensajes.	sí
+jho		duda			
+jhp		duda			
+jhq		duda			
+jhr		duda			
+jhu		duda			
+jhv		duda			
+jhy		duda			
+jhz		duda			
+jia		duda			
+jie	jgq	estructura			
+jii	hih	estructura		No implementado. Exclusivo de las capturas de gremio (Gremio); 21 mensajes.	
+jij		duda			
+jim		duda			
+jiq		duda			
+jir		duda			
+jit		duda			
+jiy		duda			
+jiz		duda			
+jja	jzg	estructura			
+jjc		duda			
+jjd		duda			
+jje	mco	estructura			
+jjf		duda			
+jjg		duda			
+jjj	kmd	estructura			
+jjn		duda			
+jjp		duda			
+jjs		duda		Un puesto de jugador en el mapa, con la cuenta detras; se descarta. 10 mensajes.	sí
+jjv		duda			
+jjw		duda			
+jjx		duda			
+jjy		duda			
+jjz		duda			
+jke		duda			
+jkh		duda			
+jki		duda			
+jkj		duda			
+jkl		duda			
+jkq	lpq	estructura			
+jkr	idq	estructura			
+jkt	lqm	estructura			
+jku	jjj	estructura			
+jkv	koa	estructura			
+jkw		duda			
+jkx		duda			
+jky		duda			
+jla		duda			
+jlb		duda			
+jlg		duda			
+jlh		duda			
+jlk		duda			
+jll		duda			
+jlq		duda			
+jls		duda			
+jlt		duda			
+jlu		duda			
+jlv		duda			
+jlx		duda		No implementado. Exclusivo de las capturas de gremio (Gremio); 8 mensajes.	
+jlz		duda			
+jma		duda			
+jmc		duda			
+jme		duda			
+jmf	jln	estructura		No implementado. Exclusivo de las capturas de gremio (Gremio); 8 mensajes.	
+jmi	jmk	estructura			
+jmo	iic	estructura			
+jmp		duda			
+jmu		duda		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 8 mensajes.	
+jmv		duda			
+jna		duda			
+jnf		duda			
+jng		duda			
+jnh		duda			
+jnk		duda			
+jnn		duda			
+jnr		duda			
+jns		duda			
+jnt	jot	estructura			
+jnu		duda			
+jny		duda			
+jnz		duda			
+joa	ipa	estructura			
+joc		duda			
+jod		duda			
+jof		duda			
+jog		duda			
+joh		duda		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+joj		duda			
+jol		duda			
+jom		duda			
+jon		duda			
+jop		duda			
+joq		duda		Sus dos llamadores son rutas de 3.6.4.3. 1 mensaje en 1 fichero.	sí
+jot		duda			
+joy		duda			
+joz		duda			
+jpb	kgq	estructura			
+jpe		duda			
+jpg		duda			
+jpi		duda			
+jpj		duda			
+jpk		duda			
+jpr		duda		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 5 mensajes.	
+jps		duda			
+jpv		duda			sí
+jpx		duda		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 8 mensajes.	
+jpy		duda			
+jpz		duda			
+jqb		duda			
+jqe		duda			
+jqf		duda			sí
+jqi		duda	MapExitRequestMessage	Estoy en el borde, puedo salir.	sí
+jqj		duda			
+jqk		duda	ChangeMapMessage	El mapa al que quiere ir; la casilla y la orientacion de llegada se calculan del lado de salida (13 de casilla lateral, 532 en vertical), medido en las capturas.	sí
+jql	klw	estructura			
+jqp		duda			
+jqr		duda			
+jqs		duda			
+jqt		duda		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 5 mensajes.	
+jqx		duda			
+jqy	lbu	estructura			
+jqz		duda			
+jra		duda			
+jrd		duda			
+jrg		duda			
+jrh		duda	MapInformationsRequestMessage	Quien esta en este mapa; sin respuesta el mapa se dibuja vacio, sin avatar, sin PNJs y sin monstruos.	sí
+jrl	ksi	estructura			
+jro		duda			
+jrq		duda			
+jrr	jqm	estructura			
+jru		duda	CurrentMapMessage	Carga este mapa; enviarlo dos veces hace que el cliente recargue el mundo en bucle.	sí
+jrv		duda			
+jry		duda			
+jrz		duda			
+jsd	jry	estructura	GameContextRemoveElementMessage	Quita un actor del mapa; su propio cambio de mapa cuenta.	sí
+jse		duda			
+jsg		duda			
+jsk		duda			
+jsn		duda	GameContextRefreshEntityLookMessage	Este actor ha cambiado: el bloque de actor entero, con casilla, id y el look nuevo. Es de lo que redibuja el cliente en el mapa.	sí
+jsq		duda	MapExitAllowedMessage	Adelante; no lleva mas que el id de peticion repetido, en el campo raiz 3. Sin el, el cliente nunca envia jqk y el personaje se queda en el borde.	sí
+jsy		duda			
+jsz		duda			
+jtc		duda			
+jtd	jsa	estructura			
+jte	jsd	estructura		Se responde con una trama jto hardcodeada. No aparece en ninguna captura.	sí
+jth		duda			
+jti		duda		Combate. 1275 mensajes, 22 ficheros.	sí
+jtj	hip	estructura			
+jtn		duda		Combate; el opcode mas frecuente de todo el conjunto: 14728 mensajes en los 23 ficheros que contienen un combate.	
+jto		duda		Lo envia el servidor y el cliente nunca; el emulador lo tiene en la rama de lista de personajes, a la que solo llega kpa. 7324 mensajes en 23 ficheros.	sí
+jtq		duda			
+jtr	meh	estructura			
+jts		duda			
+jtv	jgg	estructura			
+jtx		duda			sí
+jtz		duda			
+jue	hkz	estructura			
+juf	kbn	estructura			
+jui		duda			
+juk		duda			
+jun		duda			
+juo		duda			
+jur		duda			
+jus		duda			
+jut		duda			sí
+juu		duda			sí
+jva		duda			
+jvb		duda			
+jvc		duda			
+jvg		duda			
+jvj		duda			
+jvk		duda			
+jvn		duda			sí
+jvo		duda			
+jvt		duda			
+jvv		duda			
+jvw		duda			
+jvz		duda			
+jwa		duda			
+jwb		duda			sí
+jwc		duda			
+jwj	jmq	estructura		No implementado. Exclusivo de las capturas de tienda (Tienda); 13 mensajes.	
+jwn	inm	estructura			
+jwq		duda			sí
+jwr		duda			
+jws		duda			
+jwt		duda			
+jwx		duda			
+jwz		duda		Combate. 513 mensajes, 23 ficheros.	sí
+jxa		duda			
+jxb		duda			sí
+jxg		duda			sí
+jxh		duda		Combate. 514 mensajes, 23 ficheros.	sí
+jxi		duda			
+jxj		duda			
+jxl		duda			
+jxm		duda		Combate. 6556 mensajes, 23 ficheros.	sí
+jxn		duda			
+jxp		duda			
+jxs		duda		No implementado. Exclusivo de las capturas de mazmorras (Mazmorras); 1 mensajes.	
+jxt		duda			
+jxv		duda			
+jxw		duda		Lo envia el servidor pero el emulador lo usa como disparador de cliente. 4933 mensajes en 23 ficheros.	sí
+jxy		duda			sí
+jxz		duda			sí
+jya		duda		Solo alcanzable desde el despacho de combate muerto. 3962 mensajes en 20 ficheros.	sí
+jyb		duda			
+jyc		duda			
+jyf		duda			sí
+jyj		duda		Solo alcanzable desde el despacho de combate muerto. 178 mensajes en 21 ficheros.	sí
+jyn		duda			
+jyo		duda			
+jyp		duda			
+jyq		duda			
+jyt		duda		Combate. 503 mensajes, 20 ficheros.	sí
+jyu		duda			
+jyv		duda			
+jyz		duda			sí
+jzc	lez	estructura		Combate. 538 mensajes, 23 ficheros.	sí
+jzh	jwc	estructura			
+jzk		duda			
+jzm	jtk	estructura			
+jzq		duda			
+jzr		duda			
+jzs		duda			
+jzu		duda			sí
+jzw	hjm	estructura		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 12 mensajes.	
+jzx		duda			
+jzy		duda			sí
+jzz		duda			
+kac		duda			
+kae		duda			sí
+kai		duda			sí
+kap		duda			
+kaq		duda			sí
+kar		duda			
+kav		duda			
+kaz		duda			
+kba		duda			sí
+kbb		duda			
+kbh		duda			
+kbi		duda			
+kbk	kez	estructura			
+kbm		duda			
+kbn		duda			
+kbo		duda			
+kbt		duda			
+kbu		duda			
+kbv		duda			
+kbz		duda			
+kcd		duda			
+kce		duda			
+kcf		duda			
+kcg		duda			
+kch		duda			
+kcj	lud	estructura		No implementado. Exclusivo de las capturas de oficios (Oficios); 114 mensajes.	
+kck		duda			
+kcl		duda			
+kcr		duda	ExchangeObjectMoveMessage	Mover un objeto del cofre; la direccion no viaja, se deduce de donde esta el objeto. f1 llega como -1 cuando se arrastra la pila entera.	sí
+kcu		duda		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 4 mensajes.	
+kcy		duda			
+kcz		duda			
+kdb		duda		No implementado. Exclusivo de las capturas de oficios (Oficios); 114 mensajes.	
+kdd		duda			
+kde	irm	estructura			
+kdh		duda			
+kdk	kbe	estructura			
+kdr		duda			
+kds		duda			
+kdv		duda			
+kdw		duda			
+kdx		duda		Lo envia el cliente (10 veces en 1 fichero) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AccountCapabilitiesMessage, y eso es falso.	sí
+kdy		duda			
+kdz		duda			
+kea		duda			sí
+kee		duda			
+kef		duda			
+keg		duda			
+keh		duda			
+kei		duda			
+kej		duda			
+kek		duda			
+kem		duda			
+ken		duda			
+keo		duda			
+kep		duda			
+keq		duda		No implementado. Exclusivo de las capturas de intercambio (Intercambio); 4 mensajes.	
+ker		duda			
+keu		duda			
+kev		duda			
+kew		duda			
+kez		duda			
+kfe		duda			
+kfh	hoh	estructura			
+kfi	llf	estructura			
+kfl		duda			
+kfp		duda			
+kfs		duda			
+kfv		duda			
+kfw	jvz	estructura			
+kfx	kms	estructura			
+kga	kng	estructura			
+kgd	khf	estructura			
+kge		duda			
+kgh		duda			
+kgi		duda			
+kgj		duda			
+kgk		duda			
+kgl		duda		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 12 mensajes.	
+kgm		duda			
+kgp	kdy	estructura		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 9 mensajes.	
+kgq		duda			
+kgv		duda			
+kgx		duda			
+kgy		duda			
+kgz		duda			
+kha	khi	estructura			
+khd		duda	ExchangeLeaveMessage	El cofre se cerro.	sí
+khi		duda			
+khj		duda			
+khk		duda			
+khl		duda			
+khn		duda			
+khv		duda		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.	
+khw		duda			
+kia		duda		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.	
+kij		duda			
+kim	ksm	estructura			
+kin		duda			
+kip		duda			
+kiv		duda			
+kiy		duda			
+kjb		duda			
+kje	kje	estructura			
+kjg	iiw	estructura			
+kji		duda			
+kjl		duda		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 1 mensaje en 1 fichero.	
+kjo		duda			
+kjr		duda			
+kjs		duda			
+kjv		duda			
+kjw		duda			
+kjx		duda			
+kka		duda			
+kkc		duda			
+kke		duda			
+kkh		duda			
+kki		duda			
+kkl		duda			
+kkm		duda		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+kko	hye	estructura			
+kkq		duda			
+kkr		duda		Peticion de carga de mapa antigua (3.6.4.3). No aparece en ninguna captura.	sí
+kkt		duda			
+kku		duda		Solo alcanzable desde isi, que nunca llega. 2 mensajes en 2 ficheros.	sí
+kkw		duda			
+kkz		duda			sí
+kla		duda	LeaveDialogRequestMessage	El boton de cerrar el dialogo; vacio, y el cliente espera: la ventana no se cierra hasta que lo dice el servidor.	sí
+kld		duda	LeaveDialogMessage	Cierra el dialogo; el cliente no cierra la ventana del zaap por si mismo. f1 es un motivo fijo, no algo que calcular.	sí
+klg		duda			
+klk	jrf	estructura			
+klm	lxq	estructura			
+klp		duda		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	sí
+klq		duda			
+klx		duda			
+kmb	isr	estructura		Sale con jsn cuando se guarda un look; medidos 49 kmb estando montado y ninguno sin montura. No se envia: los cambios de look llegan igual por jsn. 172 mensajes, 62 ficheros.	
+kme		duda			
+kmh	iri	estructura			
+kmi		duda			
+kmj		duda			
+kmk		duda		Combate. 264 mensajes, 22 ficheros.	sí
+kml		duda			sí
+kmn	juk	estructura			
+kmp		duda			sí
+kmq	hiz	estructura			
+kmr		duda		En la linea temporal de entrada al mundo, el servidor le contesta con 11 tramas, entre ellas jru (el mapa).	
+kmu	kzh	estructura		Presente en 25 de las 31 carpetas de captura (399 mensajes, 90 ficheros). Nada establecido.	sí
+kmv		duda		Llega con jrh en cada carga de mapa y no espera nada de vuelta; el emulador ya lo ignora en silencio. 727 mensajes, 88 ficheros.	sí
+kmw		duda			sí
+knc	kgt	estructura			sí
+knf		duda			
+kni		duda			
+knk		duda			
+knl		duda			
+knm		duda		Junto con kno y kny es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.	
+kno		duda		Junto con knm y kny es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.	
+knt		duda			
+kny		duda		Junto con knm y kno es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.	
+knz		duda			
+kod		duda		El ping de 3.6.4.3, respondido con kns. Sustituido por kqo/kqy. No aparece en ninguna captura.	sí
+koe		duda			
+kof		duda			sí
+kog		duda			
+koh		duda			
+koi		duda			
+kok		duda			
+kon		duda			
+koo	kbq	estructura			
+koq	kbs	estructura			
+kou		duda			
+kov		duda			
+kox		duda			
+kpa		duda	CharactersListRequestMessage	Peticion de la lista de personajes; se despacha, pero solo se ve una vez en 242 capturas.	sí
+kpb		duda			
+kpe	hpj	estructura			
+kpi		duda			
+kpl		duda			
+kpm		duda			
+kpv		duda			
+kpw		duda			
+kpy		duda			
+kpz		duda			
+kqc		duda			
+kqd		duda			
+kqg		duda	ContactsListMessage	La lista de contactos de la cuenta grabada; se reconoce por opcode y se descarta. 28 mensajes.	sí
+kqi		duda			
+kqo	jyt	estructura	BasicPingMessage	El latido, cada cinco segundos mientras el cliente esta en el mundo; el mensaje de cliente mas frecuente, en 235 de los 242 ficheros. El fichero de mapeos lo llama ChatChannelsReadMessage, y eso es falso.	sí
+kqp		duda		Se envia tres veces seguidas con tres cargas distintas; significado no establecido.	sí
+kqq		duda	LogoutRequestMessage	El cliente vuelve a la pantalla de personaje o de servidor.	sí
+kqs		duda			
+kqt		duda			
+kqu	kcj	estructura	ServerOptionalFeaturesMessage	Funcionalidades habilitadas en el servidor, como ids opacos copiados de la captura. NO es una peticion de lista de personajes.	sí
+kqv	kqn	estructura			
+kqw		duda			
+kqz		duda	AuthenticationTicketMessage	Presenta el ticket de un solo uso; vincula la sesion a una cuenta y a un servidor, y un ticket desconocido cierra la conexion.	sí
+kra		duda	AuthenticationTicketAcceptedMessage	Abre la rafaga de bienvenida.	sí
+krc	ldf	estructura		Subida de caracteristicas antigua (3.6.4.3), sustituida por kum. No aparece en ninguna captura.	sí
+krf	kra	estructura			
+krh		duda			sí
+kri		duda		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+krj		duda			
+krl		duda		Lleva id de peticion real en 14 peticiones.	
+kro		duda		Lleva id de peticion real en 14 peticiones. Ojo: la cadena kro tambien es una silaba del generador de nombres aleatorios de CharacterCreationHandler, colision que no es un opcode.	
+krp		duda		Solo alcanzable desde el despacho de combate muerto. 14 mensajes en 14 ficheros.	
+krq		duda			
+krs		duda			sí
+krt		duda		Llega junto con kqz; no espera nada de vuelta.	sí
+kru		duda			
+krv		duda		El cliente lo envia justo tras la rafaga de bienvenida (9 veces en 8 ficheros) y lleva id de peticion real; el emulador deliberadamente no lo devuelve.	
+krx		duda			
+kry		duda			
+ksb		duda			
+ksc		duda			
+ksf		duda			
+ksh		duda			
+ksi		duda			
+ksl		duda			sí
+ksm		duda			
+ksn		duda			
+kso		duda			
+kst		duda			
+ksu		duda			
+ksv		duda			sí
+ksw		duda			
+ksx	luu	estructura			sí
+ktc		duda			
+kth	lgu	estructura			
+ktl		duda			
+ktn	ktd	estructura			
+kto	ksw	estructura			
+ktp	ksp	estructura			
+ktq		duda		Once seguidos en la entrada al mundo, detras de hou.	
+kts		duda		No implementado. Exclusivo de las capturas de caracteristicas (Caracteristicas); 2 mensajes.	
+ktu	jbz	estructura			
+ktw		duda			
+kty		duda			
+ktz		duda			
+kua		duda			
+kub		duda	CharacterStatsListMessage	La hoja de personaje; el campo contenedor no es el mismo para cada caracteristica y equivocarlo mata la hoja entera con NullReferenceException. Se envia dos veces (con el personaje y con el mapa) y el cliente se queda con la segunda.	sí
+kuc		duda			
+kuf		duda			sí
+kug		duda			
+kuh		duda	StatsResetRequestMessage	Reiniciar caracteristicas; la captura no cobra nada por ello, asi que aqui tampoco se cobra.	sí
+kuj		duda			
+kul		duda			
+kum	kuj	estructura	StatsUpgradeRequestMessage	Gastar puntos de caracteristica; el valor es el total pagado, no un incremento, lo que hace el mensaje idempotente, y un total que no cabe se rechaza entero. Campos: 1 inteligencia, 2 suerte, 3 vitalidad, 4 sabiduria, 5 agilidad, 6 fuerza. Lleva id de peticion real (7 peticiones).	sí
+kup		duda			
+kuq		duda			
+kur	ktl	estructura			
+kus		duda			
+kux		duda			
+kuy	jaj	estructura			
+kva		duda	CharacterSelectedSuccessMessage	Ya estas jugando con este personaje; sin el, el cliente se queda en la pantalla de personaje con el reloj de arena.	sí
+kvb	kuz	estructura	CharacterCreationResultMessage	Resultado de la creacion; vacio si va bien, f2 lleva el motivo del rechazo.	sí
+kvc		duda		El cliente lo envia justo tras la rafaga de bienvenida (10 veces en 9 ficheros); el emulador deliberadamente no lo devuelve.	
+kvd		duda	CharactersListEndMessage	Cierra la lista de personajes; vacio, justo detras de kvi en la rafaga real. Candidato principal a la causa del boton de crear personaje muerto.	sí
+kvg		duda			
+kvh		duda			
+kvi	iln	estructura	CharactersListMessage	Los personajes de la cuenta en el servidor elegido.	sí
+kvj		duda			
+kvk		duda	CharacterNameSuggestionSuccessMessage	Un nombre de personaje sugerido (el boton del dado).	sí
+kvl		duda	CharacterFirstSelectionMessage	El mismo paso justo despues de una creacion con exito: el cliente envia kvl detras de kvi y entra al mundo sin pasar por la lista.	sí
+kvm		duda			
+kvo	jat	estructura			
+kvq	kvt	estructura			
+kvt		duda			
+kvu		duda			
+kvv		duda			
+kvw		duda	CharacterSelectionMessage	Seleccionar un personaje; el id se comprueba contra la cuenta de la sesion porque lo elige el cliente y no es de fiar.	sí
+kvx		duda			
+kvy		duda			
+kvz	kvc	estructura	CharacterCreationRequestMessage	Crear un personaje.	sí
+kwa		duda			
+kwb		duda		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); 5 mensajes.	
+kwc		duda			
+kwd		duda		No implementado. Exclusivo de las capturas de extras de conexion; 8 mensajes.	
+kwh		duda			
+kwi		duda			
+kwj		duda			
+kwk		duda			
+kwl		duda			
+kwm		duda			
+kwn	iik	estructura			
+kwo		duda			
+kwr		duda			
+kwu		duda			
+kwv		duda			
+kww		duda			
+kwx		duda			
+kxa		duda			
+kxb		duda			
+kxh		duda		Lleva id de peticion real en 4 peticiones.	
+kxk		duda			
+kxm		duda			
+kxo		duda			
+kxp		duda			
+kxr		duda			
+kxs		duda			
+kxv		duda			
+kxw	kwy	estructura			
+kyb		duda			
+kyc		duda			
+kye	jle	estructura			
+kyf		duda			
+kyi		duda			
+kyl		duda			
+kym		duda			
+kyn	ira	estructura			
+kyo		duda			
+kyp		duda			
+kys		duda			
+kyw	kxv	estructura			
+kyx	kxw	estructura			
+kza	kvd	estructura			
+kze		duda			
+kzg	kyc	estructura			
+kzi	kye	estructura			
+kzj		duda			
+kzl		duda			
+kzn		duda			
+kzq		duda			
+kzt		duda			
+lab		duda			
+lad		duda		Respuesta que devuelve un id de peticion real (4 respuestas).	
+lag	hqj	estructura			
+lak		duda			
+lal		duda			
+lar		duda			
+lcf		duda			
+lcj		duda			
+lcn		duda			
+lco		duda			
+lcr		duda			
+lcx		duda			
+ldf		duda			
+ldq		duda			
+ldr	lip	estructura			
+ldx		duda			
+led	ljy	estructura			
+lee		duda			
+lej	lgn	estructura			
+leq		duda			
+les	jcj	estructura			
+let		duda			
+lfe	llv	estructura			
+lff		duda			
+lfg		duda			
+lfh		duda			
+lfi		duda			
+lfj		duda			
+lfk		duda			
+lfo		duda			
+lfv		duda			
+lfz		duda			
+lgc		duda			
+lgg		duda			
+lgj		duda			
+lgp		duda			
+lgu		duda			
+lgx	kmu	estructura			
+lgy	lfp	estructura			
+lgz	kvb	estructura			
+lhh		duda			
+lhl	lho	estructura			
+lhn		duda			
+lhp		duda			
+lhx	hkg	estructura			
+lhz		duda			
+lia	lnm	estructura			
+lib	lnj	estructura			
+lic		duda			
+lid		duda			
+lie	lfe	estructura			
+lij	lnt	estructura			
+lik		duda			
+lin		duda			
+lip		duda			
+liq		duda			
+lir		duda			
+liy	izr	estructura			
+ljh		duda			
+ljl		duda			
+ljo		duda			
+ljq		duda			
+ljr	iou	estructura			
+ljv		duda			
+lkg	iwv	estructura			
+lkh		duda			
+lki		duda			
+lkm		duda			
+lko	lgj	estructura			
+lkq		duda			
+lkr		duda			
+lks	ixc	estructura			
+lkt	jwu	estructura			
+lkv		duda			
+lld	iqy	estructura			
+llg		duda			
+llh		duda			
+lli		duda			
+llj		duda			
+llk	lpv	estructura			
+llm		duda			
+lls		duda			
+llz	jxt	estructura			
+lma	lsu	estructura			
+lme		duda			
+lmg		duda			
+lmh		duda			
+lmi		duda			
+lmo	hpt	estructura			
+lmq		duda			
+lmr	jqx	estructura			
+lms		duda			
+lmt		duda			
+lmv	ldh	estructura			
+lmw		duda			
+lmy		duda			
+lnb		duda			
+lne		duda			
+lng	ldn	estructura			
+lni		duda			
+lno		duda			
+lnv	juj	estructura			
+lnw		duda			
+lnx	lmn	estructura			
+lnz		duda			
+lob	kia	estructura			
+loc		duda			
+loj		duda			
+lon	ldx	estructura			
+lpe	lek	estructura		Lo que envia la rama lpj de 3.6.4.3. No aparece en ninguna de las 242 capturas.	sí
+lpg	lem	estructura			
+lph		duda			
+lpj	lhn	estructura		Rama de 3.6.4.3: envia lpe. No aparece en ninguna de las 242 capturas.	sí
+lpl		duda			
+lpo	joi	estructura			
+lpp		duda			
+lps		duda			
+lpu	lmj	estructura			
+lpv	lmk	estructura			
+lpy		duda			
+lpz		duda			
+lqb		duda			
+lqc		duda	GameContextCreateRequestMessage	Bloque 1 digerido: el servidor real espera esto antes de enviar el bloque 2.	sí
+lqd		duda			
+lqf		duda		Es el opcode que mas usa id de peticion real: 76 peticiones. Viaja con lqg y lqt (76 en 55 ficheros).	
+lqg		duda		Viaja con lqf (C2S) y lqt; los tres juntos aparecen en 54 ficheros de 19 carpetas. 77 mensajes, 56 ficheros.	
+lqo		duda			
+lqq		duda		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.	
+lqr		duda			
+lqs	jss	estructura			
+lqt		duda		Viaja con lqf (C2S) y lqg; los tres juntos aparecen en 54 ficheros de 19 carpetas. 76 mensajes, 55 ficheros.	
+lqu		duda	BasicTimeMessage	Sincronizacion de reloj; se envia tambien en cada cambio de mapa.	sí
+lqv		duda			
+lqw	jab	estructura		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.	
+lrc	lyd	estructura			
+lrd		duda			
+lre		duda			
+lrf		duda			
+lrg		duda			
+lrk		duda			
+lrl		duda			
+lrm	jrz	estructura			
+lrn	hlb	estructura			
+lro	iiy	estructura			
+lrr		duda			
+lru		duda		Cierra ese grupo de la entrada al mundo (hou, once ktq, lru).	
+lsd	lsm	estructura			
+lse		duda			
+lsi		duda			
+lsm		duda			
+lsp		duda			
+lsr		duda			
+lss		duda			
+lst	lvh	estructura			
+lsz	kke	estructura			
+ltb		duda			
+ltd		duda		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); es una respuesta y devuelve id de peticion real (5); 5 mensajes.	
+lte		duda			
+ltf		duda			
+ltg		duda			
+lth		duda			
+ltl		duda			
+ltm	jiq	estructura			
+ltn		duda			
+lto		duda			
+lua		duda			
+lud		duda			
+lue		duda			
+lug		duda			
+lui		duda			
+luk		duda			
+lun		duda			
+luq		duda			sí
+lur		duda			
+lus		duda			
+luu		duda			
+lux		duda		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); lleva id de peticion real (5); 5 mensajes.	
+luy	khb	estructura		Lo envia el cliente (1 vez) pero el emulador lo construye como mensaje de servidor y el builder no se llama nunca. Lleva id de peticion real. El fichero de mapeos lo llama JobDescriptionMessage, y eso es falso.	sí
+lva		duda	MapLoadedMessage	Eso es todo el listado de actores; vacio, justo detras de jss. Sin el, el cliente nunca da el mapa por cargado, espera unos dos segundos y reintenta con knm, kno y kny.	sí
+lvb	jtn	estructura		Va entre jss y lva en la entrada al mundo.	
+lvd		duda			
+lvg		duda			
+lvi		duda			
+lvo		duda			
+lvp		duda			
+lvr		duda			
+lvw		duda			
+lvx	klm	estructura			
+lvz	klo	estructura			
+lwc		duda			
+lwd		duda			
+lwe	jpj	estructura			
+lwl		duda			
+lwm		duda	OrnamentSelectRequestMessage	Elegir un ornamento; un mensaje vacio significa ninguno.	sí
+lwq		duda			
+lwu		duda			
+lwv		duda			
+lww	lxw	estructura			
+lwx		duda	AppearanceAuraResultMessage	Acuse de recibo.	sí
+lwy		duda			
+lxa		duda	TitleSelectResultMessage	Acuse de recibo.	sí
+lxc		duda	AppearancePreviewLookMessage	Tu aspecto ha cambiado: la vista previa del panel, que nadie mas ve. f1 es un uuid constante en la sesion y distinto por personaje; de donde lo aprende el cliente no se ha encontrado.	sí
+lxd		duda			sí
+lxh		duda	NpcDialogLeaveRequestMessage	Salir de un dialogo; el unico mensaje de PNJ que se observa enviar al cliente 3.6.10.10.	
+lxk		duda	AppearanceSlotVisibilityResultMessage	Acuse de recibo.	sí
+lxl		duda			
+lxp	itp	estructura			
+lxr	itr	estructura			
+lxt	ljb	estructura			
+lxu	mcc	estructura			
+lxw		duda	AppearanceAuraRequestMessage	El aura.	sí
+lxy		duda			
+lyc	iyr	estructura			
+lye		duda			
+lyf		duda	AppearanceSlotSetRequestMessage	Poner o vaciar un hueco concreto; sin variante, y sin objeto vacia el hueco.	sí
+lyh		duda			
+lyk		duda	AppearanceOpenRequestMessage	Abrir la ventana de apariencia; no tiene respuesta propia.	sí
+lyl		duda			
+lym		duda		Lleva el aura en el flujo de apariencia (f1: id de aura, vacio si ninguna); en cada captura de equipar y desequipar lleva la constante 206, cuyo significado no esta establecido.	sí
+lyn	ilr	estructura			
+lyo		duda			
+lyr		duda			
+lys		duda	AppearanceItemWearRequestMessage	Ponerse una prenda dejando que el servidor elija el hueco; acepta una variante, que es lo que usan los objetos vivos para imitar una prenda u otra.	sí
+lyt		duda	OutfitsListMessage	Los conjuntos guardados del guardarropa; obligatorio, sin el la ventana de cosmeticos suena y no se dibuja, muriendo en CosmeticUi.DisplayOutfit. En el replay se sustituye por los del personaje que juega.	sí
+lyu		duda	AppearanceSaveResultMessage	Guardado confirmado.	sí
+lyv		duda	OrnamentSelectResultMessage	Acuse de recibo.	sí
+lyy		duda	AppearanceStateRequestMessage	Pedir el estado de la ventana.	sí
+lyz		duda			
+lza		duda			
+lzd		duda			
+lze		duda	TitleSelectRequestMessage	Elegir un titulo; solo toca el borrador. Un mensaje vacio significa ninguno.	sí
+lzg		duda			
+lzh		duda		Va justo antes de kmv y jrh al final de la entrada al mundo; el servidor contesta lzl.	
+lzl		duda		La respuesta a lzh en la entrada al mundo.	
+lzn	lzl	estructura			
+lzo		duda			
+lzp	lzn	estructura			
+lzv	lzh	estructura			
+lzx		duda			
+lzy		duda			
+mab		duda			
+mac		duda			
+mad		duda			
+maf		duda			
+mag		duda			
+mah	lgm	estructura			
+mai		duda			
+maj		duda			
+mak	hsm	estructura			
+mam	kcl	estructura			
+maq		duda			
+mar		duda			
+mas		duda			
+mat		duda			
+mau		duda			
+mav		duda			
+mba		duda			
+mbd		duda			
+mbg		duda			
+mbk		duda			
+mbm		duda			
+mbn		duda			
+mbq		duda			
+mbr		duda			
+mbs		duda			
+mbt		duda			
+mbv	jqz	estructura			
+mbz		duda			
+mca		duda			
+mcc		duda			
+mcf		duda			
+mcg		duda			
+mch		duda			
+mck	khl	estructura			
+mcm		duda			
+mcn		duda			
+mco		duda			
+mcr		duda			
+mcs		duda			
+mcw		duda			
+mda		duda			
+mdf		duda			
+mdg		duda			
+mdh		duda			
+mdj		duda			
+mdk		duda			
+mdm		duda			
+mdn		duda			
+mdr	lgr	estructura			
+mdt		duda			
+mdu		duda			
+mdv		duda			
+mdw		duda			
+mdx		duda			
+mdy		duda			
+mdz		duda			
+mea		duda			
+meb		duda			
+mec		duda			
+meg		duda			
+meh		duda			
+mei		duda			
+mep	ifl	estructura			
+meq		duda			
+mer		duda			
+mes		duda			sí
+meu		duda			
+mew		duda			
+mez		duda			sí
+mfa	mfe	estructura			sí
+mfb		duda			
+mfc	mfd	estructura			
+mfe		duda		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mff		duda		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfg	lvk	estructura			
+mfl	lvl	estructura			
+mfm		duda			
+mfo		duda		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfp		duda		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfq		duda			
+mft		duda			
+mfu		duda			
+mfv		duda			
+mfx		duda		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfy	lpw	estructura			
+mga	mcr	estructura			
+mgb		duda		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mgf	hue	estructura			
+mgh	hug	estructura			
+mgk		duda			
+mgn		duda			
+mgr	mgl	estructura			
+mgt	mgn	estructura			sí
+mgy		duda			
+mgz		duda	ContentCatalogVersionMessage	Identificador del catalogo de contenido; opaco, el cliente solo lo compara consigo mismo.	sí
+mhc		duda			

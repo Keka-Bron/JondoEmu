@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text;
 
-namespace Jondo.Unity.ProtocolBuilder;
+namespace Jondo.Unity.Reversing;
 
 /// <summary>
 /// El .proto del cliente, reconstruido de sus propias clases.
@@ -32,6 +32,18 @@ public static class ProtoWriter
     private const BindingFlags Everything = BindingFlags.Public | BindingFlags.NonPublic |
                                             BindingFlags.Instance | BindingFlags.Static |
                                             BindingFlags.DeclaredOnly;
+
+    /// <summary>
+    /// El protocolo de un ensamblado, mensajes y enumerados, listo para emparejar.
+    ///
+    /// Abre, lee y cierra. Es lo que necesita todo el que quiera trabajar con una versión —la
+    /// línea de comandos, el emparejador, la interfaz— y estaba escrito tres veces.
+    /// </summary>
+    public static Matcher.Model Model(string assemblyPath)
+    {
+        using var reader = new AssemblyReader(assemblyPath);
+        return new Matcher.Model(Messages(reader), Enums(reader));
+    }
 
     /// <summary>Los mensajes de protobuf que hay en el ensamblado.</summary>
     public static List<Message> Messages(AssemblyReader reader)

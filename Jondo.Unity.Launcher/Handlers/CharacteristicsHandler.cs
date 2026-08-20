@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -55,7 +56,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task SpendAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? kum = ConnectionProtocol.ReadPayload(payload, "kum");
+            byte[]? kum = ConnectionProtocol.ReadPayload(payload, Op.StatsUpgradeRequestMessage);
             if (kum == null) return;
 
             // What the whole sheet is meant to look like: the characteristics the message does not
@@ -135,9 +136,9 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             long capacity = Pods();
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iun", ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.InventoryWeightMessage, ConnectionProtocol.BuildPods(0, capacity)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kub", ConnectionProtocol.BuildCharacteristics()));
+                ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
         }
 
         /// <summary>

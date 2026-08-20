@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -128,7 +129,7 @@ namespace Jondo.Unity.Launcher.Network
             if (ficha == null) return (seVa, 0);
 
             int llega = await BroadcastToMapAsync(quien.MapId,
-                ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
+                ConnectionProtocol.Push(Op.GameContextRefreshEntityLookMessage, ConnectionProtocol.BuildActorRefreshed(
                     ficha, quien.State.CellId, quien.State.Orientation, quien.AccountId)),
                 quien.Id);
 

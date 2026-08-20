@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Google.Protobuf;
 using Jondo.Unity.Launcher.Handlers;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -167,7 +168,7 @@ namespace Jondo.Unity.Launcher.Network
             long sessionAccountId = 0;
             int sessionServerId = 0;
 
-            if (payloadStr.Contains("type.ankama.com/lqu") || payloadStr.Contains("type.ankama.com/hoy") || payloadStr.Contains("type.ankama.com/hmt") || payloadStr.Contains("type.ankama.com/knx"))
+            if (payloadStr.Contains(Op.Uri(Op.BasicTimeMessage)) || payloadStr.Contains(Op.Uri(Op.HelloGameMessage)) || payloadStr.Contains(Op.Uri(Op.SpellVariantActivationRequestMessage)) || payloadStr.Contains("type.ankama.com/knx"))
             {
                 byte[] hoyFrame = NetworkEnvelope.ConvertHexStringToByteArray("1D-1A-1B-0A-19-0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-68-6F-79-12-04-08-1E-10-01");
                 await Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, hoyFrame);
@@ -185,7 +186,7 @@ namespace Jondo.Unity.Launcher.Network
 
                 GameServerProxy.LogTraffic("GAME_C->S", payload, payload.Length);
 
-                if (payloadStr.Contains("type.ankama.com/kqz"))
+                if (payloadStr.Contains(Op.Uri(Op.AuthenticationTicketMessage)))
                 {
                     // The client presents the ticket handed to it by the connection server. From
                     // here on the session knows which account it serves, and answers it with the
@@ -220,7 +221,7 @@ namespace Jondo.Unity.Launcher.Network
                     // and redoes the handshake with the connection server. Both ways back are
                     // handled the same: the client decides which of the two screens it lands on.
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push("kqr", BuildKqrPayload()));
+                        ConnectionProtocol.Push(Op.LogoutResultMessage, BuildKqrPayload()));
                     // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
                     // el de arena es de instancia y quedarse ahí es quedarse encerrado.
                     FightHandler.LeaveFight();
@@ -235,30 +236,30 @@ namespace Jondo.Unity.Launcher.Network
                     hasSentMapBlock = false;
                     Console.WriteLine("[Game Node] Client is going back: sent kqr and released the session.");
                 }
-                else if (!isAuthenticated && (payloadStr.Contains("type.ankama.com/hmt") || payloadStr.Contains("type.ankama.com/ise") || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx") || payloadStr.Contains("type.ankama.com/hoy")))
+                else if (!isAuthenticated && (payloadStr.Contains(Op.Uri(Op.SpellVariantActivationRequestMessage)) || payloadStr.Contains(Op.Uri(Op.Ise)) || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx") || payloadStr.Contains(Op.Uri(Op.HelloGameMessage))))
                 {
                     isAuthenticated = true;
                     await CharacterSelectionHandler.HandleAuthRequest(stream, payload, payloadStr);
                 }
                 // Careful: kqu no longer belongs here. In 3.6.10.10 it is a message pushed by the
                 // server inside the welcome burst, not a client request.
-                else if (payloadStr.Contains("type.ankama.com/jto") || payloadStr.Contains("type.ankama.com/kpc") || payloadStr.Contains("type.ankama.com/ksx") || payloadStr.Contains("type.ankama.com/kpa"))
+                else if (payloadStr.Contains(Op.Uri(Op.Jto)) || payloadStr.Contains("type.ankama.com/kpc") || payloadStr.Contains(Op.Uri(Op.Ksx)) || payloadStr.Contains(Op.Uri(Op.CharactersListRequestMessage)))
                 {
                     await CharacterSelectionHandler.HandleCharacterListRequest(stream, payload, payloadStr, sessionAccountId, sessionServerId);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kvz"))
+                else if (payloadStr.Contains(Op.Uri(Op.CharacterCreationRequestMessage)))
                 {
                     // Crear un personaje.
                     await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kvk"))
+                else if (payloadStr.Contains(Op.Uri(Op.CharacterNameSuggestionSuccessMessage)))
                 {
                     // El botón del dado: un nombre al azar.
                     await CharacterCreationHandler.SuggestNameAsync(stream);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kvw") || payloadStr.Contains("type.ankama.com/ksl")
-                         || payloadStr.Contains("type.ankama.com/kvl"))
+                else if (payloadStr.Contains(Op.Uri(Op.CharacterSelectionMessage)) || payloadStr.Contains(Op.Uri(Op.Ksl))
+                         || payloadStr.Contains(Op.Uri(Op.CharacterFirstSelectionMessage)))
                 {
                     // Character selection. We check that it belongs to this session's account:
                     // the client picks the id, so it cannot be trusted.
@@ -295,7 +296,7 @@ namespace Jondo.Unity.Launcher.Network
                     SessionContext.Current.EnterWorld();
                     await SessionRegistry.BroadcastToMapAsync(
                         SessionContext.State.MapId,
-                        ConnectionProtocol.Push("jsn", ConnectionProtocol.BuildActorRefreshed(
+                        ConnectionProtocol.Push(Op.GameContextRefreshEntityLookMessage, ConnectionProtocol.BuildActorRefreshed(
                             chosen, SessionContext.State.CellId, SessionContext.State.Orientation,
                             SessionContext.Current.AccountId)),
                         SessionContext.Current.Id);
@@ -309,7 +310,7 @@ namespace Jondo.Unity.Launcher.Network
                     await WorldEntry.SendAfterConfirmAsync(stream, chosen);
                 }
                 else if ((payloadStr.Contains("type.ankama.com/jrh")
-                          || payloadStr.Contains("type.ankama.com/kmv"))
+                          || payloadStr.Contains(Op.Uri(Op.Kmv)))
                          && FightHandler.PendingPreparation() != null)
                 {
                     // En combate, quien está en el mapa no se manda con un jss: son las jxg de la
@@ -336,7 +337,7 @@ namespace Jondo.Unity.Launcher.Network
                     var here = DatabaseManager.GetCharacterById(GameState.CharacterId);
                     if (here != null)
                     {
-                        byte[] actors = ConnectionProtocol.Push("jss",
+                        byte[] actors = ConnectionProtocol.Push(Op.MapComplementaryInformationsDataMessage,
                             ConnectionProtocol.BuildMapActors(GameState.MapId, here,
                                                               GameState.CellId, GameState.Orientation,
                                                               sessionAccountId));
@@ -361,7 +362,7 @@ namespace Jondo.Unity.Launcher.Network
                                           $"{here.Name} on cell {GameState.CellId}.");
                     }
                 }
-                else if (payloadStr.Contains("type.ankama.com/lqc"))
+                else if (payloadStr.Contains(Op.Uri(Op.GameContextCreateRequestMessage)))
                 {
                     // lqc es el cliente diciendo que ya ha digerido el primer bloque. Aquí es donde
                     // toca darle el mapa.
@@ -373,11 +374,11 @@ namespace Jondo.Unity.Launcher.Network
                     // enseña su escena por defecto, que es la de Incarnam. Por eso sonaba también su
                     // música en la pantalla de personajes.
                     Console.WriteLine("[Game Node] Client confirmed with lqc.");
-                    if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, "lqc")) hasSentMapBlock = true;
+                    if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, Op.GameContextCreateRequestMessage)) hasSentMapBlock = true;
                 }
                 // ─── 3.6.10.10 world messages. The joi/jos/jpp branches further down belong to
                 // an earlier version of the protocol and this client never sends them.
-                else if (payloadStr.Contains("type.ankama.com/jrw"))
+                else if (payloadStr.Contains(Op.Uri(Op.GameMapMovementRequestMessage)))
                 {
                     // Andar es el mismo mensaje dentro y fuera del combate. Peleando lo resuelve el
                     // manejador de combate, que además gasta puntos de movimiento; si cayera aquí,
@@ -389,12 +390,12 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await WorldMoveHandler.AllowMapExitAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jqk"))
+                else if (payloadStr.Contains(Op.Uri(Op.ChangeMapMessage)))
                 {
                     hasSentMapBlock = true;   // the map block belongs to entering the world, not to this
                     await WorldMoveHandler.ChangeMapAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kum"))
+                else if (payloadStr.Contains(Op.Uri(Op.StatsUpgradeRequestMessage)))
                 {
                     await CharacteristicsHandler.SpendAsync(stream, payload);
                 }
@@ -402,16 +403,16 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await CharacteristicsHandler.ResetAsync(stream);
                 }
-                else if (payloadStr.Contains("type.ankama.com/iuk"))
+                else if (payloadStr.Contains(Op.Uri(Op.ObjectSetPositionMessage)))
                 {
                     await EquipmentHandler.MoveAsync(stream, payload, sessionAccountId);
                 }
-                else if (payloadStr.Contains("type.ankama.com/ktm"))
+                else if (payloadStr.Contains(Op.Uri(Op.ChatClientMultiMessage)))
                 {
                     // Chat. With one player on the server there is nobody else to hand it to, so
                     // it comes straight back to whoever said it — which is also what the real
                     // server does with your own lines, and what makes them appear in the window.
-                    byte[]? ktm = ConnectionProtocol.ReadPayload(payload, "ktm");
+                    byte[]? ktm = ConnectionProtocol.ReadPayload(payload, Op.ChatClientMultiMessage);
                     if (ktm != null)
                     {
                         string text = "";
@@ -431,7 +432,7 @@ namespace Jondo.Unity.Launcher.Network
 
                         if (text.Length > 0 && !consumed)
                         {
-                            byte[] linea = ConnectionProtocol.Push("kti",
+                            byte[] linea = ConnectionProtocol.Push(Op.ChatServerMessage,
                                 ConnectionProtocol.BuildChatLine(GameState.CharacterName,
                                     GameState.CharacterId, sessionAccountId, text, channel));
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, linea);
@@ -453,19 +454,19 @@ namespace Jondo.Unity.Launcher.Network
                         }
                     }
                 }
-                else if (payloadStr.Contains("type.ankama.com/iwo"))
+                else if (payloadStr.Contains(Op.Uri(Op.InteractiveUseRequestMessage)))
                 {
                     // Ha clicado un elemento interactivo del mapa. De momento el único que
                     // declaramos es el zaap.
                     await ZaapTravelHandler.UseAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jbn"))
+                else if (payloadStr.Contains(Op.Uri(Op.EnterHavenBagRequestMessage)))
                 {
                     // El botón del merkasako, y la tecla H.
                     hasSentMapBlock = true;
                     await MerkasakoHandler.EnterFromOutsideAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jbl"))
+                else if (payloadStr.Contains(Op.Uri(Op.HavenBagThemeChangeRequestMessage)))
                 {
                     // Cambiarse de decorado dentro del merkasako.
                     hasSentMapBlock = true;
@@ -476,7 +477,7 @@ namespace Jondo.Unity.Launcher.Network
                     // Abrir el menú de gestión, para colocar muebles.
                     await MerkasakoHandler.OpenEditorAsync(stream);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jbg"))
+                else if (payloadStr.Contains(Op.Uri(Op.HavenBagFurnituresUpdateRequestMessage)))
                 {
                     // Un trozo de la habitación. Se junta y se guarda al cerrar el menú.
                     MerkasakoHandler.CollectFurniture(payload);
@@ -488,7 +489,7 @@ namespace Jondo.Unity.Launcher.Network
                     // Cerrar el menú de gestión. Los tres llegan seguidos al aceptar.
                     await MerkasakoHandler.CloseEditorAsync(stream);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kcr"))
+                else if (payloadStr.Contains(Op.Uri(Op.ExchangeObjectMoveMessage)))
                 {
                     // Mover un objeto entre la bolsa y el cofre.
                     await ChestHandler.MoveAsync(stream, payload);
@@ -503,42 +504,42 @@ namespace Jondo.Unity.Launcher.Network
                     // El estado de esa ventana.
                     await AppearanceHandler.SendStateAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lys"))
+                else if (payloadStr.Contains(Op.Uri(Op.AppearanceItemWearRequestMessage)))
                 {
                     // Ponerse una prenda; el hueco lo resuelve el servidor.
                     await AppearanceHandler.WearAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lyf"))
+                else if (payloadStr.Contains(Op.Uri(Op.AppearanceSlotSetRequestMessage)))
                 {
                     // Poner o quitar en un hueco concreto.
                     await AppearanceHandler.AssignAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lxg"))
+                else if (payloadStr.Contains(Op.Uri(Op.AppearanceSlotVisibilityRequestMessage)))
                 {
                     // Enseñar u ocultar una prenda.
                     await AppearanceHandler.ToggleAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lxw"))
+                else if (payloadStr.Contains(Op.Uri(Op.AppearanceAuraRequestMessage)))
                 {
                     // El aura.
                     await AppearanceHandler.AuraAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lze"))
+                else if (payloadStr.Contains(Op.Uri(Op.TitleSelectRequestMessage)))
                 {
                     // Elegir título en la ventana de apariencia. Solo toca el borrador.
                     await WardrobeHandler.ChooseTitleAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lwm"))
+                else if (payloadStr.Contains(Op.Uri(Op.OrnamentSelectRequestMessage)))
                 {
                     // Elegir ornamento.
                     await WardrobeHandler.ChooseOrnamentAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/lxs"))
+                else if (payloadStr.Contains(Op.Uri(Op.AppearanceSaveRequestMessage)))
                 {
                     // El botón Guardar de esa ventana.
                     await WardrobeHandler.SaveAsync(stream, payload, sessionAccountId);
                 }
-                else if (payloadStr.Contains("type.ankama.com/iuw"))
+                else if (payloadStr.Contains(Op.Uri(Op.ObjectDeleteMessage)))
                 {
                     // Destruir un objeto del inventario.
                     await DestroyItemHandler.DestroyAsync(stream, payload);
@@ -556,34 +557,34 @@ namespace Jondo.Unity.Launcher.Network
                     else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
                     else await ZaapTravelHandler.CloseAsync(stream);
                 }
-                else if (payloadStr.Contains("type.ankama.com/hjc"))
+                else if (payloadStr.Contains(Op.Uri(Op.TeleportRequestMessage)))
                 {
                     // Ha elegido destino en la lista del zaap.
                     hasSentMapBlock = true;   // el bloque del mapa es de entrar al mundo, no de esto
                     await ZaapTravelHandler.TravelAsync(stream, payload);
                 }
-                else if (isAuthenticated && payloadStr.Contains("type.ankama.com/hmt"))
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.SpellVariantActivationRequestMessage)))
                 {
                     // Cambiar un hechizo por su variante. Antes caía en la lista de mensajes que
                     // se ignoran en silencio, que es por lo que elegir una variante no hacía nada.
                     await SpellHandler.HandleVariantAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/itz"))
+                else if (payloadStr.Contains(Op.Uri(Op.ShortcutBarAddRequestMessage)))
                 {
                     // Editing a slot of the shortcut bar. The server answers with the very same
                     // entry it was given, y además se apunta dónde quedó: si no, la barra se
                     // rehace igual en cada sesión y lo que el jugador coloque se pierde al salir.
                     //
                     //   itz: f2 { f2: hueco, f6 { f2: hechizo } }, f3: qué barra
-                    byte[]? itz = ConnectionProtocol.ReadPayload(payload, "itz");
+                    byte[]? itz = ConnectionProtocol.ReadPayload(payload, Op.ShortcutBarAddRequestMessage);
                     if (itz != null)
                     {
                         RememberShortcut(itz);
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.Push("ivk", itz));
+                            ConnectionProtocol.Push(Op.ShortcutBarRefreshMessage, itz));
                     }
                 }
-                else if (payloadStr.Contains("type.ankama.com/kqo"))
+                else if (payloadStr.Contains(Op.Uri(Op.BasicPingMessage)))
                 {
                     // kqo is a heartbeat, not a request for the map. The client sends it every five
                     // seconds for as long as it is in the world and the real server answers it with
@@ -607,7 +608,7 @@ namespace Jondo.Unity.Launcher.Network
                             ConnectionProtocol.BuildHeartbeatAnswer());
                     }
                 }
-                else if (payloadStr.Contains("type.ankama.com/loy"))
+                else if (payloadStr.Contains(Op.Uri(Op.Loy)))
                 {
                     Console.WriteLine("[Game Node] Received loy (World Load Ack) from client. Map loaded successfully. Sending lok and jdj...");
                     
@@ -665,7 +666,7 @@ namespace Jondo.Unity.Launcher.Network
                     }
                     Console.WriteLine("[Game Node] Initialization burst sent successfully.");
                 }
-                else if (payloadStr.Contains("type.ankama.com/lpj"))
+                else if (payloadStr.Contains(Op.Uri(Op.Lpj)))
                 {
                     Console.WriteLine("[Game Node] Received lpj from client. Sending lpe response...");
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildLpeMessage());
@@ -729,7 +730,7 @@ namespace Jondo.Unity.Launcher.Network
                         Console.WriteLine("[Game Node] Received duplicate ibt from client. Ignored.");
                     }
                 }
-                else if (payloadStr.Contains("type.ankama.com/kkr") || payloadStr.Contains("type.ankama.com/jqf") || payloadStr.Contains("type.ankama.com/igx"))
+                else if (payloadStr.Contains(Op.Uri(Op.Kkr)) || payloadStr.Contains(Op.Uri(Op.Jqf)) || payloadStr.Contains("type.ankama.com/igx"))
                 {
                     await MapLoadHandler.HandleMapLoadRequest(stream, payload);
                 }
@@ -748,7 +749,7 @@ namespace Jondo.Unity.Launcher.Network
                         await MapChangeHandler.HandleMovementRequest(stream, payload);
                     }
                 }
-                else if (payloadStr.Contains("type.ankama.com/jos"))
+                else if (payloadStr.Contains(Op.Uri(Op.Jos)))
                 {
                     await MapChangeHandler.HandleMapChangeRequest(stream, payload);
                 }
@@ -756,40 +757,40 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await MapChangeHandler.HandleMovementConfirm(stream);
                 }
-                else if (payloadStr.Contains("type.ankama.com/isi"))
+                else if (payloadStr.Contains(Op.Uri(Op.Isi)))
                 {
                     await InventoryHandler.HandleItemMovementRequest(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/iov"))
+                else if (payloadStr.Contains(Op.Uri(Op.Iov)))
                 {
                     // Ha clicado un NPC: según la acción, se le abre la tienda o el diálogo.
                     await NpcHandler.InteractAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/ioy"))
+                else if (payloadStr.Contains(Op.Uri(Op.Ioy)))
                 {
                     // Ha elegido una respuesta del diálogo.
                     await NpcHandler.ReplyAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/kea"))
+                else if (payloadStr.Contains(Op.Uri(Op.Kea)))
                 {
                     // Comprarle algo al NPC que tiene la tienda abierta.
                     await NpcHandler.BuyAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/krc"))
+                else if (payloadStr.Contains(Op.Uri(Op.Krc)))
                 {
                     await StatsHandler.HandleStatsUpgradeRequest(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/hqa"))
+                else if (payloadStr.Contains(Op.Uri(Op.Hqa)))
                 {
                     // Atacar a un grupo de monstruos. Es lo que manda el cliente de verdad al
                     // lanzar un combate: lleva el id contextual del grupo.
                     await FightHandler.AttackAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jzy") || payloadStr.Contains("type.ankama.com/kaq")
+                else if (payloadStr.Contains(Op.Uri(Op.Jzy)) || payloadStr.Contains(Op.Uri(Op.Kaq))
                          || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
-                         || payloadStr.Contains("type.ankama.com/jwh")
-                         || payloadStr.Contains("type.ankama.com/jti")
-                         || payloadStr.Contains("type.ankama.com/hoy"))
+                         || payloadStr.Contains(Op.Uri(Op.Jwh))
+                         || payloadStr.Contains(Op.Uri(Op.Jti))
+                         || payloadStr.Contains(Op.Uri(Op.HelloGameMessage)))
                 {
                     // Colocarse, declararse listo y las opciones del combate. Los demás que había
                     // aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la 3.6.10.10 o
@@ -811,7 +812,7 @@ namespace Jondo.Unity.Launcher.Network
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, rawJtf);
                     Console.WriteLine("[Game Node] Sent jtf response");
                 }
-                else if (payloadStr.Contains("type.ankama.com/kod"))
+                else if (payloadStr.Contains(Op.Uri(Op.Kod)))
                 {
                     Console.WriteLine("[Game Node] Received Heartbeat/Ping Request (kod) [3.6]");
                     byte[] rawKns = NetworkEnvelope.ConvertHexStringToByteArray("1A-1B-0A-19-0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-6B-6E-73-12-02-08-01");
@@ -823,14 +824,14 @@ namespace Jondo.Unity.Launcher.Network
                     // Clean and silence known client-side notification payloads that don't require responses
                     // (e.g. UI logs, almanax requests, heartbeats, recipes) to prevent console flooding.
                     string cleanPayload = payloadStr.Replace("?", "").Trim();
-                    if (cleanPayload.Contains("kmw") || cleanPayload.Contains("klw") || cleanPayload.Contains("knb") || 
-                        cleanPayload.Contains("klo") || cleanPayload.Contains("kmt") || cleanPayload.Contains("jgv") || 
-                        cleanPayload.Contains("jct") || cleanPayload.Contains("jfc") || cleanPayload.Contains("kqk") || 
-                        cleanPayload.Contains("itr") || cleanPayload.Contains("knc") || cleanPayload.Contains("kna") || 
-                        cleanPayload.Contains("hmt") || cleanPayload.Contains("lxi") || cleanPayload.Contains("jqf") ||
+                    if (cleanPayload.Contains(Op.Kmw) || cleanPayload.Contains("klw") || cleanPayload.Contains("knb") || 
+                        cleanPayload.Contains("klo") || cleanPayload.Contains("kmt") || cleanPayload.Contains(Op.Jgv) || 
+                        cleanPayload.Contains(Op.Jct) || cleanPayload.Contains(Op.Jfc) || cleanPayload.Contains(Op.Kqk) || 
+                        cleanPayload.Contains(Op.Itr) || cleanPayload.Contains(Op.Knc) || cleanPayload.Contains("kna") || 
+                        cleanPayload.Contains(Op.SpellVariantActivationRequestMessage) || cleanPayload.Contains("lxi") || cleanPayload.Contains(Op.Jqf) ||
                         // kmv comes with jrh on every map load and expects nothing back; hnn is the
                         // client saying which spell the pointer is on.
-                        cleanPayload.Contains("kmv") || cleanPayload.Contains("hnn"))
+                        cleanPayload.Contains(Op.Kmv) || cleanPayload.Contains(Op.Hnn))
                     {
                         // Ignored silently as they are secondary client events
                     }
@@ -983,7 +984,7 @@ namespace Jondo.Unity.Launcher.Network
         {
             try
             {
-                byte[]? kqz = ConnectionProtocol.ReadPayload(payload, "kqz");
+                byte[]? kqz = ConnectionProtocol.ReadPayload(payload, Op.AuthenticationTicketMessage);
                 if (kqz == null || kqz.Length == 0) return false;
 
                 var msg = ProtoMessage.Parse(kqz);

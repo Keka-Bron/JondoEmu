@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Managers;
 using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -54,7 +55,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task UseAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? iwo = ConnectionProtocol.ReadPayload(payload, "iwo");
+            byte[]? iwo = ConnectionProtocol.ReadPayload(payload, Op.InteractiveUseRequestMessage);
             if (iwo == null) return;
 
             // f1 es el identificador de la instancia de habilidad, que no nos hace falta: lo que
@@ -98,12 +99,12 @@ namespace Jondo.Unity.Launcher.Handlers
             SessionContext.State.OpenZaapMapId = here;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("iwn", ConnectionProtocol.BuildElementInUse(
+                ConnectionProtocol.Push(Op.InteractiveUsedMessage, ConnectionProtocol.BuildElementInUse(
                     zaap.Id, Interactives.UseSkill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
             var destinations = Destinations(here);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("hjj", ConnectionProtocol.BuildZaapList(here, destinations)));
+                ConnectionProtocol.Push(Op.TeleportDestinationsMessage, ConnectionProtocol.BuildZaapList(here, destinations)));
 
             Console.WriteLine($"[Zaap] Abierto en el mapa {here}: {destinations.Count} destinos.");
         }
@@ -116,13 +117,13 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             SessionContext.State.OpenZaapMapId = 0;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kld", ConnectionProtocol.BuildDialogClosed()));
+                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed()));
         }
 
         /// <summary>El cliente ha elegido destino. Se le cobra y se le lleva.</summary>
         public static async Task TravelAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? hjc = ConnectionProtocol.ReadPayload(payload, "hjc");
+            byte[]? hjc = ConnectionProtocol.ReadPayload(payload, Op.TeleportRequestMessage);
             if (hjc == null) return;
 
             long target = 0;
@@ -179,12 +180,12 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapDiscovered(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ivf", ConnectionProtocol.BuildKamas(Jondo.Unity.Launcher.Network.SessionContext.State.Kamas)));
+                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(Jondo.Unity.Launcher.Network.SessionContext.State.Kamas)));
 
             // Y cerrarle la ventana, que no se cierra sola. En la captura el kld sale aquí, entre
             // los kamas y el jss del mapa nuevo.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("kld", ConnectionProtocol.BuildDialogClosed()));
+                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed()));
 
             SessionContext.State.OpenZaapMapId = 0;
             Console.WriteLine($"[Zaap] Viaje a {target} (zaap {waypoint.Id}), casilla " +

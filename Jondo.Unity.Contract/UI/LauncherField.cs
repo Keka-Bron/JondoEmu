@@ -13,7 +13,7 @@ namespace Jondo.Unity.Launcher.UI
     /// the services are down the field is made read-only instead of disabled, because a disabled
     /// WinForms text box is painted with the gray system colors and would break the dark theme.
     /// </summary>
-    internal sealed class LauncherField : Control
+    public sealed class LauncherField : Control
     {
         /// <summary>Solid color equivalent to rgba(12, 6, 3, 0.85) over the card.</summary>
         private static readonly Color NormalBackground = Color.FromArgb(13, 7, 4);

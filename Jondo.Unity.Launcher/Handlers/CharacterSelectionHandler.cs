@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Collections.Generic;
@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Launcher.Network;
 using Jondo.Unity.Protocol.Messages;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
@@ -153,11 +154,11 @@ namespace Jondo.Unity.Launcher.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, frame558);
                 Console.WriteLine("[Game Node] Sent Server Selection Status (frame558) in response to kpc");
             }
-            else if (payloadStr.Contains("type.ankama.com/ksx"))
+            else if (payloadStr.Contains(Op.Uri(Op.Ksx)))
             {
                 Console.WriteLine("[Game Node] Received Character List Request (ksx) [3.6] - Waiting for kpa");
             }
-            else if (payloadStr.Contains("type.ankama.com/kpa"))
+            else if (payloadStr.Contains(Op.Uri(Op.CharactersListRequestMessage)))
             {
                 Console.WriteLine("[Game Node] Received Character List Request (kpa) [3.6] - Sending Character List");
                 
@@ -218,9 +219,9 @@ namespace Jondo.Unity.Launcher.Handlers
             long characterIdToLoad = 0;
             try
             {
-                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, "kvw")
-                                    ?? ConnectionProtocol.ReadPayload(framePayload, "ksl")
-                                    ?? ConnectionProtocol.ReadPayload(framePayload, "kvl");
+                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, Op.CharacterSelectionMessage)
+                                    ?? ConnectionProtocol.ReadPayload(framePayload, Op.Ksl)
+                                    ?? ConnectionProtocol.ReadPayload(framePayload, Op.CharacterFirstSelectionMessage);
                 if (selection != null && selection.Length > 0)
                 {
                     var msg = ProtoMessage.Parse(selection);
