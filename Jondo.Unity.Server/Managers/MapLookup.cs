@@ -44,6 +44,49 @@ namespace Jondo.Unity.Launcher.Managers
         private static int _countedMaps = -1;
         private static readonly object _lock = new object();
 
+        /// <summary>Result of cycling to the next map sharing the current coordinates.</summary>
+        public sealed class RelativeMatch
+        {
+            public MapInfo Map { get; init; } = null!;
+            public int Candidates { get; init; }
+            public int Position { get; init; }
+            public bool Wrapped { get; init; }
+        }
+
+        /// <summary>
+        /// Finds the next map at the same world coordinates, as Giny's <c>.relative</c> command
+        /// does. Ordering by MapId makes the cycle reproducible despite dictionary/database order.
+        /// Combat arenas are intentionally not discarded here: this is an administrator browsing
+        /// command and Giny cycles through every map position, not only outdoor roleplay maps.
+        /// </summary>
+        public static RelativeMatch? NextRelative(long currentMapId)
+        {
+            if (!MapManager.Maps.TryGetValue(currentMapId, out var current)) return null;
+
+            var maps = new List<MapInfo>();
+            foreach (var map in MapManager.Maps.Values)
+            {
+                if (map.MapId > 0 && map.PosX == current.PosX && map.PosY == current.PosY)
+                    maps.Add(map);
+            }
+            maps.Sort((a, b) => a.MapId.CompareTo(b.MapId));
+            if (maps.Count <= 1) return null;
+
+            int currentIndex = maps.FindIndex(m => m.MapId == currentMapId);
+            if (currentIndex < 0) return null;
+            int nextIndex = currentIndex + 1;
+            bool wrapped = nextIndex >= maps.Count;
+            if (wrapped) nextIndex = 0;
+
+            return new RelativeMatch
+            {
+                Map = maps[nextIndex],
+                Candidates = maps.Count,
+                Position = nextIndex + 1,
+                Wrapped = wrapped,
+            };
+        }
+
         /// <summary>
         /// El mapa que hay en unas coordenadas, o null si no hay ninguno que valga.
         /// </summary>

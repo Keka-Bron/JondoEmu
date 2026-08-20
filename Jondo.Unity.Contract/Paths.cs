@@ -81,6 +81,41 @@ namespace Jondo.Unity.Launcher
         // Lo que se puede clicar en cada mapa, con su casilla y su dibujo, y los zaaps con su
         // mapa y su subzona. Los genera extract_interactivos.py de los bundles del cliente.
         public static string InteractiveElementsJson => Resolve("interactive_elements.json");
+        /// <summary>
+        /// Los catálogos de oficios, habilidades y recetas en crudo. Se quedan fuera de
+        /// <c>datos</c> a propósito: el servidor los importa a world.db y nunca los sirve.
+        ///
+        /// Se busca en <c>dofus3_data</c> ANTES que en <c>JsonFromDofusDude</c>, que es donde los
+        /// puso quien escribió esto. Los tres ficheros salen del volcado del cliente y ya vivían en
+        /// dofus3_data desde antes, así que mirando sólo en la carpeta nueva no se encontraban y la
+        /// importación se saltaba sola sin que nadie se enterara: las tablas quedaban creadas y
+        /// vacías. Se sigue mirando en las dos carpetas de antes, porque quien los tenga allí no
+        /// tiene por qué moverlos.
+        ///
+        /// La comprobación es por FICHERO y no por carpeta: <c>dofus3_data</c> existe en cualquier
+        /// instalación, así que preguntar si existe la carpeta la habría elegido siempre, tuviera
+        /// dentro los catálogos o no.
+        /// </summary>
+        public static string DofusDudeJsonDir
+        {
+            get
+            {
+                foreach (string candidate in new[]
+                {
+                    DataDir,
+                    Path.Combine(Root, "JsonFromDofusDude"),
+                    Path.GetFullPath(Path.Combine(Root, "..", "JsonFromDofusDude")),
+                })
+                {
+                    if (File.Exists(Path.Combine(candidate, "jobs.json"))) return candidate;
+                }
+
+                return Path.Combine(Root, "JsonFromDofusDude");
+            }
+        }
+        public static string JobsJson => Path.Combine(DofusDudeJsonDir, "jobs.json");
+        public static string SkillsJson => Path.Combine(DofusDudeJsonDir, "skills.json");
+        public static string RecipesJson => Path.Combine(DofusDudeJsonDir, "recipes.json");
         public static string WaypointsJson => Resolve("waypoints.json");
         public static string ZaapOverridesJson => Resolve("zaap_overrides.json");
         public static string HavenBagJson => Resolve("havenbag.json");

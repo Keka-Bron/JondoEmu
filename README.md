@@ -358,7 +358,8 @@ Two **SQLite** databases, both in `bases/`:
 Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved installation still starts.
 
 ---
-<img width="2550" height="1501" alt="image" src="https://github.com/user-attachments/assets/74b1d19c-3bfe-40f8-9c74-e82f4647173a" />
+<img width="2559" height="1499" alt="image" src="https://github.com/user-attachments/assets/3b4f1f39-45d3-4efe-b73b-65d1d5e8a595" />
+<img width="2559" height="1509" alt="image" src="https://github.com/user-attachments/assets/dde87296-dd2a-498a-b058-1491160b7d04" />
 <img width="2559" height="1506" alt="image" src="https://github.com/user-attachments/assets/521bef24-6b19-4061-bc5b-37a178e91163" />
 <img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/0f06761a-7dcf-481e-b045-02efce31c58e" />
 <img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/60b113e4-3415-435f-8bc4-738e8efbfc2a" />

@@ -831,40 +831,29 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         private static void AddInteractiveElements(Pb jss, long mapId)
         {
-            foreach (var zaap in Managers.Interactives.ZaapElements(mapId))
-            {
-                Declare(jss, zaap, Managers.Interactives.UseSkill, Managers.Interactives.ZaapType);
-            }
-
-            // Y en el merkasako, el cofre y la máquina de la lotería.
-            var chest = Managers.Merkasako.ChestOf(mapId);
-            if (chest.Id != 0)
-            {
-                Declare(jss, chest, Managers.Merkasako.ChestSkill, Managers.Merkasako.ChestType);
-            }
-
-            var machine = Managers.Lottery.Of(mapId);
-            if (machine.Id != 0)
-            {
-                Declare(jss, machine, Managers.Lottery.Skill, Managers.Lottery.Type);
-            }
+            foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
+                Declare(jss, interactive);
         }
 
         /// <summary>Un elemento clicable: qué es, qué se puede hacer con él y dónde está.</summary>
-        private static void Declare(Pb jss, Managers.Interactives.Element element, int skill, int type)
+        private static void Declare(Pb jss, Managers.RegisteredInteractive interactive)
         {
-            jss.Msg(11, Pb.New()
-                .Var(1, 1)
-                .Msg(4, Pb.New()
-                    .Var(1, Managers.Interactives.SkillInstanceOf(element.Id))
-                    .Var(2, skill))
-                .Var(5, element.Id)
-                .Var(6, type));
+            var declaration = Pb.New().Var(1, 1);
+            foreach (var action in interactive.Actions)
+            {
+                declaration.Msg(4, Pb.New()
+                    .Var(1, action.SkillInstanceId)
+                    .Var(2, action.SkillId));
+            }
+
+            jss.Msg(11, declaration
+                .Var(5, interactive.Element.Id)
+                .Var(6, interactive.Type));
 
             jss.Msg(15, Pb.New()
                 .Var(1, 1)
-                .Var(2, element.Cell)
-                .Var(3, element.Id));
+                .Var(2, interactive.Element.Cell)
+                .Var(3, interactive.Element.Id));
         }
 
         /// <summary>

@@ -176,10 +176,10 @@ public static class Op
     /// <summary>Solo alcanzable desde isi, que nunca llega. 1 mensaje en 1 fichero.</summary>
     public const string Hhf = "hhf";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>Sin identificar. 4 usos en el emulador.</summary>
     public const string Hhh = "hhh";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Hhq = "hhq";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
@@ -197,10 +197,10 @@ public static class Op
     /// <summary>Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.</summary>
     public const string Hmd = "hmd";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Hmj = "hmj";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Hml = "hml";
 
     /// <summary>El builder no se llama nunca; la rama hmv usa un payload crudo y hmv nunca llega. 243 mensajes en 9 ficheros.</summary>
@@ -221,13 +221,13 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Hpd = "hpd";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Hqa = "hqa";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ibo = "ibo";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Idf = "idf";
 
     /// <summary>Alianzas, por nombre y tag; se descarta. 9 mensajes.</summary>
@@ -263,10 +263,10 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Ios = "ios";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Iov = "iov";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ioy = "ioy";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
@@ -275,13 +275,13 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Ipw = "ipw";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Irm = "irm";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>Sin identificar. 3 usos en el emulador.</summary>
     public const string Iry = "iry";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ise = "ise";
 
     /// <summary>Solo alcanzable desde krc y desde isi, que no llegan nunca. 7 mensajes en 2 ficheros.</summary>
@@ -305,7 +305,7 @@ public static class Op
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Iue = "iue";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Iya = "iya";
 
     /// <summary>Lo envia el cliente (8 veces en 7 ficheros) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AlmanaxDateMessage, y eso es falso.</summary>
@@ -368,13 +368,13 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Jps = "jps";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>Sin identificar. 3 usos en el emulador.</summary>
     public const string Jpv = "jpv";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Jqb = "jqb";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Jqf = "jqf";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
@@ -440,7 +440,7 @@ public static class Op
     /// <summary>Sin identificar. 3 usos en el emulador.</summary>
     public const string Jzu = "jzu";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 3 usos en el emulador.</summary>
     public const string Jzy = "jzy";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
@@ -461,7 +461,7 @@ public static class Op
     /// <summary>Kamas que quedan despues de pagar.</summary>
     public const string KamasUpdateMessage = "ivf";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 3 usos en el emulador.</summary>
     public const string Kaq = "kaq";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
@@ -494,7 +494,7 @@ public static class Op
     /// <summary>Lo envia el cliente (10 veces en 1 fichero) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AccountCapabilitiesMessage, y eso es falso.</summary>
     public const string Kdx = "kdx";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Kea = "kea";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
@@ -545,7 +545,7 @@ public static class Op
     /// <summary>El ping de 3.6.4.3, respondido con kns. Sustituido por kqo/kqy. No aparece en ninguna captura.</summary>
     public const string Kod = "kod";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Kof = "kof";
 
     /// <summary>Veinte cuentas Ankama con id, apodo y tag; se reconoce y se descarta por privacidad. El builder no se llama nunca. El fichero de mapeos lo llama HavenBagStatusMessage, y eso es falso. 28 mensajes en 7 ficheros.</summary>
@@ -563,7 +563,7 @@ public static class Op
     /// <summary>Subida de caracteristicas antigua (3.6.4.3), sustituida por kum. No aparece en ninguna captura.</summary>
     public const string Krc = "krc";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Krh = "krh";
 
     /// <summary>Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.</summary>
@@ -572,13 +572,13 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Krs = "krs";
 
-    /// <summary>Sin identificar. 3 usos en el emulador.</summary>
+    /// <summary>Sin identificar. 4 usos en el emulador.</summary>
     public const string Ksl = "ksl";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ksv = "ksv";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>Sin identificar. 4 usos en el emulador.</summary>
     public const string Ksx = "ksx";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
@@ -629,13 +629,13 @@ public static class Op
     /// <summary>Respuesta a kqq; despues el cliente cierra la conexion el mismo y rehace el handshake.</summary>
     public const string LogoutResultMessage = "kqr";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Lol = "lol";
 
     /// <summary>La respuesta de la maquina de loteria; de dos capturas, una con premio en f2 y otra rechazada con f3: 1.</summary>
     public const string LotteryResultMessage = "jbs";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Lou = "lou";
 
     /// <summary>Rama de 3.6.4.3: envia tramas lok y jdj hardcodeadas. No aparece en ninguna de las 242 capturas.</summary>
@@ -653,22 +653,22 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Lry = "lry";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Lsy = "lsy";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ltk = "ltk";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>Sin identificar. 4 usos en el emulador.</summary>
     public const string Luq = "luq";
 
     /// <summary>Lo envia el cliente (1 vez) pero el emulador lo construye como mensaje de servidor y el builder no se llama nunca. Lleva id de peticion real. El fichero de mapeos lo llama JobDescriptionMessage, y eso es falso.</summary>
     public const string Luy = "luy";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Lwb = "lwb";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>Sin identificar. 3 usos en el emulador.</summary>
     public const string Lxd = "lxd";
 
     /// <summary>Lleva el aura en el flujo de apariencia (f1: id de aura, vacio si ninguna); en cada captura de equipar y desequipar lleva la constante 206, cuyo significado no esta establecido.</summary>
@@ -782,4 +782,105 @@ public static class Op
     /// <summary>Lo que la cuenta posee; el cliente ya tiene el catalogo entero y lo que no este en esta lista sale en gris. Se envia una vez al entrar al mundo. En el replay se sustituye por los de la cuenta que juega.</summary>
     public const string TitlesAndOrnamentsListMessage = "hhy";
 
+    /// <summary>
+    /// El nombre real del mensaje que viaja con este opcode. Se saben 90
+    /// de 253; de los demás devuelve cadena vacía, que es lo honrado.
+    /// </summary>
+    public static string Label(string opcode) => Labels.GetValueOrDefault(opcode, "");
+
+    /// <summary>Los que se saben, por opcode.</summary>
+    public static readonly IReadOnlyDictionary<string, string> Labels =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["hhy"] = "TitlesAndOrnamentsListMessage",
+            ["hid"] = "TitleSelectedMessage",
+            ["hif"] = "OrnamentSelectedMessage",
+            ["hjc"] = "TeleportRequestMessage",
+            ["hjj"] = "TeleportDestinationsMessage",
+            ["hms"] = "SpellListMessage",
+            ["hmt"] = "SpellVariantActivationRequestMessage",
+            ["hng"] = "SpellVariantActivationSuccessMessage",
+            ["hoy"] = "HelloGameMessage",
+            ["irq"] = "JobExperienceMultiUpdateMessage",
+            ["itc"] = "StorageObjectRemoveMessage",
+            ["itd"] = "StorageObjectUpdateMessage",
+            ["itg"] = "ShortcutBarContentMessage",
+            ["itz"] = "ShortcutBarAddRequestMessage",
+            ["iua"] = "ObjectAddedMessage",
+            ["iuk"] = "ObjectSetPositionMessage",
+            ["ium"] = "ObjectDeletedMessage",
+            ["iun"] = "InventoryWeightMessage",
+            ["iuq"] = "ShortcutBarReplacedMessage",
+            ["iuw"] = "ObjectDeleteMessage",
+            ["ivf"] = "KamasUpdateMessage",
+            ["ivk"] = "ShortcutBarRefreshMessage",
+            ["ivq"] = "ObjectMovementMessage",
+            ["ivx"] = "InventoryContentMessage",
+            ["iwb"] = "StorageInventoryContentMessage",
+            ["iwn"] = "InteractiveUsedMessage",
+            ["iwo"] = "InteractiveUseRequestMessage",
+            ["jba"] = "HavenBagEditionStoppedMessage",
+            ["jbg"] = "HavenBagFurnituresUpdateRequestMessage",
+            ["jbl"] = "HavenBagThemeChangeRequestMessage",
+            ["jbm"] = "HavenBagEditionStartedMessage",
+            ["jbn"] = "EnterHavenBagRequestMessage",
+            ["jbs"] = "LotteryResultMessage",
+            ["jbu"] = "HavenBagFurnituresMessage",
+            ["jgu"] = "SpouseInformationsMessage",
+            ["jhh"] = "GuildInformationsGeneralMessage",
+            ["jqk"] = "ChangeMapMessage",
+            ["jru"] = "CurrentMapMessage",
+            ["jrw"] = "GameMapMovementRequestMessage",
+            ["jsd"] = "GameContextRemoveElementMessage",
+            ["jsj"] = "GameMapMovementMessage",
+            ["jsn"] = "GameContextRefreshEntityLookMessage",
+            ["jsq"] = "MapExitAllowedMessage",
+            ["jss"] = "MapComplementaryInformationsDataMessage",
+            ["jtg"] = "GiftsListMessage",
+            ["kci"] = "ExchangeStartedStorageMessage",
+            ["kcr"] = "ExchangeObjectMoveMessage",
+            ["khd"] = "ExchangeLeaveMessage",
+            ["kld"] = "LeaveDialogMessage",
+            ["kpa"] = "CharactersListRequestMessage",
+            ["kqg"] = "ContactsListMessage",
+            ["kqo"] = "BasicPingMessage",
+            ["kqr"] = "LogoutResultMessage",
+            ["kqu"] = "ServerOptionalFeaturesMessage",
+            ["kqy"] = "BasicPongMessage",
+            ["kqz"] = "AuthenticationTicketMessage",
+            ["kra"] = "AuthenticationTicketAcceptedMessage",
+            ["kti"] = "ChatServerMessage",
+            ["ktm"] = "ChatClientMultiMessage",
+            ["kub"] = "CharacterStatsListMessage",
+            ["kum"] = "StatsUpgradeRequestMessage",
+            ["kva"] = "CharacterSelectedSuccessMessage",
+            ["kvb"] = "CharacterCreationResultMessage",
+            ["kvd"] = "CharactersListEndMessage",
+            ["kvi"] = "CharactersListMessage",
+            ["kvk"] = "CharacterNameSuggestionSuccessMessage",
+            ["kvl"] = "CharacterFirstSelectionMessage",
+            ["kvw"] = "CharacterSelectionMessage",
+            ["kvz"] = "CharacterCreationRequestMessage",
+            ["lqc"] = "GameContextCreateRequestMessage",
+            ["lqu"] = "BasicTimeMessage",
+            ["lva"] = "MapLoadedMessage",
+            ["lwm"] = "OrnamentSelectRequestMessage",
+            ["lwx"] = "AppearanceAuraResultMessage",
+            ["lwz"] = "AppearanceItemWornMessage",
+            ["lxa"] = "TitleSelectResultMessage",
+            ["lxc"] = "AppearancePreviewLookMessage",
+            ["lxg"] = "AppearanceSlotVisibilityRequestMessage",
+            ["lxk"] = "AppearanceSlotVisibilityResultMessage",
+            ["lxo"] = "AppearanceStateMessage",
+            ["lxs"] = "AppearanceSaveRequestMessage",
+            ["lxw"] = "AppearanceAuraRequestMessage",
+            ["lyf"] = "AppearanceSlotSetRequestMessage",
+            ["lyj"] = "AppearanceSlotSetResultMessage",
+            ["lys"] = "AppearanceItemWearRequestMessage",
+            ["lyt"] = "OutfitsListMessage",
+            ["lyu"] = "AppearanceSaveResultMessage",
+            ["lyv"] = "OrnamentSelectResultMessage",
+            ["lze"] = "TitleSelectRequestMessage",
+            ["mgz"] = "ContentCatalogVersionMessage",
+        };
 }

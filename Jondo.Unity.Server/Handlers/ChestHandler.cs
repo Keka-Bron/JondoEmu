@@ -40,13 +40,16 @@ namespace Jondo.Unity.Launcher.Handlers
             return chest.Id != 0 && chest.Id == elementId;
         }
 
-        public static async Task OpenAsync(NetworkStream stream, int elementId)
+        public static Task OpenAsync(NetworkStream stream, int elementId)
+            => OpenAsync(stream, elementId, Merkasako.ChestSkill);
+
+        public static async Task OpenAsync(NetworkStream stream, int elementId, int skillId)
         {
             SessionContext.State.IsChestOpen = true;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.InteractiveUsedMessage, ConnectionProtocol.BuildElementInUse(
-                    elementId, Merkasako.ChestSkill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
+                    elementId, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.ExchangeStartedStorageMessage, ConnectionProtocol.BuildStorageOpened()));

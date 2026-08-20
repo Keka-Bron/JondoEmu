@@ -68,12 +68,16 @@ namespace Jondo.Unity.Launcher
             Managers.EffectTable.Initialize();
             Managers.ItemSets.Initialize();
             Managers.EffectFields.Initialize();
+            Managers.JobManager.Initialize();
+            Managers.SkillManager.Initialize();
+            Managers.RecipeManager.Initialize();
             Managers.Interactives.Initialize();
             Managers.HavenBagStore.Initialize();
             Managers.Wardrobe.Initialize();
             Managers.Titles.Initialize();
             Managers.Cosmetics.Initialize();
             Managers.Merkasako.Initialize();
+            Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
             Managers.Npcs.Initialize();
             Managers.NpcShops.Initialize();

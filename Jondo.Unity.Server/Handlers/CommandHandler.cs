@@ -52,6 +52,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 [".kamas"] = "Uso: .kamas <cantidad> — por ejemplo .kamas 10000 (con menos delante, resta)",
                 [".level"] = "Uso: .level <nivel> — por ejemplo .level 200",
                 [".teleport"] = "Uso: .teleport [x,y] — por ejemplo .teleport [-1,0]",
+                [".relative"] = "Uso: .relative — pasa al siguiente MapId de las mismas coordenadas",
                 [".shop"] = "Uso: .shop — sin nada detrás",
                 [".size"] = "Uso: .size <n> — 100 es el tamaño normal, por ejemplo .size 200",
             };
@@ -69,6 +70,7 @@ namespace Jondo.Unity.Launcher.Handlers
             new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
             {
                 [".teleport"] = Roles.Moderador,
+                [".relative"] = Roles.Administrador,
                 [".kamas"] = Roles.GameMaster,
                 [".level"] = Roles.GameMaster,
                 [".size"] = Roles.GameMaster,
@@ -148,6 +150,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     case ".kamas": await KamasAsync(stream, rest, channel, accountId); break;
                     case ".level": await LevelAsync(stream, rest, channel, accountId); break;
                     case ".teleport": await TeleportAsync(stream, rest, channel, accountId); break;
+                    case ".relative": await RelativeAsync(stream, rest, channel, accountId); break;
                     case ".shop": await ShopAsync(stream, channel, accountId); break;
                     case ".size": await SizeAsync(stream, rest, channel, accountId); break;
                 }
@@ -439,6 +442,61 @@ namespace Jondo.Unity.Launcher.Handlers
             await NotifyAsync(stream,
                 $"En [{x},{y}]: mapa {match.Map.MapId}, {SubAreaName(match.Map.SubAreaId)}, " +
                 $"casilla {cell}.{chosen}", channel, accountId);
+        }
+
+        // ─── .relative ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Cycles through the MapIds which share the current coordinates. This is useful for
+        /// entering houses, workshops and other layers whose world point is the same as outdoors.
+        /// </summary>
+        private static async Task RelativeAsync(NetworkStream stream, string rest,
+                                                int channel, long accountId)
+        {
+            if (!string.IsNullOrWhiteSpace(rest))
+            {
+                await NotifyAsync(stream, Uso[".relative"], channel, accountId);
+                return;
+            }
+            if (GameState.IsInFight)
+            {
+                await NotifyAsync(stream, "No se puede teleportar en combate.", channel, accountId);
+                return;
+            }
+
+            long previousMapId = GameState.MapId;
+            var current = MapManager.GetMapInfo(previousMapId);
+            if (current == null)
+            {
+                await NotifyAsync(stream, $"El mapa actual {previousMapId} no está en MapPositions.",
+                                  channel, accountId);
+                return;
+            }
+
+            var relative = MapLookup.NextRelative(previousMapId);
+            if (relative == null)
+            {
+                await NotifyAsync(stream,
+                    $"No hay otro MapId en [{current.PosX},{current.PosY}].",
+                    channel, accountId);
+                return;
+            }
+
+            int cell = await TeleportHandler.ToMapAsync(stream, relative.Map.MapId);
+            if (cell < 0)
+            {
+                await NotifyAsync(stream,
+                    $"El mapa relativo {relative.Map.MapId} no se puede cargar.",
+                    channel, accountId);
+                return;
+            }
+
+            string loop = relative.Wrapped ? " Retour au premier MapId." : "";
+            await NotifyAsync(stream,
+                $"Relative [{current.PosX},{current.PosY}] : {previousMapId} -> " +
+                $"{relative.Map.MapId} ({relative.Position}/{relative.Candidates}), " +
+                $"{SubAreaName(relative.Map.SubAreaId)}, casilla {cell}.{loop}",
+                channel, accountId);
         }
 
         // ─── .shop ──────────────────────────────────────────────────────────────

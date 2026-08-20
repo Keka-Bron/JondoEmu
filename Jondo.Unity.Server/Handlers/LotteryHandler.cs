@@ -30,11 +30,14 @@ namespace Jondo.Unity.Launcher.Handlers
     /// </summary>
     public static class LotteryHandler
     {
-        public static async Task DrawAsync(NetworkStream stream, int elementId)
+        public static Task DrawAsync(NetworkStream stream, int elementId)
+            => DrawAsync(stream, elementId, Lottery.Skill);
+
+        public static async Task DrawAsync(NetworkStream stream, int elementId, int skillId)
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.InteractiveUsedMessage, ConnectionProtocol.BuildElementInUse(
-                    elementId, Lottery.Skill, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
+                    elementId, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
             var prize = Lottery.Draw(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
             if (prize == null)

@@ -469,9 +469,9 @@ namespace Jondo.Unity.Launcher.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.InteractiveUseRequestMessage)))
                 {
-                    // Ha clicado un elemento interactivo del mapa. De momento el único que
-                    // declaramos es el zaap.
-                    await ZaapTravelHandler.UseAsync(stream, payload);
+                    // Todos los elementos pasan por el mismo registro; él decide qué acción hay
+                    // detrás sin mezclar datos entre mapas ni entre sockets.
+                    await InteractiveActionHandler.UseAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.EnterHavenBagRequestMessage)))
                 {
