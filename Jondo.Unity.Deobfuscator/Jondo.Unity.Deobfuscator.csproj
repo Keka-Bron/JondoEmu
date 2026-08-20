@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- La cara del desofuscador. Una herramienta de taller, no algo que se reparta: se queda en
+         bin\ y no se copia a la raíz como el servidor y el lanzador, que ésos sí los abre gente. -->
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>Jondo Desofuscador</AssemblyName>
+    <RootNamespace>Jondo.Unity.Deobfuscator</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- El aspecto sale del contrato, igual que en los otros dos ejecutables. Las etapas salen de
+         Reversing, llamadas en proceso: así se ve el avance mientras corren, en vez de lanzar un
+         .exe y leerle la salida. La consola (protocolbuilder) usa exactamente las mismas. -->
+    <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Reversing\Jondo.Unity.Reversing.csproj" />
+  </ItemGroup>
+
+</Project>

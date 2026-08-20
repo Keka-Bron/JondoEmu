@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- La ingeniería inversa del protocolo, sin ninguna cara.
+         Aquí vive todo lo que sabe leer un cliente de Dofus y sacarle el protocolo: los
+         ensamblados, las huellas, el emparejador, el índice del código y el trato con el modelo de
+         lenguaje. Ni una línea de Console ni de WinForms, y por eso lo pueden conducir igual la
+         línea de comandos (Jondo.Unity.ProtocolBuilder) y la ventana (Jondo.Unity.Deobfuscator).
+
+         Se queda en net10.0 a secas, sin -windows: lo único atado a Windows es DPAPI, y eso vive
+         en la ventana. Si algún día sale un aviso de plataforma, la cura es anotar el método, no
+         arrastrar el marco entero. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.35.1" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.0" />
+    <PackageReference Include="Samboy063.Cpp2IL.Core" Version="2022.1.0-pre-release.21" />
+  </ItemGroup>
+
+</Project>

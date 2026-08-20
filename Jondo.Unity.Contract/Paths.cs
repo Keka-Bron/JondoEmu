@@ -81,6 +81,26 @@ namespace Jondo.Unity.Launcher
         // Lo que se puede clicar en cada mapa, con su casilla y su dibujo, y los zaaps con su
         // mapa y su subzona. Los genera extract_interactivos.py de los bundles del cliente.
         public static string InteractiveElementsJson => Resolve("interactive_elements.json");
+        /// <summary>
+        /// Raw 3.6.10.10 catalogues exported by dofusdude. They deliberately stay outside
+        /// <c>datos</c>: the server imports them into world.db and never serves these files.
+        /// </summary>
+        public static string DofusDudeJsonDir
+        {
+            get
+            {
+                string insideRoot = Path.Combine(Root, "JsonFromDofusDude");
+                if (Directory.Exists(insideRoot)) return insideRoot;
+
+                string besideRoot = Path.GetFullPath(Path.Combine(Root, "..", "JsonFromDofusDude"));
+                if (Directory.Exists(besideRoot)) return besideRoot;
+
+                return insideRoot;
+            }
+        }
+        public static string JobsJson => Path.Combine(DofusDudeJsonDir, "jobs.json");
+        public static string SkillsJson => Path.Combine(DofusDudeJsonDir, "skills.json");
+        public static string RecipesJson => Path.Combine(DofusDudeJsonDir, "recipes.json");
         public static string WaypointsJson => Resolve("waypoints.json");
         public static string ZaapOverridesJson => Resolve("zaap_overrides.json");
         public static string HavenBagJson => Resolve("havenbag.json");

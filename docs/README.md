@@ -54,6 +54,14 @@ and how they are spread over **562** sub-areas.
 *Go there* when something in the world is not where it should be: a map that will not load, a
 monster inside a wall, a zaap that leads nowhere.
 
+**`interactives.md`** — Clickable map elements and their actions.
+How the generic `(map, element, skill instance)` registry declares elements in `jss`, resolves
+client `iwo` requests and dispatches zaaps, haven-bag chests and the lottery without sharing player
+state between sockets. It also gives the extension path for doors, buildings, workshops, crafting
+stations and resources.
+*Go there* when an element has no cursor or action, when an `iwo` is rejected, or before adding a
+new interactive category.
+
 **`sessions.md`** — Multiple connected accounts and map broadcasts.
 Why the former static player state could only support one client, how `GameSession`, `SessionState`,
 `SessionContext` and the concurrent `SessionRegistry` divide ownership now, how a socket is bound to

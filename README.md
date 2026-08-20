@@ -1,6 +1,8 @@
 High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a playable PvM combat engine with a data-driven spell effect system.
 
 > ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.10.10 (mid August 2026)**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes.
+>
+> Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility. There is now a toolchain in this repository for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
 
 ---
 
@@ -33,7 +35,9 @@ What JondoFix does:
 
 ### Step 3 — Run it
 
-Double-click **`Jondo Emulator Launcher.exe`**. On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, select one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once. Create your account in the launcher or use the test account as follows:
+Double-click **`Jondo Emulator Launcher.exe`**. That is still the only thing you start by hand, but there are now **two executables**: the launcher is the window you use, and it starts **`Jondo Server.exe`** by itself. They were one program until the split; keeping them apart means the launcher you hand to a player carries no database, no maps, no protocol handlers and no effect catalogue — it references the shared contract and nothing else. The server has its own window with the log and the counters.
+
+On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, select one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once. Create your account in the launcher or use the test account as follows:
 
 Account: keka
 Password: test
@@ -53,7 +57,8 @@ client is started with that `--langCode`. The path row shows which one is in eff
 The root deliberately holds almost nothing — the launcher and little else. Everything is inside folders:
 
 ```
-Jondo Emulator Launcher.exe   ← this is what you run, and there is nothing else to run
+Jondo Emulator Launcher.exe   ← this is what you run
+Jondo Server.exe              the server; the launcher starts it, you never launch it yourself
 datos/                        json and bin the emulator reads (maps, items, appearances, zaaps…)
 bases/                        world.db and auth.db, the only things the emulator writes
 docs/                         technical documentation
@@ -77,6 +82,7 @@ Some folders are **not** in the repository because they are not needed to play, 
 - [x] **Embedded server log** so you can watch traffic and errors without a console window.
 - [x] **Single-file deployment** — the twelve dependency DLLs travel inside the executable; the folder stays clean.
 - [x] **Multilanguage**.
+- [x] **Launcher and server are separate programs** — `Jondo Emulator Launcher.exe` and `Jondo Server.exe`. The launcher starts the server itself, and carries none of it: no database, no maps, no protocol handlers, no effect catalogue. The server keeps its own window with the log and the counters.
 
 ### 🌍 World & Connection
 - [x] **Client / Server / Authentication emulation** (Zaap, HAAPI, Connection Server, with the VIP subscription check bypassed).
@@ -237,20 +243,103 @@ blocks rather than one spell at a time.
 
 ---
 
+## 🔎 Surviving the next patch
+
+Every protobuf message in Dofus 3 is named with three random letters — `kub`, `jru`, `lqu` — and on
+some patches Ankama reshuffles the lot. Nothing else about the protocol changes shape, but the
+emulator no longer knows what anything is called. This is the single reason an emulator dies on
+patch day, and there is now a toolchain for it.
+
+**`protocolbuilder`** is the command line; **`Jondo Desofuscador.exe`** is the same engine behind one
+window and one button. You give it the client you already knew and the one that just shipped, and it
+answers with the mapping.
+
+### What was measured
+
+Eight consecutive real clients (3.6.4.3 → 3.6.10.10) were downloaded from Ankama's own CDN and
+compared patch by patch. Some of it was surprising:
+
+* **Ankama does not reshuffle on every patch.** Three of the seven jumps keep all 2,169 names, one
+  for one. There are five obfuscation generations across the eight versions. When nothing moved, the
+  mapping is the identity and there is no work to do — the tool checks this first, in a second.
+* **Zero wrong pairings over 6,505 real pairs.** The matcher never looks at names, only at field
+  numbers, field kinds and neighbourhood, so a message that keeps its name is an answer it could not
+  have copied. It gets 71.1% of them and misses none. What it cannot decide, it leaves alone.
+* **On a patch that does reshuffle, structure alone gets about 11%** — and that is the ceiling, not
+  a tuning problem. The distinctive fingerprints collapse from ~750 to ~70, because a message is
+  distinctive when it has many fields and a many-field message is the one most likely to be touched.
+* **Chaining through intermediate versions is worse, not better**: 12 pairs against 245 for the
+  direct jump. It was a plausible idea and the measurement refuted it.
+
+The rest is what the anchors, the code index and a language model are for: the tool hands over the
+ambiguous ones with their candidate list and everything already known about each, and never invents
+an answer. Full write-up in **`docs/desofuscacion.md`**.
+
+### The `Op` layer
+
+A mapping is worthless if applying it means editing the emulator by hand. It used to mean exactly
+that: **495 three-letter literals across 35 files**. They are now behind one generated file,
+`Jondo.Unity.Protocol/Op.cs`, with a name per opcode and its meaning as documentation:
+
+```csharp
+ConnectionProtocol.Push(Op.HelloGameMessage, …)
+case Op.BasicTimeMessage: …
+```
+
+Regenerating it after a patch is one command and the emulator is not touched. Building it also
+turned up **49 opcodes that only exist in 3.6.4.3** — code that has not been able to match anything
+for a long time and nobody knew.
+
+```bash
+protocolbuilder mapear <old client> <new client>    # who is who between two versions
+protocolbuilder capa   <client> <anchors> . --aplicar  # regenerate Op.cs and migrate call sites
+protocolbuilder bajar  3.6.4.3 3.6.10.10 clientes   # fetch old clients from the CDN, 183 MB each
+protocolbuilder cadena clientes                     # measure each patch on its own
+```
+
+---
+
 ## 🧱 Source layout
 
-* **`Jondo.Unity.sln`** — solution grouping every subproject:
-  * **`Jondo.Unity.Launcher`** — entry point, proxies, network parser, handlers, managers, launcher UI and database management.
+* **`Jondo.Unity.sln`** — solution grouping every subproject.
+
+  The two executables:
+  * **`Jondo.Unity.Server`** → `Jondo Server.exe`. Proxies, network parser, handlers, managers,
+    database management and the server's own log window.
+  * **`Jondo.Unity.Launcher`** → `Jondo Emulator Launcher.exe`. The window players use. References
+    the contract and nothing else — no database, no maps, no protocol.
+
+  What they share and what they build on:
+  * **`Jondo.Unity.Contract`** — what both executables agree on: paths, settings and the launcher's
+    drawn-from-code UI widgets.
   * **`Jondo.Unity.Core`** — core networking infrastructure and TCP servers.
   * **`Jondo.Unity.Auth`** — authentication and HAAPI service handlers.
-  * **`Jondo.Unity.Protocol`** — protocol buffers, constants and message definitions.
+  * **`Jondo.Unity.Protocol`** — protocol buffers, message definitions, and the generated `Op`
+    opcode layer.
   * **`Jondo.Unity.World`** — game node / world logic, combat engine (`FightInstance`), buffs and
     states (`Embrujo`), area shapes and displacement (`Zona`), isometric geometry (`MapGeometry`)
     and monster AI.
+  * **`Jondo.Unity.Parser`** — capture parsing.
+
+  The protocol toolchain, which the emulator does not depend on:
+  * **`Jondo.Unity.Reversing`** — the whole of it with no face on it: reads a client with Cpp2IL,
+    rebuilds the `.proto`, matches two versions, indexes the code, downloads old clients from the
+    CDN (`Cytrus`) and generates the `Op` layer (`Layer`).
+  * **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder`, the command line.
+  * **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`, the same engine behind one window.
 * **`JondoFix`** — the MelonLoader client mod, source plus the compiled `JondoFix.dll`.
+
+Documentation, all of it measured rather than assumed — see `docs/README.md` for the full index:
+
+* **`docs/protocol.md`** — how a message travels: framing, the `Any` envelope and the opcode.
+* **`docs/opcodes.md`** — what each three-letter opcode means, and where that was seen.
+* **`docs/desofuscacion.md`** — surviving a patch: what rotates, what does not, and every number
+  above with the method that produced it.
 * **`docs/fight.md`** — how a fight is put together on the wire, opcode by opcode.
 * **`docs/launcher.md`** — native team UI and the identity flow for up to eight client processes.
 * **`docs/sessions.md`** — socket-owned game sessions, per-player state and map broadcasts.
+* **`docs/appearances.md`**, **`docs/world.md`**, **`docs/data.md`** — cosmetics, world data and
+  where every file in `datos/` comes from.
 * **`docs/multijugador.md`** — historical migration plan and remaining multiplayer work.
 
 The spell effect engine lives in `Jondo.Unity.Launcher/Managers`: `EfectosDeHechizo` reads the
