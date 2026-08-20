@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Jondo.Unity.Launcher.Managers
 {
-    /// <summary>Reader for the Unity reference wrapper used by dofusdude 3.6 exports.</summary>
+    /// <summary>Lector del envoltorio de referencias de Unity con el que vienen los catalogos.</summary>
     internal static class DofusDudeCatalog
     {
         public static IEnumerable<JsonElement> Rows(JsonDocument document)
@@ -12,7 +12,7 @@ namespace Jondo.Unity.Launcher.Managers
             if (!document.RootElement.TryGetProperty("references", out var references) ||
                 !references.TryGetProperty("RefIds", out var rows) ||
                 rows.ValueKind != JsonValueKind.Array)
-                throw new InvalidOperationException("Format dofusdude invalide: references.RefIds absent.");
+                throw new InvalidOperationException("Formato de dofusdude invalido: falta references.RefIds.");
 
             foreach (var reference in rows.EnumerateArray())
             {

@@ -18,18 +18,18 @@ namespace Jondo.Unity.Launcher.Handlers
             error = "";
             if (!SkillManager.TryGet(skillId, out skill))
             {
-                error = $"Compétence {skillId} inconnue.";
+                error = $"Habilidad {skillId} desconocida.";
                 return false;
             }
             recipes = RecipeManager.ForSkill(skillId);
             if (recipes.Count == 0)
             {
-                error = $"Aucune recette 3.6 pour la compétence {skillId}.";
+                error = $"No hay receta 3.6 para la habilidad {skillId}.";
                 return false;
             }
             if (!JobManager.TryGet(skill.ParentJobId, out job))
             {
-                error = $"Métier {skill.ParentJobId} absent pour la compétence {skillId}.";
+                error = $"Falta el oficio {skill.ParentJobId} de la habilidad {skillId}.";
                 return false;
             }
             return true;
@@ -48,7 +48,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             if (recipe.SkillId != skillId)
             {
-                error = $"La recette {resultId} n'appartient pas à la compétence {skillId}.";
+                error = $"La receta {resultId} no es de la habilidad {skillId}.";
                 recipe = null!;
                 return false;
             }

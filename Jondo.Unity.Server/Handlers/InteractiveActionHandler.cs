@@ -7,7 +7,7 @@ using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Handlers
 {
-    /// <summary>Point d'entrée unique des requêtes <c>iwo</c> envoyées par le client.</summary>
+    /// <summary>Puerta unica de las peticiones <c>iwo</c> que manda el cliente.</summary>
     public static class InteractiveActionHandler
     {
         public static async Task UseAsync(NetworkStream stream, byte[] payload)

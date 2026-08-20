@@ -206,7 +206,7 @@ namespace Jondo.Unity.Launcher.Managers
             else if (interactive.Type != type || interactive.Element.Cell != element.Cell)
             {
                 throw new InvalidOperationException(
-                    $"Déclaration incohérente de l'élément {element.Id} sur la carte {mapId}.");
+                    $"Declaracion incoherente del elemento {element.Id} en el mapa {mapId}.");
             }
 
             interactive.Add(kind, skillId);

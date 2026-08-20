@@ -82,20 +82,35 @@ namespace Jondo.Unity.Launcher
         // mapa y su subzona. Los genera extract_interactivos.py de los bundles del cliente.
         public static string InteractiveElementsJson => Resolve("interactive_elements.json");
         /// <summary>
-        /// Raw 3.6.10.10 catalogues exported by dofusdude. They deliberately stay outside
-        /// <c>datos</c>: the server imports them into world.db and never serves these files.
+        /// Los catálogos de oficios, habilidades y recetas en crudo. Se quedan fuera de
+        /// <c>datos</c> a propósito: el servidor los importa a world.db y nunca los sirve.
+        ///
+        /// Se busca en <c>dofus3_data</c> ANTES que en <c>JsonFromDofusDude</c>, que es donde los
+        /// puso quien escribió esto. Los tres ficheros salen del volcado del cliente y ya vivían en
+        /// dofus3_data desde antes, así que mirando sólo en la carpeta nueva no se encontraban y la
+        /// importación se saltaba sola sin que nadie se enterara: las tablas quedaban creadas y
+        /// vacías. Se sigue mirando en las dos carpetas de antes, porque quien los tenga allí no
+        /// tiene por qué moverlos.
+        ///
+        /// La comprobación es por FICHERO y no por carpeta: <c>dofus3_data</c> existe en cualquier
+        /// instalación, así que preguntar si existe la carpeta la habría elegido siempre, tuviera
+        /// dentro los catálogos o no.
         /// </summary>
         public static string DofusDudeJsonDir
         {
             get
             {
-                string insideRoot = Path.Combine(Root, "JsonFromDofusDude");
-                if (Directory.Exists(insideRoot)) return insideRoot;
+                foreach (string candidate in new[]
+                {
+                    DataDir,
+                    Path.Combine(Root, "JsonFromDofusDude"),
+                    Path.GetFullPath(Path.Combine(Root, "..", "JsonFromDofusDude")),
+                })
+                {
+                    if (File.Exists(Path.Combine(candidate, "jobs.json"))) return candidate;
+                }
 
-                string besideRoot = Path.GetFullPath(Path.Combine(Root, "..", "JsonFromDofusDude"));
-                if (Directory.Exists(besideRoot)) return besideRoot;
-
-                return insideRoot;
+                return Path.Combine(Root, "JsonFromDofusDude");
             }
         }
         public static string JobsJson => Path.Combine(DofusDudeJsonDir, "jobs.json");

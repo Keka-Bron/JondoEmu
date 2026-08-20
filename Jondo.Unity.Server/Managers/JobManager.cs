@@ -28,7 +28,7 @@ namespace Jondo.Unity.Launcher.Managers
         {
             ImportIfAvailable();
             LoadFromDatabase();
-            Console.WriteLine($"[Jobs] {_byId.Count} métiers chargés.");
+            Console.WriteLine($"[Jobs] {_byId.Count} oficios cargados.");
         }
 
         private static void ImportIfAvailable()
@@ -36,7 +36,7 @@ namespace Jondo.Unity.Launcher.Managers
             string path = Paths.JobsJson;
             if (!File.Exists(path))
             {
-                Console.WriteLine($"[Jobs] {path} absent; utilisation du catalogue déjà présent en base.");
+                Console.WriteLine($"[Jobs] Falta {path}; se usa el catalogo que ya hay en la base.");
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace Jondo.Unity.Launcher.Managers
                         HasLegendaryCraft = DofusDudeCatalog.Boolean(data, "hasLegendaryCraft"),
                     });
                 }
-                if (rows.Count == 0) throw new InvalidOperationException("Le catalogue Jobs est vide.");
+                if (rows.Count == 0) throw new InvalidOperationException("El catalogo de oficios esta vacio.");
 
                 using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
                 connection.Open();
@@ -83,7 +83,7 @@ namespace Jondo.Unity.Launcher.Managers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Jobs] Import annulé, catalogue en base conservé: {ex.Message}");
+                Console.WriteLine($"[Jobs] Importacion cancelada, se conserva el catalogo de la base: {ex.Message}");
             }
         }
 

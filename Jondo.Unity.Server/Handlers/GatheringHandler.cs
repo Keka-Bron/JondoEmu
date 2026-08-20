@@ -16,17 +16,17 @@ namespace Jondo.Unity.Launcher.Handlers
             error = "";
             if (!SkillManager.TryGet(skillId, out skill))
             {
-                error = $"Compétence {skillId} inconnue.";
+                error = $"Habilidad {skillId} desconocida.";
                 return false;
             }
             if (!skill.IsGathering)
             {
-                error = $"La compétence {skillId} n'est pas une récolte.";
+                error = $"La habilidad {skillId} no es de recoleccion.";
                 return false;
             }
             if (!JobManager.TryGet(skill.ParentJobId, out job))
             {
-                error = $"Métier {skill.ParentJobId} absent pour la compétence {skillId}.";
+                error = $"Falta el oficio {skill.ParentJobId} de la habilidad {skillId}.";
                 return false;
             }
             return true;
