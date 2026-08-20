@@ -163,69 +163,64 @@ namespace Jondo.Protocol
             }
         }
 
+        /// <summary>Cuántos paquetes llevamos, que es lo que numera cada renglón.</summary>
+        private static int _packetCount;
+
+        /// <summary>
+        /// Un paquete, un renglón.
+        ///
+        /// Antes cada paquete ocupaba veinte líneas: la cabecera de colores, el volcado en
+        /// hexadecimal y el árbol de campos con sus emojis. Con el juego andando eso son cientos de
+        /// líneas por segundo y no se lee nada; el registro pasaba de largo antes de que te diera
+        /// tiempo a mirarlo.
+        ///
+        /// Ahora sale así, que es como lo enseña un sniffer:
+        ///
+        ///   1579 [server&gt;client] kuf (CharacterExperienceGainEvent) { 1: 453 }        3 B
+        ///
+        /// No se pierde nada: el hexadecimal completo lo sigue escribiendo
+        /// <see cref="GameServerProxy.LogTraffic"/> en gameserver_traffic.log, y el árbol de campos
+        /// sigue estando en <c>ProtoMessage.DumpFieldsToString</c> para mirar un paquete concreto.
+        /// Lo que cambia es qué se enseña EN VIVO, que es otra cosa.
+        ///
+        /// El nombre sale primero de la capa Op, que se genera de las anclas medidas, y sólo si ahí
+        /// no está se cae a la tabla escrita a mano. Ese orden importa: una tabla a mano se queda
+        /// vieja en cuanto Ankama rota los nombres y la generada no.
+        /// </summary>
         private static void LogTrafficEnriched(string direction, string typeUrl, byte[] payload)
         {
-            int length = payload.Length;
-            var meta = GetPacketMetadata(typeUrl);
-            
-            // Choose color for direction
-            ConsoleColor dirColor = direction.Contains("Client") ? ConsoleColor.Cyan : ConsoleColor.Green;
+            string opcode = typeUrl.Replace("type.ankama.com/", "").Trim();
+            int number = System.Threading.Interlocked.Increment(ref _packetCount);
 
-            // Choose color for categories to make it visual
-            ConsoleColor taskColor = ConsoleColor.Gray;
-            if (meta.Task == "Character") taskColor = ConsoleColor.Yellow;
-            else if (meta.Task == "Interfaces") taskColor = ConsoleColor.Magenta;
-            else if (meta.Task == "Inventory") taskColor = ConsoleColor.DarkYellow;
-            else if (meta.Task == "Map") taskColor = ConsoleColor.Blue;
-            else if (meta.Task == "Chat") taskColor = ConsoleColor.Red;
-            else if (meta.Task == "Connection") taskColor = ConsoleColor.DarkCyan;
-            else if (meta.Task == "Sync") taskColor = ConsoleColor.DarkGreen;
+            string name = Op.Label(opcode);
+            if (name.Length == 0)
+            {
+                string description = GetPacketMetadata(typeUrl).Description;
+                int paren = description.IndexOf(" (", StringComparison.Ordinal);
+                string candidate = paren > 0 ? description[..paren] : description;
+
+                // El caso por defecto de la tabla devuelve «Utility message (xxx)», que no es un
+                // nombre: es la manera de decir que no se sabe. Enseñarlo llenaría el registro de
+                // una etiqueta que no distingue un paquete de otro.
+                name = candidate.StartsWith("Utility message", StringComparison.Ordinal) ? "" : candidate;
+            }
+
+            string fields = "";
+            try { fields = Jondo.Unity.Launcher.Network.ProtoMessage.Parse(payload).Compact(); }
+            catch { }
+
+            string where = direction.StartsWith("Client", StringComparison.Ordinal)
+                ? "client>server" : "server>client";
+
+            // El cuerpo se rellena a un ancho fijo para que el tamaño caiga siempre en la misma
+            // columna: leyendo hacia abajo se ve de un vistazo qué paquete abulta.
+            string body = $"{number,5} [{where}] {opcode}" +
+                          (name.Length > 0 ? $" ({name})" : "") +
+                          (fields.Length > 0 ? $" {fields}" : "");
 
             lock (Console.Out)
             {
-                Console.ForegroundColor = dirColor;
-                Console.Write($"[{direction}] ");
-                
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write($"({length} B) ");
-                
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"[{meta.Context}] ");
-                
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write($"[{meta.Task}] ");
-                
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write($"{typeUrl.Replace("type.ankama.com/", "")} -> ");
-                
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine(meta.Description);
-
-                string shortType = typeUrl.Replace("type.ankama.com/", "").Trim();
-                bool isPing = shortType == Op.Kod || shortType == Op.Kns || shortType == "kpc" || shortType == Op.Jgv;
-
-                if (!isPing)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    string hexStr = BitConverter.ToString(payload);
-                    if (hexStr.Length > 160) hexStr = hexStr.Substring(0, 160) + "... [truncated]";
-                    Console.WriteLine($"   📦 Hex Payload: {hexStr}");
-
-                    try
-                    {
-                        var protoTree = Jondo.Unity.Launcher.Network.ProtoMessage.Parse(payload);
-                        string treeDump = protoTree.DumpFieldsToString("      ", maxLines: 12);
-                        if (!string.IsNullOrWhiteSpace(treeDump))
-                        {
-                            Console.ForegroundColor = ConsoleColor.DarkCyan;
-                            Console.WriteLine("   🌳 Protobuf Payload Tree:");
-                            Console.WriteLine(treeDump);
-                        }
-                    }
-                    catch { }
-                }
-                
-                Console.ResetColor();
+                Console.WriteLine(body.PadRight(112) + $"{payload.Length,6} B");
             }
         }
 

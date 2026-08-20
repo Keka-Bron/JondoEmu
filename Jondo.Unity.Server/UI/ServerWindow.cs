@@ -31,7 +31,6 @@ namespace Jondo.Unity.Launcher.UI
 
         private readonly Panel _caja;
         private readonly FlickerFreePanel _cifras;
-        private readonly FlickerFreePanel _cifrasDerecha;
         private readonly RichTextBox _registro;
         private readonly LauncherLogo _logo;
         private readonly System.Windows.Forms.Timer _reloj;
@@ -109,38 +108,31 @@ namespace Jondo.Unity.Launcher.UI
                 Dock = DockStyle.Top,
             };
 
-            // Los indicadores en DOS columnas, una a cada lado del dibujo.
+            // Los cuatro indicadores en UNA columna a la izquierda.
             //
-            // Todos juntos en una sola columna quedaban apelotonados, y arriba en fila tapaban la
-            // parte de arriba del dibujo. Repartidos a los lados, cada bloque respira y el
-            // personaje se queda en medio, que es de lo que iba tener un fondo.
+            // Antes iban repartidos a los dos lados del dibujo, y era bonito pero le robaba al
+            // registro la mitad del ancho: la consola se quedaba en una tira de un cuarto de
+            // ventana donde cada línea se partía en tres. Un registro que hay que reconstruir
+            // mentalmente no se lee. Los cuatro juntos a un lado y el resto para la consola.
             _cifras = new FlickerFreePanel
             {
                 Dock = DockStyle.Left,
                 Width = 0,   // lo pone AjustarConsola
                 BackColor = Color.Transparent,
             };
-            _cifras.Paint += (s, e) => ConRed(e.Graphics, _cifras, 0, 2);
-
-            _cifrasDerecha = new FlickerFreePanel
-            {
-                Dock = DockStyle.Right,
-                Width = 0,
-                BackColor = Color.Transparent,
-            };
-            _cifrasDerecha.Paint += (s, e) => ConRed(e.Graphics, _cifrasDerecha, 2, 2);
+            _cifras.Paint += (s, e) => ConRed(e.Graphics, _cifras, 0, 4);
 
             DefinirCifras();
 
-            // La consola va a la DERECHA, no abajo.
+            // La consola se queda con todo lo que no ocupan las cifras.
             //
-            // Abajo y a todo lo ancho partía el dibujo por la mitad y le cortaba las piernas al
-            // personaje. En una columna a la derecha el dibujo se ve entero y el registro sigue
-            // cabiendo: es más estrecho pero mucho más alto, que para leer líneas de log viene
-            // mejor. El ancho es una proporción del de la ventana, no un número fijo.
+            // Estuvo abajo a todo lo ancho —partía el dibujo por la mitad— y luego en una columna a
+            // la derecha, que dejaba ver el dibujo entero pero le daba un cuarto de ventana. Un
+            // renglón de tráfico son unos cien caracteres y ahí no caben: se partía en tres y había
+            // que recomponerlo con la vista. Ahora manda el registro y el dibujo se ve por detrás.
             _caja = new Panel
             {
-                Dock = DockStyle.Right,
+                Dock = DockStyle.Fill,
                 BackColor = Color.Transparent,
                 Padding = new Padding(E(10), E(14), E(22), E(10)),
             };
@@ -160,12 +152,19 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.LogNormal,
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
-                // Con la consola en columna estrecha, las lineas largas obligaban a hacer scroll
-                // horizontal para leerlas enteras, que en un registro es inservible. Se parten y
-                // se acabo la barra de abajo.
-                Font = Mono(6f),
-                WordWrap = true,
-                ScrollBars = RichTextBoxScrollBars.Vertical,
+                // La letra va en PÍXELES y sin multiplicar por la escala del monitor.
+                //
+                // Antes era «Mono(6f)», que por dentro hacía 6 × DeviceDpi/96. Un tamaño en puntos
+                // ya es independiente del DPI, así que multiplicarlo lo duplica: en un monitor a
+                // 192 ppp salía a doce puntos y por eso el registro se veía enorme y se partía. Es
+                // el mismo fallo que ya se corrigió en el desofuscador.
+                Font = LauncherTheme.CreateMonoFont(12f),
+
+                // Sin partir líneas. Con la consola estrecha partirlas era lo menos malo; ahora que
+                // ocupa la ventana entera, un renglón es un paquete y eso vale más que no tener
+                // barra abajo.
+                WordWrap = false,
+                ScrollBars = RichTextBoxScrollBars.Both,
                 DetectUrls = false,
             };
 
@@ -173,18 +172,14 @@ namespace Jondo.Unity.Launcher.UI
             _caja.Paint += PintarCaja;
 
             // El orden importa: WinForms acopla de DELANTE hacia atrás, o sea al revés del orden en
-            // que se añaden. Así que esto se lee de abajo arriba: primero el rótulo se lleva su
-            // franja de arriba, luego las cifras la suya, luego la barra de botones la de abajo, y
-            // lo que queda es donde se coloca la columna de la consola.
-            // Se lee de abajo arriba: el rótulo coge su franja de arriba, la barra la de abajo, la
-            // consola la columna de la derecha del todo, y las cifras la columna que queda a su
-            // izquierda. En medio queda el dibujo.
-            // Se lee de abajo arriba: el rótulo coge su franja de arriba, la barra la de abajo, la
-            // consola la columna de la derecha del todo, las cifras de máquina la que queda a su
-            // izquierda, y las de mundo el borde izquierdo. En medio queda el dibujo.
-            Controls.Add(_cifras);
-            Controls.Add(_cifrasDerecha);
+            // que se añaden. Se lee de abajo arriba: el rótulo coge su franja de arriba, la barra
+            // la de abajo, las cifras la columna izquierda, y la consola —que va en Fill— se queda
+            // con TODO lo que sobre.
+            //
+            // Por eso la consola se añade la primera aunque salga la última: en Fill hay que estar
+            // al fondo de la pila o te comes el sitio de los demás.
             Controls.Add(_caja);
+            Controls.Add(_cifras);
             Controls.Add(barra);
             Controls.Add(_logo);
 
@@ -250,7 +245,7 @@ namespace Jondo.Unity.Launcher.UI
             _textos = LauncherTexts.Get(cual);
             AplicarIdioma();
             _cifras.Invalidate();
-            _cifrasDerecha.Invalidate();
+
         }
 
         private void AplicarIdioma()
@@ -612,11 +607,11 @@ namespace Jondo.Unity.Launcher.UI
             // not set" en el registro-.
             if (_caja == null) return;
 
-            int ancho = (int)(ClientSize.Width * 0.25f);
-            _caja.Width = Math.Max(E(300), Math.Min(ancho, ClientSize.Width - E(900)));
-            int columna = Math.Max(E(270), (int)(ClientSize.Width * 0.165f));
+            // La consola ya no se dimensiona: va en Fill y se queda con lo que sobre. Lo único que
+            // hay que decidir es cuánto se lleva la columna de cifras, y se le da lo justo para que
+            // quepan sus dos números por línea sin comerle sitio al registro.
+            int columna = Math.Max(E(260), Math.Min((int)(ClientSize.Width * 0.20f), E(420)));
             if (_cifras != null) _cifras.Width = columna;
-            if (_cifrasDerecha != null) _cifrasDerecha.Width = columna;
         }
 
         /// <summary>
@@ -667,7 +662,7 @@ namespace Jondo.Unity.Launcher.UI
                 if (ahora != cifra.Ultimo) { cifra.Ultimo = ahora; cambio = true; }
             }
             // Sólo se repinta si algo ha cambiado, y el panel va con doble búfer: así no parpadea.
-            if (cambio) { _cifras.Invalidate(); _cifrasDerecha.Invalidate(); }
+            if (cambio) _cifras.Invalidate();
 
             TraerRegistro();
         }
@@ -714,6 +709,18 @@ namespace Jondo.Unity.Launcher.UI
             }
         }
 
+        /// <summary>
+        /// Un renglón de tráfico, tal y como lo escribe NetworkMessage:
+        ///
+        ///   1579 [server&gt;client] kuf (CharacterExperienceGainEvent) { 1: 453 }        3 B
+        ///
+        /// Se reconoce por la forma entera y no por un trozo suelto, para que un mensaje normal del
+        /// servidor que casualmente lleve corchetes no acabe pintado como si fuera un paquete.
+        /// </summary>
+        private static readonly System.Text.RegularExpressions.Regex Paquete = new(
+            @"^(\s*\d+) (\[(?:client>server|server>client)\]) ([a-z]{3})( \([A-Za-z0-9_]+\))?(.*?)(\s+\d+ B)\s*$",
+            System.Text.RegularExpressions.RegexOptions.Compiled);
+
         private void Escribir(string hora, string texto)
         {
             _registro.SelectionStart = _registro.TextLength;
@@ -722,8 +729,37 @@ namespace Jondo.Unity.Launcher.UI
             _registro.SelectionColor = LauncherTheme.LogTime;
             _registro.AppendText(hora.Length > 0 ? hora + "  " : "");
 
+            var paquete = Paquete.Match(texto);
+            if (paquete.Success) { Paquete_(paquete); return; }
+
             _registro.SelectionColor = ColorDe(texto);
             _registro.AppendText(texto + "\n");
+        }
+
+        /// <summary>
+        /// El renglón de un paquete, cada trozo de su color.
+        ///
+        /// Los colores no son decorativos: el ojo busca el opcode, que va en claro, y el resto se
+        /// aparta. La dirección lleva el mismo código que el resto del emulador —azul lo que baja
+        /// del servidor, dorado lo que sube del cliente— para no tener que leerla.
+        /// </summary>
+        private void Paquete_(System.Text.RegularExpressions.Match m)
+        {
+            void Trozo(string texto, Color color)
+            {
+                if (texto.Length == 0) return;
+                _registro.SelectionColor = color;
+                _registro.AppendText(texto);
+            }
+
+            string direccion = m.Groups[2].Value;
+
+            Trozo(m.Groups[1].Value + " ", LauncherTheme.LogTime);
+            Trozo(direccion + " ", direccion.Contains("server>") ? LauncherTheme.LogZaap : LauncherTheme.LogServer);
+            Trozo(m.Groups[3].Value, LauncherTheme.HighlightText);
+            Trozo(m.Groups[4].Value, LauncherTheme.LogNormal);
+            Trozo(m.Groups[5].Value, LauncherTheme.LightBrownText);
+            Trozo(m.Groups[6].Value + "\n", LauncherTheme.LogTime);
         }
 
         /// <summary>

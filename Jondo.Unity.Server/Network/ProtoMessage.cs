@@ -133,6 +133,81 @@ namespace Jondo.Unity.Launcher.Network
             stream.WriteByte((byte)value);
         }
 
+        /// <summary>
+        /// Los campos en UNA línea, al estilo del sniffer: <c>{ 1: 453 2: "1630" }</c>.
+        ///
+        /// El volcado en árbol de aquí abajo sigue estando y sirve para mirar un paquete concreto,
+        /// pero para el registro no vale: veinte líneas por paquete y a los tres segundos no se ve
+        /// nada. Un paquete es un renglón, y lo que no cabe se corta con puntos suspensivos.
+        /// </summary>
+        public string Compact(int budget = 96)
+        {
+            var sb = new System.Text.StringBuilder("{ ");
+            bool cut = Write(sb, budget);
+            if (cut) sb.Append("… ");
+            sb.Append('}');
+            return sb.Length <= 3 ? "" : sb.ToString();
+        }
+
+        /// <summary>Devuelve true si se ha quedado algo fuera por falta de sitio.</summary>
+        private bool Write(System.Text.StringBuilder sb, int budget)
+        {
+            foreach (var field in Fields)
+            {
+                if (sb.Length >= budget) return true;
+
+                sb.Append(field.FieldNumber).Append(": ");
+
+                if (field.WireType == 0)
+                {
+                    sb.Append(field.VarIntValue);
+                }
+                else if (field.WireType == 2)
+                {
+                    Bytes(sb, field, budget);
+                }
+                else
+                {
+                    // Los de 32 y 64 bits fijos: se enseñan en crudo, que es lo que son.
+                    sb.Append("0x").Append(Convert.ToHexString(field.BytesValue).ToLowerInvariant());
+                }
+
+                sb.Append(' ');
+            }
+            return false;
+        }
+
+        private static void Bytes(System.Text.StringBuilder sb, ProtoField field, int budget)
+        {
+            // Un submensaje primero, porque es lo que más dice. Si no parsea, se prueba texto, y
+            // si tampoco, hexadecimal: el mismo orden que el volcado en árbol, para que las dos
+            // vistas cuenten lo mismo del mismo paquete.
+            if (field.BytesValue.Length > 0 && field.BytesValue.Length < 2000)
+            {
+                try
+                {
+                    var sub = Parse(field.BytesValue);
+                    if (sub.Fields.Count > 0)
+                    {
+                        sb.Append("{ ");
+                        if (sub.Write(sb, budget)) sb.Append("… ");
+                        sb.Append('}');
+                        return;
+                    }
+                }
+                catch { }
+            }
+
+            string text = System.Text.Encoding.UTF8.GetString(field.BytesValue);
+            if (text.Length > 0 && text.All(c => !char.IsControl(c)))
+            {
+                sb.Append('"').Append(text).Append('"');
+                return;
+            }
+
+            sb.Append("0x").Append(Convert.ToHexString(field.BytesValue).ToLowerInvariant());
+        }
+
         public string DumpFieldsToString(string indent = "  ", int maxLines = 15)
         {
             var sb = new System.Text.StringBuilder();

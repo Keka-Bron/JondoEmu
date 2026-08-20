@@ -99,6 +99,14 @@ public static class Layer
         var stale = new HashSet<string>(StringComparer.Ordinal);
         var ignored = new HashSet<string>(StringComparer.Ordinal);
 
+        // Lo que la capa ya dice hoy, si existe.
+        //
+        // Sin esto la orden sólo funciona UNA vez, y lo comprobé de la peor manera: la primera
+        // pasada sustituye los literales por Op.Loquesea, así que la segunda no encuentra ni un
+        // literal de tres letras, cree que el emulador no usa ningún opcode y reescribe Op.cs
+        // vacío. El día del parche eso habría borrado la capa entera en vez de actualizarla.
+        var already = Existing(sourceFolder);
+
         foreach (string file in Directory.EnumerateFiles(sourceFolder, "*.cs", SearchOption.AllDirectories))
         {
             if (Skip(file)) continue;
@@ -119,6 +127,15 @@ public static class Layer
                     if (known.Contains(opcode)) uses[opcode] = uses.GetValueOrDefault(opcode) + 1;
                     else if (wasKnown.Contains(opcode)) stale.Add(opcode);
                     else ignored.Add(opcode);
+                }
+
+                // Y los que ya pasaron por la capa, que se escriben Op.Loquesea y no llevan
+                // comillas. Para el recuento valen exactamente igual: son usos del opcode.
+                foreach (Match match in Through.Matches(line))
+                {
+                    if (!already.TryGetValue(match.Groups[1].Value, out string? opcode)) continue;
+                    if (known.Contains(opcode)) uses[opcode] = uses.GetValueOrDefault(opcode) + 1;
+                    else if (wasKnown.Contains(opcode)) stale.Add(opcode);
                 }
             }
         }
@@ -148,6 +165,32 @@ public static class Layer
             slots.OrderBy(s => s.Id, StringComparer.Ordinal).ToList(),
             stale.OrderBy(s => s, StringComparer.Ordinal).ToList(),
             ignored.OrderBy(s => s, StringComparer.Ordinal).ToList());
+    }
+
+    /// <summary>Un uso que ya pasó por la capa: <c>Op.Loquesea</c>.</summary>
+    private static readonly Regex Through = new(@"\bOp\.([A-Z][A-Za-z0-9_]*)\b", RegexOptions.Compiled);
+
+    /// <summary>Una constante de la capa tal y como está escrita hoy en Op.cs.</summary>
+    private static readonly Regex Declared =
+        new(@"public const string ([A-Za-z0-9_]+) = ""([a-z]{3})"";", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Lo que la capa dice hoy: del identificador al opcode.
+    ///
+    /// Si no hay Op.cs todavía —la primera vez— sale vacío y el barrido funciona sólo con los
+    /// literales, que es justo lo que hay en ese momento.
+    /// </summary>
+    private static Dictionary<string, string> Existing(string sourceFolder)
+    {
+        var map = new Dictionary<string, string>(StringComparer.Ordinal);
+        string path = Path.Combine(sourceFolder, "Jondo.Unity.Protocol", "Op.cs");
+        if (!File.Exists(path)) return map;
+
+        foreach (Match match in Declared.Matches(File.ReadAllText(path)))
+        {
+            map[match.Groups[1].Value] = match.Groups[2].Value;
+        }
+        return map;
     }
 
     /// <summary>Carpetas que no se barren: lo generado, lo compilado y las copias de trabajo.</summary>
@@ -233,6 +276,29 @@ public static class Layer
             text.AppendLine();
         }
 
+        // ─── La vuelta: del opcode a su nombre ──────────────────────────────────────────
+        //
+        // Las constantes van del nombre al opcode, que es lo que hace falta para ESCRIBIR un
+        // mensaje. El registro necesita lo contrario: llega «kuf» por el cable y hay que decir qué
+        // es. Se genera aquí y no se escribe a mano por lo de siempre —una tabla a mano se pudre—
+        // y además así el día del parche los nombres siguen saliendo bien sin tocar nada.
+        var named = sweep.Slots.Where(s => s.Name.Length > 0).ToList();
+
+        text.AppendLine("    /// <summary>");
+        text.AppendLine($"    /// El nombre real del mensaje que viaja con este opcode. Se saben {named.Count}");
+        text.AppendLine($"    /// de {sweep.Slots.Count}; de los demás devuelve cadena vacía, que es lo honrado.");
+        text.AppendLine("    /// </summary>");
+        text.AppendLine("    public static string Label(string opcode) => Labels.GetValueOrDefault(opcode, \"\");");
+        text.AppendLine();
+        text.AppendLine("    /// <summary>Los que se saben, por opcode.</summary>");
+        text.AppendLine("    public static readonly IReadOnlyDictionary<string, string> Labels =");
+        text.AppendLine("        new Dictionary<string, string>(StringComparer.Ordinal)");
+        text.AppendLine("        {");
+        foreach (var slot in named.OrderBy(s => s.Opcode, StringComparer.Ordinal))
+        {
+            text.AppendLine($"            [\"{slot.Opcode}\"] = \"{slot.Name}\",");
+        }
+        text.AppendLine("        };");
         text.AppendLine("}");
 
         string half = path + ".parcial";
