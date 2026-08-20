@@ -90,24 +90,42 @@ namespace Jondo.Unity.Launcher.Network
 
         private static Respuesta Intentar(string verbo, object? cuerpo)
         {
-            try
+            // Un intento y UN reintento de transporte. Pasaba esto: el HttpClient guarda las
+            // conexiones para reutilizarlas, http.sys las cierra por su cuenta al rato de
+            // inactividad, y la petición que llega justo después coje la conexión muerta —falla al
+            // instante, con el servidor perfectamente en pie— y el lanzador le decía a la persona
+            // «el servidor no responde» cuando sí respondía. Con el reintento, esa primera
+            // tentative se descarta y la segunda sale por una conexión nueva y llega.
+            //
+            // Y ConnectionClose en cada petición: en localhost abrir la conexión cuesta nada y así
+            // no hay nunca una guardada que pueda estar muerta. Es el mismo diagnóstico que el del
+            // reintento, atajado de raíz.
+            for (int intento = 0; ; intento++)
             {
-                string json = ConElToken(cuerpo);
-                using var peticion = new HttpRequestMessage(HttpMethod.Post, Base + Contract.Prefijo + verbo)
+                try
                 {
-                    Content = new StringContent(json, Encoding.UTF8, "application/json"),
-                };
-                if (_secreto.Length > 0) peticion.Headers.Add(Contract.Cabecera, _secreto);
+                    string json = ConElToken(cuerpo);
+                    using var peticion = new HttpRequestMessage(HttpMethod.Post, Base + Contract.Prefijo + verbo)
+                    {
+                        Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                        Headers = { ConnectionClose = true },
+                    };
+                    if (_secreto.Length > 0) peticion.Headers.Add(Contract.Cabecera, _secreto);
 
-                using var respuesta = Cliente.Send(peticion);
-                string texto = respuesta.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                return new Respuesta(true, (int)respuesta.StatusCode, texto);
-            }
-            catch
-            {
-                // No hay servidor al otro lado, o no ha contestado a tiempo. No es un error a
-                // gritos: es la situación normal mientras el servidor arranca.
-                return new Respuesta(false, 0, "");
+                    using var respuesta = Cliente.Send(peticion);
+                    string texto = respuesta.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    return new Respuesta(true, (int)respuesta.StatusCode, texto);
+                }
+                catch
+                {
+                    // Sólo el fallo de transporte se reintenta, y una sola vez: los 4 segundos de
+                    // paciencia son por petición, y no se doblan para nadie.
+                    if (intento == 0) continue;
+
+                    // No hay servidor al otro lado, o no ha contestado a tiempo. No es un error a
+                    // gritos: es la situación normal mientras el servidor arranca.
+                    return new Respuesta(false, 0, "");
+                }
             }
         }
 
@@ -152,11 +170,17 @@ namespace Jondo.Unity.Launcher.Network
         /// redirige al emulador, y lo decide sondeando este mismo puerto con 100 ms de paciencia.
         /// Si no contesta, el cliente no da ningún error: se va a los servidores de Ankama. Así que
         /// antes de lanzar hay que saber que el 8888 está contestando de verdad.
+        ///
+        /// Y como esta es justamente la comprobación que no puede darse por vencida a la primera:
+        /// se le pregunta DOS veces antes de decir que no hay nadie. Una sola contestación basta
+        /// para el sí; para el no hacen falta dos silencios seguidos, que es lo que cuesta decirle
+        /// a alguien que su servidor —que está abierto en la otra ventana— no responde.
         /// </summary>
         public static bool ServidorVivo()
         {
             var estado = Pedir("estado");
-            return estado.Bien;
+            if (estado.Bien) return true;
+            return Pedir("estado").Bien;
         }
 
         /// <summary>Espera a que el servidor conteste, hasta un tope. Devuelve si llegó a hacerlo.</summary>

@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.6.10.10-admin.5] - 2026-08-20
+
+### Fixed
+- **"The server is not responding" shown while the server was running.** The launcher's status check reused pooled HTTP connections that the server's web layer closes after a period of inactivity; when a poll happened to grab one of those dead sockets, the request failed instantly and the launcher concluded the server was down. Requests now open a fresh connection each time (negligible on localhost) and a transport failure is retried once; the pre-launch liveness check additionally asks twice before giving up. One confirmation is still enough to declare the server up.
+
+### Other
+- Merged the upstream pull request (jobs, recipes/skills, interactive-object dispatch, catalog lookups, traffic-log naming, and a security bump of the SQLite native library). The merge keeps every change listed below — the admin tool, interface zoom, packet decoding and the log improvements — with the metrics column layout taken from upstream and our version label, log filter and zoom buttons carried on top of it.
+
 ## [3.6.10.10-admin.4] - 2026-08-20
 
 ### Fixed
