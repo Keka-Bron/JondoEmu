@@ -68,6 +68,9 @@ namespace Jondo.Unity.Launcher
             Managers.EffectTable.Initialize();
             Managers.ItemSets.Initialize();
             Managers.EffectFields.Initialize();
+            Managers.JobManager.Initialize();
+            Managers.SkillManager.Initialize();
+            Managers.RecipeManager.Initialize();
             Managers.Interactives.Initialize();
             Managers.HavenBagStore.Initialize();
             Managers.Wardrobe.Initialize();

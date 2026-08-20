@@ -346,3 +346,54 @@ When debugging a new interactive, compare that line with the element advertised 
 The project compiles on .NET 10 after the migration. The remaining compiler warning is an existing
 unused local variable in the network traffic logger and is unrelated to interactives.
 
+---
+
+## 10. Profession catalogues (3.6.10.10)
+
+The first data layer for resources and workshops is now imported from the three dofusdude files
+stored in `JsonFromDofusDude`: `jobs.json`, `skills.json` and `recipes.json`. `Paths` accepts the
+folder either inside the emulator root or immediately beside it. The server reads the Unity export
+wrapper (`references.RefIds[].data`) and copies the useful fields into `world.db` on startup.
+
+The main tables are:
+
+- `Jobs`: profession id, translation id, icon and legendary-craft flag;
+- `Skills`: owning job, minimum level, gathered item, animation/range and client flags;
+- `Recipes`: result, result level/type, owning job and skill.
+
+Arrays are normalized into `RecipeIngredients`, `SkillCraftableItems` and
+`SkillModifiableItemTypes`. Their `Position` column preserves the order from the 3.6 export. This
+lets handlers query ingredients and quantities without parsing JSON stored inside SQLite.
+
+Imports are transactional per catalogue. A malformed or empty source file rolls its import back
+and the manager reloads the last valid catalogue from the database. The startup order is
+`JobManager`, `SkillManager`, then `RecipeManager`, matching their dependencies. The current
+3.6.10.10 files produce 23 jobs, 368 skills and 4,858 recipes.
+
+The managers expose indexed, read-only catalogue objects:
+
+```text
+JobManager.TryGet(jobId)
+SkillManager.TryGet(skillId)
+SkillManager.ForJob(jobId)
+RecipeManager.TryGetByResult(resultItemId)
+RecipeManager.ForSkill(skillId)
+```
+
+`GatheringHandler.TryResolve` validates that a skill exists, belongs to a known job and actually
+produces a gathered resource. `CraftHandler.TryResolve` resolves a workshop skill and its recipe
+list; `TryResolveRecipe` additionally prevents a client from asking one workshop skill to execute
+a recipe owned by another.
+
+These handlers are the server-authoritative resolution layer, not yet the network execution
+layer. Two pieces of 3.6 evidence are still required before registering resource nodes and
+workshops in `InteractiveRegistry`:
+
+1. a checked `(mapId, elementId) -> skillId/type` mapping;
+2. captures of the 3.6 messages that open a workshop and change/finish a resource state.
+
+`skills.json` does **not** supply the first mapping. In particular, `elementActionId` is an action
+animation/category value and is not the interactive type sent in `jss`; treating it as that type
+would misdeclare zaaps, chests and resources. Giny 2.68 remains useful for behaviour and database
+architecture, but its packet classes and hard-coded element mappings must not be copied as 3.6
+protocol truth.

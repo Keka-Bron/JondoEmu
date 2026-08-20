@@ -523,6 +523,8 @@ namespace Jondo.Unity.Launcher
                 ";
                 createMonsters.ExecuteNonQuery();
 
+                EnsureProfessionCatalogSchema(worldConnection);
+
                 // 5. Ensure Monsters, Mobs, Spells, and SpellLevels are seeded
                 EnsureMobsSeeded(worldConnection);
                 EnsureSpellsSeeded(worldConnection);
@@ -599,6 +601,86 @@ namespace Jondo.Unity.Launcher
             }
 
             Console.WriteLine("[SQLite] Databases initialized successfully.");
+        }
+
+        /// <summary>
+        /// Static profession catalogue from the 3.6.10.10 client data. Variable-length arrays
+        /// are normalized so recipes and skill capabilities can be queried directly by handlers.
+        /// This is catalogue data only; character job levels will belong to a separate table.
+        /// </summary>
+        private static void EnsureProfessionCatalogSchema(SqliteConnection connection)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS Jobs (
+                    Id INTEGER PRIMARY KEY,
+                    NameId INTEGER NOT NULL,
+                    IconId INTEGER NOT NULL,
+                    HasLegendaryCraft INTEGER NOT NULL DEFAULT 0
+                );
+
+                CREATE TABLE IF NOT EXISTS Skills (
+                    Id INTEGER PRIMARY KEY,
+                    NameId INTEGER NOT NULL,
+                    ParentJobId INTEGER NOT NULL,
+                    ElementActionId INTEGER NOT NULL,
+                    LevelMin INTEGER NOT NULL,
+                    GatheredResourceItem INTEGER NOT NULL,
+                    Cursor INTEGER NOT NULL,
+                    Range INTEGER NOT NULL,
+                    UseAnimation TEXT NOT NULL DEFAULT '',
+                    UseRangeInClient INTEGER NOT NULL DEFAULT 0,
+                    ClientDisplay INTEGER NOT NULL DEFAULT 0,
+                    AvailableInHouse INTEGER NOT NULL DEFAULT 0,
+                    AllowMarking INTEGER NOT NULL DEFAULT 0,
+                    IsForgemagus INTEGER NOT NULL DEFAULT 0,
+                    FOREIGN KEY (ParentJobId) REFERENCES Jobs(Id)
+                );
+
+                CREATE TABLE IF NOT EXISTS SkillCraftableItems (
+                    SkillId INTEGER NOT NULL,
+                    ItemId INTEGER NOT NULL,
+                    Position INTEGER NOT NULL,
+                    PRIMARY KEY (SkillId, Position),
+                    FOREIGN KEY (SkillId) REFERENCES Skills(Id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS SkillModifiableItemTypes (
+                    SkillId INTEGER NOT NULL,
+                    ItemTypeId INTEGER NOT NULL,
+                    Position INTEGER NOT NULL,
+                    PRIMARY KEY (SkillId, Position),
+                    FOREIGN KEY (SkillId) REFERENCES Skills(Id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS Recipes (
+                    ResultId INTEGER PRIMARY KEY,
+                    ResultNameId INTEGER NOT NULL,
+                    ResultTypeId INTEGER NOT NULL,
+                    ResultLevel INTEGER NOT NULL,
+                    JobId INTEGER NOT NULL,
+                    SkillId INTEGER NOT NULL,
+                    FOREIGN KEY (JobId) REFERENCES Jobs(Id),
+                    FOREIGN KEY (SkillId) REFERENCES Skills(Id)
+                );
+
+                CREATE TABLE IF NOT EXISTS RecipeIngredients (
+                    ResultId INTEGER NOT NULL,
+                    Position INTEGER NOT NULL,
+                    IngredientId INTEGER NOT NULL,
+                    Quantity INTEGER NOT NULL,
+                    PRIMARY KEY (ResultId, Position),
+                    FOREIGN KEY (ResultId) REFERENCES Recipes(ResultId) ON DELETE CASCADE
+                );
+
+                CREATE INDEX IF NOT EXISTS IX_Skills_ParentJobId ON Skills(ParentJobId);
+                CREATE INDEX IF NOT EXISTS IX_Skills_ElementActionId ON Skills(ElementActionId);
+                CREATE INDEX IF NOT EXISTS IX_Recipes_JobId ON Recipes(JobId);
+                CREATE INDEX IF NOT EXISTS IX_Recipes_SkillId ON Recipes(SkillId);
+                CREATE INDEX IF NOT EXISTS IX_RecipeIngredients_IngredientId
+                    ON RecipeIngredients(IngredientId);
+            ";
+            command.ExecuteNonQuery();
         }
 
         public static void EnsureMobsSeeded(SqliteConnection connection)

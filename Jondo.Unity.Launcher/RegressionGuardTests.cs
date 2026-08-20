@@ -26,6 +26,8 @@ namespace Jondo.Unity.Launcher
             Network.ClientLaunchRegistry.AssertEightClientLimit();
             AssertPerSessionPlayerCaches();
             AssertSocketWritesAreSerialized();
+            AssertProfessionCatalog();
+            AssertRelativeMapLookup();
             AssertInteractiveRegistry();
 
             // OJO: esta parte no llega a correr nunca. Subir tres carpetas desde donde está el
@@ -153,6 +155,65 @@ namespace Jondo.Unity.Launcher
                 throw new InvalidOperationException(
                     $"[RegressionGuard FAILED] Expected {expected.Count} interactives, got " +
                     $"{Managers.InteractiveRegistry.Count}.");
+            }
+        }
+
+        private static void AssertProfessionCatalog()
+        {
+            if (Managers.JobManager.Count == 0 || Managers.SkillManager.Count == 0 ||
+                Managers.RecipeManager.Count == 0)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Profession catalogue is empty.");
+
+            foreach (var skill in Managers.SkillManager.All)
+            {
+                if (!Managers.JobManager.TryGet(skill.ParentJobId, out _))
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] Skill {skill.Id} references missing job {skill.ParentJobId}.");
+            }
+
+            foreach (var recipe in Managers.RecipeManager.All)
+            {
+                if (!Managers.JobManager.TryGet(recipe.JobId, out _) ||
+                    !Managers.SkillManager.TryGet(recipe.SkillId, out _) ||
+                    recipe.Ingredients.Count == 0 ||
+                    recipe.Ingredients.Any(i => i.ItemId <= 0 || i.Quantity <= 0))
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] Recipe {recipe.ResultId} is inconsistent.");
+            }
+
+            var gathering = Managers.SkillManager.All.FirstOrDefault(s => s.IsGathering);
+            if (gathering == null ||
+                !Handlers.GatheringHandler.TryResolve(gathering.Id, out _, out _, out _))
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Gathering handler cannot resolve a gathering skill.");
+
+            var craft = Managers.RecipeManager.All.First();
+            if (!Handlers.CraftHandler.TryResolve(craft.SkillId, out _, out _, out var recipes, out _) ||
+                !Handlers.CraftHandler.TryResolveRecipe(craft.SkillId, craft.ResultId, out _, out _) ||
+                recipes.Count == 0)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Craft handler cannot resolve a known recipe.");
+        }
+
+        private static void AssertRelativeMapLookup()
+        {
+            var group = MapManager.Maps.Values
+                .Where(m => m.MapId > 0)
+                .GroupBy(m => (m.PosX, m.PosY))
+                .FirstOrDefault(g => g.Count() > 1);
+            if (group == null) return;
+
+            var ordered = group.OrderBy(m => m.MapId).ToList();
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                var match = Managers.MapLookup.NextRelative(ordered[i].MapId);
+                long expected = ordered[(i + 1) % ordered.Count].MapId;
+                if (match == null || match.Map.MapId != expected ||
+                    match.Candidates != ordered.Count ||
+                    match.Wrapped != (i == ordered.Count - 1))
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] Relative map cycle is not stable.");
             }
         }
 
