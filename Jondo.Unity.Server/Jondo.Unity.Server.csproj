@@ -38,6 +38,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
+    <!-- Microsoft.Data.Sqlite 10.0.9 arrastra SQLitePCLRaw 2.1.11, y esa lleva dentro una SQLite
+         con CVE-2025-6965: gravedad alta, alcance «<= 2.1.11». No hay Microsoft.Data.Sqlite estable
+         mas nueva que la arregle —la 11.0.0 va por preview.7—, asi que se fija aqui el paquete de
+         abajo, que es lo que de verdad trae la biblioteca nativa. Cuando salga la 11 estable esto
+         se puede quitar y comprobar que NU1903 sigue sin aparecer. -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
     <PackageReference Include="System.Text.Json" Version="10.0.9" />
   </ItemGroup>
 
