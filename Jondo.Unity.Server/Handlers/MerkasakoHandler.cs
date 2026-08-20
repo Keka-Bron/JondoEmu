@@ -38,14 +38,14 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task EnterFromOutsideAsync(NetworkStream stream, byte[] payload)
         {
-            if (ConnectionProtocol.ReadPayload(payload, Op.EnterHavenBagRequestMessage) == null) return;
+            if (ConnectionProtocol.ReadPayload(payload, Op.Jbn) == null) return;
             await GoToThemeAsync(stream, HavenBagStore.ThemeOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
         }
 
         /// <summary>Cambiarse de decorado desde dentro.</summary>
         public static async Task ChangeThemeAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? jbl = ConnectionProtocol.ReadPayload(payload, Op.HavenBagThemeChangeRequestMessage);
+            byte[]? jbl = ConnectionProtocol.ReadPayload(payload, Op.Jbl);
             if (jbl == null) return;
 
             // Sin f1 —proto3 se come el cero— se entiende el de siempre.
@@ -104,7 +104,7 @@ namespace Jondo.Unity.Launcher.Handlers
             SessionContext.State.PendingHavenBagFurniture.Clear();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.HavenBagEditionStartedMessage));
+                ConnectionProtocol.Push(Op.Jbm));
 
             Console.WriteLine("[Merkasako] Modo de colocar muebles abierto.");
         }
@@ -112,7 +112,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>Un trozo de la habitación. Se apunta y se espera al cierre para escribirla.</summary>
         public static void CollectFurniture(byte[] payload)
         {
-            byte[]? jbg = ConnectionProtocol.ReadPayload(payload, Op.HavenBagFurnituresUpdateRequestMessage);
+            byte[]? jbg = ConnectionProtocol.ReadPayload(payload, Op.Jbg);
             if (jbg == null) return;
 
             foreach (var field in ProtoMessage.Parse(jbg).Fields)
@@ -163,7 +163,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await SendFurnitureAsync(stream);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.HavenBagEditionStoppedMessage));
+                ConnectionProtocol.Push(Op.Jba));
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Jondo.Unity.Launcher.Handlers
                                                    Merkasako.ThemeOfMap(Jondo.Unity.Launcher.Network.SessionContext.State.MapId));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.HavenBagFurnituresMessage, ConnectionProtocol.BuildHavenBagFurniture(pieces)));
+                ConnectionProtocol.Push(Op.Jbu, ConnectionProtocol.BuildHavenBagFurniture(pieces)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Jaz));
         }

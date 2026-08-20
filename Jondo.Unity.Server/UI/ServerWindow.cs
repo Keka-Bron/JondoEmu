@@ -31,7 +31,7 @@ namespace Jondo.Unity.Launcher.UI
 
         private readonly Panel _caja;
         private readonly FlickerFreePanel _cifras;
-        private readonly RichTextBox _registro;
+        private readonly LauncherLogView _registro;
         private readonly LauncherLogo _logo;
         private readonly System.Windows.Forms.Timer _reloj;
         private readonly CheckBox _seguir;
@@ -97,7 +97,7 @@ namespace Jondo.Unity.Launcher.UI
             ForeColor = LauncherTheme.BaseText;
             DoubleBuffered = true;
             TryCargarIcono();
-            _foto = LauncherTheme.LoadImage("servidor_fondo.jpg") ?? LauncherTheme.LoadImage("bg.jpg");
+            _foto = Espejar(LauncherTheme.LoadImage("servidor_fondo.jpg") ?? LauncherTheme.LoadImage("bg.jpg"));
 
             _logo = new LauncherLogo
             {
@@ -145,13 +145,25 @@ namespace Jondo.Unity.Launcher.UI
                 Padding = new Padding(E(22), 0, E(22), 0),
             };
 
-            _registro = new RichTextBox
+            // El registro se pinta a mano para que se vea el dibujo por detrás.
+            //
+            // Con un RichTextBox no había manera: un cuadro de texto de WinForms es opaco y no hay
+            // color transparente que lo cambie, así que el registro era un rectángulo negro pegado
+            // encima de Nox. LauncherLogView hereda de LauncherPanel, que recorta el trozo de fondo
+            // que le toca y le pone encima las capas de color que se le digan; el velo oscuro que
+            // hace legible el texto es una capa con alfa y por debajo se sigue viendo el dibujo.
+            //
+            // Se paga con el copiar y pegar: son líneas dibujadas, no texto seleccionable. El
+            // registro entero se sigue escribiendo en logs\, que es de donde hay que sacarlo.
+            _registro = new LauncherLogView
             {
                 Dock = DockStyle.Fill,
-                BackColor = LauncherTheme.ConsoleBackground,
                 ForeColor = LauncherTheme.LogNormal,
-                BorderStyle = BorderStyle.None,
-                ReadOnly = true,
+                CornerRadius = E(6),
+                BorderColor = LauncherTheme.GoldBorder,
+                BorderWidth = Math.Max(2, E(2)),
+                Padding = new Padding(E(10), E(8), E(10), E(8)),
+
                 // La letra va en PÍXELES y sin multiplicar por la escala del monitor.
                 //
                 // Antes era «Mono(6f)», que por dentro hacía 6 × DeviceDpi/96. Un tamaño en puntos
@@ -159,17 +171,16 @@ namespace Jondo.Unity.Launcher.UI
                 // 192 ppp salía a doce puntos y por eso el registro se veía enorme y se partía. Es
                 // el mismo fallo que ya se corrigió en el desofuscador.
                 Font = LauncherTheme.CreateMonoFont(12f),
-
-                // Sin partir líneas. Con la consola estrecha partirlas era lo menos malo; ahora que
-                // ocupa la ventana entera, un renglón es un paquete y eso vale más que no tener
-                // barra abajo.
-                WordWrap = false,
-                ScrollBars = RichTextBoxScrollBars.Both,
-                DetectUrls = false,
             };
+            _registro.Layers.Add(LauncherTheme.ConsoleFill);
+
+            // Clic derecho sobre un paquete para decir qué es. Los nombres reales están en el
+            // cliente pero huérfanos —nada dice cuál va con cuál—, así que la ligadura la hace una
+            // persona con el paquete delante, eligiendo de la lista real. Lo que se elige se guarda
+            // y a partir de ahí sale en el registro.
+            _registro.MouseUp += (s, e) => { if (e.Button == MouseButtons.Right) Bautizar(e.Location); };
 
             _caja.Controls.Add(_registro);
-            _caja.Paint += PintarCaja;
 
             // El orden importa: WinForms acopla de DELANTE hacia atrás, o sea al revés del orden en
             // que se añaden. Se lee de abajo arriba: el rótulo coge su franja de arriba, la barra
@@ -204,7 +215,7 @@ namespace Jondo.Unity.Launcher.UI
             }
 
             _limpiar = Boton("", LauncherTheme.SoftGold);
-            _limpiar.Click += (s, e) => _registro.Clear();
+            _limpiar.Click += (s, e) => _registro.Wipe();
             barra.Controls.Add(_limpiar);
 
             _parar = Boton("", LauncherTheme.Red);
@@ -534,6 +545,49 @@ namespace Jondo.Unity.Launcher.UI
         /// Se compone UNA vez por tamaño y se guarda, en vez de escalar la imagen en cada
         /// repintado. Es lo que hace el lanzador y es lo que evita que la ventana vaya a tirones.
         /// </summary>
+        /// <summary>
+        /// El fondo sin la marca de agua y volteado, para que Nox quede detrás del registro.
+        ///
+        /// El dibujo trae a Nox a la izquierda, que es justo donde va la columna de cifras: quedaba
+        /// tapado. Volteado cae detrás del registro, que ahora es translúcido, y se le ve entero.
+        ///
+        /// El logotipo de Wakfu y la línea de copyright viven en la franja derecha del dibujo, y en
+        /// espejo saldrían escritos del revés. El primer intento fue volver a pegar esa esquina sin
+        /// voltear, y se notaba el recuadro a la legua: un trozo sin voltear dentro de una imagen
+        /// volteada siempre deja costura. Así que la franja se RECORTA antes de voltear. Recortar y
+        /// no pintar encima es lo que no deja artefactos: no hay nada que disimular, simplemente esa
+        /// parte del dibujo no está.
+        /// </summary>
+        private static Image? Espejar(Image? foto)
+        {
+            if (foto == null) return null;
+
+            try
+            {
+                // El 18% de la derecha cubre de sobra el logotipo y el copyright, y lo que se pierde
+                // es el borde del pinar, que no lo echa nadie de menos.
+                int ancho = Math.Max(1, (int)(foto.Width * 0.82f));
+                var recorte = new Rectangle(0, 0, ancho, foto.Height);
+
+                var espejo = new Bitmap(ancho, foto.Height);
+                using (var g = Graphics.FromImage(espejo))
+                {
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.DrawImage(foto, new Rectangle(0, 0, ancho, foto.Height), recorte, GraphicsUnit.Pixel);
+                }
+
+                espejo.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                foto.Dispose();
+                return espejo;
+            }
+            catch
+            {
+                // Si algo falla, el fondo original sirve igual: se verá a Nox tapado por las
+                // tarjetas, que es como estaba antes, pero la ventana abre.
+                return foto;
+            }
+        }
+
         private void ComponerFondo()
         {
             int ancho = Math.Max(1, ClientSize.Width);
@@ -617,34 +671,6 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>
         /// El fondo detrás de la consola, y un marco alrededor.
         ///
-        /// El marco no es adorno: el cuadro de texto es opaco —WinForms no sabe hacerlo
-        /// translúcido— así que sin un borde parecería un agujero negro pegado encima del dibujo.
-        /// </summary>
-        private void PintarCaja(object? sender, PaintEventArgs e)
-        {
-            var g = e.Graphics;
-            RecortarFondo(g, _caja);
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-
-            var dentro = new Rectangle(
-                _caja.Padding.Left - E(2), _caja.Padding.Top - E(2),
-                _caja.Width - _caja.Padding.Horizontal + E(4),
-                _caja.Height - _caja.Padding.Vertical + E(4));
-
-            if (dentro.Width <= 0 || dentro.Height <= 0) return;
-            using var camino = Redondeado(dentro, E(6));
-
-            // La consola tiene que ser una PIEZA, no un rectángulo de texto flotando.
-            //
-            // Aquí sólo se dibujaba una raya marrón fina, y por el hueco entre esa raya y la caja
-            // de texto se veía el dibujo del fondo: el área donde se escribe quedaba del mismo
-            // color que todo lo demás y no se sabía dónde empezaba. Un relleno oscuro y traslúcido
-            // —el mismo de la consola del lanzador— la separa del fondo sin taparlo, y el borde
-            // dorado le pone el marco que el marrón no llegaba a marcar.
-            using (var relleno = new SolidBrush(LauncherTheme.ConsoleFill)) g.FillPath(relleno, camino);
-            using var borde = new Pen(LauncherTheme.GoldBorder, Math.Max(2f, E(2)));
-            g.DrawPath(borde, camino);
-        }
 
         // ─── El latido ──────────────────────────────────────────────────────────────────────
 
@@ -696,17 +722,9 @@ namespace Jondo.Unity.Launcher.UI
                 Escribir(hora, texto);
             }
 
-            if (_registro.Lines.Length > 4000)
-            {
-                _registro.Select(0, _registro.GetFirstCharIndexFromLine(1500));
-                _registro.SelectedText = "";
-            }
-
-            if (_seguir.Checked)
-            {
-                _registro.SelectionStart = _registro.TextLength;
-                _registro.ScrollToCaret();
-            }
+            // Ni recortar ni bajar el cursor: de las dos cosas se encarga la vista, que sabe cuántas
+            // líneas guarda y si está pegada abajo.
+            _registro.Follow = _seguir.Checked;
         }
 
         /// <summary>
@@ -721,19 +739,56 @@ namespace Jondo.Unity.Launcher.UI
             @"^(\s*\d+) (\[(?:client>server|server>client)\]) ([a-z]{3})( \([A-Za-z0-9_]+\))?(.*?)(\s+\d+ B)\s*$",
             System.Text.RegularExpressions.RegexOptions.Compiled);
 
+        /// <summary>
+        /// Poner nombre al paquete que hay bajo el ratón.
+        ///
+        /// Sólo abre si el renglón es un paquete: sobre una línea normal del servidor no hay nada
+        /// que bautizar y un menú que sale siempre acaba saliendo cuando no toca.
+        /// </summary>
+        private void Bautizar(Point donde)
+        {
+            var paquete = Paquete.Match(_registro.TextAt(donde));
+            if (!paquete.Success) return;
+
+            string opcode = paquete.Groups[3].Value;
+            using var elegir = new NamePicker(opcode, Managers.NameBinding.Meaning(opcode),
+                                              Managers.NameBinding.Of(opcode), _escala);
+
+            if (elegir.ShowDialog(this) != DialogResult.OK) return;
+
+            Managers.NameBinding.Bind(opcode, elegir.Chosen);
+            Console.WriteLine(elegir.Chosen.Length > 0
+                ? $"[Nombres] {opcode} es {elegir.Chosen}."
+                : $"[Nombres] {opcode} vuelve a estar sin ligar.");
+        }
+
         private void Escribir(string hora, string texto)
         {
-            _registro.SelectionStart = _registro.TextLength;
-            _registro.SelectionLength = 0;
+            // Una entrada puede traer VARIOS renglones dentro.
+            //
+            // ConsoleLogBuffer guarda lo que le llega a Console.WriteLine tal cual, y hay sitios
+            // que escriben varias líneas de una vez —el volcado de un paquete sin manejar, con sus
+            // rayas y su árbol de campos—. El RichTextBox de antes las repartía solo; la vista
+            // nueva dibuja cada entrada en UNA posición, así que un texto con saltos dentro salía
+            // encaramado encima del siguiente y no se leía nada.
+            //
+            // La hora va sólo en el primero. Los demás llevan su hueco en blanco para que el texto
+            // siga cuadrado en la misma columna.
+            string[] renglones = texto.Replace("\r", "").Split('\n');
+            string sangria = hora.Length > 0 ? new string(' ', hora.Length + 2) : "";
 
-            _registro.SelectionColor = LauncherTheme.LogTime;
-            _registro.AppendText(hora.Length > 0 ? hora + "  " : "");
+            for (int i = 0; i < renglones.Length; i++)
+            {
+                var trozos = new List<LauncherLogView.Piece>(7);
+                if (hora.Length > 0)
+                    trozos.Add(new(i == 0 ? hora + "  " : sangria, LauncherTheme.LogTime));
 
-            var paquete = Paquete.Match(texto);
-            if (paquete.Success) { Paquete_(paquete); return; }
+                var paquete = Paquete.Match(renglones[i]);
+                if (paquete.Success) Paquete_(paquete, trozos);
+                else trozos.Add(new(renglones[i], ColorDe(renglones[i])));
 
-            _registro.SelectionColor = ColorDe(texto);
-            _registro.AppendText(texto + "\n");
+                _registro.Add(trozos.ToArray());
+            }
         }
 
         /// <summary>
@@ -743,13 +798,12 @@ namespace Jondo.Unity.Launcher.UI
         /// aparta. La dirección lleva el mismo código que el resto del emulador —azul lo que baja
         /// del servidor, dorado lo que sube del cliente— para no tener que leerla.
         /// </summary>
-        private void Paquete_(System.Text.RegularExpressions.Match m)
+        private static void Paquete_(System.Text.RegularExpressions.Match m,
+                                     List<LauncherLogView.Piece> trozos)
         {
             void Trozo(string texto, Color color)
             {
-                if (texto.Length == 0) return;
-                _registro.SelectionColor = color;
-                _registro.AppendText(texto);
+                if (texto.Length > 0) trozos.Add(new LauncherLogView.Piece(texto, color));
             }
 
             string direccion = m.Groups[2].Value;
@@ -759,7 +813,7 @@ namespace Jondo.Unity.Launcher.UI
             Trozo(m.Groups[3].Value, LauncherTheme.HighlightText);
             Trozo(m.Groups[4].Value, LauncherTheme.LogNormal);
             Trozo(m.Groups[5].Value, LauncherTheme.LightBrownText);
-            Trozo(m.Groups[6].Value + "\n", LauncherTheme.LogTime);
+            Trozo(m.Groups[6].Value, LauncherTheme.LogTime);
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Managers;
@@ -12,7 +12,7 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         public static async Task UseAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? iwo = ConnectionProtocol.ReadPayload(payload, Op.InteractiveUseRequestMessage);
+            byte[]? iwo = ConnectionProtocol.ReadPayload(payload, Op.Iwo);
             if (iwo == null) return;
 
             int skillInstanceId = 0;
@@ -48,6 +48,18 @@ namespace Jondo.Unity.Launcher.Handlers
                     break;
                 case InteractiveActionKind.Lottery:
                     await LotteryHandler.DrawAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.Zaapi:
+                    await ZaapiTravelHandler.OpenAsync(stream, interactive.Element, action.SkillId);
+                    break;
+                case InteractiveActionKind.Bin:
+                    await BinHandler.OpenAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.HouseDoor:
+                    await HouseHandler.EnterAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.HouseExit:
+                    await HouseHandler.LeaveAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
                 default:
                     throw new InvalidOperationException($"Acción interactiva no gestionada: {action.Kind}.");

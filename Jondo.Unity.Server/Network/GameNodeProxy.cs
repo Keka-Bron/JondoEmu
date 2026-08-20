@@ -168,7 +168,7 @@ namespace Jondo.Unity.Launcher.Network
             long sessionAccountId = 0;
             int sessionServerId = 0;
 
-            if (payloadStr.Contains(Op.Uri(Op.BasicTimeMessage)) || payloadStr.Contains(Op.Uri(Op.HelloGameMessage)) || payloadStr.Contains(Op.Uri(Op.SpellVariantActivationRequestMessage)) || payloadStr.Contains("type.ankama.com/knx"))
+            if (payloadStr.Contains(Op.Uri(Op.Lqu)) || payloadStr.Contains(Op.Uri(Op.Hoy)) || payloadStr.Contains(Op.Uri(Op.Hmt)) || payloadStr.Contains("type.ankama.com/knx"))
             {
                 byte[] hoyFrame = NetworkEnvelope.ConvertHexStringToByteArray("1D-1A-1B-0A-19-0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-68-6F-79-12-04-08-1E-10-01");
                 await Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, hoyFrame);
@@ -186,7 +186,7 @@ namespace Jondo.Unity.Launcher.Network
 
                 GameServerProxy.LogTraffic("GAME_C->S", payload, payload.Length);
 
-                if (payloadStr.Contains(Op.Uri(Op.AuthenticationTicketMessage)))
+                if (payloadStr.Contains(Op.Uri(Op.Kqz)))
                 {
                     // The client presents the ticket handed to it by the connection server. From
                     // here on the session knows which account it serves, and answers it with the
@@ -221,7 +221,7 @@ namespace Jondo.Unity.Launcher.Network
                     // and redoes the handshake with the connection server. Both ways back are
                     // handled the same: the client decides which of the two screens it lands on.
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.LogoutResultMessage, BuildKqrPayload()));
+                        ConnectionProtocol.Push(Op.Kqr, BuildKqrPayload()));
                     // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
                     // el de arena es de instancia y quedarse ahí es quedarse encerrado.
                     FightHandler.LeaveFight();
@@ -236,30 +236,30 @@ namespace Jondo.Unity.Launcher.Network
                     hasSentMapBlock = false;
                     Console.WriteLine("[Game Node] Client is going back: sent kqr and released the session.");
                 }
-                else if (!isAuthenticated && (payloadStr.Contains(Op.Uri(Op.SpellVariantActivationRequestMessage)) || payloadStr.Contains(Op.Uri(Op.Ise)) || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx") || payloadStr.Contains(Op.Uri(Op.HelloGameMessage))))
+                else if (!isAuthenticated && (payloadStr.Contains(Op.Uri(Op.Hmt)) || payloadStr.Contains(Op.Uri(Op.Ise)) || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx") || payloadStr.Contains(Op.Uri(Op.Hoy))))
                 {
                     isAuthenticated = true;
                     await CharacterSelectionHandler.HandleAuthRequest(stream, payload, payloadStr);
                 }
                 // Careful: kqu no longer belongs here. In 3.6.10.10 it is a message pushed by the
                 // server inside the welcome burst, not a client request.
-                else if (payloadStr.Contains(Op.Uri(Op.Jto)) || payloadStr.Contains("type.ankama.com/kpc") || payloadStr.Contains(Op.Uri(Op.Ksx)) || payloadStr.Contains(Op.Uri(Op.CharactersListRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Jto)) || payloadStr.Contains("type.ankama.com/kpc") || payloadStr.Contains(Op.Uri(Op.Ksx)) || payloadStr.Contains(Op.Uri(Op.Kpa)))
                 {
                     await CharacterSelectionHandler.HandleCharacterListRequest(stream, payload, payloadStr, sessionAccountId, sessionServerId);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.CharacterCreationRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Kvz)))
                 {
                     // Crear un personaje.
                     await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.CharacterNameSuggestionSuccessMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Kvk)))
                 {
                     // El botón del dado: un nombre al azar.
                     await CharacterCreationHandler.SuggestNameAsync(stream);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.CharacterSelectionMessage)) || payloadStr.Contains(Op.Uri(Op.Ksl))
-                         || payloadStr.Contains(Op.Uri(Op.CharacterFirstSelectionMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Kvw)) || payloadStr.Contains(Op.Uri(Op.Ksl))
+                         || payloadStr.Contains(Op.Uri(Op.Kvl)))
                 {
                     // Character selection. We check that it belongs to this session's account:
                     // the client picks the id, so it cannot be trusted.
@@ -296,7 +296,7 @@ namespace Jondo.Unity.Launcher.Network
                     SessionContext.Current.EnterWorld();
                     await SessionRegistry.BroadcastToMapAsync(
                         SessionContext.State.MapId,
-                        ConnectionProtocol.Push(Op.GameContextRefreshEntityLookMessage, ConnectionProtocol.BuildActorRefreshed(
+                        ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
                             chosen, SessionContext.State.CellId, SessionContext.State.Orientation,
                             SessionContext.Current.AccountId)),
                         SessionContext.Current.Id);
@@ -337,7 +337,7 @@ namespace Jondo.Unity.Launcher.Network
                     var here = DatabaseManager.GetCharacterById(GameState.CharacterId);
                     if (here != null)
                     {
-                        byte[] actors = ConnectionProtocol.Push(Op.MapComplementaryInformationsDataMessage,
+                        byte[] actors = ConnectionProtocol.Push(Op.Jss,
                             ConnectionProtocol.BuildMapActors(GameState.MapId, here,
                                                               GameState.CellId, GameState.Orientation,
                                                               sessionAccountId));
@@ -362,7 +362,7 @@ namespace Jondo.Unity.Launcher.Network
                                           $"{here.Name} on cell {GameState.CellId}.");
                     }
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.GameContextCreateRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lqc)))
                 {
                     // lqc es el cliente diciendo que ya ha digerido el primer bloque. Aquí es donde
                     // toca darle el mapa.
@@ -374,11 +374,11 @@ namespace Jondo.Unity.Launcher.Network
                     // enseña su escena por defecto, que es la de Incarnam. Por eso sonaba también su
                     // música en la pantalla de personajes.
                     Console.WriteLine("[Game Node] Client confirmed with lqc.");
-                    if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, Op.GameContextCreateRequestMessage)) hasSentMapBlock = true;
+                    if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, Op.Lqc)) hasSentMapBlock = true;
                 }
                 // ─── 3.6.10.10 world messages. The joi/jos/jpp branches further down belong to
                 // an earlier version of the protocol and this client never sends them.
-                else if (payloadStr.Contains(Op.Uri(Op.GameMapMovementRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Jrw)))
                 {
                     // Andar es el mismo mensaje dentro y fuera del combate. Peleando lo resuelve el
                     // manejador de combate, que además gasta puntos de movimiento; si cayera aquí,
@@ -390,12 +390,12 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await WorldMoveHandler.AllowMapExitAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.ChangeMapMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Jqk)))
                 {
                     hasSentMapBlock = true;   // the map block belongs to entering the world, not to this
                     await WorldMoveHandler.ChangeMapAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.StatsUpgradeRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Kum)))
                 {
                     await CharacteristicsHandler.SpendAsync(stream, payload);
                 }
@@ -403,16 +403,16 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await CharacteristicsHandler.ResetAsync(stream);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.ObjectSetPositionMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Iuk)))
                 {
                     await EquipmentHandler.MoveAsync(stream, payload, sessionAccountId);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.ChatClientMultiMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Ktm)))
                 {
                     // Chat. With one player on the server there is nobody else to hand it to, so
                     // it comes straight back to whoever said it — which is also what the real
                     // server does with your own lines, and what makes them appear in the window.
-                    byte[]? ktm = ConnectionProtocol.ReadPayload(payload, Op.ChatClientMultiMessage);
+                    byte[]? ktm = ConnectionProtocol.ReadPayload(payload, Op.Ktm);
                     if (ktm != null)
                     {
                         string text = "";
@@ -432,7 +432,7 @@ namespace Jondo.Unity.Launcher.Network
 
                         if (text.Length > 0 && !consumed)
                         {
-                            byte[] linea = ConnectionProtocol.Push(Op.ChatServerMessage,
+                            byte[] linea = ConnectionProtocol.Push(Op.Kti,
                                 ConnectionProtocol.BuildChatLine(GameState.CharacterName,
                                     GameState.CharacterId, sessionAccountId, text, channel));
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, linea);
@@ -454,19 +454,19 @@ namespace Jondo.Unity.Launcher.Network
                         }
                     }
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.InteractiveUseRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Iwo)))
                 {
                     // Todos los elementos pasan por el mismo registro; él decide qué acción hay
                     // detrás sin mezclar datos entre mapas ni entre sockets.
                     await InteractiveActionHandler.UseAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.EnterHavenBagRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Jbn)))
                 {
                     // El botón del merkasako, y la tecla H.
                     hasSentMapBlock = true;
                     await MerkasakoHandler.EnterFromOutsideAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.HavenBagThemeChangeRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Jbl)))
                 {
                     // Cambiarse de decorado dentro del merkasako.
                     hasSentMapBlock = true;
@@ -477,7 +477,7 @@ namespace Jondo.Unity.Launcher.Network
                     // Abrir el menú de gestión, para colocar muebles.
                     await MerkasakoHandler.OpenEditorAsync(stream);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.HavenBagFurnituresUpdateRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Jbg)))
                 {
                     // Un trozo de la habitación. Se junta y se guarda al cerrar el menú.
                     MerkasakoHandler.CollectFurniture(payload);
@@ -489,7 +489,7 @@ namespace Jondo.Unity.Launcher.Network
                     // Cerrar el menú de gestión. Los tres llegan seguidos al aceptar.
                     await MerkasakoHandler.CloseEditorAsync(stream);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.ExchangeObjectMoveMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Kcr)))
                 {
                     // Mover un objeto entre la bolsa y el cofre.
                     await ChestHandler.MoveAsync(stream, payload);
@@ -504,42 +504,42 @@ namespace Jondo.Unity.Launcher.Network
                     // El estado de esa ventana.
                     await AppearanceHandler.SendStateAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.AppearanceItemWearRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lys)))
                 {
                     // Ponerse una prenda; el hueco lo resuelve el servidor.
                     await AppearanceHandler.WearAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.AppearanceSlotSetRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lyf)))
                 {
                     // Poner o quitar en un hueco concreto.
                     await AppearanceHandler.AssignAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.AppearanceSlotVisibilityRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lxg)))
                 {
                     // Enseñar u ocultar una prenda.
                     await AppearanceHandler.ToggleAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.AppearanceAuraRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lxw)))
                 {
                     // El aura.
                     await AppearanceHandler.AuraAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.TitleSelectRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lze)))
                 {
                     // Elegir título en la ventana de apariencia. Solo toca el borrador.
                     await WardrobeHandler.ChooseTitleAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.OrnamentSelectRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lwm)))
                 {
                     // Elegir ornamento.
                     await WardrobeHandler.ChooseOrnamentAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.AppearanceSaveRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Lxs)))
                 {
                     // El botón Guardar de esa ventana.
                     await WardrobeHandler.SaveAsync(stream, payload, sessionAccountId);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.ObjectDeleteMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Iuw)))
                 {
                     // Destruir un objeto del inventario.
                     await DestroyItemHandler.DestroyAsync(stream, payload);
@@ -557,34 +557,34 @@ namespace Jondo.Unity.Launcher.Network
                     else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
                     else await ZaapTravelHandler.CloseAsync(stream);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.TeleportRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Hjc)))
                 {
                     // Ha elegido destino en la lista del zaap.
                     hasSentMapBlock = true;   // el bloque del mapa es de entrar al mundo, no de esto
                     await ZaapTravelHandler.TravelAsync(stream, payload);
                 }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.SpellVariantActivationRequestMessage)))
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hmt)))
                 {
                     // Cambiar un hechizo por su variante. Antes caía en la lista de mensajes que
                     // se ignoran en silencio, que es por lo que elegir una variante no hacía nada.
                     await SpellHandler.HandleVariantAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.ShortcutBarAddRequestMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Itz)))
                 {
                     // Editing a slot of the shortcut bar. The server answers with the very same
                     // entry it was given, y además se apunta dónde quedó: si no, la barra se
                     // rehace igual en cada sesión y lo que el jugador coloque se pierde al salir.
                     //
                     //   itz: f2 { f2: hueco, f6 { f2: hechizo } }, f3: qué barra
-                    byte[]? itz = ConnectionProtocol.ReadPayload(payload, Op.ShortcutBarAddRequestMessage);
+                    byte[]? itz = ConnectionProtocol.ReadPayload(payload, Op.Itz);
                     if (itz != null)
                     {
                         RememberShortcut(itz);
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.Push(Op.ShortcutBarRefreshMessage, itz));
+                            ConnectionProtocol.Push(Op.Ivk, itz));
                     }
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.BasicPingMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.Kqo)))
                 {
                     // kqo is a heartbeat, not a request for the map. The client sends it every five
                     // seconds for as long as it is in the world and the real server answers it with
@@ -790,7 +790,7 @@ namespace Jondo.Unity.Launcher.Network
                          || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jti))
-                         || payloadStr.Contains(Op.Uri(Op.HelloGameMessage)))
+                         || payloadStr.Contains(Op.Uri(Op.Hoy)))
                 {
                     // Colocarse, declararse listo y las opciones del combate. Los demás que había
                     // aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la 3.6.10.10 o
@@ -828,7 +828,7 @@ namespace Jondo.Unity.Launcher.Network
                         cleanPayload.Contains("klo") || cleanPayload.Contains("kmt") || cleanPayload.Contains(Op.Jgv) || 
                         cleanPayload.Contains(Op.Jct) || cleanPayload.Contains(Op.Jfc) || cleanPayload.Contains(Op.Kqk) || 
                         cleanPayload.Contains(Op.Itr) || cleanPayload.Contains(Op.Knc) || cleanPayload.Contains("kna") || 
-                        cleanPayload.Contains(Op.SpellVariantActivationRequestMessage) || cleanPayload.Contains("lxi") || cleanPayload.Contains(Op.Jqf) ||
+                        cleanPayload.Contains(Op.Hmt) || cleanPayload.Contains("lxi") || cleanPayload.Contains(Op.Jqf) ||
                         // kmv comes with jrh on every map load and expects nothing back; hnn is the
                         // client saying which spell the pointer is on.
                         cleanPayload.Contains(Op.Kmv) || cleanPayload.Contains(Op.Hnn))
@@ -984,7 +984,7 @@ namespace Jondo.Unity.Launcher.Network
         {
             try
             {
-                byte[]? kqz = ConnectionProtocol.ReadPayload(payload, Op.AuthenticationTicketMessage);
+                byte[]? kqz = ConnectionProtocol.ReadPayload(payload, Op.Kqz);
                 if (kqz == null || kqz.Length == 0) return false;
 
                 var msg = ProtoMessage.Parse(kqz);

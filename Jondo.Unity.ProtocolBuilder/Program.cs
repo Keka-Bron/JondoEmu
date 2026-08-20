@@ -65,6 +65,8 @@ switch (args[0])
     case "bajar": return Bajar(args).GetAwaiter().GetResult();
     case "cadena": return Cadena(args);
     case "capa": return Capa(args);
+    case "nombres": return Nombres(args);
+    case "cabecera": return Cabecera(args);
     default:
         Console.WriteLine($"No sé qué es «{args[0]}».");
         return 1;
@@ -226,6 +228,112 @@ static int Probar(string[] args)
 }
 
 /// <summary>
+/// Qué región del fichero de metadatos es cada cosa, y si el bloque de restos cae dentro de alguna.
+/// </summary>
+static int Cabecera(string[] args)
+{
+    if (args.Length < 2)
+    {
+        Console.WriteLine("Uso: cabecera <carpeta del cliente> [posición a localizar]");
+        return 1;
+    }
+
+    using var client = new ClientReader(args[1]);
+
+    // Dónde empieza el bloque con los nombres reales, medido con grep sobre el fichero.
+    long buscada = args.Length > 2 && long.TryParse(args[2], out long p) ? p : 21_607_975;
+
+    foreach (string miembro in Header.Members()) Console.WriteLine(miembro);
+    Console.WriteLine();
+
+    var campos = Header.Fields();
+    Console.WriteLine($"versión de metadatos: {campos.GetValueOrDefault("version")}");
+    Console.WriteLine();
+
+    var regiones = Header.Regions();
+    Console.WriteLine($"  {regiones.Count} regiones declaradas:");
+    foreach (var region in regiones)
+    {
+        string marca = region.Holds(buscada) ? "  <<< AQUÍ CAE EL BLOQUE" : "";
+        Console.WriteLine($"    {region.Name,-34} {region.Offset,12:N0} + {region.Size,11:N0}{marca}");
+    }
+
+    var dentro = regiones.Where(r => r.Holds(buscada)).ToList();
+    Console.WriteLine();
+    Console.WriteLine(dentro.Count == 0
+        ? $"  La posición {buscada:N0} NO cae en ninguna región declarada: es un resto no referenciado."
+        : $"  La posición {buscada:N0} cae en: {string.Join(", ", dentro.Select(r => r.Name))}");
+
+    // Y el orden: los mensajes del protocolo, tal y como los enumera la tabla de tipos.
+    Console.WriteLine();
+    Crudo(args[1]);
+    var unTipo = client.Protocol.Types.First(t => t.Fields.Count > 0);
+    Console.WriteLine("   tipo " + unTipo.Name + ", campos " + unTipo.Fields.Count);
+    var unCampo = unTipo.Fields[0];
+    Console.WriteLine("   campo " + unCampo.Name + "  backing=" + (unCampo.BackingData?.GetType().Name ?? "null"));
+    if (unCampo.BackingData != null) foreach (var kv in Header.Numbers(unCampo.BackingData)) Console.WriteLine("     bd." + kv.Key + " = " + kv.Value);
+    var parejas = Header.Pairs(client, l => Console.WriteLine(l));
+    foreach (var pareja in parejas.Take(12))
+        Console.WriteLine("      " + pareja.Opcode + "  =  " + pareja.Real);
+
+    var tipos = Header.Types();
+    var mensajes = client.Messages().Select(t => t.Name).ToHashSet(StringComparer.Ordinal);
+    var mios = tipos.Where(t => mensajes.Contains(t.Name)).ToList();
+
+    Console.WriteLine();
+    Console.WriteLine($"  {tipos.Count:N0} tipos en la tabla; {mios.Count:N0} son mensajes del protocolo");
+    if (mios.Count > 0)
+    {
+        Console.WriteLine($"    del índice {mios[0].Index:N0} al {mios[^1].Index:N0}");
+        Console.WriteLine($"    índices de nombre: del {mios.Min(t => t.NameIndex):N0} al {mios.Max(t => t.NameIndex):N0}");
+        Console.WriteLine();
+        Console.WriteLine("    los seis primeros, en orden de tabla:");
+        foreach (var tipo in mios.Take(6))
+            Console.WriteLine($"      #{tipo.Index,-7:N0} nombre@{tipo.NameIndex,-10:N0} {tipo.Name}");
+    }
+
+    return 0;
+}
+
+/// <summary>
+/// Los nombres de verdad, sacados del cliente. La sonda de <see cref="Names"/>.
+/// </summary>
+static int Nombres(string[] args)
+{
+    if (args.Length < 2)
+    {
+        Console.WriteLine("Uso: nombres <carpeta del cliente>");
+        return 1;
+    }
+
+    using var client = new ClientReader(args[1]);
+    var sitios = Names.Sites(client, linea => Console.WriteLine(linea));
+
+    Console.WriteLine();
+    Console.WriteLine($"  {sitios.Count:N0} métodos tocan un nombre o un mensaje");
+    Console.WriteLine($"    con nombres Y mensajes: {sitios.Count(s => s.Texts.Count > 0 && s.Types.Count > 0):N0}");
+    Console.WriteLine($"    sólo nombres          : {sitios.Count(s => s.Texts.Count > 0 && s.Types.Count == 0):N0}");
+    Console.WriteLine($"    sólo mensajes         : {sitios.Count(s => s.Texts.Count == 0 && s.Types.Count > 0):N0}");
+    Console.WriteLine();
+    Console.WriteLine("  los diez más cargados:");
+    foreach (var sitio in sitios.Take(10))
+    {
+        Console.WriteLine($"    {sitio.Method,-50} {sitio.Texts.Count,4} nombres  {sitio.Types.Count,4} mensajes");
+        if (sitio.Texts.Count > 0) Console.WriteLine($"      texto[0] : {sitio.Texts[0]}");
+        if (sitio.Types.Count > 0) Console.WriteLine($"      mensaje[0]: {sitio.Types[0]}");
+    }
+
+    // El caso que lo resolvería todo: un método con UN nombre y UN mensaje es una pareja directa.
+    var parejas = sitios.Where(s => s.Texts.Count == 1 && s.Types.Count == 1).ToList();
+    Console.WriteLine();
+    Console.WriteLine($"  métodos con exactamente un nombre y un mensaje: {parejas.Count:N0}");
+    foreach (var pareja in parejas.Take(8))
+        Console.WriteLine($"    {pareja.Types[0]}  =  {pareja.Texts[0]}");
+
+    return 0;
+}
+
+/// <summary>
 /// La capa Op: un nombre por opcode, generado del cliente y de las anclas.
 ///
 /// Es el último eslabón que faltaba. Sin esto el mapeo se queda en un fichero bonito: aplicarlo
@@ -251,7 +359,8 @@ static int Capa(string[] args)
     var antes = args.Length > 4 ? Messages(args[4]) : new HashSet<string>(StringComparer.Ordinal);
 
     var anclas = Dossier.Anchors(args[2]);
-    var barrido = Layer.Scan(args[3], ahora, antes, anclas);
+    var ligados = Layer.Bound("datos", Mapper.VersionOf(args[1]));
+    var barrido = Layer.Scan(args[3], ahora, antes, anclas, ligados);
 
     Console.WriteLine();
     Console.WriteLine($"  {barrido.Slots.Count:N0} opcodes de verdad, " +
@@ -284,7 +393,7 @@ static int Capa(string[] args)
     // Sin --aplicar sólo se enseña lo que cambiaría. Tocar cuarenta ficheros del emulador no es
     // algo que deba pasar por escribir una orden de más.
     bool aplicar = args.Contains("--aplicar");
-    var cambios = Layer.Apply(args[3], barrido.Slots, aplicar);
+    var cambios = Layer.Apply(args[3], barrido, aplicar);
 
     Console.WriteLine();
     Console.WriteLine($"  {cambios.Count:N0} líneas en {cambios.Select(c => c.File).Distinct().Count():N0} ficheros" +
@@ -950,4 +1059,69 @@ static void Contar(DescriptorProto message, ref int mensajes, ref int campos)
     mensajes++;
     campos += message.Field.Count;
     foreach (var anidado in message.NestedType) Contar(anidado, ref mensajes, ref campos);
+}
+
+/// <summary>Las tablas de valores por defecto, leídas del fichero a pelo.</summary>
+static void Crudo(string clientFolder)
+{
+    string path = Path.Combine(clientFolder, "Dofus_Data", "il2cpp_data", "Metadata", "global-metadata.dat");
+    byte[] file = File.ReadAllBytes(path);
+
+    var regiones = Header.Regions().ToDictionary(r => r.Name, r => r);
+    var datos = regiones["fieldAndParameterDefaultValueData"];
+    var cadenas = regiones["string"];
+    var campos = regiones["fields"];
+
+    foreach (string tabla in new[] { "fieldDefaultValues", "parameterDefaultValues" })
+    {
+        var region = regiones[tabla];
+        var entradas = Raw.Defaults(file, region.Offset, region.Size);
+
+        long desde = 21607975 - datos.Offset, hasta = 23382050 - datos.Offset;
+        int dentro = entradas.Count(e => e.Data >= desde && e.Data <= hasta);
+        Console.WriteLine("   CRUDO " + tabla + ": indices que APUNTAN al bloque de nombres = " + dentro);
+        Console.WriteLine("   CRUDO " + tabla + ": rango de indices " + entradas.Min(e => e.Data) + " .. " + entradas.Max(e => e.Data) + "  (bloque en " + desde + ".." + hasta + ")");
+        // El cruce definitivo: cada posición donde empieza un nombre real, contra cada índice de la
+        // tabla. Sin decodificar cadenas ni suponer formatos: sólo números.
+        var posiciones = new Dictionary<long, long>();
+        int cuantos = 0;
+        for (int i = 0; i + 10 < file.Length; i++)
+        {
+            if (file[i] != 'C' || file[i + 1] != 'o' || file[i + 2] != 'm' || file[i + 3] != '.' ||
+                file[i + 4] != 'A' || file[i + 5] != 'n' || file[i + 6] != 'k') continue;
+            cuantos++;
+            for (int d = 1; d <= 5; d++) posiciones[i - d - datos.Offset] = i;
+        }
+
+        var tocan = entradas.Where(e => posiciones.ContainsKey(e.Data)).ToList();
+        Console.WriteLine("   CRUCE " + tabla + ": " + cuantos + " nombres en el fichero, " +
+                          tocan.Count + " entradas apuntan a uno");
+
+        foreach (var e in tocan.Take(6))
+        {
+            long donde = posiciones[e.Data];
+            string texto = Raw.Name(file, donde, 0);
+            string nom = tabla.StartsWith("field", StringComparison.Ordinal)
+                ? Raw.Name(file, cadenas.Offset, Raw.FieldNameIndex(file, campos.Offset, e.Owner)) : "(par)";
+            Console.WriteLine("     campo «" + nom + "» -> " + texto[..Math.Min(90, texto.Length)]);
+        }
+        int aciertos = 0, muestra = 0, sueltas = 0;
+        foreach (var entrada in entradas)
+        {
+            string? texto = Raw.Text(file, datos.Offset + entrada.Data);
+            if (texto != null && sueltas < 5 && texto.Length > 3) { Console.WriteLine("   CRUDO ejemplo(" + tabla + "): " + texto.Substring(0, Math.Min(70, texto.Length))); sueltas++; }
+            if (texto == null || !texto.StartsWith("Com.Ankama", StringComparison.Ordinal)) continue;
+
+            aciertos++;
+            if (muestra++ < 4)
+            {
+                string nombre = tabla.StartsWith("field", StringComparison.Ordinal)
+                    ? Raw.Name(file, cadenas.Offset, Raw.FieldNameIndex(file, campos.Offset, entrada.Owner))
+                    : "(parámetro " + entrada.Owner + ")";
+                Console.WriteLine("   CRUDO " + tabla + ": campo «" + nombre + "» -> " + texto);
+            }
+        }
+        Console.WriteLine("   CRUDO " + tabla + ": " + entradas.Count.ToString("N0") + " entradas, " +
+                          aciertos.ToString("N0") + " con nombre real");
+    }
 }

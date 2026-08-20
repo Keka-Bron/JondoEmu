@@ -9,6 +9,18 @@ namespace Jondo.Unity.Launcher.Managers
         Zaap,
         Chest,
         Lottery,
+
+        /// <summary>El transporte corto dentro de Bonta y Brakmar.</summary>
+        Zaapi,
+
+        /// <summary>La papelera: el almacén público de lo que la gente tira.</summary>
+        Bin,
+
+        /// <summary>La puerta de la calle de una casa.</summary>
+        HouseDoor,
+
+        /// <summary>La puerta de dentro, la que devuelve a la calle.</summary>
+        HouseExit,
     }
 
     /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
@@ -90,7 +102,7 @@ namespace Jondo.Unity.Launcher.Managers
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var element in Interactives.ZaapElements(mapId))
-                    Register(mapId, element, Interactives.ZaapType,
+                    Register(mapId, element, Interactives.TypeOfZaap(mapId, element),
                         InteractiveActionKind.Zaap, Interactives.UseSkill);
             }
 
@@ -108,6 +120,36 @@ namespace Jondo.Unity.Launcher.Managers
                 if (element.Id != 0)
                     Register(mapId, element, Lottery.Type,
                         InteractiveActionKind.Lottery, Lottery.Skill);
+            }
+
+            // Los zaapis y las papeleras se reconocen por su GRÁFICO y son decenas, así que se
+            // registran en bloque en vez de uno a uno como el zaap o la lotería.
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var element in Zaapis.ElementsOn(mapId))
+                    Register(mapId, element, Zaapis.Type, InteractiveActionKind.Zaapi, Zaapis.UseSkill);
+            }
+
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var element in Bins.On(mapId))
+                    Register(mapId, element, Bins.Type, InteractiveActionKind.Bin, Bins.UseSkill);
+            }
+
+            // Las casas van en dos vueltas: las puertas de la calle, que están en mapas del mundo,
+            // y las de dentro, que están en interiores que no aparecen en Interactives.MapIds.
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var door in Houses.On(mapId))
+                    Register(mapId, new Interactives.Element(door.ElementId, door.Cell, door.Gfx),
+                             Houses.DoorType, InteractiveActionKind.HouseDoor, Houses.EnterSkill);
+            }
+
+            foreach (long interior in Houses.Interiors)
+            {
+                if (!Houses.TryGetExit(interior, out var exit)) continue;
+                Register(interior, new Interactives.Element(exit.ElementId, exit.Cell, exit.Gfx),
+                         Houses.ExitType, InteractiveActionKind.HouseExit, Houses.ExitSkill);
             }
 
             Console.WriteLine($"[Interactives] {_byElement.Count} elementos registrados.");

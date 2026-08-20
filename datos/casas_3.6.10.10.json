@@ -1,0 +1,1829 @@
+{
+ "8": {
+  "name": "Casa gigantesca de carnicero",
+  "nameId": 2523,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "9": {
+  "name": "Casa gigantesca de carnicero",
+  "nameId": 2290,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "10": {
+  "name": "Casa gigantesca de pescadero",
+  "nameId": 2326,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "11": {
+  "name": "Casa gigantesca de pescadero",
+  "nameId": 2555,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "12": {
+  "name": "Casa gigantesca de panadero",
+  "nameId": 2556,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "13": {
+  "name": "Casa gigantesca de panadero",
+  "nameId": 2321,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "14": {
+  "name": "Casa gigantesca de herrero",
+  "nameId": 2322,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "15": {
+  "name": "Casa gigantesca de herrero",
+  "nameId": 2319,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "16": {
+  "name": "Casa gigantesca de escultor",
+  "nameId": 2320,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "17": {
+  "name": "Casa gigantesca de escultor",
+  "nameId": 2323,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "18": {
+  "name": "Casa gigantesca de manitas",
+  "nameId": 2324,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "19": {
+  "name": "Casa gigantesca de manitas",
+  "nameId": 2553,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "20": {
+  "name": "Casa gigantesca de zapatero",
+  "nameId": 2315,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "21": {
+  "name": "Casa gigantesca de zapatero",
+  "nameId": 2544,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "22": {
+  "name": "Casa gigantesca de sastre",
+  "nameId": 2546,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "23": {
+  "name": "Casa gigantesca de sastre",
+  "nameId": 2316,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "36": {
+  "name": "Casa pequeña de carnicero",
+  "nameId": 2345,
+  "price": 2000000,
+  "gfx": 13,
+  "rooms": 2
+ },
+ "53": {
+  "name": "Casa pequeña de manitas",
+  "nameId": 2209,
+  "price": 2000000,
+  "gfx": 13,
+  "rooms": 2
+ },
+ "54": {
+  "name": "Casa pequeña de manitas",
+  "nameId": 2208,
+  "price": 2000000,
+  "gfx": 13,
+  "rooms": 2
+ },
+ "55": {
+  "name": "Casa pequeña de manitas",
+  "nameId": 2473,
+  "price": 2000000,
+  "gfx": 13,
+  "rooms": 2
+ },
+ "56": {
+  "name": "Casa mediana de manitas",
+  "nameId": 2211,
+  "price": 2500000,
+  "gfx": 14,
+  "rooms": 3
+ },
+ "57": {
+  "name": "Casa mediana de manitas",
+  "nameId": 2448,
+  "price": 2500000,
+  "gfx": 14,
+  "rooms": 3
+ },
+ "58": {
+  "name": "Casa grande de manitas",
+  "nameId": 2474,
+  "price": 3000000,
+  "gfx": 15,
+  "rooms": 3
+ },
+ "59": {
+  "name": "Casa grande de manitas",
+  "nameId": 2475,
+  "price": 3000000,
+  "gfx": 15,
+  "rooms": 3
+ },
+ "60": {
+  "name": "Casa gigantesca de manitas",
+  "nameId": 2466,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "61": {
+  "name": "Casa gigantesca de manitas",
+  "nameId": 2374,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "87": {
+  "name": "Casa gigantesca de pescador",
+  "nameId": 2376,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "88": {
+  "name": "Casa gigantesca de pescador",
+  "nameId": 2449,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "109": {
+  "name": "Casa gigantesca de carnicero",
+  "nameId": 2309,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "110": {
+  "name": "Casa gigantesca de carnicero",
+  "nameId": 2554,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "111": {
+  "name": "Casa gigantesca de zapatero",
+  "nameId": 2552,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "113": {
+  "name": "Casa gigantesca de joyero",
+  "nameId": 2372,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "116": {
+  "name": "Casa gigantesca de escultor",
+  "nameId": 2549,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "117": {
+  "name": "Casa gigantesca de panadero",
+  "nameId": 2550,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "118": {
+  "name": "Casa gigantesca de panadero",
+  "nameId": 2254,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "119": {
+  "name": "Casa gigantesca de herrero",
+  "nameId": 2548,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "120": {
+  "name": "Casa gigantesca de herrero",
+  "nameId": 2526,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "121": {
+  "name": "Casa gigantesca de pescadero",
+  "nameId": 2293,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "122": {
+  "name": "Casa gigantesca de pescadero",
+  "nameId": 2527,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "124": {
+  "name": "Casa gigantesca de sastre",
+  "nameId": 2529,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "137": {
+  "name": "Casa pequeña de carnicero",
+  "nameId": 2304,
+  "price": 2000000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "141": {
+  "name": "Casa mediana de carnicero",
+  "nameId": 2273,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "158": {
+  "name": "Casa pequeña de manitas",
+  "nameId": 2512,
+  "price": 2000000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "159": {
+  "name": "Casa pequeña de manitas",
+  "nameId": 2280,
+  "price": 2000000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "160": {
+  "name": "Casa pequeña de manitas",
+  "nameId": 2497,
+  "price": 2000000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "161": {
+  "name": "Casa mediana de manitas",
+  "nameId": 2496,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "162": {
+  "name": "Casa mediana de manitas",
+  "nameId": 2495,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "163": {
+  "name": "Casa grande de manitas",
+  "nameId": 2251,
+  "price": 3000000,
+  "gfx": 25,
+  "rooms": 3
+ },
+ "164": {
+  "name": "Casa grande de manitas",
+  "nameId": 2249,
+  "price": 3000000,
+  "gfx": 25,
+  "rooms": 3
+ },
+ "166": {
+  "name": "Casa gigantesca de manitas",
+  "nameId": 2492,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "169": {
+  "name": "Casa pequeña de leñador",
+  "nameId": 2256,
+  "price": 2000000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "174": {
+  "name": "Casa grande de leñador",
+  "nameId": 2257,
+  "price": 3000000,
+  "gfx": 25,
+  "rooms": 3
+ },
+ "191": {
+  "name": "Casa pequeña de pescador",
+  "nameId": 2357,
+  "price": 2000000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "206": {
+  "name": "Casa grande de sastre",
+  "nameId": 2537,
+  "price": 3000000,
+  "gfx": 25,
+  "rooms": 3
+ },
+ "209": {
+  "name": "Casa gigantesca de zapatero",
+  "nameId": 2540,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "210": {
+  "name": "Casa gigantesca de sastre",
+  "nameId": 2263,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "213": {
+  "name": "Casa grande de Sufokia",
+  "nameId": 2330,
+  "price": 2000000,
+  "gfx": 32,
+  "rooms": 3
+ },
+ "214": {
+  "name": "Casa grande de Sufokia",
+  "nameId": 2328,
+  "price": 2000000,
+  "gfx": 32,
+  "rooms": 3
+ },
+ "215": {
+  "name": "Casa pequeña de Sufokia",
+  "nameId": 2408,
+  "price": 1000000,
+  "gfx": 30,
+  "rooms": 2
+ },
+ "216": {
+  "name": "Casa pequeña de Sufokia",
+  "nameId": 2368,
+  "price": 1000000,
+  "gfx": 30,
+  "rooms": 2
+ },
+ "217": {
+  "name": "Casa pequeña de Sufokia",
+  "nameId": 2406,
+  "price": 1000000,
+  "gfx": 30,
+  "rooms": 2
+ },
+ "218": {
+  "name": "Casa pequeña de Sufokia",
+  "nameId": 2407,
+  "price": 1000000,
+  "gfx": 30,
+  "rooms": 2
+ },
+ "219": {
+  "name": "Casa pequeña de Sufokia",
+  "nameId": 2317,
+  "price": 1000000,
+  "gfx": 30,
+  "rooms": 2
+ },
+ "220": {
+  "name": "Casa pequeña de Sufokia",
+  "nameId": 2564,
+  "price": 1000000,
+  "gfx": 30,
+  "rooms": 2
+ },
+ "227": {
+  "name": "Casa grande de Sufokia",
+  "nameId": 2331,
+  "price": 2000000,
+  "gfx": 32,
+  "rooms": 3
+ },
+ "228": {
+  "name": "Casa grande de Sufokia",
+  "nameId": 2332,
+  "price": 2000000,
+  "gfx": 32,
+  "rooms": 3
+ },
+ "231": {
+  "name": "Casa elegante de Sufokia",
+  "nameId": 2353,
+  "price": 5000000,
+  "gfx": 32,
+  "rooms": 5
+ },
+ "232": {
+  "name": "Casa pequeña de ganadero",
+  "nameId": 2437,
+  "price": 1000000,
+  "gfx": 19,
+  "rooms": 1
+ },
+ "233": {
+  "name": "Casa pequeña de ganadero",
+  "nameId": 2573,
+  "price": 1000000,
+  "gfx": 19,
+  "rooms": 1
+ },
+ "234": {
+  "name": "Casa mediana de ganadero",
+  "nameId": 2571,
+  "price": 1000000,
+  "gfx": 20,
+  "rooms": 1
+ },
+ "235": {
+  "name": "Casa grande de ganadero",
+  "nameId": 2348,
+  "price": 2000000,
+  "gfx": 21,
+  "rooms": 2
+ },
+ "236": {
+  "name": "Espléndida casa de ganadero",
+  "nameId": 2341,
+  "price": 2500000,
+  "gfx": 22,
+  "rooms": 2
+ },
+ "237": {
+  "name": "Casa pequeña de Madrestam",
+  "nameId": 2344,
+  "price": 1000000,
+  "gfx": 17,
+  "rooms": 1
+ },
+ "239": {
+  "name": "Casa pequeña de Madrestam",
+  "nameId": 2342,
+  "price": 1000000,
+  "gfx": 17,
+  "rooms": 1
+ },
+ "249": {
+  "name": "Casa grande de Madrestam",
+  "nameId": 2380,
+  "price": 1500000,
+  "gfx": 18,
+  "rooms": 2
+ },
+ "255": {
+  "name": "Casa grande de Madrestam",
+  "nameId": 2513,
+  "price": 2000000,
+  "gfx": 18,
+  "rooms": 3
+ },
+ "257": {
+  "name": "Casa grande de Madrestam",
+  "nameId": 2279,
+  "price": 1500000,
+  "gfx": 18,
+  "rooms": 2
+ },
+ "258": {
+  "name": "Casa pequeña del pueblo de la canopea",
+  "nameId": 2278,
+  "price": 1000000,
+  "gfx": 33,
+  "rooms": 1
+ },
+ "259": {
+  "name": "Casa mediana del pueblo de la canopea",
+  "nameId": 2509,
+  "price": 2000000,
+  "gfx": 34,
+  "rooms": 2
+ },
+ "260": {
+  "name": "Casa grande del pueblo de la canopea",
+  "nameId": 2292,
+  "price": 3000000,
+  "gfx": 35,
+  "rooms": 3
+ },
+ "261": {
+  "name": "Casa grande de pueblo costero",
+  "nameId": 2294,
+  "price": 2000000,
+  "gfx": 38,
+  "rooms": 1
+ },
+ "262": {
+  "name": "Casa mediana de pueblo costero",
+  "nameId": 2289,
+  "price": 1500000,
+  "gfx": 37,
+  "rooms": 1
+ },
+ "263": {
+  "name": "Casa pequeña de pueblo costero",
+  "nameId": 2291,
+  "price": 1000000,
+  "gfx": 36,
+  "rooms": 1
+ },
+ "264": {
+  "name": "Casa pequeña del pueblo de Pandala",
+  "nameId": 2524,
+  "price": 1500000,
+  "gfx": 27,
+  "rooms": 2
+ },
+ "265": {
+  "name": "Casa pequeña del pueblo de Pandala",
+  "nameId": 2525,
+  "price": 1500000,
+  "gfx": 27,
+  "rooms": 2
+ },
+ "266": {
+  "name": "Casa mediana del pueblo de Pandala",
+  "nameId": 2519,
+  "price": 2000000,
+  "gfx": 29,
+  "rooms": 2
+ },
+ "267": {
+  "name": "Casa mediana del pueblo de Pandala",
+  "nameId": 2520,
+  "price": 2000000,
+  "gfx": 29,
+  "rooms": 2
+ },
+ "268": {
+  "name": "Casa grande del pueblo de Pandala",
+  "nameId": 2521,
+  "price": 2500000,
+  "gfx": 28,
+  "rooms": 3
+ },
+ "269": {
+  "name": "Casa grande del pueblo de Pandala",
+  "nameId": 2522,
+  "price": 2500000,
+  "gfx": 28,
+  "rooms": 3
+ },
+ "270": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 2352,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "271": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 2301,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "272": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 2302,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "273": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 2533,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "274": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 2300,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "275": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 2531,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "276": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 2532,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "277": {
+  "name": "Casa mediana de Astrub",
+  "nameId": 2299,
+  "price": 2500000,
+  "gfx": 3,
+  "rooms": 3
+ },
+ "278": {
+  "name": "Casa mediana de Astrub",
+  "nameId": 2530,
+  "price": 2500000,
+  "gfx": 3,
+  "rooms": 3
+ },
+ "279": {
+  "name": "Casa grande de Astrub",
+  "nameId": 2444,
+  "price": 3500000,
+  "gfx": 4,
+  "rooms": 3
+ },
+ "280": {
+  "name": "Casa grande de Astrub",
+  "nameId": 2238,
+  "price": 3500000,
+  "gfx": 4,
+  "rooms": 3
+ },
+ "281": {
+  "name": "Casa del ferrocarril abandonado",
+  "nameId": 2391,
+  "price": 1000000,
+  "gfx": 6,
+  "rooms": 1
+ },
+ "282": {
+  "name": "Casa del ferrocarril abandonado",
+  "nameId": 2390,
+  "price": 1000000,
+  "gfx": 6,
+  "rooms": 1
+ },
+ "283": {
+  "name": "Albergue del pueblo Amakna",
+  "nameId": 2433,
+  "price": 1000000,
+  "gfx": 9,
+  "rooms": 1
+ },
+ "284": {
+  "name": "Casa pequeña del pueblo de Amakna",
+  "nameId": 2224,
+  "price": 1500000,
+  "gfx": 6,
+  "rooms": 2
+ },
+ "285": {
+  "name": "Casa pequeña del pueblo de Amakna",
+  "nameId": 2415,
+  "price": 1500000,
+  "gfx": 6,
+  "rooms": 2
+ },
+ "286": {
+  "name": "Casa pequeña del pueblo de Amakna",
+  "nameId": 2414,
+  "price": 1000000,
+  "gfx": 6,
+  "rooms": 1
+ },
+ "287": {
+  "name": "Casa pequeña del pueblo de Amakna",
+  "nameId": 2413,
+  "price": 1000000,
+  "gfx": 6,
+  "rooms": 1
+ },
+ "288": {
+  "name": "Casa grande del pueblo de Amakna",
+  "nameId": 2482,
+  "price": 2000000,
+  "gfx": 8,
+  "rooms": 3
+ },
+ "289": {
+  "name": "Casa grande del pueblo de Amakna",
+  "nameId": 2392,
+  "price": 2000000,
+  "gfx": 8,
+  "rooms": 3
+ },
+ "290": {
+  "name": "Casa grande de maestro",
+  "nameId": 2434,
+  "price": 2000000,
+  "gfx": 8,
+  "rooms": 3
+ },
+ "291": {
+  "name": "Choza del pueblo de Amakna",
+  "nameId": 2446,
+  "price": 1500000,
+  "gfx": 59,
+  "rooms": 2
+ },
+ "292": {
+  "name": "Casa mediana del pueblo de Amakna",
+  "nameId": 2226,
+  "price": 2000000,
+  "gfx": 7,
+  "rooms": 3
+ },
+ "293": {
+  "name": "Choza del pueblo de Amakna",
+  "nameId": 2365,
+  "price": 1500000,
+  "gfx": 59,
+  "rooms": 2
+ },
+ "294": {
+  "name": "Casa del claro de Brus Bulguro",
+  "nameId": 2393,
+  "price": 1500000,
+  "gfx": 7,
+  "rooms": 2
+ },
+ "295": {
+  "name": "Casa del claro de Brus Bulguro",
+  "nameId": 2241,
+  "price": 1000000,
+  "gfx": 7,
+  "rooms": 1
+ },
+ "296": {
+  "name": "Casa grande del bosque de Amakna",
+  "nameId": 2233,
+  "price": 1000000,
+  "gfx": 8,
+  "rooms": 1
+ },
+ "297": {
+  "name": "Casa grande del bosque de Amakna",
+  "nameId": 2452,
+  "price": 1500000,
+  "gfx": 8,
+  "rooms": 2
+ },
+ "298": {
+  "name": "Casa de porcos",
+  "nameId": 2245,
+  "price": 1500000,
+  "gfx": 7,
+  "rooms": 1
+ },
+ "299": {
+  "name": "Casa lujosa de las Llanuras Herbosas",
+  "nameId": 1175729,
+  "price": 5500000,
+  "gfx": 58,
+  "rooms": 5
+ },
+ "300": {
+  "name": "Casa gigantesca de las Llanuras Herbosas",
+  "nameId": 1175728,
+  "price": 4500000,
+  "gfx": 57,
+  "rooms": 4
+ },
+ "301": {
+  "name": "Casa pequeña de escarahoja",
+  "nameId": 2325,
+  "price": 1000000,
+  "gfx": 5,
+  "rooms": 1
+ },
+ "302": {
+  "name": "Casa pequeña de montaña",
+  "nameId": 2476,
+  "price": 1000000,
+  "gfx": 5,
+  "rooms": 1
+ },
+ "303": {
+  "name": "Casa pequeña del castillo de Amakna",
+  "nameId": 2220,
+  "price": 1500000,
+  "gfx": 10,
+  "rooms": 2
+ },
+ "304": {
+  "name": "Casa pequeña del castillo de Amakna",
+  "nameId": 2450,
+  "price": 1500000,
+  "gfx": 10,
+  "rooms": 2
+ },
+ "305": {
+  "name": "Casa pequeña del castillo de Amakna",
+  "nameId": 2219,
+  "price": 1500000,
+  "gfx": 10,
+  "rooms": 2
+ },
+ "306": {
+  "name": "Casa pequeña del castillo de Amakna",
+  "nameId": 2478,
+  "price": 1500000,
+  "gfx": 10,
+  "rooms": 2
+ },
+ "307": {
+  "name": "Casa mediana del castillo de Amakna",
+  "nameId": 2479,
+  "price": 2000000,
+  "gfx": 11,
+  "rooms": 2
+ },
+ "308": {
+  "name": "Casa mediana del castillo de Amakna",
+  "nameId": 2236,
+  "price": 2000000,
+  "gfx": 11,
+  "rooms": 2
+ },
+ "309": {
+  "name": "Casa mediana del castillo de Amakna",
+  "nameId": 2235,
+  "price": 2000000,
+  "gfx": 11,
+  "rooms": 2
+ },
+ "310": {
+  "name": "Casa mediana del castillo de Amakna",
+  "nameId": 2212,
+  "price": 2000000,
+  "gfx": 11,
+  "rooms": 2
+ },
+ "311": {
+  "name": "Casa grande del castillo de Amakna",
+  "nameId": 2213,
+  "price": 2500000,
+  "gfx": 12,
+  "rooms": 4
+ },
+ "312": {
+  "name": "Casa grande del castillo de Amakna",
+  "nameId": 2215,
+  "price": 3000000,
+  "gfx": 12,
+  "rooms": 4
+ },
+ "313": {
+  "name": "Casa grande del castillo de Amakna",
+  "nameId": 2234,
+  "price": 2500000,
+  "gfx": 12,
+  "rooms": 4
+ },
+ "314": {
+  "name": "El palacio de los lagos",
+  "nameId": 2445,
+  "price": 60000000,
+  "gfx": 60,
+  "rooms": 15
+ },
+ "316": {
+  "name": "Casa magnífica del pueblo de Amakna",
+  "nameId": 2217,
+  "price": 4000000,
+  "gfx": 7,
+  "rooms": 4
+ },
+ "317": {
+  "name": "Casa pequeña del burgo de Frigost",
+  "nameId": 2419,
+  "price": 2000000,
+  "gfx": 39,
+  "rooms": 2
+ },
+ "318": {
+  "name": "Casa pequeña del burgo de Frigost",
+  "nameId": 2420,
+  "price": 2000000,
+  "gfx": 39,
+  "rooms": 2
+ },
+ "320": {
+  "name": "Casa pequeña del burgo de Frigost",
+  "nameId": 2488,
+  "price": 2000000,
+  "gfx": 39,
+  "rooms": 2
+ },
+ "321": {
+  "name": "Casa mediana del burgo de Frigost",
+  "nameId": 2485,
+  "price": 2500000,
+  "gfx": 40,
+  "rooms": 3
+ },
+ "322": {
+  "name": "Casa mediana del burgo de Frigost",
+  "nameId": 2232,
+  "price": 2500000,
+  "gfx": 40,
+  "rooms": 3
+ },
+ "323": {
+  "name": "Casa mediana del burgo de Frigost",
+  "nameId": 2421,
+  "price": 2500000,
+  "gfx": 40,
+  "rooms": 3
+ },
+ "324": {
+  "name": "Casa mediana del burgo de Frigost",
+  "nameId": 2484,
+  "price": 2500000,
+  "gfx": 40,
+  "rooms": 3
+ },
+ "325": {
+  "name": "Casa grande del burgo de Frigost",
+  "nameId": 2432,
+  "price": 3000000,
+  "gfx": 41,
+  "rooms": 4
+ },
+ "326": {
+  "name": "Casa grande del burgo de Frigost",
+  "nameId": 2493,
+  "price": 3000000,
+  "gfx": 41,
+  "rooms": 4
+ },
+ "327": {
+  "name": "Casa grande del burgo de Frigost",
+  "nameId": 2243,
+  "price": 3000000,
+  "gfx": 41,
+  "rooms": 4
+ },
+ "328": {
+  "name": "Casa grande del burgo de Frigost",
+  "nameId": 2240,
+  "price": 3000000,
+  "gfx": 41,
+  "rooms": 4
+ },
+ "329": {
+  "name": "Casa gigantesca de pescador",
+  "nameId": 2363,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "330": {
+  "name": "Casa gigantesca de panadero",
+  "nameId": 2360,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "331": {
+  "name": "Casa gigantesca de minero",
+  "nameId": 2362,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "332": {
+  "name": "Casa gigantesca de carnicero",
+  "nameId": 2358,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "333": {
+  "name": "Casa gigantesca de sastre",
+  "nameId": 2379,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "334": {
+  "name": "Casa gigantesca de zapatero",
+  "nameId": 2431,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "335": {
+  "name": "Casa gigantesca de herrero",
+  "nameId": 2361,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "336": {
+  "name": "Casa gigantesca de alquimista del burgo de Frigost",
+  "nameId": 2354,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "337": {
+  "name": "Casa gigantesca de manitas",
+  "nameId": 2483,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "338": {
+  "name": "Casa gigantesca de joyero",
+  "nameId": 2355,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "339": {
+  "name": "Casa gigantesca de escultor",
+  "nameId": 2364,
+  "price": 5000000,
+  "gfx": 42,
+  "rooms": 4
+ },
+ "340": {
+  "name": "Casa pequeña del burgo de Frigost",
+  "nameId": 2260,
+  "price": 2000000,
+  "gfx": 39,
+  "rooms": 2
+ },
+ "341": {
+  "name": "Cabaña del puerto de Frigost",
+  "nameId": 2356,
+  "price": 1000000,
+  "gfx": 43,
+  "rooms": 1
+ },
+ "342": {
+  "name": "Cabaña del puerto de Frigost",
+  "nameId": 2441,
+  "price": 1000000,
+  "gfx": 43,
+  "rooms": 1
+ },
+ "343": {
+  "name": "Cabaña del puerto de Frigost",
+  "nameId": 2442,
+  "price": 1000000,
+  "gfx": 43,
+  "rooms": 1
+ },
+ "344": {
+  "name": "Cabaña del puerto de Frigost",
+  "nameId": 2443,
+  "price": 1000000,
+  "gfx": 43,
+  "rooms": 1
+ },
+ "345": {
+  "name": "Casa pequeña del puerto de Frigost",
+  "nameId": 2416,
+  "price": 2000000,
+  "gfx": 44,
+  "rooms": 2
+ },
+ "346": {
+  "name": "Casa pequeña del puerto de Frigost",
+  "nameId": 2500,
+  "price": 2000000,
+  "gfx": 44,
+  "rooms": 2
+ },
+ "347": {
+  "name": "Casa pequeña del puerto de Frigost",
+  "nameId": 2503,
+  "price": 2000000,
+  "gfx": 44,
+  "rooms": 2
+ },
+ "348": {
+  "name": "Casa pequeña del puerto de Frigost",
+  "nameId": 2264,
+  "price": 2000000,
+  "gfx": 44,
+  "rooms": 2
+ },
+ "349": {
+  "name": "Casa mediana del puerto de Frigost",
+  "nameId": 2440,
+  "price": 3000000,
+  "gfx": 45,
+  "rooms": 3
+ },
+ "350": {
+  "name": "Casa mediana del puerto de Frigost",
+  "nameId": 2439,
+  "price": 3000000,
+  "gfx": 45,
+  "rooms": 3
+ },
+ "351": {
+  "name": "Casa mediana del puerto de Frigost",
+  "nameId": 2494,
+  "price": 3000000,
+  "gfx": 45,
+  "rooms": 3
+ },
+ "352": {
+  "name": "Casa mediana del puerto de Frigost",
+  "nameId": 2247,
+  "price": 3000000,
+  "gfx": 45,
+  "rooms": 3
+ },
+ "353": {
+  "name": "Mansión de El Pueblo Sepultado",
+  "nameId": 2422,
+  "price": 45000000,
+  "gfx": 50,
+  "rooms": 13
+ },
+ "354": {
+  "name": "Casa pequeña de El Pueblo Sepultado",
+  "nameId": 2427,
+  "price": 2000000,
+  "gfx": 46,
+  "rooms": 2
+ },
+ "355": {
+  "name": "Casa pequeña de El Pueblo Sepultado",
+  "nameId": 2428,
+  "price": 2000000,
+  "gfx": 46,
+  "rooms": 2
+ },
+ "356": {
+  "name": "Casa mediana de El Pueblo Sepultado",
+  "nameId": 2429,
+  "price": 2500000,
+  "gfx": 47,
+  "rooms": 2
+ },
+ "357": {
+  "name": "Casa grande de El Pueblo Sepultado",
+  "nameId": 2424,
+  "price": 3000000,
+  "gfx": 48,
+  "rooms": 3
+ },
+ "358": {
+  "name": "Casa grande de El Pueblo Sepultado",
+  "nameId": 2426,
+  "price": 3000000,
+  "gfx": 48,
+  "rooms": 3
+ },
+ "359": {
+  "name": "Casa gigantesca de El Pueblo Sepultado",
+  "nameId": 2425,
+  "price": 5000000,
+  "gfx": 49,
+  "rooms": 4
+ },
+ "362": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 94476,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "363": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 94474,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "364": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 94472,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "365": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 94471,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "366": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 94470,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "367": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 94469,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "368": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 94468,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "369": {
+  "name": "Casa mediana de Astrub",
+  "nameId": 94478,
+  "price": 2500000,
+  "gfx": 3,
+  "rooms": 3
+ },
+ "370": {
+  "name": "Casa mediana de Astrub",
+  "nameId": 94467,
+  "price": 2500000,
+  "gfx": 3,
+  "rooms": 3
+ },
+ "371": {
+  "name": "Casa pequeña de ganadero",
+  "nameId": 94466,
+  "price": 1000000,
+  "gfx": 19,
+  "rooms": 1
+ },
+ "372": {
+  "name": "Casa pequeña de ganadero",
+  "nameId": 94475,
+  "price": 1000000,
+  "gfx": 19,
+  "rooms": 1
+ },
+ "373": {
+  "name": "Casa grande de ganadero",
+  "nameId": 94473,
+  "price": 2000000,
+  "gfx": 21,
+  "rooms": 2
+ },
+ "374": {
+  "name": "Espléndida casa de ganadero",
+  "nameId": 94477,
+  "price": 2500000,
+  "gfx": 22,
+  "rooms": 2
+ },
+ "376": {
+  "name": "Granja de Tainela",
+  "nameId": 347438,
+  "price": 2500000,
+  "gfx": 2,
+  "rooms": 3
+ },
+ "377": {
+  "name": "Granja de Tainela",
+  "nameId": 347440,
+  "price": 2500000,
+  "gfx": 2,
+  "rooms": 3
+ },
+ "378": {
+  "name": "Granja de Tainela",
+  "nameId": 347439,
+  "price": 2500000,
+  "gfx": 2,
+  "rooms": 3
+ },
+ "379": {
+  "name": "Granja de Tainela",
+  "nameId": 347441,
+  "price": 2500000,
+  "gfx": 2,
+  "rooms": 3
+ },
+ "380": {
+  "name": "Granja de Tainela",
+  "nameId": 347437,
+  "price": 2500000,
+  "gfx": 2,
+  "rooms": 3
+ },
+ "381": {
+  "name": "Granja de Tainela",
+  "nameId": 347436,
+  "price": 2500000,
+  "gfx": 2,
+  "rooms": 3
+ },
+ "382": {
+  "name": "Granja de Tainela",
+  "nameId": 347435,
+  "price": 2500000,
+  "gfx": 2,
+  "rooms": 3
+ },
+ "383": {
+  "name": "Madriguera pequeña de kanig",
+  "nameId": 387045,
+  "price": 1000000,
+  "gfx": 51,
+  "rooms": 1
+ },
+ "384": {
+  "name": "Madriguera pequeña de kanig",
+  "nameId": 387048,
+  "price": 1000000,
+  "gfx": 51,
+  "rooms": 1
+ },
+ "385": {
+  "name": "Madriguera tradicional de kanig",
+  "nameId": 387047,
+  "price": 1500000,
+  "gfx": 51,
+  "rooms": 2
+ },
+ "386": {
+  "name": "Madriguera grande de kanig",
+  "nameId": 387046,
+  "price": 2000000,
+  "gfx": 51,
+  "rooms": 3
+ },
+ "388": {
+  "name": "Casa pequeña de pueblo costero",
+  "nameId": 666639,
+  "price": 1000000,
+  "gfx": 36,
+  "rooms": 1
+ },
+ "389": {
+  "name": "Casa mediana de pueblo costero",
+  "nameId": 666640,
+  "price": 1500000,
+  "gfx": 37,
+  "rooms": 1
+ },
+ "390": {
+  "name": "Casa grande de pueblo costero",
+  "nameId": 666644,
+  "price": 2000000,
+  "gfx": 38,
+  "rooms": 1
+ },
+ "391": {
+  "name": "Casa pequeña del pueblo de la canopea",
+  "nameId": 666643,
+  "price": 1000000,
+  "gfx": 33,
+  "rooms": 1
+ },
+ "392": {
+  "name": "Casa mediana del pueblo de la canopea",
+  "nameId": 666641,
+  "price": 2000000,
+  "gfx": 34,
+  "rooms": 2
+ },
+ "393": {
+  "name": "Casa grande del pueblo de la canopea",
+  "nameId": 666642,
+  "price": 3000000,
+  "gfx": 35,
+  "rooms": 3
+ },
+ "394": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 750638,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "395": {
+  "name": "Casa muy pequeña de Astrub",
+  "nameId": 750644,
+  "price": 1000000,
+  "gfx": 2,
+  "rooms": 1
+ },
+ "396": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 750648,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "397": {
+  "name": "Casa pequeña de Astrub",
+  "nameId": 750652,
+  "price": 1500000,
+  "gfx": 2,
+  "rooms": 2
+ },
+ "398": {
+  "name": "Casa mediana de Astrub",
+  "nameId": 750681,
+  "price": 2500000,
+  "gfx": 3,
+  "rooms": 3
+ },
+ "399": {
+  "name": "Casa mediana de Astrub",
+  "nameId": 750682,
+  "price": 2500000,
+  "gfx": 3,
+  "rooms": 3
+ },
+ "400": {
+  "name": "Casa grande de Astrub",
+  "nameId": 750684,
+  "price": 3500000,
+  "gfx": 4,
+  "rooms": 3
+ },
+ "401": {
+  "name": "Casa pequeña del pueblo de Pandala",
+  "nameId": 843247,
+  "price": 1500000,
+  "gfx": 27,
+  "rooms": 2
+ },
+ "402": {
+  "name": "Casa pequeña del pueblo de Pandala",
+  "nameId": 843248,
+  "price": 1500000,
+  "gfx": 27,
+  "rooms": 2
+ },
+ "403": {
+  "name": "Casa mediana del pueblo de Pandala",
+  "nameId": 843249,
+  "price": 2000000,
+  "gfx": 29,
+  "rooms": 2
+ },
+ "404": {
+  "name": "Casa mediana del pueblo de Pandala",
+  "nameId": 843250,
+  "price": 2000000,
+  "gfx": 29,
+  "rooms": 2
+ },
+ "405": {
+  "name": "Casa grande del pueblo de Pandala",
+  "nameId": 843251,
+  "price": 2500000,
+  "gfx": 28,
+  "rooms": 3
+ },
+ "406": {
+  "name": "Casa grande del pueblo de Pandala",
+  "nameId": 843252,
+  "price": 2500000,
+  "gfx": 28,
+  "rooms": 3
+ },
+ "407": {
+  "name": "Casa pequeña de Fuegodala",
+  "nameId": 874124,
+  "price": 2500000,
+  "gfx": 55,
+  "rooms": 2
+ },
+ "408": {
+  "name": "Casa grande de Fuegodala",
+  "nameId": 874136,
+  "price": 3500000,
+  "gfx": 54,
+  "rooms": 3
+ },
+ "409": {
+  "name": "Casa grande de Tierradala",
+  "nameId": 875252,
+  "price": 4500000,
+  "gfx": 52,
+  "rooms": 3
+ },
+ "410": {
+  "name": "Casa pequeña de Akwadala",
+  "nameId": 875417,
+  "price": 2000000,
+  "gfx": 53,
+  "rooms": 2
+ },
+ "411": {
+  "name": "Casa pequeña de Akwadala",
+  "nameId": 875418,
+  "price": 2000000,
+  "gfx": 53,
+  "rooms": 2
+ },
+ "412": {
+  "name": "Casa pequeña de Airedala",
+  "nameId": 875679,
+  "price": 2000000,
+  "gfx": 56,
+  "rooms": 2
+ },
+ "413": {
+  "name": "Casa pequeña de Airedala",
+  "nameId": 875680,
+  "price": 2000000,
+  "gfx": 56,
+  "rooms": 2
+ },
+ "414": {
+  "name": "Casa gigantesca de joyero",
+  "nameId": 919207,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "415": {
+  "name": "Casa gigantesca de carnicero",
+  "nameId": 919210,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "416": {
+  "name": "Casa gigantesca de panadero",
+  "nameId": 919225,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "417": {
+  "name": "Casa gigantesca de manitas",
+  "nameId": 919226,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "418": {
+  "name": "Casa gigantesca de escultor",
+  "nameId": 919232,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "419": {
+  "name": "Casa gigantesca de zapatero",
+  "nameId": 919234,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "420": {
+  "name": "Casa gigantesca de herrero",
+  "nameId": 919705,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "421": {
+  "name": "Casa gigantesca de pescador",
+  "nameId": 919237,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "422": {
+  "name": "Casa gigantesca de sastre",
+  "nameId": 919238,
+  "price": 5000000,
+  "gfx": 26,
+  "rooms": 4
+ },
+ "423": {
+  "name": "Casa grande de Brakmar",
+  "nameId": 919481,
+  "price": 2500000,
+  "gfx": 25,
+  "rooms": 3
+ },
+ "424": {
+  "name": "Casa grande de Brakmar",
+  "nameId": 919482,
+  "price": 2500000,
+  "gfx": 25,
+  "rooms": 3
+ },
+ "425": {
+  "name": "Casa mediana de joyero",
+  "nameId": 919278,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "426": {
+  "name": "Casa mediana de carnicero",
+  "nameId": 919296,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "427": {
+  "name": "Casa mediana de panadero",
+  "nameId": 919305,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "428": {
+  "name": "Casa mediana de Brakmar",
+  "nameId": 919483,
+  "price": 2000000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "429": {
+  "name": "Casa mediana de escultor",
+  "nameId": 919311,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "430": {
+  "name": "Casa mediana de zapatero",
+  "nameId": 919312,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "431": {
+  "name": "Casa mediana de herrero",
+  "nameId": 919314,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "432": {
+  "name": "Casa mediana de sastre",
+  "nameId": 919315,
+  "price": 2500000,
+  "gfx": 24,
+  "rooms": 3
+ },
+ "433": {
+  "name": "Casa pequeña de Brakmar",
+  "nameId": 919485,
+  "price": 1500000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "434": {
+  "name": "Casa pequeña de Brakmar",
+  "nameId": 919486,
+  "price": 1500000,
+  "gfx": 23,
+  "rooms": 2
+ },
+ "435": {
+  "name": "Casa gigantesca de joyero",
+  "nameId": 920202,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "436": {
+  "name": "Casa gigantesca de carnicero",
+  "nameId": 920206,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "437": {
+  "name": "Casa gigantesca de panadero",
+  "nameId": 920211,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "438": {
+  "name": "Casa gigantesca de escultor",
+  "nameId": 920218,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "439": {
+  "name": "Casa gigantesca de zapatero",
+  "nameId": 920219,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "440": {
+  "name": "Casa gigantesca de herrero",
+  "nameId": 920220,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "441": {
+  "name": "Casa gigantesca de sastre",
+  "nameId": 920221,
+  "price": 5000000,
+  "gfx": 16,
+  "rooms": 4
+ },
+ "442": {
+  "name": "Casa grande de Bonta",
+  "nameId": 920222,
+  "price": 2500000,
+  "gfx": 15,
+  "rooms": 3
+ },
+ "443": {
+  "name": "Casa grande de Bonta",
+  "nameId": 920223,
+  "price": 2500000,
+  "gfx": 15,
+  "rooms": 3
+ },
+ "444": {
+  "name": "Casa mediana de herrero",
+  "nameId": 920225,
+  "price": 2500000,
+  "gfx": 14,
+  "rooms": 3
+ },
+ "445": {
+  "name": "Casa mediana de Bonta",
+  "nameId": 920226,
+  "price": 2000000,
+  "gfx": 14,
+  "rooms": 3
+ },
+ "446": {
+  "name": "Casa pequeña de Bonta",
+  "nameId": 920227,
+  "price": 1500000,
+  "gfx": 13,
+  "rooms": 2
+ },
+ "447": {
+  "name": "Casa pequeña de Bonta",
+  "nameId": 920228,
+  "price": 1500000,
+  "gfx": 13,
+  "rooms": 2
+ }
+}

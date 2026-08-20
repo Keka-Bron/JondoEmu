@@ -56,7 +56,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task SpendAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? kum = ConnectionProtocol.ReadPayload(payload, Op.StatsUpgradeRequestMessage);
+            byte[]? kum = ConnectionProtocol.ReadPayload(payload, Op.Kum);
             if (kum == null) return;
 
             // What the whole sheet is meant to look like: the characteristics the message does not
@@ -136,9 +136,9 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             long capacity = Pods();
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.InventoryWeightMessage, ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(0, capacity)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
+                ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
         }
 
         /// <summary>

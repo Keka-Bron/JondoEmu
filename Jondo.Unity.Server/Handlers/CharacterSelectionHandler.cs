@@ -158,7 +158,7 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 Console.WriteLine("[Game Node] Received Character List Request (ksx) [3.6] - Waiting for kpa");
             }
-            else if (payloadStr.Contains(Op.Uri(Op.CharactersListRequestMessage)))
+            else if (payloadStr.Contains(Op.Uri(Op.Kpa)))
             {
                 Console.WriteLine("[Game Node] Received Character List Request (kpa) [3.6] - Sending Character List");
                 
@@ -219,9 +219,9 @@ namespace Jondo.Unity.Launcher.Handlers
             long characterIdToLoad = 0;
             try
             {
-                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, Op.CharacterSelectionMessage)
+                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, Op.Kvw)
                                     ?? ConnectionProtocol.ReadPayload(framePayload, Op.Ksl)
-                                    ?? ConnectionProtocol.ReadPayload(framePayload, Op.CharacterFirstSelectionMessage);
+                                    ?? ConnectionProtocol.ReadPayload(framePayload, Op.Kvl);
                 if (selection != null && selection.Length > 0)
                 {
                     var msg = ProtoMessage.Parse(selection);

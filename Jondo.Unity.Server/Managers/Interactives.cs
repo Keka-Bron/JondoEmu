@@ -33,6 +33,22 @@ namespace Jondo.Unity.Launcher.Managers
         public const int UseSkill = 114;
 
         /// <summary>
+        /// El tipo del VESTIGIO de zaap, que no es el del zaap.
+        ///
+        /// El dibujo 74685 estaba declarado con tipo 16, el del zaap, y las capturas dicen 359: el
+        /// único elemento con ese dibujo que sale en un jss lo lleva las cinco veces, y el 16 no
+        /// aparece nunca para él. La habilidad sí es la misma 114, y el cliente contesta con su
+        /// iwo igual, así que el 359 no lo hace inclicable: lo llama por su nombre.
+        ///
+        /// Un vestigio no es un zaap apagado. Es el sitio donde aparece una anomalía temporal; ver
+        /// <see cref="Anomalies"/>.
+        /// </summary>
+        public const int VestigeType = 359;
+
+        /// <summary>El dibujo del vestigio.</summary>
+        public const int VestigeGfx = 74685;
+
+        /// <summary>
         /// Los dibujos del zaap, que es lo que lo distingue del resto de elementos del mapa.
         ///
         /// Son dos porque hay dos modelos: el de siempre y el de las zonas nuevas. No están
@@ -40,6 +56,26 @@ namespace Jondo.Unity.Launcher.Managers
         /// el primero y 15 el segundo. Al que queda, el 62, no se le encuentra por aquí.
         /// </summary>
         private static readonly int[] ZaapGfx = { 301199, 74685 };
+
+        /// <summary>
+        /// Dibujos que abren la lista de zaaps pero a los que no se llega nunca.
+        ///
+        /// El 37493 sale en tres mapas y en ninguno de los tres dice la tabla de zaaps del cliente
+        /// que haya zaap. Como <see cref="ZaapOf"/> exige estar en esa tabla, el elemento no se
+        /// declaraba: tres zaaps donde el jugador clicaba y no pasaba nada.
+        ///
+        /// Que son zaaps lo dicen las capturas, no una suposición: el recibidor de gremio —mapa
+        /// 99093249, elemento 540375, casilla 227— sale seis veces con el par 114 / 16, que es
+        /// exactamente el del zaap de siempre. Los otros dos, la salida de la Dimensión de Jelifica
+        /// y un mapa de la Jungla de Osamodas, llevan el mismo dibujo y no aparecen en ninguna
+        /// captura; se reconocen por el dibujo igual que los 106 del 301199, que es como se
+        /// identifica aquí todo lo demás.
+        ///
+        /// Van aparte de <see cref="ZaapGfx"/> a propósito: de estos se SALE, pero no se LLEGA. Al
+        /// no estar en la tabla de zaaps, la lista de destinos del viaje no los ofrece nunca, y así
+        /// debe ser. Es el mismo trato que ya tiene el zaap del merkasako.
+        /// </summary>
+        private static readonly int[] DepartureOnlyGfx = { 37493 };
 
         public readonly struct Element
         {
@@ -90,8 +126,15 @@ namespace Jondo.Unity.Launcher.Managers
                 if (ZaapOf(waypoint.MapId).Id != 0) withZaap++;
             }
 
+            int deSalida = 0;
+            foreach (long mapId in _byMap.Keys)
+            {
+                if (DepartureZaapOf(mapId).Id != 0) deSalida++;
+            }
+
             Console.WriteLine($"[Interactives] {_byMap.Count} mapas con elementos, " +
-                              $"{_ordered.Count} zaaps ({withZaap} con su elemento localizado).");
+                              $"{_ordered.Count} zaaps ({withZaap} con su elemento localizado), " +
+                              $"{deSalida} de salida.");
         }
 
         private static void LoadWaypoints()
@@ -261,6 +304,35 @@ namespace Jondo.Unity.Launcher.Managers
             return default;
         }
 
+        /// <summary>
+        /// El zaap de salida de este mapa, si lo tiene. Ver <see cref="DepartureOnlyGfx"/> para por
+        /// qué no basta con meter el dibujo en <see cref="ZaapGfx"/>.
+        /// </summary>
+        public static Element DepartureZaapOf(long mapId)
+        {
+            foreach (int gfx in DepartureOnlyGfx)
+            {
+                var element = ElementByGfx(mapId, gfx);
+                if (element.Id != 0) return element;
+            }
+            return default;
+        }
+
+        /// <summary>
+        /// Con qué tipo se declara este elemento: el del zaap o el del vestigio.
+        ///
+        /// Dentro de un merkasako el 74685 NO es un vestigio: es el zaap de salida, con el modelo
+        /// que le toca al decorado. Se comprobó uno a uno —los cinco decorados que lo llevan no
+        /// tienen ningún elemento con el dibujo 301199— así que ahí es el único zaap que hay y
+        /// retiparlo dejaría al jugador encerrado en su casa.
+        /// </summary>
+        public static int TypeOfZaap(long mapId, Element element)
+            => element.Gfx == VestigeGfx && !Merkasako.IsHavenBag(mapId) ? VestigeType : ZaapType;
+
+        /// <summary>¿Esto es un vestigio y no un zaap? Ver <see cref="TypeOfZaap"/>.</summary>
+        public static bool IsVestige(long mapId, Element element)
+            => element.Gfx == VestigeGfx && !Merkasako.IsHavenBag(mapId);
+
         /// <summary>El elemento de un mapa que lleva un dibujo dado, si es que lo hay.</summary>
         public static Element ElementByGfx(long mapId, int gfx)
         {
@@ -283,6 +355,18 @@ namespace Jondo.Unity.Launcher.Managers
         /// se quedara encerrado. Funcionaba, pero convertía las puertas del templo en zaaps, que es
         /// mentira: cada elemento tiene lo suyo y no todo es viajar.
         /// </summary>
+        /// <summary>
+        /// TODO lo que hay en este mapa, sin filtrar por lo que sea.
+        ///
+        /// Los accesos de aquí arriba buscan una cosa concreta —el zaap, el del merkasako— y eso
+        /// sirve mientras se conozcan de uno en uno. Las papeleras y los zaapis se reconocen por su
+        /// gráfico y son decenas, así que necesitan mirar la lista entera y quedarse con los suyos.
+        /// </summary>
+        public static IReadOnlyList<Element> ElementsOf(long mapId)
+            => _byMap.TryGetValue(mapId, out var found)
+                ? found
+                : (IReadOnlyList<Element>)Array.Empty<Element>();
+
         public static List<Element> ZaapElements(long mapId)
         {
             var salida = new List<Element>();
@@ -293,6 +377,10 @@ namespace Jondo.Unity.Launcher.Managers
             // El del merkasako, que no está en la tabla de zaaps pero se usa igual.
             var propio = Merkasako.ZaapOf(mapId);
             if (propio.Id != 0) { salida.Add(propio); return salida; }
+
+            // Y el de los sitios desde los que sólo se sale, que no están en la tabla de zaaps.
+            var deSalida = DepartureZaapOf(mapId);
+            if (deSalida.Id != 0) { salida.Add(deSalida); return salida; }
 
             // Y el dicho a mano, para los que no se reconocen por el dibujo.
             if (_overrides.TryGetValue(mapId, out int elementId))
@@ -308,6 +396,23 @@ namespace Jondo.Unity.Launcher.Managers
         /// alguien a un sitio del que no puede volver es peor que no llevarlo.
         /// </summary>
         public static bool CanLeaveFrom(long mapId) => ZaapElements(mapId).Count > 0;
+
+        /// <summary>
+        /// Los zaaps que se le dicen al cliente como descubiertos al entrar al mundo.
+        ///
+        /// Aquí el personaje los tiene todos, así que son todos los activados de los que además
+        /// se sabe dónde está su elemento. Sin esta lista la ventana de viaje sale vacía por mucho
+        /// que el hjj traiga destinos; ver ConnectionProtocol.BuildDiscoveredZaaps.
+        /// </summary>
+        public static IEnumerable<long> DiscoveredZaapMaps()
+        {
+            foreach (var waypoint in _ordered)
+            {
+                if (!waypoint.Activated) continue;
+                if (!CanLeaveFrom(waypoint.MapId)) continue;
+                yield return waypoint.MapId;
+            }
+        }
 
         /// <summary>
         /// El identificador de la instancia de habilidad, que es lo que el cliente devuelve al

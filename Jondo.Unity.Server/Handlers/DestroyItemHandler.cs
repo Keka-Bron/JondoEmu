@@ -25,7 +25,7 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         public static async Task DestroyAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? iuw = ConnectionProtocol.ReadPayload(payload, Op.ObjectDeleteMessage);
+            byte[]? iuw = ConnectionProtocol.ReadPayload(payload, Op.Iuw);
             if (iuw == null) return;
 
             long uid = 0;
@@ -60,7 +60,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (entero)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.ObjectDeletedMessage, ConnectionProtocol.BuildItemGone(uid)));
+                    ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(uid)));
             }
             else
             {
@@ -76,7 +76,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.InventoryWeightMessage,
+                ConnectionProtocol.Push(Op.Iun,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
 
             Console.WriteLine($"[Inventario] Destruido {destruye} de {uid}" +

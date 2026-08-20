@@ -60,14 +60,21 @@ namespace Jondo.Unity.Launcher.Handlers
             SessionContext.State.OpenZaapMapId = here;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.InteractiveUsedMessage, ConnectionProtocol.BuildElementInUse(
+                ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
                     zaap.Id, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
-            var destinations = Destinations(here);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.TeleportDestinationsMessage, ConnectionProtocol.BuildZaapList(here, destinations)));
+            // Desde un VESTIGIO no se va a los zaaps del mundo: sólo a las anomalías. Medido —el
+            // hjj que contesta al vestigio de la Cuna de Alma trae dos entradas y las dos son
+            // anomalías, mientras que el de un zaap normal trae cuarenta y ocho—. Tiene sentido:
+            // un vestigio no es un zaap, es donde asoma una anomalía.
+            bool vestige = Interactives.IsVestige(here, zaap);
+            var destinations = vestige ? AnomalyDestinations(here) : Destinations(here);
 
-            Console.WriteLine($"[Zaap] Abierto en el mapa {here}: {destinations.Count} destinos.");
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Hjj, ConnectionProtocol.BuildZaapList(here, destinations)));
+
+            Console.WriteLine($"[{(vestige ? "Vestigio" : "Zaap")}] Abierto en el mapa {here}: " +
+                              $"{destinations.Count} destinos.");
         }
 
         /// <summary>
@@ -78,27 +85,72 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             SessionContext.State.OpenZaapMapId = 0;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed()));
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed()));
         }
 
         /// <summary>El cliente ha elegido destino. Se le cobra y se le lleva.</summary>
         public static async Task TravelAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? hjc = ConnectionProtocol.ReadPayload(payload, Op.TeleportRequestMessage);
+            byte[]? hjc = ConnectionProtocol.ReadPayload(payload, Op.Hjc);
             if (hjc == null) return;
 
-            long target = 0;
+            // El f2 dice de qué pestaña viene la elección, y de eso depende qué significa el f3:
+            // para el zaap y el zaapi es el MAPA al que se va; para la anomalía es SU SUBZONA, que
+            // es lo que la identifica. Medido: hjc { f2: 4, f3: 609 } contestado con un jru al
+            // 196085762, que no es ningún mapa de la subzona 609.
+            long chosen = 0;
+            int kind = 0;
             foreach (var field in ProtoMessage.Parse(hjc).Fields)
             {
-                if (field.FieldNumber == 3 && field.WireType == 0) target = field.VarIntValue;
+                if (field.WireType != 0) continue;
+                if (field.FieldNumber == 2) kind = (int)field.VarIntValue;
+                else if (field.FieldNumber == 3) chosen = field.VarIntValue;
             }
-            if (target <= 0) return;
+            if (chosen <= 0) return;
 
-            var waypoint = Interactives.WaypointOf(target);
-            if (waypoint == null)
+            long from = SessionContext.State.OpenZaapMapId != 0
+                ? SessionContext.State.OpenZaapMapId
+                : Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
+
+            long target;
+            long cost;
+            string what;
+
+            if (kind == Anomalies.Kind)
             {
-                Console.WriteLine($"[Zaap] El cliente pide viajar a {target}, que no tiene zaap.");
-                return;
+                if (!Anomalies.TryGet((int)chosen, out var anomaly))
+                {
+                    Console.WriteLine($"[Anomalías] El cliente pide la subzona {chosen} y no está " +
+                                      "en la lista. No se viaja.");
+                    return;
+                }
+
+                // Se cobra por dónde está el vestigio, no por dónde se acaba: en la captura los
+                // seis costes de anomalía son idénticos a los del zaap normal a ese mismo mapa.
+                target = Anomalies.ArrivalMap;
+                cost = anomaly.MapId == from ? 0 : CostBetween(from, anomaly.MapId);
+                what = $"anomalía «{anomaly.Name}» (subzona {anomaly.SubAreaId})";
+            }
+            else if (kind == Zaapis.Kind)
+            {
+                // Un destino de zaapi NO está en la tabla de zaaps —son talleres y mercadillos— así
+                // que aquí no se puede exigir un waypoint. Exigirlo era el fallo por el que el
+                // viaje en zaapi no llevaba a ninguna parte.
+                target = chosen;
+                cost = Zaapis.Cost;
+                what = $"zaapi al mapa {target}";
+            }
+            else
+            {
+                target = chosen;
+                var waypoint = Interactives.WaypointOf(target);
+                if (waypoint == null)
+                {
+                    Console.WriteLine($"[Zaap] El cliente pide viajar a {target}, que no tiene zaap.");
+                    return;
+                }
+                cost = CostBetween(from, target);
+                what = $"zaap {waypoint.Id}";
             }
 
             if (MapManager.GetMapInfo(target) == null)
@@ -107,9 +159,6 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            long cost = CostBetween(SessionContext.State.OpenZaapMapId != 0
-                ? SessionContext.State.OpenZaapMapId
-                : Jondo.Unity.Launcher.Network.SessionContext.State.MapId, target);
             if (Jondo.Unity.Launcher.Network.SessionContext.State.Kamas < cost)
             {
                 Console.WriteLine($"[Zaap] Faltan kamas para ir a {target}: cuesta {cost} y hay " +
@@ -141,15 +190,15 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapDiscovered(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(Jondo.Unity.Launcher.Network.SessionContext.State.Kamas)));
+                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(Jondo.Unity.Launcher.Network.SessionContext.State.Kamas)));
 
             // Y cerrarle la ventana, que no se cierra sola. En la captura el kld sale aquí, entre
             // los kamas y el jss del mapa nuevo.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed()));
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed()));
 
             SessionContext.State.OpenZaapMapId = 0;
-            Console.WriteLine($"[Zaap] Viaje a {target} (zaap {waypoint.Id}), casilla " +
+            Console.WriteLine($"[Zaap] Viaje a {target} ({what}), casilla " +
                               $"{Jondo.Unity.Launcher.Network.SessionContext.State.CellId}, {cost} kamas. Esperando el jrh.");
         }
 
@@ -176,6 +225,40 @@ namespace Jondo.Unity.Launcher.Handlers
                     waypoint.SubAreaId,
                     Interactives.LevelOfSubArea(waypoint.SubAreaId),
                     waypoint.MapId == from ? 0 : CostBetween(from, waypoint.MapId)));
+            }
+
+            // Y detrás, la pestaña de anomalías. Van en esta misma lista: lo que las separa es el
+            // f3 de cada entrada, no un mensaje aparte.
+            salida.AddRange(AnomalyDestinations(from));
+            return salida;
+        }
+
+        /// <summary>
+        /// Sólo la pestaña de anomalías.
+        ///
+        /// El nivel es el de SU subzona —el de la zona que la anomalía recrea, que casi nunca es el
+        /// de la zona donde asoma— y por eso no se pasa por LevelOfSubArea del mapa de destino. Se
+        /// comprobó en las dieciséis: cuadra en las dieciséis.
+        ///
+        /// Se cobra por dónde está el vestigio, no por dónde se acaba: en la captura los seis
+        /// costes de anomalía son idénticos a los del zaap normal a ese mismo mapa.
+        /// </summary>
+        private static List<ConnectionProtocol.ZaapDestination> AnomalyDestinations(long from)
+        {
+            var salida = new List<ConnectionProtocol.ZaapDestination>();
+            if (MapManager.GetMapInfo(Anomalies.ArrivalMap) == null) return salida;
+
+            foreach (var anomaly in Anomalies.All)
+            {
+                if (MapManager.GetMapInfo(anomaly.MapId) == null) continue;
+                salida.Add(new ConnectionProtocol.ZaapDestination(
+                    anomaly.MapId,
+                    anomaly.SubAreaId,
+                    anomaly.Level,
+                    anomaly.MapId == from ? 0 : CostBetween(from, anomaly.MapId),
+                    Anomalies.Kind,
+                    Anomalies.MinutesLeft(anomaly.SubAreaId),
+                    Anomalies.Duration));
             }
             return salida;
         }

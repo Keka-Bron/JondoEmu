@@ -129,7 +129,7 @@ namespace Jondo.Unity.Launcher.Network
             if (ficha == null) return (seVa, 0);
 
             int llega = await BroadcastToMapAsync(quien.MapId,
-                ConnectionProtocol.Push(Op.GameContextRefreshEntityLookMessage, ConnectionProtocol.BuildActorRefreshed(
+                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
                     ficha, quien.State.CellId, quien.State.Orientation, quien.AccountId)),
                 quien.Id);
 

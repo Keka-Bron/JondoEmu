@@ -192,7 +192,10 @@ namespace Jondo.Protocol
             string opcode = typeUrl.Replace("type.ankama.com/", "").Trim();
             int number = System.Threading.Interlocked.Increment(ref _packetCount);
 
-            string name = Op.Label(opcode);
+            // Primero lo que alguien haya ligado a mano, que es lo unico verificado. Op.Label queda
+            // como respaldo y hoy esta vacio a proposito: los nombres inventados se quitaron.
+            string name = Jondo.Unity.Launcher.Managers.NameBinding.Of(opcode);
+            if (name.Length == 0) name = Op.Label(opcode);
             if (name.Length == 0)
             {
                 string description = GetPacketMetadata(typeUrl).Description;
@@ -205,8 +208,21 @@ namespace Jondo.Protocol
                 name = candidate.StartsWith("Utility message", StringComparison.Ordinal) ? "" : candidate;
             }
 
+            // Lo que se enseña es el MENSAJE, no el sobre.
+            //
+            // Lo que llega aquí es la trama entera, y volcarla tal cual da
+            // «{ 3: { 1: { 1: "type.ankama.com/jsq" } 2: -1 } }», que es fontanería: el campo raíz
+            // que dice si va o viene, el Any con su url repetida y el id de petición. De los campos
+            // del mensaje, que es lo único que se quiere leer, no se ve ni uno.
+            //
+            // ReadPayload busca la url dentro de la trama y devuelve lo que hay detrás, que es el
+            // mensaje de verdad. El tamaño que se enseña también es el suyo y no el de la trama:
+            // con el del sobre, un mensaje vacío parecía pesar treinta y seis bytes.
+            byte[] dentro = Jondo.Unity.Launcher.Network.ConnectionProtocol.ReadPayload(payload, opcode)
+                            ?? payload;
+
             string fields = "";
-            try { fields = Jondo.Unity.Launcher.Network.ProtoMessage.Parse(payload).Compact(); }
+            try { fields = Jondo.Unity.Launcher.Network.ProtoMessage.Parse(dentro).Compact(); }
             catch { }
 
             string where = direction.StartsWith("Client", StringComparison.Ordinal)
@@ -245,7 +261,7 @@ namespace Jondo.Protocol
                 // === Context: Character Selection ===
                 case Op.Klp: return ("Character Selection", "Interfaces", "CharacterListEmpty (Initial empty character list)");
                 case Op.Ksx: return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 1)");
-                case Op.CharactersListRequestMessage: return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 2)");
+                case Op.Kpa: return ("Character Selection", "Interfaces", "CharacterListRequest (Character request - phase 2)");
                 case Op.Mes: return ("Character Selection", "Interfaces", "MessageWrapper (UI container wrapper)");
                 case Op.Knv: return ("Character Selection", "Interfaces", "UiLayoutMessage (Metadata of the selection UI)");
                 case "ksq": return ("Character Selection", "Character", "CharacterListMessage (Detailed character list)");
@@ -274,7 +290,7 @@ namespace Jondo.Protocol
                 case "jdj": return ("World Loading", "Sync", "ServerDateMessage (Server date synchronization)");
 
                 // === Context: World Loading - 33 Packets Transition Burst ===
-                case Op.BasicPingMessage: return ("World Loading", "Interfaces", "ChatChannelsReadMessage (Chat channels open for reading)");
+                case Op.Kqo: return ("World Loading", "Interfaces", "ChatChannelsReadMessage (Chat channels open for reading)");
                 case Op.Hhq: return ("World Loading", "Interfaces", "SocialGroupPackets (Guild and alliance information)");
                 case Op.Hml: return ("World Loading", "Interfaces", "SocialPreferences (The player's social settings)");
                 case Op.Isf: return ("World Loading", "Sync", "QuestListMessage (Notification of the active quests)");
@@ -282,7 +298,7 @@ namespace Jondo.Protocol
                 case "icg": return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
                 case Op.Ibo: return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Quick spell bar)");
                 case Op.Hmj: return ("World Loading", "Interfaces", "SocialGroupStatus (The player's guild status)");
-                case Op.AppearanceSaveRequestMessage: return ("World Loading", "Sync", "AlignmentSubAreaUpdate (PvP and sub-area alignment)");
+                case Op.Lxs: return ("World Loading", "Sync", "AlignmentSubAreaUpdate (PvP and sub-area alignment)");
                 case "hnq": return ("World Loading", "Sync", "SpouseStatusMessage (Marital status / marriage)");
                 case Op.Ksv: return ("World Loading", "Character", "CharacterCapabilitiesMessage (Stat caps and capabilities)");
                 case Op.Lou: return ("World Loading", "Connection", "ServerAccessStatus (Server accessibility status)");

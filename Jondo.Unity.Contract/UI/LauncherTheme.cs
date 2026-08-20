@@ -358,10 +358,19 @@ namespace Jondo.Unity.Launcher.UI
             {
                 string path = Path.Combine(AssetsFolder, name);
                 if (!File.Exists(path)) return null;
+
                 // Read into memory so the file is not left locked.
                 byte[] data = File.ReadAllBytes(path);
                 using var memory = new MemoryStream(data);
-                return Image.FromStream(memory);
+                using var loaded = Image.FromStream(memory);
+
+                // La copia NO sobra. Image.FromStream se queda con el flujo y lee de él cuando le
+                // hace falta, así que devolver esa imagen con el MemoryStream ya cerrado deja una
+                // bomba de relojería: mientras sólo se dibuje encima aguanta, pero en cuanto algo
+                // la obliga a releer los píxeles revienta con «A generic error occurred in GDI+»,
+                // y el aviso no dice ni de qué imagen se trata. Pasó al voltear el fondo del
+                // servidor. Un Bitmap nuevo se queda con los píxeles y ya no depende de nadie.
+                return new Bitmap(loaded);
             }
             catch
             {

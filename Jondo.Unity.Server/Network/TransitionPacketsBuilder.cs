@@ -14,7 +14,7 @@ namespace Jondo.Unity.Launcher.Network
         public static byte[] BuildHmlMessage() => BuildEmptyMessage(Op.Uri(Op.Hml));
         public static byte[] BuildLolMessage() => BuildEmptyMessage(Op.Uri(Op.Lol));
         public static byte[] BuildHmjMessage() => BuildEmptyMessage(Op.Uri(Op.Hmj));
-        public static byte[] BuildLxsMessage() => BuildEmptyMessage(Op.Uri(Op.AppearanceSaveRequestMessage));
+        public static byte[] BuildLxsMessage() => BuildEmptyMessage(Op.Uri(Op.Lxs));
         public static byte[] BuildIyaMessage() => BuildEmptyMessage(Op.Uri(Op.Iya));
         public static byte[] BuildItyMessage() => BuildEmptyMessage("type.ankama.com/ity");
         public static byte[] BuildKtjMessage() => BuildEmptyMessage("type.ankama.com/ktj");
@@ -92,7 +92,7 @@ namespace Jondo.Unity.Launcher.Network
             output.WriteBytes(ByteString.CopyFrom(f3Ms.ToArray()));
 
             output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.BasicPingMessage), ms.ToArray());
+            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kqo), ms.ToArray());
         }
 
         public static byte[] BuildBvrMessage()

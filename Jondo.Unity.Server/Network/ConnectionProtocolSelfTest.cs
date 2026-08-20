@@ -158,6 +158,7 @@ namespace Jondo.Unity.Launcher.Network
             CheckEnvelope(failures);
             CheckWorldMessages(failures);
             CheckFightPreparation(failures);
+            CheckTravelList(failures);
 
             if (failures.Count > 0)
             {
@@ -169,6 +170,71 @@ namespace Jondo.Unity.Launcher.Network
             }
 
             Console.WriteLine("[Protocol] The connection messages match the captured shape.");
+        }
+
+        /// <summary>
+        /// Las tres pestañas de la lista de viaje (hjj), contra los bytes de verdad.
+        ///
+        /// Las tres viajan en el mismo mensaje y en el mismo campo repetido, y lo único que las
+        /// separa es el f3 de cada entrada. Eso es fácil de romper sin enterarse, y el síntoma en
+        /// el cliente no es un error: es una pestaña vacía, o un destino que aparece donde no toca.
+        /// Por eso se compara byte a byte con lo que mandó el servidor real.
+        ///
+        /// Cada cadena es UNA entrada sacada de su captura, con sus valores exactos:
+        ///
+        ///   zaap      Castillo de Amakna, sin f3            «zaap desde castillo de amakna a bonta…»
+        ///   zaapi     taller forjamagos de Bonta, f3 = 1    «usar zaapi en bonta a taller forjamagos»
+        ///   anomalía  Cuna de Alma, f3 = 4 y su reloj       «entrar a mapa con vestigio de zaap…»
+        ///
+        /// El de la anomalía llegó con 43 minutos por delante de 120 y sin coste, porque el
+        /// personaje estaba de pie en el mapa del vestigio. Los 43 van escritos a mano a propósito:
+        /// aquí se comprueba el constructor, no el reloj.
+        /// </summary>
+        private static void CheckTravelList(List<string> failures)
+        {
+            Same(failures, "hjj (zaap)",
+                 "1a0d082810be01288196b82830b201",
+                 ConnectionProtocol.BuildZaapList(0, new[]
+                 {
+                     new ConnectionProtocol.ZaapDestination(84806401, 178, 40, 190),
+                 }));
+
+            // El 2001 del final es el f4 de la raíz: sin él el cliente abre la ventana del zaap
+            // y la deja vacía. Sale así en las tres capturas de zaapi y en ninguna de zaap.
+            Same(failures, "hjj (zaapi)",
+                 "1a0e080a10141801288180806930cf072001",
+                 ConnectionProtocol.BuildZaapList(0, new[]
+                 {
+                     new ConnectionProtocol.ZaapDestination(220200961, 975, 10, 20,
+                                                            Managers.Zaapis.Kind),
+                 }, Managers.Zaapis.Teleporter));
+
+            // Y la lista de zaaps descubiertos, que es lo que hace que la ventana no salga vacía.
+            // Son los 45 del personaje de la captura, en su orden, y tienen que dar sus 182 bytes.
+            Same(failures, "hjk (zaaps descubiertos)",
+                 "0ab3018196b82892b8098880e060a9baea198290d8208184d0588380d0209b96903c8488b00d858a"
+                 + "b0498388a039808cb0498386b849838cb0658180c0558388c0658490c02d8084e05581a6802a81"
+                 + "8e800a8188882a8998b0468a8a882a8490b05e8880e04a9092802a928880528294c04a978e882a"
+                 + "8288d0528992c06a8196e04e878af0069080b04e8194f036878ce04e8080802387849837848880"
+                 + "638290905bc9b6ea198684c02f8eace0438184e82f8080f033",
+                 ConnectionProtocol.BuildDiscoveredZaaps(new long[]
+                 {
+                     84806401, 154642, 202899464, 54172969, 68552706, 185860609, 68419587,
+                     126094107, 28050436, 153879813, 120062979, 153880064, 154010371, 212600323,
+                     179306497, 212861955, 95422468, 179831296, 88085249, 20973313, 88212481,
+                     147590153, 88212746, 197920772, 156762120, 88082704, 171967506, 156240386,
+                     88213271, 173278210, 223349001, 165153537, 14419207, 164364304, 115083777,
+                     165152263, 73400320, 115737095, 207619076, 191105026, 54172489, 99615238,
+                     142087694, 100270593, 108789760,
+                 }));
+
+            Same(failures, "hjj (anomalía)",
+                 "1a13088c0118042204102b187828c9e6e91930e104",
+                 ConnectionProtocol.BuildZaapList(0, new[]
+                 {
+                     new ConnectionProtocol.ZaapDestination(54162249, 609, 140, 0,
+                                                            Managers.Anomalies.Kind, 43, 120),
+                 }));
         }
 
         private static readonly DatabaseManager.DbCharacter TestCharacter = new DatabaseManager.DbCharacter
@@ -354,7 +420,7 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>The messages pushed by the server travel in field 1 of the frame.</summary>
         private static void CheckEnvelope(List<string> failures)
         {
-            byte[] frame = ConnectionProtocol.Push(Op.CharactersListMessage, new byte[] { 0x08, 0x01 });
+            byte[] frame = ConnectionProtocol.Push(Op.Kvi, new byte[] { 0x08, 0x01 });
             var root = ProtoMessage.Parse(frame);
 
             var wrapper = Field(root, 1, 2);
@@ -364,7 +430,7 @@ namespace Jondo.Unity.Launcher.Network
             if (any == null) { failures.Add("envelope: the Any block is missing"); return; }
 
             var anyMsg = ProtoMessage.Parse(any.BytesValue);
-            if (Text(anyMsg, 1) != ConnectionProtocol.UriPrefix + Op.CharactersListMessage)
+            if (Text(anyMsg, 1) != ConnectionProtocol.UriPrefix + Op.Kvi)
                 failures.Add("envelope: the type_url is not in f1 of the Any");
             if (Field(anyMsg, 2, 2) == null)
                 failures.Add("envelope: the payload is not in f2 of the Any");
@@ -406,7 +472,7 @@ namespace Jondo.Unity.Launcher.Network
             const string CapturedJsq =
                 "1a220a150a13747970652e616e6b616d612e636f6d2f6a737110ffffffffffffffffff01";
 
-            string jsq = Hex(ConnectionProtocol.Answer(Op.MapExitAllowedMessage, null, -1));
+            string jsq = Hex(ConnectionProtocol.Answer(Op.Jsq, null, -1));
             if (jsq != CapturedJsq)
                 failures.Add($"jsq: the answer to jqi does not match the capture ({jsq})");
 

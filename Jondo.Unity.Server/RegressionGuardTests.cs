@@ -126,6 +126,18 @@ namespace Jondo.Unity.Launcher
                 var lottery = Managers.Lottery.Of(mapId);
                 if (lottery.Id != 0) expected.Add((mapId, lottery.Id));
 
+                // Los zaapis y las papeleras se reconocen por su gráfico y son decenas, así que van
+                // en bloque. Sin esto la cuenta no cuadra y el servidor no arranca — que es lo que
+                // pasó al añadirlos: el guardia los vio antes que nadie.
+                foreach (var zaapi in Managers.Zaapis.ElementsOn(mapId))
+                    expected.Add((mapId, zaapi.Id));
+
+                foreach (var bin in Managers.Bins.On(mapId))
+                    expected.Add((mapId, bin.Id));
+
+                foreach (var door in Managers.Houses.On(mapId))
+                    expected.Add((mapId, door.ElementId));
+
                 foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
                 {
                     foreach (var action in interactive.Actions)
@@ -148,6 +160,14 @@ namespace Jondo.Unity.Launcher
                             "[RegressionGuard FAILED] Interactive registry accepted a mismatched skill instance.");
                     }
                 }
+            }
+
+            // Los interiores de casa no estan en Interactives.MapIds -son mapas sin elementos
+            // en el volcado del cliente- asi que se cuentan aparte.
+            foreach (long interior in Managers.Houses.Interiors)
+            {
+                if (Managers.Houses.TryGetExit(interior, out var exit))
+                    expected.Add((interior, exit.ElementId));
             }
 
             if (Managers.InteractiveRegistry.Count != expected.Count)

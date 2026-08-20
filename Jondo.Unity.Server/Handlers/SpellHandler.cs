@@ -25,7 +25,7 @@ namespace Jondo.Unity.Launcher.Handlers
     {
         public static async Task HandleVariantAsync(NetworkStream stream, byte[] payload)
         {
-            byte[]? hmt = ConnectionProtocol.ReadPayload(payload, Op.SpellVariantActivationRequestMessage);
+            byte[]? hmt = ConnectionProtocol.ReadPayload(payload, Op.Hmt);
             if (hmt == null) return;
 
             int wanted = 0;
@@ -61,11 +61,11 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 SpellChoices.PutInBar(slot, wanted);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.ShortcutBarReplacedMessage, ConnectionProtocol.BuildShortcutChanged(slot, wanted)));
+                    ConnectionProtocol.Push(Op.Iuq, ConnectionProtocol.BuildShortcutChanged(slot, wanted)));
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.SpellVariantActivationSuccessMessage, ConnectionProtocol.BuildSpellSwapped(wanted, grade)));
+                ConnectionProtocol.Push(Op.Hng, ConnectionProtocol.BuildSpellSwapped(wanted, grade)));
 
             Console.WriteLine($"[Hechizos] Pareja {pair.Id}: {leaving} -> {wanted} (grado {grade}), " +
                               $"{slots.Count} hueco(s) de la barra actualizados.");

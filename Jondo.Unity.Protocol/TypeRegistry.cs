@@ -16,7 +16,7 @@ namespace Jondo.Unity.Protocol
             Register(Op.Ise, GameMapMovementRequestMessage.Descriptor);
             Register(Op.Hhf, hhf.Descriptor);
             Register(Op.Hhh, hhh.Descriptor);
-            Register(Op.SpellVariantActivationRequestMessage, hmt.Descriptor);
+            Register(Op.Hmt, hmt.Descriptor);
             Register(Op.Ilc, ilc.Descriptor);
             Register(Op.Iry, iry.Descriptor);
             Register(Op.Isf, isf.Descriptor);
@@ -41,7 +41,7 @@ namespace Jondo.Unity.Protocol
             Register(Op.Kns, kns.Descriptor);
             Register("knx", knx.Descriptor);
             Register(Op.Kod, kod.Descriptor);
-            Register(Op.CharactersListRequestMessage, kpa.Descriptor);
+            Register(Op.Kpa, kpa.Descriptor);
             Register("kpc", kpc.Descriptor);
             Register("kqn", kqn.Descriptor);
             Register(Op.Kqp, kqp.Descriptor);

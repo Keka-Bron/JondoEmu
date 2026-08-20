@@ -49,6 +49,18 @@ namespace Jondo.Unity.Launcher
 
         // Session-local UI/dialog state. These used to be static fields in handlers.
         public long OpenZaapMapId { get; set; }
+
+        /// <summary>
+        /// Por dónde se entró en la casa en la que se está, para salir por ahí mismo.
+        ///
+        /// Varias puertas del mundo pueden llevar al mismo interior, así que sin esto se sale por
+        /// la primera que lleve allí y el jugador aparece en otro barrio. Si no hay nada —porque
+        /// se desconectó dentro— se tira de la puerta que dicen los datos, que al menos existe.
+        /// </summary>
+        public long HouseEntryMapId { get; set; }
+
+        /// <summary>La casilla de la calle desde la que se entró.</summary>
+        public int HouseEntryCell { get; set; }
         public bool IsChestOpen { get; set; }
         public bool IsHavenBagEditing { get; set; }
         public List<Managers.HavenBagStore.Furniture> PendingHavenBagFurniture { get; }

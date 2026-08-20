@@ -54,7 +54,8 @@ public static class Layer
     /// <param name="Slots">Los opcodes de verdad, ya con identificador.</param>
     /// <param name="Stale">Literales que fueron opcodes en otra versión y aquí ya no existen.</param>
     /// <param name="Ignored">Literales de tres letras que no son opcodes de nada.</param>
-    public sealed record Sweep(List<Slot> Slots, List<string> Stale, List<string> Ignored);
+    public sealed record Sweep(List<Slot> Slots, List<string> Stale, List<string> Ignored,
+                              Dictionary<string, string> Renames);
 
     private static readonly Regex Literal = new("\"([a-z]{3})\"", RegexOptions.Compiled);
     private static readonly Regex Uri = new("\"type\\.ankama\\.com/([a-z]{3})\"", RegexOptions.Compiled);
@@ -93,7 +94,8 @@ public static class Layer
     public static Sweep Scan(string sourceFolder,
                              IReadOnlyCollection<string> known,
                              IReadOnlyCollection<string> wasKnown,
-                             IReadOnlyDictionary<string, Dossier.Anchor> anchors)
+                             IReadOnlyDictionary<string, Dossier.Anchor> anchors,
+                             IReadOnlyDictionary<string, string> bound)
     {
         var uses = new Dictionary<string, int>(StringComparer.Ordinal);
         var stale = new HashSet<string>(StringComparer.Ordinal);
@@ -149,22 +151,32 @@ public static class Layer
         foreach (var (opcode, count) in uses.OrderByDescending(p => p.Value).ThenBy(p => p.Key, StringComparer.Ordinal))
         {
             anchors.TryGetValue(opcode, out var anchor);
-            string name = anchor?.Name ?? "";
+
+            // El nombre sale de lo ligado a mano, NUNCA del ancla: los nombres de las anclas los
+            // propusimos nosotros y ninguno resultó ser el de Ankama. El significado del ancla sí
+            // vale y se conserva, porque está medido contra capturas.
+            string name = bound.GetValueOrDefault(opcode, "");
             string id = Identifier(name, opcode);
 
-            if (!taken.Add(id))
-            {
-                id = Identifier("", opcode);
-                taken.Add(id);
-            }
-
+            if (!taken.Add(id)) continue;
             slots.Add(new Slot(id, opcode, name, anchor?.Meaning ?? "", count));
+        }
+
+        // Cómo se llamaba antes cada constante y cómo se llama ahora. Sin esto, cambiar el criterio
+        // de los identificadores deja el emulador sin compilar: hay centenares de «Op.Loquesea»
+        // repartidos que apuntan a un nombre que ya no existe.
+        var renames = new Dictionary<string, string>(StringComparer.Ordinal);
+        var byOpcode = slots.ToDictionary(s => s.Opcode, s => s.Id, StringComparer.Ordinal);
+        foreach (var (oldId, opcode) in already)
+        {
+            if (byOpcode.TryGetValue(opcode, out string? newId) && newId != oldId) renames[oldId] = newId;
         }
 
         return new Sweep(
             slots.OrderBy(s => s.Id, StringComparer.Ordinal).ToList(),
             stale.OrderBy(s => s, StringComparer.Ordinal).ToList(),
-            ignored.OrderBy(s => s, StringComparer.Ordinal).ToList());
+            ignored.OrderBy(s => s, StringComparer.Ordinal).ToList(),
+            renames);
     }
 
     /// <summary>Un uso que ya pasó por la capa: <c>Op.Loquesea</c>.</summary>
@@ -204,26 +216,68 @@ public static class Layer
     }
 
     /// <summary>
-    /// El identificador de C#: el nombre real cuando se sabe, y si no el opcode en mayúscula.
+    /// El identificador de C# es SIEMPRE el opcode. Nada de nombres.
     ///
-    /// Los 205 sin nombre se quedan con <c>Hjk</c>, <c>Iuq</c> y demás. No es bonito, pero es el
-    /// nombre por el que hoy los conoce quien trabaja con esto, es único, y es estable: cuando el
-    /// parche los renombre, el identificador NO cambia —cambia el valor—, que es justo lo que hace
-    /// falta. Si algún día se averigua el nombre de verdad, se regenera y se renombra de una vez.
+    /// Los llevaba: si el ancla proponía un nombre, la constante se llamaba
+    /// <c>Op.HelloGameMessage</c>. Se quitaron al medirlos contra los 513 nombres reales que trae el
+    /// cliente: de los 99 que proponíamos, <b>ninguno</b> era el de Ankama. Y no era mala suerte,
+    /// era sistemático —96 de 99 acababan en «Message», que es la convención de Dofus 2, cuando el
+    /// protocolo real usa Event, Request y Response (196, 117 y 105 de 513)—.
+    ///
+    /// Un nombre inventado con pinta de oficial es peor que ninguno: se lee en el registro, se cita
+    /// en una conversación y acaba en la documentación como si alguien lo hubiera comprobado. El
+    /// opcode no engaña a nadie, y el significado —que sí está medido contra capturas— va al
+    /// comentario, que es su sitio.
+    ///
+    /// Los nombres de verdad entran por otra puerta: <see cref="Bound"/>, que sólo tiene los que
+    /// alguien ha ligado a mano eligiendo de la lista real.
     /// </summary>
     private static string Identifier(string name, string opcode)
+        => char.ToUpperInvariant(opcode[0]) + opcode[1..];
+
+    /// <summary>
+    /// Los nombres que alguien ha ligado a mano, de <c>datos/nombres_ligados_&lt;versión&gt;.tsv</c>.
+    ///
+    /// Es la única fuente de nombres que se acepta. El fichero lo escribe el desplegable del
+    /// registro del servidor: se elige de los 513 nombres reales con el paquete delante, así que lo
+    /// que entra aquí lo ha reconocido alguien mirando, no lo ha deducido nadie por parecido.
+    /// </summary>
+    public static Dictionary<string, string> Bound(string dataFolder, string version)
     {
-        if (name.Length == 0) return char.ToUpperInvariant(opcode[0]) + opcode[1..];
+        var bound = new Dictionary<string, string>(StringComparer.Ordinal);
+        string path = Path.Combine(dataFolder, $"nombres_ligados_{version}.tsv");
+        if (!File.Exists(path)) return bound;
 
-        var clean = new StringBuilder();
-        foreach (char c in name)
+        foreach (string line in File.ReadLines(path))
         {
-            if (char.IsLetterOrDigit(c)) clean.Append(c);
+            if (line.StartsWith('#')) continue;
+            var parts = line.Split('\t');
+            if (parts.Length >= 2 && parts[0].Length == 3 && parts[1].Length > 0)
+                bound[parts[0].Trim()] = parts[1].Trim();
         }
+        return bound;
+    }
 
-        string id = clean.ToString();
-        if (id.Length == 0 || char.IsDigit(id[0])) return char.ToUpperInvariant(opcode[0]) + opcode[1..];
-        return char.ToUpperInvariant(id[0]) + id[1..];
+    /// <summary>Añade una ligadura al fichero, sin repetir la que ya esté.</summary>
+    public static void Bind(string dataFolder, string version, string opcode, string name)
+    {
+        string path = Path.Combine(dataFolder, $"nombres_ligados_{version}.tsv");
+        var bound = Bound(dataFolder, version);
+        bound[opcode] = name;
+
+        var text = new StringBuilder();
+        text.AppendLine($"# Opcodes de {version} ligados a su nombre real, a mano.");
+        text.AppendLine("#");
+        text.AppendLine("# Se eligen de datos/nombres_reales_*.tsv, que son los nombres que el cliente lleva dentro.");
+        text.AppendLine("# Aquí no se propone nada: lo que está, está porque alguien lo ha reconocido mirando el");
+        text.AppendLine("# paquete. Lo escribe el desplegable del registro del servidor.");
+        text.AppendLine("#");
+        text.AppendLine("# opcode\tnombre");
+        foreach (var (code, real) in bound.OrderBy(p => p.Key, StringComparer.Ordinal))
+            text.AppendLine($"{code}\t{real}");
+
+        Directory.CreateDirectory(dataFolder);
+        File.WriteAllText(path, text.ToString(), new UTF8Encoding(true));
     }
 
     /// <summary>Escribe el fichero de la capa y devuelve la ruta.</summary>
@@ -326,9 +380,10 @@ public static class Layer
     /// versiones anteriores se quedan como están a propósito: no se pueden traducir a nada, y
     /// dejarlos a la vista es lo que hace que se noten.
     /// </summary>
-    public static List<Change> Apply(string sourceFolder, IReadOnlyList<Slot> slots, bool write)
+    public static List<Change> Apply(string sourceFolder, Sweep sweep, bool write)
     {
-        var byOpcode = slots.ToDictionary(s => s.Opcode, s => s.Id, StringComparer.Ordinal);
+        var byOpcode = sweep.Slots.ToDictionary(s => s.Opcode, s => s.Id, StringComparer.Ordinal);
+        var renames = sweep.Renames;
         var changes = new List<Change>();
 
         foreach (string file in Directory.EnumerateFiles(sourceFolder, "*.cs", SearchOption.AllDirectories))
@@ -351,6 +406,12 @@ public static class Layer
 
                 after = Literal.Replace(after, m =>
                     byOpcode.TryGetValue(m.Groups[1].Value, out string? id) ? $"Op.{id}" : m.Value);
+
+                // Y las constantes que han cambiado de nombre. Pasa cuando cambia el criterio de los
+                // identificadores —como al quitar los nombres inventados— y sin esto el emulador se
+                // queda sin compilar con centenares de «Op.Loquesea» apuntando a lo que ya no está.
+                after = Through.Replace(after, m =>
+                    renames.TryGetValue(m.Groups[1].Value, out string? renamed) ? $"Op.{renamed}" : m.Value);
 
                 if (after == line) continue;
                 changes.Add(new Change(file, i + 1, line.Trim(), after.Trim()));

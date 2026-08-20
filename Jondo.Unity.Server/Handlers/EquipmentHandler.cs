@@ -35,7 +35,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static async Task MoveAsync(NetworkStream stream, byte[] payload, long accountId = 0)
         {
-            byte[]? iuk = ConnectionProtocol.ReadPayload(payload, Op.ObjectSetPositionMessage);
+            byte[]? iuk = ConnectionProtocol.ReadPayload(payload, Op.Iuk);
             if (iuk == null || iuk.Length == 0) return;
 
             // Position zero, not the bag. The amulet's slot IS zero, so proto3 leaves the field
@@ -63,7 +63,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
+                    ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
 
                 Console.WriteLine($"[Equipment] El hueco {position} lo ocupaba {evicted.Uid}; " +
                                   "a la bolsa.");
@@ -77,7 +77,7 @@ namespace Jondo.Unity.Launcher.Handlers
             bool known = Managers.Equipment.Move(uid, position);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, uid).Var(2, position).Build()));
+                ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, position).Build()));
 
             // The three of unknown meaning that travel with it, each with the value it carries in
             // every equip and unequip capture there is.
@@ -89,7 +89,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Push(Op.Hii, Pb.New().Var(1, 2).Build()));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.InventoryWeightMessage,
+                ConnectionProtocol.Push(Op.Iun,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
 
             // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
@@ -100,11 +100,11 @@ namespace Jondo.Unity.Launcher.Handlers
             if (character != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.GameContextRefreshEntityLookMessage, ConnectionProtocol.BuildActorRefreshed(
+                    ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
                         character, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation, accountId)));
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.AppearancePreviewLookMessage, ConnectionProtocol.BuildLookChanged(character)));
+                    ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
             }
 
             // And the sheet, because what the item gives goes with it. Without this the numbers
@@ -112,7 +112,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (known)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
+                    ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
             }
 
             Console.WriteLine($"[Equipment] Item {uid} -> position {position}"

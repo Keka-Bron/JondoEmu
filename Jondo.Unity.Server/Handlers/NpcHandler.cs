@@ -185,7 +185,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed(
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                     ConnectionProtocol.NpcDialogCloseReason)));
 
             if (reply != KamasMountainReply)
@@ -198,7 +198,7 @@ namespace Jondo.Unity.Launcher.Handlers
             DatabaseManager.SaveCurrentCharacter();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
@@ -288,21 +288,21 @@ namespace Jondo.Unity.Launcher.Handlers
                     gid.ToString(), uid.ToString(), quantity.ToString(), price.ToString())));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.ObjectAddedMessage, ConnectionProtocol.BuildItemArrived(3, bought)));
+                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, bought)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.InventoryWeightMessage, ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(0, capacity)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kdg));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.InventoryWeightMessage, ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(0, capacity)));
 
             Console.WriteLine($"[NPC] Comprado el objeto {gid} x{quantity} (uid {uid}) por {price}; " +
                               $"quedan {GameState.Kamas} kamas.");
@@ -322,7 +322,7 @@ namespace Jondo.Unity.Launcher.Handlers
             OpenShopNpc = 0;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.ExchangeLeaveMessage, ConnectionProtocol.BuildShopClosed()));
+                ConnectionProtocol.Push(Op.Khd, ConnectionProtocol.BuildShopClosed()));
         }
 
         /// <summary>Al cambiar de mapa no queda nada abierto.</summary>

@@ -1025,7 +1025,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // Pasar turno. Va vacío.
                 await PassTurnAsync(stream);
             }
-            else if (payloadStr.Contains(Op.Uri(Op.GameMapMovementRequestMessage)))
+            else if (payloadStr.Contains(Op.Uri(Op.Jrw)))
             {
                 // Andar. Es el mismo mensaje que fuera del combate; aquí gasta PM.
                 await WalkAsync(stream, payload);
@@ -1041,7 +1041,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // la pantalla de fin de combate cuando el último golpe la dejó esperando.
                 await AcuseAsync(stream, payload);
             }
-            else if (payloadStr.Contains(Op.Uri(Op.HelloGameMessage)))
+            else if (payloadStr.Contains(Op.Uri(Op.Hoy)))
             {
                 await HandleFightOptionToggleRequest(stream, payload);
             }
@@ -1068,7 +1068,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.MapExitAllowedMessage,
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jsq,
                 Network.FightProtocol.BuildFightAccepted()));
 
             await InitiateFightFromMobCollision(stream, group, here, groupId);
@@ -2967,7 +2967,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // y ése no existe: cero apariciones en las 295 capturas de todas las carpetas, contra
             // 672 de kub. O sea que el paquete salía de aquí y el cliente no lo recogía nunca, y
             // por eso el arreglo anterior no cambió nada.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage,
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kub,
                 ConnectionProtocol.BuildCharacteristics()));
 
             // El grupo que se acaba de matar desaparece del mapa, y en su sitio sale otro.
@@ -4780,7 +4780,7 @@ namespace Jondo.Unity.Launcher.Handlers
             //
             // Por kub, que es el opcode de la ficha en esta versión; el "kri" que había aquí no
             // sale ni una vez en las 295 capturas.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage,
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kub,
                 ConnectionProtocol.BuildCharacteristics()));
             Program.LogDebug("[FightHandler] Ficha del personaje reenviada al volver al mapa.");
 

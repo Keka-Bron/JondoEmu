@@ -1,0 +1,110 @@
+{
+ "_comentario": [
+  "Anomalias temporales medidas de las capturas. Ver tools/extraer_anomalias.py.",
+  "duracion: minutos que vive una anomalia, del campo f4.f3 del hjj.",
+  "mapaDestino: donde deja el servidor al viajar, medido de la unica captura que lo hace",
+  "  (hjc {f2:4, f3:609} -> jru 196085762). Es subzona 916, 'Anomalias temporales'.",
+  "El campo 'subzona' de cada una es lo que el cliente manda en el hjc para pedirla,",
+  "NO el sitio al que se va: dice de que zona es la anomalia."
+ ],
+ "duracion": 120,
+ "mapaDestino": 196085762,
+ "anomalias": [
+  {
+   "mapa": 154642,
+   "subzona": 455,
+   "nivel": 130,
+   "nombre": "Oscura Jungla"
+  },
+  {
+   "mapa": 54162249,
+   "subzona": 609,
+   "nivel": 140,
+   "nombre": "Cuna de Alma"
+  },
+  {
+   "mapa": 54172489,
+   "subzona": 622,
+   "nivel": 160,
+   "nombre": "Cavernas Gélifux"
+  },
+  {
+   "mapa": 88082704,
+   "subzona": 485,
+   "nivel": 15,
+   "nombre": "Campo de Amakna"
+  },
+  {
+   "mapa": 88085249,
+   "subzona": 7,
+   "nivel": 30,
+   "nombre": "Criptas del cementerio"
+  },
+  {
+   "mapa": 88212481,
+   "subzona": 314,
+   "nivel": 110,
+   "nombre": "Santuario de los dragohuevos"
+  },
+  {
+   "mapa": 95422468,
+   "subzona": 804,
+   "nivel": 200,
+   "nombre": "Salas de las salpicaduras"
+  },
+  {
+   "mapa": 99615238,
+   "subzona": 817,
+   "nivel": 110,
+   "nombre": "Galerías abandonadas"
+  },
+  {
+   "mapa": 129368579,
+   "subzona": 824,
+   "nivel": 150,
+   "nombre": "Galería de Perfósil"
+  },
+  {
+   "mapa": 134225922,
+   "subzona": 833,
+   "nivel": 200,
+   "nombre": "Barrio de los Conquistadores"
+  },
+  {
+   "mapa": 171967506,
+   "subzona": 522,
+   "nivel": 90,
+   "nombre": "Altos de los Aullidos"
+  },
+  {
+   "mapa": 197920772,
+   "subzona": 917,
+   "nivel": 200,
+   "nombre": "Cocuzko"
+  },
+  {
+   "mapa": 207619076,
+   "subzona": 949,
+   "nivel": 140,
+   "nombre": "Fábrica de Fux Artificiales"
+  },
+  {
+   "mapa": 212600323,
+   "subzona": 1011,
+   "nivel": 100,
+   "nombre": "Canales mefíticos"
+  },
+  {
+   "mapa": 223349001,
+   "subzona": 1028,
+   "nivel": 190,
+   "nombre": "Bastión de los Martilloseco"
+  },
+  {
+   "mapa": 223349001,
+   "subzona": 1030,
+   "nivel": 200,
+   "nombre": "Cámara de los Maleficios"
+  }
+ ]
+}

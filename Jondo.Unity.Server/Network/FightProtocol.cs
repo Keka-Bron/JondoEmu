@@ -478,7 +478,7 @@ namespace Jondo.Unity.Launcher.Network
             long mapId = 0;
             int facing = 0;
 
-            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, Op.GameMapMovementRequestMessage);
+            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, Op.Jrw);
             if (jrw == null) return (0, corners, 0);
 
             foreach (var field in ProtoMessage.Parse(jrw).Fields)

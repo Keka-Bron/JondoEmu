@@ -222,11 +222,15 @@ their elements:
 | neither | 1 | 1 | — |
 
 That split is exact and it is not a matter of old and new zones: **301199 is the drawing of the 46
-activated waypoints and 74685 is the drawing of the 15 that are not**. The code treats the two as
-interchangeable models of the same thing, and the captures suggest they are not — the single 74685
-element that appears in a `jss` is declared with a different element type (7.2). It costs nothing
-today, because the 15 are never offered as destinations, but the drawing is not the "newer zaap" the
-comments call it.
+activated waypoints and 74685 is the drawing of the 15 that are not**. The two are not
+interchangeable models of one thing, and the code no longer treats them as such: 74685 is the
+**zaap vestige**, the spot where a temporal anomaly surfaces, and the real server declares it type
+**359**, never 16. See 2.6.
+
+One exception, and it is the reason the drawing cannot simply be retyped everywhere: **five haven-bag
+decors carry 74685 and no 301199 at all** — Foggernaut, Corsair Ship, Brakmar Stadium, Temporal
+Anomaly and Harebourg. Inside a haven bag it is the exit zaap wearing the decor's model, so it stays
+type 16 there. `Interactives.TypeOfZaap` makes exactly that distinction.
 
 ### 2.2 The one that had to be written down by hand
 
@@ -292,15 +296,81 @@ You arrive on the zaap's own cell, or the nearest walkable one if that cell cann
 
 ### 2.5 Zaapis, and other limits
 
-* **Zaapis are not implemented.** They are not in `WaypointsDataRoot`, and the emulator only declares
-  elements carrying one of the two zaap drawings, so a zaapi on a city map is not clickable at all.
-  The exchange is identical to a zaap's — the Bonta zaapi capture was one of the three used to work
-  out §2.3 — so what is missing is the destination table, not the protocol.
-* **The guild-hall zaap is not declared either.** Drawing 37493, on three maps, is declared 114 / 16
-  in the captures — the zaap pair exactly — and none of its maps is in `WaypointsDataRoot`, so the
-  emulator ignores it. That is one more drawing that could be recognised without guessing anything.
+* **Zaapis are implemented** (`Managers/Zaapis.cs`, `Handlers/ZaapiTravelHandler.cs`). They are not
+  in `WaypointsDataRoot` and never will be, so they are recognised by drawing — 70520 and 70521 in
+  Bonta, 304418 in Brakmar — and their destination tables come from the captures, not from client
+  data: four of the six destinations have no zaapi of their own, so nothing in the client says where
+  a zaapi can take you. Type 106, skill 157, and a flat 20 kamas, identical across Bonta's 24
+  destinations and Brakmar's 21. The trip itself reuses `ZaapTravelHandler.TravelAsync`: same `hjc`,
+  same destination map. **Caveat: only *opening* a zaapi is captured. Choosing a destination is by
+  analogy with the zaap and has never been measured.**
+  Drawings 34925 and 70914 belong to neither network and are left alone — they are the Sufokia and
+  Frigost transporters, which need their own tables.
+* **The departure-only zaap is declared** (`Interactives.DepartureOnlyGfx`). Drawing 37493 is on
+  three maps and none of them is in `WaypointsDataRoot`, so `ZaapOf` — which requires membership —
+  never saw it and the element was not declared at all: three zaaps you could click with nothing
+  happening. It is a zaap by measurement, not by guess: the guild reception room (map 99093249,
+  element 540375, cell 227) shows up six times as 114 / 16, the zaap pair exactly. The other two
+  maps — the Jellith Dimension exit and one map of Osamodas's Jungle — carry the same drawing and
+  appear in no capture; they are recognised by drawing, as everything else here is. They are kept in
+  a list apart from `ZaapGfx` because **you leave from them but never arrive at them**: not being in
+  the waypoint table, `Destinations` never offers them, which is correct. The haven-bag zaap already
+  had this same treatment.
 * Nothing is charged for the zaap you are standing on, and nothing is charged for failing.
 * No zaap is ever "discovered" or saved; there is nothing per-character to store.
+
+### 2.6 Temporal anomalies
+
+The 15 waypoints marked *not activated* are not switched-off zaaps. They are **vestige sites**: the
+places where a temporal anomaly can surface. The anomaly itself is not a separate message — it rides
+in the **same `hjj`, in the same repeated field 3** as the zaaps, and the client sorts it into its
+own tab. Three tabs, one list, told apart by one field:
+
+| Tab | entry `f3` | what `hjc` sends back | what `f3` of the `hjc` means |
+|---|---|---|---|
+| Zaap | absent | `{f3: map}` | the destination **map** |
+| Zaapi | **1** | `{f1:1, f2:1, f3: map}` | the destination **map** |
+| Anomaly | **4** | `{f2:4, f3: 609}` | the anomaly's **sub-area** — not a map |
+
+An anomaly entry carries one field the others never do:
+
+```
+f4 { f2: minutes left, f3: minutes it lasts }
+```
+
+**`f3` is 120 in all 27 measured entries, and `f2` counts down in minutes.** That is measured, not
+assumed: between two captures 70.9 seconds apart, five of the six live anomalies dropped by exactly
+1 and the sixth by 2. So an anomaly lives two hours.
+
+Two more rules came out clean:
+
+* **`f1` is the level of the sub-area in `f6`**, straight out of client data — 16 of 16. For an
+  anomaly that is *its own* zone's level, which is usually far above the zone it surfaces in: the
+  anomaly on the Kwakwa Plain (level 30) is the Dragon Egg Sanctuary, level 110.
+* **An anomaly costs exactly what travelling to that map costs by zaap.** All six in the one capture
+  where both appear side by side are identical.
+
+You do not travel to the sub-area in `f6`. That field says *which zone the anomaly recreates*; the
+one capture that makes the trip answers `hjc {f2:4, f3:609}` with a `jru` to map **196085762**,
+which is sub-area **916, "Temporal Anomalies"** — 35 maps, all present in the world data.
+
+And a vestige is not a shortcut into the zaap network: **the `hjj` answering a vestige holds only
+the anomalies**. Two entries, both anomalies, where a real zaap answers with forty-eight.
+
+What is *not* measurable is **which** anomalies are live. Ankama rotates about six every two hours
+and no client data says which. Jondo offers all sixteen that were ever captured, each with its own
+clock, rather than inventing a rotation that would only hide half of them half the time.
+
+`datos/anomalias_3.6.10.10.json`, from `tools/extraer_anomalias.py`. The three tab shapes are
+guarded byte-for-byte against the captures in `ConnectionProtocolSelfTest.CheckTravelList`.
+
+#### The `hjj` `f2` is not where you are
+
+Worth writing down because the emulator gets it wrong: `f2` is **73400320 in eight captures taken
+from eight different places** with the same character, a different value for a different session,
+and **absent in all three zaapi captures**. It is the character's saved zaap, not the map the list
+was opened from. Jondo has no saved-zaap concept yet, so the zaap list still sends the departure
+map; the zaapi list now sends nothing, which is what the real server does.
 
 ---
 
@@ -881,8 +951,8 @@ maps it is used on, and one is wrong:
 
 | What the emulator declares | Pair | What the captures say for that drawing |
 |---|---|---|
-| Zaap, drawing 301199 | 114 / 16 | the same pair, 29 times. Drawing 37493, a guild-hall zaap the emulator does not recognise, gets it too, 6 times |
-| Zaap, drawing 74685 | 114 / 16 | **114 / 359**, three times, on map 54162249. Type 16 is not attested for this drawing anywhere |
+| Zaap, drawing 301199 | 114 / 16 | the same pair, 29 times. Drawing 37493 gets it too, 6 times — the guild reception room, now declared as a departure-only zaap, see 2.5 |
+| Zaap vestige, drawing 74685 | 114 / **359** | the same pair, five times on map 54162250. Type 16 is not attested for this drawing anywhere, and is now only used for the five haven-bag decors that carry it (2.1) |
 | Lottery machine, drawing 51031 | 184 / −1 | the same pair, 9 times |
 | Haven-bag chest, drawing 12367 | 104 / 85 | **184 / −1**, nine times — the lottery's pair — and 105 / 85 twice on a house chest. Never 104 / 85, which in the captures belongs to the guild-hall chest, drawing 46581, 3 times |
 

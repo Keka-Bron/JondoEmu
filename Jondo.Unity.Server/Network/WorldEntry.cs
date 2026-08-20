@@ -60,7 +60,7 @@ namespace Jondo.Unity.Launcher.Network
         {
             // Built from our own database instead. This one is not dropped, it is replaced: the
             // captured kub carries a level 154 character's sheet.
-            Op.CharacterStatsListMessage,
+            Op.Kub,
 
             // What names real people. This is not only somebody else's data: the emulator is meant
             // to be shared, and the friends panel was showing five real accounts with their
@@ -98,7 +98,7 @@ namespace Jondo.Unity.Launcher.Network
             // build them from yet, because no account here has friends, a guild or a spouse.
             //
             // tools/leak.py checks that no real name reaches the wire. Run it after touching this.
-            Op.ContactsListMessage, Op.Jhe, Op.GuildInformationsGeneralMessage, Op.Jhk, Op.Hol, Op.SpouseInformationsMessage, Op.Ihb, Op.Koj, Op.Ife, Op.Jjs, Op.Jaa,
+            Op.Kqg, Op.Jhe, Op.Jhh, Op.Jhk, Op.Hol, Op.Jgu, Op.Ihb, Op.Koj, Op.Ife, Op.Jjs, Op.Jaa,
 
             // Los adornos de la cuenta capturada. No son nombres, pero son suyos igual, y el
             // emulador ya manda los del personaje que se conecta:
@@ -110,7 +110,7 @@ namespace Jondo.Unity.Launcher.Network
             //   lyt  los conjuntos guardados del vestuario de esa cuenta, dos, cada uno con su
             //        bloque de aspecto entero. Es lo mismo que ihb, que ya estaba fuera por esto.
             //        Sin implementar los conjuntos, no mandar nada es lo que ve una cuenta nueva.
-            Op.TitlesAndOrnamentsListMessage, Op.OutfitsListMessage,
+            Op.Hhy, Op.Lyt,
         };
 
         /// <summary>Character id the capture belongs to. Learned from the blocks, never written down.</summary>
@@ -151,7 +151,7 @@ namespace Jondo.Unity.Launcher.Network
                 if (block == null) continue;
                 foreach (byte[] frame in Frames(block))
                 {
-                    byte[]? kub = ConnectionProtocol.ReadPayload(frame, Op.CharacterStatsListMessage);
+                    byte[]? kub = ConnectionProtocol.ReadPayload(frame, Op.Kub);
                     if (kub == null || kub.Length == 0) continue;
 
                     var body = Field(ProtoMessage.Parse(kub), 2);
@@ -255,7 +255,7 @@ namespace Jondo.Unity.Launcher.Network
         private static byte[] ResetJobs(byte[] frame)
         {
             var jobs = Pb.New();
-            byte[]? payload = ConnectionProtocol.ReadPayload(frame, Op.JobExperienceMultiUpdateMessage);
+            byte[]? payload = ConnectionProtocol.ReadPayload(frame, Op.Irq);
             if (payload == null) return jobs.Build();
 
             int count = 0;
@@ -295,41 +295,41 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         private static byte[]? Rebuilt(byte[] frame, DatabaseManager.DbCharacter character)
         {
-            if (ConnectionProtocol.ReadPayload(frame, Op.CharacterSelectedSuccessMessage) != null)
+            if (ConnectionProtocol.ReadPayload(frame, Op.Kva) != null)
             {
-                return ConnectionProtocol.Push(Op.CharacterSelectedSuccessMessage,
+                return ConnectionProtocol.Push(Op.Kva,
                     ConnectionProtocol.BuildCharacterSelectedSuccess(character));
             }
 
-            if (ConnectionProtocol.ReadPayload(frame, Op.JobExperienceMultiUpdateMessage) != null)
+            if (ConnectionProtocol.ReadPayload(frame, Op.Irq) != null)
             {
-                return ConnectionProtocol.Push(Op.JobExperienceMultiUpdateMessage, ResetJobs(frame));
+                return ConnectionProtocol.Push(Op.Irq, ResetJobs(frame));
             }
 
-            if (ConnectionProtocol.ReadPayload(frame, Op.SpellListMessage) != null)
+            if (ConnectionProtocol.ReadPayload(frame, Op.Hms) != null)
             {
-                return ConnectionProtocol.Push(Op.SpellListMessage,
+                return ConnectionProtocol.Push(Op.Hms,
                     ConnectionProtocol.BuildSpellList(character.Breed, character.Level));
             }
 
-            if (ConnectionProtocol.ReadPayload(frame, Op.InventoryContentMessage) != null)
+            if (ConnectionProtocol.ReadPayload(frame, Op.Ivx) != null)
             {
-                return ConnectionProtocol.Push(Op.InventoryContentMessage, ConnectionProtocol.BuildInventory());
+                return ConnectionProtocol.Push(Op.Ivx, ConnectionProtocol.BuildInventory());
             }
 
-            byte[]? itg = ConnectionProtocol.ReadPayload(frame, Op.ShortcutBarContentMessage);
+            byte[]? itg = ConnectionProtocol.ReadPayload(frame, Op.Itg);
             if (itg != null)
             {
                 if (HoldsSpells(itg))
                 {
-                    return ConnectionProtocol.Push(Op.ShortcutBarContentMessage,
+                    return ConnectionProtocol.Push(Op.Itg,
                         ConnectionProtocol.BuildSpellBar(character.Breed, character.Level));
                 }
 
                 // La otra barra, la de objetos. Iba tal cual y apuntaba a 72 uid de la cuenta
                 // capturada: objetos que en este inventario no existen. Sale vacía, que es lo que
                 // tiene un personaje que todavía no ha puesto nada en ella.
-                return ConnectionProtocol.Push(Op.ShortcutBarContentMessage, Array.Empty<byte>());
+                return ConnectionProtocol.Push(Op.Itg, Array.Empty<byte>());
             }
 
             return null;
@@ -394,7 +394,7 @@ namespace Jondo.Unity.Launcher.Network
 
             foreach (byte[] frame in Frames(_afterCharacter))
             {
-                byte[]? kva = ConnectionProtocol.ReadPayload(frame, Op.CharacterSelectedSuccessMessage);
+                byte[]? kva = ConnectionProtocol.ReadPayload(frame, Op.Kva);
                 if (kva == null || kva.Length == 0) continue;
 
                 // kva: f1 { f1 { f1 { f2: name, ... }, f2: id } }
@@ -482,7 +482,7 @@ namespace Jondo.Unity.Launcher.Network
                 if (block == null) continue;
                 foreach (byte[] frame in Frames(block))
                 {
-                    byte[]? ivx = ConnectionProtocol.ReadPayload(frame, Op.InventoryContentMessage);
+                    byte[]? ivx = ConnectionProtocol.ReadPayload(frame, Op.Ivx);
                     if (ivx == null || ivx.Length == 0) continue;
 
                     // The same message is the inventory, and reading it is what puts the equipment
@@ -607,7 +607,7 @@ namespace Jondo.Unity.Launcher.Network
             if (skipped > 0) Console.WriteLine($"[World] {skipped} messages left out: they belong to another account.");
 
             // And in place of the characteristics of the capture, the ones of this character.
-            await EnviarAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
+            await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
             Console.WriteLine($"[World] Characteristics sent for {character.Name}: level " +
                               $"{Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}, {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas} kamas.");
 
@@ -658,9 +658,9 @@ namespace Jondo.Unity.Launcher.Network
                 // safe once we build the actor list ourselves: the actors travel in this same
                 // block and still describe the captured map, so changing just the id leaves the
                 // client loading one map and being told about another, and it draws nobody.
-                if (mapId > 0 && ConnectionProtocol.ReadPayload(frame, Op.CurrentMapMessage) != null)
+                if (mapId > 0 && ConnectionProtocol.ReadPayload(frame, Op.Jru) != null)
                 {
-                    toSend = ConnectionProtocol.Push(Op.CurrentMapMessage, Pb.New().Var(2, mapId).Build());
+                    toSend = ConnectionProtocol.Push(Op.Jru, Pb.New().Var(2, mapId).Build());
                 }
 
                 await EnviarAsync(stream, toSend);
@@ -670,9 +670,17 @@ namespace Jondo.Unity.Launcher.Network
             // The characteristics go out again here. The real server sends its kub twice, once
             // with the character and once with the map, and it is this second one the client
             // keeps: sending it only in the first block left the sheet empty.
-            await EnviarAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
+            await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
 
-            Console.WriteLine($"[World] Block 3 sent: {sent} messages, map {mapId}, characteristics resent.");
+            // Los zaaps descubiertos. No está en los bloques grabados —se comprobó, ninguno de los
+            // cuatro trae un hjk— y sin él la ventana de viaje sale con «Ningún destino» aunque el
+            // hjj le mande los sesenta y tres. El servidor real lo manda justo aquí, al entrar.
+            var descubiertos = new List<long>(Managers.Interactives.DiscoveredZaapMaps());
+            await EnviarAsync(stream, ConnectionProtocol.Push(
+                Op.Hjk, ConnectionProtocol.BuildDiscoveredZaaps(descubiertos)));
+
+            Console.WriteLine($"[World] Block 3 sent: {sent} messages, map {mapId}, characteristics " +
+                              $"resent, {descubiertos.Count} zaaps descubiertos.");
             return sent;
         }
 
