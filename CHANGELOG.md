@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.6.10.10-admin.6] - 2026-08-20
+
+### Added
+- **A full data audit** of the emulator's data layer, documented in `docs/data-audit.md` and re-runnable at any time with `tools/auditoria_datos.py`. Every data file and database table was counted, and every cross-reference between the client dump and the dofusdude catalogues was followed: item sets, cosmetics, mounts and mob members all resolve with zero orphans — the two data sources agree wherever they overlap. The audit also found five real gaps: the professions tables are empty because the dofusdude dump files (`datos/JsonFromDofusDude/`) are absent; only 53 of 6,468 NPC templates are actually placed in the world; dungeons 144 and 157 have rooms on maps that don't exist; 379 spell levels reference spells that aren't in the spells table; and 11 maps have fight geometry but no walkable cells.
+- Note on dofusdb.fr: it was **not** used as a comparison source. Its licence expressly forbids feeding its data to AI agents or AI-driven pipelines, and its catalogue is Dofus 2, not the Dofus 3 Unity this emulator runs. The dofusdude dumps — already consumed by the project — are the correct Dofus 3 reference, and the audit validates against them.
+
 ## [3.6.10.10-admin.5] - 2026-08-20
 
 ### Fixed
