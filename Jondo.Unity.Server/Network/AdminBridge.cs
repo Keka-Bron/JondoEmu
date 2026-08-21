@@ -54,7 +54,7 @@ namespace Jondo.Unity.Launcher.Network
         private static long DebeSerAdministrador(string cuerpo)
         {
             string token = Texto(cuerpo, "token");
-            long cuenta = ClientLaunchRegistry.ResolveToken(token);
+            long cuenta = ClientLaunchRegistry.ResolveLauncherToken(token);
             if (cuenta <= 0) return -1;
 
             int rol = DatabaseManager.GetAccountRole(cuenta);

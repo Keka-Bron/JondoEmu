@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "aquadome-merkator",
+  "kind": "dungeon-mechanic-map",
+  "status": "Draft",
+  "sourceUrl": "https://www.dofuspourlesnoobs.com/aquadocircme-de-merkator.html",
+  "sourceRetrievedUtc": "2026-08-21T11:55:14Z",
+  "sourceTitle": "Aquadôme de Merkator",
+  "clientVersion": "3.6.10.10",
+  "dungeon": {
+    "clientDungeonId": 0,
+    "name": "Aquadôme de Merkator",
+    "roomMapIds": []
+  },
+  "encounters": [],
+  "rules": [
+    {
+      "id": "initial-boss-state",
+      "status": "GuideRequirementOnly",
+      "trigger": "fight-start",
+      "notes": "The guide describes an initial boss effect that changes combat-wide behaviour. Resolve the client effect/spell IDs and capture its S2C application before implementing it."
+    },
+    {
+      "id": "action-reactive-effects",
+      "status": "GuideRequirementOnly",
+      "trigger": "specific player or monster actions",
+      "notes": "The guide describes conditional effects tied to range, movement-point removal, weapon hits and melee actions. Do not implement from prose; each trigger requires a measured rule and test."
+    }
+  ],
+  "evidence": {
+    "guideSummary": "The guide identifies a boss encounter with a fight-start state and action-dependent reactions. This draft records the investigation scope only; it does not define numerical combat behaviour.",
+    "clientCatalogReferences": [],
+    "capturedProtocolReferences": [],
+    "acceptanceTests": []
+  },
+  "safety": {
+    "requiresMeasuredHandler": true,
+    "neverInventPackets": true,
+    "playerStateWrites": []
+  }
+}

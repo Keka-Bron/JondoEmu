@@ -18,9 +18,14 @@ Download it from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/do
 
 The official client talks to Ankama's servers and checks their SSL certificates. **JondoFix**, a MelonLoader mod, redirects it to your machine instead. It comes already built in this repository.
 
-1. Get **MelonLoader 0.7.x** from [its releases page](https://github.com/LavaGang/MelonLoader/releases). **Read this bit or you will pick the wrong one:** 0.7.x is published as *Open-Beta*, so it shows up as a **pre-release** and the page's "Latest" tag still points at 0.6.x. **0.6.x does not work with this client** — tick *show pre-releases* and take 0.7.x. The setup this repository is tested against runs **0.7.3**.
-2. Run the installer and point it at your **`Dofus.exe`**. That is the only thing you have to choose: MelonLoader works out the rest by itself. On this client it reports `Game Type: Il2cpp`, `Game Arch: x64`, `Runtime Type: net6`, Unity `6000.3.16f1` — you do not set any of that.
-3. Copy **`JondoFix/JondoFix.dll`** from this repository into the **`Mods/`** folder of your Dofus installation, next to `Dofus.exe`. MelonLoader creates that folder the first time the game starts; if it is not there yet, just create it yourself.
+Choose `Dofus.exe` in the launcher and click **Install client support**, or simply launch an
+account. The launcher silently installs the pinned official **MelonLoader 0.7.3 x64** package and
+its bundled **JondoFix**. The download is accepted only after its SHA-256 matches the official
+release asset pinned by this build; extraction is staged, paths are checked, existing files are
+backed up, and a failed install rolls back. No external installer window is opened.
+
+Manual installation remains possible: extract the official `MelonLoader.x64.zip` beside
+`Dofus.exe`, then put `JondoFix/JondoFix.dll` in the client's `Mods/` directory.
 
 > The mod ships **already compiled** and is the exact binary in use — you never need to build it. `JondoFix/` also carries its source, in case you want to read or change it.
 
@@ -29,13 +34,31 @@ Two things worth knowing afterwards:
 * MelonLoader writes a log per run under **`MelonLoader/Logs/`**. If the client starts but never reaches the emulator, that file is the first place to look.
 
 What JondoFix does:
-* **Network redirection** — intercepts sockets, Named Pipes and DNS queries and sends them to `localhost` (ports `8888`, `5555`, `15881`, `6337`).
+* **Network redirection** — intercepts the Dofus service connections and sends them to the server domain/IP selected in the launcher (ports `8888`, `5555`, `5556`, `15881`, `6337`).
 * **SSL bypass** — stops HTTPS requests from failing against the local self-signed certificate.
 * **Environment configuration** — injects the variables the client expects (`ZAAP_PORT`, `ZAAP_HASH`, and so on).
 
 ### Step 3 — Run it
 
-Double-click **`Jondo Emulator Launcher.exe`**. That is still the only thing you start by hand, but there are now **two executables**: the launcher is the window you use, and it starts **`Jondo Server.exe`** by itself. They were one program until the split; keeping them apart means the launcher you hand to a player carries no database, no maps, no protocol handlers and no effect catalogue — it references the shared contract and nothing else. The server has its own window with the log and the counters.
+The server operator starts **`Jondo Server.exe`** on the server machine. Players start only
+**`Jondo Emulator Launcher.exe`** on their PCs. The launcher never looks for, starts, or stops a
+local server process. Use the server row in the launcher to enter the cloud machine's domain/IP or
+its HTTPS reverse-proxy URL; the URL is used for account/control calls and its host is passed
+privately to JondoFix for all redirected game services.
+
+The server binds to loopback by default. A cloud host opts into network listeners with
+`JONDO_PUBLIC_BIND=1`. Dofus must reach raw port 8888 for HAAPI, but in public mode the server blocks
+remote launcher `/api/*` calls on that plaintext connection. Put the launcher control path behind a
+loopback HTTPS reverse proxy and enter its public HTTPS URL in the launcher. A trusted-LAN-only
+deployment can opt out with `JONDO_ALLOW_INSECURE_CONTROL=1`. Open only the native game ports the
+deployment actually needs.
+
+On Windows, the account running a public server needs a one-time URL reservation for the HAAPI
+listener (run in an elevated terminal, replacing the account name):
+
+```powershell
+netsh http add urlacl url=http://+:8888/ user=DOMAIN\JondoService
+```
 
 On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, select one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once. Create your account in the launcher or use the test account as follows:
 
@@ -65,6 +88,7 @@ docs/                         technical documentation
 launcher_assets/              launcher artwork and music
 JondoFix/                     the MelonLoader mod, source and compiled dll
 Jondo.Unity.*/                source code
+Jondo.Electron.Launcher/      Electron + React launcher source and catalogue explorer
 ```
 
 Some folders are **not** in the repository because they are not needed to play, and appear on your machine as you use it: `bases/` (the databases, built on first run), `logs/`, `tools/` (the Python that regenerates the files in `datos/`) and `dofus3_data/` (436 MB of raw client dump, only used by those tools).
@@ -74,7 +98,7 @@ Some folders are **not** in the repository because they are not needed to play, 
 ## 🚀 Emulation Status
 
 ### 🖥️ Custom Launcher
-- [x] **Native WinForms interface**, drawn from code, with its own theme, artwork and background music.
+- [x] **Electron + React interface**, using the Jondo artwork with a responsive player flow and a separate read-only client-data catalogue explorer.
 - [x] **Account creation and login** from the launcher itself, written straight to `auth.db`.
 - [x] **Persistent team of up to eight accounts** — add profiles once, select any subset or all of them, and launch one independent Dofus process per selected account.
 - [x] **Per-client identity chain** — unique instance id, launch hash, Zaap game session, game token, single-use connection ticket and socket-owned game session.
@@ -82,7 +106,8 @@ Some folders are **not** in the repository because they are not needed to play, 
 - [x] **Embedded server log** so you can watch traffic and errors without a console window.
 - [x] **Single-file deployment** — the twelve dependency DLLs travel inside the executable; the folder stays clean.
 - [x] **Multilanguage**.
-- [x] **Launcher and server are separate programs** — `Jondo Emulator Launcher.exe` and `Jondo Server.exe`. The launcher starts the server itself, and carries none of it: no database, no maps, no protocol handlers, no effect catalogue. The server keeps its own window with the log and the counters.
+- [x] **Launcher and server are separate programs** — `Jondo Emulator Launcher.exe` is the player-side client and does not start or require a local server process. It connects to the configured domain/IP, while `Jondo Server.exe`, its databases and game data stay on the server machine.
+- [x] **Client-data catalogue browser** — choose a pinned `client_data/3.6.10.10` snapshot to search its 204 extracted DataRoot catalogues and inspect exact JSON rows without changing a server database.
 
 ### 🌍 World & Connection
 - [x] **Client / Server / Authentication emulation** (Zaap, HAAPI, Connection Server, with the VIP subscription check bypassed).
@@ -92,6 +117,15 @@ Some folders are **not** in the repository because they are not needed to play, 
 - [x] **Movement, map change, map loading and adjacent maps** across **15,360 maps**, with **17,211** of them carrying walkable-cell data.
 - [x] **Last cell and map persistence** in the database.
 - [x] **Auto-pilot** — double-click on the minimap or the *travel to* option.
+
+### 🚪 Interactives and Houses
+- [x] **3,091 world-graph interactives** — criterion-free, single-target doors, stairs, ladders and passages are joined to their exact live map element and execute the destination encoded by the pinned 3.6.10.10 client graph.
+- [x] **Persistent houses** — 674 supported exterior doors across 106 interiors, with saved owner, price and access policy, first-hand purchase, and the measured house enter/exit packet flows.
+- [x] **Evidence precedence** — stale elements and exact world-graph keys are never reclassified from a reused zaap/house graphic. Conditional and multi-target graph routes remain disabled until their criteria can be evaluated correctly.
+
+House placement and interior assignment are server-owned emulator data. The client provides 261
+static house models but does not ship the official server's placements, owners or destinations;
+those are not presented as native Ankama world state.
 
 ### 🌀 Zaaps and Zaapis
 - [x] **62 waypoints** mapped from the client data, with their map, cell and sub-area.

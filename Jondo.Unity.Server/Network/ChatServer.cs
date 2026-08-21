@@ -39,11 +39,12 @@ namespace Jondo.Unity.Launcher.Network
                 Console.WriteLine($"[-] Error generating certificate: {ex.Message}");
             }
 
-            _listener = new TcpListener(IPAddress.Any, port);
+            _listener = new TcpListener(ServerBinding.TcpAddress, port);
             _listener.Start();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"[+] Chat Server (Mock/TLS) listening on TCP port {port}");
+            Console.WriteLine($"[+] Chat Server (Mock/TLS) listening on TCP port {port} " +
+                              $"({ServerBinding.Description})");
             Console.ResetColor();
 
             _ = AcceptConnectionsAsync();
@@ -126,30 +127,30 @@ namespace Jondo.Unity.Launcher.Network
                         int read = await sslStream.ReadAsync(buffer, 0, buffer.Length);
                         if (read == 0)
                         {
-                            Console.WriteLine("[Chat Server] Client disconnected from TLS session.");
+                            // The Dofus chat client authenticates over a short-lived TLS request.
+                            // It normally closes this connection after the acknowledgement; that
+                            // is not a TLS failure or a game disconnection.
+                            Console.WriteLine("[Chat Server] Chat authentication connection closed by client (normal one-shot flow).");
                             break;
                         }
 
-                        string hex = BitConverter.ToString(buffer, 0, read);
                         string ascii = Encoding.ASCII.GetString(buffer, 0, read);
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"[Chat Server] Received {read} bytes decrypted.");
-                        Console.WriteLine($"[Chat Server] Hex: {hex}");
-                        Console.WriteLine($"[Chat Server] ASCII: {ascii}");
-                        Console.ResetColor();
 
                         // Respond to client authentication message
                         if (ascii.Contains("\"token\""))
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("[Chat Server] Auth Token detected! Sending Success Response...");
+                            Console.WriteLine($"[Chat Server] Received a {read}-byte chat authentication request; acknowledging it.");
                             Console.ResetColor();
                             
                             string jsonResponse = "{\"success\":true}";
                             byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonResponse);
                             byte[] responseBuffer = new byte[4 + 1 + jsonBytes.Length];
                             
-                            int len = jsonBytes.Length;
+                            // The request has the same shape: the big-endian length includes the
+                            // one-byte message type in addition to the JSON payload.  Advertising
+                            // only the JSON length leaves the final byte outside the frame.
+                            int len = 1 + jsonBytes.Length;
                             responseBuffer[0] = (byte)((len >> 24) & 0xFF);
                             responseBuffer[1] = (byte)((len >> 16) & 0xFF);
                             responseBuffer[2] = (byte)((len >> 8) & 0xFF);
@@ -160,8 +161,9 @@ namespace Jondo.Unity.Launcher.Network
                             Array.Copy(jsonBytes, 0, responseBuffer, 5, jsonBytes.Length);
                             
                             await sslStream.WriteAsync(responseBuffer, 0, responseBuffer.Length);
+                            await sslStream.FlushAsync();
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("[Chat Server] Sent Auth Success Response!");
+                            Console.WriteLine("[Chat Server] Chat authentication acknowledged.");
                             Console.ResetColor();
                         }
 

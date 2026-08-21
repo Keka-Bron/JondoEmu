@@ -27,27 +27,17 @@ namespace Jondo.Unity.Launcher.Handlers
     /// </summary>
     public static class CharacterCreationHandler
     {
-        /// <summary>Donde empieza todo el mundo: el zaap de la ciudad de Astrub.</summary>
-        public const long StartingMap = 191105026L;
-
-        /// <summary>Con lo que empieza: nivel, kamas y las características de los pergaminos.</summary>
-        public const int StartingLevel = 1;
-        public const long StartingKamas = 1_000_000L;
-        public const int ScrolledStat = 101;
-
         /// <summary>
-        /// El conjunto del aventurero, que es el número 5 del juego: capa, sombrero, anillo, botas,
-        /// cinturón y amuleto. Van puestos, no en la bolsa.
+        /// Fresh characters begin in Incarnam before the tutorial, not at an Astrub zaap.
+        /// Tutorial rewards must be earned through the tutorial flow; creation never grants them.
         /// </summary>
-        private static readonly (int Gid, int Slot)[] AdventurerSet =
-        {
-            (2478, 0),    // amuleto
-            (2475, 2),    // anillo
-            (2477, 3),    // cinturón
-            (2476, 4),    // botas
-            (2474, 6),    // sombrero
-            (2473, 7),    // capa
-        };
+        public const long StartingMap = DatabaseManager.StartingMap;
+        public const int StartingCell = DatabaseManager.StartingCell;
+
+        /// <summary>Creation baseline observed by the client: level one, no money and no scrolls.</summary>
+        public const int StartingLevel = 1;
+        public const long StartingKamas = 0L;
+        public const int StartingStat = 0;
 
         /// <summary>
         /// El cliente pide un nombre al azar (kvk) y espera el mismo mensaje de vuelta con uno
@@ -118,6 +108,17 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
+            // kvz can be forged independently of the preceding kwb.  Keep the capacity check
+            // here as well, so a client cannot create characters for an unbound session or slip
+            // past the number of slots announced at login.
+            if (!HasAvailableCharacterSlot(accountId, serverId))
+            {
+                await RefuseAsync(stream, accountId > 0 && serverId > 0
+                    ? CharacterLimitReached
+                    : CreationRefused);
+                return;
+            }
+
             if (DatabaseManager.CharacterNameTaken(name))
             {
                 Console.WriteLine($"[Personajes] El nombre \"{name}\" ya está cogido.");
@@ -126,8 +127,8 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             long id = DatabaseManager.CreateCharacter(accountId, serverId, name, breed, sex, head,
-                                                      colors, StartingMap, StartingLevel,
-                                                      StartingKamas, ScrolledStat, AdventurerSet);
+                                                      colors, StartingMap, StartingCell, StartingLevel,
+                                                      StartingKamas, StartingStat);
             if (id == 0)
             {
                 await RefuseAsync(stream, CreationRefused);
@@ -141,14 +142,49 @@ namespace Jondo.Unity.Launcher.Handlers
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.CharactersListMessage, ConnectionProtocol.BuildCharactersList(characters)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.CharactersListEndMessage));
 
-            Console.WriteLine($"[Personajes] Creado {name} (id {id}), raza {breed}, en el zaap de " +
-                              $"Astrub, con el conjunto del aventurero y {StartingKamas} kamas.");
+            Console.WriteLine($"[Personajes] Creado {name} (id {id}), raza {breed}, en Incarnam " +
+                              "sin kamas, equipo ni progreso de cuenta. " +
+                              $"La lista ya contiene {characters.Count} personaje(s).");
         }
 
-        /// <summary>Los motivos que lleva el kvb cuando dice que no. El 3 es el del límite.</summary>
+        /// <summary>
+        /// The client sends empty kwb from the character-selection UI before opening an extra
+        /// character slot.  It appears after every completed kvi/kvd list in the captured
+        /// traffic.  A second empty kvd is the continuation the UI waits for; without it, the
+        /// first character can be created but the Add Character control stays pending thereafter.
+        /// </summary>
+        public static async Task ConfirmCanCreateAsync(NetworkStream stream, long accountId, int serverId)
+        {
+            if (!HasAvailableCharacterSlot(accountId, serverId))
+            {
+                if (accountId > 0 && serverId > 0)
+                    await RefuseAsync(stream, CharacterLimitReached);
+                return;
+            }
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.CharactersListEndMessage));
+            Console.WriteLine($"[Personajes] Hueco adicional confirmado para la cuenta {accountId} " +
+                              $"en el servidor {serverId}.");
+        }
+
+        /// <summary>Pure capacity rule, kept separate so the protocol guard can test its edges.</summary>
+        internal static bool HasAvailableCharacterSlot(int characterCount)
+            => characterCount >= 0 && characterCount < ConnectionProtocol.MaxCharactersPerServer;
+
+        private static bool HasAvailableCharacterSlot(long accountId, int serverId)
+        {
+            if (accountId <= 0 || serverId <= 0) return false;
+            return HasAvailableCharacterSlot(DatabaseManager.GetCharactersByAccountId(accountId, serverId).Count);
+        }
+
+        /// <summary>Los motivos que lleva el kvb cuando dice que no.</summary>
         private const int CreationRefused = 1;
         private const int NameAlreadyTaken = 2;
+        private const int CharacterLimitReached = 3;
 
         private static async Task RefuseAsync(NetworkStream stream, int reason)
         {

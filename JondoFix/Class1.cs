@@ -8,17 +8,43 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Reflection;
 using Il2CppCore.DataCenter;
 using Il2CppCore.DataCenter.Metadata.World;
+using UnityEngine.UIElements;
 
-[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.2.0", "Jondo")]
+[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.3.0", "Jondo")]
 [assembly: MelonGame("Ankama", "Dofus")]
 
 namespace JondoFix
 {
     public class JondoFixMod : MelonMod
     {
+        private const string DefaultServerHost = "127.0.0.1";
+        private static readonly int[] RedirectPorts = { 443, 5555, 5556, 6337, 8888, 15881 };
+        private static readonly object ServerAddressLock = new object();
+        private static bool _serverHostWasProvided;
+        private static bool _serverAddressResolutionAttempted;
+        private static bool _serverAddressResolutionWarningLogged;
+        private static string _resolvedServerIpv4;
+        private static string _resolvedServerIpv6;
+
         public static bool UseLocalRedirect { get; private set; } = false;
+        public static string ServerHost { get; private set; } = DefaultServerHost;
+        public static string ServerUriHost
+        {
+            get
+            {
+                if (System.Net.IPAddress.TryParse(ServerHost, out var address) &&
+                    address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                {
+                    // RFC 6874 requires a percent sign in an IPv6 zone id to be escaped in a URI.
+                    return "[" + ServerHost.Replace("%", "%25") + "]";
+                }
+                return ServerHost;
+            }
+        }
+        public static string HaapiBaseUrl => "http://" + ServerUriHost + ":8888";
         public static Il2CppSystem.Net.Security.RemoteCertificateValidationCallback BypassedCallback { get; private set; }
         public static Il2CppMono.Security.Interface.MonoRemoteCertificateValidationCallback BypassedMonoCallback { get; private set; }
         private static bool hasDumped = false;
@@ -62,6 +88,184 @@ namespace JondoFix
                 return preferred;
             }
             return Path.Combine(@"C:\Jondo", relative);
+        }
+
+        private static void ConfigureServerHost()
+        {
+            string supplied = Environment.GetEnvironmentVariable("JONDO_SERVER_HOST");
+            _serverHostWasProvided = !string.IsNullOrWhiteSpace(supplied);
+
+            if (_serverHostWasProvided && TryNormalizeServerHost(supplied, out string normalized))
+            {
+                ServerHost = normalized;
+                return;
+            }
+
+            ServerHost = DefaultServerHost;
+            if (_serverHostWasProvided)
+            {
+                MelonLogger.Warning("[JondoFix] JONDO_SERVER_HOST is malformed; using 127.0.0.1.");
+            }
+        }
+
+        private static bool TryNormalizeServerHost(string supplied, out string normalized)
+        {
+            normalized = null;
+            if (string.IsNullOrWhiteSpace(supplied)) return false;
+
+            string candidate = supplied.Trim();
+            if (candidate.Length >= 2 && candidate[0] == '[' && candidate[candidate.Length - 1] == ']')
+            {
+                candidate = candidate.Substring(1, candidate.Length - 2);
+            }
+
+            // The launcher provides a host, never a URL, path, port or credentials.
+            if (candidate.Length == 0 || candidate.Length > 253 ||
+                candidate.Any(char.IsWhiteSpace) || candidate.IndexOfAny(new[] { '/', '\\', '?', '#', '@' }) >= 0)
+            {
+                return false;
+            }
+
+            if (System.Net.IPAddress.TryParse(candidate, out var address))
+            {
+                normalized = address.ToString();
+                return true;
+            }
+
+            // Do not reinterpret a malformed dotted IPv4 address as a numeric DNS name.
+            if (candidate.Contains(".") && candidate.All(character => char.IsDigit(character) || character == '.'))
+                return false;
+
+            try
+            {
+                string ascii = new System.Globalization.IdnMapping().GetAscii(candidate.TrimEnd('.'));
+                if (ascii.Length == 0 || ascii.Length > 253) return false;
+                string[] labels = ascii.Split('.');
+                foreach (string label in labels)
+                {
+                    if (label.Length == 0 || label.Length > 63 || label[0] == '-' || label[label.Length - 1] == '-')
+                        return false;
+                    if (label.Any(c => !(char.IsLetterOrDigit(c) || c == '-')))
+                        return false;
+                }
+
+                normalized = ascii.ToLowerInvariant();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static string FormatServerEndpoint(int port)
+            => ServerUriHost + ":" + port;
+
+        public static bool ShouldRedirect(string hostOrEndpoint, int port)
+        {
+            if (!UseLocalRedirect) return false;
+            if (RedirectPorts.Contains(port)) return true;
+            if (string.IsNullOrWhiteSpace(hostOrEndpoint)) return false;
+
+            string value = hostOrEndpoint.ToLowerInvariant();
+            return value.Contains("ankama") || value.Contains("34.247.205") || value.Contains("54.75.207") ||
+                   RedirectPorts.Any(candidate => value.EndsWith(":" + candidate, StringComparison.Ordinal));
+        }
+
+        public static int RedirectPortFromEndpoint(string endpoint, int fallback)
+        {
+            if (!string.IsNullOrEmpty(endpoint))
+            {
+                int separator = endpoint.LastIndexOf(':');
+                if (separator >= 0 && separator + 1 < endpoint.Length &&
+                    int.TryParse(endpoint.Substring(separator + 1), out int port) && RedirectPorts.Contains(port))
+                {
+                    return port == 443 ? 5555 : port;
+                }
+            }
+            return fallback;
+        }
+
+        public static Il2CppSystem.Net.IPAddress CreateRedirectAddress(string currentAddress)
+        {
+            bool preferIpv6 = currentAddress != null &&
+                              (currentAddress.StartsWith("[", StringComparison.Ordinal) ||
+                               currentAddress.Count(character => character == ':') > 1);
+            string target = ResolveServerAddress(preferIpv6);
+            try
+            {
+                return Il2CppSystem.Net.IPAddress.Parse(target);
+            }
+            catch (Exception ex)
+            {
+                if (!_serverAddressResolutionWarningLogged)
+                {
+                    _serverAddressResolutionWarningLogged = true;
+                    MelonLogger.Warning($"[JondoFix] Could not create the configured socket address ({ex.Message}); using loopback.");
+                }
+                return Il2CppSystem.Net.IPAddress.Parse(DefaultServerHost);
+            }
+        }
+
+        private static string ResolveServerAddress(bool preferIpv6)
+        {
+            if (System.Net.IPAddress.TryParse(ServerHost, out var literal))
+                return literal.ToString();
+
+            lock (ServerAddressLock)
+            {
+                if (!_serverAddressResolutionAttempted)
+                {
+                    _serverAddressResolutionAttempted = true;
+                    try
+                    {
+                        foreach (var address in System.Net.Dns.GetHostAddresses(ServerHost))
+                        {
+                            if (_resolvedServerIpv4 == null &&
+                                address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                                _resolvedServerIpv4 = address.ToString();
+                            else if (_resolvedServerIpv6 == null &&
+                                     address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                                _resolvedServerIpv6 = address.ToString();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!_serverAddressResolutionWarningLogged)
+                        {
+                            _serverAddressResolutionWarningLogged = true;
+                            MelonLogger.Warning($"[JondoFix] Could not resolve configured server host; using loopback for numeric socket hooks ({ex.Message}).");
+                        }
+                    }
+                }
+
+                string resolved = preferIpv6
+                    ? _resolvedServerIpv6 ?? _resolvedServerIpv4
+                    : _resolvedServerIpv4 ?? _resolvedServerIpv6;
+                return resolved ?? DefaultServerHost;
+            }
+        }
+
+        public static string RedactUri(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+            int cut = value.IndexOfAny(new[] { '?', '#' });
+            string safe = cut >= 0 ? value.Substring(0, cut) : value;
+
+            int scheme = safe.IndexOf("://", StringComparison.Ordinal);
+            if (scheme >= 0)
+            {
+                int authorityStart = scheme + 3;
+                int authorityEnd = safe.IndexOf('/', authorityStart);
+                if (authorityEnd < 0) authorityEnd = safe.Length;
+                if (authorityEnd > authorityStart)
+                {
+                    int credentials = safe.LastIndexOf('@', authorityEnd - 1, authorityEnd - authorityStart);
+                    if (credentials >= authorityStart)
+                        safe = safe.Substring(0, authorityStart) + safe.Substring(credentials + 1);
+                }
+            }
+            return safe;
         }
 
         private static void LoadItemNames()
@@ -118,12 +322,16 @@ namespace JondoFix
 
         public override void OnInitializeMelon()
         {
+            ConfigureServerHost();
             LoadItemNames();
-            UseLocalRedirect = IsEmulatorActive();
+            // An explicit launcher setting is authoritative. Do not fall back to official servers
+            // merely because a cloud endpoint is slow or temporarily unavailable at startup.
+            UseLocalRedirect = _serverHostWasProvided || IsEmulatorActive();
             LoggerInstance.Msg("====================================================");
             LoggerInstance.Msg("  JONDO REDIRECTOR & FIX");
-            LoggerInstance.Msg($"  Version: 1.2.0");
-            LoggerInstance.Msg($"  Local Emulator Active? {UseLocalRedirect}");
+            LoggerInstance.Msg($"  Version: 1.3.0");
+            LoggerInstance.Msg($"  Server endpoint: {FormatServerEndpoint(5555)}");
+            LoggerInstance.Msg($"  Server redirection active? {UseLocalRedirect}");
             if (UseLocalRedirect)
             {
                 LoggerInstance.Msg("  [+] DNS and Socket redirection is ACTIVE");
@@ -135,10 +343,10 @@ namespace JondoFix
             LoggerInstance.Msg("====================================================");
 
             LoggerInstance.Msg($"[JondoFix Env] ZAAP_PORT = {Environment.GetEnvironmentVariable("ZAAP_PORT")}");
-            LoggerInstance.Msg($"[JondoFix Env] ZAAP_HASH = {Environment.GetEnvironmentVariable("ZAAP_HASH")}");
+            LoggerInstance.Msg($"[JondoFix Env] ZAAP_HASH = {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ZAAP_HASH")) ? "<not set>" : "<redacted>")}");
             LoggerInstance.Msg($"[JondoFix Env] ZAAP_GAME = {Environment.GetEnvironmentVariable("ZAAP_GAME")}");
             LoggerInstance.Msg($"[JondoFix Env] ZAAP_RELEASE = {Environment.GetEnvironmentVariable("ZAAP_RELEASE")}");
-            LoggerInstance.Msg($"[JondoFix Env] ZAAP_INSTANCE_ID = {Environment.GetEnvironmentVariable("ZAAP_INSTANCE_ID")}");
+            LoggerInstance.Msg($"[JondoFix Env] ZAAP_INSTANCE_ID = {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ZAAP_INSTANCE_ID")) ? "<not set>" : "<set>")}");
             LoggerInstance.Msg($"[JondoFix Env] ZAAP_CAN_AUTH = {Environment.GetEnvironmentVariable("ZAAP_CAN_AUTH")}");
             
             if (UseLocalRedirect)
@@ -474,8 +682,8 @@ namespace JondoFix
             {
                 using (var tcp = new System.Net.Sockets.TcpClient())
                 {
-                    var ar = tcp.BeginConnect("127.0.0.1", 8888, null, null);
-                    if (ar.AsyncWaitHandle.WaitOne(100)) // 100ms timeout
+                    var ar = tcp.BeginConnect(ServerHost, 8888, null, null);
+                    if (ar.AsyncWaitHandle.WaitOne(250))
                     {
                         tcp.EndConnect(ar);
                         return true;
@@ -498,9 +706,9 @@ namespace JondoFix
             {
                 if (uriString.Contains("haapi.ankama.com") || uriString.Contains("haapi.ankama.corp"))
                 {
-                    uriString = uriString.Replace("https://haapi.ankama.com", "http://127.0.0.1:8888")
-                                         .Replace("https://haapi.ankama.corp", "http://127.0.0.1:8888");
-                    MelonLogger.Msg($"[JondoFix] Redirected HAAPI URI to: {uriString}");
+                    uriString = uriString.Replace("https://haapi.ankama.com", JondoFixMod.HaapiBaseUrl)
+                                         .Replace("https://haapi.ankama.corp", JondoFixMod.HaapiBaseUrl);
+                    MelonLogger.Msg($"[JondoFix] Redirected HAAPI URI to {JondoFixMod.FormatServerEndpoint(8888)}.");
                 }
             }
         }
@@ -516,8 +724,8 @@ namespace JondoFix
                 var uri = request.RequestUri;
                 if (uri.Host.Contains("haapi.ankama.corp") || uri.Host.Contains("haapi.ankama"))
                 {
-                    var newUri = new Uri("http://127.0.0.1:8888" + uri.PathAndQuery);
-                    MelonLogger.Msg($"[JondoFix HAAPI REDIRECT] {uri} -> {newUri}");
+                    var newUri = new Uri(JondoFixMod.HaapiBaseUrl + uri.PathAndQuery);
+                    MelonLogger.Msg($"[JondoFix HAAPI REDIRECT] {JondoFixMod.RedactUri(uri.ToString())} -> {JondoFixMod.RedactUri(newUri.ToString())}");
                     request.RequestUri = newUri;
                     request.Headers.Remove("Host");
                 }
@@ -536,14 +744,12 @@ namespace JondoFix
             {
                 string ipStr = address.ToString();
                 MelonLogger.Msg($"[JondoFix] Socket connecting to IP: {ipStr}:{port}");
-                if (port == 5555 || port == 443)
+                if (JondoFixMod.ShouldRedirect(ipStr, port))
                 {
-                    if (ipStr != "127.0.0.1" && ipStr != "::1")
-                    {
-                        MelonLogger.Msg($"[JondoFix] Redirecting IP Game Server to Localhost:5555!");
-                        address = Il2CppSystem.Net.IPAddress.Parse("127.0.0.1");
-                        port = 5555;
-                    }
+                    int redirectedPort = port == 443 ? 5555 : port;
+                    MelonLogger.Msg($"[JondoFix] Redirecting TCP socket to {JondoFixMod.FormatServerEndpoint(redirectedPort)}.");
+                    address = JondoFixMod.CreateRedirectAddress(ipStr);
+                    port = redirectedPort;
                 }
             }
         }
@@ -558,10 +764,11 @@ namespace JondoFix
             {
                 string epStr = remoteEP.ToString();
                 MelonLogger.Msg($"[JondoFix] Socket connecting to EndPoint: {epStr}");
-                if (epStr.Contains("ankama") || epStr.Contains("34.247.205") || epStr.Contains("54.75.207") || epStr.Contains(":5555") || epStr.Contains(":443"))
+                if (JondoFixMod.ShouldRedirect(epStr, 0))
                 {
-                    MelonLogger.Msg($"[JondoFix] Redirecting Socket EndPoint to Localhost:5555!");
-                    remoteEP = new Il2CppSystem.Net.IPEndPoint(Il2CppSystem.Net.IPAddress.Parse("127.0.0.1"), 5555);
+                    int port = epStr.EndsWith(":443", StringComparison.Ordinal) ? 5555 : JondoFixMod.RedirectPortFromEndpoint(epStr, 5555);
+                    MelonLogger.Msg($"[JondoFix] Redirecting socket endpoint to {JondoFixMod.FormatServerEndpoint(port)}.");
+                    remoteEP = new Il2CppSystem.Net.IPEndPoint(JondoFixMod.CreateRedirectAddress(epStr), port);
                 }
             }
         }
@@ -576,10 +783,11 @@ namespace JondoFix
             {
                 string epStr = e.RemoteEndPoint.ToString();
                 MelonLogger.Msg($"[JondoFix] Socket.ConnectAsync(SocketAsyncEventArgs) to: {epStr}");
-                if (epStr.Contains("ankama") || epStr.Contains("34.247.205") || epStr.Contains("54.75.207") || epStr.Contains(":5555") || epStr.Contains(":443"))
+                if (JondoFixMod.ShouldRedirect(epStr, 0))
                 {
-                    MelonLogger.Msg($"[JondoFix] Redirecting SocketAsyncEventArgs to Localhost:5555!");
-                    e.RemoteEndPoint = new Il2CppSystem.Net.IPEndPoint(Il2CppSystem.Net.IPAddress.Parse("127.0.0.1"), 5555);
+                    int port = epStr.EndsWith(":443", StringComparison.Ordinal) ? 5555 : JondoFixMod.RedirectPortFromEndpoint(epStr, 5555);
+                    MelonLogger.Msg($"[JondoFix] Redirecting asynchronous socket to {JondoFixMod.FormatServerEndpoint(port)}.");
+                    e.RemoteEndPoint = new Il2CppSystem.Net.IPEndPoint(JondoFixMod.CreateRedirectAddress(epStr), port);
                 }
             }
         }
@@ -595,11 +803,11 @@ namespace JondoFix
             if (JondoFixMod.UseLocalRedirect)
             {
                 MelonLogger.Msg($"[JondoFix] TcpClient connecting to: {hostname}:{port}");
-                if (hostname != null && (hostname.Contains("ankama") || port == 5555 || port == 443))
+                if (JondoFixMod.ShouldRedirect(hostname, port))
                 {
-                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient to Localhost:5555!");
-                    hostname = "127.0.0.1";
-                    port = 5555;
+                    port = port == 443 ? 5555 : port;
+                    hostname = JondoFixMod.ServerHost;
+                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient to {JondoFixMod.FormatServerEndpoint(port)}.");
                 }
             }
         }
@@ -614,10 +822,11 @@ namespace JondoFix
             {
                 string epStr = remoteEP.ToString();
                 MelonLogger.Msg($"[JondoFix] TcpClient connecting to EndPoint: {epStr}");
-                if (epStr.Contains("ankama") || epStr.Contains("34.247.205") || epStr.Contains("54.75.207") || remoteEP.Port == 5555 || remoteEP.Port == 443)
+                if (JondoFixMod.ShouldRedirect(epStr, remoteEP.Port))
                 {
-                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient EndPoint to Localhost:5555!");
-                    remoteEP = new Il2CppSystem.Net.IPEndPoint(Il2CppSystem.Net.IPAddress.Parse("127.0.0.1"), 5555);
+                    int port = remoteEP.Port == 443 ? 5555 : remoteEP.Port;
+                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient endpoint to {JondoFixMod.FormatServerEndpoint(port)}.");
+                    remoteEP = new Il2CppSystem.Net.IPEndPoint(JondoFixMod.CreateRedirectAddress(epStr), port);
                 }
             }
         }
@@ -631,11 +840,11 @@ namespace JondoFix
             if (JondoFixMod.UseLocalRedirect)
             {
                 MelonLogger.Msg($"[JondoFix] TcpClient.ConnectAsync to: {host}:{port}");
-                if (host != null && (host.Contains("ankama") || port == 5555 || port == 443))
+                if (JondoFixMod.ShouldRedirect(host, port))
                 {
-                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient.ConnectAsync to Localhost:5555!");
-                    host = "127.0.0.1";
-                    port = 5555;
+                    port = port == 443 ? 5555 : port;
+                    host = JondoFixMod.ServerHost;
+                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient.ConnectAsync to {JondoFixMod.FormatServerEndpoint(port)}.");
                 }
             }
         }
@@ -649,11 +858,11 @@ namespace JondoFix
             if (JondoFixMod.UseLocalRedirect)
             {
                 MelonLogger.Msg($"[JondoFix] TcpClient.BeginConnect to: {host}:{port}");
-                if (host != null && (host.Contains("ankama") || port == 5555 || port == 443))
+                if (JondoFixMod.ShouldRedirect(host, port))
                 {
-                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient.BeginConnect to Localhost:5555!");
-                    host = "127.0.0.1";
-                    port = 5555;
+                    port = port == 443 ? 5555 : port;
+                    host = JondoFixMod.ServerHost;
+                    MelonLogger.Msg($"[JondoFix] Redirecting TcpClient.BeginConnect to {JondoFixMod.FormatServerEndpoint(port)}.");
                 }
             }
         }
@@ -668,11 +877,11 @@ namespace JondoFix
         {
             if (JondoFixMod.UseLocalRedirect)
             {
-                MelonLogger.Msg($"[JondoFix] UnityWebRequest.Get: {uri}");
+                MelonLogger.Msg($"[JondoFix] UnityWebRequest.Get: {JondoFixMod.RedactUri(uri)}");
                 if (uri != null && uri.Contains("dofus3.json"))
                 {
                     MelonLogger.Msg($"[JondoFix] Intercepting config download!");
-                    uri = "http://127.0.0.1:8888/config/dofus3.json";
+                    uri = JondoFixMod.HaapiBaseUrl + "/config/dofus3.json";
                 }
             }
         }
@@ -685,7 +894,7 @@ namespace JondoFix
         {
             if (JondoFixMod.UseLocalRedirect)
             {
-                MelonLogger.Msg($"[JondoFix] UnityWebRequest.Post: {uri}");
+                MelonLogger.Msg($"[JondoFix] UnityWebRequest.Post: {JondoFixMod.RedactUri(uri)}");
             }
         }
     }
@@ -745,7 +954,7 @@ namespace JondoFix
             {
                 if (parameters != null)
                 {
-                    MelonLogger.Msg($"[JondoFix] ZaapClient.Connect(parameters: port={parameters.port}, name={parameters.name}, release={parameters.release}, instanceId={parameters.instanceId}, hash={parameters.hash})");
+                    MelonLogger.Msg($"[JondoFix] ZaapClient.Connect(parameters: port={parameters.port}, name={parameters.name}, release={parameters.release}, instanceId=<set>, hash=<redacted>)");
                 }
                 else
                 {
@@ -762,7 +971,7 @@ namespace JondoFix
         {
             if (JondoFixMod.UseLocalRedirect)
             {
-                MelonLogger.Msg($"[JondoFix] ZaapClient.Connect(explicit: port={port}, name={name}, release={release}, instanceId={instanceId}, hash={hash})");
+                MelonLogger.Msg($"[JondoFix] ZaapClient.Connect(explicit: port={port}, name={name}, release={release}, instanceId=<set>, hash=<redacted>)");
             }
         }
     }
@@ -988,6 +1197,59 @@ namespace JondoFix
             catch (Exception ex)
             {
                 MelonLogger.Error($"[JondoFix] Error in TryGetLocalization Postfix: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// The 3.6.10.10 client can retain a stale "character limit reached" UI state after a
+    /// connection-server response has changed.  Jondo advertises the vanilla five slots and
+    /// checks the limit again on the server, so leaving the local button disabled prevents a
+    /// valid creation without providing any protection.  This compatibility guard only runs
+    /// while Jondo's redirect is active; it never changes an official-client session.
+    /// </summary>
+    [HarmonyPatch]
+    public class CharacterSelectionCreateButtonPatch
+    {
+        private static bool _enabledLogged;
+        private static bool _warningLogged;
+
+        private static MethodBase TargetMethod()
+        {
+            Type selection = AccessTools.TypeByName("Core.UILogic.Connection.CharacterSelection");
+            return selection == null ? null : AccessTools.Method(selection, "UpdateCreateButton");
+        }
+
+        public static void Postfix(object __instance)
+        {
+            if (!JondoFixMod.UseLocalRedirect || __instance == null) return;
+
+            try
+            {
+                // CharacterSelection inherits its generated binding through fzy<T>; the
+                // obfuscated field name is stable for the pinned 3.6.10.10 client.  Reflection
+                // keeps this patch isolated from the game's generated binding implementation.
+                object binding = AccessTools.Field(__instance.GetType(), "dwpp")?.GetValue(__instance);
+                if (binding == null) return;
+
+                object button = binding.GetType().GetProperty("btn_createCharacter")?.GetValue(binding);
+                if (button is VisualElement visual && !visual.enabledSelf)
+                {
+                    visual.SetEnabled(true);
+                    if (!_enabledLogged)
+                    {
+                        _enabledLogged = true;
+                        MelonLogger.Msg("[JondoFix] Character creation UI unlocked; the server remains the slot authority.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!_warningLogged)
+                {
+                    _warningLogged = true;
+                    MelonLogger.Warning($"[JondoFix] Could not apply character-creation UI compatibility: {ex.Message}");
+                }
             }
         }
     }

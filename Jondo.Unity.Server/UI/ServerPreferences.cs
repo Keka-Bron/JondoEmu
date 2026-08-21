@@ -102,10 +102,14 @@ namespace Jondo.Unity.Launcher.UI
                 var valores = Leer();
                 if (!valores.TryGetValue("zoom", out string? v)) return 1f;
                 return float.TryParse(v, System.Globalization.CultureInfo.InvariantCulture, out float zoom)
-                    ? MathF.Max(0.5f, MathF.Min(3f, zoom))
+                    ? MathF.Max(0.75f, MathF.Min(2f, zoom))
                     : 1f;
             }
-            set => Escribir("zoom", value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture));
+            set
+            {
+                float zoom = MathF.Max(0.75f, MathF.Min(2f, value));
+                Escribir("zoom", zoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture));
+            }
         }
     }
 }

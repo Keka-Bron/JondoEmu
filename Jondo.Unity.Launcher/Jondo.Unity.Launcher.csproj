@@ -31,7 +31,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
+    <EmbeddedResource Include="..\JondoFix\bin\Release\net6.0\JondoFix.dll"
+                      LogicalName="Jondo.Unity.Launcher.Payload.JondoFix.dll" />
   </ItemGroup>
+
+  <Target Name="BuildBundledJondoFix" BeforeTargets="PrepareResources">
+    <MSBuild Projects="..\JondoFix\JondoFix.csproj" Targets="Build"
+             Properties="Configuration=Release;RuntimeIdentifier=" />
+  </Target>
 
   <Target Name="DesplegarLauncher" AfterTargets="Publish">
     <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe" DestinationFiles="$(MSBuildProjectDirectory)\..\Jondo Emulator Launcher.exe" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />

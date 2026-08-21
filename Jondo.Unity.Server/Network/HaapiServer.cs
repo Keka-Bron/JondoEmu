@@ -18,11 +18,19 @@ namespace Jondo.Unity.Launcher.Network
             _isRunning = true;
 
             _listener = new HttpListener();
-            _listener.Prefixes.Add($"http://localhost:{port}/");
-            _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
+            ServerBinding.ConfigureHttp(_listener, port);
             _listener.Start();
 
-            Console.WriteLine($"[+] HAAPI HTTP Server listening on port {port}");
+            Console.WriteLine($"[+] HAAPI HTTP Server listening on port {port} ({ServerBinding.Description})");
+            if (ServerBinding.Public)
+            {
+                Console.WriteLine("[Network] Public bind enabled. Raw port 8888 serves Dofus HAAPI, " +
+                                  "but remote launcher /api routes are blocked by default.");
+                Console.WriteLine("[Network] Terminate launcher control at a loopback HTTPS reverse proxy" +
+                                  (ServerBinding.AllowInsecureRemoteControl
+                                      ? "; WARNING: insecure remote control override is enabled."
+                                      : "."));
+            }
 
             _listenTask = Task.Run(async () =>
             {
@@ -68,7 +76,10 @@ namespace Jondo.Unity.Launcher.Network
             var req = ctx.Request;
             var resp = ctx.Response;
             string path = req.Url?.AbsolutePath ?? "/";
-            string clientIp = req.RemoteEndPoint.Address.ToString();
+            bool control = path.StartsWith(Contract.Prefijo, StringComparison.Ordinal);
+            string clientIp = control
+                ? ServerBinding.ControlClientAddress(req)
+                : req.RemoteEndPoint.Address.ToString();
             bool latido = EsLatido(path);
             if (path != "/" && !latido)
             {
@@ -83,13 +94,29 @@ namespace Jondo.Unity.Launcher.Network
                 return;
             }
 
+            if (control && !ServerBinding.MayUseControlApi(req))
+            {
+                Console.WriteLine($"[Control] Rejected plaintext remote request from {clientIp}; " +
+                                  "use the configured HTTPS proxy.");
+                byte[] denied = System.Text.Encoding.UTF8.GetBytes("{\"error\":\"https-required\"}");
+                resp.StatusCode = 403;
+                resp.ContentType = "application/json; charset=utf-8";
+                resp.ContentLength64 = denied.Length;
+                await resp.OutputStream.WriteAsync(denied, 0, denied.Length);
+                resp.Close();
+                return;
+            }
+
             // Read request body if present
             string body = "";
             if (req.HasEntityBody)
             {
                 using var reader = new StreamReader(req.InputStream, req.ContentEncoding);
                 body = await reader.ReadToEndAsync();
-                if (body.Length > 0 && body.Length < 1000 && !latido) Console.WriteLine($"[HAAPI]  body: {body}");
+                // Control bodies contain passwords and persistent launcher tokens. They must
+                // never enter logs, especially once the endpoint is reachable from a network.
+                if (body.Length > 0 && body.Length < 1000 && !latido && !control)
+                    Console.WriteLine($"[HAAPI]  body: {body}");
             }
 
             // Las rutas de mando del lanzador. Estuvieron aquí, se borraron al pasar a la ventana
@@ -233,7 +260,7 @@ namespace Jondo.Unity.Launcher.Network
         private static string TokenResponse(long accountId)
         {
             string token = Guid.NewGuid().ToString("N");
-            ClientLaunchRegistry.RegisterToken(accountId, token);
+            ClientLaunchRegistry.RegisterGameToken(accountId, token);
             return System.Text.Json.JsonSerializer.Serialize(new
             {
                 token,
@@ -311,7 +338,7 @@ namespace Jondo.Unity.Launcher.Network
             if (accountId <= 0) throw new InvalidOperationException("No account token was supplied to HAAPI.");
             string token = Guid.NewGuid().ToString("N");
             DatabaseManager.SetGameToken(accountId, token);
-            ClientLaunchRegistry.RegisterToken(accountId, token);
+            ClientLaunchRegistry.RegisterGameToken(accountId, token);
 
             return System.Text.Json.JsonSerializer.Serialize(new
             {
@@ -341,7 +368,7 @@ namespace Jondo.Unity.Launcher.Network
                 string candidate = raw?.Trim() ?? "";
                 if (candidate.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                     candidate = candidate.Substring(7).Trim();
-                long accountId = ClientLaunchRegistry.ResolveToken(candidate);
+                long accountId = ClientLaunchRegistry.ResolveAnyToken(candidate);
                 if (accountId > 0) return accountId;
             }
 
@@ -356,7 +383,7 @@ namespace Jondo.Unity.Launcher.Network
                         if (property.Value.ValueKind != System.Text.Json.JsonValueKind.String) continue;
                         if (!property.Name.Contains("token", StringComparison.OrdinalIgnoreCase) &&
                             !property.Name.Contains("key", StringComparison.OrdinalIgnoreCase)) continue;
-                        long accountId = ClientLaunchRegistry.ResolveToken(property.Value.GetString());
+                        long accountId = ClientLaunchRegistry.ResolveAnyToken(property.Value.GetString());
                         if (accountId > 0) return accountId;
                     }
                 }

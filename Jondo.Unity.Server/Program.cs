@@ -55,16 +55,22 @@ namespace Jondo.Unity.Launcher
             // 1. Initialize Database and Map Manager
             Console.WriteLine("[+] Initializing Database...");
             DatabaseManager.Initialize();
+            Network.UnknownPacketStore.Initialize();
+
+            Console.WriteLine("[+] Initializing Map Manager...");
+            MapManager.Initialize();
+            // Mob eligibility depends on the resolved map layer (outside / interior) and on
+            // the client-derived dungeon room list.  Load both before materialising groups so
+            // social interiors never acquire the generic MapMobs seeded for open-world maps.
+            Managers.DungeonManager.Initialize();
 
             Console.WriteLine("[+] Initializing MobSpawnManager...");
             Managers.MobSpawnManager.InitializeAndSpawnAll();
 
-            Console.WriteLine("[+] Initializing Map Manager...");
-            MapManager.Initialize();
             ExperienceTable.Initialize();
             Managers.SpellTable.Initialize();
             Managers.BreedStatCost.Initialize();
-            Managers.DungeonManager.Initialize();
+            Managers.MechanicCatalog.Initialize();
             Managers.EffectTable.Initialize();
             Managers.ItemSets.Initialize();
             Managers.EffectFields.Initialize();
@@ -77,6 +83,15 @@ namespace Jondo.Unity.Launcher
             Managers.Titles.Initialize();
             Managers.Cosmetics.Initialize();
             Managers.Merkasako.Initialize();
+            Managers.Zaapis.Initialize();
+            Managers.Bins.Initialize();
+            Managers.Anomalies.Initialize();
+            // The exact world-graph key must be available before the house-gfx heuristic so a
+            // generic skill-184 door is not misclassified as a type-300 house entrance.
+            Managers.WorldInteractiveTransitions.Initialize();
+            Managers.WorldInteractiveReturns.Initialize();
+            Managers.Houses.Initialize();
+            Managers.HouseManager.Initialize();
             Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
             Managers.Npcs.Initialize();
@@ -156,15 +171,6 @@ namespace Jondo.Unity.Launcher
             await barrendero.DisposeAsync();
 
             StopServices();
-
-            // Safety net: if something gets stuck and the process does not end on its own, force
-            // the exit. It used to have to be killed by hand from the task manager.
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(5));
-                Console.WriteLine("[!] The graceful shutdown did not finish in time. Forcing the exit.");
-                Environment.Exit(0);
-            });
         }
 
         private static readonly TaskCompletionSource _shutdown =
@@ -173,7 +179,7 @@ namespace Jondo.Unity.Launcher
         /// <summary>Si ya se ha pedido el apagado, para que la ventana no vuelva a preguntar.</summary>
         public static bool ApagandoYa => _shutdownRequested != 0;
 
-    private static int _shutdownRequested;
+        private static int _shutdownRequested;
         private static int _servicesStopped;
 
         /// <summary>
@@ -184,6 +190,18 @@ namespace Jondo.Unity.Launcher
         {
             if (Interlocked.Exchange(ref _shutdownRequested, 1) != 0) return;
             Console.WriteLine($"[+] Shutting down the emulator ({reason})...");
+
+            // Start the watchdog BEFORE StopServices. The old watchdog was scheduled after that
+            // method returned, which meant it could never rescue the exact failure it was meant
+            // for: a listener blocking forever during shutdown and leaving an invisible process
+            // that had to be killed from Task Manager.
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                Console.WriteLine("[!] Graceful shutdown exceeded five seconds; forcing process exit.");
+                Environment.Exit(0);
+            });
+
             _shutdown.TrySetResult();
         }
 

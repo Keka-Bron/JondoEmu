@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "pinnedClientVersion": "3.6.10.10",
+  "updatedUtc": "2026-08-21T00:00:00Z",
+  "purpose": "Authoritative-source map for Jondo's 3.6.10.10 parity work. This is an evidence registry, not a bulk scraper or an automatic database import.",
+  "truthOrder": [
+    {
+      "rank": 1,
+      "source": "Installed 3.6.10.10 client and version-pinned extracted snapshot",
+      "proves": ["protocol contracts", "static IDs", "map geometry", "interactive placement", "world graph", "catalogue records", "client UI expectations"],
+      "doesNotProve": ["server-owned account state", "economy balances", "unobserved dialogue branches", "combat resolution"]
+    },
+    {
+      "rank": 2,
+      "source": "Official Dofus / Ankama pages and release notes",
+      "proves": ["published gameplay intent", "dated rule changes", "feature availability", "player-facing terminology"],
+      "doesNotProve": ["protobuf field layouts", "network replies", "database IDs", "per-character state mutations"]
+    },
+    {
+      "rank": 3,
+      "source": "Captured 3.6.10.10 client/server traffic and controlled in-game tests",
+      "proves": ["request/reply ordering", "validation", "persistence expectations", "visible state transitions"],
+      "doesNotProve": ["behaviour not exercised by the capture"]
+    },
+    {
+      "rank": 4,
+      "source": "Version-checked third-party catalogues and community guides",
+      "proves": ["cross-checks", "translations", "human gameplay specifications"],
+      "doesNotProve": ["authoritative implementation details"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "official-release-notes",
+      "label": "DOFUS official Updates / release notes",
+      "url": "https://www.dofus.com/en/mmorpg/news/updates",
+      "allowedHosts": ["www.dofus.com", "dofus.com"],
+      "evidenceKind": "dated-rule-change",
+      "useFor": ["new/changed feature requirements", "dungeon and monster mechanic changes", "economy and job rule changes", "release dates"],
+      "neverUseFor": ["protocol generation", "automatic database writes", "unverified map or entity IDs"],
+      "versionRule": "Record the published date and explicit game version on each referenced page. A note without an explicit version is design evidence only."
+    },
+    {
+      "id": "official-encyclopedia",
+      "label": "DOFUS official Encyclopedia",
+      "url": "https://www.dofus.com/en/mmorpg/encyclopedia",
+      "allowedHosts": ["www.dofus.com", "dofus.com"],
+      "evidenceKind": "player-facing-catalogue",
+      "useFor": ["names", "descriptions", "published item/monster/spell presentation", "manual QA references"],
+      "neverUseFor": ["complete server catalogue import", "spawn locations", "drop rates", "hidden mechanics", "server authority"],
+      "versionRule": "Treat the page as current unless a dated release note pins the information; cross-check IDs against the local client snapshot."
+    },
+    {
+      "id": "official-game-guide",
+      "label": "DOFUS official game guides and news",
+      "url": "https://www.dofus.com/en/mmorpg/news",
+      "allowedHosts": ["www.dofus.com", "dofus.com"],
+      "evidenceKind": "feature-specification",
+      "useFor": ["tutorial flow", "feature entry points", "NPC/service UX", "manual acceptance tests"],
+      "neverUseFor": ["server packet replies", "state schema", "undocumented prerequisites"],
+      "versionRule": "Use a guide only alongside an in-client capture before marking an interaction implemented."
+    },
+    {
+      "id": "official-status",
+      "label": "Ankama official status and service communication",
+      "url": "https://www.dofus.com/en/mmorpg/news",
+      "allowedHosts": ["www.dofus.com", "dofus.com", "support.ankama.com"],
+      "evidenceKind": "operations-only",
+      "useFor": ["explaining a public outage or maintenance window"],
+      "neverUseFor": ["parity implementation", "game data imports"],
+      "versionRule": "Never promote operational notices into gameplay behaviour."
+    }
+  ],
+  "acceptancePolicy": {
+    "automaticImport": false,
+    "requiredForImplementation": ["matching 3.6.10.10 client evidence", "captured or otherwise verified request/reply flow when the feature is networked", "validation and persistence design"],
+    "officialPageRole": "Official pages produce a traceable requirement and regression test; they do not directly mutate world.db or account data.",
+    "recordFields": ["sourceId", "url", "canonicalUrl", "retrievedUtc", "httpStatus", "title", "publishedOrVersionText", "contentSha256", "localEvidencePath", "featureTags", "implementationStatus"]
+  }
+}

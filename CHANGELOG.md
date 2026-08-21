@@ -1,5 +1,31 @@
 # Changelog
 
+## [3.6.10.10-admin.10] - 2026-08-21
+
+### Added
+- Imported the pinned Unity world graph and joined it to the current map bundles. The server now declares and executes 3,091 criterion-free, single-target doors, stairs, ladders and other map transitions, with exact element/skill validation and safe destination cells.
+- Added persistent house instances, 261 official client house models, `jss.f9` metadata, first-hand purchase confirmation (`khr`/`jal`), atomic kamas/ownership updates, access checks, and the measured house enter/exit packet sequences. Stale and graph-owned graphic guesses are excluded, leaving 674 usable exterior doors and 106 supported interiors.
+- Added deterministic client extractors and evidence catalogues for the 44,072 live interactive elements, world transitions and static house models.
+
+### Fixed
+- Restored character visibility on map entry. Synthetic `jss.f9` house metadata is now disabled by default after the live 3.6.10.10 client proved that the incomplete `lpx` instance shape aborts its entire map-actor handler. House persistence and declared door actions remain available; the raw metadata encoder is opt-in only for controlled protocol captures.
+
+### Changed
+- The launcher is now a remote-client application: it no longer starts a local server, accepts a cloud server host, and silently installs or repairs the pinned MelonLoader/JondoFix client integration before play.
+- Launcher and server windows start in a normal restored window, and the server console/layout scales coherently across DPI and screen resolutions.
+- Jondo Admin is now a light, responsive Electron application. Its Tools tab discovers every Python script in `tools`, runs a selected script with JSON-array arguments from the emulator root, and keeps arbitrary shell commands out of the UI. The retired `Jondo.Unity.Admin` C# source project is no longer part of the solution.
+
+## [3.6.10.10-admin.9] - 2026-08-21
+
+### Fixed
+- An account can again add characters on the same server. The character-selection UI's empty `kwb` extra-slot request now receives its required `kvd` continuation, and the refreshed list after a successful creation is closed with `kvd` too. The server validates this against the selected account/server and permits the 100 slots it advertises.
+- The character-name dice now handles the actual client request (`kwd`) and returns its `kvk` suggestion.
+
+## [3.6.10.10-admin.8] - 2026-08-20
+
+### Fixed
+- Clearing the spell bar in the game client no longer produces an unhandled `iuz` packet warning. The server now recognizes the client's clear-bar action and removes the saved spell-bar entries for that character.
+
 ## [3.6.10.10-admin.7] - 2026-08-20
 
 ### Fixed

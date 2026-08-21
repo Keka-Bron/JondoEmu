@@ -54,7 +54,9 @@ namespace Jondo.Unity.World.Fights
             List<Fighter> allFighters,
             HashSet<int> arenaWalkableCells = null,
             Func<int, AISpellData>? spellDataFetcher = null,
-            HashSet<int> losBlockers = null)
+            HashSet<int> losBlockers = null,
+            IReadOnlyDictionary<int, int>? spellPriorities = null,
+            double? fleeBelowHpPercent = null)
         {
             var result = new MonsterTurnResult();
             var players = allFighters.Where(f => f.TeamId == 0 && f.IsAlive).ToList();
@@ -83,11 +85,15 @@ namespace Jondo.Unity.World.Fights
             // Best effective range per AP first, so the monster picks the spell it can cast
             // without moving over the melee one.
             availableSpells = availableSpells
-                .OrderByDescending(s => (s.BaseDamageMin + s.BaseDamageMax) / 2)
+                // A higher externally configured priority wins; absent data retains the
+                // measured generic damage ordering. No monster id is hard-coded here.
+                .OrderByDescending(s => spellPriorities != null && spellPriorities.TryGetValue(s.SpellId, out int priority) ? priority : 0)
+                .ThenByDescending(s => (s.BaseDamageMin + s.BaseDamageMax) / 2)
                 .ToList();
 
             // 2. Flee mode evaluation (< 30% HP)
-            bool fleeMode = ((double)monster.CurrentHP / monster.MaxHP) < 0.30;
+            double fleeThreshold = fleeBelowHpPercent ?? 0.30;
+            bool fleeMode = ((double)monster.CurrentHP / monster.MaxHP) < fleeThreshold;
 
             // 3. Target Selection
             var target = EvaluateBestTarget(monster, players, allFighters);

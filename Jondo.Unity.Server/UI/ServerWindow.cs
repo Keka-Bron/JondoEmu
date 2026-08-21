@@ -45,6 +45,9 @@ namespace Jondo.Unity.Launcher.UI
         private readonly Label _version = new();
         private readonly System.Windows.Forms.ToolTip _pistas = new();
 
+        private bool _interfazLista;
+        private bool _ajustandoBarra;
+
         private long _ultimaLinea;
         private readonly DateTime _arranque = DateTime.UtcNow;
         private readonly System.Diagnostics.Process _yo = System.Diagnostics.Process.GetCurrentProcess();
@@ -65,6 +68,10 @@ namespace Jondo.Unity.Launcher.UI
         // LauncherTheme.CreateFont, que ya mete el ampliador dentro; multiplicar un cuerpo por
         // _escala y además dejarlo en puntos lo escalaba dos veces —la caja de «seguir el registro»
         // y las cifras salían enormes en cuanto Windows pasaba del 100%—.
+        private const float ConsoleFontPixels = 15f;
+        private const float UiFontPixels = 12f;
+        private const float MetricFontPixels = 11.5f;
+
         private float _escala;
 
         private int E(int px) => (int)Math.Round(px * _escala);
@@ -108,15 +115,19 @@ namespace Jondo.Unity.Launcher.UI
 
         public ServerWindow()
         {
+            // Every pixel measurement in this window goes through E().  Explicitly disabling
+            // WinForms' implicit font autoscaling prevents the controls from being scaled once by
+            // us and a second time by the framework at 125/150/200% DPI.
+            AutoScaleMode = AutoScaleMode.None;
             _escala = EscalaActual();
             LauncherTheme.UiZoom = ServerPreferences.Zoom;
 
             Text = "Jondo Server";
             StartPosition = FormStartPosition.CenterScreen;
-            MinimumSize = new Size(E(900), E(560));
-            Size = new Size(E(1280), E(760));
-            // Maximizada, que es como se quiere ver un servidor: de un vistazo y sin colocarla.
-            WindowState = FormWindowState.Maximized;
+            ActualizarTamanoMinimo(Screen.PrimaryScreen?.WorkingArea);
+            Size = TamanoInicial(Screen.PrimaryScreen?.WorkingArea);
+            // Normal on startup: the server remains easy to reach without taking over the desktop.
+            WindowState = FormWindowState.Normal;
             BackColor = LauncherTheme.Background;
             ForeColor = LauncherTheme.BaseText;
             DoubleBuffered = true;
@@ -128,7 +139,7 @@ namespace Jondo.Unity.Launcher.UI
                 Primera = "JONDO",
                 Segunda = "SERVER",
                 BackColor = Color.Transparent,
-                Height = E(92),
+                Height = E(78),
                 Dock = DockStyle.Top,
             };
 
@@ -138,11 +149,11 @@ namespace Jondo.Unity.Launcher.UI
             // no es el de esta versión.
             _version.Text = "v" + Contract.Version;
             _version.Dock = DockStyle.Top;
-            _version.Height = E(16);
+            _version.Height = E(20);
             _version.TextAlign = ContentAlignment.MiddleCenter;
             _version.BackColor = Color.Transparent;
             _version.ForeColor = LauncherTheme.MutedGold;
-            _version.Font = LauncherTheme.CreateFont(9f);
+            _version.Font = Letra(11f);
 
             // Los cuatro indicadores en UNA columna a la izquierda.
             //
@@ -155,8 +166,10 @@ namespace Jondo.Unity.Launcher.UI
                 Dock = DockStyle.Left,
                 Width = 0,   // lo pone AjustarConsola
                 BackColor = Color.Transparent,
+                AutoScroll = true,
             };
             _cifras.Paint += (s, e) => ConRed(e.Graphics, _cifras, 0, 4);
+            _cifras.Scroll += (s, e) => _cifras.Invalidate();
 
             DefinirCifras();
 
@@ -170,15 +183,15 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.Transparent,
-                Padding = new Padding(E(10), E(14), E(22), E(10)),
+                Padding = new Padding(E(12), E(12), E(14), E(12)),
             };
 
             var barra = new Panel
             {
                 Dock = DockStyle.Bottom,
-                Height = E(40),
+                Height = E(48),
                 BackColor = Color.Transparent,
-                Padding = new Padding(E(22), 0, E(22), 0),
+                Padding = new Padding(E(12), 0, E(12), 0),
             };
             _barra = barra;
 
@@ -189,13 +202,11 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.LogNormal,
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
-                // La letra va en PÍXELES y sin multiplicar por la escala del monitor.
-                //
-                // Antes era «Mono(6f)», que por dentro hacía 6 × DeviceDpi/96. Un tamaño en puntos
-                // ya es independiente del DPI, así que multiplicarlo lo duplica: en un monitor a
-                // 192 ppp salía a doce puntos y por eso el registro se veía enorme y se partía. Es
-                // el mismo fallo que ya se corrigió en el desofuscador.
-                Font = LauncherTheme.CreateMonoFont(12f),
+                // The factory accepts CSS pixels and creates a point-sized font. Windows then
+                // renders those points at the monitor DPI, while UiZoom adds the user's chosen
+                // enlargement exactly once. Fifteen logical pixels keeps dense logs readable
+                // without turning an ultrawide console into wrapped prose.
+                Font = Mono(ConsoleFontPixels),
 
                 // Sin partir líneas. Con la consola estrecha partirlas era lo menos malo; ahora que
                 // ocupa la ventana entera, un renglón es un paquete y eso vale más que no tener
@@ -227,8 +238,7 @@ namespace Jondo.Unity.Launcher.UI
                 ForeColor = LauncherTheme.MutedGold,
                 BackColor = Color.Transparent,
                 AutoSize = true,
-                Font = LauncherTheme.CreateFont(11f),
-                Location = new Point(E(2), E(13)),
+                Font = Letra(UiFontPixels),
             };
             barra.Controls.Add(_seguir);
 
@@ -238,13 +248,13 @@ namespace Jondo.Unity.Launcher.UI
             _filtro.ForeColor = LauncherTheme.FieldText;
             _filtro.BackColor = LauncherTheme.ConsoleBackground;
             _filtro.BorderStyle = BorderStyle.FixedSingle;
-            _filtro.Font = LauncherTheme.CreateMonoFont(9.5f);
-            _filtro.Width = E(170);
+            _filtro.Font = Mono(12f);
+            _filtro.Width = E(190);
             barra.Controls.Add(_filtro);
 
             foreach (var cual in new[] { Language.Es, Language.En, Language.Fr })
             {
-                var boton = Boton(LauncherTexts.Code(cual).ToUpperInvariant(), LauncherTheme.MutedGold, E(46));
+                var boton = Boton(LauncherTexts.Code(cual).ToUpperInvariant(), LauncherTheme.MutedGold, E(48));
                 var elegido = cual;
                 boton.Click += (s, e) => CambiarIdioma(elegido);
                 _idiomas.Add(boton);
@@ -253,11 +263,11 @@ namespace Jondo.Unity.Launcher.UI
 
             // La ampliación de la interfaz, con el mismo par de botones que el lanzador: para la
             // ventana que se pasa el día mirándose en una pantalla de muchas pulgadas al 100%.
-            _reducir = Boton("A–", LauncherTheme.MutedGold, E(46));
+            _reducir = Boton("A–", LauncherTheme.MutedGold, E(48));
             _reducir.Click += (s, e) => CambiarZoom(-0.25f);
             barra.Controls.Add(_reducir);
 
-            _ampliar = Boton("A+", LauncherTheme.MutedGold, E(46));
+            _ampliar = Boton("A+", LauncherTheme.MutedGold, E(48));
             _ampliar.Click += (s, e) => CambiarZoom(+0.25f);
             barra.Controls.Add(_ampliar);
 
@@ -269,30 +279,18 @@ namespace Jondo.Unity.Launcher.UI
             _parar.Click += PararloTodo;
             barra.Controls.Add(_parar);
 
-            void Colocar()
-            {
-                _parar.Location = new Point(barra.Width - _parar.Width - E(2), E(7));
-                _limpiar.Location = new Point(_parar.Left - _limpiar.Width - E(10), E(7));
-                _filtro.Location = new Point(_seguir.Right + E(18), E(9));
-                int x = _filtro.Right + E(14);
-                foreach (var boton in _idiomas)
-                {
-                    boton.Location = new Point(x, E(7));
-                    x += boton.Width + E(6);
-                }
-                _reducir.Location = new Point(x, E(7));
-                _ampliar.Location = new Point(x + _reducir.Width + E(6), E(7));
-            }
-            barra.Resize += (s, e) => Colocar();
+            barra.Resize += (s, e) => ColocarBarra();
 
             AplicarIdioma();
             AjustarConsola();
-            Colocar();
+            ActualizarAreaCifras();
+            ColocarBarra();
 
             _reloj = new System.Windows.Forms.Timer { Interval = 1000 };
             _reloj.Tick += (s, e) => Refrescar();
             _reloj.Start();
 
+            _interfazLista = true;
             Refrescar();
         }
 
@@ -316,6 +314,7 @@ namespace Jondo.Unity.Launcher.UI
             _parar.Text = _textos.StopServer;
             Redimensionar(_limpiar);
             Redimensionar(_parar);
+            ColocarBarra();
 
             // Las pistas emergentes: qué idioma es cada botón —dicho en su propio idioma, que es
             // como uno reconoce el suyo—, el par de ampliación y el filtro del registro.
@@ -337,7 +336,149 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         private void Redimensionar(LauncherButton boton)
-            => boton.Width = TextRenderer.MeasureText(boton.Text, boton.Font).Width + E(34);
+            => boton.Width = TextRenderer.MeasureText(boton.Text, boton.Font).Width + E(30);
+
+        // ─── Ventana y barra adaptables ────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Keeps the normal startup window inside the usable desktop. Physical pixels are used
+        /// here because Screen.WorkingArea and Form.Size use them in a DPI-aware process.
+        /// </summary>
+        private void ActualizarTamanoMinimo(Rectangle? area)
+        {
+            int ancho = E(860);
+            int alto = E(560);
+            if (area.HasValue)
+            {
+                ancho = Math.Min(ancho, Math.Max(640, area.Value.Width - E(24)));
+                alto = Math.Min(alto, Math.Max(420, area.Value.Height - E(24)));
+            }
+            MinimumSize = new Size(ancho, alto);
+        }
+
+        private Size TamanoInicial(Rectangle? area)
+        {
+            int ancho = E(1180);
+            int alto = E(700);
+            if (area.HasValue)
+            {
+                ancho = Math.Min(ancho, Math.Max(640, area.Value.Width - E(32)));
+                alto = Math.Min(alto, Math.Max(420, area.Value.Height - E(32)));
+            }
+            return new Size(Math.Max(MinimumSize.Width, ancho),
+                            Math.Max(MinimumSize.Height, alto));
+        }
+
+        private void LimitarVentanaAlArea(Rectangle area, bool centrar)
+        {
+            if (WindowState != FormWindowState.Normal) return;
+
+            int margen = E(12);
+            int anchoMaximo = Math.Max(640, area.Width - margen * 2);
+            int altoMaximo = Math.Max(420, area.Height - margen * 2);
+            int ancho = Math.Max(MinimumSize.Width, Math.Min(Width, anchoMaximo));
+            int alto = Math.Max(MinimumSize.Height, Math.Min(Height, altoMaximo));
+            int x = centrar
+                ? area.Left + (area.Width - ancho) / 2
+                : Math.Max(area.Left, Math.Min(Left, area.Right - ancho));
+            int y = centrar
+                ? area.Top + (area.Height - alto) / 2
+                : Math.Max(area.Top, Math.Min(Top, area.Bottom - alto));
+            Bounds = new Rectangle(x, y, ancho, alto);
+        }
+
+        /// <summary>
+        /// Places every toolbar item without overlap. On a narrow laptop the destructive actions
+        /// move to a second row; on wider and ultrawide displays everything stays in one compact
+        /// row. The filter is the only elastic-width item.
+        /// </summary>
+        private void ColocarBarra()
+        {
+            if (_barra == null || _ajustandoBarra) return;
+
+            _ajustandoBarra = true;
+            try
+            {
+                int margen = E(12);
+                int hueco = E(6);
+                int separacion = E(14);
+                int altoFila = E(44);
+
+                Size seguir = _seguir.GetPreferredSize(Size.Empty);
+                _seguir.Size = seguir;
+
+                int idiomas = 0;
+                foreach (var boton in _idiomas) idiomas += boton.Width + hueco;
+                idiomas = Math.Max(0, idiomas - hueco);
+                int zoom = _reducir.Width + hueco + _ampliar.Width;
+                int selectores = idiomas + hueco + zoom;
+
+                int acciones = _limpiar.Width + hueco + _parar.Width;
+                int sinFiltro = seguir.Width + separacion + separacion + selectores;
+                int disponibleUnaFila = _barra.ClientSize.Width - margen * 2 - sinFiltro
+                                       - separacion - acciones;
+                bool dosFilas = disponibleUnaFila < E(100);
+
+                // At very high zoom on a low-resolution display, moving only the actions is not
+                // enough. Move the A-/A+ pair with them; if even that row cannot fit beside the
+                // translated stop label, give the actions a third row.
+                int disponibleConDosFilas = _barra.ClientSize.Width - margen * 2 - sinFiltro;
+                bool zoomSegundaFila = dosFilas && disponibleConDosFilas < E(80);
+                if (zoomSegundaFila)
+                    sinFiltro = seguir.Width + separacion + separacion + idiomas;
+
+                int disponibleSinZoom = _barra.ClientSize.Width - margen * 2 - sinFiltro;
+                bool gruposSeparados = zoomSegundaFila && disponibleSinZoom < E(48);
+                if (gruposSeparados)
+                    sinFiltro = seguir.Width + separacion;
+
+                int segundaFila = zoomSegundaFila ? zoom + separacion + acciones : acciones;
+                bool tresFilas = gruposSeparados || (zoomSegundaFila
+                               && segundaFila > _barra.ClientSize.Width - margen * 2);
+
+                int disponibleFiltro = dosFilas
+                    ? _barra.ClientSize.Width - margen * 2 - sinFiltro
+                    : disponibleUnaFila;
+                _filtro.Width = Math.Min(E(210), Math.Max(E(48), disponibleFiltro));
+
+                int filas = tresFilas ? 3 : dosFilas ? 2 : 1;
+                int altoNecesario = altoFila * filas + E(4);
+                if (_barra.Height != altoNecesario) _barra.Height = altoNecesario;
+
+                int CentroY(Control control, int fila)
+                    => fila * altoFila + Math.Max(0, (altoFila - control.Height) / 2);
+
+                int x = margen;
+                _seguir.Location = new Point(x, CentroY(_seguir, 0));
+                x = _seguir.Right + separacion;
+
+                _filtro.Location = new Point(x, CentroY(_filtro, 0));
+                x = _filtro.Right + separacion;
+
+                int filaSelectores = gruposSeparados ? 1 : 0;
+                if (gruposSeparados) x = margen;
+                foreach (var boton in _idiomas)
+                {
+                    boton.Location = new Point(x, CentroY(boton, filaSelectores));
+                    x = boton.Right + hueco;
+                }
+
+                int filaZoom = gruposSeparados ? 1 : zoomSegundaFila ? 1 : 0;
+                int zoomX = zoomSegundaFila && !gruposSeparados ? margen : x;
+                _reducir.Location = new Point(zoomX, CentroY(_reducir, filaZoom));
+                _ampliar.Location = new Point(_reducir.Right + hueco,
+                                              CentroY(_ampliar, filaZoom));
+
+                int filaAcciones = tresFilas ? 2 : dosFilas ? 1 : 0;
+                int accionesX = Math.Max(margen, _barra.ClientSize.Width - margen - acciones);
+                _limpiar.Location = new Point(accionesX, CentroY(_limpiar, filaAcciones));
+                _parar.Location = new Point(_limpiar.Right + hueco, CentroY(_parar, filaAcciones));
+            }
+            finally
+            {
+                _ajustandoBarra = false;
+            }
+        }
 
         // ─── La ampliación ────────────────────────────────────────────────────────────────────
 
@@ -352,7 +493,7 @@ namespace Jondo.Unity.Launcher.UI
         private void CambiarZoom(float paso)
         {
             float antes = ServerPreferences.Zoom;
-            float despues = MathF.Max(0.5f, MathF.Min(3f, antes + paso));
+            float despues = MathF.Max(0.75f, MathF.Min(2f, antes + paso));
             if (MathF.Abs(despues - antes) < 0.01f) return;
 
             ServerPreferences.Zoom = despues;
@@ -363,28 +504,51 @@ namespace Jondo.Unity.Launcher.UI
         {
             LauncherTheme.UiZoom = ServerPreferences.Zoom;
             _escala = EscalaActual();
-            MinimumSize = new Size(E(900), E(560));
+            ActualizarTamanoMinimo(Screen.FromControl(this).WorkingArea);
 
-            _registro.Font = Mono(6f);
-            _seguir.Font = LauncherTheme.CreateFont(11f);
-            if (_barra != null) _barra.Height = E(40);
-            _logo.Height = E(92);
-            _version.Height = E(16);
-            _version.Font = LauncherTheme.CreateFont(9f);
-            _filtro.Font = LauncherTheme.CreateMonoFont(9.5f);
-            _filtro.Width = E(170);
+            ReemplazarFuente(_registro, Mono(ConsoleFontPixels));
+            ReemplazarFuente(_seguir, Letra(UiFontPixels));
+            _logo.Height = E(78);
+            _version.Height = E(20);
+            ReemplazarFuente(_version, Letra(11f));
+            ReemplazarFuente(_filtro, Mono(12f));
+            _filtro.Width = E(190);
+            _caja.Padding = new Padding(E(12), E(12), E(14), E(12));
+            if (_barra != null) _barra.Padding = new Padding(E(12), 0, E(12), 0);
 
-            foreach (var boton in _idiomas) { boton.Height = E(30); boton.Width = E(46); }
-            _reducir.Height = E(30); _reducir.Width = E(46);
-            _ampliar.Height = E(30); _ampliar.Width = E(46);
-            _limpiar.Height = E(30);
-            _parar.Height = E(30);
+            foreach (var boton in _idiomas)
+            {
+                AplicarEscalaBoton(boton);
+                boton.Width = E(48);
+            }
+            AplicarEscalaBoton(_reducir); _reducir.Width = E(48);
+            AplicarEscalaBoton(_ampliar); _ampliar.Width = E(48);
+            AplicarEscalaBoton(_limpiar);
+            AplicarEscalaBoton(_parar);
             Redimensionar(_limpiar);
             Redimensionar(_parar);
 
             AjustarConsola();
+            ActualizarAreaCifras();
+            ColocarBarra();
             ComponerFondo();
             Invalidate(true);
+        }
+
+        private void AplicarEscalaBoton(LauncherButton boton)
+        {
+            ReemplazarFuente(boton, Letra(12f, FontStyle.Bold));
+            boton.Height = E(34);
+            boton.CornerRadius = E(5);
+            boton.BorderWidth = Math.Max(1, E(1));
+            boton.LetterSpacing = Math.Max(1f, _escala);
+        }
+
+        private static void ReemplazarFuente(Control control, Font nueva)
+        {
+            Font anterior = control.Font;
+            control.Font = nueva;
+            if (!ReferenceEquals(anterior, Control.DefaultFont)) anterior.Dispose();
         }
 
         // ─── Las cifras ─────────────────────────────────────────────────────────────────────
@@ -521,11 +685,26 @@ namespace Jondo.Unity.Launcher.UI
 
         private bool _yaAvise;
 
+        private void ActualizarAreaCifras()
+        {
+            if (_cifras == null) return;
+
+            int y = E(6);
+            for (int i = 0; i < _lista.Count; i++)
+            {
+                if (!_lista[i].EsGrupo) continue;
+                int cuantas = 0;
+                for (int j = i + 1; j < _lista.Count && !_lista[j].EsGrupo; j++) cuantas++;
+                y += E(27) + cuantas * E(23) + E(7) + E(8);
+            }
+            _cifras.AutoScrollMinSize = new Size(0, y);
+        }
+
         /// <summary>
         /// Envuelve el pintado de una columna. Un Paint que revienta no se ve: la columna se queda
         /// en blanco y no hay ni un aviso. Ya pasó una vez y costó más de lo que debería.
         /// </summary>
-        private void ConRed(Graphics g, Control panel, int desde, int cuantos)
+        private void ConRed(Graphics g, Panel panel, int desde, int cuantos)
         {
             try { PintarColumna(g, panel, desde, cuantos); }
             catch (Exception ex)
@@ -543,92 +722,91 @@ namespace Jondo.Unity.Launcher.UI
         /// justas; en columna caben las quince que hacen falta para llevar un servidor, y agrupadas
         /// se leen por bloques en vez de como una ristra.
         /// </summary>
-        private void PintarColumna(Graphics g, Control panel, int desdeGrupo, int cuantosGrupos)
+        private void PintarColumna(Graphics g, Panel panel, int desdeGrupo, int cuantosGrupos)
         {
             RecortarFondo(g, panel);
-
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-
-            int margen = E(12);
-            int ancho = panel.Width - margen * 2;
-            if (ancho <= 0) return;
-
-            using var fGrupo = LauncherTheme.CreateFont(10f, FontStyle.Bold);
-            using var fEtiqueta = LauncherTheme.CreateFont(9.5f);
-            // El valor va del MISMO tamaño que su etiqueta, sólo que en negrita y con color. Iba
-            // tres puntos más grande y en bloques como el de RED —donde el valor es "0,0 KB/s" y
-            // no un número corto— la línea quedaba descuadrada: la palabra pequeña y el dato
-            // enorme al lado, sin ninguna razón.
-            using var fValor = LauncherTheme.CreateFont(9.5f, FontStyle.Bold);
-            using var pincelGrupo = new SolidBrush(LauncherTheme.SoftGold);
-            using var pincelEtiqueta = new SolidBrush(LauncherTheme.MutedGold);
-            using var relleno = new SolidBrush(LauncherTheme.CardFill);
-            using var borde = new Pen(LauncherTheme.BorderBrown, Math.Max(1f, _escala));
-            using var izquierda = new StringFormat(StringFormatFlags.NoWrap)
+            var estado = g.Save();
+            try
             {
-                Trimming = StringTrimming.EllipsisCharacter,
-            };
-            using var derecha = new StringFormat(StringFormatFlags.NoWrap)
-            {
-                Trimming = StringTrimming.EllipsisCharacter,
-                Alignment = StringAlignment.Far,
-            };
+                // ScrollableControl moves child controls automatically, but custom painting needs
+                // the scroll offset explicitly. This keeps every metrics card reachable on short
+                // laptop screens instead of silently dropping the last card.
+                g.TranslateTransform(panel.AutoScrollPosition.X, panel.AutoScrollPosition.Y);
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            int altoLinea = E(21);
-            int y = E(6);
+                int margen = E(12);
+                int ancho = panel.ClientSize.Width - margen * 2;
+                if (ancho <= 0) return;
 
-            // Se pintan sólo los bloques que le tocan a ESTA columna: la de la izquierda lleva los
-            // dos primeros y la de la derecha los dos siguientes.
-            int vistos = -1;
-            for (int i = 0; i < _lista.Count; i++)
-            {
-                if (!_lista[i].EsGrupo) continue;
-                vistos++;
-                if (vistos < desdeGrupo) continue;
-                if (vistos >= desdeGrupo + cuantosGrupos) break;
-
-                int cuantas = 0;
-                for (int j = i + 1; j < _lista.Count && !_lista[j].EsGrupo; j++) cuantas++;
-
-                int altoCaja = E(20) + cuantas * altoLinea + E(8);
-                var caja = new Rectangle(margen, y, ancho, altoCaja);
-                if (caja.Bottom > panel.Height) break;
-
-                using (var camino = Redondeado(caja, E(7)))
+                using var fGrupo = Letra(12.5f, FontStyle.Bold);
+                using var fEtiqueta = Letra(MetricFontPixels);
+                using var fValor = Letra(MetricFontPixels, FontStyle.Bold);
+                using var pincelGrupo = new SolidBrush(LauncherTheme.SoftGold);
+                using var pincelEtiqueta = new SolidBrush(LauncherTheme.MutedGold);
+                using var relleno = new SolidBrush(LauncherTheme.CardFill);
+                using var borde = new Pen(LauncherTheme.BorderBrown, Math.Max(1f, _escala));
+                using var izquierda = new StringFormat(StringFormatFlags.NoWrap)
                 {
-                    g.FillPath(relleno, camino);
-                    g.DrawPath(borde, camino);
-                }
-
-                g.DrawString(_lista[i].Etiqueta(_textos), fGrupo, pincelGrupo,
-                             new RectangleF(caja.X + E(10), caja.Y + E(5), caja.Width - E(20),
-                                            fGrupo.GetHeight(g) + 2), izquierda);
-
-                int linea = caja.Y + E(22);
-                for (int j = i + 1; j < _lista.Count && !_lista[j].EsGrupo; j++)
+                    Trimming = StringTrimming.EllipsisCharacter,
+                };
+                using var derecha = new StringFormat(StringFormatFlags.NoWrap)
                 {
-                    var cifra = _lista[j];
-                    var hueco = new RectangleF(caja.X + E(10), linea, caja.Width - E(20), altoLinea);
+                    Trimming = StringTrimming.EllipsisCharacter,
+                    Alignment = StringAlignment.Far,
+                };
 
-                    // Los dos ocupan el ANCHO ENTERO, uno pegado a la izquierda y el otro a la
-                    // derecha, en vez de repartirse la línea en dos mitades. Con mitades, una
-                    // etiqueta como "JUGADORES" no cabía en la suya y salía cortada aunque
-                    // sobrara sitio de sobra al lado, porque el hueco del valor estaba vacío.
-                    g.DrawString(cifra.Etiqueta(_textos), fEtiqueta, pincelEtiqueta,
-                                 new RectangleF(hueco.X, hueco.Y + E(3), hueco.Width,
-                                                fEtiqueta.GetHeight(g) + 2), izquierda);
+                int altoLinea = E(23);
+                int y = E(6);
 
-                    using var pincelValor = new SolidBrush(cifra.Tono);
-                    // A la misma altura que la etiqueta: con el mismo cuerpo, si uno arranca tres
-                    // píxeles más arriba que el otro se nota que están descolocados.
-                    g.DrawString(cifra.Ultimo, fValor, pincelValor,
-                                 new RectangleF(hueco.X, hueco.Y + E(3), hueco.Width,
-                                                fValor.GetHeight(g) + 2), derecha);
-                    linea += altoLinea;
+                int vistos = -1;
+                for (int i = 0; i < _lista.Count; i++)
+                {
+                    if (!_lista[i].EsGrupo) continue;
+                    vistos++;
+                    if (vistos < desdeGrupo) continue;
+                    if (vistos >= desdeGrupo + cuantosGrupos) break;
+
+                    int cuantas = 0;
+                    for (int j = i + 1; j < _lista.Count && !_lista[j].EsGrupo; j++) cuantas++;
+
+                    int altoCaja = E(27) + cuantas * altoLinea + E(7);
+                    var caja = new Rectangle(margen, y, ancho, altoCaja);
+
+                    using (var camino = Redondeado(caja, E(7)))
+                    {
+                        g.FillPath(relleno, camino);
+                        g.DrawPath(borde, camino);
+                    }
+
+                    g.DrawString(_lista[i].Etiqueta(_textos), fGrupo, pincelGrupo,
+                                 new RectangleF(caja.X + E(10), caja.Y + E(6), caja.Width - E(20),
+                                                fGrupo.GetHeight(g) + E(2)), izquierda);
+
+                    int linea = caja.Y + E(27);
+                    for (int j = i + 1; j < _lista.Count && !_lista[j].EsGrupo; j++)
+                    {
+                        var cifra = _lista[j];
+                        var hueco = new RectangleF(caja.X + E(10), linea,
+                                                   caja.Width - E(20), altoLinea);
+
+                        g.DrawString(cifra.Etiqueta(_textos), fEtiqueta, pincelEtiqueta,
+                                     new RectangleF(hueco.X, hueco.Y + E(2), hueco.Width,
+                                                    fEtiqueta.GetHeight(g) + E(2)), izquierda);
+
+                        using var pincelValor = new SolidBrush(cifra.Tono);
+                        g.DrawString(cifra.Ultimo, fValor, pincelValor,
+                                     new RectangleF(hueco.X, hueco.Y + E(2), hueco.Width,
+                                                    fValor.GetHeight(g) + E(2)), derecha);
+                        linea += altoLinea;
+                    }
+
+                    y = caja.Bottom + E(8);
                 }
-
-                y = caja.Bottom + E(8);
+            }
+            finally
+            {
+                g.Restore(estado);
             }
         }
 
@@ -710,26 +888,54 @@ namespace Jondo.Unity.Launcher.UI
             Invalidate(true);
         }
 
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            // StartPosition chooses the monitor, then this final clamp accounts for its taskbar
+            // and working area. It runs once, before the operator has had a chance to resize.
+            Rectangle area = Screen.FromControl(this).WorkingArea;
+            ActualizarTamanoMinimo(area);
+            LimitarVentanaAlArea(area, centrar: true);
+        }
+
+        protected override void OnDpiChanged(DpiChangedEventArgs e)
+        {
+            // A minimum expressed in the previous monitor's physical pixels can reject the
+            // smaller suggested bounds when moving from 200% to 100%. Release it before WinForms
+            // applies that rectangle, then rebuild it for the new monitor below.
+            MinimumSize = Size.Empty;
+            base.OnDpiChanged(e);
+            _escala = e.DeviceDpiNew / 96f * ServerPreferences.Zoom;
+            if (_interfazLista)
+            {
+                AplicarZoom();
+                LimitarVentanaAlArea(Screen.FromControl(this).WorkingArea, centrar: false);
+            }
+        }
+
         /// <summary>
-        /// Cuánto ocupa la consola: poco más de la mitad de la ventana, no toda.
-        ///
-        /// Es una proporción y no un alto fijo para que quede igual de bien maximizada en un
-        /// portátil que en un monitor grande. Y con un mínimo, para que estrechando la ventana no
-        /// se quede en dos líneas.
+        /// Gives the metrics a bounded, proportional column and leaves the majority of every
+        /// normal-width window to the log. On exceptionally narrow high-zoom desktops it falls
+        /// back to a percentage so both regions remain reachable.
         /// </summary>
         private void AjustarConsola()
         {
-            // Puede llegar antes de tiempo: poner WindowState = Maximized en el constructor ya
+            // Puede llegar antes de tiempo: restaurar el estado de la ventana en el constructor ya
             // dispara un OnResize, y en ese momento todavía no hay panel que ajustar. Sin esta
             // línea la ventana ni se abría -y el fallo salía como un escueto "Object reference
             // not set" en el registro-.
             if (_caja == null) return;
 
-            // La consola ya no se dimensiona: va en Fill y se queda con lo que sobre. Lo único que
-            // hay que decidir es cuánto se lleva la columna de cifras, y se le da lo justo para que
-            // quepan sus dos números por línea sin comerle sitio al registro.
-            int columna = Math.Max(E(260), Math.Min((int)(ClientSize.Width * 0.20f), E(420)));
-            if (_cifras != null) _cifras.Width = columna;
+            int columna = Math.Max(E(260),
+                                   Math.Min((int)(ClientSize.Width * 0.24f), E(340)));
+            int conConsolaLegible = ClientSize.Width - E(520);
+            if (conConsolaLegible >= E(210))
+                columna = Math.Min(columna, conConsolaLegible);
+            else
+                columna = Math.Max(1, (int)(ClientSize.Width * 0.32f));
+
+            if (_cifras != null && _cifras.Width != columna) _cifras.Width = columna;
         }
 
         /// <summary>
@@ -924,11 +1130,12 @@ namespace Jondo.Unity.Launcher.UI
             var boton = new LauncherButton
             {
                 Text = texto,
-                Font = LauncherTheme.CreateFont(11f, FontStyle.Bold),
-                Height = E(30),
+                Font = Letra(12f, FontStyle.Bold),
+                Height = E(34),
                 Width = ancho > 0 ? ancho : E(120),
-                LetterSpacing = 1f,
+                LetterSpacing = Math.Max(1f, _escala),
                 CornerRadius = E(5),
+                BorderWidth = Math.Max(1, E(1)),
                 BackgroundTop = Color.FromArgb(200, 34, 21, 12),
                 BackgroundBottom = Color.FromArgb(200, 22, 13, 8),
                 BackgroundTopHighlight = LauncherTheme.LightBrown,
@@ -997,9 +1204,11 @@ namespace Jondo.Unity.Launcher.UI
             {
                 try
                 {
+                    // Per-monitor V2 lets the manual pixel scale be recomputed when this operator
+                    // window is moved between, for example, a 100% laptop and a 200% 4K display.
+                    try { Application.SetHighDpiMode(HighDpiMode.PerMonitorV2); } catch { }
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    try { Application.SetHighDpiMode(HighDpiMode.SystemAware); } catch { }
                     var ventana = new ServerWindow();
                     lista.Set();
                     Application.Run(ventana);

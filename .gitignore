@@ -12,6 +12,26 @@ runtimes/
 # Las dll van dentro del .exe de un solo fichero; ninguna suelta.
 *.dll
 
+# ─── Electron launcher build products ──────────────────────────────────────
+Jondo.Electron.Launcher/node_modules/
+Jondo.Electron.Launcher/build/
+Jondo.Electron.Launcher/dist/
+Jondo.Electron.Launcher/release/
+Jondo.Electron.Launcher/release-*/
+Jondo.Electron.Admin/node_modules/
+Jondo.Electron.Admin/build/
+Jondo.Electron.Admin/release*/
+
+# Local publish/test staging. The canonical distributable is copied to the repository root;
+# these folders are temporary copies and must never be committed.
+.build/
+publish-*/
+.tmp_*
+.tools/
+
+# Root test builds are deliberately kept for local testing, but releases are not source changes.
+/Jondo Launcher.exe
+
 # ─── Bases de datos ─────────────────────────────────────────────────────────
 # world.db son 240 MB: se distribuye comprimida en datos/world.zip y el emulador la extrae sola
 # la primera vez. auth.db la crea él con su cuenta de prueba.
@@ -27,11 +47,28 @@ dofus3_data/
 Dofus3 Defuscated Data/
 DofusClient/
 
+# Full client catalogue dumps are reproducible from the installed client and include several
+# individual files over GitHub's 100 MiB limit. The versioned server snapshot, protocol, world,
+# mechanics and DofusDude imports remain reviewable under client_data/<version>/.
+client_data/.*/
+client_data/*/catalogs/
+
 # ─── Herramientas ───────────────────────────────────────────────────────────
 # Los scripts de Python generan los json de datos/ y auditan el tráfico. No se necesitan para
 # ejecutar el emulador.
-tools/
+tools/*
 *.py
+!tools/auditoria_datos.py
+!tools/review_unknown_packets.py
+!tools/generate_parity_ledger.py
+!tools/extraer_casas.py
+!tools/extraer_transiciones_mundo.py
+!tools/extract_client_snapshot.py
+!tools/fetch_dofusdude_dofus3.py
+!tools/fetch_official_dofus_evidence.py
+!tools/build_mechanic_map.py
+!tools/build_server_client_data_snapshot.py
+!tools/audit_client_data_runtime.py
 __pycache__/
 
 # ─── Registros y capturas ───────────────────────────────────────────────────

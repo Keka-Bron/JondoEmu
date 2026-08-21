@@ -39,7 +39,9 @@ namespace Jondo.Unity.Launcher.Network
             new(StringComparer.OrdinalIgnoreCase);
         private static readonly ConcurrentDictionary<string, Launch> ByGameSession =
             new(StringComparer.OrdinalIgnoreCase);
-        private static readonly ConcurrentDictionary<string, long> Tokens =
+        private static readonly ConcurrentDictionary<string, long> LauncherTokens =
+            new(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, long> GameTokens =
             new(StringComparer.OrdinalIgnoreCase);
         private static readonly ConcurrentDictionary<long, Launch> ByAccount = new();
         private static readonly object RegistrationGate = new();
@@ -90,7 +92,7 @@ namespace Jondo.Unity.Launcher.Network
                 };
                 ByHash[hash] = launch;
                 ByAccount[accountId] = launch;
-                RegisterToken(accountId, launcherToken);
+                RegisterLauncherToken(accountId, launcherToken);
                 return launch;
             }
         }
@@ -116,16 +118,56 @@ namespace Jondo.Unity.Launcher.Network
             return ByGameSession.TryGetValue(gameSession, out launch);
         }
 
-        public static void RegisterToken(long accountId, string? token)
+        /// <summary>Registers a control token issued to the native launcher.</summary>
+        public static void RegisterLauncherToken(long accountId, string? token)
         {
-            if (accountId > 0 && !string.IsNullOrWhiteSpace(token)) Tokens[token] = accountId;
+            if (accountId > 0 && !string.IsNullOrWhiteSpace(token)) LauncherTokens[token] = accountId;
         }
 
-        public static long ResolveToken(string? token)
+        /// <summary>Registers a token that a Dofus client may present to game or HAAPI services.</summary>
+        public static void RegisterGameToken(long accountId, string? token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return;
+            if (accountId > 0) GameTokens[token] = accountId;
+        }
+
+        /// <summary>
+        /// Issues the short-lived game-authentication token used when the client leaves an
+        /// already-running game through <c>kqq</c>.  The game client uses <c>kqr.f1</c> as the
+        /// token for its next connection-server handshake, so it must be a token this registry
+        /// can resolve — not an unrelated session GUID.
+        /// </summary>
+        public static string IssueReturnGameToken(long accountId)
+        {
+            if (accountId <= 0) throw new ArgumentOutOfRangeException(nameof(accountId));
+
+            string token = Guid.NewGuid().ToString("N");
+            DatabaseManager.SetGameToken(accountId, token);
+            RegisterGameToken(accountId, token);
+            return token;
+        }
+
+        /// <summary>Resolves only a launcher token, including one restored after a server restart.</summary>
+        public static long ResolveLauncherToken(string? token)
         {
             if (string.IsNullOrWhiteSpace(token)) return 0;
-            if (Tokens.TryGetValue(token, out long accountId)) return accountId;
+            if (LauncherTokens.TryGetValue(token, out long accountId)) return accountId;
+            return DatabaseManager.GetAccountIdByLauncherToken(token);
+        }
+
+        /// <summary>Resolves only a token that is valid for a Dofus game connection.</summary>
+        public static long ResolveGameToken(string? token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return 0;
+            if (GameTokens.TryGetValue(token, out long accountId)) return accountId;
             return DatabaseManager.GetAccountIdByToken(token);
+        }
+
+        /// <summary>HAAPI accepts either phase of the client authentication flow.</summary>
+        public static long ResolveAnyToken(string? token)
+        {
+            long accountId = ResolveGameToken(token);
+            return accountId > 0 ? accountId : ResolveLauncherToken(token);
         }
 
         public static bool IsActive(long accountId) => ByAccount.ContainsKey(accountId);
@@ -239,6 +281,32 @@ namespace Jondo.Unity.Launcher.Network
             finally
             {
                 foreach (var launch in launches) Remove(launch);
+            }
+        }
+
+        /// <summary>
+        /// A launcher token must never become a game-login credential merely because both happen
+        /// to identify an account. This is the regression guard for saved launcher profiles being
+        /// invalidated by the game's token refresh.
+        /// </summary>
+        internal static void AssertTokenScopes()
+        {
+            string launcherToken = "launcher-guard-" + Guid.NewGuid().ToString("N");
+            string gameToken = "game-guard-" + Guid.NewGuid().ToString("N");
+            const long launcherAccount = 303;
+            const long gameAccount = 404;
+
+            RegisterLauncherToken(launcherAccount, launcherToken);
+            RegisterGameToken(gameAccount, gameToken);
+
+            if (ResolveLauncherToken(launcherToken) != launcherAccount ||
+                ResolveGameToken(gameToken) != gameAccount ||
+                ResolveLauncherToken(gameToken) != 0 ||
+                ResolveGameToken(launcherToken) != 0 ||
+                ResolveAnyToken(launcherToken) != launcherAccount ||
+                ResolveAnyToken(gameToken) != gameAccount)
+            {
+                throw new InvalidOperationException("Launcher and game token scopes are not isolated.");
             }
         }
     }

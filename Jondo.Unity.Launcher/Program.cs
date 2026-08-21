@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,9 +18,6 @@ namespace Jondo.Unity.Launcher
     /// </summary>
     internal static class Program
     {
-        /// <summary>Cómo se llama el ejecutable del servidor, que vive al lado.</summary>
-        public const string EjecutableDelServidor = "Jondo Server.exe";
-
         [STAThread]
         private static async Task Main()
         {
@@ -41,8 +36,9 @@ namespace Jondo.Unity.Launcher
 
             try
             {
-                await AsegurarQueHayServidor();
-
+                // El servidor vive fuera del equipo del jugador y su ciclo de vida no pertenece
+                // al lanzador. La ventana se abre de inmediato; ella sondea el servidor sin
+                // bloquear la interfaz y enseña el estado fuera de línea cuando no responde.
                 UI.LauncherWindow.OpenOnDedicatedThread();
                 await _cerrada.Task;
                 Console.WriteLine("[Lanzador] Ventana cerrada. El servidor sigue en marcha.");
@@ -62,59 +58,6 @@ namespace Jondo.Unity.Launcher
             // nada que hacer, así que se apaga él mismo y con él cualquier hilo que haya quedado
             // enganchado.
             Environment.Exit(0);
-        }
-
-        /// <summary>
-        /// Si no hay servidor escuchando, arranca el de al lado y espera a que conteste.
-        ///
-        /// Esperar importa: el mod del cliente decide UNA sola vez, al inicializarse, si redirige al
-        /// emulador, sondeando el puerto de mando con 100 ms de paciencia. Si en ese instante no hay
-        /// nadie, el cliente no da ningún error —se conecta a los servidores de Ankama—, así que más
-        /// vale que la ventana no se abra hasta que haya alguien al otro lado.
-        /// </summary>
-        private static async Task AsegurarQueHayServidor()
-        {
-            if (Network.ControlClient.ServidorVivo())
-            {
-                Console.WriteLine("[Lanzador] Hay un servidor en marcha; me engancho a él.");
-                return;
-            }
-
-            string? aquí = Path.GetDirectoryName(Environment.ProcessPath ?? "");
-            string servidor = Path.Combine(aquí ?? "", EjecutableDelServidor);
-            if (!File.Exists(servidor))
-            {
-                // Que no esté no es un error del que haya que morirse: un jugador con sólo el
-                // lanzador es el caso normal el día que el servidor esté en otra máquina. La
-                // ventana ya sabe enseñar «fuera de línea» y dejar los botones apagados.
-                Console.WriteLine($"[Lanzador] No hay {EjecutableDelServidor} al lado y no responde ninguno.");
-                return;
-            }
-
-            Console.WriteLine("[Lanzador] No hay servidor escuchando; arrancando el de al lado.");
-            try
-            {
-                // Suelto de verdad: lo arranca Windows, sin heredar la consola ni los descriptores
-                // del lanzador, así que cerrar el lanzador después no se lo lleva por delante.
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = servidor,
-                    WorkingDirectory = aquí ?? "",
-                    UseShellExecute = true,
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Lanzador] No se ha podido arrancar el servidor: {ex.Message}");
-                return;
-            }
-
-            // Con paciencia: el servidor lee la base, los managers y los mapas antes de abrir un
-            // solo puerto, y eso son varios segundos en frío.
-            if (!await Task.Run(() => Network.ControlClient.EsperarAlServidor(TimeSpan.FromSeconds(90))))
-            {
-                Console.WriteLine("[Lanzador] El servidor no ha llegado a contestar.");
-            }
         }
 
         // ─── El cierre ──────────────────────────────────────────────────────────────────────

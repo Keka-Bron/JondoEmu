@@ -77,8 +77,8 @@ namespace Jondo.Unity.Launcher.Network
                     // Cualquiera puede llamarlas, porque hay que poder entrar antes de tener con
                     // qué demostrar quién eres.
                     case Prefijo + "estado": return Estado();
-                    case Prefijo + "entrar": return Entrar(cuerpo);
-                    case Prefijo + "crear-cuenta": return CrearCuenta(cuerpo);
+                    case Prefijo + "entrar": return Entrar(cuerpo, ip);
+                    case Prefijo + "crear-cuenta": return CrearCuenta(cuerpo, ip);
 
                     // ─── Con sesión ─────────────────────────────────────────────────────────
                     // Hace falta un token que la base reconozca. Da igual el rol: son cosas que
@@ -127,14 +127,14 @@ namespace Jondo.Unity.Launcher.Network
 
         private static Respuesta ConSesion(string cuerpo, Func<long, Respuesta> hacer)
         {
-            long cuenta = ClientLaunchRegistry.ResolveToken(Texto(cuerpo, "token"));
+            long cuenta = ClientLaunchRegistry.ResolveLauncherToken(Texto(cuerpo, "token"));
             if (cuenta <= 0) return Mal(401, "sesion");
             return hacer(cuenta);
         }
 
         private static Respuesta ConRol(string cuerpo, int haceFalta, Func<long, Respuesta> hacer)
         {
-            long cuenta = ClientLaunchRegistry.ResolveToken(Texto(cuerpo, "token"));
+            long cuenta = ClientLaunchRegistry.ResolveLauncherToken(Texto(cuerpo, "token"));
             if (cuenta <= 0) return Mal(401, "sesion");
 
             int rol = DatabaseManager.GetAccountRole(cuenta);
@@ -196,12 +196,13 @@ namespace Jondo.Unity.Launcher.Network
             return new Respuesta(200, ConsoleLogBuffer.GetLogsJson(desde));
         }
 
-        private static Respuesta Entrar(string cuerpo)
+        private static Respuesta Entrar(string cuerpo, string remoteIp)
         {
             string usuario = Texto(cuerpo, "usuario");
             string clave = Texto(cuerpo, "clave");
-            string ip = Texto(cuerpo, "ip");
-            if (ip.Length == 0) ip = Contract.LocalIp;
+            // The network endpoint, not a JSON field controlled by the player, owns identity by
+            // address and the per-IP multi-account limit.
+            string ip = remoteIp.Length > 0 ? remoteIp : Contract.LocalIp;
 
             if (!DatabaseManager.ValidateAccountCredentials(usuario, clave, ip, out var cuenta, out string fallo)
                 || cuenta == null)
@@ -210,8 +211,8 @@ namespace Jondo.Unity.Launcher.Network
             }
 
             string token = Guid.NewGuid().ToString("N");
-            DatabaseManager.SetGameToken(cuenta.Id, token);
-            ClientLaunchRegistry.RegisterToken(cuenta.Id, token);
+            DatabaseManager.SetLauncherToken(cuenta.Id, token);
+            ClientLaunchRegistry.RegisterLauncherToken(cuenta.Id, token);
 
             return Bien(new
             {
@@ -223,13 +224,12 @@ namespace Jondo.Unity.Launcher.Network
             });
         }
 
-        private static Respuesta CrearCuenta(string cuerpo)
+        private static Respuesta CrearCuenta(string cuerpo, string remoteIp)
         {
             string usuario = Texto(cuerpo, "usuario");
             string clave = Texto(cuerpo, "clave");
             string apodo = Texto(cuerpo, "apodo");
-            string ip = Texto(cuerpo, "ip");
-            if (ip.Length == 0) ip = Contract.LocalIp;
+            string ip = remoteIp.Length > 0 ? remoteIp : Contract.LocalIp;
 
             bool bien = DatabaseManager.RegisterNewAccount(usuario, clave, apodo, ip, out string fallo);
             return Bien(new { bien, motivo = fallo });
@@ -246,10 +246,14 @@ namespace Jondo.Unity.Launcher.Network
             string token = Texto(cuerpo, "token");
             if (cuenta <= 0 || token.Length == 0) return Bien(new { bien = false });
 
-            long deLaBase = DatabaseManager.GetAccountIdByToken(token);
-            if (deLaBase != cuenta) return Bien(new { bien = false });
+            long deLaBase = DatabaseManager.GetAccountIdByLauncherToken(token);
+            if (deLaBase != cuenta &&
+                !DatabaseManager.TryMigrateLegacyLauncherToken(cuenta, token))
+            {
+                return Bien(new { bien = false });
+            }
 
-            ClientLaunchRegistry.RegisterToken(cuenta, token);
+            ClientLaunchRegistry.RegisterLauncherToken(cuenta, token);
             return Bien(new { bien = true });
         }
 

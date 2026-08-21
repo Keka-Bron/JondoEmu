@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "clientVersion": "3.6.10.10",
+  "generatedUtc": "2026-08-21T12:17:37Z",
+  "files": [
+    {
+      "path": "opcode-index.json",
+      "bytes": 1431202,
+      "sha256": "658e2dc0319b217e871b8c4ddbd6a98745fdf81ea489b40553cf5cfbbfaaaa1b"
+    },
+    {
+      "path": "game-protocol.proto",
+      "bytes": 211924,
+      "sha256": "b7a1cbfd6db97d40d9be9dcbc67b8ff56705ae505b3b8652a3f7bee4095a319f"
+    }
+  ],
+  "notes": "Schema/index drive decoding and telemetry investigation. They do not generate state-changing handlers."
+}

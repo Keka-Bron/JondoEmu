@@ -4,16 +4,31 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+
+    <!--
+      Override with -p:DofusInstallDir=... / -p:MelonLoaderDir=..., or set the
+      JONDO_DOFUS_DIR environment variable. The final default is Ankama's normal
+      per-user installation location and contains no developer-machine path.
+    -->
+    <DofusInstallDir Condition="'$(DofusInstallDir)' == '' and '$(JONDO_DOFUS_DIR)' != ''">$(JONDO_DOFUS_DIR)</DofusInstallDir>
+    <DofusInstallDir Condition="'$(DofusInstallDir)' == ''">$(LOCALAPPDATA)\Ankama\Dofus-dofus3</DofusInstallDir>
+    <MelonLoaderDir Condition="'$(MelonLoaderDir)' == ''">$(DofusInstallDir)\MelonLoader</MelonLoaderDir>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Reference all assemblies in MelonLoader net6 folder for 3.6.10.10 -->
-    <Reference Include="C:\Jondo 3.6.10.10\Cliente 3.6.10.10\MelonLoader\net6\*.dll">
+    <!-- Reference the selected client's MelonLoader runtime and IL2CPP interop assemblies. -->
+    <Reference Include="$(MelonLoaderDir)\net6\*.dll">
       <Private>false</Private>
     </Reference>
-    <!-- Reference all compiled Il2Cpp assemblies for 3.6.10.10 -->
-    <Reference Include="C:\Jondo 3.6.10.10\Cliente 3.6.10.10\MelonLoader\Il2CppAssemblies\*.dll">
+    <Reference Include="$(MelonLoaderDir)\Il2CppAssemblies\*.dll">
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <Target Name="ValidateDofusReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(MelonLoaderDir)\net6')"
+           Text="MelonLoader net6 assemblies were not found at '$(MelonLoaderDir)\net6'. Set DofusInstallDir, MelonLoaderDir, or JONDO_DOFUS_DIR." />
+    <Error Condition="!Exists('$(MelonLoaderDir)\Il2CppAssemblies')"
+           Text="MelonLoader IL2CPP assemblies were not found at '$(MelonLoaderDir)\Il2CppAssemblies'. Set DofusInstallDir, MelonLoaderDir, or JONDO_DOFUS_DIR." />
+  </Target>
 </Project>

@@ -1,0 +1,1440 @@
+{
+  "catalogCount": 204,
+  "catalogs": [
+    {
+      "name": "achievementcategoriesdataroot",
+      "output": "catalogs/achievementcategoriesdataroot.json",
+      "rowCount": 134,
+      "source": "data_assets_achievementcategoriesdataroot.asset.bundle",
+      "sourceSha256": "2bbd84d20020f7f26f5a276186e0f09e39be700a290b88ff28bd9f705d230fc3"
+    },
+    {
+      "name": "achievementobjectivesdataroot",
+      "output": "catalogs/achievementobjectivesdataroot.json",
+      "rowCount": 8946,
+      "source": "data_assets_achievementobjectivesdataroot.asset.bundle",
+      "sourceSha256": "297aa487c71946da60aa026edcebaf53a709d7bc17b1f18f97234acd78d00874"
+    },
+    {
+      "name": "achievementrewardsdataroot",
+      "output": "catalogs/achievementrewardsdataroot.json",
+      "rowCount": 6394,
+      "source": "data_assets_achievementrewardsdataroot.asset.bundle",
+      "sourceSha256": "1fa9aea6f0045bc9b183c2c4c1e311da86fcb7876586e617da0dafeafb5f3c35"
+    },
+    {
+      "name": "achievementsdataroot",
+      "output": "catalogs/achievementsdataroot.json",
+      "rowCount": 2780,
+      "source": "data_assets_achievementsdataroot.asset.bundle",
+      "sourceSha256": "f42848ce9648f59c4952bbbf8b5a2a4e1eddc13da7137f124aeac5eed87fa369"
+    },
+    {
+      "name": "actionfiltersdataroot",
+      "output": "catalogs/actionfiltersdataroot.json",
+      "rowCount": 14,
+      "source": "data_assets_actionfiltersdataroot.asset.bundle",
+      "sourceSha256": "f2bd54d3fd850f81592af3b58b1c8e306694b0ddf5332b72e76b614f1f3c8996"
+    },
+    {
+      "name": "activitysuggestioncategoriesdataroot",
+      "output": "catalogs/activitysuggestioncategoriesdataroot.json",
+      "rowCount": 19,
+      "source": "data_assets_activitysuggestioncategoriesdataroot.asset.bundle",
+      "sourceSha256": "df271df3471ec9268c80779297e81c66a0e4d6e4e04161df4c9165e971487ae4"
+    },
+    {
+      "name": "activitysuggestionsdataroot",
+      "output": "catalogs/activitysuggestionsdataroot.json",
+      "rowCount": 1410,
+      "source": "data_assets_activitysuggestionsdataroot.asset.bundle",
+      "sourceSha256": "5b6bd8a3c9d9565b6c85d21ad0ab4c9ed863656394d80ada27865c805c4e78d7"
+    },
+    {
+      "name": "alignmentgiftsdataroot",
+      "output": "catalogs/alignmentgiftsdataroot.json",
+      "rowCount": 290,
+      "source": "data_assets_alignmentgiftsdataroot.asset.bundle",
+      "sourceSha256": "4a4f0fda2362088ad2868d89c92913ee4f249df202b9190cd667fbdd42009d55"
+    },
+    {
+      "name": "alignmentordersdataroot",
+      "output": "catalogs/alignmentordersdataroot.json",
+      "rowCount": 10,
+      "source": "data_assets_alignmentordersdataroot.asset.bundle",
+      "sourceSha256": "4dc59f11d0ab73a9897495cf5864e26c335e1f73bd71afcd2b65d9b60aa97e27"
+    },
+    {
+      "name": "alignmentranksdataroot",
+      "output": "catalogs/alignmentranksdataroot.json",
+      "rowCount": 39,
+      "source": "data_assets_alignmentranksdataroot.asset.bundle",
+      "sourceSha256": "dd6478dce316e499c1aad4ee4dae184331a6d09303238c9557fae63e3bee1b39"
+    },
+    {
+      "name": "alignmentranksgiftsdataroot",
+      "output": "catalogs/alignmentranksgiftsdataroot.json",
+      "rowCount": 30,
+      "source": "data_assets_alignmentranksgiftsdataroot.asset.bundle",
+      "sourceSha256": "9ffd5102bbe2c4e3035ea5a65424cecc5f59159e2d70fd0d7f6de0003711bf0e"
+    },
+    {
+      "name": "alignmentsidesdataroot",
+      "output": "catalogs/alignmentsidesdataroot.json",
+      "rowCount": 4,
+      "source": "data_assets_alignmentsidesdataroot.asset.bundle",
+      "sourceSha256": "f597cccf0d7eca14d398ecca642650b97333561fb5aadc80f7a1f5122edbd1d4"
+    },
+    {
+      "name": "alignmenttitlesdataroot",
+      "output": "catalogs/alignmenttitlesdataroot.json",
+      "rowCount": 4,
+      "source": "data_assets_alignmenttitlesdataroot.asset.bundle",
+      "sourceSha256": "98867c71ce52f8ecdf37590054d386d67fa1fdaa9516284b217d14dcada5b036"
+    },
+    {
+      "name": "allianceranknamesuggestionsdataroot",
+      "output": "catalogs/allianceranknamesuggestionsdataroot.json",
+      "rowCount": 18,
+      "source": "data_assets_allianceranknamesuggestionsdataroot.asset.bundle",
+      "sourceSha256": "a7de288b7d007613d96cb9c6fa83f3819c046e94be20678122b002b6cead9e4a"
+    },
+    {
+      "name": "allianceranksdataroot",
+      "output": "catalogs/allianceranksdataroot.json",
+      "rowCount": 4,
+      "source": "data_assets_allianceranksdataroot.asset.bundle",
+      "sourceSha256": "c1f245fb350331f6749041e19f1138d2cc67330cdaee9a84cf39be3a6f4478b9"
+    },
+    {
+      "name": "alliancerightgroupsdataroot",
+      "output": "catalogs/alliancerightgroupsdataroot.json",
+      "rowCount": 22,
+      "source": "data_assets_alliancerightgroupsdataroot.asset.bundle",
+      "sourceSha256": "31606f3471dbf476e7f1afc99407d15525ef0567637317e52b090317e1e65bb6"
+    },
+    {
+      "name": "alliancerightsdataroot",
+      "output": "catalogs/alliancerightsdataroot.json",
+      "rowCount": 18,
+      "source": "data_assets_alliancerightsdataroot.asset.bundle",
+      "sourceSha256": "31c6344d6ef0265b82a6b9f5de8054864f7b80f47253de83a80fbbe3a87e4248"
+    },
+    {
+      "name": "alliancetagsdataroot",
+      "output": "catalogs/alliancetagsdataroot.json",
+      "rowCount": 16,
+      "source": "data_assets_alliancetagsdataroot.asset.bundle",
+      "sourceSha256": "c6788ce559ada777c55606f007615b728ec82f960ee02e71e2c633826316b11e"
+    },
+    {
+      "name": "alliancetagtypesdataroot",
+      "output": "catalogs/alliancetagtypesdataroot.json",
+      "rowCount": 3,
+      "source": "data_assets_alliancetagtypesdataroot.asset.bundle",
+      "sourceSha256": "a229c6082a3a650824859470d5b7d2da0984c5a025e90afe6672f8b62fa4bb87"
+    },
+    {
+      "name": "almanaxcalendarsdataroot",
+      "output": "catalogs/almanaxcalendarsdataroot.json",
+      "rowCount": 376,
+      "source": "data_assets_almanaxcalendarsdataroot.asset.bundle",
+      "sourceSha256": "97f3096f730a9589071834de399cc3ac20a2b8ff32a04b4835821898c9b08b99"
+    },
+    {
+      "name": "almanaxcategoriesdataroot",
+      "output": "catalogs/almanaxcategoriesdataroot.json",
+      "rowCount": 14,
+      "source": "data_assets_almanaxcategoriesdataroot.asset.bundle",
+      "sourceSha256": "d78b332b845f3ddbacf0e5173a5ef7edd4639192c69484914a8ae9b22a630c80"
+    },
+    {
+      "name": "almanaxzodiacsdataroot",
+      "output": "catalogs/almanaxzodiacsdataroot.json",
+      "rowCount": 12,
+      "source": "data_assets_almanaxzodiacsdataroot.asset.bundle",
+      "sourceSha256": "a746763774dff4a54893c935f310fb714e74153279be1631a714bed831171004"
+    },
+    {
+      "name": "alterationcategoriesdataroot",
+      "output": "catalogs/alterationcategoriesdataroot.json",
+      "rowCount": 49,
+      "source": "data_assets_alterationcategoriesdataroot.asset.bundle",
+      "sourceSha256": "a15f66e5046ee33f056237b4d2593be7ea4eda4c568999c1c760005292d45c88"
+    },
+    {
+      "name": "alterationsdataroot",
+      "output": "catalogs/alterationsdataroot.json",
+      "rowCount": 1243,
+      "source": "data_assets_alterationsdataroot.asset.bundle",
+      "sourceSha256": "a003f363426ef54b3deaef6c43d81fcc9914564db62fd40f9cdd4e140aacdd00"
+    },
+    {
+      "name": "appearancesdataroot",
+      "output": "catalogs/appearancesdataroot.json",
+      "rowCount": 182,
+      "source": "data_assets_appearancesdataroot.asset.bundle",
+      "sourceSha256": "2e0b2b66c584ed5ae7e5151239f4c650c38bdbbd0364a58e0ac247dfd88210bb"
+    },
+    {
+      "name": "areasdataroot",
+      "output": "catalogs/areasdataroot.json",
+      "rowCount": 69,
+      "source": "data_assets_areasdataroot.asset.bundle",
+      "sourceSha256": "effb72fcd27d635560c46b20e6480064e63e6c9b9cef59d8687a0fc6ef7f2d03"
+    },
+    {
+      "name": "arenaleaguesdataroot",
+      "output": "catalogs/arenaleaguesdataroot.json",
+      "rowCount": 26,
+      "source": "data_assets_arenaleaguesdataroot.asset.bundle",
+      "sourceSha256": "0bd9b2a3ed72f7fbbc6e214ab01a91e3e77ce22a8ad08e344cc473daebc7c4aa"
+    },
+    {
+      "name": "arenaleagueseasonsdataroot",
+      "output": "catalogs/arenaleagueseasonsdataroot.json",
+      "rowCount": 11,
+      "source": "data_assets_arenaleagueseasonsdataroot.asset.bundle",
+      "sourceSha256": "eb3ceb700aaf9130a338cd5967929b33d06e5699e8967d687758ad092a193af4"
+    },
+    {
+      "name": "auctionhousesdataroot",
+      "output": "catalogs/auctionhousesdataroot.json",
+      "rowCount": 7,
+      "source": "data_assets_auctionhousesdataroot.asset.bundle",
+      "sourceSha256": "5640edd0a54f1a252e4ff950b7802ab1f1ccce90362fae1f0bc799027fc4d0dc"
+    },
+    {
+      "name": "bodiesdataroot",
+      "output": "catalogs/bodiesdataroot.json",
+      "rowCount": 114,
+      "source": "data_assets_bodiesdataroot.asset.bundle",
+      "sourceSha256": "da0101a71d630943a2f446653789ff788f66083c1ea1ca1ff117911fac6112a2"
+    },
+    {
+      "name": "bonusescriterionsdataroot",
+      "output": "catalogs/bonusescriterionsdataroot.json",
+      "rowCount": 2396,
+      "source": "data_assets_bonusescriterionsdataroot.asset.bundle",
+      "sourceSha256": "49924f06109bc578ff45220e299980bbddd5e57ac8ddf43eed95430e65221e08"
+    },
+    {
+      "name": "bonusesdataroot",
+      "output": "catalogs/bonusesdataroot.json",
+      "rowCount": 408,
+      "source": "data_assets_bonusesdataroot.asset.bundle",
+      "sourceSha256": "1ffc6e60d9e539e34aa9cceeaf96e2fb70990cfef10934764e0510b1ef792c85"
+    },
+    {
+      "name": "breachbossesdataroot",
+      "output": "catalogs/breachbossesdataroot.json",
+      "rowCount": 131,
+      "source": "data_assets_breachbossesdataroot.asset.bundle",
+      "sourceSha256": "739e9004db12f2c72570a825b2055ed3581e54a1afb966dac727e7786c049a44"
+    },
+    {
+      "name": "breachdungeonmodificatorsdataroot",
+      "output": "catalogs/breachdungeonmodificatorsdataroot.json",
+      "rowCount": 410,
+      "source": "data_assets_breachdungeonmodificatorsdataroot.asset.bundle",
+      "sourceSha256": "f6206631e2050911760b05b9945a9d9a25d80325d008bac5e6dd6c66a3da022a"
+    },
+    {
+      "name": "breachprizesdataroot",
+      "output": "catalogs/breachprizesdataroot.json",
+      "rowCount": 203,
+      "source": "data_assets_breachprizesdataroot.asset.bundle",
+      "sourceSha256": "163d80652c51668ff8091c09b62db8d0c3b62f73488c2ee33931ea8bd7a69e2a"
+    },
+    {
+      "name": "breachworldmapcoordinatesdataroot",
+      "output": "catalogs/breachworldmapcoordinatesdataroot.json",
+      "rowCount": 202,
+      "source": "data_assets_breachworldmapcoordinatesdataroot.asset.bundle",
+      "sourceSha256": "cf227c4bcebd328c87ed8d168fe5edd3fb50c26277cfd24b36f22bbb7d488681"
+    },
+    {
+      "name": "breachworldmapsectorsdataroot",
+      "output": "catalogs/breachworldmapsectorsdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_breachworldmapsectorsdataroot.asset.bundle",
+      "sourceSha256": "98459721c79a9d855a4de9d43e28b01c988995e345e8f991c5e9bcd71b5ee7a8"
+    },
+    {
+      "name": "breedrolesdataroot",
+      "output": "catalogs/breedrolesdataroot.json",
+      "rowCount": 8,
+      "source": "data_assets_breedrolesdataroot.asset.bundle",
+      "sourceSha256": "a6e2e64841cd23af30a1259e3e2a97fd1ec000c0330ed722e0ef50f2c638343f"
+    },
+    {
+      "name": "breedsdataroot",
+      "output": "catalogs/breedsdataroot.json",
+      "rowCount": 19,
+      "source": "data_assets_breedsdataroot.asset.bundle",
+      "sourceSha256": "7cc3bd6985006b1f18c1da4d77c3c41a6e398c3df84046d029bc1d6d2527ac8f"
+    },
+    {
+      "name": "calendareventsdataroot",
+      "output": "catalogs/calendareventsdataroot.json",
+      "rowCount": 107,
+      "source": "data_assets_calendareventsdataroot.asset.bundle",
+      "sourceSha256": "0fb5204e4da6105c20fd11d4085e5cb4d92f5b137aa178339710575ca4999a87"
+    },
+    {
+      "name": "cardbackgroundsdataroot",
+      "output": "catalogs/cardbackgroundsdataroot.json",
+      "rowCount": 8,
+      "source": "data_assets_cardbackgroundsdataroot.asset.bundle",
+      "sourceSha256": "10869d2915f13df637651bd03d6fc3750c03ae79d73e95ce1777c9cd5b52031f"
+    },
+    {
+      "name": "challengesdataroot",
+      "output": "catalogs/challengesdataroot.json",
+      "rowCount": 842,
+      "source": "data_assets_challengesdataroot.asset.bundle",
+      "sourceSha256": "f25fb80e8ef64c05002da2452b597a6b98080c81560acf7bca5a920a5bed7e9f"
+    },
+    {
+      "name": "characteristiccategoriesdataroot",
+      "output": "catalogs/characteristiccategoriesdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_characteristiccategoriesdataroot.asset.bundle",
+      "sourceSha256": "0c7c354abe3e7d0542b9b5dd0cd9e8991f52ca2efd1c165401d5bd2c851ad9fb"
+    },
+    {
+      "name": "characteristicsdataroot",
+      "output": "catalogs/characteristicsdataroot.json",
+      "rowCount": 123,
+      "source": "data_assets_characteristicsdataroot.asset.bundle",
+      "sourceSha256": "0a481dade9b30fd8b7a983879d175c6181b442b32d58d7e08487bef52dec3e36"
+    },
+    {
+      "name": "characterxpmappingsdataroot",
+      "output": "catalogs/characterxpmappingsdataroot.json",
+      "rowCount": 2339,
+      "source": "data_assets_characterxpmappingsdataroot.asset.bundle",
+      "sourceSha256": "bd9180cce7835a9a207384fd12225d7004ccdc68188842c2b31745499acc9ec4"
+    },
+    {
+      "name": "chatchannelsdataroot",
+      "output": "catalogs/chatchannelsdataroot.json",
+      "rowCount": 18,
+      "source": "data_assets_chatchannelsdataroot.asset.bundle",
+      "sourceSha256": "fdc540449531cf918cb2ff165fa1924e754b0277ce94321b09ebdb5fee75bbc4"
+    },
+    {
+      "name": "choicesdataroot",
+      "output": "catalogs/choicesdataroot.json",
+      "rowCount": 36,
+      "source": "data_assets_choicesdataroot.asset.bundle",
+      "sourceSha256": "39722c92d9bda6762b5b3c0e42a7c2d530f8ce072b6f9941adb5589e5263bef9"
+    },
+    {
+      "name": "collectablesdataroot",
+      "output": "catalogs/collectablesdataroot.json",
+      "rowCount": 150,
+      "source": "data_assets_collectablesdataroot.asset.bundle",
+      "sourceSha256": "a5b25094bdc44fe53dbd90387de493ab1d47c3965f3fe516c401798fa74cf1c1"
+    },
+    {
+      "name": "collectionsdataroot",
+      "output": "catalogs/collectionsdataroot.json",
+      "rowCount": 1,
+      "source": "data_assets_collectionsdataroot.asset.bundle",
+      "sourceSha256": "de9cb93a97b597687cf563b3cdb091d28fdf37ea16fc30d752bf697a2c85da86"
+    },
+    {
+      "name": "companioncharacteristicsdataroot",
+      "output": "catalogs/companioncharacteristicsdataroot.json",
+      "rowCount": 1835,
+      "source": "data_assets_companioncharacteristicsdataroot.asset.bundle",
+      "sourceSha256": "0895ad390af4be6ecc83a955da9e505930e15b5c9e47a68e0d0d7c0d2f618a45"
+    },
+    {
+      "name": "companionsdataroot",
+      "output": "catalogs/companionsdataroot.json",
+      "rowCount": 52,
+      "source": "data_assets_companionsdataroot.asset.bundle",
+      "sourceSha256": "7e508458d462700df66f98eed835f77f9a25e35ca36649be6c9763de5f299339"
+    },
+    {
+      "name": "companionspellsdataroot",
+      "output": "catalogs/companionspellsdataroot.json",
+      "rowCount": 312,
+      "source": "data_assets_companionspellsdataroot.asset.bundle",
+      "sourceSha256": "52388e7f71c9cda742a0810977386105dceb3dbcb6bc32b3cd4d8b6d127dac73"
+    },
+    {
+      "name": "constantsdataroot",
+      "output": "catalogs/constantsdataroot.json",
+      "rowCount": 12,
+      "source": "data_assets_constantsdataroot.asset.bundle",
+      "sourceSha256": "9ca966347c4b47e35f44a0a99419f1788955bfb0d62dde82eea016a867c8a9ad"
+    },
+    {
+      "name": "creaturebonesoverridesdataroot",
+      "output": "catalogs/creaturebonesoverridesdataroot.json",
+      "rowCount": 3,
+      "source": "data_assets_creaturebonesoverridesdataroot.asset.bundle",
+      "sourceSha256": "b666ac1829bcf3b0fb579f986684140164e10f86160fc6071798cc597b7f12f5"
+    },
+    {
+      "name": "creaturebonestypesdataroot",
+      "output": "catalogs/creaturebonestypesdataroot.json",
+      "rowCount": 11,
+      "source": "data_assets_creaturebonestypesdataroot.asset.bundle",
+      "sourceSha256": "5723cecfbec4722e12404571351aedb9957d1a36ba58eaec922daa350644ca44"
+    },
+    {
+      "name": "custommodebreedspellsdataroot",
+      "output": "catalogs/custommodebreedspellsdataroot.json",
+      "rowCount": 105,
+      "source": "data_assets_custommodebreedspellsdataroot.asset.bundle",
+      "sourceSha256": "e01ff53a0a589e09d2ba889aae7deac3cbc80f54d2e6d49158227fbcc5f627a1"
+    },
+    {
+      "name": "documentsdataroot",
+      "output": "catalogs/documentsdataroot.json",
+      "rowCount": 603,
+      "source": "data_assets_documentsdataroot.asset.bundle",
+      "sourceSha256": "bd43c45c9d7dad6077c5f14ff70df0f3bcf2db86d69edcdce26a40ba98d0acf1"
+    },
+    {
+      "name": "dofusprogressionsdataroot",
+      "output": "catalogs/dofusprogressionsdataroot.json",
+      "rowCount": 30,
+      "source": "data_assets_dofusprogressionsdataroot.asset.bundle",
+      "sourceSha256": "7795bcdda1ecb26ba5fc098af4623609cef40ca34b4808e8130f3e6861fecbc2"
+    },
+    {
+      "name": "dungeonsdataroot",
+      "output": "catalogs/dungeonsdataroot.json",
+      "rowCount": 187,
+      "source": "data_assets_dungeonsdataroot.asset.bundle",
+      "sourceSha256": "466e540fed6871c8dab810b1e67440329cc1983e47d699f6601844abaece1481"
+    },
+    {
+      "name": "effectsdataroot",
+      "output": "catalogs/effectsdataroot.json",
+      "rowCount": 872,
+      "source": "data_assets_effectsdataroot.asset.bundle",
+      "sourceSha256": "b2ebac1168d63742b1d654c00b84f5b4a263e1f867b637d3c3bf30a78e485f40"
+    },
+    {
+      "name": "emblembackgroundsdataroot",
+      "output": "catalogs/emblembackgroundsdataroot.json",
+      "rowCount": 34,
+      "source": "data_assets_emblembackgroundsdataroot.asset.bundle",
+      "sourceSha256": "5fb1f68eef8a8e5ad1f22aef0d7d70f276e405629c2e1b62542438267aaf6c96"
+    },
+    {
+      "name": "emblemsymbolcategoriesdataroot",
+      "output": "catalogs/emblemsymbolcategoriesdataroot.json",
+      "rowCount": 14,
+      "source": "data_assets_emblemsymbolcategoriesdataroot.asset.bundle",
+      "sourceSha256": "0d15146b584c019088abb5f9e59dd9b2dd0752deacab4dbe8622bb891a2cc4c4"
+    },
+    {
+      "name": "emblemsymbolsdataroot",
+      "output": "catalogs/emblemsymbolsdataroot.json",
+      "rowCount": 488,
+      "source": "data_assets_emblemsymbolsdataroot.asset.bundle",
+      "sourceSha256": "c87c8a2a2e42bf1c9795bf3ee66bf6f3494517969b0ac839e2f892bd9df1941d"
+    },
+    {
+      "name": "emoticonsdataroot",
+      "output": "catalogs/emoticonsdataroot.json",
+      "rowCount": 324,
+      "source": "data_assets_emoticonsdataroot.asset.bundle",
+      "sourceSha256": "26c805b0e4e5a7055698fed9bdf79a24dd7e8c243f1bf2a1563d0d83981fc0d4"
+    },
+    {
+      "name": "evolutiveeffectsdataroot",
+      "output": "catalogs/evolutiveeffectsdataroot.json",
+      "rowCount": 1143,
+      "source": "data_assets_evolutiveeffectsdataroot.asset.bundle",
+      "sourceSha256": "637ceb488fe08680a130bdc409be2237b0e32db09263e261262ce064e1e66d2e"
+    },
+    {
+      "name": "evolutiveitemtypesdataroot",
+      "output": "catalogs/evolutiveitemtypesdataroot.json",
+      "rowCount": 2,
+      "source": "data_assets_evolutiveitemtypesdataroot.asset.bundle",
+      "sourceSha256": "a7ca51498c70b5be344c6aa853ece226f8115400fe3d47c96bd7f693d004e5ff"
+    },
+    {
+      "name": "expeditionseasonsdataroot",
+      "output": "catalogs/expeditionseasonsdataroot.json",
+      "rowCount": 2,
+      "source": "data_assets_expeditionseasonsdataroot.asset.bundle",
+      "sourceSha256": "587a0e770a11055edd95173176be430f3ec6dc621ddaeff85fbe75b043b581b9"
+    },
+    {
+      "name": "externalnotificationsdataroot",
+      "output": "catalogs/externalnotificationsdataroot.json",
+      "rowCount": 53,
+      "source": "data_assets_externalnotificationsdataroot.asset.bundle",
+      "sourceSha256": "98715feed24a312725fc0ad6e17bdb71891e4fadb05b665d6d6e1f51de830e6e"
+    },
+    {
+      "name": "featuredescriptionsdataroot",
+      "output": "catalogs/featuredescriptionsdataroot.json",
+      "rowCount": 340,
+      "source": "data_assets_featuredescriptionsdataroot.asset.bundle",
+      "sourceSha256": "89368f3e5f9b628aea25323e9bd9f1b59d796e8f5d68f6f5c83c6ba7c05f6fb6"
+    },
+    {
+      "name": "fightscenariosdataroot",
+      "output": "catalogs/fightscenariosdataroot.json",
+      "rowCount": 22,
+      "source": "data_assets_fightscenariosdataroot.asset.bundle",
+      "sourceSha256": "247f6d9a5036229ae6ff49b0c77cf17b6506d8b97abada7339980e63c1d53cac"
+    },
+    {
+      "name": "forgettablespellsdataroot",
+      "output": "catalogs/forgettablespellsdataroot.json",
+      "rowCount": 300,
+      "source": "data_assets_forgettablespellsdataroot.asset.bundle",
+      "sourceSha256": "998c6ddd31823f563fb6579530a3f0da080bffcc2277afd5ffc53fbec8f47d56"
+    },
+    {
+      "name": "guildchesttabsdataroot",
+      "output": "catalogs/guildchesttabsdataroot.json",
+      "rowCount": 8,
+      "source": "data_assets_guildchesttabsdataroot.asset.bundle",
+      "sourceSha256": "862698a43f1feb2d504fe0553f147e7faa133132488deaeaed444d38edf66c01"
+    },
+    {
+      "name": "guildhallsdataroot",
+      "output": "catalogs/guildhallsdataroot.json",
+      "rowCount": 7,
+      "source": "data_assets_guildhallsdataroot.asset.bundle",
+      "sourceSha256": "43eaa99d0909af011a10d51fb86b78f435528a2ac75b0735a82ab59ff58fcc78"
+    },
+    {
+      "name": "guildhallthemesdataroot",
+      "output": "catalogs/guildhallthemesdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_guildhallthemesdataroot.asset.bundle",
+      "sourceSha256": "45d8a45914ba7e414c15cb6d42e26a61601c146b4710ff0de6dacb8a0dfa0fa5"
+    },
+    {
+      "name": "guildlevelrewardsdataroot",
+      "output": "catalogs/guildlevelrewardsdataroot.json",
+      "rowCount": 20,
+      "source": "data_assets_guildlevelrewardsdataroot.asset.bundle",
+      "sourceSha256": "49b9628f689d3ada6bb4c322f4fbd4249258ee643d5cb08cbf3e05729fec6663"
+    },
+    {
+      "name": "guildmissionactivitiesdataroot",
+      "output": "catalogs/guildmissionactivitiesdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_guildmissionactivitiesdataroot.asset.bundle",
+      "sourceSha256": "e2342edb32919e16dfb3ba0c05112f7c5df26eeee3f6b46b132d7057e923b51a"
+    },
+    {
+      "name": "guildmissiongradesdataroot",
+      "output": "catalogs/guildmissiongradesdataroot.json",
+      "rowCount": 11,
+      "source": "data_assets_guildmissiongradesdataroot.asset.bundle",
+      "sourceSha256": "74ece96b53fec0dd5146cfae35525a0e63cefa293b3405deaf945e1344b03b09"
+    },
+    {
+      "name": "guildmissionmilestonerewardsdataroot",
+      "output": "catalogs/guildmissionmilestonerewardsdataroot.json",
+      "rowCount": 0,
+      "source": "data_assets_guildmissionmilestonerewardsdataroot.asset.bundle",
+      "sourceSha256": "2cff5880b83b2fad45ff4bd4f9821b334bca3339e923b94fc24c0a2018a92b07"
+    },
+    {
+      "name": "guildmissionmilestonesdataroot",
+      "output": "catalogs/guildmissionmilestonesdataroot.json",
+      "rowCount": 20,
+      "source": "data_assets_guildmissionmilestonesdataroot.asset.bundle",
+      "sourceSha256": "5648441c496b4e7578b05356f9fb2237f4ee2d143b3881ab295b205192c706c5"
+    },
+    {
+      "name": "guildmissionobjectivesdataroot",
+      "output": "catalogs/guildmissionobjectivesdataroot.json",
+      "rowCount": 496,
+      "source": "data_assets_guildmissionobjectivesdataroot.asset.bundle",
+      "sourceSha256": "b2b407680e56f35f59053763588342a4a92ca6a8758133e15fef59554841398c"
+    },
+    {
+      "name": "guildmissionranksdataroot",
+      "output": "catalogs/guildmissionranksdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_guildmissionranksdataroot.asset.bundle",
+      "sourceSha256": "e09f80960dc1c858709abf94c4589b192554cabeb1bccd834abad38812cb993b"
+    },
+    {
+      "name": "guildmissionsdataroot",
+      "output": "catalogs/guildmissionsdataroot.json",
+      "rowCount": 464,
+      "source": "data_assets_guildmissionsdataroot.asset.bundle",
+      "sourceSha256": "f98d984fb143f46cbc54bd0d0f2320ee7cc640b17048f540dc0cec5f1a62f24e"
+    },
+    {
+      "name": "guildmissionsupercategoriesdataroot",
+      "output": "catalogs/guildmissionsupercategoriesdataroot.json",
+      "rowCount": 6,
+      "source": "data_assets_guildmissionsupercategoriesdataroot.asset.bundle",
+      "sourceSha256": "95169fcc07ebf55d729e231a52af75a24546b4d43c10e999dd1856fac362f8e2"
+    },
+    {
+      "name": "guildraidsdataroot",
+      "output": "catalogs/guildraidsdataroot.json",
+      "rowCount": 2,
+      "source": "data_assets_guildraidsdataroot.asset.bundle",
+      "sourceSha256": "a8da62c2e78076ddeb480a53e8e9871d687622989cd261b413d7e21933279e91"
+    },
+    {
+      "name": "guildraidsgoalsdataroot",
+      "output": "catalogs/guildraidsgoalsdataroot.json",
+      "rowCount": 32,
+      "source": "data_assets_guildraidsgoalsdataroot.asset.bundle",
+      "sourceSha256": "6f7b91bebadb946c6d68264c9b122701c2ff449351c65d76cf35e21e5be997d0"
+    },
+    {
+      "name": "guildraidsgroupsdataroot",
+      "output": "catalogs/guildraidsgroupsdataroot.json",
+      "rowCount": 2,
+      "source": "data_assets_guildraidsgroupsdataroot.asset.bundle",
+      "sourceSha256": "78f9752790c7c77a2fd028d7f2329217793a450602d58571c88704f9a7df0e73"
+    },
+    {
+      "name": "guildraidsladdersrewardsdataroot",
+      "output": "catalogs/guildraidsladdersrewardsdataroot.json",
+      "rowCount": 14,
+      "source": "data_assets_guildraidsladdersrewardsdataroot.asset.bundle",
+      "sourceSha256": "7405a8bb5e18a1e040383d3eec7889a8b216bed321a07bc2ae6d2086a1532e0f"
+    },
+    {
+      "name": "guildraidsrewardsdataroot",
+      "output": "catalogs/guildraidsrewardsdataroot.json",
+      "rowCount": 21,
+      "source": "data_assets_guildraidsrewardsdataroot.asset.bundle",
+      "sourceSha256": "4638d2b81a80ed4c674995e5bfedadd99fdfe304b8623583acd3934c812c715d"
+    },
+    {
+      "name": "guildranknamesuggestionsdataroot",
+      "output": "catalogs/guildranknamesuggestionsdataroot.json",
+      "rowCount": 34,
+      "source": "data_assets_guildranknamesuggestionsdataroot.asset.bundle",
+      "sourceSha256": "fe14db108b52578115d2cbb027d773eebd32034f6e935fe321df45b8d7c5adde"
+    },
+    {
+      "name": "guildranksdataroot",
+      "output": "catalogs/guildranksdataroot.json",
+      "rowCount": 4,
+      "source": "data_assets_guildranksdataroot.asset.bundle",
+      "sourceSha256": "839c1bd3554ceec29750ac95b34a31f7fb79cd48012da2ccc7570dc7e06bc548"
+    },
+    {
+      "name": "guildrightgroupsdataroot",
+      "output": "catalogs/guildrightgroupsdataroot.json",
+      "rowCount": 36,
+      "source": "data_assets_guildrightgroupsdataroot.asset.bundle",
+      "sourceSha256": "11488457854d0c7995d8821c14a1887477f39a3869890b2396e78a989889b04e"
+    },
+    {
+      "name": "guildrightsdataroot",
+      "output": "catalogs/guildrightsdataroot.json",
+      "rowCount": 28,
+      "source": "data_assets_guildrightsdataroot.asset.bundle",
+      "sourceSha256": "b537297b86f2420bf8a183704914d9cdf534e9fe1422af90bceef2ae2f61d072"
+    },
+    {
+      "name": "guildshopboostsdataroot",
+      "output": "catalogs/guildshopboostsdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_guildshopboostsdataroot.asset.bundle",
+      "sourceSha256": "9931b9da2f6f3248de9932b2a05b00e2c08350947f30f961002162695f07b8a3"
+    },
+    {
+      "name": "guildtagsdataroot",
+      "output": "catalogs/guildtagsdataroot.json",
+      "rowCount": 19,
+      "source": "data_assets_guildtagsdataroot.asset.bundle",
+      "sourceSha256": "bc8bbccaa532bedcf052ae199ecca8c185980bfa28f50360ddbe4cd5026e5855"
+    },
+    {
+      "name": "guildtagtypesdataroot",
+      "output": "catalogs/guildtagtypesdataroot.json",
+      "rowCount": 3,
+      "source": "data_assets_guildtagtypesdataroot.asset.bundle",
+      "sourceSha256": "1220a37bb62bb1c736f04ec5d0204a848b9386fe4f1fd6d9b369a371783cf9d8"
+    },
+    {
+      "name": "havenbagfurnituresdataroot",
+      "output": "catalogs/havenbagfurnituresdataroot.json",
+      "rowCount": 4083,
+      "source": "data_assets_havenbagfurnituresdataroot.asset.bundle",
+      "sourceSha256": "021378887864c48e8f5cc439273b29198a08aad37744440aaa5860a1857216e6"
+    },
+    {
+      "name": "havenbagthemesdataroot",
+      "output": "catalogs/havenbagthemesdataroot.json",
+      "rowCount": 48,
+      "source": "data_assets_havenbagthemesdataroot.asset.bundle",
+      "sourceSha256": "516f31546f7d737b5d96255755633d50e2d2db09f0c6bbab2e3532198a8f20e9"
+    },
+    {
+      "name": "headsdataroot",
+      "output": "catalogs/headsdataroot.json",
+      "rowCount": 638,
+      "source": "data_assets_headsdataroot.asset.bundle",
+      "sourceSha256": "e4121a6f4a6d6dc100a1ce0d8083129d1d0c2be17cc0821d800ae4a310f7d1bf"
+    },
+    {
+      "name": "hintcategoriesdataroot",
+      "output": "catalogs/hintcategoriesdataroot.json",
+      "rowCount": 12,
+      "source": "data_assets_hintcategoriesdataroot.asset.bundle",
+      "sourceSha256": "c864800bd277f2b15ccd3917924e8ceef5f969445500a30f945a63196e4b8ddf"
+    },
+    {
+      "name": "hintsdataroot",
+      "output": "catalogs/hintsdataroot.json",
+      "rowCount": 834,
+      "source": "data_assets_hintsdataroot.asset.bundle",
+      "sourceSha256": "94304299391931dc420e2db375eca118e476f00e59b2114844d9e929136238a8"
+    },
+    {
+      "name": "housesdataroot",
+      "output": "catalogs/housesdataroot.json",
+      "rowCount": 261,
+      "source": "data_assets_housesdataroot.asset.bundle",
+      "sourceSha256": "75f8bae5487f1319b357700ea8dc9f09436bb79276ba13f41f1bde35d6bc6f65"
+    },
+    {
+      "name": "idlesdataroot",
+      "output": "catalogs/idlesdataroot.json",
+      "rowCount": 39,
+      "source": "data_assets_idlesdataroot.asset.bundle",
+      "sourceSha256": "3d744b59e00bc24e2b7dd80426c28b65393062b6b7f0f3ac0cd946e5854587f9"
+    },
+    {
+      "name": "infinitedreamintensitiesdataroot",
+      "output": "catalogs/infinitedreamintensitiesdataroot.json",
+      "rowCount": 10,
+      "source": "data_assets_infinitedreamintensitiesdataroot.asset.bundle",
+      "sourceSha256": "6998b4349dd6a4d0a4fc15dbde5262cffb74c656aea5f0b17a66fa645c39578a"
+    },
+    {
+      "name": "infinitedreamrewardactionsdataroot",
+      "output": "catalogs/infinitedreamrewardactionsdataroot.json",
+      "rowCount": 161,
+      "source": "data_assets_infinitedreamrewardactionsdataroot.asset.bundle",
+      "sourceSha256": "865d56e146eac99be7cf006babb06343415343191956fc6f94c213af0bc556ec"
+    },
+    {
+      "name": "infinitedreamrewardsdataroot",
+      "output": "catalogs/infinitedreamrewardsdataroot.json",
+      "rowCount": 111,
+      "source": "data_assets_infinitedreamrewardsdataroot.asset.bundle",
+      "sourceSha256": "33ed2b0633f68084cf33bad084870d36aa6f9eda478e024b69443c52e628fee1"
+    },
+    {
+      "name": "infinitedreamtrialsdataroot",
+      "output": "catalogs/infinitedreamtrialsdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_infinitedreamtrialsdataroot.asset.bundle",
+      "sourceSha256": "fe3ad99efab9005b521529b6ef49f3a62271bb519c4912e1fe3e2bf92c29bed3"
+    },
+    {
+      "name": "infomessagesdataroot",
+      "output": "catalogs/infomessagesdataroot.json",
+      "rowCount": 2557,
+      "source": "data_assets_infomessagesdataroot.asset.bundle",
+      "sourceSha256": "81d12110288d800c220e5aa36e2e6df83226c04ac9a01616851918e5b4214ade"
+    },
+    {
+      "name": "interactivesdataroot",
+      "output": "catalogs/interactivesdataroot.json",
+      "rowCount": 446,
+      "source": "data_assets_interactivesdataroot.asset.bundle",
+      "sourceSha256": "cb812684d9ea89babd927b40d2949878f8284066ec2a9a3053c10672a62b0117"
+    },
+    {
+      "name": "itemsdataroot",
+      "output": "catalogs/itemsdataroot.json",
+      "rowCount": 66323,
+      "source": "data_assets_itemsdataroot.asset.bundle",
+      "sourceSha256": "4125f2c83014089417370076177c8bdc693e8c1887a9a0935caee970f116f440"
+    },
+    {
+      "name": "itemsetsdataroot",
+      "output": "catalogs/itemsetsdataroot.json",
+      "rowCount": 9018,
+      "source": "data_assets_itemsetsdataroot.asset.bundle",
+      "sourceSha256": "b90e32cbc6e35561273d88faa80afb19b863559090e6614cd1d95bf7b46d0ebc"
+    },
+    {
+      "name": "itemsupertypesdataroot",
+      "output": "catalogs/itemsupertypesdataroot.json",
+      "rowCount": 26,
+      "source": "data_assets_itemsupertypesdataroot.asset.bundle",
+      "sourceSha256": "0ee3319dce2bc20e25825e7d8b0584341e0d9274ba916345cd44dc422b272ee2"
+    },
+    {
+      "name": "itemtypesdataroot",
+      "output": "catalogs/itemtypesdataroot.json",
+      "rowCount": 239,
+      "source": "data_assets_itemtypesdataroot.asset.bundle",
+      "sourceSha256": "0393a0cd57b128e20f220aa31814331664c470a7e035dd1058be641298114fcc"
+    },
+    {
+      "name": "jobsdataroot",
+      "output": "catalogs/jobsdataroot.json",
+      "rowCount": 23,
+      "source": "data_assets_jobsdataroot.asset.bundle",
+      "sourceSha256": "f7b721d0b66c9a5d7c37fafd28053fb67f7444420cfa607e25a47202811aeafc"
+    },
+    {
+      "name": "kothrolesdataroot",
+      "output": "catalogs/kothrolesdataroot.json",
+      "rowCount": 7,
+      "source": "data_assets_kothrolesdataroot.asset.bundle",
+      "sourceSha256": "8018a934e4cdb20d43949cd057ceb48bcede260e39e58cf9128fba4d166cbfec"
+    },
+    {
+      "name": "legendarypowerscategoriesdataroot",
+      "output": "catalogs/legendarypowerscategoriesdataroot.json",
+      "rowCount": 33,
+      "source": "data_assets_legendarypowerscategoriesdataroot.asset.bundle",
+      "sourceSha256": "443f133564e3c4deafc02a03311ba792c7de4234369b65dd32c6426c560459b4"
+    },
+    {
+      "name": "legendarytreasurehuntsdataroot",
+      "output": "catalogs/legendarytreasurehuntsdataroot.json",
+      "rowCount": 57,
+      "source": "data_assets_legendarytreasurehuntsdataroot.asset.bundle",
+      "sourceSha256": "d7120f06741f370150170056a52e304c88994a317224355f1c8fe0f8aa7baefe"
+    },
+    {
+      "name": "livingobjectskinsmoodsdataroot",
+      "output": "catalogs/livingobjectskinsmoodsdataroot.json",
+      "rowCount": 64,
+      "source": "data_assets_livingobjectskinsmoodsdataroot.asset.bundle",
+      "sourceSha256": "d8b56a74439c0e79a8a96bcfc0bdf0454fdbdaa1818f3c060cd39f2124daac2f"
+    },
+    {
+      "name": "lobbytagsdataroot",
+      "output": "catalogs/lobbytagsdataroot.json",
+      "rowCount": 28,
+      "source": "data_assets_lobbytagsdataroot.asset.bundle",
+      "sourceSha256": "7fce1f8eec016ab85337759aa6c1c9dcd29578b4110a4df27fa598c4c689fb21"
+    },
+    {
+      "name": "lobbytypesdataroot",
+      "output": "catalogs/lobbytypesdataroot.json",
+      "rowCount": 7,
+      "source": "data_assets_lobbytypesdataroot.asset.bundle",
+      "sourceSha256": "6b5001bf9c6829dbc73ef47eb1e2196dc17a4180ca33076cad2ef835a72bfb49"
+    },
+    {
+      "name": "luaformulasdataroot",
+      "output": "catalogs/luaformulasdataroot.json",
+      "rowCount": 38,
+      "source": "data_assets_luaformulasdataroot.asset.bundle",
+      "sourceSha256": "87f7252f811396eeef45431a8dca4b3230cc58c76ec6181a51f89a55562e127a"
+    },
+    {
+      "name": "mapreferencesdataroot",
+      "output": "catalogs/mapreferencesdataroot.json",
+      "rowCount": 571,
+      "source": "data_assets_mapreferencesdataroot.asset.bundle",
+      "sourceSha256": "aa0b7c242ccb29b388da5ddca670cff45d53d67c42ecc6485e95883ec43f2bb8"
+    },
+    {
+      "name": "mapscoordinatesdataroot",
+      "output": "catalogs/mapscoordinatesdataroot.json",
+      "rowCount": 6673,
+      "source": "data_assets_mapscoordinatesdataroot.asset.bundle",
+      "sourceSha256": "81b4c8d50461149b1371e27580e1a682f530a443c0721816d6c7660431e96973"
+    },
+    {
+      "name": "mapscrollactionsdataroot",
+      "output": "catalogs/mapscrollactionsdataroot.json",
+      "rowCount": 2223,
+      "source": "data_assets_mapscrollactionsdataroot.asset.bundle",
+      "sourceSha256": "efd83eccffb1eafe9bf4094397d5ffdb13e4302769ae8a6ae3e59193a0fa3ddd"
+    },
+    {
+      "name": "mapsinformationdataroot",
+      "output": "catalogs/mapsinformationdataroot.json",
+      "rowCount": 15360,
+      "source": "data_assets_mapsinformationdataroot.asset.bundle",
+      "sourceSha256": "1c22eb4fbc87a694c9e026248c2674702155c9bbbf59b88ecfbc83c74730aef4"
+    },
+    {
+      "name": "modstersdataroot",
+      "output": "catalogs/modstersdataroot.json",
+      "rowCount": 150,
+      "source": "data_assets_modstersdataroot.asset.bundle",
+      "sourceSha256": "56a1b0bfff31b1965eb34cb898a5f5737aa602c0feab2a0ab603d3a536de40c2"
+    },
+    {
+      "name": "monsterminibossesdataroot",
+      "output": "catalogs/monsterminibossesdataroot.json",
+      "rowCount": 306,
+      "source": "data_assets_monsterminibossesdataroot.asset.bundle",
+      "sourceSha256": "8e9f255b28546e89243f5a94d309ac635a3ca9beaba1bc58498009ad7529bc3d"
+    },
+    {
+      "name": "monsterracesdataroot",
+      "output": "catalogs/monsterracesdataroot.json",
+      "rowCount": 264,
+      "source": "data_assets_monsterracesdataroot.asset.bundle",
+      "sourceSha256": "43a8095a4c671a6d15ea4f64aaca9a9994476bb3138715842214999e1fb1d8cc"
+    },
+    {
+      "name": "monstersdataroot",
+      "output": "catalogs/monstersdataroot.json",
+      "rowCount": 5134,
+      "source": "data_assets_monstersdataroot.asset.bundle",
+      "sourceSha256": "161a3e83da04ee9546ffe7dbecec96b82cb16474a360876d2a2abc432cd5b841"
+    },
+    {
+      "name": "monstersuperracesdataroot",
+      "output": "catalogs/monstersuperracesdataroot.json",
+      "rowCount": 35,
+      "source": "data_assets_monstersuperracesdataroot.asset.bundle",
+      "sourceSha256": "aa6845f0962a8bdc8d1258f6941a58aa3631d652811e0af26fec0e735993f2b8"
+    },
+    {
+      "name": "monthsdataroot",
+      "output": "catalogs/monthsdataroot.json",
+      "rowCount": 12,
+      "source": "data_assets_monthsdataroot.asset.bundle",
+      "sourceSha256": "fd1dcf82345f642d19b804a58f16aefd3858d21495a6b189f0c3a42a6740a2d1"
+    },
+    {
+      "name": "mountbehaviorsdataroot",
+      "output": "catalogs/mountbehaviorsdataroot.json",
+      "rowCount": 10,
+      "source": "data_assets_mountbehaviorsdataroot.asset.bundle",
+      "sourceSha256": "1e09fecb75ad3e5c8481f4d11d7ee82d13bd4c606c21b68164920d9616e9d845"
+    },
+    {
+      "name": "mountbonesdataroot",
+      "output": "catalogs/mountbonesdataroot.json",
+      "rowCount": 144,
+      "source": "data_assets_mountbonesdataroot.asset.bundle",
+      "sourceSha256": "375a3cf546d0bafe4d589074a207df4af70f757bd48f0dbf846eac812d54b85e"
+    },
+    {
+      "name": "mountfamiliesdataroot",
+      "output": "catalogs/mountfamiliesdataroot.json",
+      "rowCount": 6,
+      "source": "data_assets_mountfamiliesdataroot.asset.bundle",
+      "sourceSha256": "b700406092f542e616ccd2710091e135fab0360c01faa1a396b3bff31c8f48ab"
+    },
+    {
+      "name": "mountsdataroot",
+      "output": "catalogs/mountsdataroot.json",
+      "rowCount": 997,
+      "source": "data_assets_mountsdataroot.asset.bundle",
+      "sourceSha256": "d4314d220009d96ddfb6d9b44d7dbd10e0be05c4f30753d3ce48f8bf13ba5c8d"
+    },
+    {
+      "name": "namingrulesdataroot",
+      "output": "catalogs/namingrulesdataroot.json",
+      "rowCount": 18,
+      "source": "data_assets_namingrulesdataroot.asset.bundle",
+      "sourceSha256": "95f59569de13b5beab7af6ebd6747bb3ab2d9528ad34efc1b5cfebcd22ad4527"
+    },
+    {
+      "name": "notificationsdataroot",
+      "output": "catalogs/notificationsdataroot.json",
+      "rowCount": 71,
+      "source": "data_assets_notificationsdataroot.asset.bundle",
+      "sourceSha256": "35e042366477e619b37633d2a1860d3b509b527c111999e479b81f650b80dc94"
+    },
+    {
+      "name": "npcactionsdataroot",
+      "output": "catalogs/npcactionsdataroot.json",
+      "rowCount": 16,
+      "source": "data_assets_npcactionsdataroot.asset.bundle",
+      "sourceSha256": "23bf7112c5952b04a130fed387fed12f007d2b8577bd24838900722875ce6eb3"
+    },
+    {
+      "name": "npcdialogskinsdataroot",
+      "output": "catalogs/npcdialogskinsdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_npcdialogskinsdataroot.asset.bundle",
+      "sourceSha256": "703827fd1fb828894d5579a90cabc985804d3c34c0e8f8fd1b7c6da9acb7b898"
+    },
+    {
+      "name": "npcmessagesdataroot",
+      "output": "catalogs/npcmessagesdataroot.json",
+      "rowCount": 55037,
+      "source": "data_assets_npcmessagesdataroot.asset.bundle",
+      "sourceSha256": "6fe61cf04fb07c6912a401d4f27f9e306cef76fbfdedc11a2b636d503db240db"
+    },
+    {
+      "name": "npcsdataroot",
+      "output": "catalogs/npcsdataroot.json",
+      "rowCount": 6467,
+      "source": "data_assets_npcsdataroot.asset.bundle",
+      "sourceSha256": "839705de2b89fbd0c4195d8b26a626570b841ef957f66f8b87353b9f007555a7"
+    },
+    {
+      "name": "optionalfeaturesdataroot",
+      "output": "catalogs/optionalfeaturesdataroot.json",
+      "rowCount": 69,
+      "source": "data_assets_optionalfeaturesdataroot.asset.bundle",
+      "sourceSha256": "623d50c60b76fef99bca77c7d8dabd13604152932892385ddd1ed07940bd14cb"
+    },
+    {
+      "name": "ornamentsdataroot",
+      "output": "catalogs/ornamentsdataroot.json",
+      "rowCount": 167,
+      "source": "data_assets_ornamentsdataroot.asset.bundle",
+      "sourceSha256": "6fc62a8edac8689183cc626abb88731b82baa6bf82b1869425dcdd9003dfbb53"
+    },
+    {
+      "name": "paddockgaugesdataroot",
+      "output": "catalogs/paddockgaugesdataroot.json",
+      "rowCount": 6,
+      "source": "data_assets_paddockgaugesdataroot.asset.bundle",
+      "sourceSha256": "197956417f906646091f2e9ea1a200d2a6182963443b3c44e88a7b1f1242bf02"
+    },
+    {
+      "name": "paddocksdataroot",
+      "output": "catalogs/paddocksdataroot.json",
+      "rowCount": 6,
+      "source": "data_assets_paddocksdataroot.asset.bundle",
+      "sourceSha256": "f0535e031101a5acde39af878ffe5173ac3ca3a7d8ae2b423f9225fc5ecf91b8"
+    },
+    {
+      "name": "pointsofinterestdataroot",
+      "output": "catalogs/pointsofinterestdataroot.json",
+      "rowCount": 179,
+      "source": "data_assets_pointsofinterestdataroot.asset.bundle",
+      "sourceSha256": "4026c81df7b227612ccd41928c1c56250088d0d11d5175448d236ce2655f814d"
+    },
+    {
+      "name": "popupsinformationdataroot",
+      "output": "catalogs/popupsinformationdataroot.json",
+      "rowCount": 26,
+      "source": "data_assets_popupsinformationdataroot.asset.bundle",
+      "sourceSha256": "26036752e076c796b8094f7cb8abd07288791477571a0e1ce1370ee68339b5bf"
+    },
+    {
+      "name": "preseticonsdataroot",
+      "output": "catalogs/preseticonsdataroot.json",
+      "rowCount": 116,
+      "source": "data_assets_preseticonsdataroot.asset.bundle",
+      "sourceSha256": "630261697165dc382b8b1a1da2bc7cafc8b89e098f339290ae7cfa29a9739ab0"
+    },
+    {
+      "name": "progressingachievementseasonsdataroot",
+      "output": "catalogs/progressingachievementseasonsdataroot.json",
+      "rowCount": 18,
+      "source": "data_assets_progressingachievementseasonsdataroot.asset.bundle",
+      "sourceSha256": "d9b5dfcb5929242f584ec6a7eb09b3f8fc1b0a3f1fd87d977cd2f79e787d7fb2"
+    },
+    {
+      "name": "progressingachievementstepsdataroot",
+      "output": "catalogs/progressingachievementstepsdataroot.json",
+      "rowCount": 535,
+      "source": "data_assets_progressingachievementstepsdataroot.asset.bundle",
+      "sourceSha256": "d2c1ef1039b097e3b517dea104dfc3c1186a742c3e9e9bc8fea555755848edbe"
+    },
+    {
+      "name": "questcategoriesdataroot",
+      "output": "catalogs/questcategoriesdataroot.json",
+      "rowCount": 43,
+      "source": "data_assets_questcategoriesdataroot.asset.bundle",
+      "sourceSha256": "fc919a5d25c7a5a762ff4abb5fbbe957fe99a0cca4dcb17ed96f3a80bbc3dbf9"
+    },
+    {
+      "name": "questobjectivesdataroot",
+      "output": "catalogs/questobjectivesdataroot.json",
+      "rowCount": 15547,
+      "source": "data_assets_questobjectivesdataroot.asset.bundle",
+      "sourceSha256": "c893883348edda2378a2fb1555e69f5fe7023b6e646c4490459b7c49a66f3b20"
+    },
+    {
+      "name": "questobjectivetypesdataroot",
+      "output": "catalogs/questobjectivetypesdataroot.json",
+      "rowCount": 18,
+      "source": "data_assets_questobjectivetypesdataroot.asset.bundle",
+      "sourceSha256": "54ddac8c992a61c55b623fa5d290137f542145a1d333592a8a95be027df6eaa1"
+    },
+    {
+      "name": "questsdataroot",
+      "output": "catalogs/questsdataroot.json",
+      "rowCount": 1976,
+      "source": "data_assets_questsdataroot.asset.bundle",
+      "sourceSha256": "998a220e0aa43dc771ab4ef0af11d90953f6805085c154901f2e0b50cd9e1611"
+    },
+    {
+      "name": "queststeprewardsdataroot",
+      "output": "catalogs/queststeprewardsdataroot.json",
+      "rowCount": 6707,
+      "source": "data_assets_queststeprewardsdataroot.asset.bundle",
+      "sourceSha256": "ff5815b26bbe41ccc38099ce6b3cd02c83a3157969a8c0dcb7d7cb34000d2126"
+    },
+    {
+      "name": "queststepsdataroot",
+      "output": "catalogs/queststepsdataroot.json",
+      "rowCount": 2225,
+      "source": "data_assets_queststepsdataroot.asset.bundle",
+      "sourceSha256": "7e2ba7d2de359e0350251975bbb9551aaa895ff85acabd6325351ae08e7daa8d"
+    },
+    {
+      "name": "randomdropgroupsdataroot",
+      "output": "catalogs/randomdropgroupsdataroot.json",
+      "rowCount": 314,
+      "source": "data_assets_randomdropgroupsdataroot.asset.bundle",
+      "sourceSha256": "4a3d768528297d42c17df6210771741edd5ef6588dce7570ad79a60538687dcf"
+    },
+    {
+      "name": "recipesdataroot",
+      "output": "catalogs/recipesdataroot.json",
+      "rowCount": 4858,
+      "source": "data_assets_recipesdataroot.asset.bundle",
+      "sourceSha256": "8aecea844b4fc876fa5af0bf08aea64a266fe2a33b429850f0906bd0f1884ae8"
+    },
+    {
+      "name": "ridefoodsdataroot",
+      "output": "catalogs/ridefoodsdataroot.json",
+      "rowCount": 15,
+      "source": "data_assets_ridefoodsdataroot.asset.bundle",
+      "sourceSha256": "1f7d121b37dde3c119a5b12d207bfcd9398a6f9aa06d76b8d13555a1031edbd1"
+    },
+    {
+      "name": "ridegaugesdataroot",
+      "output": "catalogs/ridegaugesdataroot.json",
+      "rowCount": 3,
+      "source": "data_assets_ridegaugesdataroot.asset.bundle",
+      "sourceSha256": "bdb79f2fcb64cd9a02ba00fcde303990b72ea49a7d2c80427d5dfdd8cca2af76"
+    },
+    {
+      "name": "riderbonesdataroot",
+      "output": "catalogs/riderbonesdataroot.json",
+      "rowCount": 4,
+      "source": "data_assets_riderbonesdataroot.asset.bundle",
+      "sourceSha256": "f6f64ca242e66f55dd2ba16cec1366528e9b97518c840c4958886edb35450be4"
+    },
+    {
+      "name": "ridesdataroot",
+      "output": "catalogs/ridesdataroot.json",
+      "rowCount": 308,
+      "source": "data_assets_ridesdataroot.asset.bundle",
+      "sourceSha256": "cd1d192c3f2890915aa80617201fe2abb48764051c78d1aaf679326bb888aeab"
+    },
+    {
+      "name": "ridespeciesdataroot",
+      "output": "catalogs/ridespeciesdataroot.json",
+      "rowCount": 3,
+      "source": "data_assets_ridespeciesdataroot.asset.bundle",
+      "sourceSha256": "1cad4e0377c5907331bdd70db574c7c151dfac7634093dc0b6decfe303ebed17"
+    },
+    {
+      "name": "servercommunitiesdataroot",
+      "output": "catalogs/servercommunitiesdataroot.json",
+      "rowCount": 14,
+      "source": "data_assets_servercommunitiesdataroot.asset.bundle",
+      "sourceSha256": "843a4623b06554d60986c675b3cd3260592b6ef8cc919da86aa4dd697c22d2f8"
+    },
+    {
+      "name": "servergametypesdataroot",
+      "output": "catalogs/servergametypesdataroot.json",
+      "rowCount": 6,
+      "source": "data_assets_servergametypesdataroot.asset.bundle",
+      "sourceSha256": "00854bef68a1dd4f33b804f556e57d12eb156c3de1fe22b976f57d034e8c013c"
+    },
+    {
+      "name": "serverlangsdataroot",
+      "output": "catalogs/serverlangsdataroot.json",
+      "rowCount": 10,
+      "source": "data_assets_serverlangsdataroot.asset.bundle",
+      "sourceSha256": "d919db0a44c9d60f16948367b05f66fbbefe8386d2ab83432897443cab762c62"
+    },
+    {
+      "name": "serverpopulationsdataroot",
+      "output": "catalogs/serverpopulationsdataroot.json",
+      "rowCount": 5,
+      "source": "data_assets_serverpopulationsdataroot.asset.bundle",
+      "sourceSha256": "09cb34b9c642ee81e0e041220b61b3d3fd52f483be3e83cc99c5d0cb3c1a43e4"
+    },
+    {
+      "name": "serversdataroot",
+      "output": "catalogs/serversdataroot.json",
+      "rowCount": 27,
+      "source": "data_assets_serversdataroot.asset.bundle",
+      "sourceSha256": "af4d1c8ab1c5983292922b0a659f5e24f3480df841ed486d8062be5f507eee06"
+    },
+    {
+      "name": "serverseasonsdataroot",
+      "output": "catalogs/serverseasonsdataroot.json",
+      "rowCount": 8,
+      "source": "data_assets_serverseasonsdataroot.asset.bundle",
+      "sourceSha256": "77942b7e5c7497372771b05384341b7827df69d81efec2be8369d544a8c20c60"
+    },
+    {
+      "name": "signsdataroot",
+      "output": "catalogs/signsdataroot.json",
+      "rowCount": 320,
+      "source": "data_assets_signsdataroot.asset.bundle",
+      "sourceSha256": "e9df6e36cf6fcbbec0d2880bc080e8975e1726fed23a65492dbfaa6867f2e5db"
+    },
+    {
+      "name": "skillnamesdataroot",
+      "output": "catalogs/skillnamesdataroot.json",
+      "rowCount": 364,
+      "source": "data_assets_skillnamesdataroot.asset.bundle",
+      "sourceSha256": "17521381d96caaf77f12c11653dfed68a180d2b76ca776a35bb91b7f48904303"
+    },
+    {
+      "name": "skillsdataroot",
+      "output": "catalogs/skillsdataroot.json",
+      "rowCount": 368,
+      "source": "data_assets_skillsdataroot.asset.bundle",
+      "sourceSha256": "0ddaf330b6001fd89f1f6856d5fd4a52ffc62cda8456c2d5e4b6341dc9ba6d10"
+    },
+    {
+      "name": "skinmappingsdataroot",
+      "output": "catalogs/skinmappingsdataroot.json",
+      "rowCount": 38,
+      "source": "data_assets_skinmappingsdataroot.asset.bundle",
+      "sourceSha256": "83e463a04df668ca44d1bbe140dff20b21ea46796ef3644e3618d3b5482874b2"
+    },
+    {
+      "name": "skinslotsrulesdataroot",
+      "output": "catalogs/skinslotsrulesdataroot.json",
+      "rowCount": 951,
+      "source": "data_assets_skinslotsrulesdataroot.asset.bundle",
+      "sourceSha256": "0f8c571b691844cfec530ff9f0bf0f9b6c4efd9950cb1421da7c9c90a7b502ae"
+    },
+    {
+      "name": "smileypacksdataroot",
+      "output": "catalogs/smileypacksdataroot.json",
+      "rowCount": 8,
+      "source": "data_assets_smileypacksdataroot.asset.bundle",
+      "sourceSha256": "44e2da9e83fe2ecda3170e287a5c8ffaac92b4d857cde8f91c339b3ba2d591d3"
+    },
+    {
+      "name": "smileysdataroot",
+      "output": "catalogs/smileysdataroot.json",
+      "rowCount": 222,
+      "source": "data_assets_smileysdataroot.asset.bundle",
+      "sourceSha256": "054357971e503eecf54f03d3f1625cd17d20c2faeded705e8596ea55ba60aac4"
+    },
+    {
+      "name": "soundbonesdataroot",
+      "output": "catalogs/soundbonesdataroot.json",
+      "rowCount": 7181,
+      "source": "data_assets_soundbonesdataroot.asset.bundle",
+      "sourceSha256": "940fd9ba4ec4f42a1fde89182a7a4c409fce350eb07f0ca357836b7bb409a975"
+    },
+    {
+      "name": "speakingitemstextsdataroot",
+      "output": "catalogs/speakingitemstextsdataroot.json",
+      "rowCount": 352,
+      "source": "data_assets_speakingitemstextsdataroot.asset.bundle",
+      "sourceSha256": "4eda82eb68b6e133926926c03b96290ce122c7c2e031dd2e1971cd884e2b1606"
+    },
+    {
+      "name": "speakingitemstriggersdataroot",
+      "output": "catalogs/speakingitemstriggersdataroot.json",
+      "rowCount": 22,
+      "source": "data_assets_speakingitemstriggersdataroot.asset.bundle",
+      "sourceSha256": "51ef9005c6eff9c669a8e2db0bed5f810fb8569612c291a605d9e52f1b4973fa"
+    },
+    {
+      "name": "spellbombsdataroot",
+      "output": "catalogs/spellbombsdataroot.json",
+      "rowCount": 10,
+      "source": "data_assets_spellbombsdataroot.asset.bundle",
+      "sourceSha256": "9ce623204ff49382557aa33aeed07c3534d2ec7dbd64a2283a9579f6669b70bc"
+    },
+    {
+      "name": "spellbombwallsdataroot",
+      "output": "catalogs/spellbombwallsdataroot.json",
+      "rowCount": 8,
+      "source": "data_assets_spellbombwallsdataroot.asset.bundle",
+      "sourceSha256": "0dfc247ac7be92991015a71b024c371904effba406b3950b76150cd102d770b5"
+    },
+    {
+      "name": "spelllevelsdataroot",
+      "output": "catalogs/spelllevelsdataroot.json",
+      "rowCount": 34685,
+      "source": "data_assets_spelllevelsdataroot.asset.bundle",
+      "sourceSha256": "892009911bc5c16b64dd11de66e1c2380d9dcdc51d9c7efe5e775ba3696a8b2f"
+    },
+    {
+      "name": "spellpairsdataroot",
+      "output": "catalogs/spellpairsdataroot.json",
+      "rowCount": 726,
+      "source": "data_assets_spellpairsdataroot.asset.bundle",
+      "sourceSha256": "f11510aa0b3319a969ada4087a53f1cc0260613e78e449dc1ae4b6a3497d31b6"
+    },
+    {
+      "name": "spellscriptsdataroot",
+      "output": "catalogs/spellscriptsdataroot.json",
+      "rowCount": 14908,
+      "source": "data_assets_spellscriptsdataroot.asset.bundle",
+      "sourceSha256": "3ccab9f8cadeb151b0834d831f18d6a22eee5aabb83be76ae26d1d04f618029e"
+    },
+    {
+      "name": "spellsdataroot",
+      "output": "catalogs/spellsdataroot.json",
+      "rowCount": 17054,
+      "source": "data_assets_spellsdataroot.asset.bundle",
+      "sourceSha256": "eb371107c44141db27054d00d715973ee4aaca0e1a7ab863f6863c69d31e2d55"
+    },
+    {
+      "name": "spellstatesdataroot",
+      "output": "catalogs/spellstatesdataroot.json",
+      "rowCount": 6370,
+      "source": "data_assets_spellstatesdataroot.asset.bundle",
+      "sourceSha256": "de2c12eec16d01fa4cb64f5177c8f5fe273ad9db7e43bf7af7204bd04898892a"
+    },
+    {
+      "name": "spelltypesdataroot",
+      "output": "catalogs/spelltypesdataroot.json",
+      "rowCount": 3240,
+      "source": "data_assets_spelltypesdataroot.asset.bundle",
+      "sourceSha256": "96ef0e9b53656c1374bc6f44b7e95da030579949b4bb3b47d26d4d70f5f0fd50"
+    },
+    {
+      "name": "spellvariantsdataroot",
+      "output": "catalogs/spellvariantsdataroot.json",
+      "rowCount": 431,
+      "source": "data_assets_spellvariantsdataroot.asset.bundle",
+      "sourceSha256": "c55014b1576f0afbcfe9cf008d95f39be9523905174c22f874eb31acea8ea174"
+    },
+    {
+      "name": "stealthbonesdataroot",
+      "output": "catalogs/stealthbonesdataroot.json",
+      "rowCount": 9,
+      "source": "data_assets_stealthbonesdataroot.asset.bundle",
+      "sourceSha256": "41155969698ad82013539774952bd1d741d18fe5451c1d0bd93c7b71ee8d0d2e"
+    },
+    {
+      "name": "subareasdataroot",
+      "output": "catalogs/subareasdataroot.json",
+      "rowCount": 562,
+      "source": "data_assets_subareasdataroot.asset.bundle",
+      "sourceSha256": "7abc8ff4a59da74a4927e11f3270544afdd523ea83e381eba7d5a695148b9cb8"
+    },
+    {
+      "name": "superareasdataroot",
+      "output": "catalogs/superareasdataroot.json",
+      "rowCount": 10,
+      "source": "data_assets_superareasdataroot.asset.bundle",
+      "sourceSha256": "9f760f465aef64df9a248e278c8cd98583c8a4496ce04c658440310315a57947"
+    },
+    {
+      "name": "taxcollectorfirstnamesdataroot",
+      "output": "catalogs/taxcollectorfirstnamesdataroot.json",
+      "rowCount": 151,
+      "source": "data_assets_taxcollectorfirstnamesdataroot.asset.bundle",
+      "sourceSha256": "b6739370f60df82fe51b3e12eba02223f66ff7664cf19d558f2e9090fb18aebd"
+    },
+    {
+      "name": "taxcollectornamesdataroot",
+      "output": "catalogs/taxcollectornamesdataroot.json",
+      "rowCount": 253,
+      "source": "data_assets_taxcollectornamesdataroot.asset.bundle",
+      "sourceSha256": "85039f6f419bbd053fa0bbc38365035f79b3b40e32c3ffed68e8851f4eab625e"
+    },
+    {
+      "name": "texticonreferencesdataroot",
+      "output": "catalogs/texticonreferencesdataroot.json",
+      "rowCount": 103,
+      "source": "data_assets_texticonreferencesdataroot.asset.bundle",
+      "sourceSha256": "5176c144f7b36258da65d350de35b263fb7e26adb5b8a837e70c7534279d69e9"
+    },
+    {
+      "name": "titlecategoriesdataroot",
+      "output": "catalogs/titlecategoriesdataroot.json",
+      "rowCount": 10,
+      "source": "data_assets_titlecategoriesdataroot.asset.bundle",
+      "sourceSha256": "f27f73ccc658c58527e5a0676d71b63ff813606614eb9bc46bc05e5595216964"
+    },
+    {
+      "name": "titlesdataroot",
+      "output": "catalogs/titlesdataroot.json",
+      "rowCount": 539,
+      "source": "data_assets_titlesdataroot.asset.bundle",
+      "sourceSha256": "5432570b52ad9b29c036c068bdb4ce84057261c309489f53bc098a07231c5521"
+    },
+    {
+      "name": "veteranrewardsdataroot",
+      "output": "catalogs/veteranrewardsdataroot.json",
+      "rowCount": 76,
+      "source": "data_assets_veteranrewardsdataroot.asset.bundle",
+      "sourceSha256": "1cbb3f01b47f5280b7bc803e60cd15bbf5e4caa93c05fd5d4ffb8b3e162dca9c"
+    },
+    {
+      "name": "waypointsdataroot",
+      "output": "catalogs/waypointsdataroot.json",
+      "rowCount": 62,
+      "source": "data_assets_waypointsdataroot.asset.bundle",
+      "sourceSha256": "e06f0bc3330e9dc26ead632eebd9c598130a527787bcb72aa7a4f45e131014cd"
+    },
+    {
+      "name": "worldeventsdataroot",
+      "output": "catalogs/worldeventsdataroot.json",
+      "rowCount": 22,
+      "source": "data_assets_worldeventsdataroot.asset.bundle",
+      "sourceSha256": "2302b50eb0c64380b5f7c784322f774f140774a677508831a8274f5fd258b5d0"
+    },
+    {
+      "name": "worldeventsdungeonsdataroot",
+      "output": "catalogs/worldeventsdungeonsdataroot.json",
+      "rowCount": 86,
+      "source": "data_assets_worldeventsdungeonsdataroot.asset.bundle",
+      "sourceSha256": "0aba6a907385471404f3bac2c4fe9d9a5cb0dad1b876a723416769cb0ad1c207"
+    },
+    {
+      "name": "worldeventsfarmingsimulatordataroot",
+      "output": "catalogs/worldeventsfarmingsimulatordataroot.json",
+      "rowCount": 191,
+      "source": "data_assets_worldeventsfarmingsimulatordataroot.asset.bundle",
+      "sourceSha256": "d64271e39f87e456e74314e382cb3a948ccbf544e46f785a0a458212632321aa"
+    },
+    {
+      "name": "worldeventsmonstershunterdataroot",
+      "output": "catalogs/worldeventsmonstershunterdataroot.json",
+      "rowCount": 187,
+      "source": "data_assets_worldeventsmonstershunterdataroot.asset.bundle",
+      "sourceSha256": "e21f29adb18502485e4d240e8115353597e1af1f95e19b05928a9d8b4ef3b80e"
+    },
+    {
+      "name": "worldeventsrewardsdataroot",
+      "output": "catalogs/worldeventsrewardsdataroot.json",
+      "rowCount": 7,
+      "source": "data_assets_worldeventsrewardsdataroot.asset.bundle",
+      "sourceSha256": "f2dd21951578b4f3839ea2be7e3993dbb0c7cd9b0171d75f4142504e6cb597c8"
+    },
+    {
+      "name": "worldeventsworldbossesdataroot",
+      "output": "catalogs/worldeventsworldbossesdataroot.json",
+      "rowCount": 1,
+      "source": "data_assets_worldeventsworldbossesdataroot.asset.bundle",
+      "sourceSha256": "fb458b36121e7307337e796bc56e3be2c7ead54c1eb08d4c9e5aa8a18ad20e11"
+    },
+    {
+      "name": "worldmapsdataroot",
+      "output": "catalogs/worldmapsdataroot.json",
+      "rowCount": 40,
+      "source": "data_assets_worldmapsdataroot.asset.bundle",
+      "sourceSha256": "3b795c122d4ded25ac97b70b945a06c21666751470711d4ae8a7c21fbd441b18"
+    }
+  ],
+  "clientVersion": "3.6.10.10",
+  "purpose": "Read-only extraction staging. Import only after protocol and server-state validation.",
+  "schemaVersion": 1,
+  "skippedBundles": [],
+  "sourceRoot": "Dofus_Data/StreamingAssets",
+  "unityVersion": "6000.3.16f1",
+  "worldExtracted": true
+}

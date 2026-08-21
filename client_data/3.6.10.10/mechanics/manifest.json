@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "clientVersion": "3.6.10.10",
+  "purpose": "External, version-pinned mechanic specifications. Draft entries never alter combat; verified entries still require a measured server handler for their rule kind.",
+  "entries": [
+    {
+      "file": "dungeons/example-dungeon.json"
+    },
+    {
+      "file": "dungeons/aquadome-merkator.json"
+    },
+    {
+      "file": "monsters/client-baseline.json"
+    }
+  ]
+}

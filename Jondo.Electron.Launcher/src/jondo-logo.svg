@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 112" role="img" aria-label="Jondo Dofus 3">
+  <defs>
+    <linearGradient id="gold" x1="0" x2="0" y1="0" y2="1">
+      <stop stop-color="#fff1a6"/><stop offset=".45" stop-color="#ffc649"/><stop offset="1" stop-color="#cc7419"/>
+    </linearGradient>
+  </defs>
+  <path fill="#39200d" d="M11 57 37 12h52l26 45-26 45H37z"/>
+  <path fill="#58c5b3" d="m63 25 17 31-17 31-17-31z"/>
+  <path fill="#d79428" d="m63 34 11 22-11 22-11-22z"/>
+  <text x="126" y="66" fill="url(#gold)" stroke="#4b250c" stroke-width="4" paint-order="stroke" font-family="Arial Black,Arial,sans-serif" font-size="57" letter-spacing="2">JONDO</text>
+  <text x="131" y="93" fill="#e8b344" font-family="Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="4">DOFUS 3 · 3.6.10.10</text>
+</svg>

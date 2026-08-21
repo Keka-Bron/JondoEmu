@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Network;
@@ -74,6 +75,13 @@ namespace Jondo.Unity.Launcher.Handlers
             byte[] moved = ConnectionProtocol.BuildActorMoved(
                 Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, cells, facing);
             await SessionRegistry.BroadcastToMapAsync(SessionContext.State.MapId, moved);
+
+            // Some indoor maps have an authored return cell but no reciprocal graph edge.  The
+            // binding is created only by the exact entry transition and this fires only when the
+            // character actually reaches its configured cell.
+            if (Managers.WorldInteractiveReturns.TryTakeAtCurrentCell(out var returnTo))
+                await MoveToMapAsync(stream, returnTo.ReturnMapId, returnTo.ReturnCellId,
+                    $"salida interior de {returnTo.EntryElementId}");
         }
 
         /// <summary>
@@ -157,9 +165,62 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task AllowMapExitAsync(NetworkStream stream, byte[] payload)
         {
+            // The Dofus client emits jqi when clicking the exit cell of these one-way interiors,
+            // but it has no adjacent-map jqk to send afterwards.  Complete the already-bound,
+            // proximity-validated return rather than leaving the client on a permanent jsq loop.
+            if (Managers.WorldInteractiveReturns.TryTakeAtCurrentCell(out var returnTo))
+            {
+                await MoveToMapAsync(stream, returnTo.ReturnMapId, returnTo.ReturnCellId,
+                    $"salida interior de {returnTo.EntryElementId}");
+                return;
+            }
+
+            // House and shop interiors often use a real map-exit cell, not an interactive
+            // element.  In that wire shape the client sends jqi and no following jqk.  Do not
+            // answer jsq and strand it: resolve only an interior return bound to this session.
+            if (HouseHandler.TryResolveBoundaryExit(out long houseMap, out int houseCell,
+                                                    out int houseDoor))
+            {
+                if (await MoveToMapAsync(stream, houseMap, houseCell,
+                        $"salida de vivienda{(houseDoor != 0 ? " de " + houseDoor : "")}"))
+                    HouseHandler.CompleteBoundaryExit();
+                return;
+            }
+
+            // Non-ownable social interiors (banks, shops, workshops and quest buildings) use
+            // the same jqi-only exit. Their client map position retains the unique outdoor map
+            // at the same coordinate/sub-area. Dungeon rooms are deliberately excluded: their
+            // exits belong to dungeon progression, and ambiguous counterparts are never guessed.
+            if (TryResolveSocialInteriorExit(out long socialMap, out int socialCell))
+            {
+                await MoveToMapAsync(stream, socialMap, socialCell, "salida de edificio");
+                return;
+            }
+
             long request = ConnectionProtocol.RequestId(payload);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.MapExitAllowedMessage, null, request));
+        }
+
+        private static bool TryResolveSocialInteriorExit(out long targetMapId, out int targetCellId)
+        {
+            targetMapId = 0;
+            targetCellId = 0;
+            long hereId = SessionContext.State.MapId;
+            var here = MapManager.GetMapInfo(hereId);
+            if (here == null || here.Outdoor || Managers.DungeonManager.IsRoom(hereId)) return false;
+
+            var matches = MapManager.Maps.Values
+                .Where(map => map.Outdoor && map.SubAreaId == here.SubAreaId &&
+                              map.PosX == here.PosX && map.PosY == here.PosY)
+                .OrderBy(map => map.MapId)
+                .ToList();
+            if (matches.Count != 1) return false;
+
+            targetMapId = matches[0].MapId;
+            targetCellId = MapManager.GetNearestWalkableCell(targetMapId,
+                SessionContext.State.CellId);
+            return targetCellId >= 0;
         }
 
         // ─── jqk: take me to this map ───────────────────────────────────────────
@@ -196,30 +257,54 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             int arrival = Landing(target, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, way);
-            long oldMapId = SessionContext.State.MapId;
+            int facing = FacingFor(way,
+                Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+            await MoveToMapAsync(stream, target, arrival, $"borde {way}", facing);
+        }
 
-            Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
-            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = arrival;
-            Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = FacingFor(way, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+        /// <summary>
+        /// Completes the common server-authoritative map-change sequence after a caller has
+        /// resolved and validated its destination. Border movement and graph-backed interactive
+        /// transitions use the same persisted state and the same captured jsd/jru/lqu/hjk order.
+        /// </summary>
+        public static async Task<bool> MoveToMapAsync(NetworkStream stream, long targetMapId,
+                                                       int arrivalCell, string reason,
+                                                       int? orientation = null)
+        {
+            long oldMapId = SessionContext.State.MapId;
+            if (targetMapId <= 0 || targetMapId == oldMapId ||
+                arrivalCell < 0 || arrivalCell > 559 ||
+                MapManager.GetMapInfo(targetMapId) == null)
+            {
+                Console.WriteLine($"[Move] Cambio rechazado ({reason}): {oldMapId} -> " +
+                                  $"{targetMapId}, casilla {arrivalCell}.");
+                return false;
+            }
+
+            SessionContext.State.MapId = targetMapId;
+            SessionContext.State.CellId = arrivalCell;
+            if (orientation.HasValue && orientation.Value >= 0 && orientation.Value <= 7)
+                SessionContext.State.Orientation = orientation.Value;
             DatabaseManager.SaveCurrentCharacter();
 
             // Exactly the five the capture sends, in the same order. jsd first: the character is
             // leaving the map it was on, and the client has to be told before it is told to load
             // another one.
-            byte[] actorLeft = ConnectionProtocol.BuildActorLeft(
-                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            byte[] actorLeft = ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId);
             await SessionContext.Current.SendAsync(actorLeft);
             await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId,
-                Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+                orientation);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildLoadMap(target));
+                ConnectionProtocol.BuildLoadMap(targetMapId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(target));
+                ConnectionProtocol.BuildMapDiscovered(targetMapId));
 
-            Console.WriteLine($"[Move] Map change {way}: {target}, arriving on cell {arrival} " +
-                              $"facing {Jondo.Unity.Launcher.Network.SessionContext.State.Orientation}. Waiting for jrh.");
+            Console.WriteLine($"[Move] {reason}: {oldMapId} -> {targetMapId}, llegada " +
+                              $"{arrivalCell}, orientación {SessionContext.State.Orientation}. " +
+                              "Esperando jrh.");
+            return true;
         }
 
         /// <summary>

@@ -100,10 +100,9 @@ namespace Jondo.Unity.Launcher.Network
 
             // Cuántos personajes caben por tipo de servidor. Siete entradas, tipos 0 a 6.
             //
-            // La captura real de la pantalla de creación de personaje trae cinco en los siete, con
-            // una cuenta que tenía cuatro personajes en su servidor y el botón activo. Así que esto
-            // es el tope, no la cuenta, y subirlo es lo correcto; lo que tenía el botón apagado era
-            // otra cosa (la fecha de abono, en GameServerProxy).
+            // The captured creation screen has five in all seven blocks, with an account that
+            // already owns four characters on its server and still has the button enabled. This
+            // is the per-server cap, not the number the account currently owns.
             for (int type = 0; type <= 6; type++)
             {
                 var slots = Pb.New();
@@ -130,11 +129,11 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>
         /// Cuántos personajes caben por servidor.
         ///
-        /// El servidor real anuncia cinco, que es el límite de una cuenta de verdad. Aquí no hay
-        /// nada que limitar: es un emulador de un solo jugador y el tope solo servía para apagar el
-        /// botón de crear personaje en cuanto se llenaba.
+        /// The client accepts the captured vanilla limit of five characters per server. Values
+        /// above that are not a supported extension: they make the selection UI report its
+        /// maximum has been reached even with a single character.
         /// </summary>
-        public const int MaxCharactersPerServer = 100;
+        public const int MaxCharactersPerServer = 5;
 
         /// <summary>
         /// Format of the connection dates in the capture: ISO 8601 with milliseconds and the
@@ -415,9 +414,10 @@ namespace Jondo.Unity.Launcher.Network
             { Stat.Lock,                 () => Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility / 10 },
         };
 
-        /// <summary>Points a character starts with, before anything is spent or equipped.</summary>
-        private const int BaseActionPoints = 6;
-        private const int BaseMovementPoints = 3;
+        /// <summary>
+        /// AP and MP are read from the session's persisted character bases by <see cref="ValueOf"/>
+        /// below.  Only equipment travels separately in the characteristics packet.
+        /// </summary>
         private const int BasePods = 1000;
         private const int BaseEnergy = 10000;
 
@@ -572,8 +572,8 @@ namespace Jondo.Unity.Launcher.Network
         private static long ValueOf(int id, int level)
         {
             if (id == Stat.LifePoints) return BaseLife(level);
-            if (id == Stat.ActionPoints) return BaseActionPoints;
-            if (id == Stat.MovementPoints) return BaseMovementPoints;
+            if (id == Stat.ActionPoints) return Handlers.StatsHandler.PlayerInnateAp();
+            if (id == Stat.MovementPoints) return Handlers.StatsHandler.PlayerBaseMp;
             if (id == Stat.Energy) return BaseEnergy;
             // Five pods a point of strength on top of the base, which is what the capture shows:
             // five points of strength moved this characteristic by twenty-five.
@@ -758,6 +758,7 @@ namespace Jondo.Unity.Launcher.Network
             var where = MapManager.GetMapInfo(mapId);
             if (where != null) jss.VarIfNotZero(6, where.SubAreaId);
 
+            AddHouseMetadata(jss, mapId);
             AddInteractiveElements(jss, mapId);
 
             return jss.Build();
@@ -835,16 +836,111 @@ namespace Jondo.Unity.Launcher.Network
                 Declare(jss, interactive);
         }
 
+        /// <summary>
+        /// Persistent house state carried by <c>jss.f9</c>.  The outer <c>lpx</c> identifies the
+        /// house and client model; its on-map branch (<c>lpt</c>) pairs each exterior element with
+        /// one <c>lnx</c> instance.  A price is optional-by-presence: omitting f7 means not listed.
+        /// </summary>
+        private static void AddHouseMetadata(Pb jss, long mapId)
+        {
+            // The client does not tolerate a partially-known lpx/lnx shape.  The current world
+            // placement catalogue deliberately assigns an emulator fallback model to every
+            // door because the shipped client has no placement -> house-template join.  On a
+            // real login that synthetic f9 made mz..ctor(faa, eyk, lpx) throw, which causes the
+            // client to discard the entire jss actor list (including the player).  Keep the
+            // durable house catalogue and the explicitly declared door actions, but do not put
+            // an unverified house instance on the map by default.
+            //
+            // This opt-in is for protocol captures only; it must not be enabled for normal
+            // play until the complete lpx/lnx model and placement relation are captured.
+            if (!string.Equals(Environment.GetEnvironmentVariable("JONDO_ENABLE_EXPERIMENTAL_HOUSE_METADATA"),
+                               "1", StringComparison.Ordinal))
+                return;
+
+            foreach (var house in Managers.HouseManager.OnMap(mapId))
+            {
+                if (house.HouseTypeId <= 0 || house.ExteriorElementId <= 0) continue;
+
+                string? ownerNickname = null;
+                string? ownerTag = null;
+                if (house.OwnerAccountId > 0)
+                {
+                    var account = DatabaseManager.GetAccountById(house.OwnerAccountId);
+                    if (account != null)
+                    {
+                        ownerNickname = account.Nickname;
+                        ownerTag = (house.OwnerAccountId % 10000).ToString("D4");
+                    }
+                }
+
+                jss.Bytes(9, BuildHouseMapEntry(house, ownerNickname, ownerTag));
+            }
+        }
+
+        /// <summary>Builds one exact <c>lpx/lpt/lnx</c> on-map house entry.</summary>
+        public static byte[] BuildHouseMapEntry(Managers.HouseDefinition house,
+                                                string? ownerNickname = null,
+                                                string? ownerTag = null)
+        {
+            var instance = Pb.New()
+                .VarIfNotZero(1, house.IsOwned ? 1 : 0)       // second hand
+                .VarIfNotZero(2, house.Locked ? 1 : 0)
+                .VarIfNotZero(4, house.IsOwned ? 1 : 0)       // has owner
+                .VarIfNotZero(10, house.RoomCount)
+                .Var(12, house.Id);                           // stable instance id
+
+            // In lnx the price uses proto optional presence: listed houses carry f7, unlisted
+            // houses omit it.  Var (not VarIfNotZero) preserves that distinction.
+            if (house.IsForSale && house.Price > 0) instance.Var(7, house.Price);
+
+            // The account tag is authoritative only when auth.db still knows the owner.  Do not
+            // fabricate a nickname for an orphaned account id.
+            if (house.IsOwned && !string.IsNullOrWhiteSpace(ownerNickname) &&
+                !string.IsNullOrWhiteSpace(ownerTag))
+                instance.Msg(8, Pb.New().Str(1, ownerNickname).Str(2, ownerTag));
+
+            var onMap = Pb.New()
+                .Packed(1, new long[] { house.ExteriorElementId })
+                .Msg(2, instance);
+
+            return Pb.New()
+                .Var(2, house.Id)
+                .Var(4, house.HouseTypeId)
+                .Msg(7, onMap)
+                .Build();
+        }
+
+        /// <summary>
+        /// Opens the skill-97 confirmation dialog (<c>khr</c>). BUY is enum value zero and is
+        /// therefore represented by proto3 omission of f4, exactly as a generated serializer does.
+        /// </summary>
+        public static byte[] BuildPurchasableDialog(Managers.HouseDefinition house)
+            => Pb.New()
+                .VarIfNotZero(1, house.IsOwned ? 1 : 0)
+                .Var(2, house.Id)
+                .Var(3, house.Id)
+                .Var(5, house.Price)
+                .Build();
+
         /// <summary>Un elemento clicable: qué es, qué se puede hacer con él y dónde está.</summary>
         private static void Declare(Pb jss, Managers.RegisteredInteractive interactive)
         {
             var declaration = Pb.New().Var(1, 1);
+            int actionCount = 0;
             foreach (var action in interactive.Actions)
             {
+                if (action.Kind == Managers.InteractiveActionKind.HouseDoor &&
+                    !Managers.HouseManager.IsDoorActionVisible(
+                        interactive.MapId, interactive.Element.Id, action.SkillId,
+                        SessionContext.Current.AccountId))
+                    continue;
                 declaration.Msg(4, Pb.New()
                     .Var(1, action.SkillInstanceId)
                     .Var(2, action.SkillId));
+                actionCount++;
             }
+
+            if (actionCount == 0) return;
 
             jss.Msg(11, declaration
                 .Var(5, interactive.Element.Id)
@@ -996,19 +1092,21 @@ namespace Jondo.Unity.Launcher.Network
                 taken.Add(pair.Value);
             }
 
-            // Y lo que el jugador todavía no ha colocado se reparte por los huecos libres, que es
-            // lo que hace el juego con un personaje recién hecho.
-            //
-            // Empezando por el UNO: el hueco cero es donde el cliente dibuja el arma, y en 37 de
-            // las 51 barras de las capturas va vacío por eso mismo.
-            int next = 1;
-            foreach (var spell in known)
+            // Only a brand-new bar receives a default layout.  Once the player changes even one
+            // slot, an absent row means "intentionally empty", not "please put this spell back".
+            if (!SessionContext.State.SpellBarInitialized)
             {
-                if (taken.Contains(spell.SpellId)) continue;
-                while (next < SpellBarSlots && placed.Exists(p => p.Slot == next)) next++;
-                if (next >= SpellBarSlots) break;
-                placed.Add((next, spell.SpellId));
-                next++;
+                // Empezando por el UNO: el hueco cero es donde el cliente dibuja el arma, y en 37
+                // de las 51 barras de las capturas va vacío por eso mismo.
+                int next = 1;
+                foreach (var spell in known)
+                {
+                    if (taken.Contains(spell.SpellId)) continue;
+                    while (next < SpellBarSlots && placed.Exists(p => p.Slot == next)) next++;
+                    if (next >= SpellBarSlots) break;
+                    placed.Add((next, spell.SpellId));
+                    next++;
+                }
             }
 
             placed.Sort((a, b) => a.Slot.CompareTo(b.Slot));
@@ -1043,6 +1141,12 @@ namespace Jondo.Unity.Launcher.Network
 
         /// <summary>Qué barra es: 0 la de objetos, 1 la de hechizos.</summary>
         public const int SpellBar = 1;
+
+        /// <summary>
+        /// An authoritative empty spell bar.  Unlike <see cref="BuildSpellBar"/>, it must not
+        /// infer defaults: it is sent after the player asks to clear every slot.
+        /// </summary>
+        public static byte[] BuildEmptySpellBar() => Pb.New().Var(2, SpellBar).Build();
 
         /// <summary>
         /// El hechizo que sustituye a su pareja (hng), y el hueco de la barra donde queda (iuq).
@@ -1290,15 +1394,21 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>Un destino de la lista de zaaps.</summary>
         public readonly struct ZaapDestination
         {
-            public ZaapDestination(long mapId, int subAreaId, int level, long cost)
+            public ZaapDestination(long mapId, int subAreaId, int level, long cost,
+                                   int kind = 0, int minutesLeft = 0, int duration = 0)
             {
                 MapId = mapId; SubAreaId = subAreaId; Level = level; Cost = cost;
+                Kind = kind; MinutesLeft = minutesLeft; Duration = duration;
             }
 
             public long MapId { get; }
             public int SubAreaId { get; }
             public int Level { get; }
             public long Cost { get; }
+            /// <summary>Destination tab: 0 zaap, 1 zaapi, 4 temporal anomaly.</summary>
+            public int Kind { get; }
+            public int MinutesLeft { get; }
+            public int Duration { get; }
         }
 
         /// <summary>
@@ -1311,18 +1421,27 @@ namespace Jondo.Unity.Launcher.Network
         /// estás no cuesta nada. Comprobado contra las veinticinco entradas de la captura, donde
         /// el f6 cuadra con la subzona de MapPositions en todas.
         /// </summary>
-        public static byte[] BuildZaapList(long here, IEnumerable<ZaapDestination> destinations)
+        public static byte[] BuildZaapList(long here, IEnumerable<ZaapDestination> destinations,
+                                           int teleporter = 0)
         {
             var hjj = Pb.New().VarIfNotZero(2, here);
             foreach (var destination in destinations)
             {
-                hjj.Msg(3, Pb.New()
+                var entry = Pb.New()
                     .VarIfNotZero(1, destination.Level)
                     .VarIfNotZero(2, destination.Cost)
+                    .VarIfNotZero(3, destination.Kind);
+                if (destination.Duration > 0)
+                {
+                    entry.Msg(4, Pb.New()
+                        .VarIfNotZero(2, destination.MinutesLeft)
+                        .Var(3, destination.Duration));
+                }
+                hjj.Msg(3, entry
                     .Var(5, destination.MapId)
                     .VarIfNotZero(6, destination.SubAreaId));
             }
-            return hjj.Build();
+            return hjj.VarIfNotZero(4, teleporter).Build();
         }
 
         /// <summary>Los kamas que le quedan al personaje (ivf).</summary>
@@ -1502,8 +1621,11 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(2, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                 .Build());
 
+        public static byte[] BuildDiscoveredZaaps(IEnumerable<long> mapIds)
+            => Pb.New().Packed(1, mapIds).Build();
+
         public static byte[] BuildMapDiscovered(long mapId)
-            => Push(Op.Hjk, Pb.New().Packed(1, new long[] { mapId }).Build());
+            => Push(Op.Hjk, BuildDiscoveredZaaps(new long[] { mapId }));
 
         /// <summary>
         /// Movement along a map (jsj), which is what the server sends back to a jrw.

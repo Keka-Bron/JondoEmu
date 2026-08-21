@@ -77,6 +77,27 @@ public static class Op
     /// <summary>El mapa al que quiere ir; la casilla y la orientacion de llegada se calculan del lado de salida (13 de casilla lateral, 532 en vertical), medido en las capturas.</summary>
     public const string ChangeMapMessage = "jqk";
 
+    /// <summary>
+    /// Entrada en una vivienda. A diferencia de <see cref="CurrentMapMessage"/>, el mapa interior
+    /// viaja en el campo 1; el cliente no interpreta un <c>jru</c> como entrada de casa.
+    /// </summary>
+    public const string HouseEnterMapMessage = "jqw";
+
+    /// <summary>Confirms purchase of the house whose skill-97 dialog is open; f1 is the displayed price.</summary>
+    public const string HouseBuyRequestMessage = "jal";
+
+    /// <summary>Opens the exact client purchase confirmation: second-hand, house, instance, BUY and price.</summary>
+    public const string PurchasableDialogEvent = "khr";
+
+    /// <summary>Unidentified; client ownership evidence places it outside the house purchase flow.</summary>
+    public const string Jam = "jam";
+
+    /// <summary>Changes a house sale listing; f1 price, f2 instance, f3 for-sale, f4 from-inside.</summary>
+    public const string HouseSaleRequestMessage = "jan";
+
+    /// <summary>El cliente pide abrir otro hueco de personaje; va vacio despues de recibir la lista.</summary>
+    public const string CharacterCanBeCreatedRequestMessage = "kwb";
+
     /// <summary>Crear un personaje.</summary>
     public const string CharacterCreationRequestMessage = "kvz";
 
@@ -88,6 +109,9 @@ public static class Op
 
     /// <summary>Un nombre de personaje sugerido (el boton del dado).</summary>
     public const string CharacterNameSuggestionSuccessMessage = "kvk";
+
+    /// <summary>El boton del dado pide un nombre sugerido; va vacio y se responde con kvk.</summary>
+    public const string CharacterNameSuggestionRequestMessage = "kwd";
 
     /// <summary>Ya estas jugando con este personaje; sin el, el cliente se queda en la pantalla de personaje con el reloj de arena.</summary>
     public const string CharacterSelectedSuccessMessage = "kva";
@@ -819,6 +843,9 @@ public static class Op
             ["iwb"] = "StorageInventoryContentMessage",
             ["iwn"] = "InteractiveUsedMessage",
             ["iwo"] = "InteractiveUseRequestMessage",
+            ["jal"] = "HouseBuyRequestMessage",
+            ["jam"] = "Jam",
+            ["jan"] = "HouseSaleRequestMessage",
             ["jba"] = "HavenBagEditionStoppedMessage",
             ["jbg"] = "HavenBagFurnituresUpdateRequestMessage",
             ["jbl"] = "HavenBagThemeChangeRequestMessage",
@@ -829,6 +856,7 @@ public static class Op
             ["jgu"] = "SpouseInformationsMessage",
             ["jhh"] = "GuildInformationsGeneralMessage",
             ["jqk"] = "ChangeMapMessage",
+            ["jqw"] = "HouseEnterMapMessage",
             ["jru"] = "CurrentMapMessage",
             ["jrw"] = "GameMapMovementRequestMessage",
             ["jsd"] = "GameContextRemoveElementMessage",
@@ -837,6 +865,7 @@ public static class Op
             ["jsq"] = "MapExitAllowedMessage",
             ["jss"] = "MapComplementaryInformationsDataMessage",
             ["jtg"] = "GiftsListMessage",
+            ["khr"] = "PurchasableDialogEvent",
             ["kci"] = "ExchangeStartedStorageMessage",
             ["kcr"] = "ExchangeObjectMoveMessage",
             ["khd"] = "ExchangeLeaveMessage",
@@ -861,6 +890,8 @@ public static class Op
             ["kvl"] = "CharacterFirstSelectionMessage",
             ["kvw"] = "CharacterSelectionMessage",
             ["kvz"] = "CharacterCreationRequestMessage",
+            ["kwb"] = "CharacterCanBeCreatedRequestMessage",
+            ["kwd"] = "CharacterNameSuggestionRequestMessage",
             ["lqc"] = "GameContextCreateRequestMessage",
             ["lqu"] = "BasicTimeMessage",
             ["lva"] = "MapLoadedMessage",

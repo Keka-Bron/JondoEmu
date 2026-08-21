@@ -479,22 +479,19 @@ A new character gets:
 
 | | Value | Why |
 |---|---|---|
-| Map | 191105026, the Astrub city zaap | somewhere with a zaap, so you are never stuck |
-| Cell | nearest walkable to the zaap's cell | |
+| Map | 154010884, Incarnam | the pre-tutorial starting point |
+| Cell | 315, adjusted only if the map data marks it unwalkable | |
 | Level | 1 | |
-| Kamas | 1,000,000 | so a new character can actually use the zaaps |
-| Each of the six characteristics | 101 | as if every parchment had been drunk |
-| Equipment | the Adventurer set, worn | |
+| Kamas | 0 | tutorial rewards must be earned |
+| Each of the six characteristics | 0 | no scrolls or prior progression |
+| Equipment | none | tutorial rewards must be earned |
+| Quests / achievements | none | captured-account progress is not replayed |
 
-The Adventurer set is set 5 of the game: amulet 2478 (slot 0), ring 2475 (2), belt 2477 (3), boots
-2476 (4), hat 2474 (6), cloak 2473 (7). All six exist in `ItemTemplates`.
-
-Their effects are not blank. Each template's `possibleEffects` lists `rid` references into
-`ItemEffects`, and each one is resolved to `[effect, value, 0, 0]` taking the top of the dice range
-— a brand-new item should carry the best roll. Without this the whole set arrived with no
-characteristics at all.
-
-Item uids come from a per-character block (`characterId * 1000`) so they cannot collide.
+The server used to create a boosted Astrub test character (one million kamas, 101 in every primary
+statistic and a worn Adventurer set).  That seed is intentionally gone.  Existing characters are
+not changed; this policy applies only to characters created after this version.  The Incarnam
+tutorial itself still needs its own measured NPC/quest implementation before it can grant its
+official items and rewards.
 
 `kvk` is the random-name button: the client asks and expects the same message back with a name
 inside. The generator follows the client's own naming rule 1,

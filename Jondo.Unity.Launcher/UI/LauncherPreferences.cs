@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 namespace Jondo.Unity.Launcher.UI
 {
@@ -132,6 +133,7 @@ namespace Jondo.Unity.Launcher.UI
         // VPS— y entonces el lanzador no arranca ningún servidor: se conecta al que haya allí.
 
         private const string ClaveServidor = "servidor";
+        private const string ClaveControl = "control";
 
         /// <summary>La dirección del servidor. Vacío o "127.0.0.1" significa aquí mismo.</summary>
         public static string ServerHost
@@ -139,9 +141,140 @@ namespace Jondo.Unity.Launcher.UI
             get
             {
                 string donde = Leer().TryGetValue(ClaveServidor, out string? v) ? v.Trim() : "";
-                return donde.Length == 0 ? Contract.LocalIp : donde;
+                return TryNormalizeServerHost(donde, out string normalizado)
+                    ? normalizado
+                    : Contract.LocalIp;
             }
-            set => Escribir(ClaveServidor, (value ?? "").Trim());
+            set
+            {
+                if (!TryNormalizeServerEndpoint(value, out string normalizado, out string control))
+                    throw new ArgumentException("The server address must be a host name or IP address.", nameof(value));
+                Escribir(ClaveServidor, normalizado);
+                Escribir(ClaveControl, control);
+            }
+        }
+
+        /// <summary>
+        /// HTTPS (or local HTTP) endpoint used only by the launcher's account/control API. Game,
+        /// chat and Zaap still use <see cref="ServerHost"/> on their native fixed ports.
+        /// </summary>
+        public static string ControlBaseUrl
+        {
+            get
+            {
+                var values = Leer();
+                if (values.TryGetValue(ClaveControl, out string? saved) &&
+                    TryNormalizeServerEndpoint(saved, out string savedHost, out string endpoint) &&
+                    savedHost.Equals(ServerHost, StringComparison.OrdinalIgnoreCase))
+                {
+                    return endpoint;
+                }
+
+                return DefaultControlEndpoint(ServerHost);
+            }
+        }
+
+        /// <summary>The value shown in the editor: concise locally, explicit for TLS/proxy URLs.</summary>
+        public static string ServerEndpointDisplay
+        {
+            get
+            {
+                string endpoint = ControlBaseUrl;
+                return endpoint.Equals(DefaultControlEndpoint(ServerHost), StringComparison.OrdinalIgnoreCase)
+                    ? ServerHost
+                    : endpoint;
+            }
+        }
+
+        /// <summary>Saves the native-service host and launcher-control URL as one atomic choice.</summary>
+        public static void SetServerEndpoint(string value)
+        {
+            if (!TryNormalizeServerEndpoint(value, out string host, out string control))
+                throw new ArgumentException("The server endpoint is invalid.", nameof(value));
+
+            Escribir(ClaveServidor, host);
+            Escribir(ClaveControl, control);
+        }
+
+        /// <summary>
+        /// Normalises the address shared by the launcher's control client and JondoFix. Ports are
+        /// deliberately not accepted here: the Dofus services use several fixed ports, so a
+        /// single host name is the only value that can consistently describe all of them.
+        /// </summary>
+        public static bool TryNormalizeServerHost(string? value, out string host)
+            => TryNormalizeServerEndpoint(value, out host, out _);
+
+        /// <summary>
+        /// Accepts either a native-service host or a complete HTTP(S) control URL. A complete URL
+        /// may carry a reverse-proxy port, but must not contain credentials, a path, query or
+        /// fragment. Its host remains the destination for Dofus' fixed protocol ports.
+        /// </summary>
+        public static bool TryNormalizeServerEndpoint(string? value, out string host,
+                                                       out string controlBaseUrl)
+        {
+            host = (value ?? "").Trim();
+            controlBaseUrl = "";
+            if (host.Length == 0)
+            {
+                host = Contract.LocalIp;
+                controlBaseUrl = DefaultControlEndpoint(host);
+                return true;
+            }
+
+            // A URL describes the TLS-facing control endpoint. Its host is also used for the
+            // native game protocols, whose ports are fixed and therefore deliberately omitted.
+            if (host.Contains("://", StringComparison.Ordinal))
+            {
+                if (!Uri.TryCreate(host, UriKind.Absolute, out Uri? uri) ||
+                    (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps) ||
+                    !string.IsNullOrEmpty(uri.UserInfo) || uri.AbsolutePath != "/" ||
+                    !string.IsNullOrEmpty(uri.Query) || !string.IsNullOrEmpty(uri.Fragment) ||
+                    !TryNormalizeHostOnly(uri.Host, out string urlHost))
+                {
+                    host = "";
+                    return false;
+                }
+
+                host = urlHost;
+                var endpoint = new UriBuilder(uri.Scheme, host, uri.IsDefaultPort ? -1 : uri.Port);
+                controlBaseUrl = endpoint.Uri.GetLeftPart(UriPartial.Authority);
+                return true;
+            }
+
+            if (!TryNormalizeHostOnly(host, out host)) return false;
+            controlBaseUrl = DefaultControlEndpoint(host);
+            return true;
+        }
+
+        private static bool TryNormalizeHostOnly(string value, out string host)
+        {
+            host = value.Trim();
+            if (host.Length >= 2 && host[0] == '[' && host[^1] == ']')
+            {
+                host = host[1..^1];
+            }
+
+            if (IPAddress.TryParse(host, out IPAddress? address))
+            {
+                host = address.ToString();
+                return true;
+            }
+
+            if (host.Contains('/') || host.Contains('\\') || host.Any(char.IsWhiteSpace) ||
+                Uri.CheckHostName(host) != UriHostNameType.Dns)
+            {
+                host = "";
+                return false;
+            }
+
+            host = host.TrimEnd('.').ToLowerInvariant();
+            return host.Length > 0;
+        }
+
+        private static string DefaultControlEndpoint(string host)
+        {
+            var endpoint = new UriBuilder(Uri.UriSchemeHttp, host, Contract.Puerto);
+            return endpoint.Uri.GetLeftPart(UriPartial.Authority);
         }
 
         /// <summary>
@@ -169,8 +302,14 @@ namespace Jondo.Unity.Launcher.UI
         {
             try
             {
-                if (!Leer().TryGetValue(ClaveCuentas, out string? encoded) ||
-                    string.IsNullOrWhiteSpace(encoded)) return new List<SavedAccount>();
+                var values = Leer();
+                if (!values.TryGetValue(ScopedAccountsKey, out string? encoded) && ServerIsLocal)
+                {
+                    // One-time compatibility with profiles saved before teams became scoped to
+                    // a server. The next save writes them under the local endpoint key.
+                    values.TryGetValue(ClaveCuentas, out encoded);
+                }
+                if (string.IsNullOrWhiteSpace(encoded)) return new List<SavedAccount>();
                 string json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
                 var valid = (System.Text.Json.JsonSerializer.Deserialize<List<SavedAccount>>(json)
                              ?? new List<SavedAccount>())
@@ -191,7 +330,17 @@ namespace Jondo.Unity.Launcher.UI
                 safe.Add(account);
             }
             string json = System.Text.Json.JsonSerializer.Serialize(safe);
-            Escribir(ClaveCuentas, Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json)));
+            Escribir(ScopedAccountsKey, Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json)));
+        }
+
+        private static string ScopedAccountsKey
+        {
+            get
+            {
+                byte[] host = System.Text.Encoding.UTF8.GetBytes(ServerHost.ToLowerInvariant());
+                string suffix = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(host))[..16];
+                return ClaveCuentas + "." + suffix;
+            }
         }
     }
 }

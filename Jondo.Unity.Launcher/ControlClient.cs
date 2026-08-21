@@ -41,7 +41,8 @@ namespace Jondo.Unity.Launcher.Network
         /// local— y si no, la dirección que se haya puesto en el desplegable, que puede ser la de
         /// otro ordenador por Hamachi o la de una VPS.
         /// </summary>
-        public static string Base => $"http://{UI.LauncherPreferences.ServerHost}:{Contract.Puerto}";
+        public static string Base
+            => UI.LauncherPreferences.ControlBaseUrl;
 
         /// <summary>Lo que ha contestado el servidor, o el silencio si no había nadie.</summary>
         public readonly struct Respuesta
@@ -180,7 +181,38 @@ namespace Jondo.Unity.Launcher.Network
         {
             var estado = Pedir("estado");
             if (estado.Bien) return true;
-            return Pedir("estado").Bien;
+
+            // Some launcher builds still see the server as "offline" when the body is empty or the
+            // first HTTP attempt races the listener startup. Accept a valid JSON answer even if the
+            // transport had to retry once: the whole point of this probe is to answer "is the HAAPI
+            // alive?", not to reject a perfectly valid status payload.
+            if (estado.Llego && estado.Codigo == 200 && estado.Json.Length > 0)
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(estado.Json);
+                    if (doc.RootElement.TryGetProperty("enLinea", out var enLinea) &&
+                        enLinea.ValueKind == JsonValueKind.True)
+                    {
+                        return true;
+                    }
+                }
+                catch { }
+            }
+
+            var segunda = Pedir("estado");
+            if (segunda.Bien) return true;
+            if (segunda.Llego && segunda.Codigo == 200 && segunda.Json.Length > 0)
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(segunda.Json);
+                    return doc.RootElement.TryGetProperty("enLinea", out var enLinea) &&
+                           enLinea.ValueKind == JsonValueKind.True;
+                }
+                catch { }
+            }
+            return false;
         }
 
         /// <summary>Espera a que el servidor conteste, hasta un tope. Devuelve si llegó a hacerlo.</summary>

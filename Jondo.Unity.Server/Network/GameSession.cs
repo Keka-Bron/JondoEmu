@@ -56,7 +56,11 @@ namespace Jondo.Unity.Launcher.Network
             IsInWorld = true;
         }
 
-        public void LeaveWorld() => IsInWorld = false;
+        public void LeaveWorld()
+        {
+            IsInWorld = false;
+            State.ClearPendingHousePurchase();
+        }
     }
 
     /// <summary>

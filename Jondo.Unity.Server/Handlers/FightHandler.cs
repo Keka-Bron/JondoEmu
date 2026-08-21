@@ -4000,6 +4000,9 @@ namespace Jondo.Unity.Launcher.Handlers
 
             var arenaWalkable = MapManager.GetFightWalkable(fight.ArenaMapId);
             var losBlockers = MapManager.GetLosBlockers(fight.ArenaMapId);
+            MechanicCatalog.MonsterAiPolicy? mechanicAi = null;
+            if (MechanicCatalog.TryGetMonsterAiPolicy(monster.MonsterId, out var configuredAi))
+                mechanicAi = configuredAi;
 
             var turnResult = MonsterAI.ExecuteTurn(
                 monster,
@@ -4024,7 +4027,9 @@ namespace Jondo.Unity.Launcher.Handlers
                         MaxCastPerTurn = sData.MaxCastPerTurn
                     };
                 },
-                losBlockers
+                losBlockers,
+                mechanicAi?.SpellPriorities,
+                mechanicAi?.FleeBelowHpPercent
             );
 
             // Order matters: if the monster attacked and THEN fled, that is the order it has to be

@@ -3,6 +3,37 @@ using System.Collections.Generic;
 
 namespace Jondo.Unity.Launcher
 {
+    /// <summary>
+    /// Server-authoritative context for one house purchase confirmation.  The client only sends
+    /// the displayed price in <c>jal</c>, so the identity of the house must come from the door
+    /// that opened the dialog, never from a client-supplied dwelling id.
+    /// </summary>
+    public sealed class PendingHousePurchaseContext
+    {
+        public int HouseId { get; init; }
+        public long MapId { get; init; }
+        public int ElementId { get; init; }
+        public long ExpectedPrice { get; init; }
+        public long ExpectedOwnerAccountId { get; init; }
+        public bool ExpectedListed { get; init; }
+        public long AccountId { get; init; }
+        public long CharacterId { get; init; }
+    }
+
+    /// <summary>
+    /// Session-scoped return created by a declared one-way world-graph transition.  The static
+    /// return cell itself comes from version-pinned client data; the originating map belongs to
+    /// this session so a player cannot use an interior exit as a free teleport.
+    /// </summary>
+    public sealed class PendingWorldInteractiveReturn
+    {
+        public long InteriorMapId { get; init; }
+        public int ExitCellId { get; init; }
+        public long ReturnMapId { get; init; }
+        public int ReturnCellId { get; init; }
+        public int EntryElementId { get; init; }
+    }
+
     /// <summary>Mutable game data owned by exactly one network session.</summary>
     public sealed class SessionState
     {
@@ -16,7 +47,19 @@ namespace Jondo.Unity.Launcher
         public byte[]? LookBytes { get; set; }
 
         // Positioning
-        public long MapId { get; set; }
+        private long _mapId;
+        public long MapId
+        {
+            get => _mapId;
+            set
+            {
+                if (_mapId != value) PendingHousePurchase = null;
+                if (_mapId != value && PendingWorldInteractiveReturn != null &&
+                    value != PendingWorldInteractiveReturn.InteriorMapId)
+                    PendingWorldInteractiveReturn = null;
+                _mapId = value;
+            }
+        }
         public int CellId { get; set; }
         public int Orientation { get; set; } = 1;
         public long Kamas { get; set; }
@@ -47,8 +90,29 @@ namespace Jondo.Unity.Launcher
         public int StatChance { get; set; }
         public int StatAgility { get; set; }
 
+        // Permanent combat resources.  The AP/MP spent while a fight turn is in progress belong
+        // to Fighter and intentionally reset at the next turn; these are the character's saved
+        // bases, to which level and equipment bonuses are applied.
+        public int BaseActionPoints { get; set; } = 6;
+        public int BaseMovementPoints { get; set; } = 3;
+
         // Session-local UI/dialog state. These used to be static fields in handlers.
         public long OpenZaapMapId { get; set; }
+
+        /// <summary>
+        /// Street position used to enter the current house. Multiple doors can lead to one
+        /// interior, so this remains session-scoped and lets the character leave by the same door.
+        /// </summary>
+        public long HouseEntryMapId { get; set; }
+
+        /// <summary>Street cell used to enter the current house.</summary>
+        public int HouseEntryCell { get; set; }
+        /// <summary>Persistent house instance selected by the most recent door action.</summary>
+        public int OpenHouseId { get; set; }
+        /// <summary>The exact door and price awaiting a <c>jal</c> confirmation.</summary>
+        public PendingHousePurchaseContext? PendingHousePurchase { get; set; }
+        public void ClearPendingHousePurchase() => PendingHousePurchase = null;
+        public PendingWorldInteractiveReturn? PendingWorldInteractiveReturn { get; set; }
         public bool IsChestOpen { get; set; }
         public bool IsHavenBagEditing { get; set; }
         public List<Managers.HavenBagStore.Furniture> PendingHavenBagFurniture { get; }
@@ -66,6 +130,12 @@ namespace Jondo.Unity.Launcher
         internal Dictionary<int, int> ChosenSpells { get; } = new Dictionary<int, int>();
         internal Dictionary<int, int> SpellBar { get; } = new Dictionary<int, int>();
         internal long SpellChoicesCharacterId { get; set; }
+        /// <summary>
+        /// True once the player has accepted, edited, or cleared the default spell bar.  An empty
+        /// dictionary without this bit means a new character and is eligible for default slots;
+        /// an empty dictionary with it means the player deliberately cleared the bar.
+        /// </summary>
+        internal bool SpellBarInitialized { get; set; }
 
         // Thread-Safety Synchronization Lock
         private readonly object _lock = new object();

@@ -30,6 +30,8 @@ if (args.Length == 0)
         Leer el código y bautizar
           indexar <carpeta del cliente> [salida.json] [saltos]
                                                         qué clase del cliente toca cada mensaje
+          trazar <carpeta del cliente> <Tipo::metodo> [limite]
+                                                        instrucciones Cpp2IL de una pista concreta
           expediente <dll> <indice> <anclas> <mensaje|--todos|--medidos> [carpeta] [--ciego]
                                                         todo lo que se sabe de un mensaje, junto
           preguntar <dll> <indice> <anclas> [salida.tsv] [--evaluar] [--limite N]
@@ -58,6 +60,7 @@ switch (args[0])
     case "probar": return Probar(args);
     case "emparejar": return Emparejar(args);
     case "indexar": return Indexar(args);
+    case "trazar": return Trazar(args);
     case "expediente": return Expediente(args);
     case "preguntar": return Preguntar(args).GetAwaiter().GetResult();
     case "evaluar": return Evaluar(args);
@@ -623,6 +626,65 @@ static int Indexar(string[] args)
     CodeIndex.Save(evidencia, salida);
 
     Console.WriteLine($"  {reloj.Elapsed.TotalSeconds:0.0} s en total, escrito en {salida}");
+    return 0;
+}
+
+/// <summary>
+/// Dumps reconstructed Cpp2IL instructions for one narrowly selected client method.  The normal
+/// index keeps only call-site summaries; a packet investigation sometimes needs the nearby
+/// send/receive call and constants before it can establish a message direction.
+/// </summary>
+static int Trazar(string[] args)
+{
+    if (args.Length < 3)
+    {
+        Console.WriteLine("Uso: trazar <carpeta del cliente> <Tipo::metodo> [limite]");
+        return 1;
+    }
+
+    string needle = args[2];
+    int limit = args.Length > 3 && int.TryParse(args[3], out int parsed)
+        ? Math.Clamp(parsed, 1, 32)
+        : 8;
+
+    using var client = new ClientReader(args[1]);
+    var matches = client.AllMethods()
+        .Where(method => $"{method.DeclaringType?.FullName}::{method.DefaultName}"
+            .Contains(needle, StringComparison.OrdinalIgnoreCase))
+        .Take(limit)
+        .ToList();
+    if (matches.Count == 0)
+    {
+        Console.WriteLine($"No hay métodos que coincidan con «{needle}».");
+        return 1;
+    }
+
+    foreach (var method in matches)
+    {
+        string name = $"{method.DeclaringType?.FullName}::{method.DefaultName}";
+        string parameters = string.Join(", ", method.Parameters.Select(parameter =>
+            $"{parameter.ParameterType?.Name} {parameter.Name}"));
+        Console.WriteLine($"\n{name}({parameters}) -> {method.ReturnType?.Name}");
+        try
+        {
+            method.Analyze();
+            foreach (var instruction in method.ConvertedIsil ?? [])
+            {
+                Console.WriteLine("  " + instruction);
+                foreach (var operand in instruction.Operands)
+                    Console.WriteLine("    " + operand.Data);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"  [Cpp2IL no pudo analizar este método: {ex.Message}]");
+        }
+        finally
+        {
+            try { method.ReleaseAnalysisData(); } catch { }
+        }
+    }
+
     return 0;
 }
 

@@ -185,7 +185,7 @@ Las dos vueltas atrás son el mismo trabajo para el servidor:
 
 ```
 C->S  kqq   vacío
-S->C  kqr   f1: identificador de sesión, f4: 1
+S->C  kqr   f1: token de juego renovado, f4: 1
    ── el cliente cierra la conexión y rehace el saludo desde el principio ──
 ```
 

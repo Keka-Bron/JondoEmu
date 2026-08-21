@@ -63,11 +63,15 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Push(Op.InteractiveUsedMessage, ConnectionProtocol.BuildElementInUse(
                     zaap.Id, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
 
-            var destinations = Destinations(here);
+            // A vestige is an anomaly gateway, not an ordinary zaap. Its list contains only the
+            // anomaly tab; a normal zaap additionally exposes that tab after ordinary waypoints.
+            bool vestige = Interactives.IsVestige(here, zaap);
+            var destinations = vestige ? AnomalyDestinations(here) : Destinations(here);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.TeleportDestinationsMessage, ConnectionProtocol.BuildZaapList(here, destinations)));
 
-            Console.WriteLine($"[Zaap] Abierto en el mapa {here}: {destinations.Count} destinos.");
+            Console.WriteLine($"[{(vestige ? "Vestige" : "Zaap")}] Opened on map {here}: " +
+                              $"{destinations.Count} destinations.");
         }
 
         /// <summary>
@@ -87,18 +91,52 @@ namespace Jondo.Unity.Launcher.Handlers
             byte[]? hjc = ConnectionProtocol.ReadPayload(payload, Op.TeleportRequestMessage);
             if (hjc == null) return;
 
-            long target = 0;
+            long chosen = 0;
+            int kind = 0;
             foreach (var field in ProtoMessage.Parse(hjc).Fields)
             {
-                if (field.FieldNumber == 3 && field.WireType == 0) target = field.VarIntValue;
+                if (field.WireType != 0) continue;
+                if (field.FieldNumber == 2) kind = (int)field.VarIntValue;
+                else if (field.FieldNumber == 3) chosen = field.VarIntValue;
             }
-            if (target <= 0) return;
+            if (chosen <= 0) return;
 
-            var waypoint = Interactives.WaypointOf(target);
-            if (waypoint == null)
+            long from = SessionContext.State.OpenZaapMapId != 0
+                ? SessionContext.State.OpenZaapMapId
+                : SessionContext.State.MapId;
+
+            long target;
+            long cost;
+            string destinationLabel;
+            if (kind == Anomalies.Kind)
             {
-                Console.WriteLine($"[Zaap] El cliente pide viajar a {target}, que no tiene zaap.");
-                return;
+                if (!Anomalies.TryGet((int)chosen, out var anomaly))
+                {
+                    Console.WriteLine($"[Anomalies] Unknown subarea {chosen}; travel rejected.");
+                    return;
+                }
+                target = Anomalies.ArrivalMap;
+                cost = anomaly.MapId == from ? 0 : CostBetween(from, anomaly.MapId);
+                destinationLabel = $"anomaly {anomaly.Name} (subarea {anomaly.SubAreaId})";
+            }
+            else if (kind == Zaapis.Kind)
+            {
+                // Zaapi destinations include workshops and markets which are not waypoints.
+                target = chosen;
+                cost = Zaapis.Cost;
+                destinationLabel = $"zaapi map {target}";
+            }
+            else
+            {
+                target = chosen;
+                var waypoint = Interactives.WaypointOf(target);
+                if (waypoint == null)
+                {
+                    Console.WriteLine($"[Zaap] El cliente pide viajar a {target}, que no tiene zaap.");
+                    return;
+                }
+                cost = CostBetween(from, target);
+                destinationLabel = $"zaap {waypoint.Id}";
             }
 
             if (MapManager.GetMapInfo(target) == null)
@@ -107,9 +145,6 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            long cost = CostBetween(SessionContext.State.OpenZaapMapId != 0
-                ? SessionContext.State.OpenZaapMapId
-                : Jondo.Unity.Launcher.Network.SessionContext.State.MapId, target);
             if (Jondo.Unity.Launcher.Network.SessionContext.State.Kamas < cost)
             {
                 Console.WriteLine($"[Zaap] Faltan kamas para ir a {target}: cuesta {cost} y hay " +
@@ -149,7 +184,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed()));
 
             SessionContext.State.OpenZaapMapId = 0;
-            Console.WriteLine($"[Zaap] Viaje a {target} (zaap {waypoint.Id}), casilla " +
+            Console.WriteLine($"[Zaap] Viaje a {target} ({destinationLabel}), casilla " +
                               $"{Jondo.Unity.Launcher.Network.SessionContext.State.CellId}, {cost} kamas. Esperando el jrh.");
         }
 
@@ -177,7 +212,29 @@ namespace Jondo.Unity.Launcher.Handlers
                     Interactives.LevelOfSubArea(waypoint.SubAreaId),
                     waypoint.MapId == from ? 0 : CostBetween(from, waypoint.MapId)));
             }
+            salida.AddRange(AnomalyDestinations(from));
             return salida;
+        }
+
+        /// <summary>Builds the anomaly-only destinations, identified by subarea in the client reply.</summary>
+        private static List<ConnectionProtocol.ZaapDestination> AnomalyDestinations(long from)
+        {
+            var result = new List<ConnectionProtocol.ZaapDestination>();
+            if (MapManager.GetMapInfo(Anomalies.ArrivalMap) == null) return result;
+
+            foreach (var anomaly in Anomalies.All)
+            {
+                if (MapManager.GetMapInfo(anomaly.MapId) == null) continue;
+                result.Add(new ConnectionProtocol.ZaapDestination(
+                    anomaly.MapId,
+                    anomaly.SubAreaId,
+                    anomaly.Level,
+                    anomaly.MapId == from ? 0 : CostBetween(from, anomaly.MapId),
+                    Anomalies.Kind,
+                    Anomalies.MinutesLeft(anomaly.SubAreaId),
+                    Anomalies.Duration));
+            }
+            return result;
         }
 
         private static long CostBetween(long from, long to)

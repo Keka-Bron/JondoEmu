@@ -42,11 +42,14 @@ Preferences live outside the emulator installation at:
 The file remembers:
 
 - launcher/game language (`es`, `en` or `fr`);
+- the selected server domain or IP address;
 - an explicitly selected `Dofus.exe` path;
 - at most eight account profiles;
-- each profile's account id, login, nickname, token and selection state.
+- each profile's account id, login, nickname, persistent launcher token and selection state.
 
-The account list is serialized as JSON and Base64-encoded into the `cuentas` setting. Base64 is a
+Account lists are scoped to the server host that issued their tokens, so changing from a local
+server to a VPS cannot accidentally send one server's persistent tokens to another. Each list is
+serialized as JSON and Base64-encoded into its server-specific `cuentas.*` setting. Base64 is a
 storage encoding, not encryption. Passwords are not stored, but saved tokens must still be treated
 as private user data.
 
@@ -80,7 +83,8 @@ File: `Jondo.Unity.Launcher/LauncherService.cs`
 `SignIn` validates credentials against `auth.db`. On success it:
 
 1. generates a random launcher token;
-2. persists the game token for that account;
+2. persists a launcher-control token for that account (separate from the game token that Zaap
+   refreshes when Dofus starts);
 3. registers `token -> accountId` in `ClientLaunchRegistry`;
 4. returns the account id, nickname and token to the native UI.
 
@@ -115,11 +119,41 @@ Important arguments include:
 ```
 
 Equivalent `ZAAP_PORT`, `ZAAP_HASH`, `ZAAP_GAME`, `ZAAP_RELEASE`, `ZAAP_INSTANCE_ID` and
-`ZAAP_CAN_AUTH` environment variables are set for the child. Every client receives its own hash
-and instance id even though all clients use the same local listeners.
+`ZAAP_CAN_AUTH` environment variables are set for the child. `JONDO_SERVER_HOST` carries the
+launcher's selected domain/IP to JondoFix, which redirects HAAPI, game, game-node, chat and Zaap
+TCP connections to that machine. Every client receives its own hash and instance id.
 
 The process starts with the primary screen's working dimensions. Once Unity creates its window,
 the launcher waits briefly and maximizes it. Launching a game client also stops launcher music.
+
+Before the first launch, the launcher checks MelonLoader and JondoFix. Missing or mismatched files
+are repaired from the pinned official MelonLoader 0.7.3 x64 archive and the JondoFix payload bundled
+inside the single-file launcher. The archive and key installed files are hash-checked, extraction
+rejects paths outside its staging directory, Dofus must be closed, and replacement is transactional.
+The same operation is available explicitly through **Install client support**.
+
+### Cloud deployment boundary
+
+The launcher never starts `Jondo Server.exe`; its window opens immediately and status polling
+reports the selected remote endpoint as online or offline. The server remains loopback-only unless
+the operator starts it with `JONDO_PUBLIC_BIND=1`. In public mode the TCP listeners bind all
+interfaces and HAAPI uses an HTTP wildcard prefix (which may require a Windows URL ACL). Raw port
+8888 remains available to Dofus, but non-loopback launcher `/api/*` calls are rejected by default.
+
+Reserve that wildcard once from an elevated Windows terminal for the service account:
+
+```powershell
+netsh http add urlacl url=http://+:8888/ user=DOMAIN\JondoService
+```
+
+Do not publish launcher login directly as plaintext HTTP. Terminate TLS at a reverse proxy and
+enter its complete `https://...` URL in the launcher's server editor. The launcher uses that URL
+for account/control requests while JondoFix uses its host on the native emulator ports. Restrict
+the server firewall to those intended service ports. Windows named pipes remain local by
+definition; the cloud path uses Zaap TCP.
+
+For a trusted LAN without a TLS proxy, `JONDO_ALLOW_INSECURE_CONTROL=1` restores remote plaintext
+control explicitly. Do not use that override for an Internet-facing deployment.
 
 ---
 

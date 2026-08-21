@@ -1,0 +1,19 @@
+{
+  "_comentario": [
+    "Mapas que la tabla de zaaps del cliente cuenta como zaap pero cuyo elemento no se reconoce",
+    "por el dibujo. Uno por linea: mapa -> elemento.",
+    "",
+    "115083777 es el Templo de las alianzas (13,35). Su mapa tiene cuatro elementos y ninguno",
+    "lleva dibujo de zaap:",
+    "",
+    "  481519  gfx 41723  casilla 186   la puerta de la alianzagema: en la captura real se usa y",
+    "                                   contesta con un rechazo, no con la lista de destinos",
+    "  481520  gfx 41724  casilla 123   unico en todo el mundo, gemelo del anterior",
+    "  488131  gfx 13493  casilla 118   ese dibujo sale en 139 mapas, casi ninguno con zaap",
+    "  530219  gfx 31992  casilla 254   ese dibujo sale en 5 mapas, ninguno de los otros con zaap",
+    "",
+    "Por descarte queda el 481520. Si al clicarlo no es el zaap naranja, cambia el numero de abajo",
+    "por el del elemento bueno y ya esta: no hay nada mas que tocar."
+  ],
+  "115083777": 481520
+}

@@ -128,28 +128,25 @@ namespace Jondo.Unity.Launcher.Managers
                 }
             }
 
-            // Sólo las plantillas que hacen falta: son 6.468 en la base y aquí se usan unas pocas.
-            var wanted = new HashSet<int>();
-            foreach (var here in _byMap.Values)
+            // La base contiene el catálogo nativo completo. Cargarlo entero evita que el
+            // comportamiento de un PNJ dependa de que ya hubiese una colocación de ese PNJ al
+            // iniciar el proceso: cuando se incorpora una ubicación comprobada, su apariencia,
+            // acciones y diálogo ya están disponibles inmediatamente. Las ubicaciones siguen
+            // siendo datos del servidor; no se inventa una para una plantilla que no la trae.
+            var templates = connection.CreateCommand();
+            templates.CommandText = "SELECT Id, Look, Data FROM NpcTemplates ORDER BY Id;";
+            using (var reader = templates.ExecuteReader())
             {
-                foreach (var spawn in here) wanted.Add(spawn.NpcId);
-            }
-
-            foreach (int npcId in wanted)
-            {
-                var template = connection.CreateCommand();
-                template.CommandText = "SELECT Look, Data FROM NpcTemplates WHERE Id = $id;";
-                template.Parameters.AddWithValue("$id", npcId);
-                using var reader = template.ExecuteReader();
-                if (!reader.Read()) continue;
-
-                var read = new Template
+                while (reader.Read())
                 {
-                    Id = npcId,
-                    Look = reader.IsDBNull(0) ? "" : reader.GetString(0),
-                };
-                ReadData(reader.IsDBNull(1) ? "" : reader.GetString(1), read);
-                _templates[npcId] = read;
+                    var read = new Template
+                    {
+                        Id = reader.GetInt32(0),
+                        Look = reader.IsDBNull(1) ? "" : reader.GetString(1),
+                    };
+                    ReadData(reader.IsDBNull(2) ? "" : reader.GetString(2), read);
+                    _templates[read.Id] = read;
+                }
             }
 
             // Los que no traían aspecto propio lo heredan de su plantilla.
@@ -165,8 +162,8 @@ namespace Jondo.Unity.Launcher.Managers
             Count = 0;
             foreach (var here in _byMap.Values) Count += here.Count;
 
-            Console.WriteLine($"[NPCs] {Count} puestos en {_byMap.Count} mapas, " +
-                              $"{_templates.Count} plantillas.");
+            Console.WriteLine($"[NPCs] {Count} puestos verificados en {_byMap.Count} mapas; " +
+                              $"{_templates.Count} plantillas nativas cargadas.");
         }
 
         /// <summary>Los mapas que tienen algún NPC puesto.</summary>

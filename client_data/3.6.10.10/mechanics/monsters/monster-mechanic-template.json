@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "replace-with-stable-monster-rule-id",
+  "kind": "monster-mechanic-map",
+  "status": "Draft",
+  "sourceUrl": "https://www.dofuspourlesnoobs.com/replace-with-guide-page.html",
+  "sourceKind": "guide",
+  "clientVersion": "3.6.10.10",
+  "monster": {
+    "clientMonsterId": 0,
+    "name": "Resolve from the pinned client translation catalogue",
+    "allowedMapIds": []
+  },
+  "ai": {
+    "spellPriorities": [],
+    "fleeBelowHpPercent": null
+  },
+  "encounterRules": [],
+  "evidence": {
+    "guideSummary": "Concise paraphrase only; do not copy guide text.",
+    "clientCatalogReferences": [],
+    "capturedProtocolReferences": [],
+    "acceptanceTests": []
+  },
+  "safety": {
+    "requiresMeasuredHandler": true,
+    "neverInventPackets": true
+  }
+}

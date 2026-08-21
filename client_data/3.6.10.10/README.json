@@ -1,0 +1,7 @@
+{
+  "doNot": [
+    "Do not edit these files as live game state.",
+    "Do not assume a static catalog supplies protocol messages, placement, ownership, quests, or mechanics."
+  ],
+  "use": "Create a reviewed server importer and regression checks for each feature before use."
+}

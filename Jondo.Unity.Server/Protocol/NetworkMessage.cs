@@ -41,6 +41,10 @@ namespace Jondo.Protocol
             }
 
             ApuntarEntrada(totalRead);
+            // Full C2S capture is independent from the unknown-packet queue.  It lets parity
+            // work compare every observed client message with the extracted protocol and handler set.
+            Jondo.Unity.Launcher.Network.UnknownPacketStore.RecordObservedPacket(
+                payload, "Game", "C2S", Jondo.Unity.Launcher.Network.SessionContext.Actual);
 
             // Log packet
             try
@@ -72,6 +76,9 @@ namespace Jondo.Protocol
             
             byte[] buf = ms.ToArray();
 
+            Jondo.Unity.Launcher.Network.UnknownPacketStore.RecordObservedPacket(
+                message.ToByteArray(), "Game", "S2C", Jondo.Unity.Launcher.Network.SessionContext.Actual);
+
             // Log packet
             try
             {
@@ -93,6 +100,8 @@ namespace Jondo.Protocol
 
         public static async Task WriteFrameAsync(Stream stream, byte[] payload)
         {
+            Jondo.Unity.Launcher.Network.UnknownPacketStore.RecordObservedPacket(
+                payload, "Game", "S2C", Jondo.Unity.Launcher.Network.SessionContext.Actual);
             using var ms = new MemoryStream();
             var codedStream = new CodedOutputStream(ms);
             
@@ -357,7 +366,7 @@ namespace Jondo.Protocol
                 case "krv": return ("World Loading", "Sync", "WelcomeFollowUp (Sent right after the welcome burst; deliberately not answered)");
                 case "jqe": return ("In Game", "Map", "CellEcho (A cell number, just before the jqi/jqk of a border; exact meaning not established)");
                 case "ijm": return ("In Game", "Fight", "FightEntry (Comes with kmv when entering a fight; kmv covers the flow)");
-                case "iul": return ("In Game", "Fight", "FightNotification (During fights; meaning not established)");
+                case "iul": return ("In Game", "Interfaces", "ShortcutBarRemoveRequest (context-menu remove; f1=bar, f2=slot)");
 
                 default: return ("In Game", "Unknown", $"Utility message ({uri})");
             }

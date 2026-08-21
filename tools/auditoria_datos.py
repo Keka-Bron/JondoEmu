@@ -129,6 +129,8 @@ def main():
     vacias = [t for t in ("Jobs", "Skills", "Recipes", "RecipeIngredients",
                           "SkillCraftableItems", "SkillModifiableItemTypes")
               if uno(f'SELECT COUNT(*) FROM "{t}"') == 0]
+    casas = uno('SELECT COUNT(*) FROM Houses') if 'Houses' in tablas else 0
+    print(f"  Houses      -> {casas:,} registros en la base")
     dofusdude = os.path.join(DATOS, "JsonFromDofusDude")
     faltan = [f for f in ("jobs.json", "skills.json", "recipes.json")
               if not os.path.exists(os.path.join(dofusdude, f))]

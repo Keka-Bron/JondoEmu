@@ -54,6 +54,8 @@ namespace Jondo.Unity.Launcher
         public static int StatIntelligence { get => S.StatIntelligence; set => S.StatIntelligence = value; }
         public static int StatChance { get => S.StatChance; set => S.StatChance = value; }
         public static int StatAgility { get => S.StatAgility; set => S.StatAgility = value; }
+        public static int BaseActionPoints { get => S.BaseActionPoints; set => S.BaseActionPoints = value; }
+        public static int BaseMovementPoints { get => S.BaseMovementPoints; set => S.BaseMovementPoints = value; }
 
         // El inventario y el equipo
         public static List<PlayerItem> GetInventoryCopy() => S.GetInventoryCopy();

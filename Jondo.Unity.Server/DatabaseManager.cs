@@ -35,6 +35,7 @@ namespace Jondo.Unity.Launcher
                         Login TEXT NOT NULL UNIQUE,
                         Password TEXT NOT NULL,
                         Nickname TEXT NOT NULL,
+                        LauncherToken TEXT,
                         GameToken TEXT,
                         Role INTEGER NOT NULL DEFAULT 1
                     );
@@ -47,17 +48,17 @@ namespace Jondo.Unity.Launcher
                 // esto, quien ya tuviera su auth.db se quedaba sin poder entrar: todas las
                 // consultas de cuenta piden ya la columna.
                 bool tieneRol = false;
+                bool tieneTokenDeLanzador = false;
                 var mirar = authConnection.CreateCommand();
                 mirar.CommandText = "PRAGMA table_info(Accounts);";
                 using (var lector = mirar.ExecuteReader())
                 {
                     while (lector.Read())
                     {
-                        if (string.Equals(lector.GetString(1), "Role", StringComparison.OrdinalIgnoreCase))
-                        {
-                            tieneRol = true;
-                            break;
-                        }
+                        string columna = lector.GetString(1);
+                        if (string.Equals(columna, "Role", StringComparison.OrdinalIgnoreCase)) tieneRol = true;
+                        if (string.Equals(columna, "LauncherToken", StringComparison.OrdinalIgnoreCase))
+                            tieneTokenDeLanzador = true;
                     }
                 }
                 if (!tieneRol)
@@ -66,6 +67,13 @@ namespace Jondo.Unity.Launcher
                     anadir.CommandText = "ALTER TABLE Accounts ADD COLUMN Role INTEGER NOT NULL DEFAULT 1;";
                     anadir.ExecuteNonQuery();
                     Console.WriteLine("[DatabaseManager] Columna Role añadida a Accounts; todos empiezan como jugador.");
+                }
+                if (!tieneTokenDeLanzador)
+                {
+                    var anadir = authConnection.CreateCommand();
+                    anadir.CommandText = "ALTER TABLE Accounts ADD COLUMN LauncherToken TEXT;";
+                    anadir.ExecuteNonQuery();
+                    Console.WriteLine("[DatabaseManager] Columna LauncherToken añadida a Accounts.");
                 }
 
                 // Seed the built-in test accounts if the table is empty (credentials below)
@@ -154,7 +162,10 @@ namespace Jondo.Unity.Launcher
                         Agility INTEGER NOT NULL DEFAULT 0,
                         Look TEXT NOT NULL,
                         Orientation INTEGER NOT NULL DEFAULT 1,
-                        Kamas INTEGER NOT NULL DEFAULT 0
+                        Kamas INTEGER NOT NULL DEFAULT 0,
+                        BaseActionPoints INTEGER NOT NULL DEFAULT 6,
+                        BaseMovementPoints INTEGER NOT NULL DEFAULT 3,
+                        LastSavedUtc TEXT
                     );
                 ";
                 createCharacters.ExecuteNonQuery();
@@ -297,6 +308,30 @@ namespace Jondo.Unity.Launcher
                     // Already exists.
                 }
 
+                // Character resources which used to be hard-coded in StatsHandler.  They are
+                // permanent bases (before level/equipment bonuses), not the AP/MP left midway
+                // through a fight turn.  Keeping them in the character row makes a save fully
+                // self-contained and lets administrators inspect or tune them safely.
+                foreach (string column in new[]
+                         {
+                             "BaseActionPoints INTEGER NOT NULL DEFAULT 6",
+                             "BaseMovementPoints INTEGER NOT NULL DEFAULT 3",
+                             "LastSavedUtc TEXT"
+                         })
+                {
+                    try
+                    {
+                        var addResourceColumn = worldConnection.CreateCommand();
+                        addResourceColumn.CommandText = $"ALTER TABLE Characters ADD COLUMN {column};";
+                        addResourceColumn.ExecuteNonQuery();
+                        Console.WriteLine($"[SQLite] Migration: added {column.Split(' ')[0]} to Characters.");
+                    }
+                    catch (Microsoft.Data.Sqlite.SqliteException)
+                    {
+                        // Already exists.
+                    }
+                }
+
                 FillMissingHeads(worldConnection);
 
                 // A character with no date leaves the server-selection screen empty, so no row is
@@ -373,6 +408,19 @@ namespace Jondo.Unity.Launcher
                     );
                 ";
                 createSpellBar.ExecuteNonQuery();
+
+                // An empty bar has no CharacterSpellBar rows, so rows alone cannot distinguish a
+                // new character (which should receive the default spell layout) from a player who
+                // deliberately cleared every slot.  This one-row state makes that distinction
+                // durable across a logout or server restart.
+                var createSpellBarState = worldConnection.CreateCommand();
+                createSpellBarState.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterSpellBarState (
+                        CharacterId INTEGER PRIMARY KEY,
+                        Initialized INTEGER NOT NULL DEFAULT 1
+                    );
+                ";
+                createSpellBarState.ExecuteNonQuery();
 
                 // Seed default character if empty
                 var checkChar = worldConnection.CreateCommand();
@@ -520,10 +568,34 @@ namespace Jondo.Unity.Launcher
                         BreedId INTEGER PRIMARY KEY,
                         SpellIdsJson TEXT
                     );
+
+                        CREATE TABLE IF NOT EXISTS Houses (
+                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            HouseTypeId INTEGER NOT NULL DEFAULT 0,
+                            NameId INTEGER NOT NULL DEFAULT 0,
+                            DescriptionId INTEGER NOT NULL DEFAULT 0,
+                            TemplateGfxId INTEGER NOT NULL DEFAULT 0,
+                            RoomCount INTEGER NOT NULL DEFAULT 0,
+                            MapId INTEGER NOT NULL DEFAULT 0,
+                            CellId INTEGER NOT NULL DEFAULT 0,
+                            ExteriorElementId INTEGER NOT NULL DEFAULT 0,
+                            ExteriorGfxId INTEGER NOT NULL DEFAULT 0,
+                            InteriorMapId INTEGER NOT NULL DEFAULT 0,
+                            OwnerAccountId INTEGER NOT NULL DEFAULT 0,
+                            Price INTEGER NOT NULL DEFAULT 0,
+                            Locked INTEGER NOT NULL DEFAULT 0,
+                            VisitAllowed INTEGER NOT NULL DEFAULT 1,
+                            Listed INTEGER NOT NULL DEFAULT 0,
+                            GuildHouse INTEGER NOT NULL DEFAULT 0,
+                            AccessCodeHash TEXT NOT NULL DEFAULT '',
+                            UpdatedUtc TEXT NOT NULL DEFAULT '',
+                            ExtraJson TEXT NOT NULL DEFAULT '{}'
+                        );
                 ";
                 createMonsters.ExecuteNonQuery();
 
                 EnsureProfessionCatalogSchema(worldConnection);
+                    EnsureHouseCatalogSchema(worldConnection);
 
                 // 5. Ensure Monsters, Mobs, Spells, and SpellLevels are seeded
                 EnsureMobsSeeded(worldConnection);
@@ -681,6 +753,87 @@ namespace Jondo.Unity.Launcher
                     ON RecipeIngredients(IngredientId);
             ";
             command.ExecuteNonQuery();
+        }
+
+        private static void EnsureHouseCatalogSchema(SqliteConnection connection)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS HouseTemplates (
+                    TypeId INTEGER PRIMARY KEY,
+                    DefaultPrice INTEGER NOT NULL,
+                    NameId INTEGER NOT NULL,
+                    DescriptionId INTEGER NOT NULL,
+                    GfxId INTEGER NOT NULL,
+                    RoomCount INTEGER NOT NULL,
+                    ClientVersion TEXT NOT NULL,
+                    Source TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS Houses (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    HouseTypeId INTEGER NOT NULL DEFAULT 0,
+                    NameId INTEGER NOT NULL DEFAULT 0,
+                    DescriptionId INTEGER NOT NULL DEFAULT 0,
+                    TemplateGfxId INTEGER NOT NULL DEFAULT 0,
+                    RoomCount INTEGER NOT NULL DEFAULT 0,
+                    MapId INTEGER NOT NULL DEFAULT 0,
+                    CellId INTEGER NOT NULL DEFAULT 0,
+                    ExteriorElementId INTEGER NOT NULL DEFAULT 0,
+                    ExteriorGfxId INTEGER NOT NULL DEFAULT 0,
+                    InteriorMapId INTEGER NOT NULL DEFAULT 0,
+                    OwnerAccountId INTEGER NOT NULL DEFAULT 0,
+                    Price INTEGER NOT NULL DEFAULT 0,
+                    Locked INTEGER NOT NULL DEFAULT 0,
+                    VisitAllowed INTEGER NOT NULL DEFAULT 1,
+                    Listed INTEGER NOT NULL DEFAULT 0,
+                    GuildHouse INTEGER NOT NULL DEFAULT 0,
+                    AccessCodeHash TEXT NOT NULL DEFAULT '',
+                    UpdatedUtc TEXT NOT NULL DEFAULT '',
+                    ExtraJson TEXT NOT NULL DEFAULT '{}'
+                );
+            ";
+            command.ExecuteNonQuery();
+
+            // SQLite has no ADD COLUMN IF NOT EXISTS.  Older emulator databases already contain
+            // a much smaller Houses table, so migrate it in place without touching ownership.
+            var existing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (var columns = connection.CreateCommand())
+            {
+                columns.CommandText = "PRAGMA table_info(Houses);";
+                using var reader = columns.ExecuteReader();
+                while (reader.Read()) existing.Add(reader.GetString(1));
+            }
+
+            foreach (var definition in new[]
+            {
+                "HouseTypeId INTEGER NOT NULL DEFAULT 0",
+                "DescriptionId INTEGER NOT NULL DEFAULT 0",
+                "TemplateGfxId INTEGER NOT NULL DEFAULT 0",
+                "RoomCount INTEGER NOT NULL DEFAULT 0",
+                "ExteriorElementId INTEGER NOT NULL DEFAULT 0",
+                "ExteriorGfxId INTEGER NOT NULL DEFAULT 0",
+                "InteriorMapId INTEGER NOT NULL DEFAULT 0",
+                "Listed INTEGER NOT NULL DEFAULT 0",
+                "AccessCodeHash TEXT NOT NULL DEFAULT ''",
+                "UpdatedUtc TEXT NOT NULL DEFAULT ''"
+            })
+            {
+                string name = definition.Split(' ')[0];
+                if (existing.Contains(name)) continue;
+                using var alter = connection.CreateCommand();
+                alter.CommandText = $"ALTER TABLE Houses ADD COLUMN {definition};";
+                alter.ExecuteNonQuery();
+            }
+
+            using var indexes = connection.CreateCommand();
+            indexes.CommandText = @"
+                CREATE UNIQUE INDEX IF NOT EXISTS IX_Houses_ExteriorDoor
+                    ON Houses(MapId, ExteriorElementId) WHERE ExteriorElementId > 0;
+                CREATE INDEX IF NOT EXISTS IX_Houses_OwnerAccountId ON Houses(OwnerAccountId);
+                CREATE INDEX IF NOT EXISTS IX_Houses_InteriorMapId ON Houses(InteriorMapId);
+            ";
+            indexes.ExecuteNonQuery();
         }
 
         public static void EnsureMobsSeeded(SqliteConnection connection)
@@ -1158,6 +1311,28 @@ namespace Jondo.Unity.Launcher
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// Persists the token used by the native launcher control API.  This is intentionally
+        /// separate from <see cref="SetGameToken"/>: the game client refreshes its own token on
+        /// every launch, whereas this one must survive that refresh so a saved launcher account
+        /// remains usable after restarting the launcher.
+        /// </summary>
+        public static void SetLauncherToken(long accountId, string token)
+        {
+            using var connection = new SqliteConnection(AuthConnectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE Accounts
+                SET LauncherToken = $token
+                WHERE Id = $id;
+            ";
+            command.Parameters.AddWithValue("$token", token);
+            command.Parameters.AddWithValue("$id", accountId);
+            command.ExecuteNonQuery();
+        }
+
         public static bool ValidateGameToken(string token)
         {
             using var connection = new SqliteConnection(AuthConnectionString);
@@ -1213,6 +1388,44 @@ namespace Jondo.Unity.Launcher
             command.Parameters.AddWithValue("$token", token);
             var result = command.ExecuteScalar();
             return result != null ? (long)result : 0;
+        }
+
+        /// <summary>Resolves a persisted native-launcher session token, never a game token.</summary>
+        public static long GetAccountIdByLauncherToken(string token)
+        {
+            using var connection = new SqliteConnection(AuthConnectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT Id FROM Accounts WHERE LauncherToken = $token;";
+            command.Parameters.AddWithValue("$token", token);
+            var result = command.ExecuteScalar();
+            return result != null ? (long)result : 0;
+        }
+
+        /// <summary>
+        /// One-time compatibility path for launchers saved before LauncherToken existed.  It may
+        /// migrate only an account that has never received a dedicated launcher token, and only
+        /// when the supplied saved token is still the value in the old shared column.
+        /// </summary>
+        public static bool TryMigrateLegacyLauncherToken(long accountId, string token)
+        {
+            if (accountId <= 0 || string.IsNullOrWhiteSpace(token)) return false;
+
+            using var connection = new SqliteConnection(AuthConnectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE Accounts
+                SET LauncherToken = $token
+                WHERE Id = $id
+                  AND (LauncherToken IS NULL OR LauncherToken = '')
+                  AND GameToken = $token;
+            ";
+            command.Parameters.AddWithValue("$token", token);
+            command.Parameters.AddWithValue("$id", accountId);
+            return command.ExecuteNonQuery() == 1;
         }
 
         // --- Servers ---
@@ -1549,7 +1762,8 @@ namespace Jondo.Unity.Launcher
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT Name, Level, MapId, CellId, RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look, Breed, Sex, Orientation, Kamas, Experience
+                SELECT Name, Level, MapId, CellId, RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look, Breed, Sex, Orientation, Kamas, Experience,
+                       BaseActionPoints, BaseMovementPoints
                 FROM Characters
                 WHERE Id = $charId;
             ";
@@ -1595,6 +1809,10 @@ namespace Jondo.Unity.Launcher
                 Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility = reader.GetInt32(10);
                 Jondo.Unity.Launcher.Network.SessionContext.State.Breed = reader.GetInt32(12);
                 Jondo.Unity.Launcher.Network.SessionContext.State.Sex = reader.GetInt32(13);
+                Jondo.Unity.Launcher.Network.SessionContext.State.BaseActionPoints =
+                    reader.IsDBNull(17) ? Handlers.StatsHandler.DefaultPlayerBaseAp : Math.Max(1, reader.GetInt32(17));
+                Jondo.Unity.Launcher.Network.SessionContext.State.BaseMovementPoints =
+                    reader.IsDBNull(18) ? Handlers.StatsHandler.DefaultPlayerBaseMp : Math.Max(1, reader.GetInt32(18));
 
                 string lookHex = reader.GetString(11);
                 byte[] lookBytes = ConvertHexStringToByteArray(lookHex);
@@ -1606,7 +1824,10 @@ namespace Jondo.Unity.Launcher
                 // HumanInformationsMsg has: Field 3 (Name)
                 Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails = ReconstructActorDetails(lookBytes, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName);
 
-                Console.WriteLine($"[SQLite] Successfully loaded character: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName} (Level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel})");
+                Console.WriteLine($"[SQLite] Successfully loaded character: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName} " +
+                                  $"(Level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}, " +
+                                  $"base {Jondo.Unity.Launcher.Network.SessionContext.State.BaseActionPoints} PA / " +
+                                  $"{Jondo.Unity.Launcher.Network.SessionContext.State.BaseMovementPoints} PM)");
                 return true;
             }
             return false;
@@ -1623,7 +1844,9 @@ namespace Jondo.Unity.Launcher
                 SET MapId = $mapId, CellId = $cellId, Orientation = $orientation,
                     RemainingPoints = $pts, Vitality = $vit, Wisdom = $wis,
                     Strength = $str, Intelligence = $int, Chance = $cha, Agility = $agi,
-                    Level = $lvl, Kamas = $kamas, Experience = $xp
+                    Level = $lvl, Kamas = $kamas, Experience = $xp,
+                    BaseActionPoints = $baseAp, BaseMovementPoints = $baseMp,
+                    LastSavedUtc = $savedUtc
                 WHERE Id = $charId;
             ";
             command.Parameters.AddWithValue("$charId", Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
@@ -1640,6 +1863,9 @@ namespace Jondo.Unity.Launcher
             command.Parameters.AddWithValue("$lvl", Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
             command.Parameters.AddWithValue("$kamas", Jondo.Unity.Launcher.Network.SessionContext.State.Kamas);
             command.Parameters.AddWithValue("$xp", Jondo.Unity.Launcher.Network.SessionContext.State.Experience);
+            command.Parameters.AddWithValue("$baseAp", Math.Max(1, Jondo.Unity.Launcher.Network.SessionContext.State.BaseActionPoints));
+            command.Parameters.AddWithValue("$baseMp", Math.Max(1, Jondo.Unity.Launcher.Network.SessionContext.State.BaseMovementPoints));
+            command.Parameters.AddWithValue("$savedUtc", DateTime.UtcNow.ToString("O"));
             command.ExecuteNonQuery();
         }
 
@@ -1781,16 +2007,13 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Crea un personaje con lo que trae puesto de fábrica: nivel 1, el conjunto del aventurero
-        /// equipado, un millón de kamas y las características que dan los pergaminos.
-        ///
-        /// El identificador se saca del mayor que haya más uno. Los uid de sus objetos salen de un
-        /// rango propio por personaje, para que no choquen con los de nadie.
+        /// Creates the persistent pre-tutorial character baseline.  Tutorial equipment, kamas,
+        /// quests and achievements are earned later; none are copied from the captured account.
         /// </summary>
         public static long CreateCharacter(long accountId, int serverId, string name, int breed,
                                            int sex, int headId, IReadOnlyList<long> colors,
-                                           long mapId, int level, long kamas, int stat,
-                                           IReadOnlyList<(int Gid, int Slot)> starterSet)
+                                           long mapId, int startingCell, int level, long kamas,
+                                           int stat)
         {
             try
             {
@@ -1801,9 +2024,9 @@ namespace Jondo.Unity.Launcher
                 siguiente.CommandText = "SELECT IFNULL(MAX(Id), 1000000) + 1 FROM Characters;";
                 long id = siguiente.ExecuteScalar() is long max ? max : 1000001;
 
-                // La casilla: al lado del zaap, no encima.
-                var zaap = Managers.Interactives.ZaapOf(mapId);
-                int cell = MapManager.GetNearestWalkableCell(mapId, zaap.Cell);
+                // The location is a server-owned creation checkpoint.  Keep it on a walkable
+                // cell, but never substitute a zaap: a fresh character belongs in Incarnam.
+                int cell = MapManager.GetNearestWalkableCell(mapId, startingCell);
 
                 // Los colores que el cliente manda a -1 son "los de la raza"; se guardan vacíos y
                 // BreedLookTable pone los suyos.
@@ -1819,9 +2042,10 @@ namespace Jondo.Unity.Launcher
                     INSERT INTO Characters
                         (Id, AccountId, Name, Breed, Sex, Level, MapId, CellId, RemainingPoints,
                          Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look,
-                         Orientation, Kamas)
+                         Orientation, Kamas, BaseActionPoints, BaseMovementPoints, LastSavedUtc)
                     VALUES ($id, $acc, $name, $breed, $sex, $level, $map, $cell, 0,
-                            $stat, $stat, $stat, $stat, $stat, $stat, $look, 1, $kamas);";
+                            $stat, $stat, $stat, $stat, $stat, $stat, $look, 1, $kamas,
+                            $baseAp, $baseMp, $savedUtc);";
                 insertar.Parameters.AddWithValue("$id", id);
                 insertar.Parameters.AddWithValue("$acc", accountId);
                 insertar.Parameters.AddWithValue("$name", name);
@@ -1835,24 +2059,12 @@ namespace Jondo.Unity.Launcher
                 // se atraganta: "Additional non-parsable characters are at the end of the string".
                 insertar.Parameters.AddWithValue("$look", Convert.ToHexString(look));
                 insertar.Parameters.AddWithValue("$kamas", kamas);
+                insertar.Parameters.AddWithValue("$baseAp", Handlers.StatsHandler.DefaultPlayerBaseAp);
+                insertar.Parameters.AddWithValue("$baseMp", Handlers.StatsHandler.DefaultPlayerBaseMp);
+                insertar.Parameters.AddWithValue("$savedUtc", DateTime.UtcNow.ToString("O"));
                 insertar.ExecuteNonQuery();
 
                 SetServerAndHead(connection, id, serverId, headId);
-
-                long uid = id * 1000;
-                foreach (var (gid, slot) in starterSet)
-                {
-                    var objeto = connection.CreateCommand();
-                    objeto.CommandText = "INSERT INTO CharacterItems " +
-                                         "(CharacterId, Uid, Gid, Quantity, Position, Effects) " +
-                                         "VALUES ($id, $uid, $gid, 1, $pos, $e);";
-                    objeto.Parameters.AddWithValue("$id", id);
-                    objeto.Parameters.AddWithValue("$uid", uid++);
-                    objeto.Parameters.AddWithValue("$gid", gid);
-                    objeto.Parameters.AddWithValue("$pos", slot);
-                    objeto.Parameters.AddWithValue("$e", EffectsOfTemplate(connection, gid));
-                    objeto.ExecuteNonQuery();
-                }
 
                 transaction.Commit();
                 return id;

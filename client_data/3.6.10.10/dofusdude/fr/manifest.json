@@ -1,0 +1,68 @@
+{
+  "apiBase": "https://api.dofusdu.de/dofus3/v1",
+  "apiMeta": {
+    "release": "main",
+    "update_stamp": "2026-08-06T14:44:19.969310786+02:00",
+    "version": "3.6.10.10"
+  },
+  "catalogues": [
+    {
+      "name": "equipment",
+      "output": "equipment.json",
+      "rowCount": 4356,
+      "sha256": "82d8c9b158916038b390e844c64fe2b943e4d1fdefd370df3ca73f1f5f67ff1e",
+      "url": "https://api.dofusdu.de/dofus3/v1/fr/items/equipment/all"
+    },
+    {
+      "name": "resources",
+      "output": "resources.json",
+      "rowCount": 3639,
+      "sha256": "6aa8f53792cbea4c898c8b5cd76dd3752fdbc0feb00d915962037427c456ec09",
+      "url": "https://api.dofusdu.de/dofus3/v1/fr/items/resources/all"
+    },
+    {
+      "name": "consumables",
+      "output": "consumables.json",
+      "rowCount": 3278,
+      "sha256": "c31f66888ad176563715265c6caaaa844d69175cd6a7422cb7365c3668d33072",
+      "url": "https://api.dofusdu.de/dofus3/v1/fr/items/consumables/all"
+    },
+    {
+      "name": "quest_items",
+      "output": "quest_items.json",
+      "rowCount": 3358,
+      "sha256": "a3a5cb544dd5ba88b87911f6d011f71d1b4fd47ba400e411bc25ea8aeefe4f22",
+      "url": "https://api.dofusdu.de/dofus3/v1/fr/items/quest/all"
+    },
+    {
+      "name": "cosmetics",
+      "output": "cosmetics.json",
+      "rowCount": 2420,
+      "sha256": "0a3ceca306ae1d0a7b49dafb75c1cfc6c0c458e316287d8567c551b303925bbe",
+      "url": "https://api.dofusdu.de/dofus3/v1/fr/items/cosmetics/all"
+    },
+    {
+      "name": "sets",
+      "output": "sets.json",
+      "rowCount": 929,
+      "sha256": "758bc5bb49102a68d01a43b77ac2659865c72206c0365f225968a57ccbc28e17",
+      "url": "https://api.dofusdu.de/dofus3/v1/fr/sets/all"
+    },
+    {
+      "name": "mounts",
+      "output": "mounts.json",
+      "rowCount": 308,
+      "sha256": "9097ba56e9253c884a2ebacb803fc7ee85494e3ea0b7eac0f6021437a5ec96ff",
+      "url": "https://api.dofusdu.de/dofus3/v1/fr/mounts/all"
+    }
+  ],
+  "clientVersion": "3.6.10.10",
+  "downloadedUtc": "2026-08-21T11:53:39+00:00",
+  "limitations": [
+    "Static supplementary data only; it is not server-owned player state.",
+    "The documented API does not expose NPC placements or dialogue trees, quest progression, dungeon scripts, or network protocol messages."
+  ],
+  "locale": "fr",
+  "schemaVersion": 1,
+  "source": "https://docs.dofusdu.de/dofus3/v1/"
+}

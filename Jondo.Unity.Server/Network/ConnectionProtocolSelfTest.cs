@@ -157,6 +157,7 @@ namespace Jondo.Unity.Launcher.Network
             CheckServerSelection(failures);
             CheckEnvelope(failures);
             CheckWorldMessages(failures);
+            CheckHousePurchaseWire(failures);
             CheckFightPreparation(failures);
 
             if (failures.Count > 0)
@@ -399,6 +400,13 @@ namespace Jondo.Unity.Launcher.Network
             if (lva != CapturedLva)
                 failures.Add($"lva: the end of the actor list does not match the capture ({lva})");
 
+            // iuz asks to clear the spell bar.  The authoritative replacement is an itg with
+            // only its bar type: f2:1, no shortcut entries.  Do not use BuildSpellBar here or it
+            // will repopulate the defaults the player just cleared.
+            string emptySpellBar = Hex(ConnectionProtocol.BuildEmptySpellBar());
+            if (emptySpellBar != "1001")
+                failures.Add($"itg: an empty spell bar must be f2:1, got {emptySpellBar}");
+
             // The go-ahead for a map change. It is the one message here that does NOT travel in
             // root field 1: answers use field 3 and repeat the id the request came with. Getting
             // that wrong leaves the client standing on the edge of the map for good, so it is
@@ -423,6 +431,82 @@ namespace Jondo.Unity.Launcher.Network
                 if (WorldEntry.CharacteristicIds.Count > 0 && WorldEntry.ContainerOf(id) != 2)
                     failures.Add($"kub: characteristic {id} should travel in f2, not f{WorldEntry.ContainerOf(id)}");
             }
+        }
+
+        /// <summary>Protect the recovered khr and jss.f9 house shapes from field drift.</summary>
+        private static void CheckHousePurchaseWire(List<string> failures)
+        {
+            var free = new Managers.HouseDefinition
+            {
+                Id = 42,
+                HouseTypeId = 215,
+                ExteriorElementId = 123,
+                Price = 1_000_000,
+                RoomCount = 2,
+            };
+
+            var khr = ProtoMessage.Parse(ConnectionProtocol.BuildPurchasableDialog(free));
+            if (Varint(khr, 2) != free.Id || Varint(khr, 3) != free.Id ||
+                Varint(khr, 5) != free.Price || Field(khr, 1, 0) != null ||
+                Field(khr, 4, 0) != null)
+                failures.Add("khr: BUY must carry house, instance and price with default enums omitted");
+
+            var lpx = ProtoMessage.Parse(ConnectionProtocol.BuildHouseMapEntry(free));
+            var lptField = Field(lpx, 7, 2);
+            if (Varint(lpx, 2) != free.Id || Varint(lpx, 4) != free.HouseTypeId ||
+                lptField == null)
+            {
+                failures.Add("jss.f9/lpx: missing house id, model id or on-map branch");
+                return;
+            }
+
+            var lpt = ProtoMessage.Parse(lptField.BytesValue);
+            var doorIds = Field(lpt, 1, 2);
+            var instanceField = Field(lpt, 2, 2);
+            if (doorIds == null || Hex(doorIds.BytesValue) != "7b" || instanceField == null)
+            {
+                failures.Add("lpt: exterior element and lnx instance must be paired");
+                return;
+            }
+
+            var instance = ProtoMessage.Parse(instanceField.BytesValue);
+            if (Varint(instance, 7) != free.Price || Varint(instance, 10) != free.RoomCount ||
+                Varint(instance, 12) != free.Id || Field(instance, 4, 0) != null ||
+                Field(instance, 8, 2) != null)
+                failures.Add("lnx: ownerless listed instance shape is wrong");
+
+            var resale = new Managers.HouseDefinition
+            {
+                Id = 43,
+                HouseTypeId = 215,
+                ExteriorElementId = 124,
+                OwnerAccountId = 99,
+                Listed = true,
+                Price = 2_000_000,
+            };
+            var resaleLpx = ProtoMessage.Parse(
+                ConnectionProtocol.BuildHouseMapEntry(resale, "Owner", "0099"));
+            var resaleLpt = ProtoMessage.Parse(Field(resaleLpx, 7, 2)!.BytesValue);
+            var resaleInstance = ProtoMessage.Parse(Field(resaleLpt, 2, 2)!.BytesValue);
+            if (Varint(resaleInstance, 1) != 1 || Varint(resaleInstance, 4) != 1 ||
+                Field(resaleInstance, 8, 2) == null || Varint(resaleInstance, 7) != resale.Price)
+                failures.Add("lnx: a listed second-hand house must carry owner tag and price");
+
+            var unlisted = new Managers.HouseDefinition
+            {
+                Id = 44,
+                HouseTypeId = 215,
+                ExteriorElementId = 125,
+                OwnerAccountId = 99,
+                Listed = false,
+                Price = 2_000_000,
+            };
+            var unlistedLpx = ProtoMessage.Parse(
+                ConnectionProtocol.BuildHouseMapEntry(unlisted, "Owner", "0099"));
+            var unlistedLpt = ProtoMessage.Parse(Field(unlistedLpx, 7, 2)!.BytesValue);
+            var unlistedInstance = ProtoMessage.Parse(Field(unlistedLpt, 2, 2)!.BytesValue);
+            if (Field(unlistedInstance, 7, 0) != null)
+                failures.Add("lnx: an unlisted owned house must omit optional price f7");
         }
 
         // ─── Read helpers ───────────────────────────────────────────────────────

@@ -33,6 +33,15 @@ namespace Jondo.Unity.Launcher.Managers
         public const int UseSkill = 114;
 
         /// <summary>
+        /// The temporal-anomaly vestige type. It shares the newer zaap graphic but is not a
+        /// normal waypoint outside a Haven Bag.
+        /// </summary>
+        public const int VestigeType = 359;
+
+        /// <summary>The graphic used by a temporal-anomaly vestige.</summary>
+        public const int VestigeGfx = 74685;
+
+        /// <summary>
         /// Los dibujos del zaap, que es lo que lo distingue del resto de elementos del mapa.
         ///
         /// Son dos porque hay dos modelos: el de siempre y el de las zonas nuevas. No están
@@ -261,6 +270,14 @@ namespace Jondo.Unity.Launcher.Managers
             return default;
         }
 
+        /// <summary>Returns the protocol interactive type for a zaap-like element.</summary>
+        public static int TypeOfZaap(long mapId, Element element)
+            => element.Gfx == VestigeGfx && !Merkasako.IsHavenBag(mapId) ? VestigeType : ZaapType;
+
+        /// <summary>Whether this element opens the anomaly-only list rather than ordinary zaaps.</summary>
+        public static bool IsVestige(long mapId, Element element)
+            => element.Gfx == VestigeGfx && !Merkasako.IsHavenBag(mapId);
+
         /// <summary>El elemento de un mapa que lleva un dibujo dado, si es que lo hay.</summary>
         public static Element ElementByGfx(long mapId, int gfx)
         {
@@ -271,6 +288,12 @@ namespace Jondo.Unity.Launcher.Managers
             }
             return default;
         }
+
+        /// <summary>All map elements, used by interactive families recognised by graphic.</summary>
+        public static IReadOnlyList<Element> ElementsOf(long mapId)
+            => _byMap.TryGetValue(mapId, out var found)
+                ? found
+                : (IReadOnlyList<Element>)Array.Empty<Element>();
 
         /// <summary>
         /// Los elementos de un mapa que abren la lista de zaaps. Uno como mucho.
@@ -308,6 +331,16 @@ namespace Jondo.Unity.Launcher.Managers
         /// alguien a un sitio del que no puede volver es peor que no llevarlo.
         /// </summary>
         public static bool CanLeaveFrom(long mapId) => ZaapElements(mapId).Count > 0;
+
+        /// <summary>All activated waypoints the emulator exposes as discovered to every character.</summary>
+        public static IEnumerable<long> DiscoveredZaapMaps()
+        {
+            foreach (var waypoint in _ordered)
+            {
+                if (waypoint.Activated && CanLeaveFrom(waypoint.MapId))
+                    yield return waypoint.MapId;
+            }
+        }
 
         /// <summary>
         /// El identificador de la instancia de habilidad, que es lo que el cliente devuelve al

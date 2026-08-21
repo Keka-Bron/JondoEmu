@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "clientVersion": "3.6.10.10",
+  "serverProtocolVersion": "3.6.10.10",
+  "generatedUtc": "2026-08-21T12:17:37Z",
+  "purpose": "Static runtime inputs for Jondo Server. Never put player/account state here.",
+  "files": [
+    {
+      "path": "map_walkable_cells.json",
+      "bytes": 15123423,
+      "sha256": "f627e4152da515bca639c5f815f0fd6745849aad924ec3ba5653d4ffc38e5e29"
+    },
+    {
+      "path": "map_fight_cells.json",
+      "bytes": 20682578,
+      "sha256": "f0a4379c352bf9815d0b67e81c02a38296a236e34f5c570b8231558261e155b7"
+    },
+    {
+      "path": "character_xp.json",
+      "bytes": 38990,
+      "sha256": "a45f96c99a2614972afafa7070ffce199041eaf224e77c613462282ef2b7e2fc"
+    },
+    {
+      "path": "breed_looks.json",
+      "bytes": 4314,
+      "sha256": "1be8bd63915a40c79be935d713fedb50ab34b86b0abbfc8cd8cf733ed6e8ec1a"
+    },
+    {
+      "path": "heads.json",
+      "bytes": 56345,
+      "sha256": "56ca076bef749e5cbe245117c7a16340697f1de6fa6892b53b1e19e43a3765e1"
+    },
+    {
+      "path": "breed_stats.json",
+      "bytes": 12781,
+      "sha256": "8c72aa6079585c8c6c951d5efd175e7877b9fd165a95af74b141d6418b0d31ff"
+    },
+    {
+      "path": "item_sets.json",
+      "bytes": 152013,
+      "sha256": "11d7691641cf30de62b075dcddbd40eafae7a553d8d6259dc453b65a642827fc"
+    },
+    {
+      "path": "item_effect_fields.json",
+      "bytes": 1226,
+      "sha256": "82cf8e7e2628efe5af3febb87380b903433eaf655e5a838aec12993633019e0b"
+    },
+    {
+      "path": "dungeons.json",
+      "bytes": 36438,
+      "sha256": "73a08a92b6c50af2627f3e3c8cbdd3574666de52cf459cdf240009dddcba89fe"
+    },
+    {
+      "path": "interactive_elements_3.6.10.10.json",
+      "bytes": 1443109,
+      "sha256": "c8d6840d171fbfa40ea6cfbd516e420f824c13d38cbc8e3e5f6bf5c29e81b7de"
+    },
+    {
+      "path": "world_interactive_transitions_3.6.10.10.json",
+      "bytes": 4054906,
+      "sha256": "4283986ac51141a5840df904903c865bcf92ae33113507e2f74912121c0d39cc"
+    },
+    {
+      "path": "world_interactive_returns_3.6.10.10.json",
+      "bytes": 984,
+      "sha256": "6634d9b1b995fc809d67c9d45faa793ad7ca39f8b29987e16525a719242b7f21"
+    },
+    {
+      "path": "waypoints.json",
+      "bytes": 3553,
+      "sha256": "b68655e939d7e8eecfc82651a07219e5a0010842c5fd166e7c37ddb26ef85bd6"
+    },
+    {
+      "path": "zaap_overrides.json",
+      "bytes": 1016,
+      "sha256": "3214050218f098c244ccb3393f23d8a66a83cb36401f09443bf469273f54a561"
+    },
+    {
+      "path": "havenbag.json",
+      "bytes": 146718,
+      "sha256": "a4d02e256805eb761ed7aea86dfbf08327dbeabb0950ad08368cdf86576a6f7b"
+    },
+    {
+      "path": "house_templates_3.6.10.10.json",
+      "bytes": 42357,
+      "sha256": "3e65a998085451fe3ae3c073cd98c4ca6fc83707838a813618c4ec6320df65e7"
+    },
+    {
+      "path": "casas_mundo_3.6.10.10.json",
+      "bytes": 258443,
+      "sha256": "bbc73c14d600172c3d2e7f80e0bc9694e64415304294920d275a1d8b44680f43"
+    },
+    {
+      "path": "titles_ornaments.json",
+      "bytes": 2660,
+      "sha256": "dcad3b109329fa1fb64ad7c4e014d147b522a594e2201d95ceb128646ef33e0a"
+    },
+    {
+      "path": "cosmetics.json",
+      "bytes": 80437,
+      "sha256": "b2edf661a23fe6ce35751ec6cf56c8a5ee9931a4026544427b99a6f68269e5d4"
+    },
+    {
+      "path": "cosmetic_skins.json",
+      "bytes": 84322,
+      "sha256": "414d36d62531813d9da9fe5006c813fd7cfa6d65251a76766b9386eb1d401f5e"
+    },
+    {
+      "path": "mounts.json",
+      "bytes": 35924,
+      "sha256": "bc78ae73139045d878a69923dec66ad425aa85131530303d460de796d0464be3"
+    },
+    {
+      "path": "npc_shops.json",
+      "bytes": 35157,
+      "sha256": "3dc9ea66556dab53c90985f78bb77c041feb37cece15c982f7422da2e343b3c0"
+    },
+    {
+      "path": "spell_variants.json",
+      "bytes": 102089,
+      "sha256": "fcb180fcd6312638afb97e4efa3feafff734467ce5a8cc209fc5c7c8c2ba96f3"
+    },
+    {
+      "path": "world_etapa1_tras_elegir_personaje.bin",
+      "bytes": 64510,
+      "sha256": "4b08e983067d1455529a48f5a5a654e82b42087a7b1896ac283fc369efdf0432"
+    },
+    {
+      "path": "world_etapa2_tras_confirmar.bin",
+      "bytes": 2348,
+      "sha256": "1bd7d1bbd5f65abc28e36f031469b2f0c8c43d64a883fda12495b6e1563e9f31"
+    },
+    {
+      "path": "world_etapa3_mapa.bin",
+      "bytes": 90935,
+      "sha256": "602843eb75456f323f66aab58f87da528a72da0145e8b7fdc90aa483bd91c1ec"
+    },
+    {
+      "path": "JsonFromDofusDude/jobs.json",
+      "bytes": 4479,
+      "sha256": "d4d380ae41a4370a8a68543a49fe37940e37aa686f27163d2a3be94d32244925"
+    },
+    {
+      "path": "JsonFromDofusDude/skills.json",
+      "bytes": 192404,
+      "sha256": "c69d6ac06f66c4dd69e4b6c71d68f2cd03aa7ebcefaa4408cb0687a6a96773c1"
+    },
+    {
+      "path": "JsonFromDofusDude/recipes.json",
+      "bytes": 1516290,
+      "sha256": "026c38fc3f9bf78ea63f777db4b07bf6726552db4c4e7f01657e8e7148c5635a"
+    }
+  ],
+  "excluded": [
+    "bases/*.db",
+    "accounts",
+    "characters",
+    "inventory",
+    "quest progress",
+    "ownership",
+    "telemetry"
+  ]
+}

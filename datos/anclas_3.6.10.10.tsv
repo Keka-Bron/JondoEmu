@@ -24,12 +24,14 @@ krs	S2C			BuildWelcomeBurst	empty
 mgz	S2C	ContentCatalogVersionMessage	Identificador del catalogo de contenido; opaco, el cliente solo lo compara consigo mismo.	BuildWelcomeBurst	f1: 304672615
 kqp	S2C		Se envia tres veces seguidas con tres cargas distintas; significado no establecido.	BuildWelcomeBurst	f1:1, f2:1 then f1:1 then empty
 kvi	S2C	CharactersListMessage	Los personajes de la cuenta en el servidor elegido.	BuildCharactersList	f1 (rep) { f1 { f2: name, f3: level, f4 { f2 { f3: sex } }, f6: look, f7: breed }, f2: characterId }
-kvd	S2C	CharactersListEndMessage	Cierra la lista de personajes; vacio, justo detras de kvi en la rafaga real. Candidato principal a la causa del boton de crear personaje muerto.	BuildWelcomeBurst	empty
+kvd	S2C	CharactersListEndMessage	Cierra la lista de personajes; vacio, justo detras de kvi en la rafaga real y como continuacion de kwb al abrir otro hueco.	BuildWelcomeBurst, CharacterCreationHandler	empty
 jtg	S2C	GiftsListMessage	Catalogo de regalos de la cuenta; se envia vacio porque nuestras cuentas no tienen ninguno.	BuildGiftCatalogue	f3 (rep) { f1 { f2: name, f3 {...item...}, f6 {...description...} }, f2: id }
 kqq	C2S	LogoutRequestMessage	El cliente vuelve a la pantalla de personaje o de servidor.	GameNodeProxy	-
 kqr	S2C	LogoutResultMessage	Respuesta a kqq; despues el cliente cierra la conexion el mismo y rehace el handshake.	GameNodeProxy.BuildKqrPayload	f1: session guid, f4: 1
 kvz	C2S	CharacterCreationRequestMessage	Crear un personaje.	CharacterCreationHandler.CreateAsync	read for name, breed, sex, look
 kvb	S2C	CharacterCreationResultMessage	Resultado de la creacion; vacio si va bien, f2 lleva el motivo del rechazo.	CharacterCreationHandler	empty, or f2: reason
+kwb	C2S	CharacterCanBeCreatedRequestMessage	La pantalla de seleccion pide abrir otro hueco de personaje; vacio despues de recibir kvi/kvd.	CharacterCreationHandler.ConfirmCanCreateAsync	empty
+kwd	C2S	CharacterNameSuggestionRequestMessage	El boton del dado pide un nombre sugerido.	CharacterCreationHandler.SuggestNameAsync	empty
 kvk	S2C	CharacterNameSuggestionSuccessMessage	Un nombre de personaje sugerido (el boton del dado).	CharacterCreationHandler.SuggestNameAsync	f1: name
 kvw	C2S	CharacterSelectionMessage	Seleccionar un personaje; el id se comprueba contra la cuenta de la sesion porque lo elige el cliente y no es de fiar.	CharacterSelectionHandler	read for character id
 kvl	C2S	CharacterFirstSelectionMessage	El mismo paso justo despues de una creacion con exito: el cliente envia kvl detras de kvi y entra al mundo sin pasar por la lista.	CharacterSelectionHandler	read for character id
@@ -76,7 +78,7 @@ iuq	S2C	ShortcutBarReplacedMessage	Uno por cada hueco de barra que tenia la mita
 hng	S2C	SpellVariantActivationSuccessMessage	El hechizo nuevo y el grado que abre el nivel del personaje.	BuildSpellSwapped	f2: spell id, f3: grade
 itz	C2S	ShortcutBarAddRequestMessage	Editar un hueco de una barra de atajos; se escribe tambien en la base de datos o se pierde al salir.	GameNodeProxy.RememberShortcut	f2 { f2: slot, f6 { f2: spell id } }, f3: bar
 ivk	S2C	ShortcutBarRefreshMessage	El eco: la misma entrada que envio el cliente.	GameNodeProxy	identical to the itz payload
-iwo	C2S	InteractiveUseRequestMessage	Clic en un elemento interactivo; el zaap, el cofre y la loteria llegan todos por aqui.	ZaapTravelHandler.UseAsync	f1: skill instance uid, f2: element id
+iwo	C2S	InteractiveUseRequestMessage	Clic en un elemento interactivo; el zaap, el cofre y la loteria llegan todos por aqui. Una combinacion no registrada de mapa/elemento/instancia queda en telemetria como UnhandledInteractiveUse, no se adivina como puerta, oficio o HDV.	InteractiveActionHandler.UseAsync	f1: skill instance uid, f2: element id, f3: additional parameter
 iwn	S2C	InteractiveUsedMessage	Ese elemento esta en uso; f2 es el elemento, no la instancia de habilidad.	BuildElementInUse	f1: 1, f2: element id, f4: skill, f5: who
 hjj	S2C	TeleportDestinationsMessage	La lista de destinos del zaap; f6 casa con MapPositions en las 25 entradas de la captura y el destino donde ya estas viaja sin f2, o sea coste cero.	BuildZaapList	f2: map of the open zaap, f3 (rep) { f1: area level, f2: cost, f5: map, f6: subarea }
 hjc	C2S	TeleportRequestMessage	Destino elegido.	ZaapTravelHandler.TravelAsync	f3: destination map
@@ -145,7 +147,7 @@ itn	S2C		Lo envia el servidor pero el emulador lo usa como disparador de cliente
 ilr	S2C		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 2 mensajes en 1 fichero.	NpcHandler	
 kjl	S2C		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 1 mensaje en 1 fichero.	NpcHandler	
 kmu	S2C		Presente en 25 de las 31 carpetas de captura (399 mensajes, 90 ficheros). Nada establecido.		
-kmv	C2S		Llega con jrh en cada carga de mapa y no espera nada de vuelta; el emulador ya lo ignora en silencio. 727 mensajes, 88 ficheros.		
+kmv	C2S		Llega con jrh en cada carga normal de mapa y no espera nada de vuelta; GameNodeProxy lo registra como no-reply evidenciado. La excepción de preparación de combate conserva el bloque de preparación. 727 mensajes, 88 ficheros.	GameNodeProxy (no reply fuera de preparación de combate)
 iom	S2C		Las capturas muestran al SERVIDOR enviandolo (283 mensajes, 67 ficheros); OpcodeRegistry lo declara como MapInformationsRequest, nombre heredado y falso.	OpcodeRegistry (nombre heredado, falso)	
 kmb	S2C		Sale con jsn cuando se guarda un look; medidos 49 kmb estando montado y ninguno sin montura. No se envia: los cambios de look llegan igual por jsn. 172 mensajes, 62 ficheros.		
 lqg	S2C		Viaja con lqf (C2S) y lqt; los tres juntos aparecen en 54 ficheros de 19 carpetas. 77 mensajes, 56 ficheros.		
@@ -231,7 +233,7 @@ jau	C2S		No implementado. Exclusivo de las capturas de bolsa de viaje (Merkasako
 kts	C2S		No implementado. Exclusivo de las capturas de caracteristicas (Caracteristicas); 2 mensajes.		
 hks	S2C		No implementado. Exclusivo de las capturas de alianzas (Alianzas); 1 mensajes.		
 jxs	S2C		No implementado. Exclusivo de las capturas de mazmorras (Mazmorras); 1 mensajes.		
-iuv	C2S		No implementado. Exclusivo de las capturas de Steamer; 1 mensajes.		
+iuv	C2S	ShortcutBarMoveRequest	Mover o intercambiar dos huecos de una barra de atajos. El tráfico vivo confirma f1=hueco origen, f2=destino y f3=tipo de barra; 1 es la barra de hechizos.	GameNodeProxy.MoveBarSlot	f1: source slot, f2: target slot, f3: bar
 kkn	C2S		Rama de 3.6.4.3: dispara la rafaga de inicializacion antigua (envia kkp, kkm, krb, ilc, joh, lor, kri, hmd, itp). No aparece en ninguna de las 242 capturas.	GameNodeProxy -> 3.6.4.3 initialisation burst	
 ibt	C2S		Rama de 3.6.4.3: rafaga final (envia icg x3, ith, klt, klp). No aparece en ninguna de las 242 capturas.	GameNodeProxy -> final burst	
 hmv	C2S		Rama de 3.6.4.3: envia hnk y la lista kqm. No aparece en ninguna de las 242 capturas.	GameNodeProxy	

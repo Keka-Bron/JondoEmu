@@ -108,6 +108,9 @@ namespace Jondo.Unity.Launcher.UI
         private readonly LinkLabel _lnkBackToTeam = new();
 
         private readonly LauncherButton _btnClientPath = new();
+        private readonly LauncherButton _btnServerHost = new();
+        private readonly LauncherButton _btnClientSupport = new();
+        private bool _clientSupportBusy;
 
         private readonly StatusIndicator _statusIndicator = new();
 
@@ -123,6 +126,11 @@ namespace Jondo.Unity.Launcher.UI
         private readonly Label _lblVersion = new();
 
         private readonly System.Windows.Forms.Timer _statusTimer = new();
+        // A status request can take several seconds while the server is stopping.  The timer
+        // itself runs on the WinForms thread, so a synchronous request here made the whole
+        // launcher look frozen (and even delayed its close button) just when it was most needed.
+        // One in-flight check is enough; the next timer tick will pick up the new state.
+        private int _statusPollInProgress;
 
         public LauncherWindow()
         {
@@ -138,7 +146,6 @@ namespace Jondo.Unity.Launcher.UI
                     Token = saved.Token,
                     Selected = saved.Selected
                 });
-                LauncherService.RememberSession(saved.AccountId, saved.Token);
             }
             _authenticated = _teamAccounts.Count > 0;
 
@@ -152,7 +159,8 @@ namespace Jondo.Unity.Launcher.UI
             // ventana sin sitio para la tarjeta y los campos se salen por debajo.
             _scale = LauncherTheme.UiZoom = LauncherPreferences.Zoom;
             MinimumSize = new Size((int)(1000 * _scale), (int)(660 * _scale));
-            WindowState = FormWindowState.Maximized;
+            Size = new Size((int)(1280 * _scale), (int)(800 * _scale));
+            WindowState = FormWindowState.Normal;
             KeyPreview = true;
             Font = LauncherTheme.CreateFont(13f);
 
@@ -376,6 +384,32 @@ namespace Jondo.Unity.Launcher.UI
             _btnClientPath.Click += (s, e) => ChooseClient();
             _card.Controls.Add(_btnClientPath);
 
+            // The launcher belongs on a player's PC while the server may live on a VPS. Keeping
+            // the endpoint visible avoids requiring users to hand-edit lanzador.cfg.
+            _btnServerHost.Font = LauncherTheme.CreateFont(9.5f, FontStyle.Bold);
+            _btnServerHost.BackgroundTop = _btnServerHost.BackgroundBottom = Color.FromArgb(170, 34, 22, 13);
+            _btnServerHost.BackgroundTopHighlight = _btnServerHost.BackgroundBottomHighlight = Color.FromArgb(210, 60, 38, 20);
+            _btnServerHost.BorderColor = LauncherTheme.BorderBrown;
+            _btnServerHost.BorderColorHighlight = LauncherTheme.LightGold;
+            _btnServerHost.TextColor = LauncherTheme.SoftGold;
+            _btnServerHost.TextColorHighlight = Color.White;
+            _btnServerHost.CornerRadius = 4;
+            _btnServerHost.Click += (s, e) => ChooseServer();
+            _card.Controls.Add(_btnServerHost);
+
+            _btnClientSupport.Font = LauncherTheme.CreateFont(9.5f, FontStyle.Bold);
+            _btnClientSupport.BackgroundTop = LauncherTheme.GreenTop;
+            _btnClientSupport.BackgroundBottom = LauncherTheme.GreenBottom;
+            _btnClientSupport.BackgroundTopHighlight = LauncherTheme.GreenTopHover;
+            _btnClientSupport.BackgroundBottomHighlight = LauncherTheme.GreenBottomHover;
+            _btnClientSupport.BorderColor = LauncherTheme.GreenBorder;
+            _btnClientSupport.BorderColorHighlight = LauncherTheme.GreenBorder;
+            _btnClientSupport.TextColor = Color.White;
+            _btnClientSupport.TextColorHighlight = Color.White;
+            _btnClientSupport.CornerRadius = 4;
+            _btnClientSupport.Click += async (s, e) => await EnsureClientSupportAsync(showSuccess: true);
+            _card.Controls.Add(_btnClientSupport);
+
             // Service status.
             _statusIndicator.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
             _card.Controls.Add(_statusIndicator);
@@ -389,6 +423,8 @@ namespace Jondo.Unity.Launcher.UI
             Controls.Add(_lblVersion);
 
             RefreshClientPath();
+            RefreshServerAddress();
+            RefreshClientSupport();
             RefreshAccountRows();
         }
 
@@ -446,7 +482,164 @@ namespace Jondo.Unity.Launcher.UI
 
             LauncherPreferences.ClientExecutable = dialogo.FileName;
             RefreshClientPath();
+            RefreshClientSupport();
             RebuildLayout();
+        }
+
+        private void RefreshServerAddress()
+        {
+            string host = LauncherPreferences.ServerHost;
+            _btnServerHost.Text = string.Format(_texts.ServerAddressFormat, host);
+            _tooltips.SetToolTip(_btnServerHost,
+                $"Game services: {host}{Environment.NewLine}Launcher control: {LauncherPreferences.ControlBaseUrl}");
+        }
+
+        private void RefreshClientSupport()
+        {
+            if (_clientSupportBusy) return;
+
+            string client = LauncherService.ResolveClient();
+            if (client.Length == 0)
+            {
+                _btnClientSupport.Text = _texts.ClientSupportInstall;
+                _btnClientSupport.Enabled = false;
+                _tooltips.SetToolTip(_btnClientSupport, _texts.ClientNotFound);
+                return;
+            }
+
+            var status = MelonLoaderInstaller.GetStatus(client);
+            bool ready = status.IsReady;
+            _btnClientSupport.Text = ready
+                ? _texts.ClientSupportReady
+                : _texts.ClientSupportInstall;
+            _btnClientSupport.Enabled = true;
+            _btnClientSupport.BackgroundTop = ready ? Color.FromArgb(65, 108, 34) : LauncherTheme.GreenTop;
+            _btnClientSupport.BackgroundBottom = ready ? Color.FromArgb(38, 74, 23) : LauncherTheme.GreenBottom;
+            _btnClientSupport.BorderColor = ready ? LauncherTheme.OnlineGreen : LauncherTheme.GreenBorder;
+            _tooltips.SetToolTip(_btnClientSupport, status.Message);
+            _btnClientSupport.Invalidate();
+        }
+
+        private async Task<bool> EnsureClientSupportAsync(bool showSuccess)
+        {
+            if (_clientSupportBusy) return false;
+
+            string client = LauncherService.ResolveClient();
+            if (client.Length == 0)
+            {
+                ShowAlert(_texts.ClientNotFound);
+                return false;
+            }
+
+            var before = MelonLoaderInstaller.GetStatus(client);
+            if (before.State == MelonLoaderInstaller.InstallationState.Disabled)
+            {
+                var enabled = MelonLoaderInstaller.SetEnabled(client, enabled: true);
+                if (!enabled.Success)
+                {
+                    ShowAlert(enabled.Message);
+                    return false;
+                }
+                before = MelonLoaderInstaller.GetStatus(client);
+            }
+
+            if (before.IsReady) return true;
+
+            _clientSupportBusy = true;
+            _btnClientSupport.Enabled = false;
+            _btnClientSupport.Text = _texts.ClientSupportInstalling;
+            _btnClientSupport.Invalidate();
+            Cursor = Cursors.WaitCursor;
+
+            try
+            {
+                var progress = new Progress<MelonLoaderInstaller.InstallProgress>(update =>
+                {
+                    _btnClientSupport.Text = $"{_texts.ClientSupportInstalling}  {update.Percent}%";
+                    _tooltips.SetToolTip(_btnClientSupport, update.Message);
+                    _btnClientSupport.Invalidate();
+                });
+
+                var result = await MelonLoaderInstaller.EnsureInstalledAsync(client, progress);
+                if (!result.Success)
+                {
+                    ShowAlert(result.Message);
+                    return false;
+                }
+
+                if (result.Status?.State == MelonLoaderInstaller.InstallationState.Disabled)
+                {
+                    result = MelonLoaderInstaller.SetEnabled(client, enabled: true);
+                    if (!result.Success)
+                    {
+                        ShowAlert(result.Message);
+                        return false;
+                    }
+                }
+
+                if (showSuccess)
+                {
+                    LauncherDialog.Show(this, Text, _texts.ClientSupportInstalled,
+                                        _texts.DialogAccept);
+                }
+                return MelonLoaderInstaller.GetStatus(client).IsReady;
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+                _clientSupportBusy = false;
+                RefreshClientSupport();
+                RebuildLayout();
+            }
+        }
+
+        private void ChooseServer()
+        {
+            if (!LauncherInputDialog.Prompt(this, _texts.ServerAddressTitle,
+                    _texts.ServerAddressHelp, LauncherPreferences.ServerEndpointDisplay,
+                    _texts.SaveButton, _texts.CancelButton, out string entered)) return;
+
+            if (!LauncherPreferences.TryNormalizeServerEndpoint(entered, out string host,
+                                                                  out string controlBaseUrl))
+            {
+                ShowAlert(_texts.InvalidServerAddress);
+                return;
+            }
+
+            if (host.Equals(LauncherPreferences.ServerHost, StringComparison.OrdinalIgnoreCase) &&
+                controlBaseUrl.Equals(LauncherPreferences.ControlBaseUrl,
+                                      StringComparison.OrdinalIgnoreCase)) return;
+
+            LauncherPreferences.SetServerEndpoint(entered);
+            Network.ControlClient.Token = "";
+            _token = "";
+            _account = "";
+            _serverOnline = false;
+
+            // Account tokens belong to the server that issued them. Never display or transmit a
+            // different server's saved team after the endpoint changes.
+            _teamAccounts.Clear();
+            foreach (var saved in LauncherPreferences.LoadAccounts())
+            {
+                _teamAccounts.Add(new TeamAccount
+                {
+                    AccountId = saved.AccountId,
+                    Login = saved.Login,
+                    Nickname = saved.Nickname,
+                    Token = saved.Token,
+                    Selected = saved.Selected,
+                });
+            }
+            _authenticated = _teamAccounts.Count > 0;
+
+            HideAlert();
+            RefreshServerAddress();
+            RefreshTeamSummary();
+            RefreshAccountRows();
+            EnableControls(false);
+            UpdateStatusIndicator();
+            RebuildLayout();
+            CheckStatus();
         }
 
         private void ConfigureLanguageButton(LauncherButton button, string code, Language language)
@@ -539,6 +732,8 @@ namespace Jondo.Unity.Launcher.UI
             _lnkRemoveSelected.Font = LauncherTheme.CreateFont(10f);
             _lnkBackToTeam.Font = LauncherTheme.CreateFont(10f, FontStyle.Bold);
             _btnClientPath.Font = LauncherTheme.CreateFont(9.5f);
+            _btnServerHost.Font = LauncherTheme.CreateFont(9.5f, FontStyle.Bold);
+            _btnClientSupport.Font = LauncherTheme.CreateFont(9.5f, FontStyle.Bold);
             _statusIndicator.Font = LauncherTheme.CreateFont(11f, FontStyle.Bold);
             _lblVersion.Font = LauncherTheme.CreateFont(9f);
         }
@@ -852,8 +1047,12 @@ namespace Jondo.Unity.Launcher.UI
             }
 
             y += Px(14);
+            _btnServerHost.SetBounds(padding, y, inner, Px(28));
+            y += Px(28) + Px(8);
             _btnClientPath.SetBounds(padding, y, inner, Px(26));
-            y += Px(26) + Px(10);
+            y += Px(26) + Px(8);
+            _btnClientSupport.SetBounds(padding, y, inner, Px(30));
+            y += Px(30) + Px(10);
             _statusIndicator.SetBounds(padding, y, inner, Px(16));
             y += Px(16) + padding;
 
@@ -929,6 +1128,8 @@ namespace Jondo.Unity.Launcher.UI
             // El idioma manda también sobre el juego: es el --langCode con el que arranca. Por eso
             // la fila de la ruta lo enseña, para que no haya que adivinar en qué idioma va a abrir.
             RefreshClientPath();
+            RefreshServerAddress();
+            RefreshClientSupport();
 
             _loginTab.Text = _texts.LoginTab;
             _registerTab.Text = _texts.RegisterTab;
@@ -1026,17 +1227,29 @@ namespace Jondo.Unity.Launcher.UI
         //  Actions
         // ═══════════════════════════════════════════════════════════════════════
 
-        private void CheckStatus()
+        private async void CheckStatus()
         {
+            if (Interlocked.Exchange(ref _statusPollInProgress, 1) != 0) return;
+
             bool online;
             try
             {
-                online = LauncherService.GetStatus().Online;
+                // ControlClient is intentionally synchronous so command callers can obtain a
+                // reply directly.  Keep that transport work off the window message pump.
+                online = (await Task.Run(LauncherService.GetStatus)).Online;
             }
             catch
             {
                 online = false;
             }
+            finally
+            {
+                Interlocked.Exchange(ref _statusPollInProgress, 0);
+            }
+
+            // The form may have been closed while the background request was waiting for its
+            // network timeout.  In that case there is nothing left to repaint.
+            if (IsDisposed || Disposing) return;
 
             if (online != _serverOnline)
             {
@@ -1245,7 +1458,7 @@ namespace Jondo.Unity.Launcher.UI
             ChangeTab(false);
         }
 
-        private void LaunchGame()
+        private async void LaunchGame()
         {
             var selected = _teamAccounts.Where(a => a.Selected).ToList();
             if (selected.Count == 0)
@@ -1253,6 +1466,11 @@ namespace Jondo.Unity.Launcher.UI
                 ShowAlert(_texts.SelectAccountError);
                 return;
             }
+
+            // First launch is also the zero-dialog client setup: the official pinned archive is
+            // downloaded, verified and installed together with the bundled JondoFix mod. A
+            // separate button exposes the same operation for users who want to prepare it early.
+            if (!await EnsureClientSupportAsync(showSuccess: false)) return;
 
             var failures = new List<string>();
             Cursor = Cursors.WaitCursor;

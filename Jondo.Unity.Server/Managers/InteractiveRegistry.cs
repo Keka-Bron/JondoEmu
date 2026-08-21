@@ -9,6 +9,11 @@ namespace Jondo.Unity.Launcher.Managers
         Zaap,
         Chest,
         Lottery,
+        Zaapi,
+        Bin,
+        HouseDoor,
+        HouseExit,
+        WorldTransition,
     }
 
     /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
@@ -80,17 +85,21 @@ namespace Jondo.Unity.Launcher.Managers
             new Dictionary<(long, int), RegisteredInteractive>();
 
         public static int Count => _byElement.Count;
+        public static int WorldTransitionCount { get; private set; }
+        public static int SkippedClaimedWorldTransitionCount { get; private set; }
 
         public static void Initialize()
         {
             _byMap.Clear();
             _byElement.Clear();
+            WorldTransitionCount = 0;
+            SkippedClaimedWorldTransitionCount = 0;
 
             // Este orden conserva exactamente el orden histórico dentro del jss.
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var element in Interactives.ZaapElements(mapId))
-                    Register(mapId, element, Interactives.ZaapType,
+                    Register(mapId, element, Interactives.TypeOfZaap(mapId, element),
                         InteractiveActionKind.Zaap, Interactives.UseSkill);
             }
 
@@ -110,7 +119,55 @@ namespace Jondo.Unity.Launcher.Managers
                         InteractiveActionKind.Lottery, Lottery.Skill);
             }
 
-            Console.WriteLine($"[Interactives] {_byElement.Count} elementos registrados.");
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var element in Zaapis.ElementsOn(mapId))
+                    Register(mapId, element, Zaapis.Type, InteractiveActionKind.Zaapi, Zaapis.UseSkill);
+            }
+
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var element in Bins.On(mapId))
+                    Register(mapId, element, Bins.Type, InteractiveActionKind.Bin, Bins.UseSkill);
+            }
+
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var door in Houses.On(mapId))
+                {
+                    Register(mapId, new Interactives.Element(door.ElementId, door.Cell, door.Gfx),
+                        Houses.DoorType, InteractiveActionKind.HouseDoor, Houses.EnterSkill);
+                    Register(mapId, new Interactives.Element(door.ElementId, door.Cell, door.Gfx),
+                        Houses.DoorType, InteractiveActionKind.HouseDoor, Houses.BuySkill);
+                }
+            }
+
+            foreach (long interior in Houses.Interiors)
+            {
+                if (!Houses.TryGetExit(interior, out var exit)) continue;
+                Register(interior, new Interactives.Element(exit.ElementId, exit.Cell, exit.Gfx),
+                    Houses.ExitType, InteractiveActionKind.HouseExit, Houses.ExitSkill);
+            }
+
+            // Registered last on purpose. The world graph is authoritative for its destination,
+            // but it does not replace richer handlers already claimed by a zaap, house, chest,
+            // zaapi, bin or lottery registration on the exact same map element.
+            foreach (var route in WorldInteractiveTransitions.All)
+            {
+                if (_byElement.ContainsKey((route.MapId, route.Element.Id)))
+                {
+                    SkippedClaimedWorldTransitionCount++;
+                    continue;
+                }
+
+                Register(route.MapId, route.Element, route.ProtocolInteractiveType,
+                    InteractiveActionKind.WorldTransition, route.SkillId);
+                WorldTransitionCount++;
+            }
+
+            Console.WriteLine($"[Interactives] {_byElement.Count} elementos registrados; " +
+                              $"{WorldTransitionCount} transición(es) del grafo y " +
+                              $"{SkippedClaimedWorldTransitionCount} ya gestionada(s)." );
         }
 
         public static IReadOnlyList<RegisteredInteractive> OnMap(long mapId)

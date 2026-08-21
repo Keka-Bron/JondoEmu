@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "clientVersion": "3.6.10.10",
+  "purpose": "Reviewed returns for client interior maps whose world-graph entry has no reciprocal interactive edge. These rows bind only to the session that used the exact entry.",
+  "source": {
+    "entry": "world-graph.asset, pathType 32, criterion-free route",
+    "exit": "Content/Map/Data/mapdata_assets_world_735.bundle::map_192675846",
+    "validated": "2026-08-21 live Jondo trace: 191105028/537304 skill 184 entered 192675846; client then emitted jqi without jqk at its return cell."
+  },
+  "returns": [
+    {
+      "entry": {
+        "mapId": 191105028,
+        "elementId": 537304,
+        "sourceCellId": 163,
+        "gfxId": 62986,
+        "skillId": 184,
+        "targetMapId": 192675846
+      },
+      "exit": {
+        "mapId": 192675846,
+        "elementId": 515309,
+        "cellId": 261,
+        "gfxId": 62990
+      },
+      "return": {
+        "mapId": 191105028,
+        "cellId": 163
+      }
+    }
+  ]
+}

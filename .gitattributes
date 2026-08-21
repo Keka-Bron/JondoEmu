@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Captured protocol/map frames are opaque byte streams, even where an individual sample happens
+# to contain readable strings. Keep Git from applying text normalization or whitespace checks.
+*.bin binary

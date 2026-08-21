@@ -1,0 +1,22 @@
+{
+  "name": "jondo-electron-admin",
+  "private": true,
+  "version": "3.6.10.10",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5174 && electron .\"",
+    "build": "vite build",
+    "package": "npm run build && electron-builder --win portable"
+  },
+  "dependencies": { "react": "19.1.1", "react-dom": "19.1.1" },
+  "devDependencies": { "@vitejs/plugin-react": "5.0.2", "concurrently": "9.2.1", "electron": "37.4.0", "electron-builder": "26.0.12", "vite": "7.1.4", "wait-on": "8.0.3" },
+  "build": {
+    "appId": "com.jondo.admin",
+    "productName": "Jondo Admin",
+    "artifactName": "${productName}.${ext}",
+    "asar": true,
+    "files": ["build/**/*", "electron/**/*", "package.json"],
+    "directories": { "output": "release-admin" },
+    "win": { "target": ["portable"], "icon": "../launcher_assets/icon.ico" }
+  }
+}

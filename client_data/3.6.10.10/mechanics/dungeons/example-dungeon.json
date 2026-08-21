@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "example-dungeon-mechanic",
+  "kind": "dungeon-mechanic-map",
+  "status": "Draft",
+  "sourceUrl": "https://www.dofuspourlesnoobs.com/",
+  "sourceRetrievedUtc": "2026-08-21T00:00:00Z",
+  "clientVersion": "3.6.10.10",
+  "dungeon": {
+    "clientDungeonId": 0,
+    "name": "Replace with an identified dungeon",
+    "roomMapIds": []
+  },
+  "encounters": [],
+  "rules": [],
+  "evidence": {
+    "guideSummary": "Guide-derived requirement only. Add exact page URL and a concise paraphrase.",
+    "clientCatalogReferences": [],
+    "capturedProtocolReferences": [],
+    "acceptanceTests": []
+  },
+  "safety": {
+    "requiresMeasuredHandler": true,
+    "neverInventPackets": true,
+    "playerStateWrites": []
+  }
+}

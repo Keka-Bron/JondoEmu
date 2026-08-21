@@ -17,6 +17,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             int skillInstanceId = 0;
             int elementId = 0;
+            int additionalParam = 0;
             foreach (var field in ProtoMessage.Parse(iwo).Fields)
             {
                 if (field.WireType != 0) continue;
@@ -27,14 +28,24 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
                 if (field.FieldNumber == 1) skillInstanceId = (int)field.VarIntValue;
                 else if (field.FieldNumber == 2) elementId = (int)field.VarIntValue;
+                else if (field.FieldNumber == 3) additionalParam = (int)field.VarIntValue;
             }
+
+            // A pending purchase belongs to the exact interaction that opened it. Any new iwo,
+            // including one we cannot resolve, invalidates the previous confirmation.
+            SessionContext.State.ClearPendingHousePurchase();
 
             long mapId = SessionContext.State.MapId;
             if (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId,
                                                    out var interactive, out var action))
             {
+                var element = Interactives.ByElementId(mapId, elementId);
+                long telemetryId = UnknownPacketStore.RecordUnhandledInteractiveUse(
+                    payload, SessionContext.Actual, mapId, elementId, skillInstanceId, additionalParam,
+                    element.Cell, element.Gfx);
                 Console.WriteLine($"[Interactives] Uso desconocido: mapa {mapId}, elemento " +
-                                  $"{elementId}, instancia {skillInstanceId}.");
+                                  $"{elementId}, instancia {skillInstanceId}, parámetro {additionalParam}" +
+                                  (telemetryId > 0 ? $" (telemetría #{telemetryId})." : "."));
                 return;
             }
 
@@ -48,6 +59,26 @@ namespace Jondo.Unity.Launcher.Handlers
                     break;
                 case InteractiveActionKind.Lottery:
                     await LotteryHandler.DrawAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.Zaapi:
+                    await ZaapiTravelHandler.OpenAsync(stream, interactive.Element, action.SkillId);
+                    break;
+                case InteractiveActionKind.Bin:
+                    await BinHandler.OpenAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.HouseDoor:
+                    if (action.SkillId == Houses.EnterSkill)
+                        await HouseHandler.EnterAsync(stream, interactive.Element.Id, action.SkillId,
+                                                      additionalParam);
+                    else if (action.SkillId == Houses.BuySkill)
+                        await HouseHandler.OpenPurchaseAsync(stream, interactive.Element.Id,
+                                                            action.SkillId, additionalParam);
+                    break;
+                case InteractiveActionKind.HouseExit:
+                    await HouseHandler.LeaveAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.WorldTransition:
+                    await WorldInteractiveTransitionHandler.UseAsync(stream, interactive, action);
                     break;
                 default:
                     throw new InvalidOperationException($"Acción interactiva no gestionada: {action.Kind}.");

@@ -34,11 +34,12 @@ namespace Jondo.Unity.Launcher.Network
             _cts = new CancellationTokenSource();
 
             // Igual que en el Zaap: la bandera, después del bind. Si no, IsRunning miente.
-            _tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            _tcpListener = new TcpListener(ServerBinding.TcpAddress, port);
             _tcpListener.Start();
             _isRunning = true;
 
-            Console.WriteLine($"[+] Emulating Game Server on TCP port {port} (Binary Protocol)");
+            Console.WriteLine($"[+] Emulating Game Server on TCP port {port} " +
+                              $"(Binary Protocol, {ServerBinding.Description})");
             Console.WriteLine($"[+] Game Server logs will be saved to {Paths.TrafficLog}");
 
             _ = Task.Run(async () =>
@@ -179,8 +180,8 @@ namespace Jondo.Unity.Launcher.Network
                 try
                 {
                     var req = Jondo.Protocol.GameMessage.Parser.ParseFrom(payload);
-                    if (req.Auth != null)
-                    {
+                        if (req.Auth != null)
+                        {
                         if (!string.IsNullOrEmpty(req.Auth.Lang)) lang = req.Auth.Lang;
 
                         if (req.Auth.Ticket != null)
@@ -232,13 +233,28 @@ namespace Jondo.Unity.Launcher.Network
                                               $"to port {Program.gamePort}.");
 
                             // The client closes this connection and opens another one with the ticket.
-                            return;
+                                return;
+                            }
+                            else
+                            {
+                                long queueId = UnknownPacketStore.RecordUnhandledConnectionPacket(payload);
+                                if (queueId > 0)
+                                    Console.WriteLine($"[Packet Telemetry] Unhandled connection auth packet queued as #{queueId}.");
+                            }
                         }
-                    }
+                        else
+                        {
+                            long queueId = UnknownPacketStore.RecordUnhandledConnectionPacket(payload);
+                            if (queueId > 0)
+                                Console.WriteLine($"[Packet Telemetry] Unhandled connection packet queued as #{queueId}.");
+                        }
                 }
                 catch (Exception protoEx)
                 {
+                    long queueId = UnknownPacketStore.RecordConnectionDecodeFailure(payload, protoEx);
                     Program.LogDebug($"[Connection Server] Unrecognized frame: {protoEx.Message}");
+                    if (queueId > 0)
+                        Console.WriteLine($"[Packet Telemetry] Connection decode failure queued as #{queueId}.");
                 }
 
                 payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(clientStream);
@@ -249,14 +265,15 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// Resolves the account from the game token the client presents. The token is issued by
-        /// the launcher on login and stored on the account.
+        /// Resolves the account from the short-lived game token the client presents. It is issued
+        /// by Zaap/HAAPI for this game launch and is deliberately distinct from the token the
+        /// native launcher persists for its control API.
         /// </summary>
         private static long ResolveAccount(string? token)
         {
             if (!string.IsNullOrWhiteSpace(token))
             {
-                long byToken = ClientLaunchRegistry.ResolveToken(token);
+                long byToken = ClientLaunchRegistry.ResolveGameToken(token);
                 if (byToken > 0)
                 {
                     Console.WriteLine($"[Connection Server] Token recognized: account {byToken}.");

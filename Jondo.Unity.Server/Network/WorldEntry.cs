@@ -111,6 +111,14 @@ namespace Jondo.Unity.Launcher.Network
             //        bloque de aspecto entero. Es lo mismo que ihb, que ya estaba fuera por esto.
             //        Sin implementar los conjuntos, no mandar nada es lo que ve una cuenta nueva.
             Op.TitlesAndOrnamentsListMessage, Op.OutfitsListMessage,
+
+            // Per-character progression from the recorded account.  Replaying it is why a new
+            // character appeared to own completed achievements and unrelated open quests.  The
+            // emulator has no persistent quest/achievement engine yet, so the truthful baseline
+            // is an empty journal and no completion state.  `idr`/`iel` are consumed by the
+            // client's quest update owner and `mft` by its achievement-clear owner in the pinned
+            // 3.6.10.10 client; lry/isf/lol/izu cover the named quest-list/update messages.
+            Op.Lry, Op.Isf, Op.Lol, Op.Izu, "idr", "iel", "mft",
         };
 
         /// <summary>Character id the capture belongs to. Learned from the blocks, never written down.</summary>
@@ -608,6 +616,10 @@ namespace Jondo.Unity.Launcher.Network
 
             // And in place of the characteristics of the capture, the ones of this character.
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
+            // The capture does normally contain ivx and Rebuilt replaces it.  Send this
+            // authoritative snapshot explicitly as well: an incomplete/new capture must never
+            // leave the recorded player's UIDs visible to a newly selected character.
+            await EnviarAsync(stream, ConnectionProtocol.Push(Op.InventoryContentMessage, ConnectionProtocol.BuildInventory()));
             Console.WriteLine($"[World] Characteristics sent for {character.Name}: level " +
                               $"{Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}, {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas} kamas.");
 
@@ -672,7 +684,14 @@ namespace Jondo.Unity.Launcher.Network
             // keeps: sending it only in the first block left the sheet empty.
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
 
-            Console.WriteLine($"[World] Block 3 sent: {sent} messages, map {mapId}, characteristics resent.");
+            // The client treats this as the authoritative discovery state for the travel window.
+            // It is separate from map discovery and is not present in the captured map block.
+            var discoveredZaaps = new List<long>(Managers.Interactives.DiscoveredZaapMaps());
+            await EnviarAsync(stream, ConnectionProtocol.Push(Op.Hjk,
+                ConnectionProtocol.BuildDiscoveredZaaps(discoveredZaaps)));
+
+            Console.WriteLine($"[World] Block 3 sent: {sent} messages, map {mapId}, characteristics " +
+                              $"resent, {discoveredZaaps.Count} zaaps discovered.");
             return sent;
         }
 

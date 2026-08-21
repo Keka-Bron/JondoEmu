@@ -203,6 +203,13 @@ namespace Jondo.Unity.Launcher.Managers
         /// </summary>
         public static List<MobGroup> GetMobsForMap(long mapId)
         {
+            // MapMobs is an emulator seed table, not evidence that every map is a combat map.
+            // The official position layer marks social/building interiors as non-outdoor.  Keep
+            // actual dungeon rooms eligible: those are the one indoor category whose client
+            // data explicitly says they contain encounters.  This is deliberately checked at
+            // serving time too, so an old seed row can never put monsters back into a house.
+            if (IsSocialInterior(mapId)) return new List<MobGroup>();
+
             lock (_candado)
             {
                 if (_mapMobs.TryGetValue(mapId, out var mobs) && mobs.Count > 0)
@@ -312,6 +319,8 @@ namespace Jondo.Unity.Launcher.Managers
             var result = new List<MobGroup>();
             if (_monsters.Count == 0) return result;
 
+            if (IsSocialInterior(mapId)) return result;
+
             // En el merkasako no se pelea con nadie: es la casa de uno.
             if (Merkasako.IsHavenBag(mapId)) return result;
 
@@ -338,6 +347,7 @@ namespace Jondo.Unity.Launcher.Managers
         public static MobGroup? RespawnOneGroup(long mapId)
         {
             if (_monsters.Count == 0) return null;
+            if (IsSocialInterior(mapId)) return null;
 
             lock (_candado)
             {
@@ -400,6 +410,18 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             return innerCells.Count > 0 ? innerCells : cells;
+        }
+
+        /// <summary>
+        /// Houses, shops and other role-play interiors share <c>Outdoor=0</c> with dungeon
+        /// maps.  Only the latter may host monsters, and their membership is extracted from the
+        /// pinned client dungeon catalogue.  Unknown maps are left alone to avoid hiding mobs
+        /// when the position catalogue is incomplete.
+        /// </summary>
+        public static bool IsSocialInterior(long mapId)
+        {
+            var map = MapManager.GetMapInfo(mapId);
+            return map != null && !map.Outdoor && !DungeonManager.IsRoom(mapId);
         }
 
         /// <summary>

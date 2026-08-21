@@ -3,10 +3,10 @@
 How Jondo declares clickable map elements, resolves a client's use request and dispatches it to
 the correct game behaviour without mixing maps or game sessions.
 
-This document describes the generic interactive registry introduced in August 2026. Zaaps,
-haven-bag chests and the haven-bag lottery are the first three actions migrated to it. Their
-protocol behaviour did not change: the registry centralises discovery and routing, while their
-existing handlers still build the same replies.
+This document describes the generic interactive registry introduced in August 2026. It now
+routes zaaps, zaapis, haven-bag objects, bins, persistent houses and the criterion-free portion of
+the 3.6.10.10 world transition graph. The registry centralises discovery and request validation;
+each feature handler still owns its state changes and protocol replies.
 
 The architecture follows the useful separation also found in the Dofus 2.68 Giny server:
 an element definition, an action attached to it, and one dispatcher for use requests. Jondo does
@@ -18,7 +18,7 @@ the protobuf messages measured for that client.
 ## 1. What an interactive element is
 
 The map data already tells the client that a graphical element exists. For each element Jondo
-extracts three values into `datos/interactive_elements.json`:
+extracts three values into the pinned `datos/interactive_elements_3.6.10.10.json`:
 
 | Value | Meaning |
 |---|---|
@@ -37,10 +37,10 @@ client:
 The client data therefore answers *where and what graphic is present*. The server registry answers
 *what the player can do with it*.
 
-The raw client elements and zaap lookup remain in
-`Jondo.Unity.Launcher/Managers/Interactives.cs`. The server-owned declarations are represented by
+The raw client elements and zaap lookup live in
+`Jondo.Unity.Server/Managers/Interactives.cs`. The server-owned declarations are represented by
 `RegisteredInteractive` and `InteractiveAction` in
-`Jondo.Unity.Launcher/Managers/InteractiveRegistry.cs`.
+`Jondo.Unity.Server/Managers/InteractiveRegistry.cs`.
 
 ---
 
@@ -73,8 +73,7 @@ Each action contains:
 | `SkillId` | Protocol skill id advertised to and returned to the client |
 | `SkillInstanceId` | Instance id used to validate an `iwo` request |
 
-`InteractiveActionKind` currently contains `Zaap`, `Chest` and `Lottery`. This enum is an internal
-routing choice; it is not a value sent over the network.
+`InteractiveActionKind` is an internal routing choice; it is not a value sent over the network.
 
 The first action on an element keeps the historical stable instance formula:
 
@@ -90,9 +89,14 @@ registry.
 
 | Action kind | Element discovery | Type | Skill | Existing handler |
 |---|---|---:|---:|---|
-| Zaap | Known zaap graphic, haven-bag zaap or explicit override | 16 | 114 | `ZaapTravelHandler` |
+| Zaap | Official waypoint joined to its map element, haven-bag zaap or explicit evidence-backed override | 16 | 114 | `ZaapTravelHandler` |
 | Chest | Graphic 12367 on a haven-bag map | 85 | 104 | `ChestHandler` |
 | Lottery | Graphic 51031 on a haven-bag map | -1 | 184 | `LotteryHandler` |
+| Zaapi | Pinned city-transport catalogue | 106 | 157 | `ZaapiTravelHandler` |
+| Bin | Pinned bin catalogue | 105 | 153 | `BinHandler` |
+| House door | Active server house placement joined to the live map element | 300 | 84 / 97 | `HouseHandler` |
+| House exit | Active interior exit joined to the live map element | 316 | 184 | `HouseHandler` |
+| World transition | Safe route from the pinned client world graph | -1 unless separately proven | graph skill | `WorldInteractiveTransitionHandler` |
 
 These values come from the existing 3.6 implementation and captures. The migration does not
 reinterpret them.
@@ -334,7 +338,14 @@ initialised. It checks that:
 - every registered `(map, element, skill instance)` resolves to the same object and action;
 - a deliberately mismatched skill instance is rejected.
 
-An unresolved request produces a log containing its map, element and skill-instance ids:
+An unresolved request produces both a console line and one deduplicated `New`
+`UnhandledInteractiveUse` row in `bases/packet_telemetry.db`. Its fingerprint contains the map,
+element, skill instance and additional parameter, so actions that share the `iwo` protobuf shape
+do not collapse into one vague row. The telemetry hint preserves the element's client-data cell
+and graphic and asks for the surrounding S2C frames—the missing proof for a door, workshop,
+resource or HDV handler.
+
+The console line contains the same identity:
 
 ```text
 [Interactives] Uso desconocido: mapa ..., elemento ..., instancia ...
@@ -397,3 +408,77 @@ animation/category value and is not the interactive type sent in `jss`; treating
 would misdeclare zaaps, chests and resources. Giny 2.68 remains useful for behaviour and database
 architecture, but its packet classes and hard-coded element mappings must not be copied as 3.6
 protocol truth.
+
+## 9. World-graph doors, stairs and ladders
+
+`tools/extraer_transiciones_mundo.py` reads two pinned 3.6.10.10 client sources together:
+
+- every live map element (`mapId`, `m_interactionId`, cell and graphic) from the map bundles;
+- `Assets/Content/World/world-graph.asset`, whose pathfinding edges name an interactive skill and
+  destination map.
+
+The deterministic output is `datos/world_interactive_transitions_3.6.10.10.json`. The server only
+loads `safeRoutes`: path type 32 (`Interactive`), an empty criterion, one skill and one destination
+for the exact element. It joins the row back to the live map catalogue by all four identity fields
+(map, element, cell and graphic) and rejects the whole element on any conflict. Conditional and
+multi-target routes remain in the evidence document but are not guessed into handlers.
+
+For this pinned client, the extractor found 44,072 live interactive elements and 5,503 type-32
+graph routes. Only 4,174 routes still join the current map bundles; 1,329 orphan routes are kept as
+evidence but excluded. Applying the criterion/single-target/single-skill rule leaves 3,093 source
+rows grouped into 3,091 clickable elements. An exact reciprocal edge supplies a derived arrival
+for 2,895 rows; the remaining 198 deliberately use the nearest safe centre cell.
+
+Pathfinding type 32 is **not** a `jss` interactive type. A graph route is therefore declared with
+type -1 unless a separate, evidence-backed `protocolInteractiveTypeId` is present. These generic
+routes register after zaaps, houses, chests, zaapis, bins and the lottery; if one of those richer
+handlers already owns the same `(map, element)`, the generic route is deliberately skipped.
+Conversely, the graphic-based house heuristic yields to every exact type-32 evidence key,
+including criterion-gated keys which are not safe to execute automatically. That prevents an
+invented house destination from hiding a known world transition.
+
+On `iwo`, `WorldInteractiveTransitionHandler` revalidates the map, element, skill and source-cell
+proximity, sends the ordinary `iwn`, persists the character's new map/cell, and runs the same
+`jsd -> jru -> lqu -> hjk` sequence used by border movement. The graph stores no target cell. When
+there is one unambiguous exact reciprocal edge its source cell is labelled and used as a derived
+arrival candidate; otherwise the server chooses the safe walkable cell nearest the target-map
+centre. No reciprocal cell is invented when the evidence is missing.
+
+## 10. House doors and persistent ownership
+
+House doors are specialized registrations, but only after exact world-graph keys have been removed
+from the graphic-based candidate set. `casas_mundo_3.6.10.10.json` is a server-owned placement
+catalogue: the client supplies house graphics and 261 static house models, but it does not contain
+the official server's placement, owner or interior assignments. Those assignments must therefore
+not be described as official client data.
+
+The current snapshot begins with 1,437 configured exterior candidates. Joining them to the live
+map bundles removes 156 stale elements, and exact graph evidence removes 15 misclassified generic
+doors. Interior exits undergo the same checks: 36 are stale and 45 belong to the graph. Removing
+houses that would have no supported way out leaves 674 active exterior doors and 106 interiors.
+Every accepted exterior `(mapId, elementId)` is materialized once in SQLite `Houses`; its stable
+id, owner, price, listing and access flags survive restarts. The official client model catalogue is
+stored separately in `HouseTemplates`. Because the client contains no placement-to-model relation,
+zero-model legacy rows are migrated to the deterministic lowest positive-price client template;
+an administrator's non-zero assignment is preserved.
+
+The map block now emits `jss.f9` as the recovered `lpx -> lpt -> lnx` structure. Door element ids
+and house instances are paired, optional price presence expresses whether a house is offered, and
+known owners carry their auth-database nickname and stable account tag.
+
+The Cpp2IL-generated `lnx` model also resolves an extractor trap in the pinned `.proto`: `gcfn`
+is the presence accessor for optional price f7, not a boolean f8 on the wire. The serialized tail
+is f8 account tag, f9 admin lock, f10 room count, f11 skill ids and f12 instance id.
+
+Skill 97 sends `iwn` and `khr`, then stores a one-shot pending offer in that player's
+`SessionState`. The following `jal` only contains a proposed price, so the server resolves the
+house from the recorded map and element—not from `iwo.f3`. It validates the full offer snapshot
+again in the same SQLite transaction that deducts kamas and transfers ownership. Both the initial
+click and the confirmation must be on or adjacent to the exact door cell. The supported transfer
+is deliberately first-hand only: listed owned houses remain descriptive metadata until a capture
+proves where the seller is credited. The only evidenced immediate update is `ivf`; no speculative
+house-success opcode is emitted.
+
+Entering skill 84 checks the persistent access policy and sends the measured `iwn -> jqw` house
+sequence. The registered interior exit uses skill 184 and the measured `iwn -> jru` sequence back
+to the exterior. Both sides persist the character map/cell before announcing the map change.

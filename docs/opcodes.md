@@ -105,7 +105,7 @@ the order of the capture.
 | `kvd` | S→C | 4 / 3 files | Closes the character list. Empty, immediately behind `kvi` in the real burst. It was not being sent, and it is the leading candidate for the dead create-character button: the client received the list and nothing saying the list was complete. | `BuildWelcomeBurst` | empty |
 | `jtg` | S→C | 11 / 7 files | Catalogue of gift items on the account. Sent empty — our accounts own none. | `BuildGiftCatalogue` | `f3 (rep) { f1 { f2: name, f3 {…item…}, f6 {…description…} }, f2: id }` |
 | `kqq` | C→S | 3 / 3 files | The client is going back to the character or server screen. | `GameNodeProxy` | — |
-| `kqr` | S→C | 3 / 3 files | Answer to `kqq`. The client then closes the connection itself and redoes the handshake. | `GameNodeProxy.BuildKqrPayload` | `f1: session guid, f4: 1` |
+| `kqr` | S→C | 3 / 3 files | Answer to `kqq`. The client then closes the connection itself and redoes the handshake. | `GameNodeProxy.BuildKqrPayload` | `f1: renewed game-auth token, f4: 1` |
 
 `kvc` (client to server, 10 times across 9 files) and `krv` (9 across 8) appear at this point in the
 captures as **client** messages. An earlier version of this emulator echoed them back at the
@@ -115,8 +115,11 @@ client; they are deliberately not in the burst.
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
+| `kwb` | C→S | 2 / 2 files | The selection UI asks to open another character slot after the account list has loaded. The server validates the account/server capacity and continues with empty `kvd`. | `CharacterCreationHandler.ConfirmCanCreateAsync` | empty |
+| `kvd` | S→C | 4 / 3 files | Closes a `kvi` character list. It also is the empty continuation for `kwb`; it must follow every refreshed list as well as an accepted extra-slot request. | `BuildWelcomeBurst`, `CharacterCreationHandler` | empty |
 | `kvz` | C→S | 2 / 2 files | Create a character. | `CharacterCreationHandler.CreateAsync` | read for name, breed, sex, look |
 | `kvb` | S→C | 2 / 2 files | Result of the creation. Empty on success; `f2` carries the refusal reason. | `CharacterCreationHandler` | empty, or `f2: reason` |
+| `kwd` | C→S | 2 / 2 files | The dice button requests a random character name. | `CharacterCreationHandler.SuggestNameAsync` | empty |
 | `kvk` | S→C | 8 / 2 files | A suggested character name (the dice button). | `CharacterCreationHandler.SuggestNameAsync` | `f1: name` |
 | `kvw` | C→S | 2 / 2 files | Select a character. The id is checked against the session's account: the client picks it, so it cannot be trusted. | `CharacterSelectionHandler` | read for character id |
 | `kvl` | C→S | 1 / 1 file | Same step straight after a successful creation — the client sends `kvl` behind `kvi` and enters the world without passing through the list. | `CharacterSelectionHandler` | read for character id |
@@ -155,7 +158,7 @@ its own stored capture to decide what to substitute, not reading the client.
 | `kub` | S→C | 188 / 54 files | The character sheet. The container field is **not** the same for every characteristic and getting it wrong kills the whole sheet with a `NullReferenceException` in the client's own log. Which id uses which container is read off the captured `kub`, not written down. Sent twice — once with the character, once with the map; the client keeps the second. | `BuildCharacteristics`, `WorldEntry.ContainerOf` | `f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {…} } }` — containers: `f4 {f2: base, f3: parchments, f7: equipment}` for most, `f5 {f1: base, f5: bonus}` for 1 and 23, `f2 {f2: value}` for 29, 47 and 96 |
 | `irq` | S→C | 93 / 11 files | Jobs. The id list is kept (it is game data); the captured progress is thrown away and every job goes out at level 1. | `WorldEntry.ResetJobs` | `f1 (rep) { f1: job id, f3: level, f4/f5: experience }` |
 | `hms` | S→C | 8 / 6 files | The spells the character has, each at the grade its level opens. | `BuildSpellList` | `f1 (rep) { f1: grade, f3: spell id, f4: 1 }` |
-| `ivx` | S→C | 68 / 27 files | The inventory, built from the database. Slot omitted when zero, because zero is the amulet. | `BuildInventory` | `f3 (rep) { f1: slot, f5 { f1: template, f2 (rep) {…value…, f11: effect}, f3: quantity, f4: uid } }` |
+| `ivx` | S→C | 68 / 27 files | The authoritative character inventory, built from the database. It is sent on world entry and again if the client tries to move an unknown/stale UID; slot omitted when zero, because zero is the amulet. | `BuildInventory`, `EquipmentHandler` | `f3 (rep) { f1: slot, f5 { f1: template, f2 (rep) {…value…, f11: effect}, f3: quantity, f4: uid } }` |
 | `itg` | S→C | 19 / 7 files | The shortcut bars. The server sends **two**, and nothing inside the message says which is which: a slot holding a spell carries `f6`, one holding an item carries `f9`. The trailing bare `f2` is the bar type — the spell bar carries `f2: 1`, the item bar omits it (type zero). | `BuildSpellBar`, `WorldEntry.Rebuilt` | `f1 (rep) { f2: slot, f6 { f2: spell id } }, f2: 1` |
 
 The three experience fields of `kub` are not in the order they look. `f1` is the threshold of the
@@ -264,6 +267,9 @@ Spells come in pairs and the character holds one half. Measured on four real var
 | `iuq` | S→C | 147 / 10 files | One per bar slot that held the old half — a swap capture produced two of them because the spell sat in two slots, which is how we know it is one per slot and not one per swap. Sent **before** `hng`. | `BuildShortcutChanged` | `f2 { f2: slot, f6 { f2: spell id } }, f3: bar` |
 | `hng` | S→C | 123 / 11 files | The new spell and the grade the character's level opens. | `BuildSpellSwapped` | `f2: spell id, f3: grade` |
 | `itz` | C→S | 38 / 6 files | Edit one slot of a shortcut bar. Also written to the database — otherwise the bar is rebuilt identically each session and anything the player places is lost on exit. | `GameNodeProxy.RememberShortcut` | `f2 { f2: slot, f6 { f2: spell id } }, f3: bar` |
+| `iul` | C→S | observed in live traffic | Remove one shortcut from the context menu. `f1` is the bar type; `f2` is the slot. The server persists the removal and replaces the spell-bar content. | `GameNodeProxy` → `SpellChoices.PutInBar(slot, 0)` → `itg` | `f1: bar, f2: slot` |
+| `iuv` | C→S | observed in live traffic | Drag an existing shortcut within an action bar. `f1` is the source slot, `f2` the target slot and `f3` the bar type; `1` is the spell bar. The server moves to an empty target or swaps with its occupant, persists the two slots atomically, then replaces spell-bar content with `itg`. | `GameNodeProxy` → `SpellChoices.MoveBarSlot` → `itg` | `f1: source, f2: target, f3: bar` |
+| `iuz` | C→S | 1 / 2 files | Clear the selected action bar. The Dofus client sends `f2: 1` for the spell bar; its enclosing UI wrapper adds a trailing `f2: -1` action marker. The server deletes `CharacterSpellBar` slots, records the deliberately-empty state, then replaces the UI with an empty `itg` (`f2: 1`, no entries). | `GameNodeProxy` → `SpellChoices.ClearBar` → `itg` | `f2: 1` |
 | `ivk` | S→C | 40 / 7 files | The echo: the very same entry the client sent. | `GameNodeProxy` | identical to the `itz` payload |
 
 ### 2.9 Zaaps
@@ -277,7 +283,7 @@ C  hjc { f3: destination map }                    S  jsd, jru, lqu, hjk, ivf, kl
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
-| `iwo` | C→S | 220 / 81 files | Clicked an interactive element. The zaap, the chest and the lottery all arrive here. | `ZaapTravelHandler.UseAsync` | `f1: skill instance uid, f2: element id` |
+| `iwo` | C→S | 220 / 81 files | Clicked an interactive element. Specialized handlers resolve zaaps, houses, chests, zaapis, bins and the lottery; criterion-free single-target doors/stairs/ladders additionally resolve through the pinned client world graph. An unregistered map/element/skill is retained as a `New` `UnhandledInteractiveUse` telemetry row, including its map-data cell/gfx and the additional parameter, rather than being guessed as a workshop, resource or HDV. | `InteractiveActionHandler.UseAsync` | `f1: skill instance uid, f2: element id, f3: additional parameter` |
 | `iwn` | S→C | 402 / 102 files | "That element is in use." `f2` is the **element**, not the skill instance: crossing `iwo` and `iwn` in the same capture shows the client sending both numbers and the server returning the second. Sending the first marks an element that does not exist as busy. | `BuildElementInUse` | `f1: 1, f2: element id, f4: skill, f5: who` |
 | `hjj` | S→C | 12 / 11 files | The destination list. `f6` was checked against `MapPositions` on all 25 entries of the capture and matches every one. The destination you are already standing on travels without `f2`, which in proto3 is zero: going where you already are costs nothing. | `BuildZaapList` | `f2: map of the open zaap, f3 (rep) { f1: area level, f2: cost, f5: map, f6: subarea }` |
 | `hjc` | C→S | 11 / 10 files | Destination chosen. | `ZaapTravelHandler.TravelAsync` | `f3: destination map` |
@@ -288,7 +294,39 @@ Travel cost is ours. The real server scales it by distance (170 to 1080 across t
 destinations dearer) but the formula is in no client data file, so this one reproduces the shape
 and the range without claiming to be the original.
 
-### 2.10 Haven bag (merkasako)
+### 2.10 Houses
+
+The client contributes two different kinds of evidence. `HousesDataRoot` contains 261 static
+models (model id, default price, text ids, gfx and room count); `jss.f9` carries the mutable server
+instance behind each exterior element. There is no client placement-to-model join, so newly
+materialized emulator instances receive the deterministic lowest positive-price model (215) until
+an administrator assigns a more precise non-zero model. Existing non-zero assignments are never
+overwritten.
+
+| Opcode | Dir | What it does | Payload |
+|---|---|---|---|
+| `jss.f9` | S→C | House metadata on the current map. | `lpx { f2: house id, f4: client model, f7: lpt { f1: packed door elements, f2 (rep): lnx } }`; `lnx` uses f1 second-hand, f2 locked, f4 has-owner, optional f7 price (presence means listed), f8 account tag, f10 rooms and f12 instance id. |
+| `iwo` skill 97 | C→S | Selects a registered house door. `f3` is not trusted as purchase identity. | normal interactive fields |
+| `khr` | S→C | Opens the BUY confirmation. Enum BUY is zero and is omitted by proto3. | `f1: second-hand, f2: house id, f3: instance id, f4: action=0, f5: price` |
+| `jal` | C→S | Confirms the displayed price. It carries no house id. | `f1: proposed price` |
+| `ivf` | S→C | Synchronizes the remaining kamas after the atomic transfer. | `f1: kamas` |
+
+The current-client Cpp2IL class is authoritative where the generated pinned `.proto` disagrees:
+`lnx.gcfn` is the generated `HasPrice` property for optional f7, not a serialized f8. The actual
+constant/backing-field sequence is f8 `lfi gcfo`, f9 `bool gcfp`, f10 `int32 gcfq`, f11 repeated
+`int32 gcfr`, f12 `int32 gcfs`, matching the builder above.
+
+The pending offer is session-local and records account, character, map, element, owner/listing
+snapshot and price. `jal` must match it exactly, and `HouseManager.TryPurchase` checks that same
+snapshot again inside the SQLite transaction before debiting. A map change or disconnect clears
+the offer. The click and confirmation must also remain on the exterior door or one of its eight
+adjacent roleplay cells. Only first-hand houses can currently be bought: an owned listing is not
+transferred until the seller-credit destination is captured, because overwriting its owner would
+destroy the seller's value. No `jam` is sent: the client owner audit places that opcode in a
+haven-bag-adjacent handler, not the house purchase flow, so treating it as success would be
+invented protocol.
+
+### 2.11 Haven bag (merkasako)
 
 *Merkasako* is the Spanish name of the haven bag, and the one this codebase uses throughout —
 `MerkasakoHandler`, `Managers.Merkasako`. It is the same thing.
@@ -305,7 +343,7 @@ and the range without claiming to be the original.
 | `jbu` | S→C | 10 / 7 files | The furniture in the room, expected behind the map. Same shape as `jbg` but on `f1` instead of `f2`. | `BuildHavenBagFurniture` | `f1 (rep) { f1: cell, f2: furniture, f3: orientation }` |
 | `jaz` | S→C | 14 / 7 files | Sent with the furniture, between `jss` and `lva`. Meaning *not established*. | `MerkasakoHandler` | empty |
 
-### 2.11 The appearance window (cosmetics)
+### 2.12 The appearance window (cosmetics)
 
 This window works on a **draft**, and respecting that is what makes it behave. While the player is
 fiddling the server sends **only** `lxc`, which is the panel's own preview and nobody else sees it.
@@ -331,7 +369,7 @@ across the fourteen captures that end in a save.
 `lxs` — the Save button — is in section 2.12, because saving commits the title and the ornament
 together with the look.
 
-### 2.12 Titles and ornaments
+### 2.13 Titles and ornaments
 
 Same draft mechanic. Note the fields do **not** line up: the title travels in `f1` of `lze`, the
 ornament in `f2` of `lwm`. Both accept an **empty** message, which is how "none" is expressed —
@@ -350,7 +388,7 @@ not a zero inside.
 | `hhy` | S→C | 8 / 6 files | What the account **owns**. The client already carries the whole catalogue; anything not in this list is drawn greyed out. Sent once, on world entry. A freshly created character's `hhy` arrives with zero bytes. | `BuildTitlesOwned` | `f1: packed titles, f2: packed ornaments` |
 | `lyt` | S→C | 7 / 6 files | The saved wardrobe outfits. **Mandatory**: without it the cosmetics window plays its sound and never draws, dying in `CosmeticUi.DisplayOutfit` on a null reference because it has no outfit to show. Seen in the client's own `Player.log`. | `BuildOutfits` | `f1 (rep): each saved outfit, f2: the one worn` |
 
-### 2.13 Chat
+### 2.14 Chat
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
@@ -359,7 +397,7 @@ not a zero inside.
 
 A private message is a different message, `ktb`, and it carries its recipient. Not implemented.
 
-### 2.14 Heartbeat
+### 2.15 Heartbeat
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
@@ -370,7 +408,7 @@ Answering `kqo` with the map block is what made the client reload the world in a
 carries `jru`, and `jru` means "load this map". The block now goes out on the first `kqo` of an
 entry (or on `lqc`, whichever comes first) and the heartbeat gets its own answer from then on.
 
-### 2.15 NPC dialogue — partial
+### 2.16 NPC dialogue — partial
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
@@ -436,7 +474,7 @@ they belong to ordinary sessions rather than to one feature.
 | Opcode | Dir | Wire | Files | What is known |
 |---|---|---|---:|---|
 | `kmu` | S→C | 399 | 90 | Present in 25 of the 31 folders. Nothing established. |
-| `kmv` | C→S | 727 | 88 | Arrives with `jrh` on every map load and expects nothing back — the emulator already ignores it silently. |
+| `kmv` | C→S | 727 | 88 | Arrives with `jrh` on every normal map load and has no direct reply. `GameNodeProxy` records that evidenced no-reply path; its fight-preparation exception still sends the preparation block. |
 | `iom` | S→C | 283 | 67 | Declared in `OpcodeRegistry` as `MapInformationsRequest`, but the captures show the **server** sending it. The name is a leftover guess. |
 | `kmb` | S→C | 172 | 62 | Goes out with `jsn` when a look is saved. Measured: 49 `kmb` while mounted and none otherwise. Not sent; look changes still reach the map through `jsn`. |
 | `lqg` `lqt` | S→C | 77, 76 | 56, 55 | Travel with `lqf` (C→S, 76 in 55 files). All three together are present in 54 files across 19 folders. |

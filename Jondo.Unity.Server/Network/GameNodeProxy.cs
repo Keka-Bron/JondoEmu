@@ -32,10 +32,11 @@ namespace Jondo.Unity.Launcher.Network
             _isRunning = true;
             _cts = new CancellationTokenSource();
 
-            _tcpListener = new TcpListener(IPAddress.Any, port);
+            _tcpListener = new TcpListener(ServerBinding.TcpAddress, port);
             _tcpListener.Start();
 
-            Console.WriteLine($"[+] Emulating Game Node on TCP port {port} (Online)");
+            Console.WriteLine($"[+] Emulating Game Node on TCP port {port} " +
+                              $"(Online, {ServerBinding.Description})");
 
             _ = Task.Run(async () =>
             {
@@ -214,14 +215,75 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     // Comes along with kqz and expects no response of its own.
                 }
+                else if (payloadStr.Contains("type.ankama.com/iuz"))
+                {
+                    // UIActionBar::ClearBarAction.  The client asks the authoritative server to
+                    // clear the bar, then redraws from a ShortcutBarContentMessage.  There is no
+                    // dedicated iuz acknowledgement, but an empty itg is the state replacement.
+                    //
+                    // Decoded iuz body: f2: 1, the spell action-bar type.  The enclosing UI
+                    // wrapper carries its own trailing f2:-1 action marker.
+                    Managers.SpellChoices.ClearBar();
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.ShortcutBarContentMessage,
+                            ConnectionProtocol.BuildEmptySpellBar()));
+                    Console.WriteLine("[Game Node] Sent empty spell shortcut bar after iuz.");
+                }
+                else if (payloadStr.Contains("type.ankama.com/iul"))
+                {
+                    // UIActionBar's contextual "Remove" menu action.  The live traffic proves
+                    // iul is { f1: bar type, f2: slot }: for example f1:1/f2:11 is remove slot 11
+                    // from the spell bar.  It used to be silently ignored with the fight-entry
+                    // family, leaving both the interface and CharacterSpellBar unchanged.
+                    byte[]? iul = ConnectionProtocol.ReadPayload(payload, "iul");
+                    if (iul != null && TryReadShortcutBarSlot(iul, out int bar, out int slot) &&
+                        bar == ConnectionProtocol.SpellBar)
+                    {
+                        Managers.SpellChoices.PutInBar(slot, 0);
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push(Op.ShortcutBarContentMessage,
+                                ConnectionProtocol.BuildSpellBar(GameState.Breed, GameState.CharacterLevel)));
+                        Console.WriteLine($"[Game Node] Removed spell shortcut slot {slot} after iul.");
+                    }
+                }
+                else if (payloadStr.Contains("type.ankama.com/iuv"))
+                {
+                    // UIActionBar drag and drop: iuv { f1: source slot, f2: target slot,
+                    // f3: bar type }.  The packet appears when rearranging shortcuts already on
+                    // the spell bar, unlike itz which adds an entry from the spell book.
+                    byte[]? iuv = ConnectionProtocol.ReadPayload(payload, "iuv");
+                    if (iuv != null && TryReadShortcutBarMove(iuv, out int source, out int target, out int bar) &&
+                        bar == ConnectionProtocol.SpellBar)
+                    {
+                        bool moved = Managers.SpellChoices.MoveBarSlot(source, target);
+                        // A full itg is the authoritative state replacement.  It also restores
+                        // the visible layout if the client optimistically dragged a stale/empty
+                        // source slot and the server rejected that move.
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push(Op.ShortcutBarContentMessage,
+                                ConnectionProtocol.BuildSpellBar(GameState.Breed, GameState.CharacterLevel)));
+                        Console.WriteLine($"[Game Node] {(moved ? "Moved" : "Rejected")} spell shortcut " +
+                                          $"{source} -> {target} after iuv.");
+                    }
+                }
                 else if (payloadStr.Contains("type.ankama.com/kqq"))
                 {
                     // Going back to the character list or to the server list. In the real capture
                     // the server only answers kqr and it is the client that closes the connection
                     // and redoes the handshake with the connection server. Both ways back are
                     // handled the same: the client decides which of the two screens it lands on.
+                    if (sessionAccountId <= 0)
+                    {
+                        Console.WriteLine("[Game Node] Ignored kqq from an unbound game session.");
+                        return;
+                    }
+
+                    // kqr.f1 is consumed by the client as the token for its next connection-
+                    // server authentication. Sending a random GUID here made both menu actions
+                    // close the game socket, then fail the new connection as an unknown account.
+                    string returnToken = ClientLaunchRegistry.IssueReturnGameToken(sessionAccountId);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.LogoutResultMessage, BuildKqrPayload()));
+                        ConnectionProtocol.Push(Op.LogoutResultMessage, BuildKqrPayload(returnToken)));
                     // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
                     // el de arena es de instancia y quedarse ahí es quedarse encerrado.
                     FightHandler.LeaveFight();
@@ -234,7 +296,7 @@ namespace Jondo.Unity.Launcher.Network
                         SessionContext.Current.LeaveWorld();
                     }
                     hasSentMapBlock = false;
-                    Console.WriteLine("[Game Node] Client is going back: sent kqr and released the session.");
+                    Console.WriteLine("[Game Node] Client is going back: sent a resumable kqr token and released the session.");
                 }
                 else if (!isAuthenticated && (payloadStr.Contains(Op.Uri(Op.SpellVariantActivationRequestMessage)) || payloadStr.Contains(Op.Uri(Op.Ise)) || payloadStr.Contains("type.ankama.com/jtk") || payloadStr.Contains("type.ankama.com/knx") || payloadStr.Contains(Op.Uri(Op.HelloGameMessage))))
                 {
@@ -253,7 +315,14 @@ namespace Jondo.Unity.Launcher.Network
                     await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.CharacterNameSuggestionSuccessMessage)))
+                else if (payloadStr.Contains(Op.Uri(Op.CharacterCanBeCreatedRequestMessage)))
+                {
+                    // kwb is the empty "open another character slot" request emitted by the
+                    // selection UI.  The matching empty kvd releases that UI state.
+                    await CharacterCreationHandler.ConfirmCanCreateAsync(stream, sessionAccountId,
+                                                                          sessionServerId);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.CharacterNameSuggestionRequestMessage)))
                 {
                     // El botón del dado: un nombre al azar.
                     await CharacterCreationHandler.SuggestNameAsync(stream);
@@ -325,6 +394,14 @@ namespace Jondo.Unity.Launcher.Network
                     await FightHandler.SendPreparationAsync(stream, FightHandler.PendingPreparation()!);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.BuildActorsComplete());
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kmv)))
+                {
+                    // Fuera de la preparación de combate, kmv es la señal de sincronización que
+                    // acompaña a jrh en cada carga de mapa. Las capturas no muestran una respuesta
+                    // directa: jrh es quien pide jss/lva. Se conserva como no-reply conocido para
+                    // que no vuelva a aparecer como una laguna de compatibilidad.
+                    UnknownPacketStore.RecordKnownNoReplyGamePacket(payload, session);
                 }
                 else if (payloadStr.Contains("type.ankama.com/jrh"))
                 {
@@ -472,6 +549,12 @@ namespace Jondo.Unity.Launcher.Network
                     // Todos los elementos pasan por el mismo registro; él decide qué acción hay
                     // detrás sin mezclar datos entre mapas ni entre sockets.
                     await InteractiveActionHandler.UseAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.HouseBuyRequestMessage)))
+                {
+                    // jal only repeats the price shown by khr. House identity and offer state are
+                    // recovered from this session's exact door-backed pending context.
+                    await HouseHandler.ConfirmPurchaseAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.EnterHavenBagRequestMessage)))
                 {
@@ -846,47 +929,38 @@ namespace Jondo.Unity.Launcher.Network
                     //
                     //   kvc, krv   la pareja que va detrás de la ráfaga de bienvenida; el emulador
                     //              deliberadamente no devuelve el krv aunque lleve id de petición
-                    //   kwb        sólo en las capturas de combate, sin implementar
-                    //   kwd        sólo en las capturas de extras de conexión, sin implementar
                     //   kaz, koc   vacíos, sin contestación medida
                     //   jiy        un número pequeño (un 3 medido); sin contestación medida
                     //   hom, jha, koe, kpb, jew, hos, lrd, ivp, kon, ktn, kus
                     //              la riada de la entrada al mundo: catálogos y ajustes que el
                     //              cliente pide y que ya le llegaron por los bloques de entrada
-                    //   ijm, iul   el par de la entrada en combate: el kmv ya cubre el flujo
+                    //   ijm        entra con kmv al combate; kmv ya cubre el flujo
                     //   jqe        un número de casilla, justo antes del jqi/jqk del borde; el
                     //              estado de casilla ya lo lleva el jrw. Significado exacto sin
                     //              establecer
-                    if (cleanPayload.Contains("type.ankama.com/kvc") || cleanPayload.Contains("type.ankama.com/krv") ||
-                        cleanPayload.Contains("type.ankama.com/kwb") || cleanPayload.Contains("type.ankama.com/kwd") ||
-                        cleanPayload.Contains("type.ankama.com/kaz") || cleanPayload.Contains("type.ankama.com/koc") ||
-                        cleanPayload.Contains("type.ankama.com/jiy") || cleanPayload.Contains("type.ankama.com/hom") ||
-                        cleanPayload.Contains("type.ankama.com/jha") || cleanPayload.Contains("type.ankama.com/koe") ||
-                        cleanPayload.Contains("type.ankama.com/kpb") || cleanPayload.Contains("type.ankama.com/jew") ||
-                        cleanPayload.Contains("type.ankama.com/hos") || cleanPayload.Contains("type.ankama.com/lrd") ||
-                        cleanPayload.Contains("type.ankama.com/ivp") || cleanPayload.Contains("type.ankama.com/kon") ||
-                        cleanPayload.Contains("type.ankama.com/ktn") || cleanPayload.Contains("type.ankama.com/kus") ||
-                        cleanPayload.Contains("type.ankama.com/ijm") || cleanPayload.Contains("type.ankama.com/iul") ||
-                        cleanPayload.Contains("type.ankama.com/jqe"))
+                    if (ProtocolCatalog.IsKnownNoReply(cleanPayload))
                     {
-                        // Conocidos y sin contestación: ni ruido en el registro.
+                        // Known and evidenced as having no reply.  Keep one durable record so the
+                        // protocol map is complete, but do not make it an actionable unknown.
+                        UnknownPacketStore.RecordKnownNoReplyGamePacket(payload, session);
                     }
-                    else if (cleanPayload.Contains(Op.Kmw) || cleanPayload.Contains("klw") || cleanPayload.Contains("knb") ||
-                        cleanPayload.Contains("klo") || cleanPayload.Contains("kmt") || cleanPayload.Contains(Op.Jgv) || 
-                        cleanPayload.Contains(Op.Jct) || cleanPayload.Contains(Op.Jfc) || cleanPayload.Contains(Op.Kqk) || 
-                        cleanPayload.Contains(Op.Itr) || cleanPayload.Contains(Op.Knc) || cleanPayload.Contains("kna") || 
-                        cleanPayload.Contains(Op.SpellVariantActivationRequestMessage) || cleanPayload.Contains("lxi") || cleanPayload.Contains(Op.Jqf) ||
-                        // kmv comes with jrh on every map load and expects nothing back; hnn is the
-                        // client saying which spell the pointer is on.
-                        cleanPayload.Contains(Op.Kmv) || cleanPayload.Contains(Op.Hnn))
+                    else if (ProtocolCatalog.IsLegacyObservationOnly(cleanPayload))
                     {
-                        // Ignored silently as they are secondary client events
+                        // This is legacy behaviour, not a proof that the packet is unnecessary.
+                        // Keep it visible to the compatibility queue until it has a handler or an
+                        // evidence-backed no-reply classification.
+                        long queueId = UnknownPacketStore.RecordLegacyIgnoredGamePacket(payload, session);
+                        if (queueId > 0)
+                            Console.WriteLine($"[Packet Telemetry] Legacy ignored packet queued as #{queueId}.");
                     }
                     else
                     {
+                        long queueId = UnknownPacketStore.RecordUnhandledGamePacket(payload, session);
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine($"\n======================================================================");
-                        Console.WriteLine($"[Game Node] 🔍 UNHANDLED CLIENT PACKET DETECTED: {payloadStr.Replace("\n", " ").Replace("\r", "")}");
+                        Console.WriteLine($"[Game Node] 🔍 UNHANDLED CLIENT PACKET DETECTED" +
+                                          (queueId > 0 ? $" (telemetry #{queueId})" : "") + ": " +
+                                          payloadStr.Replace("\n", " ").Replace("\r", ""));
                         Console.WriteLine($"======================================================================");
                         try
                         {
@@ -1065,6 +1139,60 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
+        /// iul is the compact remove-shortcut request: f1 is the action-bar type and f2 the
+        /// slot.  Unlike itz it carries no nested shortcut payload because the slot alone is
+        /// sufficient to remove it.
+        /// </summary>
+        private static bool TryReadShortcutBarSlot(byte[] iul, out int bar, out int slot)
+        {
+            bar = 0;
+            slot = 0;
+            try
+            {
+                foreach (var field in ProtoMessage.Parse(iul).Fields)
+                {
+                    if (field.WireType != 0) continue;
+                    if (field.FieldNumber == 1) bar = (int)field.VarIntValue;
+                    else if (field.FieldNumber == 2) slot = (int)field.VarIntValue;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Game Node] No se pudo leer el iul: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>Parses iuv: f1 source slot, f2 target slot, f3 shortcut-bar type.</summary>
+        private static bool TryReadShortcutBarMove(byte[] iuv, out int sourceSlot, out int targetSlot, out int bar)
+        {
+            sourceSlot = 0;
+            targetSlot = 0;
+            bar = 0;
+            try
+            {
+                foreach (var field in ProtoMessage.Parse(iuv).Fields)
+                {
+                    if (field.WireType != 0) continue;
+                    if (field.FieldNumber == 1) sourceSlot = (int)field.VarIntValue;
+                    else if (field.FieldNumber == 2) targetSlot = (int)field.VarIntValue;
+                    else if (field.FieldNumber == 3) bar = (int)field.VarIntValue;
+                }
+
+                // The observed client bar spans 0..48.  Treat anything outside the action-bar
+                // range as malformed instead of allowing a packet to create arbitrary DB rows.
+                return sourceSlot is >= 0 and <= 48 && targetSlot is >= 0 and <= 48 &&
+                       sourceSlot != targetSlot;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Game Node] No se pudo leer el iuv: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Redeems the ticket the client presents in kqz and binds the session to an account and
         /// a server. The ticket travels in field 2 of the message.
         /// </summary>
@@ -1096,13 +1224,13 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// Reply to the "go back" request. In the capture it carries a session id and a one;
-        /// the id is generated fresh every time.
+        /// Reply to the "go back" request. The client presents f1 to the connection server on
+        /// its next handshake; it therefore has to be a registered game token.
         /// </summary>
-        private static byte[] BuildKqrPayload()
+        private static byte[] BuildKqrPayload(string returnGameToken)
         {
             return Pb.New()
-                .Str(1, Guid.NewGuid().ToString())
+                .Str(1, returnGameToken)
                 .Var(4, 1)
                 .Build();
         }

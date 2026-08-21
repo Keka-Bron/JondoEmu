@@ -248,6 +248,10 @@ namespace Jondo.Unity.Launcher
                 startInfo.Environment["ZAAP_RELEASE"] = "dofus3";
                 startInfo.Environment["ZAAP_INSTANCE_ID"] = instanceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 startInfo.Environment["ZAAP_CAN_AUTH"] = "true";
+                // JondoFix reads this once during MelonLoader startup and uses it for every
+                // redirected Dofus service. Keeping it in the child environment avoids machine-
+                // wide configuration and lets two launcher installations target different VPSes.
+                startInfo.Environment["JONDO_SERVER_HOST"] = UI.LauncherPreferences.ServerHost;
 
                 System.Diagnostics.Process? client;
                 try
@@ -407,11 +411,22 @@ namespace Jondo.Unity.Launcher
                 return new ServicesStatus { Online = false, DatabaseOk = false, ServicesListening = false };
             }
 
-            RefrescarQuienJuega();
+            bool online = cuerpo.Value.GetProperty("enLinea").GetBoolean();
+            if (online)
+            {
+                // "activos" is useful only after a healthy status response.  Skipping it when
+                // the service is offline also prevents a second synchronous timeout during a
+                // server shutdown.
+                RefrescarQuienJuega();
+            }
+            else
+            {
+                _jugando = new System.Collections.Generic.HashSet<long>();
+            }
 
             return new ServicesStatus
             {
-                Online = cuerpo.Value.GetProperty("enLinea").GetBoolean(),
+                Online = online,
                 DatabaseOk = cuerpo.Value.GetProperty("base_").GetBoolean(),
                 ServicesListening = cuerpo.Value.GetProperty("servicios").GetBoolean(),
                 Version = cuerpo.Value.TryGetProperty("version", out var v) ? (v.GetString() ?? Version) : Version,

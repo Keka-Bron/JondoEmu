@@ -23,10 +23,9 @@ namespace Jondo.Unity.Launcher.Handlers
     /// En cada hueco cabe una cosa, y eso lo hace cumplir este handler: lo que ya estuviera puesto
     /// sale a la bolsa con su propio ivq antes de que entre lo nuevo.
     ///
-    /// One thing this does NOT do yet is change the characteristics. Equipment adds its bonus in
-    /// field 7 of each entry of kub, and filling that in means knowing which item the uid is,
-    /// which means the inventory coming out of the database instead of out of the capture. Until
-    /// then the item moves and the sheet does not follow.
+    /// The database is authoritative for both inventory ownership and characteristics.  An item
+    /// the client did not receive from that inventory is never moved or persisted: it is a stale
+    /// capture/UI item, not something the character owns.
     /// </summary>
     public static class EquipmentHandler
     {
@@ -53,6 +52,27 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             if (uid == 0) return;
 
+            // Never acknowledge a move for an item that is not owned by the selected character.
+            // Older world-entry captures can leave the client with the recorder's inventory; an
+            // optimistic ivq for one of those UIDs makes it look equipped while there is no item
+            // (and therefore no effects or mount) in the server model.  Re-send the complete
+            // authoritative inventory instead, so the client discards that stale projection.
+            if (Managers.Equipment.ByUid(uid) == null)
+            {
+                long characterId = SessionContext.State.CharacterId;
+                if (characterId > 0) Managers.Equipment.LoadFrom(characterId);
+
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.InventoryContentMessage, ConnectionProtocol.BuildInventory()));
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.InventoryWeightMessage, ConnectionProtocol.BuildPods(0, Capacity())));
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
+
+                Console.WriteLine($"[Equipment] Rejected unknown item {uid}; authoritative inventory resent.");
+                return;
+            }
+
             // En un hueco cabe uno. Lo que hubiera puesto sale a la bolsa antes de que entre lo
             // nuevo, y se le manda su propio ivq: sin eso las dos cosas se quedaban en el mismo
             // hueco a la vez y el aspecto lo decidía la primera que se encontrase, no la que el
@@ -69,12 +89,8 @@ namespace Jondo.Unity.Launcher.Handlers
                                   "a la bolsa.");
             }
 
-            // The item may well not be ours: the inventory the client is showing is still the one
-            // replayed from the capture, and those uids are not in our database. The move is
-            // answered either way, which is what the real server does, and it is written down when
-            // it is an item we actually hold.
             DatabaseManager.SaveItemPosition(uid, position);
-            bool known = Managers.Equipment.Move(uid, position);
+            Managers.Equipment.Move(uid, position);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, uid).Var(2, position).Build()));
@@ -90,7 +106,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.InventoryWeightMessage,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, Capacity())));
 
             // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
             // recargar el mapa. Son dos mensajes y hacen falta los dos: el jsn redibuja al muñeco
@@ -109,15 +125,19 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // And the sheet, because what the item gives goes with it. Without this the numbers
             // only caught up on the next entry into the world.
-            if (known)
-            {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
-            }
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
 
             Console.WriteLine($"[Equipment] Item {uid} -> position {position}"
-                              + (position == Bag ? " (taken off)." : ".")
-                              + (known ? "" : " Not one of ours; the sheet is left alone."));
+                              + (position == Bag ? " (taken off)." : "."));
+        }
+
+        private static long Capacity()
+        {
+            var bonuses = Managers.Equipment.Bonuses();
+            bonuses.TryGetValue(ConnectionProtocol.Stat.Strength, out long equippedStrength);
+            return 1000 + 5L * Math.Max(0,
+                Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength + equippedStrength);
         }
     }
 }

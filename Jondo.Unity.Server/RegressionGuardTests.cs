@@ -24,11 +24,20 @@ namespace Jondo.Unity.Launcher
             Network.ConnectionProtocolSelfTest.Run();
             Network.ClientLaunchRegistry.AssertTwoClientsAreIsolated();
             Network.ClientLaunchRegistry.AssertEightClientLimit();
+            Network.ClientLaunchRegistry.AssertTokenScopes();
             AssertPerSessionPlayerCaches();
+            AssertCharacterSlotAllowance();
+            AssertFreshCharacterBaseline();
+            AssertCharacterCombatBases();
+            AssertEquipmentBonusesAndMountSlot();
+            AssertSpellBarDragMoves();
+            AssertHousePurchaseContextIsolation();
+            AssertHousePurchaseSafetyRules();
             AssertSocketWritesAreSerialized();
             AssertProfessionCatalog();
             AssertRelativeMapLookup();
             AssertInteractiveRegistry();
+            AssertPublicControlBoundary();
 
             // OJO: esta parte no llega a correr nunca. Subir tres carpetas desde donde está el
             // binario y volver a bajar a "Jondo.Unity.Launcher" no da con el código fuente en
@@ -112,8 +121,200 @@ namespace Jondo.Unity.Launcher
                 throw new InvalidOperationException("[RegressionGuard FAILED] Packet writes overlapped on one socket.");
         }
 
+        private static void AssertHousePurchaseContextIsolation()
+        {
+            var first = Network.GameSession.SinSocket();
+            var second = Network.GameSession.SinSocket();
+            first.State.MapId = 100;
+            second.State.MapId = 100;
+            first.State.PendingHousePurchase = new PendingHousePurchaseContext
+            {
+                HouseId = 7,
+                MapId = 100,
+                ElementId = 8,
+                ExpectedPrice = 9,
+                AccountId = 10,
+                CharacterId = 11,
+            };
+
+            if (second.State.PendingHousePurchase != null)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] House purchase context leaked between sessions.");
+
+            first.State.MapId = 101;
+            if (first.State.PendingHousePurchase != null)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] A map change did not clear the pending house offer.");
+        }
+
+        private static void AssertHousePurchaseSafetyRules()
+        {
+            var firstHand = new Managers.HouseDefinition { Price = 1_000_000 };
+            var secondHand = new Managers.HouseDefinition
+            {
+                OwnerAccountId = 99,
+                Listed = true,
+                Price = 2_000_000,
+            };
+            if (!Managers.HouseManager.CanPurchaseFirstHand(firstHand, accountId: 10) ||
+                Managers.HouseManager.CanPurchaseFirstHand(secondHand, accountId: 10))
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] An owned house could bypass the unsupported " +
+                    "second-hand payout boundary.");
+            }
+
+            const int door = 100;
+            if (!Managers.HouseManager.IsWithinInteractionRange(door, door) ||
+                !Managers.HouseManager.IsWithinInteractionRange(door + 1, door) ||
+                !Managers.HouseManager.IsWithinInteractionRange(door + 14, door) ||
+                Managers.HouseManager.IsWithinInteractionRange(door + 2, door) ||
+                Managers.HouseManager.IsWithinInteractionRange(-1, door))
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] House interaction proximity accepts a remote or " +
+                    "rejects an adjacent roleplay cell.");
+            }
+        }
+
+        private static void AssertPublicControlBoundary()
+        {
+            var loopback = System.Net.IPAddress.Loopback;
+            var remote = System.Net.IPAddress.Parse("10.20.30.40");
+
+            if (!Network.ServerBinding.MayUseControlApi(loopback, publicMode: true,
+                                                        allowInsecureRemoteControl: false) ||
+                Network.ServerBinding.MayUseControlApi(remote, publicMode: true,
+                                                       allowInsecureRemoteControl: false) ||
+                !Network.ServerBinding.MayUseControlApi(remote, publicMode: true,
+                                                        allowInsecureRemoteControl: true))
+            {
+                throw new InvalidOperationException("Public launcher-control access boundary regressed.");
+            }
+
+            string forwarded = Network.ServerBinding.ControlClientAddress(
+                loopback, "203.0.113.9, 127.0.0.1");
+            string spoofed = Network.ServerBinding.ControlClientAddress(remote, "203.0.113.9");
+            if (forwarded != "203.0.113.9" || spoofed != remote.ToString())
+            {
+                throw new InvalidOperationException("Trusted proxy address handling regressed.");
+            }
+        }
+
+        private static void AssertCharacterSlotAllowance()
+        {
+            int limit = Network.ConnectionProtocol.MaxCharactersPerServer;
+            if (limit <= 1 || !Handlers.CharacterCreationHandler.HasAvailableCharacterSlot(0) ||
+                !Handlers.CharacterCreationHandler.HasAvailableCharacterSlot(limit - 1) ||
+                Handlers.CharacterCreationHandler.HasAvailableCharacterSlot(limit) ||
+                Handlers.CharacterCreationHandler.HasAvailableCharacterSlot(-1))
+            {
+                throw new InvalidOperationException("[RegressionGuard FAILED] Character creation slot allowance is invalid.");
+            }
+        }
+
+        private static void AssertFreshCharacterBaseline()
+        {
+            if (Handlers.CharacterCreationHandler.StartingMap != DatabaseManager.StartingMap ||
+                Handlers.CharacterCreationHandler.StartingCell != DatabaseManager.StartingCell ||
+                Handlers.CharacterCreationHandler.StartingLevel != 1 ||
+                Handlers.CharacterCreationHandler.StartingKamas != 0 ||
+                Handlers.CharacterCreationHandler.StartingStat != 0)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Fresh characters no longer start as clean Incarnam tutorial characters.");
+            }
+        }
+
+        private static void AssertCharacterCombatBases()
+        {
+            var session = Network.GameSession.SinSocket();
+            session.State.BaseActionPoints = 8;
+            session.State.BaseMovementPoints = 5;
+            session.State.CharacterLevel = 1;
+
+            using (Network.SessionContext.Push(session))
+            {
+                if (Handlers.StatsHandler.PlayerBaseAp != 8 || Handlers.StatsHandler.PlayerBaseMp != 5 ||
+                    Handlers.StatsHandler.GetPlayerMaxAp() != 8 || Handlers.StatsHandler.GetPlayerMaxMp() != 5)
+                {
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] The character's saved PA/PM bases are not used by its stat sheet.");
+                }
+
+                session.State.CharacterLevel = Handlers.StatsHandler.LevelForSeventhAp;
+                if (Handlers.StatsHandler.GetPlayerMaxAp() != 9)
+                {
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] The level-based PA bonus no longer layers over the saved base.");
+                }
+            }
+        }
+
+        private static void AssertEquipmentBonusesAndMountSlot()
+        {
+            var session = Network.GameSession.SinSocket();
+            using (Network.SessionContext.Push(session))
+            {
+                session.State.EquipmentItems[1] = new Managers.Equipment.Item
+                {
+                    Uid = 1, Template = 100, Position = 6,
+                };
+                session.State.EquipmentItems[1].Effects.Add(
+                    new Managers.Equipment.ItemEffect(118, 42, 0, 0));
+
+                session.State.EquipmentItems[2] = new Managers.Equipment.Item
+                {
+                    Uid = 2, Template = 19291, Position = 8,
+                };
+
+                var bonuses = Managers.Equipment.Bonuses();
+                if (!bonuses.TryGetValue(Network.ConnectionProtocol.Stat.Strength, out long strength) ||
+                    strength != 42 || Managers.Equipment.Worn != 2)
+                {
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] Worn item effects or mount slot no longer participate in equipment state.");
+                }
+            }
+        }
+
+        private static void AssertSpellBarDragMoves()
+        {
+            var session = Network.GameSession.SinSocket();
+            session.State.SpellBar[6] = 6006;
+            session.State.SpellBar[9] = 9009;
+
+            using (Network.SessionContext.Push(session))
+            {
+                if (!Managers.SpellChoices.MoveBarSlot(6, 9) ||
+                    session.State.SpellBar[6] != 9009 || session.State.SpellBar[9] != 6006 ||
+                    !session.State.SpellBarInitialized)
+                {
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] Dragging onto an occupied spell shortcut did not swap slots.");
+                }
+
+                if (!Managers.SpellChoices.MoveBarSlot(6, 7) ||
+                    session.State.SpellBar.ContainsKey(6) || session.State.SpellBar[7] != 9009)
+                {
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] Dragging onto an empty spell shortcut did not move its slot.");
+                }
+            }
+        }
+
         private static void AssertInteractiveRegistry()
         {
+            // ImportOfficialTemplates upserts every one of the 261 pinned client models.  The
+            // table may also contain administrator-defined models, which are legitimate and
+            // must not turn a successful import into a startup failure.
+            if (Managers.HouseManager.TemplateCount < 261)
+            {
+                throw new InvalidDataException(
+                    $"[RegressionGuard FAILED] Expected at least 261 client house templates, got " +
+                    $"{Managers.HouseManager.TemplateCount}.");
+            }
+
             var expected = new HashSet<(long MapId, int ElementId)>();
             foreach (long mapId in Managers.Interactives.MapIds)
             {
@@ -125,6 +326,26 @@ namespace Jondo.Unity.Launcher
 
                 var lottery = Managers.Lottery.Of(mapId);
                 if (lottery.Id != 0) expected.Add((mapId, lottery.Id));
+
+                foreach (var zaapi in Managers.Zaapis.ElementsOn(mapId))
+                    expected.Add((mapId, zaapi.Id));
+
+                foreach (var bin in Managers.Bins.On(mapId))
+                    expected.Add((mapId, bin.Id));
+
+                foreach (var door in Managers.Houses.On(mapId))
+                {
+                    expected.Add((mapId, door.ElementId));
+                    if (!Managers.HouseManager.TryGetByDoor(mapId, door.ElementId, out var house) ||
+                        house == null || house.InteriorMapId != door.InteriorMapId ||
+                        house.HouseTypeId <= 0 || house.Price <= 0 ||
+                        !Managers.HouseManager.TryGetTemplate(house.HouseTypeId, out _))
+                    {
+                        throw new InvalidDataException(
+                            $"[RegressionGuard FAILED] House door {mapId}/{door.ElementId} has no " +
+                            "matching priced persistent instance with a valid client model.");
+                    }
+                }
 
                 foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
                 {
@@ -148,6 +369,58 @@ namespace Jondo.Unity.Launcher
                             "[RegressionGuard FAILED] Interactive registry accepted a mismatched skill instance.");
                     }
                 }
+            }
+
+            foreach (long interior in Managers.Houses.Interiors)
+            {
+                if (Managers.Houses.TryGetExit(interior, out var exit))
+                    expected.Add((interior, exit.ElementId));
+
+                foreach (var interactive in Managers.InteractiveRegistry.OnMap(interior))
+                {
+                    foreach (var action in interactive.Actions)
+                    {
+                        if (!Managers.InteractiveRegistry.TryResolveUse(
+                                interior, interactive.Element.Id, action.SkillInstanceId,
+                                out var resolved, out var resolvedAction) ||
+                            !ReferenceEquals(interactive, resolved) ||
+                            !ReferenceEquals(action, resolvedAction))
+                        {
+                            throw new InvalidOperationException(
+                                "[RegressionGuard FAILED] House exit cannot resolve its declaration.");
+                        }
+                    }
+                }
+            }
+
+            int graphRoutesClaimedBySpecializedHandlers = 0;
+            foreach (var route in Managers.WorldInteractiveTransitions.All)
+            {
+                var live = Managers.Interactives.ByElementId(route.MapId, route.Element.Id);
+                if (live.Id != route.Element.Id || live.Cell != route.Element.Cell ||
+                    live.Gfx != route.Element.Gfx || route.Sources.Count == 0 ||
+                    !Managers.WorldInteractiveTransitions.TryGet(
+                        route.MapId, route.Element.Id, out var resolvedRoute) ||
+                    !ReferenceEquals(route, resolvedRoute))
+                {
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] World-graph transition is not joined to its " +
+                        "exact live map element.");
+                }
+
+                if (!expected.Add((route.MapId, route.Element.Id)))
+                    graphRoutesClaimedBySpecializedHandlers++;
+            }
+
+            if (Managers.InteractiveRegistry.WorldTransitionCount !=
+                    Managers.WorldInteractiveTransitions.Count -
+                    graphRoutesClaimedBySpecializedHandlers ||
+                Managers.InteractiveRegistry.SkippedClaimedWorldTransitionCount !=
+                    graphRoutesClaimedBySpecializedHandlers)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] World-graph transitions replaced or bypassed a " +
+                    "specialized interactive handler.");
             }
 
             if (Managers.InteractiveRegistry.Count != expected.Count)

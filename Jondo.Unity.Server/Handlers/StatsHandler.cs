@@ -459,8 +459,15 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>Los puntos de acción y de movimiento con los que nace todo el mundo.</summary>
-        public const int PlayerBaseAp = 6;
-        public const int PlayerBaseMp = 3;
+        public const int DefaultPlayerBaseAp = 6;
+        public const int DefaultPlayerBaseMp = 3;
+
+        /// <summary>
+        /// Character-owned base AP/MP.  Equipment and the level-100 AP are deliberately added
+        /// afterwards, so editing a base in the database never bakes equipment bonuses into it.
+        /// </summary>
+        public static int PlayerBaseAp => Math.Max(1, GameState.BaseActionPoints);
+        public static int PlayerBaseMp => Math.Max(1, GameState.BaseMovementPoints);
 
         /// <summary>El nivel al que se gana el séptimo punto de acción.</summary>
         public const int LevelForSeventhAp = 100;
