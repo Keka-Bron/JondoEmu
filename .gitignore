@@ -31,6 +31,7 @@ publish-*/
 
 # Root test builds are deliberately kept for local testing, but releases are not source changes.
 /Jondo Launcher.exe
+/Jondo Emulator Launcher.exe
 
 # ─── Bases de datos ─────────────────────────────────────────────────────────
 # world.db son 240 MB: se distribuye comprimida en datos/world.zip y el emulador la extrae sola
