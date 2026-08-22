@@ -524,6 +524,7 @@ namespace Jondo.Unity.Launcher
                 createMonsters.ExecuteNonQuery();
 
                 EnsureProfessionCatalogSchema(worldConnection);
+                EnsureInteractiveTeleportSchema(worldConnection);
 
                 // 5. Ensure Monsters, Mobs, Spells, and SpellLevels are seeded
                 EnsureMobsSeeded(worldConnection);
@@ -679,6 +680,39 @@ namespace Jondo.Unity.Launcher
                 CREATE INDEX IF NOT EXISTS IX_Recipes_SkillId ON Recipes(SkillId);
                 CREATE INDEX IF NOT EXISTS IX_RecipeIngredients_IngredientId
                     ON RecipeIngredients(IngredientId);
+            ";
+            command.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Téléporteurs interactifs importés depuis le catalogue normalisé. La clé inclut la
+        /// destination afin de conserver en base les candidats ambigus, nécessairement désactivés.
+        /// Le registre de jeu ne charge que les lignes Enabled=1.
+        /// </summary>
+        private static void EnsureInteractiveTeleportSchema(SqliteConnection connection)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS InteractiveTeleports (
+                    SourceMapId INTEGER NOT NULL,
+                    ElementId INTEGER NOT NULL,
+                    SourceCellId INTEGER NOT NULL,
+                    GfxId INTEGER NOT NULL,
+                    InteractiveType INTEGER NOT NULL,
+                    SkillId INTEGER NOT NULL,
+                    DestinationMapId INTEGER NOT NULL,
+                    DestinationCellId INTEGER NOT NULL,
+                    SourceVersion TEXT NOT NULL,
+                    Confidence TEXT NOT NULL,
+                    ValidationStatus TEXT NOT NULL,
+                    Enabled INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY (SourceMapId, ElementId, DestinationMapId, DestinationCellId)
+                );
+
+                CREATE INDEX IF NOT EXISTS IX_InteractiveTeleports_Source
+                    ON InteractiveTeleports(SourceMapId, ElementId);
+                CREATE INDEX IF NOT EXISTS IX_InteractiveTeleports_EnabledMap
+                    ON InteractiveTeleports(Enabled, SourceMapId);
             ";
             command.ExecuteNonQuery();
         }

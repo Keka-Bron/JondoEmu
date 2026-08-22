@@ -21,6 +21,9 @@ namespace Jondo.Unity.Launcher.Managers
 
         /// <summary>La puerta de dentro, la que devuelve a la calle.</summary>
         HouseExit,
+
+        /// <summary>Un passage instantané entre deux maps, hors système des maisons.</summary>
+        Teleport,
     }
 
     /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
@@ -150,6 +153,15 @@ namespace Jondo.Unity.Launcher.Managers
                 if (!Houses.TryGetExit(interior, out var exit)) continue;
                 Register(interior, new Interactives.Element(exit.ElementId, exit.Cell, exit.Gfx),
                          Houses.ExitType, InteractiveActionKind.HouseExit, Houses.ExitSkill);
+            }
+
+            // Les maisons ont leur protocole jqw propre et sont enregistrées au-dessus. Ce bloc ne
+            // contient que les passages génériques validés et activés par TeleportManager.
+            foreach (var route in TeleportManager.All)
+            {
+                Register(route.SourceMapId,
+                         new Interactives.Element(route.ElementId, route.SourceCellId, route.GfxId),
+                         route.InteractiveType, InteractiveActionKind.Teleport, route.SkillId);
             }
 
             Console.WriteLine($"[Interactives] {_byElement.Count} elementos registrados.");

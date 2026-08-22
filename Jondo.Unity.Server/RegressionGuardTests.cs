@@ -138,6 +138,14 @@ namespace Jondo.Unity.Launcher
                 foreach (var door in Managers.Houses.On(mapId))
                     expected.Add((mapId, door.ElementId));
 
+                foreach (var teleport in Managers.TeleportManager.On(mapId))
+                {
+                    expected.Add((mapId, teleport.ElementId));
+                    if (Managers.Houses.TryGetDoor(mapId, teleport.ElementId, out _))
+                        throw new InvalidOperationException(
+                            "[RegressionGuard FAILED] A generic teleport overlaps a house door.");
+                }
+
                 foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
                 {
                     foreach (var action in interactive.Actions)
@@ -168,6 +176,13 @@ namespace Jondo.Unity.Launcher
             {
                 if (Managers.Houses.TryGetExit(interior, out var exit))
                     expected.Add((interior, exit.ElementId));
+            }
+
+            if (!Managers.TeleportManager.TryGet(191106048, 515837, out var astrub) ||
+                astrub.DestinationMapId != 192416776 || astrub.DestinationCellId != 534)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Astrub/Temple teleport route is missing or changed.");
             }
 
             if (Managers.InteractiveRegistry.Count != expected.Count)

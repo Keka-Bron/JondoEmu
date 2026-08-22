@@ -98,10 +98,12 @@ registry.
 | Bin | Graphics 8438, 46529, 63081, 260022 | 105 | 153 | `BinHandler` |
 | HouseDoor | Any of 37 graphics the captures declare type 300 | 300 | 84 | `HouseHandler` |
 | HouseExit | The chosen exit element of a house interior | 316 | 184 | `HouseHandler` |
+| Teleport | Exact `(mapId, elementId)` retained from Giny after 3.6 validation | 0 | 114 | `TeleportHandler` |
 
 Every one of those `(type, skill)` pairs is measured, not chosen: `tools/tipos_interactivos.py`
 cross-references the 304 packet captures against the client's element dump and yields
-`graphic → type` for 415 graphics. **1,990 elements are registered** at startup.
+`graphic → type` for 415 graphics. With the validated generic teleport routes, **3,576 elements
+are registered** at startup in the current data set.
 
 Two of those rows deserve a note.
 
@@ -417,3 +419,39 @@ animation/category value and is not the interactive type sent in `jss`; treating
 would misdeclare zaaps, chests and resources. Giny 2.68 remains useful for behaviour and database
 architecture, but its packet classes and hard-coded element mappings must not be copied as 3.6
 protocol truth.
+
+---
+
+## 11. Generic teleport routes imported from Giny
+
+Generic map passages deliberately exclude houses. A house entrance uses `jqw`, remembers the
+outside map in the player's session and remains owned by `Houses`/`HouseHandler`; treating it as a
+plain `jru` teleport would lose that protocol and return state.
+
+`generate_interactive_teleports.ps1` reads the phpMyAdmin export
+`datos/interactive_skills_Giny_Table.json`, keeps rows whose action is `Teleport`, and joins each
+one against the 3.6 `interactive_elements.json` by the exact `(mapId, elementId)` pair. It removes
+all exterior house doors and interior house exits listed in `casas_mundo_3.6.10.10.json`, merges
+identical duplicates and disables every source element for which Giny gives conflicting targets.
+The generated, versioned result is `datos/interactive_teleports_giny_2.68.json`.
+
+The current generation contains 1,679 candidate routes: 1,624 are unambiguous in the JSON, 15
+house rows were excluded, and 20 source keys remain as disabled ambiguous candidates. Startup then
+performs the 3.6 runtime checks that the offline generator cannot finish: the source element's cell
+and graphic must still match, the destination map must exist, the target cell must be in the Dofus
+cell range, and the element must not already be a zaap, zaapi, chest, lottery machine or bin.
+
+`TeleportManager.Initialize` transactionally replaces `InteractiveTeleports` from that JSON and
+reloads only `Enabled=1` rows into immutable indexes by map and by `(map, element)`. Invalid and
+ambiguous rows stay in SQLite with a `ValidationStatus` so they can be audited; a bad import rolls
+back and preserves the previous catalogue. With the current world database, 1,586 routes pass all
+checks.
+
+`InteractiveRegistry` declares those routes as type 0 / skill 114. On an `iwo`,
+`InteractiveActionHandler` resolves the exact registered element and calls `TeleportHandler`, which
+sends `iwn`, updates only the current session, persists the character, announces departure to the
+old map, then sends `jsd`, `jru`, `lqu` and `hjk`. The client requests the destination `jss` itself.
+
+The regression guard pins the Astrub example: map 191106048, element 515837, graphic 63662 must
+lead to map 192416776, requested cell 534. Landing uses `MapManager.GetNearestWalkableCell`, so an
+old edge cell that is no longer walkable cannot strand the character.

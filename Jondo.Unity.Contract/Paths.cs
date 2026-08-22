@@ -82,6 +82,12 @@ namespace Jondo.Unity.Launcher
         // mapa y su subzona. Los genera extract_interactivos.py de los bundles del cliente.
         public static string InteractiveElementsJson => Resolve("interactive_elements.json");
         /// <summary>
+        /// Routes de téléportation normalisées depuis la table interactive_skills de Giny 2.68.
+        /// Le serveur les valide puis les importe dans SQLite au démarrage; les maisons restent
+        /// dans leur catalogue séparé.
+        /// </summary>
+        public static string InteractiveTeleportsJson => Resolve("interactive_teleports_giny_2.68.json");
+        /// <summary>
         /// Los catálogos de oficios, habilidades y recetas en crudo. Se quedan fuera de
         /// <c>datos</c> a propósito: el servidor los importa a world.db y nunca los sirve.
         ///

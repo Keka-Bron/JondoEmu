@@ -154,7 +154,7 @@ level-154 character sheet, and the emulator builds its own from the database.
 
 Two SQLite files in `bases/`. They are the only things the emulator writes.
 
-### `world.db` — 251,518,976 bytes, 31 tables
+### `world.db` — 38 application tables after startup
 
 Distributed compressed as `datos/world.zip`. On startup `DatabaseManager.Initialize` checks whether
 `bases/world.db` exists *and* has an `ItemTemplates` table; if either is false it unpacks the zip
@@ -177,7 +177,7 @@ the zip. (One offline tool does write to `ItemTemplates`; see the regeneration s
 | `Effects` | 872 | The effect catalogue: category, dice usage, percent flag, priority |
 | `SubAreaTemplates` | 562 | Sub-areas |
 
-The other 22 are created by the emulator with `CREATE TABLE IF NOT EXISTS`, so a database that
+The other 29 are created by the emulator with `CREATE TABLE IF NOT EXISTS`, so a database that
 predates a feature picks it up on the next start. World data first, then what a player accumulates.
 Row counts are from the copy inside `world.zip`; the player tables grow as you play.
 
@@ -203,8 +203,12 @@ Row counts are from the copy inside `world.zip`; the player tables grow as you p
 | `HavenBag` | 1 | `Managers/HavenBagStore.cs` | Which haven bag theme the character uses |
 | `HavenBagFurniture` | 0 | `Managers/HavenBagStore.cs` | Furniture placed in the room |
 | `HavenBagChest` | 3 | `Managers/HavenBagStore.cs` | The haven bag chest contents |
+| `Jobs` / `Skills` | 23 / 368 | `DatabaseManager` | Profession and interactive-skill catalogues imported from the 3.6 dofusdude JSON |
+| `SkillCraftableItems` / `SkillModifiableItemTypes` | 5,693 / 17 | `DatabaseManager` | Normalized variable-length skill capabilities |
+| `Recipes` / `RecipeIngredients` | 4,858 / 24,532 | `DatabaseManager` | Craft results and their ordered ingredients |
+| `InteractiveTeleports` | 1,679 | `DatabaseManager` | Auditable Giny teleport candidates; only validated `Enabled=1` rows enter the runtime registry |
 
-`sqlite_sequence` is SQLite's own bookkeeping and is not counted in the 31.
+`sqlite_sequence` is SQLite's own bookkeeping and is not counted in the 38.
 
 The shipped database is already fully populated. That matters because `DatabaseManager` contains two
 seeding paths (`EnsureMobsSeeded`, `EnsureSpellsSeeded`) that read `dofus3_data/`, and
