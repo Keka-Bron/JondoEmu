@@ -1,0 +1,1854 @@
+{
+ "_comentario": [
+  "Que casa hay detras de cada puerta, medido del campo 9 del jss real.",
+  "Solo salen los mapas que se visitaron en alguna captura: la cobertura es parcial",
+  "a proposito, porque esto es dato y no inferencia.",
+  "Los nombres de los duenos NO se guardan: en Jondo las casas van sin dueno.",
+  "Ver tools/extraer_casas_reales.py."
+ ],
+ "edificios": [
+  {
+   "mapa": 154131,
+   "puerta": 9898,
+   "modelo": 390,
+   "nombre": "Casa grande de pueblo costero",
+   "precio": 2000000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 154131,
+   "puerta": 9899,
+   "modelo": 263,
+   "nombre": "Casa pequeña de pueblo costero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 154132,
+   "puerta": 9900,
+   "modelo": 388,
+   "nombre": "Casa pequeña de pueblo costero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 154643,
+   "puerta": 9023,
+   "modelo": 262,
+   "nombre": "Casa mediana de pueblo costero",
+   "precio": 1500000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 154643,
+   "puerta": 9024,
+   "modelo": 389,
+   "nombre": "Casa mediana de pueblo costero",
+   "precio": 1500000,
+   "habitaciones": 1,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 154643,
+   "puerta": 9025,
+   "modelo": 390,
+   "nombre": "Casa grande de pueblo costero",
+   "precio": 2000000,
+   "habitaciones": 1,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 154643,
+   "puerta": 9026,
+   "modelo": 263,
+   "nombre": "Casa pequeña de pueblo costero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    2,
+    4
+   ]
+  },
+  {
+   "mapa": 155155,
+   "puerta": 9085,
+   "modelo": 388,
+   "nombre": "Casa pequeña de pueblo costero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 155155,
+   "puerta": 9086,
+   "modelo": 389,
+   "nombre": "Casa mediana de pueblo costero",
+   "precio": 1500000,
+   "habitaciones": 1,
+   "instancias": [
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 155155,
+   "puerta": 9087,
+   "modelo": 261,
+   "nombre": "Casa grande de pueblo costero",
+   "precio": 2000000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    3
+   ]
+  },
+  {
+   "mapa": 54171945,
+   "puerta": 10606,
+   "modelo": 325,
+   "nombre": "Casa grande del burgo de Frigost",
+   "precio": 3000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 54171945,
+   "puerta": 10607,
+   "modelo": 328,
+   "nombre": "Casa grande del burgo de Frigost",
+   "precio": 3000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    4
+   ]
+  },
+  {
+   "mapa": 54171945,
+   "puerta": 10608,
+   "modelo": 318,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 54171946,
+   "puerta": 10647,
+   "modelo": 321,
+   "nombre": "Casa mediana del burgo de Frigost",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 54171947,
+   "puerta": 10619,
+   "modelo": 318,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 54171947,
+   "puerta": 10620,
+   "modelo": 327,
+   "nombre": "Casa grande del burgo de Frigost",
+   "precio": 3000000,
+   "habitaciones": 4,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 54171947,
+   "puerta": 10621,
+   "modelo": 317,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 54171948,
+   "puerta": 10510,
+   "modelo": 318,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 54171948,
+   "puerta": 10511,
+   "modelo": 321,
+   "nombre": "Casa mediana del burgo de Frigost",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 54171948,
+   "puerta": 10512,
+   "modelo": 317,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 54171948,
+   "puerta": 10513,
+   "modelo": 326,
+   "nombre": "Casa grande del burgo de Frigost",
+   "precio": 3000000,
+   "habitaciones": 4,
+   "instancias": [
+    3,
+    4,
+    5
+   ]
+  },
+  {
+   "mapa": 54171949,
+   "puerta": 10628,
+   "modelo": 324,
+   "nombre": "Casa mediana del burgo de Frigost",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 54171949,
+   "puerta": 10629,
+   "modelo": 322,
+   "nombre": "Casa mediana del burgo de Frigost",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 54171949,
+   "puerta": 10630,
+   "modelo": 321,
+   "nombre": "Casa mediana del burgo de Frigost",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 54172457,
+   "puerta": 10563,
+   "modelo": 320,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    5
+   ]
+  },
+  {
+   "mapa": 54172457,
+   "puerta": 10564,
+   "modelo": 318,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 54172969,
+   "puerta": 10639,
+   "modelo": 317,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 54172969,
+   "puerta": 10640,
+   "modelo": 321,
+   "nombre": "Casa mediana del burgo de Frigost",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    4
+   ]
+  },
+  {
+   "mapa": 54172969,
+   "puerta": 10641,
+   "modelo": 318,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    4,
+    6
+   ]
+  },
+  {
+   "mapa": 54172969,
+   "puerta": 10642,
+   "modelo": 320,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    5,
+    6
+   ]
+  },
+  {
+   "mapa": 54172969,
+   "puerta": 10643,
+   "modelo": 328,
+   "nombre": "Casa grande del burgo de Frigost",
+   "precio": 3000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    5,
+    6
+   ]
+  },
+  {
+   "mapa": 54173992,
+   "puerta": 10825,
+   "modelo": 342,
+   "nombre": "Cabaña del puerto de Frigost",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 54173992,
+   "puerta": 10826,
+   "modelo": 352,
+   "nombre": "Casa mediana del puerto de Frigost",
+   "precio": 3000000,
+   "habitaciones": 3,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 54173992,
+   "puerta": 10827,
+   "modelo": 350,
+   "nombre": "Casa mediana del puerto de Frigost",
+   "precio": 3000000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 54173993,
+   "puerta": 10666,
+   "modelo": 325,
+   "nombre": "Casa grande del burgo de Frigost",
+   "precio": 3000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 54173993,
+   "puerta": 10667,
+   "modelo": 317,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 54173993,
+   "puerta": 10668,
+   "modelo": 328,
+   "nombre": "Casa grande del burgo de Frigost",
+   "precio": 3000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 54173993,
+   "puerta": 10669,
+   "modelo": 320,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 54173993,
+   "puerta": 10670,
+   "modelo": 340,
+   "nombre": "Casa pequeña del burgo de Frigost",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 54174503,
+   "puerta": 10824,
+   "modelo": 352,
+   "nombre": "Casa mediana del puerto de Frigost",
+   "precio": 3000000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2
+   ]
+  },
+  {
+   "mapa": 54174504,
+   "puerta": 10803,
+   "modelo": 352,
+   "nombre": "Casa mediana del puerto de Frigost",
+   "precio": 3000000,
+   "habitaciones": 3,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 54174504,
+   "puerta": 10805,
+   "modelo": 352,
+   "nombre": "Casa mediana del puerto de Frigost",
+   "precio": 3000000,
+   "habitaciones": 3,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 54174504,
+   "puerta": 10806,
+   "modelo": 349,
+   "nombre": "Casa mediana del puerto de Frigost",
+   "precio": 3000000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 54174504,
+   "puerta": 10807,
+   "modelo": 343,
+   "nombre": "Cabaña del puerto de Frigost",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    2
+   ]
+  },
+  {
+   "mapa": 68422152,
+   "puerta": 10931,
+   "modelo": 257,
+   "nombre": "Casa grande de Madrestam",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 68423176,
+   "puerta": 10932,
+   "modelo": 249,
+   "nombre": "Casa grande de Madrestam",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 68423176,
+   "puerta": 10933,
+   "modelo": 237,
+   "nombre": "Casa pequeña de Madrestam",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 68552706,
+   "puerta": 9252,
+   "modelo": 303,
+   "nombre": "Casa pequeña del castillo de Amakna",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    3
+   ]
+  },
+  {
+   "mapa": 68552706,
+   "puerta": 9253,
+   "modelo": 308,
+   "nombre": "Casa mediana del castillo de Amakna",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 73400320,
+   "puerta": 10191,
+   "modelo": 234,
+   "nombre": "Casa mediana de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    2,
+    3,
+    4,
+    6
+   ]
+  },
+  {
+   "mapa": 73400320,
+   "puerta": 10192,
+   "modelo": 232,
+   "nombre": "Casa pequeña de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    3,
+    5
+   ]
+  },
+  {
+   "mapa": 73400321,
+   "puerta": 9637,
+   "modelo": 233,
+   "nombre": "Casa pequeña de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    2
+   ]
+  },
+  {
+   "mapa": 73400321,
+   "puerta": 9638,
+   "modelo": 374,
+   "nombre": "Espléndida casa de ganadero",
+   "precio": 2500000,
+   "habitaciones": 2,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 73400321,
+   "puerta": 9639,
+   "modelo": 234,
+   "nombre": "Casa mediana de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 73531905,
+   "puerta": 9301,
+   "modelo": 232,
+   "nombre": "Casa pequeña de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 73531905,
+   "puerta": 9302,
+   "modelo": 232,
+   "nombre": "Casa pequeña de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 73531906,
+   "puerta": 9550,
+   "modelo": 234,
+   "nombre": "Casa mediana de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 73531906,
+   "puerta": 9551,
+   "modelo": 235,
+   "nombre": "Casa grande de ganadero",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    3
+   ]
+  },
+  {
+   "mapa": 73531907,
+   "puerta": 8973,
+   "modelo": 232,
+   "nombre": "Casa pequeña de ganadero",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 88081167,
+   "puerta": 9509,
+   "modelo": 282,
+   "nombre": "Casa del ferrocarril abandonado",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    5
+   ]
+  },
+  {
+   "mapa": 88082191,
+   "puerta": 10153,
+   "modelo": 285,
+   "nombre": "Casa pequeña del pueblo de Amakna",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 88082191,
+   "puerta": 10154,
+   "modelo": 291,
+   "nombre": "Choza del pueblo de Amakna",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    5
+   ]
+  },
+  {
+   "mapa": 90704386,
+   "puerta": 9571,
+   "modelo": 214,
+   "nombre": "Casa grande de Sufokia",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 90704386,
+   "puerta": 10061,
+   "modelo": 219,
+   "nombre": "Casa pequeña de Sufokia",
+   "precio": 1000000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 90704898,
+   "puerta": 9306,
+   "modelo": 227,
+   "nombre": "Casa grande de Sufokia",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 90704898,
+   "puerta": 9569,
+   "modelo": 220,
+   "nombre": "Casa pequeña de Sufokia",
+   "precio": 1000000,
+   "habitaciones": 2,
+   "instancias": [
+    2
+   ]
+  },
+  {
+   "mapa": 90704898,
+   "puerta": 9570,
+   "modelo": 217,
+   "nombre": "Casa pequeña de Sufokia",
+   "precio": 1000000,
+   "habitaciones": 2,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 120062466,
+   "puerta": 461353,
+   "modelo": 380,
+   "nombre": "Granja de Tainela",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    5
+   ]
+  },
+  {
+   "mapa": 120063489,
+   "puerta": 461355,
+   "modelo": 382,
+   "nombre": "Granja de Tainela",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2,
+    3,
+    5
+   ]
+  },
+  {
+   "mapa": 126092058,
+   "puerta": 461363,
+   "modelo": 385,
+   "nombre": "Madriguera tradicional de kanig",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 126092569,
+   "puerta": 461361,
+   "modelo": 386,
+   "nombre": "Madriguera grande de kanig",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2,
+    4,
+    5
+   ]
+  },
+  {
+   "mapa": 126092570,
+   "puerta": 461362,
+   "modelo": 383,
+   "nombre": "Madriguera pequeña de kanig",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    1,
+    4
+   ]
+  },
+  {
+   "mapa": 126095640,
+   "puerta": 461358,
+   "modelo": 383,
+   "nombre": "Madriguera pequeña de kanig",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    3
+   ]
+  },
+  {
+   "mapa": 126095642,
+   "puerta": 461356,
+   "modelo": 385,
+   "nombre": "Madriguera tradicional de kanig",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 191102978,
+   "puerta": 461376,
+   "modelo": 395,
+   "nombre": "Casa muy pequeña de Astrub",
+   "precio": 1000000,
+   "habitaciones": 1,
+   "instancias": [
+    7,
+    9,
+    14,
+    15
+   ]
+  },
+  {
+   "mapa": 191104002,
+   "puerta": 461378,
+   "modelo": 396,
+   "nombre": "Casa pequeña de Astrub",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    3,
+    4,
+    5,
+    9,
+    10,
+    15
+   ]
+  },
+  {
+   "mapa": 191104004,
+   "puerta": 461381,
+   "modelo": 396,
+   "nombre": "Casa pequeña de Astrub",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    9,
+    10,
+    12
+   ]
+  },
+  {
+   "mapa": 191105026,
+   "puerta": 461382,
+   "modelo": 397,
+   "nombre": "Casa pequeña de Astrub",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    3,
+    4,
+    7,
+    8,
+    9,
+    10,
+    12,
+    14,
+    16,
+    18
+   ]
+  },
+  {
+   "mapa": 191105026,
+   "puerta": 461383,
+   "modelo": 397,
+   "nombre": "Casa pequeña de Astrub",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    2,
+    4,
+    5,
+    6,
+    9,
+    10,
+    11,
+    14,
+    15,
+    19
+   ]
+  },
+  {
+   "mapa": 191105028,
+   "puerta": 461389,
+   "modelo": 399,
+   "nombre": "Casa mediana de Astrub",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    3,
+    8,
+    9,
+    10,
+    14
+   ]
+  },
+  {
+   "mapa": 191106050,
+   "puerta": 461390,
+   "modelo": 399,
+   "nombre": "Casa mediana de Astrub",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    3,
+    4,
+    5,
+    6,
+    8,
+    12
+   ]
+  },
+  {
+   "mapa": 191106052,
+   "puerta": 461388,
+   "modelo": 399,
+   "nombre": "Casa mediana de Astrub",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    3,
+    5,
+    8,
+    9,
+    10,
+    13,
+    14,
+    15,
+    16
+   ]
+  },
+  {
+   "mapa": 204998657,
+   "puerta": 519519,
+   "modelo": 410,
+   "nombre": "Casa pequeña de Akwadala",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    3,
+    4
+   ]
+  },
+  {
+   "mapa": 204998659,
+   "puerta": 519522,
+   "modelo": 410,
+   "nombre": "Casa pequeña de Akwadala",
+   "precio": 2000000,
+   "habitaciones": 2,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 206177795,
+   "puerta": 519513,
+   "modelo": 407,
+   "nombre": "Casa pequeña de Fuegodala",
+   "precio": 2500000,
+   "habitaciones": 2,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 206177795,
+   "puerta": 519514,
+   "modelo": 407,
+   "nombre": "Casa pequeña de Fuegodala",
+   "precio": 2500000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    3
+   ]
+  },
+  {
+   "mapa": 206177795,
+   "puerta": 519516,
+   "modelo": 408,
+   "nombre": "Casa grande de Fuegodala",
+   "precio": 3500000,
+   "habitaciones": 3,
+   "instancias": [
+    1
+   ]
+  },
+  {
+   "mapa": 206177796,
+   "puerta": 519515,
+   "modelo": 407,
+   "nombre": "Casa pequeña de Fuegodala",
+   "precio": 2500000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    4
+   ]
+  },
+  {
+   "mapa": 206307842,
+   "puerta": 461412,
+   "modelo": 402,
+   "nombre": "Casa pequeña del pueblo de Pandala",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    5,
+    13,
+    14,
+    19,
+    21,
+    24,
+    26,
+    27,
+    33,
+    36,
+    38,
+    40,
+    42,
+    48,
+    49,
+    52,
+    53
+   ]
+  },
+  {
+   "mapa": 212598786,
+   "puerta": 519672,
+   "modelo": 446,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    3,
+    6,
+    7,
+    14
+   ]
+  },
+  {
+   "mapa": 212598787,
+   "puerta": 519676,
+   "modelo": 446,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    7,
+    10
+   ]
+  },
+  {
+   "mapa": 212598787,
+   "puerta": 519677,
+   "modelo": 447,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    8,
+    12,
+    13
+   ]
+  },
+  {
+   "mapa": 212598789,
+   "puerta": 519702,
+   "modelo": 435,
+   "nombre": "Casa gigantesca de joyero",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    1,
+    5,
+    6,
+    7,
+    13,
+    15,
+    16,
+    18,
+    19,
+    20,
+    22,
+    26
+   ]
+  },
+  {
+   "mapa": 212599301,
+   "puerta": 519700,
+   "modelo": 444,
+   "nombre": "Casa mediana de herrero",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2,
+    3,
+    4,
+    10,
+    12,
+    14,
+    15,
+    16,
+    18
+   ]
+  },
+  {
+   "mapa": 212599301,
+   "puerta": 519701,
+   "modelo": 445,
+   "nombre": "Casa mediana de Bonta",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    3,
+    5,
+    6,
+    8,
+    10
+   ]
+  },
+  {
+   "mapa": 212600323,
+   "puerta": 519682,
+   "modelo": 446,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    1,
+    2,
+    3,
+    6,
+    10,
+    11,
+    12,
+    14,
+    16,
+    17
+   ]
+  },
+  {
+   "mapa": 212600323,
+   "puerta": 519683,
+   "modelo": 445,
+   "nombre": "Casa mediana de Bonta",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2,
+    4,
+    8
+   ]
+  },
+  {
+   "mapa": 212600325,
+   "puerta": 519699,
+   "modelo": 444,
+   "nombre": "Casa mediana de herrero",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    4,
+    10,
+    13,
+    15,
+    16
+   ]
+  },
+  {
+   "mapa": 212601349,
+   "puerta": 519698,
+   "modelo": 438,
+   "nombre": "Casa gigantesca de escultor",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    3,
+    4,
+    7,
+    8,
+    9,
+    10,
+    15,
+    18,
+    19,
+    20,
+    21,
+    23,
+    25,
+    26,
+    27,
+    28
+   ]
+  },
+  {
+   "mapa": 212601859,
+   "puerta": 519692,
+   "modelo": 440,
+   "nombre": "Casa gigantesca de herrero",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    5,
+    7,
+    9,
+    10,
+    11,
+    16,
+    17,
+    18,
+    19,
+    21,
+    23,
+    24
+   ]
+  },
+  {
+   "mapa": 212601859,
+   "puerta": 519693,
+   "modelo": 447,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    3,
+    5,
+    8,
+    10,
+    11,
+    12,
+    13,
+    15,
+    17
+   ]
+  },
+  {
+   "mapa": 212601861,
+   "puerta": 519696,
+   "modelo": 440,
+   "nombre": "Casa gigantesca de herrero",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    3,
+    6,
+    7,
+    8,
+    9,
+    11,
+    12,
+    13,
+    15,
+    16,
+    18,
+    19,
+    22,
+    25,
+    26,
+    27,
+    28,
+    31
+   ]
+  },
+  {
+   "mapa": 212601861,
+   "puerta": 519697,
+   "modelo": 438,
+   "nombre": "Casa gigantesca de escultor",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    1,
+    2,
+    4,
+    6,
+    7,
+    8,
+    10,
+    11,
+    12,
+    14,
+    17,
+    18,
+    20
+   ]
+  },
+  {
+   "mapa": 212601864,
+   "puerta": 522651,
+   "modelo": 436,
+   "nombre": "Casa gigantesca de carnicero",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    6,
+    7,
+    17,
+    18,
+    19,
+    20,
+    22,
+    24,
+    25,
+    27,
+    28,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36
+   ]
+  },
+  {
+   "mapa": 212601864,
+   "puerta": 522652,
+   "modelo": 442,
+   "nombre": "Casa grande de Bonta",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    3,
+    8,
+    11,
+    12,
+    16,
+    18,
+    19,
+    20,
+    22,
+    24
+   ]
+  },
+  {
+   "mapa": 212602885,
+   "puerta": 519714,
+   "modelo": 443,
+   "nombre": "Casa grande de Bonta",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    7,
+    13,
+    18,
+    19
+   ]
+  },
+  {
+   "mapa": 212602886,
+   "puerta": 519715,
+   "modelo": 443,
+   "nombre": "Casa grande de Bonta",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    7,
+    9,
+    12
+   ]
+  },
+  {
+   "mapa": 212602887,
+   "puerta": 519716,
+   "modelo": 438,
+   "nombre": "Casa gigantesca de escultor",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    11,
+    17,
+    18,
+    19,
+    21,
+    24,
+    28,
+    30,
+    33
+   ]
+  },
+  {
+   "mapa": 212602887,
+   "puerta": 519717,
+   "modelo": 436,
+   "nombre": "Casa gigantesca de carnicero",
+   "precio": 5000000,
+   "habitaciones": 4,
+   "instancias": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    14,
+    17,
+    18,
+    20,
+    22,
+    23,
+    24,
+    25,
+    28,
+    29
+   ]
+  },
+  {
+   "mapa": 212730370,
+   "puerta": 519673,
+   "modelo": 442,
+   "nombre": "Casa grande de Bonta",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    3,
+    5,
+    6,
+    8,
+    10,
+    12
+   ]
+  },
+  {
+   "mapa": 212730371,
+   "puerta": 519674,
+   "modelo": 447,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    6,
+    10,
+    11
+   ]
+  },
+  {
+   "mapa": 212730371,
+   "puerta": 519675,
+   "modelo": 445,
+   "nombre": "Casa mediana de Bonta",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    4,
+    7,
+    8,
+    15
+   ]
+  },
+  {
+   "mapa": 212730880,
+   "puerta": 519649,
+   "modelo": 442,
+   "nombre": "Casa grande de Bonta",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    5,
+    7,
+    9
+   ]
+  },
+  {
+   "mapa": 212730880,
+   "puerta": 519650,
+   "modelo": 443,
+   "nombre": "Casa grande de Bonta",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    8,
+    9,
+    10,
+    13,
+    16
+   ]
+  },
+  {
+   "mapa": 212731137,
+   "puerta": 519645,
+   "modelo": 447,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    4,
+    13
+   ]
+  },
+  {
+   "mapa": 212731649,
+   "puerta": 519646,
+   "modelo": 445,
+   "nombre": "Casa mediana de Bonta",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    5,
+    13
+   ]
+  },
+  {
+   "mapa": 212731649,
+   "puerta": 519647,
+   "modelo": 446,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    3,
+    6,
+    7
+   ]
+  },
+  {
+   "mapa": 212731649,
+   "puerta": 519648,
+   "modelo": 447,
+   "nombre": "Casa pequeña de Bonta",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    4,
+    9,
+    12,
+    13,
+    15,
+    16
+   ]
+  },
+  {
+   "mapa": 212861955,
+   "puerta": 519530,
+   "modelo": 424,
+   "nombre": "Casa grande de Brakmar",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2,
+    3,
+    6,
+    8,
+    9,
+    11
+   ]
+  },
+  {
+   "mapa": 212861955,
+   "puerta": 519531,
+   "modelo": 428,
+   "nombre": "Casa mediana de Brakmar",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    13
+   ]
+  },
+  {
+   "mapa": 212861955,
+   "puerta": 519532,
+   "modelo": 424,
+   "nombre": "Casa grande de Brakmar",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    7,
+    8,
+    10
+   ]
+  },
+  {
+   "mapa": 212862470,
+   "puerta": 519581,
+   "modelo": 428,
+   "nombre": "Casa mediana de Brakmar",
+   "precio": 2000000,
+   "habitaciones": 3,
+   "instancias": [
+    4,
+    7,
+    8
+   ]
+  },
+  {
+   "mapa": 212863491,
+   "puerta": 519553,
+   "modelo": 426,
+   "nombre": "Casa mediana de carnicero",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    2,
+    6,
+    9,
+    10,
+    13
+   ]
+  },
+  {
+   "mapa": 212864003,
+   "puerta": 519554,
+   "modelo": 426,
+   "nombre": "Casa mediana de carnicero",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    4,
+    6,
+    7,
+    8,
+    12
+   ]
+  },
+  {
+   "mapa": 212864003,
+   "puerta": 519555,
+   "modelo": 424,
+   "nombre": "Casa grande de Brakmar",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    1,
+    3,
+    4,
+    5,
+    9
+   ]
+  },
+  {
+   "mapa": 212864007,
+   "puerta": 519565,
+   "modelo": 423,
+   "nombre": "Casa grande de Brakmar",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    2,
+    8,
+    11,
+    14
+   ]
+  },
+  {
+   "mapa": 212864007,
+   "puerta": 519566,
+   "modelo": 434,
+   "nombre": "Casa pequeña de Brakmar",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    2,
+    4,
+    5,
+    6,
+    8,
+    11
+   ]
+  },
+  {
+   "mapa": 212864008,
+   "puerta": 519567,
+   "modelo": 434,
+   "nombre": "Casa pequeña de Brakmar",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    6,
+    7,
+    8
+   ]
+  },
+  {
+   "mapa": 212864008,
+   "puerta": 519568,
+   "modelo": 424,
+   "nombre": "Casa grande de Brakmar",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    4,
+    6,
+    8,
+    9,
+    12,
+    13
+   ]
+  },
+  {
+   "mapa": 212864519,
+   "puerta": 519564,
+   "modelo": 423,
+   "nombre": "Casa grande de Brakmar",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    4
+   ]
+  },
+  {
+   "mapa": 219415040,
+   "puerta": 519601,
+   "modelo": 424,
+   "nombre": "Casa grande de Brakmar",
+   "precio": 2500000,
+   "habitaciones": 3,
+   "instancias": [
+    10,
+    11,
+    16
+   ]
+  },
+  {
+   "mapa": 219415040,
+   "puerta": 519602,
+   "modelo": 434,
+   "nombre": "Casa pequeña de Brakmar",
+   "precio": 1500000,
+   "habitaciones": 2,
+   "instancias": [
+    4,
+    5,
+    8,
+    9,
+    11
+   ]
+  }
+ ]
+}

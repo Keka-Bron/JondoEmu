@@ -110,6 +110,23 @@ namespace Jondo.Unity.Launcher.Network
         /// every client fell back to SessionContext's single shared "Suelta" state. The last
         /// character loaded then became the identity/map/look seen while processing every socket.
         /// </summary>
+        /// <summary>
+        /// La direccion del otro extremo del socket, sin el puerto. Si no se puede leer se
+        /// devuelve vacio: no saber la IP no es motivo para tirar la conexion.
+        /// </summary>
+        private static string RemoteIp(NetworkStream stream)
+        {
+            try
+            {
+                var punto = (stream.Socket?.RemoteEndPoint) as System.Net.IPEndPoint;
+                return punto?.Address.ToString() ?? "";
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
         private static async Task HandleBoundGameSessionAsync(NetworkStream stream,
                                                               byte[] firstPayload,
                                                               string firstPayloadStr)
@@ -120,6 +137,9 @@ namespace Jondo.Unity.Launcher.Network
                 Console.WriteLine("[Game Server] Rejected game connection: the 8-client limit is reached.");
                 return;
             }
+
+            // De donde viene, para poder decirselo la proxima vez que entre.
+            session.State.ClientIp = RemoteIp(stream);
 
             GameNodeProxy.SesionesVivas[session.Id] = session;
             Console.WriteLine($"[Game Server] Socket bound to session {session.Id}.");
@@ -144,6 +164,16 @@ namespace Jondo.Unity.Launcher.Network
                             session.Id);
                     }
                     catch { }
+
+                    // Y fuera del grupo, si estaba en uno: a los que se quedan hay que decirselo,
+                    // porque si no ven un miembro que ya no existe.
+                    try
+                    {
+                        using (SessionContext.Push(session))
+                            await Handlers.PartyHandler.DisconnectedAsync(session.CharacterId);
+                    }
+                    catch { }
+
                     session.LeaveWorld();
                 }
 

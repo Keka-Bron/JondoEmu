@@ -835,13 +835,45 @@ namespace Jondo.Unity.Launcher.Network
                 Declare(jss, interactive);
         }
 
-        /// <summary>Un elemento clicable: qué es, qué se puede hacer con él y dónde está.</summary>
+        /// <summary>
+        /// Un elemento clicable: qué es, qué se puede hacer con él y dónde está.
+        ///
+        /// Los RECURSOS de oficio se declaran distinto según estén llenos o no, y hay que
+        /// respetarlo o el cliente ofrece segar un trigo ya segado:
+        ///
+        ///   lleno     f11 { f1:1, f2:0, f4 { uid, habilidad }, ... }   f15 sin f4
+        ///   agotado   f11 { f1:1,       f3 { uid, habilidad }, ... }   f15 f4 = 1
+        ///   en uso    igual que agotado                                f15 f4 = 2
+        ///
+        /// Es decir, la habilidad se muda del campo 4 al 3 cuando deja de poder usarse. Medido en
+        /// los veinticinco fresnos de un mismo mapa, sin una excepción. Todo lo que no es recurso
+        /// —zaaps, cofres, puertas— va siempre en el 4 y sin estado, como hasta ahora.
+        /// </summary>
         private static void Declare(Pb jss, Managers.RegisteredInteractive interactive)
         {
+            bool gathering = Managers.Resources.Is(interactive.MapId, interactive.Element.Id);
+            var state = gathering
+                ? Managers.Resources.StateOf(interactive.MapId, interactive.Element.Id)
+                : Managers.ResourceState.Full;
+
+            // Y el nivel de oficio de QUIEN esté mirando el mapa. Un recurso que le queda grande
+            // se declara igual que uno agotado, y el cliente lo pinta en rojo y no deja clicarlo:
+            // es como lo hace el juego real, sin decirle nada a nadie por el chat.
+            bool alcanza = !gathering || Managers.Resources.WithinReach(
+                interactive.MapId, interactive.Element.Id);
+
+            bool usable = !gathering || (state == Managers.ResourceState.Full && alcanza);
+
             var declaration = Pb.New().Var(1, 1);
+
+            // El f2 sale a cero en la madera, el trigo y la salvia, y a 1 o 3 en los dos
+            // caladeros. No se ha sabido qué lo distingue, así que va el cero, que es lo medido
+            // en tres de los cuatro oficios.
+            if (gathering && usable) declaration.Var(2, 0);
+
             foreach (var action in interactive.Actions)
             {
-                declaration.Msg(4, Pb.New()
+                declaration.Msg(usable ? 4 : 3, Pb.New()
                     .Var(1, action.SkillInstanceId)
                     .Var(2, action.SkillId));
             }
@@ -850,10 +882,13 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(5, interactive.Element.Id)
                 .Var(6, interactive.Type));
 
-            jss.Msg(15, Pb.New()
+            var placement = Pb.New()
                 .Var(1, 1)
                 .Var(2, interactive.Element.Cell)
-                .Var(3, interactive.Element.Id));
+                .Var(3, interactive.Element.Id);
+            if (gathering && !usable) placement.Var(4, (int)state);
+
+            jss.Msg(15, placement);
         }
 
         /// <summary>
@@ -1080,6 +1115,80 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static byte[] BuildPods(long carried, long capacity)
             => Pb.New().VarIfNotZero(1, carried).VarIfNotZero(3, capacity).Build();
+
+        // ─── Recolección ────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// El estado de un recurso (iwf): { f1 { f2: casilla, f3: elemento, f4: estado } }.
+        ///
+        /// Cero es lleno y el servidor real no manda el campo; 1 agotado y 2 en uso. Son los
+        /// mismos números de campo que el f15 del jss, sin el f1 de aquél.
+        /// </summary>
+        public static byte[] BuildElementState(int cell, int elementId, int state)
+            => Pb.New().Msg(1, Pb.New()
+                .Var(2, cell)
+                .Var(3, elementId)
+                .VarIfNotZero(4, state)).Build();
+
+        /// <summary>
+        /// Vuelve a declarar un recurso (iwm) para que su habilidad deje de poder usarse, o
+        /// vuelva a poder: { f3 { la misma forma que el f11 del jss } }.
+        ///
+        /// Es el mensaje que apaga el trigo recién segado sin tener que reenviar el mapa entero.
+        /// </summary>
+        public static byte[] BuildElementRedeclared(int skillInstanceId, int skillId,
+                                                    int elementId, int type, bool usable)
+        {
+            var declaration = Pb.New().Var(1, 1);
+            if (usable) declaration.Var(2, 0);
+            declaration.Msg(usable ? 4 : 3, Pb.New().Var(1, skillInstanceId).Var(2, skillId));
+            return Pb.New().Msg(3, declaration.Var(5, elementId).Var(6, type)).Build();
+        }
+
+        /// <summary>
+        /// El gesto de recolectar (iwn): { f2: elemento, f3: décimas, f4: habilidad, f5: quién }.
+        ///
+        /// OJO, no es el mismo iwn que el de usar un zaap o un taller. Aquél lleva f1 = 1 y no
+        /// lleva duración; éste es al revés: sin f1 y con el f3. Medido en las cuatro capturas de
+        /// oficio, y el f3 vale 30 en las cuatro —tres segundos— con el tiempo real entre este
+        /// mensaje y el de fin midiendo 2.996, 2.999, 3.037 y 3.064 milisegundos.
+        /// </summary>
+        public static byte[] BuildGatherStarted(int elementId, int tenths, int skillId,
+                                                long characterId)
+            => Pb.New()
+                .Var(2, elementId)
+                .Var(3, tenths)
+                .Var(4, skillId)
+                .Var(5, characterId)
+                .Build();
+
+        /// <summary>Se acabó el gesto (iwi): { f1: elemento, f3: habilidad }.</summary>
+        public static byte[] BuildGatherFinished(int elementId, int skillId)
+            => Pb.New().Var(1, elementId).Var(3, skillId).Build();
+
+        /// <summary>Lo recogido en esta pasada (itn): { f1: objeto, f2: cantidad }.</summary>
+        public static byte[] BuildGathered(int itemId, int quantity)
+            => Pb.New().Var(1, itemId).Var(2, quantity).Build();
+
+        /// <summary>
+        /// La experiencia de un oficio (irq): { f1 { f1: oficio, f2: siguiente nivel, f3: nivel,
+        /// f4: suelo del nivel, f5: acumulada } }.
+        ///
+        /// Manda TOTALES, no incrementos. El f2 desaparece cuando el oficio está al tope, que es
+        /// como salía el leñador de nivel 200 en la captura de la madera.
+        /// </summary>
+        public static byte[] BuildJobExperience(int jobId, long next, int level, long floor,
+                                                long experience)
+            => Pb.New().Msg(1, Pb.New()
+                .Var(1, jobId)
+                .VarIfNotZero(2, next)
+                .VarIfNotZero(3, level)
+                .VarIfNotZero(4, floor)
+                .VarIfNotZero(5, experience)).Build();
+
+        /// <summary>Cambia la cantidad de un objeto que ya estaba en la bolsa (ivj).</summary>
+        public static byte[] BuildItemQuantity(long uid, int total)
+            => Pb.New().Msg(3, Pb.New().Var(2, uid).Var(3, total)).Build();
 
         // ─── World: apariencia ──────────────────────────────────────────────────
 
@@ -1492,19 +1601,68 @@ namespace Jondo.Unity.Launcher.Network
         private const int ShopClosedKind = 11;
 
         /// <summary>
-        /// Una línea del sistema en el chat (lqn).
+        /// Un mensaje de información (lqn), que es COMO SE LE HABLA AL JUGADOR.
         ///
-        ///   f2: qué mensaje       f4 (repetido): sus parámetros, como cadenas
+        ///   f1: el tipo           f2: qué mensaje       f4 (repetido): sus parámetros
         ///
-        /// El 45 es el de la montaña de kamas, con la cifra ingresada, y el 252 el de una compra
-        /// hecha, con objeto, uid, cantidad y lo pagado.
+        /// El servidor no manda texto: manda dos números y el cliente pone la frase, ya traducida,
+        /// sacándola de InfoMessagesDataRoot. El tipo decide cómo la pinta —0 información, 1 aviso—
+        /// y proto3 se come el cero, que es por lo que en las capturas unos lqn llevan f1 y otros
+        /// no. Ver <see cref="Managers.InfoMessages"/>.
+        ///
+        /// Esto y no una línea de chat: el chat sale por el canal general y lo lee todo el mundo.
         /// </summary>
         public static byte[] BuildSystemMessage(int messageId, params string[] parameters)
+            => BuildInfoMessage(Managers.InfoMessages.Info, messageId, parameters);
+
+        /// <summary>El mismo, diciendo de qué tipo es.</summary>
+        public static byte[] BuildInfoMessage(int type, int messageId, params string[] parameters)
         {
-            var lqn = Pb.New().Var(2, messageId);
+            var lqn = Pb.New().VarIfNotZero(1, type).Var(2, messageId);
             foreach (string parameter in parameters) lqn.Str(4, parameter);
             return lqn.Build();
         }
+
+        /// <summary>
+        /// El aviso de la última conexión, con su fecha y la dirección desde la que se hizo.
+        ///
+        /// El cliente tiene dos plantillas y la diferencia es la IP:
+        ///
+        ///   193  «Última conexión a esta cuenta realizada el {2}/{1}/{0} a las {3}:{4}»
+        ///   152  la misma «… mediante la dirección IP {5}»
+        ///
+        /// Los parámetros van en orden año, mes, día, hora, minuto y dirección — el orden de la
+        /// plantilla no es el de lectura, y el bloque grabado lo confirma: manda el 193 con
+        /// ["2026","08","09","18","53"] y el cliente pinta «09/08/2026 a las 18:53».
+        ///
+        /// Sin IP se manda el 193, que es exactamente lo que hace el servidor real cuando no la
+        /// tiene: enseñar una dirección vacía queda peor que no enseñarla.
+        /// </summary>
+        public static byte[] BuildLastConnection(DateTimeOffset when, string ip)
+        {
+            string[] cuando =
+            {
+                when.Year.ToString("D4"),
+                when.Month.ToString("D2"),
+                when.Day.ToString("D2"),
+                when.Hour.ToString("D2"),
+                when.Minute.ToString("D2"),
+            };
+
+            if (string.IsNullOrWhiteSpace(ip))
+                return BuildSystemMessage(LastConnectionMessage, cuando);
+
+            var conIp = new string[6];
+            Array.Copy(cuando, conIp, 5);
+            conIp[5] = ip;
+            return BuildSystemMessage(LastConnectionWithIpMessage, conIp);
+        }
+
+        /// <summary>«Última conexión… a las {3}:{4}», sin dirección.</summary>
+        public const int LastConnectionMessage = 193;
+
+        /// <summary>La misma, «… mediante la dirección IP {5}».</summary>
+        public const int LastConnectionWithIpMessage = 152;
 
         /// <summary>El mensaje de "has recibido kamas", con la cifra como parámetro.</summary>
         public const int KamasReceivedMessage = 45;
@@ -1842,6 +2000,101 @@ namespace Jondo.Unity.Launcher.Network
                 .EmptyMsg(8)
                 .VarIfNotZero(9, channel)
                 .Build();
+
+        // ─── Grupos ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Te han invitado a un grupo (ijz): saca la ventanita.
+        ///
+        ///   f1: a quién invitan   f2: quién invita   f3: plazas
+        ///   f5: el grupo          f6: ¿?             f7: el nombre de quien invita
+        ///
+        /// Medido: 08a28280c8e708 10a282f0a6c408 1808 28e8ac04 3001 3a064861726d6f6f, o sea
+        /// invitado 302677754146, anfitrión 293213045026, ocho plazas, grupo 71272, y «Harmoo».
+        /// El f6 vale 1 en una captura y 2 en otra y no se ha sabido qué distingue; se manda 1,
+        /// que es el de la invitación que se acepta.
+        /// </summary>
+        public static byte[] BuildPartyInvitation(long guestId, long hostId, string hostName,
+                                                  int partyId, int seats)
+            => Pb.New()
+                .Var(1, guestId)
+                .Var(2, hostId)
+                .Var(3, seats)
+                .Var(5, partyId)
+                .Var(6, 1)
+                .Str(7, hostName ?? "")
+                .Build();
+
+        /// <summary>Se acabó la invitación, para quien la rechaza (ilo): { f1: grupo, f2: quién invitaba }.</summary>
+        public static byte[] BuildInvitationClosed(int partyId, long hostId)
+            => Pb.New().Var(1, partyId).Var(2, hostId).Build();
+
+        /// <summary>Quita al invitado de la lista, para quien invitó (iko): { f1: invitado, f2: grupo }.</summary>
+        public static byte[] BuildInvitationWithdrawn(long guestId, int partyId)
+            => Pb.New().Var(1, guestId).Var(2, partyId).Build();
+
+        /// <summary>El grupo se ha deshecho (imy): { f1: grupo }.</summary>
+        public static byte[] BuildPartyDissolved(int partyId) => Pb.New().Var(1, partyId).Build();
+
+        /// <summary>Te has salido (ils): { f1: grupo }.</summary>
+        public static byte[] BuildPartyLeft(int partyId) => Pb.New().Var(1, partyId).Build();
+
+        /// <summary>
+        /// Hay jefe nuevo (ilx): { f1: el nuevo jefe, f2: el grupo }.
+        ///
+        /// Once bytes, y NO se reenvía el grupo entero: se comprobó comparando la ficha del mismo
+        /// grupo antes y después del cambio, y lo único que cambia es su campo 4.
+        /// </summary>
+        public static byte[] BuildPartyLeader(long leaderId, int partyId)
+            => Pb.New().Var(1, leaderId).Var(2, partyId).Build();
+
+        /// <summary>
+        /// Un mensaje privado (kth): { f1: fecha, f4: vacío, f5: id del otro, f6: su nombre,
+        /// f7: el texto }.
+        ///
+        /// Medido de la captura del gremio, donde el susurro a «Hiierbita-Xx» SÍ llegó:
+        ///
+        ///   0a19 «2026-08-12T22:54:29+02:00»  2200  28 a282acfea805
+        ///   320c «Hiierbita-Xx»  3a04 «hola»
+        ///
+        /// Ojo con dos cosas. No lleva CANAL: el cliente sabe que es privado por el propio
+        /// mensaje, y por eso mandarlo como un kti por el canal 9 no pinta nada. Y lo que lleva no
+        /// es quién habla sino EL OTRO —en tu copia, a quién se lo dices—, así que el mismo
+        /// mensaje sirve para los dos lados cambiando de quién se pone la identidad.
+        /// </summary>
+        public static byte[] BuildPrivateMessage(string when, long otherId, string otherName,
+                                                 string text)
+            => Pb.New()
+                .Str(1, when)
+                .EmptyMsg(4)
+                .Var(5, otherId)
+                .Str(6, otherName ?? "")
+                .Str(7, text ?? "")
+                .Build();
+
+        /// <summary>
+        /// La ventana de subida de nivel (kua): { f1: el nivel nuevo }.
+        ///
+        /// Dos bytes, y con eso el cliente saca la ventana entera —música, animación y los datos
+        /// del nivel— y la deja abierta hasta que el jugador la cierra. No contesta nada al
+        /// cerrarla, así que no hay nada que escuchar.
+        ///
+        /// Sale exactamente dos veces en las 305 capturas, las dos en el tutorial y en el
+        /// milisegundo justo de cada subida: 0802 al pasar a nivel 2 y 0803 al pasar a nivel 3.
+        /// Detrás van iun, kub y kfe, pero esos tres salen también al entrar al mundo sin subir
+        /// nada, así que el único mensaje propio de la subida es éste.
+        ///
+        /// Lo que la ventana enseña —puntos ganados, vida, hechizos— lo saca el cliente del kub
+        /// que va detrás, no de aquí. Por eso hay que mandar el kua ANTES de las características
+        /// nuevas, que es el orden de la captura.
+        /// </summary>
+        public static byte[] BuildLevelUp(int level) => Pb.New().Var(1, level).Build();
+
+        /// <summary>
+        /// El chat no ha podido con algo (ktl), con el motivo en su unico campo. Medido: 0802 es
+        /// lo que contesta el servidor real al susurrarse a uno mismo.
+        /// </summary>
+        public static byte[] BuildChatError(int reason) => Pb.New().Var(1, reason).Build();
 
         // ─── Envelope for answers ───────────────────────────────────────────────
 

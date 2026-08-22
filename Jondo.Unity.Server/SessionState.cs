@@ -43,6 +43,32 @@ namespace Jondo.Unity.Launcher
         public int StatVitality { get; set; }
         public int StatWisdom { get; set; }
         public int StatStrength { get; set; }
+
+        /// <summary>Desde donde se ha conectado esta sesion. Se guarda para la proxima vez.</summary>
+        public string ClientIp { get; set; } = "";
+
+        /// <summary>Cuando y desde donde se conecto la vez anterior, leido antes de pisarlo.</summary>
+        public DatabaseManager.LastVisit? PreviousVisit { get; set; }
+
+        /// <summary>
+        /// La experiencia de cada oficio de este personaje, cargada al entrar y guardada en la
+        /// base cada vez que sube. Vive aquí y no en un estático porque dos jugadores a la vez
+        /// tienen oficios distintos.
+        /// </summary>
+        public Dictionary<int, Managers.JobExperience.Progress> Jobs { get; } = new();
+
+        /// <summary>En qué nivel va un oficio. Cero experiencia es nivel 1, no nivel cero.</summary>
+        public int JobLevel(int jobId)
+            => Jobs.TryGetValue(jobId, out var progress) ? progress.Level : 1;
+
+        /// <summary>Suma experiencia a un oficio y dice si ha subido.</summary>
+        public bool AddJobExperience(int jobId, long amount, out long total, out int level)
+        {
+            bool sube = Managers.JobExperience.Add(Jobs, jobId, amount, out var progress);
+            total = progress.Experience;
+            level = progress.Level;
+            return sube;
+        }
         public int StatIntelligence { get; set; }
         public int StatChance { get; set; }
         public int StatAgility { get; set; }

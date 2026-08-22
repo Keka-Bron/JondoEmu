@@ -254,7 +254,10 @@ namespace Jondo.Unity.Launcher.Handlers
                 Console.WriteLine($"[Game Node] Could not load character {characterIdToLoad}.");
                 return false;
             }
-            DatabaseManager.TouchLastConnection(characterIdToLoad);
+            // Primero se lee la visita anterior y sólo después se pisa: al revés, lo que se le
+            // enseñaría al jugador es la conexión de ahora mismo, que no le dice nada.
+            SessionContext.State.PreviousVisit = DatabaseManager.ReadLastVisit(characterIdToLoad);
+            DatabaseManager.TouchLastConnection(characterIdToLoad, SessionContext.State.ClientIp);
 
             try
             {

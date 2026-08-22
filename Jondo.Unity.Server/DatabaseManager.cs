@@ -362,6 +362,20 @@ namespace Jondo.Unity.Launcher
                 ";
                 createSpellChoices.ExecuteNonQuery();
 
+                // La experiencia de cada oficio. Es lo que el comentario del catálogo llevaba
+                // tiempo prometiendo: los niveles de oficio del personaje van aparte del catálogo,
+                // que es del cliente y no cambia.
+                var createJobs = worldConnection.CreateCommand();
+                createJobs.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterJobs (
+                        CharacterId INTEGER NOT NULL,
+                        JobId INTEGER NOT NULL,
+                        Experience INTEGER NOT NULL DEFAULT 0,
+                        PRIMARY KEY (CharacterId, JobId)
+                    );
+                ";
+                createJobs.ExecuteNonQuery();
+
                 // Y en qué hueco de la barra puso cada hechizo, por lo mismo.
                 var createSpellBar = worldConnection.CreateCommand();
                 createSpellBar.CommandText = @"
@@ -1502,16 +1516,85 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>Records when a character last entered the world.</summary>
-        public static void TouchLastConnection(long characterId)
+        /// <summary>Cuando y desde donde se conecto la vez ANTERIOR. Nulo la primera vez.</summary>
+        public sealed class LastVisit
+        {
+            public DateTimeOffset When { get; init; }
+            public string Ip { get; init; } = "";
+        }
+
+        /// <summary>
+        /// Lo de la vez pasada, LEIDO ANTES de pisarlo.
+        ///
+        /// El orden importa: si se actualiza primero, lo que se le enseña al jugador es la
+        /// conexion de ahora mismo, que no le dice nada. Por eso esto va antes del Touch.
+        /// </summary>
+        public static LastVisit? ReadLastVisit(long characterId)
+        {
+            try
+            {
+                EnsureLastIpColumn();
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT LastConnection, LastIp FROM Characters WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", characterId);
+                using var reader = command.ExecuteReader();
+                if (!reader.Read()) return null;
+
+                string cuando = reader.IsDBNull(0) ? "" : reader.GetString(0);
+                string ip = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                if (string.IsNullOrWhiteSpace(cuando)) return null;
+                if (!DateTimeOffset.TryParse(cuando, out var fecha)) return null;
+
+                return new LastVisit { When = fecha, Ip = ip };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se ha podido leer la ultima conexion: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>La columna es nueva, asi que se anade sola en bases que vienen de antes.</summary>
+        private static void EnsureLastIpColumn()
         {
             try
             {
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
+                using var check = connection.CreateCommand();
+                check.CommandText = "PRAGMA table_info(Characters);";
+                using var reader = check.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (string.Equals(reader.GetString(1), "LastIp", StringComparison.OrdinalIgnoreCase))
+                        return;
+                }
+                reader.Close();
+
+                using var add = connection.CreateCommand();
+                add.CommandText = "ALTER TABLE Characters ADD COLUMN LastIp TEXT;";
+                add.ExecuteNonQuery();
+                Console.WriteLine("[SQLite] Anadida la columna LastIp a Characters.");
+            }
+            catch (Exception) { }
+        }
+
+        public static void TouchLastConnection(long characterId, string ip = "")
+        {
+            try
+            {
+                EnsureLastIpColumn();
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "UPDATE Characters SET LastConnection = $now WHERE Id = $id;";
+                command.CommandText =
+                    "UPDATE Characters SET LastConnection = $now, LastIp = $ip WHERE Id = $id;";
                 command.Parameters.AddWithValue("$now",
                     DateTimeOffset.Now.ToString(Network.ConnectionProtocol.ConnectionDateFormat));
+                command.Parameters.AddWithValue("$ip", ip ?? "");
                 command.Parameters.AddWithValue("$id", characterId);
                 command.ExecuteNonQuery();
             }
@@ -1606,7 +1689,20 @@ namespace Jondo.Unity.Launcher
                 // HumanInformationsMsg has: Field 3 (Name)
                 Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails = ReconstructActorDetails(lookBytes, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName);
 
-                Console.WriteLine($"[SQLite] Successfully loaded character: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName} (Level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel})");
+                // Los oficios, que viven en su propia tabla porque son del personaje y no del
+                // catalogo del cliente.
+                var estado = Jondo.Unity.Launcher.Network.SessionContext.State;
+                estado.Jobs.Clear();
+                foreach (var par in LoadJobExperience(estado.CharacterId))
+                {
+                    estado.Jobs[par.Key] = new Managers.JobExperience.Progress
+                    {
+                        JobId = par.Key,
+                        Experience = par.Value,
+                    };
+                }
+
+                Console.WriteLine($"[SQLite] Successfully loaded character: {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName} (Level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}), {estado.Jobs.Count} oficios.");
                 return true;
             }
             return false;
@@ -3220,6 +3316,70 @@ namespace Jondo.Unity.Launcher
         /// Puts an item into the inventory. If one of the same kind is already loose in the bag,
         /// it adds to that stack instead of creating another entry. Returns the resulting item.
         /// </summary>
+        /// <summary>Guarda la experiencia de un oficio. Se llama en cada recolección.</summary>
+        public static void SaveJobExperience(long characterId, int jobId, long experience)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterJobs (CharacterId, JobId, Experience)
+                    VALUES ($c, $j, $e)
+                    ON CONFLICT(CharacterId, JobId) DO UPDATE SET Experience = $e;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$j", jobId);
+                command.Parameters.AddWithValue("$e", experience);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se ha podido guardar el oficio {jobId}: {ex.Message}");
+            }
+        }
+
+        /// <summary>Los oficios de un personaje, para dejárselos puestos al entrar.</summary>
+        public static Dictionary<int, long> LoadJobExperience(long characterId)
+        {
+            var salida = new Dictionary<int, long>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT JobId, Experience FROM CharacterJobs WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) salida[reader.GetInt32(0)] = reader.GetInt64(1);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se han podido leer los oficios: {ex.Message}");
+            }
+            return salida;
+        }
+
+        /// <summary>El mapa que dice la base para un personaje. Solo para diagnostico.</summary>
+        public static long MapOf(long characterId)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT MapId FROM Characters WHERE Id = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                object? valor = command.ExecuteScalar();
+                return valor == null ? 0 : Convert.ToInt64(valor);
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
+
         public static PlayerItem AddItemToInventory(long characterId, int itemGid, int quantity)
         {
             var inventory = LoadInventory(characterId);

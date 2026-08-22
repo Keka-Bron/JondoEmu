@@ -244,21 +244,29 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// The jobs of the capture, at level one.
+        /// Los oficios del personaje, con el progreso que tenga.
         ///
-        /// The list of jobs is game data and is worth keeping — which trades exist, and in which
-        /// order the client wants them. What is not ours is the progress: the captured account had
-        /// a dozen of them maxed out. Only the ids travel, each at level 1 with no experience.
+        /// La LISTA de oficios sí se aprovecha de la captura: qué oficios existen y en qué orden
+        /// los quiere el cliente son datos del juego. Lo que no se hereda es el progreso, que era
+        /// del que grabó —tenía una docena al máximo—.
         ///
-        ///   irq: f1 (repeated) { f1: job id, f3: level, f4/f5: experience }
+        /// Antes esto mandaba todos a nivel 1 y punto, y tenía sentido mientras no hubiera
+        /// experiencia de oficio en ninguna parte. Ahora sí la hay: se guarda en CharacterJobs y
+        /// se carga al elegir personaje, así que aquí se pone la de verdad. Sin esto, pescabas
+        /// hasta subir a Pescador 3 y al volver a entrar te salían los veinte a nivel 1 otra vez.
+        ///
+        ///   irq: f1 (repeated) { f1: oficio, f2: siguiente nivel, f3: nivel, f4: suelo, f5: total }
         /// </summary>
-        private static byte[] ResetJobs(byte[] frame)
+        private static byte[] SendJobs(byte[] frame)
         {
             var jobs = Pb.New();
             byte[]? payload = ConnectionProtocol.ReadPayload(frame, Op.Irq);
             if (payload == null) return jobs.Build();
 
+            var progreso = SessionContext.State.Jobs;
             int count = 0;
+            int conNivel = 0;
+
             foreach (var f in ProtoMessage.Parse(payload).Fields)
             {
                 if (f.FieldNumber != 1 || f.WireType != 2) continue;
@@ -266,13 +274,25 @@ namespace Jondo.Unity.Launcher.Network
                 foreach (var g in ProtoMessage.Parse(f.BytesValue).Fields)
                 {
                     if (g.FieldNumber != 1 || g.WireType != 0) continue;
-                    jobs.Msg(1, Pb.New().Var(1, g.VarIntValue).Var(3, 1));
+
+                    int jobId = (int)g.VarIntValue;
+                    long experiencia = progreso.TryGetValue(jobId, out var suyo) ? suyo.Experience : 0;
+                    int nivel = Managers.JobExperience.LevelOf(experiencia);
+                    if (nivel > 1 || experiencia > 0) conNivel++;
+
+                    jobs.Msg(1, Pb.New()
+                        .Var(1, jobId)
+                        .VarIfNotZero(2, Managers.JobExperience.Next(nivel))
+                        .Var(3, nivel)
+                        .VarIfNotZero(4, Managers.JobExperience.Floor(nivel))
+                        .VarIfNotZero(5, experiencia));
                     count++;
                     break;
                 }
             }
 
-            if (count > 0) Console.WriteLine($"[World] {count} jobs sent at level 1.");
+            if (count > 0)
+                Console.WriteLine($"[World] {count} oficios enviados, {conNivel} con progreso.");
             return jobs.Build();
         }
 
@@ -293,6 +313,16 @@ namespace Jondo.Unity.Launcher.Network
         /// cuenta capturada, y desde que el inventario sale de la base de datos esos objetos no
         /// existen: el cliente se quedaba con una barra llena de huecos que no sabe resolver.
         /// </summary>
+        /// <summary>Qué mensaje de información lleva un lqn, o cero.</summary>
+        private static int MessageOf(byte[] lqn)
+        {
+            foreach (var field in ProtoMessage.Parse(lqn).Fields)
+            {
+                if (field.FieldNumber == 2 && field.WireType == 0) return (int)field.VarIntValue;
+            }
+            return 0;
+        }
+
         private static byte[]? Rebuilt(byte[] frame, DatabaseManager.DbCharacter character)
         {
             if (ConnectionProtocol.ReadPayload(frame, Op.Kva) != null)
@@ -303,7 +333,7 @@ namespace Jondo.Unity.Launcher.Network
 
             if (ConnectionProtocol.ReadPayload(frame, Op.Irq) != null)
             {
-                return ConnectionProtocol.Push(Op.Irq, ResetJobs(frame));
+                return ConnectionProtocol.Push(Op.Irq, SendJobs(frame));
             }
 
             if (ConnectionProtocol.ReadPayload(frame, Op.Hms) != null)
@@ -315,6 +345,20 @@ namespace Jondo.Unity.Launcher.Network
             if (ConnectionProtocol.ReadPayload(frame, Op.Ivx) != null)
             {
                 return ConnectionProtocol.Push(Op.Ivx, ConnectionProtocol.BuildInventory());
+            }
+
+            // El aviso de la última conexión. El bloque grabado trae el del que capturó —el 9 de
+            // agosto a las 18:53— y eso es de otro. Se cambia por el de este personaje, con su
+            // fecha y la dirección desde la que entró la vez pasada, leídas de la base antes de
+            // pisarlas. Los demás lqn del bloque se dejan pasar tal cual.
+            byte[]? lqn = ConnectionProtocol.ReadPayload(frame, Op.Lqn);
+            if (lqn != null && MessageOf(lqn) == ConnectionProtocol.LastConnectionMessage)
+            {
+                var anterior = SessionContext.State.PreviousVisit;
+                if (anterior == null) return Array.Empty<byte>();
+
+                return ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildLastConnection(anterior.When, anterior.Ip));
             }
 
             byte[]? itg = ConnectionProtocol.ReadPayload(frame, Op.Itg);
@@ -588,6 +632,11 @@ namespace Jondo.Unity.Launcher.Network
                 // through is why the client showed level 154, another breed and somebody else's
                 // look.
                 byte[]? built = Rebuilt(frame, character);
+
+                // Un array vacio quiere decir "este mensaje no se manda": lo usa el aviso de la
+                // ultima conexion cuando el personaje entra por primera vez y no hay anterior que
+                // contar. Mandarlo vacio seria una trama de longitud cero.
+                if (built != null && built.Length == 0) { skipped++; continue; }
                 byte[] toSend;
 
                 if (built != null)
@@ -652,7 +701,9 @@ namespace Jondo.Unity.Launcher.Network
             {
                 if (ShouldSkip(frame)) continue;
 
-                byte[] toSend = Rebuilt(frame, character) ?? CaptureRewriter.Rewrite(frame, identity);
+                byte[]? rehecho = Rebuilt(frame, character);
+                if (rehecho != null && rehecho.Length == 0) continue;
+                byte[] toSend = rehecho ?? CaptureRewriter.Rewrite(frame, identity);
 
                 // jru says which map to load. Replacing it with the character's own map is only
                 // safe once we build the actor list ourselves: the actors travel in this same

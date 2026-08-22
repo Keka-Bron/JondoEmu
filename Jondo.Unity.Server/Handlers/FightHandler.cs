@@ -2922,6 +2922,10 @@ namespace Jondo.Unity.Launcher.Handlers
                     Program.LogDebug($"[Combate] ¡Sube de nivel! {GameState.CharacterLevel} -> {newLevel} " +
                                      $"(+{upToTwoHundred * 5} puntos).");
                     GameState.CharacterLevel = newLevel;
+
+                    // Y la ventana, que es lo que el jugador espera ver al subir.
+                    await WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Kua, ConnectionProtocol.BuildLevelUp(newLevel)));
                 }
             }
             if (kamas > 0) GameState.Kamas += kamas;
@@ -4576,6 +4580,9 @@ namespace Jondo.Unity.Launcher.Handlers
                     GameState.CharacterLevel = newLevel;
                     Program.LogDebug($"[FightHandler] Level up! {previousLevel} -> {newLevel} " +
                                      $"(+{levelsGained * 5} characteristic points).");
+
+                    await WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Kua, ConnectionProtocol.BuildLevelUp(newLevel)));
                 }
                 DatabaseManager.SaveCurrentCharacter();
                 Program.LogDebug($"[FightHandler] +{totalXP} experience (total {GameState.Experience}, " +

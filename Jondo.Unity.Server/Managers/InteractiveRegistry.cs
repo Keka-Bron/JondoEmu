@@ -21,6 +21,9 @@ namespace Jondo.Unity.Launcher.Managers
 
         /// <summary>La puerta de dentro, la que devuelve a la calle.</summary>
         HouseExit,
+
+        /// <summary>Un recurso de oficio: trigo, fresno, caladero, mineral.</summary>
+        Gather,
     }
 
     /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
@@ -150,6 +153,16 @@ namespace Jondo.Unity.Launcher.Managers
                 if (!Houses.TryGetExit(interior, out var exit)) continue;
                 Register(interior, new Interactives.Element(exit.ElementId, exit.Cell, exit.Gfx),
                          Houses.ExitType, InteractiveActionKind.HouseExit, Houses.ExitSkill);
+            }
+
+            // Y los recursos de oficio, que son con diferencia lo mas numeroso: veinticinco mil.
+            // Se reconocen por su grafico igual que todo lo demas.
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var resource in Resources.On(mapId))
+                    Register(mapId, new Interactives.Element(resource.ElementId, resource.Cell,
+                                                             resource.Gfx),
+                             resource.Type, InteractiveActionKind.Gather, resource.SkillId);
             }
 
             Console.WriteLine($"[Interactives] {_byElement.Count} elementos registrados.");

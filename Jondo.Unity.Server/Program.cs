@@ -81,6 +81,8 @@ namespace Jondo.Unity.Launcher
             Managers.Bins.Initialize();
             Managers.Anomalies.Initialize();
             Managers.Houses.Initialize();
+            Managers.Resources.Initialize();
+            Managers.InfoMessages.Initialize();
             Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
             Managers.Npcs.Initialize();

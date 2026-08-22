@@ -61,6 +61,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 case InteractiveActionKind.HouseExit:
                     await HouseHandler.LeaveAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
+                case InteractiveActionKind.Gather:
+                    await GatheringHandler.GatherAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
                 default:
                     throw new InvalidOperationException($"Acción interactiva no gestionada: {action.Kind}.");
             }

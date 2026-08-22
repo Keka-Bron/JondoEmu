@@ -209,6 +209,66 @@ namespace Jondo.Unity.Launcher.Network
                                                             Managers.Zaapis.Kind),
                  }, Managers.Zaapis.Teleporter));
 
+            // Los grupos, con los bytes de la captura de "recibir invitacion de grupo y aceptar":
+            // Harmoo (293213045026) invita a Sacri-Master (302677754146) al grupo 71272.
+            Same(failures, "ijz (te invitan)",
+                 "08a28280c8e70810a282f0a6c408180828e8ac0430013a064861726d6f6f",
+                 ConnectionProtocol.BuildPartyInvitation(
+                     302677754146, 293213045026, "Harmoo", 71272, 8));
+
+            // Y los del rechazo, de la captura del koliseo y la del que invita.
+            Same(failures, "ilo (invitacion cerrada)", "08d8af0410a28280c8e708",
+                 ConnectionProtocol.BuildInvitationClosed(71640, 302677754146));
+            Same(failures, "iko (invitado fuera)", "08a282a8ffa40e10999c04",
+                 ConnectionProtocol.BuildInvitationWithdrawn(490967007522, 69145));
+            Same(failures, "imy (grupo deshecho)", "08999c04",
+                 ConnectionProtocol.BuildPartyDissolved(69145));
+            Same(failures, "ils (te has salido)", "08c29c04",
+                 ConnectionProtocol.BuildPartyLeft(69186));
+            Same(failures, "ilx (jefe nuevo)", "08a282acf7bd1a10a69c04",
+                 ConnectionProtocol.BuildPartyLeader(909978042658, 69158));
+
+            // El aviso de la ultima conexion. Sin IP tiene que salir byte a byte igual al que
+            // trae el bloque grabado: 9 de agosto de 2026 a las 18:53. Es lo que fija el orden de
+            // los parametros, que no es el de lectura.
+            Same(failures, "lqn (ultima conexion, sin IP)",
+                 "10c101220432303236220230382202303922023138220235 33".Replace(" ", ""),
+                 ConnectionProtocol.BuildLastConnection(
+                     new DateTimeOffset(2026, 8, 9, 18, 53, 0, TimeSpan.Zero), ""));
+
+            // Y con IP, que anade el sexto parametro y cambia de plantilla.
+            Same(failures, "lqn (ultima conexion, con IP)",
+                 "1098012204323032362202303822023039220231382202353322093132372e302e302e31",
+                 ConnectionProtocol.BuildLastConnection(
+                     new DateTimeOffset(2026, 8, 9, 18, 53, 0, TimeSpan.Zero), "127.0.0.1"));
+
+            // El mensaje privado, tal cual lo mando el servidor real al susurrar a Hiierbita-Xx.
+            Same(failures, "kth (mensaje privado)",
+                 "0a19323032362d30382d31325432323a35343a32392b30323a3030220028a282acfea805"
+                 + "320c4869696572626974612d58783a04686f6c61",
+                 ConnectionProtocol.BuildPrivateMessage(
+                     "2026-08-12T22:54:29+02:00", 182801072418, "Hiierbita-Xx", "hola"));
+
+            // La ventana de subida de nivel, tal cual sale en el tutorial.
+            Same(failures, "kua (nivel 2)", "0802", ConnectionProtocol.BuildLevelUp(2));
+            Same(failures, "kua (nivel 3)", "0803", ConnectionProtocol.BuildLevelUp(3));
+
+            // El rechazo de un susurro. 0802 es lo que contesta el servidor real al susurrarse
+            // a uno mismo, en la captura de la lista de artesanos.
+            Same(failures, "ktl (susurro rechazado)", "0802",
+                 ConnectionProtocol.BuildChatError(Handlers.PrivateMessageHandler.CannotWhisper));
+
+            // Los mensajes de información, que es como se le habla al jugador. El tipo 0 no se
+            // manda —proto3 se come el cero— y el 1 sí; los cuatro salen de capturas distintas.
+            Same(failures, "lqn (bienvenida, tipo 1)", "08011059",
+                 ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Warning, 89));
+            Same(failures, "lqn (hechizo imposible, tipo 1)", "080110af01",
+                 ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Warning, 175));
+            Same(failures, "lqn (kamas ganados, tipo 0)", "102d220132",
+                 ConnectionProtocol.BuildSystemMessage(Managers.InfoMessages.KamasGained, "2"));
+            Same(failures, "lqn (objeto conseguido, tipo 0)", "101522013122053130373834",
+                 ConnectionProtocol.BuildSystemMessage(Managers.InfoMessages.ItemGained, "1", "10784"));
+
             // Y la lista de zaaps descubiertos, que es lo que hace que la ventana no salga vacía.
             // Son los 45 del personaje de la captura, en su orden, y tienen que dar sus 182 bytes.
             Same(failures, "hjk (zaaps descubiertos)",

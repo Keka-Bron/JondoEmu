@@ -454,6 +454,32 @@ namespace Jondo.Unity.Launcher.Network
                         }
                     }
                 }
+                // Los grupos. Se invita por nombre y se acepta por id de grupo, asi que cada uno
+                // tiene su mensaje; ver Handlers.PartyHandler.
+                else if (payloadStr.Contains(Op.Uri(Op.Ime)))
+                {
+                    await Handlers.PartyHandler.InviteAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Ijx)))
+                {
+                    await Handlers.PartyHandler.AcceptAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Iki)))
+                {
+                    await Handlers.PartyHandler.RefuseAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Inh)))
+                {
+                    await Handlers.PartyHandler.LeaveAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Ima)))
+                {
+                    await Handlers.PartyHandler.PromoteAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Ktb)))
+                {
+                    await Handlers.PrivateMessageHandler.WhisperAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Iwo)))
                 {
                     // Todos los elementos pasan por el mismo registro; él decide qué acción hay
@@ -878,7 +904,10 @@ namespace Jondo.Unity.Launcher.Network
             var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (character == null) return false;
 
-            Console.WriteLine($"[Game Node] Sending the map block ({reason}).");
+            // El personaje y el mapa van en la traza a proposito: cuando dos clientes entran a la
+            // vez, es lo primero que hay que mirar para saber si se han cruzado.
+            Console.WriteLine($"[Game Node] Sending the map block ({reason}): " +
+                              $"{GameState.CharacterName} en el mapa {GameState.MapId}.");
             await WorldEntry.SendMapAsync(stream, character, GameState.MapId);
 
             // Y lo que uno tiene de adorno, que el servidor real manda una sola vez, aquí: los

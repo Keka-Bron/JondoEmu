@@ -61,6 +61,41 @@ namespace Jondo.Unity.Launcher.Network
         public static GameSession? FindByCharacter(long characterId)
             => _sessions.Values.FirstOrDefault(s => s.CharacterId == characterId);
 
+        /// <summary>
+        /// El personaje conectado que se llama asi. Hace falta para los susurros: el cliente
+        /// manda el NOMBRE, no el identificador.
+        ///
+        /// Se busca primero por el nombre exacto, sin distinguir mayusculas. Si no aparece, se
+        /// vuelve a buscar sin la decoracion: los nombres de esta base son del tipo
+        /// [#KEKA-BRON#], y quien escribe a mano pone "keka-bron" o "kekabron". Comparar solo
+        /// letras y numeros evita que un susurro se pierda por un corchete.
+        /// </summary>
+        public static GameSession? FindByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+
+            var exacto = _sessions.Values.FirstOrDefault(
+                s => string.Equals(s.State.CharacterName, name, StringComparison.OrdinalIgnoreCase));
+            if (exacto != null) return exacto;
+
+            string buscado = Desnudo(name);
+            if (buscado.Length == 0) return null;
+            return _sessions.Values.FirstOrDefault(
+                s => Desnudo(s.State.CharacterName) == buscado);
+        }
+
+        /// <summary>Solo las letras y los numeros, en minuscula: [#KEKA-BRON#] -> kekabron.</summary>
+        private static string Desnudo(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "";
+            var limpio = new System.Text.StringBuilder(name.Length);
+            foreach (char c in name)
+            {
+                if (char.IsLetterOrDigit(c)) limpio.Append(char.ToLowerInvariant(c));
+            }
+            return limpio.ToString();
+        }
+
         /// <summary>Returns a stable snapshot; callers never enumerate a mutable registry.</summary>
         public static IReadOnlyList<GameSession> OnMap(long mapId)
             => _sessions.Values

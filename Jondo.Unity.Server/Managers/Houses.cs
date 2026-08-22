@@ -17,15 +17,20 @@ namespace Jondo.Unity.Launcher.Managers
     ///
     /// Entrar y salir NO son el mismo mensaje, y eso costó verlo:
     ///
-    ///   entrar   iwo { f1: habilidad, f2: elemento, f3: vivienda }  →  iwn  →  jqw { f1: mapa }
+    ///   entrar   iwo { f1: habilidad, f2: elemento, f3: instancia } →  iwn  →  jqw { f1: mapa }
     ///   salir    iwo { f1: habilidad, f2: elemento }                →  iwn  →  jru { f2: mapa }
     ///
     /// Ojo al número de campo del mapa: en el jqw va en el f1 y en el jru va en el f2.
     ///
-    /// El f3 del iwo de entrada es el NÚMERO DE VIVIENDA, un campo que no estaba en el esquema
-    /// que conocíamos: un mismo elemento puerta sirve a varias viviendas de un mismo edificio
-    /// —en la captura, once— y sin él el servidor no sabría a cuál entrar. Aquí cada puerta tiene
-    /// un solo interior, así que se lee y se ignora; queda escrito para cuando haya varias.
+    /// El f3 del iwo de entrada dice A QUÉ INSTANCIA se entra, y no es un piso. Cuando Ankama
+    /// fusionó servidores no había casas para todo el mundo, así que una misma puerta con un
+    /// mismo interior pasó a pertenecer a mucha gente a la vez: cada dueño tiene su propia copia
+    /// del MISMO mapa, separada de las demás. En la captura ese edificio tiene once dueños, no
+    /// once plantas.
+    ///
+    /// Por eso una puerta lleva a un interior y sólo a uno, que es como está hecho aquí. Y por eso
+    /// en Jondo, donde las casas no tienen dueño, con una sola instancia basta: el f3 se lee y se
+    /// ignora. El día que haya dueños, ese campo es el que dice de quién es la copia que se abre.
     ///
     /// ─── Qué hemos decidido nosotros ────────────────────────────────────────────────────────
     ///
@@ -34,10 +39,23 @@ namespace Jondo.Unity.Launcher.Managers
     /// ni un campo con «house», y «doorCell» da cero ocurrencias en global-metadata.dat. Ese
     /// vínculo lo pone el servidor de Ankama y no lo tenemos.
     ///
-    /// Así que lo ponemos nosotros: cada puerta coge un interior de la piscina de su subzona —y
-    /// si su subzona no tiene, de su área—, repartido por índice con todo ordenado. Sale siempre
-    /// igual, sin guardar nada, y la casa se acuerda con la zona. Lo hace tools/casas_mundo.py y
-    /// se puede corregir a mano en el .json: es una decisión nuestra, no un dato medido.
+    /// Así que lo ponemos nosotros, y con una lista de INCLUSIÓN, no de exclusiones. Los interiores
+    /// salen sólo de las dos subzonas que se sabe que son viviendas —983 Residencia brakmariana y
+    /// 984 Residencia bontariana, 114 mapas— repartidos por índice con todo ordenado: la misma
+    /// puerta lleva siempre al mismo sitio, sin guardar nada.
+    ///
+    /// La primera versión hacía lo contrario —cualquier mapa en (0,0) menos una lista de vetos— y
+    /// salió mal en el juego: una puerta de Astrub llevaba a un taller de herrero de Tierradala,
+    /// que es un sitio público al que se llega andando, y encima se le declaraba a su FORJA que
+    /// era la salida de la casa. Es decir, un interactivo de oficio de un mapa legítimo pasaba a
+    /// sacarte a la calle. Con 2.377 mapas en (0,0) una lista de vetos nunca iba a ser suficiente:
+    /// hay que decir cuáles SÍ.
+    ///
+    /// El precio es que las casas ya no se acuerdan de su zona: sólo Bonta y Brakmar tienen
+    /// residencias, así que 1.251 de las 1.437 puertas llevan a un interior de otra parte. Es feo
+    /// y es a propósito, porque lo otro rompía contenido que funcionaba.
+    ///
+    /// Lo hace tools/casas_mundo.py y se puede corregir a mano en el .json.
     ///
     /// ─── Qué NO hace todavía ────────────────────────────────────────────────────────────────
     ///
@@ -64,13 +82,15 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>La habilidad de la puerta de dentro. Es la genérica de «usar».</summary>
         public const int ExitSkill = 184;
 
-        /// <summary>Una puerta de casa: dónde está y a dónde lleva.</summary>
+        /// <summary>Una puerta de casa: dónde está, a dónde lleva y de qué casa es.</summary>
         public readonly struct Door
         {
-            public Door(long mapId, int elementId, int cell, int gfx, long interiorMapId)
+            public Door(long mapId, int elementId, int cell, int gfx, long interiorMapId,
+                        int model, string name, long price, int rooms, int dwellings)
             {
                 MapId = mapId; ElementId = elementId; Cell = cell; Gfx = gfx;
                 InteriorMapId = interiorMapId;
+                Model = model; Name = name; Price = price; Rooms = rooms; Dwellings = dwellings;
             }
 
             public long MapId { get; }
@@ -78,6 +98,29 @@ namespace Jondo.Unity.Launcher.Managers
             public int Cell { get; }
             public int Gfx { get; }
             public long InteriorMapId { get; }
+
+            /// <summary>
+            /// El modelo de casa, el typeId de HousesDataRoot, o cero si no se sabe.
+            ///
+            /// Sólo lo tienen las 37 puertas de los 25 mapas donde la lista de casas que manda el
+            /// servidor real cuadra en número con las puertas que reconocemos. Ahí se emparejan
+            /// por orden, y el único caso comprobable dice que el orden acierta: la puerta 522653
+            /// del mapa 212601864 sale como la «Casa grande de Bonta» de once dueños, que es
+            /// exactamente el edificio en el que se entra en la captura.
+            /// </summary>
+            public int Model { get; }
+
+            public string Name { get; }
+            public long Price { get; }
+            public int Rooms { get; }
+
+            /// <summary>
+            /// Cuántos DUEÑOS distintos tiene el edificio, cada uno con su copia del mismo
+            /// interior. No son plantas: ver la explicación de la clase.
+            /// </summary>
+            public int Dwellings { get; }
+
+            public bool IsKnown => Model != 0;
         }
 
         /// <summary>
@@ -143,11 +186,20 @@ namespace Jondo.Unity.Launcher.Managers
                     if (interior <= 0) continue;
                     if (MapManager.GetMapInfo(interior) == null) continue;
 
+                    int dwellings = 0;
+                    if (entry.TryGetProperty("instancias", out var flats))
+                        dwellings = flats.GetArrayLength();
+
                     var door = new Door(
                         mapId, elementId,
                         entry.TryGetProperty("casilla", out var c) ? c.GetInt32() : 0,
                         entry.TryGetProperty("gfx", out var g) ? g.GetInt32() : 0,
-                        interior);
+                        interior,
+                        entry.TryGetProperty("casa", out var h) ? h.GetInt32() : 0,
+                        entry.TryGetProperty("nombre", out var n) ? (n.GetString() ?? "") : "",
+                        entry.TryGetProperty("precio", out var pr) ? pr.GetInt64() : 0,
+                        entry.TryGetProperty("habitaciones", out var rm) ? rm.GetInt32() : 0,
+                        dwellings);
 
                     if (_byElement.ContainsKey((mapId, elementId))) continue;
                     _byElement.Add((mapId, elementId), door);
@@ -215,8 +267,15 @@ namespace Jondo.Unity.Launcher.Managers
                 if (exit.IsRealDoor) puertasDeVerdad++;
             }
 
+            int conNombre = 0;
+            foreach (var door in _byElement.Values)
+            {
+                if (door.IsKnown) conNombre++;
+            }
+
             Console.WriteLine($"[Casas] {_byElement.Count} puertas en {_byMap.Count} mapas, " +
-                              $"{_exits.Count} interiores ({puertasDeVerdad} con puerta de verdad).");
+                              $"{_exits.Count} interiores ({puertasDeVerdad} con puerta de verdad), " +
+                              $"{conNombre} con casa identificada.");
         }
 
         public static IReadOnlyList<Door> On(long mapId)
