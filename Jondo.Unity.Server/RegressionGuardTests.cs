@@ -146,6 +146,9 @@ namespace Jondo.Unity.Launcher
                             "[RegressionGuard FAILED] A generic teleport overlaps a house door.");
                 }
 
+                foreach (var resource in Managers.Resources.On(mapId))
+                    expected.Add((mapId, resource.ElementId));
+
                 foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
                 {
                     foreach (var action in interactive.Actions)
@@ -278,11 +281,33 @@ namespace Jondo.Unity.Launcher
                         $"[RegressionGuard FAILED] Recipe {recipe.ResultId} is inconsistent.");
             }
 
+            // El catalogo tiene que traer habilidades de recoleccion y el mundo tiene que tener
+            // recursos con esas habilidades. Antes esto llamaba a GatheringHandler.TryResolve,
+            // que solo cruzaba tablas en memoria y no mandaba un byte; ahora el handler recolecta
+            // de verdad y lo que hay que comprobar es que haya algo que recolectar.
             var gathering = Managers.SkillManager.All.FirstOrDefault(s => s.IsGathering);
-            if (gathering == null ||
-                !Handlers.GatheringHandler.TryResolve(gathering.Id, out _, out _, out _))
+            if (gathering == null)
                 throw new InvalidOperationException(
-                    "[RegressionGuard FAILED] Gathering handler cannot resolve a gathering skill.");
+                    "[RegressionGuard FAILED] El catalogo no trae ninguna habilidad de recoleccion.");
+
+            if (Managers.Resources.Count == 0)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] No hay ningun recurso recolectable en el mundo.");
+
+            // Y la cantidad tiene que respetar lo medido: un oficio al tope sobre el recurso mas
+            // facil da veinte, y uno recien empezado da cuatro.
+            if (Handlers.GatheringHandler.Ceiling(200, 1) != 20 ||
+                Handlers.GatheringHandler.Ceiling(200, 80) != 13 ||
+                Handlers.GatheringHandler.Ceiling(1, 1) != 4)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] La cantidad recolectada no cuadra con las capturas.");
+
+            // Y la curva de experiencia, con los tres puntos que dan las capturas.
+            if (Managers.JobExperience.Floor(2) != 20 || Managers.JobExperience.Floor(3) != 60 ||
+                Managers.JobExperience.Floor(200) != 398000 ||
+                Managers.JobExperience.LevelOf(20) != 2 || Managers.JobExperience.LevelOf(19) != 1)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] La curva de experiencia de oficio no cuadra.");
 
             var craft = Managers.RecipeManager.All.First();
             if (!Handlers.CraftHandler.TryResolve(craft.SkillId, out _, out _, out var recipes, out _) ||

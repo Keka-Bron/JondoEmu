@@ -82,6 +82,8 @@ namespace Jondo.Unity.Launcher
             Managers.Anomalies.Initialize();
             Managers.Houses.Initialize();
             Managers.TeleportManager.Initialize();
+            Managers.Resources.Initialize();
+            Managers.InfoMessages.Initialize();
             Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
             Managers.Npcs.Initialize();

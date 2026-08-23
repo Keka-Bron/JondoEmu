@@ -24,6 +24,9 @@ namespace Jondo.Unity.Launcher.Managers
 
         /// <summary>Un passage instantané entre deux maps, hors système des maisons.</summary>
         Teleport,
+
+        /// <summary>Un recurso de oficio: trigo, fresno, caladero, mineral.</summary>
+        Gather,
     }
 
     /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
@@ -165,6 +168,16 @@ namespace Jondo.Unity.Launcher.Managers
                 Register(route.SourceMapId,
                          new Interactives.Element(route.ElementId, route.SourceCellId, route.GfxId),
                          route.InteractiveType, InteractiveActionKind.Teleport, route.SkillId);
+            }
+
+            // Y los recursos de oficio, que son con diferencia lo mas numeroso: veinticinco mil.
+            // Se reconocen por su grafico igual que todo lo demas.
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var resource in Resources.On(mapId))
+                    Register(mapId, new Interactives.Element(resource.ElementId, resource.Cell,
+                                                             resource.Gfx),
+                              resource.Type, InteractiveActionKind.Gather, resource.SkillId);
             }
 
             Console.WriteLine($"[Interactives] {_byElement.Count} elementos registrados.");

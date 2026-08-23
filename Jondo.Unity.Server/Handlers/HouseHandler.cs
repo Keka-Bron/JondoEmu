@@ -13,7 +13,7 @@ namespace Jondo.Unity.Launcher.Handlers
     /// Las dos mitades son distintas por el cable, y ésa fue la sorpresa. Medido de las capturas
     /// «entrar en mi casa» y «desde dentro de casa salir a fuera»:
     ///
-    ///   entrar   iwo { f1: habilidad, f2: elemento, f3: vivienda }
+    ///   entrar   iwo { f1: habilidad, f2: elemento, f3: instancia }
     ///            iwn { f1: 1, f2: elemento, f4: 84, f5: personaje }
     ///            jqw { f1: mapa interior }
     ///
@@ -63,8 +63,11 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
 
-            Console.WriteLine($"[Casas] Entrada por la puerta {elementId} del mapa {mapaQueDeja} " +
-                              $"al interior {door.InteriorMapId}, casilla {SessionContext.State.CellId}.");
+            string cual = door.IsKnown
+                ? $"«{door.Name}» ({door.Dwellings} dueños en el juego real)"
+                : $"puerta {elementId}";
+            Console.WriteLine($"[Casas] Entrada por {cual} del mapa {mapaQueDeja} al interior " +
+                              $"{door.InteriorMapId}, casilla {SessionContext.State.CellId}.");
         }
 
         /// <summary>El cliente ha clicado la puerta de dentro.</summary>

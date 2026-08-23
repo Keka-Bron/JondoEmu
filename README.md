@@ -109,7 +109,9 @@ Some folders are **not** in the repository because they are not needed to play, 
 - [ ] The house **plaque** — owner, price, for-sale — is not sent yet. Across 34 capture folders there are 1,276 plaques and every one has an owner, so what an ownerless house looks like on the wire is still unmeasured, and `jss` is not the message to guess in.
 - [ ] House chest, access code, buying and selling.
 
-> Which house sits behind which door is **not in the client** — checked three ways. Jondo assigns each door an interior deterministically from its own sub-area (929 doors), then its area (309), then anywhere (199), so a house at least belongs to its neighbourhood. It is written to `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
+> Which house sits behind which door is **not in the client** — checked three ways. The 1,437 doors share **114 genuine interiors**, and Jondo assigns each door one of them deterministically, keeping it inside its own neighbourhood where it can. Sharing an interior is not a bug: after a server merge there were fewer houses than players, so in the real game one interior serves many owners, each with their own separate instance. The mapping lives in `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
+>
+> An earlier version picked interiors with a blocklist over the 2,377 maps at (0,0) and sent players into public workshops — a door in Astrub opened onto a Pandala forge, and the forge acted as the way out. Interiors are now taken from an **inclusion list**: the residence sub-areas, and nothing else.
 
 ### 🗑️ Bins
 - [x] **67 public bins in 63 maps**, recognised by their four graphics. They open, show empty and close.
@@ -122,6 +124,30 @@ Some folders are **not** in the repository because they are not needed to play, 
 - [x] **Chest** with the full item flow — putting in, taking out, and persistence across sessions.
 - [x] **Lottery machine**, unlimited, handing out items with overpowered rolled stats.
 - [x] **No monsters spawn inside**, unlike the rest of the world.
+
+### ⛏️ Gathering professions
+- [x] **25,090 resources on 4,507 maps** across the six gathering jobs. The client knows where every element is and which graphic it uses, but **not what it is** — the type and the skill come from the server. Crossing 305 captures with the client dump yields graphic → (type, skill), and from the skill the client catalogue gives the job and the item you get.
+- [x] **The three states** — full, depleted, busy — declared the way the client expects them. The skill moves field: it travels in `f4` when the resource can be used and in `f3` when it cannot. Verified on 25 ash trees of one map without a single exception.
+- [x] **Job levels and experience**, persisted per character, with the real curve (`10 × level × (level − 1)`).
+- [x] **What you gather lands in your inventory**, and the amount grows with your job level over the resource's own level, so levelling up really does pay.
+- [x] **Too low a job level blocks gathering** the way the game does it: the tool icon turns red on hover, exactly like a depleted resource. No chat line — see below.
+- [ ] Crafting professions: workshops, recipes and the craft window.
+
+### 💬 Information messages, level-up and private chat
+- [x] **Information messages the right way.** "Last connection…", "You gained 320 kamas", "You do not have the required job level" are **not text from the server**: the server sends a number and the client prints its own translated string. That is `lqn { type, message, parameters }`, resolved against the client's 2,555-entry table. Sending those as chat lines instead publishes them on the **general channel for everyone on the map** to read — which is what used to happen.
+- [x] **The level-up window** — the music, the animation and the summary, on a real level gain and on `.level` in either direction, showing the destination level's numbers.
+- [x] **Private messages** between characters. A whisper is not a chat channel: it has its own message, `kth`, and the client routes it by opcode, not by channel number. Sending it as a channel-9 chat line arrives, is accepted, and paints absolutely nothing.
+- [x] **Last connection time and IP**, stored per character and shown on every world entry.
+
+### 👥 Parties
+- [x] **Invite, accept, refuse, leave, hand over the lead and kick**, measured against six captures taken from **both sides** — inviting and being invited are not the same messages.
+- [x] **Kicking** is the one that is not in any capture: across all 34 folders nobody ever throws anybody out. The request was read off the running client — `ili { party, who }` — and the answer is built only out of messages that *are* measured: the kicked player gets the same `ils` they would get by leaving, and the rest get the party again. Kicking someone who has not answered the invitation yet withdraws it instead.
+- [x] Two things that mislead: you **invite by name and accept by party id**, and the party is **created when you invite**, before the other player answers, which is why a one-member party arrives at once and dissolves by itself on a refusal.
+- [x] **A full member sheet** — name, level, sex, look, breed, map position, life, prospecting and initiative. The client sorts the panel by initiative. Position is checked against the database: the four maps in the captures give exactly the coordinates and sub-areas the messages carry.
+- [x] **If the leader leaves**, the lead passes to the next member; **if someone disconnects**, they leave the party and the rest are told. Neither is in any capture, and without them a party with real people breaks in a minute.
+- [ ] The **Details** button of the invitation popup does not answer yet (`imd` → `ilb`).
+- [ ] The dedicated *a member is gone* message. The client has a handler for `inc`, so it exists, but no capture contains one and the generated `.proto` gets field numbers wrong often enough not to trust it. Until it is measured, the remaining members are simply sent the party again.
+- [ ] Party search, party fights and following the leader across maps.
 
 ### 👕 Appearances (Cosmetics)
 Dofus does not ship the item-to-look table in its client data: the server sends it. Every pair below was **measured off real packet captures**, one garment at a time — **2,371 of the 2,420 cosmetics in the catalogue**.
@@ -254,9 +280,10 @@ blocks rather than one spell at a time.
 ### ❌ Not implemented
 - [ ] Kolossium and PvP combat
 - [ ] AP/MP dodge rolls, shields, lock and tackle in melee
-- [ ] Professions
+- [ ] Crafting professions (gathering ones do work — see above)
 - [ ] Achievements
 - [ ] Guilds
+- [ ] Combat challenges — the fifteen opcodes are measured and the family is confirmed in the client's own dispatcher; nothing is wired yet.
 
 ---
 
@@ -391,3 +418,14 @@ Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved i
 <img width="2559" height="1511" alt="image" src="https://github.com/user-attachments/assets/38c437da-d881-4d64-b2b4-0348c789a9a3" />
 <img width="2559" height="1503" alt="image" src="https://github.com/user-attachments/assets/95591e2a-f99d-4f66-b8f5-1f0c24ccf548" />
 <img width="2559" height="1480" alt="image" src="https://github.com/user-attachments/assets/4d17a777-6839-4ed0-9aac-38768159e4ac" />
+<img width="1403" height="1153" alt="image" src="https://github.com/user-attachments/assets/a22d551f-6dec-4147-b821-f6a8c5c7e721" />
+<img width="1003" height="824" alt="image" src="https://github.com/user-attachments/assets/82b10866-3f7f-4e79-83fb-f96331066fd7" />
+<img width="805" height="1021" alt="image" src="https://github.com/user-attachments/assets/bcbf1292-0474-4279-ab0d-9da0bf2b7ea4" />
+<img width="2559" height="1503" alt="image" src="https://github.com/user-attachments/assets/c86bc15b-5bcd-4487-aa3d-391df8be93c0" />
+<img width="2559" height="1515" alt="image" src="https://github.com/user-attachments/assets/dd60b531-4b3e-4347-a866-26ecb36046d4" />
+<img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/7f0406c5-34c0-46b9-8cf7-fe14913f70e0" />
+<img width="2559" height="1504" alt="image" src="https://github.com/user-attachments/assets/6b934f0d-40b7-4a3e-9926-5df97bf9c484" />
+
+
+
+

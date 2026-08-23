@@ -224,6 +224,17 @@ namespace Jondo.Unity.Launcher.Handlers
 
             GameState.CharacterLevel = newLevel;
 
+            // La ventana de subida, con el nivel de destino. Va ANTES de las características
+            // nuevas porque es de ahí de donde el cliente saca lo que enseña dentro, y ése es el
+            // orden de la captura. Se manda también al BAJAR de nivel: el mensaje sólo lleva el
+            // nivel al que se va, así que sirve igual, y ver la ventana es la forma de saber que
+            // el comando ha hecho algo.
+            if (newLevel != oldLevel)
+            {
+                await NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kua, ConnectionProtocol.BuildLevelUp(newLevel)));
+            }
+
             // La experiencia solo se toca si hay tabla con la que ponerla donde toca: sin ella
             // LevelFloor devuelve cero para todo, y eso no es "el suelo del nivel", es borrarle al
             // personaje la experiencia que tenía.
@@ -578,6 +589,13 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>
         /// El aviso al jugador, por el canal donde escribió para que le salga en la pestaña que
         /// está mirando. Es un kti, la línea de chat de la captura.
+        ///
+        /// OJO: esto es la EXCEPCIÓN, no la norma. Un kti sale por el canal general y lo lee todo
+        /// el mundo. Para decirle algo al jugador —«no tienes nivel», «has ganado kamas»— va un
+        /// lqn con su número de mensaje; ver <see cref="Managers.InfoMessages"/>. Aquí se usa el
+        /// chat porque la respuesta de un comando es texto libre que no está en la tabla del
+        /// cliente, y porque el jugador acaba de escribir en esa misma pestaña y espera la
+        /// respuesta ahí.
         /// </summary>
         private static async Task NotifyAsync(NetworkStream stream, string text, int channel, long accountId)
         {

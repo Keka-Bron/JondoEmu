@@ -287,8 +287,28 @@ namespace Jondo.Unity.Launcher
         /// Igual que Resolve pero para ficheros que el emulador CREA: si no existe todavía, la
         /// ruta que devuelve es la de la carpeta que le toca, no la de la raíz.
         /// </summary>
+        /// <summary>
+        /// Una base de datos: se busca PRIMERO en su carpeta, bases\, y sólo después en el resto.
+        ///
+        /// Antes usaba el mismo orden que los datos —datos\ primero— y eso costó una tarde. Si por
+        /// lo que sea aparece un world.db en datos\, el servidor se pone a escribir ahí y deja de
+        /// ver el de bases\: el personaje sale donde no lo dejaste, los oficios vuelven a nivel 1,
+        /// y no hay ningún fallo de código que encontrar porque cada mitad es coherente consigo
+        /// misma. Una base no es un dato del juego: datos\ es de sólo lectura y viene del cliente,
+        /// bases\ es lo que el servidor escribe.
+        ///
+        /// Si queda una copia suelta en otro sitio se avisa por consola, porque es exactamente la
+        /// clase de cosa que no se nota hasta que se ha perdido una partida.
+        /// </summary>
         private static string ResolveWritable(string filename, string folder)
         {
+            string propia = Combine(Root, Path.Combine(folder, filename));
+            if (File.Exists(propia))
+            {
+                AvisarDeCopias(filename, propia);
+                return propia;
+            }
+
             foreach (string sub in SubFolders)
             {
                 string candidate = Combine(Root, Path.Combine(sub, filename));
@@ -301,6 +321,20 @@ namespace Jondo.Unity.Launcher
             string destino = Combine(Root, folder);
             try { Directory.CreateDirectory(destino); } catch { }
             return Path.Combine(destino, filename);
+        }
+
+        /// <summary>Avisa si la misma base existe en dos sitios. Ver ResolveWritable.</summary>
+        private static void AvisarDeCopias(string filename, string usada)
+        {
+            foreach (string sub in SubFolders)
+            {
+                string otra = Combine(Root, Path.Combine(sub, filename));
+                if (!File.Exists(otra)) continue;
+                if (string.Equals(otra, usada, StringComparison.OrdinalIgnoreCase)) continue;
+
+                Console.WriteLine($"[Paths] OJO: hay otro {filename} en {otra}. Se usa {usada} " +
+                                  "y ese otro se queda sin tocar; borra el que sobre.");
+            }
         }
 
         private static string Combine(string a, string b) => Path.Combine(a, b);

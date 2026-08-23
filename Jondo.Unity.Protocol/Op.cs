@@ -119,8 +119,125 @@ public static class Op
     /// <summary>Solo se llama desde la rama kkn, que nunca llega. 5 mensajes en 3 ficheros.</summary>
     public const string Ilc = "ilc";
 
-    /// <summary>Lo envia el cliente (1 vez); el fichero datos/dofus3_mappings.json lo llama InventoryWeightMessage y eso es falso, un informe de peso seria push del servidor.</summary>
+    /// <summary>
+    /// El cliente pide los detalles de un grupo al que le han invitado: { f2: id del grupo }.
+    /// Antes estaba apuntado como "InventoryWeightMessage", que era falso: se midio en la captura
+    /// de recibir invitacion, entre el aviso ijz y el ijx de aceptar.
+    /// </summary>
     public const string Imd = "imd";
+
+    // ─── Grupos ─────────────────────────────────────────────────────────────
+    //
+    // Medido de las seis capturas de la carpeta Grupos, con los dos puntos de vista: en unas
+    // graba quien invita y en otras el invitado, y los mensajes no son los mismos.
+    //
+    // Se invita por NOMBRE y se acepta por ID DE GRUPO, que es lo que mas despista: el ime lleva
+    // "Uber-Black" en texto y el ijx lleva 71272. El grupo tiene identificador propio, un contador
+    // del servidor -69145, 69158, 69186, 71272 en las cuatro capturas-.
+
+    /// <summary>Invitar a alguien al grupo, POR SU NOMBRE: { f1 { f4 { f1: nombre } }, f3: true }.</summary>
+    public const string Ime = "ime";
+
+    /// <summary>
+    /// El grupo entero: { f1 (repetido): miembro { f1: su hoja, f2: su id }, f4: EL JEFE,
+    /// f7: id del grupo, f10: plazas }. Es el unico mensaje grande de todo el sistema.
+    /// </summary>
+    public const string Ing = "ing";
+
+    /// <summary>
+    /// Un invitado pendiente se anade a la lista: { f2: id del grupo, f3: su ficha }, y la ficha
+    /// es { f1: su aspecto, f2: su nombre, f3: su id, f5: quien invita, f6 { f1: 1 }, f8: su raza }.
+    /// </summary>
+    public const string Imf = "imf";
+
+    /// <summary>
+    /// Ha entrado alguien nuevo: { f1: id del grupo, f2: el miembro { f1: su hoja, f2: su id } }.
+    /// El miembro es EXACTAMENTE el mismo bloque que va repetido dentro del ing.
+    /// </summary>
+    public const string Ink = "ink";
+
+    /// <summary>
+    /// Te han invitado: { f1: tu, f2: quien invita, f3: plazas, f5: id del grupo, f7: su nombre }.
+    /// Es el que saca la ventanita.
+    /// </summary>
+    public const string Ijz = "ijz";
+
+    /// <summary>ACEPTAR la invitacion: { f1: id del grupo }.</summary>
+    public const string Ijx = "ijx";
+
+    /// <summary>RECHAZAR la invitacion: { f2: id del grupo }.</summary>
+    public const string Iki = "iki";
+
+    /// <summary>A quien rechaza: se acabo la invitacion { f1: id del grupo, f2: quien invitaba }.</summary>
+    public const string Ilo = "ilo";
+
+    /// <summary>Al que invito: quitale de la lista de invitados { f1: el invitado, f2: el grupo }.</summary>
+    public const string Iko = "iko";
+
+    /// <summary>ABANDONAR el grupo: { f2: id del grupo }. El f1 es un bool y no viaja.</summary>
+    public const string Inh = "inh";
+
+    /// <summary>Te has salido: { f1: id del grupo }. El cliente le quita la ventana.</summary>
+    public const string Ils = "ils";
+
+    /// <summary>El grupo se ha deshecho: { f1: id del grupo }. Llega pegado al iko.</summary>
+    public const string Imy = "imy";
+
+    /// <summary>Ceder el mando: { f1: el nuevo jefe, f3: id del grupo }.</summary>
+    public const string Ima = "ima";
+
+    /// <summary>Hay jefe nuevo: { f1: el nuevo jefe, f2: id del grupo }. Once bytes; NO se reenvia el grupo.</summary>
+    public const string Ilx = "ilx";
+
+    /// <summary>Respuesta corta y VACIA a un ima. Ni siquiera lleva carga.</summary>
+    public const string Imk = "imk";
+
+    /// <summary>Mientras el grupo sigue al lider: { f1: a quien se sigue, mapa, coordenadas, casilla }.</summary>
+    public const string Ikv = "ikv";
+
+    // Los siguientes los nombra Akuma en su tabla y encajan con los que salen sueltos en las
+    // capturas, pero NO se han medido campo a campo aqui: no hay ninguna captura donde se expulse
+    // a nadie ni donde un miembro entre en combate. Se dejan escritos para no volver a buscarlos.
+
+    /// <summary>
+    /// EXPULSAR a un miembro: { f1: id del grupo, f2: a quien se echa }. Medido del cliente
+    /// de verdad, que lo manda al pulsar el boton de la ficha del miembro.
+    /// </summary>
+    public const string Ili = "ili";
+
+    /// <summary>
+    /// Un miembro sale del grupo. El cliente SI lo maneja -tiene su metodo en la clase de la
+    /// interfaz de grupo- pero no aparece en ninguna captura, asi que su forma esta SIN MEDIR:
+    /// el proto le da { int64, bool, int32 } y ese fichero se equivoca de numeracion a menudo.
+    /// </summary>
+    public const string Inc = "inc";
+
+    /// <summary>
+    /// Actualizacion completa de un miembro: { f1: id del grupo, f2: su hoja }. Misma forma que
+    /// el ink. Sale en la captura del koliseo y en la de busqueda automatica de grupo.
+    /// </summary>
+    public const string Ilw = "ilw";
+
+    /// <summary>
+    /// Como le va a un miembro: { f1: quien, f2 { f1: 5, f3: prospeccion, f4: vida,
+    /// f6: vida maxima }, f4: id del grupo }. Llega cada vez que a alguien le cambia la vida.
+    /// </summary>
+    public const string Ino = "ino";
+
+    /// <summary>Acuse del cliente sobre el grupo. Sin medir.</summary>
+    public const string Imo = "imo";
+
+    /// <summary>Acuse del servidor sobre el grupo. Sin medir.</summary>
+    public const string Inb = "inb";
+
+    /// <summary>Los detalles de un grupo, respuesta al imd.</summary>
+    public const string Ilb = "ilb";
+
+    /// <summary>Un companero de grupo ha entrado en combate. Sin medir.</summary>
+    public const string Ilh = "ilh";
+
+    /// <summary>Unirse a un combate del grupo. Sin medir.</summary>
+    public const string Kay = "kay";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Ioc = "ioc";
@@ -184,6 +301,33 @@ public static class Op
 
     /// <summary>Un objeto llega a la bolsa, con todo: plantilla, efectos y cantidad.</summary>
     public const string Iua = "iua";
+
+    /// <summary>
+    /// El estado de un elemento del mapa: { f1 { f2: casilla, f3: elemento, f4: estado } }.
+    /// Cero lleno, 1 agotado, 2 en uso. Es el mismo juego de campos que el f15 del jss.
+    /// </summary>
+    public const string Iwf = "iwf";
+
+    /// <summary>
+    /// Vuelve a declarar un elemento: { f3 { la misma forma que el f11 del jss } }. Se manda
+    /// cuando su habilidad deja de poder usarse o vuelve a poder, porque cambia de campo.
+    /// </summary>
+    public const string Iwm = "iwm";
+
+    /// <summary>Se acaba de recolectar: { f1: elemento, f3: habilidad }.</summary>
+    public const string Iwi = "iwi";
+
+    /// <summary>Lo recogido en esta pasada: { f1: objeto, f2: cantidad }.</summary>
+    public const string Itn = "itn";
+
+    /// <summary>
+    /// Sube un oficio de nivel: { f1 { f2: oficio, f4: todas sus habilidades }, f3: nivel }.
+    /// No lleva experiencia; esa va en el irq.
+    /// </summary>
+    public const string Isz = "isz";
+
+    /// <summary>Cambia la cantidad de un objeto que ya estaba en la bolsa: { f3 { f2: uid, f3: total } }.</summary>
+    public const string Ivj = "ivj";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Iue = "iue";
@@ -593,10 +737,39 @@ public static class Op
     public const string Ksx = "ksx";
 
     /// <summary>La linea de vuelta. Canales: 0 general (omitido por ser cero), 1 equipo, 2 gremio, 3 alianza, 4 grupo, 5 comercio, 6 reclutamiento, y 9, 11, 16, 18, 19 para el resto.</summary>
+    /// <summary>
+    /// El personaje sube de nivel: { f1: el nivel nuevo }. Dos bytes, y es TODO lo que hace falta
+    /// para que el cliente saque su ventana con musica y animacion. Ni los puntos, ni la vida, ni
+    /// los hechizos van aqui: eso llega en el kub de detras. El cliente no contesta nada al
+    /// cerrarla.
+    /// </summary>
+    public const string Kua = "kua";
+
     public const string Kti = "kti";
 
     /// <summary>Una linea que escribio el jugador.</summary>
     public const string Ktm = "ktm";
+
+    /// <summary>
+    /// Susurrar a alguien: { f1: el texto, f5: a quien }. No es un canal del chat normal -eso es
+    /// el ktm- sino su propio mensaje. El canal privado es el 9 segun la tabla del cliente.
+    /// </summary>
+    public const string Ktb = "ktb";
+
+    /// <summary>
+    /// Un mensaje privado: { f1: fecha, f5: id del otro, f6: nombre del otro, f7: texto }.
+    /// El volcado de nombres reales lo llama ChatPrivateCopyMessageEvent. No lleva canal: el canal
+    /// privado se deduce del propio mensaje. Y no lleva quien lo manda sino EL OTRO, o sea el
+    /// destinatario en tu copia.
+    /// </summary>
+    public const string Kth = "kth";
+
+    /// <summary>
+    /// El chat no ha podido con algo (ChatErrorEvent): { f1: el motivo }. El 2 es el que contesta
+    /// el servidor real al susurrarse a uno mismo; los demas valores vistos no se han atado a su
+    /// causa.
+    /// </summary>
+    public const string Ktl = "ktl";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ktw = "ktw";
