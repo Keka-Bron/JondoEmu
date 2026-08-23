@@ -26,6 +26,10 @@ namespace Jondo.Unity.Launcher.Handlers
     ///   rechazar   C→S iki { grupo }         →  a ti ilo; al que invitó iko + imy
     ///   salir      C→S inh { grupo }         →  S→C ils { grupo }
     ///   ceder      C→S ima { quién, grupo }  →  S→C imk (vacío) + ilx { quién, grupo }
+    ///   echar      C→S ili { grupo, quién }  →  al echado ils; ver <see cref="KickAsync"/>
+    ///
+    /// El <c>ili</c> es el único que no sale de las capturas sino del cliente en marcha: en las
+    /// 34 carpetas no hay ni una vez que alguien expulse a nadie.
     ///
     /// Dos cosas que despistan y conviene tener presentes. Se invita por NOMBRE y se acepta por
     /// ID DE GRUPO: el ime lleva «Uber-Black» en texto y el ijx lleva 71272. Y el grupo se crea
@@ -200,17 +204,126 @@ namespace Jondo.Unity.Launcher.Handlers
             long meId = SessionContext.State.CharacterId;
             if (party == null) return;
 
-            var (quedan, deshecho, nuevoJefe) = Parties.Leave(party, meId);
+            var salida = Parties.Leave(party, meId);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ils, ConnectionProtocol.BuildPartyLeft(partyId)));
 
-            foreach (long otro in quedan)
+            await AnnounceGoneAsync(party, partyId, salida);
+
+            Console.WriteLine($"[Grupo] {SessionContext.State.CharacterName} deja el grupo " +
+                              $"{partyId}{(salida.Dissolved ? " y se deshace" : "")}.");
+        }
+
+        // ─── Expulsar ───────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Echar a alguien del grupo. El cliente lo pide con
+        ///
+        ///   ili { f1: el grupo, f2: a quién }
+        ///
+        /// que es lo único de todo esto que está medido del cliente de verdad: no hay ninguna
+        /// captura en la que se expulse a nadie, ni siquiera entre las 34 carpetas.
+        ///
+        /// Por eso al que se queda dentro NO se le manda un mensaje propio de «a fulano lo han
+        /// echado». Existe —el cliente tiene su manejador para el <c>inc</c>—, pero su forma no
+        /// está medida y el .proto se equivoca de numeración lo bastante a menudo como para no
+        /// fiarse. Se manda el grupo entero, que sí está medido y dice la verdad.
+        ///
+        /// Con dos personas, que es el caso normal, ni se plantea: el grupo se queda con uno y se
+        /// deshace, y el <c>imy</c> de deshacerlo sí está medido.
+        /// </summary>
+        public static async Task KickAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? ili = ConnectionProtocol.ReadPayload(payload, Op.Ili);
+            if (ili == null) return;
+
+            int partyId = (int)VarField(ili, 1);
+            long quien = VarField(ili, 2);
+            var party = Parties.Get(partyId);
+            if (party == null || quien == 0) return;
+
+            long meId = SessionContext.State.CharacterId;
+            string meName = SessionContext.State.CharacterName;
+
+            // Sólo el jefe echa, y para irse uno mismo está el inh.
+            if (party.LeaderId != meId)
+            {
+                Console.WriteLine($"[Grupo] {meName} intenta echar del grupo {partyId} sin mandarlo.");
+                return;
+            }
+            if (quien == meId) return;
+
+            // Si todavía no había contestado a la invitación, no se le echa: se le retira.
+            long host = Parties.Refuse(party, quien);
+            if (host != 0)
+            {
+                await WithdrawAsync(stream, party, partyId, quien, host);
+                Console.WriteLine($"[Grupo] {meName} retira la invitación de {quien} al grupo {partyId}.");
+                return;
+            }
+
+            if (!Parties.MembersOf(party).Contains(quien)) return;
+
+            var salida = Parties.Leave(party, quien);
+
+            var echado = SessionRegistry.FindByCharacter(quien);
+            if (echado != null)
+            {
+                await echado.SendAsync(ConnectionProtocol.Push(Op.Ils,
+                    ConnectionProtocol.BuildPartyLeft(partyId)));
+            }
+
+            await AnnounceGoneAsync(party, partyId, salida);
+
+            Console.WriteLine($"[Grupo] {meName} echa a " +
+                              $"{echado?.State.CharacterName ?? quien.ToString()} del grupo " +
+                              $"{partyId}{(salida.Dissolved ? ", que se deshace" : "")}.");
+        }
+
+        /// <summary>
+        /// Retirar una invitación que aún no se había contestado. Es lo mismo que manda el
+        /// servidor real cuando el invitado dice que no, pero al revés: aquí lo corta quien
+        /// invitó.
+        /// </summary>
+        private static async Task WithdrawAsync(NetworkStream stream, Managers.Parties.Party party,
+                                                int partyId, long guestId, long hostId)
+        {
+            var guest = SessionRegistry.FindByCharacter(guestId);
+            if (guest != null)
+            {
+                await guest.SendAsync(ConnectionProtocol.Push(Op.Ilo,
+                    ConnectionProtocol.BuildInvitationClosed(partyId, hostId)));
+            }
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iko,
+                    ConnectionProtocol.BuildInvitationWithdrawn(guestId, partyId)));
+
+            if (Parties.MembersOf(party).Count <= 1)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Imy, ConnectionProtocol.BuildPartyDissolved(partyId)));
+                Parties.Dissolve(party);
+            }
+        }
+
+        /// <summary>
+        /// A los que se quedan: o el grupo se ha deshecho, o hay jefe nuevo y una lista nueva.
+        ///
+        /// Lo usan los tres caminos por los que alguien deja de estar —irse, que le echen y
+        /// desconectarse— porque lo que ve el resto es lo mismo en los tres.
+        /// </summary>
+        private static async Task AnnounceGoneAsync(
+            Managers.Parties.Party party, int partyId,
+            (IReadOnlyList<long> Remaining, bool Dissolved, long NewLeader) salida)
+        {
+            foreach (long otro in salida.Remaining)
             {
                 var sesion = SessionRegistry.FindByCharacter(otro);
                 if (sesion == null) continue;
 
-                if (deshecho)
+                if (salida.Dissolved)
                 {
                     await sesion.SendAsync(ConnectionProtocol.Push(Op.Imy,
                         ConnectionProtocol.BuildPartyDissolved(partyId)));
@@ -219,16 +332,13 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 // Si el que se iba mandaba, el mando pasa al siguiente que entró: un grupo sin
                 // jefe no lo entiende el cliente.
-                if (nuevoJefe != 0)
+                if (salida.NewLeader != 0)
                 {
                     await sesion.SendAsync(ConnectionProtocol.Push(Op.Ilx,
-                        ConnectionProtocol.BuildPartyLeader(nuevoJefe, partyId)));
+                        ConnectionProtocol.BuildPartyLeader(salida.NewLeader, partyId)));
                 }
                 await sesion.SendAsync(ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
             }
-
-            Console.WriteLine($"[Grupo] {SessionContext.State.CharacterName} deja el grupo " +
-                              $"{partyId}{(deshecho ? " y se deshace" : "")}.");
         }
 
         // ─── Ceder el mando ─────────────────────────────────────────────────────
@@ -265,24 +375,8 @@ namespace Jondo.Unity.Launcher.Handlers
             var party = Parties.Of(characterId);
             if (party == null) return;
 
-            var (quedan, deshecho, nuevoJefe) = Parties.Leave(party, characterId);
-            foreach (long otro in quedan)
-            {
-                var sesion = SessionRegistry.FindByCharacter(otro);
-                if (sesion == null) continue;
-                if (deshecho)
-                {
-                    await sesion.SendAsync(ConnectionProtocol.Push(Op.Imy,
-                        ConnectionProtocol.BuildPartyDissolved(party.Id)));
-                    continue;
-                }
-                if (nuevoJefe != 0)
-                {
-                    await sesion.SendAsync(ConnectionProtocol.Push(Op.Ilx,
-                        ConnectionProtocol.BuildPartyLeader(nuevoJefe, party.Id)));
-                }
-                await sesion.SendAsync(ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
-            }
+            int partyId = party.Id;
+            await AnnounceGoneAsync(party, partyId, Parties.Leave(party, characterId));
         }
 
         // ─── Piezas ─────────────────────────────────────────────────────────────

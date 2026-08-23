@@ -140,11 +140,13 @@ Some folders are **not** in the repository because they are not needed to play, 
 - [x] **Last connection time and IP**, stored per character and shown on every world entry.
 
 ### 👥 Parties
-- [x] **Invite, accept, refuse, leave and hand over the lead**, all five measured against six captures taken from **both sides** — inviting and being invited are not the same messages.
+- [x] **Invite, accept, refuse, leave, hand over the lead and kick**, measured against six captures taken from **both sides** — inviting and being invited are not the same messages.
+- [x] **Kicking** is the one that is not in any capture: across all 34 folders nobody ever throws anybody out. The request was read off the running client — `ili { party, who }` — and the answer is built only out of messages that *are* measured: the kicked player gets the same `ils` they would get by leaving, and the rest get the party again. Kicking someone who has not answered the invitation yet withdraws it instead.
 - [x] Two things that mislead: you **invite by name and accept by party id**, and the party is **created when you invite**, before the other player answers, which is why a one-member party arrives at once and dissolves by itself on a refusal.
 - [x] **A full member sheet** — name, level, sex, look, breed, map position, life, prospecting and initiative. The client sorts the panel by initiative. Position is checked against the database: the four maps in the captures give exactly the coordinates and sub-areas the messages carry.
 - [x] **If the leader leaves**, the lead passes to the next member; **if someone disconnects**, they leave the party and the rest are told. Neither is in any capture, and without them a party with real people breaks in a minute.
 - [ ] The **Details** button of the invitation popup does not answer yet (`imd` → `ilb`).
+- [ ] The dedicated *a member is gone* message. The client has a handler for `inc`, so it exists, but no capture contains one and the generated `.proto` gets field numbers wrong often enough not to trust it. Until it is measured, the remaining members are simply sent the party again.
 - [ ] Party search, party fights and following the leader across maps.
 
 ### 👕 Appearances (Cosmetics)

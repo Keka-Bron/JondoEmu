@@ -472,6 +472,10 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     await Handlers.PartyHandler.LeaveAsync(stream, payload);
                 }
+                else if (payloadStr.Contains(Op.Uri(Op.Ili)))
+                {
+                    await Handlers.PartyHandler.KickAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Ima)))
                 {
                     await Handlers.PartyHandler.PromoteAsync(stream, payload);

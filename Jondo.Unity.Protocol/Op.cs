@@ -199,16 +199,29 @@ public static class Op
     // capturas, pero NO se han medido campo a campo aqui: no hay ninguna captura donde se expulse
     // a nadie ni donde un miembro entre en combate. Se dejan escritos para no volver a buscarlos.
 
-    /// <summary>Expulsar a un miembro. Sin medir.</summary>
+    /// <summary>
+    /// EXPULSAR a un miembro: { f1: id del grupo, f2: a quien se echa }. Medido del cliente
+    /// de verdad, que lo manda al pulsar el boton de la ficha del miembro.
+    /// </summary>
     public const string Ili = "ili";
 
-    /// <summary>Un miembro sale del grupo. Sin medir.</summary>
+    /// <summary>
+    /// Un miembro sale del grupo. El cliente SI lo maneja -tiene su metodo en la clase de la
+    /// interfaz de grupo- pero no aparece en ninguna captura, asi que su forma esta SIN MEDIR:
+    /// el proto le da { int64, bool, int32 } y ese fichero se equivoca de numeracion a menudo.
+    /// </summary>
     public const string Inc = "inc";
 
-    /// <summary>Actualizacion completa de un miembro. Sin medir.</summary>
+    /// <summary>
+    /// Actualizacion completa de un miembro: { f1: id del grupo, f2: su hoja }. Misma forma que
+    /// el ink. Sale en la captura del koliseo y en la de busqueda automatica de grupo.
+    /// </summary>
     public const string Ilw = "ilw";
 
-    /// <summary>Actualizacion al vuelo de un miembro. Sin medir.</summary>
+    /// <summary>
+    /// Como le va a un miembro: { f1: quien, f2 { f1: 5, f3: prospeccion, f4: vida,
+    /// f6: vida maxima }, f4: id del grupo }. Llega cada vez que a alguien le cambia la vida.
+    /// </summary>
     public const string Ino = "ino";
 
     /// <summary>Acuse del cliente sobre el grupo. Sin medir.</summary>
