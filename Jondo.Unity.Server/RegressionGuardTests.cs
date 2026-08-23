@@ -178,11 +178,72 @@ namespace Jondo.Unity.Launcher
                     expected.Add((interior, exit.ElementId));
             }
 
+            // Invariant Giny : chaque Teleport/ElementId/USE114 est exposé au clic et la même
+            // route est retrouvable sur sa cellule pour le déclenchement de fin de mouvement/JQI.
+            foreach (var teleport in Managers.TeleportManager.All)
+            {
+                if (!Managers.InteractiveRegistry.TryResolveUse(
+                        teleport.SourceMapId, teleport.ElementId,
+                        Managers.Interactives.SkillInstanceOf(teleport.ElementId),
+                        out var interactive, out var action) ||
+                    interactive.Element.Id != teleport.ElementId ||
+                    interactive.Element.Cell != teleport.SourceCellId ||
+                    interactive.Element.Gfx != teleport.GfxId ||
+                    action.Kind != Managers.InteractiveActionKind.Teleport ||
+                    action.SkillId != 114 || teleport.SkillId != 114 ||
+                    !Managers.TeleportManager.TryGetCellTrigger(
+                        teleport.SourceMapId, teleport.SourceCellId, out var cellRoute) ||
+                    !ReferenceEquals(teleport, cellRoute))
+                {
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] Teleport ElementId {teleport.SourceMapId}/" +
+                        $"{teleport.ElementId} is not a clickable f11/f15 interactive.");
+                }
+            }
+
             if (!Managers.TeleportManager.TryGet(191106048, 515837, out var astrub) ||
                 astrub.DestinationMapId != 192416776 || astrub.DestinationCellId != 534)
             {
                 throw new InvalidOperationException(
                     "[RegressionGuard FAILED] Astrub/Temple teleport route is missing or changed.");
+            }
+
+            if (!Managers.TeleportManager.TryGet(188746247, 515801, out var jewellerEntrance) ||
+                jewellerEntrance.DestinationMapId != 192937990 ||
+                jewellerEntrance.DestinationCellId != 400 ||
+                !Managers.TeleportManager.TryGet(192937990, 515742, out var jewellerExit) ||
+                jewellerExit.DestinationMapId != 188746247 ||
+                jewellerExit.SourceCellId != 414 || jewellerExit.DestinationCellId != 358 ||
+                !Managers.TeleportManager.TryGetCellTrigger(192937990, 414, out var cellExit) ||
+                !ReferenceEquals(jewellerExit, cellExit) ||
+                !Managers.InteractiveRegistry.TryResolveUse(
+                    192937990, 515742, Managers.Interactives.SkillInstanceOf(515742),
+                    out var jewellerInteractive, out var jewellerAction) ||
+                jewellerInteractive.Element.Cell != 414 || jewellerInteractive.Element.Gfx != 3520 ||
+                jewellerAction.Kind != Managers.InteractiveActionKind.Teleport ||
+                jewellerAction.SkillId != 114)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Astrub jeweller workshop round trip is missing or changed.");
+            }
+
+            // L'escalier gfx 62018 suit exactement la même route générique que le soleil : clic
+            // par ElementId et fin de mouvement/JQI par SourceCellId, tous deux avec USE114.
+            if (!Managers.TeleportManager.TryGet(192940038, 515691, out var stairExit) ||
+                stairExit.SourceCellId != 327 || stairExit.DestinationMapId != 188744711 ||
+                stairExit.DestinationCellId != 427 || stairExit.GfxId != 62018 ||
+                stairExit.InteractiveType != -1 || stairExit.SkillId != 114 ||
+                !Managers.TeleportManager.TryGetCellTrigger(192940038, 327, out var stairCellRoute) ||
+                !ReferenceEquals(stairExit, stairCellRoute) ||
+                !Managers.InteractiveRegistry.TryResolveUse(
+                    192940038, 515691, Managers.Interactives.SkillInstanceOf(515691),
+                    out var stairInteractive, out var stairAction) ||
+                stairInteractive.Element.Gfx != 62018 || stairInteractive.Element.Cell != 327 ||
+                stairInteractive.Type != -1 || stairAction.Kind != Managers.InteractiveActionKind.Teleport ||
+                stairAction.SkillId != 114)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Stair 192940038/515691 must be a clickable teleport.");
             }
 
             if (Managers.InteractiveRegistry.Count != expected.Count)

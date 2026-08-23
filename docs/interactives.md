@@ -442,15 +442,32 @@ and graphic must still match, the destination map must exist, the target cell mu
 cell range, and the element must not already be a zaap, zaapi, chest, lottery machine or bin.
 
 `TeleportManager.Initialize` transactionally replaces `InteractiveTeleports` from that JSON and
-reloads only `Enabled=1` rows into immutable indexes by map and by `(map, element)`. Invalid and
+reloads only `Enabled=1` rows into immutable indexes by map and `(map, element)`. Every validated
+Giny teleport row carrying an `ElementId` is a clickable interactive by default, regardless of
+whether its route enters or leaves a building. Every route is also indexed by `(map, sourceCell)`
+to reproduce Giny's end-of-movement activation. There is no inference based on indoor/outdoor maps
+or graphic families. Invalid and
 ambiguous rows stay in SQLite with a `ValidationStatus` so they can be audited; a bad import rolls
 back and preserves the previous catalogue. With the current world database, 1,586 routes pass all
 checks.
 
-`InteractiveRegistry` declares those routes as type 0 / skill 114. On an `iwo`,
+`InteractiveRegistry` declares the element-activated routes with skill 114. Their type is taken from
+`tipos_interactivos_3.6.10.10.json` when that capture-derived graphic mapping is unambiguous; its
+generic sentinel `uint64` max is normalized to -1. Unknown graphics keep Giny's type 0 as a
+fallback. Type 316 is reserved for Jondo's house-exit protocol and is not reused for ordinary
+buildings. On an `iwo`,
 `InteractiveActionHandler` resolves the exact registered element and calls `TeleportHandler`, which
 sends `iwn`, updates only the current session, persists the character, announces departure to the
 old map, then sends `jsd`, `jru`, `lqu` and `hjk`. The client requests the destination `jss` itself.
+
+For every imported route, `ElementId` is the interactive activation rule. `InteractiveRegistry`
+declares every element in both `f11` (type and skill 114) and `f15` (state and source cell), so a
+click produces `iwo` whether the graphic is a small sun, a stair, a door or another passage. No gfx
+classification is required. The same route is indexed by its exact source cell: when movement ends
+on it and the client sends `jqi`, `WorldMoveHandler` resolves `(MapId, SourceCellId)` and executes the
+same destination. This mirrors Giny `Character.EndMove()`, which finds a Teleport element on the
+arrival cell and calls the same `UseInteractive` used by a click. All imported teleport actions use
+the generic `USE114` skill.
 
 The regression guard pins the Astrub example: map 191106048, element 515837, graphic 63662 must
 lead to map 192416776, requested cell 534. Landing uses `MapManager.GetNearestWalkableCell`, so an

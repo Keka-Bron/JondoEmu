@@ -32,12 +32,12 @@ namespace Jondo.Unity.Launcher.Managers
     public static class TeleportManager
     {
         public const int UseSkill = 114;
-        public const int DefaultType = 0;
-
         private static IReadOnlyDictionary<(long MapId, int ElementId), InteractiveTeleport> _byElement =
             new Dictionary<(long, int), InteractiveTeleport>();
         private static IReadOnlyDictionary<long, IReadOnlyList<InteractiveTeleport>> _byMap =
             new Dictionary<long, IReadOnlyList<InteractiveTeleport>>();
+        private static IReadOnlyDictionary<(long MapId, int CellId), InteractiveTeleport> _byCell =
+            new Dictionary<(long, int), InteractiveTeleport>();
 
         public static int Count => _byElement.Count;
         public static IEnumerable<InteractiveTeleport> All => _byElement.Values;
@@ -46,11 +46,15 @@ namespace Jondo.Unity.Launcher.Managers
         {
             ImportIfAvailable();
             LoadFromDatabase();
-            Console.WriteLine($"[Teleport] {_byElement.Count} rutas activas cargadas.");
+            Console.WriteLine($"[Teleport] {_byElement.Count} rutas ElementId/USE114 cargadas, " +
+                              $"{_byCell.Count} rutas de fin de movimiento/JQI.");
         }
 
         public static bool TryGet(long mapId, int elementId, out InteractiveTeleport route)
             => _byElement.TryGetValue((mapId, elementId), out route!);
+
+        public static bool TryGetCellTrigger(long mapId, int cellId, out InteractiveTeleport route)
+            => _byCell.TryGetValue((mapId, cellId), out route!);
 
         public static IReadOnlyList<InteractiveTeleport> On(long mapId)
             => _byMap.TryGetValue(mapId, out var routes)
@@ -132,19 +136,23 @@ namespace Jondo.Unity.Launcher.Managers
         }
 
         private static InteractiveTeleport Read(JsonElement entry)
-            => new InteractiveTeleport
+        {
+            long sourceMapId = entry.GetProperty("sourceMapId").GetInt64();
+            long destinationMapId = entry.GetProperty("destinationMapId").GetInt64();
+            return new InteractiveTeleport
             {
-                SourceMapId = entry.GetProperty("sourceMapId").GetInt64(),
+                SourceMapId = sourceMapId,
                 ElementId = entry.GetProperty("elementId").GetInt32(),
                 SourceCellId = entry.GetProperty("sourceCellId").GetInt32(),
                 GfxId = entry.GetProperty("gfxId").GetInt32(),
                 InteractiveType = entry.GetProperty("interactiveType").GetInt32(),
                 SkillId = entry.GetProperty("skillId").GetInt32(),
-                DestinationMapId = entry.GetProperty("destinationMapId").GetInt64(),
+                DestinationMapId = destinationMapId,
                 DestinationCellId = entry.GetProperty("destinationCellId").GetInt32(),
                 SourceVersion = entry.TryGetProperty("sourceVersion", out var source) ? source.GetString() ?? "" : "",
                 Confidence = entry.TryGetProperty("confidence", out var confidence) ? confidence.GetString() ?? "" : ""
             };
+        }
 
         private static List<string> Validate(InteractiveTeleport route)
         {
@@ -152,7 +160,9 @@ namespace Jondo.Unity.Launcher.Managers
             if (route.SourceMapId <= 0 || route.DestinationMapId <= 0) errors.Add("invalid-map");
             if (route.ElementId <= 0) errors.Add("invalid-element");
             if (route.DestinationCellId < 0 || route.DestinationCellId > 559) errors.Add("invalid-cell");
-            if (route.InteractiveType != DefaultType) errors.Add("unexpected-type");
+            // -1 is the generic protobuf sentinel (uint64 max); non-negative values are concrete
+            // Dofus interactive types recovered from 3.6 captures.
+            if (route.InteractiveType < -1) errors.Add("invalid-type");
             if (route.SkillId != UseSkill) errors.Add("unexpected-skill");
             if (IsReservedInteractive(route.SourceMapId, route.ElementId))
                 errors.Add("reserved-interactive");
@@ -208,12 +218,14 @@ namespace Jondo.Unity.Launcher.Managers
             insert.Transaction = transaction;
             insert.CommandText = @"
                 INSERT INTO InteractiveTeleports
-                    (SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,
+                    (SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,ActivationMode,DisplaySkillId,
                      DestinationMapId,DestinationCellId,SourceVersion,Confidence,ValidationStatus,Enabled)
                 VALUES
-                    ($source,$element,$sourceCell,$gfx,$type,$skill,
+                    ($source,$element,$sourceCell,$gfx,$type,$skill,$activation,$displaySkill,
                      $destination,$destinationCell,$version,$confidence,$status,$enabled);";
             foreach (string name in new[] { "$source", "$element", "$sourceCell", "$gfx", "$type", "$skill",
+                                             "$activation",
+                                             "$displaySkill",
                                              "$destination", "$destinationCell", "$version", "$confidence",
                                              "$status", "$enabled" })
                 insert.Parameters.Add(new SqliteParameter(name, null));
@@ -227,6 +239,12 @@ namespace Jondo.Unity.Launcher.Managers
                 insert.Parameters["$gfx"].Value = route.GfxId;
                 insert.Parameters["$type"].Value = route.InteractiveType;
                 insert.Parameters["$skill"].Value = route.SkillId;
+                // Compatibilité de schéma : le comportement n'est plus piloté par cette colonne.
+                // Toute route est utilisable par ElementId et par sa cellule, avec USE114.
+                insert.Parameters["$activation"].Value = "interactive";
+                // Colonne historique conservée pour les bases existantes. Les éléments utilisent
+                // tous leur vraie action interactive skill 114 dans le registre f11/f15.
+                insert.Parameters["$displaySkill"].Value = 0;
                 insert.Parameters["$destination"].Value = route.DestinationMapId;
                 insert.Parameters["$destinationCell"].Value = route.DestinationCellId;
                 insert.Parameters["$version"].Value = route.SourceVersion;
@@ -242,11 +260,12 @@ namespace Jondo.Unity.Launcher.Managers
         {
             var byElement = new Dictionary<(long, int), InteractiveTeleport>();
             var byMap = new Dictionary<long, List<InteractiveTeleport>>();
+            var byCell = new Dictionary<(long, int), InteractiveTeleport>();
             using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
             connection.Open();
             using var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,
+                SELECT SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,ActivationMode,DisplaySkillId,
                        DestinationMapId,DestinationCellId,SourceVersion,Confidence
                 FROM InteractiveTeleports WHERE Enabled=1 ORDER BY SourceMapId,ElementId;";
             using var reader = command.ExecuteReader();
@@ -257,8 +276,8 @@ namespace Jondo.Unity.Launcher.Managers
                     SourceMapId = reader.GetInt64(0), ElementId = reader.GetInt32(1),
                     SourceCellId = reader.GetInt32(2), GfxId = reader.GetInt32(3),
                     InteractiveType = reader.GetInt32(4), SkillId = reader.GetInt32(5),
-                    DestinationMapId = reader.GetInt64(6), DestinationCellId = reader.GetInt32(7),
-                    SourceVersion = reader.GetString(8), Confidence = reader.GetString(9)
+                    DestinationMapId = reader.GetInt64(8), DestinationCellId = reader.GetInt32(9),
+                    SourceVersion = reader.GetString(10), Confidence = reader.GetString(11)
                 };
                 if (!byElement.TryAdd((route.SourceMapId, route.ElementId), route))
                     throw new InvalidOperationException(
@@ -266,10 +285,14 @@ namespace Jondo.Unity.Launcher.Managers
                 if (!byMap.TryGetValue(route.SourceMapId, out var list))
                     byMap.Add(route.SourceMapId, list = new List<InteractiveTeleport>());
                 list.Add(route);
+                if (!byCell.TryAdd((route.SourceMapId, route.SourceCellId), route))
+                    throw new InvalidOperationException(
+                        $"Dos rutas Teleport para {route.SourceMapId}/{route.SourceCellId}.");
             }
 
             _byElement = byElement;
             _byMap = byMap.ToDictionary(x => x.Key, x => (IReadOnlyList<InteractiveTeleport>)x.Value);
+            _byCell = byCell;
         }
     }
 }

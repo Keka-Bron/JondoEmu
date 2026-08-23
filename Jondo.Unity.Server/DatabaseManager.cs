@@ -700,6 +700,8 @@ namespace Jondo.Unity.Launcher
                     GfxId INTEGER NOT NULL,
                     InteractiveType INTEGER NOT NULL,
                     SkillId INTEGER NOT NULL,
+                    ActivationMode TEXT NOT NULL DEFAULT 'interactive',
+                    DisplaySkillId INTEGER NOT NULL DEFAULT 0,
                     DestinationMapId INTEGER NOT NULL,
                     DestinationCellId INTEGER NOT NULL,
                     SourceVersion TEXT NOT NULL,
@@ -715,6 +717,50 @@ namespace Jondo.Unity.Launcher
                     ON InteractiveTeleports(Enabled, SourceMapId);
             ";
             command.ExecuteNonQuery();
+
+            bool hasActivationMode = false;
+            using (var columns = connection.CreateCommand())
+            {
+                columns.CommandText = "PRAGMA table_info(InteractiveTeleports);";
+                using var reader = columns.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (!string.Equals(reader.GetString(1), "ActivationMode",
+                                       StringComparison.OrdinalIgnoreCase)) continue;
+                    hasActivationMode = true;
+                    break;
+                }
+            }
+            if (!hasActivationMode)
+            {
+                using var add = connection.CreateCommand();
+                add.CommandText = "ALTER TABLE InteractiveTeleports " +
+                                  "ADD COLUMN ActivationMode TEXT NOT NULL DEFAULT 'interactive';";
+                add.ExecuteNonQuery();
+                Console.WriteLine("[DatabaseManager] Columna ActivationMode añadida a InteractiveTeleports.");
+            }
+
+            bool hasDisplaySkillId = false;
+            using (var columns = connection.CreateCommand())
+            {
+                columns.CommandText = "PRAGMA table_info(InteractiveTeleports);";
+                using var reader = columns.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (!string.Equals(reader.GetString(1), "DisplaySkillId",
+                                       StringComparison.OrdinalIgnoreCase)) continue;
+                    hasDisplaySkillId = true;
+                    break;
+                }
+            }
+            if (!hasDisplaySkillId)
+            {
+                using var add = connection.CreateCommand();
+                add.CommandText = "ALTER TABLE InteractiveTeleports " +
+                                  "ADD COLUMN DisplaySkillId INTEGER NOT NULL DEFAULT 0;";
+                add.ExecuteNonQuery();
+                Console.WriteLine("[DatabaseManager] Columna DisplaySkillId añadida a InteractiveTeleports.");
+            }
         }
 
         public static void EnsureMobsSeeded(SqliteConnection connection)

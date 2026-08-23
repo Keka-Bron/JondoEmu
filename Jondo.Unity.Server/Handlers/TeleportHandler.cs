@@ -56,6 +56,26 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
+        /// Exécute la même route générique lorsque le personnage termine son déplacement sur la
+        /// cellule de l'élément puis envoie jqi. Giny appelle alors le même UseInteractive que le
+        /// clic; Jondo résout ici cette route par (MapId, SourceCellId).
+        /// </summary>
+        public static async Task<bool> TryUseCellTriggerAsync(NetworkStream stream)
+        {
+            long sourceMapId = SessionContext.State.MapId;
+            int sourceCellId = SessionContext.State.CellId;
+            if (!TeleportManager.TryGetCellTrigger(sourceMapId, sourceCellId, out var route))
+                return false;
+
+            int landed = await ToMapAsync(stream, route.DestinationMapId, route.DestinationCellId);
+            if (landed < 0) return false;
+
+            Console.WriteLine($"[Teleport] Fin de mouvement/JQI {sourceMapId}/{sourceCellId} -> " +
+                              $"{route.DestinationMapId}, casilla {landed}.");
+            return true;
+        }
+
+        /// <summary>
         /// Deja al personaje en ese mapa y avisa al cliente. Devuelve la casilla donde ha caído,
         /// o -1 si el mapa no sirve.
         /// </summary>

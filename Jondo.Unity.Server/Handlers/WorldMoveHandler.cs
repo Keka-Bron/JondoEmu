@@ -157,6 +157,11 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task AllowMapExitAsync(NetworkStream stream, byte[] payload)
         {
+            // Comme Giny.EndMove, une route Teleport placée sur la cellule finale réutilise la
+            // même action générique USE114 que le clic sur son ElementId. Un jqi sans route garde
+            // le flux normal jsq/jqk des bords de map.
+            if (await TeleportHandler.TryUseCellTriggerAsync(stream)) return;
+
             long request = ConnectionProtocol.RequestId(payload);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Jsq, null, request));

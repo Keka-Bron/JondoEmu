@@ -14,7 +14,8 @@ if ([string]::IsNullOrWhiteSpace($OutputJson)) {
 
 $elementsPath = Join-Path $Root "datos\interactive_elements.json"
 $housesPath = Join-Path $Root "datos\casas_mundo_3.6.10.10.json"
-foreach ($path in @($InputJson, $elementsPath, $housesPath)) {
+$typesPath = Join-Path $Root "datos\tipos_interactivos_3.6.10.10.json"
+foreach ($path in @($InputJson, $elementsPath, $housesPath, $typesPath)) {
     if (-not (Test-Path -LiteralPath $path)) { throw "Fichier requis absent : $path" }
 }
 
@@ -25,6 +26,7 @@ if ($null -eq $table) { throw "Table interactive_skills absente du dump Giny." }
 
 $elements = Get-Content -LiteralPath $elementsPath -Raw | ConvertFrom-Json -AsHashtable
 $houses = Get-Content -LiteralPath $housesPath -Raw | ConvertFrom-Json
+$observedTypes = Get-Content -LiteralPath $typesPath -Raw | ConvertFrom-Json -AsHashtable
 $houseKeys = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 foreach ($door in $houses.puertas) {
     [void]$houseKeys.Add("$($door.mapa):$($door.elemento)")
@@ -37,6 +39,30 @@ $teleports = @($table.data | Where-Object ActionIdentifier -eq "Teleport")
 $candidates = [System.Collections.Generic.List[object]]::new()
 $housesExcluded = 0
 $missingElements = 0
+
+function Resolve-InteractiveType([int]$gfxId) {
+    $observed = $observedTypes[[string]$gfxId]
+    if ($null -ne $observed -and -not [bool]$observed.discrepa) {
+        $text = [string]$observed.tipo
+        if ($text -eq "18446744073709551615") {
+            return [pscustomobject]@{ Value = -1; Source = "Dofus-3.6-capture" }
+        }
+
+        $value = 0L
+        if ([long]::TryParse($text, [ref]$value) -and $value -ge -1 -and $value -le [int]::MaxValue) {
+            return [pscustomobject]@{ Value = [int]$value; Source = "Dofus-3.6-capture" }
+        }
+    }
+
+    # The exact old gfx 3520 is absent from the capture sample. Its current sibling gfx 3518 is
+    # nevertheless observed 32 times with the generic sentinel (-1). Type 316 belongs to Jondo's
+    # house-exit protocol and must not be copied to ordinary building exits.
+    if ($gfxId -eq 3520) {
+        return [pscustomobject]@{ Value = -1; Source = "Dofus-3.6-exit-family" }
+    }
+
+    return [pscustomobject]@{ Value = 0; Source = "Giny-2.68-fallback" }
+}
 
 foreach ($row in $teleports) {
     $sourceMapId = 0L
@@ -65,16 +91,26 @@ foreach ($row in $teleports) {
         continue
     }
 
-    $candidates.Add([pscustomobject][ordered]@{
+    $gfxId = [int]$element[0].g
+    $type = Resolve-InteractiveType $gfxId
+    # Giny teleport routes keep skill 114. This is also measured on the two visible/clickable
+    # passages 515735 and 515736 of the same 3.6 workshop map. Skill 184 belongs to the separate
+    # house-exit protocol and makes the ordinary gfx 3520 exit unavailable to the client.
+    $skillId = 114
+    $candidate = [ordered]@{
         sourceMapId = $sourceMapId
         elementId = $elementId
         sourceCellId = [int]$element[0].c
-        gfxId = [int]$element[0].g
-        interactiveType = 0
-        skillId = 114
+        gfxId = $gfxId
+        interactiveType = $type.Value
+        typeSource = $type.Source
+        skillId = $skillId
+    }
+    $candidate += [ordered]@{
         destinationMapId = $destinationMapId
         destinationCellId = $destinationCellId
-    })
+    }
+    $candidates.Add([pscustomobject]$candidate)
 }
 
 $routes = [System.Collections.Generic.List[object]]::new()
@@ -87,19 +123,23 @@ foreach ($source in ($candidates | Group-Object sourceMapId, elementId)) {
     if ($ambiguous) { $ambiguousKeys++ }
 
     foreach ($route in $unique) {
-        $routes.Add([pscustomobject][ordered]@{
+        $normalized = [ordered]@{
             sourceMapId = $route.sourceMapId
             elementId = $route.elementId
             sourceCellId = $route.sourceCellId
             gfxId = $route.gfxId
             interactiveType = $route.interactiveType
+            typeSource = $route.typeSource
             skillId = $route.skillId
+        }
+        $normalized += [ordered]@{
             destinationMapId = $route.destinationMapId
             destinationCellId = $route.destinationCellId
             sourceVersion = "Giny-2.68"
             confidence = if ($ambiguous) { "ambiguous" } else { "exact-element-match" }
             enabled = -not $ambiguous
-        })
+        }
+        $routes.Add([pscustomobject]$normalized)
     }
 }
 

@@ -159,6 +159,9 @@ namespace Jondo.Unity.Launcher.Managers
             // contient que les passages génériques validés et activés par TeleportManager.
             foreach (var route in TeleportManager.All)
             {
+                // Règle Giny : tout ElementId de téléportation est un interactif cliquable. Le
+                // graphique peut être un soleil, un escalier, une porte ou autre chose : ils sont
+                // tous déclarés en f11 + f15 et résolus par leur ElementId lors du iwo.
                 Register(route.SourceMapId,
                          new Interactives.Element(route.ElementId, route.SourceCellId, route.GfxId),
                          route.InteractiveType, InteractiveActionKind.Teleport, route.SkillId);
