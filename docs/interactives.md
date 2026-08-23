@@ -467,7 +467,22 @@ classification is required. The same route is indexed by its exact source cell: 
 on it and the client sends `jqi`, `WorldMoveHandler` resolves `(MapId, SourceCellId)` and executes the
 same destination. This mirrors Giny `Character.EndMove()`, which finds a Teleport element on the
 arrival cell and calls the same `UseInteractive` used by a click. All imported teleport actions use
-the generic `USE114` skill.
+the generic `USE114` skill and interactive type `0`, exactly as Giny's `.sun` command does. The
+`GfxId` is never used as the interactive type: it remains the map graphic attached to the element.
+
+The graphic itself is never created or removed by the teleport route. As in Giny's `.sun` command,
+the route attaches a skill to an element already present in the map data; startup validates the
+exact `(MapId, ElementId, SourceCellId, GfxId)` tuple before enabling it. Jondo includes that element
+again in every map `jss` through its `f11` declaration and `f15` state. Instant teleport use sends
+`iwn`, then closes and resets the element with `iwi`, `iwf` state 0 and an enabled `iwm` declaration
+before loading the destination. This prevents the client from caching the gfx as busy and hiding it
+when the player enters the same building a second time.
+
+Map snapshots also keep visual presence separate from usability. `f11` is emitted only for elements
+with a registered action, while an active `f15` placement is emitted for every element found in
+`interactive_elements.json`. The client resolves the actual `GfxId` from its map data using that
+`ElementId`; consequently an element without a skill remains visible but is not clickable. Registered
+teleports receive both records and are therefore always visible and clickable.
 
 The regression guard pins the Astrub example: map 191106048, element 515837, graphic 63662 must
 lead to map 192416776, requested cell 534. Landing uses `MapManager.GetNearestWalkableCell`, so an

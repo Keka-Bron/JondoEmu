@@ -6497,7 +6497,6 @@
 {"Id":"6492","MapId":"154010369","Identifier":"489679","ActionIdentifier":"Collect","Type":"NETTLE254","SkillId":"GATHER68","Param1":null,"Param2":null,"Param3":null,"Criteria":""},
 {"Id":"6493","MapId":"154010370","Identifier":"489685","ActionIdentifier":"Collect","Type":"NETTLE254","SkillId":"GATHER68","Param1":null,"Param2":null,"Param3":null,"Criteria":""},
 {"Id":"6494","MapId":"154010370","Identifier":"489686","ActionIdentifier":"Collect","Type":"NETTLE254","SkillId":"GATHER68","Param1":null,"Param2":null,"Param3":null,"Criteria":""},
-{"Id":"6495","MapId":"154010370","Identifier":"489697","ActionIdentifier":"Teleport","Type":"0","SkillId":"USE114","Param1":"153354244","Param2":"397","Param3":null,"Criteria":""},
 {"Id":"6496","MapId":"154010371","Identifier":"490237","ActionIdentifier":"Collect","Type":"NETTLE254","SkillId":"GATHER68","Param1":null,"Param2":null,"Param3":null,"Criteria":""},
 {"Id":"6497","MapId":"88213783","Identifier":"495646","ActionIdentifier":"Collect","Type":"NETTLE254","SkillId":"GATHER68","Param1":null,"Param2":null,"Param3":null,"Criteria":""},
 {"Id":"6498","MapId":"88213784","Identifier":"495648","ActionIdentifier":"Collect","Type":"NETTLE254","SkillId":"GATHER68","Param1":null,"Param2":null,"Param3":null,"Criteria":""},

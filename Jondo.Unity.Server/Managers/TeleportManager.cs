@@ -32,6 +32,7 @@ namespace Jondo.Unity.Launcher.Managers
     public static class TeleportManager
     {
         public const int UseSkill = 114;
+        public const int GenericTeleportType = 0;
         private static IReadOnlyDictionary<(long MapId, int ElementId), InteractiveTeleport> _byElement =
             new Dictionary<(long, int), InteractiveTeleport>();
         private static IReadOnlyDictionary<long, IReadOnlyList<InteractiveTeleport>> _byMap =
@@ -145,7 +146,9 @@ namespace Jondo.Unity.Launcher.Managers
                 ElementId = entry.GetProperty("elementId").GetInt32(),
                 SourceCellId = entry.GetProperty("sourceCellId").GetInt32(),
                 GfxId = entry.GetProperty("gfxId").GetInt32(),
-                InteractiveType = entry.GetProperty("interactiveType").GetInt32(),
+                // Reproduction exacte de Giny `.sun`: le gfx reste celui de l'élément de map,
+                // tandis que l'action Teleport est toujours déclarée avec le type générique 0.
+                InteractiveType = GenericTeleportType,
                 SkillId = entry.GetProperty("skillId").GetInt32(),
                 DestinationMapId = destinationMapId,
                 DestinationCellId = entry.GetProperty("destinationCellId").GetInt32(),
@@ -160,9 +163,7 @@ namespace Jondo.Unity.Launcher.Managers
             if (route.SourceMapId <= 0 || route.DestinationMapId <= 0) errors.Add("invalid-map");
             if (route.ElementId <= 0) errors.Add("invalid-element");
             if (route.DestinationCellId < 0 || route.DestinationCellId > 559) errors.Add("invalid-cell");
-            // -1 is the generic protobuf sentinel (uint64 max); non-negative values are concrete
-            // Dofus interactive types recovered from 3.6 captures.
-            if (route.InteractiveType < -1) errors.Add("invalid-type");
+            if (route.InteractiveType != GenericTeleportType) errors.Add("unexpected-type");
             if (route.SkillId != UseSkill) errors.Add("unexpected-skill");
             if (IsReservedInteractive(route.SourceMapId, route.ElementId))
                 errors.Add("reserved-interactive");

@@ -49,6 +49,23 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
                     elementId, skillId, SessionContext.State.CharacterId)));
 
+            // `.sun` de Giny attache USE114 à l'élément existant sans supprimer son gfx. Sur le
+            // client 3.6, laisser seulement iwn avant de quitter la map conserve parfois l'élément
+            // en état occupé dans le cache : au second passage son gfx disparaît. Fermer l'usage,
+            // remettre l'état disponible et redéclarer f11 avant jru rend le cycle réentrant.
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwi,
+                    ConnectionProtocol.BuildInteractiveUseEnded(elementId, skillId)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwf,
+                    ConnectionProtocol.BuildElementState(
+                        route.SourceCellId, elementId, state: 0)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwm,
+                    ConnectionProtocol.BuildElementRedeclared(
+                        Interactives.SkillInstanceOf(elementId), skillId,
+                        elementId, route.InteractiveType, usable: true)));
+
             int landed = await ToMapAsync(stream, route.DestinationMapId, route.DestinationCellId);
             if (landed >= 0)
                 Console.WriteLine($"[Teleport] Elemento {elementId}: {sourceMapId} -> " +

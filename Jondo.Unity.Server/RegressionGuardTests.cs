@@ -192,6 +192,8 @@ namespace Jondo.Unity.Launcher
                     interactive.Element.Id != teleport.ElementId ||
                     interactive.Element.Cell != teleport.SourceCellId ||
                     interactive.Element.Gfx != teleport.GfxId ||
+                    interactive.Type != Managers.TeleportManager.GenericTeleportType ||
+                    teleport.InteractiveType != Managers.TeleportManager.GenericTeleportType ||
                     action.Kind != Managers.InteractiveActionKind.Teleport ||
                     action.SkillId != 114 || teleport.SkillId != 114 ||
                     !Managers.TeleportManager.TryGetCellTrigger(
@@ -223,6 +225,7 @@ namespace Jondo.Unity.Launcher
                     192937990, 515742, Managers.Interactives.SkillInstanceOf(515742),
                     out var jewellerInteractive, out var jewellerAction) ||
                 jewellerInteractive.Element.Cell != 414 || jewellerInteractive.Element.Gfx != 3520 ||
+                jewellerInteractive.Type != Managers.TeleportManager.GenericTeleportType ||
                 jewellerAction.Kind != Managers.InteractiveActionKind.Teleport ||
                 jewellerAction.SkillId != 114)
             {
@@ -235,14 +238,16 @@ namespace Jondo.Unity.Launcher
             if (!Managers.TeleportManager.TryGet(192940038, 515691, out var stairExit) ||
                 stairExit.SourceCellId != 327 || stairExit.DestinationMapId != 188744711 ||
                 stairExit.DestinationCellId != 427 || stairExit.GfxId != 62018 ||
-                stairExit.InteractiveType != -1 || stairExit.SkillId != 114 ||
+                stairExit.InteractiveType != Managers.TeleportManager.GenericTeleportType ||
+                stairExit.SkillId != 114 ||
                 !Managers.TeleportManager.TryGetCellTrigger(192940038, 327, out var stairCellRoute) ||
                 !ReferenceEquals(stairExit, stairCellRoute) ||
                 !Managers.InteractiveRegistry.TryResolveUse(
                     192940038, 515691, Managers.Interactives.SkillInstanceOf(515691),
                     out var stairInteractive, out var stairAction) ||
                 stairInteractive.Element.Gfx != 62018 || stairInteractive.Element.Cell != 327 ||
-                stairInteractive.Type != -1 || stairAction.Kind != Managers.InteractiveActionKind.Teleport ||
+                stairInteractive.Type != Managers.TeleportManager.GenericTeleportType ||
+                stairAction.Kind != Managers.InteractiveActionKind.Teleport ||
                 stairAction.SkillId != 114)
             {
                 throw new InvalidOperationException(

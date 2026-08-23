@@ -831,8 +831,55 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         private static void AddInteractiveElements(Pb jss, long mapId)
         {
+            var placed = new HashSet<int>();
+
+            // Une route de TeleportManager ne dépend pas du registre pour exister dans le jss.
+            // À CHAQUE chargement de sa map source, elle reçoit explicitement :
+            //   - un f11 avec USE114, pour que l'ElementId soit cliquable ;
+            //   - un f15 actif, pour que le client replace toujours son gfx sur sa cellule.
+            // Le type propre à la route est conservé tel quel.
+            foreach (var route in Managers.TeleportManager.On(mapId))
+            {
+                if (route.ElementId <= 0 || !placed.Add(route.ElementId)) continue;
+                DeclareTeleportRoute(jss, route);
+            }
+
             foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
+            {
+                // Les téléports viennent d'être déclarés directement ci-dessus. Le registre reste
+                // la source des autres actions, mais ne doit pas produire un second f11/f15.
+                if (!placed.Add(interactive.Element.Id)) continue;
                 Declare(jss, interactive);
+            }
+
+            // Le gfx appartient aux données de map du client et se retrouve par ElementId. Même
+            // lorsqu'aucune action n'est attachée à un élément, son état f15 doit donc rester
+            // présent et actif : visible, mais sans f11 il n'est simplement pas cliquable.
+            foreach (var element in Managers.Interactives.ElementsOf(mapId))
+            {
+                if (element.Id <= 0 || !placed.Add(element.Id)) continue;
+                DeclarePlacement(jss, element, Managers.ResourceState.Full);
+            }
+        }
+
+        /// <summary>
+        /// Déclaration systématique d'une route générique dans le snapshot de map. Le GfxId ne
+        /// voyage pas sur le réseau : le client le retrouve dans ses données grâce à l'ElementId.
+        /// </summary>
+        private static void DeclareTeleportRoute(Pb jss, Managers.InteractiveTeleport route)
+        {
+            var element = new Managers.Interactives.Element(
+                route.ElementId, route.SourceCellId, route.GfxId);
+
+            jss.Msg(11, Pb.New()
+                .Var(1, 1)
+                .Msg(4, Pb.New()
+                    .Var(1, Managers.Interactives.SkillInstanceOf(route.ElementId))
+                    .Var(2, Managers.TeleportManager.UseSkill))
+                .Var(5, route.ElementId)
+                .Var(6, route.InteractiveType));
+
+            DeclarePlacement(jss, element, Managers.ResourceState.Full);
         }
 
         /// <summary>
@@ -882,12 +929,23 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(5, interactive.Element.Id)
                 .Var(6, interactive.Type));
 
+            DeclarePlacement(jss, interactive.Element,
+                gathering && !usable ? state : Managers.ResourceState.Full);
+        }
+
+        /// <summary>
+        /// Présence visuelle permanente d'un élément. f1 indique qu'il appartient à la map
+        /// courante; l'absence de f4 correspond à l'état actif 0. ElementId permet au client de
+        /// retrouver le GfxId dans ses propres données de map.
+        /// </summary>
+        private static void DeclarePlacement(Pb jss, Managers.Interactives.Element element,
+                                             Managers.ResourceState state)
+        {
             var placement = Pb.New()
                 .Var(1, 1)
-                .Var(2, interactive.Element.Cell)
-                .Var(3, interactive.Element.Id);
-            if (gathering && !usable) placement.Var(4, (int)state);
-
+                .Var(2, element.Cell)
+                .Var(3, element.Id);
+            if (state != Managers.ResourceState.Full) placement.Var(4, (int)state);
             jss.Msg(15, placement);
         }
 
@@ -1395,6 +1453,14 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(4, skillId)
                 .Var(5, who)
                 .Build();
+
+        /// <summary>
+        /// Fin immédiate d'utilisation d'un interactif (iwi). Même forme que la fin de récolte :
+        /// f1 est l'ElementId et f3 le skill. Un téléporteur instantané doit être libéré avant le
+        /// jru, sinon le client peut conserver son gfx en état occupé lors du retour sur la map.
+        /// </summary>
+        public static byte[] BuildInteractiveUseEnded(int elementId, int skillId)
+            => Pb.New().Var(1, elementId).Var(3, skillId).Build();
 
         /// <summary>Un destino de la lista de zaaps.</summary>
         public readonly struct ZaapDestination

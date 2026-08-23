@@ -536,6 +536,13 @@ namespace Jondo.Unity.Launcher.Network
             if (jsq != CapturedJsq)
                 failures.Add($"jsq: the answer to jqi does not match the capture ({jsq})");
 
+            // Un téléporteur instantané ferme son utilisation avant de quitter la map. Sans cet
+            // iwi, le client peut garder l'ElementId occupé et ne plus dessiner son gfx au retour.
+            var ended = ProtoMessage.Parse(
+                ConnectionProtocol.BuildInteractiveUseEnded(515742, 114));
+            if (Varint(ended, 1) != 515742 || Varint(ended, 3) != 114)
+                failures.Add("iwi: interactive-use end must carry ElementId in f1 and USE114 in f3");
+
             // And the two containers of kub that are not f4. The client throws a
             // NullReferenceException and drops the whole sheet when one of these goes out in the
             // wrong field, which is what left the characteristics button greyed out.
