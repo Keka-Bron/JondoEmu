@@ -217,7 +217,12 @@ namespace Jondo.Unity.Launcher.Network
         {
             try
             {
-                string ruta = System.IO.Path.Combine("datos", "caracteristicas_kub.json");
+                // Por Paths y no relativo: relativo sólo funciona si el directorio de trabajo
+                // es la raíz, que es lo que deja el lanzador. Arrancado de cualquier otra forma
+                // —desde el IDE, desde un servicio, desde otra carpeta— el fichero no aparecía,
+                // la ficha se quedaba en 25 entradas de 120, y con ella se iban el crítico, la
+                // potencia, el alcance y todas las resistencias. Sin un solo mensaje de error.
+                string ruta = Paths.CharacteristicFieldsJson;
                 if (!System.IO.File.Exists(ruta))
                 {
                     Console.WriteLine("[World] No está datos/caracteristicas_kub.json: la ficha de " +

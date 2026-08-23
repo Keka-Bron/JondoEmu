@@ -77,8 +77,8 @@ namespace Jondo.Unity.Launcher.Network
                     // Cualquiera puede llamarlas, porque hay que poder entrar antes de tener con
                     // qué demostrar quién eres.
                     case Prefijo + "estado": return Estado();
-                    case Prefijo + "entrar": return Entrar(cuerpo);
-                    case Prefijo + "crear-cuenta": return CrearCuenta(cuerpo);
+                    case Prefijo + "entrar": return Entrar(cuerpo, ip);
+                    case Prefijo + "crear-cuenta": return CrearCuenta(cuerpo, ip);
 
                     // ─── Con sesión ─────────────────────────────────────────────────────────
                     // Hace falta un token que la base reconozca. Da igual el rol: son cosas que
@@ -188,11 +188,20 @@ namespace Jondo.Unity.Launcher.Network
             return new Respuesta(200, ConsoleLogBuffer.GetLogsJson(desde));
         }
 
-        private static Respuesta Entrar(string cuerpo)
+        /// <summary>
+        /// Entrar con usuario y contraseña.
+        ///
+        /// La IP es la DEL SOCKET, no la que venga escrita en el cuerpo. Con la del cuerpo, el
+        /// freno de la base —cinco intentos fallidos y un minuto de espera, y lleva la cuenta por
+        /// IP— se saltaba cambiando un campo del JSON en cada intento, así que no frenaba nada.
+        /// Esto sólo se podía aprovechar desde la propia máquina, porque el HAAPI escucha en
+        /// localhost y en 127.0.0.1 y en nada más, pero un freno que no frena es peor que ninguno:
+        /// hace creer que hay uno.
+        /// </summary>
+        private static Respuesta Entrar(string cuerpo, string ip)
         {
             string usuario = Texto(cuerpo, "usuario");
             string clave = Texto(cuerpo, "clave");
-            string ip = Texto(cuerpo, "ip");
             if (ip.Length == 0) ip = Contract.LocalIp;
 
             if (!DatabaseManager.ValidateAccountCredentials(usuario, clave, ip, out var cuenta, out string fallo)
@@ -203,6 +212,11 @@ namespace Jondo.Unity.Launcher.Network
 
             string token = Guid.NewGuid().ToString("N");
             DatabaseManager.SetGameToken(cuenta.Id, token);
+
+            // Y el mismo, aparte, como sesión del lanzador. Van a la par ahora y se separan en
+            // cuanto el jugador arranque un cliente, que le rota el del juego: si no hubiera esta
+            // segunda copia, esa rotación dejaría al lanzador sin sesión para la próxima vez.
+            DatabaseManager.SetLauncherToken(cuenta.Id, token);
             ClientLaunchRegistry.RegisterToken(cuenta.Id, token);
 
             return Bien(new
@@ -215,12 +229,12 @@ namespace Jondo.Unity.Launcher.Network
             });
         }
 
-        private static Respuesta CrearCuenta(string cuerpo)
+        /// <summary>Crear cuenta. La IP, otra vez la del socket y no la que diga el cuerpo.</summary>
+        private static Respuesta CrearCuenta(string cuerpo, string ip)
         {
             string usuario = Texto(cuerpo, "usuario");
             string clave = Texto(cuerpo, "clave");
             string apodo = Texto(cuerpo, "apodo");
-            string ip = Texto(cuerpo, "ip");
             if (ip.Length == 0) ip = Contract.LocalIp;
 
             bool bien = DatabaseManager.RegisterNewAccount(usuario, clave, apodo, ip, out string fallo);
@@ -238,8 +252,14 @@ namespace Jondo.Unity.Launcher.Network
             string token = Texto(cuerpo, "token");
             if (cuenta <= 0 || token.Length == 0) return Bien(new { bien = false });
 
-            long deLaBase = DatabaseManager.GetAccountIdByToken(token);
+            // Vale tanto la sesión del lanzador como el token de juego: las bases de antes de que
+            // hubiera columna propia sólo tienen el segundo.
+            long deLaBase = DatabaseManager.GetAccountIdByLauncherToken(token);
+            if (deLaBase == 0) deLaBase = DatabaseManager.GetAccountIdByToken(token);
             if (deLaBase != cuenta) return Bien(new { bien = false });
+
+            // Y se le da por buena para lo que venga, aunque el del juego ya se haya rotado.
+            DatabaseManager.SetLauncherToken(cuenta, token);
 
             ClientLaunchRegistry.RegisterToken(cuenta, token);
             return Bien(new { bien = true });

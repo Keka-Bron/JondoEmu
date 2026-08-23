@@ -124,7 +124,8 @@ namespace Jondo.Unity.Launcher.Handlers
             if (item != null)
             {
                 item.Position = newPosition;
-                DatabaseManager.SaveItemPosition(itemUid, newPosition);
+                DatabaseManager.SaveItemPosition(itemUid, newPosition,
+                    Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
 
                 // Update equipped cache
                 if (newPosition >= 0 && newPosition < 63)

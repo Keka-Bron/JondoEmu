@@ -157,7 +157,15 @@ namespace Jondo.Unity.World.Fights
                 return embrujo;
             }
 
+            // La ENTRADA DEL CATÁLOGO forma parte de la llave, y faltaba.
+            //
+            // Un hechizo puede traer dos efectos iguales en todo menos en su número de entrada:
+            // la Flecha Castigadora lleva dos veces el efecto 293 —«+24 de daños básicos» y «+32»—
+            // que comparten efecto, hechizo de origen, hechizo afectado y destinatario, y sólo se
+            // distinguen por el effectUid (424781 y 424782). Sin él en la llave, el segundo pisaba
+            // al primero y de los dos acumulados sólo quedaba uno.
             var yaEstaba = _puestos.FirstOrDefault(e => e.EffectId == embrujo.EffectId
+                                                     && e.EffectUid == embrujo.EffectUid
                                                      && e.HechizoOrigen == embrujo.HechizoOrigen
                                                      && e.HechizoAfectado == embrujo.HechizoAfectado
                                                      && e.Quien == embrujo.Quien);

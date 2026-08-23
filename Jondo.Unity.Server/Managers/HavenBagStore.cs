@@ -246,19 +246,28 @@ namespace Jondo.Unity.Launcher.Managers
 
                 using var transaction = connection.BeginTransaction();
 
+                // Los dos llevan el dueño delante. Hoy no hace falta —el SELECT de arriba ya
+                // ha comprobado que el objeto sea suyo, y el uid es único en todo el servidor—
+                // pero que una sentencia sea inofensiva por lo que hay TRES líneas más arriba es
+                // exactamente como se cuelan estas cosas: se mueve el guardia, o se reordena, y
+                // la sentencia se queda igual sin que nadie lo note. Filtrar aquí no cuesta nada
+                // y deja de depender del contexto.
                 if (mueve >= tiene)
                 {
                     var quitar = connection.CreateCommand();
-                    quitar.CommandText = "DELETE FROM CharacterItems WHERE Uid = $uid;";
+                    quitar.CommandText = "DELETE FROM CharacterItems WHERE Uid = $uid AND CharacterId = $id;";
                     quitar.Parameters.AddWithValue("$uid", uid);
+                    quitar.Parameters.AddWithValue("$id", characterId);
                     quitar.ExecuteNonQuery();
                 }
                 else
                 {
                     var restar = connection.CreateCommand();
-                    restar.CommandText = "UPDATE CharacterItems SET Quantity = Quantity - $n WHERE Uid = $uid;";
+                    restar.CommandText = "UPDATE CharacterItems SET Quantity = Quantity - $n " +
+                                         "WHERE Uid = $uid AND CharacterId = $id;";
                     restar.Parameters.AddWithValue("$n", mueve);
                     restar.Parameters.AddWithValue("$uid", uid);
+                    restar.Parameters.AddWithValue("$id", characterId);
                     restar.ExecuteNonQuery();
                 }
 
@@ -313,19 +322,24 @@ namespace Jondo.Unity.Launcher.Managers
 
                 using var transaction = connection.BeginTransaction();
 
+                // Con el dueño delante, por lo mismo que al meterlo: que la sentencia no
+                // dependa de que el SELECT de arriba siga estando donde está.
                 if (mueve >= tiene)
                 {
                     var quitar = connection.CreateCommand();
-                    quitar.CommandText = "DELETE FROM HavenBagChest WHERE Uid = $uid;";
+                    quitar.CommandText = "DELETE FROM HavenBagChest WHERE Uid = $uid AND CharacterId = $id;";
                     quitar.Parameters.AddWithValue("$uid", uid);
+                    quitar.Parameters.AddWithValue("$id", characterId);
                     quitar.ExecuteNonQuery();
                 }
                 else
                 {
                     var restar = connection.CreateCommand();
-                    restar.CommandText = "UPDATE HavenBagChest SET Quantity = Quantity - $n WHERE Uid = $uid;";
+                    restar.CommandText = "UPDATE HavenBagChest SET Quantity = Quantity - $n " +
+                                         "WHERE Uid = $uid AND CharacterId = $id;";
                     restar.Parameters.AddWithValue("$n", mueve);
                     restar.Parameters.AddWithValue("$uid", uid);
+                    restar.Parameters.AddWithValue("$id", characterId);
                     restar.ExecuteNonQuery();
                 }
 

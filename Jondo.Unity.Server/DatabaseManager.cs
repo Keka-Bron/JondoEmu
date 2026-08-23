@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
@@ -68,14 +68,46 @@ namespace Jondo.Unity.Launcher
                     Console.WriteLine("[DatabaseManager] Columna Role añadida a Accounts; todos empiezan como jugador.");
                 }
 
-                // Seed the built-in test accounts if the table is empty (credentials below)
-                var seedAccount = authConnection.CreateCommand();
-                seedAccount.CommandText = @"
-                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname, Role) VALUES (188940901, 'keka', 'test', 'Keka', 4);
-                    INSERT OR IGNORE INTO Accounts (Id, Login, Password, Nickname, Role) VALUES (188940902, 'dragonlord', 'test', 'DragonLord', 4);
-                ";
-                seedAccount.ExecuteNonQuery();
+                // La sesión del LANZADOR, que hasta ahora era el mismo token que el del juego.
+                //
+                // Y eso se rompía solo: al arrancar un cliente, el Zaap y el HAAPI le dan a la
+                // cuenta un GameToken nuevo, así que el que el lanzador tenía guardado dejaba de
+                // valer. A la vez siguiente el lanzador se abría con la cuenta puesta, el servidor
+                // ya no reconocía su token, y al darle a jugar salía «el servidor no responde»
+                // —que además era mentira, el servidor contestaba perfectamente que la sesión no
+                // valía—. Con una columna propia, rotar el del juego ya no toca al del lanzador.
+                bool tieneSesion = false;
+                var mirarSesion = authConnection.CreateCommand();
+                mirarSesion.CommandText = "PRAGMA table_info(Accounts);";
+                using (var lector = mirarSesion.ExecuteReader())
+                {
+                    while (lector.Read())
+                    {
+                        if (string.Equals(lector.GetString(1), "LauncherToken", StringComparison.OrdinalIgnoreCase))
+                        {
+                            tieneSesion = true;
+                            break;
+                        }
+                    }
+                }
+                if (!tieneSesion)
+                {
+                    var anadir = authConnection.CreateCommand();
+                    anadir.CommandText = "ALTER TABLE Accounts ADD COLUMN LauncherToken TEXT;";
+                    anadir.ExecuteNonQuery();
+                    Console.WriteLine("[DatabaseManager] Columna LauncherToken añadida a Accounts.");
+                }
 
+                // Aquí se sembraban 'keka' y 'dragonlord' como ADMINISTRADOR con la clave
+                // 'test'. Toda base recién hecha nacía con dos cuentas de mando y la contraseña
+                // escrita en el código fuente, que además está publicado: quien arrancase el
+                // servidor tal cual lo tenía abierto de par en par sin saberlo.
+                //
+                // Ya no se siembra nada. Las dos cuentas se dan de alta desde el lanzador como
+                // cualquier otra, con la contraseña que ponga cada uno, y el UPDATE de abajo les
+                // devuelve el rol en cuanto existen. El resultado para nosotros es el mismo; lo
+                // que desaparece es la clave conocida.
+                //
                 // Y si esas dos cuentas ya existían de antes, se les pone el rol: son las de los
                 // dos que llevan el servidor. Al resto no se le toca nada.
                 var duenos = authConnection.CreateCommand();
@@ -332,6 +364,17 @@ namespace Jondo.Unity.Launcher
                         Position INTEGER NOT NULL DEFAULT 63,
                         Effects TEXT
                     );
+
+                    -- El uid es unico en TODO el servidor, no por personaje: los uid nuevos se
+                    -- reparten con un MAX(Uid) global (NpcHandler, Lottery) y varios INSERT usan
+                    -- ON CONFLICT(Uid), que exige un indice unico para siquiera compilar.
+                    --
+                    -- Estaba creado dentro de SeedInventory, o sea que el invariante dependia de
+                    -- que a alguien le tocase sembrar el inventario de la captura. En una base
+                    -- que naciera sin pasar por ahi, los ON CONFLICT fallaban y dos personajes
+                    -- podian acabar con el mismo uid. Va aqui, con la tabla, que es donde deja
+                    -- de ser una casualidad.
+                    CREATE UNIQUE INDEX IF NOT EXISTS idx_items_uid ON CharacterItems(Uid);
                 ";
                 createItems.ExecuteNonQuery();
 
@@ -375,6 +418,19 @@ namespace Jondo.Unity.Launcher
                     );
                 ";
                 createJobs.ExecuteNonQuery();
+
+                // Los retos de mazmorra que ya se han logrado. Van con logro detrás, y un logro
+                // se hace UNA vez: cumplido el reto, no se le vuelve a ofrecer a ese personaje
+                // nunca más. Los retos normales no pasan por aquí, que ésos salen siempre.
+                var createChallenges = worldConnection.CreateCommand();
+                createChallenges.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterChallenges (
+                        CharacterId INTEGER NOT NULL,
+                        ChallengeId INTEGER NOT NULL,
+                        PRIMARY KEY (CharacterId, ChallengeId)
+                    );
+                ";
+                createChallenges.ExecuteNonQuery();
 
                 // Y en qué hueco de la barra puso cada hechizo, por lo mismo.
                 var createSpellBar = worldConnection.CreateCommand();
@@ -538,6 +594,7 @@ namespace Jondo.Unity.Launcher
                 createMonsters.ExecuteNonQuery();
 
                 EnsureProfessionCatalogSchema(worldConnection);
+                EnsureInteractiveTeleportSchema(worldConnection);
 
                 // 5. Ensure Monsters, Mobs, Spells, and SpellLevels are seeded
                 EnsureMobsSeeded(worldConnection);
@@ -693,6 +750,41 @@ namespace Jondo.Unity.Launcher
                 CREATE INDEX IF NOT EXISTS IX_Recipes_SkillId ON Recipes(SkillId);
                 CREATE INDEX IF NOT EXISTS IX_RecipeIngredients_IngredientId
                     ON RecipeIngredients(IngredientId);
+            ";
+            command.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Los pasos entre mapas importados del catálogo normalizado.
+        ///
+        /// La clave lleva el destino dentro para poder guardar también las candidatas ambiguas
+        /// —las que dan dos destinos para el mismo elemento— que necesariamente quedan apagadas.
+        /// El juego sólo carga las filas con Enabled=1.
+        /// </summary>
+        private static void EnsureInteractiveTeleportSchema(SqliteConnection connection)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS InteractiveTeleports (
+                    SourceMapId INTEGER NOT NULL,
+                    ElementId INTEGER NOT NULL,
+                    SourceCellId INTEGER NOT NULL,
+                    GfxId INTEGER NOT NULL,
+                    InteractiveType INTEGER NOT NULL,
+                    SkillId INTEGER NOT NULL,
+                    DestinationMapId INTEGER NOT NULL,
+                    DestinationCellId INTEGER NOT NULL,
+                    SourceVersion TEXT NOT NULL,
+                    Confidence TEXT NOT NULL,
+                    ValidationStatus TEXT NOT NULL,
+                    Enabled INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY (SourceMapId, ElementId, DestinationMapId, DestinationCellId)
+                );
+
+                CREATE INDEX IF NOT EXISTS IX_InteractiveTeleports_Source
+                    ON InteractiveTeleports(SourceMapId, ElementId);
+                CREATE INDEX IF NOT EXISTS IX_InteractiveTeleports_EnabledMap
+                    ON InteractiveTeleports(Enabled, SourceMapId);
             ";
             command.ExecuteNonQuery();
         }
@@ -1016,23 +1108,37 @@ namespace Jondo.Unity.Launcher
                 using var connection = new SqliteConnection(AuthConnectionString);
                 connection.Open();
 
+                // La clave ya no se compara en el SQL. Antes esto era «AND Password = $pass»,
+                // que obliga a tener la contraseña guardada en claro para poder cotejarla; ahora
+                // se trae lo guardado y lo comprueba Claves, que sabe tanto de las cifradas como
+                // de las de antes.
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Login, Nickname, Role FROM Accounts WHERE LOWER(Login) = $login AND Password = $pass;";
+                command.CommandText = "SELECT Id, Login, Nickname, Role, Password FROM Accounts " +
+                                      "WHERE LOWER(Login) = $login;";
                 command.Parameters.AddWithValue("$login", login);
-                command.Parameters.AddWithValue("$pass", password);
 
                 using var reader = command.ExecuteReader();
                 if (reader.Read())
                 {
-                    account = new DbAccount
+                    string guardada = reader.IsDBNull(4) ? "" : reader.GetString(4);
+                    if (Managers.Claves.Comprueba(password, guardada, out bool reescribir))
                     {
-                        Id = reader.GetInt64(0),
-                        Login = reader.GetString(1),
-                        Nickname = reader.GetString(2),
-                        Role = reader.IsDBNull(3) ? Roles.PorDefecto : reader.GetInt32(3),
-                    };
-                    _ipLockouts.TryRemove(clientIp, out _);
-                    return true;
+                        account = new DbAccount
+                        {
+                            Id = reader.GetInt64(0),
+                            Login = reader.GetString(1),
+                            Nickname = reader.GetString(2),
+                            Role = reader.IsDBNull(3) ? Roles.PorDefecto : reader.GetInt32(3),
+                        };
+
+                        // Es el único momento en que se tiene la contraseña en la mano y se sabe
+                        // que es la buena, así que es aquí donde se convierte la que estaba en
+                        // claro. La base vieja se va cifrando sola según entra cada uno.
+                        if (reescribir) ReescribirClave(account.Id, password);
+
+                        _ipLockouts.TryRemove(clientIp, out _);
+                        return true;
+                    }
                 }
             }
             catch (Exception ex)
@@ -1136,7 +1242,7 @@ namespace Jondo.Unity.Launcher
                 var insertCmd = connection.CreateCommand();
                 insertCmd.CommandText = "INSERT INTO Accounts (Login, Password, Nickname) VALUES ($login, $pass, $nick);";
                 insertCmd.Parameters.AddWithValue("$login", login);
-                insertCmd.Parameters.AddWithValue("$pass", password);
+                insertCmd.Parameters.AddWithValue("$pass", Managers.Claves.Cifrar(password));
                 insertCmd.Parameters.AddWithValue("$nick", nickname);
                 insertCmd.ExecuteNonQuery();
 
@@ -1149,11 +1255,82 @@ namespace Jondo.Unity.Launcher
             }
         }
 
+        /// <summary>
+        /// Vuelve a escribir la contraseña de una cuenta, ya cifrada.
+        ///
+        /// Se llama sólo desde dentro de una entrada que ha salido bien, o sea con la clave
+        /// verificada. Si falla no se dice nada al que entra —ya está dentro— pero se anota:
+        /// que no se pueda convertir es cosa de la base, no suya.
+        /// </summary>
+        private static void ReescribirClave(long cuenta, string clave)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Accounts SET Password = $pass WHERE Id = $id;";
+                command.Parameters.AddWithValue("$pass", Managers.Claves.Cifrar(clave));
+                command.Parameters.AddWithValue("$id", cuenta);
+                command.ExecuteNonQuery();
+                Console.WriteLine($"[Auth] La contraseña de la cuenta {cuenta} ya está cifrada.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Auth] No se pudo cifrar la contraseña de {cuenta}: {ex.Message}");
+            }
+        }
+
         private static void RecordFailedAttempt(string clientIp)
         {
             _ipLockouts.AddOrUpdate(clientIp,
                 (1, DateTime.UtcNow),
                 (key, old) => (old.attempts + 1, DateTime.UtcNow));
+        }
+
+        /// <summary>
+        /// Guarda la sesión del LANZADOR. Es un token aparte del de juego a propósito: el del
+        /// juego lo rota el cliente cada vez que arranca, y si fueran el mismo, abrir un cliente
+        /// dejaría al lanzador sin sesión para la próxima vez.
+        /// </summary>
+        public static void SetLauncherToken(long accountId, string token)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Accounts SET LauncherToken = $token WHERE Id = $id;";
+                command.Parameters.AddWithValue("$token", token);
+                command.Parameters.AddWithValue("$id", accountId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se ha podido guardar la sesión del lanzador: {ex.Message}");
+            }
+        }
+
+        /// <summary>De quién es esta sesión de lanzador, o cero si no la reconoce nadie.</summary>
+        public static long GetAccountIdByLauncherToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return 0;
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id FROM Accounts WHERE LauncherToken = $token;";
+                command.Parameters.AddWithValue("$token", token);
+                var result = command.ExecuteScalar();
+                return result != null ? (long)result : 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se ha podido leer la sesión del lanzador: {ex.Message}");
+                return 0;
+            }
         }
 
         public static void SetGameToken(long accountId, string token)
@@ -1849,8 +2026,13 @@ namespace Jondo.Unity.Launcher
                     Gid = $gid,
                     Quantity = $qty,
                     Position = $pos,
-                    Effects = $effects;
+                    Effects = $effects
+                WHERE CharacterItems.CharacterId = $charId;
             ";
+            // El WHERE del final es lo que impide que esto se lleve por delante la fila de OTRO
+            // personaje. Con el repartidor de uid arreglado no deberia chocar nunca, pero si
+            // alguna vez vuelve a chocar, que no pase nada es mucho mejor que convertirle a
+            // alguien su Dofus en una pluma de piwi sin decir ni pio.
             command.Parameters.AddWithValue("$charId", characterId);
             command.Parameters.AddWithValue("$uid", item.Uid);
             command.Parameters.AddWithValue("$gid", item.ItemId);
@@ -2095,20 +2277,63 @@ namespace Jondo.Unity.Launcher
             }
         }
 
-        public static void SaveItemPosition(long uid, int position)
+        /// <summary>
+        /// Mueve un objeto de hueco.
+        ///
+        /// Antes esto era «UPDATE CharacterItems SET Position = $pos WHERE Uid = $uid», sin mirar
+        /// de quien es. El uid es unico en todo el servidor —hay indice unico y se reparten con un
+        /// MAX global— asi que no le tocaba el objeto a medio mundo, pero si dejaba mover el de
+        /// OTRO: el uid lo elige el cliente y aqui no se comprobaba nada, de modo que un iuk con
+        /// el numero de un objeto ajeno lo cambiaba de hueco igual. Con el dueno delante, un uid
+        /// que no sea tuyo no encuentra fila y no pasa nada.
+        ///
+        /// El dueno es obligatorio a proposito —no tiene valor por defecto— para que una llamada
+        /// nueva que se olvide de pasarlo no llegue a compilar.
+        /// </summary>
+        public static bool SaveItemPosition(long uid, int position, long characterId)
         {
+            if (characterId <= 0) return false;
+
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = "UPDATE CharacterItems SET Position = $pos WHERE Uid = $uid;";
+            command.CommandText = "UPDATE CharacterItems SET Position = $pos " +
+                                  "WHERE Uid = $uid AND CharacterId = $id;";
             command.Parameters.AddWithValue("$pos", position);
             command.Parameters.AddWithValue("$uid", uid);
-            command.ExecuteNonQuery();
+            command.Parameters.AddWithValue("$id", characterId);
+            return command.ExecuteNonQuery() > 0;
         }
 
         /// <summary>Reads an item template's realWeight (pods) from the ItemTemplates Data JSON.</summary>
+        /// <summary>
+        /// Lo que pesa un objeto, en pods. Se pregunta una vez por plantilla y ya.
+        ///
+        /// El peso de una plantilla no cambia nunca —sale del volcado del cliente— y esto lo
+        /// recalculaba cada vez: abría una conexión a SQLite, hacía la consulta y parseaba el
+        /// JSON entero de la plantilla para sacar UN número. Como quien llama recorre el
+        /// inventario, arrastrar un solo objeto abría 1.737 conexiones y parseaba 1.737 JSON,
+        /// y el jugador notaba el tirón.
+        ///
+        /// El diccionario es concurrente porque lo tocan varias sesiones a la vez. Puede que dos
+        /// pregunten por la misma plantilla en el mismo instante y las dos vayan a la base: no
+        /// pasa nada, es la misma respuesta y se escribe la misma. Lo que no puede pasar es que
+        /// el diccionario se rompa por dentro, y de eso se encarga ConcurrentDictionary.
+        /// </summary>
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, int> _pesoPorPlantilla
+            = new System.Collections.Concurrent.ConcurrentDictionary<int, int>();
+
         public static int GetItemRealWeight(int gid)
+        {
+            if (_pesoPorPlantilla.TryGetValue(gid, out int guardado)) return guardado;
+
+            int peso = LeerPesoDeLaBase(gid);
+            _pesoPorPlantilla[gid] = peso;
+            return peso;
+        }
+
+        private static int LeerPesoDeLaBase(int gid)
         {
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
@@ -3361,6 +3586,57 @@ namespace Jondo.Unity.Launcher
             return salida;
         }
 
+        /// <summary>
+        /// Los retos con logro que este personaje ya ha cumplido, para no volver a ofrecérselos.
+        ///
+        /// Hoy devuelve siempre vacío, y es correcto que lo haga: todavía no hay nada que
+        /// compruebe durante el combate si un reto se cumple, así que aún no hay a quién apuntar
+        /// nada. La tabla existe ya para que el día que se implante esa comprobación sólo haya
+        /// que llamar a <see cref="MarkChallengeDone"/>.
+        /// </summary>
+        public static HashSet<int> LoadChallengesDone(long characterId)
+        {
+            var salida = new HashSet<int>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT ChallengeId FROM CharacterChallenges WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) salida.Add(reader.GetInt32(0));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se han podido leer los retos cumplidos: {ex.Message}");
+            }
+            return salida;
+        }
+
+        /// <summary>Apunta un reto con logro como cumplido. No se le volverá a ofrecer.</summary>
+        public static void MarkChallengeDone(long characterId, int challengeId)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterChallenges (CharacterId, ChallengeId)
+                    VALUES ($c, $r)
+                    ON CONFLICT(CharacterId, ChallengeId) DO NOTHING;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$r", challengeId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se ha podido apuntar el reto {challengeId}: {ex.Message}");
+            }
+        }
+
         /// <summary>El mapa que dice la base para un personaje. Solo para diagnostico.</summary>
         public static long MapOf(long characterId)
         {
@@ -3380,6 +3656,106 @@ namespace Jondo.Unity.Launcher
             }
         }
 
+        /// <summary>
+        /// El siguiente uid libre. Uno para TODO el servidor, y atomico.
+        ///
+        /// Esto arreglo un bug que se comia objetos. El uid es unico en toda la tabla —hay indice
+        /// unico y SaveInventoryItem hace ON CONFLICT(Uid) DO UPDATE— pero se repartia mirando el
+        /// inventario de UN personaje: «el mayor uid que tengo yo, mas uno». Con dos personajes
+        /// nuevos eso da 1 a los dos, y el segundo en lootear no anade su objeto: PISA el del
+        /// primero. Comprobado sobre una copia de la base: Ana loota una pluma y le queda el uid 1;
+        /// Beto loota una semilla, sale uid 1 otra vez, y la fila pasa a ser «personaje de Ana,
+        /// objeto de Beto». Ana pierde la pluma y Beto se queda sin nada, y no salta ni un error.
+        ///
+        /// Los otros dos repartidores que habia —NpcHandler y Lottery— leian MAX(Uid) de la base
+        /// cada vez, lo cual era correcto pero tenia su propia carrera: dos compras en el mismo
+        /// instante leen el mismo maximo y devuelven el mismo numero. Ahora los tres pasan por
+        /// aqui, se pregunta a la base UNA vez y a partir de ahi es un contador.
+        ///
+        /// El suelo es por si la tabla esta vacia; si hay algo, se sigue por encima de lo que ya
+        /// exista, sea del rango que sea.
+        /// </summary>
+        private const long PrimerUidRepartido = 1_000_000_000L;
+
+        private static long _ultimoUidRepartido;
+        private static readonly object _candadoDelUid = new object();
+
+        public static long NextItemUid()
+        {
+            if (System.Threading.Interlocked.Read(ref _ultimoUidRepartido) == 0)
+            {
+                lock (_candadoDelUid)
+                {
+                    if (_ultimoUidRepartido == 0)
+                        _ultimoUidRepartido = Math.Max(MayorUidEnUso(), PrimerUidRepartido);
+                }
+            }
+
+            return System.Threading.Interlocked.Increment(ref _ultimoUidRepartido);
+        }
+
+        /// <summary>El mayor uid escrito en la base. Lo usa la guardia de regresion.</summary>
+        public static long MayorUidGuardado() => MayorUidEnUso();
+
+        private static long MayorUidEnUso()
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT MAX(Uid) FROM CharacterItems;";
+                return command.ExecuteScalar() is long max ? max : 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se pudo leer el mayor uid en uso: {ex.Message}");
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Varios objetos de golpe, leyendo el inventario UNA vez.
+        ///
+        /// AddItemToInventory carga el inventario entero para saber si ya tienes uno de esos y
+        /// apilarlo. Eso está bien para un objeto suelto, pero el botín de un combate llama una
+        /// vez por objeto distinto, así que un combate que suelta cinco cosas cargaba cinco veces
+        /// el inventario completo —1.737 filas en la cuenta de la captura— justo en el momento en
+        /// que el jugador está esperando la pantalla de recompensa.
+        /// </summary>
+        public static void AddItemsToInventory(long characterId, IReadOnlyDictionary<int, int> items)
+        {
+            if (items == null || items.Count == 0) return;
+
+            var inventory = LoadInventory(characterId);
+
+            foreach (var kv in items)
+            {
+                var existing = inventory.FirstOrDefault(i => i.ItemId == kv.Key && i.Position == 63);
+                if (existing != null)
+                {
+                    existing.Quantity += kv.Value;
+                    SaveInventoryItem(characterId, existing);
+                    continue;
+                }
+
+                var nuevo = new PlayerItem
+                {
+                    Uid = NextItemUid(),
+                    ItemId = kv.Key,
+                    Quantity = kv.Value,
+                    Position = 63
+                };
+                SaveInventoryItem(characterId, nuevo);
+
+                // A la lista en memoria también: si el mismo botín trae dos veces el mismo objeto
+                // —no pasa hoy, pero el diccionario no lo impide— la segunda tiene que apilarse
+                // sobre la primera y no crear otra fila.
+                inventory.Add(nuevo);
+            }
+        }
+
         public static PlayerItem AddItemToInventory(long characterId, int itemGid, int quantity)
         {
             var inventory = LoadInventory(characterId);
@@ -3392,10 +3768,9 @@ namespace Jondo.Unity.Launcher
                 return existing;
             }
 
-            long maxUid = inventory.Count > 0 ? inventory.Max(i => i.Uid) : 0;
             var item = new PlayerItem
             {
-                Uid = Math.Max(maxUid + 1, 1),
+                Uid = NextItemUid(),
                 ItemId = itemGid,
                 Quantity = quantity,
                 Position = 63
@@ -3405,10 +3780,36 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Retrieves spell level data (AP cost, range, base damage, element) for a given spell ID.
-        /// Queries the SpellLevels table and parses the effects JSON.
+        /// Lo que hace un hechizo en un grado: coste, alcance, daños, efectos.
+        ///
+        /// Se guarda por (hechizo, grado), igual que ya hacía SpellEffects. La tabla SpellLevels
+        /// no cambia mientras el servidor está levantado, y esto se pregunta MUCHAS veces: cada
+        /// vez que un monstruo decide qué lanzar recorre todos sus hechizos, y cada vuelta abría
+        /// una conexión a SQLite y parseaba dos JSON —el normal y el crítico— para volver a
+        /// obtener exactamente lo mismo.
+        ///
+        /// Se guarda también el null: un hechizo que no está en la tabla tampoco va a aparecer
+        /// más tarde, y sin eso el caso malo —el que más veces se pregunta— seguía yendo a la
+        /// base en cada turno.
+        ///
+        /// OJO: lo que sale de aquí lo comparten todos, así que NO SE TOCA. Los cuatro sitios que
+        /// lo usan sólo leen, y hay una guardia (SecurityGuardTests) que salta si alguien empieza
+        /// a escribir en el objeto devuelto: cambiarle el coste a uno se lo cambiaría a todos, en
+        /// todos los combates a la vez, y eso no daría error por ningún lado.
         /// </summary>
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int), SpellCombatData?> _hechizoPorGrado
+            = new System.Collections.Concurrent.ConcurrentDictionary<(int, int), SpellCombatData?>();
+
         public static SpellCombatData? GetSpellCombatData(int spellId, int grade = 1)
+        {
+            if (_hechizoPorGrado.TryGetValue((spellId, grade), out var guardado)) return guardado;
+
+            var leido = LeerHechizoDeLaBase(spellId, grade);
+            _hechizoPorGrado[(spellId, grade)] = leido;
+            return leido;
+        }
+
+        private static SpellCombatData? LeerHechizoDeLaBase(int spellId, int grade)
         {
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();

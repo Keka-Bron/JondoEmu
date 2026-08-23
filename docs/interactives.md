@@ -98,10 +98,13 @@ registry.
 | Bin | Graphics 8438, 46529, 63081, 260022 | 105 | 153 | `BinHandler` |
 | HouseDoor | Any of 37 graphics the captures declare type 300 | 300 | 84 | `HouseHandler` |
 | HouseExit | The chosen exit element of a house interior | 316 | 184 | `HouseHandler` |
+| Teleport | Exact `(mapId, elementId)` kept from Giny 2.68 after 3.6 validation | 0 | 114 | `TeleportHandler` |
 
 Every one of those `(type, skill)` pairs is measured, not chosen: `tools/tipos_interactivos.py`
 cross-references the 304 packet captures against the client's element dump and yields
-`graphic → type` for 415 graphics. **1,990 elements are registered** at startup.
+`graphic → type` for 415 graphics. **28,572 elements are registered** at startup: 26,987 of them
+zaaps, chests, bins, house doors and gatherable resources, plus 1,585 generic teleport routes
+(section 11).
 
 Two of those rows deserve a note.
 
@@ -417,3 +420,68 @@ animation/category value and is not the interactive type sent in `jss`; treating
 would misdeclare zaaps, chests and resources. Giny 2.68 remains useful for behaviour and database
 architecture, but its packet classes and hard-coded element mappings must not be copied as 3.6
 protocol truth.
+
+---
+
+## 11. Generic teleport routes imported from Giny
+
+Houses are deliberately excluded. A house entrance uses `jqw`, remembers the outside map in the
+player's session and stays owned by `Houses`/`HouseHandler`; treating one as a plain `jru` teleport
+would lose both that protocol and the return state.
+
+The routes come from a phpMyAdmin export of Giny 2.68's `interactive_skills` table. Rows whose
+action is `Teleport` are joined against the 3.6 `interactive_elements.json` by the exact
+`(mapId, elementId)` pair, house doors and interior exits are removed, identical duplicates are
+merged, and any source element for which Giny gives conflicting targets is disabled. The result is
+the versioned `datos/interactive_teleports_giny_2.68.json`.
+
+**Why a Dofus 2 dump works at all.** Dofus 3 inherited the map- and element-id space from Dofus 2.
+4,657 of the 5,124 distinct maps in the dump (91 %) exist in this emulator's `world.db`, and every
+cell id in it falls inside 0–559. The ids are not the problem; stale routes are, and those are what
+the validation removes.
+
+The file holds **1,678 candidate routes, 1,623 of them marked enabled**. Startup then runs the 3.6
+checks the offline join cannot do: the source element's cell and graphic must still match, the
+destination map must exist, the target cell must be in range, and the element must not already be a
+zaap, zaapi, chest, lottery machine or bin. **1,585 survive** — the rest fall to 55 ambiguous
+sources and 37 destination maps that no longer exist.
+
+`TeleportManager.Initialize` transactionally replaces the `InteractiveTeleports` table from that
+JSON and reloads only `Enabled=1` rows into immutable indexes. Rejected rows stay in SQLite with
+their `ValidationStatus`, so a route that disappears can be looked up rather than guessed at. Note
+that the table is rebuilt from the JSON on **every** start: editing a row by hand does nothing.
+
+`InteractiveRegistry` declares each route with skill 114 and interactive type 0, exactly as Giny's
+`.sun` command does. The `GfxId` is never used as the interactive type — it stays the map graphic
+attached to the element. On an `iwo`, `InteractiveActionHandler` resolves the registered element and
+calls `TeleportHandler.UseAsync`, which sends `iwn`, then `iwi`, an `iwf` state 0 and an enabled
+`iwm` before loading the destination. Those three are not decoration: leaving only the `iwn` lets
+the client cache the element as busy, and its graphic is gone the next time the player returns.
+
+### What is deliberately not here
+
+**No end-of-movement trigger.** The routes are also indexed by `(map, sourceCell)`, and the guard
+uses that index to catch two routes landing on one cell — but nothing fires on stepping. The
+original implementation hooked `jqi`, which the client only sends when walking into a **map edge**.
+By the project's own cell geometry only **109 of the 1,585 routes (6.9 %)** sit on an edge cell, so
+the other 1,476 could never fire; and the hook returned before answering `jsq`, which leaves the
+character stuck on the border for good in those 109. It will come back when there is a real
+end-of-movement signal to hang it on.
+
+**No change to how other elements are declared.** `f11` is emitted only for elements with a
+registered action, and `f15` only alongside it, exactly as before. Declaring an `f15` for all 46,309
+elements in the world would be a protocol change affecting 9,840 maps, and it needs its own captures
+to back it up.
+
+### What the guard pins
+
+Three concrete routes, with their numbers, so a change in the catalogue cannot pass unnoticed:
+Astrub to the temple (191106048/515837 → 192416776 cell 534), the Astrub jeweller workshop round
+trip, and a **stair** (graphic 62018) that takes exactly the same generic path as a sun — which is
+the point: the graphic never decides anything. On top of that, every route must resolve to a
+clickable `f11`/`f15` interactive, and the total element count must match, which is what makes an
+accidental collision with a house door or a resource stop the server instead of corrupting a map.
+
+Landing uses `MapManager.GetNearestWalkableCell`, so a destination cell that is no longer walkable
+cannot strand the character. 314 of the routes (20 %) do land on a non-walkable cell and are
+rescued that way, which means one route in five puts the character slightly off the mark.

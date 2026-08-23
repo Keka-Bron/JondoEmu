@@ -234,6 +234,25 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
+            // Y que el vendedor siga estando donde está el jugador.
+            //
+            // La tienda se quedaba abierta al cambiar de mapa —Forget() existía pero no lo
+            // llamaba nadie— así que se podía hablar con un vendedor, irse andando tres mapas y
+            // seguir comprando de su catálogo desde el otro lado del mundo. Mirar sólo
+            // «OpenShop != 0» no basta: eso dice que hubo una tienda, no que la haya ahora.
+            //
+            // Se comprueba aquí y no sólo al cambiar de mapa a propósito. Acordarse de llamar a
+            // Forget() en los siete sitios desde los que se cambia de mapa —andar, zaap, zaapi,
+            // puerta de mazmorra, casa, anomalía, fin de combate— es acordarse siete veces; esto
+            // es una sola y no depende de por dónde se haya salido.
+            if (Managers.Npcs.Find(SessionContext.State.MapId, OpenShop) == null)
+            {
+                Console.WriteLine($"[NPC] El vendedor {OpenShopNpc} no está en el mapa " +
+                                  $"{SessionContext.State.MapId}: la tienda se cierra.");
+                Forget();
+                return;
+            }
+
             // Que el vendedor que está abierto lo tenga de verdad: el catálogo lo mandamos nosotros,
             // así que pedir otra cosa no es una compra válida.
             bool onSale = false;
@@ -325,30 +344,27 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Push(Op.Khd, ConnectionProtocol.BuildShopClosed()));
         }
 
-        /// <summary>Al cambiar de mapa no queda nada abierto.</summary>
+        /// <summary>
+        /// Al cambiar de mapa no queda nada abierto.
+        ///
+        /// Lo llama WorldMoveHandler al mudarse y FightHandler al empezar un combate. Aun así,
+        /// BuyAsync vuelve a comprobar que el vendedor esté en el mapa: esto es por orden, no
+        /// por seguridad, y de la seguridad se encarga quien cobra.
+        /// </summary>
         public static void Forget()
         {
             OpenShop = 0;
             OpenShopNpc = 0;
         }
 
-        private static long NextUid()
-        {
-            try
-            {
-                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
-                    DatabaseManager.WorldConnectionString);
-                connection.Open();
-
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT MAX(Uid) FROM CharacterItems WHERE Uid >= $desde;";
-                command.Parameters.AddWithValue("$desde", FirstUid);
-
-                object? result = command.ExecuteScalar();
-                if (result is long max && max >= FirstUid) return max + 1;
-            }
-            catch { }
-            return FirstUid;
-        }
+        /// <summary>
+        /// El uid del objeto que se acaba de comprar.
+        ///
+        /// Esto leia MAX(Uid) de la base en cada compra, lo cual repartia bien pero no era
+        /// atomico: dos compras a la vez leen el mismo maximo y devuelven el mismo numero, y la
+        /// segunda pisa la fila de la primera. Ahora lo reparte DatabaseManager para todo el
+        /// servidor, de una vez y con un contador.
+        /// </summary>
+        private static long NextUid() => DatabaseManager.NextItemUid();
     }
 }

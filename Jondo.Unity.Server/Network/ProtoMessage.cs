@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,9 +20,21 @@ namespace Jondo.Unity.Launcher.Network
     {
         public List<ProtoField> Fields { get; set; } = new List<ProtoField>();
 
+        /// <summary>
+        /// Descose un protobuf en campos sueltos.
+        ///
+        /// Lo que entra aqui viene del socket, asi que puede estar mal a proposito. Antes un
+        /// campo con una longitud mayor que lo que quedaba pedia el array igual —hasta 4 GB con
+        /// cinco bytes— y un tipo de cable de los que no se usan (3, 4, 6 o 7) lanzaba una
+        /// excepcion que nadie recoge. Ahora las dos cosas cortan el recorrido y devuelven lo
+        /// leido hasta ahi, que es lo mismo que ve un mensaje truncado y lo que todos los
+        /// manejadores ya saben tratar: recorren Fields buscando el suyo y si no esta, se van.
+        /// </summary>
         public static ProtoMessage Parse(byte[] data)
         {
             var msg = new ProtoMessage();
+            if (data == null) return msg;
+
             int pos = 0;
             while (pos < data.Length)
             {
@@ -36,24 +48,30 @@ namespace Jondo.Unity.Launcher.Network
                 }
                 else if (wireType == 1)
                 {
+                    if (pos + 8 > data.Length) break;
                     field.Fixed64Value = BitConverter.ToUInt64(data, pos);
                     pos += 8;
                 }
                 else if (wireType == 2)
                 {
                     int len = (int)ReadVarInt(data, ref pos);
+                    // El tope natural es lo que queda: un campo con longitud no puede pasarse
+                    // del final del mensaje que lo lleva.
+                    if (len < 0 || len > data.Length - pos) break;
                     field.BytesValue = new byte[len];
                     Array.Copy(data, pos, field.BytesValue, 0, len);
                     pos += len;
                 }
                 else if (wireType == 5)
                 {
+                    if (pos + 4 > data.Length) break;
                     field.Fixed32Value = BitConverter.ToUInt32(data, pos);
                     pos += 4;
                 }
                 else
                 {
-                    throw new Exception("Unsupported wire type: " + wireType);
+                    // 3 y 4 son los grupos, que protobuf3 ya no emite; 6 y 7 no existen.
+                    break;
                 }
                 msg.Fields.Add(field);
             }

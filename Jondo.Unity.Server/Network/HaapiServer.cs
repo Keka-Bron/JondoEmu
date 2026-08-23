@@ -89,7 +89,8 @@ namespace Jondo.Unity.Launcher.Network
             {
                 using var reader = new StreamReader(req.InputStream, req.ContentEncoding);
                 body = await reader.ReadToEndAsync();
-                if (body.Length > 0 && body.Length < 1000 && !latido) Console.WriteLine($"[HAAPI]  body: {body}");
+                if (body.Length > 0 && body.Length < 1000 && !latido)
+                    Console.WriteLine($"[HAAPI]  body: {Censura.Cuerpo(body)}");
             }
 
             // Las rutas de mando del lanzador. Estuvieron aquí, se borraron al pasar a la ventana

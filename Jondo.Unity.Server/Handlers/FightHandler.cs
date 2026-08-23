@@ -285,16 +285,50 @@ namespace Jondo.Unity.Launcher.Handlers
             // Cuando se acaba la cuenta atrás de la colocación se empieza igual. El cliente la lleva
             // por su cuenta —el servidor real no manda ni un temporizador entre las casillas y el
             // botón de listo— así que aquí sólo hace falta el plazo.
+            //
+            // Esto tenía tres agujeros y los tres eran del mismo tipo: escribía en el socket sin
+            // el candado, así que su ráfaga podía entrelazarse con la de quien estuviera
+            // atendiendo al cliente y partir una trama por la mitad; se plantaba 45 segundos sin
+            // manera de pararlo, de modo que sobrevivía a la desconexión y acababa escribiendo en
+            // un socket cerrado; y no recogía nada, así que ese fallo se perdía sin rastro.
+            //
+            // El sitio donde apuntar el temporizador ya estaba —FightInstance.PlacementTimerCts—
+            // y CancelPlacementTimer() se llama desde cuatro sitios, pero NADIE lo asignaba nunca:
+            // se cancelaba un null. Ésa era la mitad que faltaba.
             long currentFightId = fight.FightId;
+            var cuentaAtras = new System.Threading.CancellationTokenSource();
+            fight.CancelPlacementTimer();
+            fight.PlacementTimerCts = cuentaAtras;
+
             _ = Task.Run(async () =>
             {
-                await Task.Delay(PlacementTimeoutMs);
-                var f = GetCurrentFight();
-                if (f != null && f.FightId == currentFightId
-                    && f.State == Jondo.Unity.World.Fights.FightState.Placement)
+                try
                 {
+                    await Task.Delay(PlacementTimeoutMs, cuentaAtras.Token);
+                }
+                catch (OperationCanceledException) { return; }
+                catch (ObjectDisposedException) { return; }
+
+                // El mismo candado que usan el reloj de turno y lo que llega del cliente. Sin él,
+                // pulsar «listo» justo al vencer el plazo arrancaba el combate dos veces.
+                var turno = MiTurno();
+                await turno.WaitAsync();
+                try
+                {
+                    var f = GetCurrentFight();
+                    if (f == null || f.FightId != currentFightId) return;
+                    if (f.State != Jondo.Unity.World.Fights.FightState.Placement) return;
+
                     Program.LogDebug($"[Combate] Se acabó el tiempo de colocación del combate #{currentFightId}.");
                     await HandleTurnReady(stream, Array.Empty<byte>());
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[Combate] La cuenta atrás de la colocación se atragantó: {ex.Message}");
+                }
+                finally
+                {
+                    turno.Release();
                 }
             });
         }
@@ -313,8 +347,19 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static void LeaveFight()
         {
-            _finPendiente = null;
-            PararElReloj();
+            // Solo lo SUYO. Antes borraba el final pendiente y paraba el reloj de todo el
+            // servidor, asi que cualquiera que volviera a la pantalla de personajes le dejaba a
+            // otro el combate colgado y sin reloj.
+            var mio = GetCurrentFight();
+            if (mio != null)
+            {
+                mio.FinPendiente = 0;
+                mio.CancelTurnTimer();
+
+                // Y la cuenta atrás de la colocación, que si no sigue viva 45 segundos y acaba
+                // escribiendo en un socket que ya no está.
+                mio.CancelPlacementTimer();
+            }
 
             var suyo = Network.SessionContext.State;
             if (suyo.RoleplayMapId == 0) return;
@@ -391,6 +436,12 @@ namespace Jondo.Unity.Launcher.Handlers
                     Network.FightProtocol.BuildFighterPlaced(fighter.CellId, FacingOf(fight, fighter), fighter.Id)));
             }
 
+            // Cuántos retos se eligen en este combate. Va aquí, detrás de los kmk y delante del
+            // primer jxg, que es donde lo pone el servidor real; y va DOS VECES, con el mismo
+            // número, porque el original lo repite detrás de las casillas. El kwk vacío sólo
+            // acompaña al primero.
+            await ChallengeHandler.SendCountAsync(stream, fight, primeraVez: true);
+
             // Lo primero, decirle que AQUÍ HAY UN COMBATE. Sin el kam el cliente no tiene ningún
             // combate al que agarrar lo que viene detrás, y se le ve reventar en su propio registro
             // al llegarle el jwq, recorriendo una lista de combatientes que no existe. Con el mapa
@@ -443,6 +494,11 @@ namespace Jondo.Unity.Launcher.Handlers
                     fight.BluePlacementCells.ConvertAll(c => (long)c),
                     fight.RedPlacementCells.ConvertAll(c => (long)c))));
 
+            // Y otra vez cuántos retos, con el mismo número. No es un descuido de la captura: el
+            // servidor real lo manda dos veces, aquí y antes del kaa, en las siete capturas donde
+            // hay retos.
+            await ChallengeHandler.SendCountAsync(stream, fight);
+
             // Detrás de las casillas, que es donde los pone la captura: quién está metido en el
             // combate y las cuatro opciones.
             foreach (var fighter in fight.Team0)
@@ -469,6 +525,11 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk,
                 Network.FightProtocol.BuildFightMap(fight.MapId)));
+
+            // La lista de retos NO va aquí. El cliente manda sus ajustes del panel (kwo) nada más
+            // recibir el jrk, y en las doce apariciones reales la lista llega SIEMPRE detrás de
+            // ese kwo —incluidas las dos que el servidor manda sin que nadie las pida—. Se dispara
+            // desde ChallengeHandler.SettingsAsync.
 
             Program.LogDebug($"[Combate] Preparación del combate #{fight.FightId}: " +
                              $"{fight.Team0.Count} contra {fight.Team1.Count}, " +
@@ -572,6 +633,27 @@ namespace Jondo.Unity.Launcher.Handlers
         /// más, y como viven en el combatiente del combate y no en el personaje, al salir a
         /// roleplay no queda nada pegado.
         /// </summary>
+        /// <summary>
+        /// Lo que vale una caracteristica AHORA MISMO, embrujos incluidos, para mandarla suelta.
+        ///
+        /// Los puntos van por su cuenta -son los que le quedan de jugar este turno- y el resto
+        /// sale de lo que tiene la ficha mas lo que le hayan puesto encima, que es exactamente la
+        /// misma cuenta que hace la ficha completa del principio del combate.
+        /// </summary>
+        private static long ValorDeFicha(Fighter ficha, int caracteristica, int ronda)
+        {
+            if (caracteristica == ActionPointsCharacteristic) return ficha.CurrentAP;
+            if (caracteristica == MovementPointsCharacteristic) return ficha.CurrentMP;
+
+            int suyo = caracteristica switch
+            {
+                19 => ficha.Range,
+                25 => ficha.Power,
+                _ => ficha.Otra(caracteristica),
+            };
+            return ConBonos(ficha, caracteristica, suyo, ronda);
+        }
+
         private static int ConBonos(Fighter quien, int caracteristica, int loQueYaTiene, int ronda)
         {
             if (caracteristica <= 0) return loQueYaTiene;
@@ -592,6 +674,18 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>
         /// La tirada del crítico: un número del cero al noventa y nueve contra el porcentaje.
         /// </summary>
+        /// <summary>
+        /// Un numero de 0 a 100 con decimales, para las probabilidades de botin.
+        ///
+        /// Sale del mismo Random que todo lo demas y con el mismo candado. Los porcentajes de
+        /// caida llevan decimales de verdad —la bolsa de limones del jefe piwi rojo cae al 3 %—
+        /// asi que redondear a entero cambiaria lo que cae.
+        /// </summary>
+        private static double TirarPorcentaje()
+        {
+            lock (_dado) return _dado.NextDouble() * 100.0;
+        }
+
         private static bool TirarCritico(int porciento)
         {
             if (porciento <= 0) return false;
@@ -602,6 +696,9 @@ namespace Jondo.Unity.Launcher.Handlers
         /// <summary>Los mismos números que usa datos/characteristics.json.</summary>
         private const int ActionPointsCharacteristic = 1;
         private const int MovementPointsCharacteristic = 23;
+
+        /// <summary>El alcance a secas, la que suma a TODOS los hechizos.</summary>
+        private const int AlcanceCaracteristica = 19;
         private const int LifeCharacteristic = 0;
 
         /// <summary>
@@ -734,7 +831,14 @@ namespace Jondo.Unity.Launcher.Handlers
                 (91, 0, fighter.AirDamage),
                 (92, 0, fighter.NeutralDamage),
                 (95, 0, fighter.Otra(95)), (96, 0, fighter.Otra(96)),
-                (97, 0, fighter.Otra(97)), (102, 0, fighter.Otra(102)),
+
+                // La 97 es la vida que le falta, y es la UNICA forma que tiene el cliente de saber
+                // la del personaje que maneja: la de los demas la descuenta el solo de los golpes.
+                // Iba clavada a cero, asi que la barra del jugador se quedaba llena toda la pelea.
+                // Aqui va tambien para que un reenganche a un combate en marcha pinte la vida buena.
+                (Network.FightProtocol.TemporaryLifeMalus,
+                 fighter.CurrentHP - fighter.MaxHP, -fighter.VidaErosionada),
+                (102, 0, fighter.Otra(102)),
             };
 
             foreach (int cual in Multiplicadores) ficha.Add((cual, 100, 0));
@@ -956,15 +1060,17 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task HandleFightMessageAsync(NetworkStream stream, byte[] payload, string payloadStr)
         {
             // El mismo candado que usa el reloj del turno: mientras se atiende lo que manda el
-            // cliente, el reloj no puede meter su ráfaga por el medio, y al revés.
-            await _unoCadaVez.WaitAsync();
+            // cliente, el reloj no puede meter su ráfaga por el medio, y al revés. Es de esta
+            // sesión, así que un cliente atascado sólo se atasca a sí mismo.
+            var turno = MiTurno();
+            await turno.WaitAsync();
             try
             {
                 await AtenderAlClienteAsync(stream, payload, payloadStr);
             }
             finally
             {
-                _unoCadaVez.Release();
+                turno.Release();
             }
         }
 
@@ -991,15 +1097,15 @@ namespace Jondo.Unity.Launcher.Handlers
             // se enseña ya. Así un cliente que no acuse no deja el combate colgado para siempre, y
             // no hace falta un temporizador escribiendo en el socket por su cuenta, que se
             // entrelazaría con lo que escribe este mismo hilo.
-            if (_finPendiente != null && !payloadStr.Contains(Op.Uri(Op.Jti)))
+            var fight = GetCurrentFight();
+
+            if (fight != null && fight.FinPendiente != 0 && !payloadStr.Contains(Op.Uri(Op.Jti)))
             {
-                var colgado = _finPendiente.Value;
-                _finPendiente = null;
+                fight.FinPendiente = 0;
                 Program.LogDebug("[Combate] El final estaba esperando el acuse y ha llegado otra cosa; se enseña.");
-                await EndFightAsync(stream, colgado.Fight);
+                await EndFightAsync(stream, fight);
             }
 
-            var fight = GetCurrentFight();
             if (payloadStr.Contains(Op.Uri(Op.Jzy)))
             {
                 if (fight != null && fight.State == Jondo.Unity.World.Fights.FightState.Ongoing)
@@ -1030,9 +1136,15 @@ namespace Jondo.Unity.Launcher.Handlers
                 // Andar. Es el mismo mensaje que fuera del combate; aquí gasta PM.
                 await WalkAsync(stream, payload);
             }
-            else if (payloadStr.Contains(Op.Uri(Op.Jwh)))
+            else if (payloadStr.Contains(Op.Uri(Op.Jwh)) || payloadStr.Contains(Op.Uri(Op.Jwn)))
             {
-                // Lanzar un hechizo, o pegar con el arma si no trae hechizo.
+                // Lanzar un hechizo, o pegar con el arma si no trae hechizo. Los dos mensajes
+                // entran por aquí: el jwh apunta por casilla y el jwn desde el carrusel, por
+                // identificador de combatiente, y CastAsync sabe leer los dos.
+                //
+                // El jwn estaba en la puerta de fuera -GameNodeProxy- pero NO aqui, asi que
+                // llegaba al combate y no lo recogia ninguna rama: se caia por el final del
+                // if/else sin traza ninguna. Son DOS cadenas de enrutado, no una.
                 await CastAsync(stream, payload);
             }
             else if (payloadStr.Contains(Op.Uri(Op.Jti)))
@@ -1044,6 +1156,34 @@ namespace Jondo.Unity.Launcher.Handlers
             else if (payloadStr.Contains(Op.Uri(Op.Hoy)))
             {
                 await HandleFightOptionToggleRequest(stream, payload);
+            }
+            // Los retos. Cuatro de los cinco no llevan respuesta: el servidor real se queda
+            // callado ante el kwv y el kwi, y sólo contesta al kwr con la lista y al kwj con el
+            // reto fijado. Ver Handlers.ChallengeHandler.
+            else if (payloadStr.Contains(Op.Uri(Op.Kwr)))
+            {
+                if (fight != null) await ChallengeHandler.OpenAsync(stream, fight);
+            }
+            else if (payloadStr.Contains(Op.Uri(Op.Kwj)))
+            {
+                if (fight != null) await ChallengeHandler.ValidateAsync(stream, fight, payload);
+            }
+            else if (payloadStr.Contains(Op.Uri(Op.Kwv)))
+            {
+                // Marcar un candidato. OJO: el primero que llega no es un clic del jugador, sino
+                // la preselección que hace el cliente él solo dos milisegundos después de recibir
+                // la lista. Por eso marcar NO fija nada: hace falta el kwj.
+                if (fight != null) ChallengeHandler.Mark(fight, payload);
+            }
+            else if (payloadStr.Contains(Op.Uri(Op.Kwo)))
+            {
+                await ChallengeHandler.SettingsAsync(stream, fight, payload);
+            }
+            else if (payloadStr.Contains(Op.Uri(Op.Kwi)) || payloadStr.Contains(Op.Uri(Op.Kxb)))
+            {
+                // Pasar el ratón por un reto y el otro ajuste del panel. No llevan respuesta en
+                // ninguna de las 305 capturas; se recogen para que no salgan por el registro como
+                // paquetes sin atender.
             }
         }
 
@@ -1257,8 +1397,16 @@ namespace Jondo.Unity.Launcher.Handlers
             var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             long me = GameState.CharacterId;
 
+            // Los retos que quedaran sin validar los cierra el servidor aquí, ANTES del kai: si el
+            // jugador se declaró listo con uno marcado y sin validar, ése cuenta, y si ni eso, el
+            // servidor rellena. Detrás van los que impone el sitio. Medido en la anomalía.
+            await ChallengeHandler.FillAsync(stream, fight);
+
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kai,
                 Network.FightProtocol.BuildFightBegins()));
+
+            // Y la lista definitiva, que va entre el kai y el jyy.
+            await ChallengeHandler.SendFinalListAsync(stream, fight);
 
             // Los hechizos con los que se pelea son los MISMOS que el personaje tiene fuera del
             // combate, y con la misma tripa: el hms de siempre lleva f1 { f1: grado, f3: hechizo,
@@ -1296,6 +1444,10 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz,
                 Network.FightProtocol.BuildRound(FirstRound)));
+
+            // Los retos que senalan a un enemigo lo hacen aqui, detras del jyy, que es donde salen
+            // los tres kwm de las capturas.
+            await ChallengeWatcher.FightStartedAsync(stream, fight);
 
             // Los hechizos que NACEN con espera: el InitialCooldown de su grado. En la captura de
             // Paso de Cacería el primer jxc del combate lleva {370:1, 373:1, 32469:1}, y en la
@@ -1395,29 +1547,38 @@ namespace Jondo.Unity.Launcher.Handlers
         /// que llega del cliente pasan por el mismo candado: mientras uno escribe su ráfaga, el
         /// otro espera.
         /// </summary>
-        private static readonly System.Threading.SemaphoreSlim _unoCadaVez =
-            new System.Threading.SemaphoreSlim(1, 1);
+        /// <summary>
+        /// El turno de la sesión que esté atendiendo ahora mismo.
+        ///
+        /// Se PIDE una vez y se guarda en una variable en cada sitio que lo usa, nunca se llama
+        /// dos veces. Si se llamara para pedirlo y otra vez para soltarlo, el segundo podría
+        /// resolverse a otra sesión —el contexto es un AsyncLocal— y se soltaría un candado que
+        /// no se tiene mientras el propio se queda cerrado para siempre.
+        /// </summary>
+        private static System.Threading.SemaphoreSlim MiTurno()
+            => Network.SessionContext.Current.UnoCadaVez;
 
-        private static System.Threading.CancellationTokenSource? _reloj;
-
-        private static void PararElReloj()
-        {
-            var reloj = System.Threading.Interlocked.Exchange(ref _reloj, null);
-            if (reloj == null) return;
-            try { reloj.Cancel(); } catch { }
-            reloj.Dispose();
-        }
+        /// <summary>
+        /// Parar el reloj de turno de UN combate.
+        ///
+        /// Era un CancellationTokenSource estático, uno para todo el servidor, así que el segundo
+        /// jugador que empezara turno le cancelaba el reloj al primero: sólo el último tenía corte
+        /// de turno y a los demás, si se iban del teclado, el combate no les avanzaba nunca. La
+        /// pieza correcta ya existía sin usar —FightInstance.TurnTimerCts— y sólo la tocaba código
+        /// muerto de la versión anterior.
+        /// </summary>
+        private static void PararElReloj(FightInstance? fight) => fight?.CancelTurnTimer();
 
         private static void ArrancarElReloj(NetworkStream stream, FightInstance fight,
                                             Fighter quien, int decimas)
         {
-            PararElReloj();
+            PararElReloj(fight);
 
             // Al monstruo no se le pone reloj: juega solo y cede el turno él mismo.
             if (quien.IsMonster || decimas <= 0) return;
 
             var reloj = new System.Threading.CancellationTokenSource();
-            _reloj = reloj;
+            fight.TurnTimerCts = reloj;
 
             long deQuien = quien.Id;
             long deQueCombate = fight.FightId;
@@ -1432,7 +1593,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 catch (OperationCanceledException) { return; }
                 catch (ObjectDisposedException) { return; }
 
-                await _unoCadaVez.WaitAsync();
+                var turno = MiTurno();
+                await turno.WaitAsync();
                 try
                 {
                     // Puede haber cambiado todo mientras esperaba: que el combate se acabara, que
@@ -1451,7 +1613,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
                 finally
                 {
-                    _unoCadaVez.Release();
+                    turno.Release();
                 }
             });
         }
@@ -1535,6 +1697,12 @@ namespace Jondo.Unity.Launcher.Handlers
             fighter.StartTurn();
             await GivePointsBackAsync(stream, fight, fighter);
 
+            // De donde sale y con cuantos PM: es lo que hace falta para juzgar al acabar los retos
+            // de posicion y el de gastar exactamente un PM. Va DESPUES de devolver los puntos.
+            ChallengeWatcher.TurnStarted(fight, fighter);
+            await ChallengeWatcher.EnemyTurnStartedAsync(stream, fight, fighter);
+            await ChallengeWatcher.AllyTurnStartedAsync(stream, fight, fighter);
+
             // Y ahora las actitudes de "principio de turno": aquí es donde el Dofus Ocre mira si le
             // han pegado desde su turno anterior.
             await ActitudesAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
@@ -1613,7 +1781,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     Network.FightProtocol.BuildFighterSheet(fighter.Id, new[]
                     {
                         (characteristic, value),
-                    })));
+                    }, fighter.Id == GameState.CharacterId)));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
                                                            Network.FightProtocol.SheetSequence)));
@@ -1698,7 +1866,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 Network.FightProtocol.BuildFighterSheet(walker.Id, new[]
                 {
                     (MovementPointsCharacteristic, (long)walker.CurrentMP),
-                })));
+                }, walker.Id == GameState.CharacterId)));
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), walker.Id,
@@ -1746,10 +1914,63 @@ namespace Jondo.Unity.Launcher.Handlers
             if (caster == null || caster.IsMonster || caster.Id != GameState.CharacterId) return;
 
             var (cell, spell) = Network.FightProtocol.ReadCast(payload);
+
+            // Si no viene por casilla, viene POR EL CARRUSEL: el cliente deja apuntar pulsando la
+            // ficha de un combatiente en vez de su casilla del tablero, y entonces manda otro
+            // mensaje con su identificador. Es la unica forma comoda de echarse un embrujo a uno
+            // mismo, y el emulador ni siquiera lo escuchaba: se caia en el cajon de paquetes sin
+            // atender. Se resuelve a casilla y sigue por el mismo camino que el otro.
+            if (cell == 0)
+            {
+                var (senalado, hechizo) = Network.FightProtocol.ReadCastAtFighter(payload);
+                if (senalado == 0) return;
+
+                Fighter apuntado = null;
+                foreach (var uno in TodosLosCombatientes(fight))
+                {
+                    if (uno.Id == senalado && uno.IsAlive) { apuntado = uno; break; }
+                }
+                if (apuntado == null)
+                {
+                    Program.LogDebug($"[Combate] El carrusel apunta a {senalado}, que no esta en el combate.");
+                    return;
+                }
+                cell = apuntado.CellId;
+                spell = hechizo;
+            }
             if (cell == 0) return;
 
             var limites = LimitesDe(spell, caster.Level);
             int cost = limites.Cost, spellLevel = limites.LevelId, grade = limites.Grade;
+
+            // EL ALCANCE, que no se comprobaba en ninguna parte del camino vivo: se podía lanzar
+            // cualquier cosa a cualquier distancia. Por eso los embrujos que dan alcance parecían
+            // no hacer nada — no es que no se sumaran, es que no había límite que ampliar.
+            //
+            // Suman dos cosas: la característica 19, que es el alcance a secas, y los ajustes que
+            // apuntan a ESTE hechizo en concreto, que es lo que hacen Disparos Lejanos.
+            //
+            // Si el hechizo no trae alcance máximo en la base, no se comprueba nada: un dato que
+            // falta no debe impedir lanzar.
+            if (limites.AlcanceMaximo > 0)
+            {
+                int lejos = Jondo.Unity.World.Maps.MapGeometry.Distance(caster.CellId, cell);
+
+                int minimo = limites.AlcanceMinimo
+                           + caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo,
+                                                     fight.RoundNumber);
+                int maximo = limites.AlcanceMaximo
+                           + caster.Buffs.De(AlcanceCaracteristica, fight.RoundNumber)
+                           + caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMaximo,
+                                                     fight.RoundNumber);
+
+                if (lejos < minimo || lejos > maximo)
+                {
+                    Program.LogDebug($"[Combate] El hechizo {spell} no llega: {lejos} casillas, " +
+                                     $"y su alcance es de {minimo} a {maximo}.");
+                    return;
+                }
+            }
             if (cost <= 0) cost = DefaultCastCost;
             if (cost > caster.CurrentAP) return;
 
@@ -1803,6 +2024,10 @@ namespace Jondo.Unity.Launcher.Handlers
 
             caster.LanzadosEsteTurno[spell] = esteTurno + 1;
             if (aQuien != 0) caster.LanzadosPorObjetivo[(spell, aQuien)] = sobreEse + 1;
+
+            // El Versatil (no repetir accion) y los dos de rematar antes de cambiar de objetivo.
+            await ChallengeWatcher.CastAsync(stream, fight, caster, spell, victim,
+                                             esteTurno + 1);
             if (limites.Intervalo > 0) caster.Recarga[spell] = limites.Intervalo;
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
@@ -1828,7 +2053,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 Network.FightProtocol.BuildFighterSheet(caster.Id, new[]
                 {
                     (ActionPointsCharacteristic, (long)caster.CurrentAP),
-                })));
+                }, caster.Id == GameState.CharacterId)));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), caster.Id,
                                                        Network.FightProtocol.SheetSequence)));
@@ -2140,10 +2365,63 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>A quién le toca el golpe: el enemigo vivo que esté en esa casilla, si lo hay.</summary>
+        /// <summary>
+        /// Decirle al cliente que a alguien le han quitado PA o PM, para que salga el numerito
+        /// flotando encima igual que con la vida.
+        ///
+        /// Sólo cuando se QUITAN: si el efecto da puntos, el mensaje medido es otro y no está
+        /// atado a un caso concreto, así que no se manda nada antes que mandar el que no es.
+        /// </summary>
+        /// <summary>
+        /// Refrescarle al jugador la vida que le falta.
+        ///
+        /// Sólo a él: el cliente lleva la barra de todos los demás por su cuenta, descontando los
+        /// golpes que ve pasar, y la suya la saca del tope más esta característica. En las 305
+        /// capturas no hay ni un solo envío de la 97 para un monstruo ni para el jugador rival.
+        ///
+        /// Va envuelta en su jto/jwi, como cualquier ficha suelta.
+        /// </summary>
+        private static async Task RefrescarLaVidaAsync(NetworkStream stream, FightInstance fight,
+                                                       Fighter quien)
+        {
+            if (quien.Id != GameState.CharacterId) return;
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(quien.Id,
+                                                         Network.FightProtocol.SheetSequence)));
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
+                Network.FightProtocol.BuildLifeSheet(quien.Id,
+                                                     quien.CurrentHP - quien.MaxHP,
+                                                     quien.VidaErosionada)));
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
+                                                       Network.FightProtocol.SheetSequence)));
+        }
+
+        private static async Task AnunciarPuntosAsync(NetworkStream stream, Fighter quienLanza,
+                                                      Fighter sobre, int efecto, int cuanto)
+        {
+            if (cuanto >= 0) return;
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildPointsLost(quienLanza.Id, efecto, sobre.Id, cuanto)));
+        }
+
+        /// <summary>
+        /// Quien esta en la casilla apuntada, del bando que sea.
+        ///
+        /// Antes solo miraba al bando CONTRARIO, asi que apuntar a un aliado -o a uno mismo, que
+        /// es como se echan los embrujos- no devolvia a nadie: el tope por objetivo no contaba y
+        /// el bloque del objetivo no viajaba. A quien le toca el efecto lo decide luego la mascara
+        /// del propio hechizo, que para eso esta.
+        /// </summary>
         private static Fighter VictimAt(FightInstance fight, Fighter caster, int cell)
         {
-            var enemies = caster.TeamId == 0 ? fight.Team1 : fight.Team0;
-            return enemies.Find(f => f.CellId == cell && f.IsAlive);
+            foreach (var uno in TodosLosCombatientes(fight))
+            {
+                if (uno.CellId == cell && uno.IsAlive) return uno;
+            }
+            return null;
         }
 
         /// <summary>
@@ -2197,11 +2475,23 @@ namespace Jondo.Unity.Launcher.Handlers
                 {
                     c.Sobre.CurrentAP = Math.Max(0, c.Sobre.CurrentAP + c.Cuanto);
                     fichas.Add((c.Sobre.Id, ActionPointsCharacteristic));
+                    await AnunciarPuntosAsync(stream, quienLanza, c.Sobre,
+                                              Network.FightProtocol.ActionPointsLost, c.Cuanto);
                 }
                 else if (c.Caracteristica == MovementPointsCharacteristic)
                 {
                     c.Sobre.CurrentMP = Math.Max(0, c.Sobre.CurrentMP + c.Cuanto);
                     fichas.Add((c.Sobre.Id, MovementPointsCharacteristic));
+                    await AnunciarPuntosAsync(stream, quienLanza, c.Sobre,
+                                              Network.FightProtocol.MovementPointsLost, c.Cuanto);
+                }
+                else if (c.Caracteristica != 0)
+                {
+                    // Y CUALQUIER OTRA caracteristica que el embrujo haya movido: la potencia, el
+                    // alcance, los daños… Aqui no se tocaba nada, asi que un "+250 de potencia" se
+                    // apuntaba en el motor -y el daño subia de verdad- pero el panel del cliente
+                    // seguia enseñando el numero de antes, y parecia que el embrujo no hacia nada.
+                    fichas.Add((c.Sobre.Id, c.Caracteristica));
                 }
 
                 // Y si era un ROBO, lo que se le ha quitado a uno se le da al otro.
@@ -2223,9 +2513,15 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (c.Cura > 0)
                 {
                     await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
-                        Network.FightProtocol.BuildHeal(quienLanza.Id, c.Cura)));
+                        Network.FightProtocol.BuildHeal(quienLanza.Id, c.Cura, c.Sobre.Id)));
                     Program.LogDebug($"[Combate] {quienLanza.Id} cura {c.Cura} a {c.Sobre.Id}; " +
                                      $"queda en {c.Sobre.CurrentHP}/{c.Sobre.MaxHP}.");
+
+                    // El Sin Corazon: curarse uno mismo vale, que le curen a uno no.
+                    await ChallengeWatcher.HealedAsync(stream, fight, quienLanza, c.Sobre);
+
+                    // La cura tambien mueve la vida que le falta al jugador.
+                    await RefrescarLaVidaAsync(stream, fight, c.Sobre);
                     continue;
                 }
 
@@ -2297,12 +2593,13 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 var ficha = fight.Team0.Find(f => f.Id == quien) ?? fight.Team1.Find(f => f.Id == quien);
                 if (ficha == null) continue;
-                long valor = caracteristica == ActionPointsCharacteristic ? ficha.CurrentAP : ficha.CurrentMP;
+                long valor = ValorDeFicha(ficha, caracteristica, fight.RoundNumber);
 
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                     Network.FightProtocol.BuildSequenceStart(quien, Network.FightProtocol.SheetSequence)));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
-                    Network.FightProtocol.BuildFighterSheet(quien, new[] { (caracteristica, valor) })));
+                    Network.FightProtocol.BuildFighterSheet(quien, new[] { (caracteristica, valor) },
+                                                            quien == GameState.CharacterId)));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien,
                                                            Network.FightProtocol.SheetSequence)));
@@ -2582,6 +2879,9 @@ namespace Jondo.Unity.Launcher.Handlers
             int aplicado = Math.Min(damage, target.CurrentHP);
             target.TakeDamage(aplicado);
 
+            // Aqui se rompen el Intocable -si el que pierde vida es aliado- y el Elemental.
+            await ChallengeWatcher.DamagedAsync(stream, fight, target, aplicado, caster, elemento);
+
             // Y la EROSIÓN: además de la vida de ahora, cada golpe se lleva un pellizco del tope.
             //
             // Cuánto lo dice la característica 75 del que recibe, que se llama "Erosión" en el
@@ -2608,7 +2908,11 @@ namespace Jondo.Unity.Launcher.Handlers
             // anunciaba como robo de agua fuera del elemento que fuera.
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId,
-                                                  target.Id, aplicado, elemento)));
+                                                  target.Id, aplicado, elemento, erosionado)));
+
+            // Y al jugador, la vida que le queda. Sin esto le pegaban toda la pelea y su barra
+            // seguia llena: el cliente no descuenta la suya de los golpes, la lee de la ficha.
+            await RefrescarLaVidaAsync(stream, fight, target);
 
             if (target.LeHanPegado)
             {
@@ -2626,6 +2930,13 @@ namespace Jondo.Unity.Launcher.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDeath(caster.Id, target.Id)));
                 Program.LogDebug($"[Combate] {target.Id} se queda sin vida.");
+
+                // Orden de niveles, remate con arma y caida junto a un obstaculo: los tres se
+                // juzgan aqui. El arma es el hechizo cero, que es como viaja el cuerpo a cuerpo.
+                await ChallengeWatcher.DiedAsync(stream, fight, target,
+                                                 spell == Network.FightProtocol.HechizoCuerpoACuerpo,
+                                                 caster);
+                await ChallengeWatcher.AllyDiedAsync(stream, fight, target);
 
                 await CaenSusInvocadosAsync(stream, fight, target);
                 await ReenviarLaListaAsync(stream, fight);
@@ -2848,7 +3159,6 @@ namespace Jondo.Unity.Launcher.Handlers
         /// El final que está esperando a que el cliente acuse la última secuencia, y el número de
         /// acción que espera. Mientras esté puesto, la pantalla de fin de combate está en el aire.
         /// </summary>
-        private static (FightInstance Fight, int Accion)? _finPendiente;
 
         /// <summary>
         /// El cliente ha acusado una secuencia (jti). Si el combate estaba esperando justo a ésta,
@@ -2861,14 +3171,17 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         private static async Task AcuseAsync(NetworkStream stream, byte[] payload)
         {
-            var pendiente = _finPendiente;
-            if (pendiente == null) return;
+            // EL COMBATE DE QUIEN MANDA EL ACUSE, no el ultimo que se quedo esperando en todo el
+            // servidor: con dos peleas a la vez, el acuse de una cerraba la otra y le pagaba a
+            // quien no era.
+            var fight = GetCurrentFight();
+            if (fight == null || fight.FinPendiente == 0) return;
 
             int acusada = Network.FightProtocol.ReadSequenceAck(payload);
-            if (acusada != 0 && acusada < pendiente.Value.Accion) return;
+            if (acusada != 0 && acusada < fight.FinPendiente) return;
 
-            _finPendiente = null;
-            await EndFightAsync(stream, pendiente.Value.Fight);
+            fight.FinPendiente = 0;
+            await EndFightAsync(stream, fight);
         }
 
         private static async Task<bool> CheckFightOverAsync(NetworkStream stream, FightInstance fight,
@@ -2882,7 +3195,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // cliente diga que ha tragado la secuencia; si no, se come las animaciones.
             if (esperarAcuse != 0)
             {
-                _finPendiente = (fight, esperarAcuse);
+                fight.FinPendiente = esperarAcuse;
                 Program.LogDebug($"[Combate] Se acabó, pero se espera a que el cliente acuse la " +
                                  $"acción {esperarAcuse} antes de enseñar el final.");
                 return true;
@@ -2901,9 +3214,25 @@ namespace Jondo.Unity.Launcher.Handlers
             // que es la misma que enseña el cliente al pasar el ratón por el grupo; no hay fórmula
             // inventada. Los kamas y los objetos, lo que suelte cada uno.
             bool won = alliesAlive;
-            long xpGained = won ? fight.Team1.Sum(m => (long)m.XpReward) : 0;
-            long kamas = won ? fight.Team1.Sum(m => 10L + (m.Level * 5L)) : 0;
-            var loot = won ? RollFightLoot(fight) : new Dictionary<int, int>();
+
+            // Los retos, antes de todo lo del final: el servidor real manda sus kwl unas pocas
+            // tramas por delante del jyg, y en una derrota los manda todos seguidos ahi mismo.
+            // Lo que devuelve es el extra de los cumplidos, sumado, en tanto por ciento.
+            int extraDeRetos = await ChallengeWatcher.FightEndedAsync(stream, fight, won);
+
+            // Y aqui se aplica. En el cable NO viaja desglosado: el porcentaje solo existe dentro
+            // del ldd de la preparacion, y la cifra del final llega ya con el extra sumado. Se
+            // revisaron los 68 jyg de las capturas y no hay ningun hueco donde quepa un desglose,
+            // asi que es el servidor quien tiene que aplicarlo antes de mandar el numero.
+            long xpGained = won ? ConElExtra(fight.Team1.Sum(m => (long)m.XpReward), extraDeRetos) : 0;
+            long kamas = won ? ConElExtra(fight.Team1.Sum(m => 10L + (m.Level * 5L)), extraDeRetos) : 0;
+            var loot = won ? RollFightLoot(fight, extraDeRetos) : new Dictionary<int, int>();
+
+            if (extraDeRetos > 0)
+            {
+                Program.LogDebug($"[Retos] Los retos cumplidos suman un {extraDeRetos} % de mas: " +
+                                 $"{xpGained} de experiencia y {kamas} kamas.");
+            }
 
             if (xpGained > 0)
             {
@@ -3050,7 +3379,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public readonly record struct LimitesDelHechizo(
             int Cost, int LevelId, int Grade,
             int PorTurno, int PorObjetivo, int Intervalo, int EsperaInicial,
-            int CriticoPropio);
+            int CriticoPropio, int AlcanceMinimo = 0, int AlcanceMaximo = 0);
 
         /// <summary>
         /// Los límites de lanzamiento, que salen de las mismas columnas de SpellLevels de las que
@@ -3080,7 +3409,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 var command = connection.CreateCommand();
                 command.CommandText =
                     "SELECT APCost, Id, Grade, MaxCastPerTurn, MaxCastPerTarget, " +
-                    "MinCastInterval, InitialCooldown, CriticalHitProbability FROM SpellLevels " +
+                    "MinCastInterval, InitialCooldown, CriticalHitProbability, " +
+                    "MinRange, MaxRange FROM SpellLevels " +
                     "WHERE SpellId = $id AND MinPlayerLevel <= $lvl ORDER BY Grade DESC LIMIT 1;";
                 command.Parameters.AddWithValue("$id", spellId);
                 command.Parameters.AddWithValue("$lvl", nivel);
@@ -3094,7 +3424,9 @@ namespace Jondo.Unity.Launcher.Handlers
                         reader.IsDBNull(4) ? 0 : (int)reader.GetInt64(4),
                         reader.IsDBNull(5) ? 0 : (int)reader.GetInt64(5),
                         reader.IsDBNull(6) ? 0 : (int)reader.GetInt64(6),
-                        reader.IsDBNull(7) ? 0 : (int)reader.GetInt64(7));
+                        reader.IsDBNull(7) ? 0 : (int)reader.GetInt64(7),
+                        reader.IsDBNull(8) ? 0 : (int)reader.GetInt64(8),
+                        reader.IsDBNull(9) ? 0 : (int)reader.GetInt64(9));
                 }
             }
             catch (Exception ex)
@@ -3110,8 +3442,18 @@ namespace Jondo.Unity.Launcher.Handlers
             return salida;
         }
 
-        private static readonly Dictionary<(int Hechizo, int Nivel), LimitesDelHechizo> _grades
-            = new Dictionary<(int, int), LimitesDelHechizo>();
+        /// <summary>
+        /// Los límites de cada hechizo por grado, ya leídos.
+        ///
+        /// Era un Dictionary normal, y lo escriben varias sesiones a la vez: dos combates
+        /// lanzando hechizos distintos en el mismo instante pueden pillar el diccionario a medio
+        /// redimensionar, y eso no da una excepción —da un bucle infinito dentro del propio
+        /// Dictionary, con el hilo comiéndose un núcleo entero para siempre—. Es el fallo de
+        /// concurrencia más desagradable que hay en .NET porque no deja rastro: no hay excepción,
+        /// no hay registro, sólo un servidor que va cada vez peor.
+        /// </summary>
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int Hechizo, int Nivel), LimitesDelHechizo> _grades
+            = new System.Collections.Concurrent.ConcurrentDictionary<(int, int), LimitesDelHechizo>();
 
         /// <summary>
         /// El jugador pasa turno (jxy, vacío), o se le acaba el tiempo.
@@ -3122,11 +3464,11 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task PassTurnAsync(NetworkStream stream)
         {
-            // Lo primero, parar el reloj: si el turno se pasa a mano no debe saltar después.
-            PararElReloj();
-
             var fight = GetCurrentFight();
             if (fight == null || fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) return;
+
+            // Parar el reloj DE ESTE combate: si el turno se pasa a mano no debe saltar después.
+            PararElReloj(fight);
 
             var ending = fight.CurrentFighter;
             if (ending == null) return;
@@ -3147,6 +3489,10 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 if (ending.Recarga[hechizo] > 0) ending.Recarga[hechizo]--;
             }
+            // Los retos de posicion se juzgan AQUI, con el que acaba todavia donde acabo y con sus
+            // PM sin reponer. Va antes de limpiar los contadores del turno, que el Versatil los usa.
+            await ChallengeWatcher.TurnEndedAsync(stream, fight, ending);
+
             ending.LanzadosEsteTurno.Clear();
             ending.LanzadosPorObjetivo.Clear();
 
@@ -3172,6 +3518,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz,
                     Network.FightProtocol.BuildRound(fight.RoundNumber)));
                 Program.LogDebug($"[Combate] Empieza la ronda {fight.RoundNumber}.");
+
+                // El Imprevisible senala otro enemigo en cada turno global.
+                await ChallengeWatcher.RoundStartedAsync(stream, fight);
             }
 
             await AskToConfirmAsync(stream, fight);
@@ -3792,7 +4141,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 // On a critical the damage is NOT multiplied; the critical range carried by the
                 // spell itself is used instead (Frozen Arrow goes from 12-14 to 15-17).
                 int criticalChance = spell.CriticalHitProbability + caster.CriticalBonus;
-                bool isCritical = spell.HasCriticalDamage && criticalChance > 0 && _lootRandom.Next(100) < criticalChance;
+                bool isCritical = spell.HasCriticalDamage && criticalChance > 0 && TirarCritico(criticalChance);
 
                 int minBase = isCritical ? spell.CriticalDamageMin : spell.BaseDamageMin;
                 int maxBase = isCritical ? spell.CriticalDamageMax : spell.BaseDamageMax;
@@ -3908,8 +4257,20 @@ namespace Jondo.Unity.Launcher.Handlers
             var current = fight.CurrentFighter;
             if (current == null || current.Id != GameState.CharacterId) return;
 
-            var inner = ExtractMessagePayload(payload, "type.ankama.com/jyz");
-            if (inner == null) inner = ExtractMessagePayload(payload, "type.ankama.com/joi");
+            // AVISO: esto NO es por donde se anda en combate, aunque lo parezca por el nombre.
+            //
+            // Andar en combate es el jrw, y lo resuelve WalkAsync. Medido sobre la captura
+            // «combate contra 4 poutchs nivel 25»: el cliente manda jrw catorce veces y jzy UNA,
+            // la de colocarse antes de empezar. Esta función sólo se alcanza con un jzy cuando el
+            // combate ya está en marcha, y eso el cliente no lo manda.
+            //
+            // Buscaba «jyz» —la z y la y cambiadas de sitio, el mismo desliz que ya apareció en
+            // HandlePlacementCellChangeRequest— y como ExtractMessagePayload compara la url entera
+            // y exacta, devolvía null siempre. Se corrigen las letras y se deja: cuesta cero y
+            // arreglado no engaña al siguiente que lo lea. Lo que NO se puede hacer es tomarlo por
+            // el manejador del movimiento, que es justo lo que despistó a la auditoría.
+            var inner = ExtractMessagePayload(payload, Op.Uri(Op.Jzy));
+            if (inner == null) inner = ExtractMessagePayload(payload, Op.Uri(Op.Joi));
 
             var vertices = new List<int>();
             if (inner != null)
@@ -4514,7 +4875,11 @@ namespace Jondo.Unity.Launcher.Handlers
             await WriteFrameAsync(stream, env);
         }
 
-        private static readonly Random _lootRandom = new Random();
+        // Aqui habia un segundo Random —_lootRandom— sin candado, mientras el otro (_dado) si lo
+        // llevaba. Random NO es seguro entre hilos: dos combates tirando a la vez no es que saquen
+        // el mismo numero, es que dejan el estado interno hecho un lio y a partir de ahi devuelve
+        // CEROS para siempre. Con el botin eso es un servidor donde no cae nada y nadie entiende
+        // por que. Se quito y ahora las dos tiradas salen del mismo sitio, con su candado.
 
         /// <summary>
         /// Rolls the loot of every defeated monster and puts it into the inventory.
@@ -4527,7 +4892,11 @@ namespace Jondo.Unity.Launcher.Handlers
         /// the character's prospecting divided by 100, but prospecting from the gear is not being
         /// computed, so the base percentage is used (equivalent to 100 prospecting).
         /// </summary>
-        private static Dictionary<int, int> RollFightLoot(FightInstance fight)
+        /// <summary>Sube una cantidad en el tanto por ciento que hayan dado los retos.</summary>
+        private static long ConElExtra(long cuanto, int extra)
+            => extra <= 0 ? cuanto : cuanto + cuanto * extra / 100;
+
+        private static Dictionary<int, int> RollFightLoot(FightInstance fight, int extra = 0)
         {
             var loot = new Dictionary<int, int>();
 
@@ -4536,17 +4905,22 @@ namespace Jondo.Unity.Launcher.Handlers
                 var table = DatabaseManager.GetMonsterDrops(monster.MonsterId, monster.GradeIndex);
                 foreach (var drop in table)
                 {
-                    if (_lootRandom.NextDouble() * 100.0 >= drop.PercentDrop) continue;
+                    // En el botin el extra sube la PROBABILIDAD de que caiga, no la cantidad: es
+                    // una tirada por objeto y por monstruo, y lo que el reto mejora es la suerte.
+                    double probabilidad = extra > 0
+                        ? Math.Min(100.0, drop.PercentDrop * (100.0 + extra) / 100.0)
+                        : drop.PercentDrop;
+                    if (TirarPorcentaje() >= probabilidad) continue;
                     loot.TryGetValue(drop.ObjectId, out int q);
                     loot[drop.ObjectId] = q + 1;
                 }
             }
 
+            // De una vez: cada AddItemToInventory cargaba el inventario entero para ver si el
+            // objeto ya estaba, así que cinco objetos distintos eran cinco lecturas completas.
+            DatabaseManager.AddItemsToInventory(GameState.CharacterId, loot);
             foreach (var kv in loot)
-            {
-                DatabaseManager.AddItemToInventory(GameState.CharacterId, kv.Key, kv.Value);
                 Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
-            }
 
             if (loot.Count > 0)
             {

@@ -97,7 +97,96 @@ namespace Jondo.Unity.Launcher.Network
                      (271, 5, fighter),
                  }));
 
+            // El golpe, con su erosión, y la retirada de puntos. Los dos de la captura del duelo.
+            Same(failures, "jwe (daño con erosión)",
+                 "18a282f0a6c4087060c2020e10a28280c8e70818ce032003282e",
+                 FightProtocol.BuildDamage(293213045026, 96, 302677754146, 462, 3, 46));
+
+            // El gasto propio de lanzar, que es el 102 y va con el mismo id de autor y de víctima.
+            Same(failures, "jwe (gasta cuatro PA al lanzar)",
+                 "18a282f0a6c4087066a2011208fcffffffffffffffff0110a282f0a6c408",
+                 FightProtocol.BuildPointsLost(293213045026, 102, 293213045026, -4));
+
+            // La ficha con la vida que le falta al jugador, de la captura del poutch de nivel 75:
+            // le faltan 104 y lleva 208 erosionados.
+            Same(failures, "jxw (vida que le falta al jugador)",
+                 "08a28280c8e7081a1e18022a1a086122161098ffffffffffffffff0140b0feffffffffffffff01",
+                 FightProtocol.BuildLifeSheet(302677754146, -104, 208));
+
+            CheckChallenges(failures);
             CheckFightResults(failures, fighter);
+        }
+
+        /// <summary>
+        /// Los retos de la preparación, contra los bytes de las capturas donde salen.
+        ///
+        /// El reto 17 «Intocable» al 95 % es el de «entrar a combate con listo automático...
+        /// victoria»; el 37 «Pegajoso» al 75 % le acompaña en la misma lista. El 772 «Duelo» sin
+        /// porcentaje sale en la anomalía, y es la prueba de que cuando el extra es cero los dos
+        /// campos desaparecen. El 35 «Asesino a sueldo» con objetivo viene del kwm de la captura
+        /// de reconexión, y lleva dentro la casilla 262 y el luchador menos tres.
+        /// </summary>
+        private static void CheckChallenges(List<string> failures)
+        {
+            Same(failures, "kxa (cuántos retos)", "0801",
+                 FightProtocol.BuildChallengeCount(1));
+
+            Same(failures, "kxa (dos, como en la mazmorra)", "0802",
+                 FightProtocol.BuildChallengeCount(2));
+
+            byte[] intocable = FightProtocol.BuildChallenge(17, 95);
+            Same(failures, "ldd (reto 17 al 95 %)", "085f1011205f2802", intocable);
+
+            Same(failures, "ldd (reto impuesto, sin porcentaje)", "1084062802",
+                 FightProtocol.BuildChallenge(772, 0));
+
+            Same(failures, "ldd (reto 35 con su objetivo)",
+                 "084610231a0e10860218fdffffffffffffffff0120462802",
+                 FightProtocol.BuildChallenge(35, 70, new[] { (262, -3L) }));
+
+            Same(failures, "ldd (objetivo aún sin asignar)",
+                 "086410021a0b10ffffffffffffffffff0120642802",
+                 FightProtocol.BuildChallenge(2, 100, new[] { (-1, 0L) }));
+
+            Same(failures, Op.Kwx,
+                 "080f1208085f1011205f28021208084b1025204b2802",
+                 FightProtocol.BuildChallengeList(new[]
+                 {
+                     intocable,
+                     FightProtocol.BuildChallenge(37, 75),
+                 }));
+
+            Same(failures, Op.Kww, "0a08085f1011205f2802",
+                 FightProtocol.BuildChallengeChosen(intocable));
+
+            Same(failures, Op.Kwu, "1208085f1011205f2802",
+                 FightProtocol.BuildChallengeFinalList(new[] { intocable }));
+
+            // El resultado. Sin el f2 está fallado, que es como proto3 escribe el booleano falso;
+            // los cuatro salen de las capturas de la mazmorra y de la victoria del grupo.
+            Same(failures, "kwl (reto 17 cumplido)", "08111001",
+                 FightProtocol.BuildChallengeResult(17, true));
+
+            Same(failures, "kwl (reto 971 cumplido)", "08cb071001",
+                 FightProtocol.BuildChallengeResult(971, true));
+
+            Same(failures, "kwl (reto 1 fallado)", "0801",
+                 FightProtocol.BuildChallengeResult(1, false));
+
+            Same(failures, "kwl (reto 35 fallado)", "0823",
+                 FightProtocol.BuildChallengeResult(35, false));
+
+            // El aviso que acompaña al fallo, de la mazmorra: llega en la misma milésima que el
+            // kwl y dice por culpa de quién.
+            Same(failures, "lqn (reto fallado por culpa de alguien)",
+                 "10bc01220c53616372692d4d6173746572" + "22023335",
+                 ConnectionProtocol.BuildSystemMessage(188, "Sacri-Master", "35"));
+
+            // El objetivo señalado (kwm), con su casilla y su luchador dentro.
+            Same(failures, Op.Kwm,
+                 "1218084610231a0e10860218fdffffffffffffffff0120462802",
+                 FightProtocol.BuildChallengeObjective(
+                     FightProtocol.BuildChallenge(35, 70, new[] { (262, -3L) })));
         }
 
         /// <summary>
@@ -162,11 +251,19 @@ namespace Jondo.Unity.Launcher.Network
 
             if (failures.Count > 0)
             {
+                // Esto hacía «return», o sea que el servidor arrancaba igual con el protocolo
+                // roto. Era la única de las ocho guardias que no paraba, y precisamente la que
+                // vigila la fase donde un fallo NO da error: el cliente se queda con la pantalla
+                // en blanco, sin mensaje, sin registro y sin nada que mirar. Arrancar así no
+                // ayuda a nadie; se ven los fallos y se para.
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("[Protocol] The connection message check failed:");
                 foreach (string f in failures) Console.WriteLine("    - " + f);
                 Console.ResetColor();
-                return;
+
+                throw new InvalidOperationException(
+                    $"[Protocol] {failures.Count} mensaje(s) de conexión no cuadran con la captura. " +
+                    "Están escritos arriba, cada uno con los bytes de la captura y los nuestros.");
             }
 
             Console.WriteLine("[Protocol] The connection messages match the captured shape.");
@@ -535,6 +632,13 @@ namespace Jondo.Unity.Launcher.Network
             string jsq = Hex(ConnectionProtocol.Answer(Op.Jsq, null, -1));
             if (jsq != CapturedJsq)
                 failures.Add($"jsq: the answer to jqi does not match the capture ({jsq})");
+
+            // Un teleport suelta su uso antes de irse del mapa. Sin ese iwi el cliente puede
+            // dejar el elemento ocupado y no volver a dibujar su gráfico al regresar.
+            var ended = ProtoMessage.Parse(
+                ConnectionProtocol.BuildInteractiveUseEnded(515742, 114));
+            if (Varint(ended, 1) != 515742 || Varint(ended, 3) != 114)
+                failures.Add("iwi: interactive-use end must carry ElementId in f1 and USE114 in f3");
 
             // And the two containers of kub that are not f4. The client throws a
             // NullReferenceException and drops the whole sheet when one of these goes out in the

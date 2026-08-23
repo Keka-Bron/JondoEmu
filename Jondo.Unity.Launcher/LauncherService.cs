@@ -94,13 +94,22 @@ namespace Jondo.Unity.Launcher
         /// <summary>
         /// Lo que se le dice al usuario cuando el servidor no ha contestado.
         ///
-        /// Se distingue el silencio —no hay nadie escuchando— del rechazo por el secreto, porque
-        /// son dos averías distintas y la segunda se arregla rearrancando el lanzador.
+        /// Se distinguen TRES averías, porque cada una se arregla de una manera y decir la que no
+        /// es manda al usuario a dar vueltas:
+        ///
+        ///   401  la sesión ya no vale: hay que volver a entrar
+        ///   403  el secreto no cuadra: se arregla rearrancando el lanzador
+        ///   nada no hay nadie escuchando: hay que esperar a que el servidor arranque
+        ///
+        /// El 401 salía como «el servidor no responde», que era falso y encima despistaba: el
+        /// servidor contestaba de maravilla, y lo que contestaba era que la sesión estaba muerta.
         /// </summary>
         private static string MensajeDeSilencio(Network.ControlClient.Respuesta respuesta)
-            => respuesta.Llego && respuesta.Codigo == 403
-                ? UI.LauncherPreferences.Textos.ControlRechazado
-                : UI.LauncherPreferences.Textos.ServidorSinResponder;
+            => respuesta.Llego && respuesta.Codigo == 401
+                ? UI.LauncherPreferences.Textos.SessionExpiredError
+                : respuesta.Llego && respuesta.Codigo == 403
+                    ? UI.LauncherPreferences.Textos.ControlRechazado
+                    : UI.LauncherPreferences.Textos.ServidorSinResponder;
 
         /// <summary>Crea una cuenta nueva con su apodo. La escribe el servidor, no el lanzador.</summary>
         public static Result RegisterAccount(string username, string password, string nickname, string clientIp)
@@ -137,7 +146,14 @@ namespace Jondo.Unity.Launcher
             Network.ControlClient.Token = token ?? "";
             var cuerpo = ControlClient.Pedir("recordar-token",
                 new { cuenta = accountId, token }).Cuerpo();
-            return cuerpo != null && cuerpo.Value.GetProperty("bien").GetBoolean();
+
+            // Si el servidor NO ha contestado, no se sabe nada: esto corre en el constructor de la
+            // ventana y el servidor puede estar todavía cargando mapas. Se le da el beneficio de
+            // la duda y ya se verá al pulsar jugar. Sólo se da la sesión por muerta cuando el
+            // servidor contesta que no vale, que es cuando de verdad hay que volver a entrar.
+            if (cuerpo == null) return true;
+
+            return cuerpo.Value.GetProperty("bien").GetBoolean();
         }
 
         /// <summary>Si quien ha entrado es administrador. COSMÉTICO: quien decide es el servidor.</summary>

@@ -240,7 +240,22 @@ namespace Jondo.Unity.Launcher.Handlers
                 return false;
             }
 
-            if (accountId > 0 && !DatabaseManager.CharacterBelongsToAccount(characterIdToLoad, accountId))
+            // Sin cuenta no se selecciona nada. Esto estaba escrito como «accountId > 0 && ...»,
+            // o sea que la comprobación se apagaba sola justo en el caso que tenía que cazar: un
+            // socket que manda el kvw ANTES del kqz llega aquí con cuenta cero, se salta la
+            // comprobación entera y carga la ficha de quien quiera. Y como después se escribe
+            // encima al guardar, no era sólo mirar.
+            //
+            // La cuenta se resuelve al canjear el ticket en kqz, y si el ticket no vale la sesión
+            // se cierra ahí mismo, así que en el camino bueno esto nunca es cero.
+            if (accountId <= 0)
+            {
+                Console.WriteLine($"[Game Node] Character selection without a resolved account " +
+                                  $"(character {characterIdToLoad}). The ticket has not been presented.");
+                return false;
+            }
+
+            if (!DatabaseManager.CharacterBelongsToAccount(characterIdToLoad, accountId))
             {
                 Console.WriteLine($"[Game Node] Character {characterIdToLoad} does not belong to " +
                                   $"account {accountId}.");

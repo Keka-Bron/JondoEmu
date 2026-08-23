@@ -191,23 +191,7 @@ namespace Jondo.Unity.Launcher.Managers
             return 0;
         }
 
-        private static long NextUid()
-        {
-            try
-            {
-                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
-                    DatabaseManager.WorldConnectionString);
-                connection.Open();
-
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT MAX(Uid) FROM CharacterItems WHERE Uid >= $desde;";
-                command.Parameters.AddWithValue("$desde", FirstUid);
-
-                object? result = command.ExecuteScalar();
-                if (result is long max && max >= FirstUid) return max + 1;
-            }
-            catch { }
-            return FirstUid;
-        }
+        /// <summary>El uid del premio. Lo reparte DatabaseManager, uno para todo el servidor.</summary>
+        private static long NextUid() => DatabaseManager.NextItemUid();
     }
 }

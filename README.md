@@ -265,6 +265,16 @@ A spell counts only when **all** of its effects resolve. The gaps are concentrat
 effect families — glyphs and traps, appearance changes, spell-effect removal — so they close in
 blocks rather than one spell at a time.
 
+### 🎯 Combat challenges
+- [x] **The preparation dance**, measured across 305 captures with both directions on one timeline — you cannot tell who answers whom otherwise. The server offers two candidates with their 15-second timer, the player marks and validates, and whatever is left unvalidated the server fixes itself when you declare ready.
+- [x] **Two traps worth knowing.** The first `kwv` after an offer is *not* a click: the client preselects the first candidate 2–30 ms later, 12 times out of 12. And the two candidates are alternatives, not a compatible pair — the captures offer together two challenges the client's own table marks as incompatible.
+- [x] **Watched live, 15 of the 16.** Every rule comes from the challenge's own translated description, not from the `completionCriterion` mini-language, which has no glossary. End of turn covers position and movement; damage covers *Untouchable*; casting covers *Versatile* and the two focus-fire ones; a death covers kill order, weapon kills and dying next to an obstacle.
+- [x] **The result travels the moment it happens.** A failure is announced the instant the challenge breaks, a success at the end, and a defeat fails them all at once — which is the timing the captures show. Without it the client leaves the challenge spinning forever: it treats one as alive until its `kwl` arrives.
+- [x] **The bonus is applied on a win** to experience, kamas and drop rates. It is not itemised anywhere on the wire: the percentage only exists inside the preparation message, and all 68 end-of-fight packets in the captures have no slot for a breakdown, so the server has to fold it in before sending the number.
+- [x] **Dungeon and anomaly challenges are imposed, not offered**, at 0 %, and they are the ones carrying achievements: once completed they are written to the character and never offered again.
+- [ ] The percentage itself is only known for 16 challenges, from the wire — the client ships no bonus field. The same challenge appears at 90 and at 150, always +60, so there is a per-fight modifier nobody has reconstructed. Only challenges with a measured percentage *and* a working rule are offered.
+- [ ] *Hired Killer* (35), which needs the server to designate the next target and re-designate on each kill.
+
 ### 🚧 Work in progress
 - [ ] **Combat stat panel** — buffs feed the damage formula correctly, but the character sheet and
       the damage preview still show the pre-buff numbers: the per-characteristic sheet packet is
@@ -283,7 +293,6 @@ blocks rather than one spell at a time.
 - [ ] Crafting professions (gathering ones do work — see above)
 - [ ] Achievements
 - [ ] Guilds
-- [ ] Combat challenges — the fifteen opcodes are measured and the family is confirmed in the client's own dispatcher; nothing is wired yet.
 
 ---
 

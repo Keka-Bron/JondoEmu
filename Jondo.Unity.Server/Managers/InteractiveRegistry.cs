@@ -22,6 +22,9 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>La puerta de dentro, la que devuelve a la calle.</summary>
         HouseExit,
 
+        /// <summary>Un paso instantáneo entre dos mapas, fuera del sistema de casas.</summary>
+        Teleport,
+
         /// <summary>Un recurso de oficio: trigo, fresno, caladero, mineral.</summary>
         Gather,
     }
@@ -153,6 +156,18 @@ namespace Jondo.Unity.Launcher.Managers
                 if (!Houses.TryGetExit(interior, out var exit)) continue;
                 Register(interior, new Interactives.Element(exit.ElementId, exit.Cell, exit.Gfx),
                          Houses.ExitType, InteractiveActionKind.HouseExit, Houses.ExitSkill);
+            }
+
+            // Los pasos entre mapas. Las casas ya han pasado por arriba con su protocolo jqw;
+            // aquí sólo entran los genéricos que TeleportManager ha validado y dejado activos.
+            //
+            // Regla de Giny: todo elemento con teleport es clicable, sea el gráfico un sol, una
+            // escalera o una puerta. Todos se declaran igual y se resuelven por su ElementId.
+            foreach (var route in TeleportManager.All)
+            {
+                Register(route.SourceMapId,
+                         new Interactives.Element(route.ElementId, route.SourceCellId, route.GfxId),
+                         route.InteractiveType, InteractiveActionKind.Teleport, route.SkillId);
             }
 
             // Y los recursos de oficio, que son con diferencia lo mas numeroso: veinticinco mil.

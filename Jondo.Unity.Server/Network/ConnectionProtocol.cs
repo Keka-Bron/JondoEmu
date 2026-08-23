@@ -1396,6 +1396,17 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(5, who)
                 .Build();
 
+        /// <summary>
+        /// Se acabó de usar un interactivo (iwi). Misma forma que el fin de recolección: el f1 es
+        /// el elemento y el f3 la habilidad.
+        ///
+        /// Un teleport es instantáneo, pero hay que soltarlo igual ANTES del jru: si no, el
+        /// cliente se puede quedar con el elemento marcado como ocupado en su caché y al volver
+        /// al mapa su gráfico ya no aparece.
+        /// </summary>
+        public static byte[] BuildInteractiveUseEnded(int elementId, int skillId)
+            => Pb.New().Var(1, elementId).Var(3, skillId).Build();
+
         /// <summary>Un destino de la lista de zaaps.</summary>
         public readonly struct ZaapDestination
         {

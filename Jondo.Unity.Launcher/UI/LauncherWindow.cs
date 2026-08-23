@@ -115,6 +115,12 @@ namespace Jondo.Unity.Launcher.UI
         {
             _language = LauncherPreferences.Language;
             _texts = LauncherTexts.Get(_language);
+            // Las cuentas guardadas de la vez anterior, y si el servidor sigue dando por buena su
+            // sesión. Lo segundo no se miraba: se daba por entrado a cualquiera que tuviera cuenta
+            // guardada, aunque el servidor hubiera rechazado su token. El resultado era una
+            // ventana que decía estar dentro y un botón de jugar que fallaba, y encima con el
+            // mensaje equivocado. Si nadie tiene sesión viva, se pide entrar, que es lo honrado.
+            bool algunaViva = false;
             foreach (var saved in LauncherPreferences.LoadAccounts())
             {
                 _teamAccounts.Add(new TeamAccount
@@ -125,9 +131,9 @@ namespace Jondo.Unity.Launcher.UI
                     Token = saved.Token,
                     Selected = saved.Selected
                 });
-                LauncherService.RememberSession(saved.AccountId, saved.Token);
+                if (LauncherService.RememberSession(saved.AccountId, saved.Token)) algunaViva = true;
             }
-            _authenticated = _teamAccounts.Count > 0;
+            _authenticated = _teamAccounts.Count > 0 && algunaViva;
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
 

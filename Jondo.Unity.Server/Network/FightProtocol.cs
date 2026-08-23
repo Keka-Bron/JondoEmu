@@ -292,6 +292,28 @@ namespace Jondo.Unity.Launcher.Network
         private const int ActionPoints = 1;
         private const int MovementPoints = 23;
 
+        /// <summary>
+        /// «Malus de vida temporal»: LA VIDA QUE LE FALTA AL PERSONAJE QUE MANEJA EL CLIENTE.
+        ///
+        /// Y es la única forma que tiene el cliente de saberla. A los monstruos y al jugador de
+        /// enfrente les va descontando la vida de los golpes que ve pasar; la SUYA no, la suya la
+        /// saca del tope más esta característica. Está medido sin una sola excepción: de las 23
+        /// veces que aparece en las 305 capturas, las 23 van dirigidas al personaje propio. Ni una
+        /// a un monstruo, ni una al rival del duelo, que recibe golpes toda la pelea.
+        ///
+        /// Lleva dos números:
+        ///
+        ///   f2 = vida actual menos vida máxima     (sube con las curas, baja con los golpes)
+        ///   f8 = menos la vida erosionada          (sólo baja, y las curas no la tocan)
+        ///
+        /// Comprobado contra una captura entera: −104 tras recibir 104, −5 tras curarse 99,
+        /// +128 tras curarse otros 133. La cuenta cuadra al punto las tres veces.
+        ///
+        /// El emulador la mandaba una vez, vacía, al empezar el combate, y no la volvía a tocar:
+        /// por eso al jugador le pegaban toda la pelea y su barra seguía llena.
+        /// </summary>
+        public const int TemporaryLifeMalus = 97;
+
         public static Pb SheetEntry(int characteristic, long baseValue, long fromGear, bool isMonster)
         {
             var entry = Pb.New().VarIfNotZero(1, characteristic);
@@ -307,6 +329,15 @@ namespace Jondo.Unity.Launcher.Network
             if (characteristic == ActionPoints || characteristic == MovementPoints)
             {
                 return entry.Msg(5, Pb.New().VarIfNotZero(1, baseValue).VarIfNotZero(5, fromGear));
+            }
+
+            // La 97 tiene molde propio: f4 { f2, f8 }, y no f4 { f2, f7 } como las demás. Medido
+            // en las 23 apariciones que hay en las 305 capturas, y tres de ellas llevan SÓLO el
+            // f8. Ver TemporaryLifeMalus.
+            if (characteristic == TemporaryLifeMalus)
+            {
+                if (baseValue == 0 && fromGear == 0) return entry.EmptyMsg(4);
+                return entry.Msg(4, Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(8, fromGear));
             }
 
             if (baseValue == 0 && fromGear == 0)
@@ -534,6 +565,32 @@ namespace Jondo.Unity.Launcher.Network
                 else if (field.FieldNumber == 4) spell = (int)field.VarIntValue;
             }
             return (cell, spell);
+        }
+
+        /// <summary>
+        /// Lanzar apuntando DESDE EL CARRUSEL (jwn): { f1: a quién, f2: el hechizo }.
+        ///
+        /// El id viene CON SIGNO —los monstruos lo tienen negativo— y en complemento a dos de
+        /// sesenta y cuatro bits, así que hay que leerlo como <c>long</c> y no como <c>int</c>:
+        /// dos de las cuatro muestras reales valen menos uno.
+        ///
+        ///   08ffffffffffffffffff01 10ca63   =  al combatiente −1, hechizo 12746
+        ///   08a28280c8e708 10b21b           =  a uno mismo, hechizo 3506
+        /// </summary>
+        public static (long Fighter, int Spell) ReadCastAtFighter(byte[] payload)
+        {
+            byte[]? jwn = ConnectionProtocol.ReadPayload(payload, Op.Jwn);
+            if (jwn == null) return (0, 0);
+
+            long quien = 0;
+            int spell = 0;
+            foreach (var field in ProtoMessage.Parse(jwn).Fields)
+            {
+                if (field.WireType != 0) continue;
+                if (field.FieldNumber == 1) quien = unchecked((long)field.VarIntValue);
+                else if (field.FieldNumber == 2) spell = (int)field.VarIntValue;
+            }
+            return (quien, spell);
         }
 
         /// <summary>
@@ -770,20 +827,54 @@ namespace Jondo.Unity.Launcher.Network
         /// puntos de movimiento y de acción según se gastan.
         /// </summary>
         public static byte[] BuildFighterSheet(long fighterId,
-                                               IEnumerable<(int Characteristic, long Value)> sheet)
+                                               IEnumerable<(int Characteristic, long Value)> sheet,
+                                               bool esElPersonajeControlado)
         {
-            // Éste sólo se usa en marcha para los PUNTOS, que van en su propio molde: f5 { f1 }.
-            // El resto de la ficha viaja por FighterBlock, que elige el hueco por característica.
+            // El molde NO es el mismo para todos: depende de si la ficha es la del personaje que
+            // maneja el cliente o la de otro. Medido en las quince capturas de combate, sin una
+            // sola excepción:
+            //
+            //   el personaje propio          f5 { f1: valor }   y f5 vacío cuando es cero
+            //   monstruos, rival y compañeros f2 { f2: valor }   y f2 vacío cuando es cero
+            //
+            // Aquí se mandaba el molde del jugador a TODO el mundo, así que cada turno le llegaba
+            // al cliente la ficha de cada monstruo escrita en el hueco que no es.
             var stats = Pb.New().Var(3, SheetKind);
             foreach (var (characteristic, value) in sheet)
             {
                 var entry = Pb.New().VarIfNotZero(1, characteristic);
-                if (value == 0) entry.EmptyMsg(2);
-                else entry.Msg(5, Pb.New().Var(1, value));
+                if (esElPersonajeControlado)
+                {
+                    if (value == 0) entry.EmptyMsg(5);
+                    else entry.Msg(5, Pb.New().Var(1, value));
+                }
+                else
+                {
+                    if (value == 0) entry.EmptyMsg(2);
+                    else entry.Msg(2, Pb.New().Var(2, value));
+                }
                 stats.Msg(5, entry);
             }
             return Pb.New().Var(1, fighterId).Msg(3, stats).Build();
         }
+
+        /// <summary>
+        /// La ficha con la vida que le falta al personaje (jxw con la característica 97).
+        ///
+        /// Va aparte de <see cref="BuildFighterSheet"/> porque ésa sólo sabe escribir el molde de
+        /// los puntos —f5 { f1 }— y la 97 usa el suyo. Sólo se le manda al personaje que maneja
+        /// el cliente; ver <see cref="TemporaryLifeMalus"/>.
+        ///
+        ///   08a28280c8e708 1a1e 1802 2a1a 0861 2216 1098ffffffffffffffff01 40b0feffffffffffffff01
+        ///   = al jugador, le faltan 104 de vida y lleva 208 erosionados
+        /// </summary>
+        public static byte[] BuildLifeSheet(long fighterId, long deficit, long erosion)
+            => Pb.New()
+                .Var(1, fighterId)
+                .Msg(3, Pb.New()
+                    .Var(3, SheetKind)
+                    .Msg(5, SheetEntry(TemporaryLifeMalus, deficit, -Math.Abs(erosion), false)))
+                .Build();
 
         /// <summary>La secuencia de andar y la de una acción cualquiera.</summary>
         public const int WalkSequence = 4;
@@ -821,16 +912,56 @@ namespace Jondo.Unity.Launcher.Network
         /// los de tierra un 1, los mismos números que la columna ElementId del catálogo.
         /// </param>
         public static byte[] BuildDamage(long author, int efecto, long victim, int amount,
-                                         int elemento = -1)
+                                         int elemento = -1, int erosion = 0)
         {
             var detalle = Pb.New().Var(2, victim).Var(3, amount);
             if (elemento >= 0) detalle.Var(4, elemento);
+
+            // La EROSIÓN, que faltaba. Va en el f5 y es lo que el golpe se lleva del TOPE de vida,
+            // no de la de ahora. Sale en 977 de los 986 bloques de daño de las capturas, y en 727
+            // de ellos vale exactamente la décima parte del daño:
+            //
+            //   c2020e 10a28280c8e708 18ce03 2003 282e   =  462 de daño, 46 de erosión
+            //
+            // El servidor ya la calculaba —está en Fighter.Erosionar— y no la mandaba, así que el
+            // cliente nunca se enteraba de que el tope había bajado.
+            detalle.VarIfNotZero(5, erosion);
+
             return Pb.New()
                 .Var(3, author)
                 .Var(14, efecto)
                 .Msg(40, detalle)
                 .Build();
         }
+
+        /// <summary>
+        /// RETIRARLE puntos de acción a otro. No confundir con el 102, que es el gasto propio de
+        /// lanzar un hechizo: en las 1.796 muestras de las capturas, el 102 y el 129 llevan
+        /// SIEMPRE el mismo id como autor y como víctima, y aquí el autor es otro.
+        /// </summary>
+        public const int ActionPointsLost = 101;
+
+        /// <summary>Retirarle puntos de movimiento a otro. El 129 es andar, que es cosa suya.</summary>
+        public const int MovementPointsLost = 127;
+
+        /// <summary>
+        /// Se le han quitado puntos a alguien (jwe): { f3: quién, f14: cuál, f20 { f1: cuántos,
+        /// f2: a quién } }.
+        ///
+        /// La cantidad va en NEGATIVO, en complemento a dos de 64 bits:
+        ///
+        ///   a20112 08fcffffffffffffffff01 10a282f0a6c408   =  menos cuatro PA
+        ///
+        /// Esto es lo que hace salir el numerito flotando encima del combatiente, igual que con la
+        /// vida. Sin él, el servidor le quitaba los puntos por dentro y en pantalla no se movía
+        /// nada: el jugador veía al bicho quedarse sin PA sin que nada se lo dijera.
+        /// </summary>
+        public static byte[] BuildPointsLost(long author, int efecto, long victim, int cuantos)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, efecto)
+                .Msg(20, Pb.New().Var(1, -Math.Abs(cuantos)).Var(2, victim))
+                .Build();
 
         /// <summary>
         /// Los dos códigos de elemento que están medidos. Los demás caen en el rango 89 a 100 pero
@@ -842,22 +973,26 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>
         /// Una curación (jwe con f14 = 3001, "curas neutrales"):
         ///
-        ///   f3: quién cura     f6 { f1: cuánto, f4: -2 }
+        ///   f3: quién cura     f6 { f1: cuánto, f4: A QUIÉN }
         ///
-        /// Medido en el turno de la Baliza de Supervivencia, que manda <c>f6 {f1:51, f4:-2}</c> y
-        /// <c>f6 {f1:1, f4:-2}</c>. El <c>f4</c> vale menos dos en los dos y NO es el destinatario:
-        /// en esa captura los combatientes son el jugador, la baliza y un pío, y el menos dos no
-        /// es ninguno de los tres. Se manda tal cual porque así viene medido, pero no se sabe qué
-        /// significa.
+        /// El f4 es el CURADO, y esto corrige lo que decía aquí antes. El comentario anterior
+        /// sostenía que el menos dos de la captura de la Baliza no era ninguno de los tres
+        /// combatientes y que por tanto no era el destinatario; era mentira, el menos dos es el id
+        /// de un monstruo de esa pelea. Contadas las 94 curaciones de las 305 capturas: el f4
+        /// lleva siempre un identificador de combatiente de verdad —el jugador 52 veces, otros
+        /// jugadores 19, monstruos el resto— y en 40 de las 94 NO coincide con quien cura.
+        ///
+        /// Mandarlo clavado a menos dos hacía que toda cura se pintara encima del combatiente
+        /// menos dos, que en la mayoría de los combates existe y es un bicho cualquiera.
         ///
         /// La curación llega al cable ya resuelta en puntos: en la base el efecto es el 1109,
         /// "Cura: #1% de los PdV máximos", y aquí viaja el número concreto. Es el mismo apaño que
         /// con el robo de puntos, donde el 1080 se anuncia como 169 con la cantidad que salió.
         /// </summary>
-        public static byte[] BuildHeal(long author, int cuanto)
+        public static byte[] BuildHeal(long author, int cuanto, long curado)
             => Pb.New()
                 .Var(3, author)
-                .Msg(6, Pb.New().Var(1, cuanto).Var(4, -2))
+                .Msg(6, Pb.New().Var(1, cuanto).Var(4, curado))
                 .Var(14, Curacion)
                 .Build();
 
@@ -1319,5 +1454,109 @@ namespace Jondo.Unity.Launcher.Network
 
             return jyy.Build();
         }
+
+        // ─── Los retos ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// El estado que lleva todo reto por el cable. Vale dos en el cien por cien de los que
+        /// se han visto —en la propuesta, en la lista definitiva y en los de mitad de combate—,
+        /// así que de los otros dos valores del enumerado no se sabe nada.
+        /// </summary>
+        public const int ChallengeState = 2;
+
+        /// <summary>
+        /// Cuánto dura la propuesta. Vale quince en las nueve apariciones y no se le ha visto
+        /// cambiar; el cliente tiene un <c>OnChallengeProposalUpdateTimer</c>, así que es un
+        /// temporizador, pero por lo que se ve podría ser cualquier constante.
+        /// </summary>
+        public const int ChallengeTimer = 15;
+
+        /// <summary>
+        /// Un reto (ldd): { f1: %, f2: cuál, f3 (repetido): objetivos, f4: %, f5: estado }.
+        ///
+        /// Los dos porcentajes son el de experiencia y el de botín, y en los veintisiete retos
+        /// distintos de las capturas SIEMPRE valen lo mismo, así que no hay forma de saber cuál
+        /// es cuál. El cliente tampoco ayuda: su ventana pinta un solo número.
+        ///
+        /// Cuando el extra es cero los dos campos desaparecen —proto3 no manda el cero—, que es
+        /// lo que pasa con los retos que impone una anomalía.
+        ///
+        ///   085f1011205f2802   =   95 %, reto 17, 95 %, estado 2
+        /// </summary>
+        public static byte[] BuildChallenge(int id, int percent, IEnumerable<(int Cell, long Fighter)>? targets = null)
+        {
+            var ldd = Pb.New().VarIfNotZero(1, percent).Var(2, id);
+
+            if (targets != null)
+            {
+                foreach (var (cell, fighter) in targets)
+                {
+                    // Sin objetivo todavía va la casilla a menos uno: en la preparación, un reto
+                    // que apunta a dónde acabas el turno no sabe aún dónde vas a estar.
+                    ldd.Msg(3, Pb.New().Var(2, cell).VarIfNotZero(3, fighter));
+                }
+            }
+
+            return ldd.VarIfNotZero(4, percent).Var(5, ChallengeState).Build();
+        }
+
+        /// <summary>Cuántos retos hay que elegir (kxa): { f1: n }. Uno fuera de mazmorra.</summary>
+        public static byte[] BuildChallengeCount(int howMany) => Pb.New().Var(1, howMany).Build();
+
+        /// <summary>
+        /// La lista de candidatos (kwx): { f1: el temporizador, f2 (repetido): los retos }.
+        ///
+        /// Siempre son dos, y son alternativas: en las capturas se ofrecieron juntos dos que la
+        /// tabla del cliente marca como incompatibles entre sí.
+        /// </summary>
+        public static byte[] BuildChallengeList(IEnumerable<byte[]> challenges)
+        {
+            var kwx = Pb.New().Var(1, ChallengeTimer);
+            foreach (byte[] uno in challenges) kwx.Bytes(2, uno);
+            return kwx.Build();
+        }
+
+        /// <summary>Un reto queda fijado (kww): { f1: el reto }.</summary>
+        public static byte[] BuildChallengeChosen(byte[] challenge)
+            => Pb.New().Bytes(1, challenge).Build();
+
+        /// <summary>La lista definitiva (kwu): { f2 (repetido): los retos }. Va pegada al jyy.</summary>
+        public static byte[] BuildChallengeFinalList(IEnumerable<byte[]> challenges)
+        {
+            var kwu = Pb.New();
+            foreach (byte[] uno in challenges) kwu.Bytes(2, uno);
+            return kwu.Build();
+        }
+
+        /// <summary>La confirmación del ajuste del panel (kwn), con el mismo valor que llegó.</summary>
+        public static byte[] BuildChallengeSettings(long value)
+            => Pb.New().VarIfNotZero(1, value).Build();
+
+        /// <summary>
+        /// El OBJETIVO de un reto (kwm): { f2: el reto, con su objetivo dentro }.
+        ///
+        /// Es el único mensaje que lleva a quién hay que matar, y su f1 no ha viajado nunca. En
+        /// las capturas sale tres veces, las tres pegadas al jyy que arranca el combate; volver a
+        /// mandarlo cuando el objetivo cambia es la lectura natural —no hay otro mensaje que
+        /// pueda llevarlo— pero eso ya no está medido.
+        ///
+        ///   1218084610231a0e10860218fdffffffffffffffff0120462802
+        ///   = reto 35 al 70 %, objetivo en la casilla 262, luchador −3
+        /// </summary>
+        public static byte[] BuildChallengeObjective(byte[] challenge)
+            => Pb.New().Bytes(2, challenge).Build();
+
+        /// <summary>
+        /// El RESULTADO de un reto (kwl): { f1: cuál, f2: cumplido }.
+        ///
+        /// Sin el f2 está FALLADO, que es como proto3 escribe un booleano falso. El cliente lo
+        /// pinta en verde o en rojo, y hasta que no le llega esto lo tiene por vivo: si no se
+        /// manda nunca, el reto se queda para siempre en marcha en la pantalla del jugador.
+        ///
+        ///   08111001   =   reto 17 cumplido
+        ///   0801       =   reto 1 fallado
+        /// </summary>
+        public static byte[] BuildChallengeResult(int id, bool completed)
+            => Pb.New().Var(1, id).VarIfNotZero(2, completed ? 1 : 0).Build();
     }
 }

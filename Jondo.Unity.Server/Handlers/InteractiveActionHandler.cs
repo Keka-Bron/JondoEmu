@@ -61,6 +61,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 case InteractiveActionKind.HouseExit:
                     await HouseHandler.LeaveAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
+                case InteractiveActionKind.Teleport:
+                    await TeleportHandler.UseAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
                 case InteractiveActionKind.Gather:
                     await GatheringHandler.GatherAsync(stream, interactive.Element.Id, action.SkillId);
                     break;

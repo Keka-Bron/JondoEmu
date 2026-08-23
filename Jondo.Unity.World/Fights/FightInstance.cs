@@ -312,6 +312,82 @@ namespace Jondo.Unity.World.Fights
         private int _ultimaAccion;
         public int SiguienteAccion() => System.Threading.Interlocked.Increment(ref _ultimaAccion);
 
+        // ─── Los retos ──────────────────────────────────────────────────────────
+        //
+        // Van aquí y no en un campo estático del manejador por lo mismo que la ronda: dos
+        // jugadores peleando a la vez tendrían los mismos retos, y el que eligiera uno se lo
+        // cambiaría al otro.
+
+        /// <summary>Cuántos hay que elegir. Uno en un combate normal, dos en mazmorra.</summary>
+        public int ChallengesToPick { get; set; } = 1;
+
+        /// <summary>Los dos que están sobre la mesa ahora mismo. Vacío si no se ha pedido la lista.</summary>
+        public List<int> ChallengesOffered { get; } = new List<int>();
+
+        /// <summary>Cuál de los dos tiene marcado el jugador, aunque todavía no lo haya validado.</summary>
+        public int ChallengeMarked { get; set; }
+
+        /// <summary>Los que ya están fijados, con el porcentaje con el que se fijaron.</summary>
+        public List<(int Id, int Percent)> ChallengesFixed { get; } = new List<(int, int)>();
+
+        /// <summary>¿Quedan retos por elegir?</summary>
+        public bool ChallengesPending => ChallengesFixed.Count < ChallengesToPick;
+
+        // ─── Lo que hace falta para VIGILARLOS ──────────────────────────────────
+
+        /// <summary>
+        /// El final de ESTE combate está esperando a que el cliente acuse una secuencia. Cero
+        /// cuando no hay ninguno esperando.
+        ///
+        /// Vivía como un estático del manejador, uno para todo el servidor, y era la avería más
+        /// cara que había: con dos combates a la vez, el acuse de uno cerraba el del otro. Y
+        /// cerrarlo no es cosmético — reparte la experiencia, los kamas y el botín sobre la sesión
+        /// de quien mandó el acuse, y lo escribe en la base. O sea que un jugador cobraba el
+        /// combate de otro, y al dueño no le llegaba nunca su pantalla de fin.
+        /// </summary>
+        public int FinPendiente { get; set; }
+
+        /// <summary>Los que ya se han roto. Se avisa una vez y no se vuelve a mirar.</summary>
+        public HashSet<int> ChallengesBroken { get; } = new HashSet<int>();
+
+        /// <summary>Dónde y con cuántos PM empezó su turno el que lo tiene ahora.</summary>
+        public int TurnStartCell { get; set; }
+        public int TurnStartMp { get; set; }
+
+        /// <summary>A quién hay que rematar antes de pegarle a otro (retos 31 y 32).</summary>
+        public long ChallengeFocus { get; set; }
+
+        /// <summary>El nivel del último enemigo que cayó, para el orden de muertes.</summary>
+        public int LastKilledLevel { get; set; } = -1;
+
+        /// <summary>Los hechizos ya usados en TODO el combate, para el Ahorrador.</summary>
+        public HashSet<int> SpellsEverUsed { get; } = new HashSet<int>();
+
+        /// <summary>Quiénes han rematado a alguien, para el Reparto.</summary>
+        public HashSet<long> Killers { get; } = new HashSet<long>();
+
+        /// <summary>El elemento con el que se pegó la primera vez, para el Elemental. Cero, ninguno.</summary>
+        public int DamageElement { get; set; }
+
+        /// <summary>Enemigos a los que se ha pegado y siguen vivos, para el Blitzkrieg.</summary>
+        public HashSet<long> Wounded { get; } = new HashSet<long>();
+
+        /// <summary>
+        /// A quién señala cada reto: reto → luchador. Hay retos que exigen matar a uno concreto
+        /// el primero, o el último, o concentrarle los ataques, y ese «uno concreto» lo elige el
+        /// servidor y se lo dice al cliente para que le ponga la marca encima.
+        /// </summary>
+        public Dictionary<int, long> ChallengeTargets { get; } = new Dictionary<int, long>();
+
+        /// <summary>Quién atacó primero a cada enemigo, para el Duelo.</summary>
+        public Dictionary<long, long> FirstAttacker { get; } = new Dictionary<long, long>();
+
+        /// <summary>En qué ronda cayó cada enemigo, para el Dum.</summary>
+        public Dictionary<long, int> KilledOnRound { get; } = new Dictionary<long, int>();
+
+        /// <summary>Dónde ha rematado a alguien el que juega, para el Conquistador.</summary>
+        public HashSet<int> KillCells { get; } = new HashSet<int>();
+
         /// <summary>De dónde salió cada jugador al entrar en combate, para devolverlo ahí.</summary>
         public Dictionary<long, (long Mapa, int Casilla)> DeDondeVenian { get; }
             = new Dictionary<long, (long, int)>();
