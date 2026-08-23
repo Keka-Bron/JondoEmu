@@ -83,64 +83,115 @@ namespace Jondo.Unity.Launcher.Managers
             public string ValidationStatus { get; set; } = "pending";
         }
 
+        /// <summary>
+        /// Junta los catálogos y los deja en la base.
+        ///
+        /// Son DOS y el orden importa: primero el de Giny, que trae la casilla de llegada medida,
+        /// y después el del grafo de 2.73, que sólo la sabe aproximar. Cuando los dos hablan del
+        /// mismo elemento gana el primero, y el segundo queda apagado con el motivo escrito.
+        ///
+        /// Todo lo que se descarta se guarda igual, con su ValidationStatus, para que una ruta que
+        /// desaparece se pueda mirar en vez de adivinar por qué no está.
+        /// </summary>
         private static void ImportIfAvailable()
         {
-            string path = Paths.InteractiveTeleportsJson;
-            if (!File.Exists(path))
+            var catalogos = new (string Ruta, string Nombre)[]
             {
-                Console.WriteLine($"[Teleport] Falta {path}; se conserva el catálogo SQLite existente.");
-                return;
-            }
+                (Paths.InteractiveTeleportsJson, "Giny 2.68"),
+                (Paths.WorldGraphTeleportsJson, "grafo 2.73"),
+            };
+
+            var rows = new List<ImportRow>();
+            int housesSkipped = 0;
 
             try
             {
-                using var document = JsonDocument.Parse(File.ReadAllText(path));
-                JsonElement root = document.RootElement;
-                if (!root.TryGetProperty("schemaVersion", out var schema) || schema.GetInt32() != 1)
-                    throw new InvalidOperationException("schemaVersion distinto de 1.");
-                if (!root.TryGetProperty("routes", out var routes) || routes.ValueKind != JsonValueKind.Array)
-                    throw new InvalidOperationException("La propiedad routes no es una lista.");
-
-                var rows = new List<ImportRow>();
-                int housesSkipped = 0;
-                foreach (var entry in routes.EnumerateArray())
+                foreach (var (ruta, nombre) in catalogos)
                 {
-                    var route = Read(entry);
-                    if (IsHouse(route.SourceMapId, route.ElementId))
+                    if (!File.Exists(ruta))
                     {
-                        housesSkipped++;
+                        Console.WriteLine($"[Teleport] Falta el catálogo de {nombre} ({ruta}).");
                         continue;
                     }
-                    rows.Add(new ImportRow
+
+                    using var document = JsonDocument.Parse(File.ReadAllText(ruta));
+                    JsonElement root = document.RootElement;
+                    if (!root.TryGetProperty("schemaVersion", out var schema) || schema.GetInt32() != 1)
+                        throw new InvalidOperationException($"{nombre}: schemaVersion distinto de 1.");
+                    if (!root.TryGetProperty("routes", out var routes) || routes.ValueKind != JsonValueKind.Array)
+                        throw new InvalidOperationException($"{nombre}: la propiedad routes no es una lista.");
+
+                    int leidas = 0;
+                    foreach (var entry in routes.EnumerateArray())
                     {
-                        Route = route,
-                        RequestedEnabled = entry.TryGetProperty("enabled", out var enabled) && enabled.GetBoolean()
-                    });
+                        var route = Read(entry);
+                        if (IsHouse(route.SourceMapId, route.ElementId))
+                        {
+                            housesSkipped++;
+                            continue;
+                        }
+                        rows.Add(new ImportRow
+                        {
+                            Route = route,
+                            RequestedEnabled = entry.TryGetProperty("enabled", out var enabled) && enabled.GetBoolean()
+                        });
+                        leidas++;
+                    }
+                    Console.WriteLine($"[Teleport] Catálogo de {nombre}: {leidas} rutas leídas.");
                 }
 
+                if (rows.Count == 0)
+                {
+                    Console.WriteLine("[Teleport] Ningún catálogo; se conserva el que hay en SQLite.");
+                    return;
+                }
+
+                // Dos destinos para el mismo elemento dentro del MISMO catálogo: no se puede elegir
+                // por nosotros, así que no se activa ninguno.
                 var ambiguous = rows
                     .Where(x => x.RequestedEnabled)
-                    .GroupBy(x => (x.Route.SourceMapId, x.Route.ElementId))
+                    .GroupBy(x => (x.Route.SourceMapId, x.Route.ElementId, x.Route.SourceVersion))
                     .Where(x => x.Count() > 1)
-                    .Select(x => x.Key)
+                    .Select(x => (x.Key.SourceMapId, x.Key.ElementId))
                     .ToHashSet();
+
+                // Lo que ya se ha activado, para que el segundo catálogo no pise al primero. Se
+                // vigilan las dos claves: el elemento, y la casilla —dos pasos en la misma casilla
+                // dejarían el índice por casilla sin saber a cuál ir—.
+                var elementoTomado = new HashSet<(long, int)>();
+                var celdaTomada = new HashSet<(long, int)>();
 
                 int enabledCount = 0;
                 foreach (var row in rows)
                 {
                     var errors = Validate(row.Route);
+
                     if (!row.RequestedEnabled &&
                         string.Equals(row.Route.Confidence, "ambiguous", StringComparison.OrdinalIgnoreCase))
                         errors.Add("ambiguous-source");
                     if (ambiguous.Contains((row.Route.SourceMapId, row.Route.ElementId)))
                         errors.Add("ambiguous-source");
+
+                    var porElemento = (row.Route.SourceMapId, row.Route.ElementId);
+                    var porCelda = (row.Route.SourceMapId, row.Route.SourceCellId);
+                    if (row.RequestedEnabled && errors.Count == 0)
+                    {
+                        if (elementoTomado.Contains(porElemento)) errors.Add("already-covered");
+                        else if (celdaTomada.Contains(porCelda)) errors.Add("duplicate-source-cell");
+                    }
+
                     row.Enabled = row.RequestedEnabled && errors.Count == 0;
                     row.ValidationStatus = errors.Count == 0 ? "ok" : string.Join(",", errors);
-                    if (row.Enabled) enabledCount++;
+                    if (row.Enabled)
+                    {
+                        elementoTomado.Add(porElemento);
+                        celdaTomada.Add(porCelda);
+                        enabledCount++;
+                    }
                 }
 
                 ReplaceDatabase(rows);
-                Console.WriteLine($"[Teleport] Import JSON: {rows.Count} rutas, {enabledCount} activas, " +
+                Console.WriteLine($"[Teleport] Importadas {rows.Count} rutas, {enabledCount} activas, " +
                                   $"{housesSkipped} casas ignoradas.");
             }
             catch (Exception ex)

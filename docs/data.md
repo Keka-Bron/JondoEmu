@@ -203,7 +203,7 @@ Row counts are from the copy inside `world.zip`; the player tables grow as you p
 | `HavenBag` | 1 | `Managers/HavenBagStore.cs` | Which haven bag theme the character uses |
 | `HavenBagFurniture` | 0 | `Managers/HavenBagStore.cs` | Furniture placed in the room |
 | `HavenBagChest` | 3 | `Managers/HavenBagStore.cs` | The haven bag chest contents |
-| `InteractiveTeleports` | 1,678 | `Managers/TeleportManager.cs` | Giny teleport candidates, rebuilt from JSON on every start; only the 1,585 `Enabled=1` rows reach the registry |
+| `InteractiveTeleports` | 3,815 | `Managers/TeleportManager.cs` | Teleport candidates from two catalogues, rebuilt from JSON on every start; only the 3,719 `Enabled=1` rows reach the registry |
 
 `sqlite_sequence` is SQLite's own bookkeeping and is not counted in the 31.
 

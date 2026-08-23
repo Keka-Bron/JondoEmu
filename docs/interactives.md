@@ -102,8 +102,8 @@ registry.
 
 Every one of those `(type, skill)` pairs is measured, not chosen: `tools/tipos_interactivos.py`
 cross-references the 304 packet captures against the client's element dump and yields
-`graphic → type` for 415 graphics. **28,572 elements are registered** at startup: 26,987 of them
-zaaps, chests, bins, house doors and gatherable resources, plus 1,585 generic teleport routes
+`graphic → type` for 415 graphics. **30,706 elements are registered** at startup: 26,987 of them
+zaaps, chests, bins, house doors and gatherable resources, plus 3,719 generic teleport routes
 (section 11).
 
 Two of those rows deserve a note.
@@ -485,3 +485,46 @@ accidental collision with a house door or a resource stop the server instead of 
 Landing uses `MapManager.GetNearestWalkableCell`, so a destination cell that is no longer walkable
 cannot strand the character. 314 of the routes (20 %) do land on a non-walkable cell and are
 rescued that way, which means one route in five puts the character slightly off the mark.
+
+### A second catalogue: the Dofus 2.73 world graph
+
+Giny's table covers 1,585 routes. A second source fills part of the rest: `world-graph.binary`,
+the navigation graph the Dofus 2 client uses to plan routes across the world. It is parsed by
+`tools/extraer_world_graph.py` into `datos/interactive_teleports_worldgraph_2.73.json`, which
+`TeleportManager` imports after Giny's — Giny always wins a conflict, because it carries a
+measured arrival cell and the graph does not.
+
+The format was worked out by hand and is documented in the tool. It holds 30,742 edges and 31,103
+transitions; **5,719 of them are interactive** (type 32, skill 184). Three independent checks say
+the reading is right: the parser lands **exactly** on the last byte of the file; every cell in it
+falls inside 0–559; and where the graph and Giny describe the same route, **1,091 of 1,105 agree
+on the source cell** and none agrees with the destination cell — which is also how we know the
+graph's cell is the source one.
+
+The graph carries an element id per interactive transition, and **5,563 of 5,719 match one of our
+own elements on the very same cell**, so routes are keyed by element and not guessed from geometry.
+
+**What it does not carry is the arrival cell.** It says which map you end up on, not where you
+appear. That is approximated with the cell of the element that makes the return trip, and the
+server snaps it to a walkable cell on landing. Measured against the 884 routes where Giny does give
+the exact cell: 71 % land within one cell, 90 % within two, 96 % within three. Good enough to put
+the character somewhere sensible, not good enough to be called exact — which is why those rows
+carry `confidence = reverse-element-approx` and stay in their own file.
+
+Routes with no return path are dropped rather than guessed: 1,357 of them. Together with 764 whose
+maps are not in our world, 1,196 already covered by Giny and a handful of mismatches, **2,137
+usable routes** come out of the graph, of which 2,134 survive import. Total: **3,719 active routes
+across 2,655 maps.**
+
+### Why none of this comes from the 3.6.10.10 client
+
+It was looked for, and it is not there. The client ships the whole machinery —
+`Core.PathFinding.WorldPathfinding` with `Vertex`, `Edge`, `Transition`, `AStar` and
+`PathFindingData`, names and source paths perfectly readable in the IL2CPP metadata — but not the
+graph itself. None of the ~200 `DataRoot` assets it distributes holds transitions or destinations.
+Each map bundle gives every interactive its `m_interactionId`, `cellId` and `gfxId` — who it is,
+where it stands and what it looks like — but never where it leads.
+
+So a teleport destination is server data. That is why a Dofus 2 dump is the only practical source,
+and why chasing a deobfuscated build would not help: the names are not the obstacle, the absence of
+the data is.

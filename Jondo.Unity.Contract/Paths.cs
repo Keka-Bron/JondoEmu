@@ -87,6 +87,17 @@ namespace Jondo.Unity.Launcher
         /// servidor los valida contra sus propios datos y sólo importa los que sobreviven.
         /// </summary>
         public static string InteractiveTeleportsJson => Resolve("interactive_teleports_giny_2.68.json");
+
+        /// <summary>
+        /// Los pasos sacados del grafo de navegación del cliente de Dofus 2.73, que los genera
+        /// tools/extraer_world_graph.py. Rellenan los huecos que el catálogo de Giny no cubre.
+        ///
+        /// Van en un fichero aparte y NO mezclados con los de Giny a propósito: éstos traen la
+        /// casilla de llegada aproximada —el grafo no la lleva— y eso tiene que poder distinguirse
+        /// de un vistazo, tanto aquí como en la columna Confidence de la base.
+        /// </summary>
+        public static string WorldGraphTeleportsJson
+            => Resolve("interactive_teleports_worldgraph_2.73.json");
         /// <summary>
         /// Los catálogos de oficios, habilidades y recetas en crudo. Se quedan fuera de
         /// <c>datos</c> a propósito: el servidor los importa a world.db y nunca los sirve.
