@@ -81,9 +81,13 @@ namespace Jondo.Unity.Launcher
             Managers.Bins.Initialize();
             Managers.Anomalies.Initialize();
             Managers.Houses.Initialize();
+            // Detrás de Houses a propósito: TeleportManager rechaza las rutas que caen sobre una
+            // puerta de casa, y para eso las casas tienen que estar ya cargadas.
             Managers.TeleportManager.Initialize();
             Managers.Resources.Initialize();
             Managers.InfoMessages.Initialize();
+            Managers.Challenges.Initialize();
+            Managers.Challenges.OnlyOffer(Handlers.ChallengeWatcher.Watched);
             Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
             Managers.Npcs.Initialize();
@@ -206,18 +210,20 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[+] Services stopped.");
         }
 
+        /// <summary>
+        /// Una línea en el registro de depuración.
+        ///
+        /// Escribía con File.AppendAllText, que abre el fichero, escribe y lo cierra, en CADA
+        /// línea; y la ruta se resolvía cada vez, con su Directory.Exists dentro. Esto se llama
+        /// constantemente durante un combate. Ahora el manejador se queda abierto y la ruta se
+        /// resuelve una sola vez, pero se sigue vaciando línea a línea: un registro de depuración
+        /// tiene que tener escrito lo último que pasó justo cuando el servidor se muere.
+        /// </summary>
         public static void LogDebug(string message)
         {
             string line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}";
             Console.WriteLine(line);
-            lock (LogLock)
-            {
-                try
-                {
-                    File.AppendAllText(Paths.DebugLog, line + "\r\n");
-                }
-                catch { }
-            }
+            LogFile.Debug.WriteLine(line);
         }
     }
 }

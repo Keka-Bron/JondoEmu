@@ -13,6 +13,17 @@ namespace Jondo.Protocol
         private static readonly ConditionalWeakTable<Stream, SemaphoreSlim> WriteLocks
             = new ConditionalWeakTable<Stream, SemaphoreSlim>();
 
+        /// <summary>
+        /// Lo mas grande que se acepta en una trama, en bytes.
+        ///
+        /// El varint de longitud no tenia tope: cinco bytes «FF FF FF FF 07» pedian un array de
+        /// 2 GB antes de leer un solo byte de contenido, y ocho conexiones bastaban para tumbar
+        /// el servidor sin autenticarse. El tope tiene que dejar pasar lo mas gordo que mandamos
+        /// de verdad, que es el bloque de entrada al mundo (unos 737 KB), asi que 8 MB va de
+        /// sobra y sigue siendo 256 veces menos que lo que se podia pedir antes.
+        /// </summary>
+        public const int MaxFrameLength = 8 * 1024 * 1024;
+
         public static async Task<byte[]> ReadFrameAsync(Stream stream)
         {
             // Read VarInt length
@@ -23,13 +34,21 @@ namespace Jondo.Protocol
                 byte[] buf = new byte[1];
                 int read = await stream.ReadAsync(buf, 0, 1);
                 if (read == 0) return null; // End of stream
-                
+
                 byte b = buf[0];
                 length |= (b & 0x7F) << shift;
                 if ((b & 0x80) == 0) break;
                 shift += 7;
+
+                // Un varint de longitud no pasa de cinco bytes. Sin este corte, una ristra de
+                // 0xFF deja el bucle leyendo de uno en uno para siempre.
+                if (shift > 28) return null;
             }
-            
+
+            // Y lo que pida tiene que caber en el tope. El desbordamiento del or de arriba puede
+            // dejar length negativo, asi que se comprueban los dos lados.
+            if (length < 0 || length > MaxFrameLength) return null;
+
             // Read payload
             byte[] payload = new byte[length];
             int totalRead = 0;

@@ -206,7 +206,7 @@ Row counts are from the copy inside `world.zip`; the player tables grow as you p
 | `Jobs` / `Skills` | 23 / 368 | `DatabaseManager` | Profession and interactive-skill catalogues imported from the 3.6 dofusdude JSON |
 | `SkillCraftableItems` / `SkillModifiableItemTypes` | 5,693 / 17 | `DatabaseManager` | Normalized variable-length skill capabilities |
 | `Recipes` / `RecipeIngredients` | 4,858 / 24,532 | `DatabaseManager` | Craft results and their ordered ingredients |
-| `InteractiveTeleports` | 1,679 | `DatabaseManager` | Auditable Giny teleport candidates; only validated `Enabled=1` rows enter the runtime registry |
+| `InteractiveTeleports` | 3,815 | `Managers/TeleportManager.cs` | Teleport candidates from Giny and WorldGraph, rebuilt from JSON on every start; only validated `Enabled=1` rows reach the registry |
 
 `sqlite_sequence` is SQLite's own bookkeeping and is not counted in the 38.
 

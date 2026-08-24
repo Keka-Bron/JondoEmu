@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Jondo.Unity.Launcher.Network;
@@ -357,7 +357,8 @@ namespace Jondo.Unity.Launcher.Managers
                 moved.Add(item);
             }
 
-            foreach (var item in moved) DatabaseManager.SaveItemPosition(item.Uid, Bag);
+            foreach (var item in moved)
+                DatabaseManager.SaveItemPosition(item.Uid, Bag, SessionContext.State.CharacterId);
             return moved;
         }
 

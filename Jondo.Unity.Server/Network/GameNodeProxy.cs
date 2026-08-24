@@ -32,7 +32,7 @@ namespace Jondo.Unity.Launcher.Network
             _isRunning = true;
             _cts = new CancellationTokenSource();
 
-            _tcpListener = new TcpListener(IPAddress.Any, port);
+            _tcpListener = new TcpListener(ServerBinding.TcpAddress, port);
             _tcpListener.Start();
 
             Console.WriteLine($"[+] Emulating Game Node on TCP port {port} (Online)");
@@ -330,11 +330,18 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     // Peleando, el mapa ya está puesto: mandarle el jss del mapa de superficie lo
                     // sacaría del combate.
-                    if (GameState.IsInFight) continue;
+                    //
+                    // Y esto NO puede ser un continue. La lectura de la trama siguiente está al
+                    // FINAL del cuerpo de este while, así que saltar a la condición se la salta:
+                    // el payload sigue siendo el mismo, se vuelve a entrar por esta misma rama, y
+                    // se vuelve a saltar. Para siempre, sin un solo await por medio, o sea girando
+                    // a plena máquina y sin volver a leer un byte de ese cliente nunca más.
+                    var here = GameState.IsInFight
+                        ? null
+                        : DatabaseManager.GetCharacterById(GameState.CharacterId);
 
                     // The client asks who is on the map. Without an answer it draws an empty map:
                     // no avatar, no NPCs, no monsters.
-                    var here = DatabaseManager.GetCharacterById(GameState.CharacterId);
                     if (here != null)
                     {
                         byte[] actors = ConnectionProtocol.Push(Op.Jss,
@@ -383,7 +390,14 @@ namespace Jondo.Unity.Launcher.Network
                     // Andar es el mismo mensaje dentro y fuera del combate. Peleando lo resuelve el
                     // manejador de combate, que además gasta puntos de movimiento; si cayera aquí,
                     // el personaje se movería por el tablero gratis y sin avisar a nadie.
-                    if (GameState.IsInFight) await FightHandler.WalkAsync(stream, payload);
+                    //
+                    // Va por HandleFightMessageAsync y no directo a WalkAsync: ese es el que coge
+                    // el candado de la sesión. Llamando a WalkAsync a pelo, andar era lo ÚNICO del
+                    // combate que se saltaba el candado, así que podía cruzarse con el reloj de
+                    // turno —que también toca el combate y escribe en el socket— y dejar el estado
+                    // a medias. Y de paso hacía inalcanzable la rama del jrw que ya existía dentro
+                    // del manejador de combate.
+                    if (GameState.IsInFight) await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                     else await WorldMoveHandler.ConfirmMovementAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/jqi"))
@@ -819,12 +833,22 @@ namespace Jondo.Unity.Launcher.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Jzy)) || payloadStr.Contains(Op.Uri(Op.Kaq))
                          || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
+                         || payloadStr.Contains(Op.Uri(Op.Jwn))
                          || payloadStr.Contains(Op.Uri(Op.Jti))
-                         || payloadStr.Contains(Op.Uri(Op.Hoy)))
+                         || payloadStr.Contains(Op.Uri(Op.Hoy))
+                         || payloadStr.Contains(Op.Uri(Op.Kwr)) || payloadStr.Contains(Op.Uri(Op.Kwj))
+                         || payloadStr.Contains(Op.Uri(Op.Kwv)) || payloadStr.Contains(Op.Uri(Op.Kwi))
+                         || payloadStr.Contains(Op.Uri(Op.Kwo)) || payloadStr.Contains(Op.Uri(Op.Kxb)))
                 {
-                    // Colocarse, declararse listo y las opciones del combate. Los demás que había
-                    // aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la 3.6.10.10 o
-                    // los manda el servidor, no el cliente.
+                    // Colocarse, declararse listo, las opciones del combate y los RETOS. Los demás
+                    // que había aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la
+                    // 3.6.10.10 o los manda el servidor, no el cliente.
+                    //
+                    // Los seis de retos estaban atendidos dentro del manejador de combate pero no
+                    // aquí, así que no llegaban: esta puerta es una lista cerrada. El sintoma era
+                    // que el boton de aceptar el reto no hacia nada y que al empezar el combate
+                    // salia un reto distinto de los dos ofrecidos, porque el kwv de elegir se
+                    // perdia por el camino y el servidor acababa rellenando el hueco el solo.
                     await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
@@ -1101,140 +1125,5 @@ namespace Jondo.Unity.Launcher.Network
             }
         }
 
-        private static byte[] PatchKtwPacket(byte[] packetPayload)
-        {
-            try
-            {
-                var rootMsg = ProtoMessage.Parse(packetPayload);
-                var rootField = rootMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 2);
-                if (rootField == null) return packetPayload;
-
-                var wrapperMsg = ProtoMessage.Parse(rootField.BytesValue);
-                var wrapperField = wrapperMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
-                if (wrapperField == null) return packetPayload;
-
-                var anyMsg = ProtoMessage.Parse(wrapperField.BytesValue);
-                var anyValueField = anyMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                if (anyValueField == null) return packetPayload;
-
-                var ktwMsg = ProtoMessage.Parse(anyValueField.BytesValue);
-                
-                // In Dofus 3.6, the real CharacterSelectedSuccessMessage is wrapped in Field 1 of the Any value.
-                var field1 = ktwMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
-                if (field1 != null)
-                {
-                    var successMsg = ProtoMessage.Parse(field1.BytesValue);
-                    
-                    // Inside successMsg, Field 3 = characterBaseInfoMsg (CharacterBaseInformations)
-                    var field3 = successMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 2);
-                    if (field3 != null)
-                    {
-                        var characterBaseInfoMsg = ProtoMessage.Parse(field3.BytesValue);
-                        
-                        // Inside characterBaseInfoMsg:
-                        // Field 2 = characterId (VarInt)
-                        // Field 1 = details (CharacterMinimalPlusLookInformations)
-                        
-                        // 1. Patch characterId (Field 2)
-                        var idField = characterBaseInfoMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 0);
-                        if (idField != null)
-                        {
-                            idField.VarIntValue = GameState.CharacterId;
-                            Program.LogDebug($"[KTW Patch] Patched character ID to: {GameState.CharacterId}");
-                        }
-                        else
-                        {
-                            characterBaseInfoMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.CharacterId });
-                        }
-                        
-                        // 2. Patch details (Field 1)
-                        var detailsField = characterBaseInfoMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
-                        if (detailsField != null)
-                        {
-                            var detailsMsg = ProtoMessage.Parse(detailsField.BytesValue);
-                            
-                            // Inside detailsMsg:
-                            // Field 3 = characterName (String)
-                            // Field 6 = characterLevel (VarInt)
-                            // Field 2 = entityLook (Message)
-                            
-                            // Patch name (Field 3)
-                            var nameField = detailsMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 2);
-                            if (nameField != null)
-                            {
-                                nameField.BytesValue = Encoding.UTF8.GetBytes(GameState.CharacterName);
-                                Program.LogDebug($"[KTW Patch] Patched character name to: {GameState.CharacterName}");
-                            }
-                            else
-                            {
-                                detailsMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = Encoding.UTF8.GetBytes(GameState.CharacterName) });
-                            }
-                            
-                            // Patch character level (Field 6)
-                            var levelField = detailsMsg.Fields.FirstOrDefault(f => f.FieldNumber == 6 && f.WireType == 0);
-                            if (levelField != null)
-                            {
-                                levelField.VarIntValue = GameState.CharacterLevel;
-                                Program.LogDebug($"[KTW Patch] Patched character level to: {GameState.CharacterLevel}");
-                            }
-                            else
-                            {
-                                detailsMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = GameState.CharacterLevel });
-                            }
-                            
-                            // Patch entityLook (Field 2)
-                            var lookField = detailsMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                            if (lookField != null)
-                            {
-                                try
-                                {
-                                    var lookWrapper = ProtoMessage.Parse(lookField.BytesValue);
-                                    var entityLookField = lookWrapper.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                                    
-                                    byte[] defaultLookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
-                                    byte[] entityLookBytes = defaultLookBytes;
-                                    if (GameState.LookBytes != null && GameState.LookBytes.Length > 0)
-                                    {
-                                        entityLookBytes = GameState.LookBytes;
-                                    }
-
-                                    if (entityLookField != null)
-                                    {
-                                        entityLookField.BytesValue = entityLookBytes;
-                                    }
-                                    else
-                                    {
-                                        lookWrapper.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = entityLookBytes });
-                                    }
-                                    
-                                    lookField.BytesValue = lookWrapper.ToByteArray();
-                                    Program.LogDebug("[KTW Patch] Patched EntityLook inside lookWrapper.");
-                                }
-                                catch (Exception lookEx)
-                                {
-                                    Program.LogDebug($"[-] Error patching EntityLook in KTW: {lookEx.Message}");
-                                }
-                            }
-                            
-                            detailsField.BytesValue = detailsMsg.ToByteArray();
-                        }
-                        
-                        field3.BytesValue = characterBaseInfoMsg.ToByteArray();
-                        field1.BytesValue = successMsg.ToByteArray();
-                        anyValueField.BytesValue = ktwMsg.ToByteArray();
-                        wrapperField.BytesValue = anyMsg.ToByteArray();
-                        rootField.BytesValue = wrapperMsg.ToByteArray();
-                        
-                        Program.LogDebug("[KTW Patch] Successfully patched ktw packet.");
-                        return rootMsg.ToByteArray();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Program.LogDebug($"[-] Error in PatchKtwPacket: {ex.Message}");
-            }
-            return packetPayload;
-        }
     }
 }

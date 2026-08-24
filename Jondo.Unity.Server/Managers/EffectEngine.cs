@@ -191,6 +191,24 @@ namespace Jondo.Unity.Launcher.Managers
         private const int CuraPorcentual = 1109;
 
         /// <summary>Los dos números de característica de los puntos.</summary>
+        /// <summary>
+        /// Los efectos que ROBAN vida: pegan y curan al lanzador por la mitad.
+        ///
+        /// Salen del catálogo del cliente, tal cual los describe: el 91 es «robo de agua», el 92
+        /// de tierra, el 93 de aire, el 94 de fuego, el 95 neutral y el 82 el neutral fijo. Los
+        /// 2828 y 2890 son «robo del mejor elemento» y «del peor», que eligen el elemento al
+        /// vuelo pero roban igual.
+        ///
+        /// No confundirlos con los 96 a 100, que son los daños del mismo elemento y no curan
+        /// nada. Un solo número de diferencia y el comportamiento es otro.
+        /// </summary>
+        private static readonly HashSet<int> RobosDeVida = new HashSet<int>
+        {
+            82, 91, 92, 93, 94, 95, 2828, 2890
+        };
+
+        public static bool EsRoboDeVida(int efecto) => RobosDeVida.Contains(efecto);
+
         private const int PuntosDeAccion = 1;
         private const int PuntosDeMovimiento = 23;
 
@@ -679,10 +697,25 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             // Y todo lo demás: lo que toque una característica, con el signo que diga el catálogo.
+            //
+            // El dado se TIRA. En el catálogo, diceNum es el mínimo y diceSide el máximo —hay
+            // efectos de «uno o dos PA» (1 y 2) y de «dos o tres» (2 y 3)—, y aquí se cogía
+            // siempre el mínimo, así que un hechizo que puede quitar hasta tres quitaba dos
+            // siempre. Cuando diceSide vale cero, la cantidad es fija y no hay nada que tirar.
             var (caracteristica, signo) = DatabaseManager.EffectMeta(efecto.EffectId);
             int cantidad = caracteristica != 0 && signo != 0
-                ? (efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value) * signo
+                ? DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value) * signo
                 : 0;
+
+            // Y nunca más de los que le quedan. Es lo mismo que ya hacía la rama de ROBAR puntos
+            // unas líneas más arriba, y aquí faltaba: por eso un hechizo podía dejar a un bicho
+            // sin sus seis puntos de movimiento de una vez. Además, lo que se anuncia tiene que
+            // ser lo que de verdad se ha quitado, no lo que se pretendía quitar.
+            if (cantidad < 0 && (caracteristica == PuntosDeAccion || caracteristica == PuntosDeMovimiento))
+            {
+                int quedan = caracteristica == PuntosDeAccion ? sobre.CurrentAP : sobre.CurrentMP;
+                if (-cantidad > quedan) cantidad = -quedan;
+            }
 
             // Y si NO toca ninguna característica, tampoco se tira.
             //
@@ -802,6 +835,20 @@ namespace Jondo.Unity.Launcher.Managers
         }
 
         private static readonly Random _azar = new Random();
+
+        /// <summary>
+        /// Lo que sale del dado de un efecto.
+        ///
+        /// En el catálogo del cliente, <c>diceNum</c> es el mínimo y <c>diceSide</c> el máximo:
+        /// hay efectos de «uno o dos puntos de acción» (1 y 2) y de «dos o tres» (2 y 3). Con
+        /// diceSide a cero la cantidad es fija, y con los dos a cero se usa el valor suelto.
+        /// </summary>
+        private static int DelDado(int minimo, int maximo, int valor)
+        {
+            if (minimo == 0 && maximo == 0) return valor;
+            if (maximo > minimo) return _azar.Next(minimo, maximo + 1);
+            return minimo != 0 ? minimo : valor;
+        }
 
         private static double SiguienteAzar()
         {

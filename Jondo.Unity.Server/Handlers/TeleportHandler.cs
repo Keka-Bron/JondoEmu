@@ -93,6 +93,47 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
+        /// Usar un paso registrado en el mapa donde está el personaje.
+        ///
+        /// Los tres mensajes de en medio no son adorno. El «.sun» de Giny cuelga la acción del
+        /// elemento sin quitarle su gráfico, y en el cliente 3.6 dejar sólo el iwn antes de
+        /// cambiar de mapa deja a veces el elemento marcado como ocupado en su caché: al volver,
+        /// su gráfico ya no está. Cerrar el uso, devolverlo a disponible y volver a declararlo
+        /// hace que el ciclo se pueda repetir.
+        /// </summary>
+        public static async Task UseAsync(NetworkStream stream, int elementId, int skillId)
+        {
+            long sourceMapId = SessionContext.State.MapId;
+            if (!TeleportManager.TryGet(sourceMapId, elementId, out var route))
+            {
+                Console.WriteLine($"[Teleport] Ruta desconocida: mapa {sourceMapId}, elemento {elementId}.");
+                return;
+            }
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
+                    elementId, skillId, SessionContext.State.CharacterId)));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwi,
+                    ConnectionProtocol.BuildInteractiveUseEnded(elementId, skillId)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwf,
+                    ConnectionProtocol.BuildElementState(
+                        route.SourceCellId, elementId, state: 0)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwm,
+                    ConnectionProtocol.BuildElementRedeclared(
+                        Interactives.SkillInstanceOf(elementId), skillId,
+                        elementId, route.InteractiveType, usable: true)));
+
+            int landed = await ToMapAsync(stream, route.DestinationMapId, route.DestinationCellId);
+            if (landed >= 0)
+                Console.WriteLine($"[Teleport] Elemento {elementId}: {sourceMapId} -> " +
+                                  $"{route.DestinationMapId}, casilla {landed}.");
+        }
+
+        /// <summary>
         /// Deja al personaje en ese mapa y avisa al cliente. Devuelve la casilla donde ha caído,
         /// o -1 si el mapa no sirve.
         /// </summary>

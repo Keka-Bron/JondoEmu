@@ -358,16 +358,30 @@ namespace Jondo.Unity.Launcher.Network
             new DateTimeOffset(2099, 1, 1, 0, 0, 0, DateTimeOffset.Now.Offset)
                 .ToString("yyyy-MM-ddTHH:mm:sszzz");
 
+        /// <summary>
+        /// Una trama, en crudo, al registro de tráfico.
+        ///
+        /// Esto es lo que más veces se llama de todo el servidor: dos veces por trama, una por
+        /// sentido. Y hacía lo más caro que se puede hacer por llamada —abrir el fichero,
+        /// escribir, cerrarlo— más un Directory.Exists de propina, porque la ruta se resolvía
+        /// entera cada vez. Ahora va por LogFile, que se queda con el manejador abierto.
+        ///
+        /// Se puede apagar del todo poniendo JONDO_SIN_REGISTRO_DE_TRAFICO=1 en el entorno. Por
+        /// omisión sigue encendido: es la herramienta con la que se saca el protocolo, y apagarla
+        /// por sorpresa sería quitarle a alguien lo que estaba usando.
+        /// </summary>
+        private static readonly bool SeRegistraElTrafico =
+            Environment.GetEnvironmentVariable("JONDO_SIN_REGISTRO_DE_TRAFICO") != "1";
+
         public static void LogTraffic(string direction, byte[] data, int length)
         {
+            if (!SeRegistraElTrafico) return;
+
             string hex = BitConverter.ToString(data, 0, length);
             string str = Encoding.UTF8.GetString(data, 0, length).Replace("\r", "\\r").Replace("\n", "\\n");
-            string logLine = $"[{DateTime.Now:HH:mm:ss.fff}] {direction} ({length} bytes)\nHex: {hex}\nStr: {str}\n--------------------------------------------------\n";
-            try
-            {
-                File.AppendAllText(Paths.TrafficLog, logLine);
-            }
-            catch { }
+            LogFile.Traffic.Write(
+                $"[{DateTime.Now:HH:mm:ss.fff}] {direction} ({length} bytes)\nHex: {hex}\nStr: {str}\n" +
+                "--------------------------------------------------\n");
         }
     }
 }

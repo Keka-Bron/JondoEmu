@@ -81,6 +81,23 @@ namespace Jondo.Unity.Launcher
         // Lo que se puede clicar en cada mapa, con su casilla y su dibujo, y los zaaps con su
         // mapa y su subzona. Los genera extract_interactivos.py de los bundles del cliente.
         public static string InteractiveElementsJson => Resolve("interactive_elements.json");
+
+        /// <summary>
+        /// Los pasos entre mapas, normalizados de la tabla interactive_skills de Giny 2.68. El
+        /// servidor los valida contra sus propios datos y sólo importa los que sobreviven.
+        /// </summary>
+        public static string InteractiveTeleportsJson => Resolve("interactive_teleports_giny_2.68.json");
+
+        /// <summary>
+        /// Los pasos sacados del grafo de navegación del cliente de Dofus 2.73, que los genera
+        /// tools/extraer_world_graph.py. Rellenan los huecos que el catálogo de Giny no cubre.
+        ///
+        /// Van en un fichero aparte y NO mezclados con los de Giny a propósito: éstos traen la
+        /// casilla de llegada aproximada —el grafo no la lleva— y eso tiene que poder distinguirse
+        /// de un vistazo, tanto aquí como en la columna Confidence de la base.
+        /// </summary>
+        public static string WorldGraphTeleportsJson
+            => Resolve("interactive_teleports_worldgraph_2.73.json");
         /// <summary>
         /// Routes de téléportation normalisées depuis la table interactive_skills de Giny 2.68.
         /// Le serveur les valide puis les importe dans SQLite au démarrage; les maisons restent
@@ -144,6 +161,14 @@ namespace Jondo.Unity.Launcher
                 return File.Exists(inData) ? inData : Resolve("spell_variants.json");
             }
         }
+
+        // Las 120 características con el hueco que le toca a cada una dentro del kub, sacadas
+        // de los 672 kub reales de las capturas por tools/extraer_caracteristicas_kub.py. Se
+        // abría por ruta relativa, y sin ella la ficha cae de 120 entradas a 25 sin decir nada.
+        public static string CharacteristicFieldsJson => Resolve("caracteristicas_kub.json");
+
+        // Cuántas rondas vive cada invocación. Lo que no esté medido no lleva cuenta atrás.
+        public static string SummonDurationsJson => Resolve("invocaciones_duracion.json");
 
         // The three blocks of the world entry, taken from the 3.6.10.10 capture with
         // extraer_world.py. They are separate files because the real server does not push them in

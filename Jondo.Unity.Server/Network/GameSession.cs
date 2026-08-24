@@ -18,6 +18,27 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static GameSession SinSocket() => new GameSession();
 
+        /// <summary>
+        /// El turno de esta sesión: uno cada vez.
+        ///
+        /// Lo piden lo que llega del cliente y los temporizadores de combate, para que no se
+        /// pisen el estado del combate a media ráfaga. Es DE LA SESIÓN a propósito.
+        ///
+        /// Estaba en FightHandler como un SemaphoreSlim estático, uno para las ocho conexiones, y
+        /// se sostiene durante la escritura en el socket: un cliente lento —o uno al que le da
+        /// por no leer— dejaba a todos los demás sin poder mover ficha en su propio combate hasta
+        /// que aquél terminara. El motivo que lo justificaba era que NetworkMessage partía cada
+        /// trama en dos escrituras, la longitud y el cuerpo; hoy WriteSerializedAsync monta la
+        /// trama entera en un array y la escribe de una vez, detrás de un candado POR SOCKET, así
+        /// que ese motivo ya no existe.
+        ///
+        /// Cuando haya combates de grupo esto se quedará corto —dos sesiones tocando un mismo
+        /// FightInstance— y hará falta un candado por combate. Hoy cada combate es de un jugador
+        /// solo (LeaveFight busca los combates donde está ÉL), así que no se adelanta trabajo que
+        /// todavía no se puede probar.
+        /// </summary>
+        public SemaphoreSlim UnoCadaVez { get; } = new SemaphoreSlim(1, 1);
+
         public Guid Id { get; } = Guid.NewGuid();
         public DateTime ConnectedAtUtc { get; } = DateTime.UtcNow;
         public NetworkStream? Stream { get; }

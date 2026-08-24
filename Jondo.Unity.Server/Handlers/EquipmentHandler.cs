@@ -60,7 +60,7 @@ namespace Jondo.Unity.Launcher.Handlers
             foreach (var evicted in Managers.Equipment.Occupants(position, uid))
             {
                 evicted.Position = Bag;
-                DatabaseManager.SaveItemPosition(evicted.Uid, Bag);
+                DatabaseManager.SaveItemPosition(evicted.Uid, Bag, SessionContext.State.CharacterId);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
@@ -73,7 +73,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // replayed from the capture, and those uids are not in our database. The move is
             // answered either way, which is what the real server does, and it is written down when
             // it is an item we actually hold.
-            DatabaseManager.SaveItemPosition(uid, position);
+            DatabaseManager.SaveItemPosition(uid, position, SessionContext.State.CharacterId);
             bool known = Managers.Equipment.Move(uid, position);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

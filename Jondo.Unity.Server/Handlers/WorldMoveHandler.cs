@@ -203,6 +203,9 @@ namespace Jondo.Unity.Launcher.Handlers
             int arrival = Landing(target, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, way);
             long oldMapId = SessionContext.State.MapId;
 
+            // El mapa cambia: lo que estuviera abierto en el anterior deja de estarlo.
+            NpcHandler.Forget();
+
             Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
             Jondo.Unity.Launcher.Network.SessionContext.State.CellId = arrival;
             Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = FacingFor(way, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);

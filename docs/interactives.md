@@ -98,12 +98,13 @@ registry.
 | Bin | Graphics 8438, 46529, 63081, 260022 | 105 | 153 | `BinHandler` |
 | HouseDoor | Any of 37 graphics the captures declare type 300 | 300 | 84 | `HouseHandler` |
 | HouseExit | The chosen exit element of a house interior | 316 | 184 | `HouseHandler` |
-| Teleport | Exact `(mapId, elementId)` retained from Giny after 3.6 validation | 0 | 114 | `TeleportHandler` |
+| Teleport | Exact `(mapId, elementId)` kept from Giny 2.68 after 3.6 validation | 0 | 114 | `TeleportHandler` |
 
 Every one of those `(type, skill)` pairs is measured, not chosen: `tools/tipos_interactivos.py`
 cross-references the 304 packet captures against the client's element dump and yields
-`graphic → type` for 415 graphics. With the validated generic teleport routes, **3,576 elements
-are registered** at startup in the current data set.
+`graphic → type` for 415 graphics. **30,706 elements are registered** at startup: 26,987 of them
+zaaps, chests, bins, house doors and gatherable resources, plus 3,719 generic teleport routes
+(section 11).
 
 Two of those rows deserve a note.
 
@@ -424,66 +425,104 @@ protocol truth.
 
 ## 11. Generic teleport routes imported from Giny
 
-Generic map passages deliberately exclude houses. A house entrance uses `jqw`, remembers the
-outside map in the player's session and remains owned by `Houses`/`HouseHandler`; treating it as a
-plain `jru` teleport would lose that protocol and return state.
+Houses are deliberately excluded. A house entrance uses `jqw`, remembers the outside map in the
+player's session and stays owned by `Houses`/`HouseHandler`; treating one as a plain `jru` teleport
+would lose both that protocol and the return state.
 
-`generate_interactive_teleports.ps1` reads the phpMyAdmin export
-`datos/interactive_skills_Giny_Table.json`, keeps rows whose action is `Teleport`, and joins each
-one against the 3.6 `interactive_elements.json` by the exact `(mapId, elementId)` pair. It removes
-all exterior house doors and interior house exits listed in `casas_mundo_3.6.10.10.json`, merges
-identical duplicates and disables every source element for which Giny gives conflicting targets.
-The generated, versioned result is `datos/interactive_teleports_giny_2.68.json`.
+The routes come from a phpMyAdmin export of Giny 2.68's `interactive_skills` table. Rows whose
+action is `Teleport` are joined against the 3.6 `interactive_elements.json` by the exact
+`(mapId, elementId)` pair, house doors and interior exits are removed, identical duplicates are
+merged, and any source element for which Giny gives conflicting targets is disabled. The result is
+the versioned `datos/interactive_teleports_giny_2.68.json`.
 
-The current generation contains 1,679 candidate routes: 1,624 are unambiguous in the JSON, 15
-house rows were excluded, and 20 source keys remain as disabled ambiguous candidates. Startup then
-performs the 3.6 runtime checks that the offline generator cannot finish: the source element's cell
-and graphic must still match, the destination map must exist, the target cell must be in the Dofus
-cell range, and the element must not already be a zaap, zaapi, chest, lottery machine or bin.
+**Why a Dofus 2 dump works at all.** Dofus 3 inherited the map- and element-id space from Dofus 2.
+4,657 of the 5,124 distinct maps in the dump (91 %) exist in this emulator's `world.db`, and every
+cell id in it falls inside 0–559. The ids are not the problem; stale routes are, and those are what
+the validation removes.
 
-`TeleportManager.Initialize` transactionally replaces `InteractiveTeleports` from that JSON and
-reloads only `Enabled=1` rows into immutable indexes by map and `(map, element)`. Every validated
-Giny teleport row carrying an `ElementId` is a clickable interactive by default, regardless of
-whether its route enters or leaves a building. Every route is also indexed by `(map, sourceCell)`
-to reproduce Giny's end-of-movement activation. There is no inference based on indoor/outdoor maps
-or graphic families. Invalid and
-ambiguous rows stay in SQLite with a `ValidationStatus` so they can be audited; a bad import rolls
-back and preserves the previous catalogue. With the current world database, 1,586 routes pass all
-checks.
+The file holds **1,678 candidate routes, 1,623 of them marked enabled**. Startup then runs the 3.6
+checks the offline join cannot do: the source element's cell and graphic must still match, the
+destination map must exist, the target cell must be in range, and the element must not already be a
+zaap, zaapi, chest, lottery machine or bin. **1,585 survive** — the rest fall to 55 ambiguous
+sources and 37 destination maps that no longer exist.
 
-`InteractiveRegistry` declares the element-activated routes with skill 114. Their type is taken from
-`tipos_interactivos_3.6.10.10.json` when that capture-derived graphic mapping is unambiguous; its
-generic sentinel `uint64` max is normalized to -1. Unknown graphics keep Giny's type 0 as a
-fallback. Type 316 is reserved for Jondo's house-exit protocol and is not reused for ordinary
-buildings. On an `iwo`,
-`InteractiveActionHandler` resolves the exact registered element and calls `TeleportHandler`, which
-sends `iwn`, updates only the current session, persists the character, announces departure to the
-old map, then sends `jsd`, `jru`, `lqu` and `hjk`. The client requests the destination `jss` itself.
+`TeleportManager.Initialize` transactionally replaces the `InteractiveTeleports` table from that
+JSON and reloads only `Enabled=1` rows into immutable indexes. Rejected rows stay in SQLite with
+their `ValidationStatus`, so a route that disappears can be looked up rather than guessed at. Note
+that the table is rebuilt from the JSON on **every** start: editing a row by hand does nothing.
 
-For every imported route, `ElementId` is the interactive activation rule. `InteractiveRegistry`
-declares every element in both `f11` (type and skill 114) and `f15` (state and source cell), so a
-click produces `iwo` whether the graphic is a small sun, a stair, a door or another passage. No gfx
-classification is required. The same route is indexed by its exact source cell: when movement ends
-on it and the client sends `jqi`, `WorldMoveHandler` resolves `(MapId, SourceCellId)` and executes the
-same destination. This mirrors Giny `Character.EndMove()`, which finds a Teleport element on the
-arrival cell and calls the same `UseInteractive` used by a click. All imported teleport actions use
-the generic `USE114` skill and interactive type `0`, exactly as Giny's `.sun` command does. The
-`GfxId` is never used as the interactive type: it remains the map graphic attached to the element.
+`InteractiveRegistry` declares each route with skill 114 and interactive type 0, exactly as Giny's
+`.sun` command does. The `GfxId` is never used as the interactive type — it stays the map graphic
+attached to the element. On an `iwo`, `InteractiveActionHandler` resolves the registered element and
+calls `TeleportHandler.UseAsync`, which sends `iwn`, then `iwi`, an `iwf` state 0 and an enabled
+`iwm` before loading the destination. Those three are not decoration: leaving only the `iwn` lets
+the client cache the element as busy, and its graphic is gone the next time the player returns.
 
-The graphic itself is never created or removed by the teleport route. As in Giny's `.sun` command,
-the route attaches a skill to an element already present in the map data; startup validates the
-exact `(MapId, ElementId, SourceCellId, GfxId)` tuple before enabling it. Jondo includes that element
-again in every map `jss` through its `f11` declaration and `f15` state. Instant teleport use sends
-`iwn`, then closes and resets the element with `iwi`, `iwf` state 0 and an enabled `iwm` declaration
-before loading the destination. This prevents the client from caching the gfx as busy and hiding it
-when the player enters the same building a second time.
+### Jondo behaviour retained during the upstream merge
 
-Map snapshots also keep visual presence separate from usability. `f11` is emitted only for elements
-with a registered action, while an active `f15` placement is emitted for every element found in
-`interactive_elements.json`. The client resolves the actual `GfxId` from its map data using that
-`ElementId`; consequently an element without a skill remains visible but is not clickable. Registered
-teleports receive both records and are therefore always visible and clickable.
+Routes remain indexed by `(map, sourceCell)`. `WorldMoveHandler` checks this index when it receives
+the movement-end `jqi` and reuses the same destination as an ElementId click. If no route matches,
+the normal `jsq`/`jqk` map-edge flow continues unchanged.
 
-The regression guard pins the Astrub example: map 191106048, element 515837, graphic 63662 must
-lead to map 192416776, requested cell 534. Landing uses `MapManager.GetNearestWalkableCell`, so an
-old edge cell that is no longer walkable cannot strand the character.
+Every map snapshot declares its teleport routes directly from `TeleportManager`: an `f11` carrying
+the exact ElementId and `USE114` makes the route clickable, and an active `f15` places that element
+on its source cell so the client can recover its GfxId from the map data. The generic registry then
+declares the other actions without duplicating those routes. Finally, every remaining element from
+`interactive_elements.json` receives an `f15`; an element can therefore stay visible even when no
+action is attached to it.
+
+### What the guard pins
+
+Three concrete routes, with their numbers, so a change in the catalogue cannot pass unnoticed:
+Astrub to the temple (191106048/515837 → 192416776 cell 534), the Astrub jeweller workshop round
+trip, and a **stair** (graphic 62018) that takes exactly the same generic path as a sun — which is
+the point: the graphic never decides anything. On top of that, every route must resolve to a
+clickable `f11`/`f15` interactive, and the total element count must match, which is what makes an
+accidental collision with a house door or a resource stop the server instead of corrupting a map.
+
+Landing uses `MapManager.GetNearestWalkableCell`, so a destination cell that is no longer walkable
+cannot strand the character. 314 of the routes (20 %) do land on a non-walkable cell and are
+rescued that way, which means one route in five puts the character slightly off the mark.
+
+### A second catalogue: the Dofus 2.73 world graph
+
+Giny's table covers 1,585 routes. A second source fills part of the rest: `world-graph.binary`,
+the navigation graph the Dofus 2 client uses to plan routes across the world. It is parsed by
+`tools/extraer_world_graph.py` into `datos/interactive_teleports_worldgraph_2.73.json`, which
+`TeleportManager` imports after Giny's — Giny always wins a conflict, because it carries a
+measured arrival cell and the graph does not.
+
+The format was worked out by hand and is documented in the tool. It holds 30,742 edges and 31,103
+transitions; **5,719 of them are interactive** (type 32, skill 184). Three independent checks say
+the reading is right: the parser lands **exactly** on the last byte of the file; every cell in it
+falls inside 0–559; and where the graph and Giny describe the same route, **1,091 of 1,105 agree
+on the source cell** and none agrees with the destination cell — which is also how we know the
+graph's cell is the source one.
+
+The graph carries an element id per interactive transition, and **5,563 of 5,719 match one of our
+own elements on the very same cell**, so routes are keyed by element and not guessed from geometry.
+
+**What it does not carry is the arrival cell.** It says which map you end up on, not where you
+appear. That is approximated with the cell of the element that makes the return trip, and the
+server snaps it to a walkable cell on landing. Measured against the 884 routes where Giny does give
+the exact cell: 71 % land within one cell, 90 % within two, 96 % within three. Good enough to put
+the character somewhere sensible, not good enough to be called exact — which is why those rows
+carry `confidence = reverse-element-approx` and stay in their own file.
+
+Routes with no return path are dropped rather than guessed: 1,357 of them. Together with 764 whose
+maps are not in our world, 1,196 already covered by Giny and a handful of mismatches, **2,137
+usable routes** come out of the graph, of which 2,134 survive import. Total: **3,719 active routes
+across 2,655 maps.**
+
+### Why none of this comes from the 3.6.10.10 client
+
+It was looked for, and it is not there. The client ships the whole machinery —
+`Core.PathFinding.WorldPathfinding` with `Vertex`, `Edge`, `Transition`, `AStar` and
+`PathFindingData`, names and source paths perfectly readable in the IL2CPP metadata — but not the
+graph itself. None of the ~200 `DataRoot` assets it distributes holds transitions or destinations.
+Each map bundle gives every interactive its `m_interactionId`, `cellId` and `gfxId` — who it is,
+where it stands and what it looks like — but never where it leads.
+
+So a teleport destination is server data. That is why a Dofus 2 dump is the only practical source,
+and why chasing a deobfuscated build would not help: the names are not the obstacle, the absence of
+the data is.

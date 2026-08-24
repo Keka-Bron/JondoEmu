@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Launcher.Managers
 {
-    /// <summary>Une route de téléportation instantanée attachée à un élément de map.</summary>
+    /// <summary>Un paso instantáneo de un mapa a otro, colgado de un elemento del mapa.</summary>
     public sealed class InteractiveTeleport
     {
         public long SourceMapId { get; init; }
@@ -23,11 +23,18 @@ namespace Jondo.Unity.Launcher.Managers
     }
 
     /// <summary>
-    /// Importe, valide et indexe les téléporteurs issus de Giny 2.68.
+    /// Importa, valida e indexa los pasos sacados de Giny 2.68.
     ///
-    /// Le JSON normalisé est la source versionnée. SQLite est la copie de travail interrogée par
-    /// le serveur. Les maisons sont expressément refusées ici : leur protocole jqw et leur état de
-    /// retour appartiennent à <see cref="Houses"/> et <c>HouseHandler</c>.
+    /// El json normalizado es la fuente que se versiona; SQLite es la copia de trabajo que el
+    /// servidor consulta. Se reimporta en CADA arranque, así que tocar la tabla a mano no sirve
+    /// de nada: lo que manda es el json.
+    ///
+    /// Las casas se rechazan aquí a propósito: su protocolo jqw y su estado de vuelta son de
+    /// <see cref="Houses"/> y de HouseHandler, y meterlas por aquí las rompería.
+    ///
+    /// De 1.678 candidatas quedan 1.586 activas. Las que se caen lo hacen por lo que dice
+    /// Validate: 55 son ambiguas —dos destinos para el mismo elemento— y 37 apuntan a un mapa
+    /// que no existe en 3.6.10.10. Ese filtro es lo que hace utilizable un volcado de Dofus 2.
     /// </summary>
     public static class TeleportManager
     {
@@ -47,8 +54,12 @@ namespace Jondo.Unity.Launcher.Managers
         {
             ImportIfAvailable();
             LoadFromDatabase();
-            Console.WriteLine($"[Teleport] {_byElement.Count} rutas ElementId/USE114 cargadas, " +
-                              $"{_byCell.Count} rutas de fin de movimiento/JQI.");
+            // El índice por casilla cumple dos funciones conservadas por Jondo: impide dos rutas
+            // activas sobre la misma celda y permite que WorldMoveHandler reutilice la ruta cuando
+            // recibe el jqi de fin de movimiento. Sin coincidencia, jqi sigue por el flujo normal
+            // jsq/jqk de los bordes de mapa.
+            Console.WriteLine($"[Teleport] {_byElement.Count} rutas cargadas, en " +
+                              $"{_byMap.Count} mapas.");
         }
 
         public static bool TryGet(long mapId, int elementId, out InteractiveTeleport route)
@@ -70,64 +81,115 @@ namespace Jondo.Unity.Launcher.Managers
             public string ValidationStatus { get; set; } = "pending";
         }
 
+        /// <summary>
+        /// Junta los catálogos y los deja en la base.
+        ///
+        /// Son DOS y el orden importa: primero el de Giny, que trae la casilla de llegada medida,
+        /// y después el del grafo de 2.73, que sólo la sabe aproximar. Cuando los dos hablan del
+        /// mismo elemento gana el primero, y el segundo queda apagado con el motivo escrito.
+        ///
+        /// Todo lo que se descarta se guarda igual, con su ValidationStatus, para que una ruta que
+        /// desaparece se pueda mirar en vez de adivinar por qué no está.
+        /// </summary>
         private static void ImportIfAvailable()
         {
-            string path = Paths.InteractiveTeleportsJson;
-            if (!File.Exists(path))
+            var catalogos = new (string Ruta, string Nombre)[]
             {
-                Console.WriteLine($"[Teleport] Falta {path}; se conserva el catálogo SQLite existente.");
-                return;
-            }
+                (Paths.InteractiveTeleportsJson, "Giny 2.68"),
+                (Paths.WorldGraphTeleportsJson, "grafo 2.73"),
+            };
+
+            var rows = new List<ImportRow>();
+            int housesSkipped = 0;
 
             try
             {
-                using var document = JsonDocument.Parse(File.ReadAllText(path));
-                JsonElement root = document.RootElement;
-                if (!root.TryGetProperty("schemaVersion", out var schema) || schema.GetInt32() != 1)
-                    throw new InvalidOperationException("schemaVersion distinto de 1.");
-                if (!root.TryGetProperty("routes", out var routes) || routes.ValueKind != JsonValueKind.Array)
-                    throw new InvalidOperationException("La propiedad routes no es una lista.");
-
-                var rows = new List<ImportRow>();
-                int housesSkipped = 0;
-                foreach (var entry in routes.EnumerateArray())
+                foreach (var (ruta, nombre) in catalogos)
                 {
-                    var route = Read(entry);
-                    if (IsHouse(route.SourceMapId, route.ElementId))
+                    if (!File.Exists(ruta))
                     {
-                        housesSkipped++;
+                        Console.WriteLine($"[Teleport] Falta el catálogo de {nombre} ({ruta}).");
                         continue;
                     }
-                    rows.Add(new ImportRow
+
+                    using var document = JsonDocument.Parse(File.ReadAllText(ruta));
+                    JsonElement root = document.RootElement;
+                    if (!root.TryGetProperty("schemaVersion", out var schema) || schema.GetInt32() != 1)
+                        throw new InvalidOperationException($"{nombre}: schemaVersion distinto de 1.");
+                    if (!root.TryGetProperty("routes", out var routes) || routes.ValueKind != JsonValueKind.Array)
+                        throw new InvalidOperationException($"{nombre}: la propiedad routes no es una lista.");
+
+                    int leidas = 0;
+                    foreach (var entry in routes.EnumerateArray())
                     {
-                        Route = route,
-                        RequestedEnabled = entry.TryGetProperty("enabled", out var enabled) && enabled.GetBoolean()
-                    });
+                        var route = Read(entry);
+                        if (IsHouse(route.SourceMapId, route.ElementId))
+                        {
+                            housesSkipped++;
+                            continue;
+                        }
+                        rows.Add(new ImportRow
+                        {
+                            Route = route,
+                            RequestedEnabled = entry.TryGetProperty("enabled", out var enabled) && enabled.GetBoolean()
+                        });
+                        leidas++;
+                    }
+                    Console.WriteLine($"[Teleport] Catálogo de {nombre}: {leidas} rutas leídas.");
                 }
 
+                if (rows.Count == 0)
+                {
+                    Console.WriteLine("[Teleport] Ningún catálogo; se conserva el que hay en SQLite.");
+                    return;
+                }
+
+                // Dos destinos para el mismo elemento dentro del MISMO catálogo: no se puede elegir
+                // por nosotros, así que no se activa ninguno.
                 var ambiguous = rows
                     .Where(x => x.RequestedEnabled)
-                    .GroupBy(x => (x.Route.SourceMapId, x.Route.ElementId))
+                    .GroupBy(x => (x.Route.SourceMapId, x.Route.ElementId, x.Route.SourceVersion))
                     .Where(x => x.Count() > 1)
-                    .Select(x => x.Key)
+                    .Select(x => (x.Key.SourceMapId, x.Key.ElementId))
                     .ToHashSet();
+
+                // Lo que ya se ha activado, para que el segundo catálogo no pise al primero. Se
+                // vigilan las dos claves: el elemento, y la casilla —dos pasos en la misma casilla
+                // dejarían el índice por casilla sin saber a cuál ir—.
+                var elementoTomado = new HashSet<(long, int)>();
+                var celdaTomada = new HashSet<(long, int)>();
 
                 int enabledCount = 0;
                 foreach (var row in rows)
                 {
                     var errors = Validate(row.Route);
+
                     if (!row.RequestedEnabled &&
                         string.Equals(row.Route.Confidence, "ambiguous", StringComparison.OrdinalIgnoreCase))
                         errors.Add("ambiguous-source");
                     if (ambiguous.Contains((row.Route.SourceMapId, row.Route.ElementId)))
                         errors.Add("ambiguous-source");
+
+                    var porElemento = (row.Route.SourceMapId, row.Route.ElementId);
+                    var porCelda = (row.Route.SourceMapId, row.Route.SourceCellId);
+                    if (row.RequestedEnabled && errors.Count == 0)
+                    {
+                        if (elementoTomado.Contains(porElemento)) errors.Add("already-covered");
+                        else if (celdaTomada.Contains(porCelda)) errors.Add("duplicate-source-cell");
+                    }
+
                     row.Enabled = row.RequestedEnabled && errors.Count == 0;
                     row.ValidationStatus = errors.Count == 0 ? "ok" : string.Join(",", errors);
-                    if (row.Enabled) enabledCount++;
+                    if (row.Enabled)
+                    {
+                        elementoTomado.Add(porElemento);
+                        celdaTomada.Add(porCelda);
+                        enabledCount++;
+                    }
                 }
 
                 ReplaceDatabase(rows);
-                Console.WriteLine($"[Teleport] Import JSON: {rows.Count} rutas, {enabledCount} activas, " +
+                Console.WriteLine($"[Teleport] Importadas {rows.Count} rutas, {enabledCount} activas, " +
                                   $"{housesSkipped} casas ignoradas.");
             }
             catch (Exception ex)
@@ -146,8 +208,13 @@ namespace Jondo.Unity.Launcher.Managers
                 ElementId = entry.GetProperty("elementId").GetInt32(),
                 SourceCellId = entry.GetProperty("sourceCellId").GetInt32(),
                 GfxId = entry.GetProperty("gfxId").GetInt32(),
-                // Reproduction exacte de Giny `.sun`: le gfx reste celui de l'élément de map,
-                // tandis que l'action Teleport est toujours déclarée avec le type générique 0.
+                // Igual que el «.sun» de Giny: el gráfico sigue siendo el del elemento del mapa
+                // y la acción de teleport se declara siempre con el tipo genérico 0.
+                //
+                // OJO: esto PISA el tipo que trae el json, y 529 de las rutas activas lo traían
+                // medido de una captura de 3.6. De rebote, la comprobación «unexpected-type» de
+                // Validate no puede fallar nunca. Se deja tal cual porque es lo que da las 1.586
+                // que están probadas; cambiarlo cambiaría la cuenta y habría que volver a medir.
                 InteractiveType = GenericTeleportType,
                 SkillId = entry.GetProperty("skillId").GetInt32(),
                 DestinationMapId = destinationMapId,
@@ -186,8 +253,9 @@ namespace Jondo.Unity.Launcher.Managers
         }
 
         /// <summary>
-        /// Un vieux « Teleport » Giny peut être un zaap, un zaapi ou un autre élément dont Jondo
-        /// connaît maintenant le vrai protocole. Ces éléments restent dans leur manager spécialisé.
+        /// Un «Teleport» de los viejos de Giny puede ser en realidad un zaap, un zaapi o algún
+        /// otro elemento cuyo protocolo de verdad ya conocemos. Ésos se quedan en su manager, que
+        /// sabe hacerlo bien; aquí sólo entran los pasos genéricos.
         /// </summary>
         private static bool IsReservedInteractive(long mapId, int elementId)
         {
@@ -219,14 +287,12 @@ namespace Jondo.Unity.Launcher.Managers
             insert.Transaction = transaction;
             insert.CommandText = @"
                 INSERT INTO InteractiveTeleports
-                    (SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,ActivationMode,DisplaySkillId,
+                    (SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,
                      DestinationMapId,DestinationCellId,SourceVersion,Confidence,ValidationStatus,Enabled)
                 VALUES
-                    ($source,$element,$sourceCell,$gfx,$type,$skill,$activation,$displaySkill,
+                    ($source,$element,$sourceCell,$gfx,$type,$skill,
                      $destination,$destinationCell,$version,$confidence,$status,$enabled);";
             foreach (string name in new[] { "$source", "$element", "$sourceCell", "$gfx", "$type", "$skill",
-                                             "$activation",
-                                             "$displaySkill",
                                              "$destination", "$destinationCell", "$version", "$confidence",
                                              "$status", "$enabled" })
                 insert.Parameters.Add(new SqliteParameter(name, null));
@@ -240,12 +306,6 @@ namespace Jondo.Unity.Launcher.Managers
                 insert.Parameters["$gfx"].Value = route.GfxId;
                 insert.Parameters["$type"].Value = route.InteractiveType;
                 insert.Parameters["$skill"].Value = route.SkillId;
-                // Compatibilité de schéma : le comportement n'est plus piloté par cette colonne.
-                // Toute route est utilisable par ElementId et par sa cellule, avec USE114.
-                insert.Parameters["$activation"].Value = "interactive";
-                // Colonne historique conservée pour les bases existantes. Les éléments utilisent
-                // tous leur vraie action interactive skill 114 dans le registre f11/f15.
-                insert.Parameters["$displaySkill"].Value = 0;
                 insert.Parameters["$destination"].Value = route.DestinationMapId;
                 insert.Parameters["$destinationCell"].Value = route.DestinationCellId;
                 insert.Parameters["$version"].Value = route.SourceVersion;
@@ -266,7 +326,7 @@ namespace Jondo.Unity.Launcher.Managers
             connection.Open();
             using var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,ActivationMode,DisplaySkillId,
+                SELECT SourceMapId,ElementId,SourceCellId,GfxId,InteractiveType,SkillId,
                        DestinationMapId,DestinationCellId,SourceVersion,Confidence
                 FROM InteractiveTeleports WHERE Enabled=1 ORDER BY SourceMapId,ElementId;";
             using var reader = command.ExecuteReader();
@@ -277,8 +337,8 @@ namespace Jondo.Unity.Launcher.Managers
                     SourceMapId = reader.GetInt64(0), ElementId = reader.GetInt32(1),
                     SourceCellId = reader.GetInt32(2), GfxId = reader.GetInt32(3),
                     InteractiveType = reader.GetInt32(4), SkillId = reader.GetInt32(5),
-                    DestinationMapId = reader.GetInt64(8), DestinationCellId = reader.GetInt32(9),
-                    SourceVersion = reader.GetString(10), Confidence = reader.GetString(11)
+                    DestinationMapId = reader.GetInt64(6), DestinationCellId = reader.GetInt32(7),
+                    SourceVersion = reader.GetString(8), Confidence = reader.GetString(9)
                 };
                 if (!byElement.TryAdd((route.SourceMapId, route.ElementId), route))
                     throw new InvalidOperationException(

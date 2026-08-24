@@ -237,22 +237,6 @@ namespace Jondo.Unity.Launcher.Handlers
             return jpvMsg;
         }
 
-        public static async Task HandleLoy(NetworkStream stream)
-        {
-            // Server must ACK with kmw (empty packet)
-            byte[] rawKmw = NetworkEnvelope.ConvertHexStringToByteArray("0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-6B-6D-77");
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, rawKmw);
-            LogDebug("[Game Node] Received loy (world load ack) - Sent kmw response.");
-        }
-
-        public static async Task HandleLpj(NetworkStream stream)
-        {
-            // Server must ACK with jfc (empty packet)
-            byte[] rawJfc = NetworkEnvelope.ConvertHexStringToByteArray("0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-6A-66-63");
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, rawJfc);
-            LogDebug("[Game Node] Received lpj (secondary ready signal) - Sent jfc response.");
-        }
-
         private static ProtoMessage BuildNpcActorMsg(Managers.Npcs.Spawn spawn)
         {
             // 1. Build Disposition (LFJ)

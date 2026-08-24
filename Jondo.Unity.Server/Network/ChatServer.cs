@@ -39,7 +39,7 @@ namespace Jondo.Unity.Launcher.Network
                 Console.WriteLine($"[-] Error generating certificate: {ex.Message}");
             }
 
-            _listener = new TcpListener(IPAddress.Any, port);
+            _listener = new TcpListener(ServerBinding.TcpAddress, port);
             _listener.Start();
 
             Console.ForegroundColor = ConsoleColor.Green;
@@ -130,12 +130,12 @@ namespace Jondo.Unity.Launcher.Network
                             break;
                         }
 
-                        string hex = BitConverter.ToString(buffer, 0, read);
+                        // El volcado en hexadecimal se quitó: era la misma trama otra vez y
+                        // sin censurar, y por aquí pasa el token de entrada al chat.
                         string ascii = Encoding.ASCII.GetString(buffer, 0, read);
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"[Chat Server] Received {read} bytes decrypted.");
-                        Console.WriteLine($"[Chat Server] Hex: {hex}");
-                        Console.WriteLine($"[Chat Server] ASCII: {ascii}");
+                        Console.WriteLine($"[Chat Server] ASCII: {Censura.Cuerpo(ascii)}");
                         Console.ResetColor();
 
                         // Respond to client authentication message

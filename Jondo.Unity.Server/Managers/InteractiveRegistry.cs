@@ -22,7 +22,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>La puerta de dentro, la que devuelve a la calle.</summary>
         HouseExit,
 
-        /// <summary>Un passage instantané entre deux maps, hors système des maisons.</summary>
+        /// <summary>Un paso instantáneo entre dos mapas, fuera del sistema de casas.</summary>
         Teleport,
 
         /// <summary>Un recurso de oficio: trigo, fresno, caladero, mineral.</summary>
@@ -158,13 +158,13 @@ namespace Jondo.Unity.Launcher.Managers
                          Houses.ExitType, InteractiveActionKind.HouseExit, Houses.ExitSkill);
             }
 
-            // Les maisons ont leur protocole jqw propre et sont enregistrées au-dessus. Ce bloc ne
-            // contient que les passages génériques validés et activés par TeleportManager.
+            // Los pasos entre mapas. Las casas ya han pasado por arriba con su protocolo jqw;
+            // aquí sólo entran los genéricos que TeleportManager ha validado y dejado activos.
+            //
+            // Regla de Giny: todo elemento con teleport es clicable, sea el gráfico un sol, una
+            // escalera o una puerta. Todos se declaran igual y se resuelven por su ElementId.
             foreach (var route in TeleportManager.All)
             {
-                // Règle Giny : tout ElementId de téléportation est un interactif cliquable. Le
-                // graphique peut être un soleil, un escalier, une porte ou autre chose : ils sont
-                // tous déclarés en f11 + f15 et résolus par leur ElementId lors du iwo.
                 Register(route.SourceMapId,
                          new Interactives.Element(route.ElementId, route.SourceCellId, route.GfxId),
                          route.InteractiveType, InteractiveActionKind.Teleport, route.SkillId);

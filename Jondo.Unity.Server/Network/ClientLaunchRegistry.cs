@@ -125,7 +125,12 @@ namespace Jondo.Unity.Launcher.Network
         {
             if (string.IsNullOrWhiteSpace(token)) return 0;
             if (Tokens.TryGetValue(token, out long accountId)) return accountId;
-            return DatabaseManager.GetAccountIdByToken(token);
+
+            // La sesión del lanzador primero: el token de juego se lo rota el cliente cada vez que
+            // arranca, así que el que el lanzador guardó de la vez anterior sólo sigue estando en
+            // su columna.
+            long suya = DatabaseManager.GetAccountIdByLauncherToken(token);
+            return suya != 0 ? suya : DatabaseManager.GetAccountIdByToken(token);
         }
 
         public static bool IsActive(long accountId) => ByAccount.ContainsKey(accountId);

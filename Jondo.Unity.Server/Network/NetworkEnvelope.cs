@@ -77,6 +77,7 @@ namespace Jondo.Unity.Launcher.Network
                     if (fieldNum == 3 && wireType == 2)
                     {
                         uint length = ReadVarInt(rootMsgBytes, ref pos);
+                        if (length > (uint)(rootMsgBytes.Length - pos)) return null;
                         wrapperBytes = new byte[length];
                         Array.Copy(rootMsgBytes, pos, wrapperBytes, 0, length);
                         break;
@@ -100,6 +101,7 @@ namespace Jondo.Unity.Launcher.Network
                     if (fieldNum == 1 && wireType == 2)
                     {
                         uint length = ReadVarInt(wrapperBytes, ref pos);
+                        if (length > (uint)(wrapperBytes.Length - pos)) return null;
                         anyBytes = new byte[length];
                         Array.Copy(wrapperBytes, pos, anyBytes, 0, length);
                         break;
@@ -174,6 +176,7 @@ namespace Jondo.Unity.Launcher.Network
                     if (fieldNum == 1 && wireType == 2)
                     {
                         uint len = ReadVarInt(fullFrame, ref pos);
+                        if (len > (uint)(fullFrame.Length - pos)) return null;
                         envelopeBytes = new byte[len];
                         Array.Copy(fullFrame, pos, envelopeBytes, 0, len);
                         pos += (int)len;
@@ -198,6 +201,7 @@ namespace Jondo.Unity.Launcher.Network
                     if (fieldNum == 2 && wireType == 2)
                     {
                         uint len = ReadVarInt(envelopeBytes, ref pos);
+                        if (len > (uint)(envelopeBytes.Length - pos)) return null;
                         anyBytes = new byte[len];
                         Array.Copy(envelopeBytes, pos, anyBytes, 0, len);
                         pos += (int)len;
@@ -378,6 +382,15 @@ namespace Jondo.Unity.Launcher.Network
             }
         }
 
+        /// <summary>
+        /// Salta el campo que hay en pos.
+        ///
+        /// Todos los saltos acaban al final del buffer como muy lejos. Antes «pos += (int)len»
+        /// con una longitud inventada podia dejar pos NEGATIVO, y quien llama recorre con
+        /// «while (pos < bytes.Length)»: el bucle no terminaba nunca. Y un tipo de cable de los
+        /// que no se usan lanzaba una excepcion en mitad del enrutado. Las dos cosas terminan
+        /// ahora poniendo pos al final, que es lo que se hace con lo que no se entiende.
+        /// </summary>
         public static void SkipField(byte[] bytes, int wireType, ref int pos)
         {
             if (wireType == 0)
@@ -386,20 +399,20 @@ namespace Jondo.Unity.Launcher.Network
             }
             else if (wireType == 1)
             {
-                pos += 8;
+                pos = pos + 8 > bytes.Length ? bytes.Length : pos + 8;
             }
             else if (wireType == 2)
             {
                 uint len = ReadVarInt(bytes, ref pos);
-                pos += (int)len;
+                pos = len > (uint)(bytes.Length - pos) ? bytes.Length : pos + (int)len;
             }
             else if (wireType == 5)
             {
-                pos += 4;
+                pos = pos + 4 > bytes.Length ? bytes.Length : pos + 4;
             }
             else
             {
-                throw new InvalidDataException($"Unsupported wire type: {wireType}");
+                pos = bytes.Length;
             }
         }
 

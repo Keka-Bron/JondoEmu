@@ -1455,9 +1455,12 @@ namespace Jondo.Unity.Launcher.Network
                 .Build();
 
         /// <summary>
-        /// Fin immédiate d'utilisation d'un interactif (iwi). Même forme que la fin de récolte :
-        /// f1 est l'ElementId et f3 le skill. Un téléporteur instantané doit être libéré avant le
-        /// jru, sinon le client peut conserver son gfx en état occupé lors du retour sur la map.
+        /// Se acabó de usar un interactivo (iwi). Misma forma que el fin de recolección: el f1 es
+        /// el elemento y el f3 la habilidad.
+        ///
+        /// Un teleport es instantáneo, pero hay que soltarlo igual ANTES del jru: si no, el
+        /// cliente se puede quedar con el elemento marcado como ocupado en su caché y al volver
+        /// al mapa su gráfico ya no aparece.
         /// </summary>
         public static byte[] BuildInteractiveUseEnded(int elementId, int skillId)
             => Pb.New().Var(1, elementId).Var(3, skillId).Build();

@@ -437,8 +437,32 @@ public static class Op
     /// <summary>Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.</summary>
     public const string Joh = "joh";
 
+    /// <summary>Movimiento por el mapa fuera de combate: el camino que pide el cliente al andar.</summary>
+    public const string Joi = "joi";
+
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Jol = "jol";
+
+    /// <summary>
+    /// Va vacío y en pareja con <see cref="Lqt"/>, una sola vez por combate y justo antes del kai.
+    /// Medido en «combate contra 4 poutchs nivel 25»: en 2.937 mensajes salen una vez, ahí.
+    /// Aparece además en la ráfaga de entrada al mundo.
+    /// </summary>
+    public const string Lqg = "lqg";
+
+    /// <summary>El compañero del <see cref="Lqg"/>. También vacío, y sólo en el inicio de combate.</summary>
+    public const string Lqt = "lqt";
+
+    /// <summary>
+    /// El VALOR de un modificador que apunta a un hechizo concreto:
+    /// <c>f1 { f2: 1, f3: cuánto, f4: qué, f5: el hechizo }  f2: de quién</c>
+    ///
+    /// Es lo que hace que el cliente vuelva a calcular las casillas donde se puede lanzar. El jxm
+    /// del embrujo sólo le sirve para pintar el panel de efectos. Medido en
+    /// «ocra-disparos lejanos»: 272 de éstos, dos por cada hechizo afectado.
+    /// </summary>
+    public const string Hnd = "hnd";
+
 
     /// <summary>Cambio de mapa antiguo (3.6.4.3), sustituido por jqk. No aparece en ninguna captura.</summary>
     public const string Jos = "jos";
@@ -516,6 +540,19 @@ public static class Op
 
     /// <summary>Combate. 7324 mensajes, 23 ficheros.</summary>
     public const string Jwi = "jwi";
+
+    /// <summary>
+    /// Lanzar un hechizo APUNTANDO DESDE EL CARRUSEL: { f1: a quien, f2: el hechizo }.
+    ///
+    /// Es el gemelo del jwh, que apunta por casilla. En las 305 capturas hay 888 jwh y ni uno
+    /// lleva identificador de combatiente -solo casilla-, y cuatro jwn, que llevan el id y no la
+    /// casilla. Dos de esos cuatro apuntan al propio jugador: es como se lanza uno un embrujo
+    /// sobre si mismo sin buscarse en el tablero.
+    ///
+    /// El id va con SIGNO: los monstruos lo tienen negativo, y llega en complemento a dos de
+    /// sesenta y cuatro bits.
+    /// </summary>
+    public const string Jwn = "jwn";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Jwq = "jwq";
@@ -806,6 +843,95 @@ public static class Op
 
     /// <summary>Crear un personaje.</summary>
     public const string Kvz = "kvz";
+
+    // ─── Los retos del combate ──────────────────────────────────────────────────────────────
+    //
+    // Quince opcodes seguidos, kwh..kxb, todos de la fase de preparacion salvo kwm y kwl, que
+    // son de dentro del combate. Estan medidos sobre 305 capturas con la linea de tiempo de los
+    // DOS sentidos junta: pcap.streams separa por conexion, y sin volver a mezclarlos por hora
+    // el orden real se pierde y no se ve quien contesta a quien.
+    //
+    // El baile completo:
+    //
+    //   kxa   S->C  cuantos hay que elegir; llega DOS VECES, antes del kaa y despues del kba
+    //   kwo   C->S  ajuste del panel      kwn  S->C  su confirmacion, con el mismo valor
+    //   kwr   C->S  abrir el selector (vacio)
+    //   kwx   S->C  LA LISTA: { f1: 15, f2 repetido: ldd }, SIEMPRE dos candidatos
+    //   kwv   C->S  seleccionar uno. El PRIMERO llega solo, 2-30 ms detras del kwx: es la
+    //               preseleccion automatica del cliente, NO un clic del jugador
+    //   kwi   C->S  pasar el raton por un candidato. Sin respuesta, y el cliente lo sigue
+    //               mandando durante el combate, cuando ya no se puede elegir nada
+    //   kwj   C->S  validar   ->   kww  S->C  el reto queda FIJADO
+    //   kaq/kah     el listo; ahi el servidor manda los kww que falten y rellena huecos
+    //   kai         se acabo la colocacion
+    //   kwu   S->C  la lista definitiva, pegada al jyy que arranca el combate
+    //
+    // El mensaje-reto que va dentro de casi todos ellos es el ldd.
+
+    /// <summary>
+    /// El reto propuesto al RESTO DEL GRUPO: { f1: ldd }. Solo sale en el unico combate de
+    /// grupo con retos que hay en las capturas, 45-57 ms detras del kwv de un miembro.
+    /// </summary>
+    public const string Kwh = "kwh";
+
+    /// <summary>Pasar el raton por un candidato: { f1: id }. C->S y SIN respuesta.</summary>
+    public const string Kwi = "kwi";
+
+    /// <summary>Validar el reto elegido: { f1: id }. C->S; el servidor contesta con kww.</summary>
+    public const string Kwj = "kwj";
+
+    /// <summary>Ajuste del panel de retos. Siempre ha viajado vacio.</summary>
+    public const string Kwk = "kwk";
+
+    /// <summary>
+    /// El RESULTADO de un reto: { f1: id, f2: cumplido }. Sin f2, esta fallado. El fallo se
+    /// avisa en cuanto ocurre; el exito, al final, a menos de once tramas del jyg.
+    /// </summary>
+    public const string Kwl = "kwl";
+
+    /// <summary>
+    /// El OBJETIVO de un reto: { f1: ?, f2: ldd con su lda dentro }. Pegado al jyy, y solo en
+    /// los retos que apuntan a un monstruo concreto.
+    /// </summary>
+    public const string Kwm = "kwm";
+
+    /// <summary>Confirmacion del ajuste del panel, con el mismo valor que el kwo.</summary>
+    public const string Kwn = "kwn";
+
+    /// <summary>Ajuste del panel de retos: { f1: bool }. C->S; el servidor contesta kwn.</summary>
+    public const string Kwo = "kwo";
+
+    /// <summary>Abrir el selector de retos. Va VACIO; el servidor contesta con la lista.</summary>
+    public const string Kwr = "kwr";
+
+    /// <summary>
+    /// La lista DEFINITIVA de retos: { f2 repetido: ldd }. Va pegada al jyy. Su f1 (enum kws)
+    /// no ha viajado nunca.
+    /// </summary>
+    public const string Kwu = "kwu";
+
+    /// <summary>Seleccionar un candidato: { f1: id }. C->S y sin respuesta.</summary>
+    public const string Kwv = "kwv";
+
+    /// <summary>Un reto queda FIJADO: { f1: ldd }. Respuesta al kwj, o al listo.</summary>
+    public const string Kww = "kww";
+
+    /// <summary>
+    /// La lista de retos OFRECIDOS: { f1: 15, f2 repetido: ldd }. El f1 vale quince en las
+    /// nueve apariciones y es el temporizador de la propuesta; el cliente tiene un
+    /// OnChallengeProposalUpdateTimer. Siempre DOS candidatos, ni uno ni tres, y son
+    /// alternativas entre si: no tienen por que ser compatibles.
+    /// </summary>
+    public const string Kwx = "kwx";
+
+    /// <summary>
+    /// CUANTOS retos hay que elegir: { f1: n }. Uno en combate normal, dos en mazmorra,
+    /// anomalia y submarino. Su f2 (enum kwy) no ha viajado nunca.
+    /// </summary>
+    public const string Kxa = "kxa";
+
+    /// <summary>Ajuste del panel de retos: { f1: int64, f2: ... }. C->S, sin respuesta.</summary>
+    public const string Kxb = "kxb";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Lar = "lar";

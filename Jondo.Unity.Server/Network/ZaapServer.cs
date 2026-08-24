@@ -20,7 +20,7 @@ namespace Jondo.Unity.Launcher.Network
     {
         public Task<string> connect(string gameName, string releaseName, int instanceId, string hash, CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"[Thrift] connect(gameName: {gameName}, releaseName: {releaseName}, instanceId: {instanceId}, hash: {hash})");
+            Console.WriteLine($"[Thrift] connect(gameName: {gameName}, releaseName: {releaseName}, instanceId: {instanceId}, hash: {Censura.Valor(hash)})");
             if (!ClientLaunchRegistry.TryConnect(instanceId, hash, out string gameSession))
                 throw new TApplicationException(TApplicationException.ExceptionType.InternalError,
                                                 "Unknown launcher instance or invalid launch hash");
@@ -29,7 +29,7 @@ namespace Jondo.Unity.Launcher.Network
 
         public Task<string> auth_getGameToken(string gameSession, int gameId, CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"[Thrift] auth_getGameToken(gameSession: {gameSession}, gameId: {gameId})");
+            Console.WriteLine($"[Thrift] auth_getGameToken(gameSession: {Censura.Valor(gameSession)}, gameId: {gameId})");
             if (!ClientLaunchRegistry.TryGetByGameSession(gameSession, out var launch) || launch == null)
                 throw new TApplicationException(TApplicationException.ExceptionType.InternalError,
                                                 "Unknown or expired game session");
@@ -42,7 +42,7 @@ namespace Jondo.Unity.Launcher.Network
 
         public Task<string> settings_get(string gameSession, string key, CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"[Thrift] settings_get(gameSession: {gameSession}, key: {key})");
+            Console.WriteLine($"[Thrift] settings_get(gameSession: {Censura.Valor(gameSession)}, key: {key})");
             if (key == "autoConnectType") return Task.FromResult("0");
             if (key == "language" && ClientLaunchRegistry.TryGetByGameSession(gameSession, out var launch) && launch != null)
                 return Task.FromResult(launch.Language);
@@ -52,7 +52,7 @@ namespace Jondo.Unity.Launcher.Network
 
         public Task<string> userInfo_get(string gameSession, CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"[Thrift] userInfo_get(gameSession: {gameSession})");
+            Console.WriteLine($"[Thrift] userInfo_get(gameSession: {Censura.Valor(gameSession)})");
             if (!ClientLaunchRegistry.TryGetByGameSession(gameSession, out var launch) || launch == null)
                 throw new TApplicationException(TApplicationException.ExceptionType.InternalError,
                                                 "Unknown or expired game session");
@@ -69,7 +69,7 @@ namespace Jondo.Unity.Launcher.Network
 
         public Task<string> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"[Thrift] updater_isUpdateAvailable(gameSession: {gameSession})");
+            Console.WriteLine($"[Thrift] updater_isUpdateAvailable(gameSession: {Censura.Valor(gameSession)})");
             return Task.FromResult("");
         }
     }
