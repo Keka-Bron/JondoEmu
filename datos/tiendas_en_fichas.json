@@ -6,20 +6,60 @@
     "",
     "La clave de cada tienda es el id de PLANTILLA del vendedor, el mismo que usa npc_shops.json.",
     "'moneda' es el id del objeto que hace de moneda: 20440 es la Jondo Coin.",
-    "'precios' es lo que cuesta cada objeto EN FICHAS. Un objeto que este en el catalogo del",
-    "vendedor pero no aqui vale 1 ficha, que es el valor de reserva de TokenShops.DefaultPrice.",
     "",
-    "El vendedor tiene que vender ya esos objetos en npc_shops.json: esto no anade nada al",
-    "catalogo, solo cambia con que se paga. Y solo se cobra lo que este en el catalogo.",
+    "El precio se busca en tres sitios y gana el mas concreto:",
+    "   'precios'        por objeto,  {gid: fichas}",
+    "   'preciosPorTipo' por tipo,    {tipo: fichas}",
+    "   'precio'         para toda la tienda",
+    "Lo que no este en ninguno vale 1 ficha, que es TokenShops.DefaultPrice.",
     "",
-    "Ejemplo de como quedaria una tienda, para copiar:",
+    "Esto solo cambia CON QUE se paga, nunca QUE se vende: el catalogo sigue saliendo de",
+    "npc_shops.json y solo se puede comprar lo que este en el.",
     "",
-    "  \"tiendas\": {",
-    "    \"5510\": {",
-    "      \"moneda\": 20440,",
-    "      \"precios\": { \"15779\": 25, \"8992\": 40 }",
-    "    }",
-    "  }"
+    "Los cinco vendedores de apariencia estan juntos en el mapa 88212759, el del zaap del pueblo",
+    "de Amakna, en las casillas 411 a 415. Entre los cinco venden 1.848 prendas, y por eso el",
+    "precio va por TIPO y no por objeto: son nueve numeros en vez de 1.848 lineas.",
+    "",
+    "Los tipos, con lo que hay de cada uno en el catalogo del juego:",
+    "   246 sombreros (464)   247 capas (357)     248 escudos (524)    251 armas (194)",
+    "   249 mascotas (242)    250 mascoturas (151)  324 monturas (121)",
+    "   300 alas (44)         113 objetos vivientes (61)",
+    "",
+    "Para calibrar: un combate deja 16 Jondo Coin de mediana, asi que 150 fichas son unos 9",
+    "combates y 500 son unos 31. Un conjunto entero -sombrero, capa, escudo y arma- sale por 650,",
+    "unos 40 combates."
   ],
-  "tiendas": {}
+
+  "tiendas": {
+    "7562": {
+      "_quien": "Sombreros de apariencia, 444 prendas",
+      "moneda": 20440,
+      "preciosPorTipo": { "246": 150, "113": 250 },
+      "precio": 150
+    },
+    "7565": {
+      "_quien": "Capas de apariencia, 348 prendas",
+      "moneda": 20440,
+      "preciosPorTipo": { "247": 150, "300": 250, "113": 250 },
+      "precio": 150
+    },
+    "7564": {
+      "_quien": "Escudos de apariencia, 444 prendas",
+      "moneda": 20440,
+      "preciosPorTipo": { "248": 150, "113": 250 },
+      "precio": 150
+    },
+    "7563": {
+      "_quien": "Armas de apariencia, 184 prendas",
+      "moneda": 20440,
+      "preciosPorTipo": { "251": 200 },
+      "precio": 200
+    },
+    "7566": {
+      "_quien": "Arreos, mascotas y monturas de apariencia, 428 prendas",
+      "moneda": 20440,
+      "preciosPorTipo": { "249": 300, "250": 400, "324": 500 },
+      "precio": 400
+    }
+  }
 }

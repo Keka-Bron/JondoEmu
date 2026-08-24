@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Launcher.Managers
 {
@@ -39,8 +40,22 @@ namespace Jondo.Unity.Launcher.Managers
             /// <summary>La plantilla del objeto que hace de moneda.</summary>
             public int TokenGid;
 
-            /// <summary>Precio en fichas de cada objeto que vende, por plantilla.</summary>
+            /// <summary>Precio en fichas de un objeto concreto, por plantilla. Manda sobre todo.</summary>
             public Dictionary<int, long> Prices = new Dictionary<int, long>();
+
+            /// <summary>
+            /// Precio por TIPO de objeto, que es lo que hace esto manejable.
+            ///
+            /// Los vendedores de apariencia llevan 1.848 prendas entre los cinco. Escribir un
+            /// precio por prenda serían 1.848 líneas que nadie va a revisar y que se descuadran en
+            /// cuanto se añada una capa. Por tipo son nueve números: los sombreros valen lo mismo
+            /// entre ellos y una montura vale más que un sombrero, que es la única distinción que
+            /// de verdad importa.
+            /// </summary>
+            public Dictionary<int, long> PricesByType = new Dictionary<int, long>();
+
+            /// <summary>Lo que vale en esta tienda lo que no encaje en ninguna de las dos tablas.</summary>
+            public long ShopPrice;
         }
 
         private static readonly Dictionary<int, Shop> _byNpc = new Dictionary<int, Shop>();
@@ -85,6 +100,18 @@ namespace Jondo.Unity.Launcher.Managers
                         continue;
                     }
 
+                    if (entrada.Value.TryGetProperty("precio", out var suelto))
+                        shop.ShopPrice = suelto.GetInt64();
+
+                    if (entrada.Value.TryGetProperty("preciosPorTipo", out var porTipo))
+                    {
+                        foreach (var precio in porTipo.EnumerateObject())
+                        {
+                            if (!int.TryParse(precio.Name, out int tipo)) continue;
+                            shop.PricesByType[tipo] = precio.Value.GetInt64();
+                        }
+                    }
+
                     if (entrada.Value.TryGetProperty("precios", out var precios))
                     {
                         foreach (var precio in precios.EnumerateObject())
@@ -97,10 +124,13 @@ namespace Jondo.Unity.Launcher.Managers
                     _byNpc[npcId] = shop;
                 }
 
-                int objetos = 0;
-                foreach (var s in _byNpc.Values) objetos += s.Prices.Count;
-                Console.WriteLine($"[Tiendas] {_byNpc.Count} tienda(s) que cobran en fichas, " +
-                                  $"{objetos} objeto(s) con precio.");
+                LoadItemTypes();
+
+                int sueltos = 0, tipos = 0;
+                foreach (var s in _byNpc.Values) { sueltos += s.Prices.Count; tipos += s.PricesByType.Count; }
+                Console.WriteLine($"[Tiendas] {_byNpc.Count} tienda(s) que cobran en fichas: " +
+                                  $"{tipos} precio(s) por tipo, {sueltos} por objeto, " +
+                                  $"{_typeOfItem.Count} objeto(s) con su tipo cargado.");
             }
             catch (Exception ex)
             {
@@ -115,11 +145,60 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>
         /// Cuántas fichas cuesta un objeto en esa tienda.
         ///
-        /// Un objeto sin precio escrito vale <see cref="DefaultPrice"/> y no cero: regalar cosas
-        /// por olvidarse de una línea del fichero es peor que cobrarlas baratas.
+        /// Se mira en tres sitios y gana el más concreto: el precio de ESE objeto, después el de su
+        /// tipo, después el de la tienda entera. Lo que no esté en ninguno vale
+        /// <see cref="DefaultPrice"/> y no cero: regalar cosas por olvidarse de una línea del
+        /// fichero es peor que cobrarlas baratas.
         /// </summary>
         public static long PriceOf(Shop shop, int gid)
-            => shop != null && shop.Prices.TryGetValue(gid, out long precio) ? precio : DefaultPrice;
+        {
+            if (shop == null) return DefaultPrice;
+            if (shop.Prices.TryGetValue(gid, out long precio)) return precio;
+            if (shop.PricesByType.Count > 0 &&
+                _typeOfItem.TryGetValue(gid, out int tipo) &&
+                shop.PricesByType.TryGetValue(tipo, out long porTipo)) return porTipo;
+            return shop.ShopPrice > 0 ? shop.ShopPrice : DefaultPrice;
+        }
+
+        /// <summary>
+        /// El tipo de cada objeto que vende alguna tienda de fichas, para poder cobrar por tipo.
+        ///
+        /// Sólo los de esas tiendas, no las 21.748 plantillas del juego: se lee una vez al arrancar
+        /// y no se vuelve a la base en cada compra.
+        /// </summary>
+        private static readonly Dictionary<int, int> _typeOfItem = new Dictionary<int, int>();
+
+        private static void LoadItemTypes()
+        {
+            _typeOfItem.Clear();
+
+            var necesarios = new HashSet<int>();
+            foreach (var shop in _byNpc)
+            {
+                if (shop.Value.PricesByType.Count == 0) continue;
+                foreach (int gid in NpcShops.CatalogueOf(shop.Key)) necesarios.Add(gid);
+            }
+            if (necesarios.Count == 0) return;
+
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Type FROM ItemTemplates WHERE Id = $id;";
+                var id = command.Parameters.Add("$id", Microsoft.Data.Sqlite.SqliteType.Integer);
+                foreach (int gid in necesarios)
+                {
+                    id.Value = gid;
+                    if (command.ExecuteScalar() is long tipo) _typeOfItem[gid] = (int)tipo;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Tiendas] No se pudo leer el tipo de los objetos: {ex.Message}");
+            }
+        }
 
         /// <summary>Lo que cuesta un objeto al que no se le ha puesto precio.</summary>
         public const long DefaultPrice = 1;

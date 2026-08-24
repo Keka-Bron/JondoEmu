@@ -164,13 +164,49 @@ next measurement pass.
 ```
 
 The key is the NPC **template** id, the same one `npc_shops.json` uses. `moneda` is the currency
-item. `precios` is the price in coins per item template; anything in the vendor's catalogue without
-a price here costs `TokenShops.DefaultPrice` (1 coin) rather than being free.
+item. The price is looked up in three places, most specific first:
+
+| key | scope |
+|---|---|
+| `precios` | one item, `{gid: coins}` |
+| `preciosPorTipo` | one item type, `{type: coins}` |
+| `precio` | the whole shop |
+
+Anything matching none of them costs `TokenShops.DefaultPrice` (1 coin) rather than being free.
 
 This changes only *what* a shop charges in, never *what* it sells: the catalogue still comes from
 `npc_shops.json`, and only items in it can be bought.
 
 Ship it empty and nothing changes — every shop charges kamas exactly as before.
+
+### The appearance vendors
+
+The five appearance vendors stand together on map `88212759` — the Amakna village zaap — on cells
+411 to 415, and between them they sell **1,848 cosmetic pieces**. They all charge Jondo Coins.
+
+Pricing goes **by type**, which is the reason `preciosPorTipo` exists: nine numbers instead of 1,848
+lines that nobody would review and that would drift the moment a cloak is added.
+
+| type | what | coins | fights at the median |
+|---:|---|---:|---:|
+| 246 | hats | 150 | ~9 |
+| 247 | cloaks | 150 | ~9 |
+| 248 | shields | 150 | ~9 |
+| 251 | weapons | 200 | ~12 |
+| 300 | wings | 250 | ~16 |
+| 113 | living objects | 250 | ~16 |
+| 249 | pets | 300 | ~19 |
+| 250 | mounturas | 400 | ~25 |
+| 324 | mounts | 500 | ~31 |
+
+A full outfit — hat, cloak, shield and weapon — costs 650 coins, about 40 fights.
+
+Their kamas prices were 0 or 1, because the catalogue was measured on Ankama's tournament server
+which gave cosmetics away. There is no price signal in the data; these numbers are a design choice,
+calibrated against the measured 16-coins-per-fight median.
+
+`7574 Eva Zar cosméticos` is *not* included: it sells transformation potions (face, colour, name,
+class), not appearance gear. Adding it is one block in the same file.
 
 ## What the guards pin
 
