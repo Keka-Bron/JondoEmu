@@ -43,6 +43,7 @@ namespace Jondo.Unity.Launcher
             AssertJondoCoinPaysByBand();
             AssertShopCurrencyIsOptional();
             AssertPacketShapesAreTelling();
+            AssertMonstersBringTheirSpells();
             AssertFightSheetMatchesTheCapture();
 
             // El barrido del código fuente llevaba muerto desde que se reorganizaron las
@@ -672,6 +673,64 @@ namespace Jondo.Unity.Launcher
                 throw new InvalidOperationException(
                     "[RegressionGuard FAILED] Dos cargas distintas dan la misma firma. La lista de " +
                     "paquetes sin atender juntaría en una fila cosas que no tienen nada que ver.");
+        }
+
+        /// <summary>
+        /// Los monstruos llegan al combate con sus hechizos.
+        ///
+        /// Esto tapaba al 40 % de los monstruos del juego y no daba ni un error. La ficha de cada
+        /// grado trae un «startingSpellId» que NO es un id de hechizo sino de NIVEL de hechizo
+        /// —un SpellLevels.Id—, y se estaba metiendo crudo en la lista de hechizos. Lo malo no era
+        /// que ese id no valiera: era que al meterlo la lista dejaba de estar vacía, y el código
+        /// que lee los hechizos DE VERDAD estaba detrás de un «si la lista está vacía». Un número
+        /// inútil cancelaba los buenos.
+        ///
+        /// Medido: 2.133 de 5.134 monstruos traen ese campo y 1.975 de ellos no casan con ningún
+        /// hechizo, así que 2.051 monstruos —el Jalamut Real entre ellos— se plantaban en el
+        /// combate sin nada que lanzar. Se quedaban quietos, que es como se vio jugando.
+        ///
+        /// Se comprueban tres monstruos con hechizos conocidos y uno de los que traen el
+        /// startingSpellId, para que la regresión salte tanto si se deja de leer la fuente buena
+        /// como si alguien vuelve a mezclar los dos números.
+        /// </summary>
+        private static void AssertMonstersBringTheirSpells()
+        {
+            (int Monstruo, int Grado, int[] Hechizos, string Quien)[] esperado =
+            {
+                // El Jalamut Real trae ademas startingSpellId 16186, que es justo el que antes
+                // cancelaba estos tres.
+                (2854, 0, new[] { 2230, 2231, 2355 }, "Jalamut Real"),
+                (2894, 0, new[] { 2366, 2367, 2368 }, "Rata kenopintamos"),
+            };
+
+            foreach (var (monstruo, grado, hechizos, quien) in esperado)
+            {
+                var ficha = DatabaseManager.GetMonsterGradeStats(monstruo, grado);
+                if (ficha == null)
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] No hay ficha para el monstruo {monstruo} " +
+                        $"({quien}) en el grado {grado}.");
+
+                foreach (int hechizo in hechizos)
+                {
+                    if (ficha.SpellIds.Contains(hechizo)) continue;
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] El monstruo {monstruo} ({quien}) tendría que " +
+                        $"traer el hechizo {hechizo} y trae [{string.Join(", ", ficha.SpellIds)}]. " +
+                        "Sin hechizos el monstruo se queda quieto en el combate y no avisa de nada.");
+                }
+
+                // Y que no se haya colado el id de nivel de hechizo entre los de hechizo.
+                if (ficha.StartingSpellLevelId != 0 &&
+                    ficha.SpellIds.Contains(ficha.StartingSpellLevelId))
+                {
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] El monstruo {monstruo} ({quien}) lleva su " +
+                        $"startingSpellId ({ficha.StartingSpellLevelId}) en la lista de hechizos. " +
+                        "Ese número es un SpellLevels.Id, no un Spells.Id: ver Summons.cs, que lo " +
+                        "traduce bien.");
+                }
+            }
         }
 
         private static void AssertPerSessionPlayerCaches()

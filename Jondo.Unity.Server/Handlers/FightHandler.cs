@@ -1732,13 +1732,58 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 foreach (var (quien, caido) in caducados)
                 {
+                    // Si el embrujo tocaba el ALCANCE de un hechizo, primero se le retira el
+                    // modificador. El hnk es eso: la retirada. No es la declaración que acompaña
+                    // al hnd, que es como se implementó primero y por lo que dar alcance no servía
+                    // de nada —se ponía y se quitaba en la misma ráfaga—. Medido con reloj sobre
+                    // «ocra-disparos lejanos»: al lanzar van 68 hnd y CERO hnk; al caducar van 68
+                    // hnk y CERO hnd. Y en «ocra-tiro de repliegue» los 60 hnk viven solos, justo
+                    // delante de los 61 jya.
+                    if (caido.HechizoAfectado != 0 &&
+                        (caido.Sobre == Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo ||
+                         caido.Sobre == Jondo.Unity.World.Fights.SpellAspect.AlcanceMaximo))
+                    {
+                        int modificador = caido.Sobre == Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo
+                            ? Network.FightProtocol.SpellMinRange
+                            : Network.FightProtocol.SpellMaxRange;
+                        await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
+                            Network.FightProtocol.BuildSpellModifierDeclared(
+                                quien.Id, modificador, caido.HechizoAfectado)));
+                    }
+
                     await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jya,
                         Network.FightProtocol.BuildBuffGone(quien.Id, caido.Numero)));
 
-                    // Y el aviso gemelo: el servidor real manda además un jwe con el número de
-                    // embrujo que se cae y de quién era.
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
-                        Network.FightProtocol.BuildBuffExpired(quien.Id, caido.Numero)));
+                    // Y AQUÍ ESTABA EL AGUJERO: se borraba la fila del panel y no se devolvía la
+                    // característica.
+                    //
+                    // El motor caduca el embrujo bien —Buffs.Barrer lo saca y ValorDeFicha ya
+                    // devuelve el número bueno— pero ese número no salía por el cable, así que el
+                    // cliente se quedaba con el último que recibió: +250 de potencia y -3 de
+                    // alcance clavados, con el panel de embrujos vacío. Y sobrevivía a los
+                    // combates, porque nadie se lo corregía nunca.
+                    //
+                    // El servidor real manda la ficha detrás de CADA jya. Medido en
+                    // «ocra-tiros potentes», tramas #205 a #222, con este mismo hechizo:
+                    //     jya 289 -> jxw característica 19 (alcance) de vuelta a cero
+                    //     jya 290 -> jxw característica 25 (potencia)
+                    //     jya 291 -> jxw característica 84 (daño de empuje)
+                    //     jya 292 -> jxw característica 18 (% de crítico)
+                    // El patrón se repite en 787 fichas restauradas de las carpetas Ocra y Combate.
+                    //
+                    // Los PA y los PM no van por aquí: ésos se devuelven como puntos, que es lo
+                    // que hace GivePointsBackAsync justo debajo.
+                    if (caido.Caracteristica != 0 &&
+                        caido.Caracteristica != ActionPointsCharacteristic &&
+                        caido.Caracteristica != MovementPointsCharacteristic)
+                    {
+                        await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
+                            Network.FightProtocol.BuildFighterSheet(
+                                quien.Id,
+                                new[] { (caido.Caracteristica,
+                                         ValorDeFicha(quien, caido.Caracteristica, fight.RoundNumber)) },
+                                quien.Id == GameState.CharacterId)));
+                    }
                 }
 
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
@@ -2702,9 +2747,18 @@ namespace Jondo.Unity.Launcher.Handlers
         /// pero ése sólo alimenta el panel de efectos: el cliente enseñaba «Disparos Lejanos: +6
         /// de alcance máximo» y seguía iluminando las mismas casillas.
         ///
-        /// Las casillas las calcula el cliente con ESTOS dos, que van en pareja y uno por cada
-        /// hechizo tocado. En «ocra-disparos lejanos» hay 272 de cada uno, que son dos por
-        /// hechizo: el 13 con el mínimo y el 12 con el máximo.
+        /// Las casillas las calcula el cliente con el hnd, uno por hechizo tocado y modificador.
+        ///
+        /// AQUÍ SÓLO VA EL HND. La primera versión mandaba detrás la ráfaga de hnk, creyendo que
+        /// era la declaración que lo acompañaba, y por eso dar alcance no servía absolutamente de
+        /// nada: se ponía el modificador y en la misma ráfaga se le decía al cliente que lo
+        /// borrara. El hnk es la RETIRADA, y va cuando el embrujo caduca —está puesto en el bucle
+        /// de caducados de ConfirmAsync—.
+        ///
+        /// Medido con reloj sobre «ocra-disparos lejanos»: al lanzar van 68 hnd y CERO hnk; al
+        /// caducar, 68 hnk y CERO hnd, y el ciclo se repite igual cuatro veces. En
+        /// «ocra-tiro de repliegue» los 60 hnk aparecen solos, justo delante de los 61 jya, sin un
+        /// hnd cerca: el hnk vive por su cuenta.
         ///
         /// Se manda el TOTAL que tiene el hechizo ahora, no lo que acaba de sumar este embrujo:
         /// así dos embrujos sobre el mismo hechizo no se pisan, y quitar uno deja el número bueno.
@@ -2742,16 +2796,6 @@ namespace Jondo.Unity.Launcher.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnd,
                     Network.FightProtocol.BuildSpellModifier(
                         quien.Id, Network.FightProtocol.SpellMaxRange, hechizo, maximo)));
-            }
-
-            foreach (var (quien, hechizo) in tocados)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
-                    Network.FightProtocol.BuildSpellModifierDeclared(
-                        quien.Id, Network.FightProtocol.SpellMinRange, hechizo)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
-                    Network.FightProtocol.BuildSpellModifierDeclared(
-                        quien.Id, Network.FightProtocol.SpellMaxRange, hechizo)));
             }
 
             Program.LogDebug($"[ALCANCE] Anunciado el alcance de {tocados.Count} hechizo(s) " +

@@ -3161,9 +3161,29 @@ namespace Jondo.Unity.Launcher
                     stats.WaterResistance = g.TryGetProperty("waterResistance", out var wr) ? wr.GetInt32() : 0;
                     stats.AirResistance = g.TryGetProperty("airResistance", out var ar) ? ar.GetInt32() : 0;
                     stats.GradeXp = g.TryGetProperty("gradeXp", out var xp) ? xp.GetInt32() : 100;
+                    // El startingSpellId NO va aquí, y meterlo costaba los hechizos de 2.051
+                    // monstruos.
+                    //
+                    // Es un SpellLevels.Id —un id de NIVEL de hechizo— y no un Spells.Id. El
+                    // propio repositorio lo tiene bien escrito en Summons.cs:209, que lo traduce
+                    // con «SELECT SpellId, Grade FROM SpellLevels WHERE Id = $id».
+                    //
+                    // Metido crudo pasaban dos cosas, y la segunda es la venenosa: GetSpellCombatData
+                    // no encontraba ese número y devolvía null, y sobre todo la lista dejaba de
+                    // estar vacía, así que el respaldo de más abajo —el que lee los hechizos DE
+                    // VERDAD de MonsterTemplates— ya no corría. Un id que no vale para nada
+                    // cancelaba los que sí valían.
+                    //
+                    // Medido: 2.133 de 5.134 monstruos traen startingSpellId, y 1.975 de ésos no
+                    // casan con ningún hechizo. En total 2.051 de 5.134 —el 40 %— se quedaban sin
+                    // poder lanzar nada. El Jalamut Real era uno.
+                    //
+                    // Y aunque se tradujera bien, tampoco es su lista de ataque: es el hechizo de
+                    // comportamiento con el que empieza. Los ataques son MonsterTemplates.spells.
+                    // Se guarda aparte por si algún día hace falta, y no se mezcla.
                     if (g.TryGetProperty("startingSpellId", out var ssp) && ssp.GetInt32() > 0)
                     {
-                        stats.SpellIds.Add(ssp.GetInt32());
+                        stats.StartingSpellLevelId = ssp.GetInt32();
                     }
                 }
             }
@@ -3199,7 +3219,12 @@ namespace Jondo.Unity.Launcher
             //
             // spellGrades[i] describes the spell spells[i]: one "grade,level" entry per monster
             // grade, separated by ';'.
-            if (stats.SpellIds.Count == 0)
+            //
+            // Se lee SIEMPRE. Antes iba detrás de un «si la lista está vacía», y ese guardián no
+            // protegía nada: Monsters.Spells vale '[]' en los 5.134 monstruos, así que la lista
+            // sólo se podía llenar con el startingSpellId, que no es un hechizo. Lo único que
+            // conseguía el guardián era dejar sin hechizos al monstruo cuyo grado traía ese
+            // número. Repetir sí hay que evitarlo, y de eso se encarga el Contains de abajo.
             {
                 try
                 {
@@ -3243,7 +3268,7 @@ namespace Jondo.Unity.Launcher
                                 }
                             }
 
-                            stats.SpellIds.Add(sid);
+                            if (!stats.SpellIds.Contains(sid)) stats.SpellIds.Add(sid);
                             stats.SpellGrades[sid] = spellGrade;
                         }
                     }
@@ -4318,6 +4343,13 @@ namespace Jondo.Unity.Launcher
 
     public class MonsterGradeStats
     {
+        /// <summary>
+        /// El hechizo de comportamiento con el que arranca el monstruo, tal como lo trae el dato
+        /// del cliente: un <c>SpellLevels.Id</c>, NO un <c>Spells.Id</c>. No es su lista de
+        /// ataque y por eso va aparte de <see cref="SpellIds"/>. Hoy no lo lee nadie.
+        /// </summary>
+        public int StartingSpellLevelId { get; set; }
+
         public int Level { get; set; } = 1;
         public int LifePoints { get; set; } = 50;
         public int ActionPoints { get; set; } = 6;
