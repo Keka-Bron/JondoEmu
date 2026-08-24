@@ -280,6 +280,7 @@ namespace Jondo.Unity.Launcher.Handlers
             SessionContext.State.HouseEntryCell = 0;
             SessionContext.State.OpenHouseId = 0;
             DatabaseManager.SaveCurrentCharacter();
+            ZaapDiscovery.DiscoverOnArrival(SessionContext.State.CharacterId, salidaMapa);
 
             await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, here);
 
@@ -290,7 +291,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(salidaMapa));
+                ConnectionProtocol.BuildKnownZaaps(SessionContext.State.CharacterId));
 
             Console.WriteLine($"[Casas] Salida del interior {here} al mapa {salidaMapa}, " +
                               $"casilla {SessionContext.State.CellId}.");

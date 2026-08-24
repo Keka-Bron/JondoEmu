@@ -7,16 +7,38 @@ const path = require('node:path');
 function root() {
   if (!app.isPackaged) return path.resolve(__dirname, '../..');
 
-  // electron-builder portable apps run from a temporary extraction folder.
-  // This points back to the folder containing the launched EXE and its tools.
+  // electron-builder portable apps normally provide PORTABLE_EXECUTABLE_DIR, but
+  // that variable is absent for some shell launches.  In that case process.execPath
+  // can point at the temporary extraction folder, not the emulator workspace.  Find
+  // the directory that actually owns tools/ before accepting a fallback so tool
+  // selection never crashes just because the portable wrapper used a different path.
   const portableDirectory = process.env.PORTABLE_EXECUTABLE_DIR;
-  if (portableDirectory && fsSync.existsSync(path.join(portableDirectory, 'tools'))) return portableDirectory;
-  return path.dirname(process.execPath);
+  const candidates = [portableDirectory, process.env.PORTABLE_EXECUTABLE_FILE && path.dirname(process.env.PORTABLE_EXECUTABLE_FILE), process.cwd(), path.dirname(process.execPath)]
+    .filter(Boolean)
+    .map(candidate => path.resolve(candidate));
+  // A portable Electron executable temporarily extracts itself before launching.  If
+  // the wrapper did not expose PORTABLE_EXECUTABLE_DIR, walk only the immediate
+  // ancestors of known paths; this still finds a checkout launched from a child
+  // folder without accidentally scanning the drive or blocking the renderer.
+  const workspace = candidates.map(candidate => {
+    let current = candidate;
+    for (let depth = 0; depth < 6; depth += 1) {
+      if (fsSync.existsSync(path.join(current, 'tools'))) return current;
+      const parent = path.dirname(current);
+      if (parent === current) break;
+      current = parent;
+    }
+    return null;
+  }).find(Boolean);
+  return workspace || path.dirname(process.execPath);
 }
 function toolRoot() { return path.join(root(), 'tools'); }
 function safeName(name) { return typeof name === 'string' && /^[a-zA-Z0-9_-]+\.py$/.test(name) ? name : null; }
 async function listTools() {
-  const files = await fs.readdir(toolRoot(), { withFileTypes: true });
+  // Tool discovery is a UI convenience.  A bad portable launch directory must
+  // produce an empty catalogue, not terminate the Electron main process.
+  let files = [];
+  try { files = await fs.readdir(toolRoot(), { withFileTypes: true }); } catch { return []; }
   const available = new Set(files.filter(file => file.isFile() && safeName(file.name)).map(file => file.name));
   let index = [];
   try { index = JSON.parse(await fs.readFile(path.join(toolRoot(), 'tool_index.json'), 'utf8')).tools || []; } catch { /* graceful fallback for source checkouts */ }

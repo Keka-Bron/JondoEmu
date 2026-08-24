@@ -66,6 +66,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 case InteractiveActionKind.Bin:
                     await BinHandler.OpenAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
+                case InteractiveActionKind.Workshop:
+                    await CraftHandler.OpenAsync(stream, interactive.Element, action.SkillId);
+                    break;
                 case InteractiveActionKind.HouseDoor:
                     if (action.SkillId == Houses.EnterSkill)
                         await HouseHandler.EnterAsync(stream, interactive.Element.Id, action.SkillId,

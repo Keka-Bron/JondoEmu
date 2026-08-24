@@ -53,6 +53,16 @@ protocolbuilder proto <ruta a Ankama.Dofus.Protocol.Game.dll> salida.proto
 Con **números de campo y tipos**. Está en `datos/protocolo_3.6.10.10.proto` (207 KB),
 `datos/protocolo_conexion_3.6.10.10.proto` y `datos/protocolo_3.6.4.3.proto`.
 
+Desde el barrido del 24 de agosto de 2026 conserva también la presencia `optional`. El C# que
+genera protobuf añade después de cada scalar opcional una propiedad Boolean de sólo lectura
+(`HasFoo`) que no es un campo del cable; con los nombres ofuscados se estaba emparejando por error
+con la constante del campo siguiente. `ProtoWriter` descarta ahora esos indicadores y el enumerado
+auxiliar de cada `oneof`, pero conserva las propiedades `RepeatedField` y `MapField`, que sí son
+campos aunque no tengan setter. La regla cuadra exactamente en los 2.169 mensajes Game: 6.186
+constantes y 6.186 propiedades de cable, incluidos 381 indicadores de presencia descartados. Así,
+por ejemplo, `jvp` queda como `optional int32 f1`, `int64 f2` y tres `int32` en `f3..f5`, sin el
+Boolean ficticio ni el corrimiento que antes contaminaba el expediente.
+
 **De dónde sale.** El cliente es Unity con IL2CPP. El descriptor serializado de protobuf **no está
 en ninguna parte** (ver §3), pero no hace falta: el generador de C# de protobuf deja en cada clase
 una constante con el número de cada campo, justo antes del campo que la usa, y **Cpp2IL vuelca las

@@ -56,6 +56,7 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         public static bool IsShopOpen => OpenShop != 0;
+        public static bool IsDialogOpen => SessionContext.State.OpenNpcDialogId != 0;
 
         /// <summary>
         /// Desde dónde se numeran los objetos comprados.
@@ -155,6 +156,8 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
 
+            SessionContext.State.OpenNpcDialogId = npc.ContextualId;
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
 
@@ -184,9 +187,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed(
-                    ConnectionProtocol.NpcDialogCloseReason)));
+            await CloseDialogAsync(stream);
 
             if (reply != KamasMountainReply)
             {
@@ -206,6 +207,19 @@ namespace Jondo.Unity.Launcher.Handlers
 
             Console.WriteLine($"[NPC] La montaña de kamas paga {KamasMountainReward}; " +
                               $"ahora tiene {GameState.Kamas}.");
+        }
+
+        /// <summary>
+        /// The cancel button sends the same empty <c>kla</c> used by other modal interfaces.  It
+        /// does not send an <c>ioy</c>, so responding as if it were a zaap leaves the NPC panel
+        /// open in the client.  The captured NPC close acknowledgement is <c>kld { f1: 1 }</c>.
+        /// </summary>
+        public static async Task CloseDialogAsync(NetworkStream stream)
+        {
+            SessionContext.State.OpenNpcDialogId = 0;
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.LeaveDialogMessage, ConnectionProtocol.BuildDialogClosed(
+                    ConnectionProtocol.NpcDialogCloseReason)));
         }
 
         /// <summary>
@@ -282,10 +296,16 @@ namespace Jondo.Unity.Launcher.Handlers
             // repetirlas no descuadra nada.
             long capacity = 1000 + 5L * GameState.StatStrength;
 
+            // lqn/252 was copied from an unrelated capture without its rendering context. The
+            // client therefore printed its unresolved {item,gid,uid} token instead of Dragouf.
+            // Use the proven chat-line wire shape and a name resolved from version-pinned client
+            // data until an authentic NPC purchase lqn capture establishes the richer contract.
+            string language = ClientLaunchRegistry.LanguageOf(SessionContext.Current.AccountId);
+            string itemName = ItemNames.Of(gid, language);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
-                    ConnectionProtocol.PurchaseMessage,
-                    gid.ToString(), uid.ToString(), quantity.ToString(), price.ToString())));
+                ConnectionProtocol.Push(Op.ChatServerMessage, ConnectionProtocol.BuildChatLine(
+                    "Jondo", GameState.CharacterId, SessionContext.Current.AccountId,
+                    $"{quantity} x {itemName} ({price} kamas)", 0)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(GameState.Kamas)));
@@ -330,6 +350,7 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             OpenShop = 0;
             OpenShopNpc = 0;
+            SessionContext.State.OpenNpcDialogId = 0;
         }
 
         private static long NextUid()

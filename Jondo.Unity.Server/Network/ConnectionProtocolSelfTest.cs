@@ -28,6 +28,23 @@ namespace Jondo.Unity.Launcher.Network
             const long fighter = 302677754146L;   // el personaje de la captura
             const long mapId = 99222029L;
 
+            // The live 3.6.10.10 client starts a monster fight with hqa.f1 set to the same
+            // negative contextual id carried by the group in jss. Keep the complete C2S envelope
+            // here as well as the S2C preparation builders below: a reader regression would
+            // otherwise make clicking a visible group do nothing before any fight packet is sent.
+            const long group = -1017709L;
+            byte[] attackRequest = Pb.New()
+                .Msg(2, Pb.New()
+                    .Msg(1, Pb.New()
+                        .Str(1, "type.ankama.com/hqa")
+                        .Bytes(2, Pb.New().Var(1, group).Build()))
+                    .Var(2, -1))
+                .Build();
+            if (FightProtocol.ReadFightRequest(attackRequest) != group)
+            {
+                failures.Add("hqa: the negative monster-group contextual id was not decoded from f1");
+            }
+
             long[] blue = { 285, 273, 317, 373, 413, 411, 368, 312, 271, 288, 298, 302, 382, 386, 397, 400 };
             long[] red = { 270, 260, 303, 387, 428, 425, 381, 297, 257, 274, 284, 289, 396, 401, 410, 414 };
 
@@ -241,7 +258,7 @@ namespace Jondo.Unity.Launcher.Network
         {
             var servers = new[]
             {
-                new DatabaseManager.DbServer { Id = DatabaseManager.DefaultServerId, Name = "Test", Status = 1 }
+                new DatabaseManager.DbServer { Id = DatabaseManager.DefaultServerId, Name = "Test", Status = 1, Type = 1 }
             };
 
             byte[] msg = ConnectionProtocol.BuildAuthenticationAccepted(
@@ -265,9 +282,10 @@ namespace Jondo.Unity.Launcher.Network
             if (list == null) { failures.Add("authentication: the server list (f4) is missing"); return; }
 
             var listMsg = ProtoMessage.Parse(list.BytesValue);
-            int slots = 0;
-            foreach (var f in listMsg.Fields) if (f.FieldNumber == 2) slots++;
-            if (slots != 7) failures.Add($"authentication: expected 7 slot blocks but found {slots}");
+            int statuses = 0;
+            foreach (var f in listMsg.Fields) if (f.FieldNumber == 2) statuses++;
+            if (statuses != 7)
+                failures.Add($"authentication: expected seven per-server-type capacity blocks but found {statuses}");
 
             var server = Field(listMsg, 1, 2);
             if (server == null) { failures.Add("authentication: the server (f1) is missing"); return; }
@@ -275,8 +293,26 @@ namespace Jondo.Unity.Launcher.Network
             var serverMsg = ProtoMessage.Parse(server.BytesValue);
             var header = Field(serverMsg, 1, 2);
             if (header == null) failures.Add("server: the header (f1) is missing");
-            else if (Varint(ProtoMessage.Parse(header.BytesValue), 1) != DatabaseManager.DefaultServerId)
-                failures.Add("server: the id is not in f1 of the header");
+            else
+            {
+                var headerMsg = ProtoMessage.Parse(header.BytesValue);
+                if (Varint(headerMsg, 1) != DatabaseManager.DefaultServerId)
+                    failures.Add("server: the id is not in f1 of the header");
+                if (Varint(headerMsg, 3) != servers[0].Type)
+                    failures.Add("server: the server type is not in f1.f3");
+            }
+
+            bool foundCapacity = false;
+            foreach (var capacity in listMsg.Fields)
+            {
+                if (capacity.FieldNumber != 2 || capacity.WireType != 2) continue;
+                var capacityMsg = ProtoMessage.Parse(capacity.BytesValue);
+                if (Varint(capacityMsg, 1) != servers[0].Type) continue;
+                foundCapacity = Varint(capacityMsg, 2) == ConnectionProtocol.MaxCharactersPerServer;
+                break;
+            }
+            if (!foundCapacity)
+                failures.Add("authentication: the selected server type has no usable character-capacity record");
 
             var summary = Field(serverMsg, 3, 2);
             if (summary == null) { failures.Add("server: the character summary (f3) is missing"); return; }

@@ -9,9 +9,10 @@ using Jondo.Unity.World.Maps;
 namespace Jondo.Unity.Launcher.Managers
 {
     /// <summary>
-    /// Loads the explicitly reviewed subset of interior return cells which are absent from the
-    /// client world graph.  Rows remain versioned client data; this class deliberately has no
-    /// fallback heuristic based on graphics, map coordinates or a player's last map.
+    /// Loads explicitly reviewed interior return actions whose usable actor cell is not fully
+    /// described by the client world graph. Rows remain versioned client data; this class
+    /// deliberately has no fallback heuristic based on graphics, map coordinates or a player's
+    /// last map.
     /// </summary>
     public static class WorldInteractiveReturns
     {
@@ -121,14 +122,54 @@ namespace Jondo.Unity.Launcher.Managers
             var pending = SessionContext.State.PendingWorldInteractiveReturn;
             if (pending == null || SessionContext.State.MapId != pending.InteriorMapId ||
                 !MapGeometry.IsValid(pending.ExitCellId) ||
-                !MapGeometry.IsValid(SessionContext.State.CellId) ||
-                MapGeometry.Distance(SessionContext.State.CellId, pending.ExitCellId) > 1 ||
+                SessionContext.State.CellId != pending.ExitCellId ||
                 MapManager.GetMapInfo(pending.ReturnMapId) == null)
                 return false;
 
             destination = new Destination(pending.ReturnMapId, pending.ReturnCellId,
                 pending.EntryElementId);
             SessionContext.State.PendingWorldInteractiveReturn = null;
+            return true;
+        }
+
+        /// <summary>
+        /// Resolves a version-pinned interior exit when the server was restarted after the
+        /// character entered the interior, so there is no session-local entry binding to consume.
+        /// This deliberately requires the client to explicitly request a map exit at the exact
+        /// authored exit cell; it is not a coordinate or graphic heuristic and cannot be used as
+        /// an arbitrary teleport.
+        /// </summary>
+        public static bool TryResolveDeclaredExitAtCurrentCell(out Destination destination)
+            => TryResolveDeclaredExit(SessionContext.State.MapId,
+                                      SessionContext.State.CellId,
+                                      out destination);
+
+        /// <summary>
+        /// Pure resolver used by the live handler and startup regression guards. Both the map and
+        /// the actor's final action cell must match one reviewed row exactly.
+        /// </summary>
+        public static bool TryResolveDeclaredExit(long interiorMapId, int currentCellId,
+                                                  out Destination destination)
+        {
+            destination = default;
+            if (!MapGeometry.IsValid(currentCellId)) return false;
+
+            Definition? match = null;
+            foreach (Definition definition in _byEntry.Values)
+            {
+                if (definition.InteriorMapId != interiorMapId ||
+                    definition.ExitCellId != currentCellId ||
+                    MapManager.GetMapInfo(definition.ReturnMapId) == null)
+                    continue;
+
+                // More than one static definition at one map/cell would make a return ambiguous.
+                if (match != null) return false;
+                match = definition;
+            }
+
+            if (match == null) return false;
+            destination = new Destination(match.ReturnMapId, match.ReturnCellId,
+                match.EntryElementId);
             return true;
         }
 
@@ -148,7 +189,12 @@ namespace Jondo.Unity.Launcher.Managers
                     EntryGfxId = entry.GetProperty("gfxId").GetInt32(),
                     SkillId = entry.GetProperty("skillId").GetInt32(),
                     InteriorMapId = exit.GetProperty("mapId").GetInt64(),
-                    ExitCellId = exit.GetProperty("cellId").GetInt32(),
+                    // Some drawings are anchored several cells away from the actor endpoint used
+                    // by the client. Keep the authored element cell as evidence while accepting
+                    // only the separately observed action cell when one is supplied.
+                    ExitCellId = exit.TryGetProperty("actionCellId", out var actionCell)
+                        ? actionCell.GetInt32()
+                        : exit.GetProperty("cellId").GetInt32(),
                     ReturnMapId = back.GetProperty("mapId").GetInt64(),
                     ReturnCellId = back.GetProperty("cellId").GetInt32(),
                 };

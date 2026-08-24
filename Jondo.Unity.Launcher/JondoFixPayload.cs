@@ -11,10 +11,10 @@ namespace Jondo.Unity.Launcher;
 /// </summary>
 internal static class JondoFixPayload
 {
-    internal const string Version = "1.3.0";
+    internal const string Version = "1.3.6";
     internal const string Sha256 =
-        "4AF561AE6790EA456842DD59C87FFA47A65BF04935F1BC6E1999ECF427474ADA";
-    private const int ExpectedLength = 50_688;
+        "C4F9BEA6B1C982CD1F5FA93058687986C1EF8C08B590A4E48568B9F172921506";
+    private const int ExpectedLength = 58_368;
     private const string ResourceName = "Jondo.Unity.Launcher.Payload.JondoFix.dll";
 
     private const string GzipBase64 = """

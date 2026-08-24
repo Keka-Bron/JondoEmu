@@ -1,13 +1,54 @@
 {
   "schemaVersion": 1,
   "clientVersion": "3.6.10.10",
-  "purpose": "Reviewed returns for client interior maps whose world-graph entry has no reciprocal interactive edge. These rows bind only to the session that used the exact entry.",
+  "purpose": "Reviewed interior returns whose actor action cell is not fully described by the client world graph. Rows bind to the exact entry and accept only the recorded interior action cell.",
   "source": {
     "entry": "world-graph.asset, pathType 32, criterion-free route",
-    "exit": "Content/Map/Data/mapdata_assets_world_735.bundle::map_192675846",
-    "validated": "2026-08-21 live Jondo trace: 191105028/537304 skill 184 entered 192675846; client then emitted jqi without jqk at its return cell."
+    "exit": "Pinned map-data element anchors plus live 3.6.10.10 actor endpoints",
+    "validated": "2026-08-21 and 2026-08-24 live Jondo traces. Atelier entry 154010372/489326 reaches 153354242; oven action ends at 299 and must remain inside, while the exit action ends at 411 and returns to the observed pre-entry cell 288."
   },
   "returns": [
+    {
+      "entry": {
+        "mapId": 154010372,
+        "elementId": 489326,
+        "sourceCellId": 274,
+        "gfxId": 42503,
+        "skillId": 184,
+        "targetMapId": 153354242
+      },
+      "exit": {
+        "mapId": 153354242,
+        "elementId": 505687,
+        "cellId": 424,
+        "actionCellId": 411,
+        "gfxId": 3507
+      },
+      "return": {
+        "mapId": 154010372,
+        "cellId": 288
+      }
+    },
+    {
+      "entry": {
+        "mapId": 153878787,
+        "elementId": 489329,
+        "sourceCellId": 326,
+        "gfxId": 42509,
+        "skillId": 184,
+        "targetMapId": 153357316
+      },
+      "exit": {
+        "mapId": 153357316,
+        "elementId": 504679,
+        "cellId": 411,
+        "gfxId": 3518
+      },
+      "return": {
+        "mapId": 153878787,
+        "cellId": 326
+      }
+    },
     {
       "entry": {
         "mapId": 191105028,

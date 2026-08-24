@@ -16,8 +16,7 @@ namespace Jondo.Unity.Launcher.Handlers
     ///
     ///   cliente  kvz { f1 { f1: nombre, f2: cara, f3: colores, f5: 26, f7: raza } }
     ///   servidor kvb            VACÍO, que es como se dice que sí
-    ///   servidor kvi            la lista otra vez, ya con el personaje dentro
-    ///   cliente  kvl            "juego con ése"
+    ///   servidor kqp x3, kvi, kvd    refresca la fase de selección con el personaje nuevo primero
     ///
     /// Y de la que sale mal, la del límite de personajes: <c>kvb { f2: 3 }</c>. O sea que el mismo
     /// mensaje sirve para las dos cosas y lo que distingue es que lleve motivo o no.
@@ -140,8 +139,27 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Push(Op.CharacterCreationResultMessage));
 
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
+
+            // The client chooses the first entry of the refreshed list and then sends its own
+            // C2S kvl. A prior implementation fabricated an S2C kvl, but the live trace showed
+            // the client immediately replying with the oldest list entry (13825560) and entering
+            // that character. Put the just-created record first and let the client make its
+            // normal selection request. kvi must still be closed by kvd.
+            var postCreateCharacters = new List<DatabaseManager.DbCharacter>(characters.Count);
+            foreach (var character in characters)
+                if (character.Id == id) postCreateCharacters.Add(character);
+            foreach (var character in characters)
+                if (character.Id != id) postCreateCharacters.Add(character);
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.CharactersListMessage, ConnectionProtocol.BuildCharactersList(characters)));
+                ConnectionProtocol.Push(Op.Kqp, Pb.New().Var(1, 1).Var(2, 1).Build()));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Kqp, Pb.New().Var(1, 1).Build()));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Kqp));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.CharactersListMessage,
+                    ConnectionProtocol.BuildCharactersList(postCreateCharacters)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.CharactersListEndMessage));
 

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "clientVersion": "3.6.10.10",
   "serverProtocolVersion": "3.6.10.10",
-  "generatedUtc": "2026-08-21T12:17:37Z",
-  "purpose": "Static runtime inputs for Jondo Server. Never put player/account state here.",
+  "generatedUtc": "2026-08-24T16:21:47Z",
+  "purpose": "Static runtime inputs and a player-free bootstrap cache for Jondo Server. Never put player/account state here.",
   "files": [
     {
       "path": "map_walkable_cells.json",
@@ -52,28 +52,18 @@
     },
     {
       "path": "interactive_elements_3.6.10.10.json",
-      "bytes": 1443109,
-      "sha256": "c8d6840d171fbfa40ea6cfbd516e420f824c13d38cbc8e3e5f6bf5c29e81b7de"
+      "bytes": 1519399,
+      "sha256": "d3abdf8b86f4b94423a52774865d5105c5e2ec3bc08c88b75ed97b54d7885398"
     },
     {
       "path": "world_interactive_transitions_3.6.10.10.json",
-      "bytes": 4054906,
-      "sha256": "4283986ac51141a5840df904903c865bcf92ae33113507e2f74912121c0d39cc"
-    },
-    {
-      "path": "world_interactive_returns_3.6.10.10.json",
-      "bytes": 984,
-      "sha256": "6634d9b1b995fc809d67c9d45faa793ad7ca39f8b29987e16525a719242b7f21"
+      "bytes": 5397914,
+      "sha256": "3ba8b12f095d5729fdf0a6527b0d3bf78477a257cbeafc808bff29d8026f4433"
     },
     {
       "path": "waypoints.json",
       "bytes": 3553,
       "sha256": "b68655e939d7e8eecfc82651a07219e5a0010842c5fd166e7c37ddb26ef85bd6"
-    },
-    {
-      "path": "zaap_overrides.json",
-      "bytes": 1016,
-      "sha256": "3214050218f098c244ccb3393f23d8a66a83cb36401f09443bf469273f54a561"
     },
     {
       "path": "havenbag.json",
@@ -136,6 +126,36 @@
       "sha256": "602843eb75456f323f66aab58f87da528a72da0145e8b7fdc90aa483bd91c1ec"
     },
     {
+      "path": "anomalias_3.6.10.10.json",
+      "bytes": 2323,
+      "sha256": "591c7f239e78b53ea6897ddeed8ce3b943f47c0295786e6048785db39ea6ba9c"
+    },
+    {
+      "path": "zaapis_3.6.10.10.json",
+      "bytes": 4258,
+      "sha256": "402d4a8c4a8b8ece7d302d0f75e450f71f4413946eb0fa191d1e96c00e9c66ab"
+    },
+    {
+      "path": "caracteristicas_kub.json",
+      "bytes": 6397,
+      "sha256": "76ed35a53b097a0578f055aaa6acf610b630ce009b64951811ade48de14dd2f0"
+    },
+    {
+      "path": "invocaciones_duracion.json",
+      "bytes": 249,
+      "sha256": "0d43c708c21b4d5a8f69da72364e3d75431788e5490e34965b27913d46d80e38"
+    },
+    {
+      "path": "mascoturas.json",
+      "bytes": 1264,
+      "sha256": "6db00315236cf4b3525db11b8081dda4d62c5618a64c2cb51cd004c0b076ca73"
+    },
+    {
+      "path": "monturas_colores.json",
+      "bytes": 5457,
+      "sha256": "0af0213f8b4516c688b97315e101de840b962e05a05a0ed9cae0ce79dac3b9e6"
+    },
+    {
       "path": "JsonFromDofusDude/jobs.json",
       "bytes": 4479,
       "sha256": "d4d380ae41a4370a8a68543a49fe37940e37aa686f27163d2a3be94d32244925"
@@ -149,6 +169,36 @@
       "path": "JsonFromDofusDude/recipes.json",
       "bytes": 1516290,
       "sha256": "026c38fc3f9bf78ea63f777db4b07bf6726552db4c4e7f01657e8e7148c5635a"
+    },
+    {
+      "path": "world_interactive_returns_3.6.10.10.json",
+      "bytes": 1944,
+      "sha256": "78cdaaa7dffb9c403b333d45afa5dabc26db59c261ef2bc745d2bfff2518d125"
+    },
+    {
+      "path": "zaap_overrides.json",
+      "bytes": 1609,
+      "sha256": "9f9ca7edee2adb7bf94e4023826bbc755c5ff78140109d8ad2a4ee635dca6d49"
+    },
+    {
+      "path": "world.zip",
+      "bytes": 25544756,
+      "sha256": "d5fef8b7b6adcd7ba85a25529e4cfe407e87fc183568d75c023939efe7e1914e"
+    },
+    {
+      "path": "catalog_integrity.json",
+      "bytes": 36250,
+      "sha256": "b937077959647a11ece69361fdde6326ddd15e5220dec6d9ddf350d94ce9606c"
+    },
+    {
+      "path": "map_scrolls.json",
+      "bytes": 1879341,
+      "sha256": "ebb4a8130b126d3aa017a6623af2880fc5b94d4d01b279eed9ab7298a6681fbc"
+    },
+    {
+      "path": "effect_runtime_semantics.json",
+      "bytes": 620,
+      "sha256": "7a80b5b061af3f956ff98c8c1be254ec420d09546b5c12d5852894efbe33b370"
     }
   ],
   "excluded": [

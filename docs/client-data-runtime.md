@@ -15,42 +15,90 @@ py tools/build_server_client_data_snapshot.py
 py tools/audit_client_data_runtime.py
 ```
 
-The manifest contains hashes and the client version for the 28 static runtime
-inputs currently consumed by the server: map cells, appearance/experience,
+The manifest contains byte counts, SHA-256 hashes and the client version for the static runtime
+inputs currently consumed by the server: map cells and scroll links, appearance/experience,
 dungeons, interactives and graph transitions, travel, houses, cosmetics,
 mounts, NPC shops, spell variants, jobs/skills/recipes, and the three captured
-world-entry blocks.  `Paths.Resolve` and `Paths.DofusDudeJsonDir` prefer this
-snapshot only when the manifest validates for `3.6.10.10`; otherwise they fall
-back to `datos/` so a partial or wrong-version extraction cannot silently alter
-live gameplay.
+world-entry blocks. It also contains the version-pinned empty-world bootstrap
+cache and the small capture-derived tables used by characteristics, summons and
+mount rendering. `catalog_integrity.json`, itself protected by the server manifest, records the
+byte count and SHA-256 of every one of the 204 normalized raw client catalogues. Static gameplay readers use `Paths.ServerData` or
+`Paths.Catalog`; they do not fall back to `datos/` or `dofus3_data/`.
+
+Startup is fail-closed. It verifies every server file's byte count and SHA-256,
+the raw extraction manifest, all 204 generated catalogue files, the world
+extraction marker, and the mechanics manifest before opening a listener. A
+partial, edited-without-regenerating-the-manifest, or mixed-version snapshot
+cannot start the server.
 
 The raw client extraction remains under `catalogs/` and `world/`; translated
 reference snapshots are under `dofusdude/en` and `dofusdude/fr`; editable
 mechanics live under `mechanics/`.  None of those locations hold account or
 character state.
 
-## Current boundary — intentionally not claimed as complete
+## Static data versus mutable state
 
-`bases/auth.db` contains accounts.  `bases/world.db` currently contains both
+`bases/auth.db` contains accounts. `bases/world.db` currently contains both
 player tables (`Characters`, inventory, spell-bar, wardrobe, haven bag, houses)
-and legacy static game tables (`ItemTemplates`, `MonsterTemplates`, `Spells`,
+and indexed/cached static game tables (`ItemTemplates`, `MonsterTemplates`, `Spells`,
 `MapTemplates`, NPC templates/spawns, recipes, skills, dungeons, translations,
-and related lookup tables).  That is a migration debt, not an acceptable claim
-that *all* client data is in `client_data`.
+and related lookup tables). The authoritative raw definitions and bootstrap
+cache are in `client_data`. A stable fingerprint is computed from the catalogue,
+server-data, and mechanics hashes. When it changes, `StaticContentCache` transactionally
+rebuilds item/effect, spell, monster, map/scroll, subarea, and NPC-template indexes from JSON,
+then tags the cache. It deliberately leaves characters, inventory instances, spell bars,
+wardrobes, haven bags, house ownership and all other player state untouched. Startup rejects a
+database tagged for another protocol version rather than serving mixed data.
 
-Do not delete or regenerate `world.db` from the snapshot.  A safe next migration
-is to export/import those static tables into a version-pinned read-only
-`client_data/<version>/game-data.db`, make the managers read that database, and
-leave only per-account/per-character/per-world mutable state in `bases/`.
-It must include a schema/version/hash manifest and a compatibility check before
-startup.  It must not copy player rows into game-data.db.
+Normal characteristic signs are imported from the raw client's
+`EffectData.characteristicOperator`; the server no longer parses Spanish effect descriptions.
+The few characteristic-zero AP/MP steal and multiplier classifications that EffectData cannot
+express live in the versioned `server/effect_runtime_semantics.json` file.
+
+The remaining architectural debt is separating those automatically rebuilt static indexes into
+a read-only `client_data/<version>/game-data.db`, leaving only mutable rows in
+`bases/world.db`. Until that split is complete, never treat a row existing in
+world.db as proof that it is version-compatible; the snapshot/version gate is
+the proof.
+
+## Incarnam coverage
+
+`mechanics/incarnam/content-coverage.json` is generated from the pinned raw
+catalogues with `py tools/export_incarnam_content_coverage.py`, followed by
+`py tools/refresh_mechanics_manifest.py`. It inventories
+area 45 maps/subareas, every referenced monster and spell list, dungeon 90 and
+its rooms/boss, Incarnam quest definitions, and quest-start NPC templates. The
+mechanics loader cross-checks every regional monster, spell list, and effect list against the full client
+monster baseline and rejects an incomplete coverage contract.
+
+The current contract also declares the four concrete Incarnam effect gaps rather than calling the
+region complete: fire life-steal (94) still lacks caster healing, invisibility (150) lacks native
+visibility/targeting updates, start-of-turn glyphs (401) lack a persistent cell entity and packets,
+and damage per AP used (1133) lacks a verified accounting window/end-turn response. The other
+Incarnam effect IDs are handled by the generic damage, movement, summon, heal, or stat engine.
+
+The file distinguishes data that really exists in the client from server-only
+behaviour. Client bundles establish maps, cells, looks, IDs, stats and spell
+definitions. They do not establish authoritative NPC spawn placement, dialogue
+routing, quest state mutations, rewards, or special boss rules. Those fields are
+marked missing until protocol/server evidence and handlers exist; the emulator
+must never fabricate them from an opaque sample or a guide description.
+
+`mechanics/incarnam/workshops.json` and `mechanics/incarnam/npc-spawns.json` are the reviewed
+server-data exceptions. The first joins 30 public Giny.NETCore workshop rows to exact client map
+elements, skills, and recipe counts. The second imports only four exact source placements that also
+exist in the pinned client. Giny source row 42 is retained only as rejected provenance: it names NPC
+2897 with source action row 49 (`TALK`, message 20713) on map 153880835/cell 215, but template 2897 does not exist in the
+3.6.10.10 client catalogue. It must not be replaced with Ganymed (7581). The loader rejects that
+substitution and deliberately excludes conflicting Symbioz 2.38 rows. Workshop clicks now open the native 3.6.10.10 craft interface; recipe execution,
+remaining NPC placement, dialogue, and quest progression are still explicit server-owned gaps.
 
 ## Updating for a new Dofus build
 
 1. Extract raw catalogues for the exact client version into a new versioned
    directory; never overwrite `3.6.10.10`.
 2. Regenerate each transformed server input from that exact extraction.
-3. Build the `server/` snapshot and run the audit.
+3. Refresh the mechanics manifest, build the `server/` snapshot and run the audit.
 4. Update the server's pinned version and protocol evidence together.
 5. Validate game login, map entry, one interactive, one NPC/shop, and one
    character persistence flow before publishing.
@@ -58,3 +106,7 @@ startup.  It must not copy player rows into game-data.db.
 The audit passing means the *declared runtime snapshot* is complete and
 untampered; it does not mean every Dofus mechanic or protocol opcode is
 implemented.
+
+For a release check that exercises the real JSON-to-SQLite importer without touching
+`bases/world.db`, run `Jondo Server.exe --audit-static-data`. It imports into a temporary copy of
+the player-free bootstrap, checks the key row counts, and performs a second idempotence pass.

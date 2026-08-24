@@ -78,6 +78,17 @@ def main() -> int:
         help="print durable queue counts by status and highest-volume unresolved opcode",
     )
     parser.add_argument("--id", type=int, help="show one queue row; includes raw replay samples")
+    parser.add_argument(
+        "--context",
+        action="store_true",
+        help="with --id, include the closest chronological C2S/S2C telemetry events from its session",
+    )
+    parser.add_argument(
+        "--context-events",
+        type=int,
+        default=24,
+        help="maximum events returned by --context (default: 24)",
+    )
     parser.add_argument("--set-status", metavar="STATUS", help="set the status for --id")
     parser.add_argument("--notes", help="replace investigation notes when setting a status")
     args = parser.parse_args()
@@ -86,6 +97,10 @@ def main() -> int:
         parser.error("--set-status requires --id")
     if args.notes and not args.id:
         parser.error("--notes requires --id")
+    if args.context and not args.id:
+        parser.error("--context requires --id")
+    if args.context_events < 1:
+        parser.error("--context-events must be positive")
 
     try:
         with connect() as connection:
@@ -102,7 +117,34 @@ def main() -> int:
                 row = connection.execute("SELECT * FROM UnknownPackets WHERE Id = ?", (args.id,)).fetchone()
                 if row is None:
                     raise LookupError(f"No telemetry packet with id {args.id}")
-                print(json.dumps(record(row, include_sample=True), indent=2))
+                result = record(row, include_sample=True)
+                if args.context:
+                    # Timeline storage was introduced after the first telemetry captures.  A
+                    # helpful empty result is preferable to making triage fail against an older
+                    # database; the next live session will populate it automatically.
+                    exists = connection.execute(
+                        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='ObservedPacketEvents'"
+                    ).fetchone()
+                    if exists:
+                        session = row["SessionCorrelation"]
+                        seen = row["LastSeenUtc"]
+                        if session and seen:
+                            events = connection.execute(
+                                "SELECT Sequence, SeenUtc, Protocol, Direction, Opcode, TypeUrl, "
+                                "WireSignature, DecodedSummary, AccountId, CharacterId, MapId, "
+                                "Phase, ClientVersion, FrameSha256, PayloadSha256 "
+                                "FROM ObservedPacketEvents WHERE SessionCorrelation = ? "
+                                "ORDER BY ABS(julianday(SeenUtc) - julianday(?)), Sequence DESC LIMIT ?",
+                                (session, seen, args.context_events),
+                            ).fetchall()
+                            # Nearest-first is useful for SQL selection but difficult to read as
+                            # a protocol journey.  Present the retained window chronologically.
+                            result["context_events"] = [dict(event) for event in reversed(events)]
+                        else:
+                            result["context_events"] = []
+                    else:
+                        result["context_events"] = []
+                print(json.dumps(result, indent=2))
                 return 0
 
             if args.summary:

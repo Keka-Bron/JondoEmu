@@ -116,8 +116,9 @@ client; they are deliberately not in the burst.
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
 | `kwb` | C→S | 2 / 2 files | The selection UI asks to open another character slot after the account list has loaded. The server validates the account/server capacity and continues with empty `kvd`. | `CharacterCreationHandler.ConfirmCanCreateAsync` | empty |
+| `kwa` | C→S | live 3.6.10.10 | Deletes the selected character from the character-selection screen. The live client payload is `f2: characterId`; the earlier pinned proto's boolean layout is stale. The server verifies account and server ownership, removes only character-owned rows in one transaction, then refreshes the list. | `CharacterDeletionHandler.HandleAsync` | `f2: characterId` |
 | `kvd` | S→C | 4 / 3 files | Closes a `kvi` character list. It also is the empty continuation for `kwb`; it must follow every refreshed list as well as an accepted extra-slot request. | `BuildWelcomeBurst`, `CharacterCreationHandler` | empty |
-| `kvz` | C→S | 2 / 2 files | Create a character. | `CharacterCreationHandler.CreateAsync` | read for name, breed, sex, look |
+| `kvz` | C→S | 2 / 2 files | Create a character. The refreshed `kvi` puts the new record first and is closed by `kvd`; the client then sends its own selection request for that record. | `CharacterCreationHandler.CreateAsync` | read for name, breed, sex, look |
 | `kvb` | S→C | 2 / 2 files | Result of the creation. Empty on success; `f2` carries the refusal reason. | `CharacterCreationHandler` | empty, or `f2: reason` |
 | `kwd` | C→S | 2 / 2 files | The dice button requests a random character name. | `CharacterCreationHandler.SuggestNameAsync` | empty |
 | `kvk` | S→C | 8 / 2 files | A suggested character name (the dice button). | `CharacterCreationHandler.SuggestNameAsync` | `f1: name` |
@@ -151,10 +152,10 @@ its own stored capture to decide what to substitute, not reading the client.
 |---|---|---|---|---|---|
 | `lqc` | C→S | 77 / 56 files | "Block 1 digested." The real server waits for this before sending block 2. | `GameNodeProxy` | — |
 | `jru` | S→C | 719 / 86 files | "Load this map." Sending it twice makes the client reload the world in a loop. | `BuildLoadMap`, `WorldEntry.SendMapAsync` | `f2: map id` |
-| `hjk` | S→C | 7 / 6 files | Travels with `jru` on every map change. | `BuildMapDiscovered` | `f1: packed [map id]` |
+| `hjk` | S→C | 7 / 6 files | Full replacement of the character's known-zaap map-id list; travels with `jru` on every map change. | `BuildKnownZaaps`, `WorldEntry.SendMapAsync` | `f1: packed [known zaap map ids]` |
 | `jrh` | C→S | 690 / 86 files | "Who is on this map?" Unanswered, the map draws empty: no avatar, no NPCs, no monsters. | `GameNodeProxy` | — |
 | `jss` | S→C | 692 / 87 files | The actors. `f6` is not decoration: with a zero subarea the client throws inside `MapInfoUI.SetInfoFromSubarea` and loses the map name, the coordinates and the minimap marker. Actor type comes from which field appears inside `f2.f1` — `f5` player, `f7` NPC, `f4` monster group; NPCs and groups use negative contextual ids. | `BuildMapActors` | `f2: map id, f6: subarea id, f5 (rep) { f1 { f1: cell, f2: facing }, f2 {…what it is…}, f3: contextual id }` |
-| `lva` | S→C | 1071 / 88 files | "That is every actor." Empty, immediately behind `jss`. Without it the client never counts the map as loaded: it waits about two seconds, asks again with `knm`, `kno`, `kny`, and starts over. | `BuildActorsComplete` | empty |
+| `lva` | S→C | 1071 / 88 files | "That is every actor." Empty, immediately behind the `jss` sent for the map-ready `jrh`. | `BuildActorsComplete` | empty |
 | `kub` | S→C | 188 / 54 files | The character sheet. The container field is **not** the same for every characteristic and getting it wrong kills the whole sheet with a `NullReferenceException` in the client's own log. Which id uses which container is read off the captured `kub`, not written down. Sent twice — once with the character, once with the map; the client keeps the second. | `BuildCharacteristics`, `WorldEntry.ContainerOf` | `f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {…} } }` — containers: `f4 {f2: base, f3: parchments, f7: equipment}` for most, `f5 {f1: base, f5: bonus}` for 1 and 23, `f2 {f2: value}` for 29, 47 and 96 |
 | `irq` | S→C | 93 / 11 files | Jobs. The id list is kept (it is game data); the captured progress is thrown away and every job goes out at level 1. | `WorldEntry.ResetJobs` | `f1 (rep) { f1: job id, f3: level, f4/f5: experience }` |
 | `hms` | S→C | 8 / 6 files | The spells the character has, each at the grade its level opens. | `BuildSpellList` | `f1 (rep) { f1: grade, f3: spell id, f4: 1 }` |
@@ -184,7 +185,7 @@ C  kmv, jrh                        S  jss, lva
 |---|---|---|---|---|---|
 | `jrw` | C→S | 1038 / 121 files | Walk to a path of cells. Each step packs the facing in the bits above the cell. The map id is checked against the session and a mismatch is ignored — trusting it would let a stray message move the character anywhere. | `WorldMoveHandler.ConfirmMovementAsync` | `f1: map id, f2: packed path, each entry (facing << 12) \| cell` |
 | `jsj` | S→C | 2505 / 178 files | The movement confirmed. Skipping it leaves the actor at facing zero, which is why a character walking off the left edge turned to face right as the screen faded. | `BuildActorMoved` | `f1: packed cells, f2: facing, f5: contextual id` |
-| `jqi` | C→S | 834 / 114 files | "I am at the edge, may I leave?" | `WorldMoveHandler.AllowMapExitAsync` | empty |
+| `jqi` | C→S | 834 / 114 files | A pre-action/map-exit handshake, not proof by itself that the player is leaving. Normal borders receive `jsq`; an interior return executes only at an exact version-pinned actor action cell (or an unambiguous reciprocal graph cell). | `WorldMoveHandler.AllowMapExitAsync` | empty |
 | `jsq` | S→C (f3) | 834 / 114 files | Go ahead. Carries nothing but the echoed request id, on root field 3. Without it the client never sends `jqk` and the character stands on the border for good. | `ConnectionProtocol.Answer` | empty, id echoed |
 | `jqk` | C→S | 430 / 22 files | The map it wants. Landing cell and facing are worked out from the exit side: a map is 14 cells across as a diamond, so leaving sideways moves the cell by 13 and vertically by 532 — all four measured off the captures. | `WorldMoveHandler.ChangeMapAsync` | `f2: map id` |
 | `jsd` | S→C | 450 / 36 files | Take an actor off the map. Its own move to another map counts. | `BuildActorLeft` | `f2: contextual id` |
@@ -283,8 +284,10 @@ C  hjc { f3: destination map }                    S  jsd, jru, lqu, hjk, ivf, kl
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
-| `iwo` | C→S | 220 / 81 files | Clicked an interactive element. Specialized handlers resolve zaaps, houses, chests, zaapis, bins and the lottery; criterion-free single-target doors/stairs/ladders additionally resolve through the pinned client world graph. An unregistered map/element/skill is retained as a `New` `UnhandledInteractiveUse` telemetry row, including its map-data cell/gfx and the additional parameter, rather than being guessed as a workshop, resource or HDV. | `InteractiveActionHandler.UseAsync` | `f1: skill instance uid, f2: element id, f3: additional parameter` |
+| `jss` | S→C | native 3.6.10.10 writer/parser; official capture audit | Supplies the map actors and complementary data. Interactive declarations are `lev` records in `f11`: disabled actions are repeated `let` messages in `f3`, enabled actions are in `f4`, the element id is `f5`, and type is `f6`. The corrected pinned schema now preserves optional `f2`; the older extraction was shifted because it treated the generated `Has` property as a wire field. Stated position/state is a separate `ldf` record in `f15`. | `ConnectionProtocol.BuildMapActors` | `f11 (rep) { f1: 1, f4 (rep) { f1: skill instance, f2: skill }, f5: element, f6: type }, f15 (rep) { f1: 1, f2: cell, f3: element }` |
+| `iwo` | C→S | 220 / 81 files | Clicked an interactive element. Specialized handlers resolve zaaps, houses, chests, zaapis, bins, the lottery, and 30 version-pinned Incarnam workshops; criterion-free single-target doors/stairs/ladders additionally resolve through the pinned client world graph. An unregistered map/element/skill is retained as a `New` `UnhandledInteractiveUse` telemetry row, including its map-data cell/gfx and the additional parameter, rather than being guessed as a resource or HDV. | `InteractiveActionHandler.UseAsync` | `f1: skill instance uid, f2: element id, f3: additional parameter` |
 | `iwn` | S→C | 402 / 102 files | "That element is in use." `f2` is the **element**, not the skill instance: crossing `iwo` and `iwn` in the same capture shows the client sending both numbers and the server returning the second. Sending the first marks an element that does not exist as busy. | `BuildElementInUse` | `f1: 1, f2: element id, f4: skill, f5: who` |
+| `kgq` | S→C | exact 3.6.10.10 client trace | Opens crafting for a skill. `emc::zot(kgq)` forwards optional field 1 and `fsm::gak` resolves it through `SkillsDataRoot.GetSkillById` before creating `CraftUi`. This establishes the open message but not ingredient mutation or recipe completion. | `CraftHandler.OpenAsync` | `f1: craft skill id` |
 | `hjj` | S→C | 12 / 11 files | The destination list. `f6` was checked against `MapPositions` on all 25 entries of the capture and matches every one. The destination you are already standing on travels without `f2`, which in proto3 is zero: going where you already are costs nothing. | `BuildZaapList` | `f2: map of the open zaap, f3 (rep) { f1: area level, f2: cost, f5: map, f6: subarea }` |
 | `hjc` | C→S | 11 / 10 files | Destination chosen. | `ZaapTravelHandler.TravelAsync` | `f3: destination map` |
 | `ivf` | S→C | 38 / 22 files | Kamas left after paying. | `BuildKamas` | `f1: kamas` |
@@ -482,10 +485,12 @@ they belong to ordinary sessions rather than to one feature.
 | `hpm` | S→C | 103 | 35 | Nothing established. |
 | `izz` | S→C | 635 | 29 | Nothing established. |
 
-### 4.2 Combat — the largest hole
+### 4.2 Combat — working core, large remaining surface
 
-Fights are not implemented against this client at all. `jtn`, `jwe` and `jxw` appear in **exactly
-the same 23 capture files, and every one of those 23 is a recording that contains a fight** — 12
+Ordinary roaming-monster fights now work end to end against this client, including entry,
+preparation, movement, spell casts, turns, victory rewards and return to roleplay. The capture census
+still shows how much broader full combat parity is: `jtn`, `jwe` and `jxw` appear in **exactly the
+same 23 capture files, and every one of those 23 is a recording that contains a fight** — 12
 `Combate` files, Hipermago, Zurkarak (2), Steamer, the jalatós dungeon, two Sueños Infinitos, the
 tax-collector attack under Gremio, two Movimiento files that end in a fight, and the tutorial.
 
@@ -504,10 +509,10 @@ tax-collector attack under Gremio, two Movimiento files that end in a fight, and
 | `kmk` | S→C | 264 | 22 |
 
 `jtn` alone is 14,728 messages — more than any other opcode in the entire capture set. **100
-unimplemented opcodes appear in those 23 files and in none of the other 219**, so a fight is worth
-that many messages on its own. The existing `FightHandler` is 3.6.4.3 code
-speaking `joi`, `jos`, `jpp`, `jud`, `juc`, `jvm`, `joo` — none of which appears anywhere in the
-242 captures.
+unimplemented opcodes appear in those 23 files and in none of the other 219**, so the working PvM
+slice does not imply PvP, challenges, spectators, dungeon scripts, boss phases or every spell-effect
+family. The current handler uses the 3.6.10.10 aliases for the implemented path; unsupported
+messages and effects remain explicit evidence targets.
 
 ### 4.3 By feature
 
@@ -563,15 +568,14 @@ longer print as unhandled.
 | `kmr` | empty | Once, in the world-entry burst | The real server answers it with eleven frames including the `jru` of the map. Routed to the map block, guarded by the once-per-entry flag — a second `jru` is the world-reload loop. |
 | `lzh` | empty | Last of the world entry, before `kmv` and `jrh` | Answered with an empty `lzl`, as measured. |
 | `ieo` | one int (1869 measured) | Four in a row on world entry | Each answered with one `idu`; the four-for-four pairing is measured, the inside of the `idu` is not, so it goes out empty. |
-| `knm` `kno` `kny` | — | Two seconds after a map load that missed its `lva` | Given the actors and the `lva` again — the same answer the `jrh` gets, which is what the client is re-asking for. |
+| `knm` `kno` `kny` | — | Post-character-load setup, before `lzh`, `kmv` and `jrh` | Recognised but not answered until their actual feature responses are identified. They are not map retries; premature `jss`/`lva` replies throw in `MapInfoUI` before the UI is ready. |
 | `kvc` `krv` | `krv` carries a 231-digit string | Right after the welcome burst, on going back to character selection | Deliberately not answered, as before; no longer dumped. |
 | `jqe` | one cell number (468, 213 measured) | Right before every `jqi`/`jqk` border crossing | Exact meaning not established; the cell state already travels in `jrw`. Silenced. |
 | `ijm` `iul` | `ijm` a bool, `iul` two ints | Entering a fight | `kmv` already carries the flow for `ijm`; `iul` has no measured answer. Silenced. |
 | `kwb` `kwd` `kaz` `koc` `jiy` `hom` `jha` `koe` `kpb` `jew` `hos` `lrd` `ivp` `kon` `ktn` `kus` `ktn` | mostly empty | The world-entry flood; `kwb` is fight-only, `kwd` connection-extras | No measured answer; already covered by the entry blocks. Silenced and named in the traffic log. |
 
-Nothing in this table was answered by guessing: the four live answers (`lzl`, `idu`, the `kmr` map
-block, the `knm`/`kno`/`kny` actors) are exactly what the mapping notes say the real server sends,
-and the rest are quiet because quiet is what the real server is to them.
+Nothing in this table is answered by guessing: `lzl`, `idu` and the guarded `kmr` map block are
+measured. The remaining rows stay quiet until their real response semantics are established.
 
 ---
 

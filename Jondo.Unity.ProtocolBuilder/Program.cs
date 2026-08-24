@@ -21,6 +21,7 @@ if (args.Length == 0)
         Sacar la forma
           proto <dll del protocolo> [salida.proto]      mensajes, campos y números
           mirar <dll> [tipo]                            qué hay dentro de una clase
+          orden <dll> [filtro]                          orden de metadatos de los mensajes
           volcar <global-metadata.dat> [salida]         el camino muerto del descriptor (§3.1)
 
         Emparejar dos versiones
@@ -32,6 +33,8 @@ if (args.Length == 0)
                                                         qué clase del cliente toca cada mensaje
           trazar <carpeta del cliente> <Tipo::metodo> [limite]
                                                         instrucciones Cpp2IL de una pista concreta
+          buscar-llamadas <carpeta del cliente> <texto> [limite]
+                                                        métodos cuyo cuerpo llama o menciona esa pista
           expediente <dll> <indice> <anclas> <mensaje|--todos|--medidos> [carpeta] [--ciego]
                                                         todo lo que se sabe de un mensaje, junto
           preguntar <dll> <indice> <anclas> [salida.tsv] [--evaluar] [--limite N]
@@ -56,11 +59,13 @@ switch (args[0])
 {
     case "volcar": return Volcar(args);
     case "mirar": return Mirar(args);
+    case "orden": return Orden(args);
     case "proto": return Proto(args);
     case "probar": return Probar(args);
     case "emparejar": return Emparejar(args);
     case "indexar": return Indexar(args);
     case "trazar": return Trazar(args);
+    case "buscar-llamadas": return BuscarLlamadas(args);
     case "expediente": return Expediente(args);
     case "preguntar": return Preguntar(args).GetAwaiter().GetResult();
     case "evaluar": return Evaluar(args);
@@ -592,7 +597,13 @@ static int Emparejar(string[] args)
         foreach (string name in resultado.Alone) sb.AppendLine(name);
         sb.AppendLine();
         sb.AppendLine("# ambiguos");
-        foreach (string name in resultado.Ambiguous) sb.AppendLine(name);
+        foreach (string name in resultado.Ambiguous)
+        {
+            string candidates = resultado.Candidates.TryGetValue(name, out var choices)
+                ? string.Join(", ", choices)
+                : string.Empty;
+            sb.AppendLine($"{name} -> ?{(candidates.Length == 0 ? string.Empty : $"   [{candidates}]")}");
+        }
         File.WriteAllText(args[3], sb.ToString());
         Console.WriteLine($"  escrito en {args[3]}");
     }
@@ -629,6 +640,32 @@ static int Indexar(string[] args)
     return 0;
 }
 
+/// <summary>Prints message metadata order for cross-build neighbourhood correlation.</summary>
+static int Orden(string[] args)
+{
+    if (args.Length < 2)
+    {
+        Console.WriteLine("Uso: orden <dll> [filtro]");
+        return 1;
+    }
+
+    string filter = args.Length > 2 ? args[2] : string.Empty;
+    using var reader = new AssemblyReader(args[1]);
+    var messages = reader.Types()
+        .Where(type => type.GetInterfaces().Any(i => i.Name is "IMessage" or "IBufferMessage") ||
+                       (type.Name.Length == 3 && type.Name.All(char.IsLower)))
+        .OrderBy(type => type.MetadataToken)
+        .ToList();
+    for (int i = 0; i < messages.Count; i++)
+    {
+        Type type = messages[i];
+        if (filter.Length > 0 && !type.FullName!.Contains(filter, StringComparison.OrdinalIgnoreCase))
+            continue;
+        Console.WriteLine($"{i}\t0x{type.MetadataToken:X8}\t{type.FullName}");
+    }
+    return 0;
+}
+
 /// <summary>
 /// Dumps reconstructed Cpp2IL instructions for one narrowly selected client method.  The normal
 /// index keeps only call-site summaries; a packet investigation sometimes needs the nearby
@@ -643,14 +680,18 @@ static int Trazar(string[] args)
     }
 
     string needle = args[2];
+    string[] needles = needle.Split('|', StringSplitOptions.RemoveEmptyEntries |
+                                         StringSplitOptions.TrimEntries);
     int limit = args.Length > 3 && int.TryParse(args[3], out int parsed)
-        ? Math.Clamp(parsed, 1, 32)
+        ? Math.Clamp(parsed, 1, 256)
         : 8;
+    bool summaryOnly = args.Any(arg => arg.Equals("--summary", StringComparison.OrdinalIgnoreCase));
 
     using var client = new ClientReader(args[1]);
     var matches = client.AllMethods()
-        .Where(method => $"{method.DeclaringType?.FullName}::{method.DefaultName}"
-            .Contains(needle, StringComparison.OrdinalIgnoreCase))
+        .Where(method => needles.Any(part =>
+            $"{method.DeclaringType?.FullName}::{method.DefaultName}"
+                .Contains(part, StringComparison.OrdinalIgnoreCase)))
         .Take(limit)
         .ToList();
     if (matches.Count == 0)
@@ -670,6 +711,16 @@ static int Trazar(string[] args)
             method.Analyze();
             foreach (var instruction in method.ConvertedIsil ?? [])
             {
+                string searchable = instruction + " " + string.Join(" ",
+                    instruction.Operands.Select(operand => operand.Data?.ToString()));
+                if (summaryOnly && !searchable.Contains("typeof(", StringComparison.Ordinal) &&
+                    !searchable.Contains(".ctor", StringComparison.Ordinal) &&
+                    !searchable.Contains("Core.", StringComparison.Ordinal) &&
+                    !searchable.Contains("Craft", StringComparison.OrdinalIgnoreCase) &&
+                    !searchable.Contains("Exchange", StringComparison.OrdinalIgnoreCase) &&
+                    !searchable.Contains("Recipe", StringComparison.OrdinalIgnoreCase) &&
+                    !searchable.Contains("JobUI", StringComparison.OrdinalIgnoreCase))
+                    continue;
                 Console.WriteLine("  " + instruction);
                 foreach (var operand in instruction.Operands)
                     Console.WriteLine("    " + operand.Data);
@@ -686,6 +737,66 @@ static int Trazar(string[] args)
     }
 
     return 0;
+}
+
+/// <summary>
+/// Finds native client methods which reference a type or method in their reconstructed ISIL.
+/// This is deliberately separate from <see cref="Trazar"/>: packet ownership investigations
+/// often know the UI/service callee but not the obfuscated method which receives the packet.
+/// </summary>
+static int BuscarLlamadas(string[] args)
+{
+    if (args.Length < 3)
+    {
+        Console.WriteLine("Uso: buscar-llamadas <carpeta del cliente> <texto> [limite]");
+        return 1;
+    }
+
+    string needle = args[2];
+    int limit = args.Length > 3 && int.TryParse(args[3], out int parsed)
+        ? Math.Clamp(parsed, 1, 256)
+        : 64;
+    int found = 0;
+
+    using var client = new ClientReader(args[1]);
+    foreach (var method in client.AllMethods())
+    {
+        if (found >= limit) break;
+        try
+        {
+            method.Analyze();
+            var hits = (method.ConvertedIsil ?? [])
+                .Where(instruction =>
+                {
+                    string searchable = instruction + " " + string.Join(" ",
+                        instruction.Operands.Select(operand => operand.Data?.ToString()));
+                    return searchable.Contains(needle, StringComparison.OrdinalIgnoreCase);
+                })
+                .ToList();
+            if (hits.Count == 0) continue;
+
+            string name = $"{method.DeclaringType?.FullName}::{method.DefaultName}";
+            Console.WriteLine($"\n{name}");
+            foreach (var instruction in hits)
+            {
+                Console.WriteLine("  " + instruction);
+                foreach (var operand in instruction.Operands)
+                    Console.WriteLine("    " + operand.Data);
+            }
+            found++;
+        }
+        catch
+        {
+            // Unsupported native bodies carry no reliable ownership evidence.
+        }
+        finally
+        {
+            try { method.ReleaseAnalysisData(); } catch { }
+        }
+    }
+
+    Console.WriteLine($"\n{found:N0} método(s) encontrado(s).");
+    return found == 0 ? 1 : 0;
 }
 
 /// <summary>Lo que hace falta para armar expedientes, cargado una vez.</summary>

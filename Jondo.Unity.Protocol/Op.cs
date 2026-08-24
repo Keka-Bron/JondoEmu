@@ -98,6 +98,13 @@ public static class Op
     /// <summary>El cliente pide abrir otro hueco de personaje; va vacio despues de recibir la lista.</summary>
     public const string CharacterCanBeCreatedRequestMessage = "kwb";
 
+    /// <summary>
+    /// Deletes the character selected on the character-selection screen. The current 3.6.10.10
+    /// client sends its character id as the varint in payload field 2 (not the obsolete boolean
+    /// layout present in an early protocol dump).
+    /// </summary>
+    public const string CharacterDeletionRequestMessage = "kwa";
+
     /// <summary>Crear un personaje.</summary>
     public const string CharacterCreationRequestMessage = "kvz";
 
@@ -212,7 +219,7 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Hii = "hii";
 
-    /// <summary>Viaja con jru en cada cambio de mapa.</summary>
+    /// <summary>Lista completa de mapas con zaap conocidos por el personaje; reemplaza la anterior y viaja con jru en cada cambio de mapa.</summary>
     public const string Hjk = "hjk";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
@@ -274,6 +281,13 @@ public static class Op
 
     /// <summary>Ese elemento esta en uso; f2 es el elemento, no la instancia de habilidad.</summary>
     public const string InteractiveUsedMessage = "iwn";
+
+    /// <summary>
+    /// Abre la interfaz de fabricación. Identificado en el cliente IL2CPP 3.6.10.10:
+    /// <c>emc::zot(kgq)</c> entrega el campo opcional 1 al servicio de intercambio y
+    /// <c>fsm::gak</c> lo resuelve como identificador de habilidad antes de crear <c>CraftUi</c>.
+    /// </summary>
+    public const string ExchangeCraftStartedEvent = "kgq";
 
     /// <summary>El inventario, construido desde la base de datos; el hueco se omite cuando es cero porque cero es el amuleto.</summary>
     public const string InventoryContentMessage = "ivx";
@@ -843,6 +857,7 @@ public static class Op
             ["iwb"] = "StorageInventoryContentMessage",
             ["iwn"] = "InteractiveUsedMessage",
             ["iwo"] = "InteractiveUseRequestMessage",
+            ["kgq"] = "ExchangeCraftStartedEvent",
             ["jal"] = "HouseBuyRequestMessage",
             ["jam"] = "Jam",
             ["jan"] = "HouseSaleRequestMessage",

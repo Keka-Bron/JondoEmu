@@ -46,6 +46,7 @@ VISUAL_CLASSES = {
     "ClientInteractiveElementTransform",
     "ClientInteractiveAnimatedElementTransform",
 }
+BOUNDING_BOX_VISUAL_CLASS = "ClientInteractiveElementTransform"
 
 
 def fail(message: str) -> "None":
@@ -169,6 +170,8 @@ def extract_live_map_elements(
                         fail(f"map_{map_id}: rid {rid} no contiene {required}.")
 
                 element_id = int(data["m_interactionId"])
+                if not 0 < element_id <= 0xFFFFFFFF:
+                    fail(f"map_{map_id}: id de bounding box inválido {element_id}.")
                 key = (map_id, element_id)
                 if key in elements:
                     fail(
@@ -186,6 +189,40 @@ def extract_live_map_elements(
                     "requiresServerUpdate": bool(data.get("requiresServerUpdate", 0)),
                 }
                 classes[class_name] += 1
+
+            # Some click targets are stored inline as bounding boxes instead of managed
+            # interactive-transform references. They still carry the same authoritative
+            # interaction id, cell and graphic identifiers used by jss. In particular, the
+            # ordinary Incarnam/Amakna zaaps (gfx 301199) live here; omitting this collection
+            # leaves only their unrelated animated scenery elements available to the server.
+            for data in tree["mapData"].get("boundingBoxes", []):
+                if not isinstance(data, dict):
+                    fail(f"map_{map_id}: bounding box inválida.")
+                for required in ("m_interactionId", "cellId", "gfxId"):
+                    if required not in data:
+                        fail(f"map_{map_id}: bounding box sin {required}.")
+
+                element_id = int(data["m_interactionId"])
+                key = (map_id, element_id)
+                if key in elements:
+                    fail(
+                        "La clave (mapId,m_interactionId) no es única: "
+                        f"({map_id},{element_id})."
+                    )
+                cell_id = int(data["cellId"])
+                if not 0 <= cell_id <= 559:
+                    fail(f"map_{map_id}: casilla de bounding box inválida {cell_id}.")
+                gfx_id = int(data["gfxId"])
+                if gfx_id <= 0:
+                    fail(f"map_{map_id}: gfx de bounding box inválido {gfx_id}.")
+
+                elements[key] = {
+                    "elementCellId": cell_id,
+                    "gfxId": gfx_id,
+                    "visualClass": BOUNDING_BOX_VISUAL_CLASS,
+                    "requiresServerUpdate": bool(data.get("requiresServerUpdate", 0)),
+                }
+                classes[BOUNDING_BOX_VISUAL_CLASS] += 1
 
         if bundle_number % 50 == 0 or bundle_number == len(bundles):
             print(

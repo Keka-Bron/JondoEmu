@@ -56,6 +56,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task OpenAsync(NetworkStream stream, Interactives.Element zaap, int skillId)
         {
             long here = Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
+            long characterId = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
 
             SessionContext.State.OpenZaapMapId = here;
 
@@ -66,7 +67,9 @@ namespace Jondo.Unity.Launcher.Handlers
             // A vestige is an anomaly gateway, not an ordinary zaap. Its list contains only the
             // anomaly tab; a normal zaap additionally exposes that tab after ordinary waypoints.
             bool vestige = Interactives.IsVestige(here, zaap);
-            var destinations = vestige ? AnomalyDestinations(here) : Destinations(here);
+            var destinations = vestige
+                ? AnomalyDestinations(here)
+                : Destinations(here, DatabaseManager.GetDiscoveredZaapMaps(characterId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.TeleportDestinationsMessage, ConnectionProtocol.BuildZaapList(here, destinations)));
 
@@ -130,9 +133,16 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 target = chosen;
                 var waypoint = Interactives.WaypointOf(target);
-                if (waypoint == null)
+                if (waypoint == null || !waypoint.Activated || !Interactives.CanLeaveFrom(target))
                 {
-                    Console.WriteLine($"[Zaap] El cliente pide viajar a {target}, que no tiene zaap.");
+                    Console.WriteLine($"[Zaap] El cliente pide viajar a {target}, que no es un " +
+                                      "destino de zaap activo y utilizable.");
+                    return;
+                }
+                if (!DatabaseManager.HasDiscoveredZaap(SessionContext.State.CharacterId, target))
+                {
+                    Console.WriteLine($"[Zaap] El personaje {SessionContext.State.CharacterId} " +
+                                      $"intentó viajar al zaap no descubierto {target}.");
                     return;
                 }
                 cost = CostBetween(from, target);
@@ -161,6 +171,7 @@ namespace Jondo.Unity.Launcher.Handlers
             Jondo.Unity.Launcher.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(
                 target, arrival.Count > 0 ? arrival[0].Cell : 0);
             DatabaseManager.SaveCurrentCharacter();
+            ZaapDiscovery.DiscoverOnArrival(SessionContext.State.CharacterId, target);
 
             // Y que los dos mapas se enteren: el zaap no avisaba a ninguno.
             await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
@@ -174,7 +185,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(target));
+                ConnectionProtocol.BuildKnownZaaps(SessionContext.State.CharacterId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.KamasUpdateMessage, ConnectionProtocol.BuildKamas(Jondo.Unity.Launcher.Network.SessionContext.State.Kamas)));
 
@@ -189,22 +200,34 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Los destinos que se le ofrecen. Todos los zaaps activos: en este emulador el personaje
-        /// los tiene todos descubiertos.
+        /// Los destinos que se le ofrecen. Sólo los zaaps que este personaje descubrió al llegar
+        /// a su mapa. El catálogo global nunca se convierte en progreso de personaje.
         ///
         /// Con una condición: que del destino se pueda volver. Un mapa cuyo zaap no sepamos dónde
         /// está es un sitio del que no se sale, y eso es peor que no ofrecerlo. El sitio donde uno
         /// ya está se ofrece igualmente, porque en la captura real el mapa propio sale en la lista
         /// con coste cero.
         /// </summary>
-        private static List<ConnectionProtocol.ZaapDestination> Destinations(long from)
+        private static List<ConnectionProtocol.ZaapDestination> Destinations(
+            long from, IEnumerable<long> discoveredMaps)
+        {
+            var salida = OrdinaryDestinations(from, discoveredMaps);
+            salida.AddRange(AnomalyDestinations(from));
+            return salida;
+        }
+
+        /// <summary>Pure character-discovery filter, exposed internally to the startup guard.</summary>
+        internal static List<ConnectionProtocol.ZaapDestination> OrdinaryDestinations(
+            long from, IEnumerable<long> discoveredMaps)
         {
             var salida = new List<ConnectionProtocol.ZaapDestination>();
+            var discovered = new HashSet<long>(discoveredMaps);
             foreach (var waypoint in Interactives.Waypoints)
             {
+                if (!discovered.Contains(waypoint.MapId)) continue;
                 if (!waypoint.Activated) continue;
                 if (MapManager.GetMapInfo(waypoint.MapId) == null) continue;
-                if (waypoint.MapId != from && !Interactives.CanLeaveFrom(waypoint.MapId)) continue;
+                if (!Interactives.CanLeaveFrom(waypoint.MapId)) continue;
 
                 salida.Add(new ConnectionProtocol.ZaapDestination(
                     waypoint.MapId,
@@ -212,7 +235,6 @@ namespace Jondo.Unity.Launcher.Handlers
                     Interactives.LevelOfSubArea(waypoint.SubAreaId),
                     waypoint.MapId == from ? 0 : CostBetween(from, waypoint.MapId)));
             }
-            salida.AddRange(AnomalyDestinations(from));
             return salida;
         }
 

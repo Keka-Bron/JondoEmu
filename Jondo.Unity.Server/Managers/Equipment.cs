@@ -279,6 +279,37 @@ namespace Jondo.Unity.Launcher.Managers
         public static Item? ByUid(long uid) => Items.TryGetValue(uid, out var item) ? item : null;
 
         /// <summary>
+        /// Gets an item from the identifier carried by the game protocol.
+        ///
+        /// Dofus 3 declares the item id in <c>iuk</c>/<c>ivq</c> as an <c>int32</c>.  A few
+        /// early Jondo database seeds instead derived their ids from the 64-bit character id
+        /// (for example 13825560052).  The client correctly retains its low 32 bits
+        /// (940658164) and sends that value back.  Treating that as a different item made every
+        /// equip request look forged even though the item had just been sent to the client.
+        ///
+        /// New item allocation should stay inside the protocol range, but this compatibility
+        /// lookup keeps existing player inventories usable without changing their saved rows.
+        /// Returns null when the low-32-bit value would be ambiguous.
+        /// </summary>
+        public static Item? ByWireUid(long wireUid)
+        {
+            if (Items.TryGetValue(wireUid, out var direct)) return direct;
+
+            uint wanted = unchecked((uint)wireUid);
+            Item? match = null;
+            foreach (var candidate in Items.Values)
+            {
+                if (unchecked((uint)candidate.Uid) != wanted) continue;
+                if (match != null) return null; // never guess when two saved rows alias on wire
+                match = candidate;
+            }
+            return match;
+        }
+
+        /// <summary>The unsigned 32-bit representation accepted by the current client protocol.</summary>
+        public static long WireUid(long uid) => unchecked((uint)uid);
+
+        /// <summary>
         /// Quita del inventario en memoria lo que se ha ido a otro sitio —al cofre del merkasako,
         /// por ejemplo—. Si quedan unidades, se resta; si no, desaparece.
         /// </summary>

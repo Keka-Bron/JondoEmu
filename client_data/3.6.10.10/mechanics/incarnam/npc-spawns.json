@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "incarnam-npc-spawns-3.6.10.10",
+  "kind": "npc-spawn-bindings",
+  "status": "Verified",
+  "sourceUrl": "https://github.com/Skinz3/Giny.NETCore",
+  "sourceCommit": "e9a6d56077e0bc303ee734fb3ea0807bece2d962",
+  "clientVersion": "3.6.10.10",
+  "generatedUtc": "2026-08-22T00:00:00Z",
+  "validation": {
+    "scope": "Only placements present in the current source and whose map and NPC template exist in the exact 3.6.10.10 client catalogues.",
+    "sourceTable": "Ressources/SQL/SQL_a_jour_02_12_2025/giny_world.zip:giny_world.sql:npc_spawns,npc_actions",
+    "acceptedRows": 4,
+    "rejectedRows": 1,
+    "historicalRowsImported": 0,
+    "historicalRejectionReason": "Older Symbioz placement rows conflict with current cells and cannot prove the 3.6.10.10 world state.",
+    "substitutionPolicy": "A source NPC id may never be replaced by a different client NPC merely to make the placement importable."
+  },
+  "records": [
+    { "sourceRecordId": 20, "npcId": 2907, "mapId": 153881600, "cellId": 384, "orientation": 3 },
+    { "sourceRecordId": 21, "npcId": 2936, "mapId": 152835072, "cellId": 262, "orientation": 3 },
+    { "sourceRecordId": 43, "npcId": 2892, "mapId": 154010883, "cellId": 357, "orientation": 3 },
+    { "sourceRecordId": 44, "npcId": 2885, "mapId": 153357316, "cellId": 205, "orientation": 3 }
+  ],
+  "rejectedRecords": [
+    {
+      "sourceRecordId": 42,
+      "npcId": 2897,
+      "mapId": 153880835,
+      "cellId": 215,
+      "orientation": 3,
+      "sourceActionRecordId": 49,
+      "action": "TALK",
+      "dialogMessageId": 20713,
+      "reason": "The exact Giny source row is NPC 2897 with TALK message 20713, but NPC template 2897 does not exist in the pinned 3.6.10.10 client catalogue. Substituting Ganymed (7581) would invent a server-owned placement and dialogue."
+    }
+  ]
+}

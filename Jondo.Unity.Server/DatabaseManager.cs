@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Google.Protobuf;
 using Jondo.Unity.Protocol.Messages;
@@ -151,8 +152,8 @@ namespace Jondo.Unity.Launcher
                         Breed INTEGER NOT NULL,
                         Sex INTEGER NOT NULL,
                         Level INTEGER NOT NULL DEFAULT 1,
-                        MapId INTEGER NOT NULL DEFAULT 154010884,
-                        CellId INTEGER NOT NULL DEFAULT 315,
+                        MapId INTEGER NOT NULL DEFAULT 154010883,
+                        CellId INTEGER NOT NULL DEFAULT 318,
                         RemainingPoints INTEGER NOT NULL DEFAULT 0,
                         Vitality INTEGER NOT NULL DEFAULT 0,
                         Wisdom INTEGER NOT NULL DEFAULT 0,
@@ -422,6 +423,23 @@ namespace Jondo.Unity.Launcher
                 ";
                 createSpellBarState.ExecuteNonQuery();
 
+                // Zaap discovery is character progress. Static WaypointsDataRoot says which
+                // destinations exist in the world; it must never be copied wholesale into a new
+                // character. A row is created only when that character arrives on the
+                // corresponding active ordinary-zaap map.
+                var createCharacterZaaps = worldConnection.CreateCommand();
+                createCharacterZaaps.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterZaaps (
+                        CharacterId INTEGER NOT NULL,
+                        MapId INTEGER NOT NULL,
+                        DiscoveredUtc TEXT NOT NULL,
+                        PRIMARY KEY (CharacterId, MapId)
+                    );
+                    CREATE INDEX IF NOT EXISTS IX_CharacterZaaps_CharacterId
+                        ON CharacterZaaps(CharacterId);
+                ";
+                createCharacterZaaps.ExecuteNonQuery();
+
                 // Seed default character if empty
                 var checkChar = worldConnection.CreateCommand();
                 checkChar.CommandText = "SELECT COUNT(*) FROM Characters WHERE Id = 13825558;";
@@ -594,11 +612,18 @@ namespace Jondo.Unity.Launcher
                 ";
                 createMonsters.ExecuteNonQuery();
 
+                // world.db is a mutable cache/state database. Rebuild only its immutable query
+                // indexes when the versioned JSON fingerprint changes; character and account
+                // state is deliberately outside this transaction.
+                Managers.StaticContentCache.Synchronize(worldConnection);
+
                 EnsureProfessionCatalogSchema(worldConnection);
                     EnsureHouseCatalogSchema(worldConnection);
 
-                // 5. Ensure Monsters, Mobs, Spells, and SpellLevels are seeded
-                EnsureMobsSeeded(worldConnection);
+                // 5. Spells do not depend on map geometry and can be materialised now. Monster
+                // groups cannot: their cells must be selected only after MapManager has loaded
+                // the version-pinned role-play walkability and DungeonManager has classified
+                // interiors. MobSpawnManager.InitializeAndSpawnAll performs that later step.
                 EnsureSpellsSeeded(worldConnection);
 
                 if (count == 0)
@@ -838,120 +863,87 @@ namespace Jondo.Unity.Launcher
 
         public static void EnsureMobsSeeded(SqliteConnection connection)
         {
+            const int placementSeedVersion = 2;
+
+            if (MapManager.WalkableCells.Count == 0)
+                throw new InvalidOperationException(
+                    "Monster groups cannot be materialised before MapManager walkability is loaded.");
+
+            using (var schema = connection.CreateCommand())
+            {
+                schema.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS GeneratedWorldState (
+                        Key TEXT PRIMARY KEY,
+                        Version INTEGER NOT NULL,
+                        UpdatedUtc TEXT NOT NULL DEFAULT ''
+                    );";
+                schema.ExecuteNonQuery();
+            }
+
             var checkCmd = connection.CreateCommand();
             checkCmd.CommandText = "SELECT COUNT(*) FROM MapMobs;";
             long count = (long)checkCmd.ExecuteScalar();
-            if (count > 0) return;
+
+            int storedVersion = 0;
+            using (var state = connection.CreateCommand())
+            {
+                state.CommandText = "SELECT Version FROM GeneratedWorldState WHERE Key = 'MapMobs';";
+                object? value = state.ExecuteScalar();
+                if (value != null && value != DBNull.Value) storedVersion = Convert.ToInt32(value);
+            }
+
+            if (count > 0 && storedVersion == placementSeedVersion &&
+                !MapMobsContainInvalidPlacements(connection))
+                return;
 
             Console.WriteLine("[DatabaseManager] Auto-seeding Monsters, Subareas, MapSubareas, and MapMobs from JSON...");
 
-            string basePath = Paths.DataDir;
-            if (!Directory.Exists(basePath))
+            if (!Paths.UsingServerClientData)
+                throw new InvalidDataException("Static monster seeding requires the versioned client_data server snapshot.");
+
+            PopulateMonstersFromJSON(connection);
+            using var staticCount = connection.CreateCommand();
+            staticCount.CommandText = "SELECT COUNT(*) FROM Monsters;";
+            if (Convert.ToInt64(staticCount.ExecuteScalar() ?? 0L) == 0)
+                throw new InvalidDataException("The versioned monster catalogue produced no static monster rows.");
+
+            if (count > 0)
             {
-                basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "dofus3_data");
-            }
-
-            if (!Directory.Exists(basePath))
-            {
-                Console.WriteLine($"[DatabaseManager] Warning: JSON directory not found at {basePath}. Skipping auto-seeding.");
-                return;
-            }
-
-            var checkMonsters = connection.CreateCommand();
-            checkMonsters.CommandText = "SELECT COUNT(*) FROM Monsters;";
-            long mCount = (long)checkMonsters.ExecuteScalar();
-            if (mCount == 0)
-            {
-                using var transaction = connection.BeginTransaction();
-                try
-                {
-                    string monstersPath = Path.Combine(basePath, "monsters.json");
-                    if (File.Exists(monstersPath))
-                    {
-                        using var fs = new FileStream(monstersPath, FileMode.Open, FileAccess.Read);
-                        using var doc = System.Text.Json.JsonDocument.Parse(fs);
-                        var refsArr = doc.RootElement.GetProperty("references").GetProperty("RefIds");
-                        var insertCmd = connection.CreateCommand();
-                        insertCmd.Transaction = transaction;
-                        insertCmd.CommandText = "INSERT OR REPLACE INTO Monsters (Id, NameId, Look, Grades) VALUES ($id, $nameId, $look, $grades);";
-                        insertCmd.Parameters.Add("$id", Microsoft.Data.Sqlite.SqliteType.Integer);
-                        insertCmd.Parameters.Add("$nameId", Microsoft.Data.Sqlite.SqliteType.Integer);
-                        insertCmd.Parameters.Add("$look", Microsoft.Data.Sqlite.SqliteType.Text);
-                        insertCmd.Parameters.Add("$grades", Microsoft.Data.Sqlite.SqliteType.Text);
-                        int countM = 0;
-                        for (int i = 0; i < refsArr.GetArrayLength(); i++)
-                        {
-                            if (!refsArr[i].TryGetProperty("data", out var data)) continue;
-                            int monsterId = data.TryGetProperty("id", out var mid) ? mid.GetInt32() : 0;
-                            if (monsterId == 0) continue;
-                            int nameId = data.TryGetProperty("nameId", out var nid) ? nid.GetInt32() : 0;
-                            string look = data.TryGetProperty("look", out var lk) ? lk.GetString() ?? "" : "";
-                            string grades = data.TryGetProperty("grades", out var gr) ? gr.GetRawText() : "[]";
-                            insertCmd.Parameters["$id"].Value = monsterId;
-                            insertCmd.Parameters["$nameId"].Value = nameId;
-                            insertCmd.Parameters["$look"].Value = look;
-                            insertCmd.Parameters["$grades"].Value = grades;
-                            insertCmd.ExecuteNonQuery();
-                            countM++;
-                        }
-                        Console.WriteLine($"[DatabaseManager] Inserted {countM} monsters into DB.");
-                    }
-
-                    string subareasPath = Path.Combine(basePath, "subareas.json");
-                    if (File.Exists(subareasPath))
-                    {
-                        using var fs = new FileStream(subareasPath, FileMode.Open, FileAccess.Read);
-                        using var doc = System.Text.Json.JsonDocument.Parse(fs);
-                        var refsArr = doc.RootElement.GetProperty("references").GetProperty("RefIds");
-                        var insertCmd = connection.CreateCommand();
-                        insertCmd.Transaction = transaction;
-                        insertCmd.CommandText = "INSERT OR REPLACE INTO Subareas (Id, Monsters) VALUES ($id, $monsters);";
-                        insertCmd.Parameters.Add("$id", Microsoft.Data.Sqlite.SqliteType.Integer);
-                        insertCmd.Parameters.Add("$monsters", Microsoft.Data.Sqlite.SqliteType.Text);
-                        for (int i = 0; i < refsArr.GetArrayLength(); i++)
-                        {
-                            if (!refsArr[i].TryGetProperty("data", out var data)) continue;
-                            int subAreaId = data.TryGetProperty("id", out var sid) ? sid.GetInt32() : 0;
-                            if (subAreaId == 0) continue;
-                            string monsters = data.TryGetProperty("monsters", out var mst) ? mst.GetRawText() : "[]";
-                            insertCmd.Parameters["$id"].Value = subAreaId;
-                            insertCmd.Parameters["$monsters"].Value = monsters;
-                            insertCmd.ExecuteNonQuery();
-                        }
-                    }
-
-                    string mapsPath = Path.Combine(basePath, "maps_information.json");
-                    if (File.Exists(mapsPath))
-                    {
-                        using var fs = new FileStream(mapsPath, FileMode.Open, FileAccess.Read);
-                        using var doc = System.Text.Json.JsonDocument.Parse(fs);
-                        var refsArr = doc.RootElement.GetProperty("references").GetProperty("RefIds");
-                        var insertCmd = connection.CreateCommand();
-                        insertCmd.Transaction = transaction;
-                        insertCmd.CommandText = "INSERT OR REPLACE INTO MapSubareas (MapId, SubAreaId) VALUES ($id, $subid);";
-                        insertCmd.Parameters.Add("$id", Microsoft.Data.Sqlite.SqliteType.Integer);
-                        insertCmd.Parameters.Add("$subid", Microsoft.Data.Sqlite.SqliteType.Integer);
-                        for (int i = 0; i < refsArr.GetArrayLength(); i++)
-                        {
-                            if (!refsArr[i].TryGetProperty("data", out var data)) continue;
-                            long mapId = data.TryGetProperty("id", out var mid) ? mid.GetInt64() : 0;
-                            if (mapId == 0) continue;
-                            int subAreaId = data.TryGetProperty("subAreaId", out var sid) ? sid.GetInt32() : 0;
-                            insertCmd.Parameters["$id"].Value = mapId;
-                            insertCmd.Parameters["$subid"].Value = subAreaId;
-                            insertCmd.ExecuteNonQuery();
-                        }
-                    }
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    Console.WriteLine("[DatabaseManager] Error seeding JSON data: " + ex.Message);
-                }
+                using var clear = connection.CreateCommand();
+                clear.CommandText = "DELETE FROM MapMobs;";
+                clear.ExecuteNonQuery();
+                Console.WriteLine("[DatabaseManager] Rebuilding generated mob placements against loaded map geometry.");
             }
 
             PopulateMapMobs(connection);
+
+            using var remember = connection.CreateCommand();
+            remember.CommandText = @"
+                INSERT INTO GeneratedWorldState (Key, Version, UpdatedUtc)
+                VALUES ('MapMobs', $version, $updated)
+                ON CONFLICT(Key) DO UPDATE SET
+                    Version = excluded.Version,
+                    UpdatedUtc = excluded.UpdatedUtc;";
+            remember.Parameters.AddWithValue("$version", placementSeedVersion);
+            remember.Parameters.AddWithValue("$updated", DateTime.UtcNow.ToString("O"));
+            remember.ExecuteNonQuery();
+        }
+
+        private static bool MapMobsContainInvalidPlacements(SqliteConnection connection)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT MapId, CellId FROM MapMobs;";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                long mapId = reader.GetInt64(0);
+                int cellId = reader.GetInt32(1);
+                if (Managers.MobSpawnManager.IsSocialInterior(mapId) ||
+                    !MapManager.WalkableCells.TryGetValue(mapId, out var walkable) ||
+                    !walkable.Contains(cellId))
+                    return true;
+            }
+            return false;
         }
 
         private static void PopulateMapMobs(SqliteConnection connection)
@@ -1029,7 +1021,9 @@ namespace Jondo.Unity.Launcher
             }
 
             long currentMobId = -1000000;
-            Random rand = new Random();
+            // These rows are a generated cache of versioned client content, not mutable player
+            // state. A fixed seed makes the same snapshot reproduce the same placement catalogue.
+            Random rand = new Random(0x361010);
 
             using var transaction = connection.BeginTransaction();
             var insertCmd = connection.CreateCommand();
@@ -1046,6 +1040,7 @@ namespace Jondo.Unity.Launcher
                 long mapId = kvp.Key;
                 int subAreaId = kvp.Value;
 
+                if (Managers.MobSpawnManager.IsSocialInterior(mapId)) continue;
                 if (!subareas.TryGetValue(subAreaId, out var allowedMonsters) || allowedMonsters.Count == 0) continue;
                 var validMonsters = allowedMonsters.Where(id => monsters.ContainsKey(id) && id != 494).ToList();
                 if (validMonsters.Count == 0) validMonsters = allowedMonsters.Where(id => monsters.ContainsKey(id)).ToList();
@@ -1053,6 +1048,7 @@ namespace Jondo.Unity.Launcher
 
                 int numMobs = rand.Next(2, 5); // 2 to 4 groups
                 var validCells = Managers.MobSpawnManager.GetInnerWalkableCells(mapId);
+                if (validCells.Count == 0) continue;
                 var usedCells = new HashSet<int>();
 
                 for (int i = 0; i < numMobs; i++)
@@ -1436,10 +1432,15 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public const int DefaultServerId = 290;
 
-        /// <summary>Where a character starts, and where one goes back to if it ends up nowhere.
-        /// The same values the Characters table gives a new row.</summary>
-        public const long StartingMap = 154010884L;
-        public const int StartingCell = 315;
+        /// <summary>
+        /// Where a freshly-created character starts, and where one goes back to if it ends up
+        /// nowhere.  154010883 is the client map at Incarnam (-2,-3), including the tutorial NPC
+        /// placement.  The adjacent map 154010884 (-2,-4) is ordinary outdoor content and was an
+        /// old emulator default, not the tutorial entry map.  Cell 318 is present in the extracted
+        /// 3.6.10.10 walkable-cell data; the former cell 315 is not walkable.
+        /// </summary>
+        public const long StartingMap = 154010883L;
+        public const int StartingCell = 318;
 
         /// <summary>Status advertised over HTTP for a server that can be joined.</summary>
         public const int ServerStatusOnline = 3;
@@ -1466,22 +1467,12 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// The servers on offer. Only one of them is open: the rest show up in the list but
-        /// cannot be joined, so the screen looks populated without promising worlds that do not
-        /// exist. The ids and their category come from the real capture; the client resolves
-        /// each server's name against its own data.
+        /// Seeds only the local Jondo world. A server must be explicitly configured as joinable
+        /// before it is advertised; showing a placeholder that cannot issue a ticket is worse
+        /// than not showing it at all.
         /// </summary>
         private static void SeedServers(SqliteConnection connection)
         {
-            // (id, category)
-            var closed = new (int Id, int Type)[]
-            {
-                (291, 1), (292, 1), (293, 1), (294, 1), (295, 0),
-                (350, 3), (351, 3), (352, 3),
-                (353, 2), (354, 2), (355, 2),
-                (99, 4), (50, 5)
-            };
-
             var open = connection.CreateCommand();
             open.CommandText =
                 "INSERT OR IGNORE INTO Servers (Id, Name, Type, Status, Joinable, IsDefault) " +
@@ -1490,19 +1481,6 @@ namespace Jondo.Unity.Launcher
             open.Parameters.AddWithValue("$name", DefaultServerName);
             open.Parameters.AddWithValue("$status", ServerStatusOnline);
             open.ExecuteNonQuery();
-
-            foreach (var (id, type) in closed)
-            {
-                var cmd = connection.CreateCommand();
-                cmd.CommandText =
-                    "INSERT OR IGNORE INTO Servers (Id, Name, Type, Status, Joinable, IsDefault) " +
-                    "VALUES ($id, $name, $type, $status, 0, 0);";
-                cmd.Parameters.AddWithValue("$id", id);
-                cmd.Parameters.AddWithValue("$name", "Server " + id);
-                cmd.Parameters.AddWithValue("$type", type);
-                cmd.Parameters.AddWithValue("$status", ServerStatusNoJoin);
-                cmd.ExecuteNonQuery();
-            }
         }
 
         /// <summary>Name of the open server. Only used by the emulator's own logs.</summary>
@@ -1553,6 +1531,25 @@ namespace Jondo.Unity.Launcher
                 });
             }
             return list;
+        }
+
+        /// <summary>
+        /// Servers exposed to a game client. This is intentionally distinct from GetServers:
+        /// the latter is the full administrator catalogue, while the client must never be shown
+        /// a row for which the connection server will refuse to issue a ticket. Add Imagiro or
+        /// another realm by creating its Servers row with Joinable=1; its stored Type and Status
+        /// are then carried unchanged through both the connection and HAAPI lists.
+        /// </summary>
+        public static List<DbServer> GetAdvertisedServers()
+        {
+            var configured = GetServers();
+            var advertised = configured.FindAll(server => server.Joinable);
+            if (advertised.Count == 0)
+            {
+                var fallback = configured.Find(server => server.IsDefault);
+                if (fallback != null) advertised.Add(fallback);
+            }
+            return advertised;
         }
 
         /// <summary>Checks that a server exists and accepts connections.</summary>
@@ -1665,6 +1662,83 @@ namespace Jondo.Unity.Launcher
                 LastConnection = reader.GetString(8),
                 HeadId = reader.GetInt32(9)
             };
+        }
+
+        /// <summary>
+        /// Removes one character and only that character's persistent state. The account and
+        /// shared world/catalogue data deliberately remain intact. Ownership and server are
+        /// checked in the delete itself so a forged character-selection packet cannot remove a
+        /// character belonging to another account or server.
+        /// </summary>
+        public static bool TryDeleteCharacter(long characterId, long accountId, int serverId)
+        {
+            if (characterId <= 0 || accountId <= 0 || serverId <= 0) return false;
+
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
+
+                var owned = connection.CreateCommand();
+                owned.Transaction = transaction;
+                owned.CommandText = @"
+                    SELECT COUNT(*) FROM Characters
+                    WHERE Id = $id AND AccountId = $accountId
+                      AND COALESCE(ServerId, $defaultServer) = $serverId;";
+                owned.Parameters.AddWithValue("$id", characterId);
+                owned.Parameters.AddWithValue("$accountId", accountId);
+                owned.Parameters.AddWithValue("$defaultServer", DefaultServerId);
+                owned.Parameters.AddWithValue("$serverId", serverId);
+                if (Convert.ToInt64(owned.ExecuteScalar()) != 1)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                // These are all character-owned tables in the local player database. Keep the
+                // list explicit: content tables and other players must never be affected by a
+                // character deletion.
+                foreach (string table in new[]
+                         {
+                             "CharacterAppearance", "CharacterItems", "CharacterSpellBar",
+                             "CharacterSpellBarState", "CharacterSpellChoices", "CharacterWardrobe",
+                             "CharacterZaaps",
+                             "HavenBag", "HavenBagChest", "HavenBagFurniture"
+                         })
+                {
+                    var deleteChild = connection.CreateCommand();
+                    deleteChild.Transaction = transaction;
+                    deleteChild.CommandText = $"DELETE FROM {table} WHERE CharacterId = $id;";
+                    deleteChild.Parameters.AddWithValue("$id", characterId);
+                    deleteChild.ExecuteNonQuery();
+                }
+
+                var deleteCharacter = connection.CreateCommand();
+                deleteCharacter.Transaction = transaction;
+                deleteCharacter.CommandText = @"
+                    DELETE FROM Characters
+                    WHERE Id = $id AND AccountId = $accountId
+                      AND COALESCE(ServerId, $defaultServer) = $serverId;";
+                deleteCharacter.Parameters.AddWithValue("$id", characterId);
+                deleteCharacter.Parameters.AddWithValue("$accountId", accountId);
+                deleteCharacter.Parameters.AddWithValue("$defaultServer", DefaultServerId);
+                deleteCharacter.Parameters.AddWithValue("$serverId", serverId);
+                bool deleted = deleteCharacter.ExecuteNonQuery() == 1;
+                if (!deleted)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not delete character {characterId}: {ex.Message}");
+                return false;
+            }
         }
 
         /// <summary>
@@ -1867,6 +1941,94 @@ namespace Jondo.Unity.Launcher
             command.Parameters.AddWithValue("$baseMp", Math.Max(1, Jondo.Unity.Launcher.Network.SessionContext.State.BaseMovementPoints));
             command.Parameters.AddWithValue("$savedUtc", DateTime.UtcNow.ToString("O"));
             command.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Loads the zaap maps discovered by one character. The waypoint catalogue is deliberately
+        /// not used as a fallback: no row means that this character has discovered no zaap yet.
+        /// </summary>
+        public static List<long> GetDiscoveredZaapMaps(long characterId)
+        {
+            var maps = new List<long>();
+            if (characterId <= 0) return maps;
+
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    SELECT MapId
+                    FROM CharacterZaaps
+                    WHERE CharacterId = $characterId
+                    ORDER BY MapId;";
+                command.Parameters.AddWithValue("$characterId", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) maps.Add(reader.GetInt64(0));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not load zaaps for character {characterId}: {ex.Message}");
+            }
+            return maps;
+        }
+
+        /// <summary>Whether a destination belongs to this character's persisted zaap network.</summary>
+        public static bool HasDiscoveredZaap(long characterId, long mapId)
+        {
+            if (characterId <= 0 || mapId <= 0) return false;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    SELECT EXISTS(
+                        SELECT 1 FROM CharacterZaaps
+                        WHERE CharacterId = $characterId AND MapId = $mapId
+                    );";
+                command.Parameters.AddWithValue("$characterId", characterId);
+                command.Parameters.AddWithValue("$mapId", mapId);
+                return Convert.ToInt64(command.ExecuteScalar() ?? 0L) == 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not check zaap {mapId} for character " +
+                                  $"{characterId}: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Persists one discovery. The caller has already validated that the character arrived on
+        /// an active ordinary-waypoint map with a usable element. Existing rows are idempotent.
+        /// </summary>
+        public static bool TryDiscoverZaap(long characterId, long mapId, out bool newlyDiscovered)
+        {
+            newlyDiscovered = false;
+            if (characterId <= 0 || mapId <= 0) return false;
+
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT OR IGNORE INTO CharacterZaaps (CharacterId, MapId, DiscoveredUtc)
+                    SELECT $characterId, $mapId, $discoveredUtc
+                    WHERE EXISTS (SELECT 1 FROM Characters WHERE Id = $characterId);";
+                command.Parameters.AddWithValue("$characterId", characterId);
+                command.Parameters.AddWithValue("$mapId", mapId);
+                command.Parameters.AddWithValue("$discoveredUtc", DateTime.UtcNow.ToString("O"));
+                newlyDiscovered = command.ExecuteNonQuery() == 1;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not discover zaap {mapId} for character " +
+                                  $"{characterId}: {ex.Message}");
+                return false;
+            }
         }
 
         public static void SaveCharacterLook(long characterId, byte[] lookBytes)
@@ -2110,7 +2272,10 @@ namespace Jondo.Unity.Launcher
 
                 using var doc = System.Text.Json.JsonDocument.Parse(data);
                 if (!doc.RootElement.TryGetProperty("possibleEffects", out var posibles)) return "[]";
-                if (!posibles.TryGetProperty("Array", out var lista)) return "[]";
+                var lista = posibles;
+                if (lista.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                    lista.TryGetProperty("Array", out var legacyArray)) lista = legacyArray;
+                if (lista.ValueKind != System.Text.Json.JsonValueKind.Array) return "[]";
 
                 var salida = new List<string>();
                 foreach (var entrada in lista.EnumerateArray())
@@ -2325,18 +2490,14 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine($"[SQLite] Giving all level 200 items to Character {characterId}...");
 
             var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT Id, PossibleEffects FROM ItemTemplates WHERE Level = 200;";
-            var itemsToAdd = new List<(int id, string effects)>();
+            cmd.CommandText = "SELECT Id FROM ItemTemplates WHERE CAST(json_extract(Data, '$.level') AS INTEGER) = 200;";
+            var itemIds = new List<int>();
 
             using (var reader = cmd.ExecuteReader())
             {
-                while (reader.Read())
-                {
-                    int id = reader.GetInt32(0);
-                    string effects = reader.IsDBNull(1) ? "[]" : reader.GetString(1);
-                    itemsToAdd.Add((id, effects));
-                }
+                while (reader.Read()) itemIds.Add(reader.GetInt32(0));
             }
+            var itemsToAdd = itemIds.Select(id => (id, effects: EffectsOfTemplate(connection, id))).ToList();
 
             using var transaction = connection.BeginTransaction();
             try
@@ -2508,7 +2669,10 @@ namespace Jondo.Unity.Launcher
                     using var doc = System.Text.Json.JsonDocument.Parse(data.ToString()!);
                     if (doc.RootElement.TryGetProperty("possibleEffects", out var possibleEffects))
                     {
-                        if (possibleEffects.TryGetProperty("Array", out var arr) && arr.ValueKind == System.Text.Json.JsonValueKind.Array)
+                        var arr = possibleEffects;
+                        if (arr.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                            arr.TryGetProperty("Array", out var legacyArray)) arr = legacyArray;
+                        if (arr.ValueKind == System.Text.Json.JsonValueKind.Array)
                         {
                             foreach (var element in arr.EnumerateArray())
                             {
@@ -2575,19 +2739,22 @@ namespace Jondo.Unity.Launcher
         }
         private static string? FindDataFile(string filename)
         {
-            string[] candidates = new string[]
+            string catalog = filename switch
             {
-                Path.Combine(Paths.DataDir, filename),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "dofus3_data", filename),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "dofus3_data", filename),
-                Path.Combine(@"..\dofus3_data", filename),
-                filename
+                "monsters.json" => "monstersdataroot.json",
+                "subareas.json" => "subareasdataroot.json",
+                "maps_information.json" => "mapsinformationdataroot.json",
+                "spells.json" => "spellsdataroot.json",
+                "spell_levels.json" => "spelllevelsdataroot.json",
+                _ => ""
             };
-            foreach (var path in candidates)
+            if (catalog.Length == 0) return null;
+            try { return Paths.Catalog(catalog); }
+            catch (Exception ex)
             {
-                try { if (File.Exists(path)) return path; } catch { }
+                Console.WriteLine($"[StaticData] Cannot resolve {catalog}: {ex.Message}");
+                return null;
             }
-            return null;
         }
 
         public static void PopulateMonstersFromJSON(SqliteConnection connection)
@@ -2618,64 +2785,26 @@ namespace Jondo.Unity.Launcher
                     insertCmd.Parameters.Add("$grades", SqliteType.Text);
                     insertCmd.Parameters.Add("$spells", SqliteType.Text);
 
-                    if (doc.RootElement.TryGetProperty("references", out var refsObj) && refsObj.TryGetProperty("RefIds", out var refIdsArr))
+                    if (!doc.RootElement.TryGetProperty("clientVersion", out var dataVersion) ||
+                        dataVersion.GetString() != Paths.ActiveClientDataVersion ||
+                        !doc.RootElement.TryGetProperty("rows", out var monsterRows) || monsterRows.ValueKind != JsonValueKind.Array)
+                        throw new InvalidDataException("monstersdataroot.json is not a compatible normalized client catalogue.");
+
+                    foreach (var item in monsterRows.EnumerateArray())
                     {
-                        foreach (var item in refIdsArr.EnumerateArray())
-                        {
-                            if (!item.TryGetProperty("data", out var data)) continue;
-                            int monsterId = data.TryGetProperty("id", out var mid) ? mid.GetInt32() : 0;
-                            if (monsterId <= 0) continue;
-
-                            int nameId = data.TryGetProperty("nameId", out var nid) ? nid.GetInt32() : 0;
-                            string look = data.TryGetProperty("look", out var lk) ? lk.GetString() : "";
-                            string grades = data.TryGetProperty("grades", out var gr) ? gr.GetRawText() : "[]";
-
-                            string spellsJson = "[]";
-                            if (data.TryGetProperty("spells", out var spellsProp))
-                            {
-                                if (spellsProp.ValueKind == System.Text.Json.JsonValueKind.Object && spellsProp.TryGetProperty("Array", out var spellArr))
-                                    spellsJson = spellArr.GetRawText();
-                                else if (spellsProp.ValueKind == System.Text.Json.JsonValueKind.Array)
-                                    spellsJson = spellsProp.GetRawText();
-                            }
-
-                            insertCmd.Parameters["$id"].Value = monsterId;
-                            insertCmd.Parameters["$nameId"].Value = nameId;
-                            insertCmd.Parameters["$look"].Value = look ?? "";
-                            insertCmd.Parameters["$grades"].Value = grades;
-                            insertCmd.Parameters["$spells"].Value = spellsJson;
-                            insertCmd.ExecuteNonQuery();
-                        }
-                    }
-                    else if (doc.RootElement.TryGetProperty("objectsById", out var objById))
-                    {
-                        var mValuesArr = objById.GetProperty("m_values").GetProperty("Array");
-                        var mKeysArr = objById.GetProperty("m_keys").GetProperty("Array");
-
-                        for (int i = 0; i < mKeysArr.GetArrayLength(); i++)
-                        {
-                            var monsterId = mKeysArr[i].GetInt32();
-                            var data = mValuesArr[i].TryGetProperty("data", out var d) ? d : mValuesArr[i];
-                            int nameId = data.TryGetProperty("nameId", out var nid) ? nid.GetInt32() : 0;
-                            string look = data.TryGetProperty("look", out var lk) ? lk.GetString() : "";
-                            string grades = data.TryGetProperty("grades", out var gr) ? gr.GetRawText() : "[]";
-
-                            string spellsJson = "[]";
-                            if (data.TryGetProperty("spells", out var spellsProp))
-                            {
-                                if (spellsProp.ValueKind == System.Text.Json.JsonValueKind.Object && spellsProp.TryGetProperty("Array", out var spellArr))
-                                    spellsJson = spellArr.GetRawText();
-                                else if (spellsProp.ValueKind == System.Text.Json.JsonValueKind.Array)
-                                    spellsJson = spellsProp.GetRawText();
-                            }
-
-                            insertCmd.Parameters["$id"].Value = monsterId;
-                            insertCmd.Parameters["$nameId"].Value = nameId;
-                            insertCmd.Parameters["$look"].Value = look ?? "";
-                            insertCmd.Parameters["$grades"].Value = grades;
-                            insertCmd.Parameters["$spells"].Value = spellsJson;
-                            insertCmd.ExecuteNonQuery();
-                        }
+                        if (!item.TryGetProperty("data", out var data)) continue;
+                        int monsterId = data.TryGetProperty("id", out var mid) ? mid.GetInt32() : 0;
+                        if (monsterId <= 0) continue;
+                        int nameId = data.TryGetProperty("nameId", out var nid) ? nid.GetInt32() : 0;
+                        string look = data.TryGetProperty("look", out var lk) ? lk.GetString() ?? "" : "";
+                        string grades = data.TryGetProperty("grades", out var gr) ? gr.GetRawText() : "[]";
+                        string spellsJson = data.TryGetProperty("spells", out var spellsProp) ? spellsProp.GetRawText() : "[]";
+                        insertCmd.Parameters["$id"].Value = monsterId;
+                        insertCmd.Parameters["$nameId"].Value = nameId;
+                        insertCmd.Parameters["$look"].Value = look;
+                        insertCmd.Parameters["$grades"].Value = grades;
+                        insertCmd.Parameters["$spells"].Value = spellsJson;
+                        insertCmd.ExecuteNonQuery();
                     }
                 }
 
@@ -2685,8 +2814,10 @@ namespace Jondo.Unity.Launcher
                 {
                     using var fs = new FileStream(subareasPath, FileMode.Open, FileAccess.Read);
                     var doc = System.Text.Json.JsonDocument.Parse(fs);
-                    var mValuesArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_values").GetProperty("Array");
-                    var mKeysArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_keys").GetProperty("Array");
+                    if (!doc.RootElement.TryGetProperty("clientVersion", out var dataVersion) ||
+                        dataVersion.GetString() != Paths.ActiveClientDataVersion ||
+                        !doc.RootElement.TryGetProperty("rows", out var rows) || rows.ValueKind != JsonValueKind.Array)
+                        throw new InvalidDataException("subareasdataroot.json is not a compatible normalized client catalogue.");
 
                     var insertCmd = connection.CreateCommand();
                     insertCmd.Transaction = transaction;
@@ -2694,10 +2825,11 @@ namespace Jondo.Unity.Launcher
                     insertCmd.Parameters.Add("$id", SqliteType.Integer);
                     insertCmd.Parameters.Add("$monsters", SqliteType.Text);
 
-                    for (int i = 0; i < mKeysArr.GetArrayLength(); i++)
+                    foreach (var row in rows.EnumerateArray())
                     {
-                        var subAreaId = mKeysArr[i].GetInt32();
-                        var data = mValuesArr[i].GetProperty("data");
+                        if (!row.TryGetProperty("data", out var data)) continue;
+                        int subAreaId = data.TryGetProperty("id", out var id) ? id.GetInt32() : 0;
+                        if (subAreaId <= 0) continue;
                         string monsters = data.TryGetProperty("monsters", out var mst) ? mst.GetRawText() : "[]";
 
                         insertCmd.Parameters["$id"].Value = subAreaId;
@@ -2712,8 +2844,10 @@ namespace Jondo.Unity.Launcher
                 {
                     using var fs = new FileStream(mapsPath, FileMode.Open, FileAccess.Read);
                     var doc = System.Text.Json.JsonDocument.Parse(fs);
-                    var mValuesArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_values").GetProperty("Array");
-                    var mKeysArr = doc.RootElement.GetProperty("objectsById").GetProperty("m_keys").GetProperty("Array");
+                    if (!doc.RootElement.TryGetProperty("clientVersion", out var dataVersion) ||
+                        dataVersion.GetString() != Paths.ActiveClientDataVersion ||
+                        !doc.RootElement.TryGetProperty("rows", out var rows) || rows.ValueKind != JsonValueKind.Array)
+                        throw new InvalidDataException("mapsinformationdataroot.json is not a compatible normalized client catalogue.");
 
                     var insertCmd = connection.CreateCommand();
                     insertCmd.Transaction = transaction;
@@ -2721,10 +2855,11 @@ namespace Jondo.Unity.Launcher
                     insertCmd.Parameters.Add("$id", SqliteType.Integer);
                     insertCmd.Parameters.Add("$subid", SqliteType.Integer);
 
-                    for (int i = 0; i < mKeysArr.GetArrayLength(); i++)
+                    foreach (var row in rows.EnumerateArray())
                     {
-                        long mapId = mKeysArr[i].GetInt64();
-                        var data = mValuesArr[i].GetProperty("data");
+                        if (!row.TryGetProperty("data", out var data)) continue;
+                        long mapId = data.TryGetProperty("id", out var id) ? id.GetInt64() : 0;
+                        if (mapId <= 0) continue;
                         int subAreaId = data.TryGetProperty("subAreaId", out var sid) ? sid.GetInt32() : 0;
 
                         insertCmd.Parameters["$id"].Value = mapId;
@@ -2752,16 +2887,8 @@ namespace Jondo.Unity.Launcher
 
             Console.WriteLine("[DatabaseManager] Auto-seeding Spells, SpellLevels, and SpellVariants from JSON...");
 
-            string basePath = Paths.DataDir;
-            if (!Directory.Exists(basePath))
-            {
-                basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "dofus3_data");
-            }
-
-            if (!Directory.Exists(basePath)) return;
-
             // Seed Spells
-            string spellsPath = Path.Combine(basePath, "spells.json");
+            string spellsPath = Paths.Catalog("spellsdataroot.json");
             if (File.Exists(spellsPath))
             {
                 using var transaction = connection.BeginTransaction();
@@ -2769,7 +2896,9 @@ namespace Jondo.Unity.Launcher
                 {
                     using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(spellsPath));
                     var root = doc.RootElement;
-                    if (root.TryGetProperty("references", out var refs) && refs.TryGetProperty("RefIds", out var refIds))
+                    if (root.TryGetProperty("clientVersion", out var version) &&
+                        version.GetString() == Paths.ActiveClientDataVersion &&
+                        root.TryGetProperty("rows", out var refIds) && refIds.ValueKind == JsonValueKind.Array)
                     {
                         var insertCmd = connection.CreateCommand();
                         insertCmd.Transaction = transaction;
@@ -2799,7 +2928,7 @@ namespace Jondo.Unity.Launcher
             }
 
             // Seed SpellLevels
-            string slPath = Path.Combine(basePath, "spell_levels.json");
+            string slPath = Paths.Catalog("spelllevelsdataroot.json");
             if (File.Exists(slPath))
             {
                 using var transaction = connection.BeginTransaction();
@@ -2807,7 +2936,9 @@ namespace Jondo.Unity.Launcher
                 {
                     using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(slPath));
                     var root = doc.RootElement;
-                    if (root.TryGetProperty("references", out var refs) && refs.TryGetProperty("RefIds", out var refIds))
+                    if (root.TryGetProperty("clientVersion", out var version) &&
+                        version.GetString() == Paths.ActiveClientDataVersion &&
+                        root.TryGetProperty("rows", out var refIds) && refIds.ValueKind == JsonValueKind.Array)
                     {
                         var insertCmd = connection.CreateCommand();
                         insertCmd.Transaction = transaction;
@@ -2831,10 +2962,9 @@ namespace Jondo.Unity.Launcher
                             if (id <= 0) continue;
 
                             string fxJson = "[]";
-                            if (d.TryGetProperty("effects", out var fxObj) && fxObj.TryGetProperty("Array", out var fxArr))
-                            {
-                                fxJson = fxArr.GetRawText();
-                            }
+                            if (d.TryGetProperty("effects", out var fxObj))
+                                fxJson = fxObj.ValueKind == JsonValueKind.Array ? fxObj.GetRawText() :
+                                    fxObj.TryGetProperty("Array", out var fxArr) ? fxArr.GetRawText() : "[]";
 
                             insertCmd.Parameters["$id"].Value = id;
                             insertCmd.Parameters["$sid"].Value = d.TryGetProperty("spellId", out var sid) ? sid.GetInt32() : 0;
@@ -2856,7 +2986,7 @@ namespace Jondo.Unity.Launcher
             }
 
             // Seed SpellVariants
-            string svPath = Path.Combine(basePath, "spell_variants.json");
+            string svPath = Paths.SpellVariantsJson;
             if (File.Exists(svPath))
             {
                 using var transaction = connection.BeginTransaction();
@@ -3058,12 +3188,9 @@ namespace Jondo.Unity.Launcher
         /// <summary>
         /// De cada efecto, qué característica toca y con qué signo, según el catálogo del cliente.
         ///
-        /// El signo sale de la DESCRIPCIÓN, no del BonusType. Parece más basto y es al revés: el
-        /// BonusType no es de fiar. El 1079, que es el que roba PA —"-#1 a -#2 PA"—, lo tiene a
-        /// CERO, igual que el 101; con esa regla Flecha Helada no robaba nada. La descripción, en
-        /// cambio, es la plantilla con la que el propio cliente escribe el efecto en pantalla, y
-        /// los que restan empiezan todos por un guion: el 1079, el 116 del alcance y el 169 de los
-        /// PM.
+        /// El signo sale de <c>EffectData.characteristicOperator</c>. A diferencia de una
+        /// descripción localizada, es un campo numérico/semántico estable del catálogo: el 1079,
+        /// el 116 y el 169 declaran "-" aunque su BonusType no sea uniforme.
         ///
         /// Y se dejan fuera los de categoría 2, que son los del ARMA: el 101 apunta a los puntos de
         /// acción, pero es lo que cuesta pegar con ella, no puntos que se ganen.
@@ -3148,8 +3275,6 @@ namespace Jondo.Unity.Launcher
 
         // ─── Los que ROBAN puntos ───────────────────────────────────────────────
 
-        private static Dictionary<int, int>? _roboDePuntos;
-
         /// <summary>
         /// Qué característica roba un efecto de robo, o cero si no roba nada.
         ///
@@ -3160,78 +3285,26 @@ namespace Jondo.Unity.Launcher
         /// Inmovilizadora, en vez de quitarle un punto de movimiento al pío, le colgaba un
         /// embrujo llamado literalmente "Roba 1 PM" que no hacía nada.
         ///
-        /// Cuál roban lo dice su propia descripción, que es de donde el catálogo ya saca el signo
-        /// de los demás: "Roba #1 a #2 PM" contra "Roba #1 a #2 PA". No hay lista escrita a mano.
+        /// EffectData no declara qué reserva roba esta familia de característica cero. La pequeña
+        /// clasificación revisada vive en effect_runtime_semantics.json y está fijada por versión.
         /// </summary>
         public static int RoboDePuntos(int effectId)
-        {
-            if (_roboDePuntos == null)
-            {
-                var mapa = new Dictionary<int, int>();
-                try
-                {
-                    using var conn = new SqliteConnection(WorldConnectionString);
-                    conn.Open();
-                    using var cmd = conn.CreateCommand();
-                    cmd.CommandText = "SELECT Id, Description FROM Effects " +
-                                      "WHERE Description LIKE 'Roba %';";
-                    using var rd = cmd.ExecuteReader();
-                    while (rd.Read())
-                    {
-                        string texto = rd.IsDBNull(1) ? "" : rd.GetString(1).TrimEnd();
-                        if (texto.EndsWith("PM", StringComparison.Ordinal))
-                            mapa[rd.GetInt32(0)] = MovementPointsCharacteristic;
-                        else if (texto.EndsWith("PA", StringComparison.Ordinal))
-                            mapa[rd.GetInt32(0)] = ActionPointsCharacteristic;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Program.LogDebug($"[DatabaseManager] No se pudieron leer los robos de puntos: {ex.Message}");
-                }
-                _roboDePuntos = mapa;
-            }
-            return _roboDePuntos.TryGetValue(effectId, out int cual) ? cual : 0;
-        }
+            => Managers.EffectRuntimeSemantics.PointStealCharacteristic(effectId);
 
         private const int ActionPointsCharacteristic = 1;
         private const int MovementPointsCharacteristic = 23;
 
         // ─── Los que MULTIPLICAN ────────────────────────────────────────────────
 
-        private static HashSet<int>? _multiplicadores;
-
         /// <summary>
         /// Si un efecto multiplica en vez de sumar.
         /// </summary>
         /// <remarks>
-        /// Se reconocen por su descripción, que es de la forma "… x#1%": el 1163 es "Daños
-        /// sufridos x#1%" y el 1159 "Curas recibidas x#1%". Ninguno tiene característica en el
-        /// catálogo, porque el cliente los resuelve por su número, y por eso no encajan en el
-        /// camino corriente del motor.
+        /// No tienen característica en EffectData. La lista revisada se carga desde
+        /// effect_runtime_semantics.json, sin depender del idioma de una descripción cacheada.
         /// </remarks>
         public static bool EsMultiplicador(int effectId)
-        {
-            if (_multiplicadores == null)
-            {
-                var lista = new HashSet<int>();
-                try
-                {
-                    using var conn = new SqliteConnection(WorldConnectionString);
-                    conn.Open();
-                    using var cmd = conn.CreateCommand();
-                    cmd.CommandText = "SELECT Id FROM Effects WHERE Description LIKE '% x#1%';";
-                    using var rd = cmd.ExecuteReader();
-                    while (rd.Read()) lista.Add(rd.GetInt32(0));
-                }
-                catch (Exception ex)
-                {
-                    Program.LogDebug($"[DatabaseManager] No se pudieron leer los multiplicadores: {ex.Message}");
-                }
-                _multiplicadores = lista;
-            }
-            return _multiplicadores.Contains(effectId);
-        }
+            => Managers.EffectRuntimeSemantics.IsMultiplier(effectId);
 
         private static void LoadEffectCatalogue()
         {
@@ -3242,7 +3315,7 @@ namespace Jondo.Unity.Launcher
                 using var conn = new SqliteConnection(WorldConnectionString);
                 conn.Open();
                 using var cmd = conn.CreateCommand();
-                cmd.CommandText = "SELECT Id, Characteristic, Category, Description FROM Effects " +
+                cmd.CommandText = "SELECT Id, Characteristic, Category, CharacteristicOperator, BonusType FROM Effects " +
                                   "WHERE Characteristic > 0;";
                 using var rd = cmd.ExecuteReader();
                 while (rd.Read())
@@ -3250,8 +3323,10 @@ namespace Jondo.Unity.Launcher
                     int category = rd.IsDBNull(2) ? 0 : rd.GetInt32(2);
                     if (category == WeaponEffectCategory) continue;
 
-                    string description = rd.IsDBNull(3) ? "" : rd.GetString(3);
-                    int sign = description.TrimStart().StartsWith("-") ? -1 : 1;
+                    string characteristicOperator = rd.IsDBNull(3) ? "" : rd.GetString(3);
+                    int bonusType = rd.IsDBNull(4) ? 0 : rd.GetInt32(4);
+                    int sign = characteristicOperator == "-" ||
+                               (characteristicOperator.Length == 0 && bonusType < 0) ? -1 : 1;
                     meta[rd.GetInt32(0)] = (rd.GetInt32(1), sign);
                 }
             }

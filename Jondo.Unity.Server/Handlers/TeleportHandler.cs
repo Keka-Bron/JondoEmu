@@ -16,7 +16,7 @@ namespace Jondo.Unity.Launcher.Handlers
     ///   jsd   el personaje sale del mapa en el que estaba — antes de decirle que cargue otro
     ///   jru   carga este mapa
     ///   lqu   el reloj del servidor, que viaja con el jru en todos los cambios de la captura
-    ///   hjk   mapa descubierto
+    ///   hjk   lista completa de zaaps descubiertos por el personaje
     ///
     /// Y ahí se para: el cliente contesta con un jrh y es GameNodeProxy quien le manda entonces el
     /// bloque del mapa con todo lo que hay dentro. Por eso esto no manda ningún jss.
@@ -55,6 +55,7 @@ namespace Jondo.Unity.Launcher.Handlers
             GameState.MapId = mapId;
             GameState.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
             DatabaseManager.SaveCurrentCharacter();
+            Managers.ZaapDiscovery.DiscoverOnArrival(SessionContext.State.CharacterId, mapId);
 
             // Los otros dos mapas implicados: del que sale y al que entra. Sin esto, teletransportarse
             // dejaba un fantasma donde estaba y llegaba invisible a donde iba.
@@ -67,7 +68,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(mapId));
+                ConnectionProtocol.BuildKnownZaaps(SessionContext.State.CharacterId));
 
             Console.WriteLine($"[Teleport] Al mapa {mapId}, casilla {GameState.CellId}. " +
                               "Esperando el jrh.");

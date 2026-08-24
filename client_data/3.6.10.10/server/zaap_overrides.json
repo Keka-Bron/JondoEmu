@@ -13,7 +13,17 @@
     "  530219  gfx 31992  casilla 254   ese dibujo sale en 5 mapas, ninguno de los otros con zaap",
     "",
     "Por descarte queda el 481520. Si al clicarlo no es el zaap naranja, cambia el numero de abajo",
-    "por el del elemento bueno y ya esta: no hay nada mas que tocar."
+    "por el del elemento bueno y ya esta: no hay nada mas que tocar.",
+    "",
+    "88213271 es Amakna [-2,0]. El blanco clicable real esta en boundingBoxes:",
+    "540285 (gfx 301199, casilla 205). 495630 (gfx 3212, casilla 279) es otro decorado animado.",
+    "",
+    "154010371 es Incarnam [-1,-3], waypoint 49 en WaypointsDataRoot. El blanco clicable real",
+    "tambien esta en boundingBoxes: 538795 (gfx 301199, casilla 304). La captura oficial usa",
+    "ese mismo elemento con la habilidad 114. 490237 (gfx 3212, casilla 265) esta en otra",
+    "posicion y fue el override que dejaba el portal visible sin accion."
   ],
-  "115083777": 481520
+  "115083777": 481520,
+  "88213271": 540285,
+  "154010371": 538795
 }

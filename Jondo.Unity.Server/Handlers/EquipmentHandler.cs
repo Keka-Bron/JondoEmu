@@ -57,7 +57,8 @@ namespace Jondo.Unity.Launcher.Handlers
             // optimistic ivq for one of those UIDs makes it look equipped while there is no item
             // (and therefore no effects or mount) in the server model.  Re-send the complete
             // authoritative inventory instead, so the client discards that stale projection.
-            if (Managers.Equipment.ByUid(uid) == null)
+            var itemToMove = Managers.Equipment.ByWireUid(uid);
+            if (itemToMove == null)
             {
                 long characterId = SessionContext.State.CharacterId;
                 if (characterId > 0) Managers.Equipment.LoadFrom(characterId);
@@ -77,23 +78,24 @@ namespace Jondo.Unity.Launcher.Handlers
             // nuevo, y se le manda su propio ivq: sin eso las dos cosas se quedaban en el mismo
             // hueco a la vez y el aspecto lo decidía la primera que se encontrase, no la que el
             // jugador acababa de ponerse.
-            foreach (var evicted in Managers.Equipment.Occupants(position, uid))
+            foreach (var evicted in Managers.Equipment.Occupants(position, itemToMove.Uid))
             {
                 evicted.Position = Bag;
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
+                    ConnectionProtocol.Push(Op.ObjectMovementMessage,
+                        Pb.New().Var(1, Managers.Equipment.WireUid(evicted.Uid)).Var(2, Bag).Build()));
 
                 Console.WriteLine($"[Equipment] El hueco {position} lo ocupaba {evicted.Uid}; " +
                                   "a la bolsa.");
             }
 
-            DatabaseManager.SaveItemPosition(uid, position);
-            Managers.Equipment.Move(uid, position);
+            DatabaseManager.SaveItemPosition(itemToMove.Uid, position);
+            Managers.Equipment.Move(itemToMove.Uid, position);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, uid).Var(2, position).Build()));
+                ConnectionProtocol.Push(Op.ObjectMovementMessage, Pb.New().Var(1, Managers.Equipment.WireUid(itemToMove.Uid)).Var(2, position).Build()));
 
             // The three of unknown meaning that travel with it, each with the value it carries in
             // every equip and unequip capture there is.
@@ -128,7 +130,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
 
-            Console.WriteLine($"[Equipment] Item {uid} -> position {position}"
+            Console.WriteLine($"[Equipment] Item {itemToMove.Uid} (wire {uid}) -> position {position}"
                               + (position == Bag ? " (taken off)." : "."));
         }
 

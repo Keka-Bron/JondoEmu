@@ -72,6 +72,14 @@ namespace Jondo.Unity.Launcher.UI
             new() { Es = "Buff", En = "Buff", Fr = "Bonus" },
 
             // ─── El mundo y el movimiento ────────────────────────────────────────────────────
+            new() { Es = "[Personajes]", En = "[Characters]", Fr = "[Personnages]" },
+            new() { Es = "Hueco adicional confirmado para la cuenta", En = "Additional slot confirmed for account", Fr = "Emplacement supplémentaire confirmé pour le compte" },
+            new() { Es = "en el servidor", En = "on server", Fr = "sur le serveur" },
+            new() { Es = "El máximo de personajes", En = "The character limit", Fr = "La limite de personnages" },
+            new() { Es = "personajes en esta cuenta", En = "characters on this account", Fr = "personnages sur ce compte" },
+            new() { Es = "El nombre ya está cogido", En = "The name is already taken", Fr = "Le nom est déjà utilisé" },
+            new() { Es = "Nombre sugerido", En = "Suggested name", Fr = "Nom suggéré" },
+            new() { Es = "Sin kamas, equipo ni progreso de cuenta", En = "With no kamas, equipment, or account progress", Fr = "Sans kamas, équipement ni progression de compte" },
             new() { Es = "Cambio de mapa", En = "Map change", Fr = "Changement de carte" },
             new() { Es = "llegando a la casilla", En = "arriving on cell", Fr = "arrivée sur la case" },
             new() { Es = "Esperando al jrh", En = "Waiting for jrh", Fr = "En attente du jrh" },

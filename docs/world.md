@@ -92,6 +92,17 @@ character stands on the border for good.
 a number nobody has explained (197 on entering the world, 24 on a map change, 470 after a
 characteristics reset), and inventing it is worse than leaving it out.
 
+`hjk` is not a singleton "current map discovered" event. The 3.6.10.10 client replaces its complete
+known-zaap backing list with `hjk.f1`, so every map-change path resends the character's full persisted
+set. Sending only the arrival map would erase all previously discovered zaaps in the client.
+
+The client sends `knm`, `kno` and `kny` during its post-character-load setup, before `lzh`, `kmv` and
+the map-ready `jrh`. They are not requests to resend the map actors. Answering them with premature
+`jss`/`lva` pairs calls `MapInfoUI` before its labels exist; the live `Player.log` then shows one
+`SetInfoFromSubarea` exception per premature pair. Actors and map metadata are sent only for `jrh`.
+For the Atelier maps the `jss.f6` subarea is the installed-client value **444**; the former rewrite to
+nonexistent id 20663 prevented the coordinate and minimap marker update on every transition.
+
 ### 1.4 Which map is on the other side
 
 The map id inside `jqk` is a **guess, not an instruction**. The client works it out by arithmetic on
@@ -228,7 +239,7 @@ element that appears in a `jss` is declared with a different element type (7.2).
 today, because the 15 are never offered as destinations, but the drawing is not the "newer zaap" the
 comments call it.
 
-### 2.2 The one that had to be written down by hand
+### 2.2 Evidence-backed element overrides
 
 The map without a recognisable zaap is **115083777, the Temple of Alliances at (13, 35)**. It has
 four elements and none of them carries a zaap drawing:
@@ -241,9 +252,15 @@ four elements and none of them carries a zaap drawing:
 | 530219 | 31992 | 254 | that drawing appears on 5 maps, none of the others with a zaap |
 
 The first two drawings each appear on exactly one map in the whole game, so neither can be
-identified by comparison. The capture rules out 481519, which leaves **481520**. That is the whole
-content of `datos/zaap_overrides.json`, and the file carries the reasoning inside it so the next
-person does not have to redo it.
+identified by comparison. The capture rules out 481519, which leaves **481520**.
+
+Incarnam map **154010371** stores its visible zaap hit target in `mapData.boundingBoxes`, not in
+`interactiveElements`: element **538795**, cell **304**, drawing **301199**. The official traffic
+uses that same element with skill 114. Element 490237 / cell 265 / drawing 3212 is separate animated
+scenery at another position; binding the action to it leaves the visible portal without a hit. Amakna
+map **88213271** follows the same layout (element 540285 / cell 205 / drawing 301199). The pinned map
+extractor includes both collections so these targets are selected by their ordinary zaap graphic;
+the reviewed ids remain recorded in `client_data/3.6.10.10/server/zaap_overrides.json`.
 
 The alternative that was tried first was to declare **every** element on such a map as a zaap, so the
 player could not get stuck. It worked, and it was a lie: it turned the temple doors into zaaps. Each
@@ -269,9 +286,16 @@ destination lists in the 250 captures — 349 entries in all — every `f5` name
 describes, and `f6` is that map's sub-area in 327 of them. The destination you are already standing
 on travels without `f2`, which is proto3 for zero.
 
-**All 47 activated zaaps are offered**, every time. There is no discovery in this emulator: the
-character has them all. A destination is only dropped if the map is missing from `MapPositions` or if
-you could not leave it again — none of the 47 falls into either case today.
+The 47 activated world zaaps are the available catalogue, **not** a character's unlocked list.
+`CharacterZaaps` stores discovery by `(CharacterId, MapId)`. A new character has no rows. Arriving
+on a map that has an active, usable ordinary waypoint inserts only that map idempotently, before the
+post-transition full `hjk`; opening the interface itself does not unlock anything. The pinned client
+replaces its entire known list from each `hjk`, and the official capture sends `hjk` after ordinary
+map transitions but not after `iwo` opens an already-known zaap. World entry therefore drops the
+captured character's 45-map `hjk` and emits the current character-owned replacement. `hjj` is likewise
+filtered through those rows. A forged `hjc` request for an
+undiscovered, inactive or unusable waypoint is rejected before money or position changes. Haven-bag
+zaaps and anomaly vestiges do not create world-zaap discovery rows.
 
 ### 2.4 What travel costs
 
@@ -292,15 +316,15 @@ You arrive on the zaap's own cell, or the nearest walkable one if that cell cann
 
 ### 2.5 Zaapis, and other limits
 
-* **Zaapis are not implemented.** They are not in `WaypointsDataRoot`, and the emulator only declares
-  elements carrying one of the two zaap drawings, so a zaapi on a city map is not clickable at all.
-  The exchange is identical to a zaap's — the Bonta zaapi capture was one of the three used to work
-  out §2.3 — so what is missing is the destination table, not the protocol.
+* **Zaapis are implemented for the pinned Bonta and Brakmar networks.** They use their own 60-map
+  catalogue, type 106 / skill 157 and the measured flat 20-kama price; they are independent from
+  world-zaap discovery.
 * **The guild-hall zaap is not declared either.** Drawing 37493, on three maps, is declared 114 / 16
   in the captures — the zaap pair exactly — and none of its maps is in `WaypointsDataRoot`, so the
   emulator ignores it. That is one more drawing that could be recognised without guessing anything.
 * Nothing is charged for the zaap you are standing on, and nothing is charged for failing.
-* No zaap is ever "discovered" or saved; there is nothing per-character to store.
+* Zaap discovery is per character and survives reconnects. Existing characters receive no legacy
+  backfill because the old global grant contains no evidence of which portals they really used.
 
 ---
 
@@ -479,8 +503,8 @@ A new character gets:
 
 | | Value | Why |
 |---|---|---|
-| Map | 154010884, Incarnam | the pre-tutorial starting point |
-| Cell | 315, adjusted only if the map data marks it unwalkable | |
+| Map | 154010883, Incarnam (-2,-3) | pinned client tutorial map; current NPC coverage is documented separately |
+| Cell | 318 | present in the extracted 3.6.10.10 walkable-cell data |
 | Level | 1 | |
 | Kamas | 0 | tutorial rewards must be earned |
 | Each of the six characteristics | 0 | no scrolls or prior progression |
@@ -776,54 +800,23 @@ equipment included. They used to come from a formula over base vitality only, so
 the character had 305 HP while the client displayed 514, and the character died "in the background"
 with a full health bar on screen.
 
-### 6.2 What does not work
+### 6.2 Current 3.6.10.10 fight slice
 
-The fight code speaks the **3.6.4.3 protocol**. A binary scan of all 250 captures for the literal
-`type.ankama.com/<opcode>` string, over every opcode the combat path still builds or reads:
+The old handler did speak the 3.6.4.3 protocol, so the wire layer was rebuilt around the current
+`hqa`, `jzy`, `kaq`, `jrw`, `jwh`, `jxy`, `jti` and server-push messages. Ordinary roaming-monster
+entry now works end to end: the roleplay map exposes a negative group id, `hqa` validates that exact
+group on the current map, preparation waits for the client's `ijm`/`kmv`, and placement, readiness,
+turns, movement, spells, rewards and the return to roleplay complete on the current client.
 
-| Opcode still in the code | Occurrences in 250 captures |
-|---|---|
-| `jxx`, `jyk`, `jyz`, `jza`, `jwb`, `jub`, `jrb` | 0 |
-| `jwf`, `krh`, `jtx`, `jvm`, `jut`, `jyf`, `jud`, `juc` | 0 |
-| `kkp`, `kkm`, `kkq`, `jpf`, `joh`, `kkr`, `jpv`, `krb`, `lor`, `bvr` | 0 |
-| `joi`, `jos`, `jpp`, `joo` | 0 |
+This was replayed live on 2026-08-24 on map 154010372 against group -1017709 and monster 970. The
+client entered arena 153885696, completed the fight, received experience, kamas and two drops, and
+returned to the roleplay map. The startup regression also decodes the complete negative-id `hqa`
+envelope so that the first click cannot silently drift again.
 
-Not one. Most of them are `FightHandler`'s own; the last row and a few others are the map-change and
-transition path (`Handlers/MapChangeHandler.cs`, `Handlers/MapLoadHandler.cs`,
-`Handlers/StatsHandler.cs`, `Network/GameNodeProxy.cs`, `Network/TransitionPacketsBuilder.cs`). They
-are all the previous version of the protocol.
-
-And the two the fight code reads as client requests travel the other way in reality. Measured on
-`Combate/combate contra poutch nivel 50…pcapng`:
-
-```
-S->C  jtn 141   jwe 100   jxm 90   jwi 60   jto 60   jxw 31   jya 9
-C->S  jti 27    jwh 7     jwz 4    jrw 5
-```
-
-`jwe` and `jxw` are **server pushes** (9,463 and 4,933 times across all captures, never from the
-client). `FightHandler` waits for them as the client's turn-ready acknowledgement and pass-turn
-button. The real client sends `jti`, `jwh` and `jwz`, which nothing here reads.
-
-The two entry points into a fight are dead for the same reason:
-
-* `MapChangeHandler.HandleMovementRequest` starts one when a `joi` path ends on a mob's cell. This
-  client does not send `joi` — the 3.6.10.10 walk is `jrw`, and `WorldMoveHandler` has no collision
-  check.
-* `FightHandler.HandleFightOptionToggleRequest` starts one on `hoy`. In the captures `hoy` only ever
-  goes server to client, ten times: seven in server- and character-selection captures and three when
-  reconnecting to a fight already under way. The client never sends it, so the trigger never fires.
-
-So: **a fight cannot start with the 3.6.10.10 client.** Monsters are drawn on the map, they carry
-their real levels and grades and their tooltips work, and walking onto them does nothing.
-`Managers/DungeonManager.cs` says the same thing in its own class comment — it loads 187 dungeons,
-763 rooms and 159 entrance-and-exit maps and is called by nothing, waiting for combat to move to this
-version of the protocol.
-
-The root `README.md` opens by advertising "a functional PvM combat engine". Further down it is
-franker: its combat section is headed "STILL MIGRATING FROM v 3.6.4.3 - CURRENTLY DISABLED FOR
-SAFETY". The second statement is the true one. Against a 3.6.4.3 client the engine may well work;
-against the client this emulator targets it cannot start.
+That is a verified PvM slice, not a claim that all combat is complete. PvP, challenges, spectators,
+reconnection, dungeon encounter scripts, boss mechanics, waves and many effect families still need
+their own current-client evidence and state transitions. Unsupported effects are logged instead of
+being assigned invented semantics.
 
 ### 6.3 Also unverified, even on its own terms
 
@@ -855,7 +848,10 @@ f15 { f1: state, f2: cell, f3: element }
 ```
 
 Both are needed: `f11` says what exists and what can be done with it, `f15` says where it is and what
-state it is in.
+state it is in. Native client serialization, the official capture and the corrected pinned schema
+put disabled actions in `f3`, enabled actions in `f4`, the element id in `f5`, and the type in `f6`.
+The older extractor mistook optional `f2`'s `Has` property for another wire field and shifted the
+remainder; following that old shape leaves the drawing visible but prevents any interaction request.
 
 The element number is not invented — it is the `m_interactionId` from the client's own map data, and
 that holds everywhere: all 1,851 `f15` entries in the 250 captures name an element that
@@ -898,11 +894,13 @@ and offer "Open", which is the machine next to it, not the machine itself.
 
 ### 7.3 Why nothing else is declared
 
-`interactive_elements.json` holds 46,309 elements over 9,840 maps, and the emulator declares three
-kinds. The reason is not laziness: **the element type is not in the client's data.** The client data
-gives the id, the cell and the drawing; the type and the skill are the server's to supply. Declaring
-a door without knowing what it does gets nowhere — the client would show a use option that leads
-nothing to happen.
+`interactive_elements.json` holds 46,309 elements over 9,840 maps, but only some can be declared
+without extra server evidence. **The element type is not in the client's map data.** The client data
+gives the id, the cell and the drawing; the type and the skill are the server's to supply. The
+pinned world graph supplies criterion-free single-target door, stair and ladder routes. A reviewed
+Giny.NETCore world dataset now supplies 30 Incarnam workshop joins; each is accepted only when its
+map, element, cell and graphic match the exact client extraction and its skill and recipe count
+match the pinned catalogues.
 
 The three that are declared were identified by their drawing, which is the one property the client
 data does carry. The lottery machine's pair and the ordinary zaap's were then confirmed against real
@@ -911,7 +909,18 @@ it is wrong too (7.2).
 
 ### 7.4 Limits
 
-* Doors, workshops, resources, bins and every other clickable element are invisible to the server.
+* Criterion-free single-target doors, stairs and ladders from the pinned world graph are declared.
+  On reciprocal building exits, either the exact graph cell or an explicitly reviewed actor action
+  cell is required, and the return is normalized to a safe walkable outdoor cell. The farmer exit
+  drawing is anchored at 424, but the live client finishes its exit action at 411; oven use finishes
+  at 299 and remains inside. The former same-coordinate social-interior fallback was removed because
+  it turned every `jqi` handshake after an ordinary workshop action into a teleport outdoors.
+* Thirty Incarnam workshop stations, including all four bindings in the farmer interior, are
+  declared from reviewed public server rows. The exact client `kgq` path opens the craft UI for the
+  bound skill. Ingredient changes and recipe completion are not enabled until their current
+  request/result aliases are traced.
+* Resources and any other element without an evidence-backed type, skill and action remain
+  undeclared.
 * Element state is always 1. Nothing here can show a chest as open or a door as locked.
 * A map with a zaap whose element cannot be located declares none at all. Putting it on a made-up
   cell would leave the player clicking where there is nothing.
@@ -924,13 +933,13 @@ it is wrong too (7.2).
 |---|---|
 | Map loading, actors, sub-area | Works. `jrh` → `jss` + `lva`, all measured |
 | Walking, map change, autopilot | Works while the client's own guess is right. The written neighbour table is 60 % unusable and shadows the coordinate fallback (1.5) |
-| Zaaps | Works for the 47 activated destinations. Cost formula invented. The 15 non-activated waypoints are declared with the wrong element type (2.1, 7.2) |
-| Zaapis | Not implemented |
+| Zaaps | 47 active destinations exist; each character sees only portals whose maps it has visited. The distance cost formula remains emulator-authored |
+| Zaapis | Bonta/Brakmar networks work on 60 maps with the measured 20-kama price |
 | Haven bag: entry, decor, furniture, chest, lottery | Works. The chest is declared and answered with the house-chest skill and type, not the pair the captures show for a haven-bag chest (3.4, 7.2) |
 | Character creation, characteristics, spells, inventory, equipment | Works |
-| Monsters on the map | Works: drawn, correct levels and grades, tooltips |
-| Fights | **Cannot start.** The code speaks the previous protocol version |
+| Monsters on the map | Generated only on exact walkable cells; social interiors are excluded and stale generated placements are rebuilt |
+| Fights | Ordinary roaming-monster PvM works end to end on 3.6.10.10; PvP, encounter scripts and unsupported effect families remain incomplete |
 | Dungeons | Data loaded (187 / 763 rooms), nothing calls it |
-| Interactive elements other than zaap, chest and lottery | Not declared |
-| NPCs | 2 spawns in the database |
+| Interactive elements other than zaap, chest and lottery | Criterion-free world-graph transitions work; 30 reviewed Incarnam workshops open the native craft UI; resources and recipe execution still need current server/protocol evidence |
+| NPCs | The versioned Incarnam layer adds four exact placements from the reviewed Giny.NETCore source. A fifth row names NPC 2897, absent from this client, and is retained only as rejected provenance rather than substituted; dialogue and quest state still need current authoritative routing |
 | Other players | None. The emulator serves one character at a time |

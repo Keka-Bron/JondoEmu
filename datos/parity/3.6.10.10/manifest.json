@@ -7,19 +7,19 @@
       "C": 2206
     },
     "matrix_by_status": {
-      "mapped": 142,
-      "shape-known": 2113
+      "mapped": 124,
+      "shape-known": 2131
     },
     "matrix_rows": 2255,
-    "server_references": 996
+    "server_references": 979
   },
   "generator": "tools/generate_parity_ledger.py",
   "generator_sha256": "ebd82dda6a5e465411fe8ceb0ca258eb479fe41cbca3875018b23e54e01200b4",
   "inputs_sha256": {
     "datos/indice_3.6.10.10.json": "658e2dc0319b217e871b8c4ddbd6a98745fdf81ea489b40553cf5cfbbfaaaa1b",
     "datos/opcodes_emulador_3.6.10.10.tsv": "affe2d3ab6fa3d19ac0733576410f6f69eebca8162f9f7ab320f5c18275e81db",
-    "datos/protocolo_3.6.10.10.proto": "b7a1cbfd6db97d40d9be9dcbc67b8ff56705ae505b3b8652a3f7bee4095a319f",
-    "datos/protocolo_conexion_3.6.10.10.proto": "d13d730c0566873a9c4d6fbfda61ec68ead4d642ef4dd8d37f5000a9b1c46404"
+    "datos/protocolo_3.6.10.10.proto": "8f1326f36c04528570f06753d865fd40f52e856316dc9669e1225227b83395d3",
+    "datos/protocolo_conexion_3.6.10.10.proto": "4b4796d2673a92a5c8dc208251db7ab6c3ae4e6a85e3a0f56ac9d42ba890b642"
   },
   "notes": [
     "Generated rows are deliberately conservative: this ledger does not assert client acceptance.",

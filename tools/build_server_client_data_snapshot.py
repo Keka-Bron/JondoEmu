@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """Create the version-pinned runtime game-data snapshot consumed by Jondo Server.
 
-This copies only static, regenerable inputs. It deliberately excludes SQLite databases because
-they contain player/account state in the current schema. The manifest is verified by Paths before
-the server prefers this snapshot over legacy datos/ files.
+This copies only static, regenerable inputs. The world bootstrap is sanitized by
+build_static_world_bootstrap.py before inclusion, so it contains no character/player rows. The
+manifest is verified fail-closed by Paths before any gameplay service starts.
 """
 from __future__ import annotations
 
 import hashlib
 import json
 import shutil
+import subprocess
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,19 +24,29 @@ FILES = [
     "map_walkable_cells.json", "map_fight_cells.json", "character_xp.json", "breed_looks.json",
     "heads.json", "breed_stats.json", "item_sets.json", "item_effect_fields.json", "dungeons.json",
     "interactive_elements_3.6.10.10.json", "world_interactive_transitions_3.6.10.10.json",
-    "waypoints.json", "zaap_overrides.json", "havenbag.json", "house_templates_3.6.10.10.json",
+    "waypoints.json", "havenbag.json", "house_templates_3.6.10.10.json",
     "casas_mundo_3.6.10.10.json", "titles_ornaments.json", "cosmetics.json", "cosmetic_skins.json",
     "mounts.json", "npc_shops.json", "spell_variants.json", "world_etapa1_tras_elegir_personaje.bin",
-    "world_etapa2_tras_confirmar.bin", "world_etapa3_mapa.bin",
+    "world_etapa2_tras_confirmar.bin", "world_etapa3_mapa.bin", "anomalias_3.6.10.10.json",
+    "zaapis_3.6.10.10.json", "caracteristicas_kub.json", "invocaciones_duracion.json",
+    "mascoturas.json", "monturas_colores.json",
 ]
 NESTED = ["JsonFromDofusDude/jobs.json", "JsonFromDofusDude/skills.json", "JsonFromDofusDude/recipes.json"]
+VERSION_OWNED = [
+    "world_interactive_returns_3.6.10.10.json", "zaap_overrides.json", "world.zip",
+    "catalog_integrity.json", "map_scrolls.json",
+    "effect_runtime_semantics.json",
+]
 
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def main() -> int:
+    subprocess.run([sys.executable, str(ROOT / "tools" / "build_static_world_bootstrap.py")], check=True)
+    subprocess.run([sys.executable, str(ROOT / "tools" / "build_catalog_integrity_manifest.py")], check=True)
     sources = [(name, DATA / name) for name in FILES]
     sources += [(name, DATA / name) for name in NESTED]
+    sources += [(name, OUTPUT / name) for name in VERSION_OWNED]
     missing = [name for name, source in sources if not source.is_file()]
     if missing:
         raise SystemExit("Missing required generated runtime inputs: " + ", ".join(missing))
@@ -52,7 +64,7 @@ def main() -> int:
             "clientVersion": VERSION,
             "serverProtocolVersion": VERSION,
             "generatedUtc": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-            "purpose": "Static runtime inputs for Jondo Server. Never put player/account state here.",
+            "purpose": "Static runtime inputs and a player-free bootstrap cache for Jondo Server. Never put player/account state here.",
             "files": records,
             "excluded": ["bases/*.db", "accounts", "characters", "inventory", "quest progress", "ownership", "telemetry"],
         }

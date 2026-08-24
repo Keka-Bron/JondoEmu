@@ -13,7 +13,7 @@ using Il2CppCore.DataCenter;
 using Il2CppCore.DataCenter.Metadata.World;
 using UnityEngine.UIElements;
 
-[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.3.0", "Jondo")]
+[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.3.6", "Jondo")]
 [assembly: MelonGame("Ankama", "Dofus")]
 
 namespace JondoFix
@@ -28,6 +28,9 @@ namespace JondoFix
         private static bool _serverAddressResolutionWarningLogged;
         private static string _resolvedServerIpv4;
         private static string _resolvedServerIpv6;
+        private static DateTime _nextCreateCharacterUiScanUtc;
+        private static bool _createCharacterUiScanLogged;
+        private static bool _createCharacterUiElementLogged;
 
         public static bool UseLocalRedirect { get; private set; } = false;
         public static string ServerHost { get; private set; } = DefaultServerHost;
@@ -329,7 +332,7 @@ namespace JondoFix
             UseLocalRedirect = _serverHostWasProvided || IsEmulatorActive();
             LoggerInstance.Msg("====================================================");
             LoggerInstance.Msg("  JONDO REDIRECTOR & FIX");
-            LoggerInstance.Msg($"  Version: 1.3.0");
+            LoggerInstance.Msg($"  Version: 1.3.5");
             LoggerInstance.Msg($"  Server endpoint: {FormatServerEndpoint(5555)}");
             LoggerInstance.Msg($"  Server redirection active? {UseLocalRedirect}");
             if (UseLocalRedirect)
@@ -446,6 +449,7 @@ namespace JondoFix
             try
             {
                 var harmony = new HarmonyLib.Harmony("com.jondo.fix.late");
+                InstallCharacterCreationUiPatch(harmony);
                 
                 Type eudType = null;
                 try
@@ -564,8 +568,85 @@ namespace JondoFix
             }
         }
 
+        /// <summary>
+        /// Installs the character-selection hooks after IL2CPP has registered its generated
+        /// wrappers. Harmony attributes are not applied automatically by MelonLoader, so these
+        /// hooks must be installed explicitly. The client queues its final enabled state through
+        /// _UpdateCreateButton_b__77_0, so both the refresh path and deferred callback are
+        /// covered.
+        /// </summary>
+        private static void InstallCharacterCreationUiPatch(HarmonyLib.Harmony harmony)
+        {
+            try
+            {
+                Type screen = typeof(Il2CppCore.UILogic.Connection.CharacterSelection);
+                MethodInfo refreshPostfix = AccessTools.Method(
+                    typeof(CharacterSelectionCreateButtonPatch),
+                    nameof(CharacterSelectionCreateButtonPatch.Postfix));
+                MethodInfo scheduledPostfix = AccessTools.Method(
+                    typeof(CharacterSelectionCreateButtonPatch),
+                    nameof(CharacterSelectionCreateButtonPatch.PostfixScheduled));
+                MethodInfo createPrefix = AccessTools.Method(
+                    typeof(CharacterSelectionCreateButtonPatch),
+                    nameof(CharacterSelectionCreateButtonPatch.BeforeCreateCharacterClick));
+                if (refreshPostfix == null || scheduledPostfix == null || createPrefix == null)
+                {
+                    MelonLogger.Warning("[JondoFix] Character creation compatibility callbacks were not found.");
+                    return;
+                }
+
+                int refreshPatched = 0;
+                foreach (string name in new[]
+                {
+                    "OnEnable",
+                    "OnCharacterCanBeCreated",
+                    "OnCharactersListUpdated",
+                    "DisplayCharacters",
+                    "UpdateCreateButton",
+                    "HighlightEdCharacter",
+                    "Localize"
+                })
+                {
+                    MethodInfo method = AccessTools.Method(screen, name);
+                    if (method == null) continue;
+                    harmony.Patch(method, postfix: new HarmonyMethod(refreshPostfix));
+                    refreshPatched++;
+                }
+
+                MethodInfo deferred = AccessTools.Method(screen, "_UpdateCreateButton_b__77_0");
+                if (deferred != null)
+                {
+                    harmony.Patch(deferred, postfix: new HarmonyMethod(scheduledPostfix));
+                }
+
+                // The native click handler makes a second check against the account service
+                // before it navigates to the creator.  A visual SetEnabled alone therefore
+                // produces a button which looks available but cannot do anything.  The check
+                // is the faa.dlzx creation-state enum (the ninth interface property: eight
+                // preceding get/set pairs make it virtual slot 16).  Bring that state into
+                // agreement with Jondo's authenticated five-slot policy immediately before the
+                // original handler executes.
+                MethodInfo createClick = AccessTools.Method(screen, "OnCreateCharacterClicked");
+                if (createClick != null)
+                {
+                    harmony.Patch(createClick, prefix: new HarmonyMethod(createPrefix));
+                }
+
+                MelonLogger.Msg(
+                    $"[JondoFix] Character creation UI hooks installed: {refreshPatched} refresh path(s), " +
+                    $"deferred callback {(deferred != null ? "present" : "missing")}, " +
+                    $"click route {(createClick != null ? "present" : "missing")}.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[JondoFix] Could not patch the deferred character-creation UI callback: {ex.Message}");
+            }
+        }
+
         public override void OnUpdate()
         {
+            EnsureCreateCharacterButtonEnabled();
+
             if (UseLocalRedirect && !hasDumped)
             {
                 try
@@ -605,6 +686,65 @@ namespace JondoFix
                 catch (Exception)
                 {
                     // Ignore exceptions during early initialization frames when roots are not yet ready
+                }
+            }
+        }
+
+        /// <summary>
+        /// The character-selection controller is not a Unity Object and its event subscription
+        /// is created by an obfuscated native bridge. On some client builds that bridge refreshes
+        /// the visual state without invoking managed Harmony callbacks. The actual button is a
+        /// named UI Toolkit element, so locate it through the live UIDocument and keep its state
+        /// aligned with Jondo's server-side slot validation. The scan is throttled and only runs
+        /// for an emulator redirect session.
+        /// </summary>
+        private static void EnsureCreateCharacterButtonEnabled()
+        {
+            if (!UseLocalRedirect || DateTime.UtcNow < _nextCreateCharacterUiScanUtc) return;
+            _nextCreateCharacterUiScanUtc = DateTime.UtcNow.AddMilliseconds(250);
+
+            try
+            {
+                var documents = UnityEngine.Resources.FindObjectsOfTypeAll<UIDocument>();
+                if (!_createCharacterUiScanLogged && documents != null)
+                {
+                    _createCharacterUiScanLogged = true;
+                    MelonLogger.Msg($"[JondoFix] Character UI document scan active ({documents.Length} document(s)).");
+                }
+
+                if (documents == null) return;
+                for (int index = 0; index < documents.Length; index++)
+                {
+                    UIDocument document = documents[index];
+                    VisualElement root = document?.rootVisualElement;
+                    if (root == null) continue;
+
+                    VisualElement button = root.Q<VisualElement>("btn_createCharacter")
+                                           ?? root.Q<VisualElement>("_btn_createCharacter");
+                    if (button == null) continue;
+
+                    if (!_createCharacterUiElementLogged)
+                    {
+                        _createCharacterUiElementLogged = true;
+                        MelonLogger.Msg("[JondoFix] Character creation button found in the live UI document.");
+                    }
+
+                    if (!button.enabledSelf)
+                    {
+                        button.SetEnabled(true);
+                        MelonLogger.Msg("[JondoFix] Character creation UI unlocked through the live document.");
+                    }
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                // UI documents are unavailable during boot and can disappear while a screen is
+                // unloading. Keep the diagnostic concise rather than polluting the client log.
+                if (!_createCharacterUiScanLogged)
+                {
+                    _createCharacterUiScanLogged = true;
+                    MelonLogger.Warning($"[JondoFix] Character UI document scan is not ready: {ex.Message}");
                 }
             }
         }
@@ -1213,11 +1353,37 @@ namespace JondoFix
     {
         private static bool _enabledLogged;
         private static bool _warningLogged;
+        private static bool _creationStateLogged;
 
-        private static MethodBase TargetMethod()
+        private static IEnumerable<MethodBase> TargetMethods()
         {
-            Type selection = AccessTools.TypeByName("Core.UILogic.Connection.CharacterSelection");
-            return selection == null ? null : AccessTools.Method(selection, "UpdateCreateButton");
+            // Il2CppInterop prefixes generated namespaces with "Il2Cpp".  The previous patch
+            // asked for Core.UILogic... and targeted UpdateCreateButton, which does not exist in
+            // 3.6.10.10, so Harmony had nothing to patch and the guard never ran.
+            Type selection = AccessTools.TypeByName("Il2CppCore.UILogic.Connection.CharacterSelection");
+            if (selection == null)
+            {
+                MelonLogger.Warning("[JondoFix] CharacterSelection type was not found; create-button guard is unavailable.");
+                yield break;
+            }
+
+            // These are real 3.6.10.10 methods executed while the selection screen is populated,
+            // localized and highlighted.  Hooking all three also survives a different ordering
+            // between a first login and a return from the world.
+            string[] refreshPoints =
+            {
+                "UpdateCreateButton",
+                "OnCharactersListUpdated",
+                "DisplayCharacters",
+                "Localize",
+                "GetCharacterCount",
+                "HighlightEdCharacter"
+            };
+            foreach (string name in refreshPoints)
+            {
+                MethodInfo method = AccessTools.Method(selection, name);
+                if (method != null) yield return method;
+            }
         }
 
         public static void Postfix(object __instance)
@@ -1226,14 +1392,19 @@ namespace JondoFix
 
             try
             {
-                // CharacterSelection inherits its generated binding through fzy<T>; the
-                // obfuscated field name is stable for the pinned 3.6.10.10 client.  Reflection
-                // keeps this patch isolated from the game's generated binding implementation.
-                object binding = AccessTools.Field(__instance.GetType(), "dwpp")?.GetValue(__instance);
-                if (binding == null) return;
+                AlignNativeCreationState(__instance, "selection refresh");
+                VisualElement visual = FindCreateButton(__instance);
+                if (visual == null)
+                {
+                    if (!_warningLogged)
+                    {
+                        _warningLogged = true;
+                        MelonLogger.Warning($"[JondoFix] CharacterSelection was patched but btn_createCharacter was not found on {__instance.GetType().FullName}.");
+                    }
+                    return;
+                }
 
-                object button = binding.GetType().GetProperty("btn_createCharacter")?.GetValue(binding);
-                if (button is VisualElement visual && !visual.enabledSelf)
+                if (!visual.enabledSelf)
                 {
                     visual.SetEnabled(true);
                     if (!_enabledLogged)
@@ -1252,6 +1423,145 @@ namespace JondoFix
                 }
             }
         }
+
+        /// <summary>
+        /// Runs before the real 3.6.10.10 click handler.  This is deliberately a state alignment,
+        /// not a synthetic packet or an artificial navigation: the unmodified client handler
+        /// still owns the transition to the creation screen and will later send its normal kvz
+        /// request.  The server remains authoritative when it receives that request.
+        /// </summary>
+        public static void BeforeCreateCharacterClick(object __instance)
+        {
+            if (!JondoFixMod.UseLocalRedirect || __instance == null) return;
+
+            try
+            {
+                AlignNativeCreationState(__instance, "create-character click");
+            }
+            catch (Exception ex)
+            {
+                if (!_warningLogged)
+                {
+                    _warningLogged = true;
+                    MelonLogger.Warning($"[JondoFix] Could not align the creation state for the click: {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// The client invokes this lambda through its UI scheduler after UpdateCreateButton
+        /// returns. It is the final writer for enabledSelf, so correct the state here too.
+        /// </summary>
+        public static void PostfixScheduled(VisualElement __0)
+        {
+            if (!JondoFixMod.UseLocalRedirect || __0 == null) return;
+            try
+            {
+                if (!__0.enabledSelf)
+                {
+                    __0.SetEnabled(true);
+                    if (!_enabledLogged)
+                    {
+                        _enabledLogged = true;
+                        MelonLogger.Msg("[JondoFix] Character creation UI unlocked after the client scheduler refresh.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!_warningLogged)
+                {
+                    _warningLogged = true;
+                    MelonLogger.Warning($"[JondoFix] Could not update the scheduled create-character UI: {ex.Message}");
+                }
+            }
+        }
+
+        private static void AlignNativeCreationState(object selection, string source)
+        {
+            if (selection is not Il2CppCore.UILogic.Connection.CharacterSelection typedSelection)
+                return;
+
+            Il2Cpp.faa player = typedSelection.m_playerService;
+            if (player == null) return;
+
+            // Cpp2IL 3.6.10.10 evidence: OnCreateCharacterClicked and UpdateCreateButton both
+            // dispatch virtual slot 16 on faa.  The interface order resolves that slot to the
+            // getter for dlzx (faa.ezz).  A nonzero value opens the unavailable-slot path;
+            // drjv (zero) is the only value that runs the native creator navigation branch.
+            int before = Convert.ToInt32(player.dlzx);
+            if (before == 0) return;
+
+            player.dlzx = Il2Cpp.faa.ezz.drjv;
+            if (!_creationStateLogged)
+            {
+                _creationStateLogged = true;
+                MelonLogger.Msg($"[JondoFix] Character creation state {before} -> 0 ({source}); native creator route is available.");
+            }
+        }
+
+        private static VisualElement FindCreateButton(object selection)
+        {
+            // The binding lives on the closed generic base fzy<CharacterSelectionBinding>.
+            // Harmony's AccessTools cannot resolve that inherited generic field reliably under
+            // Il2CppInterop, while the generated wrapper exposes it as a normal typed property.
+            if (selection is Il2CppCore.UILogic.Connection.CharacterSelection typedSelection)
+            {
+                try
+                {
+                    VisualElement typedButton = typedSelection.dwpp?.btn_createCharacter;
+                    if (typedButton != null) return typedButton;
+                }
+                catch
+                {
+                    // Continue into the diagnostic compatibility fallback below.
+                }
+            }
+
+            // First try the generated binding name used by this pinned client. AccessTools walks
+            // base classes, which matters because CharacterSelection inherits the binding field.
+            object binding = AccessTools.Field(selection.GetType(), "dwpp")?.GetValue(selection);
+            VisualElement button = ButtonFrom(binding);
+            if (button != null) return button;
+
+            // Keep the compatibility hook robust against regenerated obfuscated field names.
+            // Only inspect one object level: generated UI bindings are fields on the screen and
+            // expose btn_createCharacter directly, so there is no need to traverse arbitrary
+            // client state or invoke unrelated properties.
+            for (Type type = selection.GetType(); type != null; type = type.BaseType)
+            {
+                foreach (FieldInfo field in type.GetFields(BindingFlags.Instance |
+                                                           BindingFlags.Public |
+                                                           BindingFlags.NonPublic |
+                                                           BindingFlags.DeclaredOnly))
+                {
+                    if (field.FieldType.IsPrimitive || field.FieldType == typeof(string)) continue;
+                    object value;
+                    try { value = field.GetValue(selection); }
+                    catch { continue; }
+                    button = ButtonFrom(value);
+                    if (button != null) return button;
+                }
+            }
+            return null;
+        }
+
+        private static VisualElement ButtonFrom(object binding)
+        {
+            if (binding == null) return null;
+            Type type = binding.GetType();
+            try
+            {
+                object value = AccessTools.Property(type, "btn_createCharacter")?.GetValue(binding)
+                               ?? AccessTools.Field(type, "btn_createCharacter")?.GetValue(binding);
+                return value as VisualElement;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
+
 }
 

@@ -173,6 +173,17 @@ namespace Jondo.Unity.Launcher.Network
         public static bool IsActive(long accountId) => ByAccount.ContainsKey(accountId);
         public static int ActiveCount => ByAccount.Count;
 
+        /// <summary>
+        /// Language negotiated by the launcher for this account's current client. Content names
+        /// are server-provided only in a few diagnostic/chat fallbacks, so they must follow the
+        /// client that is actually connected rather than the server window's display language.
+        /// </summary>
+        public static string LanguageOf(long accountId, string fallback = "fr")
+            => ByAccount.TryGetValue(accountId, out var launch) &&
+               !string.IsNullOrWhiteSpace(launch.Language)
+                ? launch.Language
+                : fallback;
+
         public static void Remove(Launch launch)
         {
             ByHash.TryRemove(launch.Hash, out _);

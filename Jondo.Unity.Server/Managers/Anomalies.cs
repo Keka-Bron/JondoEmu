@@ -79,7 +79,7 @@ namespace Jondo.Unity.Launcher.Managers
             _all.Clear();
             _bySubArea.Clear();
 
-            string path = Paths.Resolve("anomalias_3.6.10.10.json");
+            string path = Paths.ServerData("anomalias_3.6.10.10.json");
             if (!File.Exists(path))
             {
                 Console.WriteLine($"[Anomalías] Falta {Path.GetFileName(path)}; sin él no hay " +

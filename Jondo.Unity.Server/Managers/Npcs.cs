@@ -92,6 +92,7 @@ namespace Jondo.Unity.Launcher.Managers
             catch (Exception ex)
             {
                 Console.WriteLine($"[NPCs] No se han podido leer: {ex.Message}");
+                throw new InvalidOperationException("The NPC catalogue or its reviewed placements are invalid.", ex);
             }
         }
 
@@ -149,11 +150,17 @@ namespace Jondo.Unity.Launcher.Managers
                 }
             }
 
+            int imported = MergeVersionedIncarnamSpawns();
+
             // Los que no traían aspecto propio lo heredan de su plantilla.
             foreach (var here in _byMap.Values)
             {
-                foreach (var spawn in here)
+                for (int i = 0; i < here.Count; i++)
                 {
+                    var spawn = here[i];
+                    // Contextual ids are local to a map and are assigned only after the
+                    // reviewed source has replaced any stale database row.
+                    spawn.ContextualId = ActorIds.NpcDelMapa(i);
                     if (spawn.Bones != 0) continue;
                     if (_templates.TryGetValue(spawn.NpcId, out var template)) ReadLook(template.Look, spawn);
                 }
@@ -163,7 +170,43 @@ namespace Jondo.Unity.Launcher.Managers
             foreach (var here in _byMap.Values) Count += here.Count;
 
             Console.WriteLine($"[NPCs] {Count} puestos verificados en {_byMap.Count} mapas; " +
-                              $"{_templates.Count} plantillas nativas cargadas.");
+                              $"{_templates.Count} plantillas nativas cargadas; " +
+                              $"{imported} colocación(es) Incarnam importada(s).");
+        }
+
+        private static int MergeVersionedIncarnamSpawns()
+        {
+            int imported = 0;
+            foreach (var binding in IncarnamServerContent.NpcSpawns)
+            {
+                if (!_templates.ContainsKey(binding.NpcId))
+                    throw new InvalidOperationException(
+                        $"Incarnam NPC source row {binding.SourceRecordId} references missing template {binding.NpcId}.");
+                if (!_byMap.TryGetValue(binding.MapId, out var here))
+                {
+                    here = new List<Spawn>();
+                    _byMap.Add(binding.MapId, here);
+                }
+
+                bool exact = here.Exists(spawn => spawn.NpcId == binding.NpcId &&
+                                                  spawn.Cell == binding.CellId &&
+                                                  spawn.Orientation == binding.Orientation);
+                if (exact) continue;
+
+                int removed = here.RemoveAll(spawn => spawn.NpcId == binding.NpcId);
+                if (removed > 0)
+                    Console.WriteLine($"[NPCs] Replaced {removed} stale placement(s) for NPC " +
+                                      $"{binding.NpcId} on map {binding.MapId}.");
+                here.Add(new Spawn
+                {
+                    MapId = binding.MapId,
+                    NpcId = binding.NpcId,
+                    Cell = binding.CellId,
+                    Orientation = binding.Orientation,
+                });
+                imported++;
+            }
+            return imported;
         }
 
         /// <summary>Los mapas que tienen algún NPC puesto.</summary>
@@ -246,11 +289,9 @@ namespace Jondo.Unity.Launcher.Managers
                 }
 
                 // dialogData es una lista de bloques y de cada uno interesa el messageId.
-                if (root.TryGetProperty("dialogData", out var dialog)
-                    && dialog.TryGetProperty("Array", out var blocks)
-                    && blocks.ValueKind == JsonValueKind.Array)
+                if (root.TryGetProperty("dialogData", out var dialog))
                 {
-                    foreach (var block in blocks.EnumerateArray())
+                    foreach (var block in Elements(dialog))
                     {
                         if (block.TryGetProperty("messageId", out var messageId)
                             && messageId.ValueKind == JsonValueKind.Number)
@@ -262,18 +303,14 @@ namespace Jondo.Unity.Launcher.Managers
                 }
 
                 // dialogReplies es una lista de pares [idDeRespuesta, idDeTexto] y el primero manda.
-                if (root.TryGetProperty("dialogReplies", out var replies)
-                    && replies.TryGetProperty("Array", out var list)
-                    && list.ValueKind == JsonValueKind.Array)
+                if (root.TryGetProperty("dialogReplies", out var replies))
                 {
                     var fuera = new List<long>();
-                    foreach (var reply in list.EnumerateArray())
+                    foreach (var reply in Elements(replies))
                     {
                         if (!reply.TryGetProperty("values", out var values)) continue;
-                        if (!values.TryGetProperty("Array", out var pair)) continue;
-                        if (pair.ValueKind != JsonValueKind.Array) continue;
 
-                        foreach (var value in pair.EnumerateArray())
+                        foreach (var value in Elements(values))
                         {
                             if (value.ValueKind == JsonValueKind.Number) fuera.Add(value.GetInt64());
                             break;
@@ -291,15 +328,34 @@ namespace Jondo.Unity.Launcher.Managers
         private static int[] Array_(JsonElement root, string name)
         {
             if (!root.TryGetProperty(name, out var holder)) return Array.Empty<int>();
-            if (!holder.TryGetProperty("Array", out var list)) return Array.Empty<int>();
-            if (list.ValueKind != JsonValueKind.Array) return Array.Empty<int>();
 
             var fuera = new List<int>();
-            foreach (var value in list.EnumerateArray())
+            foreach (var value in Elements(holder))
             {
                 if (value.ValueKind == JsonValueKind.Number) fuera.Add(value.GetInt32());
             }
             return fuera.ToArray();
+        }
+
+        /// <summary>
+        /// The pinned client export stores collections as normal JSON arrays, whereas the
+        /// historical world database uses the serializer's { "Array": [...] } wrapper.
+        /// Accept both forms so verified client catalog rows can be imported without a lossy
+        /// conversion step.
+        /// </summary>
+        private static IEnumerable<JsonElement> Elements(JsonElement holder)
+        {
+            if (holder.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var value in holder.EnumerateArray()) yield return value;
+                yield break;
+            }
+
+            if (holder.ValueKind != JsonValueKind.Object
+                || !holder.TryGetProperty("Array", out var wrapped)
+                || wrapped.ValueKind != JsonValueKind.Array) yield break;
+
+            foreach (var value in wrapped.EnumerateArray()) yield return value;
         }
     }
 }

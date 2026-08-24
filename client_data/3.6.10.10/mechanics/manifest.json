@@ -4,13 +4,34 @@
   "purpose": "External, version-pinned mechanic specifications. Draft entries never alter combat; verified entries still require a measured server handler for their rule kind.",
   "entries": [
     {
-      "file": "dungeons/example-dungeon.json"
+      "file": "dungeons/example-dungeon.json",
+      "bytes": 737,
+      "sha256": "715d35a3eec30781382b15f1fbf0d68efa401fa51882a00653855a2286be21f0"
     },
     {
-      "file": "dungeons/aquadome-merkator.json"
+      "file": "dungeons/aquadome-merkator.json",
+      "bytes": 1585,
+      "sha256": "2aec3158abd6a73302fa9ccb1754252e6555b3d41d7525037ef189308d59824e"
     },
     {
-      "file": "monsters/client-baseline.json"
+      "file": "monsters/client-baseline.json",
+      "bytes": 6662957,
+      "sha256": "e11ad8f6c768ad77c5791dbf854c0ba09eed14d26c945759fcf775d3e763a301"
+    },
+    {
+      "file": "incarnam/content-coverage.json",
+      "bytes": 18712,
+      "sha256": "099b802f86bc05c2ff65c3d10d9fc65deccb97f17913424fb0ca060b678a6802"
+    },
+    {
+      "file": "incarnam/workshops.json",
+      "bytes": 7758,
+      "sha256": "dd8498f3f5bc787909a2691bc922cf5af593adce4a208df5dcfbfd69b101356c"
+    },
+    {
+      "file": "incarnam/npc-spawns.json",
+      "bytes": 1841,
+      "sha256": "e8499f6e073cb274887773e34a96fb023750bac7368c5e43cc959b00418bc260"
     }
   ]
 }

@@ -9,9 +9,10 @@ envelope, and [opcodes.md](opcodes.md) for the wider opcode census.
 
 ## The state of the emulator's fight code
 
-`Handlers/FightHandler.cs` was written against 3.6.4.3. Of the 48 opcodes it
-mentions, **7 still exist in 3.6.10.10** (`hoy`, `jwe`, `jxw`, `jya`, `jyg`,
-`jyj`, `krp`) and 41 never appear once in any combat capture:
+The first `Handlers/FightHandler.cs` was written against 3.6.4.3. Of the 48
+opcodes in that original implementation, **7 still exist in 3.6.10.10**
+(`hoy`, `jwe`, `jxw`, `jya`, `jyg`, `jyj`, `krp`) and 41 never appear once in
+any combat capture:
 
 ```
 bvr igs irm joh joi joo joq jox jpf jtx jub juc jud jut juu jvm jvn jwb jwf
@@ -19,14 +20,26 @@ jwk jwl jwm jwo jwu jxe jxx jyf jyi jyk jyn jys jyz jza kkm kkp kkq kkr kkz
 krh lor lsy
 ```
 
-Meanwhile 271 opcodes that do appear in those captures are not mentioned by the
-code at all. So the fight is not a matter of patching a few messages: the whole
-message layer has to be rebuilt.
+Meanwhile 271 opcodes that do appear in those captures were not mentioned by
+the old code at all. That census is why the current implementation rebuilt the
+message layer around `Network/FightProtocol.cs` while retaining the fight state
+machine.
 
-The good news is that only the message layer is wrong. The state machine in
-`FightHandler` — fight instances, teams, placement, the turn timer, spell
-casting, the monster turn, loot and the end of the fight — is a reasonable
-skeleton to keep. The work is to replace what it puts on the wire.
+Monster-fight entry is now wired end to end. A roleplay `jss` exposes each group
+under one negative contextual id; clicking it sends `hqa` with that same id.
+The server validates the id against the current map, acknowledges it with
+`jsq`, marks the next map as a fight with `kmp`, waits for the client's
+`ijm`/`kmv`, and only then emits the placement burst. `jzy` and `kaq` drive
+placement and readiness; the implemented turn/action/result slice then returns
+the character to the roleplay map.
+
+This was rechecked live on 2026-08-24 rather than inferred from code: map
+`154010372`, group `-1017709`, arena `153885696`, one player against monster
+`970`. The client completed `hqa -> ijm/kmv -> kaq -> movement -> spell -> jti`,
+received experience, kamas and two item drops, and returned to `154010372`.
+There is therefore no current blocker to starting an ordinary monster fight
+from a map. That does **not** claim full combat parity: PvP, challenges and many
+effect families remain separate work.
 
 Regenerate the census at any time with:
 
@@ -170,18 +183,55 @@ against the exact bytes the real server sent in *combate contra poutch nivel
 50…* — same cells, same fighter, same map — and it runs at startup, so a builder
 that drifts fails there instead of in the client.
 
-Still unwired: `FightHandler` has not been changed over to these yet, so the
-preparation does not run end to end in game.
+`FightHandler` and `GameNodeProxy` are wired to these current messages. The
+self-test also constructs the complete client `hqa` envelope with a negative
+group id and verifies that the entry reader recovers it; this protects the
+player-visible first click as well as the server's preparation writers.
 
-## Still to measure
+## Level shields and the damage record
 
-Everything past the start of the fight proper. In particular:
+Effect `1020` is the generic level shield. In the pinned 3.6.10.10 catalogue
+its description is `#1% del nivel en escudo`; Fervor (`14676`) is one measured
+example, with `diceNum = 50` and a two-round duration. The percentage is
+resolved against the **caster's level**, rounded down. The resulting points are
+kept in the ordinary ordered buff list: recasting the same effect from the same
+spell and caster replaces the remaining amount and refreshes the duration,
+while different spells or casters stack. Damage consumes the oldest active
+shield first. An exhausted entry stays at zero until its normal expiry because
+there is no pinned evidence for an early `jya` removal; likewise, no unproven
+maximum-shield cap is imposed.
+
+The installed client's generated `jvp` class, native receiver `fmc::bgmn`, and
+regenerated pinned schema establish the complete `jwe.f40` damage detail. The
+older extractor had mistaken the generated `HasFvlp` presence property for a
+wire field; the corrected schema preserves `f1` as optional:
+
+```
+f1  shield points lost (optional)   f2  target id
+f3  life points lost                f4  element id
+f5  permanent/max-life loss
+```
+
+The receiver checks the presence of `f1`, schedules the negative shield delta,
+then schedules the life and permanent-life deltas. The emulator now emits both
+optional losses when non-zero. Shield absorption happens before current HP and
+before erosion. Calculating erosion only from damage that penetrated the shield
+matches established Dofus combat behaviour, but that ordering has not yet been
+replayed against a retained 3.6.10.10 official shield-damage capture; it should
+remain an explicit verification target rather than be treated as capture proof.
+
+## Still to prove or complete
+
+The working monster-fight slice is not evidence for every Dofus fight feature.
+In particular:
 
 - `jto` / `jwi`, the sequence brackets, and what the codes in their fields mean
   (8, 1 and 3 have been seen).
 - `jtn`, by far the most frequent message, and why so many of them are empty.
-- `jwe`, `jxm`, `jxw` and `jya`: the effects, the damage and the point
-  variations.
-- `jti` and `jwh`, which is what the client sends to cast a spell and to move.
-- `jxy`, empty, which is almost certainly "pass turn".
-- The turn timers, the end of the fight and the reward panel.
+- Many `jwe`, `jxm`, `jxw` and `jya` effect and point-variation families still
+  need individual evidence; unsupported effects are logged rather than given
+  invented semantics.
+- PvP challenges, parties joining a fight, spectators, fight options and
+  reconnection need their own captures and state transitions.
+- Dungeon encounter scripts, boss invulnerability phases, waves and tactical
+  objectives are not implied by an ordinary roaming-monster victory.

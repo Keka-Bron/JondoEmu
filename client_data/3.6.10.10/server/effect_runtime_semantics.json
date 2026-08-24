@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "clientVersion": "3.6.10.10",
+  "sourceKind": "reviewed-client-effect-semantics",
+  "pointSteals": [
+    { "effectId": 77, "characteristicId": 23 },
+    { "effectId": 84, "characteristicId": 1 },
+    { "effectId": 440, "characteristicId": 1 },
+    { "effectId": 441, "characteristicId": 23 }
+  ],
+  "multipliers": [79, 1159, 1163],
+  "notes": "The raw EffectData rows identify these as characteristic-zero special effects, but do not encode which AP/MP pool a steal targets or that a value is multiplicative. Keep this reviewed version mapping separate from language-dependent descriptions."
+}

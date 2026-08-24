@@ -101,6 +101,50 @@ namespace Jondo.Unity.Launcher.Network
                         );
                         CREATE INDEX IF NOT EXISTS IX_ObservedPackets_Direction_Opcode
                             ON ObservedPackets(Direction, Opcode, LastSeenUtc DESC);
+
+                        -- ObservedPackets is a compact, deduplicated catalogue.  Parity work also
+                        -- needs the order in which C2S and S2C frames occurred: an unsupported
+                        -- request can only be implemented after its adjacent response (or its
+                        -- proven absence) is observed.  Keep that evidence in a separate bounded
+                        -- timeline rather than multiplying UnknownPackets rows or touching game
+                        -- state.  Payloads stay in ObservedPackets' one canonical replay sample;
+                        -- timeline rows retain the exact decoded shape and hashes needed to join it.
+                        CREATE TABLE IF NOT EXISTS ObservedPacketEvents (
+                            Sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+                            SeenUtc TEXT NOT NULL,
+                            Protocol TEXT NOT NULL,
+                            Direction TEXT NOT NULL,
+                            Opcode TEXT,
+                            TypeUrl TEXT,
+                            WireSignature TEXT NOT NULL,
+                            DecodedSummary TEXT,
+                            AccountId INTEGER,
+                            CharacterId INTEGER,
+                            MapId INTEGER,
+                            SessionCorrelation TEXT,
+                            Phase TEXT,
+                            ClientVersion TEXT,
+                            FrameSha256 TEXT NOT NULL,
+                            PayloadSha256 TEXT NOT NULL
+                        );
+                        CREATE INDEX IF NOT EXISTS IX_ObservedPacketEvents_Session_Sequence
+                            ON ObservedPacketEvents(SessionCorrelation, Sequence DESC);
+                        CREATE INDEX IF NOT EXISTS IX_ObservedPacketEvents_Opcode_Sequence
+                            ON ObservedPacketEvents(Opcode, Sequence DESC);
+
+                        -- Retain the latest 50,000 events.  The trigger only prunes once per
+                        -- 250 inserts, avoiding a delete on the hot path while keeping the
+                        -- telemetry database bounded during extended live testing.
+                        CREATE TRIGGER IF NOT EXISTS TR_ObservedPacketEvents_Bounded
+                        AFTER INSERT ON ObservedPacketEvents
+                        WHEN NEW.Sequence % 250 = 0
+                        BEGIN
+                            DELETE FROM ObservedPacketEvents
+                            WHERE Sequence <= (
+                                SELECT COALESCE(MAX(Sequence) - 50000, 0)
+                                FROM ObservedPacketEvents
+                            );
+                        END;
                     ";
                     table.ExecuteNonQuery();
                 }
@@ -380,6 +424,35 @@ namespace Jondo.Unity.Launcher.Network
                 command.Parameters.AddWithValue("$payloadHash", snapshot.PayloadHash);
                 command.Parameters.Add("$payload", SqliteType.Blob).Value = snapshot.Payload;
                 command.ExecuteNonQuery();
+
+                // Do not fold this into the catalogue UPSERT: every frame, including repeated
+                // heartbeats, is evidence when it surrounds an unhandled request.  This append is
+                // bounded by TR_ObservedPacketEvents_Bounded above and remains telemetry-only.
+                using var timeline = connection.CreateCommand();
+                timeline.CommandText = @"
+                    INSERT INTO ObservedPacketEvents (
+                        SeenUtc, Protocol, Direction, Opcode, TypeUrl, WireSignature, DecodedSummary,
+                        AccountId, CharacterId, MapId, SessionCorrelation, Phase, ClientVersion,
+                        FrameSha256, PayloadSha256)
+                    VALUES ($seen,$protocol,$direction,$opcode,$typeUrl,$signature,$summary,
+                            $accountId,$characterId,$mapId,$session,$phase,$version,
+                            $frameHash,$payloadHash);";
+                timeline.Parameters.AddWithValue("$seen", snapshot.SeenUtc);
+                timeline.Parameters.AddWithValue("$protocol", snapshot.Protocol);
+                timeline.Parameters.AddWithValue("$direction", snapshot.Direction);
+                timeline.Parameters.AddWithValue("$opcode", (object?)snapshot.Opcode ?? DBNull.Value);
+                timeline.Parameters.AddWithValue("$typeUrl", (object?)snapshot.TypeUrl ?? DBNull.Value);
+                timeline.Parameters.AddWithValue("$signature", snapshot.WireSignature);
+                timeline.Parameters.AddWithValue("$summary", snapshot.DecodedSummary);
+                timeline.Parameters.AddWithValue("$accountId", snapshot.AccountId);
+                timeline.Parameters.AddWithValue("$characterId", snapshot.CharacterId);
+                timeline.Parameters.AddWithValue("$mapId", snapshot.MapId);
+                timeline.Parameters.AddWithValue("$session", (object?)snapshot.SessionCorrelation ?? DBNull.Value);
+                timeline.Parameters.AddWithValue("$phase", snapshot.Phase);
+                timeline.Parameters.AddWithValue("$version", snapshot.ClientVersion);
+                timeline.Parameters.AddWithValue("$frameHash", snapshot.FrameHash);
+                timeline.Parameters.AddWithValue("$payloadHash", snapshot.PayloadHash);
+                timeline.ExecuteNonQuery();
             }
             catch (Exception ex) { Console.WriteLine($"[Packet Capture] Could not record observed frame: {ex.Message}"); }
         }

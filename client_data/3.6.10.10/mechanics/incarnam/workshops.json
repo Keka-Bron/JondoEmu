@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "incarnam-workshops-3.6.10.10",
+  "kind": "interactive-workshop-bindings",
+  "status": "Verified",
+  "sourceUrl": "https://github.com/Skinz3/Giny.NETCore",
+  "sourceCommit": "e9a6d56077e0bc303ee734fb3ea0807bece2d962",
+  "clientVersion": "3.6.10.10",
+  "generatedUtc": "2026-08-22T00:00:00Z",
+  "corroboratingSources": [
+    {
+      "url": "https://github.com/Skinz3/Symbioz-2.38",
+      "commit": "128a85886c5f03aace0fbe111b1dc5f6e3addb6c",
+      "scope": "Independent historical agreement for the accepted map, element, cell, type and skill bindings."
+    },
+    {
+      "url": "https://github.com/ledouxm/dofus-sqlite/releases/tag/v6.0_3.6.10.10",
+      "scope": "Exact client map element, skill and recipe catalogues."
+    }
+  ],
+  "validation": {
+    "candidateRows": 31,
+    "acceptedRows": 30,
+    "rejectedRows": 1,
+    "rejected": [
+      {
+        "sourceRecordId": 15254,
+        "mapId": 153355266,
+        "elementId": 527515,
+        "reason": "Element is absent from the exact 3.6.10.10 client map export."
+      }
+    ]
+  },
+  "records": [
+    { "sourceRecordId": 15259, "mapId": 153354240, "elementId": 489674, "cellId": 269, "gfxId": 49503, "interactiveTypeId": 107, "skillId": 156, "typeToken": "SHIELD_ANVIL107", "skillToken": "FORGE_A_SHIELD156", "recipeCount": 111 },
+    { "sourceRecordId": 15260, "mapId": 153354240, "elementId": 489676, "cellId": 412, "gfxId": 49503, "interactiveTypeId": 107, "skillId": 156, "typeToken": "SHIELD_ANVIL107", "skillToken": "FORGE_A_SHIELD156", "recipeCount": 111 },
+    { "sourceRecordId": 15261, "mapId": 153354240, "elementId": 490230, "cellId": 288, "gfxId": 32494, "interactiveTypeId": 107, "skillId": 201, "typeToken": "SHIELD_ANVIL107", "skillToken": "FORGE_A_TROPHY201", "recipeCount": 303 },
+    { "sourceRecordId": 14801, "mapId": 153354242, "elementId": 489524, "cellId": 285, "gfxId": 32991, "interactiveTypeId": 22, "skillId": 27, "typeToken": "OVEN22", "skillToken": "BAKE27", "recipeCount": 70 },
+    { "sourceRecordId": 14802, "mapId": 153354242, "elementId": 489525, "cellId": 258, "gfxId": 32991, "interactiveTypeId": 22, "skillId": 27, "typeToken": "OVEN22", "skillToken": "BAKE27", "recipeCount": 70 },
+    { "sourceRecordId": 14803, "mapId": 153354242, "elementId": 489526, "cellId": 355, "gfxId": 49528, "interactiveTypeId": 50, "skillId": 47, "typeToken": "CRUSHER50", "skillToken": "GRIND47", "recipeCount": 12 },
+    { "sourceRecordId": 14804, "mapId": 153354242, "elementId": 489527, "cellId": 343, "gfxId": 49528, "interactiveTypeId": 50, "skillId": 47, "typeToken": "CRUSHER50", "skillToken": "GRIND47", "recipeCount": 12 },
+    { "sourceRecordId": 15238, "mapId": 153354244, "elementId": 489569, "cellId": 302, "gfxId": 9798, "interactiveTypeId": 58, "skillId": 63, "typeToken": "SEWING_MACHINE58", "skillToken": "SEW63", "recipeCount": 714 },
+    { "sourceRecordId": 15240, "mapId": 153354244, "elementId": 489570, "cellId": 384, "gfxId": 402707, "interactiveTypeId": 11, "skillId": 13, "typeToken": "CRAFTING_TABLE11", "skillToken": "WORK_LEATHER13", "recipeCount": 720 },
+    { "sourceRecordId": 15239, "mapId": 153354244, "elementId": 489571, "cellId": 355, "gfxId": 49497, "interactiveTypeId": 11, "skillId": 13, "typeToken": "CRAFTING_TABLE11", "skillToken": "WORK_LEATHER13", "recipeCount": 720 },
+    { "sourceRecordId": 15237, "mapId": 153354244, "elementId": 489572, "cellId": 312, "gfxId": 49499, "interactiveTypeId": 58, "skillId": 63, "typeToken": "SEWING_MACHINE58", "skillToken": "SEW63", "recipeCount": 714 },
+    { "sourceRecordId": 15242, "mapId": 153354246, "elementId": 489187, "cellId": 329, "gfxId": 49512, "interactiveTypeId": 94, "skillId": 135, "typeToken": "WORKBENCH94", "skillToken": "PREPARE_FISH135", "recipeCount": 65 },
+    { "sourceRecordId": 15244, "mapId": 153354246, "elementId": 489188, "cellId": 384, "gfxId": 49515, "interactiveTypeId": 94, "skillId": 135, "typeToken": "WORKBENCH94", "skillToken": "PREPARE_FISH135", "recipeCount": 65 },
+    { "sourceRecordId": 15243, "mapId": 153354246, "elementId": 489189, "cellId": 355, "gfxId": 49512, "interactiveTypeId": 94, "skillId": 135, "typeToken": "WORKBENCH94", "skillToken": "PREPARE_FISH135", "recipeCount": 65 },
+    { "sourceRecordId": 15241, "mapId": 153354246, "elementId": 489364, "cellId": 285, "gfxId": 49513, "interactiveTypeId": 94, "skillId": 135, "typeToken": "WORKBENCH94", "skillToken": "PREPARE_FISH135", "recipeCount": 65 },
+    { "sourceRecordId": 15248, "mapId": 153354248, "elementId": 490182, "cellId": 354, "gfxId": 49504, "interactiveTypeId": 122, "skillId": 171, "typeToken": "WORKBENCH122", "skillToken": "CRAFT171", "recipeCount": 179 },
+    { "sourceRecordId": 15247, "mapId": 153354248, "elementId": 490183, "cellId": 286, "gfxId": 49504, "interactiveTypeId": 122, "skillId": 171, "typeToken": "WORKBENCH122", "skillToken": "CRAFT171", "recipeCount": 179 },
+    { "sourceRecordId": 15266, "mapId": 153355264, "elementId": 489176, "cellId": 245, "gfxId": 49494, "interactiveTypeId": 27, "skillId": 32, "typeToken": "MOULD27", "skillToken": "MELT32", "recipeCount": 16 },
+    { "sourceRecordId": 15267, "mapId": 153355264, "elementId": 489177, "cellId": 317, "gfxId": 49510, "interactiveTypeId": 57, "skillId": 20, "typeToken": "ANVIL57", "skillToken": "FORGE20", "recipeCount": 484 },
+    { "sourceRecordId": 15264, "mapId": 153355264, "elementId": 489178, "cellId": 257, "gfxId": 49495, "interactiveTypeId": 41, "skillId": 48, "typeToken": "GRIND41", "skillToken": "POLISH_A_STONE48", "recipeCount": 26 },
+    { "sourceRecordId": 15265, "mapId": 153355264, "elementId": 489345, "cellId": 274, "gfxId": 49494, "interactiveTypeId": 27, "skillId": 32, "typeToken": "MOULD27", "skillToken": "MELT32", "recipeCount": 16 },
+    { "sourceRecordId": 15253, "mapId": 153355266, "elementId": 489533, "cellId": 288, "gfxId": 49496, "interactiveTypeId": 13, "skillId": 15, "typeToken": "BENCH13", "skillToken": "CARVE15", "recipeCount": 289 },
+    { "sourceRecordId": 15251, "mapId": 153355266, "elementId": 489534, "cellId": 342, "gfxId": 49514, "interactiveTypeId": 2, "skillId": 101, "typeToken": "SAW2", "skillToken": "SAW101", "recipeCount": 32 },
+    { "sourceRecordId": 15252, "mapId": 153355266, "elementId": 489536, "cellId": 353, "gfxId": 49496, "interactiveTypeId": 13, "skillId": 15, "typeToken": "BENCH13", "skillToken": "CARVE15", "recipeCount": 289 },
+    { "sourceRecordId": 15232, "mapId": 153355270, "elementId": 489066, "cellId": 344, "gfxId": 49491, "interactiveTypeId": 90, "skillId": 23, "typeToken": "ALEMBIC90", "skillToken": "PREPARE_A_POTION23", "recipeCount": 264 },
+    { "sourceRecordId": 15234, "mapId": 153355270, "elementId": 489068, "cellId": 230, "gfxId": 49516, "interactiveTypeId": 90, "skillId": 23, "typeToken": "ALEMBIC90", "skillToken": "PREPARE_A_POTION23", "recipeCount": 264 },
+    { "sourceRecordId": 15233, "mapId": 153355270, "elementId": 489069, "cellId": 246, "gfxId": 49516, "interactiveTypeId": 90, "skillId": 23, "typeToken": "ALEMBIC90", "skillToken": "PREPARE_A_POTION23", "recipeCount": 264 },
+    { "sourceRecordId": 14797, "mapId": 153355272, "elementId": 489549, "cellId": 372, "gfxId": 49500, "interactiveTypeId": 12, "skillId": 12, "typeToken": "WORKSHOP12", "skillToken": "CREATE_JEWELLERY12", "recipeCount": 735 },
+    { "sourceRecordId": 14796, "mapId": 153355272, "elementId": 489550, "cellId": 357, "gfxId": 49498, "interactiveTypeId": 12, "skillId": 12, "typeToken": "WORKSHOP12", "skillToken": "CREATE_JEWELLERY12", "recipeCount": 735 },
+    { "sourceRecordId": 14798, "mapId": 153355272, "elementId": 489551, "cellId": 299, "gfxId": 49501, "interactiveTypeId": 12, "skillId": 12, "typeToken": "WORKSHOP12", "skillToken": "CREATE_JEWELLERY12", "recipeCount": 735 }
+  ]
+}

@@ -11,6 +11,7 @@ namespace Jondo.Unity.Launcher.Managers
         Lottery,
         Zaapi,
         Bin,
+        Workshop,
         HouseDoor,
         HouseExit,
         WorldTransition,
@@ -130,6 +131,10 @@ namespace Jondo.Unity.Launcher.Managers
                 foreach (var element in Bins.On(mapId))
                     Register(mapId, element, Bins.Type, InteractiveActionKind.Bin, Bins.UseSkill);
             }
+
+            foreach (var station in IncarnamServerContent.Workshops)
+                Register(station.MapId, station.Element, station.InteractiveTypeId,
+                    InteractiveActionKind.Workshop, station.SkillId);
 
             foreach (long mapId in Interactives.MapIds)
             {

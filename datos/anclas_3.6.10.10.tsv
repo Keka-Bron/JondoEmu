@@ -39,7 +39,7 @@ kva	S2C	CharacterSelectedSuccessMessage	Ya estas jugando con este personaje; sin
 kpa	C2S	CharactersListRequestMessage	Peticion de la lista de personajes; se despacha, pero solo se ve una vez en 242 capturas.	CharacterSelectionHandler.HandleCharacterListRequest	-
 lqc	C2S	GameContextCreateRequestMessage	Bloque 1 digerido: el servidor real espera esto antes de enviar el bloque 2.	GameNodeProxy	-
 jru	S2C	CurrentMapMessage	Carga este mapa; enviarlo dos veces hace que el cliente recargue el mundo en bucle.	BuildLoadMap, WorldEntry.SendMapAsync	f2: map id
-hjk	S2C		Viaja con jru en cada cambio de mapa.	BuildMapDiscovered	f1: packed [map id]
+hjk	S2C		Reemplaza la lista completa de mapas con zaap conocidos por el personaje; viaja con jru en cada cambio de mapa.	BuildKnownZaaps, WorldEntry.SendMapAsync	f1: packed [known zaap map ids]
 jrh	C2S	MapInformationsRequestMessage	Quien esta en este mapa; sin respuesta el mapa se dibuja vacio, sin avatar, sin PNJs y sin monstruos.	GameNodeProxy	-
 jss	S2C	MapComplementaryInformationsDataMessage	Los actores del mapa; f6 (subarea) es obligatorio o el cliente revienta en MapInfoUI.SetInfoFromSubarea. El tipo de actor lo da el campo presente dentro de f2.f1: f5 jugador, f7 PNJ, f4 grupo de monstruos, con ids contextuales negativos para PNJs y grupos.	BuildMapActors	f2: map id, f6: subarea id, f5 (rep) { f1 { f1: cell, f2: facing }, f2 {...what it is...}, f3: contextual id }
 lva	S2C	MapLoadedMessage	Eso es todo el listado de actores; vacio, justo detras de jss. Sin el, el cliente nunca da el mapa por cargado, espera unos dos segundos y reintenta con knm, kno y kny.	BuildActorsComplete	empty

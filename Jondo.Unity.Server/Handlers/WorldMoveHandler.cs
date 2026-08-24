@@ -175,6 +175,17 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
+            // A process restart loses the session-local entry binding.  Recover only an exact,
+            // version-pinned exit in that situation; the client has already reached the exit
+            // and explicitly sent jqi, so this cannot turn an arbitrary interior cell into a
+            // teleport.
+            if (Managers.WorldInteractiveReturns.TryResolveDeclaredExitAtCurrentCell(out var declaredReturn))
+            {
+                await MoveToMapAsync(stream, declaredReturn.ReturnMapId, declaredReturn.ReturnCellId,
+                    $"salida interior declarada de {declaredReturn.EntryElementId}");
+                return;
+            }
+
             // House and shop interiors often use a real map-exit cell, not an interactive
             // element.  In that wire shape the client sends jqi and no following jqk.  Do not
             // answer jsq and strand it: resolve only an interior return bound to this session.
@@ -187,40 +198,21 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            // Non-ownable social interiors (banks, shops, workshops and quest buildings) use
-            // the same jqi-only exit. Their client map position retains the unique outdoor map
-            // at the same coordinate/sub-area. Dungeon rooms are deliberately excluded: their
-            // exits belong to dungeon progression, and ambiguous counterparts are never guessed.
-            if (TryResolveSocialInteriorExit(out long socialMap, out int socialCell))
+            // Criterion-free world-graph entrances can carry an exact reciprocal source cell when
+            // the target-to-source edge is unique. Version-pinned action-cell overrides above take
+            // precedence on maps where the drawing anchor and the actor endpoint differ.
+            if (Managers.WorldInteractiveTransitions.TryResolveReciprocalReturn(
+                    SessionContext.State.MapId, SessionContext.State.CellId,
+                    out long returnMap, out int returnCell, out int entryElement))
             {
-                await MoveToMapAsync(stream, socialMap, socialCell, "salida de edificio");
+                await MoveToMapAsync(stream, returnMap, returnCell,
+                    $"salida recíproca de {entryElement}");
                 return;
             }
 
             long request = ConnectionProtocol.RequestId(payload);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.MapExitAllowedMessage, null, request));
-        }
-
-        private static bool TryResolveSocialInteriorExit(out long targetMapId, out int targetCellId)
-        {
-            targetMapId = 0;
-            targetCellId = 0;
-            long hereId = SessionContext.State.MapId;
-            var here = MapManager.GetMapInfo(hereId);
-            if (here == null || here.Outdoor || Managers.DungeonManager.IsRoom(hereId)) return false;
-
-            var matches = MapManager.Maps.Values
-                .Where(map => map.Outdoor && map.SubAreaId == here.SubAreaId &&
-                              map.PosX == here.PosX && map.PosY == here.PosY)
-                .OrderBy(map => map.MapId)
-                .ToList();
-            if (matches.Count != 1) return false;
-
-            targetMapId = matches[0].MapId;
-            targetCellId = MapManager.GetNearestWalkableCell(targetMapId,
-                SessionContext.State.CellId);
-            return targetCellId >= 0;
         }
 
         // ─── jqk: take me to this map ───────────────────────────────────────────
@@ -286,6 +278,8 @@ namespace Jondo.Unity.Launcher.Handlers
             if (orientation.HasValue && orientation.Value >= 0 && orientation.Value <= 7)
                 SessionContext.State.Orientation = orientation.Value;
             DatabaseManager.SaveCurrentCharacter();
+            Managers.ZaapDiscovery.DiscoverOnArrival(
+                SessionContext.State.CharacterId, targetMapId);
 
             // Exactly the five the capture sends, in the same order. jsd first: the character is
             // leaving the map it was on, and the client has to be told before it is told to load
@@ -299,7 +293,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(targetMapId));
+                ConnectionProtocol.BuildKnownZaaps(SessionContext.State.CharacterId));
 
             Console.WriteLine($"[Move] {reason}: {oldMapId} -> {targetMapId}, llegada " +
                               $"{arrivalCell}, orientación {SessionContext.State.Orientation}. " +
@@ -350,6 +344,8 @@ namespace Jondo.Unity.Launcher.Handlers
             SessionContext.State.MapId = targetMapId;
             SessionContext.State.CellId = arrival;
             DatabaseManager.SaveCurrentCharacter();
+            Managers.ZaapDiscovery.DiscoverOnArrival(
+                SessionContext.State.CharacterId, targetMapId);
 
             // Same map-change sequence as a normal border crossing. After jru the client answers
             // with jrh, and GameNodeProxy sends the actors and interactive elements of the map.
@@ -361,7 +357,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(targetMapId));
+                ConnectionProtocol.BuildKnownZaaps(SessionContext.State.CharacterId));
 
             Console.WriteLine($"[Move] Teleport: map {oldMapId} -> {targetMapId}, " +
                               $"arrival cell {arrival}. Waiting for jrh.");

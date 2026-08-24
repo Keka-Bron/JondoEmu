@@ -92,7 +92,7 @@ namespace Jondo.Unity.Launcher.Managers
                 _duraciones = new Dictionary<int, int>();
                 try
                 {
-                    string ruta = System.IO.Path.Combine("datos", "invocaciones_duracion.json");
+                    string ruta = Paths.ServerData("invocaciones_duracion.json");
                     if (System.IO.File.Exists(ruta))
                     {
                         using var doc = JsonDocument.Parse(System.IO.File.ReadAllText(ruta));

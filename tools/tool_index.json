@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "tools": [
+    {"script":"audit_client_data_runtime.py","name":"Audit client data runtime","description":"Checks that the active client-data snapshot is complete and can be loaded by the server.","usage":"Run without arguments after updating client_data.","arguments":[]},
+    {"script":"auditoria_datos.py","name":"Audit game data","description":"Validates extracted game data and reports missing or inconsistent records.","usage":"Run without arguments; review the generated report.","arguments":[]},
+    {"script":"build_mechanic_map.py","name":"Build mechanics map","description":"Builds the editable mechanics-map dataset from imported evidence.","usage":"Run after updating mechanics sources.","arguments":[]},
+    {"script":"build_protocol_data_snapshot.py","name":"Build protocol snapshot","description":"Creates a versioned protocol-data snapshot from the client extraction.","usage":"Run after extracting a new Dofus version.","arguments":[]},
+    {"script":"build_server_client_data_snapshot.py","name":"Build server client-data snapshot","description":"Builds the server-ready client-data manifest and validation snapshot.","usage":"Run after game-data import or extraction.","arguments":[]},
+    {"script":"export_monster_mechanic_baseline.py","name":"Export monster mechanics baseline","description":"Exports the editable baseline for monster mechanics.","usage":"Run to refresh mechanics source files; no arguments required.","arguments":[]},
+    {"script":"export_packet_evidence.py","name":"Export packet evidence","description":"Exports durable unknown-packet telemetry for protocol analysis.","usage":"Use --summary for a compact report or --id N for one capture.","arguments":["--summary","--id <number>"]},
+    {"script":"extract_client_snapshot.py","name":"Extract client snapshot","description":"Extracts client game data into the versioned client_data directory.","usage":"Run after the Dofus client is updated.","arguments":[]},
+    {"script":"extraer_casas.py","name":"Extract houses","description":"Extracts house templates and placement evidence from the client data.","usage":"Run after a new client snapshot.","arguments":[]},
+    {"script":"extraer_oficios.py","name":"Extract jobs","description":"Extracts jobs, skills and profession-related game data.","usage":"Run after a new client snapshot.","arguments":[]},
+    {"script":"extraer_transiciones_mundo.py","name":"Extract world transitions","description":"Extracts interactive world transitions such as doors, stairs and ladders.","usage":"Run after map data extraction.","arguments":[]},
+    {"script":"fetch_dofusdude_dofus3.py","name":"Import DofusDude catalogues","description":"Downloads and version-validates documented Dofus 3 catalogue data.","usage":"Run to refresh external catalogue imports.","arguments":[]},
+    {"script":"fetch_official_dofus_evidence.py","name":"Fetch official Dofus evidence","description":"Collects official Dofus website and patch evidence for parity research.","usage":"Run when refreshing documented source evidence.","arguments":[]},
+    {"script":"generate_parity_ledger.py","name":"Generate parity ledger","description":"Builds the emulator/client parity ledger and identifies coverage gaps.","usage":"Run without arguments after updating implementation or data.","arguments":[]},
+    {"script":"investigar_huecos.py","name":"Investigate data gaps","description":"Finds missing game-data relationships that require extraction or evidence.","usage":"Run without arguments.","arguments":[]},
+    {"script":"reparar_datos.py","name":"Repair game data","description":"Applies safe repair steps for known extracted-data inconsistencies.","usage":"Review tool output before restarting the server.","arguments":[]},
+    {"script":"review_unknown_packets.py","name":"Review unknown packets","description":"Reads and triages the durable unknown-packet queue.","usage":"Use --new for actionable captures, --investigating for backlog, --summary for counts, or --id N for a sample.","arguments":["--new","--investigating","--summary","--id <number>"]},
+    {"script":"sonda_bundles.py","name":"Inspect client bundles","description":"Inspects Unity bundles for client game-data content.","usage":"Run without arguments unless the tool output requests a focused follow-up.","arguments":[]},
+    {"script":"sonda_mapas.py","name":"Inspect maps","description":"Inspects extracted map data and interactive elements.","usage":"Run without arguments.","arguments":[]}
+  ]
+}

@@ -13,8 +13,8 @@ namespace Jondo.Unity.Launcher.Managers
     ///   111 -> characteristic  1, bonus     "+N PA"
     ///   755 -> characteristic 79, MALUS     "-N placaje"
     ///
-    /// BonusType is 1 or -1 and it is not decoration: an item that takes lock away carries a
-    /// positive number under an effect that subtracts, and adding it would read as a bonus.
+    /// The stable sign is EffectData.characteristicOperator. BonusType is retained only as a
+    /// fallback for older rows whose operator is empty.
     /// </summary>
     public static class EffectTable
     {
@@ -39,7 +39,7 @@ namespace Jondo.Unity.Launcher.Managers
                 connection.Open();
 
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Characteristic, BonusType FROM Effects;";
+                command.CommandText = "SELECT Id, Characteristic, BonusType, CharacteristicOperator FROM Effects;";
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -47,7 +47,9 @@ namespace Jondo.Unity.Launcher.Managers
                     if (characteristic < 0) continue;
 
                     int bonus = reader.IsDBNull(2) ? 1 : reader.GetInt32(2);
-                    _byId[reader.GetInt32(0)] = new Effect(characteristic, bonus < 0 ? -1 : 1);
+                    string op = reader.IsDBNull(3) ? "" : reader.GetString(3);
+                    _byId[reader.GetInt32(0)] = new Effect(characteristic,
+                        op == "-" || (op.Length == 0 && bonus < 0) ? -1 : 1);
                 }
 
                 Console.WriteLine($"[EffectTable] {_byId.Count} effects that move a characteristic.");

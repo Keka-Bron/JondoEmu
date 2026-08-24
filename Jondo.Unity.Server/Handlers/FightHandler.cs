@@ -32,7 +32,8 @@ namespace Jondo.Unity.Launcher.Handlers
 
         public static void RegisterHandlers()
         {
-            Program.LogDebug("[FightHandler] Combat handlers registered for jxx, jyk, jyz, jza, jwb, hoy.");
+            Program.LogDebug("[FightHandler] Combat handlers registered for hqa, jzy, kaq, jwz, " +
+                             "jxy, jrw, jwh, jti and hoy.");
         }
 
         /// <summary>
@@ -275,9 +276,11 @@ namespace Jondo.Unity.Launcher.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp,
                 Network.FightProtocol.BuildFightMapComing()));
 
+            ZaapDiscovery.DiscoverOnArrival(SessionContext.State.CharacterId, fight.MapId);
             await WriteFrameAsync(stream, ConnectionProtocol.BuildLoadMap(fight.MapId));
             await WriteFrameAsync(stream, ConnectionProtocol.BuildMapClock());
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildMapDiscovered(fight.MapId));
+            await WriteFrameAsync(stream, ConnectionProtocol.BuildKnownZaaps(
+                SessionContext.State.CharacterId));
 
             Program.LogDebug($"[Combate] Combate #{fight.FightId} en el mapa {fight.MapId}. " +
                              "Esperando a que el cliente pida los actores.");
@@ -2285,6 +2288,9 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 Program.LogDebug($"[Combate] Buff {c.Buff.Numero} sobre {c.Sobre.Id}: efecto " +
                                  $"{c.Efecto.EffectId}" +
+                                 (c.Efecto.EffectId == Jondo.Unity.World.Fights.Buffs.EscudoPorNivel
+                                     ? $", escudo {c.Buff.Cuanto}"
+                                     : "") +
                                  (c.Caracteristica != 0 ? $", característica {c.Caracteristica} {c.Cuanto:+#;-#;0}" : "") +
                                  (c.Buff.Estado != 0 ? $", estado {c.Buff.Estado}" : "") +
                                  (c.Buff.HechizoAfectado != 0
@@ -2576,10 +2582,16 @@ namespace Jondo.Unity.Launcher.Handlers
                                  $"{antes} pasa a {damage}.");
             }
 
-            // Lo que se ANUNCIA nunca puede pasar de la vida que le queda. Si a un pío de setenta
-            // le entran doscientos, el golpe que ve el jugador es de setenta: por encima de eso no
-            // hay vida que quitar, y el número que sobra sólo confunde.
-            int aplicado = Math.Min(damage, target.CurrentHP);
+            // Los escudos se consumen ANTES que la vida. El jvp del cliente tiene un campo
+            // opcional propio para esa pérdida y su receptor crea la variación de escudo antes
+            // que la de vida. Los embrujos se recorren por orden de colocación, igual que se
+            // anuncian en el panel.
+            int escudoPerdido = target.Buffs.AbsorberEscudo(damage, fight.RoundNumber);
+            int danoALaVida = Math.Max(0, damage - escudoPerdido);
+
+            // Lo que se ANUNCIA de VIDA nunca puede pasar de la que le queda. Si a un pío de
+            // setenta le entran doscientos después del escudo, el jugador ve setenta de vida.
+            int aplicado = Math.Min(danoALaVida, target.CurrentHP);
             target.TakeDamage(aplicado);
 
             // Y la EROSIÓN: además de la vida de ahora, cada golpe se lleva un pellizco del tope.
@@ -2588,15 +2600,16 @@ namespace Jondo.Unity.Launcher.Handlers
             // catálogo del cliente y viaja en la ficha de combate; en la captura del Ocra vale 10.
             // Con mil de vida y un golpe de cien, el bicho se queda en 900/990.
             //
-            // Se erosiona sobre el daño CALCULADO, no sobre el recortado: pegarle doscientos a uno
-            // que tiene setenta de vida erosiona por doscientos.
+            // Se erosiona sobre el daño que HA ATRAVESADO EL ESCUDO, no sobre el recortado a la
+            // vida restante: pegarle doscientos a uno que tiene setenta de vida erosiona por
+            // doscientos, pero los puntos absorbidos no erosionan.
             int porcientoDeErosion = target.Otra(Fighter.CaracteristicaDeErosion)
                                    + target.Buffs.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
-            int erosionado = target.Erosionar(damage, porcientoDeErosion);
+            int erosionado = target.Erosionar(danoALaVida, porcientoDeErosion);
             if (erosionado > 0)
             {
                 Program.LogDebug($"[Combate] {target.Id} se erosiona {erosionado} de vida máxima " +
-                                 $"({porcientoDeErosion}% de {damage}); se queda en " +
+                                 $"({porcientoDeErosion}% de {danoALaVida}); se queda en " +
                                  $"{target.CurrentHP}/{target.MaxHP}, {target.VidaErosionada} erosionados.");
             }
 
@@ -2608,15 +2621,17 @@ namespace Jondo.Unity.Launcher.Handlers
             // anunciaba como robo de agua fuera del elemento que fuera.
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId,
-                                                  target.Id, aplicado, elemento)));
+                                                  target.Id, aplicado, elemento,
+                                                  escudoPerdido, erosionado)));
 
             if (target.LeHanPegado)
             {
                 await ActitudesAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
             }
 
-            Program.LogDebug($"[Combate] {aplicado} de daño a {target.Id} (calculado {damage}); " +
-                             $"le quedan {target.CurrentHP}.");
+            Program.LogDebug($"[Combate] {aplicado} de daño a {target.Id} (calculado {damage}" +
+                             (escudoPerdido > 0 ? $", {escudoPerdido} absorbido por escudo" : "") +
+                             $"); le quedan {target.CurrentHP}.");
 
             // La muerte, LA ÚLTIMA. Y sin mandar antes una ficha con la vida a cero: el servidor
             // real no la manda, la vida la descuenta el cliente del golpe de arriba, y mandarla
@@ -2999,11 +3014,14 @@ namespace Jondo.Unity.Launcher.Handlers
                 ? Network.SessionContext.State.RoleplayMapId
                 : fight.RoleplayMapId;
             LeaveFight();
+            ZaapDiscovery.DiscoverOnArrival(SessionContext.State.CharacterId, back);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kml));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp));
             await WriteFrameAsync(stream, ConnectionProtocol.BuildLoadMap(back));
             await WriteFrameAsync(stream, ConnectionProtocol.BuildMapClock());
+            await WriteFrameAsync(stream, ConnectionProtocol.BuildKnownZaaps(
+                SessionContext.State.CharacterId));
 
             Program.LogDebug($"[Combate] Se acabó el combate #{fight.FightId}: " +
                              $"{(alliesAlive ? "victoria" : "derrota")}. De vuelta al mapa {back}.");

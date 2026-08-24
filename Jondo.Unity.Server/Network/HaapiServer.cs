@@ -309,7 +309,9 @@ namespace Jondo.Unity.Launcher.Network
             var characters = DatabaseManager.GetCharactersByAccountId(accountId);
 
             var servers = new List<object>();
-            foreach (var server in DatabaseManager.GetServers())
+            // Match the binary connection list exactly: clients must not see a server in HAAPI
+            // that the connection endpoint will later reject for being non-joinable.
+            foreach (var server in DatabaseManager.GetAdvertisedServers())
             {
                 int charactersOnServer = 0;
                 foreach (var c in characters)

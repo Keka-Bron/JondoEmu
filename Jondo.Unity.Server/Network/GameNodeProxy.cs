@@ -322,6 +322,11 @@ namespace Jondo.Unity.Launcher.Network
                     await CharacterCreationHandler.ConfirmCanCreateAsync(stream, sessionAccountId,
                                                                           sessionServerId);
                 }
+                else if (payloadStr.Contains(Op.Uri(Op.CharacterDeletionRequestMessage)))
+                {
+                    await CharacterDeletionHandler.HandleAsync(stream, payload, sessionAccountId,
+                                                               sessionServerId);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.CharacterNameSuggestionRequestMessage)))
                 {
                     // El botón del dado: un nombre al azar.
@@ -459,12 +464,12 @@ namespace Jondo.Unity.Launcher.Network
                          || payloadStr.Contains("type.ankama.com/kno")
                          || payloadStr.Contains("type.ankama.com/kny"))
                 {
-                    // knm, kno y kny son lo que reenvía el cliente a los dos segundos cuando no le
-                    // llegó el lva y no da el mapa por cargado (docs/opcodes.md). Se le da lo mismo
-                    // que se le da al jrh —los actores y detrás la marca de que ya no hay más—,
-                    // que es exactamente lo que le faltaba. En combate no: el mapa ya está y un jss
-                    // de superficie lo sacaría de la pelea.
-                    if (!GameState.IsInFight) await SendActorsAndCompleteAsync(stream, "reintento knm/kno/kny");
+                    // These are independent post-character-load requests, emitted before lzh,
+                    // kmv and the real jrh map-ready request. They are not lva retries. Sending
+                    // jss here invokes MapInfoUI before its labels are ready; the live client
+                    // throws and never updates its coordinates/minimap. Their actual feature
+                    // responses remain unidentified, so deliberately do not invent one.
+                    Console.WriteLine("[Game Node] knm/kno/kny recibido antes del mapa; sin respuesta inventada.");
                 }
                 // ─── 3.6.10.10 world messages. The joi/jos/jpp branches further down belong to
                 // an earlier version of the protocol and this client never sends them.
@@ -642,8 +647,8 @@ namespace Jondo.Unity.Launcher.Network
                 }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
-                    // El botón de cerrar del diálogo. Va vacío y espera respuesta: khd si lo que
-                    // está abierto es el cofre o la tienda de un NPC, kld si es la lista del zaap.
+                    // The empty close button is shared by chests, NPC shops, NPC conversations
+                    // and zaaps.  Each expects a distinct acknowledgement.
                     //
                     // El cliente manda el kla DOS veces seguidas al cerrar una tienda, con menos de
                     // un milisegundo entre medias, y el servidor real contesta un solo khd. Como el
@@ -651,6 +656,7 @@ namespace Jondo.Unity.Launcher.Network
                     // kld que el cliente ignora, igual que hoy.
                     if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
                     else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
+                    else if (NpcHandler.IsDialogOpen) await NpcHandler.CloseDialogAsync(stream);
                     else await ZaapTravelHandler.CloseAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.TeleportRequestMessage)))
@@ -740,7 +746,6 @@ namespace Jondo.Unity.Launcher.Network
                         }
                     }
                     catch { }
-                    if (subAreaId == 444) subAreaId = 20663;
 
                     foreach (var lor in TransitionPacketsBuilder.BuildLorList())
                     {
@@ -783,10 +788,6 @@ namespace Jondo.Unity.Launcher.Network
                     }
                     catch { }
 
-                    if (subAreaId == 444)
-                    {
-                        subAreaId = 20663;
-                    }
 
                     foreach (var kqm in TransitionPayloads.kqmList)
                     {
@@ -810,7 +811,6 @@ namespace Jondo.Unity.Launcher.Network
                             }
                         }
                         catch { }
-                        if (subAreaId == 444) subAreaId = 20663;
 
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIcgMessage());
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIcgMessage());
@@ -986,12 +986,10 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// <summary>
         /// Los actores del mapa y detrás la marca de que ya no hay más.
         ///
-        /// Es lo que pide el jrh al cargar cualquier mapa y también lo que piden los knm/kno/kny
-        /// cuando el lva se les perdió: la misma respuesta para los dos, de modo que el reintento
-        /// del cliente termina en el mismo sitio que la primera vez.
+        /// Es la respuesta al jrh que el cliente emite cuando el mapa y su interfaz ya están listos.
+        /// Los knm/kno/kny anteriores pertenecen a otros servicios y no pasan por aquí.
         /// </summary>
         private static async Task SendActorsAndCompleteAsync(NetworkStream stream, string razon)
         {
@@ -1008,10 +1006,8 @@ namespace Jondo.Unity.Launcher.Network
                                                   sessionAccountId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, actors);
 
-            // And straight behind it, the mark that says there are no more actors. In
-            // every capture that loads a map lva comes immediately after jss, and
-            // without it the client never counts the map as loaded: two seconds later
-            // it asks again with knm, kno and kny and goes round once more.
+            // And straight behind it, the mark that says there are no more actors. In every
+            // measured map-ready exchange lva comes immediately after the jss requested by jrh.
             // Dentro del merkasako van además los muebles y los permisos, que en la
             // captura salen entre el jss y el lva.
             if (Managers.Merkasako.IsHavenBag(GameState.MapId))

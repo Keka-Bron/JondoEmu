@@ -131,10 +131,6 @@ namespace Jondo.Unity.Launcher
                         {
                             long mapId = reader.GetInt64(0);
                             int subAreaId = reader.GetInt32(3);
-                            if (subAreaId == 444)
-                            {
-                                subAreaId = 20663;
-                            }
 
                             long flags = 0;
                             if (!reader.IsDBNull(6))

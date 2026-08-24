@@ -119,6 +119,10 @@ namespace Jondo.Unity.Launcher.Network
             // client's quest update owner and `mft` by its achievement-clear owner in the pinned
             // 3.6.10.10 client; lry/isf/lol/izu cover the named quest-list/update messages.
             Op.Lry, Op.Isf, Op.Lol, Op.Izu, "idr", "iel", "mft",
+
+            // hjk is the complete known-zaap list of the captured character (45 map ids), not
+            // reusable world structure. The character-owned replacement is sent with block 3.
+            Op.Hjk,
         };
 
         /// <summary>Character id the capture belongs to. Learned from the blocks, never written down.</summary>
@@ -225,10 +229,10 @@ namespace Jondo.Unity.Launcher.Network
         {
             try
             {
-                string ruta = System.IO.Path.Combine("datos", "caracteristicas_kub.json");
+                string ruta = Paths.ServerData("caracteristicas_kub.json");
                 if (!System.IO.File.Exists(ruta))
                 {
-                    Console.WriteLine("[World] No está datos/caracteristicas_kub.json: la ficha de " +
+                    Console.WriteLine("[World] No está client_data/server/caracteristicas_kub.json: la ficha de " +
                                       "características saldrá corta.");
                     return;
                 }
@@ -243,7 +247,7 @@ namespace Jondo.Unity.Launcher.Network
                 }
 
                 Console.WriteLine($"[World] {_characteristicIds.Count} características leídas de " +
-                                  $"datos/caracteristicas_kub.json.");
+                                  $"client_data/server/caracteristicas_kub.json.");
             }
             catch (Exception ex)
             {
@@ -362,7 +366,7 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>Is this one of the messages that carry other players' data?</summary>
-        private static bool ShouldSkip(byte[] message)
+        internal static bool ShouldSkip(byte[] message)
         {
             foreach (string opcode in NotReplayed)
             {
@@ -684,9 +688,11 @@ namespace Jondo.Unity.Launcher.Network
             // keeps: sending it only in the first block left the sheet empty.
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.CharacterStatsListMessage, ConnectionProtocol.BuildCharacteristics()));
 
-            // The client treats this as the authoritative discovery state for the travel window.
-            // It is separate from map discovery and is not present in the captured map block.
-            var discoveredZaaps = new List<long>(Managers.Interactives.DiscoveredZaapMaps());
+            // Arrival, including reconnecting while already standing on a waypoint map, is the
+            // observed discovery trigger. It happens before hjk because the client replaces its
+            // complete backing list when it handles that message.
+            Managers.ZaapDiscovery.DiscoverOnArrival(character.Id, mapId);
+            var discoveredZaaps = Managers.ZaapDiscovery.KnownMaps(character.Id);
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.Hjk,
                 ConnectionProtocol.BuildDiscoveredZaaps(discoveredZaaps)));
 

@@ -295,7 +295,10 @@ namespace Jondo.Unity.Launcher.Network
             var account = DatabaseManager.GetAccountById(accountId);
             string nickname = account?.Nickname ?? "Jondo";
 
-            var servers = DatabaseManager.GetServers();
+            // The connection list must only contain worlds that can issue a ticket. The complete
+            // database catalogue remains available to the admin tool for configuring additional
+            // realms (Imagiro, Pioneer, Classic, tournament, &c.).
+            var servers = DatabaseManager.GetAdvertisedServers();
             var characters = DatabaseManager.GetCharactersByAccountId(accountId);
 
             byte[] message = ConnectionProtocol.BuildAuthenticationAccepted(

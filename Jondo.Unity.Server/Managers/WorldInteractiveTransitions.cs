@@ -318,6 +318,50 @@ namespace Jondo.Unity.Launcher.Managers
         public static bool HasGraphEvidence(long mapId, int elementId)
             => _allEvidenceElements.Contains((mapId, elementId));
 
+        /// <summary>
+        /// Resolves an interior doorway from the exact reciprocal cell carried by the pinned
+        /// world graph.  A derived arrival cell exists only when the extractor found one
+        /// unambiguous target-to-source edge.  Requiring that exact cell prevents an ordinary
+        /// movement request elsewhere in a building from becoming a return teleport.
+        /// </summary>
+        public static bool TryResolveReciprocalReturn(long interiorMapId, int exitCellId,
+                                                       out long returnMapId,
+                                                       out int returnCellId,
+                                                       out int entryElementId)
+        {
+            returnMapId = 0;
+            returnCellId = 0;
+            entryElementId = 0;
+            if (interiorMapId <= 0 || !MapGeometry.IsValid(exitCellId)) return false;
+
+            Route? matchRoute = null;
+            Source? matchSource = null;
+            foreach (Route route in _all)
+            {
+                if (route.TargetMapId != interiorMapId ||
+                    MapManager.GetMapInfo(route.MapId) == null)
+                    continue;
+
+                foreach (Source source in route.Sources)
+                {
+                    if (source.DerivedArrivalCellId != exitCellId) continue;
+
+                    // One interior cell naming more than one entry route is ambiguous.  Do not
+                    // pick a destination merely because it sorts first in the catalogue.
+                    if (matchRoute != null) return false;
+                    matchRoute = route;
+                    matchSource = source;
+                }
+            }
+
+            if (matchRoute == null || matchSource == null) return false;
+            returnMapId = matchRoute.MapId;
+            returnCellId = MapManager.GetNearestWalkableCell(returnMapId, matchSource.CellId);
+            if (!MapGeometry.IsValid(returnCellId)) return false;
+            entryElementId = matchRoute.Element.Id;
+            return true;
+        }
+
         private static bool TryReadSafeRow(JsonElement row, out long mapId, out int elementId,
                                             out int elementCellId, out int gfxId, out int skillId,
                                             out long targetMapId, out int sourceCellId,

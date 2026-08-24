@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Jondo.Unity.Launcher.Managers
@@ -54,10 +55,7 @@ namespace Jondo.Unity.Launcher.Managers
             string manifestPath = Path.Combine(Paths.MechanicsDir, "manifest.json");
             if (!File.Exists(manifestPath))
             {
-                _all = loaded;
-                _monsterAi = monsterAi;
-                Console.WriteLine($"[Mechanics] No external mechanic manifest at {manifestPath}; no guide mechanics loaded.");
-                return;
+                throw new FileNotFoundException("The active client snapshot has no mechanics manifest.", manifestPath);
             }
 
             try
@@ -72,12 +70,24 @@ namespace Jondo.Unity.Launcher.Managers
                 foreach (var entry in entries.EnumerateArray())
                 {
                     string relative = RequiredText(entry, "file");
+                    if (!entry.TryGetProperty("bytes", out JsonElement bytes) || !bytes.TryGetInt64(out long expectedBytes) || expectedBytes < 0)
+                        throw new InvalidOperationException($"{relative}: manifest entry has no valid byte count.");
+                    string expectedHash = RequiredText(entry, "sha256");
                     if (Path.IsPathRooted(relative) || relative.Contains("..", StringComparison.Ordinal))
                         throw new InvalidOperationException($"unsafe mechanic path: {relative}");
                     string file = Path.GetFullPath(Path.Combine(Paths.MechanicsDir, relative));
                     string root = Path.GetFullPath(Paths.MechanicsDir) + Path.DirectorySeparatorChar;
                     if (!file.StartsWith(root, StringComparison.OrdinalIgnoreCase) || !File.Exists(file))
                         throw new InvalidOperationException($"missing mechanic file: {relative}");
+                    var info = new FileInfo(file);
+                    if (info.Length != expectedBytes)
+                        throw new InvalidOperationException($"{relative}: expected {expectedBytes} bytes, got {info.Length}.");
+                    using (var stream = File.OpenRead(file))
+                    {
+                        string actualHash = Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+                        if (!string.Equals(actualHash, expectedHash, StringComparison.OrdinalIgnoreCase))
+                            throw new InvalidOperationException($"{relative}: SHA-256 does not match the mechanics manifest.");
+                    }
 
                     using var document = JsonDocument.Parse(File.ReadAllText(file));
                     string id = RequiredText(document.RootElement, "id");
@@ -104,6 +114,7 @@ namespace Jondo.Unity.Launcher.Managers
                             throw new InvalidOperationException($"duplicate monster AI policy for monster {policy.MonsterId}");
                     }
                 }
+                ValidateRegionalCoverage(loaded);
                 _all = loaded;
                 _monsterAi = monsterAi;
                 int verified = 0;
@@ -115,7 +126,53 @@ namespace Jondo.Unity.Launcher.Managers
                 _all = new Dictionary<string, Definition>(StringComparer.Ordinal);
                 _monsterAi = new Dictionary<int, MonsterAiPolicy>();
                 Console.WriteLine($"[Mechanics] Rejected external mechanic map: {ex.Message}");
+                throw new InvalidDataException("The versioned mechanic catalogue is incomplete or corrupt.", ex);
             }
+        }
+
+        private static void ValidateRegionalCoverage(IReadOnlyDictionary<string, Definition> loaded)
+        {
+            var baselineIds = new HashSet<int>();
+            foreach (Definition definition in loaded.Values)
+            {
+                if (definition.Kind != "monster-baseline-catalog") continue;
+                if (!definition.Document.TryGetProperty("records", out JsonElement records) || records.ValueKind != JsonValueKind.Array)
+                    throw new InvalidOperationException($"{definition.Id}: monster baseline has no records.");
+                foreach (JsonElement record in records.EnumerateArray())
+                    if (record.TryGetProperty("clientMonsterId", out JsonElement id) && id.TryGetInt32(out int parsed) && parsed > 0)
+                        baselineIds.Add(parsed);
+            }
+            if (baselineIds.Count == 0) throw new InvalidOperationException("No versioned client monster baseline was loaded.");
+
+            bool incarnamFound = false;
+            foreach (Definition definition in loaded.Values)
+            {
+                if (definition.Kind != "region-content-coverage") continue;
+                if (!definition.Document.TryGetProperty("region", out JsonElement region) ||
+                    !region.TryGetProperty("clientAreaId", out JsonElement area) || !area.TryGetInt32(out int areaId) || areaId <= 0)
+                    throw new InvalidOperationException($"{definition.Id}: region coverage has no clientAreaId.");
+                if (areaId == 45) incarnamFound = true;
+                if (!region.TryGetProperty("mapIds", out JsonElement maps) || maps.ValueKind != JsonValueKind.Array || maps.GetArrayLength() == 0)
+                    throw new InvalidOperationException($"{definition.Id}: region coverage has no maps.");
+                if (!definition.Document.TryGetProperty("monsters", out JsonElement monsters) || monsters.ValueKind != JsonValueKind.Array)
+                    throw new InvalidOperationException($"{definition.Id}: region coverage has no monsters.");
+                foreach (JsonElement monster in monsters.EnumerateArray())
+                {
+                    if (!monster.TryGetProperty("clientMonsterId", out JsonElement id) || !id.TryGetInt32(out int monsterId) ||
+                        !baselineIds.Contains(monsterId))
+                        throw new InvalidOperationException($"{definition.Id}: region monster is missing from the client baseline.");
+                    _ = RequiredText(monster, "runtimeMode");
+                    _ = RequiredText(monster, "encounterRuleCoverage");
+                    if (!monster.TryGetProperty("spellIds", out JsonElement spells) || spells.ValueKind != JsonValueKind.Array)
+                        throw new InvalidOperationException($"{definition.Id}: region monster has no spellIds array.");
+                    if (!monster.TryGetProperty("effectIds", out JsonElement effects) || effects.ValueKind != JsonValueKind.Array)
+                        throw new InvalidOperationException($"{definition.Id}: region monster has no effectIds array.");
+                }
+                if (!definition.Document.TryGetProperty("dungeons", out JsonElement dungeons) || dungeons.ValueKind != JsonValueKind.Array)
+                    throw new InvalidOperationException($"{definition.Id}: region coverage has no dungeon array.");
+            }
+            if (!incarnamFound)
+                throw new InvalidOperationException("The active mechanics snapshot has no Incarnam (area 45) coverage contract.");
         }
 
         private static string RequiredText(JsonElement value, string name)

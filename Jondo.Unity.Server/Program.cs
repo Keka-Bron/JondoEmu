@@ -1,9 +1,11 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher.Network;
 using Jondo.Unity.Launcher.Handlers;
+using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Launcher
 {
@@ -28,6 +30,12 @@ namespace Jondo.Unity.Launcher
         {
             ConsoleLogBuffer.Initialize();
 
+            if (Array.Exists(args, value => string.Equals(value, "--audit-static-data", StringComparison.OrdinalIgnoreCase)))
+            {
+                RunStaticDataAudit();
+                return;
+            }
+
             if (!Contract.CogerElSitio("JondoEmuServidor"))
             {
                 Console.WriteLine("[!] Ya hay un servidor de Jondo corriendo en esta sesión. Este se cierra.");
@@ -39,6 +47,39 @@ namespace Jondo.Unity.Launcher
             finally { Contract.SoltarElSitio(); }
         }
 
+        /// <summary>
+        /// Exercises the real JSON-to-SQLite importer against a temporary copy of the player-free
+        /// bootstrap. It never opens bases/world.db and is therefore safe for release validation.
+        /// </summary>
+        private static void RunStaticDataAudit()
+        {
+            Paths.ValidateStaticContentOrThrow();
+            Managers.MechanicCatalog.Initialize();
+            Managers.EffectRuntimeSemantics.Initialize();
+            string temporary = Path.Combine(Path.GetTempPath(), "jondo-static-audit-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(temporary);
+            try
+            {
+                ZipFile.ExtractToDirectory(Paths.WorldZip, temporary);
+                string database = Path.Combine(temporary, "world.db");
+                using var connection = new SqliteConnection("Data Source=" + database.Replace('\\', '/'));
+                connection.Open();
+                Managers.StaticContentCache.Synchronize(connection);
+                foreach (string table in new[] { "ItemTemplates", "ItemEffects", "Effects", "Spells", "SpellLevels", "MonsterTemplates", "NpcTemplates", "MapTemplates", "MapScrolls" })
+                {
+                    using var count = connection.CreateCommand();
+                    count.CommandText = $"SELECT COUNT(*) FROM {table};";
+                    Console.WriteLine($"[StaticAudit] {table}: {count.ExecuteScalar()}");
+                }
+                Managers.StaticContentCache.Synchronize(connection);
+                Console.WriteLine("[StaticAudit] PASS: import completed in an isolated database.");
+            }
+            finally
+            {
+                try { Directory.Delete(temporary, recursive: true); } catch { }
+            }
+        }
+
         private static async Task ArrancarTodoYEsperar()
         {
             try { Console.Clear(); } catch { }
@@ -48,8 +89,11 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("======================================================================");
             Console.ResetColor();
 
-            // 0. Resolved data paths. Everything the emulator needs now lives inside its own
-            //    folder; the root is derived from the assembly location, not hardcoded.
+            // 0. Static gameplay is accepted only as one complete, version-pinned client_data
+            //    snapshot. Never continue with a mixture of that snapshot and legacy datos/.
+            Console.WriteLine("[+] Validating versioned static gameplay data...");
+            Paths.ValidateStaticContentOrThrow();
+            Managers.MechanicCatalog.Initialize();
             Paths.LogResolvedPaths();
 
             // 1. Initialize Database and Map Manager
@@ -70,14 +114,19 @@ namespace Jondo.Unity.Launcher
             ExperienceTable.Initialize();
             Managers.SpellTable.Initialize();
             Managers.BreedStatCost.Initialize();
-            Managers.MechanicCatalog.Initialize();
             Managers.EffectTable.Initialize();
+            Managers.EffectRuntimeSemantics.Initialize();
             Managers.ItemSets.Initialize();
+            Managers.ItemNames.Initialize();
             Managers.EffectFields.Initialize();
             Managers.JobManager.Initialize();
             Managers.SkillManager.Initialize();
             Managers.RecipeManager.Initialize();
             Managers.Interactives.Initialize();
+            // The exact client catalogues above must exist before reviewed server-owned
+            // relationships can be accepted. A mismatched map element, skill or recipe count
+            // aborts startup instead of creating a plausible-looking but false interaction.
+            Managers.IncarnamServerContent.Initialize();
             Managers.HavenBagStore.Initialize();
             Managers.Wardrobe.Initialize();
             Managers.Titles.Initialize();

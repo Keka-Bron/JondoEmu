@@ -805,12 +805,16 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>
         /// Un golpe (jwe con el f14 entre 89 y 100).
         ///
-        ///   f3: quién pega      f14: de qué elemento
-        ///   f40 { f2: a quién, f3: cuánto }
+        ///   f3: quién pega      f14: efecto de daño
+        ///   f40 { f1: escudo perdido (opcional), f2: a quién, f3: vida perdida,
+        ///         f4: elemento, f5: vida máxima perdida por erosión }
         ///
-        /// Medido: con f14 = 91 el f40 lleva { -1, 134 } y con f14 = 93, { -1, 121 }. El f40 tiene
-        /// además un f4 y un f5 que cambian de un golpe a otro y que no están descifrados; se dejan
-        /// fuera, porque lo que el cliente pinta —a quién y cuánto— sí está.
+        /// Medido: con f14 = 91 el f40 lleva { -1, 134 } y con f14 = 93, { -1, 121 }.
+        /// El extractor de .proto anterior confundía la propiedad <c>HasFvlp</c> del campo
+        /// opcional f1 con un campo de cable. La clase Cpp2IL, el receptor nativo
+        /// <c>fmc::bgmn</c> y el esquema regenerado lo resuelven:
+        /// f1 es el escudo perdido, f4 el elemento y f5 la pérdida permanente. El receptor crea
+        /// primero la variación de escudo y después la de vida/vida máxima.
         /// </summary>
         /// <param name="efecto">
         /// El NÚMERO DE EFECTO del golpe, que es lo que va en el f14: el 91 es robo de agua, el 96
@@ -821,10 +825,14 @@ namespace Jondo.Unity.Launcher.Network
         /// los de tierra un 1, los mismos números que la columna ElementId del catálogo.
         /// </param>
         public static byte[] BuildDamage(long author, int efecto, long victim, int amount,
-                                         int elemento = -1)
+                                         int elemento = -1, int shieldLoss = 0,
+                                         int permanentDamage = 0)
         {
-            var detalle = Pb.New().Var(2, victim).Var(3, amount);
+            var detalle = Pb.New();
+            if (shieldLoss > 0) detalle.Var(1, shieldLoss);
+            detalle.Var(2, victim).Var(3, amount);
             if (elemento >= 0) detalle.Var(4, elemento);
+            if (permanentDamage > 0) detalle.Var(5, permanentDamage);
             return Pb.New()
                 .Var(3, author)
                 .Var(14, efecto)

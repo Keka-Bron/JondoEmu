@@ -1,0 +1,282 @@
+{
+ "bonta": {
+  "gfx": 70521,
+  "destinos": [
+   {
+    "mapa": 220200961,
+    "subzona": 975,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601865,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601353,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601860,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601348,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212600837,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212599813,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212602885,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601350,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212599814,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212600326,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212599302,
+    "subzona": 974,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212602886,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212602375,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212600839,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212600327,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601345,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212731651,
+    "subzona": 976,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601346,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212600322,
+    "subzona": 975,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601859,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212601347,
+    "subzona": 973,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212600323,
+    "subzona": 975,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 217318404,
+    "subzona": 975,
+    "tipo": 10,
+    "coste": 20
+   }
+  ]
+ },
+ "brakmar": {
+  "gfx": 304418,
+  "destinos": [
+   {
+    "mapa": 216530944,
+    "subzona": 977,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212861952,
+    "subzona": 977,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212860928,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212860929,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212861185,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212992515,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212864002,
+    "subzona": 980,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212863490,
+    "subzona": 980,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212861954,
+    "subzona": 977,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212860930,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212992512,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212863491,
+    "subzona": 980,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212861955,
+    "subzona": 977,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212860931,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212992513,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212864004,
+    "subzona": 980,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212861957,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212862469,
+    "subzona": 978,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212864006,
+    "subzona": 978,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 212992517,
+    "subzona": 982,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 219677441,
+    "subzona": 977,
+    "tipo": 10,
+    "coste": 20
+   }
+  ]
+ }
+}

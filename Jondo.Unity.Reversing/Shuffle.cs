@@ -46,7 +46,8 @@ public static class Shuffle
 
         var messages = model.Messages.Select(m => new ProtoWriter.Message(
             Renamed(m.Name),
-            m.Fields.Select(f => new ProtoWriter.Field(f.Number, Renamed(f.Type), f.Name, f.Repeated)).ToList(),
+            m.Fields.Select(f => new ProtoWriter.Field(f.Number, Renamed(f.Type), f.Name,
+                                                        f.Repeated, f.Optional)).ToList(),
             m.Doubtful)).ToList();
 
         var enums = model.Enums.Select(e => new ProtoWriter.Enumeration(

@@ -56,7 +56,7 @@ nothing — they are working references, and `.gitignore` keeps them local.
 | `titles_ornaments.json` | 2,660 | 539 title ids and 167 ornament ids | `Titles` via `Paths.TitlesOrnamentsJson` | `extract_titulos.py` |
 | `world_etapa2_tras_confirmar.bin` | 2,348 | World entry block 2: 2 frames, `jby` (40 B, meaning not established) and `jtg` (2,306 B), the account's gift-item catalogue | `WorldEntry` via `Paths.WorldStageAfterConfirm` | carved from the capture, then `sanear_world.py` |
 | `item_effect_fields.json` | 1,226 | 121 effect ids → which protobuf field of the `ivx` entry carries the value | `EffectFields` via `Paths.EffectFieldsJson` | measured from a capture; no script |
-| `zaap_overrides.json` | 1,016 | Maps the client's waypoint table calls a zaap but whose element cannot be recognised by its graphic. One entry today: map `115083777` → element `481520`, picked by elimination among four elements, none of which carries a zaap graphic. The file writes down why, so the next person can change one number instead of redoing the work | `Interactives` via `Paths.ZaapOverridesJson` | written by hand |
+| `zaap_overrides.json` | 1,016 | Reviewed zaap element ids for exceptional or historically ambiguous maps. Map `115083777` remains a true fallback; Incarnam `154010371` → `538795` and Amakna `88213271` → `540285` document their authoritative inline bounding-box targets, now also discovered automatically by graphic `301199` | `Interactives` via `Paths.ZaapOverridesJson` | written by hand |
 
 Three notes on that table.
 

@@ -190,6 +190,19 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>"Cura: #1% de los PdV máximos". El dado es el porcentaje.</summary>
         private const int CuraPorcentual = 1109;
 
+        /// <summary>"#1% del nivel en escudo". El nivel es el de quien lanza.</summary>
+        private const int EscudoPorNivel = Buffs.EscudoPorNivel;
+
+        /// <summary>
+        /// Convierte el porcentaje del efecto 1020 en puntos. Las fichas oficiales de los
+        /// hechizos describen estos escudos como porcentaje del nivel del lanzador; la división
+        /// entera conserva el redondeo hacia abajo del servidor.
+        /// </summary>
+        public static int PuntosDeEscudo(int porcentaje, int nivelDelLanzador)
+            => porcentaje > 0 && nivelDelLanzador > 0
+                ? nivelDelLanzador * porcentaje / 100
+                : 0;
+
         /// <summary>Los dos números de característica de los puntos.</summary>
         private const int PuntosDeAccion = 1;
         private const int PuntosDeMovimiento = 23;
@@ -647,6 +660,36 @@ namespace Jondo.Unity.Launcher.Managers
                     Sobre = sobre, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
                     Cura = puntos,
+                };
+            }
+
+            // Los escudos de nivel no son una característica y por eso el catálogo trae cero.
+            // El dado es un porcentaje del NIVEL DEL LANZADOR, no del destinatario. Los puntos
+            // resueltos se guardan en el embrujo: al relanzar el mismo efecto, Buffs.Poner los
+            // sustituye y refresca su caducidad; hechizos o lanzadores distintos sí se acumulan.
+            if (efecto.EffectId == EscudoPorNivel)
+            {
+                int porcentaje = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
+                int puntos = PuntosDeEscudo(porcentaje, quienLanza.Level);
+                if (puntos <= 0) return null;
+
+                var escudo = sobre.Buffs.Poner(new Buff
+                {
+                    EffectId = efecto.EffectId,
+                    EffectUid = efecto.EffectUid,
+                    Cuanto = puntos,
+                    HechizoOrigen = hechizo,
+                    NivelOrigen = grado,
+                    Quien = quienLanza.Id,
+                    Disparador = AlLanzar,
+                    CaducaEnRonda = Caduca(efecto, ronda),
+                }, combate.SiguienteEmbrujo);
+
+                return new Outcome
+                {
+                    Sobre = sobre, Efecto = efecto, Buff = escudo,
+                    HechizoOrigen = hechizo, NivelOrigen = grado,
+                    Cuanto = puntos,
                 };
             }
 

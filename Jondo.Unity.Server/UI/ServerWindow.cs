@@ -303,6 +303,7 @@ namespace Jondo.Unity.Launcher.UI
             ServerPreferences.Language = cual;
             _textos = LauncherTexts.Get(cual);
             AplicarIdioma();
+            ReconstruirRegistro();
             _cifras.Invalidate();
 
         }
@@ -1037,6 +1038,16 @@ namespace Jondo.Unity.Launcher.UI
                 _registro.SelectionStart = _registro.TextLength;
                 _registro.ScrollToCaret();
             }
+        }
+
+        // ConsoleLogBuffer deliberately retains the original server text for the log file and
+        // remote-admin API. Replaying it is what makes a language change affect the already
+        // visible console as well as subsequent lines.
+        private void ReconstruirRegistro()
+        {
+            _ultimaLinea = 0;
+            _registro.Clear();
+            TraerRegistro();
         }
 
         /// <summary>

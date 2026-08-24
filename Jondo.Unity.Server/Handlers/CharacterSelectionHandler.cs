@@ -207,8 +207,11 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
-        /// Character selection. The id comes in field 1 of the message, inside the wrapper
-        /// (kvw in 3.6.10.10, ksl in older builds).
+        /// Character selection. The normal selection wrappers (kvw / older ksl) carry the
+        /// character id in field 1.  The post-creation wrapper is different: the live
+        /// 3.6.10.10 capture is <c>kvl { f1: 1, f2: characterId }</c>, where f1 is a mode
+        /// marker rather than an id.  Treating that marker as the id rejects the freshly
+        /// created character and leaves the client back on its play landing screen.
         ///
         /// Returns false if the character does not exist or does not belong to the session's
         /// account. There used to be a default id: when the message carried none, the same
@@ -219,13 +222,18 @@ namespace Jondo.Unity.Launcher.Handlers
             long characterIdToLoad = 0;
             try
             {
-                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, Op.CharacterSelectionMessage)
+                byte[]? firstSelection = ConnectionProtocol.ReadPayload(framePayload,
+                    Op.CharacterFirstSelectionMessage);
+                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload,
+                                        Op.CharacterSelectionMessage)
                                     ?? ConnectionProtocol.ReadPayload(framePayload, Op.Ksl)
-                                    ?? ConnectionProtocol.ReadPayload(framePayload, Op.CharacterFirstSelectionMessage);
+                                    ?? firstSelection;
                 if (selection != null && selection.Length > 0)
                 {
                     var msg = ProtoMessage.Parse(selection);
-                    var charIdField = msg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0);
+                    var charIdField = firstSelection != null
+                        ? msg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 0)
+                        : msg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0);
                     if (charIdField != null) characterIdToLoad = charIdField.VarIntValue;
                 }
             }

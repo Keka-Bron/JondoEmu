@@ -57,11 +57,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     GameState.CellId = spawnCellId;
                     var mapInfo = MapManager.GetMapInfo(mapIdToLoad);
                     int subAreaId = mapInfo != null ? mapInfo.SubAreaId : 1;
-                    if (subAreaId == 444)
-                    {
-                        subAreaId = 20663;
-                    }
- 
+
                     // 1. Send lxd (MapComplementaryInfo wrapper) - Dynamically instantiated empty lxd message
                     var emptyLxd = new Jondo.Unity.Protocol.Messages.lxd();
                     byte[] lxdPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Lxd), emptyLxd.ToByteArray());

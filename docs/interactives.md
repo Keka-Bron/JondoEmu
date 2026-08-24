@@ -101,6 +101,23 @@ registry.
 These values come from the existing 3.6 implementation and captures. The migration does not
 reinterpret them.
 
+### 2.4 Runtime coverage (3.6.10.10 snapshot)
+
+Registration is not the same as full behavior. The current snapshot contains 46,309 static
+interactive placements; 5,419 are registered and 40,890 remain deliberately unsupported until an
+exact semantic binding and protocol flow are available.
+
+| Coverage | Elements | Meaning |
+|---|---:|---|
+| End-to-end in the implemented scope | 4,350 | Ordinary/haven-bag zaaps, chests, zaapis and safe world-graph transitions parse, validate, update state and answer |
+| UI only | 97 | 67 bins open empty storage and 30 Incarnam workshops open craft UI; item transfer or recipe execution is not implemented |
+| End-to-end with emulator-authored rules | 972 | Anomaly rotation, lottery rewards and part of house placement/pricing/return semantics are not official-server parity |
+| Unsupported/unregistered | 40,890 | Resources, markets and ambiguous/criterion/multi-target elements are logged rather than guessed |
+
+Consequently, it is incorrect to claim that every interactive element works. The registry confirms
+that a declared click routes consistently; each behavior family still needs its own evidence and
+completion criteria.
+
 ---
 
 ## 3. Startup and registration
@@ -167,7 +184,11 @@ jss.f15 {
 
 `f11` describes what the element is and which actions it offers. `f15` places its stated state on
 the map. Both are necessary: declaring a skill without its stated element does not fully describe
-the clickable object to the client.
+the clickable object to the client. Native 3.6.10.10 serialization and the official capture show
+disabled actions in `f3`, enabled actions in `f4`, the element id in `f5`, and the type in `f6`.
+The older extracted schema was shifted because it mistook optional `f2`'s generated `Has` property
+for a wire field. The corrected pinned schema preserves that presence field; following the old
+shape and sending the action in `f3` makes the object visible but non-interactive.
 
 The migration changed the source of these fields, not their values or wire order. A zaap still
 emits type 16 and skill 114; the chest still emits type 85 and skill 104; the lottery still emits
@@ -396,14 +417,18 @@ produces a gathered resource. `CraftHandler.TryResolve` resolves a workshop skil
 list; `TryResolveRecipe` additionally prevents a client from asking one workshop skill to execute
 a recipe owned by another.
 
-These handlers are the server-authoritative resolution layer, not yet the network execution
-layer. Two pieces of 3.6 evidence are still required before registering resource nodes and
-workshops in `InteractiveRegistry`:
+`mechanics/incarnam/workshops.json` now supplies 30 checked
+`(mapId, elementId, cell, gfx) -> (type, skill)` mappings from public Giny.NETCore world rows. The
+runtime cross-checks every binding against the exact client map and profession catalogues before
+registering it. One source element absent from 3.6.10.10 is recorded as rejected.
 
-1. a checked `(mapId, elementId) -> skillId/type` mapping;
-2. captures of the 3.6 messages that open a workshop and change/finish a resource state.
+Opening is also implemented. Exact client IL2CPP tracing shows `emc::zot(kgq)` forwarding optional
+field 1 as the skill id and `fsm::gak` resolving that id before constructing `CraftUi`. The handler
+therefore sends `iwn` followed by `kgq { f1: skill }`. Recipe execution is not inferred from the
+static catalogue: the current ingredient-change and result messages still need to be identified
+before inventory mutation can be enabled. Resource nodes likewise remain unregistered.
 
-`skills.json` does **not** supply the first mapping. In particular, `elementActionId` is an action
+`skills.json` does **not** supply the map-element mapping. In particular, `elementActionId` is an action
 animation/category value and is not the interactive type sent in `jss`; treating it as that type
 would misdeclare zaaps, chests and resources. Giny 2.68 remains useful for behaviour and database
 architecture, but its packet classes and hard-coded element mappings must not be copied as 3.6

@@ -81,6 +81,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var zaap = Merkasako.ZaapOf(target);
             Jondo.Unity.Launcher.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(target, zaap.Cell);
             DatabaseManager.SaveCurrentCharacter();
+            ZaapDiscovery.DiscoverOnArrival(SessionContext.State.CharacterId, target);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildActorLeft(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
@@ -89,7 +90,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(target));
+                ConnectionProtocol.BuildKnownZaaps(SessionContext.State.CharacterId));
 
             Console.WriteLine($"[Merkasako] Decorado {Merkasako.ThemeOfMap(target)} -> mapa {target}, " +
                               $"casilla {Jondo.Unity.Launcher.Network.SessionContext.State.CellId} (zaap en la {zaap.Cell}).");

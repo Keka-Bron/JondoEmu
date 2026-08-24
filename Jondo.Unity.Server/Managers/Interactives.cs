@@ -332,16 +332,6 @@ namespace Jondo.Unity.Launcher.Managers
         /// </summary>
         public static bool CanLeaveFrom(long mapId) => ZaapElements(mapId).Count > 0;
 
-        /// <summary>All activated waypoints the emulator exposes as discovered to every character.</summary>
-        public static IEnumerable<long> DiscoveredZaapMaps()
-        {
-            foreach (var waypoint in _ordered)
-            {
-                if (waypoint.Activated && CanLeaveFrom(waypoint.MapId))
-                    yield return waypoint.MapId;
-            }
-        }
-
         /// <summary>
         /// El identificador de la instancia de habilidad, que es lo que el cliente devuelve al
         /// usar el elemento. El servidor real reparte números sin patrón visible; aquí se deriva

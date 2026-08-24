@@ -28,7 +28,9 @@ namespace Jondo.Unity.Launcher
             AssertPerSessionPlayerCaches();
             AssertCharacterSlotAllowance();
             AssertFreshCharacterBaseline();
+            AssertZaapDiscoveryFiltering();
             AssertCharacterCombatBases();
+            AssertShieldCombatSemantics();
             AssertEquipmentBonusesAndMountSlot();
             AssertSpellBarDragMoves();
             AssertHousePurchaseContextIsolation();
@@ -37,6 +39,7 @@ namespace Jondo.Unity.Launcher
             AssertProfessionCatalog();
             AssertRelativeMapLookup();
             AssertInteractiveRegistry();
+            AssertWorldTransitionArrivalSafety();
             AssertPublicControlBoundary();
 
             // OJO: esta parte no llega a correr nunca. Subir tres carpetas desde donde está el
@@ -226,6 +229,47 @@ namespace Jondo.Unity.Launcher
             }
         }
 
+        private static void AssertZaapDiscoveryFiltering()
+        {
+            byte[] capturedKnownList = Network.ConnectionProtocol.Push(
+                Jondo.Unity.Protocol.Op.Hjk,
+                Network.ConnectionProtocol.BuildDiscoveredZaaps(new[] { 154010371L }));
+            if (!Network.WorldEntry.ShouldSkip(capturedKnownList))
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Captured-account hjk would leak into world entry.");
+            }
+
+            if (Managers.ZaapDiscovery.IsDiscoverableMap(DatabaseManager.StartingMap))
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Fresh-character creation map would auto-unlock a zaap.");
+            }
+
+            var discoverable = Managers.Interactives.Waypoints.FirstOrDefault(waypoint =>
+                Managers.ZaapDiscovery.IsDiscoverableMap(waypoint.MapId));
+            if (discoverable == null)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] No evidence-backed ordinary zaap can be discovered.");
+            }
+
+            var empty = Handlers.ZaapTravelHandler.OrdinaryDestinations(
+                discoverable.MapId, Array.Empty<long>());
+            var one = Handlers.ZaapTravelHandler.OrdinaryDestinations(
+                discoverable.MapId, new[] { discoverable.MapId });
+            var duplicate = Handlers.ZaapTravelHandler.OrdinaryDestinations(
+                discoverable.MapId, new[] { discoverable.MapId, discoverable.MapId });
+
+            if (empty.Count != 0 || one.Count != 1 || duplicate.Count != 1 ||
+                one[0].MapId != discoverable.MapId || one[0].Cost != 0)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Zaap destinations are not strictly filtered by " +
+                    "character-owned discovery state.");
+            }
+        }
+
         private static void AssertCharacterCombatBases()
         {
             var session = Network.GameSession.SinSocket();
@@ -248,6 +292,90 @@ namespace Jondo.Unity.Launcher
                     throw new InvalidOperationException(
                         "[RegressionGuard FAILED] The level-based PA bonus no longer layers over the saved base.");
                 }
+            }
+        }
+
+        private static void AssertShieldCombatSemantics()
+        {
+            // Effect 1020 is a percentage of the caster's level. Keep an odd level here so a
+            // change from integer-floor semantics cannot pass unnoticed.
+            if (Managers.EffectEngine.PuntosDeEscudo(50, 133) != 66 ||
+                Managers.EffectEngine.PuntosDeEscudo(0, 133) != 0 ||
+                Managers.EffectEngine.PuntosDeEscudo(50, 0) != 0)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Effect 1020 no longer uses floor(percent * caster level).");
+            }
+
+            var buffs = new Jondo.Unity.World.Fights.Buffs();
+            int siguiente = 0;
+            Func<int> numero = () => ++siguiente;
+            var primero = buffs.Poner(new Jondo.Unity.World.Fights.Buff
+            {
+                EffectId = Jondo.Unity.World.Fights.Buffs.EscudoPorNivel,
+                EffectUid = 1,
+                Cuanto = 66,
+                HechizoOrigen = 14676,
+                Quien = 10,
+                CaducaEnRonda = 3,
+            }, numero);
+            var refrescado = buffs.Poner(new Jondo.Unity.World.Fights.Buff
+            {
+                EffectId = Jondo.Unity.World.Fights.Buffs.EscudoPorNivel,
+                EffectUid = 1,
+                Cuanto = 67,
+                HechizoOrigen = 14676,
+                Quien = 10,
+                CaducaEnRonda = 4,
+            }, numero);
+            var segundo = buffs.Poner(new Jondo.Unity.World.Fights.Buff
+            {
+                EffectId = Jondo.Unity.World.Fights.Buffs.EscudoPorNivel,
+                EffectUid = 2,
+                Cuanto = 30,
+                HechizoOrigen = 99999,
+                Quien = 10,
+                CaducaEnRonda = 4,
+            }, numero);
+
+            int absorbido = buffs.AbsorberEscudo(80, ronda: 1);
+            if (!ReferenceEquals(primero, refrescado) || siguiente != 2 ||
+                primero.Numero != 1 || segundo.Numero != 2 ||
+                absorbido != 80 || primero.Cuanto != 0 || segundo.Cuanto != 17 ||
+                buffs.EscudoDisponible(1) != 17 || buffs.Puestos.Count != 2)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Shields do not refresh, stack or absorb oldest-first.");
+            }
+
+            // Installed 3.6.10.10 native receiver fmc::bgmn reads jvp as: optional f1 shield
+            // loss, f2 victim, f3 life loss, f4 element, f5 permanent/erosion loss.
+            var damage = Network.ProtoMessage.Parse(Network.FightProtocol.BuildDamage(
+                author: 10, efecto: 96, victim: 20, amount: 123, elemento: 3,
+                shieldLoss: 45, permanentDamage: 12));
+            var detailField = damage.Fields.SingleOrDefault(field =>
+                field.FieldNumber == 40 && field.WireType == 2);
+            var detail = detailField == null ? null : Network.ProtoMessage.Parse(detailField.BytesValue);
+            if (detail == null ||
+                detail.Fields.SingleOrDefault(field => field.FieldNumber == 1)?.VarIntValue != 45 ||
+                detail.Fields.SingleOrDefault(field => field.FieldNumber == 2)?.VarIntValue != 20 ||
+                detail.Fields.SingleOrDefault(field => field.FieldNumber == 3)?.VarIntValue != 123 ||
+                detail.Fields.SingleOrDefault(field => field.FieldNumber == 4)?.VarIntValue != 3 ||
+                detail.Fields.SingleOrDefault(field => field.FieldNumber == 5)?.VarIntValue != 12)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] jvp shield/life/element/permanent wire fields drifted.");
+            }
+
+            var withoutOptional = Network.ProtoMessage.Parse(Network.FightProtocol.BuildDamage(
+                author: 10, efecto: 96, victim: 20, amount: 1, elemento: 3));
+            var withoutDetailField = withoutOptional.Fields.Single(field =>
+                field.FieldNumber == 40 && field.WireType == 2);
+            var withoutDetail = Network.ProtoMessage.Parse(withoutDetailField.BytesValue);
+            if (withoutDetail.Fields.Any(field => field.FieldNumber == 1 || field.FieldNumber == 5))
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Empty optional jvp shield/permanent fields were serialized.");
             }
         }
 
@@ -274,6 +402,21 @@ namespace Jondo.Unity.Launcher
                 {
                     throw new InvalidOperationException(
                         "[RegressionGuard FAILED] Worn item effects or mount slot no longer participate in equipment state.");
+                }
+
+                // The client item-move schema uses int32 ids.  Existing seeded rows can have
+                // 64-bit ids, so the low wire id must still resolve back to the saved item.
+                const long persistedUid = 13825560052L;
+                const long wireUid = 940658164L;
+                session.State.EquipmentItems[persistedUid] = new Managers.Equipment.Item
+                {
+                    Uid = persistedUid, Template = 123, Position = Managers.Equipment.Bag,
+                };
+                if (Managers.Equipment.WireUid(persistedUid) != wireUid ||
+                    Managers.Equipment.ByWireUid(wireUid)?.Uid != persistedUid)
+                {
+                    throw new InvalidOperationException(
+                        "[RegressionGuard FAILED] A persisted item id no longer resolves from the int32 client wire id.");
                 }
             }
         }
@@ -316,6 +459,139 @@ namespace Jondo.Unity.Launcher
             }
 
             var expected = new HashSet<(long MapId, int ElementId)>();
+
+            var reviewedNpcSpawns = new[]
+            {
+                (Source: 20, Npc: 2907, Map: 153881600L, Cell: 384, Direction: 3),
+                (Source: 21, Npc: 2936, Map: 152835072L, Cell: 262, Direction: 3),
+                (Source: 43, Npc: 2892, Map: 154010883L, Cell: 357, Direction: 3),
+                (Source: 44, Npc: 2885, Map: 153357316L, Cell: 205, Direction: 3),
+            };
+            bool exactNpcSpawns = Managers.IncarnamServerContent.NpcSpawns.Count == reviewedNpcSpawns.Length &&
+                reviewedNpcSpawns.All(expectedSpawn =>
+                    Managers.IncarnamServerContent.NpcSpawns.Any(actualSpawn =>
+                        actualSpawn.SourceRecordId == expectedSpawn.Source &&
+                        actualSpawn.NpcId == expectedSpawn.Npc &&
+                        actualSpawn.MapId == expectedSpawn.Map &&
+                        actualSpawn.CellId == expectedSpawn.Cell &&
+                        actualSpawn.Orientation == expectedSpawn.Direction));
+            bool inventedGanymed = Managers.IncarnamServerContent.NpcSpawns.Any(spawn =>
+                spawn.SourceRecordId == 42 ||
+                (spawn.NpcId == 7581 && spawn.MapId == 153880835 && spawn.CellId == 215));
+            if (Managers.IncarnamServerContent.Workshops.Count != 30 ||
+                !exactNpcSpawns || inventedGanymed)
+            {
+                throw new InvalidDataException(
+                    "[RegressionGuard FAILED] Expected 30 reviewed Incarnam workshop bindings " +
+                    "and exactly 4 source/client-compatible NPC placements; source row 42 must " +
+                    "remain rejected instead of being substituted with Ganymed.");
+            }
+
+            var farmerStations = Managers.IncarnamServerContent.Workshops
+                .Where(station => station.MapId == 153354242)
+                .ToList();
+            var farmerMill = farmerStations.SingleOrDefault(station =>
+                station.Element.Id == 489524 && station.Element.Cell == 285 &&
+                station.Element.Gfx == 32991 && station.InteractiveTypeId == 22 &&
+                station.SkillId == 27 && station.RecipeCount == 70);
+            if (farmerStations.Count != 4 || farmerMill == null)
+            {
+                throw new InvalidDataException(
+                    "[RegressionGuard FAILED] Incarnam farmer workshop bindings are incomplete.");
+            }
+
+            foreach (var station in Managers.IncarnamServerContent.Workshops)
+                expected.Add((station.MapId, station.Element.Id));
+
+            // The visible Incarnam waypoint is an inline map bounding-box target.  The pinned
+            // bundle and official iwo capture identify element 538795 on cell 304 with the normal
+            // zaap graphic 301199.  Element 490237/gfx 3212 is unrelated animated scenery.
+            var incarnamZaap = Managers.Interactives.ZaapElements(154010371);
+            if (incarnamZaap.Count != 1 || incarnamZaap[0].Id != 538795 ||
+                incarnamZaap[0].Cell != 304 || incarnamZaap[0].Gfx != 301199)
+            {
+                throw new InvalidDataException(
+                    "[RegressionGuard FAILED] Incarnam zaap is not bound to map element " +
+                    "538795 (cell 304, gfx 301199).");
+            }
+
+            // The native lev writer/parser (and the official capture retained in the migration
+            // notes) put disabled actions in repeated f3, enabled actions in repeated f4, the
+            // element id in f5 and the type in f6. The extracted proto was shifted by the optional
+            // f2 Has-property; trusting it made the portal visible but deliberately non-clickable.
+            var wireCharacter = new DatabaseManager.DbCharacter
+            {
+                Id = 1,
+                Name = "InteractiveWireGuard",
+                Breed = 9,
+                Sex = 0,
+                Level = 1,
+                ServerId = DatabaseManager.DefaultServerId,
+            };
+
+            // MapInfoUI resolves this exact field through the installed client's SubAreasDataRoot.
+            // A legacy 444 -> 20663 rewrite made every Atelier transition feed it an id that does
+            // not exist, so the UI threw before updating the coordinates and minimap marker.
+            foreach (var expectedSubArea in new[]
+            {
+                (MapId: 154010371L, SubAreaId: 450L),
+                (MapId: 154010372L, SubAreaId: 444L),
+                (MapId: 153354242L, SubAreaId: 444L),
+            })
+            {
+                var mapInfo = MapManager.GetMapInfo(expectedSubArea.MapId);
+                var mapJss = Network.ProtoMessage.Parse(Network.ConnectionProtocol.BuildMapActors(
+                    expectedSubArea.MapId, wireCharacter, cell: 300, facing: 1, accountId: 1));
+                long wireSubArea = mapJss.Fields.SingleOrDefault(field =>
+                    field.FieldNumber == 6 && field.WireType == 0)?.VarIntValue ?? 0;
+                if (mapInfo?.SubAreaId != expectedSubArea.SubAreaId ||
+                    wireSubArea != expectedSubArea.SubAreaId)
+                {
+                    throw new InvalidDataException(
+                        $"[RegressionGuard FAILED] Map {expectedSubArea.MapId} must send pinned " +
+                        $"subarea {expectedSubArea.SubAreaId}, got {wireSubArea}.");
+                }
+            }
+
+            var incarnamJss = Network.ProtoMessage.Parse(Network.ConnectionProtocol.BuildMapActors(
+                154010371, wireCharacter, cell: 300, facing: 1, accountId: 1));
+            var declaration = incarnamJss.Fields
+                .Where(field => field.FieldNumber == 11 && field.WireType == 2)
+                .Select(field => Network.ProtoMessage.Parse(field.BytesValue))
+                .SingleOrDefault(message => message.Fields.Any(field =>
+                    field.FieldNumber == 5 && field.WireType == 0 &&
+                    field.VarIntValue == incarnamZaap[0].Id));
+            var state = incarnamJss.Fields
+                .Where(field => field.FieldNumber == 15 && field.WireType == 2)
+                .Select(field => Network.ProtoMessage.Parse(field.BytesValue))
+                .SingleOrDefault(message => message.Fields.Any(field =>
+                    field.FieldNumber == 3 && field.WireType == 0 &&
+                    field.VarIntValue == incarnamZaap[0].Id));
+            var enabledAction = declaration?.Fields
+                .Where(field => field.FieldNumber == 4 && field.WireType == 2)
+                .Select(field => Network.ProtoMessage.Parse(field.BytesValue))
+                .SingleOrDefault();
+
+            if (declaration == null ||
+                declaration.Fields.Any(field => field.FieldNumber == 3 && field.WireType == 2) ||
+                declaration.Fields.SingleOrDefault(field => field.FieldNumber == 6 && field.WireType == 0)
+                    ?.VarIntValue != Managers.Interactives.ZaapType ||
+                enabledAction == null ||
+                enabledAction.Fields.SingleOrDefault(field => field.FieldNumber == 1 && field.WireType == 0)
+                    ?.VarIntValue != Managers.Interactives.SkillInstanceOf(incarnamZaap[0].Id) ||
+                enabledAction.Fields.SingleOrDefault(field => field.FieldNumber == 2 && field.WireType == 0)
+                    ?.VarIntValue != Managers.Interactives.UseSkill ||
+                state == null ||
+                state.Fields.SingleOrDefault(field => field.FieldNumber == 1 && field.WireType == 0)
+                    ?.VarIntValue != 1 ||
+                state.Fields.SingleOrDefault(field => field.FieldNumber == 2 && field.WireType == 0)
+                    ?.VarIntValue != incarnamZaap[0].Cell)
+            {
+                throw new InvalidDataException(
+                    "[RegressionGuard FAILED] Incarnam jss does not match the native lev/ldf " +
+                    "interactive wire shape (enabled actions f4, element f5, state f15).");
+            }
+
             foreach (long mapId in Managers.Interactives.MapIds)
             {
                 foreach (var zaap in Managers.Interactives.ZaapElements(mapId))
@@ -428,6 +704,58 @@ namespace Jondo.Unity.Launcher
                 throw new InvalidOperationException(
                     $"[RegressionGuard FAILED] Expected {expected.Count} interactives, got " +
                     $"{Managers.InteractiveRegistry.Count}.");
+            }
+        }
+
+        private static void AssertWorldTransitionArrivalSafety()
+        {
+            // Installed 3.6.10.10 client data maps this Route des Ames entrance to reciprocal
+            // source 411. That is the authored exit trigger, so arriving on it regresses into an
+            // immediate return outdoors on the first movement request.
+            const long interiorMapId = 153357316;
+            const int reciprocalDoorCell = 411;
+            if (!Handlers.WorldInteractiveTransitionHandler.TryNearestSafeWalkable(
+                    interiorMapId, reciprocalDoorCell, 2, out int arrival) ||
+                Jondo.Unity.World.Maps.MapGeometry.Distance(arrival, reciprocalDoorCell) < 2)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Interior transition arrival is still inside the exit trigger radius.");
+            }
+
+            // The Incarnam farmer workshop's exit drawing is anchored at 424, but the live client
+            // walks the actor to 411 for the exit action. Oven use ends at 299. Only the reviewed
+            // action endpoint may return to the observed, walkable pre-entry cell 288.
+            if (!Managers.WorldInteractiveReturns.TryResolveDeclaredExit(
+                    153354242, 411, out var atelierReturn) ||
+                atelierReturn.ReturnMapId != 154010372 ||
+                atelierReturn.ReturnCellId != 288 ||
+                atelierReturn.EntryElementId != 489326 ||
+                Managers.WorldInteractiveReturns.TryResolveDeclaredExit(
+                    153354242, 299, out _) ||
+                Managers.WorldInteractiveReturns.TryResolveDeclaredExit(
+                    153354242, 285, out _) ||
+                Managers.WorldInteractiveReturns.TryResolveDeclaredExit(
+                    153354242, 258, out _))
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Farmer workshop return is not bound to its exact action cell.");
+            }
+
+            // The graph itself still records the authored reciprocal anchor. Generic graph-backed
+            // returns require that exact cell and normalize the outdoor source to a walkable cell.
+            if (!Managers.WorldInteractiveTransitions.TryResolveReciprocalReturn(
+                    153354242, 424, out long returnMap, out int returnCell,
+                    out int entryElement) ||
+                returnMap != 154010372 || returnCell != 273 || entryElement != 489326 ||
+                Managers.WorldInteractiveTransitions.TryResolveReciprocalReturn(
+                    153354242, 285, out _, out _, out _) ||
+                Managers.WorldInteractiveTransitions.TryResolveReciprocalReturn(
+                    153354242, 258, out _, out _, out _) ||
+                Managers.WorldInteractiveTransitions.TryResolveReciprocalReturn(
+                    153354242, 300, out _, out _, out _))
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Farmer workshop graph return is ambiguous or unsafe.");
             }
         }
 

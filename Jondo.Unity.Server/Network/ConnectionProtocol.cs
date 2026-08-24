@@ -58,8 +58,9 @@ namespace Jondo.Unity.Launcher.Network
         ///
         /// And each server:
         ///
-        ///   f1 { f1 { f1: serverId, f3: type }
+        ///   f1 { f1 { f1: serverId, f3: server type }
         ///        f3 (repeated) { f1: name, f2: breed-1, f3: sex, f4: level, f5: last connection } }
+        ///   f2 (repeated) { f1: server type, f2: character capacity }
         /// </summary>
         public static byte[] BuildAuthenticationAccepted(
             string lang,
@@ -77,6 +78,8 @@ namespace Jondo.Unity.Launcher.Network
                 var entry = Pb.New()
                     .Msg(1, Pb.New()
                         .Var(1, server.Id)
+                        // Captured 3.6.10.10 shape: f3 is the server family/type (Tal Kasha is
+                        // type 1). The capacity belongs in ServerList.f2 below, keyed by type.
                         .VarIfNotZero(3, server.Type));
 
                 foreach (var character in characters)
@@ -98,17 +101,15 @@ namespace Jondo.Unity.Launcher.Network
                 serversList.Msg(1, entry);
             }
 
-            // Cuántos personajes caben por tipo de servidor. Siete entradas, tipos 0 a 6.
-            //
-            // The captured creation screen has five in all seven blocks, with an account that
-            // already owns four characters on its server and still has the button enabled. This
-            // is the per-server cap, not the number the account currently owns.
-            for (int type = 0; type <= 6; type++)
+            // The client looks up the create-character capacity by *server type*, not server id.
+            // Vanilla sends all seven type records even when only one server is advertised.
+            // Omitting the Tal Kasha (type 1) record leaves "Create character" disabled despite
+            // a valid additional-slot confirmation (kwb/kvd).
+            for (int serverType = 0; serverType <= 6; serverType++)
             {
-                var slots = Pb.New();
-                slots.VarIfNotZero(1, type);
-                slots.Var(2, MaxCharactersPerServer);
-                serversList.Msg(2, slots);
+                serversList.Msg(2, Pb.New()
+                    .VarIfNotZero(1, serverType)
+                    .Var(2, MaxCharactersPerServer));
             }
 
             var accepted = Pb.New()
@@ -654,10 +655,10 @@ namespace Jondo.Unity.Launcher.Network
         ///   at MapInfoUI.OnMapComplementaryInformationsData (ccn message)
         ///   at ehl.xxt (jss a)
         ///
-        /// It looks the subarea up, finds nothing because we were sending zero, and throws. With
-        /// it goes everything that widget sets: the name of the map, its coordinates, and the
-        /// little figure on the minimap, which is why that stayed painted on the zaap however far
-        /// the character walked.
+        /// It looks the subarea up and throws when the id is zero or absent from the installed
+        /// SubAreasDataRoot. With it goes everything that widget sets: the name of the map, its
+        /// coordinates, and the little figure on the minimap, which is why that stayed painted on
+        /// the zaap however far the character walked.
         ///
         /// The value is the one the map has in the database, checked against the capture: map
         /// 154010371 travels with 450 and map 154010882 with 442, and those are exactly the
@@ -832,8 +833,30 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         private static void AddInteractiveElements(Pb jss, long mapId)
         {
-            foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
+            var interactives = Managers.InteractiveRegistry.OnMap(mapId);
+            foreach (var interactive in interactives)
                 Declare(jss, interactive);
+
+            // This is deliberately emitted once per jss/map load rather than only for a received
+            // iwo.  If the client is offered no interaction it cannot send iwo at all, and the
+            // diagnostic identifies a missing content-registration record instead of disguising
+            // it as an unhandled-packet problem.
+            if (interactives.Count == 0)
+            {
+                Console.WriteLine($"[Interactives] Map {mapId}: declared 0 interactive elements.");
+                return;
+            }
+
+            var details = new List<string>(interactives.Count);
+            foreach (var interactive in interactives)
+            {
+                string actions = string.Join(",", interactive.Actions.Select(action =>
+                    $"{action.Kind}:skill={action.SkillId}:uid={action.SkillInstanceId}"));
+                details.Add($"element={interactive.Element.Id},cell={interactive.Element.Cell}," +
+                            $"gfx={interactive.Element.Gfx},type={interactive.Type},actions=[{actions}]");
+            }
+            Console.WriteLine($"[Interactives] Map {mapId}: declared {interactives.Count} " +
+                              $"interactive element(s): {string.Join("; ", details)}.");
         }
 
         /// <summary>
@@ -943,6 +966,10 @@ namespace Jondo.Unity.Launcher.Network
             if (actionCount == 0) return;
 
             jss.Msg(11, declaration
+                // Native 3.6.10.10 lev layout: f2 is an optional int whose Has-property confused
+                // the generated schema extractor; f3/f4 are the disabled/enabled action lists,
+                // f5 is the element id, and f6 is the interactive type. The native hover/context
+                // path reads enabled actions from f4.
                 .Var(5, interactive.Element.Id)
                 .Var(6, interactive.Type));
 
@@ -1391,6 +1418,14 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(5, who)
                 .Build();
 
+        /// <summary>
+        /// Exact 3.6.10.10 <c>kgq</c> payload. The optional field 1 is the craft skill id;
+        /// the native client resolves it through <c>SkillsDataRoot.GetSkillById</c> before
+        /// constructing its craft interface.
+        /// </summary>
+        public static byte[] BuildCraftStarted(int skillId)
+            => Pb.New().Var(1, skillId).Build();
+
         /// <summary>Un destino de la lista de zaaps.</summary>
         public readonly struct ZaapDestination
         {
@@ -1610,8 +1645,9 @@ namespace Jondo.Unity.Launcher.Network
 
         /// <summary>
         /// The two that travel with jru on every map change of the capture: lqu, which carries a
-        /// 120 and the server clock in milliseconds, and hjk, which carries the map id in a packed
-        /// list. lqn goes out between them in the capture and does not go out here: its one field
+        /// 120 and the server clock in milliseconds, and hjk, which replaces the client's complete
+        /// list of known zaap map ids. lqn goes out between them in the capture and does not go out
+        /// here: its one field
         /// is a number we have not been able to explain (197 on entering the world, 24 on changing
         /// map, 470 after a characteristics reset), and inventing it is worse than leaving it out.
         /// </summary>
@@ -1624,8 +1660,13 @@ namespace Jondo.Unity.Launcher.Network
         public static byte[] BuildDiscoveredZaaps(IEnumerable<long> mapIds)
             => Pb.New().Packed(1, mapIds).Build();
 
-        public static byte[] BuildMapDiscovered(long mapId)
-            => Push(Op.Hjk, BuildDiscoveredZaaps(new long[] { mapId }));
+        /// <summary>
+        /// Full character-owned discovery replacement. Sending only the destination map would
+        /// erase every other known zaap because the 3.6.10.10 client replaces, rather than appends,
+        /// its backing list when it handles hjk.
+        /// </summary>
+        public static byte[] BuildKnownZaaps(long characterId)
+            => Push(Op.Hjk, BuildDiscoveredZaaps(Managers.ZaapDiscovery.KnownMaps(characterId)));
 
         /// <summary>
         /// Movement along a map (jsj), which is what the server sends back to a jrw.
@@ -1663,7 +1704,10 @@ namespace Jondo.Unity.Launcher.Network
                     var entry = EffectEntry(effect);
                     if (entry != null) body.Msg(2, entry);
                 }
-                body.Var(3, Math.Max(1, item.Quantity)).Var(4, item.Uid);
+                // ivx.f3.f5.f4 is an int32 in the 3.6.10.10 client.  Persisted legacy ids may
+                // be wider, so explicitly emit the same low 32-bit value the client will later
+                // send in iuk instead of relying on an overflowing protobuf assignment.
+                body.Var(3, Math.Max(1, item.Quantity)).Var(4, Managers.Equipment.WireUid(item.Uid));
 
                 ivx.Msg(3, Pb.New().VarIfNotZero(1, item.Position).Msg(5, body));
             }

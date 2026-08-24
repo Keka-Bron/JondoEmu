@@ -236,15 +236,15 @@ message mia {
   miq gffc = 4;
   string gffd = 5;
   mhy gffe = 6;
-  int32 gfff = 7;
-  bool gffg = 8;
-  mja gffh = 9;
+  optional int32 gfff = 7;
+  mja gffh = 8;
+  mjx gffi = 9;
 }
 
 message mie {
   mib gffm = 1;
-  string gffn = 2;
-  bool gffo = 3;
+  optional string gffn = 2;
+  optional string gffp = 3;
 }
 
 message mig {
@@ -264,7 +264,7 @@ message mik {
 
 message mim {
   mik gfgk = 1;
-  mij gfgl = 2;
+  optional mij gfgl = 2;
 }
 
 message mio {
@@ -336,7 +336,7 @@ message mjm {
 
 message mjo {
   mjm gfjh = 1;
-  mjj gfji = 2;
+  optional mjj gfji = 2;
 }
 
 message mjp {

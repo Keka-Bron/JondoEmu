@@ -370,7 +370,10 @@ namespace Jondo.Unity.Launcher.Managers
         {
             if (!MapManager.WalkableCells.TryGetValue(mapId, out var cells) || cells.Count == 0)
             {
-                return new List<int> { 288, 303, 312, 327, 344, 350 };
+                // There is no safe generic cell shared by every Dofus map. Returning made-up
+                // centre cells is how groups ended up inside scenery and on building roofs when
+                // this method was called before the client map catalogue had loaded.
+                return new List<int>();
             }
 
             var cellSet = new HashSet<int>(cells);

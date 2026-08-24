@@ -37,7 +37,13 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             int preferredCell = source.DerivedArrivalCellId ?? TeleportHandler.MapCentre;
-            if (!TryNearestSafeWalkable(route.TargetMapId, preferredCell, out int arrivalCell))
+            // A reciprocal world-graph source identifies the destination doorway, not the cell
+            // where an arriving actor should stand. Keep the actor outside the one-cell exit
+            // trigger radius so their first walk inside the building cannot immediately consume
+            // the pending return and teleport them back outdoors.
+            int minimumDistanceFromDoor = source.DerivedArrivalCellId.HasValue ? 2 : 0;
+            if (!TryNearestSafeWalkable(route.TargetMapId, preferredCell,
+                                        minimumDistanceFromDoor, out int arrivalCell))
             {
                 Console.WriteLine($"[WorldTransitions] El mapa destino {route.TargetMapId} no " +
                                   "tiene ninguna casilla segura conocida; no se cambia el mapa.");
@@ -50,7 +56,7 @@ namespace Jondo.Unity.Launcher.Handlers
                         SessionContext.State.CharacterId)));
 
             string arrivalEvidence = source.DerivedArrivalCellId.HasValue
-                ? $"recíproco {source.DerivedArrivalCellId.Value}"
+                ? $"puerta recíproca {source.DerivedArrivalCellId.Value}, interior seguro {arrivalCell}"
                 : "centro seguro (el grafo no contiene llegada)";
             bool moved = await WorldMoveHandler.MoveToMapAsync(stream, route.TargetMapId, arrivalCell,
                 $"interactivo {interactive.Element.Id}, skill {action.SkillId}, llegada {arrivalEvidence}");
@@ -62,7 +68,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 SessionContext.State.PendingWorldInteractiveReturn = pending;
         }
 
-        private static bool TryNearestSafeWalkable(long mapId, int preferredCell, out int result)
+        internal static bool TryNearestSafeWalkable(long mapId, int preferredCell,
+                                                    int minimumDistance, out int result)
         {
             result = -1;
             IReadOnlyCollection<int>? safe = null;
@@ -76,11 +83,6 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             if (safe == null || safe.Count == 0) return false;
-            if (safe.Contains(preferredCell))
-            {
-                result = preferredCell;
-                return true;
-            }
 
             int bestDistance = int.MaxValue;
             foreach (int candidate in safe)
@@ -88,6 +90,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 int distance = MapGeometry.IsValid(preferredCell)
                     ? MapGeometry.Distance(preferredCell, candidate)
                     : Math.Abs(candidate - TeleportHandler.MapCentre);
+                if (distance < minimumDistance) continue;
                 if (distance < bestDistance ||
                     (distance == bestDistance && (result < 0 || candidate < result)))
                 {

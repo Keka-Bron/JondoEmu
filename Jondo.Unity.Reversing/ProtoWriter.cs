@@ -25,7 +25,8 @@ namespace Jondo.Unity.Reversing;
 /// </summary>
 public static class ProtoWriter
 {
-    public sealed record Field(int Number, string Type, string Name, bool Repeated);
+    public sealed record Field(int Number, string Type, string Name, bool Repeated,
+                               bool Optional = false);
     public sealed record Message(string Name, List<Field> Fields, bool Doubtful);
     public sealed record Enumeration(string Name, List<(string Name, int Value)> Values);
 
@@ -50,10 +51,16 @@ public static class ProtoWriter
     {
         var messages = new List<Message>();
 
-        foreach (var type in reader.Types())
-        {
-            if (!IsMessage(type)) continue;
+        // Obfuscated client messages have globally unique three-letter names.  A normal semantic
+        // protobuf assembly does not: nested messages such as Character or Entry can legitimately
+        // appear under several parents.  Keep the short name where it is unambiguous (which
+        // preserves every existing client-to-client mapping), and qualify only collisions.
+        var wireTypes = reader.Types().Where(type => type.IsEnum || IsMessage(type)).ToList();
+        var messageTypes = wireTypes.Where(IsMessage).ToList();
+        var identities = Identities(wireTypes);
 
+        foreach (var type in messageTypes)
+        {
             // El tipo del literal viene del contexto de metadatos, no del runtime de aquí, así que
             // se compara por nombre y no con typeof.
             var numbers = type.GetFields(Everything)
@@ -69,24 +76,35 @@ public static class ProtoWriter
             // descuadrados: eran los que tienen oneof, no los que estaban mal leídos.
             //
             // Las propiedades sí van una por número, y encima llevan el tipo bueno de cada caso.
-            // Delante están siempre las tres de oficio —el analizador y los dos descriptores— y
-            // detrás, cuando hay oneof, sobra una: la que dice cuál está puesto.
-            var properties = type.GetProperties(Everything)
-                                 .Where(p => p.PropertyType.Name is not "MessageDescriptor" &&
-                                             !p.PropertyType.Name.StartsWith("MessageParser",
-                                                                             StringComparison.Ordinal))
-                                 .ToList();
+            // Hay dos propiedades auxiliares que NO viajan:
+            //
+            //   - cada scalar `optional` lleva detrás un Boolean de sólo lectura (`HasFoo` en un
+            //     ensamblado sin ofuscar);
+            //   - cada oneof termina en un enumerado de sólo lectura que dice qué caso está puesto.
+            //
+            // Los nombres están rotados y no permiten reconocer `HasFoo`, pero la forma generada
+            // sí: todo campo normal tiene setter; repeated/map son las únicas propiedades de campo
+            // que son de sólo lectura. Con ese filtro las cuentas cuadran exactamente en los 2.169
+            // mensajes Game de 3.6.10.10, incluidos oneof y los 381 indicadores de presencia.
+            var allProperties = type.GetProperties(Everything)
+                                    .Where(p => p.PropertyType.Name is not "MessageDescriptor" &&
+                                                !p.PropertyType.Name.StartsWith("MessageParser",
+                                                                                StringComparison.Ordinal))
+                                    .ToList();
+            var properties = allProperties.Where(IsWireProperty).ToList();
 
             var fields = new List<Field>();
             int pairs = Math.Min(numbers.Count, properties.Count);
             for (int i = 0; i < pairs; i++)
             {
                 if (numbers[i].GetRawConstantValue() is not int number) continue;
-                var (name, repeated) = Describe(properties[i].PropertyType);
-                fields.Add(new Field(number, name, properties[i].Name, repeated));
+                var (name, repeated) = Describe(properties[i].PropertyType, identities);
+                fields.Add(new Field(number, name, properties[i].Name, repeated,
+                                     IsOptional(allProperties, properties[i])));
             }
 
-            messages.Add(new Message(type.Name, fields, numbers.Count > properties.Count));
+            messages.Add(new Message(identities[type.FullName ?? type.Name], fields,
+                                     numbers.Count != properties.Count));
         }
 
         return messages.OrderBy(m => m.Name, StringComparer.Ordinal).ToList();
@@ -96,8 +114,10 @@ public static class ProtoWriter
     public static List<Enumeration> Enums(AssemblyReader reader)
     {
         var enums = new List<Enumeration>();
+        var wireTypes = reader.Types().Where(type => type.IsEnum || IsMessage(type)).ToList();
+        var identities = Identities(wireTypes);
 
-        foreach (var type in reader.Types())
+        foreach (var type in wireTypes)
         {
             if (!type.IsEnum) continue;
 
@@ -106,10 +126,25 @@ public static class ProtoWriter
             {
                 if (f.GetRawConstantValue() is int v) values.Add((f.Name, v));
             }
-            if (values.Count > 0) enums.Add(new Enumeration(type.Name, values));
+            if (values.Count > 0)
+                enums.Add(new Enumeration(identities[type.FullName ?? type.Name], values));
         }
 
         return enums.OrderBy(e => e.Name, StringComparer.Ordinal).ToList();
+    }
+
+    private static Dictionary<string, string> Identities(IEnumerable<Type> types)
+    {
+        var list = types.ToList();
+        var duplicateNames = list
+            .GroupBy(type => type.Name, StringComparer.Ordinal)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
+            .ToHashSet(StringComparer.Ordinal);
+        return list.ToDictionary(
+            type => type.FullName ?? type.Name,
+            type => duplicateNames.Contains(type.Name) ? type.FullName ?? type.Name : type.Name,
+            StringComparer.Ordinal);
     }
 
     private static bool IsMessage(Type type)
@@ -125,18 +160,52 @@ public static class ProtoWriter
         return false;
     }
 
+    private static bool IsWireProperty(PropertyInfo property)
+    {
+        if (property.CanWrite) return true;
+        if (!property.PropertyType.IsGenericType) return false;
+
+        string open = property.PropertyType.Name;
+        return open.StartsWith("RepeatedField", StringComparison.Ordinal) ||
+               open.StartsWith("MapField", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Un scalar opcional va seguido inmediatamente por su Boolean de presencia, que es de sólo
+    /// lectura. No se usa el nombre porque Ankama lo rota igual que todos los demás.
+    /// </summary>
+    private static bool IsOptional(IReadOnlyList<PropertyInfo> properties, PropertyInfo property)
+    {
+        int index = -1;
+        for (int i = 0; i < properties.Count; i++)
+        {
+            if (properties[i] == property) { index = i; break; }
+        }
+
+        if (index < 0 || index + 1 >= properties.Count) return false;
+        PropertyInfo presence = properties[index + 1];
+        return presence.PropertyType.Name == "Boolean" && !presence.CanWrite &&
+               !IsWireProperty(presence);
+    }
+
     /// <summary>Cómo se llama ese tipo en un .proto, y si es una lista.</summary>
-    private static (string Name, bool Repeated) Describe(Type type)
+    private static (string Name, bool Repeated) Describe(
+        Type type, IReadOnlyDictionary<string, string>? messageIdentities = null)
     {
         if (type.IsGenericType)
         {
             string open = type.Name;
             var args = type.GetGenericArguments();
             if (open.StartsWith("RepeatedField", StringComparison.Ordinal))
-                return (Describe(args[0]).Name, true);
+                return (Describe(args[0], messageIdentities).Name, true);
             if (open.StartsWith("MapField", StringComparison.Ordinal))
-                return ($"map<{Describe(args[0]).Name}, {Describe(args[1]).Name}>", false);
+                return ($"map<{Describe(args[0], messageIdentities).Name}, " +
+                        $"{Describe(args[1], messageIdentities).Name}>", false);
         }
+
+        if (messageIdentities != null && type.FullName != null &&
+            messageIdentities.TryGetValue(type.FullName, out string? identity))
+            return (identity, false);
 
         return (type.Name switch
         {
@@ -180,7 +249,8 @@ public static class ProtoWriter
             sb.AppendLine($"message {m.Name} {{");
             foreach (var f in m.Fields)
             {
-                sb.AppendLine($"  {(f.Repeated ? "repeated " : "")}{f.Type} {f.Name} = {f.Number};");
+                string cardinality = f.Repeated ? "repeated " : f.Optional ? "optional " : "";
+                sb.AppendLine($"  {cardinality}{f.Type} {f.Name} = {f.Number};");
             }
             sb.AppendLine("}");
             sb.AppendLine();

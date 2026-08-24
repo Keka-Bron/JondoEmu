@@ -74,6 +74,12 @@ namespace Jondo.Unity.World.Fights
     /// </summary>
     public sealed class Buffs
     {
+        /// <summary>
+        /// "#1% del nivel en escudo". El 1020 no toca una característica del catálogo: deja
+        /// puntos absorbibles que el servidor real descuenta antes de la vida.
+        /// </summary>
+        public const int EscudoPorNivel = 1020;
+
         private readonly List<Buff> _puestos = new List<Buff>();
         private readonly HashSet<int> _estados = new HashSet<int>();
 
@@ -182,6 +188,42 @@ namespace Jondo.Unity.World.Fights
                 if (e.Caracteristica == caracteristica && e.Vivo(ronda)) total += e.Cuanto;
             }
             return total;
+        }
+
+        /// <summary>Los puntos de escudo de nivel que todavía quedan activos.</summary>
+        public int EscudoDisponible(int ronda)
+        {
+            int total = 0;
+            foreach (var e in _puestos)
+            {
+                if (e.EffectId == EscudoPorNivel && e.Cuanto > 0 && e.Vivo(ronda))
+                    total += e.Cuanto;
+            }
+            return total;
+        }
+
+        /// <summary>
+        /// Absorbe daño con los escudos activos, del más antiguo al más nuevo, y devuelve cuánto
+        /// se ha absorbido. Un escudo agotado se queda a cero hasta su caducidad normal: no hay
+        /// evidencia de un <c>jya</c> anticipado cuando se consume el último punto.
+        /// </summary>
+        public int AbsorberEscudo(int dano, int ronda)
+        {
+            if (dano <= 0) return 0;
+
+            int falta = dano;
+            int absorbido = 0;
+            foreach (var e in _puestos)
+            {
+                if (falta == 0) break;
+                if (e.EffectId != EscudoPorNivel || e.Cuanto <= 0 || !e.Vivo(ronda)) continue;
+
+                int deEste = Math.Min(falta, e.Cuanto);
+                e.Cuanto -= deEste;
+                falta -= deEste;
+                absorbido += deEste;
+            }
+            return absorbido;
         }
 
         /// <summary>

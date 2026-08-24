@@ -122,6 +122,12 @@ namespace Jondo.Unity.Launcher
         public bool IsWardrobeDraftLoaded { get; set; }
         public long OpenNpcShopId { get; set; }
         public int OpenNpcShopNpcId { get; set; }
+        /// <summary>
+        /// Contextual id of the NPC conversation currently shown to this client.  A dialog close
+        /// is a different protocol branch from a shop or a zaap close and must receive the NPC
+        /// kld reason.
+        /// </summary>
+        public long OpenNpcDialogId { get; set; }
 
         // Per-character manager caches. These must never be static: loading the second account
         // would otherwise replace the first account's equipment, appearance and spell bar.

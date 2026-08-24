@@ -41,3 +41,26 @@ A `Verified` `monster-mechanic-map` can currently configure only the generic AI'
 `spellPriorities` and `fleeBelowHpPercent`; those values are loaded at runtime. New effects,
 invulnerability, wave, summon, positional or state rules require a measured generic engine rule
 before they may be enabled.
+
+## Incarnam coverage
+
+`incarnam/content-coverage.json` is the generated area-45 contract. It lists every client map,
+monster, spell/effect set, dungeon room, relevant quest definition and quest-start NPC template.
+It also lists runtime gaps. `Verified` on this file means the inventory and the gap declarations
+were checked against the pinned client; it does **not** mean NPC placement, quest state, glyphs,
+invisibility, or special dungeon rules have been invented or silently enabled.
+
+Two reviewed server-owned binding documents complement that client inventory:
+
+- `incarnam/workshops.json` contains 30 workshop placements from Giny.NETCore. Every row is
+  accepted only when its map, element, cell and graphic match the exact 3.6.10.10 extraction and
+  its skill/recipe count matches the pinned profession catalogues. One stale source row is kept in
+  the rejection log instead of being loaded.
+- `incarnam/npc-spawns.json` contains the five current Incarnam placements found in that public
+  server dataset. Historical Symbioz 2.38 placements are intentionally not imported: several
+  conflict with the current source's NPC or cell on the same map.
+
+The 30 stations are registered at runtime and open the native craft interface through the exact
+3.6.10.10 `kgq` client path. Static recipes are resolvable, but executing a recipe remains disabled
+until the current ingredient/change/result request aliases are proven. The five NPC bindings add
+authoritative placement only; dialogue branches and quest mutations are separate server mechanics.

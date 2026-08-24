@@ -99,7 +99,7 @@ namespace Jondo.Unity.Launcher.Managers
             _byGfx.Clear();
             _byMap.Clear();
 
-            string path = Paths.Resolve("zaapis_3.6.10.10.json");
+            string path = Paths.ServerData("zaapis_3.6.10.10.json");
             if (!File.Exists(path))
             {
                 Console.WriteLine($"[Zaapis] Falta {Path.GetFileName(path)}; sin el no hay zaapis. " +
