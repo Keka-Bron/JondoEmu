@@ -225,7 +225,7 @@ namespace Jondo.Unity.Launcher.Managers
             // NPC, así que no se pisa nada, pero la regla vale para el día que sí.
             var nuestros = new HashSet<long>(_byMap.Keys);
 
-            int puestos = 0, saltados = 0;
+            int puestos = 0, saltados = 0, absorbidos = 0;
             try
             {
                 using var doc = JsonDocument.Parse(File.ReadAllText(path));
@@ -235,6 +235,16 @@ namespace Jondo.Unity.Launcher.Managers
                 {
                     long mapId = entrada.GetProperty("mapa").GetInt64();
                     if (nuestros.Contains(mapId)) { saltados++; continue; }
+
+                    // Un vendedor absorbido tampoco se siembra AQUI, no solo en NpcSpawns.
+                    //
+                    // Los mapas de vendedores del servidor de torneos de Ankama estan en las
+                    // capturas -de ahi salio el catalogo- asi que los 29 absorbidos volvian a
+                    // aparecer por esta puerta. Y con la tienda vacia, porque su catalogo se lo
+                    // quedo el que los absorbio: al abrirlos el servidor dice «tiene accion de
+                    // tienda pero no vende nada» y al jugador no le sale nada.
+                    int quien = entrada.GetProperty("npc").GetInt32();
+                    if (Vendors.IsAbsorbed(quien)) { absorbidos++; continue; }
 
                     if (!_byMap.TryGetValue(mapId, out var aqui))
                     {
@@ -247,7 +257,7 @@ namespace Jondo.Unity.Launcher.Managers
                     aqui.Add(new Spawn
                     {
                         MapId = mapId,
-                        NpcId = entrada.GetProperty("npc").GetInt32(),
+                        NpcId = quien,
                         Cell = entrada.GetProperty("casilla").GetInt32(),
                         Orientation = entrada.TryGetProperty("orientacion", out var o) ? o.GetInt32() : 1,
                         ContextualId = ActorIds.NpcDelMapa(aqui.Count),
@@ -257,7 +267,8 @@ namespace Jondo.Unity.Launcher.Managers
 
                 Count += puestos;
                 Console.WriteLine($"[NPCs] {puestos} del mundo, donde los tenía Ankama" +
-                                  (saltados > 0 ? $", y {saltados} saltados por estar en un mapa nuestro" : "") + ".");
+                                  (saltados > 0 ? $", {saltados} en un mapa nuestro" : "") +
+                                  (absorbidos > 0 ? $", {absorbidos} absorbidos por otro vendedor" : "") + ".");
             }
             catch (Exception ex)
             {
