@@ -1,0 +1,36 @@
+{
+  "_comentario": [
+    "Vendedores de Jondo: juntar los que Ankama parte por tramos de nivel en uno solo por",
+    "categoria, y ponerles un nombre limpio.",
+    "",
+    "El catalogo de torneos de Ankama trae «Sombreros 1 - 49», «Sombreros 50 - 99»... cinco",
+    "vendedores para lo mismo, todos en fila en el mapa 88212759, el del zaap del pueblo de",
+    "Amakna. Aqui se dice cual se queda, que otros se le echan encima y como se llama.",
+    "",
+    "   clave      el vendedor que SE QUEDA. Conserva su casilla y su tienda.",
+    "   'nombre'   como se llamara en la pantalla del jugador. Lo aplica JondoFix.",
+    "   'nameId'   su clave de texto, la que JondoFix sustituye. Sale de NpcTemplates.NameId.",
+    "   'absorbe'  los que desaparecen. Su catalogo pasa al que se queda y dejan de sembrarse.",
+    "",
+    "EL LIMITE: el kbd que manda el catalogo NO esta paginado. El mayor que Ankama manda en las",
+    "305 capturas son 444 entradas y 26.902 bytes, y sabemos que 444 funciona porque el vendedor",
+    "de sombreros de apariencia tiene justo esos. Por eso las armas van en DOS: juntas serian 683",
+    "objetos, un 54 % mas que nada medido. Partidas quedan en 355 y 333, las dos por debajo.",
+    "",
+    "Este fichero lo lee el servidor Y el mod del cliente, para que el nombre y el catalogo no se",
+    "puedan descuadrar. Si no esta, no se junta nada y todo queda como lo dejo Ankama."
+  ],
+
+  "vendedores": {
+    "5548": { "nombre": "Sombreros",  "nameId": 835835,  "absorbe": [5541, 5534, 5527, 5516] },
+    "5546": { "nombre": "Capas",      "nameId": 835833,  "absorbe": [5539, 5532, 5525, 5514] },
+    "5545": { "nombre": "Botas",      "nameId": 835832,  "absorbe": [5538, 5531, 5524, 5513] },
+    "5547": { "nombre": "Cinturones", "nameId": 835834,  "absorbe": [5540, 5533, 5526, 5515] },
+    "5543": { "nombre": "Amuletos",   "nameId": 835830,  "absorbe": [5536, 5529, 5522, 5511] },
+    "5544": { "nombre": "Anillos",    "nameId": 1085882, "absorbe": [5537, 5530, 5523, 5512] },
+    "5520": { "nombre": "Trofeos",    "nameId": 835802,  "absorbe": [5519, 5518] },
+
+    "5542": { "nombre": "Armas 1 - 99",   "nameId": 835829, "absorbe": [5535] },
+    "5528": { "nombre": "Armas 100 - 200", "nameId": 835810, "absorbe": [5521, 5510] }
+  }
+}

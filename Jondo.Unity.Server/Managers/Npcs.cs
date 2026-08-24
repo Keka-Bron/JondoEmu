@@ -104,6 +104,11 @@ namespace Jondo.Unity.Launcher.Managers
             {
                 while (reader.Read())
                 {
+                    // Los vendedores que otro ha absorbido no se ponen en el mapa: su catálogo ya
+                    // está en el que se queda, y dejarlos ahí sería el mismo escaparate dos veces
+                    // en dos casillas contiguas.
+                    if (Vendors.IsAbsorbed(reader.GetInt32(1))) continue;
+
                     long mapId = reader.GetInt64(0);
                     if (!_byMap.TryGetValue(mapId, out var here))
                     {

@@ -151,6 +151,12 @@ namespace Jondo.Unity.Launcher
         /// una tienda de fichas y a cuánto es contenido de Jondo y no sale de ninguna captura.
         /// </summary>
         public static string TokenShopsJson => Resolve("tiendas_en_fichas.json");
+
+        /// <summary>
+        /// Qué vendedores junta Jondo en uno solo y cómo se llaman. También a mano, y lo lee
+        /// además el mod del cliente para que el nombre y el catálogo no se descuadren.
+        /// </summary>
+        public static string JondoVendorsJson => Resolve("vendedores_jondo.json");
         // Las parejas de hechizo base/variante, una por cada hueco de la barra. Del volcado del
         // cliente; el personaje lleva uno de cada pareja, no los dos.
         public static string SpellVariantsJson

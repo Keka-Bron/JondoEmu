@@ -222,3 +222,56 @@ class), not appearance gear. Adding it is one block in the same file.
   feature existed, and never emits field 3. If someone turns the `VarIfNotZero` into a `Var`, all 51
   normal shops would start sending `f3 = 0`; the client would read "the currency is item 0" and the
   result is not an error but a shop where nothing can be bought.
+
+## Consolidated vendors
+
+Ankama's tournament catalogue splits every category by level band — "Sombreros 1 - 49", "Sombreros
+50 - 99", and so on — five NPCs selling the same thing, standing in a row on the Amakna zaap map.
+Eight categories were like that, 38 NPCs in total.
+
+`datos/vendedores_jondo.json` says which one survives, which ones fold into it, and what it is
+called. **51 shop vendors become 22, and 53 spawned NPCs become 24.** No item is lost: 5,508
+distinct items before and after.
+
+```json
+"5548": { "nombre": "Sombreros", "nameId": 835835, "absorbe": [5541, 5534, 5527, 5516] }
+```
+
+The same file is read by the server (to merge the catalogues and to stop spawning the absorbed
+NPCs) and by `JondoFix` (to rename the survivor). One source of truth, so the name a player reads
+and the catalogue they get cannot disagree.
+
+### The 444 limit
+
+The `kbd` that carries a catalogue is **not paginated**, and there is no case anywhere in the
+captures of two `kbd` for one shop — so there is no evidence the client can join them. The largest
+Ankama ever sends is **444 entries / 26,902 bytes**, and 444 is known to work because the appearance
+hat vendor has exactly that many.
+
+Seven of the eight categories fit comfortably:
+
+| vendor | items |
+|---|---:|
+| Anillos | 371 |
+| Botas | 367 |
+| Sombreros | 365 |
+| Cinturones | 356 |
+| Amuletos | 325 |
+| Capas | 301 |
+| Trofeos | 286 |
+
+Weapons do not: merged they would be **683**, 54 % past anything measured. They are split into
+**Armas 1 - 99** (353) and **Armas 100 - 200** (333), both under the limit.
+
+`NpcShops.JuntarVendedores` logs a warning if any merged catalogue crosses 444, so a future edit to
+the JSON that pushes a vendor over the line says so at startup instead of failing silently in the
+client.
+
+### Renaming an NPC
+
+The NPC's name comes from `NpcTemplates.NameId` resolved through the client's own text table, the
+same mechanism as an item's name. Two patches cover it: the `LocalizationAccessor` one that already
+existed for the coin, and a defensive `NpcData.get_name` postfix wired by reflection — `ItemData`
+memoises its name and never asks the accessor twice, and `NpcData` is a class of the same shape, so
+it plausibly does too. If `NpcData` cannot be found, the mod logs it and carries on with the
+accessor alone.

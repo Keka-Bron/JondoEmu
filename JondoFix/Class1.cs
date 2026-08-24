@@ -85,8 +85,22 @@ namespace JondoFix
             },
         };
 
-        /// <summary>El nombre nuevo por clave de texto, para el parche de reserva.</summary>
+        /// <summary>
+        /// El nombre nuevo por clave de texto.
+        ///
+        /// Empieza con los objetos de la tabla de arriba y luego se le anaden los VENDEDORES, que
+        /// se leen de datos/vendedores_jondo.json —el mismo fichero que usa el servidor para
+        /// juntarlos—. Asi el nombre que ve el jugador y el catalogo que le llega salen del mismo
+        /// sitio y no pueden decir cosas distintas.
+        /// </summary>
         public static readonly Dictionary<int, string> NameByTextKey = BuildNameKeys();
+
+        /// <summary>Anade un nombre por clave de texto. Lo usa la carga de los vendedores.</summary>
+        public static void AddName(int textKey, string name)
+        {
+            if (textKey == 0 || string.IsNullOrEmpty(name)) return;
+            NameByTextKey[textKey] = name;
+        }
 
         /// <summary>Y que objeto es cada clave de descripcion, para poder elegir el idioma.</summary>
         public static readonly Dictionary<int, Rename> ByDescriptionKey = BuildDescriptionKeys();
@@ -363,9 +377,53 @@ namespace JondoFix
             MelonLogger.Msg($"[JondoFix] Loaded {added} item mappings; exposed {madeSaleable} hidden items.");
         }
 
+        /// <summary>
+        /// Los nombres de los vendedores que Jondo junta, del mismo fichero que lee el servidor.
+        ///
+        /// El catalogo de Ankama parte cada categoria por tramos de nivel —«Sombreros 1 - 49»,
+        /// «Sombreros 50 - 99»...— y el servidor los junta en uno solo. Si el nombre no se cambia,
+        /// el jugador ve un NPC llamado «Sombreros 1 - 49» que le vende sombreros de nivel 200.
+        ///
+        /// Se lee del fichero y no se escribe aqui a proposito: si alguien cambia a quien absorbe
+        /// quien, el nombre le sigue sin tocar el mod.
+        /// </summary>
+        private void LoadVendorNames()
+        {
+            try
+            {
+                string path = DataFile(@"datos\vendedores_jondo.json");
+                if (!File.Exists(path))
+                {
+                    LoggerInstance.Msg($"[JondoFix] No hay {Path.GetFileName(path)}; los vendedores " +
+                                       "conservan el nombre de Ankama.");
+                    return;
+                }
+
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("vendedores", out var vendedores)) return;
+
+                int puestos = 0;
+                foreach (var entrada in vendedores.EnumerateObject())
+                {
+                    if (!entrada.Value.TryGetProperty("nameId", out var nameId)) continue;
+                    if (!entrada.Value.TryGetProperty("nombre", out var nombre)) continue;
+                    JondoRenames.AddName(nameId.GetInt32(), nombre.GetString());
+                    puestos++;
+                }
+
+                LoggerInstance.Msg($"[JondoFix] {puestos} vendedor(es) renombrados.");
+            }
+            catch (Exception ex)
+            {
+                LoggerInstance.Warning($"[JondoFix] No se pudieron leer los nombres de los " +
+                                       $"vendedores: {ex.Message}");
+            }
+        }
+
         public override void OnInitializeMelon()
         {
             LoadItemNames();
+            LoadVendorNames();
             UseLocalRedirect = IsEmulatorActive();
             IsJondoAdministrator = UseLocalRedirect &&
                 int.TryParse(Environment.GetEnvironmentVariable("JONDO_ACCOUNT_ROLE"), out int role) &&
@@ -519,12 +577,60 @@ namespace JondoFix
             }
         }
 
+        /// <summary>
+        /// El nombre de un NPC, por si no pasa por el accessor de textos.
+        ///
+        /// Con los objetos ya sabemos que no basta con el accessor: ItemData memoriza el nombre en
+        /// MemoizedValues y no vuelve a preguntar. NpcData es una clase del mismo corte, asi que
+        /// es razonable que haga lo mismo, pero no esta comprobado. Esto lo tapa por si acaso.
+        ///
+        /// Va por reflexion, como el parche de CartographyManager de mas abajo: no se sabe en que
+        /// espacio de nombres vive NpcData, y un typeof() que no resuelva no compila. Si no se
+        /// encuentra, se avisa y se sigue con el accessor, que probablemente ya sea suficiente.
+        /// </summary>
+        private void PatchNpcName()
+        {
+            try
+            {
+                Type npcData = System.AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } })
+                    .FirstOrDefault(t => t.Name == "NpcData");
+
+                if (npcData == null)
+                {
+                    LoggerInstance.Msg("[JondoFix] No se ha encontrado NpcData; los nombres de los " +
+                                       "vendedores van solo por el accessor de textos.");
+                    return;
+                }
+
+                var getter = npcData.GetMethod("get_name",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (getter == null)
+                {
+                    LoggerInstance.Msg("[JondoFix] NpcData no tiene get_name; los nombres van solo " +
+                                       "por el accessor de textos.");
+                    return;
+                }
+
+                var postfix = new HarmonyMethod(typeof(JondoNpcNamePatch)
+                    .GetMethod("Postfix", System.Reflection.BindingFlags.Public
+                                        | System.Reflection.BindingFlags.Static));
+                new HarmonyLib.Harmony("com.jondo.fix.npcname").Patch(getter, postfix: postfix);
+                LoggerInstance.Msg("[JondoFix] NpcData.get_name parcheado.");
+            }
+            catch (Exception ex)
+            {
+                LoggerInstance.Warning($"[JondoFix] No se pudo parchear el nombre de los NPC: {ex.Message}");
+            }
+        }
+
         public override void OnLateInitializeMelon()
         {
             if (!UseLocalRedirect) return;
 
             LoggerInstance.Msg("[JondoFix] Late initialization starting...");
             PatchUnDiacriticalName();
+            PatchNpcName();
             try
             {
                 var harmony = new HarmonyLib.Harmony("com.jondo.fix.late");
@@ -1321,6 +1427,41 @@ namespace JondoFix
             catch (Exception ex)
             {
                 MelonLogger.Error($"[JondoFix] Error in ItemData.name Postfix: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// El nombre de un NPC. Se engancha a mano desde JondoFixMod.PatchNpcName; ver alli por que.
+    ///
+    /// Busca por el nameId del NPC y no por su id, porque es la misma tabla de claves de texto que
+    /// usa todo lo demas y asi no hace falta una segunda.
+    /// </summary>
+    public static class JondoNpcNamePatch
+    {
+        public static void Postfix(object __instance, ref string __result)
+        {
+            try
+            {
+                if (__instance == null) return;
+
+                var campo = __instance.GetType().GetProperty("nameId")
+                         ?? __instance.GetType().GetProperty("nameld");
+                if (campo == null) return;
+
+                object valor = campo.GetValue(__instance);
+                if (valor == null) return;
+
+                int clave = Convert.ToInt32(valor);
+                if (JondoRenames.NameByTextKey.TryGetValue(clave, out string nombre) &&
+                    !string.IsNullOrEmpty(nombre))
+                {
+                    __result = nombre;
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[JondoFix] Error in NpcData.name Postfix: {ex.Message}");
             }
         }
     }

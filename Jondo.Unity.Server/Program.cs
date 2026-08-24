@@ -90,6 +90,9 @@ namespace Jondo.Unity.Launcher
             Managers.Challenges.OnlyOffer(Handlers.ChallengeWatcher.Watched);
             Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
+            // Vendors va PRIMERO: Npcs necesita saber ya a quien no debe sembrar, y NpcShops a
+            // quien le echa encima el catalogo de quien.
+            Managers.Vendors.Initialize();
             Managers.Npcs.Initialize();
             Managers.NpcShops.Initialize();
             Managers.TokenShops.Initialize();
