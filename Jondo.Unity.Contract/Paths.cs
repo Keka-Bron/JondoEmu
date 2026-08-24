@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 
 namespace Jondo.Unity.Launcher
@@ -168,6 +168,13 @@ namespace Jondo.Unity.Launcher
         /// además el mod del cliente para que el nombre y el catálogo no se descuadren.
         /// </summary>
         public static string JondoVendorsJson => Resolve("vendedores_jondo.json");
+
+
+        /// <summary>
+        /// Dónde está cada NPC del mundo, sacado de las capturas del servidor de Ankama: 422 en
+        /// 202 mapas. Lo genera tools/extraer_npcs_reales.py.
+        /// </summary>
+        public static string WorldNpcsJson => Resolve("npcs_reales.json");
         // Las parejas de hechizo base/variante, una por cada hueco de la barra. Del volcado del
         // cliente; el personaje lleva uno de cada pareja, no los dos.
         public static string SpellVariantsJson

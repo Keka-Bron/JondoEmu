@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
@@ -144,6 +145,11 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             // Sólo las plantillas que hacen falta: son 6.468 en la base y aquí se usan unas pocas.
+            // Los del mundo se siembran AQUÍ, antes de recoger las plantillas: si fueran después
+            // se quedarían sin aspecto, porque lo que se lee de NpcTemplates es sólo lo que hace
+            // falta para los que ya están puestos.
+            SembrarLosDelMundo();
+
             var wanted = new HashSet<int>();
             foreach (var here in _byMap.Values)
             {
@@ -185,6 +191,80 @@ namespace Jondo.Unity.Launcher.Managers
         }
 
         /// <summary>Los mapas que tienen algún NPC puesto.</summary>
+        /// <summary>
+        /// Los NPCs del mundo, con la casilla y la orientación que tenían en el servidor de Ankama.
+        ///
+        /// No están colocados a ojo. Cada vez que el jugador entraba en un mapa, el servidor real
+        /// le declaraba en el jss los NPCs que había; barriendo las 305 capturas salen 422 en 202
+        /// mapas, de 327 plantillas distintas, y esto es ese barrido tal cual.
+        ///
+        /// El aspecto no viene en el fichero porque sale de la plantilla —las 327 tienen Look— y
+        /// el diálogo tampoco: 246 de las 327 traen uno escrito en NpcTemplates y el manejador de
+        /// NPCs ya lo sabe leer. Las otras 81 se quedan calladas.
+        ///
+        /// NO se comprueba que la casilla sea andable, y es a propósito: un NPC puede estar de pie
+        /// sobre una casilla que el jugador no pisa, y de hecho sólo 151 de las 422 lo son. Lo que
+        /// manda es la captura.
+        ///
+        /// Si un mapa ya tenía NPCs sembrados de NpcSpawns —el del zaap de Amakna, con nuestros
+        /// vendedores— se deja como está y no se le añade nada. En las capturas ese mapa no tiene
+        /// ni un NPC, así que hoy no se pisa nada, pero la regla vale para el día que sí.
+        /// </summary>
+        private static void SembrarLosDelMundo()
+        {
+            string path = Paths.WorldNpcsJson;
+            if (!File.Exists(path))
+            {
+                Console.WriteLine($"[NPCs] No hay {Path.GetFileName(path)}: el mundo se queda sin " +
+                                  "los NPCs de las capturas.");
+                return;
+            }
+
+            // Los mapas que YA tienen NPCs puestos por nosotros se quedan como están. Hoy es sólo
+            // el del zaap de Amakna, con los vendedores; en las capturas ese mapa no tiene ni un
+            // NPC, así que no se pisa nada, pero la regla vale para el día que sí.
+            var nuestros = new HashSet<long>(_byMap.Keys);
+
+            int puestos = 0, saltados = 0;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("npcs", out var lista)) return;
+
+                foreach (var entrada in lista.EnumerateArray())
+                {
+                    long mapId = entrada.GetProperty("mapa").GetInt64();
+                    if (nuestros.Contains(mapId)) { saltados++; continue; }
+
+                    if (!_byMap.TryGetValue(mapId, out var aqui))
+                    {
+                        aqui = new List<Spawn>();
+                        _byMap[mapId] = aqui;
+                    }
+
+                    // Sin aspecto: se lo pone el paso de más abajo, el que hereda el Look de la
+                    // plantilla. Por eso esto tiene que correr antes de cargar las plantillas.
+                    aqui.Add(new Spawn
+                    {
+                        MapId = mapId,
+                        NpcId = entrada.GetProperty("npc").GetInt32(),
+                        Cell = entrada.GetProperty("casilla").GetInt32(),
+                        Orientation = entrada.TryGetProperty("orientacion", out var o) ? o.GetInt32() : 1,
+                        ContextualId = ActorIds.NpcDelMapa(aqui.Count),
+                    });
+                    puestos++;
+                }
+
+                Count += puestos;
+                Console.WriteLine($"[NPCs] {puestos} del mundo, donde los tenía Ankama" +
+                                  (saltados > 0 ? $", y {saltados} saltados por estar en un mapa nuestro" : "") + ".");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NPCs] No se pudo leer {Path.GetFileName(path)}: {ex.Message}");
+            }
+        }
+
         public static IEnumerable<long> Maps => _byMap.Keys;
 
         public static IReadOnlyList<Spawn> Of(long mapId)

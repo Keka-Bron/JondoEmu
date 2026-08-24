@@ -1,0 +1,2979 @@
+{
+ "_comentario": [
+  "Donde esta cada NPC del mundo, sacado de las capturas del servidor de Ankama.",
+  "",
+  "NO esta inventado ni colocado a ojo: cada vez que el jugador entraba en un mapa, el servidor",
+  "real le declaraba en el jss los NPCs que habia con su casilla y su orientacion. Barriendo las",
+  "305 capturas salen 422 NPCs en 202 mapas, de 327 plantillas distintas. Esto es ese barrido.",
+  "",
+  "El mapa 88212759 -el del zaap del pueblo de Amakna, donde estan nuestros vendedores- NO",
+  "aparece aqui: en las capturas no hay ni un NPC en el, asi que no hay nada que respetar y los",
+  "vendedores se quedan como los coloca datos/vendedores_jondo.json.",
+  "",
+  "El ASPECTO no va en este fichero: sale de NpcTemplates.Look, que las 327 plantillas tienen.",
+  "Y el DIALOGO tampoco: sale de NpcTemplates.Data, y 246 de las 327 traen uno escrito. Las 81",
+  "que no, se quedaran calladas.",
+  "",
+  "La casilla es la que tenia en el juego real, tal cual. No se comprueba que sea 'andable'",
+  "porque no tiene por que serlo: un NPC puede estar de pie sobre una casilla que el jugador no",
+  "pisa, y de hecho solo 151 de las 422 lo son. La captura manda.",
+  "",
+  "Lo genera tools/extraer_npcs_reales.py."
+ ],
+ "npcs": [
+  {
+   "mapa": 139784,
+   "npc": 754,
+   "casilla": 81,
+   "orientacion": 1,
+   "_quien": "Guardián koalak"
+  },
+  {
+   "mapa": 153621,
+   "npc": 925,
+   "casilla": 204,
+   "orientacion": 1,
+   "_quien": "Capitán Guarrok"
+  },
+  {
+   "mapa": 154131,
+   "npc": 1580,
+   "casilla": 275,
+   "orientacion": 3,
+   "_quien": "Dana Nular"
+  },
+  {
+   "mapa": 155667,
+   "npc": 926,
+   "casilla": 174,
+   "orientacion": 3,
+   "_quien": "Profesor Fornasol"
+  },
+  {
+   "mapa": 156692,
+   "npc": 931,
+   "casilla": 374,
+   "orientacion": 1,
+   "_quien": "Paulina Panela"
+  },
+  {
+   "mapa": 20974080,
+   "npc": 937,
+   "casilla": 345,
+   "orientacion": 1,
+   "_quien": "Cocodrail Dandi"
+  },
+  {
+   "mapa": 28049408,
+   "npc": 6693,
+   "casilla": 184,
+   "orientacion": 1,
+   "_quien": "Asistente de Otomai"
+  },
+  {
+   "mapa": 28049920,
+   "npc": 383,
+   "casilla": 262,
+   "orientacion": 1,
+   "_quien": "Girle Pylot"
+  },
+  {
+   "mapa": 54159661,
+   "npc": 7032,
+   "casilla": 187,
+   "orientacion": 1,
+   "_quien": "Gobola"
+  },
+  {
+   "mapa": 54159661,
+   "npc": 1363,
+   "casilla": 204,
+   "orientacion": 3,
+   "_quien": "Hywan Kenoby"
+  },
+  {
+   "mapa": 54160169,
+   "npc": 2050,
+   "casilla": 164,
+   "orientacion": 3,
+   "_quien": "Goblinlingüe"
+  },
+  {
+   "mapa": 54161193,
+   "npc": 1286,
+   "casilla": 316,
+   "orientacion": 1,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 54161738,
+   "npc": 1286,
+   "casilla": 467,
+   "orientacion": 3,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 54162757,
+   "npc": 1286,
+   "casilla": 145,
+   "orientacion": 1,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 54165306,
+   "npc": 1280,
+   "casilla": 370,
+   "orientacion": 3,
+   "_quien": "Agnès Pahp"
+  },
+  {
+   "mapa": 54165320,
+   "npc": 1286,
+   "casilla": 273,
+   "orientacion": 3,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 54166838,
+   "npc": 1274,
+   "casilla": 465,
+   "orientacion": 1,
+   "_quien": "Ordenalfabetist"
+  },
+  {
+   "mapa": 54167350,
+   "npc": 1282,
+   "casilla": 330,
+   "orientacion": 1,
+   "_quien": "Damar"
+  },
+  {
+   "mapa": 54167842,
+   "npc": 1286,
+   "casilla": 413,
+   "orientacion": 3,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 54168371,
+   "npc": 1305,
+   "casilla": 72,
+   "orientacion": 1,
+   "_quien": "Pescador del lago"
+  },
+  {
+   "mapa": 54168407,
+   "npc": 1286,
+   "casilla": 289,
+   "orientacion": 1,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 54171950,
+   "npc": 1376,
+   "casilla": 327,
+   "orientacion": 3,
+   "_quien": "Ramiro Quay"
+  },
+  {
+   "mapa": 54171950,
+   "npc": 1262,
+   "casilla": 382,
+   "orientacion": 1,
+   "_quien": "Casper Kolador"
+  },
+  {
+   "mapa": 54171950,
+   "npc": 1375,
+   "casilla": 511,
+   "orientacion": 3,
+   "_quien": "Nicoleta Killman"
+  },
+  {
+   "mapa": 54171983,
+   "npc": 1333,
+   "casilla": 104,
+   "orientacion": 3,
+   "_quien": "Rofu"
+  },
+  {
+   "mapa": 54171983,
+   "npc": 1331,
+   "casilla": 116,
+   "orientacion": 1,
+   "_quien": "Nicolasito"
+  },
+  {
+   "mapa": 54171983,
+   "npc": 1332,
+   "casilla": 143,
+   "orientacion": 1,
+   "_quien": "Elcastas"
+  },
+  {
+   "mapa": 54171983,
+   "npc": 1334,
+   "casilla": 149,
+   "orientacion": 3,
+   "_quien": "Clatorio"
+  },
+  {
+   "mapa": 54171983,
+   "npc": 1336,
+   "casilla": 161,
+   "orientacion": 1,
+   "_quien": "Joe Akim"
+  },
+  {
+   "mapa": 54171983,
+   "npc": 1335,
+   "casilla": 212,
+   "orientacion": 1,
+   "_quien": "Godofrío"
+  },
+  {
+   "mapa": 54173010,
+   "npc": 1286,
+   "casilla": 328,
+   "orientacion": 1,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 54174027,
+   "npc": 1385,
+   "casilla": 326,
+   "orientacion": 3,
+   "_quien": "Gélijestad"
+  },
+  {
+   "mapa": 54174503,
+   "npc": 1259,
+   "casilla": 203,
+   "orientacion": 1,
+   "_quien": "Ricardo Loor"
+  },
+  {
+   "mapa": 54174539,
+   "npc": 5043,
+   "casilla": 87,
+   "orientacion": 1,
+   "_quien": "Gélifux"
+  },
+  {
+   "mapa": 56890883,
+   "npc": 1358,
+   "casilla": 327,
+   "orientacion": 1,
+   "_quien": "Lava Azza"
+  },
+  {
+   "mapa": 60035079,
+   "npc": 1286,
+   "casilla": 481,
+   "orientacion": 1,
+   "_quien": "Agente de la compañía de Helías P."
+  },
+  {
+   "mapa": 63700992,
+   "npc": 2150,
+   "casilla": 372,
+   "orientacion": 3,
+   "_quien": "Conductow de pewfowadowa"
+  },
+  {
+   "mapa": 68421128,
+   "npc": 97,
+   "casilla": 367,
+   "orientacion": 1,
+   "_quien": "Karim Pochypich"
+  },
+  {
+   "mapa": 68423176,
+   "npc": 6587,
+   "casilla": 257,
+   "orientacion": 1,
+   "_quien": "Almirante Traflagar"
+  },
+  {
+   "mapa": 68552706,
+   "npc": 6363,
+   "casilla": 75,
+   "orientacion": 1,
+   "_quien": "Bolsillito encantado"
+  },
+  {
+   "mapa": 68552706,
+   "npc": 2759,
+   "casilla": 206,
+   "orientacion": 3,
+   "_quien": "Hervé Terano"
+  },
+  {
+   "mapa": 68552706,
+   "npc": 7590,
+   "casilla": 278,
+   "orientacion": 3,
+   "_quien": "Mago Resarci"
+  },
+  {
+   "mapa": 68552706,
+   "npc": 4564,
+   "casilla": 324,
+   "orientacion": 1,
+   "_quien": "Oto Mátic"
+  },
+  {
+   "mapa": 68552706,
+   "npc": 4565,
+   "casilla": 366,
+   "orientacion": 3,
+   "_quien": "Borrikita"
+  },
+  {
+   "mapa": 68552706,
+   "npc": 4565,
+   "casilla": 380,
+   "orientacion": 3,
+   "_quien": "Borrikita"
+  },
+  {
+   "mapa": 68552706,
+   "npc": 6826,
+   "casilla": 415,
+   "orientacion": 3,
+   "_quien": "Jonathan Poris"
+  },
+  {
+   "mapa": 73400320,
+   "npc": 771,
+   "casilla": 471,
+   "orientacion": 3,
+   "_quien": "Klako"
+  },
+  {
+   "mapa": 73400321,
+   "npc": 1579,
+   "casilla": 437,
+   "orientacion": 1,
+   "_quien": "Yoko Razón del Medio"
+  },
+  {
+   "mapa": 73531906,
+   "npc": 7931,
+   "casilla": 318,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décor - Dragodinde prune"
+  },
+  {
+   "mapa": 73531906,
+   "npc": 7927,
+   "casilla": 342,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décor - Dragodinde indigo"
+  },
+  {
+   "mapa": 73531906,
+   "npc": 7930,
+   "casilla": 417,
+   "orientacion": 7,
+   "_quien": "[!] PNJ décor - Dragodinde pourpre"
+  },
+  {
+   "mapa": 73532418,
+   "npc": 7921,
+   "casilla": 172,
+   "orientacion": 1,
+   "_quien": "Ganadero bontariano"
+  },
+  {
+   "mapa": 73532418,
+   "npc": 7928,
+   "casilla": 300,
+   "orientacion": 7,
+   "_quien": "[!] PNJ décor - Dragodinde ivoire"
+  },
+  {
+   "mapa": 73532418,
+   "npc": 7933,
+   "casilla": 383,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décor - Dragodinde turquoi"
+  },
+  {
+   "mapa": 73532419,
+   "npc": 7930,
+   "casilla": 245,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décor - Dragodinde pourpre"
+  },
+  {
+   "mapa": 73532419,
+   "npc": 7925,
+   "casilla": 328,
+   "orientacion": 7,
+   "_quien": "[!] PNJ décor - Dragodinde ébène"
+  },
+  {
+   "mapa": 73532419,
+   "npc": 7922,
+   "casilla": 443,
+   "orientacion": 3,
+   "_quien": "Ganadera brakmariana"
+  },
+  {
+   "mapa": 76283914,
+   "npc": 1475,
+   "casilla": 351,
+   "orientacion": 1,
+   "_quien": "ATMET Garzo Ranye"
+  },
+  {
+   "mapa": 76286472,
+   "npc": 1463,
+   "casilla": 398,
+   "orientacion": 1,
+   "_quien": "M.O. Excava D'or"
+  },
+  {
+   "mapa": 76286474,
+   "npc": 1453,
+   "casilla": 311,
+   "orientacion": 1,
+   "_quien": "Matt Hemático"
+  },
+  {
+   "mapa": 76286986,
+   "npc": 8014,
+   "casilla": 343,
+   "orientacion": 3,
+   "_quien": "Edgar Keólogo"
+  },
+  {
+   "mapa": 76286986,
+   "npc": 1460,
+   "casilla": 487,
+   "orientacion": 3,
+   "_quien": "Tomás Kuuk"
+  },
+  {
+   "mapa": 76286986,
+   "npc": 1460,
+   "casilla": 500,
+   "orientacion": 3,
+   "_quien": "Tomás Kuuk"
+  },
+  {
+   "mapa": 76287498,
+   "npc": 2443,
+   "casilla": 244,
+   "orientacion": 1,
+   "_quien": "Ayudante del doctor Boing Boing"
+  },
+  {
+   "mapa": 76287498,
+   "npc": 1455,
+   "casilla": 338,
+   "orientacion": 1,
+   "_quien": "Betty Boom"
+  },
+  {
+   "mapa": 76287498,
+   "npc": 1452,
+   "casilla": 373,
+   "orientacion": 3,
+   "_quien": "Capitana Juana Buey"
+  },
+  {
+   "mapa": 76416012,
+   "npc": 1462,
+   "casilla": 411,
+   "orientacion": 1,
+   "_quien": "Ángel Del Corazón"
+  },
+  {
+   "mapa": 76416012,
+   "npc": 1475,
+   "casilla": 432,
+   "orientacion": 3,
+   "_quien": "ATMET Garzo Ranye"
+  },
+  {
+   "mapa": 76808704,
+   "npc": 1447,
+   "casilla": 261,
+   "orientacion": 3,
+   "_quien": "Otto Lidenbroca"
+  },
+  {
+   "mapa": 84412416,
+   "npc": 363,
+   "casilla": 259,
+   "orientacion": 1,
+   "_quien": "Caballero Fugard"
+  },
+  {
+   "mapa": 84935177,
+   "npc": 4563,
+   "casilla": 315,
+   "orientacion": 3,
+   "_quien": "Pandep"
+  },
+  {
+   "mapa": 88080385,
+   "npc": 132,
+   "casilla": 327,
+   "orientacion": 3,
+   "_quien": "Gregor Mendal"
+  },
+  {
+   "mapa": 88087297,
+   "npc": 3244,
+   "casilla": 259,
+   "orientacion": 3,
+   "_quien": "Sered"
+  },
+  {
+   "mapa": 88211969,
+   "npc": 3663,
+   "casilla": 159,
+   "orientacion": 1,
+   "_quien": "Ícar Orval"
+  },
+  {
+   "mapa": 88212247,
+   "npc": 7816,
+   "casilla": 316,
+   "orientacion": 1,
+   "_quien": "Guardián del kanojedo"
+  },
+  {
+   "mapa": 88212247,
+   "npc": 2167,
+   "casilla": 388,
+   "orientacion": 3,
+   "_quien": "Capitán Amakna"
+  },
+  {
+   "mapa": 88212247,
+   "npc": 2171,
+   "casilla": 403,
+   "orientacion": 3,
+   "_quien": "Buuky"
+  },
+  {
+   "mapa": 88604676,
+   "npc": 914,
+   "casilla": 275,
+   "orientacion": 3,
+   "_quien": "Otomai"
+  },
+  {
+   "mapa": 88604676,
+   "npc": 6670,
+   "casilla": 285,
+   "orientacion": 1,
+   "_quien": "Jykel"
+  },
+  {
+   "mapa": 90704898,
+   "npc": 1581,
+   "casilla": 201,
+   "orientacion": 1,
+   "_quien": "Miriam Heñique"
+  },
+  {
+   "mapa": 90705410,
+   "npc": 6530,
+   "casilla": 217,
+   "orientacion": 3,
+   "_quien": "Joselu Peroles"
+  },
+  {
+   "mapa": 95420420,
+   "npc": 925,
+   "casilla": 271,
+   "orientacion": 1,
+   "_quien": "Capitán Guarrok"
+  },
+  {
+   "mapa": 95422464,
+   "npc": 1604,
+   "casilla": 161,
+   "orientacion": 1,
+   "_quien": "Isa Hakperal"
+  },
+  {
+   "mapa": 95422468,
+   "npc": 1592,
+   "casilla": 329,
+   "orientacion": 1,
+   "_quien": "Oceana"
+  },
+  {
+   "mapa": 96470528,
+   "npc": 1593,
+   "casilla": 386,
+   "orientacion": 3,
+   "_quien": "Julio Never"
+  },
+  {
+   "mapa": 96470786,
+   "npc": 1595,
+   "casilla": 410,
+   "orientacion": 1,
+   "_quien": "Ada Babbage"
+  },
+  {
+   "mapa": 96471552,
+   "npc": 1594,
+   "casilla": 396,
+   "orientacion": 1,
+   "_quien": "Calado Peul"
+  },
+  {
+   "mapa": 99090957,
+   "npc": 7628,
+   "casilla": 173,
+   "orientacion": 7,
+   "_quien": "[!] Piou bleu"
+  },
+  {
+   "mapa": 99090957,
+   "npc": 7627,
+   "casilla": 176,
+   "orientacion": 1,
+   "_quien": "[!] Piou vert"
+  },
+  {
+   "mapa": 99090957,
+   "npc": 7628,
+   "casilla": 186,
+   "orientacion": 7,
+   "_quien": "[!] Piou bleu"
+  },
+  {
+   "mapa": 99090957,
+   "npc": 7416,
+   "casilla": 244,
+   "orientacion": 1,
+   "_quien": "Puch Ingball"
+  },
+  {
+   "mapa": 99090957,
+   "npc": 7629,
+   "casilla": 248,
+   "orientacion": 5,
+   "_quien": "[!] Piou jaune"
+  },
+  {
+   "mapa": 99090957,
+   "npc": 7629,
+   "casilla": 263,
+   "orientacion": 5,
+   "_quien": "[!] Piou jaune"
+  },
+  {
+   "mapa": 99090957,
+   "npc": 7629,
+   "casilla": 277,
+   "orientacion": 5,
+   "_quien": "[!] Piou jaune"
+  },
+  {
+   "mapa": 99092225,
+   "npc": 8014,
+   "casilla": 453,
+   "orientacion": 7,
+   "_quien": "Edgar Keólogo"
+  },
+  {
+   "mapa": 99093249,
+   "npc": 7877,
+   "casilla": 273,
+   "orientacion": 3,
+   "_quien": "Intendente de gremio"
+  },
+  {
+   "mapa": 106168320,
+   "npc": 7580,
+   "casilla": 384,
+   "orientacion": 1,
+   "_quien": "Gremia"
+  },
+  {
+   "mapa": 120063489,
+   "npc": 173,
+   "casilla": 246,
+   "orientacion": 3,
+   "_quien": "Rotabla, el pastor"
+  },
+  {
+   "mapa": 120064003,
+   "npc": 2281,
+   "casilla": 441,
+   "orientacion": 1,
+   "_quien": "Palesa"
+  },
+  {
+   "mapa": 121375235,
+   "npc": 4482,
+   "casilla": 216,
+   "orientacion": 3,
+   "_quien": "Miaumiau rabioso"
+  },
+  {
+   "mapa": 121375235,
+   "npc": 4482,
+   "casilla": 228,
+   "orientacion": 1,
+   "_quien": "Miaumiau rabioso"
+  },
+  {
+   "mapa": 121375235,
+   "npc": 173,
+   "casilla": 234,
+   "orientacion": 3,
+   "_quien": "Rotabla, el pastor"
+  },
+  {
+   "mapa": 121375235,
+   "npc": 4482,
+   "casilla": 243,
+   "orientacion": 5,
+   "_quien": "Miaumiau rabioso"
+  },
+  {
+   "mapa": 126092568,
+   "npc": 2317,
+   "casilla": 331,
+   "orientacion": 3,
+   "_quien": "Esclava revolucionaria"
+  },
+  {
+   "mapa": 126092568,
+   "npc": 2330,
+   "casilla": 362,
+   "orientacion": 1,
+   "_quien": "Baile del rey Allister"
+  },
+  {
+   "mapa": 126092569,
+   "npc": 2322,
+   "casilla": 469,
+   "orientacion": 1,
+   "_quien": "Esclava charlatana"
+  },
+  {
+   "mapa": 126093079,
+   "npc": 3045,
+   "casilla": 342,
+   "orientacion": 3,
+   "_quien": "Nyangaspar"
+  },
+  {
+   "mapa": 128974852,
+   "npc": 2407,
+   "casilla": 348,
+   "orientacion": 3,
+   "_quien": "Sivago"
+  },
+  {
+   "mapa": 128975874,
+   "npc": 2408,
+   "casilla": 328,
+   "orientacion": 3,
+   "_quien": "Toponambo"
+  },
+  {
+   "mapa": 128976896,
+   "npc": 2379,
+   "casilla": 373,
+   "orientacion": 3,
+   "_quien": "Agente Ruño"
+  },
+  {
+   "mapa": 128976900,
+   "npc": 2400,
+   "casilla": 319,
+   "orientacion": 3,
+   "_quien": "Foolk"
+  },
+  {
+   "mapa": 129236992,
+   "npc": 2356,
+   "casilla": 287,
+   "orientacion": 1,
+   "_quien": "Heraldo de Anutrof"
+  },
+  {
+   "mapa": 129238529,
+   "npc": 2409,
+   "casilla": 287,
+   "orientacion": 1,
+   "_quien": "Tanguy"
+  },
+  {
+   "mapa": 129499136,
+   "npc": 2364,
+   "casilla": 339,
+   "orientacion": 1,
+   "_quien": "Rick Hachón, el tesorero"
+  },
+  {
+   "mapa": 129499136,
+   "npc": 2382,
+   "casilla": 367,
+   "orientacion": 1,
+   "_quien": "Perfisgón"
+  },
+  {
+   "mapa": 129499136,
+   "npc": 2351,
+   "casilla": 385,
+   "orientacion": 3,
+   "_quien": "Wello"
+  },
+  {
+   "mapa": 130023937,
+   "npc": 2358,
+   "casilla": 345,
+   "orientacion": 3,
+   "_quien": "Krosmoglob del coronel"
+  },
+  {
+   "mapa": 130023939,
+   "npc": 2339,
+   "casilla": 484,
+   "orientacion": 3,
+   "_quien": "Comandante Qu"
+  },
+  {
+   "mapa": 130024961,
+   "npc": 2335,
+   "casilla": 285,
+   "orientacion": 1,
+   "_quien": "Exploranciana"
+  },
+  {
+   "mapa": 130024961,
+   "npc": 2337,
+   "casilla": 429,
+   "orientacion": 3,
+   "_quien": "Coronel Onil"
+  },
+  {
+   "mapa": 130024961,
+   "npc": 2349,
+   "casilla": 453,
+   "orientacion": 1,
+   "_quien": "Recolector Thro"
+  },
+  {
+   "mapa": 130024963,
+   "npc": 2338,
+   "casilla": 455,
+   "orientacion": 3,
+   "_quien": "Doctor Boing Boing"
+  },
+  {
+   "mapa": 130025985,
+   "npc": 7829,
+   "casilla": 398,
+   "orientacion": 1,
+   "_quien": "[!] Portail de Gladis"
+  },
+  {
+   "mapa": 130025985,
+   "npc": 7830,
+   "casilla": 400,
+   "orientacion": 3,
+   "_quien": "[!] Portail de Rol Sterding"
+  },
+  {
+   "mapa": 130025985,
+   "npc": 2340,
+   "casilla": 412,
+   "orientacion": 1,
+   "_quien": "Gladis"
+  },
+  {
+   "mapa": 130025985,
+   "npc": 2336,
+   "casilla": 413,
+   "orientacion": 3,
+   "_quien": "Rol Sterding"
+  },
+  {
+   "mapa": 130025987,
+   "npc": 7829,
+   "casilla": 282,
+   "orientacion": 1,
+   "_quien": "[!] Portail de Gladis"
+  },
+  {
+   "mapa": 134480896,
+   "npc": 2471,
+   "casilla": 82,
+   "orientacion": 3,
+   "_quien": "Dominio de las arenas"
+  },
+  {
+   "mapa": 141034496,
+   "npc": 2471,
+   "casilla": 82,
+   "orientacion": 3,
+   "_quien": "Dominio de las arenas"
+  },
+  {
+   "mapa": 141296640,
+   "npc": 2471,
+   "casilla": 82,
+   "orientacion": 3,
+   "_quien": "Dominio de las arenas"
+  },
+  {
+   "mapa": 146801664,
+   "npc": 1216,
+   "casilla": 191,
+   "orientacion": 3,
+   "_quien": "Gúltar"
+  },
+  {
+   "mapa": 146801922,
+   "npc": 7416,
+   "casilla": 244,
+   "orientacion": 3,
+   "_quien": "Puch Ingball"
+  },
+  {
+   "mapa": 146802688,
+   "npc": 7416,
+   "casilla": 173,
+   "orientacion": 1,
+   "_quien": "Puch Ingball"
+  },
+  {
+   "mapa": 146802688,
+   "npc": 1386,
+   "casilla": 176,
+   "orientacion": 3,
+   "_quien": "Risette Lestat"
+  },
+  {
+   "mapa": 146803712,
+   "npc": 7378,
+   "casilla": 173,
+   "orientacion": 1,
+   "_quien": "Monturas vueloceronte"
+  },
+  {
+   "mapa": 146803712,
+   "npc": 7377,
+   "casilla": 174,
+   "orientacion": 1,
+   "_quien": "Monturas mulagua"
+  },
+  {
+   "mapa": 146803712,
+   "npc": 5550,
+   "casilla": 176,
+   "orientacion": 3,
+   "_quien": "Mascotas y mascoturas"
+  },
+  {
+   "mapa": 146803712,
+   "npc": 7374,
+   "casilla": 186,
+   "orientacion": 1,
+   "_quien": "Monturas dragopavo"
+  },
+  {
+   "mapa": 146803712,
+   "npc": 5551,
+   "casilla": 292,
+   "orientacion": 3,
+   "_quien": "Vendedor de pergaminos"
+  },
+  {
+   "mapa": 146803712,
+   "npc": 7025,
+   "casilla": 315,
+   "orientacion": 1,
+   "_quien": "Montón de kamas"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5544,
+   "casilla": 176,
+   "orientacion": 3,
+   "_quien": "Anillos 1 - 49"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5548,
+   "casilla": 192,
+   "orientacion": 3,
+   "_quien": "Sombreros 1 - 49"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5545,
+   "casilla": 201,
+   "orientacion": 1,
+   "_quien": "Botas 1 - 49"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5543,
+   "casilla": 236,
+   "orientacion": 3,
+   "_quien": "Amuletos 1 - 49"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5546,
+   "casilla": 254,
+   "orientacion": 1,
+   "_quien": "Capas 1 - 49"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5547,
+   "casilla": 306,
+   "orientacion": 3,
+   "_quien": "Cinturones 1 - 49"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5542,
+   "casilla": 309,
+   "orientacion": 1,
+   "_quien": "Armas 1 - 49"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 7025,
+   "casilla": 345,
+   "orientacion": 3,
+   "_quien": "Montón de kamas"
+  },
+  {
+   "mapa": 146804736,
+   "npc": 5517,
+   "casilla": 390,
+   "orientacion": 3,
+   "_quien": "Escudos"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5534,
+   "casilla": 161,
+   "orientacion": 1,
+   "_quien": "Sombreros 100 - 149"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5529,
+   "casilla": 163,
+   "orientacion": 3,
+   "_quien": "Amuletos 100 - 149"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5530,
+   "casilla": 187,
+   "orientacion": 1,
+   "_quien": "Anillos 100 - 149"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5533,
+   "casilla": 193,
+   "orientacion": 0,
+   "_quien": "Cinturones 100 - 149"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5531,
+   "casilla": 228,
+   "orientacion": 1,
+   "_quien": "Botas 100 - 149"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5517,
+   "casilla": 250,
+   "orientacion": 3,
+   "_quien": "Escudos"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5532,
+   "casilla": 283,
+   "orientacion": 1,
+   "_quien": "Capas 100 - 149"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 7025,
+   "casilla": 316,
+   "orientacion": 3,
+   "_quien": "Montón de kamas"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5519,
+   "casilla": 321,
+   "orientacion": 3,
+   "_quien": "Trofeos 100"
+  },
+  {
+   "mapa": 146804738,
+   "npc": 5528,
+   "casilla": 323,
+   "orientacion": 1,
+   "_quien": "Armas 100 - 149"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5516,
+   "casilla": 161,
+   "orientacion": 1,
+   "_quien": "Sombreros 200"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5511,
+   "casilla": 178,
+   "orientacion": 3,
+   "_quien": "Amuletos 200"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5512,
+   "casilla": 187,
+   "orientacion": 1,
+   "_quien": "Anillos 200"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5515,
+   "casilla": 221,
+   "orientacion": 3,
+   "_quien": "Cinturones 200"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5513,
+   "casilla": 228,
+   "orientacion": 1,
+   "_quien": "Botas 200"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5514,
+   "casilla": 254,
+   "orientacion": 1,
+   "_quien": "Capas 200"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5517,
+   "casilla": 306,
+   "orientacion": 3,
+   "_quien": "Escudos"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5510,
+   "casilla": 309,
+   "orientacion": 0,
+   "_quien": "Armas 200"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 7025,
+   "casilla": 316,
+   "orientacion": 3,
+   "_quien": "Montón de kamas"
+  },
+  {
+   "mapa": 146804740,
+   "npc": 5549,
+   "casilla": 390,
+   "orientacion": 3,
+   "_quien": "Comerciante de huevos y prismaradi"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5537,
+   "casilla": 147,
+   "orientacion": 1,
+   "_quien": "Anillos 50 - 99"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5541,
+   "casilla": 163,
+   "orientacion": 3,
+   "_quien": "Sombreros 50 - 99"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5536,
+   "casilla": 193,
+   "orientacion": 3,
+   "_quien": "Amuletos 50 - 99"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5538,
+   "casilla": 214,
+   "orientacion": 1,
+   "_quien": "Botas 50 - 99"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5539,
+   "casilla": 240,
+   "orientacion": 1,
+   "_quien": "Capas 50 - 99"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5540,
+   "casilla": 250,
+   "orientacion": 3,
+   "_quien": "Cinturones 50 - 99"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5535,
+   "casilla": 295,
+   "orientacion": 1,
+   "_quien": "Armas 50 - 99"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 7025,
+   "casilla": 316,
+   "orientacion": 3,
+   "_quien": "Montón de kamas"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5517,
+   "casilla": 321,
+   "orientacion": 3,
+   "_quien": "Escudos"
+  },
+  {
+   "mapa": 146805760,
+   "npc": 5520,
+   "casilla": 404,
+   "orientacion": 3,
+   "_quien": "Trofeos 50"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5523,
+   "casilla": 132,
+   "orientacion": 1,
+   "_quien": "Anillos 150 - 199"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5527,
+   "casilla": 134,
+   "orientacion": 3,
+   "_quien": "Sombreros 150 - 199"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5522,
+   "casilla": 164,
+   "orientacion": 3,
+   "_quien": "Amuletos 150 - 199"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5526,
+   "casilla": 208,
+   "orientacion": 3,
+   "_quien": "Cinturones 150 - 199"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5524,
+   "casilla": 214,
+   "orientacion": 1,
+   "_quien": "Botas 150 - 199"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5525,
+   "casilla": 240,
+   "orientacion": 1,
+   "_quien": "Capas 150 - 199"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5517,
+   "casilla": 278,
+   "orientacion": 3,
+   "_quien": "Escudos"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5521,
+   "casilla": 310,
+   "orientacion": 1,
+   "_quien": "Armas 150 - 199"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 7025,
+   "casilla": 316,
+   "orientacion": 1,
+   "_quien": "Montón de kamas"
+  },
+  {
+   "mapa": 146805762,
+   "npc": 5518,
+   "casilla": 349,
+   "orientacion": 3,
+   "_quien": "Trofeos 150"
+  },
+  {
+   "mapa": 146805764,
+   "npc": 7565,
+   "casilla": 187,
+   "orientacion": 1,
+   "_quien": "Capas de apariencia"
+  },
+  {
+   "mapa": 146805764,
+   "npc": 7564,
+   "casilla": 191,
+   "orientacion": 3,
+   "_quien": "Escudos de apariencia"
+  },
+  {
+   "mapa": 146805764,
+   "npc": 7562,
+   "casilla": 241,
+   "orientacion": 1,
+   "_quien": "Sombreros de apariencia"
+  },
+  {
+   "mapa": 146805764,
+   "npc": 7563,
+   "casilla": 249,
+   "orientacion": 3,
+   "_quien": "Armas de apariencia"
+  },
+  {
+   "mapa": 146805764,
+   "npc": 7574,
+   "casilla": 310,
+   "orientacion": 1,
+   "_quien": "Eva Zar cosméticos"
+  },
+  {
+   "mapa": 146805764,
+   "npc": 7025,
+   "casilla": 316,
+   "orientacion": 3,
+   "_quien": "Montón de kamas"
+  },
+  {
+   "mapa": 146805764,
+   "npc": 7566,
+   "casilla": 320,
+   "orientacion": 3,
+   "_quien": "Arreos, mascotas y monturas de apa"
+  },
+  {
+   "mapa": 154010371,
+   "npc": 2905,
+   "casilla": 361,
+   "orientacion": 3,
+   "_quien": "Ternauta Unin"
+  },
+  {
+   "mapa": 154010882,
+   "npc": 2914,
+   "casilla": 147,
+   "orientacion": 1,
+   "_quien": "Pirocelso"
+  },
+  {
+   "mapa": 154010882,
+   "npc": 2913,
+   "casilla": 160,
+   "orientacion": 1,
+   "_quien": "Nicolás Flamecha"
+  },
+  {
+   "mapa": 154010883,
+   "npc": 2892,
+   "casilla": 329,
+   "orientacion": 3,
+   "_quien": "Noken Okuto"
+  },
+  {
+   "mapa": 159650312,
+   "npc": 7397,
+   "casilla": 244,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 3"
+  },
+  {
+   "mapa": 159650312,
+   "npc": 7397,
+   "casilla": 308,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat bontarien 3"
+  },
+  {
+   "mapa": 171705355,
+   "npc": 7656,
+   "casilla": 358,
+   "orientacion": 1,
+   "_quien": "Gobkart"
+  },
+  {
+   "mapa": 171968018,
+   "npc": 7656,
+   "casilla": 0,
+   "orientacion": 3,
+   "_quien": "Gobkart"
+  },
+  {
+   "mapa": 172229135,
+   "npc": 4008,
+   "casilla": 345,
+   "orientacion": 5,
+   "_quien": "Guardia montada"
+  },
+  {
+   "mapa": 172230159,
+   "npc": 7382,
+   "casilla": 197,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172230669,
+   "npc": 7384,
+   "casilla": 133,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172231692,
+   "npc": 7386,
+   "casilla": 159,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172231692,
+   "npc": 7385,
+   "casilla": 383,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172232717,
+   "npc": 7382,
+   "casilla": 179,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172233229,
+   "npc": 7384,
+   "casilla": 62,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172233229,
+   "npc": 4008,
+   "casilla": 137,
+   "orientacion": 3,
+   "_quien": "Guardia montada"
+  },
+  {
+   "mapa": 172235272,
+   "npc": 7382,
+   "casilla": 158,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172235272,
+   "npc": 7385,
+   "casilla": 280,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 172754442,
+   "npc": 3953,
+   "casilla": 277,
+   "orientacion": 3,
+   "_quien": "Vanjel Sings"
+  },
+  {
+   "mapa": 172754442,
+   "npc": 3999,
+   "casilla": 344,
+   "orientacion": 1,
+   "_quien": "Cazadora de ghuls"
+  },
+  {
+   "mapa": 173017095,
+   "npc": 4285,
+   "casilla": 317,
+   "orientacion": 1,
+   "_quien": "Berklé"
+  },
+  {
+   "mapa": 173019141,
+   "npc": 7656,
+   "casilla": 430,
+   "orientacion": 1,
+   "_quien": "Gobkart"
+  },
+  {
+   "mapa": 182978570,
+   "npc": 4275,
+   "casilla": 110,
+   "orientacion": 3,
+   "_quien": "Jauel Indio"
+  },
+  {
+   "mapa": 184287236,
+   "npc": 4258,
+   "casilla": 91,
+   "orientacion": 3,
+   "_quien": "Triki Güest"
+  },
+  {
+   "mapa": 184287236,
+   "npc": 4300,
+   "casilla": 240,
+   "orientacion": 7,
+   "_quien": "Calcinádorl"
+  },
+  {
+   "mapa": 184287236,
+   "npc": 4300,
+   "casilla": 396,
+   "orientacion": 5,
+   "_quien": "Calcinádorl"
+  },
+  {
+   "mapa": 188744196,
+   "npc": 4427,
+   "casilla": 286,
+   "orientacion": 3,
+   "_quien": "Wauwau guardián"
+  },
+  {
+   "mapa": 188745217,
+   "npc": 4352,
+   "casilla": 129,
+   "orientacion": 1,
+   "_quien": "Mercenaria de Astrub"
+  },
+  {
+   "mapa": 188745217,
+   "npc": 1045,
+   "casilla": 353,
+   "orientacion": 1,
+   "_quien": "Ani N'Hubb"
+  },
+  {
+   "mapa": 188745729,
+   "npc": 1042,
+   "casilla": 296,
+   "orientacion": 1,
+   "_quien": "Ramón Santo"
+  },
+  {
+   "mapa": 189793289,
+   "npc": 4363,
+   "casilla": 458,
+   "orientacion": 1,
+   "_quien": "Vey Gana"
+  },
+  {
+   "mapa": 191102978,
+   "npc": 4352,
+   "casilla": 344,
+   "orientacion": 1,
+   "_quien": "Mercenaria de Astrub"
+  },
+  {
+   "mapa": 191104000,
+   "npc": 4337,
+   "casilla": 354,
+   "orientacion": 1,
+   "_quien": "Chronokwartz"
+  },
+  {
+   "mapa": 191104000,
+   "npc": 4351,
+   "casilla": 379,
+   "orientacion": 1,
+   "_quien": "Mercenario de Astrub"
+  },
+  {
+   "mapa": 191104002,
+   "npc": 1088,
+   "casilla": 286,
+   "orientacion": 3,
+   "_quien": "Snori Nairb"
+  },
+  {
+   "mapa": 191104002,
+   "npc": 4368,
+   "casilla": 312,
+   "orientacion": 1,
+   "_quien": "Bontariano enfadado"
+  },
+  {
+   "mapa": 191104002,
+   "npc": 4369,
+   "casilla": 341,
+   "orientacion": 5,
+   "_quien": "Brakmariana enfadada"
+  },
+  {
+   "mapa": 191104002,
+   "npc": 2274,
+   "casilla": 389,
+   "orientacion": 3,
+   "_quien": "Caballero de Astrub"
+  },
+  {
+   "mapa": 191105026,
+   "npc": 7870,
+   "casilla": 201,
+   "orientacion": 1,
+   "_quien": "Astrubiense paranoide"
+  },
+  {
+   "mapa": 191105026,
+   "npc": 6831,
+   "casilla": 369,
+   "orientacion": 3,
+   "_quien": "Tokageko"
+  },
+  {
+   "mapa": 191105028,
+   "npc": 4366,
+   "casilla": 120,
+   "orientacion": 3,
+   "_quien": "Cindy Cato"
+  },
+  {
+   "mapa": 191105028,
+   "npc": 4428,
+   "casilla": 367,
+   "orientacion": 1,
+   "_quien": "Alba Surilla"
+  },
+  {
+   "mapa": 191106050,
+   "npc": 2354,
+   "casilla": 235,
+   "orientacion": 3,
+   "_quien": "Diestésico"
+  },
+  {
+   "mapa": 191106050,
+   "npc": 4319,
+   "casilla": 314,
+   "orientacion": 1,
+   "_quien": "Essel Dawa"
+  },
+  {
+   "mapa": 191106050,
+   "npc": 4425,
+   "casilla": 423,
+   "orientacion": 1,
+   "_quien": "Ger Mendia"
+  },
+  {
+   "mapa": 191106052,
+   "npc": 4313,
+   "casilla": 142,
+   "orientacion": 1,
+   "_quien": "Hazel Emental"
+  },
+  {
+   "mapa": 192413696,
+   "npc": 4322,
+   "casilla": 277,
+   "orientacion": 1,
+   "_quien": "Acidrik Rasgapanza"
+  },
+  {
+   "mapa": 192413696,
+   "npc": 1904,
+   "casilla": 299,
+   "orientacion": 3,
+   "_quien": "Graslahad"
+  },
+  {
+   "mapa": 192413696,
+   "npc": 4361,
+   "casilla": 311,
+   "orientacion": 1,
+   "_quien": "Tek Abir"
+  },
+  {
+   "mapa": 192413696,
+   "npc": 4328,
+   "casilla": 415,
+   "orientacion": 3,
+   "_quien": "Meow Moew"
+  },
+  {
+   "mapa": 192413696,
+   "npc": 4370,
+   "casilla": 439,
+   "orientacion": 1,
+   "_quien": "Mega Jug'Onh"
+  },
+  {
+   "mapa": 192413698,
+   "npc": 4400,
+   "casilla": 283,
+   "orientacion": 1,
+   "_quien": "Lorina Makenit"
+  },
+  {
+   "mapa": 192413698,
+   "npc": 4399,
+   "casilla": 304,
+   "orientacion": 3,
+   "_quien": "Pistou"
+  },
+  {
+   "mapa": 192413698,
+   "npc": 465,
+   "casilla": 440,
+   "orientacion": 1,
+   "_quien": "Yve Konpetmin"
+  },
+  {
+   "mapa": 192415754,
+   "npc": 5056,
+   "casilla": 203,
+   "orientacion": 1,
+   "_quien": "Boluto del padrino"
+  },
+  {
+   "mapa": 192415754,
+   "npc": 7416,
+   "casilla": 359,
+   "orientacion": 3,
+   "_quien": "Puch Ingball"
+  },
+  {
+   "mapa": 200804356,
+   "npc": 5130,
+   "casilla": 262,
+   "orientacion": 3,
+   "_quien": "Draconiros"
+  },
+  {
+   "mapa": 200804356,
+   "npc": 5131,
+   "casilla": 314,
+   "orientacion": 3,
+   "_quien": "Crisol onírico"
+  },
+  {
+   "mapa": 201458178,
+   "npc": 5414,
+   "casilla": 393,
+   "orientacion": 1,
+   "_quien": "Kernuros"
+  },
+  {
+   "mapa": 201588736,
+   "npc": 5346,
+   "casilla": 253,
+   "orientacion": 1,
+   "_quien": "Tumba sanguinolenta"
+  },
+  {
+   "mapa": 203688196,
+   "npc": 4822,
+   "casilla": 408,
+   "orientacion": 3,
+   "_quien": "Martalo"
+  },
+  {
+   "mapa": 203689222,
+   "npc": 5412,
+   "casilla": 322,
+   "orientacion": 1,
+   "_quien": "Influjo de los Jinetes"
+  },
+  {
+   "mapa": 204604416,
+   "npc": 5469,
+   "casilla": 387,
+   "orientacion": 3,
+   "_quien": "Martalo"
+  },
+  {
+   "mapa": 204998145,
+   "npc": 6067,
+   "casilla": 498,
+   "orientacion": 5,
+   "_quien": "Pandawa melancólica"
+  },
+  {
+   "mapa": 204998403,
+   "npc": 5679,
+   "casilla": 133,
+   "orientacion": 1,
+   "_quien": "Campesina zolla"
+  },
+  {
+   "mapa": 204998403,
+   "npc": 5620,
+   "casilla": 147,
+   "orientacion": 7,
+   "_quien": "Joven zollo"
+  },
+  {
+   "mapa": 204998659,
+   "npc": 5767,
+   "casilla": 430,
+   "orientacion": 3,
+   "_quien": "Capitán Ghezen"
+  },
+  {
+   "mapa": 205259779,
+   "npc": 5609,
+   "casilla": 284,
+   "orientacion": 1,
+   "_quien": "Tanukas Kanueses"
+  },
+  {
+   "mapa": 205259780,
+   "npc": 5608,
+   "casilla": 329,
+   "orientacion": 1,
+   "_quien": "Mira Hagata"
+  },
+  {
+   "mapa": 205260033,
+   "npc": 1161,
+   "casilla": 242,
+   "orientacion": 1,
+   "_quien": "Sag Zatamos"
+  },
+  {
+   "mapa": 205260288,
+   "npc": 5639,
+   "casilla": 179,
+   "orientacion": 3,
+   "_quien": "Expositora tanuki"
+  },
+  {
+   "mapa": 205260288,
+   "npc": 5630,
+   "casilla": 199,
+   "orientacion": 1,
+   "_quien": "Tanugui Met"
+  },
+  {
+   "mapa": 205260288,
+   "npc": 5758,
+   "casilla": 399,
+   "orientacion": 1,
+   "_quien": "Figura de darumak"
+  },
+  {
+   "mapa": 205260288,
+   "npc": 5787,
+   "casilla": 400,
+   "orientacion": 3,
+   "_quien": "Artista abultado"
+  },
+  {
+   "mapa": 205260288,
+   "npc": 5788,
+   "casilla": 454,
+   "orientacion": 7,
+   "_quien": "Artista embarrada"
+  },
+  {
+   "mapa": 206045186,
+   "npc": 5658,
+   "casilla": 261,
+   "orientacion": 3,
+   "_quien": "Hina Baki"
+  },
+  {
+   "mapa": 206045188,
+   "npc": 5657,
+   "casilla": 285,
+   "orientacion": 1,
+   "_quien": "Choki Chin"
+  },
+  {
+   "mapa": 206045703,
+   "npc": 5654,
+   "casilla": 404,
+   "orientacion": 3,
+   "_quien": "Kinshi Saweta"
+  },
+  {
+   "mapa": 206045703,
+   "npc": 5640,
+   "casilla": 428,
+   "orientacion": 1,
+   "_quien": "Guardia de Fuegodala"
+  },
+  {
+   "mapa": 206177283,
+   "npc": 5661,
+   "casilla": 228,
+   "orientacion": 3,
+   "_quien": "Chiflux"
+  },
+  {
+   "mapa": 206177283,
+   "npc": 5660,
+   "casilla": 255,
+   "orientacion": 1,
+   "_quien": "Shonanhi"
+  },
+  {
+   "mapa": 206177797,
+   "npc": 5646,
+   "casilla": 300,
+   "orientacion": 1,
+   "_quien": "Hinaba"
+  },
+  {
+   "mapa": 206307330,
+   "npc": 1140,
+   "casilla": 105,
+   "orientacion": 1,
+   "_quien": "Jancló Pandam"
+  },
+  {
+   "mapa": 206307330,
+   "npc": 1090,
+   "casilla": 106,
+   "orientacion": 3,
+   "_quien": "Pandaulina Rubi"
+  },
+  {
+   "mapa": 206307331,
+   "npc": 5605,
+   "casilla": 245,
+   "orientacion": 3,
+   "_quien": "Guardia Pintaiyo"
+  },
+  {
+   "mapa": 206307842,
+   "npc": 5910,
+   "casilla": 471,
+   "orientacion": 3,
+   "_quien": "Guardia pandaleño"
+  },
+  {
+   "mapa": 206307843,
+   "npc": 661,
+   "casilla": 121,
+   "orientacion": 3,
+   "_quien": "Bazarwa la Mercante"
+  },
+  {
+   "mapa": 206307843,
+   "npc": 671,
+   "casilla": 227,
+   "orientacion": 1,
+   "_quien": "Varatijawa el Comerciante"
+  },
+  {
+   "mapa": 206307843,
+   "npc": 5931,
+   "casilla": 262,
+   "orientacion": 1,
+   "_quien": "Kawin la comerciante"
+  },
+  {
+   "mapa": 206307843,
+   "npc": 663,
+   "casilla": 293,
+   "orientacion": 3,
+   "_quien": "Binzawa el Comerciante"
+  },
+  {
+   "mapa": 206307843,
+   "npc": 5684,
+   "casilla": 300,
+   "orientacion": 3,
+   "_quien": "Artista marcial"
+  },
+  {
+   "mapa": 206307843,
+   "npc": 660,
+   "casilla": 324,
+   "orientacion": 7,
+   "_quien": "Sukawa el Comerciante"
+  },
+  {
+   "mapa": 206307843,
+   "npc": 5932,
+   "casilla": 410,
+   "orientacion": 1,
+   "_quien": "Belzoniwa el comerciante"
+  },
+  {
+   "mapa": 206438914,
+   "npc": 7983,
+   "casilla": 259,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décor - Dragodinde amande "
+  },
+  {
+   "mapa": 206438914,
+   "npc": 7926,
+   "casilla": 270,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décor - Dragodinde émeraud"
+  },
+  {
+   "mapa": 206438914,
+   "npc": 5861,
+   "casilla": 333,
+   "orientacion": 1,
+   "_quien": "Dragopavo herido"
+  },
+  {
+   "mapa": 207618054,
+   "npc": 5643,
+   "casilla": 246,
+   "orientacion": 3,
+   "_quien": "Pandako Shazaki"
+  },
+  {
+   "mapa": 207618054,
+   "npc": 5775,
+   "casilla": 370,
+   "orientacion": 3,
+   "_quien": "Qilin de papel"
+  },
+  {
+   "mapa": 207618060,
+   "npc": 5607,
+   "casilla": 345,
+   "orientacion": 3,
+   "_quien": "Anataké"
+  },
+  {
+   "mapa": 207619076,
+   "npc": 5595,
+   "casilla": 217,
+   "orientacion": 3,
+   "_quien": "Pantruku"
+  },
+  {
+   "mapa": 207619078,
+   "npc": 5641,
+   "casilla": 411,
+   "orientacion": 3,
+   "_quien": "Ozulan"
+  },
+  {
+   "mapa": 207625216,
+   "npc": 7529,
+   "casilla": 326,
+   "orientacion": 1,
+   "_quien": "Fidel Ychas"
+  },
+  {
+   "mapa": 207625216,
+   "npc": 7645,
+   "casilla": 373,
+   "orientacion": 3,
+   "_quien": "Yokai de Kaminoke"
+  },
+  {
+   "mapa": 207625216,
+   "npc": 7644,
+   "casilla": 387,
+   "orientacion": 3,
+   "_quien": "Kaminoke"
+  },
+  {
+   "mapa": 207626242,
+   "npc": 8014,
+   "casilla": 318,
+   "orientacion": 3,
+   "_quien": "Edgar Keólogo"
+  },
+  {
+   "mapa": 209192194,
+   "npc": 6120,
+   "casilla": 272,
+   "orientacion": 3,
+   "_quien": "Yokaiku itinerante"
+  },
+  {
+   "mapa": 209192194,
+   "npc": 6041,
+   "casilla": 301,
+   "orientacion": 3,
+   "_quien": "Yokaiku itinerante"
+  },
+  {
+   "mapa": 209192194,
+   "npc": 6125,
+   "casilla": 342,
+   "orientacion": 3,
+   "_quien": "Mata de hierbas"
+  },
+  {
+   "mapa": 209192195,
+   "npc": 5731,
+   "casilla": 150,
+   "orientacion": 7,
+   "_quien": "Guardia kozaru"
+  },
+  {
+   "mapa": 209192195,
+   "npc": 5629,
+   "casilla": 158,
+   "orientacion": 1,
+   "_quien": "Capitán de la guardia kozaru"
+  },
+  {
+   "mapa": 209192195,
+   "npc": 5731,
+   "casilla": 289,
+   "orientacion": 1,
+   "_quien": "Guardia kozaru"
+  },
+  {
+   "mapa": 209192195,
+   "npc": 5731,
+   "casilla": 394,
+   "orientacion": 3,
+   "_quien": "Guardia kozaru"
+  },
+  {
+   "mapa": 209192197,
+   "npc": 383,
+   "casilla": 393,
+   "orientacion": 1,
+   "_quien": "Girle Pylot"
+  },
+  {
+   "mapa": 209192198,
+   "npc": 6074,
+   "casilla": 322,
+   "orientacion": 1,
+   "_quien": "Monje Yufu"
+  },
+  {
+   "mapa": 209192706,
+   "npc": 5798,
+   "casilla": 149,
+   "orientacion": 3,
+   "_quien": "Seijin Zena"
+  },
+  {
+   "mapa": 211291138,
+   "npc": 6278,
+   "casilla": 314,
+   "orientacion": 1,
+   "_quien": "Manaia"
+  },
+  {
+   "mapa": 212598789,
+   "npc": 7397,
+   "casilla": 231,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat bontarien 3"
+  },
+  {
+   "mapa": 212599813,
+   "npc": 7398,
+   "casilla": 352,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat bontarien 4"
+  },
+  {
+   "mapa": 212599813,
+   "npc": 210,
+   "casilla": 412,
+   "orientacion": 1,
+   "_quien": "Nieve"
+  },
+  {
+   "mapa": 212600323,
+   "npc": 6639,
+   "casilla": 178,
+   "orientacion": 3,
+   "_quien": "Capitana Tadora"
+  },
+  {
+   "mapa": 212600323,
+   "npc": 215,
+   "casilla": 333,
+   "orientacion": 3,
+   "_quien": "Capitán Alrok"
+  },
+  {
+   "mapa": 212600325,
+   "npc": 221,
+   "casilla": 228,
+   "orientacion": 1,
+   "_quien": "Mub Oreicifrita"
+  },
+  {
+   "mapa": 212600325,
+   "npc": 1091,
+   "casilla": 242,
+   "orientacion": 5,
+   "_quien": "Xelora Busona"
+  },
+  {
+   "mapa": 212600837,
+   "npc": 3773,
+   "casilla": 151,
+   "orientacion": 1,
+   "_quien": "Bert Enjena"
+  },
+  {
+   "mapa": 212600837,
+   "npc": 225,
+   "casilla": 242,
+   "orientacion": 1,
+   "_quien": "Gai Tan"
+  },
+  {
+   "mapa": 212600837,
+   "npc": 224,
+   "casilla": 243,
+   "orientacion": 3,
+   "_quien": "Mili Ralloc"
+  },
+  {
+   "mapa": 212601349,
+   "npc": 3239,
+   "casilla": 249,
+   "orientacion": 3,
+   "_quien": "Arrásel Crau"
+  },
+  {
+   "mapa": 212601349,
+   "npc": 7397,
+   "casilla": 255,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 3"
+  },
+  {
+   "mapa": 212601861,
+   "npc": 302,
+   "casilla": 344,
+   "orientacion": 1,
+   "_quien": "Gringa"
+  },
+  {
+   "mapa": 212601861,
+   "npc": 301,
+   "casilla": 387,
+   "orientacion": 3,
+   "_quien": "Gringo"
+  },
+  {
+   "mapa": 212601861,
+   "npc": 303,
+   "casilla": 431,
+   "orientacion": 1,
+   "_quien": "Gringu"
+  },
+  {
+   "mapa": 212601861,
+   "npc": 304,
+   "casilla": 446,
+   "orientacion": 3,
+   "_quien": "Gringi"
+  },
+  {
+   "mapa": 212601864,
+   "npc": 6411,
+   "casilla": 108,
+   "orientacion": 3,
+   "_quien": "Vasta Detontirías"
+  },
+  {
+   "mapa": 212601864,
+   "npc": 192,
+   "casilla": 439,
+   "orientacion": 1,
+   "_quien": "Hersa Garra Oscura"
+  },
+  {
+   "mapa": 212602887,
+   "npc": 7397,
+   "casilla": 212,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 3"
+  },
+  {
+   "mapa": 212602887,
+   "npc": 6422,
+   "casilla": 341,
+   "orientacion": 3,
+   "_quien": "Ros Nefed"
+  },
+  {
+   "mapa": 212602887,
+   "npc": 298,
+   "casilla": 426,
+   "orientacion": 3,
+   "_quien": "Otabaj"
+  },
+  {
+   "mapa": 212602887,
+   "npc": 291,
+   "casilla": 452,
+   "orientacion": 1,
+   "_quien": "Jabalí de las llanuras"
+  },
+  {
+   "mapa": 212602887,
+   "npc": 291,
+   "casilla": 494,
+   "orientacion": 7,
+   "_quien": "Jabalí de las llanuras"
+  },
+  {
+   "mapa": 212602887,
+   "npc": 291,
+   "casilla": 510,
+   "orientacion": 3,
+   "_quien": "Jabalí de las llanuras"
+  },
+  {
+   "mapa": 212602887,
+   "npc": 291,
+   "casilla": 537,
+   "orientacion": 7,
+   "_quien": "Jabalí de las llanuras"
+  },
+  {
+   "mapa": 212730370,
+   "npc": 6414,
+   "casilla": 371,
+   "orientacion": 1,
+   "_quien": "Fir Mess"
+  },
+  {
+   "mapa": 212730370,
+   "npc": 7397,
+   "casilla": 390,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat bontarien 3"
+  },
+  {
+   "mapa": 212730371,
+   "npc": 6425,
+   "casilla": 376,
+   "orientacion": 1,
+   "_quien": "Dike Tarak"
+  },
+  {
+   "mapa": 212730373,
+   "npc": 6587,
+   "casilla": 457,
+   "orientacion": 3,
+   "_quien": "Almirante Traflagar"
+  },
+  {
+   "mapa": 212730880,
+   "npc": 7405,
+   "casilla": 291,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 1"
+  },
+  {
+   "mapa": 212730880,
+   "npc": 6493,
+   "casilla": 369,
+   "orientacion": 3,
+   "_quien": "Juanito"
+  },
+  {
+   "mapa": 212730880,
+   "npc": 6492,
+   "casilla": 397,
+   "orientacion": 3,
+   "_quien": "Willem Lenglade"
+  },
+  {
+   "mapa": 212730880,
+   "npc": 6494,
+   "casilla": 398,
+   "orientacion": 3,
+   "_quien": "Lady Meriane"
+  },
+  {
+   "mapa": 212731137,
+   "npc": 7405,
+   "casilla": 109,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat bontarien 1"
+  },
+  {
+   "mapa": 212731137,
+   "npc": 6627,
+   "casilla": 479,
+   "orientacion": 3,
+   "_quien": "Hemmy Lady"
+  },
+  {
+   "mapa": 212731392,
+   "npc": 7401,
+   "casilla": 388,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 7"
+  },
+  {
+   "mapa": 212731649,
+   "npc": 7406,
+   "casilla": 82,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 1"
+  },
+  {
+   "mapa": 212731649,
+   "npc": 7406,
+   "casilla": 177,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 1"
+  },
+  {
+   "mapa": 212732163,
+   "npc": 7406,
+   "casilla": 263,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 1"
+  },
+  {
+   "mapa": 212732163,
+   "npc": 6420,
+   "casilla": 290,
+   "orientacion": 1,
+   "_quien": "Nopa Sarás"
+  },
+  {
+   "mapa": 212732163,
+   "npc": 6421,
+   "casilla": 330,
+   "orientacion": 1,
+   "_quien": "Zoe Gidah"
+  },
+  {
+   "mapa": 212732163,
+   "npc": 7406,
+   "casilla": 371,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat bontarien 1"
+  },
+  {
+   "mapa": 212732163,
+   "npc": 2937,
+   "casilla": 484,
+   "orientacion": 1,
+   "_quien": "Cuerbok perdido"
+  },
+  {
+   "mapa": 212860928,
+   "npc": 7394,
+   "casilla": 185,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212860928,
+   "npc": 6615,
+   "casilla": 257,
+   "orientacion": 3,
+   "_quien": "Miliciana deprimida"
+  },
+  {
+   "mapa": 212860928,
+   "npc": 7382,
+   "casilla": 397,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212860928,
+   "npc": 7388,
+   "casilla": 456,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212861955,
+   "npc": 6638,
+   "casilla": 227,
+   "orientacion": 1,
+   "_quien": "Capitana Cryba"
+  },
+  {
+   "mapa": 212862467,
+   "npc": 7382,
+   "casilla": 315,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862467,
+   "npc": 7385,
+   "casilla": 377,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862467,
+   "npc": 230,
+   "casilla": 443,
+   "orientacion": 1,
+   "_quien": "Toka Webos"
+  },
+  {
+   "mapa": 212862469,
+   "npc": 7974,
+   "casilla": 302,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décor - Volkorne rubis"
+  },
+  {
+   "mapa": 212862469,
+   "npc": 7995,
+   "casilla": 313,
+   "orientacion": 1,
+   "_quien": "Ópalo Frenero"
+  },
+  {
+   "mapa": 212862469,
+   "npc": 7991,
+   "casilla": 344,
+   "orientacion": 7,
+   "_quien": "[!] PNJ décor - Volkorne ébène sau"
+  },
+  {
+   "mapa": 212862469,
+   "npc": 7968,
+   "casilla": 415,
+   "orientacion": 5,
+   "_quien": "[!] PNJ décor - Volkorne pourpre"
+  },
+  {
+   "mapa": 212862469,
+   "npc": 7930,
+   "casilla": 423,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décor - Dragodinde pourpre"
+  },
+  {
+   "mapa": 212862469,
+   "npc": 7925,
+   "casilla": 454,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décor - Dragodinde ébène"
+  },
+  {
+   "mapa": 212862470,
+   "npc": 4020,
+   "casilla": 123,
+   "orientacion": 1,
+   "_quien": "Guy Hoi"
+  },
+  {
+   "mapa": 212862470,
+   "npc": 7394,
+   "casilla": 210,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862470,
+   "npc": 7382,
+   "casilla": 327,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862470,
+   "npc": 7388,
+   "casilla": 374,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862471,
+   "npc": 7384,
+   "casilla": 106,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862471,
+   "npc": 7387,
+   "casilla": 110,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862471,
+   "npc": 7386,
+   "casilla": 130,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862471,
+   "npc": 249,
+   "casilla": 149,
+   "orientacion": 3,
+   "_quien": "Guerrera Kady Maxy"
+  },
+  {
+   "mapa": 212862471,
+   "npc": 7384,
+   "casilla": 150,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212862471,
+   "npc": 7382,
+   "casilla": 302,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864007,
+   "npc": 3228,
+   "casilla": 189,
+   "orientacion": 3,
+   "_quien": "Juanma Lechor"
+  },
+  {
+   "mapa": 212864007,
+   "npc": 7388,
+   "casilla": 312,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864007,
+   "npc": 7382,
+   "casilla": 377,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864007,
+   "npc": 7382,
+   "casilla": 378,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864008,
+   "npc": 266,
+   "casilla": 100,
+   "orientacion": 3,
+   "_quien": "Pel Otero"
+  },
+  {
+   "mapa": 212864008,
+   "npc": 7382,
+   "casilla": 217,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864008,
+   "npc": 7386,
+   "casilla": 261,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864008,
+   "npc": 7384,
+   "casilla": 340,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864008,
+   "npc": 6529,
+   "casilla": 411,
+   "orientacion": 3,
+   "_quien": "Capitana Brakmalicia"
+  },
+  {
+   "mapa": 212864515,
+   "npc": 7386,
+   "casilla": 273,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864515,
+   "npc": 250,
+   "casilla": 342,
+   "orientacion": 1,
+   "_quien": "Guerrero Jack, el Eruptador"
+  },
+  {
+   "mapa": 212864515,
+   "npc": 7382,
+   "casilla": 396,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864519,
+   "npc": 7382,
+   "casilla": 201,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864519,
+   "npc": 7385,
+   "casilla": 367,
+   "orientacion": 1,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 212864519,
+   "npc": 6530,
+   "casilla": 397,
+   "orientacion": 3,
+   "_quien": "Joselu Peroles"
+  },
+  {
+   "mapa": 217057284,
+   "npc": 6365,
+   "casilla": 341,
+   "orientacion": 1,
+   "_quien": "Mirleen el Encadenador"
+  },
+  {
+   "mapa": 217057284,
+   "npc": 6974,
+   "casilla": 359,
+   "orientacion": 3,
+   "_quien": "Paraxcelso"
+  },
+  {
+   "mapa": 217057286,
+   "npc": 6662,
+   "casilla": 287,
+   "orientacion": 3,
+   "_quien": "Cyrs Bluffy"
+  },
+  {
+   "mapa": 217059328,
+   "npc": 6394,
+   "casilla": 289,
+   "orientacion": 3,
+   "_quien": "Banquero bontariano"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6541,
+   "casilla": 175,
+   "orientacion": 1,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 2995,
+   "casilla": 234,
+   "orientacion": 3,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6542,
+   "casilla": 287,
+   "orientacion": 1,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6542,
+   "casilla": 310,
+   "orientacion": 1,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6541,
+   "casilla": 327,
+   "orientacion": 1,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6546,
+   "casilla": 346,
+   "orientacion": 3,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6570,
+   "casilla": 367,
+   "orientacion": 7,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6570,
+   "casilla": 389,
+   "orientacion": 3,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6570,
+   "casilla": 413,
+   "orientacion": 7,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6546,
+   "casilla": 433,
+   "orientacion": 3,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6546,
+   "casilla": 457,
+   "orientacion": 7,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219152386,
+   "npc": 6570,
+   "casilla": 500,
+   "orientacion": 7,
+   "_quien": "Guardia del palacio"
+  },
+  {
+   "mapa": 219415040,
+   "npc": 7384,
+   "casilla": 344,
+   "orientacion": 3,
+   "_quien": "[!] PNJ décors- Soldat brâkmarien "
+  },
+  {
+   "mapa": 220200961,
+   "npc": 6408,
+   "casilla": 172,
+   "orientacion": 1,
+   "_quien": "Runoga Gha"
+  },
+  {
+   "mapa": 238553348,
+   "npc": 4638,
+   "casilla": 206,
+   "orientacion": 3,
+   "_quien": "Draconiros"
+  },
+  {
+   "mapa": 241437185,
+   "npc": 8002,
+   "casilla": 550,
+   "orientacion": 3,
+   "_quien": "Voz misteriosa"
+  },
+  {
+   "mapa": 241438721,
+   "npc": 7581,
+   "casilla": 260,
+   "orientacion": 3,
+   "_quien": "Ganymed"
+  },
+  {
+   "mapa": 241439745,
+   "npc": 7581,
+   "casilla": 246,
+   "orientacion": 3,
+   "_quien": "Ganymed"
+  },
+  {
+   "mapa": 241440769,
+   "npc": 2895,
+   "casilla": 301,
+   "orientacion": 3,
+   "_quien": "Maestro Curro"
+  },
+  {
+   "mapa": 241441793,
+   "npc": 2896,
+   "casilla": 217,
+   "orientacion": 3,
+   "_quien": "Maestro Darmas"
+  },
+  {
+   "mapa": 241441793,
+   "npc": 2930,
+   "casilla": 312,
+   "orientacion": 1,
+   "_quien": "Chafer piquero celestial"
+  },
+  {
+   "mapa": 241441793,
+   "npc": 2930,
+   "casilla": 327,
+   "orientacion": 3,
+   "_quien": "Chafer piquero celestial"
+  },
+  {
+   "mapa": 241441793,
+   "npc": 2927,
+   "casilla": 370,
+   "orientacion": 5,
+   "_quien": "Chafer explorador celestial"
+  },
+  {
+   "mapa": 241443329,
+   "npc": 7581,
+   "casilla": 206,
+   "orientacion": 3,
+   "_quien": "Ganymed"
+  }
+ ]
+}

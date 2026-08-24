@@ -754,7 +754,12 @@ namespace Jondo.Unity.Launcher
             foreach (var spawn in Managers.Npcs.Of(mapa))
             {
                 var sitio = Managers.Vendors.PlacementOf(spawn.NpcId);
-                if (sitio == null) continue;
+
+                // Sólo se mira al que está donde LO HEMOS PUESTO NOSOTROS. Algunos vendedores
+                // salen además en las capturas, plantados por Ankama en otros mapas, y ésos van
+                // donde diga la captura aunque su casilla no sea pisable: un NPC puede estar de
+                // pie donde el jugador no anda, y sólo 151 de los 422 del mundo lo son.
+                if (sitio == null || spawn.Cell != sitio.Value.Cell) continue;
 
                 if (!MapManager.IsCellWalkable(spawn.MapId, spawn.Cell))
                     throw new InvalidOperationException(
