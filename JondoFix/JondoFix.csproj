@@ -26,4 +26,14 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <!-- El mod no sirve de nada en bin/: MelonLoader lo carga de la carpeta Mods del cliente. Se
+       copia solo al compilar, igual que el .exe del servidor va solo a la raiz. Se salta con
+       -p:SkipModDeploy=true, y si no hay cliente delante tampoco pasa nada. -->
+  <Target Name="DesplegarMod" AfterTargets="Build"
+          Condition="'$(SkipModDeploy)' != 'true' And Exists('$(DofusClientDir)\Mods')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DofusClientDir)\Mods"
+          OverwriteReadOnlyFiles="true" />
+    <Message Text="[Deploy] JondoFix.dll en $(DofusClientDir)\Mods." Importance="high" />
+  </Target>
 </Project>
