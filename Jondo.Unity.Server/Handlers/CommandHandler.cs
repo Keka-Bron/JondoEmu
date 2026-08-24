@@ -57,6 +57,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 [".size"] = "Uso: .size <n> — 100 es el tamaño normal, por ejemplo .size 200",
                 [".item"] = "Uso: .item <id> [cantidad] — por ejemplo .item 10784 1",
                 [".itemset"] = "Uso: .itemset <id de panoplia> — por ejemplo .itemset 1",
+                [".packets"] = "Uso: .packets [cuántos] — lo que el cliente manda y no atendemos",
             };
 
         /// <summary>
@@ -147,6 +148,7 @@ namespace Jondo.Unity.Launcher.Handlers
                     case ".size": await SizeAsync(stream, rest, channel, accountId); break;
                     case ".item": await ItemAsync(stream, rest, channel, accountId); break;
                     case ".itemset": await ItemSetAsync(stream, rest, channel, accountId); break;
+                    case ".packets": await PacketsAsync(stream, rest, channel, accountId); break;
                 }
             }
             catch (Exception ex)
@@ -697,6 +699,55 @@ namespace Jondo.Unity.Launcher.Handlers
             await NotifyAsync(stream,
                 $"Panoplia {setId}: {added}/{templates.Count} objetos añadidos.{warning}",
                 channel, accountId);
+        }
+
+        // ─── .packets ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Lo que el cliente nos manda y no sabemos atender, de lo que más pasa a lo que menos.
+        ///
+        /// Va agrupado por FORMA y no por opcode, que es lo que hace que la lista sirva: un mismo
+        /// opcode puede llevar cargas distintas según lo que el jugador esté haciendo, y contarlas
+        /// juntas esconde justo lo que hay que ver.
+        ///
+        /// Esto no descifra nada. Dice dónde mirar; lo que se mire se mide contra una captura como
+        /// todo lo demás, y hasta entonces no se contesta nada, porque una respuesta inventada deja
+        /// al cliente con un estado que el servidor no tiene.
+        /// </summary>
+        private static async Task PacketsAsync(NetworkStream stream, string rest,
+                                               int channel, long accountId)
+        {
+            int cuantas = 10;
+            if (rest.Trim().Length > 0 &&
+                (!int.TryParse(rest.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture,
+                               out cuantas) || cuantas <= 0 || cuantas > 40))
+            {
+                await NotifyAsync(stream, Uso[".packets"], channel, accountId);
+                return;
+            }
+
+            var lista = Network.UnknownPackets.Top(cuantas);
+            if (lista.Count == 0)
+            {
+                await NotifyAsync(stream, "No hay ningún paquete sin atender apuntado.",
+                                  channel, accountId);
+                return;
+            }
+
+            await NotifyAsync(stream, Network.UnknownPackets.Resumen(), channel, accountId);
+            foreach (var fila in lista)
+            {
+                string marca = fila.Kind switch
+                {
+                    Network.UnknownPackets.Kind.Silenced => "silenciado",
+                    Network.UnknownPackets.Kind.Undecodable => "ilegible",
+                    _ => "sin atender",
+                };
+                await NotifyAsync(stream,
+                    $"{fila.Opcode} x{fila.Occurrences} ({marca}, f{fila.RootField}, " +
+                    $"{fila.PayloadBytes} B) {fila.Signature}",
+                    channel, accountId);
+            }
         }
 
         private static async Task RefreshPodsAsync(NetworkStream stream)

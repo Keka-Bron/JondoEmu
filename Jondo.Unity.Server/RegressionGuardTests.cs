@@ -42,6 +42,7 @@ namespace Jondo.Unity.Launcher
             AssertItemUidsAreServerWide();
             AssertJondoCoinPaysByBand();
             AssertShopCurrencyIsOptional();
+            AssertPacketShapesAreTelling();
             AssertFightSheetMatchesTheCapture();
 
             // El barrido del código fuente llevaba muerto desde que se reorganizaron las
@@ -557,6 +558,93 @@ namespace Jondo.Unity.Launcher
                 desplazamiento += 7;
             }
             return -1;
+        }
+
+        /// <summary>
+        /// La firma de un paquete distingue formas distintas del mismo opcode y junta las iguales.
+        ///
+        /// Es lo único que hace que la lista de paquetes sin atender valga para algo. Si la firma
+        /// deja de meterse en los submensajes, todos los mensajes de un opcode colapsan en una
+        /// sola fila y la lista dice «jjm, 4.000 veces» en vez de decir cuáles de sus formas son
+        /// las que hay que mirar. Y si empieza a distinguir de más —por ejemplo por el VALOR de un
+        /// número en vez de por su presencia— cada pulsación del jugador crea una fila nueva y la
+        /// lista se convierte en un registro.
+        ///
+        /// Se prueban las dos direcciones: que dos cosas distintas den firmas distintas, y que dos
+        /// iguales con otros números dentro den la MISMA.
+        /// </summary>
+        private static void AssertPacketShapesAreTelling()
+        {
+            (byte[] Bytes, string Espera, string Que)[] casos =
+            {
+                (Network.Pb.New().Var(1, 5).Build(), "1:v",
+                 "un número suelto"),
+
+                (Network.Pb.New().Var(1, 5).Var(3, 9).Build(), "1:v,3:v",
+                 "dos números, y el número de campo cuenta"),
+
+                (Network.Pb.New().Var(1, 5).Msg(2, Network.Pb.New().Var(3, 7)).Build(),
+                 "1:v,2:{3:v}",
+                 "un submensaje, mirado por dentro"),
+
+                (Network.Pb.New().Msg(1, Network.Pb.New().Msg(2, Network.Pb.New().Var(4, 1))).Build(),
+                 "1:{2:{4:v}}",
+                 "dos capas de submensaje"),
+
+                (Network.Pb.New().Str(1, "un texto cualquiera").Build(), "1:s",
+                 "una cadena, que no es una estructura"),
+            };
+
+            foreach (var (bytes, espera, que) in casos)
+            {
+                string dio = Network.UnknownPackets.Signature(bytes);
+                if (dio == espera) continue;
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] La firma de «{que}» tendría que ser «{espera}» y " +
+                    $"es «{dio}». Sin ella la lista de paquetes sin atender no distingue nada.");
+            }
+
+            // Lo mismo con otros valores dentro tiene que dar LA MISMA firma: lo que se agrupa es
+            // la forma, no lo que el jugador acaba de pulsar.
+            string unaVez = Network.UnknownPackets.Signature(
+                Network.Pb.New().Var(1, 5).Msg(2, Network.Pb.New().Var(3, 7)).Build());
+            string otraVez = Network.UnknownPackets.Signature(
+                Network.Pb.New().Var(1, 999999).Msg(2, Network.Pb.New().Var(3, 1)).Build());
+            if (unaVez != otraVez)
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] Dos mensajes de la misma forma con otros números " +
+                    $"dan firmas distintas («{unaVez}» y «{otraVez}»). Cada pulsación del jugador " +
+                    "crearía una fila nueva.");
+
+            // Un bloque de datos que POR CASUALIDAD se lea como protobuf no puede colarse como
+            // estructura. Esto no es hipotético: el jrw —el paquete de andar— lleva el camino
+            // como un bloque de bytes, y sin el tope del número de campo se leía como una
+            // estructura con campos 1024, 1566 o 1600, distintos en cada paso que daba el
+            // jugador. Medido sobre las capturas: 307 «formas» de un mismo mensaje en 1.798
+            // capturados, o sea la lista convertida en un registro inservible.
+            //
+            // El tope está medido: en el protocolo entero de 3.6.10.10 hay 8.972 campos
+            // declarados y el más alto es el 40.
+            byte[] bloqueDeDatos = { 0x82, 0x40, 0x02, 0x11, 0x22, 0xC2, 0x60, 0x01, 0x33 };
+            string comoSale = Network.UnknownPackets.Signature(
+                Network.Pb.New().Var(1, 1).Bytes(2, bloqueDeDatos).Build());
+            if (comoSale.Contains("{"))
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] Un bloque de datos se está leyendo como estructura: " +
+                    $"la firma sale «{comoSale}». Con eso el paquete de movimiento genera una fila " +
+                    "nueva por cada paso que da el jugador.");
+
+            // Y dos formas distintas del MISMO opcode no pueden colapsar, que es el caso que
+            // motiva todo esto: en la cola de un servidor real un solo opcode llegó a tener 32
+            // cargas distintas.
+            string forma1 = Network.UnknownPackets.Signature(
+                Network.Pb.New().Var(1, 1).Msg(2, Network.Pb.New().Var(1, 1).Str(3, "x")).Build());
+            string forma2 = Network.UnknownPackets.Signature(
+                Network.Pb.New().Var(1, 1).Msg(4, Network.Pb.New().Var(2, 1)).Build());
+            if (forma1 == forma2)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Dos cargas distintas dan la misma firma. La lista de " +
+                    "paquetes sin atender juntaría en una fila cosas que no tienen nada que ver.");
         }
 
         private static void AssertPerSessionPlayerCaches()

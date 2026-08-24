@@ -887,10 +887,17 @@ namespace Jondo.Unity.Launcher.Network
                         // client saying which spell the pointer is on.
                         cleanPayload.Contains(Op.Kmv) || cleanPayload.Contains(Op.Hnn))
                     {
-                        // Ignored silently as they are secondary client events
+                        // Silenciado, pero no perdido. La lista de arriba son diecisiete opcodes
+                        // escritos a mano hace tiempo para que la consola no se inundara, y no hay
+                        // ninguna medida detras de que ninguno de ellos necesite respuesta: lo que
+                        // hay es que un dia molestaban. Apuntarlos aparte permite volver a mirarlos
+                        // sin volver a llenar la pantalla.
+                        UnknownPackets.RecordFrame(payload, UnknownPackets.Kind.Silenced);
                     }
                     else
                     {
+                        UnknownPackets.RecordFrame(payload, UnknownPackets.Kind.Unhandled);
+
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine($"\n======================================================================");
                         Console.WriteLine($"[Game Node] 🔍 UNHANDLED CLIENT PACKET DETECTED: {payloadStr.Replace("\n", " ").Replace("\r", "")}");

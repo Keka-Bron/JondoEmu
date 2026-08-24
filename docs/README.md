@@ -90,6 +90,11 @@ The exact syntax and behavior of `.item` and `.itemset`, including role checks, 
 data sources, maximum factory effects, persistence, inventory updates and partial-set failures.
 *Go there* when giving an item by template id, creating a complete set or diagnosing a rejected id.
 
+**`unknown-packets.md`** — What the client sends that no handler claims.
+Why it is grouped by message shape rather than by opcode, the measured field-number ceiling that
+keeps a byte blob from posing as a structure, and the `.packets` command.
+*Go there* before hunting for a missing feature: the list says where to look.
+
 **`jondo-coin.md`** — The server's own currency.
 Which Ankama item it reuses and why, how much each monster drops, how the client is made to call it
 "Jondo Coin", and how to point an NPC shop at it so it charges coins instead of kamas.

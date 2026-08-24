@@ -49,8 +49,19 @@ namespace Jondo.Unity.Launcher
         public static string AuthDb => ResolveWritable("auth.db", DatabaseFolder);
         public static string WorldZip => Resolve("world.zip");
 
+        /// <summary>
+        /// La base de diagnóstico donde se apuntan los paquetes que no sabemos atender.
+        ///
+        /// Va aparte de world.db y auth.db a propósito: no lleva nada que haga falta para jugar,
+        /// se puede borrar para empezar de cero y se puede copiar a otra máquina para mirarla sin
+        /// llevarse los personajes de nadie.
+        /// </summary>
+        public static string PacketTelemetryDb => ResolveWritable("paquetes.db", DatabaseFolder);
+
         public static string WorldConnectionString => "Data Source=" + WorldDb.Replace('\\', '/');
         public static string AuthConnectionString => "Data Source=" + AuthDb.Replace('\\', '/');
+        public static string PacketTelemetryConnectionString
+            => "Data Source=" + PacketTelemetryDb.Replace('\\', '/');
 
         // ─── Game data ──────────────────────────────────────────────────────────
         public static string DataDir => ResolveDir("dofus3_data");

@@ -92,6 +92,7 @@ namespace Jondo.Unity.Launcher
             Managers.Mounts.Initialize();
             // Vendors va PRIMERO: Npcs necesita saber ya a quien no debe sembrar, y NpcShops a
             // quien le echa encima el catalogo de quien.
+            Network.UnknownPackets.Initialize();
             Managers.Vendors.Initialize();
             Managers.Npcs.Initialize();
             Managers.NpcShops.Initialize();
