@@ -3500,7 +3500,9 @@ namespace Jondo.Unity.Launcher.Handlers
             var quePagan = fight.Team1.Where(m => !m.EsInvocado).ToList();
             long xpGained = won ? ConElExtra(quePagan.Sum(m => (long)m.XpReward), extraDeRetos) : 0;
             long kamas = won ? ConElExtra(quePagan.Sum(m => 10L + (m.Level * 5L)), extraDeRetos) : 0;
-            var loot = won ? RollFightLoot(fight, extraDeRetos) : new Dictionary<int, int>();
+            var caidos = new List<PlayerItem>();
+            var loot = won ? RollFightLoot(fight, extraDeRetos, out caidos)
+                           : new Dictionary<int, int>();
 
             if (extraDeRetos > 0)
             {
@@ -3562,6 +3564,28 @@ namespace Jondo.Unity.Launcher.Handlers
                 Network.FightProtocol.BuildFightOver()));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyg,
                 Network.FightProtocol.BuildFightResults(results, duration)));
+
+            // Y AHORA SE LE DICE AL CLIENTE QUE LOS TIENE.
+            //
+            // Esto faltaba entero, y es la razón de que el botín se guardara bien y no se viera
+            // por ningún lado: la pantalla de fin de combate lo pintaba —el jyg— pero nadie le
+            // decía al cliente que esos objetos habían entrado en el inventario, así que no
+            // aparecían hasta el siguiente login. Con la Jondo Coin se vio clarísimo: 73 unidades
+            // en la base y ninguna en la mochila.
+            //
+            // El servidor real manda un iua por objeto. Medido en la mazmorra de los jalates:
+            // cuatro iua de 17 bytes con f3{f1:63, f5{gid, cantidad, uid}}. El 63 es la mochila.
+            foreach (var pieza in caidos)
+            {
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iua,
+                    ConnectionProtocol.BuildItemArrived(3, new Managers.HavenBagStore.StoredItem
+                    {
+                        Uid = pieza.Uid,
+                        Gid = pieza.ItemId,
+                        Quantity = pieza.Quantity,
+                        Effects = pieza.RawEffects ?? "[]",
+                    })));
+            }
 
             Program.LogDebug($"[Combate] Reparto: {xpGained} de experiencia (total {GameState.Experience}, " +
                              $"nivel {GameState.CharacterLevel}), {kamas} kamas y {loot.Count} clase(s) de objeto.");
@@ -5170,8 +5194,10 @@ namespace Jondo.Unity.Launcher.Handlers
         private static long ConElExtra(long cuanto, int extra)
             => extra <= 0 ? cuanto : cuanto + cuanto * extra / 100;
 
-        private static Dictionary<int, int> RollFightLoot(FightInstance fight, int extra = 0)
+        private static Dictionary<int, int> RollFightLoot(FightInstance fight, int extra,
+                                                          out List<PlayerItem> caidos)
         {
+            caidos = new List<PlayerItem>();
             var loot = new Dictionary<int, int>();
 
             // Los INVOCADOS no pagan. Entran en el bando del que los invoca con IsMonster
@@ -5203,13 +5229,27 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // De una vez: cada AddItemToInventory cargaba el inventario entero para ver si el
             // objeto ya estaba, así que cinco objetos distintos eran cinco lecturas completas.
-            DatabaseManager.AddItemsToInventory(GameState.CharacterId, loot);
+            caidos = DatabaseManager.AddItemsToInventory(GameState.CharacterId, loot);
             foreach (var kv in loot)
                 Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
 
             if (loot.Count > 0)
             {
                 GameState.SetInventory(DatabaseManager.LoadInventory(GameState.CharacterId));
+
+                // Y LA OTRA LISTA, que es la que de verdad se le manda al cliente.
+                //
+                // Hay dos vistas del inventario y esto sólo refrescaba una. GameState es la del
+                // estado de sesión; la que lee BuildInventory para armar el ivx es
+                // Managers.Equipment, y se quedaba con lo de antes hasta el siguiente login. Por
+                // eso el botín se guardaba bien en la base y el jugador no lo veía por ningún
+                // lado: 73 Jondo Coin en CharacterItems y ni una en la pantalla.
+                foreach (var pieza in caidos)
+                {
+                    Managers.Equipment.Remove(pieza.Uid, int.MaxValue);
+                    Managers.Equipment.Add(pieza.Uid, pieza.ItemId, pieza.Quantity,
+                                           Managers.Equipment.Bag, pieza.RawEffects ?? "[]");
+                }
             }
 
             return loot;
@@ -5263,7 +5303,8 @@ namespace Jondo.Unity.Launcher.Handlers
             // The f3.f9 experience progress block is left out: the capture gives a single sample
             // and does not let us tell what each number means, so it is omitted instead of being
             // filled in by eye. It is optional; the screen still shows up, minus the XP bar.
-            var loot = (fight.WinnerTeamId == 0) ? RollFightLoot(fight) : new Dictionary<int, int>();
+            var loot = (fight.WinnerTeamId == 0) ? RollFightLoot(fight, 0, out _)
+                                                 : new Dictionary<int, int>();
 
             var lootMsg = new ProtoMessage();
             foreach (var kv in loot)

@@ -3989,9 +3989,11 @@ namespace Jondo.Unity.Launcher
         /// el inventario completo —1.737 filas en la cuenta de la captura— justo en el momento en
         /// que el jugador está esperando la pantalla de recompensa.
         /// </summary>
-        public static void AddItemsToInventory(long characterId, IReadOnlyDictionary<int, int> items)
+        public static List<PlayerItem> AddItemsToInventory(long characterId,
+                                                           IReadOnlyDictionary<int, int> items)
         {
-            if (items == null || items.Count == 0) return;
+            var tocados = new List<PlayerItem>();
+            if (items == null || items.Count == 0) return tocados;
 
             var inventory = LoadInventory(characterId);
 
@@ -4002,6 +4004,7 @@ namespace Jondo.Unity.Launcher
                 {
                     existing.Quantity += kv.Value;
                     SaveInventoryItem(characterId, existing);
+                    tocados.Add(existing);
                     continue;
                 }
 
@@ -4018,7 +4021,13 @@ namespace Jondo.Unity.Launcher
                 // —no pasa hoy, pero el diccionario no lo impide— la segunda tiene que apilarse
                 // sobre la primera y no crear otra fila.
                 inventory.Add(nuevo);
+                tocados.Add(nuevo);
             }
+
+            // Se devuelven con el uid y la cantidad QUE HA QUEDADO, que es lo que hace falta para
+            // decirle al cliente que le han caído: sin el uid no se puede construir el aviso, y
+            // sin él el objeto se queda invisible hasta el siguiente login.
+            return tocados;
         }
 
         public static PlayerItem AddItemToInventory(long characterId, int itemGid, int quantity)
