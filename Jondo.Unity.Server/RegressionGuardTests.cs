@@ -334,6 +334,25 @@ namespace Jondo.Unity.Launcher
                     "[RegressionGuard FAILED] El repartidor de uid devuelve el mismo número dos " +
                     "veces. Dos objetos con el mismo uid se pisan en la base.");
 
+            // Y ninguno de los que YA están escritos se sale de los 32 bits que el cliente
+            // conserva.
+            //
+            // Comprobarlo sobre lo que acaba de devolver NextItemUid no serviría: ese método
+            // lanza él mismo al pasarse del tope, así que la condición nunca podría ser cierta.
+            // Lo que sí puede volver a torcerse es la base: basta con que alguien vuelva a
+            // sembrar un inventario con `characterId * 1000` —que es de donde salió esto— para
+            // que el cliente reciba un número que no puede devolver entero. Con el personaje
+            // 13.825.560 el uid 13.825.560.000 le llegaba al cliente como 940.658.112, y al
+            // equipar el objeto el servidor no lo reconocía: «no es de los nuestros», y la ficha
+            // se quedaba sin los efectos de esa pieza.
+            int fueraDeRango = DatabaseManager.ObjetosConUidFueraDelCliente();
+            if (fueraDeRango > 0)
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] Hay {fueraDeRango} objeto(s) con un uid que el " +
+                    $"cliente no puede devolver entero: sólo conserva 32 bits. Los repara sola " +
+                    "DatabaseManager.RepairClientItemUids al arrancar, así que si esto salta es " +
+                    "que alguien escribe uid sin pasar por NextItemUid().");
+
             // Y por encima de lo que ya hay escrito, que es lo que evita chocar con lo existente.
             long enUso = DatabaseManager.MayorUidGuardado();
             if (primero <= enUso)

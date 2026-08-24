@@ -94,9 +94,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 return -1;
             }
 
-            long mapaQueDeja = GameState.MapId;
-            GameState.MapId = mapId;
-            GameState.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
+            long mapaQueDeja = SessionContext.State.MapId;
+            SessionContext.State.MapId = mapId;
+            SessionContext.State.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
             DatabaseManager.SaveCurrentCharacter();
 
             // Los otros dos mapas implicados: del que sale y al que entra. Sin esto, teletransportarse
@@ -104,7 +104,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorLeft(GameState.CharacterId));
+                ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(mapId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -112,9 +112,9 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapDiscovered(mapId));
 
-            Console.WriteLine($"[Teleport] Al mapa {mapId}, casilla {GameState.CellId}. " +
+            Console.WriteLine($"[Teleport] Al mapa {mapId}, casilla {SessionContext.State.CellId}. " +
                               "Esperando el jrh.");
-            return GameState.CellId;
+            return SessionContext.State.CellId;
         }
     }
 }

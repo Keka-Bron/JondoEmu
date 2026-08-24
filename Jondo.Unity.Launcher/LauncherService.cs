@@ -232,6 +232,9 @@ namespace Jondo.Unity.Launcher
                 long accountId = cuerpo.Value.GetProperty("cuenta").GetInt64();
                 int instanceId = cuerpo.Value.GetProperty("instancia").GetInt32();
                 string hash = cuerpo.Value.GetProperty("hash").GetString() ?? "";
+                int accountRole = cuerpo.Value.TryGetProperty("rol", out var roleValue)
+                    ? roleValue.GetInt32()
+                    : Roles.Jugador;
 
                 // Unity is told the size up front. Maximizing afterwards is not enough on its own:
                 // the client rebuilds its window when it moves between screens (server choice,
@@ -264,6 +267,9 @@ namespace Jondo.Unity.Launcher
                 startInfo.Environment["ZAAP_RELEASE"] = "dofus3";
                 startInfo.Environment["ZAAP_INSTANCE_ID"] = instanceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 startInfo.Environment["ZAAP_CAN_AUTH"] = "true";
+                // JondoFix uses this only to decide whether item ids may be shown in the client.
+                // It is cosmetic: every administration command is still authorized by the server.
+                startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                 System.Diagnostics.Process? client;
                 try

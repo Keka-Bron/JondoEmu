@@ -68,6 +68,62 @@ namespace Jondo.Unity.Launcher
                     Console.WriteLine("[DatabaseManager] Columna Role añadida a Accounts; todos empiezan como jugador.");
                 }
 
+                // La escala de roles se quedaba en el 4, que quería decir administrador. Giny y
+                // los criterios de derechos de Dofus usan la escala entera del 1 al 5: el 3 es
+                // padawan, el 4 game master y el 5 administrador.
+                //
+                // Renumerar cambia lo que significan DOS valores, así que hay que mover a los dos.
+                // El 4 pasa a 5 —los que eran administradores lo siguen siendo— y el 3 pasa a 4,
+                // porque quien era game master con el 3 se quedaría de padawan si no. El orden
+                // importa: primero el 4 y después el 3, o los que suban de 3 volverían a subir.
+                //
+                // Y se hace UNA vez, apuntándolo en JondoMigrations. Un UPDATE suelto en cada
+                // arranque ascendería en silencio a administrador a todo game master futuro.
+                var createMigrations = authConnection.CreateCommand();
+                createMigrations.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS JondoMigrations (
+                        Name TEXT PRIMARY KEY,
+                        AppliedAt TEXT NOT NULL
+                    );
+                ";
+                createMigrations.ExecuteNonQuery();
+
+                const string roleScaleMigration = "roles-giny-1-to-5";
+                var migrationDone = authConnection.CreateCommand();
+                migrationDone.CommandText = "SELECT 1 FROM JondoMigrations WHERE Name = $name LIMIT 1;";
+                migrationDone.Parameters.AddWithValue("$name", roleScaleMigration);
+                if (migrationDone.ExecuteScalar() == null)
+                {
+                    using var transaction = authConnection.BeginTransaction();
+
+                    var migrarAdministradores = authConnection.CreateCommand();
+                    migrarAdministradores.Transaction = transaction;
+                    migrarAdministradores.CommandText =
+                        "UPDATE Accounts SET Role = $admin WHERE Role = 4;";
+                    migrarAdministradores.Parameters.AddWithValue("$admin", Roles.Administrador);
+                    int administradores = migrarAdministradores.ExecuteNonQuery();
+
+                    var migrarGameMasters = authConnection.CreateCommand();
+                    migrarGameMasters.Transaction = transaction;
+                    migrarGameMasters.CommandText =
+                        "UPDATE Accounts SET Role = $gm WHERE Role = 3;";
+                    migrarGameMasters.Parameters.AddWithValue("$gm", Roles.GameMaster);
+                    int gameMasters = migrarGameMasters.ExecuteNonQuery();
+
+                    var rememberMigration = authConnection.CreateCommand();
+                    rememberMigration.Transaction = transaction;
+                    rememberMigration.CommandText =
+                        "INSERT INTO JondoMigrations (Name, AppliedAt) VALUES ($name, $when);";
+                    rememberMigration.Parameters.AddWithValue("$name", roleScaleMigration);
+                    rememberMigration.Parameters.AddWithValue("$when", DateTimeOffset.UtcNow.ToString("O"));
+                    rememberMigration.ExecuteNonQuery();
+
+                    transaction.Commit();
+                    Console.WriteLine($"[DatabaseManager] Escala de roles 1..5 aplicada: " +
+                                      $"{administradores} administrador(es) de 4 a 5 y " +
+                                      $"{gameMasters} game master(s) de 3 a 4.");
+                }
+
                 // La sesión del LANZADOR, que hasta ahora era el mismo token que el del juego.
                 //
                 // Y eso se rompía solo: al arrancar un cliente, el Zaap y el HAAPI le dan a la
@@ -111,7 +167,9 @@ namespace Jondo.Unity.Launcher
                 // Y si esas dos cuentas ya existían de antes, se les pone el rol: son las de los
                 // dos que llevan el servidor. Al resto no se le toca nada.
                 var duenos = authConnection.CreateCommand();
-                duenos.CommandText = "UPDATE Accounts SET Role = 4 WHERE Login IN ('keka', 'dragonlord') AND Role < 4;";
+                duenos.CommandText = "UPDATE Accounts SET Role = $admin " +
+                                     "WHERE Login IN ('keka', 'dragonlord') AND Role < $admin;";
+                duenos.Parameters.AddWithValue("$admin", Roles.Administrador);
                 int promovidos = duenos.ExecuteNonQuery();
                 if (promovidos > 0) Console.WriteLine($"[DatabaseManager] {promovidos} cuenta(s) puestas como administrador.");
             }
@@ -377,6 +435,13 @@ namespace Jondo.Unity.Launcher
                     CREATE UNIQUE INDEX IF NOT EXISTS idx_items_uid ON CharacterItems(Uid);
                 ";
                 createItems.ExecuteNonQuery();
+
+                // El cliente guarda el uid de inventario en 32 bits. Los personajes cuyo id es
+                // grande se sembraban con `characterId * 1000`: por ejemplo 13825561032 llegaba
+                // al cliente como 940659144. Al devolver ese número para equipar, el servidor no
+                // encontraba el objeto original y dejaba la ficha sin sus efectos. Reasigna una
+                // vez cualquier uid que no pueda hacer el viaje de ida y vuelta sin truncarse.
+                RepairClientItemUids(worldConnection);
 
                 // Migration: Ensure Effects column exists in CharacterItems
                 try
@@ -2090,6 +2155,11 @@ namespace Jondo.Unity.Launcher
                 byte[] look = Managers.BreedLookTable.BuildLook(breed, sex, headId,
                                                                propios.Count > 0 ? propios : null);
 
+                // Se reservan antes de abrir la transacción: NextItemUid consulta la misma base
+                // con otra conexión la primera vez y SQLite no debe encontrarla bloqueada aquí.
+                var starterUids = new List<long>();
+                foreach (var _ in starterSet) starterUids.Add(NextItemUid());
+
                 using var transaction = connection.BeginTransaction();
 
                 var insertar = connection.CreateCommand();
@@ -2117,7 +2187,7 @@ namespace Jondo.Unity.Launcher
 
                 SetServerAndHead(connection, id, serverId, headId);
 
-                long uid = id * 1000;
+                int uidIndex = 0;
                 foreach (var (gid, slot) in starterSet)
                 {
                     var objeto = connection.CreateCommand();
@@ -2125,7 +2195,7 @@ namespace Jondo.Unity.Launcher
                                          "(CharacterId, Uid, Gid, Quantity, Position, Effects) " +
                                          "VALUES ($id, $uid, $gid, 1, $pos, $e);";
                     objeto.Parameters.AddWithValue("$id", id);
-                    objeto.Parameters.AddWithValue("$uid", uid++);
+                    objeto.Parameters.AddWithValue("$uid", starterUids[uidIndex++]);
                     objeto.Parameters.AddWithValue("$gid", gid);
                     objeto.Parameters.AddWithValue("$pos", slot);
                     objeto.Parameters.AddWithValue("$e", EffectsOfTemplate(connection, gid));
@@ -2205,6 +2275,35 @@ namespace Jondo.Unity.Launcher
             }
             catch { }
             return "[]";
+        }
+
+        /// <summary>
+        /// Looks up an item template and rolls its factory effects at their maximum value.
+        /// Returning false distinguishes a real effect-less item from an unknown template id.
+        /// </summary>
+        public static bool TryGetItemTemplateEffects(int gid, out string effects)
+        {
+            effects = "[]";
+            if (gid <= 0) return false;
+
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var exists = connection.CreateCommand();
+                exists.CommandText = "SELECT 1 FROM ItemTemplates WHERE Id = $gid LIMIT 1;";
+                exists.Parameters.AddWithValue("$gid", gid);
+                if (exists.ExecuteScalar() == null) return false;
+
+                effects = EffectsOfTemplate(connection, gid);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se pudo leer la plantilla {gid}: {ex.Message}");
+                return false;
+            }
         }
 
         /// <summary>
@@ -3695,6 +3794,12 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private const long PrimerUidRepartido = 1_000_000_000L;
 
+        /// <summary>
+        /// El cliente 3.6 reduce el uid de inventario a 32 bits. Nos quedamos además en la mitad
+        /// positiva para que ninguna capa que lo trate como int con signo pueda cambiarlo.
+        /// </summary>
+        public const long MaxClientItemUid = int.MaxValue;
+
         private static long _ultimoUidRepartido;
         private static readonly object _candadoDelUid = new object();
 
@@ -3709,7 +3814,10 @@ namespace Jondo.Unity.Launcher
                 }
             }
 
-            return System.Threading.Interlocked.Increment(ref _ultimoUidRepartido);
+            long next = System.Threading.Interlocked.Increment(ref _ultimoUidRepartido);
+            if (next > MaxClientItemUid)
+                throw new InvalidOperationException("No quedan uid de objeto compatibles con el cliente.");
+            return next;
         }
 
         /// <summary>El mayor uid escrito en la base. Lo usa la guardia de regresion.</summary>
@@ -3723,12 +3831,110 @@ namespace Jondo.Unity.Launcher
                 connection.Open();
 
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT MAX(Uid) FROM CharacterItems;";
+                command.CommandText = "SELECT MAX(Uid) FROM CharacterItems " +
+                                      "WHERE Uid > 0 AND Uid <= $max;";
+                command.Parameters.AddWithValue("$max", MaxClientItemUid);
                 return command.ExecuteScalar() is long max ? max : 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[SQLite] No se pudo leer el mayor uid en uso: {ex.Message}");
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Arregla los uid que salieron de `characterId * 1000` y no caben en los 32 bits que el
+        /// cliente conserva.
+        ///
+        /// Medido sobre nuestra propia base: 10 de 1.777 objetos estaban así, todos de los tres
+        /// personajes cuyo id pasa de dos millones. El objeto 13.825.560.000 le llegaba al cliente
+        /// como 940.658.112 —que es el mismo número recortado a 32 bits— y al devolverlo para
+        /// equiparlo el servidor no lo reconocía. La ficha se quedaba sin los efectos de esa
+        /// pieza y en el registro salía «no es de los nuestros».
+        ///
+        /// Y no era sólo el pasado: como NextItemUid arrancaba en el mayor uid de la tabla, con
+        /// un 13.825.560.013 escrito el siguiente objeto que fabricara el servidor —un botín, una
+        /// compra, el merkasako— nacía ya roto. Por eso la consulta del mayor uid se acota ahora
+        /// al rango del cliente.
+        ///
+        /// La fila no cambia de dueño, ni de plantilla, ni de sitio, ni de efectos: lo único que
+        /// se le cambia es el número con el que viaja.
+        /// </summary>
+        private static void RepairClientItemUids(SqliteConnection connection)
+        {
+            var invalidRows = new List<(long Id, long CharacterId)>();
+            var find = connection.CreateCommand();
+            find.CommandText = "SELECT Id, CharacterId FROM CharacterItems " +
+                               "WHERE Uid <= 0 OR Uid > $max ORDER BY Id;";
+            find.Parameters.AddWithValue("$max", MaxClientItemUid);
+            using (var reader = find.ExecuteReader())
+            {
+                while (reader.Read()) invalidRows.Add((reader.GetInt64(0), reader.GetInt64(1)));
+            }
+
+            if (invalidRows.Count == 0) return;
+
+            var highest = connection.CreateCommand();
+            highest.CommandText = "SELECT MAX(Uid) FROM CharacterItems " +
+                                  "WHERE Uid > 0 AND Uid <= $max;";
+            highest.Parameters.AddWithValue("$max", MaxClientItemUid);
+            long next = highest.ExecuteScalar() is long used
+                ? Math.Max(used, PrimerUidRepartido)
+                : PrimerUidRepartido;
+
+            if (next + invalidRows.Count > MaxClientItemUid)
+                throw new InvalidOperationException(
+                    "No quedan uid de 32 bits libres para arreglar CharacterItems.");
+
+            using var transaction = connection.BeginTransaction();
+            foreach (var row in invalidRows)
+            {
+                var update = connection.CreateCommand();
+                update.Transaction = transaction;
+                // El CharacterId se queda en el filtro aunque el Id ya sea único: así toda
+                // escritura de inventario mantiene la condición de propiedad que comprueba la
+                // guardia al arrancar, y nadie que copie esta consulta más adelante puede
+                // olvidarse de ella.
+                update.CommandText = "UPDATE CharacterItems SET Uid = $uid " +
+                                     "WHERE Id = $id AND CharacterId = $character;";
+                update.Parameters.AddWithValue("$uid", ++next);
+                update.Parameters.AddWithValue("$id", row.Id);
+                update.Parameters.AddWithValue("$character", row.CharacterId);
+                update.ExecuteNonQuery();
+            }
+            transaction.Commit();
+
+            // Si el repartidor ya se había consultado, tiene que seguir por detrás de los
+            // números que esta reparación acaba de gastar.
+            System.Threading.Interlocked.Exchange(ref _ultimoUidRepartido, next);
+            Console.WriteLine($"[SQLite] {invalidRows.Count} uid de objeto que no cabían en 32 bits, arreglados.");
+        }
+
+        /// <summary>
+        /// Cuántos objetos hay escritos con un uid que el cliente no puede devolver entero.
+        ///
+        /// Lo usa la guardia de regresión. Tiene que valer cero siempre: los que había los arregló
+        /// <see cref="RepairClientItemUids"/> al arrancar, y los nuevos salen de
+        /// <see cref="NextItemUid"/>, que no reparte por encima del tope. Si esto crece es que
+        /// alguien está escribiendo uid por su cuenta.
+        /// </summary>
+        public static int ObjetosConUidFueraDelCliente()
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM CharacterItems " +
+                                      "WHERE Uid <= 0 OR Uid > $max;";
+                command.Parameters.AddWithValue("$max", MaxClientItemUid);
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se pudo contar los uid fuera de rango: {ex.Message}");
                 return 0;
             }
         }

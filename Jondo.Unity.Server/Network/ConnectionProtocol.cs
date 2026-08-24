@@ -882,12 +882,35 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(5, interactive.Element.Id)
                 .Var(6, interactive.Type));
 
+            DeclarePlacement(jss, interactive.Element,
+                gathering && !usable ? state : Managers.ResourceState.Full);
+        }
+
+        /// <summary>
+        /// Dónde está un elemento y en qué estado (f15).
+        ///
+        /// El f15 acompaña SIEMPRE a un f11 y nunca va solo. Medido sobre las 305 capturas del
+        /// juego real: en los 834 jss que llevan elementos hay 4.493 f11 y sólo 2.685 f15, y un
+        /// f15 cuyo elemento no tenga su f11 aparece 3 veces —una sola vez en cada uno—, o sea
+        /// el 0,36 %. Al revés pasa en 615 de los 834: un elemento con acción al que el servidor
+        /// no le manda colocación.
+        ///
+        /// Es decir: el f15 es un SUBCONJUNTO del f11, no un superconjunto. Declarar uno por cada
+        /// elemento del mapa —los 46.309 de interactive_elements.json, repartidos en 9.840 mapas,
+        /// hasta 71 en el peor— pondría a Jondo a mandar lo contrario de lo que manda Ankama.
+        ///
+        /// El f1 dice que el elemento es de este mapa. La ausencia del f4 es el estado activo, que
+        /// por eso no se escribe. El dibujo no viaja: el cliente lo saca de sus propios datos de
+        /// mapa a partir del número del elemento.
+        /// </summary>
+        private static void DeclarePlacement(Pb jss, Managers.Interactives.Element element,
+                                             Managers.ResourceState state)
+        {
             var placement = Pb.New()
                 .Var(1, 1)
-                .Var(2, interactive.Element.Cell)
-                .Var(3, interactive.Element.Id);
-            if (gathering && !usable) placement.Var(4, (int)state);
-
+                .Var(2, element.Cell)
+                .Var(3, element.Id);
+            if (state != Managers.ResourceState.Full) placement.Var(4, (int)state);
             jss.Msg(15, placement);
         }
 
