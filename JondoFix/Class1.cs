@@ -66,20 +66,20 @@ namespace JondoFix
                 DescriptionId = 777280,
                 Description = new Dictionary<string, string>
                 {
-                    ["es"] = "No existe fuera de Jondo: ningun banco la reconoce, ningun mercader "
-                           + "la rechaza. Acunada por Keka Bron, DragonLord y Lux en una fragua "
-                           + "que no figura en ningun mapa.",
+                    ["es"] = "No existe fuera de Jondo: ningún banco la reconoce, ningún mercader "
+                           + "la rechaza. Acuñada por Keka Bron, DragonLord y Lux en una fragua "
+                           + "que no figura en ningún mapa.",
                     ["en"] = "It does not exist outside Jondo: no bank will recognise it, no "
                            + "merchant will refuse it. Struck by Keka Bron, DragonLord and Lux in "
                            + "a forge that appears on no map.",
-                    ["fr"] = "Elle n existe pas hors de Jondo : aucune banque ne la reconnait, "
-                           + "aucun marchand ne la refuse. Frappee par Keka Bron, DragonLord et "
+                    ["fr"] = "Elle n'existe pas hors de Jondo : aucune banque ne la reconnaît, "
+                           + "aucun marchand ne la refuse. Frappée par Keka Bron, DragonLord et "
                            + "Lux dans une forge qui ne figure sur aucune carte.",
-                    ["de"] = "Ausserhalb von Jondo existiert sie nicht: Keine Bank erkennt sie an, "
-                           + "kein Handler weist sie zurueck. Gepraegt von Keka Bron, DragonLord "
+                    ["de"] = "Außerhalb von Jondo existiert sie nicht: Keine Bank erkennt sie an, "
+                           + "kein Händler weist sie zurück. Geprägt von Keka Bron, DragonLord "
                            + "und Lux in einer Schmiede, die auf keiner Karte verzeichnet ist.",
-                    ["pt"] = "Nao existe fora de Jondo: nenhum banco a reconhece, nenhum mercador "
-                           + "a recusa. Cunhada por Keka Bron, DragonLord e Lux numa forja que nao "
+                    ["pt"] = "Não existe fora de Jondo: nenhum banco a reconhece, nenhum mercador "
+                           + "a recusa. Cunhada por Keka Bron, DragonLord e Lux numa forja que não "
                            + "consta em nenhum mapa.",
                 },
             },
