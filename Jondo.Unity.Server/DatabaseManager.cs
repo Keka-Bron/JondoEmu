@@ -3580,8 +3580,21 @@ namespace Jondo.Unity.Launcher
             // devolvía una lista vacía: por eso al atacar con la espada salía un puñetazo.
             //
             // Se lee de RawEffects, que es el json tal cual vino, con el mismo parser que ya sabe
-            // su forma. Se coge el efecto de más daño, no el primero: un arma con dos efectos
-            // —«9 a 13 de agua» y «27 a 33 de neutral»— pega con el gordo.
+            // su forma.
+            //
+            // Y se guardan TODAS las líneas, no sólo la de más daño. Antes había un
+            // «if (maximo <= data.BaseDamageMax) continue;» que se quedaba con la mayor y tiraba
+            // las demás, así que un arma de tres líneas pegaba una sola vez. La Lanzapinza de
+            // Cangrancio tiene [[96,0,9,13],[96,0,9,13],[91,0,27,33]] y sólo sobrevivía la
+            // última: en el chat salía UNA cifra donde tenían que salir tres.
+            //
+            // El servidor real manda un golpe por línea, cada uno con SU número de efecto: el
+            // Cocobur crítico manda tres (2822, 91, 93), la Lavacha dos (97, 92) y las Garras dos
+            // (96, 94).
+            //
+            // Los campos sueltos —Element, BaseDamageMin y BaseDamageMax— se siguen rellenando con
+            // la línea más gorda, porque son los que mira la IA para estimar el daño y para eso
+            // vale la mayor.
             foreach (var efecto in Managers.Equipment.ParseEffects(weapon.RawEffects))
             {
                 if (efecto.Effect < 91 || efecto.Effect > 100) continue;
@@ -3590,7 +3603,6 @@ namespace Jondo.Unity.Launcher
                 int maximo = (int)(efecto.DiceSide != 0 ? efecto.DiceSide : minimo);
                 if (minimo <= 0 && maximo <= 0) continue;
                 if (maximo < minimo) maximo = minimo;
-                if (maximo <= data.BaseDamageMax) continue;
 
                 var elemCmd = connection.CreateCommand();
                 elemCmd.CommandText = "SELECT ElementId FROM Effects WHERE Id = $id;";
@@ -3598,7 +3610,11 @@ namespace Jondo.Unity.Launcher
                 object? elem = elemCmd.ExecuteScalar();
                 if (elem == null || elem == DBNull.Value) continue;
 
-                data.Element = Convert.ToInt32(elem);
+                int elemento = Convert.ToInt32(elem);
+                data.WeaponLines.Add((efecto.Effect, elemento, minimo, maximo));
+
+                if (maximo <= data.BaseDamageMax) continue;
+                data.Element = elemento;
                 data.BaseDamageMin = minimo;
                 data.BaseDamageMax = maximo;
             }
@@ -4380,6 +4396,17 @@ namespace Jondo.Unity.Launcher
 
     public class SpellCombatData
     {
+        /// <summary>
+        /// Las lineas de dano de un arma, una por cada efecto: el numero de efecto, su elemento y
+        /// sus dados. Vacia para un hechizo.
+        ///
+        /// Un arma pega una vez POR LINEA, y el servidor real manda un golpe por cada una con su
+        /// propio numero de efecto. Los campos sueltos de aqui abajo llevan la linea mas gorda,
+        /// que es lo que le vale a la IA para estimar.
+        /// </summary>
+        public List<(int Effect, int Element, int Min, int Max)> WeaponLines { get; } =
+            new List<(int, int, int, int)>();
+
         public long SpellId { get; set; }
         public int SpellLevelId { get; set; }
         public int APCost { get; set; } = 3;

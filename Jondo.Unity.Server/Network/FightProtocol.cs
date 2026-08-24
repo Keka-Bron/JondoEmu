@@ -795,7 +795,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </param>
         public static Pb CastAt(long caster, long target, int cell, int spell, int spellLevel,
                                 bool critical, int sobreEseObjetivo = 0, int esteTurno = 0,
-                                int intervalo = 0)
+                                int intervalo = 0, int arma = 0)
         {
             var suyo = Pb.New();
             if (sobreEseObjetivo > 0 && target != 0)
@@ -813,9 +813,25 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(6, cell);
             if (spell != 0)
             {
+                // Un HECHIZO lleva el hechizo y NO lleva el campo del arma. Escribirlo aunque
+                // fuera a cero cambiaba los bytes, y el auto-test del protocolo lo cazó a la
+                // primera comparando contra la captura: por eso el if envuelve a los dos.
                 detalle.Msg(7, Pb.New().Var(2, spell).VarIfNotZero(3, spellLevel));
+                return detalle.Var(8, 1);
             }
-            return detalle.Var(8, 1);
+
+            // Y un golpe CUERPO A CUERPO lleva lo contrario: sin hechizo, y con el arma.
+            //
+            // Es lo único que distingue un espadazo de un puñetazo, y por eso el chat decía
+            // «Puñetazo» al atacar con la espada. Mandar hechizo 0 estaba bien —el servidor real
+            // tampoco manda ningún hechizo de arma—; lo que faltaba era esto.
+            //
+            // El f10 lleva el Id de ItemTemplates del arma equipada, y el puñetazo es el mismo
+            // mensaje con el f10 a CERO ESCRITO, no ausente: por eso va con Var y no con
+            // VarIfNotZero. Medido en las capturas: Lavacha 19593, Cocobur 20353, Garras de la
+            // Despedazadora 31759, Garra de Gargandias 31786; y el puñetazo, «5000» en el cable,
+            // que es la etiqueta del campo 10 seguida de un cero.
+            return detalle.Var(8, 1).Var(10, arma);
         }
 
         /// <summary>

@@ -2158,7 +2158,10 @@ namespace Jondo.Unity.Launcher.Handlers
                         caster.Id, aQuien, cell, spell, spellLevel, critico,
                         sobreEseObjetivo: limites.PorObjetivo > 0 ? sobreEse + 1 : 0,
                         esteTurno: limites.PorTurno > 0 ? esteTurno + 1 : 0,
-                        intervalo: limites.Intervalo),
+                        intervalo: limites.Intervalo,
+                        // Sólo cuando el golpe es del arma. Un hechizo lleva el f10 a cero, igual
+                        // que el puñetazo: lo que el cliente mira para poner el nombre es esto.
+                        arma: spell == 0 ? ArmaEquipada(caster) : 0),
                     Network.FightProtocol.CastDetail)));
 
             // La ficha va en su propia secuencia, como en la captura, no suelta en medio.
@@ -2960,6 +2963,23 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static readonly Random _dado = new Random();
 
+        /// <summary>
+        /// La plantilla del arma que lleva puesta, o cero si va a mano limpia.
+        ///
+        /// Es lo que el cliente lee para decir con qué has pegado. Sin esto todo golpe salía como
+        /// «Puñetazo» aunque el daño y el elemento fueran los de la espada.
+        /// </summary>
+        private static int ArmaEquipada(Fighter caster)
+        {
+            if (caster.Id != GameState.CharacterId) return 0;
+
+            // La misma casilla que mira GetEquippedWeaponAsSpell: la 1 es la mano.
+            const int CasillaDelArma = 1;
+            foreach (var pieza in GameState.GetInventoryCopy())
+                if (pieza.Position == CasillaDelArma) return pieza.ItemId;
+            return 0;
+        }
+
         /// <summary>El golpe del arma equipada, que sigue viniendo del resumen de siempre.</summary>
         private static List<(Managers.SpellEffect Efecto, int Elemento, Fighter Sobre, int Lejos)>
             GolpeDelArma(Fighter caster, Fighter target)
@@ -2968,13 +2988,38 @@ namespace Jondo.Unity.Launcher.Handlers
             var arma = DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId);
             if (arma == null || (arma.BaseDamageMin <= 0 && arma.BaseDamageMax <= 0)) return fuera;
 
+            // UN GOLPE POR LÍNEA. Antes salía uno solo, con la línea de más daño y el número de
+            // efecto a cero, así que un arma de tres líneas enseñaba una cifra en el chat y las
+            // otras dos no existían. El número de efecto importa: es lo que hace que el cliente
+            // escriba «de daños de agua» o «de robo de vida», y el cero no lo usa el servidor real
+            // en ningún sitio.
+            //
             // El arma pega a uno solo y a bocajarro, así que no hay distancia al centro que valga.
-            fuera.Add((new Managers.SpellEffect
+            // El uid de efecto tiene que ser distinto en cada línea o el dado se tiraría una vez
+            // para las tres: quien las recorre las agrupa por ese uid.
+            int cual = 0;
+            foreach (var (efecto, elemento, minimo, maximo) in arma.WeaponLines)
             {
-                EffectId = 0,
-                DiceNum = arma.BaseDamageMin,
-                DiceSide = arma.BaseDamageMax,
-            }, arma.Element, target, 0));
+                fuera.Add((new Managers.SpellEffect
+                {
+                    EffectId = efecto,
+                    EffectUid = -(++cual),
+                    DiceNum = minimo,
+                    DiceSide = maximo,
+                }, elemento, target, 0));
+            }
+
+            // Y si por lo que sea no hay líneas, se pega con lo que había: mejor un golpe que
+            // ninguno.
+            if (fuera.Count == 0)
+            {
+                fuera.Add((new Managers.SpellEffect
+                {
+                    EffectId = 0,
+                    DiceNum = arma.BaseDamageMin,
+                    DiceSide = arma.BaseDamageMax,
+                }, arma.Element, target, 0));
+            }
             return fuera;
         }
 
