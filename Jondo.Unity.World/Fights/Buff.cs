@@ -58,12 +58,22 @@ namespace Jondo.Unity.World.Fights
         public int CaducaEnRonda { get; set; }
 
         /// <summary>
+        /// La ronda en la que EMPIEZA a valer. Para casi todos es la del lanzamiento; para los
+        /// retardados, tantas rondas después como diga el retardo del efecto.
+        ///
+        /// Sin esto no había manera de expresar «esto empieza dentro de dos turnos», que es lo que
+        /// hace la Flecha Castigadora, y el embrujo se aplicaba entero en el acto.
+        /// </summary>
+        public int EmpiezaEnRonda { get; set; }
+
+        /// <summary>
         /// Si se suma al que ya hubiera igual en vez de sustituirlo. Lo llevan los que un hechizo
         /// va poniendo cada vez que pasa algo —cada paso, cada golpe recibido—, que se acumulan.
         /// </summary>
         public bool Apila { get; set; }
 
-        public bool Vivo(int ronda) => CaducaEnRonda < 0 || ronda < CaducaEnRonda;
+        public bool Vivo(int ronda)
+            => ronda >= EmpiezaEnRonda && (CaducaEnRonda < 0 || ronda < CaducaEnRonda);
     }
 
     /// <summary>

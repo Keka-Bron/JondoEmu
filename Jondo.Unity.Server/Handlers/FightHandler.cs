@@ -2262,7 +2262,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 WaterResPct = receta.ResistenciaAgua,
                 AirResPct = receta.ResistenciaAire,
             };
-            invocado.MaxHP = Managers.Summons.VidaDelInvocado(receta.Vida, quienInvoca.Level);
+            invocado.MaxHP = Managers.Summons.VidaDelInvocado(receta.Vida, quienInvoca.Level,
+                                                              receta.VidaFija);
             invocado.CurrentHP = invocado.MaxHP;
 
             int vive = Managers.Summons.RondasQueVive(plantilla);

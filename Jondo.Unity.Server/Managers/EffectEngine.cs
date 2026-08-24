@@ -571,6 +571,7 @@ namespace Jondo.Unity.Launcher.Managers
                             Quien = quienLanza.Id,
                             Disparador = AlLanzar,
                             CaducaEnRonda = Caduca(efecto, ronda),
+                            EmpiezaEnRonda = Empieza(efecto, ronda),
                         }, combate.SiguienteEmbrujo)
                         : null,
                 };
@@ -596,6 +597,7 @@ namespace Jondo.Unity.Launcher.Managers
                     Quien = quienLanza.Id,
                     Disparador = AlLanzar,
                     CaducaEnRonda = Caduca(efecto, ronda),
+                    EmpiezaEnRonda = Empieza(efecto, ronda),
                 }, combate.SiguienteEmbrujo);
                 return new Outcome
                 {
@@ -632,6 +634,7 @@ namespace Jondo.Unity.Launcher.Managers
                     Quien = quienLanza.Id,
                     Disparador = AlLanzar,
                     CaducaEnRonda = Caduca(efecto, ronda),
+                    EmpiezaEnRonda = Empieza(efecto, ronda),
                 }, combate.SiguienteEmbrujo);
 
                 return new Outcome
@@ -686,6 +689,7 @@ namespace Jondo.Unity.Launcher.Managers
                     Quien = quienLanza.Id,
                     Disparador = AlLanzar,
                     CaducaEnRonda = Caduca(efecto, ronda),
+                    EmpiezaEnRonda = Empieza(efecto, ronda),
                     Apila = SeApila(efecto),
                 }, combate.SiguienteEmbrujo);
 
@@ -741,6 +745,7 @@ namespace Jondo.Unity.Launcher.Managers
                 Quien = quienLanza.Id,
                 Disparador = AlLanzar,
                 CaducaEnRonda = Caduca(efecto, ronda),
+                EmpiezaEnRonda = Empieza(efecto, ronda),
                 Apila = SeApila(efecto),
             }, combate.SiguienteEmbrujo);
 
@@ -876,6 +881,15 @@ namespace Jondo.Unity.Launcher.Managers
         /// combate"; cero, que es de un vistazo y no deja embrujo que dure.
         /// </summary>
         private static int Caduca(SpellEffect efecto, int ronda)
-            => efecto.Duration < 0 ? -1 : ronda + Math.Max(1, efecto.Duration);
+            => efecto.Duration < 0 ? -1 : ronda + efecto.Delay + Math.Max(1, efecto.Duration);
+
+        /// <summary>
+        /// La ronda en la que un efecto empieza a valer: la del lanzamiento más su retardo.
+        ///
+        /// Comprobado contra la captura de la Flecha Castigadora, lanzada en la ronda 4: el
+        /// embrujo de retardo 1 vive la ronda 5 y se cae al entrar en la 6, y el de retardo 2 vive
+        /// la 6.
+        /// </summary>
+        private static int Empieza(SpellEffect efecto, int ronda) => ronda + efecto.Delay;
     }
 }
