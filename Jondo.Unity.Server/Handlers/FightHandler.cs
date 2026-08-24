@@ -652,10 +652,40 @@ namespace Jondo.Unity.Launcher.Handlers
             if (caracteristica == ActionPointsCharacteristic) return ficha.CurrentAP;
             if (caracteristica == MovementPointsCharacteristic) return ficha.CurrentMP;
 
+            // AQUÍ ESTABA EL AGUJERO DE LA PREVISUALIZACIÓN, y era gordo.
+            //
+            // Esto sólo sabía resolver el alcance y la potencia; todo lo demás caía en
+            // ficha.Otra(), que NO contiene ni la fuerza, ni la agilidad, ni la suerte, ni la
+            // inteligencia, ni el crítico, ni los daños fijos. Devolvía cero, así que el valor que
+            // salía por el cable era SÓLO EL EMBRUJO.
+            //
+            // Y como el jxw manda el valor ABSOLUTO, cada embrujo pisaba en el cliente el número
+            // bueno que le había llegado en la ficha inicial. Medido: se mandaba la agilidad a 200
+            // cuando vale 960, y el crítico a 15 cuando vale 31.
+            //
+            // De ahí salían los dos síntomas a la vez: la previsualización de daño calculada con
+            // números de risa —la calcula el cliente, y sólo con lo que le mandamos—, y la
+            // sensación de que la potencia no hacía nada. La potencia SÍ pega: medido en el
+            // registro del servidor, la Flecha Castigadora hace 583 sin Tiros Potentes y 658 con
+            // él, con la misma tirada. Lo que no se veía era el número.
+            //
+            // Los valores salen de los mismos campos que usa la ficha completa del principio del
+            // combate, que sí los manda bien.
             int suyo = caracteristica switch
             {
                 19 => ficha.Range,
                 25 => ficha.Power,
+                10 => ficha.Strength,
+                13 => ficha.Chance,
+                14 => ficha.Agility,
+                15 => ficha.Intelligence,
+                16 => ficha.FlatDamage,
+                18 => ficha.CriticalBonus,
+                33 => ficha.EarthResPct,
+                34 => ficha.FireResPct,
+                35 => ficha.WaterResPct,
+                36 => ficha.AirResPct,
+                37 => ficha.NeutralResPct,
                 _ => ficha.Otra(caracteristica),
             };
             return ConBonos(ficha, caracteristica, suyo, ronda);
@@ -810,7 +840,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 (85, 0, fighter.Otra(85)),
                 (87, 0, fighter.CriticalDamage),
                 (101, 0, fighter.Otra(101)),
-                (27, 0, fighter.Otra(27)), (28, 0, fighter.Otra(28)), (93, 0, 0),
+                (27, 0, fighter.Otra(27)), (28, 0, fighter.Otra(28)), (93, 3, 0),
                 (79, 0, fighter.Otra(79)), (78, 0, fighter.Otra(78)),
 
                 // La vida ENTERA, también la del jugador.
@@ -836,7 +866,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 (18, 0, fighter.CriticalBonus),
                 (19, 0, fighter.Range),
                 (25, 0, fighter.Power),
-                (26, 0, fighter.Otra(26)), (50, 0, fighter.Otra(50)), (75, 0, fighter.Otra(75)),
+                (26, 0, fighter.Otra(26)), (50, 0, fighter.Otra(50)), (75, 10, fighter.Otra(75)),
                 // Aquí iba la 84, el daño de empuje. El servidor real NO LA MANDA: su ficha
                 // tiene 53 entradas y la 84 no está en ninguna, mientras que la 85 —la
                 // resistencia al empuje— sí. Y la metíamos justo en la posición 33, que es donde
@@ -2127,7 +2157,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // crítico propio, y el Ocra lleva 47; el cliente pinta 57% en su tooltip, que es
             // exactamente la suma. Antes esto estaba clavado a "false" y no salía un crítico ni
             // por casualidad.
-            int probabilidadCritico = limites.CriticoPropio + ConBonos(caster, CriticoCaracteristica, 0, fight.RoundNumber);
+            // El critico del EQUIPO se perdia entero: se pasaba un cero como base, asi que solo
+            // contaba el del hechizo y el de los embrujos. El registro lo decia en voz alta:
+            // «20 % = 20 del hechizo + 0 del personaje», con un personaje que lleva 16 puesto. No
+            // hay riesgo de contarlo dos veces: CriticalBonus es solo el equipo y Buffs.De(18)
+            // solo los embrujos.
+            int probabilidadCritico = limites.CriticoPropio +
+                ConBonos(caster, CriticoCaracteristica, caster.CriticalBonus, fight.RoundNumber);
             bool critico = TirarCritico(probabilidadCritico);
             if (critico)
             {

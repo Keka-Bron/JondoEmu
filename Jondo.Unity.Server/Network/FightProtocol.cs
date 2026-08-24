@@ -842,27 +842,44 @@ namespace Jondo.Unity.Launcher.Network
         /// Es la misma ficha que va dentro del jxg y del jxb, aquí sola. Se usa para actualizar los
         /// puntos de movimiento y de acción según se gastan.
         /// </summary>
+        /// <summary>Las dos características que van en el molde de los puntos, y sólo ellas.</summary>
+        private const int PuntosDeAccion = 1;
+        private const int PuntosDeMovimiento = 23;
+
         public static byte[] BuildFighterSheet(long fighterId,
                                                IEnumerable<(int Characteristic, long Value)> sheet,
                                                bool esElPersonajeControlado)
         {
-            // El molde NO es el mismo para todos: depende de si la ficha es la del personaje que
-            // maneja el cliente o la de otro. Medido en las quince capturas de combate, sin una
-            // sola excepción:
+            // El molde depende de DOS cosas: de quién es la ficha, y de QUÉ característica es.
             //
-            //   el personaje propio          f5 { f1: valor }   y f5 vacío cuando es cero
-            //   monstruos, rival y compañeros f2 { f2: valor }   y f2 vacío cuando es cero
+            //   del personaje propio, PA y PM   f5 { f1: valor }   y f5 vacío cuando es cero
+            //   del personaje propio, lo demás  f4 { f2: valor }   el mismo molde de la ficha llena
+            //   de monstruos y de los demás     f2 { f2: valor }   y f2 vacío cuando es cero
             //
-            // Aquí se mandaba el molde del jugador a TODO el mundo, así que cada turno le llegaba
-            // al cliente la ficha de cada monstruo escrita en el hueco que no es.
+            // Lo segundo es lo que faltaba, y era la mitad de por qué la previsualización de daño
+            // salía con números de risa. El f5 es el molde de los PUNTOS, y el servidor real lo
+            // usa SÓLO para la 1 y la 23: medido sobre las 401 capturas, en un jxw no aparece ni
+            // una vez para ninguna otra característica. Nosotros metíamos ahí la fuerza, la
+            // agilidad, el crítico y todo lo demás, y el cliente lo leía como si le estuvieran
+            // devolviendo puntos de acción.
+            //
+            // Es exactamente el mismo fallo que ya se corrigió dentro de la ficha llena, que en su
+            // día mandaba las resistencias en el hueco de los puntos invertidos. Aquí seguía.
             var stats = Pb.New().Var(3, SheetKind);
             foreach (var (characteristic, value) in sheet)
             {
                 var entry = Pb.New().VarIfNotZero(1, characteristic);
-                if (esElPersonajeControlado)
+                bool esDePuntos = characteristic == PuntosDeAccion || characteristic == PuntosDeMovimiento;
+
+                if (esElPersonajeControlado && esDePuntos)
                 {
                     if (value == 0) entry.EmptyMsg(5);
                     else entry.Msg(5, Pb.New().Var(1, value));
+                }
+                else if (esElPersonajeControlado)
+                {
+                    if (value == 0) entry.EmptyMsg(4);
+                    else entry.Msg(4, Pb.New().Var(2, value));
                 }
                 else
                 {
