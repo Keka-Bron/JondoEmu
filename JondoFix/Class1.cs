@@ -19,6 +19,60 @@ using Il2CppCore.UILogic.Components.Filters;
 
 namespace JondoFix
 {
+    /// <summary>
+    /// Los objetos de Ankama a los que Jondo les cambia el nombre en la pantalla del jugador.
+    ///
+    /// El cliente NUNCA recibe del servidor el nombre de un objeto: lo saca de su propia tabla de
+    /// textos, el fichero Content/I18n/es.bin, buscando por el nameId que trae la plantilla.
+    /// Comprobado sobre 179.425 tramas de servidor a cliente de 38 capturas reales: no viaja un
+    /// solo nombre de objeto. Por eso renombrar es un problema del CLIENTE y vive aqui.
+    ///
+    /// Se podria reescribir la cadena dentro del propio es.bin —«Jondo Coin» ocupa menos que
+    /// «Moneda onirica minuscula», asi que los desplazamientos no se moverian— pero ese fichero
+    /// esta en manifest.json con su SHA1 y una reparacion del lanzador lo devolveria a su sitio.
+    /// Con Harmony no hay nada que reparar.
+    /// </summary>
+    public static class JondoRenames
+    {
+        public sealed class Rename
+        {
+            public string Name;
+            public string Description;
+            public int NameId;
+            public int DescriptionId;
+        }
+
+        public static readonly Dictionary<int, Rename> ById = new Dictionary<int, Rename>
+        {
+            // La moneda del servidor. En los datos de Ankama es la «Moneda onirica minuscula»:
+            // icono 148013, una moneda turquesa con destellos, y peso cero, que es lo que permite
+            // acumularla sin tocar los pods.
+            [20440] = new Rename
+            {
+                Name = "Jondo Coin",
+                Description = "La moneda de Jondo. La sueltan todos los monstruos, y con ella se "
+                            + "paga en las tiendas que no cobran en kamas. Cuanto mas alto es el "
+                            + "monstruo, mas monedas deja.",
+                NameId = 777279,
+                DescriptionId = 777280,
+            },
+        };
+
+        /// <summary>La misma tabla pero por clave de texto, para el parche de reserva.</summary>
+        public static readonly Dictionary<int, string> ByTextKey = BuildTextKeys();
+
+        private static Dictionary<int, string> BuildTextKeys()
+        {
+            var map = new Dictionary<int, string>();
+            foreach (var entry in ById.Values)
+            {
+                if (entry.NameId != 0) map[entry.NameId] = entry.Name;
+                if (entry.DescriptionId != 0) map[entry.DescriptionId] = entry.Description;
+            }
+            return map;
+        }
+    }
+
     public class JondoFixMod : MelonMod
     {
         public static bool UseLocalRedirect { get; private set; } = false;
@@ -321,11 +375,50 @@ namespace JondoFix
             }
         }
 
+        /// <summary>
+        /// El nombre sin tildes de un objeto, que es por donde busca el mercadillo.
+        /// 
+        /// Va a mano y no con un atributo porque no esta claro como se llama la propiedad: en los
+        /// metadatos del cliente aparecen las dos formas, «unDiacriticalName» y
+        /// «undiacriticalName», y un [HarmonyPatch] sobre una que no exista revienta al cargar el
+        /// mod ENTERO. Asi se prueban las dos y, si no esta ninguna, se avisa y se sigue: lo unico
+        /// que se pierde es que la Jondo Coin no salga al buscarla por su nombre nuevo.
+        /// </summary>
+        private void PatchUnDiacriticalName()
+        {
+            try
+            {
+                var postfix = new HarmonyMethod(typeof(JondoUnDiacriticalPatch)
+                    .GetMethod("Postfix", System.Reflection.BindingFlags.Public
+                                        | System.Reflection.BindingFlags.Static));
+                var harmony = new HarmonyLib.Harmony("com.jondo.fix.undiacritical");
+
+                foreach (string nombre in new[] { "get_unDiacriticalName", "get_undiacriticalName" })
+                {
+                    var metodo = AccessTools.Method(typeof(ItemData), nombre);
+                    if (metodo == null) continue;
+                    harmony.Patch(metodo, postfix: postfix);
+                    LoggerInstance.Msg($"[JondoFix] {nombre} parcheado: el mercadillo encontrara " +
+                                       "los objetos renombrados.");
+                    return;
+                }
+
+                LoggerInstance.Warning("[JondoFix] ItemData no tiene nombre sin tildes con ninguno " +
+                                       "de los dos nombres conocidos; buscar la Jondo Coin en el " +
+                                       "mercadillo por su nombre nuevo no funcionara.");
+            }
+            catch (Exception ex)
+            {
+                LoggerInstance.Warning($"[JondoFix] No se pudo parchear el nombre sin tildes: {ex.Message}");
+            }
+        }
+
         public override void OnLateInitializeMelon()
         {
             if (!UseLocalRedirect) return;
 
             LoggerInstance.Msg("[JondoFix] Late initialization starting...");
+            PatchUnDiacriticalName();
             try
             {
                 var harmony = new HarmonyLib.Harmony("com.jondo.fix.late");
@@ -1074,8 +1167,16 @@ namespace JondoFix
     }
 
     /// <summary>
-    /// ItemData.name is the value consumed by encyclopedia rows. Patching the generic localization
-    /// accessor was insufficient because this client caches many item names through another path.
+    /// El nombre de un objeto, que es lo que leen las filas de la enciclopedia y el inventario.
+    ///
+    /// Aqui pasan dos cosas, y en este orden: primero se sustituye el nombre si el objeto esta en
+    /// la tabla de Jondo —la Jondo Coin—, y despues, solo al administrador, se le pega el id
+    /// detras. Asi un administrador ve «Jondo Coin [20440]» y un jugador «Jondo Coin».
+    ///
+    /// Parchear solo el accessor de localizacion no bastaba, y ya se sabe por que: ItemData
+    /// memoriza el nombre, la descripcion y el nombre sin tildes en su clase anidada
+    /// MemoizedValues, y despues de la primera vez no vuelve a preguntar. Hay que coger la
+    /// propiedad.
     /// </summary>
     [HarmonyPatch(typeof(ItemData), "get_name")]
     public class AdminItemNameIdPatch
@@ -1086,6 +1187,13 @@ namespace JondoFix
         {
             try
             {
+                if (__instance != null &&
+                    JondoRenames.ById.TryGetValue(__instance.id, out var renamed) &&
+                    !string.IsNullOrEmpty(renamed.Name))
+                {
+                    __result = renamed.Name;
+                }
+
                 if (JondoFixMod.IsJondoAdministrator && __instance != null && !string.IsNullOrEmpty(__result))
                 {
                     string suffix = $" [{__instance.id}]";
@@ -1103,6 +1211,84 @@ namespace JondoFix
             catch (Exception ex)
             {
                 MelonLogger.Error($"[JondoFix] Error in ItemData.name Postfix: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// El nombre sin tildes que usa la busqueda del mercadillo. Se engancha a mano desde
+    /// JondoFixMod.PatchUnDiacriticalName; ver alli por que no lleva atributo.
+    /// </summary>
+    public static class JondoUnDiacriticalPatch
+    {
+        public static void Postfix(ItemData __instance, ref string __result)
+        {
+            try
+            {
+                if (__instance != null &&
+                    JondoRenames.ById.TryGetValue(__instance.id, out var renamed) &&
+                    !string.IsNullOrEmpty(renamed.Name))
+                {
+                    // «Jondo Coin» no lleva ninguna tilde, asi que la forma sin tildes es la misma
+                    // palabra. Si algun dia se renombra algo con acentos, aqui hay que quitarlos.
+                    __result = renamed.Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[JondoFix] Error in unDiacriticalName Postfix: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Y la descripcion, por el mismo camino y por el mismo motivo que el nombre.
+    /// </summary>
+    [HarmonyPatch(typeof(ItemData), "get_description")]
+    public class JondoItemDescriptionPatch
+    {
+        public static void Postfix(ItemData __instance, ref string __result)
+        {
+            try
+            {
+                if (__instance != null &&
+                    JondoRenames.ById.TryGetValue(__instance.id, out var renamed) &&
+                    !string.IsNullOrEmpty(renamed.Description))
+                {
+                    __result = renamed.Description;
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[JondoFix] Error in ItemData.description Postfix: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// La red de reserva: el accessor de textos, filtrado por las claves concretas de la tabla.
+    ///
+    /// ItemData cubre el inventario y la enciclopedia, pero no todos los caminos pasan por ahi:
+    /// el registro de combate tiene su propia cache, los enlaces de objeto del chat y la
+    /// interpolacion de «$item{n}» de los mensajes de informacion van al accessor directamente.
+    /// Esto los tapa. Solo toca las claves que estan en la tabla, asi que no puede afectar a
+    /// ningun otro texto del juego.
+    /// </summary>
+    [HarmonyPatch(typeof(Il2CppCore.Localization.Utils.LocalizationAccessor), "TryGetLocalization", new Type[] { typeof(int), typeof(string) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Out })]
+    public class JondoLocalizationPatch
+    {
+        public static void Postfix(int key, ref string localization, bool __result)
+        {
+            try
+            {
+                if (__result && JondoRenames.ByTextKey.TryGetValue(key, out string texto))
+                {
+                    localization = texto;
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[JondoFix] Error in TryGetLocalization Postfix: {ex.Message}");
             }
         }
     }

@@ -145,6 +145,12 @@ namespace Jondo.Unity.Launcher
         // Qué vende cada NPC de tienda y a qué precio, medido del servidor de torneos con
         // tools/extraer_tiendas.py.
         public static string NpcShopsJson => Resolve("npc_shops.json");
+
+        /// <summary>
+        /// Las tiendas que cobran en fichas en vez de en kamas. A mano, no generado: lo que vende
+        /// una tienda de fichas y a cuánto es contenido de Jondo y no sale de ninguna captura.
+        /// </summary>
+        public static string TokenShopsJson => Resolve("tiendas_en_fichas.json");
         // Las parejas de hechizo base/variante, una por cada hueco de la barra. Del volcado del
         // cliente; el personaje lleva uno de cada pareja, no los dos.
         public static string SpellVariantsJson

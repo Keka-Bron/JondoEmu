@@ -92,6 +92,7 @@ namespace Jondo.Unity.Launcher
             Managers.Mounts.Initialize();
             Managers.Npcs.Initialize();
             Managers.NpcShops.Initialize();
+            Managers.TokenShops.Initialize();
 
             Console.WriteLine("[+] Registering Fight Packet Handlers...");
             Handlers.FightHandler.RegisterHandlers();

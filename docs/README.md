@@ -90,6 +90,11 @@ The exact syntax and behavior of `.item` and `.itemset`, including role checks, 
 data sources, maximum factory effects, persistence, inventory updates and partial-set failures.
 *Go there* when giving an item by template id, creating a complete set or diagnosing a rejected id.
 
+**`jondo-coin.md`** — The server's own currency.
+Which Ankama item it reuses and why, how much each monster drops, how the client is made to call it
+"Jondo Coin", and how to point an NPC shop at it so it charges coins instead of kamas.
+*Go there* when changing the drop rate, adding a shop that charges in coins, or renaming an item.
+
 **`role.md`** — The account-role scale and its migration.
 The corrected Giny-compatible roles 1 through 5, why the former 1-to-4 definition was ambiguous,
 how old administrators are migrated exactly once, and the current command permission thresholds.

@@ -1,0 +1,25 @@
+{
+  "_comentario": [
+    "Las tiendas que cobran en un objeto en vez de en kamas. Escrito a MANO: esto es contenido de",
+    "Jondo y no sale de ninguna captura, asi que no lo toca ningun generador. El catalogo normal,",
+    "npc_shops.json, si lo rehace tools/extraer_tiendas.py, y por eso esto va aparte.",
+    "",
+    "La clave de cada tienda es el id de PLANTILLA del vendedor, el mismo que usa npc_shops.json.",
+    "'moneda' es el id del objeto que hace de moneda: 20440 es la Jondo Coin.",
+    "'precios' es lo que cuesta cada objeto EN FICHAS. Un objeto que este en el catalogo del",
+    "vendedor pero no aqui vale 1 ficha, que es el valor de reserva de TokenShops.DefaultPrice.",
+    "",
+    "El vendedor tiene que vender ya esos objetos en npc_shops.json: esto no anade nada al",
+    "catalogo, solo cambia con que se paga. Y solo se cobra lo que este en el catalogo.",
+    "",
+    "Ejemplo de como quedaria una tienda, para copiar:",
+    "",
+    "  \"tiendas\": {",
+    "    \"5510\": {",
+    "      \"moneda\": 20440,",
+    "      \"precios\": { \"15779\": 25, \"8992\": 40 }",
+    "    }",
+    "  }"
+  ],
+  "tiendas": {}
+}

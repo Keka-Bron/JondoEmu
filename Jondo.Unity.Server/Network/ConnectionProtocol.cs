@@ -1601,8 +1601,19 @@ namespace Jondo.Unity.Launcher.Network
         /// es "servidor de torneo" y el propio servidor lo valida: las catorce entradas con el
         /// criterio más duro dieron error 243 al comprarlas. Aquí no somos un servidor de torneo, y
         /// hay doce entradas medidas que viajan sin criterio ninguno, así que se omite.
+        ///
+        /// El f3 es LA MONEDA, y con él una tienda cobra en un objeto en vez de en kamas. No hay
+        /// que inventar nada: el cliente ya lo sabe hacer. Medido sobre las 305 capturas, hay 60
+        /// kbd y 58 llevan sólo f1 y f2 —ésos cobran en kamas—; los otros dos llevan además el
+        /// f3, con el id del objeto que hace de moneda:
+        ///
+        ///   f3 = 13052   «Sebuscalón»   (la tienda de la Torre de los Viajeros)
+        ///   f3 = 30529   «Fidelicha»    (una de Pandala)
+        ///
+        /// Si el f3 no está, se cobra en kamas, que es por lo que va con VarIfNotZero: una tienda
+        /// normal sigue mandando exactamente los mismos bytes que antes.
         /// </summary>
-        public static byte[] BuildShop(long contextualId, IEnumerable<int> gids)
+        public static byte[] BuildShop(long contextualId, IEnumerable<int> gids, int tokenGid = 0)
         {
             var kbd = Pb.New();
             foreach (int gid in gids)
@@ -1621,7 +1632,7 @@ namespace Jondo.Unity.Launcher.Network
 
                 kbd.Msg(1, entry);
             }
-            return kbd.Var(2, contextualId).Build();
+            return kbd.Var(2, contextualId).VarIfNotZero(3, tokenGid).Build();
         }
 
         /// <summary>Las existencias de la tienda. Constante en las 6.106 entradas de la captura.</summary>
@@ -1703,6 +1714,13 @@ namespace Jondo.Unity.Launcher.Network
 
         /// <summary>El de "comprado": objeto, uid, cantidad y precio.</summary>
         public const int PurchaseMessage = 252;
+
+        /// <summary>
+        /// El mismo aviso pero cuando se ha pagado en fichas. Medido en la tienda de la Torre de
+        /// los Viajeros: seis parámetros, «798, 1055401001, 1, 20, 13052, 0», que son el objeto
+        /// comprado y su uid, la cantidad, el precio, y el id y el uid de la moneda.
+        /// </summary>
+        public const int TokenPurchaseMessage = 364;
 
         // ─── World: changing map ────────────────────────────────────────────────
 

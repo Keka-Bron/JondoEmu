@@ -136,12 +136,17 @@ namespace Jondo.Unity.Launcher.Handlers
             OpenShop = npc.ContextualId;
             OpenShopNpc = npc.NpcId;
 
-            byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue);
+            // Si este vendedor cobra en fichas, se le dice al cliente cuál es la moneda. Sin
+            // esto el f3 no viaja y el cliente pinta el precio en kamas, que es lo de siempre.
+            var tokenShop = TokenShops.Of(npc.NpcId);
+            byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue,
+                                                      tokenShop?.TokenGid ?? 0);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kbd, kbd));
 
+            string moneda = tokenShop == null ? "kamas" : $"la ficha {tokenShop.TokenGid}";
             Console.WriteLine($"[NPC] Tienda del {npc.NpcId}: {catalogue.Count} objetos, " +
-                              $"{kbd.Length} bytes.");
+                              $"{kbd.Length} bytes, se paga en {moneda}.");
         }
 
         /// <summary>La ventana de diálogo y su pregunta, sacadas de la plantilla del NPC.</summary>
@@ -266,8 +271,34 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            long price = NpcShops.PriceOf(gid) * quantity;
-            if (GameState.Kamas < price)
+            // Con qué se paga aquí. Sin tienda de fichas es lo de siempre: kamas.
+            var tokenShop = TokenShops.Of(OpenShopNpc);
+            long price = tokenShop == null
+                ? NpcShops.PriceOf(gid) * quantity
+                : TokenShops.PriceOf(tokenShop, gid) * quantity;
+
+            // La pila de fichas del jugador, si es que la tiene. Se busca por plantilla en el
+            // inventario: una ficha es un recurso y se apila, así que hay una sola.
+            long tokenUid = 0;
+            int tokenLeft = 0;
+            if (tokenShop != null)
+            {
+                foreach (var item in GameState.GetInventoryCopy())
+                {
+                    if (item.ItemId != tokenShop.TokenGid || item.Position != Equipment.Bag) continue;
+                    tokenUid = item.Uid;
+                    tokenLeft = item.Quantity;
+                    break;
+                }
+
+                if (tokenUid == 0 || tokenLeft < price)
+                {
+                    Console.WriteLine($"[NPC] El objeto {gid} cuesta {price} ficha(s) de " +
+                                      $"{tokenShop.TokenGid} y sólo hay {tokenLeft}.");
+                    return;
+                }
+            }
+            else if (GameState.Kamas < price)
             {
                 Console.WriteLine($"[NPC] El objeto {gid} cuesta {price} y sólo hay {GameState.Kamas}.");
                 return;
@@ -285,8 +316,20 @@ namespace Jondo.Unity.Launcher.Handlers
 
             Equipment.Add(uid, gid, (int)quantity, Equipment.Bag, effects);
 
-            GameState.Kamas -= price;
-            DatabaseManager.SaveCurrentCharacter();
+            if (tokenShop == null)
+            {
+                GameState.Kamas -= price;
+                DatabaseManager.SaveCurrentCharacter();
+            }
+            else
+            {
+                // Las fichas se gastan quitándolas del inventario, igual que al destruir parte de
+                // una pila. Si la compra se lleva la última, DestroyCharacterItem borra la fila.
+                DatabaseManager.DestroyCharacterItem(GameState.CharacterId, tokenUid, (int)price);
+                Equipment.Remove(tokenUid, (int)price);
+                tokenLeft -= (int)price;
+                GameState.SetInventory(DatabaseManager.LoadInventory(GameState.CharacterId));
+            }
 
             var bought = new HavenBagStore.StoredItem
             {
@@ -301,13 +344,31 @@ namespace Jondo.Unity.Launcher.Handlers
             // repetirlas no descuadra nada.
             long capacity = 1000 + 5L * GameState.StatStrength;
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
-                    ConnectionProtocol.PurchaseMessage,
-                    gid.ToString(), uid.ToString(), quantity.ToString(), price.ToString())));
+            if (tokenShop == null)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        ConnectionProtocol.PurchaseMessage,
+                        gid.ToString(), uid.ToString(), quantity.ToString(), price.ToString())));
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+            }
+            else
+            {
+                // El aviso de la compra en fichas y el nuevo total de la pila. El ivj lleva LO QUE
+                // QUEDA, no lo gastado: se ve en el mercadillo de runas de la captura, donde una
+                // misma pila va 107 -> 117 -> 217 -> 1217.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        ConnectionProtocol.TokenPurchaseMessage,
+                        gid.ToString(), uid.ToString(), quantity.ToString(), price.ToString(),
+                        tokenShop.TokenGid.ToString(), "0")));
+
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ivj,
+                        ConnectionProtocol.BuildItemQuantity(tokenUid, tokenLeft)));
+            }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, bought)));
@@ -323,8 +384,11 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(0, capacity)));
 
-            Console.WriteLine($"[NPC] Comprado el objeto {gid} x{quantity} (uid {uid}) por {price}; " +
-                              $"quedan {GameState.Kamas} kamas.");
+            Console.WriteLine(tokenShop == null
+                ? $"[NPC] Comprado el objeto {gid} x{quantity} (uid {uid}) por {price}; " +
+                  $"quedan {GameState.Kamas} kamas."
+                : $"[NPC] Comprado el objeto {gid} x{quantity} (uid {uid}) por {price} ficha(s) " +
+                  $"de {tokenShop.TokenGid}; quedan {tokenLeft}.");
         }
 
         /// <summary>

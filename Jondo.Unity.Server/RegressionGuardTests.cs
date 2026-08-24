@@ -40,6 +40,8 @@ namespace Jondo.Unity.Launcher
             AssertSecretsAreCensored();
             AssertFightLockIsPerSession();
             AssertItemUidsAreServerWide();
+            AssertJondoCoinPaysByBand();
+            AssertShopCurrencyIsOptional();
             AssertFightSheetMatchesTheCapture();
 
             // El barrido del código fuente llevaba muerto desde que se reorganizaron las
@@ -414,6 +416,147 @@ namespace Jondo.Unity.Launcher
                     "[RegressionGuard FAILED] La resistencia a tierra va en el hueco de los puntos " +
                     "invertidos. El servidor real la manda en el del equipo, y en el otro el " +
                     "cliente lee cero.");
+        }
+
+        /// <summary>
+        /// La Jondo Coin paga por tramos de 25 niveles, y el objeto que la representa existe.
+        ///
+        /// Los bordes son lo que se rompe solo al tocar la fórmula: el 25 tiene que pagar una y el
+        /// 26 dos, no al revés. Un «/ 25» sin el «- 1» delante cambia justo esos dos y no se nota
+        /// hasta que alguien mata un monstruo de nivel 25 y le caen dos.
+        ///
+        /// Y se comprueba que la plantilla siga en el catálogo, porque el número está escrito a
+        /// mano: si world.zip se regenera algún día sin ese objeto, la moneda dejaría de existir
+        /// en silencio y los combates repartirían un id que el cliente no sabe dibujar.
+        /// </summary>
+        private static void AssertJondoCoinPaysByBand()
+        {
+            (int Nivel, int Monedas)[] esperado =
+            {
+                (1, 1), (25, 1),        // primer tramo, sus dos bordes
+                (26, 2), (50, 2),       // segundo
+                (51, 3), (75, 3),
+                (176, 8), (200, 8),
+                (201, 9), (225, 9),     // el último tramo
+                (226, 9), (2400, 9),    // y de ahí para arriba, el techo
+            };
+
+            foreach (var (nivel, monedas) in esperado)
+            {
+                int dio = Managers.JondoCoin.RewardFor(nivel);
+                if (dio == monedas) continue;
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] Un monstruo de nivel {nivel} tendría que pagar " +
+                    $"{monedas} Jondo Coin y paga {dio}. Los tramos son de " +
+                    $"{Managers.JondoCoin.LevelsPerBand} niveles, del 1 al 25 la primera.");
+            }
+
+            // Un nivel imposible no puede dar cero ni un número negativo: el objeto llegaría al
+            // inventario con cantidad cero y el cliente pintaría una pila vacía.
+            if (Managers.JondoCoin.RewardFor(0) < 1 || Managers.JondoCoin.RewardFor(-40) < 1)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] La Jondo Coin paga menos de una moneda con un nivel " +
+                    "de cero o negativo.");
+
+            if (!DatabaseManager.TryGetItemTemplateEffects(Managers.JondoCoin.TemplateId, out _))
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] La plantilla {Managers.JondoCoin.TemplateId}, que es " +
+                    "la Jondo Coin, no está en ItemTemplates. El combate repartiría un objeto que " +
+                    "el cliente no sabe dibujar.");
+        }
+
+        /// <summary>
+        /// Una tienda que cobra en kamas manda los MISMOS BYTES que antes de que existieran las
+        /// tiendas de fichas, y una de fichas se diferencia sólo en el campo de la moneda.
+        ///
+        /// Es la regresión que de verdad puede colarse: el campo nuevo del kbd es opcional, y si
+        /// alguien cambia el VarIfNotZero por un Var, las 51 tiendas normales del servidor pasarían
+        /// a mandar un «f3 = 0». El cliente lo leería como «la moneda es el objeto 0», y lo que se
+        /// ve entonces no es un error sino una tienda donde nadie puede comprar nada.
+        ///
+        /// Medido sobre las 305 capturas: de los 60 kbd del servidor real, 58 llevan sólo f1 y f2
+        /// y dos llevan además el f3, con el 13052 «Sebuscalón» y el 30529 «Fidelicha».
+        /// </summary>
+        private static void AssertShopCurrencyIsOptional()
+        {
+            int[] catalogo = { 20440 };
+
+            byte[] enKamas = Network.ConnectionProtocol.BuildShop(1234, catalogo);
+            byte[] sinMoneda = Network.ConnectionProtocol.BuildShop(1234, catalogo, 0);
+
+            if (!enKamas.AsSpan().SequenceEqual(sinMoneda))
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Pasar una moneda de cero cambia los bytes de la " +
+                    "tienda. Tiene que dar exactamente lo mismo que no pasar ninguna.");
+
+            // Y sin moneda no puede aparecer el campo 3 por ningún lado. Se busca la etiqueta
+            // cruda: campo 3, tipo varint, que en protobuf es el byte 0x18.
+            foreach (var (campo, _) in CamposDePrimerNivel(enKamas))
+            {
+                if (campo != 3) continue;
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] Una tienda que cobra en kamas está mandando el campo " +
+                    "de la moneda. En las 58 tiendas de kamas de la captura ese campo no está.");
+            }
+
+            byte[] enFichas = Network.ConnectionProtocol.BuildShop(1234, catalogo, Managers.JondoCoin.TemplateId);
+            bool llevaMoneda = false;
+            foreach (var (campo, valor) in CamposDePrimerNivel(enFichas))
+            {
+                if (campo != 3) continue;
+                llevaMoneda = true;
+                if (valor != Managers.JondoCoin.TemplateId)
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] La tienda de fichas dice que la moneda es el " +
+                        $"objeto {valor} y se le pidió la {Managers.JondoCoin.TemplateId}.");
+            }
+            if (!llevaMoneda)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] La tienda de fichas no manda el campo de la moneda, " +
+                    "así que el cliente cobraría en kamas.");
+        }
+
+        /// <summary>Los varint de primer nivel de un mensaje, para mirarlos sin parsear del todo.</summary>
+        private static List<(int Campo, long Valor)> CamposDePrimerNivel(byte[] mensaje)
+        {
+            var salida = new List<(int, long)>();
+            int i = 0;
+            while (i < mensaje.Length)
+            {
+                long etiqueta = LeerVarint(mensaje, ref i);
+                if (etiqueta < 0) break;
+                int campo = (int)(etiqueta >> 3);
+                int tipo = (int)(etiqueta & 7);
+
+                if (tipo == 0)
+                {
+                    long valor = LeerVarint(mensaje, ref i);
+                    if (valor < 0) break;
+                    salida.Add((campo, valor));
+                }
+                else if (tipo == 2)
+                {
+                    long largo = LeerVarint(mensaje, ref i);
+                    if (largo < 0 || i + largo > mensaje.Length) break;
+                    i += (int)largo;
+                }
+                else break;
+            }
+            return salida;
+        }
+
+        private static long LeerVarint(byte[] datos, ref int i)
+        {
+            long valor = 0;
+            int desplazamiento = 0;
+            while (i < datos.Length && desplazamiento <= 63)
+            {
+                byte b = datos[i++];
+                valor |= (long)(b & 0x7F) << desplazamiento;
+                if ((b & 0x80) == 0) return valor;
+                desplazamiento += 7;
+            }
+            return -1;
         }
 
         private static void AssertPerSessionPlayerCaches()

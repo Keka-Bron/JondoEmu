@@ -3404,8 +3404,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // del ldd de la preparacion, y la cifra del final llega ya con el extra sumado. Se
             // revisaron los 68 jyg de las capturas y no hay ningun hueco donde quepa un desglose,
             // asi que es el servidor quien tiene que aplicarlo antes de mandar el numero.
-            long xpGained = won ? ConElExtra(fight.Team1.Sum(m => (long)m.XpReward), extraDeRetos) : 0;
-            long kamas = won ? ConElExtra(fight.Team1.Sum(m => 10L + (m.Level * 5L)), extraDeRetos) : 0;
+            // Sin los invocados. La suma iba sobre TODO el bando contrario, y una invocación
+            // entra en él con su nivel puesto: un monstruo que invoque estaba pagando kamas por
+            // criaturas que él mismo se fabricaba durante el combate. La experiencia no lo
+            // notaba porque un invocado no lleva XpReward, pero los kamas sí.
+            var quePagan = fight.Team1.Where(m => !m.EsInvocado).ToList();
+            long xpGained = won ? ConElExtra(quePagan.Sum(m => (long)m.XpReward), extraDeRetos) : 0;
+            long kamas = won ? ConElExtra(quePagan.Sum(m => 10L + (m.Level * 5L)), extraDeRetos) : 0;
             var loot = won ? RollFightLoot(fight, extraDeRetos) : new Dictionary<int, int>();
 
             if (extraDeRetos > 0)
@@ -5080,8 +5085,19 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             var loot = new Dictionary<int, int>();
 
-            foreach (var monster in fight.Team1.Where(m => m.IsMonster))
+            // Los INVOCADOS no pagan. Entran en el bando del que los invoca con IsMonster
+            // puesto, así que un monstruo que invoque metería a su criatura en este bucle: se
+            // llevaría su propia tabla de botín y, con la moneda, sería una fábrica de dinero
+            // que se abre sola. Se distinguen por el Invocador, que sólo tienen ellos.
+            foreach (var monster in fight.Team1.Where(m => m.IsMonster && !m.EsInvocado))
             {
+                // La moneda del servidor. Cae SIEMPRE, sin tirar el dado: no es un objeto de la
+                // tabla del monstruo, es lo que paga el combate. La cantidad sale del nivel, de
+                // 25 en 25 (ver Managers.JondoCoin).
+                int monedas = Managers.JondoCoin.RewardFor(monster.Level);
+                loot.TryGetValue(Managers.JondoCoin.TemplateId, out int llevadas);
+                loot[Managers.JondoCoin.TemplateId] = llevadas + monedas;
+
                 var table = DatabaseManager.GetMonsterDrops(monster.MonsterId, monster.GradeIndex);
                 foreach (var drop in table)
                 {
