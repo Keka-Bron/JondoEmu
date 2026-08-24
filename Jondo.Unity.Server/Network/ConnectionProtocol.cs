@@ -1612,8 +1612,15 @@ namespace Jondo.Unity.Launcher.Network
         ///
         /// Si el f3 no está, se cobra en kamas, que es por lo que va con VarIfNotZero: una tienda
         /// normal sigue mandando exactamente los mismos bytes que antes.
+        ///
+        /// OJO CON EL PRECIO. Se recibe la tienda entera y no sólo el id de la moneda, y es a
+        /// propósito: la primera versión mandaba el f3 con la ficha pero seguía poniendo en cada
+        /// entrada el precio EN KAMAS, así que el cliente enseñaba una capa a «1 ficha» y al
+        /// comprarla el servidor cobraba 150. El precio que se enseña y el que se cobra tienen
+        /// que salir del mismo sitio, y por eso salen los dos de aquí.
         /// </summary>
-        public static byte[] BuildShop(long contextualId, IEnumerable<int> gids, int tokenGid = 0)
+        public static byte[] BuildShop(long contextualId, IEnumerable<int> gids,
+                                       Managers.TokenShops.Shop? tokenShop = null)
         {
             var kbd = Pb.New();
             foreach (int gid in gids)
@@ -1621,7 +1628,9 @@ namespace Jondo.Unity.Launcher.Network
                 var entry = Pb.New()
                     .Var(1, gid)
                     .Msg(3, Pb.New()
-                        .VarIfNotZero(2, Managers.NpcShops.PriceOf(gid))
+                        .VarIfNotZero(2, tokenShop == null
+                            ? Managers.NpcShops.PriceOf(gid)
+                            : Managers.TokenShops.PriceOf(tokenShop, gid))
                         .Var(3, ShopUnlimited));
 
                 foreach (var effect in Managers.Equipment.ParseEffects(Managers.NpcShops.EffectsOf(gid)))
@@ -1632,7 +1641,7 @@ namespace Jondo.Unity.Launcher.Network
 
                 kbd.Msg(1, entry);
             }
-            return kbd.Var(2, contextualId).VarIfNotZero(3, tokenGid).Build();
+            return kbd.Var(2, contextualId).VarIfNotZero(3, tokenShop?.TokenGid ?? 0).Build();
         }
 
         /// <summary>Las existencias de la tienda. Constante en las 6.106 entradas de la captura.</summary>

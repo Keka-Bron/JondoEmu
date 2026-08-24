@@ -483,7 +483,7 @@ namespace Jondo.Unity.Launcher
             int[] catalogo = { 20440 };
 
             byte[] enKamas = Network.ConnectionProtocol.BuildShop(1234, catalogo);
-            byte[] sinMoneda = Network.ConnectionProtocol.BuildShop(1234, catalogo, 0);
+            byte[] sinMoneda = Network.ConnectionProtocol.BuildShop(1234, catalogo, null);
 
             if (!enKamas.AsSpan().SequenceEqual(sinMoneda))
                 throw new InvalidOperationException(
@@ -500,7 +500,12 @@ namespace Jondo.Unity.Launcher
                     "de la moneda. En las 58 tiendas de kamas de la captura ese campo no está.");
             }
 
-            byte[] enFichas = Network.ConnectionProtocol.BuildShop(1234, catalogo, Managers.JondoCoin.TemplateId);
+            var deFichas = new Managers.TokenShops.Shop
+            {
+                TokenGid = Managers.JondoCoin.TemplateId,
+                Prices = { [20440] = 4242 },
+            };
+            byte[] enFichas = Network.ConnectionProtocol.BuildShop(1234, catalogo, deFichas);
             bool llevaMoneda = false;
             foreach (var (campo, valor) in CamposDePrimerNivel(enFichas))
             {
@@ -515,6 +520,28 @@ namespace Jondo.Unity.Launcher
                 throw new InvalidOperationException(
                     "[RegressionGuard FAILED] La tienda de fichas no manda el campo de la moneda, " +
                     "así que el cliente cobraría en kamas.");
+
+            // Y el precio que viaja en el catálogo tiene que ser el DE FICHAS, no el de kamas.
+            //
+            // Esto salió jugando: la primera versión mandaba bien la moneda pero seguía poniendo
+            // el precio en kamas en cada entrada, así que el escaparate decía «1 ficha» y el
+            // cobro eran 150. Un precio enseñado que no es el que se cobra es de las cosas que el
+            // jugador descubre pagando.
+            bool precioBueno = false;
+            foreach (var bloque in Network.ProtoMessage.Parse(enFichas).Fields)
+            {
+                if (bloque.FieldNumber != 1 || bloque.WireType != 2) continue;
+                foreach (var dentro in Network.ProtoMessage.Parse(bloque.BytesValue).Fields)
+                {
+                    if (dentro.FieldNumber != 3 || dentro.WireType != 2) continue;
+                    foreach (var precio in Network.ProtoMessage.Parse(dentro.BytesValue).Fields)
+                        if (precio.FieldNumber == 2 && precio.VarIntValue == 4242) precioBueno = true;
+                }
+            }
+            if (!precioBueno)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] El catálogo de una tienda de fichas no lleva el " +
+                    "precio en fichas. El cliente enseñaría un precio y el servidor cobraría otro.");
         }
 
         /// <summary>Los varint de primer nivel de un mensaje, para mirarlos sin parsear del todo.</summary>

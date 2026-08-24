@@ -139,8 +139,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // Si este vendedor cobra en fichas, se le dice al cliente cuál es la moneda. Sin
             // esto el f3 no viaja y el cliente pinta el precio en kamas, que es lo de siempre.
             var tokenShop = TokenShops.Of(npc.NpcId);
-            byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue,
-                                                      tokenShop?.TokenGid ?? 0);
+            byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue, tokenShop);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kbd, kbd));
 

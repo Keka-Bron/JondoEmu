@@ -17,49 +17,54 @@
     "npc_shops.json y solo se puede comprar lo que este en el.",
     "",
     "Los cinco vendedores de apariencia estan juntos en el mapa 88212759, el del zaap del pueblo",
-    "de Amakna, en las casillas 411 a 415. Entre los cinco venden 1.848 prendas, y por eso el",
-    "precio va por TIPO y no por objeto: son nueve numeros en vez de 1.848 lineas.",
+    "de Amakna. Entre los cinco venden 1.848 prendas, y por eso el precio va por TIPO y no por",
+    "objeto: son nueve numeros en vez de 1.848 lineas.",
     "",
     "Los tipos, con lo que hay de cada uno en el catalogo del juego:",
-    "   246 sombreros (464)   247 capas (357)     248 escudos (524)    251 armas (194)",
+    "   246 sombreros (464)   247 capas (357)       248 escudos (524)    251 armas (194)",
     "   249 mascotas (242)    250 mascoturas (151)  324 monturas (121)",
     "   300 alas (44)         113 objetos vivientes (61)",
     "",
-    "Para calibrar: un combate deja 16 Jondo Coin de mediana, asi que 150 fichas son unos 9",
-    "combates y 500 son unos 31. Un conjunto entero -sombrero, capa, escudo y arma- sale por 650,",
-    "unos 40 combates."
+    "CALIBRADO. Un combate deja entre 16 y 40 Jondo Coin, asi que:",
+    "   1.000 fichas  ~   40 combates   la ropa corriente",
+    "   2.000         ~   80            armas",
+    "  10.000         ~  400            alas y objetos vivientes",
+    "  15.000         ~  600            mascotas",
+    "  50.000         ~ 2.000           mascoturas",
+    " 100.000         ~ 4.000           monturas, que es lo mas caro del servidor",
+    "Un conjunto entero -sombrero, capa, escudo y arma- sale por 5.000, unos 200 combates."
   ],
 
   "tiendas": {
     "7562": {
       "_quien": "Sombreros de apariencia, 444 prendas",
       "moneda": 20440,
-      "preciosPorTipo": { "246": 150, "113": 250 },
-      "precio": 150
+      "preciosPorTipo": { "246": 1000, "113": 10000 },
+      "precio": 1000
     },
     "7565": {
       "_quien": "Capas de apariencia, 348 prendas",
       "moneda": 20440,
-      "preciosPorTipo": { "247": 150, "300": 250, "113": 250 },
-      "precio": 150
+      "preciosPorTipo": { "247": 1000, "300": 10000, "113": 10000 },
+      "precio": 1000
     },
     "7564": {
       "_quien": "Escudos de apariencia, 444 prendas",
       "moneda": 20440,
-      "preciosPorTipo": { "248": 150, "113": 250 },
-      "precio": 150
+      "preciosPorTipo": { "248": 1000, "113": 10000 },
+      "precio": 1000
     },
     "7563": {
       "_quien": "Armas de apariencia, 184 prendas",
       "moneda": 20440,
-      "preciosPorTipo": { "251": 200 },
-      "precio": 200
+      "preciosPorTipo": { "251": 2000 },
+      "precio": 2000
     },
     "7566": {
       "_quien": "Arreos, mascotas y monturas de apariencia, 428 prendas",
       "moneda": 20440,
-      "preciosPorTipo": { "249": 300, "250": 400, "324": 500 },
-      "precio": 400
+      "preciosPorTipo": { "249": 15000, "250": 50000, "324": 100000 },
+      "precio": 50000
     }
   }
 }
