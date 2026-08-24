@@ -334,6 +334,11 @@ namespace Jondo.Unity.Launcher
                     "[RegressionGuard FAILED] El repartidor de uid devuelve el mismo número dos " +
                     "veces. Dos objetos con el mismo uid se pisan en la base.");
 
+            if (primero > DatabaseManager.MaxClientItemUid || segundo > DatabaseManager.MaxClientItemUid)
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] El repartidor de uid da {primero} y {segundo}, " +
+                    "pero el cliente sólo conserva 32 bits. Al equiparlo devolverá otro número.");
+
             // Y por encima de lo que ya hay escrito, que es lo que evita chocar con lo existente.
             long enUso = DatabaseManager.MayorUidGuardado();
             if (primero <= enUso)

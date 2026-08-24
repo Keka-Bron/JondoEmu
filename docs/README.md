@@ -85,6 +85,16 @@ instead. Three generators that `Paths.cs` still names by hand (`extract_fight_ce
 *Go there* when you need to regenerate a data file, or when you want to know which source a value
 came from before trusting it.
 
+**`item-commands.md`** — Administrator item creation commands.
+The exact syntax and behavior of `.item` and `.itemset`, including role checks, template and set
+data sources, maximum factory effects, persistence, inventory updates and partial-set failures.
+*Go there* when giving an item by template id, creating a complete set or diagnosing a rejected id.
+
+**`role.md`** — The account-role scale and its migration.
+The corrected Giny-compatible roles 1 through 5, why the former 1-to-4 definition was ambiguous,
+how old administrators are migrated exactly once, and the current command permission thresholds.
+*Go there* when adding a protected command, changing an account role or investigating access.
+
 **`NOTAS_MIGRACION_AUTH.md`** — The jump from 3.6.4.3 to 3.6.10.10. **Written in Spanish** (1,030
 lines); the rest of this folder is in English.
 The full sequence from client start to walking on a map, message by message, with what changed in

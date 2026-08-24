@@ -99,12 +99,6 @@ namespace Jondo.Unity.Launcher
         public static string WorldGraphTeleportsJson
             => Resolve("interactive_teleports_worldgraph_2.73.json");
         /// <summary>
-        /// Routes de téléportation normalisées depuis la table interactive_skills de Giny 2.68.
-        /// Le serveur les valide puis les importe dans SQLite au démarrage; les maisons restent
-        /// dans leur catalogue séparé.
-        /// </summary>
-        public static string InteractiveTeleportsJson => Resolve("interactive_teleports_giny_2.68.json");
-        /// <summary>
         /// Los catálogos de oficios, habilidades y recetas en crudo. Se quedan fuera de
         /// <c>datos</c> a propósito: el servidor los importa a world.db y nunca los sirve.
         ///

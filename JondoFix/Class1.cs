@@ -10,8 +10,11 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Il2CppCore.DataCenter;
 using Il2CppCore.DataCenter.Metadata.World;
+using Il2CppCore.DataCenter.Metadata.Item;
+using Il2CppCore.UILogic.Admin;
+using Il2CppCore.UILogic.Components.Filters;
 
-[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.2.0", "Jondo")]
+[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.3.4", "Jondo")]
 [assembly: MelonGame("Ankama", "Dofus")]
 
 namespace JondoFix
@@ -19,9 +22,11 @@ namespace JondoFix
     public class JondoFixMod : MelonMod
     {
         public static bool UseLocalRedirect { get; private set; } = false;
+        public static bool IsJondoAdministrator { get; private set; } = false;
         public static Il2CppSystem.Net.Security.RemoteCertificateValidationCallback BypassedCallback { get; private set; }
         public static Il2CppMono.Security.Interface.MonoRemoteCertificateValidationCallback BypassedMonoCallback { get; private set; }
         private static bool hasDumped = false;
+        private static bool itemMappingsLoadedFromClient = false;
         public static readonly Dictionary<int, int> ItemNameIdToGid = new Dictionary<int, int>();
 
         /// <summary>
@@ -39,12 +44,23 @@ namespace JondoFix
                 if (_emulatorRoot != null) return _emulatorRoot;
                 try
                 {
-                    string gameDir = AppDomain.CurrentDomain.BaseDirectory;
-                    string candidate = Path.GetFullPath(Path.Combine(gameDir, "..", "Jondo Unity Emulator"));
-                    if (Directory.Exists(candidate))
+                    string configured = Environment.GetEnvironmentVariable("JONDO_EMULATOR_ROOT");
+                    if (!string.IsNullOrWhiteSpace(configured) && Directory.Exists(configured))
                     {
-                        _emulatorRoot = candidate;
+                        _emulatorRoot = Path.GetFullPath(configured);
                         return _emulatorRoot;
+                    }
+
+                    string gameDir = AppDomain.CurrentDomain.BaseDirectory;
+                    string parent = Path.GetFullPath(Path.Combine(gameDir, ".."));
+                    foreach (string folder in new[] { "JondoEmu", "Jondo Unity Emulator" })
+                    {
+                        string candidate = Path.Combine(parent, folder);
+                        if (Directory.Exists(candidate))
+                        {
+                            _emulatorRoot = candidate;
+                            return _emulatorRoot;
+                        }
                     }
                 }
                 catch { }
@@ -71,7 +87,7 @@ namespace JondoFix
                 string path = DataFile(@"dofus3_data\items.json");
                 if (!File.Exists(path))
                 {
-                    MelonLogger.Warning($"[JondoFix] items.json not found at {path}!");
+                    MelonLogger.Msg($"[JondoFix] Optional legacy items.json not found at {path}; client metadata will be used.");
                     return;
                 }
 
@@ -116,14 +132,58 @@ namespace JondoFix
             }
         }
 
+        /// <summary>
+        /// Builds the localization-key to item-id map from the catalogue bundled with the running
+        /// client. It therefore covers the exact Dofus version in use, including internal items
+        /// that may be absent from an old emulator-side JSON export.
+        /// </summary>
+        private static void LoadItemNamesFromClientData()
+        {
+            if (itemMappingsLoadedFromClient) return;
+
+            var root = Il2CppCore.DataCenter.DataCenterModule.itemsDataRoot;
+            var items = root?.GetObjects();
+            if (items == null || items.Count == 0) return;
+
+            int added = 0;
+            int madeSaleable = 0;
+            for (int i = 0; i < items.Count; i++)
+            {
+                ItemData item = items[i];
+                if (item == null || item.nameId > int.MaxValue) continue;
+
+                ItemNameIdToGid[(int)item.nameId] = item.id;
+                added++;
+                try
+                {
+                    if (!item.isSaleable)
+                    {
+                        item.isSaleable = true;
+                        madeSaleable++;
+                    }
+                }
+                catch { }
+            }
+
+            // Discard lists that may have been cached before the flags were normalized.
+            try { AbstractItemFilter.s_queriedLists?.Clear(); } catch { }
+            try { AbstractItemFilter.s_typesToReturn?.Clear(); } catch { }
+            itemMappingsLoadedFromClient = true;
+            MelonLogger.Msg($"[JondoFix] Loaded {added} item mappings; exposed {madeSaleable} hidden items.");
+        }
+
         public override void OnInitializeMelon()
         {
             LoadItemNames();
             UseLocalRedirect = IsEmulatorActive();
+            IsJondoAdministrator = UseLocalRedirect &&
+                int.TryParse(Environment.GetEnvironmentVariable("JONDO_ACCOUNT_ROLE"), out int role) &&
+                role >= 5;
             LoggerInstance.Msg("====================================================");
             LoggerInstance.Msg("  JONDO REDIRECTOR & FIX");
-            LoggerInstance.Msg($"  Version: 1.2.0");
+            LoggerInstance.Msg($"  Version: 1.3.4");
             LoggerInstance.Msg($"  Local Emulator Active? {UseLocalRedirect}");
+            LoggerInstance.Msg($"  Jondo Administrator? {IsJondoAdministrator}");
             if (UseLocalRedirect)
             {
                 LoggerInstance.Msg("  [+] DNS and Socket redirection is ACTIVE");
@@ -358,6 +418,18 @@ namespace JondoFix
 
         public override void OnUpdate()
         {
+            if (UseLocalRedirect && !itemMappingsLoadedFromClient)
+            {
+                try
+                {
+                    LoadItemNamesFromClientData();
+                }
+                catch (Exception)
+                {
+                    // Data roots are unavailable during the first loading frames. Retry later.
+                }
+            }
+
             if (UseLocalRedirect && !hasDumped)
             {
                 try
@@ -970,25 +1042,54 @@ namespace JondoFix
         }
     }
 
-    [HarmonyPatch(typeof(Il2CppCore.Localization.Utils.LocalizationAccessor), "TryGetLocalization", new Type[] { typeof(int), typeof(string) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Out })]
-    public class TryGetLocalizationPatch
+    /// <summary>
+    /// ItemData.name is the value consumed by encyclopedia rows. Patching the generic localization
+    /// accessor was insufficient because this client caches many item names through another path.
+    /// </summary>
+    [HarmonyPatch(typeof(ItemData), "get_name")]
+    public class AdminItemNameIdPatch
     {
-        public static void Postfix(int key, ref string localization, bool __result)
+        private static bool hasLoggedNamePatch = false;
+
+        public static void Postfix(ItemData __instance, ref string __result)
         {
             try
             {
-                if (__result && !string.IsNullOrEmpty(localization))
+                if (JondoFixMod.IsJondoAdministrator && __instance != null && !string.IsNullOrEmpty(__result))
                 {
-                    if (JondoFixMod.ItemNameIdToGid.TryGetValue(key, out int gid))
+                    string suffix = $" [{__instance.id}]";
+                    if (!__result.EndsWith(suffix, StringComparison.Ordinal))
                     {
-                        localization = $"{localization} [{gid}]";
+                        __result += suffix;
+                        if (!hasLoggedNamePatch)
+                        {
+                            hasLoggedNamePatch = true;
+                            MelonLogger.Msg($"[JondoFix] Admin item id display active: {__result}");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"[JondoFix] Error in TryGetLocalization Postfix: {ex.Message}");
+                MelonLogger.Error($"[JondoFix] Error in ItemData.name Postfix: {ex.Message}");
             }
+        }
+    }
+
+    /// <summary>
+    /// The official administration selector deliberately drops internal/hidden entries. On the
+    /// local emulator administrators need the complete client catalogue (combat pets included),
+    /// because its selected id is precisely what commands such as .item consume.
+    /// </summary>
+    [HarmonyPatch(typeof(AdminSelectItemUI), nameof(AdminSelectItemUI.ShouldSkipItem))]
+    public class AdminSelectItemShowEverythingPatch
+    {
+        public static bool Prefix(ref bool __result)
+        {
+            if (!JondoFixMod.UseLocalRedirect) return true;
+
+            __result = false;
+            return false;
         }
     }
 }

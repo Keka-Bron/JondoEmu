@@ -27,6 +27,9 @@ namespace Jondo.Unity.Launcher.Managers
 
         private static readonly List<Set> _sets = new List<Set>();
 
+        /// <summary>set id -> every item declared by the client, including sets without bonuses.</summary>
+        private static readonly Dictionary<int, Set> _byId = new Dictionary<int, Set>();
+
         /// <summary>item template -> which sets it belongs to.</summary>
         private static readonly Dictionary<int, List<Set>> _byItem = new Dictionary<int, List<Set>>();
 
@@ -36,6 +39,7 @@ namespace Jondo.Unity.Launcher.Managers
         {
             _sets.Clear();
             _byItem.Clear();
+            _byId.Clear();
 
             string path = Paths.ItemSetsJson;
             if (!File.Exists(path))
@@ -50,6 +54,7 @@ namespace Jondo.Unity.Launcher.Managers
                 using var doc = JsonDocument.Parse(File.ReadAllText(path));
                 foreach (var entry in doc.RootElement.EnumerateObject())
                 {
+                    if (!int.TryParse(entry.Name, out int setId)) continue;
                     var set = new Set();
 
                     if (entry.Value.TryGetProperty("items", out var items))
@@ -79,8 +84,12 @@ namespace Jondo.Unity.Launcher.Managers
                         }
                     }
 
-                    if (set.Items.Count == 0 || set.Bonuses.Count == 0) continue;
+                    // The administration command needs the complete catalogue. Some cosmetic or
+                    // internal sets legitimately have no bonus table, but their item list is still
+                    // a real set and must not disappear from .itemset.
+                    if (set.Items.Count == 0) continue;
 
+                    _byId[setId] = set;
                     _sets.Add(set);
                     foreach (int template in set.Items)
                     {
@@ -93,12 +102,25 @@ namespace Jondo.Unity.Launcher.Managers
                     }
                 }
 
-                Console.WriteLine($"[ItemSets] {_sets.Count} sets with a bonus, over {_byItem.Count} items.");
+                Console.WriteLine($"[ItemSets] {_sets.Count} sets, over {_byItem.Count} items.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[ItemSets] Could not read {Path.GetFileName(path)}: {ex.Message}");
             }
+        }
+
+        /// <summary>Returns a copy of the templates in a set, for the administration command.</summary>
+        public static bool TryGetItems(int setId, out IReadOnlyList<int> items)
+        {
+            if (_byId.TryGetValue(setId, out var set))
+            {
+                items = set.Items.ToArray();
+                return true;
+            }
+
+            items = Array.Empty<int>();
+            return false;
         }
 
         /// <summary>

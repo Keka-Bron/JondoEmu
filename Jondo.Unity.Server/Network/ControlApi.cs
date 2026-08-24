@@ -287,6 +287,7 @@ namespace Jondo.Unity.Launcher.Network
                     instancia = lanzamiento.InstanceId,
                     hash = lanzamiento.Hash,
                     cuenta,
+                    rol = DatabaseManager.GetAccountRole(cuenta),
                     idioma,
                 });
             }

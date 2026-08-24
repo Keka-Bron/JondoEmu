@@ -20,11 +20,14 @@ namespace Jondo.Unity.Launcher
         /// <summary>Moderador: vigila el chat y se mueve por el mundo para atender.</summary>
         public const int Moderador = 2;
 
+        /// <summary>Game master padawan: primeras herramientas de asistencia y animación.</summary>
+        public const int GameMasterPadawan = 3;
+
         /// <summary>Game master: además toca personajes —nivel, kamas, aspecto— para arreglar cosas.</summary>
-        public const int GameMaster = 3;
+        public const int GameMaster = 4;
 
         /// <summary>Administrador: además manda sobre el propio servidor.</summary>
-        public const int Administrador = 4;
+        public const int Administrador = 5;
 
         /// <summary>El que se le pone a una cuenta nueva.</summary>
         public const int PorDefecto = Jugador;
@@ -36,6 +39,7 @@ namespace Jondo.Unity.Launcher
         {
             Administrador => "administrador",
             GameMaster => "game master",
+            GameMasterPadawan => "game master padawan",
             Moderador => "moderador",
             Jugador => "jugador",
             _ => $"desconocido ({rol})",

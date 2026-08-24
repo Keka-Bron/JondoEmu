@@ -55,6 +55,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 [".relative"] = "Uso: .relative — pasa al siguiente MapId de las mismas coordenadas",
                 [".shop"] = "Uso: .shop — sin nada detrás",
                 [".size"] = "Uso: .size <n> — 100 es el tamaño normal, por ejemplo .size 200",
+                [".item"] = "Uso: .item <id> [cantidad] — por ejemplo .item 10784 1",
+                [".itemset"] = "Uso: .itemset <id de panoplia> — por ejemplo .itemset 1",
             };
 
         /// <summary>
@@ -143,6 +145,8 @@ namespace Jondo.Unity.Launcher.Handlers
                     case ".relative": await RelativeAsync(stream, rest, channel, accountId); break;
                     case ".shop": await ShopAsync(stream, channel, accountId); break;
                     case ".size": await SizeAsync(stream, rest, channel, accountId); break;
+                    case ".item": await ItemAsync(stream, rest, channel, accountId); break;
+                    case ".itemset": await ItemSetAsync(stream, rest, channel, accountId); break;
                 }
             }
             catch (Exception ex)
@@ -582,6 +586,124 @@ namespace Jondo.Unity.Launcher.Handlers
                               channel, accountId);
 
             Console.WriteLine($"[Comandos] Tamaño del personaje {GameState.CharacterId}: {size} %.");
+        }
+
+        // ─── .item / .itemset ──────────────────────────────────────────────────
+
+        /// <summary>
+        /// Creates an item from the client template, with its real factory effects, persists it,
+        /// updates both in-memory inventory views and immediately pushes it to the client.
+        /// </summary>
+        private static async Task<bool> GiveItemAsync(NetworkStream stream, int gid, int quantity)
+        {
+            if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return false;
+
+            long uid = DatabaseManager.NextItemUid();
+            if (!DatabaseManager.InsertCharacterItem(uid, GameState.CharacterId, gid, quantity,
+                                                     Equipment.Bag, effects))
+                return false;
+
+            Equipment.Add(uid, gid, quantity, Equipment.Bag, effects);
+
+            var legacy = new PlayerItem
+            {
+                Uid = uid,
+                ItemId = gid,
+                Quantity = quantity,
+                Position = Equipment.Bag,
+                RawEffects = effects,
+            };
+            foreach (var effect in Equipment.ParseEffects(effects))
+            {
+                legacy.Effects.TryGetValue(effect.Effect, out int had);
+                legacy.Effects[effect.Effect] = had + (int)effect.Value;
+            }
+            GameState.AddInventoryItem(legacy);
+
+            await NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3,
+                    new HavenBagStore.StoredItem
+                    {
+                        Uid = uid,
+                        Gid = gid,
+                        Quantity = quantity,
+                        Effects = effects,
+                    })));
+            return true;
+        }
+
+        private static async Task ItemAsync(NetworkStream stream, string rest,
+                                            int channel, long accountId)
+        {
+            string[] parts = rest.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 1 || parts.Length > 2 ||
+                !int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int gid) ||
+                (parts.Length == 2 && !int.TryParse(parts[1], NumberStyles.Integer,
+                                                   CultureInfo.InvariantCulture, out _)))
+            {
+                await NotifyAsync(stream, Uso[".item"], channel, accountId);
+                return;
+            }
+
+            int quantity = 1;
+            if (parts.Length == 2)
+                int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out quantity);
+
+            if (quantity <= 0)
+            {
+                await NotifyAsync(stream, "La cantidad debe ser mayor que cero.", channel, accountId);
+                return;
+            }
+
+            if (!await GiveItemAsync(stream, gid, quantity))
+            {
+                await NotifyAsync(stream, $"No existe la plantilla de objeto {gid}.", channel, accountId);
+                return;
+            }
+
+            await RefreshPodsAsync(stream);
+            await NotifyAsync(stream, $"Objeto {gid} x{quantity} añadido al inventario.",
+                              channel, accountId);
+        }
+
+        private static async Task ItemSetAsync(NetworkStream stream, string rest,
+                                               int channel, long accountId)
+        {
+            if (!int.TryParse(rest.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture,
+                              out int setId))
+            {
+                await NotifyAsync(stream, Uso[".itemset"], channel, accountId);
+                return;
+            }
+
+            if (!ItemSets.TryGetItems(setId, out var templates))
+            {
+                await NotifyAsync(stream, $"No existe la panoplia {setId}.", channel, accountId);
+                return;
+            }
+
+            int added = 0;
+            var missing = new List<int>();
+            foreach (int gid in templates)
+            {
+                if (await GiveItemAsync(stream, gid, 1)) added++;
+                else missing.Add(gid);
+            }
+
+            await RefreshPodsAsync(stream);
+            string warning = missing.Count == 0
+                ? ""
+                : $" Plantillas ausentes: {string.Join(", ", missing)}.";
+            await NotifyAsync(stream,
+                $"Panoplia {setId}: {added}/{templates.Count} objetos añadidos.{warning}",
+                channel, accountId);
+        }
+
+        private static async Task RefreshPodsAsync(NetworkStream stream)
+        {
+            await NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(
+                    0, 1000 + 5L * GameState.StatStrength)));
         }
 
         // ─── Piezas sueltas ─────────────────────────────────────────────────────
