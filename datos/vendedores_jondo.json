@@ -20,17 +20,229 @@
     "Este fichero lo lee el servidor Y el mod del cliente, para que el nombre y el catalogo no se",
     "puedan descuadrar. Si no esta, no se junta nada y todo queda como lo dejo Ankama."
   ],
-
   "vendedores": {
-    "5548": { "nombre": "Sombreros",  "nameId": 835835,  "absorbe": [5541, 5534, 5527, 5516] },
-    "5546": { "nombre": "Capas",      "nameId": 835833,  "absorbe": [5539, 5532, 5525, 5514] },
-    "5545": { "nombre": "Botas",      "nameId": 835832,  "absorbe": [5538, 5531, 5524, 5513] },
-    "5547": { "nombre": "Cinturones", "nameId": 835834,  "absorbe": [5540, 5533, 5526, 5515] },
-    "5543": { "nombre": "Amuletos",   "nameId": 835830,  "absorbe": [5536, 5529, 5522, 5511] },
-    "5544": { "nombre": "Anillos",    "nameId": 1085882, "absorbe": [5537, 5530, 5523, 5512] },
-    "5520": { "nombre": "Trofeos",    "nameId": 835802,  "absorbe": [5519, 5518] },
-
-    "5542": { "nombre": "Armas 1 - 99",   "nameId": 835829, "absorbe": [5535] },
-    "5528": { "nombre": "Armas 100 - 200", "nameId": 835810, "absorbe": [5521, 5510] }
+    "5548": {
+      "nombre": "Sombreros",
+      "nameId": 835835,
+      "absorbe": [
+        5541,
+        5534,
+        5527,
+        5516
+      ]
+    },
+    "5546": {
+      "nombre": "Capas",
+      "nameId": 835833,
+      "absorbe": [
+        5539,
+        5532,
+        5525,
+        5514
+      ]
+    },
+    "5545": {
+      "nombre": "Botas",
+      "nameId": 835832,
+      "absorbe": [
+        5538,
+        5531,
+        5524,
+        5513
+      ]
+    },
+    "5547": {
+      "nombre": "Cinturones",
+      "nameId": 835834,
+      "absorbe": [
+        5540,
+        5533,
+        5526,
+        5515
+      ]
+    },
+    "5543": {
+      "nombre": "Amuletos",
+      "nameId": 835830,
+      "absorbe": [
+        5536,
+        5529,
+        5522,
+        5511
+      ]
+    },
+    "5544": {
+      "nombre": "Anillos",
+      "nameId": 1085882,
+      "absorbe": [
+        5537,
+        5530,
+        5523,
+        5512
+      ]
+    },
+    "5520": {
+      "nombre": "Trofeos",
+      "nameId": 835802,
+      "absorbe": [
+        5519,
+        5518
+      ]
+    },
+    "5542": {
+      "nombre": "Armas 1 - 99",
+      "nameId": 835829,
+      "absorbe": [
+        5535
+      ]
+    },
+    "5528": {
+      "nombre": "Armas 100 - 200",
+      "nameId": 835810,
+      "absorbe": [
+        5521,
+        5510
+      ]
+    }
+  },
+  "_comentario_colocacion": [
+    "Donde se planta cada vendedor en el mapa 88212759, el del zaap del pueblo de Amakna.",
+    "",
+    "Estaba feo por un motivo concreto: la colocacion se genero para 52 vendedores en bloques",
+    "CONTIGUOS de cinco por familia (129-130-131-132-133, 157-158-159-160-161...), y al juntarlos",
+    "por categoria dejamos de sembrar 29 sin recalcular las casillas. De cada bloque sobrevivia el",
+    "primero y quedaban cuatro huecos seguidos detras.",
+    "",
+    "Y de paso el bloque contiguo tampoco era lo que hace Ankama. Medido sobre 396 NPCs de 202",
+    "mapas de las capturas: solo 16 de 512 parejas del mismo mapa son vecinas (3,1 %), la distancia",
+    "tipica al mas cercano es de 2 a 4 casillas, y nunca hay mas de 10 en un mapa (media 1,96).",
+    "",
+    "Aqui van de tres en tres con dos casillas de separacion, agrupados por familia: equipo en la",
+    "plaza norte (filas 9, 11, 13 y 15), monturas y bichos en la sur (21 y 25), apariencias en el",
+    "rincon sur (29 y 31) y el monton de kamas solo, centrado, en la 33. Ni una pareja pegada.",
+    "",
+    "La ORIENTACION tampoco es libre: el juego real solo usa la 1 y la 3 (el 94,9 % entre las dos)",
+    "y las reparte por columna, la 1 en las columnas 0-6 y la 3 en las 7-13. Se respeta.",
+    "",
+    "Verificado antes de escribirlo: las 23 casillas son andables, ninguna cae encima de un",
+    "interactivo (el zaap esta en la 196) ni de un grupo de monstruos (312 y 344), y no se repite",
+    "ninguna."
+  ],
+  "colocacion": {
+    "5542": {
+      "casilla": 130,
+      "orientacion": 1,
+      "_quien": "Armas 1 - 99"
+    },
+    "5528": {
+      "casilla": 133,
+      "orientacion": 3,
+      "_quien": "Armas 100 - 200"
+    },
+    "5517": {
+      "casilla": 136,
+      "orientacion": 3,
+      "_quien": "Escudos"
+    },
+    "5548": {
+      "casilla": 158,
+      "orientacion": 1,
+      "_quien": "Sombreros"
+    },
+    "5546": {
+      "casilla": 161,
+      "orientacion": 3,
+      "_quien": "Capas"
+    },
+    "5545": {
+      "casilla": 164,
+      "orientacion": 3,
+      "_quien": "Botas"
+    },
+    "5547": {
+      "casilla": 186,
+      "orientacion": 1,
+      "_quien": "Cinturones"
+    },
+    "5543": {
+      "casilla": 189,
+      "orientacion": 3,
+      "_quien": "Amuletos"
+    },
+    "5544": {
+      "casilla": 192,
+      "orientacion": 3,
+      "_quien": "Anillos"
+    },
+    "5520": {
+      "casilla": 216,
+      "orientacion": 1,
+      "_quien": "Trofeos"
+    },
+    "7377": {
+      "casilla": 298,
+      "orientacion": 1,
+      "_quien": "Calado Peul"
+    },
+    "7378": {
+      "casilla": 301,
+      "orientacion": 3,
+      "_quien": "Ada Babbage"
+    },
+    "7374": {
+      "casilla": 304,
+      "orientacion": 3,
+      "_quien": "Gustavo Hifel"
+    },
+    "5549": {
+      "casilla": 354,
+      "orientacion": 1,
+      "_quien": "Ruben Paket Hado"
+    },
+    "5550": {
+      "casilla": 357,
+      "orientacion": 3,
+      "_quien": "Alain Bombardas"
+    },
+    "5551": {
+      "casilla": 360,
+      "orientacion": 3,
+      "_quien": "Stiff Yob"
+    },
+    "7562": {
+      "casilla": 410,
+      "orientacion": 1,
+      "_quien": "Roukairol de Nairouze"
+    },
+    "7565": {
+      "casilla": 413,
+      "orientacion": 3,
+      "_quien": "Yaimes Kooc"
+    },
+    "7564": {
+      "casilla": 416,
+      "orientacion": 3,
+      "_quien": "Mago Llanes"
+    },
+    "7563": {
+      "casilla": 439,
+      "orientacion": 1,
+      "_quien": "Ness Ogal"
+    },
+    "7566": {
+      "casilla": 441,
+      "orientacion": 3,
+      "_quien": "Krisadam"
+    },
+    "7574": {
+      "casilla": 443,
+      "orientacion": 3,
+      "_quien": "Stayfun Bonnawa"
+    },
+    "7025": {
+      "casilla": 468,
+      "orientacion": 1,
+      "_quien": "Monton de kamas"
+    }
   }
 }

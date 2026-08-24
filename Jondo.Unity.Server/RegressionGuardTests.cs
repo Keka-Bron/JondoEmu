@@ -44,6 +44,7 @@ namespace Jondo.Unity.Launcher
             AssertShopCurrencyIsOptional();
             AssertPacketShapesAreTelling();
             AssertMonstersBringTheirSpells();
+            AssertVendorsStandSomewhereSensible();
             AssertFightSheetMatchesTheCapture();
 
             // El barrido del código fuente llevaba muerto desde que se reorganizaron las
@@ -729,6 +730,60 @@ namespace Jondo.Unity.Launcher
                         $"startingSpellId ({ficha.StartingSpellLevelId}) en la lista de hechizos. " +
                         "Ese número es un SpellLevels.Id, no un Spells.Id: ver Summons.cs, que lo " +
                         "traduce bien.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Donde se plantan los vendedores: casillas andables, libres, sin repetir y sin pegarse.
+        ///
+        /// La colocación es un fichero que se edita a mano, y las cuatro formas de estropearla no
+        /// dan ningún error: un NPC dentro de una pared no se puede clicar, uno encima del zaap
+        /// tapa el zaap, dos en la misma casilla se dibujan uno sobre otro, y una fila de bloques
+        /// pegados es justo lo feo que esto venía a arreglar.
+        ///
+        /// Lo de no pegarse está medido: sobre 396 NPCs de 202 mapas de las capturas, sólo 16 de
+        /// 512 parejas del mismo mapa son vecinas —el 3,1 %— y la distancia típica al más cercano
+        /// es de dos a cuatro casillas. Ankama no los pone en fila.
+        /// </summary>
+        private static void AssertVendorsStandSomewhereSensible()
+        {
+            var puestos = new Dictionary<int, int>();
+
+            foreach (long mapa in Managers.Npcs.Maps)
+            foreach (var spawn in Managers.Npcs.Of(mapa))
+            {
+                var sitio = Managers.Vendors.PlacementOf(spawn.NpcId);
+                if (sitio == null) continue;
+
+                if (!MapManager.IsCellWalkable(spawn.MapId, spawn.Cell))
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] El vendedor {spawn.NpcId} está puesto en la " +
+                        $"casilla {spawn.Cell} del mapa {spawn.MapId}, que no se puede pisar. " +
+                        "Ahí no hay quien lo cliquee.");
+
+                if (puestos.TryGetValue(spawn.Cell, out int otro))
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] Los vendedores {otro} y {spawn.NpcId} están los " +
+                        $"dos en la casilla {spawn.Cell}: se dibujarían uno encima del otro.");
+                puestos[spawn.Cell] = spawn.NpcId;
+            }
+
+            // Y ninguno pegado a otro. Se mide en la rejilla del mapa, catorce de ancho.
+            const int AnchoDelMapa = 14;
+            var celdas = new List<int>(puestos.Keys);
+            for (int i = 0; i < celdas.Count; i++)
+            {
+                for (int j = i + 1; j < celdas.Count; j++)
+                {
+                    int ax = celdas[i] % AnchoDelMapa, ay = celdas[i] / AnchoDelMapa;
+                    int bx = celdas[j] % AnchoDelMapa, by = celdas[j] / AnchoDelMapa;
+                    if (Math.Abs(ax - bx) > 1 || Math.Abs(ay - by) > 1) continue;
+                    throw new InvalidOperationException(
+                        $"[RegressionGuard FAILED] Los vendedores {puestos[celdas[i]]} y " +
+                        $"{puestos[celdas[j]]} están pegados, en las casillas {celdas[i]} y " +
+                        $"{celdas[j]}. El juego real casi nunca los pone así: 16 parejas vecinas " +
+                        "de 512 medidas, el 3,1 %.");
                 }
             }
         }

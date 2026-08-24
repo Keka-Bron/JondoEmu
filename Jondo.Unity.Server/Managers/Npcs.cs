@@ -116,12 +116,22 @@ namespace Jondo.Unity.Launcher.Managers
                         _byMap[mapId] = here;
                     }
 
+                    // Donde lo pone Jondo manda sobre lo que diga la tabla.
+                    //
+                    // La colocacion de NpcSpawns se genero para 52 vendedores en bloques
+                    // contiguos de cinco por familia, y al juntarlos por categoria dejaron de
+                    // sembrarse 29 sin recalcular nada: de cada bloque quedaba el primero y
+                    // cuatro huecos seguidos detras. Las casillas buenas estan en
+                    // datos/vendedores_jondo.json, que si se versiona.
+                    int npcId = reader.GetInt32(1);
+                    var sitio = Vendors.PlacementOf(npcId);
+
                     var spawn = new Spawn
                     {
                         MapId = mapId,
-                        NpcId = reader.GetInt32(1),
-                        Cell = reader.GetInt32(2),
-                        Orientation = reader.GetInt32(3),
+                        NpcId = npcId,
+                        Cell = sitio?.Cell ?? reader.GetInt32(2),
+                        Orientation = sitio?.Orientation ?? reader.GetInt32(3),
                         ContextualId = ActorIds.NpcDelMapa(here.Count),
                         RawLook = reader.IsDBNull(4) ? "" : reader.GetString(4),
                         BoneId = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),

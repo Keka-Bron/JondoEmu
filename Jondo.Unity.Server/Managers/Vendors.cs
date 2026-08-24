@@ -40,8 +40,18 @@ namespace Jondo.Unity.Launcher.Managers
             public List<int> Absorbs = new List<int>();
         }
 
+        /// <summary>Dónde se planta un vendedor: su casilla y hacia dónde mira.</summary>
+        public readonly struct Placement
+        {
+            public Placement(int cell, int orientation) { Cell = cell; Orientation = orientation; }
+            public int Cell { get; }
+            public int Orientation { get; }
+        }
+
         private static readonly List<Merge> _merges = new List<Merge>();
         private static readonly HashSet<int> _absorbed = new HashSet<int>();
+        private static readonly Dictionary<int, Placement> _placements =
+            new Dictionary<int, Placement>();
 
         /// <summary>Los que ya no se siembran porque otro se ha quedado con su catálogo.</summary>
         public static IReadOnlyCollection<int> Absorbed => _absorbed;
@@ -54,6 +64,7 @@ namespace Jondo.Unity.Launcher.Managers
         {
             _merges.Clear();
             _absorbed.Clear();
+            _placements.Clear();
 
             string path = Paths.JondoVendorsJson;
             if (!File.Exists(path))
@@ -119,8 +130,25 @@ namespace Jondo.Unity.Launcher.Managers
                     _absorbed.Remove(merge.Keeps);
                 }
 
+                // Y dónde se planta cada uno.
+                //
+                // Va aquí y no en la tabla NpcSpawns a propósito: bases/ no se versiona, así que
+                // una colocación escrita en world.db se pierde en cuanto alguien vuelve a
+                // descomprimir world.zip. Esto sí viaja con el repositorio.
+                if (doc.RootElement.TryGetProperty("colocacion", out var colocacion))
+                {
+                    foreach (var entrada in colocacion.EnumerateObject())
+                    {
+                        if (!int.TryParse(entrada.Name, out int npcId)) continue;
+                        int casilla = entrada.Value.TryGetProperty("casilla", out var c) ? c.GetInt32() : 0;
+                        int orientacion = entrada.Value.TryGetProperty("orientacion", out var o)
+                            ? o.GetInt32() : 1;
+                        if (casilla > 0) _placements[npcId] = new Placement(casilla, orientacion);
+                    }
+                }
+
                 Console.WriteLine($"[Vendedores] {_merges.Count} vendedor(es) se quedan con lo de " +
-                                  $"otros {_absorbed.Count}.");
+                                  $"otros {_absorbed.Count}; {_placements.Count} colocado(s) a mano.");
             }
             catch (Exception ex)
             {
@@ -130,5 +158,9 @@ namespace Jondo.Unity.Launcher.Managers
 
         /// <summary>Si a ese vendedor lo ha absorbido otro y por tanto ya no se siembra.</summary>
         public static bool IsAbsorbed(int npcTemplateId) => _absorbed.Contains(npcTemplateId);
+
+        /// <summary>Dónde va ese vendedor, si Jondo lo coloca a mano.</summary>
+        public static Placement? PlacementOf(int npcTemplateId)
+            => _placements.TryGetValue(npcTemplateId, out var sitio) ? sitio : null;
     }
 }
