@@ -3444,21 +3444,39 @@ namespace Jondo.Unity.Launcher
             }
             catch { }
 
-            // Damage of the equipped instance. Every effect carries its element in the Effects table.
-            foreach (var kv in weapon.Effects)
+            // El daño del arma que lleva puesta.
+            //
+            // OJO CON DE DÓNDE SALE. En la instancia guardada, un efecto de daño es
+            // «[96, 0, 9, 13]»: el 96 es el efecto, el 0 es el VALOR —que en los daños va vacío—
+            // y el 9 y el 13 son los DADOS, que es donde está el daño de verdad.
+            //
+            // Esto leía weapon.Effects, que es un diccionario efecto→valor y por tanto ya ha
+            // perdido los dados por el camino. Con el valor a cero, la condición «kv.Value <= 0»
+            // descartaba TODOS los efectos de daño, el arma se quedaba con cero, y GolpeDelArma
+            // devolvía una lista vacía: por eso al atacar con la espada salía un puñetazo.
+            //
+            // Se lee de RawEffects, que es el json tal cual vino, con el mismo parser que ya sabe
+            // su forma. Se coge el efecto de más daño, no el primero: un arma con dos efectos
+            // —«9 a 13 de agua» y «27 a 33 de neutral»— pega con el gordo.
+            foreach (var efecto in Managers.Equipment.ParseEffects(weapon.RawEffects))
             {
-                if (kv.Key < 91 || kv.Key > 100 || kv.Value <= 0) continue;
+                if (efecto.Effect < 91 || efecto.Effect > 100) continue;
+
+                int minimo = (int)(efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value);
+                int maximo = (int)(efecto.DiceSide != 0 ? efecto.DiceSide : minimo);
+                if (minimo <= 0 && maximo <= 0) continue;
+                if (maximo < minimo) maximo = minimo;
+                if (maximo <= data.BaseDamageMax) continue;
 
                 var elemCmd = connection.CreateCommand();
                 elemCmd.CommandText = "SELECT ElementId FROM Effects WHERE Id = $id;";
-                elemCmd.Parameters.AddWithValue("$id", kv.Key);
+                elemCmd.Parameters.AddWithValue("$id", efecto.Effect);
                 object? elem = elemCmd.ExecuteScalar();
                 if (elem == null || elem == DBNull.Value) continue;
 
                 data.Element = Convert.ToInt32(elem);
-                data.BaseDamageMin = kv.Value;
-                data.BaseDamageMax = kv.Value;
-                break;
+                data.BaseDamageMin = minimo;
+                data.BaseDamageMax = maximo;
             }
 
             return data.BaseDamageMin > 0 ? data : null;

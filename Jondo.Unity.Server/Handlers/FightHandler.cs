@@ -615,6 +615,13 @@ namespace Jondo.Unity.Launcher.Handlers
         private static List<(int Characteristic, long Base, long Gear)> PlacementSheetOf(Fighter fighter)
             => FullSheetOf(fighter);
 
+        /// <summary>
+        /// La ficha de un combatiente, para que la guardia de regresión pueda compararla con la
+        /// del servidor real. No la usa el juego.
+        /// </summary>
+        public static List<(int Characteristic, long Base, long Gear)> FichaParaLaGuardia(Fighter fighter)
+            => FullSheetOf(fighter);
+
         /// <summary>"Daños sufridos x#1%", el multiplicador que pone Represalias.</summary>
         private const int DanoSufridoPorCiento = 1163;
 
@@ -784,11 +791,17 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 (ActionPointsCharacteristic, fighter.MaxAP, 0),
                 (MovementPointsCharacteristic, fighter.MaxMP, 0),
-                (37, fighter.NeutralResPct, 0),
-                (33, fighter.EarthResPct, 0),
-                (35, fighter.WaterResPct, 0),
-                (36, fighter.AirResPct, 0),
-                (34, fighter.FireResPct, 0),
+                // Las cinco resistencias en tanto por ciento, EN EL HUECO DE LA DERECHA.
+                //
+                // Iban en el de la izquierda —el de los puntos invertidos— y el servidor real las
+                // manda en el del equipo: medido sobre el jxb de «combate contra 4 poutchs», donde
+                // las cinco salen como f7 y ninguna como f2. Puestas en el hueco que no es, el
+                // cliente lee cero donde hay algo.
+                (37, 0, fighter.NeutralResPct),
+                (33, 0, fighter.EarthResPct),
+                (35, 0, fighter.WaterResPct),
+                (36, 0, fighter.AirResPct),
+                (34, 0, fighter.FireResPct),
                 (58, 0, fighter.Otra(58)), (54, 0, fighter.Otra(54)), (56, 0, fighter.Otra(56)),
                 (57, 0, fighter.Otra(57)), (55, 0, fighter.Otra(55)),
                 // El empuje y los daños críticos, que son de las que el cliente necesita para
@@ -824,7 +837,12 @@ namespace Jondo.Unity.Launcher.Handlers
                 (19, 0, fighter.Range),
                 (25, 0, fighter.Power),
                 (26, 0, fighter.Otra(26)), (50, 0, fighter.Otra(50)), (75, 0, fighter.Otra(75)),
-                (84, 0, fighter.PushDamage),
+                // Aquí iba la 84, el daño de empuje. El servidor real NO LA MANDA: su ficha
+                // tiene 53 entradas y la 84 no está en ninguna, mientras que la 85 —la
+                // resistencia al empuje— sí. Y la metíamos justo en la posición 33, que es donde
+                // empiezan los daños elementales (88 a 92), así que era una entrada que el
+                // cliente no espera, colocada justo delante de las cinco que alimentan la
+                // previsualización de daño.
                 (88, 0, fighter.EarthDamage),
                 (89, 0, fighter.FireDamage),
                 (90, 0, fighter.WaterDamage),
@@ -842,6 +860,26 @@ namespace Jondo.Unity.Launcher.Handlers
             };
 
             foreach (int cual in Multiplicadores) ficha.Add((cual, 100, 0));
+
+            // TRAZA de la ficha: es LO QUE VE EL CLIENTE para calcular su previsualización de
+            // daño. Si ahí salen la potencia, los daños y los elementales con sus números buenos
+            // y la previsualización sigue enseñando sólo el daño base, entonces el que no está
+            // haciendo la cuenta es el cliente, y hay que mirar qué más espera.
+            //
+            // Sólo la del personaje que maneja el jugador: la de los monstruos llenaría el
+            // registro y no es la que se está midiendo.
+            if (!fighter.IsMonster)
+            {
+                var interesan = new[] { 10, 11, 13, 14, 15, 16, 18, 19, 25, 84, 88, 89, 90, 91, 92 };
+                var pintado = new List<string>();
+                foreach (var (cual, baseV, extra) in ficha)
+                {
+                    if (Array.IndexOf(interesan, cual) < 0) continue;
+                    pintado.Add($"{cual}={baseV}+{extra}");
+                }
+                Program.LogDebug($"[FICHA] {fighter.Id}: " + string.Join(" ", pintado));
+            }
+
             return ficha;
         }
 
@@ -1367,6 +1405,23 @@ namespace Jondo.Unity.Launcher.Handlers
 
             Program.LogDebug("[Combate] El jugador se declara listo (kaq).");
             bool allReady = fight.SetFighterReady(GameState.CharacterId);
+
+            // La pareja lqg + lqt, los dos vacíos, justo cuando están todos listos.
+            //
+            // Esto es lo que le dice al cliente que deje de regenerar vida. La regeneración la
+            // lleva ÉL: el servidor no suma vida por su cuenta en ningún sitio. Al entrar al
+            // mundo se le enciende —el lqg va en la ráfaga de entrada, que replicamos— y como
+            // nadie se la apagaba, seguía tictaqueando dentro del combate: el jugador recibía un
+            // golpe y veía cómo la barra se le rellenaba sola de uno en uno.
+            //
+            // Van aquí y no dentro de StartFightAsync porque en la captura del combate real caen
+            // ANTES del kah del listo. Se mandan una sola vez por combate, que es como salen allí:
+            // una vez en 2.937 mensajes.
+            if (allReady)
+            {
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqg));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqt));
+            }
 
             // Enterado, que es lo único que contesta el servidor real al listo.
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kah,
@@ -1959,10 +2014,26 @@ namespace Jondo.Unity.Launcher.Handlers
                 int minimo = limites.AlcanceMinimo
                            + caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo,
                                                      fight.RoundNumber);
+                // El alcance del EQUIPO faltaba. Aquí sólo se sumaba el que dan los embrujos
+                // —Buffs.De(19)— así que un personaje con alcance en los objetos no lo veía por
+                // ningún lado: la característica 19 se le manda al cliente en la ficha, y el
+                // servidor la ignoraba al comprobar si el hechizo llega.
+                //
+                // El alcance mínimo NO lo toca: la 19 amplía hasta dónde llegas, no desde dónde.
                 int maximo = limites.AlcanceMaximo
+                           + caster.Range
                            + caster.Buffs.De(AlcanceCaracteristica, fight.RoundNumber)
                            + caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMaximo,
                                                      fight.RoundNumber);
+
+                // TRAZA del alcance: de dónde sale cada sumando. Con esto se ve de un vistazo si
+                // lo que falla es el equipo, el embrujo genérico o el que apunta a este hechizo.
+                Program.LogDebug($"[ALCANCE] hechizo {spell} a {lejos} casillas. " +
+                                 $"minimo {minimo} = base {limites.AlcanceMinimo} + embrujo " +
+                                 $"{caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo, fight.RoundNumber)}. " +
+                                 $"maximo {maximo} = base {limites.AlcanceMaximo} + equipo {caster.Range} + " +
+                                 $"caracteristica {caster.Buffs.De(AlcanceCaracteristica, fight.RoundNumber)} + embrujo " +
+                                 $"{caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMaximo, fight.RoundNumber)}");
 
                 if (lejos < minimo || lejos > maximo)
                 {
@@ -2473,14 +2544,29 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 if (c.Caracteristica == ActionPointsCharacteristic)
                 {
+                    // TRAZA para medir la retirada de PA. Se apunta de qué a qué, con qué efecto
+                    // y cuántos embrujos de PA lleva encima el afectado: si el número que se ve en
+                    // pantalla no cuadra con éste, el desajuste lo pone el cliente y no nosotros.
+                    int antes = c.Sobre.CurrentAP;
                     c.Sobre.CurrentAP = Math.Max(0, c.Sobre.CurrentAP + c.Cuanto);
+                    Program.LogDebug($"[PUNTOS] PA de {c.Sobre.Id}: {antes} -> {c.Sobre.CurrentAP} " +
+                                     $"({c.Cuanto:+#;-#;0}) por el efecto {c.Efecto.EffectId} del " +
+                                     $"hechizo {hechizo}; tope {c.Sobre.MaxAP}, embrujos de PA " +
+                                     $"encima: {c.Sobre.Buffs.De(ActionPointsCharacteristic, fight.RoundNumber)}");
+
                     fichas.Add((c.Sobre.Id, ActionPointsCharacteristic));
                     await AnunciarPuntosAsync(stream, quienLanza, c.Sobre,
                                               Network.FightProtocol.ActionPointsLost, c.Cuanto);
                 }
                 else if (c.Caracteristica == MovementPointsCharacteristic)
                 {
+                    int antes = c.Sobre.CurrentMP;
                     c.Sobre.CurrentMP = Math.Max(0, c.Sobre.CurrentMP + c.Cuanto);
+                    Program.LogDebug($"[PUNTOS] PM de {c.Sobre.Id}: {antes} -> {c.Sobre.CurrentMP} " +
+                                     $"({c.Cuanto:+#;-#;0}) por el efecto {c.Efecto.EffectId} del " +
+                                     $"hechizo {hechizo}; tope {c.Sobre.MaxMP}, embrujos de PM " +
+                                     $"encima: {c.Sobre.Buffs.De(MovementPointsCharacteristic, fight.RoundNumber)}");
+
                     fichas.Add((c.Sobre.Id, MovementPointsCharacteristic));
                     await AnunciarPuntosAsync(stream, quienLanza, c.Sobre,
                                               Network.FightProtocol.MovementPointsLost, c.Cuanto);
@@ -2604,6 +2690,72 @@ namespace Jondo.Unity.Launcher.Handlers
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien,
                                                            Network.FightProtocol.SheetSequence)));
             }
+
+            await AnunciarElAlcanceAsync(stream, fight, consecuencias);
+        }
+
+        /// <summary>
+        /// El alcance que han cambiado los embrujos, hechizo por hechizo (hnd y hnk).
+        ///
+        /// Esto FALTABA ENTERO, y es la razón de que dar alcance no sirviera de nada. El jxm que
+        /// ya mandábamos es byte a byte el del servidor real —mismo f1, f4, f6, f8, f10, f14—
+        /// pero ése sólo alimenta el panel de efectos: el cliente enseñaba «Disparos Lejanos: +6
+        /// de alcance máximo» y seguía iluminando las mismas casillas.
+        ///
+        /// Las casillas las calcula el cliente con ESTOS dos, que van en pareja y uno por cada
+        /// hechizo tocado. En «ocra-disparos lejanos» hay 272 de cada uno, que son dos por
+        /// hechizo: el 13 con el mínimo y el 12 con el máximo.
+        ///
+        /// Se manda el TOTAL que tiene el hechizo ahora, no lo que acaba de sumar este embrujo:
+        /// así dos embrujos sobre el mismo hechizo no se pisan, y quitar uno deja el número bueno.
+        /// </summary>
+        private static async Task AnunciarElAlcanceAsync(
+            NetworkStream stream, FightInstance fight,
+            List<Managers.Outcome> consecuencias)
+        {
+            // Quién y qué hechizo han quedado tocados. Se junta primero para no mandar dos veces
+            // lo mismo cuando un hechizo lleva el mínimo y el máximo a la vez.
+            var tocados = new List<(Fighter Quien, int Hechizo)>();
+            foreach (var c in consecuencias)
+            {
+                var buff = c.Buff;
+                if (buff == null || buff.HechizoAfectado == 0) continue;
+                if (buff.Sobre != Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo &&
+                    buff.Sobre != Jondo.Unity.World.Fights.SpellAspect.AlcanceMaximo) continue;
+                if (tocados.Exists(t => t.Quien.Id == c.Sobre.Id && t.Hechizo == buff.HechizoAfectado)) continue;
+                tocados.Add((c.Sobre, buff.HechizoAfectado));
+            }
+            if (tocados.Count == 0) return;
+
+            // Primero todos los valores y después todas las declaraciones, que es el orden de la
+            // captura: la ráfaga de hnd va junta y la de hnk detrás.
+            foreach (var (quien, hechizo) in tocados)
+            {
+                int minimo = quien.Buffs.DelHechizo(hechizo, Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo,
+                                                    fight.RoundNumber);
+                int maximo = quien.Buffs.DelHechizo(hechizo, Jondo.Unity.World.Fights.SpellAspect.AlcanceMaximo,
+                                                    fight.RoundNumber);
+
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnd,
+                    Network.FightProtocol.BuildSpellModifier(
+                        quien.Id, Network.FightProtocol.SpellMinRange, hechizo, minimo)));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnd,
+                    Network.FightProtocol.BuildSpellModifier(
+                        quien.Id, Network.FightProtocol.SpellMaxRange, hechizo, maximo)));
+            }
+
+            foreach (var (quien, hechizo) in tocados)
+            {
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
+                    Network.FightProtocol.BuildSpellModifierDeclared(
+                        quien.Id, Network.FightProtocol.SpellMinRange, hechizo)));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
+                    Network.FightProtocol.BuildSpellModifierDeclared(
+                        quien.Id, Network.FightProtocol.SpellMaxRange, hechizo)));
+            }
+
+            Program.LogDebug($"[ALCANCE] Anunciado el alcance de {tocados.Count} hechizo(s) " +
+                             "con hnd y hnk.");
         }
 
         /// <summary>
@@ -2909,6 +3061,34 @@ namespace Jondo.Unity.Launcher.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId,
                                                   target.Id, aplicado, elemento, erosionado)));
+
+            // EL ROBO DE VIDA. Los efectos 91 a 95 no son daño a secas: son «robo de agua»,
+            // «robo de tierra», «robo de aire», «robo de fuego» y «robo neutral», y el 82 es el
+            // robo neutral fijo. Los seis pegan igual que un daño normal y ADEMÁS curan a quien
+            // lanza por la mitad de lo que han quitado.
+            //
+            // Aquí se trataban como daño y nada más, así que el Ocra pegaba con Flecha Voraz y no
+            // se curaba. Y explica de paso lo del arma: la espada del personaje lleva
+            // «[91, 0, 27, 33]», que no es daño de agua sino ROBO de agua, y su golpe principal
+            // se quedaba a medias.
+            //
+            // La mitad, redondeando hacia abajo, y nunca por encima del tope: quien está a tope
+            // de vida no gana nada. Se cura sobre lo APLICADO, no sobre lo calculado: si al
+            // objetivo le quedaban veinte y el golpe era de trescientos, se roban diez.
+            if (aplicado > 0 && Managers.EffectEngine.EsRoboDeVida(efecto.EffectId))
+            {
+                int curado = Math.Min(aplicado / 2, Math.Max(0, caster.MaxHP - caster.CurrentHP));
+                if (curado > 0)
+                {
+                    caster.CurrentHP += curado;
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildHeal(caster.Id, curado, caster.Id)));
+                    await RefrescarLaVidaAsync(stream, fight, caster);
+                    Program.LogDebug($"[Combate] Robo de vida del efecto {efecto.EffectId}: " +
+                                     $"{caster.Id} se cura {curado} de los {aplicado} quitados; " +
+                                     $"se queda en {caster.CurrentHP}/{caster.MaxHP}.");
+                }
+            }
 
             // Y al jugador, la vida que le queda. Sin esto le pegaban toda la pelea y su barra
             // seguia llena: el cliente no descuenta la suya de los golpes, la lee de la ficha.

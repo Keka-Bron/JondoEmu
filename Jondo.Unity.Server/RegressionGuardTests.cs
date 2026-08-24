@@ -40,6 +40,7 @@ namespace Jondo.Unity.Launcher
             AssertSecretsAreCensored();
             AssertFightLockIsPerSession();
             AssertItemUidsAreServerWide();
+            AssertFightSheetMatchesTheCapture();
 
             // El barrido del código fuente llevaba muerto desde que se reorganizaron las
             // carpetas: subía tres niveles desde el binario y bajaba a "Jondo.Unity.Launcher",
@@ -339,6 +340,61 @@ namespace Jondo.Unity.Launcher
                 throw new InvalidOperationException(
                     $"[RegressionGuard FAILED] El repartidor de uid da {primero} y en la base ya hay " +
                     $"hasta {enUso}. El siguiente objeto que se guarde pisará uno que existe.");
+        }
+
+        /// <summary>
+        /// La ficha de combate lleva las mismas características, en el mismo orden y en el mismo
+        /// hueco que la del servidor real.
+        ///
+        /// La lista de abajo NO está elegida: son las 53 entradas del jxb de
+        /// «combate contra 4 poutchs nivel 25», en su orden exacto. Y el hueco importa tanto como
+        /// el número: el cliente lee cada característica de un sitio concreto, y puesta en el otro
+        /// lee cero.
+        ///
+        /// Esto cazó dos cosas de golpe. La primera: mandábamos la característica 84 —el daño de
+        /// empuje— que el servidor real NO manda en ninguna de sus 53 entradas, y encima justo en
+        /// la posición donde empiezan los daños elementales. La segunda: las cinco resistencias
+        /// iban en el hueco de los puntos invertidos cuando el real las manda en el del equipo.
+        ///
+        /// Las dos son de las que no dan error: la partida sigue, el panel enseña números, y lo
+        /// único que se ve raro es que la previsualización de daño diga una cifra ridícula.
+        /// </summary>
+        private static void AssertFightSheetMatchesTheCapture()
+        {
+            int[] delServidorReal =
+            {
+                1, 23, 37, 33, 35, 36, 34, 58, 54, 56, 57, 55, 85, 87, 101, 27, 28, 93, 79, 78,
+                0, 10, 11, 13, 14, 15, 16, 18, 19, 25, 26, 50, 75, 88, 89, 90, 91, 92, 95, 96,
+                97, 102, 107, 150, 120, 121, 122, 123, 124, 125, 141, 142, 143,
+            };
+
+            var ficha = Handlers.FightHandler.FichaParaLaGuardia(new Jondo.Unity.World.Fights.Fighter());
+            var nuestras = ficha.ConvertAll(e => e.Characteristic);
+
+            if (nuestras.Count != delServidorReal.Length)
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] La ficha de combate lleva {nuestras.Count} " +
+                    $"características y la del servidor real tiene {delServidorReal.Length}.");
+
+            for (int i = 0; i < delServidorReal.Length; i++)
+            {
+                if (nuestras[i] == delServidorReal[i]) continue;
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] La ficha de combate se desvía de la capturada en la " +
+                    $"posición {i}: el servidor real manda la característica {delServidorReal[i]} y " +
+                    $"nosotros la {nuestras[i]}.");
+            }
+
+            // Y las resistencias, en el hueco del equipo. Con un luchador recién hecho valen cero
+            // y los dos huecos salen vacíos, así que lo que se comprueba es que el sitio donde se
+            // escriben sea el segundo: por eso se le pone un valor antes de mirar.
+            var conResistencias = new Jondo.Unity.World.Fights.Fighter { EarthResPct = 37 };
+            var entrada = Handlers.FightHandler.FichaParaLaGuardia(conResistencias).Find(e => e.Characteristic == 33);
+            if (entrada.Base != 0 || entrada.Gear != 37)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] La resistencia a tierra va en el hueco de los puntos " +
+                    "invertidos. El servidor real la manda en el del equipo, y en el otro el " +
+                    "cliente lee cero.");
         }
 
         private static void AssertPerSessionPlayerCaches()

@@ -443,6 +443,27 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Jol = "jol";
 
+    /// <summary>
+    /// Va vacío y en pareja con <see cref="Lqt"/>, una sola vez por combate y justo antes del kai.
+    /// Medido en «combate contra 4 poutchs nivel 25»: en 2.937 mensajes salen una vez, ahí.
+    /// Aparece además en la ráfaga de entrada al mundo.
+    /// </summary>
+    public const string Lqg = "lqg";
+
+    /// <summary>El compañero del <see cref="Lqg"/>. También vacío, y sólo en el inicio de combate.</summary>
+    public const string Lqt = "lqt";
+
+    /// <summary>
+    /// El VALOR de un modificador que apunta a un hechizo concreto:
+    /// <c>f1 { f2: 1, f3: cuánto, f4: qué, f5: el hechizo }  f2: de quién</c>
+    ///
+    /// Es lo que hace que el cliente vuelva a calcular las casillas donde se puede lanzar. El jxm
+    /// del embrujo sólo le sirve para pintar el panel de efectos. Medido en
+    /// «ocra-disparos lejanos»: 272 de éstos, dos por cada hechizo afectado.
+    /// </summary>
+    public const string Hnd = "hnd";
+
+
     /// <summary>Cambio de mapa antiguo (3.6.4.3), sustituido por jqk. No aparece en ninguna captura.</summary>
     public const string Jos = "jos";
 

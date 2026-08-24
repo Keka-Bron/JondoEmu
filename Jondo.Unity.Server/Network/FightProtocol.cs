@@ -1558,5 +1558,49 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static byte[] BuildChallengeResult(int id, bool completed)
             => Pb.New().Var(1, id).VarIfNotZero(2, completed ? 1 : 0).Build();
+
+        /// <summary>
+        /// Lo que un modificador vale AHORA para un hechizo concreto (hnd).
+        ///
+        /// El cliente no calcula el alcance de un hechizo a partir de los embrujos del panel: lo
+        /// coge de aquí. Sin este mensaje, Disparos Lejanos salía en la lista de efectos con su
+        /// «+6 de alcance máximo» y las casillas iluminadas seguían siendo las mismas, porque el
+        /// jxm es para pintar y esto es para calcular.
+        ///
+        ///   f1 { f2: 1, f3: cuánto, f4: qué modificador, f5: el hechizo }   f2: de quién
+        ///
+        /// Medido en «ocra-disparos lejanos»: f4 = 13 con f3 = 3, y f4 = 12 con f3 = 6, que son
+        /// justo el «+3 de alcance mínimo» y el «+6 de alcance máximo» de ese hechizo.
+        /// </summary>
+        public static byte[] BuildSpellModifier(long quien, int modificador, int hechizo, long cuanto)
+            => Pb.New()
+                .Msg(1, Pb.New()
+                    .Var(2, 1)
+                    .Var(3, cuanto)
+                    .Var(4, modificador)
+                    .Var(5, hechizo))
+                .Var(2, quien)
+                .Build();
+
+        /// <summary>
+        /// La declaración que va con el <see cref="BuildSpellModifier"/> (hnk): dice que ese
+        /// hechizo tiene ese modificador puesto. Van los dos, uno detrás de otro y en el mismo
+        /// número: 272 y 272 en la captura.
+        ///
+        ///   f1: qué modificador     f2: 1     f3: el hechizo     f5: de quién
+        /// </summary>
+        public static byte[] BuildSpellModifierDeclared(long quien, int modificador, int hechizo)
+            => Pb.New()
+                .Var(1, modificador)
+                .Var(2, 1)
+                .Var(3, hechizo)
+                .Var(5, quien)
+                .Build();
+
+        /// <summary>El alcance máximo de un hechizo, tal como lo numera el hnd/hnk.</summary>
+        public const int SpellMaxRange = 12;
+
+        /// <summary>Y el mínimo. OJO: el mínimo es el 13 y el máximo el 12, no al revés.</summary>
+        public const int SpellMinRange = 13;
     }
 }

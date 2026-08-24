@@ -191,6 +191,24 @@ namespace Jondo.Unity.Launcher.Managers
         private const int CuraPorcentual = 1109;
 
         /// <summary>Los dos números de característica de los puntos.</summary>
+        /// <summary>
+        /// Los efectos que ROBAN vida: pegan y curan al lanzador por la mitad.
+        ///
+        /// Salen del catálogo del cliente, tal cual los describe: el 91 es «robo de agua», el 92
+        /// de tierra, el 93 de aire, el 94 de fuego, el 95 neutral y el 82 el neutral fijo. Los
+        /// 2828 y 2890 son «robo del mejor elemento» y «del peor», que eligen el elemento al
+        /// vuelo pero roban igual.
+        ///
+        /// No confundirlos con los 96 a 100, que son los daños del mismo elemento y no curan
+        /// nada. Un solo número de diferencia y el comportamiento es otro.
+        /// </summary>
+        private static readonly HashSet<int> RobosDeVida = new HashSet<int>
+        {
+            82, 91, 92, 93, 94, 95, 2828, 2890
+        };
+
+        public static bool EsRoboDeVida(int efecto) => RobosDeVida.Contains(efecto);
+
         private const int PuntosDeAccion = 1;
         private const int PuntosDeMovimiento = 23;
 
