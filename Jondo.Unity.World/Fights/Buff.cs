@@ -240,10 +240,24 @@ namespace Jondo.Unity.World.Fights
         /// <summary>Se lleva los que ya han caducado y devuelve cuáles eran.</summary>
         public List<Buff> Barrer(int ronda)
         {
-            var caidos = _puestos.FindAll(e => !e.Vivo(ronda));
-            _puestos.RemoveAll(e => !e.Vivo(ronda));
+            // Se barre lo que ha CADUCADO, no lo que «no esta vivo».
+            //
+            // No es lo mismo desde que existen los embrujos retardados: uno que todavia no ha
+            // empezado tampoco esta vivo, y con la condicion de antes lo barria la primera vez que
+            // pasaba la escoba, o sea el turno siguiente a lanzarlo.
+            //
+            // Eso es justo lo que se veia con la Flecha Castigadora: sus dos bonos aparecian con
+            // su cuenta atras -el 3 y el 2- y al turno siguiente desaparecian dejando la cadena
+            // vacia, sin llegar a aplicarse nunca. Nacian y se los llevaba la escoba antes de que
+            // les tocara empezar.
+            var caidos = _puestos.FindAll(e => Caducado(e, ronda));
+            _puestos.RemoveAll(e => Caducado(e, ronda));
             return caidos;
         }
+
+        /// <summary>Si a un embrujo se le ha pasado la hora. Uno que aun no ha empezado, NO.</summary>
+        private static bool Caducado(Buff embrujo, int ronda)
+            => embrujo.CaducaEnRonda >= 0 && ronda >= embrujo.CaducaEnRonda;
 
         public void Vaciar()
         {
