@@ -36,10 +36,22 @@ namespace JondoFix
     {
         public sealed class Rename
         {
+            /// <summary>El nombre nuevo. Uno solo: «Jondo Coin» no se traduce.</summary>
             public string Name;
-            public string Description;
+
+            /// <summary>La descripcion, por idioma. La clave es «es», «en», «fr», «de» o «pt».</summary>
+            public Dictionary<string, string> Description;
+
             public int NameId;
             public int DescriptionId;
+
+            /// <summary>La descripcion en el idioma del cliente, o en ingles si no se sabe cual es.</summary>
+            public string DescriptionFor(string idioma)
+            {
+                if (Description == null || Description.Count == 0) return null;
+                if (idioma != null && Description.TryGetValue(idioma, out string texto)) return texto;
+                return Description.TryGetValue(JondoLanguage.Fallback, out string ingles) ? ingles : null;
+            }
         }
 
         public static readonly Dictionary<int, Rename> ById = new Dictionary<int, Rename>
@@ -50,26 +62,120 @@ namespace JondoFix
             [20440] = new Rename
             {
                 Name = "Jondo Coin",
-                Description = "La moneda de Jondo. La sueltan todos los monstruos, y con ella se "
-                            + "paga en las tiendas que no cobran en kamas. Cuanto mas alto es el "
-                            + "monstruo, mas monedas deja.",
                 NameId = 777279,
                 DescriptionId = 777280,
+                Description = new Dictionary<string, string>
+                {
+                    ["es"] = "No existe fuera de Jondo: ningun banco la reconoce, ningun mercader "
+                           + "la rechaza. Acunada por Keka Bron, DragonLord y Lux en una fragua "
+                           + "que no figura en ningun mapa.",
+                    ["en"] = "It does not exist outside Jondo: no bank will recognise it, no "
+                           + "merchant will refuse it. Struck by Keka Bron, DragonLord and Lux in "
+                           + "a forge that appears on no map.",
+                    ["fr"] = "Elle n existe pas hors de Jondo : aucune banque ne la reconnait, "
+                           + "aucun marchand ne la refuse. Frappee par Keka Bron, DragonLord et "
+                           + "Lux dans une forge qui ne figure sur aucune carte.",
+                    ["de"] = "Ausserhalb von Jondo existiert sie nicht: Keine Bank erkennt sie an, "
+                           + "kein Handler weist sie zurueck. Gepraegt von Keka Bron, DragonLord "
+                           + "und Lux in einer Schmiede, die auf keiner Karte verzeichnet ist.",
+                    ["pt"] = "Nao existe fora de Jondo: nenhum banco a reconhece, nenhum mercador "
+                           + "a recusa. Cunhada por Keka Bron, DragonLord e Lux numa forja que nao "
+                           + "consta em nenhum mapa.",
+                },
             },
         };
 
-        /// <summary>La misma tabla pero por clave de texto, para el parche de reserva.</summary>
-        public static readonly Dictionary<int, string> ByTextKey = BuildTextKeys();
+        /// <summary>El nombre nuevo por clave de texto, para el parche de reserva.</summary>
+        public static readonly Dictionary<int, string> NameByTextKey = BuildNameKeys();
 
-        private static Dictionary<int, string> BuildTextKeys()
+        /// <summary>Y que objeto es cada clave de descripcion, para poder elegir el idioma.</summary>
+        public static readonly Dictionary<int, Rename> ByDescriptionKey = BuildDescriptionKeys();
+
+        private static Dictionary<int, string> BuildNameKeys()
         {
             var map = new Dictionary<int, string>();
             foreach (var entry in ById.Values)
-            {
-                if (entry.NameId != 0) map[entry.NameId] = entry.Name;
-                if (entry.DescriptionId != 0) map[entry.DescriptionId] = entry.Description;
-            }
+                if (entry.NameId != 0 && entry.Name != null) map[entry.NameId] = entry.Name;
             return map;
+        }
+
+        private static Dictionary<int, Rename> BuildDescriptionKeys()
+        {
+            var map = new Dictionary<int, Rename>();
+            foreach (var entry in ById.Values)
+                if (entry.DescriptionId != 0) map[entry.DescriptionId] = entry;
+            return map;
+        }
+    }
+
+    /// <summary>
+    /// En que idioma esta jugando el que tiene el cliente delante.
+    ///
+    /// NO se puede sacar de la cabecera del fichero de textos: los cinco —de.bin, en.bin, es.bin,
+    /// fr.bin y pt.bin— llevan escrito «fr» dentro, que es una pifia de la compilacion de Ankama.
+    /// Comprobado en los cinco. Detectar por ahi habria dicho «frances» siempre, y el jugador
+    /// aleman habria leido frances sin que nadie se enterara.
+    ///
+    /// Asi que se detecta por el CONTENIDO, y sin preguntarle nada al cliente. La primera vez que
+    /// se pide el nombre de un objeto de la tabla, ese nombre ya viene resuelto por el cliente en
+    /// su idioma; basta con mirar cual de los cinco es. Es justo la palabra que estamos a punto de
+    /// sustituir, asi que no cuesta ni una llamada de mas.
+    ///
+    /// Si no se reconoce ninguno —porque Ankama cambie el texto en una actualizacion, o porque
+    /// aparezca un idioma nuevo— se queda en ingles, que es lo que mas gente entiende.
+    /// </summary>
+    public static class JondoLanguage
+    {
+        /// <summary>El idioma que se usa mientras no se sepa cual es, y si no se reconoce.</summary>
+        public const string Fallback = "en";
+
+        private static string _detectado;
+
+        /// <summary>El idioma, o null mientras no se haya visto ningun texto conocido.</summary>
+        public static string Current => _detectado;
+
+        /// <summary>
+        /// El nombre de la «Moneda onirica minuscula» —clave 777279— en los cinco idiomas que trae
+        /// el cliente, sacado de los propios .bin. Es la huella con la que se reconoce el idioma.
+        /// Va sin tildes porque se compara sin ellas.
+        /// </summary>
+        private static readonly Dictionary<string, string> Huella =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Moneda onirica minuscula"] = "es",
+            ["Tiny Dream Coin"] = "en",
+            ["Minuscule piece onirique"] = "fr",
+            ["Winziges Traumstuckchen"] = "de",
+            ["Moeda Onirica Minuscula"] = "pt",
+        };
+
+        /// <summary>
+        /// Mira si ese texto delata el idioma. Se le pasa lo que el cliente acaba de resolver,
+        /// ANTES de sustituirlo.
+        /// </summary>
+        public static void Sniff(string textoDelCliente)
+        {
+            if (_detectado != null || string.IsNullOrEmpty(textoDelCliente)) return;
+            if (!Huella.TryGetValue(SinTildes(textoDelCliente), out string idioma)) return;
+
+            _detectado = idioma;
+            MelonLogger.Msg($"[JondoFix] El cliente esta en «{_detectado}».");
+        }
+
+        /// <summary>Quita las tildes, para no depender de como venga escrito el texto.</summary>
+        private static string SinTildes(string s)
+        {
+            var sb = new StringBuilder(s.Length);
+            foreach (char c in s.Normalize(System.Text.NormalizationForm.FormD))
+            {
+                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)
+                    != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+            // La escharfes-S alemana no lleva tilde que quitar, asi que se cambia a mano.
+            return sb.ToString().Normalize(System.Text.NormalizationForm.FormC).Replace("\u00df", "ss");
         }
     }
 
@@ -1191,6 +1297,10 @@ namespace JondoFix
                     JondoRenames.ById.TryGetValue(__instance.id, out var renamed) &&
                     !string.IsNullOrEmpty(renamed.Name))
                 {
+                    // El idioma se saca de aqui: lo que hay en __result es el nombre que el
+                    // cliente acaba de resolver de SU fichero de textos, y es lo unico que
+                    // distingue un es.bin de un fr.bin. Hay que mirarlo antes de pisarlo.
+                    JondoLanguage.Sniff(__result);
                     __result = renamed.Name;
                 }
 
@@ -1251,12 +1361,11 @@ namespace JondoFix
         {
             try
             {
-                if (__instance != null &&
-                    JondoRenames.ById.TryGetValue(__instance.id, out var renamed) &&
-                    !string.IsNullOrEmpty(renamed.Description))
-                {
-                    __result = renamed.Description;
-                }
+                if (__instance == null ||
+                    !JondoRenames.ById.TryGetValue(__instance.id, out var renamed)) return;
+
+                string texto = renamed.DescriptionFor(JondoLanguage.Current);
+                if (!string.IsNullOrEmpty(texto)) __result = texto;
             }
             catch (Exception ex)
             {
@@ -1281,9 +1390,19 @@ namespace JondoFix
         {
             try
             {
-                if (__result && JondoRenames.ByTextKey.TryGetValue(key, out string texto))
+                if (!__result) return;
+
+                if (JondoRenames.NameByTextKey.TryGetValue(key, out string nombre))
                 {
-                    localization = texto;
+                    JondoLanguage.Sniff(localization);
+                    localization = nombre;
+                    return;
+                }
+
+                if (JondoRenames.ByDescriptionKey.TryGetValue(key, out var renamed))
+                {
+                    string texto = renamed.DescriptionFor(JondoLanguage.Current);
+                    if (!string.IsNullOrEmpty(texto)) localization = texto;
                 }
             }
             catch (Exception ex)
