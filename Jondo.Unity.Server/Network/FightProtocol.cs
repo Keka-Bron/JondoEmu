@@ -314,13 +314,23 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public const int TemporaryLifeMalus = 97;
 
-        public static Pb SheetEntry(int characteristic, long baseValue, long fromGear, bool isMonster)
+        /// <param name="delEmbrujo">
+        /// EL HUECO DEL EMBRUJO, el f8. Es lo que los hechizos ponen y quitan durante el combate, y
+        /// va SEPARADO de la base y del equipo: el cliente guarda los tres y los suma él.
+        ///
+        /// Sin esto no había manera de refrescar una característica sin pisar lo demás, y era la
+        /// causa de que la previsualización de daño saliera mal. Medido sobre las 401 capturas:
+        /// 2.830 de las 3.279 entradas de jxw con molde detallado (86,3 %) lo llevan, y nosotros no
+        /// lo escribimos ni una vez en 1.713.
+        /// </param>
+        public static Pb SheetEntry(int characteristic, long baseValue, long fromGear, bool isMonster,
+                                    long delEmbrujo = 0)
         {
             var entry = Pb.New().VarIfNotZero(1, characteristic);
 
             if (isMonster)
             {
-                long total = baseValue + fromGear;
+                long total = baseValue + fromGear + delEmbrujo;
                 if (total == 0) entry.EmptyMsg(2);
                 else entry.Msg(2, Pb.New().Var(2, total));
                 return entry;
@@ -340,7 +350,7 @@ namespace Jondo.Unity.Launcher.Network
                 return entry.Msg(4, Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(8, fromGear));
             }
 
-            if (baseValue == 0 && fromGear == 0)
+            if (baseValue == 0 && fromGear == 0 && delEmbrujo == 0)
             {
                 return entry.EmptyMsg(4);
             }
@@ -349,7 +359,8 @@ namespace Jondo.Unity.Launcher.Network
             // Este cliente lo SUMA en vez de tomarlo como porcentaje: con él puesto, la ficha
             // enseñaba 568 de fuerza donde hay 468, y cien de más en inteligencia, suerte y
             // agilidad. Hasta saber qué espera exactamente, mejor no mandarlo.
-            var valor = Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(7, fromGear);
+            var valor = Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(7, fromGear)
+                          .VarIfNotZero(8, delEmbrujo);
             return entry.Msg(4, valor);
         }
 
@@ -847,46 +858,38 @@ namespace Jondo.Unity.Launcher.Network
         private const int PuntosDeMovimiento = 23;
 
         public static byte[] BuildFighterSheet(long fighterId,
-                                               IEnumerable<(int Characteristic, long Value)> sheet,
+                                               IEnumerable<(int Characteristic, long Base,
+                                                            long Gear, long Buff)> sheet,
                                                bool esElPersonajeControlado)
         {
-            // El molde depende de DOS cosas: de quién es la ficha, y de QUÉ característica es.
+            // UNA ENTRADA DE jxw SUSTITUYE A LA DEL jxb, NO SE SUMA A ELLA. De ahí sale todo.
             //
-            //   del personaje propio, PA y PM   f5 { f1: valor }   y f5 vacío cuando es cero
-            //   del personaje propio, lo demás  f4 { f2: valor }   el mismo molde de la ficha llena
-            //   de monstruos y de los demás     f2 { f2: valor }   y f2 vacío cuando es cero
+            // Aquí se mandaba un VALOR ABSOLUTO metido en el hueco de la base, y con eso cada
+            // refresco borraba el equipo y el resto de huecos que el jxb había mandado bien. El
+            // servidor real hace lo contrario: vuelve a escribir la entrada COMPLETA —los mismos
+            // campos que en el jxb, repetidos aunque no hayan cambiado— y añade el embrujo en su
+            // hueco propio, el f8.
             //
-            // Lo segundo es lo que faltaba, y era la mitad de por qué la previsualización de daño
-            // salía con números de risa. El f5 es el molde de los PUNTOS, y el servidor real lo
-            // usa SÓLO para la 1 y la 23: medido sobre las 401 capturas, en un jxw no aparece ni
-            // una vez para ninguna otra característica. Nosotros metíamos ahí la fuerza, la
-            // agilidad, el crítico y todo lo demás, y el cliente lo leía como si le estuvieran
-            // devolviendo puntos de acción.
+            // Medido en la captura del Zobal, sobre el mismo luchador y las mismas características:
             //
-            // Es exactamente el mismo fallo que ya se corrigió dentro de la ficha llena, que en su
-            // día mandaba las resistencias en el hueco de los puntos invertidos. Aquí seguía.
+            //   jxb   107: f4 { f2: 100 }          25: f4 { f7: 740 }
+            //   jxw   107: f4 { f2: 100, f8: +1 }  25: f4 { f7: 740, f8: +100 }
+            //   jxw   107: f4 { f2: 100 }          25: f4 { f7: 740 }      al caducar el embrujo
+            //
+            // El 100 de la base NO se toca en ninguna de las 1.699 entradas detalladas de las
+            // capturas. Nosotros mandábamos «f4 { f2: 10 }» —sólo el embrujo, y en el hueco que no
+            // es— cincuenta y cinco milisegundos después de haber mandado el 100 bueno. Y el 107 es
+            // un MULTIPLICADOR de daño: el cliente estima el golpe multiplicando por él, así que
+            // dejarlo en 10 donde vale 100 es la previsualización dividida por diez. Ése era el
+            // fallo que se veía jugando.
+            //
+            // El molde de los puntos —f5— sigue siendo sólo para la 1 y la 23; ninguna otra
+            // característica lo usa jamás en las capturas.
             var stats = Pb.New().Var(3, SheetKind);
-            foreach (var (characteristic, value) in sheet)
+            foreach (var (characteristic, baseValue, gear, buff) in sheet)
             {
-                var entry = Pb.New().VarIfNotZero(1, characteristic);
-                bool esDePuntos = characteristic == PuntosDeAccion || characteristic == PuntosDeMovimiento;
-
-                if (esElPersonajeControlado && esDePuntos)
-                {
-                    if (value == 0) entry.EmptyMsg(5);
-                    else entry.Msg(5, Pb.New().Var(1, value));
-                }
-                else if (esElPersonajeControlado)
-                {
-                    if (value == 0) entry.EmptyMsg(4);
-                    else entry.Msg(4, Pb.New().Var(2, value));
-                }
-                else
-                {
-                    if (value == 0) entry.EmptyMsg(2);
-                    else entry.Msg(2, Pb.New().Var(2, value));
-                }
-                stats.Msg(5, entry);
+                stats.Msg(5, SheetEntry(characteristic, baseValue, gear,
+                                        isMonster: !esElPersonajeControlado, delEmbrujo: buff));
             }
             return Pb.New().Var(1, fighterId).Msg(3, stats).Build();
         }
