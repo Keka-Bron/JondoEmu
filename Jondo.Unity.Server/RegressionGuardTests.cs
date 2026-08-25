@@ -41,6 +41,7 @@ namespace Jondo.Unity.Launcher
             AssertFightLockIsPerSession();
             AssertItemUidsAreServerWide();
             AssertJondoCoinPaysByBand();
+            AssertPushDamageMatchesTheCapture();
             AssertShopCurrencyIsOptional();
             AssertPacketShapesAreTelling();
             AssertMonstersBringTheirSpells();
@@ -419,6 +420,50 @@ namespace Jondo.Unity.Launcher
                     "[RegressionGuard FAILED] La resistencia a tierra va en el hueco de los puntos " +
                     "invertidos. El servidor real la manda en el del equipo, y en el otro el " +
                     "cliente lee cero.");
+        }
+
+        /// <summary>
+        /// El daño de empuje, contra las muestras que lo midieron.
+        ///
+        /// Son las anclas de las 401 capturas, y cada una fija un término distinto de la fórmula:
+        ///
+        ///   nivel 200 sin nada          33 por casilla, o sea 132 partido cuatro
+        ///   nivel 165, dos casillas     57, que es floor(2 × 114,5 / 4) y que ninguna constante
+        ///                               fija puede dar: es lo que ancla el término del nivel
+        ///   nivel 200 con 100 de la 84  58, y 68, 78 y 88 según la máscara sume 40, 80 o 120
+        ///   561 de la 84 contra 30      331 por dos casillas, que es lo que demuestra que la
+        ///                               resistencia se resta DENTRO del cuarto: fuera daría 316
+        ///
+        /// Si alguien mueve el 32, o saca la resistencia del paréntesis, o redondea por casilla en
+        /// vez de al final, alguna de estas cuatro se cae y el servidor no arranca.
+        /// </summary>
+        private static void AssertPushDamageMatchesTheCapture()
+        {
+            (int Nivel, int Empuje, int Resistencia, int Casillas, int Esperado, string Donde)[] medido =
+            {
+                (200, 0, 0, 1, 33, "nivel 200 sin bonos, una casilla"),
+                (200, 0, 0, 2, 66, "nivel 200 sin bonos, dos casillas"),
+                (200, 0, 0, 4, 132, "nivel 200 sin bonos, cuatro casillas"),
+                (165, 0, 0, 2, 57, "el Zurkarak Daddy, nivel 165"),
+                (200, 100, 0, 1, 58, "el Zobal, 100 de empuje de equipo"),
+                (200, 140, 0, 1, 68, "el Zobal con la máscara sumando 40"),
+                (200, 180, 0, 1, 78, "el Zobal con la máscara sumando 80"),
+                (200, 220, 0, 1, 88, "el Zobal con la máscara sumando 120"),
+                (200, 561, 30, 2, 331, "el koliseo, Feaxx contra Harmoo"),
+                (200, 561, 174, 3, 389, "el koliseo, Feaxx contra Sacri-Master"),
+                (200, 0, 0, 0, 0, "sin casillas bloqueadas no hay golpe"),
+                (1, 0, 500, 3, 0, "una resistencia enorme no devuelve vida"),
+            };
+
+            foreach (var (nivel, empuje, resistencia, casillas, esperado, donde) in medido)
+            {
+                int dio = Managers.EffectEngine.DanoDeColision(nivel, empuje, resistencia, casillas);
+                if (dio == esperado) continue;
+                throw new InvalidOperationException(
+                    $"[RegressionGuard FAILED] El daño de empuje de «{donde}» tendría que ser " +
+                    $"{esperado} y ha salido {dio}. La fórmula medida es " +
+                    $"casillas × (nivel/2 + la 84 − la 85 + 32) / 4, con la división al final.");
+            }
         }
 
         /// <summary>

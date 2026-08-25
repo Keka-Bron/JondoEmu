@@ -49,6 +49,26 @@ namespace Jondo.Unity.Launcher.Managers
 
         /// <summary>Los puntos de vida que se han devuelto, si el efecto cura.</summary>
         public int Cura { get; init; }
+
+        /// <summary>
+        /// El daño de haberse chocado al empujar, YA CALCULADO PERO SIN APLICAR.
+        ///
+        /// Quitar vida es del que lleva el combate: es quien recorta por la vida que queda,
+        /// erosiona, anuncia la muerte y juzga los retos. Aquí sólo se dice cuánto.
+        /// </summary>
+        public int CollisionDamage { get; init; }
+
+        /// <summary>El que hizo de pared, si lo que frenó el empujón fue otro combatiente.</summary>
+        public Fighter Blocker { get; init; }
+
+        /// <summary>
+        /// Lo que cobra la pared: la MITAD del daño del empujado, redondeando hacia abajo.
+        ///
+        /// Y es la mitad de ese daño, no una cuenta nueva con las características de la pared:
+        /// medido en el koliseo, la pareja 497/248 sale con la resistencia al empuje de la VÍCTIMA
+        /// metida en el 497. Recalculándolo con lo del bloqueador los números no cuadran.
+        /// </summary>
+        public int CollisionDamageToBlocker { get; init; }
     }
 
     /// <summary>
@@ -157,6 +177,46 @@ namespace Jondo.Unity.Launcher.Managers
             return Math.Max(0, (int)Math.Round(dano * queda));
         }
         private const int Empujar = 5;
+
+        /// <summary>La 84, «Empuje»: la suma PLANA del que empuja. El porcentaje es la 158.</summary>
+        private const int DanoDeEmpuje = 84;
+
+        /// <summary>La 85, «Empuje (fijo)»: la resta PLANA del que lo recibe.</summary>
+        private const int ResistenciaAlEmpuje = 85;
+
+        /// <summary>El estado que clava a uno en el sitio. No confundir con la característica 97.</summary>
+        private const int Indesplazable = 97;
+
+        /// <summary>
+        /// El término fijo de la fórmula del daño de colisión.
+        ///
+        /// No sale de ningún dato del cliente —ni el bundle de constantes ni las 38 fórmulas lua
+        /// tienen nada de combate—: sale de medir. Con un lanzador de nivel 200 sin bonos, el
+        /// paréntesis vale 132 y el daño por casilla 33.
+        /// </summary>
+        private const int BaseDelEmpuje = 32;
+
+        /// <summary>
+        /// El daño de estamparse al recibir un empujón.
+        ///
+        ///   daño = casillasSinRecorrer × (nivel/2 + la 84 del que empuja
+        ///                                 − la 85 del que lo recibe + 32) / 4
+        ///
+        /// Está en un método aparte para que la guardia de regresión pueda comprobarla contra las
+        /// muestras que la midieron, que están en AssertPushDamageMatchesTheCapture.
+        ///
+        /// La división por cuatro va AL FINAL, sobre el producto: con la resistencia dentro del
+        /// paréntesis y una sola división, el koliseo da 331 por dos casillas, que es lo medido.
+        /// Restando fuera saldrían 316.
+        /// </summary>
+        public static int DanoDeColision(int nivelDelQueEmpuja, int suEmpuje, int laResistencia,
+                                         int casillasSinRecorrer)
+        {
+            if (casillasSinRecorrer <= 0) return 0;
+
+            int porCasilla = nivelDelQueEmpuja / 2 + suEmpuje - laResistencia + BaseDelEmpuje;
+            return Math.Max(0, casillasSinRecorrer * porCasilla / 4);
+        }
         private const int Tirar = 6;
 
         /// <summary>"Retrocede #1 casillas" y "Avanza #1 casillas": mueven al QUE LANZA.</summary>
@@ -492,6 +552,21 @@ namespace Jondo.Unity.Launcher.Managers
                     if (efecto.EffectId == Avanzar) cuantas = -cuantas;
                 }
 
+                // INDESPLAZABLE: no se mueve, y por tanto TAMPOCO recibe daño de colisión.
+                //
+                // La diferencia importa y es fácil de equivocar: no es que el daño se reduzca a
+                // cero, es que sin desplazamiento no hay choque, aunque tenga el muro pegado a la
+                // espalda. Un empujado al que le falta sitio SÍ cobra; éste no.
+                //
+                // El número del estado está medido: de los 25 hechizos cuya descripción en español
+                // nombra el estado Indesplazable, 21 aplican el 97 y el siguiente candidato sale en
+                // 1. Y los 155 hechizos que lo ponen se leen solos: Remache, Atracción
+                // Estabilizadora, Bombinmóvil, Patinaje.
+                //
+                // Ojo: el ESTADO 97 no tiene nada que ver con la CARACTERÍSTICA 97, que es la vida
+                // que le falta al jugador. Mismo número, dos espacios distintos.
+                if (sobre.Buffs.TieneEstado(Indesplazable)) return null;
+
                 var ocupadas = new HashSet<int>();
                 foreach (var otro in Todos(combate))
                     if (otro != null && otro.IsAlive && otro != sobre) ocupadas.Add(otro.CellId);
@@ -502,17 +577,74 @@ namespace Jondo.Unity.Launcher.Managers
                 // la única frontera que quedaba era el borde de la retícula de 560 celdas, que es
                 // mucho mayor que el suelo de un mapa.
                 var pisables = MapManager.GetFightWalkable(combate.ArenaMapId);
-                int hasta = Jondo.Unity.World.Maps.Zone.Empujar(
+                var empujon = Jondo.Unity.World.Maps.Zone.Push(
                     celdaApuntada, quienLanza.CellId, desde, cuantas,
                     pisables: pisables, ocupadas: ocupadas);
 
-                if (hasta == desde) return null;
-                sobre.CellId = hasta;
+                sobre.CellId = empujon.ToCell;
+
+                // EL DAÑO DE COLISIÓN, que no se hacía en absoluto.
+                //
+                // Sale de las casillas que NO se recorrieron, y la fórmula está medida sobre los
+                // 127 mensajes de daño de empuje de las 401 capturas:
+                //
+                //   daño = casillasSinRecorrer × (nivel/2 + la 84 del que empuja
+                //                                 − la 85 del que la recibe + 32) / 4
+                //
+                // Las tres anclas: un lanzador de nivel 200 sin bonos pega 33 por casilla —132/4—
+                // y sólo salen 33, 66, 99 y 132, ni un valor intermedio; el Zurkarak «Daddy», que
+                // es de NIVEL 165, pega 57 por dos casillas, que es floor(2 × 114,5 / 4) y que
+                // ninguna constante fija puede dar; y un Zobal con 100 de empuje de equipo y
+                // máscaras de 0, 40, 80 y 120 pega 58, 68, 78 y 88 por casilla.
+                //
+                // La resistencia va DENTRO del cuarto: en el koliseo, 561 de empuje contra 30 de
+                // resistencia dan 331 por dos casillas. Restándola fuera saldría 316.
+                //
+                // Y sólo lo hace el empujón: el catálogo tiene un efecto aparte, «Empuja (sin
+                // daños)», que 54 hechizos usan justamente para no hacerlo, lo que es la prueba de
+                // que el 5 normal sí. Del TIRÓN no hay ni un caso bloqueado en las 401 capturas,
+                // así que se queda a cero hasta que se mida.
+                int colision = 0, aLaPared = 0;
+                Fighter pared = null;
+
+                bool empujaConDano = efecto.EffectId == Empujar && cuantas > 0;
+                if (empujaConDano && empujon.BlockedCells > 0)
+                {
+                    int deEmpuje = quienLanza.PushDamage + quienLanza.Buffs.De(DanoDeEmpuje, ronda);
+                    int resiste = sobre.Otra(ResistenciaAlEmpuje) +
+                                  sobre.Buffs.De(ResistenciaAlEmpuje, ronda);
+
+                    colision = DanoDeColision(quienLanza.Level, deEmpuje, resiste,
+                                              empujon.BlockedCells);
+
+                    // Y si lo que lo frenó fue otro combatiente, ése cobra la mitad. Los muros no
+                    // cobran.
+                    if (colision > 0 && empujon.Stop == Jondo.Unity.World.Maps.Zone.PushStop.Fighter)
+                    {
+                        foreach (var otro in Todos(combate))
+                        {
+                            if (otro == null || !otro.IsAlive) continue;
+                            if (otro.CellId != empujon.BlockerCell) continue;
+                            pared = otro;
+                            aLaPared = colision / 2;
+                            break;
+                        }
+                    }
+                }
+
+                // Se sale sin nada SÓLO si además no hay daño: cuando al empujado no le queda ni
+                // una casilla libre no se mueve, pero se lleva el golpe entero. Medido: en ese
+                // caso el servidor real no manda el desplazamiento, sólo el daño.
+                if (empujon.ToCell == desde && colision <= 0) return null;
+
                 return new Outcome
                 {
                     Sobre = sobre, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
-                    CasillaDesde = desde, CasillaHasta = hasta,
+                    CasillaDesde = desde, CasillaHasta = empujon.ToCell,
+                    CollisionDamage = colision,
+                    Blocker = pared,
+                    CollisionDamageToBlocker = aLaPared,
                 };
             }
 

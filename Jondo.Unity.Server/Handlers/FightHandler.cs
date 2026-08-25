@@ -2726,6 +2726,17 @@ namespace Jondo.Unity.Launcher.Handlers
                             c.CasillaDesde, c.CasillaHasta)));
                     Program.LogDebug($"[Combate] El hechizo {hechizo} mueve a {c.Sobre.Id} " +
                                      $"de la casilla {c.CasillaDesde} a la {c.CasillaHasta}.");
+
+                    await DanoDeColisionAsync(stream, fight, quienLanza, c);
+                    continue;
+                }
+
+                // Y el que NO se ha movido ni una casilla pero se ha estampado igual. El motor
+                // devuelve una consecuencia sin desplazamiento, y el servidor real hace lo mismo:
+                // en ese caso no manda el mensaje de movimiento, sólo el del golpe.
+                if (c.CollisionDamage > 0)
+                {
+                    await DanoDeColisionAsync(stream, fight, quienLanza, c);
                     continue;
                 }
 
@@ -3253,6 +3264,79 @@ namespace Jondo.Unity.Launcher.Handlers
                 await CaenSusInvocadosAsync(stream, fight, target);
                 await ReenviarLaListaAsync(stream, fight);
             }
+        }
+
+        /// <summary>
+        /// El daño de haberse estampado al recibir un empujón, y el que se lleva quien hizo de
+        /// pared.
+        ///
+        /// El motor ya ha hecho la cuenta —ver la rama de empuje de EffectEngine— y aquí sólo se
+        /// cobra: se recorta por la vida que queda, se erosiona, se anuncia y se mira si alguien se
+        /// ha muerto. Es la misma puerta por la que pasa un golpe normal, a propósito: matar por
+        /// colisión tiene que anunciarse igual que matar de un flechazo.
+        ///
+        /// Van los DOS en la misma secuencia y en este orden —primero el empujado con el golpe
+        /// entero, detrás la pared con la mitad—, que es como salen las 9 parejas medidas.
+        /// </summary>
+        private static async Task DanoDeColisionAsync(NetworkStream stream, FightInstance fight,
+                                                      Fighter quienEmpuja, Managers.Outcome c)
+        {
+            if (c.CollisionDamage <= 0) return;
+
+            await UnEstampadoAsync(stream, fight, quienEmpuja, c.Sobre, c.CollisionDamage);
+
+            if (c.Blocker != null && c.CollisionDamageToBlocker > 0)
+            {
+                await UnEstampadoAsync(stream, fight, quienEmpuja, c.Blocker,
+                                       c.CollisionDamageToBlocker);
+            }
+        }
+
+        /// <summary>Un solo golpe de colisión, contra uno solo.</summary>
+        private static async Task UnEstampadoAsync(NetworkStream stream, FightInstance fight,
+                                                   Fighter quienEmpuja, Fighter quien, int dano)
+        {
+            if (quien == null || !quien.IsAlive || dano <= 0) return;
+
+            // Lo que se anuncia nunca puede pasar de la vida que le queda, igual que en un golpe
+            // normal: por encima de eso no hay vida que quitar.
+            int aplicado = Math.Min(dano, quien.CurrentHP);
+            quien.TakeDamage(aplicado);
+
+            // La erosión se calcula sobre el daño ENTERO, no sobre el recortado. Medido: en el
+            // koliseo hay un golpe de 663 anunciado como 417 —recortado por la vida— y con la
+            // erosión en 66, que es la décima parte de 663 y no de 417.
+            int porciento = quien.Otra(Fighter.CaracteristicaDeErosion) +
+                            quien.Buffs.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
+            int erosionado = quien.Erosionar(dano, porciento);
+
+            await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, quienEmpuja, -1);
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildPushDamage(quienEmpuja.Id, quien.Id, aplicado, erosionado)));
+
+            if (aplicado > 0 && quienEmpuja.TeamId != quien.TeamId) quien.LeHanPegado = true;
+
+            await RefrescarLaVidaAsync(stream, fight, quien);
+
+            Program.LogDebug($"[Combate] {quien.Id} se estampa al ser empujado: {aplicado} de daño " +
+                             $"(calculado {dano}, erosión {erosionado}); le quedan {quien.CurrentHP}.");
+
+            if (quien.LeHanPegado)
+            {
+                await ActitudesAsync(stream, fight, quien, Managers.EffectEngine.CuandoMePegan);
+            }
+
+            if (quien.IsAlive) return;
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildDeath(quienEmpuja.Id, quien.Id)));
+            Program.LogDebug($"[Combate] {quien.Id} se queda sin vida por el golpe del empujón.");
+
+            await ChallengeWatcher.DiedAsync(stream, fight, quien, false, quienEmpuja);
+            await ChallengeWatcher.AllyDiedAsync(stream, fight, quien);
+            await CaenSusInvocadosAsync(stream, fight, quien);
+            await ReenviarLaListaAsync(stream, fight);
         }
 
         /// <summary>

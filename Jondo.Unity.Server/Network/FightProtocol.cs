@@ -971,6 +971,42 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
+        /// El número de efecto del DAÑO DE COLISIÓN al empujar.
+        ///
+        /// En el catálogo del cliente se llama <c>CharacterLifePointsLostFromPush</c>, tiene la
+        /// descripción vacía en los cinco idiomas y no lo usa ni uno de los 34.685 niveles de
+        /// hechizo: no lo escribe ningún hechizo, lo fabrica el motor. La pantalla de fin de
+        /// combate lo contabiliza aparte, en su propio renglón.
+        /// </summary>
+        public const int PushDamage = 80;
+
+        /// <summary>
+        /// El daño de haberse chocado al empujar (jwe con el f14 en 80).
+        ///
+        ///   f3: quién empujó      f14: 80
+        ///   f40 { f2: a quién, f3: la vida perdida, f4: -1, f5: la erosión }
+        ///
+        /// Va aparte de <see cref="BuildDamage"/> porque aquél tiene el convenio de «si el elemento
+        /// es menor que cero, no escribas el f4», y aquí el f4 tiene que ir Y valer MENOS UNO: es
+        /// así en los 127 mensajes de las 401 capturas, sin una excepción. Menos uno quiere decir
+        /// «sin elemento», que no es lo mismo que el cero del neutral.
+        ///
+        /// Se manda dentro de la misma secuencia del lanzamiento y justo detrás del desplazamiento;
+        /// y cuando al empujado no le queda ni una casilla, el desplazamiento no se manda y éste va
+        /// solo.
+        /// </summary>
+        public static byte[] BuildPushDamage(long author, long victim, int amount, int erosion = 0)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, PushDamage)
+                .Msg(40, Pb.New()
+                    .Var(2, victim)
+                    .Var(3, amount)
+                    .Var(4, -1)
+                    .VarIfNotZero(5, erosion))
+                .Build();
+
+        /// <summary>
         /// RETIRARLE puntos de acción a otro. No confundir con el 102, que es el gasto propio de
         /// lanzar un hechizo: en las 1.796 muestras de las capturas, el 102 y el 129 llevan
         /// SIEMPRE el mismo id como autor y como víctima, y aquí el autor es otro.

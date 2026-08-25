@@ -1,8 +1,6 @@
-High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**NET 10**), architected with decoupled modular projects, a SQLite database layer, and a playable PvM combat engine with a data-driven spell effect system.
+High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**.NET 10**), with decoupled modular projects, a SQLite data layer, and a playable PvM combat engine driven entirely by client data.
 
-> ⚠️ **Compatibility Notice**: This emulator strictly requires **Dofus 3 Client Version 3.6.10.10 (mid August 2026)**. It is **NOT compatible** with newer or latest versions of the official Dofus client due to underlying protocol changes.
->
-> Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility. There is now a toolchain in this repository for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
+> ⚠️ **Requires Dofus 3 client 3.6.10.10 exactly.** Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility with newer clients. There is a toolchain here for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
 
 ---
 
@@ -28,37 +26,30 @@ Two things worth knowing afterwards:
 * The installer drops a **`version.dll`** next to `Dofus.exe`; that is what loads MelonLoader. Renaming it to `version.dll.disabled` turns the whole thing off so you can play the official game, and renaming it back turns it on again — no need to uninstall anything.
 * MelonLoader writes a log per run under **`MelonLoader/Logs/`**. If the client starts but never reaches the emulator, that file is the first place to look.
 
-What JondoFix does:
-* **Network redirection** — intercepts sockets, Named Pipes and DNS queries and sends them to `localhost` (ports `8888`, `5555`, `15881`, `6337`).
-* **SSL bypass** — stops HTTPS requests from failing against the local self-signed certificate.
-* **Environment configuration** — injects the variables the client expects (`ZAAP_PORT`, `ZAAP_HASH`, and so on).
+What JondoFix does: intercepts sockets, Named Pipes and DNS queries and sends them to `localhost` (ports `8888`, `5555`, `15881`, `6337`); stops HTTPS requests from failing against the local self-signed certificate; and injects the environment variables the client expects (`ZAAP_PORT`, `ZAAP_HASH`, and so on).
 
 ### Step 3 — Run it
 
-Double-click **`Jondo Emulator Launcher.exe`**. That is still the only thing you start by hand, but there are now **two executables**: the launcher is the window you use, and it starts **`Jondo Server.exe`** by itself. They were one program until the split; keeping them apart means the launcher you hand to a player carries no database, no maps, no protocol handlers and no effect catalogue — it references the shared contract and nothing else. The server has its own window with the log and the counters.
+Double-click **`Jondo Emulator Launcher.exe`**. That is the only thing you start by hand: it launches **`Jondo Server.exe`** itself, in its own window with the log and the counters.
 
-On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, select one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once. Create your account in the launcher or use the test account as follows:
+On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, select one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once.
 
+```
 Account: keka
 Password: test
+```
 
-By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.10` folder beside
-the emulator folder. If yours lives somewhere else — another drive, another name — click the path
-row under the play button and point it at your `Dofus.exe`. The choice is remembered, and if the
-client later moves the launcher says so instead of failing silently.
+By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.10` folder beside the emulator folder. If yours lives somewhere else, click the path row under the play button and point it at your `Dofus.exe`. The choice is remembered, and if the client later moves the launcher says so instead of failing silently.
 
-The **ES / EN / FR** buttons in the top bar set the language of the launcher *and* of the game: the
-client is started with that `--langCode`. The path row shows which one is in effect.
+The **ES / EN / FR** buttons in the top bar set the language of the launcher *and* of the game: the client is started with that `--langCode`.
 
 ---
 
 ## 📂 What you get
 
-The root deliberately holds almost nothing — the launcher and little else. Everything is inside folders:
-
 ```
 Jondo Emulator Launcher.exe   ← this is what you run
-Jondo Server.exe              the server; the launcher starts it, you never launch it yourself
+Jondo Server.exe              the server; the launcher starts it
 datos/                        json and bin the emulator reads (maps, items, appearances, zaaps…)
 bases/                        world.db and auth.db, the only things the emulator writes
 docs/                         technical documentation
@@ -67,391 +58,230 @@ JondoFix/                     the MelonLoader mod, source and compiled dll
 Jondo.Unity.*/                source code
 ```
 
-Some folders are **not** in the repository because they are not needed to play, and appear on your machine as you use it: `bases/` (the databases, built on first run), `logs/`, `tools/` (the Python that regenerates the files in `datos/`) and `dofus3_data/` (436 MB of raw client dump, only used by those tools).
+Not in the repository because they are not needed to play: `bases/` (built on first run), `logs/`, `tools/` (the Python that regenerates `datos/`) and `dofus3_data/` (436 MB of raw client dump, only used by those tools).
 
 ---
 
-## 🚀 Emulation Status
+## ✅ Emulation status
 
-### 🖥️ Custom Launcher
-- [x] **Native WinForms interface**, drawn from code, with its own theme, artwork and background music.
-- [x] **Account creation and login** from the launcher itself, written straight to `auth.db`.
-- [x] **Persistent team of up to eight accounts** — add profiles once, select any subset or all of them, and launch one independent Dofus process per selected account.
-- [x] **Per-client identity chain** — unique instance id, launch hash, Zaap game session, game token, single-use connection ticket and socket-owned game session.
-- [x] **Independent lifecycle indicators** — selected profiles, active client processes and connected game sockets are tracked separately; closing one client does not alter the others.
-- [x] **Embedded server log** so you can watch traffic and errors without a console window.
-- [x] **Single-file deployment** — the twelve dependency DLLs travel inside the executable; the folder stays clean.
-- [x] **Multilanguage**.
-- [x] **Launcher and server are separate programs** — `Jondo Emulator Launcher.exe` and `Jondo Server.exe`. The launcher starts the server itself, and carries none of it: no database, no maps, no protocol handlers, no effect catalogue. The server keeps its own window with the log and the counters.
+✅ done · 🟡 partial · ❌ missing
 
-### 🌍 World & Connection
-- [x] **Client / Server / Authentication emulation** (Zaap, HAAPI, Connection Server, with the VIP subscription check bypassed).
-- [x] **Server selection and character selection**, showing the mount the character is riding.
-- [x] **Character creation** with a starter kit: Astrub zaap as the spawn point, adventurer set, 1,000,000 kamas, level 1 and 101 scrolled points per characteristic.
-- [x] **World loading**, character spawn and name hover.
-- [x] **Movement, map change, map loading and adjacent maps** across **15,360 maps**, with **17,211** of them carrying walkable-cell data.
-- [x] **Last cell and map persistence** in the database.
-- [x] **Auto-pilot** — double-click on the minimap or the *travel to* option.
+### 🖥️ Launcher
+- ✅ Native WinForms interface drawn from code, with its own theme, artwork and music
+- ✅ Account creation and login, written straight to `auth.db`
+- ✅ Persistent team of up to 8 accounts, one independent Dofus process each
+- ✅ Per-client identity chain — instance id, launch hash, Zaap session, game token, single-use ticket, socket-owned session
+- ✅ Independent lifecycle indicators for profiles, processes and sockets
+- ✅ Embedded server log; single-file deployment; ES/EN/FR
+- ✅ Launcher and server are separate programs — the launcher carries no database, maps, handlers or effect catalogue
 
-### 🌀 Zaaps, Zaapis and Anomalies
-- [x] **62 waypoints** mapped from the client data, with their map, cell and sub-area, plus the three departure-only zaaps the waypoint table does not list (the guild reception room among them).
-- [x] **Travel between zaaps** with the real cost and destination list.
-- [x] **Discovered zaaps** announced on world entry. The client shows *nothing at all* without that list — it is `hjk`, 45 map ids packed into one message, and its absence is why the travel window used to read "No destination".
-- [x] **Zaapis** of Bonta (24 destinations) and Brakmar (21), flat 20 kamas. Their destination tables cannot be derived from client data — four of every six destinations have no zaapi of their own — so they were read off the captures.
-- [x] **The right window.** The `hjj` carries a root field that decides which window the client opens: 0 zaap, 1 zaapi, 3 boat. Measured across all twelve captured lists without exception.
-- [x] **Temporal anomalies**, the tab beside the zaap list: 16 of them, each with the real 120-minute countdown. The 15 "unactivated" waypoints turned out not to be switched-off zaaps but **vestiges**, type 359, where an anomaly surfaces — and from a vestige only anomalies are offered.
-- [x] The alliance-temple waypoint, a special case: the temple map has four interactive elements and only one is the waypoint, so it carries an explicit override (`datos/zaap_overrides.json`) instead of being guessed.
+### 🌍 Connection and world
+- ✅ Zaap, HAAPI and connection server emulation, VIP check bypassed
+- ✅ Server and character selection, showing the mount being ridden
+- ✅ Character creation with a starter kit — Astrub zaap, adventurer set, 1,000,000 kamas, 101 scrolled points per characteristic
+- ✅ World loading, spawn, name hover, last cell and map persisted
+- ✅ **15,360 maps**, **17,211** with walkable-cell data, **17,222** with combat cells
+- ✅ Movement, map change and adjacent maps; auto-pilot from the minimap and *travel to*
+- ✅ Seeing others arrive and leave, in all four directions
+- ✅ Up to 8 clients at once, each on its own socket-owned session
 
-### 🏘️ Houses
-- [x] **1,437 doors on 553 maps**, all enterable, all ownerless.
-- [x] **261 house models** extracted from the client — name, price, room count — from 1M kamas up to the 60M, 15-room *Palacio de los lagos*.
-- [x] **Entering and leaving**, which are different messages: you go in with `jqw` and come out with `jru`, and the map id sits in a different field in each. You come out through the door you went in by.
-- [ ] The house **plaque** — owner, price, for-sale — is not sent yet. Across 34 capture folders there are 1,276 plaques and every one has an owner, so what an ownerless house looks like on the wire is still unmeasured, and `jss` is not the message to guess in.
-- [ ] House chest, access code, buying and selling.
+### 🌀 Travel
+- ✅ **62 waypoints** with map, cell and sub-area, plus 3 departure-only zaaps the waypoint table omits
+- ✅ Travel between zaaps with the real cost and destination list
+- ✅ Discovered zaaps announced on world entry (`hjk`) — without it the travel window reads "No destination"
+- ✅ Zaapis of Bonta (24) and Brakmar (21) at a flat 20 kamas, read off captures because client data cannot derive them
+- ✅ The right window per list: `hjj` root field 0 zaap, 1 zaapi, 3 boat
+- ✅ **16 temporal anomalies** with their 120-minute countdown, surfacing at vestiges (type 359), not at switched-off zaaps
+- ✅ **3,815 interactive teleports** in the database
+- 🟡 Every passage is declared with the zaap skill (114) and type 0; the real server uses 184/339/361 and its own element types
+- 🟡 1,010 of 1,124 missing passages are discarded for lack of a return element
 
-> Which house sits behind which door is **not in the client** — checked three ways. The 1,437 doors share **114 genuine interiors**, and Jondo assigns each door one of them deterministically, keeping it inside its own neighbourhood where it can. Sharing an interior is not a bug: after a server merge there were fewer houses than players, so in the real game one interior serves many owners, each with their own separate instance. The mapping lives in `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
->
-> An earlier version picked interiors with a blocklist over the 2,377 maps at (0,0) and sent players into public workshops — a door in Astrub opened onto a Pandala forge, and the forge acted as the way out. Interiors are now taken from an **inclusion list**: the residence sub-areas, and nothing else.
+### 🏘️ Houses, bins and haven bags
+- ✅ **1,437 doors on 553 maps**, all enterable and ownerless; **261 house models** with name, price and room count
+- ✅ Entering and leaving, which are different messages (`jqw` in, `jru` out), coming out through the door you went in by
+- ❌ The house plaque, chest, access code, buying and selling
+- ✅ **67 public bins on 63 maps** — they open, show empty and close
+- ❌ Putting items into a bin and taking them out
+- ✅ Haven bags: entering and leaving, their own zaap, **48 themes**, **4,083 furniture pieces** placed and persisted, chest with the full item flow, lottery machine, and no monsters inside
 
-### 🗑️ Bins
-- [x] **67 public bins in 63 maps**, recognised by their four graphics. They open, show empty and close.
-- [ ] Putting items in and taking them out: that needs a store per bin, and the haven-bag chest's switch would send them to your own house instead.
+> Which house sits behind which door is **not in the client**. The 1,437 doors share **114 genuine interiors**, assigned deterministically and kept inside their own neighbourhood; the mapping lives in `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
 
-### 🏠 Haven Bags (Merkasako)
-- [x] **Entering and leaving** from the outside, and the haven bag's own zaap.
-- [x] **48 themes**, switchable and persisted.
-- [x] **4,083 pieces of furniture** available in the decoration editor, with placement saved to the database.
-- [x] **Chest** with the full item flow — putting in, taking out, and persistence across sessions.
-- [x] **Lottery machine**, unlimited, handing out items with overpowered rolled stats.
-- [x] **No monsters spawn inside**, unlike the rest of the world.
+### 💬 Social
+- ✅ Information messages as `lqn { type, message, parameters }` against the client's 2,555-entry table, not as chat text
+- ✅ Level-up window with music and animation, on a real gain and on `.level` in either direction
+- ✅ Private messages via `kth`, which the client routes by opcode and not by channel
+- ✅ Last connection time and IP, stored per character
+- ✅ Parties — invite, accept, refuse, leave, hand over the lead, kick, and a full member sheet
+- ✅ Lead passes on when the leader leaves; a disconnect removes the member and tells the rest
+- ✅ Friends list
+- ❌ The invitation popup's *Details* button (`imd` → `ilb`), the dedicated member-gone message (`inc`), party search, party fights and following the leader
 
-### ⛏️ Gathering professions
-- [x] **25,090 resources on 4,507 maps** across the six gathering jobs. The client knows where every element is and which graphic it uses, but **not what it is** — the type and the skill come from the server. Crossing 305 captures with the client dump yields graphic → (type, skill), and from the skill the client catalogue gives the job and the item you get.
-- [x] **The three states** — full, depleted, busy — declared the way the client expects them. The skill moves field: it travels in `f4` when the resource can be used and in `f3` when it cannot. Verified on 25 ash trees of one map without a single exception.
-- [x] **Job levels and experience**, persisted per character, with the real curve (`10 × level × (level − 1)`).
-- [x] **What you gather lands in your inventory**, and the amount grows with your job level over the resource's own level, so levelling up really does pay.
-- [x] **Too low a job level blocks gathering** the way the game does it: the tool icon turns red on hover, exactly like a depleted resource. No chat line — see below.
-- [ ] Crafting professions: workshops, recipes and the craft window.
+### 🎒 Character and inventory
+- ✅ **21,748 item templates** and **66,294 item effects** — spawning, equipping, bags, destruction, persistence
+- ✅ **929 item sets** with their bonuses
+- ✅ **520 mounts** with their look, swapped and unequipped correctly
+- ✅ Characteristic assignment, dynamic capital, points in sync across every client panel
+- ✅ **17,113 spells** across **34,823 spell levels**; **638 character heads**
+- ✅ **539 titles** and **167 ornaments**, applied, persisted and carried in the map actor block
+- ✅ Commands — `.teleport`, `.kamas`, `.shop`, `.size`, `.level`
+- 🟡 `.level` does not refresh the in-fight spell bar
 
-### 💬 Information messages, level-up and private chat
-- [x] **Information messages the right way.** "Last connection…", "You gained 320 kamas", "You do not have the required job level" are **not text from the server**: the server sends a number and the client prints its own translated string. That is `lqn { type, message, parameters }`, resolved against the client's 2,555-entry table. Sending those as chat lines instead publishes them on the **general channel for everyone on the map** to read — which is what used to happen.
-- [x] **The level-up window** — the music, the animation and the summary, on a real level gain and on `.level` in either direction, showing the destination level's numbers.
-- [x] **Private messages** between characters. A whisper is not a chat channel: it has its own message, `kth`, and the client routes it by opcode, not by channel number. Sending it as a channel-9 chat line arrives, is accepted, and paints absolutely nothing.
-- [x] **Last connection time and IP**, stored per character and shown on every world entry.
+### 👕 Appearances
+Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 2,420 cosmetics** in the catalogue were measured off captures, one garment at a time.
 
-### 👥 Parties
-- [x] **Invite, accept, refuse, leave, hand over the lead and kick**, measured against six captures taken from **both sides** — inviting and being invited are not the same messages.
-- [x] **Kicking** is the one that is not in any capture: across all 34 folders nobody ever throws anybody out. The request was read off the running client — `ili { party, who }` — and the answer is built only out of messages that *are* measured: the kicked player gets the same `ils` they would get by leaving, and the rest get the party again. Kicking someone who has not answered the invitation yet withdraws it instead.
-- [x] Two things that mislead: you **invite by name and accept by party id**, and the party is **created when you invite**, before the other player answers, which is why a one-member party arrives at once and dissolves by itself on a refusal.
-- [x] **A full member sheet** — name, level, sex, look, breed, map position, life, prospecting and initiative. The client sorts the panel by initiative. Position is checked against the database: the four maps in the captures give exactly the coordinates and sub-areas the messages carry.
-- [x] **If the leader leaves**, the lead passes to the next member; **if someone disconnects**, they leave the party and the rest are told. Neither is in any capture, and without them a party with real people breaks in a minute.
-- [ ] The **Details** button of the invitation popup does not answer yet (`imd` → `ilb`).
-- [ ] The dedicated *a member is gone* message. The client has a handler for `inc`, so it exists, but no capture contains one and the generated `.proto` gets field numbers wrong often enough not to trust it. Until it is measured, the remaining members are simply sent the party again.
-- [ ] Party search, party fights and following the leader across maps.
+| Type | Working / catalogue | | Type | Working / catalogue |
+|---|---:|---|---|---:|
+| Shields | 524 / 524 | | Petmounts | 151 / 151 |
+| Hats | 464 / 464 | | Mounts | 121 / 121 |
+| Capes | 357 / 357 | | Shoulders | 121 / 121 |
+| Pets | 242 / 242 | | Costumes | 92 / 92 |
+| Weapons | 194 / 194 | | Living objects | 61 / 61 |
+| Wings | 44 / 44 | | Miscellaneous | 0 / 49 |
 
-### 👕 Appearances (Cosmetics)
-Dofus does not ship the item-to-look table in its client data: the server sends it. Every pair below was **measured off real packet captures**, one garment at a time — **2,371 of the 2,420 cosmetics in the catalogue**.
+- ✅ Appearance weapons carry no look by design — the client draws them; the server only remembers which of the 10 weapon slots each occupies
+- ✅ Living objects imitate a different garment per variant, stored as **543 object/variant pairs** across 10 slots
+- ✅ Mount and pet appearances are mutually exclusive, matching the real server
 
-| Type | Working | In catalogue |
-|---|---:|---:|
-| Appearance shields | 524 | 524 |
-| Appearance hats | 464 | 464 |
-| Appearance capes | 357 | 357 |
-| Appearance pets | 242 | 242 |
-| Appearance weapons | 194 | 194 |
-| Appearance petmounts | 151 | 151 |
-| Appearance mounts | 121 | 121 |
-| Shoulders | 121 | 121 |
-| Costumes | 92 | 92 |
-| Living objects | 61 | 61 |
-| Wings | 44 | 44 |
-| Miscellaneous appearance objects | 0 | 49 |
+### ⛏️ Professions
+- ✅ **25,090 resources on 4,507 maps** across the six gathering jobs, with graphic → (type, skill) crossed from 305 captures
+- ✅ The three states — full, depleted, busy — including the skill field moving between `f4` and `f3`
+- ✅ Job levels and experience persisted, with the real curve `10 × level × (level − 1)`
+- ✅ What you gather lands in the inventory, and the amount grows with job level
+- ✅ Too low a job level blocks gathering the way the game does it
+- ❌ Crafting professions: workshops, the craft window, and the **4,858 recipes** already in the database
 
-Details worth knowing:
-- **Hats, capes, shields, shoulders, costumes and wings** each push one skin into the look. Three of them push two: cape 18579, shield 13240 and costume 18525.
-- **Appearance pets** hang off the look as a sub-entity with their own bones, scale and colour. Forty-four of them take the wearer's own tint rather than carrying a palette.
-- **Petmounts and appearance mounts** take over the root of the look, replacing the mount you are riding — bones, scale, colour, and in the case of appearance mounts a skin of their own.
-- **Appearance weapons** carry no look at all, and that is not a gap: the client draws them by itself and they only show while animating. What the server has to remember is which of the **ten weapon slots** each one occupies — one per real weapon type: bow, wand, staff, dagger, scythe, axe, spear, hammer, shovel and sword.
-- **Living objects** imitate a different garment depending on the variant you pick, so they are stored as **543 object/variant pairs** across ten different slots. Those that land on the amulet, ring, belt and boot slots carry no skin, because Dofus never draws those on the character.
-- **Mount and pet appearances are mutually exclusive**, matching the real server: while mounted the pet shows in the appearance window preview but never reaches the map.
-
-### 🎖️ Titles and Ornaments
-- [x] **539 titles** and **167 ornaments** offered, the complete catalogue the client knows about.
-- [x] Applied and persisted per character, and carried inside the map actor block so they show on hover.
-- [x] Verified against real captures: of the 476 titles and 166 ornaments the official server was seen accepting, every single one is in the list.
-
-### 🎒 Inventory and Character
-- [x] **Inventory system** — item spawning, equipping and unequipping, item bags, destruction, and persistent storage over **21,748 item templates** and **66,294 item effects**.
-- [x] **929 item sets** with their bonuses.
-- [x] **Mounts** — **520 of them** with their look, correctly swapped and unequipped.
-- [x] **Character stats** — characteristic assignment is fully functional; all stats map correctly, capital is dynamic, and remaining points stay in sync across every client panel including the left sidebar HUD.
-- [x] **Spells and spell variants** — **17,113 spells** across **34,823 spell levels**.
-- [x] **638 character heads**.
+### 👹 NPCs, monsters and dungeons
+- ✅ **6,468 NPC templates** with 3D looks and dialogue trees
+- ✅ **422 NPCs** standing where Ankama puts them across **202 maps**, cell and orientation taken from captures, dialogue attached where it was captured
+- ✅ **5,134 monsters** with native Protobuf bone models, custom scales and textures, quest monsters and archmonsters included
+- ✅ **38,744 mapped mob groups**, respawned and kept populated, 1 to 8 monsters each
+- ✅ Sub-area aware spawning across **562 sub-areas**, with radius-2 cell validation so nothing spawns on decorations or zaap pillars
+- ✅ **187 dungeons** with their **763 rooms**, entrance and exit
+- 🟡 **401 monsters have no spells at all** in the database
 
 ### 🪙 Jondo Coin
-The server has its own currency. It is not a reskin of kamas: it is a real item with its own
-template, it drops from every monster, and there are vendors who only take it.
+A currency of this server's own — a real item with its own template, not a reskin of kamas.
 
-- [x] **Every monster drops it, at 100%**, one coin per 25 levels of the monster: 1 for levels 1-25,
-      2 for 26-50, and so on up to 9 at level 201 and above.
-- [x] **Its own description in the five client languages**, picked at runtime from the language the
-      client is actually running in, so it reads right in Spanish, English, French, German and
-      Portuguese.
-- [x] **Vendors that charge in coins instead of kamas**, one per category, with the appearance
-      shops among them. Prices come from the item's own type and rarity, not from a flat rate.
+- ✅ Drops from every monster at 100%, one coin per 25 monster levels: 1 for 1-25, 2 for 26-50, up to 9 at 201+
+- ✅ Its own description in the five client languages, picked at runtime from the language the client is running in
+- ✅ Vendors that charge in coins instead of kamas, one per category, appearance shops among them, priced by item type and rarity
 
 See `docs/jondo-coin.md`.
 
-### 👹 NPCs, Monsters and Dungeons
-- [x] **NPCs** — **6,468 templates** with spawns, 3D looks and dialogue trees, and **422 of them
-      standing where Ankama puts them**, across **202 maps**, with their cell and orientation taken
-      from the captures and their dialogue attached wherever it was captured too. The rest of the
-      world still spawns from templates.
-- [x] **Monsters & mobs system**, complete:
-  - **Dynamic map spawning and respawner** — 2 to 4 mob groups per map, kept populated, over **38,744 mapped groups**.
-  - **Sub-area aware spawning** — a map is populated with monsters that actually belong to its sub-area, across **562 sub-areas**.
-  - **Level and grade management** with correct experience calculation.
-  - **3D looks and skeleton system** — native Protobuf bone models, custom scales and textures for **5,134 monsters**, quest monsters and archmonsters included.
-  - **Multi-monster groups** of 1 to 8.
-  - **Radius-2 cell validation** (`GetInnerWalkableCells`) so mobs never spawn on decorations, walls, house windows or zaap pillars.
-- [x] **187 dungeons** with their **763 rooms**, entrance and exit.
+### ⚔️ PvM combat
+- ✅ Tactical arenas resolved from each roleplay map by zone offset, with clean context transitions
+- ✅ Placement phase with red and blue tiles and cell swapping before *Ready*
+- ✅ Isometric geometry (`MapGeometry`) over a pre-computed O(1) BFS distance matrix, with no diagonal steps
+- ✅ Line of sight traced between cell centres against the arena's own blocker set
+- ✅ Turn protocol, 30-second timers with automatic pass, AP/MP replenishment
+- ✅ Movement with per-tile MP cost and collision against occupied cells
+- ✅ Loot, victory and defeat screens, experience over **1,889 levels**, level-ups and group respawn
+- ✅ Monster AI: a target chosen **per spell**, range measured against that target, walking to the spell's own range band, `MaxCastPerTurn` honoured, breadth-first pathing around obstacles, and line of sight
+- 🟡 Weapon strikes apply damage and AP cost; the slash animation does not
+- 🟡 `MaxCastPerTarget`, minimum cast interval and cast-in-line are enforced for the player, not for monsters
+- ✅ **Push and collision damage** — being shoved into a wall, a hole or another fighter costs health, and the fighter acting as the wall takes half
+- ❌ AP/MP dodge rolls, shields, lock and tackle in melee
 
-### ⚔️ PvM Combat
-Playable. The migration from 3.6.4.3 is done and fights are no longer gated.
+> **Push damage, measured over 127 collisions in the captures.** `damage = blockedCells × (level/2 + pusher's 84 − target's 85 + 32) / 4`, floored, travelling as a `jwe` with `f14 = 80` and `f4 = −1` right behind the displacement — and alone, with no displacement, when the target could not move a single tile. Three anchors pin the three terms: a level-200 pusher with no bonus deals **33 per tile** and only ever 33, 66, 99 or 132; the level-**165** Zurkarak deals **57** over two tiles, which is `floor(2 × 114.5 / 4)` and which no fixed constant can produce; and a Zobal carrying 100 of push damage plus masks of 0/40/80/120 deals 58/68/78/88. The resistance is subtracted **inside** the quarter — 561 against 30 gives 331 over two tiles, where subtracting outside would give 316. A fighter blocking the push takes `floor(half)`, measured on 9 pairs out of 9. The **Unmovable** state (97) cancels the whole thing, because without displacement there is no collision. All twelve samples are locked into a startup regression guard.
 
-- [x] **Tactical arenas** — each roleplay map resolves to its combat arena by zone offset.
-- [x] **Context transitions** — clean switching between roleplay and tactical combat, restoring world state when the fight ends.
-- [x] **Placement phase** — red and blue placement tiles with cell swapping before *Ready*.
-- [x] **Isometric grid geometry** (`MapGeometry`) using a pre-computed $O(1)$ BFS distance matrix.
-- [x] **Line of sight** — obstacle validation extracted for **17,222 maps**, tracing segments between cell centres.
-- [x] **Turn protocol and timers** — handshake, 30-second turns with automatic pass, AP/MP replenishment.
-- [x] **Movement** — cell-by-cell path expansion, MP charged per tile, and collision against occupied cells.
-- [x] **Active monster AI** — a target chosen **per spell** rather than one for the whole turn, so a
-      heal goes to the wounded ally and not to the player's face; range measured against that
-      target, which is what makes the **1,555 monster spells with range 0-0** (20.4% of the arsenal,
-      443 of them carrying damage) castable at all; walking to the spell's own range band instead of
-      always gluing to melee, which unlocks the **857 spells with a minimum range above one**;
-      `MaxCastPerTurn` honoured, since **72.3%** of the arsenal allows repeats; breadth-first
-      pathing that goes around obstacles; and line of sight, required by **45%** of monster spells.
-      Simulated over the 5,134 monsters, the ones that cannot touch the player at all drop from
-      **24.9% to 15.1%**, and action points actually spent rise from **58.7% to 87.2%**.
-- [x] **Fight resolution and progression** — victory and defeat screens, experience over **1,889 levels**, official loot drops, level ups and group respawns.
+> **Monster AI, measured over the 5,134 monsters.** Range 0-0 spells were never cast, because range was checked against the nearest enemy and that distance is never zero: **1,555 spells, 20.4% of the arsenal, 443 of them carrying damage**. Gluing to melee also locked out the **857 spells with a minimum range above one**. Fixing both drops the monsters that cannot touch the player from **24.9% to 15.1%**, and raises action points actually spent from **58.7% to 87.2%**.
 
 ### ✨ Spell effect engine
-One engine for all eighteen classes, driven entirely by client data. There is not a single spell
-written by hand: everything comes out of `SpellLevels.EffectsJson` and the `Effects` catalogue.
+One engine for all eighteen classes, driven entirely by client data. Not a single spell is written by hand: everything comes out of `SpellLevels.EffectsJson` and the `Effects` catalogue.
 
-- [x] **Effects, triggers and target masks** read from the spell itself — `I` on cast, `TB` at turn
-      start, `TE` at turn end, `DBE` when hit, `CCMPARR` per tile walked. `a` are allies, `A` are
-      enemies, `g` are summons, and `E<n>` / `e<n>` gate on a state.
-- [x] **States** need no code: effect 950 sets a number, 951 clears it, and the masks do the rest.
-- [x] **Area shapes** from `zoneDescr` — point, circle, cross, line, diamond, square and whole-map,
-      with the per-tile damage falloff each spell declares (10% per tile, capped at four steps, on
-      the spells that carry it).
-- [x] **Displacement** — push, pull, step back and step forward, with the direction taken from the
-      centre of the area, stopping at walls, holes and other fighters.
-- [x] **Criticals** — rolled against the spell's own probability plus the character's, using the
-      spell's separate critical effect list (Frozen Arrow goes from 21-24 to 25-29).
-- [x] **Point steal**, life steal, erosion of maximum HP, and damage-taken multipliers.
-- [x] **Buff panel** — every effect reaches the client's *Effects* window with its icon, value,
-      remaining rounds and dispellable flag; buffs expire on their round and are retracted.
-- [x] **Cooldowns and cast limits** — per turn, per target, minimum interval and initial cooldown.
-- [x] **Summons** — real fighters, not buffs: their own sheet, a place in the turn carousel next to
-      their owner, their own behaviour spell, a lifetime, and they all fall when their summoner
-      dies. Weighted random picks the variant (80% Arakna / 20% Greater Arakna), and the summon cap
-      comes from the character's own characteristic.
-- [x] **Item attitudes** — the six Dofus and the trophies grant their spell through effect 1175 and
-      hook into the same triggers.
-- [x] **The characteristic sheet, in the shape the client expects.** The full sheet is 53 entries in
-      a fixed order, and a single-characteristic refresh **replaces** its entry rather than adding
-      to it — so the refresh has to repeat every field the full sheet sent and put the buff in its
-      own slot, `f8`. Ankama uses that slot in **2,830 of its 3,279** detailed refreshes. Getting
-      this wrong is what made the client's damage preview read a tenth of the real number: the
-      damage multiplier 107 ships at 100 and was being overwritten with 10 fifty-five milliseconds
-      later, and the client estimates by multiplying through it.
+- ✅ Effects, triggers and target masks read from the spell — `I` on cast, `TB` turn start, `TE` turn end, `DBE` when hit, `CCMPARR` per tile walked; `a` allies, `A` enemies, `g` summons, `E<n>`/`e<n>` gated on a state
+- ✅ States need no code — effect 950 sets a number, 951 clears it, the masks do the rest
+- ✅ Area shapes from `zoneDescr` — point, circle, cross, line, diamond, square, whole map — with each spell's own per-tile falloff
+- ✅ Displacement — push, pull, step back, step forward, direction taken from the centre of the area, stopping at walls, holes and fighters
+- ✅ Criticals rolled against the spell's probability plus the character's, using the spell's separate critical effect list
+- ✅ Point steal, life steal, erosion of maximum HP and damage-taken multipliers
+- ✅ Buff panel — icon, value, remaining rounds and dispellable flag; buffs start on their delay and expire on their round
+- ✅ Cooldowns and cast limits — per turn, per target, minimum interval, initial cooldown
+- ✅ Summons as real fighters — own sheet, place in the carousel next to their owner, behaviour spell, lifetime, and they all fall when their summoner dies
+- ✅ Item attitudes — the six Dofus and the trophies grant their spell through effect 1175
+- ✅ The characteristic sheet in the shape the client expects: 53 entries in a fixed order, and a single-characteristic refresh **replaces** its entry rather than adding to it, so it repeats every field and puts the buff in its own slot `f8`
+- ❌ Healing — effect 108 is not wired; its catalogue row has `Characteristic = 0` and `Category = 2`, so it falls into the panel-only branch
+- ❌ Glyphs and traps (effects 400, 401, 1091)
+- ❌ Appearance-changing spells — the transform payload is an opaque blob, so the Cra's Sentinel works but does not change its look
+- ❌ Area shapes `G` (55 effects) and `*` (10), which fall back to the centre tile alone
 
-Everything above was measured against real packet captures and is covered by an offline harness
-that compares the emulator's bytes against the capture's, packet by packet.
-
-### 🏹 Class status
-The engine is shared, so every class gets whatever its spells happen to use. Only the **Cra** has
-been driven against real captures spell by spell; the rest are untested and listed for honesty.
-
-| Class | Spells with every effect applied |
-|---|---:|
-| **Cra** (tested against 37 captures) | **17 / 44** |
-| Enutrof | 26 / 44 |
-| Osamodas | 21 / 44 |
-| Feca, Iop | 20 / 44 |
-| Pandawa, Eliotrope | 19 / 44 |
-| Sacrier | 18 / 44 |
-| Sram, Zobal | 15 / 44 |
-| Ecaflip, Rogue | 11 / 44 |
-| Steamer | 5 / 44 |
-| Sadida, Ouginak | 4 / 44 |
-| Eniripsa | 2 / 44 |
-| Huppermage | 1 / 44 |
-| Xelor | 0 / 44 |
-
-A spell counts only when **all** of its effects resolve. The gaps are concentrated in a handful of
-effect families — glyphs and traps, appearance changes, spell-effect removal — so they close in
-blocks rather than one spell at a time.
+> The engine is shared, so every class gets whatever its spells happen to use. Only the **Cra** has been driven against real captures spell by spell; the rest are untested. A spell only works when **all** of its effects resolve, and the gaps concentrate in a handful of effect families, so they close in blocks rather than one spell at a time.
 
 ### 🎯 Combat challenges
-- [x] **The preparation dance**, measured across 305 captures with both directions on one timeline — you cannot tell who answers whom otherwise. The server offers two candidates with their 15-second timer, the player marks and validates, and whatever is left unvalidated the server fixes itself when you declare ready.
-- [x] **Two traps worth knowing.** The first `kwv` after an offer is *not* a click: the client preselects the first candidate 2–30 ms later, 12 times out of 12. And the two candidates are alternatives, not a compatible pair — the captures offer together two challenges the client's own table marks as incompatible.
-- [x] **Watched live, 15 of the 16.** Every rule comes from the challenge's own translated description, not from the `completionCriterion` mini-language, which has no glossary. End of turn covers position and movement; damage covers *Untouchable*; casting covers *Versatile* and the two focus-fire ones; a death covers kill order, weapon kills and dying next to an obstacle.
-- [x] **The result travels the moment it happens.** A failure is announced the instant the challenge breaks, a success at the end, and a defeat fails them all at once — which is the timing the captures show. Without it the client leaves the challenge spinning forever: it treats one as alive until its `kwl` arrives.
-- [x] **The bonus is applied on a win** to experience, kamas and drop rates. It is not itemised anywhere on the wire: the percentage only exists inside the preparation message, and all 68 end-of-fight packets in the captures have no slot for a breakdown, so the server has to fold it in before sending the number.
-- [x] **Dungeon and anomaly challenges are imposed, not offered**, at 0 %, and they are the ones carrying achievements: once completed they are written to the character and never offered again.
-- [ ] The percentage itself is only known for 16 challenges, from the wire — the client ships no bonus field. The same challenge appears at 90 and at 150, always +60, so there is a per-fight modifier nobody has reconstructed. Only challenges with a measured percentage *and* a working rule are offered.
-- [ ] *Hired Killer* (35), which needs the server to designate the next target and re-designate on each kill.
+- ✅ The preparation dance, measured across 305 captures with both directions on one timeline: two candidates with a 15-second timer, the player marks and validates, and the server fixes whatever is left when you declare ready
+- ✅ **15 of the 16** watched live, with every rule taken from the challenge's own translated description
+- ✅ Results travel the moment they happen — a failure the instant the challenge breaks, a success at the end, a defeat failing them all at once
+- ✅ The bonus is folded into experience, kamas and drop rates on a win; it is not itemised anywhere on the wire
+- ✅ Dungeon and anomaly challenges are imposed at 0% and carry achievements, written once and never offered again
+- ❌ *Hired Killer* (35), which needs the server to designate and re-designate the target
+- ❌ Challenges without a measured percentage — the client ships no bonus field, and the same challenge appears at 90 and at 150 always at +60, so there is a per-fight modifier nobody has reconstructed
 
-### 🚧 Work in progress
-- [ ] **Glyphs and traps** (effects 400, 401, 1091) — the board entity exists for summons; these
-      reuse it but are not wired.
-- [ ] **Appearance-changing spells** — the transform payload is an opaque blob that has not been
-      decoded, so the Cra's Sentinel works but does not change its look.
-- [ ] **Commands** — `.teleport`, `.kamas`, `.shop`, `.size` and `.level` work; `.level` does not
-      refresh the in-fight spell bar.
-- [ ] **Weapon strikes** — damage and AP cost apply; the slash animation does not.
-- [ ] **Healing** — effect 108 is not wired: its catalogue row carries `Characteristic = 0` and
-      `Category = 2`, so it falls into the panel-only branch. Monster healers now aim at the right
-      ally and still heal nothing.
-- [ ] **Two area shapes**, `G` (55 effects) and `*` (10), are not in `Zone.cs` and fall back to the
-      centre tile alone.
-- [ ] **`MaxCastPerTarget`, minimum cast interval and cast-in-line** are read from the database and
-      enforced for the player, not yet for monsters.
-
-### ❌ Not implemented
-- [ ] **Push and collision damage.** Being shoved into a wall, a hole or another fighter costs no
-      health here. The pieces are measured — characteristic 84 is the flat push bonus and 85 the
-      flat resistance, the engine-generated effect is 80 (`CharacterLifePointsLostFromPush`), and
-      state 97 is *Unmovable*, which cancels the whole thing because nothing moves — but the base
-      figure per untravelled tile is not in any client data file, so it has to come off the wire
-      first. `Zone.Empujar` currently throws away how many tiles were left untravelled, which is
-      exactly the number the damage is made of.
-- [ ] Kolossium and PvP combat
-- [ ] AP/MP dodge rolls, shields, lock and tackle in melee
-- [ ] Crafting professions (gathering ones do work — see above)
-- [ ] Achievements
-- [ ] Guilds
+### ❌ Not implemented at all
+- Kolossium and PvP combat
+- Crafting professions
+- Achievements
+- Guilds
 
 ---
 
 ## 🔎 Surviving the next patch
 
-Every protobuf message in Dofus 3 is named with three random letters — `kub`, `jru`, `lqu` — and on
-some patches Ankama reshuffles the lot. Nothing else about the protocol changes shape, but the
-emulator no longer knows what anything is called. This is the single reason an emulator dies on
-patch day, and there is now a toolchain for it.
+Every protobuf message in Dofus 3 is named with three random letters — `kub`, `jru`, `lqu` — and on some patches Ankama reshuffles the lot. Nothing else about the protocol changes shape, but the emulator no longer knows what anything is called. **`protocolbuilder`** is the command line for that; **`Jondo Desofuscador.exe`** is the same engine behind one window and one button.
 
-**`protocolbuilder`** is the command line; **`Jondo Desofuscador.exe`** is the same engine behind one
-window and one button. You give it the client you already knew and the one that just shipped, and it
-answers with the mapping.
+Eight consecutive real clients (3.6.4.3 → 3.6.10.10) were pulled from Ankama's own CDN and compared patch by patch:
 
-### What was measured
+- **Ankama does not reshuffle on every patch.** Three of the seven jumps keep all 2,169 names, one for one — five obfuscation generations across eight versions. The tool checks for the identity mapping first, in a second.
+- **Zero wrong pairings over 6,505 real pairs.** The matcher never looks at names, only at field numbers, kinds and neighbourhood. It gets 71.1% and misses none; what it cannot decide, it leaves alone.
+- **On a patch that does reshuffle, structure alone gets about 11%** — the ceiling, not a tuning problem: distinctive fingerprints collapse from ~750 to ~70, because a many-field message is both the distinctive one and the one most likely to be touched.
+- **Chaining through intermediate versions is worse**: 12 pairs against 245 for the direct jump. A plausible idea the measurement refuted.
+- Building the `Op` layer also turned up **49 opcodes that only exist in 3.6.4.3** — dead code nobody knew about.
 
-Eight consecutive real clients (3.6.4.3 → 3.6.10.10) were downloaded from Ankama's own CDN and
-compared patch by patch. Some of it was surprising:
-
-* **Ankama does not reshuffle on every patch.** Three of the seven jumps keep all 2,169 names, one
-  for one. There are five obfuscation generations across the eight versions. When nothing moved, the
-  mapping is the identity and there is no work to do — the tool checks this first, in a second.
-* **Zero wrong pairings over 6,505 real pairs.** The matcher never looks at names, only at field
-  numbers, field kinds and neighbourhood, so a message that keeps its name is an answer it could not
-  have copied. It gets 71.1% of them and misses none. What it cannot decide, it leaves alone.
-* **On a patch that does reshuffle, structure alone gets about 11%** — and that is the ceiling, not
-  a tuning problem. The distinctive fingerprints collapse from ~750 to ~70, because a message is
-  distinctive when it has many fields and a many-field message is the one most likely to be touched.
-* **Chaining through intermediate versions is worse, not better**: 12 pairs against 245 for the
-  direct jump. It was a plausible idea and the measurement refuted it.
-
-The rest is what the anchors, the code index and a language model are for: the tool hands over the
-ambiguous ones with their candidate list and everything already known about each, and never invents
-an answer. Full write-up in **`docs/desofuscacion.md`**.
-
-### The `Op` layer
-
-A mapping is worthless if applying it means editing the emulator by hand. It used to mean exactly
-that: **495 three-letter literals across 35 files**. They are now behind one generated file,
-`Jondo.Unity.Protocol/Op.cs`, with a name per opcode and its meaning as documentation:
-
-```csharp
-ConnectionProtocol.Push(Op.HelloGameMessage, …)
-case Op.BasicTimeMessage: …
-```
-
-Regenerating it after a patch is one command and the emulator is not touched. Building it also
-turned up **49 opcodes that only exist in 3.6.4.3** — code that has not been able to match anything
-for a long time and nobody knew.
+The **`Op` layer** replaced **495 three-letter literals across 35 files** with one generated file, `Jondo.Unity.Protocol/Op.cs`, so applying a mapping never means editing the emulator by hand.
 
 ```bash
-protocolbuilder mapear <old client> <new client>    # who is who between two versions
+protocolbuilder mapear <old client> <new client>       # who is who between two versions
 protocolbuilder capa   <client> <anchors> . --aplicar  # regenerate Op.cs and migrate call sites
-protocolbuilder bajar  3.6.4.3 3.6.10.10 clientes   # fetch old clients from the CDN, 183 MB each
-protocolbuilder cadena clientes                     # measure each patch on its own
+protocolbuilder bajar  3.6.4.3 3.6.10.10 clientes      # fetch old clients from the CDN, 183 MB each
+protocolbuilder cadena clientes                        # measure each patch on its own
 ```
+
+Full write-up in `docs/desofuscacion.md`.
 
 ---
 
 ## 🧱 Source layout
 
-* **`Jondo.Unity.sln`** — solution grouping every subproject.
+The two executables:
+* **`Jondo.Unity.Server`** → `Jondo Server.exe` — proxies, network parser, handlers, managers, database and the server's log window. The spell effect engine lives in `Managers/`: `SpellEffects` reads the spell data, `EffectEngine` turns it into things that happen to somebody, and `Summons` builds summoned fighters from monster templates.
+* **`Jondo.Unity.Launcher`** → `Jondo Emulator Launcher.exe` — the player's window. References the contract and nothing else.
 
-  The two executables:
-  * **`Jondo.Unity.Server`** → `Jondo Server.exe`. Proxies, network parser, handlers, managers,
-    database management and the server's own log window.
-  * **`Jondo.Unity.Launcher`** → `Jondo Emulator Launcher.exe`. The window players use. References
-    the contract and nothing else — no database, no maps, no protocol.
+Shared:
+* **`Jondo.Unity.Contract`** — paths, settings and the launcher's drawn-from-code widgets
+* **`Jondo.Unity.Core`** — networking infrastructure and TCP servers
+* **`Jondo.Unity.Auth`** — authentication and HAAPI handlers
+* **`Jondo.Unity.Protocol`** — message definitions and the generated `Op` layer
+* **`Jondo.Unity.World`** — world logic, `FightInstance`, buffs and states (`Buff`), area shapes and displacement (`Zone`), isometric geometry (`MapGeometry`)
+* **`Jondo.Unity.Parser`** — capture parsing
 
-  What they share and what they build on:
-  * **`Jondo.Unity.Contract`** — what both executables agree on: paths, settings and the launcher's
-    drawn-from-code UI widgets.
-  * **`Jondo.Unity.Core`** — core networking infrastructure and TCP servers.
-  * **`Jondo.Unity.Auth`** — authentication and HAAPI service handlers.
-  * **`Jondo.Unity.Protocol`** — protocol buffers, message definitions, and the generated `Op`
-    opcode layer.
-  * **`Jondo.Unity.World`** — game node / world logic, combat engine (`FightInstance`), buffs and
-    states (`Embrujo`), area shapes and displacement (`Zona`), isometric geometry (`MapGeometry`)
-    and monster AI.
-  * **`Jondo.Unity.Parser`** — capture parsing.
+The protocol toolchain, which the emulator does not depend on:
+* **`Jondo.Unity.Reversing`** — reads a client with Cpp2IL, rebuilds the `.proto`, matches two versions, indexes the code, downloads old clients from the CDN (`Cytrus`) and generates the `Op` layer (`Layer`)
+* **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder` · **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`
+* **`JondoFix`** — the MelonLoader client mod, source plus the compiled dll
 
-  The protocol toolchain, which the emulator does not depend on:
-  * **`Jondo.Unity.Reversing`** — the whole of it with no face on it: reads a client with Cpp2IL,
-    rebuilds the `.proto`, matches two versions, indexes the code, downloads old clients from the
-    CDN (`Cytrus`) and generates the `Op` layer (`Layer`).
-  * **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder`, the command line.
-  * **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`, the same engine behind one window.
-* **`JondoFix`** — the MelonLoader client mod, source plus the compiled `JondoFix.dll`.
-
-Documentation, all of it measured rather than assumed — see `docs/README.md` for the full index:
-
-* **`docs/protocol.md`** — how a message travels: framing, the `Any` envelope and the opcode.
-* **`docs/opcodes.md`** — what each three-letter opcode means, and where that was seen.
-* **`docs/desofuscacion.md`** — surviving a patch: what rotates, what does not, and every number
-  above with the method that produced it.
-* **`docs/fight.md`** — how a fight is put together on the wire, opcode by opcode.
-* **`docs/launcher.md`** — native team UI and the identity flow for up to eight client processes.
-* **`docs/sessions.md`** — socket-owned game sessions, per-player state and map broadcasts.
-* **`docs/appearances.md`**, **`docs/world.md`**, **`docs/data.md`** — cosmetics, world data and
-  where every file in `datos/` comes from.
-* **`docs/multijugador.md`** — historical migration plan and remaining multiplayer work.
-
-The spell effect engine lives in `Jondo.Unity.Launcher/Managers`: `EfectosDeHechizo` reads the
-spell data, `MotorDeEfectos` turns it into things that happen to somebody, and `Invocaciones`
-builds summoned fighters from the monster templates.
+Documentation, all of it measured rather than assumed — index in `docs/README.md`. Start with `docs/protocol.md` (how a message travels), `docs/opcodes.md` (what each opcode means and where it was seen), `docs/fight.md` (a fight on the wire, opcode by opcode) and `docs/desofuscacion.md` (surviving a patch).
 
 ---
 
 ## 💾 Database and persistence
 
-Two **SQLite** databases, both in `bases/`:
+Two **SQLite** databases in `bases/`:
 
-* **`world.db`** — characters, inventories, positions, map persistence, spells, monsters, appearances, wardrobe and haven bags. Distributed compressed as `datos/world.zip`; the emulator extracts it by itself the first time it starts.
-* **`auth.db`** — accounts and authentication sessions. Created on first run.
+* **`world.db`** — 41 tables, characters, inventories, positions, map persistence, spells, monsters, appearances, wardrobe and haven bags. Distributed compressed as `datos/world.zip` and extracted on first run.
+* **`auth.db`** — accounts and authentication sessions, created on first run.
 
 Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved installation still starts.
+
+**Regression guards run at startup and throw**, so the server refuses to boot on a known-bad change: `RegressionGuardTests` sweeps 128 source files, and `ConnectionProtocolSelfTest` compares the emulator's connection bytes against the capture's, packet by packet.
 
 ---
 <img width="2559" height="1499" alt="image" src="https://github.com/user-attachments/assets/3b4f1f39-45d3-4efe-b73b-65d1d5e8a595" />
