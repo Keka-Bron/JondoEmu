@@ -188,8 +188,25 @@ Details worth knowing:
 - [x] **Spells and spell variants** — **17,113 spells** across **34,823 spell levels**.
 - [x] **638 character heads**.
 
+### 🪙 Jondo Coin
+The server has its own currency. It is not a reskin of kamas: it is a real item with its own
+template, it drops from every monster, and there are vendors who only take it.
+
+- [x] **Every monster drops it, at 100%**, one coin per 25 levels of the monster: 1 for levels 1-25,
+      2 for 26-50, and so on up to 9 at level 201 and above.
+- [x] **Its own description in the five client languages**, picked at runtime from the language the
+      client is actually running in, so it reads right in Spanish, English, French, German and
+      Portuguese.
+- [x] **Vendors that charge in coins instead of kamas**, one per category, with the appearance
+      shops among them. Prices come from the item's own type and rarity, not from a flat rate.
+
+See `docs/jondo-coin.md`.
+
 ### 👹 NPCs, Monsters and Dungeons
-- [x] **NPCs** — **6,468 templates** with spawns, 3D looks and dialogue trees.
+- [x] **NPCs** — **6,468 templates** with spawns, 3D looks and dialogue trees, and **422 of them
+      standing where Ankama puts them**, across **202 maps**, with their cell and orientation taken
+      from the captures and their dialogue attached wherever it was captured too. The rest of the
+      world still spawns from templates.
 - [x] **Monsters & mobs system**, complete:
   - **Dynamic map spawning and respawner** — 2 to 4 mob groups per map, kept populated, over **38,744 mapped groups**.
   - **Sub-area aware spawning** — a map is populated with monsters that actually belong to its sub-area, across **562 sub-areas**.
@@ -209,7 +226,15 @@ Playable. The migration from 3.6.4.3 is done and fights are no longer gated.
 - [x] **Line of sight** — obstacle validation extracted for **17,222 maps**, tracing segments between cell centres.
 - [x] **Turn protocol and timers** — handshake, 30-second turns with automatic pass, AP/MP replenishment.
 - [x] **Movement** — cell-by-cell path expansion, MP charged per tile, and collision against occupied cells.
-- [x] **Active monster AI** — target selection by lowest HP, HP percentage, isolation and distance; ranged attacks; minimal-MP BFS pathing; and fleeing below 30% HP.
+- [x] **Active monster AI** — a target chosen **per spell** rather than one for the whole turn, so a
+      heal goes to the wounded ally and not to the player's face; range measured against that
+      target, which is what makes the **1,555 monster spells with range 0-0** (20.4% of the arsenal,
+      443 of them carrying damage) castable at all; walking to the spell's own range band instead of
+      always gluing to melee, which unlocks the **857 spells with a minimum range above one**;
+      `MaxCastPerTurn` honoured, since **72.3%** of the arsenal allows repeats; breadth-first
+      pathing that goes around obstacles; and line of sight, required by **45%** of monster spells.
+      Simulated over the 5,134 monsters, the ones that cannot touch the player at all drop from
+      **24.9% to 15.1%**, and action points actually spent rise from **58.7% to 87.2%**.
 - [x] **Fight resolution and progression** — victory and defeat screens, experience over **1,889 levels**, official loot drops, level ups and group respawns.
 
 ### ✨ Spell effect engine
@@ -237,6 +262,13 @@ written by hand: everything comes out of `SpellLevels.EffectsJson` and the `Effe
       comes from the character's own characteristic.
 - [x] **Item attitudes** — the six Dofus and the trophies grant their spell through effect 1175 and
       hook into the same triggers.
+- [x] **The characteristic sheet, in the shape the client expects.** The full sheet is 53 entries in
+      a fixed order, and a single-characteristic refresh **replaces** its entry rather than adding
+      to it — so the refresh has to repeat every field the full sheet sent and put the buff in its
+      own slot, `f8`. Ankama uses that slot in **2,830 of its 3,279** detailed refreshes. Getting
+      this wrong is what made the client's damage preview read a tenth of the real number: the
+      damage multiplier 107 ships at 100 and was being overwritten with 10 fifty-five milliseconds
+      later, and the client estimates by multiplying through it.
 
 Everything above was measured against real packet captures and is covered by an offline harness
 that compares the emulator's bytes against the capture's, packet by packet.
@@ -276,9 +308,6 @@ blocks rather than one spell at a time.
 - [ ] *Hired Killer* (35), which needs the server to designate the next target and re-designate on each kill.
 
 ### 🚧 Work in progress
-- [ ] **Combat stat panel** — buffs feed the damage formula correctly, but the character sheet and
-      the damage preview still show the pre-buff numbers: the per-characteristic sheet packet is
-      measured and not yet emitted.
 - [ ] **Glyphs and traps** (effects 400, 401, 1091) — the board entity exists for summons; these
       reuse it but are not wired.
 - [ ] **Appearance-changing spells** — the transform payload is an opaque blob that has not been
@@ -286,8 +315,22 @@ blocks rather than one spell at a time.
 - [ ] **Commands** — `.teleport`, `.kamas`, `.shop`, `.size` and `.level` work; `.level` does not
       refresh the in-fight spell bar.
 - [ ] **Weapon strikes** — damage and AP cost apply; the slash animation does not.
+- [ ] **Healing** — effect 108 is not wired: its catalogue row carries `Characteristic = 0` and
+      `Category = 2`, so it falls into the panel-only branch. Monster healers now aim at the right
+      ally and still heal nothing.
+- [ ] **Two area shapes**, `G` (55 effects) and `*` (10), are not in `Zone.cs` and fall back to the
+      centre tile alone.
+- [ ] **`MaxCastPerTarget`, minimum cast interval and cast-in-line** are read from the database and
+      enforced for the player, not yet for monsters.
 
 ### ❌ Not implemented
+- [ ] **Push and collision damage.** Being shoved into a wall, a hole or another fighter costs no
+      health here. The pieces are measured — characteristic 84 is the flat push bonus and 85 the
+      flat resistance, the engine-generated effect is 80 (`CharacterLifePointsLostFromPush`), and
+      state 97 is *Unmovable*, which cancels the whole thing because nothing moves — but the base
+      figure per untravelled tile is not in any client data file, so it has to come off the wire
+      first. `Zone.Empujar` currently throws away how many tiles were left untravelled, which is
+      exactly the number the damage is made of.
 - [ ] Kolossium and PvP combat
 - [ ] AP/MP dodge rolls, shields, lock and tackle in melee
 - [ ] Crafting professions (gathering ones do work — see above)
