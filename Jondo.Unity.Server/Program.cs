@@ -76,6 +76,7 @@ namespace Jondo.Unity.Launcher
             Managers.Wardrobe.Initialize();
             Managers.Titles.Initialize();
             Managers.Cosmetics.Initialize();
+            Managers.EquipmentSkins.Initialize();
             Managers.Merkasako.Initialize();
             Managers.Zaapis.Initialize();
             Managers.Bins.Initialize();
