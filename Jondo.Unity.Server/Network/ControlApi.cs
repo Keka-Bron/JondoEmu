@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -96,6 +97,10 @@ namespace Jondo.Unity.Launcher.Network
                     case Prefijo + "registro": return ConRol(cuerpo, Roles.Administrador, _ => Registro(cuerpo));
                     case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, _ => Apagar());
                     case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador, _ => CambiarRol(cuerpo));
+                    case Prefijo + "personaje":
+                        return !metodo.Equals("POST", StringComparison.OrdinalIgnoreCase)
+                            ? Mal(405, "metodo")
+                            : ConRol(cuerpo, Roles.Administrador, _ => AdministrarPersonaje(cuerpo));
 
                     default: return Mal(404, "ruta");
                 }
@@ -147,6 +152,84 @@ namespace Jondo.Unity.Launcher.Network
             bool bien = DatabaseManager.SetAccountRole(quien, rol, out int cuantas);
             if (bien) Console.WriteLine($"[Control] {quien} pasa a {Roles.Nombre(rol)}.");
             return Bien(new { bien, cuantas });
+        }
+
+        /// <summary>
+        /// Cambia las caracteristicas base y los kamas de un personaje conectado, los guarda y
+        /// refresca la ficha sin obligarle a salir ni a reiniciar el servidor.
+        ///
+        /// La ruta pasa por <see cref="ConRol"/> y solo admite administradores. El turno de la
+        /// sesion evita que una orden HTTP pise un movimiento, un combate o cualquier otro paquete
+        /// que el cliente este atendiendo a la vez.
+        /// </summary>
+        private static Respuesta AdministrarPersonaje(string cuerpo)
+        {
+            string nombre = Texto(cuerpo, "personaje");
+            var sesion = SessionRegistry.FindByName(nombre);
+            if (sesion == null || !sesion.HasCharacter || !sesion.IsInWorld)
+                return Mal(404, "personaje-desconectado");
+
+            sesion.UnoCadaVez.Wait();
+            try
+            {
+                using (SessionContext.Push(sesion))
+                {
+                    var estado = sesion.State;
+                    if (estado.IsInFight) return Mal(409, "personaje-en-combate");
+
+                    bool cambio = false;
+                    cambio |= AsignarEntero(cuerpo, "vitalidad", value => estado.StatVitality = value);
+                    cambio |= AsignarEntero(cuerpo, "sabiduria", value => estado.StatWisdom = value);
+                    cambio |= AsignarEntero(cuerpo, "fuerza", value => estado.StatStrength = value);
+                    cambio |= AsignarEntero(cuerpo, "inteligencia", value => estado.StatIntelligence = value);
+                    cambio |= AsignarEntero(cuerpo, "suerte", value => estado.StatChance = value);
+                    cambio |= AsignarEntero(cuerpo, "agilidad", value => estado.StatAgility = value);
+                    if (TryNumero(cuerpo, "kamas", out long kamas))
+                    {
+                        estado.Kamas = Math.Max(0, kamas);
+                        cambio = true;
+                    }
+
+                    if (!cambio) return Mal(400, "sin-cambios");
+
+                    DatabaseManager.SaveCurrentCharacter();
+                    sesion.SendAsync(ConnectionProtocol.Push(Op.Kub,
+                        ConnectionProtocol.BuildCharacteristics())).GetAwaiter().GetResult();
+                    sesion.SendAsync(ConnectionProtocol.Push(Op.Ivf,
+                        ConnectionProtocol.BuildKamas(estado.Kamas))).GetAwaiter().GetResult();
+                    sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
+                        ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
+                        .GetAwaiter().GetResult();
+
+                    Console.WriteLine($"[Control] Personaje {estado.CharacterName}: caracteristicas " +
+                                      $"{estado.StatVitality}/{estado.StatWisdom}/{estado.StatStrength}/" +
+                                      $"{estado.StatIntelligence}/{estado.StatChance}/{estado.StatAgility}, " +
+                                      $"kamas {estado.Kamas}.");
+                    return Bien(new
+                    {
+                        bien = true,
+                        personaje = estado.CharacterName,
+                        vitalidad = estado.StatVitality,
+                        sabiduria = estado.StatWisdom,
+                        fuerza = estado.StatStrength,
+                        inteligencia = estado.StatIntelligence,
+                        suerte = estado.StatChance,
+                        agilidad = estado.StatAgility,
+                        kamas = estado.Kamas,
+                    });
+                }
+            }
+            finally
+            {
+                sesion.UnoCadaVez.Release();
+            }
+        }
+
+        private static bool AsignarEntero(string cuerpo, string campo, Action<int> asignar)
+        {
+            if (!TryNumero(cuerpo, campo, out long valor)) return false;
+            asignar((int)Math.Clamp(valor, 0, int.MaxValue));
+            return true;
         }
 
         // ─── Cada verbo ─────────────────────────────────────────────────────────────────────
@@ -356,6 +439,19 @@ namespace Jondo.Unity.Launcher.Network
                     : 0;
             }
             catch { return 0; }
+        }
+
+        private static bool TryNumero(string json, string campo, out long valor)
+        {
+            valor = 0;
+            try
+            {
+                using var doc = JsonDocument.Parse(json.Length == 0 ? "{}" : json);
+                return doc.RootElement.TryGetProperty(campo, out var v)
+                       && v.ValueKind == JsonValueKind.Number
+                       && v.TryGetInt64(out valor);
+            }
+            catch { return false; }
         }
     }
 }

@@ -90,6 +90,12 @@ The exact syntax and behavior of `.item` and `.itemset`, including role checks, 
 data sources, maximum factory effects, persistence, inventory updates and partial-set failures.
 *Go there* when giving an item by template id, creating a complete set or diagnosing a rejected id.
 
+**`live-character-admin.md`** — Live character administration over the local control API.
+The authenticated `POST /api/personaje` route, its administrator-role check, accepted base-stat and
+kamas fields, session serialization, persistence, immediate client refresh and error responses.
+*Go there* when building an administration tool that must update an online character without a
+restart or reconnect.
+
 **`unknown-packets.md`** — What the client sends that no handler claims.
 Why it is grouped by message shape rather than by opcode, the measured field-number ceiling that
 keeps a byte blob from posing as a structure, and the `.packets` command.
