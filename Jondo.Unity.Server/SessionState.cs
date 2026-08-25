@@ -12,6 +12,7 @@ namespace Jondo.Unity.Launcher
         public int CharacterLevel { get; set; } = 1;
         public int Breed { get; set; }
         public int Sex { get; set; }
+        public string Language { get; set; } = "es";
         public byte[]? PlayerActorDetails { get; set; }
         public byte[]? LookBytes { get; set; }
 

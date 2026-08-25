@@ -24,6 +24,8 @@ namespace Jondo.Unity.Launcher
             Network.ConnectionProtocolSelfTest.Run();
             Network.ClientLaunchRegistry.AssertTwoClientsAreIsolated();
             Network.ClientLaunchRegistry.AssertEightClientLimit();
+            Network.SessionRegistry.AssertLanguageFollowsTicket();
+            Handlers.CommandTexts.AssertCatalogs();
             AssertPerSessionPlayerCaches();
             AssertSocketWritesAreSerialized();
             AssertProfessionCatalog();

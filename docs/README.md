@@ -90,6 +90,11 @@ The exact syntax and behavior of `.item` and `.itemset`, including role checks, 
 data sources, maximum factory effects, persistence, inventory updates and partial-set failures.
 *Go there* when giving an item by template id, creating a complete set or diagnosing a rejected id.
 
+**`command-localization.md`** — Spanish, English and French command replies.
+How the launch language crosses the single-use session ticket, why it belongs to `SessionState`,
+which replies are translated and how catalogue completeness is guarded at startup.
+*Go there* when adding a command response or another server-side player message.
+
 **`unknown-packets.md`** — What the client sends that no handler claims.
 Why it is grouped by message shape rather than by opcode, the measured field-number ceiling that
 keeps a byte blob from posing as a structure, and the `.packets` command.

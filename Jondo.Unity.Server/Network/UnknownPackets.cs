@@ -371,6 +371,15 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>Un resumen de una línea, para el arranque y para el registro.</summary>
         public static string Resumen()
         {
+            var counts = Counts();
+            return $"{ShapeCount} forma(s) de {OpcodeCount} opcode(s): " +
+                   $"{counts.Unhandled} sin atender, {counts.Silenced} silenciada(s), " +
+                   $"{counts.Undecodable} ilegible(s)";
+        }
+
+        /// <summary>Counts by reason, kept separate from the Spanish diagnostic summary.</summary>
+        public static (int Unhandled, int Silenced, int Undecodable) Counts()
+        {
             int sinAtender = 0, silenciados = 0, ilegibles = 0;
             foreach (var r in _rows.Values)
             {
@@ -378,8 +387,7 @@ namespace Jondo.Unity.Launcher.Network
                 else if (r.Kind == Kind.Silenced) silenciados++;
                 else ilegibles++;
             }
-            return $"{ShapeCount} forma(s) de {OpcodeCount} opcode(s): " +
-                   $"{sinAtender} sin atender, {silenciados} silenciada(s), {ilegibles} ilegible(s)";
+            return (sinAtender, silenciados, ilegibles);
         }
 
         /// <summary>

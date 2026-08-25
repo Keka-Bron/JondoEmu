@@ -84,7 +84,7 @@ namespace Jondo.Unity.Launcher.Network
                     AccountId = accountId,
                     Hash = hash,
                     LauncherToken = launcherToken ?? "",
-                    Language = string.IsNullOrWhiteSpace(language) ? "fr" : language,
+                    Language = string.IsNullOrWhiteSpace(language) ? "es" : language,
                     Ip = deDonde,
                     CreatedAtUtc = DateTime.UtcNow
                 };

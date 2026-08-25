@@ -251,7 +251,7 @@ namespace Jondo.Unity.Launcher.Network
                             // The ticket is single-use and binds the next connection to this
                             // account and this server. Without it, the game session would have
                             // no idea who it is serving.
-                            var ticket = SessionRegistry.Issue(accountId, selectedServerId);
+                            var ticket = SessionRegistry.Issue(accountId, selectedServerId, lang);
 
                             byte[] response = ConnectionProtocol.BuildServerSelected(
                                 lang, ticket.Value, "127.0.0.1", Program.gamePort, Program.gamePort);

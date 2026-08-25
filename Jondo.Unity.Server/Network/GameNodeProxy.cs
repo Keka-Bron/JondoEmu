@@ -1041,8 +1041,8 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// Redeems the ticket the client presents in kqz and binds the session to an account and
-        /// a server. The ticket travels in field 2 of the message.
+        /// Redeems the ticket the client presents in kqz and binds the session to an account,
+        /// server and language. The ticket travels in field 2 of the message.
         /// </summary>
         private static bool HandleTicketPresentation(byte[] payload, ref long accountId, ref int serverId)
         {
@@ -1061,7 +1061,7 @@ namespace Jondo.Unity.Launcher.Network
 
                 accountId = session.AccountId;
                 serverId = session.ServerId;
-                SessionContext.Current.BindAccount(accountId, serverId);
+                SessionContext.Current.BindAccount(accountId, serverId, session.Language);
                 return true;
             }
             catch (Exception ex)

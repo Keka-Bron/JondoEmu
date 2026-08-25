@@ -63,11 +63,12 @@ namespace Jondo.Unity.Launcher.Network
                 ? Task.CompletedTask
                 : Jondo.Protocol.NetworkMessage.WriteFrameAsync(Stream, packet);
 
-        public void BindAccount(long accountId, int serverId)
+        public void BindAccount(long accountId, int serverId, string language = "es")
         {
             if (accountId <= 0) throw new ArgumentOutOfRangeException(nameof(accountId));
             AccountId = accountId;
             ServerId = serverId;
+            State.Language = string.IsNullOrWhiteSpace(language) ? "es" : language;
         }
 
         public void EnterWorld()
