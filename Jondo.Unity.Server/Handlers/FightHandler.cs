@@ -3376,6 +3376,20 @@ namespace Jondo.Unity.Launcher.Handlers
                     int lejos = CellDistance(monster.CellId, objetivo.CellId);
                     if (lejos < data.MinRange || lejos > data.MaxRange) break;
 
+                    // Y LA LINEA DE VISION, que el turno del monstruo no miraba.
+                    //
+                    // El lanzamiento del jugador si la comprueba desde siempre; aqui no, y hasta
+                    // ahora casi no se notaba porque el bicho se pegaba al lado y de al lado se ve
+                    // todo. Desde que se queda a la distancia que le conviene y repite hechizo, se
+                    // notaria: la piden 3.643 de los 8.093 pares hechizo-grado de monstruo (45,0 %),
+                    // y sin ella dispararian a traves de los muros.
+                    if (data.NeedsLineOfSight &&
+                        !MapGeometry.HasLineOfSight(monster.CellId, objetivo.CellId,
+                                                    MapManager.GetLosBlockers(fight.ArenaMapId)))
+                    {
+                        break;
+                    }
+
                     monster.CurrentAP -= data.APCost;
                     lanzados++;
 
