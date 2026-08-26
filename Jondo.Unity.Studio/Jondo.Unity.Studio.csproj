@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- THE WORLD EDITOR.
+
+       A third executable next to the launcher and the server. It works on its own: it opens
+       content/ and the databases, edits and saves, with nothing running. Talking to a live server
+       comes later, and when it does it will be a thin channel that only says "reload this domain".
+
+       Avalonia rather than a local web UI for one reason above the rest: there is no serialisation
+       boundary. It references Jondo.Unity.World and Jondo.Unity.Contract as projects and uses
+       MapGeometry, Fighter and SpellEffect directly. Seven of the eight planned modules manipulate
+       domain objects and only one paints pixels, so an HTTP layer would be a lot of machinery for
+       one module out of eight. See docs/world-editor.md. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Jondo Studio</AssemblyName>
+    <RootNamespace>Jondo.Unity.Studio</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+
+    <!-- The same egg the launcher wears, in bronze. Three executables of one family, told apart
+         at a glance in a taskbar: green the launcher, and this one bronze. -->
+    <ApplicationIcon>icon_studio.ico</ApplicationIcon>
+
+    <!-- Published as one file, like the server, so the root stays clean. The RuntimeIdentifier
+         only decides what `dotnet publish` produces here; the project still targets plain net10.0,
+         so publishing it for macOS or Linux is a flag away and nothing in the code cares. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+    <!-- Avalonia arrastra Tmds.DBus.Protocol 0.20.0, que lleva GHSA-xrw6-gwf8-vvr9 (gravedad
+         alta). Es la pieza de DBus de Linux y aqui no se usa, pero viaja igual en el paquete, asi
+         que se fija la version corregida. Mismo remedio que con SQLitePCLRaw en el servidor. -->
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Core\Jondo.Unity.Core.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
+  </ItemGroup>
+
+  <!-- Auto-deploy: to the root, next to the launcher and the server. Same reasoning as the
+       server's own target — what a person double-clicks lives in the root, and everything else
+       stays inside a folder. -->
+  <Target Name="DeployStudio" AfterTargets="Publish" Condition="'$(SkipRootDeploy)' != 'true'">
+    <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe"
+          DestinationFiles="$(MSBuildProjectDirectory)\..\$(AssemblyName).exe"
+          OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    <Message Text="[Deploy] Studio en la raiz." Importance="high" />
+  </Target>
+
+  <Target Name="ValidateOutputDirectory" BeforeTargets="BeforeBuild;BeforeRebuild">
+    <PropertyGroup>
+      <FullOutDir>$([System.IO.Path]::GetFullPath('$(OutDir)'))</FullOutDir>
+      <FullRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\'))</FullRootDir>
+    </PropertyGroup>
+    <Error Condition="'$(FullOutDir)' == '$(FullRootDir)' Or '$(FullOutDir)' == '$(FullRootDir)\'" Text="[Build Error] Do not build directly into the emulator root directory." />
+  </Target>
+
+</Project>

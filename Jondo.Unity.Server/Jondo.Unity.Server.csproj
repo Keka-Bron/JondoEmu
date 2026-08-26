@@ -64,6 +64,31 @@
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
   </ItemGroup>
 
+  <!-- NOTHING GETS PUBLISHED WITH A RED TEST.
+
+       The split between what runs at startup and what runs under `dotnet test` only holds if the
+       tests actually run, and "somebody remembers" is not a mechanism. Publishing is the right
+       gate: it is the one step between writing code and a player running it, and it is already
+       the step that copies the executable to the root.
+
+       Deliberately NOT on build. The inner loop stays fast, and a half-written change can still be
+       compiled to see whether it type-checks.
+
+       It runs as a separate `dotnet test` process rather than as a ProjectReference on purpose:
+       Jondo.Unity.Tests references this project, so wiring it in would be a cycle. The MSBuild
+       variables are cleared for the child process because a nested build inherits the parent's SDK
+       paths and fails to resolve its own.
+
+       In an emergency: dotnet publish -p:SkipTests=true. That is the whole escape hatch, and it
+       leaves a trace in the command line rather than in a config file nobody reads. -->
+  <Target Name="RunTestsBeforePublish" BeforeTargets="Publish" Condition="'$(SkipTests)' != 'true'">
+    <Message Text="[Tests] Running Jondo.Unity.Tests before publishing..." Importance="high" />
+    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Tests\Jondo.Unity.Tests.csproj&quot; --nologo --verbosity quiet"
+          IgnoreStandardErrorWarningFormat="true"
+          ContinueOnError="false" />
+    <Message Text="[Tests] Green. Publishing." Importance="high" />
+  </Target>
+
   <!-- Auto-deploy: a la raiz solo el .exe. Si quedaba alguna dll suelta de una publicacion
        anterior, se borra para que la carpeta no se quede a medias. -->
   <Target Name="DeployServer" AfterTargets="Publish" Condition="'$(SkipRootDeploy)' != 'true'">

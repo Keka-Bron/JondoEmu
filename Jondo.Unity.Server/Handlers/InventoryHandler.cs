@@ -19,6 +19,22 @@ namespace Jondo.Unity.Launcher.Handlers
     /// </summary>
     public static class InventoryHandler
     {
+        /// <summary>
+        /// A SECOND EQUIPMENT-LOOK PATH, AND IT CONTRADICTS THE FIRST. Left alone on purpose.
+        /// </summary>
+        /// <remarks>
+        /// Managers.EquipmentSkins now carries 741 real items and BuildBodyLook puts their skin in
+        /// the look's f6. This table carries four and puts them in f2, and the two disagree about
+        /// what the value even is: for the Paper Hat, Cape and Shield the new table says 460, 461
+        /// and 462 while this one says 53375140, 68293394 and 84411912. Different field, different
+        /// encoding, same three objects. The Paper Sword (10797) is only here.
+        ///
+        /// Neither has been measured against the other, so this stays until somebody does: these
+        /// four work today, and removing a path that works on the strength of a guess is how a
+        /// character ends up wearing nothing. What has to be measured is which field the real
+        /// server uses for a worn item's skin, and whether those large numbers are a packed form
+        /// of the small ones.
+        /// </remarks>
         private static readonly Dictionary<int, int> ItemGidToSkinId = new Dictionary<int, int>
         {
             { 10801, 53375140 },  // Paper Hat

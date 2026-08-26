@@ -42,21 +42,22 @@ namespace Jondo.Unity.Launcher.Handlers
     public static class CommandHandler
     {
         /// <summary>
-        /// Los comandos que existen y cómo se escriben. Manda en dos sitios: decide qué líneas se
-        /// traga el servidor en vez de publicarlas, y es lo que se le contesta al jugador cuando
-        /// se equivoca escribiéndolas.
+        /// Los comandos que existen y la clave de su texto de uso. Manda en dos sitios: decide qué
+        /// líneas se traga el servidor en vez de publicarlas, y lleva al catálogo que contesta al
+        /// jugador en el idioma de su sesión cuando se equivoca escribiéndolas.
         /// </summary>
         private static readonly Dictionary<string, string> Uso =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                [".kamas"] = "Uso: .kamas <cantidad> — por ejemplo .kamas 10000 (con menos delante, resta)",
-                [".level"] = "Uso: .level <nivel> — por ejemplo .level 200",
-                [".teleport"] = "Uso: .teleport [x,y] — por ejemplo .teleport [-1,0]",
-                [".relative"] = "Uso: .relative — pasa al siguiente MapId de las mismas coordenadas",
-                [".shop"] = "Uso: .shop — sin nada detrás",
-                [".size"] = "Uso: .size <n> — 100 es el tamaño normal, por ejemplo .size 200",
-                [".item"] = "Uso: .item <id> [cantidad] — por ejemplo .item 10784 1",
-                [".itemset"] = "Uso: .itemset <id de panoplia> — por ejemplo .itemset 1",
+                [".kamas"] = "usage.kamas",
+                [".level"] = "usage.level",
+                [".teleport"] = "usage.teleport",
+                [".relative"] = "usage.relative",
+                [".shop"] = "usage.shop",
+                [".size"] = "usage.size",
+                [".item"] = "usage.item",
+                [".itemset"] = "usage.itemset",
+                [".packets"] = "usage.packets",
             };
 
         /// <summary>
@@ -105,8 +106,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 // quien escribe "...bueno"— pero la línea sigue su camino normal.
                 if (LooksLikeCommand(command))
                 {
-                    await NotifyAsync(stream, $"El comando {command} no existe. Los que hay: " +
-                                              string.Join(", ", Uso.Keys) + ".", channel, accountId);
+                    await NotifyAsync(stream, T("command.unknown", command,
+                                              string.Join(", ", Uso.Keys)), channel, accountId);
                 }
                 return false;
             }
@@ -127,7 +128,7 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 Console.WriteLine($"[Comandos] La cuenta {quien} ({Roles.Nombre(rol)}) ha intentado " +
                                   $"{command}, que es de {Roles.Nombre(haceFalta)}. Rechazado.");
-                await NotifyAsync(stream, $"No tienes permiso para usar {command}.", channel, accountId);
+                await NotifyAsync(stream, T("command.denied", command), channel, accountId);
                 return true;   // se lo traga: ni se ejecuta ni se publica en el chat
             }
 
@@ -147,12 +148,13 @@ namespace Jondo.Unity.Launcher.Handlers
                     case ".size": await SizeAsync(stream, rest, channel, accountId); break;
                     case ".item": await ItemAsync(stream, rest, channel, accountId); break;
                     case ".itemset": await ItemSetAsync(stream, rest, channel, accountId); break;
+                    case ".packets": await PacketsAsync(stream, rest, channel, accountId); break;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Comandos] {command} ha fallado: {ex}");
-                await NotifyAsync(stream, $"El comando {command} ha fallado: {ex.Message}",
+                await NotifyAsync(stream, T("command.failed", command, ex.Message),
                                   channel, accountId);
             }
 
@@ -166,7 +168,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (!long.TryParse(rest.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture,
                                out long amount))
             {
-                await NotifyAsync(stream, Uso[".kamas"], channel, accountId);
+                await NotifyAsync(stream, Usage(".kamas"), channel, accountId);
                 return;
             }
 
@@ -184,9 +186,10 @@ namespace Jondo.Unity.Launcher.Handlers
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
-            await NotifyAsync(stream,
-                $"Kamas: {GameState.Kamas} ({(GameState.Kamas - before >= 0 ? "+" : "")}" +
-                $"{GameState.Kamas - before}).", channel, accountId);
+            long difference = GameState.Kamas - before;
+            await NotifyAsync(stream, T("kamas.result", GameState.Kamas,
+                                         difference >= 0 ? "+" : "", difference),
+                              channel, accountId);
 
             Console.WriteLine($"[Comandos] Kamas {before} -> {GameState.Kamas}.");
         }
@@ -214,7 +217,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (!int.TryParse(rest.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture,
                               out int wanted))
             {
-                await NotifyAsync(stream, Uso[".level"], channel, accountId);
+                await NotifyAsync(stream, Usage(".level"), channel, accountId);
                 return;
             }
 
@@ -292,15 +295,14 @@ namespace Jondo.Unity.Launcher.Handlers
 
             string spellNote = await RefreshSpellsAsync(stream, before);
 
-            string capped = newLevel != wanted ? $" (se pidió {wanted})" : "";
+            string capped = newLevel != wanted ? T("level.requested", wanted) : "";
             string omega = newLevel > MaxNormalLevel
-                ? " Por encima de 200 no se reparten más puntos de característica."
+                ? T("level.omega")
                 : "";
 
-            await NotifyAsync(stream,
-                $"Nivel {newLevel}{capped}, antes {oldLevel}. Experiencia {GameState.Experience}. " +
-                $"Puntos libres {GameState.CharacterRemainingPoints} de {capital}. {spellNote}{omega}",
-                channel, accountId);
+            await NotifyAsync(stream, T("level.result", newLevel, capped, oldLevel,
+                                         GameState.Experience, GameState.CharacterRemainingPoints,
+                                         capital, spellNote, omega), channel, accountId);
 
             Console.WriteLine($"[Comandos] Nivel {oldLevel} -> {newLevel}, experiencia " +
                               $"{GameState.Experience}, puntos {GameState.CharacterRemainingPoints}.");
@@ -375,13 +377,13 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             if (!SpellTable.IsLoaded)
             {
-                return "Hechizos sin tocar: la tabla de hechizos no está cargada.";
+                return T("spells.table_missing");
             }
 
             var after = Spells(GameState.CharacterLevel);
             if (after.Count == 0)
             {
-                return $"Hechizos sin tocar: la raza {GameState.Breed} no tiene ninguno en los datos.";
+                return T("spells.breed_missing", GameState.Breed);
             }
 
             await NetworkMessage.WriteFrameAsync(stream,
@@ -402,7 +404,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (!after.ContainsKey(spell.Key)) closed++;
             }
 
-            return $"Hechizos: {after.Count} (+{opened}, -{closed}, {moved} cambian de grado).";
+            return T("spells.result", after.Count, opened, closed, moved);
         }
 
         // ─── .teleport ──────────────────────────────────────────────────────────
@@ -411,27 +413,27 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             if (!ParseCoordinates(rest, out int x, out int y))
             {
-                await NotifyAsync(stream, Uso[".teleport"], channel, accountId);
+                await NotifyAsync(stream, Usage(".teleport"), channel, accountId);
                 return;
             }
 
             if (GameState.IsInFight)
             {
-                await NotifyAsync(stream, "No se puede teleportar en combate.", channel, accountId);
+                await NotifyAsync(stream, T("teleport.in_fight"), channel, accountId);
                 return;
             }
 
             var match = MapLookup.AtCoordinates(x, y);
             if (match == null)
             {
-                await NotifyAsync(stream, $"No hay ningún mapa en [{x},{y}].", channel, accountId);
+                await NotifyAsync(stream, T("teleport.no_map", x, y), channel, accountId);
                 return;
             }
 
             int cell = await TeleportHandler.ToMapAsync(stream, match.Map.MapId);
             if (cell < 0)
             {
-                await NotifyAsync(stream, $"El mapa {match.Map.MapId} de [{x},{y}] no se puede cargar.",
+                await NotifyAsync(stream, T("teleport.load_failed", match.Map.MapId, x, y),
                                   channel, accountId);
                 return;
             }
@@ -440,13 +442,12 @@ namespace Jondo.Unity.Launcher.Handlers
             // por casas, interiores y mundos aparte, y el jugador tiene que poder saber a cuál de
             // todos ha ido a parar.
             string chosen = match.Candidates > 1
-                ? $" Había {match.Candidates} mapas en esas coordenadas; se ha elegido el de la " +
-                  $"subzona con más casillas andables ({match.SubAreaCells})."
+                ? T("teleport.multiple", match.Candidates, match.SubAreaCells)
                 : "";
 
-            await NotifyAsync(stream,
-                $"En [{x},{y}]: mapa {match.Map.MapId}, {SubAreaName(match.Map.SubAreaId)}, " +
-                $"casilla {cell}.{chosen}", channel, accountId);
+            await NotifyAsync(stream, T("teleport.result", x, y, match.Map.MapId,
+                                         SubAreaName(match.Map.SubAreaId), cell, chosen),
+                              channel, accountId);
         }
 
         // ─── .relative ──────────────────────────────────────────────────────────
@@ -460,12 +461,12 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             if (!string.IsNullOrWhiteSpace(rest))
             {
-                await NotifyAsync(stream, Uso[".relative"], channel, accountId);
+                await NotifyAsync(stream, Usage(".relative"), channel, accountId);
                 return;
             }
             if (GameState.IsInFight)
             {
-                await NotifyAsync(stream, "No se puede teleportar en combate.", channel, accountId);
+                await NotifyAsync(stream, T("teleport.in_fight"), channel, accountId);
                 return;
             }
 
@@ -473,7 +474,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var current = MapManager.GetMapInfo(previousMapId);
             if (current == null)
             {
-                await NotifyAsync(stream, $"El mapa actual {previousMapId} no está en MapPositions.",
+                await NotifyAsync(stream, T("relative.current_missing", previousMapId),
                                   channel, accountId);
                 return;
             }
@@ -481,27 +482,24 @@ namespace Jondo.Unity.Launcher.Handlers
             var relative = MapLookup.NextRelative(previousMapId);
             if (relative == null)
             {
-                await NotifyAsync(stream,
-                    $"No hay otro MapId en [{current.PosX},{current.PosY}].",
-                    channel, accountId);
+                await NotifyAsync(stream, T("relative.none", current.PosX, current.PosY),
+                                  channel, accountId);
                 return;
             }
 
             int cell = await TeleportHandler.ToMapAsync(stream, relative.Map.MapId);
             if (cell < 0)
             {
-                await NotifyAsync(stream,
-                    $"El mapa relativo {relative.Map.MapId} no se puede cargar.",
-                    channel, accountId);
+                await NotifyAsync(stream, T("relative.load_failed", relative.Map.MapId),
+                                  channel, accountId);
                 return;
             }
 
-            string loop = relative.Wrapped ? " Retour au premier MapId." : "";
-            await NotifyAsync(stream,
-                $"Relative [{current.PosX},{current.PosY}] : {previousMapId} -> " +
-                $"{relative.Map.MapId} ({relative.Position}/{relative.Candidates}), " +
-                $"{SubAreaName(relative.Map.SubAreaId)}, casilla {cell}.{loop}",
-                channel, accountId);
+            string loop = relative.Wrapped ? T("relative.wrapped") : "";
+            await NotifyAsync(stream, T("relative.result", current.PosX, current.PosY,
+                                         previousMapId, relative.Map.MapId, relative.Position,
+                                         relative.Candidates, SubAreaName(relative.Map.SubAreaId),
+                                         cell, loop), channel, accountId);
         }
 
         // ─── .shop ──────────────────────────────────────────────────────────────
@@ -516,34 +514,31 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             if (GameState.IsInFight)
             {
-                await NotifyAsync(stream, "No se puede teleportar en combate.", channel, accountId);
+                await NotifyAsync(stream, T("teleport.in_fight"), channel, accountId);
                 return;
             }
 
             var (mapId, npcs) = DatabaseManager.GetMapWithMostNpcSpawns();
             if (mapId <= 0)
             {
-                await NotifyAsync(stream, "No hay ningún NPC colocado en la base: no sé a qué mapa " +
-                                          "llevarte.", channel, accountId);
+                await NotifyAsync(stream, T("shop.no_npcs"), channel, accountId);
                 return;
             }
 
             int cell = await TeleportHandler.ToMapAsync(stream, mapId);
             if (cell < 0)
             {
-                await NotifyAsync(stream, $"El mapa de los vendedores ({mapId}) no está en los datos " +
-                                          "del mundo.", channel, accountId);
+                await NotifyAsync(stream, T("shop.map_missing", mapId), channel, accountId);
                 return;
             }
 
             var info = MapManager.GetMapInfo(mapId);
             string where = info != null
                 ? $"[{info.PosX},{info.PosY}], {SubAreaName(info.SubAreaId)}"
-                : "sitio desconocido";
+                : T("shop.unknown_place");
 
-            await NotifyAsync(stream,
-                $"A la tienda: mapa {mapId} ({where}), {npcs} NPC, casilla {cell}.",
-                channel, accountId);
+            await NotifyAsync(stream, T("shop.result", mapId, where, npcs, cell),
+                              channel, accountId);
         }
 
         // ─── .size ──────────────────────────────────────────────────────────────
@@ -559,7 +554,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (!int.TryParse(rest.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture,
                               out int wanted))
             {
-                await NotifyAsync(stream, Uso[".size"], channel, accountId);
+                await NotifyAsync(stream, Usage(".size"), channel, accountId);
                 return;
             }
 
@@ -568,7 +563,7 @@ namespace Jondo.Unity.Launcher.Handlers
             var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (character == null)
             {
-                await NotifyAsync(stream, "No encuentro tu personaje en la base para redibujarlo.",
+                await NotifyAsync(stream, T("size.character_missing"),
                                   channel, accountId);
                 return;
             }
@@ -580,9 +575,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
 
             string capped = size != wanted
-                ? $" (se pidió {wanted}; el tope va de {CharacterSize.Minimum} a {CharacterSize.Maximum})"
+                ? T("size.clamped", wanted, CharacterSize.Minimum, CharacterSize.Maximum)
                 : "";
-            await NotifyAsync(stream, $"Tamaño {size} %{capped}. El normal es {CharacterSize.Normal}.",
+            await NotifyAsync(stream, T("size.result", size, capped, CharacterSize.Normal),
                               channel, accountId);
 
             Console.WriteLine($"[Comandos] Tamaño del personaje {GameState.CharacterId}: {size} %.");
@@ -641,7 +636,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 (parts.Length == 2 && !int.TryParse(parts[1], NumberStyles.Integer,
                                                    CultureInfo.InvariantCulture, out _)))
             {
-                await NotifyAsync(stream, Uso[".item"], channel, accountId);
+                await NotifyAsync(stream, Usage(".item"), channel, accountId);
                 return;
             }
 
@@ -651,18 +646,18 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (quantity <= 0)
             {
-                await NotifyAsync(stream, "La cantidad debe ser mayor que cero.", channel, accountId);
+                await NotifyAsync(stream, T("item.quantity"), channel, accountId);
                 return;
             }
 
             if (!await GiveItemAsync(stream, gid, quantity))
             {
-                await NotifyAsync(stream, $"No existe la plantilla de objeto {gid}.", channel, accountId);
+                await NotifyAsync(stream, T("item.template_missing", gid), channel, accountId);
                 return;
             }
 
             await RefreshPodsAsync(stream);
-            await NotifyAsync(stream, $"Objeto {gid} x{quantity} añadido al inventario.",
+            await NotifyAsync(stream, T("item.added", gid, quantity),
                               channel, accountId);
         }
 
@@ -672,13 +667,13 @@ namespace Jondo.Unity.Launcher.Handlers
             if (!int.TryParse(rest.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture,
                               out int setId))
             {
-                await NotifyAsync(stream, Uso[".itemset"], channel, accountId);
+                await NotifyAsync(stream, Usage(".itemset"), channel, accountId);
                 return;
             }
 
             if (!ItemSets.TryGetItems(setId, out var templates))
             {
-                await NotifyAsync(stream, $"No existe la panoplia {setId}.", channel, accountId);
+                await NotifyAsync(stream, T("itemset.missing", setId), channel, accountId);
                 return;
             }
 
@@ -693,10 +688,61 @@ namespace Jondo.Unity.Launcher.Handlers
             await RefreshPodsAsync(stream);
             string warning = missing.Count == 0
                 ? ""
-                : $" Plantillas ausentes: {string.Join(", ", missing)}.";
-            await NotifyAsync(stream,
-                $"Panoplia {setId}: {added}/{templates.Count} objetos añadidos.{warning}",
-                channel, accountId);
+                : T("itemset.templates_missing", string.Join(", ", missing));
+            await NotifyAsync(stream, T("itemset.added", setId, added, templates.Count, warning),
+                              channel, accountId);
+        }
+
+        // ─── .packets ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Lo que el cliente nos manda y no sabemos atender, de lo que más pasa a lo que menos.
+        ///
+        /// Va agrupado por FORMA y no por opcode, que es lo que hace que la lista sirva: un mismo
+        /// opcode puede llevar cargas distintas según lo que el jugador esté haciendo, y contarlas
+        /// juntas esconde justo lo que hay que ver.
+        ///
+        /// Esto no descifra nada. Dice dónde mirar; lo que se mire se mide contra una captura como
+        /// todo lo demás, y hasta entonces no se contesta nada, porque una respuesta inventada deja
+        /// al cliente con un estado que el servidor no tiene.
+        /// </summary>
+        private static async Task PacketsAsync(NetworkStream stream, string rest,
+                                               int channel, long accountId)
+        {
+            int cuantas = 10;
+            if (rest.Trim().Length > 0 &&
+                (!int.TryParse(rest.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture,
+                               out cuantas) || cuantas <= 0 || cuantas > 40))
+            {
+                await NotifyAsync(stream, Usage(".packets"), channel, accountId);
+                return;
+            }
+
+            var lista = Network.UnknownPackets.Top(cuantas);
+            if (lista.Count == 0)
+            {
+                await NotifyAsync(stream, T("packets.none"),
+                                  channel, accountId);
+                return;
+            }
+
+            var counts = Network.UnknownPackets.Counts();
+            await NotifyAsync(stream, T("packets.summary", Network.UnknownPackets.ShapeCount,
+                                         Network.UnknownPackets.OpcodeCount, counts.Unhandled,
+                                         counts.Silenced, counts.Undecodable), channel, accountId);
+            foreach (var fila in lista)
+            {
+                string marca = fila.Kind switch
+                {
+                    Network.UnknownPackets.Kind.Silenced => T("packets.silenced"),
+                    Network.UnknownPackets.Kind.Undecodable => T("packets.undecodable"),
+                    _ => T("packets.unhandled"),
+                };
+                await NotifyAsync(stream,
+                    $"{fila.Opcode} x{fila.Occurrences} ({marca}, f{fila.RootField}, " +
+                    $"{fila.PayloadBytes} B) {fila.Signature}",
+                    channel, accountId);
+            }
         }
 
         private static async Task RefreshPodsAsync(NetworkStream stream)
@@ -707,6 +753,11 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         // ─── Piezas sueltas ─────────────────────────────────────────────────────
+
+        private static string T(string key, params object[] values)
+            => CommandTexts.Get(key, values);
+
+        private static string Usage(string command) => T(Uso[command]);
 
         /// <summary>
         /// El aviso al jugador, por el canal donde escribió para que le salga en la pestaña que
@@ -791,7 +842,7 @@ namespace Jondo.Unity.Launcher.Handlers
         private static string SubAreaName(int subAreaId)
         {
             string name = DatabaseManager.GetSubAreaName(subAreaId);
-            return string.IsNullOrEmpty(name) ? $"subzona {subAreaId}" : name;
+            return string.IsNullOrEmpty(name) ? T("map.subarea", subAreaId) : name;
         }
     }
 }

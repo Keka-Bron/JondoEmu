@@ -314,13 +314,23 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public const int TemporaryLifeMalus = 97;
 
-        public static Pb SheetEntry(int characteristic, long baseValue, long fromGear, bool isMonster)
+        /// <param name="delEmbrujo">
+        /// EL HUECO DEL EMBRUJO, el f8. Es lo que los hechizos ponen y quitan durante el combate, y
+        /// va SEPARADO de la base y del equipo: el cliente guarda los tres y los suma él.
+        ///
+        /// Sin esto no había manera de refrescar una característica sin pisar lo demás, y era la
+        /// causa de que la previsualización de daño saliera mal. Medido sobre las 401 capturas:
+        /// 2.830 de las 3.279 entradas de jxw con molde detallado (86,3 %) lo llevan, y nosotros no
+        /// lo escribimos ni una vez en 1.713.
+        /// </param>
+        public static Pb SheetEntry(int characteristic, long baseValue, long fromGear, bool isMonster,
+                                    long delEmbrujo = 0)
         {
             var entry = Pb.New().VarIfNotZero(1, characteristic);
 
             if (isMonster)
             {
-                long total = baseValue + fromGear;
+                long total = baseValue + fromGear + delEmbrujo;
                 if (total == 0) entry.EmptyMsg(2);
                 else entry.Msg(2, Pb.New().Var(2, total));
                 return entry;
@@ -340,7 +350,7 @@ namespace Jondo.Unity.Launcher.Network
                 return entry.Msg(4, Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(8, fromGear));
             }
 
-            if (baseValue == 0 && fromGear == 0)
+            if (baseValue == 0 && fromGear == 0 && delEmbrujo == 0)
             {
                 return entry.EmptyMsg(4);
             }
@@ -349,7 +359,8 @@ namespace Jondo.Unity.Launcher.Network
             // Este cliente lo SUMA en vez de tomarlo como porcentaje: con él puesto, la ficha
             // enseñaba 568 de fuerza donde hay 468, y cien de más en inteligencia, suerte y
             // agilidad. Hasta saber qué espera exactamente, mejor no mandarlo.
-            var valor = Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(7, fromGear);
+            var valor = Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(7, fromGear)
+                          .VarIfNotZero(8, delEmbrujo);
             return entry.Msg(4, valor);
         }
 
@@ -795,7 +806,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </param>
         public static Pb CastAt(long caster, long target, int cell, int spell, int spellLevel,
                                 bool critical, int sobreEseObjetivo = 0, int esteTurno = 0,
-                                int intervalo = 0)
+                                int intervalo = 0, int arma = 0)
         {
             var suyo = Pb.New();
             if (sobreEseObjetivo > 0 && target != 0)
@@ -813,9 +824,25 @@ namespace Jondo.Unity.Launcher.Network
                 .Var(6, cell);
             if (spell != 0)
             {
+                // Un HECHIZO lleva el hechizo y NO lleva el campo del arma. Escribirlo aunque
+                // fuera a cero cambiaba los bytes, y el auto-test del protocolo lo cazó a la
+                // primera comparando contra la captura: por eso el if envuelve a los dos.
                 detalle.Msg(7, Pb.New().Var(2, spell).VarIfNotZero(3, spellLevel));
+                return detalle.Var(8, 1);
             }
-            return detalle.Var(8, 1);
+
+            // Y un golpe CUERPO A CUERPO lleva lo contrario: sin hechizo, y con el arma.
+            //
+            // Es lo único que distingue un espadazo de un puñetazo, y por eso el chat decía
+            // «Puñetazo» al atacar con la espada. Mandar hechizo 0 estaba bien —el servidor real
+            // tampoco manda ningún hechizo de arma—; lo que faltaba era esto.
+            //
+            // El f10 lleva el Id de ItemTemplates del arma equipada, y el puñetazo es el mismo
+            // mensaje con el f10 a CERO ESCRITO, no ausente: por eso va con Var y no con
+            // VarIfNotZero. Medido en las capturas: Lavacha 19593, Cocobur 20353, Garras de la
+            // Despedazadora 31759, Garra de Gargandias 31786; y el puñetazo, «5000» en el cable,
+            // que es la etiqueta del campo 10 seguida de un cero.
+            return detalle.Var(8, 1).Var(10, arma);
         }
 
         /// <summary>
@@ -826,34 +853,43 @@ namespace Jondo.Unity.Launcher.Network
         /// Es la misma ficha que va dentro del jxg y del jxb, aquí sola. Se usa para actualizar los
         /// puntos de movimiento y de acción según se gastan.
         /// </summary>
+        /// <summary>Las dos características que van en el molde de los puntos, y sólo ellas.</summary>
+        private const int PuntosDeAccion = 1;
+        private const int PuntosDeMovimiento = 23;
+
         public static byte[] BuildFighterSheet(long fighterId,
-                                               IEnumerable<(int Characteristic, long Value)> sheet,
+                                               IEnumerable<(int Characteristic, long Base,
+                                                            long Gear, long Buff)> sheet,
                                                bool esElPersonajeControlado)
         {
-            // El molde NO es el mismo para todos: depende de si la ficha es la del personaje que
-            // maneja el cliente o la de otro. Medido en las quince capturas de combate, sin una
-            // sola excepción:
+            // UNA ENTRADA DE jxw SUSTITUYE A LA DEL jxb, NO SE SUMA A ELLA. De ahí sale todo.
             //
-            //   el personaje propio          f5 { f1: valor }   y f5 vacío cuando es cero
-            //   monstruos, rival y compañeros f2 { f2: valor }   y f2 vacío cuando es cero
+            // Aquí se mandaba un VALOR ABSOLUTO metido en el hueco de la base, y con eso cada
+            // refresco borraba el equipo y el resto de huecos que el jxb había mandado bien. El
+            // servidor real hace lo contrario: vuelve a escribir la entrada COMPLETA —los mismos
+            // campos que en el jxb, repetidos aunque no hayan cambiado— y añade el embrujo en su
+            // hueco propio, el f8.
             //
-            // Aquí se mandaba el molde del jugador a TODO el mundo, así que cada turno le llegaba
-            // al cliente la ficha de cada monstruo escrita en el hueco que no es.
+            // Medido en la captura del Zobal, sobre el mismo luchador y las mismas características:
+            //
+            //   jxb   107: f4 { f2: 100 }          25: f4 { f7: 740 }
+            //   jxw   107: f4 { f2: 100, f8: +1 }  25: f4 { f7: 740, f8: +100 }
+            //   jxw   107: f4 { f2: 100 }          25: f4 { f7: 740 }      al caducar el embrujo
+            //
+            // El 100 de la base NO se toca en ninguna de las 1.699 entradas detalladas de las
+            // capturas. Nosotros mandábamos «f4 { f2: 10 }» —sólo el embrujo, y en el hueco que no
+            // es— cincuenta y cinco milisegundos después de haber mandado el 100 bueno. Y el 107 es
+            // un MULTIPLICADOR de daño: el cliente estima el golpe multiplicando por él, así que
+            // dejarlo en 10 donde vale 100 es la previsualización dividida por diez. Ése era el
+            // fallo que se veía jugando.
+            //
+            // El molde de los puntos —f5— sigue siendo sólo para la 1 y la 23; ninguna otra
+            // característica lo usa jamás en las capturas.
             var stats = Pb.New().Var(3, SheetKind);
-            foreach (var (characteristic, value) in sheet)
+            foreach (var (characteristic, baseValue, gear, buff) in sheet)
             {
-                var entry = Pb.New().VarIfNotZero(1, characteristic);
-                if (esElPersonajeControlado)
-                {
-                    if (value == 0) entry.EmptyMsg(5);
-                    else entry.Msg(5, Pb.New().Var(1, value));
-                }
-                else
-                {
-                    if (value == 0) entry.EmptyMsg(2);
-                    else entry.Msg(2, Pb.New().Var(2, value));
-                }
-                stats.Msg(5, entry);
+                stats.Msg(5, SheetEntry(characteristic, baseValue, gear,
+                                        isMonster: !esElPersonajeControlado, delEmbrujo: buff));
             }
             return Pb.New().Var(1, fighterId).Msg(3, stats).Build();
         }
@@ -933,6 +969,42 @@ namespace Jondo.Unity.Launcher.Network
                 .Msg(40, detalle)
                 .Build();
         }
+
+        /// <summary>
+        /// El número de efecto del DAÑO DE COLISIÓN al empujar.
+        ///
+        /// En el catálogo del cliente se llama <c>CharacterLifePointsLostFromPush</c>, tiene la
+        /// descripción vacía en los cinco idiomas y no lo usa ni uno de los 34.685 niveles de
+        /// hechizo: no lo escribe ningún hechizo, lo fabrica el motor. La pantalla de fin de
+        /// combate lo contabiliza aparte, en su propio renglón.
+        /// </summary>
+        public const int PushDamage = 80;
+
+        /// <summary>
+        /// El daño de haberse chocado al empujar (jwe con el f14 en 80).
+        ///
+        ///   f3: quién empujó      f14: 80
+        ///   f40 { f2: a quién, f3: la vida perdida, f4: -1, f5: la erosión }
+        ///
+        /// Va aparte de <see cref="BuildDamage"/> porque aquél tiene el convenio de «si el elemento
+        /// es menor que cero, no escribas el f4», y aquí el f4 tiene que ir Y valer MENOS UNO: es
+        /// así en los 127 mensajes de las 401 capturas, sin una excepción. Menos uno quiere decir
+        /// «sin elemento», que no es lo mismo que el cero del neutral.
+        ///
+        /// Se manda dentro de la misma secuencia del lanzamiento y justo detrás del desplazamiento;
+        /// y cuando al empujado no le queda ni una casilla, el desplazamiento no se manda y éste va
+        /// solo.
+        /// </summary>
+        public static byte[] BuildPushDamage(long author, long victim, int amount, int erosion = 0)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, PushDamage)
+                .Msg(40, Pb.New()
+                    .Var(2, victim)
+                    .Var(3, amount)
+                    .Var(4, -1)
+                    .VarIfNotZero(5, erosion))
+                .Build();
 
         /// <summary>
         /// RETIRARLE puntos de acción a otro. No confundir con el 102, que es el gasto propio de

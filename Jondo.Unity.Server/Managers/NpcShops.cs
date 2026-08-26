@@ -78,6 +78,8 @@ namespace Jondo.Unity.Launcher.Managers
                     }
                 }
 
+                JuntarVendedores();
+
                 var distinct = new HashSet<int>();
                 foreach (var gids in _byNpc.Values) distinct.UnionWith(gids);
                 Items = distinct.Count;
@@ -92,6 +94,54 @@ namespace Jondo.Unity.Launcher.Managers
                 Console.WriteLine($"[Tiendas] No se ha podido leer {Path.GetFileName(path)}: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Junta en uno solo los vendedores que Ankama parte por tramos de nivel.
+        ///
+        /// El catálogo del que se queda pasa a ser el suyo más el de todos los que absorbe, sin
+        /// repetidos y conservando el orden: primero lo suyo y después lo de los otros en el orden
+        /// en que estén escritos. El orden importa porque es el que ve el jugador en la lista.
+        ///
+        /// Y se avisa si algún catálogo pasa de 444 entradas, que es el mayor kbd que manda el
+        /// servidor real —26.902 bytes— y por tanto lo único que sabemos que el cliente digiere.
+        /// El mensaje no está paginado y no hay ni un caso en las capturas de dos kbd para una
+        /// misma tienda, así que por encima de esa cifra estamos en terreno sin medir.
+        /// </summary>
+        private static void JuntarVendedores()
+        {
+            if (Managers.Vendors.Count == 0) return;
+
+            foreach (var merge in Managers.Vendors.All)
+            {
+                var juntos = new List<int>();
+                var vistos = new HashSet<int>();
+
+                if (_byNpc.TryGetValue(merge.Keeps, out var suyos))
+                    foreach (int gid in suyos) if (vistos.Add(gid)) juntos.Add(gid);
+
+                foreach (int otro in merge.Absorbs)
+                {
+                    if (!_byNpc.TryGetValue(otro, out var deOtro)) continue;
+                    foreach (int gid in deOtro) if (vistos.Add(gid)) juntos.Add(gid);
+                    _byNpc.Remove(otro);
+                }
+
+                if (juntos.Count == 0) continue;
+                _byNpc[merge.Keeps] = juntos.ToArray();
+
+                string aviso = juntos.Count > CatalogoMedidoMayor
+                    ? $"  <-- POR ENCIMA DE LAS {CatalogoMedidoMayor} MEDIDAS"
+                    : "";
+                Console.WriteLine($"[Vendedores] «{merge.Name}» ({merge.Keeps}): {juntos.Count} " +
+                                  $"objetos de {merge.Absorbs.Count + 1} vendedor(es).{aviso}");
+            }
+        }
+
+        /// <summary>
+        /// El catálogo más grande que manda el servidor real, en entradas: 444, y 26.902 bytes.
+        /// Por encima de ahí no hay medida que lo respalde.
+        /// </summary>
+        private const int CatalogoMedidoMayor = 444;
 
         /// <summary>
         /// Los efectos de cada objeto que se vende, en la forma que entiende

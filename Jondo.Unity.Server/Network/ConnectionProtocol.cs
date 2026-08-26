@@ -831,55 +831,8 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         private static void AddInteractiveElements(Pb jss, long mapId)
         {
-            var placed = new HashSet<int>();
-
-            // Une route de TeleportManager ne dépend pas du registre pour exister dans le jss.
-            // À CHAQUE chargement de sa map source, elle reçoit explicitement :
-            //   - un f11 avec USE114, pour que l'ElementId soit cliquable ;
-            //   - un f15 actif, pour que le client replace toujours son gfx sur sa cellule.
-            // Le type propre à la route est conservé tel quel.
-            foreach (var route in Managers.TeleportManager.On(mapId))
-            {
-                if (route.ElementId <= 0 || !placed.Add(route.ElementId)) continue;
-                DeclareTeleportRoute(jss, route);
-            }
-
             foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
-            {
-                // Les téléports viennent d'être déclarés directement ci-dessus. Le registre reste
-                // la source des autres actions, mais ne doit pas produire un second f11/f15.
-                if (!placed.Add(interactive.Element.Id)) continue;
                 Declare(jss, interactive);
-            }
-
-            // Le gfx appartient aux données de map du client et se retrouve par ElementId. Même
-            // lorsqu'aucune action n'est attachée à un élément, son état f15 doit donc rester
-            // présent et actif : visible, mais sans f11 il n'est simplement pas cliquable.
-            foreach (var element in Managers.Interactives.ElementsOf(mapId))
-            {
-                if (element.Id <= 0 || !placed.Add(element.Id)) continue;
-                DeclarePlacement(jss, element, Managers.ResourceState.Full);
-            }
-        }
-
-        /// <summary>
-        /// Déclaration systématique d'une route générique dans le snapshot de map. Le GfxId ne
-        /// voyage pas sur le réseau : le client le retrouve dans ses données grâce à l'ElementId.
-        /// </summary>
-        private static void DeclareTeleportRoute(Pb jss, Managers.InteractiveTeleport route)
-        {
-            var element = new Managers.Interactives.Element(
-                route.ElementId, route.SourceCellId, route.GfxId);
-
-            jss.Msg(11, Pb.New()
-                .Var(1, 1)
-                .Msg(4, Pb.New()
-                    .Var(1, Managers.Interactives.SkillInstanceOf(route.ElementId))
-                    .Var(2, Managers.TeleportManager.UseSkill))
-                .Var(5, route.ElementId)
-                .Var(6, route.InteractiveType));
-
-            DeclarePlacement(jss, element, Managers.ResourceState.Full);
         }
 
         /// <summary>
@@ -934,9 +887,21 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// Présence visuelle permanente d'un élément. f1 indique qu'il appartient à la map
-        /// courante; l'absence de f4 correspond à l'état actif 0. ElementId permet au client de
-        /// retrouver le GfxId dans ses propres données de map.
+        /// Dónde está un elemento y en qué estado (f15).
+        ///
+        /// El f15 acompaña SIEMPRE a un f11 y nunca va solo. Medido sobre las 305 capturas del
+        /// juego real: en los 834 jss que llevan elementos hay 4.493 f11 y sólo 2.685 f15, y un
+        /// f15 cuyo elemento no tenga su f11 aparece 3 veces —una sola vez en cada uno—, o sea
+        /// el 0,36 %. Al revés pasa en 615 de los 834: un elemento con acción al que el servidor
+        /// no le manda colocación.
+        ///
+        /// Es decir: el f15 es un SUBCONJUNTO del f11, no un superconjunto. Declarar uno por cada
+        /// elemento del mapa —los 46.309 de interactive_elements.json, repartidos en 9.840 mapas,
+        /// hasta 71 en el peor— pondría a Jondo a mandar lo contrario de lo que manda Ankama.
+        ///
+        /// El f1 dice que el elemento es de este mapa. La ausencia del f4 es el estado activo, que
+        /// por eso no se escribe. El dibujo no viaja: el cliente lo saca de sus propios datos de
+        /// mapa a partir del número del elemento.
         /// </summary>
         private static void DeclarePlacement(Pb jss, Managers.Interactives.Element element,
                                              Managers.ResourceState state)
@@ -1636,8 +1601,26 @@ namespace Jondo.Unity.Launcher.Network
         /// es "servidor de torneo" y el propio servidor lo valida: las catorce entradas con el
         /// criterio más duro dieron error 243 al comprarlas. Aquí no somos un servidor de torneo, y
         /// hay doce entradas medidas que viajan sin criterio ninguno, así que se omite.
+        ///
+        /// El f3 es LA MONEDA, y con él una tienda cobra en un objeto en vez de en kamas. No hay
+        /// que inventar nada: el cliente ya lo sabe hacer. Medido sobre las 305 capturas, hay 60
+        /// kbd y 58 llevan sólo f1 y f2 —ésos cobran en kamas—; los otros dos llevan además el
+        /// f3, con el id del objeto que hace de moneda:
+        ///
+        ///   f3 = 13052   «Sebuscalón»   (la tienda de la Torre de los Viajeros)
+        ///   f3 = 30529   «Fidelicha»    (una de Pandala)
+        ///
+        /// Si el f3 no está, se cobra en kamas, que es por lo que va con VarIfNotZero: una tienda
+        /// normal sigue mandando exactamente los mismos bytes que antes.
+        ///
+        /// OJO CON EL PRECIO. Se recibe la tienda entera y no sólo el id de la moneda, y es a
+        /// propósito: la primera versión mandaba el f3 con la ficha pero seguía poniendo en cada
+        /// entrada el precio EN KAMAS, así que el cliente enseñaba una capa a «1 ficha» y al
+        /// comprarla el servidor cobraba 150. El precio que se enseña y el que se cobra tienen
+        /// que salir del mismo sitio, y por eso salen los dos de aquí.
         /// </summary>
-        public static byte[] BuildShop(long contextualId, IEnumerable<int> gids)
+        public static byte[] BuildShop(long contextualId, IEnumerable<int> gids,
+                                       Managers.TokenShops.Shop? tokenShop = null)
         {
             var kbd = Pb.New();
             foreach (int gid in gids)
@@ -1645,7 +1628,9 @@ namespace Jondo.Unity.Launcher.Network
                 var entry = Pb.New()
                     .Var(1, gid)
                     .Msg(3, Pb.New()
-                        .VarIfNotZero(2, Managers.NpcShops.PriceOf(gid))
+                        .VarIfNotZero(2, tokenShop == null
+                            ? Managers.NpcShops.PriceOf(gid)
+                            : Managers.TokenShops.PriceOf(tokenShop, gid))
                         .Var(3, ShopUnlimited));
 
                 foreach (var effect in Managers.Equipment.ParseEffects(Managers.NpcShops.EffectsOf(gid)))
@@ -1656,7 +1641,7 @@ namespace Jondo.Unity.Launcher.Network
 
                 kbd.Msg(1, entry);
             }
-            return kbd.Var(2, contextualId).Build();
+            return kbd.Var(2, contextualId).VarIfNotZero(3, tokenShop?.TokenGid ?? 0).Build();
         }
 
         /// <summary>Las existencias de la tienda. Constante en las 6.106 entradas de la captura.</summary>
@@ -1738,6 +1723,13 @@ namespace Jondo.Unity.Launcher.Network
 
         /// <summary>El de "comprado": objeto, uid, cantidad y precio.</summary>
         public const int PurchaseMessage = 252;
+
+        /// <summary>
+        /// El mismo aviso pero cuando se ha pagado en fichas. Medido en la tienda de la Torre de
+        /// los Viajeros: seis parámetros, «798, 1055401001, 1, 20, 13052, 0», que son el objeto
+        /// comprado y su uid, la cantidad, el precio, y el id y el uid de la moneda.
+        /// </summary>
+        public const int TokenPurchaseMessage = 364;
 
         // ─── World: changing map ────────────────────────────────────────────────
 

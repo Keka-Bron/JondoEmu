@@ -200,28 +200,106 @@ namespace Jondo.Unity.World.Maps
         /// </summary>
         public static int Empujar(int centro, int deQuienLanza, int aQuien, int casillas,
                                   HashSet<int> pisables, HashSet<int> ocupadas)
+            => Push(centro, deQuienLanza, aQuien, casillas, pisables, ocupadas).ToCell;
+
+        /// <summary>Contra qué se paró un empujón.</summary>
+        /// <remarks>
+        /// La distinción NO es cosmética: chocar contra otro combatiente hace daño A LOS DOS —el
+        /// empujado entero y la pared la mitad—, y chocar contra el borde o contra un muro se lo
+        /// come sólo el empujado. Medido en las 401 capturas: 9 parejas de dos mensajes de daño de
+        /// empuje seguidos, y las 9 con el segundo valiendo exactamente la mitad del primero.
+        /// </remarks>
+        public enum PushStop
         {
-            if (casillas == 0 || !MapGeometry.IsValid(aQuien)) return aQuien;
+            /// <summary>Recorrió las casillas que le tocaban. No hay daño.</summary>
+            None = 0,
+
+            /// <summary>El borde de la retícula.</summary>
+            Edge,
+
+            /// <summary>Casilla que no se pisa: muro, agujero o fuera del suelo del mapa.</summary>
+            Obstacle,
+
+            /// <summary>Otro combatiente. El único caso en el que el daño va a dos.</summary>
+            Fighter,
+        }
+
+        /// <summary>Cómo acabó un empujón.</summary>
+        /// <remarks>
+        /// Lo que faltaba es <see cref="BlockedCells"/>. El daño de colisión sale de LAS CASILLAS
+        /// QUE NO SE RECORRIERON, no de las recorridas ni de las que declara el hechizo, y la
+        /// versión de antes devolvía sólo la casilla final: tiraba ese número a la basura.
+        /// </remarks>
+        public readonly struct PushResult
+        {
+            /// <summary>Dónde acabó.</summary>
+            public int ToCell { get; init; }
+
+            /// <summary>Cuántas casillas se quedaron sin recorrer. Cero si llegó entero.</summary>
+            public int BlockedCells { get; init; }
+
+            /// <summary>Contra qué se paró.</summary>
+            public PushStop Stop { get; init; }
+
+            /// <summary>La casilla del que hizo de pared, si fue un combatiente. Menos uno si no.</summary>
+            public int BlockerCell { get; init; }
+        }
+
+        /// <summary>
+        /// Adónde va a parar el que recibe un empujón (o un tirón, con las casillas en negativo), y
+        /// contra qué se para.
+        ///
+        /// La dirección sale de la casilla a la que se lanzó el hechizo —el centro de su zona—
+        /// hacia el que sale volando; si es el que está justo en esa casilla, no hay vector y
+        /// entonces manda la casilla del que lanza. Medido sobre los 76 desplazamientos de las
+        /// capturas del Ocra.
+        /// </summary>
+        public static PushResult Push(int centro, int deQuienLanza, int aQuien, int casillas,
+                                      HashSet<int> pisables, HashSet<int> ocupadas)
+        {
+            var quieto = new PushResult { ToCell = aQuien, BlockedCells = 0,
+                                          Stop = PushStop.None, BlockerCell = -1 };
+            if (casillas == 0 || !MapGeometry.IsValid(aQuien)) return quieto;
 
             int origen = (centro != aQuien && MapGeometry.IsValid(centro)) ? centro : deQuienLanza;
             var d = DireccionEntre(origen, aQuien);
-            if (d == null) return aQuien;
+            if (d == null) return quieto;
 
             int dx = d.Value.Dx, dy = d.Value.Dy;
             if (casillas < 0) { dx = -dx; dy = -dy; }   // atraer es lo mismo del revés
 
+            int pedidas = Math.Abs(casillas);
             var (x, y) = MapGeometry.CellToPoint(aQuien);
-            int donde = aQuien;
-            for (int i = 0; i < Math.Abs(casillas); i++)
+            int donde = aQuien, dadas = 0;
+            var freno = PushStop.None;
+            int paredEn = -1;
+
+            for (int i = 0; i < pedidas; i++)
             {
                 x += dx; y += dy;
                 int siguiente = MapGeometry.PointToCell(x, y);
-                if (siguiente < 0) break;
-                if (pisables != null && !pisables.Contains(siguiente)) break;
-                if (ocupadas != null && ocupadas.Contains(siguiente)) break;
+
+                if (siguiente < 0) { freno = PushStop.Edge; break; }
+                if (pisables != null && !pisables.Contains(siguiente))
+                {
+                    freno = PushStop.Obstacle; break;
+                }
+                if (ocupadas != null && ocupadas.Contains(siguiente))
+                {
+                    freno = PushStop.Fighter; paredEn = siguiente; break;
+                }
+
                 donde = siguiente;
+                dadas++;
             }
-            return donde;
+
+            return new PushResult
+            {
+                ToCell = donde,
+                BlockedCells = pedidas - dadas,
+                Stop = freno,
+                BlockerCell = paredEn,
+            };
         }
     }
 }

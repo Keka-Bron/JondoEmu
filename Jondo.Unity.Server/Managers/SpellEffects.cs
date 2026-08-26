@@ -21,6 +21,20 @@ namespace Jondo.Unity.Launcher.Managers
         public int DiceNum { get; init; }
         public int DiceSide { get; init; }
         public int Duration { get; init; }
+
+        /// <summary>
+        /// El RETARDO en turnos: el efecto no arranca al lanzarlo, sino tantas rondas después.
+        ///
+        /// Esta clave del catálogo no se leía en ninguna parte del emulador, y por eso la Flecha
+        /// Castigadora estaba rota: sus efectos retardados se aplicaban en el acto y se caían a la
+        /// ronda siguiente, así que como el hechizo sólo se puede lanzar una vez por turno, el
+        /// bono nacía y moría dentro del mismo turno y no servía absolutamente de nada.
+        ///
+        /// Medido contra hechizos cuyo texto lo dice: Precipitación lleva delay 1 —«en el turno
+        /// siguiente»— y Palabra Secreta delay 2 —«dentro de 2 turnos»—.
+        /// </summary>
+        public int Delay { get; init; }
+
         public int Element { get; init; }
 
         /// <summary>Si se puede disipar. Va al cliente restándole uno, que es como se midió.</summary>
@@ -175,6 +189,7 @@ namespace Jondo.Unity.Launcher.Managers
                         DiceNum = Entero(e, "diceNum"),
                         DiceSide = Entero(e, "diceSide"),
                         Duration = Entero(e, "duration"),
+                        Delay = Entero(e, "delay"),
                         Dispellable = Entero(e, "dispellable"),
                         Element = e.TryGetProperty("effectElement", out var el) && el.TryGetInt32(out int v) ? v : -1,
                         Triggers = Texto(e, "triggers", "I"),

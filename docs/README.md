@@ -76,6 +76,12 @@ and where the independent process and socket limits are enforced.
 *Go there* when changing the team UI, the launch arguments, account-token resolution or the path
 from a launcher row to its game socket.
 
+**`remote-server.md`** — Running the server on another machine.
+How `JONDO_PUBLIC_BIND` opens all server services consistently, how the launcher's managed loopback
+relay bridges JondoFix to the configured host, which ports are involved and what the relay does not
+provide in terms of transport security.
+*Go there* when moving the server to a LAN host or VPS.
+
 **`data.md`** — Where each number comes from.
 The **27** files in `datos/` (22 json, 4 bin and `world.zip`), the **31** tables in
 `bases/world.db`, and which of the **22** Python scripts in `tools/` builds each one. Most come out
@@ -89,6 +95,26 @@ came from before trusting it.
 The exact syntax and behavior of `.item` and `.itemset`, including role checks, template and set
 data sources, maximum factory effects, persistence, inventory updates and partial-set failures.
 *Go there* when giving an item by template id, creating a complete set or diagnosing a rejected id.
+
+**`live-character-admin.md`** — Live character administration over the local control API.
+The authenticated `POST /api/personaje` route, its administrator-role check, accepted base-stat and
+kamas fields, session serialization, persistence, immediate client refresh and error responses.
+*Go there* when building an administration tool that must update an online character without a
+restart or reconnect.
+**`command-localization.md`** — Spanish, English and French command replies.
+How the launch language crosses the single-use session ticket, why it belongs to `SessionState`,
+which replies are translated and how catalogue completeness is guarded at startup.
+*Go there* when adding a command response or another server-side player message.
+
+**`unknown-packets.md`** — What the client sends that no handler claims.
+Why it is grouped by message shape rather than by opcode, the measured field-number ceiling that
+keeps a byte blob from posing as a structure, and the `.packets` command.
+*Go there* before hunting for a missing feature: the list says where to look.
+
+**`jondo-coin.md`** — The server's own currency.
+Which Ankama item it reuses and why, how much each monster drops, how the client is made to call it
+"Jondo Coin", and how to point an NPC shop at it so it charges coins instead of kamas.
+*Go there* when changing the drop rate, adding a shop that charges in coins, or renaming an item.
 
 **`role.md`** — The account-role scale and its migration.
 The corrected Giny-compatible roles 1 through 5, why the former 1-to-4 definition was ambiguous,

@@ -41,7 +41,30 @@ namespace Jondo.Unity.Launcher
 
             try
             {
-                await AsegurarQueHayServidor();
+                if (!UI.LauncherPreferences.ServerIsLocal)
+                {
+                    try
+                    {
+                        Network.RemoteRelay.Start(UI.LauncherPreferences.ServerHost);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.Forms.MessageBox.Show(
+                            UI.LauncherPreferences.Textos.GenericError + "\n\n" + ex.Message,
+                            "Jondo",
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    Console.WriteLine($"[Lanzador] Relé local activo hacia " +
+                                      $"{UI.LauncherPreferences.ServerHost}.");
+                }
+
+                // Only when the server is this machine's. In remote mode the relay is already
+                // listening on 5555, 6337, 8888 and 15881, so starting a local server here has
+                // the two of them fighting for the same four ports: whichever binds second fails,
+                // and which one that is depends on timing.
+                if (UI.LauncherPreferences.ServerIsLocal) await AsegurarQueHayServidor();
 
                 UI.LauncherWindow.OpenOnDedicatedThread();
                 await _cerrada.Task;
@@ -49,6 +72,7 @@ namespace Jondo.Unity.Launcher
             }
             finally
             {
+                Network.RemoteRelay.Stop();
                 Contract.SoltarElSitio();
             }
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
@@ -104,6 +105,11 @@ namespace Jondo.Unity.Launcher.Managers
             {
                 while (reader.Read())
                 {
+                    // Los vendedores que otro ha absorbido no se ponen en el mapa: su catálogo ya
+                    // está en el que se queda, y dejarlos ahí sería el mismo escaparate dos veces
+                    // en dos casillas contiguas.
+                    if (Vendors.IsAbsorbed(reader.GetInt32(1))) continue;
+
                     long mapId = reader.GetInt64(0);
                     if (!_byMap.TryGetValue(mapId, out var here))
                     {
@@ -111,12 +117,22 @@ namespace Jondo.Unity.Launcher.Managers
                         _byMap[mapId] = here;
                     }
 
+                    // Donde lo pone Jondo manda sobre lo que diga la tabla.
+                    //
+                    // La colocacion de NpcSpawns se genero para 52 vendedores en bloques
+                    // contiguos de cinco por familia, y al juntarlos por categoria dejaron de
+                    // sembrarse 29 sin recalcular nada: de cada bloque quedaba el primero y
+                    // cuatro huecos seguidos detras. Las casillas buenas estan en
+                    // datos/vendedores_jondo.json, que si se versiona.
+                    int npcId = reader.GetInt32(1);
+                    var sitio = Vendors.PlacementOf(npcId);
+
                     var spawn = new Spawn
                     {
                         MapId = mapId,
-                        NpcId = reader.GetInt32(1),
-                        Cell = reader.GetInt32(2),
-                        Orientation = reader.GetInt32(3),
+                        NpcId = npcId,
+                        Cell = sitio?.Cell ?? reader.GetInt32(2),
+                        Orientation = sitio?.Orientation ?? reader.GetInt32(3),
                         ContextualId = ActorIds.NpcDelMapa(here.Count),
                         RawLook = reader.IsDBNull(4) ? "" : reader.GetString(4),
                         BoneId = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
@@ -129,6 +145,11 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             // Sólo las plantillas que hacen falta: son 6.468 en la base y aquí se usan unas pocas.
+            // Los del mundo se siembran AQUÍ, antes de recoger las plantillas: si fueran después
+            // se quedarían sin aspecto, porque lo que se lee de NpcTemplates es sólo lo que hace
+            // falta para los que ya están puestos.
+            SembrarLosDelMundo();
+
             var wanted = new HashSet<int>();
             foreach (var here in _byMap.Values)
             {
@@ -170,6 +191,109 @@ namespace Jondo.Unity.Launcher.Managers
         }
 
         /// <summary>Los mapas que tienen algún NPC puesto.</summary>
+        /// <summary>
+        /// Los NPCs del mundo, con la casilla y la orientación que tenían en el servidor de Ankama.
+        ///
+        /// No están colocados a ojo. Cada vez que el jugador entraba en un mapa, el servidor real
+        /// le declaraba en el jss los NPCs que había; barriendo las 305 capturas salen 422 en 202
+        /// mapas, de 327 plantillas distintas, y esto es ese barrido tal cual.
+        ///
+        /// El aspecto no viene en el fichero porque sale de la plantilla —las 327 tienen Look— y
+        /// el diálogo tampoco: 246 de las 327 traen uno escrito en NpcTemplates y el manejador de
+        /// NPCs ya lo sabe leer. Las otras 81 se quedan calladas.
+        ///
+        /// NO se comprueba que la casilla sea andable, y es a propósito: un NPC puede estar de pie
+        /// sobre una casilla que el jugador no pisa, y de hecho sólo 151 de las 422 lo son. Lo que
+        /// manda es la captura.
+        ///
+        /// Si un mapa ya tenía NPCs sembrados de NpcSpawns —el del zaap de Amakna, con nuestros
+        /// vendedores— se deja como está y no se le añade nada. En las capturas ese mapa no tiene
+        /// ni un NPC, así que hoy no se pisa nada, pero la regla vale para el día que sí.
+        /// </summary>
+        /// <summary>
+        /// Seeds the NPCs that Ankama places around the world, through the content layers.
+        /// </summary>
+        /// <remarks>
+        /// This used to read datos/npcs_reales.json straight off the disk. It now goes through
+        /// NpcSpawnContent, which merges that file — the measured layer, 422 placements read off
+        /// the captures — with content/npcs/spawns.json, the authored one. Same placements, plus
+        /// whatever a person has decided on top, and every row remembers which of the two it came
+        /// from.
+        ///
+        /// Nothing else changes: the map is still seeded before the templates are loaded, so each
+        /// spawn inherits its look further down.
+        /// </remarks>
+        private static void SembrarLosDelMundo()
+        {
+            var spawns = Jondo.Unity.World.Content.NpcSpawnContent.Load(
+                Paths.WorldNpcsJson,
+                Paths.ContentFile(Jondo.Unity.World.Content.NpcSpawnContent.AuthoredFile),
+                Console.WriteLine);
+
+            if (spawns.Count == 0)
+            {
+                Console.WriteLine("[NPCs] No world placements at all: neither the measured file " +
+                                  "nor the authored one had any.");
+                return;
+            }
+
+            // Maps that already carry NPCs of ours are left alone. Today that is only the Amakna
+            // zaap map, with the vendors; the captures put no NPC there, so nothing is overwritten,
+            // but the rule holds for the day one is.
+            var nuestros = new HashSet<long>(_byMap.Keys);
+
+            int puestos = 0, saltados = 0, absorbidos = 0;
+            try
+            {
+                foreach (var entrada in spawns.Values)
+                {
+                    long mapId = entrada.MapId;
+                    if (nuestros.Contains(mapId)) { saltados++; continue; }
+
+                    // Un vendedor absorbido tampoco se siembra AQUI, no solo en NpcSpawns.
+                    //
+                    // Los mapas de vendedores del servidor de torneos de Ankama estan en las
+                    // capturas -de ahi salio el catalogo- asi que los 29 absorbidos volvian a
+                    // aparecer por esta puerta. Y con la tienda vacia, porque su catalogo se lo
+                    // quedo el que los absorbio: al abrirlos el servidor dice «tiene accion de
+                    // tienda pero no vende nada» y al jugador no le sale nada.
+                    int quien = entrada.NpcId;
+                    if (Vendors.IsAbsorbed(quien)) { absorbidos++; continue; }
+
+                    if (!_byMap.TryGetValue(mapId, out var aqui))
+                    {
+                        aqui = new List<Spawn>();
+                        _byMap[mapId] = aqui;
+                    }
+
+                    // Sin aspecto: se lo pone el paso de más abajo, el que hereda el Look de la
+                    // plantilla. Por eso esto tiene que correr antes de cargar las plantillas.
+                    aqui.Add(new Spawn
+                    {
+                        MapId = mapId,
+                        NpcId = quien,
+                        Cell = entrada.Cell,
+                        Orientation = entrada.Orientation,
+                        ContextualId = ActorIds.NpcDelMapa(aqui.Count),
+                    });
+                    puestos++;
+                }
+
+                Count += puestos;
+                var censo = spawns.Census();
+                Console.WriteLine($"[NPCs] {puestos} del mundo, donde los tenía Ankama" +
+                                  (saltados > 0 ? $", {saltados} en un mapa nuestro" : "") +
+                                  (absorbidos > 0 ? $", {absorbidos} absorbidos por otro vendedor" : "") + ".");
+                Console.WriteLine($"[Content] npc spawns: {censo[Jondo.Unity.World.Content.ContentLayer.Measured]} measured, " +
+                                  $"{censo[Jondo.Unity.World.Content.ContentLayer.Authored]} authored, " +
+                                  $"{spawns.ErasedCount} erased by hand.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NPCs] World placements could not be seeded: {ex.Message}");
+            }
+        }
+
         public static IEnumerable<long> Maps => _byMap.Keys;
 
         public static IReadOnlyList<Spawn> Of(long mapId)
@@ -202,7 +326,7 @@ namespace Jondo.Unity.Launcher.Managers
             string[] parts = look.Substring(start + 1, end - start - 1).Split('|');
             spawn.Bones = parts.Length > 0 ? First(parts[0]) : 0;
             spawn.Skins = parts.Length > 1 ? Numbers(parts[1]) : Array.Empty<long>();
-            spawn.Colors = parts.Length > 2 ? Numbers(parts[2]) : Array.Empty<long>();
+            spawn.Colors = parts.Length > 2 ? Colores(parts[2]) : Array.Empty<long>();
             spawn.Scales = parts.Length > 3 ? Numbers(parts[3]) : Array.Empty<long>();
         }
 
@@ -210,6 +334,70 @@ namespace Jondo.Unity.Launcher.Managers
         {
             var numbers = Numbers(part);
             return numbers.Length > 0 ? numbers[0] : 0;
+        }
+
+        /// <summary>
+        /// Los colores de un aspecto, en la forma que espera el cliente.
+        ///
+        /// La sección de color de un look NO es una lista de números: son pares
+        /// «índice=valor», y el valor viene en decimal o en hexadecimal con almohadilla. El
+        /// Bontariano enfadado es {1|90,2140|2=16305204,3=3772345,4=14024699,6=#8F5203|53}.
+        ///
+        /// Se leía con Numbers(), que espera números sueltos separados por comas: no parseaba ni
+        /// uno, no llegaba ni un color, y el cliente pintaba el aspecto sin tintes, o sea GRIS.
+        /// Medido sobre los 6.467 NPCs del catálogo: 2.045 llevan colores y LOS 2.045 usan la
+        /// forma de pares. Ni uno usa una lista plana, así que estaban saliendo grises todos.
+        ///
+        /// Por el cable el color va con su índice metido en el byte alto —(índice &lt;&lt; 24) | rgb—,
+        /// que es la misma cuenta que hace BreedLookTable.IndexColors para el personaje del
+        /// jugador. La diferencia está en de dónde sale el índice: allí es la posición en la
+        /// lista, y aquí viene ESCRITO y no es correlativo. El Bontariano usa el 2, el 3, el 4 y
+        /// el 6, y se salta el 1 y el 5; numerándolos por posición, sus tintes irían a las
+        /// ranuras equivocadas.
+        /// </summary>
+        private static long[] Colores(string parte)
+        {
+            if (string.IsNullOrWhiteSpace(parte)) return Array.Empty<long>();
+
+            var fuera = new List<long>();
+            int posicion = 0;
+            foreach (string trozo in parte.Split(','))
+            {
+                string p = trozo.Trim();
+                if (p.Length == 0) continue;
+                posicion++;
+
+                // Sin el «índice=» delante se numera por posición, que es lo que hace el aspecto
+                // del jugador. Hoy no lo usa ni un NPC; queda por si algún día cambia el dato.
+                long indice = posicion;
+                string valor = p;
+
+                int igual = p.IndexOf('=');
+                if (igual > 0)
+                {
+                    if (long.TryParse(p.Substring(0, igual).Trim(), out long suyo)) indice = suyo;
+                    valor = p.Substring(igual + 1).Trim();
+                }
+
+                if (!LeerColor(valor, out long rgb)) continue;
+                fuera.Add((indice << 24) | (rgb & 0xFFFFFF));
+            }
+            return fuera.ToArray();
+        }
+
+        /// <summary>Un color, en decimal o en hexadecimal con almohadilla delante.</summary>
+        private static bool LeerColor(string texto, out long rgb)
+        {
+            rgb = 0;
+            if (string.IsNullOrEmpty(texto)) return false;
+
+            if (texto[0] == '#')
+            {
+                return long.TryParse(texto.Substring(1),
+                                     System.Globalization.NumberStyles.HexNumber,
+                                     System.Globalization.CultureInfo.InvariantCulture, out rgb);
+            }
+            return long.TryParse(texto, out rgb);
         }
 
         private static long[] Numbers(string part)

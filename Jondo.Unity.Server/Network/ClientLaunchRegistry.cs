@@ -84,7 +84,7 @@ namespace Jondo.Unity.Launcher.Network
                     AccountId = accountId,
                     Hash = hash,
                     LauncherToken = launcherToken ?? "",
-                    Language = string.IsNullOrWhiteSpace(language) ? "fr" : language,
+                    Language = string.IsNullOrWhiteSpace(language) ? "es" : language,
                     Ip = deDonde,
                     CreatedAtUtc = DateTime.UtcNow
                 };
@@ -132,6 +132,18 @@ namespace Jondo.Unity.Launcher.Network
             long suya = DatabaseManager.GetAccountIdByLauncherToken(token);
             return suya != 0 ? suya : DatabaseManager.GetAccountIdByToken(token);
         }
+
+        /// <summary>
+        /// The launch this account is running, if it still has one.
+        /// </summary>
+        /// <remarks>
+        /// Added for the language: the launcher is the only party that knows which --langCode the
+        /// client was started with, and it puts it here. Everything downstream that wants to answer
+        /// a player in their own language has to come through this, because the authentication
+        /// request does not carry it.
+        /// </remarks>
+        public static bool TryGetByAccount(long accountId, out Launch? launch)
+            => ByAccount.TryGetValue(accountId, out launch);
 
         public static bool IsActive(long accountId) => ByAccount.ContainsKey(accountId);
         public static int ActiveCount => ByAccount.Count;

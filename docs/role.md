@@ -12,8 +12,14 @@ in `Accounts.Role`, and higher roles inherit the permissions of every lower role
 | 5 | `Roles.Administrador` | Administrator; server administration and commands reserved to the highest role. |
 
 Authorization is cumulative and is checked as `accountRole >= requiredRole`. The authoritative
-check always runs on the server. Hiding or showing an administration control in the launcher or
-client is only a convenience and is not a security boundary.
+check always runs on the server, against the database, on every command.
+
+Hiding or showing an administration control in the launcher or client is only a convenience and is
+**not** a security boundary. Concretely: the launcher passes the account role to the client through
+the `JONDO_ACCOUNT_ROLE` environment variable, and JondoFix reads it to decide whether to show item
+ids and the unfiltered catalogue. Anyone starting `Dofus.exe` by hand can set that variable to 5.
+That is acceptable precisely because it governs nothing but display — no client-side value is ever
+trusted for a decision the server makes.
 
 ## Why the former 1-to-4 scale was wrong
 
@@ -38,15 +44,28 @@ role also made direct comparisons with Giny configuration unreliable.
 ## Correction and database migration
 
 `Roles.cs` now defines all five values. Game Master moved from 3 to 4, Administrator moved from 4
-to 5, and role 3 is reserved for Game Master Padawan.
+to 5, and role 3 is reserved for Game Master Padawan. Both moved values are migrated; see below.
 
-Existing databases require special handling because their old role 4 rows represented
-administrators. At server startup, migration `roles-giny-1-to-5` changes those existing rows from
-4 to `Roles.Administrador` (5) exactly once and records completion in `JondoMigrations`.
+Existing databases require special handling because the renumbering changes what **two** values
+mean, not one. Their old role 4 rows represented administrators, and their old role 3 rows
+represented Game Masters. At server startup, migration `roles-giny-1-to-5` moves both, exactly
+once, and records completion in `JondoMigrations`:
 
-The one-time marker is essential. Repeating `UPDATE Accounts SET Role = 5 WHERE Role = 4` at every
-startup would incorrectly promote every Game Master created after the correction. Once the
-migration has run, role 4 remains available for its correct meaning.
+```sql
+UPDATE Accounts SET Role = 5 WHERE Role = 4;   -- administrators stay administrators
+UPDATE Accounts SET Role = 4 WHERE Role = 3;   -- game masters stay game masters
+```
+
+**The order matters.** Running `3 -> 4` first would feed those rows straight into `4 -> 5` and
+promote every existing Game Master to Administrator. The 4s move up before the 3s do.
+
+Migrating only `4 -> 5` would be worse than doing nothing: every existing Game Master would keep
+the value 3, which now means Game Master Padawan, and would silently lose `.kamas`, `.level`,
+`.size` and `.shop` with no error and no log line.
+
+The one-time marker is equally essential. Repeating `UPDATE Accounts SET Role = 5 WHERE Role = 4`
+at every startup would incorrectly promote every Game Master created after the correction. Once
+the migration has run, role 4 remains available for its correct meaning.
 
 Configured server-owner accounts are also promoted through the `Roles.Administrador` constant,
 not a literal number. This keeps that rule synchronized with the central role definition.

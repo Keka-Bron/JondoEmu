@@ -647,18 +647,49 @@ namespace Jondo.Unity.Launcher.Handlers
         /// sale de lo que tiene la ficha mas lo que le hayan puesto encima, que es exactamente la
         /// misma cuenta que hace la ficha completa del principio del combate.
         /// </summary>
-        private static long ValorDeFicha(Fighter ficha, int caracteristica, int ronda)
+        /// <summary>Una característica lista para meterla en un jxw, con sus tres huecos.</summary>
+        private static (int Characteristic, long Base, long Gear, long Buff) Refresco(
+            Fighter ficha, int caracteristica, int ronda)
         {
-            if (caracteristica == ActionPointsCharacteristic) return ficha.CurrentAP;
-            if (caracteristica == MovementPointsCharacteristic) return ficha.CurrentMP;
+            var (suBase, suEquipo, suEmbrujo) = HuecosDeFicha(ficha, caracteristica, ronda);
+            return (caracteristica, suBase, suEquipo, suEmbrujo);
+        }
 
-            int suyo = caracteristica switch
+        private static (long Base, long Equipo, long Embrujo) HuecosDeFicha(Fighter ficha,
+                                                                            int caracteristica,
+                                                                            int ronda)
+        {
+            // Los puntos son lo que le queda de jugar este turno, y van en su molde propio.
+            if (caracteristica == ActionPointsCharacteristic) return (ficha.CurrentAP, 0, 0);
+            if (caracteristica == MovementPointsCharacteristic) return (ficha.CurrentMP, 0, 0);
+
+            // AQUÍ ESTABA EL AGUJERO DE LA PREVISUALIZACIÓN.
+            //
+            // Esto era una lista escrita A MANO —primero dos casos, luego trece— en paralelo a la
+            // ficha completa que se manda al empezar el combate. Y el problema nunca fue cuáles
+            // faltaban, sino que fuese una lista aparte: la ficha llena tiene cincuenta y tres
+            // entradas y la copia siempre se quedaba corta. Lo que no estuviera en ella caía en
+            // ficha.Otra(), que devuelve cero, y como el jxw manda el valor ABSOLUTO, el cero
+            // pisaba en el cliente el número bueno que ya le había llegado.
+            //
+            // Lo que costaba, medido sobre nuestro propio registro de tráfico: el multiplicador de
+            // daño 107 sale a 100 en la ficha inicial, y cincuenta y seis milisegundos después un
+            // jxw lo pisaba con 10 —el efecto 1171 le suma diez y aquí la base salía cero—. El
+            // cliente estima el golpe MULTIPLICANDO por él, así que la previsualización salía
+            // dividida por diez. Y lo mismo con los otros diez multiplicadores y con los daños por
+            // elemento 88 a 92, que la última tanda tampoco cubría.
+            //
+            // Ahora el valor se busca en LA MISMA ficha que se mandó, así que las dos no pueden
+            // volver a separarse: lo que se añada allí queda cubierto aquí sin tocar nada.
+            long baseDelPersonaje = 0, delEquipo = 0;
+            foreach (var (cual, suBase, suEquipo) in FullSheetOf(ficha, conTraza: false))
             {
-                19 => ficha.Range,
-                25 => ficha.Power,
-                _ => ficha.Otra(caracteristica),
-            };
-            return ConBonos(ficha, caracteristica, suyo, ronda);
+                if (cual != caracteristica) continue;
+                baseDelPersonaje = suBase;
+                delEquipo = suEquipo;
+                break;
+            }
+            return (baseDelPersonaje, delEquipo, ficha.Buffs.De(caracteristica, ronda));
         }
 
         private static int ConBonos(Fighter quien, int caracteristica, int loQueYaTiene, int ronda)
@@ -785,7 +816,13 @@ namespace Jondo.Unity.Launcher.Handlers
         /// de la colocación el jugador lleva sus valores puestos y sólo el monstruo va con los
         /// huecos vacíos.
         /// </summary>
-        private static List<(int Characteristic, long Base, long Gear)> FullSheetOf(Fighter fighter)
+        /// <param name="conTraza">
+        /// El renglón [FICHA] del registro. Va apagado cuando quien pregunta es ValorDeFicha, que
+        /// llama a esto una vez por cada característica que mueve un embrujo: con la traza puesta
+        /// llenaba el registro de copias de la misma ficha varias veces por turno.
+        /// </param>
+        private static List<(int Characteristic, long Base, long Gear)> FullSheetOf(Fighter fighter,
+                                                                                   bool conTraza = true)
         {
             var ficha = new List<(int, long, long)>
             {
@@ -810,7 +847,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 (85, 0, fighter.Otra(85)),
                 (87, 0, fighter.CriticalDamage),
                 (101, 0, fighter.Otra(101)),
-                (27, 0, fighter.Otra(27)), (28, 0, fighter.Otra(28)), (93, 0, 0),
+                (27, 0, fighter.Otra(27)), (28, 0, fighter.Otra(28)), (93, 3, 0),
                 (79, 0, fighter.Otra(79)), (78, 0, fighter.Otra(78)),
 
                 // La vida ENTERA, también la del jugador.
@@ -836,7 +873,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 (18, 0, fighter.CriticalBonus),
                 (19, 0, fighter.Range),
                 (25, 0, fighter.Power),
-                (26, 0, fighter.Otra(26)), (50, 0, fighter.Otra(50)), (75, 0, fighter.Otra(75)),
+                (26, 0, fighter.Otra(26)), (50, 0, fighter.Otra(50)), (75, 10, fighter.Otra(75)),
                 // Aquí iba la 84, el daño de empuje. El servidor real NO LA MANDA: su ficha
                 // tiene 53 entradas y la 84 no está en ninguna, mientras que la 85 —la
                 // resistencia al empuje— sí. Y la metíamos justo en la posición 33, que es donde
@@ -868,7 +905,7 @@ namespace Jondo.Unity.Launcher.Handlers
             //
             // Sólo la del personaje que maneja el jugador: la de los monstruos llenaría el
             // registro y no es la que se está midiendo.
-            if (!fighter.IsMonster)
+            if (conTraza && !fighter.IsMonster)
             {
                 var interesan = new[] { 10, 11, 13, 14, 15, 16, 18, 19, 25, 84, 88, 89, 90, 91, 92 };
                 var pintado = new List<string>();
@@ -1732,13 +1769,57 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 foreach (var (quien, caido) in caducados)
                 {
+                    // Si el embrujo tocaba el ALCANCE de un hechizo, primero se le retira el
+                    // modificador. El hnk es eso: la retirada. No es la declaración que acompaña
+                    // al hnd, que es como se implementó primero y por lo que dar alcance no servía
+                    // de nada —se ponía y se quitaba en la misma ráfaga—. Medido con reloj sobre
+                    // «ocra-disparos lejanos»: al lanzar van 68 hnd y CERO hnk; al caducar van 68
+                    // hnk y CERO hnd. Y en «ocra-tiro de repliegue» los 60 hnk viven solos, justo
+                    // delante de los 61 jya.
+                    if (caido.HechizoAfectado != 0 &&
+                        (caido.Sobre == Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo ||
+                         caido.Sobre == Jondo.Unity.World.Fights.SpellAspect.AlcanceMaximo))
+                    {
+                        int modificador = caido.Sobre == Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo
+                            ? Network.FightProtocol.SpellMinRange
+                            : Network.FightProtocol.SpellMaxRange;
+                        await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
+                            Network.FightProtocol.BuildSpellModifierDeclared(
+                                quien.Id, modificador, caido.HechizoAfectado)));
+                    }
+
                     await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jya,
                         Network.FightProtocol.BuildBuffGone(quien.Id, caido.Numero)));
 
-                    // Y el aviso gemelo: el servidor real manda además un jwe con el número de
-                    // embrujo que se cae y de quién era.
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
-                        Network.FightProtocol.BuildBuffExpired(quien.Id, caido.Numero)));
+                    // Y AQUÍ ESTABA EL AGUJERO: se borraba la fila del panel y no se devolvía la
+                    // característica.
+                    //
+                    // El motor caduca el embrujo bien —Buffs.Barrer lo saca y ValorDeFicha ya
+                    // devuelve el número bueno— pero ese número no salía por el cable, así que el
+                    // cliente se quedaba con el último que recibió: +250 de potencia y -3 de
+                    // alcance clavados, con el panel de embrujos vacío. Y sobrevivía a los
+                    // combates, porque nadie se lo corregía nunca.
+                    //
+                    // El servidor real manda la ficha detrás de CADA jya. Medido en
+                    // «ocra-tiros potentes», tramas #205 a #222, con este mismo hechizo:
+                    //     jya 289 -> jxw característica 19 (alcance) de vuelta a cero
+                    //     jya 290 -> jxw característica 25 (potencia)
+                    //     jya 291 -> jxw característica 84 (daño de empuje)
+                    //     jya 292 -> jxw característica 18 (% de crítico)
+                    // El patrón se repite en 787 fichas restauradas de las carpetas Ocra y Combate.
+                    //
+                    // Los PA y los PM no van por aquí: ésos se devuelven como puntos, que es lo
+                    // que hace GivePointsBackAsync justo debajo.
+                    if (caido.Caracteristica != 0 &&
+                        caido.Caracteristica != ActionPointsCharacteristic &&
+                        caido.Caracteristica != MovementPointsCharacteristic)
+                    {
+                        await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
+                            Network.FightProtocol.BuildFighterSheet(
+                                quien.Id,
+                                new[] { Refresco(quien, caido.Caracteristica, fight.RoundNumber) },
+                                quien.Id == GameState.CharacterId)));
+                    }
                 }
 
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
@@ -1835,7 +1916,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
                     Network.FightProtocol.BuildFighterSheet(fighter.Id, new[]
                     {
-                        (characteristic, value),
+                        (characteristic, value, 0L, 0L),
                     }, fighter.Id == GameState.CharacterId)));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id,
@@ -1920,7 +2001,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
                 Network.FightProtocol.BuildFighterSheet(walker.Id, new[]
                 {
-                    (MovementPointsCharacteristic, (long)walker.CurrentMP),
+                    (MovementPointsCharacteristic, (long)walker.CurrentMP, 0L, 0L),
                 }, walker.Id == GameState.CharacterId)));
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
@@ -2082,7 +2163,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // crítico propio, y el Ocra lleva 47; el cliente pinta 57% en su tooltip, que es
             // exactamente la suma. Antes esto estaba clavado a "false" y no salía un crítico ni
             // por casualidad.
-            int probabilidadCritico = limites.CriticoPropio + ConBonos(caster, CriticoCaracteristica, 0, fight.RoundNumber);
+            // El critico del EQUIPO se perdia entero: se pasaba un cero como base, asi que solo
+            // contaba el del hechizo y el de los embrujos. El registro lo decia en voz alta:
+            // «20 % = 20 del hechizo + 0 del personaje», con un personaje que lleva 16 puesto. No
+            // hay riesgo de contarlo dos veces: CriticalBonus es solo el equipo y Buffs.De(18)
+            // solo los embrujos.
+            int probabilidadCritico = limites.CriticoPropio +
+                ConBonos(caster, CriticoCaracteristica, caster.CriticalBonus, fight.RoundNumber);
             bool critico = TirarCritico(probabilidadCritico);
             if (critico)
             {
@@ -2113,7 +2200,10 @@ namespace Jondo.Unity.Launcher.Handlers
                         caster.Id, aQuien, cell, spell, spellLevel, critico,
                         sobreEseObjetivo: limites.PorObjetivo > 0 ? sobreEse + 1 : 0,
                         esteTurno: limites.PorTurno > 0 ? esteTurno + 1 : 0,
-                        intervalo: limites.Intervalo),
+                        intervalo: limites.Intervalo,
+                        // Sólo cuando el golpe es del arma. Un hechizo lleva el f10 a cero, igual
+                        // que el puñetazo: lo que el cliente mira para poner el nombre es esto.
+                        arma: spell == 0 ? ArmaEquipada(caster) : 0),
                     Network.FightProtocol.CastDetail)));
 
             // La ficha va en su propia secuencia, como en la captura, no suelta en medio.
@@ -2123,7 +2213,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
                 Network.FightProtocol.BuildFighterSheet(caster.Id, new[]
                 {
-                    (ActionPointsCharacteristic, (long)caster.CurrentAP),
+                    (ActionPointsCharacteristic, (long)caster.CurrentAP, 0L, 0L),
                 }, caster.Id == GameState.CharacterId)));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), caster.Id,
@@ -2214,7 +2304,8 @@ namespace Jondo.Unity.Launcher.Handlers
                 WaterResPct = receta.ResistenciaAgua,
                 AirResPct = receta.ResistenciaAire,
             };
-            invocado.MaxHP = Managers.Summons.VidaDelInvocado(receta.Vida, quienInvoca.Level);
+            invocado.MaxHP = Managers.Summons.VidaDelInvocado(receta.Vida, quienInvoca.Level,
+                                                              receta.VidaFija);
             invocado.CurrentHP = invocado.MaxHP;
 
             int vive = Managers.Summons.RondasQueVive(plantilla);
@@ -2635,6 +2726,17 @@ namespace Jondo.Unity.Launcher.Handlers
                             c.CasillaDesde, c.CasillaHasta)));
                     Program.LogDebug($"[Combate] El hechizo {hechizo} mueve a {c.Sobre.Id} " +
                                      $"de la casilla {c.CasillaDesde} a la {c.CasillaHasta}.");
+
+                    await DanoDeColisionAsync(stream, fight, quienLanza, c);
+                    continue;
+                }
+
+                // Y el que NO se ha movido ni una casilla pero se ha estampado igual. El motor
+                // devuelve una consecuencia sin desplazamiento, y el servidor real hace lo mismo:
+                // en ese caso no manda el mensaje de movimiento, sólo el del golpe.
+                if (c.CollisionDamage > 0)
+                {
+                    await DanoDeColisionAsync(stream, fight, quienLanza, c);
                     continue;
                 }
 
@@ -2679,12 +2781,12 @@ namespace Jondo.Unity.Launcher.Handlers
             {
                 var ficha = fight.Team0.Find(f => f.Id == quien) ?? fight.Team1.Find(f => f.Id == quien);
                 if (ficha == null) continue;
-                long valor = ValorDeFicha(ficha, caracteristica, fight.RoundNumber);
+                var refresco = Refresco(ficha, caracteristica, fight.RoundNumber);
 
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                     Network.FightProtocol.BuildSequenceStart(quien, Network.FightProtocol.SheetSequence)));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxw,
-                    Network.FightProtocol.BuildFighterSheet(quien, new[] { (caracteristica, valor) },
+                    Network.FightProtocol.BuildFighterSheet(quien, new[] { refresco },
                                                             quien == GameState.CharacterId)));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien,
@@ -2702,9 +2804,18 @@ namespace Jondo.Unity.Launcher.Handlers
         /// pero ése sólo alimenta el panel de efectos: el cliente enseñaba «Disparos Lejanos: +6
         /// de alcance máximo» y seguía iluminando las mismas casillas.
         ///
-        /// Las casillas las calcula el cliente con ESTOS dos, que van en pareja y uno por cada
-        /// hechizo tocado. En «ocra-disparos lejanos» hay 272 de cada uno, que son dos por
-        /// hechizo: el 13 con el mínimo y el 12 con el máximo.
+        /// Las casillas las calcula el cliente con el hnd, uno por hechizo tocado y modificador.
+        ///
+        /// AQUÍ SÓLO VA EL HND. La primera versión mandaba detrás la ráfaga de hnk, creyendo que
+        /// era la declaración que lo acompañaba, y por eso dar alcance no servía absolutamente de
+        /// nada: se ponía el modificador y en la misma ráfaga se le decía al cliente que lo
+        /// borrara. El hnk es la RETIRADA, y va cuando el embrujo caduca —está puesto en el bucle
+        /// de caducados de ConfirmAsync—.
+        ///
+        /// Medido con reloj sobre «ocra-disparos lejanos»: al lanzar van 68 hnd y CERO hnk; al
+        /// caducar, 68 hnk y CERO hnd, y el ciclo se repite igual cuatro veces. En
+        /// «ocra-tiro de repliegue» los 60 hnk aparecen solos, justo delante de los 61 jya, sin un
+        /// hnd cerca: el hnk vive por su cuenta.
         ///
         /// Se manda el TOTAL que tiene el hechizo ahora, no lo que acaba de sumar este embrujo:
         /// así dos embrujos sobre el mismo hechizo no se pisan, y quitar uno deja el número bueno.
@@ -2742,16 +2853,6 @@ namespace Jondo.Unity.Launcher.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnd,
                     Network.FightProtocol.BuildSpellModifier(
                         quien.Id, Network.FightProtocol.SpellMaxRange, hechizo, maximo)));
-            }
-
-            foreach (var (quien, hechizo) in tocados)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
-                    Network.FightProtocol.BuildSpellModifierDeclared(
-                        quien.Id, Network.FightProtocol.SpellMinRange, hechizo)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hnk,
-                    Network.FightProtocol.BuildSpellModifierDeclared(
-                        quien.Id, Network.FightProtocol.SpellMaxRange, hechizo)));
             }
 
             Program.LogDebug($"[ALCANCE] Anunciado el alcance de {tocados.Count} hechizo(s) " +
@@ -2916,6 +3017,23 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static readonly Random _dado = new Random();
 
+        /// <summary>
+        /// La plantilla del arma que lleva puesta, o cero si va a mano limpia.
+        ///
+        /// Es lo que el cliente lee para decir con qué has pegado. Sin esto todo golpe salía como
+        /// «Puñetazo» aunque el daño y el elemento fueran los de la espada.
+        /// </summary>
+        private static int ArmaEquipada(Fighter caster)
+        {
+            if (caster.Id != GameState.CharacterId) return 0;
+
+            // La misma casilla que mira GetEquippedWeaponAsSpell: la 1 es la mano.
+            const int CasillaDelArma = 1;
+            foreach (var pieza in GameState.GetInventoryCopy())
+                if (pieza.Position == CasillaDelArma) return pieza.ItemId;
+            return 0;
+        }
+
         /// <summary>El golpe del arma equipada, que sigue viniendo del resumen de siempre.</summary>
         private static List<(Managers.SpellEffect Efecto, int Elemento, Fighter Sobre, int Lejos)>
             GolpeDelArma(Fighter caster, Fighter target)
@@ -2924,13 +3042,38 @@ namespace Jondo.Unity.Launcher.Handlers
             var arma = DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId);
             if (arma == null || (arma.BaseDamageMin <= 0 && arma.BaseDamageMax <= 0)) return fuera;
 
+            // UN GOLPE POR LÍNEA. Antes salía uno solo, con la línea de más daño y el número de
+            // efecto a cero, así que un arma de tres líneas enseñaba una cifra en el chat y las
+            // otras dos no existían. El número de efecto importa: es lo que hace que el cliente
+            // escriba «de daños de agua» o «de robo de vida», y el cero no lo usa el servidor real
+            // en ningún sitio.
+            //
             // El arma pega a uno solo y a bocajarro, así que no hay distancia al centro que valga.
-            fuera.Add((new Managers.SpellEffect
+            // El uid de efecto tiene que ser distinto en cada línea o el dado se tiraría una vez
+            // para las tres: quien las recorre las agrupa por ese uid.
+            int cual = 0;
+            foreach (var (efecto, elemento, minimo, maximo) in arma.WeaponLines)
             {
-                EffectId = 0,
-                DiceNum = arma.BaseDamageMin,
-                DiceSide = arma.BaseDamageMax,
-            }, arma.Element, target, 0));
+                fuera.Add((new Managers.SpellEffect
+                {
+                    EffectId = efecto,
+                    EffectUid = -(++cual),
+                    DiceNum = minimo,
+                    DiceSide = maximo,
+                }, elemento, target, 0));
+            }
+
+            // Y si por lo que sea no hay líneas, se pega con lo que había: mejor un golpe que
+            // ninguno.
+            if (fuera.Count == 0)
+            {
+                fuera.Add((new Managers.SpellEffect
+                {
+                    EffectId = 0,
+                    DiceNum = arma.BaseDamageMin,
+                    DiceSide = arma.BaseDamageMax,
+                }, arma.Element, target, 0));
+            }
             return fuera;
         }
 
@@ -3124,6 +3267,79 @@ namespace Jondo.Unity.Launcher.Handlers
         }
 
         /// <summary>
+        /// El daño de haberse estampado al recibir un empujón, y el que se lleva quien hizo de
+        /// pared.
+        ///
+        /// El motor ya ha hecho la cuenta —ver la rama de empuje de EffectEngine— y aquí sólo se
+        /// cobra: se recorta por la vida que queda, se erosiona, se anuncia y se mira si alguien se
+        /// ha muerto. Es la misma puerta por la que pasa un golpe normal, a propósito: matar por
+        /// colisión tiene que anunciarse igual que matar de un flechazo.
+        ///
+        /// Van los DOS en la misma secuencia y en este orden —primero el empujado con el golpe
+        /// entero, detrás la pared con la mitad—, que es como salen las 9 parejas medidas.
+        /// </summary>
+        private static async Task DanoDeColisionAsync(NetworkStream stream, FightInstance fight,
+                                                      Fighter quienEmpuja, Managers.Outcome c)
+        {
+            if (c.CollisionDamage <= 0) return;
+
+            await UnEstampadoAsync(stream, fight, quienEmpuja, c.Sobre, c.CollisionDamage);
+
+            if (c.Blocker != null && c.CollisionDamageToBlocker > 0)
+            {
+                await UnEstampadoAsync(stream, fight, quienEmpuja, c.Blocker,
+                                       c.CollisionDamageToBlocker);
+            }
+        }
+
+        /// <summary>Un solo golpe de colisión, contra uno solo.</summary>
+        private static async Task UnEstampadoAsync(NetworkStream stream, FightInstance fight,
+                                                   Fighter quienEmpuja, Fighter quien, int dano)
+        {
+            if (quien == null || !quien.IsAlive || dano <= 0) return;
+
+            // Lo que se anuncia nunca puede pasar de la vida que le queda, igual que en un golpe
+            // normal: por encima de eso no hay vida que quitar.
+            int aplicado = Math.Min(dano, quien.CurrentHP);
+            quien.TakeDamage(aplicado);
+
+            // La erosión se calcula sobre el daño ENTERO, no sobre el recortado. Medido: en el
+            // koliseo hay un golpe de 663 anunciado como 417 —recortado por la vida— y con la
+            // erosión en 66, que es la décima parte de 663 y no de 417.
+            int porciento = quien.Otra(Fighter.CaracteristicaDeErosion) +
+                            quien.Buffs.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
+            int erosionado = quien.Erosionar(dano, porciento);
+
+            await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, quienEmpuja, -1);
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildPushDamage(quienEmpuja.Id, quien.Id, aplicado, erosionado)));
+
+            if (aplicado > 0 && quienEmpuja.TeamId != quien.TeamId) quien.LeHanPegado = true;
+
+            await RefrescarLaVidaAsync(stream, fight, quien);
+
+            Program.LogDebug($"[Combate] {quien.Id} se estampa al ser empujado: {aplicado} de daño " +
+                             $"(calculado {dano}, erosión {erosionado}); le quedan {quien.CurrentHP}.");
+
+            if (quien.LeHanPegado)
+            {
+                await ActitudesAsync(stream, fight, quien, Managers.EffectEngine.CuandoMePegan);
+            }
+
+            if (quien.IsAlive) return;
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildDeath(quienEmpuja.Id, quien.Id)));
+            Program.LogDebug($"[Combate] {quien.Id} se queda sin vida por el golpe del empujón.");
+
+            await ChallengeWatcher.DiedAsync(stream, fight, quien, false, quienEmpuja);
+            await ChallengeWatcher.AllyDiedAsync(stream, fight, quien);
+            await CaenSusInvocadosAsync(stream, fight, quien);
+            await ReenviarLaListaAsync(stream, fight);
+        }
+
+        /// <summary>
         /// Al que se muere se le caen TODAS sus invocaciones, en el acto.
         ///
         /// No es que dejen de contar para el final del combate: es que desaparecen. Una baliza no
@@ -3174,11 +3390,17 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (distance < best) { best = distance; prey = enemy; }
             }
 
-            if (prey != null && best > 1 && monster.CurrentMP > 0)
+            // A QUÉ DISTANCIA LE CONVIENE PONERSE, que no es «al lado» siempre.
+            //
+            // Antes se pegaba: allowed = Min(CurrentMP, best - 1). Y pegado no se pueden lanzar los
+            // 857 hechizos de monstruo (11,3 % del arsenal) que tienen alcance mínimo mayor que
+            // uno. El bicho gastaba los puntos de movimiento en meterse justo donde no podía hacer
+            // nada, y encima ya no le quedaban para volver a separarse.
+            int deseada = prey != null ? DistanciaQueLeConviene(monster, best) : 1;
+
+            if (prey != null && deseada != best && monster.CurrentMP > 0)
             {
-                // Un paso hacia la presa por cada punto de movimiento, sin pisarla.
-                int allowed = Math.Min(monster.CurrentMP, best - 1);
-                var walked = PathToward(fight, monster.CellId, prey.CellId, allowed);
+                var walked = PathToward(fight, monster.CellId, prey.CellId, monster.CurrentMP, deseada);
                 if (walked.Count > 1)
                 {
                     var path = walked.ConvertAll(c => (long)c);
@@ -3204,6 +3426,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
 
             // Y a pegar con lo que tenga, mientras le lleguen los puntos de acción.
+            int lanzados = 0;
             foreach (int spell in monster.SpellIds)
             {
                 if (prey == null || !prey.IsAlive) break;
@@ -3213,47 +3436,200 @@ namespace Jondo.Unity.Launcher.Handlers
 
                 var data = DatabaseManager.GetSpellCombatData(spell, monsterGrade);
                 if (data == null) continue;
-                if (data.APCost <= 0 || data.APCost > monster.CurrentAP) continue;
-                if (best < data.MinRange || best > data.MaxRange) continue;
+                if (data.APCost <= 0) continue;
 
-                monster.CurrentAP -= data.APCost;
+                // CUÁNTAS VECES SE PUEDE LANZAR. El cero quiere decir «sin límite», y entonces
+                // manda lo que dé el bolsillo. Lanzando uno solo por hechizo, que es lo que se
+                // hacía, los monstruos dejaban sin gastar 19.469 de sus 47.148 puntos de acción
+                // (41,3 %): el 72,3 % de su arsenal admite repetición.
+                int tope = data.MaxCastPerTurn > 0 ? data.MaxCastPerTurn : int.MaxValue;
 
-                // Y su identificador, para que su lanzamiento también diga QUÉ se lanza.
-                int spellLevel = data.SpellLevelId;
+                for (int vez = 0; vez < tope; vez++)
+                {
+                    if (data.APCost > monster.CurrentAP) break;
+                    if (lanzados >= TopeDeLanzamientosPorTurno) break;
+                    if (!prey.IsAlive) break;
 
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
-                    Network.FightProtocol.BuildSequenceStart(monster.Id,
-                                                             Network.FightProtocol.ActionSequence)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildAction(
-                        monster.Id, Network.FightProtocol.Cast,
-                        Network.FightProtocol.CastAt(monster.Id, prey.Id, prey.CellId, spell,
-                                                     spellLevel, critical: false),
-                        Network.FightProtocol.CastDetail)));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildAction(monster.Id,
-                                                      Network.FightProtocol.SpentActionPoints,
-                                                      Network.FightProtocol.Spent(monster.Id, data.APCost),
-                                                      Network.FightProtocol.PointsDetail)));
+                    // A QUIÉN APUNTA ESTE HECHIZO. No tiene por qué ser la presa, y apuntarlo todo
+                    // a ella es lo que hacía que un jalamutín te lanzara su curación a la cara.
+                    var objetivo = ObjetivoDe(fight, monster, spell, monsterGrade, prey, data);
+                    if (objetivo == null || !objetivo.IsAlive) break;
 
-                await HurtAsync(stream, fight, monster, spell, monsterGrade, prey, prey.CellId);
+                    // Y el alcance se mide contra el objetivo ELEGIDO, no contra la presa. Ésa era
+                    // la línea que dejaba muertos los hechizos de alcance cero.
+                    int lejos = CellDistance(monster.CellId, objetivo.CellId);
+                    if (lejos < data.MinRange || lejos > data.MaxRange) break;
 
-                // Y sus efectos, igual que cuando lanza el jugador. Esto faltaba: el turno del
-                // monstruo sólo calculaba daño, así que los malus que dejan sus hechizos —el
-                // alcance que quita el Picoteo, por ejemplo— no se aplicaban ni se anunciaban, y
-                // en el panel del jugador no aparecía nunca nada puesto por un bicho.
-                await AplicarEfectosAsync(stream, fight, monster, spell, monsterGrade, prey,
-                                          Managers.EffectEngine.AlLanzar, prey.CellId);
+                    // Y LA LINEA DE VISION, que el turno del monstruo no miraba.
+                    //
+                    // El lanzamiento del jugador si la comprueba desde siempre; aqui no, y hasta
+                    // ahora casi no se notaba porque el bicho se pegaba al lado y de al lado se ve
+                    // todo. Desde que se queda a la distancia que le conviene y repite hechizo, se
+                    // notaria: la piden 3.643 de los 8.093 pares hechizo-grado de monstruo (45,0 %),
+                    // y sin ella dispararian a traves de los muros.
+                    if (data.NeedsLineOfSight &&
+                        !MapGeometry.HasLineOfSight(monster.CellId, objetivo.CellId,
+                                                    MapManager.GetLosBlockers(fight.ArenaMapId)))
+                    {
+                        break;
+                    }
 
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
-                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
-                                                           Network.FightProtocol.ActionSequence)));
+                    monster.CurrentAP -= data.APCost;
+                    lanzados++;
+
+                    // Y su identificador, para que su lanzamiento también diga QUÉ se lanza.
+                    int spellLevel = data.SpellLevelId;
+
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
+                        Network.FightProtocol.BuildSequenceStart(monster.Id,
+                                                                 Network.FightProtocol.ActionSequence)));
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildAction(
+                            monster.Id, Network.FightProtocol.Cast,
+                            Network.FightProtocol.CastAt(monster.Id, objetivo.Id, objetivo.CellId,
+                                                         spell, spellLevel, critical: false),
+                            Network.FightProtocol.CastDetail)));
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildAction(monster.Id,
+                                                          Network.FightProtocol.SpentActionPoints,
+                                                          Network.FightProtocol.Spent(monster.Id, data.APCost),
+                                                          Network.FightProtocol.PointsDetail)));
+
+                    await HurtAsync(stream, fight, monster, spell, monsterGrade, objetivo,
+                                    objetivo.CellId);
+
+                    // Y sus efectos, igual que cuando lanza el jugador. Esto faltaba: el turno del
+                    // monstruo sólo calculaba daño, así que los malus que dejan sus hechizos —el
+                    // alcance que quita el Picoteo, por ejemplo— no se aplicaban ni se anunciaban, y
+                    // en el panel del jugador no aparecía nunca nada puesto por un bicho.
+                    await AplicarEfectosAsync(stream, fight, monster, spell, monsterGrade, objetivo,
+                                              Managers.EffectEngine.AlLanzar, objetivo.CellId);
+
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
+                        Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
+                                                               Network.FightProtocol.ActionSequence)));
+                }
             }
 
             if (await CheckFightOverAsync(stream, fight)) return;
 
             // Y cede el turno solo, que el monstruo no tiene quien pulse por él.
             await PassTurnAsync(stream);
+        }
+
+        /// <summary>
+        /// El tope de lanzamientos de un turno de monstruo.
+        ///
+        /// No es una regla del juego: es un tornillo de seguridad. Desde que se respeta el
+        /// MaxCastPerTurn, un hechizo sin límite se lanza mientras haya puntos de acción, y aunque
+        /// el coste siempre es mayor que cero —está comprobado antes— más vale que un dato raro no
+        /// pueda dejar al servidor dando vueltas dentro del turno de un pío.
+        /// </summary>
+        private const int TopeDeLanzamientosPorTurno = 20;
+
+        /// <summary>
+        /// A qué distancia de la presa le conviene ponerse al monstruo: la banda del hechizo
+        /// ofensivo más lejano que pueda pagar.
+        ///
+        /// Si ya está dentro de una banda no se mueve, que acercarse cuesta puntos. Y si está
+        /// DEMASIADO CERCA para lo que quiere lanzar, la distancia que sale es mayor que la de
+        /// ahora y el camino lo aleja: es lo que hace falta para los hechizos de alcance mínimo
+        /// grande, que pegado no se pueden lanzar.
+        /// </summary>
+        private static int DistanciaQueLeConviene(Fighter monster, int ahora)
+        {
+            int deseada = -1;
+            foreach (int spell in monster.SpellIds)
+            {
+                int grado = monster.SpellGrades.TryGetValue(spell, out int g) ? g : 1;
+                var data = DatabaseManager.GetSpellCombatData(spell, grado);
+                if (data == null || data.APCost <= 0 || data.APCost > monster.CurrentAP) continue;
+
+                // Los de alcance cero se lanzan encima de uno mismo: no piden acercarse a nada.
+                if (data.MaxRange <= 0) continue;
+                if (!EsOfensivo(spell, grado)) continue;
+
+                int cabe = Math.Min(data.MaxRange, ahora);
+                if (cabe < data.MinRange) cabe = data.MinRange;
+                if (cabe > deseada) deseada = cabe;
+            }
+
+            // Sin nada ofensivo que pagar, lo de siempre: ponerse al lado.
+            return deseada > 0 ? deseada : 1;
+        }
+
+        /// <summary>¿Este hechizo le hace algo a los de enfrente? Lo dice la máscara de sus efectos.</summary>
+        private static bool EsOfensivo(int hechizo, int grado)
+        {
+            foreach (var efecto in Managers.SpellEffects.De(hechizo, grado))
+            {
+                foreach (var trozo in (efecto.TargetMask ?? "").Split(','))
+                {
+                    if (trozo.Trim().TrimStart('*') == "A") return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// A quién apunta un hechizo de monstruo.
+        ///
+        /// Se recorría la lista de hechizos apuntándolo TODO a la presa, y de ahí salían dos cosas
+        /// que se ven jugando: que un jalamutín te lance su curación a la cara —el hechizo 2226
+        /// «Esmuto», cuyo único efecto lleva máscara «g»— y que un bicho gaste el turno en bufos
+        /// en vez de en atacar.
+        ///
+        /// La máscara la sabe leer EffectEngine.AQuien de sobra; aquí sólo hace falta saber HACIA
+        /// DÓNDE se lanza, que es cosa distinta y anterior: el anuncio que va por el cable lleva la
+        /// casilla apuntada, y el cliente pinta la animación hacia ella aunque luego el efecto no
+        /// le toque a nadie. Por eso la curación «se veía» aunque no curara.
+        /// </summary>
+        private static Fighter ObjetivoDe(FightInstance fight, Fighter monster, int hechizo,
+                                          int grado, Fighter presa,
+                                          SpellCombatData data)
+        {
+            // ALCANCE CERO: se lanza sobre uno mismo. Son 1.555 hechizos de monstruo, el 20,4 % del
+            // arsenal, y hasta ahora NO SE LANZABA NI UNO, porque el alcance se comprobaba contra la
+            // presa y la distancia a la presa nunca vale cero: el bicho no se le sube encima.
+            //
+            // Y no son autobufos: 443 de esos 1.555 llevan daño, o sea que son hechizos de ZONA
+            // centrados en quien los lanza. Ésta es la causa principal de que 1.280 monstruos de
+            // 5.134 —el 24,9 %— no le hicieran absolutamente nada al jugador teniéndolo al lado.
+            if (data.MaxRange <= 0) return monster;
+
+            bool aEnemigos = false, aLosSuyos = false, alLanzador = false;
+            foreach (var efecto in Managers.SpellEffects.De(hechizo, grado))
+            {
+                foreach (var trozo in (efecto.TargetMask ?? "").Split(','))
+                {
+                    string t = trozo.Trim().TrimStart('*');
+                    if (t == "A") aEnemigos = true;
+                    else if (t == "a" || t == "g") aLosSuyos = true;
+                    else if (t == "C") alLanzador = true;
+                }
+            }
+
+            // Si toca a los de enfrente va a la presa, aunque además toque a los suyos: el Ojo de
+            // Topo se lleva por delante a los aliados que pille dentro y aun así se lanza al enemigo.
+            if (aEnemigos) return presa;
+            if (aLosSuyos) return MasHeridoDeLosSuyos(fight, monster) ?? monster;
+            if (alLanzador) return monster;
+            return presa;
+        }
+
+        /// <summary>El de su bando al que más vida le falta, que es a quien se cura.</summary>
+        private static Fighter MasHeridoDeLosSuyos(FightInstance fight, Fighter monster)
+        {
+            var suyos = monster.TeamId == 0 ? fight.Team0 : fight.Team1;
+            Fighter peor = null;
+            int falta = 0;
+            foreach (var f in suyos)
+            {
+                if (f == null || !f.IsAlive) continue;
+                int suya = f.MaxHP - f.CurrentHP;
+                if (suya > falta) { falta = suya; peor = f; }
+            }
+            return peor;
         }
 
         /// <summary>
@@ -3280,31 +3656,67 @@ namespace Jondo.Unity.Launcher.Handlers
         ///
         /// Devuelve la ristra de casillas, empezando por la de salida.
         /// </summary>
-        private static List<int> PathToward(FightInstance fight, int from, int to, int steps)
+        /// <param name="deseada">
+        /// A qué distancia del destino hay que quedarse. Uno es «pegado», que es lo de siempre,
+        /// pero un hechizo de alcance mínimo tres quiere quedarse a tres, y entonces esto también
+        /// sirve para ALEJARSE si el bicho está demasiado cerca.
+        /// </param>
+        private static List<int> PathToward(FightInstance fight, int from, int to, int steps,
+                                            int deseada = 1)
         {
-            var path = new List<int> { from };
-            int current = from;
+            var camino = new List<int> { from };
+            if (steps <= 0) return camino;
 
-            for (int step = 0; step < steps; step++)
+            // BÚSQUEDA EN ANCHURA, y no el descenso avaro de antes.
+            //
+            // Lo de antes daba un paso a la vecina que más acortara, y si NINGUNA acortaba se
+            // paraba. Con eso, un bicho cuya única vecina buena no fuera pisable se quedaba
+            // clavado: medido en un combate real, el Jalamut Real pasó siete turnos entero en la
+            // casilla 326 sin gastar uno solo de sus 105 puntos de acción, porque la única vecina
+            // que acortaba —la 313— no es pisable en combate. La anchura rodea el obstáculo.
+            //
+            // Cuesta cuatro vecinas por casilla y tantos niveles como puntos de movimiento, o sea
+            // nada: un monstruo se mueve seis casillas en el mejor de los casos.
+            var deDonde = new Dictionary<int, int> { [from] = from };
+            var pasos = new Dictionary<int, int> { [from] = 0 };
+            var cola = new Queue<int>();
+            cola.Enqueue(from);
+
+            int mejor = from;
+            int mejorFallo = Math.Abs(CellDistance(from, to) - deseada);
+
+            while (cola.Count > 0)
             {
-                int best = current;
-                int bestDistance = CellDistance(current, to);
+                int aqui = cola.Dequeue();
+                int paso = pasos[aqui];
+                if (paso >= steps) continue;
 
-                foreach (int neighbour in Neighbours(current))
+                foreach (int vecina in Neighbours(aqui))
                 {
-                    if (neighbour == to) continue;                     // no se le pisa encima
-                    if (!PisableEnCombate(fight, neighbour)) continue;
-                    if (Occupied(fight, neighbour)) continue;
+                    if (pasos.ContainsKey(vecina)) continue;
+                    if (vecina == to) continue;                        // no se le pisa encima
+                    if (!PisableEnCombate(fight, vecina)) continue;
+                    if (Occupied(fight, vecina)) continue;
 
-                    int distance = CellDistance(neighbour, to);
-                    if (distance < bestDistance) { bestDistance = distance; best = neighbour; }
+                    pasos[vecina] = paso + 1;
+                    deDonde[vecina] = aqui;
+                    cola.Enqueue(vecina);
+
+                    // La mejor casilla es la que deja al bicho más cerca de la distancia que
+                    // quiere, y como la anchura las visita en orden de pasos, la primera que
+                    // empata es también la que menos puntos de movimiento cuesta.
+                    int fallo = Math.Abs(CellDistance(vecina, to) - deseada);
+                    if (fallo < mejorFallo) { mejorFallo = fallo; mejor = vecina; }
                 }
-
-                if (best == current) break;                            // no se puede acercar más
-                current = best;
-                path.Add(current);
             }
-            return path;
+
+            if (mejor == from) return camino;
+
+            var alReves = new List<int>();
+            for (int c = mejor; c != from; c = deDonde[c]) alReves.Add(c);
+            alReves.Reverse();
+            camino.AddRange(alReves);
+            return camino;
         }
 
         /// <summary>Las cuatro casillas pegadas a una, que son las que están a distancia uno.</summary>
@@ -3404,9 +3816,16 @@ namespace Jondo.Unity.Launcher.Handlers
             // del ldd de la preparacion, y la cifra del final llega ya con el extra sumado. Se
             // revisaron los 68 jyg de las capturas y no hay ningun hueco donde quepa un desglose,
             // asi que es el servidor quien tiene que aplicarlo antes de mandar el numero.
-            long xpGained = won ? ConElExtra(fight.Team1.Sum(m => (long)m.XpReward), extraDeRetos) : 0;
-            long kamas = won ? ConElExtra(fight.Team1.Sum(m => 10L + (m.Level * 5L)), extraDeRetos) : 0;
-            var loot = won ? RollFightLoot(fight, extraDeRetos) : new Dictionary<int, int>();
+            // Sin los invocados. La suma iba sobre TODO el bando contrario, y una invocación
+            // entra en él con su nivel puesto: un monstruo que invoque estaba pagando kamas por
+            // criaturas que él mismo se fabricaba durante el combate. La experiencia no lo
+            // notaba porque un invocado no lleva XpReward, pero los kamas sí.
+            var quePagan = fight.Team1.Where(m => !m.EsInvocado).ToList();
+            long xpGained = won ? ConElExtra(quePagan.Sum(m => (long)m.XpReward), extraDeRetos) : 0;
+            long kamas = won ? ConElExtra(quePagan.Sum(m => 10L + (m.Level * 5L)), extraDeRetos) : 0;
+            var caidos = new List<PlayerItem>();
+            var loot = won ? RollFightLoot(fight, extraDeRetos, out caidos)
+                           : new Dictionary<int, int>();
 
             if (extraDeRetos > 0)
             {
@@ -3468,6 +3887,28 @@ namespace Jondo.Unity.Launcher.Handlers
                 Network.FightProtocol.BuildFightOver()));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyg,
                 Network.FightProtocol.BuildFightResults(results, duration)));
+
+            // Y AHORA SE LE DICE AL CLIENTE QUE LOS TIENE.
+            //
+            // Esto faltaba entero, y es la razón de que el botín se guardara bien y no se viera
+            // por ningún lado: la pantalla de fin de combate lo pintaba —el jyg— pero nadie le
+            // decía al cliente que esos objetos habían entrado en el inventario, así que no
+            // aparecían hasta el siguiente login. Con la Jondo Coin se vio clarísimo: 73 unidades
+            // en la base y ninguna en la mochila.
+            //
+            // El servidor real manda un iua por objeto. Medido en la mazmorra de los jalates:
+            // cuatro iua de 17 bytes con f3{f1:63, f5{gid, cantidad, uid}}. El 63 es la mochila.
+            foreach (var pieza in caidos)
+            {
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iua,
+                    ConnectionProtocol.BuildItemArrived(3, new Managers.HavenBagStore.StoredItem
+                    {
+                        Uid = pieza.Uid,
+                        Gid = pieza.ItemId,
+                        Quantity = pieza.Quantity,
+                        Effects = pieza.RawEffects ?? "[]",
+                    })));
+            }
 
             Program.LogDebug($"[Combate] Reparto: {xpGained} de experiencia (total {GameState.Experience}, " +
                              $"nivel {GameState.CharacterLevel}), {kamas} kamas y {loot.Count} clase(s) de objeto.");
@@ -5076,12 +5517,25 @@ namespace Jondo.Unity.Launcher.Handlers
         private static long ConElExtra(long cuanto, int extra)
             => extra <= 0 ? cuanto : cuanto + cuanto * extra / 100;
 
-        private static Dictionary<int, int> RollFightLoot(FightInstance fight, int extra = 0)
+        private static Dictionary<int, int> RollFightLoot(FightInstance fight, int extra,
+                                                          out List<PlayerItem> caidos)
         {
+            caidos = new List<PlayerItem>();
             var loot = new Dictionary<int, int>();
 
-            foreach (var monster in fight.Team1.Where(m => m.IsMonster))
+            // Los INVOCADOS no pagan. Entran en el bando del que los invoca con IsMonster
+            // puesto, así que un monstruo que invoque metería a su criatura en este bucle: se
+            // llevaría su propia tabla de botín y, con la moneda, sería una fábrica de dinero
+            // que se abre sola. Se distinguen por el Invocador, que sólo tienen ellos.
+            foreach (var monster in fight.Team1.Where(m => m.IsMonster && !m.EsInvocado))
             {
+                // La moneda del servidor. Cae SIEMPRE, sin tirar el dado: no es un objeto de la
+                // tabla del monstruo, es lo que paga el combate. La cantidad sale del nivel, de
+                // 25 en 25 (ver Managers.JondoCoin).
+                int monedas = Managers.JondoCoin.RewardFor(monster.Level);
+                loot.TryGetValue(Managers.JondoCoin.TemplateId, out int llevadas);
+                loot[Managers.JondoCoin.TemplateId] = llevadas + monedas;
+
                 var table = DatabaseManager.GetMonsterDrops(monster.MonsterId, monster.GradeIndex);
                 foreach (var drop in table)
                 {
@@ -5098,13 +5552,27 @@ namespace Jondo.Unity.Launcher.Handlers
 
             // De una vez: cada AddItemToInventory cargaba el inventario entero para ver si el
             // objeto ya estaba, así que cinco objetos distintos eran cinco lecturas completas.
-            DatabaseManager.AddItemsToInventory(GameState.CharacterId, loot);
+            caidos = DatabaseManager.AddItemsToInventory(GameState.CharacterId, loot);
             foreach (var kv in loot)
                 Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
 
             if (loot.Count > 0)
             {
                 GameState.SetInventory(DatabaseManager.LoadInventory(GameState.CharacterId));
+
+                // Y LA OTRA LISTA, que es la que de verdad se le manda al cliente.
+                //
+                // Hay dos vistas del inventario y esto sólo refrescaba una. GameState es la del
+                // estado de sesión; la que lee BuildInventory para armar el ivx es
+                // Managers.Equipment, y se quedaba con lo de antes hasta el siguiente login. Por
+                // eso el botín se guardaba bien en la base y el jugador no lo veía por ningún
+                // lado: 73 Jondo Coin en CharacterItems y ni una en la pantalla.
+                foreach (var pieza in caidos)
+                {
+                    Managers.Equipment.Remove(pieza.Uid, int.MaxValue);
+                    Managers.Equipment.Add(pieza.Uid, pieza.ItemId, pieza.Quantity,
+                                           Managers.Equipment.Bag, pieza.RawEffects ?? "[]");
+                }
             }
 
             return loot;
@@ -5158,7 +5626,8 @@ namespace Jondo.Unity.Launcher.Handlers
             // The f3.f9 experience progress block is left out: the capture gives a single sample
             // and does not let us tell what each number means, so it is omitted instead of being
             // filled in by eye. It is optional; the screen still shows up, minus the XP bar.
-            var loot = (fight.WinnerTeamId == 0) ? RollFightLoot(fight) : new Dictionary<int, int>();
+            var loot = (fight.WinnerTeamId == 0) ? RollFightLoot(fight, 0, out _)
+                                                 : new Dictionary<int, int>();
 
             var lootMsg = new ProtoMessage();
             foreach (var kv in loot)

@@ -76,6 +76,7 @@ namespace Jondo.Unity.Launcher
             Managers.Wardrobe.Initialize();
             Managers.Titles.Initialize();
             Managers.Cosmetics.Initialize();
+            Managers.EquipmentSkins.Initialize();
             Managers.Merkasako.Initialize();
             Managers.Zaapis.Initialize();
             Managers.Bins.Initialize();
@@ -90,8 +91,13 @@ namespace Jondo.Unity.Launcher
             Managers.Challenges.OnlyOffer(Handlers.ChallengeWatcher.Watched);
             Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
+            // Vendors va PRIMERO: Npcs necesita saber ya a quien no debe sembrar, y NpcShops a
+            // quien le echa encima el catalogo de quien.
+            Network.UnknownPackets.Initialize();
+            Managers.Vendors.Initialize();
             Managers.Npcs.Initialize();
             Managers.NpcShops.Initialize();
+            Managers.TokenShops.Initialize();
 
             Console.WriteLine("[+] Registering Fight Packet Handlers...");
             Handlers.FightHandler.RegisterHandlers();
@@ -109,6 +115,12 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[+] Starting services...");
             try
             {
+                Console.WriteLine($"[+] Network binding: {ServerBinding.Description}.");
+                if (ServerBinding.Public)
+                {
+                    Console.WriteLine("[!] Public binding does not encrypt traffic. Use it only on " +
+                                      "a trusted network or behind a VPN/tunnel.");
+                }
                 // La llave con la que el lanzador podrá hablarle a este servidor. Una por arranque:
                 // así un lanzador de una sesión anterior no se queda con llave de la de ahora.
                 ControlApi.NuevoSecreto();

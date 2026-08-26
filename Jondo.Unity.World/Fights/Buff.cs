@@ -58,12 +58,22 @@ namespace Jondo.Unity.World.Fights
         public int CaducaEnRonda { get; set; }
 
         /// <summary>
+        /// La ronda en la que EMPIEZA a valer. Para casi todos es la del lanzamiento; para los
+        /// retardados, tantas rondas después como diga el retardo del efecto.
+        ///
+        /// Sin esto no había manera de expresar «esto empieza dentro de dos turnos», que es lo que
+        /// hace la Flecha Castigadora, y el embrujo se aplicaba entero en el acto.
+        /// </summary>
+        public int EmpiezaEnRonda { get; set; }
+
+        /// <summary>
         /// Si se suma al que ya hubiera igual en vez de sustituirlo. Lo llevan los que un hechizo
         /// va poniendo cada vez que pasa algo —cada paso, cada golpe recibido—, que se acumulan.
         /// </summary>
         public bool Apila { get; set; }
 
-        public bool Vivo(int ronda) => CaducaEnRonda < 0 || ronda < CaducaEnRonda;
+        public bool Vivo(int ronda)
+            => ronda >= EmpiezaEnRonda && (CaducaEnRonda < 0 || ronda < CaducaEnRonda);
     }
 
     /// <summary>
@@ -230,10 +240,24 @@ namespace Jondo.Unity.World.Fights
         /// <summary>Se lleva los que ya han caducado y devuelve cuáles eran.</summary>
         public List<Buff> Barrer(int ronda)
         {
-            var caidos = _puestos.FindAll(e => !e.Vivo(ronda));
-            _puestos.RemoveAll(e => !e.Vivo(ronda));
+            // Se barre lo que ha CADUCADO, no lo que «no esta vivo».
+            //
+            // No es lo mismo desde que existen los embrujos retardados: uno que todavia no ha
+            // empezado tampoco esta vivo, y con la condicion de antes lo barria la primera vez que
+            // pasaba la escoba, o sea el turno siguiente a lanzarlo.
+            //
+            // Eso es justo lo que se veia con la Flecha Castigadora: sus dos bonos aparecian con
+            // su cuenta atras -el 3 y el 2- y al turno siguiente desaparecian dejando la cadena
+            // vacia, sin llegar a aplicarse nunca. Nacian y se los llevaba la escoba antes de que
+            // les tocara empezar.
+            var caidos = _puestos.FindAll(e => Caducado(e, ronda));
+            _puestos.RemoveAll(e => Caducado(e, ronda));
             return caidos;
         }
+
+        /// <summary>Si a un embrujo se le ha pasado la hora. Uno que aun no ha empezado, NO.</summary>
+        private static bool Caducado(Buff embrujo, int ronda)
+            => embrujo.CaducaEnRonda >= 0 && ronda >= embrujo.CaducaEnRonda;
 
         public void Vaciar()
         {

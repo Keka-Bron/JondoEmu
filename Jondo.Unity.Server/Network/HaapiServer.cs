@@ -18,8 +18,15 @@ namespace Jondo.Unity.Launcher.Network
             _isRunning = true;
 
             _listener = new HttpListener();
-            _listener.Prefixes.Add($"http://localhost:{port}/");
-            _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
+            if (ServerBinding.Public)
+            {
+                _listener.Prefixes.Add($"http://+:{port}/");
+            }
+            else
+            {
+                _listener.Prefixes.Add($"http://localhost:{port}/");
+                _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
+            }
             _listener.Start();
 
             Console.WriteLine($"[+] HAAPI HTTP Server listening on port {port}");

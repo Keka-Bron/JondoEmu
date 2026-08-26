@@ -1,0 +1,2177 @@
+# Mapeo de 3.6.10.10 a 3.6.10.11.
+#
+# origen: estructura = lo resolvió el emparejador y no se equivoca;
+#         modelo     = había varios candidatos con la misma forma y eligió un LLM;
+#         duda       = hay candidatos y nadie ha elegido. NO usar sin mirarlo.
+#         retirado   = ni un solo candidato: o es nuevo, o ya no está.
+#
+# viejo	nuevo	origen	nombre	qué hace	lo usa el emulador
+hdw	hdw	estructura			
+hdx	hdx	estructura			
+hdy	hdy	estructura			
+hea	hea	estructura			
+hed	hed	estructura			
+heg	heg	estructura			
+heh	heh	estructura			
+hei	hei	estructura			
+hek	hek	estructura			
+hem	hem	estructura			
+hen	hen	estructura			
+heo	heo	estructura			
+heq	heq	estructura			
+her	her	estructura			
+het	het	estructura			
+hev	hev	estructura			
+hex	hex	estructura			
+hfa	hfa	estructura			
+hfb	hfb	estructura			
+hfd	hfd	estructura			
+hfe	hfe	estructura			
+hff	hff	estructura			
+hfh	hfh	estructura			
+hfi	hfi	estructura			
+hfj	hfj	estructura			
+hfl	hfl	estructura			
+hfo	hfo	estructura			
+hfp	hfp	estructura			
+hfr	hfr	estructura			
+hfs	hfs	estructura			
+hft	hft	estructura			
+hfv	hfv	estructura			
+hfw	hfw	estructura			
+hfx	hfx	estructura			
+hfy	hfy	estructura			
+hfz	hfz	estructura			
+hga	hga	estructura			
+hgb	hgb	estructura			
+hgc	hgc	estructura			
+hgg	hgg	estructura			
+hgj	hgj	estructura			
+hgm	hgm	estructura			
+hgn	hgn	estructura			
+hgp	hgp	estructura			
+hgq	hgq	estructura			
+hgr	hgr	estructura			
+hgu	hgu	estructura			
+hgv	hgv	estructura			
+hgx	hgx	estructura			
+hha	hha	estructura			
+hhd	hhd	estructura			
+hhf	hhf	estructura		Solo alcanzable desde isi, que nunca llega. 1 mensaje en 1 fichero.	sí
+hhg	hhg	estructura			
+hhh	hhh	estructura			sí
+hhk	hhk	estructura		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 4 mensajes.	
+hhl	hhl	estructura			
+hhn	hhn	estructura			
+hhq	hhq	estructura			sí
+hht	hht	estructura			
+hhu	hhu	estructura			
+hhv	hhv	estructura			
+hhy	hhy	estructura	TitlesAndOrnamentsListMessage	Lo que la cuenta posee; el cliente ya tiene el catalogo entero y lo que no este en esta lista sale en gris. Se envia una vez al entrar al mundo. En el replay se sustituye por los de la cuenta que juega.	sí
+hhz	hhz	estructura			
+hic	hic	estructura			
+hid	hid	estructura	TitleSelectedMessage	El titulo que se lleva ahora; vacio significa ninguno, no un cero dentro.	sí
+hie	hie	estructura			sí
+hif	hif	estructura	OrnamentSelectedMessage	El ornamento que se lleva ahora, con la misma regla.	sí
+hig	hig	estructura			
+hih	hih	estructura		No implementado. Exclusivo de las capturas de extras de apariencia; 2 mensajes.	
+hii	hii	estructura			sí
+hil	hil	estructura			
+him	him	estructura		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 10 mensajes.	
+hin	hin	estructura			
+hio	hio	estructura			
+hip	hip	estructura			
+hiq	hiq	estructura			
+hir	hir	estructura		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 10 mensajes.	
+his	his	estructura			
+hit	hit	estructura			
+hiu	hiu	estructura			
+hiv	hiv	estructura			
+hiw	hiw	estructura			
+hix	hix	estructura			
+hiy	hiy	estructura			
+hja	hja	estructura			
+hjb	hjb	estructura			
+hjc	hjc	estructura	TeleportRequestMessage	Destino elegido.	sí
+hje	hje	estructura			
+hjg	hjg	estructura			
+hjh	hjh	estructura			
+hjj	hjj	estructura	TeleportDestinationsMessage	La lista de destinos del zaap; f6 casa con MapPositions en las 25 entradas de la captura y el destino donde ya estas viaja sin f2, o sea coste cero.	sí
+hjk	hjk	estructura		Viaja con jru en cada cambio de mapa.	sí
+hjl	hjl	estructura			
+hjp	hjp	estructura			
+hjq	hjq	estructura			
+hjr	hjr	estructura			
+hjt	hjt	estructura			
+hju	hju	estructura			
+hjw	hjw	estructura			
+hjx	hjx	estructura			
+hjy	hjy	estructura			
+hjz	hjz	estructura			
+hkb	hkb	estructura			
+hkc	hkc	estructura			
+hkd	hkd	estructura			
+hke	hke	estructura			
+hkf	hkf	estructura			
+hkh	hkh	estructura			
+hki	hki	estructura			
+hkl	hkl	estructura			
+hkm	hkm	estructura			
+hko	hko	estructura			
+hkp	hkp	estructura			
+hks	hks	estructura		No implementado. Exclusivo de las capturas de alianzas (Alianzas); 1 mensajes.	
+hkt	hkt	estructura			
+hkw	hkw	estructura			
+hkx	hkx	estructura			
+hla	hla	estructura			
+hlb	hlb	estructura			
+hlc	hlc	estructura			
+hld	hld	estructura			
+hle	hle	estructura			
+hlh	hlh	estructura			
+hli	hli	estructura			
+hlm	hlm	estructura			
+hln	hln	estructura			
+hlp	hlp	estructura			
+hlq	hlq	estructura			
+hlr	hlr	estructura			
+hls	hls	estructura			
+hlv	hlv	estructura			
+hlw	hlw	estructura			
+hlx	hlx	estructura			
+hly	hly	estructura			
+hlz	hlz	estructura			
+hma	hma	estructura			
+hmb	hmb	estructura			
+hmc	hmc	estructura			
+hmd	hmd	estructura		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+hme	hme	estructura			
+hmh	hmh	estructura			
+hmi	hmi	estructura			
+hmj	hmj	estructura			sí
+hmk	hmk	estructura			
+hml	hml	estructura			sí
+hmn	hmn	estructura			
+hmo	hmo	estructura			
+hmp	hmp	estructura			
+hmq	hmq	estructura			
+hms	hms	estructura	SpellListMessage	Los hechizos que tiene el personaje, cada uno al grado que abre su nivel.	sí
+hmt	hmt	estructura	SpellVariantActivationRequestMessage	Cambiar un hechizo por su variante, desde el panel o desde la barra.	sí
+hmw	hmw	estructura			
+hmz	hmz	estructura			
+hnc	hnc	estructura			
+hnd	hnd	estructura			
+hng	hng	estructura	SpellVariantActivationSuccessMessage	El hechizo nuevo y el grado que abre el nivel del personaje.	sí
+hnh	hnh	estructura			
+hnk	hnk	estructura		El builder no se llama nunca; la rama hmv usa un payload crudo y hmv nunca llega. 243 mensajes en 9 ficheros.	sí
+hnn	hnn	estructura			sí
+hnp	hnp	estructura			sí
+hns	hns	estructura		No implementado. Exclusivo de las capturas de emotes; 2 mensajes.	
+hnt	hnt	estructura			
+hnu	hnu	estructura			
+hnv	hnv	estructura			sí
+hnw	hnw	estructura			
+hnx	hnx	estructura			
+hnz	hnz	estructura			
+hob	hob	estructura			
+hoc	hoc	estructura		No implementado. Exclusivo de las capturas de emotes; 7 mensajes.	
+hod	hod	estructura			
+hof	hof	estructura			
+hoh	hoh	estructura			
+hoj	hoj	estructura			
+hol	hol	estructura		Conyuge y gremio de la cuenta grabada; se descarta. 4 mensajes.	sí
+hom	hom	estructura			
+hon	hon	estructura			
+hop	hop	estructura			
+hor	hor	estructura		No implementado. Exclusivo de las capturas de emotes; 2 mensajes.	
+hos	hos	estructura			
+hot	hot	estructura			
+hou	hou	estructura		Sale en la entrada al mundo, encabezando el grupo de once ktq y un lru.	
+hov	hov	estructura		No implementado. Exclusivo de las capturas de emotes; 19 mensajes.	
+hox	hox	estructura			
+hoy	hoy	estructura	HelloGameMessage	Saludo del servidor de juego; f5 se omite a proposito porque no aparece en ninguna de las tres capturas de arranque.	sí
+hpb	hpb	estructura			
+hpc	hpc	estructura			
+hpd	hpd	estructura			sí
+hpf	hpf	estructura			
+hph	hph	estructura			
+hpk	hpk	estructura			
+hpl	hpl	estructura			
+hpm	hpm	estructura		Nada establecido. 103 mensajes, 35 ficheros.	
+hpn	hpn	estructura			
+hpo	hpo	estructura			
+hpp	hpp	estructura			
+hpq	hpq	estructura			
+hpr	hpr	estructura			
+hps	hps	estructura			
+hpt	hpt	estructura			
+hpu	hpu	estructura		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); 6 mensajes.	
+hpv	hpv	estructura			
+hpy	hpy	estructura			
+hpz	hpz	estructura			
+hqa	hqa	estructura			sí
+hqb	hqb	estructura			
+hqc	hqc	estructura			
+hql	hql	estructura			
+hqm	hqm	estructura			
+hqp	hqp	estructura			
+hqq	hqq	estructura			
+hqr	hqr	estructura			
+hqs	hqs	estructura			
+hqu	hqu	estructura			
+hqv	hqv	estructura			
+hqw	hqw	estructura			
+hqx	hqx	estructura			
+hra	hra	estructura			
+hrc	hrc	estructura			
+hrf	hrf	estructura			
+hrh	hrh	estructura			
+hrj	hrj	estructura			
+hrl	hrl	estructura			
+hro	hro	estructura			
+hrq	hrq	estructura			
+hrr	hrr	estructura			
+hrt	hrt	estructura			
+hru	hru	estructura			
+hrx	hrx	estructura			
+hrz	hrz	estructura			
+hsa	hsa	estructura			
+hsb	hsb	estructura			
+hsc	hsc	estructura			
+hse	hse	estructura			
+hsh	hsh	estructura			
+hsk	hsk	estructura			
+hsm	hsm	estructura			
+hsn	hsn	estructura			
+hss	hss	estructura			
+hsu	hsu	estructura			
+hsv	hsv	estructura			
+hsw	hsw	estructura			
+hsy	hsy	estructura			
+hsz	hsz	estructura			
+hta	hta	estructura			
+htd	htd	estructura			
+htf	htf	estructura			
+hti	hti	estructura			
+htl	htl	estructura			
+hto	hto	estructura			
+htp	htp	estructura			
+htr	htr	estructura			
+htu	htu	estructura			
+htw	htw	estructura			
+hty	hty	estructura			
+htz	htz	estructura			
+hua	hua	estructura			
+hub	hub	estructura			
+huc	huc	estructura			
+hue	hue	estructura			
+huh	huh	estructura			
+huk	huk	estructura			
+hum	hum	estructura			
+hun	hun	estructura			
+hup	hup	estructura			
+hur	hur	estructura			
+hus	hus	estructura			
+hut	hut	estructura			
+huu	huu	estructura			
+hux	hux	estructura			
+huz	huz	estructura			
+hvf	hvf	estructura			
+hvi	hvi	estructura			
+hvk	hvk	estructura			
+hvn	hvn	estructura			
+hvs	hvs	estructura			
+hvt	hvt	estructura			
+hvw	hvw	estructura			
+hvx	hvx	estructura			
+hwa	hwa	estructura			
+hwb	hwb	estructura			
+hwe	hwe	estructura			
+hwf	hwf	estructura			
+hwg	hwg	estructura			
+hwh	hwh	estructura			
+hwk	hwk	estructura			
+hwl	hwl	estructura			
+hwo	hwo	estructura			
+hwp	hwp	estructura			
+hwr	hwr	estructura			
+hwu	hwu	estructura			
+hwv	hwv	estructura			
+hwx	hwx	estructura			
+hwz	hwz	estructura			
+hxb	hxb	estructura			
+hxd	hxd	estructura			
+hxe	hxe	estructura			
+hxg	hxg	estructura			
+hxi	hxi	estructura			
+hxj	hxj	estructura			
+hxk	hxk	estructura			
+hxm	hxm	estructura			
+hxp	hxp	estructura			
+hxq	hxq	estructura			
+hxr	hxr	estructura			
+hxt	hxt	estructura			
+hxu	hxu	estructura			
+hxx	hxx	estructura			
+hya	hya	estructura			
+hyb	hyb	estructura			
+hyc	hyc	estructura			
+hyg	hyg	estructura			
+hyj	hyj	estructura			
+hyk	hyk	estructura			
+hym	hym	estructura			
+hyp	hyp	estructura			
+hyr	hyr	estructura			
+hys	hys	estructura			
+hyt	hyt	estructura			
+hyw	hyw	estructura			
+hyx	hyx	estructura			
+hyz	hyz	estructura			
+hzb	hzb	estructura			
+hzc	hzc	estructura			
+hzd	hzd	estructura			
+hzg	hzg	estructura			
+hzh	hzh	estructura			
+hzi	hzi	estructura			
+hzj	hzj	estructura			
+hzk	hzk	estructura			
+hzn	hzn	estructura			
+hzo	hzo	estructura			
+hzp	hzp	estructura			
+hzq	hzq	estructura			
+hzr	hzr	estructura			
+hzv	hzv	estructura			
+hzw	hzw	estructura			
+hzx	hzx	estructura			
+hzy	hzy	estructura			
+iaa	iaa	estructura			
+iac	iac	estructura			
+iaf	iaf	estructura			
+iag	iag	estructura			
+iai	iai	estructura			
+iaj	iaj	estructura			
+iak	iak	estructura			
+iam	iam	estructura			
+ian	ian	estructura			
+iap	iap	estructura			
+iaq	iaq	estructura			
+ias	ias	estructura			
+iau	iau	estructura			
+iav	iav	estructura			
+iay	iay	estructura			
+iaz	iaz	estructura			
+ibc	ibc	estructura			
+ibf	ibf	estructura			
+ibg	ibg	estructura			
+ibh	ibh	estructura			
+ibj	ibj	estructura			
+ibk	ibk	estructura			
+ibl	ibl	estructura			
+ibo	ibo	estructura			sí
+ibp	ibp	estructura			
+ibr	ibr	estructura			
+ibs	ibs	estructura			
+ibv	ibv	estructura			
+ibw	ibw	estructura			
+ibz	ibz	estructura			
+icc	icc	estructura			
+ice	ice	estructura			
+ich	ich	estructura			
+icj	icj	estructura			
+icl	icl	estructura			
+icm	icm	estructura			
+icn	icn	estructura			
+icp	icp	estructura			
+icq	icq	estructura			
+icr	icr	estructura			
+icu	icu	estructura			
+icx	icx	estructura			
+icz	icz	estructura			
+ida	ida	estructura			
+ide	ide	estructura			
+idf	idf	estructura			sí
+idi	idi	estructura			
+idl	idl	estructura			
+idm	idm	estructura			
+ido	ido	estructura			
+idp	idp	estructura			
+idr	idr	estructura			
+idt	idt	estructura			
+idu	idu	estructura		La respuesta a ieo: cuatro seguidos en la entrada al mundo.	
+idv	idv	estructura			
+idw	idw	estructura		No implementado. Exclusivo de las capturas de extras de conexion; 16 mensajes.	
+idz	idz	estructura		No implementado. Exclusivo de las capturas de extras de conexion; 21 mensajes.	
+iea	iea	estructura			
+ieb	ieb	estructura			
+iec	iec	estructura			
+ied	ied	estructura			
+iee	iee	estructura			
+ief	ief	estructura			
+ieg	ieg	estructura		No implementado. Exclusivo de las capturas de extras de conexion; 12 mensajes.	
+ieh	ieh	estructura			
+iei	iei	estructura			
+iej	iej	estructura		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 38 mensajes.	
+iek	iek	estructura			
+iel	iel	estructura			
+ieo	ieo	estructura		Cuatro seguidos en la entrada al mundo; el servidor contesta cuatro idu.	
+iep	iep	estructura			
+ier	ier	estructura			
+iev	iev	estructura			
+iew	iew	estructura			
+iex	iex	estructura			
+iey	iey	estructura			
+iez	iez	estructura			
+ifa	ifa	estructura			
+ifb	ifb	estructura			
+ifd	ifd	estructura			
+ife	ife	estructura		Alianzas, por nombre y tag; se descarta. 9 mensajes.	sí
+ifg	ifg	estructura			
+ifh	ifh	estructura			
+ifi	ifi	estructura			
+ifj	ifj	estructura			
+ifl	ifl	estructura			
+ifm	ifm	estructura			
+ifn	ifn	estructura			
+ifp	ifp	estructura			
+ifr	ifr	estructura			
+ifs	ifs	estructura			
+ifu	ifu	estructura			
+ifv	ifv	estructura			
+ifw	ifw	estructura			
+ify	ify	estructura		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); lleva id de peticion real (17); 17 mensajes.	
+ifz	ifz	estructura			
+igc	igc	estructura			
+igf	igf	estructura			
+igi	igi	estructura			
+igk	igk	estructura			
+igl	igl	estructura			
+ign	ign	estructura			
+igo	igo	estructura			
+igp	igp	estructura			
+igs	igs	estructura			sí
+igv	igv	estructura			
+igy	igy	estructura		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); lleva id de peticion real (11); 11 mensajes.	
+igz	igz	estructura			
+iha	iha	estructura		Lleva id de peticion real en 2 peticiones.	
+ihb	ihb	estructura		Catorce conjuntos guardados, cada uno con un look; se descarta. 7 mensajes.	sí
+ihc	ihc	estructura			
+ihf	ihf	estructura		Lleva id de peticion real en 1 peticion.	
+ihg	ihg	estructura			
+ihh	ihh	estructura			
+ihi	ihi	estructura			
+ihm	ihm	estructura			
+iho	iho	estructura			
+ihq	ihq	estructura		Respuesta que devuelve un id de peticion real (3 respuestas).	
+ihr	ihr	estructura			
+ihs	ihs	estructura		Lleva id de peticion real en 1 peticion.	
+iht	iht	estructura			
+ihu	ihu	estructura			
+ihv	ihv	estructura			
+ihw	ihw	estructura			
+ihz	ihz	estructura			
+iia	iia	estructura			
+iic	iic	estructura		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); es una respuesta y devuelve id de peticion real (17); 17 mensajes.	
+iid	iid	estructura			
+iie	iie	estructura			
+iif	iif	estructura			
+iih	iih	estructura			
+iij	iij	estructura			
+iil	iil	estructura			
+iim	iim	estructura			
+iin	iin	estructura		Lleva id de peticion real en 1 peticion.	
+iio	iio	estructura		Lleva id de peticion real en 3 peticiones.	
+iir	iir	estructura			
+iis	iis	estructura			
+iiv	iiv	estructura			
+iix	iix	estructura			
+iiy	iiy	estructura		Lleva id de peticion real en 1 peticion.	
+iiz	iiz	estructura			
+ija	ija	estructura		No implementado. Exclusivo de las capturas de conjuntos de equipo (Conjuntos); es una respuesta y devuelve id de peticion real (11); 11 mensajes.	
+ijd	ijd	estructura			
+ijf	ijf	estructura			
+ijg	ijg	estructura			
+ijj	ijj	estructura			
+ijk	ijk	estructura			
+ijl	ijl	estructura			
+ijm	ijm	estructura			
+ijn	ijn	estructura			
+ijq	ijq	estructura			sí
+ijt	ijt	estructura			
+ijx	ijx	estructura			
+ijy	ijy	estructura			
+ijz	ijz	estructura			
+ika	ika	estructura			
+ikb	ikb	estructura			
+ike	ike	estructura			
+ikf	ikf	estructura			
+iki	iki	estructura			
+ikj	ikj	estructura			
+ikm	ikm	estructura			
+ikn	ikn	estructura			
+iko	iko	estructura			
+ikr	ikr	estructura			
+iks	iks	estructura			
+ikt	ikt	estructura			
+iku	iku	estructura			
+ikv	ikv	estructura			
+ikw	ikw	estructura			
+ikx	ikx	estructura			
+iky	iky	estructura			
+ila	ila	estructura			
+ilb	ilb	estructura			
+ilc	ilc	estructura		Solo se llama desde la rama kkn, que nunca llega. 5 mensajes en 3 ficheros.	sí
+ild	ild	estructura			
+ilf	ilf	estructura			
+ilg	ilg	estructura			
+ilh	ilh	estructura			
+ili	ili	estructura			
+ilj	ilj	estructura			
+iln	iln	estructura			
+ilo	ilo	estructura			
+ilr	ilr	estructura		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 2 mensajes en 1 fichero.	
+ils	ils	estructura			
+ilv	ilv	estructura			
+ilw	ilw	estructura			
+ilx	ilx	estructura			
+ima	ima	estructura			
+imd	imd	estructura		Lo envia el cliente (1 vez); el fichero datos/dofus3_mappings.json lo llama InventoryWeightMessage y eso es falso, un informe de peso seria push del servidor.	
+ime	ime	estructura		No implementado. Exclusivo de las capturas de grupos (Grupos); 2 mensajes.	
+imf	imf	estructura			
+imh	imh	estructura			
+imi	imi	estructura			
+imj	imj	estructura			
+imk	imk	estructura			
+imn	imn	estructura			
+imo	imo	estructura			
+imp	imp	estructura			
+imq	imq	estructura			
+imr	imr	estructura			
+imu	imu	estructura			
+imv	imv	estructura			
+imy	imy	estructura		No implementado. Exclusivo de las capturas de grupos (Grupos); 1 mensajes.	
+inb	inb	estructura			
+inc	inc	estructura			
+ind	ind	estructura			
+ine	ine	estructura			
+ing	ing	estructura			
+inh	inh	estructura			
+ink	ink	estructura			
+inn	inn	estructura			
+ino	ino	estructura			
+inp	inp	estructura			
+inq	inq	estructura			
+int	int	estructura			
+inv	inv	estructura			
+inw	inw	estructura			
+inx	inx	estructura			
+iny	iny	estructura			
+ioa	ioa	estructura			
+ioc	ioc	estructura			sí
+iof	iof	estructura			
+iog	iog	estructura			
+ioi	ioi	estructura			
+iok	iok	estructura			
+iom	iom	estructura		Las capturas muestran al SERVIDOR enviandolo (283 mensajes, 67 ficheros); OpcodeRegistry lo declara como MapInformationsRequest, nombre heredado y falso.	
+ion	ion	estructura			
+ioo	ioo	estructura			
+ioq	ioq	estructura			
+ios	ios	estructura			sí
+iot	iot	estructura			
+iou	iou	estructura			
+iov	iov	estructura			sí
+ioy	ioy	estructura			sí
+ipa	ipa	estructura		No implementado. Exclusivo de las capturas de tienda (Tienda); 7 mensajes.	
+ipb	ipb	estructura		No implementado. Exclusivo de las capturas de tienda (Tienda); 7 mensajes.	
+ipc	ipc	estructura			
+ipd	ipd	estructura			
+ipe	ipe	estructura			
+ipi	ipi	estructura			
+ipj	ipj	estructura			
+ipk	ipk	estructura			
+ipm	ipm	estructura			
+ipo	ipo	estructura			
+ipp	ipp	estructura			
+ipq	ipq	estructura			
+ipr	ipr	estructura			
+ipt	ipt	estructura			
+ipv	ipv	estructura			
+ipw	ipw	estructura			
+ipx	ipx	estructura			
+ipz	ipz	estructura			
+iqa	iqa	estructura			
+iqb	iqb	estructura			
+iqc	iqc	estructura			
+iqd	iqd	estructura			
+iqg	iqg	estructura			
+iqh	iqh	estructura			
+iqj	iqj	estructura		Lleva bloques de look: en los 73 bloques que se le miden, el campo f2 del look vale algo distinto de 3. El documento no da direccion.	
+iqk	iqk	estructura			
+iql	iql	estructura			
+iqm	iqm	estructura			
+iqn	iqn	estructura			
+iqq	iqq	estructura			
+iqr	iqr	estructura			
+iqt	iqt	estructura			
+iqu	iqu	estructura			
+iqv	iqv	estructura			
+iqw	iqw	estructura			
+iqx	iqx	estructura			
+iqy	iqy	estructura			
+iqz	iqz	estructura			
+irb	irb	estructura			
+irc	irc	estructura			
+ird	ird	estructura			
+irg	irg	estructura			
+irh	irh	estructura			
+iri	iri	estructura			
+irj	irj	estructura			
+irl	irl	estructura		No implementado. Exclusivo de las capturas de oficios (Oficios); 30 mensajes.	
+irm	irm	estructura			sí
+iro	iro	estructura			
+irp	irp	estructura			
+irq	irq	estructura	JobExperienceMultiUpdateMessage	Los oficios; se conserva la lista de ids (es dato de juego) y se tira el progreso capturado: todos salen a nivel 1.	sí
+irs	irs	estructura			
+irt	irt	estructura			
+irv	irv	estructura			
+irw	irw	estructura			
+iry	iry	estructura			sí
+isa	isa	estructura			
+isd	isd	estructura			
+ise	ise	estructura			sí
+isf	isf	estructura		Solo alcanzable desde krc y desde isi, que no llegan nunca. 7 mensajes en 2 ficheros.	sí
+isi	isi	estructura		Movimiento de objeto antiguo (3.6.4.3), sustituido por iuk. No aparece en ninguna captura.	sí
+isj	isj	estructura			
+isl	isl	estructura			
+isn	isn	estructura			
+isq	isq	estructura			
+isr	isr	estructura			
+iss	iss	estructura			
+ist	ist	estructura			
+isu	isu	estructura			
+isv	isv	estructura		No implementado. Exclusivo de las capturas de oficios (Oficios); 191 mensajes.	
+isw	isw	estructura			
+isx	isx	estructura			
+isz	isz	estructura			
+itc	itc	estructura	StorageObjectRemoveMessage	Un objeto sale del cofre.	sí
+itd	itd	estructura	StorageObjectUpdateMessage	Un objeto llega al cofre.	sí
+ite	ite	estructura			
+itf	itf	estructura			
+itg	itg	estructura	ShortcutBarContentMessage	Las barras de atajos; el servidor envia dos y nada dentro dice cual es cual: un hueco con hechizo lleva f6, uno con objeto lleva f9, y el f2 suelto del final es el tipo de barra (1 hechizos, ausente objetos).	sí
+ith	ith	estructura		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	sí
+itj	itj	estructura			
+itk	itk	estructura			
+itl	itl	estructura			
+itm	itm	estructura			
+itn	itn	estructura		Lo envia el servidor pero el emulador lo usa como disparador de cliente y lo responde con itw, que no aparece en ninguna captura. 17 mensajes en 7 ficheros.	sí
+ito	ito	estructura			
+itp	itp	estructura		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+itq	itq	estructura			
+itr	itr	estructura			sí
+its	its	estructura			
+itu	itu	estructura			
+itv	itv	estructura			
+itw	itw	estructura		Lo que GameNodeProxy responde a itn; no aparece en ninguna de las 242 capturas.	sí
+itx	itx	estructura			
+itz	itz	estructura	ShortcutBarAddRequestMessage	Editar un hueco de una barra de atajos; se escribe tambien en la base de datos o se pierde al salir.	sí
+iua	iua	estructura	ObjectAddedMessage	Un objeto llega a la bolsa, con todo: plantilla, efectos y cantidad.	sí
+iub	iub	estructura			
+iuc	iuc	estructura			
+iue	iue	estructura			
+iuf	iuf	estructura			
+iug	iug	estructura			
+iuj	iuj	estructura			sí
+iuk	iuk	estructura	ObjectSetPositionMessage	Mover un objeto a un hueco o de vuelta a la bolsa; la posicion cero es el amuleto, no la bolsa, y proto3 la omite.	sí
+iul	iul	estructura			
+ium	ium	estructura	ObjectDeletedMessage	Un objeto sale de la bolsa.	sí
+iun	iun	estructura	InventoryWeightMessage	Los pods: peso llevado y capacidad. Identificado por aritmetica, cinco pods por punto de fuerza.	sí
+iuq	iuq	estructura	ShortcutBarReplacedMessage	Uno por cada hueco de barra que tenia la mitad antigua del hechizo; se envia antes de hng.	sí
+iur	iur	estructura			
+ius	ius	estructura			
+iuu	iuu	estructura			
+iuv	iuv	estructura		No implementado. Exclusivo de las capturas de Steamer; 1 mensajes.	
+iuw	iuw	estructura	ObjectDeleteMessage	Destruir un objeto; el cliente no quita nada por su cuenta y sin respuesta el objeto se queda. Observado contra el cliente real en el log de trafico del emulador, no en el conjunto pcapng.	sí
+iux	iux	estructura			
+iuy	iuy	estructura			
+iuz	iuz	estructura			
+ivc	ivc	estructura			
+ive	ive	estructura			
+ivf	ivf	estructura	KamasUpdateMessage	Kamas que quedan despues de pagar.	sí
+ivg	ivg	estructura			
+ivi	ivi	estructura		NO es el inventario: 9694 pares de id y valor, ids de 44 a 34352 y valores de cientos de millones; parece los contadores de estadisticas de la cuenta. Es la trama mas grande del bloque 3 (87878 B, el 97 % del fichero).	
+ivj	ivj	estructura			
+ivk	ivk	estructura	ShortcutBarRefreshMessage	El eco: la misma entrada que envio el cliente.	sí
+ivl	ivl	estructura			
+ivm	ivm	estructura			
+ivo	ivo	estructura			
+ivp	ivp	estructura			
+ivq	ivq	estructura	ObjectMovementMessage	Donde acabo un objeto; un hueco solo admite un objeto, lo que hubiera se expulsa antes a la bolsa con su propio ivq.	sí
+ivr	ivr	estructura			
+ivs	ivs	estructura			
+ivt	ivt	estructura			
+ivu	ivu	estructura			
+ivv	ivv	estructura			
+ivx	ivx	estructura	InventoryContentMessage	El inventario, construido desde la base de datos; el hueco se omite cuando es cero porque cero es el amuleto.	sí
+ivy	ivy	estructura			
+iwa	iwa	estructura			
+iwb	iwb	estructura	StorageInventoryContentMessage	Lo que hay dentro del cofre; misma forma que el inventario, con la bolsa como posicion de todo.	sí
+iwc	iwc	estructura			
+iwd	iwd	estructura			
+iwf	iwf	estructura			
+iwg	iwg	estructura			
+iwi	iwi	estructura			
+iwj	iwj	estructura			
+iwm	iwm	estructura			
+iwn	iwn	estructura	InteractiveUsedMessage	Ese elemento esta en uso; f2 es el elemento, no la instancia de habilidad.	sí
+iwo	iwo	estructura	InteractiveUseRequestMessage	Clic en un elemento interactivo; el zaap, el cofre y la loteria llegan todos por aqui.	sí
+iwp	iwp	estructura			
+iwq	iwq	estructura			
+iwt	iwt	estructura			
+iww	iww	estructura			
+ixa	ixa	estructura			
+ixc	ixc	estructura			
+ixd	ixd	estructura			
+ixf	ixf	estructura			
+ixg	ixg	estructura		No implementado. Exclusivo de las capturas de Suenos Infinitos; 14 mensajes.	
+ixh	ixh	estructura			
+ixj	ixj	estructura			
+ixk	ixk	estructura			
+ixl	ixl	estructura			
+ixm	ixm	estructura			
+ixn	ixn	estructura			
+ixq	ixq	estructura			
+ixu	ixu	estructura			
+ixw	ixw	estructura			
+ixx	ixx	estructura			
+ixy	ixy	estructura			
+iya	iya	estructura			sí
+iyb	iyb	estructura		No implementado. Exclusivo de las capturas de Suenos Infinitos; 12 mensajes.	
+iyc	iyc	estructura			
+iyd	iyd	estructura			
+iyh	iyh	estructura			
+iyj	iyj	estructura			
+iyk	iyk	estructura			
+iym	iym	estructura			
+iyr	iyr	estructura			
+iyu	iyu	estructura			
+iyw	iyw	estructura			
+iyx	iyx	estructura		No implementado. Exclusivo de las capturas de Suenos Infinitos; 12 mensajes.	
+izb	izb	estructura			
+izd	izd	estructura			
+ize	ize	estructura			
+izg	izg	estructura		No implementado. Exclusivo de las capturas de Suenos Infinitos; 40 mensajes.	
+izh	izh	estructura		Lo envia el cliente (8 veces en 7 ficheros) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AlmanaxDateMessage, y eso es falso.	sí
+izi	izi	estructura			
+izj	izj	estructura			
+izk	izk	estructura			
+izm	izm	estructura			
+izo	izo	estructura			
+izq	izq	estructura			
+izr	izr	estructura			
+izs	izs	estructura			
+izu	izu	estructura		El builder no se llama nunca. 2 mensajes en 2 ficheros.	sí
+izv	izv	estructura			
+izw	izw	estructura			
+izy	izy	estructura			
+izz	izz	estructura		Nada establecido. 635 mensajes, 29 ficheros.	
+jaa	jaa	estructura		Lo mismo que jjs pero en su propio mensaje; se descarta. 5 mensajes.	sí
+jab	jab	estructura			
+jac	jac	estructura			
+jad	jad	estructura			
+jae	jae	estructura			
+jag	jag	estructura			
+jai	jai	estructura			
+jaj	jaj	estructura			
+jak	jak	estructura			
+jal	jal	estructura			
+jam	jam	estructura			
+jan	jan	estructura			
+jao	jao	estructura			
+jaq	jaq	estructura			
+jar	jar	estructura			
+jas	jas	estructura			
+jat	jat	estructura			
+jau	jau	estructura		No implementado. Exclusivo de las capturas de bolsa de viaje (Merkasako); 2 mensajes.	
+jav	jav	estructura		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	sí
+jaw	jaw	estructura		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	sí
+jax	jax	estructura			
+jay	jay	estructura			
+jaz	jaz	estructura		Se envia con los muebles, entre jss y lva; significado no establecido.	sí
+jba	jba	estructura	HavenBagEditionStoppedMessage	Modo de colocacion cerrado.	sí
+jbb	jbb	estructura			
+jbd	jbd	estructura			
+jbf	jbf	estructura			
+jbg	jbg	estructura	HavenBagFurnituresUpdateRequestMessage	Una porcion de la habitacion; llega partido en tres seguidos y cada porcion lleva la habitacion entera, no un diff.	sí
+jbh	jbh	estructura			
+jbk	jbk	estructura		Cerrar el modo de colocacion; jbk, jav y jaw llegan los tres juntos al aceptar y el documento no distingue cual es cual.	sí
+jbl	jbl	estructura	HavenBagThemeChangeRequestMessage	Cambiar el tema de la habitacion desde dentro.	sí
+jbm	jbm	estructura	HavenBagEditionStartedMessage	Modo de colocacion confirmado.	sí
+jbn	jbn	estructura	EnterHavenBagRequestMessage	El boton de la bolsa de viaje y la tecla H; lleva un personaje porque se puede visitar la de otro.	sí
+jbo	jbo	estructura			
+jbq	jbq	estructura			
+jbs	jbs	estructura	LotteryResultMessage	La respuesta de la maquina de loteria; de dos capturas, una con premio en f2 y otra rechazada con f3: 1.	sí
+jbt	jbt	estructura			
+jbu	jbu	estructura	HavenBagFurnituresMessage	Los muebles de la habitacion, esperados detras del mapa; misma forma que jbg pero en f1 en vez de f2.	sí
+jbv	jbv	estructura	HavenBagEditionStartRequestMessage	Abrir el modo de colocacion de muebles.	sí
+jbx	jbx	estructura			
+jby	jby	estructura			
+jbz	jbz	estructura			
+jca	jca	estructura			
+jcc	jcc	estructura			
+jcf	jcf	estructura			
+jci	jci	estructura		No implementado. Exclusivo de las capturas de gremio (Gremio); 10 mensajes.	
+jck	jck	estructura			
+jcl	jcl	estructura			
+jcn	jcn	estructura			
+jco	jco	estructura			
+jcq	jcq	estructura			
+jcs	jcs	estructura			
+jct	jct	estructura			sí
+jcu	jcu	estructura			
+jcv	jcv	estructura			
+jcy	jcy	estructura			
+jcz	jcz	estructura			
+jdb	jdb	estructura			
+jdc	jdc	estructura			
+jdf	jdf	estructura			
+jdh	jdh	estructura			
+jdi	jdi	estructura			
+jdk	jdk	estructura			
+jdm	jdm	estructura			
+jdp	jdp	estructura			
+jds	jds	estructura			
+jdu	jdu	estructura			
+jdv	jdv	estructura			
+jdx	jdx	estructura			
+jdz	jdz	estructura			
+jea	jea	estructura			
+jeb	jeb	estructura			
+jed	jed	estructura			
+jef	jef	estructura			
+jeg	jeg	estructura			
+jei	jei	estructura			
+jej	jej	estructura			
+jek	jek	estructura			
+jem	jem	estructura			
+jen	jen	estructura			
+jeo	jeo	estructura			
+jeq	jeq	estructura			
+jet	jet	estructura			
+jeu	jeu	estructura			
+jew	jew	estructura			
+jex	jex	estructura			
+jey	jey	estructura			
+jez	jez	estructura			
+jfb	jfb	estructura			
+jfc	jfc	estructura			sí
+jfd	jfd	estructura			
+jff	jff	estructura			
+jfh	jfh	estructura			
+jfi	jfi	estructura			
+jfk	jfk	estructura			
+jfl	jfl	estructura			
+jfm	jfm	estructura			
+jfo	jfo	estructura			
+jfp	jfp	estructura			
+jfr	jfr	estructura			
+jfs	jfs	estructura			
+jft	jft	estructura			
+jfv	jfv	estructura			
+jfw	jfw	estructura			
+jfy	jfy	estructura			
+jfz	jfz	estructura			
+jga	jga	estructura			
+jgb	jgb	estructura			
+jgc	jgc	estructura			
+jgg	jgg	estructura			
+jgi	jgi	estructura			
+jgj	jgj	estructura			
+jgl	jgl	estructura			
+jgn	jgn	estructura			
+jgo	jgo	estructura			
+jgq	jgq	estructura			
+jgr	jgr	estructura			
+jgs	jgs	estructura			
+jgu	jgu	estructura	SpouseInformationsMessage	El conyuge, con su look; se descarta. 13 mensajes.	sí
+jgv	jgv	estructura			sí
+jgw	jgw	estructura			
+jgx	jgx	estructura			
+jgz	jgz	estructura			
+jha	jha	estructura			
+jhb	jhb	estructura			
+jhc	jhc	estructura			
+jhd	jhd	estructura			
+jhe	jhe	estructura		El gremio de la cuenta grabada; se descarta. 7 mensajes.	sí
+jhf	jhf	estructura			
+jhh	jhh	estructura	GuildInformationsGeneralMessage	El gremio otra vez: fecha de fundacion, nivel y numero de miembros. Se descarta; mientras viajaba provocaba un NullReferenceException en el cliente. 18 mensajes.	sí
+jhk	jhk	estructura		El nombre del gremio, escrito. Se descarta; mientras viajaba provocaba un NullReferenceException en el cliente. 2 mensajes.	sí
+jhn	jhn	estructura			
+jho	jho	estructura			
+jhp	jhp	estructura			
+jhq	jhq	estructura			
+jhr	jhr	estructura			
+jhu	jhu	estructura			
+jhv	jhv	estructura			
+jhw	jhw	estructura			
+jhy	jhy	estructura			
+jhz	jhz	estructura			
+jia	jia	estructura			
+jib	jib	estructura			
+jid	jid	estructura			
+jie	jie	estructura			
+jii	jii	estructura		No implementado. Exclusivo de las capturas de gremio (Gremio); 21 mensajes.	
+jij	jij	estructura			
+jik	jik	estructura			
+jil	jil	estructura			
+jim	jim	estructura			
+jin	jin	estructura			
+jio	jio	estructura			
+jiq	jiq	estructura			
+jir	jir	estructura			
+jit	jit	estructura			
+jiv	jiv	estructura			
+jiy	jiy	estructura			
+jiz	jiz	estructura			
+jja	jja	estructura			
+jjc	jjc	estructura			
+jjd	jjd	estructura			
+jje	jje	estructura			
+jjf	jjf	estructura			
+jjg	jjg	estructura			
+jjj	jjj	estructura			
+jjm	jjm	estructura			
+jjn	jjn	estructura			
+jjp	jjp	estructura			
+jjs	jjs	estructura		Un puesto de jugador en el mapa, con la cuenta detras; se descarta. 10 mensajes.	sí
+jjt	jjt	estructura			
+jjv	jjv	estructura			
+jjw	jjw	estructura			
+jjx	jjx	estructura			
+jjy	jjy	estructura			
+jjz	jjz	estructura			
+jke	jke	estructura			
+jkf	jkf	estructura			
+jkh	jkh	estructura			
+jki	jki	estructura			
+jkj	jkj	estructura			
+jkl	jkl	estructura			
+jko	jko	estructura			
+jkq	jkq	estructura			
+jkr	jkr	estructura			
+jkt	jkt	estructura			
+jku	jku	estructura			
+jkv	jkv	estructura			
+jkw	jkw	estructura			
+jkx	jkx	estructura			
+jky	jky	estructura			
+jla	jla	estructura			
+jlb	jlb	estructura			
+jle	jle	estructura			
+jlg	jlg	estructura			
+jlh	jlh	estructura			
+jlk	jlk	estructura			
+jll	jll	estructura			
+jlm	jlm	estructura			
+jlo	jlo	estructura			
+jlp	jlp	estructura			
+jlq	jlq	estructura			
+jls	jls	estructura			
+jlt	jlt	estructura			
+jlu	jlu	estructura			
+jlv	jlv	estructura			
+jlw	jlw	estructura			
+jlx	jlx	estructura		No implementado. Exclusivo de las capturas de gremio (Gremio); 8 mensajes.	
+jly	jly	estructura			
+jlz	jlz	estructura			
+jma	jma	estructura			
+jmc	jmc	estructura			
+jme	jme	estructura			
+jmf	jmf	estructura		No implementado. Exclusivo de las capturas de gremio (Gremio); 8 mensajes.	
+jmi	jmi	estructura			
+jml	jml	estructura		No implementado. Exclusivo de las capturas de gremio (Gremio); 14 mensajes.	
+jmo	jmo	estructura			
+jmp	jmp	estructura			
+jms	jms	estructura			
+jmu	jmu	estructura		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 8 mensajes.	
+jmv	jmv	estructura			
+jmx	jmx	estructura			
+jmz	jmz	estructura			
+jna	jna	estructura			
+jnc	jnc	estructura			
+jnf	jnf	estructura			
+jng	jng	estructura			
+jnh	jnh	estructura			
+jnk	jnk	estructura			
+jnn	jnn	estructura			
+jnp	jnp	estructura			
+jnr	jnr	estructura			
+jns	jns	estructura			
+jnt	jnt	estructura			
+jnu	jnu	estructura			
+jnv	jnv	estructura			
+jnw	jnw	estructura			
+jny	jny	estructura			
+jnz	jnz	estructura			
+joa	joa	estructura			
+joc	joc	estructura			
+jod	jod	estructura			
+jof	jof	estructura			
+jog	jog	estructura			
+joh	joh	estructura		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+joj	joj	estructura			
+jol	jol	estructura			
+jom	jom	estructura			
+jon	jon	estructura			
+jop	jop	estructura			
+joq	joq	estructura		Sus dos llamadores son rutas de 3.6.4.3. 1 mensaje en 1 fichero.	sí
+jor	jor	estructura			
+jos	jos	estructura		Cambio de mapa antiguo (3.6.4.3), sustituido por jqk. No aparece en ninguna captura.	sí
+jot	jot	estructura			
+jov	jov	estructura			
+joy	joy	estructura			
+joz	joz	estructura			
+jpb	jpb	estructura			
+jpe	jpe	estructura			
+jpg	jpg	estructura			
+jpi	jpi	estructura			
+jpj	jpj	estructura			
+jpk	jpk	estructura			
+jpn	jpn	estructura			
+jpq	jpq	estructura			
+jpr	jpr	estructura		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 5 mensajes.	
+jps	jps	estructura			
+jpv	jpv	estructura			sí
+jpx	jpx	estructura		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 8 mensajes.	
+jpy	jpy	estructura			
+jpz	jpz	estructura			
+jqb	jqb	estructura			
+jqd	jqd	estructura			
+jqe	jqe	estructura			
+jqf	jqf	estructura			sí
+jqi	jqi	estructura	MapMovementConfirmRequest	Estoy en el borde, puedo salir.	sí
+jqj	jqj	estructura			
+jqk	jqk	estructura	ChangeMapMessage	El mapa al que quiere ir; la casilla y la orientacion de llegada se calculan del lado de salida (13 de casilla lateral, 532 en vertical), medido en las capturas.	sí
+jql	jql	estructura			
+jqn	jqn	estructura			
+jqp	jqp	estructura			
+jqr	jqr	estructura			
+jqs	jqs	estructura			
+jqt	jqt	estructura		No implementado. Exclusivo de las capturas de extras de movimiento (Movimiento); 5 mensajes.	
+jqw	jqw	estructura			
+jqx	jqx	estructura			
+jqy	jqy	estructura			
+jqz	jqz	estructura			
+jra	jra	estructura			
+jrd	jrd	estructura			
+jrg	jrg	estructura			
+jrh	jrh	estructura	WorldEntryRequests	Quien esta en este mapa; sin respuesta el mapa se dibuja vacio, sin avatar, sin PNJs y sin monstruos.	sí
+jri	jri	estructura			
+jrk	jrk	estructura			sí
+jrl	jrl	estructura			
+jrn	jrn	estructura			
+jro	jro	estructura			
+jrq	jrq	estructura			
+jrr	jrr	estructura			
+jru	jru	estructura	CurrentMapMessage	Carga este mapa; enviarlo dos veces hace que el cliente recargue el mundo en bucle.	sí
+jrv	jrv	estructura			
+jrw	jrw	estructura	GameMapMovementRequestMessage	Caminar por un camino de casillas; cada paso empaqueta la orientacion en los bits altos de la casilla. El map id se comprueba contra la sesion y si no cuadra se ignora.	sí
+jry	jry	estructura			
+jrz	jrz	estructura			
+jsa	jsa	estructura			
+jsc	jsc	estructura			
+jsd	jsd	estructura	GameContextRemoveElementMessage	Quita un actor del mapa; su propio cambio de mapa cuenta.	sí
+jse	jse	estructura			
+jsg	jsg	estructura			
+jsh	jsh	estructura			
+jsj	jsj	estructura	GameMapMovementMessage	El movimiento confirmado; saltarselo deja al actor con orientacion cero.	sí
+jsk	jsk	estructura			
+jsl	jsl	estructura			
+jsn	jsn	estructura	GameContextRefreshEntityLookMessage	Este actor ha cambiado: el bloque de actor entero, con casilla, id y el look nuevo. Es de lo que redibuja el cliente en el mapa.	sí
+jsq	jsq	estructura	MapMovementConfirmResponse	Adelante; no lleva mas que el id de peticion repetido, en el campo raiz 3. Sin el, el cliente nunca envia jqk y el personaje se queda en el borde.	sí
+jss	jss	estructura	MapComplementaryInformationsDataMessage	Los actores del mapa; f6 (subarea) es obligatorio o el cliente revienta en MapInfoUI.SetInfoFromSubarea. El tipo de actor lo da el campo presente dentro de f2.f1: f5 jugador, f7 PNJ, f4 grupo de monstruos, con ids contextuales negativos para PNJs y grupos.	sí
+jsy	jsy	estructura			
+jsz	jsz	estructura			
+jta	jta	estructura			
+jtc	jtc	estructura			
+jtd	jtd	estructura			
+jte	jte	estructura		Se responde con una trama jto hardcodeada. No aparece en ninguna captura.	sí
+jtg	jtg	estructura	GiftsListMessage	Catalogo de regalos de la cuenta; se envia vacio porque nuestras cuentas no tienen ninguno.	sí
+jth	jth	estructura			
+jti	jti	estructura		Combate. 1275 mensajes, 22 ficheros.	sí
+jtj	jtj	estructura			
+jtl	jtl	estructura			
+jtn	jtn	estructura		Combate; el opcode mas frecuente de todo el conjunto: 14728 mensajes en los 23 ficheros que contienen un combate.	
+jto	jto	estructura		Lo envia el servidor y el cliente nunca; el emulador lo tiene en la rama de lista de personajes, a la que solo llega kpa. 7324 mensajes en 23 ficheros.	sí
+jtq	jtq	estructura			
+jtr	jtr	estructura			
+jts	jts	estructura			
+jtv	jtv	estructura			
+jtw	jtw	estructura			
+jtx	jtx	estructura			sí
+jty	jty	estructura			
+jtz	jtz	estructura			
+jua	jua	estructura			
+juc	juc	estructura			sí
+jue	jue	estructura			
+juf	juf	estructura			
+jug	jug	estructura			
+jui	jui	estructura			
+juk	juk	estructura			
+jun	jun	estructura			
+juo	juo	estructura			
+jup	jup	estructura			
+jur	jur	estructura			
+jus	jus	estructura			
+jut	jut	estructura			sí
+juu	juu	estructura			sí
+jux	jux	estructura			
+juz	juz	estructura			
+jva	jva	estructura			
+jvb	jvb	estructura			
+jvc	jvc	estructura			
+jve	jve	estructura			
+jvf	jvf	estructura			
+jvg	jvg	estructura			
+jvi	jvi	estructura			
+jvj	jvj	estructura			
+jvk	jvk	estructura			
+jvl	jvl	estructura			
+jvn	jvn	estructura			sí
+jvo	jvo	estructura			
+jvp	jvp	estructura			
+jvs	jvs	estructura			
+jvt	jvt	estructura			
+jvu	jvu	estructura			
+jvv	jvv	estructura			
+jvw	jvw	estructura			
+jvz	jvz	estructura			
+jwa	jwa	estructura			
+jwb	jwb	estructura			sí
+jwc	jwc	estructura			
+jwe	jwe	estructura		Lo envia el servidor pero el emulador lo usa como disparador de cliente. 9463 mensajes en 23 ficheros.	sí
+jwf	jwf	estructura			sí
+jwh	jwh	estructura		Combate. 431 mensajes, 19 ficheros.	sí
+jwi	jwi	estructura		Combate. 7324 mensajes, 23 ficheros.	sí
+jwj	jwj	estructura		No implementado. Exclusivo de las capturas de tienda (Tienda); 13 mensajes.	
+jwm	jwm	estructura		Direccion invertida en el emulador: lo construye como mensaje de servidor pero lo envia el cliente. 7 mensajes en 1 fichero.	sí
+jwn	jwn	estructura			
+jwo	jwo	estructura			sí
+jwq	jwq	estructura			sí
+jwr	jwr	estructura			
+jws	jws	estructura			
+jwt	jwt	estructura			
+jwv	jwv	estructura			
+jww	jww	estructura			
+jwx	jwx	estructura			
+jwz	jwz	estructura		Combate. 513 mensajes, 23 ficheros.	sí
+jxa	jxa	estructura			
+jxb	jxb	estructura			sí
+jxc	jxc	estructura		Combate. 739 mensajes, 23 ficheros.	sí
+jxf	jxf	estructura			
+jxg	jxg	estructura			sí
+jxh	jxh	estructura		Combate. 514 mensajes, 23 ficheros.	sí
+jxi	jxi	estructura			
+jxj	jxj	estructura			
+jxk	jxk	estructura			
+jxl	jxl	estructura			
+jxm	jxm	estructura		Combate. 6556 mensajes, 23 ficheros.	sí
+jxn	jxn	estructura			
+jxo	jxo	estructura			
+jxp	jxp	estructura			
+jxs	jxs	estructura		No implementado. Exclusivo de las capturas de mazmorras (Mazmorras); 1 mensajes.	
+jxt	jxt	estructura			
+jxu	jxu	estructura			
+jxv	jxv	estructura			
+jxw	jxw	estructura		Lo envia el servidor pero el emulador lo usa como disparador de cliente. 4933 mensajes en 23 ficheros.	sí
+jxx	jxx	estructura		Despacho de combate antiguo (3.6.4.3). No aparece en ninguna captura.	sí
+jxy	jxy	estructura			sí
+jxz	jxz	estructura			sí
+jya	jya	estructura		Solo alcanzable desde el despacho de combate muerto. 3962 mensajes en 20 ficheros.	sí
+jyb	jyb	estructura			
+jyc	jyc	estructura			
+jyd	jyd	estructura			
+jyf	jyf	estructura			sí
+jyg	jyg	estructura		Solo alcanzable desde el despacho de combate muerto. 36 mensajes en 22 ficheros.	sí
+jyj	jyj	estructura		Solo alcanzable desde el despacho de combate muerto. 178 mensajes en 21 ficheros.	sí
+jyn	jyn	estructura			
+jyo	jyo	estructura			
+jyp	jyp	estructura			
+jyq	jyq	estructura			
+jys	jys	estructura			sí
+jyt	jyt	estructura		Combate. 503 mensajes, 20 ficheros.	sí
+jyu	jyu	estructura			
+jyv	jyv	estructura			
+jyw	jyw	estructura			
+jyy	jyy	estructura			sí
+jyz	jyz	estructura			sí
+jzb	jzb	estructura			
+jzc	jzc	estructura		Combate. 538 mensajes, 23 ficheros.	sí
+jzd	jzd	estructura			
+jze	jze	estructura			
+jzh	jzh	estructura			
+jzi	jzi	estructura			
+jzj	jzj	estructura			
+jzk	jzk	estructura			
+jzl	jzl	estructura			
+jzm	jzm	estructura			
+jzo	jzo	estructura			
+jzq	jzq	estructura			
+jzr	jzr	estructura			
+jzs	jzs	estructura			
+jzu	jzu	estructura			sí
+jzw	jzw	estructura		No implementado. Exclusivo de las capturas de busqueda de grupo (Busqueda grupo); 12 mensajes.	
+jzx	jzx	estructura			
+jzy	jzy	estructura			sí
+jzz	jzz	estructura			
+kaa	kaa	estructura			sí
+kab	kab	estructura			
+kac	kac	estructura			
+kad	kad	estructura			
+kae	kae	estructura			sí
+kah	kah	estructura			sí
+kai	kai	estructura			sí
+kal	kal	estructura			
+kam	kam	estructura			sí
+kan	kan	estructura			
+kap	kap	estructura			
+kaq	kaq	estructura			sí
+kar	kar	estructura			
+kau	kau	estructura			sí
+kav	kav	estructura			
+kaw	kaw	estructura			
+kay	kay	estructura			
+kaz	kaz	estructura			
+kba	kba	estructura			sí
+kbb	kbb	estructura			
+kbd	kbd	estructura			sí
+kbg	kbg	estructura			
+kbh	kbh	estructura			
+kbi	kbi	estructura			
+kbj	kbj	estructura			
+kbk	kbk	estructura			
+kbl	kbl	estructura			
+kbm	kbm	estructura			
+kbn	kbn	estructura			
+kbo	kbo	estructura			
+kbr	kbr	estructura			
+kbt	kbt	estructura			
+kbu	kbu	estructura			
+kbv	kbv	estructura			
+kbw	kbw	estructura			
+kby	kby	estructura			
+kbz	kbz	estructura			
+kcc	kcc	estructura			
+kcd	kcd	estructura			
+kce	kce	estructura			
+kcf	kcf	estructura			
+kcg	kcg	estructura			
+kch	kch	estructura			
+kci	kci	estructura	ExchangeStartedStorageMessage	El cofre se abre; los dos valores son constantes en la captura y el 100 parece el numero de huecos.	sí
+kcj	kcj	estructura		No implementado. Exclusivo de las capturas de oficios (Oficios); 114 mensajes.	
+kck	kck	estructura			
+kcl	kcl	estructura			
+kcm	kcm	estructura			
+kco	kco	estructura			
+kcq	kcq	estructura			
+kcr	kcr	estructura	ExchangeObjectMoveMessage	Mover un objeto del cofre; la direccion no viaja, se deduce de donde esta el objeto. f1 llega como -1 cuando se arrastra la pila entera.	sí
+kcs	kcs	estructura			
+kcu	kcu	estructura		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 4 mensajes.	
+kcv	kcv	estructura			
+kcx	kcx	estructura			
+kcy	kcy	estructura			
+kcz	kcz	estructura			
+kda	kda	estructura			
+kdb	kdb	estructura		No implementado. Exclusivo de las capturas de oficios (Oficios); 114 mensajes.	
+kdc	kdc	estructura			
+kdd	kdd	estructura			
+kde	kde	estructura			
+kdg	kdg	estructura			sí
+kdh	kdh	estructura			
+kdk	kdk	estructura			
+kdp	kdp	estructura			
+kdr	kdr	estructura			
+kds	kds	estructura			
+kdv	kdv	estructura			
+kdw	kdw	estructura			
+kdx	kdx	estructura		Lo envia el cliente (10 veces en 1 fichero) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AccountCapabilitiesMessage, y eso es falso.	sí
+kdy	kdy	estructura			
+kdz	kdz	estructura			
+kea	kea	estructura			sí
+ked	ked	estructura			
+kee	kee	estructura			
+kef	kef	estructura			
+keg	keg	estructura			
+keh	keh	estructura			
+kei	kei	estructura			
+kej	kej	estructura			
+kek	kek	estructura			
+kem	kem	estructura			
+ken	ken	estructura			
+keo	keo	estructura			
+kep	kep	estructura			
+keq	keq	estructura		No implementado. Exclusivo de las capturas de intercambio (Intercambio); 4 mensajes.	
+ker	ker	estructura			
+kes	kes	estructura			
+ket	ket	estructura		No implementado. Exclusivo de las capturas de intercambio (Intercambio); 5 mensajes.	
+keu	keu	estructura			
+kev	kev	estructura			
+kew	kew	estructura			
+kex	kex	estructura			
+kez	kez	estructura			
+kfa	kfa	estructura			
+kfb	kfb	estructura			
+kfc	kfc	estructura			
+kfe	kfe	estructura			
+kfh	kfh	estructura			
+kfi	kfi	estructura			
+kfj	kfj	estructura			
+kfk	kfk	estructura			
+kfl	kfl	estructura			
+kfn	kfn	estructura			
+kfp	kfp	estructura			
+kfs	kfs	estructura			
+kfv	kfv	estructura			
+kfw	kfw	estructura			
+kfx	kfx	estructura			
+kfz	kfz	estructura		No implementado. Exclusivo de las capturas de intercambio (Intercambio); 3 mensajes.	
+kga	kga	estructura			
+kgb	kgb	estructura			
+kgd	kgd	estructura			
+kge	kge	estructura			
+kgf	kgf	estructura			
+kgh	kgh	estructura			
+kgi	kgi	estructura			
+kgj	kgj	estructura			
+kgk	kgk	estructura			
+kgl	kgl	estructura		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 12 mensajes.	
+kgm	kgm	estructura			
+kgp	kgp	estructura		No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 9 mensajes.	
+kgq	kgq	estructura			
+kgr	kgr	estructura			
+kgt	kgt	estructura			
+kgu	kgu	estructura			
+kgv	kgv	estructura			
+kgw	kgw	estructura			
+kgx	kgx	estructura			
+kgy	kgy	estructura			
+kgz	kgz	estructura			
+kha	kha	estructura			
+khd	khd	estructura	ExchangeLeaveMessage	El cofre se cerro.	sí
+khh	khh	estructura			
+khi	khi	estructura			
+khj	khj	estructura			
+khk	khk	estructura			
+khl	khl	estructura			
+khm	khm	estructura			
+khn	khn	estructura			
+khr	khr	estructura			
+khu	khu	estructura		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.	
+khv	khv	estructura		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.	
+khw	khw	estructura			
+khx	khx	estructura			
+kia	kia	estructura		No implementado. Exclusivo de las capturas de casas (Casas); 4 mensajes.	
+kid	kid	estructura			
+kif	kif	estructura			
+kig	kig	estructura			
+kih	kih	estructura			
+kij	kij	estructura			
+kil	kil	estructura			
+kim	kim	estructura			
+kin	kin	estructura			
+kip	kip	estructura			
+kiq	kiq	estructura			
+kis	kis	estructura			
+kiv	kiv	estructura			
+kiw	kiw	estructura			
+kiy	kiy	estructura			
+kiz	kiz	estructura			
+kjb	kjb	estructura			
+kje	kje	estructura			
+kjg	kjg	estructura			
+kji	kji	estructura			
+kjj	kjj	estructura			
+kjl	kjl	estructura		Lo envia el servidor pero NpcHandler lo despacha como peticion de cliente. 1 mensaje en 1 fichero.	
+kjo	kjo	estructura			
+kjr	kjr	estructura			
+kjs	kjs	estructura			
+kjv	kjv	estructura			
+kjw	kjw	estructura			
+kjx	kjx	estructura			
+kka	kka	estructura			
+kkb	kkb	estructura			
+kkc	kkc	estructura			
+kke	kke	estructura			
+kkg	kkg	estructura			
+kkh	kkh	estructura			
+kki	kki	estructura			
+kkk	kkk	estructura			
+kkl	kkl	estructura			
+kkm	kkm	estructura		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+kko	kko	estructura			
+kkq	kkq	estructura			
+kkr	kkr	estructura		Peticion de carga de mapa antigua (3.6.4.3). No aparece en ninguna captura.	sí
+kkt	kkt	estructura			
+kku	kku	estructura		Solo alcanzable desde isi, que nunca llega. 2 mensajes en 2 ficheros.	sí
+kkw	kkw	estructura			
+kkz	kkz	estructura			sí
+kla	kla	estructura	LeaveDialogRequestMessage	El boton de cerrar el dialogo; vacio, y el cliente espera: la ventana no se cierra hasta que lo dice el servidor.	sí
+klb	klb	estructura			
+kld	kld	estructura	LeaveDialogMessage	Cierra el dialogo; el cliente no cierra la ventana del zaap por si mismo. f1 es un motivo fijo, no algo que calcular.	sí
+klg	klg	estructura			
+kli	kli	estructura			
+klk	klk	estructura			
+klm	klm	estructura			
+klp	klp	estructura		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	sí
+klq	klq	estructura			
+klu	klu	estructura			
+klx	klx	estructura			
+klz	klz	estructura			
+kmb	kmb	estructura		Sale con jsn cuando se guarda un look; medidos 49 kmb estando montado y ninguno sin montura. No se envia: los cambios de look llegan igual por jsn. 172 mensajes, 62 ficheros.	
+kmc	kmc	estructura			
+kme	kme	estructura			
+kmh	kmh	estructura			
+kmi	kmi	estructura			
+kmj	kmj	estructura			
+kmk	kmk	estructura		Combate. 264 mensajes, 22 ficheros.	sí
+kml	kml	estructura			sí
+kmn	kmn	estructura			
+kmp	kmp	estructura			sí
+kmq	kmq	estructura			
+kmr	kmr	estructura		En la linea temporal de entrada al mundo, el servidor le contesta con 11 tramas, entre ellas jru (el mapa).	
+kmu	kmu	estructura		Presente en 25 de las 31 carpetas de captura (399 mensajes, 90 ficheros). Nada establecido.	sí
+kmv	kmv	estructura		Llega con jrh en cada carga de mapa y no espera nada de vuelta; el emulador ya lo ignora en silencio. 727 mensajes, 88 ficheros.	sí
+kmw	kmw	estructura			sí
+kmz	kmz	estructura			
+knc	knc	estructura			sí
+knf	knf	estructura			
+kni	kni	estructura			
+knk	knk	estructura			
+knl	knl	estructura			
+knm	knm	estructura		Junto con kno y kny es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.	
+knn	knn	estructura			
+kno	kno	estructura		Junto con knm y kny es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.	
+kns	kns	estructura		La respuesta al ping kod de 3.6.4.3. No aparece en ninguna de las 242 capturas.	sí
+knt	knt	estructura			
+knv	knv	estructura			sí
+knw	knw	estructura			
+kny	kny	estructura		Junto con knm y kno es lo que el cliente reenvia unos dos segundos despues cuando no le llego lva y no da el mapa por cargado.	
+knz	knz	estructura			
+koc	koc	estructura			
+kod	kod	estructura		El ping de 3.6.4.3, respondido con kns. Sustituido por kqo/kqy. No aparece en ninguna captura.	sí
+koe	koe	estructura			
+kof	kof	estructura			sí
+kog	kog	estructura			
+koh	koh	estructura			
+koi	koi	estructura			
+koj	koj	estructura		Veinte cuentas Ankama con id, apodo y tag; se reconoce y se descarta por privacidad. El builder no se llama nunca. El fichero de mapeos lo llama HavenBagStatusMessage, y eso es falso. 28 mensajes en 7 ficheros.	sí
+kok	kok	estructura			
+kol	kol	estructura			
+kon	kon	estructura			
+koo	koo	estructura			
+koq	koq	estructura			
+kou	kou	estructura			
+kov	kov	estructura			
+kox	kox	estructura			
+kpa	kpa	estructura	CharactersListRequestMessage	Peticion de la lista de personajes; se despacha, pero solo se ve una vez en 242 capturas.	sí
+kpb	kpb	estructura			
+kpe	kpe	estructura			
+kph	kph	estructura			
+kpi	kpi	estructura			
+kpj	kpj	estructura			
+kpl	kpl	estructura			
+kpm	kpm	estructura			
+kpp	kpp	estructura			
+kpr	kpr	estructura			
+kpv	kpv	estructura			
+kpw	kpw	estructura			
+kpy	kpy	estructura			
+kpz	kpz	estructura			
+kqc	kqc	estructura			
+kqd	kqd	estructura			
+kqg	kqg	estructura	ContactsListMessage	La lista de contactos de la cuenta grabada; se reconoce por opcode y se descarta. 28 mensajes.	sí
+kqh	kqh	estructura			
+kqi	kqi	estructura			
+kqk	kqk	estructura			sí
+kqm	kqm	estructura		La lista que envia la rama hmv de 3.6.4.3, junto con hnk. No aparece en ninguna de las 242 capturas.	sí
+kqo	kqo	estructura	BasicPingMessage	El latido, cada cinco segundos mientras el cliente esta en el mundo; el mensaje de cliente mas frecuente, en 235 de los 242 ficheros. El fichero de mapeos lo llama ChatChannelsReadMessage, y eso es falso.	sí
+kqp	kqp	estructura		Se envia tres veces seguidas con tres cargas distintas; significado no establecido.	sí
+kqq	kqq	estructura	LogoutRequestMessage	El cliente vuelve a la pantalla de personaje o de servidor.	sí
+kqr	kqr	estructura	LogoutResultMessage	Respuesta a kqq; despues el cliente cierra la conexion el mismo y rehace el handshake.	sí
+kqs	kqs	estructura			
+kqt	kqt	estructura			
+kqu	kqu	estructura	ServerOptionalFeaturesMessage	Funcionalidades habilitadas en el servidor, como ids opacos copiados de la captura. NO es una peticion de lista de personajes.	sí
+kqv	kqv	estructura			
+kqw	kqw	estructura			
+kqy	kqy	estructura	BasicPongMessage	La respuesta al latido, y nada mas; viaja en el campo raiz 1, no en el de respuesta.	sí
+kqz	kqz	estructura	AuthenticationTicketMessage	Presenta el ticket de un solo uso; vincula la sesion a una cuenta y a un servidor, y un ticket desconocido cierra la conexion.	sí
+kra	kra	estructura	AuthenticationTicketAcceptedMessage	Abre la rafaga de bienvenida.	sí
+krc	krc	estructura		Subida de caracteristicas antigua (3.6.4.3), sustituida por kum. No aparece en ninguna captura.	sí
+krd	krd	estructura			sí
+krf	krf	estructura			
+krh	krh	estructura			sí
+kri	kri	estructura		Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.	sí
+krj	krj	estructura			
+krl	krl	estructura		Lleva id de peticion real en 14 peticiones.	
+kro	kro	estructura		Lleva id de peticion real en 14 peticiones. Ojo: la cadena kro tambien es una silaba del generador de nombres aleatorios de CharacterCreationHandler, colision que no es un opcode.	
+krp	krp	estructura		Solo alcanzable desde el despacho de combate muerto. 14 mensajes en 14 ficheros.	
+krq	krq	estructura			
+krs	krs	estructura			sí
+krt	krt	estructura		Llega junto con kqz; no espera nada de vuelta.	sí
+kru	kru	estructura			
+krv	krv	estructura		El cliente lo envia justo tras la rafaga de bienvenida (9 veces en 8 ficheros) y lleva id de peticion real; el emulador deliberadamente no lo devuelve.	
+krx	krx	estructura			
+kry	kry	estructura			
+krz	krz	estructura			
+ksb	ksb	estructura			
+ksc	ksc	estructura			
+ksf	ksf	estructura			
+ksh	ksh	estructura			
+ksi	ksi	estructura			
+ksl	ksl	estructura			sí
+ksm	ksm	estructura			
+ksn	ksn	estructura			
+kso	kso	estructura			
+ksr	ksr	estructura			
+kss	kss	estructura			
+kst	kst	estructura			
+ksu	ksu	estructura			
+ksv	ksv	estructura			sí
+ksw	ksw	estructura			
+ksx	ksx	estructura			sí
+ktb	ktb	estructura		El mensaje privado (susurro): es un mensaje distinto de ktm y lleva su destinatario. No implementado. El documento no da direccion.	
+ktc	ktc	estructura			
+kte	kte	estructura			
+ktf	ktf	estructura			
+kth	kth	estructura			
+kti	kti	estructura	ChatServerMessage	La linea de vuelta. Canales: 0 general (omitido por ser cero), 1 equipo, 2 gremio, 3 alianza, 4 grupo, 5 comercio, 6 reclutamiento, y 9, 11, 16, 18, 19 para el resto.	sí
+ktl	ktl	estructura			
+ktm	ktm	estructura	ChatClientMultiMessage	Una linea que escribio el jugador.	sí
+ktn	ktn	estructura			
+kto	kto	estructura			
+ktp	ktp	estructura			
+ktq	ktq	estructura		Once seguidos en la entrada al mundo, detras de hou.	
+kts	kts	estructura		No implementado. Exclusivo de las capturas de caracteristicas (Caracteristicas); 2 mensajes.	
+ktu	ktu	estructura			
+ktw	ktw	estructura			
+ktx	ktx	estructura			
+kty	kty	estructura			
+ktz	ktz	estructura			
+kua	kua	estructura			
+kub	kub	estructura	CharacterStatsListMessage	La hoja de personaje; el campo contenedor no es el mismo para cada caracteristica y equivocarlo mata la hoja entera con NullReferenceException. Se envia dos veces (con el personaje y con el mapa) y el cliente se queda con la segunda.	sí
+kuc	kuc	estructura			
+kuf	kuf	estructura			sí
+kug	kug	estructura			
+kuh	kuh	estructura	StatsResetRequestMessage	Reiniciar caracteristicas; la captura no cobra nada por ello, asi que aqui tampoco se cobra.	sí
+kuj	kuj	estructura			
+kul	kul	estructura			
+kum	kum	estructura	StatsUpgradeRequestMessage	Gastar puntos de caracteristica; el valor es el total pagado, no un incremento, lo que hace el mensaje idempotente, y un total que no cabe se rechaza entero. Campos: 1 inteligencia, 2 suerte, 3 vitalidad, 4 sabiduria, 5 agilidad, 6 fuerza. Lleva id de peticion real (7 peticiones).	sí
+kup	kup	estructura			
+kuq	kuq	estructura			
+kur	kur	estructura			
+kus	kus	estructura			
+kux	kux	estructura			
+kuy	kuy	estructura			
+kva	kva	estructura	CharacterSelectedSuccessMessage	Ya estas jugando con este personaje; sin el, el cliente se queda en la pantalla de personaje con el reloj de arena.	sí
+kvb	kvb	estructura	CharacterCreationResultMessage	Resultado de la creacion; vacio si va bien, f2 lleva el motivo del rechazo.	sí
+kvc	kvc	estructura		El cliente lo envia justo tras la rafaga de bienvenida (10 veces en 9 ficheros); el emulador deliberadamente no lo devuelve.	
+kvd	kvd	estructura	CharactersListEndMessage	Cierra la lista de personajes; vacio, justo detras de kvi en la rafaga real. Candidato principal a la causa del boton de crear personaje muerto.	sí
+kvg	kvg	estructura			
+kvh	kvh	estructura			
+kvi	kvi	estructura	CharactersListMessage	Los personajes de la cuenta en el servidor elegido.	sí
+kvj	kvj	estructura			
+kvk	kvk	estructura	CharacterNameSuggestionSuccessMessage	Un nombre de personaje sugerido (el boton del dado).	sí
+kvl	kvl	estructura	CharacterFirstSelectionMessage	El mismo paso justo despues de una creacion con exito: el cliente envia kvl detras de kvi y entra al mundo sin pasar por la lista.	sí
+kvm	kvm	estructura			
+kvn	kvn	estructura			
+kvo	kvo	estructura			
+kvq	kvq	estructura			
+kvt	kvt	estructura			
+kvu	kvu	estructura			
+kvv	kvv	estructura			
+kvw	kvw	estructura	CharacterSelectionMessage	Seleccionar un personaje; el id se comprueba contra la cuenta de la sesion porque lo elige el cliente y no es de fiar.	sí
+kvx	kvx	estructura			
+kvy	kvy	estructura			
+kvz	kvz	estructura	CharacterCreationRequestMessage	Crear un personaje.	sí
+kwa	kwa	estructura			
+kwb	kwb	estructura		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); 5 mensajes.	
+kwc	kwc	estructura			
+kwd	kwd	estructura		No implementado. Exclusivo de las capturas de extras de conexion; 8 mensajes.	
+kwh	kwh	estructura			
+kwi	kwi	estructura			
+kwj	kwj	estructura			
+kwk	kwk	estructura			
+kwl	kwl	estructura			
+kwm	kwm	estructura			
+kwn	kwn	estructura			
+kwo	kwo	estructura			
+kwr	kwr	estructura			
+kwu	kwu	estructura			
+kwv	kwv	estructura			
+kww	kww	estructura			
+kwx	kwx	estructura			
+kxa	kxa	estructura			
+kxb	kxb	estructura			
+kxh	kxh	estructura		Lleva id de peticion real en 4 peticiones.	
+kxj	kxj	estructura			
+kxk	kxk	estructura			
+kxm	kxm	estructura			
+kxo	kxo	estructura			
+kxp	kxp	estructura			
+kxr	kxr	estructura			
+kxs	kxs	estructura			
+kxv	kxv	estructura			
+kxw	kxw	estructura			
+kxz	kxz	estructura			
+kyb	kyb	estructura			
+kyc	kyc	estructura			
+kye	kye	estructura			
+kyf	kyf	estructura			
+kyi	kyi	estructura			
+kyl	kyl	estructura			
+kym	kym	estructura			
+kyn	kyn	estructura			
+kyo	kyo	estructura			
+kyp	kyp	estructura			
+kyr	kyr	estructura			
+kys	kys	estructura			
+kyu	kyu	estructura			
+kyw	kyw	estructura			
+kyx	kyx	estructura			
+kyy	kyy	estructura			
+kyz	kyz	estructura			
+kza	kza	estructura			
+kzc	kzc	estructura			
+kze	kze	estructura			
+kzg	kzg	estructura			
+kzi	kzi	estructura			
+kzj	kzj	estructura			
+kzl	kzl	estructura			
+kzn	kzn	estructura			
+kzq	kzq	estructura			
+kzs	kzs	estructura			
+kzt	kzt	estructura			
+kzu	kzu	estructura			
+kzy	kzy	estructura			
+lab	lab	estructura			
+lad	lad	estructura		Respuesta que devuelve un id de peticion real (4 respuestas).	
+lag	lag	estructura			
+lak	lak	estructura			
+lal	lal	estructura			
+lao	lao	estructura			
+laq	laq	estructura			
+lar	lar	estructura			
+las	las	estructura			
+lcf	lcf	estructura			
+lci	lci	estructura			
+lcj	lcj	estructura			
+lcm	lcm	estructura			
+lcn	lcn	estructura			
+lco	lco	estructura			
+lcp	lcp	estructura			
+lcr	lcr	estructura			
+lcs	lcs	estructura			
+lcu	lcu	estructura			
+lcx	lcx	estructura			
+lcy	lcy	estructura			
+lda	lda	estructura			
+ldd	ldd	estructura			
+lde	lde	estructura			
+ldf	ldf	estructura			
+ldk	ldk	estructura			
+ldm	ldm	estructura			
+ldn	ldn	estructura			
+ldo	ldo	estructura			
+ldq	ldq	estructura			
+ldr	ldr	estructura			
+ldt	ldt	estructura			sí
+ldx	ldx	estructura			
+ldz	ldz	estructura			
+lea	lea	estructura			
+leb	leb	estructura			
+lec	lec	estructura			
+led	led	estructura			
+lee	lee	estructura			
+lef	lef	estructura			
+leg	leg	estructura			
+lej	lej	estructura			
+lek	lek	estructura			
+lel	lel	estructura			
+len	len	estructura			
+leo	leo	estructura			
+leq	leq	estructura			
+les	les	estructura			
+let	let	estructura			
+lev	lev	estructura			
+ley	ley	estructura			
+lfa	lfa	estructura			
+lfc	lfc	estructura			
+lfd	lfd	estructura			
+lfe	lfe	estructura			
+lff	lff	estructura			
+lfg	lfg	estructura			
+lfh	lfh	estructura			
+lfi	lfi	estructura			
+lfj	lfj	estructura			
+lfk	lfk	estructura			
+lfm	lfm	estructura			
+lfo	lfo	estructura			
+lfq	lfq	estructura			
+lfr	lfr	estructura			
+lft	lft	estructura			
+lfu	lfu	estructura			
+lfv	lfv	estructura			
+lfx	lfx	estructura			
+lfy	lfy	estructura			
+lfz	lfz	estructura			
+lgc	lgc	estructura			
+lgd	lgd	estructura			
+lgf	lgf	estructura			
+lgg	lgg	estructura			
+lgi	lgi	estructura			
+lgj	lgj	estructura			
+lgl	lgl	estructura			
+lgm	lgm	estructura			
+lgp	lgp	estructura			
+lgr	lgr	estructura			
+lgs	lgs	estructura			
+lgt	lgt	estructura			
+lgu	lgu	estructura			
+lgw	lgw	estructura			
+lgx	lgx	estructura			
+lgy	lgy	estructura			
+lgz	lgz	estructura			
+lhd	lhd	estructura			
+lhe	lhe	estructura			
+lhg	lhg	estructura			
+lhh	lhh	estructura			
+lhi	lhi	estructura			
+lhk	lhk	estructura			
+lhl	lhl	estructura			
+lhm	lhm	estructura			
+lhn	lhn	estructura			
+lho	lho	estructura			
+lhp	lhp	estructura			
+lhq	lhq	estructura			
+lhs	lhs	estructura			
+lhx	lhx	estructura			
+lhz	lhz	estructura			
+lia	lia	estructura			
+lib	lib	estructura			
+lic	lic	estructura			
+lid	lid	estructura			
+lie	lie	estructura			
+lif	lif	estructura			
+lih	lih	estructura			
+lij	lij	estructura			
+lik	lik	estructura			
+lim	lim	estructura			
+lin	lin	estructura			
+lip	lip	estructura			
+liq	liq	estructura			
+lir	lir	estructura			
+lit	lit	estructura			
+liu	liu	estructura			
+liw	liw	estructura			
+liy	liy	estructura			
+lja	lja	estructura			
+ljg	ljg	estructura			
+ljh	ljh	estructura			
+ljj	ljj	estructura			
+ljl	ljl	estructura			
+ljo	ljo	estructura			
+ljq	ljq	estructura			
+ljr	ljr	estructura			
+ljt	ljt	estructura			
+ljv	ljv	estructura			
+ljx	ljx	estructura			
+lkc	lkc	estructura			
+lkg	lkg	estructura			
+lkh	lkh	estructura			
+lki	lki	estructura			
+lkm	lkm	estructura			
+lkn	lkn	estructura			
+lko	lko	estructura			
+lkp	lkp	estructura			
+lkq	lkq	estructura			
+lkr	lkr	estructura			
+lks	lks	estructura			
+lkt	lkt	estructura			
+lku	lku	estructura			
+lkv	lkv	estructura			
+lkx	lkx	estructura			
+lky	lky	estructura			
+lkz	lkz	estructura			
+lla	lla	estructura			
+llc	llc	estructura			
+lld	lld	estructura			
+llg	llg	estructura			
+llh	llh	estructura			
+lli	lli	estructura			
+llj	llj	estructura			
+llk	llk	estructura			
+lll	lll	estructura			
+llm	llm	estructura			
+lln	lln	estructura			
+llp	llp	estructura			
+llq	llq	estructura			
+lls	lls	estructura			
+llu	llu	estructura			
+llw	llw	estructura			
+llz	llz	estructura			
+lma	lma	estructura			
+lmc	lmc	estructura			
+lme	lme	estructura			
+lmg	lmg	estructura			
+lmh	lmh	estructura			
+lmi	lmi	estructura			
+lmk	lmk	estructura			
+lmm	lmm	estructura			
+lmn	lmn	estructura			
+lmo	lmo	estructura			
+lmq	lmq	estructura			
+lmr	lmr	estructura			
+lms	lms	estructura			
+lmt	lmt	estructura			
+lmv	lmv	estructura			
+lmw	lmw	estructura			
+lmx	lmx	estructura			
+lmy	lmy	estructura			
+lnb	lnb	estructura			
+lne	lne	estructura			
+lng	lng	estructura			
+lnh	lnh	estructura			
+lni	lni	estructura			
+lnj	lnj	estructura			
+lnk	lnk	estructura			
+lno	lno	estructura			
+lnq	lnq	estructura			
+lns	lns	estructura			
+lnv	lnv	estructura			
+lnw	lnw	estructura			
+lnx	lnx	estructura			
+lny	lny	estructura			
+lnz	lnz	estructura			
+loa	loa	estructura			
+lob	lob	estructura			
+loc	loc	estructura			
+loi	loi	estructura			
+loj	loj	estructura			
+lol	lol	estructura			sí
+lon	lon	estructura			
+lot	lot	estructura			
+lou	lou	estructura			sí
+lov	lov	estructura			
+loy	loy	estructura		Rama de 3.6.4.3: envia tramas lok y jdj hardcodeadas. No aparece en ninguna de las 242 capturas.	sí
+lpa	lpa	estructura			
+lpc	lpc	estructura			
+lpe	lpe	estructura		Lo que envia la rama lpj de 3.6.4.3. No aparece en ninguna de las 242 capturas.	sí
+lpg	lpg	estructura			
+lph	lph	estructura			
+lpj	lpj	estructura		Rama de 3.6.4.3: envia lpe. No aparece en ninguna de las 242 capturas.	sí
+lpk	lpk	estructura			
+lpl	lpl	estructura			
+lpo	lpo	estructura			
+lpp	lpp	estructura			
+lps	lps	estructura			
+lpt	lpt	estructura			
+lpu	lpu	estructura			
+lpv	lpv	estructura			
+lpx	lpx	estructura			
+lpy	lpy	estructura			
+lpz	lpz	estructura			
+lqb	lqb	estructura			
+lqc	lqc	estructura	GameContextCreateRequestMessage	Bloque 1 digerido: el servidor real espera esto antes de enviar el bloque 2.	sí
+lqd	lqd	estructura			
+lqe	lqe	estructura		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.	
+lqf	lqf	estructura		Es el opcode que mas usa id de peticion real: 76 peticiones. Viaja con lqg y lqt (76 en 55 ficheros).	
+lqg	lqg	estructura		Viaja con lqf (C2S) y lqt; los tres juntos aparecen en 54 ficheros de 19 carpetas. 77 mensajes, 56 ficheros.	
+lqj	lqj	estructura			
+lqn	lqn	estructura		Va entre lqu y hjk en cada cambio de mapa capturado; su unico campo vale 197 al entrar al mundo, 24 al cambiar de mapa y 470 tras un reinicio de caracteristicas, y no hay lectura que aguante. Deliberadamente no se envia. 213 mensajes, 53 ficheros.	sí
+lqo	lqo	estructura			
+lqq	lqq	estructura		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.	
+lqr	lqr	estructura			
+lqs	lqs	estructura			
+lqt	lqt	estructura		Viaja con lqf (C2S) y lqg; los tres juntos aparecen en 54 ficheros de 19 carpetas. 76 mensajes, 55 ficheros.	
+lqu	lqu	estructura	BasicTimeMessage	Sincronizacion de reloj; se envia tambien en cada cambio de mapa.	sí
+lqv	lqv	estructura			
+lqw	lqw	estructura		No implementado. Exclusivo de las capturas de amigos (Amigos); 1 mensajes.	
+lqx	lqx	estructura			
+lrc	lrc	estructura			
+lrd	lrd	estructura			
+lre	lre	estructura			
+lrf	lrf	estructura			
+lrg	lrg	estructura			
+lrk	lrk	estructura			
+lrl	lrl	estructura			
+lrm	lrm	estructura			
+lrn	lrn	estructura			
+lro	lro	estructura			
+lrr	lrr	estructura			
+lrs	lrs	estructura			
+lrt	lrt	estructura			
+lru	lru	estructura		Cierra ese grupo de la entrada al mundo (hou, once ktq, lru).	
+lry	lry	estructura			
+lsa	lsa	estructura			
+lsb	lsb	estructura			
+lsd	lsd	estructura			
+lse	lse	estructura			
+lsh	lsh	estructura			
+lsi	lsi	estructura			
+lsl	lsl	estructura			
+lsm	lsm	estructura			
+lsp	lsp	estructura			
+lsq	lsq	estructura			
+lsr	lsr	estructura			
+lss	lss	estructura			
+lst	lst	estructura			
+lsx	lsx	estructura			
+lsy	lsy	estructura			sí
+lsz	lsz	estructura			
+ltb	ltb	estructura			
+ltd	ltd	estructura		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); es una respuesta y devuelve id de peticion real (5); 5 mensajes.	
+lte	lte	estructura			
+ltf	ltf	estructura			
+ltg	ltg	estructura			
+lth	lth	estructura			
+ltk	ltk	estructura			sí
+ltl	ltl	estructura			
+ltm	ltm	estructura			
+ltn	ltn	estructura			
+lto	lto	estructura			
+ltq	ltq	estructura			
+ltr	ltr	estructura			
+ltu	ltu	estructura			
+ltw	ltw	estructura			
+lty	lty	estructura			
+lua	lua	estructura			
+lud	lud	estructura			
+lue	lue	estructura			
+luf	luf	estructura			
+lug	lug	estructura			
+lui	lui	estructura			
+luk	luk	estructura			
+lun	lun	estructura			
+luo	luo	estructura			
+luq	luq	estructura			sí
+lur	lur	estructura			
+lus	lus	estructura			
+luu	luu	estructura			
+luw	luw	estructura			
+lux	lux	estructura		No implementado. Exclusivo de las capturas de combate (Combate, mas alla de los de 4.2); lleva id de peticion real (5); 5 mensajes.	
+luy	luy	estructura		Lo envia el cliente (1 vez) pero el emulador lo construye como mensaje de servidor y el builder no se llama nunca. Lleva id de peticion real. El fichero de mapeos lo llama JobDescriptionMessage, y eso es falso.	sí
+lva	lva	estructura	MapLoadedMessage	Eso es todo el listado de actores; vacio, justo detras de jss. Sin el, el cliente nunca da el mapa por cargado, espera unos dos segundos y reintenta con knm, kno y kny.	sí
+lvb	lvb	estructura		Va entre jss y lva en la entrada al mundo.	
+lvd	lvd	estructura			
+lvf	lvf	estructura			
+lvg	lvg	estructura			
+lvi	lvi	estructura			
+lvl	lvl	estructura			
+lvm	lvm	estructura			
+lvo	lvo	estructura			
+lvp	lvp	estructura			
+lvq	lvq	estructura			
+lvr	lvr	estructura			
+lvs	lvs	estructura			
+lvt	lvt	estructura			
+lvv	lvv	estructura			
+lvw	lvw	estructura			
+lvx	lvx	estructura			
+lvz	lvz	estructura			
+lwa	lwa	estructura			
+lwb	lwb	estructura			sí
+lwc	lwc	estructura			
+lwd	lwd	estructura			
+lwe	lwe	estructura			
+lwk	lwk	estructura			
+lwl	lwl	estructura			
+lwm	lwm	estructura	OrnamentSelectRequestMessage	Elegir un ornamento; un mensaje vacio significa ninguno.	sí
+lwn	lwn	estructura			
+lwq	lwq	estructura			
+lwr	lwr	estructura			
+lwt	lwt	estructura			
+lwu	lwu	estructura			
+lwv	lwv	estructura			
+lww	lww	estructura			
+lwx	lwx	estructura	AppearanceAuraResultMessage	Acuse de recibo.	sí
+lwy	lwy	estructura			
+lwz	lwz	estructura	AppearanceItemWornMessage	El hueco que eligio el servidor.	sí
+lxa	lxa	estructura	TitleSelectResultMessage	Acuse de recibo.	sí
+lxb	lxb	estructura			
+lxc	lxc	estructura	AppearancePreviewLookMessage	Tu aspecto ha cambiado: la vista previa del panel, que nadie mas ve. f1 es un uuid constante en la sesion y distinto por personaje; de donde lo aprende el cliente no se ha encontrado.	sí
+lxd	lxd	estructura			sí
+lxg	lxg	estructura	AppearanceSlotVisibilityRequestMessage	Mostrar u ocultar lo que hay en un hueco; con f3 puesto esa piel desaparece del siguiente lxc, la prenda no se quita, deja de dibujarse.	sí
+lxh	lxh	estructura	NpcDialogLeaveRequestMessage	Salir de un dialogo; el unico mensaje de PNJ que se observa enviar al cliente 3.6.10.10.	
+lxk	lxk	estructura	AppearanceSlotVisibilityResultMessage	Acuse de recibo.	sí
+lxl	lxl	estructura			
+lxo	lxo	estructura	AppearanceStateMessage	El estado de la ventana; f7 es el mismo uuid que lleva la vista previa lxc y f12 su mismo look, que es como el panel sabe que la respuesta es suya.	sí
+lxp	lxp	estructura			
+lxr	lxr	estructura			
+lxs	lxs	estructura	AppearanceSaveRequestMessage	Guardar: aqui el borrador pasa a ser lo que se lleva puesto y el look llega al resto del mapa. El fichero de mapeos lo llama AlignmentSubAreaUpdate, y eso es falso.	sí
+lxt	lxt	estructura			
+lxu	lxu	estructura			
+lxw	lxw	estructura	AppearanceAuraRequestMessage	El aura.	sí
+lxy	lxy	estructura			
+lya	lya	estructura		No implementado. Exclusivo de las capturas de extras de apariencia; 3 mensajes.	
+lyb	lyb	estructura			
+lyc	lyc	estructura			
+lye	lye	estructura			
+lyf	lyf	estructura	AppearanceSlotSetRequestMessage	Poner o vaciar un hueco concreto; sin variante, y sin objeto vacia el hueco.	sí
+lyg	lyg	estructura			
+lyh	lyh	estructura			
+lyj	lyj	estructura	AppearanceSlotSetResultMessage	Acuse de recibo.	sí
+lyk	lyk	estructura	AppearanceOpenRequestMessage	Abrir la ventana de apariencia; no tiene respuesta propia.	sí
+lyl	lyl	estructura			
+lym	lym	estructura		Lleva el aura en el flujo de apariencia (f1: id de aura, vacio si ninguna); en cada captura de equipar y desequipar lleva la constante 206, cuyo significado no esta establecido.	sí
+lyn	lyn	estructura			
+lyo	lyo	estructura			
+lyr	lyr	estructura			
+lys	lys	estructura	AppearanceItemWearRequestMessage	Ponerse una prenda dejando que el servidor elija el hueco; acepta una variante, que es lo que usan los objetos vivos para imitar una prenda u otra.	sí
+lyt	lyt	estructura	OutfitsListMessage	Los conjuntos guardados del guardarropa; obligatorio, sin el la ventana de cosmeticos suena y no se dibuja, muriendo en CosmeticUi.DisplayOutfit. En el replay se sustituye por los del personaje que juega.	sí
+lyu	lyu	estructura	AppearanceSaveResultMessage	Guardado confirmado.	sí
+lyv	lyv	estructura	OrnamentSelectResultMessage	Acuse de recibo.	sí
+lyy	lyy	estructura	AppearanceStateRequestMessage	Pedir el estado de la ventana.	sí
+lyz	lyz	estructura			
+lza	lza	estructura			
+lzc	lzc	estructura			
+lzd	lzd	estructura			
+lze	lze	estructura	TitleSelectRequestMessage	Elegir un titulo; solo toca el borrador. Un mensaje vacio significa ninguno.	sí
+lzg	lzg	estructura			
+lzh	lzh	estructura		Va justo antes de kmv y jrh al final de la entrada al mundo; el servidor contesta lzl.	
+lzi	lzi	estructura			
+lzj	lzj	estructura			
+lzl	lzl	estructura		La respuesta a lzh en la entrada al mundo.	
+lzn	lzn	estructura			
+lzo	lzo	estructura			
+lzp	lzp	estructura			
+lzq	lzq	estructura			
+lzs	lzs	estructura			
+lzv	lzv	estructura			
+lzx	lzx	estructura			
+lzy	lzy	estructura			
+lzz	lzz	estructura			
+mab	mab	estructura			
+mac	mac	estructura			
+mad	mad	estructura			
+mae	mae	estructura			
+maf	maf	estructura			
+mag	mag	estructura			
+mah	mah	estructura			
+mai	mai	estructura			
+maj	maj	estructura			
+mak	mak	estructura			
+mam	mam	estructura			
+maq	maq	estructura			
+mar	mar	estructura			
+mas	mas	estructura			
+mat	mat	estructura			
+mau	mau	estructura			
+mav	mav	estructura			
+maz	maz	estructura			
+mba	mba	estructura			
+mbb	mbb	estructura			
+mbd	mbd	estructura			
+mbe	mbe	estructura			
+mbg	mbg	estructura			
+mbj	mbj	estructura			
+mbk	mbk	estructura			
+mbl	mbl	estructura			
+mbm	mbm	estructura			
+mbn	mbn	estructura			
+mbo	mbo	estructura			
+mbq	mbq	estructura			
+mbr	mbr	estructura			
+mbs	mbs	estructura			
+mbt	mbt	estructura			
+mbu	mbu	estructura			
+mbv	mbv	estructura			
+mby	mby	estructura			
+mbz	mbz	estructura			
+mca	mca	estructura			
+mcb	mcb	estructura			
+mcc	mcc	estructura			
+mce	mce	estructura			
+mcf	mcf	estructura			
+mcg	mcg	estructura			
+mch	mch	estructura			
+mck	mck	estructura			
+mcl	mcl	estructura			
+mcm	mcm	estructura			
+mcn	mcn	estructura			
+mco	mco	estructura			
+mcr	mcr	estructura			
+mcs	mcs	estructura			
+mcv	mcv	estructura			
+mcw	mcw	estructura			
+mcx	mcx	estructura			
+mcy	mcy	estructura			
+mcz	mcz	estructura			
+mda	mda	estructura			
+mde	mde	estructura			
+mdf	mdf	estructura			
+mdg	mdg	estructura			
+mdh	mdh	estructura			
+mdj	mdj	estructura			
+mdk	mdk	estructura			
+mdm	mdm	estructura			
+mdn	mdn	estructura			
+mdq	mdq	estructura			
+mdr	mdr	estructura			
+mdt	mdt	estructura			
+mdu	mdu	estructura			
+mdv	mdv	estructura			
+mdw	mdw	estructura			
+mdx	mdx	estructura			
+mdy	mdy	estructura			
+mdz	mdz	estructura			
+mea	mea	estructura			
+meb	meb	estructura			
+mec	mec	estructura			
+med	med	estructura			
+mee	mee	estructura			
+meg	meg	estructura			
+meh	meh	estructura			
+mei	mei	estructura			
+mel	mel	estructura			
+men	men	estructura			
+mep	mep	estructura			
+meq	meq	estructura			
+mer	mer	estructura			
+mes	mes	estructura			sí
+met	met	estructura			
+meu	meu	estructura			
+mew	mew	estructura			
+mez	mez	estructura			sí
+mfa	mfa	estructura			sí
+mfb	mfb	estructura			
+mfc	mfc	estructura			
+mfe	mfe	estructura		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mff	mff	estructura		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfg	mfg	estructura			
+mfj	mfj	estructura			
+mfl	mfl	estructura			
+mfm	mfm	estructura			
+mfn	mfn	estructura			
+mfo	mfo	estructura		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfp	mfp	estructura		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfq	mfq	estructura			
+mfs	mfs	estructura			
+mft	mft	estructura			
+mfu	mfu	estructura			
+mfv	mfv	estructura			
+mfx	mfx	estructura		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mfy	mfy	estructura			
+mga	mga	estructura			
+mgb	mgb	estructura		No implementado. Exclusivo de las capturas de canales de chat (Chats); el documento no indica direccion; 1 mensajes.	
+mgc	mgc	estructura			
+mgf	mgf	estructura			
+mgh	mgh	estructura			
+mgk	mgk	estructura			
+mgl	mgl	estructura			
+mgn	mgn	estructura			
+mgq	mgq	estructura			sí
+mgr	mgr	estructura			
+mgt	mgt	estructura			sí
+mgv	mgv	estructura			
+mgx	mgx	estructura			
+mgy	mgy	estructura			
+mgz	mgz	estructura	ContentCatalogVersionMessage	Identificador del catalogo de contenido; opaco, el cliente solo lo compara consigo mismo.	sí
+mhc	mhc	estructura			

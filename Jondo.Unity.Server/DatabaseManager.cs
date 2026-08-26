@@ -68,11 +68,17 @@ namespace Jondo.Unity.Launcher
                     Console.WriteLine("[DatabaseManager] Columna Role añadida a Accounts; todos empiezan como jugador.");
                 }
 
-                // Jondo used to stop at role 4, which meant administrator. Giny and the Dofus
-                // account-right criteria use the complete 1..5 scale: 3 padawan, 4 game master,
-                // 5 administrator. Convert the old administrators exactly once, then leave role 4
-                // free forever for real game masters. A naked UPDATE on every startup would
-                // silently promote every future game master to administrator.
+                // La escala de roles se quedaba en el 4, que quería decir administrador. Giny y
+                // los criterios de derechos de Dofus usan la escala entera del 1 al 5: el 3 es
+                // padawan, el 4 game master y el 5 administrador.
+                //
+                // Renumerar cambia lo que significan DOS valores, así que hay que mover a los dos.
+                // El 4 pasa a 5 —los que eran administradores lo siguen siendo— y el 3 pasa a 4,
+                // porque quien era game master con el 3 se quedaría de padawan si no. El orden
+                // importa: primero el 4 y después el 3, o los que suban de 3 volverían a subir.
+                //
+                // Y se hace UNA vez, apuntándolo en JondoMigrations. Un UPDATE suelto en cada
+                // arranque ascendería en silencio a administrador a todo game master futuro.
                 var createMigrations = authConnection.CreateCommand();
                 createMigrations.CommandText = @"
                     CREATE TABLE IF NOT EXISTS JondoMigrations (
@@ -90,11 +96,19 @@ namespace Jondo.Unity.Launcher
                 {
                     using var transaction = authConnection.BeginTransaction();
 
-                    var migrateRoles = authConnection.CreateCommand();
-                    migrateRoles.Transaction = transaction;
-                    migrateRoles.CommandText = "UPDATE Accounts SET Role = $admin WHERE Role = 4;";
-                    migrateRoles.Parameters.AddWithValue("$admin", Roles.Administrador);
-                    int migrated = migrateRoles.ExecuteNonQuery();
+                    var migrarAdministradores = authConnection.CreateCommand();
+                    migrarAdministradores.Transaction = transaction;
+                    migrarAdministradores.CommandText =
+                        "UPDATE Accounts SET Role = $admin WHERE Role = 4;";
+                    migrarAdministradores.Parameters.AddWithValue("$admin", Roles.Administrador);
+                    int administradores = migrarAdministradores.ExecuteNonQuery();
+
+                    var migrarGameMasters = authConnection.CreateCommand();
+                    migrarGameMasters.Transaction = transaction;
+                    migrarGameMasters.CommandText =
+                        "UPDATE Accounts SET Role = $gm WHERE Role = 3;";
+                    migrarGameMasters.Parameters.AddWithValue("$gm", Roles.GameMaster);
+                    int gameMasters = migrarGameMasters.ExecuteNonQuery();
 
                     var rememberMigration = authConnection.CreateCommand();
                     rememberMigration.Transaction = transaction;
@@ -105,8 +119,9 @@ namespace Jondo.Unity.Launcher
                     rememberMigration.ExecuteNonQuery();
 
                     transaction.Commit();
-                    Console.WriteLine($"[DatabaseManager] Escala de roles Giny 1..5 aplicada; " +
-                                      $"{migrated} antiguo(s) administrador(es) pasan de 4 a 5.");
+                    Console.WriteLine($"[DatabaseManager] Escala de roles 1..5 aplicada: " +
+                                      $"{administradores} administrador(es) de 4 a 5 y " +
+                                      $"{gameMasters} game master(s) de 3 a 4.");
                 }
 
                 // La sesión del LANZADOR, que hasta ahora era el mismo token que el del juego.
@@ -3146,9 +3161,29 @@ namespace Jondo.Unity.Launcher
                     stats.WaterResistance = g.TryGetProperty("waterResistance", out var wr) ? wr.GetInt32() : 0;
                     stats.AirResistance = g.TryGetProperty("airResistance", out var ar) ? ar.GetInt32() : 0;
                     stats.GradeXp = g.TryGetProperty("gradeXp", out var xp) ? xp.GetInt32() : 100;
+                    // El startingSpellId NO va aquí, y meterlo costaba los hechizos de 2.051
+                    // monstruos.
+                    //
+                    // Es un SpellLevels.Id —un id de NIVEL de hechizo— y no un Spells.Id. El
+                    // propio repositorio lo tiene bien escrito en Summons.cs:209, que lo traduce
+                    // con «SELECT SpellId, Grade FROM SpellLevels WHERE Id = $id».
+                    //
+                    // Metido crudo pasaban dos cosas, y la segunda es la venenosa: GetSpellCombatData
+                    // no encontraba ese número y devolvía null, y sobre todo la lista dejaba de
+                    // estar vacía, así que el respaldo de más abajo —el que lee los hechizos DE
+                    // VERDAD de MonsterTemplates— ya no corría. Un id que no vale para nada
+                    // cancelaba los que sí valían.
+                    //
+                    // Medido: 2.133 de 5.134 monstruos traen startingSpellId, y 1.975 de ésos no
+                    // casan con ningún hechizo. En total 2.051 de 5.134 —el 40 %— se quedaban sin
+                    // poder lanzar nada. El Jalamut Real era uno.
+                    //
+                    // Y aunque se tradujera bien, tampoco es su lista de ataque: es el hechizo de
+                    // comportamiento con el que empieza. Los ataques son MonsterTemplates.spells.
+                    // Se guarda aparte por si algún día hace falta, y no se mezcla.
                     if (g.TryGetProperty("startingSpellId", out var ssp) && ssp.GetInt32() > 0)
                     {
-                        stats.SpellIds.Add(ssp.GetInt32());
+                        stats.StartingSpellLevelId = ssp.GetInt32();
                     }
                 }
             }
@@ -3184,7 +3219,12 @@ namespace Jondo.Unity.Launcher
             //
             // spellGrades[i] describes the spell spells[i]: one "grade,level" entry per monster
             // grade, separated by ';'.
-            if (stats.SpellIds.Count == 0)
+            //
+            // Se lee SIEMPRE. Antes iba detrás de un «si la lista está vacía», y ese guardián no
+            // protegía nada: Monsters.Spells vale '[]' en los 5.134 monstruos, así que la lista
+            // sólo se podía llenar con el startingSpellId, que no es un hechizo. Lo único que
+            // conseguía el guardián era dejar sin hechizos al monstruo cuyo grado traía ese
+            // número. Repetir sí hay que evitarlo, y de eso se encarga el Contains de abajo.
             {
                 try
                 {
@@ -3228,7 +3268,7 @@ namespace Jondo.Unity.Launcher
                                 }
                             }
 
-                            stats.SpellIds.Add(sid);
+                            if (!stats.SpellIds.Contains(sid)) stats.SpellIds.Add(sid);
                             stats.SpellGrades[sid] = spellGrade;
                         }
                     }
@@ -3540,8 +3580,21 @@ namespace Jondo.Unity.Launcher
             // devolvía una lista vacía: por eso al atacar con la espada salía un puñetazo.
             //
             // Se lee de RawEffects, que es el json tal cual vino, con el mismo parser que ya sabe
-            // su forma. Se coge el efecto de más daño, no el primero: un arma con dos efectos
-            // —«9 a 13 de agua» y «27 a 33 de neutral»— pega con el gordo.
+            // su forma.
+            //
+            // Y se guardan TODAS las líneas, no sólo la de más daño. Antes había un
+            // «if (maximo <= data.BaseDamageMax) continue;» que se quedaba con la mayor y tiraba
+            // las demás, así que un arma de tres líneas pegaba una sola vez. La Lanzapinza de
+            // Cangrancio tiene [[96,0,9,13],[96,0,9,13],[91,0,27,33]] y sólo sobrevivía la
+            // última: en el chat salía UNA cifra donde tenían que salir tres.
+            //
+            // El servidor real manda un golpe por línea, cada uno con SU número de efecto: el
+            // Cocobur crítico manda tres (2822, 91, 93), la Lavacha dos (97, 92) y las Garras dos
+            // (96, 94).
+            //
+            // Los campos sueltos —Element, BaseDamageMin y BaseDamageMax— se siguen rellenando con
+            // la línea más gorda, porque son los que mira la IA para estimar el daño y para eso
+            // vale la mayor.
             foreach (var efecto in Managers.Equipment.ParseEffects(weapon.RawEffects))
             {
                 if (efecto.Effect < 91 || efecto.Effect > 100) continue;
@@ -3550,7 +3603,6 @@ namespace Jondo.Unity.Launcher
                 int maximo = (int)(efecto.DiceSide != 0 ? efecto.DiceSide : minimo);
                 if (minimo <= 0 && maximo <= 0) continue;
                 if (maximo < minimo) maximo = minimo;
-                if (maximo <= data.BaseDamageMax) continue;
 
                 var elemCmd = connection.CreateCommand();
                 elemCmd.CommandText = "SELECT ElementId FROM Effects WHERE Id = $id;";
@@ -3558,7 +3610,11 @@ namespace Jondo.Unity.Launcher
                 object? elem = elemCmd.ExecuteScalar();
                 if (elem == null || elem == DBNull.Value) continue;
 
-                data.Element = Convert.ToInt32(elem);
+                int elemento = Convert.ToInt32(elem);
+                data.WeaponLines.Add((efecto.Effect, elemento, minimo, maximo));
+
+                if (maximo <= data.BaseDamageMax) continue;
+                data.Element = elemento;
                 data.BaseDamageMin = minimo;
                 data.BaseDamageMax = maximo;
             }
@@ -3829,9 +3885,22 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Répare les anciens uid issus de `CharacterId * 1000`, trop grands pour le champ 32 bits
-        /// du client. La ligne d'objet ne change pas de propriétaire, de modèle, d'emplacement ni
-        /// d'effets : seul son identifiant de transport est remplacé par un identifiant libre.
+        /// Arregla los uid que salieron de `characterId * 1000` y no caben en los 32 bits que el
+        /// cliente conserva.
+        ///
+        /// Medido sobre nuestra propia base: 10 de 1.777 objetos estaban así, todos de los tres
+        /// personajes cuyo id pasa de dos millones. El objeto 13.825.560.000 le llegaba al cliente
+        /// como 940.658.112 —que es el mismo número recortado a 32 bits— y al devolverlo para
+        /// equiparlo el servidor no lo reconocía. La ficha se quedaba sin los efectos de esa
+        /// pieza y en el registro salía «no es de los nuestros».
+        ///
+        /// Y no era sólo el pasado: como NextItemUid arrancaba en el mayor uid de la tabla, con
+        /// un 13.825.560.013 escrito el siguiente objeto que fabricara el servidor —un botín, una
+        /// compra, el merkasako— nacía ya roto. Por eso la consulta del mayor uid se acota ahora
+        /// al rango del cliente.
+        ///
+        /// La fila no cambia de dueño, ni de plantilla, ni de sitio, ni de efectos: lo único que
+        /// se le cambia es el número con el que viaja.
         /// </summary>
         private static void RepairClientItemUids(SqliteConnection connection)
         {
@@ -3857,16 +3926,17 @@ namespace Jondo.Unity.Launcher
 
             if (next + invalidRows.Count > MaxClientItemUid)
                 throw new InvalidOperationException(
-                    "Il n'y a pas assez d'uid 32 bits libres pour réparer CharacterItems.");
+                    "No quedan uid de 32 bits libres para arreglar CharacterItems.");
 
             using var transaction = connection.BeginTransaction();
             foreach (var row in invalidRows)
             {
                 var update = connection.CreateCommand();
                 update.Transaction = transaction;
-                // CharacterId reste dans le filtre même si Id est déjà unique : toutes les
-                // écritures d'inventaire gardent ainsi l'invariant de propriété vérifié au
-                // démarrage et aucune future réutilisation de cette requête ne pourra l'omettre.
+                // El CharacterId se queda en el filtro aunque el Id ya sea único: así toda
+                // escritura de inventario mantiene la condición de propiedad que comprueba la
+                // guardia al arrancar, y nadie que copie esta consulta más adelante puede
+                // olvidarse de ella.
                 update.CommandText = "UPDATE CharacterItems SET Uid = $uid " +
                                      "WHERE Id = $id AND CharacterId = $character;";
                 update.Parameters.AddWithValue("$uid", ++next);
@@ -3876,10 +3946,38 @@ namespace Jondo.Unity.Launcher
             }
             transaction.Commit();
 
-            // Si le compteur avait déjà été consulté dans un test ou un outil embarqué, il doit
-            // repartir après les identifiants que la migration vient de réserver.
+            // Si el repartidor ya se había consultado, tiene que seguir por detrás de los
+            // números que esta reparación acaba de gastar.
             System.Threading.Interlocked.Exchange(ref _ultimoUidRepartido, next);
-            Console.WriteLine($"[SQLite] Migration: {invalidRows.Count} uid d'objet hors 32 bits réparés.");
+            Console.WriteLine($"[SQLite] {invalidRows.Count} uid de objeto que no cabían en 32 bits, arreglados.");
+        }
+
+        /// <summary>
+        /// Cuántos objetos hay escritos con un uid que el cliente no puede devolver entero.
+        ///
+        /// Lo usa la guardia de regresión. Tiene que valer cero siempre: los que había los arregló
+        /// <see cref="RepairClientItemUids"/> al arrancar, y los nuevos salen de
+        /// <see cref="NextItemUid"/>, que no reparte por encima del tope. Si esto crece es que
+        /// alguien está escribiendo uid por su cuenta.
+        /// </summary>
+        public static int ObjetosConUidFueraDelCliente()
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM CharacterItems " +
+                                      "WHERE Uid <= 0 OR Uid > $max;";
+                command.Parameters.AddWithValue("$max", MaxClientItemUid);
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se pudo contar los uid fuera de rango: {ex.Message}");
+                return 0;
+            }
         }
 
         /// <summary>
@@ -3891,9 +3989,11 @@ namespace Jondo.Unity.Launcher
         /// el inventario completo —1.737 filas en la cuenta de la captura— justo en el momento en
         /// que el jugador está esperando la pantalla de recompensa.
         /// </summary>
-        public static void AddItemsToInventory(long characterId, IReadOnlyDictionary<int, int> items)
+        public static List<PlayerItem> AddItemsToInventory(long characterId,
+                                                           IReadOnlyDictionary<int, int> items)
         {
-            if (items == null || items.Count == 0) return;
+            var tocados = new List<PlayerItem>();
+            if (items == null || items.Count == 0) return tocados;
 
             var inventory = LoadInventory(characterId);
 
@@ -3904,6 +4004,7 @@ namespace Jondo.Unity.Launcher
                 {
                     existing.Quantity += kv.Value;
                     SaveInventoryItem(characterId, existing);
+                    tocados.Add(existing);
                     continue;
                 }
 
@@ -3920,7 +4021,13 @@ namespace Jondo.Unity.Launcher
                 // —no pasa hoy, pero el diccionario no lo impide— la segunda tiene que apilarse
                 // sobre la primera y no crear otra fila.
                 inventory.Add(nuevo);
+                tocados.Add(nuevo);
             }
+
+            // Se devuelven con el uid y la cantidad QUE HA QUEDADO, que es lo que hace falta para
+            // decirle al cliente que le han caído: sin el uid no se puede construir el aviso, y
+            // sin él el objeto se queda invisible hasta el siguiente login.
+            return tocados;
         }
 
         public static PlayerItem AddItemToInventory(long characterId, int itemGid, int quantity)
@@ -4261,6 +4368,13 @@ namespace Jondo.Unity.Launcher
 
     public class MonsterGradeStats
     {
+        /// <summary>
+        /// El hechizo de comportamiento con el que arranca el monstruo, tal como lo trae el dato
+        /// del cliente: un <c>SpellLevels.Id</c>, NO un <c>Spells.Id</c>. No es su lista de
+        /// ataque y por eso va aparte de <see cref="SpellIds"/>. Hoy no lo lee nadie.
+        /// </summary>
+        public int StartingSpellLevelId { get; set; }
+
         public int Level { get; set; } = 1;
         public int LifePoints { get; set; } = 50;
         public int ActionPoints { get; set; } = 6;
@@ -4291,6 +4405,17 @@ namespace Jondo.Unity.Launcher
 
     public class SpellCombatData
     {
+        /// <summary>
+        /// Las lineas de dano de un arma, una por cada efecto: el numero de efecto, su elemento y
+        /// sus dados. Vacia para un hechizo.
+        ///
+        /// Un arma pega una vez POR LINEA, y el servidor real manda un golpe por cada una con su
+        /// propio numero de efecto. Los campos sueltos de aqui abajo llevan la linea mas gorda,
+        /// que es lo que le vale a la IA para estimar.
+        /// </summary>
+        public List<(int Effect, int Element, int Min, int Max)> WeaponLines { get; } =
+            new List<(int, int, int, int)>();
+
         public long SpellId { get; set; }
         public int SpellLevelId { get; set; }
         public int APCost { get; set; } = 3;

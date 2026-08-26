@@ -33,6 +33,12 @@ namespace Jondo.Unity.Launcher.Managers
         public int PlantillaDelAspecto { get; init; }
 
         public int Vida { get; init; }
+
+        /// <summary>
+        /// La vida que NO escala con el nivel del que invoca: la del propio grado del monstruo.
+        /// Un monstruo invocado la trae aqui y con el bonus a cero; una baliza de jugador al reves.
+        /// </summary>
+        public int VidaFija { get; init; }
         public int PuntosDeAccion { get; init; }
         public int PuntosDeMovimiento { get; init; }
 
@@ -65,8 +71,8 @@ namespace Jondo.Unity.Launcher.Managers
         /// Comprobado en: baliza 8348 grado 3 con bonus 100 -> 1050; baliza 8347 grado 2 con
         /// bonus 200 -> 2100; 262 con 60 -> 630; 246 con 30 -> 315; 7220 con 70 -> 735.
         /// </summary>
-        public static int VidaDelInvocado(int bonusDeVida, int nivelDelInvocador)
-            => (int)(bonusDeVida * (Math.Max(1, nivelDelInvocador) + 10) / 20.0);
+        public static int VidaDelInvocado(int bonusDeVida, int nivelDelInvocador, int vidaFija = 0)
+            => vidaFija + (int)(bonusDeVida * (Math.Max(1, nivelDelInvocador) + 10) / 20.0);
 
         // ─── Cuánto vive ────────────────────────────────────────────────────────
 
@@ -150,6 +156,20 @@ namespace Jondo.Unity.Launcher.Managers
                 if (elegido == null) return null;
                 var gr = elegido.Value;
 
+                // LA VIDA SON DOS NÚMEROS, y leer sólo uno dejaba a media invocación en cero.
+                //
+                // Toda esta tubería se escribió midiendo invocaciones de JUGADOR —las balizas del
+                // Ocra, las tortugas del Steamer, los cofres del Anutrof— y ésas llevan la vida en
+                // «bonusCharacteristics.lifePoints», que escala con el nivel del que invoca.
+                //
+                // Un MONSTRUO invocado la lleva en el «lifePoints» del grado, a secas, y tiene el
+                // bonus a cero. El «Regalo animado» del Minotobola de Nawidad tiene 1000, 1500 y
+                // 2000 según el grado, y bonus 0: leyendo sólo el bonus salía con CERO de vida.
+                //
+                // Y de ahí caía todo lo demás en cascada, porque IsAlive es «CurrentHP > 0»: el
+                // globo pintaba 0/0, no entraba en el orden de turnos, no salía en el carrusel, no
+                // ocupaba casilla —se podía andar a través de él— y no hacía nada.
+                int vidaFija = Math.Max(0, Entero(gr, "lifePoints"));
                 int bonusVida = 0;
                 if (gr.TryGetProperty("bonusCharacteristics", out var bonus))
                     bonusVida = Entero(bonus, "lifePoints");
@@ -165,8 +185,10 @@ namespace Jondo.Unity.Launcher.Managers
                     Nivel = Math.Max(1, Entero(gr, "level")),
                     Look = look,
                     PlantillaDelAspecto = deQuien,
-                    // La vida se deja en bruto: quien invoca sabe su nivel y la escala.
+                    // La vida se deja en bruto: quien invoca sabe su nivel y escala la parte que
+                    // escala. La fija no escala con nadie.
                     Vida = bonusVida,
+                    VidaFija = vidaFija,
                     PuntosDeAccion = Math.Max(0, Entero(gr, "actionPoints")),
                     PuntosDeMovimiento = Math.Max(0, Entero(gr, "movementPoints")),
                     ResistenciaNeutral = Entero(gr, "neutralResistance"),
@@ -197,9 +219,18 @@ namespace Jondo.Unity.Launcher.Managers
             string look = TextoDe(conexion, "SELECT Look FROM MonsterTemplates WHERE Id = $id;", plantilla);
             if (string.IsNullOrEmpty(look)) return ("", plantilla);
 
-            string limpio = look.Trim();
-            if (limpio.Length > 2 && limpio[0] == '{' && limpio[^1] == '}' &&
-                int.TryParse(limpio.Substring(1, limpio.Length - 2), out int otra) && otra != plantilla)
+            // El aspecto es el PRIMER número de entre las llaves, y antes se exigía que fuera lo
+            // único que hubiera dentro.
+            //
+            // Con «{8348}» funcionaba, pero el del «Regalo animado» es «{446|||120}» y ahí el
+            // int.TryParse fallaba, así que se devolvía la propia plantilla —3106— como aspecto y
+            // el cliente dibujaba otro bicho. Es la misma regla que ya usa FightHandler para el
+            // hueso de un monstruo normal. Medido: 21 de 21 aciertos contra las capturas, frente a
+            // 17 de 21 de la versión anterior.
+            string limpio = look.Trim().Trim('{', '}');
+            int barra = limpio.IndexOf('|');
+            string primero = barra >= 0 ? limpio.Substring(0, barra) : limpio;
+            if (int.TryParse(primero, out int otra) && otra > 0 && otra != plantilla)
             {
                 return LookDe(conexion, otra, vueltas + 1);
             }

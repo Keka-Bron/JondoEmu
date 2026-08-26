@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Launcher.Network
 {
@@ -96,6 +97,10 @@ namespace Jondo.Unity.Launcher.Network
                     case Prefijo + "registro": return ConRol(cuerpo, Roles.Administrador, _ => Registro(cuerpo));
                     case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, _ => Apagar());
                     case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador, _ => CambiarRol(cuerpo));
+                    case Prefijo + "personaje":
+                        return !metodo.Equals("POST", StringComparison.OrdinalIgnoreCase)
+                            ? Mal(405, "metodo")
+                            : ConRol(cuerpo, Roles.Administrador, _ => AdministrarPersonaje(cuerpo));
 
                     default: return Mal(404, "ruta");
                 }
@@ -147,6 +152,108 @@ namespace Jondo.Unity.Launcher.Network
             bool bien = DatabaseManager.SetAccountRole(quien, rol, out int cuantas);
             if (bien) Console.WriteLine($"[Control] {quien} pasa a {Roles.Nombre(rol)}.");
             return Bien(new { bien, cuantas });
+        }
+
+        /// <summary>
+        /// Cambia las caracteristicas base y los kamas de un personaje conectado, los guarda y
+        /// refresca la ficha sin obligarle a salir ni a reiniciar el servidor.
+        ///
+        /// La ruta pasa por <see cref="ConRol"/> y solo admite administradores. El turno de la
+        /// sesion evita que una orden HTTP pise un movimiento, un combate o cualquier otro paquete
+        /// que el cliente este atendiendo a la vez.
+        /// </summary>
+        private static Respuesta AdministrarPersonaje(string cuerpo)
+        {
+            string nombre = Texto(cuerpo, "personaje");
+            var sesion = SessionRegistry.FindByName(nombre);
+            if (sesion == null || !sesion.HasCharacter || !sesion.IsInWorld)
+                return Mal(404, "personaje-desconectado");
+
+            // With a deadline, and not Wait() forever. This runs on the HttpListener's thread and
+            // the lock is held across three socket writes: a client that has stopped reading -alt
+            // F4 with the socket still open is the usual way- would otherwise park this thread for
+            // good, and the control API has a small pool of them. Better a 409 than a listener
+            // that stops answering.
+            if (!sesion.UnoCadaVez.Wait(PlazoDelTurno)) return Mal(409, "personaje-ocupado");
+            try
+            {
+                using (SessionContext.Push(sesion))
+                {
+                    var estado = sesion.State;
+                    if (estado.IsInFight) return Mal(409, "personaje-en-combate");
+
+                    bool cambio = false;
+                    cambio |= AsignarEntero(cuerpo, "vitalidad", value => estado.StatVitality = value);
+                    cambio |= AsignarEntero(cuerpo, "sabiduria", value => estado.StatWisdom = value);
+                    cambio |= AsignarEntero(cuerpo, "fuerza", value => estado.StatStrength = value);
+                    cambio |= AsignarEntero(cuerpo, "inteligencia", value => estado.StatIntelligence = value);
+                    cambio |= AsignarEntero(cuerpo, "suerte", value => estado.StatChance = value);
+                    cambio |= AsignarEntero(cuerpo, "agilidad", value => estado.StatAgility = value);
+                    if (TryNumero(cuerpo, "kamas", out long kamas))
+                    {
+                        estado.Kamas = Math.Max(0, kamas);
+                        cambio = true;
+                    }
+
+                    if (!cambio) return Mal(400, "sin-cambios");
+
+                    DatabaseManager.SaveCurrentCharacter();
+                    sesion.SendAsync(ConnectionProtocol.Push(Op.Kub,
+                        ConnectionProtocol.BuildCharacteristics())).GetAwaiter().GetResult();
+                    sesion.SendAsync(ConnectionProtocol.Push(Op.Ivf,
+                        ConnectionProtocol.BuildKamas(estado.Kamas))).GetAwaiter().GetResult();
+                    sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
+                        ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
+                        .GetAwaiter().GetResult();
+
+                    Console.WriteLine($"[Control] Personaje {estado.CharacterName}: caracteristicas " +
+                                      $"{estado.StatVitality}/{estado.StatWisdom}/{estado.StatStrength}/" +
+                                      $"{estado.StatIntelligence}/{estado.StatChance}/{estado.StatAgility}, " +
+                                      $"kamas {estado.Kamas}.");
+                    return Bien(new
+                    {
+                        bien = true,
+                        personaje = estado.CharacterName,
+                        vitalidad = estado.StatVitality,
+                        sabiduria = estado.StatWisdom,
+                        fuerza = estado.StatStrength,
+                        inteligencia = estado.StatIntelligence,
+                        suerte = estado.StatChance,
+                        agilidad = estado.StatAgility,
+                        kamas = estado.Kamas,
+                    });
+                }
+            }
+            finally
+            {
+                sesion.UnoCadaVez.Release();
+            }
+        }
+
+        /// <summary>
+        /// The ceiling a characteristic set from outside the game is clamped to.
+        /// </summary>
+        /// <remarks>
+        /// It used to be int.MaxValue, which is the one value guaranteed to break: max HP is
+        /// computed as <c>50 + level * 5 + vitality</c> in StatsHandler, in int arithmetic and
+        /// with no check, so a vitality of int.MaxValue overflows to a NEGATIVE maximum. The
+        /// character then has a life bar the client cannot draw and the fight engine treats as
+        /// already dead.
+        ///
+        /// Ten million is far above anything the game reaches — the highest vitality a level 200
+        /// character can hold is in the low thousands — and leaves the sum three orders of
+        /// magnitude short of overflowing.
+        /// </remarks>
+        private const int TopeDeCaracteristica = 10_000_000;
+
+        /// <summary>How long to wait for the session's turn before giving up on it.</summary>
+        private static readonly TimeSpan PlazoDelTurno = TimeSpan.FromSeconds(5);
+
+        private static bool AsignarEntero(string cuerpo, string campo, Action<int> asignar)
+        {
+            if (!TryNumero(cuerpo, campo, out long valor)) return false;
+            asignar((int)Math.Clamp(valor, 0, TopeDeCaracteristica));
+            return true;
         }
 
         // ─── Cada verbo ─────────────────────────────────────────────────────────────────────
@@ -356,6 +463,19 @@ namespace Jondo.Unity.Launcher.Network
                     : 0;
             }
             catch { return 0; }
+        }
+
+        private static bool TryNumero(string json, string campo, out long valor)
+        {
+            valor = 0;
+            try
+            {
+                using var doc = JsonDocument.Parse(json.Length == 0 ? "{}" : json);
+                return doc.RootElement.TryGetProperty(campo, out var v)
+                       && v.ValueKind == JsonValueKind.Number
+                       && v.TryGetInt64(out valor);
+            }
+            catch { return false; }
         }
     }
 }
