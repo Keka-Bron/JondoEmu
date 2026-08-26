@@ -1,6 +1,8 @@
-High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.10)** written in C# (**.NET 10**), with decoupled modular projects, a SQLite data layer, and a playable PvM combat engine driven entirely by client data.
+High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** written in C# (**.NET 10**), with decoupled modular projects, a SQLite data layer, a playable PvM combat engine driven entirely by client data, and a world editor.
 
-> ⚠️ **Requires Dofus 3 client 3.6.10.10 exactly.** Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility with newer clients. There is a toolchain here for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
+> ⚠️ **Runs against Dofus 3 clients 3.6.10.11 and 3.6.10.10.** Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility with newer clients. There is a toolchain here for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
+>
+> **3.6.10.11 (26 August 2026) is not a new protocol.** Its `GameAssembly.dll` and `global-metadata.dat` are byte-identical to 3.6.10.10 — same SHA-256 on both files — and the structural matcher confirms it independently: 2,169 messages against 2,169, identity mapping, zero ambiguities. That patch moved data only: 182 bundles under `Content/Data`. The supported versions are a hand-written list in `Paths.ClientDir`, newest first, and adding one is a single line — deliberately not "whatever folder has the highest version number", because a client we cannot yet speak to would then be picked up in silence.
 
 ---
 
@@ -39,9 +41,11 @@ Account: keka
 Password: test
 ```
 
-By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.10` folder beside the emulator folder. If yours lives somewhere else, click the path row under the play button and point it at your `Dofus.exe`. The choice is remembered, and if the client later moves the launcher says so instead of failing silently.
+By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.11` folder beside the emulator folder — or `Cliente 3.6.10.10`, whichever it finds first. If yours lives somewhere else, click the path row under the play button and point it at your `Dofus.exe`. The choice is remembered, and if the client later moves the launcher says so instead of failing silently.
 
 The **ES / EN / FR** buttons in the top bar set the language of the launcher *and* of the game: the client is started with that `--langCode`.
+
+**`Jondo Studio.exe`** is the third executable and needs nothing else running: double-click it whenever you want to look at the world or build content. See [Jondo Studio](#-jondo-studio) below.
 
 ---
 
@@ -50,6 +54,8 @@ The **ES / EN / FR** buttons in the top bar set the language of the launcher *an
 ```
 Jondo Emulator Launcher.exe   ← this is what you run
 Jondo Server.exe              the server; the launcher starts it
+Jondo Studio.exe              the world editor; open it when you want to look or build
+content/                      the only files a person edits by hand, versioned in git
 datos/                        json and bin the emulator reads (maps, items, appearances, zaaps…)
 bases/                        world.db and auth.db, the only things the emulator writes
 docs/                         technical documentation
@@ -57,6 +63,8 @@ launcher_assets/              launcher artwork and music
 JondoFix/                     the MelonLoader mod, source and compiled dll
 Jondo.Unity.*/                source code
 ```
+
+`content/` **is** in the repository, deliberately: it is the only folder a person edits by hand, it is small, and a change in it is a reviewable diff.
 
 Not in the repository because they are not needed to play: `bases/` (built on first run), `logs/`, `tools/` (the Python that regenerates `datos/`) and `dofus3_data/` (436 MB of raw client dump, only used by those tools).
 
@@ -84,6 +92,7 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ Movement, map change and adjacent maps; auto-pilot from the minimap and *travel to*
 - ✅ Seeing others arrive and leave, in all four directions
 - ✅ Up to 8 clients at once, each on its own socket-owned session
+- ✅ **A server on another machine.** Every listener honours `JONDO_PUBLIC_BIND`, and the launcher runs a loopback relay so the client reaches it. The relay is not a convenience: HAAPI and the chat server both hand the client `127.0.0.1`, so repointing the client at a remote host cannot work on its own
 
 ### 🌀 Travel
 - ✅ **62 waypoints** with map, cell and sub-area, plus 3 departure-only zaaps the waypoint table omits
@@ -114,6 +123,7 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ Parties — invite, accept, refuse, leave, hand over the lead, kick, and a full member sheet
 - ✅ Lead passes on when the leader leaves; a disconnect removes the member and tells the rest
 - ✅ Friends list
+- ✅ **Every command answers in the session's own language**, from a 48-key catalogue in Spanish, English and French. The language comes from the `--langCode` the launcher started the client with, not from the wire: measured over the nine authentication captures, the client does send its two-letter code, but in `kqz` field 3
 - ❌ The invitation popup's *Details* button (`imd` → `ilb`), the dedicated member-gone message (`inc`), party search, party fights and following the leader
 
 ### 🎒 Character and inventory
@@ -123,7 +133,8 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ Characteristic assignment, dynamic capital, points in sync across every client panel
 - ✅ **17,113 spells** across **34,823 spell levels**; **638 character heads**
 - ✅ **539 titles** and **167 ornaments**, applied, persisted and carried in the map actor block
-- ✅ Commands — `.teleport`, `.kamas`, `.shop`, `.size`, `.level`
+- ✅ Commands — `.teleport`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`
+- ✅ **Live administration over HTTP** — `POST /api/personaje` sets base characteristics and kamas on a connected character, persists them and refreshes the sheet without a reconnect. Administrator role only, loopback only, and it takes the session's turn so it cannot cut across a fight
 - 🟡 `.level` does not refresh the in-fight spell bar
 
 ### 👕 Appearances
@@ -141,6 +152,9 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ Appearance weapons carry no look by design — the client draws them; the server only remembers which of the 10 weapon slots each occupies
 - ✅ Living objects imitate a different garment per variant, stored as **543 object/variant pairs** across 10 slots
 - ✅ Mount and pet appearances are mutually exclusive, matching the real server
+- ✅ **The real equipment renders too, and a cosmetic replaces it rather than stacking on top.** **741 real items** carry their own skin into the look; the slots a visible cosmetic covers are precomputed and skipped
+- 🟡 82 of those skins were inferred by image matching and flagged for review by their author, so they are held back at load until somebody measures them
+- 🟡 A second, older look path survives in `InventoryHandler` for four items and disagrees with the new table on both the field and the value. Left alone until a capture says which is right
 
 ### ⛏️ Professions
 - ✅ **25,090 resources on 4,507 maps** across the six gathering jobs, with graphic → (type, skill) crossed from 305 captures
@@ -157,7 +171,11 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ **38,744 mapped mob groups**, respawned and kept populated, 1 to 8 monsters each
 - ✅ Sub-area aware spawning across **562 sub-areas**, with radius-2 cell validation so nothing spawns on decorations or zaap pillars
 - ✅ **187 dungeons** with their **763 rooms**, entrance and exit
+- ✅ **No monsters indoors, and none standing on a zaap.** They used to spawn inside houses, banks and shops. The rule is two lists and one exception, and the exception is the one that matters: 753 of the 763 dungeon rooms are themselves marked indoors, so a blanket ban would have emptied every dungeon. 7,214 groups removed of 38,744, and the 763 rooms untouched
+- ✅ **NPC colours.** The colour section of a look is `index=value` pairs, sometimes hexadecimal, and it was being read as a plain list — so nothing parsed and every one of the **2,045 NPCs that carry colours** rendered grey
+- ✅ A dialogue always offers at least one real reply, so it can always be closed. With an empty list the client draws its own *Leave* which never answers back
 - 🟡 **401 monsters have no spells at all** in the database
+- ❌ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored. Snori Nairb has 39 replies and 3 messages, and today all 39 are offered at once. This is what the dialogue editor in Jondo Studio is for
 
 ### 🪙 Jondo Coin
 A currency of this server's own — a real item with its own template, not a reskin of kamas.
@@ -224,6 +242,109 @@ One engine for all eighteen classes, driven entirely by client data. Not a singl
 
 ---
 
+## 🛠️ Jondo Studio
+
+The world editor. A third executable next to the launcher and the server, and it needs neither of
+them running: it opens `content/` and the data files through the same paths the server uses and
+works on its own. Built with **Avalonia**, so it runs on Windows, macOS and Linux.
+
+It exists because of a problem this project could not solve any other way. The client holds a great
+deal — every item, every spell, every monster — but there are things it has never held, because on
+the real game they were the server's: which reply in a dialogue leads to which line, where an NPC
+stands and what it does there, which interactive teleport comes back to which map. Those cannot be
+extracted. They have to be **decided**, and until now the only place to decide them was a Python
+script and a JSON file nobody could review.
+
+### Three layers, and every row says where it came from
+
+The data lives in three places that cannot be edited the same way: `dofus3_data/` is a raw dump of
+the client, `datos/*.json` is regenerated by the tools in `tools/`, and `world.db` is a 240 MB
+binary no pull request can review. A hand edit in any of them disappears the next time somebody
+runs a script.
+
+So there are three layers, merged on load, and only the last one is ever edited:
+
+| layer | where from | who edits it |
+|---|---|---|
+| **base** | generated from the client dump | nobody |
+| **measured** | learned from packet captures | nobody |
+| **authored** | decided by a person | this is the one, and it always wins |
+
+The authored layer is `content/`, in versioned JSON, so a change is a reviewable diff and two people
+can edit different maps without colliding. It stores **deltas, not copies**, and it can *erase* a
+row it did not write — an NPC Ankama places and we do not want has to be removable without editing
+the generated file it came from, because that file gets rewritten.
+
+**Every row carries its provenance**, and that column is the point: six months from now nobody will
+remember whether a cell number was measured off a capture or typed in by hand, and without it on
+screen the two become indistinguishable.
+
+### What it does today
+
+- ✅ **Overview** — which files it read and what came out of each. First screen on purpose: every
+  time something has gone wrong for an hour here, it turned out to be reading a different file than
+  anybody thought
+- ✅ **NPC placements** — all 422, filterable, with the provenance column
+- ✅ **Map cells** — a map's 560 cells painted by layer: walkable, walkable-but-not-in-a-fight, seen
+  through, solid
+- ✅ A section that fails shows its error *inside* the editor instead of taking the window down
+
+Phase one is **read only**. Nothing in it writes a file yet.
+
+### What is being worked on
+
+In the order they are planned, cheapest and most unblocking first:
+
+- 🚧 **Live traffic and unknown packets** — the proxy already sees every frame and already
+  deduplicates the unknown ones by protobuf *shape*. Keyed by shape rather than by the three-letter
+  opcode on purpose: that way the knowledge survives the next time Ankama reshuffles the names
+- 🚧 **Writing** — NPC spawns, actions and dialogue trees, and monster groups
+- 🚧 **Interactives and teleports** — pick a cell on one map, a cell on another, and tie them
+  together with the return leg created for you. This is the one that unblocks houses with their own
+  interiors, and it fixes something measured: **1,010 of 1,124 missing passages** are thrown away by
+  our own extractor for want of a return element
+- 🚧 **Map cell painting**
+- 🚧 **Spells and their effects**, with a simulator — cast at a dummy and see the consequences
+  without setting up a fight
+- 🚧 **Quests** — this one is a project of its own: there is no quest engine in the server yet
+- 🚧 **A thin admin channel** so a running server can be told to reload one domain, without a
+  restart. Localhost only, token per boot, off by default
+
+The full plan, with what was decided and why, is in **`docs/world-editor.md`**.
+
+---
+
+## 🧪 Tests
+
+`Jondo.Unity.Tests` — **116 xUnit tests**, grouped by domain: `Content`, `Combat`, `Economy`,
+`Protocol`, `Security`, `Sessions`, `World`. They run in about half a second.
+
+```bash
+dotnet test Jondo.Unity.Tests
+```
+
+**Publishing the server runs them first and fails if any is red.** Not on build — the inner loop
+stays fast and a half-written change can still be compiled to see whether it type-checks — but
+publishing is the one step between writing code and a player running it, and it is already the step
+that copies the executable to the root. The escape hatch is `-p:SkipTests=true`, which leaves its
+trace on the command line rather than in a config file nobody reads.
+
+### Two kinds of check, two homes
+
+Some checks also run **at startup and throw**, so a bad build refuses to boot. That is worth paying
+only for what a green test run cannot know:
+
+* **At startup** stay the questions of the form *"is the data I was shipped sane?"* — the fight
+  sheet's 53 characteristics in their captured order, the interactive registry, the monster
+  spellbooks, the vendor placements, the profession catalogue. `datos/` and `world.db` are
+  regenerated by tooling and redistributed compressed, entirely outside the build, so a bad
+  regeneration reaches a player with every test still passing.
+* **In the test project** live the questions of the form *"is this code correct?"* — the content
+  layers, the collision damage formula, the Jondo Coin bands, frame limits, protobuf parsing,
+  password hashing, log censorship and session isolation.
+
+---
+
 ## 🔎 Surviving the next patch
 
 Every protobuf message in Dofus 3 is named with three random letters — `kub`, `jru`, `lqu` — and on some patches Ankama reshuffles the lot. Nothing else about the protocol changes shape, but the emulator no longer knows what anything is called. **`protocolbuilder`** is the command line for that; **`Jondo Desofuscador.exe`** is the same engine behind one window and one button.
@@ -262,6 +383,11 @@ Shared:
 * **`Jondo.Unity.Protocol`** — message definitions and the generated `Op` layer
 * **`Jondo.Unity.World`** — world logic, `FightInstance`, buffs and states (`Buff`), area shapes and displacement (`Zone`), isometric geometry (`MapGeometry`)
 * **`Jondo.Unity.Parser`** — capture parsing
+* **`Jondo.Unity.Studio`** → `Jondo Studio.exe`. The world editor, in Avalonia. References
+  `Jondo.Unity.World` and `Jondo.Unity.Core` as projects and uses `MapGeometry`, `Fighter` and
+  `SpellEffect` directly — that absence of a serialisation boundary is why it is a desktop app and
+  not a local web UI. The content layers themselves live in `Jondo.Unity.World/Content/`
+* **`Jondo.Unity.Tests`** — 116 xUnit tests, and the gate on publishing
 
 The protocol toolchain, which the emulator does not depend on:
 * **`Jondo.Unity.Reversing`** — reads a client with Cpp2IL, rebuilds the `.proto`, matches two versions, indexes the code, downloads old clients from the CDN (`Cytrus`) and generates the `Op` layer (`Layer`)
@@ -274,14 +400,16 @@ Documentation, all of it measured rather than assumed — index in `docs/README.
 
 ## 💾 Database and persistence
 
-Two **SQLite** databases in `bases/`:
+Three **SQLite** databases in `bases/`, and one folder of text:
 
-* **`world.db`** — 41 tables, characters, inventories, positions, map persistence, spells, monsters, appearances, wardrobe and haven bags. Distributed compressed as `datos/world.zip` and extracted on first run.
+* **`world.db`** — 41 tables and 659,397 rows: characters, inventories, positions, map persistence, spells, monsters, appearances, wardrobe and haven bags. Distributed compressed as `datos/world.zip` (24.8 MB) and extracted on first run.
 * **`auth.db`** — accounts and authentication sessions, created on first run.
+* **`paquetes.db`** — the packets the server does not yet know how to answer, deduplicated by protobuf shape. Kept apart from the other two on purpose: it carries nothing needed to play, it can be deleted to start over, and it can be handed to somebody else to look at without handing over anybody's characters.
+* **`content/`** — the authored layer, in versioned JSON. The only one edited by hand, and the only one nothing regenerates. See [Jondo Studio](#-jondo-studio).
 
 Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved installation still starts.
 
-**Regression guards run at startup and throw**, so the server refuses to boot on a known-bad change: `RegressionGuardTests` sweeps 128 source files, and `ConnectionProtocolSelfTest` compares the emulator's connection bytes against the capture's, packet by packet.
+**Some regression guards also run at startup and throw**, so the server refuses to boot when the data it was shipped does not match what the code expects — see [Tests](#-tests) for which checks live where, and why.
 
 ---
 <img width="2559" height="1499" alt="image" src="https://github.com/user-attachments/assets/3b4f1f39-45d3-4efe-b73b-65d1d5e8a595" />
