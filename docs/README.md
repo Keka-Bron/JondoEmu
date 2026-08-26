@@ -76,6 +76,12 @@ and where the independent process and socket limits are enforced.
 *Go there* when changing the team UI, the launch arguments, account-token resolution or the path
 from a launcher row to its game socket.
 
+**`remote-server.md`** — Running the server on another machine.
+How `JONDO_PUBLIC_BIND` opens all server services consistently, how the launcher's managed loopback
+relay bridges JondoFix to the configured host, which ports are involved and what the relay does not
+provide in terms of transport security.
+*Go there* when moving the server to a LAN host or VPS.
+
 **`data.md`** — Where each number comes from.
 The **27** files in `datos/` (22 json, 4 bin and `world.zip`), the **31** tables in
 `bases/world.db`, and which of the **22** Python scripts in `tools/` builds each one. Most come out

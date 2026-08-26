@@ -114,6 +114,12 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[+] Starting services...");
             try
             {
+                Console.WriteLine($"[+] Network binding: {ServerBinding.Description}.");
+                if (ServerBinding.Public)
+                {
+                    Console.WriteLine("[!] Public binding does not encrypt traffic. Use it only on " +
+                                      "a trusted network or behind a VPN/tunnel.");
+                }
                 // La llave con la que el lanzador podrá hablarle a este servidor. Una por arranque:
                 // así un lanzador de una sesión anterior no se queda con llave de la de ahora.
                 ControlApi.NuevoSecreto();

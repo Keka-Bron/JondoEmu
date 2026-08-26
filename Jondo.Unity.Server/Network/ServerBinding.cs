@@ -6,16 +6,15 @@ namespace Jondo.Unity.Launcher.Network
     /// <summary>
     /// A qué se atan los puertos del emulador: sólo a esta máquina, o a toda la red.
     ///
-    /// De los cuatro que abre el servidor, dos estaban atados a <c>127.0.0.1</c> —el proxy del
-    /// servidor de juego y el zaap— y los otros dos a <c>IPAddress.Any</c>, o sea abiertos a
-    /// cualquiera que compartiera la red: el chat y el nodo de juego. No parece una decisión, sino
-    /// dos ficheros escritos en momentos distintos, porque nada del emulador necesita esos dos
-    /// puertos desde fuera: el cliente de Dofus habla con ellos por <c>localhost</c>, que es adonde
-    /// le manda el mod.
+    /// De los cinco servicios que abre el servidor, el proxy de juego, el zaap y el HAAPI estaban
+    /// atados a <c>127.0.0.1</c>, mientras que el chat y el nodo de juego usaban
+    /// <c>IPAddress.Any</c>. No era una decisión de despliegue: eran listeners escritos en momentos
+    /// distintos. Los cinco siguen cerrados por defecto y se abren juntos cuando se pide el modo
+    /// remoto.
     ///
     /// Así que ahora los cuatro van igual, y para abrirlos hay que pedirlo a propósito con
-    /// <c>JONDO_PUBLIC_BIND=1</c>. Eso hace falta si algún día el servidor vive en otra máquina;
-    /// mientras tanto, cerrado.
+    /// <c>JONDO_PUBLIC_BIND=1</c>. Hace falta cuando el servidor vive en otra máquina; mientras
+    /// tanto, cerrado.
     ///
     /// La idea es de la pull request de Raphaël, que traía un fichero equivalente. El código es
     /// nuestro: aquí sólo hacen falta las dos líneas que de verdad se usan.

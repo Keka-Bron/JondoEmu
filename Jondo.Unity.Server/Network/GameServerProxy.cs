@@ -34,7 +34,7 @@ namespace Jondo.Unity.Launcher.Network
             _cts = new CancellationTokenSource();
 
             // Igual que en el Zaap: la bandera, después del bind. Si no, IsRunning miente.
-            _tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            _tcpListener = new TcpListener(ServerBinding.TcpAddress, port);
             _tcpListener.Start();
             _isRunning = true;
 

@@ -14,6 +14,7 @@ namespace Jondo.Unity.Launcher.UI
     ///
     ///   idioma=es|en|fr     el idioma del lanzador, que es también con el que arranca el juego
     ///   cliente=C:\...\Dofus.exe   dónde está el cliente, si no está donde se supone
+    ///   servidor=host-or-ip  el servidor remoto; vacío significa esta misma máquina
     /// </summary>
     internal static class LauncherPreferences
     {

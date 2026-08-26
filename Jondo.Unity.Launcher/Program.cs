@@ -41,6 +41,25 @@ namespace Jondo.Unity.Launcher
 
             try
             {
+                if (!UI.LauncherPreferences.ServerIsLocal)
+                {
+                    try
+                    {
+                        Network.RemoteRelay.Start(UI.LauncherPreferences.ServerHost);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.Forms.MessageBox.Show(
+                            UI.LauncherPreferences.Textos.GenericError + "\n\n" + ex.Message,
+                            "Jondo",
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    Console.WriteLine($"[Lanzador] Relé local activo hacia " +
+                                      $"{UI.LauncherPreferences.ServerHost}.");
+                }
+
                 await AsegurarQueHayServidor();
 
                 UI.LauncherWindow.OpenOnDedicatedThread();
@@ -49,6 +68,7 @@ namespace Jondo.Unity.Launcher
             }
             finally
             {
+                Network.RemoteRelay.Stop();
                 Contract.SoltarElSitio();
             }
         }
