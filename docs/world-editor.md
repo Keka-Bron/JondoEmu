@@ -106,7 +106,7 @@ Es el tercer ejecutable de la casa, junto al lanzador y al servidor:
 ```
   Jondo Emulator Launcher.exe   la ventana del jugador
   Jondo Server.exe              el mundo
-  Jondo Estudio.exe             el editor            <- nuevo
+  Jondo Studio.exe              el editor            <- nuevo
 ```
 
 Y funciona en **dos modos**, que es lo que lo hace cómodo:

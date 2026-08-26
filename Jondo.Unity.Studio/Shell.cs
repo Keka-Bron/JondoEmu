@@ -24,7 +24,14 @@ namespace Jondo.Unity.Studio
 
         public Shell()
         {
-            Title = "Jondo Estudio";
+            Title = "Jondo Studio";
+
+            // Maximised from the start. This is a workbench, not a dialog: the map grid alone is
+            // 560 cells wide and the placement list has five columns, and both of them get cropped
+            // in anything smaller than the screen.
+            WindowState = WindowState.Maximized;
+
+            // Still worth setting: this is the size it goes back to when un-maximised.
             Width = 1180;
             Height = 760;
             MinWidth = 900;
