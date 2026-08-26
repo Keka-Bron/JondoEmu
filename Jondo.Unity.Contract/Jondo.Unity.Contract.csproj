@@ -14,6 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Core\Jondo.Unity.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
   </ItemGroup>

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- THE WORLD EDITOR.
+
+       A third executable next to the launcher and the server. It works on its own: it opens
+       content/ and the databases, edits and saves, with nothing running. Talking to a live server
+       comes later, and when it does it will be a thin channel that only says "reload this domain".
+
+       Avalonia rather than a local web UI for one reason above the rest: there is no serialisation
+       boundary. It references Jondo.Unity.World and Jondo.Unity.Contract as projects and uses
+       MapGeometry, Fighter and SpellEffect directly. Seven of the eight planned modules manipulate
+       domain objects and only one paints pixels, so an HTTP layer would be a lot of machinery for
+       one module out of eight. See docs/world-editor.md. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Jondo Estudio</AssemblyName>
+    <RootNamespace>Jondo.Unity.Studio</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+    <!-- Avalonia arrastra Tmds.DBus.Protocol 0.20.0, que lleva GHSA-xrw6-gwf8-vvr9 (gravedad
+         alta). Es la pieza de DBus de Linux y aqui no se usa, pero viaja igual en el paquete, asi
+         que se fija la version corregida. Mismo remedio que con SQLitePCLRaw en el servidor. -->
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Core\Jondo.Unity.Core.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
+  </ItemGroup>
+
+</Project>
