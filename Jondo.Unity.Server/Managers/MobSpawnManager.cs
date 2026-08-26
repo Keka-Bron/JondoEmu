@@ -7,6 +7,82 @@ namespace Jondo.Unity.Launcher.Managers
 {
     public static class MobSpawnManager
     {
+        /// <summary>
+        /// Los mapas donde NO se pone un monstruo, por mucho que la tabla los tenga.
+        ///
+        /// Se ven jugando: pios dentro de una casa, dentro de un banco, dentro de una tienda y
+        /// plantados encima del zaap del pueblo. Medido sobre los 38.744 grupos colocados: 9.331
+        /// —el 24,1 %— están en un mapa bajo techo.
+        ///
+        /// La regla son dos listas y una excepción, y la excepción es la importante:
+        ///
+        ///   BAJO TECHO      MapPositions.Outdoor = 0, que son 4.165 mapas
+        ///   CON ZAAP        los 62 del catálogo de puntos de viaje; 53 tenían monstruos encima
+        ///   SALVO MAZMORRA  753 de las 763 salas de mazmorra están marcadas «bajo techo»
+        ///
+        /// Sin esa excepción, prohibir el interior VACIARÍA LAS MAZMORRAS ENTERAS: son 2.290
+        /// grupos, y una mazmorra sin bichos no es una mazmorra. Con ella, se retiran 7.214 grupos
+        /// (el 18,6 %) repartidos por 2.393 mapas, y las 763 salas se quedan como están.
+        ///
+        /// Se filtra AL CARGAR y no borrando filas de la base a propósito: world.db se regenera y
+        /// se distribuye comprimida, así que un borrado se perdería en la próxima regeneración y
+        /// habría que acordarse de repetirlo. Esto no hay que acordarse de nada.
+        /// </summary>
+        /// <summary>Los mapas vetados, guardados para que el repoblador también los respete.</summary>
+        private static HashSet<long> _vetados = new HashSet<long>();
+
+        private static HashSet<long> MapasSinMonstruos(Microsoft.Data.Sqlite.SqliteConnection connection)
+        {
+            var vetados = new HashSet<long>();
+            var salas = new HashSet<long>();
+
+            void Recoger(string sql, HashSet<long> donde)
+            {
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = sql;
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read()) donde.Add(reader.GetInt64(0));
+            }
+
+            try
+            {
+                Recoger("SELECT MapId FROM DungeonRooms;", salas);
+                Recoger("SELECT MapId FROM MapPositions WHERE Outdoor = 0;", vetados);
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[MobSpawnManager] No se ha podido leer dónde no van monstruos: {ex.Message}");
+                return new HashSet<long>();
+            }
+
+            // Los zaaps salen del catálogo de puntos de viaje. Se lee aquí el fichero en vez de
+            // preguntarle a Interactives porque ése se inicializa DESPUÉS que el spawner, y
+            // preguntárselo ahora devolvería una lista vacía sin dar ningún error.
+            try
+            {
+                string ruta = Paths.WaypointsJson;
+                if (File.Exists(ruta))
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(ruta));
+                    foreach (var entrada in doc.RootElement.EnumerateArray())
+                    {
+                        if (entrada.TryGetProperty("mapId", out var m) && m.TryGetInt64(out long mapa))
+                        {
+                            vetados.Add(mapa);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[MobSpawnManager] No he podido leer los zaaps: {ex.Message}");
+            }
+
+            // Y la mazmorra manda sobre todo lo demás.
+            vetados.ExceptWith(salas);
+            return vetados;
+        }
+
         public class MonsterGrade
         {
             public int Level { get; set; }
@@ -103,15 +179,24 @@ namespace Jondo.Unity.Launcher.Managers
             // groups are read, because they are thinned as they come in.
             Archimonsters.Initialize(connection);
 
+            // Y dónde NO se pone un monstruo por mucho que la tabla lo diga.
+            _vetados = MapasSinMonstruos(connection);
+            var vetados = _vetados;
+
             var cmdMapMobs = connection.CreateCommand();
             cmdMapMobs.CommandText = "SELECT MapId, MobId, CellId, MembersJson FROM MapMobs ORDER BY MapId, MobId;";
             int count = 0;
             int archmonsters = 0;
+            int bajoTecho = 0;
             using (var reader = cmdMapMobs.ExecuteReader())
             {
                 while (reader.Read())
                 {
                     long mapId = reader.GetInt64(0);
+
+                    // Ni en una casa, ni en un banco, ni en una tienda, ni encima de un zaap.
+                    if (vetados.Contains(mapId)) { bajoTecho++; continue; }
+
                     long mobId = reader.GetInt64(1);
                     int cellId = reader.GetInt32(2);
                     string membersJson = reader.GetString(3);
@@ -180,6 +265,11 @@ namespace Jondo.Unity.Launcher.Managers
             ActorIds.ReservarMonstruosHasta(menor);
 
             Console.WriteLine($"[MobSpawnManager] Loaded {count} persistent mobs across {_mapMobs.Count} maps from database.");
+            if (bajoTecho > 0)
+            {
+                Console.WriteLine($"[MobSpawnManager] {bajoTecho} grupos descartados por estar bajo " +
+                                  $"techo o encima de un zaap; {vetados.Count} mapas vetados.");
+            }
             Console.WriteLine($"[MobSpawnManager] Ids de grupo repartidos hasta el {menor}; " +
                               "los que se generen al vuelo siguen por debajo.");
             Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
@@ -338,6 +428,11 @@ namespace Jondo.Unity.Launcher.Managers
         public static MobGroup? RespawnOneGroup(long mapId)
         {
             if (_monsters.Count == 0) return null;
+
+            // La misma regla que al cargar. Hoy no debería llegar aquí un mapa vetado -si no se
+            // pone un grupo, no hay pelea que reponer-, pero ésta es la otra puerta por la que
+            // aparecen monstruos y más vale que las dos digan lo mismo.
+            if (_vetados.Contains(mapId)) return null;
 
             lock (_candado)
             {

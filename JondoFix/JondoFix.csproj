@@ -12,6 +12,7 @@
          o con la variable de entorno DOFUS_CLIENT_DIR. Si no se dice nada se prueban los nombres
          conocidos al lado del repositorio; el primero es el de este proyecto. -->
     <DofusClientDir Condition="'$(DofusClientDir)' == '' And '$(DOFUS_CLIENT_DIR)' != ''">$(DOFUS_CLIENT_DIR)</DofusClientDir>
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11'))</DofusClientDir>
     <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10'))</DofusClientDir>
     <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\DofusClient-3.6.10.10')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\DofusClient-3.6.10.10'))</DofusClientDir>
   </PropertyGroup>

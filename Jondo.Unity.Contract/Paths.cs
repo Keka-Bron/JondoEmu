@@ -29,15 +29,50 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static string Root { get; } = ResolveRoot();
 
+        /// <summary>
+        /// Las versiones de cliente con las que este emulador habla, DE LA MÁS NUEVA A LA MÁS
+        /// VIEJA. Se coge la primera que exista.
+        ///
+        /// Es una lista escrita a mano a propósito, y no «la carpeta de versión más alta que
+        /// haya»: el emulador está atado a una forma concreta del protocolo, y si alguien deja al
+        /// lado un cliente que todavía no sabemos hablar, cogerlo solo sería arrancar contra un
+        /// cliente incompatible sin decir nada. Añadir una versión es una línea.
+        ///
+        /// La 3.6.10.11 vale porque NO ES OTRO PROTOCOLO: su GameAssembly.dll y su
+        /// global-metadata.dat son byte a byte los mismos que los de la 3.6.10.10 —mismo SHA-256,
+        /// los dos ficheros— y el emparejador estructural lo confirma por su cuenta: 2.169
+        /// mensajes contra 2.169, mapeo identidad, cero dudas. Ese parche sólo movió datos: 182
+        /// bundles de Content/Data.
+        /// </summary>
+        private static readonly string[] ClientesQueValen =
+        {
+            "Cliente 3.6.10.11",
+            "Cliente 3.6.10.10",
+        };
+
         /// <summary>Dofus client folder (it lives outside the emulator root).</summary>
         public static string ClientDir
         {
             get
             {
-                string candidate3610 = Path.GetFullPath(Path.Combine(Root, "..", "Cliente 3.6.10.10"));
-                if (Directory.Exists(candidate3610)) return candidate3610;
-                string fallback = Path.Combine(LegacyRoot, "Cliente 3.6.10.10");
-                if (Directory.Exists(fallback)) return fallback;
+                // Al lado del emulador primero, y la ruta histórica después: una instalación a
+                // medio mover sigue arrancando igual.
+                foreach (string donde in new[]
+                         {
+                             Path.GetFullPath(Path.Combine(Root, "..")),
+                             LegacyRoot,
+                         })
+                {
+                    foreach (string version in ClientesQueValen)
+                    {
+                        string candidato = Path.Combine(donde, version);
+
+                        // Que exista la carpeta no basta: tiene que llevar el ejecutable dentro.
+                        // Una carpeta a medio descargar existe y no sirve para nada.
+                        if (File.Exists(Path.Combine(candidato, "Dofus.exe"))) return candidato;
+                    }
+                }
+
                 return Path.Combine(@"C:\Jondo", "DofusClient");
             }
         }
