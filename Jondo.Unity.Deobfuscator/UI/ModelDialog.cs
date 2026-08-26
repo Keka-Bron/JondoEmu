@@ -41,8 +41,9 @@ internal sealed class ModelDialog : Form, IBackgroundWindow
     private readonly Label _hint;
     private readonly Label _verdict;
 
-    private Bitmap? _composed;
-    public Image? ComposedBackground => _composed;
+    // This fixed dialog uses a solid background; transparent child controls therefore have no
+    // composed image to crop, unlike MapperWindow and the launcher.
+    public Image? ComposedBackground => null;
 
     private int E(int pixels) => (int)Math.Round(pixels * _scale);
     private Font Letter(float pixels, FontStyle style = FontStyle.Regular)

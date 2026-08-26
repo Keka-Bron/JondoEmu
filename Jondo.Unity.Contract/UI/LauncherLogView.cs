@@ -59,7 +59,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         /// <summary>Cuántas líneas caben de una vez.</summary>
-        private int Visible => Math.Max(1, (Height - Padding.Vertical) / _lineHeight);
+        private int VisibleLineCount => Math.Max(1, (Height - Padding.Vertical) / _lineHeight);
 
         /// <summary>Añade una línea ya troceada por colores.</summary>
         public void Add(params Piece[] pieces)
@@ -101,7 +101,7 @@ namespace Jondo.Unity.Launcher.UI
 
         private void Rescale()
         {
-            int top = Math.Max(0, _lines.Count - Visible);
+            int top = Math.Max(0, _lines.Count - VisibleLineCount);
             _bar.Maximum = top;
             _bar.LargeChange = 1;
             _bar.Enabled = top > 0;

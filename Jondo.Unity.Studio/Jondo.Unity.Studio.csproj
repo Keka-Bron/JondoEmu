@@ -40,10 +40,10 @@
     <PackageReference Include="Avalonia" Version="11.2.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
-    <!-- Avalonia arrastra Tmds.DBus.Protocol 0.20.0, que lleva GHSA-xrw6-gwf8-vvr9 (gravedad
-         alta). Es la pieza de DBus de Linux y aqui no se usa, pero viaja igual en el paquete, asi
-         que se fija la version corregida. Mismo remedio que con SQLitePCLRaw en el servidor. -->
-    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.2" />
+    <!-- Avalonia arrastra Tmds.DBus.Protocol 0.20.0, afectado por GHSA-xrw6-gwf8-vvr9. La
+         correccion se retroporto a la rama compatible 0.21 en la version 0.21.3, asi que se fija
+         aqui sin obligar a Studio a saltar a la API 0.92+. -->
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
   </ItemGroup>
 
   <ItemGroup>
