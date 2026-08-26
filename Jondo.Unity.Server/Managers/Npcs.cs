@@ -308,7 +308,7 @@ namespace Jondo.Unity.Launcher.Managers
             string[] parts = look.Substring(start + 1, end - start - 1).Split('|');
             spawn.Bones = parts.Length > 0 ? First(parts[0]) : 0;
             spawn.Skins = parts.Length > 1 ? Numbers(parts[1]) : Array.Empty<long>();
-            spawn.Colors = parts.Length > 2 ? Numbers(parts[2]) : Array.Empty<long>();
+            spawn.Colors = parts.Length > 2 ? Colores(parts[2]) : Array.Empty<long>();
             spawn.Scales = parts.Length > 3 ? Numbers(parts[3]) : Array.Empty<long>();
         }
 
@@ -316,6 +316,70 @@ namespace Jondo.Unity.Launcher.Managers
         {
             var numbers = Numbers(part);
             return numbers.Length > 0 ? numbers[0] : 0;
+        }
+
+        /// <summary>
+        /// Los colores de un aspecto, en la forma que espera el cliente.
+        ///
+        /// La sección de color de un look NO es una lista de números: son pares
+        /// «índice=valor», y el valor viene en decimal o en hexadecimal con almohadilla. El
+        /// Bontariano enfadado es {1|90,2140|2=16305204,3=3772345,4=14024699,6=#8F5203|53}.
+        ///
+        /// Se leía con Numbers(), que espera números sueltos separados por comas: no parseaba ni
+        /// uno, no llegaba ni un color, y el cliente pintaba el aspecto sin tintes, o sea GRIS.
+        /// Medido sobre los 6.467 NPCs del catálogo: 2.045 llevan colores y LOS 2.045 usan la
+        /// forma de pares. Ni uno usa una lista plana, así que estaban saliendo grises todos.
+        ///
+        /// Por el cable el color va con su índice metido en el byte alto —(índice &lt;&lt; 24) | rgb—,
+        /// que es la misma cuenta que hace BreedLookTable.IndexColors para el personaje del
+        /// jugador. La diferencia está en de dónde sale el índice: allí es la posición en la
+        /// lista, y aquí viene ESCRITO y no es correlativo. El Bontariano usa el 2, el 3, el 4 y
+        /// el 6, y se salta el 1 y el 5; numerándolos por posición, sus tintes irían a las
+        /// ranuras equivocadas.
+        /// </summary>
+        private static long[] Colores(string parte)
+        {
+            if (string.IsNullOrWhiteSpace(parte)) return Array.Empty<long>();
+
+            var fuera = new List<long>();
+            int posicion = 0;
+            foreach (string trozo in parte.Split(','))
+            {
+                string p = trozo.Trim();
+                if (p.Length == 0) continue;
+                posicion++;
+
+                // Sin el «índice=» delante se numera por posición, que es lo que hace el aspecto
+                // del jugador. Hoy no lo usa ni un NPC; queda por si algún día cambia el dato.
+                long indice = posicion;
+                string valor = p;
+
+                int igual = p.IndexOf('=');
+                if (igual > 0)
+                {
+                    if (long.TryParse(p.Substring(0, igual).Trim(), out long suyo)) indice = suyo;
+                    valor = p.Substring(igual + 1).Trim();
+                }
+
+                if (!LeerColor(valor, out long rgb)) continue;
+                fuera.Add((indice << 24) | (rgb & 0xFFFFFF));
+            }
+            return fuera.ToArray();
+        }
+
+        /// <summary>Un color, en decimal o en hexadecimal con almohadilla delante.</summary>
+        private static bool LeerColor(string texto, out long rgb)
+        {
+            rgb = 0;
+            if (string.IsNullOrEmpty(texto)) return false;
+
+            if (texto[0] == '#')
+            {
+                return long.TryParse(texto.Substring(1),
+                                     System.Globalization.NumberStyles.HexNumber,
+                                     System.Globalization.CultureInfo.InvariantCulture, out rgb);
+            }
+            return long.TryParse(texto, out rgb);
         }
 
         private static long[] Numbers(string part)

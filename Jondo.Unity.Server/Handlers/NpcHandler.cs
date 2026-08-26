@@ -148,6 +148,16 @@ namespace Jondo.Unity.Launcher.Handlers
                               $"{kbd.Length} bytes, se paga en {moneda}.");
         }
 
+        /// <summary>
+        /// «Hasta luego.», la despedida que se le pone a quien no trae ninguna respuesta.
+        ///
+        /// No es un número inventado: es la respuesta MÁS USADA de todo el juego, la llevan 62
+        /// NPCs de los 6.467, y su texto en el catálogo del cliente es exactamente «Hasta luego.».
+        /// Se eligió por eso y no por lo que dice: hace falta un id de respuesta que el cliente
+        /// sepa resolver a un texto, y éste lo es en los cinco idiomas.
+        /// </summary>
+        private const long RespuestaDeDespedida = 7846;
+
         /// <summary>La ventana de diálogo y su pregunta, sacadas de la plantilla del NPC.</summary>
         private static async Task OpenDialogAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
         {
@@ -162,12 +172,26 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
 
+            // UN DIÁLOGO SIN RESPUESTAS NO SE PUEDE CERRAR.
+            //
+            // Cuando la lista va vacía, el cliente pinta él solo un «Marcharte.», y ese botón no
+            // manda el ioy: se queda la ventana puesta y no hay manera de salir más que
+            // reconectando. Se ve con el Bontariano enfadado, que tiene un mensaje y CERO
+            // respuestas en su plantilla.
+            //
+            // Así que siempre va al menos una respuesta de verdad, porque una respuesta de verdad
+            // sí manda el ioy y entonces contestamos con el kld que cierra.
+            long[] respuestas = template.Replies.Length > 0
+                ? template.Replies
+                : new[] { RespuestaDeDespedida };
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(
-                    template.DialogMessageId, template.Replies)));
+                    template.DialogMessageId, respuestas)));
 
             Console.WriteLine($"[NPC] Diálogo del {npc.NpcId}: pregunta {template.DialogMessageId}, " +
-                              $"{template.Replies.Length} respuestas.");
+                              $"{respuestas.Length} respuestas" +
+                              (template.Replies.Length == 0 ? " (sólo la despedida, su plantilla no trae ninguna)" : "") + ".");
         }
 
         /// <summary>
