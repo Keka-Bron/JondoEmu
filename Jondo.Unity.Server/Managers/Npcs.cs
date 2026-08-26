@@ -210,30 +210,44 @@ namespace Jondo.Unity.Launcher.Managers
         /// vendedores— se deja como está y no se le añade nada. En las capturas ese mapa no tiene
         /// ni un NPC, así que hoy no se pisa nada, pero la regla vale para el día que sí.
         /// </summary>
+        /// <summary>
+        /// Seeds the NPCs that Ankama places around the world, through the content layers.
+        /// </summary>
+        /// <remarks>
+        /// This used to read datos/npcs_reales.json straight off the disk. It now goes through
+        /// NpcSpawnContent, which merges that file — the measured layer, 422 placements read off
+        /// the captures — with content/npcs/spawns.json, the authored one. Same placements, plus
+        /// whatever a person has decided on top, and every row remembers which of the two it came
+        /// from.
+        ///
+        /// Nothing else changes: the map is still seeded before the templates are loaded, so each
+        /// spawn inherits its look further down.
+        /// </remarks>
         private static void SembrarLosDelMundo()
         {
-            string path = Paths.WorldNpcsJson;
-            if (!File.Exists(path))
+            var spawns = Jondo.Unity.World.Content.NpcSpawnContent.Load(
+                Paths.WorldNpcsJson,
+                Paths.ContentFile(Jondo.Unity.World.Content.NpcSpawnContent.AuthoredFile),
+                Console.WriteLine);
+
+            if (spawns.Count == 0)
             {
-                Console.WriteLine($"[NPCs] No hay {Path.GetFileName(path)}: el mundo se queda sin " +
-                                  "los NPCs de las capturas.");
+                Console.WriteLine("[NPCs] No world placements at all: neither the measured file " +
+                                  "nor the authored one had any.");
                 return;
             }
 
-            // Los mapas que YA tienen NPCs puestos por nosotros se quedan como están. Hoy es sólo
-            // el del zaap de Amakna, con los vendedores; en las capturas ese mapa no tiene ni un
-            // NPC, así que no se pisa nada, pero la regla vale para el día que sí.
+            // Maps that already carry NPCs of ours are left alone. Today that is only the Amakna
+            // zaap map, with the vendors; the captures put no NPC there, so nothing is overwritten,
+            // but the rule holds for the day one is.
             var nuestros = new HashSet<long>(_byMap.Keys);
 
             int puestos = 0, saltados = 0, absorbidos = 0;
             try
             {
-                using var doc = JsonDocument.Parse(File.ReadAllText(path));
-                if (!doc.RootElement.TryGetProperty("npcs", out var lista)) return;
-
-                foreach (var entrada in lista.EnumerateArray())
+                foreach (var entrada in spawns.Values)
                 {
-                    long mapId = entrada.GetProperty("mapa").GetInt64();
+                    long mapId = entrada.MapId;
                     if (nuestros.Contains(mapId)) { saltados++; continue; }
 
                     // Un vendedor absorbido tampoco se siembra AQUI, no solo en NpcSpawns.
@@ -243,7 +257,7 @@ namespace Jondo.Unity.Launcher.Managers
                     // aparecer por esta puerta. Y con la tienda vacia, porque su catalogo se lo
                     // quedo el que los absorbio: al abrirlos el servidor dice «tiene accion de
                     // tienda pero no vende nada» y al jugador no le sale nada.
-                    int quien = entrada.GetProperty("npc").GetInt32();
+                    int quien = entrada.NpcId;
                     if (Vendors.IsAbsorbed(quien)) { absorbidos++; continue; }
 
                     if (!_byMap.TryGetValue(mapId, out var aqui))
@@ -258,21 +272,25 @@ namespace Jondo.Unity.Launcher.Managers
                     {
                         MapId = mapId,
                         NpcId = quien,
-                        Cell = entrada.GetProperty("casilla").GetInt32(),
-                        Orientation = entrada.TryGetProperty("orientacion", out var o) ? o.GetInt32() : 1,
+                        Cell = entrada.Cell,
+                        Orientation = entrada.Orientation,
                         ContextualId = ActorIds.NpcDelMapa(aqui.Count),
                     });
                     puestos++;
                 }
 
                 Count += puestos;
+                var censo = spawns.Census();
                 Console.WriteLine($"[NPCs] {puestos} del mundo, donde los tenía Ankama" +
                                   (saltados > 0 ? $", {saltados} en un mapa nuestro" : "") +
                                   (absorbidos > 0 ? $", {absorbidos} absorbidos por otro vendedor" : "") + ".");
+                Console.WriteLine($"[Content] npc spawns: {censo[Jondo.Unity.World.Content.ContentLayer.Measured]} measured, " +
+                                  $"{censo[Jondo.Unity.World.Content.ContentLayer.Authored]} authored, " +
+                                  $"{spawns.ErasedCount} erased by hand.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[NPCs] No se pudo leer {Path.GetFileName(path)}: {ex.Message}");
+                Console.WriteLine($"[NPCs] World placements could not be seeded: {ex.Message}");
             }
         }
 

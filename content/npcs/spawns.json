@@ -1,0 +1,20 @@
+{
+  "_comment": [
+    "The authored layer for NPC placements. Nothing regenerates this file: it is the only one",
+    "a person edits by hand, and it wins over datos/npcs_reales.json, which a tool rewrites.",
+    "",
+    "One row per placement: map, npc AND cell. The cell identifies it because the same NPC can",
+    "stand several times on one map - 18 of them do. Moving one is a remove plus a new row.",
+    "",
+    "  { \"map\": 241438721, \"npc\": 1088, \"cell\": 260, \"orientation\": 3 }   place or re-face",
+    "  { \"map\": 241438721, \"npc\": 1088, \"cell\": 260 }                     place, keep facing",
+    "  { \"map\": 241438721, \"npc\": 1088, \"cell\": 260, \"remove\": true }    take that one out",
+    "",
+    "The last one is the reason this file exists at all: an NPC Ankama places and we do not want",
+    "has to be removable without editing the generated file it came from, because that file is",
+    "rewritten by tools/extraer_npcs_reales.py and the edit would vanish.",
+    "",
+    "Empty on purpose. Nothing here yet means the world is exactly what the captures measured."
+  ],
+  "spawns": []
+}

@@ -85,3 +85,7 @@ expedientes/
 # versión y tampoco se publican: son de Ankama.
 datos/cytrus/
 clientes/
+
+# El proyecto de tests compila como cualquier otro
+Jondo.Unity.Tests/bin/
+Jondo.Unity.Tests/obj/

@@ -210,6 +210,20 @@ namespace Jondo.Unity.Launcher
         /// 202 mapas. Lo genera tools/extraer_npcs_reales.py.
         /// </summary>
         public static string WorldNpcsJson => Resolve("npcs_reales.json");
+
+        /// <summary>
+        /// The authored content layer: the only files a person edits by hand.
+        ///
+        /// It sits next to the emulator and it is versioned in git, unlike <c>datos/</c> and
+        /// <c>bases/</c>, which are generated. That is the whole point of it being text and being
+        /// small: a diff anybody can review, and two people can edit different maps without
+        /// colliding. Nothing regenerates this folder, so nothing can quietly wipe it.
+        /// </summary>
+        public static string ContentDir => Path.Combine(Root, "content");
+
+        /// <summary>One file of the authored layer, by its path relative to the content root.</summary>
+        public static string ContentFile(string relative)
+            => Path.Combine(ContentDir, relative.Replace('/', Path.DirectorySeparatorChar));
         // Las parejas de hechizo base/variante, una por cada hueco de la barra. Del volcado del
         // cliente; el personaje lleva uno de cada pareja, no los dos.
         public static string SpellVariantsJson
