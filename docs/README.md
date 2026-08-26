@@ -101,6 +101,10 @@ The authenticated `POST /api/personaje` route, its administrator-role check, acc
 kamas fields, session serialization, persistence, immediate client refresh and error responses.
 *Go there* when building an administration tool that must update an online character without a
 restart or reconnect.
+**`command-localization.md`** — Spanish, English and French command replies.
+How the launch language crosses the single-use session ticket, why it belongs to `SessionState`,
+which replies are translated and how catalogue completeness is guarded at startup.
+*Go there* when adding a command response or another server-side player message.
 
 **`unknown-packets.md`** — What the client sends that no handler claims.
 Why it is grouped by message shape rather than by opcode, the measured field-number ceiling that

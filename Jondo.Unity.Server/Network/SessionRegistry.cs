@@ -12,9 +12,10 @@ namespace Jondo.Unity.Launcher.Network
     /// Session tickets shared between the connection server and the game server.
     ///
     /// The client makes two separate connections: on the first one it authenticates and picks a
-    /// server, and gets a ticket back; on the second one it presents that ticket to say who it
-    /// is. Without this registry there is no way to know which account the second connection
-    /// belongs to, and the character list would end up being the same one for everybody.
+    /// server, and gets a ticket back; on the second one it presents that ticket to say who it is,
+    /// which server it selected and which language it uses. Without this registry there is no way
+    /// to know which account the second connection belongs to, and the character list would end up
+    /// being the same one for everybody.
     ///
     /// The ticket is single-use and expires, so that it cannot work as a permanent key.
     /// </summary>
@@ -28,6 +29,7 @@ namespace Jondo.Unity.Launcher.Network
             public string Value { get; init; } = "";
             public long AccountId { get; init; }
             public int ServerId { get; init; }
+            public string Language { get; init; } = "es";
             public DateTime Created { get; init; }
         }
 
@@ -176,16 +178,24 @@ namespace Jondo.Unity.Launcher.Network
             return (seVa, llega);
         }
 
-        /// <summary>Creates a new ticket for a specific account and server.</summary>
-        public static Ticket Issue(long accountId, int serverId)
+        /// <summary>Creates a new ticket for a specific account, server and client language.</summary>
+        public static Ticket Issue(long accountId, int serverId, string language = "es")
         {
             Purge();
+
+            string normalized = (language ?? "").Trim().ToLowerInvariant() switch
+            {
+                "en" => "en",
+                "fr" => "fr",
+                _ => "es",
+            };
 
             var ticket = new Ticket
             {
                 Value = Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant(),
                 AccountId = accountId,
                 ServerId = serverId,
+                Language = normalized,
                 Created = DateTime.UtcNow
             };
             _tickets[ticket.Value] = ticket;
@@ -203,6 +213,15 @@ namespace Jondo.Unity.Launcher.Network
             if (!_tickets.TryRemove(value.Trim(), out var ticket)) return null;
             if (DateTime.UtcNow - ticket.Created > Expiration) return null;
             return ticket;
+        }
+
+        /// <summary>Regression guard: the second socket keeps the language chosen on the first.</summary>
+        internal static void AssertLanguageFollowsTicket()
+        {
+            var issued = Issue(1, 1, "fr");
+            var redeemed = Redeem(issued.Value);
+            if (redeemed == null || redeemed.Language != "fr")
+                throw new InvalidOperationException("The session ticket lost the client language.");
         }
 
         private static void Purge()

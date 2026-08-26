@@ -6,6 +6,8 @@ administrator-only: because they are deliberately absent from the lower-role per
 
 The command can be written in any chat channel. Jondo consumes the message instead of publishing
 it, then sends the result back as a private informational chat line in the same tab.
+The usage, validation and result text follows the Spanish, English or French language selected for
+that game session; command names and arguments do not change.
 
 ## `.item`
 

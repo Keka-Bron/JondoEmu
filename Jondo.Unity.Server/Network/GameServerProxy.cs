@@ -251,7 +251,25 @@ namespace Jondo.Unity.Launcher.Network
                             // The ticket is single-use and binds the next connection to this
                             // account and this server. Without it, the game session would have
                             // no idea who it is serving.
-                            var ticket = SessionRegistry.Issue(accountId, selectedServerId);
+                            // THE LANGUAGE COMES FROM THE LAUNCH, NOT FROM THIS MESSAGE.
+                            //
+                            // `lang` here is whatever the client put in its authentication
+                            // request, and it starts at the string "0": a session issued from it
+                            // fell through the normaliser to Spanish every time, so the whole
+                            // translation did nothing.
+                            //
+                            // The real code is two doors back. The launcher starts the client with
+                            // --langCode and registers that in ClientLaunchRegistry, keyed by
+                            // account, which is the same account we are issuing this ticket for.
+                            // Measured in the nine authentication captures: the client does send
+                            // its two-letter code, but in kqz field 3 -"es" in all six that carry
+                            // it- and not in the field this proxy reads.
+                            string idioma = ClientLaunchRegistry.TryGetByAccount(accountId, out var lanzamiento)
+                                          && lanzamiento != null
+                                ? lanzamiento.Language
+                                : lang;
+
+                            var ticket = SessionRegistry.Issue(accountId, selectedServerId, idioma);
 
                             byte[] response = ConnectionProtocol.BuildServerSelected(
                                 lang, ticket.Value, "127.0.0.1", Program.gamePort, Program.gamePort);
