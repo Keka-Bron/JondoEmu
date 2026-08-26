@@ -169,7 +169,12 @@ namespace Jondo.Unity.Launcher.Network
             if (sesion == null || !sesion.HasCharacter || !sesion.IsInWorld)
                 return Mal(404, "personaje-desconectado");
 
-            sesion.UnoCadaVez.Wait();
+            // With a deadline, and not Wait() forever. This runs on the HttpListener's thread and
+            // the lock is held across three socket writes: a client that has stopped reading -alt
+            // F4 with the socket still open is the usual way- would otherwise park this thread for
+            // good, and the control API has a small pool of them. Better a 409 than a listener
+            // that stops answering.
+            if (!sesion.UnoCadaVez.Wait(PlazoDelTurno)) return Mal(409, "personaje-ocupado");
             try
             {
                 using (SessionContext.Push(sesion))
@@ -225,10 +230,29 @@ namespace Jondo.Unity.Launcher.Network
             }
         }
 
+        /// <summary>
+        /// The ceiling a characteristic set from outside the game is clamped to.
+        /// </summary>
+        /// <remarks>
+        /// It used to be int.MaxValue, which is the one value guaranteed to break: max HP is
+        /// computed as <c>50 + level * 5 + vitality</c> in StatsHandler, in int arithmetic and
+        /// with no check, so a vitality of int.MaxValue overflows to a NEGATIVE maximum. The
+        /// character then has a life bar the client cannot draw and the fight engine treats as
+        /// already dead.
+        ///
+        /// Ten million is far above anything the game reaches — the highest vitality a level 200
+        /// character can hold is in the low thousands — and leaves the sum three orders of
+        /// magnitude short of overflowing.
+        /// </remarks>
+        private const int TopeDeCaracteristica = 10_000_000;
+
+        /// <summary>How long to wait for the session's turn before giving up on it.</summary>
+        private static readonly TimeSpan PlazoDelTurno = TimeSpan.FromSeconds(5);
+
         private static bool AsignarEntero(string cuerpo, string campo, Action<int> asignar)
         {
             if (!TryNumero(cuerpo, campo, out long valor)) return false;
-            asignar((int)Math.Clamp(valor, 0, int.MaxValue));
+            asignar((int)Math.Clamp(valor, 0, TopeDeCaracteristica));
             return true;
         }
 
