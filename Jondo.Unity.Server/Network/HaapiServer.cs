@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     public static class HaapiServer
     {

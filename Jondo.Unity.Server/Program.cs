@@ -1,11 +1,12 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Network;
-using Jondo.Unity.Launcher.Handlers;
+using Jondo.Unity.Server.Network;
+using Jondo.Unity.Server.Handlers;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     class Program
     {

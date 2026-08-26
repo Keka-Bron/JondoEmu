@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Port 5555. Two different protocols come through it, and which one it is gets decided by

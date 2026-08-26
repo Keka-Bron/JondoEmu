@@ -1,0 +1,39 @@
+{
+  "_comment": [
+    "The authored layer for packets: what a person worked out about the traffic.",
+    "",
+    "The counts, the timestamps and the raw samples are NOT here. They live in",
+    "bases/paquetes.db, which the server writes and which is generated data. Here go the",
+    "conclusions, because those are what no tool can reproduce and what git has to keep.",
+    "",
+    "One row per opcode and payload shape:",
+    "",
+    "  { \"opcode\": \"jss\", \"shape\": \"*\",     \"status\": \"named\", \"name\": \"...\" }",
+    "  { \"opcode\": \"kqz\", \"shape\": \"2:s,3:s\", \"status\": \"documented\", \"notes\": \"...\" }",
+    "",
+    "A shape of * is a note about the opcode whatever it carries, which is the sane way to",
+    "say something about all 185 shapes jss turns up with.",
+    "",
+    "Both halves are needed, measured over the 72,879 frames of the traffic log: 10 of the",
+    "664 shapes are shared by more than one opcode and between them cover 180 of the 242,",
+    "and 59 of those 242 opcodes carry more than one shape.",
+    "",
+    "status: unknown, named, documented, handled, ignored."
+  ],
+  "packets": [
+    {
+      "opcode": "kqz",
+      "shape": "*",
+      "status": "documented",
+      "name": "SetLanguageRequest",
+      "notes": "The client saying which language it is running in. Field 2 is the session token, field 3 the two-letter code - measured over the nine authentication captures, and it is the only place on the wire the client states it. Everything else about language comes from the --langCode the launcher started it with."
+    },
+    {
+      "opcode": "kod",
+      "shape": "*",
+      "status": "handled",
+      "name": "PingRequest",
+      "notes": "The heartbeat. Answered with kns; the client drops the connection without it."
+    }
+  ]
+}

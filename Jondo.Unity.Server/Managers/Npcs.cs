@@ -1,10 +1,11 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Los NPCs de cada mapa: dónde están, qué se puede hacer con ellos y qué dicen.
@@ -149,6 +150,7 @@ namespace Jondo.Unity.Launcher.Managers
             // se quedarían sin aspecto, porque lo que se lee de NpcTemplates es sólo lo que hace
             // falta para los que ya están puestos.
             SembrarLosDelMundo();
+            NpcDialogues.Load();
 
             var wanted = new HashSet<int>();
             foreach (var here in _byMap.Values)

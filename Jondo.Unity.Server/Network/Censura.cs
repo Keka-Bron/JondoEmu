@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Tapa los secretos antes de que lleguen al registro.

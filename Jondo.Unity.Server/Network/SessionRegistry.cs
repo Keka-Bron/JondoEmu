@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jondo.Unity.Launcher;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Session tickets shared between the connection server and the game server.

@@ -1,10 +1,11 @@
+using Jondo.Unity.Launcher;
 using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using Google.Protobuf;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     public static class NetworkEnvelope
     {

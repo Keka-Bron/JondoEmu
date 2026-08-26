@@ -1,3 +1,4 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Por dónde le habla el lanzador al servidor.
@@ -31,7 +32,7 @@ namespace Jondo.Unity.Launcher.Network
     public static class ControlApi
     {
         /// <summary>Las rutas y la cabecera salen del contrato, que es lo que comparten los dos.</summary>
-        public const string Prefijo = Contract.Prefijo;
+        public const string Prefijo = Jondo.Unity.Launcher.Contract.Prefijo;
 
         // ─── El secreto ─────────────────────────────────────────────────────────────────────
         //

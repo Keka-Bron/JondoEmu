@@ -1,9 +1,10 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Lo que hay que saber de un bicho invocado: de dónde sale su aspecto, su vida, sus

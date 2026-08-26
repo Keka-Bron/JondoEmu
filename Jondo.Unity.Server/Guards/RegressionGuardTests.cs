@@ -1,3 +1,4 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     public static class RegressionGuardTests
     {
@@ -493,8 +494,8 @@ namespace Jondo.Unity.Launcher
             // jugador. Medido sobre las capturas: 307 «formas» de un mismo mensaje en 1.798
             // capturados, o sea la lista convertida en un registro inservible.
             //
-            // El tope está medido: en el protocolo entero de 3.6.10.10 hay 8.972 campos
-            // declarados y el más alto es el 40.
+            // El tope está medido: en el protocolo entero de 3.6.10.10 hay 6.186 campos de
+            // mensaje declarados y el más alto es el 40.
             byte[] bloqueDeDatos = { 0x82, 0x40, 0x02, 0x11, 0x22, 0xC2, 0x60, 0x01, 0x33 };
             string comoSale = Network.UnknownPackets.Signature(
                 Network.Pb.New().Var(1, 1).Bytes(2, bloqueDeDatos).Build());

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Jondo.Unity.Launcher.Managers;
+using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Connection-phase messages: authentication, server list and character list.
@@ -407,12 +407,12 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         private static readonly Dictionary<int, Func<long>> Derived = new Dictionary<int, Func<long>>
         {
-            { Stat.DodgeActionPoints,    () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.DodgeMovementPoints,  () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.WithdrawActionPoints, () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.WithdrawMovementPoints, () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.Escape,               () => Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility / 10 },
-            { Stat.Lock,                 () => Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility / 10 },
+            { Stat.DodgeActionPoints,    () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.DodgeMovementPoints,  () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.WithdrawActionPoints, () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.WithdrawMovementPoints, () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.Escape,               () => Jondo.Unity.Server.Network.SessionContext.State.StatAgility / 10 },
+            { Stat.Lock,                 () => Jondo.Unity.Server.Network.SessionContext.State.StatAgility / 10 },
         };
 
         /// <summary>Points a character starts with, before anything is spent or equipped.</summary>
@@ -489,7 +489,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static byte[] BuildCharacteristics()
         {
-            int level = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
+            int level = Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel;
 
             // The three experience fields, and they are not in the order they look:
             //
@@ -509,19 +509,19 @@ namespace Jondo.Unity.Launcher.Network
                 .VarIfNotZero(1, ExperienceTable.NextLevelFloor(level))
                 .Var(4, FreshUnknownF4)
                 .VarIfNotZero(7, ExperienceTable.LevelFloor(level))
-                .VarIfNotZero(8, Jondo.Unity.Launcher.Network.SessionContext.State.Experience)
+                .VarIfNotZero(8, Jondo.Unity.Server.Network.SessionContext.State.Experience)
                 .Bytes(9, FreshUnknownF9())
-                .VarIfNotZero(10, Jondo.Unity.Launcher.Network.SessionContext.State.Kamas);
+                .VarIfNotZero(10, Jondo.Unity.Server.Network.SessionContext.State.Kamas);
 
             // The six the player spends points on.
             var primary = new Dictionary<int, long>
             {
-                { Stat.Strength, Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength },
-                { Stat.Vitality, Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality },
-                { Stat.Wisdom, Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom },
-                { Stat.Chance, Jondo.Unity.Launcher.Network.SessionContext.State.StatChance },
-                { Stat.Agility, Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility },
-                { Stat.Intelligence, Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence },
+                { Stat.Strength, Jondo.Unity.Server.Network.SessionContext.State.StatStrength },
+                { Stat.Vitality, Jondo.Unity.Server.Network.SessionContext.State.StatVitality },
+                { Stat.Wisdom, Jondo.Unity.Server.Network.SessionContext.State.StatWisdom },
+                { Stat.Chance, Jondo.Unity.Server.Network.SessionContext.State.StatChance },
+                { Stat.Agility, Jondo.Unity.Server.Network.SessionContext.State.StatAgility },
+                { Stat.Intelligence, Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence },
             };
 
             IReadOnlyList<int> ids = WorldEntry.CharacteristicIds;
@@ -577,8 +577,8 @@ namespace Jondo.Unity.Launcher.Network
             if (id == Stat.Energy) return BaseEnergy;
             // Five pods a point of strength on top of the base, which is what the capture shows:
             // five points of strength moved this characteristic by twenty-five.
-            if (id == Stat.Pods) return BasePods + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength;
-            if (id == Stat.RemainingPoints) return Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints;
+            if (id == Stat.Pods) return BasePods + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength;
+            if (id == Stat.RemainingPoints) return Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints;
             if (Derived.TryGetValue(id, out var from)) return from();
             return FreshCharacter.TryGetValue(id, out long value) ? value : 0;
         }

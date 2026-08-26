@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// What the character is wearing, and what it adds up to.

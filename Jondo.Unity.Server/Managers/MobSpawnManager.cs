@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Jondo.Unity.Launcher;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System.Linq;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     public static class MobSpawnManager
     {
@@ -250,10 +251,14 @@ namespace Jondo.Unity.Launcher.Managers
                 }
             }
 
+            // Y lo que haya decidido una persona, encima de todo lo anterior.
+            var deLaMano = AplicarLosEscritos();
+
             // Los grupos escritos traen su id puesto desde la siembra. El repartidor tiene que
             // apartarse por debajo del más bajo de todos ellos antes de dar el primero suyo, o el
             // primer grupo generado al vuelo se llevaría un número que ya está ocupado en otro
-            // mapa —y entonces GetMobGroupById devolvería el equivocado—.
+            // mapa —y entonces GetMobGroupById devolvería el equivocado—. Los puestos a mano
+            // cuentan igual: sus ids arrancan en el -2.000.000 y son los más bajos de todos.
             long menor = ActorIds.PrimerMonstruo;
             foreach (var lista in _mapMobs.Values)
             {
@@ -274,6 +279,96 @@ namespace Jondo.Unity.Launcher.Managers
                               "los que se generen al vuelo siguen por debajo.");
             Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
                               $"({100.0 * archmonsters / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
+            // Los dos números por separado, no la resta. Con un grupo puesto y otro quitado la
+            // resta da cero y la línea no sale, que es justo el arranque en el que más falta hace
+            // ver que content/ ha tocado algo.
+            if (deLaMano.Puestos != 0 || deLaMano.Quitados != 0)
+            {
+                Console.WriteLine($"[MobSpawnManager] Desde content/: {deLaMano.Puestos} grupo(s) " +
+                                  $"puestos a mano y {deLaMano.Quitados} quitados.");
+            }
+        }
+
+        /// <summary>
+        /// Pone los grupos que ha decidido una persona y quita los que ha decidido quitar.
+        /// </summary>
+        /// <remarks>
+        /// Los 38.744 grupos de la base son la colocación de Ankama y se regeneran con ella, así
+        /// que ni añadir ni quitar se puede hacer ahí: el trabajo desaparecería la próxima vez que
+        /// alguien rehiciera la base, sin avisar. Por eso esto va en <c>content/</c>, en texto y
+        /// versionado.
+        ///
+        /// Los quitados se borran DESPUÉS de haber cargado la base a propósito. Al revés habría que
+        /// consultar la lista de lápidas dentro del bucle de lectura, y esa lista está vacía casi
+        /// siempre: así se paga una vez por lápida en vez de 38.744 veces por nada.
+        ///
+        /// El nivel de cada miembro no viene escrito: sale del monstruo y del grado, que es de
+        /// donde sale para los de la base. Guardarlo sería una segunda copia de un número derivado.
+        ///
+        /// Devuelve los dos números, para el registro.
+        /// </remarks>
+        private static (int Puestos, int Quitados) AplicarLosEscritos()
+        {
+            int puestos = 0, quitados = 0;
+
+            try
+            {
+                var escritos = Jondo.Unity.World.Content.MobGroupContent.Load(
+                    Paths.ContentFile(Jondo.Unity.World.Content.MobGroupContent.AuthoredFile),
+                    Console.WriteLine);
+
+                foreach (var clave in escritos.ErasedKeys)
+                {
+                    if (!_mapMobs.TryGetValue(clave.MapId, out var aqui)) continue;
+                    quitados += aqui.RemoveAll(grupo => grupo.MobId == clave.GroupId);
+                }
+
+                foreach (var escrito in escritos.Values)
+                {
+                    var grupo = new MobGroup { MobId = escrito.GroupId, CellId = escrito.Cell };
+
+                    foreach (var miembro in escrito.Members)
+                    {
+                        if (!_monsters.TryGetValue(miembro.MonsterId, out var datos))
+                        {
+                            Console.WriteLine($"[MobSpawnManager] El grupo {escrito.GroupId} pide el " +
+                                              $"monstruo {miembro.MonsterId}, que no está en la base.");
+                            continue;
+                        }
+
+                        int grado = Math.Clamp(miembro.Grade, 0, MobMember.MaxGradesPerMonster - 1);
+                        grupo.Members.Add(new MobMember
+                        {
+                            Monster = datos,
+                            GradeIndex = grado,
+                            Level = grado < datos.Grades.Count ? datos.Grades[grado].Level : 1,
+                        });
+                    }
+
+                    // Un grupo sin nadie dentro no se pone: el cliente pinta un grupo vacío y
+                    // atacarlo abre un combate sin enemigos del que no se sale.
+                    if (grupo.Members.Count == 0) continue;
+
+                    if (!_mapMobs.TryGetValue(escrito.MapId, out var aqui))
+                    {
+                        aqui = new List<MobGroup>();
+                        _mapMobs[escrito.MapId] = aqui;
+                    }
+
+                    // Uno escrito para un mapa vetado se pone igual, y a propósito: el veto es una
+                    // regla sobre lo que Ankama colocó por su cuenta, no sobre lo que alguien pone
+                    // aquí a sabiendas.
+                    aqui.RemoveAll(otro => otro.MobId == escrito.GroupId);
+                    aqui.Add(grupo);
+                    puestos++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MobSpawnManager] Los grupos escritos no se han podido aplicar: {ex.Message}");
+            }
+
+            return (puestos, quitados);
         }
 
         private static Random _rand = new Random();

@@ -1,6 +1,6 @@
 using System;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// La Jondo Coin: la moneda propia del servidor, la que sueltan todos los monstruos y con la

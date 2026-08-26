@@ -1,10 +1,11 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     public static class ConsoleLogBuffer
     {

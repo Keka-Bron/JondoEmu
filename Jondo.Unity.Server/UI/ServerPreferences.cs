@@ -1,7 +1,9 @@
+﻿using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
 using System;
 using System.IO;
 
-namespace Jondo.Unity.Launcher.UI
+namespace Jondo.Unity.Server.UI
 {
     /// <summary>
     /// Lo que la ventana del servidor recuerda entre un arranque y el siguiente.
@@ -21,15 +23,15 @@ namespace Jondo.Unity.Launcher.UI
             {
                 try
                 {
-                    if (!File.Exists(Fichero)) return UI.Language.Es;
+                    if (!File.Exists(Fichero)) return Language.Es;
                     return File.ReadAllText(Fichero).Trim().ToLowerInvariant() switch
                     {
-                        "en" => UI.Language.En,
-                        "fr" => UI.Language.Fr,
-                        _ => UI.Language.Es,
+                        "en" => Language.En,
+                        "fr" => Language.Fr,
+                        _ => Language.Es,
                     };
                 }
-                catch { return UI.Language.Es; }
+                catch { return Language.Es; }
             }
             set
             {

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Buscar un mapa por sus coordenadas, que es lo que hace falta para teleportar a mano.

@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Net;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// A qué se atan los puertos del emulador: sólo a esta máquina, o a toda la red.

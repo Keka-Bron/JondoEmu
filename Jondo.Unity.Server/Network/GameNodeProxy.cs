@@ -7,10 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Google.Protobuf;
-using Jondo.Unity.Launcher.Handlers;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     public static class GameNodeProxy
     {

@@ -179,6 +179,142 @@ namespace Jondo.Unity.World.Content
             }
         }
 
+        /// <summary>
+        /// What the authored file has to say so that the world comes out the way somebody wants it.
+        /// </summary>
+        /// <remarks>
+        /// This is the rule that keeps the authored layer a set of deltas instead of a copy, and it
+        /// is a rule rather than a convention because getting it wrong is invisible. An editor that
+        /// wrote out every placement it was showing would produce a file with 422 rows in it, and
+        /// from that moment the measured file would never reach the world again: re-running
+        /// <c>tools/extraer_npcs_reales.py</c> would fix a cell, and the fix would be shadowed by a
+        /// copy nobody remembered making.
+        ///
+        /// So only three things are written: rows that are not in the measured layer at all, rows
+        /// that are there but different, and tombstones for rows that were there and are not
+        /// wanted. Everything the two agree on is left to the measured file, where it belongs.
+        /// </remarks>
+        public static (List<NpcSpawn> Rows, List<NpcSpawnKey> Removed) Delta(
+            IReadOnlyDictionary<NpcSpawnKey, NpcSpawn> measured,
+            IReadOnlyDictionary<NpcSpawnKey, NpcSpawn> wanted)
+        {
+            var rows = new List<NpcSpawn>();
+            var removed = new List<NpcSpawnKey>();
+
+            foreach (var pair in wanted)
+            {
+                if (measured.TryGetValue(pair.Key, out var already) &&
+                    already.Orientation == pair.Value.Orientation)
+                {
+                    continue;
+                }
+
+                rows.Add(pair.Value);
+            }
+
+            foreach (var pair in measured)
+            {
+                if (!wanted.ContainsKey(pair.Key)) removed.Add(pair.Key);
+            }
+
+            return (rows, removed);
+        }
+
+        /// <summary>
+        /// Writes the authored file: the rows a person added or changed, and the tombstones.
+        /// </summary>
+        /// <remarks>
+        /// Fixed order and a temporary file, for the same two reasons as every other authored file:
+        /// a one-line change should give a one-line diff, and closing the editor mid-write must not
+        /// leave half a JSON file where the server will look for one.
+        /// </remarks>
+        public static void Save(string path, IEnumerable<NpcSpawn> rows, IEnumerable<NpcSpawnKey> removed,
+                                IEnumerable<string>? comment = null)
+        {
+            var ordered = new List<NpcSpawn>(rows);
+            ordered.Sort((a, b) =>
+            {
+                int byMap = a.MapId.CompareTo(b.MapId);
+                if (byMap != 0) return byMap;
+                int byCell = a.Cell.CompareTo(b.Cell);
+                return byCell != 0 ? byCell : a.NpcId.CompareTo(b.NpcId);
+            });
+
+            var tombstones = new List<NpcSpawnKey>(removed);
+            tombstones.Sort((a, b) =>
+            {
+                int byMap = a.MapId.CompareTo(b.MapId);
+                if (byMap != 0) return byMap;
+                int byCell = a.Cell.CompareTo(b.Cell);
+                return byCell != 0 ? byCell : a.NpcId.CompareTo(b.NpcId);
+            });
+
+            using var buffer = new MemoryStream();
+            using (var writer = new Utf8JsonWriter(buffer, new JsonWriterOptions
+            {
+                Indented = true,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }))
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("_comment");
+                writer.WriteStartArray();
+                foreach (string line in comment ?? DefaultComment) writer.WriteStringValue(line);
+                writer.WriteEndArray();
+
+                writer.WritePropertyName("spawns");
+                writer.WriteStartArray();
+
+                foreach (var spawn in ordered)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteNumber("map", spawn.MapId);
+                    writer.WriteNumber("npc", spawn.NpcId);
+                    writer.WriteNumber("cell", spawn.Cell);
+                    writer.WriteNumber("orientation", spawn.Orientation);
+                    writer.WriteEndObject();
+                }
+
+                foreach (var key in tombstones)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteNumber("map", key.MapId);
+                    writer.WriteNumber("npc", key.NpcId);
+                    writer.WriteNumber("cell", key.Cell);
+                    writer.WriteBoolean("remove", true);
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+                writer.WriteEndObject();
+            }
+
+            string? folder = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+
+            string temporary = path + ".writing";
+            File.WriteAllBytes(temporary, buffer.ToArray());
+            File.Move(temporary, path, overwrite: true);
+        }
+
+        private static readonly string[] DefaultComment =
+        {
+            "The authored layer for NPC placements. Nothing regenerates this file: it is the only",
+            "one a person edits by hand, and it wins over datos/npcs_reales.json, which a tool",
+            "rewrites.",
+            "",
+            "One row per placement: map, npc AND cell. The cell identifies it because the same NPC",
+            "can stand several times on one map - 18 of them do. Moving one is a remove plus a new",
+            "row.",
+            "",
+            "  { \"map\": 241438721, \"npc\": 1088, \"cell\": 260, \"orientation\": 3 }   place or re-face",
+            "  { \"map\": 241438721, \"npc\": 1088, \"cell\": 260, \"remove\": true }    take that one out",
+            "",
+            "Only what differs from the measured file is here. A copy of everything would mean the",
+            "next regeneration never reached the world again, and nobody would notice.",
+        };
+
         private static long Long(JsonElement element, string name)
             => element.TryGetProperty(name, out var value) && value.TryGetInt64(out long number) ? number : 0;
     }

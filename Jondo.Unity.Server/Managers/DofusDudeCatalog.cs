@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>Lector del envoltorio de referencias de Unity con el que vienen los catalogos.</summary>
     internal static class DofusDudeCatalog

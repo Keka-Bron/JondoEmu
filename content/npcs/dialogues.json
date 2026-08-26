@@ -1,0 +1,28 @@
+{
+  "_comment": [
+    "Which reply leads to which line. The one thing about an NPC the client has never held.",
+    "",
+    "The client ships every line an NPC can say and every reply it can be given, and nowhere does",
+    "it say which goes with which - measured across all 6,467 of them. That pairing has always",
+    "lived on Ankama's server, so it cannot be extracted or measured. It has to be decided, and",
+    "this is where the decision goes.",
+    "",
+    "  npc      the NPC's id",
+    "  map      0 for wherever it stands; a map id to say something different there",
+    "  opening  which line it starts on; the first one when left out",
+    "  lines    one per thing it says, each with what can be said back",
+    "  next     the line that reply leads to; left out, the conversation ends",
+    "",
+    "  { \"npc\": 1088, \"map\": 0, \"opening\": 3312, \"lines\": [",
+    "      { \"message\": 3312, \"choices\": [ { \"reply\": 6016, \"next\": 6047 }, { \"reply\": 7846 } ] },",
+    "      { \"message\": 6047, \"choices\": [ { \"reply\": 7846 } ] } ] }",
+    "",
+    "Every line needs at least one reply. With an empty list the client draws its own Leave",
+    "button, and that button never answers back: the window stays up and there is no way out but",
+    "reconnecting.",
+    "",
+    "Empty on purpose. Nothing here means every NPC still offers all its replies at once, which is",
+    "what the game does today - Snori Nairb hands you all thirty-nine of his."
+  ],
+  "dialogues": []
+}

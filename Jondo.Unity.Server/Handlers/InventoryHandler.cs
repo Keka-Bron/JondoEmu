@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Handles item inventory operations:
@@ -109,7 +109,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (lookBytes != null)
                 {
                     // 8. kku (ActorLookMessage) — updates character look in the world
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKkuPacket(lookBytes, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKkuPacket(lookBytes, Jondo.Unity.Server.Network.SessionContext.State.CharacterId));
                     LogDebug("[Inventory] Sent kku (ActorLookMessage)");
                 }
 
@@ -136,12 +136,12 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static void ProcessEquipmentChange(long itemUid, int newPosition)
         {
-            var item = Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryItem(itemUid);
+            var item = Jondo.Unity.Server.Network.SessionContext.State.GetInventoryItem(itemUid);
             if (item != null)
             {
                 item.Position = newPosition;
                 DatabaseManager.SaveItemPosition(itemUid, newPosition,
-                    Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
 
                 // Update equipped cache
                 if (newPosition >= 0 && newPosition < 63)
@@ -149,11 +149,11 @@ namespace Jondo.Unity.Launcher.Handlers
                     var equipped = new EquippedItemInfo { Slot = newPosition };
                     foreach (var kvp in item.Effects)
                         equipped.Stats[kvp.Key] = kvp.Value;
-                    Jondo.Unity.Launcher.Network.SessionContext.State.SetEquippedItem(itemUid, equipped);
+                    Jondo.Unity.Server.Network.SessionContext.State.SetEquippedItem(itemUid, equipped);
                 }
                 else
                 {
-                    Jondo.Unity.Launcher.Network.SessionContext.State.RemoveEquippedItem(itemUid);
+                    Jondo.Unity.Server.Network.SessionContext.State.RemoveEquippedItem(itemUid);
                 }
             }
         }
@@ -162,12 +162,12 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static byte[]? UpdateCharacterLook()
         {
-            if (Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes == null || Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes.Length == 0)
-                Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
+            if (Jondo.Unity.Server.Network.SessionContext.State.LookBytes == null || Jondo.Unity.Server.Network.SessionContext.State.LookBytes.Length == 0)
+                Jondo.Unity.Server.Network.SessionContext.State.LookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
 
             try
             {
-                var lookMsg = ProtoMessage.Parse(Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes);
+                var lookMsg = ProtoMessage.Parse(Jondo.Unity.Server.Network.SessionContext.State.LookBytes);
 
                 // 1. Extract current skins (Field 2 of EntityLook)
                 var allSkins = new List<int>();
@@ -193,9 +193,9 @@ namespace Jondo.Unity.Launcher.Handlers
                 var updatedSkins   = allSkins.Where(s => !equipmentSkins.Contains(s)).ToList();
 
                 // 3. Add skins of currently equipped items
-                foreach (var equippedItem in Jondo.Unity.Launcher.Network.SessionContext.State.GetEquippedItemsCopy())
+                foreach (var equippedItem in Jondo.Unity.Server.Network.SessionContext.State.GetEquippedItemsCopy())
                 {
-                    var playerItem = Jondo.Unity.Launcher.Network.SessionContext.State.GetInventoryItem(equippedItem.Key);
+                    var playerItem = Jondo.Unity.Server.Network.SessionContext.State.GetInventoryItem(equippedItem.Key);
                     if (playerItem != null && ItemGidToSkinId.TryGetValue(playerItem.ItemId, out int skinId))
                     {
                         if (!updatedSkins.Contains(skinId))
@@ -213,13 +213,13 @@ namespace Jondo.Unity.Launcher.Handlers
                 }
 
                 byte[] entityLookBytes = lookMsg.ToByteArray();
-                Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes = entityLookBytes;
+                Jondo.Unity.Server.Network.SessionContext.State.LookBytes = entityLookBytes;
 
                 // 5. Reconstruct actor details cleanly
-                Jondo.Unity.Launcher.Network.SessionContext.State.PlayerActorDetails = DatabaseManager.ReconstructActorDetails(Jondo.Unity.Launcher.Network.SessionContext.State.LookBytes, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterName);
+                Jondo.Unity.Server.Network.SessionContext.State.PlayerActorDetails = DatabaseManager.ReconstructActorDetails(Jondo.Unity.Server.Network.SessionContext.State.LookBytes, Jondo.Unity.Server.Network.SessionContext.State.CharacterName);
 
                 LogDebug($"[Appearance] Updated character look. Total skins: {updatedSkins.Count}");
-                DatabaseManager.SaveCharacterLook(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, entityLookBytes);
+                DatabaseManager.SaveCharacterLook(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, entityLookBytes);
                 LogDebug("[Appearance] Saved updated look to database.");
 
                 return entityLookBytes;

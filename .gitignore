@@ -48,7 +48,9 @@ datos/world_entering_3_6_10_10.bin
 datos/characteristics.json
 datos/dofus3_mappings.json
 datos/effects.json
-datos/map_neighbours.json
+# map_neighbours.json SÍ se lee desde el 27/08/2026: es lo que le da a Jondo Studio los cuatro
+# mapas de al lado, que es como se recorre el mundo de verdad en vez de a golpe de id de ocho
+# cifras. Son 2,6 MB y es el único fichero que este cambio añade al repositorio.
 
 # ─── Restos de versiones anteriores ─────────────────────────────────────────
 # La especificación técnica es una crónica de 3.893 líneas de cómo se fue descubriendo cada cosa,

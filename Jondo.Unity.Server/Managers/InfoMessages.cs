@@ -1,9 +1,10 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Los mensajes de información del juego: los que salen en el chat sin que nadie los escriba.

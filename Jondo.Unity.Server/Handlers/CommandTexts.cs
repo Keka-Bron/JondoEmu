@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Player-facing command replies. The server console stays in its diagnostic language; only

@@ -1,7 +1,8 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     /// <summary>
     /// El estado del personaje, para el código que todavía no se ha migrado a las sesiones.

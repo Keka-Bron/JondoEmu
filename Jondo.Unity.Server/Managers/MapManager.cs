@@ -1,10 +1,12 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Jondo.Unity.World.Content;
 using Microsoft.Data.Sqlite;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     public class MapInfo
     {
@@ -37,6 +39,46 @@ namespace Jondo.Unity.Launcher
 
         /// <summary>Opaque cells (los=0): they break the line of sight of spells.</summary>
         public static Dictionary<long, HashSet<int>> LosBlockingCells = new Dictionary<long, HashSet<int>>();
+
+        /// <summary>
+        /// Los cambios de casilla que ha hecho una persona, encima de los tres ficheros generados.
+        /// </summary>
+        /// <remarks>
+        /// Sin esto el editor de casillas escribe un fichero que nadie lee. Los tres ficheros de
+        /// datos/ los rehace tools/ cuando le da la gana, asi que un arreglo hecho ahi desaparece
+        /// sin decir nada; por eso lo nuestro vive en content/maps/cells.json y son DELTAS -las
+        /// casillas cambiadas, no las 560- y se ponen encima al arrancar.
+        ///
+        /// La mezcla la hace CellContent.Apply, que es el mismo metodo que usa el editor para
+        /// pintar la vista previa. Dos implementaciones de esto se pondrian de acuerdo hasta el dia
+        /// que alguien arreglara una.
+        /// </remarks>
+        private static void AplicarLasCasillasNuestras()
+        {
+            try
+            {
+                var nuestras = CellContent.Load(Paths.ContentFile(CellContent.AuthoredFile),
+                                                mensaje => Console.WriteLine("[MapManager] " + mensaje));
+                if (nuestras.Count == 0) return;
+
+                // WalkableCells guarda listas y las otras dos conjuntos, asi que se pasa por
+                // conjunto y se devuelve a lista solo lo que cambia.
+                var pisables = new Dictionary<long, HashSet<int>>();
+                foreach (var par in WalkableCells) pisables[par.Key] = new HashSet<int>(par.Value);
+
+                CellContent.Apply(nuestras.Values, pisables, FightWalkableCells, LosBlockingCells);
+
+                foreach (var par in pisables) WalkableCells[par.Key] = par.Value.ToList();
+
+                int mapas = nuestras.Values.Select(p => p.MapId).Distinct().Count();
+                Console.WriteLine($"[MapManager] {nuestras.Count} casilla(s) cambiadas a mano en {mapas} mapa(s), " +
+                                  "de content/maps/cells.json.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MapManager] No se han podido aplicar las casillas de content/: {ex.Message}");
+            }
+        }
 
         public static void Initialize()
         {
@@ -116,6 +158,8 @@ namespace Jondo.Unity.Launcher
                         Console.WriteLine($"[MapManager] Error loading map_walkable_cells.json: {wex.Message}");
                     }
                 }
+
+                AplicarLasCasillasNuestras();
 
                 using (var connection = new SqliteConnection(DatabaseManager.WorldConnectionString))
                 {

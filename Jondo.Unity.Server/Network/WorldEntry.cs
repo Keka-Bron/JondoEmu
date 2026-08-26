@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jondo.Unity.Launcher;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Entry into the world, replayed from the 3.6.10.10 capture.
@@ -663,7 +664,7 @@ namespace Jondo.Unity.Launcher.Network
             // And in place of the characteristics of the capture, the ones of this character.
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
             Console.WriteLine($"[World] Characteristics sent for {character.Name}: level " +
-                              $"{Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}, {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas} kamas.");
+                              $"{Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel}, {Jondo.Unity.Server.Network.SessionContext.State.Kamas} kamas.");
 
             Console.WriteLine($"[World] Block 1 sent: {sent} messages, {rewritten} rewritten for " +
                               $"{character.Name}.");

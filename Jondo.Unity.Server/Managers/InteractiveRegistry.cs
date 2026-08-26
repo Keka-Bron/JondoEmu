@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>La acción de juego que hay detrás de una habilidad interactiva.</summary>
     public enum InteractiveActionKind

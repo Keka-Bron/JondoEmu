@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// La experiencia de oficio: cuánta lleva cada personaje y en qué nivel va.

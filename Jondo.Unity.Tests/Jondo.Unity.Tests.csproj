@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Targets net10.0-windows because it references Jondo.Unity.Server, which is a WinForms
        executable: the server owns its own log window. Nothing here touches the UI. -->
@@ -20,6 +20,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Server\Jondo.Unity.Server.csproj" />
+    <!-- The editor, for the parts of it that are not user interface. The frame decoder and
+         the packet observations are ordinary logic that happens to live in a GUI project,
+         and they are exactly the kind of code that is wrong in ways looking at a window
+         does not reveal: a zigzagged integer or a packed array shows a plausible number
+         either way. Nothing here constructs a control. -->
+    <ProjectReference Include="..\Jondo.Unity.Studio\Jondo.Unity.Studio.csproj" />
   </ItemGroup>
 
 </Project>

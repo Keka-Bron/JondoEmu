@@ -7,15 +7,15 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using Jondo.Unity.Launcher.Network;
-using Jondo.Unity.Launcher.Managers;
+using Jondo.Unity.Server.Network;
+using Jondo.Unity.Server.Managers;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
-using static Jondo.Unity.Launcher.Network.NetworkEnvelope;
+using static Jondo.Unity.Server.Network.NetworkEnvelope;
 using static Jondo.Protocol.NetworkMessage;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     public static class FightHandler
     {

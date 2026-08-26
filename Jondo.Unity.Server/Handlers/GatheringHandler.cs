@@ -2,11 +2,11 @@ using System;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Recolectar: segar trigo, talar un fresno, pescar, minar.

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Destruir un objeto del inventario: botón derecho, destruir, aceptar.
@@ -54,7 +54,7 @@ namespace Jondo.Unity.Launcher.Handlers
             int destruye = quantity <= 0 || quantity >= item.Quantity ? item.Quantity : quantity;
             bool entero = destruye >= item.Quantity;
 
-            if (!DatabaseManager.DestroyCharacterItem(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, uid, destruye)) return;
+            if (!DatabaseManager.DestroyCharacterItem(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, uid, destruye)) return;
             Equipment.Remove(uid, destruye);
 
             if (entero)
@@ -65,7 +65,7 @@ namespace Jondo.Unity.Launcher.Handlers
             else
             {
                 // Sigue habiendo: se manda otra vez con la cantidad nueva.
-                var queda = HavenBagStore.FromInventory(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, uid);
+                var queda = HavenBagStore.FromInventory(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, uid);
                 if (queda != null)
                 {
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -77,7 +77,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
 
             Console.WriteLine($"[Inventario] Destruido {destruye} de {uid}" +
                               (entero ? " (entero)." : "."));

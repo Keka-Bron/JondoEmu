@@ -1,11 +1,12 @@
 # World Editor — planificación de arquitectura
 
-> Documento de exploración. No hay una línea de código escrita todavía. El objetivo es tener el mapa
-> del terreno antes de gastar un mes en la dirección equivocada.
+> Documento de arquitectura. Empezó como exploración, antes de que hubiera una línea escrita; las
+> fases 0, 1, 2 y 3 ya están hechas y lo que aprendieron está anotado abajo, junto a lo que este
+> documento decía y no se cumplió.
 >
-> **Decidido hasta ahora:** el armazón es **Avalonia**, el editor es un **ejecutable propio** que
-> funciona sin servidor, y el **lanzador hereda ese mismo armazón**. Lo demás sigue abierto; las
-> preguntas vivas están al final.
+> **Decidido:** el armazón es **Avalonia**, el editor es un **ejecutable propio** que funciona sin
+> servidor, la capa nuestra son **ficheros de texto en `content/`**, y el **lanzador hereda ese
+> mismo armazón**.
 
 ---
 
@@ -310,15 +311,135 @@ Ordenado por *lo que desbloquea*, no por lo que apetece.
 
 | Fase | Qué | Por qué ahí |
 |---|---|---|
-| **0** | La capa de contenido y la procedencia por fila. Sin interfaz: sólo el cargador que fusiona las tres capas y un par de ficheros de ejemplo escritos a mano. | Nada de lo demás se puede guardar hasta que esto exista. Si se hace después, hay que reescribir todos los módulos. |
-| **1** | El armazón: `HttpListener` en localhost con testigo, y vistas de **sólo lectura** de mapas, NPCs, hechizos y monstruos. | Riesgo cero, valor inmediato: hoy para ver por qué un bicho no ataca hay que escribir un script de Python. Y valida el armazón antes de dejarle escribir nada. |
-| **2** | Tráfico en vivo y registro de desconocidos por forma. | Reutiliza lo que ya existe y es lo que más acelera el trabajo del día a día. |
-| **3** | Escritura: spawns de NPC, acciones, diálogos, grupos de monstruos. | El contenido más barato de crear y el que más se nota jugando. |
+| **0** ✅ | La capa de contenido y la procedencia por fila. Sin interfaz: sólo el cargador que fusiona las tres capas y un par de ficheros de ejemplo escritos a mano. | Nada de lo demás se puede guardar hasta que esto exista. Si se hace después, hay que reescribir todos los módulos. |
+| **1** ✅ | El armazón y vistas de **sólo lectura** de mapas y NPCs. | Riesgo cero, valor inmediato: hoy para ver por qué un bicho no ataca hay que escribir un script de Python. Y valida el armazón antes de dejarle escribir nada. |
+| **2** ✅ | Tráfico en vivo y registro de desconocidos por forma. | Reutiliza lo que ya existe y es lo que más acelera el trabajo del día a día. |
+| **3** ✅ | Escritura: spawns de NPC, diálogos, grupos de monstruos. Las acciones, no: ver abajo. | El contenido más barato de crear y el que más se nota jugando. |
 | **4** | Interactivos y teleports, con la vuelta automática. | Desbloquea casas y contenido propio. Podría adelantarse si eso pesa más. |
 | **5** | Casillas de mapa. | Útil, pero sólo cuando ya haya contenido que colocar encima. |
 | **6** | Hechizos, con el simulador. | |
 | **7** | Misiones. | Proyecto propio: necesita motor de servidor, no sólo editor. |
 | **8** | Lanzador. | |
+
+---
+
+## 7 bis. Lo que la fase 2 enseñó
+
+Tres cosas que este documento daba por buenas y no lo eran.
+
+### El registro de desconocidos llevaba meses sin apuntar nada
+
+El apartado 5.1 decía «`Network/UnknownPackets.cs` ya deduplica lo desconocido por firma de forma».
+Deduplicaba, sí, pero sobre nada: abría el sobre con `ExtractGameNodePayload`, que **sólo mira el
+campo 3 de la raíz**, y con `GetMessageTypeUrl`, que mira el 1 y el 3. Las tramas del cliente van en
+el campo **2**. Medido sobre las 72.879 tramas del registro de tráfico:
+
+```
+  raíz 1 → 1 → 1     56.073   el servidor diciendo algo
+  raíz 2 → 1 → 1      8.974   el cliente pidiendo
+  raíz 3 → 1 → 1        481   el servidor contestando
+  raíz 1, suelto      4.605   un Any registrado sin su sobre exterior
+  raíz 1 → 1             41   lo mismo, una capa más abajo
+```
+
+Así que cada paquete que pasaba por ahí entraba sin opcode y con el cuerpo vacío. Después de semanas
+de juego la tabla tenía **dos filas, las dos «(sin opcode)» sobre un cuerpo vacío**. El despachador
+no se enteró nunca porque él busca los opcodes como *texto* dentro de la trama, y eso funciona sea
+cual sea el sobre.
+
+La lección no es el fallo, es cómo se escondió: la única prueba que había era que el código hacía lo
+que estaba escrito. Ahora hay cinco que corren contra el fichero de tráfico de verdad, y una de
+ellas comprueba las dos direcciones por separado, que es justo lo que una cuenta total tapaba.
+
+### La clave no puede ser sólo la forma
+
+El apartado 5.1 decía «la clave es la FORMA, no las tres letras». Medido, no se sostiene tal cual.
+Sobre las mismas 72.879 tramas: **834 parejas (opcode, forma)** entre **242 opcodes** y **664
+formas**.
+
+- **Sólo con la forma no vale.** Nada más 10 de las 664 formas las comparten varios opcodes — pero
+  son las triviales (`(empty)`, `1:v`, `1:v,2:v`…) y entre ellas se llevan **180 de los 242
+  opcodes**. Archivar por forma volcaría media protocolo en diez cajones.
+- **Sólo con el opcode tampoco.** **59 de los 242** aparecen con más de una forma, y `jss` solo
+  tiene **185**. Archivar por opcode escondería justo la variedad que se abre la lista para ver.
+
+La clave es **opcode + forma**. Lo que la forma hace de verdad es *sobrevivir al parche*, pero no
+siendo la clave: cuando Ankama rota los nombres, el emparejador estructural de `protocolbuilder`
+saca la tabla de viejo a nuevo —de ahí salió `datos/mapeo_3.6.10.10_a_3.6.10.11.tsv`— y las claves
+se reescriben con ella. Que una forma cuadre a los dos lados es lo que hace fiable ese mapeo.
+
+Y hay una válvula: forma `*` significa «esto es sobre el opcode, lleve lo que lleve», que es la
+manera sensata de decir algo sobre las 185 formas de `jss` de una vez.
+
+### El grifo de tramas por HTTP no hacía falta
+
+El apartado 5.1 pedía «un grifo en el proxy que emita cada trama por *server-sent events*». Es la
+respuesta correcta cuando quien mira es un navegador. Aquí no lo es: el servidor **ya escribe todas
+las tramas** en `logs/gameserver_traffic.log` —de ahí salen los 110 MB—, así que el grifo sería una
+segunda copia de los mismos bytes, más un socket que asegurar, más un protocolo que mantener a
+juego, más depender de que el servidor esté levantado.
+
+Leer el fichero da tres cosas gratis que el grifo no tiene: **funciona con el servidor parado**,
+**puede mirar lo que pasó antes de abrir el editor**, y **no añade superficie**. Lo que cuesta es un
+sondeo en vez de un empujón, que para una persona leyendo una lista da igual.
+
+Detalle medido y necesario: el registro se escribe desde dos sitios que no se ponen de acuerdo.
+**27.565 de las 72.879 filas llevan prefijo de longitud** y el resto no. Leer sólo una de las dos
+formas tira un tercio del fichero.
+
+---
+
+## 7 ter. Lo que la fase 3 enseñó
+
+### Los textos SÍ se pueden leer, y eso cambia el editor de diálogos
+
+El apartado 5.4 daba por hecho que un editor de diálogos trabajaría con números. Con números no
+sirve: nadie puede decidir que la respuesta 6016 va debajo de la frase 3312 sin leer ninguna de las
+dos. Resulta que el texto está a mano, por dos caminos distintos porque Ankama guarda las dos
+mitades de forma distinta:
+
+```
+  una respuesta   dialogReplies [6016, 23739]  ->  Translations[23739]  ->  "Informarse sobre..."
+  una frase       dialogData    messageId 6169 ->  NpcMessagesDataRoot  ->  Translations[...]
+```
+
+`world.db` ya lleva **339.175 traducciones** en la tabla `Translations`. La respuesta trae su clave
+al lado del id y se resuelve sola. La frase no: su `messageId` es un id de `NpcMessageData`, y hace
+falta pasar por `NpcMessagesDataRoot`, que son 16,8 MB del volcado. `tools/extraer_dialogos_npc.py`
+lo destila a **55.037 parejas, 1 MB**, que sí se puede repartir.
+
+Con eso, Snori Nairb deja de ser «3 mensajes y 39 respuestas» y pasa a ser una lista legible:
+*«¡Alto ahí! Yo soy el que vigila esta ciudad...»* con *«¿Qué puedes contarme del conflicto entre
+Bonta y Brakmar?»* debajo. Ahí ya se puede decidir.
+
+### El árbol necesitaba estado de sesión, no sólo un fichero
+
+El `ioy` con el que el cliente elige una respuesta trae **el id de la respuesta y nada más**: ni de
+qué NPC viene ni de qué frase. Sin apuntar por dónde va la conversación no hay manera de saber a
+qué línea lleva, y por eso el diálogo sólo podía tener una frase por mucho árbol que hubiera
+escrito.
+
+Va en el estado de sesión y no en un estático: con ocho clientes a la vez, un estático haría que la
+respuesta de un jugador avanzara la conversación de otro.
+
+### Las acciones por spawn no son lo que este documento decía
+
+El apartado 5.4 sostenía que «un mismo NPC se puede spawnear con acciones distintas, así que la
+acción es del *spawn*». Medido contra el cable, eso **no se puede hacer desde el servidor tal cual
+está**: el menú del botón derecho lo pinta el cliente con el `actions[]` de la *plantilla*, y el
+`f1` del `iov` es uno de esos números —cuadra en los 51 NPCs de tienda de la captura, 51 de 51—.
+Un NPC que no declare la acción ni siquiera la ofrece.
+
+O sea que una acción por spawn sólo puede **quitar** de lo que la plantilla ya declara, no añadir.
+Añadir requeriría que la carga de mapa llevara acciones por actor, y eso hay que medirlo en una
+captura antes de escribir una línea. Queda pendiente y marcado como tal, en vez de implementado a
+medias.
+
+### Los grupos de monstruos: dos números, no la resta
+
+Detalle pequeño y real. El arranque decía «N grupos de content/» con la resta de puestos menos
+quitados, y en la primera prueba de verdad —un grupo puesto y otro quitado— la resta dio cero y la
+línea no salió. Justo el arranque en el que más falta hace ver que `content/` ha tocado algo.
 
 ---
 

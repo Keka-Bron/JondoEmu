@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Net;
@@ -14,7 +14,7 @@ using Thrift.Transport.Client;
 using Thrift.Transport.Server;
 using Zaap;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     public class ZaapHandler : ZaapService.IAsync
     {

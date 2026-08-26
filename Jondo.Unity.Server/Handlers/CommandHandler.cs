@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Jondo.Unity.Launcher;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Protocol;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Los comandos de administración que el jugador escribe por el chat.

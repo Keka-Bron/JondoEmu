@@ -1,10 +1,11 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     public readonly record struct RecipeIngredient(int ItemId, int Quantity);
 

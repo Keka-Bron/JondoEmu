@@ -3,10 +3,10 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     public static class MapLoadHandler
     {

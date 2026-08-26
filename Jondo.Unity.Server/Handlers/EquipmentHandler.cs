@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Moving an item between the bag and a slot.
@@ -90,18 +90,18 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
 
             // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
             // recargar el mapa. Son dos mensajes y hacen falta los dos: el jsn redibuja al muñeco
             // del mapa y el lxc actualiza el de la ficha. En la captura salen en este orden, entre
             // los tres de arriba y el peso.
-            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (character != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                        character, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation, accountId)));
+                        character, Jondo.Unity.Server.Network.SessionContext.State.CellId, Jondo.Unity.Server.Network.SessionContext.State.Orientation, accountId)));
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));

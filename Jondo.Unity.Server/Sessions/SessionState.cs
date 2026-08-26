@@ -1,7 +1,8 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     /// <summary>Mutable game data owned by exactly one network session.</summary>
     public sealed class SessionState
@@ -97,6 +98,24 @@ namespace Jondo.Unity.Launcher
         public bool IsWardrobeDraftLoaded { get; set; }
         public long OpenNpcShopId { get; set; }
         public int OpenNpcShopNpcId { get; set; }
+
+        /// <summary>
+        /// Qué conversación hay abierta y por dónde va.
+        ///
+        /// Hace falta guardarlo porque el cliente, al elegir una respuesta, manda el ioy con el id
+        /// de la respuesta Y NADA MÁS: ni de qué NPC ni de qué frase venía. Sin esto no hay manera
+        /// de saber a qué línea lleva, y por eso el diálogo sólo podía tener una frase.
+        ///
+        /// Va en el estado de sesión y no en un estático como todo lo demás: con ocho clientes a la
+        /// vez, uno estático haría que la respuesta de un jugador avanzara la conversación de otro.
+        /// </summary>
+        public int OpenDialogueNpcId { get; set; }
+
+        /// <summary>El mapa donde se abrió, que es parte de qué conversación es.</summary>
+        public long OpenDialogueMapId { get; set; }
+
+        /// <summary>En qué frase está ahora mismo.</summary>
+        public long OpenDialogueMessage { get; set; }
 
         // Per-character manager caches. These must never be static: loading the second account
         // would otherwise replace the first account's equipment, appearance and spell bar.

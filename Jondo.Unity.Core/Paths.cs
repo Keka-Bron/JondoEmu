@@ -77,6 +77,29 @@ namespace Jondo.Unity.Launcher
             }
         }
 
+        /// <summary>
+        /// La carpeta de contenido del cliente: los textos, los iconos, los mapas.
+        ///
+        /// Todo lo que el editor necesita para ensenar algo con cara y ojos ya esta ahi dentro, y
+        /// se lee de ahi en vez de copiarse: el cliente ya ocupa lo que ocupa en el disco, y una
+        /// copia nuestra se quedaria vieja el dia del siguiente parche sin que nadie se enterara.
+        /// </summary>
+        public static string ClientContentDir
+            => Path.Combine(ClientDir, "Dofus_Data", "StreamingAssets", "Content");
+
+        /// <summary>
+        /// La tabla de textos del cliente en un idioma, con los 339.342 textos del juego dentro.
+        ///
+        /// Son los nombres de los NPCs, de los monstruos, de los objetos y de los hechizos, y las
+        /// frases de los dialogos. El idioma va en el nombre del fichero: es, en, fr, de, pt.
+        /// </summary>
+        public static string ClientTextFile(string language)
+            => Path.Combine(ClientContentDir, "I18n", language + ".bin");
+
+        /// <summary>Los iconos de los monstruos, 64 px, dentro de un bundle de Unity.</summary>
+        public static string MonsterIconsBundle
+            => Path.Combine(ClientContentDir, "Picto", "Monsters", "monster_assets_1x.bundle");
+
         // ─── Databases ──────────────────────────────────────────────────────────
         // Las bases se crean solas la primera vez, así que van por ResolveWritable: si todavía no
         // existen, la ruta que sale es la de bases\ y no la de la raíz.
@@ -126,7 +149,16 @@ namespace Jondo.Unity.Launcher
         public static string DungeonsJson => Resolve("dungeons.json");
         // Lo que se puede clicar en cada mapa, con su casilla y su dibujo, y los zaaps con su
         // mapa y su subzona. Los genera extract_interactivos.py de los bundles del cliente.
+        /// <summary>Que mapa hay a cada lado de cada mapa. 17.353 filas.</summary>
+        public static string MapNeighboursJson => Resolve("map_neighbours.json");
+
         public static string InteractiveElementsJson => Resolve("interactive_elements.json");
+
+        /// <summary>
+        /// El tipo de interactivo que se ha visto de verdad para cada dibujo, medido de las
+        /// capturas: 415 gfx, de los que 20 no cuadran con lo que declaramos.
+        /// </summary>
+        public static string InteractiveTypesJson => Resolve("tipos_interactivos_3.6.10.10.json");
 
         /// <summary>
         /// Los pasos entre mapas, normalizados de la tabla interactive_skills de Giny 2.68. El
@@ -224,9 +256,69 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static string ContentDir => Path.Combine(Root, "content");
 
+        /// <summary>
+        /// El salto que falta para leer un dialogo de NPC: id de mensaje -> clave de traduccion.
+        ///
+        /// La plantilla de un NPC trae en dialogData un messageId que NO es una traduccion, sino un
+        /// id de NpcMessageData; hay que pasar por NpcMessagesDataRoot, que son 16,8 MB del volcado
+        /// del cliente, para llegar a la clave de verdad. Este fichero es ese paso destilado a un
+        /// numero por entrada. Lo genera tools/extraer_dialogos_npc.py.
+        ///
+        /// Las respuestas no lo necesitan: dialogReplies ya trae la clave al lado del id.
+        /// </summary>
+        public static string NpcDialoguesJson => Resolve("npc_dialogos_3.6.10.10.json");
+
+        /// <summary>
+        /// Los 513 nombres de mensaje que el cliente todavia trae dentro.
+        ///
+        /// El ofuscador renombra las clases a tres letras pero deja estas cadenas en
+        /// global-metadata.dat. Estan huerfanas -nadie las referencia- pero son la lista CERRADA de
+        /// nombres validos de esta version, asi que bautizar un opcode deja de ser inventar y pasa
+        /// a ser elegir de una lista.
+        /// </summary>
+        public static string RealNamesTsv => Resolve("nombres_reales_3.6.10.10.tsv");
+
         /// <summary>One file of the authored layer, by its path relative to the content root.</summary>
         public static string ContentFile(string relative)
             => Path.Combine(ContentDir, relative.Replace('/', Path.DirectorySeparatorChar));
+
+        /// <summary>
+        /// The whole protocol as the client declares it, rebuilt from its own classes by
+        /// <c>protocolbuilder</c>: 2,169 messages and 550 enums with real field numbers and types.
+        ///
+        /// The version is in the filename, so this looks for the one that matches and then falls
+        /// back to whichever game protocol is there. The fallback is on purpose: this file only
+        /// ever feeds the frame view in the editor, and reading a frame against a protocol one
+        /// patch out of date is worth far more than reading it against nothing. The connection
+        /// protocol is a different, much smaller file and is deliberately not picked up here.
+        /// </summary>
+        public static string ProtocolProto
+        {
+            get
+            {
+                string preferred = Resolve("protocolo_3.6.10.10.proto");
+                if (File.Exists(preferred)) return preferred;
+
+                try
+                {
+                    string folder = Path.GetDirectoryName(preferred) ?? Root;
+                    var candidates = Directory.GetFiles(folder, "protocolo_*.proto");
+                    Array.Sort(candidates, StringComparer.OrdinalIgnoreCase);
+                    for (int i = candidates.Length - 1; i >= 0; i--)
+                    {
+                        string name = Path.GetFileName(candidates[i]);
+                        if (!name.StartsWith("protocolo_conexion", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return candidates[i];
+                        }
+                    }
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+
+                return preferred;
+            }
+        }
         // Las parejas de hechizo base/variante, una por cada hueco de la barra. Del volcado del
         // cliente; el personaje lleva uno de cada pareja, no los dos.
         public static string SpellVariantsJson

@@ -1,4 +1,5 @@
-namespace Jondo.Unity.Launcher
+﻿using Jondo.Unity.Launcher;
+namespace Jondo.Unity.Server
 {
     public static class TransitionPayloads
     {

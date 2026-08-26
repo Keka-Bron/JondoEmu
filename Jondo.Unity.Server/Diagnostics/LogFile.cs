@@ -1,8 +1,9 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.IO;
 using System.Text;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     /// <summary>
     /// Un fichero de registro que se queda abierto.

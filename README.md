@@ -102,8 +102,8 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ The right window per list: `hjj` root field 0 zaap, 1 zaapi, 3 boat
 - ✅ **16 temporal anomalies** with their 120-minute countdown, surfacing at vestiges (type 359), not at switched-off zaaps
 - ✅ **3,815 interactive teleports** in the database
-- 🟡 Every passage is declared with the zaap skill (114) and type 0; the real server uses 184/339/361 and its own element types
-- 🟡 1,010 of 1,124 missing passages are discarded for lack of a return element
+- 🟡 **Every passage is declared with the wrong skill.** All 3,815 say 114, which is *Utilizar* on a zaap. Measured three ways that agree: Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none; over 401 captures 184 appears on 420 elements and 114 on 23, every one a zaap; and in our own traffic skill 184 is followed by a map change 178 times while 114 opens the zaap window. 339 and 361 are real but are *not* alternatives — they are signpost skills that ride alongside 184. New passages written in Jondo Studio declare 184; the 3,815 extracted rows have not been rewritten
+- ✅ **New passages can be created**, both ways, from Jondo Studio — which is what makes a house with its own interior possible
 
 ### 🏘️ Houses, bins and haven bags
 - ✅ **1,437 doors on 553 maps**, all enterable and ownerless; **261 house models** with name, price and room count
@@ -175,7 +175,8 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ **NPC colours.** The colour section of a look is `index=value` pairs, sometimes hexadecimal, and it was being read as a plain list — so nothing parsed and every one of the **2,045 NPCs that carry colours** rendered grey
 - ✅ A dialogue always offers at least one real reply, so it can always be closed. With an empty list the client draws its own *Leave* which never answers back
 - 🟡 **401 monsters have no spells at all** in the database
-- ❌ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored. Snori Nairb has 39 replies and 3 messages, and today all 39 are offered at once. This is what the dialogue editor in Jondo Studio is for
+- ✅ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored, and now it can be: a tree written in Jondo Studio makes a reply lead to another line instead of closing the window. Nothing written means the old behaviour, which is what Snori Nairb still does — all 39 replies at once
+- ✅ **Monster groups placed by hand**, and Ankama's own removable, without touching the 240 MB database that gets regenerated
 
 ### 🪙 Jondo Coin
 A currency of this server's own — a real item with its own template, not a reskin of kamas.
@@ -244,9 +245,17 @@ One engine for all eighteen classes, driven entirely by client data. Not a singl
 
 ## 🛠️ Jondo Studio
 
+> ⚠️ **Very early.** The Studio is weeks old, it changes every day, and the parts that write files
+> have been exercised by one person on one machine. Read it, use it, tell us what is wrong — but
+> keep a copy of `content/` before a long session, and expect screens to move under you. Nothing in
+> it can damage `world.db` or a running server, which is the one guarantee it does make.
+
 The world editor. A third executable next to the launcher and the server, and it needs neither of
 them running: it opens `content/` and the data files through the same paths the server uses and
 works on its own. Built with **Avalonia**, so it runs on Windows, macOS and Linux.
+
+It unpacks `world.db` from `datos/world.zip` the first time it runs, the way the server does, so a
+fresh clone can open it and see the world without starting anything else.
 
 It exists because of a problem this project could not solve any other way. The client holds a great
 deal — every item, every spell, every monster — but there are things it has never held, because on
@@ -281,34 +290,113 @@ screen the two become indistinguishable.
 
 ### What it does today
 
+Nine sections, **in Spanish, English or French** — and the language switch changes both halves at
+once. The editor's own words come from one catalogue; the game's words — every NPC, monster, item
+and line of dialogue — are read straight out of the client's `Content/I18n/{lang}.bin`, 339,342
+texts per language. The format is not documented anywhere; it was worked out and then checked
+against `world.db`, where 500 keys sampled at random came back byte for byte identical, including
+one of 42,180 characters. An NPC is not called the same thing in Spanish and in French, and a
+dialogue tree built against one set of names has to be readable from the other.
+
+**The creatures are drawn**, out of the client's own bundles and nothing copied into the
+repository. Monsters come from a picto atlas, 5,130 of the 5,134 covered. NPCs are assembled the way
+the client assembles them: bones, a still frame, and the skins the look names — `AnimStatique_1`
+holds exactly one frame in 47 of 53 bones measured, so there is no animation to play. The humanoid
+rig is put together from its skins and tinted by the look's own colours.
+
 - ✅ **Overview** — which files it read and what came out of each. First screen on purpose: every
   time something has gone wrong for an hour here, it turned out to be reading a different file than
   anybody thought
-- ✅ **NPC placements** — all 422, filterable, with the provenance column
-- ✅ **Map cells** — a map's 560 cells painted by layer: walkable, walkable-but-not-in-a-fight, seen
-  through, solid
-- ✅ A section that fails shows its error *inside* the editor instead of taking the window down
+- ✅ **Traffic** — the client-server conversation, live as it happens and back through the log,
+  every frame opened and read **against the protocol the client itself declares**. That is the
+  difference between a hex dump and a reading: a length-delimited field could be a string, a nested
+  message or a blob, and with `string fytl = 3` in front of you there is nothing to guess. From here
+  a packet can be named on the spot, from the **513 real message names** the client still ships in
+  its metadata — so naming one stops being invention and becomes a choice off a closed list
+- ✅ **Packets** — every kind of packet seen, with a status ladder — unknown, named, documented,
+  handled, ignored — a name and notes. Only *unknown* and *handled* can be worked out by code;
+  everything between them is a person's work, and until now it had nowhere to live but a Discord
+  message
+- ✅ **NPCs** — all 422 placements, with the provenance column and the NPC drawn on the map. Pick
+  one, click a cell, turn it round, take one of Ankama's away, or put a moved one back where the
+  captures had it. Clicking a placement says what it *is*: what it does, what it says, what it
+  sells. What gets saved is the **difference** from what the captures measured, never a copy
+- ✅ **Dialogues** — which reply leads to which line, with the text on screen rather than ids. Both
+  lists are always full, because what an NPC *can* say is known and hiding it behind a drop-down
+  made the screen look broken. A reply can lead to another line, and picking a line that is not in
+  the tree yet puts it in. A reply's words cannot be typed — the client draws them from its own
+  catalogue by id — but any of the game's own lines can be borrowed, and there are 55,037 of them
+- ✅ **Monsters** — open a group that is already there, take a monster out, put another in, move it
+  two cells left. Opening is free; the moment anything changes, Ankama's group is written off and an
+  authored copy takes its place. The picker says which monsters have **no spells at all**: 371 of
+  the 5,134, and one of those joins a fight, takes its turn and does nothing
+- ✅ **Spells** — every spell with its effects, and the map showing **how far it reaches and what it
+  would hit**, worked out by calling the fight engine's own `Zone.Casillas` rather than a drawing of
+  it. And the column that matters: whether the engine can actually apply each effect
+- ✅ **Passages** — two maps side by side, a door picked on each, and one button that joins them
+  **both ways**. A passage can only hang off an interactive element the map already has — the client
+  draws those from its own map data — so the screen offers what is there and refuses to put a door
+  where there is nothing to click. 4,038 door-shaped elements are sitting unused across 2,469 maps
+- ✅ **Map cells** — the three layers painted one at a time, click to toggle and **drag to paint a
+  run**, with a compass that jumps to the four maps next door. What is saved is the changed cells,
+  never all 560
+- ✅ A section that fails shows its error *inside* the editor instead of taking the window down, and
+  `Jondo Studio.exe --selftest` builds all nine in all three languages against the real data and
+  fails the publish if any throws
 
-Phase one is **read only**. Nothing in it writes a file yet.
+**Everything it writes goes to `content/`**, in versioned text. Nothing opens `world.db` for writing
+and nothing talks to a running server. What is observed stays where it was observed and only the
+conclusions are written down, because those are the part no tool can reproduce.
+
+### What building it turned up
+
+An editor that shows you what the server believes is also an editor that shows you when the server
+is wrong. Four things it found, all measured:
+
+- **The unknown-packet registry had been recording nothing for months.** It opened frames with a
+  helper that only looks at root field 3, and client frames sit at root field 2 — so after weeks of
+  play the table held two rows, both with no opcode over an empty body. 8,974 of the 72,879 frames
+  in the log are the client's, and every one had gone in blank
+- **Every passage declares the wrong skill.** All 3,815 say 114, which is *Utilizar* on a zaap.
+  Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none;
+  across 401 captures, 184 shows up on 420 elements and 114 on 23, every one a zaap. Our own log
+  catches us emitting the pair `(type 0, skill 114)` 84 times — a pair that occurs zero times
+  anywhere real. New passages declare 184
+- **647 of the game's 872 effects do nothing at all.** They are drawn on the spell card and the
+  engine has no code for them and no characteristic to apply — and **15,841 of the 34,823 spell
+  levels carry at least one**. The Studio ranks them by how many levels each one breaks, which turns
+  a curiosity into a work list: effect 1160 alone is on 6,709 levels, and healing — effect 108 — is
+  on 751
+- **A monster's picture is filed under its `gfxId`, not its id.** Keyed by id, 847 of 5,134 found a
+  picture and every one of those 847 was *somebody else's* creature. Keyed by gfxId it is 5,130
 
 ### What is being worked on
 
-In the order they are planned, cheapest and most unblocking first:
-
-- 🚧 **Live traffic and unknown packets** — the proxy already sees every frame and already
-  deduplicates the unknown ones by protobuf *shape*. Keyed by shape rather than by the three-letter
-  opcode on purpose: that way the knowledge survives the next time Ankama reshuffles the names
-- 🚧 **Writing** — NPC spawns, actions and dialogue trees, and monster groups
-- 🚧 **Interactives and teleports** — pick a cell on one map, a cell on another, and tie them
-  together with the return leg created for you. This is the one that unblocks houses with their own
-  interiors, and it fixes something measured: **1,010 of 1,124 missing passages** are thrown away by
-  our own extractor for want of a return element
-- 🚧 **Map cell painting**
-- 🚧 **Spells and their effects**, with a simulator — cast at a dummy and see the consequences
-  without setting up a fight
-- 🚧 **Quests** — this one is a project of its own: there is no quest engine in the server yet
+- 🚧 **NPC actions per placement** — and this one turned out not to be what the plan assumed. The
+  right-click menu is drawn by the *client* from the template's `actions[]`, so an action written
+  per placement can only take options away, never add one. Adding would need the map-load packet to
+  carry actions per actor, and that has to be measured against a capture first
+- 🚧 **Editing spells.** The simulator is there; changing a spell's numbers is not — and with 647
+  effects doing nothing, implementing the top of that list buys far more than editing the values of
+  an effect the engine ignores
+- 🚧 **Shops, loot tables and dungeons** — asked for by the people using it. All three are screens
+  over data the server already reads, so they are reachable
+- 🚧 **Quests** — a project of its own, and the one everybody wants. There is no quest engine in the
+  server and no per-character progress table, so an editor today would write files nobody reads
 - 🚧 **A thin admin channel** so a running server can be told to reload one domain, without a
   restart. Localhost only, token per boot, off by default
+- 🚧 **The launcher**, which inherits this shell once the editor stops moving
+
+Two things that will not be done the way the plan assumed. The **decor** — the couple of thousand
+drawn elements on a map — stays out: it is a project of its own and the editor paints what the
+server believes, not what the map looks like. And **NPC animation** is not needed at all: the still
+frame *is* the whole animation.
+
+One correction, since this file carried the wrong number for a while. The claim that **1,010 of
+1,124 missing passages were discarded for having no return element** is not reproducible from any
+code in this repository — the extractor's own counter says 1,357 of 3,644 — and the rule behind it
+was doing something else: the return element was never a requirement, it was used to *guess* where
+the passage put you down. That guess is wrong 96.9% of the time.
 
 The full plan, with what was decided and why, is in **`docs/world-editor.md`**.
 
@@ -316,8 +404,14 @@ The full plan, with what was decided and why, is in **`docs/world-editor.md`**.
 
 ## 🧪 Tests
 
-`Jondo.Unity.Tests` — **116 xUnit tests**, grouped by domain: `Content`, `Combat`, `Economy`,
-`Protocol`, `Security`, `Sessions`, `World`. They run in about half a second.
+`Jondo.Unity.Tests` — **256 xUnit tests**, grouped by domain: `Content`, `Combat`, `Economy`,
+`Protocol`, `Security`, `Sessions`, `Studio`, `World`. They run in about four seconds.
+
+Five of them run against `logs/gameserver_traffic.log` itself when it is on the machine, and skip
+when it is not. That is a real weakness — a test that skips proves nothing — and it is there because
+of what it caught: the packet registry it replaces was fed real frames for weeks and wrote down two
+useless rows, while every test built out of frames this project constructed passed. Code doing what
+it was written to do says nothing about whether it was written to do the right thing.
 
 ```bash
 dotnet test Jondo.Unity.Tests

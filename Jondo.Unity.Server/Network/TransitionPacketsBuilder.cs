@@ -3,7 +3,7 @@ using System.IO;
 using Google.Protobuf;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     public static class TransitionPacketsBuilder
     {
@@ -37,7 +37,7 @@ namespace Jondo.Unity.Launcher.Network
 
         public static byte[] BuildKkpMessage() => BuildEmptyMessage("type.ankama.com/kkp");
         public static byte[] BuildKkmMessage() => BuildEmptyMessage(Op.Uri(Op.Kkm));
-        public static byte[] BuildKrbMessage() => BuildSingleVarIntMessage("type.ankama.com/krb", Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints);
+        public static byte[] BuildKrbMessage() => BuildSingleVarIntMessage("type.ankama.com/krb", Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints);
         public static byte[] BuildIlcMessage()
         {
             byte[] payload = new byte[] {
@@ -51,7 +51,7 @@ namespace Jondo.Unity.Launcher.Network
             using var ms = new MemoryStream();
             var output = new CodedOutputStream(ms);
             output.WriteTag((uint)((2 << 3) | 0)); // Field 2, VarInt
-            output.WriteInt64(Jondo.Unity.Launcher.Network.SessionContext.State.MapId > 0 ? Jondo.Unity.Launcher.Network.SessionContext.State.MapId : 154011397);
+            output.WriteInt64(Jondo.Unity.Server.Network.SessionContext.State.MapId > 0 ? Jondo.Unity.Server.Network.SessionContext.State.MapId : 154011397);
             output.Flush();
             return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Joh), ms.ToArray());
         }
@@ -168,7 +168,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static byte[] BuildHmdMessage()
         {
-            var spells = DatabaseManager.GetPlayerAvailableSpells(Jondo.Unity.Launcher.Network.SessionContext.State.Breed, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
+            var spells = DatabaseManager.GetPlayerAvailableSpells(Jondo.Unity.Server.Network.SessionContext.State.Breed, Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel);
 
             using var ms = new MemoryStream();
             var output = new CodedOutputStream(ms);
@@ -200,7 +200,7 @@ namespace Jondo.Unity.Launcher.Network
             output.Flush();
 
             Program.LogDebug($"[TransitionPackets] Spell book (hmd) with {spells.Count} spell(s) " +
-                             $"for breed {Jondo.Unity.Launcher.Network.SessionContext.State.Breed} at level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}.");
+                             $"for breed {Jondo.Unity.Server.Network.SessionContext.State.Breed} at level {Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel}.");
 
             return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Hmd), ms.ToArray());
         }
@@ -219,7 +219,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static byte[][] BuildItpList()
         {
-            var spells = DatabaseManager.GetPlayerAvailableSpells(Jondo.Unity.Launcher.Network.SessionContext.State.Breed, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel);
+            var spells = DatabaseManager.GetPlayerAvailableSpells(Jondo.Unity.Server.Network.SessionContext.State.Breed, Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel);
 
             using var ms = new MemoryStream();
             var output = new CodedOutputStream(ms);
@@ -265,7 +265,7 @@ namespace Jondo.Unity.Launcher.Network
             byte[] itpSpells = ms.ToArray();
 
             Program.LogDebug($"[TransitionPackets] Spell bar with {spells.Count} spell(s) " +
-                             $"for breed {Jondo.Unity.Launcher.Network.SessionContext.State.Breed} at level {Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}.");
+                             $"for breed {Jondo.Unity.Server.Network.SessionContext.State.Breed} at level {Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel}.");
 
             return new byte[][] {
                 NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Itp), itpSpells),

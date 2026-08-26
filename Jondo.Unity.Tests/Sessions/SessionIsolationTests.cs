@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Sessions
