@@ -32,6 +32,13 @@ namespace Jondo.Unity.Launcher.Managers
         /// <summary>Constant value of field 2 of the look block in every 3.6.10.10 capture.</summary>
         private const int LookType = 3;
 
+        // Los huecos de EQUIPO —no los de la ventana de apariencias, que son otros— de las tres
+        // familias que llevan piel. Salen de mirar qué tipo de objeto ocupa cada hueco en la base:
+        // el 6 lo ocupan los del tipo 16, el 7 los del 17 y el 15 los del 82.
+        private const int SlotSombrero = 6;
+        private const int SlotCapa = 7;
+        private const int SlotEscudo = 15;
+
         public sealed class BreedLook
         {
             public int Bones { get; set; } = 1;
@@ -253,10 +260,41 @@ namespace Jondo.Unity.Launcher.Managers
             int headSkin = HeadTable.SkinFor(headId, breedId, sex);
             if (headSkin > 0) skins.Add(headSkin);
 
-            // Y las prendas de apariencia. En el juego real SUSTITUYEN a la piel de la prenda de
-            // verdad —quitan la 3637 de la capa y ponen la 5044 de la capa cosmética—; aquí se
-            // añaden, porque la de la prenda de verdad nunca la hemos sabido. El resultado que se
-            // ve es el mismo mientras no se lleve nada debajo.
+            // Qué huecos de equipo quedan TAPADOS por un cosmético. En el juego real la prenda de
+            // apariencia no se suma a la de verdad: la sustituye —quita la 3637 de la capa y pone
+            // la 5044 de la capa cosmética—, así que la de debajo no puede salir en el f6.
+            //
+            // Mientras no se supo la piel de la pieza real esto no se podía hacer y se sumaban las
+            // dos; con equipment_skins.json ya se puede. Los tres huecos son los tres tipos que
+            // tienen piel: sombrero (6), capa (7) y escudo (15).
+            var tapados = new HashSet<int>();
+            if (appearance != null)
+            {
+                foreach (var prenda in appearance)
+                {
+                    if (prenda.Hidden) continue;      // con el ojo cerrado no tapa nada
+                    if (prenda.Slot == Cosmetics.SlotHat) tapados.Add(SlotSombrero);
+                    else if (prenda.Slot == Cosmetics.SlotCape) tapados.Add(SlotCapa);
+                    else if (prenda.Slot == Cosmetics.SlotShield) tapados.Add(SlotEscudo);
+                }
+            }
+
+            // El equipo de verdad. Sólo se sabe para quien está jugando —Equipment vive en la
+            // sesión, no por personaje arbitrario— y sólo lo medido en equipment_skins.json; lo
+            // demás se queda como estaba, sin piel.
+            if (quien != 0 && quien == Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)
+            {
+                foreach (var objeto in Equipment.All)
+                {
+                    if (!Equipment.IsWorn(objeto.Position)) continue;
+                    if (tapados.Contains(objeto.Position)) continue;   // lo tapa un cosmético
+
+                    int piel = EquipmentSkins.SkinOf(objeto.Template);
+                    if (piel > 0 && !skins.Contains(piel)) skins.Add(piel);
+                }
+            }
+
+            // Y las prendas de apariencia, que entran en lugar de la que acaba de quedarse fuera.
             if (appearance != null)
             {
                 foreach (var prenda in appearance)

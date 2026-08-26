@@ -185,6 +185,9 @@ namespace Jondo.Unity.Launcher
         public static string TitlesOrnamentsJson => Resolve("titles_ornaments.json");
         public static string CosmeticsJson => Resolve("cosmetics.json");
         public static string CosmeticSkinsJson => Resolve("cosmetic_skins.json");
+        // El aspecto del EQUIPO DE VERDAD (no las prendas de apariencia), medido sobre las
+        // capturas del servidor de torneos con tools/extraer_equipo_real.py.
+        public static string EquipmentSkinsJson => Resolve("equipment_skins.json");
         // El aspecto de cada montura, indexado por el objeto que la da. Lo genera
         // extract_monturas.py de los bundles del cliente.
         public static string MountsJson => Resolve("mounts.json");
