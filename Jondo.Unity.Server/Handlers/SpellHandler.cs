@@ -67,6 +67,8 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Hng, ConnectionProtocol.BuildSpellSwapped(wanted, grade)));
 
+            await FightHandler.RefreshPlayerSpellBarAsync(stream);
+
             Console.WriteLine($"[Hechizos] Pareja {pair.Id}: {leaving} -> {wanted} (grado {grade}), " +
                               $"{slots.Count} hueco(s) de la barra actualizados.");
         }

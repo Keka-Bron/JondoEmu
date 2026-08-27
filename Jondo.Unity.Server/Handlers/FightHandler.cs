@@ -1506,30 +1506,10 @@ namespace Jondo.Unity.Server.Handlers
             // que puede estar a medio llenar, y por eso el cliente enseñaba todos los hechizos
             // durante la colocación —los suyos, de antes— y se quedaba en blanco al empezar el
             // turno, cuando por fin le llegaba nuestra lista corta.
-            var spells = new List<(int Spell, int Grade)>();
-            foreach (var spell in Managers.SpellTable.KnownFor(character?.Breed ?? 0,
-                                                               GameState.CharacterLevel,
-                                                               Managers.SpellChoices.Chosen))
-            {
-                spells.Add((spell.SpellId, spell.Grade));
-            }
-            // Dónde va cada uno en el panel: lo que el jugador tenga puesto, y si no tiene nada
-            // puesto, los suyos en orden, que es mejor que dejarle el panel en blanco.
-            var bar = new List<(int Slot, int Spell)>();
-            foreach (var slot in Managers.SpellChoices.Bar)
-            {
-                if (slot.Value != 0) bar.Add((slot.Key, slot.Value));
-            }
-            if (bar.Count == 0)
-            {
-                for (int i = 0; i < spells.Count; i++) bar.Add((i + 1, spells[i].Spell));
-            }
-
-            // Y el cuerpo a cuerpo en el primer hueco que quede libre. Es una entrada de la barra
-            // como cualquier otra, sólo que con el hechizo cero, y va SIEMPRE: no depende de que
-            // se lleve arma equipada.
-            bar.Add((PrimerHuecoLibre(bar), Network.FightProtocol.HechizoCuerpoACuerpo));
-            bar.Sort((a, b) => a.Slot.CompareTo(b.Slot));
+            var spellLayout = Managers.FightSpellLayout.Current(character?.Breed ?? 0,
+                                                                 GameState.CharacterLevel);
+            var spells = spellLayout.Spells;
+            var bar = spellLayout.Bar;
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
                 Network.FightProtocol.BuildSpellBar(me, spells, bar)));
@@ -2442,20 +2422,6 @@ namespace Jondo.Unity.Server.Handlers
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
                 Network.FightProtocol.BuildTeams(todos)));
-        }
-
-        /// <summary>
-        /// El primer hueco de la barra que no tenga nada, para meter ahí el cuerpo a cuerpo. En
-        /// las capturas casi siempre es el cero, pero no siempre: hay jugadores que lo tienen en
-        /// el 12, el 21, el 24, el 31 o el 49 porque llenaron los de delante a mano.
-        /// </summary>
-        private static int PrimerHuecoLibre(List<(int Slot, int Spell)> bar)
-        {
-            var ocupados = new HashSet<int>();
-            foreach (var (slot, _) in bar) ocupados.Add(slot);
-            int hueco = 0;
-            while (ocupados.Contains(hueco)) hueco++;
-            return hueco;
         }
 
         /// <summary>La característica 26, que el cliente pinta como "Invocación" en el panel.</summary>
@@ -4151,14 +4117,14 @@ namespace Jondo.Unity.Server.Handlers
         {
             var jvnMsg = new ProtoMessage();
 
-            // Same list as the roleplay shortcut bar.
-            // TODO: once "which variant the player picked" is persisted, read it in
-            // GetPlayerAvailableSpells instead of always assuming the base one.
-            var spellList = DatabaseManager.GetPlayerAvailableSpells(GameState.Breed, GameState.CharacterLevel);
+            // Same chosen variants and saved shortcuts as the roleplay and live combat bars.
+            var layout = Managers.FightSpellLayout.Current(GameState.Breed,
+                                                           GameState.CharacterLevel);
+            var spellList = layout.Spells;
 
             Program.LogDebug($"[FightHandler] jvn: {spellList.Count} spells available at level " +
                              $"{GameState.CharacterLevel} for breed {GameState.Breed}: " +
-                             string.Join(", ", spellList));
+                             string.Join(", ", spellList.Select(spell => spell.Spell)));
 
             // First entry: the WEAPON. It carries no spell id and uses f3 = 2 (spells use f3 = 1).
             // It was missing, and that is why the sword icon vanished from the bar on entering a
@@ -4167,7 +4133,7 @@ namespace Jondo.Unity.Server.Handlers
             weaponSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 2 });
             weaponSub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
             jvnMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = weaponSub.ToByteArray() });
-            foreach (var spellId in spellList)
+            foreach (var (spellId, _) in spellList)
             {
                 var sSub = new ProtoMessage();
                 sSub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = spellId });
@@ -4179,20 +4145,25 @@ namespace Jondo.Unity.Server.Handlers
             jvnMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = GameState.CharacterId });
             jvnMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.CharacterId });
 
-            // Slot 0 left empty, just like the official capture and the itp: that is the weapon slot.
-            var weaponSlot = new ProtoMessage();
-            weaponSlot.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = Array.Empty<byte>() });
-            jvnMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = weaponSlot.ToByteArray() });
-
-            int slot = 1;
-            foreach (var spellId in spellList)
+            foreach (var (slot, spellId) in layout.Bar)
             {
-                var spSub = new ProtoMessage();
-                spSub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = spellId });
-
                 var slotSub = new ProtoMessage();
-                slotSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = slot++ });
-                slotSub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = spSub.ToByteArray() });
+                if (slot != 0)
+                    slotSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = slot });
+
+                if (spellId == Network.FightProtocol.HechizoCuerpoACuerpo)
+                {
+                    slotSub.Fields.Add(new ProtoField
+                        { FieldNumber = 4, WireType = 2, BytesValue = Array.Empty<byte>() });
+                }
+                else
+                {
+                    var spell = new ProtoMessage();
+                    spell.Fields.Add(new ProtoField
+                        { FieldNumber = 1, WireType = 0, VarIntValue = spellId });
+                    slotSub.Fields.Add(new ProtoField
+                        { FieldNumber = 4, WireType = 2, BytesValue = spell.ToByteArray() });
+                }
 
                 jvnMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = slotSub.ToByteArray() });
             }
@@ -4200,6 +4171,25 @@ namespace Jondo.Unity.Server.Handlers
             byte[] env = BuildGameNodePacket("type.ankama.com/jvn", jvnMsg.ToByteArray());
             await WriteFrameAsync(stream, env);
             Program.LogDebug($"[FightHandler] Sent jvn (SpellListMessage) with {spellList.Count} spells for Breed {GameState.Breed}.");
+        }
+
+        /// <summary>
+        /// Rebuilds the live jyy bar after an administrative level change or a variant switch.
+        /// Outside a fight hms and itg remain the authoritative messages, so there is nothing to
+        /// send here.
+        /// </summary>
+        public static async Task RefreshPlayerSpellBarAsync(NetworkStream stream)
+        {
+            if (!GameState.IsInFight || !Managers.SpellTable.IsLoaded || GetCurrentFight() == null)
+                return;
+
+            var layout = Managers.FightSpellLayout.Current(GameState.Breed,
+                                                           GameState.CharacterLevel);
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
+                Network.FightProtocol.BuildSpellBar(GameState.CharacterId,
+                                                    layout.Spells, layout.Bar)));
+            Program.LogDebug($"[FightHandler] Refreshed the in-fight spell bar with " +
+                             $"{layout.Spells.Count} spells at level {GameState.CharacterLevel}.");
         }
 
         public static async Task SendFighterResync(NetworkStream stream, FightInstance fight)

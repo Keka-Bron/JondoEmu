@@ -1038,63 +1038,24 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static byte[] BuildSpellBar(int breed, int level)
         {
-            var known = SpellTable.KnownFor(breed, level, Managers.SpellChoices.Chosen);
+            var layout = Managers.FightSpellLayout.Current(breed, level);
 
-            // Un hechizo que ya no se tiene —porque se cambió de variante— no puede quedarse en la
-            // barra: el cliente pinta un hueco que no sabe resolver.
-            var has = new HashSet<int>();
-            foreach (var spell in known) has.Add(spell.SpellId);
-
-            var placed = new List<(int Slot, int SpellId)>();
-            var taken = new HashSet<int>();
-            foreach (var pair in Managers.SpellChoices.Bar)
+            var remembered = new List<(int Slot, int SpellId)>();
+            foreach (var (slot, spell) in layout.Bar)
             {
-                if (pair.Key >= SpellBarSlots || !has.Contains(pair.Value)) continue;
-                placed.Add((pair.Key, pair.Value));
-                taken.Add(pair.Value);
+                if (spell != Network.FightProtocol.HechizoCuerpoACuerpo)
+                    remembered.Add((slot, spell));
             }
-
-            // Y lo que el jugador todavía no ha colocado se reparte por los huecos libres, que es
-            // lo que hace el juego con un personaje recién hecho.
-            //
-            // Empezando por el UNO: el hueco cero es donde el cliente dibuja el arma, y en 37 de
-            // las 51 barras de las capturas va vacío por eso mismo.
-            int next = 1;
-            foreach (var spell in known)
-            {
-                if (taken.Contains(spell.SpellId)) continue;
-                while (next < SpellBarSlots && placed.Exists(p => p.Slot == next)) next++;
-                if (next >= SpellBarSlots) break;
-                placed.Add((next, spell.SpellId));
-                next++;
-            }
-
-            placed.Sort((a, b) => a.Slot.CompareTo(b.Slot));
-            Managers.SpellChoices.RememberBar(placed);
-
-            // El cuerpo a cuerpo va en el primer hueco libre, con el hechizo CERO. Su entrada es
-            // un f6 presente y vacío —los bytes 0a 02 32 00—, que es como proto3 escribe el cero.
-            // Está en las 13 barras de jugador de las capturas, incluida la del personaje del
-            // tutorial, que no lleva ni un objeto: la casilla es la del puño y va siempre.
-            var ocupados = new HashSet<int>();
-            foreach (var (slot, _) in placed) ocupados.Add(slot);
-            int hueco = 0;
-            while (ocupados.Contains(hueco)) hueco++;
+            Managers.SpellChoices.RememberBar(remembered);
 
             var itg = Pb.New();
-            bool puesto = false;
-            foreach (var (slot, spellId) in placed)
+            foreach (var (slot, spell) in layout.Bar)
             {
-                if (!puesto && hueco < slot)
-                {
-                    itg.Msg(1, Pb.New().VarIfNotZero(2, hueco).EmptyMsg(6));
-                    puesto = true;
-                }
-                itg.Msg(1, Pb.New()
-                    .VarIfNotZero(2, slot)
-                    .Msg(6, Pb.New().Var(2, spellId)));
+                var shortcut = Pb.New().VarIfNotZero(2, slot);
+                if (spell == Network.FightProtocol.HechizoCuerpoACuerpo) shortcut.EmptyMsg(6);
+                else shortcut.Msg(6, Pb.New().Var(2, spell));
+                itg.Msg(1, shortcut);
             }
-            if (!puesto) itg.Msg(1, Pb.New().VarIfNotZero(2, hueco).EmptyMsg(6));
 
             return itg.Var(2, SpellBar).Build();
         }
@@ -1124,7 +1085,6 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>How many slots of the bar we fill. The captured one runs from 0 to 48.</summary>
-        private const int SpellBarSlots = 40;
 
         // ─── World: weight carried ──────────────────────────────────────────────
 

@@ -134,7 +134,7 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ **539 titles** and **167 ornaments**, applied, persisted and carried in the map actor block
 - ✅ Commands — `.teleport`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`
 - ✅ **Live administration over HTTP** — `POST /api/personaje` sets base characteristics and kamas on a connected character, persists them and refreshes the sheet without a reconnect. Administrator role only, loopback only, and it takes the session's turn so it cannot cut across a fight
-- 🟡 `.level` does not refresh the in-fight spell bar
+- ✅ `.level` and variant changes refresh the same selected spells and shortcuts in combat
 
 ### 👕 Appearances
 Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 2,420 cosmetics** in the catalogue were measured off captures, one garment at a time.

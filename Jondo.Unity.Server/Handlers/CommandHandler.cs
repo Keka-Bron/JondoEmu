@@ -295,6 +295,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
 
             string spellNote = await RefreshSpellsAsync(stream, before);
+            await FightHandler.RefreshPlayerSpellBarAsync(stream);
 
             string capped = newLevel != wanted ? T("level.requested", wanted) : "";
             string omega = newLevel > MaxNormalLevel
