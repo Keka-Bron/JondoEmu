@@ -36,9 +36,26 @@ namespace Jondo.Unity.Server
                 return;
             }
 
-            try { await ArrancarTodoYEsperar(); }
-            finally { Contract.SoltarElSitio(); }
+            try
+            {
+                await ArrancarTodoYEsperar();
+            }
+            catch (Exception ex)
+            {
+                Environment.ExitCode = 1;
+                string failure = StartupFailure(ex);
+                Console.WriteLine(failure);
+                LogFile.Debug.WriteLine(failure);
+            }
+            finally
+            {
+                Contract.SoltarElSitio();
+            }
         }
+
+        /// <summary>The complete failure written before a WinExe exits during startup.</summary>
+        internal static string StartupFailure(Exception error)
+            => $"[!] Fatal error while starting Jondo Server:{Environment.NewLine}{error}";
 
         private static async Task ArrancarTodoYEsperar()
         {
