@@ -139,7 +139,7 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ **539 titles** and **167 ornaments**, applied, persisted and carried in the map actor block
 - ✅ Commands — `.teleport`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`
 - ✅ **Live administration over HTTP** — `POST /api/personaje` sets characteristics, kamas and level, grants items or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only, and serialized with the target session
-- 🟡 `.level` does not refresh the in-fight spell bar
+- 🟡 `.level` repaints the in-fight spell bar, but the fighter's own level is not updated, so the engine still resolves spells at the level the fight started with
 
 ### 👕 Appearances
 Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 2,420 cosmetics** in the catalogue were measured off captures, one garment at a time.

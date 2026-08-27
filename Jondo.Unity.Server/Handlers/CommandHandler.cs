@@ -327,6 +327,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
 
             string spellNote = await RefreshSpellsAsync(stream, before);
+            await FightHandler.RefreshPlayerSpellBarAsync(stream);
 
             Console.WriteLine($"[Comandos] Nivel {oldLevel} -> {newLevel}, experiencia " +
                               $"{GameState.Experience}, puntos {GameState.CharacterRemainingPoints}.");
