@@ -1206,6 +1206,13 @@ namespace Jondo.Unity.Server.Handlers
                 // Pasar turno. Va vacío.
                 await PassTurnAsync(stream);
             }
+            else if (payloadStr.Contains("type.ankama.com/kme"))
+            {
+                // Abandonar. El cliente de la 3.6.10.10 manda un kme vacío al confirmar el
+                // diálogo. Hasta ahora ni siquiera atravesaba la puerta de GameNodeProxy y
+                // acababa registrado como paquete sin atender, por lo que el botón no hacía nada.
+                await AbandonAsync(stream);
+            }
             else if (payloadStr.Contains(Op.Uri(Op.Jrw)))
             {
                 // Andar. Es el mismo mensaje que fuera del combate; aquí gasta PM.
@@ -3795,6 +3802,26 @@ namespace Jondo.Unity.Server.Handlers
 
             await EndFightAsync(stream, fight);
             return true;
+        }
+
+        /// <summary>
+        /// Fuerza la derrota del bando del jugador y termina el combate sin recompensa.
+        ///
+        /// Se tumban también sus invocaciones: dejar una viva haría que EndFightAsync viera aún
+        /// un aliado con vida y convirtiera el abandono en victoria. Al ser una derrota, el grupo
+        /// de monstruos no se elimina ni se repone y se puede volver a atacar después.
+        /// </summary>
+        private static async Task AbandonAsync(NetworkStream stream)
+        {
+            var fight = GetCurrentFight();
+            if (fight == null) return;
+
+            fight.FinPendiente = 0;
+            foreach (var ally in fight.Team0) ally.CurrentHP = 0;
+
+            Program.LogDebug($"[Combate] {GameState.CharacterId} abandona el combate " +
+                             $"#{fight.FightId}: derrota sin recompensa.");
+            await EndFightAsync(stream, fight);
         }
 
         /// <summary>Lo que se manda cuando el combate se acaba de verdad.</summary>

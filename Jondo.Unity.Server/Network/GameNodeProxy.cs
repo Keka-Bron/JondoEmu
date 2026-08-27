@@ -832,6 +832,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jzy)) || payloadStr.Contains(Op.Uri(Op.Kaq))
                          || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
+                         || payloadStr.Contains("type.ankama.com/kme")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
                          || payloadStr.Contains(Op.Uri(Op.Jti))
@@ -840,7 +841,7 @@ namespace Jondo.Unity.Server.Network
                          || payloadStr.Contains(Op.Uri(Op.Kwv)) || payloadStr.Contains(Op.Uri(Op.Kwi))
                          || payloadStr.Contains(Op.Uri(Op.Kwo)) || payloadStr.Contains(Op.Uri(Op.Kxb)))
                 {
-                    // Colocarse, declararse listo, las opciones del combate y los RETOS. Los demás
+                    // Colocarse, declararse listo, abandonar, las opciones del combate y los RETOS. Los demás
                     // que había aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la
                     // 3.6.10.10 o los manda el servidor, no el cliente.
                     //
