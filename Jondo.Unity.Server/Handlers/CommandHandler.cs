@@ -222,6 +222,32 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            LevelChange result = await SetLevelAsync(stream, wanted);
+            string capped = result.Level != wanted ? T("level.requested", wanted) : "";
+            string omega = result.Level > MaxNormalLevel ? T("level.omega") : "";
+
+            await NotifyAsync(stream, T("level.result", result.Level, capped, result.PreviousLevel,
+                                         result.Experience, result.RemainingPoints,
+                                         result.Capital, result.SpellNote, omega), channel, accountId);
+        }
+
+        public sealed class LevelChange
+        {
+            public int PreviousLevel { get; init; }
+            public int Level { get; init; }
+            public long Experience { get; init; }
+            public int RemainingPoints { get; init; }
+            public int Capital { get; init; }
+            public string SpellNote { get; init; } = "";
+        }
+
+        /// <summary>
+        /// Applies the complete level transition and refreshes the client, without writing a chat
+        /// response. The chat command and the live administration endpoint share this path.
+        /// </summary>
+        public static async Task<LevelChange> SetLevelAsync(NetworkStream stream, int wanted)
+        {
+
             // El techo lo pone la tabla de experiencia del cliente, que llega al 1889. Sin ella
             // cargada no hay suelo de experiencia que poner y no se pasa del 200.
             int ceiling = ExperienceTable.IsLoaded ? ExperienceTable.MaxLevel : MaxNormalLevel;
@@ -255,7 +281,7 @@ namespace Jondo.Unity.Server.Handlers
             // StatsHandler y CharacteristicsHandler. Por encima de 200 se congela: los niveles
             // Omega no reparten puntos.
             int capital = StatsHandler.TotalCapitalForLevel(Math.Min(newLevel, MaxNormalLevel));
-            GameState.CharacterRemainingPoints = Math.Max(0, capital - SpentCapital());
+            GameState.CharacterRemainingPoints = Math.Max(0, capital - SpentCapital(capital));
 
             DatabaseManager.SaveCurrentCharacter();
 
@@ -296,17 +322,17 @@ namespace Jondo.Unity.Server.Handlers
 
             string spellNote = await RefreshSpellsAsync(stream, before);
 
-            string capped = newLevel != wanted ? T("level.requested", wanted) : "";
-            string omega = newLevel > MaxNormalLevel
-                ? T("level.omega")
-                : "";
-
-            await NotifyAsync(stream, T("level.result", newLevel, capped, oldLevel,
-                                         GameState.Experience, GameState.CharacterRemainingPoints,
-                                         capital, spellNote, omega), channel, accountId);
-
             Console.WriteLine($"[Comandos] Nivel {oldLevel} -> {newLevel}, experiencia " +
                               $"{GameState.Experience}, puntos {GameState.CharacterRemainingPoints}.");
+            return new LevelChange
+            {
+                PreviousLevel = oldLevel,
+                Level = newLevel,
+                Experience = GameState.Experience,
+                RemainingPoints = GameState.CharacterRemainingPoints,
+                Capital = capital,
+                SpellNote = spellNote,
+            };
         }
 
         /// <summary>
@@ -322,7 +348,7 @@ namespace Jondo.Unity.Server.Handlers
         /// Sin esa tabla cargada se cae al modelo por tramos de StatsHandler, que da lo mismo para
         /// las razas cuyo precio conocemos.
         /// </summary>
-        private static int SpentCapital()
+        private static int SpentCapital(int stopAfter = int.MaxValue)
         {
             if (!BreedStatCost.IsLoaded)
             {
@@ -347,6 +373,10 @@ namespace Jondo.Unity.Server.Handlers
                 for (int i = 0; i < points; i++)
                 {
                     spent += Math.Max(1, BreedStatCost.PriceOf(GameState.Breed, name, i));
+                    // The caller only needs to know that no capital remains. This also prevents a
+                    // live-admin character with millions of points from turning a level change
+                    // into millions of table lookups.
+                    if (spent > stopAfter) return spent;
                 }
             }
             return spent;
@@ -590,14 +620,15 @@ namespace Jondo.Unity.Server.Handlers
         /// Creates an item from the client template, with its real factory effects, persists it,
         /// updates both in-memory inventory views and immediately pushes it to the client.
         /// </summary>
-        private static async Task<bool> GiveItemAsync(NetworkStream stream, int gid, int quantity)
+        public static async Task<HavenBagStore.StoredItem?> GrantItemAsync(NetworkStream stream,
+                                                                           int gid, int quantity)
         {
-            if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return false;
+            if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return null;
 
             long uid = DatabaseManager.NextItemUid();
             if (!DatabaseManager.InsertCharacterItem(uid, GameState.CharacterId, gid, quantity,
                                                      Equipment.Bag, effects))
-                return false;
+                return null;
 
             Equipment.Add(uid, gid, quantity, Equipment.Bag, effects);
 
@@ -616,16 +647,16 @@ namespace Jondo.Unity.Server.Handlers
             }
             GameState.AddInventoryItem(legacy);
 
+            var granted = new HavenBagStore.StoredItem
+            {
+                Uid = uid,
+                Gid = gid,
+                Quantity = quantity,
+                Effects = effects,
+            };
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3,
-                    new HavenBagStore.StoredItem
-                    {
-                        Uid = uid,
-                        Gid = gid,
-                        Quantity = quantity,
-                        Effects = effects,
-                    })));
-            return true;
+                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, granted)));
+            return granted;
         }
 
         private static async Task ItemAsync(NetworkStream stream, string rest,
@@ -651,7 +682,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (!await GiveItemAsync(stream, gid, quantity))
+            if (await GrantItemAsync(stream, gid, quantity) == null)
             {
                 await NotifyAsync(stream, T("item.template_missing", gid), channel, accountId);
                 return;
@@ -682,7 +713,7 @@ namespace Jondo.Unity.Server.Handlers
             var missing = new List<int>();
             foreach (int gid in templates)
             {
-                if (await GiveItemAsync(stream, gid, 1)) added++;
+                if (await GrantItemAsync(stream, gid, 1) != null) added++;
                 else missing.Add(gid);
             }
 
