@@ -17,6 +17,7 @@ namespace Jondo.Unity.Server
         public static void Initialize()
         {
             Console.WriteLine("[SQLite] Initializing databases...");
+            DatabaseBackups.CreateBeforeMigration();
 
             // 1. Initialize auth.db
             using (var authConnection = new SqliteConnection(AuthConnectionString))

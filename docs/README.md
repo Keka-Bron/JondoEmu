@@ -91,6 +91,11 @@ instead. Three generators that `Paths.cs` still names by hand (`extract_fight_ce
 *Go there* when you need to regenerate a data file, or when you want to know which source a value
 came from before trusting it.
 
+**`database-backups.md`** — Verified snapshots before database migrations.
+How `auth.db` and `world.db` are copied with SQLite's online backup API, checked before publication,
+rotated to five complete sets and restored as a matching pair.
+*Go there* before changing database initialization or recovering an installation after an update.
+
 **`item-commands.md`** — Administrator item creation commands.
 The exact syntax and behavior of `.item` and `.itemset`, including role checks, template and set
 data sources, maximum factory effects, persistence, inventory updates and partial-set failures.

@@ -56,7 +56,7 @@ Jondo Server.exe              the server; the launcher starts it
 Jondo Studio.exe              the world editor; open it when you want to look or build
 content/                      the only files a person edits by hand, versioned in git
 datos/                        json and bin the emulator reads (maps, items, appearances, zaaps…)
-bases/                        world.db and auth.db, the only things the emulator writes
+bases/                        writable databases and five verified pre-migration backup sets
 docs/                         technical documentation
 launcher_assets/              launcher artwork and music
 JondoFix/                     the MelonLoader mod, source and compiled dll
