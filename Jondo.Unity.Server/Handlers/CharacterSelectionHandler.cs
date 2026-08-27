@@ -208,7 +208,8 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// Character selection. The id comes in field 1 of the message, inside the wrapper
-        /// (kvw in 3.6.10.10, ksl in older builds).
+        /// (kvw in 3.6.10.10, ksl in older builds). The kvl sent immediately after character
+        /// creation is different: field 1 is the success boolean and field 2 is the character id.
         ///
         /// Returns false if the character does not exist or does not belong to the session's
         /// account. There used to be a default id: when the message carried none, the same
@@ -219,15 +220,7 @@ namespace Jondo.Unity.Server.Handlers
             long characterIdToLoad = 0;
             try
             {
-                byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, Op.Kvw)
-                                    ?? ConnectionProtocol.ReadPayload(framePayload, Op.Ksl)
-                                    ?? ConnectionProtocol.ReadPayload(framePayload, Op.Kvl);
-                if (selection != null && selection.Length > 0)
-                {
-                    var msg = ProtoMessage.Parse(selection);
-                    var charIdField = msg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0);
-                    if (charIdField != null) characterIdToLoad = charIdField.VarIntValue;
-                }
+                characterIdToLoad = ReadSelectedCharacterId(framePayload);
             }
             catch (Exception ex)
             {
@@ -372,6 +365,25 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             return true;
+        }
+
+        /// <summary>Reads the two selection layouts without mistaking kvl's success flag for id 1.</summary>
+        internal static long ReadSelectedCharacterId(byte[] framePayload)
+        {
+            byte[]? selection = ConnectionProtocol.ReadPayload(framePayload, Op.Kvw)
+                                ?? ConnectionProtocol.ReadPayload(framePayload, Op.Ksl);
+            int idField = 1;
+
+            if (selection == null)
+            {
+                selection = ConnectionProtocol.ReadPayload(framePayload, Op.Kvl);
+                idField = 2;
+            }
+
+            if (selection == null || selection.Length == 0) return 0;
+            var message = ProtoMessage.Parse(selection);
+            return message.Fields.FirstOrDefault(
+                field => field.FieldNumber == idField && field.WireType == 0)?.VarIntValue ?? 0;
         }
 
         private static byte[] BuildKsqPacket(string characterName, long characterId, int level)
