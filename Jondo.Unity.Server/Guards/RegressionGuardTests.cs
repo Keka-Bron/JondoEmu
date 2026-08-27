@@ -544,6 +544,9 @@ namespace Jondo.Unity.Server
                 // cancelaba estos tres.
                 (2854, 0, new[] { 2230, 2231, 2355 }, "Jalamut Real"),
                 (2894, 0, new[] { 2366, 2367, 2368 }, "Rata kenopintamos"),
+                // Un invocado activo: startingSpellId vale cero y TODO su turno depende de que
+                // se lean estos dos desde MonsterTemplates.spells.
+                (8076, 2, new[] { 31166, 31168 }, "Dragoune"),
             };
 
             foreach (var (monstruo, grado, hechizos, quien) in esperado)

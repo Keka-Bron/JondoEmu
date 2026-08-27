@@ -49,6 +49,20 @@ namespace Jondo.Unity.Server.Managers
         public int ResistenciaAgua { get; init; }
         public int ResistenciaAire { get; init; }
 
+        /// <summary>
+        /// Caracteristicas de combate del grado, incluido su bonusCharacteristics. Estas ultimas
+        /// no son decorativas: por ejemplo la Dragoune lleva aqui 50 de inteligencia, que aumenta
+        /// tanto su golpe de fuego como la cura de su hechizo mixto.
+        /// </summary>
+        public int Fuerza { get; init; }
+        public int Inteligencia { get; init; }
+        public int Suerte { get; init; }
+        public int Agilidad { get; init; }
+        public int DanoTierra { get; init; }
+        public int DanoFuego { get; init; }
+        public int DanoAgua { get; init; }
+        public int DanoAire { get; init; }
+
         /// <summary>El hechizo que gobierna al bicho, y en qué grado.</summary>
         public int HechizoPropio { get; init; }
         public int GradoDelHechizoPropio { get; init; }
@@ -172,8 +186,20 @@ namespace Jondo.Unity.Server.Managers
                 // ocupaba casilla —se podía andar a través de él— y no hacía nada.
                 int vidaFija = Math.Max(0, Entero(gr, "lifePoints"));
                 int bonusVida = 0;
+                int bonusFuerza = 0, bonusInteligencia = 0, bonusSuerte = 0, bonusAgilidad = 0;
+                int danoTierra = 0, danoFuego = 0, danoAgua = 0, danoAire = 0;
                 if (gr.TryGetProperty("bonusCharacteristics", out var bonus))
+                {
                     bonusVida = Entero(bonus, "lifePoints");
+                    bonusFuerza = Entero(bonus, "strength");
+                    bonusInteligencia = Entero(bonus, "intelligence");
+                    bonusSuerte = Entero(bonus, "chance");
+                    bonusAgilidad = Entero(bonus, "agility");
+                    danoTierra = Entero(bonus, "bonusEarthDamage");
+                    danoFuego = Entero(bonus, "bonusFireDamage");
+                    danoAgua = Entero(bonus, "bonusWaterDamage");
+                    danoAire = Entero(bonus, "bonusAirDamage");
+                }
 
                 // El hechizo con el que se porta: el startingSpellId es un SpellLevels.Id.
                 int nivelDelHechizo = Entero(gr, "startingSpellId");
@@ -197,6 +223,14 @@ namespace Jondo.Unity.Server.Managers
                     ResistenciaFuego = Entero(gr, "fireResistance"),
                     ResistenciaAgua = Entero(gr, "waterResistance"),
                     ResistenciaAire = Entero(gr, "airResistance"),
+                    Fuerza = Entero(gr, "strength") + bonusFuerza,
+                    Inteligencia = Entero(gr, "intelligence") + bonusInteligencia,
+                    Suerte = Entero(gr, "chance") + bonusSuerte,
+                    Agilidad = Entero(gr, "agility") + bonusAgilidad,
+                    DanoTierra = danoTierra,
+                    DanoFuego = danoFuego,
+                    DanoAgua = danoAgua,
+                    DanoAire = danoAire,
                     HechizoPropio = hechizo,
                     GradoDelHechizoPropio = gradoDelHechizo,
                 };

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.World.Combat;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
 using static Jondo.Unity.Server.Network.NetworkEnvelope;
@@ -1859,11 +1860,12 @@ namespace Jondo.Unity.Server.Handlers
             // Y el reloj, con la MISMA duración que se le acaba de decir al cliente.
             ArrancarElReloj(stream, fight, fighter, duration);
 
-            // El monstruo juega solo: no hay nadie que pulse por él. Un invocado NO pasa por la
-            // inteligencia de los monstruos —no persigue ni ataca— porque lo suyo ya lo ha hecho
-            // su propio hechizo en las actitudes de principio de turno: la baliza se cura o
-            // empuja ahí y no tiene que hacer nada más.
-            if (fighter.IsMonster && !fighter.EsInvocado)
+            // Los invocados ACTIVOS traen la misma lista de hechizos de MonsterTemplates que un
+            // monstruo normal y juegan con la misma inteligencia. Los pasivos —balizas, glifos—
+            // no traen ataques: su startingSpellId ya ha disparado sus actitudes y pasan en el
+            // acto. Separarlos sólo por EsInvocado dejaba a la Dragoune sin hacer absolutamente
+            // nada aunque estuviera viva en el tablero.
+            if (fighter.IsMonster && (!fighter.EsInvocado || fighter.SpellIds.Count > 0))
             {
                 await MonsterTurnAsync(stream, fight, fighter);
             }
@@ -2266,6 +2268,12 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // El startingSpellId de la receta gobierna invocados PASIVOS. Los que caminan y
+            // lanzan hechizos llevan sus acciones en MonsterTemplates.spells, igual que un
+            // monstruo normal. Esta lectura traduce además el grado propio de cada hechizo.
+            var fichaDelMonstruo = DatabaseManager.GetMonsterGradeStats(
+                plantilla, Math.Max(0, grado - 1));
+
             // Cuántas puede llevar a la vez: la característica 26, que el cliente pinta como
             // "Invocación" en el panel. Sale de la base más el equipo, como todo lo demás.
             int tope = TopeDeInvocaciones(quienInvoca, fight.RoundNumber);
@@ -2304,6 +2312,16 @@ namespace Jondo.Unity.Server.Handlers
                 FireResPct = receta.ResistenciaFuego,
                 WaterResPct = receta.ResistenciaAgua,
                 AirResPct = receta.ResistenciaAire,
+                Strength = receta.Fuerza,
+                Intelligence = receta.Inteligencia,
+                Chance = receta.Suerte,
+                Agility = receta.Agilidad,
+                EarthDamage = receta.DanoTierra,
+                FireDamage = receta.DanoFuego,
+                WaterDamage = receta.DanoAgua,
+                AirDamage = receta.DanoAire,
+                SpellIds = fichaDelMonstruo?.SpellIds ?? new List<int>(),
+                SpellGrades = fichaDelMonstruo?.SpellGrades ?? new Dictionary<int, int>(),
             };
             invocado.MaxHP = Managers.Summons.VidaDelInvocado(receta.Vida, quienInvoca.Level,
                                                               receta.VidaFija);
@@ -2312,11 +2330,11 @@ namespace Jondo.Unity.Server.Handlers
             int vive = Managers.Summons.RondasQueVive(plantilla);
             invocado.MuereEnRonda = vive > 0 ? fight.RoundNumber + vive : -1;
 
-            // ¿Le toca turno? Sólo si su hechizo tiene algo que hacer al empezarlo. La Baliza de
-            // Supervivencia lo tiene —se cura sola— y la Táctica no, que sólo reacciona a lo que
-            // le pase alrededor; por eso en las capturas la primera juega y la segunda no aparece
-            // ni una vez en el carrusel.
-            invocado.JuegaTurno = TieneAlgoQueHacerAlEmpezar(receta.HechizoPropio,
+            // Juega si tiene acciones activas O si su hechizo de comportamiento hace algo al
+            // empezar el turno. Mirar sólo startingSpellId excluía a todos los invocados activos:
+            // la Dragoune tiene ahí cero, pero trae 31166 y 31168 en su lista de ataques.
+            invocado.JuegaTurno = invocado.SpellIds.Count > 0 ||
+                                  TieneAlgoQueHacerAlEmpezar(receta.HechizoPropio,
                                                              receta.GradoDelHechizoPropio);
 
             fight.Invocar(invocado, quienInvoca);
@@ -2332,7 +2350,9 @@ namespace Jondo.Unity.Server.Handlers
 
             Program.LogDebug($"[Combate] {quienInvoca.Id} invoca la plantilla {plantilla} grado " +
                              $"{grado} como {invocado.Id} en la casilla {celda} con " +
-                             $"{invocado.MaxHP} de vida y el hechizo {receta.HechizoPropio}.");
+                             $"{invocado.MaxHP} de vida, actitud {receta.HechizoPropio}, " +
+                             $"hechizos [{string.Join(",", invocado.SpellIds)}] y " +
+                             $"turno activo={invocado.JuegaTurno}.");
 
             // Su hechizo pasa a ser su actitud, y se lanza en el acto para que queden puestos sus
             // enganches y su cuenta atrás.
@@ -3391,17 +3411,60 @@ namespace Jondo.Unity.Server.Handlers
                 if (distance < best) { best = distance; prey = enemy; }
             }
 
+            // Un invocado de apoyo no debe salir corriendo hacia el enemigo antes de usar la
+            // cura que lleva en la propia lista de ataques. La Dragoune tiene un hechizo mixto:
+            // sobre un enemigo roba vida, sobre un aliado devuelve vida. Si hay alguien herido,
+            // primero se queda a distancia de cura —o se acerca a ella— y luego ya ataca con lo
+            // que le sobre.
+            Fighter? aliadoHerido = MasHeridoDeLosSuyos(fight, monster);
+            SpellCombatData? curaDisponible = null;
+            if (aliadoHerido != null)
+            {
+                foreach (int spell in monster.SpellIds)
+                {
+                    int spellGrade = monster.SpellGrades.TryGetValue(spell, out int g) ? g : 1;
+                    if (!CuraAliados(spell, spellGrade)) continue;
+                    var data = DatabaseManager.GetSpellCombatData(spell, spellGrade);
+                    if (data == null || data.APCost <= 0 || data.APCost > monster.CurrentAP) continue;
+                    curaDisponible = data;
+                    break;
+                }
+            }
+
             // A QUÉ DISTANCIA LE CONVIENE PONERSE, que no es «al lado» siempre.
             //
             // Antes se pegaba: allowed = Min(CurrentMP, best - 1). Y pegado no se pueden lanzar los
             // 857 hechizos de monstruo (11,3 % del arsenal) que tienen alcance mínimo mayor que
             // uno. El bicho gastaba los puntos de movimiento en meterse justo donde no podía hacer
             // nada, y encima ya no le quedaban para volver a separarse.
+            Fighter? objetivoDeMovimiento = prey;
+            int distanciaAlObjetivo = best;
             int deseada = prey != null ? DistanciaQueLeConviene(monster, best) : 1;
 
-            if (prey != null && deseada != best && monster.CurrentMP > 0)
+            if (aliadoHerido != null && curaDisponible != null)
             {
-                var walked = PathToward(fight, monster.CellId, prey.CellId, monster.CurrentMP, deseada);
+                objetivoDeMovimiento = aliadoHerido;
+                distanciaAlObjetivo = CellDistance(monster.CellId, aliadoHerido.CellId);
+
+                // Si ya puede curarlo, no se mueve: acercarse primero al enemigo podía sacar al
+                // dueño del alcance 1-2 y desperdiciar justo el hechizo que se quería lanzar.
+                if (distanciaAlObjetivo >= curaDisponible.MinRange &&
+                    distanciaAlObjetivo <= curaDisponible.MaxRange)
+                {
+                    deseada = distanciaAlObjetivo;
+                }
+                else
+                {
+                    deseada = Math.Clamp(distanciaAlObjetivo,
+                                         curaDisponible.MinRange, curaDisponible.MaxRange);
+                }
+            }
+
+            if (objetivoDeMovimiento != null && deseada != distanciaAlObjetivo &&
+                monster.CurrentMP > 0)
+            {
+                var walked = PathToward(fight, monster.CellId, objetivoDeMovimiento.CellId,
+                                        monster.CurrentMP, deseada);
                 if (walked.Count > 1)
                 {
                     var path = walked.ConvertAll(c => (long)c);
@@ -3422,13 +3485,23 @@ namespace Jondo.Unity.Server.Handlers
                     await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
                         Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
                                                                Network.FightProtocol.WalkSequence)));
-                    best = CellDistance(monster.CellId, prey.CellId);
+                    distanciaAlObjetivo = CellDistance(monster.CellId, objetivoDeMovimiento.CellId);
                 }
             }
 
-            // Y a pegar con lo que tenga, mientras le lleguen los puntos de acción.
+            // Primero las curas si hacen falta, luego los ataques. Conservar sin más el orden de
+            // MonsterTemplates hacía que un invocado gastara todos sus PA en el primer ataque y
+            // nunca alcanzara el hechizo de apoyo que venía detrás.
+            var hechizosDelTurno = monster.SpellIds
+                .OrderByDescending(spell => aliadoHerido != null &&
+                                             CuraAliados(spell,
+                                                 monster.SpellGrades.TryGetValue(spell, out int g)
+                                                     ? g : 1))
+                .ToList();
+
+            // Y a lanzar con lo que tenga, mientras le lleguen los puntos de acción.
             int lanzados = 0;
-            foreach (int spell in monster.SpellIds)
+            foreach (int spell in hechizosDelTurno)
             {
                 if (prey == null || !prey.IsAlive) break;
 
@@ -3475,8 +3548,21 @@ namespace Jondo.Unity.Server.Handlers
                         break;
                     }
 
+                    monster.LanzadosEsteTurno.TryGetValue(spell, out int delHechizo);
+                    if (data.MaxCastPerTurn > 0 && delHechizo >= data.MaxCastPerTurn) break;
+
+                    monster.LanzadosPorObjetivo.TryGetValue((spell, objetivo.Id),
+                                                            out int sobreObjetivo);
+                    if (data.MaxCastPerTarget > 0 && sobreObjetivo >= data.MaxCastPerTarget) break;
+
                     monster.CurrentAP -= data.APCost;
+                    monster.LanzadosEsteTurno[spell] = delHechizo + 1;
+                    monster.LanzadosPorObjetivo[(spell, objetivo.Id)] = sobreObjetivo + 1;
                     lanzados++;
+
+                    Program.LogDebug($"[Combate] IA {monster.Id} lanza {spell} grado " +
+                                     $"{monsterGrade} sobre {objetivo.Id} desde {monster.CellId} " +
+                                     $"a {objetivo.CellId}; PA {monster.CurrentAP}/{monster.MaxAP}.");
 
                     // Y su identificador, para que su lanzamiento también diga QUÉ se lanza.
                     int spellLevel = data.SpellLevelId;
@@ -3599,6 +3685,7 @@ namespace Jondo.Unity.Server.Handlers
             if (data.MaxRange <= 0) return monster;
 
             bool aEnemigos = false, aLosSuyos = false, alLanzador = false;
+            bool curaALosSuyos = false;
             foreach (var efecto in Managers.SpellEffects.De(hechizo, grado))
             {
                 foreach (var trozo in (efecto.TargetMask ?? "").Split(','))
@@ -3607,15 +3694,42 @@ namespace Jondo.Unity.Server.Handlers
                     if (t == "A") aEnemigos = true;
                     else if (t == "a" || t == "g") aLosSuyos = true;
                     else if (t == "C") alLanzador = true;
+
+                    if (efecto.EffectId == EffectSupport.Heal && (t == "a" || t == "g"))
+                        curaALosSuyos = true;
                 }
             }
 
-            // Si toca a los de enfrente va a la presa, aunque además toque a los suyos: el Ojo de
-            // Topo se lleva por delante a los aliados que pille dentro y aun así se lanza al enemigo.
+            // Un hechizo mixto de ataque/cura cambia de rama según la casilla apuntada. Antes la
+            // presencia de cualquier efecto «A» ganaba siempre, de modo que la Dragoune usaba su
+            // 31168 exclusivamente contra el enemigo y jamás alcanzaba el efecto 108 «a».
+            if (curaALosSuyos)
+            {
+                var herido = MasHeridoDeLosSuyos(fight, monster);
+                if (herido != null) return herido;
+            }
+
+            // Si toca a los de enfrente va a la presa, aunque además toque a los suyos: un ataque
+            // de zona puede llevarse por delante a los aliados y aun así se lanza al enemigo.
             if (aEnemigos) return presa;
             if (aLosSuyos) return MasHeridoDeLosSuyos(fight, monster) ?? monster;
             if (alLanzador) return monster;
             return presa;
+        }
+
+        /// <summary>¿Tiene al menos una cura inmediata dirigida a un aliado que no sea el lanzador?</summary>
+        private static bool CuraAliados(int hechizo, int grado)
+        {
+            foreach (var efecto in Managers.SpellEffects.De(hechizo, grado))
+            {
+                if (efecto.EffectId != EffectSupport.Heal) continue;
+                foreach (var trozo in (efecto.TargetMask ?? "").Split(','))
+                {
+                    string t = trozo.Trim().TrimStart('*');
+                    if (t == "a" || t == "g") return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>El de su bando al que más vida le falta, que es a quien se cura.</summary>
@@ -3626,7 +3740,9 @@ namespace Jondo.Unity.Server.Handlers
             int falta = 0;
             foreach (var f in suyos)
             {
-                if (f == null || !f.IsAlive) continue;
+                // Las máscaras «a» y «g» excluyen al lanzador; devolvérselo a sí mismo hacía que
+                // apuntara la animación a una casilla sobre la que el motor no podía curar a nadie.
+                if (f == null || f == monster || !f.IsAlive) continue;
                 int suya = f.MaxHP - f.CurrentHP;
                 if (suya > falta) { falta = suya; peor = f; }
             }
