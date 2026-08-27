@@ -71,8 +71,22 @@ namespace Jondo.Unity.World.Combat
         /// <summary>Summon a creature.</summary>
         public const int Summon = 181;
 
+        /// <summary>
+        /// Summon a controllable creature. Osamodas' two Gobgob spells use this id instead of the
+        /// ordinary summon id; the creature still has to be created by the same fight code.
+        /// </summary>
+        public const int ControllableSummon = 1011;
+
+        /// <summary>Set the cooldown of the spell carried in DiceNum to Value rounds.</summary>
+        public const int SetCooldown = 1045;
+
         /// <summary>Heal a fixed amount, scaled by Intelligence and the Heals characteristic.</summary>
         public const int Heal = 108;
+
+        /// <summary>Elemental heals scale with Chance, Agility and Strength respectively.</summary>
+        public const int WaterHeal = 2998;
+        public const int AirHeal = 2999;
+        public const int EarthHeal = 3000;
 
         /// <summary>Heal a percentage of maximum life.</summary>
         public const int HealPercent = 1109;
@@ -84,6 +98,13 @@ namespace Jondo.Unity.World.Combat
         public const int FirstDamage = 91;
 
         public const int LastDamage = 100;
+
+        /// <summary>Neutral damage equal to a percentage of the caster's current/missing health.</summary>
+        public const int CasterCurrentHealthDamage = 89;
+        public const int CasterMissingHealthDamage = 279;
+
+        /// <summary>Damage in whichever elemental characteristic is highest on the caster.</summary>
+        public const int BestElementDamage = 2822;
 
         /// <summary>
         /// Category 2 is the weapon-only effects, which the catalogue path deliberately skips.
@@ -105,7 +126,9 @@ namespace Jondo.Unity.World.Combat
             {
                 Push, Pull, StepBack, StepForward,
                 AddState, RemoveState,
-                CastSpell, Summon, Heal, HealPercent, Kill,
+                CastSpell, Summon, ControllableSummon, SetCooldown,
+                Heal, WaterHeal, AirHeal, EarthHeal, HealPercent, Kill,
+                CasterCurrentHealthDamage, CasterMissingHealthDamage, BestElementDamage,
             };
 
             for (int damage = FirstDamage; damage <= LastDamage; damage++) known.Add(damage);

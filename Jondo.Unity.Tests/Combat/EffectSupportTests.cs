@@ -38,9 +38,17 @@ namespace Jondo.Unity.Tests.Combat
         [InlineData(EffectSupport.RemoveState)]
         [InlineData(EffectSupport.CastSpell)]
         [InlineData(EffectSupport.Summon)]
+        [InlineData(EffectSupport.ControllableSummon)]
+        [InlineData(EffectSupport.SetCooldown)]
         [InlineData(EffectSupport.Heal)]
+        [InlineData(EffectSupport.WaterHeal)]
+        [InlineData(EffectSupport.AirHeal)]
+        [InlineData(EffectSupport.EarthHeal)]
         [InlineData(EffectSupport.HealPercent)]
         [InlineData(EffectSupport.Kill)]
+        [InlineData(EffectSupport.CasterCurrentHealthDamage)]
+        [InlineData(EffectSupport.CasterMissingHealthDamage)]
+        [InlineData(EffectSupport.BestElementDamage)]
         public void The_effects_with_code_are_reported_as_such(int effectId)
         {
             Assert.Contains(effectId, EffectSupport.HandledDirectly);

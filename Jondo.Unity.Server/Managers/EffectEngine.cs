@@ -51,6 +51,10 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Los puntos de vida que se han devuelto, si el efecto cura.</summary>
         public int Cura { get; init; }
 
+        /// <summary>When non-zero, set this spell's cooldown to <see cref="TurnosDeRecarga"/>.</summary>
+        public int HechizoConRecarga { get; init; }
+        public int TurnosDeRecarga { get; init; }
+
         /// <summary>
         /// El daño de haberse chocado al empujar, YA CALCULADO PERO SIN APLICAR.
         ///
@@ -117,11 +121,19 @@ namespace Jondo.Unity.Server.Managers
         private static readonly HashSet<int> PorLoErosionado
             = new HashSet<int> { 1092, 1093, 1094, 1095, 1096, 1118, 1119, 1120, 1121, 1122 };
 
+        private static readonly HashSet<int> DanosEspeciales = new HashSet<int>
+        {
+            EffectSupport.CasterCurrentHealthDamage,
+            EffectSupport.CasterMissingHealthDamage,
+            EffectSupport.BestElementDamage,
+        };
+
         public static bool PegaSegunLoErosionado(int efecto) => PorLoErosionado.Contains(efecto);
 
         /// <summary>¿Este efecto pega?</summary>
         public static bool EsDeDano(int efecto)
-            => (efecto >= DanoPrimero && efecto <= DanoUltimo) || PegaSegunLoErosionado(efecto);
+            => (efecto >= DanoPrimero && efecto <= DanoUltimo) ||
+               PegaSegunLoErosionado(efecto) || DanosEspeciales.Contains(efecto);
 
         /// <summary>
         /// Los golpes que da un hechizo: uno por cada efecto de daño que le toque al objetivo.
@@ -142,8 +154,7 @@ namespace Jondo.Unity.Server.Managers
 
                 // El elemento lo dice el propio hechizo en su effectElement; si no lo trae, el
                 // catálogo por el número de efecto.
-                int elemento = efecto.Element >= 0 ? efecto.Element
-                                                   : DatabaseManager.EffectElement(efecto.EffectId);
+                int elemento = ElementoDelGolpe(quienLanza, efecto, combate.RoundNumber);
                 foreach (var sobre in AQuien(combate, quienLanza, objetivo, efecto, celdaApuntada))
                 {
                     if (sobre == null || !sobre.IsAlive) continue;
@@ -157,6 +168,31 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
             return fuera;
+        }
+
+        private static int ElementoDelGolpe(Fighter quienLanza, SpellEffect efecto, int ronda)
+        {
+            if (efecto.EffectId != EffectSupport.BestElementDamage)
+                return efecto.Element >= 0 ? efecto.Element
+                                           : DatabaseManager.EffectElement(efecto.EffectId);
+
+            var elementos = new[]
+            {
+                (Elemento: 1, Valor: quienLanza.Strength + quienLanza.Buffs.De(10, ronda)),
+                (Elemento: 2, Valor: quienLanza.Intelligence + quienLanza.Buffs.De(15, ronda)),
+                (Elemento: 3, Valor: quienLanza.Chance + quienLanza.Buffs.De(13, ronda)),
+                (Elemento: 4, Valor: quienLanza.Agility + quienLanza.Buffs.De(14, ronda)),
+            };
+
+            int mejorElemento = 1;
+            int mejorValor = int.MinValue;
+            foreach (var candidato in elementos)
+            {
+                if (candidato.Valor <= mejorValor) continue;
+                mejorElemento = candidato.Elemento;
+                mejorValor = candidato.Valor;
+            }
+            return mejorElemento;
         }
 
         /// <summary>
@@ -235,6 +271,8 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>"Invoca: #1". La plantilla del bicho viaja en el dado.</summary>
         public const int Invocar = EffectSupport.Summon;
+        public const int InvocarControlable = EffectSupport.ControllableSummon;
+        private const int FijarRecarga = EffectSupport.SetCooldown;
 
         /// <summary>
         /// Los efectos que colocan algo EN UNA CASILLA en vez de sobre alguien: una invocación,
@@ -244,12 +282,22 @@ namespace Jondo.Unity.Server.Managers
         ///   401  "Coloca un glifo de inicio de turno"
         ///   1091 "Coloca un glifo aura"
         /// </summary>
-        private static readonly HashSet<int> AlSuelo = new HashSet<int> { 181, 400, 401, 1091 };
+        private static readonly HashSet<int> AlSuelo = new HashSet<int>
+        {
+            EffectSupport.Summon, EffectSupport.ControllableSummon, 400, 401, 1091
+        };
 
         public static bool VaAlSuelo(int efecto) => AlSuelo.Contains(efecto);
 
         /// <summary>"Cura: #1 a #2". La inteligencia multiplica la base y la 49 se suma al final.</summary>
         private const int CuraFija = EffectSupport.Heal;
+        private static readonly HashSet<int> CurasFijas = new HashSet<int>
+        {
+            EffectSupport.Heal, EffectSupport.WaterHeal, EffectSupport.AirHeal,
+            EffectSupport.EarthHeal,
+        };
+
+        public static bool EsCuraFija(int efecto) => CurasFijas.Contains(efecto);
 
         /// <summary>La característica de Inteligencia, que multiplica las curas fijas.</summary>
         private const int Inteligencia = 15;
@@ -371,7 +419,7 @@ namespace Jondo.Unity.Server.Managers
                 // Igual que el daño, una cura con zona tira el dado una sola vez por lanzamiento.
                 // Todos los destinatarios parten del mismo número y sólo cambia la caída por su
                 // distancia al centro.
-                int tiradaCompartida = efecto.EffectId == CuraFija || efecto.EffectId == CuraPorcentual
+                int tiradaCompartida = EsCuraFija(efecto.EffectId) || efecto.EffectId == CuraPorcentual
                     ? DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value)
                     : int.MinValue;
 
@@ -439,6 +487,7 @@ namespace Jondo.Unity.Server.Managers
             bool alLanzador = false, aLosMios = false, aLosDeEnfrente = false, aLasInvocaciones = false;
             var pideEstado = new List<int>();
             var pideNoEstado = new List<int>();
+            int vidaMinima = -1, vidaMaxima = -1;
 
             foreach (var trozo in mascara.Split(','))
             {
@@ -465,6 +514,16 @@ namespace Jondo.Unity.Server.Managers
                 if (t.Length > 1 && (t[0] == 'e' || t[0] == 'E') && int.TryParse(t.Substring(1), out int estado))
                 {
                     if (t[0] == 'E') pideEstado.Add(estado); else pideNoEstado.Add(estado);
+                    continue;
+                }
+
+                // V50 / v50 are upper/lower target vitality bands. The Gobgob Glouton carries
+                // one health-based neutral damage formula for each side of that threshold.
+                if (t.Length > 1 && (t[0] == 'V' || t[0] == 'v') &&
+                    int.TryParse(t.Substring(1), out int porcentaje))
+                {
+                    if (t[0] == 'V') vidaMinima = porcentaje;
+                    else vidaMaxima = porcentaje;
                 }
             }
 
@@ -515,6 +574,9 @@ namespace Jondo.Unity.Server.Managers
                 bool vale = true;
                 foreach (int estado in pideEstado) if (!quien.Buffs.TieneEstado(estado)) vale = false;
                 foreach (int estado in pideNoEstado) if (quien.Buffs.TieneEstado(estado)) vale = false;
+                int vida = quien.MaxHP > 0 ? (int)((long)quien.CurrentHP * 100L / quien.MaxHP) : 0;
+                if (vidaMinima >= 0 && vida < vidaMinima) vale = false;
+                if (vidaMaxima >= 0 && vida >= vidaMaxima) vale = false;
                 if (vale) yield return quien;
             }
         }
@@ -573,7 +635,7 @@ namespace Jondo.Unity.Server.Managers
                                             int celdaApuntada = -1, int tiradaCompartida = int.MinValue)
         {
             // El daño lo lleva quien ya lo llevaba; aquí no se toca.
-            if (efecto.EffectId >= DanoPrimero && efecto.EffectId <= DanoUltimo) return null;
+            if (EsDeDano(efecto.EffectId)) return null;
 
             if (efecto.EffectId == Empujar || efecto.EffectId == Tirar ||
                 efecto.EffectId == Retroceder || efecto.EffectId == Avanzar)
@@ -690,7 +752,7 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
-            if (efecto.EffectId == Invocar)
+            if (efecto.EffectId == Invocar || efecto.EffectId == InvocarControlable)
             {
                 // "Invoca: #1", con la plantilla del bicho en el dado. No lo saca al tablero el
                 // motor: hace falta repartir identificador, rehacer el orden de turnos y avisar
@@ -701,6 +763,19 @@ namespace Jondo.Unity.Server.Managers
                     Sobre = sobre, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
                     Invoca = efecto.DiceNum,
+                };
+            }
+
+            if (efecto.EffectId == FijarRecarga)
+            {
+                int turnos = efecto.Value != 0 ? efecto.Value : efecto.DiceSide;
+                if (efecto.DiceNum <= 0 || turnos <= 0) return null;
+                return new Outcome
+                {
+                    Sobre = sobre, Efecto = efecto,
+                    HechizoOrigen = hechizo, NivelOrigen = grado,
+                    HechizoConRecarga = efecto.DiceNum,
+                    TurnosDeRecarga = turnos,
                 };
             }
 
@@ -827,7 +902,7 @@ namespace Jondo.Unity.Server.Managers
             // Las curaciones fijas. La tirada es una sola para toda la zona; después se aplica la
             // caída de la casilla, la Inteligencia, las curas planas y lo que multiplique las curas
             // recibidas por el objetivo. No intervienen ni la potencia ni los daños.
-            if (efecto.EffectId == CuraFija)
+            if (EsCuraFija(efecto.EffectId))
             {
                 int curaBase = tiradaCompartida != int.MinValue
                     ? tiradaCompartida
@@ -839,10 +914,16 @@ namespace Jondo.Unity.Server.Managers
                     : 0;
                 curaBase = ConLaCaidaDeLaZona(curaBase, efecto, lejos);
 
-                int inteligencia = quienLanza.Intelligence + quienLanza.Buffs.De(Inteligencia, ronda);
+                int caracteristicaDeCura = efecto.EffectId switch
+                {
+                    EffectSupport.WaterHeal => quienLanza.Chance + quienLanza.Buffs.De(13, ronda),
+                    EffectSupport.AirHeal => quienLanza.Agility + quienLanza.Buffs.De(14, ronda),
+                    EffectSupport.EarthHeal => quienLanza.Strength + quienLanza.Buffs.De(10, ronda),
+                    _ => quienLanza.Intelligence + quienLanza.Buffs.De(Inteligencia, ronda),
+                };
                 int curasFijas = quienLanza.Otra(Curas) + quienLanza.Buffs.De(Curas, ronda);
                 int multiplicador = sobre.Buffs.Multiplicador(CurasRecibidasPorCiento, ronda);
-                int puntos = CalcularCuraFija(curaBase, inteligencia, curasFijas, multiplicador);
+                int puntos = CalcularCuraFija(curaBase, caracteristicaDeCura, curasFijas, multiplicador);
                 puntos = Math.Min(puntos, Math.Max(0, sobre.MaxHP - sobre.CurrentHP));
                 if (puntos <= 0) return null;
 

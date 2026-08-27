@@ -2707,6 +2707,17 @@ namespace Jondo.Unity.Server.Handlers
                     }
                 }
 
+                if (c.HechizoConRecarga > 0 && c.TurnosDeRecarga > 0)
+                {
+                    c.Sobre.Recarga[c.HechizoConRecarga] = c.TurnosDeRecarga;
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
+                        Network.FightProtocol.BuildCooldowns(c.Sobre.Id, RecargasDe(c.Sobre))));
+                    Program.LogDebug($"[Combate] El efecto {c.Efecto.EffectId} fija la recarga de " +
+                                     $"{c.HechizoConRecarga} a {c.TurnosDeRecarga} ronda(s) " +
+                                     $"sobre {c.Sobre.Id}.");
+                    continue;
+                }
+
                 // Las curaciones.
                 if (c.Cura > 0)
                 {
@@ -3127,6 +3138,20 @@ namespace Jondo.Unity.Server.Handlers
                 Program.LogDebug($"[Combate] El efecto {efecto.EffectId} pega el {sacadoDelDado}% de " +
                                  $"los {target.VidaErosionada} erosionados de {target.Id}: {baseDamage}.");
             }
+            else if (efecto.EffectId == EffectSupport.CasterCurrentHealthDamage)
+            {
+                baseDamage = caster.CurrentHP * sacadoDelDado / 100;
+                Program.LogDebug($"[Combate] El efecto {efecto.EffectId} pega el {sacadoDelDado}% " +
+                                 $"de la vida actual de {caster.Id}: {baseDamage}.");
+            }
+            else if (efecto.EffectId == EffectSupport.CasterMissingHealthDamage)
+            {
+                int missing = Math.Max(0, caster.MaxHP - caster.CurrentHP);
+                baseDamage = missing * sacadoDelDado / 100;
+                Program.LogDebug($"[Combate] El efecto {efecto.EffectId} pega el {sacadoDelDado}% " +
+                                 $"de los {missing} puntos de vida que le faltan a {caster.Id}: " +
+                                 $"{baseDamage}.");
+            }
 
             // Y lo que le hayan sumado a ESE hechizo por embrujo: el efecto 293, "+#3 de daños
             // básicos". Flecha Helada se lo pone a sí misma, así que la segunda vez que se lanza
@@ -3509,8 +3534,16 @@ namespace Jondo.Unity.Server.Handlers
                 int monsterGrade = monster.SpellGrades.TryGetValue(spell, out int g) ? g : 1;
 
                 var data = DatabaseManager.GetSpellCombatData(spell, monsterGrade);
-                if (data == null) continue;
-                if (data.APCost <= 0) continue;
+                if (data == null)
+                {
+                    Program.LogDebug($"[Combate] IA {monster.Id} omite {spell}: no hay datos de combate.");
+                    continue;
+                }
+                if (data.APCost <= 0)
+                {
+                    Program.LogDebug($"[Combate] IA {monster.Id} omite {spell}: coste de PA {data.APCost}.");
+                    continue;
+                }
 
                 // CUÁNTAS VECES SE PUEDE LANZAR. El cero quiere decir «sin límite», y entonces
                 // manda lo que dé el bolsillo. Lanzando uno solo por hechizo, que es lo que se
@@ -3520,19 +3553,35 @@ namespace Jondo.Unity.Server.Handlers
 
                 for (int vez = 0; vez < tope; vez++)
                 {
-                    if (data.APCost > monster.CurrentAP) break;
+                    if (data.APCost > monster.CurrentAP)
+                    {
+                        Program.LogDebug($"[Combate] IA {monster.Id} no puede lanzar {spell}: " +
+                                         $"cuesta {data.APCost} PA y le quedan {monster.CurrentAP}.");
+                        break;
+                    }
                     if (lanzados >= TopeDeLanzamientosPorTurno) break;
                     if (!prey.IsAlive) break;
 
                     // A QUIÉN APUNTA ESTE HECHIZO. No tiene por qué ser la presa, y apuntarlo todo
                     // a ella es lo que hacía que un jalamutín te lanzara su curación a la cara.
                     var objetivo = ObjetivoDe(fight, monster, spell, monsterGrade, prey, data);
-                    if (objetivo == null || !objetivo.IsAlive) break;
+                    if (objetivo == null || !objetivo.IsAlive)
+                    {
+                        Program.LogDebug($"[Combate] IA {monster.Id} no encuentra objetivo válido " +
+                                         $"para {spell}.");
+                        break;
+                    }
 
                     // Y el alcance se mide contra el objetivo ELEGIDO, no contra la presa. Ésa era
                     // la línea que dejaba muertos los hechizos de alcance cero.
                     int lejos = CellDistance(monster.CellId, objetivo.CellId);
-                    if (lejos < data.MinRange || lejos > data.MaxRange) break;
+                    if (lejos < data.MinRange || lejos > data.MaxRange)
+                    {
+                        Program.LogDebug($"[Combate] IA {monster.Id} no lanza {spell}: objetivo " +
+                                         $"a {lejos}, alcance {data.MinRange}-{data.MaxRange}, " +
+                                         $"PM restantes {monster.CurrentMP}.");
+                        break;
+                    }
 
                     // Y LA LINEA DE VISION, que el turno del monstruo no miraba.
                     //
@@ -3545,6 +3594,8 @@ namespace Jondo.Unity.Server.Handlers
                         !MapGeometry.HasLineOfSight(monster.CellId, objetivo.CellId,
                                                     MapManager.GetLosBlockers(fight.ArenaMapId)))
                     {
+                        Program.LogDebug($"[Combate] IA {monster.Id} no lanza {spell}: ligne de vue " +
+                                         $"bloquée de {monster.CellId} vers {objetivo.CellId}.");
                         break;
                     }
 
@@ -3596,6 +3647,13 @@ namespace Jondo.Unity.Server.Handlers
                         Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
                                                                Network.FightProtocol.ActionSequence)));
                 }
+            }
+
+            if (lanzados == 0)
+            {
+                Program.LogDebug($"[Combate] IA {monster.Id} termine sans lancer de sort: " +
+                                 $"PA {monster.CurrentAP}/{monster.MaxAP}, PM " +
+                                 $"{monster.CurrentMP}/{monster.MaxMP}, case {monster.CellId}.");
             }
 
             if (await CheckFightOverAsync(stream, fight)) return;
@@ -3695,7 +3753,8 @@ namespace Jondo.Unity.Server.Handlers
                     else if (t == "a" || t == "g") aLosSuyos = true;
                     else if (t == "C") alLanzador = true;
 
-                    if (efecto.EffectId == EffectSupport.Heal && (t == "a" || t == "g"))
+                    if (Managers.EffectEngine.EsCuraFija(efecto.EffectId) &&
+                        (t == "a" || t == "g"))
                         curaALosSuyos = true;
                 }
             }
@@ -3722,7 +3781,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             foreach (var efecto in Managers.SpellEffects.De(hechizo, grado))
             {
-                if (efecto.EffectId != EffectSupport.Heal) continue;
+                if (!Managers.EffectEngine.EsCuraFija(efecto.EffectId)) continue;
                 foreach (var trozo in (efecto.TargetMask ?? "").Split(','))
                 {
                     string t = trozo.Trim().TrimStart('*');
