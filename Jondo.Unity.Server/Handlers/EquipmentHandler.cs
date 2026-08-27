@@ -23,10 +23,8 @@ namespace Jondo.Unity.Server.Handlers
     /// En cada hueco cabe una cosa, y eso lo hace cumplir este handler: lo que ya estuviera puesto
     /// sale a la bolsa con su propio ivq antes de que entre lo nuevo.
     ///
-    /// One thing this does NOT do yet is change the characteristics. Equipment adds its bonus in
-    /// field 7 of each entry of kub, and filling that in means knowing which item the uid is,
-    /// which means the inventory coming out of the database instead of out of the capture. Until
-    /// then the item moves and the sheet does not follow.
+    /// Equipment changes also update the session cache used to build the characteristic sheet, so
+    /// bonuses take effect immediately instead of waiting for the next character selection.
     /// </summary>
     public static class EquipmentHandler
     {
@@ -61,6 +59,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 evicted.Position = Bag;
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag, SessionContext.State.CharacterId);
+                SessionContext.State.RemoveEquippedItem(evicted.Uid);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
@@ -75,6 +74,7 @@ namespace Jondo.Unity.Server.Handlers
             // it is an item we actually hold.
             DatabaseManager.SaveItemPosition(uid, position, SessionContext.State.CharacterId);
             bool known = Managers.Equipment.Move(uid, position);
+            if (known) RefreshCachedBonuses(uid, position);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, position).Build()));
@@ -118,6 +118,28 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Equipment] Item {uid} -> position {position}"
                               + (position == Bag ? " (taken off)." : ".")
                               + (known ? "" : " Not one of ours; the sheet is left alone."));
+        }
+
+        /// <summary>Keeps the characteristic cache aligned with the inventory's item position.</summary>
+        internal static void RefreshCachedBonuses(long uid, int position)
+        {
+            var moved = Managers.Equipment.ByUid(uid);
+            if (moved == null) return;
+
+            if (!Managers.Equipment.IsWorn(position))
+            {
+                SessionContext.State.RemoveEquippedItem(uid);
+                return;
+            }
+
+            var equipped = new EquippedItemInfo { Slot = position };
+            foreach (var effect in moved.Effects)
+            {
+                int value = (int)Math.Clamp(effect.Sheet, int.MinValue, int.MaxValue);
+                equipped.Stats.TryGetValue(effect.Effect, out int previous);
+                equipped.Stats[effect.Effect] = previous + value;
+            }
+            SessionContext.State.SetEquippedItem(uid, equipped);
         }
     }
 }
