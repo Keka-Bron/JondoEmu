@@ -12,22 +12,21 @@ namespace Jondo.Unity.Tests.Combat
     /// <see cref="EffectSupport"/>, so an effect gaining an implementation without being added here
     /// would not compile.
     ///
-    /// Measured over the 872 effects in <c>world.db</c>: 20 have code, 205 are applied as a
-    /// characteristic, and <b>647 do nothing at all</b> — and 15,841 of the 34,823 spell levels
-    /// carry at least one of those 647.
+    /// Effect 108 is also kept here explicitly because its catalogue row alone cannot reveal that
+    /// the engine now knows how to heal.
     /// </remarks>
     public class EffectSupportTests
     {
         /// <summary>
-        /// Effect 108 is healing, and it does nothing. The card says it heals, the animation plays,
-        /// and nobody's life goes up. It is on 751 spell levels.
+        /// Effect 108 has no characteristic and belongs to category 2, but direct support wins over
+        /// both catalogue fields. It occurs on 751 spell levels.
         /// </summary>
         [Fact]
-        public void Healing_is_still_not_implemented_and_says_so()
+        public void Fixed_healing_is_implemented_despite_its_catalogue_row()
         {
-            // Its catalogue row carries no characteristic, which is exactly why it falls through.
-            Assert.Equal(EffectSupportKind.PanelOnly, EffectSupport.Classify(108, 0, 2));
-            Assert.DoesNotContain(108, EffectSupport.HandledDirectly);
+            Assert.Equal(EffectSupportKind.Direct,
+                         EffectSupport.Classify(EffectSupport.Heal, 0, 2));
+            Assert.Contains(EffectSupport.Heal, EffectSupport.HandledDirectly);
         }
 
         [Theory]
@@ -39,6 +38,7 @@ namespace Jondo.Unity.Tests.Combat
         [InlineData(EffectSupport.RemoveState)]
         [InlineData(EffectSupport.CastSpell)]
         [InlineData(EffectSupport.Summon)]
+        [InlineData(EffectSupport.Heal)]
         [InlineData(EffectSupport.HealPercent)]
         [InlineData(EffectSupport.Kill)]
         public void The_effects_with_code_are_reported_as_such(int effectId)

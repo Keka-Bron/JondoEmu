@@ -26,10 +26,9 @@ namespace Jondo.Unity.World.Combat
     /// </summary>
     /// <remarks>
     /// This is the information the architecture document calls the most useful thing in the whole
-    /// spell module, and the reason is effect 108 — healing. Its catalogue row carries no
-    /// characteristic, so it falls through to the panel-only branch: the spell card says the spell
-    /// heals, the animation plays, and nobody's life goes up. Nothing anywhere says so, and until
-    /// now the only way to know was to read <c>EffectEngine.cs</c>.
+    /// spell module. Effect 108 — healing — is the reason this list matters: its catalogue row
+    /// carries no characteristic, so it used to fall through to the panel-only branch even though
+    /// the spell card said that it healed. Keeping it here makes the implementation explicit.
     ///
     /// There are two ways an effect can work, and they are not the same:
     ///
@@ -72,6 +71,9 @@ namespace Jondo.Unity.World.Combat
         /// <summary>Summon a creature.</summary>
         public const int Summon = 181;
 
+        /// <summary>Heal a fixed amount, scaled by Intelligence and the Heals characteristic.</summary>
+        public const int Heal = 108;
+
         /// <summary>Heal a percentage of maximum life.</summary>
         public const int HealPercent = 1109;
 
@@ -103,7 +105,7 @@ namespace Jondo.Unity.World.Combat
             {
                 Push, Pull, StepBack, StepForward,
                 AddState, RemoveState,
-                CastSpell, Summon, HealPercent, Kill,
+                CastSpell, Summon, Heal, HealPercent, Kill,
             };
 
             for (int damage = FirstDamage; damage <= LastDamage; damage++) known.Add(damage);

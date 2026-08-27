@@ -261,9 +261,9 @@ motor que no tiene ni un hechizo escrito a mano: todo sale de los datos.
 
 **Falta.** Editar el `EffectsJson` con una interfaz en vez de a mano, y —lo realmente útil— una
 vista que diga **qué efectos sabe aplicar el motor y cuáles caen en la rama de «sólo para el
-panel»**. Hoy eso sólo se sabe leyendo `EffectEngine.cs`, y es la información que decide si un
-hechizo funciona de verdad. El efecto 108, la curación, es el ejemplo: parece que funciona y no cura
-a nadie.
+panel»**. La clasificación compartida de `EffectSupport` evita tener que deducirlo leyendo
+`EffectEngine.cs`. El efecto 108, la curación, fue el primer caso importante: el catálogo parecía
+válido pero no bastaba para aplicarlo, así que ahora figura como efecto directo.
 
 Un simulador —lanzar un hechizo contra un objetivo de prueba y ver las consecuencias sin montar un
 combate— vale más que el propio editor.

@@ -248,8 +248,42 @@ namespace Jondo.Unity.Server.Managers
 
         public static bool VaAlSuelo(int efecto) => AlSuelo.Contains(efecto);
 
+        /// <summary>"Cura: #1 a #2". La inteligencia multiplica la base y la 49 se suma al final.</summary>
+        private const int CuraFija = EffectSupport.Heal;
+
+        /// <summary>La característica de Inteligencia, que multiplica las curas fijas.</summary>
+        private const int Inteligencia = 15;
+
+        /// <summary>La característica 49, «Curas»: puntos planos añadidos después de la Inteligencia.</summary>
+        private const int Curas = 49;
+
+        /// <summary>El efecto 1159, «Curas recibidas x#1%».</summary>
+        private const int CurasRecibidasPorCiento = 1159;
+
         /// <summary>"Cura: #1% de los PdV máximos". El dado es el porcentaje.</summary>
         private const int CuraPorcentual = EffectSupport.HealPercent;
+
+        /// <summary>
+        /// Convierte la tirada de un efecto 108 en puntos de vida.
+        ///
+        ///   cura = base × (100 + inteligencia) / 100 + curas fijas
+        ///
+        /// La potencia y los daños no intervienen. El multiplicador de curas recibidas va al final,
+        /// igual que el multiplicador de daños sufridos en la fórmula de daño.
+        /// </summary>
+        public static int CalcularCuraFija(int curaBase, int inteligencia, int curasFijas,
+                                          int multiplicadorRecibido = 100)
+        {
+            if (curaBase <= 0 || multiplicadorRecibido <= 0) return 0;
+
+            long porcentaje = Math.Max(0L, 100L + inteligencia);
+            long calculada = (long)curaBase * porcentaje / 100L + curasFijas;
+            if (calculada <= 0) return 0;
+
+            double multiplicada = calculada * (multiplicadorRecibido / 100.0);
+            if (multiplicada >= int.MaxValue) return int.MaxValue;
+            return Math.Max(0, (int)Math.Round(multiplicada));
+        }
 
         /// <summary>Los dos números de característica de los puntos.</summary>
         /// <summary>
@@ -334,6 +368,13 @@ namespace Jondo.Unity.Server.Managers
                 }
                 if (!leToca) continue;
 
+                // Igual que el daño, una cura con zona tira el dado una sola vez por lanzamiento.
+                // Todos los destinatarios parten del mismo número y sólo cambia la caída por su
+                // distancia al centro.
+                int tiradaCompartida = efecto.EffectId == CuraFija || efecto.EffectId == CuraPorcentual
+                    ? DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value)
+                    : int.MinValue;
+
                 // Lo que se pone EN EL SUELO no busca a nadie: va a la casilla, esté quien esté.
                 //
                 // Aquí se caían las balizas. El efecto 181 lleva máscara "a,A" y zona de punto, y
@@ -344,7 +385,7 @@ namespace Jondo.Unity.Server.Managers
                 if (VaAlSuelo(efecto.EffectId))
                 {
                     var puesta = Aplicar(combate, quienLanza, quienLanza, hechizo, grado, efecto,
-                                         ronda, celdaApuntada);
+                                         ronda, celdaApuntada, tiradaCompartida);
                     if (puesta != null) fuera.Add(puesta);
                     continue;
                 }
@@ -358,7 +399,7 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var sobre in AQuien(combate, quienLanza, objetivo, efecto, celdaApuntada))
                 {
                     var hecho = Aplicar(combate, quienLanza, sobre, hechizo, grado, efecto, ronda,
-                                        celdaApuntada);
+                                        celdaApuntada, tiradaCompartida);
                     if (unaSolaVez)
                     {
                         if (hecho != null) fuera.Add(hecho);
@@ -529,7 +570,7 @@ namespace Jondo.Unity.Server.Managers
 
         private static Outcome Aplicar(FightInstance combate, Fighter quienLanza, Fighter sobre,
                                             int hechizo, int grado, SpellEffect efecto, int ronda,
-                                            int celdaApuntada = -1)
+                                            int celdaApuntada = -1, int tiradaCompartida = int.MinValue)
         {
             // El daño lo lleva quien ya lo llevaba; aquí no se toca.
             if (efecto.EffectId >= DanoPrimero && efecto.EffectId <= DanoUltimo) return null;
@@ -783,15 +824,60 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
+            // Las curaciones fijas. La tirada es una sola para toda la zona; después se aplica la
+            // caída de la casilla, la Inteligencia, las curas planas y lo que multiplique las curas
+            // recibidas por el objetivo. No intervienen ni la potencia ni los daños.
+            if (efecto.EffectId == CuraFija)
+            {
+                int curaBase = tiradaCompartida != int.MinValue
+                    ? tiradaCompartida
+                    : DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value);
+                if (curaBase <= 0) return null;
+
+                int lejos = celdaApuntada >= 0
+                    ? Jondo.Unity.World.Maps.MapGeometry.Distance(celdaApuntada, sobre.CellId)
+                    : 0;
+                curaBase = ConLaCaidaDeLaZona(curaBase, efecto, lejos);
+
+                int inteligencia = quienLanza.Intelligence + quienLanza.Buffs.De(Inteligencia, ronda);
+                int curasFijas = quienLanza.Otra(Curas) + quienLanza.Buffs.De(Curas, ronda);
+                int multiplicador = sobre.Buffs.Multiplicador(CurasRecibidasPorCiento, ronda);
+                int puntos = CalcularCuraFija(curaBase, inteligencia, curasFijas, multiplicador);
+                puntos = Math.Min(puntos, Math.Max(0, sobre.MaxHP - sobre.CurrentHP));
+                if (puntos <= 0) return null;
+
+                sobre.CurrentHP += puntos;
+                return new Outcome
+                {
+                    Sobre = sobre, Efecto = efecto,
+                    HechizoOrigen = hechizo, NivelOrigen = grado,
+                    Cura = puntos,
+                };
+            }
+
             // Las curaciones por tanto por ciento de la vida máxima. El dado es el PORCENTAJE, no
             // los puntos: la Baliza de Supervivencia cura un siete por ciento del tope de quien
-            // recibe, y en el cable eso viaja ya resuelto en puntos.
+            // recibe, y en el cable eso viaja ya resuelto en puntos. No reciben Inteligencia ni
+            // curas fijas, pero sí la caída de zona y los multiplicadores de curas recibidas.
             if (efecto.EffectId == CuraPorcentual)
             {
-                int cuanto = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
+                int cuanto = tiradaCompartida != int.MinValue
+                    ? tiradaCompartida
+                    : DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value);
                 if (cuanto <= 0) return null;
 
-                int puntos = Math.Max(1, sobre.MaxHP * cuanto / 100);
+                int lejos = celdaApuntada >= 0
+                    ? Jondo.Unity.World.Maps.MapGeometry.Distance(celdaApuntada, sobre.CellId)
+                    : 0;
+                cuanto = ConLaCaidaDeLaZona(cuanto, efecto, lejos);
+                if (cuanto <= 0) return null;
+
+                long porVida = Math.Max(1L, (long)sobre.MaxHP * cuanto / 100L);
+                int multiplicador = sobre.Buffs.Multiplicador(CurasRecibidasPorCiento, ronda);
+                double multiplicada = porVida * (Math.Max(0, multiplicador) / 100.0);
+                int puntos = multiplicada >= int.MaxValue
+                    ? int.MaxValue
+                    : Math.Max(0, (int)Math.Round(multiplicada));
                 puntos = Math.Min(puntos, Math.Max(0, sobre.MaxHP - sobre.CurrentHP));
                 if (puntos <= 0) return null;
 

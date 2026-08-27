@@ -776,6 +776,7 @@ namespace Jondo.Unity.Server.Handlers
             Poner(27, sabiduria / PorCadaDiez);   // esquiva de puntos de acción
             Poner(28, sabiduria / PorCadaDiez);   // esquiva de puntos de movimiento
             Poner(12, GameState.StatWisdom);      // sabiduría
+            Poner(49, 0);                         // curas fijas
             Poner(26, 0);                         // invocaciones
             Poner(50, 0);                         // reenvío
             Poner(75, 0);                         // erosión
