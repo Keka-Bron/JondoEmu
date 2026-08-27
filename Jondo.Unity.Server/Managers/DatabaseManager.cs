@@ -18,7 +18,59 @@ namespace Jondo.Unity.Server
         {
             Console.WriteLine("[SQLite] Initializing databases...");
 
-            // 1. Initialize auth.db
+            // 1. Repair world.db before anything else touches it.
+            //
+            // Este bloque estaba DESPUES de la copia de seguridad, y ese orden se cargaba la
+            // auto-reparacion que ya funcionaba: DatabaseBackups.CreateBeforeMigration() abre las
+            // dos bases para verificar la copia, asi que con un world.db corrupto, truncado o a
+            // medio extraer reventaba y abortaba Initialize() entero -y el servidor, que hasta hoy
+            // se curaba solo sacandola otra vez de datos/world.zip, dejaba de arrancar-.
+            //
+            // Primero se repara, luego se copia, y luego se migra. Asi la copia se hace sobre una
+            // base sana y sigue estando delante de toda migracion, que es lo que la PR queria.
+            string dbPath = Paths.WorldDb;
+            bool needsExtraction = !File.Exists(dbPath);
+            if (!needsExtraction)
+            {
+                try
+                {
+                    using (var checkConn = new SqliteConnection(WorldConnectionString))
+                    {
+                        checkConn.Open();
+                        using var checkCmd = checkConn.CreateCommand();
+                        checkCmd.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='ItemTemplates';";
+                        long hasItemTemplates = Convert.ToInt64(checkCmd.ExecuteScalar() ?? 0L);
+                        if (hasItemTemplates == 0) needsExtraction = true;
+                        checkConn.Close();
+                    }
+                    SqliteConnection.ClearAllPools();
+                }
+                catch { needsExtraction = true; }
+            }
+
+            if (needsExtraction)
+            {
+                string zipPath = Paths.WorldZip;
+                if (File.Exists(zipPath))
+                {
+                    try
+                    {
+                        SqliteConnection.ClearAllPools();
+                        Console.WriteLine("[SQLite] Auto-extracting full world.db from world.zip...");
+                        System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, Path.GetDirectoryName(Paths.WorldDb)!, true);
+                        Console.WriteLine("[SQLite] Successfully extracted world.db from world.zip.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[SQLite] Zip extraction skipped (file in use or active): {ex.Message}");
+                    }
+                }
+            }
+
+            // 2. And only now the backup, with both databases sound and before a single migration.
+            DatabaseBackups.CreateBeforeMigration();
+
+            // 3. Initialize auth.db
             using (var authConnection = new SqliteConnection(AuthConnectionString))
             {
                 authConnection.Open();
@@ -173,46 +225,6 @@ namespace Jondo.Unity.Server
                 duenos.Parameters.AddWithValue("$admin", Roles.Administrador);
                 int promovidos = duenos.ExecuteNonQuery();
                 if (promovidos > 0) Console.WriteLine($"[DatabaseManager] {promovidos} cuenta(s) puestas como administrador.");
-            }
-
-            // 2. Initialize world.db (Auto-extract from world.zip if missing or lacking ItemTemplates)
-            string dbPath = Paths.WorldDb;
-            bool needsExtraction = !File.Exists(dbPath);
-            if (!needsExtraction)
-            {
-                try
-                {
-                    using (var checkConn = new SqliteConnection(WorldConnectionString))
-                    {
-                        checkConn.Open();
-                        using var checkCmd = checkConn.CreateCommand();
-                        checkCmd.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='ItemTemplates';";
-                        long hasItemTemplates = Convert.ToInt64(checkCmd.ExecuteScalar() ?? 0L);
-                        if (hasItemTemplates == 0) needsExtraction = true;
-                        checkConn.Close();
-                    }
-                    SqliteConnection.ClearAllPools();
-                }
-                catch { needsExtraction = true; }
-            }
-
-            if (needsExtraction)
-            {
-                string zipPath = Paths.WorldZip;
-                if (File.Exists(zipPath))
-                {
-                    try
-                    {
-                        SqliteConnection.ClearAllPools();
-                        Console.WriteLine("[SQLite] Auto-extracting full world.db from world.zip...");
-                        System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, Path.GetDirectoryName(Paths.WorldDb)!, true);
-                        Console.WriteLine("[SQLite] Successfully extracted world.db from world.zip.");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[SQLite] Zip extraction skipped (file in use or active): {ex.Message}");
-                    }
-                }
             }
 
             using (var worldConnection = new SqliteConnection(WorldConnectionString))

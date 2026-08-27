@@ -106,6 +106,7 @@ namespace Jondo.Unity.Launcher
         public static string WorldDb => ResolveWritable("world.db", DatabaseFolder);
         public static string AuthDb => ResolveWritable("auth.db", DatabaseFolder);
         public static string WorldZip => Resolve("world.zip");
+        public static string DatabaseBackupsDir => Path.Combine(Root, DatabaseFolder, "backups");
 
         /// <summary>
         /// La base de diagnóstico donde se apuntan los paquetes que no sabemos atender.
