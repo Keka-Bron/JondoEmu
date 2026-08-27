@@ -425,13 +425,25 @@ namespace Jondo.Unity.Server.Managers
         /// that forgot would show an inventory that only fills in after a relog.
         /// </remarks>
         public static async Task<bool> GiveAsync(NetworkStream stream, int gid, int quantity)
+            => await GrantAsync(stream, gid, quantity) != null;
+
+        /// <summary>
+        /// The same, giving back what was created instead of only whether it worked.
+        /// </summary>
+        /// <remarks>
+        /// For the callers that have to say WHAT they handed over — the live administration API
+        /// answers with the uid and the effects — and it is the same method rather than a second
+        /// one so that the two can never disagree about whether the client was told.
+        /// </remarks>
+        public static async Task<HavenBagStore.StoredItem?> GrantAsync(NetworkStream stream,
+                                                                       int gid, int quantity)
         {
-            if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return false;
+            if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return null;
 
             long uid = DatabaseManager.NextItemUid();
             if (!DatabaseManager.InsertCharacterItem(uid, SessionContext.State.CharacterId, gid, quantity,
                                                      Bag, effects))
-                return false;
+                return null;
 
             Add(uid, gid, quantity, Bag, effects);
 
@@ -450,16 +462,17 @@ namespace Jondo.Unity.Server.Managers
             }
             GameState.AddInventoryItem(legacy);
 
+            var granted = new HavenBagStore.StoredItem
+            {
+                Uid = uid,
+                Gid = gid,
+                Quantity = quantity,
+                Effects = effects,
+            };
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3,
-                    new HavenBagStore.StoredItem
-                    {
-                        Uid = uid,
-                        Gid = gid,
-                        Quantity = quantity,
-                        Effects = effects,
-                    })));
-            return true;
+                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, granted)));
+            return granted;
         }
 
         /// <summary>

@@ -138,7 +138,7 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ **17,113 spells** across **34,823 spell levels**; **638 character heads**
 - ✅ **539 titles** and **167 ornaments**, applied, persisted and carried in the map actor block
 - ✅ Commands — `.teleport`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`
-- ✅ **Live administration over HTTP** — `POST /api/personaje` sets base characteristics and kamas on a connected character, persists them and refreshes the sheet without a reconnect. Administrator role only, loopback only, and it takes the session's turn so it cannot cut across a fight
+- ✅ **Live administration over HTTP** — `POST /api/personaje` sets characteristics, kamas and level, grants items or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only, and serialized with the target session
 - 🟡 `.level` does not refresh the in-fight spell bar
 
 ### 👕 Appearances
