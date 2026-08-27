@@ -513,12 +513,13 @@ namespace Jondo.Unity.Server.Handlers
                     Network.FightProtocol.BuildFightOption(option, fight.FightId)));
             }
 
-            var everyone = new List<long>();
-            foreach (var fighter in fight.Team0) everyone.Add(fighter.Id);
-            foreach (var fighter in fight.Team1) everyone.Add(fighter.Id);
+            // jzc identifies the current vignette by its index in this list. It must therefore be
+            // the exact engine turn order, not insertion order by team.
+            var everyone = CombatantsInTurnOrder(fight);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
                 Network.FightProtocol.BuildTeams(everyone)));
+            Program.LogDebug($"[FightHandler] jzu initial order: [{string.Join(",", everyone)}].");
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwq,
                 Network.FightProtocol.BuildPlacementDone()));
@@ -2436,12 +2437,30 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task ReenviarLaListaAsync(NetworkStream stream, FightInstance fight)
         {
-            var todos = new List<long>();
-            foreach (var f in fight.Team0) if (f.IsAlive) todos.Add(f.Id);
-            foreach (var f in fight.Team1) if (f.IsAlive) todos.Add(f.Id);
+            var todos = CombatantsInTurnOrder(fight);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
                 Network.FightProtocol.BuildTeams(todos)));
+            Program.LogDebug($"[FightHandler] jzu refreshed order: [{string.Join(",", todos)}].");
+        }
+
+        /// <summary>
+        /// The list indexed by jzc's turn-position field. Keeping it as one helper prevents the
+        /// initial list and the list resent after a summon/death from drifting apart again.
+        /// </summary>
+        internal static List<long> CombatantsInTurnOrder(FightInstance fight)
+        {
+            var result = fight.TurnOrder.Where(f => f.IsAlive).Select(f => f.Id).ToList();
+            var present = new HashSet<long>(result);
+
+            // A passive summon has no turn index but still has to remain registered client-side.
+            // Put such board actors after every indexed turn fighter so they cannot shift jzc's
+            // positions while remaining visible and targetable.
+            foreach (var fighter in fight.Team0.Concat(fight.Team1))
+            {
+                if (fighter.IsAlive && present.Add(fighter.Id)) result.Add(fighter.Id);
+            }
+            return result;
         }
 
         /// <summary>
