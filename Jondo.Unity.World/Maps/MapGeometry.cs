@@ -87,6 +87,18 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
+        /// Whether two cells share one of the grid's two combat axes. Spells whose
+        /// <c>castInLine</c> flag is set may only be cast between cells for which this returns
+        /// true. The transformed coordinates are important here: comparing raw cell rows or
+        /// columns does not describe a straight line on the isometric board.
+        /// </summary>
+        public static bool AreAligned(int cellA, int cellB)
+        {
+            if (!IsValid(cellA) || !IsValid(cellB)) return false;
+            return PointX[cellA] == PointX[cellB] || PointY[cellA] == PointY[cellB];
+        }
+
+        /// <summary>
         /// Is there line of sight between two cells? Walks the segment joining their centers and
         /// fails if it crosses any cell flagged as opaque. The endpoints do not count: caster and
         /// target never block themselves.

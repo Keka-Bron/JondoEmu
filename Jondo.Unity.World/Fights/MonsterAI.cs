@@ -44,6 +44,11 @@ namespace Jondo.Unity.World.Fights
             public int BaseDamageMax { get; set; } = 10;
             public int Element { get; set; } = 0;
             public int MaxCastPerTurn { get; set; } = 2;
+            public int MaxCastPerTarget { get; set; }
+            public int MinCastInterval { get; set; }
+
+            /// <summary>Whether the target has to share one of the caster's grid axes.</summary>
+            public bool CastInLine { get; set; }
 
             /// <summary>Whether the spell requires line of sight to the target.</summary>
             public bool NeedsLineOfSight { get; set; } = true;
@@ -214,6 +219,14 @@ namespace Jondo.Unity.World.Fights
             {
                 if (dist >= spell.MinRange && dist <= spell.MaxRange && monster.CurrentAP >= spell.APCost)
                 {
+                    if (SpellCastRules.Check(
+                            monster, spell.SpellId, target.Id, monster.CellId, target.CellId,
+                            spell.MaxCastPerTurn, spell.MaxCastPerTarget, spell.MinCastInterval,
+                            spell.CastInLine) != SpellCastRules.Rejection.None)
+                    {
+                        continue;
+                    }
+
                     // A spell that requires line of sight does not go through walls. This is what
                     // made the piou fire from the far side of the arena's low wall.
                     if (spell.NeedsLineOfSight &&
@@ -243,6 +256,8 @@ namespace Jondo.Unity.World.Fights
 
                     monster.AccumulatedApLoss += spell.APCost;
                     monster.CurrentAP -= spell.APCost;
+                    SpellCastRules.Register(monster, spell.SpellId, target.Id,
+                                            spell.MinCastInterval);
 
                     return (spell.SpellId, damage);
                 }
@@ -272,6 +287,10 @@ namespace Jondo.Unity.World.Fights
                 bool canCastAny = spells.Any(s =>
                     distToTarget >= s.MinRange && distToTarget <= s.MaxRange &&
                     s.APCost <= monster.CurrentAP &&
+                    SpellCastRules.Check(
+                        monster, s.SpellId, target.Id, c, target.CellId,
+                        s.MaxCastPerTurn, s.MaxCastPerTarget, s.MinCastInterval,
+                        s.CastInLine) == SpellCastRules.Rejection.None &&
                     (!s.NeedsLineOfSight || MapGeometry.HasLineOfSight(c, target.CellId, losBlockers)));
 
                 if (canCastAny)

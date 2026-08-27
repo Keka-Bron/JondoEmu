@@ -196,7 +196,7 @@ See `docs/jondo-coin.md`.
 - ✅ Loot, victory and defeat screens, experience over **1,889 levels**, level-ups and group respawn
 - ✅ Monster AI: a target chosen **per spell**, range measured against that target, walking to the spell's own range band, `MaxCastPerTurn` honoured, breadth-first pathing around obstacles, and line of sight
 - 🟡 Weapon strikes apply damage and AP cost; the slash animation does not
-- 🟡 `MaxCastPerTarget`, minimum cast interval and cast-in-line are enforced for the player, not for monsters
+- ✅ `MaxCastPerTarget`, minimum cast interval and cast-in-line are enforced for players and monsters
 - ✅ **Push and collision damage** — being shoved into a wall, a hole or another fighter costs health, and the fighter acting as the wall takes half
 - ❌ AP/MP dodge rolls, shields, lock and tackle in melee
 

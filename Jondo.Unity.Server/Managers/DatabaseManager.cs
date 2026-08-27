@@ -4090,7 +4090,7 @@ namespace Jondo.Unity.Server
             connection.Open();
 
             var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT Id, APCost, MinRange, MaxRange, EffectsJson, CastTestLos, CastInLine, MaxCastPerTurn, MaxCastPerTarget, CriticalHitProbability, CriticalEffectsJson FROM SpellLevels WHERE SpellId = $sid AND Grade = $g LIMIT 1;";
+            cmd.CommandText = "SELECT Id, APCost, MinRange, MaxRange, EffectsJson, CastTestLos, CastInLine, MaxCastPerTurn, MaxCastPerTarget, CriticalHitProbability, CriticalEffectsJson, MinCastInterval FROM SpellLevels WHERE SpellId = $sid AND Grade = $g LIMIT 1;";
             cmd.Parameters.AddWithValue("$sid", spellId);
             cmd.Parameters.AddWithValue("$g", grade);
 
@@ -4119,7 +4119,8 @@ namespace Jondo.Unity.Server
                 CastInLine = !reader.IsDBNull(6) && reader.GetInt32(6) == 1,
                 MaxCastPerTurn = reader.IsDBNull(7) ? 0 : reader.GetInt32(7),
                 MaxCastPerTarget = reader.IsDBNull(8) ? 0 : reader.GetInt32(8),
-                CriticalHitProbability = reader.IsDBNull(9) ? 0 : reader.GetInt32(9)
+                CriticalHitProbability = reader.IsDBNull(9) ? 0 : reader.GetInt32(9),
+                MinCastInterval = reader.IsDBNull(11) ? 0 : reader.GetInt32(11)
             };
 
             // Critical hit damage. It comes in its own effect list: Frozen Arrow does 12-14 water
@@ -4440,6 +4441,9 @@ namespace Jondo.Unity.Server
 
         /// <summary>Casts allowed per turn on the SAME target. 0 = no limit.</summary>
         public int MaxCastPerTarget { get; set; }
+
+        /// <summary>Rounds before the spell can be cast again. 0 = no cooldown.</summary>
+        public int MinCastInterval { get; set; }
 
         /// <summary>
         /// Base critical hit chance, as a percentage. The critical granted by the equipment is

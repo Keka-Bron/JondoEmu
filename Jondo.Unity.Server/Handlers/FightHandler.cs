@@ -3455,6 +3455,17 @@ namespace Jondo.Unity.Server.Handlers
                     var objetivo = ObjetivoDe(fight, monster, spell, monsterGrade, prey, data);
                     if (objetivo == null || !objetivo.IsAlive) break;
 
+                    var rechazo = SpellCastRules.Check(
+                        monster, spell, objetivo.Id, monster.CellId, objetivo.CellId,
+                        data.MaxCastPerTurn, data.MaxCastPerTarget, data.MinCastInterval,
+                        data.CastInLine);
+                    if (rechazo != SpellCastRules.Rejection.None)
+                    {
+                        Program.LogDebug($"[Combate] El monstruo {monster.Id} no lanza el hechizo " +
+                                         $"{spell} sobre {objetivo.Id}: {rechazo}.");
+                        break;
+                    }
+
                     // Y el alcance se mide contra el objetivo ELEGIDO, no contra la presa. Ésa era
                     // la línea que dejaba muertos los hechizos de alcance cero.
                     int lejos = CellDistance(monster.CellId, objetivo.CellId);
@@ -3476,6 +3487,7 @@ namespace Jondo.Unity.Server.Handlers
 
                     monster.CurrentAP -= data.APCost;
                     lanzados++;
+                    SpellCastRules.Register(monster, spell, objetivo.Id, data.MinCastInterval);
 
                     // Y su identificador, para que su lanzamiento también diga QUÉ se lanza.
                     int spellLevel = data.SpellLevelId;
@@ -4106,16 +4118,12 @@ namespace Jondo.Unity.Server.Handlers
             // las lleva bajadas: medido en la captura de Agudeza Absoluta, lanzada en la ronda 8
             // con intervalo 4 —el jxc de ese turno dice 3, el de la 9 dice 2, el de la 10 uno, el
             // de la 11 cero y se relanza en la 12—. Ocho más cuatro, doce.
-            foreach (var hechizo in new List<int>(ending.Recarga.Keys))
-            {
-                if (ending.Recarga[hechizo] > 0) ending.Recarga[hechizo]--;
-            }
+            SpellCastRules.AdvanceCooldowns(ending);
             // Los retos de posicion se juzgan AQUI, con el que acaba todavia donde acabo y con sus
             // PM sin reponer. Va antes de limpiar los contadores del turno, que el Versatil los usa.
             await ChallengeWatcher.TurnEndedAsync(stream, fight, ending);
 
-            ending.LanzadosEsteTurno.Clear();
-            ending.LanzadosPorObjetivo.Clear();
+            SpellCastRules.ClearTurnCounters(ending);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(ending.Id,
@@ -4326,6 +4334,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // The turn is over: cancel the timer so it cannot force a second end of turn.
             fight.CancelTurnTimer();
+            SpellCastRules.EndTurn(endingFighter);
 
             var jwkMsg = new ProtoMessage();
             jwkMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = endingFighter.Id });
@@ -5007,7 +5016,10 @@ namespace Jondo.Unity.Server.Handlers
                         BaseDamageMax = sData.BaseDamageMax,
                         Element = sData.Element,
                         NeedsLineOfSight = sData.NeedsLineOfSight,
-                        MaxCastPerTurn = sData.MaxCastPerTurn
+                        CastInLine = sData.CastInLine,
+                        MaxCastPerTurn = sData.MaxCastPerTurn,
+                        MaxCastPerTarget = sData.MaxCastPerTarget,
+                        MinCastInterval = sData.MinCastInterval
                     };
                 },
                 losBlockers
