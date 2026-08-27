@@ -591,7 +591,8 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
                     // El botón de cerrar del diálogo. Va vacío y espera respuesta: khd si lo que
-                    // está abierto es el cofre o la tienda de un NPC, kld si es la lista del zaap.
+                    // está abierto es el cofre o la tienda de un NPC; kld con razón 1 si es una
+                    // conversación de NPC, y kld con razón 10 si es la lista del zaap.
                     //
                     // El cliente manda el kla DOS veces seguidas al cerrar una tienda, con menos de
                     // un milisegundo entre medias, y el servidor real contesta un solo khd. Como el
@@ -599,6 +600,7 @@ namespace Jondo.Unity.Server.Network
                     // kld que el cliente ignora, igual que hoy.
                     if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
                     else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
+                    else if (NpcHandler.IsDialogueOpen) await NpcHandler.CloseDialogueAsync(stream);
                     else await ZaapTravelHandler.CloseAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Hjc)))

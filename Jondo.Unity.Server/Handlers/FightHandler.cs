@@ -776,7 +776,10 @@ namespace Jondo.Unity.Server.Handlers
             Poner(27, sabiduria / PorCadaDiez);   // esquiva de puntos de acción
             Poner(28, sabiduria / PorCadaDiez);   // esquiva de puntos de movimiento
             Poner(12, GameState.StatWisdom);      // sabiduría
-            Poner(26, 0);                         // invocaciones
+            // Todo personaje puede llevar una invocación de base. Mandar cero no sólo pintaba
+            // mal el panel: el cliente usa este mismo total para habilitar los hechizos de
+            // invocación, por eso Dragún aparecía gris aunque el servidor lo hubiese aceptado.
+            Poner(26, 1);                         // invocaciones
             Poner(50, 0);                         // reenvío
             Poner(75, 0);                         // erosión
             Poner(101, 0);                        // % de resistencia a los daños
@@ -2468,13 +2471,19 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static int TopeDeInvocaciones(Fighter quien, int ronda)
         {
+            // RellenarLaFicha ya metió el equipo en Otras. Volver a sumarlo aquí duplicaba cada
+            // +invocación de los objetos: el cliente veía un total y el límite del servidor era
+            // otro. La ficha es la fuente única, tanto para jugadores como para monstruos.
             int suyo = quien.Otra(CaracteristicaDeInvocaciones);
-            if (!quien.IsMonster)
-            {
-                suyo += StatsHandler.GetEquipBonus(CaracteristicaDeInvocaciones);
-            }
             return Math.Max(0, suyo + quien.Buffs.De(CaracteristicaDeInvocaciones, ronda));
         }
+
+        /// <summary>Guardia de regresión: monta las características que recibe un jugador.</summary>
+        internal static void RellenarFichaParaLaGuardia(Fighter quien) => RellenarLaFicha(quien);
+
+        /// <summary>Guardia de regresión: el mismo límite que aplica una invocación real.</summary>
+        internal static int TopeDeInvocacionesParaLaGuardia(Fighter quien, int ronda)
+            => TopeDeInvocaciones(quien, ronda);
 
         /// <summary>Las que tiene ahora mismo en el tablero.</summary>
         private static int CuantasLleva(FightInstance fight, Fighter quien)

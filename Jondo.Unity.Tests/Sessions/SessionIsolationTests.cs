@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Xunit;
@@ -79,6 +80,26 @@ namespace Jondo.Unity.Tests.Sessions
                 Assert.Equal(2002, SpellChoices.Chosen[1]);
                 Assert.Equal(2002, SpellChoices.Bar[0]);
                 Assert.Equal(22, second.State.OpenNpcShopId);
+            }
+        }
+
+        [Fact]
+        public void Forgetting_an_npc_window_also_clears_its_dialogue()
+        {
+            var session = GameSession.SinSocket();
+            session.State.OpenDialogueNpcId = 4369;
+            session.State.OpenDialogueMapId = 153092354;
+            session.State.OpenDialogueMessage = 30424;
+
+            using (SessionContext.Push(session))
+            {
+                Assert.True(NpcHandler.IsDialogueOpen);
+
+                NpcHandler.Forget();
+
+                Assert.False(NpcHandler.IsDialogueOpen);
+                Assert.Equal(0, session.State.OpenDialogueMapId);
+                Assert.Equal(0, session.State.OpenDialogueMessage);
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Jondo.Unity.Server.Handlers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using Xunit;
 
@@ -80,6 +81,26 @@ namespace Jondo.Unity.Tests.Combat
             {
                 var entry = sheet.Find(e => e.Characteristic == which);
                 Assert.Equal(100, entry.Base);
+            }
+        }
+
+        [Fact]
+        public void A_player_has_one_base_summon_and_the_sheet_total_is_the_limit()
+        {
+            var session = GameSession.SinSocket();
+            using (SessionContext.Push(session))
+            {
+                var fighter = new Fighter();
+
+                FightHandler.RellenarFichaParaLaGuardia(fighter);
+
+                var summon = FightHandler.FichaParaLaGuardia(fighter)
+                                         .Find(e => e.Characteristic == 26);
+                Assert.Equal(1, summon.Base + summon.Gear);
+
+                // Otras already is the complete sheet total (base + equipment).
+                fighter.Otras[26] = 3;
+                Assert.Equal(3, FightHandler.TopeDeInvocacionesParaLaGuardia(fighter, 1));
             }
         }
     }

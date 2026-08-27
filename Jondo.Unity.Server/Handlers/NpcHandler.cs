@@ -57,6 +57,9 @@ namespace Jondo.Unity.Server.Handlers
 
         public static bool IsShopOpen => OpenShop != 0;
 
+        /// <summary>Si el jugador está hablando ahora mismo con un NPC.</summary>
+        public static bool IsDialogueOpen => SessionContext.State.OpenDialogueNpcId != 0;
+
         /// <summary>
         /// Desde dónde se numeran los objetos comprados.
         ///
@@ -225,6 +228,19 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.OpenDialogueNpcId = 0;
             SessionContext.State.OpenDialogueMapId = 0;
             SessionContext.State.OpenDialogueMessage = 0;
+        }
+
+        /// <summary>
+        /// El jugador ha pulsado la cruz del diálogo (kla). La conversación de NPC se cierra con
+        /// razón 1; la razón 10 pertenece al zaap y el cliente no la aplica a esta ventana.
+        /// </summary>
+        public static async Task CloseDialogueAsync(NetworkStream stream)
+        {
+            CerrarConversacion();
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                    ConnectionProtocol.NpcDialogCloseReason)));
+            Console.WriteLine("[NPC] Diálogo cerrado por el jugador.");
         }
 
         /// <summary>
@@ -521,6 +537,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             OpenShop = 0;
             OpenShopNpc = 0;
+            CerrarConversacion();
         }
 
         /// <summary>
