@@ -2,8 +2,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 > ⚠️ **Runs against Dofus 3 clients 3.6.10.11 and 3.6.10.10.** Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility with newer clients. There is a toolchain here for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
 >
-> **3.6.10.11 (26 August 2026) is not a new protocol.** Its `GameAssembly.dll` and `global-metadata.dat` are byte-identical to 3.6.10.10 — same SHA-256 on both files — and the structural matcher confirms it independently: 2,169 messages against 2,169, identity mapping, zero ambiguities. That patch moved data only: 182 bundles under `Content/Data`. The supported versions are a hand-written list in `Paths.ClientDir`, newest first, and adding one is a single line — deliberately not "whatever folder has the highest version number", because a client we cannot yet speak to would then be picked up in silence.
-
+> **3.6.10.11 (26 August 2026) is not a new protocol.** Its `GameAssembly.dll` and `global-metadata.dat` are byte-identical to 3.6.10.10
 ---
 
 ## 🚀 Quick Start
