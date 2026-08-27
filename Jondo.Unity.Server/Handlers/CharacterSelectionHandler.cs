@@ -353,15 +353,7 @@ namespace Jondo.Unity.Server.Handlers
             Jondo.Unity.Server.Network.SessionContext.State.ClearEquippedItems();
             foreach (var item in Jondo.Unity.Server.Network.SessionContext.State.GetInventoryCopy())
             {
-                if (item.Position >= 0 && item.Position < 63)
-                {
-                    var equipped = new EquippedItemInfo { Slot = item.Position };
-                    foreach (var kvp in item.Effects)
-                    {
-                        equipped.Stats[kvp.Key] = kvp.Value;
-                    }
-                    Jondo.Unity.Server.Network.SessionContext.State.SetEquippedItem(item.Uid, equipped);
-                }
+                Managers.Equipment.RememberWorn(item.Uid, item.Position, item.RawEffects);
             }
 
             return true;

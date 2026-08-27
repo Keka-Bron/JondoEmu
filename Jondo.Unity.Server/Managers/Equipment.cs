@@ -463,6 +463,66 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// The one place the worn-item cache is written.
+        /// </summary>
+        /// <remarks>
+        /// That cache — <c>SessionState.EquippedItems</c> — feeds <c>StatsHandler.GetEquipBonus</c>,
+        /// and through it the COMBAT sheet: maximum health, initiative, the lot. It is not what
+        /// builds the characteristic sheet, which comes from <see cref="Bonuses"/> over the real
+        /// inventory; getting those two the wrong way round is easy and the comment that used to
+        /// live on EquipmentHandler had them swapped.
+        ///
+        /// It exists because there were THREE places filling that one dictionary — character
+        /// selection, the inventory handler and the equipment handler — and the three disagreed
+        /// about both of the things that matter:
+        ///
+        ///   what counts as worn   two said "0 to 62", which is the whole bag, so an item sitting
+        ///                         in slot 35 counted towards combat stats until it was moved
+        ///   which value           two summed the raw parameter and one summed <c>Sheet</c>. An
+        ///                         item stored as [[100, 0, 2, 7]] is worth 0 by one and 7 by the
+        ///                         other, so the same ring gave different stats depending on
+        ///                         whether it had been re-equipped since logging in — and went
+        ///                         back to the first answer on the next relog.
+        ///
+        /// <c>Sheet</c> is the right one: it is what <see cref="Bonuses"/> uses, so the combat
+        /// sheet and the characteristic sheet finally agree about the same item.
+        /// </remarks>
+        public static void RememberWorn(long uid, int position, IEnumerable<ItemEffect>? effects)
+        {
+            if (!IsWorn(position))
+            {
+                SessionContext.State.RemoveEquippedItem(uid);
+                return;
+            }
+
+            if (effects == null)
+            {
+                // Worn, but nothing known about it. Leaving the cache alone beats writing an entry
+                // with no stats, which would silently strip whatever the item was giving.
+                return;
+            }
+
+            var worn = new EquippedItemInfo { Slot = position };
+            foreach (var effect in effects)
+            {
+                worn.Stats.TryGetValue(effect.Effect, out int had);
+                worn.Stats[effect.Effect] = had + (int)Math.Clamp(effect.Sheet, int.MinValue, int.MaxValue);
+            }
+
+            SessionContext.State.SetEquippedItem(uid, worn);
+        }
+
+        /// <summary>The same, from the effects as the database stored them.</summary>
+        /// <remarks>
+        /// For the two callers that run before <see cref="LoadFrom"/> has read this character's
+        /// inventory — character selection is one — and therefore have a <c>PlayerItem</c> rather
+        /// than an <see cref="Item"/>. It parses the raw json so that they arrive at the same
+        /// numbers as everybody else instead of at the summed parameter.
+        /// </remarks>
+        public static void RememberWorn(long uid, int position, string? rawEffects)
+            => RememberWorn(uid, position, string.IsNullOrEmpty(rawEffects) ? null : ParseEffects(rawEffects));
+
+        /// <summary>
         /// How many of a template the character is carrying, counting every stack of it.
         /// </summary>
         /// <remarks>

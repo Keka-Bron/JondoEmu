@@ -23,10 +23,11 @@ namespace Jondo.Unity.Server.Handlers
     /// En cada hueco cabe una cosa, y eso lo hace cumplir este handler: lo que ya estuviera puesto
     /// sale a la bolsa con su propio ivq antes de que entre lo nuevo.
     ///
-    /// One thing this does NOT do yet is change the characteristics. Equipment adds its bonus in
-    /// field 7 of each entry of kub, and filling that in means knowing which item the uid is,
-    /// which means the inventory coming out of the database instead of out of the capture. Until
-    /// then the item moves and the sheet does not follow.
+    /// Al mover algo se actualiza tambien la cache de lo que se lleva puesto, que es la que
+    /// alimenta StatsHandler.GetEquipBonus y con ella la ficha de COMBATE -vida maxima,
+    /// iniciativa-. No la de caracteristicas: esa se construye con Equipment.Bonuses() sobre el
+    /// inventario de verdad y nunca estuvo vieja por esta ruta. Antes la cache si lo estaba, y los
+    /// bonus de combate no llegaban hasta la siguiente seleccion de personaje.
     /// </summary>
     public static class EquipmentHandler
     {
@@ -61,6 +62,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 evicted.Position = Bag;
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag, SessionContext.State.CharacterId);
+                Managers.Equipment.RememberWorn(evicted.Uid, Bag, evicted.Effects);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
@@ -75,6 +77,13 @@ namespace Jondo.Unity.Server.Handlers
             // it is an item we actually hold.
             DatabaseManager.SaveItemPosition(uid, position, SessionContext.State.CharacterId);
             bool known = Managers.Equipment.Move(uid, position);
+
+            // Sin condicionarlo a `known`, y eso importa. Managers.Equipment.LoadFrom se traga su
+            // propia excepcion, asi que si esa lectura falla Items queda vacio mientras la cache
+            // SI se lleno al elegir personaje, que lee por otra via. A partir de ahi `known` seria
+            // false en todos los iuk y el jugador podria quitarse la ropa entera y seguir peleando
+            // con las estadisticas puestas hasta cerrar sesion.
+            Managers.Equipment.RememberWorn(uid, position, Managers.Equipment.ByUid(uid)?.Effects);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, position).Build()));

@@ -143,18 +143,8 @@ namespace Jondo.Unity.Server.Handlers
                 DatabaseManager.SaveItemPosition(itemUid, newPosition,
                     Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
 
-                // Update equipped cache
-                if (newPosition >= 0 && newPosition < 63)
-                {
-                    var equipped = new EquippedItemInfo { Slot = newPosition };
-                    foreach (var kvp in item.Effects)
-                        equipped.Stats[kvp.Key] = kvp.Value;
-                    Jondo.Unity.Server.Network.SessionContext.State.SetEquippedItem(itemUid, equipped);
-                }
-                else
-                {
-                    Jondo.Unity.Server.Network.SessionContext.State.RemoveEquippedItem(itemUid);
-                }
+                // La cache de lo que se lleva puesto, por el unico sitio que la escribe.
+                Managers.Equipment.RememberWorn(itemUid, newPosition, item.RawEffects);
             }
         }
 
