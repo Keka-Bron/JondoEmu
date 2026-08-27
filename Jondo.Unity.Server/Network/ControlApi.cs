@@ -96,12 +96,14 @@ namespace Jondo.Unity.Server.Network
                     // en el servidor, cada vez. Que el lanzador enseñe o no el botón es cosmético:
                     // el lanzador está en el ordenador del jugador y ahí no se confía en nada.
                     case Prefijo + "registro": return ConRol(cuerpo, Roles.Administrador, _ => Registro(cuerpo));
-                    case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, _ => Apagar());
-                    case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador, _ => CambiarRol(cuerpo));
+                    case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, Apagar);
+                    case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador,
+                        cuenta => CambiarRol(cuerpo, cuenta));
                     case Prefijo + "personaje":
                         return !metodo.Equals("POST", StringComparison.OrdinalIgnoreCase)
                             ? Mal(405, "metodo")
-                            : ConRol(cuerpo, Roles.Administrador, _ => AdministrarPersonaje(cuerpo));
+                            : ConRol(cuerpo, Roles.Administrador,
+                                cuenta => AdministrarPersonaje(cuerpo, cuenta));
 
                     default: return Mal(404, "ruta");
                 }
@@ -140,18 +142,22 @@ namespace Jondo.Unity.Server.Network
             {
                 Console.WriteLine($"[Control] La cuenta {cuenta} ({Roles.Nombre(rol)}) ha intentado algo " +
                                   $"de {Roles.Nombre(haceFalta)}. Rechazado.");
+                ActivityJournal.Current.Write("admin.denied", cuenta,
+                    details: new { role = rol, requiredRole = haceFalta });
                 return Mal(403, "rol");
             }
             return hacer(cuenta);
         }
 
         /// <summary>Sube o baja el rol de una cuenta. Sólo un administrador llega aquí.</summary>
-        private static Respuesta CambiarRol(string cuerpo)
+        private static Respuesta CambiarRol(string cuerpo, long administrador)
         {
             string quien = Texto(cuerpo, "cuenta");
             int rol = (int)Numero(cuerpo, "rol");
             bool bien = DatabaseManager.SetAccountRole(quien, rol, out int cuantas);
             if (bien) Console.WriteLine($"[Control] {quien} pasa a {Roles.Nombre(rol)}.");
+            ActivityJournal.Current.Write("admin.role.changed", administrador,
+                details: new { account = quien, requestedRole = rol, changed = bien, rows = cuantas });
             return Bien(new { bien, cuantas });
         }
 
@@ -163,7 +169,7 @@ namespace Jondo.Unity.Server.Network
         /// sesion evita que una orden HTTP pise un movimiento, un combate o cualquier otro paquete
         /// que el cliente este atendiendo a la vez.
         /// </summary>
-        private static Respuesta AdministrarPersonaje(string cuerpo)
+        private static Respuesta AdministrarPersonaje(string cuerpo, long administrador)
         {
             string nombre = Texto(cuerpo, "personaje");
             var sesion = SessionRegistry.FindByName(nombre);
@@ -211,6 +217,19 @@ namespace Jondo.Unity.Server.Network
                                       $"{estado.StatVitality}/{estado.StatWisdom}/{estado.StatStrength}/" +
                                       $"{estado.StatIntelligence}/{estado.StatChance}/{estado.StatAgility}, " +
                                       $"kamas {estado.Kamas}.");
+                    ActivityJournal.Current.Write("admin.character.updated", administrador,
+                        estado.CharacterId,
+                        new
+                        {
+                            character = estado.CharacterName,
+                            vitality = estado.StatVitality,
+                            wisdom = estado.StatWisdom,
+                            strength = estado.StatStrength,
+                            intelligence = estado.StatIntelligence,
+                            chance = estado.StatChance,
+                            agility = estado.StatAgility,
+                            kamas = estado.Kamas,
+                        });
                     return Bien(new
                     {
                         bien = true,
@@ -424,9 +443,10 @@ namespace Jondo.Unity.Server.Network
         /// el apagado por fallido justo cuando había funcionado. Medido: la petición volvía con el
         /// cuerpo vacío.
         /// </summary>
-        private static Respuesta Apagar()
+        private static Respuesta Apagar(long administrador)
         {
             Console.WriteLine("[Control] El lanzador pide apagar el servidor.");
+            ActivityJournal.Current.Write("admin.server.shutdown", administrador);
             _ = System.Threading.Tasks.Task.Run(async () =>
             {
                 await System.Threading.Tasks.Task.Delay(300);

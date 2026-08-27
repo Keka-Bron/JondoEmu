@@ -43,8 +43,17 @@ namespace Jondo.Unity.Server.Handlers
             if (prize == null)
             {
                 Console.WriteLine("[Lotería] La tirada no ha dado nada.");
+                ActivityJournal.Current.Write("lottery.empty",
+                    Jondo.Unity.Server.Network.SessionContext.Current.AccountId,
+                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
+                    new { elementId, skillId });
                 return;
             }
+
+            ActivityJournal.Current.Write("lottery.prize",
+                Jondo.Unity.Server.Network.SessionContext.Current.AccountId,
+                Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
+                new { elementId, skillId, uid = prize.Uid, gid = prize.Gid, quantity = prize.Quantity });
 
             // Lo que la máquina contesta, con la forma de la captura.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

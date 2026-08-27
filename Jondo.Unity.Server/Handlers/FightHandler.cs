@@ -1488,6 +1488,14 @@ namespace Jondo.Unity.Server.Handlers
 
             var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             long me = GameState.CharacterId;
+            ActivityJournal.Current.Write("fight.started", SessionContext.Current.AccountId, me,
+                new
+                {
+                    fightId = fight.FightId,
+                    mapId = fight.MapId,
+                    roleplayMapId = fight.RoleplayMapId,
+                    monsters = fight.Team1.Count,
+                });
 
             // Los retos que quedaran sin validar los cierra el servidor aquí, ANTES del kai: si el
             // jugador se declaró listo con uno marcado y sin validar, ése cuenta, y si ni eso, el
@@ -3882,6 +3890,18 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             int duration = (int)Math.Max(0, (DateTime.UtcNow - fight.StartedAt).TotalMilliseconds);
+            ActivityJournal.Current.Write("fight.ended", SessionContext.Current.AccountId,
+                GameState.CharacterId,
+                new
+                {
+                    fightId = fight.FightId,
+                    won,
+                    durationMs = duration,
+                    xp = xpGained,
+                    kamas,
+                    itemKinds = loot.Count,
+                    itemQuantity = loot.Sum(item => item.Value),
+                });
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kuf,
                 Network.FightProtocol.BuildFightOver()));

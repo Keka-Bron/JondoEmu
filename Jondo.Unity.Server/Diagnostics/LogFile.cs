@@ -38,6 +38,9 @@ namespace Jondo.Unity.Server
         /// <summary>El tráfico en crudo, hexadecimal incluido.</summary>
         public static readonly LogFile Traffic = new LogFile(() => Paths.TrafficLog);
 
+        /// <summary>Una línea JSON por acción importante de un jugador o administrador.</summary>
+        public static readonly LogFile Activity = new LogFile(() => Paths.ActivityLog);
+
         /// <summary>
         /// Escribe una línea. Si no se puede escribir —disco lleno, fichero bloqueado— se calla y
         /// no vuelve a intentarlo: un registro que no se puede escribir no es motivo para tirar el

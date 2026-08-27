@@ -132,7 +132,22 @@ namespace Jondo.Unity.Server.Network
                 // estos puede llegar cien veces por minuto —el ping del cliente sin ir más lejos—
                 // y abrir SQLite en cada uno pondría el disco a trabajar para no aprender nada
                 // nuevo. Lo que interesa es que la forma EXISTA en la lista, no el número exacto.
-                if (cuantas == 1 || cuantas % 100 == 0) Guardar(fila);
+                if (cuantas == 1 || cuantas % 100 == 0)
+                {
+                    Guardar(fila);
+                    ActivityJournal.Current.Write("packet.unknown", SeguroLaCuenta(),
+                        SeguroElPersonaje(),
+                        new
+                        {
+                            opcode = fila.Opcode,
+                            rootField = fila.RootField,
+                            kind = fila.Kind.ToString(),
+                            signature = fila.Signature,
+                            occurrences = cuantas,
+                            mapId = fila.MapId,
+                            payloadBytes = fila.PayloadBytes,
+                        });
+                }
             }
             catch
             {
@@ -196,6 +211,18 @@ namespace Jondo.Unity.Server.Network
         private static long SeguroElMapa()
         {
             try { return SessionContext.State.MapId; }
+            catch { return 0; }
+        }
+
+        private static long SeguroLaCuenta()
+        {
+            try { return SessionContext.Current.AccountId; }
+            catch { return 0; }
+        }
+
+        private static long SeguroElPersonaje()
+        {
+            try { return SessionContext.State.CharacterId; }
             catch { return 0; }
         }
 
