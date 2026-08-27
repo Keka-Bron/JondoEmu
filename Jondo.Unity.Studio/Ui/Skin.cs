@@ -61,6 +61,18 @@ namespace Jondo.Unity.Studio.Ui
         /// <summary>Blue. Measured: this came off a capture or out of the client.</summary>
         public static readonly Color MeasuredBlue = Color.FromRgb(0x5F, 0xA8, 0xD3);
 
+        /// <summary>
+        /// Violet. Derived: worked out from the client's own data rather than seen happening.
+        /// </summary>
+        /// <remarks>
+        /// Its own colour because it carries its own warning. A blue row is a row somebody watched
+        /// go past on the wire; a violet one is a conclusion — for an NPC placement, the map came
+        /// out of the quest catalogue and the cell is a placeholder. Painting the two the same
+        /// would be claiming a precision that is not there, and the whole point of the provenance
+        /// column is that six months from now nobody can tell them apart without it.
+        /// </remarks>
+        public static readonly Color Derived = Color.FromRgb(0x9B, 0x8C, 0xD8);
+
         /// <summary>Green. Done: handled, answered, working.</summary>
         public static readonly Color Done = Color.FromRgb(0x6F, 0xCF, 0x8E);
 
@@ -87,6 +99,7 @@ namespace Jondo.Unity.Studio.Ui
         public static readonly IBrush AuthoredBrush = new SolidColorBrush(Authored);
         public static readonly IBrush AuthoredSoftBrush = new SolidColorBrush(AuthoredSoft);
         public static readonly IBrush MeasuredBrush = new SolidColorBrush(MeasuredBlue);
+        public static readonly IBrush DerivedBrush = new SolidColorBrush(Derived);
         public static readonly IBrush DoneBrush = new SolidColorBrush(Done);
         public static readonly IBrush WrongBrush = new SolidColorBrush(Wrong);
 

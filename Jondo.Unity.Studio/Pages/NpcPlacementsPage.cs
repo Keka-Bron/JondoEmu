@@ -33,8 +33,29 @@ namespace Jondo.Unity.Studio.Pages
     {
         private readonly WorldData _world;
 
-        /// <summary>What the captures say, on its own. The floor the delta is measured against.</summary>
-        private readonly Dictionary<NpcSpawnKey, NpcSpawn> _measured = new Dictionary<NpcSpawnKey, NpcSpawn>();
+        /// <summary>
+        /// What the generated files say, on their own. The floor the delta is measured against.
+        /// </summary>
+        /// <remarks>
+        /// Both regenerable layers, not just the captured one, and that is the whole reason this
+        /// field exists. The authored file is a set of deltas from whatever a tool already writes;
+        /// if the derived placements were left out of this floor, then every one of the 2,009 of
+        /// them would count as a change the moment anything else on the page was saved, and the
+        /// authored file would swallow the lot. From then on re-running the derivation would never
+        /// reach the world again — the exact silent shadowing the layers exist to prevent.
+        /// </remarks>
+        private readonly Dictionary<NpcSpawnKey, NpcSpawn> _generated = new Dictionary<NpcSpawnKey, NpcSpawn>();
+
+        /// <summary>
+        /// Which of those came from the derived file: right map, guessed cell.
+        /// </summary>
+        /// <remarks>
+        /// Kept apart only so the map can paint them differently. A captured placement is where an
+        /// NPC was actually seen standing; a derived one is where the quest catalogue says the NPC
+        /// belongs, on a cell nobody has ever measured. Same layer behaviour, very different
+        /// confidence, and the person dragging them around should be able to tell at a glance.
+        /// </remarks>
+        private readonly HashSet<NpcSpawnKey> _guessed = new HashSet<NpcSpawnKey>();
 
         /// <summary>What the world should look like when this is saved.</summary>
         private readonly Dictionary<NpcSpawnKey, NpcSpawn> _wanted = new Dictionary<NpcSpawnKey, NpcSpawn>();
@@ -213,10 +234,15 @@ namespace Jondo.Unity.Studio.Pages
                 {
                     if (pair.Key.MapId != drawn) continue;
 
-                    bool measured = _measured.ContainsKey(pair.Key);
+                    bool generated = _generated.ContainsKey(pair.Key);
                     marks[pair.Key.Cell] = new CellMark
                     {
-                        Colour = measured ? Skin.MeasuredBrush : Skin.AuthoredBrush,
+                        // Three colours, because there are three things worth telling apart: a
+                        // person put it here, a capture saw it here, or the quest catalogue says
+                        // it belongs on this map and the cell underneath it is a placeholder.
+                        Colour = !generated ? Skin.AuthoredBrush
+                               : _guessed.Contains(pair.Key) ? Skin.DerivedBrush
+                               : Skin.MeasuredBrush,
                         Label = Short(Name(pair.Key.NpcId)),
                         Icon = _sprites.Of(LookOf(pair.Key.NpcId)),
                     };
@@ -258,7 +284,7 @@ namespace Jondo.Unity.Studio.Pages
                     ? Words.T("npc.placements", all.Count.ToString("N0"))
                     : Words.T("npc.someOf", shown.Count.ToString("N0"), all.Count.ToString("N0")));
 
-                var (rows, removed) = NpcSpawnContent.Delta(_measured, _wanted);
+                var (rows, removed) = NpcSpawnContent.Delta(_generated, _wanted);
                 if (rows.Count > 0 || removed.Count > 0)
                 {
                     text.Append("   ·   ").Append(Words.T("npc.delta", rows.Count, removed.Count));
@@ -354,10 +380,10 @@ namespace Jondo.Unity.Studio.Pages
                 // let the measured placements stand again.
                 foreach (var key in _wanted.Keys.Where(k => k.NpcId == chosen.Npc).ToList())
                 {
-                    if (!_measured.ContainsKey(key)) _wanted.Remove(key);
+                    if (!_generated.ContainsKey(key)) _wanted.Remove(key);
                 }
 
-                foreach (var pair in _measured.Where(p => p.Key.NpcId == chosen.Npc))
+                foreach (var pair in _generated.Where(p => p.Key.NpcId == chosen.Npc))
                 {
                     _wanted[pair.Key] = pair.Value;
                 }
@@ -374,7 +400,7 @@ namespace Jondo.Unity.Studio.Pages
             resetAll.Click += (_, _) =>
             {
                 _wanted.Clear();
-                foreach (var pair in _measured) _wanted[pair.Key] = pair.Value;
+                foreach (var pair in _generated) _wanted[pair.Key] = pair.Value;
 
                 chosen = null;
                 list.SelectedItem = null;
@@ -417,7 +443,7 @@ namespace Jondo.Unity.Studio.Pages
             {
                 try
                 {
-                    var (rows, removed) = NpcSpawnContent.Delta(_measured, _wanted);
+                    var (rows, removed) = NpcSpawnContent.Delta(_generated, _wanted);
                     NpcSpawnContent.Save(Paths.ContentFile(NpcSpawnContent.AuthoredFile), rows, removed);
                     _world.ReloadNpcPlacements();
                     _dirty = false;
@@ -513,11 +539,16 @@ namespace Jondo.Unity.Studio.Pages
                 _looks[npc.Id] = npc.Look;
             }
 
-            // The measured layer on its own, which is what the delta is worked out against. Read
-            // separately from the merged store on purpose: the merged one cannot say which rows
-            // came from where once an authored row has replaced a measured one.
-            var measured = NpcSpawnContent.Load(Paths.WorldNpcsJson, null);
-            foreach (var pair in measured.Rows) _measured[pair.Key] = pair.Value.Value;
+            // The two regenerable layers without the authored one on top, which is what the delta
+            // is worked out against. Read separately from the merged store on purpose: the merged
+            // one cannot say which rows came from where once an authored row has replaced one.
+            var generated = NpcSpawnContent.Load(Paths.WorldNpcsJson, null, null,
+                                                 Paths.WorldNpcsDerivedJson);
+            foreach (var pair in generated.Rows)
+            {
+                _generated[pair.Key] = pair.Value.Value;
+                if (pair.Value.From.Layer == ContentLayer.Base) _guessed.Add(pair.Key);
+            }
 
             foreach (var pair in _world.NpcPlacements.Rows) _wanted[pair.Key] = pair.Value.Value;
 
@@ -539,7 +570,7 @@ namespace Jondo.Unity.Studio.Pages
         private NpcSpawnKey? Moved(int npcId)
         {
             var wasThere = new List<NpcSpawnKey>();
-            foreach (var pair in _measured)
+            foreach (var pair in _generated)
             {
                 if (pair.Key.NpcId == npcId) wasThere.Add(pair.Key);
             }
@@ -575,13 +606,15 @@ namespace Jondo.Unity.Studio.Pages
             var rows = new List<Row>(_wanted.Count);
             foreach (var pair in _wanted)
             {
-                bool measured = _measured.TryGetValue(pair.Key, out var was);
-                string from = !measured
+                bool generated = _generated.TryGetValue(pair.Key, out var was);
+                string from = !generated
                     ? Words.T("common.authored")
-                    : (was.Orientation != pair.Value.Orientation ? Words.T("npc.reFaced") : Words.T("common.measured"));
+                    : was.Orientation != pair.Value.Orientation ? Words.T("npc.reFaced")
+                    : _guessed.Contains(pair.Key) ? Words.T("common.derived")
+                    : Words.T("common.measured");
 
                 rows.Add(new Row(pair.Key, pair.Value.MapId, pair.Value.NpcId, Name(pair.Value.NpcId),
-                                 pair.Value.Cell, pair.Value.Orientation, from, !measured));
+                                 pair.Value.Cell, pair.Value.Orientation, from, !generated));
             }
 
             rows.Sort((a, b) =>

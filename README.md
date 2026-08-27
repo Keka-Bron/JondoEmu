@@ -370,6 +370,44 @@ is wrong. Four things it found, all measured:
 - **A monster's picture is filed under its `gfxId`, not its id.** Keyed by id, 847 of 5,134 found a
   picture and every one of those 847 was *somebody else's* creature. Keyed by gfxId it is 5,130
 
+### Quests and dungeons
+
+Both play. Both were built by measuring the 401 captures rather than by guessing, and both found
+the repository wrong about something on the way.
+
+**Quests.** 1,976 of them, with their 2,225 steps and 15,547 objectives, read out of six Unity
+dumps the repository does not even carry. A quest is handed over by an NPC saying a particular
+line — 1,260 steps declare one and every one of them resolves to real text — and that join is what
+ties the quest catalogue to the dialogue trees the editor already writes. Objectives complete two
+ways: the client says so for the 5,670 that ask you to click something the server never sees, and
+the server counts for itself the ones that ask you to beat a monster. Progress is written at the
+moment it changes, because there is no autosave in this server and losing an evening's quest is
+worse than losing a few kamas.
+
+The start condition is a language of its own — 29 operators, brackets three deep, and a `!` that
+means "not" without an `=` after it. Six operators are understood, covering every term of 935 of
+the 1,976 conditions; the rest are let through **and named**, because refusing what this emulator
+cannot model would put 53% of the game's quests out of everybody's reach.
+
+Three things the repository had wrong, all now corrected: `ieo` and `idu` were filed as interactive
+elements and are quests (448 captured frames, every one internally consistent); the flag on an
+objective means *still to do*, not done; and the world-entry replay was handing every player the
+261-quest journal of the account somebody recorded.
+
+**Dungeons.** 187, with their rooms, their key and their boss. The keyring and the required item
+were in the client's data the whole time and the extractor was dropping them on the floor — adding
+them back is what made a locked door possible at all. Talk to the guardian, hand over the key, and
+you are in the first room; win a fight and you move on; beat the boss in the last one and you come
+out. The boss is placed at startup in 126 dungeons, in the room the data says, at the highest grade
+it has.
+
+It is not Ankama's dungeon and the difference is worth stating: theirs is a chain of rooms and
+corridors walked through ordinary doors, and **not one of the 187 has a single one of its internal
+passages** — not in the extracted table, not in Ankama's own world graph. A player put in room 0
+would have no way out, so winning moves you instead.
+
+Full workings in **`docs/quests.md`** and **`docs/dungeons.md`**.
+
 ### What is being worked on
 
 - 🚧 **NPC actions per placement** — and this one turned out not to be what the plan assumed. The
@@ -381,8 +419,8 @@ is wrong. Four things it found, all measured:
   an effect the engine ignores
 - 🚧 **Shops, loot tables and dungeons** — asked for by the people using it. All three are screens
   over data the server already reads, so they are reachable
-- 🚧 **Quests** — a project of its own, and the one everybody wants. There is no quest engine in the
-  server and no per-character progress table, so an editor today would write files nobody reads
+- 🚧 **Editing quests.** The engine plays them now and the Studio shows them, but nothing writes
+  one yet
 - 🚧 **A thin admin channel** so a running server can be told to reload one domain, without a
   restart. Localhost only, token per boot, off by default
 - 🚧 **The launcher**, which inherits this shell once the editor stops moving

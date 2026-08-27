@@ -15,7 +15,23 @@
   ],
   "bosses": [
    147
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    1568,
+    1
+   ]
+  ],
+  "achievements": [
+   37,
+   490,
+   658,
+   6151,
+   659
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "3": {
   "name": "Biblioteca del Maestro Cuerbok",
@@ -31,7 +47,23 @@
   ],
   "bosses": [
    289
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7926,
+    1
+   ]
+  ],
+  "achievements": [
+   25,
+   515,
+   708,
+   709,
+   6188
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "4": {
   "name": "Centro del Laberinto del Minotauroro",
@@ -46,7 +78,31 @@
   ],
   "bosses": [
    121
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7924,
+    1
+   ],
+   [
+    8306,
+    1
+   ],
+   [
+    8305,
+    1
+   ]
+  ],
+  "achievements": [
+   32,
+   717,
+   522,
+   716,
+   6193
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "6": {
   "name": "Antro del Dragocerdo",
@@ -72,7 +128,28 @@
   ],
   "bosses": [
    113
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7511,
+    1
+   ],
+   [
+    8320,
+    1
+   ]
+  ],
+  "achievements": [
+   22,
+   510,
+   698,
+   6178,
+   699,
+   5988
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "7": {
   "name": "Antro de Cocabulia",
@@ -90,7 +167,23 @@
   ],
   "bosses": [
    854
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8342,
+    1
+   ]
+  ],
+  "achievements": [
+   51,
+   526,
+   6196,
+   724,
+   725
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "8": {
   "name": "Granero del Girasol Hambriento",
@@ -108,7 +201,23 @@
   ],
   "bosses": [
    799
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8143,
+    1
+   ]
+  ],
+  "achievements": [
+   40,
+   488,
+   6149,
+   575,
+   576
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "9": {
   "name": "Territorio Ancestral",
@@ -126,7 +235,23 @@
   ],
   "bosses": [
    173
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7557,
+    1
+   ]
+  ],
+  "achievements": [
+   35,
+   509,
+   697,
+   696,
+   6175
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "10": {
   "name": "Claro del Roble Blando",
@@ -144,7 +269,23 @@
   ],
   "bosses": [
    257
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8436,
+    1
+   ]
+  ],
+  "achievements": [
+   53,
+   530,
+   732,
+   6202,
+   733
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "11": {
   "name": "Enclave de los Blops",
@@ -170,7 +311,23 @@
    1186,
    1187,
    1185
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    9248,
+    1
+   ]
+  ],
+  "achievements": [
+   36,
+   503,
+   6164,
+   685,
+   684
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "13": {
   "name": "Mazmorra de los Bworks",
@@ -190,7 +347,24 @@
   ],
   "bosses": [
    792
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8135,
+    1
+   ]
+  ],
+  "achievements": [
+   38,
+   668,
+   495,
+   6158,
+   669,
+   6015
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "14": {
   "name": "Cueva de Bworker",
@@ -208,7 +382,23 @@
   ],
   "bosses": [
    478
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    6884,
+    1
+   ]
+  ],
+  "achievements": [
+   52,
+   541,
+   754,
+   755,
+   6223
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "15": {
   "name": "Guarida del Maxilubo",
@@ -229,7 +419,24 @@
   ],
   "bosses": [
    232
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8156,
+    1
+   ]
+  ],
+  "achievements": [
+   39,
+   512,
+   703,
+   702,
+   6180,
+   6023
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "17": {
   "name": "Madriguera del Wey Wabbit",
@@ -247,7 +454,23 @@
   ],
   "bosses": [
    3460
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14465,
+    1
+   ]
+  ],
+  "achievements": [
+   1003,
+   1006,
+   1004,
+   1005,
+   6173
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "18": {
   "name": "Picos Rocosos de los Crujidores",
@@ -270,7 +493,23 @@
   ],
   "bosses": [
    669
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7927,
+    1
+   ]
+  ],
+  "achievements": [
+   41,
+   506,
+   690,
+   6168,
+   691
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "19": {
   "name": "Castillo de Arena",
@@ -289,7 +528,23 @@
   ],
   "bosses": [
    928
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8437,
+    1
+   ]
+  ],
+  "achievements": [
+   54,
+   489,
+   578,
+   6150,
+   657
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "21": {
   "name": "Mazmorra de los Herreros",
@@ -314,7 +569,24 @@
   ],
   "bosses": [
    252
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    1569,
+    1
+   ]
+  ],
+  "achievements": [
+   43,
+   496,
+   671,
+   6159,
+   670,
+   6008
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "22": {
   "name": "Templo del Gran Ugah",
@@ -338,7 +610,24 @@
   ],
   "bosses": [
    1159
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    9247,
+    1
+   ]
+  ],
+  "achievements": [
+   55,
+   542,
+   756,
+   6224,
+   757,
+   6011
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "24": {
   "name": "La Gelexta Dimensión",
@@ -365,7 +654,23 @@
    430,
    86,
    85
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    996,
+    1
+   ]
+  ],
+  "achievements": [
+   60,
+   507,
+   693,
+   692,
+   6166
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "25": {
   "name": "Gruta Grut'Hesqua",
@@ -383,7 +688,24 @@
   ],
   "bosses": [
    1027
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8917,
+    1
+   ]
+  ],
+  "achievements": [
+   62,
+   498,
+   674,
+   675,
+   6160,
+   6001
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "27": {
   "name": "Pueblo Kaníbola",
@@ -401,7 +723,23 @@
   ],
   "bosses": [
    2960
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11798,
+    1
+   ]
+  ],
+  "achievements": [
+   56,
+   502,
+   6165,
+   683,
+   682
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "28": {
   "name": "Canopea del Kimbo",
@@ -419,7 +757,23 @@
   ],
   "bosses": [
    1045
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8977,
+    1
+   ]
+  ],
+  "achievements": [
+   27,
+   535,
+   6212,
+   743,
+   742
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "30": {
   "name": "Cueva del Trankitronko",
@@ -444,7 +798,23 @@
   ],
   "bosses": [
    670
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7908,
+    1
+   ]
+  ],
+  "achievements": [
+   29,
+   511,
+   701,
+   700,
+   6179
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "31": {
   "name": "Antro del Kralamar Gigante",
@@ -460,7 +830,19 @@
   ],
   "bosses": [
    423
-  ]
+  ],
+  "keyring": 0,
+  "required": [],
+  "achievements": [
+   24,
+   540,
+   6225,
+   752,
+   753,
+   5962
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "32": {
   "name": "Nido de Kwoknan",
@@ -478,7 +860,24 @@
   ],
   "bosses": [
    2995
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    12017,
+    1
+   ]
+  ],
+  "achievements": [
+   67,
+   676,
+   499,
+   6161,
+   677,
+   5966
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "33": {
   "name": "Mazmorra de las Larvas",
@@ -506,7 +905,23 @@
   ],
   "bosses": [
    457
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    7425,
+    1
+   ]
+  ],
+  "achievements": [
+   34,
+   497,
+   6162,
+   672,
+   673
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "34": {
   "name": "Mansión Encantada",
@@ -524,7 +939,24 @@
   ],
   "bosses": [
    2975
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11799,
+    1
+   ]
+  ],
+  "achievements": [
+   66,
+   493,
+   665,
+   664,
+   6152,
+   5959
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "35": {
   "name": "Laboratorio de Brumen Tinctorias",
@@ -542,7 +974,24 @@
   ],
   "bosses": [
    3100
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    12073,
+    1
+   ]
+  ],
+  "achievements": [
+   64,
+   504,
+   687,
+   686,
+   6170,
+   6009
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "36": {
   "name": "Mazmorra de Nawidad",
@@ -560,7 +1009,24 @@
   ],
   "bosses": [
    1179
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    12150,
+    1
+   ]
+  ],
+  "achievements": [
+   430,
+   434,
+   431,
+   432,
+   433,
+   6271
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "37": {
   "name": "Cueva de Nawidad",
@@ -578,7 +1044,24 @@
   ],
   "bosses": [
    1194
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    12151,
+    1
+   ]
+  ],
+  "achievements": [
+   440,
+   444,
+   441,
+   443,
+   6273,
+   442
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "38": {
   "name": "Casa de Chanta Klaus",
@@ -596,7 +1079,24 @@
   ],
   "bosses": [
    872
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    12152,
+    1
+   ]
+  ],
+  "achievements": [
+   435,
+   439,
+   436,
+   438,
+   437,
+   6272
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "39": {
   "name": "Cala del Arca de Otomai",
@@ -614,7 +1114,24 @@
   ],
   "bosses": [
    1051
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8971,
+    1
+   ]
+  ],
+  "achievements": [
+   26,
+   505,
+   689,
+   688,
+   6169,
+   5995
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "41": {
   "name": "Boca del Rasgabola",
@@ -632,7 +1149,23 @@
   ],
   "bosses": [
    1071
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8972,
+    1
+   ]
+  ],
+  "achievements": [
+   61,
+   514,
+   6185,
+   706,
+   707
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "42": {
   "name": "Despensa de la Rata Blanca",
@@ -650,7 +1183,23 @@
   ],
   "bosses": [
    940
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8439,
+    1
+   ]
+  ],
+  "achievements": [
+   5188,
+   5191,
+   5190,
+   6186,
+   5189
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "43": {
   "name": "Raratonera de la Rata Negra",
@@ -668,7 +1217,24 @@
   ],
   "bosses": [
    939
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8438,
+    1
+   ]
+  ],
+  "achievements": [
+   5194,
+   5197,
+   5196,
+   6187,
+   5195,
+   5982
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "44": {
   "name": "Guarida de Sfinter Cell",
@@ -686,7 +1252,23 @@
   ],
   "bosses": [
    943
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    12351,
+    1
+   ]
+  ],
+  "achievements": [
+   47,
+   534,
+   6208,
+   740,
+   741
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "45": {
   "name": "Mazmorra de los Escarahojas",
@@ -707,7 +1289,23 @@
   ],
   "bosses": [
    797
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8139,
+    1
+   ]
+  ],
+  "achievements": [
+   48,
+   491,
+   660,
+   6153,
+   661
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "46": {
   "name": "Guarida de Skonk",
@@ -728,7 +1326,23 @@
   ],
   "bosses": [
    780
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8073,
+    1
+   ]
+  ],
+  "achievements": [
+   69,
+   527,
+   6192,
+   726,
+   727
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "47": {
   "name": "Mazmorra de los Esqueletos",
@@ -747,7 +1361,24 @@
   ],
   "bosses": [
    3238
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    1570,
+    1
+   ]
+  ],
+  "achievements": [
+   49,
+   494,
+   6154,
+   667,
+   666,
+   5994
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "48": {
   "name": "Mazmorra de los Tofus",
@@ -767,7 +1398,24 @@
   ],
   "bosses": [
    800
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7918,
+    1
+   ]
+  ],
+  "achievements": [
+   50,
+   662,
+   492,
+   663,
+   6155,
+   5980
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "49": {
   "name": "Antro del Blop Multicolor Real",
@@ -781,7 +1429,28 @@
   ],
   "bosses": [
    1188
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    9254,
+    1
+   ],
+   [
+    9248,
+    1
+   ]
+  ],
+  "achievements": [
+   21,
+   520,
+   714,
+   715,
+   6195,
+   6003
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "50": {
   "name": "Tofullinero Real",
@@ -801,7 +1470,24 @@
   ],
   "bosses": [
    382
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8142,
+    1
+   ]
+  ],
+  "achievements": [
+   73,
+   525,
+   6191,
+   723,
+   722,
+   5968
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "51": {
   "name": "Laboratorio del Tynril",
@@ -822,7 +1508,23 @@
    1072,
    1085,
    1086
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8975,
+    1
+   ]
+  ],
+  "achievements": [
+   531,
+   735,
+   734,
+   6204,
+   65
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "52": {
   "name": "Castillo del Wey Wabbit",
@@ -840,7 +1542,23 @@
   ],
   "bosses": [
    180
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14464,
+    1
+   ]
+  ],
+  "achievements": [
+   57,
+   680,
+   501,
+   6167,
+   681
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "53": {
   "name": "Sala del Minotot",
@@ -854,7 +1572,35 @@
   ],
   "bosses": [
    827
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8307,
+    1
+   ],
+   [
+    7924,
+    1
+   ],
+   [
+    8306,
+    1
+   ],
+   [
+    8305,
+    1
+   ]
+  ],
+  "achievements": [
+   71,
+   744,
+   6213,
+   536,
+   745
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "54": {
   "name": "Invernáculo de Jalamut Real",
@@ -872,7 +1618,23 @@
   ],
   "bosses": [
    2854
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11174,
+    1
+   ]
+  ],
+  "achievements": [
+   72,
+   523,
+   719,
+   6197,
+   718
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "55": {
   "name": "Excavación de Morsagüino Real",
@@ -890,7 +1652,24 @@
   ],
   "bosses": [
    2848
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11175,
+    1
+   ]
+  ],
+  "achievements": [
+   59,
+   532,
+   737,
+   6205,
+   736,
+   6024
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "56": {
   "name": "Restos del Roca Negra",
@@ -908,7 +1687,24 @@
   ],
   "bosses": [
    2877
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11176,
+    1
+   ]
+  ],
+  "achievements": [
+   58,
+   533,
+   6209,
+   739,
+   738,
+   5996
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "57": {
   "name": "Hipogeo del Obsidiantre",
@@ -928,7 +1724,23 @@
   ],
   "bosses": [
    2924
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11177,
+    1
+   ]
+  ],
+  "achievements": [
+   63,
+   537,
+   6214,
+   746,
+   747
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "58": {
   "name": "Guarida de los Gélifux",
@@ -953,7 +1765,29 @@
   "bosses": [
    2967,
    3234
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11178,
+    1
+   ]
+  ],
+  "achievements": [
+   31,
+   748,
+   538,
+   6218,
+   749,
+   134,
+   544,
+   6219,
+   761,
+   760,
+   5983
+  ],
+  "lobby": 1,
+  "autoGroup": 0
  },
  "59": {
   "name": "Antro del Cil",
@@ -971,7 +1805,23 @@
   ],
   "bosses": [
    2968
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11179,
+    1
+   ]
+  ],
+  "achievements": [
+   23,
+   750,
+   539,
+   6226,
+   751
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "60": {
   "name": "Cavernas de Tejossus",
@@ -994,7 +1844,22 @@
   "bosses": [
    2986,
    2992
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11180,
+    1
+   ]
+  ],
+  "achievements": [
+   30,
+   543,
+   6228,
+   759
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "61": {
   "name": "Antecámara de los Golosotes",
@@ -1013,7 +1878,24 @@
   ],
   "bosses": [
    2864
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    11181,
+    1
+   ]
+  ],
+  "achievements": [
+   20,
+   764,
+   546,
+   6229,
+   765,
+   6025
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "62": {
   "name": "Mazmorra de la Mina de Kéfriho",
@@ -1031,7 +1913,24 @@
   ],
   "bosses": [
    2942
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8329,
+    1
+   ]
+  ],
+  "achievements": [
+   486,
+   545,
+   762,
+   6230,
+   763,
+   5990
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "66": {
   "name": "Huerto de Haluín",
@@ -1050,7 +1949,24 @@
   ],
   "bosses": [
    3306
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    13333,
+    1
+   ]
+  ],
+  "achievements": [
+   1148,
+   6270,
+   1149,
+   1152,
+   1150,
+   1151
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "67": {
   "name": "Transportador de Sylargh",
@@ -1069,7 +1985,24 @@
   ],
   "bosses": [
    3409
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14044,
+    1
+   ]
+  ],
+  "achievements": [
+   877,
+   880,
+   878,
+   6006,
+   6234,
+   879
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "68": {
   "name": "Sala Privada de Klim",
@@ -1088,7 +2021,24 @@
   ],
   "bosses": [
    3384
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14045,
+    1
+   ]
+  ],
+  "achievements": [
+   882,
+   6012,
+   885,
+   883,
+   6235,
+   884
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "69": {
   "name": "Forjafría de Mizz Frizz",
@@ -1106,7 +2056,24 @@
   ],
   "bosses": [
    3391
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14043,
+    1
+   ]
+  ],
+  "achievements": [
+   872,
+   875,
+   874,
+   6236,
+   873,
+   5985
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "70": {
   "name": "Laboratorio de Nileza",
@@ -1124,7 +2091,24 @@
   ],
   "bosses": [
    3397
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14046,
+    1
+   ]
+  ],
+  "achievements": [
+   887,
+   888,
+   891,
+   6237,
+   889,
+   6019
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "71": {
   "name": "Mazmorra del Conde Kontatrás",
@@ -1152,7 +2136,24 @@
   ],
   "bosses": [
    3416
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14047,
+    1
+   ]
+  ],
+  "achievements": [
+   892,
+   6027,
+   895,
+   6238,
+   894,
+   893
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "72": {
   "name": "Teatro de Dramak",
@@ -1172,7 +2173,24 @@
   ],
   "bosses": [
    3476
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14560,
+    1
+   ]
+  ],
+  "achievements": [
+   1013,
+   1016,
+   1014,
+   6184,
+   1015,
+   6002
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "73": {
   "name": "Acuadomo de Merkator",
@@ -1190,7 +2208,24 @@
   ],
   "bosses": [
    3534
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14870,
+    1
+   ]
+  ],
+  "achievements": [
+   1019,
+   1024,
+   1023,
+   6239,
+   1022,
+   5991
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "74": {
   "name": "Pirámide de Sombra",
@@ -1209,7 +2244,24 @@
   ],
   "bosses": [
    3564
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    14935,
+    1
+   ]
+  ],
+  "achievements": [
+   1040,
+   1043,
+   1042,
+   6231,
+   1041,
+   5969
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "75": {
   "name": "Gruta de Kanígrula",
@@ -1227,7 +2279,24 @@
   ],
   "bosses": [
    3556
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    15093,
+    1
+   ]
+  ],
+  "achievements": [
+   1055,
+   6215,
+   1058,
+   1057,
+   1056,
+   5976
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "76": {
   "name": "Palacio del Rey Nidas",
@@ -1241,7 +2310,24 @@
   ],
   "bosses": [
    3648
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15280,
+    1
+   ]
+  ],
+  "achievements": [
+   1078,
+   1081,
+   6240,
+   1080,
+   1079,
+   5984
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "77": {
   "name": "Fábrica de Malefíscof",
@@ -1255,7 +2341,24 @@
   ],
   "bosses": [
    3652
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15278,
+    1
+   ]
+  ],
+  "achievements": [
+   1088,
+   1091,
+   6182,
+   1089,
+   1090,
+   5981
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "79": {
   "name": "Galería de Perfósil",
@@ -1269,7 +2372,23 @@
   ],
   "bosses": [
    3651
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15279,
+    1
+   ]
+  ],
+  "achievements": [
+   1083,
+   1086,
+   6210,
+   1085,
+   1084
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "80": {
   "name": "Pajarera de Thor Pestruz",
@@ -1287,7 +2406,23 @@
   ],
   "bosses": [
    3618
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    15162,
+    1
+   ]
+  ],
+  "achievements": [
+   1061,
+   1063,
+   1064,
+   6200,
+   1062
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "81": {
   "name": "Ring del Capitán Eskarlata",
@@ -1301,7 +2436,24 @@
   ],
   "bosses": [
    3753
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15477,
+    1
+   ]
+  ],
+  "achievements": [
+   1123,
+   1126,
+   6198,
+   1125,
+   1124,
+   5975
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "82": {
   "name": "Cueva de Toxoliat",
@@ -1315,7 +2467,23 @@
   ],
   "bosses": [
    3752
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15476,
+    1
+   ]
+  ],
+  "achievements": [
+   1118,
+   1120,
+   1121,
+   1119,
+   6227
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "83": {
   "name": "Trono de la Corte Tenebrosa",
@@ -1330,7 +2498,24 @@
   ],
   "bosses": [
    3726
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15475,
+    1
+   ]
+  ],
+  "achievements": [
+   1108,
+   1116,
+   6241,
+   1115,
+   1114,
+   5992
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "84": {
   "name": "Vientre de la Ballena",
@@ -1349,7 +2534,23 @@
   ],
   "bosses": [
    3828
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    15690,
+    1
+   ]
+  ],
+  "achievements": [
+   1136,
+   1137,
+   1139,
+   6242,
+   1138
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "85": {
   "name": "Megalito de Fraktal",
@@ -1363,7 +2564,23 @@
   ],
   "bosses": [
    3852
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15806,
+    1
+   ]
+  ],
+  "achievements": [
+   1166,
+   1167,
+   1169,
+   6194,
+   1168
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "86": {
   "name": "Relojarium de XLII",
@@ -1377,7 +2594,23 @@
   ],
   "bosses": [
    3849
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15807,
+    1
+   ]
+  ],
+  "achievements": [
+   1161,
+   1164,
+   1163,
+   1162,
+   6220
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "87": {
   "name": "Ojo de Vórtex",
@@ -1391,7 +2624,23 @@
   ],
   "bosses": [
    3835
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    15808,
+    1
+   ]
+  ],
+  "achievements": [
+   1156,
+   1159,
+   1158,
+   6243,
+   1157
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "88": {
   "name": "Escondrijo de Blatarata",
@@ -1411,7 +2660,24 @@
   ],
   "bosses": [
    3945
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    15991,
+    1
+   ]
+  ],
+  "achievements": [
+   1184,
+   6156,
+   1180,
+   1181,
+   1182,
+   5973
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "89": {
   "name": "Guarida de Lasoberaña",
@@ -1429,7 +2695,24 @@
   ],
   "bosses": [
    3996
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    16179,
+    1
+   ]
+  ],
+  "achievements": [
+   1195,
+   1191,
+   1193,
+   6177,
+   1192,
+   5967
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "90": {
   "name": "Cripta de Chadalid",
@@ -1447,7 +2730,23 @@
   ],
   "bosses": [
    4051
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8545,
+    1
+   ]
+  ],
+  "achievements": [
+   33,
+   571,
+   487,
+   6148,
+   574
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "91": {
   "name": "Navío de Le Chuko",
@@ -1465,7 +2764,23 @@
   ],
   "bosses": [
    230
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    17113,
+    1
+   ]
+  ],
+  "achievements": [
+   1398,
+   1399,
+   1402,
+   1403,
+   6174
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "92": {
   "name": "Árbol de Moon",
@@ -1483,7 +2798,24 @@
   ],
   "bosses": [
    226
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    17112,
+    1
+   ]
+  ],
+  "achievements": [
+   485,
+   513,
+   6183,
+   705,
+   704,
+   6016
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "93": {
   "name": "Miausoleo de Piojoporojo",
@@ -1497,7 +2829,23 @@
   ],
   "bosses": [
    4278
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    17563,
+    1
+   ]
+  ],
+  "achievements": [
+   1409,
+   1410,
+   6190,
+   1413,
+   1414
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "94": {
   "name": "Plataforma de Ush",
@@ -1511,7 +2859,23 @@
   ],
   "bosses": [
    4264
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    17564,
+    1
+   ]
+  ],
+  "achievements": [
+   1416,
+   6216,
+   1419,
+   1420,
+   1421
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "95": {
   "name": "Reto de Miauvizor",
@@ -1525,7 +2889,24 @@
   ],
   "bosses": [
    4263
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    17565,
+    1
+   ]
+  ],
+  "achievements": [
+   1437,
+   1438,
+   1439,
+   1440,
+   6244,
+   6013
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "96": {
   "name": "Templo Maldito de Araknas",
@@ -1540,7 +2921,17 @@
    182454272,
    182455296
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [
+   [
+    17785,
+    1
+   ]
+  ],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "97": {
   "name": "Nave del Capitán Meno",
@@ -1558,7 +2949,24 @@
   ],
   "bosses": [
    4460
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18066,
+    1
+   ]
+  ],
+  "achievements": [
+   1464,
+   5977,
+   1465,
+   1466,
+   1467,
+   6245
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "98": {
   "name": "Templo de Kutulú",
@@ -1576,7 +2984,24 @@
   ],
   "bosses": [
    4453
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18068,
+    1
+   ]
+  ],
+  "achievements": [
+   1471,
+   6026,
+   1472,
+   1474,
+   1473,
+   6246
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "99": {
   "name": "Palacio de Dientinea",
@@ -1594,7 +3019,24 @@
   ],
   "bosses": [
    4444
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18067,
+    1
+   ]
+  ],
+  "achievements": [
+   1478,
+   1480,
+   1481,
+   6247,
+   1479,
+   5964
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "100": {
   "name": "Cementerio de los Mastodontes",
@@ -1612,7 +3054,23 @@
   ],
   "bosses": [
    4621
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18421,
+    1
+   ]
+  ],
+  "achievements": [
+   1529,
+   1532,
+   1531,
+   1530,
+   6172
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "101": {
   "name": "Caverna de El Piko",
@@ -1630,7 +3088,23 @@
   ],
   "bosses": [
    4609
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18422,
+    1
+   ]
+  ],
+  "achievements": [
+   1536,
+   1539,
+   1538,
+   6199,
+   1537
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "102": {
   "name": "Tripas de Anelidón",
@@ -1648,7 +3122,23 @@
   ],
   "bosses": [
    4726
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18552,
+    1
+   ]
+  ],
+  "achievements": [
+   1555,
+   1558,
+   6221,
+   1557,
+   1556
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "103": {
   "name": "Cámara de Tal Kasha",
@@ -1666,7 +3156,23 @@
   ],
   "bosses": [
    4744
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18544,
+    1
+   ]
+  ],
+  "achievements": [
+   1562,
+   1565,
+   6248,
+   1564,
+   1563
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "104": {
   "name": "Campamento del Conde Razof",
@@ -1684,7 +3190,23 @@
   ],
   "bosses": [
    4803
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    18736,
+    1
+   ]
+  ],
+  "achievements": [
+   1582,
+   1583,
+   1585,
+   6232,
+   1584
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "105": {
   "name": "Carpa de los Magik Riktus",
@@ -1703,7 +3225,24 @@
   ],
   "bosses": [
    4860
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    19041,
+    1
+   ]
+  ],
+  "achievements": [
+   1593,
+   1596,
+   1594,
+   1595,
+   6176,
+   5974
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "106": {
   "name": "Mansión de Kuatropatas",
@@ -1721,7 +3260,24 @@
   ],
   "bosses": [
    4882
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    19049,
+    1
+   ]
+  ],
+  "achievements": [
+   1605,
+   1608,
+   1606,
+   6249,
+   1607,
+   5963
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "107": {
   "name": "Mirador de Ilyzaelle",
@@ -1739,7 +3295,24 @@
   ],
   "bosses": [
    4967
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    19216,
+    1
+   ]
+  ],
+  "achievements": [
+   1623,
+   1626,
+   1625,
+   1624,
+   6250,
+   5978
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "108": {
   "name": "Torre de Bethel",
@@ -1757,7 +3330,24 @@
   ],
   "bosses": [
    5110
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    19515,
+    1
+   ]
+  ],
+  "achievements": [
+   1641,
+   1644,
+   1643,
+   6251,
+   1642,
+   5998
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "109": {
   "name": "Torre de Solar",
@@ -1775,7 +3365,24 @@
   ],
   "bosses": [
    5100
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    19514,
+    1
+   ]
+  ],
+  "achievements": [
+   1634,
+   1635,
+   1637,
+   6252,
+   1636,
+   5999
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "110": {
   "name": "Cervecería del Rey Dazahk",
@@ -1793,7 +3400,24 @@
   ],
   "bosses": [
    5319
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    19963,
+    1
+   ]
+  ],
+  "achievements": [
+   1695,
+   1697,
+   1698,
+   6253,
+   5970,
+   1696
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "111": {
   "name": "Templo del Dios Kao",
@@ -1811,7 +3435,24 @@
   ],
   "bosses": [
    5666
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    20920,
+    1
+   ]
+  ],
+  "achievements": [
+   2082,
+   2084,
+   2094,
+   2085,
+   2083,
+   6282
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "112": {
   "name": "Crocantería",
@@ -1829,7 +3470,24 @@
   ],
   "bosses": [
    5664
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    20919,
+    1
+   ]
+  ],
+  "achievements": [
+   2075,
+   2093,
+   2077,
+   2076,
+   2081,
+   6281
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "113": {
   "name": "Fundición de los Waddictos",
@@ -1847,7 +3505,24 @@
   ],
   "bosses": [
    5653
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    20918,
+    1
+   ]
+  ],
+  "achievements": [
+   2072,
+   2068,
+   2092,
+   2066,
+   2067,
+   6280
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "114": {
   "name": "Santuario de Torkelonia",
@@ -1865,7 +3540,24 @@
   ],
   "bosses": [
    5806
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    21216,
+    1
+   ]
+  ],
+  "achievements": [
+   2106,
+   2109,
+   2108,
+   6254,
+   2107,
+   5971
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "115": {
   "name": "Guarida de Karnozor",
@@ -1883,7 +3575,23 @@
   ],
   "bosses": [
    5819
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    21249,
+    1
+   ]
+  ],
+  "achievements": [
+   2115,
+   2118,
+   6181,
+   2116,
+   2117
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "116": {
   "name": "Prueba de Dragenerys",
@@ -1901,7 +3609,24 @@
   ],
   "bosses": [
    5823
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    8343,
+    1
+   ]
+  ],
+  "achievements": [
+   2128,
+   2125,
+   2126,
+   2127,
+   6171,
+   5960
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "117": {
   "name": "Árbol de Muerte",
@@ -1919,7 +3644,23 @@
   ],
   "bosses": [
    6026
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    22148,
+    1
+   ]
+  ],
+  "achievements": [
+   2257,
+   2260,
+   2258,
+   6255,
+   2259
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "118": {
   "name": "Cadenas de la Tiranía",
@@ -1937,7 +3678,23 @@
   ],
   "bosses": [
    5955
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    22028,
+    1
+   ]
+  ],
+  "achievements": [
+   2271,
+   2274,
+   6256,
+   2273,
+   2272
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "119": {
   "name": "Sentencia de la Balanza",
@@ -1955,7 +3712,23 @@
   ],
   "bosses": [
    5990
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    22149,
+    1
+   ]
+  ],
+  "achievements": [
+   2278,
+   2279,
+   2281,
+   6257,
+   2280
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "120": {
   "name": "Trono de Sangre",
@@ -1973,7 +3746,23 @@
   ],
   "bosses": [
    6014
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    22147,
+    1
+   ]
+  ],
+  "achievements": [
+   2264,
+   2267,
+   2265,
+   2266,
+   6258
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "121": {
   "name": "Tormenta del Selocalipsis",
@@ -1994,7 +3783,38 @@
    5955,
    5990,
    6026
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    22401,
+    1
+   ]
+  ],
+  "achievements": [
+   2264,
+   2267,
+   2265,
+   2266,
+   6258,
+   2271,
+   2274,
+   6256,
+   2273,
+   2272,
+   2278,
+   2279,
+   2281,
+   6257,
+   2280,
+   2257,
+   2260,
+   2258,
+   6255,
+   2259
+  ],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "122": {
   "name": "Dojo del Viento",
@@ -2013,7 +3833,24 @@
   "bosses": [
    6204,
    6212
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7309,
+    1
+   ]
+  ],
+  "achievements": [
+   3011,
+   6206,
+   3014,
+   3013,
+   3012,
+   6017
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "123": {
   "name": "Valle de la Dama del Agua",
@@ -2031,7 +3868,24 @@
   ],
   "bosses": [
    6256
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7310,
+    1
+   ]
+  ],
+  "achievements": [
+   3020,
+   3023,
+   3022,
+   6201,
+   3021,
+   5989
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "124": {
   "name": "Fábrica de Fux Artificiales",
@@ -2049,7 +3903,23 @@
   ],
   "bosses": [
    6249
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7312,
+    1
+   ]
+  ],
+  "achievements": [
+   3027,
+   6207,
+   3029,
+   3030,
+   3028
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "125": {
   "name": "Bambusería de Kodámade",
@@ -2067,7 +3937,23 @@
   ],
   "bosses": [
    6326
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    12735,
+    1
+   ]
+  ],
+  "achievements": [
+   3037,
+   3039,
+   3040,
+   6189,
+   3038
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "126": {
   "name": "Taller de Tanukui San",
@@ -2085,7 +3971,24 @@
   ],
   "bosses": [
    6218
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    7311,
+    1
+   ]
+  ],
+  "achievements": [
+   3004,
+   3007,
+   6203,
+   3005,
+   3006,
+   6010
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "131": {
   "name": "Casa de los Espíritus",
@@ -2103,7 +4006,24 @@
   ],
   "bosses": [
    6394
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    23591,
+    1
+   ]
+  ],
+  "achievements": [
+   3062,
+   3065,
+   6222,
+   3064,
+   3063,
+   5997
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "132": {
   "name": "Tumba del Shogun Tofugawa",
@@ -2121,7 +4041,24 @@
   ],
   "bosses": [
    6388
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    23630,
+    1
+   ]
+  ],
+  "achievements": [
+   3071,
+   6217,
+   3073,
+   3074,
+   3072,
+   6018
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "133": {
   "name": "Memoria de Orukam",
@@ -2136,7 +4073,23 @@
   ],
   "bosses": [
    6472
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    23950,
+    1
+   ]
+  ],
+  "achievements": [
+   3083,
+   3084,
+   6259,
+   3086,
+   3085
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "134": {
   "name": "Recuerdo de Imagiro",
@@ -2151,7 +4104,24 @@
   ],
   "bosses": [
    6478
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    23951,
+    1
+   ]
+  ],
+  "achievements": [
+   3090,
+   3091,
+   6260,
+   3093,
+   3092,
+   6020
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "135": {
   "name": "Ritual de Kabaal",
@@ -2169,7 +4139,23 @@
   ],
   "bosses": [
    6654
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    25252,
+    1
+   ]
+  ],
+  "achievements": [
+   5069,
+   5070,
+   6261,
+   5072,
+   5071
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "136": {
   "name": "Batalla de la Aurora Púrpura",
@@ -2187,7 +4173,23 @@
   ],
   "bosses": [
    6792
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    26039,
+    1
+   ]
+  ],
+  "achievements": [
+   5166,
+   5168,
+   5169,
+   6262,
+   5167
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "138": {
   "name": "Akademia de los Goblins",
@@ -2205,7 +4207,24 @@
   ],
   "bosses": [
    6903
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    26680,
+    1
+   ]
+  ],
+  "achievements": [
+   5213,
+   5215,
+   5216,
+   6157,
+   5214,
+   5987
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "139": {
   "name": "Túmulo del Largo Sueño",
@@ -2223,7 +4242,24 @@
   ],
   "bosses": [
    107
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    26333,
+    1
+   ]
+  ],
+  "achievements": [
+   5211,
+   6211,
+   5205,
+   5206,
+   5207,
+   5961
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "140": {
   "name": "Cámara de los Maleficios",
@@ -2241,7 +4277,24 @@
   ],
   "bosses": [
    7210
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    27404,
+    1
+   ]
+  ],
+  "achievements": [
+   5809,
+   5810,
+   6263,
+   5812,
+   5811,
+   6005
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "141": {
   "name": "Bastión de los Martilloseco",
@@ -2259,7 +4312,24 @@
   ],
   "bosses": [
    7219
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    27440,
+    1
+   ]
+  ],
+  "achievements": [
+   5821,
+   5825,
+   5822,
+   6233,
+   5823,
+   6004
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "142": {
   "name": "Refugio Silvestre",
@@ -2277,7 +4347,24 @@
   ],
   "bosses": [
    7197
-  ]
+  ],
+  "keyring": 1,
+  "required": [
+   [
+    27374,
+    1
+   ]
+  ],
+  "achievements": [
+   5911,
+   6163,
+   5912,
+   5914,
+   5913,
+   6022
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "143": {
   "name": "Expedición - Tofullinero Real",
@@ -2290,7 +4377,12 @@
    239600129,
    239601153
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "144": {
   "name": "Expedición - Corte del Jalató Real",
@@ -2303,7 +4395,12 @@
    232784389,
    232785413
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "145": {
   "name": "Expedición - Claro del Roble Blando",
@@ -2316,7 +4413,12 @@
    239605249,
    239606273
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "146": {
   "name": "Expedición - Mazmorra de los Herreros",
@@ -2329,7 +4431,12 @@
    239607809,
    239608833
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "147": {
   "name": "Expedición - Antro de Cocabulia",
@@ -2342,7 +4449,12 @@
    239600132,
    239601156
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "148": {
   "name": "Expedición - Centro del Laberinto del Minotauroro",
@@ -2354,7 +4466,12 @@
   "rooms": [
    239603716
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "149": {
   "name": "Expedición - Biblioteca del Maestro Cuerbok",
@@ -2367,7 +4484,12 @@
    239605252,
    239606276
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "150": {
   "name": "Expedición - Granero del Girasol Hambriento",
@@ -2380,7 +4502,12 @@
    239607812,
    239608836
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "151": {
   "name": "Expedición - Antro del Blop Multicolor Real",
@@ -2392,7 +4519,12 @@
   "rooms": [
    239601159
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "152": {
   "name": "Expedición - Raratonera de la Rata Negra",
@@ -2404,7 +4536,12 @@
   "rooms": [
    239603719
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "153": {
   "name": "Expedición - Mazmorra de los Bworks",
@@ -2417,7 +4554,12 @@
    239606279,
    239605255
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "154": {
   "name": "Expedición - Picos Rocosos de los Crujidores",
@@ -2430,7 +4572,12 @@
    239607815,
    239608839
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "155": {
   "name": "Expedición - Despensa de la Rata Blanca",
@@ -2443,7 +4590,12 @@
    239600138,
    239601162
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "156": {
   "name": "Expedición - Guarida del Maxilubo",
@@ -2455,7 +4607,12 @@
   "rooms": [
    239603722
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "157": {
   "name": "Expedición - Mazmorra de los Esqueletos",
@@ -2468,7 +4625,12 @@
    232786435,
    232787459
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "158": {
   "name": "Expedición - Cueva del Trankitronko",
@@ -2480,7 +4642,12 @@
   "rooms": [
    239608842
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "159": {
   "name": "Expedición - Árbol de Moon",
@@ -2493,7 +4660,12 @@
    239600141,
    239601165
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "160": {
   "name": "Expedición - Castillo de Arena",
@@ -2506,7 +4678,12 @@
    239602701,
    239603725
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "161": {
   "name": "Expedición - Mazmorra de los Escarahojas",
@@ -2518,7 +4695,12 @@
   "rooms": [
    239606285
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "162": {
   "name": "Expedición - Antro del Dragocerdo",
@@ -2530,7 +4712,12 @@
   "rooms": [
    239608845
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "163": {
   "name": "Puesto de Control del Bzupervibzor",
@@ -2544,7 +4731,23 @@
   ],
   "bosses": [
    8052
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    31649,
+    1
+   ]
+  ],
+  "achievements": [
+   8839,
+   8840,
+   8841,
+   8842,
+   8843
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "164": {
   "name": "Coto del Venerable",
@@ -2558,7 +4761,23 @@
   ],
   "bosses": [
    8047
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    31650,
+    1
+   ]
+  ],
+  "achievements": [
+   8849,
+   8850,
+   8851,
+   8852,
+   8853
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "165": {
   "name": "Altar de la Despedazadora",
@@ -2572,7 +4791,23 @@
   ],
   "bosses": [
    8037
-  ]
+  ],
+  "keyring": 0,
+  "required": [
+   [
+    31651,
+    1
+   ]
+  ],
+  "achievements": [
+   8833,
+   8834,
+   8836,
+   8837,
+   8835
+  ],
+  "lobby": 1,
+  "autoGroup": 1
  },
  "166": {
   "name": "Expedición de Audacia - Cueva de Bworker",
@@ -2585,7 +4820,12 @@
    239600145,
    239601169
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "167": {
   "name": "Expedición de Audacia - Sala de Minotot",
@@ -2597,7 +4837,12 @@
   "rooms": [
    239603729
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "168": {
   "name": "Expedición de Audacia - Mazmorra de la Mina de Kéfriho",
@@ -2610,7 +4855,12 @@
    239605265,
    239606289
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 1,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "169": {
   "name": "Expedición de Audacia - Sala Privada de Klim",
@@ -2623,7 +4873,12 @@
    239607825,
    239608849
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "170": {
   "name": "Expedición de Audacia - Forjafría de Mizz Frizz",
@@ -2636,7 +4891,12 @@
    239600148,
    239601172
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "171": {
   "name": "Expedición de Audacia - Mazmorra del Conde Kontatrás",
@@ -2649,7 +4909,12 @@
    239602708,
    239603732
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "172": {
   "name": "Expedición de Audacia - Acuadomo de Merkator",
@@ -2662,7 +4927,12 @@
    239605268,
    239606292
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "173": {
   "name": "Expedición de Audacia - Pirámide de Sombra",
@@ -2675,7 +4945,12 @@
    239607837,
    239608861
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "174": {
   "name": "Expedición de Audacia - Gruta de Kanígrula",
@@ -2688,7 +4963,12 @@
    239607828,
    239608852
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "175": {
   "name": "Expedición de Audacia - Galería de Perfósil",
@@ -2700,7 +4980,12 @@
   "rooms": [
    239601175
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "176": {
   "name": "Expedición de Audacia - Cueva de Toxoliat",
@@ -2712,7 +4997,12 @@
   "rooms": [
    239603735
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "177": {
   "name": "Expedición de Audacia - Vientre de la Ballena",
@@ -2725,7 +5015,12 @@
    239605271,
    239606295
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "178": {
   "name": "Expedición de Audacia - Relojarium de XLII",
@@ -2737,7 +5032,12 @@
   "rooms": [
    239608855
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "179": {
   "name": "Expedición de Audacia - Nave del Capitán Meno",
@@ -2750,7 +5050,12 @@
    239600154,
    239601178
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "180": {
   "name": "Expedición de Audacia - Templo de Kutulú",
@@ -2763,7 +5068,12 @@
    239602714,
    239603738
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "181": {
   "name": "Expedición de Audacia - Palacio de Dientinea",
@@ -2776,7 +5086,12 @@
    239605274,
    239606298
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "182": {
   "name": "Expedición de Audacia - Mirador de Ilyzaelle",
@@ -2789,7 +5104,12 @@
    239607834,
    239608858
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "183": {
   "name": "Expedición de Audacia - Torre de Solar",
@@ -2802,7 +5122,12 @@
    239600157,
    239601181
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "184": {
   "name": "Expedición de Audacia - Cervecería del Rey Dazahk",
@@ -2815,7 +5140,12 @@
    239602717,
    239603741
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "185": {
   "name": "Expedición de Audacia - Trono de Sangre",
@@ -2828,7 +5158,12 @@
    239605277,
    239606301
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "186": {
   "name": "Expedición de Bravura - Cueva de Bworker",
@@ -2841,7 +5176,12 @@
    239610897,
    239611921
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "187": {
   "name": "Expedición de Bravura - Trono de Sangre",
@@ -2854,7 +5194,12 @@
    239616029,
    239617053
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "188": {
   "name": "Expedición de Bravura - Cervecería del Rey Dazahk",
@@ -2867,7 +5212,12 @@
    239613469,
    239614493
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "189": {
   "name": "Expedición de Bravura - Torre de Solar",
@@ -2880,7 +5230,12 @@
    239610909,
    239611933
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "190": {
   "name": "Expedición de Bravura - Mirador de Ilyzaelle",
@@ -2893,7 +5248,12 @@
    239618586,
    239619610
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "191": {
   "name": "Expedición de Bravura - Palacio de Dientinea",
@@ -2906,7 +5266,12 @@
    239616026,
    239617050
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "192": {
   "name": "Expedición de Bravura - Templo de Kutulú",
@@ -2919,7 +5284,12 @@
    239613466,
    239614490
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "193": {
   "name": "Expedición de Bravura - Nave del Capitán Meno",
@@ -2932,7 +5302,12 @@
    239610906,
    239611930
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "194": {
   "name": "Expedición de Bravura - Relojarium de XLII",
@@ -2944,7 +5319,12 @@
   "rooms": [
    239619607
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "195": {
   "name": "Expedición de Bravura - Vientre de la Ballena",
@@ -2957,7 +5337,12 @@
    239616023,
    239617047
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "196": {
   "name": "Expedición de Bravura - Cueva de Toxoliat",
@@ -2969,7 +5354,12 @@
   "rooms": [
    239614487
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "197": {
   "name": "Expedición de Bravura - Galería de Perfósil",
@@ -2981,7 +5371,12 @@
   "rooms": [
    239611927
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "198": {
   "name": "Expedición de Bravura - Gruta de Kanígrula",
@@ -2994,7 +5389,12 @@
    239618580,
    239619604
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "199": {
   "name": "Expedición de Bravura - Pirámide de Sombra",
@@ -3007,7 +5407,12 @@
    239618589,
    239619613
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "200": {
   "name": "Expedición de Bravura - Acuadomo de Merkator",
@@ -3020,7 +5425,12 @@
    239616020,
    239617044
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "201": {
   "name": "Expedición de Bravura - Mazmorra del Conde Kontatrás",
@@ -3033,7 +5443,12 @@
    239613460,
    239614484
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "202": {
   "name": "Expedición de Bravura - Forjafría de Mizz Frizz",
@@ -3046,7 +5461,12 @@
    239610900,
    239611924
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "203": {
   "name": "Expedición de Bravura - Sala Privada de Klim",
@@ -3059,7 +5479,12 @@
    239618577,
    239619601
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "204": {
   "name": "Expedición de Bravura - Mazmorra de la Mina de Kéfriho",
@@ -3072,7 +5497,12 @@
    239616017,
    239617041
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 1,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  },
  "205": {
   "name": "Expedición de Bravura - Sala de Minotot",
@@ -3084,6 +5514,11 @@
   "rooms": [
    239614481
   ],
-  "bosses": []
+  "bosses": [],
+  "keyring": 0,
+  "required": [],
+  "achievements": [],
+  "lobby": 0,
+  "autoGroup": 0
  }
 }

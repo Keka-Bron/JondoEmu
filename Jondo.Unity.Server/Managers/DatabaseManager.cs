@@ -498,6 +498,37 @@ namespace Jondo.Unity.Server
                 ";
                 createChallenges.ExecuteNonQuery();
 
+                // Where each character has got to on each quest. StepId zero with Completed 1 is a
+                // quest that is over; Objectives is the comma-separated list of the ones already
+                // ticked off ON THE STEP IN HAND, which is why it is emptied whenever the step
+                // changes: the client is only ever told about the current step's objectives.
+                var createQuests = worldConnection.CreateCommand();
+                createQuests.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterQuests (
+                        CharacterId INTEGER NOT NULL,
+                        QuestId INTEGER NOT NULL,
+                        StepId INTEGER NOT NULL DEFAULT 0,
+                        Objectives TEXT NOT NULL DEFAULT '',
+                        Completed INTEGER NOT NULL DEFAULT 0,
+                        PRIMARY KEY (CharacterId, QuestId)
+                    );
+                ";
+                createQuests.ExecuteNonQuery();
+
+                // Los logros conseguidos, y si ya se ha cobrado lo que dan. Son dos hechos y no
+                // uno: el cliente pide la recompensa con un paquete aparte —la captura de Logros
+                // es exactamente eso— y quien las junte pagaría dos veces o ninguna.
+                var createAchievements = worldConnection.CreateCommand();
+                createAchievements.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterAchievements (
+                        CharacterId INTEGER NOT NULL,
+                        AchievementId INTEGER NOT NULL,
+                        Claimed INTEGER NOT NULL DEFAULT 0,
+                        PRIMARY KEY (CharacterId, AchievementId)
+                    );
+                ";
+                createAchievements.ExecuteNonQuery();
+
                 // Y en qué hueco de la barra puso cada hechizo, por lo mismo.
                 var createSpellBar = worldConnection.CreateCommand();
                 createSpellBar.CommandText = @"
@@ -3721,6 +3752,136 @@ namespace Jondo.Unity.Server
             {
                 Console.WriteLine($"[SQLite] No se ha podido guardar el oficio {jobId}: {ex.Message}");
             }
+        }
+
+        /// <summary>One quest's progress as the database holds it.</summary>
+        public readonly struct QuestRow
+        {
+            public QuestRow(int questId, int stepId, string objectives, bool completed)
+            {
+                QuestId = questId;
+                StepId = stepId;
+                Objectives = objectives;
+                Completed = completed;
+            }
+
+            public int QuestId { get; }
+            public int StepId { get; }
+
+            /// <summary>The ticked objectives of the step in hand, comma separated.</summary>
+            public string Objectives { get; }
+
+            public bool Completed { get; }
+        }
+
+        /// <summary>
+        /// Writes where a character has got to on one quest.
+        /// </summary>
+        /// <remarks>
+        /// Write-through, called in the same breath as the in-memory change, the way
+        /// <see cref="SaveJobExperience"/> is. There is no periodic autosave anywhere in this
+        /// server and <c>SaveCurrentCharacter</c> only writes the Characters row, so anything that
+        /// waits for logout is lost on a crash — and losing a quest people have spent an evening on
+        /// is worse than losing a few kamas.
+        /// </remarks>
+        public static void SaveQuestProgress(long characterId, QuestRow quest)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterQuests (CharacterId, QuestId, StepId, Objectives, Completed)
+                    VALUES ($c, $q, $s, $o, $d)
+                    ON CONFLICT(CharacterId, QuestId) DO UPDATE
+                        SET StepId = $s, Objectives = $o, Completed = $d;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$q", quest.QuestId);
+                command.Parameters.AddWithValue("$s", quest.StepId);
+                command.Parameters.AddWithValue("$o", quest.Objectives ?? "");
+                command.Parameters.AddWithValue("$d", quest.Completed ? 1 : 0);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] La misión {quest.QuestId} no se ha podido guardar: {ex.Message}");
+            }
+        }
+
+        /// <summary>A character's quest log, for putting back on when they come in.</summary>
+        public static List<QuestRow> LoadQuestProgress(long characterId)
+        {
+            var salida = new List<QuestRow>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT QuestId, StepId, Objectives, Completed FROM CharacterQuests " +
+                    "WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    salida.Add(new QuestRow(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        reader.IsDBNull(2) ? "" : reader.GetString(2),
+                        reader.GetInt32(3) != 0));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se han podido leer las misiones: {ex.Message}");
+            }
+            return salida;
+        }
+
+        /// <summary>Writes down that a character has an achievement, and whether it was paid.</summary>
+        public static void SaveAchievement(long characterId, int achievementId, bool claimed)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterAchievements (CharacterId, AchievementId, Claimed)
+                    VALUES ($c, $a, $d)
+                    ON CONFLICT(CharacterId, AchievementId) DO UPDATE SET Claimed = $d;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$a", achievementId);
+                command.Parameters.AddWithValue("$d", claimed ? 1 : 0);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] El logro {achievementId} no se ha podido guardar: {ex.Message}");
+            }
+        }
+
+        /// <summary>A character's achievements: the id and whether the reward was taken.</summary>
+        public static List<(int Achievement, bool Claimed)> LoadAchievements(long characterId)
+        {
+            var salida = new List<(int, bool)>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT AchievementId, Claimed FROM CharacterAchievements WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) salida.Add((reader.GetInt32(0), reader.GetInt32(1) != 0));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se han podido leer los logros: {ex.Message}");
+            }
+            return salida;
         }
 
         /// <summary>Los oficios de un personaje, para dejárselos puestos al entrar.</summary>

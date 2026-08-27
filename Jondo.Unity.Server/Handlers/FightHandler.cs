@@ -3812,6 +3812,10 @@ namespace Jondo.Unity.Server.Handlers
             // Lo que devuelve es el extra de los cumplidos, sumado, en tanto por ciento.
             int extraDeRetos = await ChallengeWatcher.FightEndedAsync(stream, fight, won);
 
+            // Y las misiones que pedian vencer a algo, por lo mismo: aqui es donde se sabe
+            // que ha caido de verdad, y de eso no se fia uno del cliente.
+            await QuestWatcher.FightEndedAsync(stream, fight, won);
+
             // Y aqui se aplica. En el cable NO viaja desglosado: el porcentaje solo existe dentro
             // del ldd de la preparacion, y la cifra del final llega ya con el extra sumado. Se
             // revisaron los 68 jyg de las capturas y no hay ningun hueco donde quepa un desglose,
@@ -3953,6 +3957,28 @@ namespace Jondo.Unity.Server.Handlers
                 ? Network.SessionContext.State.RoleplayMapId
                 : fight.RoleplayMapId;
             LeaveFight();
+
+            // ¿Se peleaba dentro de una mazmorra? Entonces ganar mueve: a la sala siguiente, o
+            // fuera si era la última. Se decide AQUÍ y no después de que esto termine, porque el
+            // jru de abajo ya nombra un mapa y el cliente contesta a ése: un teletransporte
+            // posterior se lo comería el kkr que llega de vuelta.
+            //
+            // Hay que tocar las dos cosas, `back` y el estado, porque `back` se leyó antes de que
+            // LeaveFight() borrase el mapa de rol. Cambiar sólo una deja al cliente cargando un
+            // mapa y al servidor creyendo que está en otro.
+            if (alliesAlive)
+            {
+                long enLaMazmorra = DungeonHandler.AfterAWinIn(back);
+                if (enLaMazmorra != 0 && enLaMazmorra != back &&
+                    MapManager.GetMapInfo(enLaMazmorra) != null)
+                {
+                    back = enLaMazmorra;
+                    Network.SessionContext.State.MapId = enLaMazmorra;
+                    Network.SessionContext.State.CellId =
+                        MapManager.GetNearestWalkableCell(enLaMazmorra, TeleportHandler.MapCentre);
+                    DatabaseManager.SaveCurrentCharacter();
+                }
+            }
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kml));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp));

@@ -56,16 +56,28 @@ namespace Jondo.Unity.World.Content
     /// Reads NPC placements out of the layers and merges them.
     /// </summary>
     /// <remarks>
-    /// Two files today:
+    /// Three files today:
     ///
-    ///   measured   datos/npcs_reales.json     422 placements over 202 maps, read off the captures
-    ///                                         by tools/extraer_npcs_reales.py. Regenerable.
-    ///   authored   content/npcs/spawns.json   what a person decided. Never regenerated.
+    ///   base       datos/npc_spawns_derived.json   1,744 placements worked out from the client's
+    ///                                              quest catalogue by tools/derive_npc_spawns.py,
+    ///                                              66 of them with a cell somebody placed by hand
+    ///                                              in another emulator. Regenerable.
+    ///   measured   datos/npcs_reales.json          422 placements over 202 maps, read off the
+    ///                                              captures by tools/extraer_npcs_reales.py.
+    ///                                              Regenerable.
+    ///   authored   content/npcs/spawns.json        what a person decided. Never regenerated.
     ///
-    /// The two do not share a spelling because they do not share a life: the measured file is
+    /// The base file exists because the captures cover 327 NPCs out of 6,468 templates, and an NPC
+    /// nobody has walked past does not exist in the world at all — so the quest that needs them
+    /// cannot be started. The quest data puts 2,098 of them on a map, which is worth having even
+    /// though the cell that comes with it is a placeholder. Where both the base and the measured
+    /// file have an opinion about an NPC, they agree on the map 92.7% of the time; those overlaps
+    /// are dropped at generation time so a guessed cell cannot stand next to a captured one.
+    ///
+    /// The files do not share a spelling because they do not share a life: the measured file is
     /// written by a Python tool that has always used Spanish keys, and renaming them would break
-    /// the tool for nothing. The authored file is new, so it is in English like the rest of the
-    /// code from now on, and it is the only one anybody types into.
+    /// the tool for nothing. The other two are new, so they are in English like the rest of the
+    /// code from now on, and the authored one is the only one anybody types into.
     /// </remarks>
     public static class NpcSpawnContent
     {
@@ -75,16 +87,75 @@ namespace Jondo.Unity.World.Content
         /// <summary>Facing south-east, which is what a placement with no orientation gets.</summary>
         private const int DefaultOrientation = 1;
 
+        /// <summary>
+        /// Reads the layers and merges them.
+        /// </summary>
+        /// <remarks>
+        /// <paramref name="derivedPath"/> is last and optional even though its layer is the lowest,
+        /// which reads backwards. That is on purpose: <c>Load</c> already had two dozen call sites
+        /// when the base layer arrived, and reordering the parameters would have silently changed
+        /// what every one of them means — a measured file quietly read as authored is exactly the
+        /// kind of mistake the layers exist to prevent. The order they are read in does not matter
+        /// anyway; <see cref="ContentStore{TKey,TValue}"/> decides by layer, not by arrival.
+        /// </remarks>
         public static ContentStore<NpcSpawnKey, NpcSpawn> Load(string? measuredPath, string? authoredPath,
-                                                               Action<string>? report = null)
+                                                               Action<string>? report = null,
+                                                               string? derivedPath = null)
         {
             var store = new ContentStore<NpcSpawnKey, NpcSpawn>();
 
             // Lowest layer first only for readability: ContentStore does not care about the order,
             // precisely so that a change in startup order cannot silently undo an authored row.
+            ReadDerived(store, derivedPath, report);
             ReadMeasured(store, measuredPath, report);
             ReadAuthored(store, authoredPath, report);
             return store;
+        }
+
+        /// <summary>
+        /// The base layer: placements worked out from the quest catalogue.
+        /// </summary>
+        /// <remarks>
+        /// Deliberately strict about the cell. A row without one is dropped rather than defaulted,
+        /// because the cell is part of the key: a placement that fell back to cell 0 would key
+        /// differently from the same NPC placed properly, and the map would show them both.
+        /// </remarks>
+        private static void ReadDerived(ContentStore<NpcSpawnKey, NpcSpawn> store, string? path,
+                                        Action<string>? report)
+        {
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)) return;
+
+            var from = Origin.Base(Path.GetFileName(path));
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("spawns", out var list)) return;
+
+                foreach (var entry in list.EnumerateArray())
+                {
+                    long mapId = Long(entry, "map");
+                    int npcId = (int)Long(entry, "npc");
+                    if (mapId == 0 || npcId == 0) continue;
+
+                    if (!entry.TryGetProperty("cell", out var c) || !c.TryGetInt32(out int cell))
+                    {
+                        continue;
+                    }
+
+                    store.Put(new NpcSpawnKey(mapId, npcId, cell), new NpcSpawn
+                    {
+                        MapId = mapId,
+                        NpcId = npcId,
+                        Cell = cell,
+                        Orientation = entry.TryGetProperty("orientation", out var o) && o.TryGetInt32(out int f)
+                            ? f : DefaultOrientation,
+                    }, from);
+                }
+            }
+            catch (Exception ex)
+            {
+                report?.Invoke($"[Content] {Path.GetFileName(path)} is unreadable: {ex.Message}");
+            }
         }
 
         private static void ReadMeasured(ContentStore<NpcSpawnKey, NpcSpawn> store, string? path,

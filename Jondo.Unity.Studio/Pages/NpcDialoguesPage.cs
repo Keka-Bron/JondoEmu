@@ -82,6 +82,10 @@ namespace Jondo.Unity.Studio.Pages
                         {
                             Reply = c.Reply,
                             Next = c.Next,
+                            Quest = c.Quest,
+                            Step = c.Step,
+                            StartsQuest = c.StartsQuest,
+                            AfterQuest = c.AfterQuest,
                         }).ToArray(),
                     });
                 }
@@ -108,6 +112,22 @@ namespace Jondo.Unity.Studio.Pages
         {
             public long Reply;
             public long Next;
+
+            /// <summary>
+            /// What the reply is for, carried through untouched.
+            /// </summary>
+            /// <remarks>
+            /// The editor cannot set these yet — a reply's quest and step are written by hand or by
+            /// tools/build_dialogue_trees.py — and that is exactly why they are here. Without them
+            /// the draft would rebuild every choice from just the reply and the line it leads to,
+            /// so opening a conversation in the editor and saving it would quietly erase the quest
+            /// markings on every reply of that NPC. Nothing would look wrong until a quest stopped
+            /// being handed out.
+            /// </remarks>
+            public int Quest;
+            public int Step;
+            public int StartsQuest;
+            public bool AfterQuest;
         }
 
         /// <summary>One line of the NPC, as the list shows it.</summary>
@@ -717,7 +737,15 @@ namespace Jondo.Unity.Studio.Pages
                 var choices = new List<DraftChoice>();
                 foreach (var choice in line.Choices)
                 {
-                    choices.Add(new DraftChoice { Reply = choice.Reply, Next = choice.Next });
+                    choices.Add(new DraftChoice
+                    {
+                        Reply = choice.Reply,
+                        Next = choice.Next,
+                        Quest = choice.Quest,
+                        Step = choice.Step,
+                        StartsQuest = choice.StartsQuest,
+                        AfterQuest = choice.AfterQuest,
+                    });
                 }
 
                 draft.Lines[line.Message] = choices;

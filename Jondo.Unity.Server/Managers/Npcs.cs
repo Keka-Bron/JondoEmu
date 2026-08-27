@@ -230,7 +230,8 @@ namespace Jondo.Unity.Server.Managers
             var spawns = Jondo.Unity.World.Content.NpcSpawnContent.Load(
                 Paths.WorldNpcsJson,
                 Paths.ContentFile(Jondo.Unity.World.Content.NpcSpawnContent.AuthoredFile),
-                Console.WriteLine);
+                Console.WriteLine,
+                Paths.WorldNpcsDerivedJson);
 
             if (spawns.Count == 0)
             {
@@ -302,6 +303,10 @@ namespace Jondo.Unity.Server.Managers
             => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
 
         /// <summary>Quién es el negativo que el cliente acaba de clicar.</summary>
+        /// <summary>Los NPCs que hay en un mapa. Vacio si no hay ninguno.</summary>
+        public static IReadOnlyList<Spawn> OnMap(long mapId)
+            => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
+
         public static Spawn? Find(long mapId, long contextualId)
         {
             if (!_byMap.TryGetValue(mapId, out var here)) return null;

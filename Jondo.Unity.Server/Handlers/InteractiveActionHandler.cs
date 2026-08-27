@@ -30,6 +30,14 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             long mapId = SessionContext.State.MapId;
+
+            // ¿Es algo que una misión pide pinchar? Se mira ANTES del registro, porque una estela
+            // no es un zaap ni un recurso: no está en el registro y su única razón de existir es la
+            // misión. Es lo que hace la captura del tutorial —seis clics en los elementos
+            // 541424-541429 y detrás de cada uno el cliente preguntando «ieo {1629}»—, y lo que no
+            // hacía nadie: hasta ahora un clic así caía en la rama de «uso desconocido».
+            if (await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId)) return;
+
             if (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId,
                                                    out var interactive, out var action))
             {

@@ -1,0 +1,182 @@
+{
+ "_comment": [
+  "What finishes a free-text quest objective. Ankama's catalogue does not say.",
+  "",
+  "5.670 de los 15.547 objetivos del juego son de tipo 0: el cliente los llama '#1' y les pone",
+  "una frase, 'Examiner la stele d'un vestige dans les paturages'. Ni mapa, ni elemento, ni",
+  "objeto. Eso lo decidia el servidor de Ankama y nunca salio de ahi. Tampoco lo dice el",
+  "cliente: en las 401 capturas hay 16 tramas idw -el cliente diciendo que un objetivo esta",
+  "hecho- y las 16 son del tutorial.",
+  "",
+  "Asi que esta es la union, y es contenido. Cada fila dice: este objetivo lo cierra pinchar",
+  "este elemento en este mapa. Se comprueba con tools/check_quest_bindings.py, que exige que",
+  "el objetivo exista, que sea del tipo que no se cierra solo, que pertenezca a la mision que",
+  "la fila nombra, y que el elemento este de verdad en el mapa que dice.",
+  "",
+  "'elements' es una LISTA porque los objetivos hablan de 'un vestige', no de 'le vestige':",
+  "donde hay varios en la misma subzona vale cualquiera, y atar uno solo mandaria al que",
+  "pincho el otro a cruzar la subzona sin saber por que.",
+  "",
+  "skill 114 es 'Utiliser', la generica del cliente. type -1 es lo que las capturas declaran",
+  "para estos elementos: el grafico 3518 sale 32 veces y lleva -1 las 32."
+ ],
+ "bindings": [
+  {
+   "objective": 9817,
+   "quest": 1640,
+   "type": -1,
+   "elements": [
+    {
+     "map": 153356296,
+     "element": 504680
+    }
+   ],
+   "why": "«Examiner la stele d'un vestige sur la route des ames». El elemento 504680 es el unico de grafico 3518 en la subzona 450, que world.db llama «Route des ames». Mapa [2,-3]."
+  },
+  {
+   "objective": 9818,
+   "quest": 1640,
+   "type": -1,
+   "elements": [
+    {
+     "map": 153356294,
+     "element": 504681
+    },
+    {
+     "map": 153356294,
+     "element": 504682
+    }
+   ],
+   "why": "«Examiner la stele d'un vestige dans les champs». Los dos elementos de grafico 3518 del mapa [0,-4], cuya subzona es la 444 «Champs» -que MapLoadHandler renumera a 20663, y por eso world.db la deja sin nombre-. Valen los dos."
+  },
+  {
+   "objective": 9819,
+   "quest": 1640,
+   "type": -1,
+   "elements": [
+    {
+     "map": 153354244,
+     "element": 504677
+    },
+    {
+     "map": 153354246,
+     "element": 504672
+    },
+    {
+     "map": 153355268,
+     "element": 504675
+    },
+    {
+     "map": 153355270,
+     "element": 504678
+    }
+   ],
+   "why": "«Examiner la stele d'un vestige pres du lac». Los cuatro de grafico 3518 de la subzona 442, que world.db llama «Lac». Mapas [0,-2], [0,-1], [-1,-2] y [-2,-2]."
+  },
+  {
+   "objective": 9820,
+   "quest": 1640,
+   "type": -1,
+   "elements": [
+    {
+     "map": 153355272,
+     "element": 504674
+    },
+    {
+     "map": 153355264,
+     "element": 504676
+    }
+   ],
+   "why": "«Examiner la stele d'un vestige dans les paturages». Los dos de grafico 3518 de la subzona 445, «Paturages». Mapas [1,-4] y [2,-4]."
+  },
+  {
+   "objective": 9821,
+   "quest": 1640,
+   "type": -1,
+   "elements": [
+    {
+     "map": 153355266,
+     "element": 504673
+    }
+   ],
+   "why": "«Examiner la stele d'un vestige dans la foret». El unico de grafico 3518 en la subzona 443, «Foret». Mapa [2,-2]."
+  },
+  {
+   "objective": 9655,
+   "quest": 1629,
+   "kind": "enter",
+   "map": 241440769,
+   "why": "«Entrer dans la salle des métiers». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 9784,
+   "quest": 1635,
+   "kind": "enter",
+   "map": 153881600,
+   "why": "«Pénétrer dans l'antre du Milimilou». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13849,
+   "quest": 1958,
+   "kind": "enter",
+   "map": 192413702,
+   "why": "«Entrer dans la Tour du Conseil d'Astrub». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13851,
+   "quest": 1959,
+   "kind": "enter",
+   "map": 192413696,
+   "why": "«Entrer dans la taverne d'Astrub». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13911,
+   "quest": 2007,
+   "kind": "enter",
+   "map": 190842369,
+   "why": "«Retourner avec Finney sur la tombe où vous avez trouvé l'indice». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13919,
+   "quest": 2007,
+   "kind": "enter",
+   "map": 190842883,
+   "why": "«Rejoindre Becky devant le caveau». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13921,
+   "quest": 2007,
+   "kind": "enter",
+   "map": 190841344,
+   "why": "«Se rendre à la cabane de Becky». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13923,
+   "quest": 2007,
+   "kind": "enter",
+   "map": 190842883,
+   "why": "«Retourner au caveau». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13946,
+   "quest": 1962,
+   "kind": "enter",
+   "map": 189530630,
+   "why": "«Aller au rendez-vous fixé par Badufron». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 14110,
+   "quest": 1966,
+   "kind": "enter",
+   "map": 192675848,
+   "why": "«Entrer dans le repaire du maître des Srams». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 14230,
+   "quest": 1964,
+   "kind": "enter",
+   "map": 188482052,
+   "why": "«Entrer dans la mine d'Astrub avec le chienchien fidèle». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  }
+ ]
+}

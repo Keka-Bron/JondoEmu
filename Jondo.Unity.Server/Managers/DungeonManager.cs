@@ -25,9 +25,15 @@ namespace Jondo.Unity.Server.Managers
     ///     x = -14, -13, -15, which is not a progression. <see cref="NextRoom"/> follows it
     ///     anyway because it is the best there is, and it says so here rather than pretending.
     ///
-    /// Nothing calls this yet. It is the groundwork for moving a player on from one room to the
-    /// next after a win, and for putting them at the entrance and at the exit; combat is still on
-    /// the previous version of the protocol, so that wiring waits for it.
+    /// It is wired up now: <see cref="Handlers.DungeonHandler"/> takes the key at the door and
+    /// puts the player in the first room, and the end of a fight moves them on to the next room
+    /// or out through the exit.
+    ///
+    /// The walking order was doubted here for good reason and it has since been checked against a
+    /// real playthrough. In the capture of the Corte del Jalató Real the player goes
+    /// 121373185 → 121374209 → 121375233 → 121373187 → 121374211, which is exactly the order the
+    /// data lists. That is one dungeon of 187, so the doubt stands for the other 186 — but the
+    /// order is no longer only a guess.
     /// </summary>
     public static class DungeonManager
     {
@@ -43,6 +49,27 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>The rooms, in the order the client's data lists them.</summary>
             public List<long> Rooms { get; } = new List<long>();
             public List<int> Bosses { get; } = new List<int>();
+
+            /// <summary>Whether the keyring opens it as well as its own key. 107 of the 187.</summary>
+            public bool OnKeyring { get; set; }
+
+            /// <summary>
+            /// What has to be in the bag to get in: item id and how many. 126 of the 187 ask for
+            /// something.
+            /// </summary>
+            /// <remarks>
+            /// It was in the client's data all along and the extractor was dropping it. The Jalató
+            /// dungeon asks for item 1568, "Llave de la Corte del Jalató Real", and the capture of
+            /// somebody walking in shows the guardian asking "¿Seguro que quieres utilizar el
+            /// manojo de llaves para entrar?" before taking it.
+            /// </remarks>
+            public List<(int Item, int Count)> Required { get; } = new List<(int, int)>();
+
+            /// <summary>The last room, where the boss stands. Zero when it has no rooms.</summary>
+            public long LastRoom => Rooms.Count == 0 ? 0 : Rooms[^1];
+
+            /// <summary>The room you start in.</summary>
+            public long FirstRoom => Rooms.Count == 0 ? 0 : Rooms[0];
         }
 
         private static readonly Dictionary<int, Dungeon> _byId = new Dictionary<int, Dungeon>();
@@ -102,6 +129,19 @@ namespace Jondo.Unity.Server.Managers
                     if (entry.Value.TryGetProperty("bosses", out var bosses))
                     {
                         foreach (var boss in bosses.EnumerateArray()) dungeon.Bosses.Add(boss.GetInt32());
+                    }
+
+                    dungeon.OnKeyring = Number(entry.Value, "keyring") != 0;
+                    if (entry.Value.TryGetProperty("required", out var required))
+                    {
+                        foreach (var pair in required.EnumerateArray())
+                        {
+                            var numbers = pair.EnumerateArray();
+                            if (!numbers.MoveNext()) continue;
+                            int item = numbers.Current.GetInt32();
+                            int count = numbers.MoveNext() ? numbers.Current.GetInt32() : 1;
+                            if (item != 0) dungeon.Required.Add((item, Math.Max(1, count)));
+                        }
                     }
 
                     _byId[id] = dungeon;
@@ -192,6 +232,29 @@ namespace Jondo.Unity.Server.Managers
         }
 
         public static bool IsRoom(long mapId) => _byRoom.ContainsKey(mapId);
+
+        /// <summary>
+        /// The dungeon whose door is on this map, or null.
+        /// </summary>
+        /// <remarks>
+        /// Built lazily rather than kept as a third index because it is asked once per NPC
+        /// conversation and there are 187 of them. When two dungeons share an entrance map the
+        /// lowest id wins, the same arbitrary rule <see cref="OfRoom"/> uses and for the same
+        /// reason: nothing in the data says which the player meant.
+        /// </remarks>
+        public static Dungeon? AtEntrance(long mapId)
+        {
+            if (mapId == 0) return null;
+
+            Dungeon? best = null;
+            foreach (var dungeon in _byId.Values)
+            {
+                if (dungeon.EntranceMapId != mapId) continue;
+                if (best == null || dungeon.Id < best.Id) best = dungeon;
+            }
+
+            return best;
+        }
 
         /// <summary>
         /// The room after this one, or 0 when this is the last. Follows the order the data gives;

@@ -127,7 +127,8 @@ namespace Jondo.Unity.Studio.Data
             NpcPlacements = NpcSpawnContent.Load(
                 Paths.WorldNpcsJson,
                 Paths.ContentFile(NpcSpawnContent.AuthoredFile),
-                Complaints.Add);
+                Complaints.Add,
+                Paths.WorldNpcsDerivedJson);
         }
 
         private void LoadProtocol()

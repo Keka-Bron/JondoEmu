@@ -50,6 +50,7 @@ namespace Jondo.Unity.Studio.Pages
                 .AppendLine($"protocol   {Paths.ProtocolProto}")
                 .AppendLine($"traffic    {Paths.TrafficLog}")
                 .AppendLine($"packets    {Paths.PacketTelemetryDb}")
+                .AppendLine($"quests     {Paths.QuestsJson}")
                 .ToString()));
 
             var census = _world.NpcPlacements.Census();
@@ -58,6 +59,7 @@ namespace Jondo.Unity.Studio.Pages
             what.Children.Add(Mono(new StringBuilder()
                 .AppendLine($"maps with cell data   {_world.MapCount:N0}")
                 .AppendLine($"npc placements        {_world.NpcPlacements.Count:N0}")
+                .AppendLine($"   derived            {census[ContentLayer.Base]:N0}")
                 .AppendLine($"   measured           {census[ContentLayer.Measured]:N0}")
                 .AppendLine($"   authored           {census[ContentLayer.Authored]:N0}")
                 .AppendLine($"   erased by hand     {_world.NpcPlacements.ErasedCount:N0}")

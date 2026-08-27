@@ -833,6 +833,50 @@ namespace Jondo.Unity.Server.Network
         {
             foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
                 Declare(jss, interactive);
+
+            AddQuestElements(jss, mapId);
+        }
+
+        /// <summary>
+        /// Lo que sólo ve quien lleva la misión: la estela, el catalejo, el cartel.
+        ///
+        /// Va aparte del registro a propósito. El registro es del mundo y es igual para todos —el
+        /// zaap está para cualquiera—, y esto es de UN jugador: la estela aparece al coger la
+        /// misión y se va al cumplir su objetivo. Meterlo en el registro habría hecho falso lo
+        /// primero.
+        ///
+        /// Que se pueda preguntar por jugador aquí no es nuevo: <see cref="Declare"/> ya mira el
+        /// nivel de oficio de quien mira el mapa para decidir si un recurso se le ofrece o se le
+        /// pinta en rojo. Este jss se construye una vez por jugador y por llegada al mapa.
+        ///
+        /// La habilidad va en el f4 y sin estado, como todo lo que no es recurso. El 114 es
+        /// «Utiliser», la misma que el cliente usa para el vestigio de anomalía, y de ella dicen
+        /// las capturas que el cliente contesta con su iwo igual.
+        /// </summary>
+        private static void AddQuestElements(Pb jss, long mapId)
+        {
+            foreach (var binding in Managers.Quests.Bindings.OnMap(mapId))
+            {
+                if (!Managers.Quests.ShouldSee(binding)) continue;
+
+                foreach (var (where, elementId) in binding.Elements)
+                {
+                    if (where != mapId) continue;
+
+                    var element = Managers.Interactives.ByElementId(mapId, elementId);
+                    if (element.Id == 0) continue;
+
+                    jss.Msg(11, Pb.New()
+                        .Var(1, 1)
+                        .Msg(4, Pb.New()
+                            .Var(1, Managers.Interactives.SkillInstanceOf(elementId))
+                            .Var(2, binding.SkillId))
+                        .Var(5, elementId)
+                        .Var(6, binding.TypeId));
+
+                    DeclarePlacement(jss, element, Managers.ResourceState.Full);
+                }
+            }
         }
 
         /// <summary>

@@ -213,6 +213,17 @@ namespace Jondo.Unity.Studio.Data
             return _shops;
         }
 
+        /// <summary>
+        /// What one item is called, in the language in use. Empty when there is no such item.
+        /// </summary>
+        /// <remarks>
+        /// The table was already being read here to put names on a shop's stock; the quest screen
+        /// needs the same lookup for step rewards, and building a second copy of a 21,748-row
+        /// dictionary to answer the same question would be daft. Built on first use, as before.
+        /// </remarks>
+        public string ItemName(int itemId)
+            => ItemNames().TryGetValue(itemId, out string? name) ? name : "";
+
         private Dictionary<int, string> ItemNames()
         {
             if (_itemNames != null) return _itemNames;

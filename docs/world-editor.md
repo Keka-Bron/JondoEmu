@@ -315,9 +315,9 @@ Ordenado por *lo que desbloquea*, no por lo que apetece.
 | **1** ✅ | El armazón y vistas de **sólo lectura** de mapas y NPCs. | Riesgo cero, valor inmediato: hoy para ver por qué un bicho no ataca hay que escribir un script de Python. Y valida el armazón antes de dejarle escribir nada. |
 | **2** ✅ | Tráfico en vivo y registro de desconocidos por forma. | Reutiliza lo que ya existe y es lo que más acelera el trabajo del día a día. |
 | **3** ✅ | Escritura: spawns de NPC, diálogos, grupos de monstruos. Las acciones, no: ver abajo. | El contenido más barato de crear y el que más se nota jugando. |
-| **4** | Interactivos y teleports, con la vuelta automática. | Desbloquea casas y contenido propio. Podría adelantarse si eso pesa más. |
-| **5** | Casillas de mapa. | Útil, pero sólo cuando ya haya contenido que colocar encima. |
-| **6** | Hechizos, con el simulador. | |
+| **4** ✅ | Interactivos y teleports, con la vuelta automática. | Desbloquea casas y contenido propio. Podría adelantarse si eso pesa más. |
+| **5** ✅ | Casillas de mapa. | Útil, pero sólo cuando ya haya contenido que colocar encima. |
+| **6** ✅ | Hechizos, con el simulador. | |
 | **7** | Misiones. | Proyecto propio: necesita motor de servidor, no sólo editor. |
 | **8** | Lanzador. | |
 

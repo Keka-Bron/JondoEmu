@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using Avalonia.Controls;
 using Jondo.Unity.Studio.Data;
+using Jondo.Unity.World.Quests;
 
 namespace Jondo.Unity.Studio
 {
@@ -47,6 +48,15 @@ namespace Jondo.Unity.Studio
                               $"maps {world.MapCount:N0}, " +
                               $"protocol messages {world.Protocol.MessageCount:N0}, " +
                               $"packet notes {world.PacketNotes.Count:N0}");
+
+            // The quest catalogue, and specifically the join it exists for. A step that says which
+            // line hands it over is the only thing tying a quest to an NPC, so a run where that
+            // number collapses has lost the point of the section without breaking anything.
+            var quests = new QuestCatalogue(world.Text, null);
+            report.AppendLine($"[selftest] quests {quests.QuestCount:N0}, " +
+                              $"steps {quests.StepCount:N0} of which {quests.SpokenSteps:N0} spoken, " +
+                              $"objectives {quests.ObjectiveCount:N0}, " +
+                              $"gated behind another quest {quests.GatedQuests:N0}");
 
             // The map catalogue, timed. This is where the editor froze: two correlated subqueries
             // over unindexed tables took 67 seconds and read as a hang. A number here means the

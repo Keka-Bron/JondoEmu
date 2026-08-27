@@ -242,6 +242,7 @@ namespace Jondo.Unity.Studio
             new NpcDialoguesPage(world),
             new MonsterGroupsPage(world),
             new SpellsPage(world),
+            new QuestsPage(world),
             new PassagesPage(world),
             new MapCellsPage(world),
         };

@@ -323,6 +323,21 @@ namespace Jondo.Unity.Studio.Data
             return fallback;
         }
 
+        /// <summary>
+        /// What one line of NPC dialogue says, by the id the protocol carries.
+        /// </summary>
+        /// <remarks>
+        /// The same two-step jump <see cref="EveryLine"/> makes, for one line instead of 55,037:
+        /// the id is an NpcMessageData id, not a translation key, and the table in
+        /// <c>npc_dialogos_3.6.10.10.json</c> is what bridges them.
+        ///
+        /// The quest screen needs exactly this and nothing else from here. A quest step names the
+        /// line the NPC says to hand it over — 1,260 of the 2,225 steps do — and without the jump
+        /// that column would be a number.
+        /// </remarks>
+        public string LineText(long messageId)
+            => _messageKeys.TryGetValue(messageId, out string? key) ? Text(key) : "";
+
         /// <summary>One translation, by its key. Empty when there is not one.</summary>
         public string Text(string key)
         {

@@ -221,16 +221,25 @@ namespace Jondo.Unity.Tests.Content
         }
 
         /// <summary>
-        /// With an empty reply list the client draws its own Leave button, and that button does not
-        /// answer back: the window stays up and there is no way out but reconnecting. It is what
-        /// the Bontarian guard does, with one message and zero replies in his template.
+        /// A line with no replies used to be a complaint, and is not one any more.
         /// </summary>
+        /// <remarks>
+        /// The reason it was one has gone away. With an empty list the client draws its own Leave
+        /// button and that button does not answer back — but the X does, with <c>kla</c>, and the
+        /// server did not use to handle it: the opcode was not even declared, so the packet fell
+        /// into the unknown branch and nothing was sent back. That is why the angry Bontarian, who
+        /// has one message and zero replies, used to trap the player in the conversation.
+        ///
+        /// <c>kla</c> is answered now, so a line with nothing to say back is a dead end somebody
+        /// can still walk out of. The test is kept rather than deleted because the old rule had a
+        /// good reason and somebody will want to know why it stopped applying.
+        /// </remarks>
         [Fact]
-        public void A_line_with_no_replies_is_caught()
+        public void A_line_with_no_replies_is_no_longer_a_complaint()
         {
             var wrong = NpcDialogueContent.Complaints(Tree(1, 10, Line(10)));
 
-            Assert.Contains(wrong, complaint => complaint.Contains("close the window"));
+            Assert.DoesNotContain(wrong, complaint => complaint.Contains("close the window"));
         }
 
         [Fact]

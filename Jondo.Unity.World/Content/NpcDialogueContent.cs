@@ -15,9 +15,57 @@ namespace Jondo.Unity.World.Content
         /// <summary>The line it leads to. Zero ends the conversation, which is most of them.</summary>
         public long Next { get; init; }
 
+        /// <summary>
+        /// The quest this reply belongs to, or zero when it belongs to no quest.
+        /// </summary>
+        /// <remarks>
+        /// Without this the server has no way to hide a reply that has no business being there, and
+        /// the result is what the fallback does today: Snori Nairb offers all thirty-nine of his
+        /// replies at once, including the ones that only make sense halfway through a quest nobody
+        /// has started.
+        ///
+        /// The rule the two fields express, in the order they are checked:
+        ///
+        ///   quest only        the quest has to be under way, or finished if <see cref="AfterQuest"/>
+        ///   quest and step    it has to be under way AND on that step
+        ///   neither           always offered
+        /// </remarks>
+        public int Quest { get; init; }
+
+        /// <summary>The step of that quest it belongs to. Zero means any step.</summary>
+        public int Step { get; init; }
+
+        /// <summary>
+        /// The quest this reply hands over, or zero.
+        /// </summary>
+        /// <remarks>
+        /// Separate from <see cref="Quest"/> and it has to be: <see cref="Quest"/> hides a reply
+        /// until the quest is under way, and this one is the reply that <em>puts</em> it under way,
+        /// so marking it the same would hide the only way of starting it.
+        ///
+        /// Before this the engine started a quest on any reply of the line the step names, which
+        /// meant "no thanks" handed it over too. The capture cannot say which reply is the yes —
+        /// the extra field Ankama's replies carry is on 184 of the 429 captured ones and almost
+        /// none are quest replies — so it is said here, where a person writing the tree knows.
+        /// </remarks>
+        public int StartsQuest { get; init; }
+
+        /// <summary>True when the reply is for somebody who has already finished the quest.</summary>
+        public bool AfterQuest { get; init; }
+
         public bool Ends => Next == 0;
 
-        public override string ToString() => Ends ? $"{Reply} ✕" : $"{Reply} → {Next}";
+        /// <summary>Whether this reply is offered to nobody in particular.</summary>
+        public bool Always => Quest == 0;
+
+        public override string ToString()
+        {
+            string where = Ends ? "✕" : "→ " + Next;
+            if (Quest == 0) return $"{Reply} {where}";
+            return Step == 0
+                ? $"{Reply} {where} (quest {Quest})"
+                : $"{Reply} {where} (quest {Quest} step {Step})";
+        }
     }
 
     /// <summary>One thing the NPC says, and what can be said back.</summary>
@@ -42,6 +90,41 @@ namespace Jondo.Unity.World.Content
             var replies = new long[Choices.Count];
             for (int i = 0; i < Choices.Count; i++) replies[i] = Choices[i].Reply;
             return replies;
+        }
+
+        /// <summary>
+        /// The replies this particular character should be shown.
+        /// </summary>
+        /// <remarks>
+        /// The whole point of <see cref="DialogueChoice.Quest"/>. A reply that belongs to a quest
+        /// is not offered to somebody who has not started it, and one that belongs to a step is not
+        /// offered before that step is the one in hand — which is what stops a conversation from
+        /// showing every answer to every question at once.
+        ///
+        /// <paramref name="onStep"/> answers "is this quest on that step". It is a callback rather
+        /// than the quest log itself so that this file goes on knowing nothing about the server.
+        /// </remarks>
+        public long[] RepliesFor(Func<int, bool> active, Func<int, bool> finished,
+                                 Func<int, int, bool> onStep)
+        {
+            var replies = new List<long>(Choices.Count);
+            foreach (var choice in Choices)
+            {
+                if (choice.Always) { replies.Add(choice.Reply); continue; }
+
+                if (choice.AfterQuest)
+                {
+                    if (finished(choice.Quest)) replies.Add(choice.Reply);
+                    continue;
+                }
+
+                if (!active(choice.Quest)) continue;
+                if (choice.Step != 0 && !onStep(choice.Quest, choice.Step)) continue;
+
+                replies.Add(choice.Reply);
+            }
+
+            return replies.ToArray();
         }
 
         public override string ToString() => $"message {Message}, {Choices.Count} replies";
@@ -201,7 +284,16 @@ namespace Jondo.Unity.World.Content
                     {
                         long reply = Number(choice, "reply");
                         if (reply == 0) continue;
-                        choices.Add(new DialogueChoice { Reply = reply, Next = Number(choice, "next") });
+                        choices.Add(new DialogueChoice
+                        {
+                            Reply = reply,
+                            Next = Number(choice, "next"),
+                            Quest = (int)Number(choice, "quest"),
+                            Step = (int)Number(choice, "step"),
+                            StartsQuest = (int)Number(choice, "startsQuest"),
+                            AfterQuest = choice.TryGetProperty("afterQuest", out var after)
+                                         && after.ValueKind == JsonValueKind.True,
+                        });
                     }
                 }
 
@@ -278,6 +370,10 @@ namespace Jondo.Unity.World.Content
                             writer.WriteStartObject();
                             writer.WriteNumber("reply", choice.Reply);
                             if (!choice.Ends) writer.WriteNumber("next", choice.Next);
+                            if (choice.Quest != 0) writer.WriteNumber("quest", choice.Quest);
+                            if (choice.Step != 0) writer.WriteNumber("step", choice.Step);
+                            if (choice.StartsQuest != 0) writer.WriteNumber("startsQuest", choice.StartsQuest);
+                            if (choice.AfterQuest) writer.WriteBoolean("afterQuest", true);
                             writer.WriteEndObject();
                         }
 
@@ -329,13 +425,11 @@ namespace Jondo.Unity.World.Content
 
             foreach (var line in dialogue.Lines)
             {
-                if (line.Choices.Count == 0)
-                {
-                    // The client draws its own "Leave" when the list is empty, and that button does
-                    // not answer back: the window stays up and there is no way out but reconnecting.
-                    wrong.Add($"message {line.Message} offers no replies, so the player could not " +
-                              "close the window.");
-                }
+                // A line with no replies used to be a complaint, and it is not one any more. The
+                // client draws its own "Leave" when the list is empty and that button does not
+                // answer back — but the X does, with kla, and the server did not use to handle it.
+                // It does now, so a line with nothing to say back is a dead end the player can
+                // still walk out of.
 
                 var seen = new HashSet<long>();
                 foreach (var choice in line.Choices)

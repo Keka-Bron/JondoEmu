@@ -251,6 +251,10 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
+            // Los jefes de mazmorra, antes de lo escrito a mano para que una persona pueda
+            // cambiarlos de sitio o quitarlos.
+            int jefes = PonerLosJefesDeMazmorra();
+
             // Y lo que haya decidido una persona, encima de todo lo anterior.
             var deLaMano = AplicarLosEscritos();
 
@@ -307,6 +311,83 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// Devuelve los dos números, para el registro.
         /// </remarks>
+        /// <summary>
+        /// Pone al jefe de cada mazmorra en su última sala, y sólo a él.
+        /// </summary>
+        /// <remarks>
+        /// Sin esto una mazmorra no tiene final: la última sala se llena con lo mismo que las
+        /// demás, porque los grupos que trae world.db para los mapas de mazmorra son el fondo
+        /// genérico de la subzona —los seis bichos de la zona repartidos por los once mapas— y no
+        /// la disposición de Ankama. Se ve mirando dónde cae el 147, el Jalató Real: sale en dos
+        /// pasillos y en ninguna de las cinco salas.
+        ///
+        /// Lo que sí es de Ankama es QUIÉN es el jefe: el campo <c>bosses</c> del volcado del
+        /// cliente, que 126 de las 187 mazmorras rellenan.
+        ///
+        /// La sala del jefe se vacía primero. Un jefe compartiendo mapa con tres grupos corrientes
+        /// se puede esquivar, y una mazmorra que se puede terminar sin pelearse con el jefe no es
+        /// una mazmorra.
+        ///
+        /// Va ANTES de la capa escrita a mano a propósito, para que se pueda mover o quitar desde
+        /// el editor sin tocar código.
+        /// </remarks>
+        /// <summary>Desde donde se numeran los grupos de jefe. Por debajo de los escritos a mano.</summary>
+        private const long PrimerJefe = -3_000_000;
+
+        private static int PonerLosJefesDeMazmorra()
+        {
+            if (!DungeonManager.IsLoaded) return 0;
+
+            int puestos = 0;
+            foreach (var mazmorra in DungeonManager.All.Values)
+            {
+                long sala = mazmorra.LastRoom;
+                if (sala == 0 || mazmorra.Bosses.Count == 0) continue;
+
+                var miembros = new List<MobMember>();
+                foreach (int jefe in mazmorra.Bosses)
+                {
+                    if (!_monsters.TryGetValue(jefe, out var datos))
+                    {
+                        Console.WriteLine($"[Mazmorra] {mazmorra.Name}: el jefe {jefe} no está en la base.");
+                        continue;
+                    }
+
+                    // El grado más alto que declare. Un jefe a grado 0 es el mismo bicho que los
+                    // que se han venido matando por el camino.
+                    int grado = Math.Clamp(datos.Grades.Count - 1, 0, MobMember.MaxGradesPerMonster - 1);
+                    miembros.Add(new MobMember
+                    {
+                        Monster = datos,
+                        GradeIndex = grado,
+                        Level = grado < datos.Grades.Count ? datos.Grades[grado].Level : 1,
+                    });
+                }
+
+                if (miembros.Count == 0) continue;
+
+                if (!_mapMobs.TryGetValue(sala, out var aqui))
+                {
+                    _mapMobs[sala] = aqui = new List<MobGroup>();
+                }
+
+                aqui.Clear();
+                aqui.Add(new MobGroup
+                {
+                    // Su propio tramo, por debajo del -2.000.000 de los escritos a mano, para que
+                    // ninguno de los tres repartos de ids se pise con otro. El repartidor de abajo
+                    // se aparta por debajo del menor de todos antes de dar el primero suyo.
+                    MobId = PrimerJefe - puestos,
+                    CellId = MapManager.GetNearestWalkableCell(sala, Handlers.TeleportHandler.MapCentre),
+                    Members = miembros,
+                });
+                puestos++;
+            }
+
+            if (puestos > 0) Console.WriteLine($"[Mazmorra] {puestos} jefes puestos en su última sala.");
+            return puestos;
+        }
+
         private static (int Puestos, int Quitados) AplicarLosEscritos()
         {
             int puestos = 0, quitados = 0;

@@ -590,43 +590,16 @@ namespace Jondo.Unity.Server.Handlers
         /// Creates an item from the client template, with its real factory effects, persists it,
         /// updates both in-memory inventory views and immediately pushes it to the client.
         /// </summary>
-        private static async Task<bool> GiveItemAsync(NetworkStream stream, int gid, int quantity)
-        {
-            if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return false;
-
-            long uid = DatabaseManager.NextItemUid();
-            if (!DatabaseManager.InsertCharacterItem(uid, GameState.CharacterId, gid, quantity,
-                                                     Equipment.Bag, effects))
-                return false;
-
-            Equipment.Add(uid, gid, quantity, Equipment.Bag, effects);
-
-            var legacy = new PlayerItem
-            {
-                Uid = uid,
-                ItemId = gid,
-                Quantity = quantity,
-                Position = Equipment.Bag,
-                RawEffects = effects,
-            };
-            foreach (var effect in Equipment.ParseEffects(effects))
-            {
-                legacy.Effects.TryGetValue(effect.Effect, out int had);
-                legacy.Effects[effect.Effect] = had + (int)effect.Value;
-            }
-            GameState.AddInventoryItem(legacy);
-
-            await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3,
-                    new HavenBagStore.StoredItem
-                    {
-                        Uid = uid,
-                        Gid = gid,
-                        Quantity = quantity,
-                        Effects = effects,
-                    })));
-            return true;
-        }
+        /// <summary>
+        /// Puts an item in the bag and tells the client. Now lives in <see cref="Equipment"/>.
+        /// </summary>
+        /// <remarks>
+        /// Kept as a one-liner rather than replaced everywhere because the quest engine needs the
+        /// same thing and two copies of "give somebody an item" is how the two of them end up
+        /// disagreeing about whether the client gets told.
+        /// </remarks>
+        private static Task<bool> GiveItemAsync(NetworkStream stream, int gid, int quantity)
+            => Equipment.GiveAsync(stream, gid, quantity);
 
         private static async Task ItemAsync(NetworkStream stream, string rest,
                                             int channel, long accountId)

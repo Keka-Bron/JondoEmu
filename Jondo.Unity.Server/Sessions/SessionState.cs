@@ -59,6 +59,23 @@ namespace Jondo.Unity.Server
         /// </summary>
         public Dictionary<int, Managers.JobExperience.Progress> Jobs { get; } = new();
 
+        /// <summary>
+        /// Las misiones de este personaje: cuáles lleva, por qué paso va y qué ha cumplido.
+        /// </summary>
+        /// <remarks>
+        /// Aquí y no en un estático, por lo mismo que los oficios y con más motivo: una misión se
+        /// consulta en cada frase de cada diálogo, así que un diccionario compartido haría que
+        /// hablar con un NPC le moviese la misión al de al lado.
+        ///
+        /// Es <c>null</c> hasta que se entra al mundo. Lo pone <c>Managers.Quests.LoadFrom</c>,
+        /// porque necesita el catálogo, que es de otro proyecto y pesa 3 MB: construirlo aquí
+        /// obligaría a cargarlo también en las sesiones que nunca llegan a jugar.
+        /// </remarks>
+        public World.Quests.QuestLog? Quests { get; set; }
+
+        /// <summary>Los logros de este personaje. Null hasta entrar al mundo, como las misiones.</summary>
+        public World.Achievements.AchievementLog? Achievements { get; set; }
+
         /// <summary>En qué nivel va un oficio. Cero experiencia es nivel 1, no nivel cero.</summary>
         public int JobLevel(int jobId)
             => Jobs.TryGetValue(jobId, out var progress) ? progress.Level : 1;
