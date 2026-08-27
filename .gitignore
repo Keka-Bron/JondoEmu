@@ -89,6 +89,7 @@ datos/cytrus/
 clientes/
 
 # El proyecto de tests compila como cualquier otro
+TestResults/
 Jondo.Unity.Tests/bin/
 Jondo.Unity.Tests/obj/
 Jondo.Unity.Studio/bin/
