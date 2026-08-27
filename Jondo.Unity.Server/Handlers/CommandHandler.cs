@@ -129,6 +129,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 Console.WriteLine($"[Comandos] La cuenta {quien} ({Roles.Nombre(rol)}) ha intentado " +
                                   $"{command}, que es de {Roles.Nombre(haceFalta)}. Rechazado.");
+                ActivityJournal.Current.Write("command.denied", quien, GameState.CharacterId,
+                    new { command, role = rol, requiredRole = haceFalta });
                 await NotifyAsync(stream, T("command.denied", command), channel, accountId);
                 return true;   // se lo traga: ni se ejecuta ni se publica en el chat
             }
@@ -136,6 +138,8 @@ namespace Jondo.Unity.Server.Handlers
             string rest = RestOf(text);
             Console.WriteLine($"[Comandos] {command} {rest}".TrimEnd() +
                               $"  (cuenta {quien}, {Roles.Nombre(rol)})");
+            ActivityJournal.Current.Write("command.requested", quien, GameState.CharacterId,
+                new { command, role = rol });
 
             try
             {
@@ -155,6 +159,8 @@ namespace Jondo.Unity.Server.Handlers
             catch (Exception ex)
             {
                 Console.WriteLine($"[Comandos] {command} ha fallado: {ex}");
+                ActivityJournal.Current.Write("command.failed", quien, GameState.CharacterId,
+                    new { command, error = ex.GetType().Name, message = ex.Message });
                 await NotifyAsync(stream, T("command.failed", command, ex.Message),
                                   channel, accountId);
             }
@@ -631,6 +637,10 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             await RefreshPodsAsync(stream);
+            ActivityJournal.Current.Write("item.granted",
+                accountId > 0 ? accountId : SessionContext.Current.AccountId,
+                GameState.CharacterId,
+                new { source = "command", gid, quantity });
             await NotifyAsync(stream, T("item.added", gid, quantity),
                               channel, accountId);
         }
@@ -663,6 +673,10 @@ namespace Jondo.Unity.Server.Handlers
             string warning = missing.Count == 0
                 ? ""
                 : T("itemset.templates_missing", string.Join(", ", missing));
+            ActivityJournal.Current.Write("itemset.granted",
+                accountId > 0 ? accountId : SessionContext.Current.AccountId,
+                GameState.CharacterId,
+                new { source = "command", setId, added, requested = templates.Count, missing });
             await NotifyAsync(stream, T("itemset.added", setId, added, templates.Count, warning),
                               channel, accountId);
         }

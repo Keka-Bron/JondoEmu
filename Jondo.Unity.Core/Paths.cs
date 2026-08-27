@@ -403,6 +403,7 @@ namespace Jondo.Unity.Launcher
         // Logs are ALWAYS written inside the logs/ folder to keep the root clean.
         public static string DebugLog => Path.Combine(LogsDir, "emulator_debug.log");
         public static string TrafficLog => Path.Combine(LogsDir, "gameserver_traffic.log");
+        public static string ActivityLog => Path.Combine(LogsDir, "activity.jsonl");
 
         /// <summary>
         /// File that marks which folder is the emulator's data root.

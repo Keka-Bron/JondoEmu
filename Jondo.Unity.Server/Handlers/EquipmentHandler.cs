@@ -58,8 +58,10 @@ namespace Jondo.Unity.Server.Handlers
             // nuevo, y se le manda su propio ivq: sin eso las dos cosas se quedaban en el mismo
             // hueco a la vez y el aspecto lo decidía la primera que se encontrase, no la que el
             // jugador acababa de ponerse.
+            var evictedUids = new System.Collections.Generic.List<long>();
             foreach (var evicted in Managers.Equipment.Occupants(position, uid))
             {
+                evictedUids.Add(evicted.Uid);
                 evicted.Position = Bag;
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag, SessionContext.State.CharacterId);
                 Managers.Equipment.RememberWorn(evicted.Uid, Bag, evicted.Effects);
@@ -127,6 +129,10 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Equipment] Item {uid} -> position {position}"
                               + (position == Bag ? " (taken off)." : ".")
                               + (known ? "" : " Not one of ours; the sheet is left alone."));
+            ActivityJournal.Current.Write("equipment.moved",
+                accountId > 0 ? accountId : SessionContext.Current.AccountId,
+                SessionContext.State.CharacterId,
+                new { uid, position, known, evicted = evictedUids });
         }
     }
 }

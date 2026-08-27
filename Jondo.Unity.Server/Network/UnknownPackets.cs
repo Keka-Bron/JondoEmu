@@ -132,7 +132,26 @@ namespace Jondo.Unity.Server.Network
                 // estos puede llegar cien veces por minuto —el ping del cliente sin ir más lejos—
                 // y abrir SQLite en cada uno pondría el disco a trabajar para no aprender nada
                 // nuevo. Lo que interesa es que la forma EXISTA en la lista, no el número exacto.
-                if (cuantas == 1 || cuantas % 100 == 0) Guardar(fila);
+                if (cuantas == 1 || cuantas % 100 == 0)
+                {
+                    Guardar(fila);
+                    // Directo, sin envolver en try/catch: SessionContext.Current devuelve la
+                    // sesion Suelta cuando el AsyncLocal esta vacio y State es Current.State, asi
+                    // que ninguno de los dos puede lanzar. Los dos ayudantes que envolvian esto
+                    // eran catch muertos.
+                    ActivityJournal.Current.Write("packet.unknown",
+                        SessionContext.Current.AccountId, SessionContext.State.CharacterId,
+                        new
+                        {
+                            opcode = fila.Opcode,
+                            rootField = fila.RootField,
+                            kind = fila.Kind.ToString(),
+                            signature = fila.Signature,
+                            occurrences = cuantas,
+                            mapId = fila.MapId,
+                            payloadBytes = fila.PayloadBytes,
+                        });
+                }
             }
             catch
             {

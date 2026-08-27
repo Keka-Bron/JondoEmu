@@ -65,6 +65,11 @@ Jondo.Unity.*/                source code
 
 `content/` **is** in the repository, deliberately: it is the only folder a person edits by hand, it is small, and a change in it is a reviewable diff.
 
+Important player and administrator actions are also written as one JSON object per line in
+`logs/activity.jsonl`. Commands, equipment moves, lottery prizes, granted items, fights, live
+administration and new unhandled packet shapes can therefore be filtered without scraping the
+human-readable console log. Credentials, launcher tokens and game tickets are never included.
+
 Not in the repository because they are not needed to play: `bases/` (built on first run), `logs/`, `tools/` (the Python that regenerates `datos/`) and `dofus3_data/` (436 MB of raw client dump, only used by those tools).
 
 ---
