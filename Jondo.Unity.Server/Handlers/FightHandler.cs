@@ -1228,6 +1228,10 @@ namespace Jondo.Unity.Server.Handlers
                 // la pantalla de fin de combate cuando el último golpe la dejó esperando.
                 await AcuseAsync(stream, payload);
             }
+            else if (payloadStr.Contains(Op.Uri(Op.Kme)))
+            {
+                await AbandonAsync(stream);
+            }
             else if (payloadStr.Contains(Op.Uri(Op.Hoy)))
             {
                 await HandleFightOptionToggleRequest(stream, payload);
@@ -3750,6 +3754,62 @@ namespace Jondo.Unity.Server.Handlers
             await EndFightAsync(stream, fight);
         }
 
+        /// <summary>
+        /// Abandonment follows the measured death handshake from sacro-rendirse.pcapng: the
+        /// fighter dies inside an action sequence, and the result screen waits for the matching
+        /// jti acknowledgement. Sending kuf/jyg immediately can cut through an unfinished cast.
+        /// </summary>
+        public static async Task AbandonAsync(NetworkStream stream)
+        {
+            var fight = GetCurrentFight();
+            if (fight == null)
+            {
+                Program.LogDebug("[Fight] Ignored kme because the session has no active fight.");
+                return;
+            }
+            if (fight.State != FightState.Ongoing)
+            {
+                Program.LogDebug($"[Fight] Ignored kme for fight #{fight.FightId} in state " +
+                                 $"{fight.State}; no placement surrender was captured.");
+                return;
+            }
+
+            var quitter = AbandoningFighter(fight, GameState.CharacterId);
+            if (quitter == null)
+            {
+                Program.LogDebug($"[Fight] Ignored kme because character {GameState.CharacterId} " +
+                                 $"is not an alive fighter in fight #{fight.FightId}.");
+                return;
+            }
+
+            if (fight.CurrentFighter == quitter) PararElReloj(fight);
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(quitter.Id,
+                                                         Network.FightProtocol.ActionSequence)));
+
+            quitter.CurrentHP = 0;
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildDeath(quitter.Id, quitter.Id)));
+            await CaenSusInvocadosAsync(stream, fight, quitter);
+            await ReenviarLaListaAsync(stream, fight);
+
+            int closure = fight.SiguienteAccion();
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(closure, quitter.Id,
+                                                       Network.FightProtocol.ActionSequence)));
+
+            Program.LogDebug($"[Fight] Character {quitter.Id} abandoned fight #{fight.FightId}; " +
+                             $"waiting for jti action {closure} before the result screen.");
+            await CheckFightOverAsync(stream, fight, closure);
+        }
+
+        internal static Fighter? AbandoningFighter(FightInstance? fight, long characterId)
+        {
+            if (fight == null || fight.State != FightState.Ongoing) return null;
+            return fight.Team0.FirstOrDefault(fighter => fighter.Id == characterId && fighter.IsAlive);
+        }
+
         private static async Task<bool> CheckFightOverAsync(NetworkStream stream, FightInstance fight,
                                                             int esperarAcuse = 0)
         {
@@ -3759,15 +3819,21 @@ namespace Jondo.Unity.Server.Handlers
 
             // Si el golpe que lo ha terminado acaba de salir, no se le enseña el final hasta que el
             // cliente diga que ha tragado la secuencia; si no, se come las animaciones.
-            if (esperarAcuse != 0)
+            if (DeferFightEndUntilAck(fight, esperarAcuse))
             {
-                fight.FinPendiente = esperarAcuse;
                 Program.LogDebug($"[Combate] Se acabó, pero se espera a que el cliente acuse la " +
                                  $"acción {esperarAcuse} antes de enseñar el final.");
                 return true;
             }
 
             await EndFightAsync(stream, fight);
+            return true;
+        }
+
+        internal static bool DeferFightEndUntilAck(FightInstance fight, int actionId)
+        {
+            if (actionId == 0) return false;
+            fight.FinPendiente = actionId;
             return true;
         }
 

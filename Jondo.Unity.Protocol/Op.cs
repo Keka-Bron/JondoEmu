@@ -10,7 +10,7 @@
 namespace Jondo.Unity.Protocol;
 
 /// <summary>
-/// Los 253 opcodes que el emulador usa de verdad, con nombre.
+/// Los 254 opcodes que el emulador usa de verdad, con nombre.
 ///
 /// Son <c>const</c> y no propiedades a propósito: hay etiquetas de <c>switch</c> por medio, y
 /// una etiqueta de <c>case</c> exige una constante de tiempo de compilación.
@@ -799,6 +799,13 @@ public static class Op
 
     /// <summary>Cierra el dialogo; el cliente no cierra la ventana del zaap por si mismo. f1 es un motivo fijo, no algo que calcular.</summary>
     public const string Kld = "kld";
+
+    /// <summary>
+    /// The player abandons an ongoing fight. Measured in sacro-rendirse.pcapng and the two other
+    /// surrender captures: the server answers with a death sequence and waits for jti before the
+    /// result screen.
+    /// </summary>
+    public const string Kme = "kme";
 
     /// <summary>Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.</summary>
     public const string Klp = "klp";
