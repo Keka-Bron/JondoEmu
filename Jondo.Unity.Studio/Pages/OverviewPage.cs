@@ -1,9 +1,13 @@
+using System;
+using System.IO;
 using System.Text;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Studio.Data;
+using Jondo.Unity.Studio.Ui;
 using Jondo.Unity.World.Content;
 
 namespace Jondo.Unity.Studio.Pages
@@ -23,44 +27,81 @@ namespace Jondo.Unity.Studio.Pages
 
         public OverviewPage(WorldData world) => _world = world;
 
-        public string Title => "Overview";
+        public string TitleKey => "nav.overview";
 
-        public override string ToString() => Title;
+        public override string ToString() => Words.T(TitleKey);
 
         public Control Build()
         {
-            var panel = new StackPanel { Spacing = 14 };
+            var columns = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitions("*,16,*"),
+                RowDefinitions = new RowDefinitions("Auto,*"),
+            };
 
-            panel.Children.Add(Heading("Where the editor is reading from"));
-            panel.Children.Add(Mono(new StringBuilder()
+            var where = new StackPanel { Spacing = 8 };
+            where.Children.Add(Skin.Heading(Words.T("overview.where")));
+            where.Children.Add(Mono(new StringBuilder()
                 .AppendLine($"root       {Paths.Root}")
                 .AppendLine($"content    {Paths.ContentDir}")
+                .AppendLine($"client     {Paths.ClientDir}")
                 .AppendLine($"npc spawns {Paths.WorldNpcsJson}")
                 .AppendLine($"map cells  {Paths.WalkableCellsJson}")
-                .AppendLine($"fight      {Paths.FightCellsJson}")
+                .AppendLine($"protocol   {Paths.ProtocolProto}")
+                .AppendLine($"traffic    {Paths.TrafficLog}")
+                .AppendLine($"packets    {Paths.PacketTelemetryDb}")
+                .AppendLine($"quests     {Paths.QuestsJson}")
                 .ToString()));
 
             var census = _world.NpcPlacements.Census();
-            panel.Children.Add(Heading("What it loaded"));
-            panel.Children.Add(Mono(new StringBuilder()
+            var what = new StackPanel { Spacing = 8 };
+            what.Children.Add(Skin.Heading(Words.T("overview.what")));
+            what.Children.Add(Mono(new StringBuilder()
                 .AppendLine($"maps with cell data   {_world.MapCount:N0}")
                 .AppendLine($"npc placements        {_world.NpcPlacements.Count:N0}")
+                .AppendLine($"   derived            {census[ContentLayer.Base]:N0}")
                 .AppendLine($"   measured           {census[ContentLayer.Measured]:N0}")
                 .AppendLine($"   authored           {census[ContentLayer.Authored]:N0}")
                 .AppendLine($"   erased by hand     {_world.NpcPlacements.ErasedCount:N0}")
+                .AppendLine($"dialogue trees        {_world.NpcDialogues.Count:N0}")
+                .AppendLine($"packet notes          {_world.PacketNotes.Count:N0}")
+                .AppendLine($"protocol messages     {_world.Protocol.MessageCount:N0}")
+                .AppendLine($"game texts            {Texts()}")
+                .AppendLine($"traffic log           {TrafficSize()}")
                 .ToString()));
+
+            var left = Skin.Card(where);
+            var right = Skin.Card(what);
+            Grid.SetColumn(left, 0);
+            Grid.SetColumn(right, 2);
+            columns.Children.Add(left);
+            columns.Children.Add(right);
+
+            var panel = new StackPanel { Spacing = 14 };
+            panel.Children.Add(columns);
 
             if (_world.Complaints.Count > 0)
             {
-                panel.Children.Add(Heading("What did not load"));
-                panel.Children.Add(Mono(string.Join("\n", _world.Complaints)));
+                var trouble = new StackPanel { Spacing = 8 };
+                trouble.Children.Add(Skin.Heading(Words.T("overview.trouble")));
+                trouble.Children.Add(new SelectableTextBlock
+                {
+                    Text = string.Join(Environment.NewLine, _world.Complaints),
+                    FontFamily = Skin.Mono,
+                    FontSize = 12.5,
+                    Foreground = Skin.WrongBrush,
+                    TextWrapping = TextWrapping.Wrap,
+                });
+                panel.Children.Add(Skin.Card(trouble));
             }
 
             panel.Children.Add(new TextBlock
             {
-                Text = "Phase one is read only: nothing here writes a file.",
-                Foreground = new SolidColorBrush(Color.FromRgb(0x8A, 0x8F, 0x9A)),
-                Margin = new Avalonia.Thickness(0, 10, 0, 0),
+                Text = Words.T("overview.writes"),
+                Foreground = Skin.TextSoftBrush,
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 860,
+                HorizontalAlignment = HorizontalAlignment.Left,
             });
 
             return new ScrollViewer
@@ -70,18 +111,35 @@ namespace Jondo.Unity.Studio.Pages
             };
         }
 
-        internal static TextBlock Heading(string text) => new TextBlock
-        {
-            Text = text,
-            FontSize = 17,
-            FontWeight = FontWeight.SemiBold,
-        };
+        /// <summary>How many of the game's own words were found, and in which language.</summary>
+        private string Texts()
+            => _world.Text == null
+                ? "not there — names will show as numbers"
+                : $"{_world.Text.Count:N0} in {Words.TagOf(_world.Language)}";
 
-        internal static TextBlock Mono(string text) => new TextBlock
+        private static string TrafficSize()
+        {
+            try
+            {
+                var file = new FileInfo(Paths.TrafficLog);
+                return file.Exists
+                    ? $"{file.Length / (1024.0 * 1024.0):N1} MB"
+                    : "not there - the server has not run, or it was told not to log";
+            }
+            catch (Exception ex)
+            {
+                return $"unreadable: {ex.Message}";
+            }
+        }
+
+        internal static TextBlock Heading(string text) => Skin.Heading(text);
+
+        internal static SelectableTextBlock Mono(string text) => new SelectableTextBlock
         {
             Text = text.TrimEnd(),
-            FontFamily = new FontFamily("Consolas, Menlo, monospace"),
-            Foreground = new SolidColorBrush(Color.FromRgb(0xC8, 0xCD, 0xD6)),
+            FontFamily = Skin.Mono,
+            FontSize = 12.5,
+            Foreground = Skin.TextSoftBrush,
             TextWrapping = TextWrapping.NoWrap,
             HorizontalAlignment = HorizontalAlignment.Left,
         };

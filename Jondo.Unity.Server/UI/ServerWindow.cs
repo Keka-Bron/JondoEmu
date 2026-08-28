@@ -1,3 +1,5 @@
+﻿using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -5,7 +7,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows.Forms;
 
-namespace Jondo.Unity.Launcher.UI
+namespace Jondo.Unity.Server.UI
 {
     /// <summary>
     /// La cara del servidor.

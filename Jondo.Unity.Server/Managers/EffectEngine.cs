@@ -1,8 +1,9 @@
+using Jondo.Unity.World.Combat;
 using System;
 using System.Collections.Generic;
 using Jondo.Unity.World.Fights;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Lo que hay que hacer con un efecto ya resuelto: aplicarlo y contárselo al cliente.
@@ -105,8 +106,8 @@ namespace Jondo.Unity.Launcher.Managers
         //
         // Y el elemento no hay que deducirlo del número: lo dice el catálogo en su columna
         // ElementId, con 0 neutral, 1 tierra, 2 fuego, 3 agua y 4 aire.
-        private const int DanoPrimero = 91;
-        private const int DanoUltimo = 100;
+        private const int DanoPrimero = EffectSupport.FirstDamage;
+        private const int DanoUltimo = EffectSupport.LastDamage;
 
         /// <summary>
         /// Los que pegan en función de lo que el objetivo lleve EROSIONADO. Son cinco, uno por
@@ -176,7 +177,7 @@ namespace Jondo.Unity.Launcher.Managers
             double queda = Math.Pow(1.0 - efecto.PasoDeCaida / 100.0, pasos);
             return Math.Max(0, (int)Math.Round(dano * queda));
         }
-        private const int Empujar = 5;
+        private const int Empujar = EffectSupport.Push;
 
         /// <summary>La 84, «Empuje»: la suma PLANA del que empuja. El porcentaje es la 158.</summary>
         private const int DanoDeEmpuje = 84;
@@ -217,23 +218,23 @@ namespace Jondo.Unity.Launcher.Managers
             int porCasilla = nivelDelQueEmpuja / 2 + suEmpuje - laResistencia + BaseDelEmpuje;
             return Math.Max(0, casillasSinRecorrer * porCasilla / 4);
         }
-        private const int Tirar = 6;
+        private const int Tirar = EffectSupport.Pull;
 
         /// <summary>"Retrocede #1 casillas" y "Avanza #1 casillas": mueven al QUE LANZA.</summary>
-        private const int Retroceder = 1041;
-        private const int Avanzar = 1042;
-        private const int PonerEstado = 950;
-        private const int QuitarEstado = 951;
+        private const int Retroceder = EffectSupport.StepBack;
+        private const int Avanzar = EffectSupport.StepForward;
+        private const int PonerEstado = EffectSupport.AddState;
+        private const int QuitarEstado = EffectSupport.RemoveState;
 
         /// <summary>
         /// "Lanza el hechizo del dado en el grado de la cara". Es el enganche con el que las
         /// actitudes de los objetos encadenan lo que de verdad hacen.
         /// </summary>
-        public const int EfectoQueLanzaHechizo = 792;
+        public const int EfectoQueLanzaHechizo = EffectSupport.CastSpell;
         private const int LanzarHechizo = EfectoQueLanzaHechizo;
 
         /// <summary>"Invoca: #1". La plantilla del bicho viaja en el dado.</summary>
-        public const int Invocar = 181;
+        public const int Invocar = EffectSupport.Summon;
 
         /// <summary>
         /// Los efectos que colocan algo EN UNA CASILLA en vez de sobre alguien: una invocación,
@@ -248,7 +249,7 @@ namespace Jondo.Unity.Launcher.Managers
         public static bool VaAlSuelo(int efecto) => AlSuelo.Contains(efecto);
 
         /// <summary>"Cura: #1% de los PdV máximos". El dado es el porcentaje.</summary>
-        private const int CuraPorcentual = 1109;
+        private const int CuraPorcentual = EffectSupport.HealPercent;
 
         /// <summary>Los dos números de característica de los puntos.</summary>
         /// <summary>
@@ -276,7 +277,7 @@ namespace Jondo.Unity.Launcher.Managers
         /// "Mata al objetivo". Es la cuenta atrás de un invocado: al nacer le cuelgan uno de
         /// éstos con su ronda, y cuando llega, se deshace.
         /// </summary>
-        public const int MatarAlObjetivo = 141;
+        public const int MatarAlObjetivo = EffectSupport.Kill;
 
         /// <summary>Cuántos hechizos encadenados se admiten antes de sospechar de un bucle.</summary>
         private const int HondoMaximo = 4;

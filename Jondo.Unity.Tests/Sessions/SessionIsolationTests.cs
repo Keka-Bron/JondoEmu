@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Sessions
@@ -91,15 +91,14 @@ namespace Jondo.Unity.Tests.Sessions
         /// burst of whatever was serving the client.
         /// </remarks>
         [Fact]
-        public void Writes_on_one_socket_are_serialised()
+        public async Task Writes_on_one_socket_are_serialised()
         {
             var stream = new OverlapDetectingStream();
 
-            Task.WhenAll(
+            await Task.WhenAll(
                 Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, new byte[] { 1, 2, 3 }),
                 Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, new byte[] { 4, 5, 6 }),
-                Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, new byte[] { 7, 8, 9 }))
-                .GetAwaiter().GetResult();
+                Jondo.Protocol.NetworkMessage.WriteRawFrameAsync(stream, new byte[] { 7, 8, 9 }));
 
             Assert.False(stream.OverlapDetected, "packet writes overlapped on one socket");
         }

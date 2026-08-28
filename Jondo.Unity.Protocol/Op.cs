@@ -107,8 +107,63 @@ public static class Op
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Idf = "idf";
 
+    /// <summary>
+    /// El paso en el que va una mision, con sus objetivos y si estan hechos. Respuesta al ieo.
+    /// </summary>
+    /// <remarks>
+    /// Los seis opcodes de misiones —ieo, idu, idz, idw, ief, iec— salen de medir las 401
+    /// capturas, no de suponer. La forma es 1{2{1*{2:objetivo,4:estado}, 2:paso}, 3:mision}, y lo
+    /// que la sostiene es que cuadra sola: en las 448 tramas idu de las capturas, el paso pertenece
+    /// de verdad a esa mision las 448 veces, y los 1.479 objetivos pertenecen de verdad a ese paso.
+    ///
+    /// Los documentos del repositorio archivaban ieo/idu como la pareja de elementos interactivos
+    /// (docs/NOTAS_MIGRACION_AUTH.md) y idz/idw como «extras de conexion» (docs/opcodes.md). Era
+    /// una suposicion vieja, del mismo tipo que la que puso nombres de misiones a lry/isf/lol/izu,
+    /// que no aparecen en ninguna de las tres capturas de misiones.
+    /// </remarks>
+    public const string Idu = "idu";
+
+    /// <summary>El cliente da un objetivo por cumplido: 1:mision, 2:objetivo.</summary>
+    /// <remarks>
+    /// Va del cliente al servidor, comprobado por puertos y no solo por el campo del sobre. Es asi
+    /// porque los objetivos de tipo 0 —5.670 de los 15.547— son texto libre que pide pulsar algo de
+    /// la interfaz, y de eso el servidor no se entera nunca.
+    /// </remarks>
+    public const string Idw = "idw";
+
+    /// <summary>El servidor da un paso por validado: 1:mision, 2:paso.</summary>
+    public const string Idz = "idz";
+
+    /// <summary>El cliente pregunta por una mision suya: 1:mision.</summary>
+    public const string Iec = "iec";
+
+    /// <summary>Arranca una mision: 1:mision.</summary>
+    /// <remarks>
+    /// El unico de los seis que ya estaba documentado en el repositorio. Sale en 12 tramas de 5
+    /// capturas y las 5 son de coger una mision hablando con un NPC.
+    /// </remarks>
+    public const string Ief = "ief";
+
+    /// <summary>El cliente pide en que paso va una mision: 2:mision. Se contesta con idu.</summary>
+    public const string Ieo = "ieo";
+
     /// <summary>Alianzas, por nombre y tag; se descarta. 9 mensajes.</summary>
     public const string Ife = "ife";
+
+    /// <summary>Un logro conseguido: 2 = estado, 4 = el logro. Del servidor al cliente.</summary>
+    /// <remarks>
+    /// Los tres opcodes de logros —mfs, mfu, mga— salen de las capturas. Los ocho ids que lleva mfs
+    /// y los veinte de mfu son logros de verdad, y encima cuadran con lo que estaba pasando: en la
+    /// captura del tutorial sale el 8518 «Primer tiempo», cuyo objetivo es exactamente (Qf=2511),
+    /// justo despues de acabar la mision 2511 «Primeras armas».
+    /// </remarks>
+    public const string Mfs = "mfs";
+
+    /// <summary>Un logro conseguido, con quien y a que nivel: 1{1 nivel, 2 personaje, 3 logro}.</summary>
+    public const string Mfu = "mfu";
+
+    /// <summary>El cliente pide la recompensa de un logro: 1 = el logro, o -1 para todos.</summary>
+    public const string Mga = "mga";
 
     /// <summary>Catorce conjuntos guardados, cada uno con un look; se descarta. 7 mensajes.</summary>
     public const string Ihb = "ihb";
@@ -247,6 +302,19 @@ public static class Op
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Iov = "iov";
+
+    /// <summary>
+    /// Que actor del mapa tiene misiones que ofrecer: la marca verde encima del NPC.
+    /// </summary>
+    /// <remarks>
+    /// 1 { 2 (repetido) { 2: ids de mision empaquetados, 4: actor }, 3: mapa }
+    ///
+    /// Medido: en las 380 tramas de las capturas, los 294 numeros que llevan dentro son ids de
+    /// mision reales, los 294. Y se ve la marca apagarse: en el tutorial el actor sale primero con
+    /// [2511] y despues el mismo actor con la lista vacia, que es justo cuando se coge la mision.
+    /// 235 de las 380 van vacias, que es como se borra.
+    /// </remarks>
+    public const string Iom = "iom";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ioy = "ioy";
@@ -676,6 +744,16 @@ public static class Op
 
     /// <summary>Solo alcanzable desde isi, que nunca llega. 2 mensajes en 2 ficheros.</summary>
     public const string Kku = "kku";
+
+
+    /// <summary>La X de cerrar el dialogo. Va vacio; se contesta con kld.</summary>
+    /// <remarks>
+    /// Sale 192 veces en las 401 capturas y no estaba declarado, asi que la X no cerraba nada: el
+    /// servidor lo veia como paquete desconocido y no contestaba. Con los NPCs que no tienen
+    /// respuestas —el Bontariano enfadado, la Brakmariana enfadada— eso dejaba la ventana puesta
+    /// sin manera de salir mas que reconectando.
+    /// </remarks>
+    public const string Kla = "kla";
 
     /// <summary>Cierra el dialogo; el cliente no cierra la ventana del zaap por si mismo. f1 es un motivo fijo, no algo que calcular.</summary>
     public const string Kld = "kld";

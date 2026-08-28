@@ -1,0 +1,27 @@
+{
+  "_comment": [
+    "Monster groups put somewhere on purpose, and Ankama's own taken away.",
+    "",
+    "The 38,744 groups in world.db are Ankama's placement and are regenerated with it, so",
+    "neither adding to them nor removing from them can be done in that file: the work would",
+    "vanish the next time anybody rebuilt the database, without a word.",
+    "",
+    "  { \"map\": 241438721, \"group\": -2000000, \"cell\": 327,",
+    "    \"members\": [ { \"monster\": 2549, \"grade\": 0 } ] }",
+    "  { \"map\": 241438721, \"group\": -1000000, \"remove\": true }",
+    "",
+    "Ids for groups placed by hand start at -2000000 and go down. The measured ones run from",
+    "-1000000 to -1038743, so the two bands cannot meet and an id says which kind it is at a",
+    "glance.",
+    "",
+    "The level of a member is not written down. It follows from the monster and the grade, the",
+    "server works it out, and a second copy of a derived number goes stale the day a grade table",
+    "changes.",
+    "",
+    "A group written here is placed even on a map the indoor veto covers. That veto is a rule",
+    "about what Ankama scattered on its own, not about what somebody puts here knowingly.",
+    "",
+    "Empty on purpose."
+  ],
+  "groups": []
+}

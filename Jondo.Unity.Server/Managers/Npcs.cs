@@ -1,10 +1,11 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Los NPCs de cada mapa: dónde están, qué se puede hacer con ellos y qué dicen.
@@ -149,6 +150,7 @@ namespace Jondo.Unity.Launcher.Managers
             // se quedarían sin aspecto, porque lo que se lee de NpcTemplates es sólo lo que hace
             // falta para los que ya están puestos.
             SembrarLosDelMundo();
+            NpcDialogues.Load();
 
             var wanted = new HashSet<int>();
             foreach (var here in _byMap.Values)
@@ -228,7 +230,8 @@ namespace Jondo.Unity.Launcher.Managers
             var spawns = Jondo.Unity.World.Content.NpcSpawnContent.Load(
                 Paths.WorldNpcsJson,
                 Paths.ContentFile(Jondo.Unity.World.Content.NpcSpawnContent.AuthoredFile),
-                Console.WriteLine);
+                Console.WriteLine,
+                Paths.WorldNpcsDerivedJson);
 
             if (spawns.Count == 0)
             {
@@ -300,6 +303,10 @@ namespace Jondo.Unity.Launcher.Managers
             => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
 
         /// <summary>Quién es el negativo que el cliente acaba de clicar.</summary>
+        /// <summary>Los NPCs que hay en un mapa. Vacio si no hay ninguno.</summary>
+        public static IReadOnlyList<Spawn> OnMap(long mapId)
+            => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
+
         public static Spawn? Find(long mapId, long contextualId)
         {
             if (!_byMap.TryGetValue(mapId, out var here)) return null;

@@ -1,0 +1,1892 @@
+{
+  "_comment": [
+    "Which reply leads to which line. The one thing about an NPC the client has never held.",
+    "",
+    "The client ships every line an NPC can say and every reply it can be given, and nowhere does",
+    "it say which goes with which - measured across all 6,467 of them. That pairing has always",
+    "lived on Ankama's server, so it cannot be extracted or measured. It has to be decided, and",
+    "this is where the decision goes.",
+    "",
+    "  npc         the NPC's id",
+    "  map         0 for wherever it stands; a map id to say something different there",
+    "  opening     which line it starts on; the first one when left out",
+    "  lines       one per thing it says, each with what can be said back",
+    "  next        the line that reply leads to; left out, the conversation ends",
+    "",
+    "And what a reply is FOR, which is what stops a conversation offering everything at once:",
+    "",
+    "  startsQuest  this reply hands that quest over. Not the same as `quest`: this one is how a",
+    "               quest begins, so it is offered to somebody who has NOT got it.",
+    "  quest        only offered while that quest is under way.",
+    "  step         and only while it is on that step.",
+    "  afterQuest   only offered once the quest is finished.",
+    "",
+    "  { \"npc\": 1088, \"map\": 0, \"opening\": 3312, \"lines\": [",
+    "      { \"message\": 3312, \"choices\": [ { \"reply\": 6016, \"next\": 6047 }, { \"reply\": 7846 } ] },",
+    "      { \"message\": 6047, \"choices\": [ { \"reply\": 7846 } ] } ] }",
+    "",
+    "A line with no replies is fine now: the client draws its own Leave button and the X closes the",
+    "window, because the server answers the kla it sends. It did not before, which is why an NPC",
+    "with nothing to say back used to trap you in the conversation.",
+    "",
+    "WHERE THESE COME FROM. The ids are the client's own. The wiring - which reply leads where -",
+    "is read off the walkthroughs at dofuspourlesnoobs, which write the reply options out in",
+    "French, and matched back to ids with tools/dialogue_from_guide.py. Inside one NPC the text",
+    "identifies its lines 98.3% of the time, and the reply ids do not have to be Ankama's: the",
+    "server sends the ids and the client sends back what it was given, so any id with the right",
+    "text works as long as the tree agrees with itself."
+  ],
+  "dialogues": [
+    {
+      "npc": 4355,
+      "map": 0,
+      "opening": 30467,
+      "lines": [
+        {
+          "message": 30467,
+          "choices": [
+            {
+              "reply": 36744,
+              "next": 30468
+            },
+            {
+              "reply": 36743
+            }
+          ]
+        },
+        {
+          "message": 30468,
+          "choices": [
+            {
+              "reply": 36741,
+              "startsQuest": 1958
+            },
+            {
+              "reply": 36743
+            }
+          ]
+        }
+      ],
+      "_byHand": true
+    },
+    {
+      "npc": 1502,
+      "map": 0,
+      "opening": 9707,
+      "lines": [
+        {
+          "message": 9707,
+          "choices": [
+            {
+              "reply": 36872,
+              "next": 30552,
+              "quest": 1958
+            },
+            {
+              "reply": 36985
+            },
+            {
+              "reply": 36987
+            }
+          ]
+        },
+        {
+          "message": 30552,
+          "choices": [
+            {
+              "reply": 36869,
+              "startsQuest": 1959
+            },
+            {
+              "reply": 36987
+            }
+          ]
+        }
+      ],
+      "_byHand": true
+    },
+    {
+      "npc": 1088,
+      "map": 0,
+      "opening": 6169,
+      "lines": [
+        {
+          "message": 6169,
+          "choices": [
+            {
+              "reply": 36685,
+              "next": 30422
+            },
+            {
+              "reply": 6025
+            }
+          ]
+        },
+        {
+          "message": 30422,
+          "choices": [
+            {
+              "reply": 36680,
+              "startsQuest": 1994
+            },
+            {
+              "reply": 6025
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 1441,
+      "map": 0,
+      "opening": 8910,
+      "lines": [
+        {
+          "message": 8910,
+          "choices": [
+            {
+              "reply": 9022,
+              "next": 8915
+            }
+          ]
+        },
+        {
+          "message": 8915,
+          "choices": [
+            {
+              "reply": 9039,
+              "startsQuest": 718
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 1574,
+      "map": 0,
+      "opening": 11408,
+      "lines": [
+        {
+          "message": 11408,
+          "choices": [
+            {
+              "reply": 12619,
+              "next": 31196
+            },
+            {
+              "reply": 12620
+            }
+          ]
+        },
+        {
+          "message": 31196,
+          "choices": [
+            {
+              "reply": 37672,
+              "startsQuest": 1991
+            },
+            {
+              "reply": 12620
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 1901,
+      "map": 0,
+      "opening": 12877,
+      "lines": [
+        {
+          "message": 12877,
+          "choices": [
+            {
+              "reply": 27365,
+              "next": 31386
+            },
+            {
+              "reply": 26687
+            }
+          ]
+        },
+        {
+          "message": 31386,
+          "choices": [
+            {
+              "reply": 37906,
+              "startsQuest": 1977
+            },
+            {
+              "reply": 26687
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4310,
+      "map": 0,
+      "opening": 30925,
+      "lines": [
+        {
+          "message": 30925,
+          "choices": [
+            {
+              "reply": 37740,
+              "next": 31246
+            },
+            {
+              "reply": 37601,
+              "next": 31241
+            },
+            {
+              "reply": 37753,
+              "next": 31252
+            }
+          ]
+        },
+        {
+          "message": 31246,
+          "choices": [
+            {
+              "reply": 37743,
+              "startsQuest": 1988
+            }
+          ]
+        },
+        {
+          "message": 31241,
+          "choices": [
+            {
+              "reply": 37750,
+              "startsQuest": 1989
+            }
+          ]
+        },
+        {
+          "message": 31252,
+          "choices": [
+            {
+              "reply": 37756,
+              "startsQuest": 1990
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4311,
+      "map": 0,
+      "opening": 31327,
+      "lines": [
+        {
+          "message": 31327,
+          "choices": [
+            {
+              "reply": 37840,
+              "next": 31331
+            }
+          ]
+        },
+        {
+          "message": 31331,
+          "choices": [
+            {
+              "reply": 37846,
+              "startsQuest": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4312,
+      "map": 0,
+      "opening": 30718,
+      "lines": [
+        {
+          "message": 30718,
+          "choices": [
+            {
+              "reply": 37088,
+              "next": 26692
+            }
+          ]
+        },
+        {
+          "message": 26692,
+          "choices": [
+            {
+              "reply": 37090,
+              "startsQuest": 1841
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4313,
+      "map": 0,
+      "opening": 30730,
+      "lines": [
+        {
+          "message": 30730,
+          "choices": [
+            {
+              "reply": 37102,
+              "next": 22251
+            }
+          ]
+        },
+        {
+          "message": 22251,
+          "choices": [
+            {
+              "reply": 37103,
+              "startsQuest": 1677
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4315,
+      "map": 0,
+      "opening": 30758,
+      "lines": [
+        {
+          "message": 30758,
+          "choices": [
+            {
+              "reply": 37138,
+              "next": 11844
+            },
+            {
+              "reply": 38050
+            }
+          ]
+        },
+        {
+          "message": 11844,
+          "choices": [
+            {
+              "reply": 37141,
+              "startsQuest": 938
+            },
+            {
+              "reply": 38050
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4317,
+      "map": 0,
+      "opening": 30773,
+      "lines": [
+        {
+          "message": 30773,
+          "choices": [
+            {
+              "reply": 37160,
+              "next": 8766
+            },
+            {
+              "reply": 37179
+            }
+          ]
+        },
+        {
+          "message": 8766,
+          "choices": [
+            {
+              "reply": 37181,
+              "startsQuest": 716
+            },
+            {
+              "reply": 37179
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4318,
+      "map": 0,
+      "opening": 30801,
+      "lines": [
+        {
+          "message": 30801,
+          "choices": [
+            {
+              "reply": 37199,
+              "next": 8677
+            },
+            {
+              "reply": 37205
+            }
+          ]
+        },
+        {
+          "message": 8677,
+          "choices": [
+            {
+              "reply": 37212,
+              "startsQuest": 704
+            },
+            {
+              "reply": 37205
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4319,
+      "map": 0,
+      "opening": 30817,
+      "lines": [
+        {
+          "message": 30817,
+          "choices": [
+            {
+              "reply": 37219,
+              "next": 31615
+            },
+            {
+              "reply": 38048
+            }
+          ]
+        },
+        {
+          "message": 31615,
+          "choices": [
+            {
+              "reply": 38202,
+              "startsQuest": 1974
+            },
+            {
+              "reply": 38048
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4321,
+      "map": 0,
+      "opening": 31261,
+      "lines": [
+        {
+          "message": 31261,
+          "choices": [
+            {
+              "reply": 37962,
+              "next": 31427
+            }
+          ]
+        },
+        {
+          "message": 31427,
+          "choices": [
+            {
+              "reply": 37968,
+              "startsQuest": 2008
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4323,
+      "map": 0,
+      "opening": 30380,
+      "lines": [
+        {
+          "message": 30380,
+          "choices": [
+            {
+              "reply": 36644,
+              "next": 30382
+            },
+            {
+              "reply": 36637,
+              "next": 30391
+            }
+          ]
+        },
+        {
+          "message": 30382,
+          "choices": [
+            {
+              "reply": 36627,
+              "startsQuest": 1978
+            }
+          ]
+        },
+        {
+          "message": 30391,
+          "choices": [
+            {
+              "reply": 36640,
+              "startsQuest": 1979
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4324,
+      "map": 0,
+      "opening": 30861,
+      "lines": [
+        {
+          "message": 30861,
+          "choices": [
+            {
+              "reply": 37523,
+              "next": 31076
+            }
+          ]
+        },
+        {
+          "message": 31076,
+          "choices": [
+            {
+              "reply": 38299,
+              "startsQuest": 1965
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4326,
+      "map": 0,
+      "opening": 30864,
+      "lines": [
+        {
+          "message": 30864,
+          "choices": [
+            {
+              "reply": 37272,
+              "next": 31642
+            }
+          ]
+        },
+        {
+          "message": 31642,
+          "choices": [
+            {
+              "reply": 38245,
+              "startsQuest": 1964
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4327,
+      "map": 0,
+      "opening": 30826,
+      "lines": [
+        {
+          "message": 30826,
+          "choices": [
+            {
+              "reply": 37412,
+              "next": 30978
+            }
+          ]
+        },
+        {
+          "message": 30978,
+          "choices": [
+            {
+              "reply": 38292,
+              "startsQuest": 1972
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4328,
+      "map": 0,
+      "opening": 30671,
+      "lines": [
+        {
+          "message": 30671,
+          "choices": [
+            {
+              "reply": 37248,
+              "next": 31762
+            }
+          ]
+        },
+        {
+          "message": 31762,
+          "choices": [
+            {
+              "reply": 38396,
+              "startsQuest": 1968
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4329,
+      "map": 0,
+      "opening": 30834,
+      "lines": [
+        {
+          "message": 30834,
+          "choices": [
+            {
+              "reply": 37568,
+              "next": 31114
+            }
+          ]
+        },
+        {
+          "message": 31114,
+          "choices": [
+            {
+              "reply": 38304,
+              "startsQuest": 1970
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4333,
+      "map": 0,
+      "opening": 30830,
+      "lines": [
+        {
+          "message": 30830,
+          "choices": [
+            {
+              "reply": 38063,
+              "next": 31506
+            }
+          ]
+        },
+        {
+          "message": 31506,
+          "choices": [
+            {
+              "reply": 38059,
+              "startsQuest": 1971
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4334,
+      "map": 0,
+      "opening": 30838,
+      "lines": [
+        {
+          "message": 30838,
+          "choices": [
+            {
+              "reply": 37241,
+              "next": 31715
+            }
+          ]
+        },
+        {
+          "message": 31715,
+          "choices": [
+            {
+              "reply": 38341,
+              "startsQuest": 1969
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4335,
+      "map": 0,
+      "opening": 30857,
+      "lines": [
+        {
+          "message": 30857,
+          "choices": [
+            {
+              "reply": 37264,
+              "next": 31402
+            }
+          ]
+        },
+        {
+          "message": 31402,
+          "choices": [
+            {
+              "reply": 37954,
+              "startsQuest": 1966
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4337,
+      "map": 0,
+      "opening": 30846,
+      "lines": [
+        {
+          "message": 30846,
+          "choices": [
+            {
+              "reply": 37875,
+              "next": 31357
+            }
+          ]
+        },
+        {
+          "message": 31357,
+          "choices": [
+            {
+              "reply": 37872,
+              "startsQuest": 1967
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4338,
+      "map": 0,
+      "opening": 30876,
+      "lines": [
+        {
+          "message": 30876,
+          "choices": [
+            {
+              "reply": 37285,
+              "next": 31532
+            }
+          ]
+        },
+        {
+          "message": 31532,
+          "choices": [
+            {
+              "reply": 38095,
+              "startsQuest": 1963
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4339,
+      "map": 0,
+      "opening": 30982,
+      "lines": [
+        {
+          "message": 30982,
+          "choices": [
+            {
+              "reply": 37421,
+              "next": 31415
+            }
+          ]
+        },
+        {
+          "message": 31415,
+          "choices": [
+            {
+              "reply": 37942,
+              "startsQuest": 1993
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4342,
+      "map": 0,
+      "opening": 30574,
+      "lines": [
+        {
+          "message": 30574,
+          "choices": [
+            {
+              "reply": 36896,
+              "next": 30575
+            },
+            {
+              "reply": 36901
+            }
+          ]
+        },
+        {
+          "message": 30575,
+          "choices": [
+            {
+              "reply": 36902,
+              "startsQuest": 1998
+            },
+            {
+              "reply": 36901
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4347,
+      "map": 0,
+      "opening": 30821,
+      "lines": [
+        {
+          "message": 30821,
+          "choices": [
+            {
+              "reply": 37626,
+              "next": 31158
+            }
+          ]
+        },
+        {
+          "message": 31158,
+          "choices": [
+            {
+              "reply": 37619,
+              "startsQuest": 1973
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4356,
+      "map": 0,
+      "opening": 30495,
+      "lines": [
+        {
+          "message": 30495,
+          "choices": [
+            {
+              "reply": 36784,
+              "next": 30498
+            },
+            {
+              "reply": 36785
+            },
+            {
+              "reply": 36801,
+              "next": 30508
+            }
+          ]
+        },
+        {
+          "message": 30498,
+          "choices": [
+            {
+              "reply": 36798,
+              "startsQuest": 1984
+            },
+            {
+              "reply": 36785
+            }
+          ]
+        },
+        {
+          "message": 30508,
+          "choices": [
+            {
+              "reply": 36799,
+              "startsQuest": 1985
+            },
+            {
+              "reply": 36785
+            }
+          ]
+        },
+        {
+          "message": 30524,
+          "choices": [
+            {
+              "reply": 36799,
+              "startsQuest": 1986
+            },
+            {
+              "reply": 36785
+            }
+          ]
+        },
+        {
+          "message": 31444,
+          "choices": [
+            {
+              "reply": 37979,
+              "startsQuest": 1987
+            },
+            {
+              "reply": 36785
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4362,
+      "map": 0,
+      "opening": 30395,
+      "lines": [
+        {
+          "message": 30395,
+          "choices": [
+            {
+              "reply": 36649,
+              "next": 30398
+            }
+          ]
+        },
+        {
+          "message": 30398,
+          "choices": [
+            {
+              "reply": 36646,
+              "startsQuest": 1980
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4363,
+      "map": 0,
+      "opening": 30401,
+      "lines": [
+        {
+          "message": 30401,
+          "choices": [
+            {
+              "reply": 36656,
+              "next": 30403
+            }
+          ]
+        },
+        {
+          "message": 30403,
+          "choices": [
+            {
+              "reply": 36654,
+              "startsQuest": 1981
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4365,
+      "map": 0,
+      "opening": 30407,
+      "lines": [
+        {
+          "message": 30407,
+          "choices": [
+            {
+              "reply": 36667,
+              "next": 30409
+            }
+          ]
+        },
+        {
+          "message": 30409,
+          "choices": [
+            {
+              "reply": 36664,
+              "startsQuest": 1982
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4366,
+      "map": 0,
+      "opening": 30412,
+      "lines": [
+        {
+          "message": 30412,
+          "choices": [
+            {
+              "reply": 36675,
+              "next": 30416
+            }
+          ]
+        },
+        {
+          "message": 30416,
+          "choices": [
+            {
+              "reply": 36671,
+              "startsQuest": 1983
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4372,
+      "map": 0,
+      "opening": 30473,
+      "lines": [
+        {
+          "message": 30473,
+          "choices": [
+            {
+              "reply": 36749,
+              "next": 30476
+            }
+          ]
+        },
+        {
+          "message": 30476,
+          "choices": [
+            {
+              "reply": 36769,
+              "startsQuest": 1999
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4380,
+      "map": 0,
+      "opening": 30570,
+      "lines": [
+        {
+          "message": 30570,
+          "choices": [
+            {
+              "reply": 36888,
+              "next": 30572
+            }
+          ]
+        },
+        {
+          "message": 30572,
+          "choices": [
+            {
+              "reply": 36886,
+              "startsQuest": 2007
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4469,
+      "map": 0,
+      "opening": 31503,
+      "lines": [
+        {
+          "message": 31503,
+          "choices": [
+            {
+              "reply": 38150,
+              "next": 31581
+            }
+          ]
+        },
+        {
+          "message": 31581,
+          "choices": [
+            {
+              "reply": 38154,
+              "startsQuest": 1996
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2885,
+      "map": 0,
+      "opening": 20864,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20864,
+          "choices": [
+            {
+              "reply": 25031,
+              "startsQuest": 1633
+            },
+            {
+              "reply": 25033,
+              "quest": 1633
+            },
+            {
+              "reply": 25034
+            },
+            {
+              "reply": 25035
+            },
+            {
+              "reply": 25023
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4314,
+      "map": 0,
+      "opening": 30748,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 30748,
+          "choices": [
+            {
+              "reply": 37127,
+              "next": 20180
+            },
+            {
+              "reply": 37134,
+              "quest": 1615
+            }
+          ]
+        },
+        {
+          "message": 20180,
+          "choices": [
+            {
+              "reply": 37128,
+              "startsQuest": 1615
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4412,
+      "map": 0,
+      "opening": 30933,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 30933,
+          "choices": [
+            {
+              "reply": 37349,
+              "next": 30935
+            }
+          ]
+        },
+        {
+          "message": 30935,
+          "choices": [
+            {
+              "reply": 37348,
+              "startsQuest": 1976
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 4420,
+      "map": 0,
+      "opening": 31058,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 31058,
+          "choices": [
+            {
+              "reply": 37497,
+              "next": 31059
+            }
+          ]
+        },
+        {
+          "message": 31059,
+          "choices": [
+            {
+              "reply": 37496,
+              "startsQuest": 1962
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 1515,
+      "map": 0,
+      "opening": 20915,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20915,
+          "choices": [
+            {
+              "reply": 25108,
+              "next": 20918
+            },
+            {
+              "reply": 25109,
+              "next": 20918
+            },
+            {
+              "reply": 25113,
+              "quest": 1634
+            },
+            {
+              "reply": 25118,
+              "quest": 1634
+            },
+            {
+              "reply": 25112,
+              "next": 20926,
+              "quest": 1634,
+              "afterQuest": true
+            },
+            {
+              "reply": 25124,
+              "quest": 1635
+            },
+            {
+              "reply": 25119,
+              "startsQuest": 2004,
+              "quest": 1635,
+              "afterQuest": true
+            }
+          ]
+        },
+        {
+          "message": 20918,
+          "choices": [
+            {
+              "reply": 25103,
+              "startsQuest": 1634,
+              "quest": 1632,
+              "afterQuest": true
+            }
+          ]
+        },
+        {
+          "message": 20926,
+          "choices": [
+            {
+              "reply": 25115,
+              "startsQuest": 1635,
+              "quest": 1634,
+              "afterQuest": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2880,
+      "map": 0,
+      "opening": 20873,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20873,
+          "choices": [
+            {
+              "reply": 25047,
+              "next": 20877
+            },
+            {
+              "reply": 25054,
+              "next": 20881,
+              "quest": 1642,
+              "afterQuest": true
+            },
+            {
+              "reply": 25061,
+              "next": 20887,
+              "quest": 1643,
+              "afterQuest": true
+            },
+            {
+              "reply": 25063,
+              "next": 20888,
+              "quest": 1644,
+              "afterQuest": true
+            },
+            {
+              "reply": 25065,
+              "next": 20889,
+              "quest": 1645,
+              "afterQuest": true
+            },
+            {
+              "reply": 25067,
+              "next": 20890,
+              "quest": 1646,
+              "afterQuest": true
+            },
+            {
+              "reply": 25071,
+              "next": 20893,
+              "quest": 1647,
+              "afterQuest": true
+            },
+            {
+              "reply": 25073,
+              "quest": 1648
+            },
+            {
+              "reply": 25038
+            }
+          ]
+        },
+        {
+          "message": 20877,
+          "choices": [
+            {
+              "reply": 25045,
+              "startsQuest": 1642
+            },
+            {
+              "reply": 25046
+            }
+          ]
+        },
+        {
+          "message": 20881,
+          "choices": [
+            {
+              "reply": 25049,
+              "startsQuest": 1643
+            }
+          ]
+        },
+        {
+          "message": 20887,
+          "choices": [
+            {
+              "reply": 25060,
+              "startsQuest": 1644
+            }
+          ]
+        },
+        {
+          "message": 20888,
+          "choices": [
+            {
+              "reply": 25062,
+              "startsQuest": 1645
+            }
+          ]
+        },
+        {
+          "message": 20889,
+          "choices": [
+            {
+              "reply": 25064,
+              "startsQuest": 1646
+            }
+          ]
+        },
+        {
+          "message": 20890,
+          "choices": [
+            {
+              "reply": 25066,
+              "startsQuest": 1647
+            }
+          ]
+        },
+        {
+          "message": 20893,
+          "choices": [
+            {
+              "reply": 25068,
+              "startsQuest": 1648
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2886,
+      "map": 0,
+      "opening": 20974,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20974,
+          "choices": [
+            {
+              "reply": 25216,
+              "next": 20976
+            },
+            {
+              "reply": 25224,
+              "quest": 1637
+            },
+            {
+              "reply": 25234
+            },
+            {
+              "reply": 25222
+            }
+          ]
+        },
+        {
+          "message": 20976,
+          "choices": [
+            {
+              "reply": 25213,
+              "startsQuest": 1637
+            },
+            {
+              "reply": 25215
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2888,
+      "map": 0,
+      "opening": 21196,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 21196,
+          "choices": [
+            {
+              "reply": 25486,
+              "startsQuest": 1655
+            },
+            {
+              "reply": 25489,
+              "quest": 1655
+            },
+            {
+              "reply": 25488
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2892,
+      "map": 0,
+      "opening": 20776,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20776,
+          "choices": [
+            {
+              "reply": 24896,
+              "next": 20780
+            },
+            {
+              "reply": 38437,
+              "next": 20780
+            },
+            {
+              "reply": 24891
+            },
+            {
+              "reply": 24897
+            }
+          ]
+        },
+        {
+          "message": 20780,
+          "choices": [
+            {
+              "reply": 24892,
+              "startsQuest": 1632
+            },
+            {
+              "reply": 24900
+            },
+            {
+              "reply": 24902
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2899,
+      "map": 0,
+      "opening": 20861,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20861,
+          "choices": [
+            {
+              "reply": 25295,
+              "next": 21043
+            },
+            {
+              "reply": 25311,
+              "next": 57160,
+              "quest": 1649
+            },
+            {
+              "reply": 77764,
+              "next": 57160,
+              "quest": 1649,
+              "afterQuest": true
+            },
+            {
+              "reply": 77770,
+              "next": 21050,
+              "quest": 2512
+            },
+            {
+              "reply": 25312,
+              "next": 21050,
+              "quest": 2512,
+              "afterQuest": true
+            },
+            {
+              "reply": 25320,
+              "next": 21056,
+              "quest": 1650
+            },
+            {
+              "reply": 25333,
+              "next": 21056,
+              "quest": 1650,
+              "afterQuest": true
+            },
+            {
+              "reply": 25330,
+              "next": 57184,
+              "quest": 1651
+            },
+            {
+              "reply": 77804,
+              "next": 57184,
+              "quest": 1651,
+              "afterQuest": true
+            },
+            {
+              "reply": 77796,
+              "quest": 2513
+            },
+            {
+              "reply": 25299
+            }
+          ]
+        },
+        {
+          "message": 21043,
+          "choices": [
+            {
+              "reply": 25292,
+              "startsQuest": 1649
+            }
+          ]
+        },
+        {
+          "message": 57160,
+          "choices": [
+            {
+              "reply": 77774,
+              "startsQuest": 2512
+            }
+          ]
+        },
+        {
+          "message": 21050,
+          "choices": [
+            {
+              "reply": 25307,
+              "startsQuest": 1650
+            }
+          ]
+        },
+        {
+          "message": 21056,
+          "choices": [
+            {
+              "reply": 25323,
+              "startsQuest": 1651
+            }
+          ]
+        },
+        {
+          "message": 57184,
+          "choices": [
+            {
+              "reply": 77800,
+              "startsQuest": 2513
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2905,
+      "map": 0,
+      "opening": 20795,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20795,
+          "choices": [
+            {
+              "reply": 24935,
+              "next": 20808
+            },
+            {
+              "reply": 24940,
+              "quest": 1639
+            },
+            {
+              "reply": 24943,
+              "next": 20814,
+              "quest": 1639,
+              "afterQuest": true
+            },
+            {
+              "reply": 24947,
+              "quest": 1640
+            },
+            {
+              "reply": 24950,
+              "next": 20819,
+              "quest": 1640,
+              "afterQuest": true
+            },
+            {
+              "reply": 24952,
+              "quest": 1641
+            },
+            {
+              "reply": 24951
+            }
+          ]
+        },
+        {
+          "message": 20808,
+          "choices": [
+            {
+              "reply": 24931,
+              "startsQuest": 1639
+            }
+          ]
+        },
+        {
+          "message": 20814,
+          "choices": [
+            {
+              "reply": 24941,
+              "startsQuest": 1640
+            }
+          ]
+        },
+        {
+          "message": 20819,
+          "choices": [
+            {
+              "reply": 24948,
+              "startsQuest": 1641
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2907,
+      "map": 0,
+      "opening": 20830,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 20830,
+          "choices": [
+            {
+              "reply": 24970,
+              "startsQuest": 1638
+            },
+            {
+              "reply": 24986
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 7581,
+      "map": 0,
+      "opening": 57132,
+      "_byHand": true,
+      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "lines": [
+        {
+          "message": 57132,
+          "choices": [
+            {
+              "reply": 77742,
+              "next": 60410
+            },
+            {
+              "reply": 77744,
+              "next": 57134
+            },
+            {
+              "reply": 77743,
+              "next": 20709
+            }
+          ]
+        },
+        {
+          "message": 57134,
+          "choices": [
+            {
+              "reply": 77736,
+              "next": 57142
+            }
+          ]
+        },
+        {
+          "message": 57142,
+          "choices": [
+            {
+              "reply": 77738,
+              "next": 57133
+            }
+          ]
+        },
+        {
+          "message": 57133,
+          "choices": [
+            {
+              "reply": 83193,
+              "startsQuest": 2511
+            },
+            {
+              "reply": 77737,
+              "next": 57144
+            }
+          ]
+        },
+        {
+          "message": 57144,
+          "choices": []
+        },
+        {
+          "message": 60410,
+          "choices": [
+            {
+              "reply": 77870,
+              "next": 60411
+            }
+          ]
+        },
+        {
+          "message": 60411,
+          "choices": [
+            {
+              "reply": 83104,
+              "next": 20673
+            },
+            {
+              "reply": 83103,
+              "next": 60414
+            }
+          ]
+        },
+        {
+          "message": 60414,
+          "choices": []
+        },
+        {
+          "message": 20673,
+          "choices": [
+            {
+              "reply": 77746,
+              "startsQuest": 1629
+            }
+          ]
+        },
+        {
+          "message": 20709,
+          "choices": [
+            {
+              "reply": 77751,
+              "startsQuest": 1631
+            },
+            {
+              "reply": 77741,
+              "next": 57141,
+              "quest": 1631,
+              "afterQuest": true
+            }
+          ]
+        },
+        {
+          "message": 57141,
+          "choices": [
+            {
+              "reply": 77750,
+              "next": 60427
+            }
+          ]
+        },
+        {
+          "message": 60427,
+          "choices": [
+            {
+              "reply": 77869,
+              "next": 60428
+            }
+          ]
+        },
+        {
+          "message": 60428,
+          "choices": [
+            {
+              "reply": 83200,
+              "next": 57151
+            }
+          ]
+        },
+        {
+          "message": 57151,
+          "choices": [
+            {
+              "reply": 77755
+            },
+            {
+              "reply": 77754
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Jondo.Unity.Launcher.Managers;
+using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Connection-phase messages: authentication, server list and character list.
@@ -407,12 +407,12 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         private static readonly Dictionary<int, Func<long>> Derived = new Dictionary<int, Func<long>>
         {
-            { Stat.DodgeActionPoints,    () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.DodgeMovementPoints,  () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.WithdrawActionPoints, () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.WithdrawMovementPoints, () => Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.Escape,               () => Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility / 10 },
-            { Stat.Lock,                 () => Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility / 10 },
+            { Stat.DodgeActionPoints,    () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.DodgeMovementPoints,  () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.WithdrawActionPoints, () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.WithdrawMovementPoints, () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
+            { Stat.Escape,               () => Jondo.Unity.Server.Network.SessionContext.State.StatAgility / 10 },
+            { Stat.Lock,                 () => Jondo.Unity.Server.Network.SessionContext.State.StatAgility / 10 },
         };
 
         /// <summary>Points a character starts with, before anything is spent or equipped.</summary>
@@ -489,7 +489,7 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static byte[] BuildCharacteristics()
         {
-            int level = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel;
+            int level = Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel;
 
             // The three experience fields, and they are not in the order they look:
             //
@@ -509,19 +509,19 @@ namespace Jondo.Unity.Launcher.Network
                 .VarIfNotZero(1, ExperienceTable.NextLevelFloor(level))
                 .Var(4, FreshUnknownF4)
                 .VarIfNotZero(7, ExperienceTable.LevelFloor(level))
-                .VarIfNotZero(8, Jondo.Unity.Launcher.Network.SessionContext.State.Experience)
+                .VarIfNotZero(8, Jondo.Unity.Server.Network.SessionContext.State.Experience)
                 .Bytes(9, FreshUnknownF9())
-                .VarIfNotZero(10, Jondo.Unity.Launcher.Network.SessionContext.State.Kamas);
+                .VarIfNotZero(10, Jondo.Unity.Server.Network.SessionContext.State.Kamas);
 
             // The six the player spends points on.
             var primary = new Dictionary<int, long>
             {
-                { Stat.Strength, Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength },
-                { Stat.Vitality, Jondo.Unity.Launcher.Network.SessionContext.State.StatVitality },
-                { Stat.Wisdom, Jondo.Unity.Launcher.Network.SessionContext.State.StatWisdom },
-                { Stat.Chance, Jondo.Unity.Launcher.Network.SessionContext.State.StatChance },
-                { Stat.Agility, Jondo.Unity.Launcher.Network.SessionContext.State.StatAgility },
-                { Stat.Intelligence, Jondo.Unity.Launcher.Network.SessionContext.State.StatIntelligence },
+                { Stat.Strength, Jondo.Unity.Server.Network.SessionContext.State.StatStrength },
+                { Stat.Vitality, Jondo.Unity.Server.Network.SessionContext.State.StatVitality },
+                { Stat.Wisdom, Jondo.Unity.Server.Network.SessionContext.State.StatWisdom },
+                { Stat.Chance, Jondo.Unity.Server.Network.SessionContext.State.StatChance },
+                { Stat.Agility, Jondo.Unity.Server.Network.SessionContext.State.StatAgility },
+                { Stat.Intelligence, Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence },
             };
 
             IReadOnlyList<int> ids = WorldEntry.CharacteristicIds;
@@ -577,8 +577,8 @@ namespace Jondo.Unity.Launcher.Network
             if (id == Stat.Energy) return BaseEnergy;
             // Five pods a point of strength on top of the base, which is what the capture shows:
             // five points of strength moved this characteristic by twenty-five.
-            if (id == Stat.Pods) return BasePods + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength;
-            if (id == Stat.RemainingPoints) return Jondo.Unity.Launcher.Network.SessionContext.State.CharacterRemainingPoints;
+            if (id == Stat.Pods) return BasePods + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength;
+            if (id == Stat.RemainingPoints) return Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints;
             if (Derived.TryGetValue(id, out var from)) return from();
             return FreshCharacter.TryGetValue(id, out long value) ? value : 0;
         }
@@ -833,6 +833,50 @@ namespace Jondo.Unity.Launcher.Network
         {
             foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
                 Declare(jss, interactive);
+
+            AddQuestElements(jss, mapId);
+        }
+
+        /// <summary>
+        /// Lo que sólo ve quien lleva la misión: la estela, el catalejo, el cartel.
+        ///
+        /// Va aparte del registro a propósito. El registro es del mundo y es igual para todos —el
+        /// zaap está para cualquiera—, y esto es de UN jugador: la estela aparece al coger la
+        /// misión y se va al cumplir su objetivo. Meterlo en el registro habría hecho falso lo
+        /// primero.
+        ///
+        /// Que se pueda preguntar por jugador aquí no es nuevo: <see cref="Declare"/> ya mira el
+        /// nivel de oficio de quien mira el mapa para decidir si un recurso se le ofrece o se le
+        /// pinta en rojo. Este jss se construye una vez por jugador y por llegada al mapa.
+        ///
+        /// La habilidad va en el f4 y sin estado, como todo lo que no es recurso. El 114 es
+        /// «Utiliser», la misma que el cliente usa para el vestigio de anomalía, y de ella dicen
+        /// las capturas que el cliente contesta con su iwo igual.
+        /// </summary>
+        private static void AddQuestElements(Pb jss, long mapId)
+        {
+            foreach (var binding in Managers.Quests.Bindings.OnMap(mapId))
+            {
+                if (!Managers.Quests.ShouldSee(binding)) continue;
+
+                foreach (var (where, elementId) in binding.Elements)
+                {
+                    if (where != mapId) continue;
+
+                    var element = Managers.Interactives.ByElementId(mapId, elementId);
+                    if (element.Id == 0) continue;
+
+                    jss.Msg(11, Pb.New()
+                        .Var(1, 1)
+                        .Msg(4, Pb.New()
+                            .Var(1, Managers.Interactives.SkillInstanceOf(elementId))
+                            .Var(2, binding.SkillId))
+                        .Var(5, elementId)
+                        .Var(6, binding.TypeId));
+
+                    DeclarePlacement(jss, element, Managers.ResourceState.Full);
+                }
+            }
         }
 
         /// <summary>
@@ -1038,63 +1082,24 @@ namespace Jondo.Unity.Launcher.Network
         /// </summary>
         public static byte[] BuildSpellBar(int breed, int level)
         {
-            var known = SpellTable.KnownFor(breed, level, Managers.SpellChoices.Chosen);
+            var layout = Managers.FightSpellLayout.Current(breed, level);
 
-            // Un hechizo que ya no se tiene —porque se cambió de variante— no puede quedarse en la
-            // barra: el cliente pinta un hueco que no sabe resolver.
-            var has = new HashSet<int>();
-            foreach (var spell in known) has.Add(spell.SpellId);
-
-            var placed = new List<(int Slot, int SpellId)>();
-            var taken = new HashSet<int>();
-            foreach (var pair in Managers.SpellChoices.Bar)
+            var remembered = new List<(int Slot, int SpellId)>();
+            foreach (var (slot, spell) in layout.Bar)
             {
-                if (pair.Key >= SpellBarSlots || !has.Contains(pair.Value)) continue;
-                placed.Add((pair.Key, pair.Value));
-                taken.Add(pair.Value);
+                if (spell != Network.FightProtocol.HechizoCuerpoACuerpo)
+                    remembered.Add((slot, spell));
             }
-
-            // Y lo que el jugador todavía no ha colocado se reparte por los huecos libres, que es
-            // lo que hace el juego con un personaje recién hecho.
-            //
-            // Empezando por el UNO: el hueco cero es donde el cliente dibuja el arma, y en 37 de
-            // las 51 barras de las capturas va vacío por eso mismo.
-            int next = 1;
-            foreach (var spell in known)
-            {
-                if (taken.Contains(spell.SpellId)) continue;
-                while (next < SpellBarSlots && placed.Exists(p => p.Slot == next)) next++;
-                if (next >= SpellBarSlots) break;
-                placed.Add((next, spell.SpellId));
-                next++;
-            }
-
-            placed.Sort((a, b) => a.Slot.CompareTo(b.Slot));
-            Managers.SpellChoices.RememberBar(placed);
-
-            // El cuerpo a cuerpo va en el primer hueco libre, con el hechizo CERO. Su entrada es
-            // un f6 presente y vacío —los bytes 0a 02 32 00—, que es como proto3 escribe el cero.
-            // Está en las 13 barras de jugador de las capturas, incluida la del personaje del
-            // tutorial, que no lleva ni un objeto: la casilla es la del puño y va siempre.
-            var ocupados = new HashSet<int>();
-            foreach (var (slot, _) in placed) ocupados.Add(slot);
-            int hueco = 0;
-            while (ocupados.Contains(hueco)) hueco++;
+            Managers.SpellChoices.RememberBar(remembered);
 
             var itg = Pb.New();
-            bool puesto = false;
-            foreach (var (slot, spellId) in placed)
+            foreach (var (slot, spell) in layout.Bar)
             {
-                if (!puesto && hueco < slot)
-                {
-                    itg.Msg(1, Pb.New().VarIfNotZero(2, hueco).EmptyMsg(6));
-                    puesto = true;
-                }
-                itg.Msg(1, Pb.New()
-                    .VarIfNotZero(2, slot)
-                    .Msg(6, Pb.New().Var(2, spellId)));
+                var shortcut = Pb.New().VarIfNotZero(2, slot);
+                if (spell == Network.FightProtocol.HechizoCuerpoACuerpo) shortcut.EmptyMsg(6);
+                else shortcut.Msg(6, Pb.New().Var(2, spell));
+                itg.Msg(1, shortcut);
             }
-            if (!puesto) itg.Msg(1, Pb.New().VarIfNotZero(2, hueco).EmptyMsg(6));
 
             return itg.Var(2, SpellBar).Build();
         }
@@ -1124,7 +1129,6 @@ namespace Jondo.Unity.Launcher.Network
                 .Build();
 
         /// <summary>How many slots of the bar we fill. The captured one runs from 0 to 48.</summary>
-        private const int SpellBarSlots = 40;
 
         // ─── World: weight carried ──────────────────────────────────────────────
 

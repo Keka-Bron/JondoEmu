@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Moving an item between the bag and a slot.
@@ -23,10 +23,11 @@ namespace Jondo.Unity.Launcher.Handlers
     /// En cada hueco cabe una cosa, y eso lo hace cumplir este handler: lo que ya estuviera puesto
     /// sale a la bolsa con su propio ivq antes de que entre lo nuevo.
     ///
-    /// One thing this does NOT do yet is change the characteristics. Equipment adds its bonus in
-    /// field 7 of each entry of kub, and filling that in means knowing which item the uid is,
-    /// which means the inventory coming out of the database instead of out of the capture. Until
-    /// then the item moves and the sheet does not follow.
+    /// Al mover algo se actualiza tambien la cache de lo que se lleva puesto, que es la que
+    /// alimenta StatsHandler.GetEquipBonus y con ella la ficha de COMBATE -vida maxima,
+    /// iniciativa-. No la de caracteristicas: esa se construye con Equipment.Bonuses() sobre el
+    /// inventario de verdad y nunca estuvo vieja por esta ruta. Antes la cache si lo estaba, y los
+    /// bonus de combate no llegaban hasta la siguiente seleccion de personaje.
     /// </summary>
     public static class EquipmentHandler
     {
@@ -57,10 +58,13 @@ namespace Jondo.Unity.Launcher.Handlers
             // nuevo, y se le manda su propio ivq: sin eso las dos cosas se quedaban en el mismo
             // hueco a la vez y el aspecto lo decidía la primera que se encontrase, no la que el
             // jugador acababa de ponerse.
+            var evictedUids = new System.Collections.Generic.List<long>();
             foreach (var evicted in Managers.Equipment.Occupants(position, uid))
             {
+                evictedUids.Add(evicted.Uid);
                 evicted.Position = Bag;
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag, SessionContext.State.CharacterId);
+                Managers.Equipment.RememberWorn(evicted.Uid, Bag, evicted.Effects);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, evicted.Uid).Var(2, Bag).Build()));
@@ -76,6 +80,13 @@ namespace Jondo.Unity.Launcher.Handlers
             DatabaseManager.SaveItemPosition(uid, position, SessionContext.State.CharacterId);
             bool known = Managers.Equipment.Move(uid, position);
 
+            // Sin condicionarlo a `known`, y eso importa. Managers.Equipment.LoadFrom se traga su
+            // propia excepcion, asi que si esa lectura falla Items queda vacio mientras la cache
+            // SI se lleno al elegir personaje, que lee por otra via. A partir de ahi `known` seria
+            // false en todos los iuk y el jugador podria quitarse la ropa entera y seguir peleando
+            // con las estadisticas puestas hasta cerrar sesion.
+            Managers.Equipment.RememberWorn(uid, position, Managers.Equipment.ByUid(uid)?.Effects);
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, position).Build()));
 
@@ -90,18 +101,18 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
 
             // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
             // recargar el mapa. Son dos mensajes y hacen falta los dos: el jsn redibuja al muñeco
             // del mapa y el lxc actualiza el de la ficha. En la captura salen en este orden, entre
             // los tres de arriba y el peso.
-            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (character != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                        character, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation, accountId)));
+                        character, Jondo.Unity.Server.Network.SessionContext.State.CellId, Jondo.Unity.Server.Network.SessionContext.State.Orientation, accountId)));
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
@@ -118,6 +129,10 @@ namespace Jondo.Unity.Launcher.Handlers
             Console.WriteLine($"[Equipment] Item {uid} -> position {position}"
                               + (position == Bag ? " (taken off)." : ".")
                               + (known ? "" : " Not one of ours; the sheet is left alone."));
+            ActivityJournal.Current.Write("equipment.moved",
+                accountId > 0 ? accountId : SessionContext.Current.AccountId,
+                SessionContext.State.CharacterId,
+                new { uid, position, known, evicted = evictedUids });
         }
     }
 }

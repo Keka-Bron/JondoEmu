@@ -1,10 +1,11 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Base look of every breed, exactly as the client itself defines it.
@@ -149,7 +150,7 @@ namespace Jondo.Unity.Launcher.Managers
             // selección; sin él, por el que está jugando.
             var mount = characterId != 0 ? Mounts.RiddenBy(characterId) : Mounts.Ridden();
 
-            long quien = characterId != 0 ? characterId : Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
+            long quien = characterId != 0 ? characterId : Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
             var prendas = Wardrobe.AppearanceOf(quien);
 
             // Montado, la raíz es la montura; una MASCOTURA o una MONTURA DE APARIENCIA mandan
@@ -282,7 +283,7 @@ namespace Jondo.Unity.Launcher.Managers
             // El equipo de verdad. Sólo se sabe para quien está jugando —Equipment vive en la
             // sesión, no por personaje arbitrario— y sólo lo medido en equipment_skins.json; lo
             // demás se queda como estaba, sin piel.
-            if (quien != 0 && quien == Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)
+            if (quien != 0 && quien == Jondo.Unity.Server.Network.SessionContext.State.CharacterId)
             {
                 foreach (var objeto in Equipment.All)
                 {

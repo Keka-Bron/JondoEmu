@@ -45,6 +45,16 @@ namespace Jondo.Unity.World.Content
         public int ErasedCount => _erased.Count;
 
         /// <summary>
+        /// Which rows the authored layer has taken out.
+        /// </summary>
+        /// <remarks>
+        /// The editor needs these to write the file back: a tombstone that is loaded and not
+        /// written out again would let the next regeneration put the row it removed back, which is
+        /// exactly the silent undo the layers exist to prevent.
+        /// </remarks>
+        public IEnumerable<TKey> ErasedKeys => _erased.Keys;
+
+        /// <summary>
         /// Adds a row, unless something from a higher layer already holds that key, or the authored
         /// layer has erased it.
         /// </summary>

@@ -3,10 +3,10 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     public static class MapLoadHandler
     {
@@ -98,6 +98,15 @@ namespace Jondo.Unity.Launcher.Handlers
                     byte[] knsPacket = NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kns), knsMsg.ToByteArray());
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, knsPacket);
                     LogDebug("[Game Node] Sent dynamically instantiated kns (Fymx = true).");
+
+                    // Y lo que dependa de haber llegado aquí: los objetivos que se cumplen pisando
+                    // un mapa o una zona, y la marca verde de este mapa.
+                    //
+                    // Aquí y no en MapChangeHandler porque hay ocho sitios que cambian el mapa —el
+                    // borde, el zaap, el zaapi, la puerta de una casa, el .teleport, el merkasako,
+                    // salir de un combate, la mazmorra— y todos acaban pidiendo el mapa por kkr.
+                    // Éste es el único paso por el que pasan los ocho.
+                    await Managers.Quests.OnMapEnteredAsync(stream, mapIdToLoad, subAreaId);
                 }
             }
         }

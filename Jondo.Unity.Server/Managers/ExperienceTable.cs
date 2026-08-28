@@ -1,9 +1,10 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     /// <summary>
     /// Character experience table: how much accumulated experience is needed to reach each level.

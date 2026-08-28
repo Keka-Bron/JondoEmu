@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.World.Content;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Hablar con un NPC y comprarle.
@@ -158,40 +159,157 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         private const long RespuestaDeDespedida = 7846;
 
-        /// <summary>La ventana de diálogo y su pregunta, sacadas de la plantilla del NPC.</summary>
+        /// <summary>
+        /// La ventana de diálogo y su primera pregunta.
+        ///
+        /// Si hay una conversación escrita para este NPC, se abre por donde ella diga y con las
+        /// respuestas que ella diga. Si no, se hace lo de siempre: la frase de la plantilla y TODAS
+        /// sus respuestas de golpe, que es lo que hace que Snori Nairb ofrezca treinta y nueve.
+        /// </summary>
         private static async Task OpenDialogAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
         {
             var template = Npcs.TemplateOf(npc.NpcId);
-            if (template == null || template.DialogMessageId == 0)
+            var escrito = NpcDialogues.For(npc.NpcId, mapId);
+            var primera = escrito?.First();
+
+            if (primera == null && (template == null || template.DialogMessageId == 0))
             {
                 Console.WriteLine($"[NPC] El {npc.NpcId} no tiene diálogo en su plantilla.");
                 return;
             }
 
-
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
 
-            // UN DIÁLOGO SIN RESPUESTAS NO SE PUEDE CERRAR.
-            //
-            // Cuando la lista va vacía, el cliente pinta él solo un «Marcharte.», y ese botón no
-            // manda el ioy: se queda la ventana puesta y no hay manera de salir más que
-            // reconectando. Se ve con el Bontariano enfadado, que tiene un mensaje y CERO
-            // respuestas en su plantilla.
-            //
-            // Así que siempre va al menos una respuesta de verdad, porque una respuesta de verdad
-            // sí manda el ioy y entonces contestamos con el kld que cierra.
-            long[] respuestas = template.Replies.Length > 0
-                ? template.Replies
-                : new[] { RespuestaDeDespedida };
+            long pregunta = primera?.Message ?? template!.DialogMessageId;
+            long[] respuestas = primera != null
+                ? LasQueTocan(primera)
+                : SinArbolEscrito(template!);
+
+            // Se apunta por dónde va la conversación. Sin esto el ioy que llega después no se puede
+            // situar: trae el id de la respuesta y nada más, ni de qué NPC ni de qué frase venía.
+            SessionContext.State.OpenDialogueNpcId = npc.NpcId;
+            SessionContext.State.OpenDialogueMapId = mapId;
+            SessionContext.State.OpenDialogueMessage = pregunta;
+
+            await PreguntarAsync(stream, pregunta, respuestas, template);
+
+            // Y si alguna misión en curso pedía justamente venir a ver a éste, ya está.
+            await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
+
+            Console.WriteLine($"[NPC] Diálogo del {npc.NpcId}: pregunta {pregunta}, " +
+                              $"{Math.Max(respuestas.Length, 1)} respuestas" +
+                              (escrito != null ? $" (escrito, {escrito.Lines.Count} frases)" : " (de la plantilla)") + ".");
+        }
+
+        /// <summary>
+        /// Manda una pregunta con sus respuestas, y se asegura de que haya al menos una.
+        /// </summary>
+        /// <remarks>
+        /// UN DIÁLOGO SIN RESPUESTAS NO SE PUEDE CERRAR. Cuando la lista va vacía, el cliente pinta
+        /// él solo un «Marcharte.», y ese botón NO manda el ioy: la ventana se queda puesta y no hay
+        /// forma de salir más que reconectando. Se ve con el Bontariano enfadado, que tiene un
+        /// mensaje y cero respuestas en su plantilla.
+        ///
+        /// Así que siempre va al menos una respuesta de verdad, porque una respuesta de verdad sí
+        /// manda el ioy y entonces contestamos con el kld que cierra. Está aquí y no en los dos
+        /// sitios que preguntan porque ahora hay dos: la primera frase y cada una de las que siguen.
+        /// </remarks>
+        private static async Task PreguntarAsync(NetworkStream stream, long pregunta, long[] respuestas,
+                                                 Npcs.Template? plantilla = null)
+        {
+            if (respuestas.Length == 0)
+            {
+                // Una de las suyas, si tiene alguna. El cliente resuelve el texto de una respuesta
+                // desde la plantilla DEL NPC con el que habla, así que mandarle una que ese NPC no
+                // declara le pinta un botón en blanco: es lo que salía con la Brakmariana enfadada.
+                //
+                // Y si no tiene ninguna, no se inventa nada: se manda la lista vacía y el cliente
+                // pinta su propio «Marcharte.». Salir de ahí es cosa de la X, que ahora sí se
+                // atiende.
+                respuestas = plantilla != null && plantilla.Replies.Length > 0
+                    ? new[] { plantilla.Replies[^1] }
+                    : Array.Empty<long>();
+            }
+
+            if (respuestas.Length == 0)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(pregunta,
+                        Array.Empty<long>())));
+                return;
+            }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(
-                    template.DialogMessageId, respuestas)));
+                ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas)));
+        }
 
-            Console.WriteLine($"[NPC] Diálogo del {npc.NpcId}: pregunta {template.DialogMessageId}, " +
-                              $"{respuestas.Length} respuestas" +
-                              (template.Replies.Length == 0 ? " (sólo la despedida, su plantilla no trae ninguna)" : "") + ".");
+        /// <summary>
+        /// El jugador ha cerrado la ventana con la X (kla).
+        /// </summary>
+        /// <remarks>
+        /// Sin esto la X no cerraba nada. El opcode no estaba ni declarado, así que el paquete
+        /// caía en la rama de desconocidos y el servidor no contestaba; el cliente se queda con la
+        /// ventana puesta hasta que llega el kld. Con los NPCs que no ofrecen ninguna respuesta
+        /// —la Brakmariana enfadada, el Bontariano enfadado— eso dejaba al jugador encerrado en la
+        /// conversación sin más salida que reconectar.
+        ///
+        /// Sale 192 veces en las 401 capturas y siempre va vacío: no dice de qué NPC viene, así
+        /// que se cierra lo que hubiera abierto, que es lo único que puede haber.
+        /// </remarks>
+        public static async Task CloseAsync(NetworkStream stream, byte[] payload)
+        {
+            CerrarConversacion();
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                    ConnectionProtocol.NpcDialogCloseReason)));
+        }
+
+        /// <summary>
+        /// Las respuestas de una frase que este personaje debe ver.
+        /// </summary>
+        /// <remarks>
+        /// Una respuesta que pertenece a una misión no se le ofrece a quien no la lleva, y una que
+        /// pertenece a un paso no se ofrece antes de estar en ese paso. Lo dice el árbol escrito;
+        /// aquí sólo se le pregunta al diario del personaje.
+        /// </remarks>
+        private static long[] LasQueTocan(DialogueLine linea)
+        {
+            var diario = SessionContext.State.Quests;
+            if (diario == null) return linea.Replies();
+
+            return linea.RepliesFor(
+                diario.Active,
+                diario.Finished,
+                (mision, paso) => diario.Run(mision)?.StepId == paso);
+        }
+
+        /// <summary>
+        /// Qué ofrecer cuando no hay conversación escrita para este NPC.
+        /// </summary>
+        /// <remarks>
+        /// <b>Una sola respuesta, no las que declare la plantilla.</b> Un NPC declara TODAS las
+        /// respuestas de TODOS sus árboles juntas —Snori Nairb tiene treinta y nueve— y mandarlas
+        /// de golpe le enseña al jugador respuestas de misiones que no ha empezado, de fases a las
+        /// que no ha llegado y de tres conversaciones distintas mezcladas. Y además ninguna lleva a
+        /// ningún sitio, porque sin árbol no hay a dónde llevar: cualquiera de las treinta y nueve
+        /// cierra la ventana igual.
+        ///
+        /// Así que se ofrece una para despedirse y ya está. Es menos de lo que había y es lo único
+        /// que no miente. Lo que hace falta de verdad es el árbol, y eso se escribe en el editor.
+        /// </remarks>
+        private static long[] SinArbolEscrito(Npcs.Template plantilla)
+            => plantilla.Replies.Length > 0
+                ? new[] { plantilla.Replies[^1] }
+                : Array.Empty<long>();
+
+        /// <summary>Deja de haber conversación abierta.</summary>
+        private static void CerrarConversacion()
+        {
+            SessionContext.State.OpenDialogueNpcId = 0;
+            SessionContext.State.OpenDialogueMapId = 0;
+            SessionContext.State.OpenDialogueMessage = 0;
         }
 
         /// <summary>
@@ -211,6 +329,44 @@ namespace Jondo.Unity.Launcher.Handlers
                 if (field.FieldNumber == 1 && field.WireType == 0) reply = field.VarIntValue;
             }
 
+            // ¿La frase en la que está reparte alguna misión? Se mira ANTES de seguir, porque
+            // seguir cambia OpenDialogueMessage, y antes de CerrarConversacion, que lo pone a cero.
+            //
+            // Va después de elegir y no al llegar a la frase porque así está en la captura: el
+            // servidor baja la conversación hasta la 50071, el jugador elige la 66788, y sólo
+            // entonces sale el ief con la misión 2432.
+            // ¿Esta respuesta concreta da una misión? Lo dice el árbol escrito. Si no hay árbol,
+            // se cae en la regla vieja: cualquier respuesta de la frase que el paso nombra.
+            var frase = NpcDialogues.For(SessionContext.State.OpenDialogueNpcId,
+                                         SessionContext.State.OpenDialogueMapId)
+                                    ?.Line(SessionContext.State.OpenDialogueMessage);
+            var elegidaAhora = frase?.Choice(reply);
+
+            if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
+            {
+                await Managers.Quests.StartAsync(stream, elegidaAhora.StartsQuest);
+            }
+            else if (frase == null)
+            {
+                await Managers.Quests.OnReplyAsync(stream, SessionContext.State.OpenDialogueMessage);
+            }
+
+            // ¿Y este NPC guarda la puerta de una mazmorra? Si entra, la conversación ha acabado en
+            // un cambio de mapa y no hay nada más que decirle.
+            long dondeHabla = SessionContext.State.OpenDialogueMapId;
+            if (dondeHabla == 0) dondeHabla = SessionContext.State.MapId;
+            if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla))
+            {
+                CerrarConversacion();
+                return;
+            }
+
+            // ¿Esta respuesta lleva a otra frase? Es lo único que hace de esto una conversación en
+            // vez de una pregunta suelta, y sólo lo puede decir el árbol escrito a mano: el cliente
+            // trae las frases y las respuestas pero nunca cuál va con cuál.
+            if (await SeguirLaConversacionAsync(stream, reply)) return;
+
+            CerrarConversacion();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
@@ -234,6 +390,47 @@ namespace Jondo.Unity.Launcher.Handlers
 
             Console.WriteLine($"[NPC] La montaña de kamas paga {KamasMountainReward}; " +
                               $"ahora tiene {GameState.Kamas}.");
+        }
+
+        /// <summary>
+        /// Si la respuesta elegida lleva a otra frase, la manda y dice que sí.
+        /// </summary>
+        /// <remarks>
+        /// Devuelve <c>false</c> cuando la conversación termina aquí, que es lo que pasa con todo
+        /// NPC sin árbol escrito: entonces el que llama cierra con el kld como siempre.
+        ///
+        /// El ioy no dice de qué NPC viene ni de qué frase, así que se sitúa por el estado de
+        /// sesión. Si no cuadra —el jugador tiene otra ventana abierta, o ninguna— se cierra, que
+        /// es lo seguro: dejar la ventana puesta es dejarla sin salida.
+        /// </remarks>
+        private static async Task<bool> SeguirLaConversacionAsync(NetworkStream stream, long reply)
+        {
+            var estado = SessionContext.State;
+            if (estado.OpenDialogueNpcId == 0 || reply == 0) return false;
+
+            var conversacion = NpcDialogues.For(estado.OpenDialogueNpcId, estado.OpenDialogueMapId);
+            var frase = conversacion?.Line(estado.OpenDialogueMessage);
+            var elegida = frase?.Choice(reply);
+            if (elegida == null || elegida.Ends) return false;
+
+            var siguiente = conversacion!.Line(elegida.Next);
+            if (siguiente == null)
+            {
+                // El editor comprueba esto antes de guardar, así que llegar aquí quiere decir que
+                // el fichero se editó a mano. Se dice y se cierra en vez de dejar al jugador
+                // mirando una ventana que no responde.
+                Console.WriteLine($"[NPC] La respuesta {reply} del {estado.OpenDialogueNpcId} lleva " +
+                                  $"a la frase {elegida.Next}, que no está escrita. Se cierra.");
+                return false;
+            }
+
+            estado.OpenDialogueMessage = siguiente.Message;
+            await PreguntarAsync(stream, siguiente.Message, LasQueTocan(siguiente),
+                                 Npcs.TemplateOf(estado.OpenDialogueNpcId));
+
+            Console.WriteLine($"[NPC] La respuesta {reply} lleva a la frase {siguiente.Message}, " +
+                              $"con {Math.Max(siguiente.Choices.Count, 1)} respuestas.");
+            return true;
         }
 
         /// <summary>

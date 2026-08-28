@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jondo.Unity.Launcher;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Entry into the world, replayed from the 3.6.10.10 capture.
@@ -111,6 +112,19 @@ namespace Jondo.Unity.Launcher.Network
             //        bloque de aspecto entero. Es lo mismo que ihb, que ya estaba fuera por esto.
             //        Sin implementar los conjuntos, no mandar nada es lo que ve una cuenta nueva.
             Op.Hhy, Op.Lyt,
+
+            // El diario de misiones de la cuenta capturada: 261 tramas en el bloque 1 y 4 más en
+            // el del mapa, cada una con una misión, su paso y sus objetivos. Es de otro por partida
+            // doble: son las misiones que llevaba esa cuenta, y además contradicen a lo que el
+            // servidor cree, porque desde que hay motor de misiones el cliente recibiría 261
+            // misiones que su personaje no tiene y ninguna de las que sí.
+            //
+            // No es una suposición sobre qué es idu: en las 401 capturas hay 448 tramas suyas y las
+            // 448 nombran un paso que pertenece de verdad a la misión que nombran, con 1.479
+            // objetivos que pertenecen de verdad a ese paso.
+            //
+            // En su lugar va lo nuestro, desde la base: Managers.Quests.SendJournalAsync.
+            Op.Idu,
         };
 
         /// <summary>Character id the capture belongs to. Learned from the blocks, never written down.</summary>
@@ -663,7 +677,7 @@ namespace Jondo.Unity.Launcher.Network
             // And in place of the characteristics of the capture, the ones of this character.
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
             Console.WriteLine($"[World] Characteristics sent for {character.Name}: level " +
-                              $"{Jondo.Unity.Launcher.Network.SessionContext.State.CharacterLevel}, {Jondo.Unity.Launcher.Network.SessionContext.State.Kamas} kamas.");
+                              $"{Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel}, {Jondo.Unity.Server.Network.SessionContext.State.Kamas} kamas.");
 
             Console.WriteLine($"[World] Block 1 sent: {sent} messages, {rewritten} rewritten for " +
                               $"{character.Name}.");

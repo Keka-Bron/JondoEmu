@@ -1,4 +1,4 @@
-using Jondo.Unity.Launcher.Network;
+﻿using Jondo.Unity.Server.Network;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Security

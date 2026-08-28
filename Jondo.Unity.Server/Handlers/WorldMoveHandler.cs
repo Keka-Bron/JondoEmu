@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Walking, and walking off the edge of a map, in the 3.6.10.10 protocol.
@@ -72,7 +72,7 @@ namespace Jondo.Unity.Launcher.Handlers
             if (cells.Count == 0) return;
 
             byte[] moved = ConnectionProtocol.BuildActorMoved(
-                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, cells, facing);
+                Jondo.Unity.Server.Network.SessionContext.State.CharacterId, cells, facing);
             await SessionRegistry.BroadcastToMapAsync(SessionContext.State.MapId, moved);
         }
 
@@ -83,7 +83,7 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         private static (List<long> Cells, int Facing) Remember(byte[] payload)
         {
-            var nothing = (new List<long>(), Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+            var nothing = (new List<long>(), Jondo.Unity.Server.Network.SessionContext.State.Orientation);
 
             byte[]? jrw = ConnectionProtocol.ReadPayload(payload, Op.Jrw);
             if (jrw == null || jrw.Length == 0) return nothing;
@@ -99,7 +99,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             if (steps.Count == 0) return nothing;
 
-            if (mapId > 0 && mapId != Jondo.Unity.Launcher.Network.SessionContext.State.MapId)
+            if (mapId > 0 && mapId != Jondo.Unity.Server.Network.SessionContext.State.MapId)
             {
                 // The client believes it is on another map. Trusting it here would let a stray
                 // message move the character anywhere, so it is only logged.
@@ -119,11 +119,11 @@ namespace Jondo.Unity.Launcher.Handlers
             int cell = (int)(last & 0xFFF);
             int facing = (int)(last >> 12);
 
-            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = cell;
-            if (facing >= 0 && facing <= 7) Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = facing;
+            Jondo.Unity.Server.Network.SessionContext.State.CellId = cell;
+            if (facing >= 0 && facing <= 7) Jondo.Unity.Server.Network.SessionContext.State.Orientation = facing;
             DatabaseManager.SaveCurrentCharacter();
 
-            return (cells, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+            return (cells, Jondo.Unity.Server.Network.SessionContext.State.Orientation);
         }
 
         private static List<long> Unpack(byte[] packed)
@@ -181,12 +181,12 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             if (asked <= 0) return;
 
-            Way way = WayOut(Jondo.Unity.Launcher.Network.SessionContext.State.MapId, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, asked);
-            long target = Neighbour(Jondo.Unity.Launcher.Network.SessionContext.State.MapId, way, asked);
+            Way way = WayOut(Jondo.Unity.Server.Network.SessionContext.State.MapId, Jondo.Unity.Server.Network.SessionContext.State.CellId, asked);
+            long target = Neighbour(Jondo.Unity.Server.Network.SessionContext.State.MapId, way, asked);
 
-            if (target <= 0 || target == Jondo.Unity.Launcher.Network.SessionContext.State.MapId)
+            if (target <= 0 || target == Jondo.Unity.Server.Network.SessionContext.State.MapId)
             {
-                Console.WriteLine($"[Move] There is no map {way} of {Jondo.Unity.Launcher.Network.SessionContext.State.MapId}. " +
+                Console.WriteLine($"[Move] There is no map {way} of {Jondo.Unity.Server.Network.SessionContext.State.MapId}. " +
                                   $"The client asked for {asked} and stays where it is.");
                 return;
             }
@@ -200,25 +200,25 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            int arrival = Landing(target, Jondo.Unity.Launcher.Network.SessionContext.State.CellId, way);
+            int arrival = Landing(target, Jondo.Unity.Server.Network.SessionContext.State.CellId, way);
             long oldMapId = SessionContext.State.MapId;
 
             // El mapa cambia: lo que estuviera abierto en el anterior deja de estarlo.
             NpcHandler.Forget();
 
-            Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
-            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = arrival;
-            Jondo.Unity.Launcher.Network.SessionContext.State.Orientation = FacingFor(way, Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+            Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
+            Jondo.Unity.Server.Network.SessionContext.State.CellId = arrival;
+            Jondo.Unity.Server.Network.SessionContext.State.Orientation = FacingFor(way, Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             DatabaseManager.SaveCurrentCharacter();
 
             // Exactly the five the capture sends, in the same order. jsd first: the character is
             // leaving the map it was on, and the client has to be told before it is told to load
             // another one.
             byte[] actorLeft = ConnectionProtocol.BuildActorLeft(
-                Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+                Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             await SessionContext.Current.SendAsync(actorLeft);
             await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId,
-                Jondo.Unity.Launcher.Network.SessionContext.State.Orientation);
+                Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -227,7 +227,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.BuildMapDiscovered(target));
 
             Console.WriteLine($"[Move] Map change {way}: {target}, arriving on cell {arrival} " +
-                              $"facing {Jondo.Unity.Launcher.Network.SessionContext.State.Orientation}. Waiting for jrh.");
+                              $"facing {Jondo.Unity.Server.Network.SessionContext.State.Orientation}. Waiting for jrh.");
         }
 
         /// <summary>

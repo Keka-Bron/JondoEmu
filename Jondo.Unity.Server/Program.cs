@@ -1,11 +1,12 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Network;
-using Jondo.Unity.Launcher.Handlers;
+using Jondo.Unity.Server.Network;
+using Jondo.Unity.Server.Handlers;
 
-namespace Jondo.Unity.Launcher
+namespace Jondo.Unity.Server
 {
     class Program
     {
@@ -35,9 +36,26 @@ namespace Jondo.Unity.Launcher
                 return;
             }
 
-            try { await ArrancarTodoYEsperar(); }
-            finally { Contract.SoltarElSitio(); }
+            try
+            {
+                await ArrancarTodoYEsperar();
+            }
+            catch (Exception ex)
+            {
+                Environment.ExitCode = 1;
+                string failure = StartupFailure(ex);
+                Console.WriteLine(failure);
+                LogFile.Debug.WriteLine(failure);
+            }
+            finally
+            {
+                Contract.SoltarElSitio();
+            }
         }
+
+        /// <summary>The complete failure written before a WinExe exits during startup.</summary>
+        internal static string StartupFailure(Exception error)
+            => $"[!] Fatal error while starting Jondo Server:{Environment.NewLine}{error}";
 
         private static async Task ArrancarTodoYEsperar()
         {
@@ -57,6 +75,12 @@ namespace Jondo.Unity.Launcher
             DatabaseManager.Initialize();
 
             Console.WriteLine("[+] Initializing MobSpawnManager...");
+            // Delante de los monstruos a proposito, y esto era un fallo de verdad: el
+            // sembrador lee DungeonRooms para no vaciar las mazmorras con el veto de
+            // interiores, y quien escribe esa tabla es DungeonManager. Estando detras, lo
+            // que leia era lo que dejo escrito el arranque ANTERIOR. Ahora ademas pone al
+            // jefe en su ultima sala, que sin esto no existe.
+            Managers.DungeonManager.Initialize();
             Managers.MobSpawnManager.InitializeAndSpawnAll();
 
             Console.WriteLine("[+] Initializing Map Manager...");
@@ -64,7 +88,6 @@ namespace Jondo.Unity.Launcher
             ExperienceTable.Initialize();
             Managers.SpellTable.Initialize();
             Managers.BreedStatCost.Initialize();
-            Managers.DungeonManager.Initialize();
             Managers.EffectTable.Initialize();
             Managers.ItemSets.Initialize();
             Managers.EffectFields.Initialize();
@@ -97,6 +120,12 @@ namespace Jondo.Unity.Launcher
             Managers.Vendors.Initialize();
             Managers.Npcs.Initialize();
             Managers.NpcShops.Initialize();
+            // Detras de Npcs porque las misiones cuelgan de sus dialogos, y el catalogo es de
+            // Ankama y no cambia: se lee una vez y lo comparten todas las sesiones.
+            Managers.Quests.Load();
+            // Detras de las misiones: 259 logros se ganan acabando una, y el catalogo se indexa
+            // por mision al cargarse.
+            Managers.Achievements.Load();
             Managers.TokenShops.Initialize();
 
             Console.WriteLine("[+] Registering Fight Packet Handlers...");

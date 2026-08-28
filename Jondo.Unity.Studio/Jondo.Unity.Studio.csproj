@@ -42,8 +42,23 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
     <!-- Avalonia arrastra Tmds.DBus.Protocol 0.20.0, que lleva GHSA-xrw6-gwf8-vvr9 (gravedad
          alta). Es la pieza de DBus de Linux y aqui no se usa, pero viaja igual en el paquete, asi
-         que se fija la version corregida. Mismo remedio que con SQLitePCLRaw en el servidor. -->
-    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.2" />
+         que se fija la version corregida (0.21.3: la 0.21.2 que habia sigue marcada, y de la 0.22 en adelante tambien). Mismo remedio que con SQLitePCLRaw en el servidor. -->
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
+
+    <!-- To read bases/paquetes.db, which is where the server writes what it could not handle.
+         Read only, and it is the server's table, not the editor's: the conclusions a person draws
+         from it go to content/packets/shapes.json, which git can review. Same versions as the
+         server so the two never end up carrying two native SQLite builds. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
+
+    <!-- Para leer los bundles del propio cliente: los iconos de los monstruos estan en
+         Picto/Monsters/monster_assets_1x.bundle, 2.395 texturas de 64x64. Se leen de ahi en vez de
+         copiarse a datos/: el cliente ya ocupa lo que ocupa, y una copia nuestra se quedaria vieja
+         el dia del siguiente parche sin que nadie se enterara. La segunda hace falta porque las
+         texturas van en BC7 y hay que descomprimirlas. -->
+    <PackageReference Include="AssetsTools.NET" Version="3.0.5" />
+    <PackageReference Include="AssetsTools.NET.Texture" Version="3.0.2" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,10 +66,26 @@
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
   </ItemGroup>
 
+  <!-- Every section is built once, off screen, against the real data on this machine, and the
+       copy to the root does not happen if any of them threw.
+
+       The logic behind the sections is covered by Jondo.Unity.Tests. What no test there reaches is
+       the construction of the controls themselves, and that is not a theoretical gap: a malformed
+       column specification or a null in a template throws at construction, and until this target
+       existed the only way it showed up was somebody clicking that section. Same escape hatch as
+       the server's test gate, -p:SkipTests=true, which leaves its trace on the command line
+       rather than in a config file nobody reads. -->
+  <Target Name="StudioSelfTest" AfterTargets="Publish" Condition="'$(SkipTests)' != 'true'">
+    <Message Text="[Studio] Construyendo todas las secciones contra los datos de verdad..." Importance="high" />
+    <Exec Command="&quot;$(PublishDir)$(AssemblyName).exe&quot; --selftest"
+          IgnoreStandardErrorWarningFormat="true" />
+  </Target>
+
   <!-- Auto-deploy: to the root, next to the launcher and the server. Same reasoning as the
        server's own target — what a person double-clicks lives in the root, and everything else
        stays inside a folder. -->
-  <Target Name="DeployStudio" AfterTargets="Publish" Condition="'$(SkipRootDeploy)' != 'true'">
+  <Target Name="DeployStudio" AfterTargets="Publish" DependsOnTargets="StudioSelfTest"
+          Condition="'$(SkipRootDeploy)' != 'true'">
     <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe"
           DestinationFiles="$(MSBuildProjectDirectory)\..\$(AssemblyName).exe"
           OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />

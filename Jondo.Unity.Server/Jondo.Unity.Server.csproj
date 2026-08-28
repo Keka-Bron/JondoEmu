@@ -44,7 +44,6 @@
          abajo, que es lo que de verdad trae la biblioteca nativa. Cuando salga la 11 estable esto
          se puede quitar y comprobar que NU1903 sigue sin aparecer. -->
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
-    <PackageReference Include="System.Text.Json" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>

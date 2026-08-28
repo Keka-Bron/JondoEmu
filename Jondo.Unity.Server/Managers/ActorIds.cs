@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Quién es quién en un mapa: el reparto de identificadores contextuales de actor.

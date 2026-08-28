@@ -1,10 +1,11 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Associates one launcher invocation with one account through Zaap and the connection server.
@@ -16,7 +17,7 @@ namespace Jondo.Unity.Launcher.Network
         /// Clientes que puede tener abiertos a la vez UNA misma dirección. Ocho, que es lo que cabe
         /// en un grupo de Dofus. NO es la capacidad del servidor: esa es Contract.ClientesEnTotal.
         /// </summary>
-        public const int MaximumClients = Contract.ClientesPorIp;
+        public const int MaximumClients = Jondo.Unity.Launcher.Contract.ClientesPorIp;
         public sealed class Launch
         {
             public int InstanceId { get; init; }

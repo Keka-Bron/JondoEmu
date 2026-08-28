@@ -1,10 +1,12 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Jondo.Unity.Protocol.Wire;
 using Microsoft.Data.Sqlite;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Lo que el cliente nos manda y no sabemos atender, apuntado en vez de tirado.
@@ -130,7 +132,26 @@ namespace Jondo.Unity.Launcher.Network
                 // estos puede llegar cien veces por minuto —el ping del cliente sin ir más lejos—
                 // y abrir SQLite en cada uno pondría el disco a trabajar para no aprender nada
                 // nuevo. Lo que interesa es que la forma EXISTA en la lista, no el número exacto.
-                if (cuantas == 1 || cuantas % 100 == 0) Guardar(fila);
+                if (cuantas == 1 || cuantas % 100 == 0)
+                {
+                    Guardar(fila);
+                    // Directo, sin envolver en try/catch: SessionContext.Current devuelve la
+                    // sesion Suelta cuando el AsyncLocal esta vacio y State es Current.State, asi
+                    // que ninguno de los dos puede lanzar. Los dos ayudantes que envolvian esto
+                    // eran catch muertos.
+                    ActivityJournal.Current.Write("packet.unknown",
+                        SessionContext.Current.AccountId, SessionContext.State.CharacterId,
+                        new
+                        {
+                            opcode = fila.Opcode,
+                            rootField = fila.RootField,
+                            kind = fila.Kind.ToString(),
+                            signature = fila.Signature,
+                            occurrences = cuantas,
+                            mapId = fila.MapId,
+                            payloadBytes = fila.PayloadBytes,
+                        });
+                }
             }
             catch
             {
@@ -151,6 +172,18 @@ namespace Jondo.Unity.Launcher.Network
         /// Es lo que llama el despachador, que a esas alturas sólo tiene los bytes crudos. Sacar
         /// el opcode aquí y no allí evita repetir el destripe en los dos sitios desde los que se
         /// llama, y sobre todo evita que el despachador tenga que saber cómo es un sobre.
+        ///
+        /// AQUÍ ESTABA EL FALLO que dejaba todo esto sin servir. Se abría el sobre con
+        /// <c>ExtractGameNodePayload</c>, que sólo mira el campo 3 de la raíz, y con
+        /// <c>GetMessageTypeUrl</c>, que mira el 1 y el 3. Las tramas del cliente van en el campo
+        /// <b>2</b>: medido sobre las 72.879 del registro de tráfico, 8.974 de cliente y todas en
+        /// el 2. Así que cada paquete que pasaba por aquí entraba sin opcode y con la carga vacía,
+        /// y después de semanas de juego la tabla tenía dos filas, las dos «(sin opcode)» sobre un
+        /// cuerpo vacío. El despachador no se enteró nunca porque él busca los opcodes como texto
+        /// dentro de la trama, y eso funciona sea cual sea el sobre.
+        ///
+        /// Ahora lo abre <see cref="Envelope"/>, que vive en el proyecto de protocolo justamente
+        /// para que el editor calcule lo mismo que el servidor escribe.
         /// </summary>
         public static void RecordFrame(byte[] frame, Kind kind)
         {
@@ -158,25 +191,8 @@ namespace Jondo.Unity.Launcher.Network
             {
                 if (frame == null || frame.Length == 0) return;
 
-                string tipo = NetworkEnvelope.GetMessageTypeUrl(frame) ?? "";
-                int barra = tipo.LastIndexOf('/');
-                string opcode = barra >= 0 && barra + 1 < tipo.Length ? tipo[(barra + 1)..] : tipo;
-
-                // El campo de la raíz dice la dirección: 1 empuje, 2 petición del cliente, 3
-                // respuesta. Aquí siempre debería ser el 2, pero se mira en vez de suponerlo.
-                int raiz = 0;
-                try
-                {
-                    foreach (var campo in ProtoMessage.Parse(frame).Fields)
-                    {
-                        if (campo.WireType != 2) continue;
-                        if (campo.FieldNumber is 1 or 2 or 3) { raiz = campo.FieldNumber; break; }
-                    }
-                }
-                catch { }
-
-                byte[] dentro = NetworkEnvelope.ExtractGameNodePayload(frame) ?? Array.Empty<byte>();
-                Record(opcode, raiz, dentro, kind);
+                var sobre = Envelope.Read(frame);
+                Record(sobre.Found ? sobre.Opcode : "", sobre.RootField, sobre.Payload, kind);
             }
             catch
             {
@@ -187,99 +203,13 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>
         /// La FORMA de un mensaje: número de campo y tipo de dato, metiéndose en los submensajes.
         ///
-        ///   v   un número (varint)
-        ///   f   un número de tamaño fijo
-        ///   s   una cadena o unos bytes que no son un submensaje
-        ///   {…} un submensaje, con su forma dentro
-        ///
-        /// Un campo de longitud variable se prueba a leer como submensaje, y sólo cuenta como tal
-        /// si se lee ENTERO sin sobras: así una cadena de texto que por casualidad empiece por un
-        /// byte que parece una etiqueta no se cuela como estructura. Se para a la sexta capa,
-        /// porque más abajo ya no distingue nada y un mensaje mal formado podría no tener fondo.
+        /// El algoritmo se mudó a <see cref="ProtoShape"/>, en el proyecto de protocolo, y aquí
+        /// queda la puerta de siempre. La razón de la mudanza es que el editor tiene que calcular
+        /// EXACTAMENTE la misma cadena que el servidor escribe en paquetes.db: con una copia a cada
+        /// lado, los dos coinciden hasta el día en que alguien mejora uno, y a partir de ahí el
+        /// editor deja de encontrar las filas que el servidor apuntó, sin decir nada.
         /// </summary>
-        public static string Signature(byte[] payload, int profundidad = 0)
-        {
-            if (payload == null || payload.Length == 0) return "(vacío)";
-            if (profundidad >= ProfundidadMaxima) return "…";
-
-            ProtoMessage leido;
-            try { leido = ProtoMessage.Parse(payload); }
-            catch { return "(ilegible)"; }
-            if (leido == null || leido.Fields.Count == 0) return "(vacío)";
-
-            var partes = new List<string>();
-            foreach (var campo in leido.Fields)
-            {
-                switch (campo.WireType)
-                {
-                    case 0:
-                        partes.Add($"{campo.FieldNumber}:v");
-                        break;
-                    case 1:
-                    case 5:
-                        partes.Add($"{campo.FieldNumber}:f");
-                        break;
-                    case 2:
-                        var dentro = campo.BytesValue;
-                        if (dentro != null && dentro.Length > 0 && EsSubmensaje(dentro))
-                            partes.Add($"{campo.FieldNumber}:{{{Signature(dentro, profundidad + 1)}}}");
-                        else
-                            partes.Add($"{campo.FieldNumber}:s");
-                        break;
-                    default:
-                        partes.Add($"{campo.FieldNumber}:?");
-                        break;
-                }
-            }
-
-            return string.Join(",", partes);
-        }
-
-        private const int ProfundidadMaxima = 6;
-
-        /// <summary>
-        /// Si esos bytes son un protobuf de verdad, o unos datos que sólo lo parecen.
-        ///
-        /// Hacen falta las DOS comprobaciones, y la segunda se descubrió midiendo.
-        ///
-        /// La primera es que se lea entero: ProtoMessage.Parse se para en el primer campo que no
-        /// cuadra y devuelve lo que llevara, así que hay que comprobar que lo leído vuelve a dar
-        /// los mismos bytes.
-        ///
-        /// La segunda es el tope del número de campo, y sin ella esto no valía para nada. El jrw
-        /// —el paquete de andar— lleva el camino como un bloque de bytes, y ese bloque se leía
-        /// como si fuera una estructura: salían campos 1024, 1025, 1566, 1600, distintos en cada
-        /// paso que daba el jugador. Resultado: 307 «formas» distintas de un mismo mensaje en
-        /// 1.798 capturados, que es exactamente el registro inservible que esto quería evitar.
-        ///
-        /// El tope no es a ojo. En el protocolo entero de 3.6.10.10, extraído del cliente, hay
-        /// 8.972 campos declarados y EL MÁS ALTO ES EL 40; la mediana es 2 y el percentil 99 es
-        /// 19. Con 64 caben todos y sobra sitio para lo que Ankama añada.
-        /// </summary>
-        private static bool EsSubmensaje(byte[] bytes)
-        {
-            try
-            {
-                var leido = ProtoMessage.Parse(bytes);
-                if (leido == null || leido.Fields.Count == 0) return false;
-
-                foreach (var campo in leido.Fields)
-                    if (campo.FieldNumber > CampoMasAlto || campo.FieldNumber <= 0) return false;
-
-                byte[] devuelta = leido.ToByteArray();
-                return devuelta.Length == bytes.Length;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// El número de campo más alto que se acepta como parte de una estructura de verdad.
-        /// Medido: el más alto del protocolo 3.6.10.10 es el 40, sobre 8.972 campos.
-        /// </summary>
-        private const int CampoMasAlto = 64;
+        public static string Signature(byte[] payload) => ProtoShape.Of(payload);
 
         /// <summary>El mapa donde está el que lo mandó, si es que hay sesión. Nunca lanza.</summary>
         private static long SeguroElMapa()
@@ -403,6 +333,17 @@ namespace Jondo.Unity.Launcher.Network
                 using var connection = new SqliteConnection(Paths.PacketTelemetryConnectionString);
                 connection.Open();
                 PrepararBase(connection);
+
+                // Las filas que dejó el fallo del sobre: sin opcode y con el cuerpo vacío. No se
+                // puede hacer nada con ellas —no dicen ni qué mensaje era ni qué llevaba— y en la
+                // lista del editor sólo ocupan sitio pareciendo trabajo pendiente. Se van una vez
+                // y no vuelven, porque ahora RecordFrame abre bien el sobre.
+                var limpiar = connection.CreateCommand();
+                limpiar.CommandText =
+                    "DELETE FROM PaquetesSinAtender WHERE Opcode = '' OR Opcode = '(sin opcode)';";
+                int viejas = limpiar.ExecuteNonQuery();
+                if (viejas > 0)
+                    Console.WriteLine($"[Paquetes] {viejas} fila(s) sin opcode del sobre mal abierto, borradas.");
 
                 var leer = connection.CreateCommand();
                 leer.CommandText = @"

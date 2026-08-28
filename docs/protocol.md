@@ -431,7 +431,7 @@ reassembled with per-frame timestamps so the two directions can be lined up.
 | 7 | 8 more client messages | 4 frames |
 | 8 | `kmr` | 11 frames, including **`jru`** — the map |
 | 9 | 4 more client messages | 13 frames: `hou`, eleven `ktq`, `lru` |
-| 10 | 4 × `ieo` | 4 × `idu` |
+| 10 | 4 × `ieo` | 4 × `idu` — the quest journal, not interactive elements. See `quests.md` |
 | 11 | 5 more client messages | `ivi` (87,878 B), then `kqg`, `koj`, `hol`, `jjs` |
 | 12 | `lzh`, `kmv`, **`jrh`** (who is on this map?) | `lzl`, **`jss`** (the actors), `lvb`, **`lva`** (end of list), `hpm` |
 

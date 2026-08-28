@@ -1,11 +1,13 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Server.Handlers;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Por dónde le habla el lanzador al servidor.
@@ -31,7 +33,7 @@ namespace Jondo.Unity.Launcher.Network
     public static class ControlApi
     {
         /// <summary>Las rutas y la cabecera salen del contrato, que es lo que comparten los dos.</summary>
-        public const string Prefijo = Contract.Prefijo;
+        public const string Prefijo = Jondo.Unity.Launcher.Contract.Prefijo;
 
         // ─── El secreto ─────────────────────────────────────────────────────────────────────
         //
@@ -95,12 +97,14 @@ namespace Jondo.Unity.Launcher.Network
                     // en el servidor, cada vez. Que el lanzador enseñe o no el botón es cosmético:
                     // el lanzador está en el ordenador del jugador y ahí no se confía en nada.
                     case Prefijo + "registro": return ConRol(cuerpo, Roles.Administrador, _ => Registro(cuerpo));
-                    case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, _ => Apagar());
-                    case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador, _ => CambiarRol(cuerpo));
+                    case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, Apagar);
+                    case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador,
+                        cuenta => CambiarRol(cuerpo, cuenta));
                     case Prefijo + "personaje":
                         return !metodo.Equals("POST", StringComparison.OrdinalIgnoreCase)
                             ? Mal(405, "metodo")
-                            : ConRol(cuerpo, Roles.Administrador, _ => AdministrarPersonaje(cuerpo));
+                            : ConRol(cuerpo, Roles.Administrador,
+                                cuenta => AdministrarPersonaje(cuerpo, cuenta));
 
                     default: return Mal(404, "ruta");
                 }
@@ -139,18 +143,22 @@ namespace Jondo.Unity.Launcher.Network
             {
                 Console.WriteLine($"[Control] La cuenta {cuenta} ({Roles.Nombre(rol)}) ha intentado algo " +
                                   $"de {Roles.Nombre(haceFalta)}. Rechazado.");
+                ActivityJournal.Current.Write("admin.denied", cuenta,
+                    details: new { role = rol, requiredRole = haceFalta });
                 return Mal(403, "rol");
             }
             return hacer(cuenta);
         }
 
         /// <summary>Sube o baja el rol de una cuenta. Sólo un administrador llega aquí.</summary>
-        private static Respuesta CambiarRol(string cuerpo)
+        private static Respuesta CambiarRol(string cuerpo, long administrador)
         {
             string quien = Texto(cuerpo, "cuenta");
             int rol = (int)Numero(cuerpo, "rol");
             bool bien = DatabaseManager.SetAccountRole(quien, rol, out int cuantas);
             if (bien) Console.WriteLine($"[Control] {quien} pasa a {Roles.Nombre(rol)}.");
+            ActivityJournal.Current.Write("admin.role.changed", administrador,
+                details: new { account = quien, requestedRole = rol, changed = bien, rows = cuantas });
             return Bien(new { bien, cuantas });
         }
 
@@ -162,12 +170,29 @@ namespace Jondo.Unity.Launcher.Network
         /// sesion evita que una orden HTTP pise un movimiento, un combate o cualquier otro paquete
         /// que el cliente este atendiendo a la vez.
         /// </summary>
-        private static Respuesta AdministrarPersonaje(string cuerpo)
+        private static Respuesta AdministrarPersonaje(string cuerpo, long administrador)
         {
-            string nombre = Texto(cuerpo, "personaje");
-            var sesion = SessionRegistry.FindByName(nombre);
+            if (!LiveCharacterUpdate.TryParse(cuerpo, out var update, out string error)
+                || update == null)
+                return Mal(400, error);
+            if (!update.HasChanges) return Mal(400, "sin-cambios");
+
+            var sesion = SessionRegistry.FindByName(update.Character);
             if (sesion == null || !sesion.HasCharacter || !sesion.IsInWorld)
                 return Mal(404, "personaje-desconectado");
+            if (sesion.Stream == null) return Mal(404, "personaje-desconectado");
+
+            // Validate every operation before touching the character. A bad mount or destination
+            // must not leave the earlier fields of the same request half-applied.
+            if (update.MapId.HasValue && MapManager.GetMapInfo(update.MapId.Value) == null)
+                return Mal(400, "mapa-desconocido");
+            if (update.ItemGid.HasValue
+                && !DatabaseManager.TryGetItemTemplateEffects((int)update.ItemGid.Value, out _))
+                return Mal(400, "objeto-desconocido");
+            if (update.MountGid.HasValue
+                && (!Managers.Mounts.IsRideable((int)update.MountGid.Value)
+                    || !DatabaseManager.TryGetItemTemplateEffects((int)update.MountGid.Value, out _)))
+                return Mal(400, "montura-invalida");
 
             // With a deadline, and not Wait() forever. This runs on the HttpListener's thread and
             // the lock is held across three socket writes: a client that has stopped reading -alt
@@ -182,34 +207,97 @@ namespace Jondo.Unity.Launcher.Network
                     var estado = sesion.State;
                     if (estado.IsInFight) return Mal(409, "personaje-en-combate");
 
-                    bool cambio = false;
-                    cambio |= AsignarEntero(cuerpo, "vitalidad", value => estado.StatVitality = value);
-                    cambio |= AsignarEntero(cuerpo, "sabiduria", value => estado.StatWisdom = value);
-                    cambio |= AsignarEntero(cuerpo, "fuerza", value => estado.StatStrength = value);
-                    cambio |= AsignarEntero(cuerpo, "inteligencia", value => estado.StatIntelligence = value);
-                    cambio |= AsignarEntero(cuerpo, "suerte", value => estado.StatChance = value);
-                    cambio |= AsignarEntero(cuerpo, "agilidad", value => estado.StatAgility = value);
-                    if (TryNumero(cuerpo, "kamas", out long kamas))
+                    bool sheetChanged = false;
+                    sheetChanged |= Assign(update.Vitality, value => estado.StatVitality = value);
+                    sheetChanged |= Assign(update.Wisdom, value => estado.StatWisdom = value);
+                    sheetChanged |= Assign(update.Strength, value => estado.StatStrength = value);
+                    sheetChanged |= Assign(update.Intelligence, value => estado.StatIntelligence = value);
+                    sheetChanged |= Assign(update.Chance, value => estado.StatChance = value);
+                    sheetChanged |= Assign(update.Agility, value => estado.StatAgility = value);
+                    bool kamasChanged = AssignKamas(update.Kamas, value => estado.Kamas = value);
+
+                    CommandHandler.LevelChange? levelChange = null;
+                    if (update.Level.HasValue)
                     {
-                        estado.Kamas = Math.Max(0, kamas);
-                        cambio = true;
+                        int requested = (int)Math.Clamp(update.Level.Value, int.MinValue, int.MaxValue);
+                        levelChange = CommandHandler.SetLevelAsync(sesion.Stream, requested)
+                            .GetAwaiter().GetResult();
                     }
 
-                    if (!cambio) return Mal(400, "sin-cambios");
+                    if (sheetChanged || kamasChanged)
+                    {
+                        DatabaseManager.SaveCurrentCharacter();
+                        sesion.SendAsync(ConnectionProtocol.Push(Op.Kub,
+                            ConnectionProtocol.BuildCharacteristics())).GetAwaiter().GetResult();
+                        sesion.SendAsync(ConnectionProtocol.Push(Op.Ivf,
+                            ConnectionProtocol.BuildKamas(estado.Kamas))).GetAwaiter().GetResult();
+                        sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
+                            ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
+                            .GetAwaiter().GetResult();
+                    }
 
-                    DatabaseManager.SaveCurrentCharacter();
-                    sesion.SendAsync(ConnectionProtocol.Push(Op.Kub,
-                        ConnectionProtocol.BuildCharacteristics())).GetAwaiter().GetResult();
-                    sesion.SendAsync(ConnectionProtocol.Push(Op.Ivf,
-                        ConnectionProtocol.BuildKamas(estado.Kamas))).GetAwaiter().GetResult();
-                    sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
-                        ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
-                        .GetAwaiter().GetResult();
+                    // Un fallo de entrega tiene que decirse. GrantItemAsync devuelve null cuando
+                    // la plantilla no existe o el INSERT falla, y ese null no se miraba: la
+                    // respuesta salia con HTTP 200 y bien=true, sólo que con objetoUid a null, y
+                    // quien llamaba se quedaba creyendo que habia entregado algo.
+                    Managers.HavenBagStore.StoredItem? granted = null;
+                    if (update.ItemGid.HasValue)
+                    {
+                        granted = CommandHandler.GrantItemAsync(sesion.Stream,
+                            (int)update.ItemGid.Value, (int)(update.Quantity ?? 1))
+                            .GetAwaiter().GetResult();
+                        if (granted == null) return Mal(422, "objeto-no-entregado");
+
+                        // Y el peso, como hace el comando .item: sin esto la barra de pods se
+                        // queda vieja hasta el siguiente movimiento de inventario.
+                        sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
+                            ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
+                            .GetAwaiter().GetResult();
+                    }
+
+                    Managers.HavenBagStore.StoredItem? mount = null;
+                    if (update.MountGid.HasValue)
+                    {
+                        mount = CommandHandler.GrantItemAsync(sesion.Stream,
+                            (int)update.MountGid.Value, 1).GetAwaiter().GetResult();
+                        if (mount == null) return Mal(422, "montura-no-entregada");
+
+                        byte[] move = ConnectionProtocol.Push(Op.Iuk, Pb.New()
+                            .Var(1, 1).Var(2, mount.Uid).Var(3, Managers.Mounts.Slot).Build());
+                        EquipmentHandler.MoveAsync(sesion.Stream, move, sesion.AccountId)
+                            .GetAwaiter().GetResult();
+                    }
+
+                    int? landed = null;
+                    if (update.MapId.HasValue)
+                    {
+                        int targetCell = (int)Math.Clamp(update.Cell ?? TeleportHandler.MapCentre,
+                                                         0, int.MaxValue);
+                        landed = TeleportHandler.ToMapAsync(sesion.Stream, update.MapId.Value,
+                                                           targetCell).GetAwaiter().GetResult();
+                    }
 
                     Console.WriteLine($"[Control] Personaje {estado.CharacterName}: caracteristicas " +
                                       $"{estado.StatVitality}/{estado.StatWisdom}/{estado.StatStrength}/" +
                                       $"{estado.StatIntelligence}/{estado.StatChance}/{estado.StatAgility}, " +
-                                      $"kamas {estado.Kamas}.");
+                                      $"kamas {estado.Kamas}" +
+                                      (levelChange != null ? $", nivel {estado.CharacterLevel}" : "") +
+                                      (granted != null ? $", objeto {granted.Gid} (uid {granted.Uid})" : "") +
+                                      (mount != null ? $", montura {mount.Gid}" : "") +
+                                      (landed != null ? $", mapa {estado.MapId} celda {landed}" : "") + ".");
+                    ActivityJournal.Current.Write("admin.character.updated", administrador,
+                        estado.CharacterId,
+                        new
+                        {
+                            character = estado.CharacterName,
+                            vitality = estado.StatVitality,
+                            wisdom = estado.StatWisdom,
+                            strength = estado.StatStrength,
+                            intelligence = estado.StatIntelligence,
+                            chance = estado.StatChance,
+                            agility = estado.StatAgility,
+                            kamas = estado.Kamas,
+                        });
                     return Bien(new
                     {
                         bien = true,
@@ -221,6 +309,15 @@ namespace Jondo.Unity.Launcher.Network
                         suerte = estado.StatChance,
                         agilidad = estado.StatAgility,
                         kamas = estado.Kamas,
+                        nivel = estado.CharacterLevel,
+                        experiencia = estado.Experience,
+                        puntos = estado.CharacterRemainingPoints,
+                        nivelAnterior = levelChange?.PreviousLevel,
+                        mapa = estado.MapId,
+                        celda = estado.CellId,
+                        llegada = landed,
+                        objetoUid = granted?.Uid,
+                        monturaUid = mount?.Uid,
                     });
                 }
             }
@@ -249,10 +346,17 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>How long to wait for the session's turn before giving up on it.</summary>
         private static readonly TimeSpan PlazoDelTurno = TimeSpan.FromSeconds(5);
 
-        private static bool AsignarEntero(string cuerpo, string campo, Action<int> asignar)
+        private static bool Assign(long? raw, Action<int> assign)
         {
-            if (!TryNumero(cuerpo, campo, out long valor)) return false;
-            asignar((int)Math.Clamp(valor, 0, TopeDeCaracteristica));
+            if (!raw.HasValue) return false;
+            assign((int)Math.Clamp(raw.Value, 0, TopeDeCaracteristica));
+            return true;
+        }
+
+        private static bool AssignKamas(long? raw, Action<long> assign)
+        {
+            if (!raw.HasValue) return false;
+            assign(Math.Max(0, raw.Value));
             return true;
         }
 
@@ -423,9 +527,10 @@ namespace Jondo.Unity.Launcher.Network
         /// el apagado por fallido justo cuando había funcionado. Medido: la petición volvía con el
         /// cuerpo vacío.
         /// </summary>
-        private static Respuesta Apagar()
+        private static Respuesta Apagar(long administrador)
         {
             Console.WriteLine("[Control] El lanzador pide apagar el servidor.");
+            ActivityJournal.Current.Write("admin.server.shutdown", administrador);
             _ = System.Threading.Tasks.Task.Run(async () =>
             {
                 await System.Threading.Tasks.Task.Delay(300);
@@ -465,17 +570,5 @@ namespace Jondo.Unity.Launcher.Network
             catch { return 0; }
         }
 
-        private static bool TryNumero(string json, string campo, out long valor)
-        {
-            valor = 0;
-            try
-            {
-                using var doc = JsonDocument.Parse(json.Length == 0 ? "{}" : json);
-                return doc.RootElement.TryGetProperty(campo, out var v)
-                       && v.ValueKind == JsonValueKind.Number
-                       && v.TryGetInt64(out valor);
-            }
-            catch { return false; }
-        }
     }
 }

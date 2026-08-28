@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text.Json;
-using Jondo.Unity.Launcher.Network;
+using System.Threading.Tasks;
+using Jondo.Unity.Protocol;
+using Jondo.Unity.Server.Network;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// What the character is wearing, and what it adds up to.
@@ -411,6 +414,202 @@ namespace Jondo.Unity.Launcher.Managers
             }
 
             return total;
+        }
+        /// <summary>
+        /// Puts one item in the bag: database, memory and the client, in that order.
+        /// </summary>
+        /// <remarks>
+        /// Here rather than in the chat-command handler it grew up in, because it is not about chat
+        /// commands: quest rewards hand out items too, and 5,582 of the 6,707 rewards in the game
+        /// carry one. Two copies of this would be two answers to "was the client told", and the one
+        /// that forgot would show an inventory that only fills in after a relog.
+        /// </remarks>
+        public static async Task<bool> GiveAsync(NetworkStream stream, int gid, int quantity)
+            => await GrantAsync(stream, gid, quantity) != null;
+
+        /// <summary>
+        /// The same, giving back what was created instead of only whether it worked.
+        /// </summary>
+        /// <remarks>
+        /// For the callers that have to say WHAT they handed over — the live administration API
+        /// answers with the uid and the effects — and it is the same method rather than a second
+        /// one so that the two can never disagree about whether the client was told.
+        /// </remarks>
+        public static async Task<HavenBagStore.StoredItem?> GrantAsync(NetworkStream stream,
+                                                                       int gid, int quantity)
+        {
+            if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return null;
+
+            long uid = DatabaseManager.NextItemUid();
+            if (!DatabaseManager.InsertCharacterItem(uid, SessionContext.State.CharacterId, gid, quantity,
+                                                     Bag, effects))
+                return null;
+
+            Add(uid, gid, quantity, Bag, effects);
+
+            var legacy = new PlayerItem
+            {
+                Uid = uid,
+                ItemId = gid,
+                Quantity = quantity,
+                Position = Bag,
+                RawEffects = effects,
+            };
+            foreach (var effect in ParseEffects(effects))
+            {
+                legacy.Effects.TryGetValue(effect.Effect, out int had);
+                legacy.Effects[effect.Effect] = had + (int)effect.Value;
+            }
+            GameState.AddInventoryItem(legacy);
+
+            var granted = new HavenBagStore.StoredItem
+            {
+                Uid = uid,
+                Gid = gid,
+                Quantity = quantity,
+                Effects = effects,
+            };
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, granted)));
+            return granted;
+        }
+
+        /// <summary>
+        /// The one place the worn-item cache is written.
+        /// </summary>
+        /// <remarks>
+        /// That cache — <c>SessionState.EquippedItems</c> — feeds <c>StatsHandler.GetEquipBonus</c>,
+        /// and through it the COMBAT sheet: maximum health, initiative, the lot. It is not what
+        /// builds the characteristic sheet, which comes from <see cref="Bonuses"/> over the real
+        /// inventory; getting those two the wrong way round is easy and the comment that used to
+        /// live on EquipmentHandler had them swapped.
+        ///
+        /// It exists because there were THREE places filling that one dictionary — character
+        /// selection, the inventory handler and the equipment handler — and the three disagreed
+        /// about both of the things that matter:
+        ///
+        ///   what counts as worn   two said "0 to 62", which is the whole bag, so an item sitting
+        ///                         in slot 35 counted towards combat stats until it was moved
+        ///   which value           two summed the raw parameter and one summed <c>Sheet</c>. An
+        ///                         item stored as [[100, 0, 2, 7]] is worth 0 by one and 7 by the
+        ///                         other, so the same ring gave different stats depending on
+        ///                         whether it had been re-equipped since logging in — and went
+        ///                         back to the first answer on the next relog.
+        ///
+        /// <c>Sheet</c> is the right one: it is what <see cref="Bonuses"/> uses, so the combat
+        /// sheet and the characteristic sheet finally agree about the same item.
+        /// </remarks>
+        public static void RememberWorn(long uid, int position, IEnumerable<ItemEffect>? effects)
+        {
+            if (!IsWorn(position))
+            {
+                SessionContext.State.RemoveEquippedItem(uid);
+                return;
+            }
+
+            if (effects == null)
+            {
+                // Worn, but nothing known about it. Leaving the cache alone beats writing an entry
+                // with no stats, which would silently strip whatever the item was giving.
+                return;
+            }
+
+            var worn = new EquippedItemInfo { Slot = position };
+            foreach (var effect in effects)
+            {
+                worn.Stats.TryGetValue(effect.Effect, out int had);
+                worn.Stats[effect.Effect] = had + (int)Math.Clamp(effect.Sheet, int.MinValue, int.MaxValue);
+            }
+
+            SessionContext.State.SetEquippedItem(uid, worn);
+        }
+
+        /// <summary>The same, from the effects as the database stored them.</summary>
+        /// <remarks>
+        /// For the two callers that run before <see cref="LoadFrom"/> has read this character's
+        /// inventory — character selection is one — and therefore have a <c>PlayerItem</c> rather
+        /// than an <see cref="Item"/>. It parses the raw json so that they arrive at the same
+        /// numbers as everybody else instead of at the summed parameter.
+        /// </remarks>
+        public static void RememberWorn(long uid, int position, string? rawEffects)
+            => RememberWorn(uid, position, string.IsNullOrEmpty(rawEffects) ? null : ParseEffects(rawEffects));
+
+        /// <summary>
+        /// How many of a template the character is carrying, counting every stack of it.
+        /// </summary>
+        /// <remarks>
+        /// Every stack, because the same template can sit in several: <see cref="Add"/> merges by
+        /// uid and not by template, so two arrivals of the same thing from different places are two
+        /// entries. Counting only the first would tell a player who has five that they have three.
+        ///
+        /// Worn items count. A quest that asks for a ring the player is wearing is asking for the
+        /// ring, and refusing it because it is on a finger would be a rule nobody wrote.
+        /// </remarks>
+        public static int HowMany(int template)
+        {
+            int total = 0;
+            foreach (var item in Items.Values)
+            {
+                if (item.Template == template) total += item.Quantity;
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Takes a number of one template away and tells the client, or takes nothing at all.
+        /// </summary>
+        /// <remarks>
+        /// All or nothing on purpose. A quest handover that ate three of the five ortie it wanted
+        /// and then found there was no fifth would leave the player poorer and the quest where it
+        /// was, so the count is checked before anything is touched.
+        ///
+        /// The wire half mirrors <see cref="Handlers.DestroyItemHandler"/> rather than inventing a
+        /// second answer to "was the client told": a stack that goes entirely is <c>ium</c>, one
+        /// that is only reduced is sent again with its new quantity. Getting that backwards leaves
+        /// a phantom in the bag until the next relog.
+        /// </remarks>
+        public static async Task<bool> TakeAsync(NetworkStream stream, int template, int count)
+        {
+            if (count <= 0) return true;
+            if (HowMany(template) < count) return false;
+
+            long characterId = SessionContext.State.CharacterId;
+            int left = count;
+
+            // A copy, because the loop removes from the dictionary it would otherwise be walking.
+            var stacks = new List<Item>(Items.Values);
+            foreach (var item in stacks)
+            {
+                if (left <= 0) break;
+                if (item.Template != template) continue;
+
+                int taking = Math.Min(left, item.Quantity);
+                bool whole = taking >= item.Quantity;
+
+                if (!DatabaseManager.DestroyCharacterItem(characterId, item.Uid, taking)) return false;
+                Equipment.Remove(item.Uid, taking);
+                left -= taking;
+
+                if (whole)
+                {
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(item.Uid)));
+                    continue;
+                }
+
+                var rest = HavenBagStore.FromInventory(characterId, item.Uid);
+                if (rest != null)
+                {
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Handlers.ChestHandler.ArrivesInBag,
+                            ConnectionProtocol.BuildItemArrived(
+                                Handlers.ChestHandler.FieldOf(Handlers.ChestHandler.ArrivesInBag), rest)));
+                }
+            }
+
+            return left == 0;
         }
     }
 }

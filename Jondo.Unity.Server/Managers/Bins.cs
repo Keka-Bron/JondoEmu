@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Las papeleras: el almacén público donde va lo que la gente tira.

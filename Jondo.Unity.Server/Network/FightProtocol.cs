@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Los mensajes del combate de la 3.6.10.10, medidos de las quince capturas de

@@ -7,10 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Google.Protobuf;
-using Jondo.Unity.Launcher.Handlers;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     public static class GameNodeProxy
     {
@@ -292,6 +292,8 @@ namespace Jondo.Unity.Launcher.Network
                     hasSentMapBlock = false;
                     Managers.Equipment.LoadFrom(chosen.Id);
                     Managers.SpellChoices.LoadFrom(chosen.Id);
+                    Managers.Quests.LoadFrom(chosen.Id);
+                    Managers.Achievements.LoadFrom(chosen.Id);
 
                     SessionContext.Current.EnterWorld();
                     await SessionRegistry.BroadcastToMapAsync(
@@ -815,10 +817,36 @@ namespace Jondo.Unity.Launcher.Network
                     // Ha elegido una respuesta del diálogo.
                     await NpcHandler.ReplyAsync(stream, payload);
                 }
+                else if (payloadStr.Contains(Op.Uri(Op.Kla)))
+                {
+                    // Ha pulsado la X. Sin esta rama la ventana no se cerraba nunca.
+                    await NpcHandler.CloseAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Kea)))
                 {
                     // Comprarle algo al NPC que tiene la tienda abierta.
                     await NpcHandler.BuyAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Ieo)))
+                {
+                    // ¿Por qué paso va esta misión? Se contesta con el idu.
+                    await QuestHandler.StepAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Idw)))
+                {
+                    // El cliente da un objetivo por cumplido. Es él quien lo sabe: los de texto
+                    // libre piden pulsar algo de la interfaz y de eso aquí no se ve nada.
+                    await QuestHandler.ObjectiveAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Iec)))
+                {
+                    // Pregunta por una misión suya, justo después de cogerla.
+                    await QuestHandler.DetailAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Mga)))
+                {
+                    // Ha pulsado el botón de cobrar un logro. El -1 es «todos los que me debas».
+                    await AchievementHandler.ClaimAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Krc)))
                 {
@@ -948,6 +976,12 @@ namespace Jondo.Unity.Launcher.Network
             // Y lo que uno tiene de adorno, que el servidor real manda una sola vez, aquí: los
             // títulos y ornamentos disponibles, y cuál lleva puesto.
             await WardrobeHandler.SendOwnedAsync(stream, SessionContext.Current.AccountId);
+
+            // Y su diario de misiones, por lo mismo: el de la captura ya no viaja.
+            await Managers.Quests.SendJournalAsync(stream);
+
+            // Y la marca verde sobre quien tenga algo que ofrecer en este mapa.
+            await Managers.Quests.SendMarksAsync(stream, GameState.MapId);
             return true;
         }
 

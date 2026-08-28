@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Network;
 
-namespace Jondo.Unity.Launcher.Managers
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
     /// Lo que el jugador ha elegido de sus hechizos: qué mitad de cada pareja lleva, y en qué hueco

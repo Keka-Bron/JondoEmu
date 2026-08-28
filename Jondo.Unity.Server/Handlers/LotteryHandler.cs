@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// La máquina de la lotería del merkasako. Sin límite de tiradas: se clica y sale algo.
@@ -37,14 +37,23 @@ namespace Jondo.Unity.Launcher.Handlers
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
-                    elementId, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
+                    elementId, skillId, Jondo.Unity.Server.Network.SessionContext.State.CharacterId)));
 
-            var prize = Lottery.Draw(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            var prize = Lottery.Draw(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (prize == null)
             {
                 Console.WriteLine("[Lotería] La tirada no ha dado nada.");
+                ActivityJournal.Current.Write("lottery.empty",
+                    Jondo.Unity.Server.Network.SessionContext.Current.AccountId,
+                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
+                    new { elementId, skillId });
                 return;
             }
+
+            ActivityJournal.Current.Write("lottery.prize",
+                Jondo.Unity.Server.Network.SessionContext.Current.AccountId,
+                Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
+                new { elementId, skillId, uid = prize.Uid, gid = prize.Gid, quantity = prize.Quantity });
 
             // Lo que la máquina contesta, con la forma de la captura.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -59,7 +68,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
         }
     }
 }

@@ -1,3 +1,4 @@
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,7 +6,9 @@ using System.Linq;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
-namespace Jondo.Unity.Launcher.Managers
+using Jondo.Unity.World.Content;
+
+namespace Jondo.Unity.Server.Managers
 {
     /// <summary>Un paso instantáneo de un mapa a otro, colgado de un elemento del mapa.</summary>
     public sealed class InteractiveTeleport
@@ -351,9 +354,100 @@ namespace Jondo.Unity.Launcher.Managers
                         $"Dos rutas Teleport para {route.SourceMapId}/{route.SourceCellId}.");
             }
 
+            AplicarLosNuestros(byElement, byMap, byCell);
+
             _byElement = byElement;
             _byMap = byMap.ToDictionary(x => x.Key, x => (IReadOnlyList<InteractiveTeleport>)x.Value);
             _byCell = byCell;
+        }
+
+        /// <summary>
+        /// Los pasajes que ha decidido una persona, encima de los 3.815 extraidos.
+        /// </summary>
+        /// <remarks>
+        /// Sin esto el editor escribe un fichero que nadie lee. La tabla InteractiveTeleports se
+        /// reconstruye cada vez que se rehace world.db, asi que un pasaje anadido ahi desaparece
+        /// en la siguiente regeneracion sin decir nada; por eso lo nuestro vive en
+        /// content/interactives/teleports.json y se pone ENCIMA al arrancar.
+        ///
+        /// Se sustituye por elemento, no se suma: un elemento es una puerta y una puerta lleva a un
+        /// sitio. Y si nuestra version cambia la casilla de origen, hay que quitar la entrada vieja
+        /// del indice por casilla o quedan dos rutas para la misma casilla y el arranque revienta,
+        /// que es justo lo que comprueba la excepcion de arriba.
+        /// </remarks>
+        private static void AplicarLosNuestros(Dictionary<(long, int), InteractiveTeleport> byElement,
+                                               Dictionary<long, List<InteractiveTeleport>> byMap,
+                                               Dictionary<(long, int), InteractiveTeleport> byCell)
+        {
+            var nuestros = TeleportContent.Load(Paths.ContentFile(TeleportContent.AuthoredFile),
+                                                mensaje => Console.WriteLine("[Teleports] " + mensaje));
+
+            int puestos = 0;
+            int quitados = 0;
+
+            void Descolgar(long mapa, int elemento)
+            {
+                if (!byElement.TryGetValue((mapa, elemento), out var vieja)) return;
+
+                byElement.Remove((mapa, elemento));
+                if (byMap.TryGetValue(mapa, out var lista)) lista.RemoveAll(r => r.ElementId == elemento);
+
+                // Solo si la casilla sigue apuntando a ESTA ruta: dos elementos pueden compartir
+                // casilla y borrar a ciegas se llevaria por delante la del otro.
+                if (byCell.TryGetValue((mapa, vieja.SourceCellId), out var enLaCasilla) &&
+                    ReferenceEquals(enLaCasilla, vieja))
+                {
+                    byCell.Remove((mapa, vieja.SourceCellId));
+                }
+            }
+
+            foreach (var key in nuestros.ErasedKeys)
+            {
+                Descolgar(key.SourceMapId, (int)key.ElementId);
+                quitados++;
+            }
+
+            foreach (var fila in nuestros.Rows)
+            {
+                var passage = fila.Value.Value;
+                int elemento = (int)passage.ElementId;
+
+                Descolgar(passage.SourceMapId, elemento);
+
+                var ruta = new InteractiveTeleport
+                {
+                    SourceMapId = passage.SourceMapId,
+                    ElementId = elemento,
+                    SourceCellId = passage.SourceCell,
+                    GfxId = passage.GfxId,
+                    InteractiveType = passage.InteractiveType,
+                    SkillId = passage.SkillId,
+                    DestinationMapId = passage.DestinationMapId,
+                    DestinationCellId = passage.DestinationCell,
+                    SourceVersion = "Jondo Studio",
+                    Confidence = "authored",
+                };
+
+                byElement[(ruta.SourceMapId, ruta.ElementId)] = ruta;
+
+                if (!byMap.TryGetValue(ruta.SourceMapId, out var lista))
+                {
+                    byMap.Add(ruta.SourceMapId, lista = new List<InteractiveTeleport>());
+                }
+
+                lista.Add(ruta);
+
+                // Otro elemento en la misma casilla se queda sin su atajo por casilla, y es lo
+                // correcto: el que manda es el que se ha decidido a mano.
+                byCell[(ruta.SourceMapId, ruta.SourceCellId)] = ruta;
+                puestos++;
+            }
+
+            if (puestos > 0 || quitados > 0)
+            {
+                Console.WriteLine($"[Teleports] {puestos} pasaje(s) puestos a mano y {quitados} quitado(s), " +
+                                  "de content/interactives/teleports.json.");
+            }
         }
     }
 }

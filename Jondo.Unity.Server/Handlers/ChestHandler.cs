@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// El cofre del merkasako.
@@ -49,12 +49,12 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
-                    elementId, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
+                    elementId, skillId, Jondo.Unity.Server.Network.SessionContext.State.CharacterId)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kci, ConnectionProtocol.BuildStorageOpened()));
 
-            var content = HavenBagStore.ChestOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId);
+            var content = HavenBagStore.ChestOf(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwb, ConnectionProtocol.BuildStorageContent(content)));
 
@@ -86,7 +86,7 @@ namespace Jondo.Unity.Launcher.Handlers
             }
             if (uid == 0) return;
 
-            long who = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
+            long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
             bool enElCofre = HavenBagStore.Holds(who, uid);
 
             if (enElCofre)
@@ -102,7 +102,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Launcher.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
         }
 
         /// <summary>
@@ -147,11 +147,11 @@ namespace Jondo.Unity.Launcher.Handlers
 
         private static HavenBagStore.StoredItem? BuscarDondeEsta(long uid)
         {
-            foreach (var item in HavenBagStore.ChestOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId))
+            foreach (var item in HavenBagStore.ChestOf(Jondo.Unity.Server.Network.SessionContext.State.CharacterId))
             {
                 if (item.Uid == uid) return item;
             }
-            return HavenBagStore.FromInventory(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, uid);
+            return HavenBagStore.FromInventory(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, uid);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Network
+namespace Jondo.Unity.Server.Network
 {
     /// <summary>
     /// Check that the connection-phase messages come out with the exact shape they have in the

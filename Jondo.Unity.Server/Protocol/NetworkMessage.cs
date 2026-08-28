@@ -64,7 +64,7 @@ namespace Jondo.Protocol
             // Log packet
             try
             {
-                string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
+                string? typeUrl = Jondo.Unity.Server.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
                     LogTrafficEnriched("Client -> Server", typeUrl, payload);
@@ -95,15 +95,15 @@ namespace Jondo.Protocol
             try
             {
                 int pos = 0;
-                uint len = Jondo.Unity.Launcher.Network.NetworkEnvelope.ReadVarInt(buf, ref pos);
+                uint len = Jondo.Unity.Server.Network.NetworkEnvelope.ReadVarInt(buf, ref pos);
                 byte[] payload = new byte[len];
                 Array.Copy(buf, pos, payload, 0, len);
-                string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
+                string? typeUrl = Jondo.Unity.Server.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
                     LogTrafficEnriched("Server -> Client", typeUrl, payload);
                 }
-                Jondo.Unity.Launcher.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
+                Jondo.Unity.Server.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
             }
             catch { }
             
@@ -123,12 +123,12 @@ namespace Jondo.Protocol
             // Log packet
             try
             {
-                string? typeUrl = Jondo.Unity.Launcher.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
+                string? typeUrl = Jondo.Unity.Server.Network.NetworkEnvelope.GetMessageTypeUrl(payload);
                 if (typeUrl != null)
                 {
                     LogTrafficEnriched("Server -> Client", typeUrl, payload);
                 }
-                Jondo.Unity.Launcher.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
+                Jondo.Unity.Server.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
             }
             catch { }
             
@@ -213,7 +213,7 @@ namespace Jondo.Protocol
 
             // Primero lo que alguien haya ligado a mano, que es lo unico verificado. Op.Label queda
             // como respaldo y hoy esta vacio a proposito: los nombres inventados se quitaron.
-            string name = Jondo.Unity.Launcher.Managers.NameBinding.Of(opcode);
+            string name = Jondo.Unity.Server.Managers.NameBinding.Of(opcode);
             if (name.Length == 0) name = Op.Label(opcode);
             if (name.Length == 0)
             {
@@ -237,11 +237,11 @@ namespace Jondo.Protocol
             // ReadPayload busca la url dentro de la trama y devuelve lo que hay detrás, que es el
             // mensaje de verdad. El tamaño que se enseña también es el suyo y no el de la trama:
             // con el del sobre, un mensaje vacío parecía pesar treinta y seis bytes.
-            byte[] dentro = Jondo.Unity.Launcher.Network.ConnectionProtocol.ReadPayload(payload, opcode)
+            byte[] dentro = Jondo.Unity.Server.Network.ConnectionProtocol.ReadPayload(payload, opcode)
                             ?? payload;
 
             string fields = "";
-            try { fields = Jondo.Unity.Launcher.Network.ProtoMessage.Parse(dentro).Compact(); }
+            try { fields = Jondo.Unity.Server.Network.ProtoMessage.Parse(dentro).Compact(); }
             catch { }
 
             string where = direction.StartsWith("Client", StringComparison.Ordinal)

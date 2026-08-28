@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Usar un zaap.
@@ -55,13 +55,13 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task OpenAsync(NetworkStream stream, Interactives.Element zaap, int skillId)
         {
-            long here = Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
+            long here = Jondo.Unity.Server.Network.SessionContext.State.MapId;
 
             SessionContext.State.OpenZaapMapId = here;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
-                    zaap.Id, skillId, Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId)));
+                    zaap.Id, skillId, Jondo.Unity.Server.Network.SessionContext.State.CharacterId)));
 
             // Desde un VESTIGIO no se va a los zaaps del mundo: sólo a las anomalías. Medido —el
             // hjj que contesta al vestigio de la Cuna de Alma trae dos entradas y las dos son
@@ -110,7 +110,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             long from = SessionContext.State.OpenZaapMapId != 0
                 ? SessionContext.State.OpenZaapMapId
-                : Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
+                : Jondo.Unity.Server.Network.SessionContext.State.MapId;
 
             long target;
             long cost;
@@ -159,20 +159,20 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            if (Jondo.Unity.Launcher.Network.SessionContext.State.Kamas < cost)
+            if (Jondo.Unity.Server.Network.SessionContext.State.Kamas < cost)
             {
                 Console.WriteLine($"[Zaap] Faltan kamas para ir a {target}: cuesta {cost} y hay " +
-                                  $"{Jondo.Unity.Launcher.Network.SessionContext.State.Kamas}.");
+                                  $"{Jondo.Unity.Server.Network.SessionContext.State.Kamas}.");
                 return;
             }
 
-            long mapaQueDeja = Jondo.Unity.Launcher.Network.SessionContext.State.MapId;
-            Jondo.Unity.Launcher.Network.SessionContext.State.Kamas -= cost;
-            Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
+            long mapaQueDeja = Jondo.Unity.Server.Network.SessionContext.State.MapId;
+            Jondo.Unity.Server.Network.SessionContext.State.Kamas -= cost;
+            Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
 
             // Se llega al lado del zaap, no encima: la casilla del zaap no se pisa.
             var arrival = Interactives.ZaapElements(target);
-            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(
+            Jondo.Unity.Server.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(
                 target, arrival.Count > 0 ? arrival[0].Cell : 0);
             DatabaseManager.SaveCurrentCharacter();
 
@@ -182,7 +182,7 @@ namespace Jondo.Unity.Launcher.Handlers
             // El mismo orden que la captura: primero se saca al personaje del mapa que deja, luego
             // se le manda cargar el nuevo, y los kamas al final.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorLeft(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
+                ConnectionProtocol.BuildActorLeft(Jondo.Unity.Server.Network.SessionContext.State.CharacterId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -190,7 +190,7 @@ namespace Jondo.Unity.Launcher.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapDiscovered(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(Jondo.Unity.Launcher.Network.SessionContext.State.Kamas)));
+                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(Jondo.Unity.Server.Network.SessionContext.State.Kamas)));
 
             // Y cerrarle la ventana, que no se cierra sola. En la captura el kld sale aquí, entre
             // los kamas y el jss del mapa nuevo.
@@ -199,7 +199,7 @@ namespace Jondo.Unity.Launcher.Handlers
 
             SessionContext.State.OpenZaapMapId = 0;
             Console.WriteLine($"[Zaap] Viaje a {target} ({what}), casilla " +
-                              $"{Jondo.Unity.Launcher.Network.SessionContext.State.CellId}, {cost} kamas. Esperando el jrh.");
+                              $"{Jondo.Unity.Server.Network.SessionContext.State.CellId}, {cost} kamas. Esperando el jrh.");
         }
 
         /// <summary>

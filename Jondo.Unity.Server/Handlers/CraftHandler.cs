@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Jondo.Unity.Launcher.Managers;
+using Jondo.Unity.Server.Managers;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>Resolves a 3.6 craft skill and its recipes without inventing a 2.68 wire format.</summary>
     public static class CraftHandler

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      # Sin esto el verde miente. Unas 64 pruebas se saltan solas cuando no encuentran
+      # bases/world.db —que no se versiona— y xunit las cuenta como PASADAS, no como omitidas:
+      # el tick sale verde habiendo comprobado bastante menos de lo que parece. datos/world.zip
+      # sí está en git y lleva dentro world.db, así que se descomprime antes de nada.
+      - name: Unpack world.db
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force bases | Out-Null
+          Expand-Archive -Path datos/world.zip -DestinationPath bases -Force
+          Get-Item bases/world.db | Select-Object Name,Length
+
+      - name: Restore
+        run: dotnet restore Jondo.Unity.sln
+
+      - name: Build
+        run: dotnet build Jondo.Unity.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Jondo.Unity.Tests/Jondo.Unity.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=tests.trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/*.trx
+          if-no-files-found: ignore

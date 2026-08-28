@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Launcher.Managers;
-using Jondo.Unity.Launcher.Network;
+using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 
-namespace Jondo.Unity.Launcher.Handlers
+namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// Entrar al merkasako, cambiarse de decorado y colocar los muebles.
@@ -39,7 +39,7 @@ namespace Jondo.Unity.Launcher.Handlers
         public static async Task EnterFromOutsideAsync(NetworkStream stream, byte[] payload)
         {
             if (ConnectionProtocol.ReadPayload(payload, Op.Jbn) == null) return;
-            await GoToThemeAsync(stream, HavenBagStore.ThemeOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
+            await GoToThemeAsync(stream, HavenBagStore.ThemeOf(Jondo.Unity.Server.Network.SessionContext.State.CharacterId));
         }
 
         /// <summary>Cambiarse de decorado desde dentro.</summary>
@@ -73,17 +73,17 @@ namespace Jondo.Unity.Launcher.Handlers
                 return;
             }
 
-            HavenBagStore.SaveTheme(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId, Merkasako.ThemeOfMap(target));
+            HavenBagStore.SaveTheme(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, Merkasako.ThemeOfMap(target));
 
-            Jondo.Unity.Launcher.Network.SessionContext.State.MapId = target;
+            Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
 
             // Al lado del zaap, que es donde deja a uno el juego al entrar.
             var zaap = Merkasako.ZaapOf(target);
-            Jondo.Unity.Launcher.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(target, zaap.Cell);
+            Jondo.Unity.Server.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(target, zaap.Cell);
             DatabaseManager.SaveCurrentCharacter();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorLeft(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId));
+                ConnectionProtocol.BuildActorLeft(Jondo.Unity.Server.Network.SessionContext.State.CharacterId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -92,7 +92,7 @@ namespace Jondo.Unity.Launcher.Handlers
                 ConnectionProtocol.BuildMapDiscovered(target));
 
             Console.WriteLine($"[Merkasako] Decorado {Merkasako.ThemeOfMap(target)} -> mapa {target}, " +
-                              $"casilla {Jondo.Unity.Launcher.Network.SessionContext.State.CellId} (zaap en la {zaap.Cell}).");
+                              $"casilla {Jondo.Unity.Server.Network.SessionContext.State.CellId} (zaap en la {zaap.Cell}).");
         }
 
         // ─── El modo de colocar muebles ─────────────────────────────────────────
@@ -148,8 +148,8 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task CloseEditorAsync(NetworkStream stream)
         {
-            long who = Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId;
-            int theme = Merkasako.ThemeOfMap(Jondo.Unity.Launcher.Network.SessionContext.State.MapId);
+            long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
+            int theme = Merkasako.ThemeOfMap(Jondo.Unity.Server.Network.SessionContext.State.MapId);
 
             if (SessionContext.State.IsHavenBagEditing)
             {
@@ -172,8 +172,8 @@ namespace Jondo.Unity.Launcher.Handlers
         /// </summary>
         public static async Task SendFurnitureAsync(NetworkStream stream)
         {
-            var pieces = HavenBagStore.FurnitureOf(Jondo.Unity.Launcher.Network.SessionContext.State.CharacterId,
-                                                   Merkasako.ThemeOfMap(Jondo.Unity.Launcher.Network.SessionContext.State.MapId));
+            var pieces = HavenBagStore.FurnitureOf(Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
+                                                   Merkasako.ThemeOfMap(Jondo.Unity.Server.Network.SessionContext.State.MapId));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Jbu, ConnectionProtocol.BuildHavenBagFurniture(pieces)));

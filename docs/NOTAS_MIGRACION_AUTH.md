@@ -896,7 +896,7 @@ El nombre del personaje capturado **no está en el código**: se lee del propio 
 | `jss` | Actores del mapa. `f2`: id del mapa, `f5` repetido: un actor |
 | `lva` | Vacío. Fin de la lista de actores |
 | `lqc` | Confirmación del cliente tras el bloque 1 |
-| `ieo` → `idu` | El cliente pregunta por un elemento interactivo y el servidor le contesta |
+| `ieo` → `idu` | **CORREGIDO 27/08/2026: son misiones, no elementos interactivos.** El cliente pregunta por qué paso va una misión y el servidor le contesta con el paso y sus objetivos. Lo que lo zanja es que cuadra solo: en las 448 tramas `idu` de las 401 capturas, el paso pertenece de verdad a la misión que nombran las 448 veces, y los 1.479 objetivos pertenecen de verdad a ese paso. Ver `docs/quests.md` |
 | `hjk` | Ids de mapa empaquetados en el campo 1 |
 | `jrw` → `jsj` | Andar. El cliente manda el camino, el servidor lo reparte a los demás |
 | `jqi` → `jsq` | "Quiero salir del mapa" y el permiso, este en campo raíz 3 |
