@@ -584,9 +584,14 @@ namespace Jondo.Unity.Server
         /// tapa el zaap, dos en la misma casilla se dibujan uno sobre otro, y una fila de bloques
         /// pegados es justo lo feo que esto venía a arreglar.
         ///
-        /// Lo de no pegarse está medido: sobre 396 NPCs de 202 mapas de las capturas, sólo 16 de
-        /// 512 parejas del mismo mapa son vecinas —el 3,1 %— y la distancia típica al más cercano
-        /// es de dos a cuatro casillas. Ankama no los pone en fila.
+        /// Lo de no pegarse está medido: sobre las 422 colocaciones —327 NPCs distintos— de 202
+        /// mapas de las capturas, sólo 24 de 635 parejas del mismo mapa son vecinas —el 3,8 %— y
+        /// la distancia típica al más cercano es de dos a cuatro casillas. Ankama no los pone en
+        /// fila.
+        ///
+        /// La cuenta anterior decía 16 de 512 y el 3,1 %, y era de cuando el fichero de
+        /// colocaciones tenía menos filas. Se vuelve a medir cuando crece: un número medido que
+        /// deja de serlo pasa a ser una afirmación, y ésta es la que justifica el listón.
         /// </summary>
         private static void AssertVendorsStandSomewhereSensible()
         {
@@ -629,8 +634,8 @@ namespace Jondo.Unity.Server
                     throw new InvalidOperationException(
                         $"[RegressionGuard FAILED] Los vendedores {puestos[celdas[i]]} y " +
                         $"{puestos[celdas[j]]} están pegados, en las casillas {celdas[i]} y " +
-                        $"{celdas[j]}. El juego real casi nunca los pone así: 16 parejas vecinas " +
-                        "de 512 medidas, el 3,1 %.");
+                        $"{celdas[j]}. El juego real casi nunca los pone así: 24 parejas vecinas " +
+                        "de 635 medidas, el 3,8 %.");
                 }
             }
         }

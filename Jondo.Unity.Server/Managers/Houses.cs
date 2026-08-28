@@ -49,7 +49,7 @@ namespace Jondo.Unity.Server.Managers
     /// salió mal en el juego: una puerta de Astrub llevaba a un taller de herrero de Tierradala,
     /// que es un sitio público al que se llega andando, y encima se le declaraba a su FORJA que
     /// era la salida de la casa. Es decir, un interactivo de oficio de un mapa legítimo pasaba a
-    /// sacarte a la calle. Con 2.377 mapas en (0,0) una lista de vetos nunca iba a ser suficiente:
+    /// sacarte a la calle. Con 3.357 mapas en (0,0) una lista de vetos nunca iba a ser suficiente:
     /// hay que decir cuáles SÍ.
     ///
     /// El precio es que las casas ya no se acuerdan de su zona: sólo Bonta y Brakmar tienen

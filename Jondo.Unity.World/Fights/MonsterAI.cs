@@ -32,6 +32,31 @@ namespace Jondo.Unity.World.Fights
         public bool CastBeforeMove { get; set; }
     }
 
+    /// <summary>
+    /// A monster's turn, worked out in one place. <b>Nothing calls this today.</b>
+    /// </summary>
+    /// <remarks>
+    /// Said at the top because it is the kind of thing that reads as live and is not. The turn
+    /// monsters actually take is <c>FightHandler.MonsterTurnAsync</c>, reached from the turn loop;
+    /// this class was reached only from <c>RunMonsterTurnAsync</c>, which nothing called, and which
+    /// went out with the rest of the old packet generation -- the jtx/jud/juc frames the 3.6.10.10
+    /// client does not understand.
+    ///
+    /// Kept rather than deleted because it is not a worse version of the live path, it is a
+    /// different shape: a pure function from (monster, fighters, walkable cells, line of sight) to
+    /// a decision, which is testable without a socket. The live one decides and sends in the same
+    /// breath and cannot be tested at all. It also carries two behaviours the live path does not --
+    /// fleeing below 30% HP, and casting BEFORE moving when the target is already in range -- and
+    /// the comments on <see cref="AISpellData"/> record what those cost to get right.
+    ///
+    /// What it would take to use it: MonsterTurnAsync calls ExecuteTurn for the decision and keeps
+    /// only the sending, with the frames it already builds. The reason nobody has is that the live
+    /// path knows about spell minimum range (857 monster spells, 11.3% of the arsenal, cannot be
+    /// cast from an adjacent cell) and this one does not, so the swap is not free.
+    ///
+    /// If that day does not come, delete it. An unreachable subsystem with good documentation is
+    /// worse than none: it is the one somebody reads to find out how monsters behave.
+    /// </remarks>
     public static class MonsterAI
     {
         public class AISpellData

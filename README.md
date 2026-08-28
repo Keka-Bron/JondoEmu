@@ -446,8 +446,9 @@ The full plan, with what was decided and why, is in **`docs/world-editor.md`**.
 
 ## 🧪 Tests
 
-`Jondo.Unity.Tests` — **256 xUnit tests**, grouped by domain: `Content`, `Combat`, `Economy`,
-`Protocol`, `Security`, `Sessions`, `Studio`, `World`. They run in about four seconds.
+`Jondo.Unity.Tests` — **587 xUnit tests**, grouped by domain: `Auth`, `Content`, `Combat`,
+`Diagnostics`, `Economy`, `Network`, `Protocol`, `Quests`, `Security`, `Sessions`, `Studio`,
+`World`. They run in about four seconds.
 
 Five of them run against `logs/gameserver_traffic.log` itself when it is on the machine, and skip
 when it is not. That is a real weakness — a test that skips proves nothing — and it is there because
@@ -523,7 +524,7 @@ Shared:
   `Jondo.Unity.World` and `Jondo.Unity.Core` as projects and uses `MapGeometry`, `Fighter` and
   `SpellEffect` directly — that absence of a serialisation boundary is why it is a desktop app and
   not a local web UI. The content layers themselves live in `Jondo.Unity.World/Content/`
-* **`Jondo.Unity.Tests`** — 116 xUnit tests, and the gate on publishing
+* **`Jondo.Unity.Tests`** — 587 xUnit tests, and the gate on publishing
 
 The protocol toolchain, which the emulator does not depend on:
 * **`Jondo.Unity.Reversing`** — reads a client with Cpp2IL, rebuilds the `.proto`, matches two versions, indexes the code, downloads old clients from the CDN (`Cytrus`) and generates the `Op` layer (`Layer`)

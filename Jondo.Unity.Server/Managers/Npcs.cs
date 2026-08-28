@@ -352,7 +352,7 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// Se leía con Numbers(), que espera números sueltos separados por comas: no parseaba ni
         /// uno, no llegaba ni un color, y el cliente pintaba el aspecto sin tintes, o sea GRIS.
-        /// Medido sobre los 6.467 NPCs del catálogo: 2.045 llevan colores y LOS 2.045 usan la
+        /// Medido sobre los 6.468 NPCs del catálogo: 2.045 llevan colores y LOS 2.045 usan la
         /// forma de pares. Ni uno usa una lista plana, así que estaban saliendo grises todos.
         ///
         /// Por el cable el color va con su índice metido en el byte alto —(índice &lt;&lt; 24) | rgb—,
