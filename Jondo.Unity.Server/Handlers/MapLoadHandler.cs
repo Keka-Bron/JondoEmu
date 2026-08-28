@@ -382,15 +382,17 @@ namespace Jondo.Unity.Server.Handlers
             return actorMsg.ToByteArray();
         }
 
+        /// <summary>
+        /// One writer for the whole project. See <see cref="Network.NetworkEnvelope.WriteVarInt"/>.
+        /// </summary>
+        /// <remarks>
+        /// This copy also masked its last byte with 0x7F, which reads like it matters and does not:
+        /// the loop above it only exits once the value is already below 0x80.
+        /// </remarks>
         private static byte[] SerializeVarInt(ulong value)
         {
             using var ms = new MemoryStream();
-            while (value >= 0x80)
-            {
-                ms.WriteByte((byte)((value & 0x7F) | 0x80));
-                value >>= 7;
-            }
-            ms.WriteByte((byte)(value & 0x7F));
+            Network.NetworkEnvelope.WriteVarInt(ms, value);
             return ms.ToArray();
         }
 

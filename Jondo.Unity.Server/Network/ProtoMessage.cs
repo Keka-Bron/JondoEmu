@@ -141,15 +141,9 @@ namespace Jondo.Unity.Server.Network
             return value;
         }
 
+        /// <summary>One writer for the whole project. See <see cref="NetworkEnvelope.WriteVarInt"/>.</summary>
         public static void WriteVarInt(Stream stream, ulong value)
-        {
-            while (value >= 0x80)
-            {
-                stream.WriteByte((byte)((value & 0x7F) | 0x80));
-                value >>= 7;
-            }
-            stream.WriteByte((byte)value);
-        }
+            => NetworkEnvelope.WriteVarInt(stream, value);
 
         /// <summary>
         /// Los campos en UNA línea, al estilo del sniffer: <c>{ 1: 453 2: "1630" }</c>.

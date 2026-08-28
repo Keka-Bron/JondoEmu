@@ -200,16 +200,9 @@ namespace Jondo.Unity.Server.Network
             return false;
         }
 
+        /// <summary>One writer for the whole project. See <see cref="NetworkEnvelope.WriteVarInt"/>.</summary>
         private static void WriteVarInt(Stream stream, ulong value)
-        {
-            while (true)
-            {
-                byte b = (byte)(value & 0x7F);
-                value >>= 7;
-                if (value != 0) stream.WriteByte((byte)(b | 0x80));
-                else { stream.WriteByte(b); return; }
-            }
-        }
+            => NetworkEnvelope.WriteVarInt(stream, value);
 
         public static byte[] VarInt(long value)
         {

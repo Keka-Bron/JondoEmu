@@ -98,14 +98,17 @@ namespace Jondo.Unity.Server.Network
 
         private void WriteVarInt(ulong value) => WriteVarInt(_ms, value);
 
+        /// <summary>
+        /// One writer for the whole project, in <see cref="NetworkEnvelope"/>.
+        /// </summary>
+        /// <remarks>
+        /// This was the fourth of five hand-written copies -- Pb, NetworkEnvelope, ProtoMessage,
+        /// CaptureRewriter and MapLoadHandler -- in three spellings that all happened to agree.
+        /// Five correct copies is four chances for the next edit to land on the wrong one, and a
+        /// protocol writer that is subtly wrong produces frames the client drops without a word.
+        /// The survivor is pinned against Google's own encoder in VarIntWriterTests.
+        /// </remarks>
         private static void WriteVarInt(Stream stream, ulong value)
-        {
-            while (value >= 0x80)
-            {
-                stream.WriteByte((byte)((value & 0x7F) | 0x80));
-                value >>= 7;
-            }
-            stream.WriteByte((byte)value);
-        }
+            => NetworkEnvelope.WriteVarInt(stream, value);
     }
 }

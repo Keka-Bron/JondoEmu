@@ -4345,19 +4345,6 @@ namespace Jondo.Unity.Server.Handlers
             Program.LogDebug($"[FightHandler] Sent juu (Wait Turn Ack) for Fighter #{nextFighter.Id} ({nextFighter.Name}).");
         }
 
-        private static async Task HandlePassTurnRequest(NetworkStream stream, byte[] payload)
-        {
-            var fight = GetCurrentFight();
-            if (fight == null) return;
-
-            var current = fight.CurrentFighter;
-            if (current != null)
-            {
-                Program.LogDebug($"[FightHandler] Player requested Pass Turn (jxw) for Fighter #{current.Id}.");
-                await EndTurnAsync(stream, current);
-            }
-        }
-
         public static List<int> GenerateSimplePath(int startCell, int targetCell)
         {
             var path = new List<int> { startCell };
@@ -4572,152 +4559,16 @@ namespace Jondo.Unity.Server.Handlers
             return BuildGameNodePacket("type.ankama.com/juc", m.ToByteArray());
         }
 
-        /// <summary>
-        /// Casts of each spell during the current turn, per spell and per target. The client reads
-        /// that number straight from the cast packet (f7.f5) and compares it against the spell's
-        /// limit to grey the icon out.
-        ///
-        /// There used to be a single global counter here that was never reset: by the third or
-        /// fourth cast of the fight the client already believed Frozen Arrow's 3 casts per turn
-        /// were spent and disabled it, even when it was the first cast of that turn.
-        /// </summary>
-        // Los dos diccionarios que había aquí eran estáticos del proceso entero y sólo llevaban el
-        // id del hechizo: dos jugadores en dos combates se gastaban los lanzamientos el uno al otro,
-        // y como no se vaciaban nunca, al tercero el hechizo quedaba rechazado para siempre. Ahora
-        // viven en el FightInstance, con el lanzador en la clave, y se vacían en NextTurn.
-
-        private static async Task HandleSpellCastRequest(NetworkStream stream, byte[] payload)
-        {
-            var fight = GetCurrentFight();
-            if (fight == null) return;
-
-            var current = fight.CurrentFighter;
-            if (current == null || current.IsMonster) return;
-
-            long spellId = 0;
-            int targetCell = -1;
-            try
-            {
-                var inner = ExtractMessagePayload(payload, "type.ankama.com/jub");
-                if (inner != null)
-                {
-                    // By field NUMBER, not by position: a weapon hit arrives as { f2 = cell }
-                    // with no field 1, and reading by position took the cell as the spell id and
-                    // rejected the whole request.
-                    var jubMsg = ProtoMessage.Parse(inner);
-                    foreach (var f in jubMsg.Fields)
-                    {
-                        if (f.WireType != 0) continue;
-                        if (f.FieldNumber == 1) spellId = f.VarIntValue;
-                        else if (f.FieldNumber == 2) targetCell = (int)f.VarIntValue;
-                    }
-                }
-            }
-            catch { }
-
-            if (targetCell < 0)
-            {
-                Program.LogDebug("[FightHandler] Cast request with no target cell; discarding it.");
-                return;
-            }
-
-            // No spell id = a hit with the equipped WEAPON. That is exactly how the client sends
-            // it, with the cell alone, and until now it was rejected outright.
-            bool isWeapon = spellId <= 0;
-            var spellData = isWeapon
-                ? DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId)
-                : DatabaseManager.GetSpellCombatData((int)spellId, current.Level);
-
-            if (spellData == null)
-            {
-                Program.LogDebug(isWeapon
-                    ? "[FightHandler] Weapon hit rejected: no equipped weapon deals damage."
-                    : $"[FightHandler] Rejected spell cast: spell {spellId} data not found in DB.");
-                return;
-            }
-
-            if (current.CurrentAP < spellData.APCost)
-            {
-                Program.LogDebug($"[FightHandler] Player has insufficient AP ({current.CurrentAP}/{spellData.APCost}) for spell {spellId}.");
-                return;
-            }
-
-            int distToTarget = MapGeometry.Distance(current.CellId, targetCell);
-            if (distToTarget < spellData.MinRange || distToTarget > spellData.MaxRange)
-            {
-                Program.LogDebug($"[FightHandler] Spell {spellId} out of range ({distToTarget} cells, range {spellData.MinRange}-{spellData.MaxRange}).");
-                return;
-            }
-
-            if (spellData.NeedsLineOfSight &&
-                !MapGeometry.HasLineOfSight(current.CellId, targetCell, MapManager.GetLosBlockers(fight.ArenaMapId)))
-            {
-                Program.LogDebug($"[FightHandler] Spell {spellId} has no line of sight from {current.CellId} to {targetCell}.");
-                return;
-            }
-
-            var target = fight.Team1.FirstOrDefault(m => m.IsAlive && (m.CellId == targetCell || MapGeometry.Distance(m.CellId, targetCell) <= 1));
-            long targetId = target != null ? target.Id : -1;
-
-            // Cast limits, exactly as the spell declares them in the database.
-            fight.CastsThisTurn.TryGetValue((current.Id, spellId), out int castsDone);
-            if (spellData.MaxCastPerTurn > 0 && castsDone >= spellData.MaxCastPerTurn)
-            {
-                Program.LogDebug($"[FightHandler] Spell {spellId} already spent this turn ({castsDone}/{spellData.MaxCastPerTurn}).");
-                return;
-            }
-
-            var perTargetKey = (current.Id, spellId, targetId);
-            fight.CastsPerTargetThisTurn.TryGetValue(perTargetKey, out int castsOnTarget);
-            if (targetId != -1 && spellData.MaxCastPerTarget > 0 && castsOnTarget >= spellData.MaxCastPerTarget)
-            {
-                Program.LogDebug($"[FightHandler] Spell {spellId} already spent on that target ({castsOnTarget}/{spellData.MaxCastPerTarget}).");
-                return;
-            }
-
-            current.AccumulatedApLoss += spellData.APCost;
-            current.CurrentAP -= spellData.APCost;
-
-            castsDone++;
-            fight.CastsThisTurn[(current.Id, spellId)] = castsDone;
-            if (targetId != -1) fight.CastsPerTargetThisTurn[perTargetKey] = castsOnTarget + 1;
-
-            Program.LogDebug($"[FightHandler] {(isWeapon ? "Weapon hit" : $"Player cast spell {spellId}")} " +
-                             $"on cell {targetCell} (costs {spellData.APCost} AP, {current.CurrentAP} left, " +
-                             $"cast {castsDone}" +
-                             $"{(spellData.MaxCastPerTurn > 0 ? "/" + spellData.MaxCastPerTurn : "")} of the turn).");
-
-            // Sequence traced from the official capture (frame 254):
-            //   jud(4) -> jtx(300 cast) -> jud(3) -> jvm(AP) -> juc(3) -> jtx(102 AP loss)
-            //   -> jtx(99 damage) -> juc(4)
-            //
-            // The cast jtx is not sent for a weapon hit: there is no capture of a weapon attack
-            // and it is unknown how the client encodes that action. Only the AP cost and the
-            // damage go out, which are both verified. The sword swing animation will be missing.
-            await WriteFrameAsync(stream, BuildJud(4, current.Id));
-            if (!isWeapon)
-            {
-                await WriteFrameAsync(stream, BuildJtxSpellCastPacket(current.Id, targetCell, spellId, spellData.SpellLevelId, targetId, castsDone));
-            }
-
-            await WriteFrameAsync(stream, BuildJud(3, current.Id));
-            await WriteFrameAsync(stream, BuildJvmPacket(current.Id, 1, -current.AccumulatedApLoss, current.MaxAP));
-            await WriteFrameAsync(stream, BuildJuc(3, current.Id));
-            await WriteFrameAsync(stream, BuildJtxApLossPacket(current.Id, spellData.APCost));
-
-            if (target != null)
-            {
-                await ApplySpellEffectsAsync(stream, fight, current, spellData, target);
-            }
-
-            await WriteFrameAsync(stream, BuildJuc(4, current.Id));
-
-            fight.CheckFightEnd();
-            if (fight.State == FightState.Ended)
-            {
-                await SendFightEnd(stream, fight);
-            }
-        }
+        // The per-turn cast counters used to be two static dictionaries here, and the doc comment
+        // that stood in this spot described them as if they were still fields. They now live on the
+        // FightInstance -- keyed by caster as well as spell, and emptied in NextTurn -- because as
+        // process-wide state keyed by spell alone, two players in two different fights spent each
+        // other's casts, and nothing ever cleared them, so after three casts of a spell (summed
+        // over every player and every fight since boot) it was refused for everybody until a
+        // restart. See FightInstance.CastsThisTurn and CastCounterIsolationTests.
+        //
+        // The number matters to the client rather than only to us: it reads it out of the cast
+        // packet (f7.f5) and compares it against the spell's limit to grey the icon out.
 
         /// <summary>
         /// Applies EVERY effect of a spell to a target and reports them to the client. Player
@@ -5456,29 +5307,6 @@ namespace Jondo.Unity.Server.Handlers
             byte[] packet = BuildFighterShowBytes(fighter);
             await WriteFrameAsync(stream, packet);
             Program.LogDebug($"[FightHandler] Sent organic jxx for {(fighter.IsMonster ? $"Monster ID {fighter.MonsterId} (Fighter ID {fighter.Id}, BoneId {fighter.LookBoneId})" : $"Player ID {fighter.Id}")} at Cell {fighter.CellId}.");
-        }
-
-        private static async Task SendPointsVariation(NetworkStream stream, long fighterId, int current, int max, bool isMP)
-        {
-            // kkz for MP, jys for AP
-            string typeUrl = isMP ? "type.ankama.com/kkz" : "type.ankama.com/jys";
-            var msg = new ProtoMessage();
-            msg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = fighterId });
-            msg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = current });
-            msg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = max });
-            byte[] env = BuildGameNodePacket(typeUrl, msg.ToByteArray());
-            await WriteFrameAsync(stream, env);
-        }
-
-        private static async Task SendLifePointsVariation(NetworkStream stream, long fighterId, int currentHP, int maxHP, int damage)
-        {
-            var msg = new ProtoMessage();
-            msg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = fighterId });
-            msg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = damage });
-            msg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = currentHP });
-            msg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = maxHP });
-            byte[] env = BuildGameNodePacket("type.ankama.com/jwu", msg.ToByteArray());
-            await WriteFrameAsync(stream, env);
         }
 
         // Aqui habia un segundo Random —_lootRandom— sin candado, mientras el otro (_dado) si lo
