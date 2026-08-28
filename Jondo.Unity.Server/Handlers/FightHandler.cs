@@ -252,7 +252,22 @@ namespace Jondo.Unity.Server.Handlers
 
             // De dónde se salió, para poder volver. El mapa de combate es de instancia y no vale
             // como sitio donde dejar al personaje.
+            // NOT announced to the roleplay map, and that is a decision rather than an omission.
+            //
+            // The review asked for AnunciarMudanzaAsync at both fight boundaries, on the grounds
+            // that changing MapId without telling the old map leaves a ghost behind. True for zaaps
+            // and doors. Here it is very likely wrong: in Dofus the fighters stay drawn on the map
+            // they are fighting on, as a group other players can walk up to and join, so sending
+            // "this actor left" would erase from everybody's screen the one thing they need to see
+            // to join in.
+            //
+            // Not fixed either way, because the captures cannot settle it: every combat capture is
+            // one client's own stream, and what a BYSTANDER receives when somebody beside them
+            // starts a fight is not in any of them. Guessing at a broadcast and shipping it would
+            // be worse than the ghost. What would settle it: two clients on one map, one starts a
+            // fight, capture the other one.
             var suyo = Network.SessionContext.State;
+            suyo.FightId = fight.FightId;
             suyo.RoleplayMapId = fight.RoleplayMapId;
             suyo.RoleplayCellId = fight.Team0.Count > 0 ? fight.Team0[0].CellId : 0;
 
@@ -365,6 +380,7 @@ namespace Jondo.Unity.Server.Handlers
             if (suyo.RoleplayMapId == 0) return;
 
             suyo.IsInFight = false;
+            suyo.FightId = 0;
             suyo.MapId = suyo.RoleplayMapId;
             if (suyo.RoleplayCellId != 0) suyo.CellId = suyo.RoleplayCellId;
             DatabaseManager.SaveCurrentCharacter();

@@ -105,12 +105,35 @@ namespace Jondo.Unity.Server.Network
                 .Where(s => s.IsInWorld && s.MapId == mapId)
                 .ToArray();
 
+        /// <summary>
+        /// Whether somebody standing on the map should hear what was sent to it.
+        /// </summary>
+        /// <remarks>
+        /// Its own method because it is the whole of the rule and it is easy to write backwards.
+        /// A null sender means "the map should hear this", which is right for anything the world
+        /// itself says. A number means "only the people in that fight", where 0 is the crowd
+        /// walking around outside -- and 0 has to work the same as any other value, or a fighter
+        /// would be shouting at the passers-by.
+        /// </remarks>
+        public static bool Hears(long targetFightId, long? senderFightId)
+            => !senderFightId.HasValue || targetFightId == senderFightId.Value;
+
         /// <summary>Sends one packet to every connected character on a map.</summary>
+        /// <remarks>
+        /// <paramref name="fightId"/> is how two fights standing on one map are told apart, and it
+        /// matters because they genuinely do stand on one map: ResolveArenaMapId gives every
+        /// roleplay map a single arena, so both groups end up with the same MapId. Passing the
+        /// sender's fight -- 0 when they are not fighting -- keeps map chat inside the fight it was
+        /// said in. Left out, nothing is filtered, which is right for anything the whole map should
+        /// hear and wrong for anything said by a person.
+        /// </remarks>
         public static async Task<int> BroadcastToMapAsync(long mapId, byte[] packet,
-                                                           Guid? exceptSessionId = null)
+                                                           Guid? exceptSessionId = null,
+                                                           long? fightId = null)
         {
             var targets = OnMap(mapId)
                 .Where(s => !exceptSessionId.HasValue || s.Id != exceptSessionId.Value)
+                .Where(s => Hears(s.State.FightId, fightId))
                 .ToArray();
 
             var results = await Task.WhenAll(targets.Select(async target =>

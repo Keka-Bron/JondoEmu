@@ -38,6 +38,22 @@ namespace Jondo.Unity.Server
         /// </summary>
         public long RoleplayMapId { get; set; }
         public int RoleplayCellId { get; set; }
+
+        /// <summary>Which fight this character is in. Zero when they are not in one.</summary>
+        /// <remarks>
+        /// Needed because <see cref="MapId"/> stops telling fights apart the moment a fight starts.
+        /// Two fights on the same roleplay map resolve to the SAME arena through
+        /// <c>MapManager.ResolveArenaMapId</c> -- one arena per roleplay map, by design, because the
+        /// arena is a real map from the game files and its cell layout is what the fight is drawn
+        /// on. So both groups sit on one map id, and anything that reaches "everybody on this map"
+        /// reaches the other fight as well. Map chat did exactly that: you could read what the
+        /// strangers fighting beside you were saying, and they could read you.
+        ///
+        /// The fight packets themselves were never affected -- those go to the fight's own list of
+        /// participants and never through the map. It is only what broadcasts by map that has to
+        /// ask this question.
+        /// </remarks>
+        public long FightId { get; set; }
         public long CurrentFightMobId { get; set; }
 
         // Characteristics / Capital

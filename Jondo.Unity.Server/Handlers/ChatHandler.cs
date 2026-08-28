@@ -47,8 +47,12 @@ namespace Jondo.Unity.Server.Handlers
                 // El canal general de Dofus es el del MAPA: lo oye quien está delante, no el
                 // servidor entero. El paquete es el mismo para todos —lleva dentro el id y el
                 // nombre de quien habla—, así que se manda tal cual.
+                // Con el combate de quien habla: dos peleas en el mismo mapa comparten arena -una
+                // por mapa de superficie, que es como sale de los datos del juego- asi que sin esto
+                // el canal del mapa cruzaba las dos y cada grupo leia al otro.
                 int oidos = await SessionRegistry.BroadcastToMapAsync(
-                    SessionContext.State.MapId, echoPacket, SessionContext.Current.Id);
+                    SessionContext.State.MapId, echoPacket, SessionContext.Current.Id,
+                    SessionContext.State.FightId);
                 Console.WriteLine($"[Chat] Repartido a {oidos} jugador(es) más en el mapa " +
                                   $"{SessionContext.State.MapId}.");
             }
