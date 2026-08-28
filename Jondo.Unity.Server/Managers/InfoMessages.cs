@@ -62,6 +62,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«No tienes el nivel de oficio necesario.» Va con <see cref="Warning"/>.</summary>
         public const int JobLevelTooLow = 284;
 
+        /// <summary>Summon capacity reached. Parameter 0 is the current capacity.</summary>
+        public const int SummonLimitReached = 203;
+
         private static readonly Dictionary<(int Type, int Id), string> _texts = new();
 
         public static int Count => _texts.Count;
