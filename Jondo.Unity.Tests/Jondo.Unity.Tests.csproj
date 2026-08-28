@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Launcher\Jondo.Unity.Launcher.csproj" />
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Server\Jondo.Unity.Server.csproj" />
     <!-- The editor, for the parts of it that are not user interface. The frame decoder and

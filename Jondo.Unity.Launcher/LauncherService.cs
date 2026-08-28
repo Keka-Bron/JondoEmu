@@ -288,12 +288,16 @@ namespace Jondo.Unity.Launcher
                     return new Result { Success = false, Message = UI.LauncherPreferences.Textos.ClientStartFailed };
                 }
 
+                // The server status is polled every two seconds. Record the process immediately so
+                // a queued second click cannot send another launch request before the next poll.
+                MarkLocalClientStarted(accountId);
+
                 // Cuando el cliente se cierre hay que decírselo al servidor, que es quien lleva la
                 // cuenta de quién está jugando. Y aunque este aviso se pierda —porque se cierre el
                 // lanzador antes— el servidor tiene dos redes debajo: la baja de la sesión de juego
                 // y la caducidad de los lanzamientos que nunca llegaron a conectar.
-                client.EnableRaisingEvents = true;
                 client.Exited += (s, e) => Devolver(accountId);
+                client.EnableRaisingEvents = true;
                 MaximizeWhenReady(client);
                 Console.WriteLine($"[Launcher] Client {instanceId} launched for account {accountId} (PID {client.Id}).");
                 return new Result { Success = true };
@@ -372,6 +376,7 @@ namespace Jondo.Unity.Launcher
         {
             try { ControlClient.Pedir("fin-de-lanzamiento", new { cuenta = accountId }); }
             catch { }
+            finally { MarkLocalClientStopped(accountId); }
         }
 
         // ─── Quién está jugando ─────────────────────────────────────────────────
@@ -382,16 +387,32 @@ namespace Jondo.Unity.Launcher
         // dos segundos, y las lecturas van contra eso.
 
         private static volatile System.Collections.Generic.HashSet<long> _jugando = new();
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, byte> LocalClients = new();
         private static volatile int _tope = 8;
 
         /// <summary>Cuántos clientes admite el servidor a la vez.</summary>
         public static int MaximumClients => _tope;
 
-        /// <summary>Si esa cuenta tiene un cliente abierto, según el último sondeo.</summary>
-        public static bool IsActive(long accountId) => _jugando.Contains(accountId);
+        /// <summary>Whether the server or this launcher has an active client for the account.</summary>
+        public static bool IsActive(long accountId)
+            => _jugando.Contains(accountId) || LocalClients.ContainsKey(accountId);
 
-        /// <summary>Cuántas cuentas están jugando, según el último sondeo.</summary>
-        public static int ActiveCount => _jugando.Count;
+        /// <summary>Number of distinct active accounts reported remotely or tracked locally.</summary>
+        public static int ActiveCount
+        {
+            get
+            {
+                var activeAccounts = new System.Collections.Generic.HashSet<long>(_jugando);
+                activeAccounts.UnionWith(LocalClients.Keys);
+                return activeAccounts.Count;
+            }
+        }
+
+        internal static void MarkLocalClientStarted(long accountId)
+            => LocalClients.TryAdd(accountId, 0);
+
+        internal static void MarkLocalClientStopped(long accountId)
+            => LocalClients.TryRemove(accountId, out _);
 
         private static void RefrescarQuienJuega()
         {
