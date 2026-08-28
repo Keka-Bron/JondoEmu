@@ -458,6 +458,17 @@ public static class Op
     /// <summary>El inventario, construido desde la base de datos; el hueco se omite cuando es cero porque cero es el amuleto.</summary>
     public const string Ivx = "ivx";
 
+    /// <summary>
+    /// Los contadores de una cuenta: f2 { f2 (repetido) { f1: contador, f2: valor } }.
+    /// </summary>
+    /// <remarks>
+    /// 9.694 pares en la trama capturada, con ids del 44 al 34.352 y valores de cientos de
+    /// millones. Es lo que el cliente pinta en el panel de estadisticas —partidas, monstruos,
+    /// kamas— y estuvo mucho tiempo etiquetado como «el inventario», que no es: el inventario es
+    /// el ivx, y estos dos opcodes se parecen lo justo para confundirse.
+    /// </remarks>
+    public const string Ivi = "ivi";
+
     /// <summary>Lo que hay dentro del cofre; misma forma que el inventario, con la bolsa como posicion de todo.</summary>
     public const string Iwb = "iwb";
 

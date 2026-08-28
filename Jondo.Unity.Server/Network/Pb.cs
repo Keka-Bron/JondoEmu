@@ -46,6 +46,36 @@ namespace Jondo.Unity.Server.Network
         public Pb Msg(int field, Pb inner) => Bytes(field, inner.Build());
 
         /// <summary>
+        /// Four bytes, exactly as given (wire type 5).
+        /// </summary>
+        /// <remarks>
+        /// For rebuilding a captured message that carries one, which is rare — there is a single
+        /// fixed32 in the whole world-entry sequence. The bytes go through untouched rather than
+        /// being read as a number and written back: whatever it is, floats included, it comes out
+        /// the way it went in.
+        /// </remarks>
+        public Pb Fixed32(int field, byte[] value)
+        {
+            if (value == null || value.Length != 4)
+                throw new ArgumentException("A fixed32 is four bytes.", nameof(value));
+
+            WriteTag(field, 5);
+            _ms.Write(value, 0, 4);
+            return this;
+        }
+
+        /// <summary>Eight bytes, exactly as given (wire type 1). See <see cref="Fixed32"/>.</summary>
+        public Pb Fixed64(int field, byte[] value)
+        {
+            if (value == null || value.Length != 8)
+                throw new ArgumentException("A fixed64 is eight bytes.", nameof(value));
+
+            WriteTag(field, 1);
+            _ms.Write(value, 0, 8);
+            return this;
+        }
+
+        /// <summary>
         /// Empty submessage. This is not the same as leaving the field out: in the character
         /// list, for instance, the sex block is present but empty when the sex is 0.
         /// </summary>

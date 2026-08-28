@@ -30,9 +30,10 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static class WorldEntry
     {
-        private static byte[]? _afterCharacter;
-        private static byte[]? _afterConfirm;
-        private static byte[]? _map;
+        /// <summary>Los tres bloques, con el nombre que les da content/world/entry.json.</summary>
+        public const string BlockAfterCharacter = "afterCharacter";
+        public const string BlockAfterConfirm = "afterConfirm";
+        public const string BlockMap = "map";
 
         /// <summary>
         /// Messages of the capture that are not replayed.
@@ -108,9 +109,17 @@ namespace Jondo.Unity.Server.Network
             //        personaje y luego el emulador mandaba los suyos —los 539 y los 167— al entrar
             //        al mapa, así que el cliente recibía dos listas distintas y la primera era de
             //        otro. Lo manda WardrobeHandler.SendOwnedAsync.
-            //   lyt  los conjuntos guardados del vestuario de esa cuenta, dos, cada uno con su
-            //        bloque de aspecto entero. Es lo mismo que ihb, que ya estaba fuera por esto.
-            //        Sin implementar los conjuntos, no mandar nada es lo que ve una cuenta nueva.
+            //   lyt  los conjuntos guardados del vestuario. Se queda en la lista, aunque en estos
+            //        bloques no hay ninguno: sale 8 veces en las capturas y el dia que se replique
+            //        otra sesion conviene que ya este fuera.
+            //
+            // OJO CON ESTA PAREJA. El bloque 1 trae un «lty», que NO es este «lyt»: son dos opcodes
+            // distintos —lty sale 7 veces en las capturas y lyt 8— y durante un tiempo el comentario
+            // de aqui describia el lty creyendo que era el lyt, con lo que esta entrada de la lista
+            // no filtraba absolutamente nada y nadie lo notaba. El lty de verdad son cinco huecos
+            // vacios (todo -1 y 5) con la fecha de creacion de la cuenta, asi que no lleva nada de
+            // nadie y sigue viajando; pero la leccion es que un opcode de tres letras se confunde
+            // con su anagrama sin que salte ningun error.
             Op.Hhy, Op.Lyt,
 
             // El diario de misiones de la cuenta capturada: 261 tramas en el bloque 1 y 4 más en
@@ -125,6 +134,12 @@ namespace Jondo.Unity.Server.Network
             //
             // En su lugar va lo nuestro, desde la base: Managers.Quests.SendJournalAsync.
             Op.Idu,
+
+            // Y los contadores de esa cuenta: 9.694 pares de id y valor, con ids del 44 al 34.352 y
+            // valores de cientos de millones. Es lo que el cliente pinta en el panel de estadisticas,
+            // y son las suyas: partidas jugadas, monstruos matados, kamas ganados. 87.878 bytes, el
+            // 88 % de todo lo que quedaba copiandose tal cual. Una cuenta nueva no tiene ninguna.
+            Op.Ivi,
 
             // Y EL MISMO DIARIO OTRA VEZ, entero y en una sola trama. Quitar sólo el idu no cambió
             // nada de lo que el jugador ve, porque el bloque trae las dos cosas: 261 tramas idu
@@ -179,12 +194,9 @@ namespace Jondo.Unity.Server.Network
         {
             _characteristicIds = new List<int>();
             _containers.Clear();
-            if (_afterCharacter == null && _map == null) return;
-
-            foreach (byte[]? block in new[] { _map, _afterCharacter })
+            foreach (string block in new[] { BlockMap, BlockAfterCharacter })
             {
-                if (block == null) continue;
-                foreach (byte[] frame in Frames(block))
+                foreach (byte[] frame in WorldEntryContent.Frames(block))
                 {
                     byte[]? kub = ConnectionProtocol.ReadPayload(frame, Op.Kub);
                     if (kub == null || kub.Length == 0) continue;
@@ -453,9 +465,18 @@ namespace Jondo.Unity.Server.Network
         /// <summary>Reads the three blocks off disk. Missing files are reported, not thrown.</summary>
         public static void Initialize()
         {
-            _afterCharacter = Read(Paths.WorldStageAfterCharacter, "after choosing the character");
-            _afterConfirm = Read(Paths.WorldStageAfterConfirm, "after the client confirms");
-            _map = Read(Paths.WorldStageMap, "the map");
+            // De content/world/entry.json y no de los tres .bin. Son los mismos bytes —lo prueba
+            // WorldEntryContentTests trama a trama— pero escritos campo a campo, de modo que lo que
+            // sale al cable se puede leer y comparar en un diff. Asi es como se encontraron tarde
+            // el diario de misiones y los logros de la cuenta capturada: no habia forma de verlos.
+            WorldEntryContent.Load(Paths.ContentFile(WorldEntryContent.AuthoredFile), Console.WriteLine);
+
+            if (WorldEntryContent.Ready)
+            {
+                Console.WriteLine($"[World] Entrada al mundo: {WorldEntryContent.Count(BlockAfterCharacter)} + " +
+                                  $"{WorldEntryContent.Count(BlockAfterConfirm)} + " +
+                                  $"{WorldEntryContent.Count(BlockMap)} tramas, sin abrir un solo .bin.");
+            }
 
             LearnCapturedIdentity();
             LearnSignatures();
@@ -474,9 +495,8 @@ namespace Jondo.Unity.Server.Network
         {
             _capturedCharacterId = 0;
             _capturedName = "";
-            if (_afterCharacter == null) return;
 
-            foreach (byte[] frame in Frames(_afterCharacter))
+            foreach (byte[] frame in WorldEntryContent.Frames(BlockAfterCharacter))
             {
                 byte[]? kva = ConnectionProtocol.ReadPayload(frame, Op.Kva);
                 if (kva == null || kva.Length == 0) continue;
@@ -561,10 +581,9 @@ namespace Jondo.Unity.Server.Network
         private static void LearnSignatures()
         {
             _signatures.Clear();
-            foreach (byte[]? block in new[] { _afterCharacter, _afterConfirm, _map })
+            foreach (string block in new[] { BlockAfterCharacter, BlockAfterConfirm, BlockMap })
             {
-                if (block == null) continue;
-                foreach (byte[] frame in Frames(block))
+                foreach (byte[] frame in WorldEntryContent.Frames(block))
                 {
                     byte[]? ivx = ConnectionProtocol.ReadPayload(frame, Op.Ivx);
                     if (ivx == null || ivx.Length == 0) continue;
@@ -657,13 +676,11 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static async Task<int> SendAfterCharacterAsync(NetworkStream stream, DatabaseManager.DbCharacter character)
         {
-            if (_afterCharacter == null) return 0;
-
             var identity = IdentityFor(character);
             int sent = 0, rewritten = 0;
 
             int skipped = 0;
-            foreach (byte[] frame in Frames(_afterCharacter))
+            foreach (byte[] frame in WorldEntryContent.Frames(BlockAfterCharacter))
             {
                 if (ShouldSkip(frame)) { skipped++; continue; }
 
@@ -723,7 +740,7 @@ namespace Jondo.Unity.Server.Network
 
         public static async Task<int> SendAfterConfirmAsync(NetworkStream stream, DatabaseManager.DbCharacter character)
         {
-            return await SendRewrittenAsync(stream, _afterConfirm, "Block 2", IdentityFor(character));
+            return await SendRewrittenAsync(stream, BlockAfterConfirm, "Block 2", IdentityFor(character));
         }
 
         /// <summary>
@@ -732,12 +749,10 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static async Task<int> SendMapAsync(NetworkStream stream, DatabaseManager.DbCharacter character, long mapId)
         {
-            if (_map == null) return 0;
-
             var identity = IdentityFor(character);
             int sent = 0;
 
-            foreach (byte[] frame in Frames(_map))
+            foreach (byte[] frame in WorldEntryContent.Frames(BlockMap))
             {
                 if (ShouldSkip(frame)) continue;
 
@@ -775,13 +790,11 @@ namespace Jondo.Unity.Server.Network
             return sent;
         }
 
-        private static async Task<int> SendRewrittenAsync(NetworkStream stream, byte[]? block,
+        private static async Task<int> SendRewrittenAsync(NetworkStream stream, string block,
                                                           string name, CaptureRewriter.Identity identity)
         {
-            if (block == null) return 0;
-
             int sent = 0;
-            foreach (byte[] frame in Frames(block))
+            foreach (byte[] frame in WorldEntryContent.Frames(block))
             {
                 if (ShouldSkip(frame)) continue;
                 await EnviarAsync(stream, CaptureRewriter.Rewrite(frame, identity));
