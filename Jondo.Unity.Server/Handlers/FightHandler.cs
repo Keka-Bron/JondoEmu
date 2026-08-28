@@ -1714,7 +1714,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzc,
                 Network.FightProtocol.BuildTurnStart(fighter.Id, duration,
-                                                     fight.CurrentTurnIndex, fight.RoundNumber)));
+                                                     CarouselTurnIndex(fight), fight.RoundNumber)));
 
             // Los invocados a los que se les ha acabado el tiempo se deshacen aquí, al principio
             // del turno, que es cuando lo hace el servidor real: en la captura la baliza sale en
@@ -2424,12 +2424,50 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task ReenviarLaListaAsync(NetworkStream stream, FightInstance fight)
         {
-            var todos = new List<long>();
-            foreach (var f in fight.Team0) if (f.IsAlive) todos.Add(f.Id);
-            foreach (var f in fight.Team1) if (f.IsAlive) todos.Add(f.Id);
+            var todos = CombatantsInTurnOrder(fight);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
                 Network.FightProtocol.BuildTeams(todos)));
+            Program.LogDebug($"[Fight] Refreshed carousel order: [{string.Join(",", todos)}].");
+        }
+
+        /// <summary>
+        /// Builds the live combat carousel in engine turn order. Passive summons remain visible
+        /// and targetable but are appended because they never receive a jzc turn index.
+        /// </summary>
+        internal static List<long> CombatantsInTurnOrder(FightInstance fight)
+        {
+            var result = fight.TurnOrder.Where(fighter => fighter.IsAlive)
+                                        .Select(fighter => fighter.Id)
+                                        .ToList();
+            var present = new HashSet<long>(result);
+
+            foreach (var fighter in fight.Team0.Concat(fight.Team1))
+            {
+                if (fighter.IsAlive && present.Add(fighter.Id)) result.Add(fighter.Id);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns f7 for jzc in the same filtered prefix emitted by CombatantsInTurnOrder. The
+        /// engine keeps corpses in TurnOrder, so CurrentTurnIndex cannot be sent after a death.
+        /// </summary>
+        internal static int CarouselTurnIndex(FightInstance fight)
+        {
+            var current = fight.CurrentFighter;
+            if (current == null) return 0;
+
+            int index = 0;
+            foreach (var fighter in fight.TurnOrder)
+            {
+                if (!fighter.IsAlive) continue;
+                if (fighter == current) return index;
+                index++;
+            }
+
+            return 0;
         }
 
         /// <summary>La característica 26, que el cliente pinta como "Invocación" en el panel.</summary>
