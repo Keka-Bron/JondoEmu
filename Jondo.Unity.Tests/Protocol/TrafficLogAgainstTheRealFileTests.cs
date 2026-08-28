@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Protocol.Wire;
+using Jondo.Unity.Server;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Protocol
@@ -17,35 +18,58 @@ namespace Jondo.Unity.Tests.Protocol
     /// frames for weeks and wrote down two useless rows, because everything about it was correct
     /// except its idea of where a client frame keeps its opcode.
     ///
-    /// So these run against <c>logs/gameserver_traffic.log</c> when it is there and skip when it is
-    /// not — it is a local artefact and never in git. Skipping quietly is a real weakness, and the
-    /// thresholds are set against what was measured over the 72,879 rows of it so that they say
-    /// something when they do run.
+    /// So these run against <c>logs/gameserver_traffic.log</c> and the files it has rotated
+    /// into, when they are there, and skip when they are not: it is a local artefact and never
+    /// in git. Skipping quietly is a real weakness, and the thresholds are set against what was
+    /// measured over the 72,879 rows of it so that they say something when they do run. They
+    /// now also skip below 5,000 frames, for the same reason.
     /// </remarks>
     public class TrafficLogAgainstTheRealFileTests
     {
         /// <summary>
-        /// Read once for all of these. The log is 110 MB, and five tests each walking it turns a
-        /// one-second test run into a ten-second one for no extra coverage.
+        /// Read once for all of these. The log is tens of MB, and five tests each walking it turns
+        /// a one-second test run into a ten-second one for no extra coverage.
         /// </summary>
+        /// <remarks>
+        /// The ROTATED files are read too, newest first, and that is not tidiness -- it is what
+        /// keeps these tests meaningful. LogFile now rolls the traffic log over at 32 MB, so the
+        /// live file holds only what has been written since the last rollover: right after one it
+        /// held 2,477 frames, and the shape assertion below is a ratio that only says anything once
+        /// the vocabulary of shapes has saturated. It failed on a perfectly healthy log purely
+        /// because the sample had shrunk. Reading .1, .2 and .3 as well puts the sample back.
+        /// </remarks>
         private static readonly Lazy<List<TrafficEntry>?> TheLog = new Lazy<List<TrafficEntry>?>(() =>
         {
-            string path = Paths.TrafficLog;
-            if (!File.Exists(path) || new FileInfo(path).Length < 64 * 1024) return null;
-
-            var reader = new TrafficLogReader(path);
-            reader.SeekToStart();
-
             var all = new List<TrafficEntry>();
-            while (all.Count < 60_000)
+
+            foreach (string path in Candidates())
             {
-                var batch = reader.ReadNew(10_000);
-                if (batch.Count == 0) break;
-                all.AddRange(batch);
+                if (all.Count >= 60_000) break;
+                if (!File.Exists(path)) continue;
+
+                var reader = new TrafficLogReader(path);
+                reader.SeekToStart();
+
+                while (all.Count < 60_000)
+                {
+                    var batch = reader.ReadNew(10_000);
+                    if (batch.Count == 0) break;
+                    all.AddRange(batch);
+                }
             }
 
-            return all;
+            // Too little to say anything with. A ratio over a couple of thousand frames is noise
+            // dressed as a measurement, and firing on it would train whoever sees it to ignore it.
+            return all.Count < 5_000 ? null : all;
         });
+
+        /// <summary>The live traffic log, then the files it has rotated into, newest first.</summary>
+        private static IEnumerable<string> Candidates()
+        {
+            string live = Paths.TrafficLog;
+            yield return live;
+            for (int i = 1; i <= LogFile.Keep; i++) yield return live + "." + i;
+        }
 
         private static List<TrafficEntry>? Read(int most = 60_000)
         {
