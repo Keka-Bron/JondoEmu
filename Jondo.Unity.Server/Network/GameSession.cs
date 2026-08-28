@@ -48,6 +48,7 @@ namespace Jondo.Unity.Server.Network
         public SessionState State { get; } = new SessionState();
         public long AccountId { get; private set; }
         public int ServerId { get; private set; }
+        public int LaunchInstanceId { get; private set; }
         public long CharacterId => State.CharacterId;
         public long MapId => State.MapId;
         public bool IsAuthenticated => AccountId > 0;
@@ -63,11 +64,13 @@ namespace Jondo.Unity.Server.Network
                 ? Task.CompletedTask
                 : Jondo.Protocol.NetworkMessage.WriteFrameAsync(Stream, packet);
 
-        public void BindAccount(long accountId, int serverId, string language = "es")
+        public void BindAccount(long accountId, int serverId, string language = "es",
+                                int launchInstanceId = 0)
         {
             if (accountId <= 0) throw new ArgumentOutOfRangeException(nameof(accountId));
             AccountId = accountId;
             ServerId = serverId;
+            LaunchInstanceId = launchInstanceId;
             State.Language = string.IsNullOrWhiteSpace(language) ? "es" : language;
         }
 

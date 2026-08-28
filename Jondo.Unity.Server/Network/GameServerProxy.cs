@@ -269,7 +269,9 @@ namespace Jondo.Unity.Server.Network
                                 ? lanzamiento.Language
                                 : lang;
 
-                            var ticket = SessionRegistry.Issue(accountId, selectedServerId, idioma);
+                            int launchInstanceId = lanzamiento?.InstanceId ?? 0;
+                            var ticket = SessionRegistry.Issue(
+                                accountId, selectedServerId, idioma, launchInstanceId);
 
                             byte[] response = ConnectionProtocol.BuildServerSelected(
                                 lang, ticket.Value, "127.0.0.1", Program.gamePort, Program.gamePort);

@@ -167,7 +167,29 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static void RemoveByAccount(long accountId)
         {
-            if (ByAccount.TryGetValue(accountId, out var launch)) Remove(launch);
+            lock (RegistrationGate)
+            {
+                if (ByAccount.TryGetValue(accountId, out var launch)) Remove(launch);
+            }
+        }
+
+        /// <summary>
+        /// Releases the launch owned by a game socket that has just disconnected. The instance
+        /// check prevents an old socket from deleting a newer relaunch of the same account.
+        /// </summary>
+        public static bool TryRemoveDisconnected(long accountId, int launchInstanceId)
+        {
+            if (accountId <= 0 || launchInstanceId <= 0) return false;
+
+            lock (RegistrationGate)
+            {
+                if (!ByAccount.TryGetValue(accountId, out var launch)
+                    || launch.InstanceId != launchInstanceId)
+                    return false;
+
+                Remove(launch);
+                return true;
+            }
         }
 
         /// <summary>Las cuentas que tienen un cliente abierto ahora mismo.</summary>
@@ -190,13 +212,11 @@ namespace Jondo.Unity.Server.Network
                 var launch = pair.Value;
                 if (ahora - launch.CreatedAtUtc < cuanto) continue;
 
-                // Si ya está jugando de verdad no se toca: tiene sesión de juego abierta.
-                bool jugando = false;
-                foreach (var suya in ByGameSession)
-                {
-                    if (ReferenceEquals(suya.Value, launch)) { jugando = true; break; }
-                }
-                if (jugando) continue;
+                // A Zaap gameSession only proves that the first handshake happened. The client
+                // can disappear while opening its second connection and never present a ticket;
+                // only a bound game socket is a live client that must be preserved.
+                if (SessionRegistry.HasConnectedLaunch(launch.AccountId, launch.InstanceId))
+                    continue;
 
                 Remove(launch);
                 soltados++;
