@@ -48,6 +48,8 @@ namespace Jondo.Unity.Server.Handlers
         private const int MaximumCost = 1000;
         private const int CostPerStep = 10;
 
+        public static bool IsOpen => SessionContext.State.OpenZaapMapId != 0;
+
         /// <summary>El mapa del zaap que está abierto ahora mismo, para cobrar desde el sitio bueno.</summary>
         /// <summary>
         /// El cliente ha clicado el zaap. Se le contesta que el elemento está en uso y se le manda

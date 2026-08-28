@@ -14,6 +14,14 @@ namespace Jondo.Unity.Server.Network
 {
     public static class GameNodeProxy
     {
+        internal enum CloseTarget
+        {
+            Chest,
+            NpcShop,
+            Zaap,
+            NpcDialogue,
+        }
+
         private static TcpListener? _tcpListener;
         private static bool _isRunning;
 
@@ -592,16 +600,27 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
-                    // El botón de cerrar del diálogo. Va vacío y espera respuesta: khd si lo que
-                    // está abierto es el cofre o la tienda de un NPC, kld si es la lista del zaap.
-                    //
-                    // El cliente manda el kla DOS veces seguidas al cerrar una tienda, con menos de
-                    // un milisegundo entre medias, y el servidor real contesta un solo khd. Como el
-                    // primero ya deja la tienda cerrada, el segundo cae en el zaap y se va con un
-                    // kld que el cliente ignora, igual que hoy.
-                    if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
-                    else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
-                    else await ZaapTravelHandler.CloseAsync(stream);
+                    // kla is empty, so route it from the window state: chests and shops answer khd,
+                    // while zaaps and NPC dialogue windows answer kld. An open zaap must win over
+                    // stale NPC state left by a previous map, otherwise its close state is never
+                    // cleared. The client also sends kla twice when closing a shop; the second
+                    // request safely falls through to the dialogue response after the shop closes.
+                    switch (ResolveCloseTarget(ChestHandler.IsOpen, NpcHandler.IsShopOpen,
+                                               ZaapTravelHandler.IsOpen))
+                    {
+                        case CloseTarget.Chest:
+                            await ChestHandler.CloseAsync(stream);
+                            break;
+                        case CloseTarget.NpcShop:
+                            await NpcHandler.CloseShopAsync(stream);
+                            break;
+                        case CloseTarget.Zaap:
+                            await ZaapTravelHandler.CloseAsync(stream);
+                            break;
+                        default:
+                            await NpcHandler.CloseAsync(stream, payload);
+                            break;
+                    }
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Hjc)))
                 {
@@ -817,11 +836,6 @@ namespace Jondo.Unity.Server.Network
                     // Ha elegido una respuesta del diálogo.
                     await NpcHandler.ReplyAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Kla)))
-                {
-                    // Ha pulsado la X. Sin esta rama la ventana no se cerraba nunca.
-                    await NpcHandler.CloseAsync(stream, payload);
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Kea)))
                 {
                     // Comprarle algo al NPC que tiene la tienda abierta.
@@ -951,6 +965,14 @@ namespace Jondo.Unity.Server.Network
                 if (payload == null) break;
                 payloadStr = Encoding.UTF8.GetString(payload);
             }
+        }
+
+        internal static CloseTarget ResolveCloseTarget(bool chestOpen, bool shopOpen, bool zaapOpen)
+        {
+            if (chestOpen) return CloseTarget.Chest;
+            if (shopOpen) return CloseTarget.NpcShop;
+            if (zaapOpen) return CloseTarget.Zaap;
+            return CloseTarget.NpcDialogue;
         }
 
         /// <summary>
