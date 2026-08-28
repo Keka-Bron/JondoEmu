@@ -12554,7 +12554,7 @@
      1,
      1
     ],
-    "built": "las dos barras de atajos"
+    "built": "ConnectionProtocol.BuildSpellBar"
    },
    {
     "opcode": "itg",
@@ -12562,7 +12562,7 @@
      1,
      1
     ],
-    "built": "las dos barras de atajos"
+    "built": "la barra de objetos, que sale vacia"
    },
    {
     "opcode": "hou",

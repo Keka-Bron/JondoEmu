@@ -31,17 +31,38 @@ namespace Jondo.Unity.Server.Network
     {
         public const string AuthoredFile = "world/entry.json";
 
-        private static readonly Dictionary<string, List<byte[]>> _blocks
-            = new Dictionary<string, List<byte[]>>(StringComparer.Ordinal);
+        /// <summary>One frame of the sequence: the bytes, and what the file says about them.</summary>
+        /// <remarks>
+        /// <see cref="Built"/> is why this is a row and not just a byte array. The server used to
+        /// tell the two shortcut bars apart by looking inside the payload it was about to replace —
+        /// f6 for items, f9 for spells — and that stops working the moment the payload is not
+        /// carried any more. Now the distinction is made once, where the file is generated, and the
+        /// server reads the label instead of guessing from bytes that are no longer there.
+        /// </remarks>
+        public sealed class Row
+        {
+            public string Opcode { get; init; } = "";
+            public string Built { get; init; } = "";
+            public byte[] Frame { get; init; } = Array.Empty<byte>();
+        }
+
+        private static readonly Dictionary<string, List<Row>> _blocks
+            = new Dictionary<string, List<Row>>(StringComparer.Ordinal);
 
         /// <summary>How many frames a block holds. Zero when the file was not read.</summary>
         public static int Count(string block)
             => _blocks.TryGetValue(block, out var frames) ? frames.Count : 0;
 
-        public static IReadOnlyList<byte[]> Frames(string block)
-            => _blocks.TryGetValue(block, out var frames)
-                ? frames
-                : (IReadOnlyList<byte[]>)Array.Empty<byte[]>();
+        public static IReadOnlyList<Row> Rows(string block)
+            => _blocks.TryGetValue(block, out var rows)
+                ? rows
+                : (IReadOnlyList<Row>)Array.Empty<Row>();
+
+        /// <summary>Just the bytes, for the callers that only walk them.</summary>
+        public static IEnumerable<byte[]> Frames(string block)
+        {
+            foreach (var row in Rows(block)) yield return row.Frame;
+        }
 
         public static bool Ready => _blocks.Count > 0;
 
@@ -64,14 +85,21 @@ namespace Jondo.Unity.Server.Network
 
                 foreach (var block in blocks.EnumerateObject())
                 {
-                    var frames = new List<byte[]>();
-                    foreach (var row in block.Value.EnumerateArray())
+                    var rows = new List<Row>();
+                    foreach (var entry in block.Value.EnumerateArray())
                     {
-                        byte[]? frame = Frame(row);
-                        if (frame != null) frames.Add(frame);
+                        byte[]? frame = Frame(entry);
+                        if (frame == null) continue;
+
+                        rows.Add(new Row
+                        {
+                            Opcode = entry.TryGetProperty("opcode", out var op) ? op.GetString() ?? "" : "",
+                            Built = entry.TryGetProperty("built", out var built) ? built.GetString() ?? "" : "",
+                            Frame = frame,
+                        });
                     }
 
-                    _blocks[block.Name] = frames;
+                    _blocks[block.Name] = rows;
                 }
             }
             catch (Exception ex)

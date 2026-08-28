@@ -30,6 +30,17 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static class WorldEntry
     {
+        /// <summary>
+        /// La etiqueta con la que content/world/entry.json marca la barra de HECHIZOS.
+        /// </summary>
+        /// <remarks>
+        /// Hay dos itg en la secuencia y sólo se distinguen por lo que el manifiesto diga: antes se
+        /// miraba dentro del payload —f6 objetos, f9 hechizos— y ese payload ya no viaja. Es una
+        /// cadena y no un enum porque la escribe tools/decode_world_entry.py, que es de otro
+        /// lenguaje; si las dos dejan de coincidir, WorldEntryContentTests lo dice.
+        /// </remarks>
+        public const string SpellBarLabel = "ConnectionProtocol.BuildSpellBar";
+
         /// <summary>Los tres bloques, con el nombre que les da content/world/entry.json.</summary>
         public const string BlockAfterCharacter = "afterCharacter";
         public const string BlockAfterConfirm = "afterConfirm";
@@ -46,9 +57,15 @@ namespace Jondo.Unity.Server.Network
         /// Three that used to be here are back on the wire, because the reason they were taken out
         /// did not survive being checked:
         ///
-        ///   itg  really is the shortcut bar — two messages, f6 for items and f9 for spells — and
+        ///   itg  really is the shortcut bar — two messages, f6 for SPELLS and f9 for items — and
         ///        dropping it is why the spell bar came up empty. The plan was to build it from
         ///        the database and that never happened.
+        ///
+        ///        Ese «f6 para objetos y f9 para hechizos» que ponía aquí era falso y estuvo
+        ///        contradiciendo a HoldsSpells, tres metros más abajo, que hacía lo contrario y
+        ///        acertaba. Medido sobre las dos tramas: la de 436 bytes lleva 44 huecos con f6 y
+        ///        los 44 valores son ids de SpellTemplates de verdad, del 350 al 24.017; la de
+        ///        1.208 usa f9 y sus valores llegan a 507.645.866, que son uid de objeto.
         ///   ife  was labelled the friends list. It is not: the contacts are in kqg. It is the
         ///        alliances, by name and by tag. It came back on the wire for a while and has gone
         ///        out again — not for the reason it was taken out the first time, but because
@@ -375,7 +392,7 @@ namespace Jondo.Unity.Server.Network
             return 0;
         }
 
-        private static byte[]? Rebuilt(byte[] frame, DatabaseManager.DbCharacter character)
+        private static byte[]? Rebuilt(byte[] frame, string built, DatabaseManager.DbCharacter character)
         {
             if (ConnectionProtocol.ReadPayload(frame, Op.Kva) != null)
             {
@@ -416,7 +433,11 @@ namespace Jondo.Unity.Server.Network
             byte[]? itg = ConnectionProtocol.ReadPayload(frame, Op.Itg);
             if (itg != null)
             {
-                if (HoldsSpells(itg))
+                // Cuál de las dos barras es lo dice el manifiesto, no el cuerpo. Antes se miraba
+                // dentro del payload —f6 objetos, f9 hechizos— y eso dejó de funcionar en cuanto el
+                // payload dejó de viajar: las dos habrían salido como la de objetos, y la de
+                // hechizos vacía, que es justo el fallo que ya se arregló una vez por otro camino.
+                if (built == SpellBarLabel)
                 {
                     return ConnectionProtocol.Push(Op.Itg,
                         ConnectionProtocol.BuildSpellBar(character.Breed, character.Level));
@@ -431,23 +452,6 @@ namespace Jondo.Unity.Server.Network
             return null;
         }
 
-        /// <summary>
-        /// Tells the two shortcut bars apart. A slot holding a spell carries f6, one holding an
-        /// item carries f9; there is no flag on the message itself saying which bar it is.
-        /// </summary>
-        private static bool HoldsSpells(byte[] itg)
-        {
-            foreach (var entry in ProtoMessage.Parse(itg).Fields)
-            {
-                if (entry.FieldNumber != 1 || entry.WireType != 2) continue;
-                foreach (var slot in ProtoMessage.Parse(entry.BytesValue).Fields)
-                {
-                    if (slot.FieldNumber == 6) return true;
-                    if (slot.FieldNumber == 9) return false;
-                }
-            }
-            return false;
-        }
 
         /// <summary>Is this one of the messages that carry other players' data?</summary>
         private static bool ShouldSkip(byte[] message)
@@ -680,25 +684,26 @@ namespace Jondo.Unity.Server.Network
             int sent = 0, rewritten = 0;
 
             int skipped = 0;
-            foreach (byte[] frame in WorldEntryContent.Frames(BlockAfterCharacter))
+            foreach (var row in WorldEntryContent.Rows(BlockAfterCharacter))
             {
+                byte[] frame = row.Frame;
                 if (ShouldSkip(frame)) { skipped++; continue; }
 
                 // Rebuilt whole, not rewritten. Rewriting only swaps the id and the name, and kva
                 // also carries the level, the breed and the look: leaving the captured ones
                 // through is why the client showed level 154, another breed and somebody else's
                 // look.
-                byte[]? built = Rebuilt(frame, character);
+                byte[]? rehechoAqui = Rebuilt(row.Frame, row.Built, character);
 
                 // Un array vacio quiere decir "este mensaje no se manda": lo usa el aviso de la
                 // ultima conexion cuando el personaje entra por primera vez y no hay anterior que
                 // contar. Mandarlo vacio seria una trama de longitud cero.
-                if (built != null && built.Length == 0) { skipped++; continue; }
+                if (rehechoAqui != null && rehechoAqui.Length == 0) { skipped++; continue; }
                 byte[] toSend;
 
-                if (built != null)
+                if (rehechoAqui != null)
                 {
-                    toSend = built;
+                    toSend = rehechoAqui;
                     rewritten++;
                 }
                 else
@@ -752,11 +757,12 @@ namespace Jondo.Unity.Server.Network
             var identity = IdentityFor(character);
             int sent = 0;
 
-            foreach (byte[] frame in WorldEntryContent.Frames(BlockMap))
+            foreach (var row in WorldEntryContent.Rows(BlockMap))
             {
+                byte[] frame = row.Frame;
                 if (ShouldSkip(frame)) continue;
 
-                byte[]? rehecho = Rebuilt(frame, character);
+                byte[]? rehecho = Rebuilt(row.Frame, row.Built, character);
                 if (rehecho != null && rehecho.Length == 0) continue;
                 byte[] toSend = rehecho ?? CaptureRewriter.Rewrite(frame, identity);
 
