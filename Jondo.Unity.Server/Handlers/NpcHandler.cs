@@ -59,6 +59,18 @@ namespace Jondo.Unity.Server.Handlers
         public static bool IsShopOpen => OpenShop != 0;
 
         /// <summary>
+        /// Si hay una conversación de NPC abierta ahora mismo.
+        /// </summary>
+        /// <remarks>
+        /// Lo pregunta la cadena del kla para saber de quién es la X que se acaba de pulsar. Sin
+        /// esto, la X de una conversación se la quedaba el zaap —que es el caso por defecto de esa
+        /// cadena— y salía un kld con la razón 10; la de cerrar una conversación es la 1, así que
+        /// el cliente dejaba la ventana puesta y no había forma de salir salvo eligiendo una
+        /// respuesta.
+        /// </remarks>
+        public static bool IsDialogueOpen => SessionContext.State.OpenDialogueNpcId != 0;
+
+        /// <summary>
         /// Desde dónde se numeran los objetos comprados.
         ///
         /// Cada cosa que fabrica objetos tiene su tramo: 900.000.000 el inventario de prueba,
@@ -629,16 +641,27 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Al cambiar de mapa no queda nada abierto.
-        ///
-        /// Lo llama WorldMoveHandler al mudarse y FightHandler al empezar un combate. Aun así,
-        /// BuyAsync vuelve a comprobar que el vendedor esté en el mapa: esto es por orden, no
-        /// por seguridad, y de la seguridad se encarga quien cobra.
+        /// Al cambiar de mapa no queda nada abierto: ni la tienda ni la conversación.
         /// </summary>
+        /// <remarks>
+        /// La conversación se limpia aquí desde que la X de un diálogo se atiende ANTES que la del
+        /// zaap. Con el estado rancio —el jugador abre una conversación y se va sin cerrarla— la
+        /// siguiente X, la que era del zaap, se la quedaría el diálogo y la lista de destinos no
+        /// se cerraría. Es el mismo fallo que tenía la X del diálogo, del revés.
+        ///
+        /// Y se llama desde donde se manda la lista de actores, que es por donde pasan las cinco
+        /// maneras de llegar a un mapa. El comentario anterior decía que lo llamaban
+        /// WorldMoveHandler y FightHandler; lo de FightHandler no era cierto, no hay ninguna
+        /// llamada suya en todo el repositorio.
+        ///
+        /// BuyAsync vuelve a comprobar que el vendedor esté en el mapa: esto es por orden, no por
+        /// seguridad, y de la seguridad se encarga quien cobra.
+        /// </remarks>
         public static void Forget()
         {
             OpenShop = 0;
             OpenShopNpc = 0;
+            CerrarConversacion();
         }
 
         /// <summary>

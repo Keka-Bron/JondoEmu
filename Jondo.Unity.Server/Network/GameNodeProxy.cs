@@ -367,6 +367,24 @@ namespace Jondo.Unity.Server.Network
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                             ConnectionProtocol.BuildActorsComplete());
 
+                        // Y lo que depende de haber llegado aquí: los objetivos que se cumplen
+                        // pisando un mapa o una zona, y la marca verde de este mapa.
+                        //
+                        // AQUÍ y no en MapLoadHandler, que es donde estaba y no servía. El kkr que
+                        // atiende aquel sólo llega en la carga inicial del mundo; andar de un mapa
+                        // a otro no lo manda, y se ve en el registro: cuatro cambios de mapa
+                        // seguidos —154011397, 154010885, 154010884, 154010883— y ni una llamada a
+                        // las marcas, así que el NPC que sí tenía una misión que dar salía sin la
+                        // exclamación encima. Este bloque, en cambio, es por donde pasan las cinco
+                        // formas de llegar a un mapa, porque el cliente siempre pide los actores.
+                        // Nada abierto sobrevive a un cambio de mapa: si no, la X del zaap del
+                        // mapa nuevo se la queda una conversación que el jugador dejó atrás.
+                        NpcHandler.Forget();
+
+                        var mapaInfo = MapManager.GetMapInfo(GameState.MapId);
+                        await Managers.Quests.OnMapEnteredAsync(stream, GameState.MapId,
+                                                                mapaInfo?.SubAreaId ?? 0);
+
                         Console.WriteLine($"[Game Node] Actors of map {GameState.MapId} sent: " +
                                           $"{here.Name} on cell {GameState.CellId}.");
                     }
@@ -599,8 +617,19 @@ namespace Jondo.Unity.Server.Network
                     // un milisegundo entre medias, y el servidor real contesta un solo khd. Como el
                     // primero ya deja la tienda cerrada, el segundo cae en el zaap y se va con un
                     // kld que el cliente ignora, igual que hoy.
+                    //
+                    // Y LA CONVERSACIÓN, que faltaba aquí. Había una segunda rama para el kla más
+                    // abajo, con NpcHandler.CloseAsync, y no se alcanzaba nunca: ésta la atrapa
+                    // primero y se iba por el zaap, que manda el kld con la razón 10. La de cerrar
+                    // una conversación es la 1 —98 de los kld capturados la llevan— y con la 10 el
+                    // cliente deja la ventana puesta. Por eso la equis no cerraba nunca.
+                    //
+                    // Va DELANTE del zaap porque el zaap es el caso por defecto y no tiene guarda
+                    // propia: con la conversación abierta, cualquier orden que deje el zaap antes
+                    // se queda con la X que era del diálogo.
                     if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
                     else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
+                    else if (NpcHandler.IsDialogueOpen) await NpcHandler.CloseAsync(stream, payload);
                     else await ZaapTravelHandler.CloseAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Hjc)))
@@ -816,11 +845,6 @@ namespace Jondo.Unity.Server.Network
                 {
                     // Ha elegido una respuesta del diálogo.
                     await NpcHandler.ReplyAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Kla)))
-                {
-                    // Ha pulsado la X. Sin esta rama la ventana no se cerraba nunca.
-                    await NpcHandler.CloseAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kea)))
                 {

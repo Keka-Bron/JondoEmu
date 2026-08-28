@@ -533,10 +533,14 @@ namespace Jondo.Unity.Server.Network
                 return;
             }
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("[World] No kva found in the blocks: the identity cannot be swapped " +
-                              "and the client will refuse to enter the world.");
-            Console.ResetColor();
+            // Y esto ya no es un aviso: es lo normal desde que el manifiesto no lleva cuerpo en las
+            // tramas que el servidor rehace, y el kva es una de ellas. La identidad no hace falta
+            // porque el kva se construye entero desde la base —Rebuilt lo cambia por completo— y
+            // porque no queda nada del personaje grabado que sustituir: WorldEntryContentTests lo
+            // comprueba trama a trama. El aviso decía «el cliente se negará a entrar al mundo», que
+            // era falso y salía en cada arranque.
+            Console.WriteLine("[World] El manifiesto no trae el kva de la captura, que es lo " +
+                              "esperado: el del personaje se construye desde la base de datos.");
         }
 
         /// <summary>Every submessage under that field number, not just the first one.</summary>
