@@ -34,6 +34,65 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(1, questId).Build();
 
         /// <summary>
+        /// The whole journal in one message (idr): what is under way and what is done.
+        ///
+        ///   f1 (repeated) { f2: the objectives and the step, f3: quest id }   under way
+        ///   f3 (repeated) { f1: 1, f2: quest id }                             finished
+        ///   f4  packed varints                                              more finished ones
+        ///
+        /// No outer wrapper, unlike idu. What looks like one when reading the frame by hand is the
+        /// envelope's own <c>Any.value</c>, and mistaking it for a field of the message would put
+        /// the whole journal one level too deep.
+        /// </summary>
+        /// <remarks>
+        /// This is the message that fills the quest window on entering the world, and it is the one
+        /// that was still handing every player somebody else's journal. The captured block carries
+        /// 261 <c>idu</c> frames AND one <c>idr</c> holding the same 261 inside it plus 548
+        /// finished, so taking only the <c>idu</c> out of the replay changed nothing that the
+        /// player could see: 261 in progress and 622 finished still arrived, none of them theirs,
+        /// and every quest in Incarnam and Astrub showed as already done — which is also why no NPC
+        /// carried a green mark and none of them would hand anything over.
+        ///
+        /// The shape is measured, not guessed: all 261 f1 ids and all 548 f3 ids are real quests,
+        /// and the two counts are exactly what the client prints on its two tabs.
+        ///
+        /// <b>f4 is a second list of finished quests</b>, packed rather than one submessage each,
+        /// and the arithmetic is what says so: the capture carries 548 in f3 and 74 in f4, and the
+        /// client prints <em>Terminadas (622)</em>. 548 + 74 = 622, exactly. What separates the two
+        /// lists is not known — none of the 74 appears in f3, and 13 of them are also in the
+        /// in-progress list, so it is not simply "the rest of them" — so everything finished goes in
+        /// f3 and f4 is left empty. A character of this server has nothing to put there anyway.
+        /// </remarks>
+        public static byte[] BuildJournal(
+            IEnumerable<(int Quest, int Step, IReadOnlyList<int> Objectives, IReadOnlyCollection<int> Done)> doing,
+            IEnumerable<int> finished)
+        {
+            var inner = Pb.New();
+
+            foreach (var (quest, step, objectives, done) in doing)
+            {
+                var body = Pb.New();
+                foreach (int objective in objectives)
+                {
+                    var entry = Pb.New().Var(2, objective);
+                    if (!done.Contains(objective)) entry.Var(4, 1);
+                    body.Msg(1, entry);
+                }
+
+                body.Var(2, step);
+                inner.Msg(1, Pb.New().Msg(2, body).Var(3, quest));
+            }
+
+            foreach (int quest in finished)
+            {
+                inner.Msg(3, Pb.New().Var(1, 1).Var(2, quest));
+            }
+
+            inner.EmptyMsg(4);
+            return inner.Build();
+        }
+
+        /// <summary>
         /// A step has been validated (idz).
         ///
         ///   f1: quest id

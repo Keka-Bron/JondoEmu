@@ -644,14 +644,33 @@ namespace Jondo.Unity.Server.Managers
             var log = Log;
             if (log == null) return;
 
-            int sent = 0;
+            if (_book == null) return;
+
+            // One idr with the lot, which is how the captured block does it, rather than one idu
+            // per quest. Sending it even when it is empty matters: the client fills the window from
+            // this message, and an empty one is what says "this character has no journal".
+            var doing = new List<(int, int, IReadOnlyList<int>, IReadOnlyCollection<int>)>();
             foreach (var run in log.Doing())
             {
-                await SendStepAsync(stream, run.QuestId);
-                sent++;
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+
+                var objectives = new List<int>(step.Objectives.Count);
+                foreach (var objective in step.Objectives) objectives.Add(objective.Id);
+
+                doing.Add((run.QuestId, run.StepId, objectives, run.Done));
             }
 
-            if (sent > 0) Console.WriteLine($"[Misiones] {sent} en curso enviadas al entrar.");
+            var finished = new List<int>();
+            foreach (var pair in log.Runs)
+            {
+                if (pair.Value.Finished) finished.Add(pair.Key);
+            }
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Idr, QuestProtocol.BuildJournal(doing, finished)));
+
+            Console.WriteLine($"[Misiones] Diario enviado: {doing.Count} en curso, {finished.Count} hechas.");
         }
 
         /// <summary>

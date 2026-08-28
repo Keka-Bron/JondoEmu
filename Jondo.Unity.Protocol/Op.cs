@@ -123,6 +123,37 @@ public static class Op
     /// </remarks>
     public const string Idu = "idu";
 
+    /// <summary>
+    /// El diario de misiones entero, de una vez. Es lo que rellena la ventana al entrar al mundo.
+    /// </summary>
+    /// <remarks>
+    /// Medido sobre el bloque de entrada al mundo, que trae una sola trama de 11.667 bytes:
+    ///
+    ///   f2 { f1 (repetido) : una mision EN CURSO, con la misma forma que el idu
+    ///        f3 (repetido) { f1: 1, f2: id de mision }  : una mision TERMINADA
+    ///        f4 : uno, vacio }
+    ///
+    /// En la captura van 261 del primero y 548 del segundo, que es exactamente lo que el cliente
+    /// enseña en sus dos pestanas. Los 261 ids del f1 son misiones de verdad, los 261; y de los
+    /// 548 del f3 lo son los 548.
+    ///
+    /// No confundirlo con el idu, que dice donde ha llegado UNA mision y se manda de una en una.
+    /// El bloque capturado trae las dos cosas: 261 tramas idu sueltas Y este idr con las mismas
+    /// 261 dentro. Quitar solo el idu dejaba el diario ajeno entrando igual por aqui.
+    /// </remarks>
+    public const string Idr = "idr";
+
+    /// <summary>
+    /// Los logros ganados, todos de una vez: f2 { f1 (repetido) { f2: cuando, f3: id del logro } }.
+    /// </summary>
+    /// <remarks>
+    /// 954 entradas en la captura, y los 954 ids del f3 son logros de verdad. El f2 es un numero
+    /// grande y constante por tandas —302677754146, 879988113698— que tiene pinta de fecha.
+    ///
+    /// Es la pareja de <see cref="Mfu"/>, que anuncia UNO recien ganado.
+    /// </remarks>
+    public const string Mft = "mft";
+
     /// <summary>El cliente da un objetivo por cumplido: 1:mision, 2:objetivo.</summary>
     /// <remarks>
     /// Va del cliente al servidor, comprobado por puertos y no solo por el campo del sobre. Es asi

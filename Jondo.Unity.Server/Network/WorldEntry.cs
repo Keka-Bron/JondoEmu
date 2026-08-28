@@ -125,6 +125,27 @@ namespace Jondo.Unity.Server.Network
             //
             // En su lugar va lo nuestro, desde la base: Managers.Quests.SendJournalAsync.
             Op.Idu,
+
+            // Y EL MISMO DIARIO OTRA VEZ, entero y en una sola trama. Quitar sólo el idu no cambió
+            // nada de lo que el jugador ve, porque el bloque trae las dos cosas: 261 tramas idu
+            // sueltas Y este idr con esas mismas 261 dentro, más 548 misiones dadas por terminadas.
+            //
+            //   f1 (repetido)  una misión en curso, con la forma del cuerpo del idu
+            //   f3 (repetido)  { f1: 1, f2: id de misión }, una terminada
+            //   f4             uno, vacío
+            //
+            // Los 261 ids del f1 son misiones de verdad, los 261, y los 548 del f3 también: son
+            // exactamente los dos números que el cliente escribe en sus pestañas. Con esto entrando,
+            // el jugador veía todas las de Incarnam y Astrub como hechas, ningún NPC con la marca
+            // verde encima y ninguno dispuesto a dar nada, porque para el cliente ya las tenía.
+            //
+            // En su lugar va el nuestro, con la misma forma, desde CharacterQuests.
+            Op.Idr,
+
+            // Los logros de esa cuenta: 954 entradas, y los 954 ids que llevan son logros de verdad.
+            // Es la razón de que el personaje entrara con todos los logros del jugador capturado.
+            // Todavía no se manda nada en su lugar, que es lo que ve una cuenta nueva.
+            Op.Mft,
         };
 
         /// <summary>Character id the capture belongs to. Learned from the blocks, never written down.</summary>
