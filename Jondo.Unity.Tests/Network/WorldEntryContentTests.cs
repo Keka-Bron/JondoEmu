@@ -273,5 +273,94 @@ namespace Jondo.Unity.Tests.Network
             return false;
         }
 
+
+        [Fact]
+        public void Nothing_in_the_manifest_carries_the_recorded_character()
+        {
+            if (!Available(out _)) return;
+
+            // The guard that matters, and the one that would have caught every leak this file has
+            // had. Not "is opcode X gone" — that question has been answered yes while the same data
+            // walked out through opcode Y twice — but "is the recorded character's id or name
+            // anywhere in what we are about to send".
+            //
+            // The id and the name are read out of the capture at run time rather than written here:
+            // they belong to a real player and have no business in source. That also means this
+            // test keeps working if the blocks are ever regenerated from a different session.
+            byte[] block = File.ReadAllBytes(Paths.Resolve("world_etapa1_tras_elegir_personaje.bin"));
+            byte[]? kva = RawFrames(block)
+                .Select(frame => ConnectionProtocol.ReadPayload(frame, "kva"))
+                .FirstOrDefault(payload => payload != null && payload.Length > 0);
+
+            Assert.NotNull(kva);
+
+            long id = BiggestNumberIn(kva!);
+            Assert.True(id > 0, "no se ha podido leer el id del personaje capturado");
+
+            WorldEntryContent.Load(Paths.ContentFile(Manifest));
+
+            var carrying = new List<string>();
+            foreach (var (name, _) in Blocks)
+            {
+                foreach (var row in WorldEntryContent.Rows(name))
+                {
+                    if (Contains(row.Frame, id)) carrying.Add($"{name}: {row.Opcode}");
+                }
+            }
+
+            Assert.True(carrying.Count == 0,
+                "el manifiesto sigue llevando el id del personaje grabado en: " +
+                string.Join(", ", carrying.Distinct()));
+        }
+
+        /// <summary>The largest varint anywhere in a message. The character id is the big one.</summary>
+        private static long BiggestNumberIn(byte[] payload)
+        {
+            long biggest = 0;
+            foreach (var field in ProtoMessage.Parse(payload).Fields)
+            {
+                if (field.WireType == 0) biggest = Math.Max(biggest, field.VarIntValue);
+                else if (field.WireType == 2 && field.BytesValue is { Length: > 0 })
+                {
+                    try { biggest = Math.Max(biggest, BiggestNumberIn(field.BytesValue)); }
+                    catch (Exception) { /* not a message; nothing to read */ }
+                }
+            }
+
+            return biggest;
+        }
+
+        /// <summary>Whether the frame carries that number as a varint, at any depth.</summary>
+        /// <remarks>
+        /// Searched as bytes rather than by walking the tree, because the tree walk would have to
+        /// agree with the very parser under test. A varint is a unique byte sequence, so finding it
+        /// is enough to say the number is in there.
+        /// </remarks>
+        private static bool Contains(byte[] frame, long number)
+        {
+            var needle = new List<byte>();
+            ulong left = (ulong)number;
+            do
+            {
+                byte b = (byte)(left & 0x7F);
+                left >>= 7;
+                needle.Add(left != 0 ? (byte)(b | 0x80) : b);
+            }
+            while (left != 0);
+
+            for (int i = 0; i + needle.Count <= frame.Length; i++)
+            {
+                bool hit = true;
+                for (int j = 0; j < needle.Count; j++)
+                {
+                    if (frame[i + j] != needle[j]) { hit = false; break; }
+                }
+
+                if (hit) return true;
+            }
+
+            return false;
+        }
+
     }
 }
