@@ -330,7 +330,20 @@ namespace Jondo.Unity.Server.Network
         {
             var jobs = Pb.New();
             byte[]? payload = ConnectionProtocol.ReadPayload(frame, Op.Irq);
-            if (payload == null) return jobs.Build();
+
+            // Vacío, no nulo, es el caso que hay que atrapar. ReadPayload devuelve un array de cero
+            // bytes cuando el mensaje no trae cuerpo, y NO puede devolver null porque Rebuilt usa
+            // ese mismo `!= null` para saber a qué opcode pertenece cada trama. Cuando la entrada al
+            // mundo pasó a leerse del manifiesto y esta trama se quedó sin cuerpo, el bucle de abajo
+            // no dio ni una vuelta, count se quedó en cero —lo que además silenciaba la línea de
+            // consola— y el jugador entró sin un solo oficio, con su experiencia guardada intacta en
+            // CharacterJobs y sin nadie a quien enseñársela.
+            if (payload == null || payload.Length == 0)
+            {
+                Console.WriteLine("[World] El irq viene sin cuerpo: no se puede saber qué oficios " +
+                                  "existen y el personaje entra sin ninguno.");
+                return jobs.Build();
+            }
 
             var progreso = SessionContext.State.Jobs;
             int count = 0;
@@ -360,8 +373,9 @@ namespace Jondo.Unity.Server.Network
                 }
             }
 
-            if (count > 0)
-                Console.WriteLine($"[World] {count} oficios enviados, {conNivel} con progreso.");
+            // Siempre, también con cero: un cero en el registro es lo que habría delatado el día
+            // que dejaron de salir, en vez de no imprimir nada y parecer que no había pasado nada.
+            Console.WriteLine($"[World] {count} oficios enviados, {conNivel} con progreso.");
             return jobs.Build();
         }
 

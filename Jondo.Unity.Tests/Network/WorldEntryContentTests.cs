@@ -62,7 +62,7 @@ namespace Jondo.Unity.Tests.Network
         /// </remarks>
         private static readonly HashSet<string> Rebuilt = new HashSet<string>
         {
-            "kva", "irq", "hms", "ivx", "itg",
+            "kva", "hms", "ivx", "itg",
         };
 
         private static IEnumerable<byte[]> RawFrames(byte[] block)
@@ -360,6 +360,34 @@ namespace Jondo.Unity.Tests.Network
             }
 
             return false;
+        }
+
+
+        [Fact]
+        public void The_jobs_frame_keeps_the_body_the_server_reads_from_it()
+        {
+            if (!Available(out _)) return;
+
+            // El irq es el unico que el servidor rehace Y necesita leer: su cuerpo dice QUE oficios
+            // existen y en que orden los quiere el cliente, que son datos del juego. Quitarselo dejo
+            // al personaje entrando sin un solo oficio durante horas, y sin ruido: ReadPayload
+            // devuelve un array vacio en vez de null, asi que la guarda no salto, el bucle no dio
+            // una vuelta y la linea de consola se suprimia sola al ser cero.
+            //
+            // El catalogo no vale de sustituto: la tabla Jobs trae 23 y la captura lista 20.
+            WorldEntryContent.Load(Paths.ContentFile(Manifest));
+
+            var irq = WorldEntryContent.Rows(WorldEntry.BlockAfterCharacter)
+                .FirstOrDefault(row => row.Opcode == "irq");
+
+            Assert.NotNull(irq);
+
+            byte[]? payload = ConnectionProtocol.ReadPayload(irq!.Frame, "irq");
+            Assert.NotNull(payload);
+            Assert.True(payload!.Length > 0, "el irq del manifiesto viene sin cuerpo");
+
+            int oficios = ProtoMessage.Parse(payload).Fields.Count(f => f.FieldNumber == 1);
+            Assert.Equal(20, oficios);
         }
 
     }
