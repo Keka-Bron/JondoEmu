@@ -76,6 +76,13 @@ namespace Jondo.Unity.Launcher
         //
         // El servidor se inventa un secreto en cada arranque y lo deja escrito en el perfil del
         // usuario; el lanzador lo lee de ahí. Nadie lo teclea y no sale de la máquina.
+        //
+        // CAREFUL: this is NOT checked today. The launcher sends the header and ControlApi never
+        // reads it -- see ControlApi.Autorizada, which is written and has no callers -- so the two
+        // paragraphs above describe an intention, not what happens. What actually closes the admin
+        // routes is ConRol: a token the database recognises plus the administrator role. Spelled out
+        // because taking this section at its word led to believing the channel was shut when what
+        // shuts it is something else entirely.
 
         /// <summary>Dónde vive el secreto: en el perfil, junto a las preferencias del lanzador.</summary>
         public static string FicheroDelSecreto => Path.Combine(

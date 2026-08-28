@@ -45,6 +45,24 @@ namespace Jondo.Unity.Server.Network
         /// <summary>Reparte un secreto nuevo y lo deja escrito. Lo llama el servidor al arrancar.</summary>
         public static void NuevoSecreto() => _secreto = Contract.NuevoSecreto();
 
+        /// <summary>
+        /// Whether the request carries the secret this startup handed out.
+        /// </summary>
+        /// <remarks>
+        /// <b>Nothing calls this today</b>, and it is worth saying here because three places claimed
+        /// otherwise: HaapiServer said "without the secret this answers 403", Contract described it
+        /// as what protects these routes, and Program prints its file on every startup. None of them
+        /// reached this method, so the header the launcher sends was decoration.
+        ///
+        /// It stays unwired because enforcing it would close the remote-launcher mode, which is
+        /// supported: the launcher only sends the header if it can READ the file, and on another
+        /// machine it cannot. And it is not what matters — the admin routes go through ConRol, which
+        /// wants a token the database recognises plus the administrator role, checked server-side on
+        /// every request.
+        ///
+        /// Kept for the day this channel stops being local-only. If that day does not come, the
+        /// honest move is to delete this, _secreto, NuevoSecreto and the line in Program.
+        /// </remarks>
         private static bool Autorizada(string? traido) => Contract.MismoSecreto(traido, _secreto);
 
         // ─── Las respuestas ─────────────────────────────────────────────────────────────────

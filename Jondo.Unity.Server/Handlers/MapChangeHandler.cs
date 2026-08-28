@@ -32,6 +32,19 @@ namespace Jondo.Unity.Server.Handlers
                             LogDebug("[Map Change] Requested Map ID matches current Map ID. Ignoring transition.");
                             return;
                         }
+
+                        // The destination comes from the client, and until now that was the end of
+                        // it: whatever number arrived here was written into the session and saved.
+                        // One edited packet reached any of the 15,360 maps in the game. Walking off
+                        // an edge can only land on a map that touches this one, and MapScrolls says
+                        // which four those are -- see MapManager.IsNeighbour.
+                        if (!MapManager.IsNeighbour(SessionContext.State.MapId, requestedMapId))
+                        {
+                            Console.WriteLine($"[Map Change] Se pide saltar de {SessionContext.State.MapId} " +
+                                              $"a {requestedMapId} y no son mapas vecinos. No se hace nada.");
+                            return;
+                        }
+
                         
                         // Calculate spawn cell on the new map based on transition direction
                         string direction = "Right"; // fallback
@@ -120,8 +133,25 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     // Natively parse joi using the compiled Protobuf class
                     var joiMsg = Jondo.Unity.Protocol.Messages.joi.Parser.ParseFrom(inner);
-                    long mapId = joiMsg.Funb;
                     var pathList = joiMsg.Fune;
+
+                    // The map is NOT taken from the request. It used to be, with a comment saying
+                    // it prevented desynchronisation, and what it actually did was let a movement
+                    // packet -- the most ordinary one in the game, sent on every step -- carry any
+                    // map id it liked and be believed: written into the session, saved to the
+                    // database, and broadcast to whoever was standing there. Walking cannot change
+                    // which map you are on. That is what jos is for, and jos now checks the two
+                    // maps touch. If the client thinks it is somewhere else, the server is right.
+                    //
+                    // It has to be replaced HERE and not further down, because mapId is also what
+                    // the broadcast and the mob-collision check below go by.
+                    if (joiMsg.Funb != SessionContext.State.MapId)
+                    {
+                        Console.WriteLine($"[Movement] El cliente dice moverse en el mapa {joiMsg.Funb} " +
+                                          $"y está en el {SessionContext.State.MapId}. Se usa el del servidor.");
+                    }
+
+                    long mapId = SessionContext.State.MapId;
 
                     int lastCell = 0;
                     int orientation = Jondo.Unity.Server.Network.SessionContext.State.Orientation;
@@ -138,7 +168,6 @@ namespace Jondo.Unity.Server.Handlers
                     if (lastCell > 0)
                     {
                         Jondo.Unity.Server.Network.SessionContext.State.CellId = lastCell;
-                        Jondo.Unity.Server.Network.SessionContext.State.MapId = mapId; // Update MapId from client movement request to prevent desynchronization
                         Jondo.Unity.Server.Network.SessionContext.State.Orientation = orientation;
                         Console.WriteLine($"[Movement] Updated Jondo.Unity.Server.Network.SessionContext.State.CellId to: {lastCell}, Jondo.Unity.Server.Network.SessionContext.State.MapId to: {mapId}, and Jondo.Unity.Server.Network.SessionContext.State.Orientation to: {orientation}");
                         DatabaseManager.SaveCurrentCharacter();

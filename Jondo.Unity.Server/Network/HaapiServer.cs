@@ -169,8 +169,13 @@ namespace Jondo.Unity.Server.Network
 
             // Las rutas de mando del lanzador. Estuvieron aquí, se borraron al pasar a la ventana
             // nativa —"peso muerto con una puerta abierta encima"— y vuelven ahora que el lanzador
-            // es otro proceso y no puede llamar a nadie por memoria. La puerta ya no está abierta:
-            // sin el secreto que el servidor deja escrito al arrancar, esto contesta 403.
+            // es otro proceso y no puede llamar a nadie por memoria.
+            //
+            // What closes the door is ConRol, inside ControlApi: a token the database recognises plus
+            // the administrator role, checked server-side on every request. It is NOT the secret --
+            // the header is passed along and ControlApi never looks at it, see ControlApi.Autorizada
+            // for why. This comment used to say "without the secret this answers 403", and that was
+            // simply untrue.
             var deControl = ControlApi.Responder(path, req.HttpMethod, body, req.Headers[Contract.Cabecera], clientIp);
             if (deControl != null)
             {

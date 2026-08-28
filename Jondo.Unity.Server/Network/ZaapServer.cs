@@ -319,6 +319,23 @@ namespace Jondo.Unity.Server.Network
                                         length = BitConverter.ToInt64(extLen, 0);
                                     }
 
+                                    // The cap, BEFORE the allocation. With payloadLen == 127 the
+                                    // length is eight bytes the client chooses, and the whole array
+                                    // was reserved here before a single body byte had been read:
+                                    // sending 0x7FFFFFFFFFFFFFFF and then nothing left the server
+                                    // committing memory and waiting in the loop below. It takes no
+                                    // authentication, only finishing the WebSocket upgrade, and it
+                                    // does not count against the eight-client limit.
+                                    //
+                                    // Same bar as the game frames, 8 MB: what travels here is Thrift
+                                    // of a few KB, so there is room to spare.
+                                    if (length < 0 || length > Jondo.Protocol.NetworkMessage.MaxFrameLength)
+                                    {
+                                        Console.WriteLine($"[Zaap] Trama de {length} bytes: pasa del " +
+                                                          "tope. Se cierra la conexión.");
+                                        break;
+                                    }
+
                                     byte[] maskingKey = new byte[4];
                                     if (mask)
                                     {

@@ -1186,33 +1186,13 @@ namespace Jondo.Unity.Server
             public int Role { get; set; } = Roles.PorDefecto;
         }
 
-        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (int attempts, DateTime lockTime)> _ipLockouts
-            = new System.Collections.Concurrent.ConcurrentDictionary<string, (int attempts, DateTime lockTime)>();
-
         public static bool ValidateAccountCredentials(string login, string password, string clientIp, out DbAccount? account, out string errorMessage)
         {
             account = null;
             errorMessage = "";
 
-            // 1. Anti-DDoS Lockout check
-            if (_ipLockouts.TryGetValue(clientIp, out var lockData))
-            {
-                if (lockData.attempts >= 5)
-                {
-                    double remainingSeconds = 60 - (DateTime.UtcNow - lockData.lockTime).TotalSeconds;
-                    if (remainingSeconds > 0)
-                    {
-                        errorMessage = $"[Anti-DDoS] Too many failed attempts. Temporarily locked out for {Math.Ceiling(remainingSeconds)} s.";
-                        return false;
-                    }
-                    else
-                    {
-                        _ipLockouts.TryRemove(clientIp, out _);
-                    }
-                }
-            }
-
-            // 2. Anti-SQL Injection & Input Sanitization
+            // Shape of the name first, so the throttle counts "keka" and "Keka" as one account and
+            // so a request with nothing in it never books an attempt against anybody.
             login = (login ?? "").Trim().ToLowerInvariant();
             password = (password ?? "").Trim();
 
@@ -1222,10 +1202,18 @@ namespace Jondo.Unity.Server
                 return false;
             }
 
+            // Booked BEFORE the query and before Claves.Comprueba, which is a PBKDF2 on purpose.
+            // The old check read the counter here and incremented at the bottom of the method, so
+            // parallel attempts all walked past a limit that had not been written yet and each one
+            // bought its own hash. See LoginThrottle for the other three holes.
+            if (!Managers.LoginThrottle.TryBegin(clientIp, login, DateTime.UtcNow, out errorMessage))
+            {
+                return false;
+            }
+
             if (!System.Text.RegularExpressions.Regex.IsMatch(login, @"^[a-zA-Z0-9_@.-]{3,32}$"))
             {
                 errorMessage = "The username contains invalid characters or has the wrong length (3-32 characters).";
-                RecordFailedAttempt(clientIp);
                 return false;
             }
 
@@ -1263,7 +1251,7 @@ namespace Jondo.Unity.Server
                         // claro. La base vieja se va cifrando sola según entra cada uno.
                         if (reescribir) ReescribirClave(account.Id, password);
 
-                        _ipLockouts.TryRemove(clientIp, out _);
+                        Managers.LoginThrottle.Succeeded(clientIp, login);
                         return true;
                     }
                 }
@@ -1273,7 +1261,8 @@ namespace Jondo.Unity.Server
                 Console.WriteLine($"[DatabaseManager Error] Authentication error: {ex.Message}");
             }
 
-            RecordFailedAttempt(clientIp);
+            // No counting here: the attempt was already booked at the top, which is the whole
+            // point. Reaching this line just means it stays booked.
             errorMessage = "Wrong username or password.";
             return false;
         }
@@ -1407,13 +1396,6 @@ namespace Jondo.Unity.Server
             {
                 Console.WriteLine($"[Auth] No se pudo cifrar la contraseña de {cuenta}: {ex.Message}");
             }
-        }
-
-        private static void RecordFailedAttempt(string clientIp)
-        {
-            _ipLockouts.AddOrUpdate(clientIp,
-                (1, DateTime.UtcNow),
-                (key, old) => (old.attempts + 1, DateTime.UtcNow));
         }
 
         /// <summary>

@@ -395,8 +395,14 @@ namespace Jondo.Unity.Server.Network
         {
             if (!SeRegistraElTrafico) return;
 
-            string hex = BitConverter.ToString(data, 0, length);
-            string str = Encoding.UTF8.GetString(data, 0, length).Replace("\r", "\\r").Replace("\n", "\\n");
+            // The session token goes past here in the clear, in both directions, and this file is
+            // kept for as long as the disk allows. Scrub masks the 32 hex characters it is made of
+            // and leaves every other byte alone -- see TrafficRedaction for why it is done on the
+            // bytes rather than on the two strings below.
+            byte[] shown = Diagnostics.TrafficRedaction.Scrub(data, length);
+
+            string hex = BitConverter.ToString(shown, 0, length);
+            string str = Encoding.UTF8.GetString(shown, 0, length).Replace("\r", "\\r").Replace("\n", "\\n");
             LogFile.Traffic.Write(
                 $"[{DateTime.Now:HH:mm:ss.fff}] {direction} ({length} bytes)\nHex: {hex}\nStr: {str}\n" +
                 "--------------------------------------------------\n");
