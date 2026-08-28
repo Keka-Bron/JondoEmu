@@ -373,6 +373,7 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static async Task OnMapEnteredAsync(NetworkStream stream, long mapId, int subAreaId)
         {
+            bool advanced = false;
             var log = Log;
             if (log != null && _book != null && mapId != 0)
             {
@@ -386,7 +387,11 @@ namespace Jondo.Unity.Server.Managers
                         bool here = objective.DiscoverMapId == mapId
                                     || (subAreaId != 0 && objective.DiscoverAreaId == subAreaId);
 
-                        if (here) await TickAsync(stream, run.QuestId, objective.Id);
+                        if (here)
+                        {
+                            await TickAsync(stream, run.QuestId, objective.Id);
+                            advanced = true;
+                        }
                     }
 
                     // And the free-text ones that are an arrival: "Pénétrer dans l'antre du
@@ -399,11 +404,16 @@ namespace Jondo.Unity.Server.Managers
                         if (binding.MapId != mapId) continue;
 
                         await CloseAsync(stream, binding);
+                        advanced = true;
                     }
                 }
             }
 
-            await SendMarksAsync(stream, mapId);
+            // Only when arriving actually finished something. The marks for this map went out
+            // BEFORE the actor list, which is where the captures put them -- see the caller in
+            // GameNodeProxy. Sending them again here every time would be a second frame per step
+            // saying exactly what the first one said.
+            if (advanced) await SendMarksAsync(stream, mapId);
         }
 
         /// <summary>
@@ -499,7 +509,18 @@ namespace Jondo.Unity.Server.Managers
             if (log == null || _book == null || mapId == 0) return;
 
             var here = Npcs.OnMap(mapId);
-            if (here.Count == 0) return;
+            if (here.Count == 0)
+            {
+                // An EMPTY frame, not silence. "iom (0)" is what the real server sends on entering
+                // a map with nobody to mark, and it turns up in 20 of the captures -- every single
+                // map load has one. Saying nothing is not the same thing: the client would go on
+                // drawing whatever the previous map told it, so a mark could follow the player
+                // around. The payload is genuinely zero bytes, map id included, which is why this
+                // does not go through BuildQuestMarks.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Iom, Array.Empty<byte>()));
+                return;
+            }
 
             var marks = new List<(long Actor, IReadOnlyList<int> Quests)>(here.Count);
             foreach (var npc in here)

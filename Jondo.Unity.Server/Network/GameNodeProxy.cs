@@ -348,6 +348,19 @@ namespace Jondo.Unity.Server.Network
                     // no avatar, no NPCs, no monsters.
                     if (here != null)
                     {
+                        // The green marks go out FIRST, before the actor list. That is not a style
+                        // choice: in all 20 captures that load a map, iom comes before jss and
+                        // never after -- empty ones and full ones alike, "iom (0)" then "jss
+                        // (3589)", "iom (96)" then "jss (3895)". This server sent it after the
+                        // actors were complete, and the client drew nothing, which is exactly what
+                        // it looks like when the marks arrive for a map the client considers
+                        // finished. Same frames, same contents, wrong side of the actor list.
+                        //
+                        // Nothing open survives a map change either: otherwise the X of the new
+                        // map's zaap is taken by a conversation the player left behind.
+                        NpcHandler.Forget();
+                        await Managers.Quests.SendMarksAsync(stream, GameState.MapId);
+
                         byte[] actors = ConnectionProtocol.Push(Op.Jss,
                             ConnectionProtocol.BuildMapActors(GameState.MapId, here,
                                                               GameState.CellId, GameState.Orientation,
@@ -370,7 +383,7 @@ namespace Jondo.Unity.Server.Network
                             ConnectionProtocol.BuildActorsComplete());
 
                         // Y lo que depende de haber llegado aquí: los objetivos que se cumplen
-                        // pisando un mapa o una zona, y la marca verde de este mapa.
+                        // pisando un mapa o una zona.
                         //
                         // AQUÍ y no en MapLoadHandler, que es donde estaba y no servía. El kkr que
                         // atiende aquel sólo llega en la carga inicial del mundo; andar de un mapa
@@ -379,10 +392,6 @@ namespace Jondo.Unity.Server.Network
                         // las marcas, así que el NPC que sí tenía una misión que dar salía sin la
                         // exclamación encima. Este bloque, en cambio, es por donde pasan las cinco
                         // formas de llegar a un mapa, porque el cliente siempre pide los actores.
-                        // Nada abierto sobrevive a un cambio de mapa: si no, la X del zaap del
-                        // mapa nuevo se la queda una conversación que el jugador dejó atrás.
-                        NpcHandler.Forget();
-
                         var mapaInfo = MapManager.GetMapInfo(GameState.MapId);
                         await Managers.Quests.OnMapEnteredAsync(stream, GameState.MapId,
                                                                 mapaInfo?.SubAreaId ?? 0);

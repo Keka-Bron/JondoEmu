@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Xunit;
 
@@ -111,6 +113,42 @@ namespace Jondo.Unity.Tests.Protocol
 
             Assert.Contains("cf13", built);        // quest 2511, packed
             Assert.Contains("81a09073", built);    // map 241438721
+        }
+
+        [Fact]
+        public void The_captured_mark_is_rebuilt_byte_for_byte()
+        {
+            // Not "contains" this time: the whole frame, against the one Ankama's server sent.
+            //
+            // Taken from "hablar con NPC y aceptar una mision.pcapng", the S->C stream, frame 13 --
+            // the iom that lands right after the ief that starts the quest. Map 219417090, one
+            // actor, one quest offered.
+            //
+            // Worth pinning whole because of f4: the actor id is -20000, and NPC ids are NEGATIVE.
+            // Every earlier test here asserts on a substring, so all of them would still pass if
+            // the sign were dropped or the ten-byte encoding of a negative int64 came out short --
+            // and the client would then have a mark for an actor that is not on the map, which
+            // draws nothing at all and looks exactly like the server never sent anything.
+            //
+            //   0a16                          f1, 22 bytes
+            //     120f                          f2, 15 bytes: one actor
+            //       1202 fb12                     f2, packed: varint 2427
+            //       20 e0e3feffffffffffff01       f4: -20000
+            //     18 8294d068                   f3: map 219417090
+            Assert.Equal("0a16120f1202fb1220e0e3feffffffffffff01188294d068",
+                         Hex(QuestProtocol.BuildQuestMarks(
+                             219417090, new[] { (-20000L, (IReadOnlyList<int>)new[] { 2427 }) })));
+        }
+
+        [Fact]
+        public void The_first_npc_of_a_map_gets_the_id_the_capture_shows()
+        {
+            // The other half of the same frame. -20000 is not a number this project chose: it is
+            // what the real server put in f4 for the first NPC of that map, and ActorIds hands out
+            // PrimerNpc - position. If the two ever drift apart the mark goes to nobody.
+            Assert.Equal(-20000L, ActorIds.NpcDelMapa(0));
+            Assert.Equal(-20001L, ActorIds.NpcDelMapa(1));
+            Assert.True(ActorIds.EsNpc(ActorIds.NpcDelMapa(0)));
         }
 
         [Fact]
