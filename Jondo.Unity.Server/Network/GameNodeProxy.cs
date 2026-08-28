@@ -247,9 +247,11 @@ namespace Jondo.Unity.Server.Network
                 {
                     await CharacterSelectionHandler.HandleCharacterListRequest(stream, payload, payloadStr, sessionAccountId, sessionServerId);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Kvz)))
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvz)))
                 {
-                    // Crear un personaje.
+                    // Crear un personaje. El isAuthenticated es la primera de las dos guardas: la
+                    // segunda está dentro de CreateAsync, que rechaza una cuenta sin resolver. Van
+                    // las dos porque a esta misma rama se llega también desde GameServerProxy.
                     await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }

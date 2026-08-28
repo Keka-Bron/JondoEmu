@@ -4211,7 +4211,10 @@ namespace Jondo.Unity.Server.Handlers
             jutMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = current.Id });
             await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jut", jutMsg.ToByteArray()));
 
-            ResetTurnCastCounters();
+            // Los contadores de lanzamientos ya no se vacían aquí: los vacía FightInstance.NextTurn,
+            // que es donde cambia el turno de verdad. Este método no lo llama nadie -HandleTurnReadyAck
+            // pertenece a la generación vieja de paquetes, la que el cliente de 3.6.10.10 no entiende-
+            // así que el vaciado no ocurría nunca.
 
             // Point refresh at the start of the turn. Fighter.StartTurn() already restores AP/MP on
             // the server side; this tells the client about it. With a delta of 0 the value block
@@ -4562,15 +4565,10 @@ namespace Jondo.Unity.Server.Handlers
         /// fourth cast of the fight the client already believed Frozen Arrow's 3 casts per turn
         /// were spent and disabled it, even when it was the first cast of that turn.
         /// </summary>
-        private static readonly Dictionary<long, int> _castsThisTurn = new Dictionary<long, int>();
-        private static readonly Dictionary<(long Spell, long Target), int> _castsPerTargetThisTurn
-            = new Dictionary<(long, long), int>();
-
-        public static void ResetTurnCastCounters()
-        {
-            _castsThisTurn.Clear();
-            _castsPerTargetThisTurn.Clear();
-        }
+        // Los dos diccionarios que había aquí eran estáticos del proceso entero y sólo llevaban el
+        // id del hechizo: dos jugadores en dos combates se gastaban los lanzamientos el uno al otro,
+        // y como no se vaciaban nunca, al tercero el hechizo quedaba rechazado para siempre. Ahora
+        // viven en el FightInstance, con el lanzador en la clave, y se vacían en NextTurn.
 
         private static async Task HandleSpellCastRequest(NetworkStream stream, byte[] payload)
         {
@@ -4646,15 +4644,15 @@ namespace Jondo.Unity.Server.Handlers
             long targetId = target != null ? target.Id : -1;
 
             // Cast limits, exactly as the spell declares them in the database.
-            _castsThisTurn.TryGetValue(spellId, out int castsDone);
+            fight.CastsThisTurn.TryGetValue((current.Id, spellId), out int castsDone);
             if (spellData.MaxCastPerTurn > 0 && castsDone >= spellData.MaxCastPerTurn)
             {
                 Program.LogDebug($"[FightHandler] Spell {spellId} already spent this turn ({castsDone}/{spellData.MaxCastPerTurn}).");
                 return;
             }
 
-            var perTargetKey = (spellId, targetId);
-            _castsPerTargetThisTurn.TryGetValue(perTargetKey, out int castsOnTarget);
+            var perTargetKey = (current.Id, spellId, targetId);
+            fight.CastsPerTargetThisTurn.TryGetValue(perTargetKey, out int castsOnTarget);
             if (targetId != -1 && spellData.MaxCastPerTarget > 0 && castsOnTarget >= spellData.MaxCastPerTarget)
             {
                 Program.LogDebug($"[FightHandler] Spell {spellId} already spent on that target ({castsOnTarget}/{spellData.MaxCastPerTarget}).");
@@ -4665,8 +4663,8 @@ namespace Jondo.Unity.Server.Handlers
             current.CurrentAP -= spellData.APCost;
 
             castsDone++;
-            _castsThisTurn[spellId] = castsDone;
-            if (targetId != -1) _castsPerTargetThisTurn[perTargetKey] = castsOnTarget + 1;
+            fight.CastsThisTurn[(current.Id, spellId)] = castsDone;
+            if (targetId != -1) fight.CastsPerTargetThisTurn[perTargetKey] = castsOnTarget + 1;
 
             Program.LogDebug($"[FightHandler] {(isWeapon ? "Weapon hit" : $"Player cast spell {spellId}")} " +
                              $"on cell {targetCell} (costs {spellData.APCost} AP, {current.CurrentAP} left, " +

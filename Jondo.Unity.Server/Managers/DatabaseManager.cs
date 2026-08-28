@@ -219,6 +219,24 @@ namespace Jondo.Unity.Server
                 //
                 // Y si esas dos cuentas ya existían de antes, se les pone el rol: son las de los
                 // dos que llevan el servidor. Al resto no se le toca nada.
+                //
+                // DECIDIDO A PROPÓSITO, 28/08/2026, y anotado aquí porque una revisión lo señala
+                // cada vez que se hace. Lo que se está diciendo con estas dos líneas es: en
+                // CUALQUIER instalación de Jondo, quien consiga registrar el login «keka» o
+                // «dragonlord» es administrador en el arranque siguiente. Y /api/crear-cuenta no
+                // pide autenticación, así que en el servidor de un tercero eso lo hace cualquiera
+                // —y el README publica el nombre, de modo que no hay ni que adivinarlo—.
+                //
+                // Se acepta mientras esto sea una prueba pública en la máquina de casa, donde los
+                // cinco listeners van a loopback salvo que se ponga JONDO_PUBLIC_BIND=1 y las dos
+                // cuentas ya existen, así que el alta se rechaza. El día que alguien más lo
+                // despliegue, o el día que se abra al exterior, esto se quita: el rol se da con
+                // /api/rol desde una cuenta que ya sea administrador, que es el camino que
+                // ControlApi ya ofrece.
+                //
+                // AssertNoSeededCredentials no lo ve, y no es un descuido suyo: busca «INSERT INTO
+                // Accounts» y esto es un UPDATE. Se deja así a posta —cazarlo haría fallar la
+                // guardia por algo que hoy queremos—, pero conviene saber que ese hueco existe.
                 var duenos = authConnection.CreateCommand();
                 duenos.CommandText = "UPDATE Accounts SET Role = $admin " +
                                      "WHERE Login IN ('keka', 'dragonlord') AND Role < $admin;";

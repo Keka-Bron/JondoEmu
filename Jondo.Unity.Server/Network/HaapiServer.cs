@@ -38,7 +38,11 @@ namespace Jondo.Unity.Server.Network
                     try
                     {
                         var ctx = await _listener.GetContextAsync();
-                        _ = HandleHaapiRequestAsync(ctx);
+
+                        // Con techo. Antes se despachaba a pelo con «_ = ...», sin cola ni límite,
+                        // así que N peticiones simultáneas sumaban sus cuerpos en memoria y sus
+                        // PBKDF2 en hilos. El semáforo no rechaza a nadie: hace esperar.
+                        _ = AtenderConTechoAsync(ctx);
                     }
                     catch (Exception ex)
                     {
@@ -70,6 +74,48 @@ namespace Jondo.Unity.Server.Network
         private static bool EsLatido(string path)
             => path == Contract.Prefijo + "estado" || path == Contract.Prefijo + "activos";
 
+        /// <summary>Lo más grande que se acepta como cuerpo. El JSON mayor de estas rutas no llega a 1 KB.</summary>
+        private const int TopeDelCuerpo = 64 * 1024;
+
+        /// <summary>Cuántas peticiones se atienden a la vez.</summary>
+        /// <remarks>
+        /// Cada una puede costar un PBKDF2 —210.000 vueltas, unos 400 ms medidos— así que sin techo
+        /// un puñado de peticiones simultáneas se lleva el hilo de todos. Ocho es holgado para un
+        /// canal de mando que usa un lanzador.
+        /// </remarks>
+        private static readonly SemaphoreSlim _aLaVez = new SemaphoreSlim(8, 8);
+
+        private static async Task AtenderConTechoAsync(HttpListenerContext ctx)
+        {
+            await _aLaVez.WaitAsync();
+            try { await HandleHaapiRequestAsync(ctx); }
+            finally { _aLaVez.Release(); }
+        }
+
+        /// <summary>
+        /// El cuerpo, sin pasar de <see cref="TopeDelCuerpo"/>. Cadena vacía si se pasa.
+        /// </summary>
+        /// <remarks>
+        /// No basta con mirar Content-Length: una petición con Transfer-Encoding: chunked no lo
+        /// trae, y entonces el tope de arriba no ve nada que comparar. Aquí se cuenta lo leído de
+        /// verdad y se corta.
+        /// </remarks>
+        private static async Task<string> LeerAcotadoAsync(HttpListenerRequest req)
+        {
+            var buffer = new byte[8192];
+            using var acumulado = new MemoryStream();
+
+            while (acumulado.Length <= TopeDelCuerpo)
+            {
+                int leidos = await req.InputStream.ReadAsync(buffer, 0, buffer.Length);
+                if (leidos == 0) break;
+                acumulado.Write(buffer, 0, leidos);
+            }
+
+            if (acumulado.Length > TopeDelCuerpo) return "";
+            return (req.ContentEncoding ?? System.Text.Encoding.UTF8).GetString(acumulado.ToArray());
+        }
+
         private static async Task HandleHaapiRequestAsync(HttpListenerContext ctx)
         {
             var req = ctx.Request;
@@ -90,12 +136,33 @@ namespace Jondo.Unity.Server.Network
                 return;
             }
 
-            // Read request body if present
+            // El cuerpo, con tope y ANTES de decidir si la ruta pide token. Ese orden no se puede
+            // cambiar —hay rutas que no piden ninguno, como /api/estado— así que el tope es la única
+            // defensa: sin él, ReadToEndAsync se traga lo que le manden. HttpListener no acota el
+            // cuerpo por su cuenta (el MaxRequestBytes de http.sys es para la línea de petición y
+            // las cabeceras, no para la entidad), y ReadToEndAsync acumula en un StringBuilder y
+            // luego hace ToString(), o sea que el pico de memoria es del orden de cuatro veces lo
+            // enviado. 64 KB sobra para el JSON más grande de estas rutas.
             string body = "";
             if (req.HasEntityBody)
             {
-                using var reader = new StreamReader(req.InputStream, req.ContentEncoding);
-                body = await reader.ReadToEndAsync();
+                if (req.ContentLength64 > TopeDelCuerpo)
+                {
+                    Console.WriteLine($"[HAAPI] Cuerpo de {req.ContentLength64} bytes desde {clientIp}: " +
+                                      $"pasa del tope de {TopeDelCuerpo}. 413.");
+                    resp.StatusCode = 413;
+                    resp.Close();
+                    return;
+                }
+
+                body = await LeerAcotadoAsync(req);
+                if (body.Length == 0 && req.ContentLength64 != 0)
+                {
+                    resp.StatusCode = 413;
+                    resp.Close();
+                    return;
+                }
+
                 if (body.Length > 0 && body.Length < 1000 && !latido)
                     Console.WriteLine($"[HAAPI]  body: {Censura.Cuerpo(body)}");
             }

@@ -126,6 +126,7 @@ namespace Jondo.Unity.Server.Network
                     if (fieldNum == 2 && wireType == 2)
                     {
                         uint length = ReadVarInt(anyBytes, ref pos);
+                        if (length > (uint)(anyBytes.Length - pos)) return null;
                         payloadBytes = new byte[length];
                         Array.Copy(anyBytes, pos, payloadBytes, 0, length);
                         break;
@@ -234,6 +235,7 @@ namespace Jondo.Unity.Server.Network
                     else if (fieldNum == 2 && wireType == 2)
                     {
                         uint len = ReadVarInt(anyBytes, ref pos);
+                        if (len > (uint)(anyBytes.Length - pos)) return null;
                         valueBytes = new byte[len];
                         Array.Copy(anyBytes, pos, valueBytes, 0, len);
                         pos += (int)len;
@@ -271,6 +273,7 @@ namespace Jondo.Unity.Server.Network
                     if (fieldNum == 3 && wireType == 2)
                     {
                         uint len = ReadVarInt(fullFrame, ref pos);
+                        if (len > (uint)(fullFrame.Length - pos)) return null;
                         innerBytes = new byte[len];
                         Array.Copy(fullFrame, pos, innerBytes, 0, len);
                         isServer = true;
@@ -279,6 +282,7 @@ namespace Jondo.Unity.Server.Network
                     else if (fieldNum == 1 && wireType == 2)
                     {
                         uint len = ReadVarInt(fullFrame, ref pos);
+                        if (len > (uint)(fullFrame.Length - pos)) return null;
                         innerBytes = new byte[len];
                         Array.Copy(fullFrame, pos, innerBytes, 0, len);
                         break;
@@ -301,6 +305,7 @@ namespace Jondo.Unity.Server.Network
                     if ((isServer ? (fieldNum == 1) : (fieldNum == 2)) && wireType == 2)
                     {
                         uint len = ReadVarInt(innerBytes, ref pos);
+                        if (len > (uint)(innerBytes.Length - pos)) return null;
                         anyBytes = new byte[len];
                         Array.Copy(innerBytes, pos, anyBytes, 0, len);
                         break;

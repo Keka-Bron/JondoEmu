@@ -92,6 +92,20 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task CreateAsync(NetworkStream stream, byte[] payload, long accountId,
                                              int serverId)
         {
+            // Sin cuenta no se crea nada, y esto faltaba. La rama que llega aquí no mira
+            // isAuthenticated —la de al lado sí, y la de selección rechaza accountId<=0 y además
+            // comprueba el dueño—, CreateAsync no miraba el parámetro, y en la base AccountId es un
+            // INTEGER NOT NULL a secas: sin FOREIGN KEY a Accounts, así que la fila con cuenta 0
+            // entra y la transacción confirma. Un socket que nunca presentó su ticket podía llenar
+            // la tabla de personajes huérfanos.
+            if (accountId <= 0)
+            {
+                Console.WriteLine("[Game Node] Creación de personaje sin cuenta resuelta: no se ha " +
+                                  "presentado el ticket. Se rechaza.");
+                await RefuseAsync(stream, CreationRefused);
+                return;
+            }
+
             byte[]? kvz = ConnectionProtocol.ReadPayload(payload, Op.Kvz);
             if (kvz == null) return;
 

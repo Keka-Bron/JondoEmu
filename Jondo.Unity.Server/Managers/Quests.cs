@@ -515,6 +515,21 @@ namespace Jondo.Unity.Server.Managers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iom, QuestProtocol.BuildQuestMarks(mapId, marks)));
+
+            // Se dice en voz alta porque la ausencia de marca tiene DOS causas que se ven igual —no
+            // se ha mandado nada, o se ha mandado la lista vacía— y distinguirlas costaba abrir el
+            // registro de tráfico y decodificar el iom a mano. Con esta línea se ve de un vistazo si
+            // el NPC no tiene nada que ofrecer o si es el envío el que no llega.
+            int conMarca = 0, ofrecidas = 0;
+            foreach (var (_, quests) in marks)
+            {
+                if (quests.Count == 0) continue;
+                conMarca++;
+                ofrecidas += quests.Count;
+            }
+
+            Console.WriteLine($"[Misiones] Marcas del mapa {mapId}: {conMarca} de {marks.Count} NPCs " +
+                              $"con algo que ofrecer, {ofrecidas} misión(es).");
         }
 
         /// <summary>

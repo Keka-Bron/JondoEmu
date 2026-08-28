@@ -163,5 +163,46 @@ namespace Jondo.Unity.Tests.Network
             // The client-side reader on a server-side packet: null, not an exception.
             Assert.Null(NetworkEnvelope.ExtractMessagePayload(packet, "type.ankama.com/kqy"));
         }
+
+        [Fact]
+        public void An_inner_length_bigger_than_the_frame_allocates_nothing()
+        {
+            // The one the earlier tests missed. The 8 MB cap in NetworkMessage.MaxFrameLength is on
+            // the OUTER frame; the lengths nested inside it were read from the client and handed
+            // straight to `new byte[len]` with nothing comparing them to what was left of the
+            // buffer. Their sibling loops in ExtractGameNodePayload always had that check, which is
+            // what made the gap easy to miss: the file looked like it was already careful.
+            //
+            // Reached before any authentication: ReadFrameAsync calls GetMessageTypeUrl on the raw
+            // payload before the session handler ever sees it.
+            //
+            // f1, length = 4 billion, and eleven bytes actually present.
+            byte[] frame = new byte[] { 0x0A }
+                .Concat(Varint(4_000_000_000))
+                .Concat(new byte[] { 0x0A, 0x02, 0x08, 0x01 })
+                .ToArray();
+
+            Assert.Null(NetworkEnvelope.GetMessageTypeUrl(frame));
+            Assert.Null(NetworkEnvelope.ExtractGameNodePayload(frame));
+            Assert.Null(NetworkEnvelope.ExtractMessagePayload(frame, "type.ankama.com/kqy"));
+        }
+
+        [Theory]
+        [InlineData(3)]   // f3, the root the server replies on
+        [InlineData(1)]   // f1, the root the client sends on
+        public void A_lying_length_at_any_nesting_level_is_refused(int rootField)
+        {
+            // Same lie, one level deeper: the outer wrapper is honest and the inner one is not.
+            // Worth both roots, because GetMessageTypeUrl walks a different branch for each and the
+            // check had to be added to both.
+            byte[] inner = new byte[] { 0x0A }.Concat(Varint(3_000_000_000)).ToArray();
+            byte[] frame = new byte[] { (byte)((rootField << 3) | 2), (byte)inner.Length }
+                .Concat(inner).ToArray();
+
+            Exception? thrown = Record.Exception(() => NetworkEnvelope.GetMessageTypeUrl(frame));
+            Assert.Null(thrown);
+            Assert.Null(NetworkEnvelope.GetMessageTypeUrl(frame));
+        }
+
     }
 }

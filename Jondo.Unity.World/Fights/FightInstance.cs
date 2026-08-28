@@ -29,6 +29,27 @@ namespace Jondo.Unity.World.Fights
         public long ChallengerLeaderId => Team0.FirstOrDefault()?.Id ?? 0;
         public long DefenderLeaderId { get; set; } = -20000;
 
+        /// <summary>
+        /// Cuántas veces ha lanzado cada uno cada hechizo en el turno que corre.
+        /// </summary>
+        /// <remarks>
+        /// DEL COMBATE, y con el lanzador en la clave. Estaban en dos diccionarios ESTÁTICOS de
+        /// FightHandler indexados sólo por el id del hechizo, así que con dos clientes peleando a la
+        /// vez los lanzamientos de uno contaban contra los del otro en cuanto compartían hechizo
+        /// —los ids de hechizo se repiten entre jugadores—.
+        ///
+        /// Y peor: no se vaciaban nunca. Lo único que los limpiaba estaba dentro de un método sin un
+        /// solo llamante, así que al tercer lanzamiento del PROCESO —sumando todos los jugadores y
+        /// todos los combates— el hechizo quedaba rechazado con «ya gastado este turno» para todo el
+        /// mundo hasta reiniciar el servidor.
+        /// </remarks>
+        public Dictionary<(long Caster, long Spell), int> CastsThisTurn { get; }
+            = new Dictionary<(long, long), int>();
+
+        /// <summary>Lo mismo, por objetivo: el tope de lanzamientos sobre la misma criatura.</summary>
+        public Dictionary<(long Caster, long Spell, long Target), int> CastsPerTargetThisTurn { get; }
+            = new Dictionary<(long, long, long), int>();
+
         public List<Fighter> TurnOrder { get; private set; } = new List<Fighter>();
         public int CurrentTurnIndex { get; private set; } = 0;
         public Fighter CurrentFighter => TurnOrder.Count > 0 ? TurnOrder[CurrentTurnIndex] : null;
@@ -397,6 +418,12 @@ namespace Jondo.Unity.World.Fights
         {
             CancelTurnTimer();
             StartsNewRound = false;
+
+            // Aquí es donde cambia el turno de verdad, así que aquí se vacían los contadores. Antes
+            // se vaciaban en ResetTurnCastCounters, que sólo llama HandleTurnReadyAck, que no llama
+            // nadie: eran la única prueba escrita de una intención que no se cumplía.
+            CastsThisTurn.Clear();
+            CastsPerTargetThisTurn.Clear();
             CheckFightEnd();
             if (State == FightState.Ended) return null;
 
