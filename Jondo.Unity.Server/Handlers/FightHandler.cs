@@ -54,6 +54,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (esSuyo) _activeFights.TryRemove(par.Key, out _);
             }
 
+            // Save the roleplay location before GameState is moved to an arena placement cell.
+            // The previous code saved fight.Team0[0].CellId later, so arena cell 177 was restored
+            // on roleplay map 197918724 even though that cell is not walkable there.
+            var sessionState = Network.SessionContext.State;
+            RememberRoleplayReturn(sessionState, mapId, sessionState.CellId);
+
             GameState.IsInFight = true;
             GameState.CurrentFightMobId = mobGroup.MobId;
 
@@ -250,12 +256,6 @@ namespace Jondo.Unity.Server.Handlers
             GameState.CellId = fight.Team0.Count > 0 ? fight.Team0[0].CellId : GameState.CellId;
             fight.HasLoadedMap = false;
 
-            // De dónde se salió, para poder volver. El mapa de combate es de instancia y no vale
-            // como sitio donde dejar al personaje.
-            var suyo = Network.SessionContext.State;
-            suyo.RoleplayMapId = fight.RoleplayMapId;
-            suyo.RoleplayCellId = fight.Team0.Count > 0 ? fight.Team0[0].CellId : 0;
-
             // Sin guardar el personaje: el mapa de combate es un mapa de instancia y dejarlo escrito
             // en la ficha lo devolvería ahí al volver a entrar, a un sitio del que no se sale.
             //
@@ -366,8 +366,12 @@ namespace Jondo.Unity.Server.Handlers
 
             suyo.IsInFight = false;
             suyo.MapId = suyo.RoleplayMapId;
-            if (suyo.RoleplayCellId != 0) suyo.CellId = suyo.RoleplayCellId;
+            int storedCell = suyo.RoleplayCellId;
+            suyo.CellId = SafeRoleplayReturnCell(suyo.RoleplayMapId, storedCell);
             DatabaseManager.SaveCurrentCharacter();
+
+            Program.LogDebug($"[Fight] Returning character {suyo.CharacterId} to roleplay map " +
+                             $"{suyo.MapId}, cell {suyo.CellId} (stored cell {storedCell}).");
 
             suyo.RoleplayMapId = 0;
             suyo.RoleplayCellId = 0;
@@ -384,6 +388,28 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             Program.LogDebug("[Combate] Fuera del combate; el personaje vuelve al mapa de superficie.");
+        }
+
+        /// <summary>
+        /// Stores the surface location before the session is moved into its fight arena.
+        /// </summary>
+        internal static void RememberRoleplayReturn(SessionState state, long mapId, int cellId)
+        {
+            state.RoleplayMapId = mapId;
+            state.RoleplayCellId = SafeRoleplayReturnCell(mapId, cellId);
+
+            if (state.RoleplayCellId != cellId)
+            {
+                Program.LogDebug($"[Fight] Roleplay cell {cellId} is not walkable on map {mapId}; " +
+                                 $"return cell {state.RoleplayCellId} was stored instead.");
+            }
+        }
+
+        /// <summary>Returns a valid surface cell, falling back near the map centre.</summary>
+        internal static int SafeRoleplayReturnCell(long mapId, int cellId)
+        {
+            int target = cellId is >= 0 and <= 559 ? cellId : TeleportHandler.MapCentre;
+            return MapManager.GetNearestWalkableCell(mapId, target);
         }
 
         /// <summary>
