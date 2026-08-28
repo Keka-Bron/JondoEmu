@@ -74,8 +74,39 @@ namespace Jondo.Unity.Server.Handlers
 
                 LogDebug($"[Inventory] Client requested to equip/move Item UID {itemUid} (qty {quantity}) to position {newPosition}");
 
+                var rejection = Managers.Equipment.ValidateMove(
+                    itemUid, newPosition, SessionContext.State.CharacterLevel,
+                    out int requiredLevel, out int itemType);
+                if (rejection != Managers.Equipment.MoveRejection.None)
+                {
+                    var current = Managers.Equipment.ByUid(itemUid);
+                    if (current != null)
+                    {
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            BuildIryPacket(itemUid, current.Position));
+                    }
+
+                    int message = rejection == Managers.Equipment.MoveRejection.LevelTooLow
+                        ? Managers.InfoMessages.CharacterLevelTooLow
+                        : Managers.InfoMessages.RequirementsNotMet;
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        Network.ConnectionProtocol.Push(Op.Lqn,
+                            Network.ConnectionProtocol.BuildInfoMessage(
+                                Managers.InfoMessages.Warning, message)));
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Luy), Array.Empty<byte>()));
+
+                    LogDebug($"[Inventory] Rejected Item UID {itemUid} -> {newPosition}: {rejection} " +
+                             $"(level {SessionContext.State.CharacterLevel}/{requiredLevel}, type {itemType})");
+                    return;
+                }
+
                 // 1. Process equipment change in memory (updates equipped cache)
-                ProcessEquipmentChange(itemUid, newPosition);
+                if (!ProcessEquipmentChange(itemUid, newPosition))
+                {
+                    LogDebug($"[Inventory] Persistence rejected Item UID {itemUid} -> {newPosition}");
+                    return;
+                }
 
                 // 2. Confirm move with iry (ObjectMovementMessage)
                 byte[] iryPacket = BuildIryPacket(itemUid, newPosition);
@@ -134,18 +165,20 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── Equipment ──────────────────────────────────────────────────────────────
 
-        private static void ProcessEquipmentChange(long itemUid, int newPosition)
+        private static bool ProcessEquipmentChange(long itemUid, int newPosition)
         {
-            var item = Jondo.Unity.Server.Network.SessionContext.State.GetInventoryItem(itemUid);
-            if (item != null)
-            {
-                item.Position = newPosition;
-                DatabaseManager.SaveItemPosition(itemUid, newPosition,
-                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
+            var equipmentItem = Managers.Equipment.ByUid(itemUid);
+            if (equipmentItem == null) return false;
+            if (!DatabaseManager.SaveItemPosition(itemUid, newPosition,
+                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId)) return false;
 
-                // La cache de lo que se lleva puesto, por el unico sitio que la escribe.
-                Managers.Equipment.RememberWorn(itemUid, newPosition, item.RawEffects);
-            }
+            Managers.Equipment.Move(itemUid, newPosition);
+            var item = Jondo.Unity.Server.Network.SessionContext.State.GetInventoryItem(itemUid);
+            if (item != null) item.Position = newPosition;
+
+            // La cache de lo que se lleva puesto, por el unico sitio que la escribe.
+            Managers.Equipment.RememberWorn(itemUid, newPosition, equipmentItem.Effects);
+            return true;
         }
 
         // ─── Appearance ─────────────────────────────────────────────────────────────

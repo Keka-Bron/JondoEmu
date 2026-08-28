@@ -628,10 +628,12 @@ A new character gets:
 | Level | 1 | |
 | Kamas | 1,000,000 | so a new character can actually use the zaaps |
 | Each of the six characteristics | 101 | as if every parchment had been drunk |
-| Equipment | the Adventurer set, worn | |
+| Equipment | the Adventurer set, in the bag | its pieces require levels 4 to 9 |
 
-The Adventurer set is set 5 of the game: amulet 2478 (slot 0), ring 2475 (2), belt 2477 (3), boots
-2476 (4), hat 2474 (6), cloak 2473 (7). All six exist in `ItemTemplates`.
+The Adventurer set is set 5 of the game: amulet 2478, ring 2475, belt 2477, boots 2476, hat 2474
+and cloak 2473. All six exist in `ItemTemplates`. They start in the bag because their required
+levels range from 4 to 9; the server moves them to their proper slot only when the player equips
+them after reaching that level.
 
 Their effects are not blank. Each template's `possibleEffects` lists `rid` references into
 `ItemEffects`, and each one is resolved to `[effect, value, 0, 0]` taking the top of the dice range

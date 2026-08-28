@@ -54,6 +54,25 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (uid == 0) return;
 
+            var rejection = Managers.Equipment.ValidateMove(
+                uid, position, SessionContext.State.CharacterLevel,
+                out int requiredLevel, out int itemType);
+            if (rejection != Managers.Equipment.MoveRejection.None)
+            {
+                await RejectAsync(stream, uid, position, rejection, requiredLevel, itemType, accountId);
+                return;
+            }
+
+            // Validation established that this uid belongs to the active inventory. Persist the
+            // requested item before touching the previous occupant, so a failed write cannot
+            // unequip something else as a side effect of a rejected move.
+            if (!DatabaseManager.SaveItemPosition(uid, position, SessionContext.State.CharacterId))
+            {
+                await RejectAsync(stream, uid, position,
+                    Managers.Equipment.MoveRejection.UnknownItem, requiredLevel, itemType, accountId);
+                return;
+            }
+
             // En un hueco cabe uno. Lo que hubiera puesto sale a la bolsa antes de que entre lo
             // nuevo, y se le manda su propio ivq: sin eso las dos cosas se quedaban en el mismo
             // hueco a la vez y el aspecto lo decidía la primera que se encontrase, no la que el
@@ -73,18 +92,7 @@ namespace Jondo.Unity.Server.Handlers
                                   "a la bolsa.");
             }
 
-            // The item may well not be ours: the inventory the client is showing is still the one
-            // replayed from the capture, and those uids are not in our database. The move is
-            // answered either way, which is what the real server does, and it is written down when
-            // it is an item we actually hold.
-            DatabaseManager.SaveItemPosition(uid, position, SessionContext.State.CharacterId);
             bool known = Managers.Equipment.Move(uid, position);
-
-            // Sin condicionarlo a `known`, y eso importa. Managers.Equipment.LoadFrom se traga su
-            // propia excepcion, asi que si esa lectura falla Items queda vacio mientras la cache
-            // SI se lleno al elegir personaje, que lee por otra via. A partir de ahi `known` seria
-            // false en todos los iuk y el jugador podria quitarse la ropa entera y seguir peleando
-            // con las estadisticas puestas hasta cerrar sesion.
             Managers.Equipment.RememberWorn(uid, position, Managers.Equipment.ByUid(uid)?.Effects);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -133,6 +141,35 @@ namespace Jondo.Unity.Server.Handlers
                 accountId > 0 ? accountId : SessionContext.Current.AccountId,
                 SessionContext.State.CharacterId,
                 new { uid, position, known, evicted = evictedUids });
+        }
+
+        private static async Task RejectAsync(NetworkStream stream, long uid, int requestedPosition,
+                                              Managers.Equipment.MoveRejection rejection,
+                                              int requiredLevel, int itemType, long accountId)
+        {
+            var item = Managers.Equipment.ByUid(uid);
+            if (item != null)
+            {
+                // State is authoritative. Repeating the current position also rolls back clients
+                // that optimistically drew the item in the requested slot.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ivq,
+                        Pb.New().Var(1, uid).Var(2, item.Position).Build()));
+            }
+
+            int message = rejection == Managers.Equipment.MoveRejection.LevelTooLow
+                ? Managers.InfoMessages.CharacterLevelTooLow
+                : Managers.InfoMessages.RequirementsNotMet;
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Warning, message)));
+
+            Console.WriteLine($"[Equipment] Rechazado {uid} -> {requestedPosition}: {rejection} " +
+                              $"(nivel {SessionContext.State.CharacterLevel}/{requiredLevel}, tipo {itemType}).");
+            ActivityJournal.Current.Write("equipment.rejected",
+                accountId > 0 ? accountId : SessionContext.Current.AccountId,
+                SessionContext.State.CharacterId,
+                new { uid, requestedPosition, rejection = rejection.ToString(), requiredLevel, itemType });
         }
     }
 }

@@ -37,16 +37,17 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// El conjunto del aventurero, que es el número 5 del juego: capa, sombrero, anillo, botas,
-        /// cinturón y amuleto. Van puestos, no en la bolsa.
+        /// cinturón y amuleto. Un personaje de nivel 1 todavía no cumple los niveles 4 a 9 de sus
+        /// piezas, así que las recibe en la bolsa y podrá equiparlas conforme suba.
         /// </summary>
         private static readonly (int Gid, int Slot)[] AdventurerSet =
         {
-            (2478, 0),    // amuleto
-            (2475, 2),    // anillo
-            (2477, 3),    // cinturón
-            (2476, 4),    // botas
-            (2474, 6),    // sombrero
-            (2473, 7),    // capa
+            (2478, Equipment.Bag),    // amuleto, nivel 5
+            (2475, Equipment.Bag),    // anillo, nivel 4
+            (2477, Equipment.Bag),    // cinturón, nivel 6
+            (2476, Equipment.Bag),    // botas, nivel 7
+            (2474, Equipment.Bag),    // sombrero, nivel 9
+            (2473, Equipment.Bag),    // capa, nivel 8
         };
 
         /// <summary>

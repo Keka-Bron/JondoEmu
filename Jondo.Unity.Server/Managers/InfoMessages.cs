@@ -62,6 +62,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«No tienes el nivel de oficio necesario.» Va con <see cref="Warning"/>.</summary>
         public const int JobLevelTooLow = 284;
 
+        /// <summary>«No cumples los requisitos.» Va con <see cref="Warning"/>.</summary>
+        public const int RequirementsNotMet = 1;
+
+        /// <summary>«No tienes el nivel requerido.» Va con <see cref="Warning"/>.</summary>
+        public const int CharacterLevelTooLow = 3;
+
         private static readonly Dictionary<(int Type, int Id), string> _texts = new();
 
         public static int Count => _texts.Count;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -30,6 +31,19 @@ namespace Jondo.Unity.Server.Managers
     /// </summary>
     public static class Equipment
     {
+        public enum MoveRejection
+        {
+            None,
+            UnknownItem,
+            UnknownTemplate,
+            LevelTooLow,
+            WrongSlot,
+        }
+
+        private readonly record struct TemplateRequirement(int Level, int Type, bool Exists);
+
+        private static readonly ConcurrentDictionary<int, TemplateRequirement> TemplateRequirements = new();
+
         /// <summary>
         /// Un efecto tal y como lo declara el objeto: el valor fijo y el par de dados.
         ///
@@ -128,6 +142,13 @@ namespace Jondo.Unity.Server.Managers
                     if (!reader.IsDBNull(4)) ReadEffects(reader.GetString(4), item);
 
                     if (item.Uid != 0) Items[item.Uid] = item;
+                }
+
+                var invalid = RepairInvalidEquipment();
+                if (invalid.Count > 0)
+                {
+                    Console.WriteLine($"[Equipment] {invalid.Count} objetos no cumplian el nivel " +
+                                      "o no correspondian a su hueco; se han devuelto a la bolsa.");
                 }
 
                 var doubled = RepairDoubledSlots();
@@ -282,6 +303,92 @@ namespace Jondo.Unity.Server.Managers
         public static Item? ByUid(long uid) => Items.TryGetValue(uid, out var item) ? item : null;
 
         /// <summary>
+        /// Validates a client-requested inventory move against server-owned data.
+        /// Taking an owned item off is always allowed; putting it on requires the template's
+        /// level and the slot that belongs to its item type.
+        /// </summary>
+        public static MoveRejection ValidateMove(long uid, int position, int characterLevel,
+                                                 out int requiredLevel, out int itemType)
+        {
+            requiredLevel = 0;
+            itemType = 0;
+
+            if (!Items.TryGetValue(uid, out var item)) return MoveRejection.UnknownItem;
+            if (position == Bag) return MoveRejection.None;
+
+            TemplateRequirement requirement = RequirementOf(item.Template);
+            if (!requirement.Exists) return MoveRejection.UnknownTemplate;
+
+            requiredLevel = requirement.Level;
+            itemType = requirement.Type;
+            return ValidateTemplateMove(requirement.Level, requirement.Type, position, characterLevel);
+        }
+
+        /// <summary>Pure half of <see cref="ValidateMove"/>, kept public so every slot rule is testable.</summary>
+        public static MoveRejection ValidateTemplateMove(int itemLevel, int itemType, int position,
+                                                         int characterLevel)
+        {
+            if (position == Bag) return MoveRejection.None;
+            if (!IsWorn(position) || !TypeFitsSlot(itemType, position)) return MoveRejection.WrongSlot;
+            if (characterLevel < Math.Max(1, itemLevel)) return MoveRejection.LevelTooLow;
+            return MoveRejection.None;
+        }
+
+        private static bool TypeFitsSlot(int type, int position)
+        {
+            return position switch
+            {
+                0 => type == 1,                                      // amulet
+                1 => type is 2 or 3 or 4 or 5 or 6 or 7 or 8 or 19  // weapons
+                              or 20 or 21 or 22 or 102 or 114 or 271,
+                2 or 4 => type == 9,                                 // rings
+                3 => type == 10,                                     // belt
+                5 => type == 11,                                     // boots
+                6 => type == 16,                                     // hat
+                7 => type is 17 or 81,                               // cape / backpack
+                8 => type is 18 or 121 or 301 or 331 or 332 or 333,  // pet, petsmount, mount
+                >= 9 and <= 14 => type is 23 or 151 or 217,           // dofus, trophy, prysmaradite
+                15 => type == 82,                                    // shield
+                _ => false,
+            };
+        }
+
+        private static TemplateRequirement RequirementOf(int template)
+            => TemplateRequirements.GetOrAdd(template, ReadRequirement);
+
+        private static TemplateRequirement ReadRequirement(int template)
+        {
+            try
+            {
+                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
+                    DatabaseManager.WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Type, Data FROM ItemTemplates WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", template);
+                using var reader = command.ExecuteReader();
+                if (!reader.Read()) return new TemplateRequirement(0, 0, false);
+
+                int type = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
+                int level = 1;
+                if (!reader.IsDBNull(1))
+                {
+                    using var doc = JsonDocument.Parse(reader.GetString(1));
+                    if (doc.RootElement.TryGetProperty("level", out var value) &&
+                        value.TryGetInt32(out int parsed))
+                        level = Math.Max(1, parsed);
+                }
+                return new TemplateRequirement(level, type, true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Equipment] No se pudo leer la plantilla {template}: {ex.Message}");
+                return new TemplateRequirement(0, 0, false);
+            }
+        }
+
+        /// <summary>
         /// Quita del inventario en memoria lo que se ha ido a otro sitio —al cofre del merkasako,
         /// por ejemplo—. Si quedan unidades, se resta; si no, desaparece.
         /// </summary>
@@ -362,6 +469,37 @@ namespace Jondo.Unity.Server.Managers
 
             foreach (var item in moved)
                 DatabaseManager.SaveItemPosition(item.Uid, Bag, SessionContext.State.CharacterId);
+            return moved;
+        }
+
+        /// <summary>
+        /// Repairs equipment persisted before level/type checks existed. The database, both
+        /// in-memory inventory views and the equipped-stat cache are changed together so the
+        /// repaired item cannot keep granting bonuses until the next login.
+        /// </summary>
+        private static List<Item> RepairInvalidEquipment()
+        {
+            var moved = new List<Item>();
+            int level = SessionContext.State.CharacterLevel;
+
+            foreach (var item in Items.Values)
+            {
+                if (!IsWorn(item.Position)) continue;
+                TemplateRequirement requirement = RequirementOf(item.Template);
+                MoveRejection rejected = !requirement.Exists
+                    ? MoveRejection.UnknownTemplate
+                    : ValidateTemplateMove(requirement.Level, requirement.Type, item.Position, level);
+                if (rejected == MoveRejection.None) continue;
+
+                item.Position = Bag;
+                moved.Add(item);
+                DatabaseManager.SaveItemPosition(item.Uid, Bag, SessionContext.State.CharacterId);
+
+                var legacy = GameState.GetInventoryItem(item.Uid);
+                if (legacy != null) legacy.Position = Bag;
+                RememberWorn(item.Uid, Bag, item.Effects);
+            }
+
             return moved;
         }
 
