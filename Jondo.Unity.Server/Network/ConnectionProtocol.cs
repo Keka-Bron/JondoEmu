@@ -209,12 +209,24 @@ namespace Jondo.Unity.Server.Network
                 Push(Op.Kqp),
                 Push(Op.Kvi, BuildCharactersList(characters)),
 
-                // kvd cierra la lista de personajes. Va vacío y justo detrás del kvi en la ráfaga
-                // real, y no lo mandábamos. Es el candidato a lo que tenía el botón de crear
-                // personaje apagado: el cliente recibía la lista y nada que dijera que ya está
-                // toda, así que la pantalla se quedaba a medio montar.
-                Push(Op.Kvd),
-
+                // AQUÍ NO VA UN kvd, y mandarlo era lo que tenía muerta media pantalla.
+                //
+                // Se metió a ojo, con el razonamiento de que «cierra la lista de personajes» y de
+                // que el botón de crear estaba apagado porque a la pantalla le faltaba el final.
+                // Suena bien y es al revés. Medido sobre las capturas: el kvd sale en TRES, y las
+                // tres son de entrar directo al mundo sin pasar por la pantalla —reconexión a un
+                // combate y koliseo—, con esta pinta:
+                //
+                //   kvi(381)  kvd(0)  ipc  kva  mft        vuelve a un combate
+                //   kra  kqu  kvd(0)  kva  ivx  hlm        koliseo, y ni siquiera hay kvi
+                //
+                // Y en la ráfaga de la pantalla de personajes de verdad NO ESTÁ: ni en la de la
+                // cuenta con cuatro personajes y el botón activo, ni en la de la cuenta vacía que
+                // crea uno, ni en la que falla por límite máximo. Las tres van kvi y detrás jtg.
+                //
+                // O sea que el kvd significa «no te pares aquí». Mandándolo siempre, el cliente
+                // montaba la pantalla como si fuera de paso: el botón de crear personaje sin vida
+                // y el de cambiar de servidor sin llevar a ninguna parte.
                 Push(Op.Jtg, BuildGiftCatalogue())
             };
             return burst;

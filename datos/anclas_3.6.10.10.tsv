@@ -24,7 +24,7 @@ krs	S2C			BuildWelcomeBurst	empty
 mgz	S2C	ContentCatalogVersionMessage	Identificador del catalogo de contenido; opaco, el cliente solo lo compara consigo mismo.	BuildWelcomeBurst	f1: 304672615
 kqp	S2C		Se envia tres veces seguidas con tres cargas distintas; significado no establecido.	BuildWelcomeBurst	f1:1, f2:1 then f1:1 then empty
 kvi	S2C	CharactersListMessage	Los personajes de la cuenta en el servidor elegido.	BuildCharactersList	f1 (rep) { f1 { f2: name, f3: level, f4 { f2 { f3: sex } }, f6: look, f7: breed }, f2: characterId }
-kvd	S2C	CharactersListEndMessage	Cierra la lista de personajes; vacio, justo detras de kvi en la rafaga real. Candidato principal a la causa del boton de crear personaje muerto.	BuildWelcomeBurst	empty
+kvd	S2C	CharacterSelectionSkipped	No te pares en la pantalla de personajes. Medido: sale en 3 capturas y las 3 son de entrar directo al mundo -reconexion a combate y koliseo-; en las 3 rafagas de pantalla de personajes NO aparece.	(no se manda)	empty
 jtg	S2C	GiftsListMessage	Catalogo de regalos de la cuenta; se envia vacio porque nuestras cuentas no tienen ninguno.	BuildGiftCatalogue	f3 (rep) { f1 { f2: name, f3 {...item...}, f6 {...description...} }, f2: id }
 kqq	C2S	LogoutRequestMessage	El cliente vuelve a la pantalla de personaje o de servidor.	GameNodeProxy	-
 kqr	S2C	LogoutResultMessage	Respuesta a kqq; despues el cliente cierra la conexion el mismo y rehace el handshake.	GameNodeProxy.BuildKqrPayload	f1: session guid, f4: 1

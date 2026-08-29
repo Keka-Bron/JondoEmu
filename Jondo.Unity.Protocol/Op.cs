@@ -949,7 +949,7 @@ public static class Op
     /// <summary>Resultado de la creacion; vacio si va bien, f2 lleva el motivo del rechazo.</summary>
     public const string Kvb = "kvb";
 
-    /// <summary>Cierra la lista de personajes; vacio, justo detras de kvi en la rafaga real. Candidato principal a la causa del boton de crear personaje muerto.</summary>
+    /// <summary>No te pares en la pantalla de personajes. Solo sale al entrar directo al mundo: reconexion a combate y koliseo. NO va en la rafaga normal.</summary>
     public const string Kvd = "kvd";
 
     /// <summary>Los personajes de la cuenta en el servidor elegido.</summary>
