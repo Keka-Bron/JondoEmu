@@ -53,21 +53,18 @@ namespace Jondo.Unity.Tests.World
         {
             if (!World()) return;
 
-            // Written down because it is a real interaction and somebody has to decide about it,
-            // not because it is a bug in either half. New characters are made at level 1 and are
-            // given the set already worn, straight into the database, so it works on day one. But
-            // the pieces ask for 4 to 9, so once a piece is taken off this check will not let it
-            // back on until the character has levelled.
-            //
-            // Two honest ways out and both are the owner's call: start characters at 9, or accept
-            // that the free set is a one-way gift.
+            // The reason the set is handed over in the BAG and not worn. Its pieces ask for 4 to 9
+            // and a new character is level 1, so giving it worn wrote the character into the
+            // database dressed in things this very check would refuse -- and the first time they
+            // took a piece off, they could not put it back.
             int highest = CharacterCreationHandler.StarterItems
                                                   .Select(i => DatabaseManager.ItemLevelRequirement(i.Gid))
                                                   .Max();
 
             Assert.Equal(9, highest);
-            Assert.True(highest > CharacterCreationHandler.StartingLevel,
-                        "si esto deja de cumplirse, el comentario de arriba sobra");
+            Assert.True(highest > CharacterCreationHandler.StartingLevel);
+            Assert.All(CharacterCreationHandler.StarterItems,
+                       item => Assert.Equal(Equipment.Bag, item.Slot));
         }
 
         [Fact]

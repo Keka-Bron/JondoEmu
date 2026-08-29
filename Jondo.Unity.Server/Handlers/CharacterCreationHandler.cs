@@ -37,16 +37,27 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// El conjunto del aventurero, que es el número 5 del juego: capa, sombrero, anillo, botas,
-        /// cinturón y amuleto. Van puestos, no en la bolsa.
+        /// cinturón y amuleto.
         /// </summary>
+        /// <remarks>
+        /// EN LA BOLSA, no puestos, y es a propósito. Las seis piezas piden entre nivel 4 y nivel
+        /// 9 —el anillo 4, el amuleto 5, el cinturón 6, las botas 7, la capa 8 y el sombrero 9— y
+        /// un personaje nuevo empieza en el 1. Dárselo puesto lo colaba por la puerta de atrás: se
+        /// escribe directo en la base, sin pasar por la comprobación de nivel que hace
+        /// EquipmentHandler, así que el personaje aparecía vistiendo cosas que no puede llevar y
+        /// en cuanto se quitaba una no podía volver a ponérsela.
+        ///
+        /// Es un regalo, no un uniforme: está en la bolsa desde el minuto uno y cada pieza se
+        /// pone cuando toca.
+        /// </remarks>
         private static readonly (int Gid, int Slot)[] AdventurerSet =
         {
-            (2478, 0),    // amuleto
-            (2475, 2),    // anillo
-            (2477, 3),    // cinturón
-            (2476, 4),    // botas
-            (2474, 6),    // sombrero
-            (2473, 7),    // capa
+            (2478, Managers.Equipment.Bag),    // amuleto, nivel 5
+            (2475, Managers.Equipment.Bag),    // anillo, nivel 4
+            (2477, Managers.Equipment.Bag),    // cinturón, nivel 6
+            (2476, Managers.Equipment.Bag),    // botas, nivel 7
+            (2474, Managers.Equipment.Bag),    // sombrero, nivel 9
+            (2473, Managers.Equipment.Bag),    // capa, nivel 8
 
             // Y el manojo de llaves, en la BOLSA y no puesto. En el juego real lo regala el
             // tutorial -la frase 1111691, «Toma este manojo de llaves magicas: te abrira las

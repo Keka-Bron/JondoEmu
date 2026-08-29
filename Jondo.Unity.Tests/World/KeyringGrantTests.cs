@@ -40,17 +40,33 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
-        public void The_rest_of_the_adventurer_set_is_still_worn()
+        public void Everything_a_new_character_gets_goes_into_the_bag()
         {
-            // The keyring must not have been added by turning everything else into bag items: the
-            // six pieces of set 5 go into slots 0, 2, 3, 4, 6 and 7.
-            var worn = CharacterCreationHandler.StarterItems
-                                               .Where(item => item.Gid != DungeonHandler.Keyring)
-                                               .ToList();
+            // Including the adventurer set, which used to arrive already worn. Its six pieces ask
+            // for level 4 to 9 and a new character is level 1, and writing them straight into the
+            // database dressed the character in things the equip check would refuse -- so the
+            // first time they took a piece off they could not put it back.
+            //
+            // A gift rather than a uniform: it sits in the bag and each piece goes on when the
+            // level says so.
+            var starter = CharacterCreationHandler.StarterItems;
 
-            Assert.Equal(6, worn.Count);
-            Assert.All(worn, item => Assert.NotEqual(Equipment.Bag, item.Slot));
-            Assert.Equal(new[] { 0, 2, 3, 4, 6, 7 }, worn.Select(i => i.Slot).OrderBy(s => s));
+            Assert.Equal(7, starter.Count);
+            Assert.All(starter, item => Assert.Equal(Equipment.Bag, item.Slot));
+        }
+
+        [Fact]
+        public void The_six_pieces_of_the_set_are_all_still_there()
+        {
+            // Moving them into the bag must not have lost any: set 5 is the amulet, ring, belt,
+            // boots, hat and cloak.
+            var set = CharacterCreationHandler.StarterItems
+                                              .Where(item => item.Gid != DungeonHandler.Keyring)
+                                              .Select(item => item.Gid)
+                                              .OrderBy(gid => gid)
+                                              .ToArray();
+
+            Assert.Equal(new[] { 2473, 2474, 2475, 2476, 2477, 2478 }, set);
         }
     }
 }
