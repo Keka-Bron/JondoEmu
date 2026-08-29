@@ -207,6 +207,49 @@ namespace Jondo.Unity.Server
                     Console.WriteLine("[DatabaseManager] Columna LauncherToken añadida a Accounts.");
                 }
 
+                // Hasta cuándo está abonada cada cuenta. Antes no existía: la fecha se calculaba al
+                // vuelo, igual para todas, y era lo mismo que tener el dato escrito en el código.
+                // Con columna propia, una cuenta puede caducar y otra no, que es lo que el cliente
+                // espera poder distinguir.
+                //
+                // Se guarda en el formato que viaja —ISO 8601 con desplazamiento numérico, nunca
+                // con Z— para que lo que hay en la base sea exactamente lo que se manda y no haya
+                // una conversión en medio donde perderlo.
+                bool tieneAbono = false;
+                var mirarAbono = authConnection.CreateCommand();
+                mirarAbono.CommandText = "PRAGMA table_info(Accounts);";
+                using (var lector = mirarAbono.ExecuteReader())
+                {
+                    while (lector.Read())
+                    {
+                        if (string.Equals(lector.GetString(1), "SubscriptionEnd", StringComparison.OrdinalIgnoreCase))
+                        {
+                            tieneAbono = true;
+                            break;
+                        }
+                    }
+                }
+                if (!tieneAbono)
+                {
+                    var anadir = authConnection.CreateCommand();
+                    anadir.CommandText = "ALTER TABLE Accounts ADD COLUMN SubscriptionEnd TEXT;";
+                    anadir.ExecuteNonQuery();
+                    Console.WriteLine("[DatabaseManager] Columna SubscriptionEnd añadida a Accounts.");
+                }
+
+                // Y las que no tengan fecha —las de antes de la columna, y las creadas antes de
+                // este arranque— empiezan con un año. Sólo las vacías: una fecha ya escrita, aunque
+                // esté caducada, es un dato y no se pisa.
+                var rellenar = authConnection.CreateCommand();
+                rellenar.CommandText =
+                    "UPDATE Accounts SET SubscriptionEnd = $hasta " +
+                    "WHERE SubscriptionEnd IS NULL OR SubscriptionEnd = '';";
+                rellenar.Parameters.AddWithValue("$hasta", Network.Subscription.DefaultEndDate());
+                int puestas = rellenar.ExecuteNonQuery();
+                if (puestas > 0)
+                    Console.WriteLine($"[DatabaseManager] {puestas} cuenta(s) sin fecha de abono; " +
+                                      $"se les pone un año.");
+
                 // Aquí se sembraban 'keka' y 'dragonlord' como ADMINISTRADOR con la clave
                 // 'test'. Toda base recién hecha nacía con dos cuentas de mando y la contraseña
                 // escrita en el código fuente, que además está publicado: quien arrancase el
@@ -1382,11 +1425,18 @@ namespace Jondo.Unity.Server
                     return false;
                 }
 
+                // El abono se escribe aquí, no se deja para el relleno del arranque siguiente. Una
+                // cuenta creada con el servidor ya en marcha nacía con la columna vacía y tiraba
+                // del valor por defecto hasta que alguien reiniciase: funcionaba, pero entonces la
+                // fecha que el jugador ve no está en ninguna parte y no se le puede cambiar.
                 var insertCmd = connection.CreateCommand();
-                insertCmd.CommandText = "INSERT INTO Accounts (Login, Password, Nickname) VALUES ($login, $pass, $nick);";
+                insertCmd.CommandText =
+                    "INSERT INTO Accounts (Login, Password, Nickname, SubscriptionEnd) " +
+                    "VALUES ($login, $pass, $nick, $hasta);";
                 insertCmd.Parameters.AddWithValue("$login", login);
                 insertCmd.Parameters.AddWithValue("$pass", Managers.Claves.Cifrar(password));
                 insertCmd.Parameters.AddWithValue("$nick", nickname);
+                insertCmd.Parameters.AddWithValue("$hasta", Network.Subscription.DefaultEndDate());
                 insertCmd.ExecuteNonQuery();
 
                 return true;
@@ -1430,6 +1480,57 @@ namespace Jondo.Unity.Server
         /// juego lo rota el cliente cada vez que arranca, y si fueran el mismo, abrir un cliente
         /// dejaría al lanzador sin sesión para la próxima vez.
         /// </summary>
+        /// <summary>
+        /// Hasta cuándo está abonada una cuenta, tal cual viaja. Cadena vacía si no hay nada.
+        /// </summary>
+        /// <remarks>
+        /// Con try/catch por la misma razón que sus vecinas: esto se pregunta en el camino de
+        /// autenticación y en cada lanzamiento del cliente, y una base a medio hacer —un primer
+        /// arranque, la integración continua, que sólo descomprime el mundo— contesta «no such
+        /// table: Accounts» lanzando. Esa excepción subiría hasta el manejador de conexiones, que
+        /// es código que corre para TODO el que se presenta. Ya pasó una vez con
+        /// GetAccountIdByToken y tumbó la integración continua entera.
+        /// </remarks>
+        public static string GetSubscriptionEnd(long accountId)
+        {
+            if (accountId <= 0) return "";
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT SubscriptionEnd FROM Accounts WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", accountId);
+                return command.ExecuteScalar() as string ?? "";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se pudo leer el abono de {accountId}: {ex.Message}");
+                return "";
+            }
+        }
+
+        /// <summary>Cambia la fecha de abono de una cuenta. Devuelve si escribió algo.</summary>
+        public static bool SetSubscriptionEnd(long accountId, string endDate)
+        {
+            if (accountId <= 0) return false;
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Accounts SET SubscriptionEnd = $hasta WHERE Id = $id;";
+                command.Parameters.AddWithValue("$hasta", endDate);
+                command.Parameters.AddWithValue("$id", accountId);
+                return command.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se pudo escribir el abono de {accountId}: {ex.Message}");
+                return false;
+            }
+        }
+
         public static void SetLauncherToken(long accountId, string token)
         {
             try
@@ -1965,6 +2066,105 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>Checks that a character really does belong to the account asking for it.</summary>
+        /// <summary>
+        /// Every table a character owns a row in. Deleting one has to empty all of them.
+        /// </summary>
+        /// <remarks>
+        /// Read off the schema rather than remembered, and kept as a list so that adding a table
+        /// without adding it here is a visible omission instead of a silent orphan. Rows left
+        /// behind would be handed to whoever inherits the id.
+        /// </remarks>
+        private static readonly string[] CharacterOwnedTables =
+        {
+            "CharacterItems", "CharacterSpellChoices", "CharacterSpellBar",
+            "HavenBag", "HavenBagFurniture", "HavenBagChest",
+            "CharacterWardrobe", "CharacterAppearance", "CharacterJobs",
+            "CharacterChallenges", "CharacterQuests", "CharacterAchievements",
+            "CharacterKeyring",
+        };
+
+        /// <summary>
+        /// Deletes a character and everything hanging off it. Returns its name, or "" if nothing
+        /// was deleted.
+        /// </summary>
+        /// <remarks>
+        /// The account is a parameter and not a courtesy: the id arrives over the wire and the only
+        /// thing standing between it and someone else's character is this check. It runs inside the
+        /// transaction, against the same connection, so it cannot be answered by a row that is
+        /// about to change.
+        ///
+        /// All or nothing. A half-deleted character -- gone from Characters, still owning items --
+        /// is worse than one that is still there, and a transaction is what keeps the thirteen
+        /// tables and the character itself on the same side of the outcome.
+        /// </remarks>
+        public static string DeleteCharacter(long characterId, long accountId)
+        {
+            if (characterId <= 0 || accountId <= 0) return "";
+
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
+
+                var owner = connection.CreateCommand();
+                owner.Transaction = transaction;
+                owner.CommandText = "SELECT Name FROM Characters WHERE Id = $id AND AccountId = $accId;";
+                owner.Parameters.AddWithValue("$id", characterId);
+                owner.Parameters.AddWithValue("$accId", accountId);
+                string name = owner.ExecuteScalar() as string ?? "";
+
+                if (name.Length == 0)
+                {
+                    Console.WriteLine($"[DatabaseManager] Character {characterId} is not on account " +
+                                      $"{accountId}; nothing deleted.");
+                    return "";
+                }
+
+                foreach (string table in CharacterOwnedTables)
+                {
+                    var cleanup = connection.CreateCommand();
+                    cleanup.Transaction = transaction;
+                    // The table names come from the constant list above, never from the wire.
+                    cleanup.CommandText = $"DELETE FROM {table} WHERE CharacterId = $id;";
+                    cleanup.Parameters.AddWithValue("$id", characterId);
+                    try
+                    {
+                        cleanup.ExecuteNonQuery();
+                    }
+                    catch (SqliteException ex)
+                    {
+                        // A table an older database does not have yet. Nothing to empty in it, and
+                        // it must not take the deletion down with it.
+                        Console.WriteLine($"[DatabaseManager] Skipping {table}: {ex.Message}");
+                    }
+                }
+
+                var remove = connection.CreateCommand();
+                remove.Transaction = transaction;
+                remove.CommandText = "DELETE FROM Characters WHERE Id = $id AND AccountId = $accId;";
+                remove.Parameters.AddWithValue("$id", characterId);
+                remove.Parameters.AddWithValue("$accId", accountId);
+                int gone = remove.ExecuteNonQuery();
+
+                if (gone == 0)
+                {
+                    transaction.Rollback();
+                    return "";
+                }
+
+                transaction.Commit();
+                Console.WriteLine($"[DatabaseManager] Deleted character {name} ({characterId}) " +
+                                  $"and its rows in {CharacterOwnedTables.Length} tables.");
+                return name;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Error deleting character {characterId}: {ex.Message}");
+                return "";
+            }
+        }
+
         public static bool CharacterBelongsToAccount(long characterId, long accountId)
         {
             if (characterId <= 0 || accountId <= 0) return false;
