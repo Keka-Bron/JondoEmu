@@ -71,7 +71,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public int CollisionDamageToBlocker { get; init; }
 
-        /// <summary>Embrujos retirados por un efecto 406 o por la retirada de un estado.</summary>
+        /// <summary>Embrujos retirados par un effet 406 ou par le retrait d'un état.</summary>
         public IReadOnlyList<Buff> BuffsQuitados { get; init; } = Array.Empty<Buff>();
 
         /// <summary>Apariencia temporal solicitada por el efecto 335, o cero.</summary>
@@ -248,7 +248,12 @@ namespace Jondo.Unity.Server.Managers
         public const int EfectoQueLanzaHechizo = EffectSupport.CastSpell;
         private const int LanzarHechizo = EfectoQueLanzaHechizo;
 
+        /// <summary>
+        /// Variante utilisée par les sorts de classe. Chez l'Ouginak, elle relie notamment
+        /// Molosse/Apaisement aux sous-sorts qui ajoutent ou retirent la Rage.
+        /// </summary>
         private const int DispararHechizo = EffectSupport.TriggerSpell;
+
         private const int QuitarEfectosDeHechizo = EffectSupport.RemoveSpellEffects;
         private const int CambiarApariencia = EffectSupport.ChangeLook;
 
@@ -428,9 +433,11 @@ namespace Jondo.Unity.Server.Managers
             var fuera = new List<Outcome>();
             if (depth > HondoMaximo) return fuera;
 
-            // Toutes les conditions d'état de ce sort sont évaluées sur le même instantané. Sans
-            // cela, un seul gain de Rage franchirait I, II puis la forme bestiale dans la même
-            // résolution au lieu d'avancer d'un seul palier.
+            // Every state condition of one spell is judged against the SAME snapshot, and Rage is
+            // why that matters: grade 1 of spell 13745 carries all three branches -- 0->I, I->II
+            // and II->beast. Without a snapshot the state the first branch sets makes the second
+            // one true inside the same resolution, then the third, and a single point of Rage
+            // walks the character straight through all three tiers.
             var estadosAlEmpezar = new Dictionary<Fighter, HashSet<int>>();
             foreach (var luchador in Todos(combat))
             {
@@ -482,7 +489,7 @@ namespace Jondo.Unity.Server.Managers
                 bool unaSolaVez = efecto.EffectId == Retroceder || efecto.EffectId == Avanzar;
 
                 foreach (var sobre in AQuien(combat, caster, target, efecto, aimedCell,
-                                              estadosAlEmpezar))
+                                             estadosAlEmpezar))
                 {
                     var hecho = Aplicar(combat, caster, sobre, spell, grade, efecto, round,
                                         aimedCell, sharedHealRoll);

@@ -12,9 +12,14 @@ namespace Jondo.Unity.Tests.Combat
     /// <see cref="EffectSupport"/>, so an effect gaining an implementation without being added here
     /// would not compile.
     ///
-    /// Measured over the 872 effects in <c>world.db</c>: 21 have code, 205 are applied as a
-    /// characteristic, and <b>646 do nothing at all</b> — and 15,348 of the 34,823 spell levels
-    /// carry at least one of those 646.
+    /// Recounted against world.db after this change, because both sides of the merge carried a
+    /// stale number: of the 872 effects, <b>24</b> now have direct code, 211 are applied as a
+    /// characteristic, and <b>637 still do nothing at all</b> — carried by 12,117 of the 34,823
+    /// spell levels.
+    ///
+    /// It was 646 doing nothing a few commits ago. The fire heal took one, and rage and the
+    /// transformation took three more: 1160 (on 6,709 spell levels, the biggest single one there
+    /// was), 406 and 335.
     /// </remarks>
     public class EffectSupportTests
     {

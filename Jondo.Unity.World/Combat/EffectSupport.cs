@@ -68,7 +68,10 @@ namespace Jondo.Unity.World.Combat
         /// <summary>Cast another spell. This is the one that makes triggers work.</summary>
         public const int CastSpell = 792;
 
-        /// <summary>Cast another spell from an ordinary class-spell effect.</summary>
+        /// <summary>
+        /// Cast another spell from an ordinary spell effect. Class mechanics use this form while
+        /// item attitudes mostly use <see cref="CastSpell"/>.
+        /// </summary>
         public const int TriggerSpell = 1160;
 
         /// <summary>Remove every buff left by one spell.</summary>

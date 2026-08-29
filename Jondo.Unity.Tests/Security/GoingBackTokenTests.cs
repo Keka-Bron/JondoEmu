@@ -29,7 +29,14 @@ namespace Jondo.Unity.Tests.Security
     /// It could never have matched by accident, either: every token this server minted was 32
     /// characters — <c>Guid "N"</c> or sixteen bytes of hex — and the auth database confirms it,
     /// with a maximum stored length of 32 in both token columns.
+    ///
+    /// Esta clase y <c>GoingBackTokenTests</c> comparten colección, y hace falta: las dos vacían y
+    /// rellenan el MISMO registro estático de lanzamientos —que es estático porque tiene que
+    /// serlo— y xUnit corre las clases en paralelo. Aquí se cruzaban sin romperse por suerte de
+    /// tiempos; en la integración continua no. Verde en d703636 y rojo en el commit siguiente,
+    /// que es justo el que añadió la segunda clase.
     /// </remarks>
+    [Collection("ClientLaunchRegistry")]
     public class GoingBackTokenTests : IDisposable
     {
         private const long Account = 91_002;
@@ -45,6 +52,23 @@ namespace Jondo.Unity.Tests.Security
             ClientLaunchRegistry.RegisterToken(Account, sessionId);
 
             Assert.Equal(Account, ClientLaunchRegistry.ResolveToken(sessionId));
+        }
+
+        [Fact]
+        public void Resolving_works_with_no_authentication_database_at_all()
+        {
+            // Where this went red and the machine it ran on was right. The lookup falls through to
+            // the Accounts table, and on a server whose auth database does not exist yet -- a first
+            // boot, a deleted file, or continuous integration, which unpacks the world and nothing
+            // else -- SQLite answers "no such table: Accounts" by throwing. That exception used to
+            // climb out of ResolveToken into the connection handler, which is code that runs for
+            // EVERY client that presents itself.
+            //
+            // Its neighbour GetAccountIdByLauncherToken had the guard and this one did not.
+            Exception? thrown = Record.Exception(
+                () => ClientLaunchRegistry.ResolveToken(Guid.NewGuid().ToString()));
+
+            Assert.Null(thrown);
         }
 
         [Fact]

@@ -1469,22 +1469,46 @@ namespace Jondo.Unity.Server
             }
         }
 
+        /// <summary>Guarda el token de juego de una cuenta, pisando el anterior.</summary>
+        /// <remarks>
+        /// Con su red por lo mismo que <see cref="GetAccountIdByToken"/>: la llaman cuatro sitios
+        /// -HAAPI dos veces, el Zaap y el canal de control-, todos dentro de atender una peticion,
+        /// y sin base de autenticacion SQLite lanza en vez de contestar. Que no se pueda guardar
+        /// el token es malo; que se lleve por delante la peticion entera es peor.
+        /// </remarks>
         public static void SetGameToken(long accountId, string token)
         {
-            using var connection = new SqliteConnection(AuthConnectionString);
-            connection.Open();
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = @"
-                UPDATE Accounts
-                SET GameToken = $token
-                WHERE Id = $id;
-            ";
-            command.Parameters.AddWithValue("$token", token);
-            command.Parameters.AddWithValue("$id", accountId);
-            command.ExecuteNonQuery();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    UPDATE Accounts
+                    SET GameToken = $token
+                    WHERE Id = $id;
+                ";
+                command.Parameters.AddWithValue("$token", token);
+                command.Parameters.AddWithValue("$id", accountId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se ha podido guardar el token de la cuenta " +
+                                  $"{accountId}: {ex.Message}");
+            }
         }
 
+        /// <summary>
+        /// Si ese token es de alguna cuenta. NO LA LLAMA NADIE.
+        /// </summary>
+        /// <remarks>
+        /// Se deja escrito porque un metodo publico que valida credenciales y no se usa se lee
+        /// como si fuera la puerta por la que se entra, y no lo es: quien resuelve un token es
+        /// ClientLaunchRegistry.ResolveToken, que mira tres sitios y no este. Si sigue sin usarse,
+        /// borrarla.
+        /// </remarks>
         public static bool ValidateGameToken(string token)
         {
             using var connection = new SqliteConnection(AuthConnectionString);
@@ -1530,15 +1554,29 @@ namespace Jondo.Unity.Server
             return null;
         }
 
+        /// <summary>
+        /// La cuenta de un token de juego. Cero si no es de nadie.
+        /// </summary>
+        /// <remarks>
+        /// Con su red, igual que <see cref="GetAccountIdByLauncherToken"/>, que está aquí al lado
+        /// y sí la tenía. Ésta no, y no era un detalle: si la base de autenticación todavía no
+        /// existe —primer arranque, o el fichero borrado— SQLite lanza «no such table: Accounts»
+        /// y la excepción sube por ResolveToken hasta el manejador de la conexión, que es código
+        /// que corre para CADA cliente que se presenta.
+        ///
+        /// Cero significa «no lo conozco», que es la respuesta correcta cuando no hay dónde
+        /// mirar. Lo destapó la integración continua, donde no hay auth.db.
+        /// </remarks>
         public static long GetAccountIdByToken(string token)
         {
             if (string.IsNullOrWhiteSpace(token)) return 0;
+
             try
             {
                 using var connection = new SqliteConnection(AuthConnectionString);
                 connection.Open();
 
-                var command = connection.CreateCommand();
+                using var command = connection.CreateCommand();
                 command.CommandText = "SELECT Id FROM Accounts WHERE GameToken = $token;";
                 command.Parameters.AddWithValue("$token", token);
                 var result = command.ExecuteScalar();
@@ -1546,10 +1584,7 @@ namespace Jondo.Unity.Server
             }
             catch (Exception ex)
             {
-                // Au démarrage et dans une installation CI vierge, auth.db peut exister avant que
-                // Initialize ait créé Accounts. Un token inconnu doit alors rester inconnu, pas
-                // faire tomber la connexion ni toute la suite de tests.
-                Console.WriteLine($"[SQLite] No se ha podido leer el token de juego: {ex.Message}");
+                Console.WriteLine($"[DatabaseManager] No se ha podido buscar el token de juego: {ex.Message}");
                 return 0;
             }
         }

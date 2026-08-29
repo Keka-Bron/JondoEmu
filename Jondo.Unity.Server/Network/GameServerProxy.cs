@@ -360,21 +360,37 @@ namespace Jondo.Unity.Server.Network
         private static string BuildAccountTag(long accountId) => (accountId % 10000).ToString("D4");
 
         /// <summary>
-        /// Fin del abono. Aquí no caduca nunca, pero el FORMATO importa.
-        ///
-        /// Iba como "2099-01-01T00:00:00Z", con Z, y el servidor real la manda con desplazamiento
-        /// numérico: 25 caracteres, "####-##-##T##:##:##+##:##". Es el mismo tropiezo que ya nos
-        /// costó la pantalla de selección de servidor con la fecha de última conexión — el cliente
-        /// no traga la Z, se queda sin fecha de abono y trata la cuenta como si no lo tuviera. Una
-        /// cuenta sin abono tiene un solo hueco de personaje, y de ahí venía el botón de crear
-        /// personaje apagado diciendo que ya estaba lleno.
-        ///
-        /// El patrón está leído de una captura real de la pantalla de creación de personaje, donde
-        /// esa cuenta tenía cuatro personajes de cinco y el botón activo.
+        /// Fin del abono: dentro de un año, contado desde ahora.
         /// </summary>
+        /// <remarks>
+        /// El formato ya se había arreglado una vez y el síntoma seguía ahí, y este comentario
+        /// contaba media historia. La media buena: si el cliente NO PUEDE LEER esta fecha, trata la
+        /// cuenta como si no tuviera abono, y una cuenta sin abono tiene UN SOLO hueco de personaje
+        /// —de ahí el botón de crear apagado diciendo que ya está lleno, con un personaje—. Aquella
+        /// vez el motivo era la Z; el servidor real manda desplazamiento numérico, 25 caracteres,
+        /// "####-##-##T##:##:##+##:##".
+        ///
+        /// La otra media es el AÑO, que se quedó en 2099 y no se puede leer tampoco:
+        ///
+        ///   2026-09-06  de la captura real   1.788.645.600 s   cabe
+        ///   2099-01-01  la nuestra           4.070.901.600 s   SE PASA
+        ///   límite de un entero de 32 bits   2.147.483.647 s = 19 de enero de 2038
+        ///
+        /// O sea el efecto 2038 de toda la vida. Todas las fechas de abono de las capturas caen a
+        /// unos ocho días vista, o son el centinela "1970-01-01T00:00Z" de la cuenta sin abono;
+        /// ninguna se acerca a 2038.
+        ///
+        /// Un año desde ahora, y no una constante: está lejos de cualquier sesión, lejos del 2038
+        /// y no hay que acordarse de tocarla. Se ha comprobado en nuestro propio registro que el
+        /// número de huecos que mandamos NO es lo que apaga el botón —a las 10:50 salió con cien
+        /// huecos y cero personajes y el cliente dejó crear uno; con uno ya creado sigue apagado
+        /// tanto con cien como con cinco—, así que lo que decide es el abono.
+        ///
+        /// Queda una inferencia y se dice: que el 2099 no se pueda leer está medido, que ESO sea
+        /// lo que apaga el botón no lo demuestra ninguna captura. Lo demuestra probarlo.
+        /// </remarks>
         private static string SubscriptionEndDate =>
-            new DateTimeOffset(2099, 1, 1, 0, 0, 0, DateTimeOffset.Now.Offset)
-                .ToString("yyyy-MM-ddTHH:mm:sszzz");
+            DateTimeOffset.Now.AddYears(1).ToString("yyyy-MM-ddTHH:mm:sszzz");
 
         /// <summary>
         /// Una trama, en crudo, al registro de tráfico.

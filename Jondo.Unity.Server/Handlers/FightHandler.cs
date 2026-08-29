@@ -680,7 +680,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>"Daños sufridos x#1%", el multiplicador que pone Represalias.</summary>
         private const int DanoSufridoPorCiento = 1163;
 
-        /// <summary>Multiplicateur de dégâts finaux infligés. Sa base est 100.</summary>
+        /// <summary>Multiplier on the final damage dealt. Its base is 100.</summary>
         private const int DanoFinalInfligidoCaracteristica = 107;
 
         // Las características que entran en la fórmula de daño, con los números del catálogo.
@@ -1938,9 +1938,9 @@ namespace Jondo.Unity.Server.Handlers
             fighter.StartTurn();
             await GivePointsBackAsync(stream, fight, fighter);
 
-            // Les fiches des buffs expirés puis celles qui rendent les PA/PM peuvent laisser le
-            // client avec une ancienne caractéristique 97. Le serveur n'a pourtant rendu aucun
-            // PV : terminer la transition par cette valeur autoritaire garde la jauge calée sur
+            // The sheets for expired buffs, and then the ones that give AP/MP back, can leave the
+            // client holding an old characteristic 97 -- and the server has given no life back at
+            // all. Closing the handover with the authoritative value keeps the bar pinned to
             // CurrentHP.
             await RefrescarLaVidaAsync(stream, fight, fighter);
 
@@ -2941,7 +2941,7 @@ namespace Jondo.Unity.Server.Handlers
                     // El Sin Corazon: curarse uno mismo vale, que le curen a uno no.
                     await ChallengeWatcher.HealedAsync(stream, fight, quienLanza, c.Sobre);
 
-                    // La fiche absolue partira une seule fois, après toutes les conséquences.
+                    // The absolute sheet goes out once, after every consequence.
                     vidasCambiadas[c.Sobre.Id] = c.Sobre;
                     continue;
                 }
@@ -2984,9 +2984,9 @@ namespace Jondo.Unity.Server.Handlers
                     continue;
                 }
 
-                // Retrait d'un état ou effet 406 (« retire les effets du sort »). C'est ce qui
-                // fait redescendre proprement la Rage et ce qui enlève immédiatement la forme
-                // bestiale avec Apaisement/Affection.
+                // A state being removed, or effect 406 ("removes the spell's effects"). This is what
+                // brings Rage back down cleanly, and what takes the beast form off at once with
+                // Apaisement/Affection.
                 bool quitaApariencia = false;
                 foreach (var quitado in c.BuffsQuitados)
                 {
@@ -3262,10 +3262,10 @@ namespace Jondo.Unity.Server.Handlers
             // centro recibirían números distintos y el jugador vería una zona que no cuadra.
             var tirada = new Dictionary<int, int>();
 
-            // La vie du client est une fiche absolue. Pour un sort à plusieurs lignes, en envoyer
-            // une entre chaque nombre de dégâts met la fiche et les animations en concurrence et
-            // peut faire remonter visuellement la barre. On mémorise donc les PV avant l'action et
-            // on n'envoie qu'une fiche définitive lorsque toutes les lignes ont été appliquées.
+            // Life reaches the client as an ABSOLUTE sheet. On a spell with several lines, sending
+            // one between each damage figure puts the sheet and the animations in a race and can
+            // make the bar visibly climb back up. So the life before the action is remembered and
+            // a single final sheet goes out once every line has been applied.
             var vidasAntes = new Dictionary<long, (Fighter Fighter, int Vida)>();
             vidasAntes[caster.Id] = (caster, caster.CurrentHP);
             foreach (var (_, _, aQuien, _) in golpes)
@@ -3458,8 +3458,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 int antes = damage;
                 damage = Math.Max(0, (int)Math.Round(damage * finalInfligido / 100.0));
-                Program.LogDebug($"[Combate] {caster.Id} inflige les dégâts finaux à " +
-                                 $"{finalInfligido}% : {antes} devient {damage}.");
+                Program.LogDebug($"[Combate] {caster.Id} pega con el daño final al " +
+                                 $"{finalInfligido}%: {antes} se queda en {damage}.");
             }
 
             // Los MULTIPLICADORES de quien lo recibe: "daños sufridos x110%" es el efecto 1163, el
