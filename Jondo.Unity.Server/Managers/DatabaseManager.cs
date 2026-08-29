@@ -578,6 +578,14 @@ namespace Jondo.Unity.Server
                 ";
                 createKeyring.ExecuteNonQuery();
 
+                // El manojo de llaves a todo el que ya tuviera personaje. Los nuevos lo reciben
+                // con el conjunto del aventurero -ver CharacterCreationHandler-, pero los que ya
+                // estaban se quedarian sin el, y sin manojo no se entra en ninguna de las 107
+                // mazmorras que lo aceptan salvo fabricando su llave.
+                //
+                // Se comprueba antes de dar, asi que arrancar dos veces no reparte dos.
+                DarElManojoALosQueYaEstaban(worldConnection);
+
                 // Y en qué hueco de la barra puso cada hechizo, por lo mismo.
                 var createSpellBar = worldConnection.CreateCommand();
                 createSpellBar.CommandText = @"
@@ -4054,6 +4062,64 @@ namespace Jondo.Unity.Server
 
         private static long _ultimoUidRepartido;
         private static readonly object _candadoDelUid = new object();
+
+        /// <summary>
+        /// Pone el manojo de llaves en la bolsa de todo personaje que no lo tenga.
+        /// </summary>
+        /// <remarks>
+        /// Los personajes nuevos lo reciben con el conjunto del aventurero. Esto es para los que ya
+        /// existian: sin manojo no se entra en ninguna de las 107 mazmorras que lo aceptan si no es
+        /// fabricando su llave suelta, y esa parte del juego se quedaba cerrada para ellos.
+        ///
+        /// Idempotente a proposito: mira quien NO lo tiene antes de dar nada, asi que arrancar el
+        /// servidor dos veces no reparte dos manojos. Y si alguien lo tira, se lo devuelve el
+        /// siguiente arranque, que para un objeto de mision que no se gasta es lo que toca.
+        /// </remarks>
+        private static void DarElManojoALosQueYaEstaban(SqliteConnection connection)
+        {
+            const int Manojo = Handlers.DungeonHandler.Keyring;
+
+            try
+            {
+                var faltan = new List<long>();
+
+                using (var buscar = connection.CreateCommand())
+                {
+                    buscar.CommandText =
+                        "SELECT c.Id FROM Characters c WHERE NOT EXISTS " +
+                        "(SELECT 1 FROM CharacterItems i WHERE i.CharacterId = c.Id AND i.Gid = $gid);";
+                    buscar.Parameters.AddWithValue("$gid", Manojo);
+
+                    using var reader = buscar.ExecuteReader();
+                    while (reader.Read()) faltan.Add(reader.GetInt64(0));
+                }
+
+                if (faltan.Count == 0) return;
+
+                string efectos = EffectsOfTemplate(connection, Manojo);
+
+                foreach (long personaje in faltan)
+                {
+                    using var dar = connection.CreateCommand();
+                    dar.CommandText = "INSERT INTO CharacterItems " +
+                                      "(CharacterId, Uid, Gid, Quantity, Position, Effects) " +
+                                      "VALUES ($id, $uid, $gid, 1, $pos, $e);";
+                    dar.Parameters.AddWithValue("$id", personaje);
+                    dar.Parameters.AddWithValue("$uid", NextItemUid());
+                    dar.Parameters.AddWithValue("$gid", Manojo);
+                    dar.Parameters.AddWithValue("$pos", Managers.Equipment.Bag);
+                    dar.Parameters.AddWithValue("$e", efectos);
+                    dar.ExecuteNonQuery();
+                }
+
+                Console.WriteLine($"[SQLite] Manojo de llaves repartido a {faltan.Count} personaje(s) " +
+                                  "que no lo tenian.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se ha podido repartir el manojo de llaves: {ex.Message}");
+            }
+        }
 
         public static long NextItemUid()
         {

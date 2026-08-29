@@ -47,7 +47,21 @@ namespace Jondo.Unity.Server.Handlers
             (2476, 4),    // botas
             (2474, 6),    // sombrero
             (2473, 7),    // capa
+
+            // Y el manojo de llaves, en la BOLSA y no puesto. En el juego real lo regala el
+            // tutorial -la frase 1111691, «Toma este manojo de llaves magicas: te abrira las
+            // puertas de las mazmorras»- y aqui se da de entrada, que es lo que se ha pedido.
+            //
+            // No se gasta al usarlo: abre las 107 mazmorras que lo aceptan, una entrada gratis
+            // por mazmorra y semana. Ver DungeonHandler y DungeonKeyring.
+            (Keyring, Managers.Equipment.Bag),
         };
+
+        /// <summary>El manojo de llaves de mazmorra, objeto 10207.</summary>
+        private const int Keyring = DungeonHandler.Keyring;
+
+        /// <summary>Con lo que sale un personaje nuevo. Para los tests, y para poder mirarlo.</summary>
+        public static IReadOnlyList<(int Gid, int Slot)> StarterItems => AdventurerSet;
 
         /// <summary>
         /// El cliente pide un nombre al azar (kvk) y espera el mismo mensaje de vuelta con uno
