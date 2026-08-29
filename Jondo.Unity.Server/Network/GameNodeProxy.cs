@@ -221,7 +221,7 @@ namespace Jondo.Unity.Server.Network
                     // and redoes the handshake with the connection server. Both ways back are
                     // handled the same: the client decides which of the two screens it lands on.
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Kqr, BuildKqrPayload()));
+                        ConnectionProtocol.Push(Op.Kqr, BuildKqrPayload(sessionAccountId)));
                     // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
                     // el de arena es de instancia y quedarse ahí es quedarse encerrado.
                     FightHandler.LeaveFight();
@@ -1142,13 +1142,45 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Reply to the "go back" request. In the capture it carries a session id and a one;
-        /// the id is generated fresh every time.
+        /// Reply to the "go back" request: a session id and a one.
         /// </summary>
-        private static byte[] BuildKqrPayload()
+        /// <remarks>
+        /// EL ID SE REGISTRA ANTES DE MANDARLO, y esto era lo que dejaba colgado «Cambiar de
+        /// servidor».
+        ///
+        /// La forma estaba bien: el servidor real manda aquí un GUID CON GUIONES, 36 caracteres
+        /// —«desde world a eleccion servidor.pcapng» abre con
+        /// <c>kqr (40) 0a24 b00dae9b-e88d-4b5c-9110-e54f3ffaeb40 2001</c>— y nosotros mandábamos
+        /// uno igual. Lo que faltaba es que el nuestro no lo conocía nadie después.
+        ///
+        /// Lo que hace el cliente con él está medido en el registro del jugador: cierra la
+        /// conexión, abre otra, y presenta ESE MISMO id como su identidad. El último que mandamos
+        /// fue b52b…16eb y es exactamente el que llegó de vuelta y rechazamos, con
+        /// «The presented token does not match any account». Todos los tokens que este servidor
+        /// acuñaba eran de 32 caracteres —Guid "N" o dieciséis bytes en hexadecimal— así que un
+        /// id de 36 no podía coincidir con ninguno por definición.
+        ///
+        /// Registrarlo no abre nada: lo acuña el servidor, va por el socket ya autenticado de esa
+        /// cuenta, y vale para lo mismo que el token de juego que ya se reparte.
+        /// </remarks>
+        private static byte[] BuildKqrPayload(long accountId)
         {
+            string sessionId = Guid.NewGuid().ToString();
+
+            if (accountId > 0)
+            {
+                ClientLaunchRegistry.RegisterToken(accountId, sessionId);
+                Console.WriteLine($"[Game Node] Vuelta atrás de la cuenta {accountId}: se le da el " +
+                                  "id de sesión y queda reconocido para cuando vuelva a conectar.");
+            }
+            else
+            {
+                Console.WriteLine("[Game Node] Vuelta atrás sin cuenta identificada: el id de sesión " +
+                                  "no se registra y la reconexión será rechazada.");
+            }
+
             return Pb.New()
-                .Str(1, Guid.NewGuid().ToString())
+                .Str(1, sessionId)
                 .Var(4, 1)
                 .Build();
         }
