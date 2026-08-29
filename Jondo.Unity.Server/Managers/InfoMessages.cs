@@ -94,6 +94,18 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public const int FreeText = 0;
 
+        /// <summary>
+        /// «No puedes tener más de <b>{0}</b> invocación(es) al mismo tiempo.» El parámetro 0
+        /// es el tope. Va con <see cref="Warning"/>.
+        /// </summary>
+        /// <remarks>
+        /// El tipo importa más de lo normal en éste: en datos/mensajes_3.6.10.10.json el id 203 de
+        /// la tabla 0 es «No tienes el nivel requerido», otra frase completamente distinta. Es el
+        /// mismo número diciendo dos cosas según con qué tipo se mande, así que mandarlo con
+        /// <see cref="Info"/> por descuido le diría al jugador que le falta nivel.
+        /// </remarks>
+        public const int SummonLimitReached = 203;
+
         private static readonly Dictionary<(int Type, int Id), string> _texts = new();
 
         public static int Count => _texts.Count;

@@ -879,6 +879,7 @@ namespace Jondo.Unity.Server.Handlers
         private static List<(int Characteristic, long Base, long Gear)> FullSheetOf(Fighter fighter,
                                                                                    bool conTraza = true)
         {
+            var summonCharacteristic = SummonCharacteristicFor(fighter);
             var ficha = new List<(int, long, long)>
             {
                 (ActionPointsCharacteristic, fighter.MaxAP, 0),
@@ -928,7 +929,9 @@ namespace Jondo.Unity.Server.Handlers
                 (18, 0, fighter.CriticalBonus),
                 (19, 0, fighter.Range),
                 (25, 0, fighter.Power),
-                (26, 0, fighter.Otra(26)), (50, 0, fighter.Otra(50)), (75, 10, fighter.Otra(75)),
+                (CaracteristicaDeInvocaciones, summonCharacteristic.Base,
+                 summonCharacteristic.Gear),
+                (50, 0, fighter.Otra(50)), (75, 10, fighter.Otra(75)),
                 // Aquí iba la 84, el daño de empuje. El servidor real NO LA MANDA: su ficha
                 // tiene 53 entradas y la 84 no está en ninguna, mientras que la 85 —la
                 // resistencia al empuje— sí. Y la metíamos justo en la posición 33, que es donde
@@ -2196,7 +2199,17 @@ namespace Jondo.Unity.Server.Handlers
                                  $"{ConBonos(caster, CriticoCaracteristica, 0, fight.RoundNumber)} del personaje).");
             }
 
-            caster.CurrentAP -= cost;
+            // The capacity refusal and AP mutation stay in one tested operation. Previously the
+            // capacity guard ran much later, when the effect was applied and AP was already gone.
+            IEnumerable<SpellEffect> castEffects = spell == 0
+                ? Array.Empty<SpellEffect>()
+                : Managers.EffectEngine.EfectosDeLaTirada(spell, grade, critico);
+            if (!await TryPayCastCostAsync(
+                    fight, caster, castEffects, cost,
+                    packet => WriteFrameAsync(stream, packet)))
+            {
+                return;
+            }
 
             caster.LanzadosEsteTurno[spell] = esteTurno + 1;
             if (aQuien != 0) caster.LanzadosPorObjetivo[(spell, aQuien)] = sobreEse + 1;
@@ -2283,14 +2296,24 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Cuántas puede llevar a la vez: la característica 26, que el cliente pinta como
-            // "Invocación" en el panel. Sale de la base más el equipo, como todo lo demás.
-            int tope = TopeDeInvocaciones(quienInvoca, fight.RoundNumber);
-            int puestas = CuantasLleva(fight, quienInvoca);
-            if (tope > 0 && puestas >= tope)
+            // Keep a defensive check for delayed or chained summon effects. Immediate casts have
+            // already crossed the preflight in CastAsync, before paying AP.
+            int limit = SummonLimitFor(quienInvoca, fight.RoundNumber);
+            int active = ActiveSummonCount(fight, quienInvoca);
+            if (limit > 0 && active >= limit)
             {
-                Program.LogDebug($"[Combate] {quienInvoca.Id} ya lleva {puestas} invocación(es) y su " +
-                                 $"tope es {tope}; no se invoca la plantilla {plantilla}.");
+                // Solo a quien invoca, y solo si es el jugador. Aqui se llega tambien desde el
+                // turno del monstruo y desde una invocacion lanzando su propio hechizo, y por esos
+                // caminos el aviso saldria igualmente por el socket del jugador: le diria que ha
+                // llegado a un tope que no es el suyo.
+                if (quienInvoca.Id == GameState.CharacterId)
+                {
+                    await SendSummonLimitWarningAsync(
+                        packet => WriteFrameAsync(stream, packet), limit);
+                }
+
+                Program.LogDebug($"[Fight] Fighter {quienInvoca.Id} already controls {active} " +
+                                 $"summon(s), at capacity {limit}; template {plantilla} was not summoned.");
                 return;
             }
 
@@ -2462,33 +2485,116 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildTeams(todos)));
         }
 
-        /// <summary>La característica 26, que el cliente pinta como "Invocación" en el panel.</summary>
+        /// <summary>Characteristic 26, displayed as summon capacity by the client.</summary>
         private const int CaracteristicaDeInvocaciones = 26;
 
+        /// <summary>Every player can control one summon before equipment and buffs.</summary>
+        internal const int BasePlayerSummonLimit = 1;
+
         /// <summary>
-        /// Cuántas invocaciones puede llevar uno a la vez: lo suyo de siempre más lo que le den el
-        /// equipo y los embrujos. Para el jugador sale de la ficha; para un monstruo, de lo que
-        /// traiga su plantilla.
+        /// Splits the innate player point from equipment, in the same base/gear columns the rest
+        /// of the combat sheet uses.
         /// </summary>
-        private static int TopeDeInvocaciones(Fighter quien, int ronda)
+        /// <remarks>
+        /// A monster reads ZERO here, and that is worth saying because the obvious reading is that
+        /// it takes the value from its template. It does not: <c>Fighter.Otras</c> is written in
+        /// exactly one place, <c>RellenarLaFicha</c>, and that runs for the player fighter and
+        /// nobody else. So <see cref="SummonLimitFor"/> returns 0 for every monster and every
+        /// summon, and the <c>limit &gt; 0</c> guard reads 0 as "no cap" -- which is the behaviour
+        /// this server already had and which this change does not alter either way.
+        ///
+        /// Left as it is on purpose rather than quietly given a number: what a monster's real
+        /// summon cap should be is not in any data this repository holds, and inventing one would
+        /// change every fight against a summoner.
+        /// </remarks>
+        internal static (long Base, long Gear) SummonCharacteristicFor(Fighter fighter)
+            => fighter.IsMonster
+                ? (0, fighter.Otra(CaracteristicaDeInvocaciones))
+                : (BasePlayerSummonLimit, fighter.Otra(CaracteristicaDeInvocaciones));
+
+        /// <summary>
+        /// Returns the simultaneous summon capacity. Player equipment is already stored in
+        /// Otras[26] by RellenarLaFicha, so reading StatsHandler again would count it twice.
+        /// </summary>
+        internal static int SummonLimitFor(Fighter fighter, int round)
         {
-            int suyo = quien.Otra(CaracteristicaDeInvocaciones);
-            if (!quien.IsMonster)
-            {
-                suyo += StatsHandler.GetEquipBonus(CaracteristicaDeInvocaciones);
-            }
-            return Math.Max(0, suyo + quien.Buffs.De(CaracteristicaDeInvocaciones, ronda));
+            int innate = fighter.IsMonster ? 0 : BasePlayerSummonLimit;
+            int equipmentOrTemplate = fighter.Otra(CaracteristicaDeInvocaciones);
+            int buffs = fighter.Buffs.De(CaracteristicaDeInvocaciones, round);
+            return Math.Max(0, innate + equipmentOrTemplate + buffs);
         }
 
-        /// <summary>Las que tiene ahora mismo en el tablero.</summary>
-        private static int CuantasLleva(FightInstance fight, Fighter quien)
+        /// <summary>Counts this fighter's living summons currently present on the board.</summary>
+        internal static int ActiveSummonCount(FightInstance fight, Fighter owner)
         {
-            int cuantas = 0;
+            int active = 0;
             foreach (var f in TodosLosCombatientes(fight))
             {
-                if (f.EsInvocado && f.IsAlive && f.Invocador == quien.Id) cuantas++;
+                if (f.EsInvocado && f.IsAlive && f.Invocador == owner.Id) active++;
             }
-            return cuantas;
+            return active;
+        }
+
+        /// <summary>
+        /// Pays a cast only after an immediate summon has passed its capacity check. Keeping the
+        /// check and the AP mutation in this method makes their ordering structural and testable.
+        /// </summary>
+        /// <remarks>
+        /// THE WHOLE CAST IS REFUSED, not just its summon half, and that is the part to argue with
+        /// if this ever looks wrong. Measured in bases/world.db: of the spell levels carrying
+        /// effect 181, 1,129 carry nothing else and <b>750 carry it alongside other effects</b> --
+        /// among them the Ocra's Baliza Tactica, spell 32467, whose effects are
+        /// [181, 6, 1103, 141, 138, 1160]. So at capacity this also refuses those five.
+        ///
+        /// That matches how the client behaves -- a summon spell greys out when you are at the
+        /// cap, which is the whole spell and not part of it -- but no capture in this repository
+        /// shows a cast attempted at capacity, so it is an inference and is named as one. What
+        /// would settle it: a capture of a player at their summon cap casting a spell that both
+        /// summons and does something else.
+        /// </remarks>
+        internal static async Task<bool> TryPayCastCostAsync(
+            FightInstance fight,
+            Fighter caster,
+            IEnumerable<SpellEffect> effects,
+            int cost,
+            Func<byte[], Task> sendAsync)
+        {
+            bool summonsImmediately = effects.Any(effect =>
+                effect.EffectId == Jondo.Unity.World.Combat.EffectSupport.Summon &&
+                effect.DiceNum > 0 &&
+                effect.Disparadores().Any(trigger =>
+                    string.Equals(trigger, Managers.EffectEngine.AlLanzar,
+                                  StringComparison.OrdinalIgnoreCase)));
+
+            if (summonsImmediately)
+            {
+                int limit = SummonLimitFor(caster, fight.RoundNumber);
+                int active = ActiveSummonCount(fight, caster);
+                if (limit > 0 && active >= limit)
+                {
+                    // Sin filtrar por quien es: aqui solo se llega desde CastAsync, que es el
+                    // lanzamiento del jugador. El filtro hace falta en InvocarAsync, que si se
+                    // alcanza desde el turno del monstruo.
+                    await SendSummonLimitWarningAsync(sendAsync, limit);
+
+                    Program.LogDebug($"[Fight] Fighter {caster.Id} cannot cast a summon: " +
+                                     $"{active} active summon(s), capacity {limit}.");
+                    return false;
+                }
+            }
+
+            caster.CurrentAP -= cost;
+            return true;
+        }
+
+        private static Task SendSummonLimitWarningAsync(Func<byte[], Task> sendAsync, int limit)
+        {
+            byte[] packet = ConnectionProtocol.Push(Op.Lqn,
+                ConnectionProtocol.BuildInfoMessage(
+                    InfoMessages.Warning,
+                    InfoMessages.SummonLimitReached,
+                    limit.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            return sendAsync(packet);
         }
 
         /// <summary>
