@@ -26,17 +26,16 @@ namespace Jondo.Unity.World.Combat
     /// </summary>
     /// <remarks>
     /// This is the information the architecture document calls the most useful thing in the whole
-    /// spell module, and the reason is effect 108 — healing. Its catalogue row carries no
-    /// characteristic, so it falls through to the panel-only branch: the spell card says the spell
-    /// heals, the animation plays, and nobody's life goes up. Nothing anywhere says so, and until
-    /// now the only way to know was to read <c>EffectEngine.cs</c>.
+    /// spell module. Effect 108 — healing — is the reason this list matters: its catalogue row
+    /// carries no characteristic, so it used to fall through to the panel-only branch even though
+    /// the spell card said that it healed. Keeping it here makes the implementation explicit.
     ///
     /// There are two ways an effect can work, and they are not the same:
     ///
     /// <code>
     ///   Direct           the engine has code for it by name — a push, a summon, a state
     ///   Characteristic   its Effects row has Characteristic > 0, so the engine applies it
-    ///                    generically without knowing what it is. 213 of 872 are like this.
+    ///                    generically without knowing what it is. 205 of 872 are like this.
     ///   PanelOnly        neither. It is drawn on the card and does nothing at all.
     /// </code>
     ///
@@ -72,6 +71,29 @@ namespace Jondo.Unity.World.Combat
         /// <summary>Summon a creature.</summary>
         public const int Summon = 181;
 
+        /// <summary>
+        /// Heal a fixed amount, of FIRE. Scaled by the element's characteristic and by the flat
+        /// Heals one.
+        /// </summary>
+        /// <remarks>
+        /// The element is not decoration and leaving it out of the name is how the other five get
+        /// forgotten. The catalogue row for 108 reads "#1{{~1~2 a }}#2 de curas de fuego" with
+        /// ElementId 2, and all 751 of its occurrences in SpellLevels declare effectElement 2 --
+        /// not one is anything else.
+        ///
+        /// Its five siblings are the same effect in the other elements and NONE of them is
+        /// implemented yet, which is worth writing down next to the one that is:
+        ///
+        /// <code>
+        ///   2998  curas de agua              92 occurrences
+        ///   2999  curas de aire              66
+        ///   3000  curas de tierra            62
+        ///   3001  curas neutrales            11
+        ///   3002  curas del mejor elemento   30
+        /// </code>
+        /// </remarks>
+        public const int FireHeal = 108;
+
         /// <summary>Heal a percentage of maximum life.</summary>
         public const int HealPercent = 1109;
 
@@ -103,7 +125,7 @@ namespace Jondo.Unity.World.Combat
             {
                 Push, Pull, StepBack, StepForward,
                 AddState, RemoveState,
-                CastSpell, Summon, HealPercent, Kill,
+                CastSpell, Summon, FireHeal, HealPercent, Kill,
             };
 
             for (int damage = FirstDamage; damage <= LastDamage; damage++) known.Add(damage);

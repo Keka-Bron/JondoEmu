@@ -72,6 +72,13 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool Apila { get; set; }
 
+        /// <summary>
+        /// An instantaneous heal waiting for <see cref="EmpiezaEnRonda"/>. The amount is resolved
+        /// when the spell is cast, like every other delayed buff, but missing-life capping is done
+        /// only when the heal becomes due.
+        /// </summary>
+        public int PendingHealPoints { get; set; }
+
         public bool Vivo(int ronda)
             => ronda >= EmpiezaEnRonda && (CaducaEnRonda < 0 || ronda < CaducaEnRonda);
     }
@@ -183,6 +190,11 @@ namespace Jondo.Unity.World.Fights
             {
                 yaEstaba.Cuanto = embrujo.Cuanto;
                 yaEstaba.CaducaEnRonda = embrujo.CaducaEnRonda;
+                if (embrujo.PendingHealPoints > 0)
+                {
+                    yaEstaba.PendingHealPoints = embrujo.PendingHealPoints;
+                    yaEstaba.EmpiezaEnRonda = embrujo.EmpiezaEnRonda;
+                }
                 return yaEstaba;
             }
 
@@ -253,6 +265,18 @@ namespace Jondo.Unity.World.Fights
             var caidos = _puestos.FindAll(e => Caducado(e, ronda));
             _puestos.RemoveAll(e => Caducado(e, ronda));
             return caidos;
+        }
+
+        /// <summary>
+        /// Removes and returns delayed one-shot heals whose start round has arrived. They must be
+        /// taken before the regular expiry sweep because a zero-duration effect expires one round
+        /// after it starts.
+        /// </summary>
+        public List<Buff> TakeDueHealing(int round)
+        {
+            var due = _puestos.FindAll(e => e.PendingHealPoints > 0 && round >= e.EmpiezaEnRonda);
+            _puestos.RemoveAll(e => e.PendingHealPoints > 0 && round >= e.EmpiezaEnRonda);
+            return due;
         }
 
         /// <summary>Si a un embrujo se le ha pasado la hora. Uno que aun no ha empezado, NO.</summary>

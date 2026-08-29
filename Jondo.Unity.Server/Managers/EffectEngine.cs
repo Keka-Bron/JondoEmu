@@ -72,6 +72,15 @@ namespace Jondo.Unity.Server.Managers
         public int CollisionDamageToBlocker { get; init; }
     }
 
+    /// <summary>A delayed one-shot heal that has just reached its activation round.</summary>
+    internal sealed class DelayedHealOutcome
+    {
+        public Fighter Target { get; init; } = null!;
+        public long CasterId { get; init; }
+        public Buff Buff { get; init; } = null!;
+        public int Healed { get; init; }
+    }
+
     /// <summary>
     /// El motor de efectos: coge las entradas del EffectsJson de un hechizo y las convierte en
     /// cosas que le pasan a alguien.
@@ -248,6 +257,74 @@ namespace Jondo.Unity.Server.Managers
 
         public static bool VaAlSuelo(int efecto) => AlSuelo.Contains(efecto);
 
+        /// <summary>Fixed healing. The element's characteristic scales the roll; 49 is flat.</summary>
+        private const int FixedHeal = EffectSupport.FireHeal;
+
+        private const int HealsCharacteristic = 49;
+
+        /// <summary>
+        /// Which characteristic scales an elemental effect, by the element the effect declares.
+        /// </summary>
+        /// <remarks>
+        /// The same numbers <c>FightHandler.CaracteristicaDelElemento</c> uses for damage, keyed on
+        /// the element id rather than on the enum, because that is what <c>SpellEffect.Element</c>
+        /// carries -- straight out of the spell's own <c>effectElement</c>, in the numbering of
+        /// <c>Effects.ElementId</c>: 0 neutral, 1 earth, 2 fire, 3 water, 4 air, 5 best.
+        ///
+        /// Written as a lookup rather than a 15 on the grounds that the 15 is only correct by
+        /// accident: it is right for the one heal that is implemented, fire, and wrong for the
+        /// five that are not. Best-element (5) falls through to strength like neutral does, which
+        /// is a placeholder and is why 3002 stays unimplemented rather than half-implemented.
+        /// </remarks>
+        /// <summary>The fighter's own points for one of the four elemental characteristics.</summary>
+        private static int StatOf(Fighter quien, int caracteristica) => caracteristica switch
+        {
+            10 => quien.Strength,
+            13 => quien.Chance,
+            14 => quien.Agility,
+            15 => quien.Intelligence,
+            _ => quien.Otra(caracteristica),
+        };
+
+        internal static int CharacteristicOfElement(int element) => element switch
+        {
+            1 => 10,   // tierra, fuerza
+            2 => 15,   // fuego, inteligencia
+            3 => 13,   // agua, suerte
+            4 => 14,   // aire, agilidad
+            _ => 10,   // neutral, y el mejor elemento de momento igual
+        };
+
+        /// <summary>Effect 1159, received healing as a percentage multiplier.</summary>
+        private const int ReceivedHealingPercent = 1159;
+
+        /// <summary>
+        /// Applies the fixed-heal formula after the shared effect roll and zone falloff.
+        /// </summary>
+        /// <remarks>
+        /// <b>The shape of this formula is an inference and is written down as one.</b> Power and
+        /// damage bonuses not participating, the flat heals landing after the multiply rather than
+        /// before it, and the received-healing multiplier going last: none of the three is measured.
+        /// There is no capture of a fixed heal anywhere in this repository -- the only healing
+        /// capture is the Ocra's percentage beacon, which takes a different path entirely.
+        ///
+        /// It follows the damage formula next door, which IS measured, and that is the whole of the
+        /// argument for it. What would settle it: a capture of a character with known Intelligence
+        /// and known "Curas" casting a 108 spell, twice, with the flat bonus changed in between.
+        /// </remarks>
+        internal static int CalculateFixedHeal(int baseHeal, int intelligence, int flatHeals,
+                                               int receivedMultiplier = 100)
+        {
+            if (baseHeal <= 0 || receivedMultiplier <= 0) return 0;
+
+            long scaled = (long)baseHeal * Math.Max(0L, 100L + intelligence) / 100L + flatHeals;
+            if (scaled <= 0) return 0;
+
+            double received = scaled * (receivedMultiplier / 100.0);
+            if (received >= int.MaxValue) return int.MaxValue;
+            return Math.Max(0, (int)Math.Round(received));
+        }
+
         /// <summary>"Cura: #1% de los PdV máximos". El dado es el porcentaje.</summary>
         private const int CuraPorcentual = EffectSupport.HealPercent;
 
@@ -314,25 +391,54 @@ namespace Jondo.Unity.Server.Managers
                                                   string disparador, int ronda, int hondo = 0,
                                                   int celdaApuntada = -1, bool critico = false)
         {
-            var fuera = new List<Outcome>();
-            if (hondo > HondoMaximo) return fuera;
+            if (hondo > HondoMaximo) return new List<Outcome>();
+            return ResolveEffects(combate, quienLanza, hechizo, grado, objetivo, disparador, ronda,
+                                  EfectosDeLaTirada(hechizo, grado, critico), hondo,
+                                  celdaApuntada);
+        }
 
-            var lista = EfectosDeLaTirada(hechizo, grado, critico);
+        /// <summary>
+        /// Runs the real effect pipeline over an explicit list. Tests inject catalogue-shaped
+        /// effects here so they exercise targeting, shared rolls, delays and HP mutation without
+        /// replacing the production database.
+        /// </summary>
+        /// <remarks>
+        /// The signature is English and the body is Spanish, and that is the house rule rather than
+        /// an oversight: this is <c>Resolver</c>, which has been here a long time, given an English
+        /// name and one new parameter so a test can inject the roll. The rule for a legacy file is
+        /// to write what you ADD in English and leave the surrounding prose alone -- a wholesale
+        /// translation makes a large diff that hides the small change inside it. So the new
+        /// parameter, the new comment about the shared heal roll, and nothing else.
+        /// </remarks>
+        internal static List<Outcome> ResolveEffects(
+            FightInstance combat, Fighter caster, int spell, int grade, Fighter target,
+            string trigger, int round, IReadOnlyList<SpellEffect> effects, int depth = 0,
+            int aimedCell = -1, Func<SpellEffect, int> rollEffect = null)
+        {
+            var fuera = new List<Outcome>();
+            if (depth > HondoMaximo) return fuera;
 
             // Los efectos que van a suertes: se sortean ANTES de recorrer nada, y los que no salen
             // se quedan fuera de esta resolución.
-            var descartados = Sortear(lista);
+            var descartados = Sortear(effects);
 
-            foreach (var efecto in lista)
+            foreach (var efecto in effects)
             {
                 if (descartados.Contains(efecto)) continue;
 
                 bool leToca = false;
                 foreach (var d in efecto.Disparadores())
                 {
-                    if (string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)) { leToca = true; break; }
+                    if (string.Equals(d, trigger, StringComparison.OrdinalIgnoreCase)) { leToca = true; break; }
                 }
                 if (!leToca) continue;
+
+                // Fixed healing follows damage's roll semantics: one effect roll is shared by all
+                // recipients in the zone, then each recipient gets its own distance falloff.
+                int sharedHealRoll = efecto.EffectId == FixedHeal
+                    ? (rollEffect != null ? rollEffect(efecto)
+                                          : DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value))
+                    : int.MinValue;
 
                 // Lo que se pone EN EL SUELO no busca a nadie: va a la casilla, esté quien esté.
                 //
@@ -343,8 +449,8 @@ namespace Jondo.Unity.Server.Managers
                 // la lista estaban bien; lo que no llegaba era la orden.
                 if (VaAlSuelo(efecto.EffectId))
                 {
-                    var puesta = Aplicar(combate, quienLanza, quienLanza, hechizo, grado, efecto,
-                                         ronda, celdaApuntada);
+                    var puesta = Aplicar(combat, caster, caster, spell, grade, efecto,
+                                         round, aimedCell, sharedHealRoll);
                     if (puesta != null) fuera.Add(puesta);
                     continue;
                 }
@@ -355,10 +461,10 @@ namespace Jondo.Unity.Server.Managers
                 // alcanzara a tres bichos movería al lanzador tres veces.
                 bool unaSolaVez = efecto.EffectId == Retroceder || efecto.EffectId == Avanzar;
 
-                foreach (var sobre in AQuien(combate, quienLanza, objetivo, efecto, celdaApuntada))
+                foreach (var sobre in AQuien(combat, caster, target, efecto, aimedCell))
                 {
-                    var hecho = Aplicar(combate, quienLanza, sobre, hechizo, grado, efecto, ronda,
-                                        celdaApuntada);
+                    var hecho = Aplicar(combat, caster, sobre, spell, grade, efecto, round,
+                                        aimedCell, sharedHealRoll);
                     if (unaSolaVez)
                     {
                         if (hecho != null) fuera.Add(hecho);
@@ -370,9 +476,9 @@ namespace Jondo.Unity.Server.Managers
                     // Un efecto puede encadenar otro hechizo: es como se enganchan las actitudes.
                     if (hecho.HechizoEncadenado != 0)
                     {
-                        fuera.AddRange(Resolver(combate, quienLanza, hecho.HechizoEncadenado,
-                                                hecho.GradoEncadenado, sobre, AlLanzar, ronda,
-                                                hondo + 1, celdaApuntada));
+                        fuera.AddRange(Resolver(combat, caster, hecho.HechizoEncadenado,
+                                                hecho.GradoEncadenado, sobre, AlLanzar, round,
+                                                depth + 1, aimedCell));
                     }
                 }
             }
@@ -529,7 +635,8 @@ namespace Jondo.Unity.Server.Managers
 
         private static Outcome Aplicar(FightInstance combate, Fighter quienLanza, Fighter sobre,
                                             int hechizo, int grado, SpellEffect efecto, int ronda,
-                                            int celdaApuntada = -1)
+                                            int celdaApuntada = -1,
+                                            int sharedHealRoll = int.MinValue)
         {
             // El daño lo lleva quien ya lo llevaba; aquí no se toca.
             if (efecto.EffectId >= DanoPrimero && efecto.EffectId <= DanoUltimo) return null;
@@ -783,25 +890,54 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
+            // Fixed healing uses one roll for the whole zone. Distance falloff changes only that
+            // shared base; Intelligence, flat heals and the target's received-healing multiplier
+            // are then applied independently. Power and damage bonuses never participate.
+            if (efecto.EffectId == FixedHeal)
+            {
+                if (sobre == null || !sobre.IsAlive) return null;
+
+                int baseHeal = sharedHealRoll != int.MinValue
+                    ? sharedHealRoll
+                    : DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value);
+                if (baseHeal <= 0) return null;
+
+                int distance = celdaApuntada >= 0
+                    ? Jondo.Unity.World.Maps.MapGeometry.Distance(celdaApuntada, sobre.CellId)
+                    : 0;
+                baseHeal = ConLaCaidaDeLaZona(baseHeal, efecto, distance);
+
+                // La caracteristica del ELEMENTO del efecto. Hoy siempre es inteligencia porque
+                // la unica cura fija implementada es la de fuego, pero clavar el 15 aqui es lo que
+                // hace que las otras cinco salgan mal el dia que se implementen.
+                int elementOfHeal = efecto.Element >= 0
+                    ? efecto.Element
+                    : DatabaseManager.EffectElement(efecto.EffectId);
+                int healCharacteristic = CharacteristicOfElement(elementOfHeal);
+
+                int intelligence = StatOf(quienLanza, healCharacteristic)
+                    + quienLanza.Buffs.De(healCharacteristic, ronda);
+                int flatHeals = quienLanza.Otra(HealsCharacteristic)
+                    + quienLanza.Buffs.De(HealsCharacteristic, ronda);
+                int receivedMultiplier = sobre.Buffs.Multiplicador(ReceivedHealingPercent, ronda);
+                int points = CalculateFixedHeal(baseHeal, intelligence, flatHeals,
+                                                receivedMultiplier);
+                return ApplyHealing(combate, quienLanza, sobre, hechizo, grado, efecto,
+                                    ronda, points);
+            }
+
             // Las curaciones por tanto por ciento de la vida máxima. El dado es el PORCENTAJE, no
             // los puntos: la Baliza de Supervivencia cura un siete por ciento del tope de quien
             // recibe, y en el cable eso viaja ya resuelto en puntos.
             if (efecto.EffectId == CuraPorcentual)
             {
+                if (sobre == null || !sobre.IsAlive) return null;
                 int cuanto = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (cuanto <= 0) return null;
 
                 int puntos = Math.Max(1, sobre.MaxHP * cuanto / 100);
-                puntos = Math.Min(puntos, Math.Max(0, sobre.MaxHP - sobre.CurrentHP));
-                if (puntos <= 0) return null;
-
-                sobre.CurrentHP += puntos;
-                return new Outcome
-                {
-                    Sobre = sobre, Efecto = efecto,
-                    HechizoOrigen = hechizo, NivelOrigen = grado,
-                    Cura = puntos,
-                };
+                return ApplyHealing(combate, quienLanza, sobre, hechizo, grado, efecto,
+                                    ronda, puntos);
             }
 
             // Los que MULTIPLICAN: "daños sufridos x110%", "curas recibidas x50%". No tocan
@@ -896,6 +1032,90 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// Applies an immediate heal or records it as a one-shot buff when the catalogue carries a
+        /// delay. A delayed heal is scheduled even while the target is full because it may be hurt
+        /// before the activation round; missing-life capping therefore happens only on activation.
+        /// </summary>
+        private static Outcome ApplyHealing(FightInstance combat, Fighter caster, Fighter target,
+                                            int spell, int grade, SpellEffect effect, int round,
+                                            int points)
+        {
+            if (target == null || !target.IsAlive || points <= 0) return null;
+
+            if (effect.Delay > 0)
+            {
+                var pending = target.Buffs.Poner(new Buff
+                {
+                    EffectId = effect.EffectId,
+                    EffectUid = effect.EffectUid,
+                    Cuanto = points,
+                    PendingHealPoints = points,
+                    HechizoOrigen = spell,
+                    NivelOrigen = grade,
+                    Quien = caster.Id,
+                    Disparador = AlLanzar,
+                    CaducaEnRonda = Caduca(effect, round),
+                    EmpiezaEnRonda = Empieza(effect, round),
+                    Apila = SeApila(effect),
+                }, combat.SiguienteEmbrujo);
+
+                return new Outcome
+                {
+                    Sobre = target,
+                    Efecto = effect,
+                    Buff = pending,
+                    HechizoOrigen = spell,
+                    NivelOrigen = grade,
+                };
+            }
+
+            int applied = Math.Min(points, Math.Max(0, target.MaxHP - target.CurrentHP));
+            if (applied <= 0) return null;
+
+            target.CurrentHP += applied;
+            return new Outcome
+            {
+                Sobre = target,
+                Efecto = effect,
+                HechizoOrigen = spell,
+                NivelOrigen = grade,
+                Cura = applied,
+            };
+        }
+
+        /// <summary>
+        /// Activates every delayed one-shot heal due in this combat. Dead targets are deliberately
+        /// skipped: ordinary healing is not a resurrection path. The pending buff is consumed in
+        /// either case so it cannot fire again on the next fighter's turn in the same round.
+        /// </summary>
+        internal static List<DelayedHealOutcome> ActivateDelayedHealing(FightInstance combat, int round)
+        {
+            var results = new List<DelayedHealOutcome>();
+            foreach (var target in Todos(combat))
+            {
+                foreach (var pending in target.Buffs.TakeDueHealing(round))
+                {
+                    int healed = 0;
+                    if (target.IsAlive)
+                    {
+                        healed = Math.Min(pending.PendingHealPoints,
+                                          Math.Max(0, target.MaxHP - target.CurrentHP));
+                        target.CurrentHP += healed;
+                    }
+
+                    results.Add(new DelayedHealOutcome
+                    {
+                        Target = target,
+                        CasterId = pending.Quien,
+                        Buff = pending,
+                        Healed = healed,
+                    });
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
         /// La lista de efectos que toca, según haya salido crítico o no.
         ///
         /// Un hechizo trae DOS listas en la base y la crítica no es "la normal multiplicada": es
@@ -984,7 +1204,10 @@ namespace Jondo.Unity.Server.Managers
         private static int DelDado(int minimo, int maximo, int valor)
         {
             if (minimo == 0 && maximo == 0) return valor;
-            if (maximo > minimo) return _azar.Next(minimo, maximo + 1);
+            if (maximo > minimo)
+            {
+                lock (_azar) return _azar.Next(minimo, maximo + 1);
+            }
             return minimo != 0 ? minimo : valor;
         }
 

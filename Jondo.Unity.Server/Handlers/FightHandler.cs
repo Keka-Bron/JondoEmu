@@ -831,6 +831,7 @@ namespace Jondo.Unity.Server.Handlers
             Poner(27, sabiduria / PorCadaDiez);   // esquiva de puntos de acción
             Poner(28, sabiduria / PorCadaDiez);   // esquiva de puntos de movimiento
             Poner(12, GameState.StatWisdom);      // sabiduría
+            Poner(49, 0);                         // flat heals
             Poner(26, 0);                         // invocaciones
             Poner(50, 0);                         // reenvío
             Poner(75, 0);                         // erosión
@@ -1766,6 +1767,17 @@ namespace Jondo.Unity.Server.Handlers
                 await ReenviarLaListaAsync(stream, fight);
             }
 
+            // Delayed one-shot heals, before the ordinary expiry sweep can remove their temporary
+            // panel entry.
+            //
+            // "At the start of their round" would be the tidy sentence and it is not what happens:
+            // this runs from ConfirmAsync, which fires at the start of EVERY fighter's turn, and
+            // the heal activates on the first of those where round >= EmpiezaEnRonda. So it lands
+            // on whichever turn happens to open the round -- which can be an enemy's. It matches
+            // how the rest of the delayed effects here already behave, and there is no capture of
+            // a delayed heal to say whether Ankama does the same.
+            await ApplyDelayedHealingAsync(stream, fight);
+
             // Se caen los embrujos cumplidos antes de devolver los puntos, para que lo que se
             // devuelva sea lo que de verdad toca esta ronda. Y de cada uno hay que avisar con su
             // jya, que es como el cliente los quita del panel: por su número, uno a uno.
@@ -1903,6 +1915,49 @@ namespace Jondo.Unity.Server.Handlers
                 // mismo que usan los monstruos.
                 await PassTurnAsync(stream);
             }
+        }
+
+        /// <summary>
+        /// Announces delayed heals activated by the effect engine and removes their temporary buff
+        /// entry from the client. The engine has already capped and applied HP before this method
+        /// writes any packet.
+        /// </summary>
+        private static async Task ApplyDelayedHealingAsync(NetworkStream stream, FightInstance fight)
+        {
+            var due = Managers.EffectEngine.ActivateDelayedHealing(fight, fight.RoundNumber);
+            if (due.Count == 0) return;
+
+            long sequenceOwner = fight.CurrentFighter?.Id ?? 0;
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(
+                    sequenceOwner, Network.FightProtocol.ActionSequence)));
+
+            foreach (var result in due)
+            {
+                var caster = fight.Team0.Find(f => f.Id == result.CasterId)
+                          ?? fight.Team1.Find(f => f.Id == result.CasterId);
+                long sourceId = caster?.Id ?? result.CasterId;
+
+                if (result.Healed > 0)
+                {
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildHeal(sourceId, result.Healed, result.Target.Id)));
+                    if (caster != null)
+                    {
+                        await ChallengeWatcher.HealedAsync(stream, fight, caster, result.Target);
+                    }
+                    await RefrescarLaVidaAsync(stream, fight, result.Target);
+                }
+
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jya,
+                    Network.FightProtocol.BuildBuffGone(result.Target.Id, result.Buff.Numero)));
+                Program.LogDebug($"[Fight] Delayed heal from {sourceId} to {result.Target.Id}: " +
+                                 $"{result.Healed} HP at round {fight.RoundNumber}.");
+            }
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(
+                    fight.SiguienteAccion(), sequenceOwner, Network.FightProtocol.ActionSequence)));
         }
 
         /// <summary>

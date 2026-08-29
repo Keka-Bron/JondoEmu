@@ -223,7 +223,7 @@ One engine for all eighteen classes, driven entirely by client data. Not a singl
 - ✅ Summons as real fighters — own sheet, place in the carousel next to their owner, behaviour spell, lifetime, and they all fall when their summoner dies
 - ✅ Item attitudes — the six Dofus and the trophies grant their spell through effect 1175
 - ✅ The characteristic sheet in the shape the client expects: 53 entries in a fixed order, and a single-characteristic refresh **replaces** its entry rather than adding to it, so it repeats every field and puts the buff in its own slot `f8`
-- ❌ Healing — effect 108 is not wired; its catalogue row has `Characteristic = 0` and `Category = 2`, so it falls into the panel-only branch
+- 🚧 Healing — the FIRE fixed heal (effect 108, 751 spell levels) works, immediately and with spell delays. Its five siblings are the same heal in the other elements and none of them is done: water 2998 (92 levels), air 2999 (66), earth 3000 (62), neutral 3001 (11) and best-element 3002 (30)
 - ❌ Glyphs and traps (effects 400, 401, 1091)
 - ❌ Appearance-changing spells — the transform payload is an opaque blob, so the Cra's Sentinel works but does not change its look
 - ❌ Area shapes `G` (55 effects) and `*` (10), which fall back to the centre tile alone
@@ -366,11 +366,11 @@ is wrong. Four things it found, all measured:
   across 401 captures, 184 shows up on 420 elements and 114 on 23, every one a zaap. Our own log
   catches us emitting the pair `(type 0, skill 114)` 84 times — a pair that occurs zero times
   anywhere real. New passages declare 184
-- **647 of the game's 872 effects do nothing at all.** They are drawn on the spell card and the
-  engine has no code for them and no characteristic to apply — and **15,841 of the 34,823 spell
+- **646 of the game's 872 effects do nothing at all.** They are drawn on the spell card and the
+  engine has no code for them and no characteristic to apply — and **15,348 of the 34,823 spell
   levels carry at least one**. The Studio ranks them by how many levels each one breaks, which turns
-  a curiosity into a work list: effect 1160 alone is on 6,709 levels, and healing — effect 108 — is
-  on 751
+  a curiosity into a work list: effect 1160 alone is on 6,709 levels. Healing — effect 108 — used
+  to be next on 751 levels and is now handled directly
 - **A monster's picture is filed under its `gfxId`, not its id.** Keyed by id, 847 of 5,134 found a
   picture and every one of those 847 was *somebody else's* creature. Keyed by gfxId it is 5,130
 
@@ -418,7 +418,7 @@ Full workings in **`docs/quests.md`** and **`docs/dungeons.md`**.
   right-click menu is drawn by the *client* from the template's `actions[]`, so an action written
   per placement can only take options away, never add one. Adding would need the map-load packet to
   carry actions per actor, and that has to be measured against a capture first
-- 🚧 **Editing spells.** The simulator is there; changing a spell's numbers is not — and with 647
+- 🚧 **Editing spells.** The simulator is there; changing a spell's numbers is not — and with 646
   effects doing nothing, implementing the top of that list buys far more than editing the values of
   an effect the engine ignores
 - 🚧 **Shops, loot tables and dungeons** — asked for by the people using it. All three are screens
