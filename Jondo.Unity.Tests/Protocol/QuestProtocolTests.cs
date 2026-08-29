@@ -152,16 +152,22 @@ namespace Jondo.Unity.Tests.Protocol
         }
 
         [Fact]
-        public void An_actor_with_nothing_is_still_named()
+        public void An_actor_with_nothing_is_left_out_entirely()
         {
-            // The mark is taken away by sending the actor with an empty list, which is what 235 of
-            // the 380 captured frames do. Leaving the actor out instead would say nothing about it
-            // and the client would keep drawing the mark it was told about last time.
+            // This used to assert the opposite -- that the actor is named with an empty list --
+            // and the reasoning was that saying "this one has none" is the only way to take a mark
+            // away. It reads well and the captures disagree: the byte pair 1200, an f2 of zero
+            // length, appears ZERO times in the 145 real iom frames that carry anything. Ankama
+            // names only actors that have something, and clears by sending an iom with no body at
+            // all -- "iom (0)", which turns up on every map load.
+            //
+            // It mattered less than it looks, because iom is not what draws the mark over an NPC's
+            // head at all; that rides in the actor's own record in the jss. But an index that
+            // disagrees with the thing it indexes is a trap for the next person.
             string built = Hex(QuestProtocol.BuildQuestMarks(
                 1, new[] { (-20001L, (IReadOnlyList<int>)System.Array.Empty<int>()) }));
 
-            Assert.Contains("1200", built);   // f2, zero bytes: the empty quest list
-            Assert.NotEqual("", built);
+            Assert.DoesNotContain("1200", built);
         }
 
         [Fact]

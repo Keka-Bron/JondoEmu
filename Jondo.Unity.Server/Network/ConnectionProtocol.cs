@@ -786,6 +786,31 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private const int NpcFemale = 1;
 
+        /// <summary>
+        /// The marker over an NPC's head, written into its own actor record.
+        /// </summary>
+        /// <remarks>
+        /// Its own method so the bytes can be pinned against the capture without a world loaded.
+        /// Nothing is written when there is nothing to say: <c>1200</c>, an empty block, appears
+        /// zero times in the 145 real frames that carry markers.
+        /// </remarks>
+        public static void AddQuestMarker(Pb identity, IReadOnlyList<int> offered, IReadOnlyList<int> doing)
+        {
+            if (offered.Count == 0 && doing.Count == 0) return;
+
+            var marker = Pb.New();
+            if (doing.Count > 0) marker.Packed(1, Longs(doing));
+            if (offered.Count > 0) marker.Packed(3, Longs(offered));
+            identity.Msg(2, marker);
+        }
+
+        private static List<long> Longs(IReadOnlyList<int> values)
+        {
+            var made = new List<long>(values.Count);
+            foreach (int value in values) made.Add(value);
+            return made;
+        }
+
         private static void AddNpcs(Pb jss, long mapId)
         {
             foreach (var npc in Managers.Npcs.Of(mapId))
@@ -805,12 +830,46 @@ namespace Jondo.Unity.Server.Network
                 var template = Managers.Npcs.TemplateOf(npc.NpcId);
                 bool female = template != null && template.Gender == NpcFemale;
 
+                // LA MARCA DE LA CABEZA VA AQUI DENTRO, y esto es lo que faltaba para que no
+                // saliera nunca la exclamacion verde.
+                //
+                // No la dibuja el iom. Se diferenciaron las dos cosas comparando byte a byte el
+                // mismo mapa y el mismo actor: en el jss de Ankama del mapa 154010883, actor
+                // -20000 (el NPC 2892), hay seis bytes que en el nuestro no estaban:
+                //
+                //   Ankama  ...1217 0a0b3a09 12041a02e00c 28cc16 1a08...
+                //   Jondo   ...1211 0a053a03            28cc16 1a08...
+                //                            ^^^^^^^^^^^^
+                //                            f2 { f3: packed[1632] }
+                //
+                // 1632 es justo la mision que ese NPC reparte en ese mapa. Fuera de esos seis
+                // bytes -y de los dos largos que crecen con ellos- las tramas son identicas. Lo
+                // mismo en el 154010371 con el NPC 2905 y la mision 1639.
+                //
+                // Y hay una captura, "sin apariencias equipar un escudo", que NO lleva ni un iom
+                // en todo el flujo y sin embargo sus NPCs salen marcados: la marca no puede venir
+                // del iom. El iom es otra cosa -un indice de toda la SUBZONA, que nombra mapas en
+                // los que el jugador no esta-, y por eso el que sigue a aceptar la mision 2432
+                // nombra la 2427: son dos mapas distintos de la misma subzona 980.
+                //
+                //   f3  las que OFRECE      -> la exclamacion. 21 de 21 ids medidos son misiones
+                //                              cuyo catalogo nombra a ESE npc en ESE mapa.
+                //   f1  las que tiene EN CURSO y quieren algo de el.
+                //
+                // Va delante del genero, que es el orden de todas las capturas: 12041a02e70c 1801
+                // 28d916. Y cuando no hay nada que decir no se manda el bloque: la pareja de bytes
+                // 1200 no aparece ni una vez en las 145 tramas iom reales.
+                var offered = Managers.Quests.OfferedRightNowBy(npc.NpcId, mapId);
+                var doing = Managers.Quests.InProgressWith(npc.NpcId, mapId);
+
+                var identity = Pb.New();
+                AddQuestMarker(identity, offered, doing);
+                identity.VarIfNotZero(3, female ? NpcFemale : 0).Var(5, npc.NpcId);
+
                 jss.Msg(5, Pb.New()
                     .Msg(1, Pb.New().Var(1, npc.Cell).VarIfNotZero(2, npc.Orientation))
                     .Msg(2, Pb.New()
-                        .Msg(1, Pb.New().Msg(7, Pb.New()
-                            .VarIfNotZero(3, female ? NpcFemale : 0)
-                            .Var(5, npc.NpcId)))
+                        .Msg(1, Pb.New().Msg(7, identity))
                         .Msg(3, look))
                     .Var(3, npc.ContextualId));
             }

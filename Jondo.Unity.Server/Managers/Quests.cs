@@ -522,20 +522,24 @@ namespace Jondo.Unity.Server.Managers
                 return;
             }
 
+            // Solo los que tienen algo. El iom es un indice, no un censo: en las 145 tramas
+            // reales no hay ni un actor nombrado con la lista vacia. Quien deja de tener nada
+            // desaparece del indice, y eso es lo que le quita la marca.
             var marks = new List<(long Actor, IReadOnlyList<int> Quests)>(here.Count);
             foreach (var npc in here)
             {
-                var offers = new List<int>();
-                foreach (int questId in QuestsOfferedBy(npc.NpcId, mapId))
-                {
-                    if (log.CanStart(questId, out _)) offers.Add(questId);
-                }
-
-                marks.Add((npc.ContextualId, offers));
+                var offers = OfferedRightNowBy(npc.NpcId, mapId);
+                if (offers.Count > 0) marks.Add((npc.ContextualId, offers));
             }
 
+            // Y si en este mapa no queda nadie con nada, la trama vacia, que es como lo dice
+            // Ankama al entrar en un mapa sin marcas: "iom (0)", cero bytes de cuerpo.
+            byte[] cuerpo = marks.Count > 0
+                ? QuestProtocol.BuildQuestMarks(mapId, marks)
+                : Array.Empty<byte>();
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iom, QuestProtocol.BuildQuestMarks(mapId, marks)));
+                ConnectionProtocol.Push(Op.Iom, cuerpo));
 
             // Se dice en voz alta porque la ausencia de marca tiene DOS causas que se ven igual —no
             // se ha mandado nada, o se ha mandado la lista vacía— y distinguirlas costaba abrir el
@@ -551,6 +555,79 @@ namespace Jondo.Unity.Server.Managers
 
             Console.WriteLine($"[Misiones] Marcas del mapa {mapId}: {conMarca} de {marks.Count} NPCs " +
                               $"con algo que ofrecer, {ofrecidas} misión(es).");
+        }
+
+        /// <summary>
+        /// What this NPC can hand over to THIS character right now, conditions included.
+        /// </summary>
+        /// <remarks>
+        /// Two callers and they must never disagree: the green mark travels in the NPC's own actor
+        /// record inside the jss -- see <c>ConnectionProtocol.AddNpcs</c>, which is what actually
+        /// draws it -- and the iom carries the same list again as a sub-area index. Two copies of
+        /// this filter would be two chances to drift.
+        /// </remarks>
+        public static List<int> OfferedRightNowBy(int npcId, long mapId)
+        {
+            var log = Log;
+            var offers = new List<int>();
+            if (log == null) return offers;
+
+            foreach (int questId in QuestsOfferedBy(npcId, mapId))
+            {
+                if (log.CanStart(questId, out _)) offers.Add(questId);
+            }
+
+            return offers;
+        }
+
+        /// <summary>
+        /// Quests already in hand whose current step wants something from this NPC here.
+        /// </summary>
+        /// <remarks>
+        /// The other half of the marker over an NPC's head: measured in the captures as f1 of the
+        /// same block that carries the offered list in f3, and it is what turns the mark into the
+        /// "come back and tell me" one rather than the "I have work for you" one.
+        ///
+        /// The question is the same one <see cref="OnTalkingToAsync"/> asks when the player
+        /// actually walks up, so the mark cannot promise a conversation that then does nothing.
+        /// </remarks>
+        public static List<int> InProgressWith(int npcId, long mapId)
+        {
+            var log = Log;
+            var doing = new List<int>();
+            if (log == null || _book == null || npcId == 0) return doing;
+
+            foreach (var run in log.Doing())
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+
+                bool wants = false;
+                foreach (var objective in step.Objectives)
+                {
+                    if (run.Done.Contains(objective.Id)) continue;
+
+                    if (objective.NpcId == npcId
+                        && (objective.MapId == 0 || objective.MapId == mapId))
+                    {
+                        wants = true;
+                        break;
+                    }
+
+                    var binding = Bindings.Of(objective.Id);
+                    if (binding != null && binding.Kind == QuestBindingKind.Talk
+                        && binding.NpcId == npcId
+                        && (binding.MapId == 0 || binding.MapId == mapId))
+                    {
+                        wants = true;
+                        break;
+                    }
+                }
+
+                if (wants) doing.Add(run.QuestId);
+            }
+
+            return doing;
         }
 
         /// <summary>
