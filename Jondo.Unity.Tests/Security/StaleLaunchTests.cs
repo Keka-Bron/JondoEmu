@@ -23,7 +23,14 @@ namespace Jondo.Unity.Tests.Security
     ///
     /// So the rule here is: a launch is released only when it has been quiet for the timeout AND
     /// there is no connected socket for that account. Both, not either.
+    ///
+    /// Esta clase y <c>GoingBackTokenTests</c> comparten colección, y hace falta: las dos vacían y
+    /// rellenan el MISMO registro estático de lanzamientos —que es estático porque tiene que
+    /// serlo— y xUnit corre las clases en paralelo. Aquí se cruzaban sin romperse por suerte de
+    /// tiempos; en la integración continua no. Verde en d703636 y rojo en el commit siguiente,
+    /// que es justo el que añadió la segunda clase.
     /// </remarks>
+    [Collection("ClientLaunchRegistry")]
     public class StaleLaunchTests : IDisposable
     {
         private const long Account = 90_001;

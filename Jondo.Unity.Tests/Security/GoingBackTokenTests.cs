@@ -29,7 +29,14 @@ namespace Jondo.Unity.Tests.Security
     /// It could never have matched by accident, either: every token this server minted was 32
     /// characters — <c>Guid "N"</c> or sixteen bytes of hex — and the auth database confirms it,
     /// with a maximum stored length of 32 in both token columns.
+    ///
+    /// Esta clase y <c>GoingBackTokenTests</c> comparten colección, y hace falta: las dos vacían y
+    /// rellenan el MISMO registro estático de lanzamientos —que es estático porque tiene que
+    /// serlo— y xUnit corre las clases en paralelo. Aquí se cruzaban sin romperse por suerte de
+    /// tiempos; en la integración continua no. Verde en d703636 y rojo en el commit siguiente,
+    /// que es justo el que añadió la segunda clase.
     /// </remarks>
+    [Collection("ClientLaunchRegistry")]
     public class GoingBackTokenTests : IDisposable
     {
         private const long Account = 91_002;
