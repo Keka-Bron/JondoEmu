@@ -275,7 +275,7 @@ namespace Jondo.Unity.Server.Network
                 return GameTokenResponse(accountId);
 
             if (method == "POST" && path == "/json/Ankama/v5/Game/SelectServer")
-                return SelectServerResponse();
+                return SelectServerResponse(accountId);
 
             // Return a tolerant empty JSON response for any other unhandled endpoint
             // (e.g. telemetries like SendEvent) to prevent client-side promise rejection crashes.
@@ -400,11 +400,44 @@ namespace Jondo.Unity.Server.Network
             });
         }
 
-        private static string SelectServerResponse() => System.Text.Json.JsonSerializer.Serialize(new
+        /// <summary>
+        /// Elegir servidor: devuelve el token con el que el cliente se conectara al de juego.
+        /// </summary>
+        /// <remarks>
+        /// EL TOKEN SE REGISTRA, que es lo que aqui faltaba. Es el mismo fallo que tenia el kqr de
+        /// la vuelta atras: se acunaba un identificador, se le mandaba al cliente y no se guardaba
+        /// en ningun sitio, asi que cuando el cliente lo presentaba no lo reconocia nadie y se le
+        /// cerraba la conexion.
+        ///
+        /// Aquella se descubrio porque el jugador la pisaba; esta no la pisa NADIE con este
+        /// cliente -en las 6.803 lineas del registro y sus veinte arranques, esta ruta y la de
+        /// GameToken tienen cero visitas; las unicas /json/ que pide son Cms/PollInGame/Get,
+        /// Cms/Items/GetFeeds y Game/SendEvent-. O sea que es la misma puerta rota esperando a que
+        /// alguien la abra, no un fallo que se este viendo. Se arregla igual.
+        ///
+        /// Con la cuenta a cero no se registra nada: seria dejar un token valido sin dueno.
+        /// </remarks>
+        private static string SelectServerResponse(long accountId)
         {
-            token = Guid.NewGuid().ToString("N"),
-            server = new { host = "127.0.0.1", port = 5555 }
-        });
+            string token = Guid.NewGuid().ToString("N");
+
+            if (accountId > 0)
+            {
+                DatabaseManager.SetGameToken(accountId, token);
+                ClientLaunchRegistry.RegisterToken(accountId, token);
+            }
+            else
+            {
+                Console.WriteLine("[HAAPI] SelectServer sin cuenta identificada: el token que se " +
+                                  "devuelve no queda registrado y la conexion sera rechazada.");
+            }
+
+            return System.Text.Json.JsonSerializer.Serialize(new
+            {
+                token,
+                server = new { host = "127.0.0.1", port = 5555 }
+            });
+        }
 
         private static long ResolveRequestAccount(HttpListenerRequest request, string body)
         {
