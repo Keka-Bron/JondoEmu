@@ -559,6 +559,25 @@ namespace Jondo.Unity.Server
                 ";
                 createAchievements.ExecuteNonQuery();
 
+                // La entrada gratis del manojo de llaves, gastada o no, por personaje y por
+                // mazmorra. Una fila por las dos cosas porque el manojo da "una entrada gratis en
+                // CADA mazmorra, una vez por semana" -- traduccion 1189621, la pagina de ayuda del
+                // propio cliente-, asi que usarlo en una puerta no cierra las demas.
+                //
+                // Week es el martes en que empieza la semana, no el dia en que se uso: el manojo
+                // "se reinicia todos los martes", que no es lo mismo que siete dias despues. Quien
+                // entra un lunes vuelve a tenerlo al dia siguiente.
+                var createKeyring = worldConnection.CreateCommand();
+                createKeyring.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterKeyring (
+                        CharacterId INTEGER NOT NULL,
+                        DungeonId INTEGER NOT NULL,
+                        Week TEXT NOT NULL DEFAULT '',
+                        PRIMARY KEY (CharacterId, DungeonId)
+                    );
+                ";
+                createKeyring.ExecuteNonQuery();
+
                 // Y en qué hueco de la barra puso cada hechizo, por lo mismo.
                 var createSpellBar = worldConnection.CreateCommand();
                 createSpellBar.CommandText = @"

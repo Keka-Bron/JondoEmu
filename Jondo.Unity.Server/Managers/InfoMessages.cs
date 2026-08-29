@@ -62,6 +62,38 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«No tienes el nivel de oficio necesario.» Va con <see cref="Warning"/>.</summary>
         public const int JobLevelTooLow = 284;
 
+        /// <summary>«No tienes el nivel requerido.» Va con <see cref="Warning"/>.</summary>
+        /// <remarks>
+        /// Not the same sentence as <see cref="JobLevelTooLow"/>, and the difference is the whole
+        /// point of having both: 284 says "de oficio". The dungeon door was sending 284 for a
+        /// CHARACTER level check, so a level 8 player at a level 10 door was told their profession
+        /// was not good enough -- which sends them off to level a trade that has nothing to do with
+        /// it. Measured in datos/mensajes_3.6.10.10.json, table 1.
+        /// </remarks>
+        public const int LevelTooLow = 3;
+
+        /// <summary>«No tienes el objeto necesario.» Va con <see cref="Warning"/>.</summary>
+        public const int MissingItem = 4;
+
+        /// <summary>
+        /// La plantilla vacía: su texto es literalmente <c>{0}</c>, o sea el parámetro tal cual.
+        /// </summary>
+        /// <remarks>
+        /// Es el hueco por el que se le puede decir al jugador algo que el cliente no trae escrito,
+        /// y existe en su propia tabla — tipo 0, id 0 —, así que no es un truco: es el canal que
+        /// hay para eso. Sirve para lo que no tiene plantilla, como «la entrada gratis del manojo
+        /// vuelve el martes 1/9», que ninguna de las 339.175 frases del cliente dice.
+        ///
+        /// Va con <see cref="Info"/> o con <see cref="Warning"/>, que es lo único que cambia cómo
+        /// lo pinta. Y no es una línea de chat: el chat sale por el canal del mapa y lo lee todo
+        /// el mundo.
+        ///
+        /// Lo que NO hay que hacer con esto es sustituir una plantilla que sí existe. El cliente
+        /// está traducido a cinco idiomas y la plantilla lo está con él; lo que se mande por aquí
+        /// va en el idioma en que lo escribió quien programó esta línea, y ahí se queda.
+        /// </remarks>
+        public const int FreeText = 0;
+
         private static readonly Dictionary<(int Type, int Id), string> _texts = new();
 
         public static int Count => _texts.Count;

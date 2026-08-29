@@ -53,8 +53,13 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         public const int Keyring = 10207;
 
-        /// <summary>"No tienes el nivel necesario", roughly. Reused from the job-level warning.</summary>
-        private const int NotHighEnough = InfoMessages.JobLevelTooLow;
+        /// <summary>"No tienes el nivel requerido."</summary>
+        /// <remarks>
+        /// This used to be <c>InfoMessages.JobLevelTooLow</c>, which is a different sentence: "No
+        /// tienes el nivel <b>de oficio</b> necesario." A player turned away from a level 10 door
+        /// was being told to go and level a profession.
+        /// </remarks>
+        private const int NotHighEnough = InfoMessages.LevelTooLow;
 
         /// <summary>
         /// The player has answered the guardian of a dungeon. Try to let them in.
@@ -82,10 +87,42 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
-            if (!TryTakeTheKey(dungeon, out long uid, out int item))
+            // The keyring FIRST when its free entry is still there this week, and the loose key
+            // only after that. Backwards from how it was, and it matters to the player: the key is
+            // a craftable item somebody paid for or made, and the keyring entry expires unused
+            // every Tuesday whether or not it is spent. Burning the key while a free entry was
+            // sitting there is throwing away the one that cannot be got back.
+            bool freeEntry = dungeon.OnKeyring
+                             && DungeonKeyring.FreeEntryLeft(state.CharacterId, dungeon.Id, DateTime.Now);
+
+            // And when it is the keyring that is spent rather than missing, say which of the two it
+            // is. "No tienes el objeto necesario" would be a lie: the keyring is right there in the
+            // bag, it is this week's entry that is gone, and the two send the player to do
+            // completely different things about it.
+            bool keyringSpent = dungeon.OnKeyring && !freeEntry && FindInBag(Keyring, 1) != 0;
+
+            if (!TryTakeTheKey(dungeon, freeEntry, out long uid, out int item))
             {
+                // Told to the PLAYER, not only to the console. This branch used to return in
+                // silence: the guardian's dialogue closed, nothing happened, and nothing on screen
+                // said why. From the player's chair that is indistinguishable from the dungeon not
+                // being implemented at all -- and it is what "no veo opcion de usar el llavero"
+                // looks like from the inside, with the server log saying, correctly and only to
+                // itself, "falta la llave (8143 x1, o el manojo 10207) y no hay manojo".
+                if (keyringSpent)
+                {
+                    Console.WriteLine($"[Mazmorra] {dungeon.Name}: el manojo ya se usó esta semana " +
+                                      $"y no hay llave suelta.");
+                    await TellAsync(stream,
+                        $"Ya has usado el manojo de llaves en {dungeon.Name} esta semana. " +
+                        $"Vuelve el martes {DungeonKeyring.NextReset(DateTime.Now):d/M}. " +
+                        "Con una llave puedes entrar las veces que quieras.");
+                    return false;
+                }
+
                 Console.WriteLine($"[Mazmorra] {dungeon.Name}: falta la llave " +
                                   $"({Wanted(dungeon)}) y no hay manojo.");
+                await WarnAsync(stream, InfoMessages.MissingItem);
                 return false;
             }
 
@@ -100,6 +137,15 @@ namespace Jondo.Unity.Server.Handlers
                         ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(uid)));
                     Console.WriteLine($"[Mazmorra] {dungeon.Name}: se gasta el objeto {item}.");
                 }
+            }
+
+            if (item == Keyring)
+            {
+                // One free entry per dungeon per week, and the week turns over on Tuesday. See
+                // DungeonKeyring: this is the client's own help text, not a house rule.
+                DungeonKeyring.SpendFreeEntry(state.CharacterId, dungeon.Id, DateTime.Now);
+                Console.WriteLine($"[Mazmorra] {dungeon.Name}: entra con el manojo. La entrada " +
+                                  $"gratis vuelve el {DungeonKeyring.NextReset(DateTime.Now):dd/MM}.");
             }
 
             Console.WriteLine($"[Mazmorra] Entra en {dungeon.Name}, sala 1 de {dungeon.Rooms.Count}.");
@@ -146,13 +192,22 @@ namespace Jondo.Unity.Server.Handlers
         /// The dungeon's own key first, the keyring second, and a dungeon that asks for nothing
         /// opens for anybody — 61 of the 187 do. <paramref name="uid"/> comes back zero when
         /// nothing has to be spent, which is not the same as failing and must not be read as it.
+        ///
+        /// Two kinds of key and they behave differently, which is the whole reason this is not one
+        /// lookup. The dungeon's OWN key is an ordinary craftable item (handyman) and is SPENT:
+        /// handed to the guardian and gone from the bag. The keyring is a quest item, given once
+        /// for finishing the tutorial, and is NEVER spent — 107 of the 187 dungeons take it, and
+        /// it has to still be there for the next one.
         /// </remarks>
-        private static bool TryTakeTheKey(DungeonManager.Dungeon dungeon, out long uid, out int item)
+        private static bool TryTakeTheKey(DungeonManager.Dungeon dungeon, bool freeEntry,
+                                          out long uid, out int item)
         {
             uid = 0;
             item = 0;
 
             if (dungeon.Required.Count == 0) return true;
+
+            if (freeEntry && TryTheKeyring(out item)) return true;
 
             foreach (var (wanted, count) in dungeon.Required)
             {
@@ -165,12 +220,29 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            if (dungeon.OnKeyring)
+            return false;
+        }
+
+        /// <summary>The keyring, if it is in the bag. Never spent, so there is no uid to give back.</summary>
+        private static bool TryTheKeyring(out int item)
+        {
+            item = 0;
+
             {
                 long found = FindInBag(Keyring, 1);
                 if (found != 0)
                 {
-                    uid = found;
+                    // Opens the door and IS NOT SPENT, which is why uid stays zero: it is handed
+                    // out once, when the tutorial is finished, and it opens every dungeon that
+                    // accepts it for the rest of the character's life. Returning its uid here --
+                    // which this did -- meant the caller destroyed it on first use, and the player
+                    // silently lost the one item that opens 107 of the 187 doors.
+                    //
+                    // The 80 that refuse it are not a special case anybody has to write down:
+                    // availableOnKeyring is in the game's own data and says so. They are the
+                    // Expedicion / Expedicion de Audacia / Expedicion de Bravura runs and the
+                    // dimensional ones -- La Gelexta Dimension, Memoria de Orukam, Recuerdo de
+                    // Imagiro -- and every one of them wants its own loose key.
                     item = Keyring;
                     return true;
                 }
@@ -198,6 +270,20 @@ namespace Jondo.Unity.Server.Handlers
             if (dungeon.OnKeyring) parts.Add($"o el manojo {Keyring}");
             return parts.Count == 0 ? "nada" : string.Join(", ", parts);
         }
+
+        /// <summary>
+        /// Una frase cualquiera al jugador, por el canal de información y sólo para él.
+        /// </summary>
+        /// <remarks>
+        /// Por la plantilla vacía del cliente — <see cref="InfoMessages.FreeText"/>, cuyo texto es
+        /// <c>{0}</c> — porque lo que hay que decir aquí, cuándo vuelve la entrada gratis, no lo
+        /// dice ninguna de las frases que el cliente trae escritas.
+        /// </remarks>
+        private static Task TellAsync(NetworkStream stream, string text)
+            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning,
+                                                        InfoMessages.FreeText, text)));
 
         private static Task WarnAsync(NetworkStream stream, int messageId)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
