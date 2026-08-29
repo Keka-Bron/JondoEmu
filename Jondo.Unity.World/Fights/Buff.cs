@@ -49,6 +49,9 @@ namespace Jondo.Unity.World.Fights
         /// <summary>El estado que pone o quita, si es de los que hacen eso.</summary>
         public int Estado { get; set; }
 
+        /// <summary>La apariencia temporal impuesta por el efecto 335, o cero.</summary>
+        public int Apariencia { get; set; }
+
         public int HechizoOrigen { get; set; }
         public int NivelOrigen { get; set; }
         public long Quien { get; set; }
@@ -145,6 +148,33 @@ namespace Jondo.Unity.World.Fights
         public void QuitarEstado(int estado) => _estados.Remove(estado);
 
         /// <summary>
+        /// Quita un estado y los embrujos que lo representaban en el panel. Devolverlos permite
+        /// que la capa de red mande un <c>jya</c> por cada uno.
+        /// </summary>
+        public List<Buff> QuitarEstadoConEmbrujos(int estado)
+        {
+            _estados.Remove(estado);
+            var quitados = _puestos.FindAll(e => e.Estado == estado);
+            _puestos.RemoveAll(e => e.Estado == estado);
+            return quitados;
+        }
+
+        /// <summary>Retira todo lo que dejó un hechizo, incluidos sus estados.</summary>
+        public List<Buff> QuitarDelHechizo(int hechizo)
+        {
+            var quitados = _puestos.FindAll(e => e.HechizoOrigen == hechizo);
+            _puestos.RemoveAll(e => e.HechizoOrigen == hechizo);
+
+            foreach (var quitado in quitados)
+            {
+                if (quitado.Estado == 0) continue;
+                if (!_puestos.Any(e => e.Estado == quitado.Estado))
+                    _estados.Remove(quitado.Estado);
+            }
+            return quitados;
+        }
+
+        /// <summary>
         /// Añade un embrujo con el número que le toque. El número NO es de cada luchador: es
         /// correlativo del combate entero, y el que se usa luego para quitarlo con el jya. En la
         /// captura los del jugador van del 19 al 25 y los del monstruo siguen del 26 al 32, misma
@@ -237,6 +267,17 @@ namespace Jondo.Unity.World.Fights
             return total;
         }
 
+        /// <summary>La última apariencia temporal que siga activa, o cero.</summary>
+        public int AparienciaEn(int ronda)
+        {
+            for (int i = _puestos.Count - 1; i >= 0; i--)
+            {
+                var e = _puestos[i];
+                if (e.Apariencia != 0 && e.Vivo(ronda)) return e.Apariencia;
+            }
+            return 0;
+        }
+
         /// <summary>Se lleva los que ya han caducado y devuelve cuáles eran.</summary>
         public List<Buff> Barrer(int ronda)
         {
@@ -252,6 +293,14 @@ namespace Jondo.Unity.World.Fights
             // les tocara empezar.
             var caidos = _puestos.FindAll(e => Caducado(e, ronda));
             _puestos.RemoveAll(e => Caducado(e, ronda));
+
+            // Un estado temporal no puede sobrevivir al embrujo que lo puso. Se conserva si
+            // todavía queda otro embrujo vivo que represente el mismo estado.
+            foreach (var caido in caidos)
+            {
+                if (caido.Estado == 0) continue;
+                if (!_puestos.Any(e => e.Estado == caido.Estado)) _estados.Remove(caido.Estado);
+            }
             return caidos;
         }
 

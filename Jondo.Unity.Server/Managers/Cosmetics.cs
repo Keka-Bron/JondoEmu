@@ -107,6 +107,7 @@ namespace Jondo.Unity.Server.Managers
             = new Dictionary<int, Dictionary<int, int>>();
         private static readonly List<int> _titles = new List<int>();
         private static readonly List<int> _ornaments = new List<int>();
+        private static readonly Dictionary<int, int> _appearanceBones = new Dictionary<int, int>();
 
         public static int Count => _catalogue.Count;
         public static int KnownLooks => _skins.Count + _mounts.Count + _pets.Count + _variants.Count;
@@ -127,6 +128,7 @@ namespace Jondo.Unity.Server.Managers
             _slotsByVariant.Clear();
             _titles.Clear();
             _ornaments.Clear();
+            _appearanceBones.Clear();
 
             LoadCatalogue();
             LoadLooks();
@@ -190,6 +192,25 @@ namespace Jondo.Unity.Server.Managers
                         Type = entry.Value.TryGetProperty("t", out var t) ? t.GetInt32() : 0,
                         Level = entry.Value.TryGetProperty("l", out var l) ? l.GetInt32() : 1,
                     };
+                }
+
+                // El efecto 335 lleva un identificador de apariencia, no los huesos directamente.
+                // Las de tipo 5 son sustituciones simples del esqueleto: en 3.6.10.10 la forma
+                // bestial del Ouginak es la apariencia 1260, que apunta a los huesos 9025.
+                if (doc.RootElement.TryGetProperty("appearances", out var appearances))
+                {
+                    foreach (var entry in appearances.EnumerateObject())
+                    {
+                        if (!int.TryParse(entry.Name, out int id)) continue;
+                        if (!entry.Value.TryGetProperty("t", out var t) || t.GetInt32() != 5) continue;
+                        if (!entry.Value.TryGetProperty("d", out var d)) continue;
+
+                        string raw = d.ValueKind == JsonValueKind.String
+                            ? d.GetString() ?? ""
+                            : d.GetRawText();
+                        if (int.TryParse(raw, out int bones) && bones > 0)
+                            _appearanceBones[id] = bones;
+                    }
                 }
             }
             catch (Exception ex)
@@ -387,5 +408,9 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>Los huesos de un aura, o cero.</summary>
         public static int AuraBones(int auraId) => _auras.TryGetValue(auraId, out int b) ? b : 0;
+
+        /// <summary>Los huesos de una apariencia de tipo 5, o cero si no es compatible.</summary>
+        public static int AppearanceBones(int appearanceId)
+            => _appearanceBones.TryGetValue(appearanceId, out int bones) ? bones : 0;
     }
 }

@@ -761,11 +761,40 @@ namespace Jondo.Unity.Server.Network
         public const int WeaponCast = 303;
         public const int SpentActionPoints = 102;
         public const int Died = 103;
+        public const int LookChanged = 149;
 
         /// <summary>El campo donde va el detalle de cada cosa dentro del jwe.</summary>
         public const int CastDetail = 7;
         public const int PointsDetail = 20;
         public const int DamageDetail = 40;
+
+        /// <summary>
+        /// Cambia el aspecto de un combatiente (jwe, f14 = 149). Esta acción de combate es la que
+        /// hace que el cliente anime la transformación; un refresco de actor jsn sólo lo redibuja.
+        /// </summary>
+        public static byte[] BuildLookChanged(long fighter, byte[] look)
+            => Pb.New()
+                .Var(3, fighter)
+                .Var(14, LookChanged)
+                .Msg(26, Pb.New().Var(1, fighter).Bytes(3, look))
+                .Build();
+
+        /// <summary>Copia un EntityLook sustituyendo únicamente los huesos de su raíz.</summary>
+        public static byte[] WithRootBones(byte[] look, int bones)
+        {
+            if (look == null || look.Length == 0 || bones <= 0) return look ?? Array.Empty<byte>();
+
+            var parsed = ProtoMessage.Parse(look);
+            var field = parsed.Fields.Find(f => f.FieldNumber == 3 && f.WireType == 0);
+            if (field != null) field.VarIntValue = bones;
+            else parsed.Fields.Add(new ProtoField
+            {
+                FieldNumber = 3,
+                WireType = 0,
+                VarIntValue = bones,
+            });
+            return parsed.ToByteArray();
+        }
 
         /// <summary>Los puntos gastados, en negativo, como los manda el servidor real.</summary>
         public static Pb Spent(long fighterId, int amount)

@@ -70,6 +70,12 @@ namespace Jondo.Unity.Server.Managers
         /// metida en el 497. Recalculándolo con lo del bloqueador los números no cuadran.
         /// </summary>
         public int CollisionDamageToBlocker { get; init; }
+
+        /// <summary>Embrujos retirados par un effet 406 ou par le retrait d'un état.</summary>
+        public IReadOnlyList<Buff> BuffsQuitados { get; init; } = Array.Empty<Buff>();
+
+        /// <summary>Apariencia temporal solicitada por el efecto 335, o cero.</summary>
+        public int Apariencia { get; init; }
     }
 
     /// <summary>
@@ -233,6 +239,15 @@ namespace Jondo.Unity.Server.Managers
         public const int EfectoQueLanzaHechizo = EffectSupport.CastSpell;
         private const int LanzarHechizo = EfectoQueLanzaHechizo;
 
+        /// <summary>
+        /// Variante utilisée par les sorts de classe. Chez l'Ouginak, elle relie notamment
+        /// Molosse/Apaisement aux sous-sorts qui ajoutent ou retirent la Rage.
+        /// </summary>
+        private const int DispararHechizo = EffectSupport.TriggerSpell;
+
+        private const int QuitarEfectosDeHechizo = EffectSupport.RemoveSpellEffects;
+        private const int CambiarApariencia = EffectSupport.ChangeLook;
+
         /// <summary>"Invoca: #1". La plantilla del bicho viaja en el dado.</summary>
         public const int Invocar = EffectSupport.Summon;
 
@@ -319,6 +334,18 @@ namespace Jondo.Unity.Server.Managers
 
             var lista = EfectosDeLaTirada(hechizo, grado, critico);
 
+            // Toutes les conditions d'état d'un même sort sont évaluées contre le même instantané.
+            // C'est indispensable à la Rage : le grade 1 de 13745 contient les trois branches
+            // 0->I, I->II et II->bestial. Sans instantané, l'état posé par la première branche
+            // rend la deuxième vraie dans la même résolution, puis la troisième, et un seul gain
+            // de Rage traverse les trois paliers.
+            var estadosAlEmpezar = new Dictionary<Fighter, HashSet<int>>();
+            foreach (var luchador in Todos(combate))
+            {
+                if (luchador != null)
+                    estadosAlEmpezar[luchador] = new HashSet<int>(luchador.Buffs.Estados);
+            }
+
             // Los efectos que van a suertes: se sortean ANTES de recorrer nada, y los que no salen
             // se quedan fuera de esta resolución.
             var descartados = Sortear(lista);
@@ -355,7 +382,8 @@ namespace Jondo.Unity.Server.Managers
                 // alcanzara a tres bichos movería al lanzador tres veces.
                 bool unaSolaVez = efecto.EffectId == Retroceder || efecto.EffectId == Avanzar;
 
-                foreach (var sobre in AQuien(combate, quienLanza, objetivo, efecto, celdaApuntada))
+                foreach (var sobre in AQuien(combate, quienLanza, objetivo, efecto, celdaApuntada,
+                                              estadosAlEmpezar))
                 {
                     var hecho = Aplicar(combate, quienLanza, sobre, hechizo, grado, efecto, ronda,
                                         celdaApuntada);
@@ -392,7 +420,8 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static IEnumerable<Fighter> AQuien(FightInstance combate, Fighter quienLanza,
                                                    Fighter objetivo, SpellEffect efecto,
-                                                   int celdaApuntada = -1)
+                                                   int celdaApuntada = -1,
+                                                   IReadOnlyDictionary<Fighter, HashSet<int>> estados = null)
         {
             var mascara = efecto.TargetMask ?? "";
             bool alLanzador = false, aLosMios = false, aLosDeEnfrente = false, aLasInvocaciones = false;
@@ -471,9 +500,12 @@ namespace Jondo.Unity.Server.Managers
             foreach (var quien in candidatos)
             {
                 if (quien == null) continue;
+                IReadOnlySet<int> susEstados = estados != null && estados.TryGetValue(quien, out var alEntrar)
+                    ? alEntrar
+                    : quien.Buffs.Estados as IReadOnlySet<int> ?? new HashSet<int>(quien.Buffs.Estados);
                 bool vale = true;
-                foreach (int estado in pideEstado) if (!quien.Buffs.TieneEstado(estado)) vale = false;
-                foreach (int estado in pideNoEstado) if (quien.Buffs.TieneEstado(estado)) vale = false;
+                foreach (int estado in pideEstado) if (!susEstados.Contains(estado)) vale = false;
+                foreach (int estado in pideNoEstado) if (susEstados.Contains(estado)) vale = false;
                 if (vale) yield return quien;
             }
         }
@@ -663,7 +695,7 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
-            if (efecto.EffectId == LanzarHechizo)
+            if (efecto.EffectId == LanzarHechizo || efecto.EffectId == DispararHechizo)
             {
                 // "Lanza el hechizo del dado en el grado de la cara". Es el enganche de las
                 // actitudes: el grado 1 del Amarillo Ocre no hace nada por sí mismo, sólo dice
@@ -685,7 +717,9 @@ namespace Jondo.Unity.Server.Managers
                 int estado = efecto.Value != 0 ? efecto.Value : efecto.DiceNum;
                 if (estado == 0) return null;
                 if (efecto.EffectId == PonerEstado) sobre.Buffs.PonerEstado(estado);
-                else sobre.Buffs.QuitarEstado(estado);
+                IReadOnlyList<Buff> quitados = efecto.EffectId == QuitarEstado
+                    ? sobre.Buffs.QuitarEstadoConEmbrujos(estado)
+                    : Array.Empty<Buff>();
 
                 return new Outcome
                 {
@@ -707,6 +741,50 @@ namespace Jondo.Unity.Server.Managers
                             EmpiezaEnRonda = Empieza(efecto, ronda),
                         }, combate.SiguienteEmbrujo)
                         : null,
+                    BuffsQuitados = quitados,
+                };
+            }
+
+            if (efecto.EffectId == QuitarEfectosDeHechizo)
+            {
+                int hechizoQuitado = efecto.Value != 0 ? efecto.Value : efecto.DiceNum;
+                if (hechizoQuitado <= 0) return null;
+                return new Outcome
+                {
+                    Sobre = sobre,
+                    Efecto = efecto,
+                    HechizoOrigen = hechizo,
+                    NivelOrigen = grado,
+                    BuffsQuitados = sobre.Buffs.QuitarDelHechizo(hechizoQuitado),
+                };
+            }
+
+            if (efecto.EffectId == CambiarApariencia)
+            {
+                int apariencia = efecto.Value != 0 ? efecto.Value : efecto.DiceNum;
+                if (apariencia <= 0) return null;
+
+                var puesto = sobre.Buffs.Poner(new Buff
+                {
+                    EffectId = efecto.EffectId,
+                    EffectUid = efecto.EffectUid,
+                    Apariencia = apariencia,
+                    HechizoOrigen = hechizo,
+                    NivelOrigen = grado,
+                    Quien = quienLanza.Id,
+                    Disparador = AlLanzar,
+                    CaducaEnRonda = Caduca(efecto, ronda),
+                    EmpiezaEnRonda = Empieza(efecto, ronda),
+                }, combate.SiguienteEmbrujo);
+
+                return new Outcome
+                {
+                    Sobre = sobre,
+                    Efecto = efecto,
+                    Buff = puesto,
+                    Apariencia = apariencia,
+                    HechizoOrigen = hechizo,
+                    NivelOrigen = grado,
                 };
             }
 
