@@ -119,6 +119,10 @@ namespace Jondo.Unity.Server
             Network.UnknownPackets.Initialize();
             Managers.Vendors.Initialize();
             Managers.Npcs.Initialize();
+
+            // Detras de los NPCs a proposito: lee sus plantillas para saber con que respuesta
+            // ofrece cada guardian el manojo y con cual la llave.
+            Managers.DungeonDoor.Initialize();
             Managers.NpcShops.Initialize();
             // Detras de Npcs porque las misiones cuelgan de sus dialogos, y el catalogo es de
             // Ankama y no cambia: se lee una vez y lo comparten todas las sesiones.

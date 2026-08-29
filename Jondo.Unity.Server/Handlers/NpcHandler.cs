@@ -198,6 +198,29 @@ namespace Jondo.Unity.Server.Handlers
                 ? LasQueTocan(primera)
                 : SinArbolEscrito(template!);
 
+            // Y si este NPC guarda la puerta de una mazmorra, sus dos opciones por delante.
+            //
+            // Sin esto, un guardian sin arbol escrito cae en SinArbolEscrito, que devuelve LA
+            // ULTIMA respuesta de la plantilla y nada mas: Mawy Ingals declara diecinueve y lo
+            // unico que salia en pantalla era "No.". El manojo va siempre que la mazmorra lo
+            // acepte; la llave suelta solo si esta en la bolsa, porque una opcion que no puede
+            // funcionar no se distingue de una puerta rota. Ver DungeonHandler.DoorReplies.
+            long[] puerta = DungeonHandler.DoorReplies(npc.NpcId, mapId);
+            if (puerta.Length > 0)
+            {
+                var todas = new List<long>(puerta.Length + respuestas.Length);
+                todas.AddRange(puerta);
+
+                // Detras, lo que ya se iba a decir, sin repetir ninguna. La despedida importa:
+                // sin una salida el jugador se queda con una ventana que no cierra.
+                foreach (long r in respuestas)
+                {
+                    if (!todas.Contains(r)) todas.Add(r);
+                }
+
+                respuestas = todas.ToArray();
+            }
+
             // Se apunta por dónde va la conversación. Sin esto el ioy que llega después no se puede
             // situar: trae el id de la respuesta y nada más, ni de qué NPC ni de qué frase venía.
             SessionContext.State.OpenDialogueNpcId = npc.NpcId;
@@ -367,7 +390,7 @@ namespace Jondo.Unity.Server.Handlers
             // un cambio de mapa y no hay nada más que decirle.
             long dondeHabla = SessionContext.State.OpenDialogueMapId;
             if (dondeHabla == 0) dondeHabla = SessionContext.State.MapId;
-            if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla))
+            if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla, reply))
             {
                 CerrarConversacion();
                 return;

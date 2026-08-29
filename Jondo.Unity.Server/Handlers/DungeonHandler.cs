@@ -72,12 +72,64 @@ namespace Jondo.Unity.Server.Handlers
         /// and for the same reason: nothing in the captured data marks which reply is the yes. The
         /// guardian's own tree, once somebody writes one, is where that belongs.
         /// </remarks>
-        public static async Task<bool> AtTheDoorAsync(NetworkStream stream, long mapId)
+        /// <summary>
+        /// What the guardian of this map should offer, on top of whatever else it says.
+        /// </summary>
+        /// <remarks>
+        /// The keyring ALWAYS when the dungeon takes it, because the free entry it gives is the
+        /// player's to spend and hiding the option would hide the reason they cannot get in. The
+        /// loose key ONLY when it is in the bag: an option that can never work is worse than no
+        /// option, since the player has no way to tell it apart from a broken door.
+        ///
+        /// Empty when this map is not a dungeon entrance, or when the guardian declares neither
+        /// reply -- see <see cref="DungeonDoor"/>, which finds them by wording rather than by id.
+        /// </remarks>
+        public static long[] DoorReplies(int npcId, long mapId)
+        {
+            var dungeon = DungeonManager.AtEntrance(mapId);
+            if (dungeon == null || dungeon.FirstRoom == 0) return Array.Empty<long>();
+
+            var options = DungeonDoor.For(npcId);
+            var offer = new List<long>(2);
+
+            if (dungeon.OnKeyring && options.Keyring != 0) offer.Add(options.Keyring);
+            if (options.Key != 0 && HasAKeyFor(dungeon)) offer.Add(options.Key);
+
+            return offer.ToArray();
+        }
+
+        /// <summary>Whether one of the keys this dungeon asks for is in the bag right now.</summary>
+        private static bool HasAKeyFor(DungeonManager.Dungeon dungeon)
+        {
+            foreach (var (wanted, count) in dungeon.Required)
+            {
+                if (FindInBag(wanted, count) != 0) return true;
+            }
+
+            return false;
+        }
+
+        public static async Task<bool> AtTheDoorAsync(NetworkStream stream, long mapId, long reply = 0)
         {
             var dungeon = DungeonManager.AtEntrance(mapId);
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
 
             var state = SessionContext.State;
+
+            // Which of the two the player actually picked, when the guardian is one we recognise.
+            //
+            // When it is not -- and 60 of the 126 entrances have no guardian placed at all, while
+            // some of the placed ones declare neither reply -- the old rule stands: ANY answer
+            // opens the door. That rule is wrong and it is deliberate. Replacing it with "only the
+            // right reply opens" would shut those dungeons completely, and a door that opens on
+            // the wrong answer is a smaller lie than one that never opens.
+            var options = DungeonDoor.For(state.OpenDialogueNpcId);
+            bool recognised = options.Keyring != 0 || options.Key != 0;
+
+            if (recognised && reply != 0 && reply != options.Keyring && reply != options.Key)
+            {
+                return false;
+            }
 
             if (dungeon.MinLevel > 0 && state.CharacterLevel < dungeon.MinLevel)
             {
@@ -94,6 +146,11 @@ namespace Jondo.Unity.Server.Handlers
             // sitting there is throwing away the one that cannot be got back.
             bool freeEntry = dungeon.OnKeyring
                              && DungeonKeyring.FreeEntryLeft(state.CharacterId, dungeon.Id, DateTime.Now);
+
+            // And when the player said WHICH, that decides it rather than the order above. Picking
+            // "Darle la llave y entrar" and having the keyring spent instead would be the server
+            // overruling a choice it had just offered.
+            if (recognised && reply == options.Key && reply != 0) freeEntry = false;
 
             // And when it is the keyring that is spent rather than missing, say which of the two it
             // is. "No tienes el objeto necesario" would be a lie: the keyring is right there in the

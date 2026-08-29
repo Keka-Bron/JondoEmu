@@ -64,6 +64,18 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>Las respuestas que se le ofrecen al jugador.</summary>
             public long[] Replies = Array.Empty<long>();
+
+            /// <summary>
+            /// The translation key beside each reply, in the same order as <see cref="Replies"/>.
+            /// </summary>
+            /// <remarks>
+            /// Kept because a reply id on its own says nothing about what the reply is, and one
+            /// caller needs to know: the dungeon door has to find "Utilizar el manojo de llaves"
+            /// and "Darle la llave y entrar" among everything else the guardian can say. Those ids
+            /// are per-NPC -- 121 different ones across the game for the keyring alone -- so they
+            /// cannot be written down; the WORDING is fixed, so they can be looked up.
+            /// </remarks>
+            public long[] ReplyTexts = Array.Empty<long>();
         }
 
         /// <summary>Comprar y vender: la acción que contesta con el catálogo.</summary>
@@ -316,6 +328,9 @@ namespace Jondo.Unity.Server.Managers
         public static Template? TemplateOf(int npcId)
             => _templates.TryGetValue(npcId, out var template) ? template : null;
 
+        /// <summary>Every template that has been read, for the passes that have to look at all of them.</summary>
+        public static IEnumerable<Template> Templates => _templates.Values;
+
         /// <summary>
         /// El aspecto en la notación del propio cliente: "{huesos|pieles|colores|escalas}".
         ///
@@ -459,25 +474,41 @@ namespace Jondo.Unity.Server.Managers
                     }
                 }
 
-                // dialogReplies es una lista de pares [idDeRespuesta, idDeTexto] y el primero manda.
+                // dialogReplies es una lista de pares [idDeRespuesta, idDeTexto]. Se guardan LOS
+                // DOS: el id es con lo que se contesta, y la clave de texto es lo único que dice
+                // qué respuesta es. Ver Template.ReplyTexts.
                 if (root.TryGetProperty("dialogReplies", out var replies)
                     && replies.TryGetProperty("Array", out var list)
                     && list.ValueKind == JsonValueKind.Array)
                 {
                     var fuera = new List<long>();
+                    var textos = new List<long>();
                     foreach (var reply in list.EnumerateArray())
                     {
                         if (!reply.TryGetProperty("values", out var values)) continue;
                         if (!values.TryGetProperty("Array", out var pair)) continue;
                         if (pair.ValueKind != JsonValueKind.Array) continue;
 
+                        long id = 0, texto = 0;
+                        int cual = 0;
                         foreach (var value in pair.EnumerateArray())
                         {
-                            if (value.ValueKind == JsonValueKind.Number) fuera.Add(value.GetInt64());
-                            break;
+                            if (value.ValueKind == JsonValueKind.Number)
+                            {
+                                if (cual == 0) id = value.GetInt64();
+                                else if (cual == 1) texto = value.GetInt64();
+                            }
+
+                            if (++cual >= 2) break;
                         }
+
+                        if (id == 0) continue;
+                        fuera.Add(id);
+                        textos.Add(texto);
                     }
+
                     template.Replies = fuera.ToArray();
+                    template.ReplyTexts = textos.ToArray();
                 }
             }
             catch (Exception ex)
