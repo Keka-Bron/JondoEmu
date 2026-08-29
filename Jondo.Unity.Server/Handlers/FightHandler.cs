@@ -1261,6 +1261,10 @@ namespace Jondo.Unity.Server.Handlers
                 // la pantalla de fin de combate cuando el último golpe la dejó esperando.
                 await AcuseAsync(stream, payload);
             }
+            else if (payloadStr.Contains(Op.Uri(Op.Kme)))
+            {
+                await AbandonAsync(stream);
+            }
             else if (payloadStr.Contains(Op.Uri(Op.Hoy)))
             {
                 await HandleFightOptionToggleRequest(stream, payload);
@@ -3884,6 +3888,85 @@ namespace Jondo.Unity.Server.Handlers
 
             fight.FinPendiente = 0;
             await EndFightAsync(stream, fight);
+        }
+
+        /// <summary>
+        /// Abandonment follows the death handshake measured in the three captures that carry a
+        /// kme: «Combate/combate contra poutch nivel 75 sin dialogar con poutch maestro-marcadores
+        /// permanentes-punetazo-hechizos sacro-rendirse.pcapng», «Combate/aceptar desafio-combate
+        /// completo-abandonar al final.pcapng» and «Combate/entrar a combate-cerrar juego para
+        /// emular desconexion-reconectar-aceptar reanudar combate.pcapng». The fighter dies inside
+        /// a sequence of kind 5, a jxh follows, and the result screen waits for the acknowledgement
+        /// rather than cutting through an unfinished cast.
+        /// </summary>
+        public static async Task AbandonAsync(NetworkStream stream)
+        {
+            var fight = GetCurrentFight();
+            if (fight == null)
+            {
+                Program.LogDebug("[Fight] Ignored kme because the session has no active fight.");
+                return;
+            }
+            if (fight.State != FightState.Ongoing)
+            {
+                Program.LogDebug($"[Fight] Ignored kme for fight #{fight.FightId} in state " +
+                                 $"{fight.State}; no placement surrender was captured.");
+                return;
+            }
+
+            var quitter = AbandoningFighter(fight, GameState.CharacterId);
+            if (quitter == null)
+            {
+                Program.LogDebug($"[Fight] Ignored kme because character {GameState.CharacterId} " +
+                                 $"is not an alive fighter in fight #{fight.FightId}.");
+                return;
+            }
+
+            if (fight.CurrentFighter == quitter) PararElReloj(fight);
+
+            // EL AUTOR DE LA SECUENCIA ES EL LUCHADOR DEL TURNO, no el que se rinde, y las dos
+            // capturas parecian contradecirse hasta mirar quien muere dentro:
+            //
+            //   poutch nivel 75  jto 08a28280c8e708 1005   autor = el jugador, que es el unico
+            //                    jwe muere  a28280c8e708   y ademas es de quien es el turno
+            //
+            //   aceptar desafio  jto 08a282f0a6c408 1005   autor = el OTRO jugador
+            //                    jwe muere  a28280c8e708   pero el que muere es el nuestro
+            //
+            // O sea que el que se rinde es el del jwe de dentro, y el que envuelve es el del turno.
+            // Con quitter.Id en las dos, la segunda captura queda desmentida.
+            var author = (fight.CurrentFighter ?? quitter).Id;
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(author,
+                                                         Network.FightProtocol.SurrenderSequence)));
+
+            quitter.CurrentHP = 0;
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildDeath(quitter.Id, quitter.Id)));
+            await CaenSusInvocadosAsync(stream, fight, quitter);
+            await ReenviarLaListaAsync(stream, fight);
+
+            int closure = fight.SiguienteAccion();
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(closure, author,
+                                                       Network.FightProtocol.SurrenderSequence)));
+
+            // Y el jxh detras, que las tres capturas mandan ahi y el cliente contesta con jwz. En
+            // «aceptar desafio» ese jwz es el UNICO acuse que llega: no hay jti por ninguna parte,
+            // asi que esperar solo al jti dejaria la pantalla de resultado sin salir.
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxh,
+                Network.FightProtocol.BuildConfirmTurn(author)));
+
+            Program.LogDebug($"[Fight] Character {quitter.Id} abandoned fight #{fight.FightId}; " +
+                             $"waiting for jti action {closure} before the result screen.");
+            await CheckFightOverAsync(stream, fight, closure);
+        }
+
+        internal static Fighter? AbandoningFighter(FightInstance? fight, long characterId)
+        {
+            if (fight == null || fight.State != FightState.Ongoing) return null;
+            return fight.Team0.FirstOrDefault(fighter => fighter.Id == characterId && fighter.IsAlive);
         }
 
         private static async Task<bool> CheckFightOverAsync(NetworkStream stream, FightInstance fight,

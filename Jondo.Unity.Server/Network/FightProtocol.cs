@@ -448,6 +448,18 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildSequenceEnd(int actionId, long author, int kind)
             => Pb.New().Var(1, actionId).Var(2, author).Var(3, kind).Build();
 
+        /// <summary>
+        /// La secuencia con la que se abandona el combate.
+        /// </summary>
+        /// <remarks>
+        /// Medida en las tres capturas que llevan un kme, y no es la de accion normal. En
+        /// «combate contra poutch nivel 75 ... hechizos sacro-rendirse.pcapng» el jto que contesta
+        /// al kme es 08a28280c8e7081005 —f2 = 5— y su jwi es 080410a28280c8e7081805 —f3 = 5—; en
+        /// «aceptar desafio-combate completo-abandonar al final.pcapng», 08a282f0a6c4081005 y
+        /// 080210a282f0a6c4081805. El 5 aparece exactamente una vez por captura y solo ahi.
+        /// </remarks>
+        public const int SurrenderSequence = 5;
+
         /// <summary>La secuencia de arranque del combate.</summary>
         public const int OpeningSequence = 8;
 

@@ -258,6 +258,7 @@ icg	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres 
 ith	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama ibt)	
 klt	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama ibt)	
 klp	S2C		Parte de la rafaga final de 3.6.4.3 que dispara ibt (icg se envia tres veces). No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama ibt)	
+kme	C2S	GameFightLeaveRequestMessage	Abandonar el combate. Cuerpo vacio. El servidor contesta con jto tipo 5, el jwe de muerte, jwi tipo 5 y jxh; medido en las tres capturas con kme.	AbandonAsync	(sin campos)
 kqm	S2C		La lista que envia la rama hmv de 3.6.4.3, junto con hnk. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama hmv)	
 lpe	S2C		Lo que envia la rama lpj de 3.6.4.3. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama lpj)	
 lok	S2C		Trama hardcodeada que envia la rama loy de 3.6.4.3. No aparece en ninguna de las 242 capturas.	GameNodeProxy (rama loy)	
