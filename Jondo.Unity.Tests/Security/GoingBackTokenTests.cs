@@ -55,6 +55,23 @@ namespace Jondo.Unity.Tests.Security
         }
 
         [Fact]
+        public void Resolving_works_with_no_authentication_database_at_all()
+        {
+            // Where this went red and the machine it ran on was right. The lookup falls through to
+            // the Accounts table, and on a server whose auth database does not exist yet -- a first
+            // boot, a deleted file, or continuous integration, which unpacks the world and nothing
+            // else -- SQLite answers "no such table: Accounts" by throwing. That exception used to
+            // climb out of ResolveToken into the connection handler, which is code that runs for
+            // EVERY client that presents itself.
+            //
+            // Its neighbour GetAccountIdByLauncherToken had the guard and this one did not.
+            Exception? thrown = Record.Exception(
+                () => ClientLaunchRegistry.ResolveToken(Guid.NewGuid().ToString()));
+
+            Assert.Null(thrown);
+        }
+
+        [Fact]
         public void An_id_nobody_registered_still_resolves_to_nothing()
         {
             // The other half. Registering the one we mint must not turn into accepting anything
