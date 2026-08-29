@@ -278,12 +278,14 @@ namespace Jondo.Unity.Launcher
                 }
                 catch
                 {
+                    _arrancadosAqui.TryRemove(accountId, out _);
                     Devolver(accountId);
                     throw;
                 }
 
                 if (client == null)
                 {
+                    _arrancadosAqui.TryRemove(accountId, out _);
                     Devolver(accountId);
                     return new Result { Success = false, Message = UI.LauncherPreferences.Textos.ClientStartFailed };
                 }
@@ -292,8 +294,16 @@ namespace Jondo.Unity.Launcher
                 // cuenta de quién está jugando. Y aunque este aviso se pierda —porque se cierre el
                 // lanzador antes— el servidor tiene dos redes debajo: la baja de la sesión de juego
                 // y la caducidad de los lanzamientos que nunca llegaron a conectar.
+                // Anotado antes de nada, que es lo que hace que el segundo clic no llegue a
+                // pedirle nada al servidor.
+                _arrancadosAqui[accountId] = 0;
+
                 client.EnableRaisingEvents = true;
-                client.Exited += (s, e) => Devolver(accountId);
+                client.Exited += (s, e) =>
+                {
+                    _arrancadosAqui.TryRemove(accountId, out _);
+                    Devolver(accountId);
+                };
                 MaximizeWhenReady(client);
                 Console.WriteLine($"[Launcher] Client {instanceId} launched for account {accountId} (PID {client.Id}).");
                 return new Result { Success = true };
@@ -387,11 +397,36 @@ namespace Jondo.Unity.Launcher
         /// <summary>Cuántos clientes admite el servidor a la vez.</summary>
         public static int MaximumClients => _tope;
 
-        /// <summary>Si esa cuenta tiene un cliente abierto, según el último sondeo.</summary>
-        public static bool IsActive(long accountId) => _jugando.Contains(accountId);
+        /// <summary>
+        /// Los clientes que ha arrancado ESTE lanzador y siguen vivos.
+        /// </summary>
+        /// <remarks>
+        /// El sondeo llega cada dos segundos y un doble clic no espera dos segundos. Pulsar
+        /// «Jugar» dos veces seguidas ejecutaba el arranque dos veces: la segunda todavía veía la
+        /// cuenta libre —porque el sondeo aún no había vuelto—, lanzaba otro cliente, y el
+        /// servidor lo rechazaba con «cuenta-ya-abierta»; el lanzador enseñaba eso como si el
+        /// jugador hubiese hecho algo mal.
+        ///
+        /// Esto lo sabe en el acto y sin preguntarle a nadie: se anota al arrancar el proceso y se
+        /// quita cuando el proceso muere, que es el mismo evento que ya avisaba al servidor.
+        /// </remarks>
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, byte> _arrancadosAqui
+            = new System.Collections.Concurrent.ConcurrentDictionary<long, byte>();
 
-        /// <summary>Cuántas cuentas están jugando, según el último sondeo.</summary>
-        public static int ActiveCount => _jugando.Count;
+        /// <summary>Si esa cuenta tiene un cliente abierto: lo que dijo el sondeo, o lo que sabemos ya.</summary>
+        public static bool IsActive(long accountId)
+            => _jugando.Contains(accountId) || _arrancadosAqui.ContainsKey(accountId);
+
+        /// <summary>Cuántas cuentas están jugando, sin contar dos veces a las que salen en los dos sitios.</summary>
+        public static int ActiveCount
+        {
+            get
+            {
+                var todas = new System.Collections.Generic.HashSet<long>(_jugando);
+                foreach (var cuenta in _arrancadosAqui.Keys) todas.Add(cuenta);
+                return todas.Count;
+            }
+        }
 
         private static void RefrescarQuienJuega()
         {
