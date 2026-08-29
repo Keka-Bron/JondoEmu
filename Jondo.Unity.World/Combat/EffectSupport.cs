@@ -68,6 +68,15 @@ namespace Jondo.Unity.World.Combat
         /// <summary>Cast another spell. This is the one that makes triggers work.</summary>
         public const int CastSpell = 792;
 
+        /// <summary>Cast another spell from an ordinary class-spell effect.</summary>
+        public const int TriggerSpell = 1160;
+
+        /// <summary>Remove every buff left by one spell.</summary>
+        public const int RemoveSpellEffects = 406;
+
+        /// <summary>Replace a fighter's visual appearance for the duration of the buff.</summary>
+        public const int ChangeLook = 335;
+
         /// <summary>Summon a creature.</summary>
         public const int Summon = 181;
 
@@ -125,7 +134,8 @@ namespace Jondo.Unity.World.Combat
             {
                 Push, Pull, StepBack, StepForward,
                 AddState, RemoveState,
-                CastSpell, Summon, FireHeal, HealPercent, Kill,
+                CastSpell, TriggerSpell, RemoveSpellEffects, ChangeLook,
+                Summon, FireHeal, HealPercent, Kill,
             };
 
             for (int damage = FirstDamage; damage <= LastDamage; damage++) known.Add(damage);

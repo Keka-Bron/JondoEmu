@@ -680,6 +680,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>"Daños sufridos x#1%", el multiplicador que pone Represalias.</summary>
         private const int DanoSufridoPorCiento = 1163;
 
+        /// <summary>Multiplicateur de dégâts finaux infligés. Sa base est 100.</summary>
+        private const int DanoFinalInfligidoCaracteristica = 107;
+
         // Las características que entran en la fórmula de daño, con los números del catálogo.
         private const int PotenciaCaracteristica = 25;
         private const int CriticoCaracteristica = 18;
@@ -985,6 +988,47 @@ namespace Jondo.Unity.Server.Handlers
                 .Var(2, 3)
                 .VarIfNotZero(3, fighter.LookBoneId)
                 .Build();
+
+        /// <summary>El aspecto normal que el combatiente llevaba al entrar en esta pelea.</summary>
+        private static byte[] NormalFightLook(Fighter fighter)
+        {
+            if (fighter.IsMonster) return MonsterLook(fighter);
+
+            var character = DatabaseManager.GetCharacterById(fighter.Id);
+            return character != null
+                ? Managers.BreedLookTable.BuildLook(character.Breed, character.Sex,
+                                                     character.HeadId, null, character.Id)
+                : Array.Empty<byte>();
+        }
+
+        /// <summary>
+        /// Anuncia una transformación por la acción de combate 149. La apariencia cero devuelve
+        /// el aspecto normal; las demás conservan colores, pieles, escala y mascotas y sustituyen
+        /// sólo los huesos de la raíz.
+        /// </summary>
+        private static async Task AnnounceAppearanceAsync(NetworkStream stream, Fighter fighter,
+                                                          int appearance)
+        {
+            byte[] look = NormalFightLook(fighter);
+            if (look.Length == 0) return;
+
+            if (appearance != 0)
+            {
+                int bones = Managers.Cosmetics.AppearanceBones(appearance);
+                if (bones <= 0)
+                {
+                    Program.LogDebug($"[Combate] La apariencia {appearance} no tiene huesos " +
+                                     "compatibles; no se cambia el aspecto.");
+                    return;
+                }
+                look = Network.FightProtocol.WithRootBones(look, bones);
+            }
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildLookChanged(fighter.Id, look)));
+            Program.LogDebug($"[Combate] Aspecto de {fighter.Id}: " +
+                             (appearance == 0 ? "normal" : $"apariencia {appearance}"));
+        }
 
         public static byte[] BuildIgsPacket(FightInstance fight)
         {
@@ -1846,6 +1890,12 @@ namespace Jondo.Unity.Server.Handlers
                     await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jya,
                         Network.FightProtocol.BuildBuffGone(quien.Id, caido.Numero)));
 
+                    if (caido.Apariencia != 0)
+                    {
+                        await AnnounceAppearanceAsync(stream, quien,
+                            quien.Buffs.AparienciaEn(fight.RoundNumber));
+                    }
+
                     // Y AQUÍ ESTABA EL AGUJERO: se borraba la fila del panel y no se devolvía la
                     // característica.
                     //
@@ -1887,6 +1937,12 @@ namespace Jondo.Unity.Server.Handlers
 
             fighter.StartTurn();
             await GivePointsBackAsync(stream, fight, fighter);
+
+            // Les fiches des buffs expirés puis celles qui rendent les PA/PM peuvent laisser le
+            // client avec une ancienne caractéristique 97. Le serveur n'a pourtant rendu aucun
+            // PV : terminer la transition par cette valeur autoritaire garde la jauge calée sur
+            // CurrentHP.
+            await RefrescarLaVidaAsync(stream, fight, fighter);
 
             // De donde sale y con cuantos PM: es lo que hace falta para juzgar al acabar los retos
             // de posicion y el de gastar exactamente un PM. Va DESPUES de devolver los puntos.
@@ -2817,6 +2873,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             var fichas = new HashSet<(long Quien, int Caracteristica)>();
+            var vidasCambiadas = new Dictionary<long, Fighter>();
 
             foreach (var c in consecuencias)
             {
@@ -2884,8 +2941,8 @@ namespace Jondo.Unity.Server.Handlers
                     // El Sin Corazon: curarse uno mismo vale, que le curen a uno no.
                     await ChallengeWatcher.HealedAsync(stream, fight, quienLanza, c.Sobre);
 
-                    // La cura tambien mueve la vida que le falta al jugador.
-                    await RefrescarLaVidaAsync(stream, fight, c.Sobre);
+                    // La fiche absolue partira une seule fois, après toutes les conséquences.
+                    vidasCambiadas[c.Sobre.Id] = c.Sobre;
                     continue;
                 }
 
@@ -2927,6 +2984,28 @@ namespace Jondo.Unity.Server.Handlers
                     continue;
                 }
 
+                // Retrait d'un état ou effet 406 (« retire les effets du sort »). C'est ce qui
+                // fait redescendre proprement la Rage et ce qui enlève immédiatement la forme
+                // bestiale avec Apaisement/Affection.
+                bool quitaApariencia = false;
+                foreach (var quitado in c.BuffsQuitados)
+                {
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jya,
+                        Network.FightProtocol.BuildBuffGone(c.Sobre.Id, quitado.Numero)));
+                    if (quitado.Apariencia != 0) quitaApariencia = true;
+                    if (quitado.Caracteristica != 0 &&
+                        quitado.Caracteristica != ActionPointsCharacteristic &&
+                        quitado.Caracteristica != MovementPointsCharacteristic)
+                    {
+                        fichas.Add((c.Sobre.Id, quitado.Caracteristica));
+                    }
+                }
+                if (quitaApariencia)
+                {
+                    await AnnounceAppearanceAsync(stream, c.Sobre,
+                        c.Sobre.Buffs.AparienciaEn(fight.RoundNumber));
+                }
+
                 if (c.Buff == null) continue;
 
                 if (c.SoloParaElPanel)
@@ -2954,6 +3033,11 @@ namespace Jondo.Unity.Server.Handlers
                             c.NivelOrigen, critico)));
                 }
 
+                if (c.Apariencia != 0)
+                {
+                    await AnnounceAppearanceAsync(stream, c.Sobre, c.Apariencia);
+                }
+
                 Program.LogDebug($"[Combate] Buff {c.Buff.Numero} sobre {c.Sobre.Id}: efecto " +
                                  $"{c.Efecto.EffectId}" +
                                  (c.Caracteristica != 0 ? $", característica {c.Caracteristica} {c.Cuanto:+#;-#;0}" : "") +
@@ -2963,6 +3047,9 @@ namespace Jondo.Unity.Server.Handlers
                                      : "") +
                                  $", hasta la ronda {c.Buff.CaducaEnRonda}.");
             }
+
+            foreach (var cambiado in vidasCambiadas.Values)
+                await RefrescarLaVidaAsync(stream, fight, cambiado);
 
             foreach (var (quien, caracteristica) in fichas)
             {
@@ -3175,6 +3262,18 @@ namespace Jondo.Unity.Server.Handlers
             // centro recibirían números distintos y el jugador vería una zona que no cuadra.
             var tirada = new Dictionary<int, int>();
 
+            // La vie du client est une fiche absolue. Pour un sort à plusieurs lignes, en envoyer
+            // une entre chaque nombre de dégâts met la fiche et les animations en concurrence et
+            // peut faire remonter visuellement la barre. On mémorise donc les PV avant l'action et
+            // on n'envoie qu'une fiche définitive lorsque toutes les lignes ont été appliquées.
+            var vidasAntes = new Dictionary<long, (Fighter Fighter, int Vida)>();
+            vidasAntes[caster.Id] = (caster, caster.CurrentHP);
+            foreach (var (_, _, aQuien, _) in golpes)
+            {
+                if (!vidasAntes.ContainsKey(aQuien.Id))
+                    vidasAntes[aQuien.Id] = (aQuien, aQuien.CurrentHP);
+            }
+
             foreach (var (efecto, elementoDelGolpe, aQuien, lejos) in golpes)
             {
                 if (!tirada.TryGetValue(efecto.EffectUid, out int sacado))
@@ -3184,6 +3283,12 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 await UnGolpeAsync(stream, fight, caster, spell, efecto, elementoDelGolpe, aQuien,
                                    sacado, lejos, critico);
+            }
+
+            foreach (var estado in vidasAntes.Values)
+            {
+                if (estado.Fighter.CurrentHP != estado.Vida)
+                    await RefrescarLaVidaAsync(stream, fight, estado.Fighter);
             }
         }
 
@@ -3344,6 +3449,19 @@ namespace Jondo.Unity.Server.Handlers
                 targetResPct: target.GetResPctForElement(element),
                 targetFlatRes: 0);
 
+            // La forme bestiale pose +20 sur la caractéristique 107, dont la base vaut 100.
+            // C'est un multiplicateur final : il s'applique après caractéristiques/résistances et
+            // avant les multiplicateurs de dégâts subis de la cible.
+            int finalInfligido = 100 + caster.Buffs.De(DanoFinalInfligidoCaracteristica,
+                                                       fight.RoundNumber);
+            if (finalInfligido != 100)
+            {
+                int antes = damage;
+                damage = Math.Max(0, (int)Math.Round(damage * finalInfligido / 100.0));
+                Program.LogDebug($"[Combate] {caster.Id} inflige les dégâts finaux à " +
+                                 $"{finalInfligido}% : {antes} devient {damage}.");
+            }
+
             // Los MULTIPLICADORES de quien lo recibe: "daños sufridos x110%" es el efecto 1163, el
             // que pone Represalias. Van al final, sobre el daño ya calculado.
             int multiplica = target.Buffs.Multiplicador(DanoSufridoPorCiento, fight.RoundNumber);
@@ -3413,16 +3531,14 @@ namespace Jondo.Unity.Server.Handlers
                     caster.CurrentHP += curado;
                     await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildHeal(caster.Id, curado, caster.Id)));
-                    await RefrescarLaVidaAsync(stream, fight, caster);
                     Program.LogDebug($"[Combate] Robo de vida del efecto {efecto.EffectId}: " +
                                      $"{caster.Id} se cura {curado} de los {aplicado} quitados; " +
                                      $"se queda en {caster.CurrentHP}/{caster.MaxHP}.");
                 }
             }
 
-            // Y al jugador, la vida que le queda. Sin esto le pegaban toda la pelea y su barra
-            // seguia llena: el cliente no descuenta la suya de los golpes, la lee de la ficha.
-            await RefrescarLaVidaAsync(stream, fight, target);
+            // HurtAsync enverra la fiche de vie une seule fois, après toutes les lignes du sort.
+            // Ici, on ne fait qu'appliquer et annoncer ce composant individuel.
 
             if (target.LeHanPegado)
             {
