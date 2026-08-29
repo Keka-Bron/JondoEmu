@@ -1532,14 +1532,26 @@ namespace Jondo.Unity.Server
 
         public static long GetAccountIdByToken(string token)
         {
-            using var connection = new SqliteConnection(AuthConnectionString);
-            connection.Open();
+            if (string.IsNullOrWhiteSpace(token)) return 0;
+            try
+            {
+                using var connection = new SqliteConnection(AuthConnectionString);
+                connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = "SELECT Id FROM Accounts WHERE GameToken = $token;";
-            command.Parameters.AddWithValue("$token", token);
-            var result = command.ExecuteScalar();
-            return result != null ? (long)result : 0;
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id FROM Accounts WHERE GameToken = $token;";
+                command.Parameters.AddWithValue("$token", token);
+                var result = command.ExecuteScalar();
+                return result != null ? (long)result : 0;
+            }
+            catch (Exception ex)
+            {
+                // Au démarrage et dans une installation CI vierge, auth.db peut exister avant que
+                // Initialize ait créé Accounts. Un token inconnu doit alors rester inconnu, pas
+                // faire tomber la connexion ni toute la suite de tests.
+                Console.WriteLine($"[SQLite] No se ha podido leer el token de juego: {ex.Message}");
+                return 0;
+            }
         }
 
         // --- Servers ---
