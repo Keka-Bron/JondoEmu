@@ -144,6 +144,23 @@ public static class Op
     public const string Idr = "idr";
 
     /// <summary>
+    /// Las misiones que el jugador lleva EN SEGUIMIENTO, la cajita de la esquina.
+    /// </summary>
+    /// <remarks>
+    /// Distinta del diario. El idr dice cuales estan empezadas; este dice cuales se muestran, y
+    /// llega reemplazando la lista entera, no anadiendo a ella.
+    ///
+    ///   f2 (repetido) { f1 { f2 { f1 (repetido): un objetivo, f2: el paso }
+    ///                        f3: el id de la mision } }
+    ///
+    /// El bloque capturado trae una sola trama suya con las misiones 1869 y 2406 —«El dano de
+    /// Buril» y «Cuando el despertar no es mas que un sueno»— del jugador grabado. Como reemplaza,
+    /// borraba de la caja la mision que el personaje si tenia: el diario iba bien y la caja
+    /// mostraba las dos ajenas y ninguna propia.
+    /// </remarks>
+    public const string Iel = "iel";
+
+    /// <summary>
     /// Los logros ganados, todos de una vez: f2 { f1 (repetido) { f2: cuando, f3: id del logro } }.
     /// </summary>
     /// <remarks>
@@ -966,6 +983,38 @@ public static class Op
 
     /// <summary>Crear un personaje.</summary>
     public const string Kvz = "kvz";
+
+    // ─── Borrar un personaje ────────────────────────────────────────────────────────────────
+    //
+    // Measured in "crear personaje - borrar personaje.pcapng", which records one deletion from
+    // end to end. The client sends three messages and the server answers with five frames:
+    //
+    //   C->S  kwa  10de82c08e8a02                       f2: the character id
+    //   C->S  kvu  08<id> 1220 "9cdab917cc3d5a4a33..."  f1: the id, f2: 32 hex characters
+    //   C->S  kvh  (empty)
+    //
+    //   S->C  kvn  0a06 "Vos-Xx"                        f1: the name of what is gone
+    //   S->C  kqp kqp kqp  kvi  jtg                     the list again, framed as always
+    //   S->C  kvm  (empty)
+    //
+    // The 32 hex characters in kvu are what the player typed to confirm, hashed. This server has
+    // no secret to check it against, so what protects a character here is that the id must belong
+    // to the session's account -- see DatabaseManager.DeleteCharacter.
+
+    /// <summary>El cliente senala el personaje que va a borrar. Lleva el id en el campo 2.</summary>
+    public const string Kwa = "kwa";
+
+    /// <summary>Borrar un personaje: campo 1 el id, campo 2 la confirmacion escrita en 32 hex.</summary>
+    public const string Kvu = "kvu";
+
+    /// <summary>Cierra la peticion de borrado. Viaja vacio.</summary>
+    public const string Kvh = "kvh";
+
+    /// <summary>Respuesta al borrado: el nombre de lo que ya no esta.</summary>
+    public const string Kvn = "kvn";
+
+    /// <summary>Cierra el borrado, detras de la lista nueva. Viaja vacio.</summary>
+    public const string Kvm = "kvm";
 
     // ─── Los retos del combate ──────────────────────────────────────────────────────────────
     //

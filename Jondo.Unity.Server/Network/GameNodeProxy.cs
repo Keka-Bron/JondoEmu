@@ -255,6 +255,23 @@ namespace Jondo.Unity.Server.Network
                     await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kwa)))
+                {
+                    // La papelera. Sin esta respuesta el popup de confirmación no llega a abrirse.
+                    await CharacterDeletionHandler.AskAsync(stream, payload, sessionAccountId,
+                                                            sessionServerId);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvu)))
+                {
+                    // Borrar un personaje. Las dos guardas de siempre: isAuthenticated aquí y la
+                    // cuenta resuelta dentro, porque el id lo elige el cliente.
+                    await CharacterDeletionHandler.DeleteAsync(stream, payload, sessionAccountId,
+                                                               sessionServerId);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kvh)))
+                {
+                    await CharacterDeletionHandler.CloseAsync(stream);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Kvk)))
                 {
                     // El botón del dado: un nombre al azar.
