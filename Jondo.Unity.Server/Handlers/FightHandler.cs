@@ -3914,6 +3914,27 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // LO QUE ESTO NO HACE, y hace falta escribirlo antes de que alguien lo de por hecho:
+            // no avisa a NADIE MAS. Todas las tramas de aqui abajo salen por el socket del que se
+            // rinde y por ninguno mas.
+            //
+            // Hoy da igual, y esa es la unica razon por la que se queda asi: en este emulador NO
+            // HAY combates de dos jugadores. AddPlayer se llama desde un unico sitio -la creacion
+            // del combate, con el personaje de la sesion- y no existe ningun camino que meta a un
+            // segundo jugador en un combate ajeno, ni siquiera invitandolo. El Team0 tiene siempre
+            // exactamente uno.
+            //
+            // El dia que lo haya, esto es lo que falta y en este orden: el jwe de la muerte, la
+            // lista reenviada y el jto/jwi que los envuelven tienen que ir tambien a los demas
+            // participantes -por su lista de combate, NO por el mapa: dos combates comparten
+            // arena, ver SessionRegistry.Hears- y el combate tiene que seguir para ellos en vez de
+            // acabarse.
+            //
+            // Lo que YA funciona para ese dia, y son dos listas distintas a proposito: la RONDA la
+            // rehace Agrupar, que filtra por IsAlive, asi que al que abandona no le vuelve a tocar
+            // el turno nunca; y el CARRUSEL lo dibuja el cliente con la lista de equipos, que
+            // conserva a sus muertos, asi que se queda en pantalla en gris y no se renumeran los
+            // huecos de los demas.
             var quitter = AbandoningFighter(fight, GameState.CharacterId);
             if (quitter == null)
             {

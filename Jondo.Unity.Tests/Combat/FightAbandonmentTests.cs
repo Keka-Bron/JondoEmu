@@ -95,6 +95,50 @@ namespace Jondo.Unity.Tests.Combat
                          Hex(FightProtocol.BuildDeath(quitter, quitter)));
         }
 
+        [Fact]
+        public void Whoever_abandons_stops_getting_turns()
+        {
+            // The half of abandonment that is not about frames: the quitter is left at zero life,
+            // and NextTurn has to walk past them for the rest of the fight. If it did not, the
+            // fight would stall on a fighter who is not there any more.
+            var fight = new FightInstance(1, 1);
+            var quitter = new Fighter { Id = 10, MaxHP = 100, CurrentHP = 100 };
+            var monster = new Fighter { Id = -1, IsMonster = true, MaxHP = 100, CurrentHP = 100 };
+            fight.AddPlayer(quitter);
+            fight.AddMonster(monster);
+            fight.StartFight();
+
+            quitter.CurrentHP = 0;
+
+            for (int turn = 0; turn < 6; turn++)
+            {
+                var whose = fight.NextTurn();
+                if (whose == null) break;
+                Assert.NotEqual(quitter.Id, whose.Id);
+            }
+        }
+
+        [Fact]
+        public void The_rotation_drops_them_while_the_teams_keep_them()
+        {
+            // Two lists and they are not the same list, which is the thing to get right. The turn
+            // rotation is rebuilt by Agrupar, which filters on IsAlive, so whoever abandons is
+            // gone from it and can never come up again. The CAROUSEL the client draws is built
+            // from the teams instead -- BuildTeams over Team0 plus Team1, which keep their dead --
+            // so the player stays on screen, greyed, and nobody else's slot renumbers.
+            var fight = new FightInstance(1, 1);
+            var quitter = new Fighter { Id = 10, MaxHP = 100, CurrentHP = 100 };
+            fight.AddPlayer(quitter);
+            fight.AddMonster(new Fighter { Id = -1, IsMonster = true, MaxHP = 100, CurrentHP = 100 });
+            fight.StartFight();
+
+            quitter.CurrentHP = 0;
+            fight.UpdateTurnOrder();
+
+            Assert.DoesNotContain(fight.TurnOrder, f => f.Id == quitter.Id);
+            Assert.Contains(fight.Team0, f => f.Id == quitter.Id);
+        }
+
         private static (FightInstance Fight, Fighter Player) FightWithPlayer()
         {
             var fight = new FightInstance(1, 1);
