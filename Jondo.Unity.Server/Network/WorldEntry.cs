@@ -152,6 +152,21 @@ namespace Jondo.Unity.Server.Network
             // En su lugar va lo nuestro, desde la base: Managers.Quests.SendJournalAsync.
             Op.Idu,
 
+            // Y la cajita de misiones seguidas de esa misma cuenta, que es otra cosa que el diario
+            // y que se colaba aunque el idu y el idr estuvieran fuera. Una sola trama en el bloque
+            // 1, con las misiones 1869 y 2406 —«El daño de Búril» y «Cuando el despertar no es más
+            // que un sueño»— y sus objetivos.
+            //
+            // Lo que la hacía dañina es que REEMPLAZA la lista, no la amplía. El diario del
+            // personaje salía bien —«Diario enviado: 1 en curso» en el registro— y aun así la caja
+            // enseñaba dos misiones ajenas y ninguna propia, porque esta trama llegaba después y
+            // se quedaba con la última palabra. Recién empezada una misión sí se veía, porque el
+            // ief en vivo la añade; al volver a entrar, desaparecía.
+            //
+            // Nada va en su lugar por ahora: un personaje nuevo no sigue ninguna, y el cliente
+            // pone en la caja las que tiene empezadas.
+            Op.Iel,
+
             // Y los contadores de esa cuenta: 9.694 pares de id y valor, con ids del 44 al 34.352 y
             // valores de cientos de millones. Es lo que el cliente pinta en el panel de estadisticas,
             // y son las suyas: partidas jugadas, monstruos matados, kamas ganados. 87.878 bytes, el
