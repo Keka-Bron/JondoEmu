@@ -155,8 +155,26 @@ namespace Jondo.Unity.Server.Network
             // arranca, así que el que el lanzador guardó de la vez anterior sólo sigue estando en
             // su columna.
             long suya = DatabaseManager.GetAccountIdByLauncherToken(token);
-            return suya != 0 ? suya : DatabaseManager.GetAccountIdByToken(token);
+            if (suya != 0) return suya;
+
+            long juego = DatabaseManager.GetAccountIdByToken(token);
+            if (juego != 0) return juego;
+
+            // Se dice CUÁL se ha presentado y dónde se ha buscado, porque «no coincide con ninguna
+            // cuenta» a secas no distingue las tres razones por las que puede pasar —que el token
+            // sea de otro arranque, que la columna se haya sobrescrito, o que el cliente esté
+            // mandando otra cosa— y sin distinguirlas no hay por dónde tirar. Enmascarado: es una
+            // credencial viva y el registro se queda en disco.
+            Console.WriteLine($"[Lanzamientos] Token {Enmascarar(token)} desconocido: no está entre " +
+                              $"los {Tokens.Count} de este arranque, ni en LauncherToken, ni en GameToken.");
+            return 0;
         }
+
+        /// <summary>Los cuatro primeros y los cuatro últimos, para poder seguirle la pista sin escribirlo.</summary>
+        private static string Enmascarar(string token)
+            => token.Length <= 12
+                ? new string('x', token.Length)
+                : token.Substring(0, 4) + new string('x', token.Length - 8) + token.Substring(token.Length - 4);
 
         /// <summary>
         /// The launch this account is running, if it still has one.
@@ -184,12 +202,6 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Quita el lanzamiento de una cuenta sin tener el objeto delante.
-        ///
-        /// Hace falta desde que el lanzador es otro proceso: el que ve morir el proceso del cliente
-        /// es él, y por el cable sólo puede mandar el número de la cuenta.
-        /// </summary>
-        /// <summary>
         /// Olvida todos los lanzamientos. Del banco de pruebas: en el servidor nadie debe llamarla,
         /// porque le soltaria la cuenta a todo el que este jugando.
         /// </summary>
@@ -201,6 +213,12 @@ namespace Jondo.Unity.Server.Network
             Tokens.Clear();
         }
 
+        /// <summary>
+        /// Quita el lanzamiento de una cuenta sin tener el objeto delante.
+        ///
+        /// Hace falta desde que el lanzador es otro proceso: el que ve morir el proceso del cliente
+        /// es él, y por el cable sólo puede mandar el número de la cuenta.
+        /// </summary>
         public static void RemoveByAccount(long accountId)
         {
             if (ByAccount.TryGetValue(accountId, out var launch)) Remove(launch);

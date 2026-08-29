@@ -129,12 +129,17 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>
         /// Cuántos personajes caben por servidor.
-        ///
-        /// El servidor real anuncia cinco, que es el límite de una cuenta de verdad. Aquí no hay
-        /// nada que limitar: es un emulador de un solo jugador y el tope solo servía para apagar el
-        /// botón de crear personaje en cuanto se llenaba.
         /// </summary>
-        public const int MaxCharactersPerServer = 100;
+        /// <remarks>
+        /// CINCO, que es lo que manda el servidor real y no una cifra elegida. Medido sobre el
+        /// crudo de «desde launcher a eleccion servidor.pcapng»: la pareja de bytes 1005 —el campo
+        /// f2 con valor 5— aparece ocho veces en esa respuesta, y el 100 (1064) no aparece ni una.
+        ///
+        /// Aquí ponía 100, subido a mano con el razonamiento de que «no hay nada que limitar».
+        /// Mandar un número que el cliente no ve nunca es justo lo que este proyecto no hace: no se
+        /// sabe qué hace con él, y el botón de crear personaje seguía en gris igual.
+        /// </remarks>
+        public const int MaxCharactersPerServer = 5;
 
         /// <summary>
         /// Format of the connection dates in the capture: ISO 8601 with milliseconds and the
