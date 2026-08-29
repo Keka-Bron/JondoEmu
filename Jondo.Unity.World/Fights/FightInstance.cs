@@ -112,12 +112,20 @@ namespace Jondo.Unity.World.Fights
             }
         }
 
+        /// <summary>Ocho por bando: por debajo de esto no hay sitio para colocar dos equipos.</summary>
+        public const int PlacesForBothTeams = 16;
+
         public void GeneratePlacementCells(List<int> walkableCells)
         {
             BluePlacementCells.Clear();
             RedPlacementCells.Clear();
 
-            if (walkableCells == null || walkableCells.Count == 0)
+            // Menos de dieciseis no da para dos equipos de ocho, y partirlas por la mitad daria
+            // uno o dos huecos por bando: con una sola casilla roja los cinco monstruos se
+            // colocan encima unos de otros, y golpear esa casilla hiere a uno y a los demas no.
+            // El listón era "cero", que es justo el caso que no pasaba: en el arena 188752387
+            // llegaban DOS, y dos no es cero.
+            if (walkableCells == null || walkableCells.Count < PlacesForBothTeams)
             {
                 BluePlacementCells.AddRange(new[] { 286, 298, 326, 271, 285, 299, 312, 313 });
                 RedPlacementCells.AddRange(new[] { 411, 424, 439, 397, 410, 426, 438, 453 });

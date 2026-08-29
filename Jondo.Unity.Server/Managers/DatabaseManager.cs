@@ -1966,6 +1966,24 @@ namespace Jondo.Unity.Server
                     Jondo.Unity.Server.Network.SessionContext.State.MapId = StartingMap;
                     Jondo.Unity.Server.Network.SessionContext.State.CellId = StartingCell;
                 }
+
+                // Y la casilla, por lo mismo y por una razon concreta: hasta que se arreglo, el
+                // final de combate guardaba la casilla del ARENA como si fuera la del mapa de rol.
+                // En el taller de Incarnam eso era la 189 sobre un mapa cuyas 34 casillas van de la
+                // 244 a la 414, o sea una casilla que ahi no existe, y el cliente no dibujaba al
+                // personaje en ningun sitio. El arreglo evita que vuelva a pasar; esto limpia las
+                // fichas que ya lo llevan guardado, que si no entrarian invisibles hasta dar un
+                // paso.
+                var suyo = Jondo.Unity.Server.Network.SessionContext.State;
+                if (suyo.CellId > 0 && MapManager.WalkableCells.Count > 0
+                    && !MapManager.IsCellWalkable(suyo.MapId, suyo.CellId))
+                {
+                    int buena = MapManager.GetNearestWalkableCell(suyo.MapId, suyo.CellId);
+                    Console.WriteLine($"[SQLite] {suyo.CharacterName} estaba guardado en la casilla " +
+                                      $"{suyo.CellId} del mapa {suyo.MapId}, que no se puede pisar. " +
+                                      $"Se le pone en la {buena}.");
+                    suyo.CellId = buena;
+                }
                 Jondo.Unity.Server.Network.SessionContext.State.Orientation = reader.IsDBNull(14) ? 1 : reader.GetInt32(14);
                 Jondo.Unity.Server.Network.SessionContext.State.Kamas = reader.IsDBNull(15) ? 0 : reader.GetInt64(15);
 

@@ -66,8 +66,30 @@ namespace Jondo.Unity.Server.Handlers
             // los dos paquetes reparten el mismo número; se queda por las llamadas de fuera.
             fight.DefenderLeaderId = mobGroup.MobId;
 
-            // Generate placement cells from arena map walkable cells
-            var walkableCells = MobSpawnManager.GetInnerWalkableCells(arenaMapId);
+            // LAS CASILLAS DE COLOCACION SALEN DE GetFightWalkable, no del filtro de siembra.
+            //
+            // GetInnerWalkableCells es un filtro de SUPERFICIE: se queda solo con las casillas
+            // cuyas doce vecinas en radio 2 son todas andables y que estan lejos del borde, que es
+            // lo que hace falta para plantar un grupo de monstruos en un mapa de rol y no lo que
+            // hace falta para colocar dos equipos en un arena. En el arena 188752387 pasan 2 de
+            // sus 77 casillas, y su unica red de seguridad -"si no queda ninguna, usalas todas"-
+            // no salta porque 2 no es cero. De ahi salen 1 casilla azul y 1 roja, y los cinco
+            // monstruos acaban apilados en la misma.
+            //
+            // Incarnam funcionaba por casualidad: alli el filtro deja 0 de 65, la red salta y se
+            // usan las 65.
+            //
+            // Medido sobre los 15.360 mapas: con el filtro de siembra, 7.388 se quedan por debajo
+            // de 8 casillas rojas y 987 se quedan en UNA. Con GetFightWalkable, 15.354 tienen las
+            // 8. Es ademas el conjunto en el que ya confia el resto del combate -moverse y la
+            // linea de vision preguntan a este mismo-.
+            //
+            // La copia con ToList no es cosmetica: GetFightWalkable devuelve el HashSet vivo de
+            // MapManager, y GeneratePlacementCells recibiria los datos del mapa para siempre.
+            var enCombate = MapManager.GetFightWalkable(arenaMapId);
+            var walkableCells = enCombate != null && enCombate.Count > 0
+                ? new List<int>(enCombate)
+                : MobSpawnManager.GetInnerWalkableCells(arenaMapId);
             fight.GeneratePlacementCells(walkableCells);
 
             // Las cuatro elementales COMPLETAS: lo que el jugador se ha puesto de puntos más lo que
@@ -246,6 +268,13 @@ namespace Jondo.Unity.Server.Handlers
             // las jxg, el kba y los demás. Mandándolo antes, el cliente todavía está en el mapa de
             // superficie, no tiene contexto de combate y se lo come sin decir nada: en el registro
             // se ve la preparación saliendo y en pantalla no pasa nada.
+            // Donde esta de pie en el mapa de rol, ANTES de que la linea de abajo lo mande al
+            // arena. Se guardaba despues, y para entonces GameState.CellId ya era la casilla del
+            // arena: al acabar el combate se le devolvia a una casilla que en el mapa de rol
+            // muchas veces NO EXISTE -en el taller de Incarnam, la 189 sobre un mapa cuyas 42
+            // casillas van de la 244 a la 414- y el cliente no lo dibujaba en ningun sitio.
+            int casillaDeRol = GameState.CellId;
+
             GameState.MapId = fight.MapId;
             GameState.CellId = fight.Team0.Count > 0 ? fight.Team0[0].CellId : GameState.CellId;
             fight.HasLoadedMap = false;
@@ -269,7 +298,7 @@ namespace Jondo.Unity.Server.Handlers
             var suyo = Network.SessionContext.State;
             suyo.FightId = fight.FightId;
             suyo.RoleplayMapId = fight.RoleplayMapId;
-            suyo.RoleplayCellId = fight.Team0.Count > 0 ? fight.Team0[0].CellId : 0;
+            suyo.RoleplayCellId = casillaDeRol;
 
             // Sin guardar el personaje: el mapa de combate es un mapa de instancia y dejarlo escrito
             // en la ficha lo devolvería ahí al volver a entrar, a un sitio del que no se sale.
@@ -382,7 +411,17 @@ namespace Jondo.Unity.Server.Handlers
             suyo.IsInFight = false;
             suyo.FightId = 0;
             suyo.MapId = suyo.RoleplayMapId;
-            if (suyo.RoleplayCellId != 0) suyo.CellId = suyo.RoleplayCellId;
+            // Y siempre sobre una casilla que EXISTA en el mapa al que vuelve, igual que hacen
+            // los otros cuatro teletransportes de este emulador -el zaap, la puerta, el .teleport
+            // y el merkasako-, que todos pasan por aqui. La linea de arriba ya guarda la casilla
+            // buena, asi que esto normalmente no cambia nada; existe por las fichas que ya estan
+            // guardadas con una casilla de arena de antes de este arreglo, que si no entrarian al
+            // mundo invisibles hasta dar un paso.
+            if (suyo.RoleplayCellId != 0)
+            {
+                suyo.CellId = MapManager.GetNearestWalkableCell(suyo.MapId, suyo.RoleplayCellId);
+            }
+
             DatabaseManager.SaveCurrentCharacter();
 
             suyo.RoleplayMapId = 0;
