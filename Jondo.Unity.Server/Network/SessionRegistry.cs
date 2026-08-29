@@ -58,6 +58,26 @@ namespace Jondo.Unity.Server.Network
 
         public static bool Unregister(GameSession session) => _sessions.TryRemove(session.Id, out _);
 
+        /// <summary>
+        /// Si esta cuenta tiene ahora mismo una sesion de juego conectada.
+        /// </summary>
+        /// <remarks>
+        /// La usa el barrido de lanzamientos para no soltarle la cuenta a alguien que esta
+        /// jugando. Es la senal buena: mira lo que hay conectado AHORA, no si alguna vez lo
+        /// estuvo. Cuidado con darle otro uso -esto dice "hay socket", no "esta en el mundo".
+        /// </remarks>
+        public static bool HasConnected(long accountId)
+        {
+            if (accountId <= 0) return false;
+
+            foreach (var pair in _sessions)
+            {
+                if (pair.Value.AccountId == accountId) return true;
+            }
+
+            return false;
+        }
+
         public static bool TryGet(Guid sessionId, out GameSession? session)
             => _sessions.TryGetValue(sessionId, out session);
 

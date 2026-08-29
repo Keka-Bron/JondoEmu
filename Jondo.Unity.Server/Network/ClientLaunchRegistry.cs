@@ -34,6 +34,23 @@ namespace Jondo.Unity.Server.Network
             /// <summary>Desde dónde se lanzó. Agrupa los clientes de una misma persona.</summary>
             public string Ip { get; init; } = "";
             public DateTime CreatedAtUtc { get; init; }
+
+            /// <summary>
+            /// La ultima vez que este lanzamiento dio senales de vida.
+            /// </summary>
+            /// <remarks>
+            /// No es lo mismo que CreatedAtUtc y esa diferencia es todo el arreglo. Antes el
+            /// barrido se saltaba cualquier lanzamiento que tuviera entrada en ByGameSession, y
+            /// esa entrada la pone el handshake de Thrift y no la quita nadie: un cliente que se
+            /// moria DESPUES del handshake -y con el lanzador cerrado tambien- dejaba la cuenta
+            /// marcada como ocupada hasta reiniciar el servidor, y Register rechazaba todos los
+            /// intentos siguientes con "cuenta-ya-abierta".
+            ///
+            /// Tener entrada ahi prueba que ALGUNA VEZ conecto, no que siga estando. Esto prueba
+            /// lo segundo: se toca cada vez que alguien resuelve su sesion de juego, que es lo que
+            /// hace un cliente vivo una y otra vez.
+            /// </remarks>
+            public DateTime LastSeenUtc { get; set; }
         }
 
         private static readonly ConcurrentDictionary<string, Launch> ByHash =
@@ -87,7 +104,8 @@ namespace Jondo.Unity.Server.Network
                     LauncherToken = launcherToken ?? "",
                     Language = string.IsNullOrWhiteSpace(language) ? "es" : language,
                     Ip = deDonde,
-                    CreatedAtUtc = DateTime.UtcNow
+                    CreatedAtUtc = DateTime.UtcNow,
+                    LastSeenUtc = DateTime.UtcNow,
                 };
                 ByHash[hash] = launch;
                 ByAccount[accountId] = launch;
@@ -104,6 +122,7 @@ namespace Jondo.Unity.Server.Network
 
             gameSession = Convert.ToHexString(RandomNumberGenerator.GetBytes(24)).ToLowerInvariant();
             ByGameSession[gameSession] = launch;
+            launch.LastSeenUtc = DateTime.UtcNow;
             return true;
         }
 
@@ -114,7 +133,12 @@ namespace Jondo.Unity.Server.Network
                 launch = null;
                 return false;
             }
-            return ByGameSession.TryGetValue(gameSession, out launch);
+            if (!ByGameSession.TryGetValue(gameSession, out launch)) return false;
+
+            // Senal de vida. Un cliente vivo pasa por aqui una y otra vez -cada vez que hay que
+            // resolver de quien es esta sesion-, y uno muerto no vuelve nunca.
+            if (launch != null) launch.LastSeenUtc = DateTime.UtcNow;
+            return true;
         }
 
         public static void RegisterToken(long accountId, string? token)
@@ -165,6 +189,18 @@ namespace Jondo.Unity.Server.Network
         /// Hace falta desde que el lanzador es otro proceso: el que ve morir el proceso del cliente
         /// es él, y por el cable sólo puede mandar el número de la cuenta.
         /// </summary>
+        /// <summary>
+        /// Olvida todos los lanzamientos. Del banco de pruebas: en el servidor nadie debe llamarla,
+        /// porque le soltaria la cuenta a todo el que este jugando.
+        /// </summary>
+        internal static void ForgetEverything()
+        {
+            ByHash.Clear();
+            ByAccount.Clear();
+            ByGameSession.Clear();
+            Tokens.Clear();
+        }
+
         public static void RemoveByAccount(long accountId)
         {
             if (ByAccount.TryGetValue(accountId, out var launch)) Remove(launch);
@@ -188,21 +224,31 @@ namespace Jondo.Unity.Server.Network
             foreach (var pair in ByAccount)
             {
                 var launch = pair.Value;
-                if (ahora - launch.CreatedAtUtc < cuanto) continue;
 
-                // Si ya está jugando de verdad no se toca: tiene sesión de juego abierta.
-                bool jugando = false;
-                foreach (var suya in ByGameSession)
-                {
-                    if (ReferenceEquals(suya.Value, launch)) { jugando = true; break; }
-                }
-                if (jugando) continue;
+                // Desde la ultima senal, no desde que se anoto. El de antes era "si tiene entrada
+                // en ByGameSession no se toca", y esa entrada la pone el handshake y no la quita
+                // nadie: un cliente que se moria despues del handshake dejaba la cuenta ocupada
+                // hasta reiniciar el servidor.
+                //
+                // Y NO se suelta al cerrarse un socket, que es la otra forma de arreglar esto y
+                // abre dos agujeros: volver a la pantalla de personajes cierra el socket de juego
+                // -es la flecha de atras, no salir- asi que soltar ahi permite relanzar la misma
+                // cuenta con el cliente anterior todavia vivo, tantas veces como se quiera, y de
+                // paso el recuento por IP nunca pasa de uno y el tope de ocho deja de existir.
+                var visto = launch.LastSeenUtc == default ? launch.CreatedAtUtc : launch.LastSeenUtc;
+                if (ahora - visto < cuanto) continue;
+
+                // Y la senal que de verdad zanja: hay un socket de esa cuenta conectado ahora
+                // mismo. Hace falta ADEMAS de la marca de tiempo porque un jugador quieto puede
+                // pasarse los cinco minutos sin que nadie resuelva su sesion, y soltarle el
+                // lanzamiento le dejaria la cuenta libre para que la abriera otro cliente con el
+                // suyo todavia jugando.
+                if (SessionRegistry.HasConnected(launch.AccountId)) continue;
 
                 Remove(launch);
                 soltados++;
-                Console.WriteLine($"[Lanzamientos] La cuenta {launch.AccountId} llevaba " +
-                                  $"{(ahora - launch.CreatedAtUtc).TotalMinutes:0} min anotada sin llegar a " +
-                                  "conectar. Se suelta.");
+                Console.WriteLine($"[Lanzamientos] La cuenta {launch.AccountId} lleva " +
+                                  $"{(ahora - visto).TotalMinutes:0} min sin dar senales. Se suelta.");
             }
             return soltados;
         }

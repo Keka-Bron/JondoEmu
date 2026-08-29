@@ -224,6 +224,32 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
+        /// Rehace la lista de turnos conservando a quién le toca ahora mismo.
+        /// </summary>
+        /// <remarks>
+        /// Lo que hace falta cuando alguien SALE de la lista a media ronda. Agrupar filtra por
+        /// IsAlive, así que rehacerla lo quita y todos los de detrás se corren un hueco; sin
+        /// repuntar CurrentTurnIndex, el turno se le iría al de al lado en mitad de una acción.
+        ///
+        /// Es lo mismo que ya hacía <see cref="Invocar"/> para el caso contrario, cuando alguien
+        /// ENTRA. Sacado aquí para que las dos direcciones no puedan separarse.
+        /// </remarks>
+        public void RebuildTurnOrderKeepingCurrent()
+        {
+            var jugando = CurrentFighter;
+            TurnOrder = BuildAlternatingTurnOrder();
+
+            if (jugando != null && TurnOrder.Contains(jugando))
+            {
+                CurrentTurnIndex = TurnOrder.IndexOf(jugando);
+            }
+            else if (CurrentTurnIndex >= TurnOrder.Count)
+            {
+                CurrentTurnIndex = TurnOrder.Count > 0 ? TurnOrder.Count - 1 : 0;
+            }
+        }
+
+        /// <summary>
         /// Un bando en orden de juego: los de siempre por iniciativa, y detrás de cada uno los que
         /// haya invocado, en el orden en que los sacó.
         ///

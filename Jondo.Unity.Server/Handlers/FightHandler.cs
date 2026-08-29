@@ -1762,6 +1762,24 @@ namespace Jondo.Unity.Server.Handlers
                 gastado.CurrentHP = 0;
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDeath(gastado.Id, gastado.Id)));
+
+                // Y FUERA DE LA LISTA DE TURNOS, que es lo que faltaba. El indice que viaja en el
+                // f7 del jzc apunta a esa lista, y al no rehacerla el invocado muerto seguia
+                // ocupando su hueco: todos los de detras salian con un numero de mas y el cliente
+                // marcaba el retrato equivocado en el carrusel.
+                //
+                // Medido en "combate contra 4 poutchs nivel 25 usando varios hechizos e invos":
+                //
+                //   ronda 1   jugador(0)  -1(1) -2(2) -3(3) -4(4)
+                //   ronda 2   jugador(0)  -7(1) luego -1(2) -2(3) -3(4) -4(5)   entra una invocacion
+                //   ronda 6   jugador(0)  -9(1) ...                             las dos anteriores se
+                //                                                               fueron y se compacto
+                //
+                // O sea que el servidor real recalcula el indice en las dos direcciones, al entrar
+                // y al salir. Solo para invocados: que pasa con el hueco de un monstruo muerto no
+                // lo dice ninguna captura, asi que eso se queda como estaba.
+                fight.RebuildTurnOrderKeepingCurrent();
+
                 Program.LogDebug($"[Combate] Se deshace el invocado {gastado.Id} " +
                                  $"(le tocaba en la ronda {gastado.MuereEnRonda}).");
                 await ReenviarLaListaAsync(stream, fight);
