@@ -131,6 +131,19 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static readonly object _candado = new object();
 
+        /// <summary>
+        /// Whether this is one of the maps where no monster may be planted.
+        /// </summary>
+        /// <remarks>
+        /// Indoors, and on top of a zaap. 3,472 maps, and 7,214 groups from the database are
+        /// dropped for them at boot. Public because the answer is worth being able to ask: the bug
+        /// this exposes was that two different places had to agree about it and only one did.
+        /// </remarks>
+        public static bool IsVetoed(long mapId) => _vetados.Contains(mapId);
+
+        /// <summary>How many maps are vetoed. Zero before the world is loaded.</summary>
+        public static int VetoedCount => _vetados.Count;
+
         public static void InitializeAndSpawnAll()
         {
             Console.WriteLine("[MobSpawnManager] Loading data from SQLite...");
@@ -578,6 +591,25 @@ namespace Jondo.Unity.Server.Managers
             var result = new List<MobGroup>();
             if (_monsters.Count == 0) return result;
 
+            // BAJO TECHO Y ENCIMA DE UN ZAAP NO SE PONE A NADIE, lo mismo que al cargar. Sin esta
+            // linea el veto se mordia la cola, y esa es toda la explicacion del bicho dentro del
+            // taller de herreros y de los que salian encima del zaap de Astrub:
+            //
+            //   al arrancar se descartan los grupos de la base de los 3.472 mapas vetados
+            //     -> esos mapas se quedan SIN CLAVE en _mapMobs
+            //       -> GetMobsForMap no encuentra nada y los toma por mapas vacios
+            //         -> los repuebla al vuelo con 2 a 4 grupos de la subzona
+            //
+            // O sea que quitar los grupos era exactamente lo que provocaba que aparecieran otros.
+            // El primero que entrara en cualquiera de esos 3.472 mapas se los encontraba.
+            //
+            // Va AQUI dentro y no en GetMobsForMap a proposito: los grupos escritos a mano si
+            // ignoran el veto -para eso estan- y viven ya en _mapMobs, asi que comprobarlo mas
+            // arriba los escondiria. Con la comprobacion aqui, un grupo de mision bajo techo se
+            // sigue sirviendo, y cuando el jugador lo mata el mapa se queda vacio en vez de
+            // volver a llenarse de bichos de la zona.
+            if (_vetados.Contains(mapId)) return result;
+
             // En el merkasako no se pelea con nadie: es la casa de uno.
             if (Merkasako.IsHavenBag(mapId)) return result;
 
@@ -668,6 +700,21 @@ namespace Jondo.Unity.Server.Managers
                 {
                     innerCells.Add(cell);
                 }
+            }
+
+            // Y fuera las casillas que tienen algo encima que se pueda clicar. Un grupo plantado
+            // sobre el zaap lo tapa: el clic se lo lleva el monstruo y ya no hay forma de viajar.
+            // El veto de mapas ya deja fuera los 62 mapas de zaap enteros, pero las puertas, los
+            // talleres y los recursos estan en mapas que no estan vetados y valen igual.
+            var ocupadas = new HashSet<int>();
+            foreach (var elemento in Interactives.ElementsOf(mapId))
+            {
+                if (elemento.Cell != 0) ocupadas.Add(elemento.Cell);
+            }
+
+            if (ocupadas.Count > 0)
+            {
+                innerCells.RemoveAll(c => ocupadas.Contains(c));
             }
 
             return innerCells.Count > 0 ? innerCells : cells;

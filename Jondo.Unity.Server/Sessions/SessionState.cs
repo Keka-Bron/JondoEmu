@@ -122,6 +122,25 @@ namespace Jondo.Unity.Server
 
         /// <summary>La casilla de la calle desde la que se entró.</summary>
         public int HouseEntryCell { get; set; }
+
+        /// <summary>
+        /// Desde qué mapa se entró al merkasako, para volver ahí con la misma tecla.
+        /// </summary>
+        /// <remarks>
+        /// Hace falta porque el cliente manda EL MISMO mensaje para entrar y para salir: en
+        /// «Movimiento/ir al merkasako y volver.pcapng» las dos peticiones del jugador, la #1 y la
+        /// #8, son un jbn con el cuerpo 10a28280c8e708 byte a byte, y el servidor contesta a la
+        /// primera con el mapa de la bolsa y a la segunda con un mapa del mundo. O sea que quién
+        /// decide la dirección es el servidor, mirando dónde está el jugador, y para eso hay que
+        /// saber de dónde vino.
+        ///
+        /// Aparte de RoleplayMapId, que es del combate: se puede entrar al merkasako y pelear
+        /// dentro, y compartir el campo dejaría al que sale de la pelea en la calle.
+        /// </remarks>
+        public long HavenBagEntryMapId { get; set; }
+
+        /// <summary>La casilla del mundo desde la que se entró al merkasako.</summary>
+        public int HavenBagEntryCell { get; set; }
         public bool IsChestOpen { get; set; }
         public bool IsHavenBagEditing { get; set; }
         public List<Managers.HavenBagStore.Furniture> PendingHavenBagFurniture { get; }
