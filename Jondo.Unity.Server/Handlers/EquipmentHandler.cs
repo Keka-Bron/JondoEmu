@@ -17,8 +17,13 @@ namespace Jondo.Unity.Server.Handlers
     ///   S  iun                    pods, because what is worn still weighs
     ///
     /// Positions come from the captures and from a session of the real client: 0 the amulet,
-    /// 2 to 5 the rings and the belt, 6 the hat, 8 the pet or the mount, 12 to 14 the dofus, and
-    /// 63 the bag, which is where an item goes when it is taken off.
+    /// 2 to 5 the rings and the belt, 6 the hat, 7 the cloak, 8 the pet or the mount, 9 to 14 the
+    /// dofus, and 63 the bag, which is where an item goes when it is taken off.
+    ///
+    /// The dofus slots said "12 to 14" here and that was wrong: in
+    /// «Equipables/equipar 6 dofus.pcapng» the six ivq answers carry f2 = 09 0a 0b 0c 0d 0e, so
+    /// they are 9 to 14 -- six slots, not three. Measured in the same session: the weapon is 1
+    /// (and 0x3f, the bag, when taken off), the hat 6, the two rings 2 and 4, and the dragoturkey 8.
     ///
     /// En cada hueco cabe una cosa, y eso lo hace cumplir este handler: lo que ya estuviera puesto
     /// sale a la bolsa con su propio ivq antes de que entre lo nuevo.
@@ -53,6 +58,37 @@ namespace Jondo.Unity.Server.Handlers
                 else if (f.FieldNumber == 3) position = (int)f.VarIntValue;
             }
             if (uid == 0) return;
+
+            // NO SE PONE LO QUE NO SE PUEDE LLEVAR. El servidor no miraba el nivel del objeto, asi
+            // que un personaje de nivel 1 se equipaba un arma de nivel 110 y se quedaba con sus
+            // bonus: el cliente lo pinta en gris y no deja arrastrarlo, pero un cliente tocado
+            // manda el iuk igual y aqui se aceptaba sin preguntar.
+            //
+            // El nivel sale del campo level de la plantilla, que lo traen LAS 21.748 -no hay que
+            // adivinarlo para ninguna-. Solo se comprueba al PONER: sacar algo a la bolsa siempre
+            // se puede, que si no un personaje que perdiera nivel se quedaria sin poder desnudarse.
+            if (position != Bag)
+            {
+                var loSuyo = Managers.Equipment.ByUid(uid);
+                int pide = loSuyo != null ? DatabaseManager.ItemLevelRequirement(loSuyo.Template) : 0;
+
+                if (pide > SessionContext.State.CharacterLevel)
+                {
+                    Console.WriteLine($"[Equipment] El objeto {uid} pide nivel {pide} y el personaje " +
+                                      $"tiene {SessionContext.State.CharacterLevel}. No se pone.");
+
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                            Managers.InfoMessages.Warning, Managers.InfoMessages.LevelTooLow)));
+
+                    // Y se le devuelve a donde estaba, que si no el cliente lo deja dibujado en el
+                    // hueco nuevo hasta que algo le refresque el inventario.
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ivq,
+                            Pb.New().Var(1, uid).Var(2, loSuyo!.Position).Build()));
+                    return;
+                }
+            }
 
             // En un hueco cabe uno. Lo que hubiera puesto sale a la bolsa antes de que entre lo
             // nuevo, y se le manda su propio ivq: sin eso las dos cosas se quedaban en el mismo

@@ -2370,6 +2370,46 @@ namespace Jondo.Unity.Server
         /// Looks up an item template and rolls its factory effects at their maximum value.
         /// Returning false distinguishes a real effect-less item from an unknown template id.
         /// </summary>
+        /// <summary>
+        /// El nivel que hace falta para llevar puesto un objeto. Cero si no se sabe.
+        /// </summary>
+        /// <remarks>
+        /// Sale del campo <c>level</c> de la plantilla, que lo traen LAS 21.748: no hay que
+        /// adivinarlo para ninguna. El once mil doscientos setenta y cinco piden nivel 1 y el tope
+        /// es 200.
+        ///
+        /// Devuelve cero cuando la plantilla no esta o no se puede leer, y quien llame debe
+        /// tratarlo como "sin requisito": negarse a equipar por no haber podido consultar seria
+        /// dejar a alguien sin su equipo por un fallo de base de datos.
+        /// </remarks>
+        public static int ItemLevelRequirement(int gid)
+        {
+            if (gid <= 0) return 0;
+
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Data FROM ItemTemplates WHERE Id = $gid;";
+                command.Parameters.AddWithValue("$gid", gid);
+
+                if (command.ExecuteScalar() is not string data || data.Length == 0) return 0;
+
+                using var doc = System.Text.Json.JsonDocument.Parse(data);
+                return doc.RootElement.TryGetProperty("level", out var level)
+                       && level.TryGetInt32(out int cuanto)
+                    ? Math.Max(0, cuanto)
+                    : 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se ha podido leer el nivel del objeto {gid}: {ex.Message}");
+                return 0;
+            }
+        }
+
         public static bool TryGetItemTemplateEffects(int gid, out string effects)
         {
             effects = "[]";
