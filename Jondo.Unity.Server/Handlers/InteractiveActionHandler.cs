@@ -31,6 +31,28 @@ namespace Jondo.Unity.Server.Handlers
 
             long mapId = SessionContext.State.MapId;
 
+            // Queda apuntado antes de decidir que hace, y a proposito: hay conversaciones que
+            // dependen de haber leido algo, y si esto fuera detras del despacho un elemento que
+            // acabe en «uso desconocido» -como el cartel de la taberna, que no es zaap ni recurso
+            // ni objetivo- no dejaria rastro nunca.
+            if (elementId != 0 && SessionContext.State.ElementsUsed.Add(elementId))
+            {
+                DatabaseManager.RememberElement(GameState.CharacterId, elementId);
+            }
+
+            // ¿Es algo que se lee? Va antes de las misiones porque un cartel no es un objetivo:
+            // la oferta de trabajo de la taberna no sale en ningún paso de la misión que abre, y
+            // aun así hay que enseñarla. El apunte de arriba ya ha quedado hecho, que es lo que
+            // luego deja al tabernero ofrecer «He visto el anuncio que has puesto».
+            int documento = Readables.DocumentOf(mapId, elementId);
+            if (documento != 0)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kkt, Pb.New().Var(2, documento).Build()));
+                Console.WriteLine($"[Lecturas] Se lee el documento {documento} del elemento {elementId}.");
+                return;
+            }
+
             // ¿Es algo que una misión pide pinchar? Se mira ANTES del registro, porque una estela
             // no es un zaap ni un recurso: no está en el registro y su única razón de existir es la
             // misión. Es lo que hace la captura del tutorial —seis clics en los elementos

@@ -313,6 +313,8 @@ namespace Jondo.Unity.Server.Network
                     Managers.SpellChoices.LoadFrom(chosen.Id);
                     Managers.Quests.LoadFrom(chosen.Id);
                     Managers.Achievements.LoadFrom(chosen.Id);
+                    SessionContext.State.ElementsUsed =
+                        DatabaseManager.LoadElementsUsed(chosen.Id);
 
                     SessionContext.Current.EnterWorld();
                     await SessionRegistry.BroadcastToMapAsync(

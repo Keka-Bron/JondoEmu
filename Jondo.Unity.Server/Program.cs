@@ -127,6 +127,7 @@ namespace Jondo.Unity.Server
             // Detras de Npcs porque las misiones cuelgan de sus dialogos, y el catalogo es de
             // Ankama y no cambia: se lee una vez y lo comparten todas las sesiones.
             Managers.Quests.Load();
+            Managers.Readables.Load();
             // Detras de las misiones: 259 logros se ganan acabando una, y el catalogo se indexa
             // por mision al cargarse.
             Managers.Achievements.Load();

@@ -113,6 +113,34 @@ namespace Jondo.Unity.World.Quests
         public IReadOnlyList<(int Item, int Count)> Gives { get; init; }
             = Array.Empty<(int, int)>();
 
+        /// <summary>Lo que hay que llevar encima para que el elemento responda.</summary>
+        /// <remarks>
+        /// Se comprueba antes de cerrar nada: sin ello, «pulsar el tirador con la limonada» y
+        /// «pulsar el tirador» son lo mismo, y la mitad de la misión se salta sola.
+        /// </remarks>
+        public IReadOnlyList<(int Item, int Count)> Requires { get; init; }
+            = Array.Empty<(int, int)>();
+
+        /// <summary>Si lo exigido se gasta al usarlo. Por omisión no: basta con llevarlo.</summary>
+        public bool SpendsRequired { get; init; }
+
+        /// <summary>El monstruo que sale al pulsarlo, y cuántos. Cero cuando no sale ninguno.</summary>
+        /// <remarks>
+        /// «Haz salir a la rata de su escondite» no es una frase decorativa: el objetivo siguiente
+        /// es vencerla, y sin esto no hay nada contra lo que pelear. La Rata Nsiosa está en cero
+        /// grupos del mundo porque no debe estar puesta -- aparece cuando se la hace aparecer.
+        /// </remarks>
+        public int SpawnsMonster { get; init; }
+        public int SpawnsCount { get; init; } = 1;
+
+        /// <summary>La misión que ENTREGA este elemento, cuando no la da un NPC.</summary>
+        /// <remarks>
+        /// Hay misiones que empiezan pulsando algo, no hablando: «Mort au rat» arranca en el
+        /// anuncio de la fachada de la taberna. Cambia además cuándo se ve el elemento -- se
+        /// enseña mientras la misión NO se ha cogido, que es lo contrario de todos los demás.
+        /// </remarks>
+        public int Starts { get; init; }
+
         /// <summary>Why this row says what it says. Never read by the server; read by people.</summary>
         public string Why { get; init; } = "";
 
@@ -243,6 +271,26 @@ namespace Jondo.Unity.World.Quests
                 }
             }
 
+            // Lo que hay que llevar encima para que el elemento responda. Sin esto no se puede
+            // escribir «el tirador sólo funciona si llevas la limonada», que es la mitad de las
+            // misiones que encadenan comprar algo con usarlo en un sitio.
+            var requires = new List<(int, int)>();
+            if (row.TryGetProperty("requires", out var needed) && needed.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var one in needed.EnumerateArray())
+                {
+                    int item = Int(one, "item");
+                    if (item != 0) requires.Add((item, Math.Max(1, Int(one, "count"))));
+                }
+            }
+
+            int spawnMonster = 0, spawnCount = 0;
+            if (row.TryGetProperty("spawns", out var spawn) && spawn.ValueKind == JsonValueKind.Object)
+            {
+                spawnMonster = Int(spawn, "monster");
+                spawnCount = Math.Max(1, Int(spawn, "count"));
+            }
+
             int skill = Int(row, "skill");
             bool hasType = row.TryGetProperty("type", out _);
 
@@ -256,6 +304,12 @@ namespace Jondo.Unity.World.Quests
                 MonsterId = Int(row, "monster"),
                 Elements = elements,
                 Gives = gives,
+                Requires = requires,
+                SpendsRequired = row.TryGetProperty("spends", out var spends)
+                                 && spends.ValueKind == JsonValueKind.True,
+                SpawnsMonster = spawnMonster,
+                SpawnsCount = spawnCount,
+                Starts = Int(row, "starts"),
                 SkillId = skill == 0 ? QuestBinding.DefaultSkill : skill,
 
                 // Not `Int(...) == 0 ? default : value`, because -1 IS the default and 0 is a

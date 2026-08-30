@@ -621,6 +621,26 @@ namespace Jondo.Unity.Server
                 ";
                 createKeyring.ExecuteNonQuery();
 
+                // Los interactivos que este personaje ha usado alguna vez.
+                //
+                // Hace falta para las misiones que empiezan leyendo algo. La oferta de trabajo de
+                // la taberna de Incarnam no es un objetivo -- la misión tiene un solo paso y el
+                // cartel no sale en él --, es la CONDICIÓN para que el tabernero ofrezca «He visto
+                // el anuncio que has puesto»: sin haberlo leído esa respuesta no debería existir.
+                // Sin recordarlo no hay manera de saberlo, porque un clic no deja rastro.
+                //
+                // Se guarda de todos, no sólo del cartel: cuesta una fila y evita tener que decidir
+                // de antemano cuáles importan, que es una decisión que siempre se toma tarde.
+                var createElements = worldConnection.CreateCommand();
+                createElements.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterElements (
+                        CharacterId INTEGER NOT NULL,
+                        ElementId INTEGER NOT NULL,
+                        PRIMARY KEY (CharacterId, ElementId)
+                    );
+                ";
+                createElements.ExecuteNonQuery();
+
                 // El manojo de llaves a todo el que ya tuviera personaje. Los nuevos lo reciben
                 // con el conjunto del aventurero -ver CharacterCreationHandler-, pero los que ya
                 // estaban se quedarian sin el, y sin manojo no se entra en ninguna de las 107
@@ -2066,6 +2086,50 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>Checks that a character really does belong to the account asking for it.</summary>
+        /// <summary>Apunta que este personaje ha usado ese interactivo. Repetir no molesta.</summary>
+        public static void RememberElement(long characterId, int elementId)
+        {
+            if (characterId <= 0 || elementId == 0) return;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText =
+                    "INSERT OR IGNORE INTO CharacterElements (CharacterId, ElementId) " +
+                    "VALUES ($c, $e);";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$e", elementId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se pudo apuntar el elemento {elementId}: {ex.Message}");
+            }
+        }
+
+        /// <summary>Los interactivos que este personaje ya ha usado.</summary>
+        public static HashSet<int> LoadElementsUsed(long characterId)
+        {
+            var usados = new HashSet<int>();
+            if (characterId <= 0) return usados;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT ElementId FROM CharacterElements WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) usados.Add(reader.GetInt32(0));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] No se pudieron leer los elementos usados: {ex.Message}");
+            }
+            return usados;
+        }
+
         /// <summary>
         /// Every table a character owns a row in. Deleting one has to empty all of them.
         /// </summary>
@@ -2080,7 +2144,7 @@ namespace Jondo.Unity.Server
             "HavenBag", "HavenBagFurniture", "HavenBagChest",
             "CharacterWardrobe", "CharacterAppearance", "CharacterJobs",
             "CharacterChallenges", "CharacterQuests", "CharacterAchievements",
-            "CharacterKeyring",
+            "CharacterKeyring", "CharacterElements",
         };
 
         /// <summary>

@@ -801,6 +801,16 @@ public static class Op
     /// <summary>Peticion de carga de mapa antigua (3.6.4.3). No aparece en ninguna captura.</summary>
     public const string Kkr = "kkr";
 
+    /// <summary>
+    /// Abre un documento: un libro, un cartel, una placa.
+    /// </summary>
+    /// <remarks>
+    /// Solo lleva el id del documento, en el campo 2. Ni titulo ni texto viajan: el cliente los
+    /// tiene en su propia tabla. Medido en «abrir libro el escudo de feca y leerlo», donde el
+    /// cliente manda iuu y el servidor contesta kkt { f2: 217 }, que es el documento de ese libro.
+    /// </remarks>
+    public const string Kkt = "kkt";
+
     /// <summary>Solo alcanzable desde isi, que nunca llega. 2 mensajes en 2 ficheros.</summary>
     public const string Kku = "kku";
 
