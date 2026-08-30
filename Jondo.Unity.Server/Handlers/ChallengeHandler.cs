@@ -235,6 +235,15 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task ImposeAsync(NetworkStream stream, FightInstance fight)
         {
+            // Sólo en la sala del jefe. Estos son los retos con logro detrás, el premio de haber
+            // hecho la mazmorra entera, y salían en cada sala porque lo único que se miraba era
+            // si el combate tenía monstruos con reto. Salir en la cuarta de cinco además engaña:
+            // el jugador los lee como «esta es la última» y deja de avanzar.
+            //
+            // Un combate fuera de mazmorra no entra aquí -- IsBossRoom contesta que no cuando el
+            // mapa no es sala de ninguna --, que es lo que ya pasaba antes por otro camino.
+            if (!DungeonHandler.IsBossRoom(SessionContext.State.MapId)) return;
+
             var bichos = new List<int>();
             foreach (var uno in fight.Team1)
             {
