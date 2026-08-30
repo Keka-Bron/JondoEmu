@@ -334,7 +334,7 @@ namespace Jondo.Unity.Server.Network
                 accountId,
                 nickname,
                 BuildAccountTag(accountId),
-                SubscriptionEndDate,
+                Subscription.EndDateFor(accountId),
                 servers,
                 characters);
 
@@ -389,8 +389,12 @@ namespace Jondo.Unity.Server.Network
         /// Queda una inferencia y se dice: que el 2099 no se pueda leer está medido, que ESO sea
         /// lo que apaga el botón no lo demuestra ninguna captura. Lo demuestra probarlo.
         /// </remarks>
-        private static string SubscriptionEndDate =>
-            DateTimeOffset.Now.AddYears(1).ToString("yyyy-MM-ddTHH:mm:sszzz");
+        /// <remarks>
+        /// Moved to <see cref="Subscription"/>: the launcher answers the same question over Thrift
+        /// and the two have to agree. See that file for why the Z at the end of the launcher's copy
+        /// mattered.
+        /// </remarks>
+
 
         /// <summary>
         /// Una trama, en crudo, al registro de tráfico.

@@ -86,12 +86,184 @@ namespace Jondo.Unity.Server.Managers
             _byRoom.Clear();
 
             if (!Read()) return;
+            int reordenadas = OrderRooms();
             Store();
+
+            if (reordenadas > 0)
+                Console.WriteLine($"[DungeonManager] {reordenadas} mazmorra(s) tenían las salas " +
+                                  $"desordenadas; se han puesto en su orden de juego.");
 
             int rooms = 0;
             foreach (var dungeon in _byId.Values) rooms += dungeon.Rooms.Count;
             Console.WriteLine($"[DungeonManager] {_byId.Count} dungeons, {rooms} rooms, " +
                               $"{_byRoom.Count} maps that are one.");
+        }
+
+        /// <summary>
+        /// Puts each dungeon's rooms into the order they are walked. Returns how many were wrong.
+        /// </summary>
+        /// <remarks>
+        /// The extractor lists the rooms in whatever order the client's bundle held them, which is
+        /// not the order they are played, and this server advances a player by taking the NEXT
+        /// entry in the list. In the Famished Sunflower's Barn that list was Second, Fourth, Fifth,
+        /// First, Third -- and a player entering it landed in room two, and was moved to four, then
+        /// five, then three. Exactly the list, read straight down.
+        ///
+        /// Two sources say what the order is, and they are used in this order:
+        ///
+        /// <list type="number">
+        /// <item>The room NAMES, when every room of the dungeon has an ordinal in it. 51 dungeons
+        /// do -- "Famished Sunflower's Barn - Third Room" -- and it is the plainest statement of
+        /// intent there is.</item>
+        /// <item>The map LINKS otherwise. A room leads to the next through a corridor, and the
+        /// corridor is the same map on both sides: the right-hand exit of one room is the left-hand
+        /// entrance of the next. Following that from the only room nothing leads into gives the
+        /// chain. It orders 143 of the 187.</item>
+        /// </list>
+        ///
+        /// The two were checked against each other on the 51 dungeons where both can answer:
+        /// <b>50 agree</b>. The one that does not is the Tower of Solar, which is a tower -- its
+        /// rooms are stacked rather than strung out, so the horizontal chain says nothing useful
+        /// about it. That is why the names go first: where they exist they are never wrong.
+        ///
+        /// Anything neither source can order is left exactly as it came, because a guess would be
+        /// worse than the order the client shipped.
+        /// </remarks>
+        private static int OrderRooms()
+        {
+            var scrolls = new Dictionary<long, (long Right, long Bottom, long Left, long Top)>();
+            var names = new Dictionary<long, string>();
+
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+
+                var links = connection.CreateCommand();
+                links.CommandText =
+                    "SELECT MapId, RightMapId, BottomMapId, LeftMapId, TopMapId FROM MapScrolls;";
+                using (var reader = links.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        scrolls[reader.GetInt64(0)] = (reader.GetInt64(1), reader.GetInt64(2),
+                                                       reader.GetInt64(3), reader.GetInt64(4));
+                    }
+                }
+
+                var titles = connection.CreateCommand();
+                titles.CommandText = "SELECT MapId, Name FROM MapPositions WHERE Name IS NOT NULL;";
+                using (var reader = titles.ExecuteReader())
+                {
+                    while (reader.Read()) names[reader.GetInt64(0)] = reader.GetString(1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // A first boot, or a world without these tables. The rooms keep the order they
+                // came in, which is what happened before this method existed.
+                Console.WriteLine($"[DungeonManager] No se pudo leer el mapa para ordenar las " +
+                                  $"salas: {ex.Message}");
+                return 0;
+            }
+
+            int changed = 0;
+            foreach (var dungeon in _byId.Values)
+            {
+                if (dungeon.Rooms.Count < 2) continue;
+
+                var ordered = ByName(dungeon.Rooms, names) ?? ByLinks(dungeon.Rooms, scrolls);
+                if (ordered == null || ordered.SequenceEqual(dungeon.Rooms)) continue;
+
+                dungeon.Rooms.Clear();
+                dungeon.Rooms.AddRange(ordered);
+                changed++;
+            }
+
+            return changed;
+        }
+
+        /// <summary>The ordinals a room name can carry, in the language the map table is written in.</summary>
+        private static readonly string[] Ordinals =
+        {
+            "first", "second", "third", "fourth", "fifth", "sixth",
+            "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth",
+        };
+
+        /// <summary>Rooms by the ordinal in their name, or null when even one of them lacks it.</summary>
+        private static List<long>? ByName(List<long> rooms, Dictionary<long, string> names)
+        {
+            var numbered = new List<(long Map, int Position)>();
+
+            foreach (long room in rooms)
+            {
+                if (!names.TryGetValue(room, out string? name) || name == null) return null;
+
+                int position = 0;
+                string lower = name.ToLowerInvariant();
+                for (int i = 0; i < Ordinals.Length; i++)
+                {
+                    // " third room", and not just "third": "Third Room" is the ordinal of a room,
+                    // while a name like "Thirsty Room" must not be read as one.
+                    if (lower.Contains(Ordinals[i] + " room")) { position = i + 1; break; }
+                }
+
+                if (position == 0) return null;
+                numbered.Add((room, position));
+            }
+
+            // Two rooms claiming the same number is not an order, it is a coincidence of wording.
+            if (numbered.Select(pair => pair.Position).Distinct().Count() != numbered.Count) return null;
+
+            return numbered.OrderBy(pair => pair.Position).Select(pair => pair.Map).ToList();
+        }
+
+        /// <summary>Rooms by following the corridors, or null when the chain is not a single line.</summary>
+        private static List<long>? ByLinks(
+            List<long> rooms, Dictionary<long, (long Right, long Bottom, long Left, long Top)> scrolls)
+        {
+            // Only the forward exits. Reading the backward ones too puts an edge in both directions
+            // between every pair of neighbours, and then no room has nothing leading into it: the
+            // first attempt at this ordered 31 dungeons instead of 143 for exactly that reason.
+            var next = new Dictionary<long, HashSet<long>>();
+            var incoming = new Dictionary<long, int>();
+            foreach (long room in rooms) incoming[room] = 0;
+
+            foreach (long from in rooms)
+            {
+                if (!scrolls.TryGetValue(from, out var exits)) continue;
+
+                foreach (var (corridor, back) in new[] { (exits.Right, true), (exits.Bottom, false) })
+                {
+                    if (corridor == 0) continue;
+
+                    foreach (long to in rooms)
+                    {
+                        if (to == from || !scrolls.TryGetValue(to, out var entrances)) continue;
+                        if ((back ? entrances.Left : entrances.Top) != corridor) continue;
+
+                        if (!next.TryGetValue(from, out var set)) next[from] = set = new HashSet<long>();
+                        if (set.Add(to)) incoming[to]++;
+                    }
+                }
+            }
+
+            var starts = rooms.Where(room => incoming[room] == 0).ToList();
+            if (starts.Count != 1) return null;
+
+            var chain = new List<long>();
+            var seen = new HashSet<long>();
+            long? current = starts[0];
+
+            while (current != null && seen.Add(current.Value))
+            {
+                chain.Add(current.Value);
+                current = next.TryGetValue(current.Value, out var forward) && forward.Count == 1
+                    ? forward.First()
+                    : (long?)null;
+            }
+
+            return chain.Count == rooms.Count ? chain : null;
         }
 
         private static bool Read()

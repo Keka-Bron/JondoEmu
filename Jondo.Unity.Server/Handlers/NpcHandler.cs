@@ -292,7 +292,21 @@ namespace Jondo.Unity.Server.Handlers
         /// Sale 192 veces en las 401 capturas y siempre va vacío: no dice de qué NPC viene, así
         /// que se cierra lo que hubiera abierto, que es lo único que puede haber.
         /// </remarks>
-        public static async Task CloseAsync(NetworkStream stream, byte[] payload)
+        public static Task CloseAsync(NetworkStream stream, byte[] payload) => CloseAsync(stream);
+
+        /// <summary>
+        /// Cierra la conversación abierta, sin que haga falta un mensaje del cliente.
+        /// </summary>
+        /// <remarks>
+        /// El cliente no cierra la ventana por su cuenta: en la captura de hablar con un NPC no
+        /// manda NADA al terminar, se queda esperando el kld del servidor. Por eso una conversación
+        /// que el servidor daba por acabada sin mandarlo se quedaba pegada en pantalla y la equis
+        /// tampoco la quitaba -- no es que la equis fallara, es que también esperaba al kld.
+        ///
+        /// Lo necesita cualquier sitio que termine la conversación por su cuenta, como el guardián
+        /// de una mazmorra que acepta la llave y te mete dentro.
+        /// </remarks>
+        public static async Task CloseAsync(NetworkStream stream)
         {
             CerrarConversacion();
 
@@ -317,7 +331,9 @@ namespace Jondo.Unity.Server.Handlers
             return linea.RepliesFor(
                 diario.Active,
                 diario.Finished,
-                (mision, paso) => diario.Run(mision)?.StepId == paso);
+                (mision, paso) => diario.Run(mision)?.StepId == paso,
+                (mision, objetivo) => diario.Run(mision)?.Done.Contains(objetivo) == true,
+                elemento => SessionContext.State.ElementsUsed.Contains(elemento));
         }
 
         /// <summary>
@@ -340,6 +356,52 @@ namespace Jondo.Unity.Server.Handlers
                 : Array.Empty<long>();
 
         /// <summary>Deja de haber conversación abierta.</summary>
+        /// <summary>
+        /// Lo que una respuesta compra: cobra los kamas y da el objeto.
+        /// </summary>
+        /// <remarks>
+        /// El precio va escrito en el texto de la respuesta -- «Ponme una limonada. Toma, 1 kama.»
+        /// -- y hasta ahora eso era todo lo que había: una frase que no hacía nada. Pulsarla no
+        /// daba el objeto ni cobraba, y como la limonada es la que hace salir a la rata, la misión
+        /// se quedaba sin manera de avanzar.
+        ///
+        /// Se cobra ANTES de dar. Al revés, un fallo al descontar dejaría el objeto regalado; así,
+        /// lo peor que puede pasar es que se cobre y la entrega falle, y eso se dice por consola en
+        /// vez de callarlo.
+        /// </remarks>
+        private static async Task ComprarAsync(NetworkStream stream, DialogueChoice choice)
+        {
+            if (GameState.Kamas < choice.BuysPrice)
+            {
+                Console.WriteLine($"[NPC] No llega para {choice.BuysItem}: cuesta " +
+                                  $"{choice.BuysPrice} y tiene {GameState.Kamas}.");
+                // No hay un mensaje medido de «no te llega», asi que se usa el generico de que
+                // falta algo. Inventar un id sin captura detras es peor que decirlo de mas.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        InfoMessages.Warning, InfoMessages.MissingItem)));
+                return;
+            }
+
+            if (choice.BuysPrice > 0)
+            {
+                GameState.Kamas -= choice.BuysPrice;
+                DatabaseManager.SaveCurrentCharacter();
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+            }
+
+            if (!await Managers.Equipment.GiveAsync(stream, choice.BuysItem, choice.BuysCount))
+            {
+                Console.WriteLine($"[NPC] Cobrados {choice.BuysPrice} kamas y no se ha podido " +
+                                  $"entregar {choice.BuysCount}x{choice.BuysItem}.");
+                return;
+            }
+
+            Console.WriteLine($"[NPC] Vendido {choice.BuysCount}x{choice.BuysItem} por " +
+                              $"{choice.BuysPrice} kamas; quedan {GameState.Kamas}.");
+        }
+
         private static void CerrarConversacion()
         {
             SessionContext.State.OpenDialogueNpcId = 0;
@@ -376,6 +438,13 @@ namespace Jondo.Unity.Server.Handlers
                                          SessionContext.State.OpenDialogueMapId)
                                     ?.Line(SessionContext.State.OpenDialogueMessage);
             var elegidaAhora = frase?.Choice(reply);
+
+            // ¿La respuesta compra algo? Antes de la misión, porque una compra que falle no debe
+            // dejar la conversación a medias con la misión ya empezada.
+            if (elegidaAhora != null && elegidaAhora.BuysItem != 0)
+            {
+                await ComprarAsync(stream, elegidaAhora);
+            }
 
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
             {

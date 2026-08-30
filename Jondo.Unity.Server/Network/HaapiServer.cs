@@ -282,6 +282,40 @@ namespace Jondo.Unity.Server.Network
             return "{}";
         }
 
+        /// <summary>
+        /// The configuration the client reads before it talks to anything else.
+        /// </summary>
+        /// <remarks>
+        /// shopiDofusUrl used to point at the real https://shop-api.ankama.com, which this client
+        /// cannot reach. It is aimed at our own HAAPI so that nothing here depends on a host that
+        /// is not there, and it stays that way, but it settles nothing: it went in as a probe and
+        /// the probe came back empty.
+        ///
+        /// The idea was that the tooltip on the greyed "create a character" button offers to sell
+        /// extra character slots in the shop, so the client might ask the shop which slots the
+        /// account owns. It does not. With the url pointing here, a full run from the launcher to
+        /// the character screen asked for seven routes and not one of them was a shop route:
+        ///
+        /// <code>
+        ///   GET  /config/dofus3.json            POST /api/lanzamiento
+        ///   POST /api/recordar-token            POST /api/fin-de-lanzamiento
+        ///   POST /json/Ankama/v5/Game/SendEvent
+        ///   GET  /json/Ankama/v5/Cms/PollInGame/Get
+        ///   GET  /json/Ankama/v5/Cms/Items/GetFeeds
+        /// </code>
+        ///
+        /// Which is worth more than the hypothesis it killed: the client asks HTTP for no account
+        /// state at all -- not GetAccount, not ServerList, not GameToken. Every number it has about
+        /// the account arrives over 5555, and that message is already equivalent to the real one.
+        ///
+        /// What has been ruled out by measurement, all against the captures in
+        /// "Wireshark captures from real game/Autenticacion-Servidor-Personaje": the authentication
+        /// reply is now equivalent to the real one field for field -- the same fourteen servers
+        /// with the same types (290 is type 1, "classic", not a mono-account type), the same slot
+        /// table of types 0 to 6 with five each, a subscription date the client accepts, and a kvi
+        /// that in every real capture carries character records and nothing else. The real account
+        /// holds ten characters across six servers with the button ACTIVE.
+        /// </remarks>
         private static string Dofus3ConfigResponse() => @"{
             ""gameAppId"": 1,
             ""connectionHosts"": [
@@ -294,7 +328,7 @@ namespace Jondo.Unity.Server.Network
             ""versionFileUrl"": """",
             ""haapiAnkamaUrl"": ""http://127.0.0.1:8888/json/Ankama/v5/"",
             ""haapiDofusUrl"": ""http://127.0.0.1:8888/json/Dofus/v3/"",
-            ""shopiDofusUrl"": ""https://shop-api.ankama.com"",
+            ""shopiDofusUrl"": ""http://127.0.0.1:8888/json/Shop/v1/"",
             ""webShopDofusUrl"": ""https://store.ankama.com/"",
             ""gamesActivityDescriptorUrl"": ""https://launcher.cdn.ankama.com/configs/useractivities.json"",
             ""avatarUrlFormat"": ""https://avatar.ankama.lan/users/{0}.png"",

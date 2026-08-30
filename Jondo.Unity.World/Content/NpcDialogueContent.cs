@@ -53,6 +53,32 @@ namespace Jondo.Unity.World.Content
         /// <summary>True when the reply is for somebody who has already finished the quest.</summary>
         public bool AfterQuest { get; init; }
 
+        /// <summary>El objetivo que hay que llevar cumplido para que la respuesta se ofrezca.</summary>
+        /// <remarks>
+        /// El paso no basta. Una mision de un solo paso con cuatro objetivos --«Matarratas» lo es--
+        /// esta siempre en ese paso, asi que condicionar por paso no distingue nada y el tabernero
+        /// ofrecia «He neutralizado a la rata» desde el minuto uno, con la rata viva.
+        /// </remarks>
+        public int AfterObjective { get; init; }
+
+        /// <summary>El interactivo que hay que haber usado para que la respuesta se ofrezca.</summary>
+        /// <remarks>
+        /// «He visto el anuncio que has puesto» no puede existir antes de haber leido el anuncio.
+        /// No es un objetivo -- la mision no ha empezado todavia, la empieza esta misma respuesta --
+        /// asi que la condicion no puede venir del diario: viene de haber pulsado el cartel.
+        /// </remarks>
+        public int AfterElement { get; init; }
+
+        /// <summary>Lo que esta respuesta compra, y por cuanto. Cero cuando no compra nada.</summary>
+        /// <remarks>
+        /// El precio va en el texto de la respuesta --«Ponme una limonada. Toma, 1 kama.»-- y
+        /// hasta ahora eso era todo: una frase. Sin esto, pulsarla no daba el objeto ni cobraba,
+        /// y la mision que necesita esa limonada no se podia terminar.
+        /// </remarks>
+        public int BuysItem { get; init; }
+        public int BuysCount { get; init; } = 1;
+        public long BuysPrice { get; init; }
+
         public bool Ends => Next == 0;
 
         /// <summary>Whether this reply is offered to nobody in particular.</summary>
@@ -105,11 +131,18 @@ namespace Jondo.Unity.World.Content
         /// than the quest log itself so that this file goes on knowing nothing about the server.
         /// </remarks>
         public long[] RepliesFor(Func<int, bool> active, Func<int, bool> finished,
-                                 Func<int, int, bool> onStep)
+                                 Func<int, int, bool> onStep, Func<int, int, bool>? objectiveDone = null,
+                                 Func<int, bool>? elementUsed = null)
         {
             var replies = new List<long>(Choices.Count);
             foreach (var choice in Choices)
             {
+                // El interactivo se mira antes que nada, porque vale igual para una respuesta que
+                // pertenece a una mision y para una que la empieza -- y la que la empieza es
+                // «Always» a ojos del filtro, asi que si esto fuera despues no se comprobaria.
+                if (choice.AfterElement != 0
+                    && (elementUsed == null || !elementUsed(choice.AfterElement))) continue;
+
                 if (choice.Always) { replies.Add(choice.Reply); continue; }
 
                 if (choice.AfterQuest)
@@ -120,6 +153,13 @@ namespace Jondo.Unity.World.Content
 
                 if (!active(choice.Quest)) continue;
                 if (choice.Step != 0 && !onStep(choice.Quest, choice.Step)) continue;
+
+                // Y el objetivo, cuando la fila lo pide. Sin la llamada -- que es opcional para no
+                // obligar a quien no la tenga -- una respuesta atada a un objetivo no se ofrece,
+                // que es el lado prudente: mejor no verla que verla antes de tiempo.
+                if (choice.AfterObjective != 0
+                    && (objectiveDone == null || !objectiveDone(choice.Quest, choice.AfterObjective)))
+                    continue;
 
                 replies.Add(choice.Reply);
             }
@@ -291,6 +331,11 @@ namespace Jondo.Unity.World.Content
                             Quest = (int)Number(choice, "quest"),
                             Step = (int)Number(choice, "step"),
                             StartsQuest = (int)Number(choice, "startsQuest"),
+                            AfterObjective = (int)Number(choice, "afterObjective"),
+                            AfterElement = (int)Number(choice, "afterElement"),
+                            BuysItem = (int)Number(choice, "buyItem"),
+                            BuysCount = (int)Math.Max(1, Number(choice, "buyCount")),
+                            BuysPrice = Number(choice, "buyPrice"),
                             AfterQuest = choice.TryGetProperty("afterQuest", out var after)
                                          && after.ValueKind == JsonValueKind.True,
                         });
@@ -374,6 +419,16 @@ namespace Jondo.Unity.World.Content
                             if (choice.Step != 0) writer.WriteNumber("step", choice.Step);
                             if (choice.StartsQuest != 0) writer.WriteNumber("startsQuest", choice.StartsQuest);
                             if (choice.AfterQuest) writer.WriteBoolean("afterQuest", true);
+                            if (choice.AfterObjective != 0)
+                                writer.WriteNumber("afterObjective", choice.AfterObjective);
+                            if (choice.AfterElement != 0)
+                                writer.WriteNumber("afterElement", choice.AfterElement);
+                            if (choice.BuysItem != 0)
+                            {
+                                writer.WriteNumber("buyItem", choice.BuysItem);
+                                if (choice.BuysCount != 1) writer.WriteNumber("buyCount", choice.BuysCount);
+                                if (choice.BuysPrice != 0) writer.WriteNumber("buyPrice", choice.BuysPrice);
+                            }
                             writer.WriteEndObject();
                         }
 

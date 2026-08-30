@@ -1,0 +1,25 @@
+{
+  "_comment": [
+    "Interactivos que al pulsarlos abren un documento: carteles, libros, placas.",
+    "",
+    "El cliente los enseña con un kkt que sólo lleva el id del documento, medido en la captura",
+    "'abrir libro el escudo de feca y leerlo': el cliente manda iuu y el servidor contesta",
+    "kkt { f2: 217 }, que es el documento del libro. Nada más: ni título ni texto viajan, los",
+    "tiene el cliente en su propia tabla de documentos.",
+    "",
+    "El documento se busca en dofus3_data/documents.json, que empareja id con los textos del",
+    "título y del contenido. El 420 es 554597 'Oferta de trabajo' y 554600 'Se busca desratizador",
+    "para sanear la bodega de una taberna'.",
+    "",
+    "Leer uno queda apuntado en CharacterElements como cualquier otro uso de interactivo, y de ahí",
+    "sale la condición afterElement de las respuestas de los NPCs."
+  ],
+  "readables": [
+    {
+      "map": 153878787,
+      "element": 489412,
+      "document": 420,
+      "why": "La oferta de trabajo de la taberna de Incarnam. La guía dice «Cliquez pour accepter l'offre» y el documento 420 es exactamente ese texto. El elemento lleva el mismo id en los dos mapas contiguos [0,-3] y [1,-3], que es lo que hace un edificio que ocupa las dos; los otros dos candidatos raros del mapa se descartaron porque el dibujo 32613 son las rocas fénix y el 42509 es la puerta de entrada. Es una inferencia razonada, no una medida."
+    }
+  ]
+}

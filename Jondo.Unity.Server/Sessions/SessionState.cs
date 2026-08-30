@@ -83,6 +83,14 @@ namespace Jondo.Unity.Server
         /// consulta en cada frase de cada diálogo, así que un diccionario compartido haría que
         /// hablar con un NPC le moviese la misión al de al lado.
         ///
+        /// <summary>Los interactivos que este personaje ha usado alguna vez.</summary>
+        /// <remarks>
+        /// Se llena al entrar al mundo y crece con cada uso. Lo lee el filtro de respuestas de los
+        /// NPCs: hay conversaciones cuya opcion no debe existir hasta haber leido algo, como la
+        /// oferta de trabajo de la taberna de Incarnam.
+        /// </remarks>
+        public HashSet<int> ElementsUsed { get; set; } = new HashSet<int>();
+
         /// Es <c>null</c> hasta que se entra al mundo. Lo pone <c>Managers.Quests.LoadFrom</c>,
         /// porque necesita el catálogo, que es de otro proyecto y pesa 3 MB: construirlo aquí
         /// obligaría a cargarlo también en las sesiones que nunca llegan a jugar.

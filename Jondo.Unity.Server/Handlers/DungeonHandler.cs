@@ -205,6 +205,13 @@ namespace Jondo.Unity.Server.Handlers
                                   $"gratis vuelve el {DungeonKeyring.NextReset(DateTime.Now):dd/MM}.");
             }
 
+            // La ventana del guardián se cierra antes de mover a nadie. El cliente no la cierra por
+            // su cuenta -- no manda nada al terminar una conversación, espera el kld --, así que
+            // sin esto se quedaba abierta encima de la mazmorra y ni la equis la quitaba. Antes del
+            // teletransporte y no después, que es el orden de la captura: el kld sale delante de lo
+            // que cambia el mapa.
+            await NpcHandler.CloseAsync(stream);
+
             Console.WriteLine($"[Mazmorra] Entra en {dungeon.Name}, sala 1 de {dungeon.Rooms.Count}.");
             await TeleportHandler.ToMapAsync(stream, dungeon.FirstRoom);
             return true;

@@ -22,6 +22,55 @@
  ],
  "bindings": [
   {
+   "objective": 9655,
+   "quest": 1629,
+   "kind": "enter",
+   "map": 241440769,
+   "why": "«Entrer dans la salle des métiers». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 9769,
+   "quest": 1633,
+   "kind": "click",
+   "elements": [
+    {
+     "map": 153358340,
+     "element": 489505
+    }
+   ],
+   "requires": [
+    {
+     "item": 8543,
+     "count": 1
+    }
+   ],
+   "spends": true,
+   "spawns": {
+    "monster": 4113,
+    "count": 1
+   },
+   "why": "«Haz salir a la rata de su escondite». Mismo elemento que el 9895, el unico prop del sotano; el orden lo impone la limonada, que este pide y aquel no. La Limonada de Incarnam es el objeto 8543 y los textos 534963 y 534964 cuentan la escena: marcas de dientes en el grifo, y el vaso puesto encima del tonel. La Rata Nsiosa (4113) esta en CERO grupos del mundo porque su sitio es este."
+  },
+  {
+   "objective": 9895,
+   "quest": 1633,
+   "kind": "click",
+   "elements": [
+    {
+     "map": 153358340,
+     "element": 489505
+    }
+   ],
+   "why": "«Inspecciona el sotano». El sotano tiene dos elementos y el otro, el 488963, es la ESCALERA: el volcado de teletransportes lo declara como paso a 153357316, asi que atarlo aqui habria cerrado el objetivo al subir. El 489505 es el unico prop de verdad, y su dibujo (701195) no sale en ningun otro mapa del juego."
+  },
+  {
+   "objective": 9784,
+   "quest": 1635,
+   "kind": "enter",
+   "map": 153881600,
+   "why": "«Pénétrer dans l'antre du Milimilou». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
    "objective": 9817,
    "quest": 1640,
    "type": -1,
@@ -102,20 +151,6 @@
    "why": "«Examiner la stele d'un vestige dans la foret». El unico de grafico 3518 en la subzona 443, «Foret». Mapa [2,-2]."
   },
   {
-   "objective": 9655,
-   "quest": 1629,
-   "kind": "enter",
-   "map": 241440769,
-   "why": "«Entrer dans la salle des métiers». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
-  },
-  {
-   "objective": 9784,
-   "quest": 1635,
-   "kind": "enter",
-   "map": 153881600,
-   "why": "«Pénétrer dans l'antre du Milimilou». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
-  },
-  {
    "objective": 13849,
    "quest": 1958,
    "kind": "enter",
@@ -128,6 +163,58 @@
    "kind": "enter",
    "map": 192413696,
    "why": "«Entrer dans la taverne d'Astrub». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13946,
+   "quest": 1962,
+   "kind": "enter",
+   "map": 189530630,
+   "why": "«Aller au rendez-vous fixé par Badufron». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 14230,
+   "quest": 1964,
+   "kind": "enter",
+   "map": 188482052,
+   "why": "«Entrer dans la mine d'Astrub avec le chienchien fidèle». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 14110,
+   "quest": 1966,
+   "kind": "enter",
+   "map": 192675848,
+   "why": "«Entrer dans le repaire du maître des Srams». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+  },
+  {
+   "objective": 13953,
+   "quest": 1975,
+   "kind": "talk",
+   "npc": 4402,
+   "map": 188744194,
+   "why": "Busca el origen de los problemas. Es Didier Jean, en el estanque: la guia lo pone de segundo paso y el objetivo 13955 ya lo situa en el mapa 188744194."
+  },
+  {
+   "objective": 13954,
+   "quest": 1975,
+   "kind": "talk",
+   "npc": 4405,
+   "map": 188744194,
+   "why": "Charla con los mercenarios. El Mercenaire agace es el NPC 4405, y sus tres unicas respuestas son de esta mision."
+  },
+  {
+   "objective": 13959,
+   "quest": 1975,
+   "kind": "talk",
+   "npc": 4407,
+   "why": "Busca a Camilo Demolinos. Es el NPC 4407, Camille Demouleur, que el objetivo 13961 nombra a continuacion. Sin mapa porque el catalogo no le pone ninguno."
+  },
+  {
+   "objective": 13960,
+   "quest": 1975,
+   "kind": "beat",
+   "monster": 5250,
+   "map": 191104004,
+   "why": "Vence a los canallas. La guia dice dos Iops y un Cra: el Canalla yopuka es el monstruo 5250 y el Canalla ocra el 5249. Se ata al yopuka por ser el que se repite."
   },
   {
    "objective": 13911,
@@ -156,27 +243,6 @@
    "kind": "enter",
    "map": 190842883,
    "why": "«Retourner au caveau». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
-  },
-  {
-   "objective": 13946,
-   "quest": 1962,
-   "kind": "enter",
-   "map": 189530630,
-   "why": "«Aller au rendez-vous fixé par Badufron». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
-  },
-  {
-   "objective": 14110,
-   "quest": 1966,
-   "kind": "enter",
-   "map": 192675848,
-   "why": "«Entrer dans le repaire du maître des Srams». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
-  },
-  {
-   "objective": 14230,
-   "quest": 1964,
-   "kind": "enter",
-   "map": 188482052,
-   "why": "«Entrer dans la mine d'Astrub avec le chienchien fidèle». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
   }
  ]
 }

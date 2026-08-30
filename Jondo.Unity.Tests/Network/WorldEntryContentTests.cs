@@ -45,9 +45,24 @@ namespace Jondo.Unity.Tests.Network
         {
             "idu",   // 265 frames, one per quest of that account
             "idr",   // the same journal again, whole: 261 under way and 622 called finished
+            "iel",   // its followed quests, 1869 and 2406, in the little box in the corner
             "mft",   // its 954 achievements
             "ivi",   // its counters: 9,694 pairs of id and value
         };
+
+        /// <summary>
+        /// Quest ids belonging to the recorded player. None of them may reach the wire.
+        /// </summary>
+        /// <remarks>
+        /// 1869 is "El daño de Búril" and 2406 "Cuando el despertar no es más que un sueño". They
+        /// outlived the removal of the journal because they travelled in a different message: the
+        /// iel is the followed-quest box, not the journal, and it REPLACES the list rather than
+        /// adding to it. So the server sent the right journal -- the log said so -- and the box
+        /// still showed two quests belonging to somebody else and none belonging to the character.
+        /// A quest just picked up did appear, because the live ief adds it; logging back in made it
+        /// vanish again.
+        /// </remarks>
+        private static readonly int[] RecordedQuests = { 1869, 2406 };
 
         /// <summary>
         /// Frames the server fills in itself, so the manifest carries only the envelope.
@@ -390,5 +405,71 @@ namespace Jondo.Unity.Tests.Network
             Assert.Equal(20, oficios);
         }
 
+        [Fact]
+        public void The_followed_quest_box_of_the_recorded_player_is_not_sent()
+        {
+            // The frame itself. It was the last piece of that player's quest state still on the
+            // wire after the journal had been taken out of both blocks.
+            WorldEntryContent.Load(Paths.ContentFile(Manifest));
+
+            foreach (string block in new[]
+                     { WorldEntry.BlockAfterCharacter, WorldEntry.BlockAfterConfirm, WorldEntry.BlockMap })
+            {
+                Assert.DoesNotContain(WorldEntryContent.Rows(block), row => row.Opcode == "iel");
+            }
+        }
+
+        [Fact]
+        public void And_neither_are_the_quest_ids_it_carried()
+        {
+            // Belt and braces, and not the same assertion: this one would still fail if those two
+            // quests came back inside some other opcode, which is exactly how they survived the
+            // first two attempts at removing them.
+            WorldEntryContent.Load(Paths.ContentFile(Manifest));
+
+            foreach (int questId in RecordedQuests)
+            {
+                byte[] varint = Varint(questId);
+
+                foreach (string block in new[]
+                         { WorldEntry.BlockAfterCharacter, WorldEntry.BlockAfterConfirm, WorldEntry.BlockMap })
+                {
+                    foreach (var row in WorldEntryContent.Rows(block))
+                    {
+                        Assert.False(Contains(row.Frame, varint),
+                                     $"la misión {questId} del jugador grabado sigue viajando en un {row.Opcode}");
+                    }
+                }
+            }
+        }
+
+        private static byte[] Varint(int value)
+        {
+            var bytes = new List<byte>();
+            uint left = (uint)value;
+            while (true)
+            {
+                byte piece = (byte)(left & 0x7F);
+                left >>= 7;
+                if (left == 0) { bytes.Add(piece); break; }
+                bytes.Add((byte)(piece | 0x80));
+            }
+            return bytes.ToArray();
+        }
+
+        private static bool Contains(byte[] haystack, byte[] needle)
+        {
+            for (int i = 0; i + needle.Length <= haystack.Length; i++)
+            {
+                bool hit = true;
+                for (int j = 0; j < needle.Length; j++)
+                {
+                    if (haystack[i + j] != needle[j]) { hit = false; break; }
+                }
+
+                if (hit) return true;
+            }
+            return false;
+        }
     }
 }

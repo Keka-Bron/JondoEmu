@@ -193,6 +193,39 @@ namespace Jondo.Unity.Server.Network
         /// messages, and the previous version of this emulator sent them back to the client
         /// by mistake.
         /// </summary>
+        /// <summary>
+        /// The character list as it actually travels: three kqp, the list, and the gift catalogue.
+        /// </summary>
+        /// <remarks>
+        /// Five frames, never the kvi on its own. That is how every capture sends it -- in the
+        /// welcome burst, after a creation, and after a deletion -- and sending only the kvi is
+        /// what made a freshly created character invisible to the client.
+        ///
+        /// The symptom was ugly and easy to blame on the wrong thing: create a character, press
+        /// play, and the PREVIOUS character walked into the world. Nothing was mixed up
+        /// server-side; the selection arrived naming the old character and was honoured correctly,
+        /// because the client still held the list it had before the creation and sent the only
+        /// entry it knew. Going back to the selection screen refreshed it and everything worked,
+        /// which is exactly the shape of a stale list rather than a wrong lookup.
+        ///
+        /// Measured in "crear personaje - borrar personaje", where the real server answers a
+        /// successful kvb with the whole set again:
+        ///
+        /// <code>
+        ///   kvb (empty, success)  ->  kqp kqp kqp  kvi  jtg
+        ///   kvn (deleted)         ->  kqp kqp kqp  kvi  jtg
+        /// </code>
+        /// </remarks>
+        public static List<byte[]> CharacterListFrames(IReadOnlyList<DatabaseManager.DbCharacter> characters)
+            => new()
+            {
+                Push(Op.Kqp, Pb.New().Var(1, 1).Var(2, 1).Build()),
+                Push(Op.Kqp, Pb.New().Var(1, 1).Build()),
+                Push(Op.Kqp),
+                Push(Op.Kvi, BuildCharactersList(characters)),
+                Push(Op.Jtg, BuildGiftCatalogue()),
+            };
+
         public static List<byte[]> BuildWelcomeBurst(IReadOnlyList<DatabaseManager.DbCharacter> characters)
         {
             var burst = new List<byte[]>
@@ -204,15 +237,30 @@ namespace Jondo.Unity.Server.Network
                     .Build()),
                 Push(Op.Hoy, BuildHoy()),
                 Push(Op.Kqu, Pb.New().Packed(1, ActiveFeatures).Build()),
-                Push(Op.Mgq, Pb.New().Var(1, 1).Var(2, 1).Var(3, 1).Build()),
+                // mgq without field 1. That field is the whole reason "create a character" was
+                // dark, and it is the one frame in the burst where this server said something the
+                // captures never say on an account that can create. Sorted by whether creation
+                // worked, every capture in "Autenticacion-Servidor-Personaje" falls on the right
+                // side of it:
+                //
+                //   10011801         creation succeeds        "creacion personaje-exito"
+                //   10011801         creation succeeds        "crear personaje - borrar personaje"
+                //   10011801         already in the world     "tutorial completo"
+                //   080110011801     refused, maximum reached "fallo por limite maximo"
+                //   080110011801     account sitting at 4/5   "eleccion servidor a eleccion personaje"
+                //
+                // The same account sends it in one session and not in another, so it is a state and
+                // not a property of the account. Ours sent it always, on every login, which is why
+                // an account with a single character was told it had reached its maximum -- and why
+                // an empty one could still make its first: one is a limit you have not hit yet.
+                //
+                // What field 1 means exactly is not decoded here, and the comment says so. What is
+                // measured is that no capture where creation works carries it.
+                Push(Op.Mgq, Pb.New().Var(2, 1).Var(3, 1).Build()),
                 Push(Op.Mgt, Pb.New().EmptyMsg(2).Build()),
                 Push(Op.Hpd, Pb.New().Var(1, 1).Build()),
                 Push(Op.Krs),
                 Push(Op.Mgz, Pb.New().Var(1, CatalogMark).Build()),
-                Push(Op.Kqp, Pb.New().Var(1, 1).Var(2, 1).Build()),
-                Push(Op.Kqp, Pb.New().Var(1, 1).Build()),
-                Push(Op.Kqp),
-                Push(Op.Kvi, BuildCharactersList(characters)),
 
                 // AQUÍ NO VA UN kvd, y mandarlo era lo que tenía muerta media pantalla.
                 //
@@ -232,8 +280,10 @@ namespace Jondo.Unity.Server.Network
                 // O sea que el kvd significa «no te pares aquí». Mandándolo siempre, el cliente
                 // montaba la pantalla como si fuera de paso: el botón de crear personaje sin vida
                 // y el de cambiar de servidor sin llevar a ninguna parte.
-                Push(Op.Jtg, BuildGiftCatalogue())
             };
+
+            // The list closes the burst, framed the way it always travels.
+            burst.AddRange(CharacterListFrames(characters));
             return burst;
         }
 
@@ -272,6 +322,26 @@ namespace Jondo.Unity.Server.Network
         /// el idioma iba en inglés cuando el cliente arranca en español. Son las dos únicas
         /// diferencias que quedaban entre nuestra ráfaga de bienvenida y la real.
         /// </summary>
+        /// <summary>
+        /// The frame that carries, among other things, what the account is entitled to.
+        /// </summary>
+        /// <remarks>
+        /// Field 5 is deliberately NOT written, and the reason is worth keeping because it was
+        /// added here once on a correlation and taken straight back out.
+        ///
+        /// Across the first six captures f5 appeared in exactly one of the two accounts recorded,
+        /// and that was the account holding four characters on a single server -- which reads like
+        /// a subscription marker and is not one. The capture "crear personaje - borrar personaje"
+        /// settles it: the SAME account, in three consecutive logins, creating an eleventh
+        /// character and deleting it again, sends
+        ///
+        /// <code>
+        ///   081e100118013202667238c801      no f5, and the create button is working
+        /// </code>
+        ///
+        /// So f5 comes and goes for one account between sessions and says nothing about what the
+        /// account may do. Sending it was copying a value nobody had decoded.
+        /// </remarks>
         private static byte[] BuildHoy()
         {
             return Pb.New()
@@ -282,6 +352,8 @@ namespace Jondo.Unity.Server.Network
                 .Var(7, 200)
                 .Build();
         }
+
+
 
         /// <summary>El idioma con el que se lanza el cliente.</summary>
         public const string ClientLanguage = "es";

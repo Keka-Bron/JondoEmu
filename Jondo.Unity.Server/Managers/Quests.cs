@@ -298,8 +298,35 @@ namespace Jondo.Unity.Server.Managers
         private static async Task<bool> CloseAsync(NetworkStream stream, QuestBinding binding)
         {
             var log = Log;
-            var run = log?.Run(binding.QuestId);
-            if (log == null || _book == null || run == null || run.Finished) return false;
+            if (log == null || _book == null) return false;
+
+            // Lo que hay que llevar encima. Va lo primero de todo: si no se cumple, el elemento no
+            // hace NADA -- ni entrega, ni marca, ni saca al bicho --, que es la diferencia entre
+            // «pulsar el tirador con la limonada» y «pulsar el tirador».
+            foreach (var (item, count) in binding.Requires)
+            {
+                if (Equipment.HowMany(item) >= count) continue;
+
+                Console.WriteLine($"[Misiones] El objetivo {binding.ObjectiveId} pide {count}x{item} " +
+                                  $"y no se lleva encima.");
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        InfoMessages.Warning, InfoMessages.MissingItem)));
+                return false;
+            }
+
+            // Un elemento que entrega la misión: se coge aquí y se acaba: no hay objetivo que
+            // marcar todavía, porque el primer paso empieza justo ahora.
+            if (binding.Starts != 0)
+            {
+                if (log.Run(binding.Starts) != null) return false;
+
+                Console.WriteLine($"[Misiones] Empieza la {binding.Starts} al pulsar un elemento.");
+                return await StartAsync(stream, binding.Starts);
+            }
+
+            var run = log.Run(binding.QuestId);
+            if (run == null || run.Finished) return false;
             if (run.Done.Contains(binding.ObjectiveId)) return false;
 
             var step = _book.Step(run.StepId);
@@ -324,8 +351,57 @@ namespace Jondo.Unity.Server.Managers
                 return false;
             }
 
+            // Y lo exigido se gasta, si la fila lo dice. Después de la entrega y antes de marcar,
+            // por lo mismo: gastar la limonada y que luego falle el resto sería lo peor de todo.
+            if (binding.SpendsRequired)
+            {
+                foreach (var (item, count) in binding.Requires)
+                    await Equipment.TakeAsync(stream, item, count);
+            }
+
             await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
+
+            if (binding.SpawnsMonster != 0)
+                await SpawnAsync(stream, binding);
+
             return true;
+        }
+
+        /// <summary>
+        /// Saca al monstruo que un elemento hace aparecer, y hace que el cliente lo vea.
+        /// </summary>
+        /// <remarks>
+        /// Hay que reenviar la lista de actores. El grupo se dibuja cuando se carga el mapa, y aquí
+        /// el jugador ya está plantado en él: sin esto el bicho existe para el servidor y no está
+        /// en la pantalla, que es la peor de las dos mitades.
+        ///
+        /// Se manda sólo a quien lo ha provocado. Es su misión, su elemento y su bicho; a los demás
+        /// no les aparece nada en mitad del mapa.
+        /// </remarks>
+        private static async Task SpawnAsync(NetworkStream stream, QuestBinding binding)
+        {
+            long mapId = SessionContext.State.MapId;
+            var grupo = MobSpawnManager.SpawnNamed(mapId, binding.SpawnsMonster, binding.SpawnsCount);
+
+            if (grupo == null)
+            {
+                Console.WriteLine($"[Misiones] El objetivo {binding.ObjectiveId} debía sacar al " +
+                                  $"monstruo {binding.SpawnsMonster} y no se ha podido.");
+                return;
+            }
+
+            var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            if (ficha == null) return;
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Jss, ConnectionProtocol.BuildMapActors(
+                    mapId, ficha, SessionContext.State.CellId, SessionContext.State.Orientation,
+                    SessionContext.Current.AccountId)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.BuildActorsComplete());
+
+            Console.WriteLine($"[Misiones] Sale el monstruo {binding.SpawnsMonster} " +
+                              $"(x{binding.SpawnsCount}) en la casilla {grupo.CellId}.");
         }
 
         /// <summary>
@@ -341,6 +417,16 @@ namespace Jondo.Unity.Server.Managers
         {
             var log = Log;
             if (log == null || _book == null) return false;
+
+            // Un elemento que ENTREGA la misión va al revés que todos los demás: se enseña
+            // mientras no se tiene, y desaparece en cuanto se coge. El anuncio de la taberna no
+            // puede pedir que la misión esté en curso para dejarse pulsar, porque es él quien la
+            // pone en curso.
+            if (binding.Starts != 0)
+            {
+                var yaVa = log.Run(binding.Starts);
+                return yaVa == null;
+            }
 
             var run = log.Run(binding.QuestId);
             if (run == null || run.Finished) return false;

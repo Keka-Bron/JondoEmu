@@ -63,7 +63,7 @@ namespace Jondo.Unity.Server.Network
                                                 "Account no longer exists");
             string login = account.Login;
             string nick = account.Nickname;
-            string json = $"{{\"id\":{accId},\"type\":\"ANKAMA\",\"login\":\"{login}\",\"nickname\":\"{nick}\",\"firstname\":\"{nick}\",\"lastname\":\"User\",\"nicknameWithTag\":\"{nick}#2026\",\"tag\":\"2026\",\"security\":[\"SHIELD\"],\"addedDate\":\"2026-06-21T22:51:08+02:00\",\"locked\":\"0\",\"parentEmailStatus\":null,\"avatar\":\"https://avatar.ankama.com/users/{accId}.png\",\"isGuest\":false,\"isErrored\":false,\"needRefresh\":true,\"isMain\":true,\"active\":true,\"acceptedTermsVersion\":14,\"all\":{{\"CGU\":\"14\"}},\"gameList\":[{{\"isFreeToPlay\":false,\"isFormerSubscriber\":false,\"isSubscribed\":true,\"totalPlayTime\":4065,\"endOfSubscribe\":\"2035-01-01T00:00:00Z\",\"id\":1}}]}}";
+            string json = $"{{\"id\":{accId},\"type\":\"ANKAMA\",\"login\":\"{login}\",\"nickname\":\"{nick}\",\"firstname\":\"{nick}\",\"lastname\":\"User\",\"nicknameWithTag\":\"{nick}#2026\",\"tag\":\"2026\",\"security\":[\"SHIELD\"],\"addedDate\":\"2026-06-21T22:51:08+02:00\",\"locked\":\"0\",\"parentEmailStatus\":null,\"avatar\":\"https://avatar.ankama.com/users/{accId}.png\",\"isGuest\":false,\"isErrored\":false,\"needRefresh\":true,\"isMain\":true,\"active\":true,\"acceptedTermsVersion\":14,\"all\":{{\"CGU\":\"14\"}},\"gameList\":[{{\"isFreeToPlay\":false,\"isFormerSubscriber\":false,\"isSubscribed\":true,\"totalPlayTime\":4065,\"endOfSubscribe\":\"{Subscription.EndDateFor(accId)}\",\"id\":1}}]}}";
             return Task.FromResult(json);
         }
 

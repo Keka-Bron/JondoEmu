@@ -398,7 +398,107 @@ namespace Jondo.Unity.Server.Managers
             }
 
             if (puestos > 0) Console.WriteLine($"[Mazmorra] {puestos} jefes puestos en su última sala.");
+
+            CurarLasSalas();
             return puestos;
+        }
+
+        /// <summary>Cuántos monstruos lleva la sala del jefe cuando entra una sola persona.</summary>
+        /// <remarks>
+        /// El jefe y tres más. Un jefe solo en medio de una sala vacía no es el final de nada, y
+        /// además se le mata de un turno. Cuatro es el mínimo; con más atacantes sube a tantos
+        /// monstruos como atacantes, y de eso se encarga el escalado por grupo.
+        /// </remarks>
+        public const int MinimoEnLaSalaDelJefe = 4;
+
+        /// <summary>
+        /// Deja cada sala de mazmorra con UN grupo, y al jefe sólo en la suya.
+        /// </summary>
+        /// <remarks>
+        /// Los grupos que world.db trae para los mapas de mazmorra son el fondo genérico de la
+        /// subzona, no la disposición de Ankama, y eso se notaba de tres maneras a la vez:
+        ///
+        /// <list type="bullet">
+        /// <item>varios grupos en la misma sala, cuando una sala de mazmorra tiene uno;</item>
+        /// <item>el bicho que hace de jefe apareciendo por el camino, porque en esta zona el jefe
+        /// es también el monstruo corriente —el Girasol Hambriento sale en los campos— y el fondo
+        /// de subzona lo reparte por todas partes;</item>
+        /// <item>y la sala del jefe con el jefe solo, porque ponerlo la vacía primero.</item>
+        /// </list>
+        ///
+        /// Aquí se arregla lo primero y lo segundo, y se rellena la del jefe hasta el mínimo con
+        /// monstruos sacados de las OTRAS salas de esa misma mazmorra, que es de donde vienen los
+        /// que acompañan al jefe en el juego.
+        /// </remarks>
+        private static int CurarLasSalas()
+        {
+            if (!DungeonManager.IsLoaded) return 0;
+
+            int tocadas = 0;
+            foreach (var mazmorra in DungeonManager.All.Values)
+            {
+                if (mazmorra.Rooms.Count == 0) continue;
+                long salaDelJefe = mazmorra.LastRoom;
+                var jefes = new HashSet<int>(mazmorra.Bosses);
+
+                // El repertorio de la mazmorra: lo que sale por sus salas, sin contar al jefe. Es
+                // de donde se saca la escolta y con lo que se rellena una sala que se quede vacía.
+                var repertorio = new List<MobMember>();
+                foreach (long sala in mazmorra.Rooms)
+                {
+                    if (!_mapMobs.TryGetValue(sala, out var grupos)) continue;
+                    foreach (var grupo in grupos)
+                    {
+                        foreach (var miembro in grupo.Members)
+                        {
+                            if (miembro.Monster != null && !jefes.Contains(miembro.Monster.Id))
+                                repertorio.Add(miembro);
+                        }
+                    }
+                }
+
+                foreach (long sala in mazmorra.Rooms)
+                {
+                    if (!_mapMobs.TryGetValue(sala, out var grupos) || grupos.Count == 0) continue;
+
+                    if (sala == salaDelJefe)
+                    {
+                        var jefe = grupos[0];
+                        int falta = MinimoEnLaSalaDelJefe - jefe.Members.Count;
+                        for (int i = 0; i < falta && repertorio.Count > 0; i++)
+                        {
+                            jefe.Members.Add(repertorio[i % repertorio.Count]);
+                        }
+
+                        if (grupos.Count > 1) { grupos.RemoveRange(1, grupos.Count - 1); tocadas++; }
+                        if (falta > 0 && repertorio.Count > 0) tocadas++;
+                        continue;
+                    }
+
+                    // Una sala corriente: un grupo, y sin el jefe dentro.
+                    var primero = grupos[0];
+                    if (grupos.Count > 1) { grupos.RemoveRange(1, grupos.Count - 1); tocadas++; }
+
+                    int antes = primero.Members.Count;
+                    primero.Members.RemoveAll(
+                        miembro => miembro.Monster != null && jefes.Contains(miembro.Monster.Id));
+
+                    if (primero.Members.Count == antes) continue;
+                    tocadas++;
+
+                    // Quitar al jefe puede dejar el grupo vacío, y una sala sin nada no se puede
+                    // pasar: el jugador se queda dentro sin manera de avanzar.
+                    if (primero.Members.Count == 0 && repertorio.Count > 0)
+                        primero.Members.Add(repertorio[0]);
+                    else if (primero.Members.Count == 0)
+                        grupos.Clear();
+                }
+            }
+
+            if (tocadas > 0)
+                Console.WriteLine($"[Mazmorra] {tocadas} sala(s) corregidas: un grupo por sala y " +
+                                  $"el jefe sólo en la última.");
+            return tocadas;
         }
 
         private static (int Puestos, int Quitados) AplicarLosEscritos()
@@ -656,6 +756,75 @@ namespace Jondo.Unity.Server.Managers
 
                 mobs.Add(group);
                 return group;
+            }
+        }
+
+        /// <summary>Desde donde se numeran los grupos que saca una misión.</summary>
+        /// <remarks>
+        /// Su propio tramo, por debajo del de los jefes, para que los tres repartos de ids -- los
+        /// escritos a mano, los jefes y éstos -- no se pisen nunca.
+        /// </remarks>
+        private const long PrimerGrupoDeMision = -4_000_000;
+        private static long _siguienteDeMision;
+
+        /// <summary>
+        /// Pone en el mapa un grupo de un monstruo concreto, el que pida una misión.
+        /// </summary>
+        /// <remarks>
+        /// No pasa por el veto ni por el reparto de la subzona: aquí no se está poblando un mapa,
+        /// se está sacando a un bicho de su escondite porque alguien ha pulsado algo. La Rata
+        /// Nsiosa está en cero grupos del mundo justamente porque su sitio es éste y no el mapa.
+        ///
+        /// Devuelve null cuando el monstruo no está en la base o el mapa no tiene donde ponerlo,
+        /// y quien llama tiene que contarlo: un objetivo que dice «hazla salir» y no la saca deja
+        /// la misión encallada sin decir por qué.
+        /// </remarks>
+        public static MobGroup? SpawnNamed(long mapId, int monsterId, int howMany)
+        {
+            if (!_monsters.TryGetValue(monsterId, out var datos)) return null;
+
+            lock (_candado)
+            {
+                if (!_mapMobs.TryGetValue(mapId, out var mobs))
+                {
+                    mobs = new List<MobGroup>();
+                    _mapMobs[mapId] = mobs;
+                }
+
+                var ocupadas = new HashSet<int>(mobs.Select(m => m.CellId));
+                int celda = 0;
+                foreach (int libre in GetInnerWalkableCells(mapId))
+                {
+                    if (ocupadas.Contains(libre)) continue;
+                    celda = libre;
+                    break;
+                }
+
+                if (celda == 0) celda = MapManager.GetNearestWalkableCell(
+                    mapId, Handlers.TeleportHandler.MapCentre);
+                if (celda == 0) return null;
+
+                int grado = Math.Clamp(datos.Grades.Count - 1, 0, MobMember.MaxGradesPerMonster - 1);
+                var miembros = new List<MobMember>();
+                for (int i = 0; i < Math.Max(1, howMany); i++)
+                {
+                    miembros.Add(new MobMember
+                    {
+                        Monster = datos,
+                        GradeIndex = grado,
+                        Level = grado < datos.Grades.Count ? datos.Grades[grado].Level : 1,
+                    });
+                }
+
+                var grupo = new MobGroup
+                {
+                    MobId = PrimerGrupoDeMision - _siguienteDeMision++,
+                    CellId = celda,
+                    Members = miembros,
+                };
+
+                mobs.Add(grupo);
+                return grupo;
             }
         }
 

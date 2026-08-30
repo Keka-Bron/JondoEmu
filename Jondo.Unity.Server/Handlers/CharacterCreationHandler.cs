@@ -177,9 +177,14 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kvb));
 
+            // The whole list again, framed, and not just the kvi. Sending the kvi alone left the
+            // client holding the list it had BEFORE the creation: press play right after making a
+            // character and the previous one walked into the world, because the selection the
+            // client sent named the only character it knew about. Going back to the selection
+            // screen fixed it, which is what a stale list looks like from the outside.
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kvi, ConnectionProtocol.BuildCharactersList(characters)));
+            foreach (byte[] frame in ConnectionProtocol.CharacterListFrames(characters))
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
 
             Console.WriteLine($"[Personajes] Creado {name} (id {id}), raza {breed}, en el zaap de " +
                               $"Astrub, con el conjunto del aventurero y {StartingKamas} kamas.");
