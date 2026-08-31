@@ -89,6 +89,12 @@
               "afterQuest": true
             },
             {
+              "reply": 36990,
+              "quest": 1959,
+              "afterQuest": true,
+              "startsQuest": 2009
+            },
+            {
               "reply": 36985
             },
             {
@@ -121,7 +127,8 @@
           ]
         }
       ],
-      "_byHand": true
+      "_byHand": true,
+      "_note2": "«Consejo de clase» (2009). La guia la da a la Conseillere Archie en [4,-19] con requisito «On marche sur des oeufs», que es nuestra 1959. Su paso 2631 lleva dialogId 0, asi que NO hay linea de entrega medida: se cuelga de su frase de apertura con la respuesta 36990 «Demander la raison de sa convocation», que es la unica de sus 59 que habla de una convocatoria y encaja con un consejo de clase. La reconstruccion es nuestra; el requisito y el NPC son de la guia."
     },
     {
       "npc": 1088,

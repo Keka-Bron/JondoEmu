@@ -4,6 +4,7 @@
        executable: the server owns its own log window. Nothing here touches the UI. -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
@@ -12,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="11.2.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
@@ -26,6 +28,7 @@
          does not reveal: a zigzagged integer or a packed array shows a plausible number
          either way. Nothing here constructs a control. -->
     <ProjectReference Include="..\Jondo.Unity.Studio\Jondo.Unity.Studio.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Launcher\Jondo.Unity.Launcher.csproj" />
   </ItemGroup>
 
 </Project>

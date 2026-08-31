@@ -255,6 +255,35 @@ namespace Jondo.Unity.Server.Network
                     await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Luy)))
+                {
+                    // Apuntarse a una modalidad del koliseo.
+                    await KoliseoHandler.EnrolAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lsm)))
+                {
+                    // Lo mismo, pero con un grupo ya formado.
+                    await KoliseoHandler.EnrolPartyAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lte)))
+                {
+                    await KoliseoHandler.ReturnAsync(stream);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Lux)))
+                {
+                    // El cliente pide las modalidades del koliseo.
+                    await KoliseoHandler.SendModesAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hph)))
+                {
+                    // Retar a otro jugador.
+                    await ChallengeDuelHandler.OfferAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hpu)))
+                {
+                    // Y su respuesta: con f2 acepta, sin el rechaza.
+                    await ChallengeDuelHandler.AnswerAsync(stream, payload);
+                }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kwa)))
                 {
                     // La papelera. Sin esta respuesta el popup de confirmación no llega a abrirse.
@@ -379,6 +408,20 @@ namespace Jondo.Unity.Server.Network
                         // map's zaap is taken by a conversation the player left behind.
                         NpcHandler.Forget();
                         await Managers.Quests.SendMarksAsync(stream, GameState.MapId);
+
+                        // Y si esto es una sala de mazmorra, el grupo se pone al tamaño del equipo.
+                        // Aquí, antes de construir los actores: el grupo se DIBUJA en el mapa, así
+                        // que verlo de tres y pelear contra siete sería peor que no ajustarlo.
+                        var equipo = Managers.Parties.Of(GameState.CharacterId);
+                        int atacantes = equipo == null
+                            ? 1
+                            : Managers.Parties.MembersOf(equipo).Count;
+                        int quedan = Managers.MobSpawnManager.SizeRoomToParty(GameState.MapId, atacantes);
+                        if (quedan > 0)
+                        {
+                            Console.WriteLine($"[Mazmorra] La sala {GameState.MapId} se pone a " +
+                                              $"{quedan} monstruo(s) para {atacantes} atacante(s).");
+                        }
 
                         byte[] actors = ConnectionProtocol.Push(Op.Jss,
                             ConnectionProtocol.BuildMapActors(GameState.MapId, here,

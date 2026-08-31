@@ -92,6 +92,66 @@ namespace Jondo.Unity.Server.Managers
 
         public static bool IsWorn(int position) => position >= 0 && position <= LastWornSlot;
 
+        /// <summary>What a character is wearing, by slot, for ANY character and not only for the
+        /// one playing.</summary>
+        /// <remarks>
+        /// <see cref="All"/> reads the session, so it only ever knew about the character at the
+        /// other end of that socket. Every other place that has to draw somebody -- the character
+        /// selection screen, the other players on a map, the opponent in a fight, the portraits in
+        /// the launcher -- is asking about a character who is NOT the one in session, and got an
+        /// empty list back: all of them were drawn wearing nothing.
+        ///
+        /// A position is written to CharacterItems the moment the item is moved, so the database
+        /// is current. The session is still preferred when it is its own character: same answer
+        /// and no query.
+        /// </remarks>
+        public static IReadOnlyList<(int Slot, int Template)> WornOf(long characterId)
+        {
+            var worn = new List<(int Slot, int Template)>();
+            if (characterId == 0) return worn;
+
+            if (characterId == SessionContext.State.CharacterId)
+            {
+                foreach (var item in All)
+                {
+                    if (IsWorn(item.Position)) worn.Add((item.Position, item.Template));
+                }
+                // Por hueco. No porque ninguna captura lo pida -- no se ha medido en qué orden
+                // salen -- sino para que salgan SIEMPRE en el mismo: el diccionario de la sesión no
+                // promete orden, así que el mismo personaje podía componer dos listas distintas
+                // entre una sesión y otra.
+                worn.Sort((a, b) => a.Slot.CompareTo(b.Slot));
+                return worn;
+            }
+
+            try
+            {
+                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
+                    DatabaseManager.WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Position, Gid FROM CharacterItems " +
+                                      "WHERE CharacterId = $id AND Position BETWEEN 0 AND $last " +
+                                      "ORDER BY Position;";
+                command.Parameters.AddWithValue("$id", characterId);
+                command.Parameters.AddWithValue("$last", LastWornSlot);
+
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader.IsDBNull(0) || reader.IsDBNull(1)) continue;
+                    worn.Add((reader.GetInt32(0), reader.GetInt32(1)));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Equipment] Could not read what {characterId} is wearing: {ex.Message}");
+            }
+
+            return worn;
+        }
+
         /// <summary>
         /// Reads the character's inventory out of the database, which is where it belongs.
         ///

@@ -92,6 +92,87 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
+        /// Entra con un vale de la web en vez de con usuario y contraseña.
+        /// </summary>
+        /// <remarks>
+        /// Es la otra mitad de <see cref="Security.OAuthFlow"/>: la web dice que quien ha entrado
+        /// es de fiar y da un vale, y el servidor de juego es quien traduce ese vale a una cuenta y
+        /// devuelve la credencial de sesión de siempre. De ahí para adelante todo funciona igual,
+        /// que era la idea: el equipo, el botón de jugar y el resto no se enteran de por dónde se
+        /// entró.
+        ///
+        /// <b>Esto todavía no funciona, y conviene decirlo claro.</b> El verbo <c>entrar-con-vale</c>
+        /// NO está escrito en el servidor, y no puede estarlo: hace falta saber quién firma los
+        /// vales y con qué clave, y eso lo decide la web el día que exista. Mientras
+        /// <see cref="UI.LauncherPreferences.WebSite"/> siga vacío, el lanzador nunca llama aquí.
+        /// Lo que sí está hecho y probado es todo lo de este lado: el servidor de loopback, el
+        /// PKCE, la comprobación del estado y el canje del código.
+        /// </remarks>
+        public static SignInResult SignInWithToken(string accessToken)
+        {
+            var respuesta = ControlClient.Pedir("entrar-con-vale", new { vale = accessToken });
+
+            var cuerpo = respuesta.Cuerpo();
+            if (cuerpo == null)
+            {
+                return new SignInResult { Success = false, Message = MensajeDeSilencio(respuesta) };
+            }
+
+            if (!cuerpo.Value.GetProperty("bien").GetBoolean())
+            {
+                return new SignInResult
+                {
+                    Success = false,
+                    Message = cuerpo.Value.TryGetProperty("motivo", out var m) ? (m.GetString() ?? "") : "",
+                };
+            }
+
+            Network.ControlClient.Token = cuerpo.Value.GetProperty("token").GetString() ?? "";
+            EsAdministrador = cuerpo.Value.TryGetProperty("rol", out var rolDicho)
+                              && rolDicho.GetInt32() >= Roles.Administrador;
+
+            return new SignInResult
+            {
+                Success = true,
+                Token = cuerpo.Value.GetProperty("token").GetString() ?? "",
+                Nickname = cuerpo.Value.GetProperty("apodo").GetString() ?? "",
+                AccountId = cuerpo.Value.GetProperty("cuenta").GetInt64(),
+            };
+        }
+
+        /// <summary>
+        /// El área de trabajo de la pantalla principal, sin la barra de tareas.
+        /// </summary>
+        /// <remarks>
+        /// Se pregunta a la ventana del lanzador, que es quien sabe en qué pantalla está. Si
+        /// todavía no hay ventana —o no hay pantallas que preguntar, que pasa al arrancar sin
+        /// sesión gráfica— se devuelve 1920 por 1080, que es el mismo respaldo que tenía la
+        /// versión de Windows Forms.
+        /// </remarks>
+        private static (int Width, int Height) PantallaDeTrabajo()
+        {
+            try
+            {
+                var vida = Avalonia.Application.Current?.ApplicationLifetime
+                    as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+                var ventana = vida?.MainWindow;
+
+                var pantalla = ventana?.Screens?.ScreenFromWindow(ventana)
+                               ?? ventana?.Screens?.Primary;
+                if (pantalla != null)
+                {
+                    return (pantalla.WorkingArea.Width, pantalla.WorkingArea.Height);
+                }
+            }
+            catch
+            {
+                // Preguntar por la pantalla no puede impedir arrancar el juego.
+            }
+
+            return (1920, 1080);
+        }
+
+        /// <summary>
         /// Lo que se le dice al usuario cuando el servidor no ha contestado.
         ///
         /// Se distinguen TRES averías, porque cada una se arregla de una manera y decir la que no
@@ -154,6 +235,53 @@ namespace Jondo.Unity.Launcher
             if (cuerpo == null) return true;
 
             return cuerpo.Value.GetProperty("bien").GetBoolean();
+        }
+
+        /// <summary>Un personaje de la cuenta, tal y como lo cuenta el servidor.</summary>
+        public sealed class Character
+        {
+            public long Id { get; init; }
+            public string Name { get; init; } = "";
+            public int Level { get; init; }
+            public int Breed { get; init; }
+            public int Sex { get; init; }
+
+            /// <summary>La cadena de aspecto, que es lo que el lanzador dibuja.</summary>
+            public string Look { get; init; } = "";
+        }
+
+        /// <summary>
+        /// Los personajes de una cuenta guardada.
+        /// </summary>
+        /// <remarks>
+        /// Lo único que el lanzador no puede sacar de los assets del cliente: la cadena de aspecto
+        /// está en la base de datos y aquí no hay base de datos. El retrato sí se dibuja aquí, con
+        /// los huesos del propio cliente.
+        ///
+        /// El servidor devuelve los de la cuenta DEL TOKEN, no los del número que se le mande, así
+        /// que esto no sirve para mirar el equipo de otro.
+        /// </remarks>
+        public static List<Character> CharactersOf(string token)
+        {
+            var salida = new List<Character>();
+
+            var cuerpo = ControlClient.Pedir("personajes", new { token }).Cuerpo();
+            if (cuerpo == null || !cuerpo.Value.TryGetProperty("personajes", out var lista)) return salida;
+
+            foreach (var uno in lista.EnumerateArray())
+            {
+                salida.Add(new Character
+                {
+                    Id = uno.TryGetProperty("id", out var id) ? id.GetInt64() : 0,
+                    Name = uno.TryGetProperty("nombre", out var n) ? (n.GetString() ?? "") : "",
+                    Level = uno.TryGetProperty("nivel", out var l) ? l.GetInt32() : 1,
+                    Breed = uno.TryGetProperty("raza", out var r) ? r.GetInt32() : 0,
+                    Sex = uno.TryGetProperty("sexo", out var x) ? x.GetInt32() : 0,
+                    Look = uno.TryGetProperty("aspecto", out var a) ? (a.GetString() ?? "") : "",
+                });
+            }
+
+            return salida;
         }
 
         /// <summary>Si quien ha entrado es administrador. COSMÉTICO: quien decide es el servidor.</summary>
@@ -240,8 +368,13 @@ namespace Jondo.Unity.Launcher
                 // the client rebuilds its window when it moves between screens (server choice,
                 // character choice, world) and reapplies its own saved resolution, so it drops out
                 // of the maximized state and part of the interface ends up off screen.
-                var area = System.Windows.Forms.Screen.PrimaryScreen?.WorkingArea
-                           ?? new System.Drawing.Rectangle(0, 0, 1920, 1080);
+                //
+                // La medida la da ahora Avalonia y no System.Windows.Forms.Screen: era lo último
+                // que ataba este fichero al escritorio de Windows. Se pide el área DE TRABAJO, sin
+                // la barra de tareas, que es lo que hacía WorkingArea; si no hay pantalla que
+                // preguntar —arrancado sin sesión gráfica— se cae a 1920 por 1080, que es lo que
+                // había antes de respaldo.
+                var area = PantallaDeTrabajo();
 
                 // MelonLoader abre su propia consola negra y su pantalla de arranque delante del
                 // juego. Se le dice que no por línea de órdenes además de por Loader.cfg: la orden

@@ -29,7 +29,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <remarks>
         /// Three things worth saying about the counting.
         ///
-        /// <b>Summons do not count.</b> They sit in Team1 with <c>IsMonster</c> set and a level of
+        /// <b>Summons do not count.</b> They sit in Rojo with <c>IsMonster</c> set and a level of
         /// their own, and this project has already been bitten twice by forgetting it: a monster
         /// that summons was paying out kamas for creatures it made up during the fight. A quest
         /// that wanted three Jalatós beaten would otherwise be finished by one Jalató that summons
@@ -52,7 +52,7 @@ namespace Jondo.Unity.Server.Handlers
             // How many of each kind were beaten. Grouped by the template rather than by the
             // fighter, because a quest asks for "three Jalatós" and does not care which three.
             var beaten = new Dictionary<int, int>();
-            foreach (var monster in fight.Team1)
+            foreach (var monster in fight.Rojo)
             {
                 if (monster.EsInvocado) continue;
                 if (monster.MonsterId <= 0) continue;

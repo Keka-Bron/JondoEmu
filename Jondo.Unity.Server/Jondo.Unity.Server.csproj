@@ -61,6 +61,7 @@
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj" />
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Contract.WinForms\Jondo.Unity.Contract.WinForms.csproj" />
   </ItemGroup>
 
   <!-- NOTHING GETS PUBLISHED WITH A RED TEST.
@@ -82,9 +83,7 @@
        leaves a trace in the command line rather than in a config file nobody reads. -->
   <Target Name="RunTestsBeforePublish" BeforeTargets="Publish" Condition="'$(SkipTests)' != 'true'">
     <Message Text="[Tests] Running Jondo.Unity.Tests before publishing..." Importance="high" />
-    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Tests\Jondo.Unity.Tests.csproj&quot; --nologo --verbosity quiet"
-          IgnoreStandardErrorWarningFormat="true"
-          ContinueOnError="false" />
+    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Tests\Jondo.Unity.Tests.csproj&quot; --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
     <Message Text="[Tests] Green. Publishing." Importance="high" />
   </Target>
 

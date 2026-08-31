@@ -507,6 +507,11 @@ namespace Jondo.Unity.Server
                     -- podian acabar con el mismo uid. Va aqui, con la tabla, que es donde deja
                     -- de ser una casualidad.
                     CREATE UNIQUE INDEX IF NOT EXISTS idx_items_uid ON CharacterItems(Uid);
+
+                    -- Y por personaje, que es como se pregunta al dibujar a alguien: el aspecto
+                    -- de cada actor de un mapa necesita saber que lleva puesto su dueno, y sin
+                    -- indice eso es un recorrido de la tabla entera por actor.
+                    CREATE INDEX IF NOT EXISTS idx_items_character ON CharacterItems(CharacterId);
                 ";
                 createItems.ExecuteNonQuery();
 

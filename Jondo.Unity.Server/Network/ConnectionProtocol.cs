@@ -983,6 +983,7 @@ namespace Jondo.Unity.Server.Network
                 Declare(jss, interactive);
 
             AddQuestElements(jss, mapId);
+            AddReadableElements(jss, mapId);
         }
 
         /// <summary>
@@ -1001,6 +1002,38 @@ namespace Jondo.Unity.Server.Network
         /// «Utiliser», la misma que el cliente usa para el vestigio de anomalía, y de ella dicen
         /// las capturas que el cliente contesta con su iwo igual.
         /// </summary>
+        /// <summary>
+        /// Los carteles y libros de este mapa, declarados como pulsables.
+        /// </summary>
+        /// <remarks>
+        /// Hace falta decirlo. El servidor puede contestar de maravilla al clic de un cartel y no
+        /// servir de nada: si el elemento no viaja en la lista de actores con su habilidad, el
+        /// cliente no lo pinta como interactivo y no hay clic que contestar. Eso es exactamente lo
+        /// que pasaba con la oferta de trabajo de la taberna.
+        ///
+        /// Va aparte de los de misión porque no dependen de ninguna: un cartel se lee con o sin
+        /// ella, y por eso aquí no se pregunta nada al diario. La habilidad es la misma «Utiliser»
+        /// genérica que usan los elementos de misión.
+        /// </remarks>
+        private static void AddReadableElements(Pb jss, long mapId)
+        {
+            foreach (int elementId in Managers.Readables.OnMap(mapId))
+            {
+                var element = Managers.Interactives.ByElementId(mapId, elementId);
+                if (element.Id == 0) continue;
+
+                jss.Msg(11, Pb.New()
+                    .Var(1, 1)
+                    .Msg(4, Pb.New()
+                        .Var(1, Managers.Interactives.SkillInstanceOf(elementId))
+                        .Var(2, Jondo.Unity.World.Quests.QuestBinding.DefaultSkill))
+                    .Var(5, elementId)
+                    .Var(6, Jondo.Unity.World.Quests.QuestBinding.DefaultType));
+
+                DeclarePlacement(jss, element, Managers.ResourceState.Full);
+            }
+        }
+
         private static void AddQuestElements(Pb jss, long mapId)
         {
             foreach (var binding in Managers.Quests.Bindings.OnMap(mapId))

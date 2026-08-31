@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Jondo.Unity.Studio.Data
+namespace Jondo.Unity.Sprites
 {
     /// <summary>
     /// Which humanoid body a skin belongs to.

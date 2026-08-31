@@ -180,7 +180,7 @@ namespace Jondo.Unity.Server.Handlers
 
             Fighter? masCerca = null;
             int mejor = int.MaxValue;
-            foreach (var enemigo in fight.Team1)
+            foreach (var enemigo in fight.Rojo)
             {
                 if (!enemigo.IsAlive) continue;
                 int lejos = MapGeometry.Distance(quien.CellId, enemigo.CellId);
@@ -263,7 +263,7 @@ namespace Jondo.Unity.Server.Handlers
         private static bool EsDeLosMasBajos(FightInstance fight, Fighter quien)
         {
             int menor = int.MaxValue;
-            foreach (var uno in fight.Team0) if (uno.IsAlive && uno.Level < menor) menor = uno.Level;
+            foreach (var uno in fight.Azul) if (uno.IsAlive && uno.Level < menor) menor = uno.Level;
             return quien.Level <= menor;
         }
 
@@ -419,7 +419,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             bool quedanEnemigos = false;
-            foreach (var uno in fight.Team1) if (uno.IsAlive) { quedanEnemigos = true; break; }
+            foreach (var uno in fight.Rojo) if (uno.IsAlive) { quedanEnemigos = true; break; }
 
             // Primero: el señalado tiene que caer el primero de todos.
             if (Vivo(fight, Primero) && !EsElSenalado(fight, Primero, victima.Id))
@@ -501,7 +501,7 @@ namespace Jondo.Unity.Server.Handlers
             // Reparto: cada aliado tiene que haber rematado a alguien.
             if (won && Vivo(fight, Reparto))
             {
-                foreach (var aliado in fight.Team0)
+                foreach (var aliado in fight.Azul)
                 {
                     if (fight.Killers.Contains(aliado.Id)) continue;
                     await BreakAsync(stream, fight, Reparto, $"{aliado.Name} no ha rematado a nadie");
@@ -569,7 +569,7 @@ namespace Jondo.Unity.Server.Handlers
 
         private static bool SigueVivo(FightInstance fight, long fighterId)
         {
-            foreach (var uno in fight.Team1) if (uno.Id == fighterId) return uno.IsAlive;
+            foreach (var uno in fight.Rojo) if (uno.Id == fighterId) return uno.IsAlive;
             return false;
         }
 
@@ -613,7 +613,7 @@ namespace Jondo.Unity.Server.Handlers
         private static Fighter? UnEnemigoVivo(FightInstance fight)
         {
             var vivos = new List<Fighter>();
-            foreach (var uno in fight.Team1) if (uno.IsAlive) vivos.Add(uno);
+            foreach (var uno in fight.Rojo) if (uno.IsAlive) vivos.Add(uno);
             return vivos.Count == 0 ? null : vivos[_dado.Next(vivos.Count)];
         }
 
@@ -659,7 +659,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>¿Tiene a alguien de ese bando pegado? Pegado es a una casilla, sin diagonales.</summary>
         private static bool Adyacente(FightInstance fight, Fighter quien, int bando)
         {
-            var lista = bando == 0 ? fight.Team0 : fight.Team1;
+            var lista = bando == 0 ? fight.Azul : fight.Rojo;
             foreach (var otro in lista)
             {
                 if (!otro.IsAlive || otro.Id == quien.Id) continue;
@@ -675,7 +675,7 @@ namespace Jondo.Unity.Server.Handlers
         private static bool AlineadoConUnAliado(FightInstance fight, Fighter quien, bool diagonal)
         {
             var (x, y) = MapGeometry.CellToPoint(quien.CellId);
-            foreach (var otro in fight.Team0)
+            foreach (var otro in fight.Azul)
             {
                 if (!otro.IsAlive || otro.Id == quien.Id) continue;
                 var (ox, oy) = MapGeometry.CellToPoint(otro.CellId);
@@ -694,7 +694,7 @@ namespace Jondo.Unity.Server.Handlers
         private static bool LoVeAlgunEnemigo(FightInstance fight, Fighter quien)
         {
             MapManager.LosBlockingCells.TryGetValue(fight.MapId, out var tapan);
-            foreach (var enemigo in fight.Team1)
+            foreach (var enemigo in fight.Rojo)
             {
                 if (!enemigo.IsAlive) continue;
                 if (MapGeometry.HasLineOfSight(enemigo.CellId, quien.CellId, tapan)) return true;

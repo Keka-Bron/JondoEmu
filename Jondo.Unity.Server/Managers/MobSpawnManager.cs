@@ -759,6 +759,65 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// Pone el grupo de una sala de mazmorra al tamaño del equipo que entra.
+        /// </summary>
+        /// <remarks>
+        /// En el juego el grupo de una sala IGUALA en número a quienes van a pelear con él: entras
+        /// solo y son cuatro en la del jefe, entráis siete y son siete. Aquí era fijo, así que un
+        /// grupo de siete se peleaba contra los tres de siempre.
+        ///
+        /// Se hace al pisar la sala y no al empezar el combate porque el grupo se DIBUJA antes:
+        /// se ve en el mapa, y verlo de tres y pelear contra siete sería peor que no ajustarlo.
+        ///
+        /// Los que se añaden salen del propio grupo, repitiendo sus miembros en orden. Al recortar
+        /// se quita por el final, y el primero nunca se toca: en la sala del jefe el primero ES el
+        /// jefe, y una sala final sin jefe no es una sala final.
+        ///
+        /// El mínimo de la sala del jefe manda sobre el número de atacantes. Un jefe solo contra
+        /// uno no es un final de mazmorra, y <see cref="MinimoEnLaSalaDelJefe"/> dice por qué.
+        ///
+        /// Devuelve cuántos miembros tiene ahora el grupo, o cero si aquí no había nada que tocar.
+        /// </remarks>
+        public static int SizeRoomToParty(long mapId, int attackers)
+        {
+            if (!DungeonManager.IsLoaded || attackers <= 0) return 0;
+
+            var mazmorra = DungeonManager.OfRoom(mapId);
+            if (mazmorra == null) return 0;
+
+            int quiere = mapId == mazmorra.LastRoom
+                ? Math.Max(attackers, MinimoEnLaSalaDelJefe)
+                : attackers;
+
+            lock (_candado)
+            {
+                if (!_mapMobs.TryGetValue(mapId, out var grupos) || grupos.Count == 0) return 0;
+
+                var grupo = grupos[0];
+                if (grupo.Members.Count == 0 || grupo.Members.Count == quiere)
+                    return grupo.Members.Count;
+
+                if (grupo.Members.Count > quiere)
+                {
+                    grupo.Members.RemoveRange(quiere, grupo.Members.Count - quiere);
+                }
+                else
+                {
+                    // Repitiendo los que ya hay, empezando por el segundo: en la sala del jefe el
+                    // primero es él, y de un jefe no se hacen copias.
+                    int desde = grupo.Members.Count > 1 ? 1 : 0;
+                    int cuantos = grupo.Members.Count;
+                    for (int i = 0; grupo.Members.Count < quiere; i++)
+                    {
+                        grupo.Members.Add(grupo.Members[desde + (i % Math.Max(1, cuantos - desde))]);
+                    }
+                }
+
+                return grupo.Members.Count;
+            }
+        }
+
         /// <summary>Desde donde se numeran los grupos que saca una misión.</summary>
         /// <remarks>
         /// Su propio tramo, por debajo del de los jefes, para que los tres repartos de ids -- los

@@ -439,6 +439,22 @@ namespace Jondo.Unity.Server.Handlers
                                     ?.Line(SessionContext.State.OpenDialogueMessage);
             var elegidaAhora = frase?.Choice(reply);
 
+            // ¿Es la respuesta con la que se acepta una oferta leída? Entonces no hay NPC de por
+            // medio: la pregunta la hizo un cartel, y aceptarla es lo que deja constancia de
+            // haberla leído. Se mira aquí porque el ioy llega suelto, sin decir de dónde venía.
+            var oferta = Readables.ByAcceptReply(reply);
+            if (oferta != null)
+            {
+                if (SessionContext.State.ElementsUsed.Add(oferta.Value.Element))
+                {
+                    DatabaseManager.RememberElement(GameState.CharacterId, oferta.Value.Element);
+                }
+
+                Console.WriteLine($"[Lecturas] Aceptada la oferta del elemento {oferta.Value.Element}.");
+                await CloseAsync(stream);
+                return;
+            }
+
             // ¿La respuesta compra algo? Antes de la misión, porque una compra que falle no debe
             // dejar la conversación a medias con la misión ya empezada.
             if (elegidaAhora != null && elegidaAhora.BuysItem != 0)

@@ -31,25 +31,44 @@ namespace Jondo.Unity.Server.Handlers
 
             long mapId = SessionContext.State.MapId;
 
+            var lectura = Readables.Of(mapId, elementId);
+
             // Queda apuntado antes de decidir que hace, y a proposito: hay conversaciones que
             // dependen de haber leido algo, y si esto fuera detras del despacho un elemento que
             // acabe en «uso desconocido» -como el cartel de la taberna, que no es zaap ni recurso
             // ni objetivo- no dejaria rastro nunca.
-            if (elementId != 0 && SessionContext.State.ElementsUsed.Add(elementId))
+            //
+            // SALVO si la lectura pregunta. Entonces el apunte espera a que se acepte: un cartel
+            // con boton de aceptar en el que mirarlo bastase para haberlo aceptado convertiria el
+            // boton en un adorno.
+            bool apuntaAhora = lectura == null || !lectura.Asks;
+            if (apuntaAhora && elementId != 0 && SessionContext.State.ElementsUsed.Add(elementId))
             {
                 DatabaseManager.RememberElement(GameState.CharacterId, elementId);
             }
 
             // ¿Es algo que se lee? Va antes de las misiones porque un cartel no es un objetivo:
             // la oferta de trabajo de la taberna no sale en ningún paso de la misión que abre, y
-            // aun así hay que enseñarla. El apunte de arriba ya ha quedado hecho, que es lo que
-            // luego deja al tabernero ofrecer «He visto el anuncio que has puesto».
-            int documento = Readables.DocumentOf(mapId, elementId);
-            if (documento != 0)
+            // aun así hay que enseñarla.
+            if (lectura != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Kkt, Pb.New().Var(2, documento).Build()));
-                Console.WriteLine($"[Lecturas] Se lee el documento {documento} del elemento {elementId}.");
+                    ConnectionProtocol.Push(Op.Kkt, Pb.New().Var(2, lectura.Document).Build()));
+
+                // Y detrás, si pregunta, la pregunta. Después del documento porque primero se lee
+                // y luego se decide, que es el orden en que lo hace una persona.
+                if (lectura.Asks)
+                {
+                    var respuestas = new System.Collections.Generic.List<long> { lectura.Accept };
+                    if (lectura.Decline != 0) respuestas.Add(lectura.Decline);
+
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ios,
+                            ConnectionProtocol.BuildNpcQuestion(lectura.Question, respuestas)));
+                }
+
+                Console.WriteLine($"[Lecturas] Se lee el documento {lectura.Document} del elemento " +
+                                  $"{elementId}{(lectura.Asks ? ", con pregunta" : "")}.");
                 return;
             }
 

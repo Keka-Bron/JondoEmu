@@ -1,25 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
-    <!-- Lleva tambien el ASPECTO compartido: la paleta y el logo. Los dos ejecutables pintan
-         igual porque pintan con lo mismo, no porque alguien copie los colores a mano. -->
-    <UseWindowsForms>true</UseWindowsForms>
-    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <!-- Lo poco que el servidor y el lanzador tienen que saber el uno del otro. Ni base de datos,
-         ni protocolo, ni ventanas: rutas de fichero y el contrato del canal de mando. Es la unica
-         pieza que viaja en los DOS ejecutables, asi que cuanto menos tenga, mejor. -->
+         ni protocolo, ni ventanas: rutas de fichero, el contrato del canal de mando, los textos y
+         la paleta. Es la unica pieza que viaja en los DOS ejecutables, asi que cuanto menos tenga,
+         mejor.
+
+         Ya NO lleva Windows Forms. Los controles pintados a mano se fueron a
+         Jondo.Unity.Contract.WinForms, que es quien los necesita; asi el lanzador y Studio, que
+         son de Avalonia, no arrastran el escritorio de Windows solo por compartir los textos. Lo
+         que si se queda es LauncherPalette: los colores son numeros y no dependen de con que se
+         pinten. -->
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Core\Jondo.Unity.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Remove="System.Windows.Forms" />
-    <Using Remove="System.Drawing" />
   </ItemGroup>
 
 </Project>

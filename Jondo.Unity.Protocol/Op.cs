@@ -98,6 +98,119 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Hpd = "hpd";
 
+    // ─── Desafios entre jugadores ───────────────────────────────────────────────────────────
+    //
+    // Medidos en las cuatro capturas de desafio de la carpeta Combate. Los cuatro mensajes y sus
+    // cuerpos, tal cual:
+    //
+    //   C->S  hph { f1: a quien se reta, f2: 1, f3: n }
+    //   S->C  hqc { f1: retador, f2: retado, f3: id del desafio }
+    //   C->S  hpu { f1: id }              rechazar
+    //   C->S  hpu { f1: id, f2: 1 }       ACEPTAR
+    //   S->C  hpv { f1: retador, f2: id, f3: 1 si se acepto, f4: retado }
+    //
+    // La diferencia entre aceptar y rechazar es ese f2 del hpu, y se ve en las cuatro sin
+    // excepcion: las dos capturas de rechazo mandan «08e903» y «08ea03», a secas, y la de aceptar
+    // manda «08ec031001». El hpv lo repite en su f3: esta en las dos aceptadas y en ninguna de
+    // las rechazadas.
+
+    // ─── Koliseo ────────────────────────────────────────────────────────────────────────────
+    //
+    // Medidos en «koliseo completo con invitacion-koli 2vs2». El cliente pide la tabla de
+    // modalidades con un lux vacio y el servidor contesta con el ltd:
+    //
+    //   f1 (repetido) { f1: indice, f2 { f1: 1, f4: cuantos por equipo }, f3: 1 si esta abierta }
+    //
+    // Los cuatro que trae la captura, tal cual:
+    //
+    //   f1{      f2{f1=1 f4=1} f3=1 }    1 contra 1, abierta
+    //   f1{f1=1  f2{f1=1 f4=2} f3=1 }    2 contra 2, abierta
+    //   f1{f1=2  f2{f1=1 f4=3} f3=1 }    3 contra 3, abierta
+    //   f1{f1=3  f2{     f4=3}      }    otra de tres, SIN el f3: cerrada
+    //
+    // El indice cero no viaja, que es lo normal en protobuf; y la cuarta se distingue por no
+    // llevar el f3 ni el f1 de dentro.
+
+    /// <summary>El cliente pide la tabla de modalidades del koliseo. Viaja vacio.</summary>
+    public const string Lux = "lux";
+
+    /// <summary>Las modalidades del koliseo y cuales estan abiertas.</summary>
+    public const string Ltd = "ltd";
+
+    /// <summary>El cliente confirma que se apunto a una modalidad. Devuelve el mismo indice.</summary>
+    /// <remarks>
+    /// Es la respuesta al luy y llega a los 38 ms: se manda «1001» y vuelve «1001». El eco del
+    /// indice es todo lo que trae.
+    /// </remarks>
+    public const string Lth = "lth";
+
+    /// <summary>Apuntarse al koliseo ESTANDO EN GRUPO. El indice de modalidad va en el f1.</summary>
+    /// <remarks>
+    /// MEDIDO sobre nuestro propio cliente: con un grupo formado, el boton de encontrar partida no
+    /// manda el luy sino esto, «0801» -- f1 = 1, que es la entrada 1 del ltd, o sea el 2 contra 2,
+    /// el mismo indice y la misma numeracion que lleva el luy en la captura.
+    ///
+    /// INFERENCIA, y conviene saberlo: no hay captura del camino en grupo. La del koliseo completo
+    /// es de alguien que se apunta SOLO -- el ilw del equipo aparece despues del emparejamiento, no
+    /// antes --, asi que del lsm sabemos lo que manda el cliente y no lo que contesta el servidor
+    /// de verdad. Se le contesta el mismo lth que al luy porque es el acuse que saca la ventana de
+    /// su estado de espera, y porque las dos peticiones son la misma cosa con y sin grupo.
+    /// </remarks>
+    public const string Lsm = "lsm";
+
+    /// <summary>El cliente vuelve del koliseo. Viaja vacio.</summary>
+    /// <remarks>
+    /// Antes ponia aqui que era salirse de la cola, y era falso. Ordenando las dos mitades de la
+    /// conexion por marca de tiempo se ve que el luy y el lte estan a CINCO MINUTOS Y MEDIO uno
+    /// del otro -- 109,6 s y 446,0 s --, con el combate entero en medio. El lte llega al volver,
+    /// y el servidor le contesta con lty, lsr y lsx en 80 ms.
+    /// </remarks>
+    public const string Lte = "lte";
+
+    /// <summary>Algo del koliseo que el servidor empuja. No esta descifrado.</summary>
+    /// <remarks>
+    /// Dos apariciones y las dos distintas: «08012001» sin que el cliente pida nada, 27 s despues
+    /// de entrar, y «18032001» contestando al lte de la vuelta. f1=1/f4=1 frente a f3=3/f4=1: que
+    /// significa cada campo no se sabe. Se manda el segundo tal cual al recibir el lte, que es lo
+    /// unico medido; no se inventa el primero.
+    /// </remarks>
+    public const string Lsx = "lsx";
+
+    /// <summary>Acompana al lte de la vuelta del koliseo. 151 bytes, sin descifrar.</summary>
+    public const string Lty = "lty";
+
+    /// <summary>Acompana al lte de la vuelta del koliseo. Viaja vacio, en la raiz f3.</summary>
+    public const string Lsr = "lsr";
+
+    /// <summary>El servidor manda al cliente a OTRO servidor, el del koliseo.</summary>
+    /// <remarks>
+    /// Este es el hallazgo gordo de la captura y cambia la forma del sistema entero. Siete
+    /// segundos despues del luy, cuando ya hay partida, el servidor de mundo manda:
+    ///
+    ///   lst { f1=502, f2="dofus2-ko-tynril.ankama-games.com", f3=&lt;ip&gt;, f4=&lt;billete de 32&gt; }
+    ///
+    /// y el cliente ABRE UNA SEGUNDA CONEXION a esa maquina, se autentica con el billete y pelea
+    /// alli: el kam, el kaa y los jxg del koliseo viajan por el otro socket, no por este. Al
+    /// acabar vuelve al de mundo y manda el lte.
+    ///
+    /// Jondo es un solo servidor y no hace ese salto: el combate de koliseo se monta en el mismo
+    /// sitio. Es una diferencia de arquitectura, no un detalle, y por eso esta escrita aqui.
+    /// </remarks>
+    public const string Lst = "lst";
+
+
+    /// <summary>El cliente reta a alguien. Lleva a quien reta en el campo 1.</summary>
+    public const string Hph = "hph";
+
+    /// <summary>El servidor anuncia el desafio: retador, retado y su id.</summary>
+    public const string Hqc = "hqc";
+
+    /// <summary>La respuesta del retado. Con f2=1 acepta; sin el, rechaza.</summary>
+    public const string Hpu = "hpu";
+
+    /// <summary>Como acabo el desafio. El f3 a uno quiere decir que se acepto.</summary>
+    public const string Hpv = "hpv";
+
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Hqa = "hqa";
 
@@ -1187,8 +1300,18 @@ public static class Op
     /// <summary>Sin identificar. 4 usos en el emulador.</summary>
     public const string Luq = "luq";
 
-    /// <summary>Lo envia el cliente (1 vez) pero el emulador lo construye como mensaje de servidor y el builder no se llama nunca. Lleva id de peticion real. El fichero de mapeos lo llama JobDescriptionMessage, y eso es falso.</summary>
+    /// <summary>
+    /// Apuntarse a una modalidad del koliseo. El campo 2 es su indice en el ltd.
+    /// </summary>
+    /// <remarks>
+    /// El fichero de mapeos lo llama JobDescriptionMessage y eso es falso, como ya decia el
+    /// comentario anterior. Lo que si es, medido en «koliseo completo con invitacion-koli 2vs2»:
+    /// el cliente lo manda una sola vez, con «1001» -- f2=1 --, y esa captura es de un DOS contra
+    /// dos. El indice 1 del ltd es justo la entrada de equipos de dos, asi que el campo es la
+    /// modalidad y cuadra sin forzar nada.
+    /// </remarks>
     public const string Luy = "luy";
+    // La respuesta es el lth y no el lsx: ver la nota de aquel.
 
     /// <summary>Eso es todo el listado de actores; vacio, justo detras de jss. Sin el, el cliente nunca da el mapa por cargado, espera unos dos segundos y reintenta con knm, kno y kny.</summary>
     public const string Lva = "lva";

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <!-- Dibujar un personaje a partir de su cadena de aspecto, sacandolo de los huesos del
+         propio cliente de Dofus. Estaba dentro de Studio y ahora lo usan los dos: Studio para
+         los NPC de los mapas y el lanzador para los retratos del equipo.
+
+         Aqui no hay ni base de datos ni protocolo: se le da una cadena de aspecto y devuelve un
+         mapa de bits. Lo que decide QUE aspecto dibujar es cosa de quien llame. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="AssetsTools.NET" Version="3.0.5" />
+    <PackageReference Include="AssetsTools.NET.Texture" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Core\Jondo.Unity.Core.csproj" />
+  </ItemGroup>
+
+</Project>

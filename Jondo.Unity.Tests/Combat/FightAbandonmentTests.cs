@@ -124,7 +124,7 @@ namespace Jondo.Unity.Tests.Combat
             // Two lists and they are not the same list, which is the thing to get right. The turn
             // rotation is rebuilt by Agrupar, which filters on IsAlive, so whoever abandons is
             // gone from it and can never come up again. The CAROUSEL the client draws is built
-            // from the teams instead -- BuildTeams over Team0 plus Team1, which keep their dead --
+            // from the teams instead -- BuildTeams over Azul plus Rojo, which keep their dead --
             // so the player stays on screen, greyed, and nobody else's slot renumbers.
             var fight = new FightInstance(1, 1);
             var quitter = new Fighter { Id = 10, MaxHP = 100, CurrentHP = 100 };
@@ -136,7 +136,7 @@ namespace Jondo.Unity.Tests.Combat
             fight.UpdateTurnOrder();
 
             Assert.DoesNotContain(fight.TurnOrder, f => f.Id == quitter.Id);
-            Assert.Contains(fight.Team0, f => f.Id == quitter.Id);
+            Assert.Contains(fight.Azul, f => f.Id == quitter.Id);
         }
 
         private static (FightInstance Fight, Fighter Player) FightWithPlayer()

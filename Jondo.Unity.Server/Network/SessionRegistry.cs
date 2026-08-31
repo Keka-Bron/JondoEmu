@@ -56,7 +56,23 @@ namespace Jondo.Unity.Server.Network
             }
         }
 
-        public static bool Unregister(GameSession session) => _sessions.TryRemove(session.Id, out _);
+        /// <summary>Se va del servidor: se le quita también lo que dejó pendiente.</summary>
+        /// <remarks>
+        /// El desafío ofrecido y el sitio en la cola del koliseo sobreviven al socket porque viven
+        /// en tablas estáticas. Sin esta limpieza, quien cierra el cliente esperando partida deja
+        /// un hueco fantasma que el emparejamiento cuenta como jugador, y el desafío que ofreció
+        /// bloquea al otro para siempre.
+        /// </remarks>
+        public static bool Unregister(GameSession session)
+        {
+            long yo = session.State.CharacterId;
+            if (yo != 0)
+            {
+                Managers.Duels.ForgetThoseOf(yo);
+                Managers.KoliseoQueue.Leave(yo);
+            }
+            return _sessions.TryRemove(session.Id, out _);
+        }
 
         /// <summary>
         /// Si esta cuenta tiene ahora mismo una sesion de juego conectada.

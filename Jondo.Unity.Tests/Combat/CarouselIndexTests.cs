@@ -70,7 +70,7 @@ namespace Jondo.Unity.Tests.Combat
             // Round 2 of the capture: the summon lands at 1 and the four monsters move from 1..4
             // to 2..5. It is not appended at the end.
             var fight = FightWith(4);
-            var player = fight.Team0[0];
+            var player = fight.Azul[0];
 
             Summon(fight, -7, player);
 
@@ -85,7 +85,7 @@ namespace Jondo.Unity.Tests.Combat
             // The bug. Without the rebuild the summon keeps its slot and every monster behind it
             // is announced one too high for the rest of the fight.
             var fight = FightWith(4);
-            var player = fight.Team0[0];
+            var player = fight.Azul[0];
             var summon = Summon(fight, -7, player);
 
             summon.CurrentHP = 0;
@@ -103,7 +103,7 @@ namespace Jondo.Unity.Tests.Combat
             // everybody's index, and if CurrentTurnIndex is not repointed the turn jumps to the
             // next fighter in the middle of somebody's action.
             var fight = FightWith(4);
-            var player = fight.Team0[0];
+            var player = fight.Azul[0];
             var summon = Summon(fight, -7, player);
 
             // Hand the turn to a monster standing behind the summon.
@@ -127,7 +127,7 @@ namespace Jondo.Unity.Tests.Combat
             var fight = FightWith(4);
             int before = fight.TurnOrder.Count;
 
-            fight.Team1[0].CurrentHP = 0;
+            fight.Rojo[0].CurrentHP = 0;
 
             Assert.Equal(before, fight.TurnOrder.Count);
             Assert.Contains(fight.TurnOrder, f => f.Id == -1);
@@ -140,7 +140,7 @@ namespace Jondo.Unity.Tests.Combat
             // left, the old index can be beyond the shortened list, and CurrentFighter indexes it
             // without checking.
             var fight = FightWith(1);
-            var player = fight.Team0[0];
+            var player = fight.Azul[0];
             var summon = Summon(fight, -7, player);
 
             while (fight.CurrentFighter != null && fight.CurrentFighter.Id != -7) fight.NextTurn();

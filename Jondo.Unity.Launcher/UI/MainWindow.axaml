@@ -1,0 +1,248 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:w="clr-namespace:Jondo.Unity.Launcher.UI.Widgets"
+        x:Class="Jondo.Unity.Launcher.UI.MainWindow"
+        Title="Dofus"
+        MinWidth="1100" MinHeight="700"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BackgroundBrush}"
+        FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif">
+
+  <!-- El dibujo del fondo se ve entero: el panel ocupa una franja a la izquierda y el resto queda
+       despejado. Antes la tarjeta era de 350 y llevaba dentro TODO — entrar, el equipo, el idioma,
+       la ruta del cliente y el estado — apilado en una columna. -->
+  <Panel>
+    <Image x:Name="Fondo" Stretch="UniformToFill" />
+
+    <Border IsHitTestVisible="False">
+      <Border.Background>
+        <RadialGradientBrush GradientOrigin="50%,50%" Center="50%,50%" RadiusX="75%" RadiusY="75%">
+          <GradientStop Color="#03000000" Offset="0" />
+          <GradientStop Color="#4D000000" Offset="1" />
+        </RadialGradientBrush>
+      </Border.Background>
+    </Border>
+
+    <!-- Las chispas van por delante del dibujo y por detrás del panel: se ven caer alrededor de
+         la tarjeta sin estorbar nada de lo que hay que leer. -->
+    <w:StarField />
+
+    <Border x:Name="Panel" Width="440" Margin="56,44"
+            HorizontalAlignment="Left" VerticalAlignment="Center"
+            CornerRadius="14" BorderThickness="2"
+            BorderBrush="{DynamicResource GoldBorderBrush}"
+            Background="{DynamicResource CardFillBrush}"
+            ClipToBounds="True">
+      <DockPanel>
+
+        <!-- ═══ La cabecera: quién eres y si el servidor contesta ═══════════ -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource BarFillBrush}"
+                BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LightBrownBrush}"
+                Padding="20,14">
+          <StackPanel Spacing="10">
+            <w:LogoBanner Height="62" HorizontalAlignment="Stretch" />
+
+            <!-- El estado, arriba y con su punto. Estaba abajo del todo en letra pequeña, y es lo
+                 primero que hay que saber: si no contesta, nada de lo demás sirve. -->
+            <Border CornerRadius="20" Padding="12,5" HorizontalAlignment="Center"
+                    Background="#40000000">
+              <StackPanel Orientation="Horizontal" Spacing="7">
+                <w:StatusDot x:Name="PuntoEstado" VerticalAlignment="Center" />
+                <TextBlock x:Name="TextoEstado" VerticalAlignment="Center"
+                           FontSize="10.5" FontWeight="Bold" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <!-- ═══ Las secciones ══════════════════════════════════════════════ -->
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*" Height="42">
+          <Button x:Name="SeccionJugar" Classes="seccion" Grid.Column="0" Click="AlPulsarSeccion" Tag="jugar" />
+          <Button x:Name="SeccionCuentas" Classes="seccion" Grid.Column="1" Click="AlPulsarSeccion" Tag="cuentas" />
+          <Button x:Name="SeccionAjustes" Classes="seccion" Grid.Column="2" Click="AlPulsarSeccion" Tag="ajustes" />
+        </Grid>
+        <Border DockPanel.Dock="Top" Height="2" Background="{DynamicResource LightBrownBrush}" />
+
+        <!-- ═══ El aviso, cuando lo hay ════════════════════════════════════ -->
+        <Border x:Name="Aviso" DockPanel.Dock="Top" IsVisible="False"
+                CornerRadius="5" BorderThickness="1" Padding="12" Margin="20,16,20,0"
+                Background="{DynamicResource AlertBackgroundBrush}"
+                BorderBrush="{DynamicResource RedBrush}">
+          <TextBlock x:Name="TextoAviso" TextWrapping="Wrap" TextAlignment="Center"
+                     FontSize="12.5" Foreground="{DynamicResource AlertTextBrush}" />
+        </Border>
+
+        <!-- ═══ El cuerpo ══════════════════════════════════════════════════ -->
+        <Panel Margin="20" MinHeight="360">
+
+          <!-- ─── JUGAR ─────────────────────────────────────────────────── -->
+          <DockPanel x:Name="PanelJugar">
+            <StackPanel DockPanel.Dock="Top" Spacing="3">
+              <TextBlock x:Name="TituloEquipo" FontSize="17"
+                         Foreground="{DynamicResource HighlightTextBrush}" />
+              <TextBlock x:Name="ResumenEquipo" FontSize="12"
+                         Foreground="{DynamicResource MutedGoldBrush}" Margin="0,0,0,12" />
+            </StackPanel>
+
+            <!-- El botón grande abajo del todo, siempre en el mismo sitio caiga lo que caiga
+                 encima: es lo que se viene a pulsar. -->
+            <StackPanel DockPanel.Dock="Bottom" Spacing="10" Margin="0,14,0,0">
+              <Button x:Name="BotonJugar" Classes="launcher green" Height="52"
+                      HorizontalAlignment="Stretch" Click="AlPulsarJugar">
+                <w:SpacedText x:Name="TextoJugar" Spacing="2" Shadow="True" FontSize="17"
+                              FontWeight="Bold" Foreground="White" />
+              </Button>
+              <!-- Las dos acciones de al lado, en una fila. La de añadir cuenta estaba sólo en la
+                   pestaña de CUENTAS, y con el equipo delante nada decía cómo meter otra: había
+                   que deducir que el sitio era la pestaña de al lado. -->
+              <Grid ColumnDefinitions="*,Auto">
+                <Button x:Name="BotonTodas" Classes="link" Grid.Column="0"
+                        HorizontalContentAlignment="Left" Click="AlPulsarTodas">
+                  <TextBlock x:Name="TextoTodas" FontSize="11.5"
+                             Foreground="{DynamicResource GoldBrush}" />
+                </Button>
+                <Button x:Name="AnadirOtra" Classes="link" Grid.Column="1"
+                        HorizontalAlignment="Right" Click="AlPulsarIrACuentas">
+                  <TextBlock x:Name="TextoAnadirOtra" FontSize="11.5"
+                             Foreground="{DynamicResource SoftGoldBrush}" />
+                </Button>
+              </Grid>
+            </StackPanel>
+
+            <!-- Si no hay cuentas todavía, aquí va el atajo en vez de una lista vacía. -->
+            <Panel>
+              <ScrollViewer x:Name="ListaDeCuentas" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="FilasDeCuentas" Spacing="8" />
+              </ScrollViewer>
+
+              <StackPanel x:Name="EquipoVacio" IsVisible="False" Spacing="14"
+                          VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock x:Name="TextoEquipoVacio" TextWrapping="Wrap" TextAlignment="Center"
+                           FontSize="13" MaxWidth="300"
+                           Foreground="{DynamicResource LightBrownTextBrush}" />
+                <Button x:Name="BotonPrimeraCuenta" Classes="launcher purple" Height="42"
+                        Width="240" Click="AlPulsarIrACuentas">
+                  <w:SpacedText x:Name="TextoPrimeraCuenta" Spacing="1" FontSize="13"
+                                FontWeight="Bold" Foreground="White" />
+                </Button>
+              </StackPanel>
+            </Panel>
+          </DockPanel>
+
+          <!-- ─── CUENTAS ───────────────────────────────────────────────── -->
+          <DockPanel x:Name="PanelCuentas" IsVisible="False">
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*" Height="34" Margin="0,0,0,18">
+              <Button x:Name="PestanaEntrar" Classes="tab" Grid.Column="0"
+                      HorizontalAlignment="Stretch" Click="AlPulsarPestanaEntrar" />
+              <Button x:Name="PestanaRegistro" Classes="tab" Grid.Column="1"
+                      HorizontalAlignment="Stretch" Click="AlPulsarPestanaRegistro" />
+            </Grid>
+
+            <Panel>
+            <StackPanel x:Name="FormularioEntrar" VerticalAlignment="Top">
+              <TextBlock x:Name="RotuloUsuario" Classes="label" />
+              <TextBox x:Name="CampoUsuario" Classes="field" Margin="0,0,0,14"
+                       KeyDown="AlPulsarTeclaEnEntrar" />
+              <TextBlock x:Name="RotuloClave" Classes="label" />
+              <TextBox x:Name="CampoClave" Classes="field" PasswordChar="•" Margin="0,0,0,14"
+                       KeyDown="AlPulsarTeclaEnEntrar" />
+              <Button x:Name="BotonConectar" Classes="launcher green" Height="46"
+                      HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="AlPulsarConectar">
+                <w:SpacedText x:Name="TextoConectar" Spacing="2" Shadow="True" FontSize="16"
+                              FontWeight="Bold" Foreground="White" />
+              </Button>
+            </StackPanel>
+
+            <StackPanel x:Name="FormularioRegistro" IsVisible="False" VerticalAlignment="Top">
+              <TextBlock x:Name="RotuloNuevoUsuario" Classes="label" />
+              <TextBox x:Name="CampoNuevoUsuario" Classes="field" Margin="0,0,0,12"
+                       KeyDown="AlPulsarTeclaEnRegistro" />
+              <TextBlock x:Name="RotuloNuevaClave" Classes="label" />
+              <TextBox x:Name="CampoNuevaClave" Classes="field" PasswordChar="•" Margin="0,0,0,12"
+                       KeyDown="AlPulsarTeclaEnRegistro" />
+              <TextBlock x:Name="RotuloApodo" Classes="label" />
+              <TextBox x:Name="CampoApodo" Classes="field" Margin="0,0,0,12"
+                       KeyDown="AlPulsarTeclaEnRegistro" />
+              <Button x:Name="BotonCrear" Classes="launcher purple" Height="46"
+                      HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="AlPulsarCrear">
+                <w:SpacedText x:Name="TextoCrear" Spacing="2" Shadow="True" FontSize="16"
+                              FontWeight="Bold" Foreground="White" />
+              </Button>
+            </StackPanel>
+            </Panel>
+          </DockPanel>
+
+          <!-- ─── AJUSTES ───────────────────────────────────────────────── -->
+          <ScrollViewer x:Name="PanelAjustes" IsVisible="False" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="20">
+
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="RotuloIdioma" Classes="label" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button x:Name="BotonEs" Classes="chip" Click="AlPulsarIdioma" Tag="es">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                      <w:FlagIcon Code="es" VerticalAlignment="Center" />
+                      <TextBlock Text="Español" VerticalAlignment="Center" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                  <Button x:Name="BotonEn" Classes="chip" Click="AlPulsarIdioma" Tag="en">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                      <w:FlagIcon Code="en" VerticalAlignment="Center" />
+                      <TextBlock Text="English" VerticalAlignment="Center" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                  <Button x:Name="BotonFr" Classes="chip" Click="AlPulsarIdioma" Tag="fr">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                      <w:FlagIcon Code="fr" VerticalAlignment="Center" />
+                      <TextBlock Text="Français" VerticalAlignment="Center" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                </StackPanel>
+                <TextBlock x:Name="PieIdioma" Classes="pie" />
+              </StackPanel>
+
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="RotuloMusica" Classes="label" />
+                <Button x:Name="BotonMusica" Classes="chip" HorizontalAlignment="Left"
+                        Click="AlPulsarMusica">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Path x:Name="IconoAltavoz" Width="14" Height="14" Stretch="Uniform"
+                          Fill="{Binding $parent[Button].Foreground}"
+                          Data="M 3,6 L 6,6 L 10,2 L 10,14 L 6,10 L 3,10 Z" />
+                    <TextBlock x:Name="TextoMusica" VerticalAlignment="Center" FontSize="12" />
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="RotuloCliente" Classes="label" />
+                <Button x:Name="BotonRuta" Classes="path" Height="34" Click="AlPulsarRuta">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Path Width="14" Height="14" Stretch="Uniform"
+                          Fill="{Binding $parent[Button].Foreground}"
+                          Data="M 1,3 L 6,3 L 7.5,5 L 15,5 L 15,13 L 1,13 Z" />
+                    <TextBlock x:Name="TextoRuta" VerticalAlignment="Center" FontSize="11"
+                               TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                </Button>
+                <TextBlock x:Name="PieCliente" Classes="pie" />
+              </StackPanel>
+
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="RotuloCuentasGuardadas" Classes="label" />
+                <Button x:Name="QuitarCuentas" Classes="launcher danger" Height="38"
+                        HorizontalAlignment="Stretch" Click="AlPulsarQuitarCuentas">
+                  <TextBlock x:Name="TextoQuitarCuentas" FontSize="12.5" FontWeight="Bold" />
+                </Button>
+                <TextBlock x:Name="PieCuentasGuardadas" Classes="pie" />
+              </StackPanel>
+
+            </StackPanel>
+          </ScrollViewer>
+
+        </Panel>
+      </DockPanel>
+    </Border>
+  </Panel>
+</Window>

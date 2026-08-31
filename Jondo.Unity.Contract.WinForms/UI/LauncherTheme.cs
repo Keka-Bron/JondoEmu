@@ -19,19 +19,19 @@ namespace Jondo.Unity.Launcher.UI
     {
         // ─── Colors ─────────────────────────────────────────────────────────────
         /// <summary>Window background color (#0d0603), visible when the image is missing.</summary>
-        public static readonly Color Background = Color.FromArgb(13, 6, 3);
+        public static readonly Color Background = Argb(LauncherPalette.Background);
 
         // Las dos tarjetas van bastante más transparentes que en la web original —de 0,84 y 0,86 a
         // 0,52 y 0,55— para que se vea el dibujo del fondo por detrás. Lo que hay encima sigue
         // leyéndose porque el texto es claro sobre un marrón muy oscuro.
         /// <summary>Translucent fill of the cards.</summary>
-        public static readonly Color CardFill = Color.FromArgb(133, 16, 9, 5);
+        public static readonly Color CardFill = Argb(LauncherPalette.CardFill);
 
         /// <summary>Translucent fill of the console panel.</summary>
-        public static readonly Color ConsoleFill = Color.FromArgb(140, 12, 7, 4);
+        public static readonly Color ConsoleFill = Argb(LauncherPalette.ConsoleFill);
 
         /// <summary>Top bar of the cards: rgba(26, 15, 8, 0.75).</summary>
-        public static readonly Color BarFill = Color.FromArgb(191, 26, 15, 8);
+        public static readonly Color BarFill = Argb(LauncherPalette.BarFill);
 
         /// <summary>
         /// El cuerpo del registro. Va OPACO a la fuerza: es un RichTextBox y a un control de texto
@@ -40,56 +40,64 @@ namespace Jondo.Unity.Launcher.UI
         /// es el panel que lo rodea. Este tono es el que resulta de aquel negro al 66% sobre el
         /// fondo, para que no parezca un agujero.
         /// </summary>
-        public static readonly Color ConsoleBackground = Color.FromArgb(24, 16, 10);
+        public static readonly Color ConsoleBackground = Argb(LauncherPalette.ConsoleBackground);
 
-        public static readonly Color GoldBorder = Color.FromArgb(230, 184, 0);   // #e6b800
-        public static readonly Color LightGold = Color.FromArgb(255, 204, 0);      // #ffcc00
-        public static readonly Color Gold = Color.FromArgb(212, 175, 55);          // #d4af37
-        public static readonly Color SoftGold = Color.FromArgb(230, 194, 128);    // #e6c280
-        public static readonly Color MutedGold = Color.FromArgb(184, 152, 101);  // #b89865
-        public static readonly Color LightBrown = Color.FromArgb(89, 60, 29);    // #593c1d
+        public static readonly Color GoldBorder = Argb(LauncherPalette.GoldBorder);   // #e6b800
+        public static readonly Color LightGold = Argb(LauncherPalette.LightGold);      // #ffcc00
+        public static readonly Color Gold = Argb(LauncherPalette.Gold);          // #d4af37
+        public static readonly Color SoftGold = Argb(LauncherPalette.SoftGold);    // #e6c280
+        public static readonly Color MutedGold = Argb(LauncherPalette.MutedGold);  // #b89865
+        public static readonly Color LightBrown = Argb(LauncherPalette.LightBrown);    // #593c1d
         /// <summary>Para lo que se enseña pero no cambia: se lee sin robar atención.</summary>
-        public static readonly Color LightBrownText = Color.FromArgb(150, 126, 92);
-        public static readonly Color BorderBrown = Color.FromArgb(122, 83, 40);   // #7a5328
-        public static readonly Color BaseText = Color.FromArgb(255, 243, 214);   // #fff3d6
-        public static readonly Color CardText = Color.FromArgb(255, 243, 204);// #fff3cc
-        public static readonly Color HighlightText = Color.FromArgb(255, 230, 128); // #ffe680
-        public static readonly Color FieldText = Color.FromArgb(255, 248, 231);  // #fff8e7
+        public static readonly Color LightBrownText = Argb(LauncherPalette.LightBrownText);
+        public static readonly Color BorderBrown = Argb(LauncherPalette.BorderBrown);   // #7a5328
+        public static readonly Color BaseText = Argb(LauncherPalette.BaseText);   // #fff3d6
+        public static readonly Color CardText = Argb(LauncherPalette.CardText);// #fff3cc
+        public static readonly Color HighlightText = Argb(LauncherPalette.HighlightText); // #ffe680
+        public static readonly Color FieldText = Argb(LauncherPalette.FieldText);  // #fff8e7
 
-        public static readonly Color FieldBackground = Color.FromArgb(217, 12, 6, 3);          // rgba(12,6,3,0.85)
-        public static readonly Color DisabledFieldBackground = Color.FromArgb(128, 20, 10, 5); // rgba(20,10,5,0.5)
-        public static readonly Color DisabledFieldBorder = Color.FromArgb(68, 48, 26);     // #44301a
-        public static readonly Color DisabledFieldText = Color.FromArgb(119, 102, 85);   // #776655
+        public static readonly Color FieldBackground = Argb(LauncherPalette.FieldBackground);          // rgba(12,6,3,0.85)
+        public static readonly Color DisabledFieldBackground = Argb(LauncherPalette.DisabledFieldBackground); // rgba(20,10,5,0.5)
+        public static readonly Color DisabledFieldBorder = Argb(LauncherPalette.DisabledFieldBorder);     // #44301a
+        public static readonly Color DisabledFieldText = Argb(LauncherPalette.DisabledFieldText);   // #776655
 
-        public static readonly Color GreenTop = Color.FromArgb(125, 179, 38);  // #7db326
-        public static readonly Color GreenBottom = Color.FromArgb(70, 108, 20);    // #466c14
-        public static readonly Color GreenBorder = Color.FromArgb(163, 224, 59);   // #a3e03b
-        public static readonly Color GreenTopHover = Color.FromArgb(145, 206, 44);
-        public static readonly Color GreenBottomHover = Color.FromArgb(85, 131, 25);
+        public static readonly Color GreenTop = Argb(LauncherPalette.GreenTop);  // #7db326
+        public static readonly Color GreenBottom = Argb(LauncherPalette.GreenBottom);    // #466c14
+        public static readonly Color GreenBorder = Argb(LauncherPalette.GreenBorder);   // #a3e03b
+        public static readonly Color GreenTopHover = Argb(LauncherPalette.GreenTopHover);
+        public static readonly Color GreenBottomHover = Argb(LauncherPalette.GreenBottomHover);
 
-        public static readonly Color PurpleTop = Color.FromArgb(160, 64, 160); // #a040a0
-        public static readonly Color PurpleBottom = Color.FromArgb(96, 32, 96);    // #602060
-        public static readonly Color PurpleBorder = Color.FromArgb(208, 112, 208); // #d070d0
+        public static readonly Color PurpleTop = Argb(LauncherPalette.PurpleTop); // #a040a0
+        public static readonly Color PurpleBottom = Argb(LauncherPalette.PurpleBottom);    // #602060
+        public static readonly Color PurpleBorder = Argb(LauncherPalette.PurpleBorder); // #d070d0
 
-        public static readonly Color GrayTop = Color.FromArgb(68, 68, 68);
-        public static readonly Color GrayBottom = Color.FromArgb(34, 34, 34);
-        public static readonly Color GrayBorder = Color.FromArgb(85, 85, 85);
-        public static readonly Color GrayText = Color.FromArgb(136, 136, 136);
+        public static readonly Color GrayTop = Argb(LauncherPalette.GrayTop);
+        public static readonly Color GrayBottom = Argb(LauncherPalette.GrayBottom);
+        public static readonly Color GrayBorder = Argb(LauncherPalette.GrayBorder);
+        public static readonly Color GrayText = Argb(LauncherPalette.GrayText);
 
-        public static readonly Color Red = Color.FromArgb(255, 77, 77);          // #ff4d4d
-        public static readonly Color OnlineGreen = Color.FromArgb(146, 208, 80); // #92d050
-        public static readonly Color DotGreen = Color.FromArgb(80, 255, 80);    // #50ff50
-        public static readonly Color AlertBackground = Color.FromArgb(230, 140, 20, 20); // rgba(140,20,20,0.9)
-        public static readonly Color AlertText = Color.FromArgb(255, 230, 230); // #ffe6e6
+        public static readonly Color Red = Argb(LauncherPalette.Red);          // #ff4d4d
+        public static readonly Color OnlineGreen = Argb(LauncherPalette.OnlineGreen); // #92d050
+        public static readonly Color DotGreen = Argb(LauncherPalette.DotGreen);    // #50ff50
+        public static readonly Color AlertBackground = Argb(LauncherPalette.AlertBackground); // rgba(140,20,20,0.9)
+        public static readonly Color AlertText = Argb(LauncherPalette.AlertText); // #ffe6e6
 
         // Event log colors (the .log-* classes of the web interface).
-        public static readonly Color LogHaapi = Color.FromArgb(0, 240, 255);
-        public static readonly Color LogZaap = Color.FromArgb(51, 204, 255);
-        public static readonly Color LogServer = Color.FromArgb(255, 204, 0);
-        public static readonly Color LogSuccess = Color.FromArgb(80, 255, 80);
-        public static readonly Color LogError = Color.FromArgb(255, 77, 77);
-        public static readonly Color LogNormal = Color.FromArgb(209, 186, 134);
-        public static readonly Color LogTime = Color.FromArgb(122, 101, 72);
+        public static readonly Color LogHaapi = Argb(LauncherPalette.LogHaapi);
+        public static readonly Color LogZaap = Argb(LauncherPalette.LogZaap);
+        public static readonly Color LogServer = Argb(LauncherPalette.LogServer);
+        public static readonly Color LogSuccess = Argb(LauncherPalette.LogSuccess);
+        public static readonly Color LogError = Argb(LauncherPalette.LogError);
+        public static readonly Color LogNormal = Argb(LauncherPalette.LogNormal);
+        public static readonly Color LogTime = Argb(LauncherPalette.LogTime);
+
+        /// <summary>Un color de la paleta compartida, tal cual lo pinta GDI+.</summary>
+        /// <remarks>
+        /// Los numeros viven en <see cref="LauncherPalette"/>, que no sabe de toolkits, para que
+        /// esta paleta y la de Avalonia sean LA MISMA y no dos copias que se van separando. Antes
+        /// estaban escritos aqui y el lanzador de Avalonia habria tenido que copiarlos.
+        /// </remarks>
+        private static Color Argb(uint value) => Color.FromArgb(unchecked((int)value));
 
         // ─── Typefaces ──────────────────────────────────────────────────────────
 

@@ -16,17 +16,174 @@ namespace Jondo.Unity.World.Fights
     public class FightInstance
     {
         public long FightId { get; set; }
+
+        /// <summary>Las reglas de este combate: qué cambia respecto a pelear contra monstruos.</summary>
+        /// <remarks>
+        /// Eran dos banderas, <c>IsDuel</c> e <c>IsKoliseo</c>, y el motor las miraba en dieciséis
+        /// sitios repartidos por cinco métodos. Ver <see cref="FightRules"/> para por qué esto y no
+        /// dos motores.
+        /// </remarks>
+        public FightRules Reglas { get; set; } = FightRules.ContraMonstruos;
+
+        /// <summary>Si enfrente hay personas y no monstruos. Lo mismo que decía IsDuel.</summary>
+        public bool EsPvp => !Reglas.EnfrenteHayMonstruos;
+
         public long MapId { get; set; }
-        public bool HasLoadedMap { get; set; } = false;
+        /// <summary>Quiénes de este combate ya han recibido la preparación.</summary>
+        /// <remarks>
+        /// Esto era <c>HasLoadedMap</c>, UN booleano para el combate entero, y funcionaba mientras
+        /// sólo hubiera una persona dentro: contra monstruos, el único jugador lo ponía y ya está.
+        /// En un desafío hay dos, y el flujo es el mismo para cada uno por su propio socket:
+        ///
+        /// <code>
+        ///   C-&gt;S  kmv          «ya estoy en el mapa de combate, dame los actores»
+        ///   S-&gt;C  la preparación: jxg de cada combatiente, kba, jzu, kam, kaa, kae...
+        /// </code>
+        ///
+        /// Con la bandera compartida, el PRIMERO en mandar el kmv la ponía y al segundo le
+        /// contestaba que ya no había preparación pendiente. Su cliente se quedaba en modo rol —con
+        /// su barra de hechizos, sin combatientes y sin botón de listo— mirando el mapa de antes.
+        /// Que el desafío lo lanzara uno u otro no cambiaba nada: fallaba siempre el segundo en
+        /// cargar el mapa, que es una carrera y no un papel.
+        ///
+        /// Por combatiente y no por combate, y con candado porque los dos clientes llegan por dos
+        /// conexiones a la vez.
+        /// </remarks>
+        private readonly HashSet<long> _preparados = new HashSet<long>();
+
+        /// <summary>El último turno cuyo «confírmame» ya se atendió, como ronda y posición.</summary>
+        private (int Ronda, int Puesto) _turnoAtendido = (-1, -1);
+
+        /// <summary>Su propio candado: no comparte nada con el de la preparacion.</summary>
+        private readonly object _candadoDelTurno = new object();
+
+        /// <summary>
+        /// Deja pasar UNA sola confirmación por turno.
+        /// </summary>
+        /// <remarks>
+        /// El servidor manda un «confírmame» (jxh) antes de cada turno y el cliente contesta con su
+        /// jwz. Con una sola persona en el combate eso es una pregunta y una respuesta; en un
+        /// desafío la pregunta va a los dos y contestan los dos, y lo que cuelga de la respuesta
+        /// —deshacer invocados vencidos, barrer embrujos cumplidos, devolver puntos— tiene que
+        /// pasar una vez y no dos. Aquí es donde se decide cuál de las dos respuestas hace el
+        /// trabajo; a la otra sólo se le ignora.
+        /// </remarks>
+        public bool AtenderElTurnoUnaVez(int round, int turnIndex)
+        {
+            lock (_candadoDelTurno)
+            {
+                if (_turnoAtendido == (round, turnIndex)) return false;
+                _turnoAtendido = (round, turnIndex);
+                return true;
+            }
+        }
+
+        /// <summary>Si a este ya se le mandó la preparación.</summary>
+        public bool HasPrepared(long fighterId)
+        {
+            lock (_preparados) return _preparados.Contains(fighterId);
+        }
+
+        /// <summary>Lo apunta como preparado. Devuelve false si ya lo estaba.</summary>
+        /// <remarks>
+        /// Apuntar y comprobar en la misma llamada es lo que impide que dos tramas del mismo
+        /// cliente —el kmv y el kkr llegan casi juntos— manden la preparación dos veces.
+        /// </remarks>
+        public bool MarkPrepared(long fighterId)
+        {
+            lock (_preparados) return _preparados.Add(fighterId);
+        }
+
+        /// <summary>Lo desapunta, para volver a mandarle la preparación desde cero.</summary>
+        public void ForgetPreparation(long fighterId)
+        {
+            lock (_preparados) _preparados.Remove(fighterId);
+        }
         public FightState State { get; private set; } = FightState.Placement;
 
-        public List<Fighter> Team0 { get; } = new List<Fighter>(); // Players
-        public List<Fighter> Team1 { get; } = new List<Fighter>(); // Monsters
+        // ═══════════════════════════════════════════════════════════════════
+        //  Los dos bandos
+        // ═══════════════════════════════════════════════════════════════════
+        //
+        // Se llamaban Team0 y Team1, y al lado ponía «// Players» y «// Monsters». Ciento cinco
+        // referencias más adelante eso había dejado de ser un comentario y era una creencia: medio
+        // motor daba por hecho que en el azul está quien juega y en el rojo hay bichos.
+        //
+        // Contra monstruos es verdad. En un desafío es verdad para uno de los dos, y de ahí salió
+        // una clase entera de fallos -- el del rojo no podía recolocarse, no recibía sus esperas
+        // iniciales, no podía abandonar, y su «listo» no contaba -- que no llevaban ningún «if»
+        // porque nadie sabía que eran supuestos.
+        //
+        // Azul y Rojo son los colores de las casillas de colocación y no prometen nada sobre quién
+        // hay dentro. Debajo están las tres preguntas que el motor hacía a mano en sesenta sitios.
 
-        public List<int> BluePlacementCells { get; } = new List<int>(); // Players placement
-        public List<int> RedPlacementCells { get; } = new List<int>();  // Monsters placement
+        /// <summary>El bando que empieza: quien provoca el combate, o quien reta.</summary>
+        public const int Azules = 0;
 
-        public long ChallengerLeaderId => Team0.FirstOrDefault()?.Id ?? 0;
+        /// <summary>El otro: los monstruos, o el retado.</summary>
+        public const int Rojos = 1;
+
+        public List<Fighter> Azul { get; } = new List<Fighter>();
+        public List<Fighter> Rojo { get; } = new List<Fighter>();
+
+        public List<int> BluePlacementCells { get; } = new List<int>();
+        public List<int> RedPlacementCells { get; } = new List<int>();
+
+        /// <summary>Los del bando que se diga.</summary>
+        public List<Fighter> Bando(int equipo) => equipo == Rojos ? Rojo : Azul;
+
+        /// <summary>Las casillas de colocación de ese bando.</summary>
+        public List<int> CasillasDe(int equipo) => equipo == Rojos ? RedPlacementCells : BluePlacementCells;
+
+        /// <summary>Todos, de los dos bandos.</summary>
+        public IEnumerable<Fighter> Todos => Azul.Concat(Rojo);
+
+        /// <summary>Cualquiera del combate, del bando que sea. Null si no está.</summary>
+        public Fighter Buscar(long fighterId)
+            => Azul.FirstOrDefault(f => f.Id == fighterId)
+               ?? Rojo.FirstOrDefault(f => f.Id == fighterId);
+
+        /// <summary>En qué bando está, o -1 si no está en el combate.</summary>
+        public int EquipoDe(long fighterId)
+        {
+            if (Azul.Exists(f => f.Id == fighterId)) return Azules;
+            if (Rojo.Exists(f => f.Id == fighterId)) return Rojos;
+            return -1;
+        }
+
+        /// <summary>El bando contrario al que se diga.</summary>
+        public static int Contrario(int equipo) => equipo == Rojos ? Azules : Rojos;
+
+        /// <summary>Los de su lado, él incluido. Vacío si no está en el combate.</summary>
+        public List<Fighter> Aliados(long fighterId)
+        {
+            int suyo = EquipoDe(fighterId);
+            return suyo < 0 ? new List<Fighter>() : Bando(suyo);
+        }
+
+        /// <summary>Los del otro lado. Vacío si no está en el combate.</summary>
+        public List<Fighter> Enemigos(long fighterId)
+        {
+            int suyo = EquipoDe(fighterId);
+            return suyo < 0 ? new List<Fighter>() : Bando(Contrario(suyo));
+        }
+
+        /// <summary>Si a ese bando le queda alguien en pie.</summary>
+        /// <remarks>
+        /// Esto se escribía a mano como <c>Team0.Exists(f =&gt; f.IsAlive)</c> y se llamaba
+        /// «alliesAlive», que sólo es verdad si quien pregunta está en el azul. Con el bando por
+        /// delante ya no se puede escribir al revés sin darse cuenta.
+        /// </remarks>
+        public bool SigueVivo(int equipo) => Bando(equipo).Exists(f => f.IsAlive);
+
+        /// <summary>Si ganó quien pregunta. Falso también para quien no estaba.</summary>
+        public bool HaGanado(long fighterId)
+        {
+            int suyo = EquipoDe(fighterId);
+            return suyo >= 0 && SigueVivo(suyo);
+        }
+
+        public long ChallengerLeaderId => Azul.FirstOrDefault()?.Id ?? 0;
         public long DefenderLeaderId { get; set; } = -20000;
 
         /// <summary>
@@ -154,8 +311,26 @@ namespace Jondo.Unity.World.Fights
         {
             player.TeamId = 0;
             if (BluePlacementCells.Count > 0)
-                player.CellId = BluePlacementCells[Team0.Count % BluePlacementCells.Count];
-            Team0.Add(player);
+                player.CellId = BluePlacementCells[Azul.Count % BluePlacementCells.Count];
+            Azul.Add(player);
+            UpdateTurnOrder();
+        }
+
+        /// <summary>
+        /// Mete a un JUGADOR en el equipo contrario. Es lo que hace de un combate un duelo.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="AddPlayer"/> fuerza el equipo cero, porque hasta ahora el unico combate que
+        /// existia era uno contra monstruos y todos los jugadores iban del mismo lado. En un
+        /// desafio hay una persona a cada lado, y la casilla sale del lado rojo por lo mismo: dos
+        /// jugadores en las casillas azules empezarian pegados.
+        /// </remarks>
+        public void AddOpponent(Fighter player)
+        {
+            player.TeamId = 1;
+            if (RedPlacementCells.Count > 0)
+                player.CellId = RedPlacementCells[Rojo.Count % RedPlacementCells.Count];
+            Rojo.Add(player);
             UpdateTurnOrder();
         }
 
@@ -163,8 +338,8 @@ namespace Jondo.Unity.World.Fights
         {
             monster.TeamId = 1;
             if (RedPlacementCells.Count > 0)
-                monster.CellId = RedPlacementCells[Team1.Count % RedPlacementCells.Count];
-            Team1.Add(monster);
+                monster.CellId = RedPlacementCells[Rojo.Count % RedPlacementCells.Count];
+            Rojo.Add(monster);
             UpdateTurnOrder();
         }
 
@@ -178,8 +353,8 @@ namespace Jondo.Unity.World.Fights
         public long SiguienteIdDeInvocado()
         {
             long menor = 0;
-            foreach (var f in Team0) if (f.Id < menor) menor = f.Id;
-            foreach (var f in Team1) if (f.Id < menor) menor = f.Id;
+            foreach (var f in Azul) if (f.Id < menor) menor = f.Id;
+            foreach (var f in Rojo) if (f.Id < menor) menor = f.Id;
             return menor - 1;
         }
 
@@ -191,7 +366,7 @@ namespace Jondo.Unity.World.Fights
         {
             invocado.Invocador = dueno.Id;
             invocado.TeamId = dueno.TeamId;
-            (dueno.TeamId == 0 ? Team0 : Team1).Add(invocado);
+            (dueno.TeamId == 0 ? Azul : Rojo).Add(invocado);
 
             // El que está jugando ahora mismo sigue jugando: se rehace la lista pero se conserva
             // a quién le toca, que si no el turno se le va al de al lado en mitad de una acción.
@@ -210,8 +385,8 @@ namespace Jondo.Unity.World.Fights
         public List<Fighter> InvocadosQueSeDeshacen(int ronda)
         {
             var fuera = new List<Fighter>();
-            foreach (var f in Team0) if (SeDeshace(f, ronda)) fuera.Add(f);
-            foreach (var f in Team1) if (SeDeshace(f, ronda)) fuera.Add(f);
+            foreach (var f in Azul) if (SeDeshace(f, ronda)) fuera.Add(f);
+            foreach (var f in Rojo) if (SeDeshace(f, ronda)) fuera.Add(f);
             return fuera;
         }
 
@@ -275,12 +450,22 @@ namespace Jondo.Unity.World.Fights
             return salida;
         }
 
+        /// <summary>Alguien se declara listo. Devuelve si con eso ya lo están todos.</summary>
+        /// <remarks>
+        /// Miraba sólo el azul, en las dos mitades. En un desafío eso significaba que el combate
+        /// arrancaba en cuanto pulsaba listo el RETADOR, sin esperar al otro —su bando estaba
+        /// entero listo porque era él solo— y que el «listo» del retado no se apuntaba en ninguna
+        /// parte. Es lo que se veía como «uno ya está peleando y el otro sigue en colocación».
+        ///
+        /// Un monstruo no pulsa nada, así que para contar sólo cuentan las personas; si en un
+        /// bando no hay ninguna —el caso de siempre contra monstruos— ese bando está listo.
+        /// </remarks>
         public bool SetFighterReady(long fighterId)
         {
-            var f = Team0.FirstOrDefault(p => p.Id == fighterId);
+            var f = Buscar(fighterId);
             if (f != null) f.IsReady = true;
 
-            if (Team0.All(p => p.IsReady))
+            if (Todos.All(p => p.IsMonster || p.EsInvocado || p.IsReady))
             {
                 CancelPlacementTimer();
                 StartFight();
@@ -289,11 +474,16 @@ namespace Jondo.Unity.World.Fights
             return false;
         }
 
+        /// <summary>Se recoloca durante la fase de colocación, cada uno en las casillas de su lado.</summary>
         public void ChangePlacementCell(long fighterId, int newCellId)
         {
             if (State != FightState.Placement) return;
-            var f = Team0.FirstOrDefault(p => p.Id == fighterId);
-            if (f != null && BluePlacementCells.Contains(newCellId))
+
+            int suyo = EquipoDe(fighterId);
+            if (suyo < 0) return;
+
+            var f = Buscar(fighterId);
+            if (f != null && CasillasDe(suyo).Contains(newCellId))
             {
                 f.CellId = newCellId;
             }
@@ -324,8 +514,8 @@ namespace Jondo.Unity.World.Fights
             // Se intercalan GRUPOS, no combatientes sueltos: cada grupo es uno de los de siempre
             // con sus invocados detrás. Intercalando de uno en uno, la baliza se separaba de su
             // Ocra y jugaba después del monstruo, cuando en la captura va inmediatamente detrás.
-            var team0Sorted = Agrupar(Team0);
-            var team1Sorted = Agrupar(Team1);
+            var team0Sorted = Agrupar(Azul);
+            var team1Sorted = Agrupar(Rojo);
 
             var result = new List<Fighter>();
             int maxCount = Math.Max(team0Sorted.Count, team1Sorted.Count);
@@ -506,8 +696,8 @@ namespace Jondo.Unity.World.Fights
             // Los invocados NO cuentan para saber si un bando sigue en pie: matar la baliza del
             // rival no gana un combate. Cuando el que las puso se muere se le caen todas en el
             // acto, así que en la práctica esto es un cinturón además de los tirantes.
-            bool team0Alive = Team0.Any(f => f.IsAlive && !f.EsInvocado);
-            bool team1Alive = Team1.Any(f => f.IsAlive && !f.EsInvocado);
+            bool team0Alive = Azul.Any(f => f.IsAlive && !f.EsInvocado);
+            bool team1Alive = Rojo.Any(f => f.IsAlive && !f.EsInvocado);
 
             if (!team1Alive)
             {

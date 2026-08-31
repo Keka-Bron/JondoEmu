@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- La mitad de Windows Forms de lo compartido: los controles pintados a mano que usan el
+         servidor y el desobfuscador. Estaban dentro de Jondo.Unity.Contract, y eso obligaba a
+         Contract a ser net10.0-windows con Windows Forms dentro; como Contract lo referencian
+         TODOS, Windows Forms viajaba tambien al lanzador y a Studio, que son de Avalonia.
+
+         Al separarlo, Contract vuelve a ser net10.0 puro y lo que arrastra Windows Forms es solo
+         quien de verdad lo usa. La paleta no se ha quedado aqui: vive en Contract, en
+         LauncherPalette, para que los dos aspectos -este y el de Avalonia- salgan de los mismos
+         numeros y no de una copia a mano. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+</Project>

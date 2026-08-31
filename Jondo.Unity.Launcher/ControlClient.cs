@@ -18,10 +18,44 @@ namespace Jondo.Unity.Launcher.Network
     /// </summary>
     public static class ControlClient
     {
-        /// <summary>Cuánto se espera a una respuesta antes de dar al servidor por no disponible.</summary>
-        private static readonly TimeSpan Paciencia = TimeSpan.FromSeconds(4);
+        // ─── Los plazos, cada uno con su nombre y su razón ──────────────────────
+        //
+        // Había uno solo, de cuatro segundos, para todo. Cuatro segundos son de sobra para
+        // preguntar el estado y son POCOS para entrar cuando el servidor está leyendo los mapas:
+        // ese era el «el servidor no responde» que salía al entrar justo después de arrancarlo,
+        // con un servidor que estaba perfectamente. Un plazo sin nombre acaba usándose para todo y
+        // quedándose mal para casi todo.
 
-        private static readonly HttpClient Cliente = new HttpClient { Timeout = Paciencia };
+        /// <summary>Sondear si hay alguien. Corto a propósito: sólo se pregunta y se cuelga.</summary>
+        public static readonly TimeSpan PlazoDeSondeo = TimeSpan.FromSeconds(2);
+
+        /// <summary>Una orden normal —entrar, crear cuenta, lanzar—, que toca la base de datos.</summary>
+        public static readonly TimeSpan PlazoDeOrden = TimeSpan.FromSeconds(15);
+
+        /// <summary>
+        /// Lo que se espera a que un servidor recién arrancado conteste por primera vez.
+        /// </summary>
+        /// <remarks>
+        /// Noventa segundos, que es lo que tarda en frío: lee la base, los managers y los mapas
+        /// antes de abrir un solo puerto. No es el plazo de una petición sino el del bucle que
+        /// insiste; cada intento por dentro usa <see cref="PlazoDeSondeo"/>.
+        /// </remarks>
+        public static readonly TimeSpan PlazoDeArranque = TimeSpan.FromSeconds(90);
+
+        /// <summary>
+        /// Cada plazo, su cliente.
+        /// </summary>
+        /// <remarks>
+        /// HttpClient fija el tiempo de espera al construirse y no deja cambiarlo una vez que se ha
+        /// mandado algo, así que hay uno por plazo. Son dos objetos para toda la vida del proceso,
+        /// no uno por petición, que es lo que hay que evitar con HttpClient.
+        /// </remarks>
+        private static readonly HttpClient ClienteDeSondeo = new HttpClient { Timeout = PlazoDeSondeo };
+        private static readonly HttpClient ClienteDeOrden = new HttpClient { Timeout = PlazoDeOrden };
+
+        /// <summary>Los verbos que sólo preguntan, y que por eso van con el plazo corto.</summary>
+        private static readonly System.Collections.Generic.HashSet<string> SóloPreguntan =
+            new(StringComparer.OrdinalIgnoreCase) { "estado", "recordar-token" };
 
         private static string _secreto = "";
 
@@ -99,7 +133,8 @@ namespace Jondo.Unity.Launcher.Network
                 };
                 if (_secreto.Length > 0) peticion.Headers.Add(Contract.Cabecera, _secreto);
 
-                using var respuesta = Cliente.Send(peticion);
+                var cliente = SóloPreguntan.Contains(verbo) ? ClienteDeSondeo : ClienteDeOrden;
+                using var respuesta = cliente.Send(peticion);
                 string texto = respuesta.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 return new Respuesta(true, (int)respuesta.StatusCode, texto);
             }

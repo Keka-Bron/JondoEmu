@@ -31,6 +31,7 @@ namespace Jondo.Unity.Tests.World
     /// These run against the real world database when it is on the machine and skip when it is
     /// not — it is 240 MB and never in git.
     /// </remarks>
+    [Collection("MapManager")]
     public class MonsterVetoTests : IDisposable
     {
         private const long Smithy = 153355264;         // Incarnam, the smithy interior

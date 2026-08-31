@@ -2,15 +2,17 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- Ya no es net10.0-windows. El lanzador era Windows Forms y ahora es Avalonia, igual que
+         Studio, asi que no hay nada que lo ate al escritorio de Windows salvo la musica, que va
+         detras de una comprobacion de sistema operativo. Se sigue publicando para win-x64 porque
+         es donde estan los jugadores, no porque el codigo no sepa hacer otra cosa. -->
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Jondo Emulator Launcher</AssemblyName>
     <RootNamespace>Jondo.Unity.Launcher</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <ApplicationIcon>..\Jondo.Unity.Server\icon.ico</ApplicationIcon>
-    <UseWindowsForms>true</UseWindowsForms>
-    <NoWarn>$(NoWarn);WFO1000</NoWarn>
-    <WarningsNotAsErrors>$(WarningsNotAsErrors);WFO1000</WarningsNotAsErrors>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!-- ESTE es el que se reparte a los jugadores. Referencia el contrato y NADA MAS: ni base de
          datos, ni mapas, ni manejadores de protocolo, ni catalogo de efectos. Un solo fichero,
          igual que antes, para que quien se lo baje vea un .exe y no una carpeta de dll. -->
@@ -22,15 +24,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- WinForms mete System.Windows.Forms y System.Drawing en los using implicitos. No los
-         queremos globales: el resto del emulador usa nombres como Timer, Point o Message que
-         chocarian. Los ficheros de UI declaran los suyos. -->
-    <Using Remove="System.Windows.Forms" />
-    <Using Remove="System.Drawing" />
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
+    <!-- Avalonia.Desktop arrastra Tmds.DBus.Protocol 0.20.0 para su parte de Linux, y esa version
+         tiene un aviso de seguridad de gravedad alta (GHSA-xrw6-gwf8-vvr9). Se sube a mano, que es
+         lo mismo que ya hacia Studio por lo mismo. -->
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Sprites\Jondo.Unity.Sprites.csproj" />
   </ItemGroup>
 
   <Target Name="DesplegarLauncher" AfterTargets="Publish" Condition="'$(SkipRootDeploy)' != 'true'">

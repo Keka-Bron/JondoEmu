@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Jondo.Unity.Studio.Data
+namespace Jondo.Unity.Sprites
 {
     /// <summary>
     /// An appearance as the client writes it: <c>{bones|skins|colours|scales}</c>.

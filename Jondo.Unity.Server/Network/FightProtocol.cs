@@ -167,6 +167,18 @@ namespace Jondo.Unity.Server.Network
         /// <summary>Contra monstruos. El koliseo es 7 y un desafío entre jugadores no lleva tipo.</summary>
         public const int AgainstMonsters = 4;
 
+        /// <summary>El koliseo. Medido: su kam llega «100728ee0a», o sea f2=7.</summary>
+        public const int Koliseo = 7;
+
+        /// <summary>
+        /// Lo que dura la colocación en el koliseo, en décimas.
+        /// </summary>
+        /// <remarks>
+        /// El 592 del kaa de la captura, tal cual. Son los sesenta segundos menos lo que tardó en
+        /// llegar la trama, igual que el 445 de un combate corriente son los cuarenta y cinco.
+        /// </remarks>
+        public const int KoliseoPlacementDeciseconds = 592;
+
         /// <summary>
         /// Lo que acompaña al anuncio (kaa).
         ///
@@ -184,6 +196,17 @@ namespace Jondo.Unity.Server.Network
         /// Aquí se manda el tiempo que de verdad va a esperar el servidor antes de empezar solo,
         /// para que el reloj del cliente y el del servidor cuenten lo mismo.
         /// </summary>
+        /// <summary>
+        /// El kaa de un desafio: seis bytes y SIN cuenta atras.
+        /// </summary>
+        /// <remarks>
+        /// Medido en «enviar desafio y el otro acepta»: llega «f2=1 f3=1 f4=1» y nada mas. Ni el
+        /// f5 del tiempo ni el f6 del tipo. Por eso en un duelo no sale reloj de colocacion: no es
+        /// que se esconda, es que el servidor real no manda ninguno.
+        /// </remarks>
+        public static byte[] BuildDuelSummary()
+            => Pb.New().Var(2, 1).Var(3, 1).Var(4, 1).Build();
+
         public static byte[] BuildFightSummary(int kind, int placementDeciseconds)
             => Pb.New()
                 .Var(3, 1)
@@ -1309,6 +1332,16 @@ namespace Jondo.Unity.Server.Network
                         .Msg(1, Pb.New().Msg(2, experiencia))
                         .Var(2, result.Level));
                 }
+                // Este f3 va SIEMPRE, gane o pierda.
+                //
+                // Lo quite creyendo que era del ganador: en el jyg del koliseo sus cuatro entradas
+                // se parten en dos y dos, y las dos PERSONAS que pierden no lo traen. Pero la
+                // guardia de regresion lo caza contra una captura de combate contra monstruos, y
+                // ahi el monstruo que pierde SI lo lleva -- el servidor no arrancaba por esto.
+                //
+                // O sea que el f3 no significa «ha ganado». Que significa no lo se, y con dos
+                // capturas que se contradicen bajo mi lectura, la lectura que sobra es la mia: se
+                // deja como estaba, que es lo unico medido de punta a punta.
                 quien.Var(3, 1);
                 entrada.Msg(3, quien);
 
@@ -1494,6 +1527,38 @@ namespace Jondo.Unity.Server.Network
         ///
         /// El f2 no aparece en ninguna de las capturas.
         /// </summary>
+        /// <summary>
+        /// El desafio que se ofrece (hqc): quien reta, a quien, y el id.
+        /// </summary>
+        /// <remarks>
+        /// Byte por byte de las cuatro capturas de desafio. Los cuatro hqc medidos tienen la misma
+        /// forma y sus tres campos siempre puestos:
+        ///
+        ///   08a28280c8e708 10a282f0a6c408 18ee03    retador, retado, 494
+        /// </remarks>
+        public static byte[] BuildChallengeOffered(long challengerId, long targetId, int challengeId)
+            => Pb.New().Var(1, challengerId).Var(2, targetId).Var(3, challengeId).Build();
+
+        /// <summary>
+        /// Como acabo el desafio (hpv). El f3 solo viaja cuando se acepto.
+        /// </summary>
+        /// <remarks>
+        /// Y esa es la diferencia entera entre los dos finales, medida en las cuatro capturas:
+        ///
+        ///   aceptado   08a28280c8e708 10ee03 1801 20a282f0a6c408
+        ///   rechazado  08a28280c8e708 10e903      20a282f0a6c408
+        ///
+        /// El campo del retado es el CUATRO, no el tres, y eso no es un despiste de la lectura: en
+        /// las dos rechazadas el 20 va justo detras del id, sin nada en medio.
+        /// </remarks>
+        public static byte[] BuildChallengeAnswered(long challengerId, int challengeId,
+                                                    bool accepted, long targetId)
+        {
+            var hpv = Pb.New().Var(1, challengerId).Var(2, challengeId);
+            if (accepted) hpv.Var(3, 1);
+            return hpv.Var(4, targetId).Build();
+        }
+
         public static byte[] BuildReadyAck(long fighterId, bool ready = true)
             => Pb.New().Var(1, fighterId).Var(3, ready ? 1 : 0).Build();
 

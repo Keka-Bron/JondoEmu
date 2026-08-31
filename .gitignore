@@ -94,3 +94,6 @@ Jondo.Unity.Tests/bin/
 Jondo.Unity.Tests/obj/
 Jondo.Unity.Studio/bin/
 Jondo.Unity.Studio/obj/
+
+# Las fotos de la ventana del lanzador: son de trabajo, no del proyecto.
+capturas-lanzador/

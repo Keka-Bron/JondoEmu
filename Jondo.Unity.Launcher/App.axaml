@@ -1,0 +1,261 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Jondo.Unity.Launcher.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.Styles>
+    <FluentTheme />
+
+    <!-- Los botones del lanzador. Van con degradado vertical, esquina redonda y borde, que es lo
+         que hacia a mano LauncherButton en Windows Forms pintando cada estado. Aqui son estilos:
+         el mismo aspecto sin una sola linea de dibujo. -->
+
+    <Style Selector="Button.launcher">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector="Button.launcher:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="Button.launcher:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="{TemplateBinding Background}" />
+    </Style>
+
+    <!-- Verde: conectar y jugar. -->
+    <Style Selector="Button.green /template/ ContentPresenter">
+      <Setter Property="Background">
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Color="{DynamicResource GreenTop}" Offset="0" />
+          <GradientStop Color="{DynamicResource GreenBottom}" Offset="1" />
+        </LinearGradientBrush>
+      </Setter>
+      <Setter Property="BorderBrush" Value="{DynamicResource GreenBorderBrush}" />
+    </Style>
+    <Style Selector="Button.green:pointerover /template/ ContentPresenter">
+      <Setter Property="Background">
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Color="{DynamicResource GreenTopHover}" Offset="0" />
+          <GradientStop Color="{DynamicResource GreenBottomHover}" Offset="1" />
+        </LinearGradientBrush>
+      </Setter>
+      <Setter Property="BorderBrush" Value="{DynamicResource GreenBorderBrush}" />
+    </Style>
+
+    <!-- Morado: crear cuenta y seleccionar todo. -->
+    <Style Selector="Button.purple /template/ ContentPresenter">
+      <Setter Property="Background">
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Color="{DynamicResource PurpleTop}" Offset="0" />
+          <GradientStop Color="{DynamicResource PurpleBottom}" Offset="1" />
+        </LinearGradientBrush>
+      </Setter>
+      <Setter Property="BorderBrush" Value="{DynamicResource PurpleBorderBrush}" />
+    </Style>
+    <Style Selector="Button.purple:pointerover /template/ ContentPresenter">
+      <Setter Property="BorderBrush" Value="{DynamicResource PurpleBorderBrush}" />
+    </Style>
+
+    <!-- Las pestanas de entrar y registrarse. -->
+    <Style Selector="Button.tab">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="5,5,0,0" />
+    </Style>
+    <Style Selector="Button.tab /template/ ContentPresenter">
+      <Setter Property="Background" Value="#CC23140C" />
+    </Style>
+    <Style Selector="Button.tab:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#DC372112" />
+    </Style>
+    <Style Selector="Button.tab.on /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
+    </Style>
+
+    <!-- Los botoncitos de la barra: musica e idiomas. -->
+    <Style Selector="Button.chip">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="7,3" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrownBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource GoldBrush}" />
+    </Style>
+    <Style Selector="Button.chip /template/ ContentPresenter">
+      <Setter Property="Background" Value="#CC28180E" />
+    </Style>
+    <Style Selector="Button.chip:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource LightGoldBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.chip:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
+    </Style>
+    <Style Selector="Button.chip.on /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
+    </Style>
+    <Style Selector="Button.chip.on">
+      <Setter Property="BorderBrush" Value="{DynamicResource LightGoldBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- La fila de una cuenta del equipo. -->
+    <Style Selector="Button.account">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrownBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource SoftGoldBrush}" />
+    </Style>
+    <Style Selector="Button.account /template/ ContentPresenter">
+      <Setter Property="Background" Value="#BE20130B" />
+    </Style>
+    <Style Selector="Button.account:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource LightGoldBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.account:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
+    </Style>
+    <Style Selector="Button.account.on">
+      <Setter Property="BorderBrush" Value="{DynamicResource GoldBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.account.on /template/ ContentPresenter">
+      <Setter Property="Background" Value="#D237250F" />
+    </Style>
+
+    <!-- La fila de la ruta del cliente. -->
+    <Style Selector="Button.path">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="8,0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrownBrush}" />
+    </Style>
+    <Style Selector="Button.path /template/ ContentPresenter">
+      <Setter Property="Background" Value="#961E120A" />
+    </Style>
+    <Style Selector="Button.path:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource LightGoldBrush}" />
+    </Style>
+    <Style Selector="Button.path:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#BE342012" />
+    </Style>
+
+    <!-- Las secciones de arriba: jugar, cuentas, ajustes. -->
+    <Style Selector="Button.seccion">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedGoldBrush}" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+    <Style Selector="Button.seccion /template/ ContentPresenter">
+      <Setter Property="Background" Value="#00000000" />
+    </Style>
+    <Style Selector="Button.seccion:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource CardTextBrush}" />
+    </Style>
+    <Style Selector="Button.seccion:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#33000000" />
+    </Style>
+    <Style Selector="Button.seccion.on">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.seccion.on /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
+    </Style>
+
+    <!-- Roja: quitar cuentas. Una accion que borra no puede tener el mismo aspecto que las demas. -->
+    <Style Selector="Button.danger">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="BorderBrush" Value="#8A3A2A" />
+      <Setter Property="Foreground" Value="#E7A292" />
+    </Style>
+    <Style Selector="Button.danger /template/ ContentPresenter">
+      <Setter Property="Background" Value="#3A1C14" />
+    </Style>
+    <Style Selector="Button.danger:pointerover">
+      <Setter Property="BorderBrush" Value="#C4553C" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#5C2A1D" />
+    </Style>
+
+    <!-- La linea de explicacion que va debajo de un ajuste. -->
+    <Style Selector="TextBlock.pie">
+      <Setter Property="Foreground" Value="{DynamicResource LightBrownTextBrush}" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- Los campos de texto. -->
+    <Style Selector="TextBox.field">
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Height" Value="36" />
+      <Setter Property="Padding" Value="10,0" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource FieldBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrownBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FieldTextBrush}" />
+      <Setter Property="CaretBrush" Value="{DynamicResource LightGoldBrush}" />
+      <Setter Property="SelectionBrush" Value="{DynamicResource LightBrownBrush}" />
+    </Style>
+    <Style Selector="TextBox.field:focus /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource LightGoldBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FieldBackgroundBrush}" />
+    </Style>
+    <Style Selector="TextBox.field:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource GoldBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FieldBackgroundBrush}" />
+    </Style>
+    <Style Selector="TextBox.field:disabled /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource DisabledFieldBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DisabledFieldBackgroundBrush}" />
+    </Style>
+    <Style Selector="TextBox.field:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource DisabledFieldTextBrush}" />
+    </Style>
+
+    <!-- Los rotulos de encima de cada campo. -->
+    <Style Selector="TextBlock.label">
+      <Setter Property="Foreground" Value="{DynamicResource SoftGoldBrush}" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Margin" Value="0,0,0,5" />
+    </Style>
+
+    <!-- Los enlaces de debajo de la tarjeta. -->
+    <Style Selector="Button.link">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.link /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.link TextBlock">
+      <Setter Property="TextDecorations" Value="Underline" />
+    </Style>
+    <Style Selector="Button.link:pointerover TextBlock">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </Application.Styles>
+</Application>

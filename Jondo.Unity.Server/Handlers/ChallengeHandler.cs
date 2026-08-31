@@ -63,7 +63,7 @@ namespace Jondo.Unity.Server.Handlers
         private static int GroupLevel(FightInstance fight)
         {
             int total = 0;
-            foreach (var bicho in fight.Team1) total += bicho.Level;
+            foreach (var bicho in fight.Rojo) total += bicho.Level;
             return total;
         }
 
@@ -245,7 +245,7 @@ namespace Jondo.Unity.Server.Handlers
             if (!DungeonHandler.IsBossRoom(SessionContext.State.MapId)) return;
 
             var bichos = new List<int>();
-            foreach (var uno in fight.Team1)
+            foreach (var uno in fight.Rojo)
             {
                 if (uno.IsMonster && uno.MonsterId != 0) bichos.Add(uno.MonsterId);
             }

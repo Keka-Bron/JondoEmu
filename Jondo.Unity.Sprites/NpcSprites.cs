@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -11,7 +11,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Jondo.Unity.Launcher;
 
-namespace Jondo.Unity.Studio.Data
+namespace Jondo.Unity.Sprites
 {
     /// <summary>
     /// Draws an NPC, out of the client's own bones, as a still picture.
@@ -60,8 +60,26 @@ namespace Jondo.Unity.Studio.Data
     /// </remarks>
     public sealed class NpcSprites : IDisposable
     {
-        /// <summary>How tall the finished picture is, in pixels. Width follows the drawing.</summary>
-        private const int Tall = 96;
+        /// <summary>Lo alto que sale el dibujo, en píxeles. El ancho lo pone la figura.</summary>
+        /// <remarks>
+        /// Era constante, y 96 se le quedaba corto al retrato del lanzador: el rasterizador toma
+        /// UNA muestra por píxel, sin suavizar nada, así que a 96 los bordes salen dentados y la
+        /// cara —que ocupa una docena de píxeles— se pierde. Dibujando más alto y dejando que
+        /// Avalonia lo reduzca al pintarlo, la reducción hace de supermuestreo y sale limpio.
+        ///
+        /// Studio no lo toca: dibuja miles de NPCs en una rejilla y le sobra con los 96 de antes.
+        /// </remarks>
+        public int Height { get; set; } = 96;
+
+        /// <summary>La dirección que mira a cámara, medida mirando las cinco que trae el cliente.</summary>
+        /// <remarks>
+        /// La numeración del emulador —medida sobre las capturas, ver WorldMoveHandler— es
+        /// 0 este, 1 sureste, 2 sur, 3 suroeste, 4 oeste, 5 noroeste, 6 norte, 7 noreste. De las
+        /// ocho, un rig humanoide sólo trae cinco: {0,1,2,5,6}. Dibujadas las cinco y mirándolas,
+        /// la 2 es la única que enseña la cara y el cuerpo enteros; la 0 y la 1 salen de tres
+        /// cuartos con el escudo por delante, y la 5 y la 6 son la espalda.
+        /// </remarks>
+        private const int DeFrente = 2;
 
         /// <summary>An animation named exactly this and nothing else.</summary>
         /// <remarks>
@@ -71,7 +89,59 @@ namespace Jondo.Unity.Studio.Data
         /// </remarks>
         private static readonly Regex Standing = new Regex(@"^AnimStatique_(\d+)$", RegexOptions.Compiled);
 
+        /// <summary>Cualquier postura estática de una dirección: lo que va detrás del último «_».</summary>
+        /// <remarks>
+        /// Los rigs humanoides NO traen <c>AnimStatique_&lt;dir&gt;</c> a secas: de las 19 razas sólo
+        /// la 12 lo trae (medido abriendo los 19
+        /// <c>bones_assets_bone_1-&lt;raza&gt;-static.bundle</c> del cliente 3.6.10.11). Lo que traen
+        /// todas es la raza metida dentro del nombre y la dirección de sufijo:
+        /// <c>AnimStatiqueExploRetro9_6</c>, <c>AnimStatiqueExploNewAge4_1</c>,
+        /// <c>AnimStatiqueCombat9a_5</c>. Por eso pedir una dirección no puede casar sólo contra
+        /// <see cref="Standing"/>: no encontraría nunca nada en un personaje.
+        ///
+        /// Las transiciones —<c>AnimStatiqueExplo0_to_AnimStatiqueExploRetro13_5</c>— llevan también
+        /// el sufijo y hay que echarlas fuera a mano, que es lo que hace el <c>(?!.*_to_)</c>.
+        /// </remarks>
+        private static readonly Regex Facing = new Regex(@"^AnimStatique(?!.*_to_).*_(\d+)$", RegexOptions.Compiled);
+
         private readonly Dictionary<string, Bitmap?> _drawn = new Dictionary<string, Bitmap?>();
+
+        /// <summary>
+        /// La dirección que se quiere dibujar, o <c>null</c> para el reparto de siempre.
+        /// </summary>
+        /// <remarks>
+        /// Está aquí para poder MIRAR, no para cambiar nada: con <c>null</c> —que es lo que trae de
+        /// fábrica y lo que usan todos los llamantes de hoy— <see cref="StandingFrames"/> se
+        /// comporta exactamente igual que antes de existir esta propiedad.
+        ///
+        /// El motivo: los retratos salen de espaldas. Ningún rig humanoide casa la expresión
+        /// <see cref="Standing"/>, así que <see cref="StandingFrames"/> cae siempre por su escalera
+        /// de reserva, que se queda con la PRIMERA animación del array — y esa primera es de
+        /// dirección 5 o 6 en 18 de las 19 razas (medido). O sea que la dirección no se está
+        /// eligiendo: sale la que el bundle puso delante.
+        ///
+        /// Con <c>null</c>, que es lo normal, un HUMANOIDE se dibuja de frente
+        /// (<see cref="DeFrente"/>) y un monstruo se queda exactamente como estaba. Se separan
+        /// porque un hueso de monstruo no tiene las mismas animaciones y pedirle una dirección que
+        /// no trae sólo sirve para moverle la pose sin ganar nada.
+        ///
+        /// Poner un número aquí manda sobre las dos cosas, y es como se dibujaron las cinco para
+        /// poder compararlas.
+        /// </remarks>
+        public int? Direction { get; set; }
+
+        /// <summary>El nombre de la animación con la que se dibujó lo último. Para poder comprobarlo.</summary>
+        public string LastAnimation { get; private set; } = "";
+
+        /// <summary>
+        /// Si se pidió una <see cref="Direction"/> y el rig la traía de verdad.
+        /// </summary>
+        /// <remarks>
+        /// Falso también cuando no se pidió ninguna. Hace falta porque la escalera de reserva no
+        /// deja nunca un hueco: sin este dato, una dirección que el rig no tiene devolvería un dibujo
+        /// —el de siempre— y pasaría por buena.
+        /// </remarks>
+        public bool LastDirectionFound { get; private set; }
 
         public int Rendered { get; private set; }
 
@@ -82,6 +152,10 @@ namespace Jondo.Unity.Studio.Data
 
         /// <summary>What the last drawing was made of. For the self test, and for finding out why.</summary>
         public string LastMakeup { get; private set; } = "";
+
+        /// <summary>La dirección resuelta para el dibujo en curso. La pone <see cref="Draw"/>.</summary>
+        private int? _queMira;
+
 
         private int _fromBone;
         private int _fromSkin;
@@ -97,6 +171,18 @@ namespace Jondo.Unity.Studio.Data
         /// whether to go and fix a parser or to accept that some bones do not ship a still frame.
         /// </remarks>
         public readonly Dictionary<string, int> Why = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        /// <summary>
+        /// Cuántos triángulos ha puesto cada hueco en el último dibujo, y cero para el que el rig
+        /// pidió y ninguna piel supo llenar.
+        /// </summary>
+        /// <remarks>
+        /// Hermano de <see cref="Why"/> y por el mismo motivo: aquí no falla nada nunca. Un hueco
+        /// vacío no lanza, no avisa y devuelve un dibujo — uno al que le falta la cara. Contarlos es
+        /// lo único que lo enseña, y es de lo que se agarra la prueba que vigila que la cabeza siga
+        /// dibujándose.
+        /// </remarks>
+        public readonly Dictionary<string, int> LastSlots = new Dictionary<string, int>(StringComparer.Ordinal);
 
         private void Blame(string reason)
         {
@@ -116,15 +202,20 @@ namespace Jondo.Unity.Studio.Data
         /// <summary>The picture for a look string, or null when this build cannot draw it.</summary>
         public Bitmap? Of(string? lookString)
         {
-            string key = (lookString ?? "").Trim();
-            if (key.Length == 0) return null;
+            string look = (lookString ?? "").Trim();
+            if (look.Length == 0) return null;
+
+            // La dirección Y LA ALTURA entran en la clave. Sin eso, el primero que pidiera una se
+            // la quedaba para todos: el lanzador dibuja a 256 y Studio a 96, y comparten proceso en
+            // las pruebas.
+            string key = $"{look}#{Direction?.ToString() ?? "-"}#{Height}";
 
             if (_drawn.TryGetValue(key, out var already)) return already;
 
             Bitmap? picture = null;
             try
             {
-                picture = Draw(NpcLook.Parse(key));
+                picture = Draw(NpcLook.Parse(look));
                 if (picture != null) Rendered++;
                 else Failed++;
             }
@@ -158,10 +249,17 @@ namespace Jondo.Unity.Studio.Data
 
         private Bitmap? Draw(NpcLook look)
         {
+            LastAnimation = "";
+            LastDirectionFound = false;
+
             if (!look.Valid) { Blame("no look"); return null; }
 
             string path = look.Humanoid ? HumanoidBundleFor(look) : BundleFor(look.Bone);
             if (path.Length == 0 || !File.Exists(path)) { Blame("no bone bundle"); return null; }
+
+            // Lo pedido manda; si no se pide nada, el humanoide mira de frente y el monstruo se
+            // queda como estaba.
+            _queMira = Direction ?? (look.Humanoid ? DeFrente : (int?)null);
 
             var manager = new AssetsManager();
             try
@@ -191,6 +289,7 @@ namespace Jondo.Unity.Studio.Data
                 if (records.Count == 0) { Blame("frame 0 unreadable"); return null; }
 
                 _fromBone = _fromSkin = _followed = _tinted = 0;
+                LastSlots.Clear();
                 Following = coloured => { _followed++; if (coloured) _tinted++; };
 
                 var atlas = Atlas(manager, assets);
@@ -224,11 +323,13 @@ namespace Jondo.Unity.Studio.Data
                         continue;
                     }
 
-                    // Below minus one: a skin supplies this piece, and the slot is named.
+                    // Símbolo negativo: la pieza la pone una PIEL, y el hueco va por nombre.
                     if (piece.Name < 0 || piece.Name >= slots.Children.Count) continue;
 
                     string slot = slots.Children[piece.Name].AsString ?? "";
                     if (slot.Length == 0) continue;
+
+                    int aporte = 0;
 
                     foreach (var dressed in wardrobe)
                     {
@@ -238,8 +339,12 @@ namespace Jondo.Unity.Studio.Data
                         Walk(triangles, dressed.Mesh, part, piece, dressed.Atlas, wardrobe,
                              TintFor(slot, look), look, 0);
                         _fromSkin += triangles.Count - had;
+                        aporte = triangles.Count - had;
                         break;
                     }
+
+                    LastSlots.TryGetValue(slot, out int llevaba);
+                    LastSlots[slot] = llevaba + aporte;
                 }
 
                 Following = null;
@@ -362,6 +467,11 @@ namespace Jondo.Unity.Studio.Data
         /// <summary>Counts a reference being followed, and whether it carried a colour.</summary>
         private static Action<bool>? Following;
 
+
+
+        /// <summary>DIAGNOSTICO TEMPORAL: nombre referenciado, profundidad, si se resolvio.</summary>
+        public static Action<string, int, bool>? RefWatch;
+
         private static void Walk(List<Piece> into, AssetTypeValueField mesh, AssetTypeValueField part,
                                  Placed piece, Sheet from, List<Wardrobe> wardrobe, int tint,
                                  NpcLook look, int depth)
@@ -420,21 +530,25 @@ namespace Jondo.Unity.Studio.Data
                 {
                     // An empty group is a reference to a symbol that lives somewhere else. The head
                     // in skin 30 is seventeen of these and no geometry of its own at all.
-                    if (depth >= MaxReferenceDepth || name.Length == 0) return at + 1;
+                    if (name.Length == 0) return at + 1;
+                    if (depth >= MaxReferenceDepth) { RefWatch?.Invoke(name, depth, false); return at + 1; }
 
                     Following?.Invoke(here != Untinted);
 
                     // This skin first and then the others: a reference can cross from one skin to
                     // another, which is how a hat knows about the head it is sitting on.
+                    bool resuelta = false;
                     foreach (var dressed in Wardrobes(mesh, wardrobe))
                     {
                         if (!dressed.Parts.TryGetValue(name, out var referenced)) continue;
 
+                        resuelta = true;
                         Walk(into, dressed.Mesh, referenced, piece, dressed.Atlas, wardrobe,
                              here, look, depth + 1);
                         break;
                     }
 
+                    RefWatch?.Invoke(name, depth, resuelta);
                     return at + 1;
                 }
 
@@ -535,13 +649,35 @@ namespace Jondo.Unity.Studio.Data
         ///
         /// Only five of the eight directions are ever authored, and 26 of 53 bones ship exactly
         /// one. There is no eight-way sprite set in this data to build a rotation control on.
+        ///
+        /// Con <see cref="Direction"/> puesta se antepone un peldaño a la escalera: la animación
+        /// estática que acabe en esa dirección. Se prueba en este orden, y el orden es el que dice
+        /// la medición sobre el cliente, no una preferencia:
+        ///
+        /// <code>
+        ///   1. AnimStatique_&lt;dir&gt;            el nombre pelado — monstruos, y la raza 12
+        ///   2. AnimStatiqueExplo...&lt;raza&gt;_&lt;dir&gt;  la postura de paseo — las 19 razas
+        ///   3. AnimStatique*_&lt;dir&gt;           lo que quede, p. ej. la de combate
+        /// </code>
+        ///
+        /// Si el rig no trae esa dirección se sigue por la escalera de siempre, para que pedirla no
+        /// pueda dejar sin dibujo a nadie que hoy sí se dibuja. Que se haya conseguido o no lo dice
+        /// <see cref="LastDirectionFound"/>, y con qué animación exacta, <see cref="LastAnimation"/>.
         /// </remarks>
-        private static byte[]? StandingFrames(AssetTypeValueField rig)
+        private byte[]? StandingFrames(AssetTypeValueField rig)
         {
             byte[]? standing = null;
             byte[]? nearly = null;
             byte[]? anything = null;
             int lowest = int.MaxValue;
+
+            byte[]? asked = null;      // AnimStatique_<dir>
+            byte[]? walking = null;    // AnimStatiqueExplo...<raza>_<dir>
+            byte[]? any = null;        // cualquier otra estática que acabe en _<dir>
+
+            string standingName = "", nearlyName = "", anythingName = "";
+            string askedName = "", walkingName = "", anyName = "";
+            bool yaEsNueva = false;
 
             foreach (var animation in rig["animations.Array"])
             {
@@ -551,16 +687,55 @@ namespace Jondo.Unity.Studio.Data
                 byte[] raw = bytes.AsByteArray;
                 if (raw.Length == 0) continue;
 
-                anything ??= raw;
-
                 string name = animation["name"].AsString ?? "";
+
+                if (anything == null) { anything = raw; anythingName = name; }
+
                 var match = Standing.Match(name);
+
+                if (_queMira is int wanted)
+                {
+                    var facing = Facing.Match(name);
+                    if (facing.Success
+                        && int.TryParse(facing.Groups[1].Value, out int has)
+                        && has == wanted)
+                    {
+                        if (match.Success)
+                        {
+                            asked ??= raw;
+                            if (askedName.Length == 0) askedName = name;
+                        }
+                        else if (name.StartsWith("AnimStatiqueExplo", StringComparison.Ordinal))
+                        {
+                            // NewAge manda sobre Retro. Cada raza trae las dos posturas de reposo
+                            // y son distintas: la Retro sale encorvada y con los brazos abiertos, y
+                            // la NewAge de pie y con los brazos caídos, que es como se ve el
+                            // personaje en el juego. Sin esto ganaba la que el bundle pusiera
+                            // primero, que es la Retro en las 19 razas.
+                            if (name.Contains("NewAge", StringComparison.Ordinal))
+                            {
+                                if (!yaEsNueva) { walking = raw; walkingName = name; yaEsNueva = true; }
+                            }
+                            else if (walking == null)
+                            {
+                                walking = raw;
+                                walkingName = name;
+                            }
+                        }
+                        else
+                        {
+                            any ??= raw;
+                            if (anyName.Length == 0) anyName = name;
+                        }
+                    }
+                }
 
                 if (match.Success && int.TryParse(match.Groups[1].Value, out int direction))
                 {
                     if (direction >= lowest) continue;
                     lowest = direction;
                     standing = raw;
+                    standingName = name;
                     continue;
                 }
 
@@ -568,19 +743,34 @@ namespace Jondo.Unity.Studio.Data
                 // and for those a fighting stance is a great deal better than an empty cell — but
                 // it has to be reached for second, or the transition animations sort first and
                 // everybody comes out braced for a fight.
-                if (nearly == null && name.StartsWith("AnimStatique", StringComparison.Ordinal)) nearly = raw;
+                if (nearly == null && name.StartsWith("AnimStatique", StringComparison.Ordinal))
+                {
+                    nearly = raw;
+                    nearlyName = name;
+                }
             }
 
-            return standing ?? nearly ?? anything;
+            LastDirectionFound = _queMira != null && (asked ?? walking ?? any) != null;
+
+            if (asked != null) { LastAnimation = askedName; return asked; }
+            if (walking != null) { LastAnimation = walkingName; return walking; }
+            if (any != null) { LastAnimation = anyName; return any; }
+            if (standing != null) { LastAnimation = standingName; return standing; }
+            if (nearly != null) { LastAnimation = nearlyName; return nearly; }
+            if (anything != null) { LastAnimation = anythingName; return anything; }
+
+            LastAnimation = "";
+            return null;
         }
 
         /// <summary>
         /// One piece of the drawing, placed.
         /// </summary>
         /// <remarks>
-        /// <paramref name="Symbol"/> of zero or more indexes the rig's own graphics. Below minus
-        /// one it means a skin supplies this piece, and <paramref name="Name"/> indexes
-        /// <c>exposedNodeNames</c> to say which slot it is.
+        /// <paramref name="Symbol"/> de cero para arriba indexa los gráficos del propio rig.
+        /// NEGATIVO —el menos uno incluido, que es donde viene la cabeza— quiere decir que la pieza
+        /// la pone una piel, y entonces <paramref name="Name"/> indexa <c>exposedNodeNames</c> para
+        /// decir qué hueco es.
         /// </remarks>
         private readonly record struct Placed(int Symbol, int Name,
                                               float A, float B, float Tx, float C, float D, float Ty);
@@ -655,7 +845,14 @@ namespace Jondo.Unity.Studio.Data
                 if ((flags & 0x08) != 0) cursor += 4;
 
                 // Everything drawable carries a matrix, and everything without one is a container.
-                if ((flags & 0x10) != 0 && symbol != -1 && symbol != -99)
+                //
+                // EL MENOS UNO CUENTA, y tirarlo era lo que dejaba a los personajes sin cara. El
+                // -99 es "este registro no nombra símbolo" y ése sí sobra; el -1 estaba metido en
+                // el mismo saco por parecido, y no es lo mismo: medido sobre la Ocra hembra, los
+                // registros de símbolo -1 son los que traen Tete_2 (91 triángulos), Thorax_2 (20) y
+                // la sombra. Sin ellos sale un cuerpo entero, vestido y decapitado, y no falla
+                // nada: por eso llevaba tanto ahí.
+                if ((flags & 0x10) != 0 && symbol != -99)
                 {
                     placed.Add(new Placed(
                         symbol, name,
@@ -713,10 +910,66 @@ namespace Jondo.Unity.Studio.Data
         /// <summary>A tint of minus one means leave the pixels alone.</summary>
         private const int Untinted = -1;
 
+        /// <summary>
+        /// El gris que vale por «este píxel sale con el color tal cual», al teñir.
+        /// </summary>
+        /// <remarks>
+        /// Aquí se dividía entre 255, y eso es tratar el BLANCO como neutro: entonces todo lo que
+        /// no fuera blanco salía más oscuro que el color pedido, y la piel —#E59B68, un tostado
+        /// claro— acababa en (96,65,44), un marrón de barro. Era el «los personajes salen muy
+        /// oscuros».
+        ///
+        /// El arte gris no está pintada alrededor del blanco sino alrededor del gris medio, que es
+        /// la convención de siempre para una capa que se va a multiplicar. Medido sobre los 10.951
+        /// texels con tinte de la Ocra hembra vestida: mediana 106, media 107,6, con el 10 % en 71
+        /// y el 90 % en 140. O sea repartida alrededor de 128 y un pelo por debajo, que es lo que
+        /// se espera de un dibujo que además lleva su sombreado dentro.
+        ///
+        /// Con 128, un texel neutro sale exactamente del color pedido y el sombreado lo baja desde
+        /// ahí. Lo que quede por encima se recorta, que es lo que hace el propio cliente con sus
+        /// brillos.
+        /// </remarks>
+        private const int GrisNeutro = 128;
+
+        /// <summary>Un canal del arte gris, teñido con el color que pide el aspecto.</summary>
+        /// <remarks>
+        /// Superposición, no multiplicación. Multiplicar es lo que había y no vale para esta arte:
+        /// el gris no es una máscara de opacidad sino un DIBUJO con sus sombras y sus brillos
+        /// dentro, y multiplicar trata el blanco como neutro, así que todo lo que no fuera blanco
+        /// salía más oscuro que el color pedido. La piel —#E59B68, un tostado claro— acababa en
+        /// (96,65,44), un marrón de barro: era el «los personajes salen muy oscuros».
+        ///
+        /// Dividir entre 128 en vez de entre 255 arregla la piel y rompe lo demás: el oro y el
+        /// blanco se van de rango y se aplastan todos en el mismo blanco, y el personaje sale
+        /// lavado.
+        ///
+        /// Con superposición el gris medio da el color EXACTO, por debajo sombrea y por encima sube
+        /// hacia el blanco sin aplastarse.
+        ///
+        /// Que es lo que pide el dato. Medidos los texels de la Ocra hembra vestida, hueco a hueco
+        /// y separados por el color que piden:
+        ///
+        /// <code>
+        ///   piel      #E59B68   3.967 texels   p10  89   mediana 107   p90 140
+        ///   pelo      #DB7933     960          p10 109   mediana 156   p90 158
+        ///   ropa      #756F2B   2.479          p10  71   mediana  90   p90 140
+        ///   cuero     #8F5203   1.991          p10  57   mediana  92   p90 109
+        ///   oro       #FA950F   1.145          p10  89   mediana 115   p90 147
+        /// </code>
+        ///
+        /// Las cinco reparten alrededor del gris medio, ninguna alrededor del blanco. Con la piel
+        /// se ve mejor que con ninguna porque es la que más superficie ocupa: multiplicando salía
+        /// en (96,65,44) y así sale en (192,130,87), que es el tostado que pide el aspecto.
+        /// </remarks>
+        private static int Tenir(int gris, int color)
+            => gris < 128
+                ? 2 * gris * color / 255
+                : 255 - 2 * (255 - gris) * (255 - color) / 255;
+
         /// <summary>How deep the reference tree is followed before giving up.</summary>
         private const int MaxReferenceDepth = 6;
 
-        private static Bitmap? Rasterise(List<Piece> triangles)
+        private Bitmap? Rasterise(List<Piece> triangles)
         {
             float left = float.MaxValue, right = float.MinValue;
             float bottom = float.MaxValue, top = float.MinValue;
@@ -734,9 +987,12 @@ namespace Jondo.Unity.Studio.Data
 
             if (triangles.Count == 0 || right <= left || top <= bottom) return null;
 
-            float scale = Tall / (top - bottom);
-            int width = Math.Max(1, Math.Min(512, (int)MathF.Ceiling((right - left) * scale)));
-            int height = Tall;
+            int height = Math.Max(16, Height);
+            float scale = height / (top - bottom);
+
+            // El tope del ancho sube con la altura: era 512 fijo, y con 96 de alto no lo tocaba
+            // nadie, pero a 256 una figura ancha se habría quedado cortada por la derecha.
+            int width = Math.Max(1, Math.Min(height * 8, (int)MathF.Ceiling((right - left) * scale)));
 
             var canvas = new byte[width * height * 4];
 
@@ -811,9 +1067,9 @@ namespace Jondo.Unity.Studio.Data
                     if (alpha == 0) continue;
 
                     // BGRA out of the decoder, so blue is first.
-                    int sourceB = atlas.Bgra[from] * tintB / 255;
-                    int sourceG = atlas.Bgra[from + 1] * tintG / 255;
-                    int sourceR = atlas.Bgra[from + 2] * tintR / 255;
+                    int sourceB = Tenir(atlas.Bgra[from], tintB);
+                    int sourceG = Tenir(atlas.Bgra[from + 1], tintG);
+                    int sourceR = Tenir(atlas.Bgra[from + 2], tintR);
 
                     int into = (y * width + x) * 4;
                     if (alpha == 255)

@@ -24,6 +24,23 @@ namespace Jondo.Unity.Tests.Combat
     /// did not fire. Incarnam only ever worked by luck: there the same filter returns zero, the net
     /// fires, and all 65 cells get used.
     /// </remarks>
+    /// <summary>
+    /// Las clases que tocan el estado estatico de MapManager, en una sola coleccion.
+    /// </summary>
+    /// <remarks>
+    /// xUnit corre las clases en PARALELO, y estas se pisan: ReturnFromFightCellTests instala un
+    /// diccionario de casillas con un solo mapa, y MonsterVetoTests llama a MapManager.Initialize(),
+    /// que lo reconstruye entero desde la base. Si eso cae entre el constructor de la primera y su
+    /// asercion, la herreria deja de tener las casillas que el test acaba de poner.
+    ///
+    /// Se vio como lo que es: la suite fallaba una vez de cada siete en
+    /// An_arena_cell_is_pulled_onto_a_real_one, y en aislado pasaba siempre. Un test que falla a
+    /// veces es peor que uno que falla: se aprende a ignorarlo.
+    /// </remarks>
+    [CollectionDefinition("MapManager")]
+    public class MapManagerCollection { }
+
+    [Collection("MapManager")]
     public class PlacementCellsTests
     {
         // The real fight-walkable cells of arena 188752387, the one Astrub 188744196 resolves to.
@@ -116,6 +133,7 @@ namespace Jondo.Unity.Tests.Combat
     /// (map 153355264) has 34 walkable cells running from 244 to 414. There is no cell 189 on that
     /// map at all, so the client had nowhere to draw him.
     /// </remarks>
+    [Collection("MapManager")]
     public class ReturnFromFightCellTests
     {
         // The smithy's real walkable cells, from datos/map_walkable_cells.json: 34 of them, none

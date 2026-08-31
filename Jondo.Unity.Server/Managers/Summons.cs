@@ -220,22 +220,46 @@ namespace Jondo.Unity.Server.Managers
             string look = TextoDe(conexion, "SELECT Look FROM MonsterTemplates WHERE Id = $id;", plantilla);
             if (string.IsNullOrEmpty(look)) return ("", plantilla);
 
-            // El aspecto es el PRIMER número de entre las llaves, y antes se exigía que fuera lo
-            // único que hubiera dentro.
+            // UN REENVÍO NO ES LO MISMO QUE UN ASPECTO DE VERDAD, y distinguirlos es todo esto.
             //
-            // Con «{8348}» funcionaba, pero el del «Regalo animado» es «{446|||120}» y ahí el
-            // int.TryParse fallaba, así que se devolvía la propia plantilla —3106— como aspecto y
-            // el cliente dibujaba otro bicho. Es la misma regla que ya usa FightHandler para el
-            // hueso de un monstruo normal. Medido: 21 de 21 aciertos contra las capturas, frente a
-            // 17 de 21 de la versión anterior.
-            string limpio = look.Trim().Trim('{', '}');
-            int barra = limpio.IndexOf('|');
-            string primero = barra >= 0 ? limpio.Substring(0, barra) : limpio;
-            if (int.TryParse(primero, out int otra) && otra > 0 && otra != plantilla)
+            // La cadena es «{hueso|pieles|colores|escala}». Hay tres formas y sólo dos de ellas
+            // mandan a otra plantilla:
+            //
+            //   {8152}                              reenvío pelado          -> seguir
+            //   {446|||120}                         reenvío con escala      -> seguir
+            //   {1|91,5239,4977|1=#FFFFFF,…|52}     el aspecto de verdad    -> parar aquí
+            //
+            // Lo que los separa son las pieles y los colores: un reenvío no trae ninguno. La
+            // versión anterior se quedaba con el primer número hubiera lo que hubiera detrás, y
+            // eso rompió la baliza del Ocra. Su rastro es 8348 -> «{8152}» -> «{1|91,…}», y al
+            // llegar ahí se leía el 1 como si fuera otra plantilla y se seguía hasta la 1, que es
+            // otro bicho cualquiera. El cliente se quedaba sin aspecto que dibujar y pintaba un
+            // cuadrado azul.
+            //
+            // Medido en «ocra-baliza de supervivencia»: su jwe manda «f3{f2=3, f3=8152}», o sea
+            // que hay que pararse en la 8152 y es su cadena la que vale.
+            if (EsReenvio(look, out int otra) && otra != plantilla)
             {
                 return LookDe(conexion, otra, vueltas + 1);
             }
             return (look, plantilla);
+        }
+
+        /// <summary>Si esta cadena de aspecto manda a otra plantilla, y a cuál.</summary>
+        /// <remarks>
+        /// Aparte para poder probarla con las cadenas de verdad de la base sin abrirla: es una
+        /// regla de tres casos y es donde se rompió la baliza.
+        /// </remarks>
+        internal static bool EsReenvio(string look, out int hacia)
+        {
+            hacia = 0;
+            if (string.IsNullOrWhiteSpace(look)) return false;
+
+            string[] partes = look.Trim().Trim('{', '}').Split('|');
+            bool reenvio = partes.Length == 1
+                           || (partes.Length >= 3 && partes[1].Length == 0 && partes[2].Length == 0);
+
+            return reenvio && int.TryParse(partes[0], out hacia) && hacia > 0;
         }
 
         private static (int Hechizo, int Grado) HechizoDe(SqliteConnection conexion, int nivelId)

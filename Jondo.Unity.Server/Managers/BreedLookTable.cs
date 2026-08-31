@@ -255,6 +255,32 @@ namespace Jondo.Unity.Server.Managers
                 pb.Packed(5, CharacterSize.Applied(baseLook.Scales, quien));
             }
 
+            var skins = SkinsWornBy(breedId, sex, headId, quien, appearance);
+            if (skins.Count > 0) pb.Packed(6, skins);
+
+            return pb;
+        }
+
+        /// <summary>
+        /// Every skin a character has on: the breed's own, the head, the real equipment and the
+        /// cosmetics over it, in the order the client reads them.
+        /// </summary>
+        /// <remarks>
+        /// This used to live inside <see cref="BuildBodyLook"/>, and is out here because the look
+        /// travels in two shapes and both need the same answer: the protobuf that goes to the game
+        /// client, and the brace form that <see cref="Drawable"/> hands to the sprite reader.
+        /// Composing the list twice is how the two drift apart.
+        ///
+        /// THE FIRST SKIN IS THE BODY. The sprite reader picks the humanoid rig with
+        /// Breeds.Of(skins[0]), so the breed's own skin has to stay at the head of the list:
+        /// anything put in front of it -- the chosen head, a hat -- leaves the rig unresolved and
+        /// nothing is drawn.
+        /// </remarks>
+        private static List<long> SkinsWornBy(int breedId, int sex, int headId, long quien,
+                                              IReadOnlyList<Wardrobe.Worn>? appearance)
+        {
+            var baseLook = Get(breedId, sex);
+
             var skins = new List<long>();
             if (baseLook != null) skins.AddRange(baseLook.Skins);
 
@@ -280,19 +306,18 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
-            // El equipo de verdad. Sólo se sabe para quien está jugando —Equipment vive en la
-            // sesión, no por personaje arbitrario— y sólo lo medido en equipment_skins.json; lo
-            // demás se queda como estaba, sin piel.
-            if (quien != 0 && quien == Jondo.Unity.Server.Network.SessionContext.State.CharacterId)
+            // El equipo de verdad, el que da las características. Sale de WornOf y no de
+            // Equipment.All: aquel lee la sesión, así que sólo sabía del personaje que estaba
+            // jugando y a todos los demás —los de la pantalla de selección, los otros jugadores
+            // del mapa, el rival del combate— los dibujaba sin nada puesto.
+            //
+            // Sólo se sabe la piel de lo medido en equipment_skins.json; lo demás no viste.
+            foreach (var (hueco, plantilla) in Equipment.WornOf(quien))
             {
-                foreach (var objeto in Equipment.All)
-                {
-                    if (!Equipment.IsWorn(objeto.Position)) continue;
-                    if (tapados.Contains(objeto.Position)) continue;   // lo tapa un cosmético
+                if (tapados.Contains(hueco)) continue;   // lo tapa un cosmético
 
-                    int piel = EquipmentSkins.SkinOf(objeto.Template);
-                    if (piel > 0 && !skins.Contains(piel)) skins.Add(piel);
-                }
+                int piel = EquipmentSkins.SkinOf(plantilla);
+                if (piel > 0 && !skins.Contains(piel)) skins.Add(piel);
             }
 
             // Y las prendas de apariencia, que entran en lugar de la que acaba de quedarse fuera.
@@ -316,9 +341,54 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
-            if (skins.Count > 0) pb.Packed(6, skins);
+            return skins;
+        }
 
-            return pb;
+        /// <summary>
+        /// The same character, written the way the sprite reader wants it:
+        /// <c>{bones|skins|colours|scale}</c>.
+        /// </summary>
+        /// <remarks>
+        /// The look travels in two shapes and they are not interchangeable. The game client is
+        /// sent the protobuf, which is what <see cref="BuildLook"/> builds and what the Look
+        /// column stores; what the bone reader draws is this brace form. Handing one where the
+        /// other is expected does not fail -- NpcLook.Parse calls it invalid and nothing is drawn,
+        /// without a single error anywhere.
+        ///
+        /// The skins are the same list the game client gets, equipment and cosmetics included, so
+        /// the portrait is the character as they look in the world.
+        ///
+        /// TWO THINGS THIS CANNOT SAY, both because the brace form is a single flat look with no
+        /// sub-entities: the mount and the pet. A character who is riding is drawn here on foot.
+        /// For a portrait that is the wanted answer anyway -- the face is what identifies the
+        /// account, not the dragoturkey underneath.
+        /// </remarks>
+        public static string Drawable(DatabaseManager.DbCharacter character)
+        {
+            var baseLook = Get(character.Breed, character.Sex);
+            if (baseLook == null) return "";
+
+            var skins = SkinsWornBy(character.Breed, character.Sex, character.HeadId,
+                                    character.Id, Wardrobe.AppearanceOf(character.Id));
+            if (skins.Count == 0) return "";
+
+            var colours = new List<string>();
+            var plain = PlainColors(character.Breed, character.Sex, null);
+            for (int i = 0; i < plain.Count; i++)
+            {
+                colours.Add($"{i + 1}=#{plain[i] & 0xFFFFFF:X6}");
+            }
+
+            // El tamaño de verdad, el mismo que va al f5: lo que declara la raza con el porcentaje
+            // del personaje ya aplicado.
+            long scale = 100;
+            if (baseLook.Scales.Count > 0)
+            {
+                var applied = CharacterSize.Applied(baseLook.Scales, character.Id);
+                if (applied.Count > 0) scale = applied[0];
+            }
+
+            return $"{{{baseLook.Bones}|{string.Join(",", skins)}|{string.Join(",", colours)}|{scale}}}";
         }
 
         /// <summary>

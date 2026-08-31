@@ -661,8 +661,8 @@ namespace Jondo.Unity.Server.Managers
 
         private static IEnumerable<Fighter> Todos(FightInstance combate)
         {
-            foreach (var f in combate.Team0) yield return f;
-            foreach (var f in combate.Team1) yield return f;
+            foreach (var f in combate.Azul) yield return f;
+            foreach (var f in combate.Rojo) yield return f;
         }
 
         private static Outcome Aplicar(FightInstance combate, Fighter quienLanza, Fighter sobre,

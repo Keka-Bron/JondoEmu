@@ -21,7 +21,7 @@ namespace Jondo.Unity.Tests.Combat
         {
             var fight = new FightInstance(1, 1);
             var ouginak = new Fighter { Id = 1, TeamId = 0, CellId = 100, CurrentHP = 1000 };
-            fight.Team0.Add(ouginak);
+            fight.Azul.Add(ouginak);
             return (fight, ouginak);
         }
 
@@ -51,7 +51,7 @@ namespace Jondo.Unity.Tests.Combat
         {
             var (fight, ouginak) = Combat();
             var target = new Fighter { Id = 2, TeamId = 1, CellId = 101, CurrentHP = 1000 };
-            fight.Team1.Add(target);
+            fight.Rojo.Add(target);
 
             EffectEngine.Resolver(fight, ouginak, Molosse, 1, target,
                                   EffectEngine.AlLanzar, 0);

@@ -105,6 +105,7 @@ namespace Jondo.Unity.Server.Network
                     // Hace falta un token que la base reconozca. Da igual el rol: son cosas que
                     // cualquier jugador hace con su propia cuenta.
                     case Prefijo + "activos": return ConSesion(cuerpo, _ => Activos());
+                    case Prefijo + "personajes": return ConSesion(cuerpo, Personajes);
                     case Prefijo + "recordar-token": return RecordarToken(cuerpo);
                     case Prefijo + "lanzamiento": return ConSesion(cuerpo, cuenta => Lanzamiento(cuerpo, cuenta, ip));
                     case Prefijo + "fin-de-lanzamiento":
@@ -408,6 +409,39 @@ namespace Jondo.Unity.Server.Network
                 cuantos = cuentas.Count,
                 cuentas,
             });
+        }
+
+        /// <summary>
+        /// Los personajes de la cuenta que llama, para que el lanzador pinte su equipo.
+        /// </summary>
+        /// <remarks>
+        /// El lanzador dibuja el retrato de cada personaje sacándolo de los huesos del propio
+        /// cliente de Dofus, igual que hace Studio con los NPC. Pero para eso necesita saber QUÉ
+        /// dibujar, y la cadena de aspecto vive en la base de datos: el lanzador no la toca a
+        /// propósito —es lo que se reparte a los jugadores y sólo lleva el contrato—, así que se
+        /// la damos aquí.
+        ///
+        /// De su PROPIA cuenta y de ninguna otra: la cuenta sale del token que valida
+        /// <see cref="ConSesion"/>, no de nada que venga escrito en el cuerpo. Con la del cuerpo,
+        /// cualquiera podría pedir los personajes del vecino con sólo cambiar un número.
+        /// </remarks>
+        private static Respuesta Personajes(long cuenta)
+        {
+            var suyos = new List<object>();
+            foreach (var personaje in DatabaseManager.GetCharactersByAccountId(cuenta))
+            {
+                suyos.Add(new
+                {
+                    id = personaje.Id,
+                    nombre = personaje.Name ?? "",
+                    nivel = personaje.Level,
+                    raza = personaje.Breed,
+                    sexo = personaje.Sex,
+                    aspecto = Managers.BreedLookTable.Drawable(personaje),
+                });
+            }
+
+            return Bien(new { personajes = suyos });
         }
 
         /// <summary>Las líneas de consola desde la que ya tenga el lanzador.</summary>
