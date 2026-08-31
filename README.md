@@ -1,8 +1,28 @@
-High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** written in C# (**.NET 10**), with decoupled modular projects, a SQLite data layer, a playable PvM combat engine driven entirely by client data, and a world editor.
+High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** written in C# (**.NET 10**), with decoupled modular projects, a SQLite data layer, a combat engine driven entirely by client data — PvM, duels and Koliseo — a cross-platform launcher and a world editor.
 
 > ⚠️ **Runs against Dofus 3 clients 3.6.10.11 and 3.6.10.10.** Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility with newer clients. There is a toolchain here for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
 >
-> **3.6.10.11 (26 August 2026) is not a new protocol.** Its `GameAssembly.dll` and `global-metadata.dat` are byte-identical to 3.6.10.10
+> **3.6.10.11 (26 August 2026) is not a new protocol.** Its `GameAssembly.dll` and `global-metadata.dat` are byte-identical to 3.6.10.10.
+
+---
+
+## 📑 Contents
+
+**Getting it running**
+[Quick Start](#-quick-start) · [What you get](#-what-you-get)
+
+**What works**
+[Launcher](#-launcher) · [Connection and world](#-connection-and-world) · [Travel](#-travel) · [Houses, bins and haven bags](#-houses-bins-and-haven-bags) · [Social](#-social) · [Character and inventory](#-character-and-inventory) · [Appearances](#-appearances) · [Professions](#-professions) · [NPCs, monsters and dungeons](#-npcs-monsters-and-dungeons) · [Jondo Coin](#-jondo-coin)
+
+**Combat**
+[One engine, three rulebooks](#-one-engine-three-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#-koliseo) · [Spell effect engine](#-spell-effect-engine) · [Combat challenges](#-combat-challenges) · [Not implemented](#-not-implemented-at-all)
+
+**Tools**
+[Jondo Studio](#-jondo-studio) · [Surviving the next patch](#-surviving-the-next-patch)
+
+**Under the hood**
+[Tests](#-tests) · [Source layout](#-source-layout) · [Database and persistence](#-database-and-persistence)
+
 ---
 
 ## 🚀 Quick Start
@@ -33,16 +53,16 @@ What JondoFix does: intercepts sockets, Named Pipes and DNS queries and sends th
 
 Double-click **`Jondo Emulator Launcher.exe`**. That is the only thing you start by hand: it launches **`Jondo Server.exe`** itself, in its own window with the log and the counters.
 
-On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, select one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once.
+On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB, it takes a moment) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, tick one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once.
 
 ```
 Account: keka
 Password: test
 ```
 
-By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.11` folder beside the emulator folder — or `Cliente 3.6.10.10`, whichever it finds first. If yours lives somewhere else, click the path row under the play button and point it at your `Dofus.exe`. The choice is remembered, and if the client later moves the launcher says so instead of failing silently.
+By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.11` folder beside the emulator folder — or `Cliente 3.6.10.10`, whichever it finds first. If yours lives somewhere else, set it in **Settings** and point it at your `Dofus.exe`. The choice is remembered, and if the client later moves the launcher says so instead of failing silently.
 
-The **ES / EN / FR** buttons in the top bar set the language of the launcher *and* of the game: the client is started with that `--langCode`.
+The **ES / EN / FR** switch sets the language of the launcher *and* of the game: the client is started with that `--langCode`.
 
 **`Jondo Studio.exe`** is the third executable and needs nothing else running: double-click it whenever you want to look at the world or build content. See [Jondo Studio](#-jondo-studio) below.
 
@@ -65,10 +85,7 @@ Jondo.Unity.*/                source code
 
 `content/` **is** in the repository, deliberately: it is the only folder a person edits by hand, it is small, and a change in it is a reviewable diff.
 
-Important player and administrator actions are also written as one JSON object per line in
-`logs/activity.jsonl`. Commands, equipment moves, lottery prizes, granted items, fights, live
-administration and new unhandled packet shapes can therefore be filtered without scraping the
-human-readable console log. Credentials, launcher tokens and game tickets are never included.
+Important player and administrator actions are also written as one JSON object per line in `logs/activity.jsonl`. Commands, equipment moves, lottery prizes, granted items, fights, live administration and new unhandled packet shapes can therefore be filtered without scraping the human-readable console log. Credentials, launcher tokens and game tickets are never included.
 
 Not in the repository because they are not needed to play: `bases/` (built on first run), `logs/`, `tools/` (the Python that regenerates `datos/`) and `dofus3_data/` (436 MB of raw client dump, only used by those tools).
 
@@ -76,18 +93,32 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 
 ## ✅ Emulation status
 
-✅ done · 🟡 partial · ❌ missing
+✅ done · 🟡 partial · 🚧 in progress · ❌ missing
 
 ### 🖥️ Launcher
-- ✅ Native WinForms interface drawn from code, with its own theme, artwork and music
-- ✅ Account creation and login, written straight to `auth.db`
-- ✅ Persistent team of up to 8 accounts, one independent Dofus process each
+
+<!-- 📷 aquí: la ventana del lanzador, y un vídeo corto del arranque de neón y las estrellas -->
+
+Rewritten in **Avalonia**, the same toolkit as the Studio. It used to be Windows Forms, drawn from code; nothing but the music is tied to the Windows desktop any more.
+
+- ✅ **Three screens instead of one wall of buttons** — *Play*, *Accounts*, *Settings*, with the server-status pill in the header
+- ✅ **Account cards with the character drawn in them** — portrait, name, level and a big tick. The portrait is assembled from the **client's own bones**, exactly the way Jondo Studio draws NPCs: not one image ships inside the executable
+- ✅ The portrait shows the character **as they look in the world** — the chosen head, the real equipment and the cosmetics over it, in the same skin list the game client is sent
+- ✅ Persistent team of up to 8 accounts, one independent Dofus process each; the highest-level character of each account is the one shown
+- ✅ Account creation and login, written straight to `auth.db`; credentials sealed with DPAPI
 - ✅ Per-client identity chain — instance id, launch hash, Zaap session, game token, single-use ticket, socket-owned session
 - ✅ Independent lifecycle indicators for profiles, processes and sockets
 - ✅ Embedded server log; single-file deployment; ES/EN/FR
+- ✅ A neon sign that **starts like a real tube** — a hand-written stutter sequence, then a steady glow with the occasional flicker — and falling stars behind it. The choreography is written down rather than random on purpose: random timings read as a broken light, not a starting one
 - ✅ Launcher and server are separate programs — the launcher carries no database, maps, handlers or effect catalogue
+- 🚧 **OAuth is wired up and waiting for the website** — loopback redirect and PKCE on the launcher side; the server half is deliberately unwritten until there is a site to talk to
+
+> **Three bugs the portraits turned up, and none of them produced a single error.** The chosen head was overwriting the **first** skin, which is the one the sprite reader uses to pick the humanoid rig — no rig, so a strip of colour instead of a character. The pose came out **facing away** because the regex that picks a standing animation, `^AnimStatique_(\d+)$`, matches no humanoid rig at all except breed 12's; every other breed fell through to a fallback that takes whatever the bundle listed first, which is direction 6 — north — in 13 of the 19. And frame records with symbol **−1** were being discarded next to the ones with −99: −1 is the one that carries `Tete`, `Thorax` and the shadow, so the character came out fully dressed and decapitated. In all three cases a picture was produced, saved and shown. Only looking at it said anything.
 
 ### 🌍 Connection and world
+
+<!-- 📷 aquí: entrada al mundo, varios clientes a la vez -->
+
 - ✅ Zaap, HAAPI and connection server emulation, VIP check bypassed
 - ✅ Server and character selection, showing the mount being ridden
 - ✅ Character creation with a starter kit — Astrub zaap, adventurer set, 1,000,000 kamas, 101 scrolled points per characteristic
@@ -96,20 +127,25 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ Movement, map change and adjacent maps; auto-pilot from the minimap and *travel to*
 - ✅ Seeing others arrive and leave, in all four directions
 - ✅ Up to 8 clients at once, each on its own socket-owned session
+- ✅ **Other players are drawn wearing their gear.** Equipment used to be read out of the session, so the server only ever knew what the character on *that* socket had on: the selection screen, everybody else on the map and your opponent in a fight were all drawn wearing nothing. It now comes from `CharacterItems`, per character
 - ✅ **A server on another machine.** Every listener honours `JONDO_PUBLIC_BIND`, and the launcher runs a loopback relay so the client reaches it. The relay is not a convenience: HAAPI and the chat server both hand the client `127.0.0.1`, so repointing the client at a remote host cannot work on its own
 
 ### 🌀 Travel
+
 - ✅ **62 waypoints** with map, cell and sub-area, plus 3 departure-only zaaps the waypoint table omits
 - ✅ Travel between zaaps with the real cost and destination list
 - ✅ Discovered zaaps announced on world entry (`hjk`) — without it the travel window reads "No destination"
 - ✅ Zaapis of Bonta (24) and Brakmar (21) at a flat 20 kamas, read off captures because client data cannot derive them
 - ✅ The right window per list: `hjj` root field 0 zaap, 1 zaapi, 3 boat
 - ✅ **16 temporal anomalies** with their 120-minute countdown, surfacing at vestiges (type 359), not at switched-off zaaps
-- ✅ **3,815 interactive teleports** in the database
-- 🟡 **Every passage is declared with the wrong skill.** All 3,815 say 114, which is *Utilizar* on a zaap. Measured three ways that agree: Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none; over 401 captures 184 appears on 420 elements and 114 on 23, every one a zaap; and in our own traffic skill 184 is followed by a map change 178 times while 114 opens the zaap window. 339 and 361 are real but are *not* alternatives — they are signpost skills that ride alongside 184. New passages written in Jondo Studio declare 184; the 3,815 extracted rows have not been rewritten
+- ✅ **3,815 interactive teleports** imported, 3,719 active across 2,655 maps
+- ✅ **Passages that fire when you step on the cell**, hooked to the end of a walk rather than to the map edge — which is what the ground-level exits need
+- ✅ Each route carries **its own measured interactive type** instead of a forced zero. The type is part of the element's identity on the client side: with a zero the numbers still travel but the client stops attaching the declaration to the drawing, and the exit sun disappears
+- 🟡 **Every extracted passage still declares skill 114**, which is *Utilizar* on a zaap. Measured three ways that agree: Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none; over 401 captures 184 appears on 420 elements and 114 on 23, every one a zaap; and in our own traffic skill 184 is followed by a map change 178 times while 114 opens the zaap window. New passages written in Jondo Studio declare 184; the extracted rows have not been rewritten
 - ✅ **New passages can be created**, both ways, from Jondo Studio — which is what makes a house with its own interior possible
 
 ### 🏘️ Houses, bins and haven bags
+
 - ✅ **1,437 doors on 553 maps**, all enterable and ownerless; **261 house models** with name, price and room count
 - ✅ Entering and leaving, which are different messages (`jqw` in, `jru` out), coming out through the door you went in by
 - ❌ The house plaque, chest, access code, buying and selling
@@ -120,6 +156,7 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 > Which house sits behind which door is **not in the client**. The 1,437 doors share **114 genuine interiors**, assigned deterministically and kept inside their own neighbourhood; the mapping lives in `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
 
 ### 💬 Social
+
 - ✅ Information messages as `lqn { type, message, parameters }` against the client's 2,555-entry table, not as chat text
 - ✅ Level-up window with music and animation, on a real gain and on `.level` in either direction
 - ✅ Private messages via `kth`, which the client routes by opcode and not by channel
@@ -128,9 +165,10 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - ✅ Lead passes on when the leader leaves; a disconnect removes the member and tells the rest
 - ✅ Friends list
 - ✅ **Every command answers in the session's own language**, from a 48-key catalogue in Spanish, English and French. The language comes from the `--langCode` the launcher started the client with, not from the wire: measured over the nine authentication captures, the client does send its two-letter code, but in `kqz` field 3
-- ❌ The invitation popup's *Details* button (`imd` → `ilb`), the dedicated member-gone message (`inc`), party search, party fights and following the leader
+- ❌ The invitation popup's *Details* button (`imd` → `ilb`), the dedicated member-gone message (`inc`), party search and following the leader
 
 ### 🎒 Character and inventory
+
 - ✅ **21,748 item templates** and **66,294 item effects** — spawning, equipping, bags, destruction, persistence
 - ✅ **929 item sets** with their bonuses
 - ✅ **520 mounts** with their look, swapped and unequipped correctly
@@ -142,6 +180,9 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 - 🟡 `.level` repaints the in-fight spell bar, but the fighter's own level is not updated, so the engine still resolves spells at the level the fight started with
 
 ### 👕 Appearances
+
+<!-- 📷 aquí: la ventana de apariencias y un personaje vestido -->
+
 Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 2,420 cosmetics** in the catalogue were measured off captures, one garment at a time.
 
 | Type | Working / catalogue | | Type | Working / catalogue |
@@ -157,10 +198,13 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ Living objects imitate a different garment per variant, stored as **543 object/variant pairs** across 10 slots
 - ✅ Mount and pet appearances are mutually exclusive, matching the real server
 - ✅ **The real equipment renders too, and a cosmetic replaces it rather than stacking on top.** **741 real items** carry their own skin into the look; the slots a visible cosmetic covers are precomputed and skipped
+- ✅ The same skin list now feeds the launcher's portraits, so one change fixes both
 - 🟡 82 of those skins were inferred by image matching and flagged for review by their author, so they are held back at load until somebody measures them
 - 🟡 A second, older look path survives in `InventoryHandler` for four items and disagrees with the new table on both the field and the value. Left alone until a capture says which is right
+- ❌ **Per-character colours.** Every look is composed from the breed's default palette: there is no colour column anywhere and `customColors` is null at all eleven call sites. Two characters of the same breed and sex are tinted identically
 
 ### ⛏️ Professions
+
 - ✅ **25,090 resources on 4,507 maps** across the six gathering jobs, with graphic → (type, skill) crossed from 305 captures
 - ✅ The three states — full, depleted, busy — including the skill field moving between `f4` and `f3`
 - ✅ Job levels and experience persisted, with the real curve `10 × level × (level − 1)`
@@ -169,6 +213,7 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ❌ Crafting professions: workshops, the craft window, and the **4,858 recipes** already in the database
 
 ### 👹 NPCs, monsters and dungeons
+
 - ✅ **6,468 NPC templates** with 3D looks and dialogue trees
 - ✅ **422 NPCs** standing where Ankama puts them across **202 maps**, cell and orientation taken from captures, dialogue attached where it was captured
 - ✅ **5,134 monsters** with native Protobuf bone models, custom scales and textures, quest monsters and archmonsters included
@@ -179,10 +224,11 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ **NPC colours.** The colour section of a look is `index=value` pairs, sometimes hexadecimal, and it was being read as a plain list — so nothing parsed and every one of the **2,045 NPCs that carry colours** rendered grey
 - ✅ A dialogue always offers at least one real reply, so it can always be closed. With an empty list the client draws its own *Leave* which never answers back
 - 🟡 **401 monsters have no spells at all** in the database
-- ✅ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored, and now it can be: a tree written in Jondo Studio makes a reply lead to another line instead of closing the window. Nothing written means the old behaviour, which is what Snori Nairb still does — all 39 replies at once
+- ✅ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored, and now it can be
 - ✅ **Monster groups placed by hand**, and Ankama's own removable, without touching the 240 MB database that gets regenerated
 
 ### 🪙 Jondo Coin
+
 A currency of this server's own — a real item with its own template, not a reskin of kamas.
 
 - ✅ Drops from every monster at 100%, one coin per 25 monster levels: 1 for 1-25, 2 for 26-50, up to 9 at 201+
@@ -191,7 +237,48 @@ A currency of this server's own — a real item with its own template, not a res
 
 See `docs/jondo-coin.md`.
 
-### ⚔️ PvM combat
+---
+
+## ⚔️ One engine, three rulebooks
+
+There is one fight engine, and it answers three different games. It used to ask *what kind of fight
+am I* in five different methods — `if (!fight.IsDuel)`, `fight.IsKoliseo ? … : …` — which is how a
+duel ended up being played by the monster rules. Now it asks **what do I do**, and the answer comes
+from a rules object:
+
+| | Against monsters | Duel | Koliseo |
+|---|:---:|:---:|:---:|
+| Challenges offered | yes | no | no |
+| Placement clock | 45.0 s | — | 59.2 s |
+| `kam` type | 4 | 0 | 7 |
+| `kaa` countdown | yes | no | yes |
+| Monster loot and experience | yes | no | no |
+| Koliseo payout | no | no | yes |
+| Clears the group on a win | yes | no | no |
+| Moves to the next room | yes | no | no |
+
+None of those numbers is chosen: the 4, the 0 and the 7 are the `kam`'s field 2 in the captures,
+and the 592 is the `kaa`'s field 5 in the Koliseo one.
+
+Two other things changed with it, and both were behind a whole family of duel bugs:
+
+* **The teams are `Azul` and `Rojo`, not `Team0` and `Team1`.** Half the engine assumed team 0 was
+  the players and team 1 the monsters. In a duel both sides are people.
+* **Everything sent to a client is composed inside that client's own session.** The engine was
+  written for one player and one socket, so a frame built for the second player was built from the
+  first player's data: the opponent showed up as `???`, wearing the wrong look, with the wrong AP,
+  and the loser never got a defeat screen.
+
+**Three architecture tests now guard it**, and each was verified by injecting a real violation and
+watching it go red: no lookups that assume one team is the players, no rules decided by fight type
+outside the rules object, and nothing writing to a single socket unless it is painting one person's
+own view. That last one caught a genuine bug in an incoming pull request — a rebound animation that
+only reached the caster's client.
+
+### 🐉 PvM combat
+
+<!-- 📷 aquí: un combate contra monstruos, colocación y turnos -->
+
 - ✅ Tactical arenas resolved from each roleplay map by zone offset, with clean context transitions
 - ✅ Placement phase with red and blue tiles and cell swapping before *Ready*
 - ✅ Isometric geometry (`MapGeometry`) over a pre-computed O(1) BFS distance matrix, with no diagonal steps
@@ -209,7 +296,55 @@ See `docs/jondo-coin.md`.
 
 > **Monster AI, measured over the 5,134 monsters.** Range 0-0 spells were never cast, because range was checked against the nearest enemy and that distance is never zero: **1,555 spells, 20.4% of the arsenal, 443 of them carrying damage**. Gluing to melee also locked out the **857 spells with a minimum range above one**. Fixing both drops the monsters that cannot touch the player from **24.9% to 15.1%**, and raises action points actually spent from **58.7% to 87.2%**.
 
+### 🤺 Duels
+
+<!-- 📷 aquí: retar a alguien, el combate, y la pantalla de victoria/derrota -->
+
+Player against player, on the map, by challenging somebody standing there.
+
+- ✅ Offer, accept and refuse, with the challenge id echoed through every frame of the fight
+- ✅ Both fighters composed from their **own** character record — look, level, characteristics, equipment
+- ✅ Placement with no clock, and no challenges offered: there are no monsters to set them against
+- ✅ Victory **and defeat** screens, each player's own, and both sides returned to the map
+- ✅ Nothing is won and nothing is lost — no experience, no kamas, no loot. Without that rule the
+  winner was being paid for the opponent's level as if they were a monster
+- ✅ The end-of-fight card shows the other player's portrait instead of a question mark: an entry
+  with no level is a *monster* to the client, so a person always carries theirs
+
+### 🏟️ Koliseo
+
+<!-- 📷 aquí: la ventana del koliseo, el buscando, y el reparto de kolichas al ganar -->
+
+Ranked PvP through a queue. Open the window, pick a format, get matched, fight, get paid.
+
+- ✅ **The format table** (`lux` → `ltd`) — 1v1, 2v2, 3v3 open and a fourth closed, byte for byte as the capture
+- ✅ **Enrolling** (`lsm`), with the format carried as the client's own enum
+- ✅ **The queue state** (`lsx`) pushed back, which is what paints *searching* in the window
+- ✅ **Matchmaking on enrolment**, one queue per format, drawn under a lock so two simultaneous requests cannot take the same person into two fights
+- ✅ Everybody re-checked as still connected **before** anyone loses their place in the queue; if somebody dropped, the rest go back to the queue rather than pay for it
+- ✅ The fight itself, with the Koliseo rulebook, and both sides returned to roleplay at the end
+- ✅ **The winner is paid** — kamas, Kolichas, Vitorichas and experience — and the loser gets nothing, not even a zero
+- 🚧 The *match found* popup with accept and refuse
+- 🚧 Fights are held on an ordinary arena; the real game picks one of the many Koliseo maps at random
+- ❌ Rankings (`iqt`, `irc`), two undeciphered lists of over three thousand bytes each
+- ❌ The `lst` redirect to a separate Koliseo server. Jondo is one server and holds the fight in place
+
+> **What the winner is paid, and how much of it is measured.** The end-of-fight `jyg` of the Koliseo
+> capture has four entries. The two that won carry `3,400 kamas · 260 × 12736 · 2 × 34478 · 4,722,600 xp`
+> at level 227 and `2,800 · 230 · 2 · 7,496,344` at level 290; 12736 is the Kolicha and 34478 the
+> Vitoricha. The two that lost carry a zero-byte loot block and an experience block **with the gained
+> field absent** — not set to zero.
+>
+> That it is paid, and what is paid, is measured. **The formula is not**, and it cannot be from two
+> winners: they go the wrong way round, the higher level earning *fewer* kamas and *fewer* Kolichas,
+> and both beat the same two opponents so the opponents cannot explain the gap. So kamas, Kolichas
+> and Vitorichas are constants — the mean of what was measured — sitting in three named fields for
+> the day there are more captures. Experience does better: laid over the **band of the winner's own
+> level** the two samples land at 7.22% and 6.12%, a point apart, so 6.67% is used and the result
+> stays sane at every level instead of being absurd at one end.
+
 ### ✨ Spell effect engine
+
 One engine for all eighteen classes, driven entirely by client data. Not a single spell is written by hand: everything comes out of `SpellLevels.EffectsJson` and the `Effects` catalogue.
 
 - ✅ Effects, triggers and target masks read from the spell — `I` on cast, `TB` turn start, `TE` turn end, `DBE` when hit, `CCMPARR` per tile walked; `a` allies, `A` enemies, `g` summons, `E<n>`/`e<n>` gated on a state
@@ -219,18 +354,21 @@ One engine for all eighteen classes, driven entirely by client data. Not a singl
 - ✅ Criticals rolled against the spell's probability plus the character's, using the spell's separate critical effect list
 - ✅ Point steal, life steal, erosion of maximum HP and damage-taken multipliers
 - ✅ Buff panel — icon, value, remaining rounds and dispellable flag; buffs start on their delay and expire on their round
+- ✅ **Stack limits** — a spell level's `MaxStack` is honoured, so a bonus that builds up stops where the game stops it
 - ✅ Cooldowns and cast limits — per turn, per target, minimum interval, initial cooldown
+- ✅ **Rebounds that pick the nearest eligible target** (effect 2160), bounded by a budget so a chain cannot loop, with the damage still attributed to the caster while the animation travels from the previous victim
 - ✅ Summons as real fighters — own sheet, place in the carousel next to their owner, behaviour spell, lifetime, and they all fall when their summoner dies
 - ✅ Item attitudes — the six Dofus and the trophies grant their spell through effect 1175
-- ✅ The characteristic sheet in the shape the client expects: 53 entries in a fixed order, and a single-characteristic refresh **replaces** its entry rather than adding to it, so it repeats every field and puts the buff in its own slot `f8`
-- 🚧 Healing — the FIRE fixed heal (effect 108, 751 spell levels) works, immediately and with spell delays. Its five siblings are the same heal in the other elements and none of them is done: water 2998 (92 levels), air 2999 (66), earth 3000 (62), neutral 3001 (11) and best-element 3002 (30)
+- ✅ The characteristic sheet in the shape the client expects: 53 entries in a fixed order, and a single-characteristic refresh **replaces** its entry rather than adding to it
+- 🚧 Healing — the FIRE fixed heal (effect 108, 751 spell levels) works. Its five siblings are the same heal in the other elements and none is done: water 2998 (92 levels), air 2999 (66), earth 3000 (62), neutral 3001 (11) and best-element 3002 (30)
 - ❌ Glyphs and traps (effects 400, 401, 1091)
-- ❌ Appearance-changing spells — the transform payload is an opaque blob, so the Cra's Sentinel works but does not change its look
+- ❌ Appearance-changing spells — the transform payload is an opaque blob
 - ❌ Area shapes `G` (55 effects) and `*` (10), which fall back to the centre tile alone
 
 > The engine is shared, so every class gets whatever its spells happen to use. Only the **Cra** has been driven against real captures spell by spell; the rest are untested. A spell only works when **all** of its effects resolve, and the gaps concentrate in a handful of effect families, so they close in blocks rather than one spell at a time.
 
 ### 🎯 Combat challenges
+
 - ✅ The preparation dance, measured across 305 captures with both directions on one timeline: two candidates with a 15-second timer, the player marks and validates, and the server fixes whatever is left when you declare ready
 - ✅ **15 of the 16** watched live, with every rule taken from the challenge's own translated description
 - ✅ Results travel the moment they happen — a failure the instant the challenge breaks, a success at the end, a defeat failing them all at once
@@ -240,19 +378,22 @@ One engine for all eighteen classes, driven entirely by client data. Not a singl
 - ❌ Challenges without a measured percentage — the client ships no bonus field, and the same challenge appears at 90 and at 150 always at +60, so there is a per-fight modifier nobody has reconstructed
 
 ### ❌ Not implemented at all
-- Kolossium and PvP combat
+
 - Crafting professions
 - Achievements
 - Guilds
+- Party fights
 
 ---
 
 ## 🛠️ Jondo Studio
 
-> ⚠️ **Very early.** The Studio is weeks old, it changes every day, and the parts that write files
-> have been exercised by one person on one machine. Read it, use it, tell us what is wrong — but
-> keep a copy of `content/` before a long session, and expect screens to move under you. Nothing in
-> it can damage `world.db` or a running server, which is the one guarantee it does make.
+<!-- 📷 aquí: dos o tres pantallas del editor -->
+
+> ⚠️ **Very early.** The Studio changes every day, and the parts that write files have been exercised
+> by one person on one machine. Read it, use it, tell us what is wrong — but keep a copy of
+> `content/` before a long session, and expect screens to move under you. Nothing in it can damage
+> `world.db` or a running server, which is the one guarantee it does make.
 
 The world editor. A third executable next to the launcher and the server, and it needs neither of
 them running: it opens `content/` and the data files through the same paths the server uses and
@@ -285,8 +426,7 @@ So there are three layers, merged on load, and only the last one is ever edited:
 
 The authored layer is `content/`, in versioned JSON, so a change is a reviewable diff and two people
 can edit different maps without colliding. It stores **deltas, not copies**, and it can *erase* a
-row it did not write — an NPC Ankama places and we do not want has to be removable without editing
-the generated file it came from, because that file gets rewritten.
+row it did not write.
 
 **Every row carries its provenance**, and that column is the point: six months from now nobody will
 remember whether a cell number was measured off a capture or typed in by hand, and without it on
@@ -295,62 +435,29 @@ screen the two become indistinguishable.
 ### What it does today
 
 Nine sections, **in Spanish, English or French** — and the language switch changes both halves at
-once. The editor's own words come from one catalogue; the game's words — every NPC, monster, item
-and line of dialogue — are read straight out of the client's `Content/I18n/{lang}.bin`, 339,342
-texts per language. The format is not documented anywhere; it was worked out and then checked
-against `world.db`, where 500 keys sampled at random came back byte for byte identical, including
-one of 42,180 characters. An NPC is not called the same thing in Spanish and in French, and a
-dialogue tree built against one set of names has to be readable from the other.
+once. The editor's own words come from one catalogue; the game's words are read straight out of the
+client's `Content/I18n/{lang}.bin`, 339,342 texts per language. The format is not documented
+anywhere; it was worked out and then checked against `world.db`, where 500 keys sampled at random
+came back byte for byte identical, including one of 42,180 characters.
 
-**The creatures are drawn**, out of the client's own bundles and nothing copied into the
-repository. Monsters come from a picto atlas, 5,130 of the 5,134 covered. NPCs are assembled the way
-the client assembles them: bones, a still frame, and the skins the look names — `AnimStatique_1`
-holds exactly one frame in 47 of 53 bones measured, so there is no animation to play. The humanoid
-rig is put together from its skins and tinted by the look's own colours.
+**The creatures are drawn**, out of the client's own bundles and nothing copied into the repository.
+Monsters come from a picto atlas, 5,130 of the 5,134 covered. NPCs are assembled the way the client
+assembles them: bones, a still frame, and the skins the look names. That renderer now lives in its
+own project, `Jondo.Unity.Sprites`, and the launcher draws its account portraits with it.
 
-- ✅ **Overview** — which files it read and what came out of each. First screen on purpose: every
-  time something has gone wrong for an hour here, it turned out to be reading a different file than
-  anybody thought
-- ✅ **Traffic** — the client-server conversation, live as it happens and back through the log,
-  every frame opened and read **against the protocol the client itself declares**. That is the
-  difference between a hex dump and a reading: a length-delimited field could be a string, a nested
-  message or a blob, and with `string fytl = 3` in front of you there is nothing to guess. From here
-  a packet can be named on the spot, from the **513 real message names** the client still ships in
-  its metadata — so naming one stops being invention and becomes a choice off a closed list
-- ✅ **Packets** — every kind of packet seen, with a status ladder — unknown, named, documented,
-  handled, ignored — a name and notes. Only *unknown* and *handled* can be worked out by code;
-  everything between them is a person's work, and until now it had nowhere to live but a Discord
-  message
-- ✅ **NPCs** — all 422 placements, with the provenance column and the NPC drawn on the map. Pick
-  one, click a cell, turn it round, take one of Ankama's away, or put a moved one back where the
-  captures had it. Clicking a placement says what it *is*: what it does, what it says, what it
-  sells. What gets saved is the **difference** from what the captures measured, never a copy
-- ✅ **Dialogues** — which reply leads to which line, with the text on screen rather than ids. Both
-  lists are always full, because what an NPC *can* say is known and hiding it behind a drop-down
-  made the screen look broken. A reply can lead to another line, and picking a line that is not in
-  the tree yet puts it in. A reply's words cannot be typed — the client draws them from its own
-  catalogue by id — but any of the game's own lines can be borrowed, and there are 55,037 of them
-- ✅ **Monsters** — open a group that is already there, take a monster out, put another in, move it
-  two cells left. Opening is free; the moment anything changes, Ankama's group is written off and an
-  authored copy takes its place. The picker says which monsters have **no spells at all**: 371 of
-  the 5,134, and one of those joins a fight, takes its turn and does nothing
-- ✅ **Spells** — every spell with its effects, and the map showing **how far it reaches and what it
-  would hit**, worked out by calling the fight engine's own `Zone.Casillas` rather than a drawing of
-  it. And the column that matters: whether the engine can actually apply each effect
-- ✅ **Passages** — two maps side by side, a door picked on each, and one button that joins them
-  **both ways**. A passage can only hang off an interactive element the map already has — the client
-  draws those from its own map data — so the screen offers what is there and refuses to put a door
-  where there is nothing to click. 4,038 door-shaped elements are sitting unused across 2,469 maps
-- ✅ **Map cells** — the three layers painted one at a time, click to toggle and **drag to paint a
-  run**, with a compass that jumps to the four maps next door. What is saved is the changed cells,
-  never all 560
-- ✅ A section that fails shows its error *inside* the editor instead of taking the window down, and
-  `Jondo Studio.exe --selftest` builds all nine in all three languages against the real data and
-  fails the publish if any throws
+- ✅ **Overview** — which files it read and what came out of each. First screen on purpose
+- ✅ **Traffic** — the client-server conversation, live and back through the log, every frame read **against the protocol the client itself declares**. From here a packet can be named on the spot, from the **513 real message names** the client still ships in its metadata
+- ✅ **Packets** — every kind of packet seen, with a status ladder: unknown, named, documented, handled, ignored
+- ✅ **NPCs** — all 422 placements, with the provenance column and the NPC drawn on the map
+- ✅ **Dialogues** — which reply leads to which line, with the text on screen rather than ids
+- ✅ **Monsters** — open a group, take a monster out, put another in, move it two cells left
+- ✅ **Spells** — every spell with its effects, and the map showing **how far it reaches and what it would hit**, worked out by calling the fight engine's own `Zone.Casillas` rather than a drawing of it
+- ✅ **Passages** — two maps side by side, a door picked on each, and one button that joins them **both ways**
+- ✅ **Map cells** — the three layers painted one at a time, click to toggle and **drag to paint a run**
+- ✅ A section that fails shows its error *inside* the editor, and `Jondo Studio.exe --selftest` builds all nine in all three languages against the real data and fails the publish if any throws
 
 **Everything it writes goes to `content/`**, in versioned text. Nothing opens `world.db` for writing
-and nothing talks to a running server. What is observed stays where it was observed and only the
-conclusions are written down, because those are the part no tool can reproduce.
+and nothing talks to a running server.
 
 ### What building it turned up
 
@@ -359,96 +466,65 @@ is wrong. Four things it found, all measured:
 
 - **The unknown-packet registry had been recording nothing for months.** It opened frames with a
   helper that only looks at root field 3, and client frames sit at root field 2 — so after weeks of
-  play the table held two rows, both with no opcode over an empty body. 8,974 of the 72,879 frames
-  in the log are the client's, and every one had gone in blank
+  play the table held two rows, both with no opcode over an empty body
 - **Every passage declares the wrong skill.** All 3,815 say 114, which is *Utilizar* on a zaap.
-  Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none;
-  across 401 captures, 184 shows up on 420 elements and 114 on 23, every one a zaap. Our own log
-  catches us emitting the pair `(type 0, skill 114)` 84 times — a pair that occurs zero times
-  anywhere real. New passages declare 184
-- **646 of the game's 872 effects do nothing at all.** They are drawn on the spell card and the
-  engine has no code for them and no characteristic to apply — and **15,348 of the 34,823 spell
-  levels carry at least one**. The Studio ranks them by how many levels each one breaks, which turns
-  a curiosity into a work list: effect 1160 alone is on 6,709 levels. Healing — effect 108 — used
-  to be next on 751 levels and is now handled directly
+  Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none
+- **646 of the game's 872 effects do nothing at all**, and **15,348 of the 34,823 spell levels carry
+  at least one**. The Studio ranks them by how many levels each one breaks, which turns a curiosity
+  into a work list: effect 1160 alone is on 6,709 levels
 - **A monster's picture is filed under its `gfxId`, not its id.** Keyed by id, 847 of 5,134 found a
   picture and every one of those 847 was *somebody else's* creature. Keyed by gfxId it is 5,130
 
 ### Quests and dungeons
 
-Both play. Both were built by measuring the 401 captures rather than by guessing, and both found
-the repository wrong about something on the way.
+Both play. Both were built by measuring the 401 captures rather than by guessing.
 
-**Quests.** 1,976 of them, with their 2,225 steps and 15,547 objectives, read out of six Unity
-dumps the repository does not even carry. A quest is handed over by an NPC saying a particular
-line — 1,260 steps declare one and every one of them resolves to real text — and that join is what
-ties the quest catalogue to the dialogue trees the editor already writes. Objectives complete two
-ways: the client says so for the 5,670 that ask you to click something the server never sees, and
-the server counts for itself the ones that ask you to beat a monster. Progress is written at the
-moment it changes, because there is no autosave in this server and losing an evening's quest is
-worse than losing a few kamas.
+**Quests.** 1,976 of them, with their 2,225 steps and 15,547 objectives, read out of six Unity dumps
+the repository does not even carry. A quest is handed over by an NPC saying a particular line —
+1,260 steps declare one and every one resolves to real text. Objectives complete two ways: the
+client says so for the 5,670 that ask you to click something the server never sees, and the server
+counts for itself the ones that ask you to beat a monster.
 
 The start condition is a language of its own — 29 operators, brackets three deep, and a `!` that
-means "not" without an `=` after it. Six operators are understood, covering every term of 935 of
-the 1,976 conditions; the rest are let through **and named**, because refusing what this emulator
-cannot model would put 53% of the game's quests out of everybody's reach.
+means "not" without an `=` after it. Six operators are understood, covering every term of 935 of the
+1,976 conditions; the rest are let through **and named**, because refusing what this emulator cannot
+model would put 53% of the game's quests out of everybody's reach.
 
-Three things the repository had wrong, all now corrected: `ieo` and `idu` were filed as interactive
-elements and are quests (448 captured frames, every one internally consistent); the flag on an
-objective means *still to do*, not done; and the world-entry replay was handing every player the
-261-quest journal of the account somebody recorded.
+**Dungeons.** 187, with their rooms, their key and their boss. The keyring and the required item were
+in the client's data the whole time and the extractor was dropping them on the floor. Talk to the
+guardian, hand over the key, and you are in the first room; win a fight and you move on; beat the
+boss in the last one and you come out.
 
-**Dungeons.** 187, with their rooms, their key and their boss. The keyring and the required item
-were in the client's data the whole time and the extractor was dropping them on the floor — adding
-them back is what made a locked door possible at all. Talk to the guardian, hand over the key, and
-you are in the first room; win a fight and you move on; beat the boss in the last one and you come
-out. The boss is placed at startup in 126 dungeons, in the room the data says, at the highest grade
-it has.
-
-It is not Ankama's dungeon and the difference is worth stating: theirs is a chain of rooms and
-corridors walked through ordinary doors, and **not one of the 187 has a single one of its internal
-passages** — not in the extracted table, not in Ankama's own world graph. A player put in room 0
-would have no way out, so winning moves you instead.
+It is not Ankama's dungeon and the difference is worth stating: theirs is a chain of rooms walked
+through ordinary doors, and **not one of the 187 has a single one of its internal passages** — not
+in the extracted table, not in Ankama's own world graph. A player put in room 0 would have no way
+out, so winning moves you instead.
 
 Full workings in **`docs/quests.md`** and **`docs/dungeons.md`**.
 
 ### What is being worked on
 
-- 🚧 **NPC actions per placement** — and this one turned out not to be what the plan assumed. The
-  right-click menu is drawn by the *client* from the template's `actions[]`, so an action written
-  per placement can only take options away, never add one. Adding would need the map-load packet to
-  carry actions per actor, and that has to be measured against a capture first
-- 🚧 **Editing spells.** The simulator is there; changing a spell's numbers is not — and with 646
-  effects doing nothing, implementing the top of that list buys far more than editing the values of
-  an effect the engine ignores
-- 🚧 **Shops, loot tables and dungeons** — asked for by the people using it. All three are screens
-  over data the server already reads, so they are reachable
-- 🚧 **Editing quests.** The engine plays them now and the Studio shows them, but nothing writes
-  one yet
-- 🚧 **A thin admin channel** so a running server can be told to reload one domain, without a
-  restart. Localhost only, token per boot, off by default
-- 🚧 **The launcher**, which inherits this shell once the editor stops moving
+- 🚧 **NPC actions per placement** — the right-click menu is drawn by the *client* from the
+  template's `actions[]`, so an action written per placement can only take options away, never add
+  one
+- 🚧 **Editing spells.** The simulator is there; changing a spell's numbers is not
+- 🚧 **Shops, loot tables and dungeons** — all three are screens over data the server already reads
+- 🚧 **Editing quests.** The engine plays them and the Studio shows them, but nothing writes one yet
+- 🚧 **A thin admin channel** so a running server can be told to reload one domain, without a restart
 
-Two things that will not be done the way the plan assumed. The **decor** — the couple of thousand
-drawn elements on a map — stays out: it is a project of its own and the editor paints what the
-server believes, not what the map looks like. And **NPC animation** is not needed at all: the still
-frame *is* the whole animation.
-
-One correction, since this file carried the wrong number for a while. The claim that **1,010 of
-1,124 missing passages were discarded for having no return element** is not reproducible from any
-code in this repository — the extractor's own counter says 1,357 of 3,644 — and the rule behind it
-was doing something else: the return element was never a requirement, it was used to *guess* where
-the passage put you down. That guess is wrong 96.9% of the time.
-
-The full plan, with what was decided and why, is in **`docs/world-editor.md`**.
+The full plan is in **`docs/world-editor.md`**.
 
 ---
 
 ## 🧪 Tests
 
-`Jondo.Unity.Tests` — **587 xUnit tests**, grouped by domain: `Auth`, `Content`, `Combat`,
-`Diagnostics`, `Economy`, `Network`, `Protocol`, `Quests`, `Security`, `Sessions`, `Studio`,
-`World`. They run in about four seconds.
+`Jondo.Unity.Tests` — **848 xUnit tests** across 99 files, grouped by domain: `Auth`, `Combat`,
+`Content`, `Diagnostics`, `Economy`, `Launcher`, `Movement`, `Network`, `Protocol`, `Quests`,
+`Security`, `Sessions`, `Sprites`, `Studio`, `World`. They run in about half a minute.
+
+```bash
+dotnet test Jondo.Unity.Tests
+```
 
 Five of them run against `logs/gameserver_traffic.log` itself when it is on the machine, and skip
 when it is not. That is a real weakness — a test that skips proves nothing — and it is there because
@@ -456,29 +532,30 @@ of what it caught: the packet registry it replaces was fed real frames for weeks
 useless rows, while every test built out of frames this project constructed passed. Code doing what
 it was written to do says nothing about whether it was written to do the right thing.
 
-```bash
-dotnet test Jondo.Unity.Tests
-```
-
 **Publishing the server runs them first and fails if any is red.** Not on build — the inner loop
-stays fast and a half-written change can still be compiled to see whether it type-checks — but
-publishing is the one step between writing code and a player running it, and it is already the step
-that copies the executable to the root. The escape hatch is `-p:SkipTests=true`, which leaves its
-trace on the command line rather than in a config file nobody reads.
+stays fast — but publishing is the one step between writing code and a player running it. The escape
+hatch is `-p:SkipTests=true`, which leaves its trace on the command line rather than in a config
+file nobody reads.
 
-### Two kinds of check, two homes
+### Three kinds of check, three homes
 
-Some checks also run **at startup and throw**, so a bad build refuses to boot. That is worth paying
-only for what a green test run cannot know:
-
-* **At startup** stay the questions of the form *"is the data I was shipped sane?"* — the fight
-  sheet's 53 characteristics in their captured order, the interactive registry, the monster
+* **At startup, and it throws** stay the questions of the form *"is the data I was shipped sane?"* —
+  the fight sheet's 53 characteristics in their captured order, the interactive registry, the monster
   spellbooks, the vendor placements, the profession catalogue. `datos/` and `world.db` are
-  regenerated by tooling and redistributed compressed, entirely outside the build, so a bad
-  regeneration reaches a player with every test still passing.
+  regenerated by tooling outside the build, so a bad regeneration reaches a player with every test
+  still passing.
 * **In the test project** live the questions of the form *"is this code correct?"* — the content
   layers, the collision damage formula, the Jondo Coin bands, frame limits, protobuf parsing,
   password hashing, log censorship and session isolation.
+* **Architecture tests** ask *"is this code shaped right?"* — they read the fight engine's own source
+  and fail on the patterns that caused whole families of bugs. They are the only kind that catches a
+  mistake **before** it has a symptom, and they hold an exception list where every entry carries a
+  written reason.
+
+Some checks are hard to write as tests because the bug produces no error at all — a portrait that
+draws a character facing away, or with no head, is a valid PNG. Those are guarded by counting: the
+animation name has to end in the direction that faces the camera, and the head slot has to
+contribute more than zero triangles.
 
 ---
 
@@ -490,18 +567,24 @@ Eight consecutive real clients (3.6.4.3 → 3.6.10.10) were pulled from Ankama's
 
 - **Ankama does not reshuffle on every patch.** Three of the seven jumps keep all 2,169 names, one for one — five obfuscation generations across eight versions. The tool checks for the identity mapping first, in a second.
 - **Zero wrong pairings over 6,505 real pairs.** The matcher never looks at names, only at field numbers, kinds and neighbourhood. It gets 71.1% and misses none; what it cannot decide, it leaves alone.
-- **On a patch that does reshuffle, structure alone gets about 11%** — the ceiling, not a tuning problem: distinctive fingerprints collapse from ~750 to ~70, because a many-field message is both the distinctive one and the one most likely to be touched.
+- **On a patch that does reshuffle, structure alone gets about 11%** — the ceiling, not a tuning problem.
 - **Chaining through intermediate versions is worse**: 12 pairs against 245 for the direct jump. A plausible idea the measurement refuted.
 - Building the `Op` layer also turned up **49 opcodes that only exist in 3.6.4.3** — dead code nobody knew about.
 
 The **`Op` layer** replaced **495 three-letter literals across 35 files** with one generated file, `Jondo.Unity.Protocol/Op.cs`, so applying a mapping never means editing the emulator by hand.
 
 ```bash
-protocolbuilder mapear <old client> <new client>       # who is who between two versions
-protocolbuilder capa   <client> <anchors> . --aplicar  # regenerate Op.cs and migrate call sites
-protocolbuilder bajar  3.6.4.3 3.6.10.10 clientes      # fetch old clients from the CDN, 183 MB each
-protocolbuilder cadena clientes                        # measure each patch on its own
+protocolbuilder proto    <client dll> [out.proto]      the client's own message shapes
+protocolbuilder mapear   <old client> <new client>     who is who between two versions
+protocolbuilder capa     <client> <anchors> . --aplicar  regenerate Op.cs and migrate call sites
+protocolbuilder bajar    3.6.4.3 3.6.10.10 clientes    fetch old clients from the CDN, 183 MB each
+protocolbuilder cadena   clientes                      measure each patch on its own
 ```
+
+> `proto` earns its keep beyond migrations. A message read wrong off a capture stays wrong until
+> something contradicts it, and the client's own schema is that something: the Koliseo's *searching*
+> state was implemented against the wrong message for a while, and it was `lth { bool, bool }` in the
+> extracted schema — two booleans where an index was assumed — that showed why the window never moved.
 
 Full write-up in `docs/desofuscacion.md`.
 
@@ -509,25 +592,24 @@ Full write-up in `docs/desofuscacion.md`.
 
 ## 🧱 Source layout
 
-The two executables:
-* **`Jondo.Unity.Server`** → `Jondo Server.exe` — proxies, network parser, handlers, managers, database and the server's log window. The spell effect engine lives in `Managers/`: `SpellEffects` reads the spell data, `EffectEngine` turns it into things that happen to somebody, and `Summons` builds summoned fighters from monster templates.
-* **`Jondo.Unity.Launcher`** → `Jondo Emulator Launcher.exe` — the player's window. References the contract and nothing else.
+The three executables:
+* **`Jondo.Unity.Server`** → `Jondo Server.exe` — proxies, network parser, handlers, managers, database and the server's log window. The spell effect engine lives in `Managers/`: `SpellEffects` reads the spell data, `EffectEngine` turns it into things that happen to somebody, and `Summons` builds summoned fighters from monster templates
+* **`Jondo.Unity.Launcher`** → `Jondo Emulator Launcher.exe` — the player's window, in Avalonia. References the contract and the sprite renderer, and nothing else
+* **`Jondo.Unity.Studio`** → `Jondo Studio.exe` — the world editor, in Avalonia
 
 Shared:
-* **`Jondo.Unity.Contract`** — paths, settings and the launcher's drawn-from-code widgets
+* **`Jondo.Unity.Contract`** — paths, settings and the shared palette
+* **`Jondo.Unity.Contract.WinForms`** — what is left of the old Windows Forms shell, kept apart so nothing else drags it in
 * **`Jondo.Unity.Core`** — networking infrastructure and TCP servers
 * **`Jondo.Unity.Auth`** — authentication and HAAPI handlers
 * **`Jondo.Unity.Protocol`** — message definitions and the generated `Op` layer
-* **`Jondo.Unity.World`** — world logic, `FightInstance`, buffs and states (`Buff`), area shapes and displacement (`Zone`), isometric geometry (`MapGeometry`)
+* **`Jondo.Unity.World`** — world logic, `FightInstance`, the fight rulebooks (`FightRules`), buffs and states (`Buff`), area shapes and displacement (`Zone`), isometric geometry (`MapGeometry`)
+* **`Jondo.Unity.Sprites`** — draws a character or an NPC out of the client's own bones, skins and atlases. Shared by the Studio and the launcher so a fix to either reaches both
 * **`Jondo.Unity.Parser`** — capture parsing
-* **`Jondo.Unity.Studio`** → `Jondo Studio.exe`. The world editor, in Avalonia. References
-  `Jondo.Unity.World` and `Jondo.Unity.Core` as projects and uses `MapGeometry`, `Fighter` and
-  `SpellEffect` directly — that absence of a serialisation boundary is why it is a desktop app and
-  not a local web UI. The content layers themselves live in `Jondo.Unity.World/Content/`
-* **`Jondo.Unity.Tests`** — 587 xUnit tests, and the gate on publishing
+* **`Jondo.Unity.Tests`** — 848 xUnit tests, and the gate on publishing
 
 The protocol toolchain, which the emulator does not depend on:
-* **`Jondo.Unity.Reversing`** — reads a client with Cpp2IL, rebuilds the `.proto`, matches two versions, indexes the code, downloads old clients from the CDN (`Cytrus`) and generates the `Op` layer (`Layer`)
+* **`Jondo.Unity.Reversing`** — reads a client with Cpp2IL, rebuilds the `.proto`, matches two versions, indexes the code, downloads old clients from the CDN (`Cytrus`) and generates the `Op` layer
 * **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder` · **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`
 * **`JondoFix`** — the MelonLoader client mod, source plus the compiled dll
 
@@ -541,7 +623,7 @@ Three **SQLite** databases in `bases/`, and one folder of text:
 
 * **`world.db`** — 41 tables and 659,397 rows: characters, inventories, positions, map persistence, spells, monsters, appearances, wardrobe and haven bags. Distributed compressed as `datos/world.zip` (24.8 MB) and extracted on first run.
 * **`auth.db`** — accounts and authentication sessions, created on first run.
-* **`paquetes.db`** — the packets the server does not yet know how to answer, deduplicated by protobuf shape. Kept apart from the other two on purpose: it carries nothing needed to play, it can be deleted to start over, and it can be handed to somebody else to look at without handing over anybody's characters.
+* **`paquetes.db`** — the packets the server does not yet know how to answer, deduplicated by protobuf shape. Kept apart on purpose: it carries nothing needed to play, it can be deleted to start over, and it can be handed to somebody else to look at without handing over anybody's characters.
 * **`content/`** — the authored layer, in versioned JSON. The only one edited by hand, and the only one nothing regenerates. See [Jondo Studio](#-jondo-studio).
 
 Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved installation still starts.
@@ -549,6 +631,10 @@ Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved i
 **Some regression guards also run at startup and throw**, so the server refuses to boot when the data it was shipped does not match what the code expects — see [Tests](#-tests) for which checks live where, and why.
 
 ---
+
+<details>
+<summary>📷 Old screenshot gallery — being redistributed into the sections above</summary>
+
 <img width="2559" height="1499" alt="image" src="https://github.com/user-attachments/assets/3b4f1f39-45d3-4efe-b73b-65d1d5e8a595" />
 <img width="2559" height="1509" alt="image" src="https://github.com/user-attachments/assets/dde87296-dd2a-498a-b058-1491160b7d04" />
 <img width="2559" height="1506" alt="image" src="https://github.com/user-attachments/assets/521bef24-6b19-4061-bc5b-37a178e91163" />
@@ -573,6 +659,4 @@ Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved i
 <img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/7f0406c5-34c0-46b9-8cf7-fe14913f70e0" />
 <img width="2559" height="1504" alt="image" src="https://github.com/user-attachments/assets/6b934f0d-40b7-4a3e-9926-5df97bf9c484" />
 
-
-
-
+</details>
