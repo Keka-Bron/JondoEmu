@@ -3279,7 +3279,11 @@ namespace Jondo.Unity.Server.Handlers
                     var animationGrade = LimitesDeGrado(c.HechizoOrigen, c.NivelOrigen);
                     if (animationGrade.LevelId > 0)
                     {
-                        await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                        // A TODOS, no al socket que atiende. La animacion del rebote la tienen
+                        // que ver los dos bandos: contra monstruos daba igual porque solo hay una
+                        // persona mirando, pero en un desafio o en un koliseo el rival se quedaba
+                        // sin ver de donde a donde salta la flecha.
+                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                             Network.FightProtocol.BuildAction(
                                 animationCaster.Id,
                                 Network.FightProtocol.Cast,
