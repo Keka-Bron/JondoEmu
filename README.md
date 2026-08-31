@@ -121,8 +121,6 @@ Rewritten in **Avalonia**, the same toolkit as the Studio. It used to be Windows
 - ✅ Launcher and server are separate programs — the launcher carries no database, maps, handlers or effect catalogue
 - 🚧 **OAuth is wired up and waiting for the website** — loopback redirect and PKCE on the launcher side; the server half is deliberately unwritten until there is a site to talk to
 
-> **Three bugs the portraits turned up, and none of them produced a single error.** The chosen head was overwriting the **first** skin, which is the one the sprite reader uses to pick the humanoid rig — no rig, so a strip of colour instead of a character. The pose came out **facing away** because the regex that picks a standing animation, `^AnimStatique_(\d+)$`, matches no humanoid rig at all except breed 12's; every other breed fell through to a fallback that takes whatever the bundle listed first, which is direction 6 — north — in 13 of the 19. And frame records with symbol **−1** were being discarded next to the ones with −99: −1 is the one that carries `Tete`, `Thorax` and the shadow, so the character came out fully dressed and decapitated. In all three cases a picture was produced, saved and shown. Only looking at it said anything.
-
 ### 🧩 Server
 
 <!-- 📷 aquí: la ventana del servidor con el log y los contadores -->
@@ -166,7 +164,7 @@ its own — or on another machine.
 - ✅ Movement, map change and adjacent maps; auto-pilot from the minimap and *travel to*
 - ✅ Seeing others arrive and leave, in all four directions
 - ✅ Up to 8 clients at once, each on its own socket-owned session
-- ✅ **Other players are drawn wearing their gear.** Equipment used to be read out of the session, so the server only ever knew what the character on *that* socket had on: the selection screen, everybody else on the map and your opponent in a fight were all drawn wearing nothing. It now comes from `CharacterItems`, per character
+- ✅ **Everybody is drawn wearing their gear** — the other players on the map, the opponent in a fight and every character on the selection screen. Equipment is read per character from `CharacterItems`, so it never depends on who happens to be connected
 
 ### 🌀 Travel
 
@@ -259,8 +257,8 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ **5,134 monsters** with native Protobuf bone models, custom scales and textures, quest monsters and archmonsters included
 - ✅ **38,744 mapped mob groups**, respawned and kept populated, 1 to 8 monsters each
 - ✅ Sub-area aware spawning across **562 sub-areas**, with radius-2 cell validation so nothing spawns on decorations or zaap pillars
-- ✅ **No monsters indoors, and none standing on a zaap.** They used to spawn inside houses, banks and shops. The rule is two lists and one exception, and the exception is the one that matters: 753 of the 763 dungeon rooms are themselves marked indoors, so a blanket ban would have emptied every dungeon. 7,214 groups removed of 38,744, and the 763 rooms untouched
-- ✅ **NPC colours.** The colour section of a look is `index=value` pairs, sometimes hexadecimal, and it was being read as a plain list — so nothing parsed and every one of the **2,045 NPCs that carry colours** rendered grey
+- ✅ **No monsters indoors, and none standing on a zaap** — not in houses, banks or shops. The rule is two lists and one exception, and the exception is the one that matters: 753 of the 763 dungeon rooms are themselves marked indoors, so a blanket ban would empty every dungeon. 7,214 groups of 38,744 kept out, and the 763 rooms untouched
+- ✅ **NPC colours**, read as what they are: `index=value` pairs, sometimes hexadecimal. The **2,045 NPCs that carry colours** render with theirs
 - ✅ A dialogue always offers at least one real reply, so it can always be closed. With an empty list the client draws its own *Leave* which never answers back
 - 🟡 **401 monsters have no spells at all** in the database
 - ✅ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored, and now it can be
@@ -285,11 +283,6 @@ repository does not even carry.
   **935 of the 1,976** conditions; the rest are let through **and named**, because refusing what
   this emulator cannot model would put 53% of the game's quests out of everybody's reach
 
-> Three things this repository had wrong, all corrected: `ieo` and `idu` were filed as interactive
-> elements and are quests (448 captured frames, every one internally consistent); the flag on an
-> objective means *still to do*, not done; and the world-entry replay was handing every player the
-> 261-quest journal of the account somebody recorded.
-
 Full workings in **`docs/quests.md`**.
 
 ### 🏰 Dungeons
@@ -302,8 +295,8 @@ Full workings in **`docs/quests.md`**.
   move on; beat the boss in the last one and you come out
 - ✅ The boss is placed at startup in **126** dungeons, in the room the data says, at the highest
   grade it has
-- ✅ The keyring and the required item were in the client's data the whole time and the extractor
-  was dropping them on the floor — putting them back is what made a locked door possible at all
+- ✅ The keyring and the required item come straight from the client's own data, which is what
+  makes a locked door possible
 - ✅ Dungeon challenges are imposed at 0% and carry achievements
 
 > It is not Ankama's dungeon, and the difference is worth stating: theirs is a chain of rooms and
@@ -327,10 +320,9 @@ See `docs/jondo-coin.md`.
 
 ## ⚔️ One engine, three rulebooks
 
-There is one fight engine, and it answers three different games. It used to ask *what kind of fight
-am I* in five different methods — `if (!fight.IsDuel)`, `fight.IsKoliseo ? … : …` — which is how a
-duel ended up being played by the monster rules. Now it asks **what do I do**, and the answer comes
-from a rules object:
+There is one fight engine, and it answers three different games. It does not ask *what kind of
+fight am I*; it asks **what do I do**, and the answer comes from a rules object — so adding something
+to the Koliseo touches one class instead of five methods:
 
 | | Against monsters | Duel | Koliseo |
 |---|:---:|:---:|:---:|
@@ -346,20 +338,17 @@ from a rules object:
 None of those numbers is chosen: the 4, the 0 and the 7 are the `kam`'s field 2 in the captures,
 and the 592 is the `kaa`'s field 5 in the Koliseo one.
 
-Two other things changed with it, and both were behind a whole family of duel bugs:
+Two rules hold the rest of it together:
 
-* **The teams are `Azul` and `Rojo`, not `Team0` and `Team1`.** Half the engine assumed team 0 was
-  the players and team 1 the monsters. In a duel both sides are people.
-* **Everything sent to a client is composed inside that client's own session.** The engine was
-  written for one player and one socket, so a frame built for the second player was built from the
-  first player's data: the opponent showed up as `???`, wearing the wrong look, with the wrong AP,
-  and the loser never got a defeat screen.
+* **The teams are `Azul` and `Rojo`, not `Team0` and `Team1`.** Nothing assumes one side is the
+  players and the other the monsters, because in a duel both sides are people.
+* **Everything sent to a client is composed inside that client's own session.** Each fighter's look,
+  level, characteristics and equipment come from their own record, so what the second player is sent
+  describes the second player.
 
-**Three architecture tests now guard it**, and each was verified by injecting a real violation and
-watching it go red: no lookups that assume one team is the players, no rules decided by fight type
-outside the rules object, and nothing writing to a single socket unless it is painting one person's
-own view. That last one caught a genuine bug in an incoming pull request — a rebound animation that
-only reached the caster's client.
+**Three architecture tests enforce it**, each verified by injecting a real violation and watching it
+go red: no lookups that assume one team is the players, no rules decided by fight type outside the
+rules object, and nothing writing to a single socket unless it is painting one person's own view.
 
 ### 🐉 PvM combat
 
@@ -380,7 +369,7 @@ only reached the caster's client.
 
 > **Push damage, measured over 127 collisions in the captures.** `damage = blockedCells × (level/2 + pusher's 84 − target's 85 + 32) / 4`, floored, travelling as a `jwe` with `f14 = 80` and `f4 = −1` right behind the displacement — and alone, with no displacement, when the target could not move a single tile. Three anchors pin the three terms: a level-200 pusher with no bonus deals **33 per tile** and only ever 33, 66, 99 or 132; the level-**165** Zurkarak deals **57** over two tiles, which is `floor(2 × 114.5 / 4)` and which no fixed constant can produce; and a Zobal carrying 100 of push damage plus masks of 0/40/80/120 deals 58/68/78/88. The resistance is subtracted **inside** the quarter — 561 against 30 gives 331 over two tiles, where subtracting outside would give 316. A fighter blocking the push takes `floor(half)`, measured on 9 pairs out of 9. The **Unmovable** state (97) cancels the whole thing, because without displacement there is no collision. All twelve samples are locked into a startup regression guard.
 
-> **Monster AI, measured over the 5,134 monsters.** Range 0-0 spells were never cast, because range was checked against the nearest enemy and that distance is never zero: **1,555 spells, 20.4% of the arsenal, 443 of them carrying damage**. Gluing to melee also locked out the **857 spells with a minimum range above one**. Fixing both drops the monsters that cannot touch the player from **24.9% to 15.1%**, and raises action points actually spent from **58.7% to 87.2%**.
+> **Monster AI, measured over the 5,134 monsters.** Range is judged against the target the spell itself picked, not against the nearest enemy — which is what makes the **1,555 range 0-0 spells** castable at all, 20.4% of the arsenal and 443 of them carrying damage. Walking to the spell's own range band rather than into melee reaches the **857 spells with a minimum range above one**. Together they leave **15.1%** of monsters unable to touch the player, against 24.9% without them, and put action points actually spent at **87.2%**, against 58.7%.
 
 ### 🤺 Duels
 
@@ -392,8 +381,7 @@ Player against player, on the map, by challenging somebody standing there.
 - ✅ Both fighters composed from their **own** character record — look, level, characteristics, equipment
 - ✅ Placement with no clock, and no challenges offered: there are no monsters to set them against
 - ✅ Victory **and defeat** screens, each player's own, and both sides returned to the map
-- ✅ Nothing is won and nothing is lost — no experience, no kamas, no loot. Without that rule the
-  winner was being paid for the opponent's level as if they were a monster
+- ✅ Nothing is won and nothing is lost — no experience, no kamas, no loot
 - ✅ The end-of-fight card shows the other player's portrait instead of a question mark: an entry
   with no level is a *monster* to the client, so a person always carries theirs
 
@@ -545,22 +533,6 @@ own project, `Jondo.Unity.Sprites`, and the launcher draws its account portraits
 **Everything it writes goes to `content/`**, in versioned text. Nothing opens `world.db` for writing
 and nothing talks to a running server.
 
-### What building it turned up
-
-An editor that shows you what the server believes is also an editor that shows you when the server
-is wrong. Four things it found, all measured:
-
-- **The unknown-packet registry had been recording nothing for months.** It opened frames with a
-  helper that only looks at root field 3, and client frames sit at root field 2 — so after weeks of
-  play the table held two rows, both with no opcode over an empty body
-- **Every passage declares the wrong skill.** All 3,815 say 114, which is *Utilizar* on a zaap.
-  Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none
-- **646 of the game's 872 effects do nothing at all**, and **15,348 of the 34,823 spell levels carry
-  at least one**. The Studio ranks them by how many levels each one breaks, which turns a curiosity
-  into a work list: effect 1160 alone is on 6,709 levels
-- **A monster's picture is filed under its `gfxId`, not its id.** Keyed by id, 847 of 5,134 found a
-  picture and every one of those 847 was *somebody else's* creature. Keyed by gfxId it is 5,130
-
 ### What is being worked on
 
 - 🚧 **NPC actions per placement** — the right-click menu is drawn by the *client* from the
@@ -586,10 +558,9 @@ dotnet test Jondo.Unity.Tests
 ```
 
 Five of them run against `logs/gameserver_traffic.log` itself when it is on the machine, and skip
-when it is not. That is a real weakness — a test that skips proves nothing — and it is there because
-of what it caught: the packet registry it replaces was fed real frames for weeks and wrote down two
-useless rows, while every test built out of frames this project constructed passed. Code doing what
-it was written to do says nothing about whether it was written to do the right thing.
+when it is not. A test that skips proves nothing, and that is the trade being made on purpose:
+frames this project builds itself only ever prove that the builder and the reader agree, so a
+handful of checks are pointed at traffic the real client produced.
 
 **Publishing the server runs them first and fails if any is red.** Not on build — the inner loop
 stays fast — but publishing is the one step between writing code and a player running it. The escape
@@ -606,15 +577,15 @@ file nobody reads.
 * **In the test project** live the questions of the form *"is this code correct?"* — the content
   layers, the collision damage formula, the Jondo Coin bands, frame limits, protobuf parsing,
   password hashing, log censorship and session isolation.
-* **Architecture tests** ask *"is this code shaped right?"* — they read the fight engine's own source
-  and fail on the patterns that caused whole families of bugs. They are the only kind that catches a
-  mistake **before** it has a symptom, and they hold an exception list where every entry carries a
-  written reason.
+* **Architecture tests** ask *"is this code shaped right?"* — they read the fight engine's own
+  source and fail on the shapes a multi-client engine cannot afford. They are the only kind that
+  catches a mistake **before** it has a symptom, and they hold an exception list where every entry
+  carries a written reason.
 
-Some checks are hard to write as tests because the bug produces no error at all — a portrait that
-draws a character facing away, or with no head, is a valid PNG. Those are guarded by counting: the
-animation name has to end in the direction that faces the camera, and the head slot has to
-contribute more than zero triangles.
+Some things cannot be asserted by asking whether an operation succeeded, because it always does: a
+portrait that draws a character facing away, or with no head, is still a valid PNG. Those are
+guarded by counting — the animation name has to end in the direction that faces the camera, and the
+head slot has to contribute more than zero triangles.
 
 ---
 
@@ -628,7 +599,7 @@ Eight consecutive real clients (3.6.4.3 → 3.6.10.10) were pulled from Ankama's
 - **Zero wrong pairings over 6,505 real pairs.** The matcher never looks at names, only at field numbers, kinds and neighbourhood. It gets 71.1% and misses none; what it cannot decide, it leaves alone.
 - **On a patch that does reshuffle, structure alone gets about 11%** — the ceiling, not a tuning problem.
 - **Chaining through intermediate versions is worse**: 12 pairs against 245 for the direct jump. A plausible idea the measurement refuted.
-- Building the `Op` layer also turned up **49 opcodes that only exist in 3.6.4.3** — dead code nobody knew about.
+- Building the `Op` layer also turned up **49 opcodes that only exist in 3.6.4.3**.
 
 The **`Op` layer** replaced **495 three-letter literals across 35 files** with one generated file, `Jondo.Unity.Protocol/Op.cs`, so applying a mapping never means editing the emulator by hand.
 
@@ -640,10 +611,9 @@ protocolbuilder bajar    3.6.4.3 3.6.10.10 clientes    fetch old clients from th
 protocolbuilder cadena   clientes                      measure each patch on its own
 ```
 
-> `proto` earns its keep beyond migrations. A message read wrong off a capture stays wrong until
-> something contradicts it, and the client's own schema is that something: the Koliseo's *searching*
-> state was implemented against the wrong message for a while, and it was `lth { bool, bool }` in the
-> extracted schema — two booleans where an index was assumed — that showed why the window never moved.
+> `proto` earns its keep beyond migrations. What a message carries is settled by the client's
+> own schema rather than by one reading of one capture: `lth { bool, bool }` is two booleans,
+> and no amount of staring at two bytes on the wire says that as plainly.
 
 Full write-up in `docs/desofuscacion.md`.
 
