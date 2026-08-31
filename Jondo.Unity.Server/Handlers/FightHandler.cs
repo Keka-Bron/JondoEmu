@@ -467,7 +467,14 @@ namespace Jondo.Unity.Server.Handlers
                     // se le devuelve al acabar, y tiene que leerse ahora: dos líneas más abajo
                     // GameState.CellId ya es la casilla del arena, y devolver a alguien a una
                     // casilla del arena lo deja en un sitio que en el mapa de rol no existe.
+                    //
+                    // Y EL MAPA TAMBIÉN ES EL SUYO. En un desafío los dos están en el mismo, así
+                    // que daba igual leerlo del combate; en un koliseo no se conocen de nada y cada
+                    // uno viene del suyo. Con el del combate, el rival volvía al mapa del primero
+                    // del equipo azul: uno estaba en Frigost, el otro en Astrub, y los dos
+                    // acababan en Frigost.
                     int casillaDeRol = GameState.CellId;
+                    long mapaDeRol = GameState.MapId;
 
                     var luchador = BuildPlayerFighter(fight);
                     if (retador) fight.AddPlayer(luchador);
@@ -485,7 +492,7 @@ namespace Jondo.Unity.Server.Handlers
 
                     var suyo = SessionContext.State;
                     suyo.FightId = fight.FightId;
-                    suyo.RoleplayMapId = fight.RoleplayMapId;
+                    suyo.RoleplayMapId = mapaDeRol;
                     suyo.RoleplayCellId = casillaDeRol;
 
                     GameState.IsInFight = true;
