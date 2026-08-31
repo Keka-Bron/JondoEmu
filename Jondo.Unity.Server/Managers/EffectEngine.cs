@@ -1,6 +1,7 @@
 using Jondo.Unity.World.Combat;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Jondo.Unity.World.Fights;
 
 namespace Jondo.Unity.Server.Managers
@@ -12,6 +13,14 @@ namespace Jondo.Unity.Server.Managers
     public sealed class Outcome
     {
         public Fighter Sobre { get; init; } = null!;
+        /// <summary>The concrete caster after following a hidden spell chain.</summary>
+        public Fighter Caster { get; init; }
+        /// <summary>
+        /// The fighter from whose cell a hidden chained spell is visually launched. Damage still
+        /// belongs to <see cref="Caster"/>; a nearest-target rebound merely travels from its
+        /// previous victim to the next one on the client.
+        /// </summary>
+        public Fighter AnimationCaster { get; init; }
         public SpellEffect Efecto { get; init; } = null!;
         public Buff Buff { get; init; }
         public int HechizoOrigen { get; init; }
@@ -24,6 +33,17 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Si el efecto encadena otro hechizo, cuál y en qué grado.</summary>
         public int HechizoEncadenado { get; init; }
         public int GradoEncadenado { get; init; }
+
+        /// <summary>
+        /// A concrete damage row selected inside a chained spell. Root-cast damage still follows
+        /// the ordinary damage pipeline; this marker preserves the target and spell-bonus
+        /// snapshot of a hidden 792/1160/2160 execution.
+        /// </summary>
+        public bool NestedDamage { get; init; }
+        public int DamageElement { get; init; }
+        public int DamageDistance { get; init; }
+        public int DamageSpellBonus { get; init; }
+        public bool CriticalDamage { get; init; }
 
         /// <summary>
         /// Si el efecto mueve a alguien, de dónde a dónde. Menos uno cuando no mueve a nadie.
@@ -253,6 +273,7 @@ namespace Jondo.Unity.Server.Managers
         /// Molosse/Apaisement aux sous-sorts qui ajoutent ou retirent la Rage.
         /// </summary>
         private const int DispararHechizo = EffectSupport.TriggerSpell;
+        private const int NearestTargetExecuteSpell = EffectSupport.NearestTargetExecuteSpell;
 
         private const int QuitarEfectosDeHechizo = EffectSupport.RemoveSpellEffects;
         private const int CambiarApariencia = EffectSupport.ChangeLook;
@@ -404,12 +425,18 @@ namespace Jondo.Unity.Server.Managers
         public static List<Outcome> Resolver(FightInstance combate, Fighter quienLanza,
                                                   int hechizo, int grado, Fighter objetivo,
                                                   string disparador, int ronda, int hondo = 0,
-                                                  int celdaApuntada = -1, bool critico = false)
+                                                  int celdaApuntada = -1, bool critico = false,
+                                                  int nearestChainBudget = -1,
+                                                  Fighter animationCaster = null)
         {
             if (hondo > HondoMaximo) return new List<Outcome>();
+            if (nearestChainBudget < 0)
+                nearestChainBudget = Todos(combate).Count(fighter => fighter != null && fighter.IsAlive);
             return ResolveEffects(combate, quienLanza, hechizo, grado, objetivo, disparador, ronda,
                                   EfectosDeLaTirada(hechizo, grado, critico), hondo,
-                                  celdaApuntada);
+                                  celdaApuntada, critical: critico,
+                                  nearestChainBudget: nearestChainBudget,
+                                  animationCaster: animationCaster);
         }
 
         /// <summary>
@@ -428,10 +455,14 @@ namespace Jondo.Unity.Server.Managers
         internal static List<Outcome> ResolveEffects(
             FightInstance combat, Fighter caster, int spell, int grade, Fighter target,
             string trigger, int round, IReadOnlyList<SpellEffect> effects, int depth = 0,
-            int aimedCell = -1, Func<SpellEffect, int> rollEffect = null)
+            int aimedCell = -1, Func<SpellEffect, int> rollEffect = null,
+            bool critical = false, int nearestChainBudget = -1,
+            Fighter animationCaster = null)
         {
             var fuera = new List<Outcome>();
             if (depth > HondoMaximo) return fuera;
+            if (nearestChainBudget < 0)
+                nearestChainBudget = Todos(combat).Count(fighter => fighter != null && fighter.IsAlive);
 
             // Every state condition of one spell is judged against the SAME snapshot, and Rage is
             // why that matters: grade 1 of spell 13745 carries all three branches -- 0->I, I->II
@@ -460,6 +491,40 @@ namespace Jondo.Unity.Server.Managers
                 }
                 if (!leToca) continue;
 
+                // Root damage is sent by HurtAsync. Damage inside a hidden chained spell must be
+                // materialized here or Aplicar will deliberately discard it as an ordinary row.
+                if (depth > 0 && EsDeDano(efecto.EffectId))
+                {
+                    int element = efecto.Element >= 0
+                        ? efecto.Element
+                        : DatabaseManager.EffectElement(efecto.EffectId);
+                    int spellBonus = caster.Buffs.DelHechizo(
+                        spell, SpellAspect.DanoBase, round);
+                    foreach (var recipient in AQuien(
+                                 combat, caster, target, efecto, aimedCell, estadosAlEmpezar))
+                    {
+                        if (recipient == null || !recipient.IsAlive) continue;
+                        fuera.Add(new Outcome
+                        {
+                            Sobre = recipient,
+                            Caster = caster,
+                            AnimationCaster = animationCaster ?? caster,
+                            Efecto = efecto,
+                            HechizoOrigen = spell,
+                            NivelOrigen = grade,
+                            NestedDamage = true,
+                            DamageElement = element,
+                            DamageDistance = aimedCell >= 0
+                                ? Jondo.Unity.World.Maps.MapGeometry.Distance(
+                                    aimedCell, recipient.CellId)
+                                : 0,
+                            DamageSpellBonus = spellBonus,
+                            CriticalDamage = critical,
+                        });
+                    }
+                    continue;
+                }
+
                 // Fixed healing follows damage's roll semantics: one effect roll is shared by all
                 // recipients in the zone, then each recipient gets its own distance falloff.
                 int sharedHealRoll = efecto.EffectId == FixedHeal
@@ -479,6 +544,40 @@ namespace Jondo.Unity.Server.Managers
                     var puesta = Aplicar(combat, caster, caster, spell, grade, efecto,
                                          round, aimedCell, sharedHealRoll);
                     if (puesta != null) fuera.Add(puesta);
+                    continue;
+                }
+
+                // Effect 2160 executes one spell on the nearest eligible target. This selection
+                // intentionally uses live states: the same hidden spell has just marked its
+                // current victim, and that mark is the loop guard for the next rebound.
+                if (efecto.EffectId == NearestTargetExecuteSpell)
+                {
+                    if (nearestChainBudget <= 0) continue;
+                    Fighter nearest = AQuien(combat, caster, target, efecto, aimedCell)
+                        .Where(candidate => candidate != null && candidate.IsAlive)
+                        .OrderBy(candidate => aimedCell >= 0
+                            ? Jondo.Unity.World.Maps.MapGeometry.Distance(
+                                aimedCell, candidate.CellId)
+                            : 0)
+                        .ThenBy(candidate => candidate.CellId)
+                        .ThenBy(candidate => candidate.Id)
+                        .FirstOrDefault();
+                    if (nearest == null) continue;
+
+                    var chained = Aplicar(combat, caster, nearest, spell, grade, efecto, round,
+                                          nearest.CellId, sharedHealRoll);
+                    if (chained == null) continue;
+                    fuera.Add(chained);
+                    if (chained.HechizoEncadenado != 0)
+                    {
+                        fuera.AddRange(Resolver(
+                            combat, caster, chained.HechizoEncadenado,
+                            chained.GradoEncadenado, nearest, AlLanzar, round,
+                            depth, nearest.CellId, critical, nearestChainBudget - 1,
+                            // Keep damage attribution on the Cra while drawing the next spell
+                            // from the previous victim's cell.
+                            target));
+                    }
                     continue;
                 }
 
@@ -506,7 +605,8 @@ namespace Jondo.Unity.Server.Managers
                     {
                         fuera.AddRange(Resolver(combat, caster, hecho.HechizoEncadenado,
                                                 hecho.GradoEncadenado, sobre, AlLanzar, round,
-                                                depth + 1, aimedCell));
+                                                depth + 1, aimedCell, critical,
+                                                nearestChainBudget));
                     }
                 }
             }
@@ -533,6 +633,7 @@ namespace Jondo.Unity.Server.Managers
             bool alLanzador = false, aLosMios = false, aLosDeEnfrente = false, aLasInvocaciones = false;
             var pideEstado = new List<int>();
             var pideNoEstado = new List<int>();
+            var requiredMonsterTemplates = new List<int>();
 
             foreach (var trozo in mascara.Split(','))
             {
@@ -555,6 +656,15 @@ namespace Jondo.Unity.Server.Managers
                 // Las invocaciones. Son 1.518 efectos en la base con "g" a secas, y hasta ahora se
                 // caían todos en silencio: es lo que dejaba a la Baliza de Supervivencia sin curar.
                 if (t == "g") { aLasInvocaciones = true; continue; }
+
+                // Multiple uppercase F entries are alternatives. Fulminating Arrow uses this to
+                // mark either Cra beacon template while excluding ordinary allies.
+                if (t.Length > 1 && t[0] == 'F' &&
+                    int.TryParse(t.Substring(1), out int monsterTemplate))
+                {
+                    requiredMonsterTemplates.Add(monsterTemplate);
+                    continue;
+                }
 
                 if (t.Length > 1 && (t[0] == 'e' || t[0] == 'E') && int.TryParse(t.Substring(1), out int estado))
                 {
@@ -610,6 +720,11 @@ namespace Jondo.Unity.Server.Managers
                     ? alEntrar
                     : quien.Buffs.Estados as IReadOnlySet<int> ?? new HashSet<int>(quien.Buffs.Estados);
                 bool vale = true;
+                if (requiredMonsterTemplates.Count > 0 &&
+                    (!quien.IsMonster || !requiredMonsterTemplates.Contains(quien.MonsterId)))
+                {
+                    vale = false;
+                }
                 foreach (int estado in pideEstado) if (!susEstados.Contains(estado)) vale = false;
                 foreach (int estado in pideNoEstado) if (susEstados.Contains(estado)) vale = false;
                 if (vale) yield return quien;
@@ -802,7 +917,8 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
-            if (efecto.EffectId == LanzarHechizo || efecto.EffectId == DispararHechizo)
+            if (efecto.EffectId == LanzarHechizo || efecto.EffectId == DispararHechizo ||
+                efecto.EffectId == NearestTargetExecuteSpell)
             {
                 // "Lanza el hechizo del dado en el grado de la cara". Es el enganche de las
                 // actitudes: el grado 1 del Amarillo Ocre no hace nada por sí mismo, sólo dice
@@ -910,6 +1026,8 @@ namespace Jondo.Unity.Server.Managers
                     Sobre = que,
                     HechizoAfectado = efecto.DiceNum,
                     Cuanto = cuanto,
+                    Apila = efecto.MaxStack > 1,
+                    MaxStacks = Math.Max(0, efecto.MaxStack),
                     HechizoOrigen = hechizo,
                     NivelOrigen = grado,
                     Quien = quienLanza.Id,

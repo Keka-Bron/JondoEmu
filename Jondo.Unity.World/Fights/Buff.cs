@@ -75,6 +75,9 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool Apila { get; set; }
 
+        /// <summary>Maximum equivalent rows that may coexist; zero means no explicit cap.</summary>
+        public int MaxStacks { get; set; }
+
         /// <summary>
         /// An instantaneous heal waiting for <see cref="EmpiezaEnRonda"/>. The amount is resolved
         /// when the spell is cast, like every other delayed buff, but missing-life capping is done
@@ -199,6 +202,22 @@ namespace Jondo.Unity.World.Fights
             // embrujo NUEVO por cada paso, apuntando al primero.
             if (embrujo.Apila)
             {
+                if (embrujo.MaxStacks > 0)
+                {
+                    var equivalent = _puestos.Where(e => e.EffectId == embrujo.EffectId
+                                                      && e.EffectUid == embrujo.EffectUid
+                                                      && e.HechizoOrigen == embrujo.HechizoOrigen
+                                                      && e.HechizoAfectado == embrujo.HechizoAfectado
+                                                      && e.Quien == embrujo.Quien).ToList();
+                    if (equivalent.Count >= embrujo.MaxStacks)
+                    {
+                        var oldest = equivalent[0];
+                        oldest.Cuanto = embrujo.Cuanto;
+                        oldest.CaducaEnRonda = embrujo.CaducaEnRonda;
+                        oldest.EmpiezaEnRonda = embrujo.EmpiezaEnRonda;
+                        return oldest;
+                    }
+                }
                 embrujo.Numero = siguienteNumero();
                 _puestos.Add(embrujo);
                 return embrujo;

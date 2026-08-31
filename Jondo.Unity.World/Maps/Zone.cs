@@ -34,6 +34,7 @@ namespace Jondo.Unity.World.Maps
         public const int Aspa = 'X';
         public const int Cruz = 'T';
         public const int TodoElMapa = 'a';
+        public const int WholeMap = 'A';
         public const int Linea = 'L';
         public const int MediaLinea = 'V';
         public const int Rombo = 'Q';
@@ -59,6 +60,7 @@ namespace Jondo.Unity.World.Maps
                     return fuera;
 
                 case TodoElMapa:
+                case WholeMap:
                     for (int c = 0; c < MapGeometry.MaxCells; c++) fuera.Add(c);
                     return fuera;
 

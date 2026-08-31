@@ -44,6 +44,7 @@ namespace Jondo.Unity.Tests.Combat
         [InlineData(EffectSupport.RemoveState)]
         [InlineData(EffectSupport.CastSpell)]
         [InlineData(EffectSupport.TriggerSpell)]
+        [InlineData(EffectSupport.NearestTargetExecuteSpell)]
         [InlineData(EffectSupport.RemoveSpellEffects)]
         [InlineData(EffectSupport.ChangeLook)]
         [InlineData(EffectSupport.Summon)]

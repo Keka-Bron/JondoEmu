@@ -74,6 +74,12 @@ namespace Jondo.Unity.Server.Managers
         public int TopeDeCaida { get; init; }
 
         /// <summary>
+        /// Maximum number of identical rows the spell level allows to coexist. Values at or below
+        /// one use refresh semantics; a larger value is a real stack limit.
+        /// </summary>
+        public int MaxStack { get; init; }
+
+        /// <summary>
         /// La probabilidad de que a este efecto le toque, en tanto por ciento, y el sorteo al que
         /// pertenece.
         ///
@@ -135,7 +141,7 @@ namespace Jondo.Unity.Server.Managers
 
                     var orden = conexion.CreateCommand();
                     orden.CommandText =
-                        "SELECT EffectsJson, CriticalEffectsJson FROM SpellLevels " +
+                        "SELECT EffectsJson, CriticalEffectsJson, MaxStack FROM SpellLevels " +
                         "WHERE SpellId = $id AND Grade = $g LIMIT 1;";
                     orden.Parameters.AddWithValue("$id", hechizo);
                     orden.Parameters.AddWithValue("$g", clave.Item2);
@@ -143,8 +149,9 @@ namespace Jondo.Unity.Server.Managers
                     using var lector = orden.ExecuteReader();
                     if (lector.Read())
                     {
-                        Parsear(lector.IsDBNull(0) ? "" : lector.GetString(0), normales);
-                        Parsear(lector.IsDBNull(1) ? "" : lector.GetString(1), criticos);
+                        int maxStack = lector.IsDBNull(2) ? -1 : lector.GetInt32(2);
+                        Parsear(lector.IsDBNull(0) ? "" : lector.GetString(0), normales, maxStack);
+                        Parsear(lector.IsDBNull(1) ? "" : lector.GetString(1), criticos, maxStack);
                     }
                 }
                 catch (Exception ex)
@@ -159,7 +166,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        private static void Parsear(string json, List<SpellEffect> donde)
+        private static void Parsear(string json, List<SpellEffect> donde, int maxStack)
         {
             if (string.IsNullOrEmpty(json)) return;
             try
@@ -199,6 +206,7 @@ namespace Jondo.Unity.Server.Managers
                         ParaEnElObjetivo = para,
                         PasoDeCaida = paso,
                         TopeDeCaida = tope,
+                        MaxStack = maxStack,
                         Probabilidad = e.TryGetProperty("random", out var rnd) &&
                                        rnd.TryGetDouble(out double p) ? p : 0,
                         Sorteo = Entero(e, "group"),
