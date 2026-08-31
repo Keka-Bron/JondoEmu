@@ -8,20 +8,50 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 ## 📑 Contents
 
-**Getting it running**
-[Quick Start](#-quick-start) · [What you get](#-what-you-get)
+**Getting it running** — [Quick Start](#-quick-start) · [What you get](#-what-you-get)
 
-**What works**
-[Launcher](#-launcher) · [Connection and world](#-connection-and-world) · [Travel](#-travel) · [Houses, bins and haven bags](#-houses-bins-and-haven-bags) · [Social](#-social) · [Character and inventory](#-character-and-inventory) · [Appearances](#-appearances) · [Professions](#-professions) · [NPCs, monsters and dungeons](#-npcs-monsters-and-dungeons) · [Jondo Coin](#-jondo-coin)
+**The three programs**
+
+| | | |
+|---|---|---|
+| 🖥️ [Launcher](#-launcher) | 🧩 [Server](#-server) | 🛠️ [Jondo Studio](#-jondo-studio) |
+| the player's window, in Avalonia | the emulator itself, four listeners in one process | the world editor |
+
+**World**
+[Connection and authentication](#-connection-and-authentication) ·
+[World and movement](#-world-and-movement) ·
+[Travel](#-travel) ·
+[Houses, bins and haven bags](#-houses-bins-and-haven-bags) ·
+[Social](#-social)
+
+**Character**
+[Character and inventory](#-character-and-inventory) ·
+[Appearances](#-appearances) ·
+[Professions](#-professions)
+
+**Content**
+[NPCs and monsters](#-npcs-and-monsters) ·
+[Quests](#-quests) ·
+[Dungeons](#-dungeons) ·
+[Jondo Coin](#-jondo-coin)
 
 **Combat**
-[One engine, three rulebooks](#-one-engine-three-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#-koliseo) · [Spell effect engine](#-spell-effect-engine) · [Combat challenges](#-combat-challenges) · [Not implemented](#-not-implemented-at-all)
+[One engine, three rulebooks](#-one-engine-three-rulebooks) ·
+[PvM](#-pvm-combat) ·
+[Duels](#-duels) ·
+[Koliseo](#-koliseo) ·
+[Spell effect engine](#-spell-effect-engine) ·
+[Combat challenges](#-combat-challenges) ·
+[Not implemented](#-not-implemented-at-all)
 
 **Tools**
-[Jondo Studio](#-jondo-studio) · [Surviving the next patch](#-surviving-the-next-patch)
+[Jondo Studio](#-jondo-studio) ·
+[Surviving the next patch](#-surviving-the-next-patch)
 
 **Under the hood**
-[Tests](#-tests) · [Source layout](#-source-layout) · [Database and persistence](#-database-and-persistence)
+[Tests](#-tests) ·
+[Source layout](#-source-layout) ·
+[Database and persistence](#-database-and-persistence)
 
 ---
 
@@ -115,20 +145,50 @@ Rewritten in **Avalonia**, the same toolkit as the Studio. It used to be Windows
 
 > **Three bugs the portraits turned up, and none of them produced a single error.** The chosen head was overwriting the **first** skin, which is the one the sprite reader uses to pick the humanoid rig — no rig, so a strip of colour instead of a character. The pose came out **facing away** because the regex that picks a standing animation, `^AnimStatique_(\d+)$`, matches no humanoid rig at all except breed 12's; every other breed fell through to a fallback that takes whatever the bundle listed first, which is direction 6 — north — in 13 of the 19. And frame records with symbol **−1** were being discarded next to the ones with −99: −1 is the one that carries `Tete`, `Thorax` and the shadow, so the character came out fully dressed and decapitated. In all three cases a picture was produced, saved and shown. Only looking at it said anything.
 
-### 🌍 Connection and world
+### 🧩 Server
+
+<!-- 📷 aquí: la ventana del servidor con el log y los contadores -->
+
+`Jondo Server.exe`. The launcher starts it, but it is a program in its own right and can be run on
+its own — or on another machine.
+
+- ✅ Four listeners in one process — Zaap (`8888`), game (`5555`), chat (`6337`) and HAAPI
+  (`15881`), plus a self-signed certificate so the client's HTTPS does not fail
+- ✅ **One session per socket**, not one per account: every handler reads the session it is
+  serving, so eight clients on one machine never see each other's state
+- ✅ Its own window with the live log, the counters and the connected clients
+- ✅ **Regression guards that run at boot and refuse to start** when the shipped data does not match
+  what the code expects — see [Tests](#-tests)
+- ✅ A loopback **control API** the launcher talks to: log tail, account login, and the characters
+  of an account with the look already composed for drawing
+- ✅ **Runs on another machine.** Every listener honours `JONDO_PUBLIC_BIND`, and the launcher runs a
+  loopback relay so the client reaches it. The relay is not a convenience: HAAPI and the chat server
+  both hand the client `127.0.0.1`, so repointing the client at a remote host cannot work on its own
+- ✅ Unanswerable packets are recorded in their own database, deduplicated by protobuf shape
+
+### 🔐 Connection and authentication
+
+- ✅ Zaap, HAAPI and connection server emulation, VIP check bypassed
+- ✅ Account creation and login against `auth.db`, with the password hashed and the attempt rate
+  limited **by the socket's own IP** — taking it from the request body meant one JSON field made the
+  limiter useless
+- ✅ Per-client identity chain — instance id, launch hash, Zaap session, game token, single-use
+  ticket, socket-owned session
+- ✅ Server and character selection, showing the mount being ridden and each character's equipment
+- ✅ Character creation with a starter kit — Astrub zaap, adventurer set, 1,000,000 kamas, 101
+  scrolled points per characteristic
+- ✅ Account roles, and an administrator-only channel over loopback
+
+### 🗺️ World and movement
 
 <!-- 📷 aquí: entrada al mundo, varios clientes a la vez -->
 
-- ✅ Zaap, HAAPI and connection server emulation, VIP check bypassed
-- ✅ Server and character selection, showing the mount being ridden
-- ✅ Character creation with a starter kit — Astrub zaap, adventurer set, 1,000,000 kamas, 101 scrolled points per characteristic
 - ✅ World loading, spawn, name hover, last cell and map persisted
 - ✅ **15,360 maps**, **17,211** with walkable-cell data, **17,222** with combat cells
 - ✅ Movement, map change and adjacent maps; auto-pilot from the minimap and *travel to*
 - ✅ Seeing others arrive and leave, in all four directions
 - ✅ Up to 8 clients at once, each on its own socket-owned session
 - ✅ **Other players are drawn wearing their gear.** Equipment used to be read out of the session, so the server only ever knew what the character on *that* socket had on: the selection screen, everybody else on the map and your opponent in a fight were all drawn wearing nothing. It now comes from `CharacterItems`, per character
-- ✅ **A server on another machine.** Every listener honours `JONDO_PUBLIC_BIND`, and the launcher runs a loopback relay so the client reaches it. The relay is not a convenience: HAAPI and the chat server both hand the client `127.0.0.1`, so repointing the client at a remote host cannot work on its own
 
 ### 🌀 Travel
 
@@ -212,20 +272,68 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ Too low a job level blocks gathering the way the game does it
 - ❌ Crafting professions: workshops, the craft window, and the **4,858 recipes** already in the database
 
-### 👹 NPCs, monsters and dungeons
+### 👹 NPCs and monsters
+
+<!-- 📷 aquí: un NPC con su diálogo, y un grupo de monstruos en el mapa -->
 
 - ✅ **6,468 NPC templates** with 3D looks and dialogue trees
 - ✅ **422 NPCs** standing where Ankama puts them across **202 maps**, cell and orientation taken from captures, dialogue attached where it was captured
 - ✅ **5,134 monsters** with native Protobuf bone models, custom scales and textures, quest monsters and archmonsters included
 - ✅ **38,744 mapped mob groups**, respawned and kept populated, 1 to 8 monsters each
 - ✅ Sub-area aware spawning across **562 sub-areas**, with radius-2 cell validation so nothing spawns on decorations or zaap pillars
-- ✅ **187 dungeons** with their **763 rooms**, entrance and exit
 - ✅ **No monsters indoors, and none standing on a zaap.** They used to spawn inside houses, banks and shops. The rule is two lists and one exception, and the exception is the one that matters: 753 of the 763 dungeon rooms are themselves marked indoors, so a blanket ban would have emptied every dungeon. 7,214 groups removed of 38,744, and the 763 rooms untouched
 - ✅ **NPC colours.** The colour section of a look is `index=value` pairs, sometimes hexadecimal, and it was being read as a plain list — so nothing parsed and every one of the **2,045 NPCs that carry colours** rendered grey
 - ✅ A dialogue always offers at least one real reply, so it can always be closed. With an empty list the client draws its own *Leave* which never answers back
 - 🟡 **401 monsters have no spells at all** in the database
 - ✅ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored, and now it can be
 - ✅ **Monster groups placed by hand**, and Ankama's own removable, without touching the 240 MB database that gets regenerated
+
+### 📜 Quests
+
+<!-- 📷 aquí: el diario de misiones y una misión en curso -->
+
+**1,976 quests**, with their 2,225 steps and 15,547 objectives, read out of six Unity dumps the
+repository does not even carry.
+
+- ✅ A quest is handed over by an NPC saying a particular line — 1,260 steps declare one and every
+  one of them resolves to real text, which is what ties the quest catalogue to the dialogue trees
+- ✅ Objectives complete two ways: the client says so for the **5,670** that ask you to click
+  something the server never sees, and the server counts for itself the ones that ask you to beat a
+  monster
+- ✅ Progress is written the moment it changes — there is no autosave here, and losing an evening's
+  quest is worse than losing a few kamas
+- 🟡 The start condition is a language of its own: **29 operators**, brackets three deep, and a `!`
+  that means "not" without an `=` after it. Six operators are understood, covering every term of
+  **935 of the 1,976** conditions; the rest are let through **and named**, because refusing what
+  this emulator cannot model would put 53% of the game's quests out of everybody's reach
+
+> Three things this repository had wrong, all corrected: `ieo` and `idu` were filed as interactive
+> elements and are quests (448 captured frames, every one internally consistent); the flag on an
+> objective means *still to do*, not done; and the world-entry replay was handing every player the
+> 261-quest journal of the account somebody recorded.
+
+Full workings in **`docs/quests.md`**.
+
+### 🏰 Dungeons
+
+<!-- 📷 aquí: la puerta de una mazmorra, la llave y el jefe -->
+
+**187 dungeons**, with their **763 rooms**, their key and their boss.
+
+- ✅ Talk to the guardian, hand over the key, and you are in the first room; win a fight and you
+  move on; beat the boss in the last one and you come out
+- ✅ The boss is placed at startup in **126** dungeons, in the room the data says, at the highest
+  grade it has
+- ✅ The keyring and the required item were in the client's data the whole time and the extractor
+  was dropping them on the floor — putting them back is what made a locked door possible at all
+- ✅ Dungeon challenges are imposed at 0% and carry achievements
+
+> It is not Ankama's dungeon, and the difference is worth stating: theirs is a chain of rooms and
+> corridors walked through ordinary doors, and **not one of the 187 has a single one of its internal
+> passages** — not in the extracted table, not in Ankama's own world graph. A player put in room 0
+> would have no way out, so winning moves you instead.
+
+Full workings in **`docs/dungeons.md`**.
 
 ### 🪙 Jondo Coin
 
@@ -474,33 +582,6 @@ is wrong. Four things it found, all measured:
   into a work list: effect 1160 alone is on 6,709 levels
 - **A monster's picture is filed under its `gfxId`, not its id.** Keyed by id, 847 of 5,134 found a
   picture and every one of those 847 was *somebody else's* creature. Keyed by gfxId it is 5,130
-
-### Quests and dungeons
-
-Both play. Both were built by measuring the 401 captures rather than by guessing.
-
-**Quests.** 1,976 of them, with their 2,225 steps and 15,547 objectives, read out of six Unity dumps
-the repository does not even carry. A quest is handed over by an NPC saying a particular line —
-1,260 steps declare one and every one resolves to real text. Objectives complete two ways: the
-client says so for the 5,670 that ask you to click something the server never sees, and the server
-counts for itself the ones that ask you to beat a monster.
-
-The start condition is a language of its own — 29 operators, brackets three deep, and a `!` that
-means "not" without an `=` after it. Six operators are understood, covering every term of 935 of the
-1,976 conditions; the rest are let through **and named**, because refusing what this emulator cannot
-model would put 53% of the game's quests out of everybody's reach.
-
-**Dungeons.** 187, with their rooms, their key and their boss. The keyring and the required item were
-in the client's data the whole time and the extractor was dropping them on the floor. Talk to the
-guardian, hand over the key, and you are in the first room; win a fight and you move on; beat the
-boss in the last one and you come out.
-
-It is not Ankama's dungeon and the difference is worth stating: theirs is a chain of rooms walked
-through ordinary doors, and **not one of the 187 has a single one of its internal passages** — not
-in the extracted table, not in Ankama's own world graph. A player put in room 0 would have no way
-out, so winning moves you instead.
-
-Full workings in **`docs/quests.md`** and **`docs/dungeons.md`**.
 
 ### What is being worked on
 
