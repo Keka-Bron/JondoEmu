@@ -215,7 +215,10 @@ namespace Jondo.Unity.Tests.Combat
         public void El_lsx_de_la_vuelta_es_el_de_la_captura()
         {
             // «18032001», el que contesta al lte a los 80 ms.
-            Assert.Equal("18032001", Convert.ToHexString(KoliseoHandler.BuildReturned()).ToLowerInvariant());
+            // La modalidad va en el f4, igual que en el lsx de estar buscando: «18032001» en la
+            // captura del 2 contra 2 y «18032002» en la del 3 contra 3.
+            Assert.Equal("18032001", Convert.ToHexString(KoliseoHandler.BuildLeftQueue(1)).ToLowerInvariant());
+            Assert.Equal("18032002", Convert.ToHexString(KoliseoHandler.BuildLeftQueue(2)).ToLowerInvariant());
         }
 
         [Fact]

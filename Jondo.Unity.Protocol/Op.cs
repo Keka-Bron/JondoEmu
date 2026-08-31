@@ -176,6 +176,18 @@ public static class Op
     /// </remarks>
     public const string Lsx = "lsx";
 
+    /// <summary>El koliseo ha encontrado partida: «acepta o rechaza». Los segundos van en el f2.</summary>
+    /// <remarks>
+    /// MEDIDO dos veces, en dos capturas de servidores distintos y de modalidades distintas -- un
+    /// 2 contra 2 y un 3 contra 3 -- y las dos traen exactamente «103b», o sea f2 = 59. En la del
+    /// 3 contra 3 el jugador dejo vencer el plazo y entre el lsh y lo que manda el servidor al
+    /// vencer pasan 60.014 ms: son segundos, no un identificador.
+    ///
+    /// La forma completa, leida del cliente, es { int32, int32, repeated int64 }. Del f1 y del f3
+    /// no se sabe nada porque en las dos muestras no viajan.
+    /// </remarks>
+    public const string Lsh = "lsh";
+
     /// <summary>Acompana al lte de la vuelta del koliseo. 151 bytes, sin descifrar.</summary>
     public const string Lty = "lty";
 

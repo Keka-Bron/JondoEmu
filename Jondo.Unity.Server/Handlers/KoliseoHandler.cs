@@ -102,47 +102,6 @@ namespace Jondo.Unity.Server.Handlers
             return abiertas;
         }
 
-        /// <summary>El cliente se apunta a una modalidad (luy).</summary>
-        /// <remarks>
-        /// El campo 2 es el índice del ltd: la captura manda «1001» y es de un 2 contra 2, que es
-        /// justo la entrada de índice 1. Una modalidad cerrada no admite a nadie, que es lo que
-        /// significa que esté cerrada.
-        /// </remarks>
-        public static async Task EnrolAsync(NetworkStream stream, byte[] payload)
-        {
-            byte[]? luy = ConnectionProtocol.ReadPayload(payload, Op.Luy);
-            if (luy == null) return;
-
-            int indice = IndiceDeModalidad(luy, 2);
-
-            var modo = FindMode(indice);
-            if (modo == null || !modo.Value.Open)
-            {
-                Console.WriteLine($"[Koliseo] Se apuntan a la modalidad {indice}, que no está abierta.");
-                return;
-            }
-
-            long yo = GameState.CharacterId;
-            if (!KoliseoQueue.Enrol(yo, indice))
-            {
-                Console.WriteLine($"[Koliseo] {yo} ya estaba en una cola.");
-                return;
-            }
-
-            // La respuesta medida es el lth con el MISMO indice, a 38 ms, y por la raíz 3 con el
-            // id de la petición —el 19 del luy vuelve como 19—. El lsx que había aquí era cosa
-            // mía: en la captura no contesta al luy ni una sola vez.
-            // EL ESTADO DE LA COLA, que es lo que pinta el «buscando». No es un acuse a la
-            // peticion: es un empujon del servidor con como esta el jugador ahora mismo.
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lsx, BuildQueueState(indice, true)));
-
-            Console.WriteLine($"[Koliseo] {yo} en la cola de {modo.Value.TeamSize} contra " +
-                              $"{modo.Value.TeamSize}: {KoliseoQueue.CountIn(indice)} esperando.");
-
-            await TryMatchAsync(indice, modo.Value.TeamSize);
-        }
-
         /// <summary>Se apunta un GRUPO entero (lsm).</summary>
         /// <remarks>
         /// El mismo botón que el <see cref="EnrolAsync"/>, pero con gente detrás. Con un grupo
@@ -174,6 +133,18 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             long yo = GameState.CharacterId;
+
+            // El castigo por dejar vencer un cartel. El servidor real contesta con el lqn 642 y
+            // los minutos que faltan, y no te apunta.
+            int faltan = KoliseoOffers.MinutesLeft(yo);
+            if (faltan > 0)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, BuildStillBanned(faltan)));
+                Console.WriteLine($"[Koliseo] {yo} no puede apuntarse todavia: {faltan} minuto(s).");
+                return;
+            }
+
             var grupo = Parties.Of(yo);
             var quienes = grupo != null ? Parties.MembersOf(grupo) : new List<long> { yo };
 
@@ -197,6 +168,157 @@ namespace Jondo.Unity.Server.Handlers
             await TryMatchAsync(indice, modo.Value.TeamSize);
         }
 
+        /// <summary>El jugador acepta o rechaza la partida (luy).</summary>
+        /// <remarks>
+        /// El luy es <c>{ map&lt;string,string&gt;, bool }</c> leido del propio cliente: el campo 2 es
+        /// un BOOLEANO, no un indice de modalidad. Aceptar llega como «1001» y el servidor real
+        /// contesta un lth identico por la raiz 3 con el id de la peticion, a 38 ms.
+        ///
+        /// SIN MEDIR el rechazo: en la captura se dejo vencer el plazo. Un bool de proto3 en falso
+        /// no viaja, asi que un «no» tendria que llegar con la carga vacia, y asi se trata. El
+        /// desafio pvp hace exactamente lo mismo -- aceptar «08ec031001», rechazar «08e903» --.
+        /// </remarks>
+        public static async Task AnswerOfferAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? luy = ConnectionProtocol.ReadPayload(payload, Op.Luy);
+            if (luy == null) return;
+
+            long yo = GameState.CharacterId;
+            var oferta = KoliseoOffers.Of(yo);
+            if (oferta == null)
+            {
+                Console.WriteLine($"[Koliseo] {yo} contesta a una partida que ya no existe.");
+                return;
+            }
+
+            bool acepta = false;
+            foreach (var field in ProtoMessage.Parse(luy).Fields)
+            {
+                if (field.FieldNumber == 2 && field.WireType == 0) acepta = field.VarIntValue != 0;
+            }
+
+            // El acuse va siempre, se diga que si o que no: es la respuesta a SU peticion.
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Answer(Op.Lth, BuildAccepted(acepta),
+                                          ConnectionProtocol.RequestId(payload)));
+
+            if (!acepta)
+            {
+                Console.WriteLine($"[Koliseo] {yo} rechaza la partida.");
+                await DeshacerAsync(oferta, new List<long> { yo });
+                return;
+            }
+
+            Console.WriteLine($"[Koliseo] {yo} acepta la partida.");
+            if (!KoliseoOffers.Accept(oferta, yo)) return;
+
+            KoliseoOffers.Forget(oferta);
+            await EmpezarAsync(oferta);
+        }
+
+        /// <summary>Espera el plazo y, si no han dicho que si todos, la deshace.</summary>
+        private static async Task VencerAsync(KoliseoOffers.Offer oferta)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(KoliseoOffers.Segundos + 1));
+
+            // Si alguien la acepto entera por los pelos, Close devuelve falso y aqui no se toca.
+            if (!KoliseoOffers.Close(oferta)) return;
+
+            Console.WriteLine($"[Koliseo] Vence el plazo de la partida {oferta.Id}.");
+            await DeshacerAsync(oferta, KoliseoOffers.WhoDidNotAnswer(oferta), yaCerrada: true);
+        }
+
+        /// <summary>
+        /// Deshace una partida: castiga a quien no dijo que si y devuelve a los demas a la cola.
+        /// </summary>
+        /// <remarks>
+        /// Medido al vencer el plazo: lqn con el aviso y la marca de tiempo, ltk vacio, y el lsx
+        /// diciendo que ya no se busca. El lty de la clasificacion tambien viaja ahi y NO se manda:
+        /// son 144 bytes con un bloque de coma flotante dentro que no se ha descifrado, y mandar
+        /// bytes inventados es peor que no mandarlos.
+        /// </remarks>
+        private static async Task DeshacerAsync(KoliseoOffers.Offer oferta, List<long> culpables,
+                                                bool yaCerrada = false)
+        {
+            if (!yaCerrada && !KoliseoOffers.Close(oferta)) return;
+
+            var castigados = new HashSet<long>(culpables);
+            var hasta = DateTime.UtcNow.AddMinutes(KoliseoOffers.Castigo);
+
+            foreach (long quien in oferta.Everybody)
+            {
+                var sesion = SessionRegistry.FindByCharacter(quien);
+
+                if (castigados.Contains(quien))
+                {
+                    KoliseoOffers.Ban(quien, hasta);
+                    if (sesion != null)
+                    {
+                        await Escribir(sesion, ConnectionProtocol.Push(Op.Lqn,
+                            BuildSanction(new DateTimeOffset(hasta).ToUnixTimeSeconds())));
+                    }
+                }
+                else
+                {
+                    // El que si dijo que si no pierde el sitio por culpa de otro.
+                    KoliseoQueue.Enrol(quien, oferta.Mode);
+                }
+
+                if (sesion == null) continue;
+                await Escribir(sesion, ConnectionProtocol.Push(Op.Ltk));
+                await Escribir(sesion, ConnectionProtocol.Push(Op.Lsx, BuildLeftQueue(oferta.Mode)));
+            }
+
+            Console.WriteLine($"[Koliseo] Partida deshecha: {castigados.Count} castigado(s) " +
+                              $"{KoliseoOffers.Castigo} minuto(s).");
+
+            // Los que se quedaron pueden emparejarse con otros que estuvieran esperando.
+            var modo = FindMode(oferta.Mode);
+            if (modo != null) await TryMatchAsync(oferta.Mode, modo.Value.TeamSize);
+        }
+
+        /// <summary>Todos han dicho que si: se monta el combate.</summary>
+        private static async Task EmpezarAsync(KoliseoOffers.Offer oferta)
+        {
+            var azul = new List<GameSession>();
+            var rojo = new List<GameSession>();
+
+            foreach (long id in oferta.Blue)
+            {
+                var sesion = SessionRegistry.FindByCharacter(id);
+                if (sesion != null && sesion.IsInWorld) azul.Add(sesion);
+            }
+            foreach (long id in oferta.Red)
+            {
+                var sesion = SessionRegistry.FindByCharacter(id);
+                if (sesion != null && sesion.IsInWorld) rojo.Add(sesion);
+            }
+
+            if (azul.Count != oferta.TeamSize || rojo.Count != oferta.TeamSize)
+            {
+                Console.WriteLine("[Koliseo] Alguien se fue entre aceptar y empezar; se deshace.");
+                await DeshacerAsync(oferta, new List<long>(), yaCerrada: true);
+                return;
+            }
+
+            Console.WriteLine($"[Koliseo] Todos aceptan: partida de {oferta.TeamSize} contra " +
+                              $"{oferta.TeamSize}.");
+            await FightHandler.InitiatePvpAsync(azul, rojo, azul[0].MapId, koliseo: true);
+        }
+
+        /// <summary>Escribe a una sesion sin que un socket caido se lleve por delante a los demas.</summary>
+        private static async Task Escribir(GameSession sesion, byte[] frame)
+        {
+            try
+            {
+                await sesion.SendAsync(frame);
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[Koliseo] No se ha podido escribir a {sesion.Id}: {ex.Message}");
+            }
+        }
+
         /// <summary>El cliente vuelve del koliseo (lte).</summary>
         /// <remarks>
         /// No es salirse de la cola, aunque lo pareciera: en la captura el luy y el lte van a
@@ -213,7 +335,8 @@ namespace Jondo.Unity.Server.Handlers
             KoliseoQueue.Leave(GameState.CharacterId);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lsx, BuildReturned()));
+                ConnectionProtocol.Push(Op.Lsx,
+                    BuildLeftQueue(KoliseoOffers.LastMode(GameState.CharacterId))));
 
             Console.WriteLine($"[Koliseo] {GameState.CharacterId} vuelve del koliseo.");
         }
@@ -280,8 +403,18 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            Console.WriteLine($"[Koliseo] Partida de {teamSize} contra {teamSize} formada.");
-            await FightHandler.InitiatePvpAsync(azul, rojo, azul[0].MapId, koliseo: true);
+            // Y AQUI NO EMPIEZA EL COMBATE, empieza el cartel. El servidor real manda un lsh
+            // con el plazo y espera; medido en dos capturas, y el plazo son 59 segundos.
+            var oferta = KoliseoOffers.Open(mode, teamSize, pareja.Value.Blue, pareja.Value.Red);
+
+            byte[] aviso = ConnectionProtocol.Push(Op.Lsh, BuildOffer(KoliseoOffers.Segundos));
+            foreach (var sesion in azul) await Escribir(sesion, aviso);
+            foreach (var sesion in rojo) await Escribir(sesion, aviso);
+
+            Console.WriteLine($"[Koliseo] Partida de {teamSize} contra {teamSize} encontrada: " +
+                              $"{KoliseoOffers.Segundos} s para aceptarla.");
+
+            _ = VencerAsync(oferta);
         }
 
         private static Mode? FindMode(int index)
@@ -320,8 +453,42 @@ namespace Jondo.Unity.Server.Handlers
         public static byte[] BuildQueueState(int modeIndex, bool searching)
             => Pb.New().VarIfNotZero(1, searching ? 1 : 0).VarIfNotZero(4, modeIndex).Build();
 
-        /// <summary>El lsx de la vuelta: «18032001» de la captura.</summary>
-        public static byte[] BuildReturned() => Pb.New().Var(3, 3).Var(4, 1).Build();
+        /// <summary>El lsh: el cartel de partida encontrada, con el plazo en segundos.</summary>
+        public static byte[] BuildOffer(int seconds) => Pb.New().VarIfNotZero(2, seconds).Build();
+
+        /// <summary>El lth: el acuse de la respuesta. El campo 2 es un booleano.</summary>
+        public static byte[] BuildAccepted(bool accepted)
+            => Pb.New().VarIfNotZero(2, accepted ? 1 : 0).Build();
+
+        /// <summary>
+        /// El lsx de salir de la cola: «18032002» de la captura del 3 contra 3.
+        /// </summary>
+        /// <remarks>
+        /// Llevaba la modalidad clavada a uno, que es la de la otra captura. Es el f4, igual que en
+        /// el lsx de estar buscando, y la del 3 contra 3 lo enseña con un dos.
+        /// </remarks>
+        public static byte[] BuildLeftQueue(int modeIndex)
+            => Pb.New().Var(3, 3).VarIfNotZero(4, modeIndex).Build();
+
+        /// <summary>
+        /// El lqn del castigo: «prohibido participar», con la marca de tiempo en que se levanta.
+        /// </summary>
+        /// <remarks>
+        /// «080110f703220a31373838323136393936» de la captura: f1 = 1, f2 = 503 —la plantilla del
+        /// cliente— y el f4 la marca de tiempo en segundos, COMO CADENA. Es la misma forma de
+        /// mensaje informativo que ya se usa en todo el emulador.
+        /// </remarks>
+        public static byte[] BuildSanction(long epochSeconds)
+            => Pb.New().Var(1, 1).Var(2, 503)
+                       .Str(4, epochSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                       .Build();
+
+        /// <summary>El lqn de «todavia no puedes», con los minutos que faltan.</summary>
+        /// <remarks>«0801108205220134»: f1 = 1, f2 = 642, f4 = «4».</remarks>
+        public static byte[] BuildStillBanned(int minutes)
+            => Pb.New().Var(1, 1).Var(2, 642)
+                       .Str(4, minutes.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                       .Build();
 
         /// <summary>El ltd, byte por byte como la captura.</summary>
         public static byte[] BuildModes(IReadOnlyList<Mode> modes)

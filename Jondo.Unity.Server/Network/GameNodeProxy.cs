@@ -257,8 +257,9 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Luy)))
                 {
-                    // Apuntarse a una modalidad del koliseo.
-                    await KoliseoHandler.EnrolAsync(stream, payload);
+                    // Aceptar o rechazar la partida de koliseo que se acaba de encontrar. NO es
+                    // apuntarse: su campo 2 es un booleano, no un indice de modalidad.
+                    await KoliseoHandler.AnswerOfferAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lsm)))
                 {
