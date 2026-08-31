@@ -965,13 +965,13 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Lo que se puede clicar en el mapa. De momento, el zaap.
+        /// Les éléments graphiques de la carte et, lorsqu'elle existe, leur action serveur.
         ///
         ///   f11 { f1: 1, f4 { f1: uid de la habilidad, f2: habilidad }, f5: elemento, f6: tipo }
         ///   f15 { f1: estado, f2: casilla, f3: elemento }
         ///
-        /// Son dos mensajes distintos y hacen falta los dos: el f11 dice qué elemento existe y qué
-        /// se puede hacer con él, y el f15 dónde está y en qué estado. El número del elemento sale
+        /// Le f11 dit quel élément existe et ce que l'on peut faire avec lui. Le f15 est réservé
+        /// au sous-ensemble qui possède un état dynamique. Le numéro de l'élément sort
         /// de los datos del propio cliente (<see cref="Managers.Interactives"/>), así que el
         /// cliente ya sabe qué dibujo ponerle y dónde.
         ///
@@ -1028,7 +1028,7 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Un elemento clicable: qué es, qué se puede hacer con él y dónde está.
+        /// Un élément de carte : son identité, son type et ses éventuelles actions.
         ///
         /// Los RECURSOS de oficio se declaran distinto según estén llenos o no, y hay que
         /// respetarlo o el cliente ofrece segar un trigo ya segado:
@@ -1073,6 +1073,15 @@ namespace Jondo.Unity.Server.Network
             jss.Msg(11, declaration
                 .Var(5, interactive.Element.Id)
                 .Var(6, interactive.Type));
+
+            // Dans la capture officielle, les sorties 515742/gfx3520 et 515801 n'ont aucun f15.
+            // Le f15 est un état dynamique, pas la déclaration du dessin. Les éléments passifs et
+            // les routes sont visibles par leur f11 et ne doivent donc pas recevoir cet état
+            // artificiel qui empêchait le client d'associer le soleil à ses données de carte.
+            bool teleport = false;
+            foreach (var action in interactive.Actions)
+                if (action.Kind == Managers.InteractiveActionKind.Teleport) teleport = true;
+            if (interactive.Actions.Count == 0 || teleport) return;
 
             DeclarePlacement(jss, interactive.Element,
                 gathering && !usable ? state : Managers.ResourceState.Full);

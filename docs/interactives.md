@@ -163,8 +163,8 @@ longer repeated inside the network dispatcher.
 ## 4. Declaring interactives in `jss`
 
 When the client requests a map, `ConnectionProtocol.AddInteractiveElements` asks
-`InteractiveRegistry.OnMap(mapId)` for the registered elements. Each one produces the same two
-blocks used before the migration:
+`InteractiveRegistry.OnMap(mapId)` for the registered elements. Each one produces an `f11`;
+stateful elements additionally produce an `f15`:
 
 ```text
 jss.f11 {
@@ -184,9 +184,9 @@ jss.f15 {
 }
 ```
 
-`f11` describes what the element is and which actions it offers. `f15` places its stated state on
-the map. Both are necessary: declaring a skill without its stated element does not fully describe
-the clickable object to the client.
+`f11` describes what the element is and which actions it offers. `f15` carries the current state
+for stateful elements. Official captures show that `f15` is only a subset of `f11`: exits such as
+element 515742 (`gfx 3520`) are declared by `f11` without any `f15`.
 
 The migration changed the source of these fields, not their values or wire order. A zaap still
 emits type 16 and skill 114; the chest still emits type 85 and skill 104; the lottery still emits
