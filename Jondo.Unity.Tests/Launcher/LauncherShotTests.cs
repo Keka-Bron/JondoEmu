@@ -138,6 +138,18 @@ namespace Jondo.Unity.Tests.Launcher
             // Sin base poblada no hay nada que mirar, y esto es una herramienta: no falla por eso.
             if (personajes.Count == 0) return;
 
+            // Y SIN EL CLIENTE DE DOFUS tampoco, que es lo que rompia la integracion continua. El
+            // retrato se dibuja con los huesos del cliente, y el cliente no esta en el repo ni
+            // puede estarlo; en la maquina de GitHub no hay ni un bundle, asi que Of() devolvia
+            // nulo y el Assert de abajo tumbaba el check con un «1 no bone bundle» que no es un
+            // fallo del emulador sino una maquina sin juego instalado.
+            if (!System.IO.File.Exists(System.IO.Path.Combine(
+                    Jondo.Unity.Launcher.Paths.ClientContentDir, "Characters", "Bones",
+                    "bones_assets_bone_1-9-static.bundle")))
+            {
+                return;
+            }
+
             using var pintor = new Jondo.Unity.Sprites.NpcSprites();
             string carpeta = System.IO.Path.Combine(RaizDeLaSolucion(), "capturas-lanzador");
             System.IO.Directory.CreateDirectory(carpeta);

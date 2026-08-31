@@ -113,11 +113,7 @@ namespace Jondo.Unity.Server.Handlers
             byte[]? luy = ConnectionProtocol.ReadPayload(payload, Op.Luy);
             if (luy == null) return;
 
-            int indice = -1;
-            foreach (var field in ProtoMessage.Parse(luy).Fields)
-            {
-                if (field.FieldNumber == 2 && field.WireType == 0) indice = (int)field.VarIntValue;
-            }
+            int indice = IndiceDeModalidad(luy, 2);
 
             var modo = FindMode(indice);
             if (modo == null || !modo.Value.Open)
@@ -167,11 +163,7 @@ namespace Jondo.Unity.Server.Handlers
             byte[]? lsm = ConnectionProtocol.ReadPayload(payload, Op.Lsm);
             if (lsm == null) return;
 
-            int indice = -1;
-            foreach (var field in ProtoMessage.Parse(lsm).Fields)
-            {
-                if (field.FieldNumber == 1 && field.WireType == 0) indice = (int)field.VarIntValue;
-            }
+            int indice = IndiceDeModalidad(lsm, 1);
 
             var modo = FindMode(indice);
             if (modo == null || !modo.Value.Open)
@@ -222,6 +214,30 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Lsx, BuildReturned()));
 
             Console.WriteLine($"[Koliseo] {GameState.CharacterId} vuelve del koliseo.");
+        }
+
+        /// <summary>
+        /// El índice de modalidad que trae una petición de apuntarse.
+        /// </summary>
+        /// <remarks>
+        /// CERO CUANDO NO VIENE, y ahí estaba el fallo. El campo no viaja cuando vale cero —es el
+        /// valor por omisión de protobuf, y lo dice nuestro propio Op.cs sobre este mismo ltd: «el
+        /// índice cero no viaja»— así que un uno contra uno llega con la carga vacía. Empezando en
+        /// menos uno, esa carga vacía se leía como «modalidad -1», caía en «no está abierta», y el
+        /// cliente se quedaba esperando un acuse que no llegaba sin un solo aviso por ninguna
+        /// parte. El dos contra dos funcionaba porque su índice es el uno y sí viaja.
+        ///
+        /// El número de campo cambia según por dónde entre —el luy lo trae en el 2 y el lsm en el
+        /// 1— pero la numeración es la misma en los dos, y es el orden de las entradas del ltd:
+        /// 0 uno contra uno, 1 dos contra dos, 2 tres contra tres.
+        /// </remarks>
+        internal static int IndiceDeModalidad(byte[] carga, int campo)
+        {
+            foreach (var field in ProtoMessage.Parse(carga).Fields)
+            {
+                if (field.FieldNumber == campo && field.WireType == 0) return (int)field.VarIntValue;
+            }
+            return 0;
         }
 
         /// <summary>

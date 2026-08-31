@@ -1,4 +1,5 @@
-using Jondo.Unity.Protocol;
+﻿using Jondo.Unity.Protocol;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
 using Xunit;
 
@@ -48,6 +49,24 @@ namespace Jondo.Unity.Tests.Network
 
             Assert.Equal(1, IndiceDe(lsm, 1));
             Assert.Equal(-1, IndiceDe(lsm, 2));
+        }
+
+        [Fact]
+        public void El_uno_contra_uno_es_el_indice_cero_y_no_viaja()
+        {
+            // El 1 contra 1 es la primera entrada del ltd, o sea el indice 0, y protobuf no manda
+            // los ceros: la carga llega VACIA. Leyendo eso como «no hay indice» -que es lo que
+            // hacia, empezando en menos uno- el 1 contra 1 caia en «modalidad no abierta» y el
+            // cliente se quedaba esperando un acuse que no llegaba, sin un solo aviso.
+            Assert.Equal(0, KoliseoHandler.IndiceDeModalidad(System.Array.Empty<byte>(), 1));
+            Assert.Equal(0, KoliseoHandler.IndiceDeModalidad(System.Array.Empty<byte>(), 2));
+
+            // Y con el campo puesto, lo que ponga. El 1 es el 2 contra 2.
+            Assert.Equal(1, KoliseoHandler.IndiceDeModalidad(new byte[] { 0x08, 0x01 }, 1));
+            Assert.Equal(1, KoliseoHandler.IndiceDeModalidad(new byte[] { 0x10, 0x01 }, 2));
+
+            // Un campo que no es el suyo no cuenta: leer el 2 en un lsm daria cero, no el valor.
+            Assert.Equal(0, KoliseoHandler.IndiceDeModalidad(new byte[] { 0x08, 0x02 }, 2));
         }
 
         [Fact]
