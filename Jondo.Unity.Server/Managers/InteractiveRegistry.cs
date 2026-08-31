@@ -180,6 +180,17 @@ namespace Jondo.Unity.Server.Managers
                              resource.Type, InteractiveActionKind.Gather, resource.SkillId);
             }
 
+            // Le jss officiel de l'atelier 192937990 déclare les huit éléments présents dans les
+            // données de carte, y compris ceux dont le serveur n'offre aucune route. Sans f11 le
+            // client ne rattache pas certains dessins (notamment les soleils) à la carte. On
+            // déclare donc tous les éléments, mais sans leur inventer de compétence : seuls les
+            // fournisseurs passés ci-dessus restent cliquables et résolubles par iwo.
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var element in Interactives.ElementsOf(mapId))
+                    RegisterPassive(mapId, element, Interactives.TypeOfGfx(element.Gfx));
+            }
+
             Console.WriteLine($"[Interactives] {_byElement.Count} elementos registrados.");
         }
 
@@ -280,6 +291,21 @@ namespace Jondo.Unity.Server.Managers
             }
 
             interactive.Add(kind, skillId);
+        }
+
+        private static void RegisterPassive(long mapId, Interactives.Element element, int type)
+        {
+            var key = (mapId, element.Id);
+            if (_byElement.ContainsKey(key)) return;
+
+            var interactive = new RegisteredInteractive(mapId, element, type);
+            _byElement.Add(key, interactive);
+            if (!_byMap.TryGetValue(mapId, out var entries))
+            {
+                entries = new List<RegisteredInteractive>();
+                _byMap.Add(mapId, entries);
+            }
+            entries.Add(interactive);
         }
     }
 }

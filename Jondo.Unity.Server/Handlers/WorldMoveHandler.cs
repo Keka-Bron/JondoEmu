@@ -121,6 +121,9 @@ namespace Jondo.Unity.Server.Handlers
 
             Jondo.Unity.Server.Network.SessionContext.State.CellId = cell;
             if (facing >= 0 && facing <= 7) Jondo.Unity.Server.Network.SessionContext.State.Orientation = facing;
+            Jondo.Unity.Server.Network.SessionContext.State.PendingMovementMapId =
+                Jondo.Unity.Server.Network.SessionContext.State.MapId;
+            Jondo.Unity.Server.Network.SessionContext.State.PendingMovementCellId = cell;
             DatabaseManager.SaveCurrentCharacter();
 
             return (cells, Jondo.Unity.Server.Network.SessionContext.State.Orientation);
@@ -149,8 +152,9 @@ namespace Jondo.Unity.Server.Handlers
         // ─── jqi: may I leave? ──────────────────────────────────────────────────
 
         /// <summary>
-        /// The client reached the edge and asks to leave. The answer carries nothing but the id of
-        /// the request, and it travels on root field 3, which is the one used for answers.
+        /// The client has finished walking. At an edge this also asks permission to leave; on a
+        /// floor passage it is the only notification that the destination cell was reached. The
+        /// answer carries nothing but the id of the request, on root field 3.
         ///
         /// Without it the client never sends the jqk that names the map it wants, and the
         /// character stands on the border for good.
@@ -160,6 +164,38 @@ namespace Jondo.Unity.Server.Handlers
             long request = ConnectionProtocol.RequestId(payload);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Jsq, null, request));
+
+            // Toujours répondre avant de changer de map. L'ancien branchement retournait dès
+            // qu'il trouvait une route sur la cellule et privait donc les sorties de bord de leur
+            // jsq. Ici une cellule sans passage continue exactement vers le jqk habituel.
+            if (!TryTakeCompletedMovement(SessionContext.State, out long mapId, out int cellId))
+                return;
+            if (!Managers.TeleportManager.TryGetCellTrigger(mapId, cellId, out var route))
+                return;
+
+            int landed = await TeleportHandler.ToMapAsync(
+                stream, route.DestinationMapId, route.DestinationCellId);
+            if (landed >= 0)
+            {
+                Console.WriteLine($"[Teleport] Cellule {cellId}, élément {route.ElementId}: " +
+                                  $"{mapId} -> {route.DestinationMapId}, casilla {landed}.");
+            }
+        }
+
+        /// <summary>
+        /// Consomme une fin de mouvement une seule fois et seulement si la session se trouve
+        /// encore exactement à la destination annoncée par le dernier <c>jrw</c>.
+        /// </summary>
+        internal static bool TryTakeCompletedMovement(SessionState state, out long mapId,
+                                                      out int cellId)
+        {
+            mapId = state.PendingMovementMapId;
+            cellId = state.PendingMovementCellId;
+            state.PendingMovementMapId = 0;
+            state.PendingMovementCellId = -1;
+
+            return mapId > 0 && cellId >= 0 &&
+                   state.MapId == mapId && state.CellId == cellId;
         }
 
         // ─── jqk: take me to this map ───────────────────────────────────────────

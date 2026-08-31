@@ -95,6 +95,7 @@ namespace Jondo.Unity.Server.Managers
         }
 
         private static readonly Dictionary<long, List<Element>> _byMap = new Dictionary<long, List<Element>>();
+        private static readonly Dictionary<int, int> _measuredTypes = new Dictionary<int, int>();
         private static readonly Dictionary<long, Waypoint> _waypoints = new Dictionary<long, Waypoint>();
         private static readonly List<Waypoint> _ordered = new List<Waypoint>();
 
@@ -112,12 +113,14 @@ namespace Jondo.Unity.Server.Managers
         public static void Initialize()
         {
             _byMap.Clear();
+            _measuredTypes.Clear();
             _waypoints.Clear();
             _ordered.Clear();
             _subAreaLevels.Clear();
 
             LoadWaypoints();
             LoadElements();
+            LoadMeasuredTypes();
             LoadSubAreaLevels();
             LoadOverrides();
 
@@ -344,6 +347,45 @@ namespace Jondo.Unity.Server.Managers
             }
             return default;
         }
+
+        /// <summary>
+        /// Type vu dans les captures 3.6 pour chaque dessin. Le fichier encode le type -1 avec
+        /// la sentinelle protobuf non signée ulong.MaxValue; il ne faut surtout pas la remplacer
+        /// par zéro, car les soleils de sortie sont justement déclarés en type -1 par Ankama.
+        /// </summary>
+        private static void LoadMeasuredTypes()
+        {
+            string path = Paths.InteractiveTypesJson;
+            if (!File.Exists(path)) return;
+
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                foreach (var entry in doc.RootElement.EnumerateObject())
+                {
+                    if (!int.TryParse(entry.Name, out int gfx)) continue;
+                    if (entry.Value.TryGetProperty("discrepa", out var disputed) &&
+                        disputed.ValueKind == JsonValueKind.True) continue;
+                    if (!entry.Value.TryGetProperty("tipo", out var type)) continue;
+
+                    if (type.TryGetInt32(out int measured))
+                        _measuredTypes[gfx] = measured;
+                    else if (type.TryGetUInt64(out ulong unsigned) && unsigned == ulong.MaxValue)
+                        _measuredTypes[gfx] = -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Interactives] No se pudo leer {Path.GetFileName(path)}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Type de déclaration d'un dessin qui n'a pas encore de comportement serveur. -1 est le
+        /// type neutre mesuré pour les sorties; il conserve le dessin sans inventer une action.
+        /// </summary>
+        public static int TypeOfGfx(int gfx)
+            => _measuredTypes.TryGetValue(gfx, out int type) ? type : -1;
 
         /// <summary>
         /// Los elementos de un mapa que abren la lista de zaaps. Uno como mucho.
