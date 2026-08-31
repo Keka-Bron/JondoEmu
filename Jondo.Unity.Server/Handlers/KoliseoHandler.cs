@@ -132,9 +132,10 @@ namespace Jondo.Unity.Server.Handlers
             // La respuesta medida es el lth con el MISMO indice, a 38 ms, y por la raíz 3 con el
             // id de la petición —el 19 del luy vuelve como 19—. El lsx que había aquí era cosa
             // mía: en la captura no contesta al luy ni una sola vez.
+            // EL ESTADO DE LA COLA, que es lo que pinta el «buscando». No es un acuse a la
+            // peticion: es un empujon del servidor con como esta el jugador ahora mismo.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer(Op.Lth, BuildEnrolled(indice),
-                                          ConnectionProtocol.RequestId(payload)));
+                ConnectionProtocol.Push(Op.Lsx, BuildQueueState(indice, true)));
 
             Console.WriteLine($"[Koliseo] {yo} en la cola de {modo.Value.TeamSize} contra " +
                               $"{modo.Value.TeamSize}: {KoliseoQueue.CountIn(indice)} esperando.");
@@ -182,11 +183,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (KoliseoQueue.Enrol(miembro, indice)) nuevos++;
             }
 
-            // El acuse va SIEMPRE, aunque no se haya apuntado nadie nuevo: sin él la ventana se
-            // queda como si no hubiera pasado nada, que es exactamente el fallo que trae aquí.
+            // Va SIEMPRE, aunque no se haya apuntado nadie nuevo: sin esto la ventana se queda
+            // como si no hubiera pasado nada, que es exactamente el fallo que trae aqui.
+            // EL ESTADO DE LA COLA, que es lo que pinta el «buscando». No es un acuse a la
+            // peticion: es un empujon del servidor con como esta el jugador ahora mismo.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer(Op.Lth, BuildEnrolled(indice),
-                                          ConnectionProtocol.RequestId(payload)));
+                ConnectionProtocol.Push(Op.Lsx, BuildQueueState(indice, true)));
 
             Console.WriteLine($"[Koliseo] Grupo de {quienes.Count} en la cola de " +
                               $"{modo.Value.TeamSize} contra {modo.Value.TeamSize} " +
@@ -288,9 +290,35 @@ namespace Jondo.Unity.Server.Handlers
             return null;
         }
 
-        /// <summary>El lth: el índice de vuelta, tal cual llegó.</summary>
-        public static byte[] BuildEnrolled(int modeIndex)
-            => Pb.New().VarIfNotZero(2, modeIndex).Build();
+        /// <summary>
+        /// El lsx: en qué cola está el jugador, que es lo que pinta el «buscando».
+        /// </summary>
+        /// <remarks>
+        /// Esto estuvo mal leído desde el principio y merece quedar escrito. Se le contestaba un
+        /// lth con el índice dentro, y el lth no es eso: el esquema del propio cliente dice
+        /// <c>lth { bool gdak = 1; bool gdal = 2; }</c>, dos booleanos, y es la respuesta a un luy
+        /// —<c>{ map&lt;string,string&gt;, bool }</c>—, que no es apuntarse a nada. La ventana
+        /// recibía una cosa que no entendía y se quedaba igual que estaba, sin un solo error.
+        ///
+        /// El que lleva el estado es el lsx, y el esquema lo deja claro:
+        ///
+        /// <code>
+        ///   enum lsg { 0, 1, 2, 3 }                          las cuatro modalidades
+        ///   message lsm { lsg gcxp = 1; }                    apuntarse: la modalidad y ya
+        ///   message lsx { bool gcyt = 1; … lsg gcyw = 4; }   ¿buscando?, y en cuál
+        /// </code>
+        ///
+        /// Y la captura lo confirma byte a byte: el lsx que el servidor empuja a los 27 segundos
+        /// de entrar, sin que el cliente pida nada, es «08012001» — f1 cierto, f4 uno. O sea
+        /// «estás buscando, en la modalidad 1», que es el dos contra dos. Ese jugador ya estaba
+        /// apuntado de antes, y por eso en la captura no sale el apuntarse por ningún lado: pasó
+        /// antes de empezar a grabar. Buscar el lsm en las 37 carpetas de capturas no lo encuentra
+        /// ni una vez.
+        ///
+        /// La modalidad cero no viaja, como en todo lo demás de aquí.
+        /// </remarks>
+        public static byte[] BuildQueueState(int modeIndex, bool searching)
+            => Pb.New().VarIfNotZero(1, searching ? 1 : 0).VarIfNotZero(4, modeIndex).Build();
 
         /// <summary>El lsx de la vuelta: «18032001» de la captura.</summary>
         public static byte[] BuildReturned() => Pb.New().Var(3, 3).Var(4, 1).Build();

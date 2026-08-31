@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.Protocol;
@@ -185,28 +185,30 @@ namespace Jondo.Unity.Tests.Combat
         // -------------------------------------------------------- apuntarse y el emparejamiento
 
         [Fact]
-        public void El_ltd_y_el_lth_van_por_la_raiz_tres_con_el_id_de_la_peticion()
+        public void El_estado_de_la_cola_es_el_lsx_de_la_captura()
         {
-            // El envoltorio entero del lth de la captura: «1a1d 0a19 …lth… 1013». Raíz 3, y el 19
-            // es el mismo id con el que llegó el luy. Con Push salía por la raíz 1 y sin id.
-            byte[] lth = ConnectionProtocol.Answer(Op.Lth, KoliseoHandler.BuildEnrolled(1), 19);
-
-            Assert.Equal("1a1d0a190a13747970652e616e6b616d612e636f6d2f6c7468120210011013",
-                         Convert.ToHexString(lth).ToLowerInvariant());
+            // «08012001», el lsx que el servidor real empuja a los 27 segundos de entrar sin que
+            // el cliente pida nada: f1 cierto, f4 uno. El esquema del cliente dice
+            // lsx { bool gcyt = 1; ... lsg gcyw = 4; }, o sea «buscando» y «en cual», y el lsg es
+            // el enumerado de las cuatro modalidades. El 1 es el dos contra dos.
+            Assert.Equal("08012001",
+                         Convert.ToHexString(KoliseoHandler.BuildQueueState(1, true)).ToLowerInvariant());
         }
 
         [Fact]
-        public void El_lth_devuelve_el_mismo_indice_que_llego_en_el_luy()
+        public void La_modalidad_cero_no_viaja_en_el_lsx()
         {
-            // «1001» va y «1001» vuelve, a 38 ms. Es un eco y nada más.
-            Assert.Equal("1001", Convert.ToHexString(KoliseoHandler.BuildEnrolled(1)).ToLowerInvariant());
+            // El uno contra uno es el valor cero del enumerado, y protobuf no manda los ceros.
+            // Buscando en el uno contra uno son dos bytes: solo el «si».
+            Assert.Equal("0801",
+                         Convert.ToHexString(KoliseoHandler.BuildQueueState(0, true)).ToLowerInvariant());
         }
 
         [Fact]
-        public void El_indice_cero_no_viaja_en_el_lth()
+        public void Dejar_de_buscar_no_lleva_el_si()
         {
-            // Como en el ltd: cero es el valor por omisión de protobuf y no ocupa bytes.
-            Assert.Empty(KoliseoHandler.BuildEnrolled(0));
+            // Falso es el valor por omision de un bool y tampoco viaja.
+            Assert.Empty(KoliseoHandler.BuildQueueState(0, false));
         }
 
         [Fact]
