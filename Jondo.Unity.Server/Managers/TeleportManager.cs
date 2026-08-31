@@ -42,6 +42,8 @@ namespace Jondo.Unity.Server.Managers
     public static class TeleportManager
     {
         public const int UseSkill = 114;
+        public const int ExitSkill = 339;
+        /// <summary>Type de repli pour les routes dont la source ne fournit aucune mesure.</summary>
         public const int GenericTeleportType = 0;
         private static IReadOnlyDictionary<(long MapId, int ElementId), InteractiveTeleport> _byElement =
             new Dictionary<(long, int), InteractiveTeleport>();
@@ -57,12 +59,9 @@ namespace Jondo.Unity.Server.Managers
         {
             ImportIfAvailable();
             LoadFromDatabase();
-            // El índice por casilla se conserva porque es lo que caza dos rutas puestas en la
-            // misma casilla, y la guardia de regresión lo comprueba. Lo que NO hay es disparo por
-            // pisar la casilla: eso venía enganchado al jqi, que el cliente sólo manda al llegar
-            // al borde del mapa, así que servía para 109 de 1.586 rutas y de paso dejaba esas 109
-            // salidas de mapa sin respuesta. Se quitó; volverá cuando haya un fin de movimiento
-            // de verdad al que engancharse.
+            // L'indice par case détecte les doublons et sert aussi aux passages au sol. Ceux-ci
+            // sont déclenchés après la confirmation du dernier jrw, tout en répondant toujours au
+            // jqi : les sorties normales par le bord conservent ainsi leur échange jsq/jqk.
             Console.WriteLine($"[Teleport] {_byElement.Count} rutas cargadas, en " +
                               $"{_byMap.Count} mapas.");
         }
@@ -213,14 +212,11 @@ namespace Jondo.Unity.Server.Managers
                 ElementId = entry.GetProperty("elementId").GetInt32(),
                 SourceCellId = entry.GetProperty("sourceCellId").GetInt32(),
                 GfxId = entry.GetProperty("gfxId").GetInt32(),
-                // Igual que el «.sun» de Giny: el gráfico sigue siendo el del elemento del mapa
-                // y la acción de teleport se declara siempre con el tipo genérico 0.
-                //
-                // OJO: esto PISA el tipo que trae el json, y 529 de las rutas activas lo traían
-                // medido de una captura de 3.6. De rebote, la comprobación «unexpected-type» de
-                // Validate no puede fallar nunca. Se deja tal cual porque es lo que da las 1.586
-                // que están probadas; cambiarlo cambiaría la cuenta y habría que volver a medir.
-                InteractiveType = GenericTeleportType,
+                // Le type fait partie de l'identité de l'élément côté client. 538 routes Giny
+                // portent une mesure directe de Dofus 3.6, notamment le gfx 3507 avec le type -1.
+                // L'écraser par zéro laisse bien f11/f15 sur le fil, mais le client ne rattache
+                // plus la déclaration au dessin de sortie.
+                InteractiveType = ReadInteractiveType(entry),
                 SkillId = entry.GetProperty("skillId").GetInt32(),
                 DestinationMapId = destinationMapId,
                 DestinationCellId = entry.GetProperty("destinationCellId").GetInt32(),
@@ -229,14 +225,26 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
+        internal static int ReadInteractiveType(JsonElement entry)
+        {
+            if (!entry.TryGetProperty("interactiveType", out var type) ||
+                type.ValueKind != JsonValueKind.Number || !type.TryGetInt32(out int measured))
+            {
+                return GenericTeleportType;
+            }
+            return measured;
+        }
+
         private static List<string> Validate(InteractiveTeleport route)
         {
             var errors = new List<string>();
             if (route.SourceMapId <= 0 || route.DestinationMapId <= 0) errors.Add("invalid-map");
             if (route.ElementId <= 0) errors.Add("invalid-element");
             if (route.DestinationCellId < 0 || route.DestinationCellId > 559) errors.Add("invalid-cell");
-            if (route.InteractiveType != GenericTeleportType) errors.Add("unexpected-type");
-            if (route.SkillId != UseSkill) errors.Add("unexpected-skill");
+            // -1 est un type proto valide et mesuré : sur le fil il devient ulong.MaxValue.
+            // Les valeurs positives viennent également des captures (portes, transports, etc.).
+            if (route.InteractiveType < -1) errors.Add("invalid-type");
+            if (route.SkillId != UseSkill && route.SkillId != ExitSkill) errors.Add("unexpected-skill");
             if (IsReservedInteractive(route.SourceMapId, route.ElementId))
                 errors.Add("reserved-interactive");
 

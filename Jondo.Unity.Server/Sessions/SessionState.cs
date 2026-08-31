@@ -21,6 +21,19 @@ namespace Jondo.Unity.Server
         public long MapId { get; set; }
         public int CellId { get; set; }
         public int Orientation { get; set; } = 1;
+
+        /// <summary>
+        /// Destination du dernier déplacement <c>jrw</c>, en attente de sa confirmation
+        /// <c>jqi</c>. Une valeur de map nulle signifie qu'il n'y a rien à confirmer.
+        /// </summary>
+        /// <remarks>
+        /// Le client ne demande pas un <c>iwo</c> pour certaines sorties posées au sol : il marche
+        /// jusqu'à leur cellule puis confirme la fin du mouvement. Cet état doit rester propre à
+        /// la session, sinon la confirmation d'un joueur pourrait déclencher la sortie d'un autre.
+        /// </remarks>
+        public long PendingMovementMapId { get; set; }
+        public int PendingMovementCellId { get; set; } = -1;
+
         public long Kamas { get; set; }
 
         /// <summary>The character's ACCUMULATED experience, not the current level's.</summary>

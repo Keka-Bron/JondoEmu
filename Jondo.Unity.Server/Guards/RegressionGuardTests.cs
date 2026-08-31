@@ -645,6 +645,11 @@ namespace Jondo.Unity.Server
             var expected = new HashSet<(long MapId, int ElementId)>();
             foreach (long mapId in Managers.Interactives.MapIds)
             {
+                // Tout élément du client doit avoir son f11. Ceux qui n'ont aucune action restent
+                // passifs et ne deviennent donc pas cliquables.
+                foreach (var element in Managers.Interactives.ElementsOf(mapId))
+                    expected.Add((mapId, element.Id));
+
                 foreach (var zaap in Managers.Interactives.ZaapElements(mapId))
                     expected.Add((mapId, zaap.Id));
 
@@ -709,10 +714,9 @@ namespace Jondo.Unity.Server
                     expected.Add((interior, exit.ElementId));
             }
 
-            // Regla de Giny: cada paso es un elemento clicable con USE114, y la misma ruta se
-            // encuentra por su casilla. Lo de la casilla ya no dispara nada —el enganche al jqi
-            // se quedó fuera— pero el índice sigue existiendo y esto es lo que caza que dos rutas
-            // acaben en la misma casilla, que es un dato malo, no una casualidad.
+            // Regla de Giny: cada paso se puede resolver como elemento USE114 y por su casilla.
+            // La segunda vía cubre los soles et sorties au sol qui terminent par jrw/jqi sans iwo,
+            // et l'index repère aussi deux routes placées par erreur sur la même case.
             foreach (var teleport in Managers.TeleportManager.All)
             {
                 if (!Managers.InteractiveRegistry.TryResolveUse(
@@ -722,17 +726,16 @@ namespace Jondo.Unity.Server
                     interactive.Element.Id != teleport.ElementId ||
                     interactive.Element.Cell != teleport.SourceCellId ||
                     interactive.Element.Gfx != teleport.GfxId ||
-                    interactive.Type != Managers.TeleportManager.GenericTeleportType ||
-                    teleport.InteractiveType != Managers.TeleportManager.GenericTeleportType ||
+                    interactive.Type != teleport.InteractiveType ||
                     action.Kind != Managers.InteractiveActionKind.Teleport ||
-                    action.SkillId != 114 || teleport.SkillId != 114 ||
+                    action.SkillId != teleport.SkillId ||
                     !Managers.TeleportManager.TryGetCellTrigger(
                         teleport.SourceMapId, teleport.SourceCellId, out var cellRoute) ||
                     !ReferenceEquals(teleport, cellRoute))
                 {
                     throw new InvalidOperationException(
                         $"[RegressionGuard FAILED] El paso {teleport.SourceMapId}/" +
-                        $"{teleport.ElementId} no es un interactivo clicable f11/f15.");
+                        $"{teleport.ElementId} no es un interactivo de ruta declarado en f11.");
                 }
             }
 
@@ -758,9 +761,9 @@ namespace Jondo.Unity.Server
                     192937990, 515742, Managers.Interactives.SkillInstanceOf(515742),
                     out var jewellerInteractive, out var jewellerAction) ||
                 jewellerInteractive.Element.Cell != 414 || jewellerInteractive.Element.Gfx != 3520 ||
-                jewellerInteractive.Type != Managers.TeleportManager.GenericTeleportType ||
+                jewellerInteractive.Type != -1 ||
                 jewellerAction.Kind != Managers.InteractiveActionKind.Teleport ||
-                jewellerAction.SkillId != 114)
+                jewellerAction.SkillId != Managers.TeleportManager.ExitSkill)
             {
                 throw new InvalidOperationException(
                     "[RegressionGuard FAILED] Falta o ha cambiado la ida y vuelta del taller del " +
@@ -770,7 +773,7 @@ namespace Jondo.Unity.Server
             if (!Managers.TeleportManager.TryGet(192940038, 515691, out var stairExit) ||
                 stairExit.SourceCellId != 327 || stairExit.DestinationMapId != 188744711 ||
                 stairExit.DestinationCellId != 427 || stairExit.GfxId != 62018 ||
-                stairExit.InteractiveType != Managers.TeleportManager.GenericTeleportType ||
+                stairExit.InteractiveType != -1 ||
                 stairExit.SkillId != 114 ||
                 !Managers.TeleportManager.TryGetCellTrigger(192940038, 327, out var stairCellRoute) ||
                 !ReferenceEquals(stairExit, stairCellRoute) ||
@@ -778,13 +781,33 @@ namespace Jondo.Unity.Server
                     192940038, 515691, Managers.Interactives.SkillInstanceOf(515691),
                     out var stairInteractive, out var stairAction) ||
                 stairInteractive.Element.Gfx != 62018 || stairInteractive.Element.Cell != 327 ||
-                stairInteractive.Type != Managers.TeleportManager.GenericTeleportType ||
+                stairInteractive.Type != stairExit.InteractiveType ||
                 stairAction.Kind != Managers.InteractiveActionKind.Teleport ||
                 stairAction.SkillId != 114)
             {
                 throw new InvalidOperationException(
                     "[RegressionGuard FAILED] La escalera 192940038/515691 tiene que ser un paso " +
                     "clicable.");
+            }
+
+            // Atelier d'Astrub testé en jeu : le gfx 3507 est déclaré en type -1 dans 27
+            // captures 3.6. Le remplacer par zéro conserve les numéros dans jss mais fait
+            // disparaître le soleil côté client.
+            if (!Managers.TeleportManager.TryGet(192940040, 515845, out var workshopExit) ||
+                workshopExit.SourceCellId != 415 || workshopExit.GfxId != 3507 ||
+                workshopExit.InteractiveType != -1 ||
+                workshopExit.SkillId != Managers.TeleportManager.ExitSkill ||
+                workshopExit.DestinationMapId != 188745223 ||
+                workshopExit.DestinationCellId != 371 ||
+                !Managers.InteractiveRegistry.TryResolveUse(
+                    192940040, 515845, Managers.Interactives.SkillInstanceOf(515845),
+                    out var workshopInteractive, out var workshopAction) ||
+                workshopInteractive.Type != -1 ||
+                workshopAction.Kind != Managers.InteractiveActionKind.Teleport)
+            {
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] La sortie 192940040/515845 doit conserver son " +
+                    "type mesuré -1.");
             }
 
             if (Managers.InteractiveRegistry.Count != expected.Count)

@@ -74,6 +74,12 @@ namespace Jondo.Unity.World.Combat
         /// </summary>
         public const int TriggerSpell = 1160;
 
+        /// <summary>
+        /// Execute the spell carried in DiceNum on the nearest eligible fighter in the effect
+        /// area. Chained spells use states to exclude fighters already visited by the chain.
+        /// </summary>
+        public const int NearestTargetExecuteSpell = 2160;
+
         /// <summary>Remove every buff left by one spell.</summary>
         public const int RemoveSpellEffects = 406;
 
@@ -137,7 +143,8 @@ namespace Jondo.Unity.World.Combat
             {
                 Push, Pull, StepBack, StepForward,
                 AddState, RemoveState,
-                CastSpell, TriggerSpell, RemoveSpellEffects, ChangeLook,
+                CastSpell, TriggerSpell, NearestTargetExecuteSpell,
+                RemoveSpellEffects, ChangeLook,
                 Summon, FireHeal, HealPercent, Kill,
             };
 

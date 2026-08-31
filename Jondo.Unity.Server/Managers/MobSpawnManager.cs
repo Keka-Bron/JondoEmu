@@ -930,6 +930,12 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
+            // Si no hay ninguna casilla suficientemente interior, se conserva el antiguo repli
+            // sur les cases marchables. Il faut le choisir AVANT de retirer les interactifs :
+            // sinon, lorsque toutes les cases intérieures sont occupées, le repli remet exactement
+            // les cases cliquables que l'on vient d'écarter.
+            var candidatas = innerCells.Count > 0 ? innerCells : new List<int>(cells);
+
             // Y fuera las casillas que tienen algo encima que se pueda clicar. Un grupo plantado
             // sobre el zaap lo tapa: el clic se lo lleva el monstruo y ya no hay forma de viajar.
             // El veto de mapas ya deja fuera los 62 mapas de zaap enteros, pero las puertas, los
@@ -942,10 +948,10 @@ namespace Jondo.Unity.Server.Managers
 
             if (ocupadas.Count > 0)
             {
-                innerCells.RemoveAll(c => ocupadas.Contains(c));
+                candidatas.RemoveAll(c => ocupadas.Contains(c));
             }
 
-            return innerCells.Count > 0 ? innerCells : cells;
+            return candidatas;
         }
 
         /// <summary>

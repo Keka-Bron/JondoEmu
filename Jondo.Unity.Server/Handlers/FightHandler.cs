@@ -3273,6 +3273,36 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var c in consecuencias)
             {
+                if (c.NestedDamage)
+                {
+                    Fighter animationCaster = c.AnimationCaster ?? c.Caster ?? quienLanza;
+                    var animationGrade = LimitesDeGrado(c.HechizoOrigen, c.NivelOrigen);
+                    if (animationGrade.LevelId > 0)
+                    {
+                        await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
+                            Network.FightProtocol.BuildAction(
+                                animationCaster.Id,
+                                Network.FightProtocol.Cast,
+                                Network.FightProtocol.CastAt(
+                                    animationCaster.Id, c.Sobre.Id, c.Sobre.CellId,
+                                    c.HechizoOrigen, animationGrade.LevelId,
+                                    c.CriticalDamage),
+                                Network.FightProtocol.CastDetail)));
+                        Program.LogDebug($"[Fight] Nested spell {c.HechizoOrigen} animation " +
+                                         $"{animationCaster.Id} -> {c.Sobre.Id} on cell " +
+                                         $"{c.Sobre.CellId} (level {animationGrade.LevelId}).");
+                    }
+
+                    int lifeBefore = c.Sobre.CurrentHP;
+                    await UnGolpeAsync(
+                        stream, fight, c.Caster ?? quienLanza, c.HechizoOrigen, c.Efecto,
+                        c.DamageElement, c.Sobre, TirarElDado(c.Efecto), c.DamageDistance,
+                        c.CriticalDamage, c.DamageSpellBonus);
+                    if (c.Sobre.IsAlive && c.Sobre.CurrentHP != lifeBefore)
+                        await RefrescarLaVidaAsync(stream, fight, c.Sobre);
+                    continue;
+                }
+
                 if (c.Caracteristica == ActionPointsCharacteristic)
                 {
                     // TRAZA para medir la retirada de PA. Se apunta de qué a qué, con qué efecto
@@ -3767,7 +3797,7 @@ namespace Jondo.Unity.Server.Handlers
                                                Fighter caster, int spell,
                                                Managers.SpellEffect efecto, int elemento,
                                                Fighter target, int sacadoDelDado, int lejosDelCentro,
-                                               bool critical)
+                                               bool critical, int? capturedSpellBonus = null)
         {
             // El elemento lo dice el catálogo: 0 neutral, 1 tierra, 2 fuego, 3 agua, 4 aire.
             var element = elemento switch
@@ -3796,7 +3826,8 @@ namespace Jondo.Unity.Server.Handlers
             // Y lo que le hayan sumado a ESE hechizo por embrujo: el efecto 293, "+#3 de daños
             // básicos". Flecha Helada se lo pone a sí misma, así que la segunda vez que se lanza
             // pega más que la primera.
-            int deEmbrujo = caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.DanoBase, fight.RoundNumber);
+            int deEmbrujo = capturedSpellBonus ?? caster.Buffs.DelHechizo(
+                spell, Jondo.Unity.World.Fights.SpellAspect.DanoBase, fight.RoundNumber);
             if (deEmbrujo != 0)
             {
                 baseDamage += deEmbrujo;
@@ -4986,6 +5017,53 @@ namespace Jondo.Unity.Server.Handlers
 
             _grades[(spellId, nivel)] = salida;
             return salida;
+        }
+
+        /// <summary>Exact hidden-spell grade used by chained cast animations.</summary>
+        private static LimitesDelHechizo LimitesDeGrado(int spellId, int grade)
+        {
+            int exactGrade = Math.Max(1, grade);
+            var cacheKey = (spellId, -exactGrade);
+            if (_grades.TryGetValue(cacheKey, out var known)) return known;
+
+            var result = new LimitesDelHechizo(0, 0, exactGrade, 0, 0, 0, 0, 0);
+            try
+            {
+                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
+                    DatabaseManager.WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT APCost, Id, Grade, MaxCastPerTurn, MaxCastPerTarget, " +
+                    "MinCastInterval, InitialCooldown, CriticalHitProbability, " +
+                    "MinRange, MaxRange FROM SpellLevels " +
+                    "WHERE SpellId = $id AND Grade = $grade LIMIT 1;";
+                command.Parameters.AddWithValue("$id", spellId);
+                command.Parameters.AddWithValue("$grade", exactGrade);
+
+                using var reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    result = new LimitesDelHechizo(
+                        (int)reader.GetInt64(0), (int)reader.GetInt64(1), (int)reader.GetInt64(2),
+                        reader.IsDBNull(3) ? 0 : (int)reader.GetInt64(3),
+                        reader.IsDBNull(4) ? 0 : (int)reader.GetInt64(4),
+                        reader.IsDBNull(5) ? 0 : (int)reader.GetInt64(5),
+                        reader.IsDBNull(6) ? 0 : (int)reader.GetInt64(6),
+                        reader.IsDBNull(7) ? 0 : (int)reader.GetInt64(7),
+                        reader.IsDBNull(8) ? 0 : (int)reader.GetInt64(8),
+                        reader.IsDBNull(9) ? 0 : (int)reader.GetInt64(9));
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[Fight] Could not read exact grade {exactGrade} of spell " +
+                                 $"{spellId}: {ex.Message}");
+            }
+
+            _grades[cacheKey] = result;
+            return result;
         }
 
         /// <summary>
