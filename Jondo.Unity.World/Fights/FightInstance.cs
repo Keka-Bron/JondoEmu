@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -271,6 +271,22 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>Ocho por bando: por debajo de esto no hay sitio para colocar dos equipos.</summary>
         public const int PlacesForBothTeams = 16;
+
+        /// <summary>
+        /// Las casillas de colocación tal cual, cuando el mapa ya las trae.
+        /// </summary>
+        /// <remarks>
+        /// Las arenas de koliseo las marcan en el propio cliente, bando por bando, así que ahí no
+        /// hay nada que repartir: <see cref="GeneratePlacementCells"/> parte una lista de casillas
+        /// pisables por la mitad porque en un arena corriente no hay otra cosa.
+        /// </remarks>
+        public void SetPlacementCells(IEnumerable<int> blue, IEnumerable<int> red)
+        {
+            BluePlacementCells.Clear();
+            RedPlacementCells.Clear();
+            BluePlacementCells.AddRange(blue);
+            RedPlacementCells.AddRange(red);
+        }
 
         public void GeneratePlacementCells(List<int> walkableCells)
         {

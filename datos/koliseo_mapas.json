@@ -1,0 +1,7080 @@
+{
+ "_comentario": [
+  "Los mapas de koliseo, sacados del cliente 3.6.10.11 con tools/extraer_mapas_koliseo.py.",
+  "Las tres subareas de koliseo son la 885 (Duelo), la 1122 (Equipos) y la 1123 (Entrenamiento);",
+  "el nombre sale de resolver su nameId contra Translations, por eso buscar el texto no da nada.",
+  "",
+  "rojas y azules son las casillas de colocacion que el propio cliente marca en cellsData[].",
+  "Comprobadas contra el kba del servidor real en el mapa 233308168 de la captura del 2 contra 2:",
+  "f1 = rojas, f2 = azules, los mismos conjuntos.",
+  "",
+  "La capacidad de un mapa es el minimo de las dos listas: es lo que decide a que modalidad sirve.",
+  "Las de Duelo son pequenas -77 de 85 no admiten tres por bando- y las de Equipos nunca bajan de 4."
+ ],
+ "mapas": [
+  {
+   "id": 177471490,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena II",
+   "rojas": [
+    189,
+    262
+   ],
+   "azules": [
+    395,
+    467
+   ]
+  },
+  {
+   "id": 177471494,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    172
+   ],
+   "azules": [
+    429
+   ]
+  },
+  {
+   "id": 177471498,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XIV",
+   "rojas": [
+    430
+   ],
+   "azules": [
+    228
+   ]
+  },
+  {
+   "id": 177471502,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    428,
+    459
+   ],
+   "azules": [
+    225,
+    256
+   ]
+  },
+  {
+   "id": 177472514,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena III",
+   "rojas": [
+    276,
+    401
+   ],
+   "azules": [
+    173,
+    297
+   ]
+  },
+  {
+   "id": 177472518,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    368
+   ]
+  },
+  {
+   "id": 177472522,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XV",
+   "rojas": [
+    160,
+    245
+   ],
+   "azules": [
+    411,
+    496
+   ]
+  },
+  {
+   "id": 177472526,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    312,
+    367
+   ],
+   "azules": [
+    178,
+    233
+   ]
+  },
+  {
+   "id": 177473538,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena IV",
+   "rojas": [
+    426
+   ],
+   "azules": [
+    217
+   ]
+  },
+  {
+   "id": 177473542,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    332,
+    458
+   ],
+   "azules": [
+    116,
+    241
+   ]
+  },
+  {
+   "id": 177473546,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XVI",
+   "rojas": [
+    353,
+    423
+   ],
+   "azules": [
+    220,
+    290
+   ]
+  },
+  {
+   "id": 177473550,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    311
+   ],
+   "azules": [
+    332
+   ]
+  },
+  {
+   "id": 177474562,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena V",
+   "rojas": [
+    262,
+    400
+   ],
+   "azules": [
+    174,
+    312
+   ]
+  },
+  {
+   "id": 177474566,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    376,
+    484
+   ],
+   "azules": [
+    173,
+    281
+   ]
+  },
+  {
+   "id": 177474570,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XVII",
+   "rojas": [
+    197,
+    310
+   ],
+   "azules": [
+    207,
+    320
+   ]
+  },
+  {
+   "id": 177474574,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    412,
+    472
+   ],
+   "azules": [
+    185,
+    245
+   ]
+  },
+  {
+   "id": 177475586,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena VI",
+   "rojas": [
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441
+   ]
+  },
+  {
+   "id": 177475594,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XVIII",
+   "rojas": [
+    146,
+    185
+   ],
+   "azules": [
+    387,
+    427
+   ]
+  },
+  {
+   "id": 177476610,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena VII",
+   "rojas": [
+    409,
+    412
+   ],
+   "azules": [
+    188,
+    191
+   ]
+  },
+  {
+   "id": 177476614,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    480
+   ]
+  },
+  {
+   "id": 177476618,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XIX",
+   "rojas": [
+    235,
+    468
+   ],
+   "azules": [
+    105,
+    339
+   ]
+  },
+  {
+   "id": 177477642,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    452,
+    457
+   ],
+   "azules": [
+    228,
+    233
+   ]
+  },
+  {
+   "id": 177478658,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena IX",
+   "rojas": [
+    225,
+    270
+   ],
+   "azules": [
+    415,
+    515
+   ]
+  },
+  {
+   "id": 177478662,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XX",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    399
+   ]
+  },
+  {
+   "id": 177478666,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    325,
+    396
+   ],
+   "azules": [
+    177,
+    247
+   ]
+  },
+  {
+   "id": 177479686,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XXI",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    483
+   ]
+  },
+  {
+   "id": 177479690,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    430,
+    469
+   ],
+   "azules": [
+    244,
+    284
+   ]
+  },
+  {
+   "id": 177480706,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XI",
+   "rojas": [
+    148
+   ],
+   "azules": [
+    411
+   ]
+  },
+  {
+   "id": 177480710,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    467
+   ],
+   "azules": [
+    218
+   ]
+  },
+  {
+   "id": 177480714,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    276
+   ],
+   "azules": [
+    241
+   ]
+  },
+  {
+   "id": 177481730,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XII",
+   "rojas": [
+    174,
+    185,
+    255
+   ],
+   "azules": [
+    304,
+    374,
+    385
+   ]
+  },
+  {
+   "id": 177481734,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    366,
+    396,
+    453
+   ],
+   "azules": [
+    148,
+    205,
+    235
+   ]
+  },
+  {
+   "id": 177481738,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    439
+   ],
+   "azules": [
+    206
+   ]
+  },
+  {
+   "id": 177482758,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    443
+   ],
+   "azules": [
+    284
+   ]
+  },
+  {
+   "id": 177482762,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    149
+   ],
+   "azules": [
+    424
+   ]
+  },
+  {
+   "id": 177483786,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    148
+   ],
+   "azules": [
+    454
+   ]
+  },
+  {
+   "id": 177603586,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena I",
+   "rojas": [
+    291
+   ],
+   "azules": [
+    240
+   ]
+  },
+  {
+   "id": 177603590,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    135,
+    202
+   ],
+   "azules": [
+    371,
+    437
+   ]
+  },
+  {
+   "id": 177603594,
+   "subarea": 885,
+   "nombre": "Kolossium Duel - Arena XIII",
+   "rojas": [
+    215,
+    305
+   ],
+   "azules": [
+    379,
+    469
+   ]
+  },
+  {
+   "id": 177603598,
+   "subarea": 885,
+   "nombre": "",
+   "rojas": [
+    397
+   ],
+   "azules": [
+    177
+   ]
+  },
+  {
+   "id": 177603602,
+   "subarea": 885,
+   "nombre": "54 - Chaos Clock (Duel)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 177471488,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XIX",
+   "rojas": [
+    188,
+    189,
+    234,
+    262,
+    333
+   ],
+   "azules": [
+    323,
+    395,
+    423,
+    467,
+    468
+   ]
+  },
+  {
+   "id": 177471492,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    132,
+    150,
+    201,
+    204,
+    244,
+    296
+   ],
+   "azules": [
+    304,
+    356,
+    397,
+    400,
+    451,
+    468
+   ]
+  },
+  {
+   "id": 177471496,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXI",
+   "rojas": [
+    348,
+    383,
+    413,
+    416,
+    469
+   ],
+   "azules": [
+    188,
+    241,
+    244,
+    274,
+    310
+   ]
+  },
+  {
+   "id": 177471500,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    373,
+    428,
+    440,
+    459,
+    485
+   ],
+   "azules": [
+    199,
+    225,
+    243,
+    256,
+    311
+   ]
+  },
+  {
+   "id": 177472512,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XX",
+   "rojas": [
+    221,
+    249,
+    304,
+    333,
+    401
+   ],
+   "azules": [
+    173,
+    240,
+    269,
+    324,
+    352
+   ]
+  },
+  {
+   "id": 177472516,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    91,
+    177,
+    220,
+    231
+   ],
+   "azules": [
+    314,
+    324,
+    368,
+    454
+   ]
+  },
+  {
+   "id": 177472520,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXII",
+   "rojas": [
+    146,
+    246,
+    277,
+    331,
+    389
+   ],
+   "azules": [
+    267,
+    325,
+    379,
+    410,
+    511
+   ]
+  },
+  {
+   "id": 177472524,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    297,
+    369,
+    370,
+    408,
+    467
+   ],
+   "azules": [
+    77,
+    136,
+    175,
+    176,
+    247
+   ]
+  },
+  {
+   "id": 177473536,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXI",
+   "rojas": [
+    159,
+    216,
+    242,
+    256,
+    281,
+    311
+   ],
+   "azules": [
+    332,
+    362,
+    387,
+    401,
+    427,
+    484
+   ]
+  },
+  {
+   "id": 177473540,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    62,
+    135,
+    188,
+    208,
+    290
+   ],
+   "azules": [
+    284,
+    366,
+    385,
+    438,
+    512
+   ]
+  },
+  {
+   "id": 177473544,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXIII",
+   "rojas": [
+    215,
+    240,
+    270,
+    325,
+    380
+   ],
+   "azules": [
+    263,
+    318,
+    373,
+    403,
+    428
+   ]
+  },
+  {
+   "id": 177473548,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    213,
+    215,
+    217,
+    283,
+    339
+   ],
+   "azules": [
+    304,
+    360,
+    426,
+    428,
+    430
+   ]
+  },
+  {
+   "id": 177474560,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXII",
+   "rojas": [
+    248,
+    275,
+    375,
+    400,
+    401,
+    411
+   ],
+   "azules": [
+    162,
+    173,
+    174,
+    199,
+    298,
+    325
+   ]
+  },
+  {
+   "id": 177474564,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    147,
+    188,
+    219,
+    275,
+    301,
+    348
+   ],
+   "azules": [
+    309,
+    355,
+    381,
+    437,
+    468,
+    510
+   ]
+  },
+  {
+   "id": 177474568,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXIV",
+   "rojas": [
+    130,
+    133,
+    183,
+    213,
+    268
+   ],
+   "azules": [
+    248,
+    303,
+    333,
+    383,
+    386
+   ]
+  },
+  {
+   "id": 177474572,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    412,
+    424,
+    469,
+    472,
+    510
+   ],
+   "azules": [
+    148,
+    185,
+    188,
+    234,
+    245
+   ]
+  },
+  {
+   "id": 177475584,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXIII",
+   "rojas": [
+    229,
+    244,
+    257,
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441,
+    457,
+    469,
+    485
+   ]
+  },
+  {
+   "id": 177475588,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    215,
+    217,
+    304,
+    329,
+    403
+   ],
+   "azules": [
+    215,
+    310,
+    383,
+    408,
+    495,
+    497
+   ]
+  },
+  {
+   "id": 177475592,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXV",
+   "rojas": [
+    146,
+    147,
+    185,
+    191,
+    199
+   ],
+   "azules": [
+    374,
+    381,
+    387,
+    426,
+    427
+   ]
+  },
+  {
+   "id": 177476608,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXIV",
+   "rojas": [
+    341,
+    386,
+    409,
+    412,
+    481
+   ],
+   "azules": [
+    120,
+    188,
+    191,
+    214,
+    260
+   ]
+  },
+  {
+   "id": 177476612,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    160,
+    177,
+    245,
+    249,
+    303,
+    389
+   ],
+   "azules": [
+    267,
+    353,
+    407,
+    411,
+    480,
+    496
+   ]
+  },
+  {
+   "id": 177476616,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXVI",
+   "rojas": [
+    235,
+    317,
+    347,
+    372,
+    455
+   ],
+   "azules": [
+    119,
+    202,
+    227,
+    257,
+    339
+   ]
+  },
+  {
+   "id": 177477632,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXV",
+   "rojas": [
+    292,
+    320,
+    387,
+    389,
+    413
+   ],
+   "azules": [
+    160,
+    184,
+    186,
+    254,
+    282
+   ]
+  },
+  {
+   "id": 177477640,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    437,
+    443,
+    466,
+    470,
+    496
+   ],
+   "azules": [
+    188,
+    214,
+    218,
+    241,
+    247
+   ]
+  },
+  {
+   "id": 177478656,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXVI",
+   "rojas": [
+    185,
+    210,
+    259,
+    270,
+    309,
+    379
+   ],
+   "azules": [
+    346,
+    415,
+    446,
+    495,
+    512,
+    529
+   ]
+  },
+  {
+   "id": 177478660,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXVII",
+   "rojas": [
+    91,
+    147,
+    160,
+    162,
+    200
+   ],
+   "azules": [
+    346,
+    383,
+    385,
+    399,
+    455
+   ]
+  },
+  {
+   "id": 177478664,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    199,
+    282,
+    283,
+    285,
+    311,
+    396
+   ],
+   "azules": [
+    177,
+    262,
+    288,
+    290,
+    291,
+    374
+   ]
+  },
+  {
+   "id": 177479680,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXVII",
+   "rojas": [
+    317,
+    401,
+    413,
+    431,
+    439,
+    470
+   ],
+   "azules": [
+    130,
+    161,
+    170,
+    187,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 177479684,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXXVIII",
+   "rojas": [
+    160,
+    161,
+    201,
+    205,
+    214,
+    287
+   ],
+   "azules": [
+    343,
+    415,
+    425,
+    429,
+    468,
+    469
+   ]
+  },
+  {
+   "id": 177479688,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    424,
+    438,
+    443,
+    469,
+    483
+   ],
+   "azules": [
+    231,
+    244,
+    270,
+    275,
+    290
+   ]
+  },
+  {
+   "id": 177480704,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXVIII",
+   "rojas": [
+    146,
+    149,
+    163,
+    234,
+    248
+   ],
+   "azules": [
+    311,
+    325,
+    396,
+    410,
+    413
+   ]
+  },
+  {
+   "id": 177480708,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    389,
+    402,
+    412,
+    457,
+    468
+   ],
+   "azules": [
+    217,
+    229,
+    273,
+    284,
+    296
+   ]
+  },
+  {
+   "id": 177480712,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    236,
+    276,
+    290,
+    357,
+    371
+   ],
+   "azules": [
+    147,
+    160,
+    228,
+    241,
+    282
+   ]
+  },
+  {
+   "id": 177481728,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXIX",
+   "rojas": [
+    173,
+    174,
+    185,
+    227,
+    255
+   ],
+   "azules": [
+    304,
+    332,
+    374,
+    385,
+    386
+   ]
+  },
+  {
+   "id": 177481732,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    255,
+    366,
+    396,
+    398,
+    453
+   ],
+   "azules": [
+    148,
+    203,
+    205,
+    235,
+    346
+   ]
+  },
+  {
+   "id": 177481736,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    369,
+    423,
+    439,
+    467
+   ],
+   "azules": [
+    178,
+    206,
+    222,
+    276
+   ]
+  },
+  {
+   "id": 177482756,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    348,
+    388,
+    439,
+    443,
+    511
+   ],
+   "azules": [
+    216,
+    284,
+    288,
+    339,
+    379
+   ]
+  },
+  {
+   "id": 177482760,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    149,
+    160,
+    163,
+    231,
+    233
+   ],
+   "azules": [
+    340,
+    342,
+    409,
+    412,
+    424
+   ]
+  },
+  {
+   "id": 177483784,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    144,
+    146,
+    148,
+    150,
+    203
+   ],
+   "azules": [
+    399,
+    452,
+    454,
+    456,
+    458
+   ]
+  },
+  {
+   "id": 177603584,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XVIII",
+   "rojas": [
+    240,
+    324,
+    343,
+    411,
+    414
+   ],
+   "azules": [
+    117,
+    120,
+    188,
+    207,
+    240,
+    291
+   ]
+  },
+  {
+   "id": 177603588,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    105,
+    118,
+    135,
+    202,
+    217
+   ],
+   "azules": [
+    355,
+    371,
+    437,
+    455,
+    467
+   ]
+  },
+  {
+   "id": 177603592,
+   "subarea": 1122,
+   "nombre": "Tournament - Arena XXX",
+   "rojas": [
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455
+   ]
+  },
+  {
+   "id": 177603596,
+   "subarea": 1122,
+   "nombre": "",
+   "rojas": [
+    284,
+    327,
+    385,
+    397,
+    426
+   ],
+   "azules": [
+    148,
+    177,
+    188,
+    246,
+    290
+   ]
+  },
+  {
+   "id": 177603600,
+   "subarea": 1122,
+   "nombre": "54 - Chaos Clock (Teams)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 230162945,
+   "subarea": 1123,
+   "nombre": "A11 - Cracklers (Teams)",
+   "rojas": [
+    240,
+    324,
+    343,
+    411,
+    414
+   ],
+   "azules": [
+    117,
+    120,
+    188,
+    207,
+    291
+   ]
+  },
+  {
+   "id": 230162947,
+   "subarea": 1123,
+   "nombre": "A11 - Cracklers (Duel)",
+   "rojas": [
+    291
+   ],
+   "azules": [
+    240
+   ]
+  },
+  {
+   "id": 230162949,
+   "subarea": 1123,
+   "nombre": "A23 - Dragon Pig I (Teams)",
+   "rojas": [
+    105,
+    118,
+    135,
+    202,
+    217
+   ],
+   "azules": [
+    355,
+    371,
+    437,
+    455,
+    467
+   ]
+  },
+  {
+   "id": 230162951,
+   "subarea": 1123,
+   "nombre": "A23 - Dragon Pig I (Duel)",
+   "rojas": [
+    135,
+    202
+   ],
+   "azules": [
+    371,
+    437
+   ]
+  },
+  {
+   "id": 230162953,
+   "subarea": 1123,
+   "nombre": "A35 - The Possessed I (Teams)",
+   "rojas": [
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455
+   ]
+  },
+  {
+   "id": 230162955,
+   "subarea": 1123,
+   "nombre": "A35 - The Possessed I (Duel)",
+   "rojas": [
+    215,
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455,
+    469
+   ]
+  },
+  {
+   "id": 230162957,
+   "subarea": 1123,
+   "nombre": "A47 - Dopples (Teams)",
+   "rojas": [
+    284,
+    327,
+    385,
+    397,
+    426
+   ],
+   "azules": [
+    148,
+    177,
+    188,
+    246,
+    290
+   ]
+  },
+  {
+   "id": 230162959,
+   "subarea": 1123,
+   "nombre": "A47 - Dopples (Duel)",
+   "rojas": [
+    397
+   ],
+   "azules": [
+    177
+   ]
+  },
+  {
+   "id": 230162961,
+   "subarea": 1123,
+   "nombre": "A54 - Chaos Clock (Teams)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 230162963,
+   "subarea": 1123,
+   "nombre": "A54 - Chaos Clock (Duel)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 230163969,
+   "subarea": 1123,
+   "nombre": "A12 - Ecaflipus (Teams)",
+   "rojas": [
+    188,
+    189,
+    234,
+    262,
+    333
+   ],
+   "azules": [
+    323,
+    395,
+    423,
+    467,
+    468
+   ]
+  },
+  {
+   "id": 230163971,
+   "subarea": 1123,
+   "nombre": "A12 - Ecaflipus (Duel)",
+   "rojas": [
+    189,
+    262
+   ],
+   "azules": [
+    395,
+    467
+   ]
+  },
+  {
+   "id": 230163973,
+   "subarea": 1123,
+   "nombre": "A25 - Kolossium (Teams)",
+   "rojas": [
+    132,
+    150,
+    201,
+    204,
+    244,
+    296
+   ],
+   "azules": [
+    304,
+    356,
+    397,
+    400,
+    451,
+    468
+   ]
+  },
+  {
+   "id": 230163975,
+   "subarea": 1123,
+   "nombre": "A25 - Kolossium (Duel)",
+   "rojas": [
+    172
+   ],
+   "azules": [
+    429
+   ]
+  },
+  {
+   "id": 230163977,
+   "subarea": 1123,
+   "nombre": "A36 - The Possessed II (Teams)",
+   "rojas": [
+    348,
+    383,
+    413,
+    416,
+    469
+   ],
+   "azules": [
+    188,
+    241,
+    244,
+    274,
+    310
+   ]
+  },
+  {
+   "id": 230163979,
+   "subarea": 1123,
+   "nombre": "A36 - The Possessed II (Duel)",
+   "rojas": [
+    430
+   ],
+   "azules": [
+    228
+   ]
+  },
+  {
+   "id": 230163981,
+   "subarea": 1123,
+   "nombre": "A48 - Sidekicks (Teams)",
+   "rojas": [
+    373,
+    428,
+    440,
+    459,
+    485
+   ],
+   "azules": [
+    199,
+    225,
+    243,
+    256,
+    311
+   ]
+  },
+  {
+   "id": 230163983,
+   "subarea": 1123,
+   "nombre": "A48 - Sidekicks (Duel)",
+   "rojas": [
+    428,
+    459
+   ],
+   "azules": [
+    225,
+    256
+   ]
+  },
+  {
+   "id": 230164993,
+   "subarea": 1123,
+   "nombre": "A13 - Sufokia (Teams)",
+   "rojas": [
+    221,
+    249,
+    304,
+    333,
+    401
+   ],
+   "azules": [
+    173,
+    240,
+    269,
+    324,
+    352
+   ]
+  },
+  {
+   "id": 230164995,
+   "subarea": 1123,
+   "nombre": "A13 - Sufokia (Duel)",
+   "rojas": [
+    276,
+    401
+   ],
+   "azules": [
+    173,
+    297
+   ]
+  },
+  {
+   "id": 230164997,
+   "subarea": 1123,
+   "nombre": "A26 - Cemetery (Teams)",
+   "rojas": [
+    91,
+    177,
+    220,
+    231
+   ],
+   "azules": [
+    314,
+    324,
+    368,
+    454
+   ]
+  },
+  {
+   "id": 230164999,
+   "subarea": 1123,
+   "nombre": "A26 - Cemetery (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    368
+   ]
+  },
+  {
+   "id": 230165001,
+   "subarea": 1123,
+   "nombre": "A37 - The Possessed III (Teams)",
+   "rojas": [
+    146,
+    246,
+    277,
+    331,
+    389
+   ],
+   "azules": [
+    267,
+    325,
+    379,
+    410,
+    511
+   ]
+  },
+  {
+   "id": 230165003,
+   "subarea": 1123,
+   "nombre": "A37 - The Possessed III (Duel)",
+   "rojas": [
+    160,
+    245
+   ],
+   "azules": [
+    411,
+    496
+   ]
+  },
+  {
+   "id": 230165005,
+   "subarea": 1123,
+   "nombre": "A49 - Koalaks (Teams)",
+   "rojas": [
+    297,
+    369,
+    370,
+    408,
+    467
+   ],
+   "azules": [
+    77,
+    136,
+    175,
+    176,
+    247
+   ]
+  },
+  {
+   "id": 230165007,
+   "subarea": 1123,
+   "nombre": "A49 - Koalaks (Duel)",
+   "rojas": [
+    367
+   ],
+   "azules": [
+    178
+   ]
+  },
+  {
+   "id": 230166017,
+   "subarea": 1123,
+   "nombre": "A14 - Aerdala (Teams)",
+   "rojas": [
+    159,
+    216,
+    242,
+    256,
+    281,
+    311
+   ],
+   "azules": [
+    332,
+    362,
+    387,
+    401,
+    427,
+    484
+   ]
+  },
+  {
+   "id": 230166019,
+   "subarea": 1123,
+   "nombre": "A14 - Aerdala (Duel)",
+   "rojas": [
+    426
+   ],
+   "azules": [
+    217
+   ]
+  },
+  {
+   "id": 230166021,
+   "subarea": 1123,
+   "nombre": "A27 - Kwismas (Teams)",
+   "rojas": [
+    62,
+    135,
+    188,
+    192,
+    208,
+    290
+   ],
+   "azules": [
+    284,
+    366,
+    381,
+    385,
+    438,
+    512
+   ]
+  },
+  {
+   "id": 230166023,
+   "subarea": 1123,
+   "nombre": "A27 - Kwismas (Duel)",
+   "rojas": [
+    332,
+    458
+   ],
+   "azules": [
+    116,
+    241
+   ]
+  },
+  {
+   "id": 230166025,
+   "subarea": 1123,
+   "nombre": "A38 - Wukin (Teams)",
+   "rojas": [
+    215,
+    240,
+    270,
+    325,
+    380
+   ],
+   "azules": [
+    263,
+    318,
+    373,
+    403,
+    428
+   ]
+  },
+  {
+   "id": 230166027,
+   "subarea": 1123,
+   "nombre": "A38 - Wukin (Duel)",
+   "rojas": [
+    353,
+    423
+   ],
+   "azules": [
+    220,
+    290
+   ]
+  },
+  {
+   "id": 230166029,
+   "subarea": 1123,
+   "nombre": "A50 - Sylargh (Teams)",
+   "rojas": [
+    213,
+    215,
+    217,
+    283,
+    339
+   ],
+   "azules": [
+    304,
+    360,
+    426,
+    428,
+    430
+   ]
+  },
+  {
+   "id": 230166031,
+   "subarea": 1123,
+   "nombre": "A50 - Sylargh (Duel)",
+   "rojas": [
+    311
+   ],
+   "azules": [
+    332
+   ]
+  },
+  {
+   "id": 230167041,
+   "subarea": 1123,
+   "nombre": "A15 - Moon (Teams)",
+   "rojas": [
+    248,
+    275,
+    375,
+    400,
+    401,
+    411
+   ],
+   "azules": [
+    162,
+    173,
+    174,
+    199,
+    298,
+    325
+   ]
+  },
+  {
+   "id": 230167043,
+   "subarea": 1123,
+   "nombre": "A15 - Moon (Duel)",
+   "rojas": [
+    262,
+    400
+   ],
+   "azules": [
+    174,
+    312
+   ]
+  },
+  {
+   "id": 230167045,
+   "subarea": 1123,
+   "nombre": "A24 - Dragon Pig II (Teams)",
+   "rojas": [
+    147,
+    188,
+    219,
+    275,
+    301,
+    348
+   ],
+   "azules": [
+    309,
+    355,
+    381,
+    437,
+    468,
+    510
+   ]
+  },
+  {
+   "id": 230167047,
+   "subarea": 1123,
+   "nombre": "A24 - Dragon Pig II (Duel)",
+   "rojas": [
+    376,
+    484
+   ],
+   "azules": [
+    173,
+    281
+   ]
+  },
+  {
+   "id": 230167049,
+   "subarea": 1123,
+   "nombre": "A39 - Wukang (Teams)",
+   "rojas": [
+    130,
+    133,
+    183,
+    213,
+    268
+   ],
+   "azules": [
+    248,
+    303,
+    333,
+    383,
+    386
+   ]
+  },
+  {
+   "id": 230167051,
+   "subarea": 1123,
+   "nombre": "A39 - Wukang (Duel)",
+   "rojas": [
+    197,
+    310
+   ],
+   "azules": [
+    207,
+    320
+   ]
+  },
+  {
+   "id": 230167053,
+   "subarea": 1123,
+   "nombre": "A51 - Solary (Teams)",
+   "rojas": [
+    412,
+    424,
+    469,
+    472,
+    510
+   ],
+   "azules": [
+    148,
+    185,
+    188,
+    234,
+    245
+   ]
+  },
+  {
+   "id": 230167055,
+   "subarea": 1123,
+   "nombre": "A51 - Solary (Duel)",
+   "rojas": [
+    412,
+    472
+   ],
+   "azules": [
+    185,
+    245
+   ]
+  },
+  {
+   "id": 230168065,
+   "subarea": 1123,
+   "nombre": "A16 - Srambad (Teams)",
+   "rojas": [
+    229,
+    244,
+    257,
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441,
+    457,
+    469,
+    485
+   ]
+  },
+  {
+   "id": 230168067,
+   "subarea": 1123,
+   "nombre": "A16 - Srambad (Duel)",
+   "rojas": [
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441
+   ]
+  },
+  {
+   "id": 230168069,
+   "subarea": 1123,
+   "nombre": "A28 - Ecaflip City (Teams)",
+   "rojas": [
+    215,
+    217,
+    304,
+    329,
+    403
+   ],
+   "azules": [
+    215,
+    310,
+    383,
+    408,
+    423,
+    495,
+    497
+   ]
+  },
+  {
+   "id": 230168071,
+   "subarea": 1123,
+   "nombre": "A28 - Ecaflip City (Duel)",
+   "rojas": [
+    497
+   ],
+   "azules": [
+    215
+   ]
+  },
+  {
+   "id": 230168073,
+   "subarea": 1123,
+   "nombre": "A40 - Bonta (Teams)",
+   "rojas": [
+    146,
+    147,
+    185,
+    191,
+    199
+   ],
+   "azules": [
+    374,
+    381,
+    387,
+    426,
+    427
+   ]
+  },
+  {
+   "id": 230168075,
+   "subarea": 1123,
+   "nombre": "A40 - Bonta (Duel)",
+   "rojas": [
+    146,
+    185
+   ],
+   "azules": [
+    387,
+    427
+   ]
+  },
+  {
+   "id": 230169089,
+   "subarea": 1123,
+   "nombre": "A17 - Sidimote I (Teams)",
+   "rojas": [
+    341,
+    386,
+    409,
+    412,
+    481
+   ],
+   "azules": [
+    120,
+    188,
+    191,
+    214,
+    260
+   ]
+  },
+  {
+   "id": 230169091,
+   "subarea": 1123,
+   "nombre": "A17 - Sidimote I (Duel)",
+   "rojas": [
+    409,
+    412
+   ],
+   "azules": [
+    188,
+    191
+   ]
+  },
+  {
+   "id": 230169093,
+   "subarea": 1123,
+   "nombre": "A29 - Xelorium (Teams)",
+   "rojas": [
+    160,
+    177,
+    245,
+    249,
+    303,
+    389
+   ],
+   "azules": [
+    267,
+    353,
+    407,
+    411,
+    480,
+    496
+   ]
+  },
+  {
+   "id": 230169095,
+   "subarea": 1123,
+   "nombre": "A29 - Xelorium (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    480
+   ]
+  },
+  {
+   "id": 230169097,
+   "subarea": 1123,
+   "nombre": "A41 - Brakmar (Teams)",
+   "rojas": [
+    235,
+    317,
+    347,
+    372,
+    455
+   ],
+   "azules": [
+    119,
+    202,
+    227,
+    257,
+    339
+   ]
+  },
+  {
+   "id": 230169099,
+   "subarea": 1123,
+   "nombre": "A41 - Brakmar (Duel)",
+   "rojas": [
+    235,
+    468
+   ],
+   "azules": [
+    105,
+    339
+   ]
+  },
+  {
+   "id": 230170113,
+   "subarea": 1123,
+   "nombre": "A18 - Sidimote II (Teams)",
+   "rojas": [
+    292,
+    320,
+    387,
+    389,
+    413
+   ],
+   "azules": [
+    160,
+    184,
+    186,
+    254,
+    282
+   ]
+  },
+  {
+   "id": 230170115,
+   "subarea": 1123,
+   "nombre": "A18 - Sidimote II (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    427
+   ]
+  },
+  {
+   "id": 230170117,
+   "subarea": 1123,
+   "nombre": "",
+   "rojas": [
+    136,
+    176,
+    202,
+    231,
+    262,
+    292
+   ],
+   "azules": [
+    338,
+    368,
+    399,
+    428,
+    454,
+    493
+   ]
+  },
+  {
+   "id": 230170121,
+   "subarea": 1123,
+   "nombre": "A42 - Belladonna (Teams)",
+   "rojas": [
+    437,
+    443,
+    466,
+    470,
+    496
+   ],
+   "azules": [
+    188,
+    214,
+    218,
+    241,
+    247
+   ]
+  },
+  {
+   "id": 230170123,
+   "subarea": 1123,
+   "nombre": "A42 - Belladonna (Duel)",
+   "rojas": [
+    452,
+    457
+   ],
+   "azules": [
+    228,
+    233
+   ]
+  },
+  {
+   "id": 230171137,
+   "subarea": 1123,
+   "nombre": "A19 - Incarnam (Teams)",
+   "rojas": [
+    185,
+    210,
+    259,
+    270,
+    309,
+    379
+   ],
+   "azules": [
+    346,
+    415,
+    446,
+    495,
+    512,
+    529
+   ]
+  },
+  {
+   "id": 230171139,
+   "subarea": 1123,
+   "nombre": "A19 - Incarnam (Duel)",
+   "rojas": [
+    225,
+    270
+   ],
+   "azules": [
+    415,
+    515
+   ]
+  },
+  {
+   "id": 230171141,
+   "subarea": 1123,
+   "nombre": "A30 - Last Hope (Teams)",
+   "rojas": [
+    91,
+    147,
+    160,
+    162,
+    200
+   ],
+   "azules": [
+    346,
+    383,
+    385,
+    399,
+    455
+   ]
+  },
+  {
+   "id": 230171143,
+   "subarea": 1123,
+   "nombre": "A30 - Last Hope (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    399
+   ]
+  },
+  {
+   "id": 230171145,
+   "subarea": 1123,
+   "nombre": "A43 - Ereboria (Teams)",
+   "rojas": [
+    199,
+    282,
+    283,
+    285,
+    311,
+    396
+   ],
+   "azules": [
+    177,
+    262,
+    288,
+    290,
+    291,
+    374
+   ]
+  },
+  {
+   "id": 230171147,
+   "subarea": 1123,
+   "nombre": "A43 - Ereboria (Duel)",
+   "rojas": [
+    325,
+    396
+   ],
+   "azules": [
+    177,
+    247
+   ]
+  },
+  {
+   "id": 230172161,
+   "subarea": 1123,
+   "nombre": "A20 - Ohwymi (Teams)",
+   "rojas": [
+    317,
+    401,
+    413,
+    431,
+    439,
+    470
+   ],
+   "azules": [
+    130,
+    161,
+    170,
+    187,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 230172163,
+   "subarea": 1123,
+   "nombre": "A20 - Ohwymi (Duel)",
+   "rojas": [
+    317,
+    401,
+    470
+   ],
+   "azules": [
+    130,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 230172165,
+   "subarea": 1123,
+   "nombre": "A31 - War (Teams)",
+   "rojas": [
+    160,
+    161,
+    201,
+    205,
+    214,
+    287
+   ],
+   "azules": [
+    343,
+    415,
+    425,
+    429,
+    468,
+    469
+   ]
+  },
+  {
+   "id": 230172167,
+   "subarea": 1123,
+   "nombre": "A31 - War (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    483
+   ]
+  },
+  {
+   "id": 230172169,
+   "subarea": 1123,
+   "nombre": "A44 - Ephedrya (Teams)",
+   "rojas": [
+    424,
+    438,
+    443,
+    469,
+    483
+   ],
+   "azules": [
+    231,
+    244,
+    270,
+    275,
+    290
+   ]
+  },
+  {
+   "id": 230172171,
+   "subarea": 1123,
+   "nombre": "A44 - Ephedrya (Duel)",
+   "rojas": [
+    430,
+    469
+   ],
+   "azules": [
+    244,
+    284
+   ]
+  },
+  {
+   "id": 230173185,
+   "subarea": 1123,
+   "nombre": "A21 - Fields (Teams)",
+   "rojas": [
+    146,
+    149,
+    163,
+    234,
+    248
+   ],
+   "azules": [
+    311,
+    325,
+    396,
+    410,
+    413
+   ]
+  },
+  {
+   "id": 230173187,
+   "subarea": 1123,
+   "nombre": "A21 - Fields (Duel)",
+   "rojas": [
+    148
+   ],
+   "azules": [
+    411
+   ]
+  },
+  {
+   "id": 230173189,
+   "subarea": 1123,
+   "nombre": "A32 - Amber (Teams)",
+   "rojas": [
+    389,
+    402,
+    412,
+    457,
+    468
+   ],
+   "azules": [
+    217,
+    229,
+    273,
+    284,
+    296
+   ]
+  },
+  {
+   "id": 230173191,
+   "subarea": 1123,
+   "nombre": "A32 - Amber (Duel)",
+   "rojas": [
+    467
+   ],
+   "azules": [
+    218
+   ]
+  },
+  {
+   "id": 230173193,
+   "subarea": 1123,
+   "nombre": "A45 - Albuera (Teams)",
+   "rojas": [
+    236,
+    276,
+    290,
+    357,
+    371
+   ],
+   "azules": [
+    147,
+    160,
+    228,
+    241,
+    282
+   ]
+  },
+  {
+   "id": 230173195,
+   "subarea": 1123,
+   "nombre": "A45 - Albuera (Duel)",
+   "rojas": [
+    276
+   ],
+   "azules": [
+    241
+   ]
+  },
+  {
+   "id": 230174209,
+   "subarea": 1123,
+   "nombre": "A22 - Freezammer (Teams)",
+   "rojas": [
+    173,
+    174,
+    185,
+    227,
+    255
+   ],
+   "azules": [
+    304,
+    332,
+    374,
+    385,
+    386
+   ]
+  },
+  {
+   "id": 230174211,
+   "subarea": 1123,
+   "nombre": "A22 - Freezammer (Duel)",
+   "rojas": [
+    174,
+    185,
+    255
+   ],
+   "azules": [
+    304,
+    374,
+    385
+   ]
+  },
+  {
+   "id": 230174213,
+   "subarea": 1123,
+   "nombre": "A33 - Crocuzko (Teams)",
+   "rojas": [
+    255,
+    366,
+    396,
+    398,
+    453
+   ],
+   "azules": [
+    148,
+    203,
+    205,
+    235,
+    346
+   ]
+  },
+  {
+   "id": 230174215,
+   "subarea": 1123,
+   "nombre": "A33 - Crocuzko (Duel)",
+   "rojas": [
+    366,
+    396,
+    453
+   ],
+   "azules": [
+    148,
+    205,
+    235
+   ]
+  },
+  {
+   "id": 230174217,
+   "subarea": 1123,
+   "nombre": "A46 - Tales (Teams)",
+   "rojas": [
+    369,
+    423,
+    439,
+    467
+   ],
+   "azules": [
+    178,
+    206,
+    222,
+    276
+   ]
+  },
+  {
+   "id": 230174219,
+   "subarea": 1123,
+   "nombre": "A46 - Tales (Duel)",
+   "rojas": [
+    439
+   ],
+   "azules": [
+    206
+   ]
+  },
+  {
+   "id": 230175237,
+   "subarea": 1123,
+   "nombre": "A34 - Pandawa (Teams)",
+   "rojas": [
+    348,
+    388,
+    439,
+    443,
+    511
+   ],
+   "azules": [
+    216,
+    284,
+    288,
+    339,
+    379
+   ]
+  },
+  {
+   "id": 230175239,
+   "subarea": 1123,
+   "nombre": "A34 - Pandawa (Duel)",
+   "rojas": [
+    443
+   ],
+   "azules": [
+    284
+   ]
+  },
+  {
+   "id": 230175241,
+   "subarea": 1123,
+   "nombre": "A52 - Gargandyas (Teams)",
+   "rojas": [
+    149,
+    160,
+    163,
+    231,
+    233
+   ],
+   "azules": [
+    340,
+    342,
+    409,
+    412,
+    424
+   ]
+  },
+  {
+   "id": 230175243,
+   "subarea": 1123,
+   "nombre": "A52 - Gargandyas (Duel)",
+   "rojas": [
+    149
+   ],
+   "azules": [
+    424
+   ]
+  },
+  {
+   "id": 230176265,
+   "subarea": 1123,
+   "nombre": "A53 - Gargandyas (Teams)",
+   "rojas": [
+    144,
+    146,
+    148,
+    150,
+    203
+   ],
+   "azules": [
+    399,
+    452,
+    454,
+    456,
+    458
+   ]
+  },
+  {
+   "id": 230176267,
+   "subarea": 1123,
+   "nombre": "A53 - Gargandyas (Duel)",
+   "rojas": [
+    148
+   ],
+   "azules": [
+    454
+   ]
+  },
+  {
+   "id": 230425089,
+   "subarea": 1123,
+   "nombre": "B11 - Cracklers (Teams)",
+   "rojas": [
+    240,
+    324,
+    343,
+    411,
+    414
+   ],
+   "azules": [
+    117,
+    120,
+    188,
+    207,
+    240,
+    291
+   ]
+  },
+  {
+   "id": 230425091,
+   "subarea": 1123,
+   "nombre": "B11 - Cracklers (Duel)",
+   "rojas": [
+    291
+   ],
+   "azules": [
+    240
+   ]
+  },
+  {
+   "id": 230425093,
+   "subarea": 1123,
+   "nombre": "B23 - Dragon Pig I (Teams)",
+   "rojas": [
+    105,
+    118,
+    135,
+    202,
+    217
+   ],
+   "azules": [
+    355,
+    371,
+    437,
+    455,
+    467
+   ]
+  },
+  {
+   "id": 230425095,
+   "subarea": 1123,
+   "nombre": "B23 - Dragon Pig I (Duel)",
+   "rojas": [
+    135,
+    202
+   ],
+   "azules": [
+    371,
+    437
+   ]
+  },
+  {
+   "id": 230425097,
+   "subarea": 1123,
+   "nombre": "B35 - The Possessed I (Teams)",
+   "rojas": [
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455
+   ]
+  },
+  {
+   "id": 230425099,
+   "subarea": 1123,
+   "nombre": "B35 - The Possessed I (Duel)",
+   "rojas": [
+    215,
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455,
+    469
+   ]
+  },
+  {
+   "id": 230425101,
+   "subarea": 1123,
+   "nombre": "B47 - Dopples (Teams)",
+   "rojas": [
+    284,
+    327,
+    385,
+    397,
+    426
+   ],
+   "azules": [
+    148,
+    177,
+    188,
+    246,
+    290
+   ]
+  },
+  {
+   "id": 230425103,
+   "subarea": 1123,
+   "nombre": "B47 - Dopples (Duel)",
+   "rojas": [
+    397
+   ],
+   "azules": [
+    177
+   ]
+  },
+  {
+   "id": 230425105,
+   "subarea": 1123,
+   "nombre": "B54 - Chaos Clock (Teams)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 230425107,
+   "subarea": 1123,
+   "nombre": "B54 - Chaos Clock (Duel)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 230426113,
+   "subarea": 1123,
+   "nombre": "B12 - Ecaflipus (Teams)",
+   "rojas": [
+    188,
+    189,
+    234,
+    262,
+    333
+   ],
+   "azules": [
+    323,
+    395,
+    423,
+    467,
+    468
+   ]
+  },
+  {
+   "id": 230426115,
+   "subarea": 1123,
+   "nombre": "B12 - Ecaflipus (Duel)",
+   "rojas": [
+    189,
+    262
+   ],
+   "azules": [
+    395,
+    467
+   ]
+  },
+  {
+   "id": 230426117,
+   "subarea": 1123,
+   "nombre": "B25 - Kolossium (Teams)",
+   "rojas": [
+    132,
+    150,
+    201,
+    204,
+    244,
+    296
+   ],
+   "azules": [
+    304,
+    356,
+    397,
+    400,
+    451,
+    468
+   ]
+  },
+  {
+   "id": 230426119,
+   "subarea": 1123,
+   "nombre": "B25 - Kolossium (Duel)",
+   "rojas": [
+    172
+   ],
+   "azules": [
+    429
+   ]
+  },
+  {
+   "id": 230426121,
+   "subarea": 1123,
+   "nombre": "B36 - The Possessed II (Teams)",
+   "rojas": [
+    348,
+    383,
+    413,
+    416,
+    469
+   ],
+   "azules": [
+    188,
+    241,
+    244,
+    274,
+    310
+   ]
+  },
+  {
+   "id": 230426123,
+   "subarea": 1123,
+   "nombre": "B36 - The Possessed II (Duel)",
+   "rojas": [
+    430
+   ],
+   "azules": [
+    228,
+    275
+   ]
+  },
+  {
+   "id": 230426125,
+   "subarea": 1123,
+   "nombre": "B48 - Sidekicks (Teams)",
+   "rojas": [
+    373,
+    428,
+    440,
+    459,
+    485
+   ],
+   "azules": [
+    199,
+    225,
+    243,
+    256,
+    311
+   ]
+  },
+  {
+   "id": 230426127,
+   "subarea": 1123,
+   "nombre": "B48 - Sidekicks (Duel)",
+   "rojas": [
+    428,
+    459
+   ],
+   "azules": [
+    225,
+    256
+   ]
+  },
+  {
+   "id": 230427137,
+   "subarea": 1123,
+   "nombre": "B13 - Sufokia (Teams)",
+   "rojas": [
+    221,
+    249,
+    304,
+    333,
+    401
+   ],
+   "azules": [
+    173,
+    240,
+    269,
+    324,
+    352
+   ]
+  },
+  {
+   "id": 230427139,
+   "subarea": 1123,
+   "nombre": "B13 - Sufokia (Duel)",
+   "rojas": [
+    276,
+    401
+   ],
+   "azules": [
+    173,
+    297
+   ]
+  },
+  {
+   "id": 230427141,
+   "subarea": 1123,
+   "nombre": "B26 - Cemetery (Teams)",
+   "rojas": [
+    91,
+    177,
+    220,
+    231
+   ],
+   "azules": [
+    314,
+    324,
+    368,
+    454
+   ]
+  },
+  {
+   "id": 230427143,
+   "subarea": 1123,
+   "nombre": "B26 - Cemetery (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    368
+   ]
+  },
+  {
+   "id": 230427145,
+   "subarea": 1123,
+   "nombre": "B37 - The Possessed III (Teams)",
+   "rojas": [
+    146,
+    246,
+    277,
+    331,
+    389
+   ],
+   "azules": [
+    267,
+    325,
+    379,
+    410,
+    511
+   ]
+  },
+  {
+   "id": 230427147,
+   "subarea": 1123,
+   "nombre": "B37 - The Possessed III (Duel)",
+   "rojas": [
+    160,
+    245
+   ],
+   "azules": [
+    411,
+    496
+   ]
+  },
+  {
+   "id": 230427149,
+   "subarea": 1123,
+   "nombre": "B49 - Koalaks (Teams)",
+   "rojas": [
+    297,
+    369,
+    370,
+    408,
+    467
+   ],
+   "azules": [
+    77,
+    136,
+    175,
+    176,
+    247
+   ]
+  },
+  {
+   "id": 230427151,
+   "subarea": 1123,
+   "nombre": "B49 - Koalaks (Duel)",
+   "rojas": [
+    367
+   ],
+   "azules": [
+    178
+   ]
+  },
+  {
+   "id": 230428161,
+   "subarea": 1123,
+   "nombre": "B14 - Aerdala (Teams)",
+   "rojas": [
+    332,
+    362,
+    387,
+    401,
+    427,
+    484
+   ],
+   "azules": [
+    159,
+    216,
+    242,
+    256,
+    281,
+    311
+   ]
+  },
+  {
+   "id": 230428163,
+   "subarea": 1123,
+   "nombre": "B14 - Aerdala (Duel)",
+   "rojas": [
+    426
+   ],
+   "azules": [
+    217
+   ]
+  },
+  {
+   "id": 230428165,
+   "subarea": 1123,
+   "nombre": "B27 - Kwismas (Teams)",
+   "rojas": [
+    62,
+    135,
+    188,
+    192,
+    208,
+    290
+   ],
+   "azules": [
+    284,
+    366,
+    381,
+    385,
+    438,
+    512
+   ]
+  },
+  {
+   "id": 230428167,
+   "subarea": 1123,
+   "nombre": "B27 - Kwismas (Duel)",
+   "rojas": [
+    332,
+    458
+   ],
+   "azules": [
+    116,
+    241
+   ]
+  },
+  {
+   "id": 230428169,
+   "subarea": 1123,
+   "nombre": "B38 - Wukin (Teams)",
+   "rojas": [
+    215,
+    240,
+    270,
+    325,
+    380
+   ],
+   "azules": [
+    263,
+    318,
+    373,
+    403,
+    428
+   ]
+  },
+  {
+   "id": 230428171,
+   "subarea": 1123,
+   "nombre": "B38 - Wukin (Duel)",
+   "rojas": [
+    353,
+    423
+   ],
+   "azules": [
+    220,
+    290
+   ]
+  },
+  {
+   "id": 230428173,
+   "subarea": 1123,
+   "nombre": "B50 - Sylargh (Teams)",
+   "rojas": [
+    213,
+    215,
+    217,
+    283,
+    339
+   ],
+   "azules": [
+    304,
+    360,
+    426,
+    428,
+    430
+   ]
+  },
+  {
+   "id": 230428175,
+   "subarea": 1123,
+   "nombre": "B50 - Sylargh (Duel)",
+   "rojas": [
+    311
+   ],
+   "azules": [
+    332
+   ]
+  },
+  {
+   "id": 230429185,
+   "subarea": 1123,
+   "nombre": "B15 - Moon (Teams)",
+   "rojas": [
+    248,
+    275,
+    375,
+    400,
+    401,
+    411
+   ],
+   "azules": [
+    162,
+    173,
+    174,
+    199,
+    298,
+    325
+   ]
+  },
+  {
+   "id": 230429187,
+   "subarea": 1123,
+   "nombre": "B15 - Moon (Duel)",
+   "rojas": [
+    262,
+    400
+   ],
+   "azules": [
+    174,
+    312
+   ]
+  },
+  {
+   "id": 230429189,
+   "subarea": 1123,
+   "nombre": "B24 - Dragon Pig II (Teams)",
+   "rojas": [
+    147,
+    188,
+    219,
+    275,
+    301,
+    348
+   ],
+   "azules": [
+    309,
+    355,
+    381,
+    437,
+    468,
+    510
+   ]
+  },
+  {
+   "id": 230429191,
+   "subarea": 1123,
+   "nombre": "B24 - Dragon Pig II (Duel)",
+   "rojas": [
+    376,
+    484
+   ],
+   "azules": [
+    173,
+    281
+   ]
+  },
+  {
+   "id": 230429193,
+   "subarea": 1123,
+   "nombre": "B39 - Wukang (Teams)",
+   "rojas": [
+    130,
+    133,
+    183,
+    213,
+    268
+   ],
+   "azules": [
+    248,
+    303,
+    333,
+    383,
+    386
+   ]
+  },
+  {
+   "id": 230429195,
+   "subarea": 1123,
+   "nombre": "B39 - Wukang (Duel)",
+   "rojas": [
+    197,
+    310
+   ],
+   "azules": [
+    207,
+    320
+   ]
+  },
+  {
+   "id": 230429197,
+   "subarea": 1123,
+   "nombre": "B51 - Solary (Teams)",
+   "rojas": [
+    412,
+    424,
+    469,
+    472,
+    510
+   ],
+   "azules": [
+    148,
+    185,
+    188,
+    234,
+    245
+   ]
+  },
+  {
+   "id": 230429199,
+   "subarea": 1123,
+   "nombre": "B51 - Solary (Duel)",
+   "rojas": [
+    412,
+    472
+   ],
+   "azules": [
+    185,
+    245
+   ]
+  },
+  {
+   "id": 230430209,
+   "subarea": 1123,
+   "nombre": "B16 - Srambad (Teams)",
+   "rojas": [
+    229,
+    244,
+    257,
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441,
+    457,
+    469,
+    485
+   ]
+  },
+  {
+   "id": 230430211,
+   "subarea": 1123,
+   "nombre": "B16 - Srambad (Duel)",
+   "rojas": [
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441
+   ]
+  },
+  {
+   "id": 230430213,
+   "subarea": 1123,
+   "nombre": "B28 - Ecaflip City (Teams)",
+   "rojas": [
+    215,
+    217,
+    304,
+    329,
+    403
+   ],
+   "azules": [
+    215,
+    310,
+    383,
+    408,
+    423,
+    495,
+    497
+   ]
+  },
+  {
+   "id": 230430215,
+   "subarea": 1123,
+   "nombre": "B28 - Ecaflip City (Duel)",
+   "rojas": [
+    497
+   ],
+   "azules": [
+    215
+   ]
+  },
+  {
+   "id": 230430217,
+   "subarea": 1123,
+   "nombre": "B40 - Bonta (Teams)",
+   "rojas": [
+    146,
+    147,
+    185,
+    191,
+    199
+   ],
+   "azules": [
+    374,
+    381,
+    387,
+    426,
+    427
+   ]
+  },
+  {
+   "id": 230430219,
+   "subarea": 1123,
+   "nombre": "B40 - Bonta (Duel)",
+   "rojas": [
+    146,
+    185
+   ],
+   "azules": [
+    387,
+    427
+   ]
+  },
+  {
+   "id": 230431233,
+   "subarea": 1123,
+   "nombre": "B17 - Sidimote I (Teams)",
+   "rojas": [
+    341,
+    386,
+    409,
+    412,
+    481
+   ],
+   "azules": [
+    120,
+    188,
+    191,
+    214,
+    260
+   ]
+  },
+  {
+   "id": 230431235,
+   "subarea": 1123,
+   "nombre": "B17 - Sidimote I (Duel)",
+   "rojas": [
+    409,
+    412
+   ],
+   "azules": [
+    188,
+    191
+   ]
+  },
+  {
+   "id": 230431237,
+   "subarea": 1123,
+   "nombre": "B29 - Xelorium (Teams)",
+   "rojas": [
+    160,
+    177,
+    245,
+    249,
+    303,
+    389
+   ],
+   "azules": [
+    267,
+    353,
+    407,
+    411,
+    480,
+    496
+   ]
+  },
+  {
+   "id": 230431239,
+   "subarea": 1123,
+   "nombre": "B29 - Xelorium (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    480
+   ]
+  },
+  {
+   "id": 230431241,
+   "subarea": 1123,
+   "nombre": "B41 - Brakmar (Teams)",
+   "rojas": [
+    235,
+    317,
+    347,
+    372,
+    455
+   ],
+   "azules": [
+    119,
+    202,
+    227,
+    257,
+    339
+   ]
+  },
+  {
+   "id": 230431243,
+   "subarea": 1123,
+   "nombre": "B41 - Brakmar (Duel)",
+   "rojas": [
+    235,
+    468
+   ],
+   "azules": [
+    105,
+    339
+   ]
+  },
+  {
+   "id": 230432257,
+   "subarea": 1123,
+   "nombre": "B18 - Sidimote II (Teams)",
+   "rojas": [
+    292,
+    320,
+    387,
+    389,
+    413
+   ],
+   "azules": [
+    160,
+    184,
+    186,
+    254,
+    282
+   ]
+  },
+  {
+   "id": 230432259,
+   "subarea": 1123,
+   "nombre": "B18 - Sidimote II (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    427
+   ]
+  },
+  {
+   "id": 230432261,
+   "subarea": 1123,
+   "nombre": "",
+   "rojas": [
+    136,
+    176,
+    202,
+    231,
+    262,
+    292
+   ],
+   "azules": [
+    338,
+    368,
+    399,
+    428,
+    454,
+    493
+   ]
+  },
+  {
+   "id": 230432265,
+   "subarea": 1123,
+   "nombre": "B42 - Belladonna (Teams)",
+   "rojas": [
+    437,
+    443,
+    466,
+    470,
+    496
+   ],
+   "azules": [
+    188,
+    214,
+    218,
+    241,
+    247
+   ]
+  },
+  {
+   "id": 230432267,
+   "subarea": 1123,
+   "nombre": "B42 - Belladonna (Duel)",
+   "rojas": [
+    452,
+    457
+   ],
+   "azules": [
+    228,
+    233
+   ]
+  },
+  {
+   "id": 230433281,
+   "subarea": 1123,
+   "nombre": "B19 - Incarnam (Teams)",
+   "rojas": [
+    185,
+    210,
+    259,
+    270,
+    309,
+    379
+   ],
+   "azules": [
+    346,
+    415,
+    446,
+    495,
+    512,
+    529
+   ]
+  },
+  {
+   "id": 230433283,
+   "subarea": 1123,
+   "nombre": "B19 - Incarnam (Duel)",
+   "rojas": [
+    225,
+    270
+   ],
+   "azules": [
+    415,
+    515
+   ]
+  },
+  {
+   "id": 230433285,
+   "subarea": 1123,
+   "nombre": "B30 - Last Hope (Teams)",
+   "rojas": [
+    91,
+    147,
+    160,
+    162,
+    200
+   ],
+   "azules": [
+    346,
+    383,
+    385,
+    399,
+    455
+   ]
+  },
+  {
+   "id": 230433287,
+   "subarea": 1123,
+   "nombre": "B30 - Last Hope (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    399
+   ]
+  },
+  {
+   "id": 230433289,
+   "subarea": 1123,
+   "nombre": "B43 - Ereboria (Teams)",
+   "rojas": [
+    199,
+    282,
+    283,
+    285,
+    311,
+    396
+   ],
+   "azules": [
+    177,
+    262,
+    288,
+    290,
+    291,
+    374
+   ]
+  },
+  {
+   "id": 230433291,
+   "subarea": 1123,
+   "nombre": "B43 - Ereboria (Duel)",
+   "rojas": [
+    325,
+    396
+   ],
+   "azules": [
+    177,
+    247
+   ]
+  },
+  {
+   "id": 230434305,
+   "subarea": 1123,
+   "nombre": "B20 - Ohwymi (Teams)",
+   "rojas": [
+    317,
+    401,
+    413,
+    431,
+    439,
+    470
+   ],
+   "azules": [
+    130,
+    161,
+    170,
+    187,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 230434307,
+   "subarea": 1123,
+   "nombre": "B20 - Ohwymi (Duel)",
+   "rojas": [
+    317,
+    401,
+    470
+   ],
+   "azules": [
+    130,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 230434309,
+   "subarea": 1123,
+   "nombre": "B31 - War (Teams)",
+   "rojas": [
+    160,
+    161,
+    201,
+    205,
+    214,
+    287
+   ],
+   "azules": [
+    343,
+    415,
+    425,
+    429,
+    468,
+    469
+   ]
+  },
+  {
+   "id": 230434311,
+   "subarea": 1123,
+   "nombre": "B31 - War (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    483
+   ]
+  },
+  {
+   "id": 230434313,
+   "subarea": 1123,
+   "nombre": "B44 - Ephedrya (Teams)",
+   "rojas": [
+    424,
+    438,
+    443,
+    469,
+    483
+   ],
+   "azules": [
+    231,
+    244,
+    270,
+    275,
+    290
+   ]
+  },
+  {
+   "id": 230434315,
+   "subarea": 1123,
+   "nombre": "B44 - Ephedrya (Duel)",
+   "rojas": [
+    430,
+    469
+   ],
+   "azules": [
+    244,
+    284
+   ]
+  },
+  {
+   "id": 230435329,
+   "subarea": 1123,
+   "nombre": "B21 - Fields (Teams)",
+   "rojas": [
+    146,
+    149,
+    163,
+    234,
+    248
+   ],
+   "azules": [
+    311,
+    325,
+    396,
+    410,
+    413
+   ]
+  },
+  {
+   "id": 230435331,
+   "subarea": 1123,
+   "nombre": "B21 - Fields (Duel)",
+   "rojas": [
+    148
+   ],
+   "azules": [
+    411
+   ]
+  },
+  {
+   "id": 230435333,
+   "subarea": 1123,
+   "nombre": "B32 - Amber (Teams)",
+   "rojas": [
+    389,
+    402,
+    412,
+    457,
+    468
+   ],
+   "azules": [
+    217,
+    229,
+    273,
+    284,
+    296
+   ]
+  },
+  {
+   "id": 230435335,
+   "subarea": 1123,
+   "nombre": "B32 - Amber (Duel)",
+   "rojas": [
+    467
+   ],
+   "azules": [
+    218
+   ]
+  },
+  {
+   "id": 230435337,
+   "subarea": 1123,
+   "nombre": "B45 - Albuera (Teams)",
+   "rojas": [
+    236,
+    276,
+    290,
+    357,
+    371
+   ],
+   "azules": [
+    147,
+    160,
+    228,
+    241,
+    282
+   ]
+  },
+  {
+   "id": 230435339,
+   "subarea": 1123,
+   "nombre": "B45 - Albuera (Duel)",
+   "rojas": [
+    276
+   ],
+   "azules": [
+    241
+   ]
+  },
+  {
+   "id": 230436353,
+   "subarea": 1123,
+   "nombre": "B22 - Freezammer (Teams)",
+   "rojas": [
+    173,
+    174,
+    185,
+    227,
+    255
+   ],
+   "azules": [
+    304,
+    332,
+    374,
+    385,
+    386
+   ]
+  },
+  {
+   "id": 230436355,
+   "subarea": 1123,
+   "nombre": "B22 - Freezammer (Duel)",
+   "rojas": [
+    174,
+    185,
+    255
+   ],
+   "azules": [
+    304,
+    374,
+    385
+   ]
+  },
+  {
+   "id": 230436357,
+   "subarea": 1123,
+   "nombre": "B33 - Crocuzko (Teams)",
+   "rojas": [
+    255,
+    366,
+    396,
+    398,
+    453
+   ],
+   "azules": [
+    148,
+    203,
+    205,
+    235,
+    346
+   ]
+  },
+  {
+   "id": 230436359,
+   "subarea": 1123,
+   "nombre": "B33 - Crocuzko (Duel)",
+   "rojas": [
+    366,
+    396,
+    453
+   ],
+   "azules": [
+    148,
+    205,
+    235
+   ]
+  },
+  {
+   "id": 230436361,
+   "subarea": 1123,
+   "nombre": "B46 - Tales (Teams)",
+   "rojas": [
+    369,
+    423,
+    439,
+    467
+   ],
+   "azules": [
+    178,
+    206,
+    222,
+    276
+   ]
+  },
+  {
+   "id": 230436363,
+   "subarea": 1123,
+   "nombre": "B46 - Tales (Duel)",
+   "rojas": [
+    439
+   ],
+   "azules": [
+    206
+   ]
+  },
+  {
+   "id": 230437381,
+   "subarea": 1123,
+   "nombre": "B34 - Pandawa (Teams)",
+   "rojas": [
+    348,
+    388,
+    439,
+    443,
+    511
+   ],
+   "azules": [
+    216,
+    284,
+    288,
+    339,
+    379
+   ]
+  },
+  {
+   "id": 230437383,
+   "subarea": 1123,
+   "nombre": "B34 - Pandawa (Duel)",
+   "rojas": [
+    443
+   ],
+   "azules": [
+    284
+   ]
+  },
+  {
+   "id": 230437385,
+   "subarea": 1123,
+   "nombre": "B52 - Gargandyas (Teams)",
+   "rojas": [
+    149,
+    160,
+    163,
+    231,
+    233
+   ],
+   "azules": [
+    340,
+    342,
+    409,
+    412,
+    424
+   ]
+  },
+  {
+   "id": 230437387,
+   "subarea": 1123,
+   "nombre": "B52 - Gargandyas (Duel)",
+   "rojas": [
+    149
+   ],
+   "azules": [
+    424
+   ]
+  },
+  {
+   "id": 230438409,
+   "subarea": 1123,
+   "nombre": "B53 - Gargandyas (Teams)",
+   "rojas": [
+    129,
+    131,
+    133,
+    135,
+    188
+   ],
+   "azules": [
+    384,
+    437,
+    439,
+    441,
+    443
+   ]
+  },
+  {
+   "id": 230438411,
+   "subarea": 1123,
+   "nombre": "B53 - Gargandyas (Duel)",
+   "rojas": [
+    133
+   ],
+   "azules": [
+    439
+   ]
+  },
+  {
+   "id": 230687233,
+   "subarea": 1123,
+   "nombre": "C11 - Cracklers (Teams)",
+   "rojas": [
+    240,
+    324,
+    343,
+    411,
+    414
+   ],
+   "azules": [
+    117,
+    120,
+    188,
+    207,
+    291
+   ]
+  },
+  {
+   "id": 230687235,
+   "subarea": 1123,
+   "nombre": "C11 - Cracklers (Duel)",
+   "rojas": [
+    291
+   ],
+   "azules": [
+    240
+   ]
+  },
+  {
+   "id": 230687237,
+   "subarea": 1123,
+   "nombre": "C23 - Dragon Pig I (Teams)",
+   "rojas": [
+    105,
+    118,
+    135,
+    202,
+    217
+   ],
+   "azules": [
+    355,
+    371,
+    437,
+    455,
+    467
+   ]
+  },
+  {
+   "id": 230687239,
+   "subarea": 1123,
+   "nombre": "C23 - Dragon Pig I (Duel)",
+   "rojas": [
+    135,
+    202
+   ],
+   "azules": [
+    371,
+    437
+   ]
+  },
+  {
+   "id": 230687241,
+   "subarea": 1123,
+   "nombre": "C35 - The Possessed I (Teams)",
+   "rojas": [
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455
+   ]
+  },
+  {
+   "id": 230687243,
+   "subarea": 1123,
+   "nombre": "C35 - The Possessed I (Duel)",
+   "rojas": [
+    215,
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455,
+    469
+   ]
+  },
+  {
+   "id": 230687245,
+   "subarea": 1123,
+   "nombre": "C47 - Dopples (Teams)",
+   "rojas": [
+    284,
+    327,
+    385,
+    397,
+    426
+   ],
+   "azules": [
+    148,
+    177,
+    188,
+    246,
+    290
+   ]
+  },
+  {
+   "id": 230687247,
+   "subarea": 1123,
+   "nombre": "C47 - Dopples (Duel)",
+   "rojas": [
+    397
+   ],
+   "azules": [
+    177
+   ]
+  },
+  {
+   "id": 230687249,
+   "subarea": 1123,
+   "nombre": "C54 - Chaos Clock (Teams)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 230687251,
+   "subarea": 1123,
+   "nombre": "C54 - Chaos Clock (Duel)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 230688257,
+   "subarea": 1123,
+   "nombre": "C12 - Ecaflipus (Teams)",
+   "rojas": [
+    188,
+    189,
+    234,
+    262,
+    333
+   ],
+   "azules": [
+    323,
+    395,
+    423,
+    467,
+    468
+   ]
+  },
+  {
+   "id": 230688259,
+   "subarea": 1123,
+   "nombre": "C12 - Ecaflipus (Duel)",
+   "rojas": [
+    189,
+    262
+   ],
+   "azules": [
+    395,
+    467
+   ]
+  },
+  {
+   "id": 230688261,
+   "subarea": 1123,
+   "nombre": "C25 - Kolossium (Teams)",
+   "rojas": [
+    132,
+    150,
+    201,
+    204,
+    244,
+    296
+   ],
+   "azules": [
+    304,
+    356,
+    397,
+    400,
+    451,
+    468
+   ]
+  },
+  {
+   "id": 230688263,
+   "subarea": 1123,
+   "nombre": "C25 - Kolossium (Duel)",
+   "rojas": [
+    172
+   ],
+   "azules": [
+    429
+   ]
+  },
+  {
+   "id": 230688265,
+   "subarea": 1123,
+   "nombre": "C36 - The Possessed II (Teams)",
+   "rojas": [
+    348,
+    383,
+    413,
+    416,
+    469
+   ],
+   "azules": [
+    188,
+    241,
+    244,
+    274,
+    310
+   ]
+  },
+  {
+   "id": 230688267,
+   "subarea": 1123,
+   "nombre": "C36 - The Possessed II (Duel)",
+   "rojas": [
+    430
+   ],
+   "azules": [
+    228
+   ]
+  },
+  {
+   "id": 230688269,
+   "subarea": 1123,
+   "nombre": "C48 - Sidekicks (Teams)",
+   "rojas": [
+    373,
+    428,
+    440,
+    459,
+    485
+   ],
+   "azules": [
+    199,
+    225,
+    243,
+    256,
+    311
+   ]
+  },
+  {
+   "id": 230688271,
+   "subarea": 1123,
+   "nombre": "C48 - Sidekicks (Duel)",
+   "rojas": [
+    428,
+    459
+   ],
+   "azules": [
+    225,
+    256
+   ]
+  },
+  {
+   "id": 230689281,
+   "subarea": 1123,
+   "nombre": "C13 - Sufokia (Teams)",
+   "rojas": [
+    221,
+    249,
+    304,
+    333,
+    401
+   ],
+   "azules": [
+    173,
+    240,
+    269,
+    324,
+    352
+   ]
+  },
+  {
+   "id": 230689283,
+   "subarea": 1123,
+   "nombre": "C13 - Sufokia (Duel)",
+   "rojas": [
+    276,
+    401
+   ],
+   "azules": [
+    173,
+    297
+   ]
+  },
+  {
+   "id": 230689285,
+   "subarea": 1123,
+   "nombre": "C26 - Cemetery (Teams)",
+   "rojas": [
+    91,
+    177,
+    220,
+    231
+   ],
+   "azules": [
+    314,
+    324,
+    368,
+    454
+   ]
+  },
+  {
+   "id": 230689287,
+   "subarea": 1123,
+   "nombre": "C26 - Cemetery (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    368
+   ]
+  },
+  {
+   "id": 230689289,
+   "subarea": 1123,
+   "nombre": "C37 - The Possessed III (Teams)",
+   "rojas": [
+    146,
+    246,
+    277,
+    331,
+    389
+   ],
+   "azules": [
+    267,
+    325,
+    379,
+    410,
+    511
+   ]
+  },
+  {
+   "id": 230689291,
+   "subarea": 1123,
+   "nombre": "C37 - The Possessed III (Duel)",
+   "rojas": [
+    160,
+    245
+   ],
+   "azules": [
+    411,
+    496
+   ]
+  },
+  {
+   "id": 230689293,
+   "subarea": 1123,
+   "nombre": "C49 - Koalaks (Teams)",
+   "rojas": [
+    297,
+    369,
+    370,
+    408,
+    467
+   ],
+   "azules": [
+    77,
+    136,
+    175,
+    176,
+    247
+   ]
+  },
+  {
+   "id": 230689295,
+   "subarea": 1123,
+   "nombre": "C49 - Koalaks (Duel)",
+   "rojas": [
+    367
+   ],
+   "azules": [
+    178
+   ]
+  },
+  {
+   "id": 230690305,
+   "subarea": 1123,
+   "nombre": "C14 - Aerdala (Teams)",
+   "rojas": [
+    159,
+    216,
+    242,
+    256,
+    281,
+    311
+   ],
+   "azules": [
+    332,
+    362,
+    387,
+    401,
+    427,
+    484
+   ]
+  },
+  {
+   "id": 230690307,
+   "subarea": 1123,
+   "nombre": "C14 - Aerdala (Duel)",
+   "rojas": [
+    426
+   ],
+   "azules": [
+    217
+   ]
+  },
+  {
+   "id": 230690309,
+   "subarea": 1123,
+   "nombre": "C27 - Kwismas (Teams)",
+   "rojas": [
+    62,
+    135,
+    188,
+    192,
+    208,
+    290
+   ],
+   "azules": [
+    284,
+    366,
+    381,
+    385,
+    438,
+    512
+   ]
+  },
+  {
+   "id": 230690311,
+   "subarea": 1123,
+   "nombre": "C27 - Kwismas (Duel)",
+   "rojas": [
+    332,
+    458
+   ],
+   "azules": [
+    116,
+    241
+   ]
+  },
+  {
+   "id": 230690313,
+   "subarea": 1123,
+   "nombre": "C38 - Wukin (Teams)",
+   "rojas": [
+    215,
+    240,
+    270,
+    325,
+    380
+   ],
+   "azules": [
+    263,
+    318,
+    373,
+    403,
+    428
+   ]
+  },
+  {
+   "id": 230690315,
+   "subarea": 1123,
+   "nombre": "C38 - Wukin (Duel)",
+   "rojas": [
+    353,
+    423
+   ],
+   "azules": [
+    220,
+    290
+   ]
+  },
+  {
+   "id": 230690317,
+   "subarea": 1123,
+   "nombre": "C50 - Sylargh (Teams)",
+   "rojas": [
+    213,
+    215,
+    217,
+    283,
+    339
+   ],
+   "azules": [
+    304,
+    360,
+    426,
+    428,
+    430
+   ]
+  },
+  {
+   "id": 230690319,
+   "subarea": 1123,
+   "nombre": "C50 - Sylargh (Duel)",
+   "rojas": [
+    311
+   ],
+   "azules": [
+    332
+   ]
+  },
+  {
+   "id": 230691329,
+   "subarea": 1123,
+   "nombre": "C15 - Moon (Teams)",
+   "rojas": [
+    248,
+    275,
+    375,
+    400,
+    401,
+    411
+   ],
+   "azules": [
+    162,
+    173,
+    174,
+    199,
+    298,
+    325
+   ]
+  },
+  {
+   "id": 230691331,
+   "subarea": 1123,
+   "nombre": "C15 - Moon (Duel)",
+   "rojas": [
+    262,
+    400
+   ],
+   "azules": [
+    174,
+    312
+   ]
+  },
+  {
+   "id": 230691333,
+   "subarea": 1123,
+   "nombre": "C24 - Dragon Pig II (Teams)",
+   "rojas": [
+    147,
+    188,
+    219,
+    275,
+    301,
+    348
+   ],
+   "azules": [
+    309,
+    355,
+    381,
+    437,
+    468,
+    510
+   ]
+  },
+  {
+   "id": 230691335,
+   "subarea": 1123,
+   "nombre": "C24 - Dragon Pig II (Duel)",
+   "rojas": [
+    376,
+    484
+   ],
+   "azules": [
+    173,
+    281
+   ]
+  },
+  {
+   "id": 230691337,
+   "subarea": 1123,
+   "nombre": "C39 - Wukang (Teams)",
+   "rojas": [
+    130,
+    133,
+    183,
+    213,
+    268
+   ],
+   "azules": [
+    248,
+    303,
+    333,
+    383,
+    386
+   ]
+  },
+  {
+   "id": 230691339,
+   "subarea": 1123,
+   "nombre": "C39 - Wukang (Duel)",
+   "rojas": [
+    197,
+    310
+   ],
+   "azules": [
+    207,
+    320
+   ]
+  },
+  {
+   "id": 230691341,
+   "subarea": 1123,
+   "nombre": "C51 - Solary (Teams)",
+   "rojas": [
+    412,
+    424,
+    469,
+    472,
+    510
+   ],
+   "azules": [
+    148,
+    185,
+    188,
+    234,
+    245
+   ]
+  },
+  {
+   "id": 230691343,
+   "subarea": 1123,
+   "nombre": "C51 - Solary (Duel)",
+   "rojas": [
+    412,
+    472
+   ],
+   "azules": [
+    185,
+    245
+   ]
+  },
+  {
+   "id": 230692353,
+   "subarea": 1123,
+   "nombre": "C16 - Srambad (Teams)",
+   "rojas": [
+    229,
+    244,
+    257,
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441,
+    457,
+    469,
+    485
+   ]
+  },
+  {
+   "id": 230692355,
+   "subarea": 1123,
+   "nombre": "C16 - Srambad (Duel)",
+   "rojas": [
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441
+   ]
+  },
+  {
+   "id": 230692357,
+   "subarea": 1123,
+   "nombre": "C28 - Ecaflip City (Teams)",
+   "rojas": [
+    215,
+    217,
+    304,
+    329,
+    403
+   ],
+   "azules": [
+    215,
+    310,
+    383,
+    408,
+    423,
+    495,
+    497
+   ]
+  },
+  {
+   "id": 230692359,
+   "subarea": 1123,
+   "nombre": "C28 - Ecaflip City (Duel)",
+   "rojas": [
+    497
+   ],
+   "azules": [
+    215
+   ]
+  },
+  {
+   "id": 230692361,
+   "subarea": 1123,
+   "nombre": "C40 - Bonta (Teams)",
+   "rojas": [
+    146,
+    147,
+    185,
+    191,
+    199
+   ],
+   "azules": [
+    374,
+    381,
+    387,
+    426,
+    427
+   ]
+  },
+  {
+   "id": 230692363,
+   "subarea": 1123,
+   "nombre": "C40 - Bonta (Duel)",
+   "rojas": [
+    146,
+    185
+   ],
+   "azules": [
+    387,
+    427
+   ]
+  },
+  {
+   "id": 230693377,
+   "subarea": 1123,
+   "nombre": "C17 - Sidimote I (Teams)",
+   "rojas": [
+    341,
+    386,
+    409,
+    412,
+    481
+   ],
+   "azules": [
+    120,
+    188,
+    191,
+    214,
+    260
+   ]
+  },
+  {
+   "id": 230693379,
+   "subarea": 1123,
+   "nombre": "C17 - Sidimote I (Duel)",
+   "rojas": [
+    409,
+    412
+   ],
+   "azules": [
+    188,
+    191
+   ]
+  },
+  {
+   "id": 230693381,
+   "subarea": 1123,
+   "nombre": "C29 - Xelorium (Teams)",
+   "rojas": [
+    160,
+    177,
+    245,
+    249,
+    303,
+    389
+   ],
+   "azules": [
+    267,
+    353,
+    407,
+    411,
+    480,
+    496
+   ]
+  },
+  {
+   "id": 230693383,
+   "subarea": 1123,
+   "nombre": "C29 - Xelorium (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    480
+   ]
+  },
+  {
+   "id": 230693385,
+   "subarea": 1123,
+   "nombre": "C41 - Brakmar (Teams)",
+   "rojas": [
+    235,
+    317,
+    347,
+    372,
+    455
+   ],
+   "azules": [
+    119,
+    202,
+    227,
+    257,
+    339
+   ]
+  },
+  {
+   "id": 230693387,
+   "subarea": 1123,
+   "nombre": "C41 - Brakmar (Duel)",
+   "rojas": [
+    235,
+    468
+   ],
+   "azules": [
+    105,
+    339
+   ]
+  },
+  {
+   "id": 230694401,
+   "subarea": 1123,
+   "nombre": "C18 - Sidimote II (Teams)",
+   "rojas": [
+    292,
+    320,
+    387,
+    389,
+    413
+   ],
+   "azules": [
+    160,
+    184,
+    186,
+    254,
+    282
+   ]
+  },
+  {
+   "id": 230694403,
+   "subarea": 1123,
+   "nombre": "C18 - Sidimote II (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    427
+   ]
+  },
+  {
+   "id": 230694405,
+   "subarea": 1123,
+   "nombre": "",
+   "rojas": [
+    136,
+    176,
+    202,
+    231,
+    262,
+    292
+   ],
+   "azules": [
+    338,
+    368,
+    399,
+    428,
+    454,
+    493
+   ]
+  },
+  {
+   "id": 230694409,
+   "subarea": 1123,
+   "nombre": "C42 - Belladonna (Teams)",
+   "rojas": [
+    437,
+    443,
+    466,
+    470,
+    496
+   ],
+   "azules": [
+    188,
+    214,
+    218,
+    241,
+    247
+   ]
+  },
+  {
+   "id": 230694411,
+   "subarea": 1123,
+   "nombre": "C42 - Belladonna (Duel)",
+   "rojas": [
+    452,
+    457
+   ],
+   "azules": [
+    228,
+    233
+   ]
+  },
+  {
+   "id": 230695425,
+   "subarea": 1123,
+   "nombre": "C19 - Incarnam (Teams)",
+   "rojas": [
+    185,
+    210,
+    259,
+    270,
+    309,
+    379
+   ],
+   "azules": [
+    346,
+    415,
+    446,
+    495,
+    512,
+    529
+   ]
+  },
+  {
+   "id": 230695427,
+   "subarea": 1123,
+   "nombre": "C19 - Incarnam (Duel)",
+   "rojas": [
+    225,
+    270
+   ],
+   "azules": [
+    415,
+    515
+   ]
+  },
+  {
+   "id": 230695429,
+   "subarea": 1123,
+   "nombre": "C30 - Last Hope (Teams)",
+   "rojas": [
+    91,
+    147,
+    160,
+    162,
+    200
+   ],
+   "azules": [
+    346,
+    383,
+    385,
+    399,
+    455
+   ]
+  },
+  {
+   "id": 230695431,
+   "subarea": 1123,
+   "nombre": "C30 - Last Hope (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    399
+   ]
+  },
+  {
+   "id": 230695433,
+   "subarea": 1123,
+   "nombre": "C43 - Ereboria (Teams)",
+   "rojas": [
+    199,
+    282,
+    283,
+    285,
+    311,
+    396
+   ],
+   "azules": [
+    177,
+    262,
+    288,
+    290,
+    291,
+    374
+   ]
+  },
+  {
+   "id": 230695435,
+   "subarea": 1123,
+   "nombre": "C43 - Ereboria (Duel)",
+   "rojas": [
+    325,
+    396
+   ],
+   "azules": [
+    177,
+    247
+   ]
+  },
+  {
+   "id": 230696449,
+   "subarea": 1123,
+   "nombre": "C20 - Ohwymi (Teams)",
+   "rojas": [
+    317,
+    401,
+    413,
+    431,
+    439,
+    470
+   ],
+   "azules": [
+    130,
+    161,
+    170,
+    187,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 230696451,
+   "subarea": 1123,
+   "nombre": "C20 - Ohwymi (Duel)",
+   "rojas": [
+    317,
+    401,
+    470
+   ],
+   "azules": [
+    130,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 230696453,
+   "subarea": 1123,
+   "nombre": "C31 - War (Teams)",
+   "rojas": [
+    160,
+    161,
+    201,
+    205,
+    214,
+    287
+   ],
+   "azules": [
+    343,
+    415,
+    425,
+    429,
+    468,
+    469
+   ]
+  },
+  {
+   "id": 230696455,
+   "subarea": 1123,
+   "nombre": "C31 - War (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    483
+   ]
+  },
+  {
+   "id": 230696457,
+   "subarea": 1123,
+   "nombre": "C44 - Ephedrya (Teams)",
+   "rojas": [
+    424,
+    438,
+    443,
+    469,
+    483
+   ],
+   "azules": [
+    231,
+    244,
+    270,
+    275,
+    290
+   ]
+  },
+  {
+   "id": 230696459,
+   "subarea": 1123,
+   "nombre": "C44 - Ephedrya (Duel)",
+   "rojas": [
+    430,
+    469
+   ],
+   "azules": [
+    244,
+    284
+   ]
+  },
+  {
+   "id": 230697473,
+   "subarea": 1123,
+   "nombre": "C21 - Fields (Teams)",
+   "rojas": [
+    146,
+    149,
+    163,
+    234,
+    248
+   ],
+   "azules": [
+    311,
+    325,
+    396,
+    410,
+    413
+   ]
+  },
+  {
+   "id": 230697475,
+   "subarea": 1123,
+   "nombre": "C21 - Fields (Duel)",
+   "rojas": [
+    148
+   ],
+   "azules": [
+    411
+   ]
+  },
+  {
+   "id": 230697477,
+   "subarea": 1123,
+   "nombre": "C32 - Amber (Teams)",
+   "rojas": [
+    389,
+    402,
+    412,
+    457,
+    468
+   ],
+   "azules": [
+    217,
+    229,
+    273,
+    284,
+    296
+   ]
+  },
+  {
+   "id": 230697479,
+   "subarea": 1123,
+   "nombre": "C32 - Amber (Duel)",
+   "rojas": [
+    467
+   ],
+   "azules": [
+    218
+   ]
+  },
+  {
+   "id": 230697481,
+   "subarea": 1123,
+   "nombre": "C45 - Albuera (Teams)",
+   "rojas": [
+    236,
+    276,
+    290,
+    357,
+    371
+   ],
+   "azules": [
+    147,
+    160,
+    228,
+    241,
+    282
+   ]
+  },
+  {
+   "id": 230697483,
+   "subarea": 1123,
+   "nombre": "C45 - Albuera (Duel)",
+   "rojas": [
+    276
+   ],
+   "azules": [
+    241
+   ]
+  },
+  {
+   "id": 230698497,
+   "subarea": 1123,
+   "nombre": "C22 - Freezammer (Teams)",
+   "rojas": [
+    173,
+    174,
+    185,
+    227,
+    255
+   ],
+   "azules": [
+    304,
+    332,
+    374,
+    385,
+    386
+   ]
+  },
+  {
+   "id": 230698499,
+   "subarea": 1123,
+   "nombre": "C22 - Freezammer (Duel)",
+   "rojas": [
+    174,
+    185,
+    255
+   ],
+   "azules": [
+    304,
+    374,
+    385
+   ]
+  },
+  {
+   "id": 230698501,
+   "subarea": 1123,
+   "nombre": "C33 - Crocuzko (Teams)",
+   "rojas": [
+    255,
+    366,
+    396,
+    398,
+    453
+   ],
+   "azules": [
+    148,
+    203,
+    205,
+    235,
+    346
+   ]
+  },
+  {
+   "id": 230698503,
+   "subarea": 1123,
+   "nombre": "C33 - Crocuzko (Duel)",
+   "rojas": [
+    366,
+    396,
+    453
+   ],
+   "azules": [
+    148,
+    205,
+    235
+   ]
+  },
+  {
+   "id": 230698505,
+   "subarea": 1123,
+   "nombre": "C46 - Tales (Teams)",
+   "rojas": [
+    369,
+    423,
+    439,
+    467
+   ],
+   "azules": [
+    178,
+    206,
+    222,
+    276
+   ]
+  },
+  {
+   "id": 230698507,
+   "subarea": 1123,
+   "nombre": "C46 - Tales (Duel)",
+   "rojas": [
+    439
+   ],
+   "azules": [
+    206
+   ]
+  },
+  {
+   "id": 230699525,
+   "subarea": 1123,
+   "nombre": "C34 - Pandawa (Teams)",
+   "rojas": [
+    348,
+    388,
+    439,
+    443,
+    511
+   ],
+   "azules": [
+    216,
+    284,
+    288,
+    339,
+    379
+   ]
+  },
+  {
+   "id": 230699527,
+   "subarea": 1123,
+   "nombre": "C34 - Pandawa (Duel)",
+   "rojas": [
+    443
+   ],
+   "azules": [
+    284
+   ]
+  },
+  {
+   "id": 230699529,
+   "subarea": 1123,
+   "nombre": "C52 - Gargandyas (Teams)",
+   "rojas": [
+    149,
+    160,
+    163,
+    231,
+    233
+   ],
+   "azules": [
+    340,
+    342,
+    409,
+    412,
+    424
+   ]
+  },
+  {
+   "id": 230699531,
+   "subarea": 1123,
+   "nombre": "C52 - Gargandyas (Duel)",
+   "rojas": [
+    149
+   ],
+   "azules": [
+    424
+   ]
+  },
+  {
+   "id": 230700553,
+   "subarea": 1123,
+   "nombre": "C53 - Gargandyas (Teams)",
+   "rojas": [
+    129,
+    131,
+    133,
+    135,
+    188
+   ],
+   "azules": [
+    384,
+    437,
+    439,
+    441,
+    443
+   ]
+  },
+  {
+   "id": 230700555,
+   "subarea": 1123,
+   "nombre": "C53 - Gargandyas (Duel)",
+   "rojas": [
+    133
+   ],
+   "azules": [
+    439
+   ]
+  },
+  {
+   "id": 233308162,
+   "subarea": 885,
+   "nombre": "11 - Cracklers (Duel)",
+   "rojas": [
+    291
+   ],
+   "azules": [
+    240
+   ]
+  },
+  {
+   "id": 233308166,
+   "subarea": 885,
+   "nombre": "23 - Dragon Pig I (Duel)",
+   "rojas": [
+    135,
+    202
+   ],
+   "azules": [
+    371,
+    437
+   ]
+  },
+  {
+   "id": 233308170,
+   "subarea": 885,
+   "nombre": "35 - The Possessed I (Duel)",
+   "rojas": [
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455
+   ]
+  },
+  {
+   "id": 233308174,
+   "subarea": 885,
+   "nombre": "47 - Dopples (Duel)",
+   "rojas": [
+    397
+   ],
+   "azules": [
+    177
+   ]
+  },
+  {
+   "id": 233308178,
+   "subarea": 885,
+   "nombre": "54 - Chaos Clock (Duel)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 233309186,
+   "subarea": 885,
+   "nombre": "12 - Ecaflipus (Duel)",
+   "rojas": [
+    189,
+    262
+   ],
+   "azules": [
+    395,
+    467
+   ]
+  },
+  {
+   "id": 233309190,
+   "subarea": 885,
+   "nombre": "25 - Kolossium (Duel)",
+   "rojas": [
+    172
+   ],
+   "azules": [
+    429
+   ]
+  },
+  {
+   "id": 233309194,
+   "subarea": 885,
+   "nombre": "36 - The Possessed II (Duel)",
+   "rojas": [
+    430
+   ],
+   "azules": [
+    228
+   ]
+  },
+  {
+   "id": 233309198,
+   "subarea": 885,
+   "nombre": "48 - Sidekicks (Duel)",
+   "rojas": [
+    428,
+    459
+   ],
+   "azules": [
+    225,
+    256
+   ]
+  },
+  {
+   "id": 233310210,
+   "subarea": 885,
+   "nombre": "13 - Sufokia (Duel)",
+   "rojas": [
+    276,
+    401
+   ],
+   "azules": [
+    173,
+    297
+   ]
+  },
+  {
+   "id": 233310214,
+   "subarea": 885,
+   "nombre": "26 - Cemetery (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    368
+   ]
+  },
+  {
+   "id": 233310218,
+   "subarea": 885,
+   "nombre": "37 - The Possessed III (Duel)",
+   "rojas": [
+    160,
+    245
+   ],
+   "azules": [
+    411,
+    496
+   ]
+  },
+  {
+   "id": 233310222,
+   "subarea": 885,
+   "nombre": "49 - Koalaks (Duel)",
+   "rojas": [
+    367
+   ],
+   "azules": [
+    178
+   ]
+  },
+  {
+   "id": 233311234,
+   "subarea": 885,
+   "nombre": "14 - Aerdala (Duel)",
+   "rojas": [
+    426
+   ],
+   "azules": [
+    217
+   ]
+  },
+  {
+   "id": 233311238,
+   "subarea": 885,
+   "nombre": "27 - Kwismas (Duel)",
+   "rojas": [
+    332,
+    458
+   ],
+   "azules": [
+    116,
+    241
+   ]
+  },
+  {
+   "id": 233311242,
+   "subarea": 885,
+   "nombre": "38 - Wukin (Duel)",
+   "rojas": [
+    353,
+    423
+   ],
+   "azules": [
+    220,
+    290
+   ]
+  },
+  {
+   "id": 233311246,
+   "subarea": 885,
+   "nombre": "50 - Sylargh (Duel)",
+   "rojas": [
+    311
+   ],
+   "azules": [
+    332
+   ]
+  },
+  {
+   "id": 233312258,
+   "subarea": 885,
+   "nombre": "15 - Moon (Duel)",
+   "rojas": [
+    262,
+    400
+   ],
+   "azules": [
+    174,
+    312
+   ]
+  },
+  {
+   "id": 233312262,
+   "subarea": 885,
+   "nombre": "24 - Dragon Pig II (Duel)",
+   "rojas": [
+    376,
+    484
+   ],
+   "azules": [
+    173,
+    281
+   ]
+  },
+  {
+   "id": 233312266,
+   "subarea": 885,
+   "nombre": "39 - Wukang (Duel)",
+   "rojas": [
+    197,
+    310
+   ],
+   "azules": [
+    207,
+    320
+   ]
+  },
+  {
+   "id": 233312270,
+   "subarea": 885,
+   "nombre": "51 - Solary (Duel)",
+   "rojas": [
+    412,
+    472
+   ],
+   "azules": [
+    185,
+    245
+   ]
+  },
+  {
+   "id": 233313282,
+   "subarea": 885,
+   "nombre": "16 - Srambad (Duel)",
+   "rojas": [
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441
+   ]
+  },
+  {
+   "id": 233313286,
+   "subarea": 885,
+   "nombre": "28 - Ecaflip City (Duel)",
+   "rojas": [
+    497
+   ],
+   "azules": [
+    215
+   ]
+  },
+  {
+   "id": 233313290,
+   "subarea": 885,
+   "nombre": "40 - Bonta (Duel)",
+   "rojas": [
+    146,
+    185
+   ],
+   "azules": [
+    387,
+    427
+   ]
+  },
+  {
+   "id": 233314306,
+   "subarea": 885,
+   "nombre": "17 - Sidimote (Duel)",
+   "rojas": [
+    409,
+    412
+   ],
+   "azules": [
+    188,
+    191
+   ]
+  },
+  {
+   "id": 233314310,
+   "subarea": 885,
+   "nombre": "29 - Xelorium (Duel)",
+   "rojas": [
+    177
+   ],
+   "azules": [
+    480
+   ]
+  },
+  {
+   "id": 233314314,
+   "subarea": 885,
+   "nombre": "41 - Brakmar (Duel)",
+   "rojas": [
+    235,
+    468
+   ],
+   "azules": [
+    105,
+    339
+   ]
+  },
+  {
+   "id": 233315330,
+   "subarea": 885,
+   "nombre": "18 - Sidimote II (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    427
+   ]
+  },
+  {
+   "id": 233315338,
+   "subarea": 885,
+   "nombre": "42 - Belladonna (Duel)",
+   "rojas": [
+    452,
+    457
+   ],
+   "azules": [
+    228,
+    233
+   ]
+  },
+  {
+   "id": 233316354,
+   "subarea": 885,
+   "nombre": "19 - Incarnam (Duel)",
+   "rojas": [
+    225,
+    270
+   ],
+   "azules": [
+    415,
+    515
+   ]
+  },
+  {
+   "id": 233316358,
+   "subarea": 885,
+   "nombre": "30 - Last Hope (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    399
+   ]
+  },
+  {
+   "id": 233316362,
+   "subarea": 885,
+   "nombre": "43 - Ereboria (Duel)",
+   "rojas": [
+    325,
+    396
+   ],
+   "azules": [
+    177,
+    247
+   ]
+  },
+  {
+   "id": 233317378,
+   "subarea": 885,
+   "nombre": "20 - Ohwymi (Duel)",
+   "rojas": [
+    317,
+    401,
+    470
+   ],
+   "azules": [
+    130,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 233317382,
+   "subarea": 885,
+   "nombre": "31 - War (Duel)",
+   "rojas": [
+    147
+   ],
+   "azules": [
+    483
+   ]
+  },
+  {
+   "id": 233317386,
+   "subarea": 885,
+   "nombre": "44 - Ephedrya (Duel)",
+   "rojas": [
+    430,
+    469
+   ],
+   "azules": [
+    244,
+    284
+   ]
+  },
+  {
+   "id": 233318402,
+   "subarea": 885,
+   "nombre": "21 - Fields (Duel)",
+   "rojas": [
+    148
+   ],
+   "azules": [
+    411
+   ]
+  },
+  {
+   "id": 233318406,
+   "subarea": 885,
+   "nombre": "32 - Amber (Duel)",
+   "rojas": [
+    467
+   ],
+   "azules": [
+    218
+   ]
+  },
+  {
+   "id": 233318410,
+   "subarea": 885,
+   "nombre": "45 - Albuera (Duel)",
+   "rojas": [
+    276
+   ],
+   "azules": [
+    241
+   ]
+  },
+  {
+   "id": 233319426,
+   "subarea": 885,
+   "nombre": "22 - Freezammer (Duel)",
+   "rojas": [
+    174,
+    185,
+    255
+   ],
+   "azules": [
+    304,
+    374,
+    385
+   ]
+  },
+  {
+   "id": 233319430,
+   "subarea": 885,
+   "nombre": "33 - Crocuzko (Duel)",
+   "rojas": [
+    366,
+    396,
+    453
+   ],
+   "azules": [
+    148,
+    205,
+    235
+   ]
+  },
+  {
+   "id": 233319434,
+   "subarea": 885,
+   "nombre": "46 - Tales (Duel)",
+   "rojas": [
+    439
+   ],
+   "azules": [
+    206
+   ]
+  },
+  {
+   "id": 233320454,
+   "subarea": 885,
+   "nombre": "34 - Pandawa (Duel)",
+   "rojas": [
+    443
+   ],
+   "azules": [
+    284
+   ]
+  },
+  {
+   "id": 233320458,
+   "subarea": 885,
+   "nombre": "52 - Gargandyas (Duel)",
+   "rojas": [
+    149
+   ],
+   "azules": [
+    424
+   ]
+  },
+  {
+   "id": 233321482,
+   "subarea": 885,
+   "nombre": "53 - Gargandyas (Duel)",
+   "rojas": [
+    133
+   ],
+   "azules": [
+    439
+   ]
+  },
+  {
+   "id": 233308160,
+   "subarea": 1122,
+   "nombre": "11 - Cracklers (Teams)",
+   "rojas": [
+    240,
+    324,
+    343,
+    411,
+    414
+   ],
+   "azules": [
+    117,
+    120,
+    188,
+    207,
+    291
+   ]
+  },
+  {
+   "id": 233308164,
+   "subarea": 1122,
+   "nombre": "23 - Dragon Pig I (Teams)",
+   "rojas": [
+    105,
+    118,
+    135,
+    202,
+    217
+   ],
+   "azules": [
+    355,
+    371,
+    437,
+    455,
+    467
+   ]
+  },
+  {
+   "id": 233308168,
+   "subarea": 1122,
+   "nombre": "35 - The Possessed I (Teams)",
+   "rojas": [
+    230,
+    232,
+    248,
+    301,
+    305
+   ],
+   "azules": [
+    379,
+    383,
+    436,
+    453,
+    455
+   ]
+  },
+  {
+   "id": 233308172,
+   "subarea": 1122,
+   "nombre": "47 - Dopples (Teams)",
+   "rojas": [
+    284,
+    327,
+    385,
+    397,
+    426
+   ],
+   "azules": [
+    148,
+    177,
+    188,
+    246,
+    290
+   ]
+  },
+  {
+   "id": 233308176,
+   "subarea": 1122,
+   "nombre": "54 - Chaos Clock (Teams)",
+   "rojas": [
+    146,
+    241,
+    271,
+    282,
+    353,
+    380
+   ],
+   "azules": [
+    220,
+    247,
+    319,
+    329,
+    359,
+    455
+   ]
+  },
+  {
+   "id": 233309184,
+   "subarea": 1122,
+   "nombre": "12 - Ecaflipus (Teams)",
+   "rojas": [
+    188,
+    189,
+    234,
+    262,
+    333
+   ],
+   "azules": [
+    323,
+    395,
+    423,
+    467,
+    468
+   ]
+  },
+  {
+   "id": 233309188,
+   "subarea": 1122,
+   "nombre": "25 - Kolossium (Teams)",
+   "rojas": [
+    132,
+    150,
+    201,
+    204,
+    244,
+    263
+   ],
+   "azules": [
+    338,
+    356,
+    397,
+    400,
+    451,
+    468
+   ]
+  },
+  {
+   "id": 233309192,
+   "subarea": 1122,
+   "nombre": "36 - The Possessed II (Teams)",
+   "rojas": [
+    348,
+    383,
+    413,
+    416,
+    469
+   ],
+   "azules": [
+    188,
+    241,
+    244,
+    274,
+    310
+   ]
+  },
+  {
+   "id": 233309196,
+   "subarea": 1122,
+   "nombre": "48 - Sidekicks (Teams)",
+   "rojas": [
+    373,
+    428,
+    440,
+    459,
+    485
+   ],
+   "azules": [
+    199,
+    225,
+    243,
+    256,
+    311
+   ]
+  },
+  {
+   "id": 233310208,
+   "subarea": 1122,
+   "nombre": "13 - Sufokia (Teams)",
+   "rojas": [
+    221,
+    249,
+    304,
+    333,
+    401
+   ],
+   "azules": [
+    173,
+    240,
+    269,
+    324,
+    352
+   ]
+  },
+  {
+   "id": 233310212,
+   "subarea": 1122,
+   "nombre": "26 - Cemetery (Teams)",
+   "rojas": [
+    91,
+    177,
+    220,
+    231
+   ],
+   "azules": [
+    314,
+    324,
+    368,
+    454
+   ]
+  },
+  {
+   "id": 233310216,
+   "subarea": 1122,
+   "nombre": "37 - The Possessed III (Teams)",
+   "rojas": [
+    146,
+    246,
+    277,
+    331,
+    389
+   ],
+   "azules": [
+    267,
+    325,
+    379,
+    410,
+    511
+   ]
+  },
+  {
+   "id": 233310220,
+   "subarea": 1122,
+   "nombre": "49 - Koalaks (Teams)",
+   "rojas": [
+    297,
+    369,
+    370,
+    408,
+    467
+   ],
+   "azules": [
+    77,
+    136,
+    175,
+    176,
+    247
+   ]
+  },
+  {
+   "id": 233311232,
+   "subarea": 1122,
+   "nombre": "14 - Aerdala (Teams)",
+   "rojas": [
+    159,
+    216,
+    242,
+    256,
+    281,
+    311
+   ],
+   "azules": [
+    332,
+    362,
+    387,
+    401,
+    427,
+    484
+   ]
+  },
+  {
+   "id": 233311236,
+   "subarea": 1122,
+   "nombre": "27 - Kwismas (Teams)",
+   "rojas": [
+    62,
+    135,
+    188,
+    192,
+    208,
+    290
+   ],
+   "azules": [
+    284,
+    366,
+    381,
+    385,
+    438,
+    512
+   ]
+  },
+  {
+   "id": 233311240,
+   "subarea": 1122,
+   "nombre": "38 - Wukin (Teams)",
+   "rojas": [
+    215,
+    240,
+    270,
+    325,
+    380
+   ],
+   "azules": [
+    263,
+    318,
+    373,
+    403,
+    428
+   ]
+  },
+  {
+   "id": 233311244,
+   "subarea": 1122,
+   "nombre": "50 - Sylargh (Teams)",
+   "rojas": [
+    213,
+    215,
+    217,
+    283
+   ],
+   "azules": [
+    360,
+    426,
+    428,
+    430
+   ]
+  },
+  {
+   "id": 233312256,
+   "subarea": 1122,
+   "nombre": "15 - Moon (Teams)",
+   "rojas": [
+    248,
+    275,
+    375,
+    400,
+    401,
+    411
+   ],
+   "azules": [
+    162,
+    173,
+    174,
+    199,
+    298,
+    325
+   ]
+  },
+  {
+   "id": 233312260,
+   "subarea": 1122,
+   "nombre": "24 - Dragon Pig II (Teams)",
+   "rojas": [
+    147,
+    188,
+    219,
+    275,
+    301,
+    348
+   ],
+   "azules": [
+    309,
+    355,
+    381,
+    437,
+    468,
+    510
+   ]
+  },
+  {
+   "id": 233312264,
+   "subarea": 1122,
+   "nombre": "39 - Wukang (Teams)",
+   "rojas": [
+    130,
+    133,
+    183,
+    213,
+    268
+   ],
+   "azules": [
+    248,
+    303,
+    333,
+    383,
+    386
+   ]
+  },
+  {
+   "id": 233312268,
+   "subarea": 1122,
+   "nombre": "51 - Solary (Teams)",
+   "rojas": [
+    412,
+    424,
+    469,
+    472,
+    510
+   ],
+   "azules": [
+    148,
+    185,
+    188,
+    234,
+    245
+   ]
+  },
+  {
+   "id": 233313280,
+   "subarea": 1122,
+   "nombre": "16 - Srambad (Teams)",
+   "rojas": [
+    229,
+    244,
+    257,
+    272,
+    284
+   ],
+   "azules": [
+    430,
+    441,
+    457,
+    469,
+    485
+   ]
+  },
+  {
+   "id": 233313284,
+   "subarea": 1122,
+   "nombre": "28 - Ecaflip City (Teams)",
+   "rojas": [
+    215,
+    217,
+    304,
+    329,
+    403
+   ],
+   "azules": [
+    310,
+    383,
+    423,
+    495,
+    497
+   ]
+  },
+  {
+   "id": 233313288,
+   "subarea": 1122,
+   "nombre": "40 - Bonta (Teams)",
+   "rojas": [
+    146,
+    147,
+    185,
+    191,
+    199
+   ],
+   "azules": [
+    374,
+    381,
+    387,
+    426,
+    427
+   ]
+  },
+  {
+   "id": 233314304,
+   "subarea": 1122,
+   "nombre": "17 - Sidimote I (Teams)",
+   "rojas": [
+    341,
+    386,
+    409,
+    412,
+    481
+   ],
+   "azules": [
+    120,
+    188,
+    191,
+    214,
+    260
+   ]
+  },
+  {
+   "id": 233314308,
+   "subarea": 1122,
+   "nombre": "29 - Xelorium (Teams)",
+   "rojas": [
+    160,
+    177,
+    245,
+    249,
+    303,
+    389
+   ],
+   "azules": [
+    267,
+    353,
+    407,
+    411,
+    480,
+    496
+   ]
+  },
+  {
+   "id": 233314312,
+   "subarea": 1122,
+   "nombre": "41 - Brakmar (Teams)",
+   "rojas": [
+    235,
+    317,
+    347,
+    372,
+    455
+   ],
+   "azules": [
+    119,
+    202,
+    227,
+    257,
+    339
+   ]
+  },
+  {
+   "id": 233315328,
+   "subarea": 1122,
+   "nombre": "18 - Sidimote II (Teams)",
+   "rojas": [
+    292,
+    320,
+    387,
+    389,
+    413
+   ],
+   "azules": [
+    160,
+    184,
+    186,
+    254,
+    282
+   ]
+  },
+  {
+   "id": 233315336,
+   "subarea": 1122,
+   "nombre": "42 - Belladonna (Teams)",
+   "rojas": [
+    437,
+    443,
+    466,
+    470,
+    496
+   ],
+   "azules": [
+    188,
+    214,
+    218,
+    241,
+    247
+   ]
+  },
+  {
+   "id": 233316352,
+   "subarea": 1122,
+   "nombre": "19 - Incarnam (Teams)",
+   "rojas": [
+    185,
+    210,
+    259,
+    270,
+    309,
+    379
+   ],
+   "azules": [
+    346,
+    415,
+    446,
+    495,
+    512,
+    529
+   ]
+  },
+  {
+   "id": 233316356,
+   "subarea": 1122,
+   "nombre": "30 - Last Hope (Teams)",
+   "rojas": [
+    91,
+    147,
+    160,
+    162,
+    200
+   ],
+   "azules": [
+    346,
+    383,
+    385,
+    399,
+    455
+   ]
+  },
+  {
+   "id": 233316360,
+   "subarea": 1122,
+   "nombre": "43 - Ereboria (Teams)",
+   "rojas": [
+    199,
+    282,
+    283,
+    285,
+    311,
+    396
+   ],
+   "azules": [
+    177,
+    262,
+    288,
+    290,
+    291,
+    374
+   ]
+  },
+  {
+   "id": 233317376,
+   "subarea": 1122,
+   "nombre": "20 - Ohwymi (Teams)",
+   "rojas": [
+    317,
+    401,
+    413,
+    431,
+    439,
+    470
+   ],
+   "azules": [
+    130,
+    161,
+    170,
+    187,
+    200,
+    284
+   ]
+  },
+  {
+   "id": 233317380,
+   "subarea": 1122,
+   "nombre": "31 - War (Teams)",
+   "rojas": [
+    160,
+    161,
+    201,
+    205,
+    214,
+    287
+   ],
+   "azules": [
+    343,
+    415,
+    425,
+    429,
+    468,
+    469
+   ]
+  },
+  {
+   "id": 233317384,
+   "subarea": 1122,
+   "nombre": "44 - Ephedrya (Teams)",
+   "rojas": [
+    424,
+    438,
+    443,
+    469,
+    483
+   ],
+   "azules": [
+    231,
+    244,
+    270,
+    275,
+    290
+   ]
+  },
+  {
+   "id": 233318400,
+   "subarea": 1122,
+   "nombre": "21 - Fields (Teams)",
+   "rojas": [
+    146,
+    149,
+    163,
+    234,
+    248
+   ],
+   "azules": [
+    311,
+    325,
+    396,
+    410,
+    413
+   ]
+  },
+  {
+   "id": 233318404,
+   "subarea": 1122,
+   "nombre": "32 - Amber (Teams)",
+   "rojas": [
+    389,
+    402,
+    412,
+    457,
+    468
+   ],
+   "azules": [
+    217,
+    229,
+    273,
+    284,
+    296
+   ]
+  },
+  {
+   "id": 233318408,
+   "subarea": 1122,
+   "nombre": "45 - Albuera (Teams)",
+   "rojas": [
+    236,
+    276,
+    290,
+    292,
+    346
+   ],
+   "azules": [
+    172,
+    226,
+    228,
+    241,
+    282
+   ]
+  },
+  {
+   "id": 233319424,
+   "subarea": 1122,
+   "nombre": "22 - Freezammer (Teams)",
+   "rojas": [
+    173,
+    174,
+    185,
+    227,
+    255
+   ],
+   "azules": [
+    304,
+    332,
+    374,
+    385,
+    386
+   ]
+  },
+  {
+   "id": 233319428,
+   "subarea": 1122,
+   "nombre": "33 - Crocuzko (Teams)",
+   "rojas": [
+    255,
+    366,
+    396,
+    398,
+    453
+   ],
+   "azules": [
+    148,
+    203,
+    205,
+    235,
+    346
+   ]
+  },
+  {
+   "id": 233319432,
+   "subarea": 1122,
+   "nombre": "46 - Tales (Teams)",
+   "rojas": [
+    369,
+    423,
+    439,
+    467
+   ],
+   "azules": [
+    178,
+    206,
+    222,
+    276
+   ]
+  },
+  {
+   "id": 233320452,
+   "subarea": 1122,
+   "nombre": "34 - Pandawa (Teams)",
+   "rojas": [
+    348,
+    388,
+    439,
+    443,
+    511
+   ],
+   "azules": [
+    216,
+    284,
+    288,
+    339,
+    379
+   ]
+  },
+  {
+   "id": 233320456,
+   "subarea": 1122,
+   "nombre": "52 - Gargandyas (Teams)",
+   "rojas": [
+    149,
+    160,
+    163,
+    231,
+    233
+   ],
+   "azules": [
+    340,
+    342,
+    409,
+    412,
+    424
+   ]
+  },
+  {
+   "id": 233321480,
+   "subarea": 1122,
+   "nombre": "53 - Gargandyas (Teams)",
+   "rojas": [
+    129,
+    131,
+    133,
+    135,
+    188
+   ],
+   "azules": [
+    384,
+    437,
+    439,
+    441,
+    443
+   ]
+  }
+ ]
+}

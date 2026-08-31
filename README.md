@@ -1,8 +1,8 @@
 High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** written in C# (**.NET 10**), with decoupled modular projects, a SQLite data layer, a combat engine driven entirely by client data — PvM, duels and Koliseo — a cross-platform launcher and a world editor.
 
-> ⚠️ **Runs against Dofus 3 clients 3.6.10.11 and 3.6.10.10.** Ankama renames every protobuf message to three random letters on some patches, which is what breaks compatibility with newer clients. There is a toolchain here for surviving that — see [Surviving the next patch](#-surviving-the-next-patch). It does not make the emulator version-agnostic; it makes the migration measurable instead of guesswork.
->
-> **3.6.10.11 (26 August 2026) is not a new protocol.** Its `GameAssembly.dll` and `global-metadata.dat` are byte-identical to 3.6.10.10.
+> ⚠️ **Runs against Dofus 3 clients 3.6.10.11 and 3.6.10.10.** Ankama renames every protobuf
+> message to three random letters on some patches; there is a toolchain here for surviving that —
+> see [Surviving the next patch](#-surviving-the-next-patch).
 
 ---
 
@@ -361,15 +361,11 @@ rules object, and nothing writing to a single socket unless it is painting one p
 - ✅ Turn protocol, 30-second timers with automatic pass, AP/MP replenishment
 - ✅ Movement with per-tile MP cost and collision against occupied cells
 - ✅ Loot, victory and defeat screens, experience over **1,889 levels**, level-ups and group respawn
-- ✅ Monster AI: a target chosen **per spell**, range measured against that target, walking to the spell's own range band, `MaxCastPerTurn` honoured, breadth-first pathing around obstacles, and line of sight
+- ✅ Monster AI: a target chosen **per spell**, range measured against that target rather than against the nearest enemy, walking to the spell's own range band, `MaxCastPerTurn` honoured, breadth-first pathing around obstacles and line of sight. Measured over the 5,134 monsters: **15.1%** cannot reach the player, against 24.9% without it, and **87.2%** of action points get spent, against 58.7%
 - 🟡 Weapon strikes apply damage and AP cost; the slash animation does not
 - 🟡 `MaxCastPerTarget`, minimum cast interval and cast-in-line are enforced for the player, not for monsters
-- ✅ **Push and collision damage** — being shoved into a wall, a hole or another fighter costs health, and the fighter acting as the wall takes half
+- ✅ **Push and collision damage**, `blockedCells × (level/2 + push − resistance + 32) / 4`, floored — measured over 127 collisions, with the resistance subtracted *inside* the quarter. The fighter acting as the wall takes half, and the **Unmovable** state cancels it. Twelve samples are locked into a startup guard
 - ❌ AP/MP dodge rolls, shields, lock and tackle in melee
-
-> **Push damage, measured over 127 collisions in the captures.** `damage = blockedCells × (level/2 + pusher's 84 − target's 85 + 32) / 4`, floored, travelling as a `jwe` with `f14 = 80` and `f4 = −1` right behind the displacement — and alone, with no displacement, when the target could not move a single tile. Three anchors pin the three terms: a level-200 pusher with no bonus deals **33 per tile** and only ever 33, 66, 99 or 132; the level-**165** Zurkarak deals **57** over two tiles, which is `floor(2 × 114.5 / 4)` and which no fixed constant can produce; and a Zobal carrying 100 of push damage plus masks of 0/40/80/120 deals 58/68/78/88. The resistance is subtracted **inside** the quarter — 561 against 30 gives 331 over two tiles, where subtracting outside would give 316. A fighter blocking the push takes `floor(half)`, measured on 9 pairs out of 9. The **Unmovable** state (97) cancels the whole thing, because without displacement there is no collision. All twelve samples are locked into a startup regression guard.
-
-> **Monster AI, measured over the 5,134 monsters.** Range is judged against the target the spell itself picked, not against the nearest enemy — which is what makes the **1,555 range 0-0 spells** castable at all, 20.4% of the arsenal and 443 of them carrying damage. Walking to the spell's own range band rather than into melee reaches the **857 spells with a minimum range above one**. Together they leave **15.1%** of monsters unable to touch the player, against 24.9% without them, and put action points actually spent at **87.2%**, against 58.7%.
 
 ### 🤺 Duels
 
@@ -397,25 +393,12 @@ Ranked PvP through a queue. Open the window, pick a format, get matched, fight, 
 - ✅ **Matchmaking on enrolment**, one queue per format, drawn under a lock so two simultaneous requests cannot take the same person into two fights
 - ✅ Everybody re-checked as still connected **before** anyone loses their place in the queue; if somebody dropped, the rest go back to the queue rather than pay for it
 - ✅ The fight itself, with the Koliseo rulebook, and both sides returned to roleplay at the end
-- ✅ **The winner is paid** — kamas, Kolichas, Vitorichas and experience — and the loser gets nothing, not even a zero
+- ✅ **The winner is paid** — kamas, Kolichas (item 12736), Vitorichas (34478) and experience. The loser gets nothing, and its experience block carries the gained field *absent* rather than zero, which is how the capture has it
+- 🟡 **The amounts are constants, not a formula.** Two winners in one capture is not enough to derive one — they go the wrong way round, the higher level earning fewer kamas — so kamas, Kolichas and Vitorichas sit in three named fields. Experience does better: over the band of the winner's own level the two samples land at 7.22% and 6.12%, so 6.67% is used
 - 🚧 The *match found* popup with accept and refuse
 - 🚧 Fights are held on an ordinary arena; the real game picks one of the many Koliseo maps at random
 - ❌ Rankings (`iqt`, `irc`), two undeciphered lists of over three thousand bytes each
 - ❌ The `lst` redirect to a separate Koliseo server. Jondo is one server and holds the fight in place
-
-> **What the winner is paid, and how much of it is measured.** The end-of-fight `jyg` of the Koliseo
-> capture has four entries. The two that won carry `3,400 kamas · 260 × 12736 · 2 × 34478 · 4,722,600 xp`
-> at level 227 and `2,800 · 230 · 2 · 7,496,344` at level 290; 12736 is the Kolicha and 34478 the
-> Vitoricha. The two that lost carry a zero-byte loot block and an experience block **with the gained
-> field absent** — not set to zero.
->
-> That it is paid, and what is paid, is measured. **The formula is not**, and it cannot be from two
-> winners: they go the wrong way round, the higher level earning *fewer* kamas and *fewer* Kolichas,
-> and both beat the same two opponents so the opponents cannot explain the gap. So kamas, Kolichas
-> and Vitorichas are constants — the mean of what was measured — sitting in three named fields for
-> the day there are more captures. Experience does better: laid over the **band of the winner's own
-> level** the two samples land at 7.22% and 6.12%, a point apart, so 6.67% is used and the result
-> stays sane at every level instead of being absurd at one end.
 
 ### ✨ Spell effect engine
 

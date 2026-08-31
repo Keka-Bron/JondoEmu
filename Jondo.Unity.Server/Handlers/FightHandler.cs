@@ -428,18 +428,36 @@ namespace Jondo.Unity.Server.Handlers
             long fightId = pvpId != 0
                 ? pvpId
                 : System.Threading.Interlocked.Increment(ref _nextFightId);
-            long arenaMapId = MapManager.ResolveArenaMapId(mapId);
+            // El koliseo tiene sus propias arenas y no se pelea en la que le tocaria al mapa de
+            // rol. Se elige una al azar de las que tengan sitio para este tamano de equipo: las de
+            // duelo son pequenas -37 de 85 con una sola casilla por bando- y meter ahi un tres
+            // contra tres no cabe. Sin el fichero de arenas, al de siempre.
+            var arenaKoliseo = koliseo ? Managers.KoliseoMaps.PickFor(blue.Count) : null;
+            long arenaMapId = arenaKoliseo?.MapId ?? MapManager.ResolveArenaMapId(mapId);
+
             var fight = new FightInstance(fightId, mapId, arenaMapId)
             {
                 Reglas = koliseo ? FightRules.Koliseo : FightRules.Desafio,
             };
 
-            // Las mismas casillas que un combate corriente, y por la misma razon: el filtro de
-            // siembra deja dos de las setenta y siete de un arena y los dos acabarian encima.
-            var enCombate = MapManager.GetFightWalkable(arenaMapId);
-            fight.GeneratePlacementCells(enCombate != null && enCombate.Count > 0
-                ? new List<int>(enCombate)
-                : MobSpawnManager.GetInnerWalkableCells(arenaMapId));
+            if (arenaKoliseo != null)
+            {
+                // Las de koliseo traen las suyas de verdad, marcadas en el propio cliente y
+                // comprobadas contra el kba del servidor real. Nada de partir una lista por la
+                // mitad.
+                fight.SetPlacementCells(arenaKoliseo.Blue, arenaKoliseo.Red);
+                Program.LogDebug($"[Koliseo] Arena {arenaKoliseo.MapId} «{arenaKoliseo.Name}», " +
+                                 $"{arenaKoliseo.Capacity} por bando.");
+            }
+            else
+            {
+                // Las mismas casillas que un combate corriente, y por la misma razon: el filtro de
+                // siembra deja dos de las setenta y siete de un arena y los dos acabarian encima.
+                var enCombate = MapManager.GetFightWalkable(arenaMapId);
+                fight.GeneratePlacementCells(enCombate != null && enCombate.Count > 0
+                    ? new List<int>(enCombate)
+                    : MobSpawnManager.GetInnerWalkableCells(arenaMapId));
+            }
 
             // Contra quien se pelea, que es lo que nombra el kmu de la entrada. En un desafio es
             // una persona y no un grupo de bichos.

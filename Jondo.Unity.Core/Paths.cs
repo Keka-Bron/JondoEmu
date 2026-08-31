@@ -221,6 +221,10 @@ namespace Jondo.Unity.Launcher
         // El aspecto del EQUIPO DE VERDAD (no las prendas de apariencia), medido sobre las
         // capturas del servidor de torneos con tools/extraer_equipo_real.py.
         public static string EquipmentSkinsJson => Resolve("equipment_skins.json");
+
+        // Las arenas del koliseo con sus casillas de colocacion por bando, sacadas del cliente
+        // con tools/extraer_mapas_koliseo.py. Las tres subareas de koliseo y nada mas.
+        public static string KoliseoMapsJson => Resolve("koliseo_mapas.json");
         // El aspecto de cada montura, indexado por el objeto que la da. Lo genera
         // extract_monturas.py de los bundles del cliente.
         public static string MountsJson => Resolve("mounts.json");
