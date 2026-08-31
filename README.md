@@ -8,50 +8,28 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 ## 📑 Contents
 
-**Getting it running** — [Quick Start](#-quick-start) · [What you get](#-what-you-get)
-
-**The three programs**
-
-| | | |
-|---|---|---|
 | 🖥️ [Launcher](#-launcher) | 🧩 [Server](#-server) | 🛠️ [Jondo Studio](#-jondo-studio) |
-| the player's window, in Avalonia | the emulator itself, four listeners in one process | the world editor |
+|:---|:---|:---|
+| The player's window, in Avalonia. A team of up to eight accounts, each with its character drawn from the client's own bones. | The emulator itself. Four listeners in one process, one session per socket, and guards that refuse to boot on bad data. | The world editor. Nine sections over the client's data, writing a reviewable diff instead of a 240 MB binary. |
 
-**World**
-[Connection and authentication](#-connection-and-authentication) ·
-[World and movement](#-world-and-movement) ·
-[Travel](#-travel) ·
-[Houses, bins and haven bags](#-houses-bins-and-haven-bags) ·
-[Social](#-social)
+&nbsp;
 
-**Character**
-[Character and inventory](#-character-and-inventory) ·
-[Appearances](#-appearances) ·
-[Professions](#-professions)
+> **New here?** [Quick Start](#-quick-start) puts you in the game in three steps ·
+> [What you get](#-what-you-get) is what lands on disk
 
-**Content**
-[NPCs and monsters](#-npcs-and-monsters) ·
-[Quests](#-quests) ·
-[Dungeons](#-dungeons) ·
-[Jondo Coin](#-jondo-coin)
+&nbsp;
 
-**Combat**
-[One engine, three rulebooks](#-one-engine-three-rulebooks) ·
-[PvM](#-pvm-combat) ·
-[Duels](#-duels) ·
-[Koliseo](#-koliseo) ·
-[Spell effect engine](#-spell-effect-engine) ·
-[Combat challenges](#-combat-challenges) ·
-[Not implemented](#-not-implemented-at-all)
+- 🌍 &nbsp;**World** &nbsp;— &nbsp;[Connection and authentication](#-connection-and-authentication) · [World and movement](#-world-and-movement) · [Travel](#-travel) · [Houses, bins and haven bags](#-houses-bins-and-haven-bags) · [Social](#-social)
 
-**Tools**
-[Jondo Studio](#-jondo-studio) ·
-[Surviving the next patch](#-surviving-the-next-patch)
+- 🎒 &nbsp;**Character** &nbsp;— &nbsp;[Character and inventory](#-character-and-inventory) · [Appearances](#-appearances) · [Professions](#-professions)
 
-**Under the hood**
-[Tests](#-tests) ·
-[Source layout](#-source-layout) ·
-[Database and persistence](#-database-and-persistence)
+- 📚 &nbsp;**Content** &nbsp;— &nbsp;[NPCs and monsters](#-npcs-and-monsters) · [Quests](#-quests) · [Dungeons](#-dungeons) · [Jondo Coin](#-jondo-coin)
+
+- ⚔️ &nbsp;**Combat** &nbsp;— &nbsp;[One engine, three rulebooks](#-one-engine-three-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#-koliseo) · [Spell effect engine](#-spell-effect-engine) · [Combat challenges](#-combat-challenges) · [Not implemented](#-not-implemented-at-all)
+
+- 🔎 &nbsp;**Tools** &nbsp;— &nbsp;[Jondo Studio](#-jondo-studio) · [Surviving the next patch](#-surviving-the-next-patch)
+
+- 🧱 &nbsp;**Under the hood** &nbsp;— &nbsp;[Tests](#-tests) · [Source layout](#-source-layout) · [Database and persistence](#-database-and-persistence)
 
 ---
 
