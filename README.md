@@ -105,7 +105,8 @@ Not in the repository because they are not needed to play: `bases/` (built on fi
 
 ### 🖥️ Launcher
 
-<!-- 📷 aquí: la ventana del lanzador, y un vídeo corto del arranque de neón y las estrellas -->
+<img width="2560" height="1512" alt="image" src="https://github.com/user-attachments/assets/68e0e721-b36c-4524-b5d6-660fd5beb3c0" />
+<img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/86f835e0-f161-4f51-af42-a810a192f150" />
 
 Rewritten in **Avalonia**, the same toolkit as the Studio. It used to be Windows Forms, drawn from code; nothing but the music is tied to the Windows desktop any more.
 
@@ -123,7 +124,7 @@ Rewritten in **Avalonia**, the same toolkit as the Studio. It used to be Windows
 
 ### 🧩 Server
 
-<!-- 📷 aquí: la ventana del servidor con el log y los contadores -->
+<img width="2558" height="1508" alt="image" src="https://github.com/user-attachments/assets/df3cce87-166d-4f5a-8aff-a4fcd2575c87" />
 
 `Jondo Server.exe`. The launcher starts it, but it is a program in its own right and can be run on
 its own — or on another machine.
@@ -151,17 +152,22 @@ its own — or on another machine.
 - ✅ Per-client identity chain — instance id, launch hash, Zaap session, game token, single-use
   ticket, socket-owned session
 - ✅ Server and character selection, showing the mount being ridden and each character's equipment
+<img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/c4c194ad-dcd1-407f-a3f1-b44c8f4baed2" />
+<img width="2558" height="1504" alt="image" src="https://github.com/user-attachments/assets/70d02ad2-8fc0-4ec8-b836-1dda959ed271" />
 - ✅ Character creation with a starter kit — Astrub zaap, adventurer set, 1,000,000 kamas, 101
   scrolled points per characteristic
+<img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/881c9530-6631-46ed-b85e-c7fd92602455" />
+<img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/09a94e1f-165a-407d-91f1-1dd7b18063de" />
+<img width="2558" height="1510" alt="image" src="https://github.com/user-attachments/assets/a65407d0-7e65-4481-bdfe-ea65554bb29e" />
+
 - ✅ Account roles, and an administrator-only channel over loopback
 
 ### 🗺️ World and movement
-
-<!-- 📷 aquí: entrada al mundo, varios clientes a la vez -->
-
-- ✅ World loading, spawn, name hover, last cell and map persisted
+- ✅ World loading, spawn, name hover, last cell and map persisted. Multiclient.
+<img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/8882de29-36b0-4af9-be22-2d5f3bd4c6d4" />
 - ✅ **15,360 maps**, **17,211** with walkable-cell data, **17,222** with combat cells
 - ✅ Movement, map change and adjacent maps; auto-pilot from the minimap and *travel to*
+<img width="538" height="452" alt="image" src="https://github.com/user-attachments/assets/a6438938-00c2-4a76-b4e1-48abf3d56934" />
 - ✅ Seeing others arrive and leave, in all four directions
 - ✅ Up to 8 clients at once, each on its own socket-owned session
 - ✅ **Everybody is drawn wearing their gear** — the other players on the map, the opponent in a fight and every character on the selection screen. Equipment is read per character from `CharacterItems`, so it never depends on who happens to be connected
@@ -170,10 +176,13 @@ its own — or on another machine.
 
 - ✅ **62 waypoints** with map, cell and sub-area, plus 3 departure-only zaaps the waypoint table omits
 - ✅ Travel between zaaps with the real cost and destination list
+<img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/1524d485-a845-4b62-a71c-b88de3bb7b54" />
 - ✅ Discovered zaaps announced on world entry (`hjk`) — without it the travel window reads "No destination"
 - ✅ Zaapis of Bonta (24) and Brakmar (21) at a flat 20 kamas, read off captures because client data cannot derive them
+<img width="2560" height="1484" alt="image" src="https://github.com/user-attachments/assets/472e09f2-a49d-431e-8935-f60355457cdd" />
 - ✅ The right window per list: `hjj` root field 0 zaap, 1 zaapi, 3 boat
 - ✅ **16 temporal anomalies** with their 120-minute countdown, surfacing at vestiges (type 359), not at switched-off zaaps
+<img width="2560" height="1514" alt="image" src="https://github.com/user-attachments/assets/942d4d71-9711-45f1-9156-5381f7ad14b8" />
 - ✅ **3,815 interactive teleports** imported, 3,719 active across 2,655 maps
 - ✅ **Passages that fire when you step on the cell**, hooked to the end of a walk rather than to the map edge — which is what the ground-level exits need
 - ✅ Each route carries **its own measured interactive type** instead of a forced zero. The type is part of the element's identity on the client side: with a zero the numbers still travel but the client stops attaching the declaration to the drawing, and the exit sun disappears
@@ -183,18 +192,20 @@ its own — or on another machine.
 ### 🏘️ Houses, bins and haven bags
 
 - ✅ **1,437 doors on 553 maps**, all enterable and ownerless; **261 house models** with name, price and room count
+<img width="1112" height="920" alt="image" src="https://github.com/user-attachments/assets/1506283c-f6cd-45b5-b9c4-f345273f67bb" />
 - ✅ Entering and leaving, which are different messages (`jqw` in, `jru` out), coming out through the door you went in by
 - ❌ The house plaque, chest, access code, buying and selling
 - ✅ **67 public bins on 63 maps** — they open, show empty and close
 - ❌ Putting items into a bin and taking them out
 - ✅ Haven bags: entering and leaving, their own zaap, **48 themes**, **4,083 furniture pieces** placed and persisted, chest with the full item flow, lottery machine, and no monsters inside
-
+<img width="2560" height="1492" alt="image" src="https://github.com/user-attachments/assets/a81a3b24-8559-4ad5-8a27-e6913eef95a8" />
 > Which house sits behind which door is **not in the client**. The 1,437 doors share **114 genuine interiors**, assigned deterministically and kept inside their own neighbourhood; the mapping lives in `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
 
 ### 💬 Social
 
 - ✅ Information messages as `lqn { type, message, parameters }` against the client's 2,555-entry table, not as chat text
 - ✅ Level-up window with music and animation, on a real gain and on `.level` in either direction
+
 - ✅ Private messages via `kth`, which the client routes by opcode and not by channel
 - ✅ Last connection time and IP, stored per character
 - ✅ Parties — invite, accept, refuse, leave, hand over the lead, kick, and a full member sheet
