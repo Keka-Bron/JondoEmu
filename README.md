@@ -152,10 +152,13 @@ its own — or on another machine.
 - ✅ Per-client identity chain — instance id, launch hash, Zaap session, game token, single-use
   ticket, socket-owned session
 - ✅ Server and character selection, showing the mount being ridden and each character's equipment
+  
 <img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/c4c194ad-dcd1-407f-a3f1-b44c8f4baed2" />
 <img width="2558" height="1504" alt="image" src="https://github.com/user-attachments/assets/70d02ad2-8fc0-4ec8-b836-1dda959ed271" />
+
 - ✅ Character creation with a starter kit — Astrub zaap, adventurer set, 1,000,000 kamas, 101
   scrolled points per characteristic
+  
 <img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/881c9530-6631-46ed-b85e-c7fd92602455" />
 <img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/09a94e1f-165a-407d-91f1-1dd7b18063de" />
 <img width="2558" height="1510" alt="image" src="https://github.com/user-attachments/assets/a65407d0-7e65-4481-bdfe-ea65554bb29e" />
@@ -165,9 +168,11 @@ its own — or on another machine.
 ### 🗺️ World and movement
 - ✅ World loading, spawn, name hover, last cell and map persisted. Multiclient.
 <img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/8882de29-36b0-4af9-be22-2d5f3bd4c6d4" />
+
 - ✅ **15,360 maps**, **17,211** with walkable-cell data, **17,222** with combat cells
 - ✅ Movement, map change and adjacent maps; auto-pilot from the minimap and *travel to*
 <img width="538" height="452" alt="image" src="https://github.com/user-attachments/assets/a6438938-00c2-4a76-b4e1-48abf3d56934" />
+
 - ✅ Seeing others arrive and leave, in all four directions
 - ✅ Up to 8 clients at once, each on its own socket-owned session
 - ✅ **Everybody is drawn wearing their gear** — the other players on the map, the opponent in a fight and every character on the selection screen. Equipment is read per character from `CharacterItems`, so it never depends on who happens to be connected
@@ -177,12 +182,15 @@ its own — or on another machine.
 - ✅ **62 waypoints** with map, cell and sub-area, plus 3 departure-only zaaps the waypoint table omits
 - ✅ Travel between zaaps with the real cost and destination list
 <img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/1524d485-a845-4b62-a71c-b88de3bb7b54" />
+
 - ✅ Discovered zaaps announced on world entry (`hjk`) — without it the travel window reads "No destination"
 - ✅ Zaapis of Bonta (24) and Brakmar (21) at a flat 20 kamas, read off captures because client data cannot derive them
 <img width="2560" height="1484" alt="image" src="https://github.com/user-attachments/assets/472e09f2-a49d-431e-8935-f60355457cdd" />
+
 - ✅ The right window per list: `hjj` root field 0 zaap, 1 zaapi, 3 boat
 - ✅ **16 temporal anomalies** with their 120-minute countdown, surfacing at vestiges (type 359), not at switched-off zaaps
 <img width="2560" height="1514" alt="image" src="https://github.com/user-attachments/assets/942d4d71-9711-45f1-9156-5381f7ad14b8" />
+
 - ✅ **3,815 interactive teleports** imported, 3,719 active across 2,655 maps
 - ✅ **Passages that fire when you step on the cell**, hooked to the end of a walk rather than to the map edge — which is what the ground-level exits need
 - ✅ Each route carries **its own measured interactive type** instead of a forced zero. The type is part of the element's identity on the client side: with a zero the numbers still travel but the client stops attaching the declaration to the drawing, and the exit sun disappears
@@ -193,18 +201,21 @@ its own — or on another machine.
 
 - ✅ **1,437 doors on 553 maps**, all enterable and ownerless; **261 house models** with name, price and room count
 <img width="1112" height="920" alt="image" src="https://github.com/user-attachments/assets/1506283c-f6cd-45b5-b9c4-f345273f67bb" />
+
 - ✅ Entering and leaving, which are different messages (`jqw` in, `jru` out), coming out through the door you went in by
 - ❌ The house plaque, chest, access code, buying and selling
 - ✅ **67 public bins on 63 maps** — they open, show empty and close
 - ❌ Putting items into a bin and taking them out
 - ✅ Haven bags: entering and leaving, their own zaap, **48 themes**, **4,083 furniture pieces** placed and persisted, chest with the full item flow, lottery machine, and no monsters inside
 <img width="2560" height="1492" alt="image" src="https://github.com/user-attachments/assets/a81a3b24-8559-4ad5-8a27-e6913eef95a8" />
+
 > Which house sits behind which door is **not in the client**. The 1,437 doors share **114 genuine interiors**, assigned deterministically and kept inside their own neighbourhood; the mapping lives in `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
 
 ### 💬 Social
 
 - ✅ Information messages as `lqn { type, message, parameters }` against the client's 2,555-entry table, not as chat text
 - ✅ Level-up window with music and animation, on a real gain and on `.level` in either direction
+<img width="2560" height="1514" alt="image" src="https://github.com/user-attachments/assets/490997fc-1300-4a29-9963-32077efdf0dd" />
 
 - ✅ Private messages via `kth`, which the client routes by opcode and not by channel
 - ✅ Last connection time and IP, stored per character
@@ -219,16 +230,26 @@ its own — or on another machine.
 - ✅ **21,748 item templates** and **66,294 item effects** — spawning, equipping, bags, destruction, persistence
 - ✅ **929 item sets** with their bonuses
 - ✅ **520 mounts** with their look, swapped and unequipped correctly
+<img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/375da573-ab61-4bf0-83fd-6f2a8f872cde" />
+<img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/581b105c-9569-4f54-ab77-01e122b8ce06" />
+
 - ✅ Characteristic assignment, dynamic capital, points in sync across every client panel
+<img width="708" height="1048" alt="image" src="https://github.com/user-attachments/assets/b07f0ac2-f701-4f3a-82e2-c04f884d696d" />
+
 - ✅ **17,113 spells** across **34,823 spell levels**; **638 character heads**
+<img width="2560" height="1508" alt="image" src="https://github.com/user-attachments/assets/02b5e575-20e3-47ed-b095-55443fb792ab" />
+
 - ✅ **539 titles** and **167 ornaments**, applied, persisted and carried in the map actor block
+<img width="2560" height="1498" alt="image" src="https://github.com/user-attachments/assets/0e579800-2776-4aba-8629-58bb2e6c7acf" />
+<img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/25225e6b-2b6e-4aa6-8f56-12937b0754a0" />
+
 - ✅ Commands — `.teleport`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`
 - ✅ **Live administration over HTTP** — `POST /api/personaje` sets characteristics, kamas and level, grants items or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only, and serialized with the target session
 - 🟡 `.level` repaints the in-fight spell bar, but the fighter's own level is not updated, so the engine still resolves spells at the level the fight started with
 
 ### 👕 Appearances
-
-<!-- 📷 aquí: la ventana de apariencias y un personaje vestido -->
+<img width="2560" height="1508" alt="image" src="https://github.com/user-attachments/assets/30ee645b-191b-4146-9966-d2c3fb72a9cf" />
+<img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/2655dfd1-d565-484c-9735-54dd00f4f8b0" />
 
 Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 2,420 cosmetics** in the catalogue were measured off captures, one garment at a time.
 
@@ -255,17 +276,21 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ **25,090 resources on 4,507 maps** across the six gathering jobs, with graphic → (type, skill) crossed from 305 captures
 - ✅ The three states — full, depleted, busy — including the skill field moving between `f4` and `f3`
 - ✅ Job levels and experience persisted, with the real curve `10 × level × (level − 1)`
+
 - ✅ What you gather lands in the inventory, and the amount grows with job level
 - ✅ Too low a job level blocks gathering the way the game does it
 - ❌ Crafting professions: workshops, the craft window, and the **4,858 recipes** already in the database
 
 ### 👹 NPCs and monsters
-
-<!-- 📷 aquí: un NPC con su diálogo, y un grupo de monstruos en el mapa -->
+<img width="954" height="836" alt="image" src="https://github.com/user-attachments/assets/78779a18-0cd2-4f5c-b403-0c39cd291bcb" />
+<img width="2560" height="1496" alt="image" src="https://github.com/user-attachments/assets/bf4e3381-61a9-44e0-bea4-eed3193a7a93" />
+<img width="2558" height="1510" alt="image" src="https://github.com/user-attachments/assets/0b4adf75-9b36-4298-b428-d0444297adb3" />
 
 - ✅ **6,468 NPC templates** with 3D looks and dialogue trees
 - ✅ **422 NPCs** standing where Ankama puts them across **202 maps**, cell and orientation taken from captures, dialogue attached where it was captured
 - ✅ **5,134 monsters** with native Protobuf bone models, custom scales and textures, quest monsters and archmonsters included
+<img width="1700" height="930" alt="image" src="https://github.com/user-attachments/assets/02254e58-ec87-4839-82ac-f142ec5ef9cd" />
+
 - ✅ **38,744 mapped mob groups**, respawned and kept populated, 1 to 8 monsters each
 - ✅ Sub-area aware spawning across **562 sub-areas**, with radius-2 cell validation so nothing spawns on decorations or zaap pillars
 - ✅ **No monsters indoors, and none standing on a zaap** — not in houses, banks or shops. The rule is two lists and one exception, and the exception is the one that matters: 753 of the 763 dungeon rooms are themselves marked indoors, so a blanket ban would empty every dungeon. 7,214 groups of 38,744 kept out, and the 763 rooms untouched
@@ -273,11 +298,15 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 - ✅ A dialogue always offers at least one real reply, so it can always be closed. With an empty list the client draws its own *Leave* which never answers back
 - 🟡 **401 monsters have no spells at all** in the database
 - ✅ **Dialogue trees.** The client holds every line an NPC can say and every reply it can be given, and never which goes with which — measured across all 6,467 NPCs, there is no field for it. That mapping has always been the server's own, so it has to be authored, and now it can be
+<img width="1138" height="694" alt="image" src="https://github.com/user-attachments/assets/fc1182c3-a261-4bcd-9532-84a2ceda8dc8" />
+<img width="1082" height="692" alt="image" src="https://github.com/user-attachments/assets/39cdf857-b506-4968-b2f9-c0c5f80b64c3" />
+
 - ✅ **Monster groups placed by hand**, and Ankama's own removable, without touching the 240 MB database that gets regenerated
 
 ### 📜 Quests
 
-<!-- 📷 aquí: el diario de misiones y una misión en curso -->
+<img width="2560" height="1498" alt="image" src="https://github.com/user-attachments/assets/6dbe2000-4f3c-4b41-9409-5be932f84d6e" />
+<img width="1452" height="1226" alt="image" src="https://github.com/user-attachments/assets/77256193-a9dd-48df-9d0a-5408613fef34" />
 
 **1,976 quests**, with their 2,225 steps and 15,547 objectives, read out of six Unity dumps the
 repository does not even carry.
@@ -297,8 +326,8 @@ repository does not even carry.
 Full workings in **`docs/quests.md`**.
 
 ### 🏰 Dungeons
-
-<!-- 📷 aquí: la puerta de una mazmorra, la llave y el jefe -->
+<img width="2560" height="1510" alt="image" src="https://github.com/user-attachments/assets/3c73a696-1de3-46ae-bea6-149bc06009fb" />
+<img width="2560" height="1508" alt="image" src="https://github.com/user-attachments/assets/7b481a47-2fea-43da-a8a0-5b2692030473" />
 
 **187 dungeons**, with their **763 rooms**, their key and their boss.
 
@@ -319,7 +348,8 @@ Full workings in **`docs/dungeons.md`**.
 
 ### 🪙 Jondo Coin
 
-A currency of this server's own — a real item with its own template, not a reskin of kamas.
+A currency of this server's own — a real item with its own template.
+<img width="1676" height="1102" alt="image" src="https://github.com/user-attachments/assets/aee2eb3f-b2a3-4c35-a35c-fafe69669355" />
 
 - ✅ Drops from every monster at 100%, one coin per 25 monster levels: 1 for 1-25, 2 for 26-50, up to 9 at 201+
 - ✅ Its own description in the five client languages, picked at runtime from the language the client is running in
