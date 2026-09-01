@@ -687,34 +687,3 @@ Three **SQLite** databases in `bases/`, and one folder of text:
 Files are looked up in `datos/`, then `bases/`, then the root, so a half-moved installation still starts.
 
 **Some regression guards also run at startup and throw**, so the server refuses to boot when the data it was shipped does not match what the code expects — see [Tests](#-tests) for which checks live where, and why.
-
----
-
-<details>
-<summary>📷 Old screenshot gallery — being redistributed into the sections above</summary>
-
-<img width="2559" height="1499" alt="image" src="https://github.com/user-attachments/assets/3b4f1f39-45d3-4efe-b73b-65d1d5e8a595" />
-<img width="2559" height="1509" alt="image" src="https://github.com/user-attachments/assets/dde87296-dd2a-498a-b058-1491160b7d04" />
-<img width="2559" height="1506" alt="image" src="https://github.com/user-attachments/assets/521bef24-6b19-4061-bc5b-37a178e91163" />
-<img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/0f06761a-7dcf-481e-b045-02efce31c58e" />
-<img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/60b113e4-3415-435f-8bc4-738e8efbfc2a" />
-<img width="2559" height="1499" alt="image" src="https://github.com/user-attachments/assets/6faa6737-b04b-4cba-986f-3046ff2b4f2a" />
-<img width="2559" height="1488" alt="image" src="https://github.com/user-attachments/assets/aa2249c3-699d-4137-aeef-96fc2278fcf2" />
-<img width="2559" height="1497" alt="image" src="https://github.com/user-attachments/assets/33829fde-d8f1-4b5e-a3f1-11e34fd8c4ca" />
-<img width="2559" height="1493" alt="image" src="https://github.com/user-attachments/assets/86a0b6e6-ea31-45a3-b381-4ba4fcc6b043" />
-<img width="2559" height="1503" alt="image" src="https://github.com/user-attachments/assets/7c2aec0c-85a5-497b-9e1f-db4b77697605" />
-<img width="2559" height="1508" alt="image" src="https://github.com/user-attachments/assets/cb587972-a7c5-42cd-a1e2-c1567cecccc8" />
-<img width="910" height="929" alt="image" src="https://github.com/user-attachments/assets/00b35bbe-7356-41d0-ba9a-d079fbc7165f" />
-<img width="2559" height="1493" alt="image" src="https://github.com/user-attachments/assets/cb75bca8-358d-4153-a2e6-955c10be92f9" />
-<img width="2559" height="1511" alt="image" src="https://github.com/user-attachments/assets/38c437da-d881-4d64-b2b4-0348c789a9a3" />
-<img width="2559" height="1503" alt="image" src="https://github.com/user-attachments/assets/95591e2a-f99d-4f66-b8f5-1f0c24ccf548" />
-<img width="2559" height="1480" alt="image" src="https://github.com/user-attachments/assets/4d17a777-6839-4ed0-9aac-38768159e4ac" />
-<img width="1403" height="1153" alt="image" src="https://github.com/user-attachments/assets/a22d551f-6dec-4147-b821-f6a8c5c7e721" />
-<img width="1003" height="824" alt="image" src="https://github.com/user-attachments/assets/82b10866-3f7f-4e79-83fb-f96331066fd7" />
-<img width="805" height="1021" alt="image" src="https://github.com/user-attachments/assets/bcbf1292-0474-4279-ab0d-9da0bf2b7ea4" />
-<img width="2559" height="1503" alt="image" src="https://github.com/user-attachments/assets/c86bc15b-5bcd-4487-aa3d-391df8be93c0" />
-<img width="2559" height="1515" alt="image" src="https://github.com/user-attachments/assets/dd60b531-4b3e-4347-a866-26ecb36046d4" />
-<img width="2559" height="1500" alt="image" src="https://github.com/user-attachments/assets/7f0406c5-34c0-46b9-8cf7-fe14913f70e0" />
-<img width="2559" height="1504" alt="image" src="https://github.com/user-attachments/assets/6b934f0d-40b7-4a3e-9926-5df97bf9c484" />
-
-</details>
