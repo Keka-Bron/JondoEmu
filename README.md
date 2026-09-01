@@ -487,8 +487,11 @@ One engine for all eighteen classes, driven entirely by client data. Not a singl
 ---
 
 ## 🛠️ Jondo Studio
+<img width="2560" height="1508" alt="image" src="https://github.com/user-attachments/assets/14ee4541-d473-4bd1-81dd-617d03c8ba82" />
+<img width="2558" height="1502" alt="image" src="https://github.com/user-attachments/assets/21917c8d-4e7a-43a1-a7bc-73dddee31137" />
+<img width="2558" height="1496" alt="image" src="https://github.com/user-attachments/assets/39afe77a-c451-43a2-a67b-8ab5e6abe4c4" />
+<img width="2558" height="1508" alt="image" src="https://github.com/user-attachments/assets/c139b38c-232d-4a58-9f45-572e643ccd93" />
 
-<!-- 📷 aquí: dos o tres pantallas del editor -->
 
 > ⚠️ **Very early.** The Studio changes every day, and the parts that write files have been exercised
 > by one person on one machine. Read it, use it, tell us what is wrong — but keep a copy of
