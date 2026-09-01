@@ -196,6 +196,7 @@ its own — or on another machine.
 - ✅ Each route carries **its own measured interactive type** instead of a forced zero. The type is part of the element's identity on the client side: with a zero the numbers still travel but the client stops attaching the declaration to the drawing, and the exit sun disappears
 - 🟡 **Every extracted passage still declares skill 114**, which is *Utilizar* on a zaap. Measured three ways that agree: Ankama's own world graph uses **184** on 5,629 of 5,719 interactive transitions and 114 on none; over 401 captures 184 appears on 420 elements and 114 on 23, every one a zaap; and in our own traffic skill 184 is followed by a map change 178 times while 114 opens the zaap window. New passages written in Jondo Studio declare 184; the extracted rows have not been rewritten
 - ✅ **New passages can be created**, both ways, from Jondo Studio — which is what makes a house with its own interior possible
+<img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/e3908060-2ad1-415c-a11a-cb6f323b9378" />
 
 ### 🏘️ Houses, bins and haven bags
 
