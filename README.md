@@ -284,7 +284,7 @@ Dofus does not ship the item-to-look table: the server sends it. **2,371 of the 
 
 ### 👹 NPCs and monsters
 <img width="954" height="836" alt="image" src="https://github.com/user-attachments/assets/78779a18-0cd2-4f5c-b403-0c39cd291bcb" />
-<img width="2560" height="1496" alt="image" src="https://github.com/user-attachments/assets/bf4e3381-61a9-44e0-bea4-eed3193a7a93" />
+<img width="2560" height="1510" alt="image" src="https://github.com/user-attachments/assets/43ebcfc4-fdbb-4924-b876-0c06743f8294" />
 <img width="2558" height="1510" alt="image" src="https://github.com/user-attachments/assets/0b4adf75-9b36-4298-b428-d0444297adb3" />
 
 - ✅ **6,468 NPC templates** with 3D looks and dialogue trees
