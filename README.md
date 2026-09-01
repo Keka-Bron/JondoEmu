@@ -328,6 +328,7 @@ Full workings in **`docs/quests.md`**.
 ### 🏰 Dungeons
 <img width="2560" height="1510" alt="image" src="https://github.com/user-attachments/assets/3c73a696-1de3-46ae-bea6-149bc06009fb" />
 <img width="2560" height="1508" alt="image" src="https://github.com/user-attachments/assets/7b481a47-2fea-43da-a8a0-5b2692030473" />
+<img width="2560" height="1510" alt="image" src="https://github.com/user-attachments/assets/a6347069-3d31-45bc-b40f-f4d942674e48" />
 
 **187 dungeons**, with their **763 rooms**, their key and their boss.
 
@@ -392,8 +393,7 @@ go red: no lookups that assume one team is the players, no rules decided by figh
 rules object, and nothing writing to a single socket unless it is painting one person's own view.
 
 ### 🐉 PvM combat
-
-<!-- 📷 aquí: un combate contra monstruos, colocación y turnos -->
+<img width="2560" height="1510" alt="image" src="https://github.com/user-attachments/assets/d5fdf2d1-0244-4529-b2b9-06cf3dcdc1e5" />
 
 - ✅ Tactical arenas resolved from each roleplay map by zone offset, with clean context transitions
 - ✅ Placement phase with red and blue tiles and cell swapping before *Ready*
@@ -409,8 +409,8 @@ rules object, and nothing writing to a single socket unless it is painting one p
 - ❌ AP/MP dodge rolls, shields, lock and tackle in melee
 
 ### 🤺 Duels
-
-<!-- 📷 aquí: retar a alguien, el combate, y la pantalla de victoria/derrota -->
+<img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/286367e0-6342-4aef-b07b-52d3bdbdf9d4" />
+<img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/c1f3f058-81ea-4189-8f4b-312e3209f63a" />
 
 Player against player, on the map, by challenging somebody standing there.
 
@@ -423,8 +423,10 @@ Player against player, on the map, by challenging somebody standing there.
   with no level is a *monster* to the client, so a person always carries theirs
 
 ### 🏟️ Koliseo
-
-<!-- 📷 aquí: la ventana del koliseo, el buscando, y el reparto de kolichas al ganar -->
+<img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/2b19a035-4124-41d6-9c43-0c6881f69e40" />
+<img width="2560" height="1498" alt="image" src="https://github.com/user-attachments/assets/417c9bf9-c895-4a7a-8de3-ef394ce5392c" />
+<img width="2560" height="1498" alt="image" src="https://github.com/user-attachments/assets/0a3bc3d6-ce61-4729-aa23-958a024c07fb" />
+<img width="2560" height="1496" alt="image" src="https://github.com/user-attachments/assets/dfb0aeb1-b507-48b0-8e05-286c3fa1945e" />
 
 Ranked PvP through a queue. Open the window, pick a format, get matched, fight, get paid.
 
