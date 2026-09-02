@@ -29,6 +29,11 @@ namespace Jondo.Unity.Server.Handlers
                 else if (field.FieldNumber == 2) elementId = (int)field.VarIntValue;
             }
 
+            // Dentro de un sueno, las puertas son interactivos que no existen en el mapa de rol,
+            // asi que se prueban ANTES: el registro de siempre no sabria que hacer con ellas y las
+            // dejaria en «uso desconocido».
+            if (await DreamHandler.TryDoorAsync(stream, elementId)) return;
+
             long mapId = SessionContext.State.MapId;
 
             var lectura = Readables.Of(mapId, elementId);

@@ -623,8 +623,67 @@ public static class Op
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Iya = "iya";
 
-    /// <summary>Lo envia el cliente (8 veces en 7 ficheros) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AlmanaxDateMessage, y eso es falso.</summary>
+    /// <summary>La TORMENTA ASTRAL de los Suenos Infinitos. Viaja vacia.</summary>
+    /// <remarks>
+    /// Estaba aqui como «sin identificar» y como AlmanaxDateMessage en el fichero de mapeos, que
+    /// es falso. Medido en las capturas de suenos: el cliente lo manda vacio y el servidor
+    /// contesta con el izg del estado, un jru de cambio de mapa y un izj «1001».
+    /// </remarks>
     public const string Izh = "izh";
+
+    // ─── Los Suenos Infinitos ───────────────────────────────────────────────────────────
+    //
+    // Trece capturas en «Sueños Infinitos/» cubren el ciclo entero, y este es:
+    //
+    //   C->S  iwo             usar el pozo, que es un interactivo de los de siempre
+    //   S->C  iwn + iyj       el resultado del interactivo y LA VENTANA con el mapa del sueno
+    //   C->S  ixf { f1 }      empezar, con la dificultad dentro
+    //   S->C  izg + jru       el estado y el cambio de mapa a la primera sala
+    //   S->C  ixa             el acuse, por la raiz 3 y vacio
+    //   C->S  iwo             elegir puerta: otro interactivo
+    //   S->C  izg + jru       estado nuevo y a la sala siguiente
+    //   C->S  iyx             salir
+    //   S->C  jru + ixg + iom
+    //   S->C  iyb «0801»      el acuse de la salida, por la raiz 3
+
+    /// <summary>El mapa de un sueno: la cabecera, las once salas y el grafo que las une.</summary>
+    /// <remarks>
+    /// Entre 490 y 618 bytes en las capturas. Lleva el nombre del personaje, su nivel y la
+    /// dificultad, luego la lista de salas —cada una con su fila, su grupo de MapMobs y el efecto
+    /// que la modifica— y por ultimo las conexiones, que dibujan un rombo de cinco filas.
+    /// </remarks>
+    public const string Iyj = "iyj";
+
+    /// <summary>Empezar un sueno, o descartar el que haya en curso. Un mensaje, dos operaciones.</summary>
+    /// <remarks>
+    /// El campo dice cual: <c>f1</c> es empezar y lleva la dificultad en su f3, y <c>f2</c> es
+    /// descartar. Medido comparando el ixf de nueve capturas contra la dificultad que el jugador
+    /// eligio en cada una: 1..3 Sueno, 4..7 Paradoja, 8..10 Pesadilla.
+    /// </remarks>
+    public const string Ixf = "ixf";
+
+    /// <summary>El estado del sueno en curso. Viaja en cada cambio de sala, junto al jru.</summary>
+    /// <remarks>
+    /// Su f2 es la dificultad y coincide con la que se mando en el ixf. Su f4 son las PUERTAS que
+    /// se ofrecen ahora mismo: cada una con la sala a la que lleva y el identificador de habilidad
+    /// que el cliente devolvera en el iwo.
+    /// </remarks>
+    public const string Izg = "izg";
+
+    /// <summary>El acuse de haber empezado el sueno. Viaja vacio, por la raiz 3.</summary>
+    public const string Ixa = "ixa";
+
+    /// <summary>Acompana a la tormenta astral. «1001» en la captura.</summary>
+    public const string Izj = "izj";
+
+    /// <summary>Salir del sueno. Viaja vacio.</summary>
+    public const string Iyx = "iyx";
+
+    /// <summary>El acuse de la salida. «0801», por la raiz 3.</summary>
+    public const string Iyb = "iyb";
+
+    /// <summary>Acompana a la salida del sueno. Viaja vacio.</summary>
+    public const string Ixg = "ixg";
 
     /// <summary>El builder no se llama nunca. 2 mensajes en 2 ficheros.</summary>
     public const string Izu = "izu";

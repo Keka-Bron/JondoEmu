@@ -101,6 +101,7 @@ namespace Jondo.Unity.Server
             Managers.Cosmetics.Initialize();
             Managers.EquipmentSkins.Initialize();
             Managers.KoliseoMaps.Initialize();
+            Managers.Dreams.Initialize();
             Managers.Merkasako.Initialize();
             Managers.Zaapis.Initialize();
             Managers.Bins.Initialize();

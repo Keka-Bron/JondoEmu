@@ -592,6 +592,21 @@ namespace Jondo.Unity.Server.Network
                 {
                     await Handlers.PrivateMessageHandler.WhisperAsync(stream, payload);
                 }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixf)))
+                {
+                    // Empezar un sueno, o descartar el que hubiera.
+                    await DreamHandler.StartOrDiscardAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Izh)))
+                {
+                    // La tormenta astral.
+                    await DreamHandler.AstralStormAsync(stream);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyx)))
+                {
+                    // Salir del sueno.
+                    await DreamHandler.LeaveAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Iwo)))
                 {
                     // Todos los elementos pasan por el mismo registro; él decide qué acción hay
