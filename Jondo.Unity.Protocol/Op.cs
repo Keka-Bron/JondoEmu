@@ -685,6 +685,15 @@ public static class Op
     /// <summary>Acompana a la salida del sueno. Viaja vacio.</summary>
     public const string Ixg = "ixg";
 
+    /// <summary>El boton de Suenos Infinitos del menu, y la tecla T. Viaja vacio.</summary>
+    /// <remarks>
+    /// NO abre la ventana: te lleva al Plano Astral, y alli el pozo es el que la abre. Medido en
+    /// la captura de «Sueño III-pelear-morir»: al iyc le siguen un jru al mapa 238551040 -la
+    /// subarea 938, «Dominios de Draconiros»- y el iom de siempre. Es lo que dice el devblog, que
+    /// al Plano Astral se entra desde cualquier sitio del Mundo de los Doce.
+    /// </remarks>
+    public const string Iyc = "iyc";
+
     /// <summary>El builder no se llama nunca. 2 mensajes en 2 ficheros.</summary>
     public const string Izu = "izu";
 

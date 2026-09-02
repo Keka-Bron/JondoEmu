@@ -592,6 +592,11 @@ namespace Jondo.Unity.Server.Network
                 {
                     await Handlers.PrivateMessageHandler.WhisperAsync(stream, payload);
                 }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyc)))
+                {
+                    // El boton de Suenos Infinitos del menu, y la tecla T: al Plano Astral.
+                    await DreamHandler.ToAstralPlaneAsync(stream);
+                }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixf)))
                 {
                     // Empezar un sueno, o descartar el que hubiera.

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -123,6 +123,20 @@ namespace Jondo.Unity.Server.Managers
             => _enCurso.TryGetValue(characterId, out var s) ? s : null;
 
         public static void Olvidar(long characterId) => _enCurso.TryRemove(characterId, out _);
+
+        /// <summary>De donde salio cada uno hacia el Plano Astral.</summary>
+        /// <remarks>
+        /// Se apunta al pulsar el boton del menu, que es el ultimo momento en que se sabe: dentro
+        /// del plano y de las salas el mapa de la sesion ya es otro. Sin esto, salir del sueno
+        /// dejaria al jugador en el plano en vez de donde estaba.
+        /// </remarks>
+        private static readonly ConcurrentDictionary<long, (long Mapa, int Casilla)> _deDonde = new();
+
+        public static void RecordarDeDondeViene(long characterId, long mapa, int casilla)
+            => _deDonde[characterId] = (mapa, casilla);
+
+        public static (long Mapa, int Casilla) DeDondeViene(long characterId)
+            => _deDonde.TryGetValue(characterId, out var d) ? d : (0, 0);
 
         /// <summary>Cuántos grupos hay disponibles para plantar en las salas.</summary>
         public static int GruposDisponibles { get { Cargar(); return _grupos?.Count ?? 0; } }

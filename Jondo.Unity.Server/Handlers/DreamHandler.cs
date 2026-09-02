@@ -48,6 +48,44 @@ namespace Jondo.Unity.Server.Handlers
         public static int ElementoDePuerta(long characterId, int sala)
             => 539500 + (int)((characterId % 1000) * 100) + sala;
 
+        /// <summary>
+        /// El Plano Astral, que es a donde lleva el boton del menu.
+        /// </summary>
+        /// <remarks>
+        /// Medido: el jru que sigue al iyc va al 238551040, que en nuestra propia base es la
+        /// subarea 938, «Dominios de Draconiros». Es el vestibulo de los Suenos, no una sala.
+        /// </remarks>
+        public const long PlanoAstral = 238551040;
+
+        // ═══════════════════════════════════════════════════════════════════
+        //  El boton del menu
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// El boton de Suenos Infinitos del menu, y la tecla T (iyc).
+        /// </summary>
+        /// <remarks>
+        /// No abre la ventana: TELETRANSPORTA al Plano Astral, y alli el pozo es el que la abre.
+        /// Medido en la captura, donde al iyc le siguen un jru al plano y el iom de siempre.
+        ///
+        /// Se apunta de donde viene para poder devolverlo: si ya esta en el plano no se hace nada,
+        /// que si no un segundo toque a la tecla se guardaria el plano como sitio de vuelta y el
+        /// jugador se quedaria alli para siempre.
+        /// </remarks>
+        public static async Task ToAstralPlaneAsync(NetworkStream stream)
+        {
+            if (GameState.MapId == PlanoAstral)
+            {
+                Console.WriteLine("[Sueños] Ya está en el Plano Astral.");
+                return;
+            }
+
+            Dreams.RecordarDeDondeViene(GameState.CharacterId, GameState.MapId, GameState.CellId);
+
+            int aterriza = await TeleportHandler.ToMapAsync(stream, PlanoAstral, 0);
+            Console.WriteLine($"[Sueños] {GameState.CharacterId} al Plano Astral, casilla {aterriza}.");
+        }
+
         // ═══════════════════════════════════════════════════════════════════
         //  Abrir la ventana
         // ═══════════════════════════════════════════════════════════════════
@@ -228,9 +266,20 @@ namespace Jondo.Unity.Server.Handlers
             var sueno = Dreams.De(GameState.CharacterId);
             if (sueno == null) return;
 
-            if (sueno.MapaDeVuelta != 0)
+            // A donde estaba ANTES DE PULSAR EL BOTON, no al mapa desde el que empezo el sueno:
+            // a esas alturas ese mapa ya es el propio Plano Astral, y devolverlo alli lo dejaria
+            // dando vueltas por el vestibulo.
+            var (mapa, casilla) = Dreams.DeDondeViene(sueno.CharacterId);
+            if (mapa == 0) { mapa = sueno.MapaDeVuelta; casilla = sueno.CasillaDeVuelta; }
+
+            if (mapa != 0 && mapa != PlanoAstral)
             {
-                await TeleportHandler.ToMapAsync(stream, sueno.MapaDeVuelta, sueno.CasillaDeVuelta);
+                await TeleportHandler.ToMapAsync(stream, mapa, casilla);
+            }
+            else
+            {
+                // Sin sitio conocido, al plano: es de donde se entro y siempre existe.
+                await TeleportHandler.ToMapAsync(stream, PlanoAstral, 0);
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
