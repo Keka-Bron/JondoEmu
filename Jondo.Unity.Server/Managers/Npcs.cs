@@ -309,6 +309,47 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// Pone un NPC en un mapa de sala de sueño, si no está ya.
+        /// </summary>
+        /// <remarks>
+        /// Aparte de las tres capas normales a propósito. Aquéllas describen el mundo, que es
+        /// igual para todos; esto es de UNA partida: el Rey Gob aparece en la sala de Favor del
+        /// sueño de quien la abrió y no tiene por qué estar ahí para nadie más.
+        ///
+        /// Se hereda el aspecto de la plantilla igual que en la carga normal, porque si no el
+        /// cliente recibe un actor sin nada que dibujar.
+        /// </remarks>
+        public static void PonerDelSueno(long mapId, int npcId, int cell, int orientation)
+        {
+            lock (_byMap)
+            {
+                if (!_byMap.TryGetValue(mapId, out var aqui))
+                {
+                    aqui = new List<Spawn>();
+                    _byMap[mapId] = aqui;
+                }
+
+                foreach (var puesto in aqui)
+                {
+                    if (puesto.NpcId == npcId && puesto.Cell == cell) return;
+                }
+
+                var plantilla = TemplateOf(npcId);
+                aqui.Add(new Spawn
+                {
+                    MapId = mapId,
+                    NpcId = npcId,
+                    Cell = cell,
+                    Orientation = orientation,
+                    ContextualId = ActorIds.NpcDelMapa(aqui.Count),
+                    RawLook = plantilla?.Look ?? "",
+                });
+            }
+
+            Console.WriteLine($"[Sueños] Rey Gob {npcId} puesto en el mapa {mapId}, casilla {cell}.");
+        }
+
         public static IEnumerable<long> Maps => _byMap.Keys;
 
         public static IReadOnlyList<Spawn> Of(long mapId)

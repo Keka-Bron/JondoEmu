@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Jondo.Unity.Server.Managers
@@ -27,6 +27,12 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>Un recurso de oficio: trigo, fresno, caladero, mineral.</summary>
         Gather,
+
+        /// <summary>El pozo de los Suenos Infinitos, que abre la ventana del sueno.</summary>
+        Dream,
+
+        /// <summary>Una de las tres puertas de una sala, que lleva a la fila de abajo.</summary>
+        DreamDoor,
     }
 
     /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
@@ -127,6 +133,42 @@ namespace Jondo.Unity.Server.Managers
                     Register(mapId, element, Lottery.Type,
                         InteractiveActionKind.Lottery, Lottery.Skill);
             }
+
+            // El pozo de los Suenos. Esta en los datos del cliente como un elemento mas -el 539616,
+            // grafico 90166, casilla 370 del mapa del Plano Astral- pero sin una accion declarada
+            // el cliente ni siquiera deja pulsarlo: es un adorno.
+            //
+            // El elemento y la habilidad salen del f11 del jss real de ese mapa, no del iwo: el
+            // iwo devuelve el UID de instancia, y tomarlo por la habilidad es lo que dejó el pozo
+            // sin pulsar. Véase Dreams.HabilidadDelPozo.
+            foreach (var pozo in Interactives.ElementsOf(Dreams.MapaDelPozo))
+            {
+                if (pozo.Id != Dreams.ElementoDelPozo) continue;
+                Register(Dreams.MapaDelPozo, pozo, Dreams.TipoDelPozo,
+                         InteractiveActionKind.Dream, Dreams.HabilidadDelPozo);
+                Register(Dreams.MapaDelPozo, pozo, Dreams.TipoDelPozo,
+                         InteractiveActionKind.Dream, Dreams.SegundaHabilidadDelPozo);
+            }
+
+            // Y las puertas de las salas. Sin esto pasa lo mismo que pasaba con el pozo: el
+            // cliente las dibuja —están en sus propios datos de mapa— y no deja pulsarlas, así
+            // que el jugador entra en el sueño, se planta en la sala de entrada y no tiene por
+            // dónde seguir. Ningún error, otra vez.
+            //
+            // Medido en las ocho salas que salen en las capturas, 48 declaraciones y todas
+            // iguales: f11 { f1: 1, f4 { uid, 184 }, f5: el elemento, f6: -1 }.
+            int puertas = 0;
+            foreach (long sala in Dreams.TodosLosMapasDeSala())
+            {
+                foreach (var puerta in Interactives.ElementsOf(sala))
+                {
+                    Register(sala, puerta, Dreams.TipoDelPozo,
+                             InteractiveActionKind.DreamDoor, Dreams.HabilidadDelPozo);
+                    puertas++;
+                }
+            }
+
+            if (puertas > 0) Console.WriteLine($"[Sueños] {puertas} puerta(s) de sala declaradas.");
 
             // Los zaapis y las papeleras se reconocen por su GRÁFICO y son decenas, así que se
             // registran en bloque en vez de uno a uno como el zaap o la lotería.

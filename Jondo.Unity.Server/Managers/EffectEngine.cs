@@ -62,6 +62,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>La plantilla de bicho que hay que sacar al tablero, si el efecto invoca.</summary>
         public int Invoca { get; init; }
 
+        /// <summary>El efecto 141: mata al objetivo, sin cálculo de por medio.</summary>
+        public bool Fulmina { get; init; }
+
         /// <summary>
         /// Cuántos puntos se lleva el que lanza, cuando el efecto es de ROBO. Los mismos que se
         /// le han quitado al objetivo, que van en <see cref="Cuanto"/> en negativo.
@@ -382,6 +385,15 @@ namespace Jondo.Unity.Server.Managers
         };
 
         public static bool EsRoboDeVida(int efecto) => RobosDeVida.Contains(efecto);
+
+        /// <summary>«Mata al objetivo», el 141 del catálogo del cliente.</summary>
+        /// <remarks>
+        /// Lo trae Doom de Masas (3450), que es de administración: un PA, alcance cero, zona, y un
+        /// efecto 120 detrás que devuelve el PA gastado. Hasta ahora el 141 caía en la rama de
+        /// «no sé aplicarlo pero lo anuncio», que lo pintaba en el panel de embrujos y no mataba
+        /// a nadie.
+        /// </remarks>
+        private const int MataAlObjetivo = 141;
 
         private const int PuntosDeAccion = 1;
         private const int PuntosDeMovimiento = 23;
@@ -787,6 +799,21 @@ namespace Jondo.Unity.Server.Managers
         {
             // El daño lo lleva quien ya lo llevaba; aquí no se toca.
             if (efecto.EffectId >= DanoPrimero && efecto.EffectId <= DanoUltimo) return null;
+
+            if (efecto.EffectId == MataAlObjetivo)
+            {
+                if (!sobre.IsAlive) return null;
+
+                return new Outcome
+                {
+                    Sobre = sobre,
+                    Caster = quienLanza,
+                    Efecto = efecto,
+                    HechizoOrigen = hechizo,
+                    NivelOrigen = grado,
+                    Fulmina = true,
+                };
+            }
 
             if (efecto.EffectId == Empujar || efecto.EffectId == Tirar ||
                 efecto.EffectId == Retroceder || efecto.EffectId == Avanzar)

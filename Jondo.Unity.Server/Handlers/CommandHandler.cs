@@ -426,7 +426,8 @@ namespace Jondo.Unity.Server.Handlers
 
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Hms,
-                    ConnectionProtocol.BuildSpellList(GameState.Breed, GameState.CharacterLevel)));
+                    ConnectionProtocol.BuildSpellList(GameState.Breed, GameState.CharacterLevel,
+                        Network.SessionContext.Current.AccountId)));
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Itg,
                     ConnectionProtocol.BuildSpellBar(GameState.Breed, GameState.CharacterLevel)));

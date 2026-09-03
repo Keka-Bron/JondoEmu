@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Jondo.Unity.Tests.Movement
 {
+    [Collection("MapManager")]
     public sealed class TeleportInteractiveTypeTests
     {
         [Fact]

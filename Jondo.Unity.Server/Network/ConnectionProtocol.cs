@@ -1111,10 +1111,22 @@ namespace Jondo.Unity.Server.Network
             // Le f15 est un état dynamique, pas la déclaration du dessin. Les éléments passifs et
             // les routes sont visibles par leur f11 et ne doivent donc pas recevoir cet état
             // artificiel qui empêchait le client d'associer le soleil à ses données de carte.
-            bool teleport = false;
+            // Rien de ce qui appartient aux Songes non plus. Mesuré et sans exception: les 22 jss
+            // réels de la carte 238551040 et les 36 des salles n'ont AUCUN f15 — ni pour le puits,
+            // ni pour les quatre arcades, ni pour les trois portes de chaque salle.
+            //
+            // Et ce n'est pas un détail cosmétique: le commentaire ci-dessus le dit déjà pour les
+            // soleils de sortie — un f15 artificiel empêche le client de rattacher l'élément au
+            // dessin de ses propres données de carte. C'est ce qui laissait les portes invisibles
+            // tant qu'on ne tenait pas la touche des interactifs enfoncée.
+            bool sinColocacion = false;
             foreach (var action in interactive.Actions)
-                if (action.Kind == Managers.InteractiveActionKind.Teleport) teleport = true;
-            if (interactive.Actions.Count == 0 || teleport) return;
+            {
+                if (action.Kind == Managers.InteractiveActionKind.Teleport
+                    || action.Kind == Managers.InteractiveActionKind.Dream
+                    || action.Kind == Managers.InteractiveActionKind.DreamDoor) sinColocacion = true;
+            }
+            if (interactive.Actions.Count == 0 || sinColocacion) return;
 
             DeclarePlacement(jss, interactive.Element,
                 gathering && !usable ? state : Managers.ResourceState.Full);
@@ -1230,7 +1242,7 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private const int GradoDelCuerpoACuerpo = 1;
 
-        public static byte[] BuildSpellList(int breed, int level)
+        public static byte[] BuildSpellList(int breed, int level, long accountId = 0)
         {
             var hms = Pb.New();
 
@@ -1239,6 +1251,17 @@ namespace Jondo.Unity.Server.Network
             foreach (var spell in SpellTable.KnownFor(breed, level, Managers.SpellChoices.Chosen))
             {
                 hms.Msg(1, Pb.New().Var(1, spell.Grade).Var(3, spell.SpellId).Var(4, 1));
+            }
+
+            // Y los de administración, que van detrás y sólo para quien lo es. El rol se mira
+            // contra la base cada vez: quitárselo a alguien tiene efecto en cuanto vuelva a
+            // entrar, sin nada guardado en la sesión que se quede desfasado.
+            if (Managers.AdminSpells.Para(accountId))
+            {
+                hms.Msg(1, Pb.New()
+                    .Var(1, Managers.AdminSpells.GradoDeDoom)
+                    .Var(3, Managers.AdminSpells.DoomDeMasas)
+                    .Var(4, 1));
             }
 
             // El f2 suelto del final, que es el mismo tipo de descuido que tuvo la barra de
@@ -1270,9 +1293,9 @@ namespace Jondo.Unity.Server.Network
         /// The slot is left out when it is zero, as proto3 does everywhere else. The client edits
         /// a slot with itz —f2 el atajo, f3 la barra— and the server echoes it in ivk.
         /// </summary>
-        public static byte[] BuildSpellBar(int breed, int level)
+        public static byte[] BuildSpellBar(int breed, int level, long accountId = 0)
         {
-            var layout = Managers.FightSpellLayout.Current(breed, level);
+            var layout = Managers.FightSpellLayout.Current(breed, level, accountId);
 
             var remembered = new List<(int Slot, int SpellId)>();
             foreach (var (slot, spell) in layout.Bar)
@@ -1766,11 +1789,35 @@ namespace Jondo.Unity.Server.Network
         /// NpcTemplates, así que ponerlos sería inventárselos.
         /// </summary>
         public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies)
+            => BuildNpcQuestion(messageId, replies, null);
+
+        /// <summary>
+        /// La misma pregunta, con los PARÁMETROS que algunas respuestas llevan dentro.
+        /// </summary>
+        /// <remarks>
+        /// Una respuesta no es siempre sólo un identificador: puede traer números que el cliente
+        /// mete en su texto. La fuente de los Sueños Infinitos es el caso claro —el Rey Gob—, y en
+        /// la captura larga su respuesta viaja así:
+        ///
+        ///   f2 { f1: 82314, f3 { f1: 4037 }, f3 { f1: 4035 } }
+        ///
+        /// El f3 es repetido y lleva un número cada uno. Sin ellos la respuesta se ofrece igual,
+        /// pero pelada: el cliente pinta el hueco del número vacío.
+        /// </remarks>
+        public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies,
+                                              IReadOnlyDictionary<long, IReadOnlyList<long>> parametros)
         {
             var ios = Pb.New().Var(1, messageId);
             foreach (long reply in replies)
             {
-                ios.Msg(2, Pb.New().Var(1, reply));
+                var una = Pb.New().Var(1, reply);
+
+                if (parametros != null && parametros.TryGetValue(reply, out var suyos))
+                {
+                    foreach (long valor in suyos) una.Msg(3, Pb.New().Var(1, valor));
+                }
+
+                ios.Msg(2, una);
             }
             return ios.Build();
         }

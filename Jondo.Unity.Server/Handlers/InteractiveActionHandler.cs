@@ -103,6 +103,17 @@ namespace Jondo.Unity.Server.Handlers
                 case InteractiveActionKind.Lottery:
                     await LotteryHandler.DrawAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
+                case InteractiveActionKind.Dream:
+                    await DreamHandler.ShowAsync(stream);
+                    break;
+                case InteractiveActionKind.DreamDoor:
+                    // TryDoorAsync ya se ha probado más arriba, antes del despacho normal. Si se
+                    // llega aquí es que esa puerta no es de la sala en la que está: puede ser una
+                    // de las otras dos del mapa, o alguien que pulsa una puerta sin sueño en
+                    // curso. No se hace nada, que es mejor que llevarle a una sala que no le toca.
+                    Console.WriteLine($"[Sueños] Puerta {interactive.Element.Id} pulsada y no " +
+                                      "lleva a ninguna salida de la sala actual.");
+                    break;
                 case InteractiveActionKind.Zaapi:
                     await ZaapiTravelHandler.OpenAsync(stream, interactive.Element, action.SkillId);
                     break;

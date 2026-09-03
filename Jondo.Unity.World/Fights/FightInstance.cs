@@ -505,6 +505,15 @@ namespace Jondo.Unity.World.Fights
             }
         }
 
+        /// <summary>Si ya se le ha dicho al cliente que deje de regenerar vida.</summary>
+        /// <remarks>
+        /// La pareja lqg + lqt se manda una sola vez por combate, que es como sale en la captura.
+        /// Iba sólo en la rama de «todos listos», así que un combate que arrancara porque se acabó
+        /// el tiempo de colocación —el caso normal contra monstruos si nadie pulsa— se quedaba sin
+        /// ella, y el cliente seguía rellenando la barra de vida de uno en uno dentro de la pelea.
+        /// </remarks>
+        public bool RegeneracionApagada { get; set; }
+
         public void StartFight()
         {
             CancelPlacementTimer();

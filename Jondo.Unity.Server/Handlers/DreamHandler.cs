@@ -34,21 +34,6 @@ namespace Jondo.Unity.Server.Handlers
     public static class DreamHandler
     {
         /// <summary>
-        /// El elemento interactivo de la puerta que lleva a una sala.
-        /// </summary>
-        /// <remarks>
-        /// Es el ELEMENTO, no la habilidad, y conviene no confundirlos porque el iwo lleva los dos:
-        /// su f1 es la habilidad y su f2 el elemento. En la captura la puerta a la sala «1» sale
-        /// listada en el izg con el 539509, y el iwo que la pulsa trae ese mismo 539509 en su f2 y
-        /// un 6.809.520 en el f1. O sea que lo que identifica la puerta es el f2.
-        ///
-        /// Aquí se deriva del personaje y de la sala: lo único que hace falta es que sea estable
-        /// mientras dure el sueño y distinto entre puertas.
-        /// </remarks>
-        public static int ElementoDePuerta(long characterId, int sala)
-            => 539500 + (int)((characterId % 1000) * 100) + sala;
-
-        /// <summary>
         /// El Plano Astral, que es a donde lleva el boton del menu.
         /// </summary>
         /// <remarks>
@@ -100,6 +85,20 @@ namespace Jondo.Unity.Server.Handlers
             sueno ??= Dreams.Crear(yo, GameState.CharacterName, GameState.CharacterLevel, 1,
                                    GameState.MapId, GameState.CellId);
 
+            // Primero soltar el elemento. En la captura de Pesadilla II el orden es exacto:
+            //
+            //   C->S iwo  0887a20110e0f720
+            //   S->C iwn  080110e0f72020b80128a28280c8e708
+            //   S->C iyj  (618 B)
+            //
+            // Y el orden importa: sin el iwn el cliente sigue teniendo el pozo por ocupado y no
+            // abre la ventana que le llega detrás. No da ningún error; simplemente no pasa nada,
+            // que es lo que se vio al pulsarlo. El f4 de ese iwn es 184, la misma habilidad que
+            // ya se anuncia en el f11.
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
+                    Dreams.ElementoDelPozo, Dreams.HabilidadDelPozo, yo)));
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iyj, DreamProtocol.BuildDreamMap(sueno)));
 
@@ -110,14 +109,29 @@ namespace Jondo.Unity.Server.Handlers
         //  Empezar y descartar
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>Empezar el sueño (ixf f1) o descartar el que hubiera (ixf f2).</summary>
+        /// <summary>Empezar un sueño (ixf f1) o entrar en el que ya hay (ixf f2).</summary>
+        /// <remarks>
+        /// El f2 se leyó mal durante un tiempo: se tomó por «descartar» porque las capturas donde
+        /// aparece se llaman «descartar el sueño en curso». Los bytes dicen otra cosa. En
+        /// «continuar sueño infinito» y en «Sueño II-descartar», el mismo «12020801» va seguido de
+        /// un izg y de un jru A UNA SALA: el jugador ENTRA.
+        ///
+        ///   C->S ixf  12020801
+        ///   S->C izg  (1150 B)
+        ///   S->C jru  108080b071      -> 237764608, la sala en la que estaba
+        ///   S->C ixa  (raíz 3, vacío)
+        ///
+        /// Y descartar no tiene mensaje propio: en «Sueño III-descartar» y «paradoja I-descartar»
+        /// el cliente manda directamente el f1 con la dificultad nueva. La ventana de «ya tienes
+        /// un sueño en curso» se resuelve en el cliente; al servidor sólo le llega el comienzo.
+        /// </remarks>
         public static async Task StartOrDiscardAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? ixf = ConnectionProtocol.ReadPayload(payload, Op.Ixf);
             if (ixf == null) return;
 
             int dificultad = 0;
-            bool descartar = false;
+            bool continuar = false;
 
             foreach (var field in ProtoMessage.Parse(ixf).Fields)
             {
@@ -136,23 +150,35 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 else if (field.FieldNumber == 2)
                 {
-                    descartar = true;
+                    continuar = true;
                 }
             }
 
             long yo = GameState.CharacterId;
 
-            if (descartar)
+            if (continuar)
             {
-                Dreams.Olvidar(yo);
-                Console.WriteLine($"[Sueños] {yo} descarta el sueño en curso.");
+                var enCurso = Dreams.De(yo);
+                if (enCurso == null)
+                {
+                    Console.WriteLine($"[Sueños] {yo} quiere continuar y no tiene sueño en curso.");
+                    return;
+                }
+
+                Console.WriteLine($"[Sueños] {yo} continúa en la sala {enCurso.Actual}.");
+
+                await EntrarEnSalaAsync(stream, enCurso, enCurso.Actual);
+
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Answer(Op.Ixa, null, ConnectionProtocol.RequestId(payload)));
                 return;
             }
 
             if (dificultad <= 0 || dificultad > Dreams.MaximaDificultad)
             {
                 Console.WriteLine($"[Sueños] Dificultad {dificultad} fuera de la escalera de 1 a " +
-                                  $"{Dreams.MaximaDificultad}.");
+                                  $"{Dreams.MaximaDificultad}. ixf: " +
+                                  Convert.ToHexString(ixf).ToLowerInvariant());
                 return;
             }
 
@@ -189,15 +215,61 @@ namespace Jondo.Unity.Server.Handlers
             var actual = sueno.SalaActual;
             if (actual == null) return false;
 
-            foreach (int destino in actual.Salidas)
+            // Y no se sale de una sala sin haberla limpiado. La guía lo dice de la única manera
+            // que importa: «es absolutamente imposible volver atrás» una vez entras, y se avanza
+            // sala a sala peleando. Con las puertas abiertas desde el principio se podía recorrer
+            // el sueño entero sin dar un golpe, cobrando los puntos de todas las salas.
+            //
+            // La entrada y la última no tienen grupo, así que no bloquean.
+            if (!SalaSuperada(actual))
             {
-                if (ElementoDePuerta(sueno.CharacterId, destino) != elementId) continue;
+                Console.WriteLine($"[Sueños] La sala {actual.Id} todavía tiene su grupo en pie: " +
+                                  "no se abre la puerta.");
+                return false;
+            }
 
-                await EntrarEnSalaAsync(stream, sueno, destino);
+            // Las puertas son los elementos del propio mapa de la sala, en su orden: la primera
+            // lleva a la primera salida, la segunda a la segunda. Los mapas de la subárea 904
+            // traen tres, que es también el máximo de salidas que se ha medido en una sala.
+            for (int cual = 0; cual < actual.Salidas.Count; cual++)
+            {
+                if (Dreams.PuertaDe(actual, cual) != elementId) continue;
+
+                // Soltar la puerta ANTES del izg y del jru. Medido en la captura de Sueño III:
+                //
+                //   C->S iwo  08d0a59f0310f7f620          el elemento 539511
+                //   S->C iwn  080110f7f62020b80128…       con la habilidad 184
+                //   S->C izg  (833 B)
+                //   S->C jru  108090b071
+                //
+                // Es el mismo orden que el del pozo, y saltárselo tiene el mismo precio: el
+                // cliente se queda con la puerta por ocupada y no pasa nada de lo que venga
+                // detrás. Sin un solo error.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
+                        elementId, Dreams.HabilidadDelPozo, GameState.CharacterId)));
+
+                await EntrarEnSalaAsync(stream, sueno, actual.Salidas[cual]);
                 return true;
             }
 
             return false;
+        }
+
+        /// <summary>¿Se puede salir ya de esta sala?</summary>
+        /// <remarks>
+        /// Una sala sin grupo —la entrada y la última— se cruza sin más. Una de pelea hace falta
+        /// haberla ganado: <see cref="Dreams.Sala.Hecha"/> lo pone el final del combate.
+        ///
+        /// Se mira también si el grupo sigue plantado, y no sólo la marca, porque son dos cosas
+        /// distintas: la marca dice que se ganó, y el grupo en pie dice que sigue ahí. Con sólo
+        /// una de las dos, un sueño continuado tras reconectar dejaría pasar sin pelear.
+        /// </remarks>
+        private static bool SalaSuperada(Dreams.Sala sala)
+        {
+            if (sala.Miembros.Count == 0) return true;
+            if (sala.Hecha) return true;
+            return sala.Plantado == 0;
         }
 
         /// <summary>Mete al jugador en una sala: el estado y el cambio de mapa.</summary>
@@ -212,24 +284,119 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Izg, DreamProtocol.BuildDreamState(sueno)));
 
-            // Y el cambio de mapa. La sala de entrada no tiene grupo ni mapa propio, así que se
-            // usa el de la primera que sí lo tenga: el cliente necesita un mapa al que ir.
-            long mapa = sala.MapaId != 0 ? sala.MapaId : PrimerMapa(sueno);
-            if (mapa != 0)
+            // Y el cambio de mapa: al mapa DE LA SALA, que es uno de los 484 de la subárea 904
+            // hechos para esto, no al del grupo de monstruos. Mandarle al del grupo es lo que le
+            // dejaba de pie en Frigost, andando por el mundo y sin minimapa.
+            long mapa = sala.MapaDeLaSala;
+            if (mapa == 0)
             {
-                int aterriza = await TeleportHandler.ToMapAsync(stream, mapa,
-                    sala.Casilla > 0 ? sala.Casilla : 0);
-
-                Console.WriteLine($"[Sueños] Sala {salaId} (fila {sala.Fila}): mapa {mapa}, " +
-                                  $"grupo {sala.Grupo}, efecto {sala.Efecto} de {sala.Valor}. " +
-                                  $"Aterriza en {aterriza}.");
+                Console.WriteLine($"[Sueños] La sala {salaId} se ha quedado sin mapa propio.");
+                return;
             }
+
+            // El grupo se planta ANTES del cambio de mapa: el jss que el cliente pide justo
+            // después es el que lleva los actores, y un grupo plantado un instante tarde no
+            // aparece hasta que se vuelve a entrar.
+            if (sala.EsFavor) PlantarElFavor(sala); else PlantarElGrupo(sala);
+
+            int aterriza = await TeleportHandler.ToMapAsync(stream, mapa, 0);
+
+            Console.WriteLine($"[Sueños] Sala {salaId} (fila {sala.Fila}): mapa {mapa}, " +
+                              $"grupo {sala.Grupo} del mapa {sala.MapaId} con " +
+                              $"{sala.Miembros.Count} monstruo(s), efecto {sala.Efecto} de " +
+                              $"{sala.Valor}. Aterriza en {aterriza}.");
         }
 
-        private static long PrimerMapa(Dreams.Sueno sueno)
+        /// <summary>
+        /// Pone en la sala al Rey Gob, que es la tienda.
+        /// </summary>
+        /// <remarks>
+        /// No hace falta protocolo nuevo: la fuente de los Sueños es un NPC y punto. Se coloca
+        /// como cualquier otro y el motor de diálogos hace el resto; lo que ofrece va escrito en
+        /// su respuesta, con el porcentaje de puntos que da.
+        /// </remarks>
+        private static void PlantarElFavor(Dreams.Sala sala)
         {
-            foreach (var s in sueno.Salas) if (s.MapaId != 0) return s.MapaId;
-            return 0;
+            if (sala.MapaDeLaSala == 0) return;
+
+            Managers.Npcs.PonerDelSueno(sala.MapaDeLaSala, Dreams.ReyGob,
+                                        Dreams.CasillaDelReyGob, Dreams.OrientacionDelReyGob);
+        }
+
+        /// <summary>
+        /// Pone en la sala los monstruos que le tocan, si no están ya.
+        /// </summary>
+        /// <remarks>
+        /// Sin esto la sala está vacía y no hay nada que atacar: el cliente pide la pelea con un
+        /// hqa que lleva el id contextual de un grupo del mapa, así que si no hay grupo no hay
+        /// manera de empezar. En la captura de Sueño III se ve el hqa con ese negativo justo antes
+        /// del kub, y hasta ahí llega la sala sin dar ningún error: simplemente no se puede pelear.
+        ///
+        /// La entrada y la última no llevan grupo, que es lo que dicen las nueve capturas.
+        /// </remarks>
+        private static void PlantarElGrupo(Dreams.Sala sala)
+        {
+            if (sala.Miembros.Count == 0 || sala.MapaDeLaSala == 0) return;
+
+            // Ya plantado: se vuelve a entrar en la misma sala al continuar un sueño.
+            if (sala.Plantado != 0
+                && MobSpawnManager.GetMobGroupById(sala.Plantado) != null) return;
+
+            var grupo = MobSpawnManager.SpawnComposed(sala.MapaDeLaSala, sala.Miembros);
+            if (grupo == null)
+            {
+                Console.WriteLine($"[Sueños] La sala {sala.Id} no ha podido plantar su grupo.");
+                return;
+            }
+
+            sala.Plantado = grupo.MobId;
+        }
+
+        /// <summary>
+        /// Se ha ganado la pelea de una sala: la marca hecha y suma sus puntos.
+        /// </summary>
+        /// <remarks>
+        /// Devuelve verdadero si el grupo derrotado era el de una sala, que es lo que le dice al
+        /// motor de combate que NO reponga otro en su sitio.
+        ///
+        /// Los puntos son el f1 de la sala en el iyj —lo que la ventana enseña debajo de cada
+        /// una—, medido entre 4 y 40 en las 89 salas de las nueve capturas. Sumarlos aquí es lo
+        /// que hace que la moneda del sueño exista: sin esto la ventana promete cinco puntos por
+        /// sala y limpiarla no da ninguno.
+        /// </remarks>
+        public static bool SalaLimpiada(long grupoDerrotado)
+        {
+            if (grupoDerrotado == 0) return false;
+
+            var sueno = Dreams.De(GameState.CharacterId);
+            if (sueno == null) return false;
+
+            foreach (var sala in sueno.Salas)
+            {
+                if (sala.Plantado != grupoDerrotado) continue;
+
+                sala.Plantado = 0;
+                if (sala.Hecha) return true;
+
+                sala.Hecha = true;
+                sueno.Puntos += sala.Puntos;
+
+                Console.WriteLine($"[Sueños] Sala {sala.Id} limpiada: +{sala.Puntos} puntos, " +
+                                  $"{sueno.Puntos} en total.");
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>Vuelve a mandar el estado del sueño, si es que hay uno.</summary>
+        public static async Task RefrescarEstadoAsync(NetworkStream stream)
+        {
+            var sueno = Dreams.De(GameState.CharacterId);
+            if (sueno == null) return;
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Izg, DreamProtocol.BuildDreamState(sueno)));
         }
 
         // ═══════════════════════════════════════════════════════════════════

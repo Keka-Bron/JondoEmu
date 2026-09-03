@@ -1851,15 +1851,7 @@ namespace Jondo.Unity.Server.Handlers
             // Van aquí y no dentro de StartFightAsync porque en la captura del combate real caen
             // ANTES del kah del listo. Se mandan una sola vez por combate, que es como salen allí:
             // una vez en 2.937 mensajes.
-            if (allReady)
-            {
-                // A LOS DOS. Salian solo por el socket de quien pulsaba listo el ultimo, asi que
-                // al otro no se le apagaba nada: su cliente seguia regenerandole la vida dentro
-                // del combate, de uno en uno, como si estuviera paseando por el mapa. Se veia
-                // clarisimo en el retado, que es el que casi nunca pulsa el ultimo.
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqg));
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqt));
-            }
+            if (allReady) await ApagarLaRegeneracionAsync(fight);
 
             // Enterado, que es lo único que contesta el servidor real al listo.
             //
@@ -1892,12 +1884,37 @@ namespace Jondo.Unity.Server.Handlers
             fight.StartFight();
             fight.CancelPlacementTimer();
 
+            // Y si nadie llegó a pulsar «listo» —el combate ha arrancado porque se acabó el
+            // tiempo de colocación— aquí es donde toca apagar la regeneración.
+            await ApagarLaRegeneracionAsync(fight);
+
             // Y la racha entera a cada uno desde su propio contexto. Se manda completa y por
             // separado, en vez de repartir «esto a todos y esto al que sea», porque el orden que
             // trae la captura -- kai, jyy, jxz, jxc, jto, jxb, jwi, jxh -- mezcla tramas del
             // combate con tramas de quien mira, y partirlo dejaria a un cliente recibiendo el jxb
             // fuera de su propia secuencia.
             await ACadaUnoAsync(fight, sesion => ArrancarParaUnoAsync(sesion.Stream, fight));
+        }
+
+        /// <summary>
+        /// Le dice al cliente que deje de regenerar vida: la pareja lqg + lqt, los dos vacíos.
+        /// </summary>
+        /// <remarks>
+        /// La regeneración la lleva ÉL; el servidor no suma vida por su cuenta en ningún sitio. Al
+        /// entrar al mundo se le enciende con el lqg de la ráfaga de entrada, y si nadie se la
+        /// apaga sigue tictaqueando dentro del combate: el jugador recibe un golpe y ve cómo la
+        /// barra se le rellena sola de uno en uno.
+        ///
+        /// Una vez por combate, que es como sale en la captura —una vez en 2.937 mensajes— y a
+        /// TODOS, no sólo a quien pulsó listo el último.
+        /// </remarks>
+        private static async Task ApagarLaRegeneracionAsync(FightInstance fight)
+        {
+            if (fight.RegeneracionApagada) return;
+            fight.RegeneracionApagada = true;
+
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqg));
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqt));
         }
 
         /// <summary>La racha de arranque, tal y como la ve UNA de las personas del combate.</summary>
@@ -1936,7 +1953,8 @@ namespace Jondo.Unity.Server.Handlers
             // durante la colocación —los suyos, de antes— y se quedaba en blanco al empezar el
             // turno, cuando por fin le llegaba nuestra lista corta.
             var spellLayout = Managers.FightSpellLayout.Current(character?.Breed ?? 0,
-                                                                 GameState.CharacterLevel);
+                                                                 GameState.CharacterLevel,
+                                                                 SessionContext.Current.AccountId);
             var spells = spellLayout.Spells;
             var bar = spellLayout.Bar;
 
@@ -3298,6 +3316,21 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var c in consecuencias)
             {
+                // El 141: mata, y por el mismo camino que un golpe, para que se anuncie igual,
+                // se le caigan las invocaciones igual y el combate termine igual.
+                if (c.Fulmina)
+                {
+                    if (!c.Sobre.IsAlive) continue;
+
+                    Program.LogDebug($"[Combate] {(c.Caster ?? quienLanza).Id} fulmina a " +
+                                     $"{c.Sobre.Id} con el hechizo {c.HechizoOrigen} " +
+                                     $"({c.Sobre.CurrentHP} de vida).");
+
+                    await UnGolpeAsync(stream, fight, c.Caster ?? quienLanza, c.HechizoOrigen,
+                                       c.Efecto, 0, c.Sobre, 0, 0, false, 0, fulmina: true);
+                    continue;
+                }
+
                 if (c.NestedDamage)
                 {
                     Fighter animationCaster = c.AnimationCaster ?? c.Caster ?? quienLanza;
@@ -3826,8 +3859,10 @@ namespace Jondo.Unity.Server.Handlers
                                                Fighter caster, int spell,
                                                Managers.SpellEffect efecto, int elemento,
                                                Fighter target, int sacadoDelDado, int lejosDelCentro,
-                                               bool critical, int? capturedSpellBonus = null)
+                                               bool critical, int? capturedSpellBonus = null,
+                                               bool fulmina = false)
         {
+
             // El elemento lo dice el catálogo: 0 neutral, 1 tierra, 2 fuego, 3 agua, 4 aire.
             var element = elemento switch
             {
@@ -3926,6 +3961,13 @@ namespace Jondo.Unity.Server.Handlers
                 Program.LogDebug($"[Combate] {target.Id} sufre los daños al {multiplica}%: " +
                                  $"{antes} pasa a {damage}.");
             }
+
+            // FULMINAR: el efecto 141 del catálogo, «Mata al objetivo». No es un golpe muy grande,
+            // es otra cosa, y por eso entra AQUÍ y no arriba: ni el dado, ni las resistencias, ni
+            // los porcentajes pueden dejar a nadie exactamente en cero. Se le quita la vida que
+            // tenga y se sigue por el mismo camino que cualquier golpe —el anuncio, la muerte, el
+            // botín, el fin del combate—, que es lo único que hay que compartir.
+            if (fulmina) damage = target.CurrentHP;
 
             // Lo que se ANUNCIA nunca puede pasar de la vida que le queda. Si a un pío de setenta
             // le entran doscientos, el golpe que ve el jugador es de setenta: por encima de eso no
@@ -4902,11 +4944,17 @@ namespace Jondo.Unity.Server.Handlers
                 MobSpawnManager.RemoveMobGroup(fight.RoleplayMapId, muerto);
                 Program.LogDebug($"[Combate] El grupo #{muerto} desaparece del mapa {fight.RoleplayMapId}.");
 
-                var repuesto = MobSpawnManager.RespawnOneGroup(fight.RoleplayMapId);
-                if (repuesto != null)
+                // En una sala de sueño NO se repone: la sala se limpia y se queda limpia, que es
+                // lo que hace que avanzar signifique algo. Reponerla dejaría al jugador peleando
+                // la misma sala para siempre.
+                if (!DreamHandler.SalaLimpiada(muerto))
                 {
-                    Program.LogDebug($"[Combate] Repuesto el grupo #{repuesto.MobId} en la casilla " +
-                                     $"{repuesto.CellId} con {repuesto.Members.Count} miembro(s).");
+                    var repuesto = MobSpawnManager.RespawnOneGroup(fight.RoleplayMapId);
+                    if (repuesto != null)
+                    {
+                        Program.LogDebug($"[Combate] Repuesto el grupo #{repuesto.MobId} en la casilla " +
+                                         $"{repuesto.CellId} con {repuesto.Members.Count} miembro(s).");
+                    }
                 }
             }
             GameState.CurrentFightMobId = 0;
@@ -4938,6 +4986,11 @@ namespace Jondo.Unity.Server.Handlers
                     DatabaseManager.SaveCurrentCharacter();
                 }
             }
+
+            // Si esto era una sala de sueño, el estado ha cambiado —la sala está hecha y los
+            // puntos han subido— y hay que decírselo antes de recargar el mapa, o la ventana
+            // seguirá enseñando lo de antes hasta que se cambie de sala.
+            await DreamHandler.RefrescarEstadoAsync(stream);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kml));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp));
@@ -5187,7 +5240,8 @@ namespace Jondo.Unity.Server.Handlers
                 return;
 
             var layout = Managers.FightSpellLayout.Current(GameState.Breed,
-                                                           GameState.CharacterLevel);
+                                                           GameState.CharacterLevel,
+                                                           SessionContext.Current.AccountId);
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
                 Network.FightProtocol.BuildSpellBar(GameState.CharacterId,
                                                     layout.Spells, layout.Bar)));

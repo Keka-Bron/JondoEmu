@@ -227,7 +227,8 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.OpenDialogueMapId = mapId;
             SessionContext.State.OpenDialogueMessage = pregunta;
 
-            await PreguntarAsync(stream, pregunta, respuestas, template);
+            await PreguntarAsync(stream, pregunta, respuestas, template,
+                                 escrito?.Line(pregunta));
 
             // Y si alguna misión en curso pedía justamente venir a ver a éste, ya está.
             await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
@@ -251,7 +252,8 @@ namespace Jondo.Unity.Server.Handlers
         /// sitios que preguntan porque ahora hay dos: la primera frase y cada una de las que siguen.
         /// </remarks>
         private static async Task PreguntarAsync(NetworkStream stream, long pregunta, long[] respuestas,
-                                                 Npcs.Template? plantilla = null)
+                                                 Npcs.Template? plantilla = null,
+                                                 Jondo.Unity.World.Content.DialogueLine? frase = null)
         {
             if (respuestas.Length == 0)
             {
@@ -275,8 +277,21 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // Los números que algunas respuestas llevan dentro, si el árbol escrito los dice.
+            Dictionary<long, IReadOnlyList<long>>? parametros = null;
+            if (frase != null)
+            {
+                foreach (var opcion in frase.Choices)
+                {
+                    if (opcion.Parameters.Count == 0) continue;
+                    parametros ??= new Dictionary<long, IReadOnlyList<long>>();
+                    parametros[opcion.Reply] = opcion.Parameters;
+                }
+            }
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas)));
+                ConnectionProtocol.Push(Op.Ios,
+                    ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros)));
         }
 
         /// <summary>
@@ -462,6 +477,29 @@ namespace Jondo.Unity.Server.Handlers
                 await ComprarAsync(stream, elegidaAhora);
             }
 
+            // ¿La respuesta toca los puntos del sueño? Es la tienda de la fuente, que no tiene
+            // protocolo propio: es este mismo diálogo, y lo que compra va escrito en la respuesta.
+            if (elegidaAhora != null && elegidaAhora.DreamPointsPercent != 0)
+            {
+                var sueno = Managers.Dreams.De(GameState.CharacterId);
+                if (sueno != null)
+                {
+                    int antes = sueno.Puntos;
+                    sueno.Puntos = (int)Math.Round(sueno.Puntos * elegidaAhora.DreamPointsPercent / 100.0);
+
+                    Console.WriteLine($"[Sueños] La respuesta {reply} deja los puntos de " +
+                                      $"{antes} en {sueno.Puntos} " +
+                                      $"({elegidaAhora.DreamPointsPercent}%).");
+
+                    await DreamHandler.RefrescarEstadoAsync(stream);
+                }
+                else
+                {
+                    Console.WriteLine($"[Sueños] La respuesta {reply} toca los puntos y " +
+                                      "no hay sueño en curso.");
+                }
+            }
+
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
             {
                 await Managers.Quests.StartAsync(stream, elegidaAhora.StartsQuest);
@@ -478,6 +516,32 @@ namespace Jondo.Unity.Server.Handlers
             if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla, reply))
             {
                 CerrarConversacion();
+                return;
+            }
+
+            // ¿Esta respuesta mueve al jugador? Va ANTES de seguir la conversación porque una
+            // respuesta que teletransporta la termina: en la captura el servidor manda el kld y
+            // acto seguido el jru, sin una frase más de por medio.
+            if (elegidaAhora != null && (elegidaAhora.TeleportsTo != 0 || elegidaAhora.ReturnsHome))
+            {
+                long adonde = elegidaAhora.TeleportsTo;
+                if (elegidaAhora.ReturnsHome)
+                {
+                    // De donde salió, que es lo que se apuntó al entrar. Si no hay apunte -alguien
+                    // que llegó por su cuenta, o un servidor recién arrancado- se le deja en la
+                    // entrada del pozo en vez de dejarlo encerrado, que es lo que pasaba antes.
+                    adonde = Managers.Dreams.DeDondeViene(GameState.CharacterId).Mapa;
+                    if (adonde == 0) adonde = Managers.Dreams.MapaDelPozo;
+                }
+
+                CerrarConversacion();
+
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                        ConnectionProtocol.NpcDialogCloseReason)));
+
+                await WorldMoveHandler.TeleportAsync(stream, adonde);
+                Console.WriteLine($"[NPC] Respuesta {reply}: lleva al mapa {adonde}.");
                 return;
             }
 
@@ -546,7 +610,7 @@ namespace Jondo.Unity.Server.Handlers
 
             estado.OpenDialogueMessage = siguiente.Message;
             await PreguntarAsync(stream, siguiente.Message, LasQueTocan(siguiente),
-                                 Npcs.TemplateOf(estado.OpenDialogueNpcId));
+                                 Npcs.TemplateOf(estado.OpenDialogueNpcId), siguiente);
 
             Console.WriteLine($"[NPC] La respuesta {reply} lleva a la frase {siguiente.Message}, " +
                               $"con {Math.Max(siguiente.Choices.Count, 1)} respuestas.");

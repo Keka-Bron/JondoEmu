@@ -1,0 +1,74 @@
+{
+  "_comment": [
+    "Passages a person decided, on top of the ones the tools measured. Nothing regenerates",
+    "this file.",
+    "",
+    "  { map, element, cell, gfx, type, skill, toMap, toCell }   declare or re-point one",
+    "  { map, element, remove: true }                            take one out",
+    "",
+    "THE ASTRAL PLANE. The four arches of the Well of Dreams map and the way back from",
+    "Draconiros' room. They are not neighbours on the world grid - (0,0) and (1,-1) with",
+    "nothing between them - so without these the room is placed and unreachable, which for a",
+    "player is the same as not being there.",
+    "",
+    "Every number is measured in the capture 'entrar a suenos-hablar con draconiros...':",
+    "the jss f11 gives the element, its uid and its skill; the iwo says which one the client",
+    "presses; the jru gives the destination map and the jss after it the landing cell. Four",
+    "round trips, and all four arches land on the same cell 381, all four returns on 221.",
+    "",
+    "The skill is 184 and NOT the 20739-20743 of the iwo: those are instance uids. Reading",
+    "one as the other is what left the well unclickable, with no error anywhere."
+  ],
+  "passages": [
+    {
+      "map": 238551040,
+      "element": 539699,
+      "cell": 163,
+      "gfx": 90010,
+      "type": -1,
+      "skill": 184,
+      "toMap": 238553348,
+      "toCell": 381
+    },
+    {
+      "map": 238551040,
+      "element": 539700,
+      "cell": 192,
+      "gfx": 90009,
+      "type": -1,
+      "skill": 184,
+      "toMap": 238553348,
+      "toCell": 381
+    },
+    {
+      "map": 238551040,
+      "element": 539701,
+      "cell": 221,
+      "gfx": 90010,
+      "type": -1,
+      "skill": 184,
+      "toMap": 238553348,
+      "toCell": 381
+    },
+    {
+      "map": 238551040,
+      "element": 539702,
+      "cell": 250,
+      "gfx": 90009,
+      "type": -1,
+      "skill": 184,
+      "toMap": 238553348,
+      "toCell": 381
+    },
+    {
+      "map": 238553348,
+      "element": 539673,
+      "cell": 395,
+      "gfx": 91033,
+      "type": -1,
+      "skill": 184,
+      "toMap": 238551040,
+      "toCell": 221
+    }
+  ]
+}

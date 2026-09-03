@@ -79,6 +79,53 @@ namespace Jondo.Unity.World.Content
         public int BuysCount { get; init; } = 1;
         public long BuysPrice { get; init; }
 
+        /// <summary>The map this reply moves the player to, or zero when it moves nobody.</summary>
+        /// <remarks>
+        /// A reply is not always something said: Draconiros' "Join the dream crucible" ends the
+        /// conversation with a map change, and the capture shows it as a kld followed straight by
+        /// a jru. Without this the reply is offered, chosen, and does nothing at all - which is
+        /// the failure this project keeps meeting, the one that raises no error anywhere.
+        /// </remarks>
+        public long TeleportsTo { get; init; }
+
+        /// <summary>
+        /// The numbers this reply carries inside its own message, for the client to read into
+        /// its text. Empty for almost every reply.
+        /// </summary>
+        /// <remarks>
+        /// Measured on the Rey Gob of the Infinite Dreams, whose reply travels as
+        /// f2 { f1: 82314, f3 { f1: 4037 }, f3 { f1: 4035 } }. Without them the reply is still
+        /// offered, but with an empty hole where its number should be.
+        /// </remarks>
+        public IReadOnlyList<long> Parameters { get; init; } = Array.Empty<long>();
+
+        /// <summary>
+        /// What this reply does to the player's dream points, as a percentage. Zero for the
+        /// replies of everybody who is not inside a dream.
+        /// </summary>
+        /// <remarks>
+        /// The Rey Gob of the Infinite Dreams says it in his own words — "Multiplicar los puntos
+        /// de sueño por 1,5" — so it is 150 here. It is a percentage and not a factor because
+        /// there is no reason to carry a decimal through a JSON file for one NPC.
+        ///
+        /// This is the shop the guide calls a Faveur Onirique: the fountain is not a new protocol
+        /// at all, it is an ordinary NPC conversation whose reply changes the dream.
+        /// </remarks>
+        public int DreamPointsPercent { get; init; }
+
+        /// <summary>True when the reply puts the player back where they came in from.</summary>
+        /// <remarks>
+        /// Separate from <see cref="TeleportsTo"/> because there is no map to write down: the
+        /// destination is wherever this particular player was standing before they went in. In the
+        /// capture Draconiros' "Leave the dream plane" answers with a jru to the Astrub inn, which
+        /// is not a property of the dream at all - it is where that player had been.
+        ///
+        /// One sample, so this is an inference rather than a measurement: a fixed destination
+        /// would fit the bytes just as well. It is the reading that makes the exit an exit for
+        /// everybody instead of only for someone who happened to start in that inn.
+        /// </remarks>
+        public bool ReturnsHome { get; init; }
+
         public bool Ends => Next == 0;
 
         /// <summary>Whether this reply is offered to nobody in particular.</summary>
@@ -257,6 +304,20 @@ namespace Jondo.Unity.World.Content
         /// <summary>The authored file, relative to the content root.</summary>
         public const string AuthoredFile = "npcs/dialogues.json";
 
+        /// <summary>A list of numbers on a JSON entry, or an empty one.</summary>
+        private static IReadOnlyList<long> Numbers(JsonElement element, string name)
+        {
+            if (!element.TryGetProperty(name, out var list) || list.ValueKind != JsonValueKind.Array)
+                return Array.Empty<long>();
+
+            var salen = new List<long>();
+            foreach (var item in list.EnumerateArray())
+            {
+                if (item.TryGetInt64(out long valor)) salen.Add(valor);
+            }
+            return salen;
+        }
+
         public static ContentStore<NpcDialogueKey, NpcDialogue> Load(string? authoredPath,
                                                                      Action<string>? report = null)
         {
@@ -336,6 +397,11 @@ namespace Jondo.Unity.World.Content
                             BuysItem = (int)Number(choice, "buyItem"),
                             BuysCount = (int)Math.Max(1, Number(choice, "buyCount")),
                             BuysPrice = Number(choice, "buyPrice"),
+                            TeleportsTo = Number(choice, "teleport"),
+                            Parameters = Numbers(choice, "params"),
+                            DreamPointsPercent = (int)Number(choice, "dreamPointsPercent"),
+                            ReturnsHome = choice.TryGetProperty("teleportBack", out var back)
+                                          && back.ValueKind == JsonValueKind.True,
                             AfterQuest = choice.TryGetProperty("afterQuest", out var after)
                                          && after.ValueKind == JsonValueKind.True,
                         });
@@ -429,6 +495,17 @@ namespace Jondo.Unity.World.Content
                                 if (choice.BuysCount != 1) writer.WriteNumber("buyCount", choice.BuysCount);
                                 if (choice.BuysPrice != 0) writer.WriteNumber("buyPrice", choice.BuysPrice);
                             }
+                            if (choice.TeleportsTo != 0)
+                                writer.WriteNumber("teleport", choice.TeleportsTo);
+                            if (choice.DreamPointsPercent != 0)
+                                writer.WriteNumber("dreamPointsPercent", choice.DreamPointsPercent);
+                            if (choice.Parameters.Count > 0)
+                            {
+                                writer.WriteStartArray("params");
+                                foreach (long valor in choice.Parameters) writer.WriteNumberValue(valor);
+                                writer.WriteEndArray();
+                            }
+                            if (choice.ReturnsHome) writer.WriteBoolean("teleportBack", true);
                             writer.WriteEndObject();
                         }
 

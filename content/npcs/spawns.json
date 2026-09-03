@@ -14,7 +14,12 @@
     "has to be removable without editing the generated file it came from, because that file is",
     "rewritten by tools/extraer_npcs_reales.py and the edit would vanish.",
     "",
-    "Empty on purpose. Nothing here yet means the world is exactly what the captures measured."
+    "Empty on purpose. Nothing here yet means the world is exactly what the captures measured.",
+    "",
+    "Draconiros was briefly written here before it turned out datos/npcs_reales.json already",
+    "carried him - map 238553348, cell 206, orientation 3. He was invisible because his room had",
+    "no way in, not because he was unplaced, and restating a measurement in the authored layer",
+    "would have hidden that."
   ],
   "spawns": []
 }

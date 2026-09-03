@@ -437,7 +437,8 @@ namespace Jondo.Unity.Server.Network
             if (ConnectionProtocol.ReadPayload(frame, Op.Hms) != null)
             {
                 return ConnectionProtocol.Push(Op.Hms,
-                    ConnectionProtocol.BuildSpellList(character.Breed, character.Level));
+                    ConnectionProtocol.BuildSpellList(character.Breed, character.Level,
+                        SessionContext.Current.AccountId));
             }
 
             if (ConnectionProtocol.ReadPayload(frame, Op.Ivx) != null)

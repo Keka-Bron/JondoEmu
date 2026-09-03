@@ -17,7 +17,29 @@ namespace Jondo.Unity.Server.Managers
         }
 
         public static Layout Current(int breed, int level)
-            => Build(SpellTable.KnownFor(breed, level, SpellChoices.Chosen), SpellChoices.Bar);
+            => Current(breed, level, 0);
+
+        /// <summary>
+        /// La barra de dentro del combate, con los hechizos de administración si la cuenta lo es.
+        /// </summary>
+        /// <remarks>
+        /// Va aparte de la lista de fuera del combate: son dos mensajes distintos —el hms de la
+        /// entrada al mundo y el jyy del arranque de la pelea— y añadir el hechizo sólo al primero
+        /// lo deja visible en el panel de paseo y ausente justo donde hace falta.
+        /// </remarks>
+        public static Layout Current(int breed, int level, long accountId)
+        {
+            var conocidos = new List<SpellTable.KnownSpell>(
+                SpellTable.KnownFor(breed, level, SpellChoices.Chosen));
+
+            if (AdminSpells.Para(accountId))
+            {
+                conocidos.Add(new SpellTable.KnownSpell(
+                    AdminSpells.DoomDeMasas, AdminSpells.DoomDeMasas, AdminSpells.GradoDeDoom));
+            }
+
+            return Build(conocidos, SpellChoices.Bar);
+        }
 
         /// <summary>
         /// Keeps valid saved shortcuts, drops spells lost after a level or variant change, fills

@@ -2022,6 +2022,174 @@
           ]
         }
       ]
+    },
+    {
+      "npc": 4638,
+      "map": 0,
+      "opening": 32574,
+      "lines": [
+        {
+          "message": 32574,
+          "choices": [
+            {
+              "reply": 39607,
+              "next": 32599
+            },
+            {
+              "reply": 39609,
+              "next": 32605
+            },
+            {
+              "reply": 81544,
+              "next": 59628
+            },
+            {
+              "reply": 50321,
+              "teleport": 200804356
+            },
+            {
+              "reply": 81733
+            }
+          ]
+        },
+        {
+          "message": 32599,
+          "choices": [
+            {
+              "reply": 39606,
+              "next": 32600
+            }
+          ]
+        },
+        {
+          "message": 32600,
+          "choices": [
+            {
+              "reply": 39605,
+              "next": 32601
+            }
+          ]
+        },
+        {
+          "message": 32601,
+          "choices": [
+            {
+              "reply": 39604,
+              "next": 32602
+            }
+          ]
+        },
+        {
+          "message": 32602,
+          "choices": [
+            {
+              "reply": 39603,
+              "next": 32603
+            }
+          ]
+        },
+        {
+          "message": 32603,
+          "choices": [
+            {
+              "reply": 39602,
+              "next": 32604
+            }
+          ]
+        },
+        {
+          "message": 32604,
+          "choices": [
+            {
+              "reply": 81529
+            }
+          ]
+        },
+        {
+          "message": 32605,
+          "choices": [
+            {
+              "reply": 39608,
+              "next": 32606
+            }
+          ]
+        },
+        {
+          "message": 32606,
+          "choices": []
+        },
+        {
+          "message": 59628,
+          "choices": [
+            {
+              "reply": 81542,
+              "next": 59629
+            },
+            {
+              "reply": 81543
+            }
+          ]
+        },
+        {
+          "message": 59629,
+          "choices": [
+            {
+              "reply": 81541
+            }
+          ]
+        }
+      ],
+      "_byHand": true
+    },
+    {
+      "npc": 5130,
+      "map": 0,
+      "opening": 38840,
+      "lines": [
+        {
+          "message": 38840,
+          "choices": [
+            {
+              "reply": 50989,
+              "teleportBack": true
+            }
+          ]
+        }
+      ],
+      "_byHand": true
+    },
+    {
+      "npc": 7850,
+      "map": 0,
+      "opening": 59712,
+      "lines": [
+        {
+          "message": 59712,
+          "choices": [
+            {
+              "reply": 82315,
+              "next": 59988
+            }
+          ]
+        },
+        {
+          "message": 59988,
+          "choices": [
+            {
+              "reply": 82314,
+              "params": [
+                4037,
+                4035
+              ],
+              "dreamPointsPercent": 150
+            },
+            {
+              "reply": 82316
+            }
+          ]
+        }
+      ],
+      "_byHand": true
     }
   ]
 }

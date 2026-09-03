@@ -887,6 +887,72 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// Planta un grupo con una composición dada, para las salas de los Sueños Infinitos.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="SpawnNamed"/> planta N copias de un mismo monstruo, que sirve para lo que
+        /// se hizo —un objetivo de misión— y no para esto: la sala de un sueño reproduce un grupo
+        /// del mundo, y esos grupos son mezclados. Plantar cinco copias del primero cambiaría la
+        /// pelea sin decírselo a nadie.
+        ///
+        /// El grupo va con un identificador de los negativos, igual que los de misión, para que no
+        /// choque con los del mundo ni sobreviva a un respawn.
+        /// </remarks>
+        public static MobGroup? SpawnComposed(long mapId, IEnumerable<(int Monstruo, int Grado)> miembros)
+        {
+            var quienes = new List<MobMember>();
+
+            foreach (var (monstruo, grado) in miembros)
+            {
+                if (!_monsters.TryGetValue(monstruo, out var datos)) continue;
+                if (datos.Grades.Count == 0) continue;
+
+                int cual = Math.Clamp(grado, 0, Math.Min(datos.Grades.Count,
+                                                         MobMember.MaxGradesPerMonster) - 1);
+                quienes.Add(new MobMember
+                {
+                    Monster = datos,
+                    GradeIndex = cual,
+                    Level = datos.Grades[cual].Level,
+                });
+            }
+
+            if (quienes.Count == 0) return null;
+
+            lock (_candado)
+            {
+                if (!_mapMobs.TryGetValue(mapId, out var mobs))
+                {
+                    mobs = new List<MobGroup>();
+                    _mapMobs[mapId] = mobs;
+                }
+
+                var ocupadas = new HashSet<int>(mobs.Select(m => m.CellId));
+                int celda = 0;
+                foreach (int libre in GetInnerWalkableCells(mapId))
+                {
+                    if (ocupadas.Contains(libre)) continue;
+                    celda = libre;
+                    break;
+                }
+
+                if (celda == 0) celda = MapManager.GetNearestWalkableCell(
+                    mapId, Handlers.TeleportHandler.MapCentre);
+                if (celda == 0) return null;
+
+                var grupo = new MobGroup
+                {
+                    MobId = PrimerGrupoDeMision - _siguienteDeMision++,
+                    CellId = celda,
+                    Members = quienes,
+                };
+
+                mobs.Add(grupo);
+                return grupo;
+            }
+        }
+
         public static List<int> GetInnerWalkableCells(long mapId)
         {
             if (!MapManager.WalkableCells.TryGetValue(mapId, out var cells) || cells.Count == 0)
