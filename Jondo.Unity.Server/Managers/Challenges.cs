@@ -76,6 +76,260 @@ namespace Jondo.Unity.Server.Managers
             /// que traiga umbral de nivel, que es lo único que aquí se sabe leer del criterio.
             /// </summary>
             public bool Offerable => Percent > 0 && MinGroupLevel > 0 && !DungeonOnly && !NeedsMonster;
+
+            // ─── Cómo se juzga uno de los que impone el sitio ───────────────────
+            //
+            // Los retos de jefe son los mismos de siempre con otro número: el «Prudente» del
+            // Jalató Real (121) trae el mismo criterio, letra por letra, que el Prudente normal
+            // (40). Así que no hace falta un vigilante por cada uno de los 773: se mira a cuál
+            // de los que ya se vigilan equivale, y lo lleva ése. Lo rellena OnlyOffer.
+
+            /// <summary>
+            /// El reto vigilado al que equivale: él mismo si es de los normales, el gemelo si es
+            /// de jefe, y cero si nadie sabe llevarlo.
+            /// </summary>
+            public int Kind { get; set; }
+
+            /// <summary>«CK#monstruo»: ese monstruo —o uno de ésos— tiene que caer el primero.</summary>
+            public IReadOnlyList<int> KillFirst { get; set; } = Array.Empty<int>();
+
+            /// <summary>«Ck#monstruo»: ese monstruo tiene que caer el último.</summary>
+            public IReadOnlyList<int> KillLast { get; set; } = Array.Empty<int>();
+
+            /// <summary>«ST&lt;N»: hay que ganar antes de la ronda N. Cero si no hay tope.</summary>
+            public int TurnLimit { get; set; }
+
+            /// <summary>
+            /// Los que no piden nada más que haber entrado pocos: el «Solo», que es ganar con un
+            /// personaje y cuyo criterio dice sólo «Ma=1». Lo que hay que mirar ya lo mira la
+            /// activación.
+            /// </summary>
+            public bool PartySizeOnly { get; set; }
+
+            /// <summary>La regla puesta a mano, para los que sólo la dicen en la descripción.</summary>
+            public BossRule Rule { get; set; }
+
+            /// <summary>¿Hay quien lo juzgue? El que no, no se impone: saldría cumplido siempre.</summary>
+            public bool Judged => Kind != 0 || KillFirst.Count > 0 || KillLast.Count > 0
+                                  || TurnLimit > 0 || PartySizeOnly || Rule != BossRule.None;
+        }
+
+        /// <summary>
+        /// Las reglas de los retos de jefe cuyo criterio es «Ma=1», o sea «lo lleva un guión»: lo
+        /// que piden está sólo en la descripción, y se ha leído una a una. Aquí están las que se
+        /// pueden juzgar con lo que el combate ya sabe —dónde acaba cada uno, quién pega a quién
+        /// y desde dónde, quién cura, quién cae—. Las que dependen de un hechizo o un estado
+        /// propio del jefe se quedan fuera.
+        /// </summary>
+        public enum BossRule
+        {
+            None = 0,
+
+            // Dónde se acaba el turno.
+            EndInLineWithEnemy,
+            EndDiagonalToEnemy,
+            NeverInLineWithEnemy,
+            NeverLineOrDiagonalEnemy,
+            NeverInLineWithAlly,
+            NeverLineEnemyOrAlly,
+            NeverDiagonalEnemyOrAlly,
+            EndOnStartCell,
+            EndNearEnemy5,
+            EndFarFromAllies3,
+            EndFarFromAllies4,
+            BeginOrEndInLineWithEnemy,
+
+            // Quién cae y cuándo.
+            NoEnemyKilledBeforeRound6,
+            NobodyKilledBeforeRound6,
+            NoEnemySummonKilledByAlly,
+
+            // Curas.
+            NoHealEnemies,
+            NoHealAllies,
+
+            // Daños.
+            NoRangedDamageToEnemies,
+            NoMeleeDamageToEnemies,
+            NoRangedDamageToBoss,
+            NoPushDamageToEnemies,
+            NoPushDamageToAllies,
+            NoDamageToEnemySummons,
+            NoDamageWhileEnemySummons,
+            BossUntouchedUntilAlone,
+        }
+
+        /// <summary>Reto → su regla. Los números son los de la tabla del cliente 3.6.10.10.</summary>
+        private static readonly Dictionary<int, BossRule> _byHand = new()
+        {
+            [1037] = BossRule.EndInLineWithEnemy,          // Roblenlace
+            [1056] = BossRule.EndDiagonalToEnemy,          // Sin tocar
+            [1054] = BossRule.NeverInLineWithEnemy,        // Emancipación maternal
+            [1059] = BossRule.NeverLineOrDiagonalEnemy,    // Micología
+            [1060] = BossRule.NeverInLineWithAlly,         // Un proyecto tentacular
+            [985] = BossRule.NeverLineEnemyOrAlly,         // La línea prohibida
+            [1045] = BossRule.NeverDiagonalEnemyOrAlly,    // Diagonal del vacío
+            [1033] = BossRule.EndOnStartCell,              // Salida de ring
+            [1023] = BossRule.EndNearEnemy5,               // Maestro Cuerbok
+            [1061] = BossRule.EndFarFromAllies3,           // Sin pisarme las patas
+            [1053] = BossRule.EndFarFromAllies4,           // Autonomía helada
+            [1074] = BossRule.BeginOrEndInLineWithEnemy,   // Hay gente por aquí
+
+            [525] = BossRule.NoEnemyKilledBeforeRound6,    // Domakuroptimización
+            [528] = BossRule.NobodyKilledBeforeRound6,     // Dorigamisericordia
+            [1100] = BossRule.NoEnemySummonKilledByAlly,   // Protección de cascasaurios
+            [1101] = BossRule.NoEnemySummonKilledByAlly,
+            [1102] = BossRule.NoEnemySummonKilledByAlly,
+
+            [980] = BossRule.NoHealEnemies,                // Un milubo en el corral
+            [1063] = BossRule.NoHealAllies,                // Aliados pasados al futuro
+
+            [485] = BossRule.NoRangedDamageToEnemies,      // Combate cercano
+            [1050] = BossRule.NoRangedDamageToEnemies,     // Colmillo a colmillo
+            [1066] = BossRule.NoRangedDamageToEnemies,     // Juego de sombras
+            [1404] = BossRule.NoRangedDamageToEnemies,     // Crocantes y sonantes
+            [1073] = BossRule.NoMeleeDamageToEnemies,      // El fracaso no es una opción
+            [1007] = BossRule.NoRangedDamageToBoss,        // Al alcance del dardo
+            [990] = BossRule.NoPushDamageToEnemies,        // ¿Kwoknan? ¡Kwokpujeee!
+            [1008] = BossRule.NoPushDamageToAllies,        // A toda máquina
+            [1013] = BossRule.NoPushDamageToAllies,        // No hay que dar demasiada miel al cerdo
+            [1071] = BossRule.NoPushDamageToAllies,        // Cuidado, suelo resbaladizo
+            [982] = BossRule.NoDamageToEnemySummons,       // Dorado, mi fa sol
+            [993] = BossRule.NoDamageToEnemySummons,       // No toques a mi blop, los cuatro
+            [994] = BossRule.NoDamageToEnemySummons,
+            [995] = BossRule.NoDamageToEnemySummons,
+            [996] = BossRule.NoDamageToEnemySummons,
+            [998] = BossRule.NoDamageToEnemySummons,       // Sin desierto, los cuatro
+            [999] = BossRule.NoDamageToEnemySummons,
+            [1000] = BossRule.NoDamageToEnemySummons,
+            [1001] = BossRule.NoDamageToEnemySummons,
+            [1103] = BossRule.NoDamageToEnemySummons,      // Protección de cascasaurios, el de Grozilla
+            [1003] = BossRule.NoDamageWhileEnemySummons,   // Unos auténticos cracks
+            [1022] = BossRule.BossUntouchedUntilAlone,     // Ratuperación
+        };
+
+        /// <summary>«Matar a {0} en último lugar», dicho sólo en la descripción: el suyo, el último.</summary>
+        private static readonly int[] _killBossLast = { 1017, 1062, 2093 };
+
+        /// <summary>«Los enemigos deben ser eliminados antes del inicio del turno 6.»</summary>
+        private static readonly int[] _beforeRound6 = { 526, 527 };
+
+        /// <summary>«Huele a motín»: acabar en línea con un aliado, que es el Del mismo linaje.</summary>
+        private const int InLineWithAlly = 1080;
+        private const int SameLineage = 964;
+
+        /// <summary>Todos los que llevan regla puesta a mano, de una forma u otra.</summary>
+        internal static IEnumerable<int> HandWired
+        {
+            get
+            {
+                foreach (int id in _byHand.Keys) yield return id;
+                foreach (int id in _killBossLast) yield return id;
+                foreach (int id in _beforeRound6) yield return id;
+                yield return InLineWithAlly;
+            }
+        }
+
+        /// <summary>El criterio que no dice nada: «lo lleva un guión del servidor».</summary>
+        private const string Scripted = "Ma=1";
+
+        private static readonly System.Text.RegularExpressions.Regex _killOrder =
+            new System.Text.RegularExpressions.Regex(@"^C([Kk])#(\d+),1$");
+
+        private static readonly System.Text.RegularExpressions.Regex _turnLimit =
+            new System.Text.RegularExpressions.Regex(@"^ST<(\d+)$");
+
+        /// <summary>«GN&lt;3,0»: cuántos luchadores, comparado con qué, y de qué bando.</summary>
+        private static readonly System.Text.RegularExpressions.Regex _fighterCount =
+            new System.Text.RegularExpressions.Regex(@"GN([<>=])(\d+),([01])");
+
+        /// <summary>
+        /// Le busca a cada reto de jefe quién lo juzga, mirando su criterio de cumplimiento.
+        ///
+        /// Lo que queda sin juez —«Manos limpias», los de no quitar PA ni PM, «Místico» y los
+        /// setenta y tantos que son la mecánica propia de un jefe— no se impone.
+        /// </summary>
+        private static void FindJudges(IReadOnlyDictionary<int, int> vigilados)
+        {
+            // Criterio → el reto normal que lo lleva. El «Ma=1» no entra: lo comparten el
+            // Bárbaro y medio catálogo, y no distingue a nadie.
+            var porCriterio = new Dictionary<string, int>();
+            var porNombre = new Dictionary<string, int>();
+            foreach (int id in vigilados.Keys)
+            {
+                var normal = Get(id);
+                if (normal == null || normal.NeedsMonster) continue;
+                normal.Kind = id;
+                if (normal.Completion == Scripted) porNombre[normal.Name] = id;
+                else if (normal.Completion.Length > 0) porCriterio[normal.Completion] = id;
+            }
+
+            foreach (var reto in _byId.Values)
+            {
+                if (!reto.NeedsMonster) continue;
+
+                var primero = new List<int>();
+                var ultimo = new List<int>();
+                bool orden = true;
+                foreach (string trozo in reto.Completion.Split('|'))
+                {
+                    var m = _killOrder.Match(trozo);
+                    if (!m.Success) { orden = false; break; }
+                    (m.Groups[1].Value == "K" ? primero : ultimo).Add(int.Parse(m.Groups[2].Value));
+                }
+
+                var tope = _turnLimit.Match(reto.Completion);
+
+                if (orden && (primero.Count == 0 || ultimo.Count == 0))
+                {
+                    reto.KillFirst = primero;
+                    reto.KillLast = ultimo;
+                }
+                else if (tope.Success) reto.TurnLimit = int.Parse(tope.Groups[1].Value);
+                else if (porCriterio.TryGetValue(reto.Completion, out int gemelo)) reto.Kind = gemelo;
+                else if (reto.Completion == Scripted)
+                {
+                    if (_byHand.TryGetValue(reto.Id, out var regla)) reto.Rule = regla;
+                    else if (Array.IndexOf(_killBossLast, reto.Id) >= 0) reto.KillLast = reto.Monsters;
+                    else if (Array.IndexOf(_beforeRound6, reto.Id) >= 0) reto.TurnLimit = 6;
+                    else if (reto.Id == InLineWithAlly && vigilados.ContainsKey(SameLineage)) reto.Kind = SameLineage;
+                    else if (porNombre.TryGetValue(reto.Name, out int tocayo)) reto.Kind = tocayo;
+                    else reto.PartySizeOnly = _fighterCount.IsMatch(reto.Activation)
+                                              && reto.Activation.Contains("GN<");
+                }
+            }
+
+            int jueces = 0, total = 0;
+            foreach (var reto in _byId.Values)
+            {
+                if (!reto.NeedsMonster) continue;
+                total++;
+                if (reto.Judged) jueces++;
+            }
+            Console.WriteLine($"[Retos] De los {total} que impone un monstruo, {jueces} tienen quien " +
+                              $"los juzgue; los otros {total - jueces} no se impondrán.");
+        }
+
+        /// <summary>
+        /// ¿Caben los que hay? Es lo que dice el «GN» de la activación: el «Dúo» pide menos de
+        /// tres en el bando de los jugadores, el «Pegajoso» más de uno. Las invocaciones no
+        /// cuentan.
+        /// </summary>
+        public static bool FitsParty(Challenge reto, int players, int monsters)
+        {
+            foreach (System.Text.RegularExpressions.Match m in _fighterCount.Matches(reto.Activation))
+            {
+                int cuantos = m.Groups[3].Value == "0" ? players : monsters;
+                int n = int.Parse(m.Groups[2].Value);
+                bool vale = m.Groups[1].Value switch
+                {
+                    "<" => cuantos < n,
+                    ">" => cuantos > n,
+                    _ => cuantos == n,
+                };
+                if (!vale) return false;
+            }
+            return true;
         }
 
         private static readonly Dictionary<int, Challenge> _byId = new();
@@ -101,6 +355,7 @@ namespace Jondo.Unity.Server.Managers
         public static void OnlyOffer(IReadOnlyDictionary<int, int> vigilados)
         {
             _offerable.Clear();
+            FindJudges(vigilados);
 
             foreach (var reto in _byId.Values)
             {
@@ -119,10 +374,23 @@ namespace Jondo.Unity.Server.Managers
 
         public static Challenge? Get(int id) => _byId.TryGetValue(id, out var reto) ? reto : null;
 
+        /// <summary>
+        /// El reto vigilado al que equivale éste. Uno normal es su propio juez; uno de jefe lo
+        /// es el gemelo que le encontró <see cref="FindJudges"/>, o nadie.
+        /// </summary>
+        public static int KindOf(int id)
+        {
+            var reto = Get(id);
+            if (reto == null) return id;
+            if (reto.Kind != 0) return reto.Kind;
+            return reto.NeedsMonster ? 0 : id;
+        }
+
         public static void Initialize()
         {
             _byId.Clear();
             _offerable.Clear();
+            _byMonster.Clear();
 
             string path = Paths.Resolve("retos_3.6.10.10.json");
             if (!File.Exists(path))
@@ -204,7 +472,8 @@ namespace Jondo.Unity.Server.Managers
         /// hecho: un logro se hace una vez.
         /// </summary>
         public static IReadOnlyList<Challenge> Imposed(IEnumerable<int> monsters,
-                                                       IReadOnlyCollection<int> alreadyDone)
+                                                       IReadOnlyCollection<int> alreadyDone,
+                                                       int players, int monsterCount)
         {
             var salida = new List<Challenge>();
             var puestos = new HashSet<int>();
@@ -215,6 +484,10 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var reto in suyos)
                 {
                     if (alreadyDone.Contains(reto.Id)) continue;
+
+                    // El que nadie juzga saldría cumplido con sólo ganar, y el que pide ser
+                    // pocos no es para un grupo entero.
+                    if (!reto.Judged || !FitsParty(reto, players, monsterCount)) continue;
                     if (!puestos.Add(reto.Id)) continue;
                     salida.Add(reto);
                 }

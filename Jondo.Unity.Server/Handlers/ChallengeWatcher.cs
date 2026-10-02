@@ -144,6 +144,16 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (fight.ChallengesFixed.Count == 0) return;
 
+            // De dónde sale cada aliado, para «Salida de ring». Una vez por combate, no por jugador.
+            var apuntes = Notes(fight);
+            lock (apuntes)
+            {
+                if (apuntes.StartCells.Count == 0)
+                {
+                    foreach (var aliado in fight.Azul) apuntes.StartCells[aliado.Id] = aliado.CellId;
+                }
+            }
+
             foreach (int reto in SenalanAlEmpezar)
             {
                 if (Vivo(fight, reto)) await SenalarAsync(stream, fight, reto, UnEnemigoVivo(fight));
@@ -160,6 +170,12 @@ namespace Jondo.Unity.Server.Handlers
             fight.TurnStartMp = quien.CurrentMP;
             fight.TurnTackledMp = 0;
             fight.KillCells.Clear();
+
+            // «Hay gente por aquí» deja elegir: empezar O acabar el turno en línea con un enemigo.
+            if (quien.TeamId == 0 && fight.ChallengesFixed.Count > 0)
+            {
+                Notes(fight).BeganInLineWithEnemy = Alineado(fight.Rojo, quien, diagonal: false);
+            }
         }
 
         /// <summary>
@@ -168,6 +184,19 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static async Task RoundStartedAsync(NetworkStream stream, FightInstance fight)
         {
+            // El «Dúo», el «Trío» y el «Crono» de un jefe: ganar en MENOS de N turnos. En cuanto
+            // empieza la ronda N ya no se puede, y se dice entonces, que es cuando ocurre.
+            foreach (var (id, _) in fight.ChallengesFixed.ToArray())
+            {
+                if (fight.ChallengesBroken.Contains(id)) continue;
+                int tope = Challenges.Get(id)?.TurnLimit ?? 0;
+                if (tope > 0 && fight.RoundNumber >= tope)
+                {
+                    await BreakOneAsync(stream, fight, id,
+                                        $"empieza la ronda {fight.RoundNumber} y había que ganar antes de la {tope}");
+                }
+            }
+
             if (Vivo(fight, Imprevisible))
                 await SenalarAsync(stream, fight, Imprevisible, UnEnemigoVivo(fight));
         }
@@ -260,6 +289,51 @@ namespace Jondo.Unity.Server.Handlers
                 await BreakAsync(stream, fight, Conquistador,
                                  $"{quien.Name} remató pero no acaba en la casilla del muerto");
             }
+
+            await BossPositionAsync(stream, fight, quien);
+        }
+
+        /// <summary>
+        /// Los retos de jefe que miran dónde se acaba el turno y que sólo lo dicen en su
+        /// descripción. Son primos de los de arriba: en línea o en diagonal, cerca o lejos, pero
+        /// respecto a los enemigos o con un número de casillas propio.
+        /// </summary>
+        private static async Task BossPositionAsync(NetworkStream stream, FightInstance fight, Fighter quien)
+        {
+            if (!AlgunaRegla(fight)) return;
+
+            bool lineaEnemigo = Alineado(fight.Rojo, quien, diagonal: false);
+            bool diagonalEnemigo = Alineado(fight.Rojo, quien, diagonal: true);
+            bool lineaAliado = Alineado(fight.Azul, quien, diagonal: false);
+            bool diagonalAliado = Alineado(fight.Azul, quien, diagonal: true);
+            int alEnemigo = MasCercano(fight.Rojo, quien);
+            int alAliado = MasCercano(fight.Azul, quien);
+            var apuntes = Notes(fight);
+
+            async Task Si(bool roto, Challenges.BossRule regla, string porque)
+            {
+                if (roto) await BreakRuleAsync(stream, fight, regla, $"{quien.Name} {porque}");
+            }
+
+            await Si(!lineaEnemigo, Challenges.BossRule.EndInLineWithEnemy, "acaba sin alinearse con ningún enemigo");
+            await Si(!diagonalEnemigo, Challenges.BossRule.EndDiagonalToEnemy, "acaba sin ningún enemigo en diagonal");
+            await Si(lineaEnemigo, Challenges.BossRule.NeverInLineWithEnemy, "acaba en línea con un enemigo");
+            await Si(lineaEnemigo || diagonalEnemigo, Challenges.BossRule.NeverLineOrDiagonalEnemy,
+                     "acaba en línea o en diagonal con un enemigo");
+            await Si(lineaAliado, Challenges.BossRule.NeverInLineWithAlly, "acaba en línea con un aliado");
+            await Si(lineaEnemigo || lineaAliado, Challenges.BossRule.NeverLineEnemyOrAlly,
+                     "acaba en línea con alguien");
+            await Si(diagonalEnemigo || diagonalAliado, Challenges.BossRule.NeverDiagonalEnemyOrAlly,
+                     "acaba en diagonal con alguien");
+            await Si(alEnemigo > 5, Challenges.BossRule.EndNearEnemy5, "acaba a más de 5 casillas de todo enemigo");
+            await Si(alAliado <= 3, Challenges.BossRule.EndFarFromAllies3, "acaba a 3 casillas o menos de un aliado");
+            await Si(alAliado <= 4, Challenges.BossRule.EndFarFromAllies4, "acaba a 4 casillas o menos de un aliado");
+            await Si(!apuntes.BeganInLineWithEnemy && !lineaEnemigo, Challenges.BossRule.BeginOrEndInLineWithEnemy,
+                     "ni empieza ni acaba en línea con un enemigo");
+
+            // El que no estaba al empezar —una invocación— no tiene casilla de salida que guardar.
+            await Si(apuntes.StartCells.TryGetValue(quien.Id, out int salida) && quien.CellId != salida,
+                     Challenges.BossRule.EndOnStartCell, "no acaba en su casilla de inicio");
         }
 
         /// <summary>¿Es de los aliados de menor nivel? Puede haber varios empatados.</summary>
@@ -295,6 +369,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!Alguno(fight) || cuanto <= 0) return;
 
+            await BossDamageAsync(stream, fight, quien, quienPega, elemento);
+
             if (quien.TeamId == 0)
             {
                 if (Vivo(fight, Intocable))
@@ -315,6 +391,86 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
+        /// <summary>El daño de empuje viaja sin elemento: así lo manda el combate.</summary>
+        private const int Empuje = -1;
+
+        /// <summary>
+        /// Los retos de jefe que miran un daño: desde dónde se pega, a quién, y con qué.
+        ///
+        /// «A distancia» es no estar pegado al que recibe, en el momento del golpe. Un veneno o
+        /// un glifo que hace daño con su dueño lejos cuenta como a distancia: es la lectura que
+        /// rompe de más y nunca regala el reto.
+        /// </summary>
+        private static async Task BossDamageAsync(NetworkStream stream, FightInstance fight,
+                                                  Fighter quien, Fighter quienPega, int elemento)
+        {
+            if (!AlgunaRegla(fight)) return;
+
+            if (quien.TeamId == 0)
+            {
+                if (elemento == Empuje)
+                {
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.NoPushDamageToAllies,
+                                         $"{quien.Name} sufre daños de empuje");
+                }
+                return;
+            }
+
+            if (elemento == Empuje)
+            {
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoPushDamageToEnemies,
+                                     $"{quien.Name} sufre daños de empuje");
+            }
+            else if (quienPega is { TeamId: 0 })
+            {
+                bool lejos = MapGeometry.Distance(quienPega.CellId, quien.CellId) > 1;
+                await BreakRuleAsync(stream, fight,
+                    lejos ? Challenges.BossRule.NoRangedDamageToEnemies : Challenges.BossRule.NoMeleeDamageToEnemies,
+                    $"{quienPega.Name} daña a {quien.Name} " + (lejos ? "a distancia" : "cuerpo a cuerpo"));
+
+                // «Mantícoro no debe recibir daños a distancia»: sólo el suyo.
+                if (lejos)
+                {
+                    foreach (int id in ConRegla(fight, Challenges.BossRule.NoRangedDamageToBoss))
+                    {
+                        if (Challenges.Get(id)!.Monsters.Contains(quien.MonsterId))
+                            await BreakOneAsync(stream, fight, id, $"{quienPega.Name} daña a {quien.Name} a distancia");
+                    }
+                }
+            }
+
+            if (quien.EsInvocado)
+            {
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoDamageToEnemySummons,
+                                     $"la invocación {quien.Name} sufre daños");
+                return;
+            }
+
+            bool hayInvocaciones = false, hayOtros = false;
+            foreach (var uno in fight.Rojo)
+            {
+                if (!uno.IsAlive || uno.Id == quien.Id) continue;
+                if (uno.EsInvocado) hayInvocaciones = true;
+                else if (uno.MonsterId != quien.MonsterId) hayOtros = true;
+            }
+
+            if (hayInvocaciones)
+            {
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoDamageWhileEnemySummons,
+                                     $"{quien.Name} sufre daños con invocaciones enemigas en pie");
+            }
+
+            // «La Rata Negra no debe sufrir daños antes de que los otros hayan sido eliminados.»
+            if (hayOtros)
+            {
+                foreach (int id in ConRegla(fight, Challenges.BossRule.BossUntouchedUntilAlone))
+                {
+                    if (Challenges.Get(id)!.Monsters.Contains(quien.MonsterId))
+                        await BreakOneAsync(stream, fight, id, $"{quien.Name} sufre daños y aún quedan otros enemigos");
+                }
+            }
+        }
+
         /// <summary>
         /// Una curación. El Sin Corazón sólo deja curarse a uno mismo: si el que cura y el curado
         /// son aliados distintos, se rompe.
@@ -322,7 +478,14 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task HealedAsync(NetworkStream stream, FightInstance fight,
                                              Fighter quienCura, Fighter curado)
         {
-            if (!Alguno(fight) || !Vivo(fight, SinCorazon)) return;
+            if (!Alguno(fight)) return;
+
+            // Los dos de jefe que no dejan curar a un bando, venga la cura de quien venga.
+            await BreakRuleAsync(stream, fight,
+                curado.TeamId == 0 ? Challenges.BossRule.NoHealAllies : Challenges.BossRule.NoHealEnemies,
+                $"{curado.Name} recibe una cura de {quienCura.Name}");
+
+            if (!Vivo(fight, SinCorazon)) return;
             if (curado.TeamId != 0 || quienCura.TeamId != 0 || quienCura.Id == curado.Id) return;
 
             await BreakAsync(stream, fight, SinCorazon,
@@ -333,6 +496,12 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task AllyDiedAsync(NetworkStream stream, FightInstance fight, Fighter quien)
         {
             if (!Alguno(fight) || quien.TeamId != 0) return;
+
+            if (!quien.EsInvocado && fight.RoundNumber < 6)
+            {
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NobodyKilledBeforeRound6,
+                                     $"{quien.Name} cae en la ronda {fight.RoundNumber}, antes de la 6");
+            }
 
             if (Vivo(fight, Superviviente))
                 await BreakAsync(stream, fight, Superviviente, $"{quien.Name} ha caído");
@@ -424,6 +593,22 @@ namespace Jondo.Unity.Server.Handlers
             bool quedanEnemigos = false;
             foreach (var uno in fight.Rojo) if (uno.IsAlive) { quedanEnemigos = true; break; }
 
+            await KillOrderAsync(stream, fight, victima);
+
+            // Los de jefe que miran quién cae: nadie antes de la ronda 6, y las invocaciones
+            // enemigas, que no las remate un aliado.
+            if (!victima.EsInvocado && fight.RoundNumber < 6)
+            {
+                string pronto = $"{victima.Name} cae en la ronda {fight.RoundNumber}, antes de la 6";
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoEnemyKilledBeforeRound6, pronto);
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NobodyKilledBeforeRound6, pronto);
+            }
+            if (victima.EsInvocado && quienRemata != null && quienRemata.TeamId == 0)
+            {
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoEnemySummonKilledByAlly,
+                                     $"{quienRemata.Name} remata a la invocación {victima.Name}");
+            }
+
             // Primero: el señalado tiene que caer el primero de todos.
             if (Vivo(fight, Primero) && !EsElSenalado(fight, Primero, victima.Id))
             {
@@ -481,6 +666,56 @@ namespace Jondo.Unity.Server.Handlers
             // Un merecido pin: cada enemigo tiene que caer pegado a un obstáculo.
             if (Vivo(fight, MerecidoPin) && !JuntoAObstaculo(fight, victima.CellId))
                 await BreakAsync(stream, fight, MerecidoPin, $"{victima.Name} cae al descubierto");
+        }
+
+        /// <summary>
+        /// El «Primero» y el «Último» de un jefe. No señalan a nadie a suertes como los normales:
+        /// el criterio trae el monstruo —«CK#147,1», que el Jalató Real caiga el primero— y el
+        /// cliente ya lo nombra en la descripción, así que no hay kwm que mandar.
+        ///
+        /// Las invocaciones no cuentan ni para un lado ni para el otro: un jalató invocado que
+        /// cae antes que el jefe no es «otro antes», ni uno que queda en pie es «otro después».
+        /// </summary>
+        private static async Task KillOrderAsync(NetworkStream stream, FightInstance fight, Fighter victima)
+        {
+            if (victima.EsInvocado) return;
+
+            foreach (var (id, _) in fight.ChallengesFixed.ToArray())
+            {
+                if (fight.ChallengesBroken.Contains(id)) continue;
+                var reto = Challenges.Get(id);
+                if (reto == null) continue;
+
+                if (reto.KillFirst.Count > 0 && !reto.KillFirst.Contains(victima.MonsterId))
+                {
+                    bool yaCayo = false;
+                    foreach (var uno in fight.Rojo)
+                    {
+                        if (uno.Id != victima.Id && !uno.IsAlive && !uno.EsInvocado
+                            && reto.KillFirst.Contains(uno.MonsterId)) { yaCayo = true; break; }
+                    }
+                    if (!yaCayo)
+                    {
+                        await BreakOneAsync(stream, fight, id,
+                                            $"ha caído {victima.Name} antes que el que tenía que caer primero");
+                    }
+                }
+
+                if (reto.KillLast.Count > 0 && reto.KillLast.Contains(victima.MonsterId))
+                {
+                    bool quedaOtro = false;
+                    foreach (var uno in fight.Rojo)
+                    {
+                        if (uno.Id != victima.Id && uno.IsAlive && !uno.EsInvocado
+                            && !reto.KillLast.Contains(uno.MonsterId)) { quedaOtro = true; break; }
+                    }
+                    if (quedaOtro)
+                    {
+                        await BreakOneAsync(stream, fight, id,
+                                            $"{victima.Name} tenía que caer el último y aún quedan enemigos");
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -595,7 +830,89 @@ namespace Jondo.Unity.Server.Handlers
             => _ends.TryGetValue(fight.FightId, out var end) ? end.Won : (IReadOnlyCollection<int>)System.Array.Empty<int>();
 
         /// <summary>The fight is over for everybody: its verdicts go.</summary>
-        public static void Forget(FightInstance fight) => _ends.TryRemove(fight.FightId, out _);
+        public static void Forget(FightInstance fight)
+        {
+            _ends.TryRemove(fight.FightId, out _);
+            _notes.TryRemove(fight.FightId, out _);
+        }
+
+        // ─── Lo que hace falta recordar para las reglas de jefe ─────────────────
+
+        /// <summary>Lo que un combate apunta para las reglas de jefe y nadie más necesita.</summary>
+        private sealed class FightNotes
+        {
+            /// <summary>Aliado → la casilla en la que empezó el combate.</summary>
+            public Dictionary<long, int> StartCells { get; } = new Dictionary<long, int>();
+
+            /// <summary>¿Empezó su turno en línea con un enemigo el que está jugando?</summary>
+            public bool BeganInLineWithEnemy { get; set; }
+        }
+
+        private static readonly ConcurrentDictionary<long, FightNotes> _notes = new ConcurrentDictionary<long, FightNotes>();
+
+        private static FightNotes Notes(FightInstance fight) => _notes.GetOrAdd(fight.FightId, _ => new FightNotes());
+
+        /// <summary>Los retos fijados y sin romper que se juzgan con esa regla.</summary>
+        private static List<int> ConRegla(FightInstance fight, Challenges.BossRule regla)
+        {
+            var salida = new List<int>();
+            foreach (var (id, _) in fight.ChallengesFixed)
+            {
+                if (fight.ChallengesBroken.Contains(id)) continue;
+                if (Challenges.Get(id)?.Rule == regla) salida.Add(id);
+            }
+            return salida;
+        }
+
+        /// <summary>¿Queda en juego alguno con regla de jefe? Para no echar cuentas en balde.</summary>
+        private static bool AlgunaRegla(FightInstance fight)
+        {
+            foreach (var (id, _) in fight.ChallengesFixed)
+            {
+                if (fight.ChallengesBroken.Contains(id)) continue;
+                var reto = Challenges.Get(id);
+                if (reto != null && reto.Rule != Challenges.BossRule.None) return true;
+            }
+            return false;
+        }
+
+        private static async Task BreakRuleAsync(NetworkStream stream, FightInstance fight,
+                                                 Challenges.BossRule regla, string porque)
+        {
+            foreach (int id in ConRegla(fight, regla)) await BreakOneAsync(stream, fight, id, porque);
+        }
+
+        /// <summary>¿Está en línea —o en diagonal— con alguno de ésos que siga en pie?</summary>
+        private static bool Alineado(IEnumerable<Fighter> lista, Fighter quien, bool diagonal)
+        {
+            var (x, y) = MapGeometry.CellToPoint(quien.CellId);
+            foreach (var otro in lista)
+            {
+                if (!otro.IsAlive || otro.Id == quien.Id) continue;
+                var (ox, oy) = MapGeometry.CellToPoint(otro.CellId);
+
+                if (diagonal)
+                {
+                    int dx = Math.Abs(ox - x), dy = Math.Abs(oy - y);
+                    if (dx != 0 && dx == dy) return true;
+                }
+                else if (ox == x || oy == y) return true;
+            }
+            return false;
+        }
+
+        /// <summary>A cuántas casillas tiene al más cercano de ésos. Si no hay ninguno, lejísimos.</summary>
+        private static int MasCercano(IEnumerable<Fighter> lista, Fighter quien)
+        {
+            int mejor = int.MaxValue;
+            foreach (var otro in lista)
+            {
+                if (!otro.IsAlive || otro.Id == quien.Id) continue;
+                int lejos = MapGeometry.Distance(quien.CellId, otro.CellId);
+                if (lejos < mejor) mejor = lejos;
+            }
+            return mejor;
+        }
 
         /// <summary>
         /// The bonus a won fight's challenges will give, worked out without judging anything aloud:
@@ -623,10 +940,17 @@ namespace Jondo.Unity.Server.Handlers
             => fight.ChallengesFixed.Count > fight.ChallengesBroken.Count;
 
         /// <summary>¿Está ese reto en juego y todavía sin romper?</summary>
+        /// <remarks>
+        /// Se pregunta por la CLASE y no por el número: el «Prudente» que impone el Jalató Real
+        /// es el 121 y se juzga igual que el 40, así que cuenta como vivo si lo está cualquiera
+        /// de los dos. Quién equivale a quién lo dice <see cref="Challenges.KindOf"/>.
+        /// </remarks>
         private static bool Vivo(FightInstance fight, int id)
         {
-            if (fight.ChallengesBroken.Contains(id)) return false;
-            foreach (var (suyo, _) in fight.ChallengesFixed) if (suyo == id) return true;
+            foreach (var (suyo, _) in fight.ChallengesFixed)
+            {
+                if (Challenges.KindOf(suyo) == id && !fight.ChallengesBroken.Contains(suyo)) return true;
+            }
             return false;
         }
 
@@ -705,6 +1029,20 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task BreakAsync(NetworkStream stream, FightInstance fight, int id,
                                              string porque, string culpable = "", List<byte[]>? record = null)
+        {
+            // Todos los de esa clase: el normal y el de jefe se rompen por lo mismo y a la vez.
+            var deEsaClase = new List<int>();
+            foreach (var (suyo, _) in fight.ChallengesFixed)
+            {
+                if (Challenges.KindOf(suyo) == id) deEsaClase.Add(suyo);
+            }
+
+            foreach (int uno in deEsaClase) await BreakOneAsync(stream, fight, uno, porque, culpable, record);
+        }
+
+        /// <summary>Romper UN reto, por su número. Lo que hace <see cref="BreakAsync"/> con cada uno.</summary>
+        private static async Task BreakOneAsync(NetworkStream stream, FightInstance fight, int id,
+                                                string porque, string culpable = "", List<byte[]>? record = null)
         {
             if (!fight.ChallengesBroken.Add(id)) return;
 

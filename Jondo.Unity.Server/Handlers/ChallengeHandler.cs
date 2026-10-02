@@ -229,9 +229,8 @@ namespace Jondo.Unity.Server.Handlers
         /// exigiendo el monstruo 5781, que era el de esa anomalía.
         ///
         /// Como llevan logro, se hacen una vez: al personaje que ya los tenga cumplidos no se le
-        /// vuelven a poner. Hoy esa lista está siempre vacía porque todavía nadie comprueba si un
-        /// reto se cumple, así que a efectos prácticos salen siempre; el día que se implante la
-        /// comprobación, esto ya está en su sitio.
+        /// vuelven a poner. Y sólo se ponen los que el vigilante sabe juzgar y los que caben en
+        /// el grupo que hay —el «Dúo» no sale con tres—: lo decide <see cref="Challenges.Imposed"/>.
         /// </summary>
         private static async Task ImposeAsync(NetworkStream stream, FightInstance fight)
         {
@@ -242,7 +241,11 @@ namespace Jondo.Unity.Server.Handlers
             //
             // Un combate fuera de mazmorra no entra aquí -- IsBossRoom contesta que no cuando el
             // mapa no es sala de ninguna --, que es lo que ya pasaba antes por otro camino.
-            if (!DungeonHandler.IsBossRoom(SessionContext.State.MapId)) return;
+            //
+            // Se pregunta por el mapa de ROL del combate y no por el de la sesión: al entrar en
+            // combate la sesión pasa al mapa del arena, que no es sala de ninguna mazmorra, y con
+            // ése la respuesta era siempre que no. Ni un reto impuesto salió desde entonces.
+            if (!DungeonHandler.IsBossRoom(fight.RoleplayMapId)) return;
 
             var bichos = new List<int>();
             foreach (var uno in fight.Rojo)
@@ -251,13 +254,20 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (bichos.Count == 0) return;
 
+            int jugadores = 0, monstruos = 0;
+            foreach (var uno in fight.Azul) if (!uno.EsInvocado) jugadores++;
+            foreach (var uno in fight.Rojo) if (!uno.EsInvocado) monstruos++;
+
             var cumplidos = DatabaseManager.LoadChallengesDone(GameState.CharacterId);
-            var puestos = Challenges.Imposed(bichos, cumplidos);
+            var puestos = Challenges.Imposed(bichos, cumplidos, jugadores, monstruos);
             if (puestos.Count == 0) return;
 
+            var yaFijados = FixedIds(fight);
             foreach (var reto in puestos)
             {
-                fight.ChallengesFixed.Add((reto.Id, 0));
+                // El combate es uno y la lista también: al segundo jugador del grupo se le
+                // manda el mismo reto, pero no se apunta dos veces.
+                if (Array.IndexOf(yaFijados, reto.Id) < 0) fight.ChallengesFixed.Add((reto.Id, 0));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kww,
                     Network.FightProtocol.BuildChallengeChosen(
                         Network.FightProtocol.BuildChallenge(reto.Id, 0))));
