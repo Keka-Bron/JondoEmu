@@ -920,7 +920,7 @@ namespace Jondo.Unity.Server.Network
             if (where != null) jss.VarIfNotZero(6, where.SubAreaId);
 
             // The houses, between the subarea and the elements as in both house captures: f7 the
-            // one the viewer is inside, f9 those on this street that have an owner.
+            // one the viewer is inside, f9 those on this street that can be owned.
             Handlers.HouseHandler.AddToMap(jss, mapId);
 
             AddInteractiveElements(jss, mapId, accountId);

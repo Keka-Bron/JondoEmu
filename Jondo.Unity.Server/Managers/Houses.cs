@@ -66,8 +66,9 @@ namespace Jondo.Unity.Server.Managers
     /// everybody and nobody's.
     ///
     /// The plaque -- lnx -- only ever travels for a house WITH an owner: of the 1,276 plaques in
-    /// the 34 capture folders, all 1,276 have one, and there is no sample of a free house. So a
-    /// house without an owner still sends none, exactly as before.
+    /// the 34 capture folders, all 1,276 have one, and there is no sample of a free house. A
+    /// house that can be owned and has no owner sends one all the same, without a name and at its
+    /// model's price: the client opens no buyer's window for a house its map did not declare.
     ///
     /// Each door is ONE house with ONE instance (<see cref="Instance"/>); the house id the
     /// protocol carries is ours, the door's rank in (map, element) order, stable while the doors

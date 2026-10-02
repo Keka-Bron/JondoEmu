@@ -357,7 +357,7 @@ namespace Jondo.Unity.Server.Handlers
                 Instance = Houses.Instance,
                 OwnerName = name,
                 OwnerTag = tag,
-                Price = house.ForSale ? house.Price : 0,
+                Price = HouseStore.AskingPrice(house, door.Price),
                 Locked = house.Owned && house.Locked,
                 Rooms = door.Rooms,
             };
@@ -373,8 +373,10 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The houses of a map's jss: f7, the one the viewer is inside, and f9, those on this
-        /// street that have an owner. A house nobody owns sends nothing, as before: no plaque of a
-        /// free house was ever captured.
+        /// street that can be owned. A house nobody owns is declared too, on sale at its model's
+        /// price: without it the client knows no house behind the door and drops the buyer's khr.
+        /// No plaque of a free house was ever captured, but the client takes this one: it shows the
+        /// house as abandoned and on sale at that price, and opens the buyer's window.
         /// </summary>
         public static void AddToMap(Pb jss, long mapId)
         {
@@ -397,7 +399,6 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (!door.IsOwnable) continue;
                 var house = HouseStore.Of(mapId, door.ElementId);
-                if (!house.Owned) continue;
                 jss.Msg(9, HouseProtocol.BuildOnMap(Houses.HouseIdOf(mapId, door.ElementId), door.Model,
                     new long[] { door.ElementId }, new[] { PlaqueOf(house, door) }));
             }
