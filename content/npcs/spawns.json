@@ -92,6 +92,390 @@
       "npc": 3516,
       "cell": 289,
       "orientation": 3
+    },
+    {
+      "map": 158334976,
+      "npc": 774,
+      "cell": 344,
+      "orientation": 3
+    },
+    {
+      "map": 34473220,
+      "npc": 783,
+      "cell": 343,
+      "orientation": 3
+    },
+    {
+      "map": 72221696,
+      "npc": 784,
+      "cell": 328,
+      "orientation": 3
+    },
+    {
+      "map": 198967296,
+      "npc": 789,
+      "cell": 315,
+      "orientation": 3
+    },
+    {
+      "map": 147851777,
+      "npc": 1619,
+      "cell": 370,
+      "orientation": 3
+    },
+    {
+      "map": 149422080,
+      "npc": 797,
+      "cell": 343,
+      "orientation": 3
+    },
+    {
+      "map": 104862211,
+      "npc": 775,
+      "cell": 399,
+      "orientation": 3
+    },
+    {
+      "map": 172493057,
+      "npc": 712,
+      "cell": 399,
+      "orientation": 3
+    },
+    {
+      "map": 171706891,
+      "npc": 3947,
+      "cell": 426,
+      "orientation": 3
+    },
+    {
+      "map": 181146624,
+      "npc": 1036,
+      "cell": 356,
+      "orientation": 3
+    },
+    {
+      "map": 25693696,
+      "npc": 946,
+      "cell": 383,
+      "orientation": 3
+    },
+    {
+      "map": 96993793,
+      "npc": 1438,
+      "cell": 356,
+      "orientation": 3
+    },
+    {
+      "map": 66192641,
+      "npc": 795,
+      "cell": 327,
+      "orientation": 3
+    },
+    {
+      "map": 66060545,
+      "npc": 795,
+      "cell": 383,
+      "orientation": 3
+    },
+    {
+      "map": 89916416,
+      "npc": 945,
+      "cell": 314,
+      "orientation": 3
+    },
+    {
+      "map": 216927751,
+      "npc": 800,
+      "cell": 371,
+      "orientation": 3
+    },
+    {
+      "map": 101714451,
+      "npc": 818,
+      "cell": 386,
+      "orientation": 3
+    },
+    {
+      "map": 63310595,
+      "npc": 758,
+      "cell": 342,
+      "orientation": 3
+    },
+    {
+      "map": 63964672,
+      "npc": 943,
+      "cell": 300,
+      "orientation": 3
+    },
+    {
+      "map": 34473476,
+      "npc": 783,
+      "cell": 343,
+      "orientation": 3
+    },
+    {
+      "map": 55836672,
+      "npc": 1300,
+      "cell": 426,
+      "orientation": 3
+    },
+    {
+      "map": 59510784,
+      "npc": 1385,
+      "cell": 356,
+      "orientation": 3
+    },
+    {
+      "map": 117965057,
+      "npc": 2175,
+      "cell": 285,
+      "orientation": 3
+    },
+    {
+      "map": 125829633,
+      "npc": 2314,
+      "cell": 412,
+      "orientation": 3
+    },
+    {
+      "map": 133171202,
+      "npc": 2436,
+      "cell": 441,
+      "orientation": 3
+    },
+    {
+      "map": 136839168,
+      "npc": 2445,
+      "cell": 343,
+      "orientation": 3
+    },
+    {
+      "map": 140641537,
+      "npc": 2636,
+      "cell": 415,
+      "orientation": 3
+    },
+    {
+      "map": 144707846,
+      "npc": 2660,
+      "cell": 357,
+      "orientation": 3
+    },
+    {
+      "map": 161742848,
+      "npc": 3097,
+      "cell": 356,
+      "orientation": 3
+    },
+    {
+      "map": 169084930,
+      "npc": 3256,
+      "cell": 328,
+      "orientation": 3
+    },
+    {
+      "map": 168560640,
+      "npc": 3259,
+      "cell": 382,
+      "orientation": 3
+    },
+    {
+      "map": 173280513,
+      "npc": 3646,
+      "cell": 326,
+      "orientation": 3
+    },
+    {
+      "map": 173540352,
+      "npc": 3657,
+      "cell": 329,
+      "orientation": 3
+    },
+    {
+      "map": 174850048,
+      "npc": 3679,
+      "cell": 428,
+      "orientation": 3
+    },
+    {
+      "map": 175637504,
+      "npc": 3686,
+      "cell": 342,
+      "orientation": 3
+    },
+    {
+      "map": 179438082,
+      "npc": 3747,
+      "cell": 327,
+      "orientation": 3
+    },
+    {
+      "map": 181797888,
+      "npc": 3966,
+      "cell": 373,
+      "orientation": 3
+    },
+    {
+      "map": 179831808,
+      "npc": 3962,
+      "cell": 397,
+      "orientation": 3
+    },
+    {
+      "map": 186384896,
+      "npc": 4189,
+      "cell": 271,
+      "orientation": 3
+    },
+    {
+      "map": 183108098,
+      "npc": 4188,
+      "cell": 357,
+      "orientation": 3
+    },
+    {
+      "map": 194779138,
+      "npc": 4499,
+      "cell": 342,
+      "orientation": 3
+    },
+    {
+      "map": 197133314,
+      "npc": 4818,
+      "cell": 355,
+      "orientation": 3
+    },
+    {
+      "map": 197526528,
+      "npc": 4817,
+      "cell": 370,
+      "orientation": 3
+    },
+    {
+      "map": 196346371,
+      "npc": 4819,
+      "cell": 314,
+      "orientation": 3
+    },
+    {
+      "map": 197918722,
+      "npc": 4976,
+      "cell": 328,
+      "orientation": 3
+    },
+    {
+      "map": 84411905,
+      "npc": 4975,
+      "cell": 369,
+      "orientation": 3
+    },
+    {
+      "map": 201851392,
+      "npc": 5363,
+      "cell": 328,
+      "orientation": 3
+    },
+    {
+      "map": 201591809,
+      "npc": 5325,
+      "cell": 342,
+      "orientation": 3
+    },
+    {
+      "map": 209191685,
+      "npc": 5734,
+      "cell": 414,
+      "orientation": 3
+    },
+    {
+      "map": 204999425,
+      "npc": 5683,
+      "cell": 356,
+      "orientation": 3
+    },
+    {
+      "map": 205521925,
+      "npc": 5601,
+      "cell": 356,
+      "orientation": 3
+    },
+    {
+      "map": 205260802,
+      "npc": 5733,
+      "cell": 342,
+      "orientation": 3
+    },
+    {
+      "map": 207095299,
+      "npc": 5831,
+      "cell": 356,
+      "orientation": 3
+    },
+    {
+      "map": 206832641,
+      "npc": 5829,
+      "cell": 355,
+      "orientation": 3
+    },
+    {
+      "map": 210633732,
+      "npc": 6020,
+      "cell": 315,
+      "orientation": 3
+    },
+    {
+      "map": 210765572,
+      "npc": 6021,
+      "cell": 300,
+      "orientation": 3
+    },
+    {
+      "map": 214961664,
+      "npc": 6214,
+      "cell": 371,
+      "orientation": 3
+    },
+    {
+      "map": 219939328,
+      "npc": 6381,
+      "cell": 315,
+      "orientation": 3
+    },
+    {
+      "map": 221250562,
+      "npc": 2217,
+      "cell": 370,
+      "orientation": 3
+    },
+    {
+      "map": 224660233,
+      "npc": 6929,
+      "cell": 343,
+      "orientation": 3
+    },
+    {
+      "map": 225313792,
+      "npc": 6848,
+      "cell": 342,
+      "orientation": 3
+    },
+    {
+      "map": 235668239,
+      "npc": 7669,
+      "cell": 385,
+      "orientation": 3
+    },
+    {
+      "map": 235147011,
+      "npc": 7699,
+      "cell": 411,
+      "orientation": 3
+    },
+    {
+      "map": 235405571,
+      "npc": 7701,
+      "cell": 287,
+      "orientation": 3
     }
   ]
 }
