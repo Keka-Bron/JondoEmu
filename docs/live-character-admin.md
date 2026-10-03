@@ -27,11 +27,15 @@ change:
   "celda": 321,
   "objeto": 1234,
   "cantidad": 3,
+  "modo": "aleatorio",
   "montura": 5678
 }
 ```
 
-Every value after `personaje` is optional. Characteristic values are clamped from zero to
+Every value after `personaje` is optional. `personaje` itself may be left out or empty: the
+character is then the caller's own, the one its account has in the world. `modo` goes with `objeto`:
+`"max"` (the default) gives the top of every range, `"aleatorio"` or `"random"` rolls each
+characteristic in its range the way a craft does; at most 100 rolled items per request. Characteristic values are clamped from zero to
 10,000,000 and kamas cannot be negative. Item quantities are limited to 1,000,000. `celda` is
 optional but only valid with `mapa`; the nearest walkable cell is used. `montura` must identify a
 rideable item template. The response contains the complete resulting character state and the UIDs
@@ -62,11 +66,34 @@ To change an account role, use `POST /api/rol` with the same administrator token
 
 The role is clamped to the supported range documented in `docs/role.md`.
 
+## Who is connected
+
+`POST /api/conectados` with the same administrator token answers the characters in the world:
+
+```json
+{ "conectados": [ { "nombre": "Keka", "nivel": 200, "propio": true } ] }
+```
+
+`propio` marks the caller's own character.
+
+## The item window in the client
+
+JondoFix opens a window on **F10** for an administrator: the client's own item catalogue with a
+search (name, type, id, or a level range such as `190-200`), the lines of the item picked, the
+connected characters to give it to, a quantity, and two buttons — maximum characteristics or
+rolled ones. It is these two routes and nothing else: the launcher hands the client its account's
+token in `JONDO_CONTROL_TOKEN` (administrators only), the mod posts it, and the server checks
+token and role on every request. The control API is on loopback, so the window works when the
+server runs on the same machine as the client. Implementation: `JondoFix/AdminItemsUi.cs`.
+
 ## Errors
 
 | HTTP status | Error | Meaning |
 |---|---|---|
 | 400 | `sin-cambios` | No supported numeric field was supplied. |
+| 400 | `modo-invalido` | `modo` is not `max`, `aleatorio` or `random`. |
+| 400 | `modo-sin-objeto` | A rolled mode was asked for with no `objeto`. |
+| 400 | `cantidad-excesiva` | More than 100 items that roll, in rolled mode. |
 | 400 | `campo-invalido-*` | A supported field was supplied with a non-numeric value. |
 | 400 | `objeto-desconocido` | The requested item template does not exist. |
 | 400 | `montura-invalida` | The requested template is not a rideable mount. |

@@ -754,6 +754,13 @@ namespace JondoFix
 
         public override void OnUpdate()
         {
+            // The administrator's item window: its key, and what the server answered it.
+            if (IsJondoAdministrator)
+            {
+                try { AdminItemsUi.Tick(); }
+                catch (Exception ex) { LoggerInstance.Warning($"[JondoFix] Item window: {ex.Message}"); }
+            }
+
             if (UseLocalRedirect && !itemMappingsLoadedFromClient)
             {
                 try

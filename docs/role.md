@@ -21,6 +21,10 @@ ids and the unfiltered catalogue. Anyone starting `Dofus.exe` by hand can set th
 That is acceptable precisely because it governs nothing but display — no client-side value is ever
 trusted for a decision the server makes.
 
+The same goes for the administrator's item window (F10): that variable only decides whether the key
+opens it. What gives the item is `POST /api/personaje`, with the account's token the launcher
+passes in `JONDO_CONTROL_TOKEN` to administrators only, and the server checks token and role there.
+
 ## Why the former 1-to-4 scale was wrong
 
 The former Jondo definition omitted `GameMasterPadawan`. It therefore used:

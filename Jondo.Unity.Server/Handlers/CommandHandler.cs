@@ -837,6 +837,16 @@ namespace Jondo.Unity.Server.Handlers
                                             int channel, long accountId)
         {
             string[] parts = rest.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+
+            // A last word of "random" rolls each characteristic in its range, the way a craft
+            // does; "max", or nothing, is the top of every one, as it has always been.
+            bool random = false;
+            if (parts.Length > 1 && TryParseStatMode(parts[^1], out bool asked))
+            {
+                random = asked;
+                parts = parts[..^1];
+            }
+
             if (parts.Length < 1 || parts.Length > 2 ||
                 !int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int gid) ||
                 (parts.Length == 2 && !int.TryParse(parts[1], NumberStyles.Integer,
@@ -856,7 +866,10 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (await GrantItemAsync(stream, gid, quantity) == null)
+            bool given = random
+                ? await WorkshopHandler.GiveAsync(stream, gid, quantity)
+                : await GrantItemAsync(stream, gid, quantity) != null;
+            if (!given)
             {
                 await NotifyAsync(stream, T("item.template_missing", gid), channel, accountId);
                 return;
@@ -866,9 +879,24 @@ namespace Jondo.Unity.Server.Handlers
             ActivityJournal.Current.Write("item.granted",
                 accountId > 0 ? accountId : SessionContext.Current.AccountId,
                 GameState.CharacterId,
-                new { source = "command", gid, quantity });
+                new { source = "command", gid, quantity, random });
             await NotifyAsync(stream, T("item.added", gid, quantity),
                               channel, accountId);
+        }
+
+        /// <summary>"max" or "random" (and "aleatorio", "aléatoire"): how an item given comes out.</summary>
+        internal static bool TryParseStatMode(string word, out bool random)
+        {
+            random = false;
+            switch ((word ?? "").Trim().ToLowerInvariant())
+            {
+                case "max": return true;
+                case "random":
+                case "aleatorio":
+                case "aléatoire":
+                case "aleatoire": random = true; return true;
+                default: return false;
+            }
         }
 
         private static async Task ItemSetAsync(NetworkStream stream, string rest,

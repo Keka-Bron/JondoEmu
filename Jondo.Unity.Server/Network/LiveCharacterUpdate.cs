@@ -21,6 +21,12 @@ namespace Jondo.Unity.Server.Network
         public long? Quantity { get; private init; }
         public long? MountGid { get; private init; }
 
+        /// <summary>
+        /// Whether the item given rolls each characteristic in its template's range, the way a
+        /// craft does, instead of coming out at the top of every one. "modo": "aleatorio".
+        /// </summary>
+        public bool RandomStats { get; private init; }
+
         public bool HasChanges => Vitality.HasValue || Wisdom.HasValue || Strength.HasValue
             || Intelligence.HasValue || Chance.HasValue || Agility.HasValue || Kamas.HasValue
             || Level.HasValue || MapId.HasValue || ItemGid.HasValue || MountGid.HasValue;
@@ -58,6 +64,17 @@ namespace Jondo.Unity.Server.Network
                     || !Read(root, "cantidad", out long? quantity, out error)
                     || !Read(root, "montura", out long? mount, out error))
                     return false;
+
+                if (!ReadMode(root, out bool randomStats))
+                {
+                    error = "modo-invalido";
+                    return false;
+                }
+                if (randomStats && !item.HasValue)
+                {
+                    error = "modo-sin-objeto";
+                    return false;
+                }
 
                 if (cell.HasValue && !mapId.HasValue)
                 {
@@ -111,6 +128,7 @@ namespace Jondo.Unity.Server.Network
                     ItemGid = item,
                     Quantity = quantity,
                     MountGid = mount,
+                    RandomStats = randomStats,
                 };
                 return true;
             }
@@ -118,6 +136,26 @@ namespace Jondo.Unity.Server.Network
             {
                 error = "cuerpo-invalido";
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// "modo": "max" (or nothing) for the top of every range, "aleatorio" or "random" for a
+        /// roll. Anything else is refused rather than read as max: a misspelt "aleatorio" would
+        /// otherwise hand over a perfect item and say nothing.
+        /// </summary>
+        private static bool ReadMode(JsonElement root, out bool random)
+        {
+            random = false;
+            if (!root.TryGetProperty("modo", out var mode)) return true;
+            if (mode.ValueKind != JsonValueKind.String) return false;
+
+            switch ((mode.GetString() ?? "").Trim().ToLowerInvariant())
+            {
+                case "max": return true;
+                case "aleatorio":
+                case "random": random = true; return true;
+                default: return false;
             }
         }
 

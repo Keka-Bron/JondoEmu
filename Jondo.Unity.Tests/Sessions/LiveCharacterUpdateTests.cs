@@ -68,6 +68,35 @@ namespace Jondo.Unity.Tests.Sessions
             Assert.Equal(expected, error);
         }
 
+        [Theory]
+        [InlineData("{\"objeto\":1234}", false)]
+        [InlineData("{\"objeto\":1234,\"modo\":\"max\"}", false)]
+        [InlineData("{\"objeto\":1234,\"modo\":\"aleatorio\"}", true)]
+        [InlineData("{\"objeto\":1234,\"modo\":\"Random\"}", true)]
+        public void An_item_comes_out_at_its_maximum_unless_a_roll_is_asked_for(string json, bool random)
+        {
+            bool parsed = LiveCharacterUpdate.TryParse(json, out var update, out string error);
+
+            Assert.True(parsed, error);
+            Assert.NotNull(update);
+            Assert.Equal(random, update.RandomStats);
+            // No name: the caller's own character.
+            Assert.Equal("", update.Character);
+        }
+
+        [Theory]
+        // A misspelt mode is refused, not read as max: it would hand over a perfect item.
+        [InlineData("{\"objeto\":1234,\"modo\":\"aleatoro\"}", "modo-invalido")]
+        [InlineData("{\"objeto\":1234,\"modo\":1}", "modo-invalido")]
+        [InlineData("{\"kamas\":10,\"modo\":\"aleatorio\"}", "modo-sin-objeto")]
+        public void A_mode_is_one_of_the_known_ones_and_goes_with_an_item(string json, string expected)
+        {
+            bool parsed = LiveCharacterUpdate.TryParse(json, out _, out string error);
+
+            Assert.False(parsed);
+            Assert.Equal(expected, error);
+        }
+
         [Fact]
         public void An_empty_patch_is_valid_but_has_no_changes()
         {

@@ -408,6 +408,11 @@ namespace Jondo.Unity.Launcher
                 // JondoFix uses this only to decide whether item ids may be shown in the client.
                 // It is cosmetic: every administration command is still authorized by the server.
                 startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                // And, to an administrator only, the token the mod's give-item panel presents to
+                // the control API. It is the account's own session, in its own process, and the
+                // server still checks token and role on every request.
+                if (Roles.AlMenos(accountRole, Roles.Administrador))
+                    startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
 
                 System.Diagnostics.Process? client;
                 try

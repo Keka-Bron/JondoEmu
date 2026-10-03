@@ -360,7 +360,8 @@ Built with **Avalonia**, the same toolkit as the Studio.
   lost fights against monsters; it never drops below 1, so nobody becomes a ghost
 - ❌ Energy coming back — with rest or consumables; no capture measures the rate
 - ✅ Commands — `.teleport [x,y]` or `.teleport <map id>`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`, `.receta`, `.sueno`, `.gremio`, `.raid`; they answer with an information line only their author sees
-- ✅ Live administration over HTTP — `POST /api/personaje` sets characteristics, kamas and level, grants items or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only
+- ✅ The administrator's item window, on **F10** in the client: the client's own catalogue with its icons, a search, a category filter and a type filter under it, pages of 40, the item's lines, the connected characters to give it to, and two buttons — maximum characteristics or rolled ones. `.item <id> [quantity] random` rolls too. A window of the client's own, opened by JondoFix; clicks on it do not reach the map
+- ✅ Live administration over HTTP — `POST /api/personaje` sets characteristics, kamas and level, grants items (at their maximum or rolled) or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only
 - 🟡 `.level` repaints the in-fight spell bar, but the fighter's own level is not updated until the next fight
 
 ### 👕 Appearances

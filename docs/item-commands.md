@@ -17,7 +17,7 @@ that game session; command names and arguments do not change.
 Syntax:
 
 ```text
-.item <item-template-id> [quantity]
+.item <item-template-id> [quantity] [max|random]
 ```
 
 Examples:
@@ -25,10 +25,19 @@ Examples:
 ```text
 .item 10784
 .item 10784 10
+.item 10784 1 random
 ```
 
 The first argument is the item template id (`gid`) from `ItemTemplates` in `world.db`. Quantity is
 optional and defaults to `1`; it must be a positive integer.
+
+A last word of `random` (or `aleatorio`, `aléatoire`) rolls each characteristic in its template's
+range instead, through the same code a craft uses (`WorkshopHandler.GiveAsync`): an item that rolls
+is created one row per unit, each with its own roll, and one that rolls nothing joins a stack.
+`max`, or no word at all, is the behaviour described below.
+
+The same choice, with a catalogue to pick from and a connected character to give to, is in the
+administrator's item window of the client (F10); see `docs/live-character-admin.md`.
 
 For a valid template, the server:
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Jondo.Unity.Protocol;
@@ -119,6 +120,7 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, Apagar);
                     case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador,
                         cuenta => CambiarRol(cuerpo, cuenta));
+                    case Prefijo + "conectados": return ConRol(cuerpo, Roles.Administrador, Conectados);
                     case Prefijo + "personaje":
                         return !metodo.Equals("POST", StringComparison.OrdinalIgnoreCase)
                             ? Mal(405, "metodo")
@@ -196,7 +198,11 @@ namespace Jondo.Unity.Server.Network
                 return Mal(400, error);
             if (!update.HasChanges) return Mal(400, "sin-cambios");
 
-            var sesion = SessionRegistry.FindByName(update.Character);
+            // No name is the caller's own character: the in-game panel gives to oneself without
+            // having to know what the client calls its character.
+            var sesion = update.Character.Length > 0
+                ? SessionRegistry.FindByName(update.Character)
+                : SessionRegistry.InWorld().FirstOrDefault(s => s.AccountId == administrador);
             if (sesion == null || !sesion.HasCharacter || !sesion.IsInWorld)
                 return Mal(404, "personaje-desconectado");
             if (sesion.Stream == null) return Mal(404, "personaje-desconectado");
@@ -208,6 +214,13 @@ namespace Jondo.Unity.Server.Network
             if (update.ItemGid.HasValue
                 && !DatabaseManager.TryGetItemTemplateEffects((int)update.ItemGid.Value, out _))
                 return Mal(400, "objeto-desconocido");
+            // A rolled item is one row each, so a careless quantity is that many inserts and that
+            // many messages to the client. What rolls nothing joins one stack and has no such cost.
+            if (update.ItemGid.HasValue && update.RandomStats
+                && (update.Quantity ?? 1) > TopeDeObjetosTirados
+                && Managers.Forgemagic.TemplateOf((int)update.ItemGid.Value) is { } plantilla
+                && !Managers.Forgemagic.Stacks(plantilla))
+                return Mal(400, "cantidad-excesiva");
             if (update.MountGid.HasValue
                 && (!Managers.Mounts.IsRideable((int)update.MountGid.Value)
                     || !DatabaseManager.TryGetItemTemplateEffects((int)update.MountGid.Value, out _)))
@@ -262,10 +275,24 @@ namespace Jondo.Unity.Server.Network
                     Managers.HavenBagStore.StoredItem? granted = null;
                     if (update.ItemGid.HasValue)
                     {
-                        granted = CommandHandler.GrantItemAsync(sesion.Stream,
-                            (int)update.ItemGid.Value, (int)(update.Quantity ?? 1))
-                            .GetAwaiter().GetResult();
-                        if (granted == null) return Mal(422, "objeto-no-entregado");
+                        int gid = (int)update.ItemGid.Value;
+                        int quantity = (int)(update.Quantity ?? 1);
+                        if (update.RandomStats)
+                        {
+                            // Rolled the way a craft rolls it, and by the same code.
+                            if (!WorkshopHandler.GiveAsync(sesion.Stream, gid, quantity)
+                                    .GetAwaiter().GetResult())
+                                return Mal(422, "objeto-no-entregado");
+                        }
+                        else
+                        {
+                            granted = CommandHandler.GrantItemAsync(sesion.Stream, gid, quantity)
+                                .GetAwaiter().GetResult();
+                            if (granted == null) return Mal(422, "objeto-no-entregado");
+                        }
+                        ActivityJournal.Current.Write("item.granted", administrador,
+                            estado.CharacterId,
+                            new { source = "control", gid, quantity, random = update.RandomStats });
 
                         // Y el peso, como hace el comando .item: sin esto la barra de pods se
                         // queda vieja hasta el siguiente movimiento de inventario.
@@ -336,6 +363,9 @@ namespace Jondo.Unity.Server.Network
                         celda = estado.CellId,
                         llegada = landed,
                         objetoUid = granted?.Uid,
+                        objeto = update.ItemGid,
+                        cantidad = update.ItemGid.HasValue ? update.Quantity ?? 1 : (long?)null,
+                        aleatorio = update.RandomStats,
                         monturaUid = mount?.Uid,
                     });
                 }
@@ -361,6 +391,28 @@ namespace Jondo.Unity.Server.Network
         /// magnitude short of overflowing.
         /// </remarks>
         private const int TopeDeCaracteristica = 10_000_000;
+
+        /// <summary>The most rolled items one request hands over: a guard, not a rule of the game.</summary>
+        private const int TopeDeObjetosTirados = 100;
+
+        /// <summary>
+        /// Who is in the world, for whoever is about to give something to one of them: the name
+        /// /api/personaje takes, the level, and which of them is the caller's own.
+        /// </summary>
+        private static Respuesta Conectados(long administrador)
+        {
+            var conectados = new List<object>();
+            foreach (var sesion in SessionRegistry.InWorld())
+            {
+                conectados.Add(new
+                {
+                    nombre = sesion.State.CharacterName ?? "",
+                    nivel = sesion.State.CharacterLevel,
+                    propio = sesion.AccountId == administrador,
+                });
+            }
+            return Bien(new { conectados });
+        }
 
         /// <summary>How long to wait for the session's turn before giving up on it.</summary>
         private static readonly TimeSpan PlazoDelTurno = TimeSpan.FromSeconds(5);

@@ -15,6 +15,26 @@ namespace Jondo.Unity.Tests.Commands
         public void A_recipe_is_for_administrators()
             => Assert.Equal(Roles.Administrador, CommandHandler.RequiredRole(".receta"));
 
+        /// <summary>".item 10784 1 random": the last word says how the item comes out.</summary>
+        [Theory]
+        [InlineData("max", false)]
+        [InlineData("random", true)]
+        [InlineData("Random", true)]
+        [InlineData("aleatorio", true)]
+        [InlineData("aléatoire", true)]
+        public void An_item_is_given_at_its_maximum_or_rolled(string word, bool random)
+        {
+            Assert.True(CommandHandler.TryParseStatMode(word, out bool r));
+            Assert.Equal(random, r);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("10")]
+        [InlineData("maximo")]
+        public void A_quantity_is_not_a_mode(string word)
+            => Assert.False(CommandHandler.TryParseStatMode(word, out _));
+
         [Theory]
         [InlineData("44", 44, 1)]
         [InlineData(" 44 ", 44, 1)]
