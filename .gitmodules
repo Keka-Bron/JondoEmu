@@ -1,0 +1,3 @@
+[submodule "Jondo.Unity.WebClient"]
+	path = Jondo.Unity.WebClient
+	url = https://github.com/leonardo-spy/Jondo.Unity.WebClient.git
