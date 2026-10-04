@@ -26,6 +26,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Lo que cuesta un objeto si el catálogo medido no dice otra cosa.</summary>
         public const long DefaultPrice = 1;
 
+        /// <summary>Los catálogos escritos a mano, relativo a la raíz de contenido.</summary>
+        public const string AuthoredFile = "npcs/shops.json";
+
         private static readonly Dictionary<int, int[]> _byNpc = new();
         private static readonly Dictionary<int, long> _prices = new();
         private static readonly Dictionary<int, string> _effects = new();
@@ -80,6 +83,7 @@ namespace Jondo.Unity.Server.Managers
                 }
 
                 JuntarVendedores();
+                ApplyAuthored(Paths.ContentFile(AuthoredFile));
 
                 var distinct = new HashSet<int>();
                 foreach (var gids in _byNpc.Values) distinct.UnionWith(gids);
@@ -208,6 +212,60 @@ namespace Jondo.Unity.Server.Managers
                 }
                 catch { }
             }
+        }
+
+        /// <summary>
+        /// Los vendedores escritos a mano, encima de los medidos.
+        /// </summary>
+        /// <remarks>
+        /// datos/npc_shops.json lo rehace una herramienta, así que un vendedor añadido ahí se
+        /// pierde en la siguiente pasada sin decir nada; lo nuestro vive en content/npcs/shops.json
+        /// y se pone ENCIMA al arrancar. Un vendedor escrito sustituye su catálogo entero -es lo
+        /// que se ha decidido que venda- y un precio escrito es el de ese objeto donde se venda.
+        /// </remarks>
+        internal static void ApplyAuthored(string path)
+        {
+            if (!File.Exists(path)) return;
+
+            int vendors = 0;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("shops", out var shops)) return;
+
+                foreach (var shop in shops.EnumerateArray())
+                {
+                    if (!shop.TryGetProperty("npc", out var npc) || !shop.TryGetProperty("items", out var items)) continue;
+
+                    var gids = new List<int>();
+                    foreach (var item in items.EnumerateArray())
+                    {
+                        if (!item.TryGetProperty("gid", out var gid)) continue;
+                        int id = gid.GetInt32();
+                        if (id <= 0 || gids.Contains(id)) continue;
+                        gids.Add(id);
+                        if (item.TryGetProperty("price", out var price)) _prices[id] = price.GetInt64();
+                    }
+
+                    if (gids.Count == 0) continue;
+                    _byNpc[npc.GetInt32()] = gids.ToArray();
+                    vendors++;
+                }
+
+                if (vendors > 0) Console.WriteLine($"[Tiendas] {vendors} vendedor(es) escritos a mano, de {AuthoredFile}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Tiendas] No se ha podido leer {Path.GetFileName(path)}: {ex.Message}");
+            }
+        }
+
+        /// <summary>Para las pruebas: un catálogo en memoria sin pasar por el fichero.</summary>
+        internal static void Forget()
+        {
+            _byNpc.Clear();
+            _prices.Clear();
+            _effects.Clear();
         }
 
         /// <summary>Los efectos de fábrica de un objeto que se vende, o "[]" si no tiene.</summary>

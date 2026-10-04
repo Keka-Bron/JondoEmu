@@ -387,6 +387,24 @@ namespace Jondo.Unity.Server.Managers
         // Initialize got empty tables and a character with nothing on -- silently, which is why
         // the launcher shot tests had to remember to initialize by hand.
         public static bool Exists(int gid) { Ensure(); return _catalogue.ContainsKey(gid); }
+
+        /// <summary>Every appearance mount and pet-mount whose look is measured.</summary>
+        public static IReadOnlyCollection<PieceLook> MountLooks { get { Ensure(); return _mounts.Values; } }
+
+        /// <summary>
+        /// The slot a cosmetic's skin dresses, as the real item type it stands for -- hat 16, cape
+        /// 17, shield 82 -- or zero.
+        /// </summary>
+        public static int ItemTypeOfSkin(int skin)
+        {
+            Ensure();
+            foreach (var (gid, skins) in _skins)
+            {
+                if (Array.IndexOf(skins, skin) < 0 || !_catalogue.TryGetValue(gid, out var piece)) continue;
+                return piece.Type switch { 246 => 16, 247 => 17, 248 => 82, _ => 0 };
+            }
+            return 0;
+        }
         public static Piece? Of(int gid)
         {
             Ensure();

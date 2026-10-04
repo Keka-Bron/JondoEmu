@@ -14,7 +14,7 @@ using Il2CppCore.DataCenter.Metadata.Item;
 using Il2CppCore.UILogic.Admin;
 using Il2CppCore.UILogic.Components.Filters;
 
-[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.3.4", "Jondo")]
+[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.4.0", "Jondo")]
 [assembly: MelonGame("Ankama", "Dofus")]
 
 namespace JondoFix

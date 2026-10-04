@@ -102,8 +102,19 @@ namespace Jondo.Unity.Server.Managers
             public MonsterData Monster { get; set; }
             public int GradeIndex { get; set; }
 
-            /// <summary>Cuántos grados acepta el cliente: del 1 al 5, ni uno más.</summary>
+            /// <summary>Cuántos grados se reparten a los grupos generados: del 1 al 5, ni uno más.</summary>
             public const int MaxGradesPerMonster = 5;
+
+            /// <summary>
+            /// Y hasta el sexto para un grupo escrito o compuesto a mano, si el monstruo lo tiene.
+            /// </summary>
+            /// <remarks>
+            /// Medido: el Puch Ingball de nivel 200 del kanojedo viaja como <c>f2=200 f4=6</c> en
+            /// dos capturas y el cliente lo dibuja y lo deja mirar. El tope de cinco se midió en
+            /// grupos silvestres, que nunca pasaban de ahí; no es que el sexto no exista, es que
+            /// no se había visto.
+            /// </remarks>
+            public const int MaxWrittenGrades = 6;
             public int Level { get; set; }
         }
 
@@ -111,7 +122,17 @@ namespace Jondo.Unity.Server.Managers
         {
             public long MobId { get; set; }
             public int CellId { get; set; }
+
+            /// <summary>Hacia dónde mira, de 1 a 7. Los generados miran al sureste.</summary>
+            public int Orientation { get; set; } = 1;
+
             public List<MobMember> Members { get; set; } = new List<MobMember>();
+
+            /// <summary>
+            /// A dungeon room's group: its eight in a fixed order, of which a fight takes the first
+            /// clamp(fighters, 4, 8) -- see <see cref="MembersFor"/>. Drawn with its alternatives.
+            /// </summary>
+            public bool Modular { get; set; }
         }
 
         private static Dictionary<int, MonsterData> _monsters = new Dictionary<int, MonsterData>();
@@ -144,16 +165,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>How many maps are vetoed. Zero before the world is loaded.</summary>
         public static int VetoedCount => _vetados.Count;
 
-        public static void InitializeAndSpawnAll()
+        /// <summary>The monsters and their grades, from the Monsters table.</summary>
+        private static void LoadMonsterData(SqliteConnection connection)
         {
-            Console.WriteLine("[MobSpawnManager] Loading data from SQLite...");
-            
-            using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
-            connection.Open();
-
-            DatabaseManager.EnsureMobsSeeded(connection);
-
-            // Load Monsters
             var cmdMonsters = connection.CreateCommand();
             cmdMonsters.CommandText = "SELECT Id, NameId, Look, Grades FROM Monsters;";
             using (var reader = cmdMonsters.ExecuteReader())
@@ -185,6 +199,30 @@ namespace Jondo.Unity.Server.Managers
                     _monsters[id] = data;
                 }
             }
+        }
+
+        /// <summary>
+        /// For tests: the monsters without the world -- what composing a group needs, without
+        /// reading and spawning 38,744 groups.
+        /// </summary>
+        internal static void EnsureMonsterData()
+        {
+            if (_monsters.Count > 0) return;
+            using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+            connection.Open();
+            LoadMonsterData(connection);
+        }
+
+        public static void InitializeAndSpawnAll()
+        {
+            Console.WriteLine("[MobSpawnManager] Loading data from SQLite...");
+            
+            using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+            connection.Open();
+
+            DatabaseManager.EnsureMobsSeeded(connection);
+
+            LoadMonsterData(connection);
 
             _mapMobs.Clear();
 
@@ -192,6 +230,9 @@ namespace Jondo.Unity.Server.Managers
             // Who is an archmonster and where each one belongs. It has to be known before the
             // groups are read, because they are thinned as they come in.
             Archimonsters.Initialize(connection);
+
+            // Who lives in each subarea, which is who a dungeon room is made of.
+            _subareaRosters = LoadSubareaRosters(connection);
 
             // Y dónde NO se pone un monstruo por mucho que la tabla lo diga.
             _vetados = MapasSinMonstruos(connection);
@@ -266,7 +307,7 @@ namespace Jondo.Unity.Server.Managers
 
             // Los jefes de mazmorra, antes de lo escrito a mano para que una persona pueda
             // cambiarlos de sitio o quitarlos.
-            int jefes = PonerLosJefesDeMazmorra();
+            int jefes = ComposeDungeonRooms();
 
             // Y lo que haya decidido una persona, encima de todo lo anterior.
             var deLaMano = AplicarLosEscritos();
@@ -306,6 +347,241 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>Desde donde se numeran los grupos de jefe. Por debajo de los escritos a mano.</summary>
+        private const long PrimerJefe = -3_000_000;
+
+        /// <summary>
+        /// Where the groups of the dungeon rooms that had none in the base are numbered from: past
+        /// the bosses' stretch and above the missions', so no two ways of handing out ids meet.
+        /// </summary>
+        private const long FirstComposedRoom = -3_500_000;
+
+        /// <summary>The members a dungeon room's group has: one leader and seven, as in the capture.</summary>
+        public const int DungeonGroupSize = 8;
+
+        /// <summary>The fewest monsters a dungeon room fights with: four, whoever comes in alone.</summary>
+        public const int DungeonMinimum = 4;
+
+        /// <summary>
+        /// Every dungeon room with its group, composed once, the way the jalatós capture shows it.
+        /// </summary>
+        /// <remarks>
+        /// Measured in <c>Mazmorras/mazmorra de los jalatós completa</c>, a Sacrier alone through
+        /// the five rooms of dungeon 1:
+        ///
+        /// <list type="bullet">
+        /// <item>each room has ONE group of eight -- a leader and seven -- and its jss carries the
+        /// ones a team fights, by team size: 4 for 1 player (and up to 4), then 5, 6, 7 and 8,
+        /// each the first N of the eight;</item>
+        /// <item>the first four are four different monsters; in the boss room the boss leads and
+        /// is there once;</item>
+        /// <item>every monster of room k is at grade k: 1 to 5 over the five rooms, the boss at 5
+        /// with the others;</item>
+        /// <item>the solo player fought four in every room, the boss's included -- the player and
+        /// fighters -1 to -4 in the jxg and the jzu.</item>
+        /// </list>
+        ///
+        /// Who is in them is the dungeon's own: <c>Subareas.Monsters</c> of the room's subarea,
+        /// the dungeon's bosses taken out, which for dungeon 1 is exactly the capture's
+        /// {149, 134, 101, 148, 4822}. The base's MapMobs for these maps are the subarea's generic
+        /// background -- two to four groups of one to eight, drawn at random -- and a room made of
+        /// them was what left a solo player facing one monster in 574 of the 763 rooms.
+        ///
+        /// Runs BEFORE the layer written by hand, so a person can still move or remove a group
+        /// from the editor without touching code.
+        /// </remarks>
+        private static int ComposeDungeonRooms()
+        {
+            if (!DungeonManager.IsLoaded) return 0;
+
+            int composed = 0, bosses = 0, empty = 0;
+            foreach (var dungeon in DungeonManager.All.Values)
+            {
+                if (dungeon.Rooms.Count == 0) continue;
+
+                // What the base put in its rooms, for a room whose subarea lists nobody.
+                var fallback = new List<int>();
+                foreach (long room in dungeon.Rooms)
+                {
+                    if (!_mapMobs.TryGetValue(room, out var groups)) continue;
+                    foreach (var member in groups.SelectMany(g => g.Members))
+                        if (member.Monster != null && !fallback.Contains(member.Monster.Id)) fallback.Add(member.Monster.Id);
+                }
+
+                for (int index = 0; index < dungeon.Rooms.Count; index++)
+                {
+                    long room = dungeon.Rooms[index];
+                    _mapMobs.TryGetValue(room, out var before);
+                    bool bossRoom = room == dungeon.LastRoom && dungeon.Bosses.Count > 0;
+                    long id = bossRoom ? PrimerJefe - bosses
+                            : before?.FirstOrDefault()?.MobId ?? FirstComposedRoom - composed;
+
+                    var group = ComposeDungeonRoom(dungeon, index, fallback, id, before?.FirstOrDefault()?.CellId);
+                    if (group == null) { empty++; continue; }
+
+                    _mapMobs[room] = new List<MobGroup> { group };
+                    composed++;
+                    if (bossRoom) bosses++;
+                }
+            }
+
+            Console.WriteLine($"[Mazmorra] {composed} salas compuestas a {DungeonGroupSize} ({bosses} con su jefe); " +
+                              $"{empty} sin nadie que poner.");
+            return bosses;
+        }
+
+        /// <summary>
+        /// A dungeon room's group: its eight, from the dungeon's own monsters, the boss leading in
+        /// the boss room. Null when there is nobody to put in it.
+        /// </summary>
+        private static MobGroup? ComposeDungeonRoom(DungeonManager.Dungeon dungeon, int index,
+                                                    IReadOnlyList<int> fallback, long id, int? cell)
+        {
+            long room = dungeon.Rooms[index];
+            var bosses = new HashSet<int>(dungeon.Bosses);
+            bool bossRoom = room == dungeon.LastRoom && dungeon.Bosses.Count > 0;
+
+            var roster = RosterOf(room).Where(m => !bosses.Contains(m)).ToList();
+            if (roster.Count == 0) roster = fallback.Where(m => !bosses.Contains(m)).ToList();
+
+            var members = ComposeRoom(roster, bossRoom ? dungeon.Bosses : Array.Empty<int>(),
+                                      index, dungeon.Rooms.Count, room);
+            if (members.Count == 0) return null;
+
+            return new MobGroup
+            {
+                MobId = id,
+                CellId = cell ?? MapManager.GetNearestWalkableCell(room, Handlers.TeleportHandler.MapCentre),
+                Members = members,
+                Modular = true,
+            };
+        }
+
+        /// <summary>
+        /// The eight of a dungeon room, in their order: the bosses first, at their top grade and
+        /// never twice; then every monster of the roster once, so the four a solo player fights are
+        /// four different ones; then the roster again, drawn, up to eight. All but the bosses at
+        /// the room's grade. Seeded by the map, so a room is the same each time it is composed.
+        /// </summary>
+        internal static List<MobMember> ComposeRoom(IReadOnlyList<int> roster, IReadOnlyList<int> bosses,
+                                                    int room, int rooms, long seed)
+        {
+            var dice = new Random(unchecked((int)(seed ^ (seed >> 32))));
+            var members = new List<MobMember>();
+
+            foreach (int boss in bosses.Distinct())
+            {
+                if (members.Count >= DungeonGroupSize) break;
+                if (!_monsters.TryGetValue(boss, out var data) || data.Grades.Count == 0)
+                {
+                    Console.WriteLine($"[Mazmorra] El jefe {boss} no está en la base.");
+                    continue;
+                }
+                members.Add(MemberAt(data, int.MaxValue));
+            }
+
+            var species = roster.Distinct().Where(m => _monsters.TryGetValue(m, out var d) && d.Grades.Count > 0)
+                                .OrderBy(m => m).ToList();
+            var order = species.OrderBy(_ => dice.Next()).ToList();
+            foreach (int monster in order)
+            {
+                if (members.Count >= DungeonGroupSize) break;
+                members.Add(MemberAt(_monsters[monster], RoomGrade(room, rooms)));
+            }
+            while (members.Count < DungeonGroupSize && order.Count > 0)
+                members.Add(MemberAt(_monsters[order[dice.Next(order.Count)]], RoomGrade(room, rooms)));
+
+            return members;
+        }
+
+        /// <summary>
+        /// The grade of a room's monsters, 0-based: the rooms spread over the five grades so the
+        /// first is at the lowest and the last at the highest -- rooms 1 to 5 at grades 1 to 5 in
+        /// the capture. A dungeon of one room is all top grade. How Ankama spreads the rooms of a
+        /// dungeon with more or fewer than five is not measured; this is the linear reading.
+        /// </summary>
+        internal static int RoomGrade(int room, int rooms)
+        {
+            int top = MobMember.MaxGradesPerMonster - 1;
+            if (rooms <= 1) return top;
+            return (int)Math.Round((double)Math.Clamp(room, 0, rooms - 1) * top / (rooms - 1), MidpointRounding.AwayFromZero);
+        }
+
+        /// <summary>A monster at a grade, brought down to the ones it has; its level from that grade.</summary>
+        private static MobMember MemberAt(MonsterData data, int grade)
+        {
+            int index = Math.Clamp(grade, 0, Math.Min(data.Grades.Count, MobMember.MaxGradesPerMonster) - 1);
+            return new MobMember { Monster = data, GradeIndex = index, Level = data.Grades[index].Level };
+        }
+
+        /// <summary>The monsters of a map's subarea, as <c>Subareas.Monsters</c> lists them.</summary>
+        private static IReadOnlyList<int> RosterOf(long mapId)
+        {
+            var info = MapManager.GetMapInfo(mapId);
+            if (info == null) return Array.Empty<int>();
+            return _subareaRosters.TryGetValue(info.SubAreaId, out var roster) ? roster : Array.Empty<int>();
+        }
+
+        private static Dictionary<int, List<int>> _subareaRosters = new Dictionary<int, List<int>>();
+
+        /// <summary>Who lives in each subarea: <c>Subareas.Monsters</c>, a JSON <c>{"Array":[...]}</c>.</summary>
+        private static Dictionary<int, List<int>> LoadSubareaRosters(SqliteConnection connection)
+        {
+            var rosters = new Dictionary<int, List<int>>();
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, Monsters FROM Subareas;";
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader.IsDBNull(1)) continue;
+                    using var doc = System.Text.Json.JsonDocument.Parse(reader.GetString(1));
+                    var array = doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                                doc.RootElement.TryGetProperty("Array", out var inner) ? inner : doc.RootElement;
+                    if (array.ValueKind != System.Text.Json.JsonValueKind.Array) continue;
+                    rosters[reader.GetInt32(0)] = array.EnumerateArray()
+                        .Where(e => e.ValueKind == System.Text.Json.JsonValueKind.Number)
+                        .Select(e => e.GetInt32()).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MobSpawnManager] Could not read the subareas' monsters: {ex.Message}");
+            }
+            return rosters;
+        }
+
+        /// <summary>
+        /// A dungeon room's group again, after it was beaten: the same composition, under a new
+        /// id. Null for a map that is not a dungeon room, or one with nobody to put in it.
+        /// </summary>
+        public static MobGroup? RecomposeDungeonRoom(long mapId)
+        {
+            var dungeon = DungeonManager.OfRoom(mapId);
+            if (dungeon == null) return null;
+
+            lock (_candado)
+            {
+                var group = ComposeDungeonRoom(dungeon, dungeon.Rooms.IndexOf(mapId), Array.Empty<int>(),
+                                               ActorIds.NuevoMonstruo(), null);
+                if (group == null) return null;
+                _mapMobs[mapId] = new List<MobGroup> { group };
+                return group;
+            }
+        }
+
+        /// <summary>
+        /// Who of a group comes into a fight: all of an ordinary group; of a dungeon room's, the
+        /// first <c>clamp(fighters, 4, 8)</c> -- four for a player alone, one more each from the
+        /// fifth, as the jss's alternatives say.
+        /// </summary>
+        public static List<MobMember> MembersFor(MobGroup group, int fighters)
+            => !group.Modular
+                ? group.Members
+                : group.Members.Take(Math.Clamp(fighters, DungeonMinimum, DungeonGroupSize)).ToList();
+
+
         /// <summary>
         /// Pone los grupos que ha decidido una persona y quita los que ha decidido quitar.
         /// </summary>
@@ -324,183 +600,6 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// Devuelve los dos números, para el registro.
         /// </remarks>
-        /// <summary>
-        /// Pone al jefe de cada mazmorra en su última sala, y sólo a él.
-        /// </summary>
-        /// <remarks>
-        /// Sin esto una mazmorra no tiene final: la última sala se llena con lo mismo que las
-        /// demás, porque los grupos que trae world.db para los mapas de mazmorra son el fondo
-        /// genérico de la subzona —los seis bichos de la zona repartidos por los once mapas— y no
-        /// la disposición de Ankama. Se ve mirando dónde cae el 147, el Jalató Real: sale en dos
-        /// pasillos y en ninguna de las cinco salas.
-        ///
-        /// Lo que sí es de Ankama es QUIÉN es el jefe: el campo <c>bosses</c> del volcado del
-        /// cliente, que 126 de las 187 mazmorras rellenan.
-        ///
-        /// La sala del jefe se vacía primero. Un jefe compartiendo mapa con tres grupos corrientes
-        /// se puede esquivar, y una mazmorra que se puede terminar sin pelearse con el jefe no es
-        /// una mazmorra.
-        ///
-        /// Va ANTES de la capa escrita a mano a propósito, para que se pueda mover o quitar desde
-        /// el editor sin tocar código.
-        /// </remarks>
-        /// <summary>Desde donde se numeran los grupos de jefe. Por debajo de los escritos a mano.</summary>
-        private const long PrimerJefe = -3_000_000;
-
-        private static int PonerLosJefesDeMazmorra()
-        {
-            if (!DungeonManager.IsLoaded) return 0;
-
-            int puestos = 0;
-            foreach (var mazmorra in DungeonManager.All.Values)
-            {
-                long sala = mazmorra.LastRoom;
-                if (sala == 0 || mazmorra.Bosses.Count == 0) continue;
-
-                var miembros = new List<MobMember>();
-                foreach (int jefe in mazmorra.Bosses)
-                {
-                    if (!_monsters.TryGetValue(jefe, out var datos))
-                    {
-                        Console.WriteLine($"[Mazmorra] {mazmorra.Name}: el jefe {jefe} no está en la base.");
-                        continue;
-                    }
-
-                    // El grado más alto que declare. Un jefe a grado 0 es el mismo bicho que los
-                    // que se han venido matando por el camino.
-                    int grado = Math.Clamp(datos.Grades.Count - 1, 0, MobMember.MaxGradesPerMonster - 1);
-                    miembros.Add(new MobMember
-                    {
-                        Monster = datos,
-                        GradeIndex = grado,
-                        Level = grado < datos.Grades.Count ? datos.Grades[grado].Level : 1,
-                    });
-                }
-
-                if (miembros.Count == 0) continue;
-
-                if (!_mapMobs.TryGetValue(sala, out var aqui))
-                {
-                    _mapMobs[sala] = aqui = new List<MobGroup>();
-                }
-
-                aqui.Clear();
-                aqui.Add(new MobGroup
-                {
-                    // Su propio tramo, por debajo del -2.000.000 de los escritos a mano, para que
-                    // ninguno de los tres repartos de ids se pise con otro. El repartidor de abajo
-                    // se aparta por debajo del menor de todos antes de dar el primero suyo.
-                    MobId = PrimerJefe - puestos,
-                    CellId = MapManager.GetNearestWalkableCell(sala, Handlers.TeleportHandler.MapCentre),
-                    Members = miembros,
-                });
-                puestos++;
-            }
-
-            if (puestos > 0) Console.WriteLine($"[Mazmorra] {puestos} jefes puestos en su última sala.");
-
-            CurarLasSalas();
-            return puestos;
-        }
-
-        /// <summary>Cuántos monstruos lleva la sala del jefe cuando entra una sola persona.</summary>
-        /// <remarks>
-        /// El jefe y tres más. Un jefe solo en medio de una sala vacía no es el final de nada, y
-        /// además se le mata de un turno. Cuatro es el mínimo; con más atacantes sube a tantos
-        /// monstruos como atacantes, y de eso se encarga el escalado por grupo.
-        /// </remarks>
-        public const int MinimoEnLaSalaDelJefe = 4;
-
-        /// <summary>
-        /// Deja cada sala de mazmorra con UN grupo, y al jefe sólo en la suya.
-        /// </summary>
-        /// <remarks>
-        /// Los grupos que world.db trae para los mapas de mazmorra son el fondo genérico de la
-        /// subzona, no la disposición de Ankama, y eso se notaba de tres maneras a la vez:
-        ///
-        /// <list type="bullet">
-        /// <item>varios grupos en la misma sala, cuando una sala de mazmorra tiene uno;</item>
-        /// <item>el bicho que hace de jefe apareciendo por el camino, porque en esta zona el jefe
-        /// es también el monstruo corriente —el Girasol Hambriento sale en los campos— y el fondo
-        /// de subzona lo reparte por todas partes;</item>
-        /// <item>y la sala del jefe con el jefe solo, porque ponerlo la vacía primero.</item>
-        /// </list>
-        ///
-        /// Aquí se arregla lo primero y lo segundo, y se rellena la del jefe hasta el mínimo con
-        /// monstruos sacados de las OTRAS salas de esa misma mazmorra, que es de donde vienen los
-        /// que acompañan al jefe en el juego.
-        /// </remarks>
-        private static int CurarLasSalas()
-        {
-            if (!DungeonManager.IsLoaded) return 0;
-
-            int tocadas = 0;
-            foreach (var mazmorra in DungeonManager.All.Values)
-            {
-                if (mazmorra.Rooms.Count == 0) continue;
-                long salaDelJefe = mazmorra.LastRoom;
-                var jefes = new HashSet<int>(mazmorra.Bosses);
-
-                // El repertorio de la mazmorra: lo que sale por sus salas, sin contar al jefe. Es
-                // de donde se saca la escolta y con lo que se rellena una sala que se quede vacía.
-                var repertorio = new List<MobMember>();
-                foreach (long sala in mazmorra.Rooms)
-                {
-                    if (!_mapMobs.TryGetValue(sala, out var grupos)) continue;
-                    foreach (var grupo in grupos)
-                    {
-                        foreach (var miembro in grupo.Members)
-                        {
-                            if (miembro.Monster != null && !jefes.Contains(miembro.Monster.Id))
-                                repertorio.Add(miembro);
-                        }
-                    }
-                }
-
-                foreach (long sala in mazmorra.Rooms)
-                {
-                    if (!_mapMobs.TryGetValue(sala, out var grupos) || grupos.Count == 0) continue;
-
-                    if (sala == salaDelJefe)
-                    {
-                        var jefe = grupos[0];
-                        int falta = MinimoEnLaSalaDelJefe - jefe.Members.Count;
-                        for (int i = 0; i < falta && repertorio.Count > 0; i++)
-                        {
-                            jefe.Members.Add(repertorio[i % repertorio.Count]);
-                        }
-
-                        if (grupos.Count > 1) { grupos.RemoveRange(1, grupos.Count - 1); tocadas++; }
-                        if (falta > 0 && repertorio.Count > 0) tocadas++;
-                        continue;
-                    }
-
-                    // Una sala corriente: un grupo, y sin el jefe dentro.
-                    var primero = grupos[0];
-                    if (grupos.Count > 1) { grupos.RemoveRange(1, grupos.Count - 1); tocadas++; }
-
-                    int antes = primero.Members.Count;
-                    primero.Members.RemoveAll(
-                        miembro => miembro.Monster != null && jefes.Contains(miembro.Monster.Id));
-
-                    if (primero.Members.Count == antes) continue;
-                    tocadas++;
-
-                    // Quitar al jefe puede dejar el grupo vacío, y una sala sin nada no se puede
-                    // pasar: el jugador se queda dentro sin manera de avanzar.
-                    if (primero.Members.Count == 0 && repertorio.Count > 0)
-                        primero.Members.Add(repertorio[0]);
-                    else if (primero.Members.Count == 0)
-                        grupos.Clear();
-                }
-            }
-
-            if (tocadas > 0)
-                Console.WriteLine($"[Mazmorra] {tocadas} sala(s) corregidas: un grupo por sala y " +
-                                  $"el jefe sólo en la última.");
-            return tocadas;
-        }
-
         private static (int Puestos, int Quitados) AplicarLosEscritos()
         {
             int puestos = 0, quitados = 0;
@@ -519,7 +618,12 @@ namespace Jondo.Unity.Server.Managers
 
                 foreach (var escrito in escritos.Values)
                 {
-                    var grupo = new MobGroup { MobId = escrito.GroupId, CellId = escrito.Cell };
+                    var grupo = new MobGroup
+                    {
+                        MobId = escrito.GroupId,
+                        CellId = escrito.Cell,
+                        Orientation = escrito.Orientation,
+                    };
 
                     foreach (var miembro in escrito.Members)
                     {
@@ -530,7 +634,11 @@ namespace Jondo.Unity.Server.Managers
                             continue;
                         }
 
-                        int grado = Math.Clamp(miembro.Grade, 0, MobMember.MaxGradesPerMonster - 1);
+                        // Hasta el sexto grado si el monstruo lo declara: el Puch Ingball de nivel
+                        // 200 viaja como grado 6 en las capturas del kanojedo y el cliente lo
+                        // pinta. El tope de cinco se queda para lo generado, que es donde se midió.
+                        int grado = Math.Clamp(miembro.Grade, 0,
+                                               Math.Min(datos.Grades.Count, MobMember.MaxWrittenGrades) - 1);
                         grupo.Members.Add(new MobMember
                         {
                             Monster = datos,
@@ -713,6 +821,16 @@ namespace Jondo.Unity.Server.Managers
             // En el merkasako no se pelea con nadie: es la casa de uno.
             if (Merkasako.IsHavenBag(mapId)) return result;
 
+            // A dungeon room is its own composition, not the subarea's background.
+            if (DungeonManager.IsLoaded && DungeonManager.IsRoom(mapId))
+            {
+                var dungeon = DungeonManager.OfRoom(mapId)!;
+                var room = ComposeDungeonRoom(dungeon, dungeon.Rooms.IndexOf(mapId), Array.Empty<int>(),
+                                              ActorIds.NuevoMonstruo(), null);
+                if (room != null) result.Add(room);
+                return result;
+            }
+
             var availableMonsters = GetSpawnableMonsterIds(mapId);
             var validCells = GetInnerWalkableCells(mapId);
             var usedCells = new HashSet<int>();
@@ -756,65 +874,6 @@ namespace Jondo.Unity.Server.Managers
 
                 mobs.Add(group);
                 return group;
-            }
-        }
-
-        /// <summary>
-        /// Pone el grupo de una sala de mazmorra al tamaño del equipo que entra.
-        /// </summary>
-        /// <remarks>
-        /// En el juego el grupo de una sala IGUALA en número a quienes van a pelear con él: entras
-        /// solo y son cuatro en la del jefe, entráis siete y son siete. Aquí era fijo, así que un
-        /// grupo de siete se peleaba contra los tres de siempre.
-        ///
-        /// Se hace al pisar la sala y no al empezar el combate porque el grupo se DIBUJA antes:
-        /// se ve en el mapa, y verlo de tres y pelear contra siete sería peor que no ajustarlo.
-        ///
-        /// Los que se añaden salen del propio grupo, repitiendo sus miembros en orden. Al recortar
-        /// se quita por el final, y el primero nunca se toca: en la sala del jefe el primero ES el
-        /// jefe, y una sala final sin jefe no es una sala final.
-        ///
-        /// El mínimo de la sala del jefe manda sobre el número de atacantes. Un jefe solo contra
-        /// uno no es un final de mazmorra, y <see cref="MinimoEnLaSalaDelJefe"/> dice por qué.
-        ///
-        /// Devuelve cuántos miembros tiene ahora el grupo, o cero si aquí no había nada que tocar.
-        /// </remarks>
-        public static int SizeRoomToParty(long mapId, int attackers)
-        {
-            if (!DungeonManager.IsLoaded || attackers <= 0) return 0;
-
-            var mazmorra = DungeonManager.OfRoom(mapId);
-            if (mazmorra == null) return 0;
-
-            int quiere = mapId == mazmorra.LastRoom
-                ? Math.Max(attackers, MinimoEnLaSalaDelJefe)
-                : attackers;
-
-            lock (_candado)
-            {
-                if (!_mapMobs.TryGetValue(mapId, out var grupos) || grupos.Count == 0) return 0;
-
-                var grupo = grupos[0];
-                if (grupo.Members.Count == 0 || grupo.Members.Count == quiere)
-                    return grupo.Members.Count;
-
-                if (grupo.Members.Count > quiere)
-                {
-                    grupo.Members.RemoveRange(quiere, grupo.Members.Count - quiere);
-                }
-                else
-                {
-                    // Repitiendo los que ya hay, empezando por el segundo: en la sala del jefe el
-                    // primero es él, y de un jefe no se hacen copias.
-                    int desde = grupo.Members.Count > 1 ? 1 : 0;
-                    int cuantos = grupo.Members.Count;
-                    for (int i = 0; grupo.Members.Count < quiere; i++)
-                    {
-                        grupo.Members.Add(grupo.Members[desde + (i % Math.Max(1, cuantos - desde))]);
-                    }
-                }
-
-                return grupo.Members.Count;
             }
         }
 
@@ -901,23 +960,7 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static MobGroup? SpawnComposed(long mapId, IEnumerable<(int Monstruo, int Grado)> miembros)
         {
-            var quienes = new List<MobMember>();
-
-            foreach (var (monstruo, grado) in miembros)
-            {
-                if (!_monsters.TryGetValue(monstruo, out var datos)) continue;
-                if (datos.Grades.Count == 0) continue;
-
-                int cual = Math.Clamp(grado, 0, Math.Min(datos.Grades.Count,
-                                                         MobMember.MaxGradesPerMonster) - 1);
-                quienes.Add(new MobMember
-                {
-                    Monster = datos,
-                    GradeIndex = cual,
-                    Level = datos.Grades[cual].Level,
-                });
-            }
-
+            var quienes = Componer(miembros);
             if (quienes.Count == 0) return null;
 
             lock (_candado)
@@ -950,6 +993,54 @@ namespace Jondo.Unity.Server.Managers
 
                 mobs.Add(grupo);
                 return grupo;
+            }
+        }
+
+        /// <summary>Los miembros de un grupo compuesto a mano, hasta el sexto grado.</summary>
+        private static List<MobMember> Componer(IEnumerable<(int Monstruo, int Grado)> miembros)
+        {
+            var quienes = new List<MobMember>();
+            foreach (var (monstruo, grado) in miembros)
+            {
+                if (!_monsters.TryGetValue(monstruo, out var datos)) continue;
+                if (datos.Grades.Count == 0) continue;
+
+                int cual = Math.Clamp(grado, 0, Math.Min(datos.Grades.Count,
+                                                         MobMember.MaxWrittenGrades) - 1);
+                quienes.Add(new MobMember
+                {
+                    Monster = datos,
+                    GradeIndex = cual,
+                    Level = datos.Grades[cual].Level,
+                });
+            }
+
+            return quienes;
+        }
+
+        /// <summary>
+        /// Un grupo compuesto a mano que NO se pone en ningún mapa: sólo existe para el combate
+        /// que se va a abrir con él.
+        /// </summary>
+        /// <remarks>
+        /// Es lo que hace el puch maestro del kanojedo: en la captura el combate empieza con un
+        /// grupo de id nuevo -el kmu lleva un -23597 que no estaba en el jss- y ningún jsn lo
+        /// pinta antes en el mapa. Ponerlo en el mapa como hace <see cref="SpawnComposed"/> lo
+        /// dejaría a la vista y clicable para los demás mientras dura la pelea.
+        /// </remarks>
+        public static MobGroup? ComposeOffMap(IEnumerable<(int Monstruo, int Grado)> miembros)
+        {
+            var quienes = Componer(miembros);
+            if (quienes.Count == 0) return null;
+
+            lock (_candado)
+            {
+                return new MobGroup
+                {
+                    MobId = PrimerGrupoDeMision - _siguienteDeMision++,
+                    CellId = 0,
+                    Members = quienes,
+                };
             }
         }
 

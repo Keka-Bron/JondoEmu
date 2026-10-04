@@ -76,6 +76,13 @@ and where the independent process and socket limits are enforced.
 *Go there* when changing the team UI, the launch arguments, account-token resolution or the path
 from a launcher row to its game socket.
 
+**`client-graphics.md`** — The HD and 4K scenery packs and the Windows renderer.
+What makes a pack show (on disk, `--hdReady` / `--4kReady` saying so, the player's pick in the
+game's options), why `-force-d3d11` is a separate choice, where the packs are on Ankama's CDN for
+the client's own version, and how the Jondo launcher downloads, verifies and passes them.
+*Go there* when an installed HD pack is not offered, when changing the client's launch arguments,
+or when a pack download misbehaves.
+
 **`remote-server.md`** — Running the server on another machine.
 How `JONDO_PUBLIC_BIND` opens all server services consistently, how the launcher's managed loopback
 relay bridges JondoFix to the configured host, which ports are involved and what the relay does not
@@ -96,9 +103,16 @@ How `auth.db` and `world.db` are copied with SQLite's online backup API, checked
 rotated to five complete sets and restored as a matching pair.
 *Go there* before changing database initialization or recovering an installation after an update.
 
+**`bosses.md`** — Monster and boss mechanics.
+How the engine runs what the monsters' spells say: the behaviour spell cast at the fight's start,
+triggered rows armed on every fighter they name, the 30-odd triggers fired, state disabling (952),
+telefrags and the T/W masks, life thresholds, revives, glyphs, and what is still missing.
+*Go there* before touching a boss, or when a monster does something its guide says it should not.
+
 **`item-commands.md`** — Administrator item creation commands.
-The exact syntax and behavior of `.item` and `.itemset`, including role checks, template and set
-data sources, maximum factory effects, persistence, inventory updates and partial-set failures.
+The exact syntax and behavior of `.item`, `.itemset` and `.receta`, including role checks, template,
+set and recipe data sources, maximum factory effects, stacking, persistence, inventory updates and
+partial failures.
 *Go there* when giving an item by template id, creating a complete set or diagnosing a rejected id.
 
 **`live-character-admin.md`** — Live character administration over the local control API.

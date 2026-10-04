@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
@@ -16,6 +16,39 @@ namespace Jondo.Unity.Server.Managers
     public sealed class SpellEffect
     {
         public int EffectId { get; init; }
+
+        /// <summary>A copy of the row, for changing what firing or arming it reads -- its delay, its mask.</summary>
+        internal SpellEffect Copia() => (SpellEffect)MemberwiseClone();
+
+        /// <summary>
+        /// The same row under another effect number, everything else kept: a share of a blow
+        /// goes out as the one of its family in the blow's element (1223 as 1227).
+        /// </summary>
+        internal SpellEffect ComoEfecto(int effectId) => new SpellEffect
+        {
+            EffectId = effectId,
+            EffectUid = EffectUid,
+            Value = Value,
+            DiceNum = DiceNum,
+            DiceSide = DiceSide,
+            Duration = Duration,
+            Delay = Delay,
+            Element = Element,
+            Dispellable = Dispellable,
+            Triggers = Triggers,
+            TargetMask = TargetMask,
+            CeldasFijas = CeldasFijas,
+            Forma = Forma,
+            Tamano = Tamano,
+            TamanoMinimo = TamanoMinimo,
+            ParaEnElObjetivo = ParaEnElObjetivo,
+            PasoDeCaida = PasoDeCaida,
+            TopeDeCaida = TopeDeCaida,
+            MaxStack = MaxStack,
+            Probabilidad = Probabilidad,
+            Sorteo = Sorteo,
+            Flags = Flags,
+        };
         public int EffectUid { get; init; }
         public int Value { get; init; }
         public int DiceNum { get; init; }
@@ -33,7 +66,7 @@ namespace Jondo.Unity.Server.Managers
         /// Medido contra hechizos cuyo texto lo dice: Precipitación lleva delay 1 —«en el turno
         /// siguiente»— y Palabra Secreta delay 2 —«dentro de 2 turnos»—.
         /// </summary>
-        public int Delay { get; init; }
+        public int Delay { get; set; }
 
         public int Element { get; init; }
 
@@ -46,7 +79,7 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>A quién va: "C" a quien lo lanza, "a"/"A" a los de enfrente, y con "e519" o
         /// "E519" pegado, sólo si NO tiene o SÍ tiene ese estado.</summary>
-        public string TargetMask { get; init; } = "";
+        public string TargetMask { get; set; } = "";
 
         /// <summary>
         /// La FORMA de la zona, que es una letra guardada como su código: 'P' un punto, 'C' un
@@ -56,8 +89,19 @@ namespace Jondo.Unity.Server.Managers
         /// el Ojo de Topo enseñaba la previsualización sobre los dos pious y luego no le hacía
         /// nada al segundo.
         /// </summary>
+        /// <summary>The cells a ';' zone names, map cells; empty for every other shape.</summary>
+        public IReadOnlyList<int> CeldasFijas { get; init; } = Array.Empty<int>();
+
         public int Forma { get; init; } = 'P';
         public int Tamano { get; init; } = 1;
+
+        /// <summary>
+        /// The zone's inner edge (<c>param2</c>): cells nearer than this to the centre are left
+        /// out. Patada's three rings are X3/3, X2/2 and X1/1 -- the push grows as the ring
+        /// shrinks -- and Imantación's X6/1 is a cross without its centre, which is where the
+        /// bomb it is cast on stands and "no afecta al lanzador". See Zone.Casillas.
+        /// </summary>
+        public int TamanoMinimo { get; init; }
 
         /// <summary>Si la zona se corta al llegar al objetivo, para las líneas.</summary>
         public bool ParaEnElObjetivo { get; init; }
@@ -90,6 +134,33 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public double Probabilidad { get; init; }
         public int Sorteo { get; init; }
+
+        /// <summary>
+        /// The client's <c>EffectInstanceFlags</c> of the row: 1 visible in the tooltip, 2 in
+        /// the buff panel, 4 in the fight log, 8 on the terrain, 16 for the client only.
+        /// </summary>
+        public int Flags { get; init; }
+
+        /// <summary>The bit of <see cref="Flags"/> that marks a row the server never runs.</summary>
+        public const int ForClientOnlyFlag = 16;
+
+        /// <summary>
+        /// A row that is the SHEET'S COPY of something the spell really does elsewhere, and
+        /// that the server never runs.
+        /// </summary>
+        /// <remarks>
+        /// The client's enum names the bit ForClientOnly, and the catalogue is written on it:
+        /// Furor carries a "+20 de daños básicos" with the bit next to a 1160 that casts 28604,
+        /// where the real +20 lives; Vitalidad its two "+N% vitalidad" next to the 1160s that
+        /// cast 25215; Manticolmillo its "+15 huida" next to the 1160 that casts 24012 on each
+        /// enemy; Virtud its shield and its "-50 potencia" next to 29723. In the Furor capture
+        /// the rows that go out are 28604's alone -- the state, the +20, the hooked 1160 --
+        /// and never 13156's; in the Vitalidad capture only 25215's +230; in the Virtud
+        /// capture only 29723's. Run, the copy doubled every one of them: Furor gave +60.
+        /// Remisión's push "under DM" is the same thing, which is what the engine had already
+        /// read off its capture case by case.
+        /// </remarks>
+        public bool ForClientOnly => (Flags & ForClientOnlyFlag) != 0;
 
         public IEnumerable<string> Disparadores()
         {
@@ -176,13 +247,32 @@ namespace Jondo.Unity.Server.Managers
 
                 foreach (var e in doc.RootElement.EnumerateArray())
                 {
-                    int forma = 'P', tamano = 1, paso = 0, tope = 0;
+                    // The sheet's copies stay on the sheet: a row for the client only is not
+                    // read into the list at all, so nothing downstream can run it by mistake.
+                    int flags = Entero(e, "m_flags");
+                    if ((flags & SpellEffect.ForClientOnlyFlag) != 0) continue;
+
+                    int forma = 'P', tamano = 1, minimo = 0, paso = 0, tope = 0;
                     bool para = false;
+                    var fijas = new List<int>();
                     if (e.TryGetProperty("zoneDescr", out var z) && z.ValueKind == JsonValueKind.Object)
                     {
+                        // The ';' zone names its cells outright, map cells: the summons a boss
+                        // puts on fixed cells, its runes, its fixed-cell blows.
+                        if (z.TryGetProperty("cellIds", out var celdas))
+                        {
+                            var lista = celdas.ValueKind == JsonValueKind.Object && celdas.TryGetProperty("Array", out var dentro)
+                                ? dentro : celdas;
+                            if (lista.ValueKind == JsonValueKind.Array)
+                            {
+                                foreach (var c in lista.EnumerateArray())
+                                    if (c.ValueKind == JsonValueKind.Number) fijas.Add(c.GetInt32());
+                            }
+                        }
                         int f = Entero(z, "shape");
                         if (f > 0) forma = f;
                         tamano = Entero(z, "param1");
+                        minimo = Entero(z, "param2");
                         para = Entero(z, "isStopAtTarget") != 0;
                         paso = Entero(z, "damageDecreaseStepPercent");
                         tope = Entero(z, "maxDamageDecreaseApplyCount");
@@ -201,8 +291,10 @@ namespace Jondo.Unity.Server.Managers
                         Element = e.TryGetProperty("effectElement", out var el) && el.TryGetInt32(out int v) ? v : -1,
                         Triggers = Texto(e, "triggers", "I"),
                         TargetMask = Texto(e, "targetMask", ""),
+                        CeldasFijas = fijas,
                         Forma = forma,
                         Tamano = tamano,
+                        TamanoMinimo = minimo,
                         ParaEnElObjetivo = para,
                         PasoDeCaida = paso,
                         TopeDeCaida = tope,
@@ -210,6 +302,7 @@ namespace Jondo.Unity.Server.Managers
                         Probabilidad = e.TryGetProperty("random", out var rnd) &&
                                        rnd.TryGetDouble(out double p) ? p : 0,
                         Sorteo = Entero(e, "group"),
+                        Flags = flags,
                     });
                 }
             }

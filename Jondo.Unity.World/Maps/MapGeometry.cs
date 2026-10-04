@@ -123,6 +123,15 @@ namespace Jondo.Unity.World.Maps
         public static bool HasLineOfSight(int fromCell, int toCell, HashSet<int> blockers)
         {
             if (blockers == null || blockers.Count == 0) return true;
+            return HasLineOfSight(fromCell, toCell, blockers.Contains);
+        }
+
+        /// <summary>
+        /// The same walk, with whatever blocks sight asked cell by cell: the map's opaque cells
+        /// and, in a fight, the fighters standing between.
+        /// </summary>
+        public static bool HasLineOfSight(int fromCell, int toCell, Func<int, bool> opaque)
+        {
             if (!IsValid(fromCell) || !IsValid(toCell) || fromCell == toCell) return true;
 
             int x0 = PointX[fromCell], y0 = PointY[fromCell];
@@ -154,7 +163,7 @@ namespace Jondo.Unity.World.Maps
                         int cell = PointToCell(gx, gy);
                         if (cell < 0 || cell == fromCell || cell == toCell) continue;
                         anyCell = true;
-                        if (!blockers.Contains(cell)) anyOpen = true;
+                        if (!opaque(cell)) anyOpen = true;
                     }
                 }
 

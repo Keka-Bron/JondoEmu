@@ -1,0 +1,13569 @@
+{
+"_comment": [
+"The Almanax calendar, flattened from the client dump by tools/extract_almanax.py.",
+"dates     \"dd/mm/*\", \"*\" meaning any: the days this entry covers.",
+"saint     the NPC of the day.",
+"quest     the offering quest, found through the objective the entry names; its",
+"          start condition is \"PL>19&Ad=<this entry>\".",
+"bonuses   type and amount as the client gives them, criteria as [type, value].",
+"          The meaning of the types is not in the client data, only their names."
+],
+"days": {
+"1": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+1030
+]
+],
+"id": 368,
+"type": 1
+}
+],
+"category": 12,
+"dates": [
+"01/09/*"
+],
+"description": 1055984,
+"name": 324635,
+"objective": 7515,
+"quest": 1340,
+"saint": 1736
+},
+"10": {
+"bonuses": [],
+"category": 12,
+"dates": [
+"25/09/*"
+],
+"description": 1056024,
+"name": 1056023,
+"objective": 5999,
+"quest": 1012,
+"saint": 1639
+},
+"100": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+1
+]
+],
+"id": 242,
+"type": 8
+}
+],
+"category": 15,
+"dates": [
+"22/12/*"
+],
+"description": 1056154,
+"name": 1056153,
+"objective": 6151,
+"quest": 1050,
+"saint": 1723
+},
+"101": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17130
+],
+[
+9,
+17131
+]
+],
+"id": 125,
+"type": 26
+}
+],
+"category": 15,
+"dates": [
+"23/12/*"
+],
+"description": 1077040,
+"name": 324421,
+"objective": 6155,
+"quest": 1051,
+"saint": 1724
+},
+"102": {
+"bonuses": [],
+"category": 15,
+"dates": [
+"24/12/*"
+],
+"description": 1162547,
+"name": 1162546,
+"objective": 5975,
+"quest": 1006,
+"saint": 1725
+},
+"103": {
+"bonuses": [],
+"category": 15,
+"dates": [
+"25/12/*"
+],
+"description": 1086058,
+"name": 324417,
+"objective": 5967,
+"quest": 1004,
+"saint": 1726
+},
+"104": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+618
+]
+],
+"id": 117,
+"type": 16
+}
+],
+"category": 15,
+"dates": [
+"26/12/*"
+],
+"description": 1056157,
+"name": 324409,
+"objective": 6195,
+"quest": 1061,
+"saint": 1727
+},
+"105": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+274
+]
+],
+"id": 168,
+"type": 1
+}
+],
+"category": 15,
+"dates": [
+"27/12/*"
+],
+"description": 1113263,
+"name": 324411,
+"objective": 6159,
+"quest": 1052,
+"saint": 1728
+},
+"106": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+2,
+210
+],
+[
+2,
+459
+],
+[
+2,
+620
+],
+[
+2,
+811
+],
+[
+2,
+853
+],
+[
+2,
+953
+],
+[
+2,
+621
+],
+[
+2,
+840
+],
+[
+2,
+880
+],
+[
+2,
+954
+],
+[
+2,
+94
+],
+[
+2,
+494
+],
+[
+2,
+783
+],
+[
+2,
+623
+],
+[
+2,
+831
+],
+[
+2,
+624
+],
+[
+2,
+752
+],
+[
+2,
+653
+],
+[
+2,
+814
+],
+[
+2,
+884
+],
+[
+2,
+1028
+],
+[
+2,
+1044
+]
+],
+"id": 36,
+"type": 6
+}
+],
+"category": 15,
+"dates": [
+"28/12/*"
+],
+"description": 1056160,
+"name": 1056159,
+"objective": 6163,
+"quest": 1053,
+"saint": 1729
+},
+"107": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+52
+],
+[
+10,
+159
+]
+],
+"id": 120,
+"type": 7
+}
+],
+"category": 15,
+"dates": [
+"29/12/*"
+],
+"description": 324408,
+"name": 324407,
+"objective": 6167,
+"quest": 1054,
+"saint": 1730
+},
+"108": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+159
+],
+[
+3,
+2329
+],
+[
+3,
+2411
+],
+[
+3,
+2413
+]
+],
+"id": 314,
+"type": 16
+}
+],
+"category": 15,
+"dates": [
+"30/12/*"
+],
+"description": 1113264,
+"name": 324955,
+"objective": 6171,
+"quest": 1055,
+"saint": 1731
+},
+"109": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 446,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+166
+]
+],
+"id": 414,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+166
+]
+],
+"id": 433,
+"type": 16
+}
+],
+"category": 15,
+"dates": [
+"31/12/*"
+],
+"description": 1067136,
+"name": 1056162,
+"objective": 6175,
+"quest": 1056,
+"saint": 1732
+},
+"11": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+161
+],
+[
+10,
+192
+]
+],
+"id": 32,
+"type": 7
+}
+],
+"category": 12,
+"dates": [
+"26/09/*"
+],
+"description": 1056025,
+"name": 324329,
+"objective": 5811,
+"quest": 965,
+"saint": 1638
+},
+"113": {
+"bonuses": [
+{
+"amount": 300,
+"criteria": [],
+"id": 158,
+"type": 20
+},
+{
+"amount": 100,
+"criteria": [],
+"id": 159,
+"type": 21
+},
+{
+"amount": 100,
+"criteria": [],
+"id": 505,
+"type": 32
+}
+],
+"category": 12,
+"dates": [
+"02/09/*"
+],
+"description": 1055986,
+"name": 1055985,
+"objective": 7519,
+"quest": 1341,
+"saint": 1737
+},
+"114": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+232
+],
+[
+4,
+233
+]
+],
+"id": 385,
+"type": 16
+}
+],
+"category": 12,
+"dates": [
+"03/09/*"
+],
+"description": 1113240,
+"name": 1055987,
+"objective": 7567,
+"quest": 1353,
+"saint": 1738
+},
+"115": {
+"bonuses": [
+{
+"amount": 10,
+"criteria": [
+[
+10,
+101
+]
+],
+"id": 506,
+"type": 19
+}
+],
+"category": 12,
+"dates": [
+"04/09/*"
+],
+"description": 1055991,
+"name": 1055989,
+"objective": 7575,
+"quest": 1355,
+"saint": 1739
+},
+"116": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+210
+],
+[
+2,
+319
+]
+],
+"id": 229,
+"type": 17
+}
+],
+"category": 12,
+"dates": [
+"05/09/*"
+],
+"description": 1055993,
+"name": 1055992,
+"objective": 7523,
+"quest": 1342,
+"saint": 1740
+},
+"117": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+51
+],
+[
+3,
+2437
+]
+],
+"id": 270,
+"type": 1
+}
+],
+"category": 12,
+"dates": [
+"06/09/*"
+],
+"description": 1113241,
+"name": 324937,
+"objective": 7527,
+"quest": 1343,
+"saint": 1741
+},
+"118": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+4,
+74
+],
+[
+3,
+2360
+],
+[
+3,
+2544
+],
+[
+3,
+2546
+],
+[
+3,
+2550
+],
+[
+3,
+2554
+],
+[
+3,
+2565
+],
+[
+3,
+2579
+]
+],
+"id": 194,
+"type": 5
+}
+],
+"category": 12,
+"dates": [
+"07/09/*"
+],
+"description": 1113242,
+"name": 324935,
+"objective": 7571,
+"quest": 1354,
+"saint": 1742
+},
+"119": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+1,
+63
+]
+],
+"id": 448,
+"type": 8
+}
+],
+"category": 12,
+"dates": [
+"08/09/*"
+],
+"description": 1056001,
+"name": 1056000,
+"objective": 7531,
+"quest": 1344,
+"saint": 1743
+},
+"12": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+459
+]
+],
+"id": 90,
+"type": 1
+}
+],
+"category": 12,
+"dates": [
+"27/09/*"
+],
+"description": 1056027,
+"name": 1056026,
+"objective": 6003,
+"quest": 1013,
+"saint": 1637
+},
+"120": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+178
+]
+],
+"id": 102,
+"type": 1
+}
+],
+"category": 12,
+"dates": [
+"09/09/*"
+],
+"description": 1056003,
+"name": 1056002,
+"objective": 7543,
+"quest": 1347,
+"saint": 1744
+},
+"121": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+16,
+2
+]
+],
+"id": 536,
+"type": 36
+}
+],
+"category": 12,
+"dates": [
+"10/09/*"
+],
+"description": 1174867,
+"name": 1174866,
+"objective": 7535,
+"quest": 1345,
+"saint": 1745
+},
+"122": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+235
+]
+],
+"id": 119,
+"type": 1
+}
+],
+"category": 12,
+"dates": [
+"11/09/*"
+],
+"description": 1056007,
+"name": 1056006,
+"objective": 7539,
+"quest": 1346,
+"saint": 1746
+},
+"123": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+8,
+9
+],
+[
+8,
+10
+]
+],
+"id": 378,
+"type": 14
+}
+],
+"category": 12,
+"dates": [
+"12/09/*"
+],
+"description": 1043349,
+"name": 324969,
+"objective": 7551,
+"quest": 1349,
+"saint": 1747
+},
+"124": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+50
+]
+],
+"id": 19,
+"type": 7
+}
+],
+"category": 12,
+"dates": [
+"13/09/*"
+],
+"description": 324976,
+"name": 324975,
+"objective": 7547,
+"quest": 1348,
+"saint": 1748
+},
+"125": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 445,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+280
+]
+],
+"id": 419,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+280
+]
+],
+"id": 439,
+"type": 16
+}
+],
+"category": 12,
+"dates": [
+"14/09/*"
+],
+"description": 1056009,
+"name": 1056008,
+"objective": 7579,
+"quest": 1356,
+"saint": 1749
+},
+"126": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+790
+]
+],
+"id": 244,
+"type": 17
+}
+],
+"category": 12,
+"dates": [
+"15/09/*"
+],
+"description": 1056011,
+"name": 1056010,
+"objective": 7555,
+"quest": 1350,
+"saint": 1750
+},
+"127": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+878
+],
+[
+2,
+879
+]
+],
+"id": 121,
+"type": 16
+}
+],
+"category": 12,
+"dates": [
+"16/09/*"
+],
+"description": 1056012,
+"name": 324977,
+"objective": 7559,
+"quest": 1351,
+"saint": 1751
+},
+"128": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+4
+]
+],
+"id": 358,
+"type": 8
+}
+],
+"category": 12,
+"dates": [
+"17/09/*"
+],
+"description": 1056014,
+"name": 1056013,
+"objective": 7563,
+"quest": 1352,
+"saint": 1752
+},
+"129": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [],
+"id": 4,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [],
+"id": 518,
+"type": 2
+}
+],
+"category": 2,
+"dates": [
+"22/09/*",
+"23/09/*",
+"24/09/*",
+"25/09/*",
+"26/09/*",
+"27/09/*",
+"28/09/*",
+"29/09/*",
+"30/09/*",
+"*/10/*",
+"*/11/*",
+"01/12/*",
+"02/12/*",
+"03/12/*",
+"04/12/*",
+"05/12/*",
+"06/12/*",
+"07/12/*",
+"08/12/*",
+"09/12/*",
+"10/12/*",
+"11/12/*",
+"12/12/*",
+"13/12/*",
+"14/12/*",
+"15/12/*",
+"16/12/*",
+"17/12/*",
+"18/12/*",
+"19/12/*",
+"20/12/*"
+],
+"description": 1056167,
+"name": 1056166,
+"objective": 6225,
+"quest": 1065,
+"saint": 1754
+},
+"13": {
+"bonuses": [],
+"category": 12,
+"dates": [
+"28/09/*"
+],
+"description": 1162545,
+"name": 1162544,
+"objective": 6007,
+"quest": 1014,
+"saint": 1636
+},
+"130": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [],
+"id": 4,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [],
+"id": 518,
+"type": 2
+}
+],
+"category": 2,
+"dates": [
+"21/12/*",
+"22/12/*",
+"23/12/*",
+"24/12/*",
+"25/12/*",
+"26/12/*",
+"27/12/*",
+"28/12/*",
+"29/12/*",
+"30/12/*",
+"31/12/*",
+"*/01/*",
+"*/02/*",
+"01/03/*",
+"02/03/*",
+"03/03/*",
+"04/03/*",
+"05/03/*",
+"06/03/*",
+"07/03/*",
+"08/03/*",
+"09/03/*",
+"10/03/*",
+"11/03/*",
+"12/03/*",
+"13/03/*",
+"14/03/*",
+"15/03/*",
+"16/03/*",
+"17/03/*",
+"18/03/*",
+"19/03/*"
+],
+"description": 1056169,
+"name": 1056168,
+"objective": 6225,
+"quest": 1065,
+"saint": 1754
+},
+"131": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [],
+"id": 4,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [],
+"id": 518,
+"type": 2
+}
+],
+"category": 2,
+"dates": [
+"20/03/*",
+"21/03/*",
+"22/03/*",
+"23/03/*",
+"24/03/*",
+"25/03/*",
+"26/03/*",
+"27/03/*",
+"28/03/*",
+"29/03/*",
+"30/03/*",
+"31/03/*",
+"*/04/*",
+"*/05/*",
+"01/06/*",
+"02/06/*",
+"03/06/*",
+"04/06/*",
+"05/06/*",
+"06/06/*",
+"07/06/*",
+"08/06/*",
+"09/06/*",
+"10/06/*",
+"11/06/*",
+"12/06/*",
+"13/06/*",
+"14/06/*",
+"15/06/*",
+"16/06/*",
+"17/06/*",
+"18/06/*",
+"19/06/*",
+"20/06/*"
+],
+"description": 1056171,
+"name": 1056170,
+"objective": 6225,
+"quest": 1065,
+"saint": 1754
+},
+"132": {
+"bonuses": [],
+"category": 4,
+"dates": [
+"01/01/*"
+],
+"description": 1067373,
+"name": 1055548,
+"objective": 6232,
+"quest": 1072,
+"saint": 1770
+},
+"133": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+28
+]
+],
+"id": 363,
+"type": 10
+}
+],
+"category": 4,
+"dates": [
+"02/01/*"
+],
+"description": 1055550,
+"name": 325003,
+"objective": 6236,
+"quest": 1073,
+"saint": 1771
+},
+"134": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+939
+]
+],
+"id": 24,
+"type": 17
+}
+],
+"category": 4,
+"dates": [
+"03/01/*"
+],
+"description": 1055552,
+"name": 1055551,
+"objective": 6240,
+"quest": 1074,
+"saint": 1772
+},
+"135": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+610
+]
+],
+"id": 320,
+"type": 16
+}
+],
+"category": 4,
+"dates": [
+"04/01/*"
+],
+"description": 1055553,
+"name": 324999,
+"objective": 6244,
+"quest": 1075,
+"saint": 1773
+},
+"136": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+10,
+191
+]
+],
+"id": 153,
+"type": 7
+}
+],
+"category": 4,
+"dates": [
+"05/01/*"
+],
+"description": 1055555,
+"name": 1055554,
+"objective": 6248,
+"quest": 1076,
+"saint": 1774
+},
+"137": {
+"bonuses": [],
+"category": 4,
+"dates": [
+"06/01/*"
+],
+"description": 1067383,
+"name": 324995,
+"objective": 6252,
+"quest": 1077,
+"saint": 1775
+},
+"138": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+44
+],
+[
+3,
+2428
+],
+[
+3,
+2439
+],
+[
+3,
+2549
+]
+],
+"id": 31,
+"type": 1
+}
+],
+"category": 4,
+"dates": [
+"07/01/*"
+],
+"description": 1113158,
+"name": 1055556,
+"objective": 6256,
+"quest": 1078,
+"saint": 1776
+},
+"139": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+336
+]
+],
+"id": 184,
+"type": 17
+}
+],
+"category": 4,
+"dates": [
+"08/01/*"
+],
+"description": 1055559,
+"name": 1055558,
+"objective": 6260,
+"quest": 1079,
+"saint": 1777
+},
+"14": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+86
+]
+],
+"id": 301,
+"type": 17
+}
+],
+"category": 12,
+"dates": [
+"29/09/*"
+],
+"description": 1113269,
+"name": 1056030,
+"objective": 6011,
+"quest": 1015,
+"saint": 1635
+},
+"140": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+1,
+7
+]
+],
+"id": 135,
+"type": 11
+}
+],
+"category": 4,
+"dates": [
+"09/01/*"
+],
+"description": 325046,
+"name": 325045,
+"objective": 6264,
+"quest": 1080,
+"saint": 1778
+},
+"141": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+16,
+4
+]
+],
+"id": 532,
+"type": 36
+}
+],
+"category": 4,
+"dates": [
+"10/01/*"
+],
+"description": 1174820,
+"name": 1174819,
+"objective": 6268,
+"quest": 1081,
+"saint": 1779
+},
+"142": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+28
+],
+[
+3,
+2289
+],
+[
+3,
+2384
+],
+[
+3,
+2391
+],
+[
+3,
+2433
+],
+[
+3,
+2493
+],
+[
+3,
+2508
+],
+[
+3,
+2525
+],
+[
+3,
+2539
+],
+[
+3,
+2540
+],
+[
+3,
+2585
+]
+],
+"id": 45,
+"type": 16
+}
+],
+"category": 4,
+"dates": [
+"11/01/*"
+],
+"description": 1113159,
+"name": 325049,
+"objective": 6272,
+"quest": 1082,
+"saint": 1780
+},
+"143": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+29
+]
+],
+"id": 138,
+"type": 7
+}
+],
+"category": 4,
+"dates": [
+"12/01/*"
+],
+"description": 1055563,
+"name": 325047,
+"objective": 6276,
+"quest": 1083,
+"saint": 1781
+},
+"144": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+785
+],
+[
+2,
+786
+],
+[
+2,
+787
+],
+[
+2,
+788
+],
+[
+2,
+789
+]
+],
+"id": 28,
+"type": 17
+}
+],
+"category": 4,
+"dates": [
+"13/01/*"
+],
+"description": 1055565,
+"name": 1055564,
+"objective": 6280,
+"quest": 1084,
+"saint": 1782
+},
+"145": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+190
+]
+],
+"id": 482,
+"type": 7
+}
+],
+"category": 4,
+"dates": [
+"14/01/*"
+],
+"description": 1055567,
+"name": 1055566,
+"objective": 6284,
+"quest": 1085,
+"saint": 1783
+},
+"146": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+163
+]
+],
+"id": 79,
+"type": 16
+}
+],
+"category": 4,
+"dates": [
+"15/01/*"
+],
+"description": 1113160,
+"name": 1055568,
+"objective": 6288,
+"quest": 1086,
+"saint": 1784
+},
+"147": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+280
+]
+],
+"id": 35,
+"type": 5
+}
+],
+"category": 4,
+"dates": [
+"16/01/*"
+],
+"description": 1055571,
+"name": 1055570,
+"objective": 6292,
+"quest": 1087,
+"saint": 1785
+},
+"148": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+136
+]
+],
+"id": 84,
+"type": 17
+}
+],
+"category": 4,
+"dates": [
+"17/01/*"
+],
+"description": 1113161,
+"name": 1055572,
+"objective": 6296,
+"quest": 1088,
+"saint": 1786
+},
+"149": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+36
+]
+],
+"id": 178,
+"type": 7
+}
+],
+"category": 4,
+"dates": [
+"18/01/*"
+],
+"description": 1055576,
+"name": 325031,
+"objective": 6300,
+"quest": 1089,
+"saint": 1787
+},
+"15": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+243
+]
+],
+"id": 137,
+"type": 16
+}
+],
+"category": 12,
+"dates": [
+"30/09/*"
+],
+"description": 1056033,
+"name": 1056032,
+"objective": 6015,
+"quest": 1016,
+"saint": 1634
+},
+"150": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 445,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+917
+]
+],
+"id": 403,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+917
+]
+],
+"id": 422,
+"type": 16
+}
+],
+"category": 4,
+"dates": [
+"19/01/*"
+],
+"description": 1173727,
+"name": 1055577,
+"objective": 6304,
+"quest": 1090,
+"saint": 1788
+},
+"151": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+240
+]
+],
+"id": 88,
+"type": 16
+}
+],
+"category": 4,
+"dates": [
+"20/01/*"
+],
+"description": 1113162,
+"name": 324673,
+"objective": 6308,
+"quest": 1091,
+"saint": 1789
+},
+"152": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+10,
+23
+]
+],
+"id": 483,
+"type": 19
+}
+],
+"category": 4,
+"dates": [
+"21/01/*"
+],
+"description": 1055583,
+"name": 1055582,
+"objective": 6312,
+"quest": 1092,
+"saint": 1790
+},
+"153": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+68
+]
+],
+"id": 3,
+"type": 7
+}
+],
+"category": 4,
+"dates": [
+"22/01/*"
+],
+"description": 1055585,
+"name": 1055584,
+"objective": 6316,
+"quest": 1093,
+"saint": 1791
+},
+"154": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+48
+]
+],
+"id": 484,
+"type": 31
+}
+],
+"category": 4,
+"dates": [
+"23/01/*"
+],
+"description": 1055587,
+"name": 1055586,
+"objective": 6320,
+"quest": 1094,
+"saint": 1792
+},
+"155": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+781
+]
+],
+"id": 41,
+"type": 17
+}
+],
+"category": 4,
+"dates": [
+"24/01/*"
+],
+"description": 1055590,
+"name": 1055589,
+"objective": 6324,
+"quest": 1095,
+"saint": 1793
+},
+"156": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+230
+]
+],
+"id": 151,
+"type": 1
+}
+],
+"category": 4,
+"dates": [
+"25/01/*"
+],
+"description": 1011698,
+"name": 324683,
+"objective": 6328,
+"quest": 1096,
+"saint": 1794
+},
+"157": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+10
+]
+],
+"id": 38,
+"type": 7
+}
+],
+"category": 4,
+"dates": [
+"26/01/*"
+],
+"description": 1055592,
+"name": 1055591,
+"objective": 6332,
+"quest": 1097,
+"saint": 1795
+},
+"158": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+5,
+28
+]
+],
+"id": 277,
+"type": 19
+}
+],
+"category": 4,
+"dates": [
+"27/01/*"
+],
+"description": 1055594,
+"name": 1055593,
+"objective": 6336,
+"quest": 1098,
+"saint": 1796
+},
+"159": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+339
+]
+],
+"id": 154,
+"type": 17
+}
+],
+"category": 4,
+"dates": [
+"28/01/*"
+],
+"description": 1055595,
+"name": 324685,
+"objective": 6340,
+"quest": 1099,
+"saint": 1797
+},
+"16": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+176
+],
+[
+4,
+177
+]
+],
+"id": 280,
+"type": 1
+}
+],
+"category": 13,
+"dates": [
+"01/10/*"
+],
+"description": 1113270,
+"name": 324315,
+"objective": 5771,
+"quest": 955,
+"saint": 1622
+},
+"160": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+5
+]
+],
+"id": 64,
+"type": 5
+}
+],
+"category": 4,
+"dates": [
+"29/01/*"
+],
+"description": 1055597,
+"name": 1055596,
+"objective": 6344,
+"quest": 1100,
+"saint": 1798
+},
+"161": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+2
+],
+[
+3,
+2313
+],
+[
+3,
+2314
+],
+[
+3,
+2318
+],
+[
+3,
+2328
+],
+[
+3,
+2335
+]
+],
+"id": 131,
+"type": 16
+}
+],
+"category": 4,
+"dates": [
+"30/01/*"
+],
+"description": 1113163,
+"name": 1055598,
+"objective": 6348,
+"quest": 1101,
+"saint": 1799
+},
+"162": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+72
+]
+],
+"id": 157,
+"type": 7
+}
+],
+"category": 4,
+"dates": [
+"31/01/*"
+],
+"description": 1055600,
+"name": 324751,
+"objective": 6352,
+"quest": 1102,
+"saint": 1800
+},
+"163": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+14,
+481
+]
+],
+"id": 486,
+"type": 1
+},
+{
+"amount": 50,
+"criteria": [
+[
+14,
+481
+]
+],
+"id": 485,
+"type": 16
+}
+],
+"category": 5,
+"dates": [
+"01/02/*"
+],
+"description": 1055602,
+"name": 1055601,
+"objective": 6356,
+"quest": 1103,
+"saint": 1801
+},
+"164": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+9
+],
+[
+3,
+2315
+],
+[
+3,
+2316
+],
+[
+3,
+2317
+],
+[
+3,
+2324
+],
+[
+3,
+672
+],
+[
+3,
+671
+],
+[
+4,
+79
+],
+[
+3,
+972
+],
+[
+3,
+973
+],
+[
+3,
+971
+],
+[
+3,
+984
+]
+],
+"id": 116,
+"type": 17
+},
+{
+"amount": 50,
+"criteria": [
+[
+5,
+28
+],
+[
+5,
+41
+],
+[
+5,
+36
+]
+],
+"id": 122,
+"type": 2
+}
+],
+"category": 5,
+"dates": [
+"02/02/*"
+],
+"description": 1055603,
+"name": 1055604,
+"objective": 6360,
+"quest": 1104,
+"saint": 1802
+},
+"165": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+172
+]
+],
+"id": 384,
+"type": 1
+}
+],
+"category": 5,
+"dates": [
+"03/02/*"
+],
+"description": 1113164,
+"name": 1055605,
+"objective": 6364,
+"quest": 1105,
+"saint": 1803
+},
+"166": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+608
+]
+],
+"id": 10,
+"type": 16
+}
+],
+"category": 5,
+"dates": [
+"04/02/*"
+],
+"description": 1055608,
+"name": 1055607,
+"objective": 6368,
+"quest": 1106,
+"saint": 1804
+},
+"167": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+2,
+538
+],
+[
+2,
+875
+],
+[
+2,
+175
+],
+[
+2,
+844
+],
+[
+2,
+846
+],
+[
+2,
+888
+],
+[
+2,
+154
+],
+[
+2,
+213
+],
+[
+2,
+223
+],
+[
+2,
+800
+],
+[
+2,
+823
+],
+[
+2,
+847
+],
+[
+2,
+919
+],
+[
+2,
+211
+],
+[
+2,
+470
+],
+[
+2,
+852
+],
+[
+2,
+946
+],
+[
+2,
+1010
+],
+[
+2,
+1013
+]
+],
+"id": 85,
+"type": 6
+}
+],
+"category": 5,
+"dates": [
+"05/02/*"
+],
+"description": 1055610,
+"name": 1055609,
+"objective": 6372,
+"quest": 1107,
+"saint": 1805
+},
+"168": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+11
+]
+],
+"id": 152,
+"type": 10
+}
+],
+"category": 5,
+"dates": [
+"06/02/*"
+],
+"description": 1055611,
+"name": 324763,
+"objective": 6376,
+"quest": 1108,
+"saint": 1806
+},
+"169": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 445,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+22
+]
+],
+"id": 404,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+22
+]
+],
+"id": 423,
+"type": 16
+}
+],
+"category": 5,
+"dates": [
+"07/02/*"
+],
+"description": 1055615,
+"name": 1055614,
+"objective": 6380,
+"quest": 1109,
+"saint": 1807
+},
+"17": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+141
+],
+[
+10,
+411
+]
+],
+"id": 507,
+"type": 7
+}
+],
+"category": 13,
+"dates": [
+"02/10/*"
+],
+"description": 1056035,
+"name": 324317,
+"objective": 5775,
+"quest": 956,
+"saint": 1623
+},
+"170": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+6
+]
+],
+"id": 167,
+"type": 7
+}
+],
+"category": 5,
+"dates": [
+"08/02/*"
+],
+"description": 324842,
+"name": 324841,
+"objective": 6384,
+"quest": 1110,
+"saint": 1808
+},
+"171": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+811
+]
+],
+"id": 33,
+"type": 16
+}
+],
+"category": 5,
+"dates": [
+"09/02/*"
+],
+"description": 1055618,
+"name": 1055617,
+"objective": 6388,
+"quest": 1111,
+"saint": 1809
+},
+"172": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+17,
+4
+]
+],
+"id": 538,
+"type": 37
+}
+],
+"category": 5,
+"dates": [
+"10/02/*"
+],
+"description": 1174823,
+"name": 1174822,
+"objective": 6392,
+"quest": 1112,
+"saint": 1810
+},
+"173": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+325
+],
+[
+10,
+327
+]
+],
+"id": 273,
+"type": 7
+}
+],
+"category": 5,
+"dates": [
+"11/02/*"
+],
+"description": 1055622,
+"name": 1055621,
+"objective": 6396,
+"quest": 1113,
+"saint": 1811
+},
+"174": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+39
+],
+[
+3,
+2337
+]
+],
+"id": 171,
+"type": 17
+}
+],
+"category": 5,
+"dates": [
+"12/02/*"
+],
+"description": 1113165,
+"name": 324835,
+"objective": 6400,
+"quest": 1114,
+"saint": 1812
+},
+"175": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+25
+]
+],
+"id": 172,
+"type": 7
+}
+],
+"category": 5,
+"dates": [
+"13/02/*"
+],
+"description": 1055623,
+"name": 324827,
+"objective": 6404,
+"quest": 1115,
+"saint": 1813
+},
+"176": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+7,
+9491
+]
+],
+"id": 173,
+"type": 1
+}
+],
+"category": 5,
+"dates": [
+"14/02/*"
+],
+"description": 324830,
+"name": 324829,
+"objective": 6408,
+"quest": 1116,
+"saint": 1814
+},
+"177": {
+"bonuses": [],
+"category": 5,
+"dates": [
+"15/02/*"
+],
+"description": 1162541,
+"name": 1162540,
+"objective": 6412,
+"quest": 1117,
+"saint": 1815
+},
+"178": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+41
+]
+],
+"id": 175,
+"type": 10
+}
+],
+"category": 5,
+"dates": [
+"16/02/*"
+],
+"description": 1055656,
+"name": 324847,
+"objective": 6416,
+"quest": 1118,
+"saint": 1816
+},
+"179": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+102
+],
+[
+3,
+2373
+],
+[
+3,
+2551
+],
+[
+3,
+2552
+],
+[
+3,
+2553
+],
+[
+3,
+2600
+],
+[
+3,
+2601
+]
+],
+"id": 112,
+"type": 16
+}
+],
+"category": 5,
+"dates": [
+"17/02/*"
+],
+"description": 1113166,
+"name": 324843,
+"objective": 6420,
+"quest": 1119,
+"saint": 1817
+},
+"18": {
+"bonuses": [],
+"category": 13,
+"dates": [
+"03/10/*"
+],
+"description": 483658,
+"name": 324405,
+"objective": 5779,
+"quest": 957,
+"saint": 1624
+},
+"180": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+265
+],
+[
+3,
+2386
+],
+[
+3,
+2388
+],
+[
+3,
+2389
+]
+],
+"id": 37,
+"type": 1
+}
+],
+"category": 5,
+"dates": [
+"18/02/*"
+],
+"description": 1113167,
+"name": 1055664,
+"objective": 6424,
+"quest": 1120,
+"saint": 1818
+},
+"181": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+126
+],
+[
+10,
+127
+]
+],
+"id": 222,
+"type": 7
+}
+],
+"category": 5,
+"dates": [
+"19/02/*"
+],
+"description": 1055666,
+"name": 324899,
+"objective": 6428,
+"quest": 1121,
+"saint": 1819
+},
+"182": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+464
+],
+[
+2,
+472
+]
+],
+"id": 48,
+"type": 17
+}
+],
+"category": 5,
+"dates": [
+"20/02/*"
+],
+"description": 1055668,
+"name": 1055667,
+"objective": 6432,
+"quest": 1122,
+"saint": 1820
+},
+"183": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+8
+],
+[
+2,
+277
+]
+],
+"id": 22,
+"type": 16
+}
+],
+"category": 5,
+"dates": [
+"21/02/*"
+],
+"description": 1055674,
+"name": 1055673,
+"objective": 6436,
+"quest": 1123,
+"saint": 1821
+},
+"184": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+314
+]
+],
+"id": 1,
+"type": 1
+}
+],
+"category": 5,
+"dates": [
+"22/02/*"
+],
+"description": 1055676,
+"name": 1055675,
+"objective": 6440,
+"quest": 1124,
+"saint": 1822
+},
+"185": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+1016
+]
+],
+"id": 78,
+"type": 17
+}
+],
+"category": 5,
+"dates": [
+"23/02/*"
+],
+"description": 1055678,
+"name": 1055677,
+"objective": 6444,
+"quest": 1125,
+"saint": 1823
+},
+"186": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+804
+],
+[
+2,
+805
+],
+[
+2,
+806
+]
+],
+"id": 74,
+"type": 5
+}
+],
+"category": 5,
+"dates": [
+"24/02/*"
+],
+"description": 1055682,
+"name": 1055681,
+"objective": 6448,
+"quest": 1126,
+"saint": 1824
+},
+"187": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+890
+]
+],
+"id": 50,
+"type": 16
+}
+],
+"category": 5,
+"dates": [
+"25/02/*"
+],
+"description": 1055686,
+"name": 1055685,
+"objective": 6452,
+"quest": 1127,
+"saint": 1825
+},
+"188": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+274
+]
+],
+"id": 133,
+"type": 17
+}
+],
+"category": 5,
+"dates": [
+"26/02/*"
+],
+"description": 1113170,
+"name": 1055689,
+"objective": 6456,
+"quest": 1128,
+"saint": 1826
+},
+"189": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17144
+],
+[
+9,
+17145
+],
+[
+9,
+17146
+],
+[
+9,
+17147
+]
+],
+"id": 186,
+"type": 26
+}
+],
+"category": 5,
+"dates": [
+"27/02/*"
+],
+"description": 1067917,
+"name": 324907,
+"objective": 6460,
+"quest": 1129,
+"saint": 1827
+},
+"19": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+1026
+]
+],
+"id": 210,
+"type": 5
+}
+],
+"category": 13,
+"dates": [
+"04/10/*"
+],
+"description": 1056037,
+"name": 1056036,
+"objective": 5783,
+"quest": 958,
+"saint": 1629
+},
+"190": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+847
+]
+],
+"id": 11,
+"type": 1
+}
+],
+"category": 5,
+"dates": [
+"28/02/*"
+],
+"description": 1055697,
+"name": 1055696,
+"objective": 6464,
+"quest": 1130,
+"saint": 1828
+},
+"191": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [],
+"id": 189,
+"type": 1
+},
+{
+"amount": 75,
+"criteria": [],
+"id": 188,
+"type": 16
+},
+{
+"amount": 50,
+"criteria": [],
+"id": 2,
+"type": 2
+}
+],
+"category": 5,
+"dates": [
+"29/02/*"
+],
+"description": 1011715,
+"name": 955790,
+"objective": 6468,
+"quest": 1131,
+"saint": 1829
+},
+"192": {
+"bonuses": [],
+"category": 3,
+"dates": [
+"12/02/2013",
+"09/02/2016",
+"28/02/2017",
+"13/02/2018",
+"04/03/2014",
+"17/02/2015",
+"05/03/2019",
+"25/02/2020",
+"16/02/2021",
+"01/03/2022",
+"21/02/2023",
+"13/02/2024",
+"04/03/2025",
+"17/02/2026",
+"09/02/2027",
+"29/02/2028",
+"13/02/2029",
+"05/03/2030",
+"25/02/2031",
+"10/02/2032",
+"01/03/2033",
+"21/02/2034",
+"06/02/2035"
+],
+"description": 1055702,
+"name": 324381,
+"objective": 6472,
+"quest": 1132,
+"saint": 1830
+},
+"193": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+16
+]
+],
+"id": 21,
+"type": 10
+}
+],
+"category": 6,
+"dates": [
+"01/03/*"
+],
+"description": 1054604,
+"name": 324395,
+"objective": 6476,
+"quest": 1133,
+"saint": 1831
+},
+"194": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+275
+]
+],
+"id": 71,
+"type": 17
+}
+],
+"category": 6,
+"dates": [
+"02/03/*"
+],
+"description": 1054605,
+"name": 324391,
+"objective": 6480,
+"quest": 1134,
+"saint": 1832
+},
+"195": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+38
+],
+[
+10,
+155
+]
+],
+"id": 192,
+"type": 7
+}
+],
+"category": 6,
+"dates": [
+"03/03/*"
+],
+"description": 1068017,
+"name": 324363,
+"objective": 6484,
+"quest": 1135,
+"saint": 1833
+},
+"196": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+89
+]
+],
+"id": 20,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"04/03/*"
+],
+"description": 1113171,
+"name": 1054627,
+"objective": 6488,
+"quest": 1136,
+"saint": 1834
+},
+"197": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 449,
+"type": 16
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+518
+]
+],
+"id": 424,
+"type": 16
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+518
+]
+],
+"id": 405,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"05/03/*"
+],
+"description": 1054640,
+"name": 1054639,
+"objective": 6492,
+"quest": 1137,
+"saint": 1835
+},
+"198": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+2,
+601
+]
+],
+"id": 294,
+"type": 11
+}
+],
+"category": 6,
+"dates": [
+"06/03/*"
+],
+"description": 1054642,
+"name": 1054641,
+"objective": 6496,
+"quest": 1138,
+"saint": 1836
+},
+"199": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+225
+],
+[
+3,
+2398
+],
+[
+3,
+2412
+],
+[
+3,
+2511
+],
+[
+3,
+2512
+]
+],
+"id": 197,
+"type": 17
+}
+],
+"category": 6,
+"dates": [
+"07/03/*"
+],
+"description": 1113176,
+"name": 1054643,
+"objective": 6500,
+"quest": 1139,
+"saint": 1837
+},
+"2": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [],
+"id": 4,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [],
+"id": 518,
+"type": 2
+}
+],
+"category": 2,
+"dates": [
+"21/06/*",
+"22/06/*",
+"23/06/*",
+"24/06/*",
+"25/06/*",
+"26/06/*",
+"27/06/*",
+"28/06/*",
+"29/06/*",
+"30/06/*",
+"*/07/*",
+"*/08/*",
+"01/09/*",
+"02/09/*",
+"03/09/*",
+"04/09/*",
+"05/09/*",
+"06/09/*",
+"07/09/*",
+"08/09/*",
+"09/09/*",
+"10/09/*",
+"11/09/*",
+"12/09/*",
+"13/09/*",
+"14/09/*",
+"15/09/*",
+"16/09/*",
+"17/09/*",
+"18/09/*",
+"19/09/*",
+"20/09/*",
+"21/09/*"
+],
+"description": 1056165,
+"name": 1056164,
+"objective": 6225,
+"quest": 1065,
+"saint": 1754
+},
+"20": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+130
+],
+[
+10,
+131
+],
+[
+10,
+318
+]
+],
+"id": 13,
+"type": 7
+}
+],
+"category": 13,
+"dates": [
+"05/10/*"
+],
+"description": 1080903,
+"name": 1056038,
+"objective": 5787,
+"quest": 959,
+"saint": 1630
+},
+"200": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+3
+],
+[
+4,
+263
+],
+[
+4,
+264
+],
+[
+3,
+2293
+],
+[
+3,
+2294
+],
+[
+3,
+2304
+],
+[
+3,
+2305
+],
+[
+3,
+2308
+],
+[
+3,
+2402
+],
+[
+3,
+2403
+],
+[
+3,
+2498
+]
+],
+"id": 142,
+"type": 16
+}
+],
+"category": 6,
+"dates": [
+"08/03/*"
+],
+"description": 1113177,
+"name": 1054645,
+"objective": 6504,
+"quest": 1140,
+"saint": 1838
+},
+"201": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+46
+]
+],
+"id": 198,
+"type": 7
+}
+],
+"category": 6,
+"dates": [
+"09/03/*"
+],
+"description": 324596,
+"name": 324595,
+"objective": 6508,
+"quest": 1141,
+"saint": 1839
+},
+"202": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+16,
+3
+]
+],
+"id": 533,
+"type": 36
+}
+],
+"category": 6,
+"dates": [
+"10/03/*"
+],
+"description": 1174825,
+"name": 1174824,
+"objective": 6512,
+"quest": 1142,
+"saint": 1840
+},
+"203": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+31
+],
+[
+2,
+232
+],
+[
+2,
+233
+]
+],
+"id": 89,
+"type": 5
+}
+],
+"category": 6,
+"dates": [
+"11/03/*"
+],
+"description": 1054732,
+"name": 324625,
+"objective": 6516,
+"quest": 1143,
+"saint": 1841
+},
+"204": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+36
+]
+],
+"id": 201,
+"type": 10
+}
+],
+"category": 6,
+"dates": [
+"12/03/*"
+],
+"description": 1054733,
+"name": 324631,
+"objective": 6520,
+"quest": 1144,
+"saint": 1842
+},
+"205": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+3,
+58
+],
+[
+3,
+85
+],
+[
+3,
+86
+],
+[
+3,
+107
+],
+[
+3,
+113
+],
+[
+3,
+121
+],
+[
+3,
+147
+],
+[
+3,
+173
+],
+[
+3,
+180
+],
+[
+3,
+226
+],
+[
+3,
+230
+],
+[
+3,
+232
+],
+[
+3,
+252
+],
+[
+3,
+257
+],
+[
+3,
+289
+],
+[
+3,
+382
+],
+[
+3,
+423
+],
+[
+3,
+430
+],
+[
+3,
+457
+],
+[
+3,
+478
+],
+[
+3,
+568
+],
+[
+3,
+605
+],
+[
+3,
+612
+],
+[
+3,
+669
+],
+[
+3,
+670
+],
+[
+3,
+780
+],
+[
+3,
+792
+],
+[
+3,
+797
+],
+[
+3,
+799
+],
+[
+3,
+800
+],
+[
+3,
+827
+],
+[
+3,
+3137
+],
+[
+3,
+854
+],
+[
+3,
+872
+],
+[
+3,
+874
+],
+[
+3,
+928
+],
+[
+3,
+939
+],
+[
+3,
+940
+],
+[
+3,
+943
+],
+[
+3,
+4051
+],
+[
+3,
+1027
+],
+[
+3,
+1045
+],
+[
+3,
+1051
+],
+[
+3,
+1071
+],
+[
+3,
+1072
+],
+[
+3,
+1085
+],
+[
+3,
+1086
+],
+[
+3,
+1087
+],
+[
+3,
+1159
+],
+[
+3,
+1179
+],
+[
+3,
+1184
+],
+[
+3,
+1185
+],
+[
+3,
+1186
+],
+[
+3,
+1187
+],
+[
+3,
+1188
+],
+[
+3,
+1194
+],
+[
+3,
+2772
+],
+[
+3,
+2786
+],
+[
+3,
+2793
+],
+[
+3,
+2802
+],
+[
+3,
+2819
+],
+[
+3,
+2821
+],
+[
+3,
+2848
+],
+[
+3,
+2854
+],
+[
+3,
+2864
+],
+[
+3,
+2877
+],
+[
+3,
+2924
+],
+[
+3,
+2942
+],
+[
+3,
+2960
+],
+[
+3,
+2967
+],
+[
+3,
+2968
+],
+[
+3,
+2970
+],
+[
+3,
+2975
+],
+[
+3,
+2986
+],
+[
+3,
+2992
+],
+[
+3,
+2995
+],
+[
+3,
+3100
+],
+[
+3,
+3142
+],
+[
+3,
+3143
+],
+[
+3,
+3208
+],
+[
+3,
+3232
+],
+[
+3,
+3234
+],
+[
+3,
+3238
+],
+[
+3,
+3293
+],
+[
+3,
+3294
+],
+[
+3,
+3295
+],
+[
+3,
+3296
+],
+[
+3,
+3297
+],
+[
+3,
+3298
+],
+[
+3,
+3306
+],
+[
+3,
+3384
+],
+[
+3,
+3391
+],
+[
+3,
+3397
+],
+[
+3,
+3409
+],
+[
+3,
+3416
+],
+[
+3,
+3460
+],
+[
+3,
+3476
+],
+[
+3,
+3534
+],
+[
+3,
+3564
+],
+[
+3,
+3556
+],
+[
+3,
+3652
+],
+[
+3,
+3651
+],
+[
+3,
+3648
+],
+[
+3,
+3618
+],
+[
+3,
+3753
+],
+[
+3,
+3752
+],
+[
+3,
+3726
+],
+[
+3,
+3828
+],
+[
+3,
+3852
+],
+[
+3,
+3849
+],
+[
+3,
+3835
+],
+[
+3,
+3945
+],
+[
+3,
+3996
+],
+[
+3,
+4278
+],
+[
+3,
+4264
+],
+[
+3,
+4263
+],
+[
+3,
+4265
+],
+[
+3,
+4460
+],
+[
+3,
+4444
+],
+[
+3,
+4453
+],
+[
+3,
+4621
+],
+[
+3,
+4609
+],
+[
+3,
+4726
+],
+[
+3,
+4744
+],
+[
+3,
+4803
+],
+[
+3,
+4860
+],
+[
+3,
+4882
+],
+[
+3,
+4967
+],
+[
+3,
+5100
+],
+[
+3,
+5110
+],
+[
+3,
+5319
+],
+[
+3,
+5653
+],
+[
+3,
+5664
+],
+[
+3,
+5666
+],
+[
+3,
+5806
+],
+[
+3,
+5819
+],
+[
+3,
+5823
+],
+[
+3,
+5955
+],
+[
+3,
+5990
+],
+[
+3,
+6014
+],
+[
+3,
+6026
+],
+[
+3,
+6249
+],
+[
+3,
+6204
+],
+[
+3,
+6212
+],
+[
+3,
+6256
+],
+[
+3,
+6326
+],
+[
+3,
+6218
+],
+[
+3,
+6388
+],
+[
+3,
+6394
+],
+[
+3,
+6472
+],
+[
+3,
+6478
+],
+[
+3,
+6654
+],
+[
+3,
+6792
+],
+[
+3,
+6903
+],
+[
+3,
+7197
+],
+[
+3,
+7210
+],
+[
+3,
+7219
+],
+[
+3,
+8052
+],
+[
+3,
+8047
+],
+[
+3,
+8037
+]
+],
+"id": 202,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"13/03/*"
+],
+"description": 1011720,
+"name": 324613,
+"objective": 6524,
+"quest": 1145,
+"saint": 1843
+},
+"206": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+71
+]
+],
+"id": 203,
+"type": 7
+}
+],
+"category": 6,
+"dates": [
+"14/03/*"
+],
+"description": 324620,
+"name": 324619,
+"objective": 6528,
+"quest": 1146,
+"saint": 1844
+},
+"207": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+4,
+160
+],
+[
+3,
+2300
+]
+],
+"id": 12,
+"type": 5
+}
+],
+"category": 6,
+"dates": [
+"15/03/*"
+],
+"description": 1113178,
+"name": 1054735,
+"objective": 6532,
+"quest": 1147,
+"saint": 1845
+},
+"208": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+77
+],
+[
+3,
+2569
+],
+[
+3,
+2566
+],
+[
+3,
+2562
+],
+[
+3,
+2578
+],
+[
+3,
+2587
+]
+],
+"id": 52,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"16/03/*"
+],
+"description": 1113179,
+"name": 324481,
+"objective": 6536,
+"quest": 1148,
+"saint": 1846
+},
+"209": {
+"bonuses": [],
+"category": 6,
+"dates": [
+"17/03/*"
+],
+"description": 1113267,
+"name": 1067699,
+"objective": 6540,
+"quest": 1149,
+"saint": 1847
+},
+"21": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+463
+]
+],
+"id": 155,
+"type": 16
+}
+],
+"category": 13,
+"dates": [
+"06/10/*"
+],
+"description": 1056041,
+"name": 1056040,
+"objective": 5791,
+"quest": 960,
+"saint": 1631
+},
+"210": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+74
+]
+],
+"id": 489,
+"type": 31
+}
+],
+"category": 6,
+"dates": [
+"18/03/*"
+],
+"description": 1055549,
+"name": 1054739,
+"objective": 6544,
+"quest": 1150,
+"saint": 1848
+},
+"211": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+56
+]
+],
+"id": 207,
+"type": 7
+}
+],
+"category": 6,
+"dates": [
+"19/03/*"
+],
+"description": 1054740,
+"name": 324441,
+"objective": 6548,
+"quest": 1151,
+"saint": 1849
+},
+"212": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+869
+]
+],
+"id": 60,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"20/03/*"
+],
+"description": 1054742,
+"name": 1054741,
+"objective": 6552,
+"quest": 1152,
+"saint": 1850
+},
+"213": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 453,
+"type": 6
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+892
+]
+],
+"id": 406,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+892
+]
+],
+"id": 425,
+"type": 16
+}
+],
+"category": 6,
+"dates": [
+"21/03/*"
+],
+"description": 1054745,
+"name": 1054744,
+"objective": 6556,
+"quest": 1153,
+"saint": 1851
+},
+"214": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+793
+]
+],
+"id": 68,
+"type": 16
+}
+],
+"category": 6,
+"dates": [
+"22/03/*"
+],
+"description": 1054747,
+"name": 1054746,
+"objective": 6560,
+"quest": 1154,
+"saint": 1852
+},
+"215": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+2
+]
+],
+"id": 211,
+"type": 8
+}
+],
+"category": 6,
+"dates": [
+"23/03/*"
+],
+"description": 324428,
+"name": 324427,
+"objective": 6564,
+"quest": 1155,
+"saint": 1853
+},
+"216": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+37
+],
+[
+3,
+2280
+],
+[
+3,
+2281
+],
+[
+3,
+2282
+],
+[
+3,
+2283
+]
+],
+"id": 70,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"24/03/*"
+],
+"description": 1113180,
+"name": 1054748,
+"objective": 6568,
+"quest": 1156,
+"saint": 1854
+},
+"217": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+131
+]
+],
+"id": 176,
+"type": 16
+}
+],
+"category": 6,
+"dates": [
+"25/03/*"
+],
+"description": 1113181,
+"name": 324435,
+"objective": 6572,
+"quest": 1157,
+"saint": 1855
+},
+"218": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+84
+]
+],
+"id": 234,
+"type": 17
+}
+],
+"category": 6,
+"dates": [
+"26/03/*"
+],
+"description": 1113182,
+"name": 324549,
+"objective": 6576,
+"quest": 1158,
+"saint": 1856
+},
+"219": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17126
+],
+[
+9,
+17127
+],
+[
+9,
+17128
+],
+[
+9,
+17129
+]
+],
+"id": 366,
+"type": 26
+}
+],
+"category": 6,
+"dates": [
+"27/03/*"
+],
+"description": 1070540,
+"name": 324547,
+"objective": 6580,
+"quest": 1159,
+"saint": 1857
+},
+"22": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+971
+]
+],
+"id": 140,
+"type": 1
+}
+],
+"category": 13,
+"dates": [
+"07/10/*"
+],
+"description": 1056042,
+"name": 324361,
+"objective": 5795,
+"quest": 961,
+"saint": 1632
+},
+"220": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+791
+]
+],
+"id": 107,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"28/03/*"
+],
+"description": 1054754,
+"name": 1054753,
+"objective": 6584,
+"quest": 1160,
+"saint": 1858
+},
+"221": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+94
+]
+],
+"id": 146,
+"type": 16
+}
+],
+"category": 6,
+"dates": [
+"29/03/*"
+],
+"description": 1054756,
+"name": 1054755,
+"objective": 6588,
+"quest": 1161,
+"saint": 1859
+},
+"222": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+166
+]
+],
+"id": 80,
+"type": 1
+}
+],
+"category": 6,
+"dates": [
+"30/03/*"
+],
+"description": 1113183,
+"name": 1054757,
+"objective": 6592,
+"quest": 1162,
+"saint": 1860
+},
+"223": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+491
+]
+],
+"id": 219,
+"type": 17
+}
+],
+"category": 6,
+"dates": [
+"31/03/*"
+],
+"description": 1011728,
+"name": 324501,
+"objective": 6596,
+"quest": 1163,
+"saint": 1861
+},
+"224": {
+"bonuses": [
+{
+"amount": 30,
+"criteria": [
+[
+1,
+71
+]
+],
+"id": 23,
+"type": 1
+},
+{
+"amount": 30,
+"criteria": [
+[
+1,
+71
+]
+],
+"id": 39,
+"type": 16
+}
+],
+"category": 3,
+"dates": [
+"31/03/2013",
+"20/04/2014",
+"05/04/2015",
+"27/03/2016",
+"16/04/2017",
+"01/04/2018",
+"20/04/2025",
+"31/03/2024",
+"09/04/2023",
+"17/04/2022",
+"04/04/2021",
+"12/04/2020",
+"21/04/2019",
+"05/04/2026",
+"28/03/2027",
+"16/04/2028",
+"01/04/2029",
+"21/04/2030",
+"13/04/2031",
+"28/03/2032",
+"17/04/2033",
+"09/04/2034",
+"25/03/2035"
+],
+"description": 1054760,
+"name": 1054759,
+"objective": 6600,
+"quest": 1164,
+"saint": 1862
+},
+"225": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+69
+],
+[
+4,
+40
+],
+[
+3,
+2893
+],
+[
+3,
+998
+],
+[
+3,
+2914
+],
+[
+3,
+1022
+],
+[
+3,
+1027
+],
+[
+3,
+1061
+],
+[
+3,
+1060
+],
+[
+3,
+1063
+],
+[
+3,
+1062
+],
+[
+3,
+423
+],
+[
+3,
+2327
+],
+[
+3,
+2346
+],
+[
+3,
+2338
+],
+[
+3,
+2339
+],
+[
+3,
+2340
+],
+[
+3,
+2272
+],
+[
+3,
+2351
+],
+[
+3,
+2558
+],
+[
+3,
+2559
+],
+[
+3,
+2555
+],
+[
+3,
+2557
+],
+[
+3,
+2560
+],
+[
+3,
+2295
+],
+[
+3,
+2298
+],
+[
+3,
+2297
+],
+[
+3,
+2296
+],
+[
+4,
+152
+],
+[
+4,
+153
+],
+[
+4,
+154
+],
+[
+4,
+155
+],
+[
+4,
+177
+],
+[
+4,
+203
+],
+[
+4,
+181
+],
+[
+4,
+117
+]
+],
+"id": 220,
+"type": 1
+},
+{
+"amount": 50,
+"criteria": [
+[
+4,
+69
+],
+[
+4,
+40
+],
+[
+3,
+2893
+],
+[
+3,
+998
+],
+[
+3,
+2914
+],
+[
+3,
+1022
+],
+[
+3,
+1027
+],
+[
+3,
+1061
+],
+[
+3,
+1060
+],
+[
+3,
+1063
+],
+[
+3,
+1062
+],
+[
+3,
+423
+],
+[
+3,
+2327
+],
+[
+3,
+2346
+],
+[
+3,
+2338
+],
+[
+3,
+2339
+],
+[
+3,
+2340
+],
+[
+3,
+2272
+],
+[
+3,
+2351
+],
+[
+3,
+2558
+],
+[
+3,
+2559
+],
+[
+3,
+2555
+],
+[
+3,
+2557
+],
+[
+3,
+2560
+],
+[
+3,
+2295
+],
+[
+3,
+2298
+],
+[
+3,
+2297
+],
+[
+3,
+2296
+],
+[
+4,
+152
+],
+[
+4,
+153
+],
+[
+4,
+154
+],
+[
+4,
+155
+],
+[
+4,
+177
+],
+[
+4,
+203
+],
+[
+4,
+181
+],
+[
+4,
+117
+]
+],
+"id": 221,
+"type": 16
+}
+],
+"category": 7,
+"dates": [
+"01/04/*"
+],
+"description": 1173933,
+"name": 955793,
+"objective": 6604,
+"quest": 1165,
+"saint": 1863
+},
+"226": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+873
+]
+],
+"id": 179,
+"type": 5
+}
+],
+"category": 7,
+"dates": [
+"02/04/*"
+],
+"description": 1054790,
+"name": 1054789,
+"objective": 6608,
+"quest": 1166,
+"saint": 1864
+},
+"227": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+955
+]
+],
+"id": 223,
+"type": 1
+}
+],
+"category": 7,
+"dates": [
+"03/04/*"
+],
+"description": 1011730,
+"name": 324487,
+"objective": 6612,
+"quest": 1167,
+"saint": 1865
+},
+"228": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+2,
+32
+]
+],
+"id": 490,
+"type": 11
+}
+],
+"category": 7,
+"dates": [
+"04/04/*"
+],
+"description": 1054798,
+"name": 1054797,
+"objective": 6616,
+"quest": 1168,
+"saint": 1866
+},
+"229": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+74
+]
+],
+"id": 346,
+"type": 7
+}
+],
+"category": 7,
+"dates": [
+"05/04/*"
+],
+"description": 1054390,
+"name": 1054392,
+"objective": 6620,
+"quest": 1169,
+"saint": 1867
+},
+"23": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+9,
+16663
+],
+[
+9,
+17123
+],
+[
+9,
+17124
+],
+[
+9,
+17125
+],
+[
+9,
+17126
+],
+[
+9,
+17127
+],
+[
+9,
+17128
+],
+[
+9,
+17129
+],
+[
+9,
+17130
+],
+[
+9,
+17131
+],
+[
+9,
+17132
+],
+[
+9,
+17133
+],
+[
+9,
+17134
+],
+[
+9,
+17135
+],
+[
+9,
+17136
+],
+[
+9,
+17137
+],
+[
+9,
+17138
+],
+[
+9,
+17139
+],
+[
+9,
+17140
+],
+[
+9,
+17141
+],
+[
+9,
+17142
+],
+[
+9,
+17143
+],
+[
+9,
+17144
+],
+[
+9,
+17145
+],
+[
+9,
+17146
+],
+[
+9,
+17147
+],
+[
+9,
+17148
+],
+[
+9,
+17149
+],
+[
+9,
+17150
+],
+[
+9,
+17151
+],
+[
+9,
+17152
+],
+[
+9,
+17153
+],
+[
+9,
+17154
+],
+[
+9,
+17155
+],
+[
+9,
+17156
+],
+[
+9,
+17157
+],
+[
+9,
+17158
+],
+[
+9,
+17159
+],
+[
+9,
+17160
+],
+[
+9,
+17161
+]
+],
+"id": 126,
+"type": 26
+}
+],
+"category": 13,
+"dates": [
+"08/10/*"
+],
+"description": 324370,
+"name": 324369,
+"objective": 5799,
+"quest": 962,
+"saint": 1633
+},
+"230": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+522
+]
+],
+"id": 226,
+"type": 16
+}
+],
+"category": 7,
+"dates": [
+"06/04/*"
+],
+"description": 1011732,
+"name": 324857,
+"objective": 6624,
+"quest": 1170,
+"saint": 1868
+},
+"231": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+53
+]
+],
+"id": 227,
+"type": 7
+}
+],
+"category": 7,
+"dates": [
+"07/04/*"
+],
+"description": 324854,
+"name": 324853,
+"objective": 6628,
+"quest": 1171,
+"saint": 1869
+},
+"232": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+93
+]
+],
+"id": 42,
+"type": 1
+}
+],
+"category": 7,
+"dates": [
+"08/04/*"
+],
+"description": 1054823,
+"name": 324877,
+"objective": 6632,
+"quest": 1172,
+"saint": 1870
+},
+"233": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+800
+]
+],
+"id": 95,
+"type": 17
+}
+],
+"category": 7,
+"dates": [
+"09/04/*"
+],
+"description": 1054912,
+"name": 324873,
+"objective": 6636,
+"quest": 1173,
+"saint": 1871
+},
+"234": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+16,
+1
+]
+],
+"id": 534,
+"type": 36
+}
+],
+"category": 7,
+"dates": [
+"10/04/*"
+],
+"description": 1174827,
+"name": 1174826,
+"objective": 6640,
+"quest": 1174,
+"saint": 1872
+},
+"235": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+2,
+56
+]
+],
+"id": 407,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+56
+]
+],
+"id": 427,
+"type": 16
+},
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 445,
+"type": 1
+}
+],
+"category": 7,
+"dates": [
+"11/04/*"
+],
+"description": 1054393,
+"name": 1054398,
+"objective": 6644,
+"quest": 1175,
+"saint": 1873
+},
+"236": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+230
+],
+[
+3,
+2374
+],
+[
+3,
+2471
+],
+[
+3,
+2469
+],
+[
+3,
+2370
+]
+],
+"id": 232,
+"type": 16
+}
+],
+"category": 7,
+"dates": [
+"12/04/*"
+],
+"description": 1113268,
+"name": 324887,
+"objective": 6648,
+"quest": 1176,
+"saint": 1874
+},
+"237": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+34
+],
+[
+10,
+174
+]
+],
+"id": 233,
+"type": 7
+}
+],
+"category": 7,
+"dates": [
+"13/04/*"
+],
+"description": 1068519,
+"name": 324885,
+"objective": 6652,
+"quest": 1177,
+"saint": 1875
+},
+"238": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+755
+]
+],
+"id": 241,
+"type": 16
+}
+],
+"category": 7,
+"dates": [
+"14/04/*"
+],
+"description": 1054947,
+"name": 1054946,
+"objective": 6656,
+"quest": 1178,
+"saint": 1876
+},
+"239": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+5,
+65
+]
+],
+"id": 235,
+"type": 19
+}
+],
+"category": 7,
+"dates": [
+"15/04/*"
+],
+"description": 324882,
+"name": 324881,
+"objective": 6660,
+"quest": 1179,
+"saint": 1877
+},
+"24": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+4,
+229
+],
+[
+3,
+2303
+],
+[
+3,
+2597
+],
+[
+3,
+2278
+],
+[
+3,
+2526
+]
+],
+"id": 43,
+"type": 5
+}
+],
+"category": 13,
+"dates": [
+"09/10/*"
+],
+"description": 1113244,
+"name": 324375,
+"objective": 5803,
+"quest": 963,
+"saint": 1647
+},
+"240": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+128
+],
+[
+10,
+129
+]
+],
+"id": 491,
+"type": 7
+}
+],
+"category": 7,
+"dates": [
+"16/04/*"
+],
+"description": 1054949,
+"name": 1054948,
+"objective": 6664,
+"quest": 1180,
+"saint": 1878
+},
+"241": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+12
+]
+],
+"id": 237,
+"type": 16
+}
+],
+"category": 7,
+"dates": [
+"17/04/*"
+],
+"description": 1011738,
+"name": 324913,
+"objective": 6668,
+"quest": 1181,
+"saint": 1879
+},
+"242": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+792
+]
+],
+"id": 174,
+"type": 1
+}
+],
+"category": 7,
+"dates": [
+"18/04/*"
+],
+"description": 1054955,
+"name": 1054954,
+"objective": 6672,
+"quest": 1182,
+"saint": 1880
+},
+"243": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+30
+]
+],
+"id": 239,
+"type": 7
+}
+],
+"category": 7,
+"dates": [
+"19/04/*"
+],
+"description": 1078598,
+"name": 324917,
+"objective": 6676,
+"quest": 1183,
+"saint": 1881
+},
+"244": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+228
+],
+[
+3,
+2392
+],
+[
+3,
+2415
+],
+[
+3,
+2548
+],
+[
+3,
+2593
+]
+],
+"id": 257,
+"type": 17
+}
+],
+"category": 7,
+"dates": [
+"20/04/*"
+],
+"description": 1113210,
+"name": 1054959,
+"objective": 6680,
+"quest": 1184,
+"saint": 1882
+},
+"245": {
+"bonuses": [],
+"category": 7,
+"dates": [
+"21/04/*"
+],
+"description": 1162543,
+"name": 1162542,
+"objective": 6684,
+"quest": 1185,
+"saint": 1883
+},
+"246": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+152
+]
+],
+"id": 218,
+"type": 16
+}
+],
+"category": 7,
+"dates": [
+"22/04/*"
+],
+"description": 1113211,
+"name": 1054963,
+"objective": 6688,
+"quest": 1186,
+"saint": 1884
+},
+"247": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+73
+],
+[
+3,
+2363
+],
+[
+3,
+2575
+],
+[
+3,
+2614
+],
+[
+3,
+2361
+]
+],
+"id": 243,
+"type": 1
+}
+],
+"category": 7,
+"dates": [
+"23/04/*"
+],
+"description": 1113212,
+"name": 324925,
+"objective": 6692,
+"quest": 1187,
+"saint": 1885
+},
+"248": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+2
+]
+],
+"id": 156,
+"type": 5
+}
+],
+"category": 7,
+"dates": [
+"24/04/*"
+],
+"description": 1054966,
+"name": 1054965,
+"objective": 6696,
+"quest": 1188,
+"saint": 1886
+},
+"249": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17138
+],
+[
+9,
+17139
+],
+[
+9,
+17140
+],
+[
+9,
+17141
+]
+],
+"id": 245,
+"type": 26
+}
+],
+"category": 7,
+"dates": [
+"25/04/*"
+],
+"description": 1068770,
+"name": 324929,
+"objective": 6700,
+"quest": 1189,
+"saint": 1887
+},
+"25": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+17,
+3
+]
+],
+"id": 540,
+"type": 37
+}
+],
+"category": 13,
+"dates": [
+"10/10/*"
+],
+"description": 1174870,
+"name": 1174869,
+"objective": 5819,
+"quest": 967,
+"saint": 1648
+},
+"250": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [],
+"id": 246,
+"type": 15
+}
+],
+"category": 7,
+"dates": [
+"26/04/*"
+],
+"description": 324702,
+"name": 324701,
+"objective": 6704,
+"quest": 1190,
+"saint": 1888
+},
+"251": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+162
+],
+[
+3,
+2359
+],
+[
+3,
+2445
+],
+[
+3,
+2455
+],
+[
+3,
+2503
+]
+],
+"id": 357,
+"type": 17
+}
+],
+"category": 7,
+"dates": [
+"27/04/*"
+],
+"description": 1113216,
+"name": 1054967,
+"objective": 6708,
+"quest": 1191,
+"saint": 1889
+},
+"252": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+24
+]
+],
+"id": 287,
+"type": 7
+}
+],
+"category": 7,
+"dates": [
+"28/04/*"
+],
+"description": 1054395,
+"name": 1054394,
+"objective": 6712,
+"quest": 1192,
+"saint": 1890
+},
+"253": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+46
+],
+[
+3,
+2355
+],
+[
+4,
+267
+]
+],
+"id": 347,
+"type": 16
+}
+],
+"category": 7,
+"dates": [
+"29/04/*"
+],
+"description": 1113217,
+"name": 324689,
+"objective": 6716,
+"quest": 1193,
+"saint": 1891
+},
+"254": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+26
+]
+],
+"id": 250,
+"type": 7
+}
+],
+"category": 7,
+"dates": [
+"30/04/*"
+],
+"description": 324744,
+"name": 324743,
+"objective": 6720,
+"quest": 1194,
+"saint": 1892
+},
+"256": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [],
+"id": 2,
+"type": 2
+},
+{
+"amount": 25,
+"criteria": [
+[
+10,
+151
+]
+],
+"id": 253,
+"type": 19
+},
+{
+"amount": 15,
+"criteria": [
+[
+10,
+151
+]
+],
+"id": 254,
+"type": 10
+}
+],
+"category": 8,
+"dates": [
+"01/05/*"
+],
+"description": 1076524,
+"name": 324733,
+"objective": 6775,
+"quest": 1203,
+"saint": 1923
+},
+"257": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+494
+]
+],
+"id": 255,
+"type": 1
+}
+],
+"category": 8,
+"dates": [
+"02/05/*"
+],
+"description": 1055750,
+"name": 324727,
+"objective": 6779,
+"quest": 1204,
+"saint": 1924
+},
+"258": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 446,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+523
+]
+],
+"id": 408,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+523
+]
+],
+"id": 426,
+"type": 16
+}
+],
+"category": 8,
+"dates": [
+"03/05/*"
+],
+"description": 1055752,
+"name": 1055751,
+"objective": 6783,
+"quest": 1205,
+"saint": 1925
+},
+"259": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+6
+],
+[
+3,
+2430
+],
+[
+3,
+2494
+]
+],
+"id": 249,
+"type": 16
+}
+],
+"category": 8,
+"dates": [
+"04/05/*"
+],
+"description": 1113218,
+"name": 1055753,
+"objective": 6787,
+"quest": 1206,
+"saint": 1926
+},
+"26": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+57
+]
+],
+"id": 170,
+"type": 16
+}
+],
+"category": 13,
+"dates": [
+"11/10/*"
+],
+"description": 1056046,
+"name": 324385,
+"objective": 6019,
+"quest": 1017,
+"saint": 1649
+},
+"260": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+70
+]
+],
+"id": 200,
+"type": 5
+}
+],
+"category": 8,
+"dates": [
+"05/05/*"
+],
+"description": 1055755,
+"name": 324789,
+"objective": 6791,
+"quest": 1207,
+"saint": 1927
+},
+"261": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+139
+],
+[
+10,
+37
+]
+],
+"id": 258,
+"type": 7
+}
+],
+"category": 8,
+"dates": [
+"06/05/*"
+],
+"description": 1066094,
+"name": 324773,
+"objective": 6795,
+"quest": 1208,
+"saint": 1928
+},
+"262": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+898
+],
+[
+2,
+899
+]
+],
+"id": 177,
+"type": 17
+}
+],
+"category": 8,
+"dates": [
+"07/05/*"
+],
+"description": 1055758,
+"name": 1055757,
+"objective": 6799,
+"quest": 1209,
+"saint": 1929
+},
+"263": {
+"bonuses": [],
+"category": 8,
+"dates": [
+"08/05/*"
+],
+"description": 483663,
+"name": 324781,
+"objective": 6803,
+"quest": 1210,
+"saint": 1930
+},
+"264": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+253
+]
+],
+"id": 260,
+"type": 16
+}
+],
+"category": 8,
+"dates": [
+"09/05/*"
+],
+"description": 1011747,
+"name": 324777,
+"objective": 6807,
+"quest": 1211,
+"saint": 1931
+},
+"265": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+79
+]
+],
+"id": 543,
+"type": 10
+}
+],
+"category": 8,
+"dates": [
+"10/05/*"
+],
+"description": 1174830,
+"name": 1174829,
+"objective": 6811,
+"quest": 1212,
+"saint": 1932
+},
+"266": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+5,
+44
+],
+[
+5,
+48
+]
+],
+"id": 531,
+"type": 2
+}
+],
+"category": 8,
+"dates": [
+"11/05/*"
+],
+"description": 1135503,
+"name": 1135502,
+"objective": 6815,
+"quest": 1213,
+"saint": 1933
+},
+"267": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+58
+]
+],
+"id": 263,
+"type": 7
+}
+],
+"category": 8,
+"dates": [
+"12/05/*"
+],
+"description": 324824,
+"name": 324823,
+"objective": 6819,
+"quest": 1214,
+"saint": 1934
+},
+"268": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+254
+]
+],
+"id": 264,
+"type": 17
+}
+],
+"category": 8,
+"dates": [
+"13/05/*"
+],
+"description": 1011749,
+"name": 324819,
+"objective": 6823,
+"quest": 1215,
+"saint": 1935
+},
+"269": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+2,
+10
+],
+[
+2,
+4
+]
+],
+"id": 317,
+"type": 11
+}
+],
+"category": 8,
+"dates": [
+"14/05/*"
+],
+"description": 1055768,
+"name": 324797,
+"objective": 6827,
+"quest": 1216,
+"saint": 1936
+},
+"27": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+1,
+53
+],
+[
+1,
+54
+],
+[
+1,
+55
+],
+[
+1,
+59
+],
+[
+1,
+60
+],
+[
+1,
+96
+]
+],
+"id": 163,
+"type": 1
+},
+{
+"amount": 50,
+"criteria": [
+[
+1,
+53
+],
+[
+1,
+54
+],
+[
+1,
+55
+],
+[
+1,
+59
+],
+[
+1,
+60
+],
+[
+1,
+96
+]
+],
+"id": 181,
+"type": 16
+}
+],
+"category": 13,
+"dates": [
+"12/10/*"
+],
+"description": 1056048,
+"name": 1056047,
+"objective": 6023,
+"quest": 1018,
+"saint": 1650
+},
+"270": {
+"bonuses": [],
+"category": 8,
+"dates": [
+"15/05/*"
+],
+"description": 325020,
+"name": 325019,
+"objective": 6831,
+"quest": 1217,
+"saint": 1937
+},
+"271": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+26
+]
+],
+"id": 266,
+"type": 8
+}
+],
+"category": 8,
+"dates": [
+"16/05/*"
+],
+"description": 1055779,
+"name": 325021,
+"objective": 6835,
+"quest": 1218,
+"saint": 1938
+},
+"272": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+73
+],
+[
+3,
+2361
+],
+[
+3,
+2363
+],
+[
+3,
+2575
+],
+[
+3,
+2614
+]
+],
+"id": 252,
+"type": 16
+}
+],
+"category": 8,
+"dates": [
+"17/05/*"
+],
+"description": 1113219,
+"name": 325027,
+"objective": 6839,
+"quest": 1219,
+"saint": 1939
+},
+"273": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 453,
+"type": 6
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+942
+]
+],
+"id": 429,
+"type": 16
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+942
+]
+],
+"id": 409,
+"type": 1
+}
+],
+"category": 8,
+"dates": [
+"18/05/*"
+],
+"description": 1055782,
+"name": 1055781,
+"objective": 6843,
+"quest": 1220,
+"saint": 1940
+},
+"274": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+55
+],
+[
+10,
+162
+]
+],
+"id": 269,
+"type": 7
+}
+],
+"category": 8,
+"dates": [
+"19/05/*"
+],
+"description": 1055788,
+"name": 325023,
+"objective": 6847,
+"quest": 1221,
+"saint": 1941
+},
+"275": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+60
+]
+],
+"id": 224,
+"type": 10
+}
+],
+"category": 8,
+"dates": [
+"20/05/*"
+],
+"description": 1055790,
+"name": 1055789,
+"objective": 6851,
+"quest": 1222,
+"saint": 1942
+},
+"276": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+5,
+15
+],
+[
+5,
+16
+],
+[
+5,
+27
+]
+],
+"id": 206,
+"type": 2
+}
+],
+"category": 8,
+"dates": [
+"21/05/*"
+],
+"description": 1055792,
+"name": 1055791,
+"objective": 6855,
+"quest": 1223,
+"saint": 1943
+},
+"277": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [],
+"id": 46,
+"type": 14
+}
+],
+"category": 8,
+"dates": [
+"22/05/*"
+],
+"description": 1055794,
+"name": 1055793,
+"objective": 6859,
+"quest": 1224,
+"saint": 1944
+},
+"278": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+317
+],
+[
+10,
+321
+],
+[
+10,
+323
+]
+],
+"id": 144,
+"type": 7
+}
+],
+"category": 8,
+"dates": [
+"23/05/*"
+],
+"description": 1055795,
+"name": 325011,
+"objective": 6863,
+"quest": 1225,
+"saint": 1945
+},
+"279": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+68
+]
+],
+"id": 182,
+"type": 8
+}
+],
+"category": 8,
+"dates": [
+"24/05/*"
+],
+"description": 1055797,
+"name": 1055796,
+"objective": 6867,
+"quest": 1226,
+"saint": 1946
+},
+"28": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+224
+],
+[
+3,
+2510
+],
+[
+3,
+2590
+],
+[
+3,
+2591
+],
+[
+3,
+2592
+]
+],
+"id": 289,
+"type": 1
+}
+],
+"category": 13,
+"dates": [
+"13/10/*"
+],
+"description": 1113271,
+"name": 1056049,
+"objective": 5983,
+"quest": 1008,
+"saint": 1651
+},
+"280": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+454
+]
+],
+"id": 56,
+"type": 1
+}
+],
+"category": 8,
+"dates": [
+"25/05/*"
+],
+"description": 1055798,
+"name": 325057,
+"objective": 6871,
+"quest": 1227,
+"saint": 1947
+},
+"281": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+319
+]
+],
+"id": 272,
+"type": 5
+}
+],
+"category": 8,
+"dates": [
+"26/05/*"
+],
+"description": 1055800,
+"name": 1055799,
+"objective": 6875,
+"quest": 1228,
+"saint": 1948
+},
+"282": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+5,
+36
+]
+],
+"id": 162,
+"type": 19
+}
+],
+"category": 8,
+"dates": [
+"27/05/*"
+],
+"description": 1055807,
+"name": 325061,
+"objective": 6879,
+"quest": 1229,
+"saint": 1949
+},
+"283": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17136
+],
+[
+9,
+17137
+]
+],
+"id": 278,
+"type": 26
+}
+],
+"category": 8,
+"dates": [
+"28/05/*"
+],
+"description": 560022,
+"name": 325063,
+"objective": 6883,
+"quest": 1230,
+"saint": 1950
+},
+"284": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+59
+],
+[
+2,
+61
+]
+],
+"id": 114,
+"type": 1
+}
+],
+"category": 8,
+"dates": [
+"29/05/*"
+],
+"description": 1055818,
+"name": 1055817,
+"objective": 6887,
+"quest": 1231,
+"saint": 1951
+},
+"285": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+44
+]
+],
+"id": 493,
+"type": 31
+}
+],
+"category": 8,
+"dates": [
+"30/05/*"
+],
+"description": 1055835,
+"name": 1055834,
+"objective": 6891,
+"quest": 1232,
+"saint": 1952
+},
+"286": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+623
+]
+],
+"id": 208,
+"type": 16
+}
+],
+"category": 8,
+"dates": [
+"31/05/*"
+],
+"description": 1055842,
+"name": 325069,
+"objective": 6895,
+"quest": 1233,
+"saint": 1953
+},
+"287": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [],
+"id": 128,
+"type": 8
+}
+],
+"category": 3,
+"dates": [
+"09/05/2013",
+"29/05/2014",
+"14/05/2015",
+"05/05/2016",
+"25/05/2017",
+"10/05/2018",
+"29/05/2025",
+"09/05/2024",
+"18/05/2023",
+"26/05/2022",
+"13/05/2021",
+"21/05/2020",
+"30/05/2019",
+"14/05/2026",
+"06/05/2027",
+"25/05/2028",
+"10/05/2029",
+"30/05/2030",
+"22/05/2031",
+"06/05/2032",
+"26/05/2033",
+"18/05/2034",
+"03/05/2035"
+],
+"description": 1113281,
+"name": 1055855,
+"objective": 6899,
+"quest": 1234,
+"saint": 1954
+},
+"288": {
+"bonuses": [],
+"category": 3,
+"dates": [
+"20/05/2013",
+"09/06/2014",
+"25/05/2015",
+"16/05/2016",
+"05/06/2017",
+"21/05/2018",
+"09/06/2025",
+"20/05/2024",
+"29/05/2023",
+"06/06/2022",
+"24/05/2021",
+"01/06/2020",
+"10/06/2019",
+"25/05/2026",
+"17/05/2027",
+"05/06/2028",
+"21/05/2029",
+"10/06/2030",
+"02/06/2031",
+"17/05/2032",
+"06/06/2033",
+"29/05/2034",
+"14/05/2035"
+],
+"description": 483664,
+"name": 325053,
+"objective": 6903,
+"quest": 1235,
+"saint": 1955
+},
+"289": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+4,
+181
+],
+[
+3,
+2327
+],
+[
+3,
+2351
+],
+[
+3,
+2431
+],
+[
+3,
+2457
+]
+],
+"id": 283,
+"type": 5
+}
+],
+"category": 9,
+"dates": [
+"01/06/*"
+],
+"description": 1113220,
+"name": 325055,
+"objective": 6907,
+"quest": 1236,
+"saint": 1956
+},
+"29": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+814
+]
+],
+"id": 276,
+"type": 17
+}
+],
+"category": 13,
+"dates": [
+"14/10/*"
+],
+"description": 1056051,
+"name": 324351,
+"objective": 5807,
+"quest": 964,
+"saint": 1652
+},
+"290": {
+"bonuses": [],
+"category": 9,
+"dates": [
+"02/06/*"
+],
+"description": 1077474,
+"name": 1077473,
+"objective": 6911,
+"quest": 1237,
+"saint": 1957
+},
+"291": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+2,
+702
+],
+[
+2,
+297
+],
+[
+2,
+516
+],
+[
+2,
+201
+],
+[
+2,
+842
+],
+[
+2,
+1018
+],
+[
+2,
+284
+],
+[
+2,
+528
+],
+[
+2,
+460
+],
+[
+2,
+755
+],
+[
+2,
+491
+],
+[
+2,
+1022
+],
+[
+2,
+493
+],
+[
+2,
+700
+],
+[
+2,
+77
+],
+[
+2,
+537
+],
+[
+2,
+243
+],
+[
+2,
+474
+],
+[
+2,
+756
+],
+[
+2,
+920
+]
+],
+"id": 447,
+"type": 6
+}
+],
+"category": 9,
+"dates": [
+"03/06/*"
+],
+"description": 1055362,
+"name": 1055361,
+"objective": 6915,
+"quest": 1238,
+"saint": 1958
+},
+"292": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [],
+"id": 127,
+"type": 18
+},
+{
+"amount": 400,
+"criteria": [],
+"id": 282,
+"type": 9
+}
+],
+"category": 9,
+"dates": [
+"04/06/*"
+],
+"description": 1113282,
+"name": 1055373,
+"objective": 6919,
+"quest": 1239,
+"saint": 1959
+},
+"293": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+131
+]
+],
+"id": 97,
+"type": 1
+}
+],
+"category": 9,
+"dates": [
+"05/06/*"
+],
+"description": 1113221,
+"name": 1055389,
+"objective": 6923,
+"quest": 1240,
+"saint": 1960
+},
+"294": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+794
+]
+],
+"id": 274,
+"type": 16
+}
+],
+"category": 9,
+"dates": [
+"06/06/*"
+],
+"description": 1055391,
+"name": 1055392,
+"objective": 6927,
+"quest": 1241,
+"saint": 1961
+},
+"295": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+87
+]
+],
+"id": 130,
+"type": 1
+}
+],
+"category": 9,
+"dates": [
+"07/06/*"
+],
+"description": 1113222,
+"name": 324957,
+"objective": 6931,
+"quest": 1242,
+"saint": 1962
+},
+"296": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 446,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+526
+]
+],
+"id": 410,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+526
+]
+],
+"id": 428,
+"type": 16
+}
+],
+"category": 9,
+"dates": [
+"08/06/*"
+],
+"description": 1173728,
+"name": 1055394,
+"objective": 6935,
+"quest": 1243,
+"saint": 1963
+},
+"297": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+73
+]
+],
+"id": 291,
+"type": 7
+}
+],
+"category": 9,
+"dates": [
+"09/06/*"
+],
+"description": 1055396,
+"name": 324951,
+"objective": 6939,
+"quest": 1244,
+"saint": 1964
+},
+"298": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+16,
+6
+]
+],
+"id": 535,
+"type": 36
+}
+],
+"category": 9,
+"dates": [
+"10/06/*"
+],
+"description": 1174852,
+"name": 1174851,
+"objective": 6943,
+"quest": 1245,
+"saint": 1965
+},
+"299": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+884
+]
+],
+"id": 309,
+"type": 16
+}
+],
+"category": 9,
+"dates": [
+"11/06/*"
+],
+"description": 1055416,
+"name": 324947,
+"objective": 6947,
+"quest": 1246,
+"saint": 1966
+},
+"3": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+516
+]
+],
+"id": 376,
+"type": 1
+}
+],
+"category": 12,
+"dates": [
+"18/09/*"
+],
+"description": 1056016,
+"name": 1056015,
+"objective": 5823,
+"quest": 968,
+"saint": 1646
+},
+"30": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+54
+]
+],
+"id": 62,
+"type": 7
+}
+],
+"category": 13,
+"dates": [
+"15/10/*"
+],
+"description": 1076498,
+"name": 1076502,
+"objective": 6027,
+"quest": 1019,
+"saint": 1653
+},
+"300": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+807
+]
+],
+"id": 285,
+"type": 17
+}
+],
+"category": 9,
+"dates": [
+"12/06/*"
+],
+"description": 1055575,
+"name": 1055574,
+"objective": 6951,
+"quest": 1247,
+"saint": 1967
+},
+"301": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+154
+]
+],
+"id": 494,
+"type": 7
+}
+],
+"category": 9,
+"dates": [
+"13/06/*"
+],
+"description": 1055580,
+"name": 1055579,
+"objective": 6955,
+"quest": 1248,
+"saint": 1968
+},
+"302": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+65
+]
+],
+"id": 296,
+"type": 10
+}
+],
+"category": 9,
+"dates": [
+"14/06/*"
+],
+"description": 1055588,
+"name": 324371,
+"objective": 6959,
+"quest": 1249,
+"saint": 1969
+},
+"303": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+460
+]
+],
+"id": 332,
+"type": 1
+}
+],
+"category": 9,
+"dates": [
+"15/06/*"
+],
+"description": 1055613,
+"name": 1055612,
+"objective": 6963,
+"quest": 1250,
+"saint": 1970
+},
+"304": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+23
+]
+],
+"id": 298,
+"type": 5
+}
+],
+"category": 9,
+"dates": [
+"16/06/*"
+],
+"description": 1055616,
+"name": 324359,
+"objective": 6967,
+"quest": 1251,
+"saint": 1971
+},
+"305": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+22
+],
+[
+3,
+2299
+],
+[
+3,
+2309
+],
+[
+3,
+2385
+]
+],
+"id": 387,
+"type": 17
+}
+],
+"category": 9,
+"dates": [
+"17/06/*"
+],
+"description": 1113223,
+"name": 1055743,
+"objective": 6971,
+"quest": 1252,
+"saint": 1972
+},
+"306": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+410
+]
+],
+"id": 495,
+"type": 7
+}
+],
+"category": 9,
+"dates": [
+"18/06/*"
+],
+"description": 1055746,
+"name": 1055745,
+"objective": 6975,
+"quest": 1253,
+"saint": 1973
+},
+"307": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+943
+]
+],
+"id": 54,
+"type": 16
+}
+],
+"category": 9,
+"dates": [
+"19/06/*"
+],
+"description": 1055748,
+"name": 1055747,
+"objective": 6979,
+"quest": 1254,
+"saint": 1974
+},
+"308": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+45
+]
+],
+"id": 302,
+"type": 7
+}
+],
+"category": 9,
+"dates": [
+"20/06/*"
+],
+"description": 324480,
+"name": 324479,
+"objective": 6983,
+"quest": 1255,
+"saint": 1975
+},
+"309": {
+"bonuses": [],
+"category": 9,
+"dates": [
+"21/06/*"
+],
+"description": 1056172,
+"name": 1055886,
+"objective": 6987,
+"quest": 1256,
+"saint": 1976
+},
+"31": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+223
+]
+],
+"id": 180,
+"type": 1
+}
+],
+"category": 13,
+"dates": [
+"16/10/*"
+],
+"description": 1056054,
+"name": 1056053,
+"objective": 6031,
+"quest": 1020,
+"saint": 1654
+},
+"310": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+453
+]
+],
+"id": 313,
+"type": 5
+}
+],
+"category": 9,
+"dates": [
+"22/06/*"
+],
+"description": 1055889,
+"name": 1055888,
+"objective": 6991,
+"quest": 1257,
+"saint": 1977
+},
+"311": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+236
+]
+],
+"id": 145,
+"type": 1
+}
+],
+"category": 9,
+"dates": [
+"23/06/*"
+],
+"description": 1113224,
+"name": 1055944,
+"objective": 6995,
+"quest": 1258,
+"saint": 1978
+},
+"312": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+24
+],
+[
+3,
+2286
+],
+[
+3,
+2446
+],
+[
+3,
+2447
+],
+[
+3,
+2448
+]
+],
+"id": 256,
+"type": 16
+}
+],
+"category": 9,
+"dates": [
+"24/06/*"
+],
+"description": 1113225,
+"name": 1055965,
+"objective": 6999,
+"quest": 1259,
+"saint": 1979
+},
+"313": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+1034
+]
+],
+"id": 307,
+"type": 8
+}
+],
+"category": 9,
+"dates": [
+"25/06/*"
+],
+"description": 1055994,
+"name": 324457,
+"objective": 7003,
+"quest": 1260,
+"saint": 1980
+},
+"314": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+1,
+78
+]
+],
+"id": 496,
+"type": 11
+}
+],
+"category": 9,
+"dates": [
+"26/06/*"
+],
+"description": 1055996,
+"name": 1055995,
+"objective": 7007,
+"quest": 1261,
+"saint": 1981
+},
+"315": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+871
+]
+],
+"id": 377,
+"type": 16
+}
+],
+"category": 9,
+"dates": [
+"27/06/*"
+],
+"description": 1055997,
+"name": 324465,
+"objective": 7011,
+"quest": 1262,
+"saint": 1982
+},
+"316": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 446,
+"type": 17
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+881
+]
+],
+"id": 411,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+881
+]
+],
+"id": 430,
+"type": 16
+}
+],
+"category": 9,
+"dates": [
+"28/06/*"
+],
+"description": 1056095,
+"name": 1056094,
+"objective": 7015,
+"quest": 1263,
+"saint": 1983
+},
+"317": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17156
+],
+[
+9,
+17157
+],
+[
+9,
+17158
+],
+[
+9,
+17159
+]
+],
+"id": 124,
+"type": 26
+}
+],
+"category": 9,
+"dates": [
+"29/06/*"
+],
+"description": 1070842,
+"name": 324545,
+"objective": 7019,
+"quest": 1264,
+"saint": 1984
+},
+"318": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+1018
+]
+],
+"id": 225,
+"type": 1
+}
+],
+"category": 9,
+"dates": [
+"30/06/*"
+],
+"description": 1055336,
+"name": 324543,
+"objective": 7023,
+"quest": 1265,
+"saint": 1985
+},
+"319": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+201
+],
+[
+3,
+2454
+],
+[
+3,
+2456
+],
+[
+3,
+2458
+],
+[
+3,
+2460
+]
+],
+"id": 288,
+"type": 16
+}
+],
+"category": 10,
+"dates": [
+"01/07/*"
+],
+"description": 1113226,
+"name": 324541,
+"objective": 7587,
+"quest": 1358,
+"saint": 2072
+},
+"32": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+41
+],
+[
+10,
+306
+]
+],
+"id": 297,
+"type": 7
+}
+],
+"category": 13,
+"dates": [
+"17/10/*"
+],
+"description": 1080904,
+"name": 1056055,
+"objective": 6035,
+"quest": 1021,
+"saint": 1655
+},
+"320": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+780
+]
+],
+"id": 318,
+"type": 17
+}
+],
+"category": 10,
+"dates": [
+"02/07/*"
+],
+"description": 1055862,
+"name": 1055861,
+"objective": 7591,
+"quest": 1359,
+"saint": 2073
+},
+"321": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+26
+]
+],
+"id": 316,
+"type": 10
+}
+],
+"category": 10,
+"dates": [
+"03/07/*"
+],
+"description": 1055863,
+"name": 324521,
+"objective": 7595,
+"quest": 1360,
+"saint": 2074
+},
+"322": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [],
+"id": 497,
+"type": 34
+},
+{
+"amount": 50,
+"criteria": [
+[
+1,
+0
+]
+],
+"id": 73,
+"type": 1
+},
+{
+"amount": 50,
+"criteria": [
+[
+1,
+0
+]
+],
+"id": 75,
+"type": 16
+}
+],
+"category": 10,
+"dates": [
+"04/07/*"
+],
+"description": 1179801,
+"name": 1055864,
+"objective": 7583,
+"quest": 1357,
+"saint": 2075
+},
+"323": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+948
+]
+],
+"id": 342,
+"type": 16
+}
+],
+"category": 10,
+"dates": [
+"05/07/*"
+],
+"description": 1055867,
+"name": 1055866,
+"objective": 7599,
+"quest": 1361,
+"saint": 2076
+},
+"324": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+124
+],
+[
+10,
+125
+]
+],
+"id": 498,
+"type": 7
+}
+],
+"category": 10,
+"dates": [
+"06/07/*"
+],
+"description": 1055868,
+"name": 324533,
+"objective": 7603,
+"quest": 1362,
+"saint": 2077
+},
+"325": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+307
+],
+[
+10,
+308
+]
+],
+"id": 499,
+"type": 7
+}
+],
+"category": 10,
+"dates": [
+"07/07/*"
+],
+"description": 1055870,
+"name": 1055869,
+"objective": 7607,
+"quest": 1363,
+"saint": 2078
+},
+"326": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+41
+],
+[
+3,
+2408
+],
+[
+3,
+2419
+],
+[
+3,
+2538
+]
+],
+"id": 228,
+"type": 1
+}
+],
+"category": 10,
+"dates": [
+"08/07/*"
+],
+"description": 1113227,
+"name": 324525,
+"objective": 7611,
+"quest": 1364,
+"saint": 2079
+},
+"327": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+62
+]
+],
+"id": 500,
+"type": 31
+}
+],
+"category": 10,
+"dates": [
+"09/07/*"
+],
+"description": 1055880,
+"name": 1055879,
+"objective": 7615,
+"quest": 1365,
+"saint": 2080
+},
+"328": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+17,
+5
+]
+],
+"id": 539,
+"type": 37
+}
+],
+"category": 10,
+"dates": [
+"10/07/*"
+],
+"description": 1174861,
+"name": 1174860,
+"objective": 7619,
+"quest": 1366,
+"saint": 2081
+},
+"329": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+31
+]
+],
+"id": 324,
+"type": 7
+}
+],
+"category": 10,
+"dates": [
+"11/07/*"
+],
+"description": 1055902,
+"name": 324589,
+"objective": 7623,
+"quest": 1367,
+"saint": 2082
+},
+"33": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+230
+],
+[
+3,
+2469
+],
+[
+3,
+2374
+],
+[
+3,
+2471
+],
+[
+3,
+2370
+]
+],
+"id": 290,
+"type": 17
+}
+],
+"category": 13,
+"dates": [
+"18/10/*"
+],
+"description": 1113272,
+"name": 1056057,
+"objective": 5887,
+"quest": 984,
+"saint": 1656
+},
+"330": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+4,
+184
+]
+],
+"id": 143,
+"type": 5
+}
+],
+"category": 10,
+"dates": [
+"12/07/*"
+],
+"description": 1113228,
+"name": 1055903,
+"objective": 7627,
+"quest": 1368,
+"saint": 2083
+},
+"331": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+947
+]
+],
+"id": 164,
+"type": 16
+}
+],
+"category": 10,
+"dates": [
+"13/07/*"
+],
+"description": 1055906,
+"name": 1055905,
+"objective": 7631,
+"quest": 1369,
+"saint": 2084
+},
+"332": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [],
+"id": 327,
+"type": 28
+}
+],
+"category": 10,
+"dates": [
+"14/07/*"
+],
+"description": 1011777,
+"name": 324583,
+"objective": 7635,
+"quest": 1370,
+"saint": 2085
+},
+"333": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17160
+],
+[
+9,
+17161
+]
+],
+"id": 311,
+"type": 26
+}
+],
+"category": 10,
+"dates": [
+"15/07/*"
+],
+"description": 1077036,
+"name": 324585,
+"objective": 7639,
+"quest": 1371,
+"saint": 2086
+},
+"334": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 449,
+"type": 16
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+764
+],
+[
+2,
+763
+],
+[
+2,
+766
+],
+[
+2,
+765
+]
+],
+"id": 390,
+"type": 16
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+764
+],
+[
+2,
+763
+],
+[
+2,
+766
+],
+[
+2,
+765
+]
+],
+"id": 365,
+"type": 1
+}
+],
+"category": 10,
+"dates": [
+"16/07/*"
+],
+"description": 1055910,
+"name": 1055909,
+"objective": 7643,
+"quest": 1372,
+"saint": 2087
+},
+"335": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+173
+]
+],
+"id": 330,
+"type": 1
+}
+],
+"category": 10,
+"dates": [
+"17/07/*"
+],
+"description": 1055912,
+"name": 1055911,
+"objective": 7647,
+"quest": 1373,
+"saint": 2088
+},
+"336": {
+"bonuses": [
+{
+"amount": 10,
+"criteria": [
+[
+10,
+181
+]
+],
+"id": 501,
+"type": 19
+}
+],
+"category": 10,
+"dates": [
+"18/07/*"
+],
+"description": 1076525,
+"name": 1055913,
+"objective": 7651,
+"quest": 1374,
+"saint": 2089
+},
+"337": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+870
+]
+],
+"id": 300,
+"type": 1
+}
+],
+"category": 10,
+"dates": [
+"19/07/*"
+],
+"description": 1055915,
+"name": 324573,
+"objective": 7655,
+"quest": 1375,
+"saint": 2090
+},
+"338": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+28
+]
+],
+"id": 333,
+"type": 8
+}
+],
+"category": 10,
+"dates": [
+"20/07/*"
+],
+"description": 324578,
+"name": 324577,
+"objective": 7659,
+"quest": 1376,
+"saint": 2091
+},
+"339": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+93
+]
+],
+"id": 329,
+"type": 16
+}
+],
+"category": 10,
+"dates": [
+"21/07/*"
+],
+"description": 1113230,
+"name": 324663,
+"objective": 7663,
+"quest": 1377,
+"saint": 2092
+},
+"34": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+36
+]
+],
+"id": 53,
+"type": 8
+}
+],
+"category": 13,
+"dates": [
+"19/10/*"
+],
+"description": 324332,
+"name": 324331,
+"objective": 5911,
+"quest": 990,
+"saint": 1657
+},
+"340": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+600
+],
+[
+2,
+601
+]
+],
+"id": 86,
+"type": 1
+}
+],
+"category": 10,
+"dates": [
+"22/07/*"
+],
+"description": 1055918,
+"name": 1055917,
+"objective": 7667,
+"quest": 1378,
+"saint": 2093
+},
+"341": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [],
+"id": 502,
+"type": 30
+}
+],
+"category": 10,
+"dates": [
+"23/07/*"
+],
+"description": 1076517,
+"name": 1055919,
+"objective": 7671,
+"quest": 1379,
+"saint": 2094
+},
+"342": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+35
+],
+[
+10,
+158
+]
+],
+"id": 337,
+"type": 7
+}
+],
+"category": 10,
+"dates": [
+"24/07/*"
+],
+"description": 1055921,
+"name": 324659,
+"objective": 7675,
+"quest": 1380,
+"saint": 2095
+},
+"343": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+71
+]
+],
+"id": 99,
+"type": 17
+}
+],
+"category": 10,
+"dates": [
+"25/07/*"
+],
+"description": 1055922,
+"name": 324661,
+"objective": 7679,
+"quest": 1381,
+"saint": 2096
+},
+"344": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+9
+],
+[
+2,
+1019
+]
+],
+"id": 369,
+"type": 5
+}
+],
+"category": 10,
+"dates": [
+"26/07/*"
+],
+"description": 1055924,
+"name": 1055923,
+"objective": 7683,
+"quest": 1382,
+"saint": 2097
+},
+"345": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17123
+],
+[
+9,
+17124
+],
+[
+9,
+17125
+]
+],
+"id": 149,
+"type": 26
+}
+],
+"category": 10,
+"dates": [
+"27/07/*"
+],
+"description": 1077037,
+"name": 1055925,
+"objective": 7687,
+"quest": 1383,
+"saint": 2098
+},
+"346": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+950
+]
+],
+"id": 196,
+"type": 1
+}
+],
+"category": 10,
+"dates": [
+"28/07/*"
+],
+"description": 1055928,
+"name": 1055927,
+"objective": 7691,
+"quest": 1384,
+"saint": 2099
+},
+"347": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+876
+]
+],
+"id": 14,
+"type": 16
+}
+],
+"category": 10,
+"dates": [
+"29/07/*"
+],
+"description": 1055929,
+"name": 324649,
+"objective": 7695,
+"quest": 1385,
+"saint": 2100
+},
+"348": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+702
+]
+],
+"id": 344,
+"type": 1
+},
+{
+"amount": 100,
+"criteria": [
+[
+2,
+702
+]
+],
+"id": 343,
+"type": 16
+}
+],
+"category": 10,
+"dates": [
+"30/07/*"
+],
+"description": 1055931,
+"name": 1055930,
+"objective": 7699,
+"quest": 1386,
+"saint": 2101
+},
+"349": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+171
+]
+],
+"id": 185,
+"type": 1
+}
+],
+"category": 10,
+"dates": [
+"31/07/*"
+],
+"description": 1113232,
+"name": 324641,
+"objective": 7703,
+"quest": 1387,
+"saint": 2102
+},
+"35": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+958
+],
+[
+2,
+959
+]
+],
+"id": 183,
+"type": 1
+}
+],
+"category": 13,
+"dates": [
+"20/10/*"
+],
+"description": 1056060,
+"name": 1056059,
+"objective": 5915,
+"quest": 991,
+"saint": 1658
+},
+"350": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+69
+]
+],
+"id": 49,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"01/08/*"
+],
+"description": 1055933,
+"name": 324737,
+"objective": 7707,
+"quest": 1388,
+"saint": 2103
+},
+"351": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+122
+]
+],
+"id": 141,
+"type": 17
+}
+],
+"category": 11,
+"dates": [
+"02/08/*"
+],
+"description": 1113234,
+"name": 1055934,
+"objective": 7711,
+"quest": 1389,
+"saint": 2104
+},
+"352": {
+"bonuses": [],
+"category": 11,
+"dates": [
+"03/08/*"
+],
+"description": 483665,
+"name": 324725,
+"objective": 7715,
+"quest": 1390,
+"saint": 2105
+},
+"353": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+771
+]
+],
+"id": 93,
+"type": 16
+}
+],
+"category": 11,
+"dates": [
+"04/08/*"
+],
+"description": 1055937,
+"name": 1055936,
+"objective": 7719,
+"quest": 1391,
+"saint": 2106
+},
+"354": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+10,
+189
+]
+],
+"id": 349,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"05/08/*"
+],
+"description": 1055938,
+"name": 324695,
+"objective": 7723,
+"quest": 1392,
+"saint": 2107
+},
+"355": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+335
+]
+],
+"id": 315,
+"type": 5
+}
+],
+"category": 11,
+"dates": [
+"06/08/*"
+],
+"description": 1055940,
+"name": 1055939,
+"objective": 7727,
+"quest": 1393,
+"saint": 2108
+},
+"356": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+796
+]
+],
+"id": 351,
+"type": 17
+}
+],
+"category": 11,
+"dates": [
+"07/08/*"
+],
+"description": 1011788,
+"name": 324687,
+"objective": 7731,
+"quest": 1394,
+"saint": 2109
+},
+"357": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+24
+]
+],
+"id": 248,
+"type": 10
+}
+],
+"category": 11,
+"dates": [
+"08/08/*"
+],
+"description": 1055941,
+"name": 324711,
+"objective": 7735,
+"quest": 1395,
+"saint": 2110
+},
+"358": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+10
+],
+[
+3,
+2277
+],
+[
+3,
+2348
+],
+[
+3,
+2352
+],
+[
+3,
+2358
+]
+],
+"id": 362,
+"type": 16
+}
+],
+"category": 11,
+"dates": [
+"09/08/*"
+],
+"description": 1113235,
+"name": 1055942,
+"objective": 7739,
+"quest": 1396,
+"saint": 2111
+},
+"359": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+5,
+79
+]
+],
+"id": 544,
+"type": 19
+}
+],
+"category": 11,
+"dates": [
+"10/08/*"
+],
+"description": 1174864,
+"name": 1174863,
+"objective": 7743,
+"quest": 1397,
+"saint": 2112
+},
+"36": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+5,
+41
+]
+],
+"id": 55,
+"type": 19
+}
+],
+"category": 13,
+"dates": [
+"21/10/*"
+],
+"description": 544473,
+"name": 324343,
+"objective": 5919,
+"quest": 992,
+"saint": 1659
+},
+"360": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+955
+]
+],
+"id": 355,
+"type": 16
+}
+],
+"category": 11,
+"dates": [
+"11/08/*"
+],
+"description": 1011789,
+"name": 324811,
+"objective": 7747,
+"quest": 1398,
+"saint": 2113
+},
+"361": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17148
+],
+[
+9,
+17149
+],
+[
+9,
+17150
+],
+[
+9,
+17151
+]
+],
+"id": 328,
+"type": 26
+}
+],
+"category": 11,
+"dates": [
+"12/08/*"
+],
+"description": 1071053,
+"name": 1055948,
+"objective": 7751,
+"quest": 1399,
+"saint": 2114
+},
+"362": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+4,
+96
+],
+[
+3,
+3178
+],
+[
+3,
+3179
+],
+[
+3,
+3180
+],
+[
+3,
+3181
+],
+[
+3,
+3182
+],
+[
+3,
+3183
+],
+[
+3,
+3184
+],
+[
+3,
+3185
+],
+[
+3,
+3186
+],
+[
+3,
+3187
+],
+[
+3,
+3188
+],
+[
+3,
+3189
+],
+[
+3,
+3190
+],
+[
+3,
+3191
+],
+[
+3,
+3192
+],
+[
+3,
+3193
+],
+[
+3,
+3194
+],
+[
+3,
+3195
+],
+[
+3,
+3196
+],
+[
+3,
+3197
+],
+[
+3,
+7175
+],
+[
+4,
+339
+],
+[
+4,
+340
+],
+[
+4,
+341
+],
+[
+4,
+342
+]
+],
+"id": 348,
+"type": 5
+}
+],
+"category": 11,
+"dates": [
+"13/08/*"
+],
+"description": 1188996,
+"name": 1055950,
+"objective": 7755,
+"quest": 1400,
+"saint": 2115
+},
+"363": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+203
+]
+],
+"id": 7,
+"type": 17
+}
+],
+"category": 11,
+"dates": [
+"14/08/*"
+],
+"description": 1113237,
+"name": 1055952,
+"objective": 7759,
+"quest": 1401,
+"saint": 2116
+},
+"364": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 445,
+"type": 1
+},
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 449,
+"type": 16
+},
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 453,
+"type": 6
+}
+],
+"category": 11,
+"dates": [
+"15/08/*"
+],
+"description": 1055954,
+"name": 956827,
+"objective": 7763,
+"quest": 1402,
+"saint": 2117
+},
+"365": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+160
+],
+[
+10,
+303
+]
+],
+"id": 503,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"16/08/*"
+],
+"description": 1080902,
+"name": 1055955,
+"objective": 7767,
+"quest": 1403,
+"saint": 2118
+},
+"366": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+26
+]
+],
+"id": 361,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"17/08/*"
+],
+"description": 1055957,
+"name": 324779,
+"objective": 7771,
+"quest": 1404,
+"saint": 2119
+},
+"367": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+242
+]
+],
+"id": 161,
+"type": 16
+}
+],
+"category": 11,
+"dates": [
+"18/08/*"
+],
+"description": 1113238,
+"name": 324775,
+"objective": 7775,
+"quest": 1405,
+"saint": 2120
+},
+"368": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+1,
+18
+]
+],
+"id": 265,
+"type": 11
+}
+],
+"category": 11,
+"dates": [
+"19/08/*"
+],
+"description": 1055960,
+"name": 1055959,
+"objective": 7779,
+"quest": 1406,
+"saint": 2121
+},
+"369": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17132
+],
+[
+9,
+17133
+],
+[
+9,
+17134
+],
+[
+9,
+17135
+]
+],
+"id": 215,
+"type": 26
+}
+],
+"category": 11,
+"dates": [
+"20/08/*"
+],
+"description": 1055962,
+"name": 1055961,
+"objective": 7783,
+"quest": 1407,
+"saint": 2122
+},
+"37": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+5,
+26
+],
+[
+5,
+24
+],
+[
+5,
+2
+],
+[
+5,
+79
+]
+],
+"id": 322,
+"type": 2
+}
+],
+"category": 13,
+"dates": [
+"22/10/*"
+],
+"description": 1174247,
+"name": 1056061,
+"objective": 5923,
+"quest": 993,
+"saint": 1660
+},
+"370": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+930
+],
+[
+2,
+931
+],
+[
+2,
+932
+],
+[
+2,
+933
+]
+],
+"id": 214,
+"type": 17
+}
+],
+"category": 11,
+"dates": [
+"21/08/*"
+],
+"description": 1078241,
+"name": 1055963,
+"objective": 7787,
+"quest": 1408,
+"saint": 2123
+},
+"371": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+326
+],
+[
+10,
+328
+]
+],
+"id": 77,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"22/08/*"
+],
+"description": 1055968,
+"name": 1055967,
+"objective": 7791,
+"quest": 1409,
+"saint": 2124
+},
+"372": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+611
+],
+[
+2,
+753
+]
+],
+"id": 367,
+"type": 16
+}
+],
+"category": 11,
+"dates": [
+"23/08/*"
+],
+"description": 1055969,
+"name": 324871,
+"objective": 7795,
+"quest": 1410,
+"saint": 2125
+},
+"373": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+1010
+]
+],
+"id": 134,
+"type": 1
+}
+],
+"category": 11,
+"dates": [
+"24/08/*"
+],
+"description": 1055970,
+"name": 324867,
+"objective": 7799,
+"quest": 1411,
+"saint": 2126
+},
+"374": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+28
+]
+],
+"id": 353,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"25/08/*"
+],
+"description": 1055972,
+"name": 1055971,
+"objective": 7803,
+"quest": 1412,
+"saint": 2127
+},
+"375": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+2,
+790
+],
+[
+2,
+791
+],
+[
+2,
+792
+],
+[
+2,
+793
+],
+[
+2,
+794
+],
+[
+2,
+807
+],
+[
+2,
+825
+],
+[
+2,
+832
+],
+[
+2,
+835
+],
+[
+2,
+841
+],
+[
+2,
+854
+],
+[
+2,
+869
+],
+[
+2,
+870
+],
+[
+2,
+871
+],
+[
+2,
+882
+],
+[
+2,
+890
+],
+[
+2,
+893
+],
+[
+2,
+898
+],
+[
+2,
+899
+],
+[
+2,
+903
+],
+[
+2,
+918
+],
+[
+2,
+930
+],
+[
+2,
+931
+],
+[
+2,
+932
+],
+[
+2,
+933
+],
+[
+2,
+939
+],
+[
+2,
+958
+],
+[
+2,
+959
+],
+[
+2,
+968
+],
+[
+2,
+972
+],
+[
+2,
+1030
+],
+[
+2,
+1045
+],
+[
+2,
+1046
+]
+],
+"id": 150,
+"type": 6
+}
+],
+"category": 11,
+"dates": [
+"26/08/*"
+],
+"description": 1055975,
+"name": 324861,
+"objective": 7807,
+"quest": 1413,
+"saint": 2128
+},
+"376": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+322
+],
+[
+10,
+324
+]
+],
+"id": 110,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"27/08/*"
+],
+"description": 1055977,
+"name": 1055976,
+"objective": 7811,
+"quest": 1414,
+"saint": 2129
+},
+"377": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+40
+]
+],
+"id": 372,
+"type": 7
+}
+],
+"category": 11,
+"dates": [
+"28/08/*"
+],
+"description": 1055978,
+"name": 324855,
+"objective": 7815,
+"quest": 1415,
+"saint": 2130
+},
+"378": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+493
+]
+],
+"id": 373,
+"type": 16
+}
+],
+"category": 11,
+"dates": [
+"29/08/*"
+],
+"description": 1055979,
+"name": 324851,
+"objective": 7819,
+"quest": 1416,
+"saint": 2131
+},
+"379": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+16
+],
+[
+3,
+2432
+],
+[
+3,
+2453
+]
+],
+"id": 338,
+"type": 17
+}
+],
+"category": 11,
+"dates": [
+"30/08/*"
+],
+"description": 1113239,
+"name": 1055980,
+"objective": 7823,
+"quest": 1417,
+"saint": 2132
+},
+"38": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 449,
+"type": 16
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+813
+]
+],
+"id": 412,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+813
+]
+],
+"id": 431,
+"type": 16
+}
+],
+"category": 13,
+"dates": [
+"23/10/*"
+],
+"description": 1056064,
+"name": 1056063,
+"objective": 5851,
+"quest": 975,
+"saint": 1661
+},
+"380": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+64
+]
+],
+"id": 504,
+"type": 31
+}
+],
+"category": 11,
+"dates": [
+"31/08/*"
+],
+"description": 1055983,
+"name": 1055982,
+"objective": 7827,
+"quest": 1418,
+"saint": 2133
+},
+"39": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+24
+]
+],
+"id": 58,
+"type": 7
+}
+],
+"category": 13,
+"dates": [
+"24/10/*"
+],
+"description": 1056065,
+"name": 324341,
+"objective": 5879,
+"quest": 982,
+"saint": 1662
+},
+"4": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+41
+],
+[
+4,
+86
+],
+[
+4,
+76
+],
+[
+4,
+287
+],
+[
+3,
+2538
+],
+[
+3,
+2408
+],
+[
+3,
+2545
+],
+[
+3,
+2588
+],
+[
+3,
+2419
+]
+],
+"id": 25,
+"type": 1
+},
+{
+"amount": 50,
+"criteria": [
+[
+4,
+41
+],
+[
+4,
+86
+],
+[
+4,
+76
+],
+[
+4,
+287
+],
+[
+3,
+2538
+],
+[
+3,
+2408
+],
+[
+3,
+2545
+],
+[
+3,
+2588
+],
+[
+3,
+2419
+]
+],
+"id": 26,
+"type": 16
+}
+],
+"category": 12,
+"dates": [
+"19/09/*"
+],
+"description": 1011631,
+"name": 955785,
+"objective": 5979,
+"quest": 1007,
+"saint": 1645
+},
+"40": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+82
+]
+],
+"id": 59,
+"type": 16
+}
+],
+"category": 13,
+"dates": [
+"25/10/*"
+],
+"description": 1113247,
+"name": 324489,
+"objective": 6039,
+"quest": 1022,
+"saint": 1663
+},
+"41": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+3
+],
+[
+4,
+263
+],
+[
+4,
+264
+],
+[
+3,
+2293
+],
+[
+3,
+2294
+],
+[
+3,
+2304
+],
+[
+3,
+2305
+],
+[
+3,
+2308
+],
+[
+3,
+2402
+],
+[
+3,
+2403
+],
+[
+3,
+2498
+]
+],
+"id": 306,
+"type": 1
+}
+],
+"category": 13,
+"dates": [
+"26/10/*"
+],
+"description": 1113248,
+"name": 324499,
+"objective": 6043,
+"quest": 1023,
+"saint": 1664
+},
+"42": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+13
+]
+],
+"id": 61,
+"type": 10
+}
+],
+"category": 13,
+"dates": [
+"27/10/*"
+],
+"description": 1056068,
+"name": 324495,
+"objective": 6047,
+"quest": 1024,
+"saint": 1665
+},
+"43": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+304
+],
+[
+10,
+305
+]
+],
+"id": 508,
+"type": 7
+}
+],
+"category": 13,
+"dates": [
+"28/10/*"
+],
+"description": 1056070,
+"name": 1056069,
+"objective": 6051,
+"quest": 1025,
+"saint": 1666
+},
+"44": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+606
+]
+],
+"id": 195,
+"type": 16
+}
+],
+"category": 13,
+"dates": [
+"29/10/*"
+],
+"description": 1056072,
+"name": 1056071,
+"objective": 6055,
+"quest": 1026,
+"saint": 1667
+},
+"45": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+2,
+210
+],
+[
+2,
+254
+],
+[
+2,
+325
+],
+[
+2,
+617
+],
+[
+2,
+780
+],
+[
+2,
+796
+],
+[
+2,
+839
+],
+[
+2,
+818
+],
+[
+2,
+830
+],
+[
+2,
+876
+],
+[
+2,
+947
+],
+[
+2,
+948
+],
+[
+2,
+463
+],
+[
+2,
+618
+],
+[
+2,
+781
+],
+[
+2,
+949
+],
+[
+2,
+950
+],
+[
+2,
+339
+],
+[
+2,
+619
+],
+[
+2,
+824
+],
+[
+2,
+1016
+]
+],
+"id": 370,
+"type": 6
+}
+],
+"category": 13,
+"dates": [
+"30/10/*"
+],
+"description": 1056074,
+"name": 1056073,
+"objective": 6059,
+"quest": 1027,
+"saint": 1668
+},
+"46": {
+"bonuses": [],
+"category": 13,
+"dates": [
+"31/10/*"
+],
+"description": 404653,
+"name": 324535,
+"objective": 6063,
+"quest": 1028,
+"saint": 1669
+},
+"47": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [],
+"id": 542,
+"type": 38
+}
+],
+"category": 3,
+"dates": [
+"08/10/2012",
+"14/10/2013",
+"13/10/2014",
+"12/10/2015",
+"10/10/2016",
+"09/10/2017",
+"08/10/2018",
+"13/10/2025",
+"14/10/2024",
+"09/10/2023",
+"10/10/2022",
+"11/10/2021",
+"12/10/2020",
+"14/10/2019",
+"12/10/2026",
+"11/10/2027",
+"09/10/2028",
+"08/10/2029",
+"14/10/2030",
+"13/10/2031",
+"11/10/2032",
+"10/10/2033",
+"09/10/2034",
+"08/10/2035"
+],
+"description": 1174878,
+"name": 1174875,
+"objective": 6067,
+"quest": 1029,
+"saint": 1670
+},
+"48": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+7,
+12035
+],
+[
+7,
+13423
+],
+[
+7,
+6812
+],
+[
+7,
+11611
+],
+[
+7,
+11850
+],
+[
+7,
+6498
+],
+[
+7,
+11612
+],
+[
+7,
+12463
+],
+[
+7,
+11375
+],
+[
+7,
+14273
+],
+[
+7,
+14601
+],
+[
+7,
+17502
+],
+[
+7,
+27542
+],
+[
+7,
+18428
+],
+[
+7,
+16003
+],
+[
+7,
+9143
+],
+[
+7,
+8473
+],
+[
+7,
+6955
+],
+[
+7,
+12850
+],
+[
+7,
+9549
+],
+[
+7,
+30856
+]
+],
+"id": 67,
+"type": 16
+},
+{
+"amount": 50,
+"criteria": [
+[
+7,
+12035
+],
+[
+7,
+13423
+],
+[
+7,
+6812
+],
+[
+7,
+11611
+],
+[
+7,
+11850
+],
+[
+7,
+6498
+],
+[
+7,
+11612
+],
+[
+7,
+12463
+],
+[
+7,
+11375
+],
+[
+7,
+14273
+],
+[
+7,
+14601
+],
+[
+7,
+17502
+],
+[
+7,
+27542
+],
+[
+7,
+30856
+],
+[
+7,
+9549
+],
+[
+7,
+12850
+],
+[
+7,
+6955
+],
+[
+7,
+8473
+],
+[
+7,
+9143
+],
+[
+7,
+16003
+],
+[
+7,
+18428
+]
+],
+"id": 66,
+"type": 1
+}
+],
+"category": 14,
+"dates": [
+"01/11/*"
+],
+"description": 324512,
+"name": 955786,
+"objective": 5855,
+"quest": 976,
+"saint": 1671
+},
+"49": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+967
+],
+[
+2,
+969
+]
+],
+"id": 213,
+"type": 16
+}
+],
+"category": 14,
+"dates": [
+"02/11/*"
+],
+"description": 1056075,
+"name": 324523,
+"objective": 5875,
+"quest": 981,
+"saint": 1672
+},
+"5": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17152
+],
+[
+9,
+17153
+],
+[
+9,
+17154
+],
+[
+9,
+17155
+]
+],
+"id": 123,
+"type": 26
+}
+],
+"category": 12,
+"dates": [
+"20/09/*"
+],
+"description": 1077038,
+"name": 324611,
+"objective": 5827,
+"quest": 969,
+"saint": 1644
+},
+"50": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+27
+]
+],
+"id": 271,
+"type": 10
+}
+],
+"category": 14,
+"dates": [
+"03/11/*"
+],
+"description": 1056076,
+"name": 324437,
+"objective": 6071,
+"quest": 1030,
+"saint": 1673
+},
+"51": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+4,
+32
+],
+[
+4,
+90
+],
+[
+4,
+127
+],
+[
+4,
+147
+],
+[
+4,
+156
+]
+],
+"id": 509,
+"type": 3
+}
+],
+"category": 14,
+"dates": [
+"04/11/*"
+],
+"description": 1056078,
+"name": 1056077,
+"objective": 6075,
+"quest": 1031,
+"saint": 1674
+},
+"52": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+903
+]
+],
+"id": 325,
+"type": 17
+}
+],
+"category": 14,
+"dates": [
+"05/11/*"
+],
+"description": 1056079,
+"name": 324429,
+"objective": 5859,
+"quest": 977,
+"saint": 1675
+},
+"53": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+39
+]
+],
+"id": 72,
+"type": 7
+}
+],
+"category": 14,
+"dates": [
+"06/11/*"
+],
+"description": 324426,
+"name": 324425,
+"objective": 5863,
+"quest": 978,
+"saint": 1676
+},
+"54": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+49
+],
+[
+3,
+2333
+],
+[
+3,
+2349
+],
+[
+3,
+2353
+]
+],
+"id": 456,
+"type": 16
+}
+],
+"category": 14,
+"dates": [
+"07/11/*"
+],
+"description": 1113257,
+"name": 1056080,
+"objective": 6079,
+"quest": 1032,
+"saint": 1677
+},
+"55": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+154
+]
+],
+"id": 345,
+"type": 1
+}
+],
+"category": 14,
+"dates": [
+"08/11/*"
+],
+"description": 1113249,
+"name": 1056082,
+"objective": 6083,
+"quest": 1033,
+"saint": 1678
+},
+"56": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+76
+],
+[
+4,
+287
+],
+[
+3,
+2545
+],
+[
+3,
+2588
+]
+],
+"id": 364,
+"type": 17
+}
+],
+"category": 14,
+"dates": [
+"09/11/*"
+],
+"description": 1113273,
+"name": 1056084,
+"objective": 6087,
+"quest": 1034,
+"saint": 1679
+},
+"57": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+17,
+6
+]
+],
+"id": 541,
+"type": 37
+}
+],
+"category": 14,
+"dates": [
+"10/11/*"
+],
+"description": 1174881,
+"name": 1174880,
+"objective": 6091,
+"quest": 1035,
+"saint": 1680
+},
+"58": {
+"bonuses": [],
+"category": 14,
+"dates": [
+"11/11/*"
+],
+"description": 324456,
+"name": 324455,
+"objective": 6095,
+"quest": 1036,
+"saint": 1681
+},
+"59": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+153
+]
+],
+"id": 204,
+"type": 16
+}
+],
+"category": 14,
+"dates": [
+"12/11/*"
+],
+"description": 1113250,
+"name": 1056088,
+"objective": 6099,
+"quest": 1037,
+"saint": 1682
+},
+"6": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+1,
+11
+]
+],
+"id": 27,
+"type": 11
+}
+],
+"category": 12,
+"dates": [
+"21/09/*"
+],
+"description": 324608,
+"name": 324607,
+"objective": 5831,
+"quest": 970,
+"saint": 1643
+},
+"60": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+756
+]
+],
+"id": 510,
+"type": 17
+}
+],
+"category": 14,
+"dates": [
+"13/11/*"
+],
+"description": 1056090,
+"name": 324605,
+"objective": 5987,
+"quest": 1009,
+"saint": 1683
+},
+"61": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+63
+]
+],
+"id": 511,
+"type": 31
+}
+],
+"category": 14,
+"dates": [
+"14/11/*"
+],
+"description": 1056092,
+"name": 1056091,
+"objective": 6103,
+"quest": 1038,
+"saint": 1684
+},
+"62": {
+"bonuses": [],
+"category": 14,
+"dates": [
+"15/11/*"
+],
+"description": 779722,
+"name": 324615,
+"objective": 6107,
+"quest": 1039,
+"saint": 1685
+},
+"63": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+257
+],
+[
+3,
+2423
+],
+[
+3,
+2273
+],
+[
+3,
+2275
+],
+[
+4,
+256
+],
+[
+3,
+2334
+],
+[
+3,
+2350
+]
+],
+"id": 455,
+"type": 1
+}
+],
+"category": 14,
+"dates": [
+"16/11/*"
+],
+"description": 1113258,
+"name": 324633,
+"objective": 6111,
+"quest": 1040,
+"saint": 1686
+},
+"64": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+9,
+17142
+],
+[
+9,
+17143
+]
+],
+"id": 512,
+"type": 26
+}
+],
+"category": 14,
+"dates": [
+"17/11/*"
+],
+"description": 1077039,
+"name": 324627,
+"objective": 5903,
+"quest": 988,
+"saint": 1687
+},
+"65": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+985
+],
+[
+2,
+1011
+]
+],
+"id": 81,
+"type": 5
+}
+],
+"category": 14,
+"dates": [
+"18/11/*"
+],
+"description": 961773,
+"name": 324643,
+"objective": 6115,
+"quest": 1041,
+"saint": 1688
+},
+"66": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+2
+]
+],
+"id": 82,
+"type": 10
+}
+],
+"category": 14,
+"dates": [
+"19/11/*"
+],
+"description": 1056096,
+"name": 324639,
+"objective": 5867,
+"quest": 979,
+"saint": 1689
+},
+"67": {
+"bonuses": [
+{
+"amount": 25,
+"criteria": [
+[
+2,
+925
+],
+[
+2,
+926
+],
+[
+2,
+927
+],
+[
+2,
+928
+]
+],
+"id": 413,
+"type": 1
+},
+{
+"amount": 25,
+"criteria": [
+[
+2,
+925
+],
+[
+2,
+926
+],
+[
+2,
+927
+],
+[
+2,
+928
+]
+],
+"id": 432,
+"type": 16
+},
+{
+"amount": 100,
+"criteria": [
+[
+13,
+1
+]
+],
+"id": 453,
+"type": 6
+}
+],
+"category": 14,
+"dates": [
+"20/11/*"
+],
+"description": 1173729,
+"name": 1056097,
+"objective": 6119,
+"quest": 1042,
+"saint": 1690
+},
+"68": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+47
+],
+[
+3,
+2310
+],
+[
+3,
+2323
+],
+[
+3,
+2336
+]
+],
+"id": 356,
+"type": 1
+}
+],
+"category": 14,
+"dates": [
+"21/11/*"
+],
+"description": 1113251,
+"name": 1056099,
+"objective": 6123,
+"quest": 1043,
+"saint": 1691
+},
+"69": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+120
+],
+[
+3,
+2472
+],
+[
+3,
+2473
+],
+[
+3,
+2474
+],
+[
+3,
+2475
+],
+[
+3,
+2476
+]
+],
+"id": 267,
+"type": 16
+}
+],
+"category": 14,
+"dates": [
+"22/11/*"
+],
+"description": 1113256,
+"name": 1056101,
+"objective": 5871,
+"quest": 980,
+"saint": 1692
+},
+"7": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+872
+]
+],
+"id": 454,
+"type": 5
+}
+],
+"category": 12,
+"dates": [
+"22/09/*"
+],
+"description": 1056019,
+"name": 1056018,
+"objective": 5815,
+"quest": 966,
+"saint": 1642
+},
+"70": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+175
+]
+],
+"id": 513,
+"type": 17
+}
+],
+"category": 14,
+"dates": [
+"23/11/*"
+],
+"description": 1113259,
+"name": 1056104,
+"objective": 6127,
+"quest": 1044,
+"saint": 1693
+},
+"71": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+57
+]
+],
+"id": 87,
+"type": 7
+}
+],
+"category": 14,
+"dates": [
+"24/11/*"
+],
+"description": 324552,
+"name": 324551,
+"objective": 5891,
+"quest": 985,
+"saint": 1694
+},
+"72": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+602
+]
+],
+"id": 216,
+"type": 5
+}
+],
+"category": 14,
+"dates": [
+"25/11/*"
+],
+"description": 1056107,
+"name": 1056106,
+"objective": 6131,
+"quest": 1045,
+"saint": 1695
+},
+"73": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+135
+]
+],
+"id": 299,
+"type": 16
+}
+],
+"category": 14,
+"dates": [
+"26/11/*"
+],
+"description": 1113274,
+"name": 1056108,
+"objective": 6135,
+"quest": 1046,
+"saint": 1696
+},
+"74": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+33
+]
+],
+"id": 132,
+"type": 7
+}
+],
+"category": 14,
+"dates": [
+"27/11/*"
+],
+"description": 1056111,
+"name": 1056110,
+"objective": 6179,
+"quest": 1057,
+"saint": 1697
+},
+"75": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+85
+]
+],
+"id": 371,
+"type": 1
+}
+],
+"category": 14,
+"dates": [
+"28/11/*"
+],
+"description": 1113260,
+"name": 1056112,
+"objective": 5839,
+"quest": 972,
+"saint": 1698
+},
+"76": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+28
+]
+],
+"id": 92,
+"type": 7
+}
+],
+"category": 14,
+"dates": [
+"29/11/*"
+],
+"description": 1056114,
+"name": 324579,
+"objective": 5899,
+"quest": 987,
+"saint": 1699
+},
+"77": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+4,
+88
+]
+],
+"id": 63,
+"type": 17
+}
+],
+"category": 14,
+"dates": [
+"30/11/*"
+],
+"description": 1113261,
+"name": 1056115,
+"objective": 5895,
+"quest": 986,
+"saint": 1700
+},
+"78": {
+"bonuses": [
+{
+"amount": 20,
+"criteria": [
+[
+15,
+1
+]
+],
+"id": 514,
+"type": 35
+}
+],
+"category": 3,
+"dates": [
+"22/11/2012",
+"28/11/2013",
+"27/11/2014",
+"26/11/2015",
+"24/11/2016",
+"23/11/2017",
+"22/11/2018",
+"27/11/2025",
+"28/11/2024",
+"23/11/2023",
+"24/11/2022",
+"25/11/2021",
+"26/11/2020",
+"28/11/2019",
+"26/11/2026",
+"25/11/2027",
+"23/11/2028",
+"22/11/2029",
+"28/11/2030",
+"27/11/2031"
+],
+"description": 1056118,
+"name": 1056117,
+"objective": 6183,
+"quest": 1058,
+"saint": 1701
+},
+"79": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+173
+]
+],
+"id": 457,
+"type": 1
+}
+],
+"category": 15,
+"dates": [
+"01/12/*"
+],
+"description": 1113262,
+"name": 1056119,
+"objective": 6187,
+"quest": 1059,
+"saint": 1702
+},
+"8": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+71
+],
+[
+3,
+2571
+],
+[
+3,
+2547
+],
+[
+3,
+2580
+],
+[
+3,
+2572
+],
+[
+3,
+2561
+],
+[
+3,
+2556
+]
+],
+"id": 29,
+"type": 16
+}
+],
+"category": 12,
+"dates": [
+"23/09/*"
+],
+"description": 1113243,
+"name": 324597,
+"objective": 5835,
+"quest": 971,
+"saint": 1641
+},
+"80": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+5,
+11
+],
+[
+5,
+13
+],
+[
+5,
+60
+],
+[
+5,
+65
+]
+],
+"id": 515,
+"type": 2
+}
+],
+"category": 15,
+"dates": [
+"02/12/*"
+],
+"description": 1056122,
+"name": 1056121,
+"objective": 6191,
+"quest": 1060,
+"saint": 1703
+},
+"81": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+615
+]
+],
+"id": 238,
+"type": 5
+}
+],
+"category": 15,
+"dates": [
+"03/12/*"
+],
+"description": 1056124,
+"name": 1056123,
+"objective": 5843,
+"quest": 973,
+"saint": 1704
+},
+"82": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+2
+]
+],
+"id": 98,
+"type": 7
+}
+],
+"category": 15,
+"dates": [
+"04/12/*"
+],
+"description": 324816,
+"name": 324815,
+"objective": 5847,
+"quest": 974,
+"saint": 1705
+},
+"83": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+96
+]
+],
+"id": 191,
+"type": 1
+}
+],
+"category": 15,
+"dates": [
+"05/12/*"
+],
+"description": 1056126,
+"name": 1056125,
+"objective": 5927,
+"quest": 994,
+"saint": 1706
+},
+"84": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [],
+"id": 100,
+"type": 25
+}
+],
+"category": 15,
+"dates": [
+"06/12/*"
+],
+"description": 324804,
+"name": 324803,
+"objective": 5931,
+"quest": 995,
+"saint": 1707
+},
+"85": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+60
+],
+[
+3,
+2306
+],
+[
+3,
+2442
+],
+[
+3,
+2270
+],
+[
+3,
+2515
+],
+[
+3,
+2271
+],
+[
+3,
+2517
+],
+[
+3,
+2462
+],
+[
+3,
+2509
+],
+[
+3,
+2513
+],
+[
+3,
+2516
+],
+[
+3,
+2518
+],
+[
+3,
+2528
+],
+[
+4,
+269
+]
+],
+"id": 101,
+"type": 16
+}
+],
+"category": 15,
+"dates": [
+"07/12/*"
+],
+"description": 1113275,
+"name": 324795,
+"objective": 5907,
+"quest": 989,
+"saint": 1708
+},
+"86": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+10,
+188
+]
+],
+"id": 103,
+"type": 7
+}
+],
+"category": 15,
+"dates": [
+"08/12/*"
+],
+"description": 1056128,
+"name": 1056127,
+"objective": 5935,
+"quest": 996,
+"saint": 1709
+},
+"87": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+2,
+1013
+]
+],
+"id": 205,
+"type": 1
+}
+],
+"category": 15,
+"dates": [
+"09/12/*"
+],
+"description": 1056130,
+"name": 1056129,
+"objective": 5883,
+"quest": 983,
+"saint": 1710
+},
+"88": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+16,
+5
+]
+],
+"id": 537,
+"type": 36
+}
+],
+"category": 15,
+"dates": [
+"10/12/*"
+],
+"description": 1174883,
+"name": 1174882,
+"objective": 6139,
+"quest": 1047,
+"saint": 1711
+},
+"89": {
+"bonuses": [
+{
+"amount": 15,
+"criteria": [
+[
+5,
+15
+]
+],
+"id": 105,
+"type": 10
+}
+],
+"category": 15,
+"dates": [
+"11/12/*"
+],
+"description": 1056133,
+"name": 324785,
+"objective": 5971,
+"quest": 1005,
+"saint": 1712
+},
+"9": {
+"bonuses": [
+{
+"amount": 200,
+"criteria": [
+[
+2,
+846
+],
+[
+2,
+847
+],
+[
+2,
+447
+],
+[
+2,
+306
+],
+[
+2,
+336
+],
+[
+2,
+82
+],
+[
+2,
+297
+],
+[
+2,
+702
+],
+[
+2,
+516
+],
+[
+2,
+201
+],
+[
+2,
+755
+],
+[
+2,
+491
+],
+[
+2,
+528
+],
+[
+2,
+460
+],
+[
+2,
+124
+],
+[
+2,
+284
+],
+[
+2,
+493
+],
+[
+2,
+700
+],
+[
+2,
+537
+],
+[
+2,
+538
+],
+[
+2,
+77
+],
+[
+2,
+78
+],
+[
+2,
+243
+],
+[
+2,
+474
+],
+[
+2,
+756
+],
+[
+2,
+776
+],
+[
+2,
+175
+],
+[
+2,
+154
+],
+[
+2,
+213
+],
+[
+2,
+223
+],
+[
+2,
+470
+],
+[
+2,
+211
+],
+[
+2,
+617
+],
+[
+2,
+493
+],
+[
+2,
+325
+],
+[
+2,
+210
+],
+[
+2,
+125
+],
+[
+2,
+254
+],
+[
+2,
+780
+],
+[
+2,
+133
+],
+[
+2,
+618
+],
+[
+2,
+463
+],
+[
+2,
+144
+],
+[
+2,
+781
+],
+[
+2,
+619
+],
+[
+2,
+339
+],
+[
+2,
+620
+],
+[
+2,
+210
+],
+[
+2,
+459
+],
+[
+2,
+94
+],
+[
+2,
+623
+],
+[
+2,
+624
+],
+[
+2,
+752
+],
+[
+2,
+653
+],
+[
+2,
+494
+],
+[
+2,
+783
+],
+[
+2,
+321
+],
+[
+2,
+759
+],
+[
+2,
+760
+],
+[
+2,
+782
+],
+[
+2,
+771
+],
+[
+2,
+1010
+],
+[
+2,
+852
+],
+[
+2,
+621
+],
+[
+2,
+869
+],
+[
+2,
+853
+],
+[
+2,
+854
+],
+[
+2,
+1016
+],
+[
+2,
+784
+],
+[
+2,
+790
+],
+[
+2,
+791
+],
+[
+2,
+792
+],
+[
+2,
+793
+],
+[
+2,
+794
+],
+[
+2,
+800
+],
+[
+2,
+807
+],
+[
+2,
+814
+],
+[
+2,
+796
+],
+[
+2,
+811
+],
+[
+2,
+823
+],
+[
+2,
+824
+],
+[
+2,
+825
+],
+[
+2,
+818
+],
+[
+2,
+830
+],
+[
+2,
+831
+],
+[
+2,
+832
+],
+[
+2,
+835
+],
+[
+2,
+839
+],
+[
+2,
+840
+],
+[
+2,
+841
+],
+[
+2,
+842
+],
+[
+2,
+844
+],
+[
+2,
+870
+],
+[
+2,
+871
+],
+[
+2,
+875
+],
+[
+2,
+876
+],
+[
+2,
+880
+],
+[
+2,
+882
+],
+[
+2,
+884
+],
+[
+2,
+888
+],
+[
+2,
+890
+],
+[
+2,
+893
+],
+[
+2,
+898
+],
+[
+2,
+899
+],
+[
+2,
+903
+],
+[
+2,
+918
+],
+[
+2,
+919
+],
+[
+2,
+920
+],
+[
+2,
+930
+],
+[
+2,
+931
+],
+[
+2,
+932
+],
+[
+2,
+933
+],
+[
+2,
+968
+],
+[
+2,
+948
+],
+[
+2,
+949
+],
+[
+2,
+950
+],
+[
+2,
+953
+],
+[
+2,
+954
+],
+[
+2,
+958
+],
+[
+2,
+959
+],
+[
+2,
+946
+],
+[
+2,
+947
+],
+[
+2,
+939
+],
+[
+2,
+1018
+],
+[
+2,
+972
+],
+[
+2,
+1013
+],
+[
+2,
+1030
+],
+[
+2,
+1022
+],
+[
+2,
+1028
+]
+],
+"id": 286,
+"type": 6
+}
+],
+"category": 12,
+"dates": [
+"24/09/*"
+],
+"description": 1056022,
+"name": 1056021,
+"objective": 5995,
+"quest": 1011,
+"saint": 1640
+},
+"90": {
+"bonuses": [],
+"category": 15,
+"dates": [
+"12/12/*"
+],
+"description": 483660,
+"name": 324729,
+"objective": 5939,
+"quest": 997,
+"saint": 1713
+},
+"91": {
+"bonuses": [
+{
+"amount": 100,
+"criteria": [
+[
+5,
+24
+]
+],
+"id": 106,
+"type": 8
+}
+],
+"category": 15,
+"dates": [
+"13/12/*"
+],
+"description": 324736,
+"name": 324735,
+"objective": 5943,
+"quest": 998,
+"saint": 1714
+},
+"92": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+882
+]
+],
+"id": 516,
+"type": 17
+}
+],
+"category": 15,
+"dates": [
+"14/12/*"
+],
+"description": 1056135,
+"name": 1056134,
+"objective": 5963,
+"quest": 1003,
+"saint": 1715
+},
+"93": {
+"bonuses": [
+{
+"amount": 75,
+"criteria": [
+[
+2,
+178
+]
+],
+"id": 108,
+"type": 16
+}
+],
+"category": 15,
+"dates": [
+"15/12/*"
+],
+"description": 1011669,
+"name": 324745,
+"objective": 5947,
+"quest": 999,
+"saint": 1716
+},
+"94": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+4,
+68
+],
+[
+4,
+343
+],
+[
+4,
+344
+],
+[
+4,
+345
+]
+],
+"id": 109,
+"type": 5
+}
+],
+"category": 15,
+"dates": [
+"16/12/*"
+],
+"description": 1188957,
+"name": 324713,
+"objective": 5951,
+"quest": 1000,
+"saint": 1717
+},
+"95": {
+"bonuses": [
+{
+"amount": 125,
+"criteria": [
+[
+10,
+320
+],
+[
+10,
+319
+]
+],
+"id": 319,
+"type": 7
+}
+],
+"category": 15,
+"dates": [
+"17/12/*"
+],
+"description": 1056136,
+"name": 324715,
+"objective": 5955,
+"quest": 1001,
+"saint": 1718
+},
+"96": {
+"bonuses": [
+{
+"amount": 150,
+"criteria": [
+[
+2,
+447
+],
+[
+2,
+306
+],
+[
+2,
+336
+],
+[
+2,
+82
+],
+[
+2,
+297
+],
+[
+2,
+702
+],
+[
+2,
+516
+],
+[
+2,
+201
+],
+[
+2,
+755
+],
+[
+2,
+491
+],
+[
+2,
+528
+],
+[
+2,
+460
+],
+[
+2,
+124
+],
+[
+2,
+284
+],
+[
+2,
+493
+],
+[
+2,
+700
+],
+[
+2,
+537
+],
+[
+2,
+538
+],
+[
+2,
+77
+],
+[
+2,
+78
+],
+[
+2,
+243
+],
+[
+2,
+474
+],
+[
+2,
+756
+],
+[
+2,
+776
+],
+[
+2,
+175
+],
+[
+2,
+154
+],
+[
+2,
+213
+],
+[
+2,
+223
+],
+[
+2,
+1013
+],
+[
+2,
+1010
+],
+[
+2,
+470
+],
+[
+2,
+211
+],
+[
+2,
+617
+],
+[
+2,
+493
+],
+[
+2,
+325
+],
+[
+2,
+210
+],
+[
+2,
+125
+],
+[
+2,
+254
+],
+[
+2,
+780
+],
+[
+2,
+133
+],
+[
+2,
+618
+],
+[
+2,
+463
+],
+[
+2,
+144
+],
+[
+2,
+781
+],
+[
+2,
+619
+],
+[
+2,
+339
+],
+[
+2,
+620
+],
+[
+2,
+210
+],
+[
+2,
+459
+],
+[
+2,
+94
+],
+[
+2,
+621
+],
+[
+2,
+623
+],
+[
+2,
+624
+],
+[
+2,
+752
+],
+[
+2,
+653
+],
+[
+2,
+494
+],
+[
+2,
+783
+],
+[
+2,
+321
+],
+[
+2,
+759
+],
+[
+2,
+760
+],
+[
+2,
+782
+],
+[
+2,
+771
+],
+[
+2,
+784
+],
+[
+2,
+790
+],
+[
+2,
+791
+],
+[
+2,
+792
+],
+[
+2,
+793
+],
+[
+2,
+794
+],
+[
+2,
+800
+],
+[
+2,
+807
+],
+[
+2,
+814
+],
+[
+2,
+796
+],
+[
+2,
+811
+],
+[
+2,
+823
+],
+[
+2,
+824
+],
+[
+2,
+825
+],
+[
+2,
+818
+],
+[
+2,
+830
+],
+[
+2,
+831
+],
+[
+2,
+832
+],
+[
+2,
+835
+],
+[
+2,
+839
+],
+[
+2,
+840
+],
+[
+2,
+841
+],
+[
+2,
+842
+],
+[
+2,
+844
+],
+[
+2,
+846
+],
+[
+2,
+847
+],
+[
+2,
+852
+],
+[
+2,
+853
+],
+[
+2,
+854
+],
+[
+2,
+869
+],
+[
+2,
+870
+],
+[
+2,
+871
+],
+[
+2,
+875
+],
+[
+2,
+876
+],
+[
+2,
+880
+],
+[
+2,
+882
+],
+[
+2,
+884
+],
+[
+2,
+888
+],
+[
+2,
+890
+],
+[
+2,
+893
+],
+[
+2,
+898
+],
+[
+2,
+899
+],
+[
+2,
+903
+],
+[
+2,
+918
+],
+[
+2,
+919
+],
+[
+2,
+920
+],
+[
+2,
+930
+],
+[
+2,
+931
+],
+[
+2,
+932
+],
+[
+2,
+933
+],
+[
+2,
+968
+],
+[
+2,
+948
+],
+[
+2,
+949
+],
+[
+2,
+950
+],
+[
+2,
+953
+],
+[
+2,
+954
+],
+[
+2,
+958
+],
+[
+2,
+959
+],
+[
+2,
+946
+],
+[
+2,
+947
+],
+[
+2,
+939
+],
+[
+2,
+972
+],
+[
+2,
+1016
+],
+[
+2,
+1018
+],
+[
+2,
+1030
+],
+[
+2,
+1022
+],
+[
+2,
+1028
+],
+[
+2,
+1044
+],
+[
+2,
+1045
+],
+[
+2,
+1046
+]
+],
+"id": 111,
+"type": 17
+}
+],
+"category": 15,
+"dates": [
+"18/12/*"
+],
+"description": 1011670,
+"name": 1056137,
+"objective": 5959,
+"quest": 1002,
+"saint": 1719
+},
+"97": {
+"bonuses": [
+{
+"amount": 50,
+"criteria": [
+[
+4,
+68
+],
+[
+4,
+343
+],
+[
+4,
+344
+],
+[
+4,
+345
+]
+],
+"id": 118,
+"type": 1
+}
+],
+"category": 15,
+"dates": [
+"19/12/*"
+],
+"description": 1188958,
+"name": 1056138,
+"objective": 5991,
+"quest": 1010,
+"saint": 1720
+},
+"98": {
+"bonuses": [
+{
+"amount": 10,
+"criteria": [
+[
+10,
+32
+],
+[
+10,
+48
+]
+],
+"id": 517,
+"type": 19
+}
+],
+"category": 15,
+"dates": [
+"20/12/*"
+],
+"description": 1056148,
+"name": 1056147,
+"objective": 6143,
+"quest": 1048,
+"saint": 1721
+},
+"99": {
+"bonuses": [
+{
+"amount": 1,
+"criteria": [
+[
+2,
+6
+],
+[
+2,
+7
+]
+],
+"id": 335,
+"type": 5
+}
+],
+"category": 15,
+"dates": [
+"21/12/*"
+],
+"description": 1056152,
+"name": 1056151,
+"objective": 6147,
+"quest": 1049,
+"saint": 1722
+}
+}
+}

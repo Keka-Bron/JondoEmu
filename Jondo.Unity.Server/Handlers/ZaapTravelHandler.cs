@@ -176,6 +176,11 @@ namespace Jondo.Unity.Server.Handlers
                 target, arrival.Count > 0 ? arrival[0].Cell : 0);
             DatabaseManager.SaveCurrentCharacter();
 
+            // A zaap ends the party following him, and his followers are told before the old map
+            // is: the empty imk and then the kmu, frames 245-246 of "Grupos/con grupo seguir
+            // desplazamiento del lider...". See PartyFollowHandler.
+            await PartyFollowHandler.LeaderTravelledAsync(SessionContext.Current);
+
             // Y que los dos mapas se enteren: el zaap no avisaba a ninguno.
             await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
 

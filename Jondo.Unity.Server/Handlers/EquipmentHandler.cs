@@ -137,7 +137,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.TotalStrength)));
 
             // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
             // recargar el mapa. Son dos mensajes y hacen falta los dos: el jsn redibuja al muñeco

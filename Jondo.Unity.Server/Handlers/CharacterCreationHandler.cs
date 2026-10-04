@@ -33,7 +33,17 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Con lo que empieza: nivel, kamas y las características de los pergaminos.</summary>
         public const int StartingLevel = 1;
         public const long StartingKamas = 1_000_000L;
-        public const int ScrolledStat = 101;
+
+        /// <summary>
+        /// Lo que dan los pergaminos en cada característica, y va APARTE de la base.
+        /// </summary>
+        /// <remarks>
+        /// Cien y no ciento uno: en las capturas de personajes reales el f3 de cada característica
+        /// -el campo de los pergaminos- vale 100 en 156 capturas y 4.815 apariciones, y 101 no sale
+        /// ni una vez. Y en su columna y no en la base, porque la base son los puntos repartidos:
+        /// metidos ahí, un nivel 200 recién hecho tenía 183 puntos por repartir en vez de 995.
+        /// </remarks>
+        public const int ScrolledStat = 100;
 
         /// <summary>
         /// El conjunto del aventurero, que es el número 5 del juego: capa, sombrero, anillo, botas,

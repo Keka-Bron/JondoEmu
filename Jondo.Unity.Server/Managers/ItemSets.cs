@@ -141,6 +141,9 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>Every set's id.</summary>
+        public static IReadOnlyList<int> Ids { get { Ensure(); return _byId.Keys.ToList(); } }
+
         /// <summary>Returns a copy of the templates in a set, for the administration command.</summary>
         public static bool TryGetItems(int setId, out IReadOnlyList<int> items)
         {

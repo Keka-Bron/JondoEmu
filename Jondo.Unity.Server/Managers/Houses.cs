@@ -58,16 +58,20 @@ namespace Jondo.Unity.Server.Managers
     ///
     /// Lo hace tools/casas_mundo.py y se puede corregir a mano en el .json.
     ///
-    /// ─── Qué NO hace todavía ────────────────────────────────────────────────────────────────
+    /// ─── Owners ──────────────────────────────────────────────────────────────────────────────
     ///
-    /// No se manda la FICHA de la casa. La ficha es el submensaje que el cliente llama <c>lnx</c>
-    /// y viaja dentro del jss en el campo 9: precio en su f7, dueño en su f8, y estar en venta no
-    /// es un booleano sino llevar el f7. El problema es «sin dueño»: de las 1.276 fichas que hay
-    /// en las 34 carpetas de capturas, las 1.276 traen dueño. No hay ni una muestra de casa libre,
-    /// así que omitir el f8 es lo coherente con el formato pero NO está medido — y el jss es el
-    /// mensaje del que cuelga el mapa entero. Se deja fuera hasta tener una captura.
+    /// A house can have an owner now (see <see cref="HouseStore"/>), and only the 37 doors whose
+    /// model is known can: the plaque names the house by its model (f4 of the jss f9 entry) and
+    /// the model is where the price comes from. The other doors stay what they were, open to
+    /// everybody and nobody's.
     ///
-    /// Tampoco se hace el cofre de la casa, ni el código de acceso, ni comprar o vender.
+    /// The plaque -- lnx -- only ever travels for a house WITH an owner: of the 1,276 plaques in
+    /// the 34 capture folders, all 1,276 have one, and there is no sample of a free house. So a
+    /// house without an owner still sends none, exactly as before.
+    ///
+    /// Each door is ONE house with ONE instance (<see cref="Instance"/>); the house id the
+    /// protocol carries is ours, the door's rank in (map, element) order, stable while the doors
+    /// are. What is kept is keyed by the door, not by that number.
     /// </summary>
     public static class Houses
     {
@@ -76,6 +80,48 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>La habilidad «entrar en la casa».</summary>
         public const int EnterSkill = 84;
+
+        /// <summary>
+        /// "Comprar". Not in any capture: nobody bought a house. It is the client's own skill for
+        /// it, with the same action (5) as the four door skills that are measured.
+        /// </summary>
+        public const int BuySkill = 97;
+
+        /// <summary>"Vender": the owner's door when the house is not on sale, "poner casa en venta", frame 2.</summary>
+        public const int SellSkill = 98;
+
+        /// <summary>"Modificar el código", the owner's door, "cambiar codigo acceso", frame 5.</summary>
+        public const int CodeSkill = 100;
+
+        /// <summary>"Modificar el precio de venta": the owner's door once on sale, "retirar casa de la venta", frame 2.</summary>
+        public const int PriceSkill = 108;
+
+        /// <summary>
+        /// The skills a door of a house that can be owned is registered with, each with its own
+        /// skill instance. Which of them a viewer is offered is decided when the map is sent:
+        /// see <see cref="Handlers.HouseHandler.DoorSkillsFor"/>.
+        /// </summary>
+        public static readonly IReadOnlyList<int> OwnableDoorSkills = new[] { EnterSkill, BuySkill, SellSkill, CodeSkill, PriceSkill };
+
+        /// <summary>
+        /// The instance of every house: one per door here. The real server numbers the owners of a
+        /// building -- 22 is Sacrogrito69's in "Casas/" -- and the client sends it back in iwo f3,
+        /// izv f1 and jan f2; it is read and checked against this.
+        /// </summary>
+        public const int Instance = 1;
+
+        /// <summary>A house chest, as the interior's jss declares it: type 85, "entrar en mi casa", frame 16.</summary>
+        public const int ChestType = 85;
+
+        /// <summary>"Abrir", the chest's first skill (104), and "Poner el cerrojo", its second (105).</summary>
+        public const int ChestOpenSkill = 104;
+        public const int ChestLockSkill = 105;
+
+        /// <summary>
+        /// The two chests there are inside the 114 interiors: 12367 -- the one in the capture,
+        /// element 522477 -- and 46581, which the captures declare with type 85 three times.
+        /// </summary>
+        private static readonly HashSet<int> ChestGraphics = new() { 12367, 46581 };
 
         /// <summary>El tipo de la puerta de dentro, la que devuelve a la calle.</summary>
         public const int ExitType = 316;
@@ -122,6 +168,9 @@ namespace Jondo.Unity.Server.Managers
             public int Dwellings { get; }
 
             public bool IsKnown => Model != 0;
+
+            /// <summary>Whether the house can have an owner: its model, and so its price, is known.</summary>
+            public bool IsOwnable => IsKnown && Price > 0;
         }
 
         /// <summary>
@@ -152,6 +201,10 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Por qué puerta se vuelve a la calle desde cada interior.</summary>
         private static readonly Dictionary<long, Door> _wayBack = new();
 
+        /// <summary>The house id of every door, and the door of every house id.</summary>
+        private static readonly Dictionary<(long MapId, int ElementId), int> _houseIds = new();
+        private static readonly Dictionary<int, Door> _byHouseId = new();
+
         public static int Count => _byElement.Count;
         public static int InteriorCount => _exits.Count;
         public static IEnumerable<long> Interiors => _exits.Keys;
@@ -162,6 +215,8 @@ namespace Jondo.Unity.Server.Managers
             _byElement.Clear();
             _exits.Clear();
             _wayBack.Clear();
+            _houseIds.Clear();
+            _byHouseId.Clear();
 
             string path = Paths.Resolve("casas_mundo_3.6.10.10.json");
             if (!File.Exists(path))
@@ -262,6 +317,15 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
+            // The house ids: the doors' rank in (map, element) order, from 1.
+            var keys = new List<(long MapId, int ElementId)>(_byElement.Keys);
+            keys.Sort();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                _houseIds[keys[i]] = i + 1;
+                _byHouseId[i + 1] = _byElement[keys[i]];
+            }
+
             int puertasDeVerdad = 0;
             foreach (var exit in _exits.Values)
             {
@@ -296,6 +360,36 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>La puerta por la que se vuelve a la calle desde este interior.</summary>
         public static bool TryGetWayBack(long interiorMapId, out Door door)
             => _wayBack.TryGetValue(interiorMapId, out door);
+
+        /// <summary>The house id this door carries on the wire; zero for a door that is not a house.</summary>
+        public static int HouseIdOf(long mapId, int elementId)
+            => _houseIds.TryGetValue((mapId, elementId), out int id) ? id : 0;
+
+        /// <summary>The door of a house id, as the client sends it back in izv f2.</summary>
+        public static bool TryGetByHouseId(int houseId, out Door door)
+            => _byHouseId.TryGetValue(houseId, out door);
+
+        /// <summary>The chests standing in an interior: the elements with a chest's graphic.</summary>
+        public static List<Interactives.Element> ChestsIn(long interiorMapId)
+        {
+            var chests = new List<Interactives.Element>();
+            if (!IsInterior(interiorMapId)) return chests;
+            foreach (var element in Interactives.ElementsOf(interiorMapId))
+            {
+                if (ChestGraphics.Contains(element.Gfx)) chests.Add(element);
+            }
+            return chests;
+        }
+
+        /// <summary>Whether this element is a chest of this interior.</summary>
+        public static bool IsChest(long interiorMapId, int elementId)
+        {
+            foreach (var chest in ChestsIn(interiorMapId))
+            {
+                if (chest.Id == elementId) return true;
+            }
+            return false;
+        }
 
         private static List<long> SortedKeys(Dictionary<long, List<Door>> source)
         {

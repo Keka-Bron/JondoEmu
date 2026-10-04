@@ -56,6 +56,20 @@ namespace Jondo.Unity.Server
         public static int StatChance { get => S.StatChance; set => S.StatChance = value; }
         public static int StatAgility { get => S.StatAgility; set => S.StatAgility = value; }
 
+        // Lo que dieron los pergaminos, aparte de los puntos, y la suma de las dos cosas.
+        public static int ScrolledVitality { get => S.ScrolledVitality; set => S.ScrolledVitality = value; }
+        public static int ScrolledWisdom { get => S.ScrolledWisdom; set => S.ScrolledWisdom = value; }
+        public static int ScrolledStrength { get => S.ScrolledStrength; set => S.ScrolledStrength = value; }
+        public static int ScrolledIntelligence { get => S.ScrolledIntelligence; set => S.ScrolledIntelligence = value; }
+        public static int ScrolledChance { get => S.ScrolledChance; set => S.ScrolledChance = value; }
+        public static int ScrolledAgility { get => S.ScrolledAgility; set => S.ScrolledAgility = value; }
+        public static int TotalVitality => S.TotalVitality;
+        public static int TotalWisdom => S.TotalWisdom;
+        public static int TotalStrength => S.TotalStrength;
+        public static int TotalIntelligence => S.TotalIntelligence;
+        public static int TotalChance => S.TotalChance;
+        public static int TotalAgility => S.TotalAgility;
+
         // El inventario y el equipo
         public static List<PlayerItem> GetInventoryCopy() => S.GetInventoryCopy();
         public static void SetInventory(List<PlayerItem> items) => S.SetInventory(items);

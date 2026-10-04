@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -195,20 +195,29 @@ namespace Jondo.Unity.Server.Handlers
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(
-                        0, 1000 + 5L * SessionContext.State.StatStrength)));
+                        0, 1000 + 5L * SessionContext.State.TotalStrength)));
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Itn, ConnectionProtocol.BuildGathered(
                         resource.ItemId, cuantos)));
 
                 bool subeNivel = SessionContext.State.AddJobExperience(
-                    resource.JobId, JobExperience.PerGather, out long total, out int nivel);
+                    resource.JobId,
+                    Managers.Almanax.WithBonus(Managers.Almanax.BonusType.JobExperience, JobExperience.PerGather),
+                    out long total, out int nivel);
                 DatabaseManager.SaveJobExperience(characterId, resource.JobId, total);
+
+                // The new level goes before the experience, as the wheat that took the farmer to
+                // level 2 sends it: isz, then irq.
+                if (subeNivel) await WorkshopHandler.SendLevelUpAsync(stream, resource.JobId, nivel);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Irq, ConnectionProtocol.BuildJobExperience(
                         resource.JobId, JobExperience.Next(nivel), nivel,
                         JobExperience.Floor(nivel), total)));
+
+                // The job achievements: "Alcanzar el nivel 10 en 1 oficio" and its kind.
+                if (subeNivel) await Managers.Achievements.AfterJobLevelAsync(stream);
 
                 Resources.Spend(resource.MapId, resource.ElementId);
 

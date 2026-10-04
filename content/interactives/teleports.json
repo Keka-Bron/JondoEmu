@@ -17,7 +17,15 @@
     "round trips, and all four arches land on the same cell 381, all four returns on 221.",
     "",
     "The skill is 184 and NOT the 20739-20743 of the iwo: those are instance uids. Reading",
-    "one as the other is what left the well unclickable, with no error anywhere."
+    "one as the other is what left the well unclickable, with no error anywhere.",
+    "",
+    "THE KANOJEDO OF THE AMAKNA VILLAGE. The door of 88212247 into 99090957, 'The Kanojedo'.",
+    "The element is measured: the jss of 88212247 declares 472901 with skill 184 and the map",
+    "data puts it on cell 315, one step from where the guardian of the kanojedo stands (316).",
+    "The two doors out - 504555 and 504556, landing on 343 - were already in Giny's catalogue;",
+    "the way IN was in nobody's. The landing cell 457 is NOT measured: no capture walks through",
+    "this door. It is the walkable cell between the two doors out, so whoever comes in stands",
+    "where whoever goes out starts from."
   ],
   "passages": [
     {
@@ -69,6 +77,16 @@
       "skill": 184,
       "toMap": 238551040,
       "toCell": 221
+    },
+    {
+      "map": 88212247,
+      "element": 472901,
+      "cell": 315,
+      "gfx": 38080,
+      "type": -1,
+      "skill": 184,
+      "toMap": 99090957,
+      "toCell": 457
     }
   ]
 }

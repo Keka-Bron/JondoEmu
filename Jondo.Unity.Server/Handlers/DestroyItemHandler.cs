@@ -77,7 +77,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.TotalStrength)));
 
             Console.WriteLine($"[Inventario] Destruido {destruye} de {uid}" +
                               (entero ? " (entero)." : "."));

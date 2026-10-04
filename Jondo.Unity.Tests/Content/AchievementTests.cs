@@ -98,10 +98,14 @@ namespace Jondo.Unity.Tests.Content
             var book = new AchievementCatalogue();
             var log = new AchievementLog(book, new Player { Level = 200 });
 
+            // Except the level: "Alcanzar el nivel 200" is something a level-200 character has
+            // done. Those eleven are the only ones that may hold.
             int handedOut = 0;
             foreach (var badge in book.All())
             {
-                if (log.Holds(badge.Id)) handedOut++;
+                bool byLevel = badge.Objectives.Count > 0
+                               && badge.Objectives.All(o => o.Link?.Kind == AchievementLink.Level);
+                if (!byLevel && log.Holds(badge.Id)) handedOut++;
             }
 
             Assert.True(handedOut == 0,
@@ -116,13 +120,15 @@ namespace Jondo.Unity.Tests.Content
             var book = new AchievementCatalogue();
             var log = new AchievementLog(book, new Player());
 
+            // 322 name objectives the client does not describe; the link file ties 272 of those to
+            // a zone, a level, a job, a quest or a monster, and the rest stay without any.
             int empty = 0;
             foreach (var badge in book.All())
             {
                 if (badge.Objectives.Count == 0) empty++;
             }
 
-            Assert.True(empty > 250, $"only {empty} achievements have no objectives at all");
+            Assert.True(empty > 30, $"only {empty} achievements have no objectives at all");
 
             foreach (var badge in book.All())
             {

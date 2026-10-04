@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Reads Ankama's Cytrus manifests: which files a client version is made of, which chunks
+         each file is cut into, and which bundle on the CDN holds each chunk. Nothing else.
+
+         No package references on purpose. The launcher is what players get, and it only pulls
+         in what it needs; this is shared with the reversing tool, which downloads single files
+         from old clients with the same reader. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
+</Project>

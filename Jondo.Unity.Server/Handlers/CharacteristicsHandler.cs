@@ -148,7 +148,7 @@ namespace Jondo.Unity.Server.Handlers
         ///
         /// What it is CARRYING goes out as zero, because nothing here weighs the inventory yet.
         /// </summary>
-        private static long Pods() => 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength;
+        private static long Pods() => 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.TotalStrength;
 
         /// <summary>
         /// Sets a characteristic to whatever <paramref name="points"/> buys, counting from zero.

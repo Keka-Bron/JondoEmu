@@ -1,11 +1,14 @@
 # Administration item commands
 
-Jondo implements the Giny-style `.item` and `.itemset` chat commands. Both commands are
-administrator-only: because they are deliberately absent from the lower-role permission table,
-`CommandHandler` applies its safe default and requires `Roles.Administrador` (role **5**).
+Jondo implements the Giny-style `.item` and `.itemset` chat commands, and `.receta`, which hands
+over the ingredients of a recipe. All three are administrator-only: because they are deliberately
+absent from the lower-role permission table, `CommandHandler` applies its safe default and requires
+`Roles.Administrador` (role **5**).
 
 The command can be written in any chat channel. Jondo consumes the message instead of publishing
-it, then sends the result back as a private informational chat line in the same tab.
+it, then sends the result back as an information message (`lqn`, type 0, id 0 — the client's own
+row whose text is `{0}`), which only the author sees. It used to be a chat line in the author's own
+name, on the channel they had written in, and so it read as them talking in the general chat.
 The usage, validation and result text follows the Spanish, English or French language selected for
 that game session; command names and arguments do not change.
 
@@ -69,9 +72,40 @@ still created and the missing template ids are listed in the response.
 
 An unknown set id is rejected with `No existe la panoplia <id>.`
 
+## `.receta`
+
+Syntax:
+
+```text
+.receta <item-template-id> [times]
+```
+
+Examples:
+
+```text
+.receta 44
+.receta 44 5
+```
+
+The argument is the id of the item to craft, not of an ingredient. The server looks the recipe up
+in `Recipes` / `RecipeIngredients` and puts every ingredient in the bag, as many as the recipe asks
+for; `times`, from 1 to 100 and 1 by default, multiplies them. `.receta 44 5` hands over five
+crafts' worth, three and three times five of the two ingredients of item 44.
+
+Unlike `.item`, each ingredient joins the stack of the same thing the character already has
+(`ivj`), or starts one (`iua`), the way the grinder hands over runes: the workshop finds it in one
+piece. An ingredient whose template rolls — an item with characteristics in a range — arrives as one
+item each, each rolled on its own, the way a craft makes them.
+
+The answer names the recipe's job and level and lists what was handed over, `quantity x id`. An item
+with no recipe is rejected with `El objeto <id> no tiene receta.` If an ingredient has no template,
+the others still arrive and the missing ids are listed.
+
 ## Data and implementation
 
 - Command parsing, authorization and inventory push: `Jondo.Unity.Server/Handlers/CommandHandler.cs`
+- Stacking an ingredient into the bag: `WorkshopHandler.GiveAsync`
+- Recipe catalogue: `Jondo.Unity.Server/Managers/RecipeManager.cs`, tables `Recipes` and `RecipeIngredients`
 - Template lookup and factory-effect creation: `Jondo.Unity.Server/DatabaseManager.cs`
 - Complete set-id catalogue: `Jondo.Unity.Server/Managers/ItemSets.cs`
 - Set data: `datos/item_sets.json`

@@ -1,0 +1,496 @@
+{
+ "1": {
+  "name": "Borracho",
+  "preventsFight": true
+ },
+ "3": {
+  "name": "{{spell,24243,1::Portador}}",
+  "preventsSpellCast": true,
+  "preventsFight": true
+ },
+ "6": {
+  "name": "Arraigado",
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "7": {
+  "name": "Pesante",
+  "cantSwitchPosition": true
+ },
+ "18": {
+  "name": "Helado",
+  "preventsSpellCast": true,
+  "preventsFight": true
+ },
+ "19": {
+  "name": "Agrietado",
+  "preventsSpellCast": true,
+  "preventsFight": true
+ },
+ "41": {
+  "name": "Silencioso",
+  "preventsSpellCast": true
+ },
+ "42": {
+  "name": "Debilitado",
+  "preventsFight": true
+ },
+ "56": {
+  "name": "Invulnerable",
+  "invulnerable": true
+ },
+ "76": {
+  "name": "Incurable",
+  "incurable": true
+ },
+ "95": {
+  "name": "Imbloqueante",
+  "cantTackle": true
+ },
+ "96": {
+  "name": "No Placable",
+  "cantBeTackled": true
+ },
+ "97": {
+  "name": "Indesplazable",
+  "cantBeMoved": true
+ },
+ "115": {
+  "name": "Quinta Marca de Daigorobo",
+  "preventsFight": true
+ },
+ "157": {
+  "name": "Inquebrantable",
+  "cantBePushed": true
+ },
+ "218": {
+  "name": "Pacifista",
+  "cantDealDamage": true
+ },
+ "252": {
+  "name": "Aprisionado",
+  "cantBeMoved": true
+ },
+ "253": {
+  "name": "Capullo",
+  "cantTackle": true
+ },
+ "256": {
+  "name": "{{spell,24283,1::Frondoso}}",
+  "cantBePushed": true
+ },
+ "257": {
+  "name": "Amor Infinito",
+  "cantDealDamage": true
+ },
+ "269": {
+  "name": "Invulnerable",
+  "invulnerable": true
+ },
+ "298": {
+  "name": "Djim",
+  "invulnerable": true
+ },
+ "299": {
+  "name": "Ultram",
+  "invulnerable": true
+ },
+ "301": {
+  "name": "Norecules",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true
+ },
+ "365": {
+  "name": "Invulnerable",
+  "invulnerable": true
+ },
+ "375": {
+  "name": "Invulnerable a Distancia",
+  "invulnerableRange": true
+ },
+ "376": {
+  "name": "Invulnerable en Cuerpo a Cuerpo",
+  "invulnerableMelee": true
+ },
+ "379": {
+  "name": "Indesplazable",
+  "cantBeMoved": true
+ },
+ "388": {
+  "name": "Pesadilla",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "invulnerable": true,
+  "cantSwitchPosition": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "399": {
+  "name": "Invulnerable",
+  "invulnerable": true
+ },
+ "416": {
+  "name": "Ansohtería",
+  "cantBePushed": true,
+  "cantSwitchPosition": true
+ },
+ "438": {
+  "name": "Libertad",
+  "cantBePushed": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "555": {
+  "name": "Defensa de los Reyes",
+  "cantBeMoved": true,
+  "invulnerable": true,
+  "cantTackle": true
+ },
+ "567": {
+  "name": "Indesplazable e Invulnerable",
+  "cantBeMoved": true,
+  "invulnerable": true
+ },
+ "568": {
+  "name": "Fosa",
+  "cantSwitchPosition": true
+ },
+ "575": {
+  "name": "Aurora",
+  "invulnerable": true,
+  "incurable": true
+ },
+ "576": {
+  "name": "Cénit",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "invulnerable": true,
+  "incurable": true,
+  "cantBeTackled": true
+ },
+ "577": {
+  "name": "Crepúsculo",
+  "invulnerable": true
+ },
+ "659": {
+  "name": "Invulnerable",
+  "invulnerable": true
+ },
+ "678": {
+  "name": "Teleportal Imposible",
+  "cantUsePortals": true
+ },
+ "805": {
+  "name": "Eoquim",
+  "invulnerableRange": true,
+  "cantBeTackled": true
+ },
+ "807": {
+  "name": "Piroquim",
+  "invulnerableMelee": true
+ },
+ "808": {
+  "name": "Geoquim",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true
+ },
+ "935": {
+  "name": "Invulnerabilidad Glacial",
+  "invulnerable": true
+ },
+ "1116": {
+  "name": "Bilbieto",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true
+ },
+ "1277": {
+  "name": "Protegido de Ixchelonia",
+  "invulnerable": true
+ },
+ "1349": {
+  "name": "Ensordecido",
+  "cantBePushed": true
+ },
+ "1864": {
+  "name": "Bumbola",
+  "cantBeMoved": true,
+  "cantBePushed": true
+ },
+ "2445": {
+  "name": "Bomba",
+  "preventsSpellCast": true,
+  "preventsFight": true
+ },
+ "2608": {
+  "name": "Invulnerabilidad a distancia de bonquerubín",
+  "invulnerableRange": true
+ },
+ "2609": {
+  "name": "Cólera Bontariana 1",
+  "invulnerableRange": true
+ },
+ "2610": {
+  "name": "Cólera Bontariana 2",
+  "invulnerableRange": true
+ },
+ "2611": {
+  "name": "Cólera Bontariana 3",
+  "invulnerableRange": true
+ },
+ "2612": {
+  "name": "Cólera Bontariana 4",
+  "invulnerableRange": true
+ },
+ "2613": {
+  "name": "Cólera Bontariana 5",
+  "invulnerableRange": true
+ },
+ "2614": {
+  "name": "Cólera Bontariana 6",
+  "invulnerableRange": true
+ },
+ "2615": {
+  "name": "Cólera Bontariana 7",
+  "invulnerableRange": true
+ },
+ "2616": {
+  "name": "Cólera Bontariana 8",
+  "invulnerableRange": true
+ },
+ "2617": {
+  "name": "Cólera Bontariana 9",
+  "invulnerableRange": true
+ },
+ "2618": {
+  "name": "Cólera Bontariana 10",
+  "invulnerableRange": true
+ },
+ "2619": {
+  "name": "Invulnerabilidad a distancia de brakdiablillo",
+  "invulnerableMelee": true
+ },
+ "2620": {
+  "name": "Odio Brakmariano 1",
+  "invulnerableMelee": true
+ },
+ "2621": {
+  "name": "Odio Brakmariano 2",
+  "invulnerableMelee": true
+ },
+ "2622": {
+  "name": "Odio Brakmariano 3",
+  "invulnerableMelee": true
+ },
+ "2623": {
+  "name": "Odio Brakmariano 4",
+  "invulnerableMelee": true
+ },
+ "2624": {
+  "name": "Odio Brakmariano 5",
+  "invulnerableMelee": true
+ },
+ "2625": {
+  "name": "Odio Brakmariano 6",
+  "invulnerableMelee": true
+ },
+ "2626": {
+  "name": "Odio Brakmariano 7",
+  "invulnerableMelee": true
+ },
+ "2627": {
+  "name": "Odio Brakmariano 8",
+  "invulnerableMelee": true
+ },
+ "2628": {
+  "name": "Odio Brakmariano 9",
+  "invulnerableMelee": true
+ },
+ "2629": {
+  "name": "Odio Brakmariano 10",
+  "invulnerableMelee": true
+ },
+ "2930": {
+  "name": "Debilitado",
+  "preventsFight": true
+ },
+ "3083": {
+  "name": "[!] invu coffre",
+  "invulnerable": true
+ },
+ "3084": {
+  "name": "[!] Pacifist",
+  "preventsFight": true,
+  "cantDealDamage": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "3085": {
+  "name": "[!] Disciple (sans Pacifiste)",
+  "preventsFight": true,
+  "cantTackle": true
+ },
+ "3422": {
+  "name": "[!] Libéré",
+  "cantBePushed": true
+ },
+ "3483": {
+  "name": "[!] Belladone : Phase 1 et 3",
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "incurable": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "3505": {
+  "name": "{{spell,32263,1::Jardín Zen}}",
+  "invulnerable": true
+ },
+ "3697": {
+  "name": "[!] Lances combat reliquaire",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "invulnerable": true
+ },
+ "3814": {
+  "name": "[!] Fiolie Fiurieuse",
+  "incurable": true
+ },
+ "4361": {
+  "name": "Muñeca",
+  "cantBePushed": true
+ },
+ "4383": {
+  "name": "¡Se fue!",
+  "cantBePushed": true
+ },
+ "5141": {
+  "name": "[!] Marqueur Combat Erdnasyl",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true
+ },
+ "5191": {
+  "name": "Precipitado",
+  "preventsFight": true
+ },
+ "5346": {
+  "name": "Montón de Huesos",
+  "incurable": true
+ },
+ "5970": {
+  "name": "Gladiatroolear",
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "5971": {
+  "name": "[!] Mama Trooll (pré fight)",
+  "cantBeMoved": true,
+  "cantSwitchPosition": true
+ },
+ "6257": {
+  "name": "Incurable",
+  "incurable": true
+ },
+ "6261": {
+  "name": "Apático",
+  "cantDealDamage": true
+ },
+ "6288": {
+  "name": "[!] Gargandyas",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "incurable": true
+ },
+ "6298": {
+  "name": "Dormido",
+  "cantBeMoved": true,
+  "cantDealDamage": true,
+  "invulnerable": true,
+  "cantTackle": true
+ },
+ "6338": {
+  "name": "Despierto",
+  "invulnerable": true
+ },
+ "6476": {
+  "name": "[!] Corruption",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "incurable": true
+ },
+ "6530": {
+  "name": "[!] Qilby - Phase 1",
+  "invulnerableMelee": true
+ },
+ "6531": {
+  "name": "[!] Qilby - Phase 2",
+  "invulnerableRange": true
+ },
+ "6630": {
+  "name": "Aprisionado",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "incurable": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "6636": {
+  "name": "[!] Floracle",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "6637": {
+  "name": "[!] Cachot Libre",
+  "invulnerable": true
+ },
+ "6638": {
+  "name": "[!] playerStill inStartJail",
+  "invulnerable": true
+ },
+ "6642": {
+  "name": "[!] Épée Cassée",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "6648": {
+  "name": "Flor Maléfica",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "6649": {
+  "name": "Nautic el Prespic",
+  "invulnerable": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "6650": {
+  "name": "{{spell,32011,1::Estatua Maldita}}",
+  "cantBeMoved": true,
+  "cantBePushed": true,
+  "cantSwitchPosition": true,
+  "cantTackle": true,
+  "cantBeTackled": true
+ },
+ "7015": {
+  "name": "",
+  "cantTackle": true,
+  "cantBeTackled": true
+ }
+}

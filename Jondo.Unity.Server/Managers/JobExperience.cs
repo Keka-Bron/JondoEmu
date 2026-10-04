@@ -95,5 +95,39 @@ namespace Jondo.Unity.Server.Managers
             if (progress.Experience > Floor(MaxLevel)) progress.Experience = Floor(MaxLevel);
             return progress.Level > before;
         }
+
+        /// <summary>
+        /// What one craft gives: 20 a level of the recipe, less the further the job is above it.
+        /// </summary>
+        /// <remarks>
+        /// The only craft in the captures is the tutorial's ring, a level-1 recipe crafted at job
+        /// level 1: +20, which is exactly what takes the job to level 2. The rest is the formula
+        /// players measured on the official server and posted on its forum (2021):
+        ///
+        ///     xp = ⌊20 · recipe level / (1 + 0.1 · (job level − recipe level)^1.1)⌋
+        ///
+        /// which gives 20 there. A recipe above the job's level cannot be crafted at all.
+        /// </remarks>
+        public static int Craft(int jobLevel, int recipeLevel)
+        {
+            if (recipeLevel <= 0) return 0;
+            int gap = Math.Max(0, jobLevel - recipeLevel);
+            return (int)Math.Floor(20.0 * recipeLevel / (1 + 0.1 * Math.Pow(gap, 1.1)));
+        }
+
+        /// <summary>
+        /// What a rune that enters gives the magus: the item's level, with the same fall-off.
+        /// </summary>
+        /// <remarks>
+        /// Measured only at the top: in the two smithmagic captures a level-200 magus gets +1 for
+        /// each of the 83 runes that entered, on items of level 7, 10 and 44, and nothing for the
+        /// ones that failed. The item's level through the craft fall-off gives 1 for all three; a
+        /// magus of the item's own level gets the item's level.
+        /// </remarks>
+        public static int Magus(int jobLevel, int itemLevel)
+        {
+            int gap = Math.Max(0, jobLevel - itemLevel);
+            return Math.Max(1, (int)Math.Floor(Math.Max(1, itemLevel) / (1 + 0.1 * Math.Pow(gap, 1.1))));
+        }
     }
 }

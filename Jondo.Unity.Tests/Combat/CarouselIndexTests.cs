@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Jondo.Unity.World.Fights;
 using Xunit;
 
@@ -57,7 +57,6 @@ namespace Jondo.Unity.Tests.Combat
                 MaxHP = 50,
                 CurrentHP = 50,
                 JuegaTurno = true,
-                MuereEnRonda = -1,
             };
 
             fight.Invocar(summon, owner);

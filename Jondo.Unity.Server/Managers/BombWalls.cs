@@ -37,7 +37,8 @@ namespace Jondo.Unity.Server.Managers
     /// From the client's own class sheet: "Cuando hay al menos 2 bombas alineadas y espaciadas de
     /// 2 a 6 casillas máximo, forman automáticamente un muro de bombas. Se trata de un glifo en el
     /// suelo que no bloquea los desplazamientos ni las líneas de visión. Un muro puede estar
-    /// formado por tres bombas como mucho."
+    /// formado por tres bombas como mucho." The "2 a 6" is the room between the bombs, not
+    /// their distance -- see <see cref="MaxGap"/>.
     ///
     /// Nothing places a wall and nothing removes one: it is a FUNCTION of where the bombs are, so
     /// it is computed on demand and never stored. A bomb that dies takes its wall with it without
@@ -55,9 +56,23 @@ namespace Jondo.Unity.Server.Managers
     /// </remarks>
     public static class BombWalls
     {
-        /// <summary>The closest and furthest two bombs can stand and still hold a wall.</summary>
+        /// <summary>
+        /// The closest and furthest two bombs can stand and still hold a wall, as a distance
+        /// between their cells: 2 is one cell between them, 7 is six.
+        /// </summary>
+        /// <remarks>
+        /// MEASURED, and the sheet's "de 2 a 6 casillas" turned out to count the cells BETWEEN
+        /// the bombs, not the distance: read as a distance it refused the widest wall a player
+        /// can lay. Every wall the real server raised in the 22 Tymador captures, re-announced
+        /// as a burst of 401 glyphs whenever a bomb lands or moves, scored against the two
+        /// bombs holding it: distance 2 walled 4 times (245-274 with 260 between), 3 six times,
+        /// 4 six, 5 ten, 6 five, and 7 four times -- frame 4213 of "explobomba-tornabomba...":
+        /// bombs on 144 and 245 with all six cells 158, 173, 187, 202, 216, 231 announced. At 8
+        /// the wall is refused: frame 8192 of the same capture summons a bomb on 129 with one on
+        /// 245, the server takes every wall down and puts back only the 245-303 one.
+        /// </remarks>
         public const int MinGap = 2;
-        public const int MaxGap = 6;
+        public const int MaxGap = 7;
 
         /// <summary>"Un muro puede estar formado por tres bombas como mucho."</summary>
         public const int MaxBombs = 3;

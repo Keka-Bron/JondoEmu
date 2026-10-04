@@ -108,10 +108,16 @@ namespace Jondo.Unity.World.Content
         /// de sueño por 1,5" — so it is 150 here. It is a percentage and not a factor because
         /// there is no reason to carry a decimal through a JSON file for one NPC.
         ///
-        /// This is the shop the guide calls a Faveur Onirique: the fountain is not a new protocol
-        /// at all, it is an ordinary NPC conversation whose reply changes the dream.
+        /// He stands at a fountain, one in four, and is not the guide's Faveur Onirique: that is
+        /// a room of its own with its own NPC, see <see cref="DreamFavor"/>.
         /// </remarks>
         public int DreamPointsPercent { get; init; }
+
+        /// <summary>
+        /// True when this reply opens the dream favour of the room: the Dispensador de favores'
+        /// "Acepto el favor.", which ends the conversation on the favour's three choices.
+        /// </summary>
+        public bool DreamFavor { get; init; }
 
         /// <summary>True when the reply puts the player back where they came in from.</summary>
         /// <remarks>
@@ -400,6 +406,8 @@ namespace Jondo.Unity.World.Content
                             TeleportsTo = Number(choice, "teleport"),
                             Parameters = Numbers(choice, "params"),
                             DreamPointsPercent = (int)Number(choice, "dreamPointsPercent"),
+                            DreamFavor = choice.TryGetProperty("dreamFavor", out var favor)
+                                         && favor.ValueKind == JsonValueKind.True,
                             ReturnsHome = choice.TryGetProperty("teleportBack", out var back)
                                           && back.ValueKind == JsonValueKind.True,
                             AfterQuest = choice.TryGetProperty("afterQuest", out var after)
@@ -499,6 +507,7 @@ namespace Jondo.Unity.World.Content
                                 writer.WriteNumber("teleport", choice.TeleportsTo);
                             if (choice.DreamPointsPercent != 0)
                                 writer.WriteNumber("dreamPointsPercent", choice.DreamPointsPercent);
+                            if (choice.DreamFavor) writer.WriteBoolean("dreamFavor", true);
                             if (choice.Parameters.Count > 0)
                             {
                                 writer.WriteStartArray("params");

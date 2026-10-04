@@ -66,6 +66,9 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static volatile bool _loaded;
 
+        /// <summary>The maps of the file left out for having no name: see the load.</summary>
+        private static int _sinNombre;
+
         public static int Count
         {
             get { EnsureLoaded(); return _arenas.Count; }
@@ -96,7 +99,8 @@ namespace Jondo.Unity.Server.Managers
             if (!first) return;
 
             Console.WriteLine($"[Koliseo] {_arenas.Count} arenas: {CountFor(1)} para uno contra uno, " +
-                              $"{CountFor(2)} para dos contra dos, {CountFor(3)} para tres contra tres.");
+                              $"{CountFor(2)} para dos contra dos, {CountFor(3)} para tres contra tres " +
+                              $"({_sinNombre} sin nombre, fuera).");
         }
 
         private static void EnsureLoaded()
@@ -141,6 +145,13 @@ namespace Jondo.Unity.Server.Managers
                     // Las rojas del cliente son nuestro azul, y al revés. Ver el comentario de arriba.
                     Leer(entrada, "rojas", arena.Blue);
                     Leer(entrada, "azules", arena.Red);
+
+                    // Only the named ones are arenas the game fights on. The 46 without a name are
+                    // leftovers, and three of them (230170117, 230432261, 230694405) are not even
+                    // a board: every one of their 522 cells walks in a fight, where the drawn
+                    // board has 253 -- the client itself lights up cells out in the void, and
+                    // titles the map "Amakna 0,0" because it does not know it.
+                    if (arena.Name.Length == 0) { _sinNombre++; continue; }
 
                     if (arena.Capacity > 0) _arenas.Add(arena);
                 }

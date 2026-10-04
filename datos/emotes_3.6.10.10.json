@@ -1,0 +1,2093 @@
+{
+"_comment": [
+"The emotes, flattened from the client dump by tools/extract_emotes.py.",
+"anim        what khh names when the emote is played.",
+"cooldown    and duration, in milliseconds, as the client data gives them.",
+"allowOnMount  missing means it cannot be played on a mount.",
+"aura        an aura, not a gesture: the captures never answer one with khh.",
+"Every default value is dropped, so a missing key means zero or empty."
+],
+"emotes": {
+"1": {
+"anim": "AnimEmoteSit",
+"cooldown": 1200,
+"duration": 1250,
+"name": 2075,
+"staticAnim": "AnimEmoteSit_Statique"
+},
+"10": {
+"anim": "AnimEmoteKiss",
+"cooldown": 1800,
+"duration": 1250,
+"name": 2073
+},
+"100": {
+"anim": "AnimEmoteFountain",
+"cooldown": 2800,
+"duration": 1250,
+"name": 454248
+},
+"101": {
+"anim": "AnimEmoteCawwot",
+"cooldown": 2500,
+"duration": 1250,
+"name": 454250
+},
+"102": {
+"anim": "AnimEmoteScream",
+"cooldown": 1000,
+"duration": 1250,
+"name": 319452
+},
+"103": {
+"anim": "AnimEmoteCake",
+"cooldown": 1000,
+"duration": 1250,
+"name": 319828,
+"persistent": 1,
+"staticAnim": "AnimEmoteCake_Statique"
+},
+"104": {
+"anim": "AnimEmoteRobot",
+"cooldown": 3500,
+"duration": 1250,
+"name": 322821
+},
+"105": {
+"anim": "AnimEmoteBoxing",
+"cooldown": 2600,
+"duration": 1250,
+"name": 323192
+},
+"106": {
+"anim": "AnimEmoteWhiteflag",
+"cooldown": 2600,
+"duration": 1250,
+"name": 323210
+},
+"107": {
+"anim": "AnimEmoteFire",
+"cooldown": 1600,
+"duration": 1250,
+"name": 323257
+},
+"108": {
+"anim": "AnimEmoteFly_0",
+"cooldown": 3000,
+"name": 331024
+},
+"109": {
+"anim": "AnimEmoteWorm_0",
+"cooldown": 3500,
+"name": 331042
+},
+"11": {
+"anim": "AnimEmotePfc1",
+"cooldown": 2100,
+"duration": 1250,
+"name": 849684
+},
+"110": {
+"anim": "AnimEmoteDrill_0",
+"cooldown": 3000,
+"name": 396336
+},
+"111": {
+"anim": "AnimEmoteSniff_0",
+"cooldown": 3000,
+"name": 404642
+},
+"112": {
+"anim": "AnimEmoteTreasuremap",
+"cooldown": 3000,
+"duration": 1250,
+"name": 396875,
+"staticAnim": "AnimEmoteTreasuremap_Statique"
+},
+"113": {
+"anim": "AnimEmoteCompass",
+"cooldown": 600,
+"duration": 1250,
+"name": 396893,
+"staticAnim": "AnimEmoteCompass_Statique"
+},
+"114": {
+"anim": "AnimEmotePortal",
+"cooldown": 3000,
+"duration": 1250,
+"name": 408744
+},
+"115": {
+"anim": "AnimEmotePriest",
+"cooldown": 2600,
+"duration": 1250,
+"name": 397106
+},
+"116": {
+"anim": "AnimEmoteGravedigger",
+"cooldown": 2500,
+"duration": 1250,
+"name": 397227
+},
+"117": {
+"anim": "AnimEmoteEnu",
+"cooldown": 30000,
+"duration": 1250,
+"name": 428641
+},
+"118": {
+"anim": "AnimEmoteRoar_0",
+"cooldown": 2000,
+"name": 401722
+},
+"119": {
+"anim": "AnimEmoteSram",
+"cooldown": 30000,
+"duration": 1250,
+"name": 428638
+},
+"12": {
+"anim": "AnimEmotePfc2",
+"cooldown": 2100,
+"duration": 1250,
+"name": 849672
+},
+"120": {
+"anim": "AnimEmoteRogue",
+"cooldown": 30000,
+"duration": 1250,
+"name": 428701,
+"spellLevel": 84974
+},
+"121": {
+"anim": "AnimEmoteXelor",
+"cooldown": 30000,
+"duration": 1250,
+"name": 458143
+},
+"122": {
+"anim": "AnimEmoteEliotrope",
+"cooldown": 30000,
+"duration": 1250,
+"name": 494187
+},
+"123": {
+"anim": "AnimEmoteHaunt_0",
+"cooldown": 1000,
+"name": 493139
+},
+"124": {
+"anim": "AnimEmoteWaddle_0",
+"cooldown": 2700,
+"name": 492515
+},
+"125": {
+"anim": "AnimEmoteStomp_0",
+"cooldown": 3300,
+"name": 492533
+},
+"126": {
+"anim": "AnimEmoteInflame_0",
+"cooldown": 1000,
+"name": 506732
+},
+"127": {
+"anim": "AnimEmoteAuthenticator",
+"cooldown": 60000,
+"criterion": "OW=1",
+"duration": 1250,
+"name": 493084
+},
+"128": {
+"anim": "AnimEmotePaint",
+"cooldown": 3000,
+"duration": 3100,
+"name": 509224
+},
+"129": {
+"anim": "AnimEmoteSadida",
+"cooldown": 30000,
+"duration": 1250,
+"name": 509683
+},
+"13": {
+"anim": "AnimEmotePfc3",
+"cooldown": 2100,
+"duration": 1250,
+"name": 849685
+},
+"130": {
+"anim": "AnimEmoteDragon",
+"cooldown": 30000,
+"duration": 4200,
+"name": 515549
+},
+"131": {
+"anim": "AnimEmoteColor",
+"cooldown": 1800,
+"duration": 1250,
+"name": 510252
+},
+"132": {
+"anim": "AnimEmoteSteamer",
+"cooldown": 30000,
+"duration": 1250,
+"name": 556085,
+"spellLevel": 84975
+},
+"133": {
+"anim": "AnimEmoteUmbrella",
+"cooldown": 1500,
+"duration": 1250,
+"name": 658377,
+"persistent": 1,
+"staticAnim": "AnimEmoteUmbrella_Statique"
+},
+"134": {
+"anim": "AnimEmoteFishing",
+"cooldown": 3600,
+"duration": 1250,
+"name": 556061
+},
+"135": {
+"anim": "AnimEmoteCra",
+"cooldown": 30000,
+"duration": 1250,
+"name": 556268
+},
+"136": {
+"anim": "AnimEmotePandawa",
+"cooldown": 30000,
+"duration": 1250,
+"name": 576317
+},
+"137": {
+"anim": "AnimEmoteHuppermage",
+"cooldown": 30000,
+"duration": 1250,
+"name": 594696,
+"spellLevel": 83803
+},
+"138": {
+"anim": "AnimEmoteKrosmaga",
+"cooldown": 30000,
+"duration": 1250,
+"name": 594698
+},
+"139": {
+"anim": "AnimEmoteBonta",
+"cooldown": 20000,
+"criterion": "Pr=5|Pr=6|Pr=10|Pr=11|Pr=16|Pr=17",
+"duration": 1250,
+"name": 594694
+},
+"14": {
+"anim": "AnimEmoteCross",
+"cooldown": 1200,
+"duration": 1250,
+"name": 2098,
+"persistent": 1,
+"staticAnim": "AnimEmoteCross_Statique"
+},
+"140": {
+"anim": "AnimEmoteBrakmar",
+"cooldown": 20000,
+"criterion": "Pr=22|Pr=23|Pr=27|Pr=28|Pr=32|Pr=33",
+"duration": 1250,
+"name": 594692
+},
+"141": {
+"anim": "random(AnimEmoteHeadsortailsA,AnimEmoteHeadsortailsB)",
+"cooldown": 3100,
+"duration": 1250,
+"name": 615724
+},
+"142": {
+"anim": "AnimEmoteEcaflip",
+"cooldown": 30000,
+"duration": 1250,
+"name": 615721
+},
+"143": {
+"anim": "AnimEmoteSacrieur",
+"cooldown": 30000,
+"duration": 1250,
+"name": 662429
+},
+"144": {
+"anim": "AnimEmoteEni",
+"cooldown": 30000,
+"duration": 1250,
+"name": 632762
+},
+"146": {
+"anim": "AnimEmoteZobal",
+"cooldown": 30000,
+"duration": 1250,
+"name": 636611
+},
+"147": {
+"anim": "AnimEmoteOsa",
+"cooldown": 30000,
+"duration": 1250,
+"name": 671323,
+"spellLevel": 83802
+},
+"148": {
+"anim": "AnimEmoteFeca",
+"cooldown": 30000,
+"duration": 1250,
+"name": 668011
+},
+"149": {
+"anim": "AnimEmoteBallon",
+"cooldown": 5000,
+"duration": 3800,
+"name": 700925
+},
+"15": {
+"anim": "AnimEmotePoint",
+"cooldown": 1400,
+"duration": 1700,
+"name": 2094,
+"persistent": 1,
+"staticAnim": "AnimEmotePoint_Statique"
+},
+"150": {
+"anim": "AnimEmoteVials",
+"cooldown": 10000,
+"duration": 1250,
+"name": 700924
+},
+"152": {
+"anim": "AnimEmoteOuginak",
+"cooldown": 30000,
+"duration": 1250,
+"name": 720641
+},
+"153": {
+"anim": "AnimEmoteWow_0",
+"cooldown": 4760,
+"name": 720686
+},
+"154": {
+"anim": "AnimEmotePipi_0",
+"cooldown": 4040,
+"name": 720693
+},
+"155": {
+"anim": "AnimEmoteGuildwinner",
+"cooldown": 2000,
+"criterion": "Pw=2",
+"duration": 1250,
+"name": 720985,
+"persistent": 1,
+"staticAnim": "AnimEmoteGuildwinner_Statique"
+},
+"156": {
+"anim": "AnimEmoteChampcup",
+"cooldown": 60000,
+"duration": 1250,
+"name": 723308,
+"staticAnim": "AnimEmoteChampcup_Statique"
+},
+"158": {
+"anim": "AnimEmoteVomi",
+"cooldown": 3000,
+"duration": 1250,
+"name": 724156
+},
+"159": {
+"anim": "AnimEmoteQuest",
+"cooldown": 3500,
+"duration": 1250,
+"name": 727533
+},
+"16": {
+"anim": "AnimEmoteCrow",
+"cooldown": 2600,
+"duration": 1250,
+"name": 2116
+},
+"160": {
+"anim": "AnimEmoteSidimote",
+"cooldown": 30000,
+"duration": 1250,
+"name": 729468,
+"spellLevel": 84976
+},
+"163": {
+"anim": "AnimEmoteTournoi",
+"cooldown": 60000,
+"name": 728385,
+"spellLevel": 33875
+},
+"166": {
+"anim": "AnimEmoteZombie",
+"cooldown": 30000,
+"duration": 1250,
+"name": 730566
+},
+"167": {
+"anim": "AnimEmoteEtendardbonta",
+"cooldown": 3200,
+"criterion": "Ps=1&Pa>99",
+"duration": 1250,
+"name": 732259
+},
+"168": {
+"anim": "AnimEmoteEtendardbrakmar",
+"cooldown": 3200,
+"criterion": "Ps=2&Pa>99",
+"duration": 1250,
+"name": 732260
+},
+"169": {
+"anim": "AnimEmoteFlammesbo_0",
+"cooldown": 2100,
+"name": 736779
+},
+"17": {
+"anim": "AnimEmoteCrunchbread",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1125819
+},
+"170": {
+"anim": "AnimEmoteFlammesbr_0",
+"cooldown": 2100,
+"name": 736781
+},
+"171": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 746079
+},
+"172": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 746081
+},
+"173": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 746083
+},
+"174": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 746088
+},
+"175": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 746089
+},
+"176": {
+"anim": "AnimEmoteEtendarddws1",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761548,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws1_Statique"
+},
+"177": {
+"anim": "AnimEmoteEtendarddws2",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761546,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws2_Statique"
+},
+"178": {
+"anim": "AnimEmoteEtendarddws3",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761545,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws3_Statique"
+},
+"179": {
+"anim": "AnimEmoteEtendarddws4",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761544,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws4_Statique"
+},
+"18": {
+"anim": "AnimEmoteBeer",
+"cooldown": 1800,
+"duration": 1250,
+"name": 2120
+},
+"180": {
+"anim": "AnimEmoteEtendarddws5",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761543,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws5_Statique"
+},
+"181": {
+"anim": "AnimEmoteDofus5",
+"cooldown": 2100,
+"duration": 1250,
+"name": 754738
+},
+"182": {
+"anim": "AnimEmoteDofus6",
+"cooldown": 2100,
+"duration": 1250,
+"name": 754740
+},
+"183": {
+"anim": "AnimEmoteDofus1",
+"cooldown": 2100,
+"duration": 1250,
+"name": 754742
+},
+"184": {
+"anim": "AnimEmoteDofus3",
+"cooldown": 2100,
+"duration": 1250,
+"name": 754744
+},
+"185": {
+"anim": "AnimEmoteDofus4",
+"cooldown": 2100,
+"duration": 1250,
+"name": 754746
+},
+"186": {
+"anim": "AnimEmoteDofus2",
+"cooldown": 2100,
+"duration": 1250,
+"name": 754748
+},
+"187": {
+"anim": "AnimEmoteCrunchfish",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1125800
+},
+"188": {
+"anim": "AnimEmoteCrunchmeat",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1125801
+},
+"189": {
+"anim": "AnimEmoteDino",
+"cooldown": 30000,
+"duration": 1250,
+"name": 761541
+},
+"19": {
+"anim": "AnimEmoteRest",
+"cooldown": 1000,
+"duration": 1250,
+"name": 2102
+},
+"190": {
+"anim": "AnimEmoteEtendarddws6",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761679,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws6_Statique"
+},
+"191": {
+"anim": "AnimEmoteEtendarddws7",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761681,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws7_Statique"
+},
+"192": {
+"anim": "AnimEmoteEtendarddws8",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761683,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws8_Statique"
+},
+"193": {
+"anim": "AnimEmoteEtendarddws9",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761685,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws9_Statique"
+},
+"194": {
+"anim": "AnimEmoteEtendarddws10",
+"cooldown": 1000,
+"duration": 1250,
+"name": 761699,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendarddws10_Statique"
+},
+"195": {
+"anim": "AnimEmoteDinofear",
+"cooldown": 30000,
+"duration": 1250,
+"name": 762775
+},
+"196": {
+"anim": "AnimEmoteOla",
+"cooldown": 2600,
+"duration": 1250,
+"name": 774969
+},
+"197": {
+"anim": "AnimEmoteCarnival",
+"cooldown": 2600,
+"duration": 1250,
+"name": 774995,
+"persistent": 1,
+"staticAnim": "AnimEmoteCarnival_Statique"
+},
+"198": {
+"anim": "AnimEmoteOlatrigger",
+"duration": 1250,
+"name": 775270
+},
+"199": {
+"anim": "AnimEmoteBlackdragon",
+"cooldown": 3900,
+"duration": 1250,
+"name": 775440
+},
+"2": {
+"anim": "AnimEmoteBye",
+"cooldown": 2400,
+"duration": 1250,
+"name": 2087
+},
+"200": {
+"anim": "AnimEmoteSwishswish",
+"cooldown": 1800,
+"duration": 1250,
+"name": 777690
+},
+"201": {
+"anim": "AnimEmoteSwishswishtrigger",
+"cooldown": 1800,
+"duration": 1250,
+"name": 778002
+},
+"202": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 778759
+},
+"203": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 778761
+},
+"204": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 778763
+},
+"205": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 778783
+},
+"206": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 778785
+},
+"207": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 778787
+},
+"208": {
+"anim": "AnimEmoteReunificationdofus",
+"cooldown": 3400,
+"duration": 1250,
+"name": 779640
+},
+"209": {
+"anim": "AnimEmoteInsecte",
+"cooldown": 6000,
+"duration": 1250,
+"name": 783481
+},
+"21": {
+"anim": "AnimEmoteChamp",
+"cooldown": 60000,
+"duration": 1250,
+"name": 2081
+},
+"210": {
+"anim": "AnimEmoteTimeanomaly",
+"cooldown": 3400,
+"duration": 1250,
+"name": 795100
+},
+"211": {
+"anim": "AnimEmoteHungry",
+"cooldown": 2000,
+"duration": 1250,
+"name": 790006
+},
+"212": {
+"anim": "AnimEmoteStuffed",
+"cooldown": 2000,
+"duration": 1250,
+"name": 790008
+},
+"213": {
+"anim": "AnimEmoteBunnyhop",
+"cooldown": 3400,
+"duration": 1250,
+"name": 790010
+},
+"214": {
+"anim": "AnimEmoteHeartbreak",
+"cooldown": 200,
+"duration": 1250,
+"name": 790012
+},
+"215": {
+"anim": "AnimEmoteNoxine",
+"cooldown": 200,
+"duration": 1250,
+"name": 795103
+},
+"216": {
+"anim": "AnimEmoteDuckwalk",
+"cooldown": 4500,
+"duration": 1250,
+"name": 800007
+},
+"217": {
+"anim": "AnimEmoteHeadbang",
+"cooldown": 4000,
+"duration": 1250,
+"name": 800008
+},
+"218": {
+"anim": "AnimEmoteHell",
+"cooldown": 2000,
+"duration": 1250,
+"name": 800012
+},
+"219": {
+"anim": "AnimEmoteEguitar",
+"cooldown": 2600,
+"duration": 1250,
+"name": 800018
+},
+"22": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 2160
+},
+"220": {
+"anim": "AnimEmoteMicro",
+"cooldown": 5200,
+"duration": 1250,
+"name": 800028
+},
+"221": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 801614
+},
+"222": {
+"anim": "AnimEmoteCrocabulia",
+"cooldown": 4000,
+"duration": 3900,
+"name": 805246
+},
+"223": {
+"anim": "random(AnimEmoteDream,AnimEmoteDreamdofus,AnimEmoteDreamfly,AnimEmoteDreamkamas,AnimEmoteDreamsaw,AnimEmoteDreamslip)",
+"cooldown": 5500,
+"duration": 1250,
+"name": 815615
+},
+"224": {
+"anim": "AnimEmoteSavage",
+"cooldown": 6000,
+"duration": 1250,
+"name": 815578
+},
+"23": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 2162
+},
+"230": {
+"anim": "AnimEmoteBox",
+"cooldown": 2500,
+"duration": 1250,
+"name": 815407
+},
+"231": {
+"anim": "AnimEmoteAnniversary",
+"cooldown": 5000,
+"duration": 1250,
+"name": 815412
+},
+"232": {
+"anim": "AnimEmotePandora",
+"cooldown": 3000,
+"duration": 1250,
+"name": 824672
+},
+"233": {
+"anim": "random(AnimEmoteMagicpiou,AnimEmoteMagictofu,AnimEmoteMagicwabbit)",
+"cooldown": 5500,
+"duration": 1250,
+"name": 836727
+},
+"234": {
+"anim": "AnimEmoteFlyingbroom",
+"cooldown": 5500,
+"duration": 1250,
+"name": 837803
+},
+"235": {
+"anim": "AnimEmoteMagicaway",
+"cooldown": 2000,
+"duration": 1250,
+"name": 836732
+},
+"236": {
+"anim": "AnimEmoteVanish",
+"cooldown": 900,
+"duration": 1250,
+"name": 836734
+},
+"237": {
+"anim": "AnimEmoteSamourai",
+"cooldown": 5500,
+"duration": 1250,
+"name": 857488
+},
+"238": {
+"anim": "AnimEmoteDragonkta",
+"cooldown": 4600,
+"duration": 1250,
+"name": 869498
+},
+"239": {
+"anim": "AnimEmotePandawushu",
+"cooldown": 17200,
+"duration": 1250,
+"name": 875667
+},
+"24": {
+"anim": "AnimEmoteLaugh",
+"cooldown": 4200,
+"duration": 6500,
+"name": 2152
+},
+"240": {
+"anim": "AnimEmoteOrigami",
+"cooldown": 10800,
+"duration": 1250,
+"name": 880764
+},
+"241": {
+"anim": "AnimEmoteGuerrier",
+"cooldown": 6400,
+"duration": 1250,
+"name": 891440
+},
+"242": {
+"anim": "random(AnimEmoteDice1,AnimEmoteDice2,AnimEmoteDice3,AnimEmoteDice4,AnimEmoteDice5,AnimEmoteDice6)",
+"cooldown": 3750,
+"duration": 1250,
+"name": 894874
+},
+"243": {
+"anim": "AnimEmoteJackpot",
+"cooldown": 7300,
+"duration": 1250,
+"name": 894877
+},
+"244": {
+"anim": "AnimEmoteRoulette",
+"cooldown": 5700,
+"duration": 1250,
+"name": 894878
+},
+"245": {
+"anim": "AnimEmoteKrosmose",
+"cooldown": 13000,
+"duration": 1250,
+"name": 899286
+},
+"246": {
+"anim": "AnimEmoteCharmeurdeserpent",
+"cooldown": 18100,
+"duration": 1250,
+"name": 899418
+},
+"247": {
+"anim": "AnimEmoteSlip20ans",
+"cooldown": 32000,
+"duration": 1250,
+"name": 899449
+},
+"248": {
+"anim": "AnimEmoteMeteor",
+"cooldown": 4800,
+"duration": 1250,
+"name": 909359
+},
+"249": {
+"anim": "AnimEmoteSnap",
+"cooldown": 3200,
+"duration": 1250,
+"name": 915006
+},
+"25": {
+"anim": "AnimEmoteNo",
+"cooldown": 2200,
+"duration": 1250,
+"name": 2158
+},
+"250": {
+"anim": "AnimEmoteSnapvanish",
+"cooldown": 3900,
+"duration": 1250,
+"name": 915008
+},
+"251": {
+"anim": "AnimEmoteMagicalbox",
+"cooldown": 5400,
+"duration": 1250,
+"name": 915010
+},
+"252": {
+"anim": "AnimEmoteMagichead",
+"cooldown": 5000,
+"duration": 1250,
+"name": 915012
+},
+"253": {
+"anim": "random(AnimEmoteHeads1,AnimEmoteHeads2,AnimEmoteHeads3,AnimEmoteHeads4)",
+"cooldown": 1900,
+"criterion": "PX!G&HA!876",
+"duration": 1250,
+"name": 915014,
+"staticAnim": "random(AnimEmoteHeads1_Statique,AnimEmoteHeads2_Statique,AnimEmoteHeads3_Statique,AnimEmoteHeads4_Statique)"
+},
+"254": {
+"anim": "AnimEmotePluie",
+"cooldown": 13900,
+"duration": 1250,
+"name": 916412
+},
+"255": {
+"anim": "AnimEmoteEtendardkta",
+"cooldown": 1000,
+"duration": 1250,
+"name": 916358,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardkta_Statique"
+},
+"256": {
+"anim": "AnimEmoteEtendardemperor",
+"cooldown": 1000,
+"duration": 1250,
+"name": 922878,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardemperor_Statique"
+},
+"257": {
+"anim": "AnimEmoteEtendardSolary",
+"cooldown": 1000,
+"duration": 1250,
+"name": 922882,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardSolary_Statique"
+},
+"258": {
+"anim": "AnimEmote1500",
+"cooldown": 15000,
+"duration": 1250,
+"name": 923729
+},
+"259": {
+"anim": "AnimEmoteCassenoisette",
+"cooldown": 6500,
+"duration": 1250,
+"name": 924257
+},
+"26": {
+"anim": "AnimEmoteCry",
+"cooldown": 2500,
+"duration": 4800,
+"name": 2155
+},
+"260": {
+"anim": "AnimEmoteSporthiver",
+"cooldown": 20000,
+"duration": 1250,
+"name": 923836
+},
+"261": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 926996
+},
+"262": {
+"anim": "AnimEmoteJiva",
+"cooldown": 10080,
+"duration": 1250,
+"name": 929251,
+"spellLevel": 84399
+},
+"263": {
+"anim": "AnimEmoteSilvosse",
+"cooldown": 16280,
+"duration": 1250,
+"name": 931846
+},
+"264": {
+"anim": "AnimEmoteUlgrude",
+"cooldown": 7300,
+"duration": 1250,
+"name": 937416
+},
+"265": {
+"anim": "AnimEmoteShariva",
+"cooldown": 600,
+"duration": 1250,
+"name": 937691
+},
+"266": {
+"anim": "AnimEmoteOcreDragon",
+"cooldown": 9040,
+"duration": 1250,
+"name": 939932
+},
+"267": {
+"anim": "AnimEmoteSilouate",
+"cooldown": 1628,
+"duration": 1250,
+"name": 940930
+},
+"268": {
+"anim": "AnimEmoteTsmd",
+"cooldown": 8000,
+"duration": 1250,
+"name": 943466
+},
+"269": {
+"anim": "AnimEmoteTsmdreaction",
+"cooldown": 8000,
+"duration": 1250,
+"name": 943571
+},
+"27": {
+"anim": "AnimEmoteDance",
+"cooldown": 1800,
+"duration": 1250,
+"name": 463124
+},
+"270": {
+"anim": "AnimEmoteRosal",
+"cooldown": 14200,
+"duration": 1250,
+"name": 948947
+},
+"271": {
+"anim": "AnimEmoteTeamcroquette",
+"cooldown": 8680,
+"duration": 1250,
+"name": 953256
+},
+"272": {
+"anim": "AnimEmoteCapturedame",
+"cooldown": 16680,
+"duration": 1250,
+"name": 953265
+},
+"273": {
+"anim": "random(AnimEmoteEvolution1,AnimEmoteEvolution2,AnimEmoteEvolution3,AnimEmoteEvolution4)",
+"cooldown": 8500,
+"duration": 1250,
+"name": 954919,
+"staticAnim": "random(AnimEmoteEvolution1_Statique,AnimEmoteEvolution2_Statique,AnimEmoteEvolution3_Statique,AnimEmoteEvolution4_Statique)"
+},
+"274": {
+"anim": "AnimEmoteRabbi",
+"cooldown": 20000,
+"duration": 1250,
+"name": 949625
+},
+"275": {
+"anim": "AnimEmoteSumens",
+"cooldown": 8600,
+"duration": 1250,
+"name": 954589
+},
+"277": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 959952
+},
+"278": {
+"anim": "AnimEmoteHecate",
+"cooldown": 28400,
+"duration": 1250,
+"name": 962491
+},
+"279": {
+"anim": "AnimEmotePouchecot",
+"cooldown": 3000,
+"duration": 1250,
+"name": 963775,
+"persistent": 1,
+"staticAnim": "AnimEmotePouchecot_Statique"
+},
+"28": {
+"anim": "AnimEmoteGuitar",
+"cooldown": 1800,
+"duration": 1250,
+"name": 494387,
+"staticAnim": "AnimEmoteGuitar_Statique"
+},
+"280": {
+"anim": "AnimEmoteRaval",
+"cooldown": 10000,
+"duration": 1250,
+"name": 967298
+},
+"281": {
+"anim": "AnimEmoteEtendardmercenaire",
+"cooldown": 1000,
+"duration": 1250,
+"name": 968384
+},
+"282": {
+"anim": "AnimEmoteMaimane",
+"cooldown": 5000,
+"duration": 1250,
+"name": 972247
+},
+"283": {
+"anim": "AnimEmoteBrumaire",
+"cooldown": 10000,
+"duration": 1250,
+"name": 977677,
+"persistent": 1,
+"spellLevel": 84383,
+"staticAnim": "AnimEmoteBrumaire_Statique"
+},
+"284": {
+"anim": "AnimEmoteKnight",
+"cooldown": 3000,
+"duration": 1250,
+"name": 985809,
+"persistent": 1,
+"staticAnim": "AnimEmoteKnight_Statique"
+},
+"285": {
+"anim": "AnimEmoteDjaul",
+"cooldown": 10720,
+"duration": 1250,
+"name": 986065
+},
+"286": {
+"anim": "AnimEmoteForgelances",
+"cooldown": 16900,
+"duration": 1250,
+"name": 997136
+},
+"287": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 1044410
+},
+"29": {
+"anim": "AnimEmoteJuggle",
+"cooldown": 2000,
+"duration": 3000,
+"name": 454253,
+"persistent": 1,
+"staticAnim": "AnimEmoteJuggle_Statique"
+},
+"291": {
+"anim": "AnimEmoteDieuIop",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1090534,
+"spellLevel": 29063
+},
+"292": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1126023,
+"spellLevel": 35914
+},
+"293": {
+"anim": "AnimEmoteDieuEcaflip",
+"cooldown": 20000,
+"duration": 5000,
+"name": 1126033,
+"spellLevel": 35916
+},
+"294": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 5100,
+"duration": 5100,
+"name": 1126043,
+"spellLevel": 29217
+},
+"295": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 6100,
+"duration": 6100,
+"name": 1126053,
+"spellLevel": 29218
+},
+"296": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1126063,
+"spellLevel": 29219
+},
+"297": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7500,
+"duration": 7500,
+"name": 1126073,
+"spellLevel": 29220
+},
+"298": {
+"anim": "AnimEmoteDieuEniripsa",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1090837,
+"persistent": 1,
+"spellLevel": 35917,
+"staticAnim": "AnimEmoteDieuEniripsa_Statique"
+},
+"299": {
+"anim": "AnimEmoteDieuCra",
+"cooldown": 20000,
+"duration": 5000,
+"name": 1090836,
+"spellLevel": 35918
+},
+"3": {
+"anim": "AnimEmoteAppl",
+"cooldown": 1300,
+"duration": 1250,
+"name": 2085
+},
+"30": {
+"anim": "AnimEmoteRead",
+"cooldown": 1800,
+"duration": 1250,
+"name": 454244
+},
+"300": {
+"anim": "AnimEmoteDieuSacri",
+"cooldown": 20000,
+"duration": 5000,
+"name": 1135992,
+"spellLevel": 35920
+},
+"301": {
+"anim": "AnimEmoteDieuSadi",
+"cooldown": 15000,
+"duration": 15000,
+"name": 1136002,
+"spellLevel": 35921
+},
+"302": {
+"anim": "AnimEmoteDieuOsamodas",
+"cooldown": 20000,
+"duration": 5000,
+"name": 1136012,
+"spellLevel": 35922
+},
+"303": {
+"anim": "AnimEmoteDieuSram",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1136022,
+"spellLevel": 35924,
+"staticAnim": "AnimEmoteDieuSram_Statique"
+},
+"304": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1136042,
+"spellLevel": 35926
+},
+"305": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1136032,
+"spellLevel": 35924
+},
+"306": {
+"anim": "AnimEmoteDieuXelor",
+"cooldown": 20000,
+"duration": 5000,
+"name": 1090842,
+"spellLevel": 35925
+},
+"307": {
+"anim": "AnimEmoteDieuFeca",
+"cooldown": 20000,
+"duration": 5000,
+"name": 1136052,
+"spellLevel": 35919
+},
+"308": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1090848,
+"spellLevel": 44862
+},
+"309": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1090850,
+"spellLevel": 48252
+},
+"310": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1090852,
+"spellLevel": 49778
+},
+"311": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1090854,
+"spellLevel": 52097
+},
+"312": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1090856,
+"spellLevel": 52095
+},
+"313": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1090858,
+"spellLevel": 52098
+},
+"314": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1090861,
+"spellLevel": 52096
+},
+"315": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 7200,
+"duration": 7200,
+"name": 1090863,
+"spellLevel": 52099
+},
+"316": {
+"anim": "AnimEmoteDefaut",
+"cooldown": 5000,
+"duration": 5000,
+"name": 1090865,
+"spellLevel": 53645
+},
+"318": {
+"anim": "AnimEmoteDegaine",
+"cooldown": 50,
+"name": 1118273,
+"persistent": 1,
+"staticAnim": "AnimEmoteDegaine_Statique"
+},
+"319": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 1118840
+},
+"32": {
+"anim": "AnimEmoteWin",
+"cooldown": 3000,
+"duration": 1250,
+"name": 454246
+},
+"320": {
+"anim": "AnimEmoteEtendardKCorp",
+"cooldown": 1800,
+"duration": 1700,
+"name": 1118983,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardKCorp_Statique"
+},
+"321": {
+"anim": "AnimEmoteEtendardGentlemate",
+"cooldown": 1800,
+"duration": 1700,
+"name": 1118985,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardGentlemate_Statique"
+},
+"322": {
+"anim": "AnimEmoteEtendardAgis",
+"cooldown": 1800,
+"duration": 1700,
+"name": 1118987,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardAgis_Statique"
+},
+"323": {
+"anim": "AnimEmoteBackToRush",
+"cooldown": 1800,
+"duration": 1700,
+"name": 1124237,
+"persistent": 1,
+"staticAnim": "AnimEmoteBackToRush_Statique"
+},
+"324": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 30,
+"name": 1125450
+},
+"325": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 30,
+"name": 1125452
+},
+"326": {
+"anim": "AnimEmoteEliacube",
+"cooldown": 4900,
+"duration": 1480,
+"name": 1125462
+},
+"327": {
+"anim": "AnimEmoteGrougalorasalar",
+"cooldown": 7100,
+"duration": 2130,
+"name": 1125467
+},
+"328": {
+"anim": "AnimEmoteEatfish",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1125778,
+"persistent": 1,
+"staticAnim": "AnimEmoteEatfish_Statique"
+},
+"329": {
+"anim": "AnimEmoteEatmeat",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1125811,
+"persistent": 1,
+"staticAnim": "AnimEmoteEatmeat_Statique"
+},
+"33": {
+"anim": "AnimEmoteShit",
+"cooldown": 2200,
+"duration": 1250,
+"name": 2109
+},
+"330": {
+"anim": "AnimEmoteEatbread",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1125829,
+"persistent": 1,
+"staticAnim": "AnimEmoteEatbread_Statique"
+},
+"331": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 30,
+"name": 1126113
+},
+"332": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 30,
+"name": 1139812
+},
+"333": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 30,
+"name": 1141655
+},
+"334": {
+"anim": "AnimEmoteBroom",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1142955,
+"persistent": 1,
+"staticAnim": "AnimEmoteBroom_Statique"
+},
+"335": {
+"anim": "AnimEmoteColor",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1142957
+},
+"336": {
+"anim": "AnimEmoteChichala",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1142959
+},
+"337": {
+"anim": "AnimEmoteBouclier",
+"cooldown": 2000,
+"duration": 1250,
+"name": 1144075
+},
+"338": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 30,
+"criterion": "Pw=2",
+"name": 1156668
+},
+"339": {
+"cooldown": 200,
+"name": 1158317,
+"spellLevel": 9636
+},
+"34": {
+"anim": "AnimEmoteHips",
+"cooldown": 1000,
+"duration": 1250,
+"name": 2111
+},
+"341": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1800,
+"name": 1171643
+},
+"342": {
+"anim": "AnimEmoteDraconique",
+"cooldown": 10000,
+"duration": 1250,
+"name": 1171642,
+"persistent": 1,
+"staticAnim": "AnimEmoteDraconique_Statique"
+},
+"343": {
+"anim": "AnimEmoteEtendardSSJ",
+"cooldown": 1000,
+"duration": 1250,
+"name": 1171798,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardSSJ_Statique"
+},
+"344": {
+"anim": "AnimEmoteEtendardMotamawa",
+"cooldown": 1000,
+"duration": 1250,
+"name": 1171801,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardMotamawa_Statique"
+},
+"345": {
+"anim": "AnimEmoteEtendardRLCS",
+"cooldown": 1000,
+"duration": 1250,
+"name": 1171806,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardRLCS_Statique"
+},
+"347": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 30,
+"name": 1178657
+},
+"348": {
+"anim": "AnimEmoteEtendardJL",
+"cooldown": 1000,
+"duration": 1250,
+"name": 1186038,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardJL_Statique"
+},
+"349": {
+"anim": "AnimEmoteEtendardPeps",
+"cooldown": 1000,
+"duration": 1250,
+"name": 1186037,
+"persistent": 1,
+"staticAnim": "AnimEmoteEtendardPeps_Statique"
+},
+"35": {
+"anim": "AnimEmoteFlower",
+"cooldown": 1000,
+"duration": 1250,
+"name": 2096,
+"persistent": 1,
+"staticAnim": "AnimEmoteFlower_Statique"
+},
+"350": {
+"anim": "AnimEmoteWhistle",
+"cooldown": 1500,
+"duration": 1250,
+"name": 1180660
+},
+"351": {
+"anim": "AnimEmoteDig",
+"cooldown": 3500,
+"duration": 1250,
+"name": 1189619
+},
+"36": {
+"anim": "AnimEmoteFreeze",
+"cooldown": 2600,
+"duration": 1250,
+"name": 2118
+},
+"37": {
+"anim": "AnimEmoteSneeze",
+"cooldown": 2000,
+"duration": 1250,
+"name": 2122
+},
+"38": {
+"anim": "AnimEmoteFlower2",
+"cooldown": 3000,
+"duration": 1250,
+"name": 2077,
+"persistent": 1,
+"staticAnim": "AnimEmoteFlower2_Statique"
+},
+"39": {
+"anim": "AnimEmoteCold",
+"cooldown": 1600,
+"duration": 1250,
+"name": 2139
+},
+"4": {
+"anim": "random(AnimEmoteMad,AnimEmoteMad_1)",
+"cooldown": 1500,
+"duration": 1400,
+"name": 2166
+},
+"40": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 2150
+},
+"41": {
+"anim": "AnimEmoteYawn",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454240
+},
+"42": {
+"anim": "AnimEmoteHop",
+"cooldown": 1800,
+"duration": 1250,
+"name": 454238,
+"staticAnim": "AnimEmoteHop_Statique"
+},
+"43": {
+"anim": "AnimEmoteThumbsup",
+"cooldown": 1000,
+"duration": 1250,
+"name": 2083
+},
+"44": {
+"anim": "AnimEmoteThumbsdown",
+"cooldown": 1200,
+"duration": 1250,
+"name": 2084
+},
+"45": {
+"anim": "AnimEmoteDrum",
+"cooldown": 1800,
+"duration": 1250,
+"name": 494388,
+"persistent": 1,
+"staticAnim": "AnimEmoteDrum_Statique"
+},
+"46": {
+"anim": "AnimEmoteFamished",
+"cooldown": 1400,
+"duration": 1250,
+"name": 454230
+},
+"48": {
+"anim": "AnimEmotePiwi",
+"cooldown": 1000,
+"duration": 1250,
+"name": 454234
+},
+"49": {
+"anim": "AnimEmoteHello",
+"cooldown": 2600,
+"duration": 1250,
+"name": 454228
+},
+"5": {
+"anim": "AnimEmoteFear",
+"cooldown": 1000,
+"duration": 1250,
+"name": 2164,
+"persistent": 1,
+"staticAnim": "AnimEmoteFear_Statique"
+},
+"50": {
+"anim": "AnimEmoteCard",
+"cooldown": 3600,
+"duration": 1250,
+"name": 454226
+},
+"51": {
+"anim": "AnimEmoteSuperhero",
+"cooldown": 1600,
+"duration": 1250,
+"name": 102855,
+"staticAnim": "random(AnimEmoteSuperheroA_Statique,AnimEmoteSuperheroB_Statique,AnimEmoteSuperheroC_Statique,AnimEmoteSuperheroD_Statique,AnimEmoteSuperheroE_Statique)"
+},
+"52": {
+"anim": "AnimEmoteImplore",
+"cooldown": 1000,
+"duration": 1250,
+"name": 454223
+},
+"53": {
+"anim": "AnimEmoteTrumpet",
+"cooldown": 1000,
+"duration": 1250,
+"name": 494390
+},
+"55": {
+"allowOnMount": 1,
+"aura": 1,
+"cooldown": 1000,
+"name": 2144
+},
+"56": {
+"anim": "AnimEmoteGift",
+"cooldown": 1000,
+"duration": 1250,
+"name": 2104
+},
+"57": {
+"anim": "AnimEmoteIop",
+"cooldown": 30000,
+"duration": 1250,
+"name": 428644,
+"spellLevel": 84973
+},
+"58": {
+"anim": "AnimEmoteSeiza",
+"cooldown": 1000,
+"duration": 1250,
+"name": 2100,
+"staticAnim": "AnimEmoteSeiza_Statique"
+},
+"6": {
+"anim": "AnimEmoteWeap",
+"cooldown": 1400,
+"duration": 1250,
+"name": 252619
+},
+"61": {
+"anim": "AnimEmoteDrink",
+"cooldown": 2000,
+"duration": 1250,
+"name": 2106
+},
+"63": {
+"anim": "AnimEmotePfc4",
+"cooldown": 2100,
+"duration": 1250,
+"name": 454210
+},
+"64": {
+"anim": "AnimEmotePfc5",
+"cooldown": 2100,
+"duration": 1250,
+"name": 454208
+},
+"65": {
+"anim": "AnimEmoteVulcain",
+"cooldown": 1000,
+"duration": 1250,
+"name": 454214
+},
+"66": {
+"anim": "AnimEmoteKowtow",
+"cooldown": 3000,
+"duration": 1250,
+"name": 454212
+},
+"67": {
+"anim": "AnimEmotePulco",
+"cooldown": 2000,
+"duration": 1250,
+"name": 454202
+},
+"68": {
+"anim": "AnimEmoteBiceps",
+"cooldown": 2000,
+"duration": 1250,
+"name": 483639
+},
+"69": {
+"anim": "AnimEmoteMap",
+"cooldown": 4000,
+"duration": 1250,
+"name": 454204,
+"staticAnim": "AnimEmoteMap_Statique"
+},
+"7": {
+"anim": "AnimEmotePipo",
+"cooldown": 2600,
+"duration": 1250,
+"name": 2168
+},
+"70": {
+"anim": "AnimEmoteOgrine_0",
+"cooldown": 3000,
+"name": 1104824
+},
+"71": {
+"anim": "AnimEmoteRaised",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454188
+},
+"72": {
+"anim": "AnimEmoteSnook",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454186
+},
+"73": {
+"anim": "AnimEmoteAttention",
+"cooldown": 2000,
+"duration": 1250,
+"name": 454184
+},
+"74": {
+"anim": "AnimEmoteSilence",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454198
+},
+"75": {
+"anim": "AnimEmoteHandrub",
+"cooldown": 2000,
+"duration": 1250,
+"name": 454196
+},
+"76": {
+"anim": "AnimEmoteFacepalm",
+"cooldown": 2000,
+"duration": 1250,
+"name": 454194
+},
+"77": {
+"anim": "AnimEmoteSalute",
+"cooldown": 2000,
+"criterion": "Pr=3|Pr=4|Pr=5|Pr=6|Pr=8|Pr=9|Pr=10|Pr=11|Pr=14|Pr=15|Pr=16|Pr=17|Pr=20|Pr=21|Pr=22|Pr=23|Pr=25|Pr=26|Pr=27|Pr=28|Pr=30|Pr=31|Pr=32|Pr=33",
+"duration": 1250,
+"name": 454192
+},
+"78": {
+"anim": "AnimEmoteWave",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454182
+},
+"79": {
+"anim": "AnimEmoteForehead",
+"cooldown": 1000,
+"duration": 1250,
+"name": 454180
+},
+"8": {
+"anim": "AnimEmoteOups",
+"cooldown": 1000,
+"duration": 1250,
+"name": 141650
+},
+"80": {
+"anim": "AnimEmoteBehind",
+"cooldown": 2000,
+"duration": 1250,
+"name": 454178,
+"persistent": 1,
+"staticAnim": "AnimEmoteBehind_Statique"
+},
+"81": {
+"anim": "AnimEmoteMacarena",
+"cooldown": 4000,
+"duration": 1250,
+"name": 454286
+},
+"82": {
+"anim": "AnimEmoteWhistling",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454288
+},
+"84": {
+"anim": "AnimEmoteSpyglass",
+"cooldown": 4500,
+"duration": 1250,
+"name": 454292
+},
+"85": {
+"anim": "AnimEmoteLens",
+"cooldown": 2500,
+"duration": 1250,
+"name": 454278
+},
+"86": {
+"anim": "AnimEmotePacify",
+"cooldown": 2000,
+"duration": 1250,
+"name": 454280
+},
+"87": {
+"anim": "AnimEmoteBoo",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454282
+},
+"88": {
+"anim": "AnimEmoteCheer",
+"cooldown": 2500,
+"duration": 1250,
+"name": 454284
+},
+"89": {
+"anim": "AnimEmoteDeaf",
+"cooldown": 2000,
+"duration": 1250,
+"name": 454294,
+"persistent": 1,
+"staticAnim": "AnimEmoteDeaf_Statique"
+},
+"9": {
+"anim": "AnimEmoteHi",
+"cooldown": 1700,
+"duration": 1250,
+"name": 2148
+},
+"90": {
+"anim": "AnimEmoteHalloween",
+"cooldown": 3000,
+"duration": 1250,
+"name": 454276,
+"staticAnim": "AnimEmoteHalloween_Statique"
+},
+"91": {
+"anim": "AnimEmoteChichala",
+"cooldown": 4400,
+"duration": 1250,
+"name": 454274
+},
+"92": {
+"anim": "AnimEmoteWrite",
+"cooldown": 3000,
+"duration": 1250,
+"name": 454270,
+"staticAnim": "AnimEmoteWrite_Statique"
+},
+"93": {
+"anim": "AnimEmoteUnsheathe",
+"cooldown": 1000,
+"duration": 1250,
+"name": 454272
+},
+"94": {
+"anim": "AnimEmoteTongue_0",
+"cooldown": 1000,
+"name": 454266
+},
+"95": {
+"anim": "AnimEmoteOpacity_0",
+"cooldown": 1000,
+"name": 454268
+},
+"96": {
+"anim": "AnimEmoteShield",
+"cooldown": 1200,
+"duration": 1250,
+"name": 454262,
+"persistent": 1,
+"staticAnim": "AnimEmoteShield_Statique"
+},
+"97": {
+"anim": "AnimEmoteGuild",
+"cooldown": 1000,
+"criterion": "Pw=2",
+"duration": 1250,
+"name": 454264,
+"persistent": 1,
+"staticAnim": "AnimEmoteGuild_Statique"
+},
+"98": {
+"anim": "AnimEmoteAlliance",
+"cooldown": 1000,
+"criterion": "Ow=2",
+"duration": 1250,
+"name": 454258,
+"persistent": 1,
+"staticAnim": "AnimEmoteAlliance_Statique"
+},
+"99": {
+"anim": "AnimEmoteTime",
+"cooldown": 1500,
+"duration": 1250,
+"name": 454260,
+"staticAnim": "AnimEmoteTime_Statique"
+}
+}
+}

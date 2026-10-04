@@ -172,7 +172,30 @@ namespace Jondo.Protocol
             await gate.WaitAsync();
             try
             {
-                await stream.WriteAsync(frame, 0, frame.Length);
+                // A socket that is already gone drops the frame. The fight engine writes to the
+                // stream of whoever it was serving when the action started, and if that client
+                // closed the game in the middle of a fight every one of those writes used to
+                // throw -- out of the turn clock, out of a monster's turn, out of the sequence
+                // that was half sent -- and the fight stopped dead for the other player. The real
+                // server keeps the fight going without him and lets him back in later (see
+                // FightHandler.ResumeForOneAsync); for that the engine has to be able to keep
+                // acting on a fighter nobody is listening for, and this is the cheapest place to
+                // make that true: one silent check per write, and the first failure is logged.
+                if (DeadStreams.TryGetValue(stream, out _)) return;
+
+                try
+                {
+                    await stream.WriteAsync(frame, 0, frame.Length);
+                }
+                catch (Exception ex) when (ex is IOException or ObjectDisposedException
+                                           or System.Net.Sockets.SocketException
+                                           or InvalidOperationException)
+                {
+                    DeadStreams.AddOrUpdate(stream, new object());
+                    Jondo.Unity.Server.Program.LogDebug(
+                        $"[Red] Socket cerrado; se descarta lo que se le escriba desde ahora: {ex.Message}");
+                    return;
+                }
                 Interlocked.Increment(ref _paquetesFuera);
                 Interlocked.Add(ref _bytesFuera, frame.Length);
             }
@@ -181,6 +204,9 @@ namespace Jondo.Protocol
                 gate.Release();
             }
         }
+
+        /// <summary>The streams that have already failed a write. Weakly held, like the locks.</summary>
+        private static readonly ConditionalWeakTable<Stream, object> DeadStreams = new();
 
         /// <summary>Cuántos paquetes llevamos, que es lo que numera cada renglón.</summary>
         private static int _packetCount;

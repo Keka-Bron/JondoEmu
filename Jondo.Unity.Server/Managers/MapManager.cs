@@ -251,6 +251,12 @@ namespace Jondo.Unity.Server
 
         public static long ResolveArenaMapId(long roleplayMapId)
         {
+            // Lo medido manda sobre la regla. Los kanojedos pelean en un mapa a 131.072 ids del
+            // suyo, que ninguna diferencia pequeña encuentra, y la regla caía en «cualquiera de la
+            // subárea» elegido por hash. Ver content/fights/arenas.json.
+            long medida = Managers.MeasuredArenas.Of(roleplayMapId);
+            if (medida != 0 && Maps.ContainsKey(medida)) return medida;
+
             if (!Maps.TryGetValue(roleplayMapId, out var info)) return roleplayMapId;
 
             // Do NOT return the roleplay map here for outdoor maps: the reference capture proves

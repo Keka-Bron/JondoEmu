@@ -145,11 +145,10 @@ namespace Jondo.Unity.Tests.World
                 Assert.True(sala.Grupo > 0, $"la sala {sala.Id} se ha quedado sin grupo");
                 Assert.True(sala.MapaId > 0, $"la sala {sala.Id} se ha quedado sin mapa");
 
-                // El potenciador sale de los veinte medidos en los 196 f15 de las capturas. Los
-                // cuatro de antes -118 fuerza, 119 agilidad, 125 vitalidad, 126 inteligencia-
-                // salieron de una lectura mía y no aparecen en ninguno de esos 196.
-                Assert.NotNull(sala.Regalo);
-                Assert.True(sala.Efecto > 0);
+                // What it gives is one of the nine rewards the rooms of the captures offer: a
+                // bonus, or dream points.
+                Assert.NotNull(sala.Reward);
+                Assert.Contains(sala.Reward!, Dreams.RoomRewards);
             }
         }
 
@@ -323,34 +322,19 @@ namespace Jondo.Unity.Tests.World
         [InlineData(8, 220)]
         [InlineData(9, 250)]
         [InlineData(10, 300)]
-        public void Cada_dificultad_reparte_los_puntos_medidos(int dificultad, int puntos)
+        public void Each_difficulty_has_its_measured_bonus(int difficulty, int percent)
         {
-            // El f22 de los 39 izg de las capturas: una dificultad, un valor, sin discrepancias.
-            // Sin esto el sueño empieza con cero puntos, y con cero puntos el cliente no pinta la
-            // ventanita de los bonos, los puntos y la tormenta: no hay nada que enseñar.
-            Assert.Equal(puntos, Dreams.PuntosDeSalida(dificultad));
+            // The f22 of the izg of the captures: one difficulty, one value. It is the bonus to
+            // experience and loot the client paints under the dream's name -- "220% 220%" in a
+            // Pesadilla I -- and the f8 starts from it.
+            Assert.Equal(percent, Dreams.BonusOf(difficulty));
 
             Interactives.Initialize();
             Dreams.OlvidarTodo();
-            var s = Dreams.Crear(1, "Prueba", 200, dificultad, 100, 200);
+            var s = Dreams.Crear(1, "Prueba", 200, difficulty, 100, 200);
 
-            Assert.Equal(puntos, s.PuntosDeSalida);
-            Assert.Equal(puntos, s.Puntos);
-        }
-
-        [Fact]
-        public void Limpiar_una_sala_sube_los_puntos_de_ahora_y_no_la_dotacion()
-        {
-            // Medido en Pesadilla III: los dos valen 300 en la sala 0, y en la 2 el f8 va por 315
-            // con el f22 todavía en 300. O sea que el f22 es la dotación y el f8 el total.
-            var s = Uno(dificultad: 10);
-            int dotacion = s.PuntosDeSalida;
-
-            s.Puntos += 15;
-
-            Assert.Equal(300, dotacion);
-            Assert.Equal(315, s.Puntos);
-            Assert.Equal(300, s.PuntosDeSalida);
+            Assert.Equal(percent, s.BaseBonus);
+            Assert.Equal(percent, s.Bonus);
         }
 
         [Fact]
@@ -381,8 +365,13 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(2, s.Franja);
             Assert.True(s.Salas.Count > antes, "la franja siguiente no ha añadido salas");
             Assert.NotEmpty(fuente.Salidas);
-            Assert.False(fuente.EsFuente, "la fuente vieja sigue marcada; ahora es la puerta");
-            Assert.Single(s.Salas.Where(x => x.EsFuente));
+
+            // And it stays a fountain: in the long capture room 9 is still of type 3 in both
+            // graphs once the second band is open. The new band's own fountain has no way out yet.
+            Assert.True(fuente.EsFuente);
+            var fountains = s.Salas.Where(x => x.EsFuente).ToList();
+            Assert.Equal(2, fountains.Count);
+            Assert.Empty(fountains.Single(x => x != fuente).Salidas);
 
             // Y nadie se queda sin poder llegar.
             foreach (var sala in s.Salas)

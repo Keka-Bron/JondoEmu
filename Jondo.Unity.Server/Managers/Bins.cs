@@ -6,10 +6,11 @@ namespace Jondo.Unity.Server.Managers
     /// <summary>
     /// Las papeleras: el almacén público donde va lo que la gente tira.
     ///
-    /// En el juego real guardan lo que otros han soltado, y se vacían solas al cabo de un rato. Aquí
-    /// abren VACÍAS y a propósito: no hay nada que restaurar —nadie ha tirado nada en este servidor—
-    /// y llenarlas de objetos inventados sería poner en el mundo cosas que no vienen de ninguna
-    /// parte. Lo que se implementa es el mecanismo: se clica, se abre, se puede meter y sacar.
+    /// In the real game they keep what others have thrown away. Here they start EMPTY on purpose:
+    /// nobody has thrown anything on this server yet, and filling them with invented items would
+    /// put things in the world that come from nowhere. What players throw in stays, for anyone,
+    /// through restarts: each bin is a storage of its own in <see cref="StorageStacks"/>, and
+    /// <see cref="Handlers.BinHandler"/> opens it.
     ///
     /// ─── De dónde sale cada número ──────────────────────────────────────────────────────────
     ///

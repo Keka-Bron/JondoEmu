@@ -1,0 +1,36 @@
+{
+  "_comment": [
+    "Shop catalogues decided by hand, on top of the 51 measured in datos/npc_shops.json, which a",
+    "tool regenerates. A vendor written here sells what is written here, in this order, and a",
+    "price written here is the price of that item wherever it is sold.",
+    "",
+    "  { \"npc\": 7580, \"items\": [ { \"gid\": 1575, \"price\": 1 }, { \"gid\": 30810 } ] }",
+    "",
+    "An item with no price costs what datos/npc_shops.json says, or one kama.",
+    "",
+    "GREMIA, the vendor outside the Guild Temple (NPC 7580 on 106168320). Measured in the capture",
+    "'comprar gremialogema-crear gremio-...': her kbd lists the guildalogem 1575 at 30,000, the",
+    "book 30810 'Acerca de los gremios' at 500 and the guild shield 13240 at 100,000. This server",
+    "sells the guildalogem for one kama so that anyone can found a guild; the other two keep the",
+    "price the capture shows."
+  ],
+  "shops": [
+    {
+      "npc": 7580,
+      "items": [
+        {
+          "gid": 1575,
+          "price": 1
+        },
+        {
+          "gid": 30810,
+          "price": 500
+        },
+        {
+          "gid": 13240,
+          "price": 100000
+        }
+      ]
+    }
+  ]
+}

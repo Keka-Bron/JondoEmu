@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.World.Fights;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -69,8 +70,22 @@ namespace Jondo.Unity.Server.Handlers
             new Mode(0, 1, true, true),
             new Mode(1, 2, true, true),
             new Mode(2, 3, true, true),
-            new Mode(3, 3, false, false),
+            new Mode(JondoBotMode, 1, true, false),
         };
+
+        /// <summary>
+        /// The fourth card of the Koliseo window: 1v1 against a JondoBot (<see cref="KoliseoBots"/>).
+        /// </summary>
+        /// <remarks>
+        /// The client's window has a fourth card besides 1v1, 2v2 and 3v3, its "event" one
+        /// (ctr_pvpEventLeagueInfo, UpdateEventMode): the entry of the ltd whose settings are
+        /// not the default ones (no f1 in its lsz). It shows when that mode is open and its
+        /// texts are the client's own. Measured closed, as a 3v3, in the capture; here it is open,
+        /// a 1v1, and every enrolment in it is a fight against a JondoBot at once -- the 1v1's own
+        /// "searching", its match-found popup, its accept, its sanction for letting it run out.
+        /// It pays as a Koliseo and leaves the ladder alone.
+        /// </remarks>
+        public const int JondoBotMode = 3;
 
         /// <summary>El cliente pide la tabla (lux). Se le contesta con el ltd.</summary>
         /// <remarks>
@@ -148,11 +163,24 @@ namespace Jondo.Unity.Server.Handlers
             var grupo = Parties.Of(yo);
             var quienes = grupo != null ? Parties.MembersOf(grupo) : new List<long> { yo };
 
-            int nuevos = 0;
-            foreach (long miembro in quienes)
+            // The JondoBot card: each of them against a JondoBot of his own, now.
+            if (indice == JondoBotMode)
             {
-                if (KoliseoQueue.Enrol(miembro, indice)) nuevos++;
+                foreach (long miembro in quienes)
+                {
+                    var suya = SessionRegistry.FindByCharacter(miembro);
+                    if (suya == null || !suya.IsInWorld || KoliseoOffers.Of(miembro) != null) continue;
+                    if (suya.State.IsInFight || KoliseoQueue.Waits(miembro)) continue;
+                    await StartJondoBotAsync(suya);
+                }
+                return;
             }
+
+            // A party that fits one side waits, and fights, as one unit; one that does not (three
+            // enrolling for 1v1) goes in one by one.
+            int nuevos = 0;
+            if (quienes.Count <= modo.Value.TeamSize) nuevos = KoliseoQueue.EnrolUnit(quienes, indice);
+            else foreach (long miembro in quienes) if (KoliseoQueue.Enrol(miembro, indice)) nuevos++;
 
             // Va SIEMPRE, aunque no se haya apuntado nadie nuevo: sin esto la ventana se queda
             // como si no hubiera pasado nada, que es exactamente el fallo que trae aqui.
@@ -247,6 +275,11 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (long quien in oferta.Everybody)
             {
+                if (KoliseoBots.IsBot(quien))
+                {
+                    KoliseoBots.Forget(quien);
+                    continue;
+                }
                 var sesion = SessionRegistry.FindByCharacter(quien);
 
                 if (castigados.Contains(quien))
@@ -258,7 +291,7 @@ namespace Jondo.Unity.Server.Handlers
                             BuildSanction(new DateTimeOffset(hasta).ToUnixTimeSeconds())));
                     }
                 }
-                else
+                else if (oferta.Mode != JondoBotMode)
                 {
                     // El que si dijo que si no pierde el sitio por culpa de otro.
                     KoliseoQueue.Enrol(quien, oferta.Mode);
@@ -274,7 +307,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // Los que se quedaron pueden emparejarse con otros que estuvieran esperando.
             var modo = FindMode(oferta.Mode);
-            if (modo != null) await TryMatchAsync(oferta.Mode, modo.Value.TeamSize);
+            if (modo != null && oferta.Mode != JondoBotMode) await TryMatchAsync(oferta.Mode, modo.Value.TeamSize);
         }
 
         /// <summary>Todos han dicho que si: se monta el combate.</summary>
@@ -282,19 +315,13 @@ namespace Jondo.Unity.Server.Handlers
         {
             var azul = new List<GameSession>();
             var rojo = new List<GameSession>();
+            var azulBots = new List<Fighter>();
+            var rojoBots = new List<Fighter>();
 
-            foreach (long id in oferta.Blue)
-            {
-                var sesion = SessionRegistry.FindByCharacter(id);
-                if (sesion != null && sesion.IsInWorld) azul.Add(sesion);
-            }
-            foreach (long id in oferta.Red)
-            {
-                var sesion = SessionRegistry.FindByCharacter(id);
-                if (sesion != null && sesion.IsInWorld) rojo.Add(sesion);
-            }
+            foreach (long id in oferta.Blue) Juntar(id, azul, azulBots);
+            foreach (long id in oferta.Red) Juntar(id, rojo, rojoBots);
 
-            if (azul.Count != oferta.TeamSize || rojo.Count != oferta.TeamSize)
+            if (azul.Count + azulBots.Count != oferta.TeamSize || rojo.Count + rojoBots.Count != oferta.TeamSize)
             {
                 Console.WriteLine("[Koliseo] Alguien se fue entre aceptar y empezar; se deshace.");
                 await DeshacerAsync(oferta, new List<long>(), yaCerrada: true);
@@ -303,7 +330,23 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[Koliseo] Todos aceptan: partida de {oferta.TeamSize} contra " +
                               $"{oferta.TeamSize}.");
-            await FightHandler.InitiatePvpAsync(azul, rojo, azul[0].MapId, koliseo: true);
+            long mapa = azul.Count > 0 ? azul[0].MapId : rojo[0].MapId;
+            await FightHandler.InitiatePvpAsync(azul, rojo, mapa, koliseo: true, koliseoMode: oferta.Mode,
+                                                blueBots: azulBots, redBots: rojoBots);
+        }
+
+        /// <summary>One of an offer's fighters: his session, or the JondoBot built for the fight.</summary>
+        private static void Juntar(long id, List<GameSession> sesiones, List<Fighter> bots)
+        {
+            if (KoliseoBots.IsBot(id))
+            {
+                var spec = KoliseoBots.Of(id);
+                if (spec != null) bots.Add(KoliseoBots.BuildFighter(spec));
+                KoliseoBots.Forget(id);
+                return;
+            }
+            var sesion = SessionRegistry.FindByCharacter(id);
+            if (sesion != null && sesion.IsInWorld) sesiones.Add(sesion);
         }
 
         /// <summary>Escribe a una sesion sin que un socket caido se lleve por delante a los demas.</summary>
@@ -330,15 +373,66 @@ namespace Jondo.Unity.Server.Handlers
         /// Por si acaso se le quita también el sitio en la cola: volver del koliseo y seguir
         /// apuntado no tendría sentido, y si no estaba, no cuesta nada.
         /// </remarks>
-        public static async Task ReturnAsync(NetworkStream stream)
+        public static async Task ReturnAsync(NetworkStream stream, byte[]? payload = null)
         {
             KoliseoQueue.Leave(GameState.CharacterId);
 
+            // The league as the fight left it (lty, pushed), then the empty lsr that answers the
+            // lte (root 3, with its request id), as the capture has them.
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lty, BuildRanks(GameState.CharacterId, GameState.CharacterLevel)));
+            if (payload != null)
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Answer(Op.Lsr, null, ConnectionProtocol.RequestId(payload)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Lsx,
                     BuildLeftQueue(KoliseoOffers.LastMode(GameState.CharacterId))));
 
             Console.WriteLine($"[Koliseo] {GameState.CharacterId} vuelve del koliseo.");
+        }
+
+        /// <summary>
+        /// The window's "leave the queue" (lsi): out of the queue with the unit he enrolled with --
+        /// a party leaves together -- and each of them told with the lsx of leaving, which puts
+        /// the window back to "search a fight" (see <see cref="Op.Lsi"/>).
+        /// </summary>
+        /// <remarks>
+        /// On the JondoBot card the search is the offer itself, drawn at once: leaving withdraws it,
+        /// with no sanction, since nothing was refused. A normal mode's offer is answered from its
+        /// popup, not from here.
+        /// </remarks>
+        public static async Task LeaveQueueAsync(NetworkStream stream)
+        {
+            long yo = GameState.CharacterId;
+
+            var oferta = KoliseoOffers.Of(yo);
+            if (oferta != null && oferta.Mode == JondoBotMode)
+            {
+                Console.WriteLine($"[Koliseo] {yo} deja la tarjeta de JondoBots antes de aceptar.");
+                await DeshacerAsync(oferta, new List<long>());
+                return;
+            }
+
+            var (mode, members) = KoliseoQueue.LeaveWithUnit(yo);
+            if (mode < 0)
+            {
+                // Not waiting anywhere: the window is set straight all the same, so that it does
+                // not stay "searching" for a search the server does not have.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lsx, BuildLeftQueue(KoliseoOffers.LastMode(yo))));
+                Console.WriteLine($"[Koliseo] {yo} deja una cola en la que no estaba.");
+                return;
+            }
+
+            byte[] left = ConnectionProtocol.Push(Op.Lsx, BuildLeftQueue(mode));
+            foreach (long id in members)
+            {
+                var sesion = SessionRegistry.FindByCharacter(id);
+                if (sesion != null) await Escribir(sesion, left);
+            }
+            Console.WriteLine($"[Koliseo] {yo} deja la cola del modo {mode}" +
+                              (members.Count > 1 ? $" con su grupo ({members.Count})." : ".") +
+                              $" Quedan {KoliseoQueue.CountIn(mode)} esperando.");
         }
 
         /// <summary>
@@ -414,6 +508,93 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Koliseo] Partida de {teamSize} contra {teamSize} encontrada: " +
                               $"{KoliseoOffers.Segundos} s para aceptarla.");
 
+            _ = VencerAsync(oferta);
+        }
+
+        /// <summary>
+        /// Every few seconds: the queues looked at again, since the rating window widens with the
+        /// wait and a match impossible when someone enrolled may be possible now.
+        /// </summary>
+        public static async Task TickAsync()
+        {
+            foreach (var modo in Modes)
+            {
+                if (!modo.Open || modo.Index == JondoBotMode || KoliseoQueue.CountIn(modo.Index) < modo.TeamSize * 2) continue;
+                int before;
+                do
+                {
+                    before = KoliseoQueue.CountIn(modo.Index);
+                    await TryMatchAsync(modo.Index, modo.TeamSize);
+                } while (KoliseoQueue.CountIn(modo.Index) < before && KoliseoQueue.CountIn(modo.Index) >= modo.TeamSize * 2);
+            }
+        }
+
+        // ─── The ladder ─────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// The lty: the season's start and a character's standing in every mode, what the Koliseo
+        /// window draws its leagues and victories from.
+        /// </summary>
+        /// <remarks>
+        /// Measured in the world entry of every capture and after the 2v2 of "koliseo completo";
+        /// the field meanings read off the client (its frame fff builds one oa per ltw, which the
+        /// window's UpdateUILeague and UpdateUIVictories draw):
+        ///
+        /// <code>
+        ///   lty { f2: season start, "2025-03-14T20:46:31.598Z"
+        ///         f3 (repeated) ltw { f1: mode, f3: league (-1 none), f4: placement fights left,
+        ///                             f5: season wins, f6: season fights, f7: day wins,
+        ///                             f8 { f1: best league of the season (-1 none) },
+        ///                             f10: day fights } }
+        /// </code>
+        ///
+        /// The recorder of "koliseo completo" LOST the 2v2 (the kolichas of its jyg went to the
+        /// other side), and the lty that follows says f6 = 1, f10 = 1 and no f5 or f7: so f6 and
+        /// f10 are fights and f5 and f7 wins. The f4 of that capture's f8, 6691, is not read by
+        /// any of the window's code seen, and is not sent.
+        /// </remarks>
+        public static byte[] BuildRanks(long characterId, int level)
+        {
+            var season = KoliseoLadder.Current();
+            var lty = Pb.New().Str(2, season.StartUtc.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'",
+                                                               System.Globalization.CultureInfo.InvariantCulture));
+            foreach (var s in KoliseoLadder.AllOf(characterId, level))
+            {
+                lty.Msg(3, Pb.New()
+                    .VarIfNotZero(1, s.Mode)
+                    .Var(3, s.League)
+                    .VarIfNotZero(4, s.PlacementLeft)
+                    .VarIfNotZero(5, s.SeasonWins)
+                    .VarIfNotZero(6, s.SeasonFights)
+                    .VarIfNotZero(7, s.DayWins)
+                    .Msg(8, Pb.New().Var(1, s.BestLeague))
+                    .VarIfNotZero(10, s.DayFights));
+            }
+            return lty.Build();
+        }
+
+        private static string IsoDate(DateTime utc)
+            => DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'",
+                                                                      System.Globalization.CultureInfo.InvariantCulture);
+
+        // ─── The JondoBots ───────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Enrolled on the JondoBot card: a JondoBot drawn for him and the 1v1's match-found popup,
+        /// the JondoBot's yes already given. What follows is the Koliseo's own: his accept starts
+        /// the fight (<see cref="EmpezarAsync"/>), his no or the clock undoes it.
+        /// </summary>
+        private static async Task StartJondoBotAsync(GameSession human)
+        {
+            var bot = KoliseoBots.Create(against: human.State.CharacterId);
+            var oferta = KoliseoOffers.Open(JondoBotMode, 1, new List<long> { human.State.CharacterId },
+                                            new List<long> { bot.Id });
+            KoliseoOffers.Accept(oferta, bot.Id);
+
+            await Escribir(human, ConnectionProtocol.Push(Op.Lsx, BuildQueueState(JondoBotMode, true)));
+            await Escribir(human, ConnectionProtocol.Push(Op.Lsh, BuildOffer(KoliseoOffers.Segundos)));
+            Console.WriteLine($"[Koliseo] {human.State.CharacterId} against {bot.Name} (level {KoliseoBots.Level}): " +
+                              $"{KoliseoOffers.Segundos} s to accept.");
             _ = VencerAsync(oferta);
         }
 
@@ -497,8 +678,16 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var modo in modes)
             {
+                // lsz { f1: default mode, f2: start, f3: end, f4: team size }, as the client's
+                // ArenaStateModeWrapper reads it. The event one runs for the season.
                 var dentro = Pb.New();
                 if (modo.Inner) dentro.Var(1, 1);
+                if (!modo.Inner && modo.Open)
+                {
+                    var season = KoliseoLadder.Current();
+                    dentro.Str(2, IsoDate(season.StartUtc));
+                    dentro.Str(3, IsoDate(season.StartUtc + KoliseoLadder.SeasonLength));
+                }
                 dentro.Var(4, modo.TeamSize);
 
                 var entrada = Pb.New();

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
@@ -277,6 +278,23 @@ namespace Jondo.Unity.Server.Managers
                 grade = HighestGrade(wanted, level);
             }
             if (grade > 0) into.Add(new KnownSpell(pair.Id, wanted, grade));
+        }
+
+        /// <summary>The classes with spells of their own: every breed but the common spells' one.</summary>
+        public static IReadOnlyList<int> ClassBreeds
+        {
+            get
+            {
+                Ensure();
+                return _pairsByBreed.Keys.Where(b => b != CommonBreed).OrderBy(b => b).ToList();
+            }
+        }
+
+        /// <summary>A class's pairs of spells, base and variant, in the client's order.</summary>
+        public static IReadOnlyList<Pair> PairsOf(int breed)
+        {
+            Ensure();
+            return _pairsByBreed.TryGetValue(breed, out var pairs) ? pairs : new List<Pair>();
         }
 
         /// <summary>El grado de este hechizo que abre este nivel, o 0 si no abre ninguno.</summary>

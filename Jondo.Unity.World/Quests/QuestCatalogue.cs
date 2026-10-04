@@ -143,6 +143,20 @@ namespace Jondo.Unity.World.Quests
         public double ExperienceRatio { get; init; }
         public double KamasRatio { get; init; }
 
+        /// <summary>Whether the kamas are worked out on the character's level rather than the step's.</summary>
+        public bool KamasScale { get; init; }
+
+        /// <summary>
+        /// The levels this reward is for; zero means no bound. 4,555 of the 6,707 rewards carry a
+        /// bracket: the Almanax offerings, for one, list ten rewards from level 9-29 to 190-200, and
+        /// only the one matching the character's level is paid.
+        /// </summary>
+        public int LevelMin { get; init; }
+        public int LevelMax { get; init; }
+
+        /// <summary>Whether a character of that level gets this reward.</summary>
+        public bool For(int level) => (LevelMin <= 0 || level >= LevelMin) && (LevelMax <= 0 || level <= LevelMax);
+
         /// <summary>Item id and how many of it.</summary>
         public IReadOnlyList<(int Item, int Count)> Items { get; init; } = Array.Empty<(int, int)>();
 
@@ -175,6 +189,12 @@ namespace Jondo.Unity.World.Quests
         public long DialogId { get; init; }
 
         public int OptimalLevel { get; init; }
+
+        /// <summary>
+        /// The step's duration, the third factor of its experience after the ratio and the level:
+        /// 0.25 for the tutorial's quests, 0.5 for the Almanax offerings. See RewardFormula.
+        /// </summary>
+        public double Duration { get; init; }
 
         public IReadOnlyList<QuestObjective> Objectives { get; init; } = Array.Empty<QuestObjective>();
         public IReadOnlyList<QuestReward> Rewards { get; init; } = Array.Empty<QuestReward>();
@@ -465,6 +485,9 @@ namespace Jondo.Unity.World.Quests
                     Id = id,
                     ExperienceRatio = Double(row, "experienceRatio"),
                     KamasRatio = Double(row, "kamasRatio"),
+                    KamasScale = Long(row, "kamasScale") != 0,
+                    LevelMin = (int)Long(row, "levelMin"),
+                    LevelMax = (int)Long(row, "levelMax"),
                     Items = items,
                     Spells = Numbers(row, "spells"),
                     Emotes = Numbers(row, "emotes"),
@@ -557,6 +580,7 @@ namespace Jondo.Unity.World.Quests
                     Description = say(Long(row, "description")),
                     DialogId = dialog,
                     OptimalLevel = (int)Long(row, "level"),
+                    Duration = Double(row, "duration"),
                     Objectives = objectives,
                     Rewards = mine,
                 };

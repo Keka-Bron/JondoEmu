@@ -52,7 +52,7 @@ namespace Jondo.Unity.World.Fights
         private readonly HashSet<long> _preparados = new HashSet<long>();
 
         /// <summary>El último turno cuyo «confírmame» ya se atendió, como ronda y posición.</summary>
-        private (int Ronda, int Puesto) _turnoAtendido = (-1, -1);
+        private (int Ronda, int Puesto, long Quien) _turnoAtendido = (-1, -1, -1);
 
         /// <summary>Su propio candado: no comparte nada con el de la preparacion.</summary>
         private readonly object _candadoDelTurno = new object();
@@ -68,13 +68,55 @@ namespace Jondo.Unity.World.Fights
         /// pasar una vez y no dos. Aquí es donde se decide cuál de las dos respuestas hace el
         /// trabajo; a la otra sólo se le ignora.
         /// </remarks>
-        public bool AtenderElTurnoUnaVez(int round, int turnIndex)
+        /// <param name="fighterId">
+        /// Whose turn it is. The index alone is not a turn: a death or a summon in the middle of a
+        /// round rebuilds the order and moves everybody's index, and the next turn can land on
+        /// the index of the last one confirmed. Measured: the Ocra's own turn at index 2 of round
+        /// R, a fighter before him gone, his Arakna summoned at index 2 -- and her turn, "round R,
+        /// index 2", was taken for the one already opened. No jzc went out, the fight stood still
+        /// and the client's clock ran into the negatives.
+        /// </param>
+        public bool AtenderElTurnoUnaVez(int round, int turnIndex, long fighterId = 0)
         {
             lock (_candadoDelTurno)
             {
-                if (_turnoAtendido == (round, turnIndex)) return false;
-                _turnoAtendido = (round, turnIndex);
+                if (_turnoAtendido == (round, turnIndex, fighterId)) return false;
+                _turnoAtendido = (round, turnIndex, fighterId);
                 return true;
+            }
+        }
+
+        /// <summary>
+        /// Whether the turn at hand has been announced (jzc) or is still waiting for a client to
+        /// confirm it (jxh sent, jwz not back). A fight whose only human closed the game parks
+        /// here, and somebody reconnecting needs to know which of the two he is walking into.
+        /// </summary>
+        public bool TurnAwaitingConfirmation
+        {
+            get { lock (_candadoDelTurno) return _turnoAtendido != (RoundNumber, CurrentTurnIndex, CurrentFighter?.Id ?? 0); }
+        }
+
+        /// <summary>
+        /// The last turn that went out as a jzc: who, at what index and round, for how long, and
+        /// when. It is what a reconnecting client is told first, so that his carousel and his
+        /// clock line up with everybody else's. Measured in the reconnection capture: the burst
+        /// carries the jzc of the turn IN PROGRESS with f6 = what is left of it, 132 tenths where
+        /// 21.8 seconds of a 350 turn had gone by.
+        /// </summary>
+        public AnnouncedTurn LastAnnouncedTurn { get; set; }
+
+        /// <param name="Carried">The tenths carried from the fighter's last turn, on top of <paramref name="Deciseconds"/>.</param>
+        public readonly record struct AnnouncedTurn(long FighterId, int Index, int Round,
+                                                    int Deciseconds, DateTime StartedUtc, int Carried = 0)
+        {
+            public bool Announced => FighterId != 0;
+
+            /// <summary>What is left of it, carried time and all, in tenths of a second; never below zero.</summary>
+            public int RemainingDeciseconds(DateTime nowUtc)
+            {
+                if (!Announced) return 0;
+                long gone = (long)(nowUtc - StartedUtc).TotalMilliseconds / 100;
+                return (int)Math.Max(0, Deciseconds + Carried - gone);
             }
         }
 
@@ -125,6 +167,9 @@ namespace Jondo.Unity.World.Fights
 
         public List<Fighter> Azul { get; } = new List<Fighter>();
         public List<Fighter> Rojo { get; } = new List<Fighter>();
+
+        /// <summary>The Koliseo mode this fight was matched in, for the ladder; -1 for none.</summary>
+        public int KoliseoMode { get; set; } = -1;
 
         public List<int> BluePlacementCells { get; } = new List<int>();
         public List<int> RedPlacementCells { get; } = new List<int>();
@@ -232,6 +277,49 @@ namespace Jondo.Unity.World.Fights
 
         public CancellationTokenSource PlacementTimerCts { get; set; }
         public CancellationTokenSource TurnTimerCts { get; set; }
+
+        /// <summary>
+        /// A sequence the clients are owed but that has not been opened yet: it opens right
+        /// before the next frame of the fight goes out, and never opens at all when no frame
+        /// follows. The attitude sequences hang on this, because whether an attitude will
+        /// announce anything is only known once its effects have run, and the real server
+        /// never sends an empty jto/jwi pair -- not one in 264 captures.
+        /// </summary>
+        public Func<Task> SequenceToOpen { get; set; }
+
+        /// <summary>The end-of-fight numbers of each person, by character id.</summary>
+        private readonly Dictionary<long, FightStatistics> _statistics = new Dictionary<long, FightStatistics>();
+
+        /// <summary>This person's numbers so far, started at zero the first time they are asked for.</summary>
+        public FightStatistics StatisticsOf(long characterId)
+        {
+            if (!_statistics.TryGetValue(characterId, out var stats))
+            {
+                stats = new FightStatistics();
+                _statistics[characterId] = stats;
+            }
+            return stats;
+        }
+
+        /// <summary>
+        /// Where the blows being dealt right now come from. A glyph going off sets it to
+        /// Glyph for as long as it resolves; everything else is Direct.
+        /// </summary>
+        public DamageSource CurrentDamageSource { get; set; } = DamageSource.Direct;
+
+        /// <summary>
+        /// The kind of glyph going off right now (its effect: 400 a trap, 401 a glyph...), zero
+        /// the rest of the time: a trap's blow sets off "DT" on whoever it hurts.
+        /// </summary>
+        public int CurrentGlyphType { get; set; }
+
+        /// <summary>
+        /// Who dealt the blow whose triggers are firing right now, for as long as they fire;
+        /// null the rest of the time. It is what the target mask letter "O" points at: the
+        /// push of Remisión, "repele a sus atacantes", goes to whoever hit the bearer in melee,
+        /// who is nowhere near the aimed cell of the spell that pushes.
+        /// </summary>
+        public Fighter TriggeringAttacker { get; set; }
 
         public FightInstance(long fightId, long mapId, long arenaMapId = 0)
         {
@@ -378,6 +466,17 @@ namespace Jondo.Unity.World.Fights
         /// Mete un invocado en el combate, en el bando del que lo invoca, y rehace el orden de
         /// turnos para que le toque jugar.
         /// </summary>
+        /// <summary>
+        /// A monster that comes into the fight once it has started -- a wave of the Fin du rêve.
+        /// Not a summon: nobody summoned it, it pays like any monster, and it plays its own turn.
+        /// </summary>
+        public void Join(Fighter fighter)
+        {
+            fighter.TeamId = 1;
+            Rojo.Add(fighter);
+            RebuildTurnOrderKeepingCurrent();
+        }
+
         public void Invocar(Fighter invocado, Fighter dueno)
         {
             invocado.Invocador = dueno.Id;
@@ -395,19 +494,18 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Los invocados a los que se les ha acabado el tiempo en esta ronda. El efecto 141 les
-        /// cuelga la cuenta atrás al nacer y aquí se cobra.
+        /// Takes a fighter off the board for good -- an illusion that is gone. Not a death: no
+        /// list keeps him, the carousel never had him, and the turn order is rebuilt around
+        /// whoever is playing.
         /// </summary>
-        public List<Fighter> InvocadosQueSeDeshacen(int ronda)
+        public void Quitar(Fighter fighter)
         {
-            var fuera = new List<Fighter>();
-            foreach (var f in Azul) if (SeDeshace(f, ronda)) fuera.Add(f);
-            foreach (var f in Rojo) if (SeDeshace(f, ronda)) fuera.Add(f);
-            return fuera;
+            if (fighter == null) return;
+            fighter.CurrentHP = 0;
+            Azul.Remove(fighter);
+            Rojo.Remove(fighter);
+            RebuildTurnOrderKeepingCurrent();
         }
-
-        private static bool SeDeshace(Fighter f, int ronda)
-            => f.EsInvocado && f.IsAlive && f.MuereEnRonda >= 0 && ronda >= f.MuereEnRonda;
 
         public void UpdateTurnOrder()
         {
@@ -476,6 +574,16 @@ namespace Jondo.Unity.World.Fights
         /// Un monstruo no pulsa nada, así que para contar sólo cuentan las personas; si en un
         /// bando no hay ninguna —el caso de siempre contra monstruos— ese bando está listo.
         /// </remarks>
+        /// <summary>
+        /// Takes the ready flag back. The real server does it for whoever reconnects during the
+        /// placement: the capture shows him pressing ready again before the fight starts.
+        /// </summary>
+        public void ForgetReady(long fighterId)
+        {
+            var f = Buscar(fighterId);
+            if (f != null) f.IsReady = false;
+        }
+
         public bool SetFighterReady(long fighterId)
         {
             var f = Buscar(fighterId);
@@ -490,6 +598,190 @@ namespace Jondo.Unity.World.Fights
             return false;
         }
 
+        // ═══════════════════════════════════════════════════════════════════
+        //  Somebody joins during the placement
+        // ═══════════════════════════════════════════════════════════════════
+        //
+        // Measured in «Combate/meterse en combate de otra persona haciendo click en la espadita»
+        // (a player clicks the swords of a fight on the map), «Combate/entrar a combate con listo
+        // automatico y entrada automatica siguiendo a lider de grupo» (a party member pulled in
+        // behind his leader) and «Busqueda grupo/busqueda automatica de grupo...» (four players
+        // into one dungeon fight, the monster side rebuilt at every arrival). What travels is in
+        // Network/FightJoinProtocol.cs; this is only who fits where.
+
+        /// <summary>When the placement opened: what the kaa of a late joiner counts down from.</summary>
+        public DateTime PlacementOpenedUtc { get; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// What is left of a placement of <paramref name="totalDeciseconds"/>, in tenths, never
+        /// below zero. Measured: the follower's kaa said 442 at 0.7 s into a 450 placement, the
+        /// fourth player of the dungeon fight 403 at 4.6 s.
+        /// </summary>
+        public int PlacementDecisecondsLeft(int totalDeciseconds, DateTime nowUtc)
+        {
+            long gone = (long)(nowUtc - PlacementOpenedUtc).TotalMilliseconds / 100;
+            return (int)Math.Max(0, totalDeciseconds - gone);
+        }
+
+        /// <summary>Why somebody cannot come into this fight.</summary>
+        // ─── Options: who may come in, and who may watch ──────────────────────────────
+
+        /// <summary>No spectators: jzx with no option, kau { f4: 1 } with no f3.</summary>
+        public const int OptionSecret = 0;
+
+        /// <summary>Only the side's party: kau { f3: 1 }, on by itself when a party opens it.</summary>
+        public const int OptionPartyOnly = 1;
+
+        /// <summary>Nobody else: jzx { f1: 2 }, with lqn 95.</summary>
+        public const int OptionClosed = 2;
+
+        /// <summary>Asking for help: jzx { f1: 3 }.</summary>
+        public const int OptionHelp = 3;
+
+        private readonly bool[,] _options = new bool[2, 4];
+
+        /// <summary>Whether a side has an option on.</summary>
+        public bool OptionOn(int team, int option)
+        {
+            if (team is < 0 or > 1 || option is < 0 or > 3) return false;
+            lock (_options) return _options[team, option];
+        }
+
+        /// <summary>Turns a side's option on or off.</summary>
+        public void SetOption(int team, int option, bool on)
+        {
+            if (team is < 0 or > 1 || option is < 0 or > 3) return;
+            lock (_options) _options[team, option] = on;
+        }
+
+        public enum JoinRefusal
+        {
+            None,
+
+            /// <summary>The side is closed: nobody else comes in.</summary>
+            Closed,
+
+            /// <summary>The placement is over: the swords are gone from the map (hpr).</summary>
+            NotInPlacement,
+
+            /// <summary>The team asked for is not one of the two.</summary>
+            NoSuchTeam,
+
+            /// <summary>A person does not join the monsters' side.</summary>
+            MonsterTeam,
+
+            /// <summary>No room: as many people as a team takes, or no free placement cell.</summary>
+            TeamFull,
+        }
+
+        /// <summary>The people of a side, summons and monsters left out.</summary>
+        public int PeopleIn(int team) => Bando(team).Count(f => !f.IsMonster && !f.EsInvocado);
+
+        /// <summary>
+        /// Whether one more person fits in <paramref name="team"/>. The cap is the caller's: it is
+        /// not a property of the fight but of the game (eight, see FightJoin).
+        /// </summary>
+        public JoinRefusal CanJoin(int team, int maxPeoplePerTeam)
+        {
+            if (State != FightState.Placement) return JoinRefusal.NotInPlacement;
+            if (team != Azules && team != Rojos) return JoinRefusal.NoSuchTeam;
+            if (Bando(team).Exists(f => f.IsMonster && !f.EsInvocado)) return JoinRefusal.MonsterTeam;
+            if (OptionOn(team, OptionClosed)) return JoinRefusal.Closed;
+            if (PeopleIn(team) >= maxPeoplePerTeam) return JoinRefusal.TeamFull;
+            if (FreePlacementCell(team) < 0) return JoinRefusal.TeamFull;
+            return JoinRefusal.None;
+        }
+
+        /// <summary>
+        /// The first placement cell of that side nobody stands on, or -1.
+        /// </summary>
+        /// <remarks>
+        /// In the order of the kba, which is the order the real server fills: the joiner of the
+        /// sword capture landed on 216, the first red cell, next to the leader on 260, the second.
+        /// <see cref="AddPlayer"/> picks by index instead, which is right only while nobody has
+        /// moved.
+        /// </remarks>
+        public int FreePlacementCell(int team)
+        {
+            foreach (int cell in CasillasDe(team))
+            {
+                if (!Todos.Any(f => f.IsAlive && f.CellId == cell)) return cell;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Puts a person who joins into <paramref name="team"/>, on its first free cell. False,
+        /// and nothing changed, when <see cref="CanJoin"/> says no.
+        /// </summary>
+        public bool JoinTeam(Fighter person, int team, int maxPeoplePerTeam)
+        {
+            if (person == null || CanJoin(team, maxPeoplePerTeam) != JoinRefusal.None) return false;
+
+            person.TeamId = team;
+            person.CellId = FreePlacementCell(team);
+            Bando(team).Add(person);
+            UpdateTurnOrder();
+            return true;
+        }
+
+        /// <summary>
+        /// Takes a person out during the placement: he leaves, the fight goes on without him.
+        /// </summary>
+        public bool LeavePlacement(long fighterId)
+        {
+            if (State != FightState.Placement) return false;
+            var who = Buscar(fighterId);
+            if (who == null || who.IsMonster) return false;
+
+            Azul.Remove(who);
+            Rojo.Remove(who);
+            ForgetPreparation(fighterId);
+            DeDondeVenian.Remove(fighterId);
+            UpdateTurnOrder();
+            return true;
+        }
+
+        /// <summary>
+        /// The monster side rebuilt from scratch: every monster that is not a summon goes, and
+        /// <paramref name="count"/> new ones come, built by <paramref name="build"/> from their
+        /// position in the group, their id and their cell.
+        /// </summary>
+        /// <remarks>
+        /// What the dungeon capture shows at every arrival, even when the number does not change:
+        /// with two players the -1..-4 are taken off (jzw) and -5..-8 put on (kae), with three
+        /// -5..-8 give way to -9..-12, with four -9..-12 to -13..-16. So the new ids carry on
+        /// below the old ones -- which is why they are drawn before anything is removed -- and
+        /// the cells are the red ones in order, the same four (487, 444, 485, 486) every time.
+        /// </remarks>
+        public (List<Fighter> Removed, List<Fighter> Added) ReplaceMonsters(
+            int count, Func<int, long, int, Fighter> build)
+        {
+            var added = new List<Fighter>();
+            if (State != FightState.Placement || build == null) return (new List<Fighter>(), added);
+
+            var removed = Rojo.Where(f => f.IsMonster && !f.EsInvocado).ToList();
+            long firstId = SiguienteIdDeInvocado();
+            foreach (var gone in removed) Rojo.Remove(gone);
+
+            for (int i = 0; i < count; i++)
+            {
+                int cell = RedPlacementCells.Count > 0
+                    ? RedPlacementCells[i % RedPlacementCells.Count]
+                    : 0;
+                var monster = build(i, firstId - i, cell);
+                if (monster == null) continue;
+                monster.Id = firstId - i;
+                monster.TeamId = Rojos;
+                monster.CellId = cell;
+                Rojo.Add(monster);
+                added.Add(monster);
+            }
+
+            UpdateTurnOrder();
+            return (removed, added);
+        }
+
         /// <summary>Se recoloca durante la fase de colocación, cada uno en las casillas de su lado.</summary>
         public void ChangePlacementCell(long fighterId, int newCellId)
         {
@@ -501,6 +793,9 @@ namespace Jondo.Unity.World.Fights
             var f = Buscar(fighterId);
             if (f != null && CasillasDe(suyo).Contains(newCellId))
             {
+                // Nobody on top of anybody. With one person per side this could not happen; with
+                // a party on one side it can, and two fighters on one cell is one target for two.
+                if (Todos.Any(o => o != f && o.IsAlive && o.CellId == newCellId)) return;
                 f.CellId = newCellId;
             }
         }
@@ -541,6 +836,104 @@ namespace Jondo.Unity.World.Fights
         /// </remarks>
         public HashSet<long> WallHitThisTurn { get; } = new HashSet<long>();
 
+        /// <summary>
+        /// An effect of the cast in progress asked for the caster's turn to end (1031, "Hace
+        /// pasar de turno"). Raised by the effect loop, consumed by the cast once its sequence
+        /// has closed.
+        /// </summary>
+        public bool EndTurnRequested { get; set; }
+
+        /// <summary>
+        /// How deep the triggers set off by other triggers go right now. A hit fires "D", "D"
+        /// casts a spell that hits, and that hit fires "D" again: past a few levels it is a loop
+        /// in the data, not a mechanic, and it stops there.
+        /// </summary>
+        public int TriggerDepth { get; set; }
+
+        /// <summary>
+        /// The telefrags of the spell being resolved: who swapped cells with whom through a
+        /// teleport, both ways. The client's own sheet on the Xelor says it -- "se generan cuando
+        /// dos entidades intercambian posiciones debido a los efectos de teletransportación de un
+        /// hechizo" -- and the masks' T names them for the rows that follow in the same spell.
+        /// </summary>
+        public Dictionary<long, long> Telefrags { get; set; } = new Dictionary<long, long>();
+
+        /// <summary>
+        /// The dead, in the order they fell: "Invoca al último aliado muerto" (780, 1034) brings
+        /// back the last of the caster's side.
+        /// </summary>
+        public List<Fighter> Muertos { get; } = new List<Fighter>();
+
+        /// <summary>The "EC" counts that have come true, per fighter, so each goes off once until it is false again.</summary>
+        public HashSet<(long, string)> RecuentosCumplidos { get; } = new HashSet<(long, string)>();
+
+        /// <summary>
+        /// The damage of the blow that set the triggers off, while they go off: "% de los daños
+        /// iniciales sufridos" (1123-1128) and "Cura #1% de los daños sufridos" read it.
+        /// </summary>
+        public int DanoDelDisparo { get; set; }
+
+        /// <summary>
+        /// The element of that same blow: a share of it returned (1223, 1123) goes out in it --
+        /// the Xelor's cómplice returns a 92 of air as a 69 of air, "jwe 1225".
+        /// </summary>
+        public int ElementoDelDisparo { get; set; }
+
+        /// <summary>
+        /// Who began the resolution going on right now -- the caster of the cast, or the owner of
+        /// the hook that a trigger set off -- whatever sub-casts it runs through. A share of a
+        /// blow returned is his: Masacre's 30% goes out in the Yopuka's name although the enemy
+        /// who carries it casts the spell that returns it.
+        /// </summary>
+        public Fighter RootCaster { get; set; }
+
+        /// <summary>
+        /// While above zero, a cast's triggered rows are not armed on anybody: an attitude fires
+        /// its own rows itself, and a player's passives keep the hooks their captures measured.
+        /// </summary>
+        public int SinArmar { get; set; }
+
+        /// <summary>
+        /// The fighters a teleport of the spell being resolved could not land -- the mirror cell
+        /// off the board or not walkable. The masks' W names them: Conde Kontatrás's clock kills a
+        /// whole side when his mirror cell does not exist, as the guide says.
+        /// </summary>
+        public HashSet<long> TeleportsFallidos { get; set; } = new HashSet<long>();
+
+        /// <summary>
+        /// Whether the cast being resolved went through a portal: what the masks' R and r ask,
+        /// set for as long as a spell cast at a portal is resolved at the other end.
+        /// </summary>
+        public bool CastThroughPortal { get; set; }
+
+        /// <summary>
+        /// The bonus, in percent, of the damage and the healing of the cast being resolved when it
+        /// went through portals (PortalNetwork.BonusPercent); zero the rest of the time.
+        /// </summary>
+        public int PortalBonusPercent { get; set; }
+
+        /// <summary>The portals of this fight (effect 1181): see <see cref="PortalNetwork"/>.</summary>
+        public PortalNetwork Portales { get; } = new PortalNetwork();
+
+        /// <summary>
+        /// Who stands on a cell -- alive, and not carried on somebody else's -- or zero: what keeps
+        /// a portal off.
+        /// </summary>
+        public long OccupantOf(int cell)
+        {
+            foreach (var f in Todos)
+            {
+                if (f != null && f.IsAlive && !f.EstaCargado && f.CellId == cell) return f.Id;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Whom the caster of the spell being resolved carried as it began, for the masks' K:
+        /// a Pandawa's throw lands the one he carried before its rows hurt or heal him.
+        /// </summary>
+        public (long Caster, long Carried) CarriedAtCast { get; set; }
+
         private int _siguienteGlifo;
 
         /// <summary>Pone algo en el suelo y le da su identificador.</summary>
@@ -551,6 +944,12 @@ namespace Jondo.Unity.World.Fights
             return glifo;
         }
 
+        /// <summary>
+        /// A mark number for a portal. Glyphs and portals go out through the same jwe 401 and 310,
+        /// so they are numbered from one count -- INFERRED: no capture lays both in one fight.
+        /// </summary>
+        public int SiguienteMarca() => ++_siguienteGlifo;
+
         /// <summary>Lo que se dispara con alguien pisando esa casilla.</summary>
         public List<Glifo> LosQuePisa(int casilla)
         {
@@ -558,6 +957,17 @@ namespace Jondo.Unity.World.Fights
             foreach (var g in Glifos)
             {
                 if (g.SeDisparaAlPisar && g.Cubre(casilla)) salen.Add(g);
+            }
+            return salen;
+        }
+
+        /// <summary>What goes off with somebody ending his turn there.</summary>
+        public List<Glifo> LosQueAcaban(int casilla)
+        {
+            var salen = new List<Glifo>();
+            foreach (var g in Glifos)
+            {
+                if (g.SeDisparaAlAcabarElTurno && g.Cubre(casilla)) salen.Add(g);
             }
             return salen;
         }
@@ -577,12 +987,32 @@ namespace Jondo.Unity.World.Fights
         public List<Glifo> BarrerLosGlifos()
         {
             var caidos = new List<Glifo>();
+            // Only the spent ones here. A glyph's time is its caster's: it falls at the start of
+            // his turn once its round has come, the way the rows he puts do -- see
+            // QuitarLosGlifosCaducados. Falling at whoever's turn came first, the time glyph of a
+            // boss who plays last was gone before any player started a turn in it.
             foreach (var g in Glifos)
             {
-                if (g.Gastado) { caidos.Add(g); continue; }
-                if (g.CaducaEnRonda > 0 && RoundNumber >= g.CaducaEnRonda) caidos.Add(g);
+                if (g.Gastado) caidos.Add(g);
             }
 
+            foreach (var muerto in caidos) Glifos.Remove(muerto);
+            return caidos;
+        }
+
+        /// <summary>
+        /// The glyphs whose time is up at this turn start, taken off: the ones whose round has come
+        /// and whose time runs on this fighter's turns (<paramref name="suTiempoCorre"/>), and the
+        /// ones whose caster is gone, which do not outlive him.
+        /// </summary>
+        public List<Glifo> QuitarLosGlifosCaducados(Func<Glifo, bool> suTiempoCorre, Func<Glifo, bool> sinDueno)
+        {
+            var caidos = new List<Glifo>();
+            foreach (var g in Glifos)
+            {
+                bool cumplido = g.CaducaEnRonda > 0 && RoundNumber >= g.CaducaEnRonda && suTiempoCorre(g);
+                if (cumplido || sinDueno(g)) caidos.Add(g);
+            }
             foreach (var muerto in caidos) Glifos.Remove(muerto);
             return caidos;
         }
@@ -600,7 +1030,7 @@ namespace Jondo.Unity.World.Fights
 
             if (CurrentFighter != null)
             {
-                CurrentFighter.StartTurn();
+                CurrentFighter.StartTurn(RoundNumber);
             }
         }
 
@@ -690,12 +1120,25 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public int FinPendiente { get; set; }
 
+        /// <summary>
+        /// What <see cref="FinPendiente"/> holds when the end waits for the client's jwz, not for
+        /// the jti of a sequence of its own: a monster's blows are not the client's to acknowledge,
+        /// and no jti reaches this number.
+        /// </summary>
+        public const int WaitsForTheJwz = int.MaxValue;
+
         /// <summary>Los que ya se han roto. Se avisa una vez y no se vuelve a mirar.</summary>
         public HashSet<int> ChallengesBroken { get; } = new HashSet<int>();
 
         /// <summary>Dónde y con cuántos PM empezó su turno el que lo tiene ahora.</summary>
         public int TurnStartCell { get; set; }
         public int TurnStartMp { get; set; }
+
+        /// <summary>
+        /// The MP the fighter whose turn it is has lost to tackles this turn. They are no MP he
+        /// used: the Zombi challenge (1008205) says losing MP to a tackle does not break it.
+        /// </summary>
+        public int TurnTackledMp { get; set; }
 
         /// <summary>A quién hay que rematar antes de pegarle a otro (retos 31 y 32).</summary>
         public long ChallengeFocus { get; set; }
@@ -774,7 +1217,7 @@ namespace Jondo.Unity.World.Fights
                 return null;
             }
 
-            CurrentFighter.StartTurn();
+            CurrentFighter.StartTurn(RoundNumber);
             return CurrentFighter;
         }
 

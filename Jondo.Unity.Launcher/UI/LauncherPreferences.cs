@@ -17,6 +17,8 @@ namespace Jondo.Unity.Launcher.UI
     ///   servidor=host-or-ip  el servidor remoto; vacío significa esta misma máquina
     ///   web=https://...      la web donde se entra; vacío significa que todavía no hay
     ///   cuentas=...          las cuentas guardadas, CIFRADAS (ver SecretStore)
+    ///   packHd=0|1           start the client with --hdReady when the HD pack is installed
+    ///   pack4k=0|1           start the client with --4kReady when the 4K pack is installed
     /// </summary>
     internal static class LauncherPreferences
     {
@@ -156,6 +158,27 @@ namespace Jondo.Unity.Launcher.UI
                 string donde = ServerHost;
                 return donde == Contract.LocalIp || donde.Equals("localhost", StringComparison.OrdinalIgnoreCase);
             }
+        }
+
+        // ─── Texture packs ─────────────────────────────────────────────────────
+        //
+        // Whether the player wants each pack offered to the client. Wanting it is not enough: the
+        // flag is only passed while the pack is installed and verified for the client's version,
+        // see Packs.TexturePackService.LaunchFlags.
+
+        private const string KeyPackHd = "packHd";
+        private const string KeyPack4k = "pack4k";
+
+        public static bool PackHd
+        {
+            get => Leer().TryGetValue(KeyPackHd, out string? v) && v.Trim() == "1";
+            set => Escribir(KeyPackHd, value ? "1" : "0");
+        }
+
+        public static bool Pack4k
+        {
+            get => Leer().TryGetValue(KeyPack4k, out string? v) && v.Trim() == "1";
+            set => Escribir(KeyPack4k, value ? "1" : "0");
         }
 
         // ─── Dónde se entra ────────────────────────────────────────────────────

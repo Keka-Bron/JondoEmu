@@ -51,6 +51,34 @@ namespace Jondo.Unity.Tests.Combat
             Assert.DoesNotContain(b, muro.Cells);
         }
 
+        /// <summary>
+        /// The widest wall of the captures: bombs on 144 and 245, six cells apart, raise all six
+        /// (frame 4213 of "explobomba-tornabomba-bomba de agua-...").
+        /// </summary>
+        [Fact]
+        public void Six_cells_between_the_bombs_is_still_a_wall()
+        {
+            var tymador = Tymador();
+            var bombas = new[] { Bomba(-9, tymador, 245, 3113), Bomba(-10, tymador, 144, 3113) };
+
+            var muro = Assert.Single(BombWalls.Of(bombas.Append(tymador), tymador));
+
+            Assert.Equal(new[] { 158, 173, 187, 202, 216, 231 }, muro.Cells.OrderBy(c => c));
+        }
+
+        /// <summary>
+        /// And seven is not: frame 8192 of the same capture, a bomb on 129 next to one on 245,
+        /// and the server puts back every wall but that one.
+        /// </summary>
+        [Fact]
+        public void Seven_cells_between_them_is_not()
+        {
+            var tymador = Tymador();
+            var bombas = new[] { Bomba(-6, tymador, 245, 3113), Bomba(-7, tymador, 129, 3113) };
+
+            Assert.Empty(BombWalls.Of(bombas.Append(tymador), tymador));
+        }
+
         [Fact]
         public void Mas_lejos_del_tope_no_hay_muro()
         {

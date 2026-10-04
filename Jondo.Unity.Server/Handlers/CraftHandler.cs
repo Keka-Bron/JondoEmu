@@ -35,6 +35,31 @@ namespace Jondo.Unity.Server.Handlers
             return true;
         }
 
+        /// <summary>
+        /// The recipe of this skill that the ingredients on the workbench make, if any: the same
+        /// items in the same quantities, nothing missing and nothing left over. A signature rune is
+        /// not an ingredient and the caller takes it out before asking.
+        /// </summary>
+        public static RecipeDefinition? Match(int skillId, IReadOnlyDictionary<int, int> ingredients)
+        {
+            if (ingredients.Count == 0) return null;
+            foreach (var recipe in RecipeManager.ForSkill(skillId))
+            {
+                var wanted = new Dictionary<int, int>();
+                foreach (var i in recipe.Ingredients)
+                    wanted[i.ItemId] = wanted.TryGetValue(i.ItemId, out int had) ? had + i.Quantity : i.Quantity;
+                if (wanted.Count != ingredients.Count) continue;
+
+                bool same = true;
+                foreach (var pair in wanted)
+                {
+                    if (!ingredients.TryGetValue(pair.Key, out int got) || got != pair.Value) { same = false; break; }
+                }
+                if (same) return recipe;
+            }
+            return null;
+        }
+
         /// <summary>Validates that a result belongs to the craft skill selected on the element.</summary>
         public static bool TryResolveRecipe(int skillId, int resultId,
                                             out RecipeDefinition recipe, out string error)

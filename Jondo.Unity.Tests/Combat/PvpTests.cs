@@ -19,6 +19,7 @@ namespace Jondo.Unity.Tests.Combat
     /// Lo que más importa fijar aquí es que aceptar y rechazar NO son dos opcodes distintos: los
     /// separa un solo campo del hpu, y confundirlos haría que rechazar montase el combate.
     /// </remarks>
+    [Collection("koliseo")]
     public class PvpTests
     {
         public PvpTests()
@@ -92,8 +93,9 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Las_tres_modalidades_estan_abiertas()
         {
-            // Lo que se pedía: 1 contra 1, 2 contra 2 y 3 contra 3.
-            Assert.Equal(3, KoliseoHandler.CountOpen());
+            // Lo que se pedía: 1 contra 1, 2 contra 2 y 3 contra 3; y la cuarta tarjeta, 1 contra 1
+            // contra un JondoBot.
+            Assert.Equal(4, KoliseoHandler.CountOpen());
 
             foreach (int equipos in new[] { 1, 2, 3 })
             {
@@ -105,14 +107,14 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void La_tabla_es_la_de_la_captura()
         {
-            // Byte por byte el ltd de «koliseo completo con invitacion-koli 2vs2». Las tres
-            // primeras abiertas y la cuarta cerrada, que es como llega: encenderla sería inventar
-            // una modalidad que nadie ha visto funcionar.
+            // Byte por byte el ltd de «koliseo completo con invitacion-koli 2vs2» en las tres
+            // primeras. La cuarta llega cerrada, un 3 contra 3; aquí es la tarjeta de los JondoBots,
+            // abierta y de 1 contra 1 (ver KoliseoBotTests).
             byte[] ltd = KoliseoHandler.BuildModes(KoliseoHandler.Modes);
 
-            Assert.Equal("0a0812040801200118010a0a080112040801200218010a0a0802120408012003" +
-                         "18010a06080312022003",
-                         Convert.ToHexString(ltd).ToLowerInvariant());
+            Assert.StartsWith("0a0812040801200118010a0a080112040801200218010a0a0802120408012003" +
+                              "18010a",
+                              Convert.ToHexString(ltd).ToLowerInvariant());
         }
 
         // ------------------------------------------------------ la preparación de cada cliente
@@ -180,6 +182,20 @@ namespace Jondo.Unity.Tests.Combat
             // Y el turno siguiente vuelve a abrirse, que si no el combate se para en el primero.
             Assert.True(combate.AtenderElTurnoUnaVez(1, 1));
             Assert.True(combate.AtenderElTurnoUnaVez(2, 0));
+        }
+
+        /// <summary>
+        /// The same index of the same round is somebody else's turn once the order is rebuilt: the
+        /// Ocra at index 2, a fighter before him gone, his Arakna summoned at index 2. Her turn
+        /// opens; taken for his, it never did.
+        /// </summary>
+        [Fact]
+        public void A_turn_at_an_index_already_confirmed_opens_when_it_is_somebody_elses()
+        {
+            var combate = new FightInstance(1, 100, 200);
+            Assert.True(combate.AtenderElTurnoUnaVez(3, 2, 13825558));
+            Assert.False(combate.AtenderElTurnoUnaVez(3, 2, 13825558));
+            Assert.True(combate.AtenderElTurnoUnaVez(3, 2, -3));
         }
 
         // -------------------------------------------------------- apuntarse y el emparejamiento

@@ -153,9 +153,13 @@ namespace Jondo.Unity.Server.Managers
                 return;
             }
 
+            // The session is read through when asked, not captured: the same connection can come
+            // back in with another character, and these must answer for whoever is playing.
             var log = new QuestLog(_book,
                 () => SessionContext.State.CharacterLevel,
-                () => SessionContext.State.MapId);
+                () => SessionContext.State.MapId,
+                Almanax.Scalar,
+                achievement => SessionContext.State.Achievements?.Has(achievement) ?? false);
 
             int rows = 0;
             foreach (var row in DatabaseManager.LoadQuestProgress(characterId))
@@ -198,6 +202,15 @@ namespace Jondo.Unity.Server.Managers
             foreach (var step in StepsHandedOverBy(dialogId))
             {
                 await StartAsync(stream, step.QuestId);
+            }
+
+            // The Almanax offering names no line to be handed over on, so the rule for an NPC with
+            // no written tree is applied to the one who gives them all: his opening conversation
+            // hands over today's. INFERRED, see Almanax.
+            if (Almanax.Giver != 0 && SessionContext.State.OpenDialogueNpcId == Almanax.Giver)
+            {
+                int today = Almanax.TodaysOffering();
+                if (today != 0 && log.Run(today) is not { Finished: false }) await StartAsync(stream, today);
             }
         }
 
@@ -535,6 +548,8 @@ namespace Jondo.Unity.Server.Managers
             var log = Log;
             if (log == null) return false;
 
+            if (OfferedAlreadyToday(questId)) return false;
+
             if (!log.CanStart(questId, out var verdict))
             {
                 if (verdict.Broke)
@@ -685,11 +700,19 @@ namespace Jondo.Unity.Server.Managers
 
             foreach (int questId in QuestsOfferedBy(npcId, mapId))
             {
-                if (log.CanStart(questId, out _)) offers.Add(questId);
+                if (!OfferedAlreadyToday(questId) && log.CanStart(questId, out _)) offers.Add(questId);
             }
 
             return offers;
         }
+
+        /// <summary>
+        /// Whether this is an Almanax offering this character already made today. The offerings
+        /// are repeatable — a saint's day comes back every year — so the quest log alone would let
+        /// the same one be taken again the moment it was handed in.
+        /// </summary>
+        private static bool OfferedAlreadyToday(int questId)
+            => Almanax.IsOffering(questId) && Almanax.OfferedToday(SessionContext.State.AchievementTallies, questId);
 
         /// <summary>
         /// Quests already in hand whose current step wants something from this NPC here.
@@ -825,6 +848,14 @@ namespace Jondo.Unity.Server.Managers
             }
 
             long declared = quest.Steps.Count > 0 ? quest.Steps[0].DialogId : 0;
+
+            // The Almanax offerings declare no line at all; their giver hands over today's on his
+            // opening conversation, and only today's. See OnReplyAsync.
+            if (declared == 0 && npcId == Almanax.Giver && Almanax.IsOffering(questId))
+            {
+                return questId == Almanax.TodaysOffering();
+            }
+
             var template = Npcs.TemplateOf(npcId);
             return declared != 0 && template != null && template.DialogMessageId == declared;
         }
@@ -954,6 +985,13 @@ namespace Jondo.Unity.Server.Managers
             {
                 Console.WriteLine($"[Misiones] Terminada la {questId}.");
 
+                // An Almanax offering is made once a day: the day is written down, so the same
+                // quest is not handed out again until the saint comes round next year.
+                if (Almanax.IsOffering(questId))
+                {
+                    Achievements.SetTally(Almanax.OfferingKind, questId, Almanax.DayKey(Almanax.Clock()));
+                }
+
                 // Y lo que esa misión acabada haya ganado. 259 logros cuelgan de terminar una, y
                 // el 8518 «Primer tiempo» del tutorial es literalmente (Qf=2511).
                 await Achievements.AfterQuestAsync(stream, questId);
@@ -964,13 +1002,14 @@ namespace Jondo.Unity.Server.Managers
         /// Hands over what a finished step promised.
         /// </summary>
         /// <remarks>
-        /// <b>The items only, and that is a real gap rather than an oversight.</b> A reward carries
-        /// items with their quantity — exact numbers, and 5,582 of the 6,707 rewards have some —
-        /// but the experience and the kamas are <em>ratios</em>: 2, or 1.2, or 0.035. A ratio is a
-        /// multiplier on a base this emulator does not have, and the base is not in the client's
-        /// data anywhere anybody has looked. Inventing a formula would put a number on screen that
-        /// looks right and is not, which is worse than nothing, so what happens instead is that the
-        /// ratio is written to the log and a person can decide.
+        /// Items with their quantity, emotes, and the experience and kamas the reward's ratios are
+        /// ratios of. The base is the client's own formula (<see cref="RewardFormula"/>), with the
+        /// step's optimal level and duration: the tutorial's quest 1629 pays 141 experience at
+        /// level 2 in the capture, and that is what it gives here.
+        ///
+        /// Only the rewards whose level bracket holds the character are paid. 4,555 of the 6,707
+        /// rewards carry one, and the Almanax offerings list ten, from level 9-29 to 190-200 — paid
+        /// all together they would be every bracket's items at once.
         ///
         /// Nothing here can fail the step. A bag with no room, or an item id the database does not
         /// know, must not leave a quest half advanced — the step is already validated by the time
@@ -981,8 +1020,18 @@ namespace Jondo.Unity.Server.Managers
             var step = _book?.Step(stepId);
             if (step == null || step.Rewards.Count == 0) return;
 
+            int level = SessionContext.State.CharacterLevel;
+            long experience = 0, kamas = 0;
+
             foreach (var reward in step.Rewards)
             {
+                if (!reward.For(level)) continue;
+
+                experience += RewardFormula.Experience(level, step.OptimalLevel, reward.ExperienceRatio,
+                                                       step.Duration);
+                kamas += RewardFormula.Kamas(reward.KamasScale ? level : step.OptimalLevel,
+                                             reward.KamasRatio, step.Duration);
+
                 foreach (var (item, count) in reward.Items)
                 {
                     bool given = await Equipment.GiveAsync(stream, item, Math.Max(1, count));
@@ -993,13 +1042,24 @@ namespace Jondo.Unity.Server.Managers
                     }
                 }
 
-                if (reward.ExperienceRatio > 0 || reward.KamasRatio > 0)
-                {
-                    Console.WriteLine($"[Misiones] El paso {stepId} promete experiencia x" +
-                                      $"{reward.ExperienceRatio} y kamas x{reward.KamasRatio}. Son " +
-                                      "multiplicadores y no se sabe sobre qué, así que no se pagan.");
-                }
+                foreach (int emote in reward.Emotes) await Emotes.LearnAsync(stream, emote);
             }
+
+            // The Almanax days that raise what quests pay, when they do so unconditionally.
+            experience = Almanax.WithBonus(Almanax.BonusType.QuestExperience, experience);
+            kamas = Almanax.WithBonus(Almanax.BonusType.QuestKamas, kamas);
+
+            bool paid = await CharacterRewards.GiveKamasAsync(stream, kamas);
+            bool levelled = await CharacterRewards.GiveExperienceAsync(stream, experience);
+            paid |= experience > 0;
+
+            if (paid)
+            {
+                CharacterRewards.Save();
+                Console.WriteLine($"[Misiones] El paso {stepId} paga {experience} de experiencia y {kamas} kamas.");
+            }
+
+            if (levelled) await Achievements.AfterLevelAsync(stream);
         }
 
         private static void Save(int questId, QuestRun run)

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Jondo.Unity.World.Combat
 {
@@ -53,6 +53,88 @@ namespace Jondo.Unity.World.Combat
         /// <summary>Pull towards the caster.</summary>
         public const int Pull = 6;
 
+        /// <summary>
+        /// 1103, "Empuja #1 casilla (sin daños)": the push of Patada and of 54 other spells,
+        /// which is a 5 that never collides. In the Patada capture the bomb pushed three cells
+        /// and the enemy pushed one both travel as a plain jwe 5 with no damage behind.
+        /// </summary>
+        public const int PushWithoutDamage = 1103;
+
+        /// <summary>
+        /// 783 "Hace retroceder hasta la casilla objetivo" and 1043 "Atrae hasta la casilla
+        /// objetivo": the push and the pull whose length is the distance to the aimed cell. The
+        /// one moved is the first fighter on the caster's line -- before the aimed cell for the
+        /// push, beyond it for the pull. Measured on the Tymobot at 287: Empujoncito aimed at 260
+        /// sends the bomb at 273 to 260, Aspirador aimed at 273 brings the bomb at 260 to 273,
+        /// both as a plain jwe 5 with from and to.
+        /// </summary>
+        public const int PushToTargetCell = 783;
+        public const int PullToTargetCell = 1043;
+
+        /// <summary>
+        /// 50 "Permite levantar al objetivo" and 51 "Lanza a un enemigo": carrying and throwing,
+        /// the Pandawa's Karcham and Chamrak and the Tymobot's Pinzas alike. Measured on Pinzas:
+        /// "jwe 50 f18{f1=273 f3=-13}" picks the bomb up from 273 and "jwe 51 f27{f1=-13 f2=260}"
+        /// throws it to 260, with the bot walking onto 273 in between.
+        /// </summary>
+        public const int Carry = 50;
+        public const int Throw = 51;
+
+        /// <summary>
+        /// The two states of a carry: 3 on the one carrying, 8 on the one carried. Read off
+        /// Pinzas, whose cast condition is "HS=3|HS!8" -- may throw while carrying, may pick up
+        /// while not carried -- and whose pick-up carries "*e3" (the caster is not carrying) and
+        /// whose throw "*E3" (he is).
+        /// </summary>
+        public const int CarryingState = 3;
+        public const int CarriedState = 8;
+
+        /// <summary>
+        /// 1097 "Crea ilusiones": the caster teleports to the aimed cell and leaves copies of
+        /// himself on the cells symmetric to it around the cell he left. 1029 is the
+        /// one that takes a copy away: at the caster's next turn start, all of them at once, and
+        /// -- the class sheet -- the moment any of them takes damage. 150 is the visibility
+        /// switch that goes with it: state 1 as the copies appear, 2 as they go.
+        /// </summary>
+        /// <remarks>
+        /// Measured on the Tymadura capture: the Tymador on 230 aims at 257 (two cells up its
+        /// axis), goes there, and the copies -8, -6, -7 appear on 259, 201 and 203 -- (+2,0),
+        /// (-2,0) and (0,+2) from 230; (0,-2) is 257, where he now stands. At his next turn:
+        /// jto 6, jwe 150 {2}, jwe 1029 per copy, jwi.
+        /// </remarks>
+        public const int Illusions = 1097;
+        public const int IllusionGone = 1029;
+        public const int Visibility = 150;
+        public const int Teleport = 4;
+        public const int SwapPositions = 8;
+
+        /// <summary>1031, "Hace pasar de turno": Tymadura ends the caster's turn on the spot.</summary>
+        public const int EndsTheTurn = 1031;
+
+        /// <summary>
+        /// 2027, "Toma el control de la entidad": a row on a summon that makes it its owner's to
+        /// play (Fighter.PlaysOnItsOwn). The Steamer's Evolución III lays it on his turrets,
+        /// the Sram's Doble on the double, Dominio de Invocaciones on the summons -- row 248585
+        /// in the Steamer captures, family 0, for good.
+        /// </summary>
+        public const int TakesControl = 2027;
+
+        /// <summary>
+        /// 1033 and 1078, minus and plus a percentage of VITALITY. Measured on Último Aliento:
+        /// -50% on 1150 vitality goes out as the sheet's vitality hole f8 = -575 and a buff of
+        /// effect 153 ("-#1 vitalidad") worth 575, so the percentage is of the characteristic and
+        /// the panel shows the flat number.
+        /// </summary>
+        public const int VitalityPercentMalus = 1033;
+        public const int VitalityPercentBonus = 1078;
+        public const int VitalityFlatMalus = 153;
+
+        /// <summary>
+        /// The bonus goes out as its own flat effect, 125 "+#1 vitalidad": Vitalidad's 20% on
+        /// 1,150 vitality is "jxm 125 dice 230" in its capture, from 25215 at grade 5.
+        /// </summary>
+        public const int VitalityFlatBonus = 125;
+
         /// <summary>The caster steps back.</summary>
         public const int StepBack = 1041;
 
@@ -64,6 +146,13 @@ namespace Jondo.Unity.World.Combat
 
         /// <summary>Take a state off.</summary>
         public const int RemoveState = 951;
+
+        /// <summary>
+        /// "Desactiva el estado #3": the state stays on the bearer, switched off for the row's
+        /// duration -- Conde Kontatrás's Reloj de Bolsillo takes his Invulnerable (56) away for a
+        /// turn this way, and it is back the turn after with nothing putting it again.
+        /// </summary>
+        public const int DisableState = 952;
 
         /// <summary>Cast another spell. This is the one that makes triggers work.</summary>
         public const int CastSpell = 792;

@@ -48,6 +48,13 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Los que tienen la invitación abierta: invitado → quién le invitó.</summary>
             public Dictionary<long, long> Pending { get; } = new();
 
+            /// <summary>
+            /// The members following the leader's movement: each asked with an imh and has not
+            /// said imo since. Right after a change of leader the new one can still be in here,
+            /// until the handler cuts them all; <see cref="FollowersOf"/> never returns him.
+            /// </summary>
+            public HashSet<long> Followers { get; } = new();
+
             public object Gate { get; } = new();
         }
 
@@ -150,6 +157,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 party.Members.Remove(characterId);
                 party.Pending.Remove(characterId);
+                party.Followers.Remove(characterId);
 
                 if (party.LeaderId == characterId && party.Members.Count > 0)
                 {
@@ -186,6 +194,7 @@ namespace Jondo.Unity.Server.Managers
                 todos = party.Members.Concat(party.Pending.Keys).ToArray();
                 party.Members.Clear();
                 party.Pending.Clear();
+                party.Followers.Clear();
             }
             foreach (long quien in todos) _of.TryRemove(quien, out _);
             _parties.TryRemove(party.Id, out _);
@@ -195,6 +204,79 @@ namespace Jondo.Unity.Server.Managers
         public static IReadOnlyList<long> MembersOf(Party party)
         {
             lock (party.Gate) return new List<long>(party.Members);
+        }
+
+        // ─── Following the leader ───────────────────────────────────────────────
+
+        /// <summary>
+        /// A member starts following the leader's movement (imh). Returns his party, or null
+        /// when he cannot follow anybody.
+        /// </summary>
+        /// <remarks>
+        /// Only somebody already inside and not leading: an invitee has not joined yet, and the
+        /// leader following himself would be sent his own position after every step. The imh
+        /// carries nothing, not even whom to follow, so it always means the leader.
+        /// <paramref name="isNew"/> is false when he was following already: the member's client
+        /// asks again every time the leader switches following on, without an imo in between
+        /// (frames 0 and 10 of "Grupos/con grupo seguir desplazamiento del lider...").
+        /// </remarks>
+        public static Party? Follow(long characterId, out bool isNew)
+        {
+            isNew = false;
+            var party = Of(characterId);
+            if (party == null) return null;
+
+            lock (party.Gate)
+            {
+                if (!party.Members.Contains(characterId) || party.LeaderId == characterId) return null;
+                isNew = party.Followers.Add(characterId);
+            }
+            return party;
+        }
+
+        /// <summary>
+        /// A member stops following (imo). Returns his party, or null when he is in none.
+        /// <paramref name="wasFollowing"/> says whether the server still had him as following.
+        /// </summary>
+        public static Party? Unfollow(long characterId, out bool wasFollowing)
+        {
+            wasFollowing = false;
+            var party = Of(characterId);
+            if (party == null) return null;
+
+            lock (party.Gate)
+            {
+                if (!party.Members.Contains(characterId)) return null;
+                wasFollowing = party.Followers.Remove(characterId);
+            }
+            return party;
+        }
+
+        /// <summary>
+        /// Who is following this character: his followers if he leads a party, nobody otherwise.
+        /// It is asked on every step anybody takes, so a character in no party costs one lookup.
+        /// </summary>
+        public static IReadOnlyList<long> FollowersOf(long leaderId)
+        {
+            var party = Of(leaderId);
+            if (party == null) return Array.Empty<long>();
+
+            lock (party.Gate)
+            {
+                if (party.LeaderId != leaderId || party.Followers.Count == 0) return Array.Empty<long>();
+                return party.Followers.Where(f => f != leaderId && party.Members.Contains(f)).ToList();
+            }
+        }
+
+        /// <summary>Everybody stops following at once. Returns who was.</summary>
+        public static IReadOnlyList<long> CutFollowers(Party party)
+        {
+            lock (party.Gate)
+            {
+                var were = party.Followers.ToList();
+                party.Followers.Clear();
+                return were;
+            }
         }
     }
 }

@@ -461,6 +461,16 @@ namespace Jondo.Unity.Server
                     // Already exists.
                 }
 
+                // Migración: lo que dieron los pergaminos, aparte de los puntos repartidos.
+                //
+                // Nace a 100 para todo el que ya existía, que es la política de este servidor -todo
+                // personaje se crea con los pergaminos hechos- y lo que las capturas enseñan de los
+                // personajes reales: el f3 de cada característica vale 100 en 156 capturas y 4.815
+                // veces, y 101 no sale ni una. Y luego se sacan de la base los 101 que la creación
+                // metía ahí, que es lo que dejaba a un nivel 200 recién hecho con 183 puntos en vez
+                // de 995: contaba los pergaminos como puntos gastados.
+                MoveScrollsOutOfTheBase(worldConnection);
+
                 FillMissingHeads(worldConnection);
 
                 // A character with no date leaves the server-selection screen empty, so no row is
@@ -563,6 +573,33 @@ namespace Jondo.Unity.Server
                 ";
                 createJobs.ExecuteNonQuery();
 
+                // What each character says of itself as an artisan, job by job: the minimum
+                // level of a customer, crafting for free, and being in the public directory.
+                var createCrafter = worldConnection.CreateCommand();
+                createCrafter.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterCrafterSettings (
+                        CharacterId INTEGER NOT NULL,
+                        JobId INTEGER NOT NULL,
+                        MinLevel INTEGER NOT NULL DEFAULT 1,
+                        Free INTEGER NOT NULL DEFAULT 1,
+                        Listed INTEGER NOT NULL DEFAULT 0,
+                        PRIMARY KEY (CharacterId, JobId)
+                    );
+                ";
+                createCrafter.ExecuteNonQuery();
+
+                // The Infinite Dream each character has going, whole, as JSON: it outlives a
+                // disconnection and a restart, and it is what the well offers to continue.
+                var createDream = worldConnection.CreateCommand();
+                createDream.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterDreams (
+                        CharacterId INTEGER PRIMARY KEY,
+                        Json TEXT NOT NULL,
+                        UpdatedAt TEXT NOT NULL
+                    );
+                ";
+                createDream.ExecuteNonQuery();
+
                 // Los retos de mazmorra que ya se han logrado. Van con logro detrás, y un logro
                 // se hace UNA vez: cumplido el reto, no se le vuelve a ofrecer a ese personaje
                 // nunca más. Los retos normales no pasan por aquí, que ésos salen siempre.
@@ -607,6 +644,9 @@ namespace Jondo.Unity.Server
                 ";
                 createAchievements.ExecuteNonQuery();
 
+                // And the tallies and emotes that go with them, created the same way.
+                EnsureProgressionTables();
+
                 // La entrada gratis del manojo de llaves, gastada o no, por personaje y por
                 // mazmorra. Una fila por las dos cosas porque el manojo da "una entrada gratis en
                 // CADA mazmorra, una vez por semana" -- traduccion 1189621, la pagina de ayuda del
@@ -645,6 +685,9 @@ namespace Jondo.Unity.Server
                     );
                 ";
                 createElements.ExecuteNonQuery();
+
+                // Los gremios y sus miembros. La base de todo lo del gremio; ver GuildStore.
+                Managers.GuildStore.EnsureTables(worldConnection);
 
                 // El manojo de llaves a todo el que ya tuviera personaje. Los nuevos lo reciben
                 // con el conjunto del aventurero -ver CharacterCreationHandler-, pero los que ya
@@ -1955,6 +1998,70 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
+        /// The six scroll columns, and the one-off that takes the scrolls back out of the base.
+        /// </summary>
+        /// <remarks>
+        /// The columns default to 100 -- every character on this server is born scrolled, and 100
+        /// is what the captures show on every real one -- so a row that existed before them is
+        /// scrolled the moment they appear. What has to be undone by hand is what creation did
+        /// before: it wrote 101 into all six base characteristics to stand in for the scrolls,
+        /// and the base is where spent points live. A row with exactly 101 in all six is one of
+        /// those and nothing else -- no spread of points a player chose lands on 101 six times --
+        /// so it goes back to zero, and its points to spend go back to being its whole capital.
+        /// The columns already being there means the second half has already run: it is keyed
+        /// on the ALTER succeeding, so it runs once.
+        /// </remarks>
+        internal static void MoveScrollsOutOfTheBase(SqliteConnection connection)
+        {
+            string[] columns =
+            {
+                "ScrolledVitality", "ScrolledWisdom", "ScrolledStrength",
+                "ScrolledIntelligence", "ScrolledChance", "ScrolledAgility",
+            };
+
+            bool added = false;
+            foreach (string column in columns)
+            {
+                try
+                {
+                    var add = connection.CreateCommand();
+                    add.CommandText = $"ALTER TABLE Characters ADD COLUMN {column} INTEGER NOT NULL DEFAULT " +
+                                      $"{Handlers.CharacterCreationHandler.ScrolledStat};";
+                    add.ExecuteNonQuery();
+                    added = true;
+                }
+                catch (SqliteException)
+                {
+                    // Already there.
+                }
+            }
+
+            if (!added) return;
+            Console.WriteLine("[SQLite] Migration: Added the six Scrolled columns to Characters.");
+
+            try
+            {
+                var fix = connection.CreateCommand();
+                fix.CommandText = @"
+                    UPDATE Characters
+                    SET Vitality = 0, Wisdom = 0, Strength = 0, Intelligence = 0, Chance = 0, Agility = 0,
+                        RemainingPoints = 5 * (MIN(Level, 200) - 1)
+                    WHERE Vitality = 101 AND Wisdom = 101 AND Strength = 101
+                      AND Intelligence = 101 AND Chance = 101 AND Agility = 101;";
+                int moved = fix.ExecuteNonQuery();
+                if (moved > 0)
+                {
+                    Console.WriteLine($"[SQLite] Migration: {moved} character(s) had the scrolls inside " +
+                                      "the base; moved out, with their capital back to spend.");
+                }
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"[SQLite] Could not move the scrolls out of the base: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Gives a head to the characters that have none. They predate the column, so the one
         /// their player picked is not recorded anywhere: each gets the first head the creation
         /// screen offers for its breed and sex, which is what the real client defaults to.
@@ -2147,9 +2254,11 @@ namespace Jondo.Unity.Server
         {
             "CharacterItems", "CharacterSpellChoices", "CharacterSpellBar",
             "HavenBag", "HavenBagFurniture", "HavenBagChest",
-            "CharacterWardrobe", "CharacterAppearance", "CharacterJobs",
+            "CharacterWardrobe", "CharacterAppearance", "CharacterJobs", "CharacterCrafterSettings",
+            "CharacterDreams",
             "CharacterChallenges", "CharacterQuests", "CharacterAchievements",
             "CharacterKeyring", "CharacterElements",
+            "CharacterEnergy",
         };
 
         /// <summary>
@@ -2254,6 +2363,29 @@ namespace Jondo.Unity.Server
             }
         }
 
+        /// <summary>
+        /// The account a character belongs to (Characters.AccountId), or zero when there is no such
+        /// character. What a marketplace pays a seller's bank through, connected or not.
+        /// </summary>
+        public static long AccountIdOfCharacter(long characterId)
+        {
+            if (characterId <= 0) return 0;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT AccountId FROM Characters WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", characterId);
+                return command.ExecuteScalar() is long accountId ? accountId : 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Could not read the account of {characterId}: {ex.Message}");
+                return 0;
+            }
+        }
+
         public static bool LoadCharacter(long characterId)
         {
             using var connection = new SqliteConnection(WorldConnectionString);
@@ -2261,7 +2393,8 @@ namespace Jondo.Unity.Server
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT Name, Level, MapId, CellId, RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look, Breed, Sex, Orientation, Kamas, Experience
+                SELECT Name, Level, MapId, CellId, RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look, Breed, Sex, Orientation, Kamas, Experience,
+                       ScrolledVitality, ScrolledWisdom, ScrolledStrength, ScrolledIntelligence, ScrolledChance, ScrolledAgility
                 FROM Characters
                 WHERE Id = $charId;
             ";
@@ -2323,6 +2456,12 @@ namespace Jondo.Unity.Server
                 Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence = reader.GetInt32(8);
                 Jondo.Unity.Server.Network.SessionContext.State.StatChance = reader.GetInt32(9);
                 Jondo.Unity.Server.Network.SessionContext.State.StatAgility = reader.GetInt32(10);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledVitality = reader.GetInt32(17);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledWisdom = reader.GetInt32(18);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledStrength = reader.GetInt32(19);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledIntelligence = reader.GetInt32(20);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledChance = reader.GetInt32(21);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledAgility = reader.GetInt32(22);
                 Jondo.Unity.Server.Network.SessionContext.State.Breed = reader.GetInt32(12);
                 Jondo.Unity.Server.Network.SessionContext.State.Sex = reader.GetInt32(13);
 
@@ -2349,6 +2488,10 @@ namespace Jondo.Unity.Server
                     };
                 }
 
+                estado.CrafterSettings.Clear();
+                foreach (var setting in LoadCrafterSettings(estado.CharacterId))
+                    estado.CrafterSettings[setting.Key] = setting.Value;
+
                 Console.WriteLine($"[SQLite] Successfully loaded character: {Jondo.Unity.Server.Network.SessionContext.State.CharacterName} (Level {Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel}), {estado.Jobs.Count} oficios.");
                 return true;
             }
@@ -2366,6 +2509,8 @@ namespace Jondo.Unity.Server
                 SET MapId = $mapId, CellId = $cellId, Orientation = $orientation,
                     RemainingPoints = $pts, Vitality = $vit, Wisdom = $wis,
                     Strength = $str, Intelligence = $int, Chance = $cha, Agility = $agi,
+                    ScrolledVitality = $svit, ScrolledWisdom = $swis, ScrolledStrength = $sstr,
+                    ScrolledIntelligence = $sint, ScrolledChance = $scha, ScrolledAgility = $sagi,
                     Level = $lvl, Kamas = $kamas, Experience = $xp
                 WHERE Id = $charId;
             ";
@@ -2380,6 +2525,12 @@ namespace Jondo.Unity.Server
             command.Parameters.AddWithValue("$int", Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence);
             command.Parameters.AddWithValue("$cha", Jondo.Unity.Server.Network.SessionContext.State.StatChance);
             command.Parameters.AddWithValue("$agi", Jondo.Unity.Server.Network.SessionContext.State.StatAgility);
+            command.Parameters.AddWithValue("$svit", Jondo.Unity.Server.Network.SessionContext.State.ScrolledVitality);
+            command.Parameters.AddWithValue("$swis", Jondo.Unity.Server.Network.SessionContext.State.ScrolledWisdom);
+            command.Parameters.AddWithValue("$sstr", Jondo.Unity.Server.Network.SessionContext.State.ScrolledStrength);
+            command.Parameters.AddWithValue("$sint", Jondo.Unity.Server.Network.SessionContext.State.ScrolledIntelligence);
+            command.Parameters.AddWithValue("$scha", Jondo.Unity.Server.Network.SessionContext.State.ScrolledChance);
+            command.Parameters.AddWithValue("$sagi", Jondo.Unity.Server.Network.SessionContext.State.ScrolledAgility);
             command.Parameters.AddWithValue("$lvl", Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel);
             command.Parameters.AddWithValue("$kamas", Jondo.Unity.Server.Network.SessionContext.State.Kamas);
             command.Parameters.AddWithValue("$xp", Jondo.Unity.Server.Network.SessionContext.State.Experience);
@@ -2567,14 +2718,20 @@ namespace Jondo.Unity.Server
 
                 using var transaction = connection.BeginTransaction();
 
+                // Los pergaminos van en SUS columnas y la base nace a cero: la base son los puntos
+                // que el jugador reparte, y un personaje recién hecho no ha repartido ninguno.
                 var insertar = connection.CreateCommand();
                 insertar.CommandText = @"
                     INSERT INTO Characters
                         (Id, AccountId, Name, Breed, Sex, Level, MapId, CellId, RemainingPoints,
-                         Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look,
-                         Orientation, Kamas)
+                         Vitality, Wisdom, Strength, Intelligence, Chance, Agility,
+                         ScrolledVitality, ScrolledWisdom, ScrolledStrength,
+                         ScrolledIntelligence, ScrolledChance, ScrolledAgility,
+                         Look, Orientation, Kamas)
                     VALUES ($id, $acc, $name, $breed, $sex, $level, $map, $cell, 0,
-                            $stat, $stat, $stat, $stat, $stat, $stat, $look, 1, $kamas);";
+                            0, 0, 0, 0, 0, 0,
+                            $stat, $stat, $stat, $stat, $stat, $stat,
+                            $look, 1, $kamas);";
                 insertar.Parameters.AddWithValue("$id", id);
                 insertar.Parameters.AddWithValue("$acc", accountId);
                 insertar.Parameters.AddWithValue("$name", name);
@@ -2779,6 +2936,33 @@ namespace Jondo.Unity.Server
             catch (Exception ex)
             {
                 Console.WriteLine($"[SQLite] No se pudo crear el objeto {uid}: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Rewrites how many there are of an item and what it carries: a crafted stack that grows,
+        /// a rune that changes an item, a signature. Only on the owner's row, like every write here.
+        /// </summary>
+        public static bool UpdateCharacterItem(long characterId, long uid, int quantity, string effects)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE CharacterItems SET Quantity = $n, Effects = $e " +
+                                      "WHERE Uid = $uid AND CharacterId = $id;";
+                command.Parameters.AddWithValue("$n", Math.Max(1, quantity));
+                command.Parameters.AddWithValue("$e", effects);
+                command.Parameters.AddWithValue("$uid", uid);
+                command.Parameters.AddWithValue("$id", characterId);
+                return command.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not rewrite item {uid}: {ex.Message}");
                 return false;
             }
         }
@@ -3600,6 +3784,13 @@ namespace Jondo.Unity.Server
                     stats.Chance = g.TryGetProperty("chance", out var cha) ? cha.GetInt32() : 0;
                     stats.Agility = g.TryGetProperty("agility", out var agi) ? agi.GetInt32() : 0;
                     stats.Wisdom = g.TryGetProperty("wisdom", out var wis) ? wis.GetInt32() : 0;
+                    stats.PaDodge = g.TryGetProperty("paDodge", out var pad) ? pad.GetInt32() : 0;
+                    stats.PmDodge = g.TryGetProperty("pmDodge", out var pmd) ? pmd.GetInt32() : 0;
+                    if (g.TryGetProperty("bonusCharacteristics", out var bonus))
+                    {
+                        stats.TackleEvadeBonus = bonus.TryGetProperty("tackleEvade", out var te) ? te.GetInt32() : 0;
+                        stats.TackleBlockBonus = bonus.TryGetProperty("tackleBlock", out var tb) ? tb.GetInt32() : 0;
+                    }
                     stats.NeutralResistance = g.TryGetProperty("neutralResistance", out var nr) ? nr.GetInt32() : 0;
                     stats.EarthResistance = g.TryGetProperty("earthResistance", out var er) ? er.GetInt32() : 0;
                     stats.FireResistance = g.TryGetProperty("fireResistance", out var fr) ? fr.GetInt32() : 0;
@@ -4141,6 +4332,79 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
+        /// The other loot table a monster has: the global one, the same for every grade.
+        /// </summary>
+        /// <remarks>
+        /// A monster carries two lists and they are not the same thing. <c>drops</c> is its own,
+        /// with a percentage per grade; <c>globalDrops</c> is what it hands out on top of that, one
+        /// percentage for everyone, and it is where the seasonal and the RAID loot lives -- every
+        /// one of the Abyss monsters carries its salt and its gems here and nothing at all in the
+        /// other list, so a raid where nothing drops is a raid that never read this.
+        ///
+        /// Each row brings a criterion saying who may receive it, and it is left for the caller to
+        /// answer rather than filtered here: the criterion asks where the player is standing and
+        /// what raid he is in, and that is not something a database reader knows.
+        ///
+        /// MEASURED: 55 raid-resource rows across nine monsters, all of them with min and max
+        /// alike and none of them with a criterion, so the two ends are the same number and the
+        /// minimum is what goes out. Where the two ends differ -- the anomaly fragment, at 1 to
+        /// 20 -- the row always carries a criterion we cannot satisfy, so nothing is decided here
+        /// on a guess.
+        /// </remarks>
+        public static List<MonsterDrop> GetMonsterGlobalDrops(int monsterId)
+        {
+            var drops = new List<MonsterDrop>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = "SELECT Data FROM MonsterTemplates WHERE Id = $id;";
+                cmd.Parameters.AddWithValue("$id", monsterId);
+                string? json = cmd.ExecuteScalar() as string;
+                if (string.IsNullOrEmpty(json)) return drops;
+
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                if (!doc.RootElement.TryGetProperty("globalDrops", out var list)) return drops;
+                if (list.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                    list.TryGetProperty("Array", out var inner)) list = inner;
+                if (list.ValueKind != System.Text.Json.JsonValueKind.Array) return drops;
+
+                foreach (var e in list.EnumerateArray())
+                {
+                    if (!e.TryGetProperty("objectId", out var oid)) continue;
+                    int objectId = oid.GetInt32();
+
+                    // Filas con objeto -1: no reparten un objeto, reparten una alteración, y de
+                    // eso no hay nada hecho. Se dejan pasar de largo en vez de meter un objeto
+                    // inexistente en la bolsa.
+                    if (objectId <= 0) continue;
+
+                    double pct = 0;
+                    if (e.TryGetProperty("minPercentDrop", out var min)) pct = min.GetDouble();
+                    if (pct <= 0) continue;
+
+                    string criterion = e.TryGetProperty("receiverCriterion", out var c)
+                        ? (c.GetString() ?? "") : "";
+
+                    drops.Add(new MonsterDrop
+                    {
+                        ObjectId = objectId,
+                        PercentDrop = pct,
+                        ReceiverCriterion = criterion,
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[DatabaseManager] Error reading the global loot table of monster " +
+                                 $"{monsterId}: {ex.Message}");
+            }
+            return drops;
+        }
+
+        /// <summary>
         /// Puts an item into the inventory. If one of the same kind is already loose in the bag,
         /// it adds to that stack instead of creating another entry. Returns the resulting item.
         /// </summary>
@@ -4165,6 +4429,113 @@ namespace Jondo.Unity.Server
             {
                 Console.WriteLine($"[SQLite] No se ha podido guardar el oficio {jobId}: {ex.Message}");
             }
+        }
+
+        /// <summary>A character's dream, as JSON, over the one it had.</summary>
+        public static void SaveDream(long characterId, string json)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterDreams (CharacterId, Json, UpdatedAt) VALUES ($c, $j, $t)
+                    ON CONFLICT(CharacterId) DO UPDATE SET Json = $j, UpdatedAt = $t;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$j", json);
+                command.Parameters.AddWithValue("$t", DateTime.UtcNow.ToString("o"));
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not save the dream of {characterId}: {ex.Message}");
+            }
+        }
+
+        /// <summary>A character's dream, over: won, or lost with no arena left.</summary>
+        public static void DeleteDream(long characterId)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "DELETE FROM CharacterDreams WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not delete the dream of {characterId}: {ex.Message}");
+            }
+        }
+
+        /// <summary>A character's dream as JSON, or null when it has none.</summary>
+        public static string? LoadDream(long characterId)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Json FROM CharacterDreams WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                return command.ExecuteScalar() as string;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not read the dream of {characterId}: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>One job's artisan settings, written as they change.</summary>
+        public static void SaveCrafterSetting(long characterId, int jobId, Handlers.ArtisanHandler.Setting setting)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterCrafterSettings (CharacterId, JobId, MinLevel, Free, Listed)
+                    VALUES ($c, $j, $m, $f, $l)
+                    ON CONFLICT(CharacterId, JobId) DO UPDATE SET MinLevel = $m, Free = $f, Listed = $l;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$j", jobId);
+                command.Parameters.AddWithValue("$m", setting.MinLevel);
+                command.Parameters.AddWithValue("$f", setting.Free ? 1 : 0);
+                command.Parameters.AddWithValue("$l", setting.Listed ? 1 : 0);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not save the artisan settings of job {jobId}: {ex.Message}");
+            }
+        }
+
+        /// <summary>A character's artisan settings, job by job.</summary>
+        public static Dictionary<int, Handlers.ArtisanHandler.Setting> LoadCrafterSettings(long characterId)
+        {
+            var settings = new Dictionary<int, Handlers.ArtisanHandler.Setting>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT JobId, MinLevel, Free, Listed FROM CharacterCrafterSettings WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                    settings[reader.GetInt32(0)] = new Handlers.ArtisanHandler.Setting(
+                        reader.GetInt32(1), reader.GetInt32(2) != 0, reader.GetInt32(3) != 0);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not read the artisan settings: {ex.Message}");
+            }
+            return settings;
         }
 
         /// <summary>One quest's progress as the database holds it.</summary>
@@ -4252,9 +4623,156 @@ namespace Jondo.Unity.Server
             return salida;
         }
 
+        private static volatile bool _progressionTables;
+
+        /// <summary>
+        /// The tables achievements and emotes keep, created if they are not there.
+        /// </summary>
+        /// <remarks>
+        /// Its own method, and called by the readers and writers below as well as by
+        /// <see cref="Initialize"/>, because a base fresh out of <c>datos/world.zip</c> has none of
+        /// them: that is the schema the continuous integration tests against.
+        ///
+        /// CharacterAchievementCounters holds the tallies the achievement data counts and nothing
+        /// else keeps: monsters beaten (EM), monsters beaten with a challenge won (Ef), subareas
+        /// entered (Xs), items crafted (Xc) and the day of the last Almanax offering (Ax). Kind is
+        /// the operator the achievement data uses, or a two-letter key of ours where it names none.
+        ///
+        /// CharacterEmotes holds the emotes a character has learned beyond the four every
+        /// character starts with.
+        /// </remarks>
+        public static void EnsureProgressionTables()
+        {
+            if (_progressionTables) return;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterAchievements (
+                        CharacterId INTEGER NOT NULL,
+                        AchievementId INTEGER NOT NULL,
+                        Claimed INTEGER NOT NULL DEFAULT 0,
+                        PRIMARY KEY (CharacterId, AchievementId)
+                    );
+                    CREATE TABLE IF NOT EXISTS CharacterAchievementCounters (
+                        CharacterId INTEGER NOT NULL,
+                        Kind TEXT NOT NULL,
+                        Key INTEGER NOT NULL,
+                        Count INTEGER NOT NULL DEFAULT 0,
+                        PRIMARY KEY (CharacterId, Kind, Key)
+                    );
+                    CREATE TABLE IF NOT EXISTS CharacterEmotes (
+                        CharacterId INTEGER NOT NULL,
+                        EmoteId INTEGER NOT NULL,
+                        PRIMARY KEY (CharacterId, EmoteId)
+                    );";
+                command.ExecuteNonQuery();
+                _progressionTables = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Las tablas de logros y actitudes no se han podido crear: {ex.Message}");
+            }
+        }
+
+        /// <summary>A character's achievement tallies, by kind and key.</summary>
+        public static Dictionary<(string Kind, long Key), long> LoadAchievementCounters(long characterId)
+        {
+            EnsureProgressionTables();
+            var tallies = new Dictionary<(string, long), long>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText =
+                    "SELECT Kind, Key, Count FROM CharacterAchievementCounters WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) tallies[(reader.GetString(0), reader.GetInt64(1))] = reader.GetInt64(2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se han podido leer los contadores de logros: {ex.Message}");
+            }
+            return tallies;
+        }
+
+        /// <summary>Writes one tally as it now stands.</summary>
+        public static void SaveAchievementCounter(long characterId, string kind, long key, long count)
+        {
+            EnsureProgressionTables();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterAchievementCounters (CharacterId, Kind, Key, Count)
+                    VALUES ($c, $k, $key, $n)
+                    ON CONFLICT(CharacterId, Kind, Key) DO UPDATE SET Count = $n;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$k", kind);
+                command.Parameters.AddWithValue("$key", key);
+                command.Parameters.AddWithValue("$n", count);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] El contador {kind}/{key} no se ha podido guardar: {ex.Message}");
+            }
+        }
+
+        /// <summary>The emotes a character has learned, beyond the starting ones.</summary>
+        public static HashSet<int> LoadEmotes(long characterId)
+        {
+            EnsureProgressionTables();
+            var emotes = new HashSet<int>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT EmoteId FROM CharacterEmotes WHERE CharacterId = $c;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) emotes.Add(reader.GetInt32(0));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] No se han podido leer las actitudes: {ex.Message}");
+            }
+            return emotes;
+        }
+
+        /// <summary>Writes down that a character has learned an emote.</summary>
+        public static void SaveEmote(long characterId, int emoteId)
+        {
+            EnsureProgressionTables();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CharacterEmotes (CharacterId, EmoteId) VALUES ($c, $e)
+                    ON CONFLICT(CharacterId, EmoteId) DO NOTHING;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$e", emoteId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] La actitud {emoteId} no se ha podido guardar: {ex.Message}");
+            }
+        }
+
         /// <summary>Writes down that a character has an achievement, and whether it was paid.</summary>
         public static void SaveAchievement(long characterId, int achievementId, bool claimed)
         {
+            EnsureProgressionTables();
             try
             {
                 using var connection = new SqliteConnection(WorldConnectionString);
@@ -4278,6 +4796,7 @@ namespace Jondo.Unity.Server
         /// <summary>A character's achievements: the id and whether the reward was taken.</summary>
         public static List<(int Achievement, bool Claimed)> LoadAchievements(long characterId)
         {
+            EnsureProgressionTables();
             var salida = new List<(int, bool)>();
             try
             {
@@ -4496,6 +5015,37 @@ namespace Jondo.Unity.Server
 
         /// <summary>El mayor uid escrito en la base. Lo usa la guardia de regresion.</summary>
         public static long MayorUidGuardado() => MayorUidEnUso();
+
+        /// <summary>
+        /// Makes sure no uid handed out from now on is at or below <paramref name="highest"/>.
+        /// </summary>
+        /// <remarks>
+        /// For the tables that keep items outside CharacterItems, the bank's first: the dispenser
+        /// starts above the highest uid in CharacterItems and nothing else, so an item that went
+        /// into the bank with the highest uid of all would have its number handed out again on the
+        /// next start. Whoever owns such a table tells the dispenser its highest uid once.
+        /// </remarks>
+        public static void KeepUidsAbove(long highest)
+        {
+            if (highest <= 0) return;
+
+            if (System.Threading.Interlocked.Read(ref _ultimoUidRepartido) == 0)
+            {
+                lock (_candadoDelUid)
+                {
+                    if (_ultimoUidRepartido == 0)
+                        _ultimoUidRepartido = Math.Max(MayorUidEnUso(), PrimerUidRepartido);
+                }
+            }
+
+            long seen;
+            do
+            {
+                seen = System.Threading.Interlocked.Read(ref _ultimoUidRepartido);
+                if (seen >= highest) return;
+            }
+            while (System.Threading.Interlocked.CompareExchange(ref _ultimoUidRepartido, highest, seen) != seen);
+        }
 
         private static long MayorUidEnUso()
         {
@@ -4847,11 +5397,14 @@ namespace Jondo.Unity.Server
                         int characteristic = GetEffectCharacteristic(effectId);
                         if (characteristic > 0 && dice != 0)
                         {
+                            // The sign is the catalogue's own, read off the description: a bonus adds, a "-" row
+                            // takes away. Everything was a removal before, and a monster's own
+                            // buffs -- +MP, +damage, power -- never counted as buffs to it.
                             data.StatEffects.Add(new SpellStatEffect
                             {
                                 EffectId = effectId,
                                 Characteristic = characteristic,
-                                Value = -dice,
+                                Value = EffectMeta(effectId).Sign < 0 ? -dice : dice,
                                 Duration = dur
                             });
                         }
@@ -4956,6 +5509,74 @@ namespace Jondo.Unity.Server
             return (0, 0);
         }
 
+        /// <summary>La subárea en la que cae un mapa, o cero. Es lo que pregunta el criterio «PB».</summary>
+        public static int SubAreaOfMap(long mapId)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var query = connection.CreateCommand();
+                query.CommandText = "SELECT SubAreaId FROM MapSubareas WHERE MapId = $m LIMIT 1;";
+                query.Parameters.AddWithValue("$m", mapId);
+                var value = query.ExecuteScalar();
+                return value == null || value is DBNull ? 0 : Convert.ToInt32(value);
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[DatabaseManager] No se pudo leer la subárea del mapa {mapId}: {ex.Message}");
+                return 0;
+            }
+        }
+
+        /// <summary>Los mapas de una subárea, en orden. Vacío cuando no hay ninguno.</summary>
+        public static List<long> MapsOfSubArea(int subAreaId)
+        {
+            var fuera = new List<long>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var query = connection.CreateCommand();
+                query.CommandText = "SELECT MapId FROM MapSubareas WHERE SubAreaId = $s ORDER BY MapId;";
+                query.Parameters.AddWithValue("$s", subAreaId);
+                using var reader = query.ExecuteReader();
+                while (reader.Read()) fuera.Add(reader.GetInt64(0));
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[DatabaseManager] No se pudieron leer los mapas de la subárea {subAreaId}: {ex.Message}");
+            }
+            return fuera;
+        }
+
+        /// <summary>
+        /// El criterio de inmunidad a la agresión de un monstruo, tal y como lo trae su plantilla.
+        /// Es lo que gobierna la luz de las raids: los de la Sima llevan
+        /// <c>(PB=1131&amp;RV!7,n1_worldlight,0)|…</c> y dejan de ser inmunes a oscuras.
+        /// </summary>
+        public static string MonsterAggressiveImmunity(int monsterTemplate)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var query = connection.CreateCommand();
+                query.CommandText = "SELECT Data FROM MonsterTemplates WHERE Id = $m;";
+                query.Parameters.AddWithValue("$m", monsterTemplate);
+                if (query.ExecuteScalar() is not string data) return "";
+                using var doc = System.Text.Json.JsonDocument.Parse(data);
+                return doc.RootElement.TryGetProperty("aggressiveImmunityCriterion", out var criterion)
+                    ? criterion.GetString() ?? ""
+                    : "";
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[DatabaseManager] No se pudo leer el criterio del monstruo {monsterTemplate}: {ex.Message}");
+                return "";
+            }
+        }
+
         /// <summary>
         /// El nombre de una subzona, en el idioma del cliente.
         ///
@@ -5017,6 +5638,18 @@ namespace Jondo.Unity.Server
         public int Chance { get; set; }
         public int Agility { get; set; }
         public int Wisdom { get; set; }
+
+        /// <summary>The grade's own AP and MP dodge ("paDodge", "pmDodge"), on top of what its wisdom gives.</summary>
+        public int PaDodge { get; set; }
+        public int PmDodge { get; set; }
+
+        /// <summary>
+        /// The grade's own escape and tackle ("bonusCharacteristics.tackleEvade" and
+        /// "tackleBlock"), on top of the tenth of its agility both come from. 75 grades carry one.
+        /// </summary>
+        public int TackleEvadeBonus { get; set; }
+        public int TackleBlockBonus { get; set; }
+
         public int NeutralResistance { get; set; }
         public int EarthResistance { get; set; }
         public int FireResistance { get; set; }
@@ -5034,6 +5667,16 @@ namespace Jondo.Unity.Server
         public int ObjectId { get; set; }
         /// <summary>Drop chance, as a percentage, for the monster's grade.</summary>
         public double PercentDrop { get; set; }
+
+        /// <summary>
+        /// What the receiver has to satisfy to get it, in the client's own criterion language, or
+        /// empty when anybody does.
+        /// </summary>
+        /// <remarks>
+        /// Only the global table carries one. It is what keeps a raid's treasures inside the raid
+        /// and the season's fragments inside the season.
+        /// </remarks>
+        public string ReceiverCriterion { get; set; } = "";
     }
 
     public class SpellCombatData

@@ -96,6 +96,8 @@ namespace Jondo.Unity.Server
             Managers.RecipeManager.Initialize();
             Managers.Interactives.Initialize();
             Managers.HavenBagStore.Initialize();
+            Managers.StorageStacks.Initialize();
+            Managers.Bank.Initialize();
             Managers.Wardrobe.Initialize();
             Managers.Titles.Initialize();
             Managers.Cosmetics.Initialize();
@@ -107,10 +109,19 @@ namespace Jondo.Unity.Server
             Managers.Bins.Initialize();
             Managers.Anomalies.Initialize();
             Managers.Houses.Initialize();
+            Managers.HouseStore.Initialize();
+            Managers.GuildChests.Initialize();
             // Detrás de Houses a propósito: TeleportManager rechaza las rutas que caen sobre una
             // puerta de casa, y para eso las casas tienen que estar ya cargadas.
             Managers.TeleportManager.Initialize();
             Managers.Resources.Initialize();
+            Managers.Workshops.Initialize();
+            // Before the registry, which declares their counters; the book of lots on sale with
+            // them, and what ran out of time while the server was down goes back to its sellers.
+            Managers.Marketplaces.Initialize();
+            Managers.MarketplaceListings.Initialize();
+            Handlers.MarketplaceHandler.SweepExpiredAsync().GetAwaiter().GetResult();
+            Managers.Forgemagic.Initialize();
             Managers.InfoMessages.Initialize();
             Managers.Challenges.Initialize();
             Managers.Challenges.OnlyOffer(Handlers.ChallengeWatcher.Watched);
@@ -125,6 +136,8 @@ namespace Jondo.Unity.Server
             // Detras de los NPCs a proposito: lee sus plantillas para saber con que respuesta
             // ofrece cada guardian el manojo y con cual la llave.
             Managers.DungeonDoor.Initialize();
+            // Behind the NPCs too, and for the same reason: the bankers are found in their templates.
+            Managers.Bankers.Initialize();
             Managers.NpcShops.Initialize();
             // Detras de Npcs porque las misiones cuelgan de sus dialogos, y el catalogo es de
             // Ankama y no cambia: se lee una vez y lo comparten todas las sesiones.
@@ -133,6 +146,10 @@ namespace Jondo.Unity.Server
             // Detras de las misiones: 259 logros se ganan acabando una, y el catalogo se indexa
             // por mision al cargarse.
             Managers.Achievements.Load();
+            // Behind the quests as well: the Almanax offerings are quests, and the calendar finds
+            // their giver in the quest catalogue.
+            Managers.Almanax.Load();
+            Managers.Emotes.Load();
             Managers.TokenShops.Initialize();
 
             Console.WriteLine("[+] Registering Fight Packet Handlers...");
@@ -201,6 +218,16 @@ namespace Jondo.Unity.Server
                 _ => { try { Network.ClientLaunchRegistry.SoltarLosCaducados(TimeSpan.FromMinutes(5)); } catch { } },
                 null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
+            // The Koliseo's queues, looked at again every few seconds: the rating window widens
+            // with the wait, so a match that was not possible at enrolment may be now.
+            var koliseo = new System.Threading.Timer(
+                _ =>
+                {
+                    try { Handlers.KoliseoHandler.TickAsync().GetAwaiter().GetResult(); }
+                    catch (Exception ex) { Console.WriteLine($"[Koliseo] The queue tick failed: {ex.Message}"); }
+                },
+                null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+
             // Y su ventana: el registro y las cifras. Si no se pudiera abrir —sin escritorio, por
             // ejemplo— el servidor sigue funcionando igual: la ventana es para mirar, no para que
             // las cosas pasen.
@@ -213,6 +240,7 @@ namespace Jondo.Unity.Server
 
             await _shutdown.Task;
             await barrendero.DisposeAsync();
+            await koliseo.DisposeAsync();
 
             StopServices();
 

@@ -2159,6 +2159,30 @@
       "_byHand": true
     },
     {
+      "npc": 7835,
+      "map": 0,
+      "opening": 59655,
+      "lines": [
+        {
+          "message": 59655,
+          "choices": [
+            {
+              "reply": 81584,
+              "dreamFavor": true
+            },
+            {
+              "reply": 81585
+            }
+          ]
+        },
+        {
+          "message": 59657,
+          "choices": []
+        }
+      ],
+      "_byHand": true
+    },
+    {
       "npc": 7850,
       "map": 0,
       "opening": 59712,

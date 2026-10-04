@@ -7,44 +7,52 @@ using Jondo.Unity.Server.Network;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// The one thing the client says about achievements: pay me.
+    /// What the client says about achievements: open the window, show a category or one
+    /// achievement, and pay me.
     /// </summary>
     /// <remarks>
     /// Earning an achievement is the server's business — nobody is asked whether they finished a
-    /// quest — so there is only the claim to handle. The capture
-    /// <c>Logros\aceptar recompensas de un logro</c> is exactly one press of that button:
-    /// <c>mga {1: 8990}</c> goes up, and the character sheet and the confirmation come back.
+    /// quest — so everything that comes in is either the window asking what to draw or the claim.
+    /// The capture <c>Logros\aceptar recompensas de un logro</c> is exactly one press of the claim
+    /// button: <c>mga {1: 8990}</c> goes up, and the character sheet, the experience gained and the
+    /// confirmation come back. <c>Chats\usando todos los chats</c> ends with the window opening:
+    /// <c>mfe</c>, <c>mfp</c> and <c>mff {40}</c> go up, and <c>mgb</c>, <c>mfx</c> and <c>mfo</c>
+    /// come back.
     /// </remarks>
     public static class AchievementHandler
     {
-        /// <summary>
-        /// The client wants the reward of an achievement (mga): f1 the achievement, or -1 for all.
-        /// </summary>
-        /// <remarks>
-        /// The -1 is not a guess: three of the captures send <c>mga</c> with a varint of
-        /// 18446744073709551615, which is what -1 looks like on the wire, and they send it on
-        /// entering the world rather than in front of any particular achievement.
-        /// </remarks>
+        /// <summary>The client wants the reward of an achievement (mga): f1 the achievement, or -1 for all.</summary>
         public static async Task ClaimAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? mga = ConnectionProtocol.ReadPayload(payload, Op.Mga);
             if (mga == null) return;
 
-            int achievementId = -1;
-            foreach (var field in ProtoMessage.Parse(mga).Fields)
-            {
-                if (field.FieldNumber != 1 || field.WireType != 0) continue;
+            await Achievements.ClaimAsync(stream, AchievementProtocol.ReadClaim(mga));
+        }
 
-                long value = field.VarIntValue;
+        /// <summary>The window has opened (mfe, empty).</summary>
+        public static Task OpenedAsync(NetworkStream stream) => Achievements.OpenedAsync(stream);
 
-                // Anything that does not fit in an int is the client's -1, not an id: achievement
-                // ids stop at 9,062. Reading it as an unsigned number would ask for reward
-                // number 18,446,744,073,709,551,615 and quietly do nothing.
-                achievementId = value > 0 && value <= int.MaxValue ? (int)value : -1;
-                break;
-            }
+        /// <summary>The window's second request (mfp, empty), answered on root 3 with the request's id.</summary>
+        public static Task SecondRequestAsync(NetworkStream stream, byte[] payload)
+            => Achievements.SecondRequestAsync(stream, payload);
 
-            await Achievements.ClaimAsync(stream, achievementId);
+        /// <summary>A category of the window (mff): f1 the category.</summary>
+        public static async Task CategoryAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? mff = ConnectionProtocol.ReadPayload(payload, Op.Mff);
+            if (mff == null) return;
+
+            await Achievements.CategoryAsync(stream, AchievementProtocol.ReadCategory(mff));
+        }
+
+        /// <summary>One achievement of the window (mfm). INFERRED: never captured.</summary>
+        public static async Task DetailsAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? mfm = ConnectionProtocol.ReadPayload(payload, Op.Mfm);
+            if (mfm == null) return;
+
+            await Achievements.DetailsAsync(stream, AchievementProtocol.ReadDetailsRequest(mfm));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jondo.Unity.World.Fights
 {
@@ -12,6 +13,13 @@ namespace Jondo.Unity.World.Fights
         public bool IsMonster { get; set; }
         public int MonsterId { get; set; }
         public int GradeIndex { get; set; } = 0;
+
+        /// <summary>
+        /// A character's class, the breed of its record: what the masks' B and b ask. Zero for a
+        /// monster or a summon, which are of no class.
+        /// </summary>
+        public int Breed { get; set; }
+
         public int Level { get; set; }
         public int LookBoneId { get; set; }
         public string Look { get; set; } = "";
@@ -40,6 +48,18 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>Critical points granted by the equipment, added on top of the spell's own.</summary>
         public int CriticalBonus { get; set; }
+
+        /// <summary>
+        /// The damage it deals, in percent, applied last to every blow: 105 with a dream's "5%
+        /// damage". "All the bonuses add up first and are multiplied last by the % of damage."
+        /// </summary>
+        public int DamageDealtPercent { get; set; } = 100;
+
+        /// <summary>Rounds taken off the cooldown of every spell it casts: a dream's "-1 reactivation".</summary>
+        public int CooldownReduction { get; set; }
+
+        /// <summary>Casts more on the same target for every spell that caps them: a dream's "+1 cast per target".</summary>
+        public int ExtraCastsPerTarget { get; set; }
 
         /// <summary>
         /// Daños fijos generales (característica 16). Se suman al final del cálculo, después de
@@ -109,6 +129,31 @@ namespace Jondo.Unity.World.Fights
         public bool IsAlive => CurrentHP > 0;
         public bool IsReady { get; set; }
 
+        /// <summary>
+        /// A Koliseo JondoBot: shown as a character of its class, played by the server's tactics.
+        /// It has no session and no row in Characters, so its look and sex travel here.
+        /// </summary>
+        public bool IsBot { get; set; }
+
+        /// <summary>
+        /// Where the other side last saw him while he is invisible: the cell he went invisible
+        /// on, then each one he casts from. -1 before he ever was. What a JondoBot aims at when
+        /// it cannot see him.
+        /// </summary>
+        public int LastSeenCell { get; set; } = -1;
+
+        /// <summary>
+        /// The tenths of a second this fighter kept from the turn he passed, for his next one
+        /// (FightProtocol.SavedAfter). Only a character keeps any.
+        /// </summary>
+        public int SavedTurnTime { get; set; }
+
+        /// <summary>A bot's sex, for its identity (a character reads it from his row).</summary>
+        public int Sex { get; set; }
+
+        /// <summary>A bot's look, built once when it is made.</summary>
+        public byte[]? BotLook { get; set; }
+
         // Spells available to this fighter
         public List<int> SpellIds { get; set; } = new List<int>();
 
@@ -117,6 +162,14 @@ namespace Jondo.Unity.World.Fights
 
         public int AccumulatedMpLoss { get; set; } = 0;
         public int AccumulatedApLoss { get; set; } = 0;
+
+        /// <summary>
+        /// Whether its template lets it tackle: the <c>CanTackle</c> bit (128) of a monster's or a
+        /// summon's <c>m_flags</c>. People always can. The training dummies are among the 358
+        /// templates without it, and walking away from one never costs a point in the class
+        /// captures -- 26 walks out of their contact. See <see cref="Tackle"/>.
+        /// </summary>
+        public bool TemplateAllowsTackle { get; set; } = true;
 
         // ─── Lo que limita los lanzamientos ─────────────────────────────────────
 
@@ -156,12 +209,6 @@ namespace Jondo.Unity.World.Fights
         public int HechizoPropio { get; set; }
 
         /// <summary>
-        /// La ronda en la que se deshace solo. Menos uno mientras no tenga cuenta atrás. Lo pone
-        /// el efecto 141, que el servidor le cuelga al nacer.
-        /// </summary>
-        public int MuereEnRonda { get; set; } = -1;
-
-        /// <summary>
         /// Si le toca turno en el carrusel.
         ///
         /// No todos los invocados juegan. Medido en las capturas: la Baliza de Supervivencia
@@ -171,6 +218,88 @@ namespace Jondo.Unity.World.Fights
         /// a los daños y a los empujes, así que no tiene nada que hacer cuando le tocaría.
         /// </summary>
         public bool JuegaTurno { get; set; } = true;
+
+        /// <summary>
+        /// The spells a summon casts, each at its grade, for the jyy of whoever controls it.
+        /// Empty for anybody who is not a summon.
+        /// </summary>
+        public IReadOnlyList<(int Spell, int Grade)> HechizosDeInvocado { get; set; }
+            = System.Array.Empty<(int, int)>();
+
+        /// <summary>
+        /// Whether <paramref name="characterId"/> plays this fighter: himself, or a summon of
+        /// his that is his to play. The real server sends the owner a jyj when such a summon's
+        /// turn comes, and the owner's jrw and jwh then move and cast it.
+        /// </summary>
+        public bool ControlledBy(long characterId)
+            => Id == characterId || (EsInvocado && Invocador == characterId && !PlaysOnItsOwn);
+
+        /// <summary>
+        /// A summon with NOTHING TO PLAY: no step to take and no spell of its own. Its turn is
+        /// its start-of-turn triggers and then the turn handed on, and nobody gets a jyj for
+        /// it. Every other summon is its owner's to play, by hand: the Tymobot (jyj on its
+        /// jzc, then the owner's jrw and jwh, in its capture), the Bomba Ambulante, the
+        /// Osamodas' animals, the Enutrof's chests. What never gets one in the captures is what
+        /// cannot act: both beacons (no MP, no spells), the Xelor's dials, the Pandawa's
+        /// barrel. It was the owner's to play here too, which is what put a "pass turn" button
+        /// on the beacon's fifteen seconds.
+        /// </summary>
+        /// <remarks>
+        /// A live 2027 row, "Toma el control de la entidad", makes it its owner's whatever it
+        /// has to play. Every summon with a step or a spell is his already -- the fight has no
+        /// hand of its own for them -- so the row only matters to one that has neither. On
+        /// somebody else's fighter it is not honoured: no class spell lays it there.
+        /// </remarks>
+        public bool PlaysOnItsOwn => EsInvocado && MaxMP <= 0 && HechizosDeInvocado.Count == 0 && !ControlTaken;
+
+        /// <summary>
+        /// The character this fighter is the double of (effect 180), or zero: his look and his
+        /// identity are what the double shows.
+        /// </summary>
+        public long DoubleOf { get; set; }
+
+        /// <summary>
+        /// The facing of his last walk, or minus one before he has walked: what one who follows
+        /// him (2184) ends up facing -- the f2 of the follower's jsj is the one of the leader's
+        /// last jsj in both follows of the Osamodas capture, frames 2091/2125 and 2133/2140.
+        /// </summary>
+        public int LastFacing { get; set; } = -1;
+
+        /// <summary>Whether a live 2027 row hands this fighter to its owner.</summary>
+        public bool ControlTaken
+            => Buffs.Puestos.Any(b => b.EffectId == Jondo.Unity.World.Combat.EffectSupport.TakesControl && !b.Pendiente);
+
+        /// <summary>Who carries this fighter (effect 50), or zero. A carried fighter shares the carrier's cell and holds no cell of his own.</summary>
+        public long CarriedBy { get; set; }
+
+        /// <summary>Whom this fighter carries, or zero.</summary>
+        public long Carrying { get; set; }
+
+        public bool EstaCargado => CarriedBy != 0;
+
+        /// <summary>
+        /// A copy left by Tymadura: it holds a cell and can tackle, plays no turn, sits in no
+        /// carousel, and goes with the first point of damage, with the whole set when its owner
+        /// is hit, and at its owner's next turn in any case.
+        /// </summary>
+        public bool EsIlusion { get; set; }
+
+        /// <summary>
+        /// Set while the blow that finishes him is being resolved, so that what goes off on
+        /// his death -- his attitudes, the spells hooked on him with an X trigger -- fires once,
+        /// with him still standing, and not again from whatever it sets off.
+        /// </summary>
+        public bool Muriendo { get; set; }
+
+        /// <summary>The copies this fighter has out, by id. Empty for everybody else.</summary>
+        public List<long> Ilusiones { get; } = new List<long>();
+
+        /// <summary>
+        /// Whether his own side still sees him drawn as hidden -- the visibility switch that
+        /// goes with the copies -- so that the switch back can be sent even after the last
+        /// copy has gone on its own.
+        /// </summary>
+        public bool HiddenAmongCopies { get; set; }
 
         /// <summary>
         /// How much of its summoner's capacity this fighter takes up, copied from the template's
@@ -219,13 +348,24 @@ namespace Jondo.Unity.World.Fights
             return b.Bonus;
         }
 
-        public void StartTurn()
+        /// <summary>
+        /// The points for a new turn: the maximum plus whatever the live buffs say. A buff of
+        /// points changes the current ones the moment it lands, and from then on it is the
+        /// turn start that carries it -- "+1 PA durante 3 turnos" is one more on each of those
+        /// turns, and "-2 PA" put on somebody before his turn is two fewer when it starts.
+        /// Without the buffs here, both ended with the turn they were cast in.
+        /// </summary>
+        public void StartTurn(int ronda)
         {
-            CurrentAP = MaxAP;
-            CurrentMP = MaxMP;
+            CurrentAP = Math.Max(0, MaxAP + Buffs.De(CaracteristicaDePuntosDeAccion, ronda));
+            CurrentMP = Math.Max(0, MaxMP + Buffs.De(CaracteristicaDePuntosDeMovimiento, ronda));
             AccumulatedMpLoss = 0;
             AccumulatedApLoss = 0;
         }
+
+        /// <summary>The catalogue's numbers for the two kinds of points.</summary>
+        public const int CaracteristicaDePuntosDeAccion = 1;
+        public const int CaracteristicaDePuntosDeMovimiento = 23;
 
         /// <summary>Dónde estaba antes del último movimiento. Menos uno si no se ha movido.</summary>
         /// <remarks>
@@ -234,6 +374,22 @@ namespace Jondo.Unity.World.Fights
         /// a un sitio cualquiera sería peor que no hacer nada.
         /// </remarks>
         public int CasillaAnterior { get; private set; } = -1;
+
+        /// <summary>
+        /// A monster's behaviour spell -- its grade's startingSpellId -- cast when the fight
+        /// begins, or when it joins one. Its triggered rows are armed for good on the fighters they
+        /// name. (0, 0) for everybody else.
+        /// </summary>
+        public (int Spell, int Grade) Conducta { get; set; }
+
+        /// <summary>
+        /// Where the fighter stood when his last turn began: effect 1099, "Teletransporta a la
+        /// posición de inicio de turno", sends him back there. Minus one before his first turn.
+        /// </summary>
+        public int CasillaAlEmpezarTurno { get; set; } = -1;
+
+        /// <summary>Where he stood when the fight began: effect 784 sends him back there.</summary>
+        public int CasillaAlEmpezarCombate { get; set; } = -1;
 
         /// <summary>Mueve al combatiente y se acuerda de dónde estaba.</summary>
         public void MoverA(int casilla)
@@ -278,6 +434,18 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
+        /// Takes points off the shield: what a replaced shield row was worth, when a spell that
+        /// does not stack is cast again and its old row goes. Never below zero -- a shield
+        /// already eaten by blows has nothing left to give back.
+        /// </summary>
+        public void Desescudar(int cuanto)
+        {
+            if (cuanto <= 0) return;
+            PuntosDeEscudo = Math.Max(0, PuntosDeEscudo - cuanto);
+            if (PuntosDeEscudo == 0) EscudoCaducaEnRonda = 0;
+        }
+
+        /// <summary>
         /// Le mete un golpe al escudo primero y devuelve lo que llega a la vida.
         /// </summary>
         public int PasarPorElEscudo(int dano)
@@ -316,6 +484,18 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>La característica 75 del catálogo: el tanto por ciento que erosiona.</summary>
         public const int CaracteristicaDeErosion = 75;
+
+        /// <summary>
+        /// The erosion everybody starts with, as a percentage of every hit taken off the maximum.
+        /// </summary>
+        /// <remarks>
+        /// Ten for players and monsters alike. Measured on the Ocra capture, whose sheet carries a
+        /// 75 worth 10, and on the damage blocks themselves: 977 of the 986 in the captures carry
+        /// an f5, and a hit of 413 on a monster carries 41. The sheet we send to the client
+        /// already said ten; the server side said zero, so nobody ever eroded and no hit ever
+        /// carried its f5.
+        /// </remarks>
+        public const int ErosionBase = 10;
 
         /// <summary>
         /// Erosiona por un golpe y devuelve cuánto tope se ha perdido.

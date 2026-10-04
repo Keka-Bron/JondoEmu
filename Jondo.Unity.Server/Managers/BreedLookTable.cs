@@ -215,6 +215,32 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// A look put together from its parts, for a fighter the server dresses itself -- a
+        /// JondoBot: the body (its bones, its skins, its colours already indexed, its scales) and,
+        /// when it rides, the mount -- one of mounts.json, or an appearance one -- with the body
+        /// inside as the rider, on the rider's bones.
+        /// </summary>
+        public static byte[] Composed(long bones, IReadOnlyList<long> skins, IReadOnlyList<long> colors,
+                                      IReadOnlyList<long> scales, Mounts.Look? mount = null,
+                                      Cosmetics.PieceLook? appearanceMount = null)
+        {
+            bool riding = mount != null || (appearanceMount != null && appearanceMount.Bones != 0);
+            var body = Pb.New();
+            if (colors.Count > 0) body.Packed(1, colors);
+            body.Var(2, LookType);
+            body.Var(3, riding ? Mounts.RiderBones : bones);
+            if (scales.Count > 0) body.Packed(5, scales);
+            if (skins.Count > 0) body.Packed(6, skins);
+            if (!riding) return body.Build();
+
+            var root = mount ?? new Mounts.Look { Bones = appearanceMount!.Bones, Scale = appearanceMount.Scale };
+            return Mounted(body.Build(), root, appearanceMount, null, colors);
+        }
+
+        /// <summary>A breed's colours as they travel, each with its index in the high byte.</summary>
+        public static List<long> IndexedColors(int breedId, int sex) => ColorsFor(breedId, sex, null);
+
+        /// <summary>
         /// El personaje montado: el cuerpo que se dibuja es el de la montura y el jinete va dentro.
         ///
         ///   f1: los colores de la montura   f2: 3   f3: sus huesos   f5: [su escala]

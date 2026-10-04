@@ -106,18 +106,35 @@ namespace Jondo.Unity.World.Quests
         private readonly Dictionary<int, QuestRun> _runs = new Dictionary<int, QuestRun>();
         private readonly QuestCatalogue _book;
 
-        public QuestLog(QuestCatalogue book, Func<int> level, Func<long> map)
+        public QuestLog(QuestCatalogue book, Func<int> level, Func<long> map,
+                        Func<string, long?>? scalar = null, Func<int, bool>? achievement = null)
         {
             _book = book;
             _level = level;
             _map = map;
+            _scalar = scalar;
+            _achievement = achievement;
         }
 
         private readonly Func<int> _level;
         private readonly Func<long> _map;
+        private readonly Func<string, long?>? _scalar;
+        private readonly Func<int, bool>? _achievement;
 
         public int Level => _level();
         public long MapId => _map();
+
+        /// <summary>
+        /// A number the server knows about the world rather than the character — today's Almanax
+        /// entry, for <c>Ad</c>. Null, and so let through, when nothing was handed in.
+        /// </summary>
+        public long? Scalar(string op) => _scalar?.Invoke(op);
+
+        /// <summary>
+        /// Whether an achievement is earned, for the eight quests whose start condition names one.
+        /// False when nothing was handed in, which is what it always was.
+        /// </summary>
+        public bool AchievementDone(int achievementId) => _achievement?.Invoke(achievementId) ?? false;
 
         /// <summary>Every quest this character has touched, finished or not.</summary>
         public IReadOnlyDictionary<int, QuestRun> Runs => _runs;

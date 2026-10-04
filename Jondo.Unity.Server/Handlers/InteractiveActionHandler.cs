@@ -121,7 +121,13 @@ namespace Jondo.Unity.Server.Handlers
                     await BinHandler.OpenAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
                 case InteractiveActionKind.HouseDoor:
-                    await HouseHandler.EnterAsync(stream, interactive.Element.Id, action.SkillId);
+                    await HouseHandler.UseDoorAsync(stream, interactive, action);
+                    break;
+                case InteractiveActionKind.HouseChest:
+                    await HouseHandler.UseChestAsync(stream, interactive, action);
+                    break;
+                case InteractiveActionKind.GuildChest:
+                    await GuildChestHandler.OpenAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
                 case InteractiveActionKind.HouseExit:
                     await HouseHandler.LeaveAsync(stream, interactive.Element.Id, action.SkillId);
@@ -131,6 +137,15 @@ namespace Jondo.Unity.Server.Handlers
                     break;
                 case InteractiveActionKind.Gather:
                     await GatheringHandler.GatherAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.Workshop:
+                    await WorkshopHandler.OpenAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.GuildFounding:
+                    await GuildHandler.OpenFoundingAsync(stream, interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.Marketplace:
+                    await MarketplaceHandler.OpenAsync(interactive.Element.Id, action.SkillId);
                     break;
                 default:
                     throw new InvalidOperationException($"Acción interactiva no gestionada: {action.Kind}.");

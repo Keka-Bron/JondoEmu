@@ -1,0 +1,21 @@
+{
+  "_": [
+    "Which arena a roleplay map's fights are held on, where a capture has measured it.",
+    "",
+    "The rule in MapManager.ResolveArenaMapId works the arena out - same subarea, (0,0), the",
+    "arena flag, a small id offset - and it is right for Astrub and Incarnam, where it was",
+    "checked. It is wrong for the kanojedos: the Amakna one at 99090957 fights on 99222029,",
+    "an offset of 131,072, which no small-delta rule finds, so the resolver fell back to",
+    "'any arena of the subarea' and picked one by hash. Anything written here wins over the",
+    "rule, and is read off a capture: the jru that follows the fight's start names the arena,",
+    "and the jru that follows its end names the map you are put back on.",
+    "",
+    "  { \"map\": 99090957, \"arena\": 99222029, \"measured\": \"...\" }"
+  ],
+  "arenas": [
+    { "map": 99090957,  "arena": 99222029,  "measured": "4 starts and 5 returns across Clases/Hipermago, Clases/Zurkarak and four Combate captures" },
+    { "map": 146801922, "arena": 146803972, "measured": "6 starts and 7 returns across the Clases/Ocra captures" },
+    { "map": 146802688, "arena": 146804996, "measured": "14 starts and 20 returns across the Clases captures" },
+    { "map": 192415754, "arena": 192419850, "measured": "3 starts and 4 returns across the Clases captures" }
+  ]
+}

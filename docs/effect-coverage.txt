@@ -26,7 +26,7 @@ EFFECT  SPELLS  RESOLVED BY     CLASSES  WHAT IT DOES
 2960    42      engine          7        sub-cast: spell #1
 1080    39      characteristic  17       -#1..-#2 MP
 128     39      characteristic  16       #1-#2 MP
-293     39      MISSING         14       #1: +#3 basic damage on that spell
+293     39      engine          14       #1: +#3 basic damage on that spell
 3792    39      engine          7        script marker, nothing to apply
 1109    38      engine          12       heals: #1-#2% max HP
 1020    35      engine          11       shield worth #1-#2% of the caster level
@@ -37,7 +37,7 @@ EFFECT  SPELLS  RESOLVED BY     CLASSES  WHAT IT DOES
 8       27      engine          16       swaps positions
 1042    27      engine          13       moves forward #1 cells
 4       26      engine          15       teleports to the target cell
-1079    26      characteristic  10       -#1..-#2 AP
+1079    26      engine          10       -#1..-#2 AP
 91      25      engine          13       #1-#2 water life steal
 1091    25      engine          8        places an aura glyph
 2160    24      engine          5        sub-cast: spell #1 on the nearest target
@@ -60,26 +60,26 @@ EFFECT  SPELLS  RESOLVED BY     CLASSES  WHAT IT DOES
 1011    14      engine          4        summons: #1
 1104    13      engine          11       symmetrical teleport around the target
 141     13      engine          6        kills the target
-2998    12      MISSING         6        #1-#2 water healing
+2998    12      engine          6        #1-#2 water healing
 405     12      engine          1        kills the target and replaces it with summon: #1
 754     10      characteristic  9        -#1..-#2 escape
 417     10      characteristic  10       -#1..-#2 push resistance
-2999    10      MISSING         5        #1-#2 air healing
+2999    10      engine          5        #1-#2 air healing
 115     9       characteristic  5        #1-#2% critical
 186     9       characteristic  7        -#1..-#2 power
 1048    9       engine          2        -#1..-#2% HP
 117     9       characteristic  7        #1-#2 range
-3000    9       MISSING         5        #1-#2 earth healing
+3000    9       engine          5        #1-#2 earth healing
 401     9       engine          3        places to start-of-turn glyph
 335     8       engine          6        changes the look
 752     8       characteristic  6        #1-#2 escape
 145     8       characteristic  8        -#1..-#2 damage
 1008    8       engine          1        summons: #1
-786     7       MISSING         7        heals the attacker for #1% of the damage
+786     7       engine          7        heals the attacker for #1% of the damage
 171     7       characteristic  6        -#1..-#2% critical
 90      7       engine          3        transfers #1-#2% of their life
-1078    7       characteristic  4        #1-#2% vitality
-51      7       MISSING         1        throws an enemy
+1078    7       engine          4        #1-#2% vitality
+51      7       engine          1        throws an enemy
 1105    7       engine          6        symmetrical teleport around the caster
 414     7       characteristic  6        #1-#2 push damage
 169     7       characteristic  4        -#1..-#2 MP
@@ -89,106 +89,106 @@ EFFECT  SPELLS  RESOLVED BY     CLASSES  WHAT IT DOES
 119     6       characteristic  4        #1-#2 agility
 123     6       characteristic  4        #1-#2 chance
 126     6       characteristic  4        #1-#2 intelligence
-202     6       MISSING         4        reveals invisible entities
-2973    6       MISSING         4        heals #1-#2% of the damage dealt
-1045    6       MISSING         4        #1: cooldown pinned to #3 turns
-1181    6       MISSING         1        places a portal (+#3% damage, +#1% per cell travelled)
-1223    5       MISSING         5        damage: #1-#2% of the final damage taken
+202     6       engine          4        reveals invisible entities
+2973    6       engine          4        heals #1-#2% of the damage dealt
+1045    6       engine          4        #1: cooldown pinned to #3 turns
+1181    6       engine          1        places a portal (+#3% damage, +#1% per cell travelled)
+1223    5       engine          5        damage: #1-#2% of the final damage taken
 112     5       characteristic  5        #1-#2 damage
-3002    5       MISSING         4        #1-#2 best-element healing
+3002    5       engine          4        #1-#2 best-element healing
 265     5       characteristic  3        -#1-#2 damage recibidos
-1061    5       MISSING         4        shares damage
+1061    5       engine          4        shares damage
 163     5       characteristic  5        -#1..-#2 dodge MP
-77      5       MISSING         5        Roba #1-#2 MP
-2023    5       MISSING         1        triggers runes
-281     4       MISSING         3        #1: +#3 max range
+77      5       engine          5        steals #1-#2 MP
+2023    5       engine          1        triggers runes
+281     4       engine          3        #1: +#3 max range
 2828    4       engine          3        #1-#2 best-element life steal
-2018    4       MISSING         1        dispels glyphs
+2018    4       engine          1        dispels glyphs
 1172    4       characteristic  4        -#1% final damage
-1103    4       MISSING         4        pushes #1 cells (sin damage)
+1103    4       engine          4        pushes #1 cells (sin damage)
 2971    4       characteristic  3        increases final healing dealt by #1%
 1039    3       engine          1        shield worth #1-#2% of HP
-89      3       MISSING         2        neutral damage: #1-#2% of the caster HP
-765     3       MISSING         3        intercepts damage
+89      3       engine          2        neutral damage: #1-#2% of the caster HP
+765     3       engine          3        intercepts damage
 161     3       characteristic  3        #1-#2 MP-loss dodge
-290     3       MISSING         3        #1: +#3 cast(s) per turn
+290     3       engine          3        #1: +#3 cast(s) per turn
 416     3       characteristic  3        #1-#2 push resistance
 420     3       characteristic  2        #1-#2 critical resistance
 168     3       characteristic  3        -#1..-#2 AP
 100     3       engine          2        #1-#2 neutral damage
-402     3       MISSING         2        places an end-of-turn glyph
-1165    3       MISSING         2        places to glyph
+402     3       engine          2        places an end-of-turn glyph
+1165    3       engine          2        places to glyph
 1009    3       engine          1        sets a bomb off
-50      2       MISSING         1        Permite levantar to the objetivo
+50      2       engine          1        Permite levantar to the objetivo
 410     2       characteristic  2        #1-#2 AP-removal resistance
 418     2       characteristic  1        #1-#2 critical damage
-781     2       MISSING         2        minimises the target random rolls
-269     2       characteristic  2        steals #1..-#2 intelligence
-268     2       characteristic  2        steals #1..-#2 agility
+781     2       engine          2        minimises the random rolls of the target
+269     2       engine          2        steals #1..-#2 intelligence
+268     2       engine          2        steals #1..-#2 agility
 150     2       characteristic  2        Vuelve invisible to the objetivo
-180     2       MISSING         1        summons to double of the caster
-266     2       characteristic  2        steals #1..-#2 chance
-271     2       characteristic  2        steals #1..-#2 strength
-1036    2       MISSING         2        #1: -#3 cooldown
+180     2       engine          1        summons to double of the caster
+266     2       engine          2        steals #1..-#2 chance
+271     2       engine          2        steals #1..-#2 strength
+1036    2       engine          2        #1: -#3 cooldown
 154     2       characteristic  2        -#1..-#2 agility
 155     2       characteristic  2        -#1..-#2 intelligence
 157     2       characteristic  2        -#1..-#2 strength
 152     2       characteristic  2        -#1..-#2 chance
 755     2       characteristic  2        -#1..-#2 lock
-1026    2       MISSING         1        triggers glyphs
-1406    2       MISSING         2        removes the effects of grade #1 of spell #2
+1026    2       engine          1        triggers glyphs
+1406    2       engine          2        removes the effects of grade #1 of spell #2
 2800    2       characteristic  2        #1-#2% damage CaC
 2804    2       characteristic  2        #1-#2% ranged damage
-1031    2       MISSING         2        skips the turn
-2796    2       MISSING         1        kills the target and replaces it with summon: #1
+1031    2       engine          2        skips the turn
+2796    2       engine          1        kills the target and replaces it with summon #1
 1017    2       engine          2        sub-cast: spell #1 back at the parent caster
 162     2       characteristic  2        -#1..-#2 AP dodge
-1183    2       MISSING         1        deactivates a portal
-1182    2       MISSING         1        Teleportal
-320     2       MISSING         2        steals #1-#2 range
-2935    2       MISSING         1        #1: +#3 basic healing on that spell
-280     2       MISSING         1        #1: +#3 min range
+1183    2       engine          1        deactivates a portal
+1182    2       engine          1        teleports through the portals
+320     2       engine          2        steals #1-#2 range
+2935    2       engine          1        #1: +#3 basic healing on that spell
+280     2       engine          1        #1: +#3 min range
 1118    1       engine          1        neutral damage: #1-#2% of the caster eroded HP
 333     1       characteristic  1        changes one colour
 2812    1       characteristic  1        #1-#2% spell damage
-2020    1       MISSING         1        heals #1-#2% of the damage taken
-296     1       MISSING         1        #1: +#3 AP
+2020    1       engine          1        heals #1-#2% of the damage taken
+296     1       engine          1        #1: +#3 AP cost
 411     1       characteristic  1        -#1..-#2 AP removal
 413     1       characteristic  1        -#1..-#2 MP removal
-291     1       MISSING         1        #1: +#3 lanzamiento(s) per objetivo
+291     1       engine          1        #1: +#3 cast(s) per target
 412     1       characteristic  1        #1-#2 to the retiro MP
 160     1       characteristic  1        #1-#2 AP-loss dodge
 178     1       characteristic  1        #1-#2 healss
 421     1       characteristic  1        -#1..-#2 critical resistance
 419     1       characteristic  1        -#1..-#2 critical damage
-783     1       MISSING         1        Hace retroceder hasta the cell objetivo
-1013    1       MISSING         1        #1-#2 air damage (% MP restantes)
-84      1       engine          1        Roba #1-#2 AP
-1099    1       MISSING         1        teleports to the turn-start position
-285     1       MISSING         1        #1: -#3 AP
-1101    1       MISSING         1        teleports o intercambia posiciones
-279     1       MISSING         1        damage neutrales: #1-#2% HP faltantes of the lanzador
-1097    1       MISSING         1        Crea ilusiones
-1033    1       characteristic  1        -#1..-#2% vitality
+783     1       engine          1        Hace retroceder hasta the cell objetivo
+1013    1       engine          1        #1-#2 air damage (% MP left)
+84      1       engine          1        steals #1-#2 AP
+1099    1       engine          1        teleports to the turn-start position
+285     1       engine          1        #1: -#3 AP cost
+1101    1       engine          1        teleports, or swaps with whoever stands there
+279     1       engine          1        neutral damage: #1-#2% of the caster's missing HP
+1097    1       engine          1        Crea ilusiones
+1033    1       engine          1        -#1..-#2% vitality
 1076    1       characteristic  1        #1-#2 % resistance
 215     1       characteristic  1        -#1..-#2% resistance to the tierra
 216     1       characteristic  1        -#1..-#2% resistance to the agua
 217     1       characteristic  1        -#1..-#2% resistance to the aire
 218     1       characteristic  1        -#1..-#2% resistance to the fuego
 219     1       characteristic  1        -#1..-#2% resistance neutral
-1019    1       MISSING         1        #1
+1019    1       engine          1        sub-cast: spell #1, cast by the source at itself
 2803    1       characteristic  1        #1-#2% resistance CaC
-952     1       characteristic  1        Desactiva the estado #3
+952     1       engine          1        switches state #3 off
 2802    1       characteristic  1        -#1..-#2% resistance CaC
 2806    1       characteristic  1        -#1..-#2% resistance distancia
 2844    1       characteristic  1        #1-#2% vitality
 182     1       characteristic  1        #1-#2 summonss
-2184    1       MISSING         1        Sigue to the lanzador
-2832    1       MISSING         1        #1-#2 damage of the peor elemento
+2184    1       engine          1        follows the caster
+2832    1       engine          1        #1-#2 worst-element damage
 2795    1       engine          1        sub-cast: spell #1
-1016    1       MISSING         1        #1-#2 earth damage (% MP restantes)
-289     1       MISSING         1        #1: line of sight disabled
+1016    1       engine          1        #1-#2 earth damage (% MP left)
+289     1       engine          1        #1: line of sight disabled
 1092    1       engine          1        damage neutrales: #1-#2% HP erosionados of the objetivo
 2805    1       characteristic  1        -#1..-#2% ranged damage
 ----------------------------------------------------------------------------------------------------------------
-179 effects: 57 engine, 71 characteristic, 51 MISSING
+179 effects: 116 engine, 63 characteristic, 0 MISSING

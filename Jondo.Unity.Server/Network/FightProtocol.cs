@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Server.Network
@@ -108,6 +109,19 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildPlacementDone() => Array.Empty<byte>();
 
         /// <summary>
+        /// The same jwq when a fight is already running: every live buff of everybody, each
+        /// entry being exactly the payload its jxm carried. Measured in the reconnection
+        /// capture, where the jwq of the burst is 1,449 bytes of jxm bodies where the one of a
+        /// fresh fight is empty.
+        /// </summary>
+        public static byte[] BuildBuffSync(IEnumerable<byte[]> buffs)
+        {
+            var jwq = Pb.New();
+            foreach (byte[] buff in buffs) jwq.Bytes(1, buff);
+            return jwq.Build();
+        }
+
+        /// <summary>
         /// En qué mapa se pelea (jrk).
         ///
         ///   f2: 10      f3: vacío      f4: el mapa
@@ -207,23 +221,20 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildDuelSummary()
             => Pb.New().Var(2, 1).Var(3, 1).Var(4, 1).Build();
 
+        /// <summary>
+        /// The kaa of a fight already running, for whoever comes back into it: f1 = 1 and no
+        /// countdown. "0801180120013004" in both resumes of the reconnection capture; a duel's
+        /// would carry no f6, which is not measured.
+        /// </summary>
+        public static byte[] BuildFightInProgressSummary(int kind)
+            => Pb.New().Var(1, 1).Var(3, 1).Var(4, 1).VarIfNotZero(6, kind).Build();
+
         public static byte[] BuildFightSummary(int kind, int placementDeciseconds)
             => Pb.New()
                 .Var(3, 1)
                 .Var(4, 1)
                 .VarIfNotZero(5, placementDeciseconds)
                 .VarIfNotZero(6, kind)
-                .Build();
-
-        /// <summary>
-        /// Uno que está en el combate (kae).
-        ///
-        ///   f1 { f3: quién, f4: 1, f5: vacío }      f2: el id del combate
-        /// </summary>
-        public static byte[] BuildFighterInFight(long fighterId, long fightId)
-            => Pb.New()
-                .Msg(1, Pb.New().Var(3, fighterId).Var(4, 1).EmptyMsg(5))
-                .Var(2, fightId)
                 .Build();
 
         /// <summary>
@@ -234,7 +245,15 @@ namespace Jondo.Unity.Server.Network
         /// Salen cuatro seguidas en cada apertura, con f3 valiendo 2, 1, 3 y la cuarta sin f3.
         /// </summary>
         public static byte[] BuildFightOption(int option, long fightId)
-            => Pb.New().VarIfNotZero(3, option).Var(5, fightId).Build();
+            => BuildFightOption(0, option, false, fightId);
+
+        /// <summary>
+        /// The same with its side and its state: { f1: the side, f3: which, f4: on, f5: the fight }.
+        /// "08011802200128bb26" is the defenders' side closed in the sword capture (frame 34),
+        /// "1801200128e703" the attackers' restricted to their party in the follow capture (136).
+        /// </summary>
+        public static byte[] BuildFightOption(int team, int option, bool on, long fightId)
+            => Pb.New().VarIfNotZero(1, team).VarIfNotZero(3, option).VarIfNotZero(4, on ? 1 : 0).Var(5, fightId).Build();
 
         /// <summary>Las cuatro que manda el servidor real, en su orden.</summary>
         public static readonly int[] FightOptions = { 2, 1, 3, 0 };
@@ -326,11 +345,19 @@ namespace Jondo.Unity.Server.Network
         ///
         /// Lleva dos números:
         ///
-        ///   f2 = vida actual menos vida máxima     (sube con las curas, baja con los golpes)
-        ///   f8 = menos la vida erosionada          (sólo baja, y las curas no la tocan)
+        ///   f2 = vida actual menos vida máxima ORIGINAL   (sube con las curas, baja con los golpes)
+        ///   f8 = no es la erosión
         ///
         /// Comprobado contra una captura entera: −104 tras recibir 104, −5 tras curarse 99,
         /// +128 tras curarse otros 133. La cuenta cuadra al punto las tres veces.
+        ///
+        /// Y con el desafío completo: f2 = −1567 con 1567 de daño acumulado y el tope ya
+        /// erosionado en 159, o sea que el tope de la resta es el de SALIDA, no el de ahora. El
+        /// f8 que aquí se leía como erosión vale −1122 en ese mismo mensaje y −3324 en el
+        /// siguiente, con 236 de erosión: no es eso. En la mazmorra de los jalatós sale en las
+        /// ocho 97 con valores entre −114 y −338 y el f2 llega a ser POSITIVO (+220) tras una
+        /// racha de curas. Es el hueco de embrujo del molde general y no se manda hasta saber
+        /// qué va dentro.
         ///
         /// El emulador la mandaba una vez, vacía, al empezar el combate, y no la volvía a tocar:
         /// por eso al jugador le pegaban toda la pelea y su barra seguía llena.
@@ -510,11 +537,46 @@ namespace Jondo.Unity.Server.Network
         /// El f7 es lo que ordena el carrusel: no hay ninguna lista de iniciativa aparte, cada
         /// turno dice qué puesto ocupa el que lo juega.
         /// </summary>
-        public static byte[] BuildTurnStart(long fighterId, int deciseconds, int index, int round)
+        /// <param name="carried">The tenths he kept from his last turn (f4): see <see cref="SavedAfter"/>.</param>
+        public static byte[] BuildTurnStart(long fighterId, int deciseconds, int index, int round, int carried = 0)
             => Pb.New()
                 .Var(1, fighterId)
                 .Var(2, deciseconds)
+                .VarIfNotZero(4, carried)
                 .VarIfNotZero(7, index)
+                .VarIfNotZero(8, round)
+                .Build();
+
+        /// <summary>
+        /// What a character keeps of the turn he passes: half of what was left of it, and never so
+        /// much that his next turn, with it, goes beyond <see cref="MaxTurnDeciseconds"/>.
+        /// </summary>
+        /// <remarks>
+        /// Measured in "bastante pelea con hipermago", a turn of 360 after another: he passes with
+        /// 83 tenths left and the jyt keeps 41, the next jzc carries them in its f4; 401 to use,
+        /// 158 used, 121 kept; 481, 137, 172. Across the captures f2 + f4 never goes beyond 600 --
+        /// a turn of 370 carries 230 at most, one of 430 carries 170 -- and this server goes to
+        /// 900, a minute and a half, which is what its owner asked for. Passed by the clock,
+        /// nothing is left and nothing is kept.
+        /// </remarks>
+        public static int SavedAfter(int remainingDeciseconds, int baseDeciseconds)
+            => Math.Max(0, Math.Min(remainingDeciseconds / 2, MaxTurnDeciseconds - baseDeciseconds));
+
+        /// <summary>The longest a character's turn can be, carried time and all: a minute and a half.</summary>
+        public const int MaxTurnDeciseconds = 900;
+
+        /// <summary>
+        /// The same jzc for somebody who comes back in the middle of the turn: f6 is what is
+        /// left of it, in tenths. One sample, and it adds up to the tenth: in the reconnection
+        /// capture the turn of 350 had started 21.8 seconds before the burst and f6 says 132.
+        /// That frame carries no f7, so neither does this one.
+        /// </summary>
+        public static byte[] BuildTurnResumed(long fighterId, int deciseconds, int remaining, int round, int carried = 0)
+            => Pb.New()
+                .Var(1, fighterId)
+                .Var(2, deciseconds)
+                .VarIfNotZero(4, carried)
+                .VarIfNotZero(6, remaining)
                 .VarIfNotZero(8, round)
                 .Build();
 
@@ -679,13 +741,22 @@ namespace Jondo.Unity.Server.Network
         public static int FamiliaDelEmbrujo(int efecto, int categoria, int boost)
         {
             const int PoneEstado = 950;
+            const int DesactivaEstado = 952;
             const int ModificaUnHechizo = 3;
 
             if (categoria == ModificaUnHechizo) return 4;
-            if (efecto == PoneEstado) return 2;
-            if (boost == 0) return 7;
+            // 952 is a state row too -- the state it switches off rides in its value -- so it is
+            // drawn with them. No capture shows one; the family is the reading, not a measure.
+            if (efecto == PoneEstado || efecto == DesactivaEstado) return 2;
+            if (boost == 0) return HiddenFamily;
             return 0;                 // bono de característica: el f15 no viaja
         }
+
+        /// <summary>
+        /// The family the panel does not draw. A waiting row travels with it whatever its
+        /// effect -- the +1 MP of Paso de Cacería included -- and turns visible when it goes off.
+        /// </summary>
+        public const int HiddenFamily = 7;
 
         /// <param name="grado">
         /// El grado del hechizo que lo pone. Iba clavado a uno; medido contra los 1.297 jxm de las
@@ -696,10 +767,20 @@ namespace Jondo.Unity.Server.Network
         /// Flecha Helada deja tres turnos de daños básicos: lanzada en la ronda 5 el servidor real
         /// manda un ocho, y en la 6, un nueve. Menos uno es "hasta que acabe el combate".
         /// </param>
+        /// <param name="padre">
+        /// The waiting row this one came out of, in f11, for the rows a delayed effect turns
+        /// into when its round comes. Measured on Paso de Cacería: the live +1 MP row names
+        /// the "Y" row of the cast. Zero when there is none.
+        /// </param>
+        /// <param name="activacion">
+        /// For a waiting row, the round it goes off in, carried in f12 in place of the two
+        /// "nobody" of an ordinary row: "f12{f2=27}" on the beacon's delayed kill, "f12{f2=2}"
+        /// on Paso de Cacería's. Negative for an ordinary row.
+        /// </param>
         public static byte[] BuildBuff(long sobre, long quien, int numero, int efecto, int effectUid,
                                        int valor, int dado, int cara, int hechizo, string disparador,
                                        int rondas, int dispellable, int familia, int grado = 1,
-                                       bool critico = false)
+                                       bool critico = false, int padre = 0, int activacion = -1)
         {
             var dentro = Pb.New()
                 .VarIfNotZero(1, dado)
@@ -707,14 +788,17 @@ namespace Jondo.Unity.Server.Network
                 .Var(3, numero)
                 .Var(4, grado)
                 .Msg(6, Pb.New().Var(2, rondas))
-                .Str(7, disparador ?? "I")
+                .Str(7, WireTrigger(disparador))
                 .VarIfNotZero(8, effectUid)
                 // Uno si el lanzamiento salió crítico. Medido en la captura de Flecha Helada: los
                 // seis embrujos del efecto 293 son idénticos salvo el del lanzamiento crítico, que
                 // es el único que trae este campo.
                 .VarIfNotZero(9, critico ? 1 : 0)
                 .VarIfNotZero(10, valor)
-                .Msg(12, Pb.New().Var(2, Nobody).Var(3, Nobody))
+                .VarIfNotZero(11, padre)
+                .Msg(12, activacion >= 0
+                    ? Pb.New().Var(2, activacion)
+                    : Pb.New().Var(2, Nobody).Var(3, Nobody))
                 .VarIfNotZero(13, cara)
                 .Var(14, hechizo)
                 .VarIfNotZero(15, familia)
@@ -731,6 +815,21 @@ namespace Jondo.Unity.Server.Network
                     .Var(2, quien)
                     .Var(3, efecto))
                 .Build();
+        }
+
+        /// <summary>
+        /// A trigger as a jxm carries it: what an EON or an EOFF waits on and the mask of an EK stay
+        /// behind -- "EON", "EOFF" and "EK" in all 581 of them in the class captures, never a state:
+        /// Lazo Espiritual's "EON8" and "EOFF8" go out as "EON" and "EOFF" at frames 2114-2115 of
+        /// the Osamodas capture, the Sram's "EK:m" as "EK".
+        /// </summary>
+        public static string WireTrigger(string trigger)
+        {
+            if (string.IsNullOrEmpty(trigger)) return "I";
+            if (trigger.StartsWith("EOFF", StringComparison.Ordinal)) return "EOFF";
+            if (trigger.StartsWith("EON", StringComparison.Ordinal)) return "EON";
+            int colon = trigger.IndexOf(':');
+            return colon > 0 ? trigger.Substring(0, colon) : trigger;
         }
 
         /// <summary>
@@ -757,6 +856,35 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         public const int EmbrujoCaido = 514;
+
+        /// <summary>
+        /// A spell's rows taken off by a 406 (jwe with f14 = 406):
+        ///
+        ///   f3: who cast the 406     f33 { f2: the spell whose rows went, f4: off whom }
+        ///
+        /// Behind the jya of each row. Measured on the Furor capture -- "jwe f3=53721170019
+        /// f14=406 f33{f2=28604 f4=53721170019}" after jya 36, 37 and 38 -- and eleven times
+        /// on Tempestad de Potencia's, on the enemies.
+        /// </summary>
+        /// <param name="grade">
+        /// The grade a 1406 took off, in f3, with <paramref name="effect"/> 1406: "jwe 1406
+        /// f33{f2=30842 f3=6 f4=-3}" in Aguja's capture. Zero for a 406, which takes every grade.
+        /// </param>
+        /// <param name="shown">
+        /// The 406 row is visible in the fight log -- the bit 4 of its m_flags: an f5 of 1 then, as
+        /// 17 of the 17 such removals of the class captures have it -- Resonancia's "jwe 406
+        /// f33{f2=14611 f4=-1 f5=1}" at frame 223 -- and none of the 1,397 whose row lacks the bit.
+        /// </param>
+        public static byte[] BuildSpellEffectsRemoved(long author, int spell, long fromWhom, int grade = 0,
+                                                      int effect = SpellEffectsRemoved, bool shown = false)
+            => BuildAction(author, effect,
+                           Pb.New().Var(2, spell).VarIfNotZero(3, grade).Var(4, fromWhom).VarIfNotZero(5, shown ? 1 : 0),
+                           detailField: 33);
+
+        /// <summary>The row's "visible in the fight log" bit, which puts an f5 of 1 on its 406: see BuildSpellEffectsRemoved.</summary>
+        public const int ShownRowFlag = 4;
+
+        public const int SpellEffectsRemoved = 406;
 
         /// <summary>
         /// Qué secuencia acusa el cliente (jti): <c>f2</c> lleva el mismo número de acción con el
@@ -844,6 +972,94 @@ namespace Jondo.Unity.Server.Network
         public const int RemovedGlyph = 310;
 
         /// <summary>
+        /// A portal laid (the f32 of a jwe 401, as for any mark, with the f14 before it):
+        ///
+        ///   f1 { f1 { f2: 255, f3: the cell }     f2: the row's diceSide    f3: its diceNum
+        ///        f4: the mark number   f5: 3   f6: the grade   f9: the spell that laid it
+        ///        f10: the cell   f11: 1 when it is on   f12: whose it is }
+        /// </summary>
+        /// <remarks>
+        /// Measured, byte for byte, on the 21 portals of the six Selatrop captures: "poner portales
+        /// de selatrop" frame 109 is the first one, alone and off, with no f11; frame 131 the
+        /// second, on. The dice go where a spell glyph carries the spell it casts and its grade --
+        /// f3 the 2 of "+2% per cell", f2 the 44338 that is Teleportal's level. The colour is 255
+        /// on all 21 and in no data: a constant here. The f5 is the kind of mark -- 2 on the bomb
+        /// walls, none on the glyphs, 3 on every portal.
+        /// </remarks>
+        public static byte[] BuildPortal(long owner, int portalId, int cell, int diceNum, int diceSide,
+                                         int grade, int layingSpell, bool active)
+            => Pb.New()
+                .Var(3, owner)
+                .Var(14, PlacedGlyph)
+                .Msg(32, Pb.New().Msg(1, Pb.New()
+                    .Msg(1, Pb.New().Var(2, PortalColour).Var(3, cell))
+                    .VarIfNotZero(2, diceSide)
+                    .VarIfNotZero(3, diceNum)
+                    .Var(4, portalId)
+                    .Var(5, PortalMark)
+                    .Var(6, grade)
+                    .Var(9, layingSpell)
+                    .Var(10, cell)
+                    .VarIfNotZero(11, active ? 1 : 0)
+                    .Var(12, owner)))
+                .Build();
+
+        /// <summary>The colour every portal of the captures carries: 0x0000FF.</summary>
+        public const int PortalColour = 255;
+
+        /// <summary>The kind of mark of a portal, the f5 of its jwe 401.</summary>
+        public const int PortalMark = 3;
+
+        /// <summary>
+        /// A portal turned on or off (jwe 1181): f3 who does it, f17 { f1: the portal, f2: 1 when
+        /// it is on }. 58 of them across the Selatrop captures; see Jondo.Unity.World.Fights.PortalNetwork
+        /// for when each goes out.
+        /// </summary>
+        public static byte[] BuildPortalState(long author, int portalId, bool active)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, PortalState)
+                .Msg(17, Pb.New().Var(1, portalId).VarIfNotZero(2, active ? 1 : 0))
+                .Build();
+
+        public const int PortalState = 1181;
+
+        /// <summary>
+        /// A glyph a SPELL lays down -- a trap, a turn-start or turn-end glyph, an aura: the same
+        /// jwe 401 as the bomb wall, with a body of its own.
+        ///
+        ///   f1 { f1 (repeated) { f2: colour, f3: cell }   one per cell of its footprint
+        ///        f2: 1        f3: the spell it casts     f4: the glyph's number
+        ///        f6: grade    f7: colour                  f9: the spell that laid it
+        ///        f10: the aimed cell    f11: 1           f12: whose it is }
+        /// </summary>
+        /// <remarks>
+        /// Measured on the 58 of them the captures hold outside the Rogue's walls: Feca, Anutrof,
+        /// Ocra, the troll fair's. The Anutrof's 29575 lists its twelve cells, a ring of three, in
+        /// the f1s. The colour is the placing row's <c>value</c> in RGB, in every one of them --
+        /// 5718180 is Excursión's and 3222918 Caza's -- so it is the data's colour and not a
+        /// choice: Conde Kontatrás's time glyph carries 0, black. What the f2 counts is not
+        /// clear: 1 in most, 2 to 4 in some, 1 to 12 across the twelve glyphs of one cast of the
+        /// troll fair. One is sent. The size of the bomb wall's f5 does not appear.
+        /// </remarks>
+        public static byte[] BuildSpellGlyph(long owner, int glyphId, IEnumerable<int> cells, int aimedCell,
+                                             int castSpell, int layingSpell, int grade, int colour)
+        {
+            var body = Pb.New();
+            foreach (int cell in cells) body.Msg(1, Pb.New().VarIfNotZero(2, colour).Var(3, cell));
+            body.Var(2, 1)
+                .Var(3, castSpell)
+                .Var(4, glyphId)
+                .Var(6, grade)
+                .VarIfNotZero(7, colour)
+                .Var(9, layingSpell)
+                .Var(10, aimedCell)
+                .Var(11, 1)
+                .Var(12, owner);
+            return BuildAction(owner, PlacedGlyph, Pb.New().Msg(1, body), detailField: 32);
+        }
+
+        /// <summary>
         /// And how one GOES OFF (a jwe with f14 = 306 or 307):
         ///
         ///   f3: whose glyph it is
@@ -899,6 +1115,22 @@ namespace Jondo.Unity.Server.Network
         public const int SpentActionPoints = 102;
         public const int Died = 103;
         public const int LookChanged = 149;
+
+        /// <summary>
+        /// The 3793 script marker going off (jwe, f14 = 3793): f3 who cast the spell, f25 { f2:
+        /// the grade, f3: the cell it lands on, f4: the spell, f5: the marker's value }. The
+        /// shape of 187 of the 202 in the class captures; the other 15 carry one more field
+        /// that is not read. Remisión sends it on the attacker's cell when its push goes off,
+        /// Paso de Cacería on the cell of the cast the turn after.
+        /// </summary>
+        public const int ScriptMarker = 3793;
+
+        public static byte[] BuildScriptMarker(long author, int grade, int cell, int spell, int value)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, ScriptMarker)
+                .Msg(25, Pb.New().Var(2, grade).Var(3, cell).Var(4, spell).Var(5, value))
+                .Build();
 
         /// <summary>El campo donde va el detalle de cada cosa dentro del jwe.</summary>
         public const int CastDetail = 7;
@@ -1039,9 +1271,23 @@ namespace Jondo.Unity.Server.Network
         /// 3; Paso de Cacería, Disparos Lejanos, Tiros Potentes y Flecha de Expiación mandan un 2
         /// y valen 2 en el grado que juega el personaje de la captura.
         /// </param>
+        /// <param name="noTarget">
+        /// A cast on an empty cell names nobody: no f2 at all, where a target of zero otherwise
+        /// stands for the caster himself. "poner portales de selatrop", frames 104 to 352, and the
+        /// Osamodas' teleport at frame 1906 -- every cast aimed at an empty cell of the captures.
+        /// </param>
+        /// <param name="chained">
+        /// A spell another one set off (792, 1160...): no f8. See FightHandler.AnunciarElEncadenadoAsync.
+        /// </param>
+        /// <param name="portals">
+        /// The portals a cast went through, the one aimed at first, packed in the spell's f1; the
+        /// cell is then where it landed. "jwe 300 f6=344 f7{f1=[10,9,8,7] f2=14593}" for Audacia
+        /// aimed at the portal on 303, "pegar a traves de diferentes portales", frame 16.
+        /// </param>
         public static Pb CastAt(long caster, long target, int cell, int spell, int spellLevel,
                                 bool critical, int sobreEseObjetivo = 0, int esteTurno = 0,
-                                int intervalo = 0, int arma = 0)
+                                int intervalo = 0, int arma = 0, bool noTarget = false,
+                                IReadOnlyList<int> portals = null, bool chained = false)
         {
             var suyo = Pb.New();
             if (sobreEseObjetivo > 0 && target != 0)
@@ -1052,9 +1298,9 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(3, intervalo)
                 .Var(4, caster);
 
-            var detalle = Pb.New()
-                .Var(2, target != 0 ? target : caster)
-                .Msg(4, suyo)
+            var detalle = Pb.New();
+            if (target != 0 || !noTarget) detalle.Var(2, target != 0 ? target : caster);
+            detalle.Msg(4, suyo)
                 .VarIfNotZero(5, critical ? 1 : 0)
                 .Var(6, cell);
             if (spell != 0)
@@ -1062,8 +1308,11 @@ namespace Jondo.Unity.Server.Network
                 // Un HECHIZO lleva el hechizo y NO lleva el campo del arma. Escribirlo aunque
                 // fuera a cero cambiaba los bytes, y el auto-test del protocolo lo cazó a la
                 // primera comparando contra la captura: por eso el if envuelve a los dos.
-                detalle.Msg(7, Pb.New().Var(2, spell).VarIfNotZero(3, spellLevel));
-                return detalle.Var(8, 1);
+                var delHechizo = Pb.New();
+                if (portals != null && portals.Count > 0) delHechizo.Packed(1, portals.Select(p => (long)p));
+                detalle.Msg(7, delHechizo.Var(2, spell).VarIfNotZero(3, spellLevel));
+                // The f8 is a cast somebody made; a chained one goes without it.
+                return chained ? detalle : detalle.Var(8, 1);
             }
 
             // Y un golpe CUERPO A CUERPO lleva lo contrario: sin hechizo, y con el arma.
@@ -1185,7 +1434,9 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildDamage(long author, int efecto, long victim, int amount,
                                          int elemento = -1, int erosion = 0)
         {
-            var detalle = Pb.New().Var(2, victim).Var(3, amount);
+            // No amount is no field: the blow on an invulnerable target travels as f40 with the
+            // victim and the element only (Influencia's capture), the way proto3 leaves a zero.
+            var detalle = Pb.New().Var(2, victim).VarIfNotZero(3, amount);
             if (elemento >= 0) detalle.Var(4, elemento);
 
             // La EROSIÓN, que faltaba. Va en el f5 y es lo que el golpe se lleva del TOPE de vida,
@@ -1250,6 +1501,34 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>Retirarle puntos de movimiento a otro. El 129 es andar, que es cosa suya.</summary>
         public const int MovementPointsLost = 127;
+
+        /// <summary>
+        /// Points of a removal the target DODGED (jwe 308 for AP, 309 for MP): { f3: who cast,
+        /// f28 { f1: how many, f3: who dodged } }. The shape of all 401 in the class captures
+        /// -- 157 of AP, 244 of MP -- and always before the sheet and the row of what did land,
+        /// when anything did: "jwe 309 f28{f1=1 f3=-5}", then the -5 sheet at two MP, then the
+        /// jxm 169 with f1=1 of a Palabra Juguetona that asked for two.
+        /// </summary>
+        public const int ActionPointsDodged = 308;
+        public const int MovementPointsDodged = 309;
+
+        public static byte[] BuildPointsDodged(long author, int characteristic, long quien, int cuantos)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, characteristic == 1 ? ActionPointsDodged : MovementPointsDodged)
+                .Msg(28, Pb.New().Var(1, cuantos).Var(3, quien))
+                .Build();
+
+        /// <summary>
+        /// Points given (jwe 120, "devuelve N PA"): the same f20 as a loss with the amount
+        /// positive. "18..70 78 a201 09 0801 10.." at frame 11 of "usar neutral en portales".
+        /// </summary>
+        public static byte[] BuildPointsGiven(long author, int efecto, long quien, int cuantos)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, efecto)
+                .Msg(20, Pb.New().Var(1, Math.Abs(cuantos)).Var(2, quien))
+                .Build();
 
         /// <summary>
         /// Se le han quitado puntos a alguien (jwe): { f3: quién, f14: cuál, f20 { f1: cuántos,
@@ -1325,9 +1604,14 @@ namespace Jondo.Unity.Server.Network
         /// La ficha va con el molde de los monstruos, <c>f2 { f2: valor }</c>, que es el que ya
         /// arma <see cref="SheetEntry"/> con <c>isMonster</c>.
         /// </summary>
+        /// <param name="efecto">
+        /// The effect that summoned it, which is the f14: 181 for an ordinary summon, 1008 for
+        /// a bomb, 1011 for one the owner plays. Every summon went out as 181 until now.
+        /// </param>
         public static byte[] BuildSummon(long quienInvoca, long quienEs, int celda, int orientacion,
                                          int plantillaDelAspecto, int plantillaDelBicho, int grado,
-                                         IEnumerable<(int Characteristic, long Base, long Gear)> ficha)
+                                         IEnumerable<(int Characteristic, long Base, long Gear)> ficha,
+                                         int efecto = Invoca)
         {
             var stats = Pb.New()
                 .Var(1, quienInvoca)
@@ -1352,12 +1636,57 @@ namespace Jondo.Unity.Server.Network
             return Pb.New()
                 .Msg(1, Pb.New().Msg(1, Pb.New().Msg(1, cuerpo)))
                 .Var(3, quienInvoca)
-                .Var(14, Invoca)
+                .Var(14, efecto)
                 .Build();
         }
 
         /// <summary>El número de efecto de "Invoca: #1" en el catálogo.</summary>
         public const int Invoca = 181;
+
+        /// <summary>
+        /// A double of a character comes out (jwe 180): the summon's block, with the character's
+        /// look where a monster's names its template and his name and level where a monster
+        /// names template and grade --
+        ///
+        ///   f3 { the look, as the character's own fighter block carries it }
+        ///   f5 { f2 { f1: name, f2: level } }
+        ///
+        /// -- and the sheet in the monsters' mould, as for any summon. Frame 16 of "sram-doble":
+        /// the Sram's look and "KTAS5625" at 200, on 258 facing 5, as -4.
+        /// </summary>
+        public static byte[] BuildDouble(long quienInvoca, long quienEs, int celda, int orientacion,
+                                         byte[] look, string nombre, int nivel,
+                                         IEnumerable<(int Characteristic, long Base, long Gear)> ficha)
+        {
+            var stats = Pb.New()
+                .Var(1, quienInvoca)
+                .Var(3, SheetKind)
+                .Var(4, 1);
+            foreach (var (caracteristica, valor, equipo) in ficha)
+            {
+                stats.Msg(5, SheetEntry(caracteristica, valor, equipo, isMonster: true));
+            }
+
+            var cuerpo = Pb.New()
+                .Msg(1, Pb.New()
+                    .Var(3, 1)
+                    .Msg(4, Pb.New()
+                        .Msg(1, Pb.New().Var(1, celda).VarIfNotZero(2, orientacion).Var(4, 0))
+                        .Var(3, quienEs)))
+                .Var(2, 0)
+                .Bytes(3, look ?? Array.Empty<byte>())
+                .Msg(5, Pb.New().Msg(2, Pb.New().Str(1, nombre ?? "").Var(2, nivel)))
+                .Msg(6, stats);
+
+            return Pb.New()
+                .Msg(1, Pb.New().Msg(1, Pb.New().Msg(1, cuerpo)))
+                .Var(3, quienInvoca)
+                .Var(14, InvocaUnDoble)
+                .Build();
+        }
+
+        /// <summary>"Invoca un doble del lanzador".</summary>
+        public const int InvocaUnDoble = 180;
 
         /// <summary>
         /// A alguien lo mueven de sitio sin que ande (jwe con el f14 al número del efecto):
@@ -1379,6 +1708,152 @@ namespace Jondo.Unity.Server.Network
                 .Var(3, author)
                 .Var(14, efecto)
                 .Msg(38, Pb.New().Var(1, desde).Var(2, quien).Var(3, hasta))
+                .Build();
+
+        /// <summary>
+        /// A teleport (jwe 4): f3 who does it, f35 { f1: where, f2: who lands }. Every one of the
+        /// 581 teleports in the captures travels like this and not as a 5 with from and to,
+        /// which is what we sent for them until now.
+        /// </summary>
+        public static byte[] BuildTeleport(long author, long quien, int hasta)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, Jondo.Unity.World.Combat.EffectSupport.Teleport)
+                .Msg(35, Pb.New().Var(1, hasta).Var(2, quien))
+                .Build();
+
+        /// <summary>
+        /// Two fighters swap places (jwe 8): f2 { f1: the caster's old cell, f2: the other, f3:
+        /// the other's old cell }, f3 the caster. One frame for the two of them: Jugarreta from
+        /// 260 onto the bomb at 341 is "121108840210f5…0118d502 18… 7008".
+        /// </summary>
+        public static byte[] BuildSwap(long author, int deDondeElAutor, long otro, int deDondeElOtro)
+            => Pb.New()
+                .Msg(2, Pb.New().Var(1, deDondeElAutor).Var(2, otro).Var(3, deDondeElOtro))
+                .Var(3, author)
+                .Var(14, Jondo.Unity.World.Combat.EffectSupport.SwapPositions)
+                .Build();
+
+        /// <summary>The visibility switch (jwe 150): f34 { f1: state, f4: who }. 1 as the illusions appear, 2 as they go.</summary>
+        public static byte[] BuildVisibility(long author, long quien, int state)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, Jondo.Unity.World.Combat.EffectSupport.Visibility)
+                .Msg(34, Pb.New().Var(1, state).Var(4, quien))
+                .Build();
+
+        public const int Hidden = 1;
+        public const int Visible = 2;
+
+        /// <summary>
+        /// An illusion appears (jwe 1097): a fighter block of the copy, with its cell, a sheet of
+        /// its own in the monster mould (f2 {f2 = value}), a pointer to the original at the cell he LEFT, and the original's look.
+        /// </summary>
+        /// <remarks>
+        /// The block is the jxg's, with the copy's id in f3 and, inside the fighter, no id and no
+        /// identity: only the sheet (f2) and the f7 "again" whose disposition is the ORIGINAL's --
+        /// 230, facing 3 -- and whose f3 is the original's id. Measured on the three copies of
+        /// the capture, byte for byte.
+        /// </remarks>
+        /// <param name="identity">
+        /// Who the copy claims to be, for the side that must not tell it apart. The captured
+        /// block -- the Tymador's own client -- carries no identity and a monster's mould of a
+        /// sheet, and the client names nothing on hovering such a copy while it names the
+        /// original: enough of a tell for an enemy. What the enemy's client is sent is not
+        /// measured, so it gets the copy dressed as the person -- his identity, his own sheet
+        /// with his life as it stands, his look -- and the copy's own id where the person's
+        /// would go. Null keeps the captured shape.
+        /// </param>
+        public static byte[] BuildIllusion(long author, long illusionId, int cell, int orientation,
+                                           int originalCell, int originalOrientation,
+                                           IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
+                                           byte[] look, Pb identity = null)
+        {
+            var stats = Pb.New().Var(3, SheetKind);
+            foreach (var (characteristic, baseValue, gear) in sheet)
+            {
+                stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster: identity == null));
+            }
+            var original = Pb.New()
+                .Var(3, 1)
+                .Msg(4, Pb.New()
+                    .Msg(1, Pb.New().Var(1, originalCell).VarIfNotZero(2, originalOrientation).Var(4, 0))
+                    .Var(3, author));
+            var fighter = Pb.New();
+            if (identity != null) fighter.Var(1, illusionId);
+            fighter.Msg(2, stats);
+            if (identity != null) fighter.Msg(6, identity);
+            fighter.Msg(7, original);
+            var block = Pb.New()
+                .Msg(1, Pb.New().Var(1, cell).VarIfNotZero(2, orientation).Var(4, 0))
+                .Msg(2, Pb.New().Msg(2, fighter).Bytes(3, look))
+                .Var(3, illusionId);
+            return Pb.New()
+                .Msg(1, Pb.New().Msg(2, Pb.New().Msg(2, block)))
+                .Var(3, author)
+                .Var(14, Jondo.Unity.World.Combat.EffectSupport.Illusions)
+                .Build();
+        }
+
+        /// <summary>An illusion goes (jwe 1029): f3 its owner, f10 { f1: which }.</summary>
+        public static byte[] BuildIllusionGone(long author, long illusionId)
+            => Pb.New()
+                .Var(3, author)
+                .Msg(10, Pb.New().Var(1, illusionId))
+                .Var(14, Jondo.Unity.World.Combat.EffectSupport.IllusionGone)
+                .Build();
+
+        /// <summary>
+        /// The sheet of an illusion, as the three of the capture carry it: 5 AP, 4 MP, the life
+        /// of the level, a hundred in the five elements and in the multipliers, zero elsewhere.
+        /// Not the original's numbers -- his are 7 AP and 3 MP -- so it is what the client
+        /// draws for a copy, and the copy never uses it.
+        /// </summary>
+        public static IEnumerable<(int Characteristic, long Base, long Gear)> IllusionSheet(int level)
+        {
+            int[] order = { 1, 23, 37, 33, 35, 36, 34, 58, 54, 56, 57, 55, 85, 87, 101, 27, 28, 93, 79, 78, 0,
+                            10, 11, 13, 14, 15, 16, 18, 19, 25, 26, 50, 75, 88, 89, 90, 91, 92, 95, 96, 97, 102,
+                            107, 150, 120, 121, 122, 123, 124, 125, 141, 142, 143 };
+            foreach (int c in order)
+            {
+                long value = c switch
+                {
+                    1 => 5,
+                    23 => 4,
+                    0 => 50 + 5 * Math.Max(1, level),
+                    10 or 11 or 13 or 14 or 15 => 100,
+                    19 or 26 => 1,
+                    107 or 150 or 120 or 121 or 122 or 123 or 124 or 125 or 141 or 142 or 143 => 100,
+                    27 or 28 or 79 or 78 or 75 => 10,
+                    93 => 3,
+                    _ => 0,
+                };
+                yield return (c, value, 0);
+            }
+        }
+
+        /// <summary>The sequence the illusions go in at the owner's turn start: jto 6 in the capture.</summary>
+        public const int TurnStartSequence = 6;
+
+        /// <summary>
+        /// Somebody is picked up (jwe 50): f3 who carries, f18 { f1: the cell he was on, f3: who }.
+        /// Byte for byte the Pinzas of the Tymobot capture: "18f0ff…01 7032 92010e 089102 18f3ff…01".
+        /// </summary>
+        public static byte[] BuildCarry(long author, int desde, long quien)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, Jondo.Unity.World.Combat.EffectSupport.Carry)
+                .Msg(18, Pb.New().Var(1, desde).Var(3, quien))
+                .Build();
+
+        /// <summary>
+        /// Somebody is thrown (jwe 51): f3 who throws, f27 { f1: who, f2: where he lands }.
+        /// </summary>
+        public static byte[] BuildThrow(long author, long quien, int hasta)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, Jondo.Unity.World.Combat.EffectSupport.Throw)
+                .Msg(27, Pb.New().Var(1, quien).Var(2, hasta))
                 .Build();
 
         /// <summary>
@@ -1524,6 +1999,89 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>El resultado que lleva el jyg en la captura de una victoria.</summary>
         public const int Victory = 2;
+
+        /// <summary>
+        /// One person's end-of-fight statistics (jxo), which the client shows on the
+        /// "Personaje" and "Estadísticas" tabs of the fight-over window. Sent right behind
+        /// the jyg, to each person with his own numbers only.
+        /// </summary>
+        /// <remarks>
+        /// Shape, as the real server sends it in the 30 fights measured (see
+        /// <see cref="Jondo.Unity.World.Fights.FightStatistics"/> for which field is what):
+        ///
+        ///   f1 { f1: the character           f2 {
+        ///        f1 { f2: '', f4: the character }
+        ///        f2 { f2: enemies defeated, f4: the same }
+        ///        f3 { f4: AP per turn (float) }
+        ///        f4 ''
+        ///        f5 { f3: taken per turn, f4: taken, f9: taken }        only when hit
+        ///        f6 { f1: shields given, f3: per turn }                 only when any
+        ///        f8 { f4: MP per turn }                                 '' when none
+        ///        f9 ''
+        ///        f10 { f3: heals per turn, f4: given, f5: received }    only when any
+        ///        f11 { f1: on triggers, f2: the summons', f3: own per AP, f4: total,
+        ///              f5: pushes, f6: total per turn, f7: glyphs, f9: direct } } }
+        ///   f2 { f1: enemies, f3: taken, f4: heals given, f5: total dealt, f8: shields }
+        ///
+        /// Zero counters are left out of their block and an empty block is sent as such,
+        /// which is how the captures have them: "f5='' f6='' f9='' f10=''" on a fight with
+        /// nothing taken, shielded or healed, and "f8=''" when no MP was spent. Floats are
+        /// the client's own float32.
+        /// </remarks>
+        public static byte[] BuildFightStatistics(long character,
+                                                  Jondo.Unity.World.Fights.FightStatistics s,
+                                                  int enemiesDefeated)
+        {
+            static byte[] F(float value) => BitConverter.GetBytes(value);
+
+            var mine = Pb.New()
+                .Msg(1, Pb.New().Bytes(2, Array.Empty<byte>()).Var(4, character))
+                .Msg(2, Pb.New().VarIfNotZero(2, enemiesDefeated).VarIfNotZero(4, enemiesDefeated))
+                .Msg(3, Pb.New().Fixed32(4, F(s.PerTurn(s.ActionPointsSpent))))
+                .EmptyMsg(4);
+
+            if (s.DamageTaken > 0)
+                mine.Msg(5, Pb.New().Fixed32(3, F(s.PerTurn(s.DamageTaken))).Var(4, s.DamageTaken).Var(9, s.DamageTaken));
+            else mine.EmptyMsg(5);
+
+            if (s.ShieldsGiven > 0)
+                mine.Msg(6, Pb.New().Var(1, s.ShieldsGiven).Fixed32(3, F(s.PerTurn(s.ShieldsGiven))));
+            else mine.EmptyMsg(6);
+
+            if (s.MovementPointsSpent > 0)
+                mine.Msg(8, Pb.New().Fixed32(4, F(s.PerTurn(s.MovementPointsSpent))));
+            else mine.EmptyMsg(8);
+
+            mine.EmptyMsg(9);
+
+            if (s.HealsGiven > 0 || s.HealsReceived > 0)
+                mine.Msg(10, Pb.New().Fixed32(3, F(s.PerTurn(s.HealsGiven)))
+                                     .VarIfNotZero(4, s.HealsGiven).VarIfNotZero(5, s.HealsReceived));
+            else mine.EmptyMsg(10);
+
+            var dealt = Pb.New()
+                .VarIfNotZero(1, s.TriggerDamage)
+                .VarIfNotZero(2, s.SummonDamage)
+                .Fixed32(3, F(s.OwnDamage / (float)Math.Max(1, s.ActionPointsOnDamage)))
+                .Var(4, s.TotalDamage)
+                .VarIfNotZero(5, s.PushDamage)
+                .Fixed32(6, F(s.PerTurn(s.TotalDamage)))
+                .VarIfNotZero(7, s.GlyphDamage)
+                .VarIfNotZero(9, s.DirectDamage);
+            mine.Msg(11, dealt);
+
+            var totals = Pb.New()
+                .VarIfNotZero(1, enemiesDefeated)
+                .VarIfNotZero(3, s.DamageTaken)
+                .VarIfNotZero(4, s.HealsGiven)
+                .VarIfNotZero(5, s.TotalDamage)
+                .VarIfNotZero(8, s.ShieldsGiven);
+
+            return Pb.New()
+                .Msg(1, Pb.New().Var(1, character).Msg(2, mine))
+                .Msg(2, totals)
+                .Build();
+        }
 
         /// <summary>
         /// Se acabó el turno (jyt).
@@ -1755,6 +2313,31 @@ namespace Jondo.Unity.Server.Network
         /// Si lleva la entrada del cuerpo a cuerpo. La llevan las barras de los JUGADORES, las 27
         /// de las capturas; las de los invocados, que traen una o dos entradas, no.
         /// </param>
+        /// <summary>
+        /// The spell bar of a summon, for the player who controls it (jyy): f3 the summon, f4
+        /// the owner, one f6 per spell with its grade and origin 6, one f7 per slot, no melee.
+        /// Measured on the Tymobot and on the Osamodas' animals: "f3=-12 f4=owner f6{f1=3
+        /// f3=13451 f4=6} ... f7{f6{f2=13451}} f7{f2=1 f6{f2=13452}} ...".
+        /// </summary>
+        public static byte[] BuildSummonSpellBar(long summonId, long ownerId,
+                                                 IEnumerable<(int Spell, int Grade)> spells)
+        {
+            var jyy = Pb.New().Var(3, summonId).Var(4, ownerId);
+            var lista = new List<(int Spell, int Grade)>(spells);
+            foreach (var (spell, grade) in lista)
+            {
+                jyy.Msg(6, Pb.New().VarIfNotZero(1, grade).Var(3, spell).Var(4, OrigenDeInvocado));
+            }
+            for (int slot = 0; slot < lista.Count; slot++)
+            {
+                jyy.Msg(7, Pb.New().VarIfNotZero(2, slot).Msg(6, Pb.New().Var(2, lista[slot].Spell)));
+            }
+            return jyy.Build();
+        }
+
+        /// <summary>The origin of a summon's spell in its jyy: 6 in all 24 summon bars of the captures.</summary>
+        private const int OrigenDeInvocado = 6;
+
         public static byte[] BuildSpellBar(long fighterId, IEnumerable<(int Spell, int Grade)> spells,
                                            IEnumerable<(int Slot, int Spell)> bar, bool conArma = true)
         {
@@ -1921,11 +2504,17 @@ namespace Jondo.Unity.Server.Network
         /// Medido en «ocra-disparos lejanos»: f4 = 13 con f3 = 3, y f4 = 12 con f3 = 6, que son
         /// justo el «+3 de alcance mínimo» y el «+6 de alcance máximo» de ese hechizo.
         /// </summary>
-        public static byte[] BuildSpellModifier(long quien, int modificador, int hechizo, long cuanto)
+        /// <param name="accion">
+        /// Add (1), take away (2) or set (3): Bestialidad's pinned ranges go out as
+        /// "f2=3 f3=2 f4=12", and a pin to zero with no f3 at all -- a zero total is not written.
+        /// See <see cref="Managers.SpellModifiers"/>.
+        /// </param>
+        public static byte[] BuildSpellModifier(long quien, int modificador, int hechizo, long cuanto,
+                                                int accion = Managers.SpellModifiers.Add)
             => Pb.New()
                 .Msg(1, Pb.New()
-                    .Var(2, 1)
-                    .Var(3, cuanto)
+                    .Var(2, accion)
+                    .VarIfNotZero(3, cuanto)
                     .Var(4, modificador)
                     .Var(5, hechizo))
                 .Var(2, quien)
@@ -1938,10 +2527,11 @@ namespace Jondo.Unity.Server.Network
         ///
         ///   f1: qué modificador     f2: 1     f3: el hechizo     f5: de quién
         /// </summary>
-        public static byte[] BuildSpellModifierDeclared(long quien, int modificador, int hechizo)
+        public static byte[] BuildSpellModifierDeclared(long quien, int modificador, int hechizo,
+                                                        int accion = Managers.SpellModifiers.Add)
             => Pb.New()
                 .Var(1, modificador)
-                .Var(2, 1)
+                .Var(2, accion)
                 .Var(3, hechizo)
                 .Var(5, quien)
                 .Build();

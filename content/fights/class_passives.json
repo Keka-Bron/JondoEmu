@@ -1,0 +1,34 @@
+{
+  "_": [
+    "The spell each class casts on itself before the first turn of every fight -- its passive -- and",
+    "the spell type ('Hechizos iniciales <clase>' in the client's own spell types) that gathers the",
+    "class's initial spells. The client's data links neither to a breed, so this is measured in the",
+    "class captures: the passive is the spell cast in every fight of the class and in no other's,",
+    "and for the classes with no fight captured it is the spell of that type carrying the class's",
+    "name. The other spells of the type are cast at fight start too, one for each spell of the same",
+    "name the character has -- the Tymador with Explobomba gets 25200 'Explobomba' at his grade of",
+    "it, with Explobomba Resiliente 24847 instead -- and that part is read off the names, not from",
+    "here. Order in the captures: those first, then the item attitudes, then the passive."
+  ],
+  "classes": {
+    "1":  { "name": "Feca",       "passive": 21980, "initialSpellType": 1996, "measured": "2 of 2 fights" },
+    "2":  { "name": "Osamodas",   "passive": 31196, "initialSpellType": 646,  "measured": "3 of 5 fights; absent from the two oldest captures" },
+    "3":  { "name": "Anutrof",    "passive": 14330, "initialSpellType": 692,  "measured": "no fight captured; the spell of the type named after the class" },
+    "4":  { "name": "Sram",       "passive": 21978, "initialSpellType": 1995, "measured": "6 of 6 fights" },
+    "5":  { "name": "Xelor",      "passive": 21984, "initialSpellType": 1999, "measured": "12 of 12 fights" },
+    "6":  { "name": "Zurcarák",   "passive": 14316, "initialSpellType": 684,  "measured": "4 of 4 fights" },
+    "7":  { "name": "Aniripsa",   "passive": 21982, "initialSpellType": 1998, "measured": "no fight captured; the spell of the type named after the class" },
+    "8":  { "name": "Yopuka",     "passive": 21981, "initialSpellType": 1997, "measured": "2 of 2 fights" },
+    "9":  { "name": "Ocra",       "passive": 21977, "initialSpellType": 1992, "measured": "14 of 14 fights" },
+    "10": { "name": "Sadida",     "passive": 14377, "initialSpellType": 698,  "measured": "no fight captured; the spell of the type named after the class" },
+    "11": { "name": "Sacrógrito", "passive": 12718, "initialSpellType": 1994, "measured": "no fight captured; the spell of the type named after the class" },
+    "12": { "name": "Pandawa",    "passive": 12830, "initialSpellType": 1993, "measured": "1 of 1 fight" },
+    "13": { "name": "Tymador",    "passive": 20488, "initialSpellType": 2004, "measured": "11 of 11 fights" },
+    "14": { "name": "Zobal",      "passive": 18633, "initialSpellType": 1333, "measured": "5 of 5 fights" },
+    "15": { "name": "Steamer",    "passive": 21987, "initialSpellType": 2002, "measured": "4 of 4 fights" },
+    "16": { "name": "Selatrop",   "passive": 14631, "initialSpellType": 2003, "measured": "1 of 1 fight" },
+    "17": { "name": "Hipermago",  "passive": 23959, "initialSpellType": 2000, "measured": "3 of 3 fights (Última Runa); Torrente Arcano in 2 of 3, by name" },
+    "18": { "name": "Uginak",     "passive": 21986, "initialSpellType": 2001, "measured": "no fight captured; the spell of the type named after the class" },
+    "20": { "name": "Forjalanza", "passive": 24387, "initialSpellType": 2377, "measured": "no fight captured; the spell of the type named after the class" }
+  }
+}

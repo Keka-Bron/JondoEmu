@@ -37,6 +37,21 @@ namespace Jondo.Unity.Server.Managers
         public static IReadOnlyList<RecipeDefinition> ForSkill(int skillId)
             => _bySkill.TryGetValue(skillId, out var recipes) ? recipes : Array.Empty<RecipeDefinition>();
 
+        /// <summary>For tests: a recipe declared by hand, next to whatever is loaded.</summary>
+        internal static void Declare(RecipeDefinition recipe, params RecipeIngredient[] ingredients)
+        {
+            recipe.MutableIngredients.Clear();
+            recipe.MutableIngredients.AddRange(ingredients);
+            var byResult = new Dictionary<int, RecipeDefinition>(_byResult) { [recipe.ResultId] = recipe };
+            var bySkill = new Dictionary<int, IReadOnlyList<RecipeDefinition>>(_bySkill);
+            var list = new List<RecipeDefinition>(ForSkill(recipe.SkillId));
+            list.RemoveAll(r => r.ResultId == recipe.ResultId);
+            list.Add(recipe);
+            bySkill[recipe.SkillId] = list;
+            _byResult = byResult;
+            _bySkill = bySkill;
+        }
+
         public static void Initialize()
         {
             ImportIfAvailable();

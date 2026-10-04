@@ -162,6 +162,48 @@ ids (12736, which also appears in `jyy`) and small numbers (370, 373), so it is
 *not* the initiative list, whatever it is. The turn order has not been located
 yet.
 
+## Coming into somebody else's fight
+
+Measured in `Combate/meterse en combate de otra persona haciendo click en la espadita...` (a
+click on the swords), `Combate/entrar a combate con listo automatico y entrada automatica
+siguiendo a lider de grupo...` (a party member pulled in behind his leader),
+`Busqueda grupo/busqueda automatica de grupo...` (four players into one dungeon fight) and
+`Mazmorras/mazmorra de los jalatós completa` (a refused one). Builders in
+`Network/FightJoinProtocol.cs`, logic in `Handlers/FightJoin.cs` and `FightInstance.JoinTeam`.
+
+What the map sees when somebody attacks a group (follow capture 131-141):
+
+```
+S→C  kmu { f2: the group }  kmu { f2: the attacker }     both go off the map (no jsd)
+S→C  hpy { f1: flags [attacker cell, group cell], f2: 4, team, team, options x2, f6: fight }
+S→C  jqz { f2: fights on this map }
+S→C  kae { team 0 with its people }  kae { team 1, empty }  kae { team 1 +1 monster } x N
+```
+
+A jss of a map with fights carries each one in placement as an f12 (the hpy's body) and is
+followed by a jqz. When the placement ends the swords go with `hpr { f1: fight }`; the jqz drops
+when the fight is over.
+
+Coming in: `C→S kay { f1: a fighter of the side, f2: fight }`, or nothing at all when the server
+pulls a party member in (he has the automatic entry on, stands on the map, and his leader opens
+the fight; if he is walking, when his walk ends). Then `kml kmp(1) jru lqu kuq lva` to him, and to
+the whole fight `kmk {his enemies, him}`, `kae {his side}`, `kxa kwk`, `jxg {him}`, `jzu`. His
+board is the ordinary one, with the kam naming who opened the fight and the kaa what is LEFT of
+the placement (442 at 0.7 s). Every board carries one kae: the receiver's own side, empty.
+
+In a dungeon every arrival rebuilds the monster side (`kar`, `kmu`, `jzw` per monster gone; `kmk`
+x2, `jxg`, `jzu` per monster come) to the first clamp(people, 4, 8) of the room's eight.
+
+The party window's two switches are server-side, each answered on root 3 with an empty message:
+`ilf → ikm` / `int → ilv` automatic entry on / off, `ikr → inn` / `inp → ilr` automatic ready
+on / off (which pair is which is read off the clock of the capture). With the automatic ready on,
+a member is ready when his leader presses ready: both kah leave together.
+
+Leaving from the placement (`kme`): `jxa`, then `kml kmp ktz jru lqu` as at a fight's end.
+
+Refusals: only `jxs { f1, f2: 16 }` is measured, for a side restricted to its party. The other
+reasons (started, full) are not answered at all rather than invented.
+
 ## What the builders reproduce
 
 `Network/FightProtocol.cs` builds `kba`, `jzu`, `jrk`, `kmk` and `kah`, and reads
@@ -185,3 +227,124 @@ Everything past the start of the fight proper. In particular:
 - `jti` and `jwh`, which is what the client sends to cast a spell and to move.
 - `jxy`, empty, which is almost certainly "pass turn".
 - The turn timers, the end of the fight and the reward panel.
+
+## What a row of `EffectsJson` means
+
+Measured on the class captures (Yopuka, Ocra, Tymador) and the client's own
+metadata (`Core.DataCenter.Metadata.Effect.EffectInstanceFlags`).
+
+- `m_flags`: 1 visible in the tooltip, 2 in the buff panel, 4 in the fight
+  log, 8 on the terrain, **16 for the client only**. A row with the 16 is the
+  sheet's copy of what the spell does through a sub-cast, and the real server
+  never sends it: Furor's "+20" (the real one is 28604's), Vitalidad's "+N%"
+  (25215's), Manticolmillo's "+15 huida" (24012's), Virtud's shield and "-50"
+  (29723's), Remisión's push under DM (13430's), Ojo por Ojo's "+6" (no row at
+  all in three casts), the water bomb's "-2 PA" (25589's, by combo). The
+  engine drops them when it reads the spell (`SpellEffect.ForClientOnly`).
+- `random` and `group`: one draw per spell level. The shares of the random
+  rows of a level add up to 100 in 1,602 of the 1,603 levels that carry any;
+  the draw picks one row and every row of its `group` comes with it; group 0
+  is no group. Bumerán Pérfido: eight rows of 12.5 in four groups, a life
+  steal and the characteristic of the same element each.
+- `maxStack` of the level: how many equivalent rows (same entry, same spell,
+  same caster) live together on a target. `-1` no limit (Fervor cast twice in
+  a turn keeps both shields, Tumulto one "+20" per enemy), `0`/`1` the new row
+  replaces the old — dropped as `jya` + `jwe 514` before the new `jxm`, never
+  refreshed under its number —, `N` a cap the oldest gives way to. Presión and
+  Espada Destructora are 2.
+- Targets are picked before anything moves: Fricción pulls the enemy and its
+  state still lands on him, cast at the cell he left.
+- A hooked row with a `delay` fires that many rounds after the cast: Furor's
+  "1160 under TE" goes out with the round after the cast in its `f12`.
+- Rows read by the blow, registered at the cast with their kind as a
+  condition: `-N de daños recibidos` (105, 265) and `daños sufridos x#1%`
+  (1163) under `D`, `DR`, `DM`/`DCAC`, `DTB`/`DTE`.
+- Mask letters, by side (lower case the caster's, upper case the other): `c`
+  the caster when he stands in the zone (Acumulación's "en el lanzador",
+  Flecha Asaltante's `950 mask c` on the Ocra one cell from the centre),
+  `l`/`L` the players (Caja de Herramientas, Ghulificación), `m`/`M` the
+  monsters that are nobody's summon, `i`/`I` and `j`/`J` the summons (Látigo's
+  "si es una invocación aliada" is a bare `i`; what tells `j` from `i` is not
+  written anywhere). `H` the enemy characters, as `L`; `D`/`d` the companions,
+  which this build does not field, so they name nobody.
+- Rows read by the blow, too: `Intercepta los daños` (765) and `Comparte los
+  daños` (1061), "jxm 765 'D'" and "jxm 1061 'D'" with no dice and family 7, one
+  per bearer, in the name of the one who cast them (Sacrifice frame 62, Égida
+  1500 laid by the shield on its Feca, DonNaturel 334, Harmonie 182-185). What a
+  blow does with them is in no capture.
+- A trigger in a `jxm` goes out bare: `EON`, `EOFF`, `EK` -- the state or the
+  mask behind it stays in the data, in all 581 of them.
+- The hooks a class spell lays go out as rows of their own, one per trigger
+  (Resonancia's "jxm 1160 'D'" and "'XD'" on its target, frames 195-196; Lazo
+  Espiritual's six on the Osamodas), and come off with a `jya` when a `406` takes
+  the spell. The emulator does not send them yet.
+- Zone letters measured on impacts with known positions: `Q` is a straight
+  cross like `X` with `param2` as inner radius (Palabra Turbulenta Q1 pushes
+  the four cells around, Llave de Contacto "en una cruz de 1 casilla"); `T` is
+  the bar across the cast, the centre and `param1` cells to each side
+  perpendicular to the nearest of the eight directions from the caster (seven
+  impacts: Cencerro, Magmacha Calcinada, Flecha de Pelea ×2, Impacto
+  Aplastante, Espora Dyka ×2, none behind or in front); `O` is the ring.
+- Spell states: the client's `SpellStateData` flags 104 of 6,375 states —
+  `invulnerable`, `invulnerableMelee`/`Range`, `cantBeMoved`, `cantBePushed`,
+  `incurable`, `cantDealDamage`, `preventsSpellCast`... — in
+  `datos/spell_states.json`. A blow on an invulnerable target goes out as
+  `jwe <effect> f40{f2: victim, f4: element}`, no amount (Influencia's
+  capture), and nothing of the blow happens. One more is read off its effects:
+  678, "Teleportal Imposible", the only state with effect 33, keeps its bearer
+  out of the portals.
+- A `406` is announced after the rows it takes: `jwe 406 f33{f2: spell, f4:
+  from whom}` behind their `jya`, and `f5=1` when the 406's own row is visible
+  in the fight log (`m_flags` 4): 17 of the 17 such removals, none of the 1,397
+  others.
+- A chained cast's `jwe 300` has no `f8`, the mark of a cast somebody made --
+  18,526 chained casts without it, 3,171 of 3,171 cast from a `jwh` with it --
+  and names the cell it was aimed at, where its caster stood even if a row of the
+  same cast has moved him since (Estela's 31021 on 371, frame 10).
+- `Devuelve N PA` (120): the AP sheet in its short sequence, then `jwe 120
+  f20{f1: N, f2: who}` in the caster's name, 117 times in 35 captures.
+- A cast on an empty cell names nobody: no `f2` in its `jwe 300`.
+- A critical cast runs the whole chain on the critical lists. A chained spell
+  with a critical list of its own uses it and its rows go out with `f9=1` and
+  the critical entry's uid (Virtud's shield: `1040 dice 1100 uid 383796`,
+  29723's critical row, next to the ordinary `1000 uid 383778`); one without
+  runs its ordinary list and its rows go out unflagged (Tumulto's 13154). A
+  waiting row keeps the flag and hands it to the live row it turns into. The
+  chained cast's own `jwe 300` carries no `f5`.
+- What a turn trigger fires goes inside one action sequence of the bearer's,
+  after his `jyt`: `jyt -6, jto{-6,3}, jwe 300 13155, ..., jya 67, jwi`
+  (Sentencia). Sent bare, the client applies none of it.
+- `+N% vitalidad` (1078) and `-N%` (1033) are of the maximum life, base and
+  gear included: the naked level-200 test characters of the captures stand at
+  1,150 and get +230 and -575. Announced as the flat rows 125 and 153.
+
+## Portals
+
+Measured on the six Selatrop captures; the rules are `World/Fights/Portals.cs`,
+the frames `Handlers/FightPortals.cs`.
+
+- Laid (1181): `jwe 401 f32{f1{f1{f2: 255, f3: cell}, f2: the row's diceSide
+  (44338, Teleportal's level), f3: its diceNum (2), f4: number, f5: 3, f6: grade,
+  f9: the spell, f10: cell, f11: 1 when on, f12: owner}}` -- `f5` is the kind of
+  mark, 2 on a bomb wall, none on a glyph. Four a Selatrop: the fifth takes the
+  oldest off first (`jwe 310`). Laid off, it is followed by its own `jwe 1181
+  f17{f1: number}`; every other portal it turns on or off by its own.
+- On and off (`jwe 1181 f17{f1: number, f2: 1 when on}`): a portal is on when it
+  can be used and another of its owner's can too; it cannot when it was crossed
+  this turn, when a 1183 switched it off (until that caster's next turn), or when
+  somebody stands on it. The one laid under its own owner counts as free as it is
+  laid (Estela's goes down on and off right after). The turn start brings back
+  what it can, in a `jto 2` of the one beginning, the 1181s in his name.
+- Crossed, walking (or pushed) onto one that is on: inside the walk's sequence,
+  after its 129, `jwe 307` on the portal entered, `1181` off for it and for the
+  way out, `jwe 4` in the walker's name, `jwe 307` on the way out; the walk ends
+  there. A Teleportal (1182) is the same without the first 307. The chain goes
+  from each portal to the nearest usable one not yet in it, the newest between
+  two as near; the last one is the way out, and only it and the first go off.
+- Cast at a portal that is on, a spell -- not one about portals: Neutral aimed at
+  one switches it off -- lands at the way out plus the vector from the caster to
+  the portal, and its `jwe 300` names the chain in its spell's `f1`. The
+  Selatrop's passive then goes off (PST).
+- Not measured: what a spell through portals gains -- the effect's text, "+#3%
+  daños, +#1% por casilla que separe entre 2 portales", is applied as a final
+  percent on its damage and healing.

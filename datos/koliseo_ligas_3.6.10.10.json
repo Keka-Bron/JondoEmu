@@ -1,0 +1,270 @@
+{
+ "_comentario": [
+  "Las ligas del koliseo, sacadas de ArenaLeaguesDataRoot del cliente 3.6.10.11 por",
+  "tools/extraer_ligas_koliseo.py. low/high es la cota que cubre cada division; las vecinas",
+  "se solapan 50 puntos, que es el \"tampon\" del devblog de 2023: se conserva la division",
+  "mientras la cota siga dentro. El tier sale del ornamento, uno por liga."
+ ],
+ "ligas": [
+  {
+   "id": 6,
+   "nameId": 1048152,
+   "tier": "Bronze",
+   "division": 1,
+   "ornamentId": 127,
+   "low": 0,
+   "high": 419,
+   "last": false
+  },
+  {
+   "id": 7,
+   "nameId": 1048153,
+   "tier": "Bronze",
+   "division": 2,
+   "ornamentId": 127,
+   "low": 370,
+   "high": 569,
+   "last": false
+  },
+  {
+   "id": 8,
+   "nameId": 1048154,
+   "tier": "Bronze",
+   "division": 3,
+   "ornamentId": 127,
+   "low": 520,
+   "high": 719,
+   "last": false
+  },
+  {
+   "id": 9,
+   "nameId": 1048157,
+   "tier": "Bronze",
+   "division": 4,
+   "ornamentId": 127,
+   "low": 670,
+   "high": 869,
+   "last": false
+  },
+  {
+   "id": 10,
+   "nameId": 1048156,
+   "tier": "Bronze",
+   "division": 5,
+   "ornamentId": 127,
+   "low": 820,
+   "high": 1019,
+   "last": false
+  },
+  {
+   "id": 16,
+   "nameId": 766756,
+   "tier": "Silver",
+   "division": 1,
+   "ornamentId": 128,
+   "low": 970,
+   "high": 1169,
+   "last": false
+  },
+  {
+   "id": 17,
+   "nameId": 766758,
+   "tier": "Silver",
+   "division": 2,
+   "ornamentId": 128,
+   "low": 1120,
+   "high": 1319,
+   "last": false
+  },
+  {
+   "id": 18,
+   "nameId": 766760,
+   "tier": "Silver",
+   "division": 3,
+   "ornamentId": 128,
+   "low": 1270,
+   "high": 1469,
+   "last": false
+  },
+  {
+   "id": 20,
+   "nameId": 766764,
+   "tier": "Silver",
+   "division": 4,
+   "ornamentId": 128,
+   "low": 1420,
+   "high": 1619,
+   "last": false
+  },
+  {
+   "id": 21,
+   "nameId": 766766,
+   "tier": "Silver",
+   "division": 5,
+   "ornamentId": 128,
+   "low": 1570,
+   "high": 1769,
+   "last": false
+  },
+  {
+   "id": 27,
+   "nameId": 766780,
+   "tier": "Gold",
+   "division": 1,
+   "ornamentId": 129,
+   "low": 1720,
+   "high": 1919,
+   "last": false
+  },
+  {
+   "id": 28,
+   "nameId": 766782,
+   "tier": "Gold",
+   "division": 2,
+   "ornamentId": 129,
+   "low": 1870,
+   "high": 2069,
+   "last": false
+  },
+  {
+   "id": 29,
+   "nameId": 766784,
+   "tier": "Gold",
+   "division": 3,
+   "ornamentId": 129,
+   "low": 2020,
+   "high": 2219,
+   "last": false
+  },
+  {
+   "id": 30,
+   "nameId": 766786,
+   "tier": "Gold",
+   "division": 4,
+   "ornamentId": 129,
+   "low": 2170,
+   "high": 2369,
+   "last": false
+  },
+  {
+   "id": 31,
+   "nameId": 766788,
+   "tier": "Gold",
+   "division": 5,
+   "ornamentId": 129,
+   "low": 2320,
+   "high": 2519,
+   "last": false
+  },
+  {
+   "id": 36,
+   "nameId": 1048158,
+   "tier": "Platinum",
+   "division": 1,
+   "ornamentId": 130,
+   "low": 2470,
+   "high": 2669,
+   "last": false
+  },
+  {
+   "id": 37,
+   "nameId": 1048159,
+   "tier": "Platinum",
+   "division": 2,
+   "ornamentId": 130,
+   "low": 2620,
+   "high": 2819,
+   "last": false
+  },
+  {
+   "id": 38,
+   "nameId": 1048160,
+   "tier": "Platinum",
+   "division": 3,
+   "ornamentId": 130,
+   "low": 2770,
+   "high": 2969,
+   "last": false
+  },
+  {
+   "id": 39,
+   "nameId": 1048161,
+   "tier": "Platinum",
+   "division": 4,
+   "ornamentId": 130,
+   "low": 2920,
+   "high": 3119,
+   "last": false
+  },
+  {
+   "id": 40,
+   "nameId": 1048162,
+   "tier": "Platinum",
+   "division": 5,
+   "ornamentId": 130,
+   "low": 3070,
+   "high": 3269,
+   "last": false
+  },
+  {
+   "id": 42,
+   "nameId": 766811,
+   "tier": "Diamond",
+   "division": 1,
+   "ornamentId": 131,
+   "low": 3220,
+   "high": 3419,
+   "last": false
+  },
+  {
+   "id": 43,
+   "nameId": 766813,
+   "tier": "Diamond",
+   "division": 2,
+   "ornamentId": 131,
+   "low": 3370,
+   "high": 3569,
+   "last": false
+  },
+  {
+   "id": 44,
+   "nameId": 766815,
+   "tier": "Diamond",
+   "division": 3,
+   "ornamentId": 131,
+   "low": 3520,
+   "high": 3719,
+   "last": false
+  },
+  {
+   "id": 45,
+   "nameId": 766817,
+   "tier": "Diamond",
+   "division": 4,
+   "ornamentId": 131,
+   "low": 3670,
+   "high": 3869,
+   "last": false
+  },
+  {
+   "id": 46,
+   "nameId": 766819,
+   "tier": "Diamond",
+   "division": 5,
+   "ornamentId": 131,
+   "low": 3820,
+   "high": 4000,
+   "last": false
+  },
+  {
+   "id": 47,
+   "nameId": 766821,
+   "tier": "Legend",
+   "division": 1,
+   "ornamentId": 132,
+   "low": 3999,
+   "high": 4001,
+   "last": true
+  }
+ ]
+}

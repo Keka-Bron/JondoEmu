@@ -21,7 +21,171 @@
     "A group written here is placed even on a map the indoor veto covers. That veto is a rule",
     "about what Ankama scattered on its own, not about what somebody puts here knowingly.",
     "",
-    "Empty on purpose."
+    "THE KANOJEDO'S PUNCHING BAGS. Six Puch Ingball (494) on 'The Kanojedo' 99090957, one per grade",
+    "from level 1 to level 200, and the same six on the tester dojo 146801922. Cells, facings and",
+    "grades are measured off the jss of Clases/Hipermago (99090957) and Clases/Ocra (146801922):",
+    "every group is one monster, closes with f5 = -1, and the level-200 one travels as grade 6.",
+    "They never move and are never replaced: a kanojedo map fights under the training rulebook,",
+    "which leaves the group where it was after a win.",
+    "",
+    "'orientation' is which way the group faces, 1 to 7, south-east when absent."
   ],
-  "groups": []
+  "groups": [
+    {
+      "map": 99090957,
+      "group": -2000000,
+      "cell": 453,
+      "orientation": 5,
+      "_level": 1,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 0
+        }
+      ]
+    },
+    {
+      "map": 99090957,
+      "group": -2000001,
+      "cell": 409,
+      "orientation": 1,
+      "_level": 25,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "map": 99090957,
+      "group": -2000002,
+      "cell": 325,
+      "orientation": 3,
+      "_level": 50,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 2
+        }
+      ]
+    },
+    {
+      "map": 99090957,
+      "group": -2000003,
+      "cell": 285,
+      "orientation": 3,
+      "_level": 75,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 3
+        }
+      ]
+    },
+    {
+      "map": 99090957,
+      "group": -2000004,
+      "cell": 288,
+      "orientation": 1,
+      "_level": 100,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 4
+        }
+      ]
+    },
+    {
+      "map": 99090957,
+      "group": -2000005,
+      "cell": 331,
+      "orientation": 3,
+      "_level": 200,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 5
+        }
+      ]
+    },
+    {
+      "map": 146801922,
+      "group": -2000006,
+      "cell": 311,
+      "orientation": 3,
+      "_level": 1,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 0
+        }
+      ]
+    },
+    {
+      "map": 146801922,
+      "group": -2000007,
+      "cell": 353,
+      "orientation": 7,
+      "_level": 25,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "map": 146801922,
+      "group": -2000008,
+      "cell": 396,
+      "orientation": 3,
+      "_level": 50,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 2
+        }
+      ]
+    },
+    {
+      "map": 146801922,
+      "group": -2000009,
+      "cell": 425,
+      "orientation": 1,
+      "_level": 75,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 3
+        }
+      ]
+    },
+    {
+      "map": 146801922,
+      "group": -2000010,
+      "cell": 440,
+      "orientation": 1,
+      "_level": 100,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 4
+        }
+      ]
+    },
+    {
+      "map": 146801922,
+      "group": -2000011,
+      "cell": 456,
+      "orientation": 3,
+      "_level": 200,
+      "members": [
+        {
+          "monster": 494,
+          "grade": 5
+        }
+      ]
+    }
+  ]
 }

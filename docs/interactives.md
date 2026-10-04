@@ -96,8 +96,10 @@ registry.
 | Lottery | Graphic 51031 on a haven-bag map | -1 | 184 | `LotteryHandler` |
 | Zaapi | Graphics 70520/70521 (Bonta), 304418 (Brakmar) | 106 | 157 | `ZaapiTravelHandler` |
 | Bin | Graphics 8438, 46529, 63081, 260022 | 105 | 153 | `BinHandler` |
-| HouseDoor | Any of 37 graphics the captures declare type 300 | 300 | 84 | `HouseHandler` |
+| HouseDoor | Any of 37 graphics the captures declare type 300 | 300 | 84; 84, 97, 98, 100, 108 on the 37 doors that can be owned, offered per viewer | `HouseHandler` |
 | HouseExit | The chosen exit element of a house interior | 316 | 184 | `HouseHandler` |
+| HouseChest | Graphics 12367 and 46581 inside a house interior | 85 | 104, 105, offered per viewer | `HouseHandler` |
+| GuildChest | Graphic 70671 (the banks' guild chest) | 388 | 184 | `GuildChestHandler` |
 | Teleport | Exact `(mapId, elementId)` kept from Giny 2.68 after 3.6 validation | 0 | 114 | `TeleportHandler` |
 
 Every one of those `(type, skill)` pairs is measured, not chosen: `tools/tipos_interactivos.py`
@@ -408,18 +410,186 @@ produces a gathered resource. `CraftHandler.TryResolve` resolves a workshop skil
 list; `TryResolveRecipe` additionally prevents a client from asking one workshop skill to execute
 a recipe owned by another.
 
-These handlers are the server-authoritative resolution layer, not yet the network execution
-layer. Two pieces of 3.6 evidence are still required before registering resource nodes and
-workshops in `InteractiveRegistry`:
+### 10.1 Workshop stations
 
-1. a checked `(mapId, elementId) -> skillId/type` mapping;
-2. captures of the 3.6 messages that open a workshop and change/finish a resource state.
+The two pieces of evidence that section once asked for are in: the element-to-skill mapping comes
+out of the captures, and the whole workshop cycle is captured in 3.6.10.10.
 
-`skills.json` does **not** supply the first mapping. In particular, `elementActionId` is an action
-animation/category value and is not the interactive type sent in `jss`; treating it as that type
-would misdeclare zaaps, chests and resources. Giny 2.68 remains useful for behaviour and database
-architecture, but its packet classes and hard-coded element mappings must not be copied as 3.6
-protocol truth.
+`tools/extract_workshops.py` writes `datos/talleres_3.6.10.10.json`, graphic -> type and craft
+skills, from four sources in order of trust:
+
+| Source | What it is | Graphics |
+|---|---|---:|
+| `jss` | a real `jss` declared the element with a craft or forgemagus skill (every skill it offers: the magus table 49506 offers three) | 21 |
+| `use` | an `iwo` on the element answered by an `iwn` with the skill (Bonta's oven 49492, the mill 49511) | 2 |
+| `pr44` | the Incarnam stations PR #44 read off the `jss` of its own JobsIncarnam captures | 15 |
+| `inferred` | a graphic standing in two or more workshop interiors of one job only, that job having one craft skill | 16 |
+
+A workshop interior is a map off the world map (`worldMap` -1) at the coordinates of a
+"Taller de X" hint of the client's `HintsDataRoot`. The farmer, miner and maker have several
+skills and the magus hint stands for six jobs, so none of them is ever inferred. `Workshops`
+reads the table and `InteractiveRegistry` declares every element with one of those graphics:
+577 stations. The type is the measured one, or the one most often measured for the same skill.
+
+### 10.2 The cycle
+
+```text
+open    C iwo                       S iwn { f1: 1, element, skill, who }, ivx (kamas in f1), hlm {}, kgq { skill }
+        C itr { f3: 2 }             S ivx, hlm {}                      (12 of 12 in the captures)
+recipe  C kew { f2: result }        S kfb per stack: { f1 { f1: 63, f5: item }, f3: 0.0 }
+move    C kcr { f1: ±n, f2: uid }   S kfb in, kex changed, kfs { uid } out
+count   C kdx { f1: n }             S kgl { f1: n }
+craft   C kep { f1: true, f2: step }
+                                    S ium or ivj { f2 { left, 1 }, f3 { uid, left } } and kfs per stack
+                                      itf { f1 { 63, item } } for new items, itu { f1 { uid, total } } for a stack
+                                      kdr { f2 { f4: item }, f3: 2 }   (one craft: the whole item; several: { gid, n })
+                                      isz on a new level, irq, iun, kgl { 1 } after several
+        no recipe                   S kdr {}                            (the wrong gift paper)
+close   C kla                       S khd { f3: 11 }, ivx, hlm {}
+```
+
+`kep`'s f2 is the exchange's step, not a quantity (25 in the tutorial, 1 to 5 in the grinder).
+The count is `kdx`. A bench makes a recipe only with exactly its ingredients; the job must be at
+the recipe's level, except for the "Base" job 1 (the grinder's fusions), which gives no
+experience. An item whose template rolls anything is created one by one, each rolled in its own
+ranges; one that rolls nothing joins a stack of the same thing.
+
+Experience per craft is the formula players measured on the official server,
+`⌊20 · recipe level / (1 + 0.1 · (job level − recipe level)^1.1)⌋`: the tutorial's level-1 ring
+gives 20 at job level 1, as captured. A level-up sends `isz { f1 { f2: job, f4: skills }, f3:
+level }` before the `irq`, from the workshop and now from gathering too.
+
+### 10.3 Smithmagic
+
+A magus table is a workshop whose skill `isForgemagus`. The item goes on it with `kcr` (it must
+be of one of the skill's `modifiableItemTypeIds`); a rune is applied with `kcj { f1: rune, f3: 1,
+f6: true }`, and every rune answers, in the captured order:
+
+```text
+kfb (the rune)   irq (only if it entered)   ivj or ium   kfs
+kdr { f2 { f1: pool change 0/1/2, f3: pool, f4: item }, f3: 1 failure / 2 success }
+kex (the item)   iun   kdb { f2: true }
+```
+
+The other way of the captures: the rune laid in its slot with `kcr`, then `kep` applies it (the
+same answer without the `kfb` and the `kdb`). A signature rune laid on the table with `kcr` goes
+with the next rune, spent either way, and signs only if that rune enters.
+
+What a rune does is in `Forgemagic`. The weights are the client's `effectPowerRate`; the pool
+takes the loss first and keeps what a whole point overshoots, as the 114 captured runes show. The
+odds are the community's model, with its constants named in the code: 66/34/0 on a weak item,
+43/50/7 at the perfect jet, a floor of 15/50/35, a rune's reach of 30·√weight past which it fades
+to 1%, over and exo never past a weight of 101, exo AP/MP/range at 1% and only one of them. The
+pool is kept as a hidden line of the item's effects (`-1`, hundredths of weight) and never goes on
+the wire; with the signatures (988 "Fabricado por", 985 "Modificado por", from the signature rune
+7508) it lives in the item's row and goes wherever the item goes.
+
+### 10.4 A commission: maging someone else's item
+
+`CommissionHandler`. Measured whole from the magus' side (two sessions, one of them paid) and from
+the customer's up to accepting:
+
+```text
+invite   C kbl { f1: other, f2: skill, f3: 10 I am the magus / 11 I am the customer }
+         S kgu { f1: other, f2: my role, f3: who invited } + hlm {}, to each of the two
+         S kdv { f1: 3 }                       no table with that skill on the magus' map
+refuse   C kla   S khd { f3: 11 } + hlm {}
+accept   C kgi   customer: iss { the magus' job } + kgw { magus' level, skill }; magus: keg { skill }
+offer    magus sees ked { item, f4: true }, kcl { kamas }, kgt { f3: ready, f4: customer }
+table    C kgd { f1: ±1, f4: uid }   S keo + kfb onto the table, kfs + ked back to the offer
+runes    the magus table's, on the customer's item, from either one's bag
+close    C kla   magus: lqs { 64, "+", n } + lqn 594 + ivf when paid, kcl {}, khd, ivx, hlm
+```
+
+The customer's view of the magus' work is not captured: it is the magus' messages with the "the
+other one did it" flag each of them has (`kfb` f2, `kfs` f2, `kex` f1, `ked` f4), set the way the
+trade capture sets it on the side of the one who did not act. The payment comes from `kee`, the
+kamas of a trade. The customer pays at the close if they were ready and a rune went onto their
+item, which is exactly when the second captured session pays its 5,000.
+
+### 10.5 Breaking items at the grinder
+
+The grinder offers two skills in its `jss`: 121 fuses runes (an ordinary recipe) and 181 breaks.
+
+```text
+open     C iwo                        S iwn, kbv {}
+lay      C kcr { f1: ±n, f2: uid }    S kfb (no float), kfs
+break    C kbj { f2: true, f3: step } S kgt { f3: 1, f4: me }, ium per item, ivj or iua per rune,
+                                        iun, kfp { per item: uid, its runes, its coefficient twice }
+close    C kla                        S khd { f3: 11 }
+```
+
+Every characteristic gives runes of its base rune (the smallest of it), by the community's formula
+`(3 · value · weight · level / 200 + 1) · coefficient / rune weight`, the fraction being the
+chance of one more. It holds on the seven captured lines, with the coefficients the server itself
+reported (40%, 66%, 236%). How the official coefficient moves is not known; here each template
+starts at 100%, loses 1% of it per unit broken and grows back 2 points an hour (`Breaking`).
+
+A focus turns the other characteristics into the focused one: its own weight plus half of every
+other line's, all given in its rune (the rule players give on the official forum). No capture
+focuses: `kbj` leaves two int32 unused, f1 and f4, and whichever arrives set is taken for the
+focus -- an effect, or a rune -- with the raw frame written to the console until a real one
+settles it.
+
+### 10.6 The artisans' directory
+
+`ArtisanHandler`, measured in four captures:
+
+```text
+settings C irl { f1 { f3: job, f4: free, f5: minimum level } }
+         S isd { f1 (repeated) { f3: job, f4: free, f5: minimum level } }   every job, every time
+listing  C kef { f2: [job] }          S iro { f1 { f1: job, f2: listed } }   a toggle
+the book C iwo                        S iwn, kfj { f2: [the workshop's jobs] }
+a job    C isr { f2: job }            S isf { entries }; isv when one comes, isq when one goes
+close    C kla                        S khd { f3: 11 }
+entry    { f1 { f2: job, f3: minimum level, f4: free, f5: job level },
+           f2 { f1 { f1: 1 }, f2: name, f3: breed, f4: id, f5: sex, f7 { f1: map } } }
+```
+
+The settings live in `CharacterCrafterSettings` and replace, at the entry into the world, the
+captured `isd` -- which gave every character the capturer's own minimum levels. A job never
+touched is free with a minimum level of 1, as the capture's untouched jobs are. The directory
+lists the base job and every job with a recipe, a resource or a magus table: exactly the 21 of
+the real `isd`, the six magi in, Pergamago and Bestiólogo left out. The book of a workshop (graphic 13493, "Consultar", skill 170)
+opens the jobs of the stations on its map, or of the workshop hint at its coordinates: the
+farmers' book [28], the magi's the six magus jobs, as the captures show. Only connected artisans
+are listed; the list is told when one joins or leaves it, or disconnects, but not when one
+changes map.
+
+### 10.7 Transcendence runes
+
+The Infinite Dreams' "Runa Ta/Buta/Suta" (item type 211, 81 of them) say what they do in their
+own template: the characteristic, 2827 "100% de probabilidades de éxito", 2825 "Ninguna forjamagia
+futura", and a 2826 without text, 40, 60 or 80. The client's help text: they "cannot fail and make
+the item insensitive to any other smithmagic". The rules, the way players describe them and the
+way the 2826 fits the community's table to the unit:
+
+- never on an item with an over or an exo, and never twice (the first one leaves 2825);
+- a line the item already has may weigh at most 101 minus the 2826: 61, 41 and 21 strength; 8,
+  5 and 3 AP reduction; 12, 8 and 4 elemental damage; 6 and 2 critical;
+- they go on whole, nothing else lost, and the item then takes no rune;
+- refused, the item stays as it was and the rune is not spent.
+
+On a commission only the customer's own transcendence is accepted: the real game asks the
+customer first ("¿Aceptas que el artesano fusione este objeto con una runa de trascendencia?")
+and that question is not captured.
+
+### 10.8 Forgegod mode
+
+`.forjadios on | off` (`.forgegod` in English, `.forgedieu` in French), administrators only (role
+5), for the session that types it until it is turned off or the character logs out. At the forge
+of that character, and on a commission's table where it is the magus:
+
+- every rune goes in clean: no failure, no loss, the pool untouched;
+- no cap: an over or an exo past a weight of 101, two AP of exo or more, any number of exos;
+- a transcendence goes on anything, over, exo or already transcended, and never fails;
+- an item "sin forjamagia futura" takes runes again;
+- a magus table takes any item, whatever its type;
+- a recipe asks no job level.
+
+Corruption runes, the double-edged ones of the same help text, do not exist in the 3.6.10 game
+data: no item and no item type carries them. Ankama took them out of the Infinite Dreams'
+rewards in 2.51, and only the text is left.
 
 ---
 

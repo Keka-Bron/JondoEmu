@@ -109,14 +109,17 @@ namespace Jondo.Unity.Server.Network
                         {
                             try
                             {
-                                await SessionRegistry.BroadcastToMapAsync(
-                                    sesion.MapId,
-                                    ConnectionProtocol.BuildActorLeft(sesion.CharacterId),
-                                    sesion.Id);
+                                await SessionRegistry.RemoveFromMapAsync(
+                                    sesion.MapId, sesion.CharacterId, sesion.Id);
                             }
                             catch { }
                             sesion.LeaveWorld();
                         }
+
+                        // A commission half done ends for the one left behind too.
+                        try { await CommissionHandler.AbandonAsync(sesion); } catch { }
+                        try { await TradeHandler.AbandonAsync(sesion); } catch { }
+                        try { await ArtisanHandler.LeftAsync(sesion); } catch { }
 
                         // Guardar al cerrar, que no se hacía en ninguna parte: hasta ahora el
                         // personaje sólo se escribía cuando algo lo provocaba de paso, así que
@@ -125,7 +128,14 @@ namespace Jondo.Unity.Server.Network
                         {
                             try
                             {
-                                using (SessionContext.Push(sesion)) DatabaseManager.SaveCurrentCharacter();
+                                using (SessionContext.Push(sesion))
+                                {
+                                    // Off the arena first. A client closed in the middle of a
+                                    // fight was being saved on the tactical map, and came back
+                                    // to it on the next login, fight music and all.
+                                    FightHandler.BackToRoleplayMap();
+                                    DatabaseManager.SaveCurrentCharacter();
+                                }
                                 Console.WriteLine($"[Game Node] {sesion.State.CharacterName} saved on the " +
                                                   $"way out: map {sesion.State.MapId}, cell {sesion.State.CellId}.");
                             }
@@ -195,12 +205,19 @@ namespace Jondo.Unity.Server.Network
                     if (HandleTicketPresentation(payload, ref sessionAccountId, ref sessionServerId))
                     {
                         var characters = DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId);
-                        foreach (byte[] frame in ConnectionProtocol.BuildWelcomeBurst(characters))
+
+                        // One of them still in a fight: the burst stops short of the list, and
+                        // the list goes out with the kvd behind it when the client asks (kvc).
+                        // Sending the list inside the burst and the kvd after it -- behind the
+                        // jtg -- put the client on the character screen anyway.
+                        bool backIntoAFight = characters.Any(c => FightHandler.FightToRejoin(c.Id) != null);
+                        foreach (byte[] frame in ConnectionProtocol.BuildWelcomeBurst(characters, withList: !backIntoAFight))
                         {
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
                         }
                         Console.WriteLine($"[Game Node] Burst sent to account {sessionAccountId}: " +
-                                          $"{characters.Count} character(s) on server {sessionServerId}.");
+                                          $"{characters.Count} character(s) on server {sessionServerId}" +
+                                          (backIntoAFight ? ", one of them still in a fight." : "."));
                     }
                     else
                     {
@@ -224,12 +241,25 @@ namespace Jondo.Unity.Server.Network
                         ConnectionProtocol.Push(Op.Kqr, BuildKqrPayload(sessionAccountId)));
                     // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
                     // el de arena es de instancia y quedarse ahí es quedarse encerrado.
-                    FightHandler.LeaveFight();
+                    //
+                    // But the fight itself stays, the same as when the socket simply dies: the
+                    // character is still in it, the next character list carries the kvd, and he
+                    // can come back. LeaveFight -- which throws the whole fight away -- is only
+                    // for a fight he could not go back to anyway.
+                    if (FightHandler.FightToRejoin(SessionContext.State.CharacterId) != null)
+                    {
+                        FightHandler.BackToRoleplayMap();
+                        SessionContext.State.IsInFight = false;
+                        SessionContext.State.FightId = 0;
+                    }
+                    else
+                    {
+                        FightHandler.LeaveFight();
+                    }
                     if (SessionContext.Current.IsInWorld)
                     {
-                        await SessionRegistry.BroadcastToMapAsync(
-                            SessionContext.State.MapId,
-                            ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId),
+                        await SessionRegistry.RemoveFromMapAsync(
+                            SessionContext.State.MapId, SessionContext.State.CharacterId,
                             SessionContext.Current.Id);
                         SessionContext.Current.LeaveWorld();
                     }
@@ -268,7 +298,12 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lte)))
                 {
-                    await KoliseoHandler.ReturnAsync(stream);
+                    await KoliseoHandler.ReturnAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lsi)))
+                {
+                    // The Koliseo window's "leave the queue".
+                    await KoliseoHandler.LeaveQueueAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lux)))
                 {
@@ -324,43 +359,66 @@ namespace Jondo.Unity.Server.Network
                         return;
                     }
 
-                    // Block 1 of the world entry, replayed from the 3.6.10.10 capture with the
-                    // identity rebuilt from the database. The real server stops here and waits
-                    // for the client to confirm with lqc before sending anything else.
-                    var chosen = DatabaseManager.GetCharacterById(GameState.CharacterId);
-                    if (chosen == null)
+                    // Picking a character that is still in a fight the ordinary way -- not the
+                    // kwb of "go on then" -- is turning the fight down: he gives it up, the
+                    // others get his surrender, and he enters the world where he left it.
+                    var turnedDown = FightHandler.FightToRejoin(GameState.CharacterId);
+                    if (turnedDown != null)
+                    {
+                        await FightHandler.AbandonFromOutsideAsync(turnedDown, GameState.CharacterId);
+                    }
+
+                    // A fresh entry into the world: the map block is owed again.
+                    hasSentMapBlock = false;
+                    if (!await EnterWorldAsync(stream)) return;
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvc)))
+                {
+                    // The client asks for the list. On an ordinary login it already has it; when
+                    // a character is still in a fight this is where it goes, with the empty kvd
+                    // behind it: "do not stop here". The client answers kwb, handled below.
+                    var characters = DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId);
+                    var stillFighting = characters.FirstOrDefault(c => FightHandler.FightToRejoin(c.Id) != null);
+                    if (stillFighting != null)
+                    {
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push(Op.Kvi, ConnectionProtocol.BuildCharactersList(characters)));
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push(Op.Kvd));
+                        Console.WriteLine($"[Game Node] {stillFighting.Name} is still in a fight: kvi and kvd sent.");
+                    }
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kwb)))
+                {
+                    // "Go on then": the answer to the kvd. The character is the one of this
+                    // account still in a fight; the message itself names nobody.
+                    long back = 0;
+                    Jondo.Unity.World.Fights.FightInstance? fightToRejoin = null;
+                    foreach (var candidate in DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId))
+                    {
+                        fightToRejoin = FightHandler.FightToRejoin(candidate.Id);
+                        if (fightToRejoin != null) { back = candidate.Id; break; }
+                    }
+                    if (fightToRejoin == null
+                        || !CharacterSelectionHandler.SelectCharacter(back, sessionAccountId))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"[Game Node] Character {GameState.CharacterId} is not in the database.");
+                        Console.WriteLine("[Game Node] kwb without a fight to go back to. Closing the session.");
                         Console.ResetColor();
                         return;
                     }
 
-                    // A fresh entry into the world: the map block is owed again, and the
-                    // inventory is read from the database for this character.
                     hasSentMapBlock = false;
-                    Managers.Equipment.LoadFrom(chosen.Id);
-                    Managers.SpellChoices.LoadFrom(chosen.Id);
-                    Managers.Quests.LoadFrom(chosen.Id);
-                    Managers.Achievements.LoadFrom(chosen.Id);
-                    SessionContext.State.ElementsUsed =
-                        DatabaseManager.LoadElementsUsed(chosen.Id);
-
-                    SessionContext.Current.EnterWorld();
-                    await SessionRegistry.BroadcastToMapAsync(
-                        SessionContext.State.MapId,
-                        ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                            chosen, SessionContext.State.CellId, SessionContext.State.Orientation,
-                            SessionContext.Current.AccountId)),
-                        SessionContext.Current.Id);
-
-                    await WorldEntry.SendAfterCharacterAsync(stream, chosen);
-
-                    // Block 2 goes out straight after. In the capture the client asks for it with
-                    // lqc, and it does send that lqc here too, only later: it comes once the client
-                    // has digested block 1, by which time ours has already sent block 2. Waiting
-                    // for it would leave the client without the catalogues for no reason.
-                    await WorldEntry.SendAfterConfirmAsync(stream, chosen);
+                    FightHandler.RejoinState(fightToRejoin);
+                    if (!await EnterWorldAsync(stream)) return;
+                }
+                else if ((payloadStr.Contains(Op.Uri(Op.Ijm)) || payloadStr.Contains(Op.Uri(Op.Kmv)))
+                         && FightHandler.PendingResume() != null)
+                {
+                    // Back into a fight already running: the board as it is now, once, and the
+                    // client picks the fight up from there. The placement case is not this: it
+                    // goes through the preparation below, from scratch, as the capture does.
+                    await FightHandler.ResumeForOneAsync(stream, FightHandler.PendingResume()!);
                 }
                 else if ((payloadStr.Contains("type.ankama.com/jrh")
                           || payloadStr.Contains(Op.Uri(Op.Kmv)))
@@ -408,27 +466,19 @@ namespace Jondo.Unity.Server.Network
                         // Nothing open survives a map change either: otherwise the X of the new
                         // map's zaap is taken by a conversation the player left behind.
                         NpcHandler.Forget();
+                        WorkshopHandler.Forget();
+                        MarketplaceHandler.Forget();
+                        await Handlers.DreamHandler.OnMapLoadedAsync(stream);
                         await Managers.Quests.SendMarksAsync(stream, GameState.MapId);
-
-                        // Y si esto es una sala de mazmorra, el grupo se pone al tamaño del equipo.
-                        // Aquí, antes de construir los actores: el grupo se DIBUJA en el mapa, así
-                        // que verlo de tres y pelear contra siete sería peor que no ajustarlo.
-                        var equipo = Managers.Parties.Of(GameState.CharacterId);
-                        int atacantes = equipo == null
-                            ? 1
-                            : Managers.Parties.MembersOf(equipo).Count;
-                        int quedan = Managers.MobSpawnManager.SizeRoomToParty(GameState.MapId, atacantes);
-                        if (quedan > 0)
-                        {
-                            Console.WriteLine($"[Mazmorra] La sala {GameState.MapId} se pone a " +
-                                              $"{quedan} monstruo(s) para {atacantes} atacante(s).");
-                        }
 
                         byte[] actors = ConnectionProtocol.Push(Op.Jss,
                             ConnectionProtocol.BuildMapActors(GameState.MapId, here,
                                                               GameState.CellId, GameState.Orientation,
                                                               sessionAccountId));
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, actors);
+
+                        // How many fights the map has, right behind its actors when it has any.
+                        await FightHandler.SendFightCountAsync(stream, GameState.MapId);
 
                         // And straight behind it, the mark that says there are no more actors. In
                         // every capture that loads a map lva comes immediately after jss, and
@@ -458,6 +508,11 @@ namespace Jondo.Unity.Server.Network
                         var mapaInfo = MapManager.GetMapInfo(GameState.MapId);
                         await Managers.Quests.OnMapEnteredAsync(stream, GameState.MapId,
                                                                 mapaInfo?.SubAreaId ?? 0);
+
+                        // And the achievements that walking here earns: the zone explored, and
+                        // the level and the bag looked at again. Same place, same reason.
+                        await Managers.Achievements.OnMapEnteredAsync(stream, GameState.MapId,
+                                                                      mapaInfo?.SubAreaId ?? 0);
 
                         Console.WriteLine($"[Game Node] Actors of map {GameState.MapId} sent: " +
                                           $"{here.Name} on cell {GameState.CellId}.");
@@ -497,6 +552,10 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains("type.ankama.com/jqi"))
                 {
                     await WorldMoveHandler.AllowMapExitAsync(stream, payload);
+
+                    // A party member whose leader opened a fight while he was walking goes in
+                    // when his walk ends, as the follow capture does.
+                    await FightHandler.AfterWalkAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jqk)))
                 {
@@ -588,9 +647,150 @@ namespace Jondo.Unity.Server.Network
                 {
                     await Handlers.PartyHandler.PromoteAsync(stream, payload);
                 }
+                // Following the party leader: see Handlers.PartyFollowHandler.
+                else if (payloadStr.Contains(Op.Uri(Op.Imh)))
+                {
+                    await Handlers.PartyFollowHandler.FollowAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Imo)))
+                {
+                    await Handlers.PartyFollowHandler.UnfollowAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Ktb)))
                 {
                     await Handlers.PrivateMessageHandler.WhisperAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jjg)))
+                {
+                    // Crear un gremio.
+                    await Handlers.GuildHandler.CreateAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jho)))
+                {
+                    // Abandonar el gremio.
+                    await Handlers.GuildHandler.LeaveAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlx)))
+                {
+                    // La pestaña de candidaturas. Va delante del jml al abrir la ventana.
+                    await Handlers.GuildHandler.ApplicationsAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jml)))
+                {
+                    // The guild window's members.
+                    await Handlers.GuildHandler.MembersAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlk)))
+                {
+                    // The guild window opens: the chest's tabs and the header. The window used to
+                    // come out black when the client sent jlk and jii and waited: it was waiting
+                    // for these, and for the jfp's jff as an answer.
+                    await Handlers.GuildHandler.OpenWindowAsync(stream);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jii)))
+                {
+                    // A tab of the guild window: the real server never answers it (26 of 28
+                    // captured, the other two answered by their neighbours). It was answered with
+                    // the guild again, jgw first, and every tab printed "acabas de unirte".
+                }
+                // The guild window's tabs whose contents this server does not keep, answered empty
+                // as the captures of a new guild answer them (see Op.Jfv to Op.Hxm).
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfv)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jfs, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jeu)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jei, 3);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jga)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jfz, 1);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jgr)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jgq, 1);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jet)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jdb, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfw)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jfr, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hzc)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Ice, 1);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hvx)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Hxm, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jew)))
+                {
+                    // When the week starts again: asked at world entry too.
+                    await Handlers.GuildHandler.WeeklyResetAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jiy)))
+                {
+                    // La ficha del anuario o las contribuciones que quedan, según la pestaña.
+                    await Handlers.GuildHandler.TabAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfp)))
+                {
+                    await Handlers.GuildHandler.BenefitsAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jcs)))
+                {
+                    await Handlers.GuildHandler.RanksAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jct)))
+                {
+                    await Handlers.GuildHandler.EditRankAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jck)))
+                {
+                    await Handlers.GuildHandler.SetRightsAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jcv)))
+                {
+                    await Handlers.GuildHandler.CreateRankAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jjj)))
+                {
+                    await Handlers.GuildHandler.NoteAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jim)))
+                {
+                    await Handlers.GuildHandler.LogAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jcc)))
+                {
+                    await Handlers.GuildHandler.SetProfileAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jjm)))
+                {
+                    await Handlers.GuildHandler.SearchAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlt)))
+                {
+                    // Ver una candidatura.
+                    await Handlers.GuildHandler.ApplicationDetailAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jjn)))
+                {
+                    // Aceptar una candidatura.
+                    await Handlers.GuildHandler.AcceptApplicationAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jiz)))
+                {
+                    // Contestar a una invitación de gremio.
+                    await Handlers.GuildHandler.AnswerInvitationAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jki)))
+                {
+                    // Abrir la tienda del gremio.
+                    await Handlers.GuildHandler.OpenShopAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jkw)))
+                {
+                    // Comprar un oráculo.
+                    await Handlers.GuildHandler.BuyOracleAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jky)))
+                {
+                    // Activarlo.
+                    await Handlers.GuildHandler.ActivateOracleAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlb)))
+                {
+                    // Contribuir al gremio.
+                    await Handlers.GuildHandler.ContributeAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyc)))
                 {
@@ -601,6 +801,21 @@ namespace Jondo.Unity.Server.Network
                 {
                     // Empezar un sueno, o descartar el que hubiera.
                     await DreamHandler.StartOrDiscardAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iym)))
+                {
+                    // Buying at the fountain (inferred).
+                    await DreamHandler.BuyAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixq)))
+                {
+                    // The loot table of the dream's room.
+                    await DreamHandler.DropTableAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kaz)))
+                {
+                    // Where a fight here would place everybody.
+                    await DreamHandler.PositionsAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Izh)))
                 {
@@ -617,6 +832,36 @@ namespace Jondo.Unity.Server.Network
                     // Todos los elementos pasan por el mismo registro; él decide qué acción hay
                     // detrás sin mezclar datos entre mapas ni entre sockets.
                     await InteractiveActionHandler.UseAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Izv)))
+                {
+                    // A house's plaque, asked for by the sale window.
+                    await HouseHandler.InfoAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Jan)))
+                {
+                    // The house sale window's answer: on sale at a price, or off sale.
+                    await HouseHandler.SellAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Jad)) || payloadStr.Contains(Op.Uri(Op.Jal)))
+                {
+                    // A buyer's yes, by inference: see HouseHandler.BuyAsync.
+                    await HouseHandler.BuyAsync(stream, payload, payloadStr.Contains(Op.Uri(Op.Jad)) ? Op.Jad : Op.Jal);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Khv)))
+                {
+                    // An owner's code keypad: the door's or a chest's.
+                    await HouseHandler.ChangeCodeAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Khw)))
+                {
+                    // A stranger's code keypad: a locked door or chest.
+                    await HouseHandler.UseCodeAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Jll)))
+                {
+                    // Another tab of the guild chest.
+                    await GuildChestHandler.SelectTabAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jbn)))
                 {
@@ -649,8 +894,133 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kcr)))
                 {
-                    // Mover un objeto entre la bolsa y el cofre.
-                    await ChestHandler.MoveAsync(stream, payload);
+                    // Mover un objeto entre la bolsa y el cofre. The same kcr lays a stack on a
+                    // commission's offer, on a workshop's bench, or on a magus table.
+                    // And in a marketplace open to sell, it takes a lot back off sale.
+                    // And a house chest, a bin or the guild chest.
+                    if (!await CommissionHandler.OfferAsync(stream, payload)
+                        && !await TradeHandler.MoveAsync(stream, payload)
+                        && !await WorkshopHandler.MoveAsync(stream, payload)
+                        && !await BankHandler.MoveAsync(stream, payload)
+                        && !await StorageHandler.MoveAsync(stream, payload)
+                        && !await MarketplaceHandler.WithdrawAsync(payload))
+                        await ChestHandler.MoveAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kdk)))
+                {
+                    // A marketplace: follow an item type, or stop.
+                    await MarketplaceHandler.TypeAsync(payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Keh)))
+                {
+                    // A marketplace: follow an item and see its offers, or stop.
+                    await MarketplaceHandler.ItemAsync(payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kbm)))
+                {
+                    // A marketplace: buy a lot.
+                    await MarketplaceHandler.BuyAsync(payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kbz)))
+                {
+                    // A marketplace open to sell: an item's prices.
+                    await MarketplaceHandler.PriceAsync(payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kge)))
+                {
+                    // A marketplace open to sell: a lot goes on sale.
+                    await MarketplaceHandler.SellAsync(payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kch)))
+                {
+                    // A marketplace open to sell: a new price for a lot on sale.
+                    await MarketplaceHandler.ChangePriceAsync(payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Lar)))
+                {
+                    // The sales history window opened: the account's history.
+                    await MarketplaceHandler.SalesHistoryAsync();
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kew)))
+                {
+                    // A recipe picked in the workshop's list.
+                    await WorkshopHandler.SelectRecipeAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kdx)))
+                {
+                    // How many times to craft it.
+                    await WorkshopHandler.CountAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kep)))
+                {
+                    // Ready: a commission's customer, or in a workshop the craft button.
+                    if (!await CommissionHandler.ReadyAsync(stream, payload)
+                        && !await TradeHandler.ReadyAsync(stream, payload))
+                        await WorkshopHandler.CraftAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kcj)))
+                {
+                    // A rune on the magus table.
+                    await WorkshopHandler.RuneAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kbj)))
+                {
+                    // Break what is on the grinder.
+                    await WorkshopHandler.BreakAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kbl)))
+                {
+                    // An invitation to a commission, from the magus or from the customer.
+                    await CommissionHandler.InviteAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kgi)))
+                {
+                    // Accepting it, or a trade.
+                    if (!await CommissionHandler.AcceptAsync(stream)) await TradeHandler.AcceptAsync();
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kgd)))
+                {
+                    // The magus moves one of the customer's stacks onto the table or back.
+                    await CommissionHandler.MoveAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Irl)))
+                {
+                    // A job's settings as an artisan.
+                    await ArtisanHandler.SettingsAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kef)))
+                {
+                    // In or out of the public artisans' list.
+                    await ArtisanHandler.ToggleListingAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Isr)))
+                {
+                    // One job's artisans.
+                    await ArtisanHandler.ListAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kee)))
+                {
+                    // Kamas in an exchange: a commission's payment, the bank's, or a trade's.
+                    if (!await CommissionHandler.PaymentAsync(stream, payload)
+                        && !await BankHandler.KamasAsync(stream, payload)
+                        && !await HouseHandler.KamasAsync(stream))
+                        await TradeHandler.KamasAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Jzx)))
+                {
+                    // A side's fight option switched: no spectators, party only, closed, help.
+                    await FightHandler.FightOptionAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Keu)))
+                {
+                    // Asking another player to trade.
+                    await TradeHandler.RequestAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Itr)))
+                {
+                    // The client asks for its inventory again. Silenced until now; the real
+                    // server answers ivx and hlm the twelve times it is captured.
+                    await WorkshopHandler.InventoryAsync(stream);
                 }
                 else if (payloadStr.Contains("type.ankama.com/lyk"))
                 {
@@ -721,7 +1091,14 @@ namespace Jondo.Unity.Server.Network
                     // Va DELANTE del zaap porque el zaap es el caso por defecto y no tiene guarda
                     // propia: con la conversación abierta, cualquier orden que deje el zaap antes
                     // se queda con la X que era del diálogo.
-                    if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
+                    if (await CommissionHandler.CloseAsync()) { }
+                    else if (await TradeHandler.CloseAsync()) { }
+                    else if (MarketplaceHandler.IsOpen) await MarketplaceHandler.CloseAsync();
+                    else if (WorkshopHandler.IsOpen) await WorkshopHandler.CloseAsync(stream);
+                    else if (BankHandler.IsOpen) await BankHandler.CloseAsync(stream);
+                    else if (await HouseHandler.CloseDialogAsync(stream)) { }
+                    else if (StorageHandler.IsOpen) await StorageHandler.CloseAsync(stream);
+                    else if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
                     else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
                     else if (NpcHandler.IsDialogueOpen) await NpcHandler.CloseAsync(stream, payload);
                     else await ZaapTravelHandler.CloseAsync(stream);
@@ -932,8 +1309,10 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Iov)))
                 {
-                    // Ha clicado un NPC: según la acción, se le abre la tienda o el diálogo.
-                    await NpcHandler.InteractAsync(stream, payload);
+                    // Ha clicado un NPC: según la acción, se le abre la tienda o el diálogo. With
+                    // a marketplace open and no NPC, it is its buy or sell button.
+                    if (!await MarketplaceHandler.ModeAsync(payload))
+                        await NpcHandler.InteractAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Ioy)))
                 {
@@ -966,6 +1345,37 @@ namespace Jondo.Unity.Server.Network
                     // Ha pulsado el botón de cobrar un logro. El -1 es «todos los que me debas».
                     await AchievementHandler.ClaimAsync(stream, payload);
                 }
+                else if (payloadStr.Contains(Op.Uri(Op.Mfe)))
+                {
+                    // The achievement window opening: the ones closest to being earned.
+                    await AchievementHandler.OpenedAsync(stream);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Mfp)))
+                {
+                    await AchievementHandler.SecondRequestAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Mff)))
+                {
+                    // A category of the achievement window.
+                    await AchievementHandler.CategoryAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Mfm)))
+                {
+                    await AchievementHandler.DetailsAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Khl)))
+                {
+                    // An emote from the emote bar, sitting included.
+                    await EmoteHandler.PlayAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Hov)))
+                {
+                    await EmoteHandler.SmileyAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Hor)))
+                {
+                    await EmoteHandler.MoodAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Krc)))
                 {
                     await StatsHandler.HandleStatsUpgradeRequest(stream, payload);
@@ -975,6 +1385,17 @@ namespace Jondo.Unity.Server.Network
                     // Atacar a un grupo de monstruos. Es lo que manda el cliente de verdad al
                     // lanzar un combate: lleva el id contextual del grupo.
                     await FightHandler.AttackAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Kay)))
+                {
+                    // Into somebody else's fight during its placement: the swords on the map or
+                    // the party window.
+                    await FightHandler.JoinRequestAsync(stream, payload);
+                }
+                else if (FightHandler.IsAutoOptionRequest(payloadStr))
+                {
+                    // The party window's automatic entry and automatic ready.
+                    await FightHandler.AutoOptionAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jzy)) || payloadStr.Contains(Op.Uri(Op.Kaq))
                          || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
@@ -1027,7 +1448,7 @@ namespace Jondo.Unity.Server.Network
                     string cleanPayload = payloadStr.Replace("?", "").Trim();
                     if (cleanPayload.Contains(Op.Kmw) || cleanPayload.Contains("klw") || cleanPayload.Contains("knb") || 
                         cleanPayload.Contains("klo") || cleanPayload.Contains("kmt") || cleanPayload.Contains(Op.Jgv) || 
-                        cleanPayload.Contains(Op.Jct) || cleanPayload.Contains(Op.Jfc) || cleanPayload.Contains(Op.Kqk) || 
+                        cleanPayload.Contains(Op.Jfc) || cleanPayload.Contains(Op.Kqk) || 
                         cleanPayload.Contains(Op.Itr) || cleanPayload.Contains(Op.Knc) || cleanPayload.Contains("kna") || 
                         cleanPayload.Contains(Op.Hmt) || cleanPayload.Contains("lxi") || cleanPayload.Contains(Op.Jqf) ||
                         // kmv comes with jrh on every map load and expects nothing back; hnn is the
@@ -1073,6 +1494,55 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
+        /// What follows a selection, whoever made it: the character's things are read from the
+        /// database, the session enters the world, and blocks 1 and 2 go out. False when the
+        /// character is not in the database, which closes the session.
+        /// </summary>
+        private static async Task<bool> EnterWorldAsync(NetworkStream stream)
+        {
+            // Block 1 of the world entry, replayed from the 3.6.10.10 capture with the identity
+            // rebuilt from the database. The real server stops here and waits for the client to
+            // confirm with lqc before sending anything else.
+            var chosen = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            if (chosen == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"[Game Node] Character {GameState.CharacterId} is not in the database.");
+                Console.ResetColor();
+                return false;
+            }
+
+            Managers.Equipment.LoadFrom(chosen.Id);
+            Managers.SpellChoices.LoadFrom(chosen.Id);
+            Managers.Quests.LoadFrom(chosen.Id);
+            Managers.Achievements.LoadFrom(chosen.Id);
+            Managers.Emotes.LoadFrom(chosen.Id);
+            SessionContext.State.ElementsUsed = DatabaseManager.LoadElementsUsed(chosen.Id);
+
+            SessionContext.Current.EnterWorld();
+
+            // Somebody going back into a fight is not on a roleplay map for anybody to see.
+            if (!GameState.IsInFight)
+            {
+                await SessionRegistry.BroadcastToMapAsync(
+                    SessionContext.State.MapId,
+                    ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
+                        chosen, SessionContext.State.CellId, SessionContext.State.Orientation,
+                        SessionContext.Current.AccountId)),
+                    SessionContext.Current.Id);
+            }
+
+            await WorldEntry.SendAfterCharacterAsync(stream, chosen);
+
+            // Block 2 goes out straight after. In the capture the client asks for it with lqc,
+            // and it does send that lqc here too, only later: it comes once the client has
+            // digested block 1, by which time ours has already sent block 2. Waiting for it
+            // would leave the client without the catalogues for no reason.
+            await WorldEntry.SendAfterConfirmAsync(stream, chosen);
+            return true;
+        }
+
+        /// <summary>
         /// Manda el bloque del mapa, una sola vez por entrada al mundo.
         ///
         /// El bloque lleva un jru, y jru quiere decir "carga este mapa": mandarlo dos veces hace
@@ -1090,14 +1560,23 @@ namespace Jondo.Unity.Server.Network
             // vez, es lo primero que hay que mirar para saber si se han cruzado.
             Console.WriteLine($"[Game Node] Sending the map block ({reason}): " +
                               $"{GameState.CharacterName} en el mapa {GameState.MapId}.");
-            await WorldEntry.SendMapAsync(stream, character, GameState.MapId);
+            await WorldEntry.SendMapAsync(stream, character, GameState.MapId,
+                                          GameState.IsInFight ? FightHandler.FightOf(GameState.CharacterId) : null);
 
             // Y lo que uno tiene de adorno, que el servidor real manda una sola vez, aquí: los
             // títulos y ornamentos disponibles, y cuál lleva puesto.
             await WardrobeHandler.SendOwnedAsync(stream, SessionContext.Current.AccountId);
 
+            // The account's houses (jaa): the capture's no longer travels, this one is ours.
+            await HouseHandler.SendAccountHousesAsync(stream);
+
             // Y su diario de misiones, por lo mismo: el de la captura ya no viaja.
             await Managers.Quests.SendJournalAsync(stream);
+
+            // And their emotes and achievements, for the same reason: the replayed block carried
+            // the recorded account's 47 emotes and 954 achievements.
+            await Managers.Emotes.SendListAsync(stream);
+            await Managers.Achievements.SendListAsync(stream);
 
             // Y la marca verde sobre quien tenga algo que ofrecer en este mapa.
             await Managers.Quests.SendMarksAsync(stream, GameState.MapId);

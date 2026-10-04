@@ -15,6 +15,10 @@ namespace Jondo.Unity.Server.Managers
     /// El cofre guarda objetos igual que CharacterItems, con su uid, su cantidad y sus efectos, para
     /// que un objeto guardado y sacado vuelva idéntico. Lo que se mete en el cofre se BORRA del
     /// inventario y al revés: un objeto está en un sitio o en el otro, nunca en los dos.
+    ///
+    /// Moving items in and out is <see cref="StorageStacks"/>'s, as for every other storage: a
+    /// stack changes uid when it changes side, and the highest uid in the chest is kept out of the
+    /// uid dispenser's way at start, so it is never handed out again after a restart.
     /// </summary>
     public static class HavenBagStore
     {
@@ -66,6 +70,9 @@ namespace Jondo.Unity.Server.Managers
             {
                 Console.WriteLine($"[Merkasako] No se pudieron crear las tablas: {ex.Message}");
             }
+
+            // The chest's uids above the dispenser, as the bank's: see StorageStacks.EnsureTables.
+            StorageStacks.EnsureTables();
         }
 
         // ─── El decorado ────────────────────────────────────────────────────────
@@ -186,186 +193,9 @@ namespace Jondo.Unity.Server.Managers
 
         // ─── El cofre ───────────────────────────────────────────────────────────
 
+        /// <summary>What is in this character's chest, oldest uid first.</summary>
         public static List<StoredItem> ChestOf(long characterId)
-        {
-            var salida = new List<StoredItem>();
-            try
-            {
-                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
-                connection.Open();
-
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT Uid, Gid, Quantity, Effects FROM HavenBagChest " +
-                                      "WHERE CharacterId = $id;";
-                command.Parameters.AddWithValue("$id", characterId);
-
-                using var reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    salida.Add(new StoredItem
-                    {
-                        Uid = reader.GetInt64(0),
-                        Gid = reader.GetInt32(1),
-                        Quantity = reader.IsDBNull(2) ? 1 : reader.GetInt32(2),
-                        Effects = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Merkasako] No se pudo leer el cofre: {ex.Message}");
-            }
-            return salida;
-        }
-
-        /// <summary>Del inventario al cofre. El objeto deja de estar en CharacterItems.</summary>
-        public static bool PutIn(long characterId, long uid, int quantity)
-        {
-            try
-            {
-                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
-                connection.Open();
-
-                var leer = connection.CreateCommand();
-                leer.CommandText = "SELECT Gid, Quantity, Effects FROM CharacterItems " +
-                                   "WHERE Uid = $uid AND CharacterId = $id;";
-                leer.Parameters.AddWithValue("$uid", uid);
-                leer.Parameters.AddWithValue("$id", characterId);
-
-                int gid, tiene;
-                string efectos;
-                using (var reader = leer.ExecuteReader())
-                {
-                    if (!reader.Read()) return false;
-                    gid = reader.GetInt32(0);
-                    tiene = reader.IsDBNull(1) ? 1 : reader.GetInt32(1);
-                    efectos = reader.IsDBNull(2) ? "" : reader.GetString(2);
-                }
-
-                int mueve = quantity <= 0 || quantity > tiene ? tiene : quantity;
-
-                using var transaction = connection.BeginTransaction();
-
-                // Los dos llevan el dueño delante. Hoy no hace falta —el SELECT de arriba ya
-                // ha comprobado que el objeto sea suyo, y el uid es único en todo el servidor—
-                // pero que una sentencia sea inofensiva por lo que hay TRES líneas más arriba es
-                // exactamente como se cuelan estas cosas: se mueve el guardia, o se reordena, y
-                // la sentencia se queda igual sin que nadie lo note. Filtrar aquí no cuesta nada
-                // y deja de depender del contexto.
-                if (mueve >= tiene)
-                {
-                    var quitar = connection.CreateCommand();
-                    quitar.CommandText = "DELETE FROM CharacterItems WHERE Uid = $uid AND CharacterId = $id;";
-                    quitar.Parameters.AddWithValue("$uid", uid);
-                    quitar.Parameters.AddWithValue("$id", characterId);
-                    quitar.ExecuteNonQuery();
-                }
-                else
-                {
-                    var restar = connection.CreateCommand();
-                    restar.CommandText = "UPDATE CharacterItems SET Quantity = Quantity - $n " +
-                                         "WHERE Uid = $uid AND CharacterId = $id;";
-                    restar.Parameters.AddWithValue("$n", mueve);
-                    restar.Parameters.AddWithValue("$uid", uid);
-                    restar.Parameters.AddWithValue("$id", characterId);
-                    restar.ExecuteNonQuery();
-                }
-
-                var meter = connection.CreateCommand();
-                meter.CommandText = "INSERT INTO HavenBagChest (Uid, CharacterId, Gid, Quantity, Effects) " +
-                                    "VALUES ($uid, $id, $gid, $n, $e) " +
-                                    "ON CONFLICT(Uid) DO UPDATE SET Quantity = Quantity + $n;";
-                meter.Parameters.AddWithValue("$uid", uid);
-                meter.Parameters.AddWithValue("$id", characterId);
-                meter.Parameters.AddWithValue("$gid", gid);
-                meter.Parameters.AddWithValue("$n", mueve);
-                meter.Parameters.AddWithValue("$e", efectos);
-                meter.ExecuteNonQuery();
-
-                transaction.Commit();
-
-                Equipment.Remove(uid, mueve);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Merkasako] No se pudo meter {uid} en el cofre: {ex.Message}");
-                return false;
-            }
-        }
-
-        /// <summary>Del cofre al inventario, a la bolsa.</summary>
-        public static bool TakeOut(long characterId, long uid, int quantity)
-        {
-            try
-            {
-                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
-                connection.Open();
-
-                var leer = connection.CreateCommand();
-                leer.CommandText = "SELECT Gid, Quantity, Effects FROM HavenBagChest " +
-                                   "WHERE Uid = $uid AND CharacterId = $id;";
-                leer.Parameters.AddWithValue("$uid", uid);
-                leer.Parameters.AddWithValue("$id", characterId);
-
-                int gid, tiene;
-                string efectos;
-                using (var reader = leer.ExecuteReader())
-                {
-                    if (!reader.Read()) return false;
-                    gid = reader.GetInt32(0);
-                    tiene = reader.IsDBNull(1) ? 1 : reader.GetInt32(1);
-                    efectos = reader.IsDBNull(2) ? "" : reader.GetString(2);
-                }
-
-                int mueve = quantity <= 0 || quantity > tiene ? tiene : quantity;
-
-                using var transaction = connection.BeginTransaction();
-
-                // Con el dueño delante, por lo mismo que al meterlo: que la sentencia no
-                // dependa de que el SELECT de arriba siga estando donde está.
-                if (mueve >= tiene)
-                {
-                    var quitar = connection.CreateCommand();
-                    quitar.CommandText = "DELETE FROM HavenBagChest WHERE Uid = $uid AND CharacterId = $id;";
-                    quitar.Parameters.AddWithValue("$uid", uid);
-                    quitar.Parameters.AddWithValue("$id", characterId);
-                    quitar.ExecuteNonQuery();
-                }
-                else
-                {
-                    var restar = connection.CreateCommand();
-                    restar.CommandText = "UPDATE HavenBagChest SET Quantity = Quantity - $n " +
-                                         "WHERE Uid = $uid AND CharacterId = $id;";
-                    restar.Parameters.AddWithValue("$n", mueve);
-                    restar.Parameters.AddWithValue("$uid", uid);
-                    restar.Parameters.AddWithValue("$id", characterId);
-                    restar.ExecuteNonQuery();
-                }
-
-                var devolver = connection.CreateCommand();
-                devolver.CommandText = "INSERT INTO CharacterItems (Uid, CharacterId, Gid, Quantity, Position, Effects) " +
-                                       "VALUES ($uid, $id, $gid, $n, $bolsa, $e) " +
-                                       "ON CONFLICT(Uid) DO UPDATE SET Quantity = Quantity + $n;";
-                devolver.Parameters.AddWithValue("$uid", uid);
-                devolver.Parameters.AddWithValue("$id", characterId);
-                devolver.Parameters.AddWithValue("$gid", gid);
-                devolver.Parameters.AddWithValue("$n", mueve);
-                devolver.Parameters.AddWithValue("$bolsa", Equipment.Bag);
-                devolver.Parameters.AddWithValue("$e", efectos);
-                devolver.ExecuteNonQuery();
-
-                transaction.Commit();
-
-                Equipment.Add(uid, gid, mueve, Equipment.Bag, efectos);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Merkasako] No se pudo sacar {uid} del cofre: {ex.Message}");
-                return false;
-            }
-        }
+            => StorageStacks.ItemsOf(StorageStacks.HavenBag(characterId));
 
         /// <summary>Un objeto del inventario, leído igual que los del cofre.</summary>
         public static StoredItem? FromInventory(long characterId, long uid)
@@ -397,15 +227,6 @@ namespace Jondo.Unity.Server.Managers
                 Console.WriteLine($"[Merkasako] No se pudo leer el objeto {uid}: {ex.Message}");
                 return null;
             }
-        }
-
-        public static bool Holds(long characterId, long uid)
-        {
-            foreach (var item in ChestOf(characterId))
-            {
-                if (item.Uid == uid) return true;
-            }
-            return false;
         }
     }
 }

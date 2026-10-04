@@ -227,6 +227,15 @@ namespace Jondo.Unity.Server.Handlers
                 Program.LogDebug($"[-] Error reading the character id: {ex.Message}");
             }
 
+            return SelectCharacter(characterIdToLoad, accountId);
+        }
+
+        /// <summary>
+        /// The same selection when the SERVER names the character: the kwb of a reconnection
+        /// into a fight carries no id, the fight does.
+        /// </summary>
+        public static bool SelectCharacter(long characterIdToLoad, long accountId)
+        {
             if (characterIdToLoad <= 0)
             {
                 Console.WriteLine("[Game Node] The character selection carried no character id.");

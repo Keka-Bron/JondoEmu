@@ -536,6 +536,69 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// Creates an item in the bag, with the effects given, and tells nobody: the caller owns
+        /// the wire. The database and both inventory caches get it, the way <see cref="GrantAsync"/>
+        /// does it.
+        /// </summary>
+        public static Item? Create(int gid, int quantity, IReadOnlyList<ItemEffect> effects)
+        {
+            string stored = Forgemagic.Serialize(effects);
+            long uid = DatabaseManager.NextItemUid();
+            if (!DatabaseManager.InsertCharacterItem(uid, SessionContext.State.CharacterId, gid, quantity,
+                                                     Bag, stored))
+                return null;
+
+            var item = Add(uid, gid, quantity, Bag, stored);
+            var legacy = new PlayerItem
+            {
+                Uid = uid,
+                ItemId = gid,
+                Quantity = quantity,
+                Position = Bag,
+                RawEffects = stored,
+            };
+            foreach (var effect in effects)
+            {
+                if (effect.Effect <= 0) continue;
+                legacy.Effects.TryGetValue(effect.Effect, out int had);
+                legacy.Effects[effect.Effect] = had + (int)effect.Value;
+            }
+            GameState.AddInventoryItem(legacy);
+            return item;
+        }
+
+        /// <summary>
+        /// Rewrites how many there are of an item and what it carries -- a stack a craft adds to, an
+        /// item a rune changed, a signature -- in the database and in both caches.
+        /// </summary>
+        public static bool Rewrite(Item item, int quantity, IReadOnlyList<ItemEffect> effects)
+        {
+            string stored = Forgemagic.Serialize(effects);
+            if (!DatabaseManager.UpdateCharacterItem(SessionContext.State.CharacterId, item.Uid, quantity, stored))
+                return false;
+
+            item.Quantity = quantity;
+            var copy = new List<ItemEffect>(effects);
+            item.Effects.Clear();
+            item.Effects.AddRange(copy);
+
+            var legacy = GameState.GetInventoryItem(item.Uid);
+            if (legacy != null)
+            {
+                legacy.Quantity = quantity;
+                legacy.RawEffects = stored;
+                legacy.Effects.Clear();
+                foreach (var effect in copy)
+                {
+                    if (effect.Effect <= 0) continue;
+                    legacy.Effects.TryGetValue(effect.Effect, out int had);
+                    legacy.Effects[effect.Effect] = had + (int)effect.Value;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
         /// The one place the worn-item cache is written.
         /// </summary>
         /// <remarks>

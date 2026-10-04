@@ -180,6 +180,35 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task OpenDialogAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
         {
+            // ¿Es una luminomáquina? Entonces ni plantilla ni árbol escrito: lo que dice y lo que
+            // ofrece salen de la luz que tenga la planta y de la sal que lleve encima el jugador.
+            if (npc.NpcId == Luminomachine.NpcId)
+            {
+                await OpenMachineAsync(stream, npc, mapId);
+                return;
+            }
+
+            // Y el cofre de la raid tampoco tiene árbol: lo que ofrece depende de si traes tesoros.
+            if (npc.NpcId == RaidChest.NpcId)
+            {
+                await OpenChestAsync(stream, npc, mapId);
+                return;
+            }
+
+            // El puch maestro del kanojedo: los seis niveles, y luego cuántos.
+            if (npc.NpcId == Kanojedo.MasterNpc)
+            {
+                await OpenMasterAsync(stream, npc, mapId);
+                return;
+            }
+
+            // The Dispensador de favores of a dream favour opens on what the favour is at.
+            if (npc.NpcId == Managers.Dreams.FavorNpc)
+            {
+                await OpenFavorAsync(stream, npc, mapId);
+                return;
+            }
+
             var template = Npcs.TemplateOf(npc.NpcId);
             var escrito = NpcDialogues.For(npc.NpcId, mapId);
             var primera = escrito?.First();
@@ -221,6 +250,11 @@ namespace Jondo.Unity.Server.Handlers
                 respuestas = todas.ToArray();
             }
 
+            // And a banker offers the bank: his reply in front of the rest, the way the Bontarian
+            // banker offers it in frame 74 of the bank capture. See BankHandler.
+            var banker = Bankers.Of(npc.NpcId);
+            if (banker != null) respuestas = BankHandler.WithTheBankReply(banker, respuestas);
+
             // Se apunta por dónde va la conversación. Sin esto el ioy que llega después no se puede
             // situar: trae el id de la respuesta y nada más, ni de qué NPC ni de qué frase venía.
             SessionContext.State.OpenDialogueNpcId = npc.NpcId;
@@ -228,7 +262,7 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.OpenDialogueMessage = pregunta;
 
             await PreguntarAsync(stream, pregunta, respuestas, template,
-                                 escrito?.Line(pregunta));
+                                 escrito?.Line(pregunta), banker);
 
             // Y si alguna misión en curso pedía justamente venir a ver a éste, ya está.
             await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
@@ -237,6 +271,343 @@ namespace Jondo.Unity.Server.Handlers
                               $"{Math.Max(respuestas.Length, 1)} respuestas" +
                               (escrito != null ? $" (escrito, {escrito.Lines.Count} frases)" : " (de la plantilla)") + ".");
         }
+
+        /// <summary>
+        /// La ventana de una luminomáquina: lo que le queda por iluminar y lo que cuesta.
+        /// </summary>
+        /// <remarks>
+        /// La máquina no tiene conversación escrita en ninguna parte y no la necesita: sus setenta
+        /// y seis respuestas dicen cada una lo suyo -«Dejar 4 sales de las profundidades para
+        /// iluminar la segunda franja»- y lo único que hay que decidir es cuáles enseñar. Eso lo
+        /// resuelve <see cref="Luminomachine.RepliesFor"/> con dos números: cuánta luz tiene la
+        /// planta y cuánta sal lleva quien pregunta.
+        ///
+        /// Fuera de una raid la máquina está muerta. No es que se esconda: está en el mapa y se
+        /// puede hablar con ella, pero no hay instancia ninguna que iluminar, así que lo único que
+        /// ofrece es no tocarla. Prometer luz que no se puede encender sería peor que callarse.
+        /// </remarks>
+        private static async Task OpenMachineAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
+        {
+            int floor = Luminomachines.FloorOn(mapId);
+            int light = floor == 0 ? -1 : Luminomachines.LightOn(GameState.CharacterId, floor);
+            int salt = Managers.Equipment.HowMany(Luminomachine.SaltItem);
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
+
+            long pregunta;
+            long[] respuestas;
+
+            if (light < 0)
+            {
+                pregunta = Luminomachine.LitMessage;
+                respuestas = new[] { Luminomachine.DontTouchReply };
+            }
+            else
+            {
+                pregunta = Luminomachine.MessageAt(floor, light);
+                respuestas = Lista(Luminomachine.RepliesFor(floor, light, salt));
+            }
+
+            SessionContext.State.OpenDialogueNpcId = npc.NpcId;
+            SessionContext.State.OpenDialogueMapId = mapId;
+            SessionContext.State.OpenDialogueMessage = pregunta;
+
+            await PreguntarAsync(stream, pregunta, respuestas);
+
+            Console.WriteLine($"[Luminomáquinas] Planta {floor}, luz {light}, {salt} sales: " +
+                              $"pregunta {pregunta}, {respuestas.Length} respuestas.");
+        }
+
+        /// <summary>
+        /// Lo que hace una respuesta de la luminomáquina: cobrar la sal y subir la luz.
+        /// </summary>
+        /// <remarks>
+        /// La sal se cobra ANTES de tocar la luz, y si la luz ha cambiado entre medias se le
+        /// devuelve. Con ocho personas en la misma planta eso no es una rareza teórica: dos que
+        /// hablen a la vez con la misma máquina ven los dos la misma oferta, y el segundo en
+        /// contestar estaría pagando por una franja que ya está encendida.
+        /// </remarks>
+        private static async Task MachineReplyAsync(NetworkStream stream, long reply)
+        {
+            var elegida = Luminomachine.Read(reply);
+
+            CerrarConversacion();
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                    ConnectionProtocol.NpcDialogCloseReason)));
+
+            // No tocarla, o irse a buscar más sal: las dos se van sin pagar nada.
+            if (elegida == null || !elegida.Value.Buys) return;
+
+            var compra = elegida.Value;
+            if (!await Managers.Equipment.TakeAsync(stream, Luminomachine.SaltItem, compra.Cost))
+            {
+                await DecirleAsync(stream, CommandTexts.Get("light.nosalt", compra.Cost));
+                return;
+            }
+
+            int luz = Luminomachines.Deposit(GameState.CharacterId, compra.Floor, compra.From, compra.To);
+            if (luz < 0)
+            {
+                await Managers.Equipment.GiveAsync(stream, Luminomachine.SaltItem, compra.Cost);
+                await DecirleAsync(stream, CommandTexts.Get("light.changed"));
+                return;
+            }
+
+            await DecirleAsync(stream, CommandTexts.Get("light.lit", compra.Floor, luz, compra.Cost));
+        }
+
+        /// <summary>
+        /// El cofre de la raid: soltar los tesoros, acercarse, o dar media vuelta.
+        /// </summary>
+        /// <remarks>
+        /// Soltar los tesoros sólo sale cuando se trae alguno, por lo mismo que en la máquina. Y
+        /// fuera de una raid el cofre no es de nadie: no hay puntuación que subir ni raid que
+        /// acabar, así que lo único que ofrece es retroceder.
+        /// </remarks>
+        private static async Task OpenChestAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
+        {
+            long who = GameState.CharacterId;
+            long score = Managers.RaidChests.ScoreOf(who);
+            var traidos = score < 0 ? new Dictionary<int, int>() : Managers.RaidTreasures.InTheBag();
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
+
+            await PreguntaDelCofreAsync(stream, npc, mapId, score, traidos.Count > 0);
+
+            Console.WriteLine($"[Raids] Cofre del mapa {mapId}: {score} puntos, " +
+                              $"{traidos.Count} clases de tesoro encima.");
+        }
+
+        /// <summary>La primera pantalla del cofre, que se vuelve a poner después de soltar.</summary>
+        private static async Task PreguntaDelCofreAsync(NetworkStream stream, Npcs.Spawn npc, long mapId,
+                                                        long score, bool carrying)
+        {
+            long[] respuestas = score < 0
+                ? new[] { RaidChest.StepBack }
+                : Lista(RaidChest.FirstReplies(carrying));
+
+            SessionContext.State.OpenDialogueNpcId = npc.NpcId;
+            SessionContext.State.OpenDialogueMapId = mapId;
+            SessionContext.State.OpenDialogueMessage = RaidChest.Vibrating;
+
+            await PreguntarAsync(stream, RaidChest.Vibrating, respuestas);
+        }
+
+        /// <summary>
+        /// Lo que hace cada respuesta del cofre.
+        /// </summary>
+        /// <remarks>
+        /// Se cobra lo que DE VERDAD sale de la bolsa, no lo que se ofreció: entre que la ventana
+        /// se abre y llega la respuesta, una pila puede haberse ido a otra parte, y puntuar lo que
+        /// no se entregó sería puntuar el aire.
+        /// </remarks>
+        private static async Task ChestReplyAsync(NetworkStream stream, long reply)
+        {
+            long who = GameState.CharacterId;
+            long mapa = SessionContext.State.OpenDialogueMapId;
+            var npc = CofreDelMapa(mapa);
+
+            if (reply == RaidChest.DropTreasures)
+            {
+                var traidos = Managers.RaidTreasures.InTheBag();
+                var entregados = new Dictionary<int, int>();
+                foreach (var kv in traidos)
+                {
+                    if (await Managers.Equipment.TakeAsync(stream, kv.Key, kv.Value))
+                    {
+                        entregados[kv.Key] = kv.Value;
+                    }
+                }
+
+                long ahora = Managers.RaidChests.Drop(who, entregados);
+                if (entregados.Count == 0 || ahora < 0)
+                {
+                    await DecirleAsync(stream, CommandTexts.Get("chest.gone"));
+                }
+                else
+                {
+                    long cuantos = 0;
+                    foreach (var kv in entregados) cuantos += kv.Value;
+                    await DecirleAsync(stream, CommandTexts.Get("chest.dropped", cuantos,
+                                                                Managers.RaidTreasures.Worth(entregados), ahora));
+                }
+
+                // Y la ventana se queda puesta, ahora sin la opción de soltar: lo normal después de
+                // vaciar la bolsa es acercarse al cofre, no tener que volver a hablarle.
+                if (npc != null)
+                {
+                    await PreguntaDelCofreAsync(stream, npc, mapa, Managers.RaidChests.ScoreOf(who), false);
+                    return;
+                }
+            }
+            else if (reply == RaidChest.Approach)
+            {
+                SessionContext.State.OpenDialogueMessage = RaidChest.Warning;
+                await PreguntarAsync(stream, RaidChest.Warning, Lista(RaidChest.WarningReplies()));
+                return;
+            }
+            else if (reply == RaidChest.TakeAndRun)
+            {
+                var raid = Managers.GuildRaidManager.RaidOf(who);
+                int cual = raid?.RaidId ?? 0;
+
+                CerrarConversacion();
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                        ConnectionProtocol.NpcDialogCloseReason)));
+
+                long guild = raid?.GuildId ?? 0;
+                long puntos = await Managers.RaidChests.TakeAsync(who);
+                if (puntos <= 0)
+                {
+                    await DecirleAsync(stream, CommandTexts.Get("chest.taken.none"));
+                    return;
+                }
+
+                int puesto = Managers.GuildStore.PlaceOf(guild, cual, DateTimeOffset.UtcNow);
+                await DecirleAsync(stream, CommandTexts.Get("chest.taken", puntos, puesto,
+                                                            Jondo.Unity.World.Content.Raids.Of(cual)?.Name ?? ""));
+                return;
+            }
+
+            CerrarConversacion();
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                    ConnectionProtocol.NpcDialogCloseReason)));
+        }
+
+        /// <summary>
+        /// El puch maestro: la primera pantalla, con los seis niveles.
+        /// </summary>
+        /// <remarks>
+        /// Medido en la captura del Hipermago sobre el kanojedo de Amakna: ioc, y un ios con la
+        /// 54965 y las seis respuestas de nivel, de la 200 a la 1, en ese orden.
+        /// </remarks>
+        private static async Task OpenMasterAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
+        {
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
+
+            SessionContext.State.OpenDialogueNpcId = npc.NpcId;
+            SessionContext.State.OpenDialogueMapId = mapId;
+            SessionContext.State.OpenDialogueMessage = Kanojedo.FirstMessage;
+
+            await PreguntarAsync(stream, Kanojedo.FirstMessage, Lista(Kanojedo.LevelReplies));
+            Console.WriteLine($"[Kanojedo] El maestro del mapa {mapId} ofrece sus seis niveles.");
+        }
+
+        /// <summary>
+        /// The Dispensador de favores: his offer while the favour of the room is to be chosen --
+        /// 59655 "La suerte te sonríe...", with "Acepto el favor." and "No, gracias." -- and once
+        /// it is chosen 59657, "La suerte ya te ha sonreído. No puedo hacerte otro favor por ahora.",
+        /// with no reply but the client's own way out. The lines and their replies are his
+        /// template's; which goes with which is the tree in content/npcs/dialogues.json.
+        /// </summary>
+        private static async Task OpenFavorAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
+        {
+            var escrito = NpcDialogues.For(npc.NpcId, mapId);
+            long pregunta = DreamHandler.FavorPending() ? Managers.Dreams.FavorOfferMessage : Managers.Dreams.FavorGivenMessage;
+            var linea = escrito?.Line(pregunta);
+            long[] respuestas = linea != null ? LasQueTocan(linea) : Array.Empty<long>();
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
+
+            SessionContext.State.OpenDialogueNpcId = npc.NpcId;
+            SessionContext.State.OpenDialogueMapId = mapId;
+            SessionContext.State.OpenDialogueMessage = pregunta;
+
+            await PreguntarAsync(stream, pregunta, respuestas, null, linea);
+            Console.WriteLine($"[Sueños] The Dispensador de favores says {pregunta}, {respuestas.Length} replies.");
+        }
+
+        /// <summary>
+        /// Lo que hace cada respuesta del puch maestro.
+        /// </summary>
+        /// <remarks>
+        /// Un nivel lleva a la segunda pantalla, cuyas cuatro respuestas de «Entrenarte con N»
+        /// llevan el parámetro 905 que llevan en la captura -y la de volver, no-. Una cuenta abre
+        /// el combate en el acto: en la captura, tras el ioy vienen el kld y la misma ráfaga que
+        /// al pisar un grupo, con un id de grupo que en el mapa no estaba. Y así se hace: el grupo
+        /// se compone y no se pone en el mapa.
+        /// </remarks>
+        private static async Task MasterReplyAsync(NetworkStream stream, long reply)
+        {
+            long mapa = SessionContext.State.OpenDialogueMapId;
+            if (mapa == 0) mapa = SessionContext.State.MapId;
+
+            int nivel = Kanojedo.LevelIndexOf(reply);
+            if (nivel >= 0)
+            {
+                var parametros = new Dictionary<long, IReadOnlyList<long>>();
+                var cuentas = Kanojedo.CountReplies(nivel);
+                for (int i = 0; i < Kanojedo.MostPuchs; i++)
+                {
+                    parametros[cuentas[i]] = new[] { Kanojedo.ReplyParameter };
+                }
+
+                SessionContext.State.OpenDialogueMessage = Kanojedo.MessageFor(nivel);
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ios,
+                        ConnectionProtocol.BuildNpcQuestion(Kanojedo.MessageFor(nivel), Lista(cuentas), parametros)));
+                return;
+            }
+
+            if (Kanojedo.IsBack(reply))
+            {
+                SessionContext.State.OpenDialogueMessage = Kanojedo.FirstMessage;
+                await PreguntarAsync(stream, Kanojedo.FirstMessage, Lista(Kanojedo.LevelReplies));
+                return;
+            }
+
+            CerrarConversacion();
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                    ConnectionProtocol.NpcDialogCloseReason)));
+
+            var pedido = Kanojedo.ReadCount(reply);
+            if (pedido == null) return;
+
+            int level = Kanojedo.LevelAt(pedido.Value.LevelIndex);
+            var elegidos = Kanojedo.Pick(level, pedido.Value.Count);
+            var grupo = Managers.MobSpawnManager.ComposeOffMap(elegidos);
+            if (grupo == null)
+            {
+                Console.WriteLine($"[Kanojedo] No hay puchs con grado al nivel {level}.");
+                return;
+            }
+
+            Console.WriteLine($"[Kanojedo] Sesión al nivel {level} con {elegidos.Count} puch(s): " +
+                              string.Join(", ", elegidos.Select(e => e.Monster)) + ".");
+            await FightHandler.InitiateFightFromMobCollision(stream, grupo, mapa);
+        }
+
+        /// <summary>El cofre que hay puesto en un mapa, para volver a preguntarle.</summary>
+        private static Npcs.Spawn CofreDelMapa(long mapId)
+        {
+            foreach (var puesto in Npcs.Of(mapId))
+            {
+                if (puesto.NpcId == RaidChest.NpcId) return puesto;
+            }
+
+            return null;
+        }
+
+        /// <summary>Una lista de respuestas como el array que espera la trama.</summary>
+        private static long[] Lista(IReadOnlyList<long> respuestas)
+        {
+            var fuera = new long[respuestas.Count];
+            for (int i = 0; i < respuestas.Count; i++) fuera[i] = respuestas[i];
+            return fuera;
+        }
+
+        /// <summary>An information line, which is where what has no window of its own is told.</summary>
+        private static Task DecirleAsync(NetworkStream stream, string text)
+            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(text)));
 
         /// <summary>
         /// Manda una pregunta con sus respuestas, y se asegura de que haya al menos una.
@@ -253,7 +624,8 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         private static async Task PreguntarAsync(NetworkStream stream, long pregunta, long[] respuestas,
                                                  Npcs.Template? plantilla = null,
-                                                 Jondo.Unity.World.Content.DialogueLine? frase = null)
+                                                 Jondo.Unity.World.Content.DialogueLine? frase = null,
+                                                 Bankers.Banker? banker = null)
         {
             if (respuestas.Length == 0)
             {
@@ -287,6 +659,19 @@ namespace Jondo.Unity.Server.Handlers
                     parametros ??= new Dictionary<long, IReadOnlyList<long>>();
                     parametros[opcion.Reply] = opcion.Parameters;
                 }
+            }
+
+            // A banker's greeting says the fee -- "te costará #1 kamas" -- and his bank reply
+            // carries effect 196: ios f3 "1397" and f2 { f1: 63535, f3 { f1: 196 } }, frame 74.
+            if (banker != null)
+            {
+                parametros ??= new Dictionary<long, IReadOnlyList<long>>();
+                parametros[banker.Consult] = BankHandler.ConsultReplyEffects;
+
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ios, BankProtocol.BuildQuestion(pregunta, respuestas, parametros,
+                        BankHandler.GreetingParameters(SessionContext.Current.AccountId))));
+                return;
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -441,6 +826,39 @@ namespace Jondo.Unity.Server.Handlers
                 if (field.FieldNumber == 1 && field.WireType == 0) reply = field.VarIntValue;
             }
 
+            // ¿Ha contestado una luminomáquina? Ni misiones ni árbol escrito: lo que hace cada una
+            // de sus respuestas lo dice la respuesta misma.
+            if (SessionContext.State.OpenDialogueNpcId == Luminomachine.NpcId &&
+                Luminomachine.Owns(reply))
+            {
+                await MachineReplyAsync(stream, reply);
+                return;
+            }
+
+            // Y lo mismo el cofre de la raid.
+            if (SessionContext.State.OpenDialogueNpcId == RaidChest.NpcId && RaidChest.Owns(reply))
+            {
+                await ChestReplyAsync(stream, reply);
+                return;
+            }
+
+            // Y el puch maestro del kanojedo.
+            if (SessionContext.State.OpenDialogueNpcId == Kanojedo.MasterNpc && Kanojedo.Owns(reply))
+            {
+                await MasterReplyAsync(stream, reply);
+                return;
+            }
+
+            // The bank's reply: the dialogue closes and the bank opens behind it, frames 79-84 of
+            // the bank capture. See BankHandler.
+            var banker = Bankers.Of(SessionContext.State.OpenDialogueNpcId);
+            if (banker != null && reply == banker.Consult)
+            {
+                CerrarConversacion();
+                await BankHandler.OpenAsync(stream);
+                return;
+            }
+
             // ¿La frase en la que está reparte alguna misión? Se mira ANTES de seguir, porque
             // seguir cambia OpenDialogueMessage, y antes de CerrarConversacion, que lo pone a cero.
             //
@@ -482,15 +900,26 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.DreamPointsPercent != 0)
             {
                 var sueno = Managers.Dreams.De(GameState.CharacterId);
-                if (sueno != null)
+                var aqui = sueno?.SalaActual;
+                if (sueno != null && aqui != null && aqui.FavorTaken)
                 {
-                    int antes = sueno.Puntos;
-                    sueno.Puntos = (int)Math.Round(sueno.Puntos * elegidaAhora.DreamPointsPercent / 100.0);
+                    // Once per fountain: his favor was taken here already. It could be asked for
+                    // again and again, and 25 points became as many as one had patience for.
+                    Console.WriteLine($"[Sueños] The Rey Gob's favor was already taken in room {aqui.Id}.");
+                }
+                else if (sueno != null)
+                {
+                    if (aqui != null) aqui.FavorTaken = true;
+                    // The dream points, the f11: 25 become 38 in the long capture, 25 x 1.5 rounded up.
+                    int antes = sueno.DreamPoints;
+                    sueno.DreamPoints = (int)Math.Round(sueno.DreamPoints * elegidaAhora.DreamPointsPercent / 100.0,
+                                                        MidpointRounding.AwayFromZero);
 
                     Console.WriteLine($"[Sueños] La respuesta {reply} deja los puntos de " +
-                                      $"{antes} en {sueno.Puntos} " +
+                                      $"{antes} en {sueno.DreamPoints} " +
                                       $"({elegidaAhora.DreamPointsPercent}%).");
 
+                    DreamHandler.Persist(sueno);
                     await DreamHandler.RefrescarEstadoAsync(stream);
                 }
                 else
@@ -498,6 +927,18 @@ namespace Jondo.Unity.Server.Handlers
                     Console.WriteLine($"[Sueños] La respuesta {reply} toca los puntos y " +
                                       "no hay sueño en curso.");
                 }
+            }
+
+            // "Acepto el favor.": the conversation ends and the favour's three choices open, in
+            // the dream's shop window. See DreamHandler.OfferFavorAsync.
+            if (elegidaAhora != null && elegidaAhora.DreamFavor)
+            {
+                CerrarConversacion();
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                        ConnectionProtocol.NpcDialogCloseReason)));
+                await DreamHandler.OfferFavorAsync(stream);
+                return;
             }
 
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
@@ -746,7 +1187,7 @@ namespace Jondo.Unity.Server.Handlers
             // El orden es el medido, y las dos tandas de ivf/iun también: el servidor real las manda
             // idénticas antes y después del kdg. Como las dos llevan el total y no un incremento,
             // repetirlas no descuadra nada.
-            long capacity = 1000 + 5L * GameState.StatStrength;
+            long capacity = 1000 + 5L * GameState.TotalStrength;
 
             if (tokenShop == null)
             {

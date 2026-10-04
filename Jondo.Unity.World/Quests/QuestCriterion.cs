@@ -40,6 +40,54 @@ namespace Jondo.Unity.World.Quests
         /// this alone and get the old behaviour.
         /// </remarks>
         bool AchievementDone(int achievementId) => false;
+
+        /// <summary>
+        /// A single number about the character for an operator this reader has no meaning of its
+        /// own for, such as <c>Oa</c> (achievement points) or <c>SC</c> (the server's game type).
+        /// Null when the facts do not know it, which leaves the term unjudged.
+        /// </summary>
+        /// <remarks>
+        /// Defaulted, like <see cref="AchievementDone"/>, so that everything that only judges
+        /// quests keeps the behaviour it had: an operator nobody answers is let through and named.
+        /// </remarks>
+        long? Scalar(string op) => null;
+
+        /// <summary>
+        /// How many of one thing the character has done or holds, for the operators written as
+        /// <c>OP&gt;key,n</c>: <c>PO</c> an item held, <c>Ef</c> a monster beaten with a challenge
+        /// won, <c>EM</c> a monster beaten, <c>EH</c> a challenge validated.
+        /// </summary>
+        /// <remarks>
+        /// <paramref name="flag"/> is the third value some of them carry — <c>EM&gt;147,0,d</c>, "in
+        /// its dungeon" — and is empty otherwise. Null when the facts do not know it.
+        /// </remarks>
+        long? Count(string op, long key, string flag) => null;
+    }
+
+    /// <summary>One term of a condition: <c>Ef&gt;3567,0</c> is Ef, '&gt;', ["3567", "0"].</summary>
+    public sealed class CriterionTerm
+    {
+        public CriterionTerm(string op, char comparison, IReadOnlyList<string> values)
+        {
+            Op = op;
+            Comparison = comparison;
+            Values = values;
+        }
+
+        public string Op { get; }
+        public char Comparison { get; }
+        public IReadOnlyList<string> Values { get; }
+
+        /// <summary>The first value as a number, or zero when it is not one.</summary>
+        public long Key => Values.Count > 0 && long.TryParse(Values[0], out long n) ? n : 0;
+
+        /// <summary>The second value as a number, or -1 when there is none.</summary>
+        public long Threshold => Values.Count > 1 && long.TryParse(Values[1], out long n) ? n : -1;
+
+        /// <summary>The third value, <c>d</c> in <c>EM&gt;147,0,d</c>, or empty.</summary>
+        public string Flag => Values.Count > 2 ? Values[2] : "";
+
+        public override string ToString() => $"{Op}{Comparison}{string.Join(",", Values)}";
     }
 
     /// <summary>What came of judging a condition.</summary>
@@ -125,6 +173,12 @@ namespace Jondo.Unity.World.Quests
     /// worse answer than offering them slightly early; the terms that <em>are</em> understood in
     /// those conditions are still enforced, and <see cref="CriterionVerdict.Skipped"/> names the
     /// ones that were not.
+    ///
+    /// <b>Beyond its own seven, the facts can answer.</b> <see cref="IQuestFacts.Scalar"/> and
+    /// <see cref="IQuestFacts.Count"/> let whoever holds the character's state judge the rest —
+    /// the achievement engine answers items held, monsters beaten, challenges validated, the
+    /// server type; the quest log answers <c>Ad</c>, today's Almanax entry. An operator nobody
+    /// answers is let through and named, as before.
     /// </remarks>
     public static class QuestCriterion
     {
@@ -157,6 +211,43 @@ namespace Jondo.Unity.World.Quests
                 skipped.Add(criterion);
                 return new CriterionVerdict(true, skipped, broke: true);
             }
+        }
+
+        /// <summary>
+        /// The terms of a condition, in the order they are written, without judging anything.
+        /// </summary>
+        /// <remarks>
+        /// For the questions asked of a condition rather than of a character: which quests,
+        /// monsters or items an achievement is waiting on, and which number its progress bar
+        /// counts. The brackets and connectives are skipped, since none of those questions
+        /// depends on them.
+        /// </remarks>
+        public static List<CriterionTerm> Terms(string criterion)
+        {
+            var terms = new List<CriterionTerm>();
+            if (string.IsNullOrEmpty(criterion)) return terms;
+
+            int at = 0;
+            while (at + 2 < criterion.Length)
+            {
+                if (!char.IsLetter(criterion[at]) || !char.IsLetter(criterion[at + 1])
+                    || criterion[at + 2] is not ('=' or '!' or '>' or '<' or 'E'))
+                {
+                    at++;
+                    continue;
+                }
+
+                string op = criterion.Substring(at, 2);
+                char comparison = criterion[at + 2];
+                at += 3;
+
+                int start = at;
+                while (at < criterion.Length && criterion[at] is not ('&' or '|' or '(' or ')')) at++;
+                terms.Add(new CriterionTerm(op, comparison == 'E' ? '=' : comparison,
+                                            criterion.Substring(start, at - start).Split(',')));
+            }
+
+            return terms;
         }
 
         /// <summary>Whether this engine knows what an operator means.</summary>
@@ -278,6 +369,11 @@ namespace Jondo.Unity.World.Quests
 
                 if (!Understands(op))
                 {
+                    // Not one of the reader's own, but the facts may know it: the achievement
+                    // engine answers item counts, monster tallies and the like through here.
+                    bool? answered = ByFacts(op, comparison, values);
+                    if (answered.HasValue) return answered.Value;
+
                     string term = _text.Substring(start, At - start);
                     if (!_skipped.Contains(term)) _skipped.Add(term);
                     return true;
@@ -292,6 +388,38 @@ namespace Jondo.Unity.World.Quests
                 }
 
                 return Judge(op, comparison, value);
+            }
+
+            /// <summary>
+            /// A term the facts answer, or null when they do not know it.
+            /// </summary>
+            /// <remarks>
+            /// Two shapes, told apart by how many values the term carries. <c>OP&gt;key,n</c> is a
+            /// tally compared with n: <c>Ef&gt;3567,0</c> is "monster 3567 beaten at least once".
+            /// <c>OP=value</c> is either a number compared with the value — <c>SC=5</c>, the server
+            /// type — or, when the facts have no single number for the operator, "holds at least
+            /// one": <c>PO=20737</c> is "has item 20737", <c>PO!10207</c> "has none".
+            /// </remarks>
+            private bool? ByFacts(string op, char comparison, List<string> values)
+            {
+                // POE14271: Ankama's typo for '=', see Term.
+                if (comparison == 'E') comparison = '=';
+                if (!long.TryParse(values[0], out long first)) return null;
+
+                if (values.Count >= 2)
+                {
+                    if (!long.TryParse(values[1], out long threshold)) return null;
+                    string flag = values.Count >= 3 ? values[2] : "";
+                    long? tally = _facts.Count(op, first, flag);
+                    return tally.HasValue ? Compare(tally.Value, comparison, threshold) : null;
+                }
+
+                long? scalar = _facts.Scalar(op);
+                if (scalar.HasValue) return Compare(scalar.Value, comparison, first);
+
+                long? held = _facts.Count(op, first, "");
+                if (!held.HasValue) return null;
+                return comparison == '!' ? held.Value == 0 : held.Value > 0;
             }
 
             /// <summary>Everything up to the next thing that ends a value.</summary>

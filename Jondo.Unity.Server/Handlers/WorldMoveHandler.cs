@@ -74,6 +74,10 @@ namespace Jondo.Unity.Server.Handlers
             byte[] moved = ConnectionProtocol.BuildActorMoved(
                 Jondo.Unity.Server.Network.SessionContext.State.CharacterId, cells, facing);
             await SessionRegistry.BroadcastToMapAsync(SessionContext.State.MapId, moved);
+
+            // If he leads a party, the ones following him learn where the walk ends, right behind
+            // the jsj: that ikv is what makes their clients walk after him (PartyFollowHandler).
+            await PartyFollowHandler.LeaderMovedAsync(SessionContext.Current);
         }
 
         /// <summary>
@@ -236,6 +240,8 @@ namespace Jondo.Unity.Server.Handlers
 
             // El mapa cambia: lo que estuviera abierto en el anterior deja de estarlo.
             NpcHandler.Forget();
+            WorkshopHandler.Forget();
+            MarketplaceHandler.Forget();
 
             Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
             Jondo.Unity.Server.Network.SessionContext.State.CellId = arrival;
@@ -244,9 +250,11 @@ namespace Jondo.Unity.Server.Handlers
 
             // Exactly the five the capture sends, in the same order. jsd first: the character is
             // leaving the map it was on, and the client has to be told before it is told to load
-            // another one.
+            // another one. With the way out, as the mover's own jsd carries it in "Grupos/con
+            // grupo seguir desplazamiento del lider..." (frames 110, 131, 169, 193, 226).
             byte[] actorLeft = ConnectionProtocol.BuildActorLeft(
-                Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
+                Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
+                Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             await SessionContext.Current.SendAsync(actorLeft);
             await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId,
                 Jondo.Unity.Server.Network.SessionContext.State.Orientation);

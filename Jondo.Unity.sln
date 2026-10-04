@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Contract.WinFor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Sprites", "Jondo.Unity.Sprites\Jondo.Unity.Sprites.csproj", "{DA645745-3A97-4A71-947F-3BC5723FD0D5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Cytrus", "Jondo.Unity.Cytrus\Jondo.Unity.Cytrus.csproj", "{14F2ED35-E478-429A-83BC-2C04C31C8553}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -223,6 +225,18 @@ Global
 		{DA645745-3A97-4A71-947F-3BC5723FD0D5}.Release|x64.Build.0 = Release|Any CPU
 		{DA645745-3A97-4A71-947F-3BC5723FD0D5}.Release|x86.ActiveCfg = Release|Any CPU
 		{DA645745-3A97-4A71-947F-3BC5723FD0D5}.Release|x86.Build.0 = Release|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Debug|x64.Build.0 = Debug|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Debug|x86.Build.0 = Debug|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Release|x64.ActiveCfg = Release|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Release|x64.Build.0 = Release|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Release|x86.ActiveCfg = Release|Any CPU
+		{14F2ED35-E478-429A-83BC-2C04C31C8553}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -97,6 +97,10 @@ namespace Jondo.Unity.Server.Network
         public static bool TryGet(Guid sessionId, out GameSession? session)
             => _sessions.TryGetValue(sessionId, out session);
 
+        /// <summary>Every session with a character in the world, whatever the map.</summary>
+        public static IReadOnlyList<GameSession> InWorld()
+            => _sessions.Values.Where(s => s.IsInWorld && s.CharacterId != 0).ToList();
+
         public static GameSession? FindByCharacter(long characterId)
             => _sessions.Values.FirstOrDefault(s => s.CharacterId == characterId);
 
@@ -218,8 +222,12 @@ namespace Jondo.Unity.Server.Network
             int seVa = 0;
             if (mapaQueDeja > 0 && mapaQueDeja != quien.MapId)
             {
-                seVa = await BroadcastToMapAsync(mapaQueDeja,
-                    ConnectionProtocol.BuildActorLeft(quien.CharacterId, porDonde), quien.Id);
+                seVa = await RemoveFromMapAsync(mapaQueDeja, quien.CharacterId, quien.Id, porDonde);
+
+                // And whoever follows him, if he leads a party, learns where he landed, right
+                // behind the jsd and kmu of the old map: frames 101-103 of "Grupos/con grupo
+                // seguir desplazamiento del lider...". See PartyFollowHandler.
+                await Handlers.PartyFollowHandler.LeaderMovedAsync(quien);
             }
 
             var ficha = DatabaseManager.GetCharacterById(quien.CharacterId);
@@ -236,6 +244,54 @@ namespace Jondo.Unity.Server.Network
                                  $"Avisados {seVa} que deja y {llega} que se encuentra.");
             }
             return (seVa, llega);
+        }
+
+        /// <summary>
+        /// A character gone from a map, told to everyone still on it: the kmu that takes him off
+        /// their screens, with the jsd before it for the ones in his party, as the captures have
+        /// it (see <see cref="ConnectionProtocol.BuildActorRemoved"/>).
+        /// </summary>
+        public static async Task<int> RemoveFromMapAsync(long mapId, long characterId, Guid exceptSessionId,
+                                                         int? porDonde = null)
+        {
+            var party = Managers.Parties.Of(characterId);
+
+            var targets = OnMap(mapId).Where(s => s.Id != exceptSessionId).ToArray();
+            var results = await Task.WhenAll(targets.Select(async target =>
+            {
+                try
+                {
+                    bool mate = party != null && Managers.Parties.Of(target.CharacterId) == party;
+                    foreach (byte[] notice in LeaveNotices(characterId, mate, porDonde))
+                        await target.SendAsync(notice);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Unregister(target);
+                    Program.LogDebug($"[Sessions] Send to {target.Id} failed: {ex.Message}");
+                    return false;
+                }
+            }));
+            return results.Count(delivered => delivered);
+        }
+
+        /// <summary>
+        /// What one person still on the map gets when a character leaves it, in order.
+        /// </summary>
+        /// <remarks>
+        /// The jsd only goes when the character walked out, because only then is there a way out
+        /// to tell. When the leader takes the zaap in "Grupos/con grupo seguir desplazamiento del
+        /// lider...", the member standing next to him gets an empty imk and the kmu, and no jsd
+        /// (frames 245-246). A jsd without its f3 is not "no direction" either: it is direction 0,
+        /// east, which proto3 leaves off the wire -- frame 5 is the leader walking right from
+        /// [1,-32] to [2,-32] -- so sending one for a jump told the party he had walked off east.
+        /// </remarks>
+        internal static IReadOnlyList<byte[]> LeaveNotices(long characterId, bool partyMate, int? porDonde)
+        {
+            byte[] removed = ConnectionProtocol.BuildActorRemoved(characterId);
+            if (!partyMate || !porDonde.HasValue) return new[] { removed };
+            return new[] { ConnectionProtocol.BuildActorLeft(characterId, porDonde), removed };
         }
 
         /// <summary>Creates a new ticket for a specific account, server and client language.</summary>

@@ -226,7 +226,15 @@ namespace Jondo.Unity.Server.Network
                 Push(Op.Jtg, BuildGiftCatalogue()),
             };
 
-        public static List<byte[]> BuildWelcomeBurst(IReadOnlyList<DatabaseManager.DbCharacter> characters)
+        /// <param name="withList">
+        /// Whether the character list closes the burst. It does on an ordinary login; when a
+        /// character of the account is still in a fight the real burst stops at the krs, the
+        /// client asks with kvc, and the answer is the list followed by the kvd. Measured in the
+        /// two reconnection captures: "kra lqu hoy kqu mgq mgt hpd krs", then "kvc krv" from the
+        /// client, then "kvi kvd".
+        /// </param>
+        public static List<byte[]> BuildWelcomeBurst(IReadOnlyList<DatabaseManager.DbCharacter> characters,
+                                                     bool withList = true)
         {
             var burst = new List<byte[]>
             {
@@ -283,7 +291,7 @@ namespace Jondo.Unity.Server.Network
             };
 
             // The list closes the burst, framed the way it always travels.
-            burst.AddRange(CharacterListFrames(characters));
+            if (withList) burst.AddRange(CharacterListFrames(characters));
             return burst;
         }
 
@@ -474,7 +482,21 @@ namespace Jondo.Unity.Server.Network
             public const int DodgeMovementPoints = 28;
             public const int Pods = 40;
             public const int Initiative = 44;
-            public const int Energy = 47;
+
+            /// <summary>
+            /// The energy, "energyPoints" in the client's catalogue, and the gauge it fills,
+            /// "maxEnergyPoints". 47 was named Energy here and carried the 10,000 of the gauge,
+            /// while 29 went out at zero: every captured kub has 10000 in both, or 8000 in the 29
+            /// once a fight is lost. See <see cref="Managers.Energy"/>.
+            /// </summary>
+            public const int EnergyPoints = 29;
+            public const int MaxEnergyPoints = 47;
+
+            /// <summary>
+            /// "hitPointLoss": the life missing outside a fight, negative, in the f2 of its f4.
+            /// "f4 { f2: -576 }" after the defeats of the captures. See <see cref="Managers.RestingLife"/>.
+            /// </summary>
+            public const int HitPointLoss = 97;
             public const int Prospecting = 48;
             public const int Heals = 49;
             public const int Escape = 78;
@@ -496,19 +518,18 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static readonly Dictionary<int, Func<long>> Derived = new Dictionary<int, Func<long>>
         {
-            { Stat.DodgeActionPoints,    () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.DodgeMovementPoints,  () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.WithdrawActionPoints, () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.WithdrawMovementPoints, () => Jondo.Unity.Server.Network.SessionContext.State.StatWisdom / 10 },
-            { Stat.Escape,               () => Jondo.Unity.Server.Network.SessionContext.State.StatAgility / 10 },
-            { Stat.Lock,                 () => Jondo.Unity.Server.Network.SessionContext.State.StatAgility / 10 },
+            { Stat.DodgeActionPoints,    () => Jondo.Unity.Server.Network.SessionContext.State.TotalWisdom / 10 },
+            { Stat.DodgeMovementPoints,  () => Jondo.Unity.Server.Network.SessionContext.State.TotalWisdom / 10 },
+            { Stat.WithdrawActionPoints, () => Jondo.Unity.Server.Network.SessionContext.State.TotalWisdom / 10 },
+            { Stat.WithdrawMovementPoints, () => Jondo.Unity.Server.Network.SessionContext.State.TotalWisdom / 10 },
+            { Stat.Escape,               () => Jondo.Unity.Server.Network.SessionContext.State.TotalAgility / 10 },
+            { Stat.Lock,                 () => Jondo.Unity.Server.Network.SessionContext.State.TotalAgility / 10 },
         };
 
         /// <summary>Points a character starts with, before anything is spent or equipped.</summary>
         private const int BaseActionPoints = 6;
         private const int BaseMovementPoints = 3;
         private const int BasePods = 1000;
-        private const int BaseEnergy = 10000;
 
         /// <summary>
         /// What every characteristic is worth on a character that has just been created, taken
@@ -602,7 +623,9 @@ namespace Jondo.Unity.Server.Network
                 .Bytes(9, FreshUnknownF9())
                 .VarIfNotZero(10, Jondo.Unity.Server.Network.SessionContext.State.Kamas);
 
-            // The six the player spends points on.
+            // The six the player spends points on: the base, which is the points, and beside it
+            // what the scrolls gave. The two travel in different fields and the client draws them
+            // as two lines, "Base" and "Adicional".
             var primary = new Dictionary<int, long>
             {
                 { Stat.Strength, Jondo.Unity.Server.Network.SessionContext.State.StatStrength },
@@ -612,6 +635,15 @@ namespace Jondo.Unity.Server.Network
                 { Stat.Agility, Jondo.Unity.Server.Network.SessionContext.State.StatAgility },
                 { Stat.Intelligence, Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence },
             };
+            var scrolled = new Dictionary<int, long>
+            {
+                { Stat.Strength, Jondo.Unity.Server.Network.SessionContext.State.ScrolledStrength },
+                { Stat.Vitality, Jondo.Unity.Server.Network.SessionContext.State.ScrolledVitality },
+                { Stat.Wisdom, Jondo.Unity.Server.Network.SessionContext.State.ScrolledWisdom },
+                { Stat.Chance, Jondo.Unity.Server.Network.SessionContext.State.ScrolledChance },
+                { Stat.Agility, Jondo.Unity.Server.Network.SessionContext.State.ScrolledAgility },
+                { Stat.Intelligence, Jondo.Unity.Server.Network.SessionContext.State.ScrolledIntelligence },
+            };
 
             IReadOnlyList<int> ids = WorldEntry.CharacteristicIds;
             if (ids.Count == 0)
@@ -620,7 +652,7 @@ namespace Jondo.Unity.Server.Network
                 var fallback = new List<int>
                 {
                     Stat.LifePoints, Stat.ActionPoints, Stat.RemainingPoints,
-                    Stat.MovementPoints, Stat.Energy, Stat.Pods
+                    Stat.MovementPoints, Stat.EnergyPoints, Stat.MaxEnergyPoints, Stat.Pods
                 };
                 fallback.AddRange(primary.Keys);
                 fallback.AddRange(FreshCharacter.Keys);
@@ -634,6 +666,7 @@ namespace Jondo.Unity.Server.Network
             {
                 long value = primary.TryGetValue(id, out long spent) ? spent : ValueOf(id, level);
                 fromEquipment.TryGetValue(id, out long equipped);
+                scrolled.TryGetValue(id, out long fromScrolls);
 
                 switch (WorldEntry.ContainerOf(id))
                 {
@@ -649,7 +682,7 @@ namespace Jondo.Unity.Server.Network
                         break;
 
                     default:
-                        AddStat(body, id, value, equipped);
+                        AddStat(body, id, value, equipped, fromScrolls);
                         break;
                 }
             }
@@ -658,15 +691,25 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>Value of a characteristic that the player does not spend points on.</summary>
-        private static long ValueOf(int id, int level)
+        internal static long ValueOf(int id, int level)
         {
             if (id == Stat.LifePoints) return BaseLife(level);
             if (id == Stat.ActionPoints) return BaseActionPoints;
             if (id == Stat.MovementPoints) return BaseMovementPoints;
-            if (id == Stat.Energy) return BaseEnergy;
+            if (id == Stat.MaxEnergyPoints) return Jondo.Unity.World.Fights.DefeatPenalty.MaxEnergy;
+            if (id == Stat.EnergyPoints)
+                return Managers.Energy.Of(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
+            if (id == Stat.HitPointLoss)
+            {
+                // What was missing when the client's regeneration counter last started: it counts
+                // on from there by itself (the ktz of every return to roleplay).
+                var state = Jondo.Unity.Server.Network.SessionContext.State;
+                DateTime since = state.RegenerationStartedUtc == default ? DateTime.UtcNow : state.RegenerationStartedUtc;
+                return -Managers.RestingLife.MissingAt(state.CharacterId, since);
+            }
             // Five pods a point of strength on top of the base, which is what the capture shows:
             // five points of strength moved this characteristic by twenty-five.
-            if (id == Stat.Pods) return BasePods + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength;
+            if (id == Stat.Pods) return BasePods + 5L * Jondo.Unity.Server.Network.SessionContext.State.TotalStrength;
             if (id == Stat.RemainingPoints) return Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints;
             if (Derived.TryGetValue(id, out var from)) return from();
             return FreshCharacter.TryGetValue(id, out long value) ? value : 0;
@@ -688,14 +731,22 @@ namespace Jondo.Unity.Server.Network
         private static byte[] FreshUnknownF9() =>
             Pb.New().Var(2, 2).Msg(3, Pb.New().Var(3, 500)).Var(5, 1).Build();
 
-        private static void AddStat(Pb body, int id, long value, long fromEquipment = 0)
+        /// <summary>
+        /// One characteristic: f2 the base, f3 what the scrolls gave, f7 what the equipment adds.
+        /// </summary>
+        /// <remarks>
+        /// f3 is MEASURED: every scrolled character in the captures carries its scrolls there --
+        /// <c>f4 { f2: 398, f3: 100, f7: 499 }</c> is a real strength -- and a characteristic the
+        /// player never scrolled leaves it out, as proto3 does with a zero.
+        /// </remarks>
+        private static void AddStat(Pb body, int id, long value, long fromEquipment = 0, long fromScrolls = 0)
         {
             // Characteristic 0 is life, and it is the one entry of the real message that carries
             // no id at all: proto3 leaves the field out when the value is zero, and zero is its
             // id. Writing Var(1, 0) here would put a field the real one does not have.
             var entry = Pb.New();
             if (id != 0) entry.Var(1, id);
-            entry.Msg(4, Pb.New().VarIfNotZero(2, value).VarIfNotZero(7, fromEquipment));
+            entry.Msg(4, Pb.New().VarIfNotZero(2, value).VarIfNotZero(3, fromScrolls).VarIfNotZero(7, fromEquipment));
             body.Msg(11, entry);
         }
 
@@ -723,6 +774,52 @@ namespace Jondo.Unity.Server.Network
         /// and starts over.
         /// </summary>
         public static byte[] BuildActorsComplete() => Push(Op.Lva);
+
+        // ─── World: life regeneration ────────────────────────────────────────
+
+        /// <summary>
+        /// The regeneration rate the real server hands out on every return to roleplay, in
+        /// tenths of a second per life point: 135 of the 143 ktz in the captures carry it.
+        /// </summary>
+        /// <remarks>
+        /// The other eight carry 1 -- the Trool fair and one world entry with a guild raid -- and
+        /// what makes a rate fast is not measured, so nothing here decides it.
+        /// </remarks>
+        public const int RegenerationRate = 5;
+
+        /// <summary>One regeneration tick, in milliseconds: the rate is in tenths of a second.</summary>
+        public const int RegenerationTickMs = RegenerationRate * 100;
+
+        /// <summary>
+        /// Life regeneration begins (ktz): f1 the rate. Right behind every "kml kmp" back to
+        /// roleplay -- the world entry replays the captured one, and the fight end builds this.
+        /// </summary>
+        public static byte[] BuildRegenerationStarted(int rate)
+            => Push(Op.Ktz, Pb.New().Var(1, rate).Build());
+
+        /// <summary>
+        /// Life regeneration ends (kuq): f1 the life, f2 the ticks the counter had run, f4 the
+        /// maximum. Between the lqu and the lva of the tactical map load, at every fight entry.
+        /// </summary>
+        /// <remarks>
+        /// This is what stops the client's own counter. Without it the counter started at the
+        /// world entry keeps adding one point every tick THROUGH the fight, to the local player's
+        /// bar only, which is what "the Ocra recovers life tick by tick" was: the roleplay
+        /// regeneration drawn over a fight. Measured against the two challenge captures of the
+        /// 9th of August: 08db2810970120bb29 is {5211, 151, 5307}.
+        /// </remarks>
+        public static byte[] BuildRegenerationEnded(int life, int ticks, int maxLife)
+            => Push(Op.Kuq, Pb.New().Var(1, life).VarIfNotZero(2, ticks).Var(4, maxLife).Build());
+
+        /// <summary>
+        /// How many ticks a counter started at <paramref name="startedUtc"/> has run by
+        /// <paramref name="nowUtc"/>: the f2 of the kuq. Zero when it was never started.
+        /// </summary>
+        public static int RegenerationTicksSince(DateTime startedUtc, DateTime nowUtc)
+        {
+            if (startedUtc == default || nowUtc <= startedUtc) return 0;
+            return (int)Math.Min(int.MaxValue, (long)(nowUtc - startedUtc).TotalMilliseconds / RegenerationTickMs);
+        }
 
         // ─── World: actors on the map ───────────────────────────────────────────
 
@@ -809,36 +906,11 @@ namespace Jondo.Unity.Server.Network
             {
                 if (group.Members.Count == 0) continue;
 
-                var creatures = Pb.New();
-                for (int i = 1; i < group.Members.Count; i++)
-                {
-                    var member = group.Members[i];
-                    creatures.Msg(1, Pb.New()
-                        .Var(1, member.Monster.Id)
-                        .VarIfNotZero(2, LevelOf(member))
-                        .Msg(3, Pb.New()
-                            .Var(2, LookKind)
-                            .VarIfNotZero(3, BonesOf(member.Monster.Look)))
-                        .VarIfNotZero(4, GradeOf(member)));
-                }
+                // A group being fought went off the map with a kmu when its fight opened (the
+                // follow capture, frame 132): it is not drawn for whoever comes now either.
+                if (Handlers.FightHandler.IsGroupFighting(group.MobId)) continue;
 
-                var leader = group.Members[0];
-                creatures.Msg(2, Pb.New()
-                    .Var(1, leader.Monster.Id)
-                    .VarIfNotZero(2, LevelOf(leader))
-                    .VarIfNotZero(4, GradeOf(leader)));
-
-                jss.Msg(5, Pb.New()
-                    .Msg(1, Pb.New().Var(1, group.CellId).Var(2, 1))
-                    .Msg(2, Pb.New()
-                        .Msg(1, Pb.New().Msg(4, Pb.New()
-                            .Var(1, 1)
-                            .Msg(2, creatures)
-                            .Var(5, -1)))
-                        .Msg(3, Pb.New()
-                            .Var(2, LookKind)
-                            .VarIfNotZero(3, BonesOf(leader.Monster.Look))))
-                    .Var(3, group.MobId));
+                jss.Msg(5, MonsterGroupActor(group));
             }
 
             AddNpcs(jss, mapId);
@@ -847,9 +919,61 @@ namespace Jondo.Unity.Server.Network
             var where = MapManager.GetMapInfo(mapId);
             if (where != null) jss.VarIfNotZero(6, where.SubAreaId);
 
-            AddInteractiveElements(jss, mapId);
+            // The houses, between the subarea and the elements as in both house captures: f7 the
+            // one the viewer is inside, f9 those on this street that have an owner.
+            Handlers.HouseHandler.AddToMap(jss, mapId);
+
+            AddInteractiveElements(jss, mapId, accountId);
+
+            // And last, the fights in their placement: the swords. Each f12 is what an hpy carries
+            // (the sword capture's jss at frame 53, the jalatós one at 840); a fight past its
+            // placement has none -- it is only counted, by the jqz that follows the jss.
+            foreach (var fight in Handlers.FightHandler.PlacementFightsOnMap(mapId))
+            {
+                jss.Msg(12, Handlers.FightHandler.MapEntryOf(fight));
+            }
 
             return jss.Build();
+        }
+
+        /// <summary>
+        /// A monster group as an actor of the map: its entry in the jss, and what a jsn carries
+        /// to draw it again (the follow capture's frame 131 is this same block).
+        /// </summary>
+        internal static Pb MonsterGroupActor(Managers.MobSpawnManager.MobGroup group)
+        {
+            var creatures = Pb.New();
+            for (int i = 1; i < group.Members.Count; i++)
+            {
+                var member = group.Members[i];
+                creatures.Msg(1, Pb.New()
+                    .Var(1, member.Monster.Id)
+                    .VarIfNotZero(2, LevelOf(member))
+                    .Msg(3, Pb.New()
+                        .Var(2, LookKind)
+                        .VarIfNotZero(3, BonesOf(member.Monster.Look)))
+                    .VarIfNotZero(4, GradeOf(member)));
+            }
+
+            var leader = group.Members[0];
+            creatures.Msg(2, Pb.New()
+                .Var(1, leader.Monster.Id)
+                .VarIfNotZero(2, LevelOf(leader))
+                .VarIfNotZero(4, GradeOf(leader)));
+
+            if (group.Modular) AddAlternatives(creatures, group.Members);
+
+            return Pb.New()
+                .Msg(1, Pb.New().Var(1, group.CellId).Var(2, group.Orientation))
+                .Msg(2, Pb.New()
+                    .Msg(1, Pb.New().Msg(4, Pb.New()
+                        .Var(1, 1)
+                        .Msg(2, creatures)
+                        .Var(5, -1)))
+                    .Msg(3, Pb.New()
+                        .Var(2, LookKind)
+                        .VarIfNotZero(3, BonesOf(leader.Monster.Look))))
+                .Var(3, group.MobId);
         }
 
         /// <summary>
@@ -902,14 +1026,37 @@ namespace Jondo.Unity.Server.Network
 
         private static void AddNpcs(Pb jss, long mapId)
         {
+            // Quién pregunta, para los NPCs que se pintan de varias maneras. Se arma UNA vez por
+            // mapa y sólo si hace falta: el resolvedor mira el gremio en la base, y hacerlo por
+            // cada NPC sería una consulta por actor en cada carga de mapa.
+            Jondo.Unity.World.Content.Criterion.Resolver quien = null;
+
             foreach (var npc in Managers.Npcs.Of(mapId))
             {
+                long bones = npc.Bones;
+                var skins = npc.Skins;
+                var colors = npc.Colors;
+                var scales = npc.Scales;
+
+                if (npc.Variants.Count > 1)
+                {
+                    quien ??= Managers.GuildRaidManager.ResolverFor(GameState.CharacterId);
+                    var otro = Managers.Npcs.VariantFor(npc, quien);
+                    if (otro != null)
+                    {
+                        bones = otro.Bones;
+                        skins = otro.Skins;
+                        colors = otro.Colors;
+                        scales = otro.Scales;
+                    }
+                }
+
                 var look = Pb.New();
-                if (npc.Colors.Length > 0) look.Packed(1, npc.Colors);
+                if (colors.Length > 0) look.Packed(1, colors);
                 look.Var(2, LookKind);
-                look.VarIfNotZero(3, npc.Bones);
-                if (npc.Scales.Length > 0) look.Packed(5, npc.Scales);
-                if (npc.Skins.Length > 0) look.Packed(6, npc.Skins);
+                look.VarIfNotZero(3, bones);
+                if (scales.Length > 0) look.Packed(5, scales);
+                if (skins.Length > 0) look.Packed(6, skins);
 
                 // El género sólo viaja cuando vale 1. Comprobado en las cincuenta y seis plantillas
                 // de la captura: las veinte con género 1 lo mandan, las treinta y cinco con género
@@ -977,10 +1124,10 @@ namespace Jondo.Unity.Server.Network
         ///
         /// Van al final, detrás de la subzona, que es donde los pone la captura real.
         /// </summary>
-        private static void AddInteractiveElements(Pb jss, long mapId)
+        private static void AddInteractiveElements(Pb jss, long mapId, long viewerAccountId)
         {
             foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
-                Declare(jss, interactive);
+                Declare(jss, interactive, viewerAccountId);
 
             AddQuestElements(jss, mapId);
             AddReadableElements(jss, mapId);
@@ -1074,7 +1221,7 @@ namespace Jondo.Unity.Server.Network
         /// los veinticinco fresnos de un mismo mapa, sin una excepción. Todo lo que no es recurso
         /// —zaaps, cofres, puertas— va siempre en el 4 y sin estado, como hasta ahora.
         /// </summary>
-        private static void Declare(Pb jss, Managers.RegisteredInteractive interactive)
+        private static void Declare(Pb jss, Managers.RegisteredInteractive interactive, long viewerAccountId)
         {
             bool gathering = Managers.Resources.Is(interactive.MapId, interactive.Element.Id);
             var state = gathering
@@ -1096,7 +1243,9 @@ namespace Jondo.Unity.Server.Network
             // en tres de los cuatro oficios.
             if (gathering && usable) declaration.Var(2, 0);
 
-            foreach (var action in interactive.Actions)
+            // A house's door and chests offer each viewer his own skills: the owner sells, a
+            // stranger buys. Every other element offers all of them.
+            foreach (var action in Handlers.HouseHandler.VisibleActions(interactive, viewerAccountId))
             {
                 declaration.Msg(usable ? 4 : 3, Pb.New()
                     .Var(1, action.SkillInstanceId)
@@ -1119,12 +1268,16 @@ namespace Jondo.Unity.Server.Network
             // soleils de sortie — un f15 artificiel empêche le client de rattacher l'élément au
             // dessin de ses propres données de carte. C'est ce qui laissait les portes invisibles
             // tant qu'on ne tenait pas la touche des interactifs enfoncée.
+            //
+            // A marketplace counter has none either: 22 declarations of 17 counters in the
+            // captures, 212600837's equipment to 207625216's cosmetics, and not one f15 among them.
             bool sinColocacion = false;
             foreach (var action in interactive.Actions)
             {
                 if (action.Kind == Managers.InteractiveActionKind.Teleport
                     || action.Kind == Managers.InteractiveActionKind.Dream
-                    || action.Kind == Managers.InteractiveActionKind.DreamDoor) sinColocacion = true;
+                    || action.Kind == Managers.InteractiveActionKind.DreamDoor
+                    || action.Kind == Managers.InteractiveActionKind.Marketplace) sinColocacion = true;
             }
             if (interactive.Actions.Count == 0 || sinColocacion) return;
 
@@ -1164,6 +1317,34 @@ namespace Jondo.Unity.Server.Network
         /// Level of a spawned monster: the one the spawner rolled, or failing that the one its
         /// grade declares.
         /// </summary>
+        /// <summary>
+        /// The groups a dungeon room shows by team size, behind the leader in the same f2:
+        ///
+        ///   f3 { f1 (repeated): member { f1: id, f2: level, f4: grade }   f2: team size }
+        ///
+        /// Measured on the five rooms of the jalatós capture: one alternative for 1 player with
+        /// the first four of the eight, then 5, 6, 7 and 8 with the first five to eight -- none
+        /// for 2, 3 or 4, which fight the four of the first. Members with no look of their own,
+        /// like the leader.
+        /// </summary>
+        internal static void AddAlternatives(Pb creatures, IReadOnlyList<Managers.MobSpawnManager.MobMember> members)
+        {
+            for (int size = Managers.MobSpawnManager.DungeonMinimum;
+                 size <= Math.Min(members.Count, Managers.MobSpawnManager.DungeonGroupSize); size++)
+            {
+                var alternative = Pb.New();
+                for (int i = 0; i < size; i++)
+                {
+                    alternative.Msg(1, Pb.New()
+                        .Var(1, members[i].Monster.Id)
+                        .VarIfNotZero(2, LevelOf(members[i]))
+                        .VarIfNotZero(4, GradeOf(members[i])));
+                }
+                alternative.Var(2, size == Managers.MobSpawnManager.DungeonMinimum ? 1 : size);
+                creatures.Msg(3, alternative);
+            }
+        }
+
         private static long LevelOf(Managers.MobSpawnManager.MobMember member)
         {
             if (member.Level > 0) return member.Level;
@@ -1177,9 +1358,24 @@ namespace Jondo.Unity.Server.Network
         private const int LookKind = 3;
 
         /// <summary>
-        /// El grado de un monstruo, de 1 a 5.
+        /// An NPC's look as the actor block carries it: { f1: packed colours, f2: 3, f3: bones,
+        /// f5: packed scales, f6: packed skins }. The same bytes the map's NPCs go out with.
+        /// </summary>
+        public static byte[] BuildNpcLook(long bones, long[] skins, long[] colors, long[] scales)
+        {
+            var look = Pb.New();
+            if (colors.Length > 0) look.Packed(1, colors);
+            look.Var(2, LookKind);
+            look.VarIfNotZero(3, bones);
+            if (scales.Length > 0) look.Packed(5, scales);
+            if (skins.Length > 0) look.Packed(6, skins);
+            return look.Build();
+        }
+
+        /// <summary>
+        /// El grado de un monstruo, de 1 a 5, o hasta 6 si el monstruo declara seis.
         ///
-        /// Y ahí está el tope, que es lo que importa: en trescientos y pico monstruos de las
+        /// El tope de cinco es lo que importa: en trescientos y pico monstruos silvestres de las
         /// capturas reales el grado sale 1, 2, 3, 4 o 5 y nunca más. Nuestros datos no se portan
         /// igual —4.098 monstruos tienen cinco grados, pero 479 tienen seis, 169 tienen diez y uno
         /// tiene veinte— y el generador elegía cualquiera, así que salían grados 6 y más arriba.
@@ -1187,11 +1383,21 @@ namespace Jondo.Unity.Server.Network
         /// Al cliente eso le sienta mal en silencio: el grupo se dibuja, pero pasarle el ratón por
         /// encima no enseña nada y la tecla W lo salta. Por eso solo se veía la información de uno
         /// o dos grupos de los cuatro del mapa.
+        ///
+        /// Y el sexto, medido después: el Puch Ingball de nivel 200 del kanojedo viaja como
+        /// <c>f2=200 f4=6</c> en dos capturas, y el cliente lo pinta y lo deja mirar, porque sus
+        /// propios datos le dan seis grados. El sexto sólo sale cuando el monstruo lo tiene, y a
+        /// los generados nadie se lo reparte; lo que se ve más arriba de eso sigue sin medir.
         /// </summary>
         private const int MaxGrade = 5;
+        private const int MaxDeclaredGrade = 6;
 
         private static long GradeOf(Managers.MobSpawnManager.MobMember member)
-            => Math.Clamp(member.GradeIndex + 1, 1, MaxGrade);
+        {
+            int declared = member.Monster?.Grades?.Count ?? 0;
+            int top = declared >= MaxDeclaredGrade ? MaxDeclaredGrade : MaxGrade;
+            return Math.Clamp(member.GradeIndex + 1, 1, top);
+        }
 
         /// <summary>
         /// The bonesId out of the look the database stores for a monster, which comes in the
@@ -1425,6 +1631,23 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(3, level)
                 .VarIfNotZero(4, floor)
                 .VarIfNotZero(5, experience)).Build();
+
+        /// <summary>
+        /// Several jobs in one irq, the way the entry into the world lists them all: one f1 entry
+        /// each, the same five fields as <see cref="BuildJobExperience"/>.
+        /// </summary>
+        public static byte[] BuildJobsExperience(IEnumerable<(int JobId, long Next, int Level, long Floor, long Experience)> jobs)
+        {
+            var irq = Pb.New();
+            foreach (var (jobId, next, level, floor, experience) in jobs)
+                irq.Msg(1, Pb.New()
+                    .Var(1, jobId)
+                    .VarIfNotZero(2, next)
+                    .VarIfNotZero(3, level)
+                    .VarIfNotZero(4, floor)
+                    .VarIfNotZero(5, experience));
+            return irq.Build();
+        }
 
         /// <summary>Cambia la cantidad de un objeto que ya estaba en la bolsa (ivj).</summary>
         public static byte[] BuildItemQuantity(long uid, int total)
@@ -1910,10 +2133,27 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildSystemMessage(int messageId, params string[] parameters)
             => BuildInfoMessage(Managers.InfoMessages.Info, messageId, parameters);
 
+        /// <summary>
+        /// A line of free text as an information message (lqn), only to the one it is for: the
+        /// answer of a command, or what a window we have no measured frame for would have said.
+        /// Before this those went as a chat line in the player's own name, on the channel they
+        /// wrote in -- the general one, most of the time -- so it read as them talking.
+        /// </summary>
+        public static byte[] BuildNotice(string text)
+            => BuildInfoMessage(Managers.InfoMessages.Info, Managers.InfoMessages.FreeText, text ?? "");
+
+        /// <summary>
+        /// "{0} acaba de volver a conectarse al combate." (lqn, type 1, text 184). The real
+        /// server sends it right behind the lqu of the tactical map when somebody reconnects
+        /// into his fight, in both reconnection captures, before the lva.
+        /// </summary>
+        public static byte[] BuildBackInTheFight(string name)
+            => BuildInfoMessage(Managers.InfoMessages.Warning, Managers.InfoMessages.BackInTheFight, name);
+
         /// <summary>El mismo, diciendo de qué tipo es.</summary>
         public static byte[] BuildInfoMessage(int type, int messageId, params string[] parameters)
         {
-            var lqn = Pb.New().VarIfNotZero(1, type).Var(2, messageId);
+            var lqn = Pb.New().VarIfNotZero(1, type).VarIfNotZero(2, messageId);
             foreach (string parameter in parameters) lqn.Str(4, parameter);
             return lqn.Build();
         }
@@ -1987,17 +2227,36 @@ namespace Jondo.Unity.Server.Network
         /// muñeco andando hacia ese lado y entonces lo borra.
         ///
         ///   10 a282f0a6c408 18 06     quién, y se fue por arriba
-        ///   10 a282f0a6c408           quién, y ya está
-        ///
-        /// Los que van sin dirección son las salidas que no tienen ninguna: por el zaap uno no se
-        /// va hacia ningún lado, desaparece. Por eso es opcional.
+        ///   10 a282f0a6c408           who, and he left to the east (0, off the wire)
         /// </summary>
+        /// <remarks>
+        /// The one without f3 is direction 0, east, which proto3 leaves off the wire; it is not an
+        /// exit with no direction. Frame 5 of that capture is the leader walking from [1,-32] to
+        /// [2,-32], and the member's own jsd of frame 19 is the same walk. So a 0 is written the
+        /// same way here, and a jump -- which has no way out at all -- sends no jsd: see
+        /// <see cref="SessionRegistry.LeaveNotices"/>.
+        /// </remarks>
         public static byte[] BuildActorLeft(long contextualId, int? porDonde = null)
         {
             var pb = Pb.New().Var(2, contextualId);
-            if (porDonde.HasValue) pb.Var(3, porDonde.Value);
+            if (porDonde.HasValue) pb.VarIfNotZero(3, porDonde.Value);
             return Push(Op.Jsd, pb.Build());
         }
+
+        /// <summary>
+        /// Takes an actor off the map in the client of someone watching (kmu): only who.
+        /// </summary>
+        /// <remarks>
+        /// This, and not the jsd, is what makes a character who left disappear from the others'
+        /// screens. In "Movimiento/captura otro personaje saliendo del mapa" two characters walk
+        /// off the observer's map, and each time the server sends their jsj to the edge and then
+        /// kmu { f2: their id } -- no jsd at all. The jsd goes to the one leaving, before his jru,
+        /// and to his party: in "Grupos/con grupo seguir desplazamiento del lider..." the member
+        /// watching gets the leader's jsd and, right behind it, the same kmu. With the jsd alone
+        /// the character walked to the edge on the others' screens and stayed there.
+        /// </remarks>
+        public static byte[] BuildActorRemoved(long contextualId)
+            => Push(Op.Kmu, Pb.New().Var(2, contextualId).Build());
 
         /// <summary>"Load this map" (jru).</summary>
         public static byte[] BuildLoadMap(long mapId)
@@ -2062,7 +2321,10 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static byte[] BuildInventory()
         {
-            var ivx = Pb.New();
+            // f1 is the kamas: every ivx of every capture carries them there, 66,381,547 on the way
+            // into the world, 61,898,327 when the oven opens. Without them a refresh of the bag
+            // reads as a character with none.
+            var ivx = Pb.New().VarIfNotZero(1, SessionContext.State.Kamas);
             foreach (var item in Managers.Equipment.All)
             {
                 var body = Pb.New().Var(1, item.Template);
@@ -2089,6 +2351,10 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static Pb? EffectEntry(Managers.Equipment.ItemEffect effect)
         {
+            // The smithmagic pool and any other line of ours that is no effect of the client's:
+            // it lives with the item and never goes on the wire.
+            if (effect.Effect <= 0) return null;
+
             // Los que no son un número van con su texto en f1: el 988 es "Fabricado por: #4" y el
             // #4 es esta cadena. Sin texto no van, porque la etiqueta saldría vacía.
             if (!string.IsNullOrEmpty(effect.Text))
@@ -2104,7 +2370,9 @@ namespace Jondo.Unity.Server.Network
             switch (field)
             {
                 case Managers.EffectFields.AsNumber:
-                    entry.VarIfNotZero(4, v1);
+                    // Written even at zero: "Ninguna forjamagia futura" (2825) travels as
+                    // 20 00 58 89 16 on the captured shield, its f4 there and empty.
+                    entry.Var(4, v1);
                     break;
                 case Managers.EffectFields.AsRange:
                     entry.Msg(5, Pb.New().VarIfNotZero(1, v1).VarIfNotZero(2, v2));
@@ -2154,6 +2422,16 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static void AddCharacterOptions(Pb humanoidBody, long characterId)
         {
+            // El gremio, el primero de las opciones. Medido en el jsn del fundador nada más fundar
+            // «Jondo»: f5 { f4 { f1{f3 emblema}, f2 id, f3 nombre, f4 nivel } }, delante del
+            // ornamento y del f7:1. Sin esto un personaje con gremio no lleva su nombre en el
+            // mapa, ni para él ni para los demás.
+            var guild = Managers.GuildStore.GuildOf(characterId);
+            if (guild != null)
+            {
+                humanoidBody.Msg(5, Pb.New().Msg(4, GuildProtocol.GuildBlock(guild)));
+            }
+
             var (title, ornament) = Managers.Wardrobe.Of(characterId);
 
             if (title != Managers.Wardrobe.None)
@@ -2202,18 +2480,8 @@ namespace Jondo.Unity.Server.Network
 
         // ─── World: cofre ───────────────────────────────────────────────────────
 
-        /// <summary>
-        /// "El cofre está abierto" (kci). De la captura del cofre de una casa:
-        ///
-        ///   f1: 100   f3: 4
-        ///
-        /// Los dos son constantes ahí; el 100 tiene pinta de ser cuántos huecos tiene.
-        /// </summary>
-        public static byte[] BuildStorageOpened()
-            => Pb.New().Var(1, StorageSlots).Var(3, StorageKind).Build();
-
-        private const int StorageSlots = 100;
-        private const int StorageKind = 4;
+        // "El cofre está abierto" (kci) is built per kind of storage -- a house chest's is not a
+        // bin's nor the haven bag's -- in StorageProtocol.BuildOpened.
 
         /// <summary>
         /// Lo que hay dentro del cofre (iwb). Misma forma que el inventario, con la bolsa como
@@ -2251,6 +2519,37 @@ namespace Jondo.Unity.Server.Network
             return Pb.New()
                 .Msg(field, Pb.New().Var(1, Managers.Equipment.Bag).Msg(5, body))
                 .Build();
+        }
+
+        /// <summary>
+        /// An item the way every item message carries it: { f1: template, f2: effects, f3: how
+        /// many, f4: uid }. The uid is left out when it is zero, as the kdr of a craft of several
+        /// does.
+        /// </summary>
+        internal static Pb ItemBody(int gid, IEnumerable<Managers.Equipment.ItemEffect> effects, int quantity, long uid)
+        {
+            var body = Pb.New().Var(1, gid);
+            foreach (var effect in effects)
+            {
+                var entry = EffectEntry(effect);
+                if (entry != null) body.Msg(2, entry);
+            }
+            return body.Var(3, Math.Max(1, quantity)).VarIfNotZero(4, uid);
+        }
+
+        /// <summary>
+        /// An item's effects, one entry each under the field given, the way <see cref="ItemBody"/>
+        /// writes them under f2. The marketplace's offers carry them under f4 (kbt, kgp) and f1
+        /// (kfi), with nothing else of the item around them.
+        /// </summary>
+        internal static Pb AddEffects(Pb target, int field, IEnumerable<Managers.Equipment.ItemEffect> effects)
+        {
+            foreach (var effect in effects)
+            {
+                var entry = EffectEntry(effect);
+                if (entry != null) target.Msg(field, entry);
+            }
+            return target;
         }
 
         /// <summary>Un objeto que se va (itc del cofre, ium de la bolsa): solo su identificador.</summary>

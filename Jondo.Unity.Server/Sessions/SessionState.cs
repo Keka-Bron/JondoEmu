@@ -39,8 +39,21 @@ namespace Jondo.Unity.Server
         /// <summary>The character's ACCUMULATED experience, not the current level's.</summary>
         public long Experience { get; set; }
 
+        /// <summary>
+        /// When the client's life regeneration counter was last started (the ktz), so that the
+        /// kuq that stops it at fight entry can say how many ticks it ran. Default when it never
+        /// was.
+        /// </summary>
+        public DateTime RegenerationStartedUtc { get; set; }
+
         // Combat State
         public bool IsInFight { get; set; }
+
+        /// <summary>
+        /// This session came back into a fight that was already running, and the client has
+        /// not asked for the board yet. Cleared by the burst that answers that request.
+        /// </summary>
+        public bool FightRejoinPending { get; set; }
 
         /// <summary>
         /// De dónde salió este jugador al entrar en combate, para devolverlo ahí al acabar.
@@ -113,6 +126,30 @@ namespace Jondo.Unity.Server
         /// <summary>Los logros de este personaje. Null hasta entrar al mundo, como las misiones.</summary>
         public World.Achievements.AchievementLog? Achievements { get; set; }
 
+        /// <summary>
+        /// The tallies achievements count — monsters beaten, zones entered, items crafted — by
+        /// kind and key, loaded on entering the world and written as they change.
+        /// </summary>
+        public Dictionary<(string Kind, long Key), long> AchievementTallies { get; set; } = new();
+
+        /// <summary>The dungeon and anomaly challenges this character has validated, for <c>EH</c>.</summary>
+        public HashSet<int> ChallengesDone { get; set; } = new HashSet<int>();
+
+        /// <summary>The level the level-based achievements were last looked at on, so a map change does not look again for nothing.</summary>
+        public int AchievementLevelChecked { get; set; }
+
+        /// <summary>Achievements a fight may have earned, looked at once the character is back on the map.</summary>
+        public HashSet<int> AchievementsPending { get; } = new HashSet<int>();
+
+        /// <summary>The emotes this character can play: the starting ones and the ones learned.</summary>
+        public HashSet<int> Emotes { get; set; } = new HashSet<int>();
+
+        /// <summary>When the last emote played, for the gap the real server keeps between two.</summary>
+        public DateTime LastEmoteUtc { get; set; } = DateTime.MinValue;
+
+        /// <summary>When the last smiley went up, for the same gap.</summary>
+        public DateTime LastSmileyUtc { get; set; } = DateTime.MinValue;
+
         /// <summary>En qué nivel va un oficio. Cero experiencia es nivel 1, no nivel cero.</summary>
         public int JobLevel(int jobId)
             => Jobs.TryGetValue(jobId, out var progress) ? progress.Level : 1;
@@ -129,6 +166,33 @@ namespace Jondo.Unity.Server
         public int StatChance { get; set; }
         public int StatAgility { get; set; }
 
+        /// <summary>
+        /// What the scrolls gave, per characteristic, kept apart from the points the player spent.
+        /// </summary>
+        /// <remarks>
+        /// The two are different things to the client and to the cost of the next point: the
+        /// sheet draws them as "Base" and "Adicional", the next point of strength is priced off the
+        /// base alone, and the capital the player has left is the capital minus the base. Measured:
+        /// every scrolled character in the captures carries its scrolls in f3 of the
+        /// characteristic and its spent points in f2, and never the sum in either. Keeping the
+        /// scrolls inside the base was what made a fresh level 200 show 183 points to spend
+        /// instead of 995.
+        /// </remarks>
+        public int ScrolledVitality { get; set; }
+        public int ScrolledWisdom { get; set; }
+        public int ScrolledStrength { get; set; }
+        public int ScrolledIntelligence { get; set; }
+        public int ScrolledChance { get; set; }
+        public int ScrolledAgility { get; set; }
+
+        /// <summary>The characteristic as the game uses it: points spent plus scrolls.</summary>
+        public int TotalVitality => StatVitality + ScrolledVitality;
+        public int TotalWisdom => StatWisdom + ScrolledWisdom;
+        public int TotalStrength => StatStrength + ScrolledStrength;
+        public int TotalIntelligence => StatIntelligence + ScrolledIntelligence;
+        public int TotalChance => StatChance + ScrolledChance;
+        public int TotalAgility => StatAgility + ScrolledAgility;
+
         // Session-local UI/dialog state. These used to be static fields in handlers.
         public long OpenZaapMapId { get; set; }
 
@@ -143,6 +207,18 @@ namespace Jondo.Unity.Server
 
         /// <summary>La casilla de la calle desde la que se entró.</summary>
         public int HouseEntryCell { get; set; }
+
+        /// <summary>
+        /// The street door one came in by: which house this is, since several doors lead to the
+        /// same interior and each door is a house of its own, with its own owner and chests.
+        /// </summary>
+        public int HouseEntryElementId { get; set; }
+
+        /// <summary>The house window this character has open -- a sale, a purchase, a code keypad -- if any.</summary>
+        public Handlers.HouseHandler.Dialog? HouseDialog { get; set; }
+
+        /// <summary>The house chest, bin or guild chest this character has open, if any.</summary>
+        public Handlers.StorageHandler.Window? Storage { get; set; }
 
         /// <summary>
         /// Desde qué mapa se entró al merkasako, para volver ahí con la misma tecla.
@@ -163,6 +239,39 @@ namespace Jondo.Unity.Server
         /// <summary>La casilla del mundo desde la que se entró al merkasako.</summary>
         public int HavenBagEntryCell { get; set; }
         public bool IsChestOpen { get; set; }
+
+        /// <summary>
+        /// The map where this character opened the bank, or zero when the bank is not open.
+        /// A map rather than a flag: see <see cref="Handlers.BankHandler.IsOpen"/>.
+        /// </summary>
+        public long BankMapId { get; set; }
+
+        /// <summary>The workshop this character has open -- craft station, magus table, grinder -- if any.</summary>
+        public Handlers.WorkshopHandler.Bench? Workshop { get; set; }
+
+        /// <summary>The commission this character is in, as the magus or as the customer, if any.</summary>
+        public Handlers.Commission? Commission { get; set; }
+
+        /// <summary>The trade with another player this character is in, asked or open, if any.</summary>
+        public Handlers.Trade? Trade { get; set; }
+
+        /// <summary>The marketplace this character has open, to buy or to sell, if any.</summary>
+        public Handlers.MarketplaceWindow? Marketplace { get; set; }
+
+        /// <summary>
+        /// This character's settings as an artisan, job by job: the minimum level asked of a
+        /// customer, whether they craft for free, and whether they are in the public list.
+        /// </summary>
+        public Dictionary<int, Handlers.ArtisanHandler.Setting> CrafterSettings { get; } = new();
+
+        /// <summary>Whose list this character is reading in the artisans' directory; zero when none.</summary>
+        public int DirectoryJob { get; set; }
+
+        /// <summary>
+        /// Forgegod mode (".forjadios on"): no rune fails, no cap nor restriction applies at the
+        /// forge. Administrators only, and for this session only -- it is off again at the next login.
+        /// </summary>
+        public bool ForgeGod { get; set; }
         public bool IsHavenBagEditing { get; set; }
         public List<Managers.HavenBagStore.Furniture> PendingHavenBagFurniture { get; }
             = new List<Managers.HavenBagStore.Furniture>();

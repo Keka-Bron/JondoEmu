@@ -244,9 +244,12 @@ namespace Jondo.Unity.Server.Managers
         /// Without the ceiling it would not run high, it would run absurd: every 1060 kept would
         /// put a rung-15 bomb at 760% of its size.
         /// </remarks>
+        /// <summary>A bomb with no size buff: 100 percent.</summary>
+        public const int BaseSize = 100;
+
         public static int SizeOf(Fighter who, int round)
         {
-            if (who == null) return 100;
+            if (who == null) return BaseSize;
 
             var live = new List<int>();
             foreach (var buff in who.Buffs.Puestos)

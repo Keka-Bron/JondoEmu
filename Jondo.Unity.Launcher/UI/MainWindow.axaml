@@ -229,6 +229,14 @@
                 <TextBlock x:Name="PieCliente" Classes="pie" />
               </StackPanel>
 
+              <!-- The optional HD and 4K scenery packs. The rows are built in MainWindow.Packs.cs,
+                   one per pack, because their buttons change with the state of each pack. -->
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="RotuloGraficos" Classes="label" />
+                <StackPanel x:Name="FilasDePacks" Spacing="8" />
+                <TextBlock x:Name="PieGraficos" Classes="pie" />
+              </StackPanel>
+
               <StackPanel Spacing="8">
                 <TextBlock x:Name="RotuloCuentasGuardadas" Classes="label" />
                 <Button x:Name="QuitarCuentas" Classes="launcher danger" Height="38"

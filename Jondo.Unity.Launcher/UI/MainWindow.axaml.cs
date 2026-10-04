@@ -288,6 +288,8 @@ namespace Jondo.Unity.Launcher.UI
         protected override void OnClosed(EventArgs e)
         {
             _reloj.Stop();
+            // A pack download in flight stops here; its journal keeps what was done.
+            _packCancelar?.Cancel();
             _musica?.Dispose();
             _retratos.Dispose();
             base.OnClosed(e);
@@ -345,6 +347,9 @@ namespace Jondo.Unity.Launcher.UI
                 "ajustes" => Seccion.Ajustes,
                 _ => Seccion.Jugar,
             };
+            // The packs can change behind the launcher's back (a client update, a folder
+            // deleted by hand), so their rows are read again each time the settings open.
+            if (_seccion == Seccion.Ajustes) RefrescarPacks();
             Recolocar();
         }
 
@@ -405,6 +410,7 @@ namespace Jondo.Unity.Launcher.UI
             RefrescarResumen();
             RefrescarBotonDeMusica();
             RefrescarEstado();
+            RefrescarPacks();
         }
 
         /// <summary>El rótulo espaciado de las pestañas, que en la web era el letter-spacing.</summary>
@@ -823,6 +829,7 @@ namespace Jondo.Unity.Launcher.UI
 
             LauncherPreferences.ClientExecutable = ruta;
             RefrescarRutaDelCliente();
+            RefrescarPacks();
         }
 
         // ═══════════════════════════════════════════════════════════════════════

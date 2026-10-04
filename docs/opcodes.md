@@ -226,9 +226,9 @@ Both are clicked with the same `iwo` as a zaap, so the element id decides which 
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
-| `kci` | S→C | 6 / 5 files | The chest opens. Both values constant in the capture; the 100 looks like the slot count. | `BuildStorageOpened` | `f1: 100, f3: 4` |
+| `kci` | S→C | 7 / 6 files | A storage opens. `f3` is which one: 4 a house chest, 17 a bin, 19 the haven bag chest, 16 the bank; `f1` looks like the slot count (100, or int.MaxValue for the haven bag and the bank). | `StorageProtocol.BuildOpened` | `f1: 100, f3: 4` |
 | `iwb` | S→C | 7 / 5 files | What is inside. Same shape as the inventory, with the bag as the position of everything — nothing is worn inside a chest. | `BuildStorageContent` | `f1 (rep) { f1: 63, f5 { … } }` |
-| `kcr` | C→S | 87 / 14 files | Move an item. The **direction does not travel**: it is deduced from where the item is. `f1` arrives as -1 when the whole stack is dragged. | `ChestHandler.MoveAsync` | `f1: quantity, f2: uid` |
+| `kcr` | C→S | 87 / 14 files | Move an item. `f1` is a **signed count**: positive puts that many in, negative takes that many out — the bin capture takes a stack of four one unit per `-1`. A moved stack gets a new uid on the other side. | `StorageHandler.MoveAsync`, `ChestHandler.MoveAsync` | `f1: quantity, f2: uid` |
 | `kla` | C→S | 62 / 43 files | The dialog close button. Empty, and the client waits: the window does not close until the server says so. | `GameNodeProxy` → chest or zaap | empty |
 | `khd` | S→C | 41 / 33 files | The chest closed. | `BuildStorageClosed` | `f3: 11` |
 | `jbs` | S→C | 2 / 2 files | The lottery machine's answer. From two captures: one with a prize in `f2`, one refused with `f3: 1`. | `BuildLotteryResult` | `f2: prize uid` or `f3: reason` |

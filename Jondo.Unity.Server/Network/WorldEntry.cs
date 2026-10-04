@@ -191,8 +191,13 @@ namespace Jondo.Unity.Server.Network
 
             // Los logros de esa cuenta: 954 entradas, y los 954 ids que llevan son logros de verdad.
             // Es la razón de que el personaje entrara con todos los logros del jugador capturado.
-            // Todavía no se manda nada en su lugar, que es lo que ve una cuenta nueva.
+            // In their place goes the character's own list: Managers.Achievements.SendListAsync.
             Op.Mft,
+
+            // And that account's emotes: 47 of them, where a new character has four (1, 97, 98
+            // and 127, in the three captures that create one). In their place goes the
+            // character's own list: Managers.Emotes.SendListAsync.
+            Op.Khn,
         };
 
         /// <summary>Character id the capture belongs to. Learned from the blocks, never written down.</summary>
@@ -432,6 +437,20 @@ namespace Jondo.Unity.Server.Network
             if (ConnectionProtocol.ReadPayload(frame, Op.Irq) != null)
             {
                 return ConnectionProtocol.Push(Op.Irq, SendJobs(frame));
+            }
+
+            // The Koliseo ladder: the captured one was the capturer's, unplaced in the season of
+            // 14/03/2025. This character's own leagues, in this server's season.
+            if (ConnectionProtocol.ReadPayload(frame, Op.Lty) != null)
+            {
+                return ConnectionProtocol.Push(Op.Lty, Handlers.KoliseoHandler.BuildRanks(character.Id, character.Level));
+            }
+
+            // The artisan settings of every job. The captured ones were the capturer's -- a
+            // minimum level of 150 for the miner, 69 for the farmer -- handed to everybody.
+            if (ConnectionProtocol.ReadPayload(frame, Op.Isd) != null)
+            {
+                return ConnectionProtocol.Push(Op.Isd, Handlers.ArtisanHandler.BuildSettings(SessionContext.State));
             }
 
             if (ConnectionProtocol.ReadPayload(frame, Op.Hms) != null)
@@ -751,6 +770,39 @@ namespace Jondo.Unity.Server.Network
             }
             if (skipped > 0) Console.WriteLine($"[World] {skipped} messages left out: they belong to another account.");
 
+            // The jobs this character keeps in the public artisans' list, so that the window's
+            // box says so after a relog and the next toggle takes them off rather than on.
+            var listed = SessionContext.State.CrafterSettings.Where(s => s.Value.Listed).Select(s => (s.Key, true)).ToList();
+            if (listed.Count > 0)
+                await EnviarAsync(stream, ConnectionProtocol.Push(Op.Iro, Handlers.ArtisanHandler.BuildListing(listed)));
+
+            // The guild frames the captured jhe/jhh/jhk were dropped for: built from our own
+            // database now, so a character who has a guild sees it. Nothing goes out for one who
+            // has none, which is what the discard already did. The captured ranks are a fixed
+            // default template (jco), reused here.
+            // In the capture's order, "jco jhe jhh": the ranks, then belonging (jhe) -- not the
+            // jgw of joining, which printed "acabas de unirte al gremio" at every login.
+            var guild = Managers.GuildStore.GuildOf(character.Id);
+            if (guild != null)
+            {
+                int rank = Managers.GuildStore.RankOf(character.Id);
+                var members = Managers.GuildStore.Members(guild.Id);
+                await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
+                await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jhe,
+                    GuildProtocol.BuildMembership(guild, rank, Managers.GuildStore.ContributedBy(character.Id))));
+                await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jhh,
+                    GuildProtocol.BuildGuildInfo(guild, members.Count)));
+                Console.WriteLine($"[World] Guild sent for {character.Name}: {guild.Name} ({members.Count} members).");
+            }
+
+            // Back on a dream's map: the dream again, or out of it when there is none to go back to.
+            await Handlers.DreamHandler.OnWorldEntryAsync(stream);
+
+            // What the account sold in the marketplaces, and what came back unsold, for the sales
+            // history window: its "last connection" box is the part since the last logout.
+            byte[]? sales = Handlers.MarketplaceHandler.SalesHistoryAtEntry(character.Id, SessionContext.Current.AccountId);
+            if (sales != null) await EnviarAsync(stream, ConnectionProtocol.Push(Op.Las, sales));
+
             // And in place of the characteristics of the capture, the ones of this character.
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
             Console.WriteLine($"[World] Characteristics sent for {character.Name}: level " +
@@ -786,7 +838,15 @@ namespace Jondo.Unity.Server.Network
         /// Block 3, the map. jru carries the map id in field 2, and it is replaced with the one
         /// the character is standing on: otherwise everyone would land on the map of the capture.
         /// </summary>
-        public static async Task<int> SendMapAsync(NetworkStream stream, DatabaseManager.DbCharacter character, long mapId)
+        /// <param name="fightToRejoin">
+        /// Set when the character is going straight back into a fight. The block then takes the
+        /// shape of the two reconnection captures: the kmp says "fight" (f1 = 1), the jru is the
+        /// arena, and behind the lqu go "{0} acaba de volver a conectarse al combate" and the
+        /// lva; the ktz and the iom of a roleplay entry are not sent. Everything else is the
+        /// same block.
+        /// </param>
+        public static async Task<int> SendMapAsync(NetworkStream stream, DatabaseManager.DbCharacter character, long mapId,
+                                                   Jondo.Unity.World.Fights.FightInstance? fightToRejoin = null)
         {
             var identity = IdentityFor(character);
             int sent = 0;
@@ -809,9 +869,33 @@ namespace Jondo.Unity.Server.Network
                     toSend = ConnectionProtocol.Push(Op.Jru, Pb.New().Var(2, mapId).Build());
                 }
 
+                if (fightToRejoin != null)
+                {
+                    if (ConnectionProtocol.ReadPayload(frame, Op.Ktz) != null
+                        || ConnectionProtocol.ReadPayload(frame, Op.Iom) != null) continue;
+                    if (ConnectionProtocol.ReadPayload(frame, Op.Kmp) != null)
+                    {
+                        toSend = ConnectionProtocol.Push(Op.Kmp, FightProtocol.BuildFightMapComing());
+                    }
+                }
+
                 await EnviarAsync(stream, toSend);
                 sent++;
+
+                if (fightToRejoin != null && ConnectionProtocol.ReadPayload(frame, Op.Lqu) != null)
+                {
+                    await EnviarAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                        ConnectionProtocol.BuildBackInTheFight(character.Name)));
+                    await EnviarAsync(stream, ConnectionProtocol.BuildActorsComplete());
+                    sent += 2;
+                }
             }
+
+            // The block carries the captured ktz -- regeneration begins, rate 5 -- right behind
+            // its kml kmp, so the client's counter starts here. The kuq at fight entry reports
+            // how long it ran, and that is counted from this moment. Not when going back into a
+            // fight: that block carries no ktz.
+            if (fightToRejoin == null) SessionContext.State.RegenerationStartedUtc = DateTime.UtcNow;
 
             // The characteristics go out again here. The real server sends its kub twice, once
             // with the character and once with the map, and it is this second one the client

@@ -321,13 +321,37 @@ marques en él.** Sin árbol vale cualquier respuesta de la frase que el paso no
 que se lleve la frase de entrega sin marcar nada en ella deja una conversación impecable que no
 entrega nada. Lo vigila `AuthoredDialoguesTests`.
 
-## 9. Lo que falta
+## 9. Las recompensas
 
+La experiencia y los kamas son **multiplicadores** —2, o 1,2, o 0,035— y la base sobre la que
+multiplican está en el código del cliente, que la enseña antes de dar la recompensa: clase `lg` de
+Core, la misma fórmula para misiones y logros, con el nivel óptimo del paso y su duración. Ver
+`docs/achievements.md` §4 y `RewardFormula`. Medido: la misión 1629 del tutorial paga 141 a nivel 2
+en la captura, y eso es lo que paga aquí (con el 5 % de bonus que tenía ese personaje).
 
-- **La experiencia y los kamas de las recompensas.** Los objetos sí se dan —son exactos, y 5.582 de
-  las 6.707 recompensas llevan alguno— pero la XP y los kamas son **multiplicadores**: 2, o 1,2, o
-  0,035. Un multiplicador sobre una base que no tenemos. Se escribe en el registro y no se paga,
-  porque inventar la fórmula pondría en pantalla un número que parece bueno y no lo es.
+Sólo se paga la recompensa del **tramo de nivel** del personaje: 4.555 de las 6.707 llevan
+`levelMin`/`levelMax`, y las ofrendas del Almanax declaran diez, de 9-29 a 190-200. Antes se
+pagaban todas juntas. Las actitudes de la recompensa se enseñan con `khi`.
+
+## 10. El Almanax
+
+INFERIDO entero: ninguna captura pisa el santuario. Cada uno de los 376 días del calendario del
+cliente lleva a una misión corriente, «Ofrenda para …», con la condición `PL>19&Ad=<día>`. `Ad` lo
+contesta `Managers.Almanax`: la entrada del día de hoy. Las 376 las da Ontoral Zo (NPC 1625) y
+ningún paso nombra una frase suya, así que se le aplica la regla de los NPCs sin árbol: su
+conversación de apertura entrega la de hoy. Una vez al día.
+
+Qué día es hoy: cada fecha del año la nombran dos entradas, el santo del mes (sólo ese día) y Bryss
+(31 a 34 días, «se encargará de reemplazar lo irremplazable»), y seis días al año una fiesta móvil
+con su año. Gana la más precisa: la fecha con año, y si no la entrada que nombra menos días.
+
+El santo de hoy sólo está donde el cliente lo pone: 80 de los 373 tienen mapa en los datos, así que
+los demás días el objetivo «ve a ver a …» no se puede cerrar. De los bonus del día se aplican los que
+no llevan condición y tocan misiones u oficios (experiencia y kamas de misión, experiencia de
+oficio); los demás llevan condiciones cuyos tipos el cliente no explica, y no se aplican.
+
+## 11. Lo que falta
+
 - **Editar misiones.** El Studio las enseña; no las escribe.
 - **Los objetivos de recolectar, fabricar y escoltar.** Tipos 2, 3, 12 y 17.
 - **`repeatLimit`**, que necesita contar cuántas veces se ha hecho una misión y eso no se guarda.

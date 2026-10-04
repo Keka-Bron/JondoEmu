@@ -115,6 +115,29 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>The item type -- hat 16, cape 17, shield 82 -- whose piece puts this skin on, or zero.</summary>
+        public static int TypeOfSkin(int skin)
+        {
+            EnsureLoaded();
+            var byType = _typeOfSkin;
+            if (byType == null)
+            {
+                byType = new Dictionary<int, int>();
+                foreach (var (template, itsSkin) in _skins)
+                {
+                    int type = Forgemagic.TemplateOf(template)?.Type ?? 0;
+                    if (type != 0) byType.TryAdd(itsSkin, type);
+                }
+                _typeOfSkin = byType;
+            }
+            return byType.TryGetValue(skin, out int found) ? found : 0;
+        }
+
+        private static Dictionary<int, int>? _typeOfSkin;
+
+        /// <summary>Every real item with its skin measured.</summary>
+        public static IReadOnlyDictionary<int, int> All { get { EnsureLoaded(); return _skins; } }
+
         /// <summary>La piel que mete ese objeto real, o cero si no la tenemos medida.</summary>
         public static int SkinOf(int templateId)
         {

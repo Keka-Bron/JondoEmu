@@ -201,7 +201,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var item in GameState.GetInventoryCopy())
                 currentWeight += DatabaseManager.GetItemRealWeight(item.ItemId) * item.Quantity;
 
-            int maxWeight = 1000 + GameState.StatStrength * 5;
+            int maxWeight = 1000 + GameState.TotalStrength * 5;
 
             using var ms = new MemoryStream();
             var output = new CodedOutputStream(ms);
@@ -314,12 +314,12 @@ namespace Jondo.Unity.Server.Handlers
                 larMsg.Fields.Add(CreateStatField(0, baseHp,                      GetEquipBonus(0)));  // Base HP
                 larMsg.Fields.Add(CreateInnateStatField(1, PlayerInnateAp(),       GetEquipBonus(1)));  // AP
                 larMsg.Fields.Add(CreateInnateStatField(23, PlayerBaseMp,          GetEquipBonus(23))); // MP
-                larMsg.Fields.Add(CreateStatField(11, GameState.StatVitality,     GetEquipBonus(11))); // Vitality
-                larMsg.Fields.Add(CreateStatField(12, GameState.StatWisdom,       GetEquipBonus(12))); // Wisdom
-                larMsg.Fields.Add(CreateStatField(10, GameState.StatStrength,     GetEquipBonus(10))); // Strength
-                larMsg.Fields.Add(CreateStatField(15, GameState.StatIntelligence, GetEquipBonus(15))); // Intelligence
-                larMsg.Fields.Add(CreateStatField(13, GameState.StatChance,       GetEquipBonus(13))); // Chance
-                larMsg.Fields.Add(CreateStatField(14, GameState.StatAgility,      GetEquipBonus(14))); // Agility
+                larMsg.Fields.Add(CreateStatField(11, GameState.StatVitality,     GetEquipBonus(11), GameState.ScrolledVitality));     // Vitality
+                larMsg.Fields.Add(CreateStatField(12, GameState.StatWisdom,       GetEquipBonus(12), GameState.ScrolledWisdom));       // Wisdom
+                larMsg.Fields.Add(CreateStatField(10, GameState.StatStrength,     GetEquipBonus(10), GameState.ScrolledStrength));     // Strength
+                larMsg.Fields.Add(CreateStatField(15, GameState.StatIntelligence, GetEquipBonus(15), GameState.ScrolledIntelligence)); // Intelligence
+                larMsg.Fields.Add(CreateStatField(13, GameState.StatChance,       GetEquipBonus(13), GameState.ScrolledChance));       // Chance
+                larMsg.Fields.Add(CreateStatField(14, GameState.StatAgility,      GetEquipBonus(14), GameState.ScrolledAgility));      // Agility
                 larMsg.Fields.Add(CreateStatField(25, 0,                          GetEquipBonus(25))); // Power
                 larMsg.Fields.Add(CreateStatField(18, 0,                          GetEquipBonus(18))); // Critical
 
@@ -355,17 +355,19 @@ namespace Jondo.Unity.Server.Handlers
         // ─── Stat helpers ───────────────────────────────────────────────────────────
 
         /// <summary>Serializes a single stat entry (las wrapper) as a ProtoField for the kri message.</summary>
-        public static ProtoField CreateStatField(int statId, int baseValue, int equipValue)
+        public static ProtoField CreateStatField(int statId, int baseValue, int equipValue, int scrolledValue = 0)
         {
             var statMsg = new ProtoMessage();
 
             // Field 5: Stat ID
             statMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = statId });
 
-            // Field 3: las sub-message (Field 2 = base value, Field 7 = equip bonus)
+            // Field 3: las sub-message (Field 2 = base value, Field 3 = scrolls, Field 7 = equip bonus)
             var lasMsg = new ProtoMessage();
             if (baseValue != 0)
                 lasMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = baseValue });
+            if (scrolledValue != 0)
+                lasMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = scrolledValue });
             if (equipValue != 0)
                 lasMsg.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = equipValue });
 
@@ -453,7 +455,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static int GetPlayerMaxHp()
         {
-            int baseHp = 50 + (GameState.CharacterLevel * 5) + GameState.StatVitality;
+            int baseHp = 50 + (GameState.CharacterLevel * 5) + GameState.TotalVitality;
             int equipHp = GetEquipBonus(11) + GetEquipBonus(0);
             return baseHp + equipHp;
         }
@@ -491,10 +493,10 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Los puntos de movimiento del personaje, base más equipo (característica 23).</summary>
         public static int GetPlayerMaxMp() => PlayerBaseMp + GetEquipBonus(23);
 
-        /// <summary>Lo que el jugador se ha puesto de puntos en las cuatro elementales.</summary>
+        /// <summary>Las cuatro elementales del personaje, puntos y pergaminos, que es lo que cuenta la iniciativa.</summary>
         public static int IniciativaInvertida()
-            => GameState.StatStrength + GameState.StatIntelligence
-             + GameState.StatChance + GameState.StatAgility;
+            => GameState.TotalStrength + GameState.TotalIntelligence
+             + GameState.TotalChance + GameState.TotalAgility;
 
         /// <summary>
         /// Lo que el equipo le suma a la iniciativa: las CUATRO elementales de los objetos y además

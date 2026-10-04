@@ -42,11 +42,26 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>El Look de la fila tal cual, sin la vuelta a la plantilla. Lo pide el jpv.</summary>
             public string RawLook = "";
 
-            /// <summary>El aspecto, ya troceado: "{5949|||200}".</summary>
+            /// <summary>El aspecto, ya troceado: "{5949|||200}". Es el del primer variante.</summary>
             public long Bones;
             public long[] Skins = Array.Empty<long>();
             public long[] Colors = Array.Empty<long>();
             public long[] Scales = Array.Empty<long>();
+
+            /// <summary>Todos los aspectos que puede tener, con su condición. Casi siempre uno.</summary>
+            public List<LookVariant> Variants = new();
+        }
+
+        /// <summary>Uno de los aspectos de un NPC, con lo que hace falta para verlo así.</summary>
+        public sealed class LookVariant
+        {
+            public long Bones;
+            public long[] Skins = Array.Empty<long>();
+            public long[] Colors = Array.Empty<long>();
+            public long[] Scales = Array.Empty<long>();
+
+            /// <summary>Vacío en el de por defecto, que es el que se lleva quien no cumpla otro.</summary>
+            public string Criterion = "";
         }
 
         /// <summary>Lo que la plantilla del NPC dice de él.</summary>
@@ -162,9 +177,10 @@ namespace Jondo.Unity.Server.Managers
             // se quedarían sin aspecto, porque lo que se lee de NpcTemplates es sólo lo que hace
             // falta para los que ya están puestos.
             SembrarLosDelMundo();
+            SembrarLasLuminomaquinas();
             NpcDialogues.Load();
 
-            var wanted = new HashSet<int>();
+            var wanted = new HashSet<int>(PlacedLater);
             foreach (var here in _byMap.Values)
             {
                 foreach (var spawn in here) wanted.Add(spawn.NpcId);
@@ -310,12 +326,70 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// Las luminomáquinas de la Sima, una por planta con luz.
+        /// </summary>
+        /// <remarks>
+        /// No van por la capa escrita a mano porque no hay nada que escribir: su sitio se CALCULA
+        /// de la base -la planta, su mapa más bajo, la casilla andable más cercana al centro- y
+        /// dejarlo en un fichero serían cinco números mágicos que envejecen mal. Dónde y por qué
+        /// está en <see cref="Luminomachines.Place"/>, que es quien lo decide.
+        ///
+        /// Aquí, como los del mundo: sin aspecto, que lo hereda de la plantilla en el paso de más
+        /// abajo. Por eso esto corre antes de cargar las plantillas y no después.
+        /// </remarks>
+        private static void SembrarLasLuminomaquinas()
+        {
+            try
+            {
+                Luminomachines.Place();
+                foreach (var machine in Luminomachines.Placed)
+                {
+                    Poner(machine.MapId, Jondo.Unity.World.Content.Luminomachine.NpcId, machine.Cell);
+                }
+
+                RaidChests.Place();
+                foreach (var chest in RaidChests.Placed)
+                {
+                    Poner(chest.MapId, Jondo.Unity.World.Content.RaidChest.NpcId, chest.Cell);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Raids] No se han podido poner las máquinas y los cofres: {ex.Message}");
+            }
+        }
+
+        /// <summary>Un NPC del mobiliario de las raids, en su mapa.</summary>
+        private static void Poner(long mapId, int npcId, int cell)
+        {
+            if (mapId <= 0) return;
+            if (!_byMap.TryGetValue(mapId, out var aqui))
+            {
+                aqui = new List<Spawn>();
+                _byMap[mapId] = aqui;
+            }
+
+            aqui.Add(new Spawn
+            {
+                MapId = mapId,
+                NpcId = npcId,
+                Cell = cell,
+                Orientation = DefaultOrientation,
+                ContextualId = ActorIds.NpcDelMapa(aqui.Count),
+            });
+        }
+
+        /// <summary>Mirando al sureste, que es lo que le toca a quien no dice otra cosa.</summary>
+        private const int DefaultOrientation = 1;
+
+        /// <summary>
         /// Pone un NPC en un mapa de sala de sueño, si no está ya.
         /// </summary>
         /// <remarks>
         /// Aparte de las tres capas normales a propósito. Aquéllas describen el mundo, que es
-        /// igual para todos; esto es de UNA partida: el Rey Gob aparece en la sala de Favor del
-        /// sueño de quien la abrió y no tiene por qué estar ahí para nadie más.
+        /// igual para todos; esto es de UNA partida: el Rey Gob aparece en la fuente, y el
+        /// Dispensador de favores en el favor, del sueño de quien la abrió y no tiene por qué
+        /// estar ahí para nadie más.
         ///
         /// Se hereda el aspecto de la plantilla igual que en la carga normal, porque si no el
         /// cliente recibe un actor sin nada que dibujar.
@@ -336,7 +410,7 @@ namespace Jondo.Unity.Server.Managers
                 }
 
                 var plantilla = TemplateOf(npcId);
-                aqui.Add(new Spawn
+                var spawn = new Spawn
                 {
                     MapId = mapId,
                     NpcId = npcId,
@@ -344,13 +418,31 @@ namespace Jondo.Unity.Server.Managers
                     Orientation = orientation,
                     ContextualId = ActorIds.NpcDelMapa(aqui.Count),
                     RawLook = plantilla?.Look ?? "",
-                });
+                };
+
+                // The look cut into bones, skins, colours and scale, as every other spawn has it.
+                // Only the raw text was copied, and an NPC with bone 0 is the question mark the
+                // client draws for a look it cannot find: the Rey Gob came out as one. The real
+                // one is bone 6243, skin 1665, six colours and 110 of scale -- the template's.
+                ReadLook(spawn.RawLook, spawn);
+                spawn.BoneId = (int)spawn.Bones;
+                aqui.Add(spawn);
             }
 
-            Console.WriteLine($"[Sueños] Rey Gob {npcId} puesto en el mapa {mapId}, casilla {cell}.");
+            Console.WriteLine($"[Sueños] NPC {npcId} placed on map {mapId}, cell {cell}.");
         }
 
         public static IEnumerable<long> Maps => _byMap.Keys;
+
+        /// <summary>Every NPC placed in the world, map by map.</summary>
+        public static IEnumerable<Spawn> AllSpawns
+        {
+            get
+            {
+                foreach (var here in _byMap.Values)
+                    foreach (var spawn in here) yield return spawn;
+            }
+        }
 
         public static IReadOnlyList<Spawn> Of(long mapId)
             => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
@@ -366,6 +458,14 @@ namespace Jondo.Unity.Server.Managers
             return here.Find(s => s.ContextualId == contextualId);
         }
 
+        /// <summary>
+        /// NPCs that stand on no map when the server starts and are placed later -- the dream's
+        /// Rey Gob and Dispensador de favores -- whose templates are read all the same. Only the
+        /// placed ones' were, and the Rey Gob came out with no template, no look, and the question
+        /// mark for a face.
+        /// </summary>
+        private static readonly int[] PlacedLater = { Dreams.ReyGob, Dreams.FavorNpc };
+
         public static Template? TemplateOf(int npcId)
             => _templates.TryGetValue(npcId, out var template) ? template : null;
 
@@ -378,19 +478,133 @@ namespace Jondo.Unity.Server.Managers
         /// Cada hueco puede llevar varios números separados por comas, y casi todos van vacíos: de
         /// los cincuenta y seis NPCs de la captura ninguno lleva pieles y sólo cinco llevan colores.
         /// </summary>
+        /// <summary>
+        /// El aspecto de un NPC, que puede ser VARIOS con una condición cada uno.
+        /// </summary>
+        /// <remarks>
+        /// Cuarenta y ocho plantillas de las 6.467 traen el aspecto escrito como una lista separada
+        /// por comas, cada uno con su criterio detrás de un dólar:
+        ///
+        ///   {10152|||95$1;0;0;RV&lt;7,Raid_Score,5000},{10151|||95$1;0;0;RV&gt;7,Raid_Score,4999&amp;...}
+        ///
+        /// Eso es el cofre de la raid, que se va llenando según la puntuación. Antes esto cortaba
+        /// por el PRIMER corchete y el ÚLTIMO, así que en una plantilla de varias se tragaba los
+        /// cinco de una vez y salía un aspecto imposible; ahora se leen uno a uno.
+        ///
+        /// El primero manda mientras nadie elija otro: en 47 de las 48 el primero no lleva criterio
+        /// —es el de siempre— y quien sí lo lleva es este cofre, cuyo primero es el del cofre
+        /// vacío. Las dos cosas quieren lo mismo: sin nada que preguntar, el de por defecto.
+        /// </remarks>
         private static void ReadLook(string look, Spawn spawn)
         {
             if (string.IsNullOrEmpty(look)) return;
 
-            int start = look.IndexOf('{');
-            int end = look.LastIndexOf('}');
-            if (start < 0 || end <= start) return;
+            var variants = Variantes(look);
+            if (variants.Count == 0) return;
 
-            string[] parts = look.Substring(start + 1, end - start - 1).Split('|');
-            spawn.Bones = parts.Length > 0 ? First(parts[0]) : 0;
-            spawn.Skins = parts.Length > 1 ? Numbers(parts[1]) : Array.Empty<long>();
-            spawn.Colors = parts.Length > 2 ? Colores(parts[2]) : Array.Empty<long>();
-            spawn.Scales = parts.Length > 3 ? Numbers(parts[3]) : Array.Empty<long>();
+            spawn.Variants = variants;
+            spawn.Bones = variants[0].Bones;
+            spawn.Skins = variants[0].Skins;
+            spawn.Colors = variants[0].Colors;
+            spawn.Scales = variants[0].Scales;
+        }
+
+        /// <summary>Los aspectos de arriba, separados por su nivel de corchete y no por comas.</summary>
+        /// <remarks>
+        /// Por el nivel de corchete porque un aspecto puede llevar otro dentro —la montura de un
+        /// NPC es <c>1@0={195|||110}</c>— y las comas de dentro no separan nada.
+        /// </remarks>
+        internal static List<LookVariant> Variantes(string look)
+        {
+            var fuera = new List<LookVariant>();
+            int depth = 0, start = -1;
+
+            for (int i = 0; i < look.Length; i++)
+            {
+                char c = look[i];
+                if (c == '{')
+                {
+                    if (depth == 0) start = i + 1;
+                    depth++;
+                }
+                else if (c == '}')
+                {
+                    depth--;
+                    if (depth == 0 && start >= 0)
+                    {
+                        fuera.Add(Variante(look.Substring(start, i - start)));
+                        start = -1;
+                    }
+                }
+            }
+
+            return fuera;
+        }
+
+        /// <summary>Un aspecto suelto: los números delante del dólar y el criterio detrás.</summary>
+        private static LookVariant Variante(string contenido)
+        {
+            string criterio = "";
+            int depth = 0, dolar = -1;
+
+            for (int i = 0; i < contenido.Length; i++)
+            {
+                char c = contenido[i];
+                if (c == '{') depth++;
+                else if (c == '}') depth--;
+                else if (c == '$' && depth == 0) { dolar = i; break; }
+            }
+
+            if (dolar >= 0)
+            {
+                // Detrás del dólar van «orden;?;?;criterio», y el criterio es todo lo que queda
+                // después del tercer punto y coma: puede llevar los suyos dentro.
+                string cola = contenido.Substring(dolar + 1);
+                contenido = contenido.Substring(0, dolar);
+
+                int at = 0;
+                for (int saltos = 0; saltos < 3 && at >= 0; saltos++)
+                {
+                    int next = cola.IndexOf(';', at);
+                    at = next < 0 ? -1 : next + 1;
+                }
+
+                if (at >= 0 && at <= cola.Length) criterio = cola.Substring(at);
+            }
+
+            string[] parts = contenido.Split('|');
+            return new LookVariant
+            {
+                Bones = parts.Length > 0 ? First(parts[0]) : 0,
+                Skins = parts.Length > 1 ? Numbers(parts[1]) : Array.Empty<long>(),
+                Colors = parts.Length > 2 ? Colores(parts[2]) : Array.Empty<long>(),
+                Scales = parts.Length > 3 ? Numbers(parts[3]) : Array.Empty<long>(),
+                Criterion = criterio,
+            };
+        }
+
+        /// <summary>
+        /// Cuál de los aspectos de un NPC le toca ver a quien pregunta, o null para el de siempre.
+        /// </summary>
+        /// <remarks>
+        /// El de por defecto es el primero, y se devuelve null en vez de él para que quien llame no
+        /// tenga que copiar nada: si nadie gana, se queda lo que el spawn ya traía.
+        ///
+        /// Los que NO llevan criterio no se eligen, se heredan: son el de siempre, y preguntarles
+        /// daría que sí antes de mirar los demás. Y lo que no se sabe contestar tampoco gana, que
+        /// es lo que deja al cofre vacío para quien no está en ninguna raid.
+        /// </remarks>
+        public static LookVariant VariantFor(Spawn spawn, Jondo.Unity.World.Content.Criterion.Resolver resolver)
+        {
+            if (spawn == null || spawn.Variants.Count <= 1) return null;
+
+            foreach (var variant in spawn.Variants)
+            {
+                if (variant.Criterion.Length == 0) continue;
+                if (Jondo.Unity.World.Content.Criterion.Met(variant.Criterion, resolver)) return variant;
+            }
+
+            return null;
         }
 
         private static long First(string part)

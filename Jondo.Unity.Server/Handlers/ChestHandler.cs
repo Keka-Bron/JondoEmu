@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
@@ -9,25 +9,33 @@ namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// El cofre del merkasako.
-    ///
-    /// Leído de la captura del cofre de una casa, que usa el mismo protocolo:
-    ///
-    ///   cliente  iwo { f1: uid de habilidad, f2: elemento }    ha clicado el cofre
-    ///   servidor iwn { f1:1, f2: elemento, f4: 104, f5: quién }
-    ///   servidor kci { f1: 100, f3: 4 }                        el cofre se abre
-    ///   servidor iwb { f1 (rep): lo que hay dentro }
-    ///
-    ///   cliente  kcr { f1: cuántos, f2: uid }                  mover un objeto
-    ///   servidor iua / itd  el objeto que llega    itc / ium  el que se va    iun  el peso
-    ///
-    ///   cliente  kla        servidor khd { f3: 11 }            cerrar
-    ///
-    /// La dirección del movimiento no viaja en el kcr: se deduce de dónde esté el objeto ahora. Si
-    /// lo tiene el inventario, entra al cofre; si lo tiene el cofre, sale a la bolsa. Es lo que hace
-    /// el juego, y es lo único que puede ser: el cliente manda el mismo mensaje en los dos sentidos.
-    ///
-    /// El f1 es la cantidad, y llega como -1 cuando se arrastra la pila entera.
     /// </summary>
+    /// <remarks>
+    /// Measured on "Interactivos varios/abrir cofre de mi merkasako-cambiar cosas entre cofre e
+    /// inventario-cerrar.pcapng", frame numbers being positions in <c>hilo.tramas</c>:
+    ///
+    ///   4   C iwo { f1: 4493210, f2: 516924 }        the chest
+    ///   5   S iwn
+    ///   6   S kci { f1: 2147483647, f3: 19 }          the haven bag's window: kind 19
+    ///   7   S iwb { what is inside }
+    ///   12  C kcr { f1: -1, f2: 530092084 }  → itc, iua (534451715, a NEW uid), kcu, iun
+    ///   18  C kcr { f1: 1,  f2: 530090564 }  → ium, itd (534456574, a new uid), kcu, iun
+    ///   33  C kla → 34 S khd { f3: 11 }
+    ///
+    /// It is the storage every other one is, with two differences the capture shows: kci's kind is
+    /// 19 and not the house chest's 4 -- which is what this sent until now -- and what leaves goes
+    /// out BEFORE what arrives, where the house chest, the bin and the guild chest send the
+    /// arrival first.
+    ///
+    /// Two things this used to get wrong. kcr's f1 is a signed count, and -1 is ONE unit out, not
+    /// "the whole stack": the bin in front of the Bonta bank takes a stack of four one unit per -1
+    /// (see <see cref="StorageHandler"/>). And a stack changes uid when it changes side, as every
+    /// capture of a storage shows; keeping the same uid on both sides put two stacks with one uid
+    /// in the client the moment a move was partial.
+    ///
+    /// Left out: kcu { f1, f3 }, the chest's weight and what it can hold (1878 of 11578 there).
+    /// The chest's capacity is not known.
+    /// </remarks>
     public static class ChestHandler
     {
         /// <summary>El cofre que está abierto, para no atender un kcr con el cofre cerrado.</summary>
@@ -43,66 +51,34 @@ namespace Jondo.Unity.Server.Handlers
         public static Task OpenAsync(NetworkStream stream, int elementId)
             => OpenAsync(stream, elementId, Merkasako.ChestSkill);
 
-        public static async Task OpenAsync(NetworkStream stream, int elementId, int skillId)
+        public static async Task OpenAsync(NetworkStream? stream, int elementId, int skillId)
         {
             SessionContext.State.IsChestOpen = true;
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
-                    elementId, skillId, Jondo.Unity.Server.Network.SessionContext.State.CharacterId)));
+            await StorageHandler.SendAsync(stream, Op.Iwn, ConnectionProtocol.BuildElementInUse(
+                elementId, skillId, SessionContext.State.CharacterId));
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kci, ConnectionProtocol.BuildStorageOpened()));
+            await StorageHandler.SendAsync(stream, Op.Kci, StorageProtocol.BuildHavenBagOpened());
 
-            var content = HavenBagStore.ChestOf(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iwb, ConnectionProtocol.BuildStorageContent(content)));
+            var content = HavenBagStore.ChestOf(SessionContext.State.CharacterId);
+            await StorageHandler.SendAsync(stream, Op.Iwb, ConnectionProtocol.BuildStorageContent(content));
 
-            Console.WriteLine($"[Cofre] Abierto: {content.Count} objeto(s) dentro.");
+            Console.WriteLine($"[Chest] Opened: {content.Count} stack(s) inside.");
         }
 
-        public static async Task CloseAsync(NetworkStream stream)
+        public static async Task CloseAsync(NetworkStream? stream)
         {
             SessionContext.State.IsChestOpen = false;
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Khd, ConnectionProtocol.BuildStorageClosed()));
+            await StorageHandler.SendAsync(stream, Op.Khd, ConnectionProtocol.BuildStorageClosed());
         }
 
-        public static async Task MoveAsync(NetworkStream stream, byte[] payload)
+        public static async Task MoveAsync(NetworkStream? stream, byte[] payload)
         {
-            byte[]? kcr = ConnectionProtocol.ReadPayload(payload, Op.Kcr);
-            if (kcr == null || !SessionContext.State.IsChestOpen) return;
+            if (!SessionContext.State.IsChestOpen) return;
+            if (!StorageHandler.ReadMove(payload, out int quantity, out long uid)) return;
 
-            long uid = 0;
-            int quantity = 0;
-            foreach (var field in ProtoMessage.Parse(kcr).Fields)
-            {
-                if (field.WireType != 0) continue;
-                // El -1 viaja como el varint más grande que hay; significa "toda la pila".
-                if (field.FieldNumber == 1)
-                    quantity = field.VarIntValue < 0 || field.VarIntValue > int.MaxValue
-                        ? 0 : (int)field.VarIntValue;
-                else if (field.FieldNumber == 2) uid = field.VarIntValue;
-            }
-            if (uid == 0) return;
-
-            long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
-            bool enElCofre = HavenBagStore.Holds(who, uid);
-
-            if (enElCofre)
-            {
-                if (!HavenBagStore.TakeOut(who, uid, quantity)) return;
-                await AnnounceAsync(stream, uid, ArrivesInBag, Op.Itc, "sale del cofre");
-            }
-            else
-            {
-                if (!HavenBagStore.PutIn(who, uid, quantity)) return;
-                await AnnounceAsync(stream, uid, ArrivesInChest, Op.Ium, "entra en el cofre");
-            }
-
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.StatStrength)));
+            await StorageHandler.MoveAsync(stream, StorageStacks.HavenBag(SessionContext.State.CharacterId),
+                                           quantity, uid, goneFirst: true);
         }
 
         /// <summary>
@@ -127,31 +103,5 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>El campo donde va el objeto en cada uno: f3 en el iua, f1 en el itd.</summary>
         public static int FieldOf(string opcode) => opcode == ArrivesInBag ? 3 : 1;
-
-        private static async Task AnnounceAsync(NetworkStream stream, long uid, string llega,
-                                                string seVa, string que)
-        {
-            var destino = BuscarDondeEsta(uid);
-            if (destino != null)
-            {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(llega,
-                        ConnectionProtocol.BuildItemArrived(FieldOf(llega), destino)));
-            }
-
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(seVa, ConnectionProtocol.BuildItemGone(uid)));
-
-            Console.WriteLine($"[Cofre] El objeto {uid} {que}.");
-        }
-
-        private static HavenBagStore.StoredItem? BuscarDondeEsta(long uid)
-        {
-            foreach (var item in HavenBagStore.ChestOf(Jondo.Unity.Server.Network.SessionContext.State.CharacterId))
-            {
-                if (item.Uid == uid) return item;
-            }
-            return HavenBagStore.FromInventory(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, uid);
-        }
     }
 }

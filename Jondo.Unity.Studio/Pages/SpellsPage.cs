@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -539,9 +539,7 @@ namespace Jondo.Unity.Studio.Pages
             if (effect.ZoneShape == 0) return "";
 
             char letter = (char)effect.ZoneShape;
-            bool known = effect.ZoneShape is Zone.Punto or Zone.Circulo or Zone.Aspa or Zone.Cruz
-                                          or Zone.TodoElMapa or Zone.Linea or Zone.MediaLinea
-                                          or Zone.Rombo or Zone.CruzCompleta or Zone.Cuadrado;
+            bool known = Zone.IsKnown(effect.ZoneShape);
 
             return known ? $"{letter}{effect.ZoneSize}" : $"{letter}? {effect.ZoneSize}";
         }

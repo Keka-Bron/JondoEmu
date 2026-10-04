@@ -34,8 +34,9 @@ namespace Jondo.Unity.Server.Managers
     /// sale por el CANAL GENERAL y la lee todo el mundo, que es un fallo que ya hubo que quitar
     /// de la recolección.
     ///
-    /// La excepción es el texto libre que no esté en la tabla —la respuesta de un comando como
-    /// <c>.teleport</c>—: eso no se puede mandar por aquí y no queda más remedio que el chat.
+    /// Free text that is in no row of the table -- what a command answers, like <c>.teleport</c>
+    /// -- goes this way too, through <see cref="FreeText"/>. None of the 452 lqn of the captures
+    /// uses that row: the real server has no free text to say.
     /// </summary>
     public static class InfoMessages
     {
@@ -45,6 +46,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Aviso o error: el cliente lo pinta distinto.</summary>
         public const int Warning = 1;
 
+        /// <summary>«{0} acaba de volver a conectarse al combate.» Va con <see cref="Warning"/>.</summary>
+        public const int BackInTheFight = 184;
+
         // ─── Los que usa el emulador, con su texto al lado ──────────────────────
 
         /// <summary>«Has ganado $quantity{0} kamas.»</summary>
@@ -53,11 +57,53 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«Has perdido $quantity{0} kamas.»</summary>
         public const int KamasLost = 46;
 
+        /// <summary>
+        /// «Has perdido &lt;b&gt;{0}&lt;/b&gt; puntos de energía.» Info, the amount as its one parameter:
+        /// "lqn { f2: 34, f4: "2000" }" right behind the kub of every lost fight against monsters.
+        /// </summary>
+        public const int EnergyLost = 34;
+
         /// <summary>«Has conseguido {0} '$item{1}'.»</summary>
         public const int ItemGained = 21;
 
         /// <summary>«$quantity{2} x {{item,{0},{1}}} ($quantity{3} kamas)», la compra.</summary>
         public const int Purchase = 252;
+
+        // ─── The marketplaces' ────────────────────────────────────────────────────
+        //
+        // No capture refuses anything or sells anything of the player's, so these are the rows of
+        // the client's own table that say it, and which one goes where is INFERRED. The refusals
+        // go with Warning: table 0 repeats the same sentences under other ids (57, 58, 59, 61,
+        // 63, 64), and table 1 is the one of warnings and errors.
+
+        /// <summary>«Este objeto no forma parte de las categorías aceptadas en este mercadillo.» Warning.</summary>
+        public const int MarketplaceWrongCategory = 64;
+
+        /// <summary>«No tienes suficientes kamas para poder pagar el impuesto de puesta en venta...» Warning.</summary>
+        public const int MarketplaceCannotPayTax = 65;
+
+        /// <summary>«No puedes poner más objetos en venta por el momento...» Warning.</summary>
+        public const int MarketplaceTooManyListings = 66;
+
+        /// <summary>«No tienes suficientes kamas para poder comprar este objeto.» Warning.</summary>
+        public const int MarketplaceCannotAfford = 71;
+
+        /// <summary>«Este objeto ya no está disponible por este precio. Alguien ha sido más rápido...» Warning.</summary>
+        public const int MarketplaceSoldOut = 72;
+
+        /// <summary>
+        /// «Banco: + $quantity{0} kamas (venta: $quantity{3} $item{2}).» Info, to the seller of a
+        /// lot. Its twin <see cref="MarketplaceSoldLinked"/> is the one sent now.
+        /// </summary>
+        public const int MarketplaceSold = 73;
+
+        /// <summary>
+        /// «Banco: + $quantity{0} kamas ({{salesHistory,0,false,true::venta}}: $quantity{3}
+        /// $item{2}).» Info, to the seller of a lot: the same words as 73, with "venta" a link
+        /// that opens the sales history on this session's sales. Which of the twins the real
+        /// server sends is INFERRED: this is the one with a history behind it.
+        /// </summary>
+        public const int MarketplaceSoldLinked = 65;
 
         /// <summary>«No tienes el nivel de oficio necesario.» Va con <see cref="Warning"/>.</summary>
         public const int JobLevelTooLow = 284;

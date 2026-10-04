@@ -114,6 +114,10 @@ Important arguments include:
 --langCode <es|en|fr>
 ```
 
+The texture-pack arguments (`--hdReady`, `--4kReady`) come last, and only for a pack the player
+turned on in Settings → Graphics that is installed and verified for the client's own version. How
+the packs are downloaded from Ankama's CDN and verified is in `client-graphics.md`.
+
 Equivalent `ZAAP_PORT`, `ZAAP_HASH`, `ZAAP_GAME`, `ZAAP_RELEASE`, `ZAAP_INSTANCE_ID` and
 `ZAAP_CAN_AUTH` environment variables are set for the child. Every client receives its own hash
 and instance id even though all clients use the same local listeners.

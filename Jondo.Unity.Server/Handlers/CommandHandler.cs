@@ -1,5 +1,6 @@
 ﻿using Jondo.Unity.Launcher;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
@@ -58,7 +59,19 @@ namespace Jondo.Unity.Server.Handlers
                 [".size"] = "usage.size",
                 [".item"] = "usage.item",
                 [".itemset"] = "usage.itemset",
+                [".receta"] = "usage.recipe",
                 [".packets"] = "usage.packets",
+                [".gremio"] = "usage.guild",
+                [".raid"] = "usage.raid",
+                [".oficio"] = "usage.job",
+                [".oficios"] = "usage.jobs",
+                [".forjadios"] = "usage.forgegod",
+                [".forgegod"] = "usage.forgegod",
+                [".forgedieu"] = "usage.forgegod",
+                [".sueno"] = "usage.dream",
+                [".sueño"] = "usage.dream",
+                [".dream"] = "usage.dream",
+                [".reve"] = "usage.dream",
             };
 
         /// <summary>
@@ -77,9 +90,29 @@ namespace Jondo.Unity.Server.Handlers
                 [".relative"] = Roles.Administrador,
                 [".kamas"] = Roles.GameMaster,
                 [".level"] = Roles.GameMaster,
+                [".oficio"] = Roles.GameMaster,
+                [".oficios"] = Roles.GameMaster,
+                // Written out rather than left to the default, which is the same: forgegod is for
+                // the highest role there is and nobody else, whatever the default becomes.
+                [".forjadios"] = Roles.Administrador,
+                [".forgegod"] = Roles.Administrador,
+                [".forgedieu"] = Roles.Administrador,
+                // The same for skipping a dream forward: it skips the game.
+                [".sueno"] = Roles.Administrador,
+                [".sueño"] = Roles.Administrador,
+                [".dream"] = Roles.Administrador,
+                [".reve"] = Roles.Administrador,
                 [".size"] = Roles.GameMaster,
                 [".shop"] = Roles.GameMaster,
+                [".gremio"] = Roles.Jugador,
             };
+
+        /// <summary>
+        /// The role a command asks for: its row in the table, or Administrator for one without --
+        /// the safe side to be wrong on.
+        /// </summary>
+        internal static int RequiredRole(string command)
+            => HaceFalta.TryGetValue(command, out int role) ? role : Roles.Administrador;
 
         /// <summary>El nivel al que se acaba el juego normal; de ahí para arriba es Omega.</summary>
         private const int MaxNormalLevel = 200;
@@ -123,7 +156,7 @@ namespace Jondo.Unity.Server.Handlers
             // La cuenta sale de la sesión de este socket, no de nada que mande el cliente.
             long quien = accountId > 0 ? accountId : Network.SessionContext.Current.AccountId;
             int rol = DatabaseManager.GetAccountRole(quien);
-            int haceFalta = HaceFalta.TryGetValue(command, out int pide) ? pide : Roles.Administrador;
+            int haceFalta = RequiredRole(command);
 
             if (!Roles.AlMenos(rol, haceFalta))
             {
@@ -153,7 +186,19 @@ namespace Jondo.Unity.Server.Handlers
                     case ".size": await SizeAsync(stream, rest, channel, accountId); break;
                     case ".item": await ItemAsync(stream, rest, channel, accountId); break;
                     case ".itemset": await ItemSetAsync(stream, rest, channel, accountId); break;
+                    case ".receta": await RecipeAsync(stream, rest, channel, accountId); break;
                     case ".packets": await PacketsAsync(stream, rest, channel, accountId); break;
+                    case ".gremio": await GremioAsync(stream, rest, channel, accountId); break;
+                    case ".raid": await RaidAsync(stream, rest, channel, accountId); break;
+                    case ".oficio": await JobAsync(stream, rest, channel, accountId); break;
+                    case ".oficios": await AllJobsAsync(stream, rest, channel, accountId); break;
+                    case ".forjadios":
+                    case ".forgegod":
+                    case ".forgedieu": await ForgeGodAsync(stream, rest, channel, accountId); break;
+                    case ".sueno":
+                    case ".sueño":
+                    case ".dream":
+                    case ".reve": await DreamAsync(stream, rest, channel, accountId); break;
                 }
             }
             catch (Exception ex)
@@ -235,6 +280,116 @@ namespace Jondo.Unity.Server.Handlers
             await NotifyAsync(stream, T("level.result", result.Level, capped, result.PreviousLevel,
                                          result.Experience, result.RemainingPoints,
                                          result.Capital, result.SpellNote, omega), channel, accountId);
+        }
+
+        // ─── .oficio ────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Puts a job at a level, to try the recipes of that level without gathering for hours.
+        /// The experience goes to the floor of the level, and the client hears it the way a real
+        /// level-up says it: isz, then irq.
+        /// </summary>
+        private static async Task JobAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            var parts = rest.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 2 && AllWords.Contains(parts[0].ToLowerInvariant()))
+            {
+                await AllJobsAsync(stream, parts[1], channel, accountId);
+                return;
+            }
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int job)
+                || !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int wanted)
+                || !JobManager.TryGet(job, out _))
+            {
+                await NotifyAsync(stream, Usage(".oficio"), channel, accountId);
+                return;
+            }
+
+            int level = Math.Clamp(wanted, 1, JobExperience.MaxLevel);
+            var state = Network.SessionContext.State;
+            int before = state.JobLevel(job);
+            long experience = JobExperience.Floor(level);
+            state.Jobs[job] = new JobExperience.Progress { JobId = job, Experience = experience };
+            DatabaseManager.SaveJobExperience(state.CharacterId, job, experience);
+
+            if (level != before) await WorkshopHandler.SendLevelUpAsync(stream, job, level);
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Irq, ConnectionProtocol.BuildJobExperience(
+                    job, JobExperience.Next(level), level, JobExperience.Floor(level), experience)));
+
+            await NotifyAsync(stream, T("job.result", job, level, before), channel, accountId);
+        }
+
+        /// <summary>"Every job", in the three languages the replies speak.</summary>
+        private static readonly HashSet<string> AllWords = new HashSet<string> { "todos", "all", "tous" };
+
+        /// <summary>The level .oficios puts every job at when it is given none.</summary>
+        private const int AllJobsDefault = 200;
+
+        /// <summary>
+        /// Every job at one level: ".oficios" for 200, ".oficios 150", or ".oficio todos 150". The
+        /// jobs are the directory's -- the twenty with a recipe, a resource or a magus table, the base one aside,
+        /// which has no level. The client is told with one irq carrying all of them, the way the
+        /// entry into the world does it, and no level-up window: twenty of them in a row would be
+        /// twenty windows to close.
+        /// </summary>
+        private static async Task AllJobsAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            string word = rest.Trim();
+            int wanted = AllJobsDefault;
+            if (word.Length > 0 && !int.TryParse(word, NumberStyles.Integer, CultureInfo.InvariantCulture, out wanted))
+            {
+                await NotifyAsync(stream, Usage(".oficios"), channel, accountId);
+                return;
+            }
+
+            int level = Math.Clamp(wanted, 1, JobExperience.MaxLevel);
+            long experience = JobExperience.Floor(level);
+            var state = Network.SessionContext.State;
+            var jobs = ArtisanHandler.Jobs().Where(j => j != WorkshopHandler.BaseJob).ToList();
+            foreach (int job in jobs)
+            {
+                state.Jobs[job] = new JobExperience.Progress { JobId = job, Experience = experience };
+                DatabaseManager.SaveJobExperience(state.CharacterId, job, experience);
+            }
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Irq,
+                ConnectionProtocol.BuildJobsExperience(jobs.Select(job =>
+                    (job, JobExperience.Next(level), level, JobExperience.Floor(level), experience)))));
+
+            await NotifyAsync(stream, T("jobs.result", jobs.Count, level), channel, accountId);
+            Console.WriteLine($"[Comandos] {jobs.Count} jobs of {state.CharacterName} at level {level}.");
+        }
+
+        // ─── .forjadios / .forgegod / .forgedieu ───────────────────────────────
+
+        /// <summary>
+        /// Forgegod mode, on or off: at the forge no rune fails, no weight cap holds on an over or
+        /// an exo (two AP of exo, a thousand vitality), a transcendence goes on anything, an item
+        /// "sin forjamagia futura" takes runes again, a magus table takes any item and a recipe
+        /// asks no job level. For this session only.
+        /// </summary>
+        private static async Task ForgeGodAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            string word = rest.Trim().ToLowerInvariant();
+            bool? on = word switch
+            {
+                "on" or "1" or "si" or "sí" or "yes" or "oui" => true,
+                "off" or "0" or "no" or "non" => false,
+                _ => null,
+            };
+            var state = Network.SessionContext.State;
+            if (on == null)
+            {
+                await NotifyAsync(stream, Usage(".forjadios") + " " + T(state.ForgeGod ? "forgegod.on" : "forgegod.off"),
+                                  channel, accountId);
+                return;
+            }
+
+            state.ForgeGod = on.Value;
+            await NotifyAsync(stream, T(on.Value ? "forgegod.on" : "forgegod.off"), channel, accountId);
+            Console.WriteLine($"[Comandos] Forgegod {(on.Value ? "on" : "off")} for {state.CharacterName}.");
         }
 
         public sealed class LevelChange
@@ -322,7 +477,7 @@ namespace Jondo.Unity.Server.Handlers
             // manda CharacteristicsHandler al repartir puntos.
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.StatStrength)));
+                    ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.TotalStrength)));
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
 
@@ -450,15 +605,43 @@ namespace Jondo.Unity.Server.Handlers
 
         private static async Task TeleportAsync(NetworkStream stream, string rest, int channel, long accountId)
         {
-            if (!ParseCoordinates(rest, out int x, out int y))
+            // Un solo número es un id de mapa, y va directo: es la forma de llegar a un interior
+            // concreto cuando hay cuatro mapas en la misma coordenada, como en el Templo de los
+            // Gremios. Sólo si el mapa existe; un número que no es un mapa es un error de uso.
+            bool byId = long.TryParse((rest ?? "").Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out long mapId)
+                        && mapId > 0;
+            var info = byId ? MapManager.GetMapInfo(mapId) : null;
+
+            int x = 0, y = 0;
+            if (!byId && !ParseCoordinates(rest, out x, out y))
             {
                 await NotifyAsync(stream, Usage(".teleport"), channel, accountId);
+                return;
+            }
+
+            if (byId && info == null)
+            {
+                await NotifyAsync(stream, T("teleport.no_such_map", mapId), channel, accountId);
                 return;
             }
 
             if (GameState.IsInFight)
             {
                 await NotifyAsync(stream, T("teleport.in_fight"), channel, accountId);
+                return;
+            }
+
+            if (byId)
+            {
+                int landed = await TeleportHandler.ToMapAsync(stream, mapId);
+                if (landed < 0)
+                {
+                    await NotifyAsync(stream, T("teleport.load_failed", mapId, info!.PosX, info.PosY), channel, accountId);
+                    return;
+                }
+
+                await NotifyAsync(stream, T("teleport.result", info!.PosX, info.PosY, mapId,
+                                             SubAreaName(info.SubAreaId), landed, ""), channel, accountId);
                 return;
             }
 
@@ -724,6 +907,139 @@ namespace Jondo.Unity.Server.Handlers
                               channel, accountId);
         }
 
+        // ─── .receta ───────────────────────────────────────────────────────────
+
+        /// <summary>The most times .receta multiplies a recipe by: a guard on the command, not a rule of the game.</summary>
+        internal const int MaxRecipeTimes = 100;
+
+        /// <summary>
+        /// ".receta &lt;item&gt; [times]": every ingredient of the item's recipe into the bag, as many
+        /// as the recipe asks for, times as many times as given. Each joins the stack of the same
+        /// thing the character already has, so the workshop finds it in one piece. Administrators
+        /// only, like .item: it makes items out of nothing, and it is left out of the table on
+        /// purpose, for the default to close it.
+        /// </summary>
+        private static async Task RecipeAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            if (!TryParseRecipe(rest, out int gid, out int times))
+            {
+                await NotifyAsync(stream, Usage(".receta"), channel, accountId);
+                return;
+            }
+            if (!RecipeManager.TryGetByResult(gid, out var recipe))
+            {
+                await NotifyAsync(stream, T("recipe.missing", gid), channel, accountId);
+                return;
+            }
+
+            var ingredients = IngredientsOf(recipe, times);
+            var given = new List<(int Item, int Quantity)>();
+            var missing = new List<int>();
+            foreach (var (item, quantity) in ingredients)
+            {
+                if (await WorkshopHandler.GiveAsync(stream, item, quantity)) given.Add((item, quantity));
+                else missing.Add(item);
+            }
+
+            await RefreshPodsAsync(stream);
+            ActivityJournal.Current.Write("recipe.granted",
+                accountId > 0 ? accountId : SessionContext.Current.AccountId,
+                GameState.CharacterId,
+                new
+                {
+                    source = "command", result = gid, times,
+                    ingredients = given.Select(g => new { gid = g.Item, quantity = g.Quantity }).ToList(),
+                    missing,
+                });
+
+            string list = given.Count == 0 ? "-" : string.Join(", ", given.Select(g => $"{g.Quantity} x {g.Item}"));
+            string warning = missing.Count == 0 ? "" : T("itemset.templates_missing", string.Join(", ", missing));
+            await NotifyAsync(stream, T("recipe.added", gid, times, recipe.JobId, recipe.ResultLevel, list, warning),
+                              channel, accountId);
+            Console.WriteLine($"[Comandos] Recipe {gid} x{times} for {GameState.CharacterName}: {list}" +
+                              (missing.Count == 0 ? "." : $", missing {string.Join(", ", missing)}."));
+        }
+
+        /// <summary>".receta 44" or ".receta 44 5": the item, and how many times its recipe, 1 to <see cref="MaxRecipeTimes"/>.</summary>
+        internal static bool TryParseRecipe(string rest, out int gid, out int times)
+        {
+            gid = 0;
+            times = 1;
+            var parts = (rest ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 1 || parts.Length > 2) return false;
+            if (!int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out gid) || gid <= 0) return false;
+            if (parts.Length == 2 &&
+                !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out times)) return false;
+            return times >= 1 && times <= MaxRecipeTimes;
+        }
+
+        /// <summary>
+        /// What a recipe asks for, times over: one line per item, in the recipe's order, an item
+        /// that appeared twice added up into its first line.
+        /// </summary>
+        internal static IReadOnlyList<(int Item, int Quantity)> IngredientsOf(RecipeDefinition recipe, int times)
+            => recipe.Ingredients
+                .GroupBy(i => i.ItemId)
+                .Select(g => (g.Key, g.Sum(i => i.Quantity) * times))
+                .ToList();
+
+        // ─── .sueno ────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// ".sueno [row]" (".dream", ".reve"): the dream one has going carried forward to a room of
+        /// the row given, or to the Fin du rêve with none, the rooms on the way won as if fought.
+        /// For testing what lies deep in a dream -- band V's fountain, the end and its waves --
+        /// without twenty-five fights first. Administrators only: it skips the game.
+        /// </summary>
+        private static async Task DreamAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            if (!TryParseDreamRow(rest, out int? row))
+            {
+                await NotifyAsync(stream, Usage(".sueno"), channel, accountId);
+                return;
+            }
+            if (GameState.IsInFight)
+            {
+                await NotifyAsync(stream, T("dream.in_fight"), channel, accountId);
+                return;
+            }
+            var dream = Dreams.De(GameState.CharacterId);
+            if (dream == null)
+            {
+                await NotifyAsync(stream, T("dream.none"), channel, accountId);
+                return;
+            }
+
+            var (outcome, room, skipped) = await DreamHandler.SkipToAsync(stream, dream, row);
+            if (outcome == Dreams.SkipOutcome.Done && room != null)
+            {
+                ActivityJournal.Current.Write("dream.skipped",
+                    accountId > 0 ? accountId : SessionContext.Current.AccountId,
+                    GameState.CharacterId,
+                    new { source = "command", room = room.Id, row = room.Fila, skipped, dreamPoints = dream.DreamPoints });
+            }
+
+            string reply = outcome switch
+            {
+                Dreams.SkipOutcome.Done when room != null => T("dream.skipped", room.Id, room.Fila, skipped, dream.DreamPoints),
+                Dreams.SkipOutcome.Behind => T("dream.behind", dream.SalaActual?.Fila ?? 0),
+                Dreams.SkipOutcome.Past => T("dream.past", dream.Salas.Count == 0 ? 0 : dream.Salas.Max(r => r.Fila)),
+                _ => T("dream.none"),
+            };
+            await NotifyAsync(stream, reply, channel, accountId);
+        }
+
+        /// <summary>".sueno" alone for the end, or ".sueno 25": a row of rooms, 1 or deeper.</summary>
+        internal static bool TryParseDreamRow(string rest, out int? row)
+        {
+            row = null;
+            string text = (rest ?? "").Trim();
+            if (text.Length == 0) return true;
+            if (!int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value) || value < 1) return false;
+            row = value;
+            return true;
+        }
+
         // ─── .packets ──────────────────────────────────────────────────────────
 
         /// <summary>
@@ -780,7 +1096,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(
-                    0, 1000 + 5L * GameState.StatStrength)));
+                    0, 1000 + 5L * GameState.TotalStrength)));
         }
 
         // ─── Piezas sueltas ─────────────────────────────────────────────────────
@@ -789,6 +1105,235 @@ namespace Jondo.Unity.Server.Handlers
             => CommandTexts.Get(key, values);
 
         private static string Usage(string command) => T(Uso[command]);
+
+        /// <summary>
+        /// Las raids de gremio: comprarla, lanzarla, entrar, salir, cerrarla, y ver cómo va.
+        ///
+        /// Comando y no botones por lo mismo que la invitación: la pestaña de raids de la tienda
+        /// del gremio sale en las capturas VACÍA -el gremio grabado no tenía ninguna-, así que no
+        /// se sabe con qué mensaje se compra ni con cuál se lanza. Lo que hay debajo sí es de
+        /// verdad: la instancia, el reloj y las variables que el contenido del cliente lee.
+        /// </summary>
+        private static async Task RaidAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
+            string[] partes = (rest ?? "").Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            string que = partes.Length > 0 ? partes[0].ToLowerInvariant() : "";
+
+            if (que.Length == 0)
+            {
+                await NotifyAsync(stream, RaidStatus(who), channel, accountId);
+                return;
+            }
+
+            if (que == "entrar" || que == "salir" || que == "fin")
+            {
+                string fallo = que == "entrar" ? await Managers.GuildRaidManager.EnterAsync(who)
+                             : que == "salir" ? await Managers.GuildRaidManager.LeaveAsync(who)
+                             : await Managers.GuildRaidManager.CloseAsync(who);
+                await NotifyAsync(stream, fallo == null ? RaidStatus(who) : T(fallo), channel, accountId);
+                return;
+            }
+
+            if ((que == "comprar" || que == "lanzar") && partes.Length > 1
+                && int.TryParse(partes[1].Trim(), out int cual))
+            {
+                string fallo = que == "comprar"
+                    ? Managers.GuildRaidManager.Buy(who, cual)
+                    : await Managers.GuildRaidManager.LaunchAsync(who, cual);
+                await NotifyAsync(stream, fallo == null ? RaidStatus(who) : T(fallo), channel, accountId);
+                return;
+            }
+
+            if (que == "clasificacion" || que == "clasificación")
+            {
+                await LadderAsync(stream, partes, channel, accountId);
+                return;
+            }
+
+            await NotifyAsync(stream, Usage(".raid"), channel, accountId);
+        }
+
+        /// <summary>
+        /// La clasificación semanal de una raid.
+        /// </summary>
+        /// <remarks>
+        /// Por el chat, como todo lo de las raids, y por lo mismo: la ventana de clasificaciones
+        /// existe en el cliente -«Acceder a las clasificaciones», «Ver la clasificación»- pero
+        /// ninguna captura la abre, así que no se sabe con qué mensaje se llena.
+        ///
+        /// El ornamento del podio se NOMBRA y no se entrega. Hoy el guardarropa ofrece los 167 a
+        /// todo el mundo, así que «darlo» no sería dar nada; el día que haya ornamentos por ganar,
+        /// aquí está a quién le tocan.
+        /// </remarks>
+        private static async Task LadderAsync(NetworkStream stream, string[] partes, int channel, long accountId)
+        {
+            int cual = Jondo.Unity.World.Content.Raids.Gigalodon;
+            if (partes.Length > 1 && int.TryParse(partes[1].Trim(), out int pedida)) cual = pedida;
+
+            var kind = Jondo.Unity.World.Content.Raids.Of(cual);
+            if (kind == null)
+            {
+                await NotifyAsync(stream, T("raid.unknown"), channel, accountId);
+                return;
+            }
+
+            var ahora = DateTimeOffset.UtcNow;
+            var tabla = Managers.GuildStore.Ladder(cual, ahora);
+            if (tabla.Count == 0)
+            {
+                await NotifyAsync(stream, T("raid.ladder.empty", kind.Name), channel, accountId);
+                return;
+            }
+
+            await NotifyAsync(stream, T("raid.ladder.head", kind.Name,
+                                        Managers.GuildStore.WeekOf(ahora)), channel, accountId);
+
+            foreach (var fila in tabla)
+            {
+                string premio = fila.Place <= kind.Podium.Count
+                    ? T("raid.ladder.podium", kind.Podium[fila.Place - 1].ToString())
+                    : "";
+                await NotifyAsync(stream, T("raid.ladder.row", fila.Place.ToString(), fila.Name,
+                                            fila.Score.ToString(), fila.Runs.ToString(), premio),
+                                  channel, accountId);
+            }
+        }
+
+        /// <summary>Cómo va la raid del gremio, que es lo que el panel del cliente enseñaría.</summary>
+        private static string RaidStatus(long characterId)
+        {
+            var guild = Managers.GuildStore.GuildOf(characterId);
+            if (guild == null) return T("raid.noguild");
+
+            var running = Managers.GuildRaidManager.RunningOf(characterId);
+            if (running == null)
+            {
+                var compradas = Managers.GuildStore.OwnedRaids(guild.Id);
+                string tiene = compradas.Count == 0
+                    ? T("raid.status.none")
+                    : string.Join(", ", compradas.Select(r =>
+                        Jondo.Unity.World.Content.Raids.Of(r)?.Name + " (" + r + ")"));
+                return T("raid.status.idle", tiene, guild.GuildKamas.ToString());
+            }
+
+            var kind = Jondo.Unity.World.Content.Raids.Of(running.RaidId);
+            var queda = running.Left(DateTimeOffset.UtcNow);
+            int planta = kind.FloorOf(Managers.GuildRaidManager.SubAreaOf(
+                Jondo.Unity.Server.Network.SessionContext.State.MapId));
+            string estado = T("raid.status.running", kind.Name, ((int)queda.TotalMinutes).ToString(),
+                              running.Score.ToString(), running.Members.Count.ToString(),
+                              planta > 0 ? planta.ToString() : "-");
+
+            // Y la luz, que no tiene otro sitio donde salir. El panel de la raid la pintaría, pero
+            // ese panel necesita mensajes que ninguna captura trae; hasta entonces, aquí.
+            if (!kind.HasLight) return estado;
+
+            var luces = new List<string>();
+            for (int planta2 = 1; planta2 <= Jondo.Unity.World.Content.Luminomachine.Machines; planta2++)
+            {
+                luces.Add($"{planta2}:{running.Get(Jondo.Unity.World.Content.RaidInstance.LightVariable(planta2))}" +
+                          $"/{Jondo.Unity.World.Content.Luminomachine.MostLight}");
+            }
+
+            return estado + T("raid.status.light", string.Join(" ", luces),
+                              Managers.Equipment.HowMany(
+                                  Jondo.Unity.World.Content.Luminomachine.SaltItem).ToString());
+        }
+
+        /// <summary>
+        /// Invitar a alguien al gremio, o echar una candidatura a uno.
+        ///
+        /// Esto es un comando y no un botón porque el botón NO ESTÁ MEDIDO: las capturas de
+        /// gremio son del lado de quien recibe la invitación y del líder que lee la candidatura,
+        /// así que se sabe lo que el servidor manda -el jiq y el jma- y lo que el cliente
+        /// contesta -el jiz y el jjn-, pero no con qué mensaje se piden. El día que aparezca en
+        /// una captura, el botón llama a los mismos dos métodos y el comando sobra.
+        /// </summary>
+        private static async Task GremioAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            string entrada = (rest ?? "").Trim();
+            string[] crear = entrada.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            if (crear.Length > 0 && (crear[0].Equals("crear", StringComparison.OrdinalIgnoreCase) ||
+                                     crear[0].Equals("creer", StringComparison.OrdinalIgnoreCase)))
+            {
+                if (crear.Length < 2)
+                {
+                    await NotifyAsync(stream, Usage(".gremio"), channel, accountId);
+                    return;
+                }
+
+                long founder = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
+                string name = crear[1].Trim();
+                string? fallo = await Handlers.GuildHandler.CreateFromCommandAsync(stream, founder, name);
+                await NotifyAsync(stream,
+                    fallo == null ? T("guild.create.done", name) : T(fallo, name),
+                    channel, accountId);
+                return;
+            }
+
+            string[] partes = entrada.Split(' ', 3, StringSplitOptions.RemoveEmptyEntries);
+            long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
+
+            // Salir por el chat es lo mismo que salir por la ventana: el jho, sin el jho.
+            if (partes.Length == 1 && partes[0].Equals("salir", StringComparison.OrdinalIgnoreCase))
+            {
+                var dejado = Managers.GuildStore.GuildOf(who);
+                if (dejado == null)
+                {
+                    await NotifyAsync(stream, T("guild.invite.noguild"), channel, accountId);
+                    return;
+                }
+
+                await Handlers.GuildHandler.LeaveAsync(stream, who);
+                await NotifyAsync(stream, T("guild.left", dejado.Name), channel, accountId);
+                return;
+            }
+
+            if (partes.Length < 2)
+            {
+                await NotifyAsync(stream, Usage(".gremio"), channel, accountId);
+                return;
+            }
+
+            string que = partes[0].ToLowerInvariant();
+            string quien = partes[1];
+
+            if (que == "rango" && partes.Length > 2 && int.TryParse(partes[2].Trim(), out int rango))
+            {
+                string fallo = await Handlers.GuildHandler.SetMemberRankAsync(who, quien, rango);
+                await NotifyAsync(stream, fallo == null ? T("guild.rank.done", quien, rango.ToString()) : T(fallo, quien),
+                                  channel, accountId);
+                return;
+            }
+
+            if (que == "expulsar")
+            {
+                string fallo = await Handlers.GuildHandler.KickAsync(who, quien);
+                await NotifyAsync(stream, fallo == null ? T("guild.kick.done", quien) : T(fallo, quien),
+                                  channel, accountId);
+                return;
+            }
+
+            if (que == "invitar")
+            {
+                string fallo = await Handlers.GuildHandler.InviteAsync(who, quien);
+                await NotifyAsync(stream, fallo == null ? T("guild.invite.sent", quien) : T(fallo, quien),
+                                  channel, accountId);
+                return;
+            }
+
+            if (que == "solicitar")
+            {
+                string mensaje = partes.Length > 2 ? partes[2] : "";
+                string fallo = await Handlers.GuildHandler.ApplyAsync(who, quien, mensaje);
+                await NotifyAsync(stream, fallo == null ? T("guild.apply.sent", quien) : T(fallo, quien),
+                                  channel, accountId);
+                return;
+            }
+
+            await NotifyAsync(stream, Usage(".gremio"), channel, accountId);
+        }
 
         /// <summary>
         /// El aviso al jugador, por el canal donde escribió para que le salga en la pestaña que
@@ -801,12 +1346,15 @@ namespace Jondo.Unity.Server.Handlers
         /// cliente, y porque el jugador acaba de escribir en esa misma pestaña y espera la
         /// respuesta ahí.
         /// </summary>
+        /// <summary>
+        /// A command's answer: an information line only its author sees. The channel and the
+        /// account are what the chat line it used to be needed; the information message needs
+        /// neither, and they stay so the sixty-odd callers do not all change.
+        /// </summary>
         private static async Task NotifyAsync(NetworkStream stream, string text, int channel, long accountId)
         {
             await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kti, ConnectionProtocol.BuildChatLine(
-                    GameState.CharacterName, GameState.CharacterId, accountId,
-                    "[INFO] " + text, channel)));
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(text)));
         }
 
         /// <summary>La primera palabra en minúsculas, o null si la línea no empieza por punto.</summary>
@@ -849,7 +1397,18 @@ namespace Jondo.Unity.Server.Handlers
         /// Las coordenadas, escritas como sea: [-1,0], -1 0, -1,0 o (-1;0). Los corchetes y los
         /// separadores se cambian por espacios y lo que queda tienen que ser dos números.
         /// </summary>
-        private static bool ParseCoordinates(string rest, out int x, out int y)
+        /// <summary>
+        /// Las coordenadas de un comando, tal como el cliente las manda.
+        /// </summary>
+        /// <remarks>
+        /// Y no es como el jugador las escribe. Al teclear <c>[0,-8]</c> en el chat, el cliente lo
+        /// convierte en un enlace de mapa antes de enviarlo, y lo que llega al servidor es
+        /// <c>.teleport {{map,0,-8,1}}</c> -medido en el registro, tres veces seguidas-. Con el
+        /// parser de antes eso eran cuatro trozos y no dos, así que el comando contestaba con su
+        /// uso a quien lo había escrito bien. Ahora se lee el enlace: la palabra «map» y el mundo
+        /// de detrás se descartan y quedan las dos cifras.
+        /// </remarks>
+        internal static bool ParseCoordinates(string rest, out int x, out int y)
         {
             x = 0;
             y = 0;
@@ -858,12 +1417,20 @@ namespace Jondo.Unity.Server.Handlers
             var cleaned = new System.Text.StringBuilder(rest.Length);
             foreach (char c in rest)
             {
-                cleaned.Append(c == '[' || c == ']' || c == '(' || c == ')' || c == ',' || c == ';'
+                cleaned.Append(c == '[' || c == ']' || c == '(' || c == ')' || c == '{' || c == '}'
+                               || c == ',' || c == ';'
                     ? ' ' : c);
             }
 
-            var parts = cleaned.ToString().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 2) return false;
+            var parts = new List<string>(cleaned.ToString().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+            if (parts.Count > 0 && parts[0].Equals("map", StringComparison.OrdinalIgnoreCase))
+            {
+                // {{map,x,y,mundo}}: fuera la palabra, y el mundo del final sobra.
+                parts.RemoveAt(0);
+                if (parts.Count == 3) parts.RemoveAt(2);
+            }
+
+            if (parts.Count != 2) return false;
 
             return int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out x)
                 && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out y);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -22,7 +22,8 @@ namespace Jondo.Unity.Server.Handlers
     ///                                                      «Detalles» de la ventanita no
     ///                                                      contesta nada todavía)
     ///   aceptar    C→S ijx { grupo }         →  S→C ing (el grupo entero)
-    ///                                           y al que invitó: ink + lqn 1663
+    ///                                           y al que invitó: ink
+    ///   seguir     C→S imh / imo             →  ver <see cref="PartyFollowHandler"/>
     ///   rechazar   C→S iki { grupo }         →  a ti ilo; al que invitó iko + imy
     ///   salir      C→S inh { grupo }         →  S→C ils { grupo }
     ///   ceder      C→S ima { quién, grupo }  →  S→C imk (vacío) + ilx { quién, grupo }
@@ -49,9 +50,6 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     public static class PartyHandler
     {
-        /// <summary>«<b>{0}</b> sigue tu desplazamiento», al entrar alguien.</summary>
-        private const int FollowsYouMessage = 1663;
-
         // ─── Invitar ────────────────────────────────────────────────────────────
 
         public static async Task InviteAsync(NetworkStream stream, byte[] payload)
@@ -135,6 +133,10 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
 
             // Y a los demás, sólo el que entra: el grupo entero no se reenvía.
+            //
+            // The 1663 («... sigue tu desplazamiento») that used to go with it belongs to the imh
+            // the new member's client may send next, not to joining: two other captures add a
+            // member with the same ink and no 1663. See PartyFollowProtocol.FollowsYouMessage.
             string meName = SessionContext.State.CharacterName;
             byte[] entra = ConnectionProtocol.Push(Op.Ink,
                 Pb.New().Var(1, party.Id).Msg(2, BuildMember(meId)).Build());
@@ -146,8 +148,6 @@ namespace Jondo.Unity.Server.Handlers
                 if (sesion == null) continue;
 
                 await sesion.SendAsync(entra);
-                await sesion.SendAsync(ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildSystemMessage(FollowsYouMessage, meName)));
             }
 
             Console.WriteLine($"[Grupo] {meName} entra en el grupo {party.Id} " +
@@ -339,6 +339,10 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 await sesion.SendAsync(ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
             }
+
+            // Whoever followed the one who left stops: the leader they followed is gone.
+            if (!salida.Dissolved && salida.NewLeader != 0)
+                await PartyFollowHandler.LeaderChangedAsync(party);
         }
 
         // ─── Ceder el mando ─────────────────────────────────────────────────────
@@ -365,6 +369,10 @@ namespace Jondo.Unity.Server.Handlers
                 await sesion.SendAsync(ConnectionProtocol.Push(Op.Ilx,
                     ConnectionProtocol.BuildPartyLeader(nuevo, partyId)));
             }
+
+            // And following ends with the old leader: the imk above is the one the zaap sends to
+            // the followers, so they get it too. Inferred; see PartyFollowHandler.
+            await PartyFollowHandler.LeaderChangedAsync(party);
 
             Console.WriteLine($"[Grupo] El grupo {partyId} pasa a mandarlo {nuevo}.");
         }
@@ -519,19 +527,13 @@ namespace Jondo.Unity.Server.Handlers
                 initiative = StatsHandler.GetPlayerInitiative();
                 Managers.Equipment.Bonuses().TryGetValue(
                     ConnectionProtocol.Stat.Prospecting, out long delEquipo);
-                prospecting = BaseProspecting + state.StatChance / 10 + (int)delEquipo;
+                prospecting = BaseProspecting + state.TotalChance / 10 + (int)delEquipo;
             }
 
             var info = Pb.New().Msg(2, Pb.New().Var(1, 1));
 
-            if (map != null)
-            {
-                info.Msg(4, Pb.New()
-                    .Var(1, state.MapId)
-                    .VarIfNotZero(2, map.PosX)
-                    .VarIfNotZero(4, map.SubAreaId)
-                    .VarIfNotZero(5, map.PosY));
-            }
+            // The same block the ikv carries when the party follows its leader.
+            if (map != null) info.Msg(4, PartyFollowProtocol.MapPosition(state.MapId, map));
 
             return info
                 .Msg(7, Pb.New()

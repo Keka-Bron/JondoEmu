@@ -14,6 +14,9 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>Las dos cosas: el glifo de aura y la runa.</summary>
         AlPisarYAlEmpezar,
+
+        /// <summary>At the end of the turn of whoever stands on it: the turn-end glyph (402).</summary>
+        AlAcabarElTurno,
     }
 
     /// <summary>
@@ -50,6 +53,9 @@ namespace Jondo.Unity.World.Fights
             Cuando = cuando;
         }
 
+        /// <summary>The cell it was aimed at: the f10 of its jwe 401. Minus one when unknown.</summary>
+        public int Centro { get; set; } = -1;
+
         /// <summary>Quién lo puso. El daño que haga es suyo.</summary>
         public long Dueno { get; }
 
@@ -76,6 +82,17 @@ namespace Jondo.Unity.World.Fights
 
         public bool SeDisparaAlEmpezarElTurno
             => !Gastado && (Cuando == Disparo.AlEmpezarElTurno || Cuando == Disparo.AlPisarYAlEmpezar);
+
+        public bool SeDisparaAlAcabarElTurno => !Gastado && Cuando == Disparo.AlAcabarElTurno;
+
+        /// <summary>The effect that laid it -- 400 trap, 401/402 glyph, 1091 aura, 1165 glyph, 2022 rune -- for 1026 and 2023.</summary>
+        public int Tipo { get; set; }
+
+        /// <summary>The fighters inside a monster's aura glyph: what it gave them goes when they leave.</summary>
+        public HashSet<long> Dentro { get; } = new HashSet<long>();
+
+        /// <summary>The spell that laid it, which a 2018 "Disipa los glifos" names in its die.</summary>
+        public int HechizoQueLoPuso { get; set; }
 
         /// <summary>La trampa se gasta; el glifo se queda hasta que caduque.</summary>
         public bool SeGastaAlDispararse => Cuando == Disparo.AlPisar;

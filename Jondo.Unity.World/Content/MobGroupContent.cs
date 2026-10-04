@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
@@ -11,7 +11,16 @@ namespace Jondo.Unity.World.Content
     {
         public int MonsterId { get; init; }
 
-        /// <summary>Which of its grades, from 0. The client accepts five and no more.</summary>
+        /// <summary>
+        /// Which of its grades, from 0.
+        /// </summary>
+        /// <remarks>
+        /// Up to the sixth. Five was the cap, measured on three hundred wild monsters that never
+        /// went past it; then the kanojedo's level-200 Puch Ingball turned up in two captures
+        /// travelling as grade 6 -- <c>f2=200 f4=6</c> -- drawn and hoverable, because the
+        /// client's own data gives that monster six grades. The cap is the monster's, not a
+        /// number: what the client knows for it, it accepts.
+        /// </remarks>
         public int Grade { get; init; }
 
         public override string ToString() => $"{MonsterId} grade {Grade}";
@@ -26,6 +35,16 @@ namespace Jondo.Unity.World.Content
         public long GroupId { get; init; }
 
         public int Cell { get; init; }
+
+        /// <summary>
+        /// Which way it faces, 1 to 7; south-east when the file does not say.
+        /// </summary>
+        /// <remarks>
+        /// A generated group faces 1 and nobody notices; the six Puch Ingball of the kanojedo are
+        /// measured facing 5, 1, 3, 3, 1 and 3, and a training dummy that stands where the
+        /// capture put it but looks the other way is the kind of wrong that is visible.
+        /// </remarks>
+        public int Orientation { get; init; } = 1;
 
         public IReadOnlyList<MobMemberSpec> Members { get; init; } = Array.Empty<MobMemberSpec>();
 
@@ -83,8 +102,11 @@ namespace Jondo.Unity.World.Content
         /// </remarks>
         public const long FirstAuthoredId = -2_000_000;
 
-        /// <summary>How many grades the client accepts. Anything past this is clamped by the server.</summary>
-        public const int MaxGrade = 4;
+        /// <summary>
+        /// The highest grade index a written group may ask for: the sixth. See
+        /// <see cref="MobMemberSpec.Grade"/> for why six and not five.
+        /// </summary>
+        public const int MaxGrade = 5;
 
         public static ContentStore<MobGroupKey, MobGroupSpawn> Load(string? authoredPath,
                                                                     Action<string>? report = null)
@@ -140,6 +162,8 @@ namespace Jondo.Unity.World.Content
                         MapId = mapId,
                         GroupId = groupId,
                         Cell = (int)Number(entry, "cell"),
+                        Orientation = entry.TryGetProperty("orientation", out var facing)
+                            ? Math.Clamp(facing.GetInt32(), 0, 7) : 1,
                         Members = members,
                     }, from);
                 }

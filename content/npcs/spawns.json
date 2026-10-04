@@ -14,12 +14,84 @@
     "has to be removable without editing the generated file it came from, because that file is",
     "rewritten by tools/extraer_npcs_reales.py and the edit would vanish.",
     "",
-    "Empty on purpose. Nothing here yet means the world is exactly what the captures measured.",
+    "The bankers of the banks no capture shows. Only Bonta's banker is measured (the jss of frame 16",
+    "of 'Interactivos varios/entrar en banco bonta...': template 6394 on cell 289 of 217059328,",
+    "facing 3). The other banks are placed here, INFERRED, on the same rule: the walkable cell of",
+    "the bank's first room nearest to Bonta's 289 -- the centre of the room, where he stands --",
+    "that no interactive and no other NPC takes, facing 3. The banker of each is the client's own:",
+    "the Brakmarian (6374) says 'the only safe place in Brakmar'; Moneo (3516) owes his bank to the",
+    "Parafrascos corporation of the cacterro desert, Picanesburgo's area; Yendong (5653) is taken",
+    "for Pandala by his name; the rest get the generic owl 'Banquero' (100). Astrub's 100 on 318",
+    "was 'placed by hand in Giny' in the derived layer: removed, and placed by the same rule.",
+    "Bonta's 289 is a cell nobody walks on -- he stands behind his counter -- but where each other bank's",
+    "counter is cannot be read off the data (captured NPCs stand on walkable, fight-only and unwalkable",
+    "cells alike: 151, 113 and 158), so these stand inside the room, where they can be reached.",
     "",
     "Draconiros was briefly written here before it turned out datos/npcs_reales.json already",
     "carried him - map 238553348, cell 206, orientation 3. He was invisible because his room had",
     "no way in, not because he was unplaced, and restating a measurement in the authored layer",
     "would have hidden that."
   ],
-  "spawns": []
+  "spawns": [
+    {
+      "map": 192415750,
+      "npc": 100,
+      "cell": 318,
+      "remove": true
+    },
+    {
+      "map": 192415750,
+      "npc": 100,
+      "cell": 289,
+      "orientation": 3
+    },
+    {
+      "map": 214695944,
+      "npc": 6374,
+      "cell": 329,
+      "orientation": 3
+    },
+    {
+      "map": 99095051,
+      "npc": 100,
+      "cell": 343,
+      "orientation": 3
+    },
+    {
+      "map": 207618052,
+      "npc": 5653,
+      "cell": 289,
+      "orientation": 3
+    },
+    {
+      "map": 84935175,
+      "npc": 100,
+      "cell": 343,
+      "orientation": 3
+    },
+    {
+      "map": 91753985,
+      "npc": 100,
+      "cell": 344,
+      "orientation": 3
+    },
+    {
+      "map": 86511105,
+      "npc": 100,
+      "cell": 289,
+      "orientation": 3
+    },
+    {
+      "map": 54534165,
+      "npc": 100,
+      "cell": 370,
+      "orientation": 3
+    },
+    {
+      "map": 173937154,
+      "npc": 3516,
+      "cell": 289,
+      "orientation": 3
+    }
+  ]
 }

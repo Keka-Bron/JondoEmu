@@ -21,7 +21,7 @@ Two rules shaped the layout:
 
 ## `datos/`
 
-27 files, 67,040,313 bytes (63.9 MB): 22 json, 4 bin and one zip.
+29 files, 67,074,219 bytes (64.0 MB): 24 json, 4 bin and one zip.
 
 "Read by" is the class that loads the file at startup; the path always comes from a `Paths`
 property, never from a literal. Four json files and one bin sit in the folder but are resolved by
@@ -49,6 +49,10 @@ nothing — they are working references, and `.gitignore` keeps them local.
 | `character_xp.json` | 38,990 | 1,889 levels → accumulated experience | `ExperienceTable` via `Paths.CharacterXpJson` | `extract_character_xp.py` |
 | `mounts.json` | 35,924 | 520 mounts, indexed by the certificate item that grants them: bones, colors, scale | `Mounts` via `Paths.MountsJson` | `extract_monturas.py` |
 | `characteristics.json` | 14,927 | 122 characteristic ids → name, upgradable, visible, order, category | nothing | `extract_characteristics.py` |
+| `spell_states.json` | 9,486 | The 103 spell states the client flags: invulnerable (23), cannot be moved (22) or pushed (25), incurable (10), cannot deal damage (5)... with the state's name. The other 6,272 states carry no flag and are not written | `SpellStates` via `Paths.SpellStatesJson` | `extract_spell_states.py` |
+| `effect_weights.json` | 22,775 | All 872 client effects as `[weight, category, useDice, oppositeId, bonusType]`. The weight is `effectPowerRate`, what smithmagic counts a point at: vitality 0.2, strength 1, AP 100, and negative for the maluses (-0.5 a point of -strength). 209 carry one | `Forgemagic` via `Paths.EffectWeightsJson` | `extract_effect_weights.py` |
+| `talleres_3.6.10.10.json` | 11,131 | 54 graphics -> workshop station: its type, the skills its element offers and where that came from (`jss`, `use`, `pr44`, `inferred`), 577 stations in the world; and the artisans' book (13493) with the jobs it opens on each of its 130 maps | `Workshops` via `Paths.WorkshopsJson` | `extract_workshops.py` |
+| `suenos_3.6.10.10.json` | 20,445 | The Infinite Dreams: the client's ten intensities (loot and xp bonus, starting dream points and sand, legends allowed, dream fragments a wave), its 111 rewards and their actions, and the dream's loot table, the 61 lines of the captures' `izo` taken back to a loot bonus of 100 | `DreamData` via `Paths.Resolve` | `extraer_suenos.py` (client DataRoots + captures) |
 | `breed_stats.json` | 12,781 | 19 breeds × 6 characteristics → what a point costs in each band | `BreedStatCost` via `Paths.BreedStatsJson` | `extract_breed_stats.py` |
 | `dofus3_mappings.json` | 9,524 | 93 `type.ankama.com/<opcode>` → a name someone assigned while reversing; 3 also carry field renames | nothing | no script |
 | `breed_looks.json` | 4,314 | 19 breeds × male/female → bones, skins, scales, six default colors | `BreedLookTable` via `Paths.BreedLooksJson` | `extract_breed_looks.py` |
@@ -273,6 +277,8 @@ below.
 py tools/extract_breed_looks.py          -> breed_looks.json
 py tools/extract_breed_stats.py          -> breed_stats.json
 py tools/extract_characteristics.py      -> characteristics.json
+py tools/extract_spell_states.py         -> spell_states.json
+py tools/extract_effect_weights.py       -> effect_weights.json
 py tools/extract_heads.py                -> heads.json, but in the repository root; move it
 py tools/extract_dungeons.py             -> dungeons.json
 py tools/extract_merkasako.py            -> havenbag.json
@@ -292,6 +298,8 @@ py tools/completar_cosmeticos.py               -> ItemTemplates + cosmetics.json
 py tools/extraer_apariencias.py <capture.pcapng> --guardar   -> cosmetic_skins.json
 py tools/sanear_world.py --ver                               -> what would still be stripped
 py tools/sanear_world.py --salida datos                      -> rewrite the world_etapa*.bin clean
+py tools/extract_workshops.py                                -> talleres_3.6.10.10.json (also reads
+                                                                the client's HintsDataRoot)
 
 # 5. Repack, once world.db is right (PowerShell)
 Compress-Archive -Path bases\world.db -DestinationPath datos\world.zip -Force

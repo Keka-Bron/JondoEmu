@@ -376,15 +376,20 @@ namespace Jondo.Unity.Launcher
                 // había antes de respaldo.
                 var area = PantallaDeTrabajo();
 
-                // MelonLoader abre su propia consola negra y su pantalla de arranque delante del
-                // juego. Se le dice que no por línea de órdenes además de por Loader.cfg: la orden
-                // manda sobre el fichero, así que da igual que alguien lo reescriba.
-                string arguments =
-                    $"-force-d3d11 -screen-fullscreen 0 -screen-width {area.Width} -screen-height {area.Height} " +
-                    "--melonloader.hideconsole --melonloader.disablestartscreen " +
-                    $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId {instanceId} --hash {hash} " +
-                    $"--canLogin true --langCode {language} " +
-                    "--autoConnectType 1 --connectionPort 5555";
+                // The optional HD/4K scenery packs: a flag only for a pack the player turned on
+                // AND that is installed and verified for the client's current version.
+                string packFlags = Packs.TexturePackService.ForClient(clientPath)
+                    .LaunchFlags(UI.LauncherPreferences.PackHd, UI.LauncherPreferences.Pack4k);
+                if ((UI.LauncherPreferences.PackHd || UI.LauncherPreferences.Pack4k) && packFlags.Length == 0)
+                {
+                    Console.WriteLine("[Launcher] A texture pack is turned on but not installed and verified " +
+                                      "for this client version; starting without it.");
+                }
+
+                string arguments = ClientArguments(area.Width, area.Height, instanceId, hash, language, packFlags);
+
+                // The client's mod, as the emulator ships it.
+                InstallMod(clientPath);
 
                 var startInfo = new System.Diagnostics.ProcessStartInfo
                 {
@@ -445,6 +450,66 @@ namespace Jondo.Unity.Launcher
             {
                 return new Result { Success = false, Message = $"Error starting the client: {ex.Message}" };
             }
+        }
+
+        /// <summary>The Dofus client's command line.</summary>
+        /// <param name="packFlags">From <see cref="Packs.TexturePackService.LaunchFlags"/>; may be empty.</param>
+        internal static string ClientArguments(int width, int height, int instanceId, string hash, string language, string packFlags)
+        {
+            // MelonLoader abre su propia consola negra y su pantalla de arranque delante del
+            // juego. Se le dice que no por línea de órdenes además de por Loader.cfg: la orden
+            // manda sobre el fichero, así que da igual que alguien lo reescriba.
+            string arguments =
+                $"-force-d3d11 -screen-fullscreen 0 -screen-width {width} -screen-height {height} " +
+                "--melonloader.hideconsole --melonloader.disablestartscreen " +
+                $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId {instanceId} --hash {hash} " +
+                $"--canLogin true --langCode {language} " +
+                "--autoConnectType 1 --connectionPort 5555";
+
+            // Same place as in Ankama's zaap.yml: after the connection arguments, with no value.
+            return packFlags.Length > 0 ? arguments + " " + packFlags : arguments;
+        }
+
+        /// <summary>
+        /// The emulator's JondoFix into the client's Mods, when it differs from the one there.
+        /// </summary>
+        /// <remarks>
+        /// What the mod changes in the client -- the Koliseo window with the JondoBots' card, among
+        /// the rest -- comes with the emulator, not with a new client: whoever has a client with
+        /// MelonLoader gets it at the next launch. A client without MelonLoader is left alone. A
+        /// client already open holds the file; it is then updated at the next launch.
+        /// </remarks>
+        internal static void InstallMod(string clientPath)
+        {
+            try
+            {
+                string shipped = Path.Combine(Paths.Root, "JondoFix", "JondoFix.dll");
+                string clientDir = Path.GetDirectoryName(clientPath) ?? "";
+                if (!File.Exists(shipped) || !Directory.Exists(Path.Combine(clientDir, "MelonLoader"))) return;
+
+                string mods = Path.Combine(clientDir, "Mods");
+                string installed = Path.Combine(mods, "JondoFix.dll");
+                if (File.Exists(installed) && SameContent(installed, shipped)) return;
+
+                Directory.CreateDirectory(mods);
+                File.Copy(shipped, installed, overwrite: true);
+                Console.WriteLine($"[Launcher] JondoFix updated in {mods}.");
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                Console.WriteLine($"[Launcher] JondoFix could not be updated now (is a client open?): {ex.Message}");
+            }
+        }
+
+        internal static bool SameContent(string a, string b)
+        {
+            var infoA = new FileInfo(a);
+            var infoB = new FileInfo(b);
+            if (infoA.Length != infoB.Length) return false;
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            using var streamA = File.OpenRead(a);
+            using var streamB = File.OpenRead(b);
+            return sha.ComputeHash(streamA).AsSpan().SequenceEqual(sha.ComputeHash(streamB));
         }
 
         /// <summary>

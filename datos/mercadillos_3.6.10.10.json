@@ -1,0 +1,857 @@
+{
+ "_comentario": [
+  "Los mercadillos del mundo: sus ajustes, que tipos de objeto acepta cada uno y que elemento",
+  "interactivo es cada uno. Generado con tools/extraer_mercadillos.py; no se edita a mano.",
+  "",
+  "habilidad: la de todo mostrador de mercadillo en los jss reales, 355 «Consultar»; el iwn",
+  "  que contesta al iwo la repite en su f4.",
+  "",
+  "mercadillos: los siete de AuctionHousesDataRoot del cliente (id, lotes). El id es el f4 del kdw",
+  "  real, asi que un mercadillo es UNO para todo el mundo: el de equipables de Bonta y el de Astrub",
+  "  son el mismo 1262 y comparten sus ventas.",
+  "  tipoInteractivo: el tipo con el que el jss declara su mostrador; el nombre es el de",
+  "  InteractivesDataRoot. Medido (iwo+jss / iwo+pista) en los cinco de las capturas; los otros",
+  "  dos (1261 y 1263) por el orden de los ids, que los cinco medidos cumplen (313<314<315<318<",
+  "  319<320<381 frente a 1261..1267) y que repiten los textos de sus pistas (749268 recursos,",
+  "  749269 equipables, 749270 consumibles).",
+  "  tiposDeObjeto: el f9 del kdw real (tiposFuente kdw). Para recursos y consumibles, que ninguna",
+  "  captura abre, los tipos de la categoria del cliente (2 recursos, 1 consumibles) que no toma",
+  "  ya ningun mercadillo medido (tiposFuente categoria N). INFERIDO.",
+  "  ajustes: los campos del kdw tal cual. f1 -1, f2 200, f3 708, f5 2.0 el impuesto en %, f6 672",
+  "  las horas de venta (el kes da 2.419.200 s), f7 1.0. En los que no se miden, lo comun a los",
+  "  cinco medidos, que coinciden en todo menos en f4 y f9.",
+  "",
+  "elementos: el mostrador de cada uno, por elemento. Se busca en el mapa de cada pista de la",
+  "  categoria Mercadillos (HintsDataRoot) y en los interiores que el cliente pone en sus mismas",
+  "  coordenadas y subzona (MapPositions): el de cosmeticos de Bonta esta en 217064452, detras",
+  "  de la puerta de la pista, los dos en (-35,-60). Por orden, y un empate deja la pista fuera:",
+  "  jss                 declarado en un jss real con el tipo de ese mercadillo",
+  "  iwo                 abierto en una captura y contestado con el kdw de ese mercadillo",
+  "  pista+grafico       con el grafico de un mostrador que un jss declara en otro sitio",
+  "                      (Brakmar usa el mismo en los cinco suyos). INFERIDO.",
+  "  pista+grafico unico el unico elemento con un grafico que no tiene ningun otro elemento",
+  "                      del mundo, y que ningun jss declara como otra cosa. INFERIDO.",
+  "  sinResolver: pistas cuyo mostrador no se decide con esto; se quedan fuera, sin inventar."
+ ],
+ "habilidad": 355,
+ "mercadillos": {
+  "1261": {
+   "tipoInteractivo": 313,
+   "nombre": "Mercadillo de recursos",
+   "tipoInteractivoFuente": "orden",
+   "lotes": [
+    1,
+    10,
+    100,
+    1000
+   ],
+   "tiposDeObjeto": [
+    15,
+    34,
+    35,
+    36,
+    38,
+    39,
+    40,
+    41,
+    46,
+    47,
+    48,
+    50,
+    51,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    63,
+    65,
+    66,
+    68,
+    70,
+    71,
+    84,
+    95,
+    96,
+    98,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    119,
+    125,
+    152,
+    153,
+    154,
+    164,
+    167,
+    174,
+    175,
+    179,
+    183,
+    185,
+    195,
+    219,
+    228,
+    229,
+    230,
+    231,
+    232,
+    241,
+    262,
+    266,
+    278,
+    309,
+    312,
+    315
+   ],
+   "tiposFuente": "categoria 2",
+   "ajustes": {
+    "f1": -1,
+    "f2": 200,
+    "f3": 708,
+    "f5": 2.0,
+    "f6": 672,
+    "f7": 1.0,
+    "f8": 0
+   },
+   "ajustesFuente": "comun a los medidos"
+  },
+  "1262": {
+   "tipoInteractivo": 314,
+   "nombre": "Mercadillo de equipables",
+   "tipoInteractivoFuente": "iwo+jss",
+   "lotes": [
+    1,
+    10,
+    100,
+    1000
+   ],
+   "tiposDeObjeto": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    271,
+    16,
+    17,
+    273,
+    82,
+    274,
+    19,
+    275,
+    276,
+    21,
+    277,
+    22,
+    151,
+    23,
+    279,
+    280,
+    217,
+    169,
+    240,
+    114
+   ],
+   "tiposFuente": "kdw",
+   "ajustes": {
+    "f1": -1,
+    "f2": 200,
+    "f3": 708,
+    "f5": 2.0,
+    "f6": 672,
+    "f7": 1.0,
+    "f8": 0
+   },
+   "ajustesFuente": "kdw",
+   "captura": "Interactivos varios/abrir mercadillo equipables-navegar items-comprar-poner en venta.pcapng"
+  },
+  "1263": {
+   "tipoInteractivo": 315,
+   "nombre": "Mercadillo de consumibles",
+   "tipoInteractivoFuente": "orden",
+   "lotes": [
+    1,
+    10,
+    100,
+    1000
+   ],
+   "tiposDeObjeto": [
+    12,
+    13,
+    14,
+    25,
+    33,
+    37,
+    42,
+    43,
+    49,
+    69,
+    74,
+    75,
+    76,
+    79,
+    80,
+    85,
+    87,
+    88,
+    89,
+    94,
+    100,
+    112,
+    157,
+    165,
+    166,
+    172,
+    173,
+    176,
+    184,
+    187,
+    188,
+    200,
+    214,
+    216,
+    218,
+    222,
+    226,
+    236,
+    245,
+    284,
+    297,
+    302,
+    303,
+    304,
+    306,
+    310,
+    314,
+    322,
+    329,
+    330
+   ],
+   "tiposFuente": "categoria 1",
+   "ajustes": {
+    "f1": -1,
+    "f2": 200,
+    "f3": 708,
+    "f5": 2.0,
+    "f6": 672,
+    "f7": 1.0,
+    "f8": 0
+   },
+   "ajustesFuente": "comun a los medidos"
+  },
+  "1264": {
+   "tipoInteractivo": 318,
+   "nombre": "Mercadillo de runas",
+   "tipoInteractivoFuente": "iwo+jss",
+   "lotes": [
+    1,
+    10,
+    100,
+    1000
+   ],
+   "tiposDeObjeto": [
+    258,
+    211,
+    233,
+    26,
+    189,
+    78
+   ],
+   "tiposFuente": "kdw",
+   "ajustes": {
+    "f1": -1,
+    "f2": 200,
+    "f3": 708,
+    "f5": 2.0,
+    "f6": 672,
+    "f7": 1.0,
+    "f8": 0
+   },
+   "ajustesFuente": "kdw",
+   "captura": "Interactivos varios/abrir mercadillo de runas y comprar-lote 1-lote 10-lote 100-lote 1000.pcapng"
+  },
+  "1265": {
+   "tipoInteractivo": 319,
+   "nombre": "Mercadillo de criaturas",
+   "tipoInteractivoFuente": "iwo+pista",
+   "lotes": [
+    1,
+    10,
+    100,
+    1000
+   ],
+   "tiposDeObjeto": [
+    209,
+    18,
+    99,
+    323,
+    197,
+    326,
+    121,
+    331,
+    332,
+    301,
+    333,
+    206
+   ],
+   "tiposFuente": "kdw",
+   "ajustes": {
+    "f1": -1,
+    "f2": 200,
+    "f3": 708,
+    "f5": 2.0,
+    "f6": 672,
+    "f7": 1.0,
+    "f8": 0
+   },
+   "ajustesFuente": "kdw",
+   "captura": "Interactivos varios/abrir mercadillo de criaturas.pcapng"
+  },
+  "1266": {
+   "tipoInteractivo": 320,
+   "nombre": "Mercadillo de almas",
+   "tipoInteractivoFuente": "iwo+jss",
+   "lotes": [
+    1,
+    10,
+    100,
+    1000
+   ],
+   "tiposDeObjeto": [
+    259,
+    83,
+    327,
+    328
+   ],
+   "tiposFuente": "kdw",
+   "ajustes": {
+    "f1": -1,
+    "f2": 200,
+    "f3": 708,
+    "f5": 2.0,
+    "f6": 672,
+    "f7": 1.0,
+    "f8": 0
+   },
+   "ajustesFuente": "kdw",
+   "captura": "Interactivos varios/zaapi desde zaap bonta a mercadillo almas-abrir mercadillo almas-comprar piedra.pcapng"
+  },
+  "1267": {
+   "tipoInteractivo": 381,
+   "nombre": "Mercadillo de cosméticos",
+   "tipoInteractivoFuente": "iwo+jss",
+   "lotes": [
+    1,
+    10,
+    100,
+    1000
+   ],
+   "tiposDeObjeto": [
+    113,
+    324,
+    246,
+    247,
+    199,
+    248,
+    249,
+    250,
+    251,
+    299,
+    252,
+    300
+   ],
+   "tiposFuente": "kdw",
+   "ajustes": {
+    "f1": -1,
+    "f2": 200,
+    "f3": 708,
+    "f5": 2.0,
+    "f6": 672,
+    "f7": 1.0,
+    "f8": 0
+   },
+   "ajustesFuente": "kdw",
+   "captura": "Apariencias/entrar a mercadillo cosmeticos-comprar anillo objevivo.pcapng"
+  }
+ },
+ "elementos": {
+  "515219": {
+   "mercadillo": 1263,
+   "fuente": "pista+grafico unico",
+   "pista": 3444,
+   "mapas": [
+    191102976
+   ],
+   "grafico": 63456
+  },
+  "515220": {
+   "mercadillo": 1261,
+   "fuente": "jss",
+   "pista": 3435,
+   "mapas": [
+    191104004
+   ],
+   "grafico": 63454
+  },
+  "515221": {
+   "mercadillo": 1262,
+   "fuente": "jss",
+   "pista": 3452,
+   "mapas": [
+    191106052
+   ],
+   "grafico": 63455
+  },
+  "515278": {
+   "mercadillo": 1261,
+   "fuente": "pista+grafico unico",
+   "pista": 3436,
+   "mapas": [
+    54172456
+   ],
+   "grafico": 63472
+  },
+  "515279": {
+   "mercadillo": 1263,
+   "fuente": "jss",
+   "pista": 3445,
+   "mapas": [
+    54173481
+   ],
+   "grafico": 63474
+  },
+  "515280": {
+   "mercadillo": 1262,
+   "fuente": "pista+grafico unico",
+   "pista": 3453,
+   "mapas": [
+    54172968,
+    54173480
+   ],
+   "grafico": 63473
+  },
+  "515281": {
+   "mercadillo": 1261,
+   "fuente": "pista+grafico unico",
+   "pista": 3437,
+   "mapas": [
+    90707714,
+    90707715
+   ],
+   "grafico": 63492
+  },
+  "515282": {
+   "mercadillo": 1263,
+   "fuente": "pista+grafico unico",
+   "pista": 3446,
+   "mapas": [
+    95424516
+   ],
+   "grafico": 63494
+  },
+  "515283": {
+   "mercadillo": 1262,
+   "fuente": "pista+grafico unico",
+   "pista": 3454,
+   "mapas": [
+    90702848,
+    90702849
+   ],
+   "grafico": 63493
+  },
+  "515297": {
+   "mercadillo": 1263,
+   "fuente": "pista+grafico unico",
+   "pista": 3448,
+   "mapas": [
+    154641,
+    155153
+   ],
+   "grafico": 63484
+  },
+  "515298": {
+   "mercadillo": 1261,
+   "fuente": "jss",
+   "pista": 3439,
+   "mapas": [
+    154643,
+    155155
+   ],
+   "grafico": 63482
+  },
+  "515299": {
+   "mercadillo": 1262,
+   "fuente": "jss",
+   "pista": 3456,
+   "mapas": [
+    154132,
+    154644
+   ],
+   "grafico": 63483
+  },
+  "515300": {
+   "mercadillo": 1261,
+   "fuente": "pista+grafico unico",
+   "pista": 3440,
+   "mapas": [
+    73400322,
+    73400834
+   ],
+   "grafico": 63477
+  },
+  "515301": {
+   "mercadillo": 1263,
+   "fuente": "jss",
+   "pista": 3449,
+   "mapas": [
+    73400321,
+    73400833
+   ],
+   "grafico": 63479
+  },
+  "515302": {
+   "mercadillo": 1262,
+   "fuente": "jss",
+   "pista": 3457,
+   "mapas": [
+    73400320,
+    73531904
+   ],
+   "grafico": 63478
+  },
+  "515303": {
+   "mercadillo": 1261,
+   "fuente": "pista+grafico unico",
+   "pista": 3441,
+   "mapas": [
+    153879299,
+    153879811
+   ],
+   "grafico": 63528
+  },
+  "519795": {
+   "mercadillo": 1261,
+   "fuente": "jss",
+   "pista": 3438,
+   "mapas": [
+    206307843,
+    206308355
+   ],
+   "grafico": 66617
+  },
+  "519824": {
+   "mercadillo": 1262,
+   "fuente": "jss",
+   "pista": 3455,
+   "mapas": [
+    206307330,
+    206438914
+   ],
+   "grafico": 66557
+  },
+  "519826": {
+   "mercadillo": 1263,
+   "fuente": "pista+grafico unico",
+   "pista": 3447,
+   "mapas": [
+    206308354,
+    206308866
+   ],
+   "grafico": 66612
+  },
+  "520442": {
+   "mercadillo": 1264,
+   "fuente": "pista+grafico unico",
+   "pista": 3514,
+   "mapas": [
+    206439426
+   ],
+   "grafico": 67181
+  },
+  "520565": {
+   "mercadillo": 1264,
+   "fuente": "pista+grafico unico",
+   "pista": 3518,
+   "mapas": [
+    54530067
+   ],
+   "grafico": 259584
+  },
+  "522691": {
+   "mercadillo": 1262,
+   "fuente": "jss",
+   "pista": 3450,
+   "mapas": [
+    212600325,
+    212600837
+   ],
+   "grafico": 69398
+  },
+  "522692": {
+   "mercadillo": 1263,
+   "fuente": "pista+grafico unico",
+   "pista": 3442,
+   "mapas": [
+    212600839
+   ],
+   "grafico": 260018
+  },
+  "522693": {
+   "mercadillo": 1264,
+   "fuente": "jss",
+   "pista": 2926,
+   "mapas": [
+    212601859
+   ],
+   "grafico": 69396
+  },
+  "522694": {
+   "mercadillo": 1261,
+   "fuente": "pista+grafico unico",
+   "pista": 3433,
+   "mapas": [
+    212601350
+   ],
+   "grafico": 69399
+  },
+  "522695": {
+   "mercadillo": 1265,
+   "fuente": "iwo",
+   "pista": 2987,
+   "mapas": [
+    212601345,
+    212601857
+   ],
+   "grafico": 69397
+  },
+  "522696": {
+   "mercadillo": 1266,
+   "fuente": "jss",
+   "pista": 3010,
+   "mapas": [
+    220200961
+   ],
+   "grafico": 69400
+  },
+  "523705": {
+   "mercadillo": 1267,
+   "fuente": "pista+grafico unico",
+   "pista": 2909,
+   "mapas": [
+    214697994
+   ],
+   "grafico": 304640
+  },
+  "523752": {
+   "mercadillo": 1267,
+   "fuente": "jss",
+   "pista": 3540,
+   "mapas": [
+    217064452
+   ],
+   "grafico": 70438
+  },
+  "523902": {
+   "mercadillo": 1266,
+   "fuente": "pista+grafico unico",
+   "pista": 3011,
+   "mapas": [
+    219677441
+   ],
+   "grafico": 304467
+  },
+  "535580": {
+   "mercadillo": 1261,
+   "fuente": "pista+grafico",
+   "pista": 3434,
+   "mapas": [
+    212861952,
+    212862209,
+    212862464,
+    212862721
+   ],
+   "grafico": 306023
+  },
+  "535621": {
+   "mercadillo": 1262,
+   "fuente": "pista+grafico",
+   "pista": 3451,
+   "mapas": [
+    212860930
+   ],
+   "grafico": 306023
+  },
+  "535623": {
+   "mercadillo": 1263,
+   "fuente": "jss",
+   "pista": 3443,
+   "mapas": [
+    212863491,
+    212864003
+   ],
+   "grafico": 306023
+  },
+  "535624": {
+   "mercadillo": 1264,
+   "fuente": "pista+grafico",
+   "pista": 2925,
+   "mapas": [
+    212861957
+   ],
+   "grafico": 306023
+  },
+  "535625": {
+   "mercadillo": 1265,
+   "fuente": "jss",
+   "pista": 2986,
+   "mapas": [
+    212862469
+   ],
+   "grafico": 306023
+  },
+  "538514": {
+   "mercadillo": 1265,
+   "fuente": "pista+grafico unico",
+   "pista": 3642,
+   "mapas": [
+    90704643,
+    90705155
+   ],
+   "grafico": 74989
+  },
+  "538583": {
+   "mercadillo": 1265,
+   "fuente": "pista+grafico unico",
+   "pista": 3644,
+   "mapas": [
+    54170402,
+    54170914
+   ],
+   "grafico": 74990
+  },
+  "538695": {
+   "mercadillo": 1265,
+   "fuente": "jss",
+   "pista": 3656,
+   "mapas": [
+    206307330,
+    206438914
+   ],
+   "grafico": 74994
+  },
+  "538724": {
+   "mercadillo": 1267,
+   "fuente": "jss",
+   "pista": 3668,
+   "mapas": [
+    207625216
+   ],
+   "grafico": 74994
+  }
+ },
+ "sinResolver": [
+  {
+   "pista": 3516,
+   "nombre": "Mercadillo de runas",
+   "mapa": 90703617,
+   "coordenadas": [
+    13,
+    24
+   ],
+   "subzona": 32,
+   "mapasMirados": [
+    90703617,
+    91750921
+   ]
+  },
+  {
+   "pista": 3634,
+   "nombre": "Mercadillo de cosméticos",
+   "mapa": 191105028,
+   "coordenadas": [
+    5,
+    -17
+   ],
+   "subzona": 95,
+   "mapasMirados": [
+    191105028,
+    192417794,
+    192675846,
+    192676870
+   ]
+  },
+  {
+   "pista": 3641,
+   "nombre": "Mercadillo de cosméticos",
+   "mapa": 90708226,
+   "coordenadas": [
+    22,
+    23
+   ],
+   "subzona": 32,
+   "mapasMirados": [
+    90708226,
+    91750927,
+    91751951,
+    91752965
+   ]
+  },
+  {
+   "pista": 3643,
+   "nombre": "Mercadillo de cosméticos",
+   "mapa": 54176556,
+   "coordenadas": [
+    -85,
+    -44
+   ],
+   "subzona": 601,
+   "mapasMirados": [
+    54176556,
+    54658069
+   ]
+  },
+  {
+   "pista": 3671,
+   "nombre": "Mercadillo de criaturas",
+   "mapa": 188744199,
+   "coordenadas": [
+    2,
+    -15
+   ],
+   "subzona": 95,
+   "mapasMirados": [
+    188744199
+   ]
+  },
+  {
+   "pista": 3756,
+   "nombre": "Mercadillo de criaturas",
+   "mapa": 73532928,
+   "coordenadas": [
+    -19,
+    1
+   ],
+   "subzona": 182,
+   "mapasMirados": [
+    73532928
+   ]
+  }
+ ]
+}

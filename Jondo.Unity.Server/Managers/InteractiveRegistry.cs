@@ -28,11 +28,29 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Un recurso de oficio: trigo, fresno, caladero, mineral.</summary>
         Gather,
 
+        /// <summary>
+        /// A workshop station: it opens the craft window, or the smithmagic one when the skill is
+        /// a magus'. Both are the same kgq with the skill in it.
+        /// </summary>
+        Workshop,
+
         /// <summary>El pozo de los Suenos Infinitos, que abre la ventana del sueno.</summary>
         Dream,
 
         /// <summary>Una de las tres puertas de una sala, que lleva a la fila de abajo.</summary>
         DreamDoor,
+
+        /// <summary>El altar del Templo de los Gremios, que abre el editor de fundación.</summary>
+        GuildFounding,
+
+        /// <summary>A marketplace counter: it opens the marketplace to buy (kdw).</summary>
+        Marketplace,
+
+        /// <summary>A chest inside a house: open it (104) or lock it (105).</summary>
+        HouseChest,
+
+        /// <summary>The guild chest, in the banks: "Utilizar" (184) opens the guild's.</summary>
+        GuildChest,
     }
 
     /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
@@ -76,6 +94,18 @@ namespace Jondo.Unity.Server.Managers
             // plusieurs, les suivantes reçoivent les uid contigus encore libres.
             int instance = Interactives.SkillInstanceOf(Element.Id);
             while (ContainsInstance(instance)) instance++;
+            _actions.Add(new InteractiveAction(kind, skillId, instance));
+        }
+
+        /// <summary>
+        /// An action with the skill instance it is to have. For the elements whose skills are
+        /// offered per viewer -- a house's door and chests -- each skill keeps one instance for
+        /// good, whichever of them a viewer gets.
+        /// </summary>
+        internal void Add(InteractiveActionKind kind, int skillId, int instance)
+        {
+            if (ContainsInstance(instance))
+                throw new InvalidOperationException($"Skill instance {instance} declared twice on element {Element.Id}.");
             _actions.Add(new InteractiveAction(kind, skillId, instance));
         }
 
@@ -162,8 +192,13 @@ namespace Jondo.Unity.Server.Managers
             {
                 foreach (var puerta in Interactives.ElementsOf(sala))
                 {
-                    Register(sala, puerta, Dreams.TipoDelPozo,
-                             InteractiveActionKind.DreamDoor, Dreams.HabilidadDelPozo);
+                    // The favour room's centrepiece is neither a door nor a fountain: left alone.
+                    if (!Dreams.IsDoorOrFountain(puerta.Gfx)) continue;
+
+                    // The Fontaine onirique of a fountain room is not a door: skill 355,
+                    // "Consultar", as the long capture declares element 539708.
+                    int skill = puerta.Gfx == Dreams.FountainGfx ? Dreams.FountainSkill : Dreams.HabilidadDelPozo;
+                    Register(sala, puerta, Dreams.TipoDelPozo, InteractiveActionKind.DreamDoor, skill);
                     puertas++;
                 }
             }
@@ -186,11 +221,19 @@ namespace Jondo.Unity.Server.Managers
 
             // Las casas van en dos vueltas: las puertas de la calle, que están en mapas del mundo,
             // y las de dentro, que están en interiores que no aparecen en Interactives.MapIds.
+            // A door of a house that can be owned carries all five door skills, each with its own
+            // instance; who is offered which is decided per viewer when the map is sent
+            // (HouseHandler.VisibleActions). Any other door enters, as it always did.
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var door in Houses.On(mapId))
-                    Register(mapId, new Interactives.Element(door.ElementId, door.Cell, door.Gfx),
-                             Houses.DoorType, InteractiveActionKind.HouseDoor, Houses.EnterSkill);
+                {
+                    var element = new Interactives.Element(door.ElementId, door.Cell, door.Gfx);
+                    var skills = door.IsOwnable ? Houses.OwnableDoorSkills : new[] { Houses.EnterSkill };
+                    foreach (int skill in skills)
+                        Register(mapId, element, Houses.DoorType, InteractiveActionKind.HouseDoor, skill,
+                                 Handlers.HouseHandler.DoorSkillInstance(door.ElementId, skill));
+                }
             }
 
             foreach (long interior in Houses.Interiors)
@@ -198,6 +241,47 @@ namespace Jondo.Unity.Server.Managers
                 if (!Houses.TryGetExit(interior, out var exit)) continue;
                 Register(interior, new Interactives.Element(exit.ElementId, exit.Cell, exit.Gfx),
                          Houses.ExitType, InteractiveActionKind.HouseExit, Houses.ExitSkill);
+            }
+
+            // And the chests inside, type 85 with "Abrir" and "Poner el cerrojo" as the interior's
+            // jss declares them ("entrar en mi casa", frame 16). Whose chest it is depends on the
+            // door one came in by, so the same element is every house's chest of that interior.
+            int houseChests = 0;
+            foreach (long interior in Houses.Interiors)
+            {
+                foreach (var chest in Houses.ChestsIn(interior))
+                {
+                    if (_byElement.ContainsKey((interior, chest.Id))) continue;
+                    Register(interior, chest, Houses.ChestType, InteractiveActionKind.HouseChest, Houses.ChestOpenSkill,
+                             Handlers.HouseHandler.DoorSkillInstance(chest.Id, Houses.ChestOpenSkill));
+                    Register(interior, chest, Houses.ChestType, InteractiveActionKind.HouseChest, Houses.ChestLockSkill,
+                             Handlers.HouseHandler.DoorSkillInstance(chest.Id, Houses.ChestLockSkill));
+                    houseChests++;
+                }
+            }
+            if (houseChests > 0) Console.WriteLine($"[Houses] {houseChests} chests declared inside the interiors.");
+
+            // The guild chests of the banks, by their graphic: type 388, "Utilizar", as the Bonta
+            // bank's jss declares element 524415.
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var chest in GuildChests.On(mapId))
+                {
+                    if (_byElement.ContainsKey((mapId, chest.Id))) continue;
+                    Register(mapId, chest, GuildChests.Type, InteractiveActionKind.GuildChest, GuildChests.UseSkill);
+                }
+            }
+
+            // El altar del Templo de los Gremios. Como el pozo: está en los datos del cliente como
+            // un elemento más -el 480310, casilla 326 del mapa 106169344- y sin una acción
+            // declarada es un adorno. La habilidad y el elemento salen del iwo/iwn de la captura
+            // de fundar «Jondo»: iwo {3597, 480310} → iwn {1, 480310, f4 184} y detrás el jjc que
+            // abre el editor. Véase GuildHandler.OpenFoundingAsync.
+            foreach (var altar in Interactives.ElementsOf(Handlers.GuildHandler.FoundingMap))
+            {
+                if (altar.Id != Handlers.GuildHandler.FoundingAltar) continue;
+                Register(Handlers.GuildHandler.FoundingMap, altar, Handlers.GuildHandler.FoundingType,
+                         InteractiveActionKind.GuildFounding, Handlers.GuildHandler.FoundingSkill);
             }
 
             // Los pasos entre mapas. Las casas ya han pasado por arriba con su protocolo jqw;
@@ -212,6 +296,22 @@ namespace Jondo.Unity.Server.Managers
                          route.InteractiveType, InteractiveActionKind.Teleport, route.SkillId);
             }
 
+            // The marketplace counters, by element and not by graphic: Brakmar's five share one
+            // graphic and each opens another marketplace. Declared with the type of their kind and
+            // the skill every real jss gives them; something already declared keeps its own.
+            int counters = 0;
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var (element, house) in Marketplaces.On(mapId))
+                {
+                    if (_byElement.ContainsKey((mapId, element.Id))) continue;
+                    Register(mapId, element, house.InteractiveType, InteractiveActionKind.Marketplace,
+                             Marketplaces.Skill);
+                    counters++;
+                }
+            }
+            if (counters > 0) Console.WriteLine($"[Marketplaces] {counters} counter declarations on the maps.");
+
             // Y los recursos de oficio, que son con diferencia lo mas numeroso: veinticinco mil.
             // Se reconocen por su grafico igual que todo lo demas.
             foreach (long mapId in Interactives.MapIds)
@@ -221,6 +321,37 @@ namespace Jondo.Unity.Server.Managers
                                                              resource.Gfx),
                              resource.Type, InteractiveActionKind.Gather, resource.SkillId);
             }
+
+            // And the workshop stations, by their graphic too. One element can offer several
+            // skills -- the magus table of Bonta offers three -- and each one is an action of its
+            // own, with its own skill instance, the way the jss declares them.
+            int stations = 0;
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var (element, station) in Workshops.On(mapId))
+                {
+                    // Something already declared there -- a door, a teleport -- keeps its own
+                    // declaration: a second one with another type would not be the same element.
+                    if (_byElement.ContainsKey((mapId, element.Id))) continue;
+                    foreach (int skill in station.Skills)
+                        Register(mapId, element, station.Type, InteractiveActionKind.Workshop, skill);
+                    stations++;
+                }
+            }
+            if (stations > 0) Console.WriteLine($"[Workshops] {stations} stations declared.");
+
+            // The artisans' book of each workshop: it opens the directory of the workshop's jobs.
+            int books = 0;
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var (element, type, skill) in Workshops.BooksOn(mapId))
+                {
+                    if (_byElement.ContainsKey((mapId, element.Id))) continue;
+                    Register(mapId, element, type, InteractiveActionKind.Workshop, skill);
+                    books++;
+                }
+            }
+            if (books > 0) Console.WriteLine($"[Workshops] {books} artisans' books declared.");
 
             // Le jss officiel de l'atelier 192937990 déclare les huit éléments présents dans les
             // données de carte, y compris ceux dont le serveur n'offre aucune route. Sans f11 le
@@ -312,7 +443,18 @@ namespace Jondo.Unity.Server.Managers
         }
 
         private static void Register(long mapId, Interactives.Element element, int type,
+                                     InteractiveActionKind kind, int skillId, int instance)
+        {
+            Declared(mapId, element, type).Add(kind, skillId, instance);
+        }
+
+        private static void Register(long mapId, Interactives.Element element, int type,
                                      InteractiveActionKind kind, int skillId)
+        {
+            Declared(mapId, element, type).Add(kind, skillId);
+        }
+
+        private static RegisteredInteractive Declared(long mapId, Interactives.Element element, int type)
         {
             var key = (mapId, element.Id);
             if (!_byElement.TryGetValue(key, out var interactive))
@@ -332,7 +474,7 @@ namespace Jondo.Unity.Server.Managers
                     $"Declaracion incoherente del elemento {element.Id} en el mapa {mapId}.");
             }
 
-            interactive.Add(kind, skillId);
+            return interactive;
         }
 
         private static void RegisterPassive(long mapId, Interactives.Element element, int type)

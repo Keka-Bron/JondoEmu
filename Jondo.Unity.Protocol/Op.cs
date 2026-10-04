@@ -167,6 +167,15 @@ public static class Op
     /// </remarks>
     public const string Lte = "lte";
 
+    /// <summary>Leaving the Koliseo queue: the window's button while it is searching. Travels empty.</summary>
+    /// <remarks>
+    /// Read from the client, with no capture of it: fff::bdyu, on the window's leave event, sets
+    /// its registered mode to -1 and sends an lsi with nothing in it. What turns the window back
+    /// to "search a fight" is an lsx with f1 false and reason 3 (fff::bdyy passes f3 on;
+    /// PvpArenaFightsUi.OnArenaRegistrationStatusUpdate: 0 searching, 3 idle).
+    /// </remarks>
+    public const string Lsi = "lsi";
+
     /// <summary>Algo del koliseo que el servidor empuja. No esta descifrado.</summary>
     /// <remarks>
     /// Dos apariciones y las dos distintas: «08012001» sin que el cliente pida nada, 27 s despues
@@ -188,7 +197,11 @@ public static class Op
     /// </remarks>
     public const string Lsh = "lsh";
 
-    /// <summary>Acompana al lte de la vuelta del koliseo. 151 bytes, sin descifrar.</summary>
+    /// <summary>
+    /// Server to client: the Koliseo ladder, { f2: season start, f3 (repeated): per mode { f1: mode,
+    /// f3: league, f4: placement fights left, f5/f6: season wins/fights, f7: day wins, f8 { f1:
+    /// best league }, f10: day fights } }. At world entry and after the lte of a Koliseo's end.
+    /// </summary>
     public const string Lty = "lty";
 
     /// <summary>Acompana al lte de la vuelta del koliseo. Viaja vacio, en la raiz f3.</summary>
@@ -338,8 +351,66 @@ public static class Op
     /// <summary>El cliente pide la recompensa de un logro: 1 = el logro, o -1 para todos.</summary>
     public const string Mga = "mga";
 
+    /// <summary>
+    /// C→S, empty: sent as the achievement window opens, first of three (mfe, mfp, mff). Answered
+    /// here with <see cref="Mgb"/>, the order the one capture of the window gives the answers in.
+    /// </summary>
+    public const string Mfe = "mfe";
+
+    /// <summary>C→S, empty: the second request of an opening achievement window. Answered with <see cref="Mfx"/>.</summary>
+    public const string Mfp = "mfp";
+
+    /// <summary>C→S: one category of the achievement window, f1 the category. Answered with <see cref="Mfo"/>.</summary>
+    public const string Mff = "mff";
+
+    /// <summary>C→S: one achievement's details, f1 the achievement (INFERRED, never captured). Answered with <see cref="Mfg"/>.</summary>
+    public const string Mfm = "mfm";
+
+    /// <summary>
+    /// S→C: a category's achievements with every objective's progress. f2 (repeated) { f2 id,
+    /// f3 (repeated) { f1 objective, f2 out of, f4 so far, present even at zero while not done } }.
+    /// </summary>
+    public const string Mfo = "mfo";
+
+    /// <summary>S→C: the achievements closest to being earned, f1 (repeated) the same record as <see cref="Mfo"/>.</summary>
+    public const string Mgb = "mgb";
+
+    /// <summary>S→C: one achievement's details, f1 the same record as <see cref="Mfo"/>. INFERRED.</summary>
+    public const string Mfg = "mfg";
+
+    /// <summary>S→C, root 3 and empty in the one capture: the answer to <see cref="Mfp"/>. f1 would be a list of number pairs.</summary>
+    public const string Mfx = "mfx";
+
+    /// <summary>C→S: play an emote, f1 the emote. Answered by <see cref="Khh"/> to the whole map, or not at all.</summary>
+    public const string Khl = "khl";
+
+    /// <summary>S→C: an emote played. f1 character, f3 emote, f5 account, f6 animation name.</summary>
+    public const string Khh = "khh";
+
+    /// <summary>S→C: the character's emotes, f1 packed. Sent on entering the world.</summary>
+    public const string Khn = "khn";
+
+    /// <summary>C→S: a smiley over the head, f2 the smiley.</summary>
+    public const string Hov = "hov";
+
+    /// <summary>S→C: a smiley over somebody's head. f2 character, f3 account, f4 smiley.</summary>
+    public const string Hoc = "hoc";
+
+    /// <summary>C→S: the mood smiley, f5 the smiley, or empty to clear it.</summary>
+    public const string Hor = "hor";
+
+    /// <summary>S→C: the mood smiley is now f3, or cleared when empty.</summary>
+    public const string Hns = "hns";
+
     /// <summary>Catorce conjuntos guardados, cada uno con un look; se descarta. 7 mensajes.</summary>
     public const string Ihb = "ihb";
+
+    /// <summary>
+    /// El cliente pide el tablero de un combate: va vacio, en pareja con el kmv del mapa, en
+    /// cuanto carga el mapa tactico que le anuncio un kmp con f1 = 1. Es lo que contesta la
+    /// preparacion (ijq kam kaa jxg...), y en una reconexion, el combate tal cual va.
+    /// </summary>
+    public const string Ijm = "ijm";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Ijq = "ijq";
@@ -417,11 +488,29 @@ public static class Op
     /// <summary>Hay jefe nuevo: { f1: el nuevo jefe, f2: id del grupo }. Once bytes; NO se reenvia el grupo.</summary>
     public const string Ilx = "ilx";
 
-    /// <summary>Respuesta corta y VACIA a un ima. Ni siquiera lleva carga.</summary>
+    /// <summary>
+    /// Following the leader switched on or off: { f1: on }. Empty when off, 0801 when on; the
+    /// member's client answers the first with an imo and the second with an imh. Measured in
+    /// "Grupos/con grupo seguir desplazamiento del lider...": empty in the same segment as the
+    /// kmu of the leader leaving by zaap. The ima of "nombrar a otro jugador jefe" gets it empty.
+    /// </summary>
     public const string Imk = "imk";
 
-    /// <summary>Mientras el grupo sigue al lider: { f1: a quien se sigue, mapa, coordenadas, casilla }.</summary>
+    /// <summary>
+    /// Where the leader is, to the members following him: { f1: leader, f3 { f1: map, f2: x,
+    /// f4: subarea, f5: y }, f4: cell }. After every walk of his and every map change; it is
+    /// what makes the member's client walk after him.
+    /// </summary>
     public const string Ikv = "ikv";
+
+    /// <summary>A member asks to follow the leader: empty. Answered with lqn 1662, ikv and iln.</summary>
+    public const string Imh = "imh";
+
+    /// <summary>The answer to imh, empty, on root field 3 with the request id.</summary>
+    public const string Iln = "iln";
+
+    /// <summary>A member stopped following: { f1: the member }. Sent to him, between lqn 1661 and inb.</summary>
+    public const string Ika = "ika";
 
     // Los siguientes los nombra Akuma en su tabla y encajan con los que salen sueltos en las
     // capturas, pero NO se han medido campo a campo aqui: no hay ninguna captura donde se expulse
@@ -452,10 +541,10 @@ public static class Op
     /// </summary>
     public const string Ino = "ino";
 
-    /// <summary>Acuse del cliente sobre el grupo. Sin medir.</summary>
+    /// <summary>A member stops following the leader: empty. Answered with lqn 1661, ika and inb.</summary>
     public const string Imo = "imo";
 
-    /// <summary>Acuse del servidor sobre el grupo. Sin medir.</summary>
+    /// <summary>The answer to imo, empty, on root field 3 with the request id.</summary>
     public const string Inb = "inb";
 
     /// <summary>Los detalles de un grupo, respuesta al imd.</summary>
@@ -473,7 +562,11 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Ios = "ios";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>
+    /// Client to server: an NPC's action, { f1: action, f2: map, f3: the NPC }. A marketplace's
+    /// buy and sell buttons come through here too, with no NPC: { f1: 5 sell or 6 buy, f2: the
+    /// map, f3: -1 } in the equipment marketplace capture.
+    /// </summary>
     public const string Iov = "iov";
 
     /// <summary>
@@ -510,7 +603,11 @@ public static class Op
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Ise = "ise";
 
-    /// <summary>Solo alcanzable desde krc y desde isi, que no llegan nunca. 7 mensajes en 2 ficheros.</summary>
+    /// <summary>
+    /// One job's artisans, the answer to isr: { f1 (repeated) { f1 { f2: job, f3: minimum level,
+    /// f4: free, f5: job level }, f2 { f1 { f1: 1 }, f2: name, f3: breed, f4: id, f5: sex,
+    /// f7 { f1: map } } } }.
+    /// </summary>
     public const string Isf = "isf";
 
     /// <summary>Movimiento de objeto antiguo (3.6.4.3), sustituido por iuk. No aparece en ninguna captura.</summary>
@@ -534,8 +631,23 @@ public static class Op
     /// <summary>Parte de la rafaga de inicializacion de 3.6.4.3 que dispara kkn. No aparece en ninguna de las 242 capturas.</summary>
     public const string Itp = "itp";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>
+    /// The client asks for its inventory again: { f3: 2 } after a workshop opens, { f3: 1 }
+    /// elsewhere. Answered with ivx and an empty hlm in the twelve times it is captured.
+    /// </summary>
     public const string Itr = "itr";
+
+    /// <summary>
+    /// Items arrive in the bag, a list of them: { f1 (repeated) { f1: 63, f5: item } }. The
+    /// crafted ring of the tutorial arrives this way, not by iua.
+    /// </summary>
+    public const string Itf = "itf";
+
+    /// <summary>
+    /// Stacks change size, a list of them: { f1 (repeated) { f2: uid, f3: total } }. A craft whose
+    /// result joins a stack already in the bag (the runes fused in the grinder's capture).
+    /// </summary>
+    public const string Itu = "itu";
 
     /// <summary>Editar un hueco de una barra de atajos; se escribe tambien en la base de datos o se pierde al salir.</summary>
     public const string Itz = "itz";
@@ -631,6 +743,45 @@ public static class Op
     /// </remarks>
     public const string Izh = "izh";
 
+    /// <summary>
+    /// Client to server, INFERRED as buying at a dream's fountain: { f1: int32, f2: a message of
+    /// repeated int64, strings and booleans }. No capture has one. It is the only one of the
+    /// client's six dream requests that carries a choice; see DreamHandler.BuyAsync.
+    /// </summary>
+    public const string Iym = "iym";
+
+    /// <summary>
+    /// Client to server, empty: the loot table of the dream's room (InfiniteDreamDropTableRequest).
+    /// Answered by <see cref="Izo"/>, in five captures.
+    /// </summary>
+    public const string Ixq = "ixq";
+
+    /// <summary>
+    /// Server to client, empty: opens the fountain's shop. Read off the client, not a capture: its
+    /// handlers raise the event bxv, and the dream window manager's three bxv methods are the ones
+    /// that set up InfiniteDreamShopUi.
+    /// </summary>
+    public const string Ixm = "ixm";
+
+    /// <summary>
+    /// Server to client, by root 3: the loot table of the dream's room, one f2 per item --
+    /// { f1: criterion, f2: item, f3: quantity, f5: percent as a float }.
+    /// </summary>
+    public const string Izo = "izo";
+
+    /// <summary>
+    /// Client to server, empty: where a fight on this map would place everybody -- the dream's
+    /// bestiary preview and its "show the positions". Answered by <see cref="Jxj"/>.
+    /// </summary>
+    public const string Kaz = "kaz";
+
+    /// <summary>
+    /// Server to client, by root 3: { f1: the fight's map, f2: the map, f3 { f1: the attackers'
+    /// cells, f2: the defenders' cells, packed } }. Measured in "Pesadilla III-...-mostrar
+    /// posiciones combate" and the long capture.
+    /// </summary>
+    public const string Jxj = "jxj";
+
     // ─── Los Suenos Infinitos ───────────────────────────────────────────────────────────
     //
     // Trece capturas en «Sueños Infinitos/» cubren el ciclo entero, y este es:
@@ -694,11 +845,72 @@ public static class Op
     /// </remarks>
     public const string Iyc = "iyc";
 
-    /// <summary>El builder no se llama nunca. 2 mensajes en 2 ficheros.</summary>
+    /// <summary>
+    /// Server to client: a house's sale changed, { f2: owner's nickname, f3: house, f5: tag,
+    /// f6: price, f8: instance }. Frame 19 of "Casas/poner casa en venta", 23 of the withdrawal.
+    /// </summary>
     public const string Izu = "izu";
 
-    /// <summary>Lo mismo que jjs pero en su propio mensaje; se descarta. 5 mensajes.</summary>
+    /// <summary>
+    /// Server to client: the account's houses, f1 (repeated) { f2: house, f4: model, f6 { where,
+    /// full plaque } }. The captured one is left out of the world entry replay; ours is built
+    /// from the database (HouseHandler.SendAccountHousesAsync), empty with no house.
+    /// </summary>
     public const string Jaa = "jaa";
+
+    /// <summary>Server to client, a response: a house's full plaque, { f1: lnx }. The answer to izv.</summary>
+    public const string Izr = "izr";
+
+    /// <summary>Client to server: a house's plaque, please, { f1: instance, f2: house }.</summary>
+    public const string Izv = "izv";
+
+    /// <summary>Server to client: a house changed, { f1: plaque, f2: house, f3: packed doors }.</summary>
+    public const string Izz = "izz";
+
+    /// <summary>Client to server: the sale window's answer, { f1: price, f2: instance, f3: on sale }.</summary>
+    public const string Jan = "jan";
+
+    /// <summary>
+    /// Client to server, { f1: int64 }: one of the two house requests with a lone number, built by
+    /// the class that builds jan and khv. Taken as a buyer's yes by inference; see HouseHandler.BuyAsync.
+    /// </summary>
+    public const string Jad = "jad";
+
+    /// <summary>The other one; see <see cref="Jad"/>.</summary>
+    public const string Jal = "jal";
+
+    /// <summary>Server to client: jjt { f3: instance, f4: house }, a house going on sale (sale frame 15).</summary>
+    public const string Jjt = "jjt";
+
+    /// <summary>Server to client: the sale window, { f1: buying, f2: house, f3: instance, f4: 1, f5: price }.</summary>
+    public const string Khr = "khr";
+
+    /// <summary>Server to client: a code's outcome, empty or { f2: 1 } for a wrong one.</summary>
+    public const string Khu = "khu";
+
+    /// <summary>Client to server: an owner's new code, { f1: code }; no f1 takes it off.</summary>
+    public const string Khv = "khv";
+
+    /// <summary>Client to server: a code typed at a locked door or chest, { f1: code }.</summary>
+    public const string Khw = "khw";
+
+    /// <summary>Server to client: the code keypad, { f1: 1 to get in, f3: 8 }.</summary>
+    public const string Kia = "kia";
+
+    /// <summary>Server to client: the guild chest's tabs, f1 (repeated) { types, tab, rights, name }.</summary>
+    public const string Ivl = "ivl";
+
+    /// <summary>Server to client: the guild chest's window, { f1: 22, f2: tab, f3: 100 }.</summary>
+    public const string Kbk = "kbk";
+
+    /// <summary>Client to server: another tab of the guild chest, { f2: tab }.</summary>
+    public const string Jll = "jll";
+
+    /// <summary>Server to client: who has the guild chest open, f1 (repeated) names.</summary>
+    public const string Jlo = "jlo";
+
+    /// <summary>Server to client: jlq { f1: name }, the one who just opened the guild chest.</summary>
+    public const string Jlq = "jlq";
 
     /// <summary>Se envia con los muebles, entre jss y lva; significado no establecido.</summary>
     public const string Jaz = "jaz";
@@ -724,11 +936,239 @@ public static class Op
     /// <summary>Los muebles de la habitacion, esperados detras del mapa; misma forma que jbg pero en f1 en vez de f2.</summary>
     public const string Jbu = "jbu";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>C→S: editar un rango del gremio. f1 { f2 nombre, f3 permisos, f4 { f2 icono, f3 orden }, f5 id }. Se contesta con el jco entero.</summary>
     public const string Jct = "jct";
+
+    /// <summary>C→S, vacío: abrir la gestión de rangos. Se contesta con el jco.</summary>
+    public const string Jcs = "jcs";
+
+    /// <summary>C→S: los permisos de un rango. f1 la lista empaquetada, f2 el rango. Se contesta con el jco.</summary>
+    public const string Jck = "jck";
+
+    /// <summary>C→S: crear un rango. f1 el orden, f4 el nombre, f5 el icono. Se contesta con el jco.</summary>
+    public const string Jcv = "jcv";
+
+    /// <summary>C→S: la nota de un miembro. f1 el texto, f3 el personaje. Se contesta con el jgz.</summary>
+    public const string Jjj = "jjj";
+
+    /// <summary>S→C: un miembro puesto al día. f2 { la misma entrada que el jgu }. Tras la nota y tras contribuir.</summary>
+    public const string Jgz = "jgz";
+
+    /// <summary>C→S, vacío: el diario del gremio. Se contesta con el jil.</summary>
+    public const string Jim = "jim";
+
+    /// <summary>S→C: el diario. Un f1 por línea { f11 gremio, f17 '' la fundación, f19 cuándo, f20 { f2 personaje, f3 nombre, f4 } }.</summary>
+    public const string Jil = "jil";
+
+    /// <summary>C→S: escribir la ficha del anuario. f2 { f2 descripción, f3 nivel mínimo, f4 etiquetas, f5, f6, f9 nivel máximo, f10 gremio, f13 título }. Se contesta con el jci.</summary>
+    public const string Jcc = "jcc";
+
+    /// <summary>S→C, vacío: acuse de la búsqueda del anuario, delante del jiv.</summary>
+    public const string Jme = "jme";
+
+    /// <summary>S→C: el anuario. Un f1 por gremio { f1 { f1 { f1 jefe, f6 ficha, f7 miembros }, f3 emblema }, f2 id, f3 nombre, f4 nivel }.</summary>
+    public const string Jiv = "jiv";
+
+    /// <summary>S→C: al abrir la ventana, f3 '' en un gremio nuevo. Lo que lleva en uno con recorrido no está entendido.</summary>
+    public const string Jff = "jff";
+
+    /// <summary>S→C: las contribuciones que quedan esta semana. f1 = 5, 4, 3 en la captura de contribuir.</summary>
+    public const string Jla = "jla";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Jfc = "jfc";
+
+    // ─── Gremio ──────────────────────────────────────────────────────────────
+    //
+    // Medido en las 12 capturas de Gremio/. El identificador es el opcode; el nombre va en el
+    // comentario porque no lo sabemos por otra via que la captura. Ver Managers.GuildStore y
+    // Network.GuildProtocol.
+
+    /// <summary>
+    /// S→C, vacío: abre el editor de fundación del cliente. Es la respuesta al iwo del altar del
+    /// Templo de los Gremios (elemento 480310 del mapa 106169344), detrás del iwn. 1 mensaje en
+    /// la captura de fundar «Jondo», y sin él el editor no se abre nunca.
+    /// </summary>
+    public const string Jjc = "jjc";
+
+    /// <summary>C→S: crear gremio. f1 el emblema {símbolo, color símbolo, fondo, color fondo}, f2 el nombre.</summary>
+    public const string Jjg = "jjg";
+
+    /// <summary>S→C, vacío: detrás del jjg, entre el ium de la gremialogema y el jco. 1 mensaje, sin significado reconstruido.</summary>
+    public const string Jhq = "jhq";
+
+    /// <summary>
+    /// S→C: an emote learned, f1 the emote. Measured as f1=97 between the jgw and the jgu when a
+    /// guild is founded, and its pair khj carries the same 97 on leaving one: 97 is the guild
+    /// banner emote ("Pw=2"). The client's emote frame (ern) is what takes it: it looks the emote
+    /// up, adds it to the emote list and announces its name.
+    /// </summary>
+    public const string Khi = "khi";
+
+    /// <summary>S→C, vacío: detrás del khj al salir del gremio, antes del jsn que redibuja al que sale. 1 mensaje.</summary>
+    public const string Jhc = "jhc";
+
+    /// <summary>S→C: el gremio al que se pertenece. f2 el puesto, f3 { f1{f3 emblema}, f2 id, f3 nombre, f4 nivel }.</summary>
+    public const string Jgw = "jgw";
+
+    /// <summary>S→C: los puestos del gremio (rangos). Uno por f2 { f2 nombre, f3 permisos, f4{f2 icono, f3 orden}, f5 id }.</summary>
+    public const string Jco = "jco";
+
+    /// <summary>C→S: abrir una pestaña de la ventana de gremio. f1 sección, f3 sub-pestaña.</summary>
+    public const string Jii = "jii";
+
+    /// <summary>C→S: pedir la lista de miembros del gremio.</summary>
+    public const string Jml = "jml";
+
+    /// <summary>C→S: acompaña la apertura de la ventana de gremio (parámetro fijo).</summary>
+    public const string Jlx = "jlx";
+
+    /// <summary>C→S: parte de la apertura de la ventana de gremio.</summary>
+    public const string Jlk = "jlk";
+
+    /// <summary>C→S: parte de la apertura de la ventana de gremio.</summary>
+    public const string Jfp = "jfp";
+
+    /// <summary>C→S: cambia de pestaña dentro de la ventana de gremio. f2 la pestaña.</summary>
+    public const string Jiy = "jiy";
+
+    // ─── The guild window's tabs, as the captures answer them for a guild with nothing ────
+    // Each pair is request → answer (root 3). "Gremio/muchas acciones en mi gremio como lider".
+
+    /// <summary>C→S: the perks tab (with jfp, jeu, jga and an empty jml). Answered with <see cref="Jfs"/>.</summary>
+    public const string Jfv = "jfv";
+
+    /// <summary>S→C: answer to the jfv, empty.</summary>
+    public const string Jfs = "jfs";
+
+    /// <summary>C→S: the perks tab. Answered with <see cref="Jei"/>, "1a00" for none.</summary>
+    public const string Jeu = "jeu";
+
+    /// <summary>S→C: answer to the jeu.</summary>
+    public const string Jei = "jei";
+
+    /// <summary>C→S: the perks tab. Answered with <see cref="Jfz"/>, "0a00" for none.</summary>
+    public const string Jga = "jga";
+
+    /// <summary>S→C: answer to the jga.</summary>
+    public const string Jfz = "jfz";
+
+    /// <summary>C→S: when the week starts again, asked at world entry and from the guild window.</summary>
+    public const string Jew = "jew";
+
+    /// <summary>
+    /// S→C: answer to the jew, f1 the next weekly reset as an ISO string: Tuesday, 05:00 UTC, in
+    /// all five captures ("2026-08-18T05:00:00Z" asked on Wednesday the 12th and Saturday the 15th).
+    /// </summary>
+    public const string Jez = "jez";
+
+    /// <summary>C→S: asked with the jew from the guild window. Answered with <see cref="Jgq"/>, "0a00" for none.</summary>
+    public const string Jgr = "jgr";
+
+    /// <summary>S→C: answer to the jgr.</summary>
+    public const string Jgq = "jgq";
+
+    /// <summary>C→S: a guild tab's paged list ("08012200": f1 page 1). Answered with <see cref="Jdb"/>.</summary>
+    public const string Jet = "jet";
+
+    /// <summary>S→C: answer to the jet.</summary>
+    public const string Jdb = "jdb";
+
+    /// <summary>C→S: a guild tab, with hzc and hvx. Answered with <see cref="Jfr"/>, empty.</summary>
+    public const string Jfw = "jfw";
+
+    /// <summary>S→C: answer to the jfw.</summary>
+    public const string Jfr = "jfr";
+
+    /// <summary>C→S: sent with the jfw. Answered with <see cref="Ice"/>, "0a00" for none.</summary>
+    public const string Hzc = "hzc";
+
+    /// <summary>S→C: answer to the hzc.</summary>
+    public const string Ice = "ice";
+
+    /// <summary>C→S: sent with the jfw, and alone. Answered with <see cref="Hxm"/>, empty.</summary>
+    public const string Hvx = "hvx";
+
+    /// <summary>S→C: answer to the hvx.</summary>
+    public const string Hxm = "hxm";
+
+    /// <summary>C→S: abandonar el gremio. f1 el personaje.</summary>
+    public const string Jho = "jho";
+
+    /// <summary>S→C: las candidaturas al gremio. f2 el total, f3 { la candidatura }.</summary>
+    public const string Jmf = "jmf";
+
+    /// <summary>S→C: una candidatura nueva. f2 { la candidatura }, f3 la cuenta.</summary>
+    public const string Jly = "jly";
+
+    /// <summary>S→C: resultado de invitar. f1 el nombre, f2 un id, f3 el estado (1 pedida, 3 aceptada/rechazada).</summary>
+    public const string Jin = "jin";
+
+    /// <summary>S→C: acuse de invitación por id de cuenta.</summary>
+    public const string Jma = "jma";
+
+    /// <summary>S→C: la ficha pública del gremio en la ventana (descripción, líder, reclutamiento).</summary>
+    public const string Jci = "jci";
+
+    /// <summary>S→C: el número de solicitudes pendientes. f1 el estado.</summary>
+    public const string Jij = "jij";
+
+    /// <summary>C→S: abrir la tienda del gremio. Va vacío.</summary>
+    public const string Jki = "jki";
+
+    /// <summary>S→C: la tienda del gremio (oráculos). f2 { f1 cuentas, f2 { f1 id, f2 { f1 precio } } }.</summary>
+    public const string Jkh = "jkh";
+
+    /// <summary>C→S: comprar un artículo de la tienda del gremio. f1 el artículo.</summary>
+    public const string Jkw = "jkw";
+
+    /// <summary>
+    /// S→C: acuse de compra en la tienda del gremio. Con f1 el artículo comprado cuando sale
+    /// bien; VACÍO cuando se rechaza, que es lo que llega en la captura donde no había kamas.
+    /// </summary>
+    public const string Jkj = "jkj";
+
+    /// <summary>S→C: lo comprado que falta por activar. f1 { f2 { f3 el plazo } }, f2 el artículo.</summary>
+    public const string Jkv = "jkv";
+
+    /// <summary>C→S: activar un oráculo ya comprado. f1 el artículo.</summary>
+    public const string Jky = "jky";
+
+    /// <summary>S→C: acuse de activación. f1 el artículo.</summary>
+    public const string Jkx = "jkx";
+
+    /// <summary>S→C: una alteración puesta. f1 { f1 desde, f2 la alteración, f4 2, f5 hasta } en milisegundos.</summary>
+    public const string Lzs = "lzs";
+
+    /// <summary>C→S: contribuir al gremio. f1 el tramo (1 = 10.000 kamas).</summary>
+    public const string Jlb = "jlb";
+
+    /// <summary>S→C: la contribución hecha. f1 los kamas, f2 las que quedan esta semana.</summary>
+    public const string Jle = "jle";
+
+    /// <summary>S→C: te invitan a un gremio. f1 el bloque del gremio, f2 quién invita.</summary>
+    public const string Jiq = "jiq";
+
+    /// <summary>C→S: contestar a la invitación. Vacío rechaza; f1 = 1 acepta.</summary>
+    public const string Jiz = "jiz";
+
+    /// <summary>C→S: ver una candidatura. f2 el personaje que la mandó.</summary>
+    public const string Jlt = "jlt";
+
+    /// <summary>C→S: aceptar una candidatura. f2 el personaje que la mandó.</summary>
+    public const string Jjn = "jjn";
+
+    /// <summary>C→S: buscar en el anuario. f2, f3 y f17 niveles, f9 y f14 filtros. Se contesta con jme y jiv. (Contribuir es el jlb.)</summary>
+    public const string Jjm = "jjm";
+
+    /// <summary>S→C: los kamas de gremio que quedan. f1 la cantidad.</summary>
+    public const string Jia = "jia";
+
+    /// <summary>
+    /// S→C: an emote lost, f1 the emote. Sent with f1=97, the guild banner, when leaving a guild;
+    /// the client's emote frame (ern) removes it from the list. See <see cref="Khi"/>.
+    /// </summary>
+    public const string Khj = "khj";
 
     /// <summary>El conyuge, con su look; se descarta. 13 mensajes.</summary>
     public const string Jgu = "jgu";
@@ -736,7 +1176,11 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Jgv = "jgv";
 
-    /// <summary>El gremio de la cuenta grabada; se descarta. 7 mensajes.</summary>
+    /// <summary>
+    /// S→C: belonging to a guild, silently (fft::begx): f1 the guild, f2 the rank, f3 the
+    /// member's contribution, f4 not known. What world entry sends -- "jco jhe jhh ... jgu" in
+    /// every capture of it --; the jgw is the one of joining, with its chat line and popup.
+    /// </summary>
     public const string Jhe = "jhe";
 
     /// <summary>El gremio otra vez: fecha de fundacion, nivel y numero de miembros. Se descarta; mientras viajaba provocaba un NullReferenceException en el cliente. 18 mensajes.</summary>
@@ -764,13 +1208,21 @@ public static class Op
     public const string Jol = "jol";
 
     /// <summary>
-    /// Va vacío y en pareja con <see cref="Lqt"/>, una sola vez por combate y justo antes del kai.
-    /// Medido en «combate contra 4 poutchs nivel 25»: en 2.937 mensajes salen una vez, ahí.
-    /// Aparece además en la ráfaga de entrada al mundo.
+    /// La sonda periódica del servidor: va vacío, en pareja con <see cref="Lqt"/>, y el cliente
+    /// contesta en el acto con lqc {f1 = cuántas lleva contestadas} y lqf {f2 = milisegundos}.
     /// </summary>
+    /// <remarks>
+    /// Se leyó como «una vez por combate, justo antes del kai» porque en «combate contra 4
+    /// poutchs nivel 25» cayó ahí. Medido en las 24 capturas que traen dos o más: el intervalo
+    /// entre pares es 240 segundos clavados (52→293, 118→358, 226→466→706, 50→290→530→770,
+    /// 240→480→720→960...), el f1 del lqc sube de uno en uno con cada par y el f2 del lqf
+    /// vale 38-40 en la mayoría y 100-190 en las capturas de conexión lenta. Cae donde caiga
+    /// el reloj: en medio de un turno, tras un emote, en la colocación. No tiene nada que ver
+    /// con el combate ni con la regeneración de vida, que son ktz y kuq.
+    /// </remarks>
     public const string Lqg = "lqg";
 
-    /// <summary>El compañero del <see cref="Lqg"/>. También vacío, y sólo en el inicio de combate.</summary>
+    /// <summary>El compañero del <see cref="Lqg"/>: también vacío, siempre detrás, cada 240 segundos.</summary>
     public const string Lqt = "lqt";
 
     /// <summary>
@@ -892,6 +1344,14 @@ public static class Op
     /// <summary>Combate. 6556 mensajes, 23 ficheros.</summary>
     public const string Jxm = "jxm";
 
+    /// <summary>
+    /// Las estadisticas de fin de combate de UN jugador -danos infligidos por fuente, recibidos,
+    /// curas, escudos, enemigos derrotados y las medias por turno y por PA-, detras del jyg y
+    /// antes del jxo... del siguiente: "kuf jyg jxo" en cada final de combate de las capturas.
+    /// Un mapa por personaje (f1) y los totales (f2). Medido campo a campo en 30 combates.
+    /// </summary>
+    public const string Jxo = "jxo";
+
     /// <summary>Lo envia el servidor pero el emulador lo usa como disparador de cliente. 4933 mensajes en 23 ficheros.</summary>
     public const string Jxw = "jxw";
 
@@ -940,7 +1400,10 @@ public static class Op
     /// <summary>Sin identificar. 3 usos en el emulador.</summary>
     public const string Kaq = "kaq";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>
+    /// A fight option's state: { f1: the side, f3: which, f4: on, f5: the fight }. Four at every
+    /// board, in the order 2, 1, 3, 0, and one whenever a side switches one (jzx).
+    /// </summary>
     public const string Kau = "kau";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
@@ -949,8 +1412,36 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Kbd = "kbd";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>
+    /// Server to client, a marketplace: one item's offers, { f1: item type, f2: item, f3 (repeated)
+    /// { f1: offer, f4: effects, f5: item, f6: packed price of each lot size, 0 where none,
+    /// f8: item type } }. The answer to keh; without f3 when nothing is on sale, and bare, f1 and
+    /// f2 alone, to the first keh that stops following the item.
+    /// </summary>
     public const string Kbt = "kbt";
+
+    /// <summary>
+    /// Client to server, a marketplace: buy a lot, { f1: offer, f2: the price it was shown, f3:
+    /// the lot size }. Seven in the runes capture, one per lot size of 1, 10, 100 and 1000.
+    /// </summary>
+    public const string Kbm = "kbm";
+
+    /// <summary>
+    /// Server to client: the marketplace opens to sell, { f3: the same settings as kdw's f1 }.
+    /// Its f1 is the seller's own listings, a repeated { f2: item as kes's f1, f3: price, f4: the
+    /// time left } by the client's own class; the capture's seller had none, so that part is
+    /// read off the client and not measured.
+    /// </summary>
+    public const string Kby = "kby";
+
+    /// <summary>Client to server, a marketplace in sell mode: the prices of an item, { f1: item }. Answered by kcq.</summary>
+    public const string Kbz = "kbz";
+
+    /// <summary>
+    /// Server to client, a marketplace: the prices of an item for whoever sells it, { f3: item,
+    /// f4: average price, f5 { f1: packed lowest price of each lot size } }.
+    /// </summary>
+    public const string Kcq = "kcq";
 
     /// <summary>El cofre se abre; los dos valores son constantes en la captura y el 100 parece el numero de huecos.</summary>
     public const string Kci = "kci";
@@ -958,32 +1449,281 @@ public static class Op
     /// <summary>Mover un objeto del cofre; la direccion no viaja, se deduce de donde esta el objeto. f1 llega como -1 cuando se arrastra la pila entera.</summary>
     public const string Kcr = "kcr";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>
+    /// Server to client, a marketplace: a purchase went through, { f2: offer, f4: true }. The last
+    /// of what a kbm is answered with, after the lqn 252 that says what was bought.
+    /// </summary>
     public const string Kcx = "kcx";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>
+    /// Server to client, a marketplace: the items of one type on sale, { f1: packed items, f2:
+    /// type }; f2 alone when there are none. The answer to kdk.
+    /// </summary>
     public const string Kda = "kda";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Kdg = "kdg";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>
+    /// Client to server, a marketplace: follow an item type, { f2: true, f4: type }, answered by
+    /// kda; stop following it, f4 alone, answered by nothing.
+    /// </summary>
     public const string Kdk = "kdk";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>
+    /// Server to client: a marketplace opens to buy, { f1 { f1: -1, f2: 200, f3: 708, f4: the
+    /// marketplace, f5: float tax percentage, f6: hours on sale, f7: float, f9: packed item
+    /// types, f10: packed lot sizes } }. f4 is the id of the client's AuctionHousesDataRoot.
+    /// </summary>
     public const string Kdw = "kdw";
 
-    /// <summary>Lo envia el cliente (10 veces en 1 fichero) pero el emulador lo construye como mensaje de servidor y nunca lo llama. El fichero de mapeos lo llama AccountCapabilitiesMessage, y eso es falso.</summary>
+    /// <summary>
+    /// How many times to craft the recipe in the workshop: { f1: count }, and the server says it
+    /// back in kgl. Nine in a row in the grinder's capture, 2 to 10. The mappings file calls it
+    /// AccountCapabilitiesMessage, and that is false.
+    /// </summary>
     public const string Kdx = "kdx";
+
+    /// <summary>
+    /// A workshop opens: { f1: the skill }. It comes after iwn, the inventory and an empty hlm;
+    /// the same message opens a craft station and a magus table.
+    /// </summary>
+    public const string Kgq = "kgq";
+
+    /// <summary>
+    /// Always empty around a workshop: after the inventory when it opens, when it closes, and in
+    /// answer to itr.
+    /// </summary>
+    public const string Hlm = "hlm";
+
+    /// <summary>The client picks a recipe in the workshop's list: { f2: the result }.</summary>
+    public const string Kew = "kew";
+
+    /// <summary>
+    /// Ready, in an exchange or a workshop: { f1: true, f2: step }. In a workshop it is the craft
+    /// button. The step counts the moves so far (25 in the tutorial, 1 to 5 in the grinder); it
+    /// is not a quantity -- that one is kdx.
+    /// </summary>
+    public const string Kep = "kep";
+
+    /// <summary>
+    /// How many times the recipe is to be crafted, the server saying back what kdx asked:
+    /// { f1: count }. After a craft of several it goes back to { f1: 1 }.
+    /// </summary>
+    public const string Kgl = "kgl";
+
+    /// <summary>
+    /// Something enters the workshop: { f1 { f1: 63, f5: item with its quantity in it }, f3: 0.0 }.
+    /// The float goes written even at zero.
+    /// </summary>
+    public const string Kfb = "kfb";
+
+    /// <summary>Something leaves the workshop: { f1: uid }.</summary>
+    public const string Kfs = "kfs";
+
+    /// <summary>Something in the workshop changes: { f2 { f1: 63, f5: item } }.</summary>
+    public const string Kex = "kex";
+
+    /// <summary>
+    /// The result of a craft or of a rune: { f2 { f1: pool change, f3: pool, f4: item }, f3: 1 on
+    /// a failure, 2 on a success }, and empty when the ingredients make no recipe.
+    /// </summary>
+    public const string Kdr = "kdr";
+
+    /// <summary>A rune applied on the magus table: { f1: rune uid, f3: 1, f6: true }.</summary>
+    public const string Kcj = "kcj";
+
+    /// <summary>Closes every rune: { f2: true }.</summary>
+    public const string Kdb = "kdb";
+
+    // ─── A commission: a magus working on someone else's item ───────────────────────────
+    // Measured from the magus' side in two sessions (Oficios/"envio invitacion a maguear ..."),
+    // and from the customer's up to the moment they accept ("recibo invitacion ...").
+
+    /// <summary>
+    /// An invitation to a commission: { f1: the other character, f2: skill, f3: 10 when the one
+    /// who sends it is the magus, 11 when it is the customer }.
+    /// </summary>
+    public const string Kbl = "kbl";
+
+    /// <summary>
+    /// A commission waiting for an answer: { f1: the other character, f2: 10 magus / 11 customer,
+    /// the role of whoever receives it, f3: who sent the invitation }. Followed by an empty hlm.
+    /// </summary>
+    public const string Kgu = "kgu";
+
+    /// <summary>The invitation cannot be: { f1: 3 } when the magus is too far from the workshop.</summary>
+    public const string Kdv = "kdv";
+
+    /// <summary>Accepting what was offered: a commission, a trade. Empty.</summary>
+    public const string Kgi = "kgi";
+
+    /// <summary>The magus' window opens: { f2: skill }.</summary>
+    public const string Keg = "keg";
+
+    /// <summary>The customer's window opens: { f1: the magus' job level, f2: skill }.</summary>
+    public const string Kgw = "kgw";
+
+    /// <summary>
+    /// Somebody else's job experience: { f1 { job, next, level, floor, experience }, f2: whose }.
+    /// The customer gets the magus' on accepting.
+    /// </summary>
+    public const string Iss = "iss";
+
+    /// <summary>
+    /// The customer's offer gains an item: { f3 { f1: 63, f5: item }, f4: true when the other one
+    /// did it }.
+    /// </summary>
+    public const string Ked = "ked";
+
+    /// <summary>The customer's offer loses an item: { f1: uid }. It went onto the table.</summary>
+    public const string Keo = "keo";
+
+    /// <summary>The magus moves an offered item onto the table or back: { f1: ±1, f4: uid }.</summary>
+    public const string Kgd = "kgd";
+
+    /// <summary>Somebody is ready, or no longer: { f3: true, f4: who }; without f3 it is "no".</summary>
+    public const string Kgt = "kgt";
+
+    /// <summary>What the customer pays: { f1: kamas }; empty once it has been paid.</summary>
+    public const string Kcl = "kcl";
+
+    /// <summary>Kamas put into an exchange: { f1: kamas }.</summary>
+    public const string Kee = "kee";
+
+    /// <summary>Client to server: asking another player to trade, { f2: whom }.</summary>
+    public const string Keu = "keu";
+
+    /// <summary>A trade asked for, to both: { f1: who asks, f2: who is asked, f4: 1 }.</summary>
+    public const string Kfz = "kfz";
+
+    /// <summary>
+    /// The trade window opens, to both: { f2: asker's pods capacity, f3: 1, f4: asked's capacity,
+    /// f5: asker's pods carried, f6: asker, f7: asked, f8: asked's carried }.
+    /// </summary>
+    public const string Kbg = "kbg";
+
+    /// <summary>The kamas one side of a trade puts in: { f1: kamas, f3: true when the other one's }.</summary>
+    public const string Ket = "ket";
+
+    /// <summary>A side's pods once a trade is done: { f1: capacity, f2: true when the other one's, f3: carried }.</summary>
+    public const string Keq = "keq";
+
+    /// <summary>
+    /// A line of the chat log: { f3: kind, f4: parameters }. The payment of a commission writes
+    /// { f3: 64, f4: "+", f4: amount } beside lqn 594, "Pago: {0} kamas.".
+    /// </summary>
+    public const string Lqs = "lqs";
+
+    // ─── The grinder: breaking items into runes ─────────────────────────────────────────
+
+    /// <summary>The grinder's breaking window opens. Empty.</summary>
+    public const string Kbv = "kbv";
+
+    /// <summary>Break what is on the grinder: { f2: true, f3: step }.</summary>
+    public const string Kbj = "kbj";
+
+    /// <summary>
+    /// What came out of each broken item: { f1 (repeated) { f1: uid, f3 (repeated) { f1: rune,
+    /// f2: how many }, f4: coefficient, f5: coefficient } }.
+    /// </summary>
+    public const string Kfp = "kfp";
+
+    // ─── The artisans' directory ────────────────────────────────────────────────────────
+    // Four captures (Oficios/"abrir interfaz oficios-constar en la lista publica ...",
+    // "... estar visible en lista artesanos ...", "consultar lista de artesanos en el
+    // interactivo del libro", "dejar de constar en lista artesanos ...").
+
+    /// <summary>
+    /// A job's settings as a crafter: { f1 { f3: job, f4: free, f5: minimum level } }. The client
+    /// sends one per job when the jobs window opens, and one each time a setting changes.
+    /// </summary>
+    public const string Irl = "irl";
+
+    /// <summary>
+    /// The settings of every job: { f1 (repeated) { f3: job, f4: free, f5: minimum level } }. The
+    /// answer to every irl, and part of the entry into the world.
+    /// </summary>
+    public const string Isd = "isd";
+
+    /// <summary>Show me in the public list, or stop: { f2: [jobs], packed }. A toggle.</summary>
+    public const string Kef = "kef";
+
+    /// <summary>Whether a job is in the public list: { f1 { f1: job, f2: listed } }.</summary>
+    public const string Iro = "iro";
+
+    /// <summary>The artisans' book opens its window: { f2: [the workshop's jobs], packed }.</summary>
+    public const string Kfj = "kfj";
+
+    /// <summary>The list of one job's artisans: { f2: job }.</summary>
+    public const string Isr = "isr";
+
+    /// <summary>
+    /// One more artisan in the list, or one who changed: { f1: entry }, the entry as isf's.
+    /// </summary>
+    public const string Isv = "isv";
+
+    /// <summary>An artisan gone from a job's list: { f1: who, f2: job }.</summary>
+    public const string Isq = "isq";
 
     /// <summary>Sin identificar. 2 usos en el emulador.</summary>
     public const string Kea = "kea";
 
-    /// <summary>Sin identificar. 2 usos en el emulador.</summary>
+    /// <summary>
+    /// Client to server, a marketplace: follow an item, { f1: item, f2: true }, answered by kbt;
+    /// stop following it, f1 alone. The client sends that one twice in a row.
+    /// </summary>
     public const string Keh = "keh";
 
-    /// <summary>No implementado. Exclusivo de las capturas de interactivos varios (Interactivos varios); 9 mensajes.</summary>
+    /// <summary>
+    /// Server to client, a marketplace: an offer of a followed item changed, { f2: packed price
+    /// of each lot size, f3: offer, f4: effects, f5: item, f6: item type }. To the buyer after
+    /// every lot bought from an offer that still has more, and to the seller behind kfi.
+    /// </summary>
     public const string Kgp = "kgp";
+
+    /// <summary>
+    /// Server to client, a marketplace: an offer of a followed item is gone, { f1: item, f2: item
+    /// type, f4: offer }. What the buyer gets instead of kgp when the lot bought was its last.
+    /// </summary>
+    public const string Kgv = "kgv";
+
+    /// <summary>
+    /// Server to client, a marketplace: an offer of a followed item appeared, { f1: effects, f2:
+    /// item type, f3: item, f4: packed price of each lot size, f5: offer }, then kgp for it.
+    /// </summary>
+    public const string Kfi = "kfi";
+
+    /// <summary>
+    /// Client to server, a marketplace in sell mode: put a lot on sale, { f1: price, f2: the
+    /// stack's uid, f3: the lot size }.
+    /// </summary>
+    public const string Kge = "kge";
+
+    /// <summary>
+    /// Server to client, a marketplace: the seller's lot is on sale, { f1 { f1: the listing, f2:
+    /// effects, f3: item, f4: how many }, f2: price, f4: seconds on sale, 2,419,200 }.
+    /// </summary>
+    public const string Kes = "kes";
+
+    /// <summary>
+    /// Client to server, a marketplace in sell mode: a new price for a lot on sale, { f1: the
+    /// listing, f2: the new price, f3: how many }. Read off the client: its sell window's
+    /// OnConfirmModifyObject is what raises it. No capture.
+    /// </summary>
+    public const string Kch = "kch";
+
+    /// <summary>
+    /// Server to client, a marketplace: one of the seller's lots is off sale, { f1: the listing }.
+    /// Read off the client, no capture.
+    /// </summary>
+    public const string Ken = "ken";
+
+    /// <summary>
+    /// Server to client: the seller's sales history, { f3 (repeated): laq { f1: kamas, f3: date,
+    /// f4: 0 sold / 1 unsold, f5: the item, f6: the marketplace } }. Read off the client.
+    /// </summary>
+    public const string Las = "las";
 
     /// <summary>El cofre se cerro.</summary>
     public const string Khd = "khd";
@@ -1037,6 +1777,59 @@ public static class Op
 
     /// <summary>Presente en 25 de las 31 carpetas de captura (399 mensajes, 90 ficheros). Nada establecido.</summary>
     public const string Kmu = "kmu";
+
+    // ─── A fight on the map, and coming into one (Network/FightJoinProtocol.cs) ──────────
+
+    /// <summary>Server to client: the swords of a fight in its placement appear on the map.</summary>
+    public const string Hpy = "hpy";
+
+    /// <summary>Server to client: the swords go, the placement is over. { f1: the fight }.</summary>
+    public const string Hpr = "hpr";
+
+    /// <summary>Server to client: how many fights the map has. { f2: how many }, empty for none.</summary>
+    public const string Jqz = "jqz";
+
+    /// <summary>Server to client: a member taken off a team shown on the map.</summary>
+    public const string Jzw = "jzw";
+
+    /// <summary>Server to client: a fighter taken off the board during the placement.</summary>
+    public const string Kar = "kar";
+
+    /// <summary>Server to client: a kay turned down, { f1: the fighter named, f2: why }.</summary>
+    public const string Jxs = "jxs";
+
+    /// <summary>
+    /// Client to server: a side's fight option switched, { f1: which } -- none for no spectators,
+    /// 1 party only, 2 closed, 3 asking for help. Answered by kau with its new state.
+    /// </summary>
+    public const string Jzx = "jzx";
+
+    /// <summary>Server to client, empty: out of the fight, sent to whoever leaves the placement.</summary>
+    public const string Jxa = "jxa";
+
+    /// <summary>Client to server, empty: the party window's automatic entry into fights, on.</summary>
+    public const string Ilf = "ilf";
+
+    /// <summary>Server to client, root 3, empty: the answer to ilf.</summary>
+    public const string Ikm = "ikm";
+
+    /// <summary>Client to server, empty: the automatic entry, off.</summary>
+    public const string Int = "int";
+
+    /// <summary>Server to client, root 3, empty: the answer to int.</summary>
+    public const string Ilv = "ilv";
+
+    /// <summary>Client to server, empty: the party window's automatic ready, on.</summary>
+    public const string Ikr = "ikr";
+
+    /// <summary>Server to client, root 3, empty: the answer to ikr.</summary>
+    public const string Inn = "inn";
+
+    /// <summary>Client to server, empty: the automatic ready, off.</summary>
+    public const string Inp = "inp";
+
+    /// <summary>Server to client, root 3, empty: the answer to inp.</summary>
+    public const string Ilr = "ilr";
 
     /// <summary>Llega con jrh en cada carga de mapa y no espera nada de vuelta; el emulador ya lo ignora en silencio. 727 mensajes, 88 ficheros.</summary>
     public const string Kmv = "kmv";
@@ -1160,6 +1953,36 @@ public static class Op
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
     public const string Kuf = "kuf";
 
+    /// <summary>
+    /// Se acabó la regeneración de vida: f1 la vida que tiene, f2 los medios segundos que llevaba
+    /// regenerando, f4 la vida máxima. Va al entrar en combate, entre el lqu y el lva de la carga
+    /// del mapa táctico, y es lo que para el contador del cliente: sin él la barra del combate
+    /// sigue subiendo de uno en uno como en el mapa.
+    /// </summary>
+    /// <remarks>
+    /// 97 mensajes en 69 ficheros, 88 detrás de «kub jru lqu» y 83 delante de «lva kmk». En
+    /// el desafío del 9 de agosto, {f1=5211 f2=151 f4=5307} con el ino de al lado diciendo vida
+    /// 5211 de 5307: f1 y f4 son la vida y el tope. El f2 no es vida ganada —la vida no sube 151—:
+    /// entre el ktz del final del combate anterior (23:23:34) y este kuq (23:24:50) pasan 76
+    /// segundos, 152 tics de medio segundo, y f2 vale 151. Es lo que llevaba el contador, con el
+    /// ritmo 5 del ktz (5 décimas por punto). Inferencia con dos muestras de tiempo; la forma
+    /// es medida.
+    /// </remarks>
+    public const string Kuq = "kuq";
+
+    /// <summary>
+    /// Empieza la regeneración de vida: f1 es el ritmo, en décimas de segundo por punto de vida.
+    /// Va justo detrás de cada «kml kmp» de vuelta al rol: al entrar al mundo y al salir de un
+    /// combate.
+    /// </summary>
+    /// <remarks>
+    /// 143 mensajes en 105 ficheros, todos detrás de «kml kmp» y 135 con f1=5. Los ocho con
+    /// f1=1 son la feria del Trool y una entrada al mundo con raid de gremio: un ritmo rápido
+    /// que no se sabe de qué depende y no se manda. El 5 cuadra con el kuq: 151 tics en 76
+    /// segundos.
+    /// </remarks>
+    public const string Ktz = "ktz";
+
     /// <summary>Gastar puntos de caracteristica; el valor es el total pagado, no un incremento, lo que hace el mensaje idempotente, y un total que no cabe se rechaza entero. Campos: 1 inteligencia, 2 suerte, 3 vitalidad, 4 sabiduria, 5 agilidad, 6 fuerza. Lleva id de peticion real (7 peticiones).</summary>
     public const string Kum = "kum";
 
@@ -1171,6 +1994,14 @@ public static class Op
 
     /// <summary>No te pares en la pantalla de personajes. Solo sale al entrar directo al mundo: reconexion a combate y koliseo. NO va en la rafaga normal.</summary>
     public const string Kvd = "kvd";
+
+    /// <summary>
+    /// El cliente pide la lista de personajes. Va con un krv detras (una clave larga) en cuanto
+    /// termina la rafaga de bienvenida. En una entrada corriente la lista ya viajo en la rafaga
+    /// y no se contesta nada; en una reconexion a combate la rafaga va SIN lista y la respuesta
+    /// es kvi y kvd, medido en las dos capturas de reconexion.
+    /// </summary>
+    public const string Kvc = "kvc";
 
     /// <summary>Los personajes de la cuenta en el servidor elegido.</summary>
     public const string Kvi = "kvi";
@@ -1206,6 +2037,14 @@ public static class Op
 
     /// <summary>El cliente senala el personaje que va a borrar. Lleva el id en el campo 2.</summary>
     public const string Kwa = "kwa";
+
+    /// <summary>
+    /// «Adelante»: la respuesta del cliente al <see cref="Kvd"/>, vacia. No dice que personaje
+    /// porque no hace falta: el servidor sabe cual esta en combate. Medido en las tres capturas
+    /// de entrada directa (dos reconexiones a combate y el koliseo): kvd, kwb, y detras el kva
+    /// y la entrada al mundo de siempre.
+    /// </summary>
+    public const string Kwb = "kwb";
 
     /// <summary>Borrar un personaje: campo 1 el id, campo 2 la confirmacion escrita en 32 hex.</summary>
     public const string Kvu = "kvu";
@@ -1308,7 +2147,11 @@ public static class Op
     /// <summary>Ajuste del panel de retos: { f1: int64, f2: ... }. C->S, sin respuesta.</summary>
     public const string Kxb = "kxb";
 
-    /// <summary>Sin identificar. 1 uso en el emulador.</summary>
+    /// <summary>
+    /// Client to server, empty: the sales history window was opened, and wants its lines (las).
+    /// Read off the client: the one request that window's OnEnable sends, and the marketplace
+    /// sender's empty message. No capture.
+    /// </summary>
     public const string Lar = "lar";
 
     /// <summary>Sin identificar. 1 uso en el emulador.</summary>
@@ -1359,7 +2202,12 @@ public static class Op
     /// <summary>Rama de 3.6.4.3: envia lpe. No aparece en ninguna de las 242 capturas.</summary>
     public const string Lpj = "lpj";
 
-    /// <summary>Bloque 1 digerido: el servidor real espera esto antes de enviar el bloque 2.</summary>
+    /// <summary>
+    /// La respuesta del cliente a la sonda <see cref="Lqg"/>+<see cref="Lqt"/>: f1 es cuántas
+    /// sondas lleva contestadas en la sesión (1, 2, 3... una por par, cada 240 segundos). En la
+    /// entrada al mundo el primer par cae en el bloque 1, y por eso el servidor real parecía
+    /// esperar «el bloque 1 digerido» antes de mandar el 2: espera esta contestación.
+    /// </summary>
     public const string Lqc = "lqc";
 
     /// <summary>Va entre lqu y hjk en cada cambio de mapa capturado; su unico campo vale 197 al entrar al mundo, 24 al cambiar de mapa y 470 tras un reinicio de caracteristicas, y no hay lectura que aguante. Deliberadamente no se envia. 213 mensajes, 53 ficheros.</summary>

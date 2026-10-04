@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.World.Fights;
@@ -84,7 +84,10 @@ namespace Jondo.Unity.Tests.Combat
                 var efectos = SpellEffects.De(explosion, 3);
                 Assert.Contains(efectos, e => e.EffectId == 141);        // se mata sola
                 Assert.Contains(efectos, e => e.Forma == Zone.Circulo && e.Tamano == 2);
-                Assert.Contains(efectos, e => e.EffectId == EffectEngine.ActivarBomba);
+                // The explosion's own "activa una bomba" is the sheet's copy, for the client
+                // only, and is not read: the chain reaction is the queue behind the 1009 that
+                // set the first bomb off, which takes the bombs the explosion reaches.
+                Assert.DoesNotContain(efectos, e => e.EffectId == EffectEngine.ActivarBomba);
                 Assert.True(efectos.Any(e => e.EffectId is DanoAgua or DanoTierra
                                                         or DanoAire or DanoFuego),
                             $"la explosión {explosion} de la plantilla {template} no hace daño");
