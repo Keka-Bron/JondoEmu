@@ -174,7 +174,7 @@ namespace Jondo.Unity.Server.Managers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Misiones] Fallback dialogue texts could not be read: {ex.Message}");
+                Console.WriteLine($"[Quests] Fallback dialogue texts could not be read: {ex.Message}");
             }
 
             return found;

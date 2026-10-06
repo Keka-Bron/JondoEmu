@@ -269,11 +269,11 @@ namespace Jondo.Unity.Server.Handlers
             // Y si alguna misión en curso pedía justamente venir a ver a éste, ya está.
             await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
 
-            string origen = arbolEscrito ? $" (escrito, {escrito!.Lines.Count} frases)"
-                : escrito != null ? " (fallback aceptar/rechazar)"
-                : " (de la plantilla)";
-            Console.WriteLine($"[NPC] Diálogo del {npc.NpcId}: pregunta {pregunta}, " +
-                              $"{Math.Max(respuestas.Length, 1)} respuestas{origen}.");
+            string origen = arbolEscrito ? $" (authored, {escrito!.Lines.Count} lines)"
+                : escrito != null ? " (accept/refuse fallback)"
+                : " (template)";
+            Console.WriteLine($"[NPC] Dialogue for {npc.NpcId}: question {pregunta}, " +
+                              $"{Math.Max(respuestas.Length, 1)} replies{origen}.");
         }
 
         /// <summary>
@@ -863,15 +863,13 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // ¿La frase en la que está reparte alguna misión? Se mira ANTES de seguir, porque
-            // seguir cambia OpenDialogueMessage, y antes de CerrarConversacion, que lo pone a cero.
+            // Does the current line hand a quest over? Checked BEFORE walking further, because
+            // walking changes OpenDialogueMessage, and before CerrarConversacion, which clears it.
             //
-            // Va después de elegir y no al llegar a la frase porque así está en la captura: el
-            // servidor baja la conversación hasta la 50071, el jugador elige la 66788, y sólo
-            // entonces sale el ief con la misión 2432.
-            // ¿Esta respuesta concreta da una misión? Lo dice el árbol (escrito o el fallback
-            // aceptar/rechazar). Si no hay ninguno, se cae en la regla vieja: cualquier respuesta
-            // de la frase que el paso nombra.
+            // After the reply, not on arriving at the line: the capture walks to line 50071, the
+            // player picks 66788, and only then does ief {2432} go out.
+            // Does this reply start a quest? The tree says so (authored or accept/refuse fallback).
+            // With neither, the old rule applies: any reply on the line the step names.
             var frase = NpcDialogues.ForTalk(SessionContext.State.OpenDialogueNpcId,
                                              SessionContext.State.OpenDialogueMapId)
                                     ?.Line(SessionContext.State.OpenDialogueMessage);
