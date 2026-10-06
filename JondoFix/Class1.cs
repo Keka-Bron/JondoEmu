@@ -14,38 +14,38 @@ using Il2CppCore.DataCenter.Metadata.Item;
 using Il2CppCore.UILogic.Admin;
 using Il2CppCore.UILogic.Components.Filters;
 
-[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.3.4", "Jondo")]
+[assembly: MelonInfo(typeof(JondoFix.JondoFixMod), "JondoFix", "1.4.0", "Jondo")]
 [assembly: MelonGame("Ankama", "Dofus")]
 
 namespace JondoFix
 {
     /// <summary>
-    /// Los objetos de Ankama a los que Jondo les cambia el nombre en la pantalla del jugador.
+    /// Ankama's items whose name Jondo changes on the player's screen.
     ///
-    /// El cliente NUNCA recibe del servidor el nombre de un objeto: lo saca de su propia tabla de
-    /// textos, el fichero Content/I18n/es.bin, buscando por el nameId que trae la plantilla.
-    /// Comprobado sobre 179.425 tramas de servidor a cliente de 38 capturas reales: no viaja un
-    /// solo nombre de objeto. Por eso renombrar es un problema del CLIENTE y vive aqui.
+    /// The client NEVER receives an item's name from the server: it takes it from its own text
+    /// table, the file Content/I18n/es.bin, looking it up by the nameId the template brings.
+    /// Checked over 179,425 server-to-client frames of 38 real captures: not a single
+    /// item name travels. That is why renaming is a CLIENT problem and lives here.
     ///
-    /// Se podria reescribir la cadena dentro del propio es.bin —«Jondo Coin» ocupa menos que
-    /// «Moneda onirica minuscula», asi que los desplazamientos no se moverian— pero ese fichero
-    /// esta en manifest.json con su SHA1 y una reparacion del lanzador lo devolveria a su sitio.
-    /// Con Harmony no hay nada que reparar.
+    /// The string could be rewritten inside es.bin itself —«Jondo Coin» takes less room than
+    /// «Moneda onirica minuscula», so the offsets would not move— but that file
+    /// is in manifest.json with its SHA1 and a launcher repair would put it back in place.
+    /// With Harmony there is nothing to repair.
     /// </summary>
     public static class JondoRenames
     {
         public sealed class Rename
         {
-            /// <summary>El nombre nuevo. Uno solo: «Jondo Coin» no se traduce.</summary>
+            /// <summary>The new name. A single one: «Jondo Coin» is not translated.</summary>
             public string Name;
 
-            /// <summary>La descripcion, por idioma. La clave es «es», «en», «fr», «de» o «pt».</summary>
+            /// <summary>The description, per language. The key is «es», «en», «fr», «de» or «pt».</summary>
             public Dictionary<string, string> Description;
 
             public int NameId;
             public int DescriptionId;
 
-            /// <summary>La descripcion en el idioma del cliente, o en ingles si no se sabe cual es.</summary>
+            /// <summary>The description in the client's language, or in English if it is not known which.</summary>
             public string DescriptionFor(string idioma)
             {
                 if (Description == null || Description.Count == 0) return null;
@@ -56,9 +56,9 @@ namespace JondoFix
 
         public static readonly Dictionary<int, Rename> ById = new Dictionary<int, Rename>
         {
-            // La moneda del servidor. En los datos de Ankama es la «Moneda onirica minuscula»:
-            // icono 148013, una moneda turquesa con destellos, y peso cero, que es lo que permite
-            // acumularla sin tocar los pods.
+            // The server's currency. In Ankama's data it is the «Moneda onirica minuscula»:
+            // icon 148013, a turquoise coin with sparkles, and zero weight, which is what allows
+            // piling it up without touching the pods.
             [20440] = new Rename
             {
                 Name = "Jondo Coin",
@@ -86,23 +86,23 @@ namespace JondoFix
         };
 
         /// <summary>
-        /// El nombre nuevo por clave de texto.
+        /// The new name by text key.
         ///
-        /// Empieza con los objetos de la tabla de arriba y luego se le anaden los VENDEDORES, que
-        /// se leen de datos/vendedores_jondo.json —el mismo fichero que usa el servidor para
-        /// juntarlos—. Asi el nombre que ve el jugador y el catalogo que le llega salen del mismo
-        /// sitio y no pueden decir cosas distintas.
+        /// It starts with the items of the table above and then the SELLERS are added, which
+        /// are read from datos/vendedores_jondo.json —the same file the server uses to
+        /// merge them—. That way the name the player sees and the catalogue that reaches him come from the same
+        /// place and cannot say different things.
         /// </summary>
         public static readonly Dictionary<int, string> NameByTextKey = BuildNameKeys();
 
-        /// <summary>Anade un nombre por clave de texto. Lo usa la carga de los vendedores.</summary>
+        /// <summary>Adds a name by text key. The sellers' loading uses it.</summary>
         public static void AddName(int textKey, string name)
         {
             if (textKey == 0 || string.IsNullOrEmpty(name)) return;
             NameByTextKey[textKey] = name;
         }
 
-        /// <summary>Y que objeto es cada clave de descripcion, para poder elegir el idioma.</summary>
+        /// <summary>And which item each description key is, to be able to choose the language.</summary>
         public static readonly Dictionary<int, Rename> ByDescriptionKey = BuildDescriptionKeys();
 
         private static Dictionary<int, string> BuildNameKeys()
@@ -123,35 +123,35 @@ namespace JondoFix
     }
 
     /// <summary>
-    /// En que idioma esta jugando el que tiene el cliente delante.
+    /// Which language whoever has the client in front of them is playing in.
     ///
-    /// NO se puede sacar de la cabecera del fichero de textos: los cinco —de.bin, en.bin, es.bin,
-    /// fr.bin y pt.bin— llevan escrito «fr» dentro, que es una pifia de la compilacion de Ankama.
-    /// Comprobado en los cinco. Detectar por ahi habria dicho «frances» siempre, y el jugador
-    /// aleman habria leido frances sin que nadie se enterara.
+    /// It CANNOT be taken from the text file's header: all five —de.bin, en.bin, es.bin,
+    /// fr.bin and pt.bin— carry «fr» written inside, which is a blunder in Ankama's build.
+    /// Checked in all five. Detecting it that way would always have said «French», and the German
+    /// player would have read French without anyone noticing.
     ///
-    /// Asi que se detecta por el CONTENIDO, y sin preguntarle nada al cliente. La primera vez que
-    /// se pide el nombre de un objeto de la tabla, ese nombre ya viene resuelto por el cliente en
-    /// su idioma; basta con mirar cual de los cinco es. Es justo la palabra que estamos a punto de
-    /// sustituir, asi que no cuesta ni una llamada de mas.
+    /// So it is detected by the CONTENT, and without asking the client anything. The first time
+    /// an item of the table's name is asked for, that name already comes resolved by the client in
+    /// its language; it is enough to look at which of the five it is. It is exactly the word we are about to
+    /// replace, so it does not cost a single extra call.
     ///
-    /// Si no se reconoce ninguno —porque Ankama cambie el texto en una actualizacion, o porque
-    /// aparezca un idioma nuevo— se queda en ingles, que es lo que mas gente entiende.
+    /// If none is recognised —because Ankama changes the text in an update, or because
+    /// a new language appears— it stays in English, which is what most people understand.
     /// </summary>
     public static class JondoLanguage
     {
-        /// <summary>El idioma que se usa mientras no se sepa cual es, y si no se reconoce.</summary>
+        /// <summary>The language used while it is not known which, and if it is not recognised.</summary>
         public const string Fallback = "en";
 
         private static string _detectado;
 
-        /// <summary>El idioma, o null mientras no se haya visto ningun texto conocido.</summary>
+        /// <summary>The language, or null while no known text has been seen.</summary>
         public static string Current => _detectado;
 
         /// <summary>
-        /// El nombre de la «Moneda onirica minuscula» —clave 777279— en los cinco idiomas que trae
-        /// el cliente, sacado de los propios .bin. Es la huella con la que se reconoce el idioma.
-        /// Va sin tildes porque se compara sin ellas.
+        /// The name of the «Moneda onirica minuscula» —key 777279— in the five languages the
+        /// client brings, taken from the .bin files themselves. It is the fingerprint the language is recognised by.
+        /// It goes without accents because it is compared without them.
         /// </summary>
         private static readonly Dictionary<string, string> Huella =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -164,8 +164,8 @@ namespace JondoFix
         };
 
         /// <summary>
-        /// Mira si ese texto delata el idioma. Se le pasa lo que el cliente acaba de resolver,
-        /// ANTES de sustituirlo.
+        /// Looks at whether that text gives the language away. It is passed what the client has just resolved,
+        /// BEFORE replacing it.
         /// </summary>
         public static void Sniff(string textoDelCliente)
         {
@@ -176,7 +176,7 @@ namespace JondoFix
             MelonLogger.Msg($"[JondoFix] El cliente esta en «{_detectado}».");
         }
 
-        /// <summary>Quita las tildes, para no depender de como venga escrito el texto.</summary>
+        /// <summary>Removes the accents, so as not to depend on how the text comes written.</summary>
         private static string SinTildes(string s)
         {
             var sb = new StringBuilder(s.Length);
@@ -188,7 +188,7 @@ namespace JondoFix
                     sb.Append(c);
                 }
             }
-            // La escharfes-S alemana no lleva tilde que quitar, asi que se cambia a mano.
+            // The German eszett carries no accent to remove, so it is changed by hand.
             return sb.ToString().Normalize(System.Text.NormalizationForm.FormC).Replace("\u00df", "ss");
         }
     }
@@ -197,23 +197,23 @@ namespace JondoFix
     {
         public static bool UseLocalRedirect { get; private set; } = false;
         /// <summary>
-        /// Si el cliente puede ENSEÑAR las cosas de administrador: el id junto al nombre del
-        /// objeto y el catálogo sin filtrar.
+        /// Whether the client may SHOW the administrator things: the id next to the item's
+        /// name and the unfiltered catalogue.
         ///
-        /// NO es una comprobación de permisos y no se puede usar como tal. Sale de una variable
-        /// de entorno que pone el lanzador, y cualquiera que arranque el Dofus.exe a mano puede
-        /// ponérsela. Quien decide de verdad es el servidor, que mira el rol en la base cada vez
-        /// que llega un comando.
+        /// It is NOT a permissions check and cannot be used as one. It comes from an environment
+        /// variable the launcher sets, and anyone who starts Dofus.exe by hand can
+        /// set it. Who really decides is the server, which looks at the role in the base every time
+        /// a command arrives.
         /// </summary>
         public static bool IsJondoAdministrator { get; private set; } = false;
 
         /// <summary>
-        /// El rol de administrador, el mismo <c>Roles.Administrador</c> del servidor.
+        /// The administrator role, the same <c>Roles.Administrador</c> as the server's.
         ///
-        /// Se repite aquí porque JondoFix no puede referenciar Jondo.Unity.Contract: es un mod del
-        /// cliente y se compila contra los ensamblados de Unity. Si la escala vuelve a moverse
-        /// —ya pasó una vez, del 4 al 5— hay que tocar este número a mano, y no lo va a avisar el
-        /// compilador. Por eso está aquí arriba y con nombre, y no suelto dentro de un if.
+        /// It is repeated here because JondoFix cannot reference Jondo.Unity.Contract: it is a client
+        /// mod and is compiled against Unity's assemblies. If the scale moves again
+        /// —it already happened once, from 4 to 5— this number has to be touched by hand, and the
+        /// compiler is not going to warn. That is why it is up here and with a name, and not loose inside an if.
         /// </summary>
         private const int RolAdministrador = 5;
         public static Il2CppSystem.Net.Security.RemoteCertificateValidationCallback BypassedCallback { get; private set; }
@@ -246,8 +246,8 @@ namespace JondoFix
 
                     string gameDir = AppDomain.CurrentDomain.BaseDirectory;
                     string parent = Path.GetFullPath(Path.Combine(gameDir, ".."));
-                    // El nombre de la carpeta del repositorio. Si alguien la tiene con otro
-                    // nombre, JONDO_EMULATOR_ROOT ya lo resuelve, que es para lo que está.
+                    // The repository folder's name. If someone has it with another
+                    // name, JONDO_EMULATOR_ROOT already solves it, which is what it is for.
                     foreach (string folder in new[] { "Jondo Unity Emulator", "JondoEmu" })
                     {
                         string candidate = Path.Combine(parent, folder);
@@ -350,11 +350,11 @@ namespace JondoFix
                 ItemNameIdToGid[(int)item.nameId] = item.id;
                 added++;
 
-                // Destapar los objetos que Ankama esconde SÓLO al administrador. Leer el
-                // catálogo lo hace todo el mundo, porque de ahí sale la tabla de nombres, pero
-                // tocar la marca cambia lo que ve el jugador en su enciclopedia: sin esta
-                // condición, cualquiera se encontraría los objetos internos mezclados con los
-                // suyos.
+                // Uncovering the items Ankama hides ONLY for the administrator. Reading the
+                // catalogue is done by everyone, because the names table comes from there, but
+                // touching the flag changes what the player sees in his encyclopedia: without this
+                // condition, anyone would find the internal items mixed with their
+                // own.
                 if (!JondoFixMod.IsJondoAdministrator) continue;
                 try
                 {
@@ -367,7 +367,7 @@ namespace JondoFix
                 catch { }
             }
 
-            // Las listas que el cliente ya hubiera cacheado antes de tocar las marcas.
+            // The lists the client had already cached before touching the flags.
             if (JondoFixMod.IsJondoAdministrator)
             {
                 try { AbstractItemFilter.s_queriedLists?.Clear(); } catch { }
@@ -378,14 +378,14 @@ namespace JondoFix
         }
 
         /// <summary>
-        /// Los nombres de los vendedores que Jondo junta, del mismo fichero que lee el servidor.
+        /// The names of the sellers Jondo merges, from the same file the server reads.
         ///
-        /// El catalogo de Ankama parte cada categoria por tramos de nivel —«Sombreros 1 - 49»,
-        /// «Sombreros 50 - 99»...— y el servidor los junta en uno solo. Si el nombre no se cambia,
-        /// el jugador ve un NPC llamado «Sombreros 1 - 49» que le vende sombreros de nivel 200.
+        /// Ankama's catalogue splits each category by level brackets —«Sombreros 1 - 49»,
+        /// «Sombreros 50 - 99»...— and the server merges them into one. If the name is not changed,
+        /// the player sees an NPC called «Sombreros 1 - 49» selling him level 200 hats.
         ///
-        /// Se lee del fichero y no se escribe aqui a proposito: si alguien cambia a quien absorbe
-        /// quien, el nombre le sigue sin tocar el mod.
+        /// It is read from the file and not written here on purpose: if someone changes who absorbs
+        /// whom, the name follows without touching the mod.
         /// </summary>
         private void LoadVendorNames()
         {
@@ -540,13 +540,13 @@ namespace JondoFix
         }
 
         /// <summary>
-        /// El nombre sin tildes de un objeto, que es por donde busca el mercadillo.
-        /// 
-        /// Va a mano y no con un atributo porque no esta claro como se llama la propiedad: en los
-        /// metadatos del cliente aparecen las dos formas, «unDiacriticalName» y
-        /// «undiacriticalName», y un [HarmonyPatch] sobre una que no exista revienta al cargar el
-        /// mod ENTERO. Asi se prueban las dos y, si no esta ninguna, se avisa y se sigue: lo unico
-        /// que se pierde es que la Jondo Coin no salga al buscarla por su nombre nuevo.
+        /// An item's name without accents, which is what the marketplace searches by.
+        ///
+        /// It goes by hand and not with an attribute because it is not clear what the property is called: in the
+        /// client's metadata both forms appear, «unDiacriticalName» and
+        /// «undiacriticalName», and an [HarmonyPatch] on one that does not exist blows up loading the
+        /// WHOLE mod. This way both are tried and, if neither is there, a warning is given and it carries on: the only thing
+        /// lost is the Jondo Coin not coming up when searched for by its new name.
         /// </summary>
         private void PatchUnDiacriticalName()
         {
@@ -578,15 +578,15 @@ namespace JondoFix
         }
 
         /// <summary>
-        /// El nombre de un NPC, por si no pasa por el accessor de textos.
+        /// An NPC's name, in case it does not go through the text accessor.
         ///
-        /// Con los objetos ya sabemos que no basta con el accessor: ItemData memoriza el nombre en
-        /// MemoizedValues y no vuelve a preguntar. NpcData es una clase del mismo corte, asi que
-        /// es razonable que haga lo mismo, pero no esta comprobado. Esto lo tapa por si acaso.
+        /// With items we already know the accessor is not enough: ItemData memoises the name in
+        /// MemoizedValues and does not ask again. NpcData is a class of the same cut, so
+        /// it is reasonable that it does the same, but it is not checked. This covers it just in case.
         ///
-        /// Va por reflexion, como el parche de CartographyManager de mas abajo: no se sabe en que
-        /// espacio de nombres vive NpcData, y un typeof() que no resuelva no compila. Si no se
-        /// encuentra, se avisa y se sigue con el accessor, que probablemente ya sea suficiente.
+        /// It goes by reflection, like the CartographyManager patch further down: it is not known in which
+        /// namespace NpcData lives, and a typeof() that does not resolve does not compile. If it is not
+        /// found, a warning is given and it carries on with the accessor, which is probably already enough.
         /// </summary>
         private void PatchNpcName()
         {
@@ -754,6 +754,13 @@ namespace JondoFix
 
         public override void OnUpdate()
         {
+            // The administrator's item window: its key, and what the server answered it.
+            if (IsJondoAdministrator)
+            {
+                try { AdminItemsUi.Tick(); }
+                catch (Exception ex) { LoggerInstance.Warning($"[JondoFix] Item window: {ex.Message}"); }
+            }
+
             if (UseLocalRedirect && !itemMappingsLoadedFromClient)
             {
                 try
@@ -1379,16 +1386,16 @@ namespace JondoFix
     }
 
     /// <summary>
-    /// El nombre de un objeto, que es lo que leen las filas de la enciclopedia y el inventario.
+    /// An item's name, which is what the encyclopedia's and the inventory's rows read.
     ///
-    /// Aqui pasan dos cosas, y en este orden: primero se sustituye el nombre si el objeto esta en
-    /// la tabla de Jondo —la Jondo Coin—, y despues, solo al administrador, se le pega el id
-    /// detras. Asi un administrador ve «Jondo Coin [20440]» y un jugador «Jondo Coin».
+    /// Here two things happen, in this order: first the name is replaced if the item is in
+    /// Jondo's table —the Jondo Coin—, and then, only for the administrator, the id is stuck
+    /// behind it. That way an administrator sees «Jondo Coin [20440]» and a player «Jondo Coin».
     ///
-    /// Parchear solo el accessor de localizacion no bastaba, y ya se sabe por que: ItemData
-    /// memoriza el nombre, la descripcion y el nombre sin tildes en su clase anidada
-    /// MemoizedValues, y despues de la primera vez no vuelve a preguntar. Hay que coger la
-    /// propiedad.
+    /// Patching only the localisation accessor was not enough, and it is known why: ItemData
+    /// memoises the name, the description and the accentless name in its nested class
+    /// MemoizedValues, and after the first time it does not ask again. The
+    /// property has to be caught.
     /// </summary>
     [HarmonyPatch(typeof(ItemData), "get_name")]
     public class AdminItemNameIdPatch
@@ -1403,9 +1410,9 @@ namespace JondoFix
                     JondoRenames.ById.TryGetValue(__instance.id, out var renamed) &&
                     !string.IsNullOrEmpty(renamed.Name))
                 {
-                    // El idioma se saca de aqui: lo que hay en __result es el nombre que el
-                    // cliente acaba de resolver de SU fichero de textos, y es lo unico que
-                    // distingue un es.bin de un fr.bin. Hay que mirarlo antes de pisarlo.
+                    // The language is taken from here: what is in __result is the name the
+                    // client has just resolved from ITS text file, and it is the only thing that
+                    // tells an es.bin from an fr.bin. It has to be looked at before overwriting it.
                     JondoLanguage.Sniff(__result);
                     __result = renamed.Name;
                 }
@@ -1432,10 +1439,10 @@ namespace JondoFix
     }
 
     /// <summary>
-    /// El nombre de un NPC. Se engancha a mano desde JondoFixMod.PatchNpcName; ver alli por que.
+    /// An NPC's name. It is hooked by hand from JondoFixMod.PatchNpcName; see there for why.
     ///
-    /// Busca por el nameId del NPC y no por su id, porque es la misma tabla de claves de texto que
-    /// usa todo lo demas y asi no hace falta una segunda.
+    /// It looks up by the NPC's nameId and not by its id, because it is the same text key table
+    /// everything else uses and that way a second one is not needed.
     /// </summary>
     public static class JondoNpcNamePatch
     {
@@ -1467,8 +1474,8 @@ namespace JondoFix
     }
 
     /// <summary>
-    /// El nombre sin tildes que usa la busqueda del mercadillo. Se engancha a mano desde
-    /// JondoFixMod.PatchUnDiacriticalName; ver alli por que no lleva atributo.
+    /// The accentless name the marketplace search uses. It is hooked by hand from
+    /// JondoFixMod.PatchUnDiacriticalName; see there for why it carries no attribute.
     /// </summary>
     public static class JondoUnDiacriticalPatch
     {
@@ -1480,8 +1487,8 @@ namespace JondoFix
                     JondoRenames.ById.TryGetValue(__instance.id, out var renamed) &&
                     !string.IsNullOrEmpty(renamed.Name))
                 {
-                    // «Jondo Coin» no lleva ninguna tilde, asi que la forma sin tildes es la misma
-                    // palabra. Si algun dia se renombra algo con acentos, aqui hay que quitarlos.
+                    // «Jondo Coin» carries no accent, so the accentless form is the same
+                    // word. If some day something is renamed with accents, they have to be removed here.
                     __result = renamed.Name;
                 }
             }
@@ -1493,7 +1500,7 @@ namespace JondoFix
     }
 
     /// <summary>
-    /// Y la descripcion, por el mismo camino y por el mismo motivo que el nombre.
+    /// And the description, by the same path and for the same reason as the name.
     /// </summary>
     [HarmonyPatch(typeof(ItemData), "get_description")]
     public class JondoItemDescriptionPatch
@@ -1516,13 +1523,13 @@ namespace JondoFix
     }
 
     /// <summary>
-    /// La red de reserva: el accessor de textos, filtrado por las claves concretas de la tabla.
+    /// The safety net: the text accessor, filtered by the table's specific keys.
     ///
-    /// ItemData cubre el inventario y la enciclopedia, pero no todos los caminos pasan por ahi:
-    /// el registro de combate tiene su propia cache, los enlaces de objeto del chat y la
-    /// interpolacion de «$item{n}» de los mensajes de informacion van al accessor directamente.
-    /// Esto los tapa. Solo toca las claves que estan en la tabla, asi que no puede afectar a
-    /// ningun otro texto del juego.
+    /// ItemData covers the inventory and the encyclopedia, but not every path goes through there:
+    /// the fight log has its own cache, and the chat's item links and the
+    /// «$item{n}» interpolation of the information messages go to the accessor directly.
+    /// This covers them. It only touches the keys in the table, so it cannot affect
+    /// any other text in the game.
     /// </summary>
     [HarmonyPatch(typeof(Il2CppCore.Localization.Utils.LocalizationAccessor), "TryGetLocalization", new Type[] { typeof(int), typeof(string) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Out })]
     public class JondoLocalizationPatch

@@ -5,25 +5,25 @@ using Cpp2IL.Core.Model.Contexts;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El cliente entero abierto por dentro: no las fachadas, el código de verdad.
+/// The whole client opened from the inside: not the façades, the real code.
 ///
-/// Hasta aquí el protocolo se sacaba de los ensamblados que deja Cpp2IL en <c>cpp2il_out</c>, y eso
-/// basta para los NÚMEROS y los TIPOS de cada mensaje. Pero esos ensamblados están huecos: sus
-/// métodos no tienen cuerpo. Medido: de los 110.811 métodos de <c>Core.dll</c>, ninguno pasa de
-/// dieciséis bytes de IL, y la mediana son dos. El código del juego no está ahí; está compilado a
-/// máquina dentro de <c>GameAssembly.dll</c>.
+/// Until now the protocol was taken from the assemblies Cpp2IL leaves in <c>cpp2il_out</c>, and that
+/// is enough for each message's NUMBERS and TYPES. But those assemblies are hollow: their
+/// methods have no body. Measured: of the 110,811 methods of <c>Core.dll</c>, none goes beyond
+/// sixteen bytes of IL, and the median is two. The game's code is not there; it is compiled to
+/// machine code inside <c>GameAssembly.dll</c>.
 ///
-/// Por eso esto no lee ficheros .dll sino el cliente en crudo —el binario más los metadatos— con la
-/// misma biblioteca que usa Cpp2IL. A cambio de cargar 110 MB se obtiene lo que no había: qué hace
-/// cada método. La conversión a ISIL —un lenguaje intermedio independiente de la máquina— resuelve
-/// además las llamadas y los usos de metadatos, así que un <c>call</c> deja de ser una dirección y
-/// pasa a ser «llama a tal método de tal clase».
+/// That is why this does not read .dll files but the raw client —the binary plus the metadata— with the
+/// same library Cpp2IL uses. In exchange for loading 110 MB one gets what was missing: what
+/// each method does. The conversion to ISIL —a machine-independent intermediate language— also resolves
+/// the calls and the metadata uses, so a <c>call</c> stops being an address and
+/// becomes «calls such method of such class».
 ///
-/// Coste medido en este cliente: nueve segundos en cargar y veinte en analizar los 366.413 métodos.
+/// Cost measured on this client: nine seconds to load and twenty to analyse the 366,413 methods.
 /// </summary>
 public sealed class ClientReader : IDisposable
 {
-    /// <summary>Prepara el cliente. La ruta es la carpeta donde está Dofus.exe.</summary>
+    /// <summary>Prepares the client. The path is the folder where Dofus.exe is.</summary>
     public ClientReader(string clientFolder)
     {
         Folder = clientFolder;
@@ -44,8 +44,8 @@ public sealed class ClientReader : IDisposable
 
         App = Cpp2IlApi.CurrentAppContext;
 
-        // Si esto no está, lo que se ha abierto no es el cliente de Dofus. Mejor decirlo aquí que
-        // dejar que reviente veinte segundos después, en medio del barrido y sin explicar por qué.
+        // If this is not there, what has been opened is not the Dofus client. Better to say so here than
+        // to let it blow up twenty seconds later, in the middle of the sweep and without explaining why.
         Protocol = App.GetAssemblyByName("Ankama.Dofus.Protocol.Game")
                    ?? throw new InvalidOperationException(
                        $"en {clientFolder} no hay Ankama.Dofus.Protocol.Game: ¿es la carpeta del cliente?");
@@ -55,24 +55,24 @@ public sealed class ClientReader : IDisposable
     public UnityVersion Version { get; }
     public ApplicationAnalysisContext App { get; }
 
-    /// <summary>El ensamblado del protocolo del juego, donde viven los mensajes.</summary>
+    /// <summary>The game's protocol assembly, where the messages live.</summary>
     public AssemblyAnalysisContext Protocol { get; }
 
     /// <summary>
-    /// Los mensajes del protocolo: los tipos que implementan <c>IMessage</c>.
+    /// The protocol's messages: the types implementing <c>IMessage</c>.
     ///
-    /// Se pregunta por la interfaz y no por el nombre de tres letras a propósito. Los dos criterios
-    /// dan lo mismo hoy —2.169 tipos en 3.6.10.10— pero el nombre es una costumbre de Ankama y la
-    /// interfaz es lo que de verdad hace que algo viaje por el cable.
+    /// The interface is asked for and not the three-letter name on purpose. Both criteria
+    /// give the same today —2,169 types in 3.6.10.10— but the name is an Ankama habit and the
+    /// interface is what really makes something travel on the wire.
     /// </summary>
     public IEnumerable<TypeAnalysisContext> Messages()
         => Protocol.Types.Where(t => t.InterfaceContexts.Any(i => i.Name is "IMessage" or "IBufferMessage"));
 
     /// <summary>
-    /// Todos los métodos del cliente, con el ensamblado al que pertenecen.
+    /// All the client's methods, with the assembly they belong to.
     ///
-    /// Incluye los de UnityEngine y los de mscorlib, que no interesan por sí mismos pero sí como
-    /// eslabones: un método del juego puede llegar a un mensaje pasando por una lista genérica.
+    /// It includes those of UnityEngine and mscorlib, which are of no interest in themselves but are as
+    /// links: a game method can reach a message going through a generic list.
     /// </summary>
     public IEnumerable<MethodAnalysisContext> AllMethods()
         => App.Assemblies.SelectMany(a => a.Types).SelectMany(t => t.Methods);
@@ -80,13 +80,13 @@ public sealed class ClientReader : IDisposable
     public void Dispose() => Cpp2IlApi.ResetInternalState();
 
     /// <summary>
-    /// El arranque de Cpp2IL, que se hace UNA vez por proceso.
+    /// Cpp2IL's startup, which is done ONCE per process.
     ///
-    /// <c>Init</c> registra los complementos recorriendo una lista mientras le añade cosas, así que
-    /// la segunda llamada revienta con «Collection was modified». No se nota abriendo un cliente,
-    /// que es lo que se hacía hasta ahora; se nota abriendo ocho seguidos para recorrer la cadena.
-    /// <c>ResetInternalState</c>, que es lo que deja Dispose, limpia el cliente cargado pero no los
-    /// complementos, así que basta con no repetir el registro.
+    /// <c>Init</c> registers the plugins walking a list while adding things to it, so
+    /// the second call blows up with «Collection was modified». It is not noticed opening one client,
+    /// which is what was done until now; it is noticed opening eight in a row to walk the chain.
+    /// <c>ResetInternalState</c>, which is what Dispose leaves, cleans the loaded client but not the
+    /// plugins, so it is enough not to repeat the registration.
     /// </summary>
     private static bool _ready;
 

@@ -9,29 +9,29 @@ using Jondo.Unity.World.Fights;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los Sueños Infinitos: el mapa de un sueño y por dónde va cada jugador.
+    /// The Infinite Dreams: a dream's map and where each player is.
     /// </summary>
     /// <remarks>
-    /// Es la versión del POZO, la refundición que convirtió los Sueños en un roguelite: eliges
-    /// dificultad, te dan un mapa de salas con bifurcaciones, y en cada sala hay un grupo y una
-    /// modificación. Las anteriores funcionaban de otra manera y no valen de referencia.
+    /// It is the WELL version, the remake that turned the Dreams into a roguelite: you choose a
+    /// difficulty, you get a map of rooms with forks, and in each room there is a group and a modifier.
+    /// The previous ones worked differently and are no good as a reference.
     ///
-    /// Todo lo de aquí sale de las trece capturas de <c>Sueños Infinitos/</c>. El mensaje que abre
-    /// la ventana, el iyj, trae DOS listas y son la clave del asunto:
+    /// Everything here comes from the thirteen captures in <c>Sueños Infinitos/</c>. The message that
+    /// opens the window, the iyj, carries TWO lists and they are the key to it:
     ///
     /// <code>
-    ///   las salas    f1 = "0".."10"
-    ///                  f6   la fila del grafo
+    ///   the rooms    f1 = "0".."10"
+    ///                  f6   the graph's row
     ///                  f4   what the room gives: a Reward, whose f10 is its InfiniteDreamRewardData row
-    ///   el grafo     0 -> 1,2   1 -> 3,4   2 -> 4,5   3 -> 6,7
+    ///   the graph    0 -> 1,2   1 -> 3,4   2 -> 4,5   3 -> 6,7
     ///                4 -> 7,8   5 -> 8,9   6..9 -> 10
     /// </code>
     ///
-    /// Que dibuja un rombo de once salas en cinco filas —1, 2, 3, 4, 1— y no un árbol: a la sala 4
-    /// se llega desde la 1 y desde la 2.
+    /// Which draws a diamond of eleven rooms in five rows -- 1, 2, 3, 4, 1 -- and not a tree: room 4 is
+    /// reached from 1 and from 2.
     ///
-    ///   MEDIDO en la captura de Paradoja I, sala por sala: la fila que dice el f6 de cada una
-    ///   coincide exactamente con la que le toca en el grafo. The f9 of those rooms -- 14931,
+    ///   MEASURED in the Paradoja I capture, room by room: the row each one's f6 says matches
+    ///   exactly the one it gets in the graph. The f9 of those rooms -- 14931,
     ///   14812, 15026, 14798, 14797 -- were read here as MapMobs groups, and they are the
     ///   rewards' icons: 14798 is +20% vitality in every room it appears in, while the bestiary
     ///   lists different monsters each time. The group a room is fought against is chosen here
@@ -42,24 +42,24 @@ namespace Jondo.Unity.Server.Managers
     /// InfiniteDreamGateTooltipBuilder.SetupViewWithContent @0x182D80E58, which names them
     /// startRoom, fightRoom, dreamFavor, dreamFountain and bossRoom in that order.
     ///
-    /// La dificultad va de 1 a 10 y la numeración también está medida, comparando el ixf de nueve
-    /// capturas contra el nombre que el jugador eligió en cada una:
+    /// The difficulty goes from 1 to 10 and the numbering is measured too, comparing the ixf of nine
+    /// captures against the name the player chose in each:
     ///
     /// <code>
-    ///   1..3   Sueño I, II, III            8..10  Pesadilla I, II, III
-    ///   4..7   Paradoja I, II, III, IV
+    ///   1..3   Dream I, II, III            8..10  Nightmare I, II, III
+    ///   4..7   Paradox I, II, III, IV
     /// </code>
     /// </remarks>
     public static class Dreams
     {
-        /// <summary>Cuántas salas hay en cada fila del rombo. Medido sobre el grafo del iyj.</summary>
+        /// <summary>How many rooms there are in each row of the diamond. Measured on the iyj's graph.</summary>
         private static readonly int[] Filas = { 1, 3, 3, 3, 1 };
 
-        /// <summary>Lo que puede medir una fila de en medio. Medido de 2 a 4 en nueve capturas.</summary>
+        /// <summary>What a middle row can measure. Measured from 2 to 4 in nine captures.</summary>
         private const int MinimoPorFila = 2;
         private const int MaximoPorFila = 4;
 
-        /// <summary>Y lo que suman las tres juntas: de 7 a 9, o sea sueños de 9, 10 u 11 salas.</summary>
+        /// <summary>And what the three add up to together: from 7 to 9, that is dreams of 9, 10 or 11 rooms.</summary>
         private const int MinimoDeEnMedio = 7;
         private const int MaximoDeEnMedio = 9;
 
@@ -257,85 +257,85 @@ namespace Jondo.Unity.Server.Managers
         private const int LastSueno = 3;
         private const int LastParadoja = 7;
 
-        /// <summary>La dificultad más alta, Pesadilla III.</summary>
+        /// <summary>The highest difficulty, Nightmare III.</summary>
         public const int MaximaDificultad = 10;
 
-        /// <summary>El mapa del Plano Astral, que es donde está el pozo.</summary>
+        /// <summary>The Astral Plane's map, which is where the well is.</summary>
         /// <remarks>
-        /// Medido: es a donde lleva el jru que sigue al iyc del botón del menú, y en nuestra propia
-        /// base es la subárea 938, «Dominios de Draconiros».
+        /// Measured: it is where the jru following the menu button's iyc leads, and in our own database it is
+        /// subarea 938, «Dominios de Draconiros».
         /// </remarks>
         public const long MapaDelPozo = 238551040;
 
-        /// <summary>El pozo, que en los datos del cliente es un elemento más de ese mapa.</summary>
+        /// <summary>The well, which in the client's data is one more element of that map.</summary>
         /// <remarks>
-        /// El 539616, gráfico 90166, casilla 370. Está en el mapa desde siempre; lo que faltaba era
-        /// declararle una acción, porque sin ella el cliente no lo deja pulsar y queda de adorno.
+        /// 539616, graphic 90166, cell 370. It has always been on the map; what was missing was declaring an
+        /// action for it, because without one the client does not let it be pressed and it stays decoration.
         /// </remarks>
         public const int ElementoDelPozo = 539616;
 
-        /// <summary>La habilidad con la que se usa el pozo.</summary>
+        /// <summary>The skill the well is used with.</summary>
         /// <remarks>
-        /// El 20743 del iwo «0887a20110e0f720» NO es esto. Es el uid de instancia, y confundir uno
-        /// con otro es lo que dejó el pozo sin pulsar: anunciábamos la habilidad 20743, que el
-        /// cliente no conoce, y un elemento cuya habilidad no existe no se puede clicar y no da un
-        /// solo error. El f11 del jss real del mapa lo dice campo a campo:
+        /// The 20743 of the iwo «0887a20110e0f720» is NOT this. It is the instance uid, and mistaking one for
+        /// the other is what left the well unpressable: we announced skill 20743, which the client does not
+        /// know, and an element whose skill does not exist cannot be clicked and gives not a single error. The
+        /// f11 of the map's real jss says it field by field:
         ///
         ///   f11 { f1: 1, f4 { f1: 20744, f2: 360 }, f4 { f1: 20743, f2: 184 }, f5: 539616, f6: -1 }
         ///
-        /// El f4.f1 es el uid —lo que el cliente devuelve en el iwo— y el f4.f2 la habilidad. La
-        /// 184 es la misma con la que ya se entra en una casa y se usa la lotería, así que el
-        /// cliente la conoce de sobra. El uid nuestro lo pone Interactives.SkillInstanceOf y el
-        /// cliente lo devuelve tal cual, así que no hace falta copiar el suyo.
+        /// f4.f1 is the uid -- what the client sends back in the iwo -- and f4.f2 the skill. 184 is the same one
+        /// a house is already entered with and the lottery used with, so the client knows it well. Our uid is
+        /// set by Interactives.SkillInstanceOf and the client sends it back as is, so there is no need to copy
+        /// theirs.
         /// </remarks>
         public const int HabilidadDelPozo = 184;
 
-        /// <summary>El tipo de interactivo del pozo y de las arcadas: el f6 del f11, medido en -1.</summary>
+        /// <summary>The interactive type of the well and of the arches: the f11's f6, measured at -1.</summary>
         public const int TipoDelPozo = -1;
 
-        /// <summary>La segunda acción del pozo, la del f4 { 20744, 360 }.</summary>
+        /// <summary>The well's second action, the one of f4 { 20744, 360 }.</summary>
         /// <remarks>
-        /// El pozo ofrece DOS cosas, no una: en las 22 tramas jss del mapa 238551040 que hay en las
-        /// trece capturas —las 22 idénticas— van dos f4, el de la habilidad 184 y éste. Declarar
-        /// sólo uno deja al jugador con media carta.
+        /// The well offers TWO things, not one: in the 22 jss frames of map 238551040 in the thirteen
+        /// captures -- all 22 identical -- two f4 go, the one with skill 184 and this one. Declaring only one
+        /// leaves the player with half the menu.
         ///
-        /// Qué contesta el servidor real a ésta no se ha medido: en las capturas nadie la pulsa,
-        /// las once veces que se usa el pozo van por la 184. Aquí abre la misma ventana, que es lo
-        /// único que sabemos hacer con el pozo, y queda dicho que es una suposición.
+        /// What the real server answers to this one has not been measured: in the captures nobody presses it,
+        /// the eleven times the well is used go through 184. Here it opens the same window, which is the only
+        /// thing we know how to do with the well, and it is stated that it is an assumption.
         /// </remarks>
         public const int SegundaHabilidadDelPozo = 360;
 
-        /// <summary>El mapa de la sala de entrada de todo sueño.</summary>
+        /// <summary>The map of every dream's entrance room.</summary>
         /// <remarks>
-        /// Medido en las diez capturas que empiezan un sueño: el jru que sigue al primer izg lleva
-        /// siempre aquí, sin excepción. Las salas de pelea vienen después y ésas sí cambian.
+        /// Measured in the ten captures that start a dream: the jru following the first izg always leads
+        /// here, without exception. The fight rooms come afterwards and those do change.
         /// </remarks>
         public const long MapaDeEntrada = 237897728;
 
-        /// <summary>La subárea donde viven las salas: 484 mapas hechos para esto.</summary>
+        /// <summary>The subarea where the rooms live: 484 maps made for this.</summary>
         /// <remarks>
-        /// Los nueve mapas de sala que aparecen en las capturas —237764608, 237765632, 237766656,
-        /// 237767680, 237768704, 237765684, 237765686, 237777980 y 237774854— están todos aquí, y
-        /// también la entrada. Cada uno lleva EXACTAMENTE tres elementos interactivos con el
-        /// gráfico 90166, que son las tres puertas a la fila de abajo.
+        /// The nine room maps appearing in the captures -- 237764608, 237765632, 237766656, 237767680,
+        /// 237768704, 237765684, 237765686, 237777980 and 237774854 -- are all here, and so is the entrance.
+        /// Each one carries EXACTLY three interactive elements with graphic 90166, which are the three doors to
+        /// the row below.
         ///
-        /// Esto es lo que faltaba para que entrar en un sueño no fuese un viaje a Frigost: se
-        /// estaba mandando al jugador al mapa del grupo de monstruos, que es un mapa del mundo.
+        /// This is what was missing for going into a dream not to be a trip to Frigost: the player was being
+        /// sent to the monster group's map, which is a world map.
         /// </remarks>
         public const int SubareaDeLasSalas = 904;
 
-        /// <summary>Cuántas puertas tiene una sala. Tres en los 100 mapas que las traen.</summary>
+        /// <summary>How many doors a room has. Three in the 100 maps that carry them.</summary>
         public const int PuertasPorSala = 3;
 
-        /// <summary>La sala de Draconiros, al otro lado de cualquiera de las cuatro arcadas.</summary>
+        /// <summary>Draconiros's room, on the other side of any of the four arches.</summary>
         /// <remarks>
-        /// No es vecina de la del pozo en la rejilla —una está en (0,0) y la otra en (1,-1)— así que
-        /// no se llega andando: se llega pulsando una arcada. Sin declararlas, Draconiros está bien
-        /// colocado y es inalcanzable, que para el jugador es lo mismo que no estar.
+        /// It is not the well's neighbour on the grid -- one is at (0,0) and the other at (1,-1) -- so it is
+        /// not reached on foot: it is reached by pressing an arch. Without declaring them, Draconiros is well
+        /// placed and unreachable, which for the player is the same as not being there.
         /// </remarks>
         public const long MapaDeDraconiros = 238553348;
 
-        /// <summary>Las dos clases de sala del f3: 5 en 63 salas medidas, 15 en 8.</summary>
+        /// <summary>The two classes of room of f3: 5 in 63 measured rooms, 15 in 8.</summary>
         private const int ClaseNormal = 5;
         private const int ClaseSenalada = 15;
 
@@ -343,22 +343,21 @@ namespace Jondo.Unity.Server.Managers
         private const int ClaseDeLaVenta = 10;
         private const int FilaDeLaVenta = 22;
 
-        /// <summary>Cuántos sueños se le han ofrecido a cada personaje, para el f13.</summary>
+        /// <summary>How many dreams each character has been offered, for f13.</summary>
         private static readonly Dictionary<long, int> _cuenta = new Dictionary<long, int>();
 
         /// <summary>
-        /// Un potenciador de los Sueños: lo que una sala regala al entrar.
+        /// A Dreams booster: what a room gives away on entering.
         /// </summary>
         /// <remarks>
-        /// Censados los 196 f15 de las quince capturas, y sólo hay dos formas:
+        /// The 196 f15 of the fifteen captures were counted, and there are only two shapes:
         ///
-        ///   f15 { f1 { f4: el valor,        f11: el efecto }, f2: 1 }   132 veces
-        ///   f15 { f1 { f6 { f1: cuántos },  f11: el efecto }, f2: 1 }    64 veces
+        ///   f15 { f1 { f4: the value,       f11: the effect }, f2: 1 }   132 times
+        ///   f15 { f1 { f6 { f1: how many }, f11: the effect }, f2: 1 }    64 times
         ///
-        /// El f11 es un id del catálogo de efectos del propio cliente —2844 es «% vitalidad», 111
-        /// «PA», 128 «PM», 117 «alcance»—, así que no hay nada que inventar: el cliente sabe
-        /// escribir la línea él solo. La segunda forma es la de los efectos cuyo texto nombra un
-        /// hechizo, como el 281 «+#3 de alcance máximo».
+        /// f11 is an id of the client's own effect catalogue -- 2844 is «% vitality», 111 «AP», 128 «MP», 117
+        /// «range» --, so there is nothing to make up: the client knows how to write the line by itself. The
+        /// second shape is that of the effects whose text names a spell, like 281 «+#3 maximum range».
         /// </remarks>
         public sealed class Bono
         {
@@ -369,19 +368,19 @@ namespace Jondo.Unity.Server.Managers
                 Anidado = anidado;
             }
 
-            /// <summary>El id del catálogo de efectos: el f11.</summary>
+            /// <summary>The effect catalogue's id: the f11.</summary>
             public int Efecto { get; }
 
-            /// <summary>Cuánto da.</summary>
+            /// <summary>How much it gives.</summary>
             public int Valor { get; }
 
             /// <summary>
-            /// Si el valor viaja dentro del f6 en vez de en el f4.
+            /// Whether the value travels inside f6 instead of f4.
             /// </summary>
             /// <remarks>
-            /// Es sólo dónde va el número, no a qué se aplica. El «+alcance máximo» del 281 sube
-            /// el alcance de TODOS los hechizos, no el de uno; leerlo como una referencia a un
-            /// hechizo concreto sería equivocarse con el mismo campo por segunda vez.
+            /// It is only where the number goes, not what it applies to. 281's «+maximum range» raises the range
+            /// of ALL spells, not of one; reading it as a reference to a specific spell would be getting the same
+            /// field wrong a second time.
             /// </remarks>
             public bool Anidado { get; }
         }
@@ -512,39 +511,39 @@ namespace Jondo.Unity.Server.Managers
 
         public sealed class Sala
         {
-            /// <summary>Su número, que en el cable viaja como CADENA: «0», «1»…</summary>
+            /// <summary>Its number, which on the wire travels as a STRING: «0», «1»…</summary>
             public int Id { get; init; }
 
-            /// <summary>La fila del rombo, de 0 a 4. Es el f6 del iyj.</summary>
+            /// <summary>The diamond's row, from 0 to 4. It is the iyj's f6.</summary>
             public int Fila { get; init; }
 
-            /// <summary>A qué salas se puede ir desde aquí.</summary>
+            /// <summary>Which rooms can be reached from here.</summary>
             [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
             public List<int> Salidas { get; } = new List<int>();
 
-            /// <summary>La fila de MapMobs que se pelea aquí. Cero en la entrada.</summary>
+            /// <summary>The MapMobs row fought here. Zero at the entrance.</summary>
             public int Grupo { get; set; }
 
-            /// <summary>Los monstruos de ese grupo, con su grado, para plantarlos en la sala.</summary>
+            /// <summary>That group's monsters, with their grade, to place them in the room.</summary>
             [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
             public List<(int Monstruo, int Grado)> Miembros { get; } = new List<(int, int)>();
 
-            /// <summary>El grupo ya plantado en el mapa de la sala, para poder quitarlo.</summary>
+            /// <summary>The group already placed on the room's map, to be able to remove it.</summary>
             /// <remarks>Not saved: after a restart nothing is planted, and the room plants anew.</remarks>
             [JsonIgnore]
             public long Plantado { get; set; }
 
-            /// <summary>El mapa del mundo donde vive ese grupo. NO es a donde se va el jugador.</summary>
+            /// <summary>The world map where that group lives. It is NOT where the player goes.</summary>
             /// <remarks>
-            /// Se guarda para poder plantar la pelea con los monstruos que le tocan; mandarle a él
-            /// allí es lo que le dejaba en mitad de Frigost con el minimapa apagado.
+            /// It is kept to be able to set up the fight with the monsters that belong to it; sending him there is
+            /// what left him in the middle of Frigost with the minimap off.
             /// </remarks>
             public long MapaId { get; set; }
 
-            /// <summary>El mapa de la subárea 904 en el que ocurre esta sala.</summary>
+            /// <summary>The subarea 904 map where this room takes place.</summary>
             public long MapaDeLaSala { get; set; }
 
-            /// <summary>La casilla donde está plantado el grupo.</summary>
+            /// <summary>The cell where the group is placed.</summary>
             public int Casilla { get; set; }
 
             /// <summary>What the room gives on entering. Null at the entrance and at a fountain.</summary>
@@ -582,14 +581,14 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Whether the favour of this room was chosen: until then its doors stay shut.</summary>
             public bool FavorChosen { get; set; }
 
-            /// <summary>El efecto que modifica la sala, y cuánto. Cero: sin modificación.</summary>
+            /// <summary>The effect that modifies the room, and by how much. Zero: no modifier.</summary>
             [JsonIgnore] public int Efecto => Regalo?.Efecto ?? 0;
             [JsonIgnore] public int Valor => Regalo?.Valor ?? 0;
 
-            /// <summary>Si ya se ha peleado aquí.</summary>
+            /// <summary>Whether it has already been fought here.</summary>
             public bool Hecha { get; set; }
 
-            /// <summary>Si ya se cobró su potenciador. Se vuelve a entrar al continuar un sueño.</summary>
+            /// <summary>Whether its booster has already been collected. The room is entered again when continuing a dream.</summary>
             public bool Cobrada { get; set; }
 
             /// <summary>The room's score: its f1 in the graph.</summary>
@@ -609,10 +608,10 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>The band the room was made in, from 1. A fountain closes its band and opens the next.</summary>
             public int Franja { get; set; } = 1;
 
-            /// <summary>Sala señalada. El f7, que vale 1 en 8 de las 89 y siempre con Clase 15.</summary>
+            /// <summary>Marked room. The f7, which is 1 in 8 of the 89 and always with Class 15.</summary>
             public bool Senalada { get; set; }
 
-            /// <summary>Si esta sala es la Fuente Onírica: la tienda, y siempre la última de su franja.</summary>
+            /// <summary>Whether this room is the Dream Fountain: the shop, and always the last of its band.</summary>
             /// <remarks>
             /// The kind, the f5, over the 293 distinct rooms of the captures' graphs: 244 of kind 1
             /// (fights), 24 of kind 3 (fountains, the last row of every band but band IV's), 6 of
@@ -620,8 +619,9 @@ namespace Jondo.Unity.Server.Managers
             /// kind 4 (its Fin du rêve). A census of rows 1 to 4 alone, 665 rooms of kinds 1 and 3,
             /// was taken for the whole dream for a time.
             ///
-            /// El propio cliente lo dice al pasar el ratón: «Fuente onírica - TIENDA - te permite
-            /// intercambiar tus puntos de sueño por bonus». Lo saca de este número.
+            /// The client itself says so on hovering: «Fuente onírica - TIENDA - te permite intercambiar tus puntos
+            /// de sueño por bonus» (Dream fountain - SHOP - lets you trade your dream points for bonuses). It takes
+            /// it from this number.
             /// </remarks>
             public bool EsFuente { get; set; }
 
@@ -646,7 +646,7 @@ namespace Jondo.Unity.Server.Managers
             [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
             public List<Sala> Salas { get; } = new List<Sala>();
 
-            /// <summary>En qué sala está. Empieza en la cero, que es la entrada.</summary>
+            /// <summary>Which room he is in. It starts at zero, which is the entrance.</summary>
             public int Actual { get; set; }
 
             /// <summary>The breed of the dreamer: the f4 of the izg's f1, the portrait.</summary>
@@ -677,7 +677,7 @@ namespace Jondo.Unity.Server.Managers
             [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
             public List<int> Visited { get; } = new List<int>();
 
-            /// <summary>Tormentas astrales que quedan. Es el f7, y el número del botón.</summary>
+            /// <summary>Astral storms left. It is the f7, and the button's number.</summary>
             public int Tormentas { get; set; } = 1;
 
             /// <summary>
@@ -695,35 +695,35 @@ namespace Jondo.Unity.Server.Managers
             /// </remarks>
             public int Arena { get; set; }
 
-            /// <summary>Los potenciadores ya cobrados, en el orden en que cayeron.</summary>
+            /// <summary>The boosters already collected, in the order they fell.</summary>
             /// <remarks>
-            /// Se cobra al ENTRAR en la sala, no al ganarla: la guía dice que los bonos se
-            /// recogen al entrar y que el combate empieza inmediatamente después.
+            /// It is collected ON ENTERING the room, not on winning it: the guide says bonuses are picked up on
+            /// entering and the fight starts immediately afterwards.
             /// </remarks>
             [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
             public List<Bono> Ganados { get; } = new List<Bono>();
 
-            /// <summary>Por qué franja va, empezando por la I.</summary>
+            /// <summary>Which band he is on, starting with I.</summary>
             /// <remarks>
-            /// La guía del juego lo dice con todas las letras: «Chaque palier (à l'exception du
-            /// premier et du dernier) commencera toujours par une Fontaine Onirique». O sea que la
-            /// fuente que ABRE una franja es la última sala de la anterior: la misma vista desde
-            /// los dos lados, que es justo lo que se mide —fila 4 con tipo 3 en 68 de 68—.
+            /// The game's guide says it in so many words: «Chaque palier (à l'exception du premier et du dernier)
+            /// commencera toujours par une Fontaine Onirique». So the fountain that OPENS a band is the last room of
+            /// the previous one: the same seen from both sides, which is exactly what is measured -- row 4 with
+            /// type 3 in 68 of 68 --.
             ///
-            /// Por eso al entrar en la fuente el sueño no se acaba: se le añade la franja
-            /// siguiente y se sigue bajando. En la captura larga se ve el grafo creciendo, con
-            /// salas de fila 5 y más dentro del mismo f16.
+            /// That is why on entering the fountain the dream does not end: the next band is added and one keeps
+            /// going down. In the long capture the graph can be seen growing, with rooms of row 5 and beyond inside
+            /// the same f16.
             /// </remarks>
             public int Franja { get; set; } = 1;
 
-            /// <summary>Cuántos sueños se le han ofrecido ya. Es el f13 del iyj.</summary>
+            /// <summary>How many dreams he has already been offered. It is the iyj's f13.</summary>
             /// <remarks>
-            /// Las nueve capturas son del mismo personaje y el f13 vale 1, 2, 3, 4, 5, 6, 8, 9 y
-            /// 10, en el orden en que se grabaron. O sea: una cuenta, no un identificador.
+            /// The nine captures are of the same character and f13 is 1, 2, 3, 4, 5, 6, 8, 9 and 10, in the order
+            /// they were recorded. That is: a count, not an identifier.
             /// </remarks>
             public int Cuenta { get; init; }
 
-            /// <summary>Dónde estaba en el mundo antes de entrar, para devolverlo al salir.</summary>
+            /// <summary>Where he was in the world before going in, to send him back on leaving.</summary>
             public long MapaDeVuelta { get; init; }
             public int CasillaDeVuelta { get; init; }
 
@@ -740,10 +740,10 @@ namespace Jondo.Unity.Server.Managers
         private static readonly ConcurrentDictionary<long, Sueno> _enCurso = new();
         private static readonly Random _azar = new Random();
 
-        /// <summary>Los grupos que se pueden plantar en una sala, por nivel.</summary>
+        /// <summary>The groups that can be placed in a room, by level.</summary>
         /// <remarks>
-        /// Se leen una vez y se quedan: son 38.744 filas y consultarlas por sala sería una lectura
-        /// completa por bifurcación. Sólo interesan el mapa, la casilla y el nivel del grupo.
+        /// They are read once and kept: they are 38,744 rows and querying them per room would be a full read
+        /// per fork. Only the map, the cell and the group's level matter.
         /// </remarks>
         private static List<(int Id, long MapaId, int Casilla, int Nivel, string Miembros)>? _grupos;
         private static readonly object _candado = new object();
@@ -836,12 +836,11 @@ namespace Jondo.Unity.Server.Managers
             if (mapas.Count > 0) lock (_azar) sala.MapaDeLaSala = mapas[_azar.Next(mapas.Count)];
         }
 
-        /// <summary>Se acabó el sueño: se olvida, y con él los grupos que dejó plantados.</summary>
+        /// <summary>The dream is over: it is forgotten, and with it the groups it left placed.</summary>
         /// <remarks>
-        /// Lo segundo importa tanto como lo primero. Los mapas de sala son cien y se reparten
-        /// entre todos los sueños; un grupo que no se quita se queda ahí para el siguiente que
-        /// caiga en ese mapa, y se va acumulando sala tras sala hasta que la sala tiene monstruos
-        /// de tres sueños ajenos.
+        /// The second matters as much as the first. The room maps are a hundred and are shared among all the
+        /// dreams; a group that is not removed stays there for the next one to land on that map, and it piles up
+        /// room after room until the room has monsters from three other people's dreams.
         /// </remarks>
         public static void Olvidar(long characterId)
         {
@@ -855,11 +854,11 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>De donde salio cada uno hacia el Plano Astral.</summary>
+        /// <summary>Where each one left from towards the Astral Plane.</summary>
         /// <remarks>
-        /// Se apunta al pulsar el boton del menu, que es el ultimo momento en que se sabe: dentro
-        /// del plano y de las salas el mapa de la sesion ya es otro. Sin esto, salir del sueno
-        /// dejaria al jugador en el plano en vez de donde estaba.
+        /// It is noted on pressing the menu button, which is the last moment it is known: inside the plane and
+        /// the rooms the session's map is already another. Without this, leaving the dream would leave the
+        /// player on the plane instead of where he was.
         /// </remarks>
         private static readonly ConcurrentDictionary<long, (long Mapa, int Casilla)> _deDonde = new();
 
@@ -869,7 +868,7 @@ namespace Jondo.Unity.Server.Managers
         public static (long Mapa, int Casilla) DeDondeViene(long characterId)
             => _deDonde.TryGetValue(characterId, out var d) ? d : (0, 0);
 
-        /// <summary>Cuántos grupos hay disponibles para plantar en las salas.</summary>
+        /// <summary>How many groups are available to place in the rooms.</summary>
         public static int GruposDisponibles { get { Cargar(); return _grupos?.Count ?? 0; } }
 
         private static void Cargar()
@@ -911,8 +910,8 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>El nivel de un grupo: el del miembro más alto, que es lo que lo hace difícil.</summary>
-        /// <summary>Los monstruos de un grupo, con el grado con el que salen en el mundo.</summary>
+        /// <summary>A group's level: that of its highest member, which is what makes it hard.</summary>
+        /// <summary>A group's monsters, with the grade they come out with in the world.</summary>
         private static List<(int Monstruo, int Grado)> MiembrosDe(string miembros)
         {
             var salen = new List<(int, int)>();
@@ -956,23 +955,23 @@ namespace Jondo.Unity.Server.Managers
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Montar un sueño
+        //  Setting up a dream
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// Genera un sueño nuevo: el rombo de once salas, con su grupo y su modificación.
+        /// Generates a new dream: the diamond of eleven rooms, with its group and its modifier.
         /// </summary>
         /// <remarks>
-        /// La entrada y la última no llevan grupo — en la captura la sala «0» viaja con un solo
-        /// campo y la «10» sin f9 —, así que sólo se puebla lo de en medio.
+        /// The entrance and the last one carry no group -- in the capture room «0» travels with a single field
+        /// and «10» without f9 --, so only what is in between is populated.
         /// </remarks>
         public static Sueno Crear(long characterId, string nombre, int nivel, int dificultad,
                                   long mapaDeVuelta, int casillaDeVuelta, int breed = 0)
         {
             Cargar();
 
-            // Empezar uno nuevo tira el anterior, que es lo que hace el cliente al confirmar. Va
-            // por Olvidar para que se lleve por delante los grupos que dejó plantados.
+            // Starting a new one throws away the previous one, which is what the client does on
+            // confirming. It goes through Olvidar so that it takes the groups it left placed with it.
             Olvidar(characterId);
 
             _cuenta.TryGetValue(characterId, out int cuenta);
@@ -994,16 +993,16 @@ namespace Jondo.Unity.Server.Managers
                 CasillaDeVuelta = casillaDeVuelta,
             };
 
-            // Cinco filas: la entrada, tres de entre dos y cuatro salas, y la última. El ancho de
-            // las de en medio cambia de un sueño a otro —nueve capturas y siete repartos
-            // distintos— así que se sortea, con una semilla que hace el sueño reproducible.
+            // Five rows: the entrance, three of between two and four rooms, and the last. The width
+            // of the middle ones changes from one dream to another -- nine captures and seven
+            // different layouts -- so it is drawn, with a seed that makes the dream reproducible.
             var dado = new Random(HashCode.Combine(characterId, cuenta));
 
-            // El total de las tres filas de en medio va de siete a nueve —los sueños medidos
-            // tienen nueve, diez u once salas—, así que no vale sortear cada fila por su cuenta:
-            // tres tiradas libres de 2 a 4 dan de seis a doce. Se reparte un total. Y la primera
-            // fila nunca pasa de tres: la entrada abre a TODAS sus salas y un mapa sólo trae tres
-            // puertas, así que con cuatro una quedaría sin puerta que la abriese.
+            // The total of the three middle rows goes from seven to nine -- the measured dreams have
+            // nine, ten or eleven rooms --, so drawing each row on its own will not do: three free
+            // draws from 2 to 4 give from six to twelve. A total is shared out. And the first row
+            // never goes above three: the entrance opens onto ALL its rooms and a map only carries
+            // three doors, so with four one would be left without a door to open it.
             var anchos = AnchosDeLasFilas(dado, FightRowsOf(1));
 
             MontarUnaFranja(sueno, anchos, nivel, primera: true);
@@ -1013,12 +1012,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Añade la franja siguiente al sueño y devuelve por dónde se entra en ella.
+        /// Adds the next band to the dream and returns where it is entered.
         /// </summary>
         /// <remarks>
-        /// Se llama al pisar la Fuente, que es la última sala de la franja en curso y a la vez la
-        /// primera de la que viene. Sin esto el jugador se queda encerrado ahí: la fuente no tiene
-        /// salidas y el sueño no tiene forma de seguir ni de acabarse.
+        /// It is called on stepping on the Fountain, which is the last room of the current band and at the
+        /// same time the first of the next. Without this the player is locked in there: the fountain has no
+        /// exits and the dream has no way of going on nor of ending.
         /// </remarks>
         public static void AnadirFranja(Sueno sueno)
         {
@@ -1053,7 +1052,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Whether a room closes its band -- saved dreams from before the mark count their fountains.</summary>
         public static bool Closes(Sala sala) => sala.Cierre || (sala.EsFuente && sala.Franja < Bands);
 
-        /// <summary>Las tres filas de en medio, con el total que sale medido.</summary>
+        /// <summary>The three middle rows, with the total that comes out measured.</summary>
         private static int[] AnchosDeLasFilas(Random dado, int filas = 3)
         {
             // Two to four a row, the first no more than three -- its entry has three doors. The
@@ -1076,11 +1075,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Monta una franja: tres filas de pelea y una Fuente al final.
+        /// Sets up a band: three fight rows and a Fountain at the end.
         /// </summary>
         /// <remarks>
-        /// La primera lleva además su sala de entrada; las demás entran por la fuente de la
-        /// anterior, que ya está puesta y sólo hay que colgarle las salidas nuevas.
+        /// The first one also carries its entrance room; the others are entered through the previous one's
+        /// fountain, which is already in place and only needs the new exits hung on it.
         /// </remarks>
         private static void MontarUnaFranja(Sueno sueno, int[] anchos, int nivel, bool primera)
         {
@@ -1169,17 +1168,17 @@ namespace Jondo.Unity.Server.Managers
                 porFila.Add(new List<Sala> { fin });
             }
 
-            // Y las salidas. Cada sala se abre a la de su misma posición en la fila siguiente y a
-            // la de al lado, que es lo que hace que la de en medio se alcance por dos caminos: en
-            // la captura a la 4 se llega desde la 1 y desde la 2.
+            // And the exits. Each room opens onto the one in the same position on the next row and
+            // onto the one beside it, which is what makes the middle one reachable by two roads: in
+            // the capture room 4 is reached from 1 and from 2.
             for (int fila = 0; fila + 1 < porFila.Count; fila++)
             {
                 var esta = porFila[fila];
                 var abajo = porFila[fila + 1];
 
-                // La entrada abre a TODA la fila siguiente —«0 -> 1,2,3» en la captura— y la fila
-                // de encima de la última lleva entera a la última —«7,8,9 -> 10»—. Las dos cosas
-                // están en las nueve.
+                // The entrance opens onto the WHOLE next row -- «0 -> 1,2,3» in the capture -- and the row
+                // above the last leads entirely to the last -- «7,8,9 -> 10» --. Both things are in all
+                // nine.
                 if (esta.Count == 1 || abajo.Count == 1)
                 {
                     foreach (var origen in esta)
@@ -1198,14 +1197,14 @@ namespace Jondo.Unity.Server.Managers
                     if (primero + 1 < abajo.Count && !esta[i].EsFavor) esta[i].Salidas.Add(abajo[primero + 1].Id);
                 }
 
-                // Y que no quede ninguna sin padre. Una sala a la que no se puede llegar se dibuja
-                // igual en la ventana, y el jugador la ve y no entiende por qué no la alcanza.
+                // And let none be left without a parent. A room that cannot be reached is drawn all the
+                // same in the window, and the player sees it and does not understand why he cannot get there.
                 for (int j = 0; j < abajo.Count; j++)
                 {
                     if (esta.Exists(x => x.Salidas.Contains(abajo[j].Id))) continue;
 
-                    // Al que tenga sitio: ninguna sala puede ofrecer más salidas que puertas hay
-                    // en su mapa, o la de más no se podría pulsar. Not a favour: it keeps its one.
+                    // To whichever has room: no room can offer more exits than there are doors on its map,
+                    // or the extra one could not be pressed. Not a favour: it keeps its one.
                     var padre = esta.Find(x => !x.EsFavor && x.Salidas.Count < PuertasPorSala)
                                 ?? esta.Find(x => !x.EsFavor)
                                 ?? esta[Math.Min(j, esta.Count - 1)];
@@ -1570,13 +1569,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// A cada sala, un mapa de los suyos.
+        /// To each room, a map of its own.
         /// </summary>
         /// <remarks>
-        /// La entrada es siempre el 237897728 —diez de diez capturas— y las demás salen del
-        /// catálogo de la subárea 904, cogiendo sólo los que traen sus tres puertas. Sin repetir
-        /// dentro de un mismo sueño: dos salas en el mismo mapa harían que sus puertas fueran las
-        /// mismas y el camino dejaría de significar nada.
+        /// The entrance is always 237897728 -- ten of ten captures -- and the others come from the catalogue of
+        /// subarea 904, taking only those that carry their three doors. Without repeating within the same
+        /// dream: two rooms on the same map would make their doors the same and the path would stop meaning
+        /// anything.
         /// </remarks>
         private static void RepartirMapas(Sueno sueno)
         {
@@ -1631,13 +1630,13 @@ namespace Jondo.Unity.Server.Managers
 
         private static List<long>? _mapasDeSala;
 
-        /// <summary>Los mapas de sala: subárea 904 y con sus tres puertas.</summary>
+        /// <summary>The room maps: subarea 904 and with their three doors.</summary>
         /// <remarks>
-        /// La subárea trae 484 mapas y sólo 100 llevan elementos interactivos. Los que los llevan
-        /// llevan exactamente tres, con el gráfico 90166 —el mismo del pozo—, que son las puertas.
-        /// Un mapa de sala sin puertas sería un callejón del que no se puede salir.
+        /// The subarea carries 484 maps and only 100 carry interactive elements. Those that do carry exactly
+        /// three, with graphic 90166 -- the same as the well's --, which are the doors. A room map without doors
+        /// would be a dead end there is no way out of.
         /// </remarks>
-        /// <summary>Todos los mapas del sueño, la entrada incluida, para declararles las puertas.</summary>
+        /// <summary>All the dream's maps, the entrance included, to declare their doors.</summary>
         public static IEnumerable<long> TodosLosMapasDeSala()
         {
             yield return MapaDeEntrada;
@@ -1790,8 +1789,8 @@ namespace Jondo.Unity.Server.Managers
 
             salen.Sort();
 
-            // Vacío NO se guarda. Si esto se pide antes de que Interactives esté cargado la lista
-            // sale vacía, y cachearla dejaría todos los sueños de la sesión sin mapas de sala.
+            // Empty is NOT cached. If this is asked before Interactives is loaded the list comes out
+            // empty, and caching it would leave all of the session's dreams without room maps.
             if (salen.Count == 0) return salen;
 
             _mapasDeSala = salen;
@@ -1799,7 +1798,7 @@ namespace Jondo.Unity.Server.Managers
             return _mapasDeSala;
         }
 
-        /// <summary>La puerta número <paramref name="cual"/> de una sala, o cero si no la tiene.</summary>
+        /// <summary>Door number <paramref name="cual"/> of a room, or zero if it has none.</summary>
         public static int PuertaDe(Sala sala, int cual)
         {
             if (sala.MapaDeLaSala == 0) return 0;
@@ -1809,10 +1808,10 @@ namespace Jondo.Unity.Server.Managers
             return puertas[cual].Id;
         }
 
-        /// <summary>El Rey Gob del Favor Onírico, y dónde se pone.</summary>
+        /// <summary>The Dream Favour's Rey Gob, and where he is placed.</summary>
         /// <remarks>
-        /// Medido en «sueño infinito largo»: npc 7850, casilla 232, orientación 3, con el id
-        /// contextual negativo de siempre. Su diálogo está en content/npcs/dialogues.json.
+        /// Measured in «sueño infinito largo»: npc 7850, cell 232, orientation 3, with the usual negative
+        /// contextual id. His dialogue is in content/npcs/dialogues.json.
         /// </remarks>
         public const int ReyGob = 7850;
         public const int CasillaDelReyGob = 232;
@@ -1844,11 +1843,11 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>"Acepto el favor.", the reply that opens the three choices.</summary>
         public const int FavorAcceptReply = 81584;
 
-        /// <summary>Le pone a una sala su grupo y su modificación.</summary>
+        /// <summary>Gives a room its group and its modifier.</summary>
         /// <remarks>
-        /// El grupo se elige entre los que andan por el nivel del personaje, con una banda que se
-        /// abre si no hay bastantes: los Sueños se juegan a partir del 50 y hay tramos del mundo
-        /// donde no hay grupos de ese nivel exacto.
+        /// The group is chosen among those around the character's level, with a band that widens if there are
+        /// not enough: the Dreams are played from level 50 and there are stretches of the world where there are
+        /// no groups of that exact level.
         /// </remarks>
         private static void Poblar(Sala sala, int nivel, int dificultad, bool keepReward = false)
         {
@@ -1873,7 +1872,7 @@ namespace Jondo.Unity.Server.Managers
             sala.Miembros.Clear();
             sala.Miembros.AddRange(MiembrosDe(elegido.Miembros));
 
-            // Y lo que regala la sala, de las nueve recompensas que ofrecen las salas medidas.
+            // And what the room gives away, from the nine rewards the measured rooms offer.
             if (keepReward && sala.Reward != null) return;
             lock (_azar)
             {

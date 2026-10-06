@@ -7,12 +7,12 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// Gremia, la vendedora del Templo de los Gremios, y la capa de tiendas escritas a mano.
+    /// Gremia, the Guild Temple's seller, and the layer of hand-written shops.
     /// </summary>
     /// <remarks>
-    /// Medido: su kbd en la captura de fundar «Jondo» lista la gremialogema a 30.000, el libro
-    /// «Acerca de los gremios» a 500 y el escudo de gremio a 100.000. Aquí la gremialogema vale un
-    /// kama, que es decisión de este servidor, y los otros dos lo que la captura dice.
+    /// Measured: her kbd in the capture of founding «Jondo» lists the guildalogem at 30,000, the book
+    /// «Acerca de los gremios» at 500 and the guild shield at 100,000. Here the guildalogem costs one
+    /// kama, which is this server's decision, and the other two what the capture says.
     /// </remarks>
     public class GuildVendorTests
     {
@@ -32,7 +32,7 @@ namespace Jondo.Unity.Tests.World
             NpcShops.Forget();
         }
 
-        /// <summary>Un fichero que no está no rompe nada, y uno a medias tampoco.</summary>
+        /// <summary>A file that is not there breaks nothing, and a half-written one does not either.</summary>
         [Fact]
         public void A_missing_or_empty_file_changes_nothing()
         {

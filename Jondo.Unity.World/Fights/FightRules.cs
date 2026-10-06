@@ -1,65 +1,65 @@
 ﻿namespace Jondo.Unity.World.Fights
 {
     /// <summary>
-    /// Lo que cambia de un tipo de combate a otro, en un sitio y con nombre.
+    /// What changes from one fight type to another, in one place and with a name.
     /// </summary>
     /// <remarks>
-    /// <b>Por qué esto y no dos motores.</b> Andar, empujar, el orden de turnos, los embrujos, el
-    /// daño, las resistencias y los invocados son el noventa por ciento del motor y son idénticos
-    /// peleando contra monstruos o contra una persona. Partirlo daría dos copias que se separan, y
-    /// un arreglo de daño habría que hacerlo dos veces o se quedaría a medias. Es el mismo
-    /// argumento por el que el motor de efectos es uno y no uno por raza.
+    /// <b>Why this and not two engines.</b> Walking, pushing, the turn order, the buffs, the
+    /// damage, the resistances and the summons are ninety per cent of the engine and are identical
+    /// fighting against monsters or against a person. Splitting it would give two copies that drift apart, and
+    /// a damage fix would have to be made twice or would be left half done. It is the same
+    /// argument by which the effect engine is one and not one per breed.
     ///
-    /// Lo que sí es distinto son estas siete respuestas, y estaban disueltas en dieciséis <c>if</c>
-    /// repartidos por cinco métodos —<c>if (!fight.IsDuel)</c>, <c>fight.IsKoliseo ? … : …</c>—.
-    /// Así, el motor deja de preguntar QUÉ CLASE DE COMBATE ERES y pregunta QUÉ HAGO, y añadir algo
-    /// del koliseo toca una clase en vez de cinco métodos.
+    /// What is different are these seven answers, and they were dissolved in sixteen <c>if</c>s
+    /// spread over five methods —<c>if (!fight.IsDuel)</c>, <c>fight.IsKoliseo ? … : …</c>—.
+    /// This way, the engine stops asking WHAT KIND OF FIGHT ARE YOU and asks WHAT DO I DO, and adding something
+    /// for the koliseo touches one class instead of five methods.
     ///
     /// <code>
     ///                       ContraMonstruos   Desafío   Koliseo   Entrenamiento
-    ///   HayRetos                    sí          no        no          no
-    ///   RelojDeColocación        45,0 s          —      59,2 s      45,0 s
+    ///   HayRetos                   yes          no        no          no
+    ///   RelojDeColocación        45.0 s          —      59.2 s      45.0 s
     ///   TipoDelKam                   4           0         7           4
-    ///   KaaConCuentaAtrás           sí          no        sí          sí
-    ///   ReparteBotín                sí          no        no          no
-    ///   PagaElKoliseo               no          no        sí          no
-    ///   BorraElGrupoAlGanar         sí          no        no          no
-    ///   AvanzaDeSala                sí          no        no          no
-    ///   DefeatCosts                 sí          no        no          no
+    ///   KaaConCuentaAtrás          yes          no        yes         yes
+    ///   ReparteBotín               yes          no        no          no
+    ///   PagaElKoliseo               no          no        yes         no
+    ///   BorraElGrupoAlGanar        yes          no        no          no
+    ///   AvanzaDeSala               yes          no        no          no
+    ///   DefeatCosts                yes          no        no          no
     /// </code>
     ///
-    /// Los números no son elegidos: el 4, el 0 y el 7 son el f2 del kam en las capturas, y el 592
-    /// es el f5 del kaa del koliseo.
+    /// The numbers are not chosen: 4, 0 and 7 are the kam's f2 in the captures, and 592
+    /// is the koliseo kaa's f5.
     /// </remarks>
     public abstract class FightRules
     {
-        /// <summary>Si se ofrecen retos, que dan un extra sobre el botín de los monstruos.</summary>
+        /// <summary>Whether challenges are offered, which give an extra on top of the monsters' loot.</summary>
         public abstract bool HayRetos { get; }
 
-        /// <summary>Lo que dura la colocación, en décimas de segundo. Cero: no hay reloj.</summary>
+        /// <summary>How long placement lasts, in tenths of a second. Zero: there is no clock.</summary>
         public abstract int RelojDeColocacion { get; }
 
-        /// <summary>El tipo que va en el f2 del kam.</summary>
+        /// <summary>The type that goes in the kam's f2.</summary>
         public abstract int TipoDelKam { get; }
 
-        /// <summary>Si enfrente hay monstruos de verdad, que es lo que el kam lista.</summary>
+        /// <summary>Whether there are real monsters opposite, which is what the kam lists.</summary>
         public abstract bool EnfrenteHayMonstruos { get; }
 
-        /// <summary>Si se gana experiencia, kamas y objetos.</summary>
+        /// <summary>Whether experience, kamas and items are earned.</summary>
         public abstract bool ReparteBotin { get; }
 
-        /// <summary>Si el que gana cobra lo del koliseo: kolichas, vitorichas, kamas y experiencia.</summary>
+        /// <summary>Whether the winner is paid the koliseo's: kolichas, vitorichas, kamas and experience.</summary>
         /// <remarks>
-        /// Va aparte de <see cref="ReparteBotin"/> porque no es el mismo reparto ni sale del mismo
-        /// sitio. Aquel son las tablas de botín de los monstruos y su experiencia; esto es lo que
-        /// paga el koliseo por ganar, y enfrente no hay monstruos de los que sacar nada.
+        /// It goes apart from <see cref="ReparteBotin"/> because it is not the same distribution nor does it come from the same
+        /// place. That one is the monsters' loot tables and their experience; this is what
+        /// the koliseo pays for winning, and opposite there are no monsters to take anything from.
         /// </remarks>
         public abstract bool PagaElKoliseo { get; }
 
-        /// <summary>Si al ganar desaparece del mapa el grupo con el que se peleaba.</summary>
+        /// <summary>Whether on winning the group being fought disappears from the map.</summary>
         public abstract bool BorraElGrupoAlGanar { get; }
 
-        /// <summary>Si ganar puede mover a la sala siguiente de una mazmorra.</summary>
+        /// <summary>Whether winning can move to a dungeon's next room.</summary>
         public abstract bool AvanzaDeSala { get; }
 
         /// <summary>
@@ -72,31 +72,31 @@
         /// </summary>
         public abstract bool DefeatCosts { get; }
 
-        /// <summary>Si el kaa lleva cuenta atrás. Se deduce del reloj: no es otra decisión.</summary>
+        /// <summary>Whether the kaa carries a countdown. It is deduced from the clock: it is not another decision.</summary>
         public bool KaaConCuentaAtras => RelojDeColocacion > 0;
 
-        /// <summary>Cómo se llama esto en el registro.</summary>
+        /// <summary>What this is called in the log.</summary>
         public abstract string Nombre { get; }
 
-        // ─── Las tres ───────────────────────────────────────────────────────
+        // ─── The three ──────────────────────────────────────────────────────
 
-        /// <summary>Pelear contra monstruos, que es de donde salió todo el motor.</summary>
+        /// <summary>Fighting monsters, which is where the whole engine came from.</summary>
         public static readonly FightRules ContraMonstruos = new Monstruos();
 
         /// <summary>Un desafío entre dos jugadores.</summary>
         public static readonly FightRules Desafio = new Reto();
 
-        /// <summary>El koliseo: PvP, pero con reloj de colocación como un combate normal.</summary>
+        /// <summary>The koliseo: PvP, but with a placement clock like a normal fight.</summary>
         public static readonly FightRules Koliseo = new Arena();
 
-        /// <summary>El kanojedo: pegarle a un puch, que es un combate contra monstruos sin nada en juego.</summary>
+        /// <summary>The kanojedo: hitting a puch, which is a fight against monsters with nothing at stake.</summary>
         public static readonly FightRules Entrenamiento = new Kanojedo();
 
         private sealed class Monstruos : FightRules
         {
             public override bool HayRetos => true;
 
-            /// <summary>Cuarenta y cinco segundos. El cliente enseña la misma cuenta atrás.</summary>
+            /// <summary>Forty-five seconds. The client shows the same countdown.</summary>
             public override int RelojDeColocacion => 450;
 
             public override int TipoDelKam => 4;
@@ -111,19 +111,19 @@
 
         private sealed class Reto : FightRules
         {
-            /// <summary>No hay botín que multiplicar, y la captura del desafío no trae ni un reto.</summary>
+            /// <summary>There is no loot to multiply, and the challenge capture does not bring a single challenge.</summary>
             public override bool HayRetos => false;
 
             /// <summary>
-            /// Ninguno: el combate empieza cuando los dos pulsan listo.
+            /// None: the fight starts when both press ready.
             /// </summary>
             /// <remarks>
-            /// No es que el reloj se esconda: el servidor real no manda ninguno. Su kaa son seis
-            /// bytes sin el f5 del tiempo.
+            /// It is not that the clock is hidden: the real server sends none. Its kaa is six
+            /// bytes without the time's f5.
             /// </remarks>
             public override int RelojDeColocacion => 0;
 
-            /// <summary>Sin tipo. Medido: su kam llega «f3=retado f5=id f6=retador».</summary>
+            /// <summary>No type. Measured: its kam arrives «f3=challenged f5=id f6=challenger».</summary>
             public override int TipoDelKam => 0;
 
             public override bool EnfrenteHayMonstruos => false;
@@ -136,11 +136,11 @@
         }
 
         /// <summary>
-        /// Los puchs del kanojedo. Medido en la captura del Hipermago sobre el kanojedo de Amakna:
-        /// el kam es de tipo 4 y el kaa lleva su cuenta atrás —445 décimas, la misma de siempre
-        /// salvo el latido— igual que contra monstruos, pero en sesenta segundos de pelea no sale
-        /// ni un opcode de reto, y el jyg del final lleva las recompensas VACÍAS. Y el puch se
-        /// queda donde estaba: es un saco de entrenar, no un bicho que se mata.
+        /// The kanojedo's puchs. Measured in the Hipermago capture on the Amakna kanojedo:
+        /// the kam is type 4 and the kaa carries its countdown —445 tenths, the usual one
+        /// except for the heartbeat— just like against monsters, but in sixty seconds of fighting not
+        /// a single challenge opcode comes out, and the final jyg carries EMPTY rewards. And the puch
+        /// stays where it was: it is a training bag, not a creature that gets killed.
         /// </summary>
         private sealed class Kanojedo : FightRules
         {
@@ -160,18 +160,18 @@
         {
             public override bool HayRetos => false;
 
-            /// <summary>El 592 del kaa de «koliseo completo con invitacion-koli 2vs2».</summary>
+            /// <summary>The 592 of the kaa of «koliseo completo con invitacion-koli 2vs2».</summary>
             public override int RelojDeColocacion => 592;
 
-            /// <summary>El 7 de su kam, «100728ee0a».</summary>
+            /// <summary>The 7 of its kam, «100728ee0a».</summary>
             public override int TipoDelKam => 7;
 
             public override bool EnfrenteHayMonstruos => false;
 
-            /// <summary>Las tablas de los monstruos no, que enfrente no hay monstruos.</summary>
+            /// <summary>Not the monsters' tables, since there are no monsters opposite.</summary>
             public override bool ReparteBotin => false;
 
-            /// <summary>Y las kolichas sí, que es lo que paga el koliseo. Ver KoliseoRewards.</summary>
+            /// <summary>And the kolichas yes, which is what the koliseo pays. See KoliseoRewards.</summary>
             public override bool PagaElKoliseo => true;
 
             public override bool BorraElGrupoAlGanar => false;

@@ -25,17 +25,17 @@ namespace Jondo.Unity.Tests.Combat
     /// fires, and all 65 cells get used.
     /// </remarks>
     /// <summary>
-    /// Las clases que tocan el estado estatico de MapManager, en una sola coleccion.
+    /// The classes that touch MapManager's static state, in a single collection.
     /// </summary>
     /// <remarks>
-    /// xUnit corre las clases en PARALELO, y estas se pisan: ReturnFromFightCellTests instala un
-    /// diccionario de casillas con un solo mapa, y MonsterVetoTests llama a MapManager.Initialize(),
-    /// que lo reconstruye entero desde la base. Si eso cae entre el constructor de la primera y su
-    /// asercion, la herreria deja de tener las casillas que el test acaba de poner.
+    /// xUnit runs the classes in PARALLEL, and these step on each other: ReturnFromFightCellTests installs a
+    /// cell dictionary with a single map, and MonsterVetoTests calls MapManager.Initialize(),
+    /// which rebuilds it whole from the base. If that falls between the first one's constructor and its
+    /// assertion, the smithy stops having the cells the test has just put in.
     ///
-    /// Se vio como lo que es: la suite fallaba una vez de cada siete en
-    /// An_arena_cell_is_pulled_onto_a_real_one, y en aislado pasaba siempre. Un test que falla a
-    /// veces es peor que uno que falla: se aprende a ignorarlo.
+    /// It was seen for what it is: the suite failed once in seven in
+    /// An_arena_cell_is_pulled_onto_a_real_one, and in isolation it always passed. A test that fails
+    /// sometimes is worse than one that fails: one learns to ignore it.
     /// </remarks>
     [CollectionDefinition("MapManager")]
     public class MapManagerCollection { }

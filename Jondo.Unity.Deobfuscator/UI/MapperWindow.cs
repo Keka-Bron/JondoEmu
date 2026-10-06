@@ -8,19 +8,19 @@ using Jondo.Unity.Reversing;
 namespace Jondo.Unity.Deobfuscator.UI;
 
 /// <summary>
-/// Una pantalla: dos protocolos, un botón, el mapeo.
+/// One screen: two protocols, one button, the mapping.
 ///
-/// Hubo antes un asistente de nueve pasos. Estaba de más: lo que hace falta el día del parche son
-/// dos rutas y darle a un botón. Los pasos eran ceremonia alrededor de una llamada a
-/// <see cref="Mapper.Build"/> que tarda tres segundos.
+/// Before there was a nine-step wizard. It was superfluous: what is needed on patch day is
+/// two paths and pressing a button. The steps were ceremony around a call to
+/// <see cref="Mapper.Build"/> that takes three seconds.
 ///
-/// Lo que sí se conserva de aquello, porque no era ceremonia sino honradez:
+/// What is kept from that, because it was not ceremony but honesty:
 ///
-///   · el ORIGEN de cada pareja va en su fila. No es lo mismo lo que resolvió la estructura —que no
-///     se equivoca— que lo que eligió un modelo entre cinco candidatos. Enseñarlos con el mismo
-///     aspecto sería mentir por omisión.
-///   · lo que no se resuelve sale marcado, nunca inventado.
-///   · la cuenta que decide es «de los que usa el emulador, cuántos», no el porcentaje sobre dos mil.
+///   · each pair's ORIGIN goes in its row. What the structure resolved —which does not
+///     get it wrong— is not the same as what a model chose among five candidates. Showing them with the same
+///     look would be lying by omission.
+///   · what is not resolved comes out marked, never invented.
+///   · the figure that decides is «of the ones the emulator uses, how many», not the percentage over two thousand.
 /// </summary>
 internal sealed class MapperWindow : Form, IBackgroundWindow
 {
@@ -81,7 +81,7 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
             Dock = DockStyle.Top,
         };
 
-        // ─── Arriba: las dos rutas y el botón ───────────────────────────────────────────
+        // ─── Top: the two paths and the button ──────────────────────────────────────────
         _top = new LauncherPanel
         {
             Dock = DockStyle.Top,
@@ -112,7 +112,7 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
             _go, _model,
         });
 
-        // ─── El centro: la tabla ────────────────────────────────────────────────────────
+        // ─── The middle: the table ──────────────────────────────────────────────────────
         _list = new ListView
         {
             Dock = DockStyle.Fill,
@@ -147,7 +147,7 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
         _card.Layers.Add(LauncherTheme.CardFill);
         _card.Controls.Add(_list);
 
-        // ─── Abajo: la cuenta y lo que se puede hacer con ella ──────────────────────────
+        // ─── Bottom: the figure and what can be done with it ────────────────────────────
         _footer = new LauncherPanel
         {
             Dock = DockStyle.Bottom,
@@ -193,14 +193,14 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
         _status.Text = Texts.MapReady;
     }
 
-    // ─── El botón ───────────────────────────────────────────────────────────────────────
+    // ─── The button ─────────────────────────────────────────────────────────────────────
 
     private async Task GoAsync()
     {
         if (_running != null) { _running.Cancel(); return; }
 
-        // Se le pasa lo que el usuario escribió, no el .dll ya resuelto: la versión sale del nombre
-        // de la carpeta —«Cliente 3.6.10.10»— y el ensamblado siempre se llama igual.
+        // It is passed what the user wrote, not the already resolved .dll: the version comes from the folder's
+        // name —«Cliente 3.6.10.10»— and the assembly is always called the same.
         string oldPath = _old.Value.Trim();
         string newPath = _new.Value.Trim();
 
@@ -221,9 +221,9 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
         try
         {
             var mine = Emulator();
-            // El progreso va por IProgress: el trabajo corre en otro hilo y no puede tocar los
-            // controles. Report() es explícito en la interfaz, no en la clase, así que se declara
-            // como IProgress y no como Progress.
+            // Progress goes through IProgress: the work runs on another thread and cannot touch the
+            // controls. Report() is explicit on the interface, not on the class, so it is declared
+            // as IProgress and not as Progress.
             IProgress<string> report = new Progress<string>(line => Say(line, LauncherTheme.SoftGold));
             await Task.Run(() => _mapper.Build(oldPath, newPath, Folder, mine, report.Report),
                            _running.Token);
@@ -246,7 +246,7 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
         }
     }
 
-    /// <summary>Las dudas, al modelo. Es lo único para lo que hace falta clave.</summary>
+    /// <summary>The doubts, to the model. It is the only thing a key is needed for.</summary>
     private async Task AskAsync()
     {
         var doubts = _mapper.Doubts();
@@ -292,11 +292,11 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Folder) { UseShellExecute = true });
     }
 
-    // ─── La tabla ───────────────────────────────────────────────────────────────────────
+    // ─── The table ──────────────────────────────────────────────────────────────────────
 
     private void Fill()
     {
-        // Primero lo que usa el emulador, y dentro de eso las dudas arriba: es lo que hay que mirar.
+        // First what the emulator uses, and within that the doubts on top: it is what has to be looked at.
         _rows = _mapper.Rows
             .Where(r => r.New.Length > 0 || r.How == Mapper.How.Doubt)
             .OrderByDescending(r => r.Mine)
@@ -355,11 +355,11 @@ internal sealed class MapperWindow : Form, IBackgroundWindow
     private static string Cut(string text, int max)
         => text.Length <= max ? text : text[..max] + "…";
 
-    // ─── Fontanería ─────────────────────────────────────────────────────────────────────
+    // ─── Plumbing ───────────────────────────────────────────────────────────────────────
 
     private static string Folder => Path.Combine(Paths.Root, "datos");
 
-    /// <summary>Los opcodes que el emulador usa de verdad, para la cuenta que importa.</summary>
+    /// <summary>The opcodes the emulator really uses, for the figure that matters.</summary>
     private IReadOnlyCollection<string> Emulator()
     {
         var opcodes = new HashSet<string>(StringComparer.Ordinal);

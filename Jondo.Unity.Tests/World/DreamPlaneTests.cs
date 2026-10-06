@@ -6,20 +6,20 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// El Plano Astral: el pozo pulsable y las cuatro arcadas que llevan a Draconiros.
+    /// The Astral Plane: the clickable well and the four arches leading to Draconiros.
     /// </summary>
     /// <remarks>
-    /// Todo lo que se comprueba aquí está medido en «entrar a sueños-hablar con draconiros…»,
-    /// leyendo el f11 del jss del mapa 238551040:
+    /// Everything checked here is measured in «entrar a sueños-hablar con draconiros…»,
+    /// reading the f11 of the jss of map 238551040:
     ///
     ///   f11 { f1: 1, f4 { f1: 20744, f2: 360 }, f4 { f1: 20743, f2: 184 }, f5: 539616, f6: -1 }
     ///   f11 { f1: 1, f4 { f1: 20739, f2: 184 },                            f5: 539699, f6: -1 }
-    ///   ... y lo mismo para 539700, 539701 y 539702.
+    ///   ... and the same for 539700, 539701 and 539702.
     ///
-    /// El f4.f1 es el uid de instancia —lo que el cliente devuelve en su iwo— y el f4.f2 la
-    /// habilidad. Anunciar el uid en el sitio de la habilidad es exactamente lo que dejó el pozo
-    /// de adorno: el cliente no conoce ninguna habilidad 20743, y un elemento cuya habilidad no
-    /// existe no se puede pulsar y no da un solo error.
+    /// f4.f1 is the instance uid —what the client returns in its iwo— and f4.f2 the
+    /// skill. Announcing the uid in the skill's place is exactly what left the well
+    /// as an ornament: the client knows no skill 20743, and an element whose skill does not
+    /// exist cannot be clicked and does not give a single error.
     /// </remarks>
     [Collection("MapManager")]
     public class DreamPlaneTests
@@ -29,8 +29,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void El_pozo_se_anuncia_con_una_habilidad_que_el_cliente_conoce()
         {
-            // La 184 no es un número elegido: es con la que ya se entra en una casa y se usa la
-            // lotería, así que si esto se rompe se rompe también algo que hoy funciona.
+            // 184 is not a chosen number: it is the one with which a house is already entered and the
+            // lottery used, so if this breaks something that works today breaks too.
             Assert.Equal(184, Dreams.HabilidadDelPozo);
             Assert.Equal(Houses.ExitSkill, Dreams.HabilidadDelPozo);
             Assert.NotEqual(20743, Dreams.HabilidadDelPozo);
@@ -63,7 +63,7 @@ namespace Jondo.Unity.Tests.World
         [InlineData(539702)]
         public void Cada_arcada_lleva_a_la_sala_de_Draconiros(int elemento)
         {
-            // Cuatro idas medidas, las cuatro al mismo mapa y a la misma casilla.
+            // Four measured goings, all four to the same map and the same cell.
             Interactives.Initialize();
             TeleportManager.Initialize();
 
@@ -77,9 +77,9 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Del_crisol_se_sale_por_donde_se_entro()
         {
-            // El dragón del crisol baja una sola frase y una sola respuesta, y esa respuesta no
-            // dice nada: devuelve al jugador. Sin ella el crisol era un callejón sin salida y
-            // había que volver a zaaps.
+            // The crucible's dragon brings down a single sentence and a single reply, and that reply
+            // says nothing: it sends the player back. Without it the crucible was a dead end and
+            // one had to go back by zaap.
             Npcs.Initialize();
 
             var charla = NpcDialogues.For(DraconirosDelCrisol, 0);
@@ -97,7 +97,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void El_pozo_se_suelta_antes_de_ensenar_la_ventana()
         {
-            // El iwn de la captura, campo a campo: «080110e0f72020b80128a28280c8e708».
+            // The capture's iwn, field by field: «080110e0f72020b80128a28280c8e708».
             byte[] iwn = Jondo.Unity.Server.Network.ConnectionProtocol.BuildElementInUse(
                 Dreams.ElementoDelPozo, Dreams.HabilidadDelPozo, 0x1c8e00280a2);
 
@@ -108,8 +108,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Las_puertas_del_sueno_usan_la_misma_habilidad_que_el_pozo()
         {
-            // El iwn de la puerta 539511 en la captura de Sueño III lleva f4 = 184, el mismo que
-            // el del pozo. Una sola habilidad para todo el Plano Astral.
+            // The iwn of door 539511 in the Dream III capture carries f4 = 184, the same as
+            // the well's. A single skill for the whole Astral Plane.
             byte[] iwn = Jondo.Unity.Server.Network.ConnectionProtocol.BuildElementInUse(
                 539511, Dreams.HabilidadDelPozo, 0x1c8e00280a2);
 
@@ -120,8 +120,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Las_puertas_de_las_salas_estan_declaradas()
         {
-            // El mismo fallo que tuvo el pozo, y en el mismo sitio: dibujadas pero sin acción, o
-            // sea que el jugador entra en el sueño y no tiene por dónde seguir.
+            // The same bug the well had, and in the same place: drawn but without an action, that
+            // is the player enters the dream and has nowhere to go on.
             Interactives.Initialize();
             TeleportManager.Initialize();
             InteractiveRegistry.Initialize();
@@ -136,7 +136,7 @@ namespace Jondo.Unity.Tests.World
                                                   && a.SkillId == 184);
             }
 
-            // Las tres de la entrada son las 539509, 539510 y 539511 de la captura.
+            // The entrance's three are the capture's 539509, 539510 and 539511.
             var ids = entrada.Select(x => x.Element.Id).OrderBy(x => x).ToArray();
             Assert.Equal(new[] { 539509, 539510, 539511 }, ids);
         }
@@ -144,7 +144,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Y_de_la_sala_se_vuelve()
         {
-            // Cuatro vueltas medidas, las cuatro por el mismo elemento a la casilla 221.
+            // Four measured returns, all four through the same element to cell 221.
             Interactives.Initialize();
             TeleportManager.Initialize();
 

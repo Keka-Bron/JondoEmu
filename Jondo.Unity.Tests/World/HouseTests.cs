@@ -123,6 +123,28 @@ namespace Jondo.Unity.Tests.World
                          HouseProtocol.BuildOnMap(519513, 407, new long[] { 520644 }, new[] { plaque }).Build());
         }
 
+        /// <summary>
+        /// A house nobody owns is declared on its street too, on sale at its model's price, with an
+        /// empty owner block (f8) and neither f4 nor f9: a house its map never declared, the client
+        /// drops the buyer's khr for, and the buy window did not open.
+        /// </summary>
+        [Fact]
+        public void A_house_nobody_owns_is_on_sale_at_its_models_price()
+        {
+            var door = new Houses.Door(212601864, Door, 300, 0, 0, 407, "", 5_000_000, 3, 1);
+            var plaque = HouseHandler.PlaqueOf(new HouseStore.House(), door);
+            Assert.Equal(5_000_000, plaque.Price);
+            Assert.False(plaque.HasOwner);
+
+            var lnx = ProtoMessage.Parse(HouseProtocol.Build(plaque, false).Build());
+            Assert.DoesNotContain(lnx.Fields, f => f.FieldNumber == 4 || f.FieldNumber == 9);
+            Assert.Empty(Assert.Single(lnx.Fields, f => f.FieldNumber == 8).BytesValue);
+            Assert.Equal(5_000_000, Assert.Single(lnx.Fields, f => f.FieldNumber == 7).VarIntValue);
+
+            // One that has an owner and is not on sale asks nothing.
+            Assert.Equal(0, HouseHandler.PlaqueOf(new HouseStore.House { AccountId = 7 }, door).Price);
+        }
+
         [Fact]
         public void The_house_one_is_inside_is_the_jss_f7()
         {

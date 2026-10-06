@@ -130,8 +130,8 @@ namespace Jondo.Unity.Server.Network
                             break;
                         }
 
-                        // El volcado en hexadecimal se quitó: era la misma trama otra vez y
-                        // sin censurar, y por aquí pasa el token de entrada al chat.
+                        // The hexadecimal dump was removed: it was the same frame again and
+                        // uncensored, and the chat login token goes through here.
                         string ascii = Encoding.ASCII.GetString(buffer, 0, read);
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"[Chat Server] Received {read} bytes decrypted.");

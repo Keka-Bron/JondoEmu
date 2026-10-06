@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Jondo.Unity.Server.Managers
 {
-    /// <summary>Lector del envoltorio de referencias de Unity con el que vienen los catalogos.</summary>
+    /// <summary>Reader of the Unity reference wrapper the catalogues come in.</summary>
     internal static class DofusDudeCatalog
     {
         public static IEnumerable<JsonElement> Rows(JsonDocument document)

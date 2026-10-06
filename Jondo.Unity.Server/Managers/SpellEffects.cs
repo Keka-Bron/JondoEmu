@@ -6,12 +6,12 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Una entrada del EffectsJson de un hechizo, tal cual viene, sin interpretar.
+    /// An entry of a spell's EffectsJson, just as it comes, uninterpreted.
     ///
-    /// El emulador ya leía este JSON, pero se quedaba sólo con tres cosas —el daño, el empuje y las
-    /// características— y tiraba el resto: el disparador, la máscara del objetivo y el
-    /// identificador del efecto. Sin esas tres no se puede hacer nada de lo que hacen los dofus ni
-    /// los boosts, así que aquí se conserva la entrada entera.
+    /// The emulator already read this JSON, but kept only three things —the damage, the push and the
+    /// characteristics— and threw the rest away: the trigger, the target mask and the
+    /// effect's identifier. Without those three nothing of what the dofus and the
+    /// boosts do can be done, so the whole entry is kept here.
     /// </summary>
     public sealed class SpellEffect
     {
@@ -56,38 +56,38 @@ namespace Jondo.Unity.Server.Managers
         public int Duration { get; init; }
 
         /// <summary>
-        /// El RETARDO en turnos: el efecto no arranca al lanzarlo, sino tantas rondas después.
+        /// The DELAY in turns: the effect does not start on casting, but that many rounds later.
         ///
-        /// Esta clave del catálogo no se leía en ninguna parte del emulador, y por eso la Flecha
-        /// Castigadora estaba rota: sus efectos retardados se aplicaban en el acto y se caían a la
-        /// ronda siguiente, así que como el hechizo sólo se puede lanzar una vez por turno, el
-        /// bono nacía y moría dentro del mismo turno y no servía absolutamente de nada.
+        /// This catalogue key was not read anywhere in the emulator, and that is why the Flecha
+        /// Castigadora was broken: its delayed effects were applied on the spot and dropped on the
+        /// next round, so since the spell can only be cast once per turn, the
+        /// bonus was born and died within the same turn and was of absolutely no use.
         ///
-        /// Medido contra hechizos cuyo texto lo dice: Precipitación lleva delay 1 —«en el turno
-        /// siguiente»— y Palabra Secreta delay 2 —«dentro de 2 turnos»—.
+        /// Measured against spells whose text says so: Precipitación carries delay 1 —«en el turno
+        /// siguiente»— and Palabra Secreta delay 2 —«dentro de 2 turnos»—.
         /// </summary>
         public int Delay { get; set; }
 
         public int Element { get; init; }
 
-        /// <summary>Si se puede disipar. Va al cliente restándole uno, que es como se midió.</summary>
+        /// <summary>Whether it can be dispelled. It goes to the client minus one, which is how it was measured.</summary>
         public int Dispellable { get; init; }
 
-        /// <summary>Cuándo salta: "I" en el acto, "TB" al empezar el turno, "TE" al acabarlo,
-        /// "DBE" cuando le pegan... Un efecto puede traer varios separados por barras.</summary>
+        /// <summary>When it fires: "I" on the spot, "TB" at the start of the turn, "TE" at its end,
+        /// "DBE" when he is hit... An effect can bring several separated by bars.</summary>
         public string Triggers { get; init; } = "I";
 
-        /// <summary>A quién va: "C" a quien lo lanza, "a"/"A" a los de enfrente, y con "e519" o
-        /// "E519" pegado, sólo si NO tiene o SÍ tiene ese estado.</summary>
+        /// <summary>Who it goes to: "C" the caster, "a"/"A" the opponents, and with "e519" or
+        /// "E519" attached, only if he does NOT have or DOES have that state.</summary>
         public string TargetMask { get; set; } = "";
 
         /// <summary>
-        /// La FORMA de la zona, que es una letra guardada como su código: 'P' un punto, 'C' un
-        /// círculo, 'X' una cruz, 'L' una línea... y <see cref="Tamano"/> es su radio o su largo.
+        /// The SHAPE of the zone, which is a letter stored as its code: 'P' a point, 'C' a
+        /// circle, 'X' a cross, 'L' a line... and <see cref="Tamano"/> is its radius or its length.
         ///
-        /// Sin esto, un hechizo de zona sólo tocaba a quien estuviera justo en la casilla apuntada:
-        /// el Ojo de Topo enseñaba la previsualización sobre los dos pious y luego no le hacía
-        /// nada al segundo.
+        /// Without this, a zone spell only touched whoever was right on the targeted cell:
+        /// Ojo de Topo showed the preview over the two pious and then did nothing
+        /// to the second.
         /// </summary>
         /// <summary>The cells a ';' zone names, map cells; empty for every other shape.</summary>
         public IReadOnlyList<int> CeldasFijas { get; init; } = Array.Empty<int>();
@@ -103,16 +103,16 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public int TamanoMinimo { get; init; }
 
-        /// <summary>Si la zona se corta al llegar al objetivo, para las líneas.</summary>
+        /// <summary>Whether the zone is cut on reaching the target, for lines.</summary>
         public bool ParaEnElObjetivo { get; init; }
 
         /// <summary>
-        /// Cuánto daño pierde por cada casilla que uno esté alejado del centro de la zona, en
-        /// tanto por ciento, y cuántas casillas como mucho se cuentan.
+        /// How much damage it loses for each cell one is away from the zone's centre, as a
+        /// percentage, and how many cells at most are counted.
         ///
-        /// Sale del <c>zoneDescr</c> y va POR HECHIZO: dieciséis de los efectos de zona del Ocra
-        /// llevan un diez por ciento con tope de cuatro pasos, y otros siete lo llevan a cero, o
-        /// sea que pegan lo mismo en todo su alcance —Diamantes Destructores es de ésos—.
+        /// It comes from the <c>zoneDescr</c> and goes PER SPELL: sixteen of the Cra's zone effects
+        /// carry ten per cent with a cap of four steps, and another seven carry zero, that is
+        /// they hit the same across their whole reach —Diamantes Destructores is one of those—.
         /// </summary>
         public int PasoDeCaida { get; init; }
         public int TopeDeCaida { get; init; }
@@ -124,13 +124,13 @@ namespace Jondo.Unity.Server.Managers
         public int MaxStack { get; init; }
 
         /// <summary>
-        /// La probabilidad de que a este efecto le toque, en tanto por ciento, y el sorteo al que
-        /// pertenece.
+        /// The probability of this effect coming up, as a percentage, and the draw it
+        /// belongs to.
         ///
-        /// Es lo que hace que Invocación de Arakna saque una Arakna corriente el ochenta por
-        /// ciento de las veces y una Arakna mayor el veinte: son DOS efectos 181, uno con la
-        /// plantilla 246 y un random de 80, y otro con la 2630 y un random de 20. Sin mirar esto
-        /// salían las dos a la vez.
+        /// It is what makes Invocación de Arakna bring out an ordinary Arakna eighty per
+        /// cent of the time and a greater Arakna twenty: they are TWO 181 effects, one with
+        /// template 246 and a random of 80, and another with 2630 and a random of 20. Without looking at this
+        /// both came out at once.
         /// </summary>
         public double Probabilidad { get; init; }
         public int Sorteo { get; init; }
@@ -174,10 +174,10 @@ namespace Jondo.Unity.Server.Managers
     }
 
     /// <summary>
-    /// Los efectos de un hechizo, en un grado, leídos de SpellLevels.
+    /// A spell's effects, at one grade, read from SpellLevels.
     ///
-    /// Se cachea por (hechizo, grado) porque durante un combate se piden muchas veces y la tabla no
-    /// cambia mientras el servidor está levantado.
+    /// It is cached by (spell, grade) because during a fight they are asked for many times and the table does not
+    /// change while the server is up.
     /// </summary>
     public static class SpellEffects
     {
@@ -321,8 +321,8 @@ namespace Jondo.Unity.Server.Managers
                 : porDefecto;
 
         /// <summary>
-        /// El grado que un personaje tiene abierto de un hechizo, y el identificador de esa fila.
-        /// Sale de SpellLevels por MinPlayerLevel, que es de donde lo saca el propio cliente.
+        /// The grade a character has unlocked of a spell, and that row's identifier.
+        /// It comes from SpellLevels by MinPlayerLevel, which is where the client itself takes it from.
         /// </summary>
         public static (int Grado, int NivelId, int Coste) GradoDe(int hechizo, int nivelDelPersonaje)
         {
@@ -349,14 +349,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Las actitudes que regalan los objetos equipados: el efecto 1175 de cada uno lleva en su
-        /// <c>diceNum</c> el hechizo que da. De ahí salen las de los seis dofus y las de los
-        /// trofeos, y con ellas la regla del Ocre —"al principio de cada turno, un PA si no te han
-        /// pegado"— sin escribir ni una línea sobre el Ocre.
+        /// The attitudes the equipped items give away: each one's 1175 effect carries in its
+        /// <c>diceNum</c> the spell it gives. From there come those of the six dofus and those of the
+        /// trophies, and with them the Ochre's rule —"at the start of each turn, an AP if you have not been
+        /// hit"— without writing a single line about the Ochre.
         /// </summary>
         public const int EfectoQueRegalaHechizo = 1175;
 
-        /// <summary>Las casillas que son equipo de verdad; de la 63 en adelante es la bolsa.</summary>
+        /// <summary>The slots that are real equipment; from 63 onwards it is the bag.</summary>
         private const int UltimaCasillaDeEquipo = 62;
 
         public static List<int> ActitudesDelEquipo(long personaje)
@@ -375,8 +375,8 @@ namespace Jondo.Unity.Server.Managers
                 using var lector = orden.ExecuteReader();
                 while (lector.Read())
                 {
-                    // Hace falta el efecto crudo y no el resumen del inventario: el hechizo que
-                    // regala el objeto viaja en el DADO, no en el valor.
+                    // The raw effect is needed and not the inventory summary: the spell the item
+                    // gives away travels in the DIE, not in the value.
                     foreach (var efecto in Equipment.ParseEffects(lector.IsDBNull(0) ? "" : lector.GetString(0)))
                     {
                         if (efecto.Effect != EfectoQueRegalaHechizo) continue;

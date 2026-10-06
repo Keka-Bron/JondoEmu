@@ -6,22 +6,22 @@ using System.Text;
 namespace Jondo.Unity.Server
 {
     /// <summary>
-    /// Un fichero de registro que se queda abierto.
+    /// A log file that stays open.
     ///
-    /// Todo esto se escribía con File.AppendAllText, que abre el fichero, escribe y lo cierra. En
-    /// cada línea. Y el registro de tráfico escribe DOS veces por trama —una por sentido— así que
-    /// en un combate movido eso son cientos de aperturas por segundo, cada una con su ida al
-    /// sistema de ficheros, más un Directory.Exists por llamada porque la ruta se resolvía cada
-    /// vez. El servidor se pasaba más tiempo abriendo ficheros que atendiendo al cliente.
+    /// All of this used to be written with File.AppendAllText, which opens the file, writes and
+    /// closes it. On every line. And the traffic log writes TWICE per frame -- once per direction --
+    /// so in a busy fight that is hundreds of opens per second, each with its round trip to the file
+    /// system, plus a Directory.Exists per call because the path was resolved every time. The server
+    /// spent more time opening files than serving the client.
     ///
-    /// Aquí el manejador se abre una vez y se queda. Lo que NO se hace es guardar las líneas en un
-    /// buffer para escribirlas luego: esto es un registro de depuración, o sea que la vez que de
-    /// verdad hace falta es justo la vez que el servidor se muere, y un buffer sin vaciar se lleva
-    /// por delante precisamente las últimas líneas, que son las que explican qué pasó. Con
-    /// AutoFlush queda en disco cada línea igual que antes, pero sin abrir y cerrar.
+    /// Here the handle is opened once and kept. What is NOT done is holding lines in a buffer to
+    /// write them later: this is a debug log, so the time it is really needed is exactly the time
+    /// the server dies, and an unflushed buffer takes with it precisely the last lines, which are the
+    /// ones that explain what happened. With AutoFlush every line reaches the disk as before, but
+    /// without opening and closing.
     ///
-    /// La ruta se resuelve UNA vez, la primera. Paths.LogsDir comprueba y crea la carpeta en cada
-    /// llamada, y eso tampoco tiene por qué pagarse por línea.
+    /// The path is resolved ONCE, the first time. Paths.LogsDir checks and creates the folder on
+    /// every call, and that does not have to be paid per line either.
     /// </summary>
     /// <remarks>
     /// It also rotates now, which it did not. The traffic log had reached 112 MB on this machine
@@ -54,19 +54,19 @@ namespace Jondo.Unity.Server
 
         public LogFile(Func<string> comoSeLlama) => _comoSeLlama = comoSeLlama;
 
-        /// <summary>El registro de depuración: lo que hace el emulador, línea a línea.</summary>
+        /// <summary>The debug log: what the emulator does, line by line.</summary>
         public static readonly LogFile Debug = new LogFile(() => Paths.DebugLog);
 
         /// <summary>El tráfico en crudo, hexadecimal incluido.</summary>
         public static readonly LogFile Traffic = new LogFile(() => Paths.TrafficLog);
 
-        /// <summary>Una línea JSON por acción importante de un jugador o administrador.</summary>
+        /// <summary>One JSON line per significant action of a player or an administrator.</summary>
         public static readonly LogFile Activity = new LogFile(() => Paths.ActivityLog);
 
         /// <summary>
-        /// Escribe una línea. Si no se puede escribir —disco lleno, fichero bloqueado— se calla y
-        /// no vuelve a intentarlo: un registro que no se puede escribir no es motivo para tirar el
-        /// servidor, y menos aún para intentarlo otra vez con cada trama.
+        /// Writes a line. If it cannot be written -- disk full, file locked -- it stays quiet and does
+        /// not try again: a log that cannot be written is no reason to bring the server down, and even
+        /// less to try again with every frame.
         /// </summary>
         public void WriteLine(string texto)
         {
@@ -90,7 +90,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>Lo mismo, pero sin añadir el salto de línea.</summary>
+        /// <summary>The same, without adding the line break.</summary>
         public void Write(string texto)
         {
             if (_seRindio) return;

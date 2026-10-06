@@ -83,16 +83,16 @@ namespace Jondo.Unity.Server.Handlers
                         
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, johPacket);
 
-                        // Los dos avisos —jsd al mapa que deja, jsn al que llega— los da la misma
-                        // pieza para los cuatro caminos que cambian de mapa. Aquí estaban escritos
-                        // a mano, y era la única de las cuatro que los daba: el zaap, el borde y
-                        // el .teleport se quedaron sin ellos y sólo se notaba jugando de dos en dos.
-                        // Va detrás del joh para que el que llega esté ya contado en el mapa nuevo.
+                        // The two notices -- jsd to the map being left, jsn to the one being reached -- are given
+                        // by the same piece for the four roads that change map. Here they were written out by
+                        // hand, and it was the only one of the four that gave them: the zaap, the edge and
+                        // .teleport were left without them and it was only noticed playing two at a time.
+                        // It goes after the joh so that whoever arrives is already counted on the new map.
                         //
-                        // La dirección que viaja en el jsd es la CARDINAL de las capturas —0
-                        // derecha, 2 abajo, 4 izquierda, 6 arriba—, no el newOrientation de aquí
-                        // arriba, que usa las impares (1/5/3/7). Las cuatro medidas están en la
-                        // cabecera de WorldMoveHandler, sacadas de las capturas de Movimiento.
+                        // The direction travelling in the jsd is the CARDINAL one of the captures -- 0
+                        // right, 2 down, 4 left, 6 up --, not the newOrientation up here, which uses the
+                        // odd ones (1/5/3/7). The four measurements are in the header of WorldMoveHandler,
+                        // taken from the Movimiento captures.
                         int haciaDonde = direction switch
                         {
                             "Right" => 0,

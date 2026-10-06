@@ -8,19 +8,19 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Dos reglas del motor de combate, comprobadas sobre su propio código fuente.
+    /// Two rules of the fight engine, checked against its own source code.
     /// </summary>
     /// <remarks>
-    /// Es fea y da igual: de las cuatro cosas que se hicieron para separar PvM de PvP, ésta es la
-    /// única que sigue trabajando dentro de seis meses. Las otras tres arreglan lo que hay; ésta
-    /// impide que vuelva.
+    /// It is ugly and it does not matter: of the four things done to separate PvM from PvP, this is the
+    /// only one still working six months from now. The other three fix what there is; this one
+    /// keeps it from coming back.
     ///
-    /// Las dos reglas salen de las dos clases de fallo que dieron catorce errores en dos tardes de
-    /// desafíos, y las dos son invisibles en revisión: el código compila, las pruebas de siempre
-    /// pasan, y el fallo sólo se ve desde la pantalla del OTRO jugador.
+    /// The two rules come from the two kinds of bug that gave fourteen errors in two afternoons of
+    /// challenges, and both are invisible in review: the code compiles, the usual tests
+    /// pass, and the bug is only seen from the OTHER player's screen.
     ///
-    /// Si una de las dos salta y estás seguro de que tu caso es bueno, añádelo a su lista de
-    /// excepciones CON el motivo escrito. Que cueste un comentario es parte del asunto.
+    /// If one of the two fires and you are sure your case is good, add it to its list of
+    /// exceptions WITH the reason written. That it costs a comment is part of the point.
     /// </remarks>
     public class FightArchitectureTests
     {
@@ -62,12 +62,12 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Nadie_busca_combatientes_en_un_solo_bando()
         {
-            // «fight.Azul.Find(f => f.Id == quien)» es la forma de este fallo. Contra monstruos
-            // acierta siempre porque el único humano está en el azul; en un desafío deja al retado
-            // sin poder recolocarse, sin sus esperas iniciales y sin poder abandonar.
+            // «fight.Azul.Find(f => f.Id == quien)» is the shape of this bug. Against monsters
+            // it always hits because the only human is on blue; in a challenge it leaves the challenged
+            // unable to reposition, without his initial waits and unable to abandon.
             //
-            // Para buscar a alguien está fight.Buscar(id); para saber de qué lado es, EquipoDe(id);
-            // para los suyos y los otros, Aliados(id) y Enemigos(id).
+            // To look someone up there is fight.Buscar(id); to know which side he is on, EquipoDe(id);
+            // for his own and the others, Aliados(id) and Enemigos(id).
             var prohibido = new Regex(@"\.(Azul|Rojo)\.(Find|Exists|FirstOrDefault|Any|All)\b");
 
             var culpables = Culpables(Motor(), linea => prohibido.IsMatch(linea));
@@ -77,28 +77,28 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Regla 2: lo que se difunde no puede depender de quién mira
+        //  Rule 2: what is broadcast cannot depend on who is looking
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// Las difusiones que SÍ pueden leer GameState, y por qué.
+        /// The broadcasts that MAY read GameState, and why.
         /// </summary>
         /// <remarks>
-        /// El kah dice quién acaba de declararse listo. Corre en el contexto de quien pulsó, así
-        /// que ese GameState.CharacterId es el SUJETO de la trama y no quien la recibe: la trama
-        /// es la misma para los dos y difundirla es lo correcto.
+        /// The kah says who has just declared himself ready. It runs in the context of whoever pressed, so
+        /// that GameState.CharacterId is the frame's SUBJECT and not whoever receives it: the frame
+        /// is the same for both and broadcasting it is right.
         /// </remarks>
         private static readonly string[] Permitidas = { "Op.Kah" };
 
         [Fact]
         public void Lo_que_se_difunde_no_se_construye_desde_una_sesion()
         {
-            // Ésta es la que encontró el fallo del jxw: una trama que lleva dentro «este
-            // combatiente eres tú», difundida UNA vez con esa marca calculada contra la sesión que
-            // estuviera corriendo. El otro recibía sus propios puntos marcados como ajenos.
+            // This is the one that found the jxw bug: a frame that carries inside «this
+            // fighter is you», broadcast ONCE with that mark computed against whichever session
+            // happened to be running. The other received his own points marked as someone else's.
             //
-            // Si el contenido cambia según quién lo reciba, no es una difusión: es una trama por
-            // persona, y para eso está ACadaUnoAsync -- o un ayudante como FichaATodosAsync.
+            // If the content changes depending on who receives it, it is not a broadcast: it is one frame per
+            // person, and that is what ACadaUnoAsync is for -- or a helper like FichaATodosAsync.
             var malas = new List<string>();
 
             foreach (var (numero, llamada) in Difusiones(Motor()))
@@ -115,22 +115,22 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Regla 3: escribir a un socket suelto es la excepción, no el atajo
+        //  Rule 3: writing to a loose socket is the exception, not the shortcut
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// Los métodos que SÍ construyen la vista de una sola persona, y por eso escriben a su
-        /// socket. Cualquier otro que lo haga se está saltando la regla del destinatario.
+        /// The methods that DO build a single person's view, and that is why they write to his
+        /// socket. Any other doing so is skipping the recipient rule.
         /// </summary>
         /// <remarks>
-        /// Los seis primeros son las ráfagas por cliente: la entrada al combate, la preparación,
-        /// el arranque, la vuelta a un combate en marcha, el final y el reenvío del mapa. Los <c>Send…</c> son trozos de esas mismas
-        /// ráfagas. Los dos últimos son casos sueltos con su motivo:
+        /// The first six are the per-client bursts: the entry into the fight, the preparation,
+        /// the start, the return to a fight in progress, the end and the map resend. The <c>Send…</c> are pieces of those same
+        /// bursts. The last two are loose cases with their reason:
         ///
-        ///   AttackAsync                   su jsq es el permiso de cambio de mapa de quien ataca
-        ///   HandleFightOptionToggle       los interruptores del panel; SIN MEDIR si el rival los ve
-        ///   AnnounceAppearanceAsync       no recibe el combate; hace falta pasárselo para difundir
-        ///   RefreshPlayerSpellBarAsync    la barra de hechizos es de quien la mira
+        ///   AttackAsync                   its jsq is the map change permission of the attacker
+        ///   HandleFightOptionToggle       the panel's switches; NOT MEASURED whether the rival sees them
+        ///   AnnounceAppearanceAsync       does not receive the fight; it has to be passed to broadcast
+        ///   RefreshPlayerSpellBarAsync    the spell bar belongs to whoever looks at it
         /// </remarks>
         private static readonly string[] VistaDeUnaPersona =
         {
@@ -149,10 +149,10 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Solo_escriben_a_un_socket_los_que_pintan_la_vista_de_uno()
         {
-            // La regla del destinatario: lo que pasa en el tablero va a todos, y la vista de una
-            // persona va a cada uno desde su contexto. Mientras escribir al socket suelto esté a
-            // mano dentro del motor, el próximo método nuevo se la salta sin querer -- que es
-            // exactamente lo que pasó con el «listo», con el arranque y con el final del combate.
+            // The recipient rule: what happens on the board goes to everyone, and a person's view
+            // goes to each one from his own context. As long as writing to the loose socket is at
+            // hand inside the engine, the next new method skips it without meaning to -- which is
+            // exactly what happened with the «ready», with the start and with the end of the fight.
             var metodo = new Regex(@"^\s*(?:private|public|internal).*\sTask[<\w>]*\s+(\w+)\s*\(");
             var lineas = Motor().Split('\n');
 
@@ -178,8 +178,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void La_guardia_esta_mirando_de_verdad()
         {
-            // Que las dos de arriba no pasen por no haber encontrado el fichero, o por haber
-            // renombrado el ayudante y quedarse sin nada que revisar.
+            // That the two above do not pass for not having found the file, or for having
+            // renamed the helper and being left with nothing to check.
             string motor = Fuente(ElMotor);
 
             Assert.Contains("ATodosAsync", motor);
@@ -187,9 +187,9 @@ namespace Jondo.Unity.Tests.Combat
                 "Se esperaban decenas de difusiones y se han visto " + Difusiones(motor).Count);
         }
 
-        // ─── las dos herramientas ───────────────────────────────────────────
+        // ─── the two tools ──────────────────────────────────────────────────
 
-        /// <summary>Las líneas que cumplen el filtro, con su número y sin contar las comentadas.</summary>
+        /// <summary>The lines that match the filter, with their number and not counting the commented ones.</summary>
         private static List<string> Culpables(string fuente, Func<string, bool> filtro)
         {
             var salida = new List<string>();
@@ -204,10 +204,10 @@ namespace Jondo.Unity.Tests.Combat
             return salida;
         }
 
-        /// <summary>Cada llamada a ATodosAsync entera, con su número de línea.</summary>
+        /// <summary>Each whole call to ATodosAsync, with its line number.</summary>
         /// <remarks>
-        /// Se cuentan los paréntesis para coger la llamada completa: el contenido interesante casi
-        /// siempre está en las líneas de debajo, no en la primera.
+        /// The parentheses are counted to take the complete call: the interesting content is almost
+        /// always in the lines below, not in the first.
         /// </remarks>
         private static List<(int Numero, string Llamada)> Difusiones(string fuente)
         {

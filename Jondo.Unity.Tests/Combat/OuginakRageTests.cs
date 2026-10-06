@@ -4,10 +4,11 @@ using Xunit;
 
 namespace Jondo.Unity.Tests.Combat
 {
-    /// <summary>Régressions de la mécanique mesurée dans les captures Ouginak.</summary>
+    /// <summary>Regressions of the mechanic measured in the Ouginak captures.</summary>
     public class OuginakRageTests
     {
         private const int RageManager = 13745;
+        private const int BestialFormEnd = 13747;
         private const int Molosse = 13756;
         private const int Apaisement = 13769;
         private const int RageOne = 513;
@@ -61,6 +62,23 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
+        public void Molosse_still_grants_rage_when_the_damage_killed_its_target()
+        {
+            var (fight, ouginak) = Combat();
+            // FightHandler applies the damage before it resolves the spell's other rows, so this
+            // target stands for the monster Molosse has already killed.
+            var target = new Fighter { Id = 2, TeamId = 1, CellId = 101, CurrentHP = 0 };
+            fight.Rojo.Add(target);
+
+            EffectEngine.Resolver(fight, ouginak, Molosse, 1, target,
+                                  EffectEngine.AlLanzar, 0, celdaApuntada: target.CellId);
+
+            Assert.True(ouginak.Buffs.TieneEstado(RageOne));
+            Assert.True(ouginak.Buffs.TieneEstado(RagePresent));
+            Assert.False(ouginak.Buffs.TieneEstado(RageTwo));
+        }
+
+        [Fact]
         public void Third_gain_transforms_and_grants_twenty_percent_final_damage()
         {
             var (fight, ouginak) = Combat();
@@ -77,6 +95,39 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(20, ouginak.Buffs.De(FinalDamage, 0));
             Assert.Equal(BestialAppearance, ouginak.Buffs.AparienciaEn(0));
             Assert.Contains(consequences, c => c.Apariencia == BestialAppearance);
+        }
+
+        [Fact]
+        public void Bestial_form_cleanup_waits_until_the_end_of_the_following_turn()
+        {
+            var (fight, ouginak) = Combat();
+
+            Gain(fight, ouginak, round: 2);
+            Gain(fight, ouginak, round: 2);
+            Gain(fight, ouginak, round: 2);
+
+            Assert.True(ouginak.Buffs.TieneEstado(BestialForm));
+            Assert.Equal(BestialAppearance, ouginak.Buffs.AparienciaEn(2));
+
+            var waiting = Assert.Single(ouginak.Buffs.Puestos,
+                buff => buff.Pendiente && buff.Dado == BestialFormEnd);
+            Assert.Equal(3, waiting.EmpiezaEnRonda);
+            Assert.Empty(EffectEngine.ActivateDuePending(fight, 2));
+
+            var due = Assert.Single(EffectEngine.ActivateDuePending(fight, 3),
+                activation => activation.Casts && activation.Waiting.Dado == BestialFormEnd);
+            Assert.Equal(ouginak, due.Target);
+
+            // The delayed spell only arms its TE row at the start of round 3. The form remains
+            // throughout that turn, then this row removes Bestialidad when the turn ends.
+            EffectEngine.Resolver(fight, ouginak, BestialFormEnd, 1, ouginak,
+                                  EffectEngine.AlLanzar, 3);
+            Assert.True(ouginak.Buffs.TieneEstado(BestialForm));
+
+            EffectEngine.Resolver(fight, ouginak, BestialFormEnd, 1, ouginak,
+                                  EffectEngine.AlAcabarElTurno, 3);
+            Assert.False(ouginak.Buffs.TieneEstado(BestialForm));
+            Assert.Equal(0, ouginak.Buffs.AparienciaEn(3));
         }
 
         [Fact]
@@ -104,8 +155,8 @@ namespace Jondo.Unity.Tests.Combat
             Gain(fight, ouginak);
             Gain(fight, ouginak);
 
-            // Apaisement passe par l'effet 1160 vers 13782, qui retire les effets du sort de
-            // transformation avec l'effet 406.
+            // Apaisement goes through effect 1160 towards 13782, which removes the effects of the
+            // transformation spell with effect 406.
             EffectEngine.Resolver(fight, ouginak, Apaisement, 1, ouginak,
                                   EffectEngine.AlLanzar, 0);
 

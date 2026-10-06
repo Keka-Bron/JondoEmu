@@ -73,9 +73,11 @@ namespace Jondo.Unity.Server.Network
         /// is changed ("desde dentro de casa salir a fuera", frame 13) and never after, even with a
         /// code set and at the next login (jaa of "Gremio/comprar una raid", 2 September).
         ///
-        /// A house with no owner has never been captured. Without one, f4, f8 and f9 -- which only
-        /// ever come with an owner -- are left out: an inference, used only to answer an izv about
-        /// a house that is for sale by nobody.
+        /// A house with no owner has never been captured. Without one, f4 and f9 -- which only ever
+        /// come with an owner -- are left out and f8 goes empty, so the client has an account to
+        /// read and no name in it. Not captured, but seen in the client: it shows such a house as
+        /// abandoned. It travels on the street too, because the client drops the buyer's khr of a
+        /// house its map never declared -- the window did not open until it did.
         /// </remarks>
         public static Pb Build(Plaque plaque, bool full)
         {
@@ -89,6 +91,10 @@ namespace Jondo.Unity.Server.Network
             {
                 lnx.Msg(8, Pb.New().Str(1, plaque.OwnerName).Str(2, plaque.OwnerTag));
                 lnx.Var(9, 1);
+            }
+            else
+            {
+                lnx.Msg(8, Pb.New());
             }
             if (full)
             {

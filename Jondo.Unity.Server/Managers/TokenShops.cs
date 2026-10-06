@@ -8,54 +8,54 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las tiendas que cobran en un OBJETO en vez de en kamas.
+    /// The shops that charge in an ITEM instead of in kamas.
     ///
-    /// Esto no es un invento de Jondo: el cliente 3.6.10.10 ya lo sabe hacer, y está medido. De los
-    /// 60 mensajes de apertura de tienda —el kbd— que hay en las 305 capturas, 58 llevan sólo los
-    /// campos f1 y f2 y cobran en kamas; los otros dos llevan un f3 con el id del objeto que hace
-    /// de moneda: el 13052 «Sebuscalón» en la tienda de la Torre de los Viajeros y el 30529
-    /// «Fidelicha» en una de Pandala. Con ese campo puesto, el cliente pinta la ficha en lugar del
-    /// símbolo de las kamas y pide confirmación con el número de fichas.
+    /// This is not a Jondo invention: the 3.6.10.10 client already knows how to do it, and it is measured. Of the
+    /// 60 shop opening messages —the kbd— in the 305 captures, 58 carry only the
+    /// fields f1 and f2 and charge in kamas; the other two carry an f3 with the id of the item acting
+    /// as currency: 13052 «Sebuscalón» in the Travellers' Tower shop and 30529
+    /// «Fidelicha» in one in Pandala. With that field set, the client draws the token instead of the
+    /// kama symbol and asks for confirmation with the number of tokens.
     ///
-    /// Y la compra cambia sólo en dos mensajes, los dos medidos en la captura de la Torre:
+    /// And the purchase changes in only two messages, both measured in the Tower capture:
     ///
-    ///   lqn 364   en vez del 252. Seis parámetros: el objeto comprado y su uid, la cantidad, el
-    ///             precio, y el id y el uid de la moneda. Medido: 798, 1055401001, 1, 20, 13052, 0.
-    ///   ivj       en vez del ivf. Lleva { f2: el uid de la pila de fichas, f3: LO QUE QUEDA }.
-    ///             Que el f3 es el total nuevo y no lo gastado se ve en el mercadillo de runas de
-    ///             otra captura, donde la misma pila va 107 -> 117 -> 217 -> 1217.
+    ///   lqn 364   instead of 252. Six parameters: the item bought and its uid, the quantity, the
+    ///             price, and the currency's id and uid. Measured: 798, 1055401001, 1, 20, 13052, 0.
+    ///   ivj       instead of ivf. It carries { f2: the uid of the token stack, f3: WHAT IS LEFT }.
+    ///             That f3 is the new total and not what was spent is seen in the rune marketplace of
+    ///             another capture, where the same stack goes 107 -> 117 -> 217 -> 1217.
     ///
-    /// Lo que vende cada tienda de fichas y a qué precio NO sale de ninguna captura: es contenido
-    /// nuestro. Por eso vive en su propio fichero, datos/tiendas_en_fichas.json, escrito a mano y
-    /// no generado. El catálogo normal, datos/npc_shops.json, lo rehace tools/extraer_tiendas.py
-    /// cada vez que se vuelve a medir, así que meter esto ahí sería perderlo en la siguiente vuelta.
+    /// What each token shop sells and at what price does NOT come from any capture: it is our
+    /// content. That is why it lives in its own file, datos/tiendas_en_fichas.json, written by hand and
+    /// not generated. The normal catalogue, datos/npc_shops.json, is remade by tools/extraer_tiendas.py
+    /// every time it is measured again, so putting this there would be losing it on the next round.
     ///
-    /// Si el fichero no está, o está vacío, no pasa nada: ninguna tienda cobra en fichas y todo
-    /// sigue exactamente igual que antes.
+    /// If the file is not there, or is empty, nothing happens: no shop charges in tokens and everything
+    /// stays exactly as before.
     /// </summary>
     public static class TokenShops
     {
-        /// <summary>Una tienda que cobra en fichas: qué moneda pide y a cuánto vende cada cosa.</summary>
+        /// <summary>A shop that charges in tokens: which currency it asks for and how much it sells each thing for.</summary>
         public sealed class Shop
         {
-            /// <summary>La plantilla del objeto que hace de moneda.</summary>
+            /// <summary>The template of the item acting as currency.</summary>
             public int TokenGid;
 
-            /// <summary>Precio en fichas de un objeto concreto, por plantilla. Manda sobre todo.</summary>
+            /// <summary>Price in tokens of a specific item, by template. It rules over everything.</summary>
             public Dictionary<int, long> Prices = new Dictionary<int, long>();
 
             /// <summary>
-            /// Precio por TIPO de objeto, que es lo que hace esto manejable.
+            /// Price per item TYPE, which is what makes this manageable.
             ///
-            /// Los vendedores de apariencia llevan 1.848 prendas entre los cinco. Escribir un
-            /// precio por prenda serían 1.848 líneas que nadie va a revisar y que se descuadran en
-            /// cuanto se añada una capa. Por tipo son nueve números: los sombreros valen lo mismo
-            /// entre ellos y una montura vale más que un sombrero, que es la única distinción que
-            /// de verdad importa.
+            /// The appearance sellers carry 1,848 garments among the five. Writing a
+            /// price per garment would be 1,848 lines nobody is going to review and that go out of line as
+            /// soon as a cape is added. Per type it is nine numbers: hats cost the same
+            /// among themselves and a mount costs more than a hat, which is the only distinction that
+            /// really matters.
             /// </summary>
             public Dictionary<int, long> PricesByType = new Dictionary<int, long>();
 
-            /// <summary>Lo que vale en esta tienda lo que no encaje en ninguna de las dos tablas.</summary>
+            /// <summary>What anything that fits in neither table is worth in this shop.</summary>
             public long ShopPrice;
         }
 
@@ -92,8 +92,8 @@ namespace Jondo.Unity.Server.Managers
                     if (entrada.Value.TryGetProperty("moneda", out var moneda))
                         shop.TokenGid = moneda.GetInt32();
 
-                    // Sin moneda no es una tienda de fichas. Se salta en vez de cobrar en kamas
-                    // por accidente, que es lo que haría el cliente con un f3 a cero.
+                    // Without a currency it is not a token shop. It is skipped instead of charging in kamas
+                    // by accident, which is what the client would do with an f3 at zero.
                     if (shop.TokenGid <= 0)
                     {
                         Console.WriteLine($"[Tiendas] El vendedor {npcId} no dice qué moneda pide; " +
@@ -139,17 +139,17 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>La tienda de fichas de ese vendedor, o null si cobra en kamas como todos.</summary>
+        /// <summary>That seller's token shop, or null if it charges in kamas like everyone.</summary>
         public static Shop? Of(int npcTemplateId)
             => _byNpc.TryGetValue(npcTemplateId, out var shop) ? shop : null;
 
         /// <summary>
-        /// Cuántas fichas cuesta un objeto en esa tienda.
+        /// How many tokens an item costs in that shop.
         ///
-        /// Se mira en tres sitios y gana el más concreto: el precio de ESE objeto, después el de su
-        /// tipo, después el de la tienda entera. Lo que no esté en ninguno vale
-        /// <see cref="DefaultPrice"/> y no cero: regalar cosas por olvidarse de una línea del
-        /// fichero es peor que cobrarlas baratas.
+        /// It is looked up in three places and the most specific wins: the price of THAT item, then that of its
+        /// type, then that of the whole shop. What is in none of them is worth
+        /// <see cref="DefaultPrice"/> and not zero: giving things away for forgetting a line of the
+        /// file is worse than charging little for them.
         /// </summary>
         public static long PriceOf(Shop shop, int gid)
         {
@@ -162,10 +162,10 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El tipo de cada objeto que vende alguna tienda de fichas, para poder cobrar por tipo.
+        /// The type of each item some token shop sells, to be able to charge by type.
         ///
-        /// Sólo los de esas tiendas, no las 21.748 plantillas del juego: se lee una vez al arrancar
-        /// y no se vuelve a la base en cada compra.
+        /// Only those of these shops, not the game's 21,748 templates: it is read once at start
+        /// and the base is not visited again on each purchase.
         /// </summary>
         private static readonly Dictionary<int, int> _typeOfItem = new Dictionary<int, int>();
 
@@ -201,7 +201,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Lo que cuesta un objeto al que no se le ha puesto precio.</summary>
+        /// <summary>What an item with no price set costs.</summary>
         public const long DefaultPrice = 1;
     }
 }

@@ -1,22 +1,22 @@
 {
  "_comment": [
-  "La entrada al mundo, trama a trama, sacada de las tres capturas con",
-  "tools/decode_world_entry.py. Sustituye a los .bin: el servidor ya no los abre.",
+  "The entry into the world, frame by frame, taken from the three captures with",
+  "tools/decode_world_entry.py. It replaces the .bin files: the server no longer opens them.",
   "",
-  "Cada fila es una trama. root dice si el servidor empuja (1) o contesta (3).",
-  "payload son los campos del mensaje tal cual: v es un varint, msg un submensaje,",
-  "raw unos bytes que no son un mensaje. Las que llevan skip no se mandan y dicen",
-  "por que; las que llevan built las construye el servidor desde la base de datos.",
+  "Each row is a frame. root says whether the server pushes (1) or answers (3).",
+  "payload is the message's fields as they are: v is a varint, msg a submessage,",
+  "raw some bytes that are not a message. The ones carrying skip are not sent and say",
+  "why; the ones carrying built are built by the server from the database.",
   "",
-  "Todo lo que queda en payload son bytes de la captura. No es de nadie -se ha",
-  "comprobado uno a uno- pero sigue siendo estructura copiada, y la lista deberia",
-  "ir encogiendo segun se sepa construir cada mensaje.",
+  "Everything left in payload is bytes from the capture. It belongs to nobody -it has been",
+  "checked one by one- but it is still copied structure, and the list should",
+  "keep shrinking as each message is learnt to be built.",
   "",
-  "Lo que NO esta aqui porque no se manda, y por que, en WorldEntry.NotReplayed:",
-  "   idu   x265  el diario de misiones, una trama por mision",
-  "   mft   x1    los 954 logros de esa cuenta",
-  "   idr   x1    el diario entero otra vez: 261 en curso y 622 dadas por hechas",
-  "   ivi   x1    los contadores de esa cuenta: 9.694 pares de id y valor"
+  "What is NOT here because it is not sent, and why, in WorldEntry.NotReplayed:",
+  "   idu   x265  the quest journal, one frame per quest",
+  "   mft   x1    that account's 954 achievements",
+  "   idr   x1    the whole journal again: 261 in progress and 622 taken as done",
+  "   ivi   x1    that account's counters: 9,694 id and value pairs"
  ],
  "blocks": {
   "afterCharacter": [
@@ -12869,7 +12869,7 @@
      1,
      1
     ],
-    "built": "la barra de objetos, que sale vacia"
+    "built": "the items bar, which goes out empty"
    },
    {
     "opcode": "hou",

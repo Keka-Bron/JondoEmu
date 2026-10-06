@@ -7,34 +7,34 @@ using Jondo.Unity.Launcher;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los interactivos que al pulsarlos abren un documento: carteles, libros, placas.
+    /// The interactives that open a document when pressed: signs, books, plaques.
     /// </summary>
     /// <remarks>
-    /// El cliente los enseña con un <c>kkt</c> que sólo lleva el id del documento; ni el título ni
-    /// el texto viajan, los tiene él en su propia tabla. Está medido en la captura de abrir el
-    /// libro del escudo de Feca: el cliente manda <c>iuu</c> y el servidor contesta
+    /// The client shows them with a <c>kkt</c> that only carries the document's id; neither the title nor
+    /// the text travel, it has them in its own table. It is measured in the capture of opening the
+    /// Feca shield book: the client sends <c>iuu</c> and the server answers
     /// <c>kkt { f2: 217 }</c>.
     ///
-    /// Vive en un fichero aparte y no en las ataduras de misión porque no es una cosa de misiones:
-    /// un cartel se puede leer con o sin misión, y lo que hace es dejar constancia de que se ha
-    /// leído. Que esa constancia luego abra una respuesta de un NPC es asunto del diálogo.
+    /// It lives in a separate file and not in the quest bindings because it is not a quest thing:
+    /// a sign can be read with or without a quest, and what it does is leave a record that it has been
+    /// read. That this record then opens an NPC's reply is the dialogue's business.
     /// </remarks>
     public static class Readables
     {
         public const string File = "world/readables.json";
 
-        /// <summary>Una lectura: el documento y, si la tiene, su pregunta de aceptar.</summary>
+        /// <summary>A reading: the document and, if it has one, its accept question.</summary>
         public sealed class Readable
         {
             public int Document { get; init; }
 
-            /// <summary>La frase de la pregunta. Cero cuando la lectura no pregunta nada.</summary>
+            /// <summary>The question's sentence. Zero when the reading asks nothing.</summary>
             public int Question { get; init; }
 
-            /// <summary>La respuesta que acepta. Es la que deja constancia de haber leido.</summary>
+            /// <summary>The reply that accepts. It is the one that leaves a record of having read.</summary>
             public int Accept { get; init; }
 
-            /// <summary>La que se marcha sin aceptar. Opcional.</summary>
+            /// <summary>The one that leaves without accepting. Optional.</summary>
             public int Decline { get; init; }
 
             public bool Asks => Question != 0 && Accept != 0;
@@ -118,12 +118,12 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>El documento de este elemento, o cero si no abre ninguno.</summary>
+        /// <summary>This element's document, or zero if it opens none.</summary>
         /// <remarks>
-        /// Se pregunta primero por el mapa exacto y después con mapa cero, que quiere decir «en
-        /// cualquiera». El cartel de la taberna lleva el MISMO id de elemento en los dos mapas
-        /// contiguos, porque el edificio ocupa las dos casillas, y sin la segunda pregunta habría
-        /// que escribir la misma fila dos veces.
+        /// It is asked first by the exact map and then with map zero, which means «on
+        /// any». The tavern sign carries the SAME element id on the two adjacent
+        /// maps, because the building takes up both cells, and without the second question the
+        /// same row would have to be written twice.
         /// </remarks>
         public static Readable? Of(long mapId, int elementId)
         {
@@ -131,10 +131,10 @@ namespace Jondo.Unity.Server.Managers
             return _porElemento.TryGetValue((0, elementId), out lectura) ? lectura : null;
         }
 
-        /// <summary>La lectura cuya respuesta de aceptar es esta, o null.</summary>
+        /// <summary>The reading whose accept reply is this one, or null.</summary>
         /// <remarks>
-        /// Hace falta para atender el ioy: la respuesta llega suelta, sin decir de que elemento
-        /// venia, y es la unica manera de saber que se acaba de aceptar una oferta.
+        /// It is needed to handle the ioy: the reply arrives on its own, without saying which element
+        /// it came from, and it is the only way of knowing that an offer has just been accepted.
         /// </remarks>
         public static (long Map, int Element, Readable Lectura)? ByAcceptReply(long reply)
         {
@@ -145,11 +145,11 @@ namespace Jondo.Unity.Server.Managers
             return null;
         }
 
-        /// <summary>Los elementos de este mapa que abren un documento.</summary>
+        /// <summary>The elements of this map that open a document.</summary>
         /// <remarks>
-        /// Lo necesita la lista de actores: sin declararlos ahí el cliente no los pinta como
-        /// pulsables, y entonces da igual lo bien que el servidor conteste al clic, porque no
-        /// llega ninguno. Incluye los de mapa cero, que valen en cualquiera.
+        /// The actor list needs it: without declaring them there the client does not draw them as
+        /// pressable, and then however well the server answers the click does not matter, because none
+        /// arrives. It includes the map-zero ones, which hold on any.
         /// </remarks>
         public static IEnumerable<int> OnMap(long mapId)
         {

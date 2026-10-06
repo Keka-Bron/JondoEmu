@@ -11,54 +11,54 @@ using static Jondo.Protocol.NetworkMessage;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Los retos del combate, fase de preparación: ofrecerlos y dejar que el jugador elija.
+    /// Fight challenges, placement phase: offering them and letting the player choose.
     ///
-    /// ─── El guión, medido sobre 305 capturas ────────────────────────────────────────────────
+    /// ─── The script, measured over 305 captures ─────────────────────────────────────────────
     ///
-    /// Con la línea de tiempo de los DOS sentidos junta, que es lo que costó: las capturas se
-    /// leen por conexión, y sin volver a mezclar los dos lados por hora no se ve quién contesta
-    /// a quién y todo parece llegar suelto.
+    /// With the timeline of BOTH directions put together, which is what it took: the captures are
+    /// read per connection, and without merging the two sides again by time it cannot be seen who
+    /// answers whom and everything seems to arrive loose.
     ///
-    ///   kxa   S→C  cuántos hay que elegir. Llega DOS VECES, con el mismo número: una al entrar
-    ///              en la preparación y otra detrás de las casillas
-    ///   kwo   C→S  ajuste del panel          →  kwn  S→C  con el mismo valor
-    ///   kwr   C→S  abrir el selector (vacío) →  kwx  S→C  LA LISTA, siempre dos candidatos
-    ///   kwv   C→S  marcar uno
-    ///   kwi   C→S  pasar el ratón. Sin respuesta
-    ///   kwj   C→S  validar                   →  kww  S→C  el reto queda FIJADO
-    ///   kaq   C→S  listo                     →  kah, y ahí van los kww que falten
-    ///   kai   S→C  se acabó la colocación
-    ///   kwu   S→C  la lista definitiva, pegada al jyy
+    ///   kxa   S→C  how many have to be chosen. It arrives TWICE, with the same number: once on
+    ///              entering placement and again after the cells
+    ///   kwo   C→S  panel setting               →  kwn  S→C  with the same value
+    ///   kwr   C→S  open the selector (empty)   →  kwx  S→C  THE LIST, always two candidates
+    ///   kwv   C→S  mark one
+    ///   kwi   C→S  hover. No answer
+    ///   kwj   C→S  validate                    →  kww  S→C  the challenge is LOCKED IN
+    ///   kaq   C→S  ready                       →  kah, and there go the missing kww
+    ///   kai   S→C  placement is over
+    ///   kwu   S→C  the final list, next to the jyy
     ///
-    /// ─── Dos trampas que costaron entender la traza ─────────────────────────────────────────
+    /// ─── Two traps that took understanding the trace ────────────────────────────────────────
     ///
-    /// La primera: el PRIMER <c>kwv</c> no es un clic. Llega solo, entre dos y treinta
-    /// milisegundos detrás de la lista, y siempre con el id del primer candidato: es el cliente
-    /// marcando uno por su cuenta. Nueve de nueve veces. Si se tomara por una elección del
-    /// jugador, el reto quedaría fijado sin que nadie lo hubiera tocado.
+    /// The first: the FIRST <c>kwv</c> is not a click. It arrives on its own, between two and
+    /// thirty milliseconds after the list, and always with the first candidate's id: it is the
+    /// client marking one by itself. Nine times out of nine. If it were taken for the player's
+    /// choice, the challenge would be locked in without anybody having touched it.
     ///
-    /// La segunda: los dos candidatos son ALTERNATIVAS, no una pareja compatible. En las capturas
-    /// se ofrecieron juntos dos retos que la propia tabla del cliente marca como incompatibles.
-    /// La incompatibilidad manda entre los ya FIJADOS, no entre los que están sobre la mesa.
+    /// The second: the two candidates are ALTERNATIVES, not a compatible pair. In the captures two
+    /// challenges that the client's own table marks as incompatible were offered together.
+    /// Incompatibility rules among the ones already LOCKED IN, not among those on the table.
     ///
-    /// ─── Lo que aquí no está ────────────────────────────────────────────────────────────────
+    /// ─── What is not here ───────────────────────────────────────────────────────────────────
     ///
-    /// Comprobar durante el combate si el reto se cumple, y aplicar el porcentaje al ganar. Esto
-    /// es sólo la preparación: los retos se eligen, se fijan y viajan, pero todavía no vigilan
-    /// nada. El mensaje del resultado es el <c>kwl</c> y está medido —{ f1: cuál, f2: cumplido },
-    /// y sin el f2 está fallado—, pero nadie lo emite aún.
+    /// Checking during the fight whether the challenge is met, and applying the percentage on
+    /// winning. This is only placement: challenges are chosen, locked in and travel, but they do
+    /// not watch anything yet. The result message is <c>kwl</c> and it is measured -- { f1: which,
+    /// f2: met }, and without f2 it is failed --, but nobody sends it yet.
     /// </summary>
     public static class ChallengeHandler
     {
-        /// <summary>Cuántos se eligen en un combate normal. En mazmorra son dos.</summary>
+        /// <summary>How many are chosen in a normal fight. In a dungeon it is two.</summary>
         private const int NormalCount = 1;
 
         private static readonly Random _dado = new Random();
 
         /// <summary>
-        /// El nivel del grupo, que es lo que decide si un reto se puede ofrecer: la suma de los
-        /// niveles de los monstruos. Con eso se explica por qué contra un poutch no sale ninguno,
-        /// que es lo que pasa en las cuatro capturas de poutch: ni un kxa, ni un kwx.
+        /// The group's level, which is what decides whether a challenge can be offered: the sum of the
+        /// monsters' levels. That explains why none comes up against a poutch, which is what happens in
+        /// the four poutch captures: not one kxa, not one kwx.
         /// </summary>
         private static int GroupLevel(FightInstance fight)
         {
@@ -67,15 +67,15 @@ namespace Jondo.Unity.Server.Handlers
             return total;
         }
 
-        /// <summary>¿Hay retos que ofrecer en este combate?</summary>
+        /// <summary>Are there challenges to offer in this fight?</summary>
         public static bool Any(FightInstance fight)
             => Challenges.Pair(GroupLevel(fight), NoneFixed, _dado).Count > 0;
 
         private static readonly int[] NoneFixed = Array.Empty<int>();
 
         /// <summary>
-        /// Cuántos hay que elegir (kxa). El servidor real lo manda DOS veces con el mismo número,
-        /// así que esto se llama dos veces desde la preparación.
+        /// How many have to be chosen (kxa). The real server sends it TWICE with the same number,
+        /// so this is called twice from placement.
         /// </summary>
         public static async Task SendCountAsync(NetworkStream stream, FightInstance fight,
                                                 bool primeraVez = false)
@@ -86,25 +86,25 @@ namespace Jondo.Unity.Server.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kxa,
                 Network.FightProtocol.BuildChallengeCount(fight.ChallengesToPick)));
 
-            // Y pegado al PRIMER kxa, un kwk vacío. Sale seis veces en las capturas, siempre sin
-            // carga y siempre en este mismo hueco, entre el primer kxa y el primer jxg. No se
-            // sabe qué dice —va vacío, no hay nada que leer—, pero es lo único que el servidor
-            // real manda ahí y que aquí faltaba.
+            // And right after the FIRST kxa, an empty kwk. It shows up six times in the captures, always
+            // without a payload and always in this same spot, between the first kxa and the first jxg.
+            // What it says is unknown -- it is empty, there is nothing to read --, but it is the only thing
+            // the real server sends there and it was missing here.
             if (primeraVez) await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwk));
         }
 
         /// <summary>
-        /// Mandar la pareja de candidatos (kwx).
+        /// Sending the pair of candidates (kwx).
         ///
-        /// La pareja se SORTEA UNA VEZ y se guarda. Antes se volvía a sortear en cada llamada, así
-        /// que si el jugador abría el selector con dos retos ya en pantalla, se los cambiaba por
-        /// otros dos delante de sus narices. El servidor real conserva el que no se ha elegido.
+        /// The pair is DRAWN ONCE and kept. It used to be drawn again on every call, so if the player
+        /// opened the selector with two challenges already on screen, they were swapped for two others
+        /// in front of his eyes. The real server keeps the one that was not chosen.
         /// </summary>
         public static async Task OpenAsync(NetworkStream stream, FightInstance fight)
         {
             if (!fight.ChallengesPending) return;
 
-            // Si ya hay una pareja sobre la mesa, se vuelve a mandar la misma.
+            // If there is already a pair on the table, the same one is sent again.
             var lista = new List<byte[]>();
             var nombres = new List<Challenges.Challenge>();
 
@@ -141,8 +141,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El jugador marca un candidato (kwv). No se contesta nada: en las capturas el servidor
-        /// se queda callado. Sólo se apunta cuál, para saber qué fijar cuando valide.
+        /// The player marks a candidate (kwv). Nothing is answered: in the captures the server stays
+        /// silent. Only which one is noted, to know what to lock in when he validates.
         /// </summary>
         public static void Mark(FightInstance fight, byte[] payload)
         {
@@ -154,9 +154,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El jugador valida (kwj): el reto queda fijado y se le contesta con el kww. Si todavía
-        /// quedan retos por elegir, detrás va otra lista con la pareja siguiente, que es
-        /// exactamente lo que hace el servidor real en la mazmorra.
+        /// The player validates (kwj): the challenge is locked in and he is answered with the kww. If
+        /// there are still challenges to choose, another list follows with the next pair, which is
+        /// exactly what the real server does in a dungeon.
         /// </summary>
         public static async Task ValidateAsync(NetworkStream stream, FightInstance fight, byte[] payload)
         {
@@ -173,12 +173,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El ajuste del panel (kwo): se devuelve tal cual en un kwn, y DETRÁS va la lista.
+        /// The panel setting (kwo): it is sent back as it came in a kwn, and the list goes AFTER it.
         ///
-        /// El orden importa y está medido: en las doce veces que el servidor real manda la lista
-        /// de candidatos, las doce van DESPUÉS del kwo del cliente —incluidas las dos que llegan
-        /// sin que nadie las pida, en la captura de entrada automática—. El emulador la mandaba
-        /// al final de la preparación, antes de que el cliente hubiera dicho nada de su panel.
+        /// The order matters and is measured: in the twelve times the real server sends the list of
+        /// candidates, all twelve go AFTER the client's kwo -- including the two that arrive without
+        /// anybody asking, in the automatic entry capture. The emulator sent it at the end of
+        /// placement, before the client had said anything about its panel.
         /// </summary>
         public static async Task SettingsAsync(NetworkStream stream, FightInstance? fight, byte[] payload)
         {
@@ -192,16 +192,16 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El jugador ha pulsado listo y quedan retos sin elegir: el servidor los rellena él
-        /// solo. Está medido en la anomalía, donde el jugador eligió uno de los dos y el servidor
-        /// mandó el que faltaba sin haberlo ofrecido nunca.
+        /// The player has pressed ready and there are challenges left unchosen: the server fills them
+        /// in by itself. It is measured in the anomaly, where the player chose one of the two and the
+        /// server sent the missing one without ever having offered it.
         ///
-        /// Va ANTES del kai, que es el corte entre la colocación y el combate.
+        /// It goes BEFORE the kai, which is the cut between placement and the fight.
         /// </summary>
         public static async Task FillAsync(NetworkStream stream, FightInstance fight)
         {
-            // Lo que estuviera marcado sin validar cuenta: el jugador lo eligió, sólo que no llegó
-            // a pulsar el botón antes de declararse listo.
+            // Whatever was marked without being validated counts: the player chose it, he just did not
+            // get to press the button before declaring himself ready.
             if (fight.ChallengeMarked != 0 && fight.ChallengesPending)
             {
                 await FixAsync(stream, fight, fight.ChallengeMarked);
@@ -218,31 +218,35 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Y detrás, los que PONE el contenido, que son otra cosa.
+        /// And after them, the ones the CONTENT imposes, which are something else.
         ///
-        /// En una mazmorra o una anomalía no salen sólo los dos retos normales: van además de uno
-        /// a tres retos propios de ese sitio, los que llevan logro detrás. No se proponen ni se
-        /// eligen —el jugador no los ve en el selector— y llegan con el extra a CERO.
+        /// In a dungeon or an anomaly it is not only the two normal challenges: one to three
+        /// challenges of that place come on top, the ones with an achievement behind them. They are
+        /// neither proposed nor chosen -- the player does not see them in the selector -- and they arrive
+        /// with the bonus at ZERO.
         ///
-        /// Está medido en la anomalía: detrás de los dos normales llegaron tres kww más, 772,
-        /// 773 y 774, que no se habían ofrecido nunca, los tres sin porcentaje, y los tres
-        /// exigiendo el monstruo 5781, que era el de esa anomalía.
+        /// It is measured in the anomaly: after the two normal ones three more kww arrived, 772, 773
+        /// and 774, which had never been offered, all three without a percentage, and all three
+        /// requiring monster 5781, which was that anomaly's.
         ///
-        /// Como llevan logro, se hacen una vez: al personaje que ya los tenga cumplidos no se le
-        /// vuelven a poner. Hoy esa lista está siempre vacía porque todavía nadie comprueba si un
-        /// reto se cumple, así que a efectos prácticos salen siempre; el día que se implante la
-        /// comprobación, esto ya está en su sitio.
+        /// Since they carry an achievement, they are done once: a character who has already completed
+        /// them does not get them again. And only the ones the watcher can judge and that fit the party
+        /// there is -- no "Dúo" for three -- are imposed: <see cref="Challenges.Imposed"/> decides.
         /// </summary>
         private static async Task ImposeAsync(NetworkStream stream, FightInstance fight)
         {
-            // Sólo en la sala del jefe. Estos son los retos con logro detrás, el premio de haber
-            // hecho la mazmorra entera, y salían en cada sala porque lo único que se miraba era
-            // si el combate tenía monstruos con reto. Salir en la cuarta de cinco además engaña:
-            // el jugador los lee como «esta es la última» y deja de avanzar.
+            // Only in the boss room. These are the challenges with an achievement behind them, the reward
+            // for having done the whole dungeon, and they came out in every room because the only thing
+            // looked at was whether the fight had monsters with a challenge. Coming out in the fourth of
+            // five also misleads: the player reads them as «this is the last one» and stops advancing.
             //
-            // Un combate fuera de mazmorra no entra aquí -- IsBossRoom contesta que no cuando el
-            // mapa no es sala de ninguna --, que es lo que ya pasaba antes por otro camino.
-            if (!DungeonHandler.IsBossRoom(SessionContext.State.MapId)) return;
+            // A fight outside a dungeon does not get here -- IsBossRoom answers no when the map is no
+            // dungeon's room --, which is what already happened before by another road.
+            //
+            // The fight's ROLEPLAY map is asked about, not the session's: on entering a fight the
+            // session moves to the arena's map, which is no dungeon's room, and with that one the
+            // answer was always no. Not one imposed challenge came out since.
+            if (!DungeonHandler.IsBossRoom(fight.RoleplayMapId)) return;
 
             var bichos = new List<int>();
             foreach (var uno in fight.Rojo)
@@ -251,13 +255,20 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (bichos.Count == 0) return;
 
+            int players = 0, monsterCount = 0;
+            foreach (var uno in fight.Azul) if (!uno.EsInvocado) players++;
+            foreach (var uno in fight.Rojo) if (!uno.EsInvocado) monsterCount++;
+
             var cumplidos = DatabaseManager.LoadChallengesDone(GameState.CharacterId);
-            var puestos = Challenges.Imposed(bichos, cumplidos);
+            var puestos = Challenges.Imposed(bichos, cumplidos, players, monsterCount);
             if (puestos.Count == 0) return;
 
+            var alreadyFixed = FixedIds(fight);
             foreach (var reto in puestos)
             {
-                fight.ChallengesFixed.Add((reto.Id, 0));
+                // One fight, one list: the party's second player is sent the same challenge, but
+                // it is not written down twice.
+                if (Array.IndexOf(alreadyFixed, reto.Id) < 0) fight.ChallengesFixed.Add((reto.Id, 0));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kww,
                     Network.FightProtocol.BuildChallengeChosen(
                         Network.FightProtocol.BuildChallenge(reto.Id, 0))));
@@ -267,7 +278,7 @@ namespace Jondo.Unity.Server.Handlers
                               $"combate #{fight.FightId}.");
         }
 
-        /// <summary>La lista definitiva (kwu). Va entre el kai y el jyy.</summary>
+        /// <summary>The final list (kwu). It goes between the kai and the jyy.</summary>
         public static async Task SendFinalListAsync(NetworkStream stream, FightInstance fight)
         {
             if (fight.ChallengesFixed.Count == 0) return;

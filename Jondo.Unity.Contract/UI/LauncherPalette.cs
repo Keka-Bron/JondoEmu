@@ -3,18 +3,18 @@ using System;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// La paleta del lanzador, en numeros y sin toolkit.
+    /// The launcher's palette, in numbers and without a toolkit.
     /// </summary>
     /// <remarks>
-    /// Todos los valores salen de la hoja de estilos de la interfaz web original
-    /// (launcher_assets/index.html) y estaban escritos como <c>Color.FromArgb</c> dentro de
-    /// LauncherTheme, que es de Windows Forms. Al migrar el lanzador a Avalonia habria hecho falta
-    /// copiarlos, y una copia se separa del original en cuanto alguien toca uno de los dos.
+    /// All the values come from the original web interface's style sheet
+    /// (launcher_assets/index.html) and were written as <c>Color.FromArgb</c> inside
+    /// LauncherTheme, which is Windows Forms. On migrating the launcher to Avalonia they would have had
+    /// to be copied, and a copy drifts from the original as soon as someone touches one of the two.
     ///
-    /// Aqui son <c>uint</c> en formato 0xAARRGGBB, que es lo que entienden los dos: Windows Forms
-    /// hace <c>Color.FromArgb((int)valor)</c> y Avalonia <c>Color.FromUInt32(valor)</c>. El
-    /// servidor y el lanzador siguen pintando igual porque pintan con lo mismo, que era justo la
-    /// idea de tenerlo compartido.
+    /// Here they are <c>uint</c> in 0xAARRGGBB format, which is what both understand: Windows Forms
+    /// does <c>Color.FromArgb((int)value)</c> and Avalonia <c>Color.FromUInt32(value)</c>. The
+    /// server and the launcher keep painting the same because they paint with the same thing, which was exactly the
+    /// idea of having it shared.
     /// </remarks>
     public static class LauncherPalette
     {

@@ -48,20 +48,20 @@ namespace Jondo.Unity.Server.Network
         {
             lock (SessionGate)
             {
-                // La capacidad del SERVIDOR, que no tiene nada que ver con cuántos clientes abre una
-                // persona. Aquí ponía el tope del lanzador multicuenta -ocho- y por eso el servidor
-                // entero rechazaba la novena conexión, viniera del ordenador que viniera.
+                // The SERVER's capacity, which has nothing to do with how many clients a
+                // person opens. Here it had the multi-account launcher's cap -eight- and that is why the whole server
+                // rejected the ninth connection, whatever computer it came from.
                 if (_sessions.Count >= Contract.ClientesEnTotal) return false;
                 return _sessions.TryAdd(session.Id, session);
             }
         }
 
-        /// <summary>Se va del servidor: se le quita también lo que dejó pendiente.</summary>
+        /// <summary>He leaves the server: what he left pending is removed too.</summary>
         /// <remarks>
-        /// El desafío ofrecido y el sitio en la cola del koliseo sobreviven al socket porque viven
-        /// en tablas estáticas. Sin esta limpieza, quien cierra el cliente esperando partida deja
-        /// un hueco fantasma que el emparejamiento cuenta como jugador, y el desafío que ofreció
-        /// bloquea al otro para siempre.
+        /// The challenge offered and the place in the koliseo queue survive the socket because they live
+        /// in static tables. Without this cleanup, whoever closes the client while waiting for a match leaves
+        /// a ghost slot the matchmaking counts as a player, and the challenge he offered
+        /// blocks the other forever.
         /// </remarks>
         public static bool Unregister(GameSession session)
         {
@@ -75,12 +75,12 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Si esta cuenta tiene ahora mismo una sesion de juego conectada.
+        /// Whether this account has a game session connected right now.
         /// </summary>
         /// <remarks>
-        /// La usa el barrido de lanzamientos para no soltarle la cuenta a alguien que esta
-        /// jugando. Es la senal buena: mira lo que hay conectado AHORA, no si alguna vez lo
-        /// estuvo. Cuidado con darle otro uso -esto dice "hay socket", no "esta en el mundo".
+        /// The launch sweep uses it so as not to release the account of someone who is
+        /// playing. It is the good sign: it looks at what is connected NOW, not whether it ever
+        /// was. Careful with giving it another use -this says "there is a socket", not "he is in the world".
         /// </remarks>
         public static bool HasConnected(long accountId)
         {
@@ -105,13 +105,13 @@ namespace Jondo.Unity.Server.Network
             => _sessions.Values.FirstOrDefault(s => s.CharacterId == characterId);
 
         /// <summary>
-        /// El personaje conectado que se llama asi. Hace falta para los susurros: el cliente
-        /// manda el NOMBRE, no el identificador.
+        /// The connected character with that name. It is needed for whispers: the client
+        /// sends the NAME, not the identifier.
         ///
-        /// Se busca primero por el nombre exacto, sin distinguir mayusculas. Si no aparece, se
-        /// vuelve a buscar sin la decoracion: los nombres de esta base son del tipo
-        /// [#KEKA-BRON#], y quien escribe a mano pone "keka-bron" o "kekabron". Comparar solo
-        /// letras y numeros evita que un susurro se pierda por un corchete.
+        /// It is looked up first by the exact name, case-insensitive. If it does not appear, it
+        /// is looked up again without the decoration: the names in this base are of the kind
+        /// [#KEKA-BRON#], and whoever types by hand puts "keka-bron" or "kekabron". Comparing only
+        /// letters and digits keeps a whisper from getting lost over a bracket.
         /// </summary>
         public static GameSession? FindByName(string name)
         {
@@ -127,7 +127,7 @@ namespace Jondo.Unity.Server.Network
                 s => Desnudo(s.State.CharacterName) == buscado);
         }
 
-        /// <summary>Solo las letras y los numeros, en minuscula: [#KEKA-BRON#] -> kekabron.</summary>
+        /// <summary>Only the letters and digits, lowercase: [#KEKA-BRON#] -> kekabron.</summary>
         private static string Desnudo(string name)
         {
             if (string.IsNullOrEmpty(name)) return "";
@@ -194,24 +194,24 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// La mudanza de un personaje, contada a los dos mapas: al que deja, que se ha ido (jsd);
-        /// al que llega, que ha llegado (jsn).
+        /// A character's move, told to both maps: to the one he leaves, that he has gone (jsd);
+        /// to the one he reaches, that he has arrived (jsn).
         ///
-        /// Hacía falta UNA sola pieza porque los caminos por los que un personaje cambia de mapa
-        /// son cuatro —el borde, el zaap, el .teleport y el mando de mapa— y cada uno avisaba a su
-        /// manera: el del borde mandaba el jsd al mapa viejo y nada al nuevo; el del zaap no
-        /// mandaba ninguno de los dos, sólo sacaba al personaje de su propia pantalla. De ahí lo
-        /// que se veía jugando: quien llegaba por el zaap veía a los que ya estaban —su lista de
-        /// actores se la trae entera— pero ellos a él no lo veían hasta recargar el mapa. Y al
-        /// revés igual: quien se iba por el zaap se quedaba de fantasma en la pantalla del otro.
+        /// ONE single piece was needed because the ways a character changes map
+        /// are four —the edge, the zaap, the .teleport and the map command— and each one told in its own
+        /// way: the edge one sent the jsd to the old map and nothing to the new one; the zaap one did not
+        /// send either, it only removed the character from his own screen. Hence what
+        /// was seen while playing: whoever arrived by the zaap saw those already there —he brings his whole actor
+        /// list with him— but they did not see him until reloading the map. And the other
+        /// way round too: whoever left by the zaap stayed as a ghost on the other's screen.
         ///
-        /// El aviso de llegada es el mismo jsn que ya se manda al entrar al mundo, así que el
-        /// cliente no distingue entre «acaba de conectarse» y «acaba de llegar»: dibuja al actor.
+        /// The arrival notice is the same jsn already sent on entering the world, so the
+        /// client does not distinguish between «has just connected» and «has just arrived»: it draws the actor.
         ///
-        /// Se llama DESPUÉS de mover el estado de la sesión al mapa nuevo, que es lo que decide a
-        /// quién le llega cada cosa: el que se muda ya no está en el mapa viejo y sí en el nuevo,
-        /// y en los dos casos se le excluye a él mismo, que de sus propios movimientos ya se
-        /// entera por otro lado.
+        /// It is called AFTER moving the session's state to the new map, which is what decides
+        /// whom each thing reaches: the one moving is no longer on the old map and is on the new one,
+        /// and in both cases he himself is excluded, since he already learns about his own movements
+        /// another way.
         /// </summary>
         public static async Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien,
                                                                             long mapaQueDeja,

@@ -7,18 +7,18 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los títulos y los ornamentos que existen en el juego.
+    /// The titles and ornaments that exist in the game.
     ///
-    /// El título es el texto que sale bajo el nombre; el ornamento, el marco que lo rodea. El
-    /// cliente ya tiene el catálogo entero en sus datos —539 títulos y 167 ornamentos— y lo que
-    /// espera del servidor es solo la lista de los que uno TIENE, que manda una vez al entrar:
+    /// The title is the text shown under the name; the ornament, the frame around it. The
+    /// client already has the whole catalogue in its data —539 titles and 167 ornaments— and what it
+    /// expects from the server is only the list of the ones one HAS, which it sends once on entering:
     ///
-    ///   hhy { f1: [títulos], f2: [ornamentos] }     los dos empaquetados
+    ///   hhy { f1: [titles], f2: [ornaments] }     both packed
     ///
-    /// Lo que no está en esa lista lo pinta en gris. Aquí van todos, que es lo que se pide.
+    /// What is not in that list it draws in grey. Here they all go, which is what is asked.
     ///
-    /// Los ids salen de titles_ornaments.json, que genera tools/extract_titulos.py leyendo las
-    /// tablas `titles` y `ornaments` del cliente.
+    /// The ids come from titles_ornaments.json, which tools/extract_titulos.py generates by reading the
+    /// client's `titles` and `ornaments` tables.
     /// </summary>
     public static class Titles
     {

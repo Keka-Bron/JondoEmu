@@ -14,14 +14,14 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// Fundar un gremio por donde lo hace el juego: el altar del Templo de los Gremios abre el
-    /// editor, y el fundador sale del jjg con el nombre del gremio bajo el suyo.
+    /// Founding a guild the way the game does it: the altar of the Guild Temple opens the
+    /// editor, and the founder comes out of the jjg with the guild's name under his own.
     /// </summary>
     /// <remarks>
-    /// Contra la captura «comprar gremialogema-crear gremio-...»: iwo {3597, 480310} en el mapa
-    /// 106169344, iwn con la habilidad 184, jjc, y tras el jjg un jsn cuyo actor lleva el gremio
-    /// como opción f5 { f4 { bloque } }. En la misma colección que las demás de gremio porque
-    /// comparten el almacén de paso.
+    /// Against the capture «comprar gremialogema-crear gremio-...»: iwo {3597, 480310} on map
+    /// 106169344, iwn with skill 184, jjc, and after the jjg a jsn whose actor carries the guild
+    /// as option f5 { f4 { block } }. In the same collection as the other guild ones because
+    /// they share the pass-through store.
     /// </remarks>
     [Collection("guild raids")]
     public class GuildFoundingTests : IDisposable
@@ -42,8 +42,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// El altar está en los datos del mapa donde la captura lo pulsa: el 480310, en la 326 del
-        /// Templo de los Gremios. Y los tres opcodes de la fundación tienen su nombre.
+        /// The altar is in the data of the map where the capture clicks it: 480310, on 326 of the
+        /// Guild Temple. And the three founding opcodes have their name.
         /// </summary>
         [Fact]
         public void The_founding_altar_is_where_the_capture_pressed_it()
@@ -63,9 +63,9 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// El actor de quien tiene gremio lleva el bloque del gremio como primera opción, y el de
-        /// quien no lo tiene, no. Es lo que pinta el nombre del gremio bajo el del personaje en el
-        /// mapa, para él y para los demás.
+        /// The actor of whoever has a guild carries the guild block as its first option, and that of
+        /// whoever does not, does not. It is what draws the guild's name under the character's on the
+        /// map, for him and for the others.
         /// </summary>
         [Fact]
         public void A_guilded_actor_carries_its_guild_block()
@@ -85,7 +85,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Null(GuildOption(ConnectionProtocol.BuildPlayerActorBlock(loner, 341, 5, 65924386)));
         }
 
-        /// <summary>El f5 { f4 { ... } } del cuerpo humanoide del actor, o null si no lo lleva.</summary>
+        /// <summary>The f5 { f4 { ... } } of the actor's humanoid body, or null if it does not carry it.</summary>
         private static ProtoMessage? GuildOption(byte[] actor)
         {
             var root = ProtoMessage.Parse(actor);

@@ -109,8 +109,8 @@ namespace Jondo.Unity.Studio.Data
         {
             var data = new WorldData();
 
-            // Antes que nada: sin world.db no hay mapas, ni NPCs, ni monstruos, ni hechizos, y
-            // quien acaba de clonar el repositorio solo tiene datos/world.zip.
+            // Before anything else: without world.db there are no maps, nor NPCs, nor monsters, nor spells, and
+            // whoever has just cloned the repository only has datos/world.zip.
             WorldArchive.Ensure(data.Complaints.Add);
 
             data.LoadNpcPlacements();

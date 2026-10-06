@@ -21,14 +21,14 @@ namespace Jondo.Unity.Server.Network
         public List<ProtoField> Fields { get; set; } = new List<ProtoField>();
 
         /// <summary>
-        /// Descose un protobuf en campos sueltos.
+        /// Unpicks a protobuf into loose fields.
         ///
-        /// Lo que entra aqui viene del socket, asi que puede estar mal a proposito. Antes un
-        /// campo con una longitud mayor que lo que quedaba pedia el array igual —hasta 4 GB con
-        /// cinco bytes— y un tipo de cable de los que no se usan (3, 4, 6 o 7) lanzaba una
-        /// excepcion que nadie recoge. Ahora las dos cosas cortan el recorrido y devuelven lo
-        /// leido hasta ahi, que es lo mismo que ve un mensaje truncado y lo que todos los
-        /// manejadores ya saben tratar: recorren Fields buscando el suyo y si no esta, se van.
+        /// What comes in here comes from the socket, so it can be wrong on purpose. Before, a
+        /// field with a length greater than what was left asked for the array all the same —up to 4 GB with
+        /// five bytes— and one of the unused wire types (3, 4, 6 or 7) threw an
+        /// exception nobody catches. Now both things cut the walk short and return what was
+        /// read up to there, which is the same a truncated message sees and what all the
+        /// handlers already know how to treat: they walk Fields looking for theirs and if it is not there, they leave.
         /// </summary>
         public static ProtoMessage Parse(byte[] data)
         {
@@ -55,8 +55,8 @@ namespace Jondo.Unity.Server.Network
                 else if (wireType == 2)
                 {
                     int len = (int)ReadVarInt(data, ref pos);
-                    // El tope natural es lo que queda: un campo con longitud no puede pasarse
-                    // del final del mensaje que lo lleva.
+                    // The natural ceiling is what is left: a field with a length cannot go past
+                    // the end of the message carrying it.
                     if (len < 0 || len > data.Length - pos) break;
                     field.BytesValue = new byte[len];
                     Array.Copy(data, pos, field.BytesValue, 0, len);
@@ -70,7 +70,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else
                 {
-                    // 3 y 4 son los grupos, que protobuf3 ya no emite; 6 y 7 no existen.
+                    // 3 and 4 are groups, which protobuf3 no longer emits; 6 and 7 do not exist.
                     break;
                 }
                 msg.Fields.Add(field);
@@ -146,11 +146,11 @@ namespace Jondo.Unity.Server.Network
             => NetworkEnvelope.WriteVarInt(stream, value);
 
         /// <summary>
-        /// Los campos en UNA línea, al estilo del sniffer: <c>{ 1: 453 2: "1630" }</c>.
+        /// The fields on ONE line, sniffer style: <c>{ 1: 453 2: "1630" }</c>.
         ///
-        /// El volcado en árbol de aquí abajo sigue estando y sirve para mirar un paquete concreto,
-        /// pero para el registro no vale: veinte líneas por paquete y a los tres segundos no se ve
-        /// nada. Un paquete es un renglón, y lo que no cabe se corta con puntos suspensivos.
+        /// The tree dump down here is still there and serves to look at a specific packet,
+        /// but for the log it is no good: twenty lines per packet and after three seconds nothing
+        /// can be seen. A packet is one line, and what does not fit is cut with an ellipsis.
         /// </summary>
         public string Compact(int budget = 96)
         {
@@ -161,7 +161,7 @@ namespace Jondo.Unity.Server.Network
             return sb.Length <= 3 ? "" : sb.ToString();
         }
 
-        /// <summary>Devuelve true si se ha quedado algo fuera por falta de sitio.</summary>
+        /// <summary>Returns true if something was left out for lack of room.</summary>
         private bool Write(System.Text.StringBuilder sb, int budget)
         {
             foreach (var field in Fields)
@@ -180,7 +180,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else
                 {
-                    // Los de 32 y 64 bits fijos: se enseñan en crudo, que es lo que son.
+                    // The fixed 32 and 64 bit ones: shown raw, which is what they are.
                     sb.Append("0x").Append(Convert.ToHexString(field.BytesValue).ToLowerInvariant());
                 }
 
@@ -191,9 +191,9 @@ namespace Jondo.Unity.Server.Network
 
         private static void Bytes(System.Text.StringBuilder sb, ProtoField field, int budget)
         {
-            // Un submensaje primero, porque es lo que más dice. Si no parsea, se prueba texto, y
-            // si tampoco, hexadecimal: el mismo orden que el volcado en árbol, para que las dos
-            // vistas cuenten lo mismo del mismo paquete.
+            // A submessage first, because it is what says the most. If it does not parse, text is tried, and
+            // if not that either, hexadecimal: the same order as the tree dump, so that both
+            // views tell the same about the same packet.
             if (field.BytesValue.Length > 0 && field.BytesValue.Length < 2000)
             {
                 try

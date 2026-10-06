@@ -10,25 +10,25 @@ using System.Windows.Forms;
 namespace Jondo.Unity.Server.UI
 {
     /// <summary>
-    /// La cara del servidor.
+    /// The server's face.
     ///
-    /// El registro se veía en el lanzador, que era el mismo proceso. Desde que son dos, el registro
-    /// es del servidor y se ve aquí: quien lo lleva lo tiene delante sin depender de que haya un
-    /// lanzador abierto, y el lanzador que se reparte a los jugadores se queda sin ninguna forma de
-    /// leerle la consola a nadie.
+    /// The log was seen in the launcher, which was the same process. Since they are two, the log
+    /// belongs to the server and is seen here: whoever runs it has it in front of him without depending on a
+    /// launcher being open, and the launcher handed out to the players is left without any way of
+    /// reading anybody's console.
     ///
-    /// Pinta con <see cref="LauncherTheme"/> y con <see cref="LauncherLogo"/>, que viven en el
-    /// contrato y comparten los dos ejecutables: se parecen porque pintan con lo MISMO, no porque
-    /// alguien haya copiado los colores de un sitio a otro.
+    /// It draws with <see cref="LauncherTheme"/> and <see cref="LauncherLogo"/>, which live in the
+    /// contract and are shared by both executables: they look alike because they draw with the SAME thing, not because
+    /// someone copied the colours from one place to the other.
     ///
-    /// Todo lo que se enseña sale de lo que el servidor ya sabe. Nada inventado para rellenar.
+    /// Everything shown comes from what the server already knows. Nothing invented to fill in.
     /// </summary>
     internal sealed class ServerWindow : Form, IBackgroundWindow
     {
         private Image? _foto;
         private Bitmap? _fondoCompuesto;
 
-        /// <summary>El fondo ya compuesto, para que los paneles se recorten su trozo.</summary>
+        /// <summary>The background already composed, so the panels cut out their piece.</summary>
         public Image? ComposedBackground => _fondoCompuesto;
 
         private readonly Panel _caja;
@@ -55,11 +55,11 @@ namespace Jondo.Unity.Server.UI
         private Font Mono(float cuerpo) => new Font(LauncherTheme.MonoFamily, cuerpo * _escala);
 
         /// <summary>
-        /// Un panel que no parpadea al repintarse.
+        /// A panel that does not flicker on repainting.
         ///
-        /// Las cifras se refrescan cada segundo y daban un pestañeo en cada una: un Panel normal
-        /// borra el fondo y luego dibuja, y entre las dos cosas se ve el hueco. Con doble búfer se
-        /// compone fuera de pantalla y se vuelca de una vez.
+        /// The figures refresh every second and gave a blink on each one: a normal Panel
+        /// erases the background and then draws, and between the two the gap is seen. With double buffering it is
+        /// composed off-screen and dumped in one go.
         /// </summary>
         private sealed class FlickerFreePanel : Panel
         {
@@ -71,7 +71,7 @@ namespace Jondo.Unity.Server.UI
             }
         }
 
-        /// <summary>Cada cifra: su etiqueta, de dónde sale y de qué color va.</summary>
+        /// <summary>Each figure: its label, where it comes from and what colour it goes in.</summary>
         private sealed class Metric
         {
             public Func<LauncherTexts, string> Etiqueta = _ => "";
@@ -79,7 +79,7 @@ namespace Jondo.Unity.Server.UI
             public Color Tono = LauncherTheme.LightGold;
             public string Ultimo = "";
 
-            /// <summary>Si es la cabecera de un bloque en vez de un dato.</summary>
+            /// <summary>Whether it is a block's header instead of a datum.</summary>
             public bool EsGrupo;
         }
 
@@ -93,7 +93,7 @@ namespace Jondo.Unity.Server.UI
             StartPosition = FormStartPosition.CenterScreen;
             MinimumSize = new Size(E(900), E(560));
             Size = new Size(E(1280), E(760));
-            // Maximizada, que es como se quiere ver un servidor: de un vistazo y sin colocarla.
+            // Maximised, which is how a server wants to be seen: at a glance and without arranging it.
             WindowState = FormWindowState.Maximized;
             BackColor = LauncherTheme.Background;
             ForeColor = LauncherTheme.BaseText;
@@ -110,28 +110,28 @@ namespace Jondo.Unity.Server.UI
                 Dock = DockStyle.Top,
             };
 
-            // Los cuatro indicadores en UNA columna a la izquierda.
+            // The four indicators in ONE column on the left.
             //
-            // Antes iban repartidos a los dos lados del dibujo, y era bonito pero le robaba al
-            // registro la mitad del ancho: la consola se quedaba en una tira de un cuarto de
-            // ventana donde cada línea se partía en tres. Un registro que hay que reconstruir
-            // mentalmente no se lee. Los cuatro juntos a un lado y el resto para la consola.
+            // Before, they were spread on both sides of the drawing, and it was pretty but it stole
+            // half the width from the log: the console was left as a strip a quarter of the
+            // window wide where each line broke into three. A log that has to be rebuilt
+            // mentally is not read. The four together on one side and the rest for the console.
             _cifras = new FlickerFreePanel
             {
                 Dock = DockStyle.Left,
-                Width = 0,   // lo pone AjustarConsola
+                Width = 0,   // AjustarConsola sets it
                 BackColor = Color.Transparent,
             };
             _cifras.Paint += (s, e) => ConRed(e.Graphics, _cifras, 0, 4);
 
             DefinirCifras();
 
-            // La consola se queda con todo lo que no ocupan las cifras.
+            // The console takes everything the figures do not take up.
             //
-            // Estuvo abajo a todo lo ancho —partía el dibujo por la mitad— y luego en una columna a
-            // la derecha, que dejaba ver el dibujo entero pero le daba un cuarto de ventana. Un
-            // renglón de tráfico son unos cien caracteres y ahí no caben: se partía en tres y había
-            // que recomponerlo con la vista. Ahora manda el registro y el dibujo se ve por detrás.
+            // It was at the bottom full width —it cut the drawing in half— and then in a column on
+            // the right, which let the whole drawing be seen but gave it a quarter of the window. A
+            // traffic line is some hundred characters and they do not fit there: it broke into three and had
+            // to be put back together by eye. Now the log rules and the drawing is seen behind it.
             _caja = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -147,16 +147,16 @@ namespace Jondo.Unity.Server.UI
                 Padding = new Padding(E(22), 0, E(22), 0),
             };
 
-            // El registro se pinta a mano para que se vea el dibujo por detrás.
+            // The log is drawn by hand so that the drawing is seen behind it.
             //
-            // Con un RichTextBox no había manera: un cuadro de texto de WinForms es opaco y no hay
-            // color transparente que lo cambie, así que el registro era un rectángulo negro pegado
-            // encima de Nox. LauncherLogView hereda de LauncherPanel, que recorta el trozo de fondo
-            // que le toca y le pone encima las capas de color que se le digan; el velo oscuro que
-            // hace legible el texto es una capa con alfa y por debajo se sigue viendo el dibujo.
+            // With a RichTextBox there was no way: a WinForms text box is opaque and there is no
+            // transparent colour that changes it, so the log was a black rectangle stuck
+            // on top of Nox. LauncherLogView inherits from LauncherPanel, which cuts out the piece of background
+            // that belongs to it and puts on top the colour layers it is told; the dark veil that
+            // makes the text readable is a layer with alpha and the drawing is still seen beneath.
             //
-            // Se paga con el copiar y pegar: son líneas dibujadas, no texto seleccionable. El
-            // registro entero se sigue escribiendo en logs\, que es de donde hay que sacarlo.
+            // It is paid for with copy and paste: they are drawn lines, not selectable text. The
+            // whole log is still written to logs\, which is where it has to be taken from.
             _registro = new LauncherLogView
             {
                 Dock = DockStyle.Fill,
@@ -166,31 +166,31 @@ namespace Jondo.Unity.Server.UI
                 BorderWidth = Math.Max(2, E(2)),
                 Padding = new Padding(E(10), E(8), E(10), E(8)),
 
-                // La letra va en PÍXELES y sin multiplicar por la escala del monitor.
+                // The font goes in PIXELS and without multiplying by the monitor's scale.
                 //
-                // Antes era «Mono(6f)», que por dentro hacía 6 × DeviceDpi/96. Un tamaño en puntos
-                // ya es independiente del DPI, así que multiplicarlo lo duplica: en un monitor a
-                // 192 ppp salía a doce puntos y por eso el registro se veía enorme y se partía. Es
-                // el mismo fallo que ya se corrigió en el desofuscador.
+                // Before it was «Mono(6f)», which inside did 6 × DeviceDpi/96. A size in points
+                // is already DPI-independent, so multiplying it doubles it: on a
+                // 192 dpi monitor it came out at twelve points and that is why the log looked huge and broke. It is
+                // the same bug already fixed in the deobfuscator.
                 Font = LauncherTheme.CreateMonoFont(12f),
             };
             _registro.Layers.Add(LauncherTheme.ConsoleFill);
 
-            // Clic derecho sobre un paquete para decir qué es. Los nombres reales están en el
-            // cliente pero huérfanos —nada dice cuál va con cuál—, así que la ligadura la hace una
-            // persona con el paquete delante, eligiendo de la lista real. Lo que se elige se guarda
-            // y a partir de ahí sale en el registro.
+            // Right-click on a packet to say what it is. The real names are in the
+            // client but orphaned —nothing says which goes with which—, so the binding is done by a
+            // person with the packet in front, choosing from the real list. What is chosen is stored
+            // and from then on it comes out in the log.
             _registro.MouseUp += (s, e) => { if (e.Button == MouseButtons.Right) Bautizar(e.Location); };
 
             _caja.Controls.Add(_registro);
 
-            // El orden importa: WinForms acopla de DELANTE hacia atrás, o sea al revés del orden en
-            // que se añaden. Se lee de abajo arriba: el rótulo coge su franja de arriba, la barra
-            // la de abajo, las cifras la columna izquierda, y la consola —que va en Fill— se queda
-            // con TODO lo que sobre.
+            // The order matters: WinForms docks from FRONT to back, that is the reverse of the order in
+            // which they are added. It reads from bottom to top: the title takes its strip at the top, the bar
+            // the one at the bottom, the figures the left column, and the console —which goes in Fill— keeps
+            // EVERYTHING left over.
             //
-            // Por eso la consola se añade la primera aunque salga la última: en Fill hay que estar
-            // al fondo de la pila o te comes el sitio de los demás.
+            // That is why the console is added first even though it comes out last: in Fill one has to be
+            // at the bottom of the stack or one eats the others' space.
             Controls.Add(_caja);
             Controls.Add(_cifras);
             Controls.Add(barra);
@@ -282,24 +282,24 @@ namespace Jondo.Unity.Server.UI
         private void Redimensionar(LauncherButton boton)
             => boton.Width = TextRenderer.MeasureText(boton.Text, boton.Font).Width + E(34);
 
-        // ─── Las cifras ─────────────────────────────────────────────────────────────────────
+        // ─── The figures ────────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Qué se enseña, en su orden y agrupado.
+        /// What is shown, in its order and grouped.
         ///
-        /// Agrupadas y en columna, no en una fila apretada arriba: así caben las que hacen falta
-        /// para llevar un servidor —tráfico, CPU, hilos— y se leen de un vistazo por bloques.
+        /// Grouped and in a column, not in a cramped row at the top: that way the ones needed
+        /// to run a server fit —traffic, CPU, threads— and are read at a glance by blocks.
         ///
-        /// Todas salen de algo que el servidor sabe de verdad. Ninguna está puesta para rellenar:
-        /// si no se puede medir, no se enseña.
+        /// All of them come from something the server really knows. None is there to fill in:
+        /// if it cannot be measured, it is not shown.
         /// </summary>
         private void DefinirCifras()
         {
             Grupo(t => t.GroupWorld);
 
-            // Conectados es el número de sockets de juego vivos. "En el mundo" son los que además
-            // han llegado a entrar a un mapa: entre una cosa y otra hay unos segundos de carga, y
-            // con un cliente atascado la diferencia se queda ahí y se ve.
+            // Connected is the number of live game sockets. "En el mundo" are the ones that have also
+            // managed to enter a map: between one and the other there are a few seconds of loading, and
+            // with a stuck client the difference stays there and is seen.
             Cifra_(t => t.StatPlayers, LauncherTheme.OnlineGreen,
                    () => $"{Network.GameNodeProxy.SesionesVivas.Count}/{Contract.ClientesEnTotal}");
             Cifra_(t => t.StatInWorld, LauncherTheme.DotGreen, () =>
@@ -324,8 +324,8 @@ namespace Jondo.Unity.Server.UI
 
             Grupo(t => t.GroupNetwork);
 
-            // Lo que ha pasado por los sockets desde que arrancó, y a qué ritmo va ahora. El ritmo
-            // es lo que dice si el servidor está haciendo algo: los totales sólo dicen que hizo.
+            // What has gone through the sockets since it started, and at what rate it goes now. The rate
+            // is what says whether the server is doing something: the totals only say it did.
             Cifra_(t => t.StatSent, LauncherTheme.LogSuccess,
                    () => $"{Bonito(Jondo.Protocol.NetworkMessage.BytesFuera)}  " +
                          $"({Miles(Jondo.Protocol.NetworkMessage.PaquetesFuera)})");
@@ -357,8 +357,8 @@ namespace Jondo.Unity.Server.UI
 
             Grupo(t => t.GroupLoaded);
 
-            // Esto no cambia en toda la ejecución, pero dice de un vistazo si el mundo se cargó
-            // entero o si algo se quedó a medias, que es lo primero que uno quiere saber.
+            // This does not change during the whole run, but it says at a glance whether the world loaded
+            // whole or whether something was left half done, which is the first thing one wants to know.
             Cifra_(t => t.StatWorldMaps, LauncherTheme.SoftGold,
                    () => Miles(Managers.MobSpawnManager.MapasConGrupos));
             Cifra_(t => t.StatWorldGroups, LauncherTheme.MutedGold,
@@ -381,7 +381,7 @@ namespace Jondo.Unity.Server.UI
 
         private static string Miles(long cuantos) => cuantos.ToString("N0");
 
-        // ─── CPU y ritmo, que hay que medirlos entre dos momentos ───────────────────────────
+        // ─── CPU and rate, which have to be measured between two moments ────────────────────
 
         private TimeSpan _cpuAntes;
         private DateTime _cuandoAntes = DateTime.UtcNow;
@@ -399,8 +399,8 @@ namespace Jondo.Unity.Server.UI
                 if (segundos <= 0) return;
 
                 var cpuAhora = _yo.TotalProcessorTime;
-                // Entre todos los núcleos: si no, un servidor usando un núcleo entero de ocho
-                // marcaría 100% y parecería que está ahogado cuando le sobran siete.
+                // Across all the cores: otherwise, a server using one whole core out of eight
+                // would show 100% and would seem to be choking when it has seven to spare.
                 _cpu = (cpuAhora - _cpuAntes).TotalSeconds / segundos / Environment.ProcessorCount * 100.0;
                 _cpuAntes = cpuAhora;
 
@@ -417,8 +417,8 @@ namespace Jondo.Unity.Server.UI
         private bool _yaAvise;
 
         /// <summary>
-        /// Envuelve el pintado de una columna. Un Paint que revienta no se ve: la columna se queda
-        /// en blanco y no hay ni un aviso. Ya pasó una vez y costó más de lo que debería.
+        /// Wraps a column's painting. A Paint that blows up is not seen: the column stays
+        /// blank and there is not even a warning. It already happened once and cost more than it should.
         /// </summary>
         private void ConRed(Graphics g, Control panel, int desde, int cuantos)
         {
@@ -432,11 +432,11 @@ namespace Jondo.Unity.Server.UI
         }
 
         /// <summary>
-        /// La columna de cifras: una tarjeta por bloque y dentro una línea por dato.
+        /// The figures column: one card per block and inside one line per datum.
         ///
-        /// La primera versión era una fila de tarjetas apretadas arriba. Cabían seis y ya iban
-        /// justas; en columna caben las quince que hacen falta para llevar un servidor, y agrupadas
-        /// se leen por bloques en vez de como una ristra.
+        /// The first version was a row of cards cramped at the top. Six fitted and were already
+        /// tight; in a column the fifteen needed to run a server fit, and grouped
+        /// they are read by blocks instead of as a string.
         /// </summary>
         private void PintarColumna(Graphics g, Control panel, int desdeGrupo, int cuantosGrupos)
         {
@@ -451,10 +451,10 @@ namespace Jondo.Unity.Server.UI
 
             using var fGrupo = LauncherTheme.CreateFont(10f * _escala, FontStyle.Bold);
             using var fEtiqueta = LauncherTheme.CreateFont(9.5f * _escala);
-            // El valor va del MISMO tamaño que su etiqueta, sólo que en negrita y con color. Iba
-            // tres puntos más grande y en bloques como el de RED —donde el valor es "0,0 KB/s" y
-            // no un número corto— la línea quedaba descuadrada: la palabra pequeña y el dato
-            // enorme al lado, sin ninguna razón.
+            // The value goes at the SAME size as its label, only bold and coloured. It went
+            // three points bigger and in blocks like RED —where the value is "0,0 KB/s" and
+            // not a short number— the line was out of line: the small word and the datum
+            // huge beside it, for no reason at all.
             using var fValor = LauncherTheme.CreateFont(9.5f * _escala, FontStyle.Bold);
             using var pincelGrupo = new SolidBrush(LauncherTheme.SoftGold);
             using var pincelEtiqueta = new SolidBrush(LauncherTheme.MutedGold);
@@ -473,8 +473,8 @@ namespace Jondo.Unity.Server.UI
             int altoLinea = E(21);
             int y = E(6);
 
-            // Se pintan sólo los bloques que le tocan a ESTA columna: la de la izquierda lleva los
-            // dos primeros y la de la derecha los dos siguientes.
+            // Only the blocks belonging to THIS column are painted: the left one carries the
+            // first two and the right one the next two.
             int vistos = -1;
             for (int i = 0; i < _lista.Count; i++)
             {
@@ -506,17 +506,17 @@ namespace Jondo.Unity.Server.UI
                     var cifra = _lista[j];
                     var hueco = new RectangleF(caja.X + E(10), linea, caja.Width - E(20), altoLinea);
 
-                    // Los dos ocupan el ANCHO ENTERO, uno pegado a la izquierda y el otro a la
-                    // derecha, en vez de repartirse la línea en dos mitades. Con mitades, una
-                    // etiqueta como "JUGADORES" no cabía en la suya y salía cortada aunque
-                    // sobrara sitio de sobra al lado, porque el hueco del valor estaba vacío.
+                    // Both take the WHOLE WIDTH, one stuck to the left and the other to the
+                    // right, instead of splitting the line into two halves. With halves, a
+                    // label like "JUGADORES" did not fit in its own and came out cut even though
+                    // there was plenty of room to spare beside it, because the value's slot was empty.
                     g.DrawString(cifra.Etiqueta(_textos), fEtiqueta, pincelEtiqueta,
                                  new RectangleF(hueco.X, hueco.Y + E(3), hueco.Width,
                                                 fEtiqueta.GetHeight(g) + 2), izquierda);
 
                     using var pincelValor = new SolidBrush(cifra.Tono);
-                    // A la misma altura que la etiqueta: con el mismo cuerpo, si uno arranca tres
-                    // píxeles más arriba que el otro se nota que están descolocados.
+                    // At the same height as the label: with the same body, if one starts three
+                    // pixels higher than the other it shows that they are misplaced.
                     g.DrawString(cifra.Ultimo, fValor, pincelValor,
                                  new RectangleF(hueco.X, hueco.Y + E(3), hueco.Width,
                                                 fValor.GetHeight(g) + 2), derecha);
@@ -539,26 +539,26 @@ namespace Jondo.Unity.Server.UI
             return camino;
         }
 
-        // ─── El fondo ───────────────────────────────────────────────────────────────────────
+        // ─── The background ─────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Compone el fondo: la foto recortada como haría un background-size: cover.
+        /// Composes the background: the photo cropped as a background-size: cover would.
         ///
-        /// Se compone UNA vez por tamaño y se guarda, en vez de escalar la imagen en cada
-        /// repintado. Es lo que hace el lanzador y es lo que evita que la ventana vaya a tirones.
+        /// It is composed ONCE per size and kept, instead of scaling the image on each
+        /// repaint. It is what the launcher does and it is what keeps the window from stuttering.
         /// </summary>
         /// <summary>
-        /// El fondo sin la marca de agua y volteado, para que Nox quede detrás del registro.
+        /// The background without the watermark and flipped, so that Nox ends up behind the log.
         ///
-        /// El dibujo trae a Nox a la izquierda, que es justo donde va la columna de cifras: quedaba
-        /// tapado. Volteado cae detrás del registro, que ahora es translúcido, y se le ve entero.
+        /// The drawing brings Nox on the left, which is exactly where the figures column goes: he was
+        /// covered. Flipped he falls behind the log, which is now translucent, and he is seen whole.
         ///
-        /// El logotipo de Wakfu y la línea de copyright viven en la franja derecha del dibujo, y en
-        /// espejo saldrían escritos del revés. El primer intento fue volver a pegar esa esquina sin
-        /// voltear, y se notaba el recuadro a la legua: un trozo sin voltear dentro de una imagen
-        /// volteada siempre deja costura. Así que la franja se RECORTA antes de voltear. Recortar y
-        /// no pintar encima es lo que no deja artefactos: no hay nada que disimular, simplemente esa
-        /// parte del dibujo no está.
+        /// The Wakfu logo and the copyright line live in the drawing's right strip, and
+        /// mirrored they would come out written backwards. The first attempt was to paste that corner back without
+        /// flipping, and the box was noticeable a mile off: an unflipped piece inside a flipped
+        /// image always leaves a seam. So the strip is CROPPED before flipping. Cropping and
+        /// not painting over is what leaves no artefacts: there is nothing to disguise, that
+        /// part of the drawing simply is not there.
         /// </summary>
         private static Image? Espejar(Image? foto)
         {
@@ -566,8 +566,8 @@ namespace Jondo.Unity.Server.UI
 
             try
             {
-                // El 18% de la derecha cubre de sobra el logotipo y el copyright, y lo que se pierde
-                // es el borde del pinar, que no lo echa nadie de menos.
+                // The right 18% amply covers the logo and the copyright, and what is lost
+                // is the edge of the pine wood, which nobody misses.
                 int ancho = Math.Max(1, (int)(foto.Width * 0.82f));
                 var recorte = new Rectangle(0, 0, ancho, foto.Height);
 
@@ -584,8 +584,8 @@ namespace Jondo.Unity.Server.UI
             }
             catch
             {
-                // Si algo falla, el fondo original sirve igual: se verá a Nox tapado por las
-                // tarjetas, que es como estaba antes, pero la ventana abre.
+                // If something fails, the original background works all the same: Nox will be seen covered by the
+                // cards, which is how it was before, but the window opens.
                 return foto;
             }
         }
@@ -611,13 +611,13 @@ namespace Jondo.Unity.Server.UI
                 g.DrawImage(_foto, (ancho - anchoFoto) / 2, (alto - altoFoto) / 2, anchoFoto, altoFoto);
             }
 
-            // Un velo MUY suave, sólo el necesario para que se lea lo de encima. El primer intento
-            // llevaba uno tan oscuro que la foto no se veía: parecía un fondo negro y punto.
+            // A VERY soft veil, only what is needed so that what is on top is readable. The first attempt
+            // carried one so dark that the photo could not be seen: it looked like a black background, full stop.
             using var velo = new SolidBrush(Color.FromArgb(84, 8, 4, 2));
             g.FillRectangle(velo, 0, 0, ancho, alto);
         }
 
-        /// <summary>Le da a un panel transparente el trozo de fondo que le toca.</summary>
+        /// <summary>Gives a transparent panel the piece of background that belongs to it.</summary>
         private void RecortarFondo(Graphics g, Control panel)
         {
             ComponerFondo();
@@ -649,32 +649,31 @@ namespace Jondo.Unity.Server.UI
         }
 
         /// <summary>
-        /// Cuánto ocupa la consola: poco más de la mitad de la ventana, no toda.
+        /// How much the console takes up: a little over half the window, not all of it.
         ///
-        /// Es una proporción y no un alto fijo para que quede igual de bien maximizada en un
-        /// portátil que en un monitor grande. Y con un mínimo, para que estrechando la ventana no
-        /// se quede en dos líneas.
+        /// It is a proportion and not a fixed height so that it looks equally good maximised on a
+        /// laptop as on a big monitor. And with a minimum, so that narrowing the window does not
+        /// leave it at two lines.
         /// </summary>
         private void AjustarConsola()
         {
-            // Puede llegar antes de tiempo: poner WindowState = Maximized en el constructor ya
-            // dispara un OnResize, y en ese momento todavía no hay panel que ajustar. Sin esta
-            // línea la ventana ni se abría -y el fallo salía como un escueto "Object reference
-            // not set" en el registro-.
+            // It can arrive early: setting WindowState = Maximized in the constructor already
+            // fires an OnResize, and at that moment there is still no panel to adjust. Without this
+            // line the window did not even open -and the failure came out as a terse "Object reference
+            // not set" in the log-.
             if (_caja == null) return;
 
-            // La consola ya no se dimensiona: va en Fill y se queda con lo que sobre. Lo único que
-            // hay que decidir es cuánto se lleva la columna de cifras, y se le da lo justo para que
-            // quepan sus dos números por línea sin comerle sitio al registro.
+            // The console is no longer sized: it goes in Fill and keeps whatever is left. The only thing
+            // to decide is how much the figures column takes, and it is given just enough for
+            // its two numbers per line to fit without eating space from the log.
             int columna = Math.Max(E(260), Math.Min((int)(ClientSize.Width * 0.20f), E(420)));
             if (_cifras != null) _cifras.Width = columna;
         }
 
         /// <summary>
-        /// El fondo detrás de la consola, y un marco alrededor.
-        ///
+        /// The background behind the console, and a frame around it.
 
-        // ─── El latido ──────────────────────────────────────────────────────────────────────
+        // ─── The heartbeat ──────────────────────────────────────────────────────────────────
 
         private void Refrescar()
         {
@@ -689,7 +688,7 @@ namespace Jondo.Unity.Server.UI
                 catch { ahora = "—"; }
                 if (ahora != cifra.Ultimo) { cifra.Ultimo = ahora; cambio = true; }
             }
-            // Sólo se repinta si algo ha cambiado, y el panel va con doble búfer: así no parpadea.
+            // It is only repainted if something has changed, and the panel is double buffered: that way it does not flicker.
             if (cambio) _cifras.Invalidate();
 
             TraerRegistro();
@@ -724,28 +723,28 @@ namespace Jondo.Unity.Server.UI
                 Escribir(hora, texto);
             }
 
-            // Ni recortar ni bajar el cursor: de las dos cosas se encarga la vista, que sabe cuántas
-            // líneas guarda y si está pegada abajo.
+            // Neither trimming nor moving the cursor down: the view takes care of both, since it knows how many
+            // lines it keeps and whether it is stuck to the bottom.
             _registro.Follow = _seguir.Checked;
         }
 
         /// <summary>
-        /// Un renglón de tráfico, tal y como lo escribe NetworkMessage:
+        /// A traffic line, just as NetworkMessage writes it:
         ///
         ///   1579 [server&gt;client] kuf (CharacterExperienceGainEvent) { 1: 453 }        3 B
         ///
-        /// Se reconoce por la forma entera y no por un trozo suelto, para que un mensaje normal del
-        /// servidor que casualmente lleve corchetes no acabe pintado como si fuera un paquete.
+        /// It is recognised by its whole shape and not by a loose piece, so that a normal server
+        /// message that happens to carry brackets does not end up painted as if it were a packet.
         /// </summary>
         private static readonly System.Text.RegularExpressions.Regex Paquete = new(
             @"^(\s*\d+) (\[(?:client>server|server>client)\]) ([a-z]{3})( \([A-Za-z0-9_]+\))?(.*?)(\s+\d+ B)\s*$",
             System.Text.RegularExpressions.RegexOptions.Compiled);
 
         /// <summary>
-        /// Poner nombre al paquete que hay bajo el ratón.
+        /// Naming the packet under the mouse.
         ///
-        /// Sólo abre si el renglón es un paquete: sobre una línea normal del servidor no hay nada
-        /// que bautizar y un menú que sale siempre acaba saliendo cuando no toca.
+        /// It only opens if the line is a packet: on a normal server line there is nothing
+        /// to christen and a menu that always comes up ends up coming up when it should not.
         /// </summary>
         private void Bautizar(Point donde)
         {
@@ -766,16 +765,16 @@ namespace Jondo.Unity.Server.UI
 
         private void Escribir(string hora, string texto)
         {
-            // Una entrada puede traer VARIOS renglones dentro.
+            // An entry can bring SEVERAL lines inside.
             //
-            // ConsoleLogBuffer guarda lo que le llega a Console.WriteLine tal cual, y hay sitios
-            // que escriben varias líneas de una vez —el volcado de un paquete sin manejar, con sus
-            // rayas y su árbol de campos—. El RichTextBox de antes las repartía solo; la vista
-            // nueva dibuja cada entrada en UNA posición, así que un texto con saltos dentro salía
-            // encaramado encima del siguiente y no se leía nada.
+            // ConsoleLogBuffer keeps whatever reaches Console.WriteLine as is, and there are places
+            // that write several lines at once —the dump of an unhandled packet, with its
+            // dashes and its field tree—. The old RichTextBox split them on its own; the new
+            // view draws each entry at ONE position, so a text with line breaks inside came out
+            // perched on top of the next one and nothing could be read.
             //
-            // La hora va sólo en el primero. Los demás llevan su hueco en blanco para que el texto
-            // siga cuadrado en la misma columna.
+            // The time goes only on the first. The rest carry their blank slot so that the text
+            // stays aligned in the same column.
             string[] renglones = texto.Replace("\r", "").Split('\n');
             string sangria = hora.Length > 0 ? new string(' ', hora.Length + 2) : "";
 
@@ -794,11 +793,11 @@ namespace Jondo.Unity.Server.UI
         }
 
         /// <summary>
-        /// El renglón de un paquete, cada trozo de su color.
+        /// A packet's line, each piece in its colour.
         ///
-        /// Los colores no son decorativos: el ojo busca el opcode, que va en claro, y el resto se
-        /// aparta. La dirección lleva el mismo código que el resto del emulador —azul lo que baja
-        /// del servidor, dorado lo que sube del cliente— para no tener que leerla.
+        /// The colours are not decorative: the eye looks for the opcode, which goes in light, and the rest
+        /// steps aside. The direction carries the same code as the rest of the emulator —blue what comes down
+        /// from the server, gold what goes up from the client— so it does not have to be read.
         /// </summary>
         private static void Paquete_(System.Text.RegularExpressions.Match m,
                                      List<LauncherLogView.Piece> trozos)
@@ -819,8 +818,8 @@ namespace Jondo.Unity.Server.UI
         }
 
         /// <summary>
-        /// El color de cada línea, con la misma paleta de consola que el lanzador y mirando los
-        /// mismos prefijos entre corchetes que el servidor lleva escribiendo desde siempre.
+        /// Each line's colour, with the same console palette as the launcher and looking at the
+        /// same bracketed prefixes the server has always been writing.
         /// </summary>
         private static Color ColorDe(string linea)
         {
@@ -838,12 +837,12 @@ namespace Jondo.Unity.Server.UI
         // ─── Botones ────────────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Un botón con el estilo del lanzador.
+        /// A button in the launcher's style.
         ///
-        /// Antes eran <see cref="Button"/> de WinForms en plano, con su rectángulo y su letra del
-        /// sistema: al lado del resto de la ventana cantaban muchísimo. LauncherButton es el mismo
-        /// control que usa el lanzador —degradado, esquinas redondeadas, letra espaciada— y ahora
-        /// vive en el contrato para que lo puedan usar los dos.
+        /// Before, they were flat WinForms <see cref="Button"/>s, with their rectangle and their system
+        /// font: next to the rest of the window they stuck out a mile. LauncherButton is the same
+        /// control the launcher uses —gradient, rounded corners, spaced lettering— and it now
+        /// lives in the contract so that both can use it.
         /// </summary>
         private LauncherButton Boton(string texto, Color tono, int ancho = 0)
         {
@@ -888,8 +887,8 @@ namespace Jondo.Unity.Server.UI
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            // Cerrar esta ventana SÍ para el servidor: es su ventana. Pero se pregunta, porque
-            // puede haber gente jugando y una X es fácil de dar sin querer.
+            // Closing this window DOES stop the server: it is its window. But it asks, because
+            // there may be people playing and an X is easy to hit by accident.
             if (e.CloseReason == CloseReason.UserClosing && !Program.ApagandoYa)
             {
                 if (!Confirmar()) { e.Cancel = true; return; }
@@ -904,8 +903,8 @@ namespace Jondo.Unity.Server.UI
         {
             try
             {
-                // El del servidor es el mismo huevo del lanzador pero en azul claro, para
-                // distinguir de un vistazo las dos ventanas en la barra de tareas.
+                // The server's is the same egg as the launcher's but in light blue, to
+                // tell the two windows apart at a glance on the taskbar.
                 foreach (string nombre in new[] { "icono_servidor.ico", "favicon.ico" })
                 {
                     string ruta = Path.Combine(LauncherTheme.AssetsFolder, nombre);
@@ -915,7 +914,7 @@ namespace Jondo.Unity.Server.UI
             catch { }
         }
 
-        /// <summary>Abre la ventana en su propio hilo, para que no estorbe a los servicios.</summary>
+        /// <summary>Opens the window on its own thread, so it does not get in the services' way.</summary>
         public static void Abrir()
         {
             var lista = new System.Threading.ManualResetEventSlim(false);

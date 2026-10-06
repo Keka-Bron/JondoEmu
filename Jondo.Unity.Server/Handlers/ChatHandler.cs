@@ -25,10 +25,10 @@ namespace Jondo.Unity.Server.Handlers
 
             if (!string.IsNullOrEmpty(msgText))
             {
-                // Un comando NO se publica: se atiende y ahí se acaba, sin eco. Si se dejara caer
-                // al eco, un ".kamas 10000" saldría escrito en la pestaña donde se escribió y lo
-                // vería todo el mundo. Solo se traga los que existen; una línea que empiece por
-                // punto y no sea ninguno sigue su camino como cualquier otra.
+                // A command is NOT published: it is handled and that is the end of it, with no echo. If it
+                // fell through to the echo, a ".kamas 10000" would appear written in the tab where it was
+                // typed and everybody would see it. Only the ones that exist are swallowed; a line that
+                // starts with a dot and is none of them goes on its way like any other.
                 if (await CommandHandler.TryHandleAsync(stream, msgText, channel: 0, accountId: accountId))
                 {
                     return;
@@ -38,18 +38,18 @@ namespace Jondo.Unity.Server.Handlers
                 byte[] echoPacket = BuildChatBroadcastPacket(msgText, GameState.CharacterName, channel: 0);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, echoPacket);
 
-                // Y a los demás, que de eso va un chat.
+                // And to the others, which is what a chat is about.
                 //
-                // Esto sólo se hacía eco: el mensaje volvía a quien lo escribía y ahí se acababa,
-                // así que dos jugadores en el mismo mapa hablaban cada uno con su propia pantalla.
-                // Se llamaba «broadcast» sin serlo, de cuando el servidor atendía a uno solo.
+                // This was only an echo: the message went back to whoever wrote it and that was it,
+                // so two players on the same map each talked to their own screen. It was called
+                // «broadcast» without being one, from when the server served a single player.
                 //
-                // El canal general de Dofus es el del MAPA: lo oye quien está delante, no el
-                // servidor entero. El paquete es el mismo para todos —lleva dentro el id y el
-                // nombre de quien habla—, así que se manda tal cual.
-                // Con el combate de quien habla: dos peleas en el mismo mapa comparten arena -una
-                // por mapa de superficie, que es como sale de los datos del juego- asi que sin esto
-                // el canal del mapa cruzaba las dos y cada grupo leia al otro.
+                // Dofus's general channel is the MAP's: whoever is there hears it, not the whole
+                // server. The packet is the same for everybody -- it carries the speaker's id and
+                // name inside --, so it is sent as it is.
+                // With the speaker's fight: two fights on the same map share an arena -- one per
+                // surface map, which is how it comes out of the game's data -- so without this the
+                // map channel crossed the two and each group read the other.
                 int oidos = await SessionRegistry.BroadcastToMapAsync(
                     SessionContext.State.MapId, echoPacket, SessionContext.Current.Id,
                     SessionContext.State.FightId);

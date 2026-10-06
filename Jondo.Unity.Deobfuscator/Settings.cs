@@ -6,58 +6,58 @@ using Jondo.Unity.Reversing;
 namespace Jondo.Unity.Deobfuscator;
 
 /// <summary>
-/// Lo que el desofuscador recuerda entre una vez y la siguiente.
+/// What the deobfuscator remembers from one time to the next.
 ///
-/// Vive en <c>%APPDATA%\Jondo\desofuscador.cfg</c>, en el mismo sitio y con el mismo formato de
-/// <c>clave=valor</c> que las preferencias del lanzador: fuera de la carpeta del emulador, porque
-/// son preferencias de quien lo usa y no datos del emulador, y en texto para poder abrirlo y
-/// arreglarlo a mano si algo se tuerce.
+/// It lives in <c>%APPDATA%\Jondo\desofuscador.cfg</c>, in the same place and with the same
+/// <c>key=value</c> format as the launcher's preferences: outside the emulator's folder, because
+/// they are the user's preferences and not the emulator's data, and in text so it can be opened and
+/// fixed by hand if something goes wrong.
 ///
-/// ─── Las claves de la API ───────────────────────────────────────────────────────────────
+/// ─── The API keys ───────────────────────────────────────────────────────────────────────
 ///
-/// Con dos excepciones. La primera: las claves NO van en claro. Se cifran con DPAPI atadas a la
-/// cuenta de Windows, así que el fichero sólo se puede descifrar desde la sesión de quien las
-/// escribió. No es una caja fuerte —quien pueda ejecutar código como tú puede leerlas— pero cierra
-/// los dos accidentes que de verdad pasan: que se cuelen en una captura de pantalla y que se vayan
-/// en un zip a otra máquina.
+/// With two exceptions. The first: the keys do NOT go in the clear. They are encrypted with DPAPI tied to the
+/// Windows account, so the file can only be decrypted from the session of whoever
+/// wrote them. It is not a safe —whoever can run code as you can read them— but it closes
+/// the two accidents that really happen: that they slip into a screenshot and that they leave
+/// in a zip for another machine.
 ///
-/// La segunda: se guarda UNA POR PROVEEDOR. Probar Gemini un rato y volver a Claude no puede
-/// costar ir a buscar otra vez la clave de Claude; quien tenga tres, tiene las tres puestas.
+/// The second: ONE PER PROVIDER is kept. Trying Gemini for a while and going back to Claude cannot
+/// cost going to fetch Claude's key again; whoever has three has all three set.
 /// </summary>
 public sealed class Settings
 {
-    /// <summary>Dónde vive, al lado de las del lanzador.</summary>
+    /// <summary>Where it lives, next to the launcher's.</summary>
     public static string Path { get; } = System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo", "desofuscador.cfg");
 
-    // ─── El modelo ──────────────────────────────────────────────────────────────────────
+    // ─── The model ──────────────────────────────────────────────────────────────────────
 
-    /// <summary>Cuál de los atajos de <see cref="Provider"/> está elegido.</summary>
+    /// <summary>Which of the <see cref="Provider"/> shortcuts is chosen.</summary>
     public string ProviderName { get; set; } = Provider.All[0].Name;
 
     public string Url { get; set; } = Provider.All[0].Url;
     public string Model { get; set; } = Provider.All[0].Suggested;
     public Llm.Dialect Dialect { get; set; } = Provider.All[0].Dialect;
 
-    /// <summary>Cuántas preguntas van a la vez. Cuatro es prudente con un proveedor de pago.</summary>
+    /// <summary>How many questions go at once. Four is prudent with a paid provider.</summary>
     public int AtOnce { get; set; } = 4;
 
-    /// <summary>Las claves en claro y sólo en memoria, una por proveedor.</summary>
+    /// <summary>The keys in the clear and only in memory, one per provider.</summary>
     private readonly Dictionary<string, string> _keys = new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>La clave del proveedor elegido.</summary>
+    /// <summary>The chosen provider's key.</summary>
     public string Key
     {
         get => _keys.GetValueOrDefault(ProviderName, "");
         set => _keys[ProviderName] = value;
     }
 
-    /// <summary>El proveedor elegido, con su dialecto y su pista.</summary>
+    /// <summary>The chosen provider, with its dialect and its hint.</summary>
     public Provider Provider => Reversing.Provider.All
         .FirstOrDefault(p => p.Name.Equals(ProviderName, StringComparison.OrdinalIgnoreCase))
         ?? Reversing.Provider.All[^1];
 
-    /// <summary>Deja puesto un proveedor, sin pisar lo que el usuario haya escrito a mano.</summary>
+    /// <summary>Sets a provider, without overwriting what the user has typed by hand.</summary>
     public void Use(Provider provider)
     {
         ProviderName = provider.Name;
@@ -66,24 +66,24 @@ public sealed class Settings
         if (provider.Suggested.Length > 0) Model = provider.Suggested;
     }
 
-    // ─── Las rutas ──────────────────────────────────────────────────────────────────────
+    // ─── The paths ──────────────────────────────────────────────────────────────────────
 
-    /// <summary>La carpeta del cliente NUEVO, el que se quiere desofuscar.</summary>
+    /// <summary>The NEW client's folder, the one to be deobfuscated.</summary>
     public string ClientFolder { get; set; } = "";
 
-    /// <summary>El ensamblado del protocolo de la versión VIEJA, la que ya se conoce.</summary>
+    /// <summary>The protocol assembly of the OLD version, the one already known.</summary>
     public string OldProtocolDll { get; set; } = "";
 
-    /// <summary>Por qué paso del asistente iba, para poder cerrar y volver.</summary>
+    /// <summary>Which wizard step it was on, to be able to close and come back.</summary>
     public int Step { get; set; }
 
-    /// <summary>El idioma de la ventana, de los tres que habla el emulador.</summary>
+    /// <summary>The window's language, of the three the emulator speaks.</summary>
     public Language Language { get; set; } = Language.Es;
 
-    /// <summary>Cómo hay que llamar al modelo con lo que está puesto ahora.</summary>
+    /// <summary>How the model has to be called with what is set now.</summary>
     public Llm.Endpoint Endpoint() => new(Url, Model, Key, Dialect, AtOnce);
 
-    // ─── Ir y volver del disco ──────────────────────────────────────────────────────────
+    // ─── To and from disk ───────────────────────────────────────────────────────────────
 
     public static Settings Load()
     {
@@ -159,8 +159,8 @@ public sealed class Settings
         {
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path)!);
 
-            // Se escribe al lado y se mueve encima: si se corta a mitad, lo que se pierde es lo
-            // nuevo y no lo que ya había, que incluye las claves.
+            // It is written alongside and moved on top: if it is cut halfway, what is lost is the
+            // new and not what was already there, which includes the keys.
             string half = Path + ".escribiendo";
             File.WriteAllLines(half, lines);
             File.Move(half, Path, overwrite: true);
@@ -188,11 +188,11 @@ public sealed class Settings
     }
 
     /// <summary>
-    /// Una clave, cifrada contra la cuenta de Windows.
+    /// A key, encrypted against the Windows account.
     ///
-    /// Si el cifrado falla —que no debería, pero pasa en cuentas de sistema y en algunos perfiles
-    /// itinerantes— se guarda VACÍA a propósito. Volver a pedirla molesta; dejarla en claro en un
-    /// fichero de configuración es peor.
+    /// If the encryption fails —which it should not, but it happens on system accounts and in some roaming
+    /// profiles— it is stored EMPTY on purpose. Asking for it again is annoying; leaving it in the clear in a
+    /// configuration file is worse.
     /// </summary>
     private static string Cipher(string clear)
     {

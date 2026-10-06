@@ -10,17 +10,17 @@ using Xunit;
 namespace Jondo.Unity.Tests.Launcher
 {
     /// <summary>
-    /// Deja una foto de la ventana del lanzador en disco, para poder mirarla.
+    /// Leaves a photo of the launcher window on disk, so it can be looked at.
     /// </summary>
     /// <remarks>
-    /// No comprueba nada: es una herramienta. Avalonia sabe pintar sobre un lienzo en memoria con
-    /// Skia, así que se puede ver cómo queda la interfaz sin abrir el lanzador ni tener pantalla,
-    /// que es la única forma de trabajar el diseño con criterio en vez de a ciegas.
+    /// It checks nothing: it is a tool. Avalonia knows how to paint onto an in-memory canvas with
+    /// Skia, so one can see how the interface looks without opening the launcher or having a screen,
+    /// which is the only way of working on the design with judgement instead of blindly.
     ///
-    /// La foto sale en <c>capturas-lanzador/</c>, junto a la solución, y ese directorio está en el
-    /// .gitignore: son imágenes de trabajo, no parte del proyecto.
+    /// The photo comes out in <c>capturas-lanzador/</c>, next to the solution, and that directory is in the
+    /// .gitignore: they are working images, not part of the project.
     ///
-    /// Se pide con:
+    /// It is asked for with:
     ///
     ///   dotnet test --filter "FullyQualifiedName~LauncherShotTests"
     /// </remarks>
@@ -70,8 +70,8 @@ namespace Jondo.Unity.Tests.Launcher
         [AvaloniaFact]
         public void Una_foto_de_jugar_con_equipo()
         {
-            // Con cuentas dentro, que es la pantalla que se ve el 99 % de las veces y la que no
-            // sale en las otras fotos: sin cuentas guardadas, Jugar enseña el estado vacío.
+            // With accounts inside, which is the screen seen 99 % of the time and the one that does not
+            // come out in the other photos: without stored accounts, Jugar shows the empty state.
             var ventana = new MainWindow { Width = 1280, Height = 800 };
             ventana.Show();
 
@@ -87,7 +87,7 @@ namespace Jondo.Unity.Tests.Launcher
         [AvaloniaFact]
         public void Una_foto_del_rotulo_solo()
         {
-            // Aislado y sobre un fondo oscuro, para ver si dibuja algo.
+            // Isolated and on a dark background, to see whether it draws anything.
             var ventana = new Avalonia.Controls.Window
             {
                 Width = 400, Height = 160,
@@ -108,13 +108,13 @@ namespace Jondo.Unity.Tests.Launcher
         [AvaloniaFact]
         public void Una_foto_del_retrato_de_cada_personaje()
         {
-            // Los cosméticos y las pieles del equipo se cargan solos la primera vez que se
-            // preguntan, así que aquí ya no hay que arrancarlos a mano: sin eso las prendas de
-            // apariencia no metían piel y el retrato salía con lo de debajo.
+            // The cosmetics and the equipment skins load themselves the first time they are
+            // asked for, so here they no longer have to be started by hand: without that the appearance
+            // garments put in no skin and the portrait came out with what was underneath.
 
-            // La MISMA cadena que manda el servidor al lanzador, sacada de los personajes que hay
-            // de verdad en la base: con su cabeza, su equipo y sus cosméticos. Es la única forma
-            // de ver si el retrato sale entero, sale desnudo o sale una tira de color.
+            // The SAME string the server sends the launcher, taken from the characters really in
+            // the base: with their head, their equipment and their cosmetics. It is the only way
+            // of seeing whether the portrait comes out whole, comes out naked or comes out as a colour strip.
             var personajes = new System.Collections.Generic.List<
                 Jondo.Unity.Server.DatabaseManager.DbCharacter>();
 
@@ -133,14 +133,14 @@ namespace Jondo.Unity.Tests.Launcher
                 }
             }
 
-            // Sin base poblada no hay nada que mirar, y esto es una herramienta: no falla por eso.
+            // Without a populated base there is nothing to look at, and this is a tool: it does not fail because of it.
             if (personajes.Count == 0) return;
 
-            // Y SIN EL CLIENTE DE DOFUS tampoco, que es lo que rompia la integracion continua. El
-            // retrato se dibuja con los huesos del cliente, y el cliente no esta en el repo ni
-            // puede estarlo; en la maquina de GitHub no hay ni un bundle, asi que Of() devolvia
-            // nulo y el Assert de abajo tumbaba el check con un «1 no bone bundle» que no es un
-            // fallo del emulador sino una maquina sin juego instalado.
+            // And WITHOUT THE DOFUS CLIENT either, which is what broke continuous integration. The
+            // portrait is drawn with the client's bones, and the client is not in the repo nor
+            // can it be; on the GitHub machine there is not a single bundle, so Of() returned
+            // null and the Assert below brought the check down with a «1 no bone bundle» that is not a
+            // failure of the emulator but a machine with no game installed.
             if (!System.IO.File.Exists(System.IO.Path.Combine(
                     Jondo.Unity.Launcher.Paths.ClientContentDir, "Characters", "Bones",
                     "bones_assets_bone_1-9-static.bundle")))
@@ -170,11 +170,11 @@ namespace Jondo.Unity.Tests.Launcher
         [AvaloniaFact]
         public void Una_foto_de_cada_direccion()
         {
-            // Una foto por dirección, para poder MIRAR cuál sale de frente. Hoy los retratos salen
-            // de espaldas y no porque nadie lo haya elegido: ningún rig humanoide trae
-            // «AnimStatique_<dir>» a secas, así que NpcSprites cae por su escalera de reserva y se
-            // queda con la primera animación del array, que es de dirección 5 o 6 en 18 de las 19
-            // razas. Esto no arregla nada: deja las cinco sobre la mesa.
+            // One photo per direction, to be able to LOOK at which one comes out facing front. Today the portraits come out
+            // from behind and not because anyone chose it: no humanoid rig brings
+            // a bare «AnimStatique_<dir>», so NpcSprites falls back down its ladder and
+            // keeps the array's first animation, which is direction 5 or 6 in 18 of the 19
+            // breeds. This fixes nothing: it leaves the five on the table.
 
             var personajes = new System.Collections.Generic.List<
                 Jondo.Unity.Server.DatabaseManager.DbCharacter>();
@@ -196,7 +196,7 @@ namespace Jondo.Unity.Tests.Launcher
                 }
             }
 
-            // Es una herramienta: sin esos personajes en la base no hay nada que mirar y no falla.
+            // It is a tool: without those characters in the base there is nothing to look at and it does not fail.
             if (personajes.Count == 0)
             {
                 System.Console.WriteLine(
@@ -207,9 +207,9 @@ namespace Jondo.Unity.Tests.Launcher
             string carpeta = System.IO.Path.Combine(RaizDeLaSolucion(), "capturas-lanzador");
             System.IO.Directory.CreateDirectory(carpeta);
 
-            // Las ocho, no las cinco. Que estén autorizadas {0,1,2,5,6} está medido sobre los
-            // bundles, pero preguntarlas todas es lo que convierte esa medición en una comprobación
-            // en vez de en una suposición copiada.
+            // The eight, not the five. That {0,1,2,5,6} are allowed is measured on the
+            // bundles, but asking for all of them is what turns that measurement into a check
+            // instead of a copied assumption.
             foreach (var quien in personajes)
             {
                 string look = Jondo.Unity.Server.Managers.BreedLookTable.Drawable(quien);
@@ -227,8 +227,8 @@ namespace Jondo.Unity.Tests.Launcher
 
                 for (int direccion = 0; direccion <= 7; direccion++)
                 {
-                    // Un pintor por dirección: así ninguna caché ni ningún dato de la anterior
-                    // puede contaminar lo que se mide de ésta.
+                    // One painter per direction: that way no cache and no data from the previous one
+                    // can contaminate what is measured for this one.
                     using var pintor = new Jondo.Unity.Sprites.NpcSprites
                     {
                         Direction = direccion,
@@ -244,8 +244,8 @@ namespace Jondo.Unity.Tests.Launcher
 
                     if (!pintor.LastDirectionFound)
                     {
-                        // El rig no la trae. Ha dibujado, sí, pero con la de reserva: guardarla
-                        // sería guardar la misma foto ocho veces y creerse que son ocho.
+                        // The rig does not bring it. It has drawn, yes, but with the fallback: storing it
+                        // would be storing the same photo eight times and believing they are eight.
                         faltan.Add($"{direccion} (el rig no la trae; habría caído en «{pintor.LastAnimation}»)");
                         continue;
                     }

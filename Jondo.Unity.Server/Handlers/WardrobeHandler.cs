@@ -8,21 +8,21 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// La ventana de apariencia: el título y el ornamento.
+    /// The appearance window: the title and the ornament.
     ///
-    /// Funciona por BORRADOR. Nada de lo que se toca ahí dentro se aplica hasta que se pulsa
-    /// Guardar, y eso se ve en el protocolo:
+    /// It works as a DRAFT. Nothing touched in there is applied until Save is pressed, and that shows
+    /// in the protocol:
     ///
-    ///   cliente  lze { f1: título }    o vacío para quitárselo   → servidor lxa { f2: 1 }
-    ///   cliente  lwm { f2: ornamento } o vacío para quitárselo   → servidor lyv { f1: 1 }
-    ///   cliente  lxs (vacío, el botón Guardar)                   → servidor hid, hif, jsn, lxc
-    ///                                                              y de vuelta lyu { f1: 1 }
+    ///   client   lze { f1: title }      or empty to take it off   → server lxa { f2: 1 }
+    ///   client   lwm { f2: ornament }   or empty to take it off   → server lyv { f1: 1 }
+    ///   client   lxs (empty, the Save button)                     → server hid, hif, jsn, lxc
+    ///                                                               and back lyu { f1: 1 }
     ///
-    /// Ojo con los campos, que no coinciden: el título viaja en el f1 del lze y el ornamento en el
-    /// f2 del lwm. Y los dos aceptan el mensaje VACÍO, que es "ninguno" —no un cero dentro—.
+    /// Careful with the fields, which do not match: the title travels in the lze's f1 and the ornament
+    /// in the lwm's f2. And both accept the EMPTY message, which is "none" -- not a zero inside --.
     ///
-    /// Los tres acuses van en el campo raíz 3, que es el de respuesta, repitiendo el identificador
-    /// de la petición.
+    /// The three acknowledgements go in root field 3, which is the answer one, repeating the request's
+    /// identifier.
     /// </summary>
     public static class WardrobeHandler
     {
@@ -35,7 +35,7 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.IsWardrobeDraftLoaded = true;
         }
 
-        /// <summary>El cliente elige un título en la ventana. Solo toca el borrador.</summary>
+        /// <summary>The client picks a title in the window. Only the draft is touched.</summary>
         public static async Task ChooseTitleAsync(NetworkStream stream, byte[] frame)
         {
             EnsureDraft();
@@ -62,7 +62,7 @@ namespace Jondo.Unity.Server.Handlers
                                           ConnectionProtocol.RequestId(frame)));
         }
 
-        /// <summary>Lo mismo con el ornamento, que viaja en el f2.</summary>
+        /// <summary>The same with the ornament, which travels in f2.</summary>
         public static async Task ChooseOrnamentAsync(NetworkStream stream, byte[] frame)
         {
             EnsureDraft();
@@ -89,7 +89,7 @@ namespace Jondo.Unity.Server.Handlers
                                           ConnectionProtocol.RequestId(frame)));
         }
 
-        /// <summary>El botón Guardar. Aquí es donde el borrador se convierte en lo puesto.</summary>
+        /// <summary>The Save button. This is where the draft becomes what is worn.</summary>
         public static async Task SaveAsync(NetworkStream stream, byte[] frame, long accountId)
         {
             EnsureDraft();
@@ -109,8 +109,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Lo que se le cuenta al cliente cuando algo cambia: el título, el ornamento y el actor
-        /// entero, que es lo que hace que el nombre se repinte con su marco.
+        /// What the client is told when something changes: the title, the ornament and the whole actor,
+        /// which is what makes the name repaint with its frame.
         /// </summary>
         public static async Task AnnounceAsync(NetworkStream stream, long accountId)
         {
@@ -131,15 +131,15 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
         }
 
-        /// <summary>Todo lo que uno tiene, que se manda una vez al entrar al mundo.</summary>
+        /// <summary>Everything one has, sent once on entering the world.</summary>
         public static async Task SendOwnedAsync(NetworkStream stream, long accountId)
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Hhy, ConnectionProtocol.BuildTitlesOwned(
                     Titles.All, Titles.AllOrnaments)));
 
-            // Los conjuntos del vestuario. Sin esto la ventana de cosméticos suena pero no llega a
-            // dibujarse: el cliente no tiene ningún conjunto que enseñar y se cae.
+            // The wardrobe's sets. Without this the cosmetics window makes its sound but never gets
+            // drawn: the client has no set to show and falls over.
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (character != null)
             {

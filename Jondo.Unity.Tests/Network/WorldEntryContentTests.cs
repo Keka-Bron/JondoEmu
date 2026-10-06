@@ -173,7 +173,7 @@ namespace Jondo.Unity.Tests.Network
                         continue;
                     }
 
-                    // Las que el servidor rehace llevan el sobre y el cuerpo vacío a propósito.
+                    // The ones the server rebuilds carry the envelope and an empty body on purpose.
                     if (Rebuilt.Contains(opcode)) continue;
 
                     if (expected[i].AsSpan().SequenceEqual(actual[i].Frame)) continue;
@@ -383,13 +383,13 @@ namespace Jondo.Unity.Tests.Network
         {
             if (!Available(out _)) return;
 
-            // El irq es el unico que el servidor rehace Y necesita leer: su cuerpo dice QUE oficios
-            // existen y en que orden los quiere el cliente, que son datos del juego. Quitarselo dejo
-            // al personaje entrando sin un solo oficio durante horas, y sin ruido: ReadPayload
-            // devuelve un array vacio en vez de null, asi que la guarda no salto, el bucle no dio
-            // una vuelta y la linea de consola se suprimia sola al ser cero.
+            // The irq is the only one the server rebuilds AND needs to read: its body says WHICH professions
+            // exist and in what order the client wants them, which are game data. Taking it away left
+            // the character entering without a single profession for hours, and silently: ReadPayload
+            // returns an empty array instead of null, so the guard did not fire, the loop did not go
+            // round once and the console line suppressed itself for being zero.
             //
-            // El catalogo no vale de sustituto: la tabla Jobs trae 23 y la captura lista 20.
+            // The catalogue is no substitute: the Jobs table brings 23 and the capture lists 20.
             WorldEntryContent.Load(Paths.ContentFile(Manifest));
 
             var irq = WorldEntryContent.Rows(WorldEntry.BlockAfterCharacter)

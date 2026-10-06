@@ -43,7 +43,7 @@ namespace Jondo.Unity.World.Fights
         public int Agility { get; set; }
         public int Power { get; set; }
 
-        /// <summary>La vitalidad, base más equipo. Va en la ficha; la vida sale de MaxHP.</summary>
+        /// <summary>Vitality, base plus equipment. It goes in the sheet; life comes from MaxHP.</summary>
         public int Vitality { get; set; }
 
         /// <summary>Critical points granted by the equipment, added on top of the spell's own.</summary>
@@ -62,20 +62,20 @@ namespace Jondo.Unity.World.Fights
         public int ExtraCastsPerTarget { get; set; }
 
         /// <summary>
-        /// Daños fijos generales (característica 16). Se suman al final del cálculo, después de
-        /// multiplicar por la característica elemental y la potencia.
+        /// General fixed damage (characteristic 16). It is added at the end of the calculation, after
+        /// multiplying by the elemental characteristic and the power.
         /// </summary>
         public int FlatDamage { get; set; }
 
         /// <summary>
-        /// Daños críticos (característica 86). Sólo se suman cuando el golpe sale crítico, y van
-        /// donde los daños fijos: al final, no multiplicados.
+        /// Critical damage (characteristic 86). It is only added when the hit is critical, and it goes
+        /// where the fixed damage goes: at the end, not multiplied.
         /// </summary>
         public int CriticalDamage { get; set; }
 
         /// <summary>
-        /// Daños fijos de cada elemento (características 88 a 92: tierra, fuego, agua, aire y
-        /// neutral). Sólo cuenta el del elemento con el que se pega.
+        /// Fixed damage of each element (characteristics 88 to 92: earth, fire, water, air and
+        /// neutral). Only that of the element hit with counts.
         /// </summary>
         public int EarthDamage { get; set; }
         public int FireDamage { get; set; }
@@ -84,28 +84,28 @@ namespace Jondo.Unity.World.Fights
         public int NeutralDamage { get; set; }
 
         /// <summary>
-        /// Daños de empuje (característica 84) y alcance (19). Los pide el cliente para dibujar la
-        /// previsualización: la del desplazamiento sale del empuje y la de a dónde se puede tirar,
-        /// del alcance.
+        /// Push damage (characteristic 84) and range (19). The client asks for them to draw the
+        /// preview: the displacement one comes from the push and the one of where one can throw,
+        /// from the range.
         /// </summary>
         public int PushDamage { get; set; }
         public int Range { get; set; }
 
         /// <summary>
-        /// Todo lo demás de la ficha, por número de característica: huida, placaje, esquivas,
-        /// resistencias porcentuales, invocaciones...
+        /// Everything else on the sheet, by characteristic number: flee, tackle, dodges,
+        /// percentage resistances, summons...
         ///
-        /// Va en un diccionario y no en un campo por cada una porque son treinta y tantas, no
-        /// intervienen en ninguna cuenta del servidor y lo único que hacen falta es mandarlas. El
-        /// día que alguna se use para algo —la huida contra el placaje, por ejemplo— se le pone su
-        /// campo y se saca de aquí.
+        /// It goes in a dictionary and not in a field for each because there are thirty-odd, they do not
+        /// take part in any of the server's calculations and all that is needed is to send them. The
+        /// day one of them is used for something —flee against tackle, for example— it is given its
+        /// field and taken out of here.
         /// </summary>
         public Dictionary<int, int> Otras { get; } = new Dictionary<int, int>();
 
         public int Otra(int caracteristica)
             => Otras.TryGetValue(caracteristica, out int valor) ? valor : 0;
 
-        /// <summary>Los daños fijos del elemento con el que se está pegando.</summary>
+        /// <summary>The fixed damage of the element being hit with.</summary>
         public int GetFlatDamageForElement(ElementType element)
         {
             return element switch
@@ -130,10 +130,23 @@ namespace Jondo.Unity.World.Fights
         public bool IsReady { get; set; }
 
         /// <summary>
-        /// A Koliseo megabot: shown as a character of its class, played by the server's tactics.
+        /// A Koliseo JondoBot: shown as a character of its class, played by the server's tactics.
         /// It has no session and no row in Characters, so its look and sex travel here.
         /// </summary>
         public bool IsBot { get; set; }
+
+        /// <summary>
+        /// Where the other side last saw him while he is invisible: the cell he went invisible
+        /// on, then each one he casts from. -1 before he ever was. What a JondoBot aims at when
+        /// it cannot see him.
+        /// </summary>
+        public int LastSeenCell { get; set; } = -1;
+
+        /// <summary>
+        /// The tenths of a second this fighter kept from the turn he passed, for his next one
+        /// (FightProtocol.SavedAfter). Only a character keeps any.
+        /// </summary>
+        public int SavedTurnTime { get; set; }
 
         /// <summary>A bot's sex, for its identity (a character reads it from his row).</summary>
         public int Sex { get; set; }
@@ -158,51 +171,51 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool TemplateAllowsTackle { get; set; } = true;
 
-        // ─── Lo que limita los lanzamientos ─────────────────────────────────────
+        // ─── What limits the casts ──────────────────────────────────────────────
 
         /// <summary>
-        /// Las rondas que le faltan a cada hechizo para poder volver a lanzarse.
+        /// The rounds each spell has left before it can be cast again.
         ///
-        /// Una clave que entra aquí NO SE BORRA: baja hasta cero y se queda. Es lo que hace el
-        /// servidor real, cuyo jxc sigue nombrando los hechizos con un cero ronda tras ronda.
+        /// A key that goes in here is NOT DELETED: it goes down to zero and stays. It is what the
+        /// real server does, whose jxc keeps naming the spells with a zero round after round.
         /// </summary>
         public Dictionary<int, int> Recarga { get; } = new Dictionary<int, int>();
 
-        /// <summary>Veces que se ha lanzado cada hechizo en ESTE turno.</summary>
+        /// <summary>Times each spell has been cast in THIS turn.</summary>
         public Dictionary<int, int> LanzadosEsteTurno { get; } = new Dictionary<int, int>();
 
-        /// <summary>Veces que se ha lanzado cada hechizo sobre cada objetivo en ESTE turno.</summary>
+        /// <summary>Times each spell has been cast on each target in THIS turn.</summary>
         public Dictionary<(int Hechizo, long Objetivo), int> LanzadosPorObjetivo { get; }
             = new Dictionary<(int, long), int>();
 
-        // ─── Los invocados ──────────────────────────────────────────────────────
+        // ─── The summons ────────────────────────────────────────────────────────
 
         /// <summary>
-        /// De quién es, si a éste lo ha invocado alguien. Cero cuando no lo es.
+        /// Whose it is, if someone summoned this one. Zero when it is not.
         ///
-        /// Una baliza del Ocra, un glifo o una trampa NO son embrujos: son combatientes con su
-        /// identificador negativo, su casilla, su bando, su ficha y su turno. En las capturas el
-        /// servidor los manda con el mismo molde que a un monstruo y luego les toca jugar.
+        /// A Cra beacon, a glyph or a trap are NOT buffs: they are fighters with their
+        /// negative identifier, their cell, their side, their sheet and their turn. In the captures the
+        /// server sends them with the same mould as a monster and then they get to play.
         /// </summary>
         public long Invocador { get; set; }
 
         public bool EsInvocado => Invocador != 0;
 
         /// <summary>
-        /// El hechizo con el que se porta, el <c>startingSpellId</c> de su grado en la tabla de
-        /// bichos. Es lo que le da su comportamiento: sus efectos son enganches 792 —"al empezar
-        /// mi turno lanza mi grado 2"— igual que las actitudes que regalan los dofus.
+        /// The spell it behaves with, its grade's <c>startingSpellId</c> in the creature
+        /// table. It is what gives it its behaviour: its effects are 792 hooks —"at the start of
+        /// my turn cast my grade 2"— just like the attitudes the dofus give away.
         /// </summary>
         public int HechizoPropio { get; set; }
 
         /// <summary>
-        /// Si le toca turno en el carrusel.
+        /// Whether it gets a turn in the carousel.
         ///
-        /// No todos los invocados juegan. Medido en las capturas: la Baliza de Supervivencia
-        /// recibe su jzc con reloj 150 justo detrás de su Ocra y lo cierra en el acto con un jyt;
-        /// la Baliza Táctica NO recibe ni uno en todo el combate. La diferencia está en su
-        /// hechizo: la primera tiene un enganche de principio de turno y la segunda sólo reacciona
-        /// a los daños y a los empujes, así que no tiene nada que hacer cuando le tocaría.
+        /// Not all summons play. Measured in the captures: the Baliza de Supervivencia
+        /// receives its jzc with clock 150 right behind its Cra and closes it on the spot with a jyt;
+        /// the Baliza Táctica does NOT receive a single one in the whole fight. The difference is in its
+        /// spell: the first has a turn-start hook and the second only reacts
+        /// to damage and pushes, so it has nothing to do when its turn would come.
         /// </summary>
         public bool JuegaTurno { get; set; } = true;
 
@@ -301,13 +314,13 @@ namespace Jondo.Unity.World.Fights
         public int SummonCost { get; set; } = 1;
 
         /// <summary>
-        /// Lo que lleva puesto encima: embrujos, estados y las actitudes que le dan sus objetos.
+        /// What it carries on it: buffs, states and the attitudes its items give it.
         /// </summary>
         public Buffs Buffs { get; } = new Buffs();
 
         /// <summary>
-        /// Si le han pegado desde su turno anterior. Lo mira el disparador "DBE" de las actitudes,
-        /// que es de donde sale la regla del Dofus Ocre.
+        /// Whether it has been hit since its previous turn. The attitudes' "DBE" trigger looks at it,
+        /// which is where the Ochre Dofus's rule comes from.
         /// </summary>
         public bool LeHanPegado { get; set; }
 
@@ -354,11 +367,11 @@ namespace Jondo.Unity.World.Fights
         public const int CaracteristicaDePuntosDeAccion = 1;
         public const int CaracteristicaDePuntosDeMovimiento = 23;
 
-        /// <summary>Dónde estaba antes del último movimiento. Menos uno si no se ha movido.</summary>
+        /// <summary>Where it was before the last movement. Minus one if it has not moved.</summary>
         /// <remarks>
-        /// Lo pide el efecto 1100, «teletransporta a la posición anterior», que deshace el último
-        /// desplazamiento. Sin esta memoria el efecto no tiene a dónde devolver a nadie, y mandar
-        /// a un sitio cualquiera sería peor que no hacer nada.
+        /// Effect 1100 asks for it, «teletransporta a la posición anterior», which undoes the last
+        /// displacement. Without this memory the effect has nowhere to send anyone back to, and sending
+        /// them to some random place would be worse than doing nothing.
         /// </remarks>
         public int CasillaAnterior { get; private set; } = -1;
 
@@ -378,7 +391,7 @@ namespace Jondo.Unity.World.Fights
         /// <summary>Where he stood when the fight began: effect 784 sends him back there.</summary>
         public int CasillaAlEmpezarCombate { get; set; } = -1;
 
-        /// <summary>Mueve al combatiente y se acuerda de dónde estaba.</summary>
+        /// <summary>Moves the fighter and remembers where it was.</summary>
         public void MoverA(int casilla)
         {
             if (casilla == CellId) return;
@@ -391,27 +404,27 @@ namespace Jondo.Unity.World.Fights
             CurrentHP = Math.Max(0, CurrentHP - damage);
         }
 
-        // ─── El escudo ──────────────────────────────────────────────────────────
+        // ─── The shield ─────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Puntos de escudo: se gastan antes que la vida y no se curan.
+        /// Shield points: they are spent before life and are not healed.
         /// </summary>
         /// <remarks>
-        /// Los ponen dos familias de efectos, 401 hechizos entre las dos: el 1020, que da un
-        /// tanto por ciento del NIVEL del lanzador, y el 1039, un tanto por ciento de la VIDA.
-        /// El catálogo del cliente los declara sin característica, así que no salen del camino
-        /// genérico de los boosts: hacen falta aquí.
+        /// Two families of effects set them, 401 spells between the two: 1020, which gives a
+        /// percentage of the caster's LEVEL, and 1039, a percentage of his LIFE.
+        /// The client's catalogue declares them without a characteristic, so they do not come out of the
+        /// boosts' generic path: they are needed here.
         ///
-        /// No es vida: no se cura, no cuenta para la muerte y desaparece cuando caduca. Meterlo
-        /// en CurrentHP habría sido más corto y habría dejado a un personaje escudado curándose
-        /// hasta el tope del escudo.
+        /// It is not life: it is not healed, it does not count for death and it disappears when it expires. Putting it
+        /// in CurrentHP would have been shorter and would have left a shielded character healing
+        /// up to the shield's cap.
         /// </remarks>
         public int PuntosDeEscudo { get; private set; }
 
-        /// <summary>La ronda en la que el escudo se cae. Cero cuando no hay escudo.</summary>
+        /// <summary>The round in which the shield drops. Zero when there is no shield.</summary>
         public int EscudoCaducaEnRonda { get; private set; }
 
-        /// <summary>Añade escudo. Se suma al que hubiera y se queda la caducidad más lejana.</summary>
+        /// <summary>Adds shield. It is added to whatever there was and keeps the furthest expiry.</summary>
         public void Escudar(int cuanto, int caducaEnRonda)
         {
             if (cuanto <= 0) return;
@@ -433,7 +446,7 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Le mete un golpe al escudo primero y devuelve lo que llega a la vida.
+        /// Puts a hit into the shield first and returns what reaches life.
         /// </summary>
         public int PasarPorElEscudo(int dano)
         {
@@ -444,7 +457,7 @@ namespace Jondo.Unity.World.Fights
             return dano - aguanta;
         }
 
-        /// <summary>Quita el escudo si ya le tocaba caerse.</summary>
+        /// <summary>Removes the shield if its time to drop has come.</summary>
         public void CaducarElEscudo(int ronda)
         {
             if (PuntosDeEscudo <= 0) return;
@@ -454,22 +467,22 @@ namespace Jondo.Unity.World.Fights
             EscudoCaducaEnRonda = 0;
         }
 
-        // ─── La erosión ─────────────────────────────────────────────────────────
+        // ─── Erosion ────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Los puntos de vida MÁXIMA que se han perdido para siempre en este combate.
+        /// The MAXIMUM life points lost for good in this fight.
         ///
-        /// Cada golpe no sólo quita vida: se lleva además un pellizco del tope. Con mil de vida y
-        /// un golpe de cien con un quince por ciento de erosión, uno se queda en 900/985: los cien
-        /// de daño salen de la vida de ahora y quince del tope.
+        /// Each hit does not only take life: it also takes a pinch of the cap. With a thousand life and
+        /// a hit of a hundred with fifteen per cent erosion, one ends up at 900/985: the hundred
+        /// of damage come out of the current life and fifteen out of the cap.
         ///
-        /// Se guarda aparte de <see cref="MaxHP"/> —que ya va bajando— porque hay efectos que
-        /// pegan EN FUNCIÓN de lo erosionado: el 1092 de Represalias hace un veinte por ciento de
-        /// lo que uno lleve erosionado.
+        /// It is kept apart from <see cref="MaxHP"/> —which is already going down— because there are effects that
+        /// hit BASED ON what is eroded: Represalias's 1092 does twenty per cent of
+        /// what one has eroded.
         /// </summary>
         public int VidaErosionada { get; private set; }
 
-        /// <summary>La característica 75 del catálogo: el tanto por ciento que erosiona.</summary>
+        /// <summary>The catalogue's characteristic 75: the percentage that erodes.</summary>
         public const int CaracteristicaDeErosion = 75;
 
         /// <summary>
@@ -485,18 +498,18 @@ namespace Jondo.Unity.World.Fights
         public const int ErosionBase = 10;
 
         /// <summary>
-        /// Erosiona por un golpe y devuelve cuánto tope se ha perdido.
+        /// Erodes for a hit and returns how much cap has been lost.
         ///
-        /// <paramref name="porciento"/> es la erosión de quien recibe, que sale de su
-        /// característica 75 más lo que le hayan puesto encima.
+        /// <paramref name="porciento"/> is the receiver's erosion, which comes from his
+        /// characteristic 75 plus whatever has been put on him.
         /// </summary>
         public int Erosionar(int dano, int porciento)
         {
             if (dano <= 0 || porciento <= 0) return 0;
 
             int pierde = dano * porciento / 100;
-            // No se erosiona por debajo de la mitad del tope de salida, que es donde el juego lo
-            // corta. El tope de salida es el de ahora más lo que ya se haya perdido.
+            // It does not erode below half the starting cap, which is where the game
+            // cuts it. The starting cap is the current one plus whatever has already been lost.
             int original = MaxHP + VidaErosionada;
             int cabe = Math.Max(0, (original / 2) - VidaErosionada);
             pierde = Math.Min(pierde, cabe);

@@ -9,46 +9,46 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// Lo que el cliente nos manda y no sabemos atender, apuntado en vez de tirado.
+    /// What the client sends us and we do not know how to handle, recorded instead of thrown away.
     ///
-    /// Hasta ahora un paquete sin manejador hacía dos cosas, las dos malas: o se imprimía en la
-    /// consola con un marco de asteriscos —y se iba scroll arriba a los treinta segundos— o caía
-    /// en la lista de silencio de GameNodeProxy, que son diecisiete opcodes escritos a mano para
-    /// que no inunden el registro. Lo silenciado es peor que lo ruidoso: deja de existir.
+    /// Until now a packet with no handler did two things, both bad: either it was printed on the
+    /// console with a frame of asterisks —and scrolled off in thirty seconds— or it fell
+    /// into GameNodeProxy's silence list, which is seventeen opcodes written by hand so
+    /// that they do not flood the log. The silenced is worse than the noisy: it stops existing.
     ///
-    /// Aquí se guardan los dos, con la diferencia apuntada, y así «hay algo que no sé» se
-    /// convierte en una lista con la que se puede trabajar: qué falta, cuántas veces pasa y desde
-    /// dónde.
+    /// Here both are kept, with the difference noted, and so «there is something I do not know»
+    /// becomes a list that can be worked with: what is missing, how often it happens and from
+    /// where.
     ///
-    /// LO QUE HACE QUE ESTO SIRVA es que NO se agrupa por opcode, sino por la FORMA del mensaje.
-    /// Un mismo opcode puede llevar cargas distintas según lo que el jugador esté haciendo, y
-    /// contarlas juntas esconde justo lo que hace falta ver. La forma se saca recorriendo el
-    /// protobuf y anotando número de campo y tipo de dato, metiéndose dentro de los submensajes:
+    /// WHAT MAKES THIS USEFUL is that it does NOT group by opcode, but by the message's SHAPE.
+    /// One same opcode can carry different payloads depending on what the player is doing, and
+    /// counting them together hides exactly what needs to be seen. The shape is taken by walking the
+    /// protobuf and noting field number and data type, going inside the submessages:
     ///
-    ///     jjm  1:v,2:{1:v,3:s}     el jugador manda un número y una cadena
-    ///     jjm  1:v,4:{2:v}         el mismo opcode, otra cosa distinta
+    ///     jjm  1:v,2:{1:v,3:s}     the player sends a number and a string
+    ///     jjm  1:v,4:{2:v}         the same opcode, something entirely different
     ///
-    /// Esto NO descifra nada y no debe hacerlo. Un paquete apuntado aquí no autoriza a inventarse
-    /// una respuesta: sin una captura del servidor real que diga qué contesta, contestar cualquier
-    /// cosa es peor que no contestar, porque el cliente se queda con un estado que nadie tiene.
-    /// La lista dice DÓNDE MIRAR, y lo que se mire se mide como todo lo demás.
+    /// This does NOT decipher anything and must not. A packet recorded here does not authorise inventing
+    /// an answer: without a capture of the real server saying what it answers, answering anything
+    /// is worse than not answering, because the client is left with a state nobody has.
+    /// The list says WHERE TO LOOK, and what is looked at is measured like everything else.
     /// </summary>
     public static class UnknownPackets
     {
-        /// <summary>Por qué está aquí este paquete.</summary>
+        /// <summary>Why this packet is here.</summary>
         public enum Kind
         {
-            /// <summary>Ningún manejador lo reclamó: cayó al final de la cadena.</summary>
+            /// <summary>No handler claimed it: it fell to the end of the chain.</summary>
             Unhandled = 0,
 
-            /// <summary>Lo tapa la lista de silencio, que es una decisión vieja y sin medir.</summary>
+            /// <summary>The silence list covers it, which is an old and unmeasured decision.</summary>
             Silenced = 1,
 
-            /// <summary>Llegó, pero no se pudo leer como protobuf.</summary>
+            /// <summary>It arrived, but could not be read as protobuf.</summary>
             Undecodable = 2,
         }
 
-        /// <summary>Una forma de mensaje, con lo que se sabe de ella.</summary>
+        /// <summary>A message shape, with what is known about it.</summary>
         public sealed class Row
         {
             public string Opcode = "";
@@ -61,7 +61,7 @@ namespace Jondo.Unity.Server.Network
             public long MapId;
             public int PayloadBytes;
 
-            /// <summary>Una muestra para poder volver a mirarla. Se guarda la primera.</summary>
+            /// <summary>A sample to be able to look at it again. The first one is kept.</summary>
             public string SampleHex = "";
         }
 
@@ -74,7 +74,7 @@ namespace Jondo.Unity.Server.Network
         /// <summary>Cuántas formas distintas hay apuntadas.</summary>
         public static int ShapeCount => _rows.Count;
 
-        /// <summary>Y cuántos opcodes distintos, que siempre son menos.</summary>
+        /// <summary>And how many distinct opcodes, which are always fewer.</summary>
         public static int OpcodeCount
         {
             get
@@ -86,8 +86,8 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Apunta un paquete. No lanza nunca: esto va colgado del despachador y un fallo aquí no
-        /// puede tumbar la conexión de nadie.
+        /// Records a packet. It never throws: this hangs off the dispatcher and a failure here
+        /// cannot bring down anyone's connection.
         /// </summary>
         public static void Record(string opcode, int rootField, byte[] payload, Kind kind)
         {
@@ -99,11 +99,11 @@ namespace Jondo.Unity.Server.Network
                 string firma = Signature(payload);
                 string clave = $"{opcode}|{rootField}|{(int)kind}|{firma}";
 
-                // Un techo, por si algún día una forma se desboca. Medido sobre las 305 capturas:
-                // 243 opcodes distintos del cliente dan 317 formas en 29.991 mensajes, así que mil
-                // es diez veces lo que hace falta. Si se llega ahí es que algo está generando
-                // firmas basura, y entonces lo que hay que hacer es arreglarlo, no comerse la
-                // memoria del servidor mientras tanto.
+                // A ceiling, in case some day a shape runs wild. Measured over the 305 captures:
+                // 243 distinct client opcodes give 317 shapes in 29,991 messages, so a thousand
+                // is ten times what is needed. If it gets there, something is generating
+                // garbage signatures, and then what has to be done is fix it, not eat up the
+                // server's memory meanwhile.
                 if (_rows.Count >= TechoDeFormas && !_rows.ContainsKey(clave)) return;
 
                 var fila = _rows.GetOrAdd(clave, _ =>
@@ -128,17 +128,17 @@ namespace Jondo.Unity.Server.Network
                 long cuantas = System.Threading.Interlocked.Increment(ref fila.Occurrences);
                 fila.LastSeen = DateTimeOffset.UtcNow;
 
-                // Se escribe a la base la primera vez y luego de tanto en tanto. Un paquete de
-                // estos puede llegar cien veces por minuto —el ping del cliente sin ir más lejos—
-                // y abrir SQLite en cada uno pondría el disco a trabajar para no aprender nada
-                // nuevo. Lo que interesa es que la forma EXISTA en la lista, no el número exacto.
+                // It is written to the base the first time and then every so often. A packet of
+                // these can arrive a hundred times a minute —the client's ping, for one—
+                // and opening SQLite for each one would put the disk to work to learn nothing
+                // new. What matters is that the shape EXISTS in the list, not the exact number.
                 if (cuantas == 1 || cuantas % 100 == 0)
                 {
                     Guardar(fila);
-                    // Directo, sin envolver en try/catch: SessionContext.Current devuelve la
-                    // sesion Suelta cuando el AsyncLocal esta vacio y State es Current.State, asi
-                    // que ninguno de los dos puede lanzar. Los dos ayudantes que envolvian esto
-                    // eran catch muertos.
+                    // Direct, without wrapping in try/catch: SessionContext.Current returns the
+                    // Suelta session when the AsyncLocal is empty and State is Current.State, so
+                    // neither of the two can throw. The two helpers that wrapped this
+                    // were dead catches.
                     ActivityJournal.Current.Write("packet.unknown",
                         SessionContext.Current.AccountId, SessionContext.State.CharacterId,
                         new
@@ -155,35 +155,35 @@ namespace Jondo.Unity.Server.Network
             }
             catch
             {
-                // A propósito. Esto es diagnóstico: si falla, se pierde una anotación, no una
-                // partida.
+                // On purpose. This is diagnostics: if it fails, a note is lost, not a
+                // game.
             }
         }
 
-        /// <summary>Lo más que se guarda de una muestra, en bytes.</summary>
+        /// <summary>The most that is kept of a sample, in bytes.</summary>
         private const int MuestraMaxima = 512;
 
-        /// <summary>Cuántas formas distintas se aguantan en memoria antes de dejar de apuntar.</summary>
+        /// <summary>How many distinct shapes are held in memory before stopping recording.</summary>
         private const int TechoDeFormas = 1000;
 
         /// <summary>
-        /// Apunta una trama entera: le saca el sobre, el opcode y la carga, y llama al de arriba.
+        /// Records a whole frame: takes off its envelope, the opcode and the payload, and calls the one above.
         ///
-        /// Es lo que llama el despachador, que a esas alturas sólo tiene los bytes crudos. Sacar
-        /// el opcode aquí y no allí evita repetir el destripe en los dos sitios desde los que se
-        /// llama, y sobre todo evita que el despachador tenga que saber cómo es un sobre.
+        /// It is what the dispatcher calls, which at that point only has the raw bytes. Extracting
+        /// the opcode here and not there avoids repeating the gutting in the two places it is
+        /// called from, and above all keeps the dispatcher from having to know what an envelope looks like.
         ///
-        /// AQUÍ ESTABA EL FALLO que dejaba todo esto sin servir. Se abría el sobre con
-        /// <c>ExtractGameNodePayload</c>, que sólo mira el campo 3 de la raíz, y con
-        /// <c>GetMessageTypeUrl</c>, que mira el 1 y el 3. Las tramas del cliente van en el campo
-        /// <b>2</b>: medido sobre las 72.879 del registro de tráfico, 8.974 de cliente y todas en
-        /// el 2. Así que cada paquete que pasaba por aquí entraba sin opcode y con la carga vacía,
-        /// y después de semanas de juego la tabla tenía dos filas, las dos «(sin opcode)» sobre un
-        /// cuerpo vacío. El despachador no se enteró nunca porque él busca los opcodes como texto
-        /// dentro de la trama, y eso funciona sea cual sea el sobre.
+        /// HERE WAS THE BUG that left all this useless. The envelope was opened with
+        /// <c>ExtractGameNodePayload</c>, which only looks at the root's field 3, and with
+        /// <c>GetMessageTypeUrl</c>, which looks at 1 and 3. The client's frames go in field
+        /// <b>2</b>: measured over the 72,879 of the traffic log, 8,974 from the client and all in
+        /// 2. So every packet going through here came in with no opcode and an empty payload,
+        /// and after weeks of play the table had two rows, both «(sin opcode)» over an
+        /// empty body. The dispatcher never noticed because it looks for the opcodes as text
+        /// inside the frame, and that works whatever the envelope.
         ///
-        /// Ahora lo abre <see cref="Envelope"/>, que vive en el proyecto de protocolo justamente
-        /// para que el editor calcule lo mismo que el servidor escribe.
+        /// Now <see cref="Envelope"/> opens it, which lives in the protocol project precisely
+        /// so that the editor computes the same thing the server writes.
         /// </summary>
         public static void RecordFrame(byte[] frame, Kind kind)
         {
@@ -196,29 +196,29 @@ namespace Jondo.Unity.Server.Network
             }
             catch
             {
-                // Igual que Record: esto no puede tumbar a nadie.
+                // Same as Record: this cannot bring anyone down.
             }
         }
 
         /// <summary>
-        /// La FORMA de un mensaje: número de campo y tipo de dato, metiéndose en los submensajes.
+        /// A message's SHAPE: field number and data type, going into the submessages.
         ///
-        /// El algoritmo se mudó a <see cref="ProtoShape"/>, en el proyecto de protocolo, y aquí
-        /// queda la puerta de siempre. La razón de la mudanza es que el editor tiene que calcular
-        /// EXACTAMENTE la misma cadena que el servidor escribe en paquetes.db: con una copia a cada
-        /// lado, los dos coinciden hasta el día en que alguien mejora uno, y a partir de ahí el
-        /// editor deja de encontrar las filas que el servidor apuntó, sin decir nada.
+        /// The algorithm moved to <see cref="ProtoShape"/>, in the protocol project, and here
+        /// the usual door remains. The reason for the move is that the editor has to compute
+        /// EXACTLY the same string the server writes in paquetes.db: with a copy on each
+        /// side, both agree until the day someone improves one, and from then on the
+        /// editor stops finding the rows the server recorded, without a word.
         /// </summary>
         public static string Signature(byte[] payload) => ProtoShape.Of(payload);
 
-        /// <summary>El mapa donde está el que lo mandó, si es que hay sesión. Nunca lanza.</summary>
+        /// <summary>The map whoever sent it is on, if there is a session. It never throws.</summary>
         private static long SeguroElMapa()
         {
             try { return SessionContext.State.MapId; }
             catch { return 0; }
         }
 
-        // ─── La base ────────────────────────────────────────────────────────────
+        // ─── The base ───────────────────────────────────────────────────────────
 
         private static void Guardar(Row fila)
         {
@@ -288,7 +288,7 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Lo apuntado hasta ahora, de lo que más pasa a lo que menos. Lo usa el comando .packets.
+        /// What has been recorded so far, from the most frequent to the least. The .packets command uses it.
         /// </summary>
         public static List<Row> Top(int cuantas)
         {
@@ -298,7 +298,7 @@ namespace Jondo.Unity.Server.Network
             return todas;
         }
 
-        /// <summary>Un resumen de una línea, para el arranque y para el registro.</summary>
+        /// <summary>A one-line summary, for startup and for the log.</summary>
         public static string Resumen()
         {
             var counts = Counts();
@@ -321,10 +321,10 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Vuelve a leer de la base lo que se apuntó en arranques anteriores.
+        /// Reads back from the base what was recorded in previous starts.
         ///
-        /// Sin esto, cada vez que se reinicia el servidor la lista empieza vacía y lo que costó una
-        /// tarde de juego se pierde. Las cuentas se suman a lo que venga de esta sesión.
+        /// Without this, every time the server restarts the list starts empty and what cost an
+        /// afternoon of play is lost. The counts are added to whatever comes from this session.
         /// </summary>
         public static void Initialize()
         {
@@ -334,10 +334,10 @@ namespace Jondo.Unity.Server.Network
                 connection.Open();
                 PrepararBase(connection);
 
-                // Las filas que dejó el fallo del sobre: sin opcode y con el cuerpo vacío. No se
-                // puede hacer nada con ellas —no dicen ni qué mensaje era ni qué llevaba— y en la
-                // lista del editor sólo ocupan sitio pareciendo trabajo pendiente. Se van una vez
-                // y no vuelven, porque ahora RecordFrame abre bien el sobre.
+                // The rows the envelope bug left: no opcode and an empty body. Nothing
+                // can be done with them —they say neither which message it was nor what it carried— and in the
+                // editor's list they only take up space looking like pending work. They go once
+                // and do not come back, because RecordFrame now opens the envelope correctly.
                 var limpiar = connection.CreateCommand();
                 limpiar.CommandText =
                     "DELETE FROM PaquetesSinAtender WHERE Opcode = '' OR Opcode = '(sin opcode)';";

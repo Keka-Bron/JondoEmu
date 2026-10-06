@@ -8,13 +8,13 @@ using Jondo.Unity.Launcher.UI;
 namespace Jondo.Unity.Launcher
 {
     /// <summary>
-    /// La aplicación de Avalonia: los estilos y la ventana.
+    /// The Avalonia application: the styles and the window.
     /// </summary>
     /// <remarks>
-    /// Los colores se meten aquí desde <see cref="LauncherPalette"/> en vez de escribirlos en el
-    /// XAML. Es más rodeo, pero es la única forma de que el lanzador y el servidor sigan pintando
-    /// con los mismos números: en cuanto un color se escriba a mano en un .axaml, esa copia y la de
-    /// Windows Forms empiezan a separarse y nadie se entera hasta que se ven las dos juntas.
+    /// The colours are put in here from <see cref="LauncherPalette"/> instead of writing them in the
+    /// XAML. It is more roundabout, but it is the only way for the launcher and the server to keep painting
+    /// with the same numbers: as soon as a colour is written by hand in an .axaml, that copy and the
+    /// Windows Forms one start drifting apart and nobody notices until the two are seen together.
     /// </remarks>
     public sealed class App : Application
     {
@@ -30,9 +30,9 @@ namespace Jondo.Unity.Launcher
             {
                 escritorio.MainWindow = new MainWindow();
 
-                // Cerrar la ventana ya NO apaga el emulador: sólo termina el proceso del lanzador.
-                // El servidor es otro programa y sigue con lo suyo, con los jugadores que tenga
-                // dentro.
+                // Closing the window NO longer shuts down the emulator: it only ends the launcher's process.
+                // The server is another program and carries on with its own, with whatever players it has
+                // inside.
                 escritorio.ShutdownMode = ShutdownMode.OnMainWindowClose;
             }
 
@@ -41,7 +41,7 @@ namespace Jondo.Unity.Launcher
 
         private void CargarLaPaleta()
         {
-            // Los que el XAML usa como Color, dentro de un degradado.
+            // The ones the XAML uses as Color, inside a gradient.
             Poner("GreenTop", LauncherPalette.GreenTop);
             Poner("GreenBottom", LauncherPalette.GreenBottom);
             Poner("GreenTopHover", LauncherPalette.GreenTopHover);
@@ -49,7 +49,7 @@ namespace Jondo.Unity.Launcher
             Poner("PurpleTop", LauncherPalette.PurpleTop);
             Poner("PurpleBottom", LauncherPalette.PurpleBottom);
 
-            // Y los que usa como Brush, sueltos.
+            // And the ones it uses as Brush, loose.
             PonerBrocha("GoldBrush", LauncherPalette.Gold);
             PonerBrocha("LightGoldBrush", LauncherPalette.LightGold);
             PonerBrocha("SoftGoldBrush", LauncherPalette.SoftGold);

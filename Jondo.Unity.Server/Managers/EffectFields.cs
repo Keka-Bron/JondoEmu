@@ -8,46 +8,46 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Cómo viaja el valor de un efecto de objeto dentro del ivx.
+    /// How an item effect's value travels inside the ivx.
     ///
-    /// No es un número suelto en un campo fijo. Cada entrada de efecto lleva el id en f11 y el
-    /// valor en UNO de varios campos, y ese campo NO es un hueco: es el que dice de qué tipo es el
-    /// efecto, igual que un `oneof`. Sacado del inventario de la captura real, 609 objetos:
+    /// It is not a loose number in a fixed field. Each effect entry carries the id in f11 and the value in
+    /// ONE of several fields, and that field is NOT a slot: it is the one that says what type the effect
+    /// is, like a `oneof`. Taken from the real capture's inventory, 609 items:
     ///
-    ///   f4: número          un varint suelto            "+400 vitalidad"
-    ///   f5 { f1, f2 }       un rango, máximo y mínimo   "10 a 1 de daños neutrales"
-    ///   f6 { f1, f2, f3 }   valor, diceNum y diceSide   el hechizo de un dofus, un título...
-    ///   f1: cadena          "Fabricado por: ..."
-    ///   f2 { f1..f5 }       una fecha
-    ///   nada                "Ligado a una cuenta"
+    ///   f4: number          a loose varint              "+400 vitality"
+    ///   f5 { f1, f2 }       a range, maximum and minimum "10 to 1 neutral damage"
+    ///   f6 { f1, f2, f3 }   value, diceNum and diceSide  a dofus's spell, a title...
+    ///   f1: string          "Fabricado por: ..."
+    ///   f2 { f1..f5 }       a date
+    ///   nothing             "Ligado a una cuenta"
     ///
-    /// Escribir un varint en f5 o en f6 es un error de tipo de alambre, no un valor distinto: el
-    /// cliente busca ahí un submensaje, no lo encuentra, y se queda sin los parámetros. Eso es lo
-    /// que dejaba las armas sin daños y lo que sacaba `{spellNoLvl,,}` en los dofus en vez del
-    /// nombre del hechizo — con su propio Player.log diciéndolo con todas las letras:
+    /// Writing a varint in f5 or in f6 is a wire-type error, not a different value: the client looks for a
+    /// submessage there, does not find it, and is left without the parameters. That is what left weapons
+    /// without damage and what put `{spellNoLvl,,}` on the dofus instead of the spell's name -- with its own
+    /// Player.log saying so in so many words:
     ///
     ///   ERROR [Hyperlink] Error while trying to convert an hyperlink of type spellNoLvl,
     ///   parameters , and text .
     ///
-    /// La tabla aprendida de la captura (item_effect_fields.json, 121 efectos) manda siempre que
-    /// tenga entrada. Para el resto se decide con la propia tabla Effects, y la regla se comprobó
-    /// contra los 670 efectos del inventario capturado.
+    /// The table learnt from the capture (item_effect_fields.json, 121 effects) always rules when it has an
+    /// entry. For the rest it is decided with the Effects table itself, and the rule was checked against the
+    /// 670 effects of the captured inventory.
     /// </summary>
     public static class EffectFields
     {
-        /// <summary>Qué campo usa cada efecto, aprendido de la captura. Manda sobre la regla.</summary>
+        /// <summary>Which field each effect uses, learnt from the capture. It rules over the rule.</summary>
         private static readonly Dictionary<int, int> _fields = new Dictionary<int, int>();
 
-        /// <summary>Category y UseDice de cada efecto, que es con lo que se decide el resto.</summary>
+        /// <summary>Category and UseDice of each effect, which is what the rest is decided with.</summary>
         private static readonly Dictionary<int, (int Category, bool UseDice)> _kind =
             new Dictionary<int, (int, bool)>();
 
         public static int Count => _fields.Count;
 
-        /// <summary>Los efectos de daño de arma, que son los que viajan como rango.</summary>
+        /// <summary>The weapon damage effects, which are the ones that travel as a range.</summary>
         private const int WeaponDamageCategory = 2;
 
-        /// <summary>El efecto no se manda: lo suyo es un texto o una fecha que aquí no existe.</summary>
+        /// <summary>The effect is not sent: its thing is a text or a date that does not exist here.</summary>
         public const int Skip = -1;
 
         public const int NoValue = 0;
@@ -110,12 +110,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Cómo debe viajar esta instancia del efecto.
+        /// How this instance of the effect must travel.
         ///
-        /// Se le pasan los tres números tal y como los declara el objeto — el valor fijo, y el par
-        /// de dados — y devuelve el campo y lo que va dentro de él. Un efecto de tirada llega aquí
-        /// ya resuelto, con el número en <paramref name="value"/> y los dados a cero: elegir qué
-        /// punto del rango le toca a un objeto es cosa de quien lo fabrica, no del protocolo.
+        /// It is passed the three numbers as the item declares them -- the fixed value, and the pair of dice --
+        /// and it returns the field and what goes inside it. A rolled effect arrives here already resolved, with
+        /// the number in <paramref name="value"/> and the dice at zero: choosing which point of the range an item
+        /// gets is the business of whoever makes it, not of the protocol.
         /// </summary>
         public static (int Field, long V1, long V2, long V3) Shape(int effect, long value, long diceNum, long diceSide)
         {
@@ -128,9 +128,9 @@ namespace Jondo.Unity.Server.Managers
                     case AsRange: return (AsRange, diceSide != 0 ? diceSide : diceNum, diceNum, 0);
                     case AsDice: return (AsDice, value, diceNum, diceSide);
                     case AsNumber: return (AsNumber, OnlyNonZero(value, diceNum, diceSide), 0, 0);
-                    // Una cadena o una fecha: "Fabricado por", "Intercambiable el". Las pone el
-                    // servidor sobre el objeto ya fabricado, y aquí no se fabrica nada. Mandarlas
-                    // vacías deja al cliente pintando la etiqueta sin nada detrás, así que no van.
+                    // A string or a date: "Fabricado por", "Intercambiable el". The server puts them on the
+                    // item once made, and nothing is made here. Sending them empty leaves the client
+                    // drawing the label with nothing behind, so they do not go.
                     case AsString:
                     case AsDate: return (Skip, 0, 0, 0);
                     default: return (NoValue, 0, 0, 0);
@@ -139,15 +139,15 @@ namespace Jondo.Unity.Server.Managers
 
             if (value == 0 && diceNum == 0 && diceSide == 0) return (NoValue, 0, 0, 0);
 
-            // Daño de arma con rango de verdad. Los de esta categoría que traen un solo número
-            // —empujar, atraer, quitar PM— sí viajan como número suelto, y así se ven bien.
+            // Weapon damage with a real range. The ones of this category that carry a single number
+            // -- pushing, pulling, removing MP -- do travel as a loose number, and so look right.
             if (kind.Category == WeaponDamageCategory && diceSide != 0 && diceSide != diceNum)
             {
                 return (AsRange, diceSide, diceNum, 0);
             }
 
-            // Un efecto compuesto: el que nombra un hechizo, un oficio, un título. Los de tirada
-            // no entran aquí — su par de números es el rango del que ya se sacó el valor.
+            // A compound effect: the one naming a spell, a profession, a title. The rolled ones do
+            // not come in here -- their pair of numbers is the range the value was already taken from.
             int nonZero = (value != 0 ? 1 : 0) + (diceNum != 0 ? 1 : 0) + (diceSide != 0 ? 1 : 0);
             if (!kind.UseDice && nonZero > 1) return (AsDice, value, diceNum, diceSide);
 
@@ -158,8 +158,8 @@ namespace Jondo.Unity.Server.Managers
             => value != 0 ? value : (diceNum != 0 ? diceNum : diceSide);
 
         /// <summary>
-        /// Lo que este efecto suma a la ficha. Solo los que viajan como número suelto o como rango
-        /// cuentan: los compuestos nombran cosas, no mueven características.
+        /// What this effect adds to the sheet. Only those travelling as a loose number or as a range count:
+        /// compound ones name things, they do not move characteristics.
         /// </summary>
         public static long SheetValue(int effect, long value, long diceNum, long diceSide)
         {

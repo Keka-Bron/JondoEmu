@@ -7,36 +7,36 @@ using System.Text;
 namespace Jondo.Unity.Launcher.Security
 {
     /// <summary>
-    /// Cifra en reposo lo que el lanzador guarda en disco.
+    /// Encrypts at rest what the launcher stores on disk.
     /// </summary>
     /// <remarks>
-    /// <b>Que habia antes.</b> Las cuentas guardadas -- con su credencial de sesion dentro -- iban a
-    /// <c>%APPDATA%\Jondo\lanzador.cfg</c> pasadas por Base64. Base64 no cifra nada: es una forma de
-    /// escribir, no un secreto. Cualquiera con acceso al fichero, o cualquier cosa que se cuele en
-    /// el perfil, se llevaba las credenciales de las ocho cuentas en claro.
+    /// <b>What there was before.</b> The stored accounts -- with their session credential inside -- went to
+    /// <c>%APPDATA%\Jondo\lanzador.cfg</c> run through Base64. Base64 encrypts nothing: it is a way of
+    /// writing, not a secret. Anyone with access to the file, or anything that sneaks into
+    /// the profile, took the credentials of the eight accounts in the clear.
     ///
-    /// <b>Que hay ahora.</b> En Windows, DPAPI con ambito de usuario: la clave la guarda el sistema,
-    /// atada a la cuenta de Windows, y el fichero copiado a otra maquina o abierto por otro usuario
-    /// no se descifra. Es lo mismo que hace un navegador con las contrasenas guardadas.
+    /// <b>What there is now.</b> On Windows, DPAPI with user scope: the key is kept by the system,
+    /// tied to the Windows account, and the file copied to another machine or opened by another user
+    /// does not decrypt. It is the same a browser does with saved passwords.
     ///
-    /// Fuera de Windows hay un respaldo con AES-GCM y una clave en un fichero aparte con permisos
-    /// de solo-el-dueno. <b>Es mas debil y conviene decirlo</b>: quien pueda leer el fichero de
-    /// clave puede descifrar. Se pone porque el lanzador ya no esta atado a Windows y es mejor que
-    /// dejar el respaldo en claro, no porque sea equivalente a DPAPI.
+    /// Outside Windows there is a fallback with AES-GCM and a key in a separate file with owner-only
+    /// permissions. <b>It is weaker and it is worth saying so</b>: whoever can read the key
+    /// file can decrypt. It is there because the launcher is no longer tied to Windows and it is better than
+    /// leaving the fallback in the clear, not because it is equivalent to DPAPI.
     ///
-    /// Si algo no se puede descifrar -- fichero de otra maquina, perfil recreado, clave perdida --
-    /// se descarta y se empieza de cero, que es lo que hace tambien el cliente de Bubble con su
-    /// sesion. Intentar rescatarlo acaba en un estado a medias que nadie sabe interpretar.
+    /// If something cannot be decrypted -- a file from another machine, a recreated profile, a lost key --
+    /// it is discarded and one starts from scratch, which is also what Bubble's client does with its
+    /// session. Trying to rescue it ends in a half state nobody knows how to interpret.
     /// </remarks>
     internal static class SecretStore
     {
-        /// <summary>Marca de que el contenido esta cifrado y con que.</summary>
+        /// <summary>Mark saying the content is encrypted and with what.</summary>
         private const string DpapiPrefix = "dpapi:";
         private const string AesPrefix = "aesgcm:";
 
         private static bool OnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-        /// <summary>El texto cifrado y en Base64, listo para escribirlo en el fichero.</summary>
+        /// <summary>The ciphertext in Base64, ready to write to the file.</summary>
         public static string Protect(string plain)
         {
             if (string.IsNullOrEmpty(plain)) return "";
@@ -53,15 +53,15 @@ namespace Jondo.Unity.Launcher.Security
             }
             catch (Exception ex)
             {
-                // Sin cifrado NO se guarda. Antes esto acababa en Base64 y parecia que habia algo
-                // protegido; devolver vacio hace que la sesion no se recuerde, que es peor de usar
-                // y mucho mejor de defender.
+                // Without encryption it is NOT stored. Before, this ended up in Base64 and it looked like something was
+                // protected; returning empty makes the session not be remembered, which is worse to use
+                // and much better to defend.
                 Program.LogDebug($"[Lanzador] No se ha podido cifrar lo que se iba a guardar: {ex.Message}");
                 return "";
             }
         }
 
-        /// <summary>Lo de vuelta, o cadena vacia si no se puede descifrar.</summary>
+        /// <summary>What comes back, or an empty string if it cannot be decrypted.</summary>
         public static string Unprotect(string stored)
         {
             if (string.IsNullOrWhiteSpace(stored)) return "";
@@ -87,8 +87,8 @@ namespace Jondo.Unity.Launcher.Security
                 return "";
             }
 
-            // Sin prefijo es lo de la version anterior: Base64 a secas. Se lee UNA vez para no
-            // echar del lanzador a quien ya lo tenia, y al guardarse vuelve cifrado.
+            // Without a prefix it is from the previous version: plain Base64. It is read ONCE so as not to
+            // throw out of the launcher whoever already had it, and on saving it comes back encrypted.
             try
             {
                 return Encoding.UTF8.GetString(Convert.FromBase64String(stored));
@@ -99,13 +99,13 @@ namespace Jondo.Unity.Launcher.Security
             }
         }
 
-        /// <summary>Si lo guardado viene de la version que no cifraba.</summary>
+        /// <summary>Whether what is stored comes from the version that did not encrypt.</summary>
         public static bool LooksUnprotected(string stored)
             => !string.IsNullOrWhiteSpace(stored)
                && !stored.StartsWith(DpapiPrefix, StringComparison.Ordinal)
                && !stored.StartsWith(AesPrefix, StringComparison.Ordinal);
 
-        // ─── El respaldo de fuera de Windows ────────────────────────────────────
+        // ─── The fallback outside Windows ───────────────────────────────────────
 
         private static string KeyPath => System.IO.Path.Combine(
             System.IO.Path.GetDirectoryName(UI.LauncherPreferences.Path) ?? ".", "clave.bin");
@@ -125,13 +125,13 @@ namespace Jondo.Unity.Launcher.Security
 
             try
             {
-                // Sólo el dueño. Sin esto la clave queda legible para cualquier cuenta de la
-                // máquina y el cifrado no defiende de nada.
+                // Only the owner. Without this the key stays readable for any account on the
+                // machine and the encryption defends against nothing.
                 File.SetUnixFileMode(KeyPath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
             }
             catch
             {
-                // En sistemas sin permisos POSIX no hay nada que ajustar.
+                // On systems without POSIX permissions there is nothing to adjust.
             }
 
             return nueva;

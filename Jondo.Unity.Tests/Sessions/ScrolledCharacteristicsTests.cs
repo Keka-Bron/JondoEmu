@@ -10,19 +10,19 @@ using Xunit;
 namespace Jondo.Unity.Tests.Sessions
 {
     /// <summary>
-    /// Los pergaminos van aparte de los puntos: en su campo de la trama, en su columna de la base,
-    /// y fuera de la cuenta de lo gastado.
+    /// Scrolls go apart from points: in their own field of the frame, in their own column of the base,
+    /// and out of the count of what was spent.
     /// </summary>
     /// <remarks>
-    /// Un nivel 200 recién hecho tenía 183 puntos por repartir en vez de 995 porque la creación
-    /// metía los pergaminos en la base, y la base son los puntos gastados. El campo es el f3 de
-    /// cada característica, medido en 156 capturas de personajes reales -siempre 100, nunca 101-,
-    /// al lado del f2 de los puntos y del f7 del equipo.
+    /// A freshly made level 200 had 183 points to distribute instead of 995 because creation
+    /// put the scrolls in the base, and the base is the points spent. The field is the f3 of
+    /// each characteristic, measured in 156 captures of real characters -always 100, never 101-,
+    /// next to the points' f2 and the equipment's f7.
     /// </remarks>
     public class ScrolledCharacteristicsTests
     {
         /// <summary>
-        /// La hoja lleva los puntos en f2 y los pergaminos en f3, como la fuerza real de la captura:
+        /// The sheet carries the points in f2 and the scrolls in f3, like the capture's real strength:
         /// <c>f4 { f2: 398, f3: 100, f7: 499 }</c>.
         /// </summary>
         [Fact]
@@ -46,25 +46,25 @@ namespace Jondo.Unity.Tests.Sessions
                 Assert.Equal(398, Value(strength, 2));
                 Assert.Equal(100, Value(strength, 3));
 
-                // Sin puntos y con pergaminos: sólo el f3, que es lo que hace un proto3 con un cero.
+                // No points and with scrolls: only f3, which is what a proto3 does with a zero.
                 var vitality = Detail(body, ConnectionProtocol.Stat.Vitality);
                 Assert.Equal(0, Value(vitality, 2));
                 Assert.Equal(100, Value(vitality, 3));
 
-                // Y sin ninguna de las dos cosas, nada de nada.
+                // And with neither of the two, nothing at all.
                 var wisdom = Detail(body, ConnectionProtocol.Stat.Wisdom);
                 Assert.Equal(0, Value(wisdom, 2));
                 Assert.Equal(0, Value(wisdom, 3));
 
-                // Lo que el juego usa es la suma: 498 de fuerza son 3.490 pods.
+                // What the game uses is the sum: 498 strength is 3,490 pods.
                 Assert.Equal(498, session.State.TotalStrength);
                 Assert.Equal(1000 + 5 * 498, Value(Detail(body, ConnectionProtocol.Stat.Pods), 2));
             }
         }
 
         /// <summary>
-        /// La migración: los que nacieron con 101 en las seis de la base los pierden, se quedan con
-        /// los pergaminos en su columna y recuperan todo su capital. Los demás no se tocan.
+        /// The migration: those born with 101 in the six of the base lose them, keep
+        /// the scrolls in their column and get all their capital back. The rest are not touched.
         /// </summary>
         [Fact]
         public void The_migration_moves_the_scrolls_out_of_the_base_once()
@@ -94,7 +94,7 @@ namespace Jondo.Unity.Tests.Sessions
                                        "FROM Characters ORDER BY Id;";
                     using var rows = read.ExecuteReader();
 
-                    // Test: los 101 fuera, 995 por repartir, pergaminos a 100.
+                    // Test: the 101s out, 995 to distribute, scrolls at 100.
                     Assert.True(rows.Read());
                     Assert.Equal(995, rows.GetInt32(1));
                     Assert.Equal(0, rows.GetInt32(2));
@@ -102,13 +102,13 @@ namespace Jondo.Unity.Tests.Sessions
                     Assert.Equal(100, rows.GetInt32(4));
                     Assert.Equal(100, rows.GetInt32(5));
 
-                    // Terceron, nivel 3: diez puntos, que son sus 5 x 2.
+                    // Terceron, level 3: ten points, which are his 5 x 2.
                     Assert.True(rows.Read());
                     Assert.Equal(10, rows.GetInt32(1));
                     Assert.Equal(0, rows.GetInt32(2));
 
-                    // Keka, que repartió de verdad: la base se queda, y pergaminos a 100 igual, que
-                    // es lo que su captura enseña en el f3.
+                    // Keka, who really distributed: the base stays, and scrolls at 100 all the same, which
+                    // is what her capture shows in f3.
                     Assert.True(rows.Read());
                     Assert.Equal(0, rows.GetInt32(1));
                     Assert.Equal(398, rows.GetInt32(2));
@@ -120,9 +120,9 @@ namespace Jondo.Unity.Tests.Sessions
                     Assert.Equal(50, rows.GetInt32(2));
                     rows.Close();
 
-                    // La segunda vez no hace nada: las columnas ya están y la limpieza va atada a
-                    // crearlas. Un personaje que después reparta hasta tener 101 en las seis no
-                    // se lo ve borrar.
+                    // The second time it does nothing: the columns are already there and the cleanup is tied to
+                    // creating them. A character who later distributes up to 101 in all six does not
+                    // see them erased.
                     var later = connection.CreateCommand();
                     later.CommandText = "UPDATE Characters SET Vitality = 101, Wisdom = 101, Strength = 101, " +
                                         "Intelligence = 101, Chance = 101, Agility = 101, RemainingPoints = 7 WHERE Id = 4;";

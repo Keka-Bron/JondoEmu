@@ -8,18 +8,18 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Destruir un objeto del inventario: botón derecho, destruir, aceptar.
+    /// Destroying an inventory item: right click, destroy, accept.
     ///
-    ///   cliente  iuw { f2 { f2: uid, f3: cuántos } }
+    ///   client  iuw { f2 { f2: uid, f3: how many } }
     ///
-    /// El cliente no quita nada por su cuenta: manda la petición y espera. Sin respuesta, el objeto
-    /// se queda en su sitio, que es lo que pasaba —el iuw llevaba tiempo saliendo en el registro de
-    /// mensajes sin atender.
+    /// The client removes nothing by itself: it sends the request and waits. Without an answer, the
+    /// item stays where it is, which is what used to happen -- the iuw had been showing up in the log
+    /// of unhandled messages for a while.
     ///
-    /// La respuesta es la misma que cuando un objeto se va de la bolsa por cualquier otro motivo:
+    /// The answer is the same as when an item leaves the bag for any other reason:
     ///
-    ///   ium { f1: uid }   se va          o   iua, si solo baja la cantidad
-    ///   iun               el peso, que ahora es menor
+    ///   ium { f1: uid }   it goes          or   iua, if only the quantity drops
+    ///   iun               the weight, which is now lower
     /// </summary>
     public static class DestroyItemHandler
     {
@@ -64,7 +64,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             else
             {
-                // Sigue habiendo: se manda otra vez con la cantidad nueva.
+                // There is still some: it is sent again with the new quantity.
                 var queda = HavenBagStore.FromInventory(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, uid);
                 if (queda != null)
                 {

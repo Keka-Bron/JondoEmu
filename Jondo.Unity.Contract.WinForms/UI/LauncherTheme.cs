@@ -21,9 +21,9 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Window background color (#0d0603), visible when the image is missing.</summary>
         public static readonly Color Background = Argb(LauncherPalette.Background);
 
-        // Las dos tarjetas van bastante más transparentes que en la web original —de 0,84 y 0,86 a
-        // 0,52 y 0,55— para que se vea el dibujo del fondo por detrás. Lo que hay encima sigue
-        // leyéndose porque el texto es claro sobre un marrón muy oscuro.
+        // The two cards go quite a bit more transparent than in the original website —from 0.84 and 0.86 to
+        // 0.52 and 0.55— so that the background drawing is seen behind. What is on top still
+        // reads because the text is light on a very dark brown.
         /// <summary>Translucent fill of the cards.</summary>
         public static readonly Color CardFill = Argb(LauncherPalette.CardFill);
 
@@ -34,11 +34,11 @@ namespace Jondo.Unity.Launcher.UI
         public static readonly Color BarFill = Argb(LauncherPalette.BarFill);
 
         /// <summary>
-        /// El cuerpo del registro. Va OPACO a la fuerza: es un RichTextBox y a un control de texto
-        /// de Windows no se le puede poner un color con alfa —lanza "el control no admite colores de
-        /// fondo transparentes" y se lleva por delante la ventana entera—. Lo que sí es translúcido
-        /// es el panel que lo rodea. Este tono es el que resulta de aquel negro al 66% sobre el
-        /// fondo, para que no parezca un agujero.
+        /// The log's body. It goes OPAQUE by necessity: it is a RichTextBox and a Windows text control
+        /// cannot be given a colour with alpha —it throws "el control no admite colores de
+        /// fondo transparentes" and takes the whole window down with it—. What is translucent
+        /// is the panel around it. This tone is what that black at 66% over the
+        /// background results in, so it does not look like a hole.
         /// </summary>
         public static readonly Color ConsoleBackground = Argb(LauncherPalette.ConsoleBackground);
 
@@ -48,7 +48,7 @@ namespace Jondo.Unity.Launcher.UI
         public static readonly Color SoftGold = Argb(LauncherPalette.SoftGold);    // #e6c280
         public static readonly Color MutedGold = Argb(LauncherPalette.MutedGold);  // #b89865
         public static readonly Color LightBrown = Argb(LauncherPalette.LightBrown);    // #593c1d
-        /// <summary>Para lo que se enseña pero no cambia: se lee sin robar atención.</summary>
+        /// <summary>For what is shown but does not change: it reads without stealing attention.</summary>
         public static readonly Color LightBrownText = Argb(LauncherPalette.LightBrownText);
         public static readonly Color BorderBrown = Argb(LauncherPalette.BorderBrown);   // #7a5328
         public static readonly Color BaseText = Argb(LauncherPalette.BaseText);   // #fff3d6
@@ -91,11 +91,11 @@ namespace Jondo.Unity.Launcher.UI
         public static readonly Color LogNormal = Argb(LauncherPalette.LogNormal);
         public static readonly Color LogTime = Argb(LauncherPalette.LogTime);
 
-        /// <summary>Un color de la paleta compartida, tal cual lo pinta GDI+.</summary>
+        /// <summary>A colour from the shared palette, just as GDI+ paints it.</summary>
         /// <remarks>
-        /// Los numeros viven en <see cref="LauncherPalette"/>, que no sabe de toolkits, para que
-        /// esta paleta y la de Avalonia sean LA MISMA y no dos copias que se van separando. Antes
-        /// estaban escritos aqui y el lanzador de Avalonia habria tenido que copiarlos.
+        /// The numbers live in <see cref="LauncherPalette"/>, which knows nothing about toolkits, so that
+        /// this palette and Avalonia's are THE SAME and not two copies drifting apart. Before they
+        /// were written here and the Avalonia launcher would have had to copy them.
         /// </remarks>
         private static Color Argb(uint value) => Color.FromArgb(unchecked((int)value));
 
@@ -251,8 +251,8 @@ namespace Jondo.Unity.Launcher.UI
         /// so they are replaced by an equivalent vector icon.
         /// </summary>
         /// <summary>
-        /// Una carpeta abierta, para el botón que elige dónde está el cliente. Dibujada a mano como
-        /// el resto de iconos: la ventana no carga ninguna imagen que no esté en launcher_assets.
+        /// An open folder, for the button that chooses where the client is. Drawn by hand like
+        /// the rest of the icons: the window loads no image that is not in launcher_assets.
         /// </summary>
         public static void DrawFolder(Graphics g, Rectangle r, Color color)
         {
@@ -262,7 +262,7 @@ namespace Jondo.Unity.Launcher.UI
             using var brush = new SolidBrush(color);
             float x = r.X, y = r.Y, w = r.Width, h = r.Height;
 
-            // La pestaña de arriba a la izquierda y el cuerpo, como una carpeta de toda la vida.
+            // The tab at the top left and the body, like an old-fashioned folder.
             g.FillRectangle(brush, x, y + h * 0.16f, w * 0.42f, h * 0.16f);
             using (var cuerpo = new GraphicsPath())
             {
@@ -372,12 +372,12 @@ namespace Jondo.Unity.Launcher.UI
                 using var memory = new MemoryStream(data);
                 using var loaded = Image.FromStream(memory);
 
-                // La copia NO sobra. Image.FromStream se queda con el flujo y lee de él cuando le
-                // hace falta, así que devolver esa imagen con el MemoryStream ya cerrado deja una
-                // bomba de relojería: mientras sólo se dibuje encima aguanta, pero en cuanto algo
-                // la obliga a releer los píxeles revienta con «A generic error occurred in GDI+»,
-                // y el aviso no dice ni de qué imagen se trata. Pasó al voltear el fondo del
-                // servidor. Un Bitmap nuevo se queda con los píxeles y ya no depende de nadie.
+                // The copy is NOT superfluous. Image.FromStream keeps the stream and reads from it when it
+                // needs to, so returning that image with the MemoryStream already closed leaves a
+                // time bomb: while it is only drawn on top it holds, but as soon as something
+                // forces it to reread the pixels it blows up with «A generic error occurred in GDI+»,
+                // and the warning does not even say which image it is about. It happened on flipping the
+                // server's background. A new Bitmap keeps the pixels and no longer depends on anyone.
                 return new Bitmap(loaded);
             }
             catch

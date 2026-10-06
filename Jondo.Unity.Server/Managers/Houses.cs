@@ -7,56 +7,56 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las casas del mundo: sus puertas, y a qué interior lleva cada una.
+    /// The world's houses: their doors, and which interior each one leads to.
     ///
-    /// ─── Qué está medido ────────────────────────────────────────────────────────────────────
+    /// ─── What is measured ───────────────────────────────────────────────────────────────────
     ///
-    /// Que un elemento es la puerta de una casa lo dice el servidor real declarándolo con TIPO
-    /// 300, y ese tipo trae tres habilidades que sólo tiene una vivienda: entrar (84), código de
-    /// acceso (100) y poner en venta (98, o 108 si ya lo está). Un edificio que no es casa sale
-    /// con tipo −1 y no se puede clicar siquiera.
+    /// That an element is a house door is said by the real server declaring it with TYPE
+    /// 300, and that type brings three skills only a dwelling has: enter (84), access
+    /// code (100) and put up for sale (98, or 108 if it already is). A building that is not a house comes
+    /// out with type −1 and cannot even be clicked.
     ///
-    /// Entrar y salir NO son el mismo mensaje, y eso costó verlo:
+    /// Entering and leaving are NOT the same message, and that took some seeing:
     ///
-    ///   entrar   iwo { f1: habilidad, f2: elemento, f3: instancia } →  iwn  →  jqw { f1: mapa }
-    ///   salir    iwo { f1: habilidad, f2: elemento }                →  iwn  →  jru { f2: mapa }
+    ///   enter    iwo { f1: skill, f2: element, f3: instance } →  iwn  →  jqw { f1: map }
+    ///   leave    iwo { f1: skill, f2: element }               →  iwn  →  jru { f2: map }
     ///
-    /// Ojo al número de campo del mapa: en el jqw va en el f1 y en el jru va en el f2.
+    /// Mind the map's field number: in the jqw it goes in f1 and in the jru it goes in f2.
     ///
-    /// El f3 del iwo de entrada dice A QUÉ INSTANCIA se entra, y no es un piso. Cuando Ankama
-    /// fusionó servidores no había casas para todo el mundo, así que una misma puerta con un
-    /// mismo interior pasó a pertenecer a mucha gente a la vez: cada dueño tiene su propia copia
-    /// del MISMO mapa, separada de las demás. En la captura ese edificio tiene once dueños, no
-    /// once plantas.
+    /// The f3 of the entering iwo says WHICH INSTANCE is entered, and it is not a floor. When Ankama
+    /// merged servers there were not houses for everybody, so one same door with one same
+    /// interior came to belong to many people at once: each owner has his own copy
+    /// of the SAME map, separate from the others. In the capture that building has eleven owners, not
+    /// eleven floors.
     ///
-    /// Por eso una puerta lleva a un interior y sólo a uno, que es como está hecho aquí. Y por eso
-    /// en Jondo, donde las casas no tienen dueño, con una sola instancia basta: el f3 se lee y se
-    /// ignora. El día que haya dueños, ese campo es el que dice de quién es la copia que se abre.
+    /// That is why a door leads to one interior and only one, which is how it is done here. And that is why
+    /// in Jondo, where houses have no owner, a single instance is enough: the f3 is read and
+    /// ignored. The day there are owners, that field is the one saying whose copy is opened.
     ///
-    /// ─── Qué hemos decidido nosotros ────────────────────────────────────────────────────────
+    /// ─── What we decided ourselves ──────────────────────────────────────────────────────────
     ///
-    /// A qué mapa lleva cada puerta NO ESTÁ EN EL CLIENTE. Se comprobó a tres bandas:
-    /// HousesDataRoot trae seis campos y ninguno es un mapa, los 569 bundles de mapas no llevan
-    /// ni un campo con «house», y «doorCell» da cero ocurrencias en global-metadata.dat. Ese
-    /// vínculo lo pone el servidor de Ankama y no lo tenemos.
+    /// Which map each door leads to IS NOT IN THE CLIENT. It was checked three ways:
+    /// HousesDataRoot brings six fields and none is a map, the 569 map bundles do not carry
+    /// a single field with «house», and «doorCell» gives zero hits in global-metadata.dat. That
+    /// link is set by Ankama's server and we do not have it.
     ///
-    /// Así que lo ponemos nosotros, y con una lista de INCLUSIÓN, no de exclusiones. Los interiores
-    /// salen sólo de las dos subzonas que se sabe que son viviendas —983 Residencia brakmariana y
-    /// 984 Residencia bontariana, 114 mapas— repartidos por índice con todo ordenado: la misma
-    /// puerta lleva siempre al mismo sitio, sin guardar nada.
+    /// So we set it ourselves, and with an INCLUSION list, not one of exclusions. The interiors
+    /// come only from the two subzones known to be dwellings —983 Residencia brakmariana and
+    /// 984 Residencia bontariana, 114 maps— handed out by index with everything sorted: the same
+    /// door always leads to the same place, without storing anything.
     ///
-    /// La primera versión hacía lo contrario —cualquier mapa en (0,0) menos una lista de vetos— y
-    /// salió mal en el juego: una puerta de Astrub llevaba a un taller de herrero de Tierradala,
-    /// que es un sitio público al que se llega andando, y encima se le declaraba a su FORJA que
-    /// era la salida de la casa. Es decir, un interactivo de oficio de un mapa legítimo pasaba a
-    /// sacarte a la calle. Con 3.357 mapas en (0,0) una lista de vetos nunca iba a ser suficiente:
-    /// hay que decir cuáles SÍ.
+    /// The first version did the opposite —any map at (0,0) except a list of vetoes— and
+    /// it went wrong in the game: an Astrub door led to a blacksmith's workshop in Tierradala,
+    /// which is a public place reached on foot, and on top of that its FORGE was declared to be
+    /// the house's exit. That is, a profession interactive of a legitimate map ended up throwing
+    /// you out into the street. With 3,357 maps at (0,0) a veto list was never going to be enough:
+    /// one has to say which ones YES.
     ///
-    /// El precio es que las casas ya no se acuerdan de su zona: sólo Bonta y Brakmar tienen
-    /// residencias, así que 1.251 de las 1.437 puertas llevan a un interior de otra parte. Es feo
-    /// y es a propósito, porque lo otro rompía contenido que funcionaba.
+    /// The price is that houses no longer remember their zone: only Bonta and Brakmar have
+    /// residences, so 1,251 of the 1,437 doors lead to an interior from somewhere else. It is ugly
+    /// and it is on purpose, because the other way broke content that worked.
     ///
-    /// Lo hace tools/casas_mundo.py y se puede corregir a mano en el .json.
+    /// tools/casas_mundo.py does it, and it can be corrected by hand in the .json.
     ///
     /// ─── Owners ──────────────────────────────────────────────────────────────────────────────
     ///
@@ -66,8 +66,9 @@ namespace Jondo.Unity.Server.Managers
     /// everybody and nobody's.
     ///
     /// The plaque -- lnx -- only ever travels for a house WITH an owner: of the 1,276 plaques in
-    /// the 34 capture folders, all 1,276 have one, and there is no sample of a free house. So a
-    /// house without an owner still sends none, exactly as before.
+    /// the 34 capture folders, all 1,276 have one, and there is no sample of a free house. A
+    /// house that can be owned and has no owner sends one all the same, without a name and at its
+    /// model's price: the client opens no buyer's window for a house its map did not declare.
     ///
     /// Each door is ONE house with ONE instance (<see cref="Instance"/>); the house id the
     /// protocol carries is ours, the door's rank in (map, element) order, stable while the doors
@@ -75,10 +76,10 @@ namespace Jondo.Unity.Server.Managers
     /// </summary>
     public static class Houses
     {
-        /// <summary>El tipo con el que el cliente dibuja la puerta de una casa.</summary>
+        /// <summary>The type the client draws a house door with.</summary>
         public const int DoorType = 300;
 
-        /// <summary>La habilidad «entrar en la casa».</summary>
+        /// <summary>The «enter the house» skill.</summary>
         public const int EnterSkill = 84;
 
         /// <summary>
@@ -123,13 +124,13 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static readonly HashSet<int> ChestGraphics = new() { 12367, 46581 };
 
-        /// <summary>El tipo de la puerta de dentro, la que devuelve a la calle.</summary>
+        /// <summary>The type of the inside door, the one leading back to the street.</summary>
         public const int ExitType = 316;
 
-        /// <summary>La habilidad de la puerta de dentro. Es la genérica de «usar».</summary>
+        /// <summary>The inside door's skill. It is the generic «use» one.</summary>
         public const int ExitSkill = 184;
 
-        /// <summary>Una puerta de casa: dónde está, a dónde lleva y de qué casa es.</summary>
+        /// <summary>A house door: where it is, where it leads and which house it belongs to.</summary>
         public readonly struct Door
         {
             public Door(long mapId, int elementId, int cell, int gfx, long interiorMapId,
@@ -147,13 +148,13 @@ namespace Jondo.Unity.Server.Managers
             public long InteriorMapId { get; }
 
             /// <summary>
-            /// El modelo de casa, el typeId de HousesDataRoot, o cero si no se sabe.
+            /// The house model, HousesDataRoot's typeId, or zero if it is not known.
             ///
-            /// Sólo lo tienen las 37 puertas de los 25 mapas donde la lista de casas que manda el
-            /// servidor real cuadra en número con las puertas que reconocemos. Ahí se emparejan
-            /// por orden, y el único caso comprobable dice que el orden acierta: la puerta 522653
-            /// del mapa 212601864 sale como la «Casa grande de Bonta» de once dueños, que es
-            /// exactamente el edificio en el que se entra en la captura.
+            /// Only the 37 doors of the 25 maps where the house list the real server sends matches
+            /// in number the doors we recognise have it. There they are paired in order, and the
+            /// only checkable case says the order is right: door 522653 of map 212601864 comes out
+            /// as the eleven-owner «Casa grande de Bonta», which is exactly the building entered in
+            /// the capture.
             /// </summary>
             public int Model { get; }
 
@@ -162,8 +163,8 @@ namespace Jondo.Unity.Server.Managers
             public int Rooms { get; }
 
             /// <summary>
-            /// Cuántos DUEÑOS distintos tiene el edificio, cada uno con su copia del mismo
-            /// interior. No son plantas: ver la explicación de la clase.
+            /// How many distinct OWNERS the building has, each one with his copy of the same
+            /// interior. They are not floors: see the class's explanation.
             /// </summary>
             public int Dwellings { get; }
 
@@ -174,12 +175,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El elemento por el que se sale de un interior.
+        /// The element an interior is left through.
         ///
-        /// Cuando <see cref="IsRealDoor"/> es cierto, es una puerta de verdad —lleva el dibujo
-        /// 44035, el que se midió en la captura—. Cuando es falso, es el elemento de número más
-        /// bajo del mapa y lo hemos elegido nosotros: puede ser un mueble. Es a propósito, porque
-        /// un mueble por el que se sale es mejor que un interior del que no se sale.
+        /// When <see cref="IsRealDoor"/> is true, it is a real door —it carries drawing
+        /// 44035, the one measured in the capture—. When it is false, it is the lowest-numbered
+        /// element of the map and we chose it ourselves: it may be a piece of furniture. It is on purpose, because
+        /// a piece of furniture one leaves through is better than an interior one cannot leave.
         /// </summary>
         public readonly struct Exit
         {
@@ -198,7 +199,7 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Dictionary<(long MapId, int ElementId), Door> _byElement = new();
         private static readonly Dictionary<long, Exit> _exits = new();
 
-        /// <summary>Por qué puerta se vuelve a la calle desde cada interior.</summary>
+        /// <summary>Which door leads back to the street from each interior.</summary>
         private static readonly Dictionary<long, Door> _wayBack = new();
 
         /// <summary>The house id of every door, and the door of every house id.</summary>
@@ -237,8 +238,8 @@ namespace Jondo.Unity.Server.Managers
                     int elementId = entry.GetProperty("elemento").GetInt32();
                     long interior = entry.TryGetProperty("interior", out var i) ? i.GetInt64() : 0;
 
-                    // Una puerta que no lleva a ningún sitio no se declara: el jugador clicaría y
-                    // no pasaría nada, que es peor que no poder clicar.
+                    // A door that leads nowhere is not declared: the player would click and nothing
+                    // would happen, which is worse than not being able to click.
                     if (interior <= 0) continue;
                     if (MapManager.GetMapInfo(interior) == null) continue;
 
@@ -285,8 +286,8 @@ namespace Jondo.Unity.Server.Managers
                 return;
             }
 
-            // Una puerta cuyo interior no tenga salida declarada no se declara tampoco: entrar
-            // ahí sería encerrar al jugador.
+            // A door whose interior has no declared exit is not declared either: entering
+            // there would lock the player in.
             var huerfanas = new List<(long, int)>();
             foreach (var pair in _byElement)
             {
@@ -306,9 +307,9 @@ namespace Jondo.Unity.Server.Managers
                 Console.WriteLine($"[Casas] {huerfanas.Count} puertas descartadas: su interior no " +
                                   "tiene por dónde salir.");
 
-            // Y por dónde se vuelve: la primera puerta que lleva a cada interior. Se saca de los
-            // datos y no de la sesión a propósito, para que salir siga funcionando después de
-            // desconectarse dentro de una casa.
+            // And where one goes back through: the first door leading to each interior. It is taken
+            // from the data and not from the session on purpose, so that leaving still works after
+            // disconnecting inside a house.
             foreach (long mapId in SortedKeys(_byMap))
             {
                 foreach (var door in _byMap[mapId])
@@ -351,13 +352,13 @@ namespace Jondo.Unity.Server.Managers
         public static bool TryGetDoor(long mapId, int elementId, out Door door)
             => _byElement.TryGetValue((mapId, elementId), out door);
 
-        /// <summary>¿Este mapa es el interior de alguna casa?</summary>
+        /// <summary>Is this map the interior of some house?</summary>
         public static bool IsInterior(long mapId) => _exits.ContainsKey(mapId);
 
         public static bool TryGetExit(long interiorMapId, out Exit exit)
             => _exits.TryGetValue(interiorMapId, out exit);
 
-        /// <summary>La puerta por la que se vuelve a la calle desde este interior.</summary>
+        /// <summary>The door that leads back to the street from this interior.</summary>
         public static bool TryGetWayBack(long interiorMapId, out Door door)
             => _wayBack.TryGetValue(interiorMapId, out door);
 

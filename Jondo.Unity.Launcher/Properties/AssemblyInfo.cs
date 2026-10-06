@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-// Para que las pruebas puedan mirar por dentro lo que no forma parte de la superficie publica del
-// lanzador. Lo que mas importa aqui es SecretStore: es cifrado, y un cifrado sin pruebas es una
-// promesa. Mismo apano que ya tenia Jondo.Unity.Server.
+// So that the tests can look inside at what is not part of the launcher's public
+// surface. What matters most here is SecretStore: it is encryption, and encryption without tests is a
+// promise. The same workaround Jondo.Unity.Server already had.
 [assembly: InternalsVisibleTo("Jondo.Unity.Tests")]

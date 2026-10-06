@@ -13,23 +13,23 @@ using Jondo.Unity.Launcher.UI.Widgets;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// La ventana del lanzador.
+    /// The launcher's window.
     /// </summary>
     /// <remarks>
-    /// Es la misma interfaz de siempre —la tarjeta de acceso sobre el dibujo del fondo, con su
-    /// música— reescrita en Avalonia. Lo que se ve no cambia; lo que cambia es que ya no hay que
-    /// pintarlo a mano:
+    /// It is the same interface as always —the login card over the background drawing, with its
+    /// music— rewritten in Avalonia. What is seen does not change; what changes is that it no longer has to be
+    /// painted by hand:
     ///
-    ///   - la colocación la hacen StackPanel y Grid, y con ella se van los 250 lines de LayOutCard
-    ///     y su Px() multiplicando cada medida por el DPI
-    ///   - la transparencia la compone Avalonia, y con ella se va el bitmap de fondo compartido
-    ///   - el fondo recortado a lo «background-size: cover» es Stretch="UniformToFill"
+    ///   - layout is done by StackPanel and Grid, and with it go the 250 lines of LayOutCard
+    ///     and its Px() multiplying each measure by the DPI
+    ///   - the transparency is composed by Avalonia, and with it goes the shared background bitmap
+    ///   - the background cropped «background-size: cover» style is Stretch="UniformToFill"
     ///
-    /// Lo que sí es distinto de verdad son dos cosas, y las dos a mejor. La primera: entrar y
-    /// registrarse ya no bloquean la ventana; van por <see cref="Task.Run(Action)"/> y mientras
-    /// tanto los botones se apagan. Antes la llamada HTTP se hacía en el hilo de la interfaz con un
-    /// cursor de reloj, y un servidor lento dejaba la ventana congelada. La segunda: las cuentas
-    /// guardadas van cifradas, ver <see cref="Security.SecretStore"/>.
+    /// What really is different are two things, and both for the better. The first: logging in and
+    /// registering no longer block the window; they go through <see cref="Task.Run(Action)"/> and meanwhile
+    /// the buttons grey out. Before, the HTTP call was made on the interface thread with a
+    /// clock cursor, and a slow server left the window frozen. The second: the stored accounts
+    /// go encrypted, see <see cref="Security.SecretStore"/>.
     /// </remarks>
     public sealed partial class MainWindow : Window
     {
@@ -43,22 +43,22 @@ namespace Jondo.Unity.Launcher.UI
             public long ExpiresAtUnix { get; set; }
             public bool Selected { get; set; }
 
-            /// <summary>El personaje que se enseña en la fila, cuando el servidor ya lo ha dicho.</summary>
+            /// <summary>The character shown in the row, once the server has said so.</summary>
             public LauncherService.Character? Personaje { get; set; }
 
-            /// <summary>Su retrato, dibujado con los huesos del cliente. Null mientras no haya.</summary>
+            /// <summary>Its portrait, drawn with the client's bones. Null until there is one.</summary>
             public Avalonia.Media.Imaging.Bitmap? Retrato { get; set; }
         }
 
         private readonly List<TeamAccount> _cuentas = new();
         private readonly DispatcherTimer _reloj = new() { Interval = TimeSpan.FromSeconds(2) };
 
-        /// <summary>Las tres pantallas del lanzador.</summary>
+        /// <summary>The launcher's three screens.</summary>
         /// <remarks>
-        /// Antes no había ninguna: entrar, el equipo, el idioma, la música, la ruta del cliente y
-        /// el estado del servidor estaban apilados en la misma columna de 350 píxeles, y la
-        /// pantalla que tocaba se decidía con un booleano de «he entrado o no». Eso deja los
-        /// ajustes —cosas que se tocan una vez— compitiendo por sitio con el botón de jugar.
+        /// Before there were none: logging in, the team, the language, the music, the client's path and
+        /// the server's status were stacked in the same 350-pixel column, and the
+        /// screen to show was decided with an «I have logged in or not» boolean. That leaves the
+        /// settings —things touched once— competing for space with the play button.
         /// </remarks>
         private enum Seccion { Jugar, Cuentas, Ajustes }
 
@@ -71,17 +71,17 @@ namespace Jondo.Unity.Launcher.UI
         private MusicPlayer? _musica;
         private string _firmaDeActivas = "";
 
-        /// <summary>Quien dibuja los retratos, sacándolos de los huesos del cliente de Dofus.</summary>
+        /// <summary>Whoever draws the portraits, taking them from the Dofus client's bones.</summary>
         /// <remarks>
-        /// Es el mismo que usa Studio para los NPC de los mapas. Guarda dentro lo que ya ha
-        /// dibujado, así que uno por ventana y no uno por fila. Se cierra al cerrarse la ventana.
+        /// It is the same one Studio uses for the maps' NPCs. It keeps inside what it has already
+        /// drawn, so one per window and not one per row. It is closed when the window closes.
         /// </remarks>
         private readonly Jondo.Unity.Sprites.NpcSprites _retratos = new()
         {
-            // Cuatro veces el hueco. El dibujante no suaviza nada —una muestra por píxel— así que
-            // a la altura de la ficha los bordes salían de sierra; dibujando grande y dejando que
-            // Avalonia lo reduzca, la reducción hace de suavizado. La dirección la pone él solo:
-            // de frente, que es lo que se pide de un retrato.
+            // Four times the slot. The drawer smooths nothing —one sample per pixel— so
+            // at the card's height the edges came out jagged; drawing big and letting
+            // Avalonia shrink it, the shrinking acts as smoothing. It sets the direction on its own:
+            // facing front, which is what is asked of a portrait.
             Height = 256,
         };
 
@@ -97,18 +97,18 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         /// <summary>
-        /// Recupera las cuentas de la vez anterior y comprueba con el servidor si su sesión vale.
+        /// Recovers the accounts from the previous time and checks with the server whether their session is valid.
         /// </summary>
         /// <remarks>
-        /// Esto estaba en el constructor y ahí hacía daño: son hasta ocho peticiones HTTP, una por
-        /// cuenta, y la ventana no se dibujaba hasta que terminaban todas. Con el servidor apagado
-        /// eran ocho tiempos de espera seguidos —media docena de segundos largos— con la pantalla
-        /// en negro y sin nada que dijera que el lanzador estaba vivo.
+        /// This was in the constructor and there it did harm: it is up to eight HTTP requests, one per
+        /// account, and the window was not drawn until they all finished. With the server off
+        /// it was eight timeouts in a row —a good half-dozen seconds— with the screen
+        /// black and nothing saying the launcher was alive.
         ///
-        /// Ahora la ventana sale primero y las cuentas aparecen cuando el servidor conteste. Lo que
-        /// no cambia es lo que se comprueba: sin preguntar, se daba por dentro a cualquiera que
-        /// tuviera cuenta guardada aunque el servidor hubiera rechazado su credencial, y quedaba
-        /// una ventana que decía estar dentro con un botón de jugar que fallaba.
+        /// Now the window comes out first and the accounts appear when the server answers. What
+        /// does not change is what is checked: without asking, anyone who
+        /// had a stored account was taken as logged in even if the server had rejected their credential, and what was left was
+        /// a window claiming to be logged in with a play button that failed.
         /// </remarks>
         private async Task CargarLasCuentasAsync()
         {
@@ -142,8 +142,8 @@ namespace Jondo.Unity.Launcher.UI
                 });
             }
 
-            // Si el servidor ha rechazado TODAS las sesiones guardadas, hay que volver a entrar:
-            // se enseña la sección de cuentas en vez de un equipo con un botón que fallaría.
+            // If the server has rejected ALL the stored sessions, one has to log in again:
+            // the accounts section is shown instead of a team with a button that would fail.
             if (vivas.Count == 0)
             {
                 _seccion = Seccion.Cuentas;
@@ -153,16 +153,16 @@ namespace Jondo.Unity.Launcher.UI
             RefrescarResumen();
             Recolocar();
 
-            // Y los retratos al final del todo, que es lo que más tarda y lo que menos falta hace
-            // para poder jugar.
+            // And the portraits at the very end, which is what takes longest and is least needed
+            // to be able to play.
             await CargarLosRetratosAsync();
         }
 
-        /// <summary>Mete cuentas inventadas para poder fotografiar la pantalla de jugar.</summary>
+        /// <summary>Puts in made-up accounts to be able to photograph the play screen.</summary>
         /// <remarks>
-        /// Sólo lo usa el harness de capturas. Sin esto, una ventana recién abierta sin cuentas
-        /// guardadas enseña el estado vacío, que es justo la pantalla que NO hay que mirar al
-        /// trabajar el diseño del equipo.
+        /// Only the screenshot harness uses it. Without this, a freshly opened window without stored
+        /// accounts shows the empty state, which is exactly the screen NOT to look at when
+        /// working on the team's design.
         /// </remarks>
         internal void MeterCuentasDeMentira(int cuantas)
         {
@@ -184,20 +184,20 @@ namespace Jondo.Unity.Launcher.UI
             Recolocar();
         }
 
-        /// <summary>Pide los personajes al servidor y les dibuja el retrato.</summary>
+        /// <summary>Asks the server for the characters and draws their portrait.</summary>
         /// <remarks>
-        /// Dos cosas separadas y en dos sitios distintos a propósito:
+        /// Two separate things and in two different places on purpose:
         ///
-        ///   - <b>QUÉ dibujar</b> lo dice el servidor. La cadena de aspecto está en la base de
-        ///     datos, y el lanzador no la toca: es lo que se reparte a los jugadores y sólo lleva
-        ///     el contrato. Eso es una petición por cuenta, y va fuera del hilo de la interfaz.
+        ///   - <b>WHAT to draw</b> is said by the server. The look string is in the
+        ///     database, and the launcher does not touch it: it is what is handed out to the players and only carries
+        ///     the contract. That is one request per account, and it goes off the interface thread.
         ///
-        ///   - <b>DIBUJARLO</b> se hace aquí, con los huesos del cliente de Dofus, igual que hace
-        ///     Studio con los NPC. No llevamos ni un retrato dentro del ejecutable.
+        ///   - <b>DRAWING IT</b> is done here, with the Dofus client's bones, just as
+        ///     Studio does with the NPCs. We carry not a single portrait inside the executable.
         ///
-        /// Va al final del todo y sin bloquear nada: la ventana ya está en pantalla y el equipo ya
-        /// se puede usar. Los retratos aparecen cuando aparezcan, y si el cliente no está donde se
-        /// cree, no aparecen y la ficha se lee igual.
+        /// It goes at the very end and without blocking anything: the window is already on screen and the team can already
+        /// be used. The portraits appear whenever they appear, and if the client is not where it is
+        /// believed to be, they do not appear and the card reads the same.
         /// </remarks>
         private async Task CargarLosRetratosAsync()
         {
@@ -207,7 +207,7 @@ namespace Jondo.Unity.Launcher.UI
                 var personajes = await Task.Run(() => LauncherService.CharactersOf(token));
                 if (personajes.Count == 0) continue;
 
-                // El de más nivel: es el que la gente reconoce como «su» personaje.
+                // The highest level one: it is the one people recognise as «their» character.
                 personajes.Sort((a, b) => b.Level.CompareTo(a.Level));
                 cuenta.Personaje = personajes[0];
 
@@ -217,7 +217,7 @@ namespace Jondo.Unity.Launcher.UI
                 }
                 catch (Exception ex)
                 {
-                    // Un aspecto que no se sepa dibujar no puede dejar el lanzador sin equipo.
+                    // A look that cannot be drawn cannot leave the launcher without a team.
                     Program.LogDebug($"[Lanzador] Sin retrato para {personajes[0].Name}: {ex.Message}");
                 }
             }
@@ -226,7 +226,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        //  Vida de la ventana
+        //  The window's life
         // ═══════════════════════════════════════════════════════════════════════
 
         protected override void OnOpened(EventArgs e)
@@ -236,7 +236,7 @@ namespace Jondo.Unity.Launcher.UI
             AplicarIdioma();
             Recolocar();
 
-            // La música arranca sola, igual que el autoplay de la interfaz web.
+            // The music starts on its own, just like the web interface's autoplay.
             if (OperatingSystem.IsWindows())
             {
                 _musica = new MusicPlayer(Path.Combine(LauncherSkin.AssetsFolder, "theme.mp3"));
@@ -249,23 +249,23 @@ namespace Jondo.Unity.Launcher.UI
 
             AlFrente();
 
-            // Y las cuentas guardadas, ya con la ventana en pantalla.
+            // And the stored accounts, with the window already on screen.
             _ = CargarLasCuentasAsync();
         }
 
         /// <summary>
-        /// Pone la ventana delante al abrirse.
+        /// Brings the window to the front on opening.
         /// </summary>
         /// <remarks>
-        /// Windows NO le da el primer plano a una ventana creada por un proceso que no era el
-        /// activo, así que un <c>Activate()</c> a secas no basta: la ventana se abre DETRÁS de lo
-        /// que hubiera en pantalla y la única señal de que el lanzador arrancó es la música.
-        /// Marcarla como «siempre encima» un instante es lo que se salta esa regla; se le quita
-        /// justo después para que a partir de ahí se comporte como cualquier otra.
+        /// Windows does NOT give the foreground to a window created by a process that was not the
+        /// active one, so a bare <c>Activate()</c> is not enough: the window opens BEHIND whatever
+        /// was on screen and the only sign that the launcher started is the music.
+        /// Marking it «always on top» for an instant is what gets around that rule; it is removed
+        /// right after so that from then on it behaves like any other.
         ///
-        /// La versión de Windows Forms tenía esto mismo y al migrar a Avalonia se quedó en un
-        /// Activate() suelto. El resultado era un lanzador que «no arranca»: arrancaba, abría su
-        /// ventana, y se quedaba debajo del navegador.
+        /// The Windows Forms version had this very thing and on migrating to Avalonia it was left as a
+        /// loose Activate(). The result was a launcher that «does not start»: it started, opened its
+        /// window, and stayed under the browser.
         /// </remarks>
         private void AlFrente()
         {
@@ -280,8 +280,8 @@ namespace Jondo.Unity.Launcher.UI
             }
             catch
             {
-                // No poder ponerse delante no es motivo para fallar: la ventana ya está ahí,
-                // sólo que debajo.
+                // Not being able to come to the front is no reason to fail: the window is already there,
+                // just underneath.
             }
         }
 
@@ -294,16 +294,16 @@ namespace Jondo.Unity.Launcher.UI
             _retratos.Dispose();
             base.OnClosed(e);
 
-            // Cerrar la ventana ya NO apaga el emulador: sólo termina este proceso. El servidor es
-            // otro programa y sigue con los jugadores que tenga dentro.
+            // Closing the window NO longer shuts down the emulator: it only ends this process. The server is
+            // another program and carries on with whatever players it has inside.
             Program.RequestShutdown("se ha cerrado la ventana del lanzador");
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        //  Qué se ve en cada momento
+        //  What is seen at each moment
         // ═══════════════════════════════════════════════════════════════════════
 
-        /// <summary>Enseña la sección que toque y apaga las otras dos.</summary>
+        /// <summary>Shows the section due and switches off the other two.</summary>
         private void Recolocar()
         {
             PanelJugar.IsVisible = _seccion == Seccion.Jugar;
@@ -319,16 +319,16 @@ namespace Jondo.Unity.Launcher.UI
             PestanaEntrar.Classes.Set("on", !_modoRegistro);
             PestanaRegistro.Classes.Set("on", _modoRegistro);
 
-            // Sin cuentas todavía, la pantalla de jugar no enseña una lista vacía y un botón que
-            // no hace nada: enseña qué hay que hacer y el atajo para hacerlo.
+            // With no accounts yet, the play screen does not show an empty list and a button that
+            // does nothing: it shows what has to be done and the shortcut to do it.
             bool hayCuentas = _cuentas.Count > 0;
             ListaDeCuentas.IsVisible = hayCuentas;
             EquipoVacio.IsVisible = !hayCuentas;
             BotonJugar.IsVisible = hayCuentas;
             BotonTodas.IsVisible = hayCuentas;
 
-            // Y con el equipo lleno se apaga en vez de esconderse, con el motivo puesto encima:
-            // un botón que desaparece deja pensando si alguna vez estuvo.
+            // And with the team full it greys out instead of hiding, with the reason on top:
+            // a button that disappears leaves one wondering whether it was ever there.
             bool cabenMas = _cuentas.Count < LauncherService.MaximumClients;
             AnadirOtra.IsVisible = hayCuentas;
             AnadirOtra.IsEnabled = cabenMas;
@@ -385,8 +385,8 @@ namespace Jondo.Unity.Launcher.UI
             TextoCrear.Text = _textos.CreateButton;
             TextoQuitarCuentas.Text = _textos.RemoveSelected;
 
-            // Los rótulos de las tres secciones y los de los ajustes. Van aquí y no en el XAML
-            // porque cambian con el idioma como todo lo demás.
+            // The titles of the three sections and those of the settings. They go here and not in the XAML
+            // because they change with the language like everything else.
             SeccionJugar.Content = Etiqueta(Textos.Jugar(_idioma), 1.5, bold: true);
             SeccionCuentas.Content = Etiqueta(Textos.Cuentas(_idioma), 1.5, bold: true);
             SeccionAjustes.Content = Etiqueta(Textos.Ajustes(_idioma), 1.5, bold: true);
@@ -404,8 +404,8 @@ namespace Jondo.Unity.Launcher.UI
             TextoPrimeraCuenta.Text = _textos.AddAccountButton;
             TextoAnadirOtra.Text = _textos.AddAccountButton;
 
-            // El idioma manda también sobre el juego: es el --langCode con el que arranca. Por eso
-            // la fila de la ruta lo enseña, para no tener que adivinar en qué idioma va a abrir.
+            // The language also rules over the game: it is the --langCode it starts with. That is why
+            // the path row shows it, so one does not have to guess which language it will open in.
             RefrescarRutaDelCliente();
             RefrescarResumen();
             RefrescarBotonDeMusica();
@@ -413,7 +413,7 @@ namespace Jondo.Unity.Launcher.UI
             RefrescarPacks();
         }
 
-        /// <summary>El rótulo espaciado de las pestañas, que en la web era el letter-spacing.</summary>
+        /// <summary>The tabs' spaced title, which on the website was the letter-spacing.</summary>
         private SpacedText Etiqueta(string texto, double separacion, bool bold) => new SpacedText
         {
             Text = texto,
@@ -445,7 +445,7 @@ namespace Jondo.Unity.Launcher.UI
             }
         }
 
-        /// <summary>Rutas largas por el medio: el final es lo que identifica al fichero.</summary>
+        /// <summary>Long paths cut in the middle: the end is what identifies the file.</summary>
         private static string Recortar(string ruta)
         {
             const int tope = 46;
@@ -458,7 +458,7 @@ namespace Jondo.Unity.Launcher.UI
             int elegidas = _cuentas.Count(a => a.Selected);
 
             TituloEquipo.Text = string.Format(_textos.TeamTitle, _cuentas.Count);
-            // «2 seleccionado(s) · 0 activo(s)» no decía qué era «activo». Ahora lo dice.
+            // «2 seleccionado(s) · 0 activo(s)» did not say what «activo» was. Now it says.
             ResumenEquipo.Text = Textos.Resumen(_idioma, elegidas, LauncherService.ActiveCount);
             TextoJugar.Text = string.Format(_textos.LaunchSelected, elegidas);
             TextoTodas.Text = elegidas == _cuentas.Count && elegidas > 0
@@ -493,16 +493,16 @@ namespace Jondo.Unity.Launcher.UI
             _firmaDeActivas = FirmaDeActivas();
         }
 
-        /// <summary>La cajita de una cuenta: retrato, nombre, nivel y la marca de si va.</summary>
+        /// <summary>An account's little box: portrait, name, level and the mark of whether it goes.</summary>
         /// <remarks>
-        /// Era una línea de texto con un cuadradito y el apodo. Ahora es una ficha con el
-        /// personaje dibujado, porque en un equipo de ocho lo que se reconoce de un vistazo es la
-        /// cara, no el número de cuenta.
+        /// It was a line of text with a little square and the nickname. Now it is a card with the
+        /// character drawn, because in a team of eight what one recognises at a glance is the
+        /// face, not the account number.
         ///
-        /// El retrato sale de los huesos del CLIENTE, no de ningún dibujo que llevemos nosotros
-        /// dentro: el servidor dice la cadena de aspecto y <see cref="Jondo.Unity.Sprites.NpcSprites"/>
-        /// la pinta. Si el cliente no está donde se cree, o esa cadena no se sabe dibujar, el hueco
-        /// se queda con la inicial del nombre y la ficha sigue leyéndose igual.
+        /// The portrait comes from the CLIENT's bones, not from any drawing we carry
+        /// inside: the server says the look string and <see cref="Jondo.Unity.Sprites.NpcSprites"/>
+        /// paints it. If the client is not where it is believed to be, or that string cannot be drawn, the slot
+        /// keeps the name's initial and the card still reads the same.
         /// </remarks>
         private Control FichaDe(TeamAccount cuenta, bool jugando)
         {
@@ -528,9 +528,9 @@ namespace Jondo.Unity.Launcher.UI
                 Child = marca,
             };
 
-            // Los retratos salen de unos 75 por 96, así que el hueco va con esa proporción y el
-            // personaje entra ENTERO. Con la caja más cuadrada y alineado abajo se le veían las
-            // piernas y poco más.
+            // The portraits come out at about 75 by 96, so the slot goes with that proportion and the
+            // character fits WHOLE. With a squarer box aligned to the bottom one saw its
+            // legs and little else.
             var hueco = new Border
             {
                 Width = 50,
@@ -614,7 +614,7 @@ namespace Jondo.Unity.Launcher.UI
             return dentro;
         }
 
-        /// <summary>La inicial que se enseña mientras no hay retrato.</summary>
+        /// <summary>The initial shown while there is no portrait.</summary>
         private static string Inicial(TeamAccount cuenta)
         {
             string de = cuenta.Personaje?.Name is { Length: > 0 } suyo ? suyo : cuenta.Nickname;
@@ -635,8 +635,8 @@ namespace Jondo.Unity.Launcher.UI
 
         private void RefrescarBotonDeMusica()
         {
-            // Decía «MÚSICA: ON», que es su estado y no lo que pasa al pulsarlo. Un botón se
-            // nombra por lo que hace.
+            // It said «MÚSICA: ON», which is its state and not what happens on pressing it. A button is
+            // named after what it does.
             bool sonando = _musica?.Playing ?? false;
             TextoMusica.Text = sonando ? Textos.ApagarMusica(_idioma) : Textos.EncenderMusica(_idioma);
             IconoAltavoz.Opacity = sonando ? 1 : 0.45;
@@ -652,11 +652,11 @@ namespace Jondo.Unity.Launcher.UI
         private void QuitarElAviso() => Aviso.IsVisible = false;
 
         /// <summary>
-        /// Apaga los campos mientras no se pueda usarlos.
+        /// Greys out the fields while they cannot be used.
         /// </summary>
         /// <remarks>
-        /// Dos motivos y no uno: que el servidor no conteste, y que haya una petición en marcha.
-        /// El segundo no estaba y por eso se podía pulsar «entrar» dos veces y mandar dos peticiones.
+        /// Two reasons and not one: that the server does not answer, and that there is a request in progress.
+        /// The second was missing and that is why «entrar» could be pressed twice and send two requests.
         /// </remarks>
         private void HabilitarCampos()
         {
@@ -672,7 +672,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        //  El pulso
+        //  The pulse
         // ═══════════════════════════════════════════════════════════════════════
 
         private void MirarElEstado()
@@ -704,7 +704,7 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        //  Lo que se puede pulsar
+        //  What can be pressed
         // ═══════════════════════════════════════════════════════════════════════
 
         private void AlPulsarMusica(object? remitente, Avalonia.Interactivity.RoutedEventArgs e)
@@ -818,7 +818,7 @@ namespace Jondo.Unity.Launcher.UI
                     }
                     catch
                     {
-                        // Que no se pueda sugerir carpeta no impide elegir fichero.
+                        // Not being able to suggest a folder does not prevent choosing a file.
                     }
                 }
             }
@@ -833,15 +833,15 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        //  Entrar, registrarse y jugar
+        //  Logging in, registering and playing
         // ═══════════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// Entra: por la web si la hay, y si no con usuario y contraseña.
+        /// Logs in: through the website if there is one, and if not with username and password.
         /// </summary>
         /// <remarks>
-        /// El día que exista la web, <see cref="LauncherPreferences.WebSite"/> deja de estar vacío
-        /// y este método empieza a abrir el navegador sin que haya que tocar nada más. Ver
+        /// The day the website exists, <see cref="LauncherPreferences.WebSite"/> stops being empty
+        /// and this method starts opening the browser without anything else having to be touched. See
         /// <see cref="Security.OAuthFlow"/>.
         /// </remarks>
         private async Task EntrarAsync()
@@ -862,8 +862,8 @@ namespace Jondo.Unity.Launcher.UI
             LauncherService.SignInResult resultado;
             try
             {
-                // Fuera del hilo de la interfaz: es una petición de red y antes congelaba la
-                // ventana mientras durase.
+                // Off the interface thread: it is a network request and it used to freeze the
+                // window while it lasted.
                 resultado = await Task.Run(() =>
                     LauncherService.SignIn(usuario, clave, LauncherService.LocalIp));
             }
@@ -899,8 +899,8 @@ namespace Jondo.Unity.Launcher.UI
                 var puntos = Security.OAuthFlow.Endpoints.For(LauncherPreferences.WebSite);
                 var sesion = await Security.OAuthFlow.SignInAsync(puntos);
 
-                // La web devuelve un vale; el servidor de juego es quien dice a qué cuenta
-                // corresponde. Con eso ya se puede montar la ficha del equipo.
+                // The website returns a voucher; the game server is the one that says which account it
+                // belongs to. With that the team card can now be built.
                 var quien = await Task.Run(() => LauncherService.SignInWithToken(sesion.AccessToken));
                 if (!quien.Success)
                 {
@@ -953,7 +953,7 @@ namespace Jondo.Unity.Launcher.UI
             }
             else _cuentas.Add(ficha);
 
-            // Recién entrado, lo que quiere es jugar.
+            // Just logged in, what one wants is to play.
             _seccion = Seccion.Jugar;
             GuardarCuentas();
             RefrescarResumen();
@@ -1028,7 +1028,7 @@ namespace Jondo.Unity.Launcher.UI
 
             if (fallos.Count > 0) Avisar(string.Join(Environment.NewLine, fallos));
 
-            // Arrancar el cliente calla la música del lanzador.
+            // Starting the client silences the launcher's music.
             if (_musica != null && _musica.Playing)
             {
                 _musica.Stop();
@@ -1038,8 +1038,8 @@ namespace Jondo.Unity.Launcher.UI
             RefrescarResumen();
             RefrescarFilasDeCuentas();
 
-            // Sin ventana de confirmación: que se abra el cliente ya lo confirma, y un diálogo
-            // modal se quedaría encima del juego esperando a que alguien lo cierre.
+            // No confirmation window: the client opening already confirms it, and a modal
+            // dialog would stay on top of the game waiting for someone to close it.
         }
 
         private void Ocupado(bool si)

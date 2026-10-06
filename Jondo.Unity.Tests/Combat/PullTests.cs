@@ -4,12 +4,12 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Un tirón se para en cuanto llegaría al centro, y no se pasa de largo.
+    /// A pull stops as soon as it would reach the centre, and does not overshoot.
     /// </summary>
     /// <remarks>
-    /// Sin esto la Imantación del tymador —que tira de sus bombas SEIS casillas— cruzaba el punto
-    /// y las dejaba al otro lado. Y como el hechizo tira dos veces, la segunda las traía de vuelta:
-    /// en el registro se ve el baile, la bomba -5 de la 272 a la 185 y de la 185 otra vez a la 272.
+    /// Without this the Rogue's Imantación —which pulls his bombs SIX cells— crossed the point
+    /// and left them on the other side. And since the spell pulls twice, the second brought them back:
+    /// in the log the dance is seen, bomb -5 from 272 to 185 and from 185 back to 272.
     /// </remarks>
     public class PullTests
     {

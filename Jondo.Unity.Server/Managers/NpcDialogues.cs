@@ -5,17 +5,17 @@ using Jondo.Unity.World.Content;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las conversaciones escritas a mano, que es lo único de un NPC que el cliente nunca ha traído.
+    /// The conversations written by hand, which is the only thing about an NPC the client has never brought.
     /// </summary>
     /// <remarks>
-    /// El cliente reparte todas las frases que un NPC puede decir y todas las respuestas que se le
-    /// pueden dar, y en ningún sitio dice cuál va con cuál —medido sobre los 6.467—. Ese
-    /// emparejamiento siempre ha sido del servidor de Ankama, así que aquí sólo puede venir de
-    /// <c>content/npcs/dialogues.json</c>, escrito por una persona con el editor.
+    /// The client hands out all the sentences an NPC can say and all the replies that can
+    /// be given to it, and nowhere does it say which goes with which —measured over the 6,467—. That
+    /// pairing has always been Ankama's server's, so here it can only come from
+    /// <c>content/npcs/dialogues.json</c>, written by a person with the editor.
     ///
-    /// Sin nada escrito no cambia nada: se sigue haciendo lo de antes, que es soltar todas las
-    /// respuestas de la plantilla debajo de la primera frase. Es lo que hace Snori Nairb con sus
-    /// treinta y nueve.
+    /// With nothing written nothing changes: the same as before is still done, which is to drop all the
+    /// template's replies under the first sentence. It is what Snori Nairb does with his
+    /// thirty-nine.
     /// </remarks>
     public static class NpcDialogues
     {
@@ -30,7 +30,7 @@ namespace Jondo.Unity.Server.Managers
         private static volatile bool _loaded;
         private static readonly object _lock = new object();
 
-        /// <summary>Cuántas conversaciones hay escritas.</summary>
+        /// <summary>How many conversations are written.</summary>
         public static int Count { get { Ensure(); return _dialogues.Count; } }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// La conversación de este NPC aquí: la escrita para este mapa, la escrita para todos, o
-        /// ninguna.
+        /// This NPC's conversation here: the one written for this map, the one written for all, or
+        /// none.
         /// </summary>
         public static NpcDialogue? For(int npcId, long mapId)
         {

@@ -59,9 +59,9 @@ namespace Jondo.Unity.Launcher.UI
         public string AutoScroll { get; init; } = "";
         public string GenericError { get; init; } = "";
 
-        // Los avisos de lanzar un cliente. Estaban escritos en francés dentro de LauncherService y
-        // de ClientLaunchRegistry, así que salían en francés con el lanzador puesto en español o en
-        // inglés. Aquí es donde vive el idioma.
+        // The notices of launching a client. They were written in French inside LauncherService and
+        // ClientLaunchRegistry, so they came out in French with the launcher set to Spanish or
+        // English. Here is where the language lives.
         public string SessionExpiredError { get; init; } = "";
         public string ClientStartFailed { get; init; } = "";
         public string AccountAlreadyRunning { get; init; } = "";
@@ -71,8 +71,8 @@ namespace Jondo.Unity.Launcher.UI
         public string ServidorSinResponder { get; init; } = "";
         public string ControlRechazado { get; init; } = "";
 
-        // La ventana del servidor. El lanzador no las usa, pero el catalogo es uno solo: asi los
-        // dos hablan los mismos tres idiomas sin dos tablas que se desincronizan.
+        // The server window. The launcher does not use them, but the catalogue is a single one: that way both
+        // speak the same three languages without two tables getting out of sync.
         public string StatPlayers { get; init; } = "";
         public string StatClients { get; init; } = "";
         public string StatFights { get; init; } = "";
@@ -83,7 +83,7 @@ namespace Jondo.Unity.Launcher.UI
         public string StopServerConfirm { get; init; } = "";
         public string StopServerWithPlayers { get; init; } = "";
 
-        // Los bloques de la columna de cifras del servidor, y las cifras nuevas.
+        // The blocks of the server's figures column, and the new figures.
         public string GroupWorld { get; init; } = "";
         public string GroupNetwork { get; init; } = "";
         public string GroupMachine { get; init; } = "";
@@ -329,9 +329,9 @@ namespace Jondo.Unity.Launcher.UI
             _ => "es"
         };
 
-        // Las preferencias las guarda LauncherPreferences. Esto se queda como atajo porque lo
-        // llaman desde varios sitios, pero el fichero lo lleva él: escribir aquí con WriteAllText,
-        // como se hacía antes, borraba de paso la ruta del cliente que guarda la otra opción.
+        // The preferences are kept by LauncherPreferences. This stays as a shortcut because it is
+        // called from several places, but the file is handled by that class: writing here with WriteAllText,
+        // as was done before, erased in passing the client path the other option stores.
 
     }
 }

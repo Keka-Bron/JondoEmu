@@ -5,13 +5,13 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// El «mejor elemento»: el 2822 y el elemento 5 del catálogo.
+    /// The «best element»: 2822 and the catalogue's element 5.
     /// </summary>
     /// <remarks>
-    /// Veinte hechizos de clase pegan «en el mejor elemento del lanzador» — Llamilla, Bilbipo,
-    /// Apetito de Cocobur —. No es un elemento: es una pregunta al lanzador, y se contesta con
-    /// los embrujos puestos, porque un hechizo que te suba la agilidad a mitad de combate puede
-    /// cambiar la respuesta, y eso es justamente para lo que se lanza.
+    /// Twenty class spells hit «in the caster's best element» — Llamilla, Bilbipo,
+    /// Apetito de Cocobur —. It is not an element: it is a question to the caster, and it is answered with
+    /// the buffs on, because a spell that raises your agility mid-fight can
+    /// change the answer, and that is precisely what it is cast for.
     /// </remarks>
     public class BestElementTests
     {
@@ -36,8 +36,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void El_empate_se_rompe_siempre_igual()
         {
-            // No está medido cuál elige el juego real con dos características iguales, pero hace
-            // falta UN criterio estable: dos lanzamientos idénticos tienen que dar lo mismo.
+            // Which one the real game picks with two equal characteristics is not measured, but ONE
+            // stable criterion is needed: two identical casts have to give the same.
             var quien = Con(300, 300, 300, 300);
 
             int primero = EffectEngine.MejorElementoDe(quien, ronda: 1);
@@ -48,7 +48,7 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void El_2822_cuenta_como_dano()
         {
-            // Si no contase, sus veinte hechizos no pegarían y no darían ningún error.
+            // If it did not count, its twenty spells would not hit and would give no error.
             Assert.True(EffectEngine.EsDeDano(2822));
             Assert.True(EffectEngine.EsDeDano(99));
             Assert.False(EffectEngine.EsDeDano(141));

@@ -10,25 +10,24 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Entrar y salir de una casa.
+    /// Going in and out of a house.
     ///
-    /// Las dos mitades son distintas por el cable, y ésa fue la sorpresa. Medido de las capturas
-    /// «entrar en mi casa» y «desde dentro de casa salir a fuera»:
+    /// The two halves are different on the wire, and that was the surprise. Measured from the
+    /// captures «entrar en mi casa» and «desde dentro de casa salir a fuera»:
     ///
-    ///   entrar   iwo { f1: habilidad, f2: elemento, f3: instancia }
-    ///            iwn { f1: 1, f2: elemento, f4: 84, f5: personaje }
-    ///            jqw { f1: mapa interior }
+    ///   going in   iwo { f1: skill, f2: element, f3: instance }
+    ///              iwn { f1: 1, f2: element, f4: 84, f5: character }
+    ///              jqw { f1: interior map }
     ///
-    ///   salir    iwo { f1: habilidad, f2: elemento }
-    ///            iwn { f1: 1, f2: elemento, f4: 184, f5: personaje }
-    ///            jru { f2: mapa de la calle }
+    ///   going out  iwo { f1: skill, f2: element }
+    ///              iwn { f1: 1, f2: element, f4: 184, f5: character }
+    ///              jru { f2: street map }
     ///
-    /// El mapa viaja en el campo 1 del jqw y en el campo 2 del jru. Mandar un jru para entrar
-    /// haría que el cliente cargase el mapa sin saber que está entrando en una vivienda.
+    /// The map travels in field 1 of the jqw and in field 2 of the jru. Sending a jru to go in would
+    /// make the client load the map without knowing it is entering a dwelling.
     ///
-    /// Después de cualquiera de los dos el cliente pide el mapa por su cuenta con kmv y jrh, así
-    /// que aquí no se manda el jss: se manda el aviso y se deja que lo pida, que es lo que hace
-    /// el servidor real.
+    /// After either of the two the client asks for the map by itself with kmv and jrh, so the jss is
+    /// not sent here: the notice is sent and it is left to ask, which is what the real server does.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -147,9 +146,10 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>El cliente ha clicado la puerta de la calle.</summary>
+        /// <summary>The client has clicked the street door.</summary>
         public static async Task EnterAsync(NetworkStream? stream, int elementId, int skillId)
         {
+            if (await Managers.Jail.KeepsInAsync(stream)) return;
             long here = SessionContext.State.MapId;
             if (!Houses.TryGetDoor(here, elementId, out var door))
             {
@@ -184,7 +184,7 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.HouseEntryElementId = door.ElementId;
             SessionContext.State.MapId = door.InteriorMapId;
 
-            // Se entra al lado de la salida, no encima: así el primer clic para salir cae cerca.
+            // He comes in next to the exit, not on it: that way the first click to leave falls nearby.
             int destino = Houses.TryGetExit(door.InteriorMapId, out var exit) ? exit.Cell : 0;
             SessionContext.State.CellId = MapManager.GetNearestWalkableCell(door.InteriorMapId, destino);
             DatabaseManager.SaveCurrentCharacter();
@@ -202,12 +202,12 @@ namespace Jondo.Unity.Server.Handlers
                               $"{door.InteriorMapId}, casilla {SessionContext.State.CellId}.");
         }
 
-        /// <summary>El cliente ha clicado la puerta de dentro.</summary>
+        /// <summary>The client has clicked the inside door.</summary>
         public static async Task LeaveAsync(NetworkStream? stream, int elementId, int skillId)
         {
             long here = SessionContext.State.MapId;
 
-            // Primero por donde se entro; si no se sabe, por donde digan los datos.
+            // First the way he came in; if it is not known, the way the data says.
             long salidaMapa = SessionContext.State.HouseEntryMapId;
             int salidaCasilla = SessionContext.State.HouseEntryCell;
             if (salidaMapa == 0 || salidaMapa == here)
@@ -357,7 +357,7 @@ namespace Jondo.Unity.Server.Handlers
                 Instance = Houses.Instance,
                 OwnerName = name,
                 OwnerTag = tag,
-                Price = house.ForSale ? house.Price : 0,
+                Price = HouseStore.AskingPrice(house, door.Price),
                 Locked = house.Owned && house.Locked,
                 Rooms = door.Rooms,
             };
@@ -373,8 +373,10 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The houses of a map's jss: f7, the one the viewer is inside, and f9, those on this
-        /// street that have an owner. A house nobody owns sends nothing, as before: no plaque of a
-        /// free house was ever captured.
+        /// street that can be owned. A house nobody owns is declared too, on sale at its model's
+        /// price: without it the client knows no house behind the door and drops the buyer's khr.
+        /// No plaque of a free house was ever captured, but the client takes this one: it shows the
+        /// house as abandoned and on sale at that price, and opens the buyer's window.
         /// </summary>
         public static void AddToMap(Pb jss, long mapId)
         {
@@ -397,7 +399,6 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (!door.IsOwnable) continue;
                 var house = HouseStore.Of(mapId, door.ElementId);
-                if (!house.Owned) continue;
                 jss.Msg(9, HouseProtocol.BuildOnMap(Houses.HouseIdOf(mapId, door.ElementId), door.Model,
                     new long[] { door.ElementId }, new[] { PlaqueOf(house, door) }));
             }

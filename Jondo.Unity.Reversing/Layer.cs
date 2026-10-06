@@ -4,56 +4,56 @@ using System.Text.RegularExpressions;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// La capa <c>Op</c>: un nombre por opcode, en un solo fichero, generado.
+/// The <c>Op</c> layer: one name per opcode, in a single file, generated.
 ///
-/// El emulador lleva 495 literales de tres letras repartidos por 310 opcodes y 40 ficheros. El día
-/// que Ankama rote los nombres hay que cambiarlos todos, y editarlos a mano no es un plan: es la
-/// razón por la que un mapeo perfecto hoy no se puede aplicar. Con esta capa el parche toca un
-/// fichero.
+/// The emulator carries 495 three-letter literals spread over 310 opcodes and 40 files. The day
+/// Ankama rotates the names they all have to be changed, and editing them by hand is not a plan: it is the
+/// reason a perfect mapping today cannot be applied. With this layer the patch touches one
+/// file.
 ///
-/// ─── Por qué se genera y no se escribe ──────────────────────────────────────────────────
+/// ─── Why it is generated and not written ────────────────────────────────────────────────
 ///
-/// Ya hubo un intento a mano, <c>OpcodeRegistry.cs</c>, y salió mal de las dos maneras posibles:
-/// no lo usaba nadie —cero referencias fuera de sí mismo— y encima mentía. Decía que <c>kub</c> era
-/// la colocación en combate cuando es la hoja de personaje, y que <c>kqu</c> era la petición de
-/// lista de personajes cuando la propia ancla avisa de que NO lo es. Una tabla escrita a mano que
-/// nadie ejecuta se pudre en silencio; ésta sale de los datos medidos y se rehace en cada parche.
+/// There was already an attempt by hand, <c>OpcodeRegistry.cs</c>, and it went wrong both possible ways:
+/// nobody used it —zero references outside itself— and on top of that it lied. It said <c>kub</c> was
+/// fight placement when it is the character sheet, and that <c>kqu</c> was the character list
+/// request when the anchor itself warns that it is NOT. A hand-written table that
+/// nobody runs rots in silence; this one comes from the measured data and is redone on every patch.
 ///
-/// ─── Qué es un opcode y qué no ──────────────────────────────────────────────────────────
+/// ─── What is an opcode and what is not ──────────────────────────────────────────────────
 ///
-/// Un literal de tres letras minúsculas no basta. Medido sobre el emulador entero, de los 310 que
-/// hay: 251 son mensajes de verdad del protocolo, 49 son restos de 3.6.4.3 que ya no existen, y 10
-/// no son opcodes en absoluto —<c>key</c>, <c>msg</c>, <c>rid</c>, <c>tag</c>, <c>unk</c>,
-/// <c>ids</c>, <c>rol</c> y las sílabas <c>bel</c>, <c>dan</c>, <c>gor</c> del generador de nombres.
+/// A three-lowercase-letter literal is not enough. Measured over the whole emulator, of the 310
+/// there are: 251 are real protocol messages, 49 are 3.6.4.3 remnants that no longer exist, and 10
+/// are not opcodes at all —<c>key</c>, <c>msg</c>, <c>rid</c>, <c>tag</c>, <c>unk</c>,
+/// <c>ids</c>, <c>rol</c> and the syllables <c>bel</c>, <c>dan</c>, <c>gor</c> of the name generator.
 ///
-/// El único criterio que separa bien los tres montones es preguntarle al cliente: **es opcode si es
-/// un mensaje del protocolo**. Lo demás son heurísticas que se equivocan.
+/// The only criterion that separates the three heaps well is asking the client: **it is an opcode if it is
+/// a protocol message**. The rest are heuristics that get it wrong.
 ///
-/// Y queda una colisión de verdad que ninguna regla resuelve: <c>kro</c> es a la vez un mensaje del
-/// protocolo y una sílaba del generador de nombres. Va en <see cref="Forbidden"/>, a mano y
-/// explicada, porque una lista de excepciones con motivo escrito es honrada y una regla retorcida
-/// para que encaje no lo es.
+/// And one real collision remains that no rule resolves: <c>kro</c> is both a
+/// protocol message and a syllable of the name generator. It goes in <see cref="Forbidden"/>, by hand and
+/// explained, because a list of exceptions with a written reason is honest and a rule twisted
+/// to make it fit is not.
 /// </summary>
 public static class Layer
 {
     /// <summary>
-    /// Opcodes que son mensajes del protocolo pero que en el emulador NO se usan como tales.
+    /// Opcodes that are protocol messages but that are NOT used as such in the emulator.
     ///
-    /// <c>kro</c> es una sílaba del generador de nombres de personaje —<c>"kro", "bel", "dan",
-    /// "gor"</c>— y da la casualidad de que también hay un mensaje que se llama así. Sustituirla
-    /// cambiaría los nombres que propone el creador de personajes.
+    /// <c>kro</c> is a syllable of the character name generator —<c>"kro", "bel", "dan",
+    /// "gor"</c>— and it so happens that there is also a message called that. Replacing it
+    /// would change the names the character creator proposes.
     /// </summary>
     public static readonly HashSet<string> Forbidden = new(StringComparer.Ordinal) { "kro" };
 
-    /// <summary>Un opcode con su sitio en la capa.</summary>
-    /// <param name="Id">El identificador de C#: el nombre real si se sabe, y si no el propio opcode.</param>
-    /// <param name="Uses">Cuántas veces aparece en el código, para saber qué duele más.</param>
+    /// <summary>An opcode with its place in the layer.</summary>
+    /// <param name="Id">The C# identifier: the real name if it is known, and if not the opcode itself.</param>
+    /// <param name="Uses">How many times it appears in the code, to know what hurts most.</param>
     public sealed record Slot(string Id, string Opcode, string Name, string Meaning, int Uses);
 
-    /// <summary>Lo que el barrido encontró, incluido lo que NO es opcode.</summary>
-    /// <param name="Slots">Los opcodes de verdad, ya con identificador.</param>
-    /// <param name="Stale">Literales que fueron opcodes en otra versión y aquí ya no existen.</param>
-    /// <param name="Ignored">Literales de tres letras que no son opcodes de nada.</param>
+    /// <summary>What the sweep found, including what is NOT an opcode.</summary>
+    /// <param name="Slots">The real opcodes, already with an identifier.</param>
+    /// <param name="Stale">Literals that were opcodes in another version and no longer exist here.</param>
+    /// <param name="Ignored">Three-letter literals that are opcodes of nothing.</param>
     public sealed record Sweep(List<Slot> Slots, List<string> Stale, List<string> Ignored,
                               Dictionary<string, string> Renames);
 
@@ -61,19 +61,19 @@ public static class Layer
     private static readonly Regex Uri = new("\"type\\.ankama\\.com/([a-z]{3})\"", RegexOptions.Compiled);
 
     /// <summary>
-    /// Una DIRECTIVA using, que es una cosa distinta de una sentencia using.
+    /// A using DIRECTIVE, which is a different thing from a using statement.
     ///
-    /// Exige la línea entera —espacio de nombres y punto y coma, nada más— porque la primera versión
-    /// buscaba «empieza por using » y eso también lo cumple <c>using var ms = new MemoryStream();</c>
-    /// dentro de un método. La directiva se colaba en mitad del cuerpo de una función y once
-    /// ficheros dejaron de compilar.
+    /// It requires the whole line —namespace and semicolon, nothing else— because the first version
+    /// looked for «starts with using » and <c>using var ms = new MemoryStream();</c> also meets that
+    /// inside a method. The directive slipped into the middle of a function's body and eleven
+    /// files stopped compiling.
     /// </summary>
     private static readonly Regex Directive =
         new(@"^\s*(global\s+)?using\s+(static\s+)?[\w.]+\s*;\s*$", RegexOptions.Compiled);
 
     /// <summary>
-    /// Dónde acaba el bloque de directivas: se deja de mirar al llegar al espacio de nombres,
-    /// porque a partir de ahí lo que se parezca a una directiva ya no lo es.
+    /// Where the directives block ends: it stops looking on reaching the namespace,
+    /// because from there on whatever looks like a directive no longer is one.
     /// </summary>
     private static int LastDirective(List<string> lines)
     {
@@ -87,10 +87,10 @@ public static class Layer
     }
 
     /// <summary>
-    /// Barre el código del emulador y decide qué es opcode contra el protocolo del cliente.
+    /// Sweeps the emulator's code and decides what is an opcode against the client's protocol.
     /// </summary>
-    /// <param name="known">Los mensajes del protocolo de ESTA versión.</param>
-    /// <param name="wasKnown">Los de la versión anterior, para saber qué es un resto y qué es basura.</param>
+    /// <param name="known">The protocol messages of THIS version.</param>
+    /// <param name="wasKnown">Those of the previous version, to know what is a remnant and what is garbage.</param>
     public static Sweep Scan(string sourceFolder,
                              IReadOnlyCollection<string> known,
                              IReadOnlyCollection<string> wasKnown,
@@ -101,12 +101,12 @@ public static class Layer
         var stale = new HashSet<string>(StringComparer.Ordinal);
         var ignored = new HashSet<string>(StringComparer.Ordinal);
 
-        // Lo que la capa ya dice hoy, si existe.
+        // What the layer already says today, if it exists.
         //
-        // Sin esto la orden sólo funciona UNA vez, y lo comprobé de la peor manera: la primera
-        // pasada sustituye los literales por Op.Loquesea, así que la segunda no encuentra ni un
-        // literal de tres letras, cree que el emulador no usa ningún opcode y reescribe Op.cs
-        // vacío. El día del parche eso habría borrado la capa entera en vez de actualizarla.
+        // Without this the command only works ONCE, and I found out the worst way: the first
+        // pass replaces the literals with Op.Whatever, so the second does not find a single
+        // three-letter literal, believes the emulator uses no opcode and rewrites Op.cs
+        // empty. On patch day that would have erased the whole layer instead of updating it.
         var already = Existing(sourceFolder);
 
         foreach (string file in Directory.EnumerateFiles(sourceFolder, "*.cs", SearchOption.AllDirectories))
@@ -115,8 +115,8 @@ public static class Layer
 
             foreach (string line in File.ReadLines(file))
             {
-                // Un opcode citado en un comentario no es un uso: no lo lee nadie en ejecución, y
-                // sustituirlo dejaría el comentario diciendo «Op.Foo» donde decía «icw».
+                // An opcode cited in a comment is not a use: nobody reads it at run time, and
+                // replacing it would leave the comment saying «Op.Foo» where it said «icw».
                 string clean = line.TrimStart();
                 if (clean.StartsWith("//", StringComparison.Ordinal) ||
                     clean.StartsWith("*", StringComparison.Ordinal)) continue;
@@ -131,8 +131,8 @@ public static class Layer
                     else ignored.Add(opcode);
                 }
 
-                // Y los que ya pasaron por la capa, que se escriben Op.Loquesea y no llevan
-                // comillas. Para el recuento valen exactamente igual: son usos del opcode.
+                // And those that already went through the layer, which are written Op.Whatever and carry no
+                // quotes. For the count they are worth exactly the same: they are uses of the opcode.
                 foreach (Match match in Through.Matches(line))
                 {
                     if (!already.TryGetValue(match.Groups[1].Value, out string? opcode)) continue;
@@ -142,9 +142,9 @@ public static class Layer
             }
         }
 
-        // Los nombres reales pueden repetirse: dos mensajes viejos con el mismo nombre propuesto
-        // darían dos constantes con el mismo identificador y el fichero no compilaría. Se detecta
-        // aquí y el segundo se queda con su opcode como identificador, que siempre es único.
+        // The real names can repeat: two old messages with the same proposed name
+        // would give two constants with the same identifier and the file would not compile. It is detected
+        // here and the second keeps its opcode as its identifier, which is always unique.
         var taken = new HashSet<string>(StringComparer.Ordinal);
         var slots = new List<Slot>();
 
@@ -152,9 +152,9 @@ public static class Layer
         {
             anchors.TryGetValue(opcode, out var anchor);
 
-            // El nombre sale de lo ligado a mano, NUNCA del ancla: los nombres de las anclas los
-            // propusimos nosotros y ninguno resultó ser el de Ankama. El significado del ancla sí
-            // vale y se conserva, porque está medido contra capturas.
+            // The name comes from what was bound by hand, NEVER from the anchor: the anchors' names were
+            // proposed by us and none turned out to be Ankama's. The anchor's meaning does
+            // count and is kept, because it is measured against captures.
             string name = bound.GetValueOrDefault(opcode, "");
             string id = Identifier(name, opcode);
 
@@ -162,9 +162,9 @@ public static class Layer
             slots.Add(new Slot(id, opcode, name, anchor?.Meaning ?? "", count));
         }
 
-        // Cómo se llamaba antes cada constante y cómo se llama ahora. Sin esto, cambiar el criterio
-        // de los identificadores deja el emulador sin compilar: hay centenares de «Op.Loquesea»
-        // repartidos que apuntan a un nombre que ya no existe.
+        // What each constant was called before and what it is called now. Without this, changing the
+        // identifiers' criterion leaves the emulator not compiling: there are hundreds of «Op.Whatever»
+        // spread around pointing to a name that no longer exists.
         var renames = new Dictionary<string, string>(StringComparer.Ordinal);
         var byOpcode = slots.ToDictionary(s => s.Opcode, s => s.Id, StringComparer.Ordinal);
         foreach (var (oldId, opcode) in already)
@@ -179,18 +179,18 @@ public static class Layer
             renames);
     }
 
-    /// <summary>Un uso que ya pasó por la capa: <c>Op.Loquesea</c>.</summary>
+    /// <summary>A use that already went through the layer: <c>Op.Whatever</c>.</summary>
     private static readonly Regex Through = new(@"\bOp\.([A-Z][A-Za-z0-9_]*)\b", RegexOptions.Compiled);
 
-    /// <summary>Una constante de la capa tal y como está escrita hoy en Op.cs.</summary>
+    /// <summary>A layer constant as it is written today in Op.cs.</summary>
     private static readonly Regex Declared =
         new(@"public const string ([A-Za-z0-9_]+) = ""([a-z]{3})"";", RegexOptions.Compiled);
 
     /// <summary>
-    /// Lo que la capa dice hoy: del identificador al opcode.
+    /// What the layer says today: from the identifier to the opcode.
     ///
-    /// Si no hay Op.cs todavía —la primera vez— sale vacío y el barrido funciona sólo con los
-    /// literales, que es justo lo que hay en ese momento.
+    /// If there is no Op.cs yet —the first time— it comes out empty and the sweep works only with the
+    /// literals, which is exactly what there is at that moment.
     /// </summary>
     private static Dictionary<string, string> Existing(string sourceFolder)
     {
@@ -205,7 +205,7 @@ public static class Layer
         return map;
     }
 
-    /// <summary>Carpetas que no se barren: lo generado, lo compilado y las copias de trabajo.</summary>
+    /// <summary>Folders not swept: the generated, the compiled and the working copies.</summary>
     private static bool Skip(string file)
     {
         string path = file.Replace('\\', '/');
@@ -216,31 +216,31 @@ public static class Layer
     }
 
     /// <summary>
-    /// El identificador de C# es SIEMPRE el opcode. Nada de nombres.
+    /// The C# identifier is ALWAYS the opcode. No names.
     ///
-    /// Los llevaba: si el ancla proponía un nombre, la constante se llamaba
-    /// <c>Op.HelloGameMessage</c>. Se quitaron al medirlos contra los 513 nombres reales que trae el
-    /// cliente: de los 99 que proponíamos, <b>ninguno</b> era el de Ankama. Y no era mala suerte,
-    /// era sistemático —96 de 99 acababan en «Message», que es la convención de Dofus 2, cuando el
-    /// protocolo real usa Event, Request y Response (196, 117 y 105 de 513)—.
+    /// It used to carry them: if the anchor proposed a name, the constant was called
+    /// <c>Op.HelloGameMessage</c>. They were removed on measuring them against the 513 real names the
+    /// client brings: of the 99 we proposed, <b>none</b> was Ankama's. And it was not bad luck,
+    /// it was systematic —96 of 99 ended in «Message», which is the Dofus 2 convention, when the
+    /// real protocol uses Event, Request and Response (196, 117 and 105 of 513)—.
     ///
-    /// Un nombre inventado con pinta de oficial es peor que ninguno: se lee en el registro, se cita
-    /// en una conversación y acaba en la documentación como si alguien lo hubiera comprobado. El
-    /// opcode no engaña a nadie, y el significado —que sí está medido contra capturas— va al
-    /// comentario, que es su sitio.
+    /// An invented name that looks official is worse than none: it is read in the log, cited
+    /// in a conversation and ends up in the documentation as if someone had checked it. The
+    /// opcode fools nobody, and the meaning —which is measured against captures— goes to the
+    /// comment, which is where it belongs.
     ///
-    /// Los nombres de verdad entran por otra puerta: <see cref="Bound"/>, que sólo tiene los que
-    /// alguien ha ligado a mano eligiendo de la lista real.
+    /// The real names come in through another door: <see cref="Bound"/>, which only has the ones
+    /// someone has bound by hand choosing from the real list.
     /// </summary>
     private static string Identifier(string name, string opcode)
         => char.ToUpperInvariant(opcode[0]) + opcode[1..];
 
     /// <summary>
-    /// Los nombres que alguien ha ligado a mano, de <c>datos/nombres_ligados_&lt;versión&gt;.tsv</c>.
+    /// The names someone has bound by hand, from <c>datos/nombres_ligados_&lt;versión&gt;.tsv</c>.
     ///
-    /// Es la única fuente de nombres que se acepta. El fichero lo escribe el desplegable del
-    /// registro del servidor: se elige de los 513 nombres reales con el paquete delante, así que lo
-    /// que entra aquí lo ha reconocido alguien mirando, no lo ha deducido nadie por parecido.
+    /// It is the only source of names accepted. The file is written by the server log's
+    /// drop-down: one chooses from the 513 real names with the packet in front, so what
+    /// goes in here someone has recognised by looking, nobody has deduced it by resemblance.
     /// </summary>
     public static Dictionary<string, string> Bound(string dataFolder, string version)
     {
@@ -258,7 +258,7 @@ public static class Layer
         return bound;
     }
 
-    /// <summary>Añade una ligadura al fichero, sin repetir la que ya esté.</summary>
+    /// <summary>Adds a binding to the file, without repeating one already there.</summary>
     public static void Bind(string dataFolder, string version, string opcode, string name)
     {
         string path = Path.Combine(dataFolder, $"nombres_ligados_{version}.tsv");
@@ -280,7 +280,7 @@ public static class Layer
         File.WriteAllText(path, text.ToString(), new UTF8Encoding(true));
     }
 
-    /// <summary>Escribe el fichero de la capa y devuelve la ruta.</summary>
+    /// <summary>Writes the layer file and returns the path.</summary>
     public static string Write(Sweep sweep, string version, string path)
     {
         var text = new StringBuilder();
@@ -330,12 +330,12 @@ public static class Layer
             text.AppendLine();
         }
 
-        // ─── La vuelta: del opcode a su nombre ──────────────────────────────────────────
+        // ─── The way back: from the opcode to its name ──────────────────────────────────
         //
-        // Las constantes van del nombre al opcode, que es lo que hace falta para ESCRIBIR un
-        // mensaje. El registro necesita lo contrario: llega «kuf» por el cable y hay que decir qué
-        // es. Se genera aquí y no se escribe a mano por lo de siempre —una tabla a mano se pudre—
-        // y además así el día del parche los nombres siguen saliendo bien sin tocar nada.
+        // The constants go from the name to the opcode, which is what is needed to WRITE a
+        // message. The log needs the opposite: «kuf» arrives on the wire and one has to say what
+        // it is. It is generated here and not written by hand for the usual reason —a hand-written table rots—
+        // and also that way on patch day the names keep coming out right without touching anything.
         var named = sweep.Slots.Where(s => s.Name.Length > 0).ToList();
 
         text.AppendLine("    /// <summary>");
@@ -364,21 +364,21 @@ public static class Layer
     private static string Escape(string text)
         => text.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
 
-    // ─── La migración ───────────────────────────────────────────────────────────────────
+    // ─── The migration ──────────────────────────────────────────────────────────────────
 
-    /// <summary>Una línea que cambia, para poder verlo antes de tocar nada.</summary>
+    /// <summary>A line that changes, to be able to see it before touching anything.</summary>
     public sealed record Change(string File, int Line, string Before, string After);
 
     /// <summary>
-    /// Sustituye los literales por las constantes de la capa.
+    /// Replaces the literals with the layer's constants.
     ///
-    /// Se hace desde aquí y no con un guión suelto porque no es una migración de una vez: cada vez
-    /// que alguien escriba un literal de tres letras en vez de usar la capa, volver a pasar esto lo
-    /// arregla. Un guión que se ejecuta una tarde y se pierde no da eso.
+    /// It is done from here and not with a loose script because it is not a one-off migration: every time
+    /// someone writes a three-letter literal instead of using the layer, running this again
+    /// fixes it. A script run one afternoon and lost does not give that.
     ///
-    /// Sólo toca lo que <see cref="Scan"/> ha reconocido como opcode de ESTA versión. Los restos de
-    /// versiones anteriores se quedan como están a propósito: no se pueden traducir a nada, y
-    /// dejarlos a la vista es lo que hace que se noten.
+    /// It only touches what <see cref="Scan"/> has recognised as an opcode of THIS version. The remnants of
+    /// earlier versions stay as they are on purpose: they cannot be translated to anything, and
+    /// leaving them in sight is what makes them noticed.
     /// </summary>
     public static List<Change> Apply(string sourceFolder, Sweep sweep, bool write)
     {
@@ -399,17 +399,17 @@ public static class Layer
                 if (clean.StartsWith("//", StringComparison.Ordinal) ||
                     clean.StartsWith("*", StringComparison.Ordinal)) continue;
 
-                // El sobre entero primero. Si se hiciera al revés, «type.ankama.com/kub» ya se
-                // habría quedado en «type.ankama.com/» + Op.Kub y el sobre no se reconocería.
+                // The whole envelope first. If it were done the other way round, «type.ankama.com/kub» would already
+                // have become «type.ankama.com/» + Op.Kub and the envelope would not be recognised.
                 string after = Uri.Replace(line, m =>
                     byOpcode.TryGetValue(m.Groups[1].Value, out string? id) ? $"Op.Uri(Op.{id})" : m.Value);
 
                 after = Literal.Replace(after, m =>
                     byOpcode.TryGetValue(m.Groups[1].Value, out string? id) ? $"Op.{id}" : m.Value);
 
-                // Y las constantes que han cambiado de nombre. Pasa cuando cambia el criterio de los
-                // identificadores —como al quitar los nombres inventados— y sin esto el emulador se
-                // queda sin compilar con centenares de «Op.Loquesea» apuntando a lo que ya no está.
+                // And the constants that have changed name. It happens when the identifiers' criterion
+                // changes —as when removing the invented names— and without this the emulator
+                // is left not compiling with hundreds of «Op.Whatever» pointing to what is no longer there.
                 after = Through.Replace(after, m =>
                     renames.TryGetValue(m.Groups[1].Value, out string? renamed) ? $"Op.{renamed}" : m.Value);
 
@@ -421,11 +421,11 @@ public static class Layer
 
             if (!touched || !write) continue;
 
-            // Los ficheros del propio proyecto del protocolo ya están en el espacio de nombres, y
-            // añadirles el using sobra; a los demás hay que ponérselo o no compilan.
-            // La comparación es EXACTA, no «contiene». Varios ficheros traen ya
-            // «using Jondo.Unity.Protocol.Messages;», que contiene la cadena pero es otro espacio de
-            // nombres y no trae Op: dándolo por bueno, siete ficheros se quedaron sin directiva.
+            // The protocol project's own files are already in the namespace, and
+            // adding the using to them is superfluous; the rest have to be given it or they do not compile.
+            // The comparison is EXACT, not «contains». Several files already bring
+            // «using Jondo.Unity.Protocol.Messages;», which contains the string but is another
+            // namespace and does not bring Op: taking it as good, seven files were left without the directive.
             var text = lines.ToList();
             if (!text.Any(l => l.Contains("namespace Jondo.Unity.Protocol", StringComparison.Ordinal)) &&
                 !text.Any(l => l.Trim() == "using Jondo.Unity.Protocol;"))

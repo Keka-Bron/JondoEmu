@@ -5,50 +5,50 @@ using LibCpp2IL;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// Los nombres de verdad de cada mensaje, sacados del propio cliente.
+/// The real names of each message, taken from the client itself.
 ///
-/// El ofuscador renombra las CLASES —el mensaje que se llamaba
-/// <c>CharacterExperienceGainEvent</c> pasa a llamarse <c>kuf</c>— pero protobuf necesita el nombre
-/// completo en tiempo de ejecución para empaquetar y desempaquetar <c>Any</c>, y ese nombre viaja
-/// como cadena de texto. Las cadenas no se ofuscan: están en claro dentro de global-metadata.dat.
+/// The obfuscator renames the CLASSES —the message that was called
+/// <c>CharacterExperienceGainEvent</c> becomes <c>kuf</c>— but protobuf needs the full name
+/// at run time to pack and unpack <c>Any</c>, and that name travels
+/// as a text string. Strings are not obfuscated: they are in the clear inside global-metadata.dat.
 ///
-/// Medido en 3.6.10.10: <b>513</b> nombres del tipo
+/// Measured in 3.6.10.10: <b>513</b> names of the kind
 /// <c>Com.Ankama.Dofus.Server.Game.Protocol.Character.CharacterExperienceGainEvent</c>.
 ///
-/// Lo que faltaba era atarlos a su clase. El código que genera protobuf registra los tipos y sus
-/// nombres JUNTOS, en el mismo método: carga la cadena y toca el tipo. Así que se recorre el método
-/// y se anotan las dos cosas EN ORDEN; cuando en un método hay tantos nombres como mensajes, la
-/// pareja sale por posición.
+/// What was missing was tying them to their class. The code protobuf generates registers the types and their
+/// names TOGETHER, in the same method: it loads the string and touches the type. So the method is walked
+/// and both things are noted IN ORDER; when a method has as many names as messages, the
+/// pair comes out by position.
 ///
-/// Si esto funciona, se acaba el problema que motivó todo lo demás: los nombres salen del cliente,
-/// completos, y se vuelven a sacar en cada parche sin adivinar nada y sin preguntarle a nadie.
+/// If this works, the problem that motivated everything else is over: the names come from the client,
+/// complete, and are taken again on every patch without guessing anything and without asking anyone.
 /// </summary>
 public static class Names
 {
-    /// <summary>Lo que un método toca, en el orden en que lo toca.</summary>
-    /// <param name="Method">Dónde se ha encontrado, para poder ir a mirarlo.</param>
-    /// <param name="Texts">Los nombres completos que carga.</param>
-    /// <param name="Types">Los mensajes del protocolo que menciona.</param>
+    /// <summary>What a method touches, in the order it touches it.</summary>
+    /// <param name="Method">Where it was found, to be able to go and look at it.</param>
+    /// <param name="Texts">The full names it loads.</param>
+    /// <param name="Types">The protocol messages it mentions.</param>
     public sealed record Site(string Method, List<string> Texts, List<string> Types);
 
-    /// <summary>El prefijo de los nombres de protobuf de Ankama.</summary>
+    /// <summary>The prefix of Ankama's protobuf names.</summary>
     public const string Prefix = "Com.Ankama.Dofus.";
 
     /// <summary>
-    /// Busca los sitios donde conviven los nombres y los tipos.
+    /// Looks for the places where the names and the types live together.
     ///
-    /// Se barre el cliente ENTERO y no sólo el ensamblado del protocolo: quien registra los tipos
-    /// puede ser una clase de arranque que viva en otra parte, y descartarla de antemano sería
-    /// decidir la respuesta antes de mirar.
+    /// The WHOLE client is swept and not only the protocol assembly: whoever registers the types
+    /// can be a startup class living somewhere else, and ruling it out beforehand would be
+    /// deciding the answer before looking.
     /// </summary>
     public static List<Site> Sites(ClientReader client, Action<string>? report = null)
     {
         var messages = client.Messages().Select(t => t.Name).ToHashSet(StringComparer.Ordinal);
         report?.Invoke($"{messages.Count:N0} mensajes en el protocolo; buscando quién los nombra…");
 
-        // Antes de buscar quién carga las cadenas conviene saber si son cadenas siquiera. Los
-        // nombres podrían estar en la tabla de TIPOS —un tipo sin ofuscar— y entonces no habría
-        // nada que atar: se leerían directamente.
+        // Before looking for who loads the strings it is worth knowing whether they are strings at all. The
+        // names could be in the TYPES table —an unobfuscated type— and then there would be
+        // nothing to tie: they would be read directly.
         var declared = client.App.Assemblies
             .SelectMany(a => a.Types)
             .Where(t => (t.Namespace ?? "").StartsWith("Com.Ankama", StringComparison.Ordinal))
@@ -56,8 +56,8 @@ public static class Names
 
         report?.Invoke($"tipos declarados en Com.Ankama.*: {declared.Count:N0}");
 
-        // La pista buena: los tipos ANIDADOS conservan su nombre real, y su declarante es la clase
-        // de tres letras. Si eso se sostiene, la pareja sale sin adivinar nada.
+        // The good clue: NESTED types keep their real name, and their declaring type is the
+        // three-letter class. If that holds, the pair comes out without guessing anything.
         int anidados = 0;
         foreach (var type in client.Protocol.Types)
         {
@@ -81,9 +81,9 @@ public static class Names
             List<string>? texts = null;
             List<string>? types = null;
 
-            // Sin Analyze() el ISIL viene vacío y no se encuentra nada. La primera versión no lo
-            // llamaba y dio cero métodos en todo el cliente, que era la pista de que el fallo estaba
-            // aquí y no en la hipótesis.
+            // Without Analyze() the ISIL comes empty and nothing is found. The first version did not
+            // call it and gave zero methods in the whole client, which was the clue that the bug was
+            // here and not in the hypothesis.
             try { method.Analyze(); } catch { continue; }
 
             foreach (var instruction in method.ConvertedIsil ?? [])
@@ -92,7 +92,7 @@ public static class Names
                 {
                     switch (operand.Data)
                     {
-                        // Un tipo ya resuelto llega por su propio operando, sin pasar por dirección.
+                        // An already resolved type arrives through its own operand, without going through an address.
                         case IsilTypeMetadataUsageOperand usage
                             when usage.TypeAnalysisContext != null &&
                                  messages.Contains(usage.TypeAnalysisContext.Name):
@@ -121,7 +121,7 @@ public static class Names
         return sites.OrderByDescending(s => s.Texts.Count + s.Types.Count).ToList();
     }
 
-    /// <summary>Qué hay en esa dirección: un nombre, un mensaje, o nada que interese.</summary>
+    /// <summary>What is at that address: a name, a message, or nothing of interest.</summary>
     private static void Look(ulong address, ref List<string>? texts, ref List<string>? types,
                              HashSet<string> messages)
     {

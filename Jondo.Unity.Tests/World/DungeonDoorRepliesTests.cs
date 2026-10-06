@@ -35,12 +35,12 @@ namespace Jondo.Unity.Tests.World
             (20904, 425811),    // Sí.
             (20905, 425817),    // No.
             (36910, 749484),    // Ir a visitar a Megustam Laspelas.
-            (74097, 1070580),   // Retomar la Mazmorra de los Campos donde la dejaste. (expedición)
-            (74100, 1070584),   // Darle la llave y entrar.                            (expedición)
+            (74097, 1070580),   // Retomar la Mazmorra de los Campos donde la dejaste. (expedition)
+            (74100, 1070584),   // Darle la llave y entrar.                            (expedition)
             (15920, 366337),    // Salir.
             (74096, 1070579),   // Sí, quiero volver a esta sala.                      (expedición)
-            (74098, 1070582),   // Sí.                                                 (expedición)
-            (74099, 1070583),   // No.                                                 (expedición)
+            (74098, 1070582),   // Sí.                                                 (expedition)
+            (74099, 1070583),   // No.                                                 (expedition)
         };
 
         // The translation keys those two sentences have, for Mawy. The real table has 126 keys

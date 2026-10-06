@@ -7,30 +7,30 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las prendas de apariencia: qué existe y qué aspecto tiene cada una.
+    /// Appearance garments: what exists and what each one looks like.
     ///
-    /// Son dos ficheros y conviene no confundirlos:
+    /// There are two files and they should not be confused:
     ///
-    ///   cosmetics.json       el CATÁLOGO, sacado del cliente: 2.409 objetos repartidos en los 12
-    ///                        tipos que el cliente marca como categoría 5 (sombreros, capas,
-    ///                        escudos, trajes, alas, hombreras, mascotas, mascoturas y demás).
-    ///   cosmetic_skins.json  el ASPECTO de cada una, que NO está en el cliente y se ha medido
-    ///                        comparando el bloque de aspecto antes y después de equipar en las
-    ///                        capturas reales.
+    ///   cosmetics.json       the CATALOGUE, taken from the client: 2,409 items spread over the 12
+    ///                        types the client marks as category 5 (hats, capes, shields, outfits,
+    ///                        wings, shoulder pads, pets, petsmounts and so on).
+    ///   cosmetic_skins.json  each one's LOOK, which is NOT in the client and was measured by
+    ///                        comparing the look block before and after equipping in the real
+    ///                        captures.
     ///
-    /// De las capturas se sabe además cómo cambia cada tipo de prenda el aspecto, y no todas lo
-    /// hacen igual:
+    /// From the captures it is also known how each kind of garment changes the look, and not all do it
+    /// the same:
     ///
-    ///   una capa, un sombrero, un escudo, un traje, unas alas o unas hombreras METEN UN NÚMERO en
-    ///   la lista de pieles (el f6) — en el juego real sustituyen al de la prenda de verdad, aquí
-    ///   se añade porque nunca hemos sabido el de la prenda de verdad;
-    ///   una mascotura CAMBIA LOS HUESOS de la raíz, y no toca las pieles;
-    ///   una mascota CUELGA una subentidad del enganche 1;
-    ///   un aura, otra del enganche 6.
+    ///   a cape, a hat, a shield, an outfit, wings or shoulder pads PUT A NUMBER in the list of
+    ///   skins (the f6) -- in the real game they replace the real garment's, here it is added because
+    ///   we never knew the real garment's;
+    ///   a petsmount CHANGES THE ROOT'S BONES, and does not touch the skins;
+    ///   a pet HANGS a subentity from attachment 1;
+    ///   an aura, another from attachment 6.
     /// </summary>
     public static class Cosmetics
     {
-        /// <summary>Los huecos de la ventana de apariencia, de las capturas.</summary>
+        /// <summary>The appearance window's slots, from the captures.</summary>
         public const int SlotAmulet = 0;
         public const int SlotMount = 5;
         public const int SlotCape = 9;
@@ -42,20 +42,19 @@ namespace Jondo.Unity.Server.Managers
         public const int SlotShoulders = 25;
 
         /// <summary>
-        /// El hueco al que va cada tipo de objeto. Sirve de red: cuando el hueco está MEDIDO en las
-        /// capturas manda el medido, porque para dos familias esta tabla no puede acertar. Las 194
-        /// armas de apariencia son todas del mismo tipo y se reparten en diez huecos (uno por tipo
-        /// de arma real imitada), y un objeto viviente cambia de hueco según la variante que se le
-        /// elija.
+        /// The slot each item type goes to. It acts as a net: when the slot is MEASURED in the captures the
+        /// measured one rules, because for two families this table cannot get it right. The 194 appearance
+        /// weapons are all of the same type and spread over ten slots (one per type of real weapon
+        /// imitated), and a living item changes slot depending on the variant chosen for it.
         /// </summary>
         private static readonly Dictionary<int, int> SlotOfType = new Dictionary<int, int>
         {
-            { 246, SlotHat },        // sombrero de apariencia
+            { 246, SlotHat },        // appearance hat
             { 247, SlotCape },       // capa
             { 248, SlotShield },     // escudo
             { 249, SlotPet },        // mascota
             { 250, SlotMount },      // mascotura
-            { 324, SlotMount },      // montura de apariencia
+            { 324, SlotMount },      // appearance mount
             { 199, SlotCostume },    // traje
             { 299, SlotShoulders },  // hombreras
             { 300, SlotWings },      // alas
@@ -71,27 +70,27 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El aspecto que impone una prenda que no va por pieles: una mascota, que cuelga del
-        /// enganche 1, o una mascotura/montura, que manda en la raíz.
+        /// The look a garment that does not go through skins imposes: a pet, which hangs from attachment 1,
+        /// or a petsmount/mount, which rules the root.
         ///
-        /// La ESCALA ausente es la de por defecto, no cero: viaja como repetido empaquetado y un
-        /// cero se codificaría explícitamente, así que cero aquí significa "no la toques".
+        /// A missing SCALE is the default one, not zero: it travels as a packed repeated and a zero would be
+        /// encoded explicitly, so zero here means "do not touch it".
         /// </summary>
         public sealed class PieceLook
         {
             public int Bones { get; init; }
             public int Scale { get; init; }
-            /// <summary>La piel de la raíz; solo la ponen las monturas de apariencia.</summary>
+            /// <summary>The root's skin; only appearance mounts set it.</summary>
             public int Skin { get; init; }
-            /// <summary>Los colores medidos, ya empaquetados. Vacío si la prenda no los toca.</summary>
+            /// <summary>The measured colours, already packed. Empty if the garment does not touch them.</summary>
             public byte[]? Colors { get; init; }
-            /// <summary>El color es el del PERSONAJE que la lleva, copiado byte a byte.</summary>
+            /// <summary>The colour is that of the CHARACTER wearing it, copied byte for byte.</summary>
             public bool ColorsFromWearer { get; init; }
         }
 
         private static readonly Dictionary<int, Piece> _catalogue = new Dictionary<int, Piece>();
-        // Casi todas las prendas meten UNA piel, pero hay tres medidas que meten dos —la capa
-        // 18579, el escudo 13240 y el traje 18525—, así que el valor es una lista.
+        // Nearly every garment puts in ONE skin, but there are three measured ones that put in two --
+        // cape 18579, shield 13240 and outfit 18525 --, so the value is a list.
         private static readonly Dictionary<int, int[]> _skins = new Dictionary<int, int[]>();
         private static readonly Dictionary<int, Dictionary<int, int[]>> _variants
             = new Dictionary<int, Dictionary<int, int[]>>();
@@ -99,9 +98,8 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Dictionary<int, PieceLook> _mounts = new Dictionary<int, PieceLook>();
         private static readonly Dictionary<int, PieceLook> _pets = new Dictionary<int, PieceLook>();
         private static readonly Dictionary<int, int> _auras = new Dictionary<int, int>();
-        // Huecos medidos: los de las armas van por objeto, los de los objetos vivientes por
-        // (objeto, variante), porque una misma sortija imita una capa o un sombrero según cuál se
-        // elija.
+        // Measured slots: the weapons' go by item, the living items' by (item, variant), because
+        // the same ring imitates a cape or a hat depending on which is chosen.
         private static readonly Dictionary<int, int> _slots = new Dictionary<int, int>();
         private static readonly Dictionary<int, Dictionary<int, int>> _slotsByVariant
             = new Dictionary<int, Dictionary<int, int>>();
@@ -122,7 +120,7 @@ namespace Jondo.Unity.Server.Managers
             get { Ensure(); return _skins.Count + _mounts.Count + _pets.Count + _variants.Count; }
         }
         public static IEnumerable<KeyValuePair<int, Piece>> All { get { Ensure(); return _catalogue; } }
-        /// <summary>Los títulos y ornamentos que el servidor real aceptó en las capturas.</summary>
+        /// <summary>The titles and ornaments the real server accepted in the captures.</summary>
         public static IReadOnlyList<int> MeasuredTitles { get { Ensure(); return _titles; } }
         public static IReadOnlyList<int> MeasuredOrnaments { get { Ensure(); return _ornaments; } }
 
@@ -178,9 +176,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los títulos y ornamentos que el servidor real aceptó tienen que estar entre los que se
-        /// ofrecen. Si algún día se regenera titles_ornaments.json y se pierde alguno, esto lo dice
-        /// en vez de dejar un título que existe pero no se puede poner.
+        /// The titles and ornaments the real server accepted have to be among those offered. If
+        /// titles_ornaments.json is ever regenerated and one is lost, this says so instead of leaving a title
+        /// that exists but cannot be put on.
         /// </summary>
         private static void CheckMeasuredAgainstOffered()
         {
@@ -223,9 +221,9 @@ namespace Jondo.Unity.Server.Managers
                     };
                 }
 
-                // El efecto 335 lleva un identificador de apariencia, no los huesos directamente.
-                // Las de tipo 5 son sustituciones simples del esqueleto: en 3.6.10.10 la forma
-                // bestial del Ouginak es la apariencia 1260, que apunta a los huesos 9025.
+                // Effect 335 carries an appearance identifier, not the bones directly.
+                // Type 5 ones are simple skeleton replacements: in 3.6.10.10 the Ouginak's bestial
+                // form is appearance 1260, which points at bones 9025.
                 if (doc.RootElement.TryGetProperty("appearances", out var appearances))
                 {
                     foreach (var entry in appearances.EnumerateObject())
@@ -301,7 +299,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Los aspectos que no van por pieles: mascotas y monturas.</summary>
+        /// <summary>The looks that do not go through skins: pets and mounts.</summary>
         private static void ReadLooks(JsonElement root, string name, Dictionary<int, PieceLook> into)
         {
             if (!root.TryGetProperty(name, out var block)) return;
@@ -345,7 +343,7 @@ namespace Jondo.Unity.Server.Managers
             catch { return null; }
         }
 
-        /// <summary>Una piel viene como número; varias, como lista.</summary>
+        /// <summary>A skin comes as a number; several, as a list.</summary>
         private static int[] ReadSkinValue(JsonElement value)
         {
             if (value.ValueKind == JsonValueKind.Array)
@@ -387,6 +385,24 @@ namespace Jondo.Unity.Server.Managers
         // Initialize got empty tables and a character with nothing on -- silently, which is why
         // the launcher shot tests had to remember to initialize by hand.
         public static bool Exists(int gid) { Ensure(); return _catalogue.ContainsKey(gid); }
+
+        /// <summary>Every appearance mount and pet-mount whose look is measured.</summary>
+        public static IReadOnlyCollection<PieceLook> MountLooks { get { Ensure(); return _mounts.Values; } }
+
+        /// <summary>
+        /// The slot a cosmetic's skin dresses, as the real item type it stands for -- hat 16, cape
+        /// 17, shield 82 -- or zero.
+        /// </summary>
+        public static int ItemTypeOfSkin(int skin)
+        {
+            Ensure();
+            foreach (var (gid, skins) in _skins)
+            {
+                if (Array.IndexOf(skins, skin) < 0 || !_catalogue.TryGetValue(gid, out var piece)) continue;
+                return piece.Type switch { 246 => 16, 247 => 17, 248 => 82, _ => 0 };
+            }
+            return 0;
+        }
         public static Piece? Of(int gid)
         {
             Ensure();
@@ -394,11 +410,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El hueco que le toca a una prenda. Es lo que el servidor devuelve en el lwz.
+        /// The slot a garment gets. It is what the server returns in the lwz.
         ///
-        /// Manda lo MEDIDO, y por variante antes que por objeto: una sortija viviente imita una capa
-        /// con una variante y un sombrero con otra. Solo si no hay medida se cae al tipo, que para
-        /// las armas y los objetos vivientes acertaría poco.
+        /// The MEASURED one rules, and by variant before by item: a living ring imitates a cape with one
+        /// variant and a hat with another. Only if there is no measurement does it fall back to the type,
+        /// which for weapons and living items would rarely be right.
         /// </summary>
         public static int SlotOf(int gid, int variant = 0)
         {
@@ -408,7 +424,7 @@ namespace Jondo.Unity.Server.Managers
                 if (porVariante.TryGetValue(variant, out int medido)) return medido;
                 if (variant == 0 && porVariante.Count > 0)
                 {
-                    foreach (var v in porVariante) return v.Value;   // la primera que se midió
+                    foreach (var v in porVariante) return v.Value;   // the first one measured
                 }
             }
             if (_slots.TryGetValue(gid, out int slot)) return slot;
@@ -419,8 +435,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Las pieles que mete una prenda, vacío si no las sabemos. Casi siempre es una sola; los
-        /// objetos vivientes cambian según la variante elegida.
+        /// The skins a garment puts in, empty if we do not know them. It is nearly always a single one;
+        /// living items change depending on the chosen variant.
         /// </summary>
         public static IReadOnlyList<int> SkinsOf(int gid, int variant)
         {
@@ -428,16 +444,15 @@ namespace Jondo.Unity.Server.Managers
             if (_variants.TryGetValue(gid, out var tabla))
             {
                 if (tabla.TryGetValue(variant, out var deVariante)) return deVariante;
-                // Una variante que no está medida no debe caer en la piel de otra: mejor nada.
+                // A variant that is not measured must not fall into another's skin: better nothing.
                 if (variant != 0) return _ninguna;
             }
             return _skins.TryGetValue(gid, out var pieles) ? pieles : _ninguna;
         }
 
         /// <summary>
-        /// El aspecto que impone una mascotura o una montura de apariencia sobre la raíz, o null.
-        /// Las dos van al hueco 5 y las dos sustituyen a la montura; la diferencia es que la de
-        /// apariencia trae además su propia piel.
+        /// The look a petsmount or an appearance mount imposes on the root, or null. Both go to slot 5 and
+        /// both replace the mount; the difference is that the appearance one also brings its own skin.
         /// </summary>
         public static PieceLook? MountLookOf(int gid)
         {
@@ -445,21 +460,21 @@ namespace Jondo.Unity.Server.Managers
             return _mounts.TryGetValue(gid, out var m) ? m : null;
         }
 
-        /// <summary>La subentidad de una mascota de apariencia, o null.</summary>
+        /// <summary>An appearance pet's subentity, or null.</summary>
         public static PieceLook? PetOf(int gid)
         {
             Ensure();
             return _pets.TryGetValue(gid, out var p) ? p : null;
         }
 
-        /// <summary>Los huesos de un aura, o cero.</summary>
+        /// <summary>An aura's bones, or zero.</summary>
         public static int AuraBones(int auraId)
         {
             Ensure();
             return _auras.TryGetValue(auraId, out int b) ? b : 0;
         }
 
-        /// <summary>Los huesos de una apariencia de tipo 5, o cero si no es compatible.</summary>
+        /// <summary>A type 5 appearance's bones, or zero if it is not compatible.</summary>
         public static int AppearanceBones(int appearanceId)
         {
             Ensure();

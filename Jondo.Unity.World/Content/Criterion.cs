@@ -75,7 +75,7 @@ namespace Jondo.Unity.World.Content
             if (string.IsNullOrWhiteSpace(criterion)) return Answer.True;
             int at = 0;
             var answer = Or(criterion, ref at, resolver);
-            return at >= criterion.Length ? answer : Answer.Unknown;   // sobra texto: no se entendió
+            return at >= criterion.Length ? answer : Answer.Unknown;   // leftover text: it was not understood
         }
 
         /// <summary>The same, with Unknown counted as the caller says.</summary>

@@ -140,8 +140,7 @@ The corrected Giny-compatible roles 1 through 5, why the former 1-to-4 definitio
 how old administrators are migrated exactly once, and the current command permission thresholds.
 *Go there* when adding a protected command, changing an account role or investigating access.
 
-**`NOTAS_MIGRACION_AUTH.md`** — The jump from 3.6.4.3 to 3.6.10.10. **Written in Spanish** (1,030
-lines); the rest of this folder is in English.
+**`auth-migration-notes.md`** — The jump from 3.6.4.3 to 3.6.10.10.
 The full sequence from client start to walking on a map, message by message, with what changed in
 this version: server selection, character list, character creation, world entry, map actors,
 characteristics, chat, spells and equipment. It also tracks what is done and what is missing.

@@ -242,14 +242,14 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
-            // Sin cuenta no se selecciona nada. Esto estaba escrito como «accountId > 0 && ...»,
-            // o sea que la comprobación se apagaba sola justo en el caso que tenía que cazar: un
-            // socket que manda el kvw ANTES del kqz llega aquí con cuenta cero, se salta la
-            // comprobación entera y carga la ficha de quien quiera. Y como después se escribe
-            // encima al guardar, no era sólo mirar.
+            // Without an account nothing is selected. This was written as «accountId > 0 && ...»,
+            // so the check switched itself off exactly in the case it had to catch: a socket that
+            // sends the kvw BEFORE the kqz gets here with account zero, skips the whole check and
+            // loads whatever sheet it wants. And since it is written over on saving afterwards, it
+            // was not just looking.
             //
-            // La cuenta se resuelve al canjear el ticket en kqz, y si el ticket no vale la sesión
-            // se cierra ahí mismo, así que en el camino bueno esto nunca es cero.
+            // The account is resolved when the ticket is redeemed in kqz, and if the ticket is no good
+            // the session is closed right there, so on the good path this is never zero.
             if (accountId <= 0)
             {
                 Console.WriteLine($"[Game Node] Character selection without a resolved account " +
@@ -271,8 +271,8 @@ namespace Jondo.Unity.Server.Handlers
                 Console.WriteLine($"[Game Node] Could not load character {characterIdToLoad}.");
                 return false;
             }
-            // Primero se lee la visita anterior y sólo después se pisa: al revés, lo que se le
-            // enseñaría al jugador es la conexión de ahora mismo, que no le dice nada.
+            // The previous visit is read first and only then overwritten: the other way round, what the
+            // player would be shown is the connection of right now, which tells him nothing.
             SessionContext.State.PreviousVisit = DatabaseManager.ReadLastVisit(characterIdToLoad);
             DatabaseManager.TouchLastConnection(characterIdToLoad, SessionContext.State.ClientIp);
 

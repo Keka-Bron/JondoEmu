@@ -157,10 +157,10 @@ namespace Jondo.Unity.Server.Network
             if (_isRunning) return;
             _cts = new CancellationTokenSource();
 
-            // La bandera se levanta DESPUÉS de que el puerto esté cogido de verdad. Estaba antes,
-            // así que si el bind fallaba —el caso normal cuando ya hay otro servidor arriba—
-            // IsRunning decía que sí y el semáforo del lanzador pintaba «en línea» con el listener
-            // muerto. Con un solo proceso no se notaba porque el fallo mataba el emulador entero.
+            // The flag is raised AFTER the port is really taken. It was before,
+            // so if the bind failed —the normal case when another server is already up—
+            // IsRunning said yes and the launcher's traffic light showed «en línea» with the listener
+            // dead. With a single process it was not noticed because the failure killed the whole emulator.
             _tcpListener = new TcpListener(ServerBinding.TcpAddress, port);
             _tcpListener.Start();
             _isRunning = true;

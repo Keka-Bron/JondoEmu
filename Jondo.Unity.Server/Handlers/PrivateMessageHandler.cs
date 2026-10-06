@@ -8,56 +8,57 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Los susurros: hablar en privado con otro personaje.
+    /// Whispers: talking privately with another character.
     ///
-    /// ─── Lo que va por el cable ─────────────────────────────────────────────────────────────
+    /// ─── What goes over the wire ────────────────────────────────────────────────────────────
     ///
-    /// El susurro NO es un canal más del chat normal. El chat de canal va en <c>ktm</c>, con el
-    /// número del canal en su f3; el susurro tiene mensaje propio:
+    /// A whisper is NOT one more channel of the normal chat. Channel chat goes in <c>ktm</c>, with the
+    /// channel number in its f3; the whisper has a message of its own:
     ///
-    ///   ktb { f1: el texto, f5: a quién }
+    ///   ktb { f1: the text, f5: to whom }
     ///
-    /// Medido en tres capturas, con esta forma exacta:
+    /// Measured in three captures, with this exact shape:
     ///
     ///   0a04 686f6c61  2200  2a0c 53616372692d4d6173746572
     ///   f1 = "hola"    f4 = ""    f5 = "Sacri-Master"
     ///
-    /// El canal privado es el 9. Eso no lo hemos deducido: está en la propia tabla del cliente,
-    /// ChatChannelsDataRoot, donde el 9 se llama «Privado», lleva <c>isPrivate</c> y su atajo es
-    /// <c>/w</c>. En esa misma tabla el 10 es «Información» y el 11 «Combate», los tres privados.
+    /// The private channel is 9. That was not deduced: it is in the client's own table,
+    /// ChatChannelsDataRoot, where 9 is called «Privado», carries <c>isPrivate</c> and its shortcut is
+    /// <c>/w</c>. In that same table 10 is «Información» and 11 «Combate», the three of them private.
     ///
-    /// Cuando algo no se puede decir, el servidor contesta con <c>ktl</c>, que el volcado de
-    /// nombres reales llama <c>ChatErrorEvent</c>, y lleva un solo número. El único valor que
-    /// tenemos atado a una causa concreta es el 2, que es lo que contestó el servidor real al
-    /// susurrarse a uno mismo. Los otros vistos —1, 4, 5, 8 y 10— salen al hablar por canales
-    /// donde el jugador no puede, pero no se ha podido emparejar cada número con su motivo, así
-    /// que aquí sólo se usa el 2, que sí está medido.
+    /// When something cannot be said, the server answers with <c>ktl</c>, which the dump of real names
+    /// calls <c>ChatErrorEvent</c>, and it carries a single number. The only value we have tied to a
+    /// specific cause is 2, which is what the real server answered when whispering to oneself. The
+    /// others seen -- 1, 4, 5, 8 and 10 -- come up when talking on channels where the player cannot, but
+    /// it has not been possible to pair each number with its reason, so only 2, which is measured, is
+    /// used here.
     ///
-    /// ─── El mensaje NO es una línea de chat ─────────────────────────────────────────────────
+    /// ─── The message is NOT a chat line ─────────────────────────────────────────────────────
     ///
-    /// Esto costó un intento fallido: un susurro no se manda como un <c>kti</c> por el canal 9.
-    /// Tiene mensaje propio, <c>kth</c> —ChatPrivateCopyMessageEvent en el volcado de nombres—, y
-    /// el cliente lo reparte por el opcode, no por el canal. Mandarlo como kti canal 9 no pinta
-    /// absolutamente nada: llega, el servidor lo da por hecho, y en pantalla no hay nada.
+    /// This took a failed attempt: a whisper is not sent as a <c>kti</c> on channel 9. It has its own
+    /// message, <c>kth</c> -- ChatPrivateCopyMessageEvent in the names dump --, and the client dispatches
+    /// it by opcode, not by channel. Sending it as a channel 9 kti draws absolutely nothing: it arrives,
+    /// the server considers it done, and there is nothing on screen.
     ///
-    ///   kth { f1: fecha, f4: vacío, f5: id del otro, f6: su nombre, f7: el texto }
+    ///   kth { f1: date, f4: empty, f5: the other's id, f6: his name, f7: the text }
     ///
-    /// Y lo que lleva no es quién habla, sino EL OTRO: en la copia del que envía va a quién se lo
-    /// dice. Está medido en la captura del gremio, donde el susurro a «Hiierbita-Xx» sí llegó a su
-    /// destino y el servidor contestó con este kth.
+    /// And what it carries is not who speaks, but THE OTHER: in the sender's copy goes whom it is said
+    /// to. It is measured in the guild capture, where the whisper to «Hiierbita-Xx» did reach its
+    /// destination and the server answered with this kth.
     ///
-    /// Del lado de QUIEN LO RECIBE no hay captura —haría falta grabar siendo el destinatario— así
-    /// que se le manda el mismo kth con la identidad de quien habla. Es la lectura natural del
-    /// formato: el campo es «el otro», y para el que recibe el otro es el que le escribe.
+    /// From the side of WHOEVER RECEIVES IT there is no capture -- it would need recording as the
+    /// recipient -- so he is sent the same kth with the identity of whoever speaks. It is the natural
+    /// reading of the format: the field is «the other», and for the receiver the other is whoever
+    /// writes to him.
     /// </summary>
     public static class PrivateMessageHandler
     {
-        /// <summary>El canal privado, de ChatChannelsDataRoot.</summary>
+        /// <summary>The private channel, from ChatChannelsDataRoot.</summary>
         public const int PrivateChannel = 9;
 
         /// <summary>
-        /// Lo que contesta el servidor real cuando el susurro no sale. Medido susurrándose a uno
-        /// mismo; para «ese personaje no está» no hay captura, así que se usa el mismo.
+        /// What the real server answers when the whisper does not go out. Measured by whispering to oneself;
+        /// for «that character is not here» there is no capture, so the same one is used.
         /// </summary>
         public const int CannotWhisper = 2;
 
@@ -79,7 +80,7 @@ namespace Jondo.Unity.Server.Handlers
 
             string from = SessionContext.State.CharacterName;
 
-            // A uno mismo no. Es justo el caso que hay medido: el servidor real contesta ktl 2.
+            // Not to oneself. It is exactly the measured case: the real server answers ktl 2.
             if (string.Equals(target, from, StringComparison.OrdinalIgnoreCase))
             {
                 await RefuseAsync(stream);
@@ -97,12 +98,12 @@ namespace Jondo.Unity.Server.Handlers
 
             string cuando = DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:sszzz");
 
-            // Al que lo recibe: el otro es quien le escribe.
+            // To the receiver: the other is whoever writes to him.
             await destino.SendAsync(ConnectionProtocol.Push(Op.Kth,
                 ConnectionProtocol.BuildPrivateMessage(
                     cuando, SessionContext.State.CharacterId, from, text)));
 
-            // Y a quien lo manda, su copia: el otro es a quien se lo dice.
+            // And to the sender, his copy: the other is whom he says it to.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kth,
                     ConnectionProtocol.BuildPrivateMessage(

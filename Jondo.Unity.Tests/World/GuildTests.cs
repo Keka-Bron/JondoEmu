@@ -9,19 +9,19 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// El gremio, contra la captura de crear «Jondo»: las tres tramas que el servidor real manda
-    /// al fundar -el gremio al que perteneces, sus rangos y su cabecera- byte a byte, y el
-    /// almacén que las alimenta.
+    /// The guild, against the capture of creating «Jondo»: the three frames the real server sends
+    /// on founding -the guild you belong to, its ranks and its header- byte for byte, and the
+    /// store that feeds them.
     /// </summary>
     /// <remarks>
-    /// En la misma colección que las raids: las dos clases apuntan el almacén a una base de paso
-    /// con el MISMO interruptor estático, así que corriendo a la vez se pisan y una se encuentra
-    /// la base de la otra. Una colección compartida es lo que le dice a xUnit que no las solape.
+    /// In the same collection as the raids: both classes point the store at a pass-through base
+    /// with the SAME static switch, so running at once they step on each other and one finds
+    /// the other's base. A shared collection is what tells xUnit not to overlap them.
     /// </remarks>
     [Collection("guild raids")]
     public class GuildTests
     {
-        /// <summary>El gremio de la captura: emblema 165/8/16744448/9476018, id 42043, «Jondo», nivel 1.</summary>
+        /// <summary>The capture's guild: emblem 165/8/16744448/9476018, id 42043, «Jondo», level 1.</summary>
         private static GuildStore.Guild Jondo() => new()
         {
             Id = 42043,
@@ -58,8 +58,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// «Perteneces a este gremio» (jgw) tal y como salió al crear «Jondo»: el puesto 1 y el
-        /// bloque del gremio con su emblema.
+        /// «You belong to this guild» (jgw) just as it came out on creating «Jondo»: position 1 and the
+        /// guild block with its emblem.
         /// </summary>
         [Fact]
         public void The_guild_you_belong_to_is_the_capture()
@@ -69,8 +69,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// La cabecera de la ventana (jhh) de un gremio recién creado: la fecha de fundación, el
-        /// nivel 1, los 50 miembros que caben y el único que hay.
+        /// The window header (jhh) of a freshly created guild: the founding date, the
+        /// level 1, the 50 members that fit and the only one there is.
         /// </summary>
         [Fact]
         public void The_guild_header_is_the_capture()
@@ -80,7 +80,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(50, GuildStore.MaxMembers(1));
         }
 
-        /// <summary>Los cuatro rangos por defecto (jco), el molde entero de un gremio nuevo.</summary>
+        /// <summary>The four default ranks (jco), the whole mould of a new guild.</summary>
         [Fact]
         public void The_default_ranks_are_the_capture()
         {
@@ -93,8 +93,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// El gremio visto desde el mapa (jhe) lleva el mismo bloque que el jgw, el puesto y el
-        /// cierre constante que sale en todas las capturas de «Jondo».
+        /// The guild seen from the map (jhe) carries the same block as the jgw, the position and the
+        /// constant ending that appears in all the «Jondo» captures.
         /// </summary>
         [Fact]
         public void The_guild_of_an_actor_carries_the_same_block()
@@ -102,7 +102,7 @@ namespace Jondo.Unity.Tests.World
             byte[] jhe = GuildProtocol.BuildActorGuild(Jondo(), rank: 1, memberExperience: 10);
             byte[] jgw = GuildProtocol.BuildGuildJoined(Jondo(), rank: 1);
 
-            // El bloque del gremio del jgw va en su f3 y el del jhe en su f1: los mismos bytes.
+            // The jgw's guild block goes in its f3 and the jhe's in its f1: the same bytes.
             string bloque = "0a111a0f08a5011008188080fe0728b2afc20410bbc8021a054a6f6e646f2001";
             Assert.Contains(bloque, Hex(jhe));
             Assert.Contains(bloque, Hex(jgw));
@@ -111,8 +111,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// «Te invitan a un gremio» (jiq), byte a byte contra la captura de recibir una
-        /// invitación al gremio «Hezbola» de manos de «Harmoo».
+        /// «You are invited to a guild» (jiq), byte for byte against the capture of receiving an
+        /// invitation to the guild «Hezbola» from «Harmoo».
         /// </summary>
         [Fact]
         public void The_invitation_is_the_capture()
@@ -129,8 +129,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// La tienda (jkh) de un gremio de cuatro cuentas: los cinco oráculos a 80, 80, 800, 200
-        /// y 80, que es el precio de cada uno por las cuatro. Byte a byte.
+        /// The shop (jkh) of a four-account guild: the five oracles at 80, 80, 800, 200
+        /// and 80, which is each one's price times the four. Byte for byte.
         /// </summary>
         [Fact]
         public void The_shop_is_the_capture()
@@ -141,8 +141,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Y la del gremio de una sola cuenta, que es donde se leen los precios sueltos: 20, 20,
-        /// 200, 50 y 20.
+        /// And that of the single-account guild, which is where the bare prices are read: 20, 20,
+        /// 200, 50 and 20.
         /// </summary>
         [Fact]
         public void The_shop_of_a_one_account_guild_carries_the_bare_prices()
@@ -157,8 +157,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Lo que queda por activar (jkv) y el acuse de compra: la compra del oráculo 1 con su
-        /// plazo de un día, byte a byte contra la captura.
+        /// What is left to activate (jkv) and the purchase acknowledgement: the purchase of oracle 1 with its
+        /// one-day deadline, byte for byte against the capture.
         /// </summary>
         [Fact]
         public void The_pending_oracle_is_the_capture()
@@ -171,28 +171,28 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// La alteración que pone el oráculo al activarlo (lzs): el «Oráculo de saber» de la
-        /// captura empieza y acaba donde dice, con sus dos horas. Los dos bloques de detalle que
-        /// lleva allí no se reproducen -sólo está medido uno de los cinco oráculos-, así que se
-        /// comparan los campos que sí van.
+        /// The alteration the oracle sets on being activated (lzs): the capture's «Oráculo de saber»
+        /// starts and ends where it says, with its two hours. The two detail blocks it
+        /// carries there are not reproduced -only one of the five oracles is measured-, so
+        /// the fields that do go are compared.
         /// </summary>
         [Fact]
         public void The_oracle_puts_its_alteration_for_two_hours()
         {
             Assert.Equal(859, GuildOracles.Of(1).Alteration);
 
-            // El lzs de la captura empieza igual -«0a31 088d81fef9853410db06»- y acaba con el
-            // mismo «28e0dab4fd8534»: lo que va en medio son sus dos bloques de detalle, que no
-            // se reproducen. Lo que sí va, va donde va.
+            // The capture's lzs starts the same -«0a31 088d81fef9853410db06»- and ends with the
+            // same «28e0dab4fd8534»: what goes in between is its two detail blocks, which are not
+            // reproduced. What does go, goes where it goes.
             string lzs = Hex(GuildProtocol.BuildAlteration(859, 1788304392333, 1788311580000));
             Assert.Equal("0a13088d81fef9853410db06200228e0dab4fd8534", lzs);
-            Assert.Contains("088d81fef9853410db06", lzs);        // desde, y la alteración 859
-            Assert.Contains("28e0dab4fd8534", lzs);              // hasta, dos horas después
+            Assert.Contains("088d81fef9853410db06", lzs);        // from, and alteration 859
+            Assert.Contains("28e0dab4fd8534", lzs);              // until, two hours later
             Assert.Equal(2, GuildOracles.HoursActive);
             Assert.Equal(24, GuildOracles.HoursToActivate);
         }
 
-        /// <summary>La contribución (jle): diez mil kamas y las tres que le quedan, de la captura.</summary>
+        /// <summary>The contribution (jle): ten thousand kamas and the three left, from the capture.</summary>
         [Fact]
         public void The_contribution_is_the_capture()
         {
@@ -202,8 +202,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Las contribuciones se cuentan por semana y la semana empieza el martes, que es cuando
-        /// el juego reinicia lo semanal.
+        /// Contributions are counted per week and the week starts on Tuesday, which is when
+        /// the game resets the weekly things.
         /// </summary>
         [Fact]
         public void The_week_starts_on_tuesday()
@@ -214,8 +214,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// El almacén, sobre una base de paso: crear deja al fundador dentro con rango 1, el
-        /// gremio se lee por su personaje y salir lo saca.
+        /// The store, over a pass-through base: creating leaves the founder inside with rank 1, the
+        /// guild is read by his character and leaving takes him out.
         /// </summary>
         [Fact]
         public void A_guild_survives_being_written_and_read_back()
@@ -255,8 +255,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Una candidatura aceptada mete al candidato de rango 4 -el que lleva en la captura el
-        /// que entró así- y se lleva la candidatura por delante.
+        /// An accepted application puts the candidate in at rank 4 -the one carried in the capture by whoever
+        /// joined that way- and takes the application away with it.
         /// </summary>
         [Fact]
         public void An_application_accepted_puts_the_newcomer_in_at_the_bottom_rank()
@@ -288,9 +288,9 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Contribuir sube los kamas del gremio de diez en diez y se acaba a las cinco por
-        /// semana; con ellos se compra un oráculo, que los descuenta y deja un plazo para
-        /// activarlo.
+        /// Contributing raises the guild's kamas ten at a time and runs out at five per
+        /// week; with them an oracle is bought, which deducts them and leaves a deadline to
+        /// activate it.
         /// </summary>
         [Fact]
         public void Contributions_feed_the_guild_kamas_and_the_shop_spends_them()
@@ -308,14 +308,14 @@ namespace Jondo.Unity.Tests.World
                 for (int i = 0; i < 4; i++) GuildStore.Contribute(7001, guild.Id);
                 Assert.Equal(50, GuildStore.GuildOf(7001).GuildKamas);
                 Assert.Equal(0, GuildStore.ContributionsLeft(7001));
-                Assert.Equal(-1, GuildStore.Contribute(7001, guild.Id));   // la sexta no entra
+                Assert.Equal(-1, GuildStore.Contribute(7001, guild.Id));   // the sixth does not go in
                 Assert.Equal(50, GuildStore.GuildOf(7001).GuildKamas);
 
-                // El divino cuesta 200 por cuenta: con 50 no llega y no se toca nada.
+                // The divine one costs 200 per account: with 50 it does not reach and nothing is touched.
                 Assert.False(GuildStore.SpendGuildKamas(guild.Id, GuildOracles.PriceFor(3, 1)));
                 Assert.Equal(50, GuildStore.GuildOf(7001).GuildKamas);
 
-                // El de saber sí: 20, y quedan 30.
+                // The knowledge one does: 20, and 30 are left.
                 Assert.True(GuildStore.SpendGuildKamas(guild.Id, GuildOracles.PriceFor(1, 1)));
                 Assert.Equal(30, GuildStore.GuildOf(7001).GuildKamas);
 

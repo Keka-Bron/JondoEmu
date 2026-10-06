@@ -32,7 +32,7 @@ namespace Jondo.Unity.Tests.World
             // The adventurer set, which is what a new character is given: 4 to 9.
             Assert.Equal(4, DatabaseManager.ItemLevelRequirement(2475));    // anillo
             Assert.Equal(9, DatabaseManager.ItemLevelRequirement(2474));    // sombrero
-            Assert.Equal(1, DatabaseManager.ItemLevelRequirement(10207));   // el manojo
+            Assert.Equal(1, DatabaseManager.ItemLevelRequirement(10207));   // the keyring
         }
 
         [Fact]

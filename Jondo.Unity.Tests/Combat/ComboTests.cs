@@ -25,11 +25,11 @@ namespace Jondo.Unity.Tests.Combat
         {
             var escalera = Combo.Ladder();
 
-            // La ficha dice "de 1 a 15", y son los quince que se ven. Pero la escalera del
-            // hechizo tiene DIECIOCHO peldaños: los tres de arriba (2751, 2752, 2753) existen y
-            // se pueden alcanzar, y los tres pagan lo mismo que el quince porque el hechizo 20500
-            // se queda sin grados. O sea que el tope de la ficha es real, pero está en el
-            // porcentaje y no en el número de peldaños.
+            // The sheet says "de 1 a 15", and those are the fifteen seen. But the spell's
+            // ladder has EIGHTEEN rungs: the top three (2751, 2752, 2753) exist and
+            // can be reached, and all three pay the same as fifteen because spell 20500
+            // runs out of grades. So the sheet's cap is real, but it is in the
+            // percentage and not in the number of rungs.
             Assert.Equal(18, escalera.Count);
             Assert.Equal(2484, escalera[0]);
             Assert.Equal(new[] { 2751, 2752, 2753 }, escalera.Skip(15).ToArray());
@@ -85,7 +85,7 @@ namespace Jondo.Unity.Tests.Combat
                 Assert.Equal(esperado, Combo.LevelOf(bomba));
             }
 
-            // Y en el peldaño cinco pega un 80% más, que es lo que dice la ficha del Combo V.
+            // And on rung five it hits 80% more, which is what the Combo V sheet says.
             Assert.Equal(80, Combo.PercentOf(bomba));
         }
 
@@ -111,9 +111,9 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Only_a_bomb_can_carry_a_combo()
         {
-            // Polvora y Mosquete encadenan el hechizo del combo con mascaras que el motor no sabe
-            // estrechar, y sin esto caia en el lanzador: el tymador salia con Combo IV en su panel
-            // y la bomba se quedaba igual.
+            // Polvora and Mosquete chain the combo spell with masks the engine does not know how
+            // to narrow, and without this it fell on the caster: the Rogue came out with Combo IV on his panel
+            // and the bomb stayed the same.
             var fight = new FightInstance(1, 1);
             var tymador = new Fighter { Id = 10, TeamId = 0, CellId = 300, MaxHP = 500, CurrentHP = 500 };
             fight.AddPlayer(tymador);
@@ -236,7 +236,7 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.Equal(125, Combo.SizeOf(bomba, 1));
 
-            // Y nunca mas de dos vivos: el tercero desaloja al primero.
+            // And never more than two alive: the third evicts the first.
             bomba.Buffs.Poner(new Buff { EffectId = 1060, Cuanto = 20, EffectUid = 3,
                                          CaducaEnRonda = -1 }, () => 3);
             Assert.Equal(135, Combo.SizeOf(bomba, 1));
@@ -261,17 +261,17 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
-        /// Ningún número de embrujo se repite en una bomba, y los que se van se anuncian todos.
+        /// No buff number repeats on a bomb, and the ones that go are all announced.
         /// </summary>
         /// <remarks>
-        /// Es lo que dejaba la bomba en Combo I. Volver a poner el peldaño que ya llevaba caía en
-        /// la rama de «éste ya estaba» y devolvía el MISMO número, así que al cliente le llegaba
-        /// dos veces el embrujo 1 con el estado 2484 y una sola retirada; el estado sobrante se
-        /// quedaba puesto y es el nombre del estado —«Combo I»— lo que el cliente pinta.
+        /// It is what left the bomb at Combo I. Setting again the rung it already carried fell into
+        /// the «this one was already there» branch and returned the SAME number, so the client got
+        /// buff 1 with state 2484 twice and a single removal; the leftover state
+        /// stayed on and it is the state's name —«Combo I»— that the client draws.
         ///
-        /// El servidor real no repite un número ni una vez: en «tymador-explobomba resiliente» la
-        /// misma bomba lleva el 2484 en el embrujo 19 y otra vez en el 23, y en los frames 260 y
-        /// 261 los quita los dos.
+        /// The real server does not repeat a number even once: in «tymador-explobomba resiliente» the
+        /// same bomb carries 2484 in buff 19 and again in 23, and in frames 260 and
+        /// 261 it removes both.
         /// </remarks>
         [Fact]
         public void A_bomb_never_gets_the_same_buff_number_twice()
@@ -300,7 +300,7 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.Equal(puestos.Count, puestos.Distinct().Count());
 
-            // Y de todos los que se pusieron sólo sigue vivo el último: los demás se anunciaron.
+            // And of all those set only the last is still alive: the rest were announced.
             Assert.Equal(puestos.Count - 1, quitados.Distinct().Count());
             Assert.DoesNotContain(puestos[^1], quitados);
         }

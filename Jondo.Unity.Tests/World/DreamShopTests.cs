@@ -5,21 +5,21 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// La tienda de los Sueños: el Rey Gob, que es un NPC y no un protocolo nuevo.
+    /// The Dreams' shop: the Rey Gob, who is an NPC and not a new protocol.
     /// </summary>
     /// <remarks>
-    /// Medido en «sueño infinito largo». La fuente no manda un mensaje propio: el jugador habla
-    /// con el npc 7850 igual que con cualquiera, y lo que compra va DENTRO de la respuesta.
+    /// Measured in «sueño infinito largo». The fountain sends no message of its own: the player talks
+    /// to npc 7850 like to anyone, and what he buys goes INSIDE the reply.
     ///
-    ///   C->S iov  el npc, contextual -157447 en el mapa 237783053
-    ///   S->C ios  08c0d203 1204088b8305                  «¡REY GOB!» + una respuesta
+    ///   C->S iov  the npc, contextual -157447 on map 237783053
+    ///   S->C ios  08c0d203 1204088b8305                  «¡REY GOB!» + one reply
     ///   C->S ioy  088b8305
     ///   S->C ios  08d4d403 120e088a83051a0308c51f1a0308c31f 1204088c8305
     ///   C->S ioy  088a8305
     ///   S->C kld  0801
     ///
-    /// Y esa respuesta larga es la clave: f2 { f1: 82314, f3 { f1: 4037 }, f3 { f1: 4035 } }. Los
-    /// dos f3 son números que el cliente mete en su propio texto, «Multiplicar los puntos de
+    /// And that long reply is the key: f2 { f1: 82314, f3 { f1: 4037 }, f3 { f1: 4035 } }. The
+    /// two f3 are numbers the client puts in its own text, «Multiplicar los puntos de
     /// sueño por 1,5».
     /// </remarks>
     [Collection("MapManager")]
@@ -34,7 +34,7 @@ namespace Jondo.Unity.Tests.World
             Assert.NotNull(charla);
             Assert.Equal(59712, charla!.Opening);
 
-            // Se saluda, y eso lleva a la frase que ofrece.
+            // One greets, and that leads to the sentence that offers.
             var saludo = charla.Line(59712);
             Assert.NotNull(saludo);
             Assert.Equal(59988, Assert.Single(saludo!.Choices).Next);
@@ -43,13 +43,13 @@ namespace Jondo.Unity.Tests.World
             Assert.NotNull(oferta);
             Assert.Equal(2, oferta!.Choices.Count);
 
-            // «Multiplicar los puntos de sueño por 1,5», con sus dos parámetros.
+            // «Multiplicar los puntos de sueño por 1,5», with its two parameters.
             var bono = oferta.Choice(82314);
             Assert.NotNull(bono);
             Assert.Equal(150, bono!.DreamPointsPercent);
             Assert.Equal(new long[] { 4037, 4035 }, bono.Parameters.ToArray());
 
-            // Y «Huir», que no hace nada.
+            // And «Huir», which does nothing.
             var huir = oferta.Choice(82316);
             Assert.NotNull(huir);
             Assert.Equal(0, huir!.DreamPointsPercent);
@@ -58,7 +58,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void El_ios_lleva_los_parametros_de_la_respuesta()
         {
-            // La forma exacta de la captura: f2 { f1: 82314, f3 { f1: 4037 }, f3 { f1: 4035 } }.
+            // The capture's exact shape: f2 { f1: 82314, f3 { f1: 4037 }, f3 { f1: 4035 } }.
             var parametros = new System.Collections.Generic.Dictionary<long, System.Collections.Generic.IReadOnlyList<long>>
             {
                 [82314] = new long[] { 4037, 4035 },
@@ -74,9 +74,9 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void La_tienda_esta_en_la_fuente_y_solo_alli()
         {
-            // Corregido tras medir: la tienda no va repartida por las filas de en medio. Las 529
-            // salas de las filas 1, 2 y 3 son TODAS de pelea, y la guía lo remata —los Favores no
-            // salen en el primer palier—. La única sala sin pelea es la Fuente del final.
+            // Corrected after measuring: the shop is not spread over the middle rows. The 529
+            // rooms of rows 1, 2 and 3 are ALL fights, and the guide clinches it —the Favours do not
+            // appear in the first palier—. The only room without a fight is the Fountain at the end.
             Interactives.Initialize();
             Dreams.OlvidarTodo();
             var s = Dreams.Crear(1, "Prueba", 200, 5, 100, 200);

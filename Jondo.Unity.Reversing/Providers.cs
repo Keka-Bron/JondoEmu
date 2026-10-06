@@ -1,19 +1,19 @@
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// Los sitios donde se puede tener un modelo, con lo que hace falta para llegar a ellos.
+/// The places where one can have a model, with what is needed to reach them.
 ///
-/// Es una lista de atajos, no una limitación: «Otro» acepta cualquier servidor que hable como
-/// OpenAI, que a estas alturas es casi cualquiera. Está aquí y no en la interfaz porque es
-/// conocimiento del mundo —qué dirección tiene cada uno y qué dialecto habla—, no una decisión de
-/// cómo pintar una ventana.
+/// It is a list of shortcuts, not a limitation: «Otro» accepts any server that speaks like
+/// OpenAI, which by now is almost any. It is here and not in the interface because it is
+/// knowledge of the world —which address each has and which dialect it speaks—, not a decision about
+/// how to paint a window.
 ///
-/// ─── Por qué casi ninguno trae modelo sugerido ──────────────────────────────────────────
+/// ─── Why almost none brings a suggested model ───────────────────────────────────────────
 ///
-/// Porque los identificadores caducan y una lista escrita a mano envejece mal: se queda uno con un
-/// nombre que ya no existe y el error que devuelve el proveedor no dice que sea eso. En su lugar se
-/// le pregunta al propio proveedor con <see cref="Llm.CatalogueAsync"/>, que además comprueba de
-/// paso que la dirección y la clave valen. Sólo lleva sugerencia lo que se sabe cierto hoy.
+/// Because identifiers expire and a hand-written list ages badly: one is left with a
+/// name that no longer exists and the error the provider returns does not say that is it. Instead
+/// the provider itself is asked with <see cref="Llm.CatalogueAsync"/>, which also checks in
+/// passing that the address and the key are valid. Only what is known to be true today carries a suggestion.
 /// </summary>
 public sealed record Provider(
     string Name,
@@ -23,7 +23,7 @@ public sealed record Provider(
     string Suggested = "",
     string Hint = "")
 {
-    /// <summary>Si el modelo corre en la máquina de uno y por tanto no cuesta dinero.</summary>
+    /// <summary>Whether the model runs on one's own machine and therefore costs no money.</summary>
     public bool Local => !NeedsKey;
 
     public static IReadOnlyList<Provider> All { get; } = new[]
@@ -50,7 +50,7 @@ public sealed record Provider(
                      Hint: "cualquier servidor que hable como OpenAI: vLLM, llama.cpp, un túnel..."),
     };
 
-    /// <summary>El que mejor case con lo que ya estaba configurado, para no perder la elección.</summary>
+    /// <summary>The one that best matches what was already configured, so as not to lose the choice.</summary>
     public static Provider Match(string url, Llm.Dialect dialect)
         => All.FirstOrDefault(p => p.Url.Length > 0 &&
                                    url.StartsWith(p.Url, StringComparison.OrdinalIgnoreCase))

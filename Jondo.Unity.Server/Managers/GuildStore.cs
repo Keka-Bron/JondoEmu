@@ -5,20 +5,20 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los gremios y quién está en cada uno, guardados en world.db.
+    /// The guilds and who is in each one, stored in world.db.
     ///
-    /// Es la base sobre la que se apoya todo lo demás del gremio -la ventana, la tienda, el
-    /// cofre y, más adelante, las raids-, así que va aquí y no en el aire: un gremio creado
-    /// sobrevive al reinicio del servidor.
+    /// It is the base everything else about the guild rests on -- the window, the shop, the
+    /// chest and, later on, the raids --, so it goes here and not in the air: a created guild
+    /// survives a server restart.
     ///
-    /// Lo que sabemos de una captura y lo que no: el nombre, el emblema, el nivel, la fecha de
-    /// fundación y quién pertenece están medidos en las 12 capturas de Gremio/. La experiencia,
-    /// los kamas de gremio, los guildatones y los permisos por rango salen en las tramas pero su
-    /// escala completa no se ha reconstruido; se guardan los que se ven y el resto arranca a cero.
+    /// What we know from a capture and what we do not: the name, the emblem, the level, the
+    /// founding date and who belongs are measured on the 12 captures of Gremio/. The experience,
+    /// the guild kamas, the guildathons and the per-rank permissions appear in the frames but
+    /// their full scale has not been reconstructed; the ones seen are stored and the rest start at zero.
     /// </summary>
     public static class GuildStore
     {
-        /// <summary>Un gremio: lo que lo identifica y lo que el cliente pinta de él.</summary>
+        /// <summary>A guild: what identifies it and what the client draws of it.</summary>
         public sealed class Guild
         {
             public long Id { get; init; }
@@ -27,22 +27,22 @@ namespace Jondo.Unity.Server.Managers
             public long Experience { get; set; }
 
             /// <summary>
-            /// El emblema, los cuatro números del <c>jjg</c> de creación: el símbolo, el índice
-            /// de color del símbolo, el color de fondo (RGB) y el color del símbolo (RGB).
+            /// The emblem, the four numbers of the creation <c>jjg</c>: the symbol, the symbol's
+            /// colour index, the background colour (RGB) and the symbol's colour (RGB).
             /// </summary>
             public int EmblemSymbol { get; init; }
             public int EmblemSymbolColor { get; init; }
             public int EmblemBackground { get; init; }
             public int EmblemSymbolRgb { get; init; }
 
-            /// <summary>La fecha de fundación, en ISO-8601 con Z, tal y como viaja en el <c>jhh</c>.</summary>
+            /// <summary>The founding date, in ISO-8601 with Z, just as it travels in the <c>jhh</c>.</summary>
             public string FoundedUtc { get; init; } = "";
 
-            /// <summary>Los kamas de gremio que quedan por gastar (contribuciones menos compras).</summary>
+            /// <summary>The guild kamas left to spend (contributions minus purchases).</summary>
             public long GuildKamas { get; set; }
         }
 
-        /// <summary>Un miembro: su personaje, su rango, cuándo entró y la nota que le puso el jefe.</summary>
+        /// <summary>A member: his character, his rank, when he joined and the note the leader gave him.</summary>
         public sealed class Member
         {
             public long CharacterId { get; init; }
@@ -51,19 +51,19 @@ namespace Jondo.Unity.Server.Managers
             public long JoinedUtcMs { get; init; }
             public long Experience { get; set; }
 
-            /// <summary>La nota de la columna «Nota» y cuándo se escribió. Medido en el jgz de «hola».</summary>
+            /// <summary>The note in the «Nota» column and when it was written. Measured on the jgz of «hola».</summary>
             public string Note { get; set; } = "";
             public long NoteMs { get; set; }
         }
 
         /// <summary>
-        /// Un rango del gremio, tal como viaja en el jco: nombre, permisos, icono y orden.
+        /// A guild rank, just as it travels in the jco: name, permissions, icon and order.
         /// </summary>
         /// <remarks>
-        /// Los permisos son dos cosas que el cliente manda y el servidor devuelve sin cambiarlas:
-        /// una lista empaquetada de números (el f3.f3) y una marca (el f3.f1, 1 en todos los
-        /// rangos salvo el del jefe y el de los recién llegados). Qué permiso es cada número no se
-        /// ha reconstruido y no hace falta para guardarlos: se devuelven como llegaron.
+        /// The permissions are two things the client sends and the server returns unchanged:
+        /// a packed list of numbers (the f3.f3) and a flag (the f3.f1, 1 in every rank except
+        /// the leader's and the newcomers'). Which permission each number is has not been
+        /// reconstructed, and it is not needed to store them: they are returned as they came.
         /// </remarks>
         public sealed class Rank
         {
@@ -76,13 +76,13 @@ namespace Jondo.Unity.Server.Managers
             public int Order { get; set; }
         }
 
-        /// <summary>Una línea del diario del gremio (jil).</summary>
+        /// <summary>A line of the guild's journal (jil).</summary>
         public sealed class LogEntry
         {
             public long GuildId { get; init; }
             public long WhenMs { get; init; }
 
-            /// <summary>0 la fundación, 1 alguien entra, 2 alguien pasa por algo con f4 = 2 (medido, no entendido).</summary>
+            /// <summary>0 the founding, 1 someone joins, 2 someone goes through something with f4 = 2 (measured, not understood).</summary>
             public int Kind { get; init; }
             public long CharacterId { get; init; }
             public string Name { get; init; } = "";
@@ -92,9 +92,9 @@ namespace Jondo.Unity.Server.Managers
         public const int LogJoined = 1;
 
         /// <summary>
-        /// La ficha pública del gremio, la del anuario: lo que el jefe escribe con el jcc y lo que
-        /// el jci devuelve. Los campos se guardan como llegan; el f1 es cuándo se escribió y el f8
-        /// el nombre del jefe, que pone el servidor.
+        /// The guild's public sheet, the directory's: what the leader writes with the jcc and what
+        /// the jci returns. The fields are stored as they come; f1 is when it was written and f8
+        /// the leader's name, which the server puts in.
         /// </summary>
         public sealed class Profile
         {
@@ -110,10 +110,10 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El nivel máximo de miembros por nivel de gremio. Medido en dos puntos -un gremio de
-        /// nivel 1 dice 50 (jhh f9=50) y uno de nivel 7 dice 410-; entre ellos es una inferencia
-        /// y va dicha como tal. El resto de la curva no está medido, así que fuera de esos dos
-        /// niveles se devuelve el más cercano conocido.
+        /// The maximum number of members per guild level. Measured at two points -- a level 1
+        /// guild says 50 (jhh f9=50) and a level 7 one says 410 --; between them it is an inference
+        /// and is stated as such. The rest of the curve is not measured, so outside those two
+        /// levels the closest known one is returned.
         /// </summary>
         public static int MaxMembers(int level) => level <= 1 ? 50 : level >= 7 ? 410 : 50 + (level - 1) * 60;
 
@@ -206,7 +206,7 @@ namespace Jondo.Unity.Server.Managers
                 );";
             create.ExecuteNonQuery();
 
-            // Las notas de los miembros, en la tabla que ya existía.
+            // The members' notes, in the table that already existed.
             foreach (string column in new[] { "Note TEXT NOT NULL DEFAULT ''", "NoteMs INTEGER NOT NULL DEFAULT 0" })
             {
                 try
@@ -217,7 +217,7 @@ namespace Jondo.Unity.Server.Managers
                 }
                 catch (SqliteException)
                 {
-                    // Ya estaba.
+                    // It was already there.
                 }
             }
         }
@@ -233,7 +233,7 @@ namespace Jondo.Unity.Server.Managers
             return conexion;
         }
 
-        /// <summary>Crea el gremio con su primer miembro -el fundador- de rango 1, y lo devuelve.</summary>
+        /// <summary>Creates the guild with its first member -- the founder -- at rank 1, and returns it.</summary>
         public static Guild Create(long founderCharacterId, string name, int symbol, int symbolColor,
                                    int background, int symbolRgb)
         {
@@ -275,7 +275,7 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
-        /// <summary>El gremio de un personaje, o null si no tiene.</summary>
+        /// <summary>A character's guild, or null if he has none.</summary>
         public static Guild GuildOf(long characterId)
         {
             using var conexion = Open();
@@ -298,7 +298,7 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
-        /// <summary>Un gremio por su nombre, sin distinguir mayúsculas. Null si no hay ninguno así.</summary>
+        /// <summary>A guild by its name, case-insensitive. Null if there is none like that.</summary>
         public static Guild ByName(string name)
         {
             using var conexion = Open();
@@ -320,7 +320,7 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
-        /// <summary>El puesto de un personaje en su gremio, o cero si no está en ninguno.</summary>
+        /// <summary>A character's position in his guild, or zero if he is in none.</summary>
         public static int RankOf(long characterId)
         {
             using var conexion = Open();
@@ -331,7 +331,7 @@ namespace Jondo.Unity.Server.Managers
             return value == null || value is DBNull ? 0 : Convert.ToInt32(value);
         }
 
-        /// <summary>Los miembros de un gremio, por su personaje y su rango.</summary>
+        /// <summary>A guild's members, by their character and their rank.</summary>
         public static List<Member> Members(long guildId)
         {
             using var conexion = Open();
@@ -357,13 +357,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Mete a un personaje en un gremio con el rango que se le dé. El rango 4 es el de los
-        /// que acaban de entrar: es el que lleva en la lista de miembros el que entró por
-        /// candidatura en la captura de crear «Jondo».
+        /// Puts a character into a guild with the rank given. Rank 4 is the one of those who
+        /// have just joined: it is the one carried on the member list by whoever joined by
+        /// application in the capture of creating «Jondo».
         /// </summary>
         public const int RankNewcomer = 4;
 
-        /// <summary>El rango 1 es el del jefe: el que lleva el fundador en el jgw y el jgu de la captura.</summary>
+        /// <summary>Rank 1 is the leader's: the one the founder carries in the capture's jgw and jgu.</summary>
         public const int RankLeader = 1;
 
         public static Member Join(long characterId, long guildId, int rank = RankNewcomer)
@@ -407,7 +407,7 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
-        /// <summary>La nota que el jefe le pone a un miembro (jjj). Devuelve el miembro puesto al día.</summary>
+        /// <summary>The note the leader puts on a member (jjj). Returns the member brought up to date.</summary>
         public static Member SetNote(long characterId, string note, long whenMs)
         {
             using var conexion = Open();
@@ -420,7 +420,7 @@ namespace Jondo.Unity.Server.Managers
             return MemberOf(characterId);
         }
 
-        /// <summary>Cambia el rango de un miembro. Devuelve el miembro puesto al día, o null si no está.</summary>
+        /// <summary>Changes a member's rank. Returns the member brought up to date, or null if he is not there.</summary>
         public static Member SetRank(long characterId, int rank)
         {
             using var conexion = Open();
@@ -433,8 +433,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Las gremichas de un miembro: lo que ha contribuido, en kamas de gremio. Es lo que el
-        /// f7.f2 del jgu enseña -10 tras una contribución, 20 tras dos- y la columna «Gremichas».
+        /// A member's guild coins: what he has contributed, in guild kamas. It is what the jgu's
+        /// f7.f2 shows -- 10 after one contribution, 20 after two -- and the «Gremichas» column.
         /// </summary>
         public static int ContributedBy(long characterId)
         {
@@ -448,9 +448,9 @@ namespace Jondo.Unity.Server.Managers
         // ─── Rangos ─────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Los cuatro rangos con los que nace un gremio, los del jco de la captura de crear
-        /// «Jondo»: nombres por clave de traducción, permisos como llegaron, iconos 116, 115, 114
-        /// y 117, y el orden 0 a 3.
+        /// The four ranks a guild is born with, the ones in the jco of the capture of creating
+        /// «Jondo»: names by translation key, permissions as they came, icons 116, 115, 114
+        /// and 117, and order 0 to 3.
         /// </summary>
         public static List<Rank> DefaultRanks(long guildId)
         {
@@ -468,7 +468,7 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
-        /// <summary>Los rangos de un gremio, en el orden en que se enseñan. Los de siempre si no tiene ninguno guardado.</summary>
+        /// <summary>A guild's ranks, in the order they are shown. The usual ones if it has none stored.</summary>
         public static List<Rank> Ranks(long guildId)
         {
             using var conexion = Open();
@@ -489,7 +489,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (fuera.Count > 0) return fuera;
 
-            // Un gremio de antes de que se guardaran: se le ponen los de siempre.
+            // A guild from before they were stored: it is given the usual ones.
             var defaults = DefaultRanks(guildId);
             foreach (var rank in defaults) SaveRank(conexion, rank);
             return defaults;
@@ -520,9 +520,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Un rango nuevo (jcv): con el nombre y el icono que se le dan, en el orden que se pide,
-        /// y los que estaban de ahí para abajo se corren uno. El id es el siguiente libre y la
-        /// marca va puesta, que es como nació «Rango personalizado» en la captura: f3 { f1: 1 }.
+        /// A new rank (jcv): with the name and icon given, in the order asked for, and the ones
+        /// from there down shift by one. The id is the next free one and the flag is set, which
+        /// is how «Rango personalizado» was born in the capture: f3 { f1: 1 }.
         /// </summary>
         public static Rank CreateRank(long guildId, string name, int icon, int order)
         {
@@ -543,7 +543,7 @@ namespace Jondo.Unity.Server.Managers
             return created;
         }
 
-        // ─── El diario ──────────────────────────────────────────────────────────
+        // ─── The journal ────────────────────────────────────────────────────────
 
         private static void WriteLog(SqliteConnection conexion, long guildId, long whenMs, int kind, long characterId, string name)
         {
@@ -557,7 +557,7 @@ namespace Jondo.Unity.Server.Managers
             insert.ExecuteNonQuery();
         }
 
-        /// <summary>El diario de un gremio, de lo más viejo a lo más nuevo, como lo manda el jil.</summary>
+        /// <summary>A guild's journal, from oldest to newest, as the jil sends it.</summary>
         public static List<LogEntry> LogOf(long guildId)
         {
             using var conexion = Open();
@@ -577,9 +577,9 @@ namespace Jondo.Unity.Server.Managers
             return fuera;
         }
 
-        // ─── La ficha pública ───────────────────────────────────────────────────
+        // ─── The public sheet ───────────────────────────────────────────────────
 
-        /// <summary>La ficha del anuario de un gremio, o null si nadie la ha escrito.</summary>
+        /// <summary>A guild's directory sheet, or null if nobody has written it.</summary>
         public static Profile ProfileOf(long guildId)
         {
             using var conexion = Open();
@@ -621,7 +621,7 @@ namespace Jondo.Unity.Server.Managers
             upsert.ExecuteNonQuery();
         }
 
-        /// <summary>Todos los gremios, para el anuario.</summary>
+        /// <summary>All the guilds, for the directory.</summary>
         public static List<Guild> AllGuilds()
         {
             using var conexion = Open();
@@ -646,7 +646,7 @@ namespace Jondo.Unity.Server.Managers
             return fuera;
         }
 
-        /// <summary>El jefe de un gremio: el de rango 1, o el primero que haya.</summary>
+        /// <summary>A guild's leader: the one at rank 1, or the first there is.</summary>
         public static Member LeaderOf(long guildId)
         {
             Member first = null;
@@ -660,7 +660,7 @@ namespace Jondo.Unity.Server.Managers
 
         // ─── Candidaturas ───────────────────────────────────────────────────────
 
-        /// <summary>Una candidatura: quién la manda, a qué gremio, con qué texto y cuándo.</summary>
+        /// <summary>An application: who sends it, to which guild, with what text and when.</summary>
         public sealed class Application
         {
             public long GuildId { get; init; }
@@ -725,26 +725,26 @@ namespace Jondo.Unity.Server.Managers
             borra.ExecuteNonQuery();
         }
 
-        // ─── Kamas de gremio, contribuciones y tienda ───────────────────────────
+        // ─── Guild kamas, contributions and shop ────────────────────────────────
 
         /// <summary>
-        /// Lo que una contribución mueve: 10.000 kamas del personaje por 10 de gremio, y cinco
-        /// como mucho por semana. Medido en «contribuir en el gremio»: el jle dice 10.000 y los
-        /// kamas de gremio suben de 10 a 20; el contador de las que quedan bajó de 4 a 3, o sea
-        /// que la quinta era la última.
+        /// What a contribution moves: 10,000 of the character's kamas for 10 guild ones, and five
+        /// at most per week. Measured on «contribuir en el gremio»: the jle says 10,000 and the
+        /// guild kamas go up from 10 to 20; the counter of the ones left went down from 4 to 3, so
+        /// the fifth was the last.
         /// </summary>
         public const int ContributionKamas = 10000;
         public const int ContributionGuildKamas = 10;
         public const int ContributionsPerWeek = 5;
 
-        /// <summary>El martes en que empieza la semana, que es cuando el juego reinicia lo semanal.</summary>
+        /// <summary>The Tuesday the week starts on, which is when the game resets the weekly things.</summary>
         public static string WeekOf(DateTimeOffset when)
         {
             int back = ((int)when.UtcDateTime.DayOfWeek - (int)DayOfWeek.Tuesday + 7) % 7;
             return when.UtcDateTime.Date.AddDays(-back).ToString("yyyy-MM-dd");
         }
 
-        /// <summary>Cuántas contribuciones le quedan esta semana a un personaje.</summary>
+        /// <summary>How many contributions a character has left this week.</summary>
         public static int ContributionsLeft(long characterId)
         {
             using var conexion = Open();
@@ -758,8 +758,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Apunta una contribución y le suma al gremio sus kamas. Devuelve cuántas le quedan al
-        /// personaje esta semana, o menos uno si ya no le quedaba ninguna.
+        /// Records a contribution and adds its kamas to the guild. Returns how many the character
+        /// has left this week, or minus one if he had none left.
         /// </summary>
         public static int Contribute(long characterId, long guildId)
         {
@@ -778,7 +778,7 @@ namespace Jondo.Unity.Server.Managers
             return ContributionsLeft(characterId);
         }
 
-        /// <summary>Gasta kamas de gremio. Falso -y no gasta nada- cuando no llegan.</summary>
+        /// <summary>Spends guild kamas. False -- and spends nothing -- when they do not reach.</summary>
         public static bool SpendGuildKamas(long guildId, long amount)
         {
             using var conexion = Open();
@@ -789,7 +789,7 @@ namespace Jondo.Unity.Server.Managers
             return gasta.ExecuteNonQuery() > 0;
         }
 
-        /// <summary>Apunta un oráculo comprado, con el plazo que tienen los miembros para activarlo.</summary>
+        /// <summary>Records a bought oracle, with the deadline the members have to activate it.</summary>
         public static void BuyOracle(long guildId, int oracle, DateTimeOffset deadline)
         {
             using var conexion = Open();
@@ -803,7 +803,7 @@ namespace Jondo.Unity.Server.Managers
             insert.ExecuteNonQuery();
         }
 
-        /// <summary>El plazo de un oráculo comprado, o null si el gremio no lo tiene.</summary>
+        /// <summary>A bought oracle's deadline, or null if the guild does not have it.</summary>
         public static string OracleDeadline(long guildId, int oracle)
         {
             using var conexion = Open();
@@ -814,9 +814,9 @@ namespace Jondo.Unity.Server.Managers
             return query.ExecuteScalar() as string;
         }
 
-        // ─── Las raids compradas ────────────────────────────────────────────────
+        // ─── Bought raids ───────────────────────────────────────────────────────
 
-        /// <summary>Apunta una raid comprada por el gremio, a la espera de lanzarla.</summary>
+        /// <summary>Records a raid bought by the guild, waiting to be launched.</summary>
         public static void BuyRaid(long guildId, int raidId)
         {
             using var conexion = Open();
@@ -840,7 +840,7 @@ namespace Jondo.Unity.Server.Managers
             return query.ExecuteScalar() != null;
         }
 
-        /// <summary>Las raids que el gremio tiene compradas y sin gastar.</summary>
+        /// <summary>The raids the guild has bought and not spent.</summary>
         public static List<int> OwnedRaids(long guildId)
         {
             using var conexion = Open();
@@ -853,7 +853,7 @@ namespace Jondo.Unity.Server.Managers
             return fuera;
         }
 
-        /// <summary>Se gasta al lanzarla: una raid comprada es un uso, no una llave permanente.</summary>
+        /// <summary>It is spent on launching: a bought raid is one use, not a permanent key.</summary>
         public static void DropRaid(long guildId, int raidId)
         {
             using var conexion = Open();
@@ -864,31 +864,31 @@ namespace Jondo.Unity.Server.Managers
             borra.ExecuteNonQuery();
         }
 
-        // ─── La clasificación semanal ───────────────────────────────────────────
+        // ─── The weekly ranking ─────────────────────────────────────────────────
 
-        /// <summary>Una fila de la clasificación: un gremio, su mejor puntuación de la semana.</summary>
+        /// <summary>A row of the ranking: a guild, its best score of the week.</summary>
         public sealed class LadderRow
         {
             public long GuildId;
             public string Name = "";
             public long Score;
 
-            /// <summary>Cuántas raids de ésta ha terminado el gremio esta semana.</summary>
+            /// <summary>How many raids of this one the guild has finished this week.</summary>
             public int Runs;
 
-            /// <summary>El puesto, contando desde uno.</summary>
+            /// <summary>The position, counting from one.</summary>
             public int Place;
         }
 
         /// <summary>
-        /// Apunta lo que ha sacado un gremio en una raid. Se queda con la MEJOR de la semana.
+        /// Records what a guild scored in a raid. It keeps the BEST of the week.
         /// </summary>
         /// <remarks>
-        /// La mejor y no la suma, y es una decisión nuestra que conviene decir: la página del juego
-        /// habla de una clasificación global en la que «los mejores podrán representar con orgullo a
-        /// su gremio», y sumar premiaría al gremio que más veces entra antes que al que mejor lo
-        /// hace. Ningún dato del cliente dice cuál de las dos es. Las veces que ha entrado se
-        /// apuntan igualmente, que es lo que hace falta para cambiar de idea sin perder nada.
+        /// The best and not the sum, and it is a decision of ours worth stating: the game's page
+        /// speaks of a global ranking in which «los mejores podrán representar con orgullo a
+        /// su gremio», and adding up would reward the guild that goes in most often over the one
+        /// that does it best. No client data says which of the two it is. The number of times it
+        /// went in is recorded anyway, which is what is needed to change our mind without losing anything.
         /// </remarks>
         public static long RecordRaidScore(long guildId, int raidId, long score, DateTimeOffset when)
         {
@@ -924,12 +924,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// La clasificación de una raid en una semana, de más a menos.
+        /// A raid's ranking in a week, from most to least.
         /// </summary>
         /// <remarks>
-        /// A igual puntuación manda quien la hizo antes, que es lo que hacen todas las tablas de
-        /// este juego y lo único que deja un orden estable: sin eso, dos gremios empatados se
-        /// intercambiarían el puesto cada vez que se pinta la lista.
+        /// On equal score, whoever did it first wins, which is what every table of this game does
+        /// and the only thing that leaves a stable order: without it, two tied guilds would swap
+        /// places every time the list is drawn.
         /// </remarks>
         public static List<LadderRow> Ladder(int raidId, DateTimeOffset when, int most = 20)
         {
@@ -962,7 +962,7 @@ namespace Jondo.Unity.Server.Managers
             return rows;
         }
 
-        /// <summary>El puesto de un gremio esta semana en una raid, o cero si no está.</summary>
+        /// <summary>A guild's position this week in a raid, or zero if it is not there.</summary>
         public static int PlaceOf(long guildId, int raidId, DateTimeOffset when)
         {
             foreach (var row in Ladder(raidId, when, int.MaxValue))
@@ -973,7 +973,7 @@ namespace Jondo.Unity.Server.Managers
             return 0;
         }
 
-        /// <summary>Saca a un personaje de su gremio. Devuelve el gremio que dejó, o null si no tenía.</summary>
+        /// <summary>Takes a character out of his guild. Returns the guild he left, or null if he had none.</summary>
         public static Guild Leave(long characterId)
         {
             var guild = GuildOf(characterId);

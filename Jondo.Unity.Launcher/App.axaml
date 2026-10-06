@@ -6,9 +6,9 @@
   <Application.Styles>
     <FluentTheme />
 
-    <!-- Los botones del lanzador. Van con degradado vertical, esquina redonda y borde, que es lo
-         que hacia a mano LauncherButton en Windows Forms pintando cada estado. Aqui son estilos:
-         el mismo aspecto sin una sola linea de dibujo. -->
+    <!-- The launcher's buttons. They go with a vertical gradient, rounded corner and border, which is what
+         LauncherButton did by hand in Windows Forms painting each state. Here they are styles:
+         the same look without a single line of drawing. -->
 
     <Style Selector="Button.launcher">
       <Setter Property="Cursor" Value="Hand" />
@@ -27,7 +27,7 @@
       <Setter Property="Background" Value="{TemplateBinding Background}" />
     </Style>
 
-    <!-- Verde: conectar y jugar. -->
+    <!-- Green: connect and play. -->
     <Style Selector="Button.green /template/ ContentPresenter">
       <Setter Property="Background">
         <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
@@ -47,7 +47,7 @@
       <Setter Property="BorderBrush" Value="{DynamicResource GreenBorderBrush}" />
     </Style>
 
-    <!-- Morado: crear cuenta y seleccionar todo. -->
+    <!-- Purple: create an account and select all. -->
     <Style Selector="Button.purple /template/ ContentPresenter">
       <Setter Property="Background">
         <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
@@ -61,7 +61,7 @@
       <Setter Property="BorderBrush" Value="{DynamicResource PurpleBorderBrush}" />
     </Style>
 
-    <!-- Las pestanas de entrar y registrarse. -->
+    <!-- The log in and register tabs. -->
     <Style Selector="Button.tab">
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="CornerRadius" Value="5,5,0,0" />
@@ -76,7 +76,7 @@
       <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
     </Style>
 
-    <!-- Los botoncitos de la barra: musica e idiomas. -->
+    <!-- The bar's little buttons: music and languages. -->
     <Style Selector="Button.chip">
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="4" />
@@ -102,7 +102,7 @@
       <Setter Property="Foreground" Value="White" />
     </Style>
 
-    <!-- La fila de una cuenta del equipo. -->
+    <!-- The row of an account of the team. -->
     <Style Selector="Button.account">
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="4" />
@@ -130,7 +130,7 @@
       <Setter Property="Background" Value="#D237250F" />
     </Style>
 
-    <!-- La fila de la ruta del cliente. -->
+    <!-- The client path row. -->
     <Style Selector="Button.path">
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="4" />
@@ -149,7 +149,7 @@
       <Setter Property="Background" Value="#BE342012" />
     </Style>
 
-    <!-- Las secciones de arriba: jugar, cuentas, ajustes. -->
+    <!-- The sections at the top: play, accounts, settings. -->
     <Style Selector="Button.seccion">
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="CornerRadius" Value="0" />
@@ -177,7 +177,7 @@
       <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
     </Style>
 
-    <!-- Roja: quitar cuentas. Una accion que borra no puede tener el mismo aspecto que las demas. -->
+    <!-- Red: remove accounts. An action that deletes cannot look the same as the others. -->
     <Style Selector="Button.danger">
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="5" />
@@ -195,14 +195,14 @@
       <Setter Property="Background" Value="#5C2A1D" />
     </Style>
 
-    <!-- La linea de explicacion que va debajo de un ajuste. -->
+    <!-- The explanation line that goes under a setting. -->
     <Style Selector="TextBlock.pie">
       <Setter Property="Foreground" Value="{DynamicResource LightBrownTextBrush}" />
       <Setter Property="FontSize" Value="11" />
       <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
-    <!-- Los campos de texto. -->
+    <!-- The text fields. -->
     <Style Selector="TextBox.field">
       <Setter Property="CornerRadius" Value="4" />
       <Setter Property="BorderThickness" Value="1" />
@@ -231,7 +231,7 @@
       <Setter Property="Foreground" Value="{DynamicResource DisabledFieldTextBrush}" />
     </Style>
 
-    <!-- Los rotulos de encima de cada campo. -->
+    <!-- The labels above each field. -->
     <Style Selector="TextBlock.label">
       <Setter Property="Foreground" Value="{DynamicResource SoftGoldBrush}" />
       <Setter Property="FontWeight" Value="Bold" />
@@ -239,7 +239,7 @@
       <Setter Property="Margin" Value="0,0,0,5" />
     </Style>
 
-    <!-- Los enlaces de debajo de la tarjeta. -->
+    <!-- The links under the card. -->
     <Style Selector="Button.link">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />

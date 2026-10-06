@@ -4,28 +4,28 @@ using System.Text;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// global-metadata.dat leído a pelo, sin pasar por LibCpp2IL.
+/// global-metadata.dat read raw, without going through LibCpp2IL.
 ///
-/// Se llega aquí después de tres intentos de preguntárselo a la biblioteca —campos, propiedades,
-/// <c>GetDefaultValue</c>— y de que los tres devolvieran cero sobre 71.190 entradas. Cuando la
-/// respuesta es cero en TODAS, el fallo no está en los datos: está en cómo se pregunta.
+/// One gets here after three attempts at asking the library —fields, properties,
+/// <c>GetDefaultValue</c>— and after all three returned zero over 71,190 entries. When the
+/// answer is zero in ALL, the bug is not in the data: it is in how it is asked.
 ///
-/// Aquí no hay nada que adivinar. Los desplazamientos los da la cabecera, y los tamaños confirman la
-/// estructura sin margen de duda:
+/// Here there is nothing to guess. The offsets are given by the header, and the sizes confirm the
+/// structure without any room for doubt:
 ///
-///   fieldDefaultValues       631.476 / 12 = 52.623  ← justo las entradas que dice la cabecera
-///   parameterDefaultValues   222.804 / 12 = 18.567  ← ídem
+///   fieldDefaultValues       631,476 / 12 = 52,623  ← exactly the entries the header says
+///   parameterDefaultValues   222,804 / 12 = 18,567  ← ditto
 ///
-/// Doce bytes por entrada y tres enteros dentro. Con eso se puede recorrer la tabla a mano.
+/// Twelve bytes per entry and three integers inside. With that the table can be walked by hand.
 /// </summary>
 public static class Raw
 {
-    /// <summary>Una entrada de las tablas de valores por defecto.</summary>
-    /// <param name="Owner">El campo o el parámetro al que pertenece el valor.</param>
-    /// <param name="Data">Dónde está el valor, relativo a la zona de datos.</param>
+    /// <summary>An entry of the default value tables.</summary>
+    /// <param name="Owner">The field or parameter the value belongs to.</param>
+    /// <param name="Data">Where the value is, relative to the data area.</param>
     public readonly record struct Entry(int Owner, int TypeIndex, int Data);
 
-    /// <summary>Lee una tabla de valores por defecto: tres enteros por entrada.</summary>
+    /// <summary>Reads a default value table: three integers per entry.</summary>
     public static List<Entry> Defaults(byte[] file, long offset, long size)
     {
         var entries = new List<Entry>((int)(size / 12));
@@ -40,24 +40,24 @@ public static class Raw
     }
 
     /// <summary>
-    /// El valor guardado en esa posición, si es una cadena.
+    /// The value stored at that position, if it is a string.
     ///
-    /// IL2CPP guarda las cadenas con la longitud delante como entero comprimido: si el primer byte
-    /// es menor que 0x80 la longitud es ese byte y ya está, y si no ocupa dos o cuatro. Los nombres
-    /// del protocolo miden entre 40 y 130 caracteres, así que casi todos caen en el caso de dos
-    /// bytes; se contemplan los tres por no dejar el caso raro fuera.
+    /// IL2CPP stores strings with the length in front as a compressed integer: if the first byte
+    /// is below 0x80 the length is that byte and that is it, and if not it takes two or four. The protocol's
+    /// names measure between 40 and 130 characters, so almost all fall in the two-byte
+    /// case; all three are covered so as not to leave the odd case out.
     /// </summary>
     public static string? Text(byte[] file, long at)
     {
         if (at < 0 || at >= file.Length) return null;
 
-        // La longitud es un int32, no un entero comprimido.
+        // The length is an int32, not a compressed integer.
         //
-        // La primera versión lo leyó como comprimido y las cadenas salían con basura delante:
-        // «\0\0\0</col» en vez de «</color>». Es lo que pasa al tomar por longitud el primer byte
-        // de un int32 pequeño y empezar a leer tres bytes antes de tiempo. Se vio porque forcé la
-        // sonda a enseñar cadenas cualesquiera en vez de sólo las que buscaba; con el filtro puesto
-        // el fallo habría pasado por «aquí no hay nada».
+        // The first version read it as compressed and the strings came out with garbage in front:
+        // «\0\0\0</col» instead of «</color>». It is what happens when taking the first byte
+        // of a small int32 as the length and starting to read three bytes too early. It was seen because I forced the
+        // probe to show any strings instead of only the ones I was looking for; with the filter on
+        // the bug would have passed as «there is nothing here».
         if (at + 4 > file.Length) return null;
         int length = BinaryPrimitives.ReadInt32LittleEndian(file.AsSpan((int)at));
         at += 4;
@@ -66,7 +66,7 @@ public static class Raw
         return Encoding.UTF8.GetString(file, (int)at, length);
     }
 
-    /// <summary>Una cadena de la tabla de nombres, que van terminadas en cero.</summary>
+    /// <summary>A string from the names table, which are zero-terminated.</summary>
     public static string Name(byte[] file, long offset, int index)
     {
         long at = offset + index;
@@ -77,7 +77,7 @@ public static class Raw
         return Encoding.UTF8.GetString(file, (int)at, (int)(end - at));
     }
 
-    /// <summary>El índice de nombre de un campo, de la tabla de campos (tres enteros por entrada).</summary>
+    /// <summary>A field's name index, from the fields table (three integers per entry).</summary>
     public static int FieldNameIndex(byte[] file, long fieldsOffset, int fieldIndex)
     {
         long at = fieldsOffset + (long)fieldIndex * 12;

@@ -20,8 +20,8 @@ namespace Jondo.Unity.Server.Network
         private static CancellationTokenSource? _cts;
 
         /// <summary>
-        /// Las conexiones vivas ahora mismo, una por cliente. Es lo que permite mandarle algo a
-        /// uno concreto o a todos los de un mapa sin pasar el socket de mano en mano.
+        /// The connections alive right now, one per client. It is what allows sending something to
+        /// a specific one or to everyone on a map without passing the socket from hand to hand.
         /// </summary>
         public static readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, GameSession>
             SesionesVivas = new System.Collections.Concurrent.ConcurrentDictionary<Guid, GameSession>();
@@ -73,17 +73,17 @@ namespace Jondo.Unity.Server.Network
                     Console.WriteLine($"[+] Client connected to Game Node! ({client.Client.RemoteEndPoint})");
                     var stream = client.GetStream();
 
-                    // La sesión de ESTA conexión, atada al hilo antes de leer nada.
+                    // The session of THIS connection, bound to the thread before reading anything.
                     //
-                    // Sin esto no funcionaba nada: hay 295 sitios que piden SessionContext.State y
-                    // no había ni un solo Push en todo el proyecto, así que el primero que pedía
-                    // el estado se llevaba una excepción por delante y la conexión se cerraba. Es
-                    // el "No game session is bound to the current async flow" que salía nada más
-                    // elegir personaje.
+                    // Without this nothing worked: there are 295 places asking for SessionContext.State and
+                    // there was not a single Push in the whole project, so the first one asking for
+                    // the state got an exception thrown at it and the connection closed. It is
+                    // the "No game session is bound to the current async flow" that came out right after
+                    // choosing a character.
                     //
-                    // Va aquí y envolviendo el bucle entero porque AsyncLocal se hereda hacia
-                    // dentro: todo lo que se espere desde este punto ve la misma sesión sin que
-                    // haya que pasarla a mano por doscientas firmas.
+                    // It goes here and wrapping the whole loop because AsyncLocal is inherited
+                    // inwards: everything awaited from this point sees the same session without
+                    // having to pass it by hand through two hundred signatures.
                     var sesion = new GameSession(stream);
                     if (!SessionRegistry.Register(sesion))
                     {
@@ -121,9 +121,9 @@ namespace Jondo.Unity.Server.Network
                         try { await TradeHandler.AbandonAsync(sesion); } catch { }
                         try { await ArtisanHandler.LeftAsync(sesion); } catch { }
 
-                        // Guardar al cerrar, que no se hacía en ninguna parte: hasta ahora el
-                        // personaje sólo se escribía cuando algo lo provocaba de paso, así que
-                        // cerrar el cliente sin más perdía la última posición y los kamas.
+                        // Saving on close, which was not done anywhere: until now the
+                        // character was only written when something triggered it in passing, so
+                        // closing the client outright lost the last position and the kamas.
                         if (sesion.State.CharacterId > 0)
                         {
                             try
@@ -239,8 +239,8 @@ namespace Jondo.Unity.Server.Network
                     // handled the same: the client decides which of the two screens it lands on.
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Kqr, BuildKqrPayload(sessionAccountId)));
-                    // Si se sale estando en un combate, hay que devolverlo al mapa de superficie:
-                    // el de arena es de instancia y quedarse ahí es quedarse encerrado.
+                    // If he leaves while in a fight, he has to be returned to the surface map:
+                    // the arena one is an instance and staying there is staying locked in.
                     //
                     // But the fight itself stays, the same as when the socket simply dies: the
                     // character is still in it, the next character list carries the kvd, and he
@@ -279,52 +279,57 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvz)))
                 {
-                    // Crear un personaje. El isAuthenticated es la primera de las dos guardas: la
-                    // segunda está dentro de CreateAsync, que rechaza una cuenta sin resolver. Van
-                    // las dos porque a esta misma rama se llega también desde GameServerProxy.
+                    // Creating a character. isAuthenticated is the first of the two guards: the
+                    // second is inside CreateAsync, which rejects an unresolved account. Both
+                    // go because this same branch is also reached from GameServerProxy.
                     await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Luy)))
                 {
-                    // Aceptar o rechazar la partida de koliseo que se acaba de encontrar. NO es
-                    // apuntarse: su campo 2 es un booleano, no un indice de modalidad.
+                    // Accepting or declining the koliseo match just found. It is NOT
+                    // signing up: its field 2 is a boolean, not a mode index.
                     await KoliseoHandler.AnswerOfferAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lsm)))
                 {
-                    // Lo mismo, pero con un grupo ya formado.
+                    // The same, but with a party already formed.
                     await KoliseoHandler.EnrolPartyAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lte)))
                 {
                     await KoliseoHandler.ReturnAsync(stream, payload);
                 }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lsi)))
+                {
+                    // The Koliseo window's "leave the queue".
+                    await KoliseoHandler.LeaveQueueAsync(stream);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Lux)))
                 {
-                    // El cliente pide las modalidades del koliseo.
+                    // The client asks for the koliseo modes.
                     await KoliseoHandler.SendModesAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hph)))
                 {
-                    // Retar a otro jugador.
+                    // Challenging another player.
                     await ChallengeDuelHandler.OfferAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hpu)))
                 {
-                    // Y su respuesta: con f2 acepta, sin el rechaza.
+                    // And its answer: with f2 it accepts, without it it declines.
                     await ChallengeDuelHandler.AnswerAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kwa)))
                 {
-                    // La papelera. Sin esta respuesta el popup de confirmación no llega a abrirse.
+                    // The bin. Without this answer the confirmation popup never gets to open.
                     await CharacterDeletionHandler.AskAsync(stream, payload, sessionAccountId,
                                                             sessionServerId);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvu)))
                 {
-                    // Borrar un personaje. Las dos guardas de siempre: isAuthenticated aquí y la
-                    // cuenta resuelta dentro, porque el id lo elige el cliente.
+                    // Deleting a character. The usual two guards: isAuthenticated here and the
+                    // resolved account inside, because the client picks the id.
                     await CharacterDeletionHandler.DeleteAsync(stream, payload, sessionAccountId,
                                                                sessionServerId);
                 }
@@ -334,7 +339,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kvk)))
                 {
-                    // El botón del dado: un nombre al azar.
+                    // The dice button: a random name.
                     await CharacterCreationHandler.SuggestNameAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kvw)) || payloadStr.Contains(Op.Uri(Op.Ksl))
@@ -343,9 +348,9 @@ namespace Jondo.Unity.Server.Network
                     // Character selection. We check that it belongs to this session's account:
                     // the client picks the id, so it cannot be trusted.
                     //
-                    // El kvl es el mismo paso pero recién creado el personaje: en la captura de una
-                    // creación que sale bien, el cliente manda kvl justo detrás del kvi y entra al
-                    // mundo sin pasar por la lista.
+                    // The kvl is the same step but right after the character was created: in the capture of a
+                    // creation that goes well, the client sends kvl right after the kvi and enters the
+                    // world without going through the list.
                     if (!CharacterSelectionHandler.HandleCharacterSelectionRequest(payload, sessionAccountId))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -419,29 +424,29 @@ namespace Jondo.Unity.Server.Network
                           || payloadStr.Contains(Op.Uri(Op.Kmv)))
                          && FightHandler.PendingPreparation() != null)
                 {
-                    // En combate, quien está en el mapa no se manda con un jss: son las jxg de la
-                    // preparación, y sólo cuando el cliente las pide. Ese es el orden de la
-                    // captura, y mandarlas antes del cambio de mapa hace que las descarte.
+                    // In a fight, who is on the map is not sent with a jss: it is the preparation's jxg,
+                    // and only when the client asks for them. That is the capture's
+                    // order, and sending them before the map change makes it discard them.
                     //
-                    // Y las pide con kmv, no con jrh. Al cargar un mapa normal el cliente manda los
-                    // dos, así que enganchar el jrh bastaba ahí; pero al entrar en combate manda
-                    // ijm y kmv y nada más, y kmv estaba en la lista de mensajes que se ignoran sin
-                    // decir nada. Por eso el combate salía en el registro del servidor y en pantalla
-                    // no pasaba nada.
+                    // And it asks for them with kmv, not with jrh. On loading a normal map the client sends
+                    // both, so hooking the jrh was enough there; but on entering a fight it sends
+                    // ijm and kmv and nothing else, and kmv was on the list of messages ignored without
+                    // a word. That is why the fight appeared in the server log and on screen
+                    // nothing happened.
                     await FightHandler.SendPreparationAsync(stream, FightHandler.PendingPreparation()!);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.BuildActorsComplete());
                 }
                 else if (payloadStr.Contains("type.ankama.com/jrh"))
                 {
-                    // Peleando, el mapa ya está puesto: mandarle el jss del mapa de superficie lo
-                    // sacaría del combate.
+                    // While fighting, the map is already set: sending it the surface map's jss would
+                    // take it out of the fight.
                     //
-                    // Y esto NO puede ser un continue. La lectura de la trama siguiente está al
-                    // FINAL del cuerpo de este while, así que saltar a la condición se la salta:
-                    // el payload sigue siendo el mismo, se vuelve a entrar por esta misma rama, y
-                    // se vuelve a saltar. Para siempre, sin un solo await por medio, o sea girando
-                    // a plena máquina y sin volver a leer un byte de ese cliente nunca más.
+                    // And this CANNOT be a continue. Reading the next frame is at the
+                    // END of this while's body, so jumping to the condition skips it:
+                    // the payload is still the same, this same branch is entered again, and
+                    // it jumps again. Forever, without a single await in between, that is spinning
+                    // at full speed and never reading another byte from that client again.
                     var here = GameState.IsInFight
                         ? null
                         : DatabaseManager.GetCharacterById(GameState.CharacterId);
@@ -479,8 +484,8 @@ namespace Jondo.Unity.Server.Network
                         // every capture that loads a map lva comes immediately after jss, and
                         // without it the client never counts the map as loaded: two seconds later
                         // it asks again with knm, kno and kny and goes round once more.
-                        // Dentro del merkasako van además los muebles y los permisos, que en la
-                        // captura salen entre el jss y el lva.
+                        // Inside the haven bag the furniture and the permissions also go, which in the
+                        // capture come out between the jss and the lva.
                         if (Managers.Merkasako.IsHavenBag(GameState.MapId))
                         {
                             await MerkasakoHandler.SendFurnitureAsync(stream);
@@ -490,16 +495,16 @@ namespace Jondo.Unity.Server.Network
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                             ConnectionProtocol.BuildActorsComplete());
 
-                        // Y lo que depende de haber llegado aquí: los objetivos que se cumplen
-                        // pisando un mapa o una zona.
+                        // And what depends on having arrived here: the objectives met
+                        // by stepping on a map or a zone.
                         //
-                        // AQUÍ y no en MapLoadHandler, que es donde estaba y no servía. El kkr que
-                        // atiende aquel sólo llega en la carga inicial del mundo; andar de un mapa
-                        // a otro no lo manda, y se ve en el registro: cuatro cambios de mapa
-                        // seguidos —154011397, 154010885, 154010884, 154010883— y ni una llamada a
-                        // las marcas, así que el NPC que sí tenía una misión que dar salía sin la
-                        // exclamación encima. Este bloque, en cambio, es por donde pasan las cinco
-                        // formas de llegar a un mapa, porque el cliente siempre pide los actores.
+                        // HERE and not in MapLoadHandler, which is where it was and it did not work. The kkr
+                        // that one handles only arrives on the world's initial load; walking from one map
+                        // to another does not send it, and it is seen in the log: four map changes
+                        // in a row —154011397, 154010885, 154010884, 154010883— and not one call to
+                        // the marks, so the NPC that did have a quest to give came out without the
+                        // exclamation mark above it. This block, on the other hand, is where the five
+                        // ways of reaching a map go through, because the client always asks for the actors.
                         var mapaInfo = MapManager.GetMapInfo(GameState.MapId);
                         await Managers.Quests.OnMapEnteredAsync(stream, GameState.MapId,
                                                                 mapaInfo?.SubAreaId ?? 0);
@@ -515,15 +520,15 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lqc)))
                 {
-                    // lqc es el cliente diciendo que ya ha digerido el primer bloque. Aquí es donde
-                    // toca darle el mapa.
+                    // lqc is the client saying it has already digested the first block. This is where
+                    // it is time to give it the map.
                     //
-                    // Antes esperábamos al primer kqo, que es el latido y llega cada cinco segundos:
-                    // en el registro del cliente real pasaron 4,8 s entre elegir personaje y recibir
-                    // el mapa. Ese hueco es el destello de Incarnam vacío antes del fundido a negro:
-                    // el cliente ya está en el mundo, no sabe todavía en qué mapa, y mientras tanto
-                    // enseña su escena por defecto, que es la de Incarnam. Por eso sonaba también su
-                    // música en la pantalla de personajes.
+                    // Before, we waited for the first kqo, which is the heartbeat and arrives every five seconds:
+                    // in the real client's log 4.8 s passed between choosing a character and receiving
+                    // the map. That gap is the flash of empty Incarnam before the fade to black:
+                    // the client is already in the world, does not yet know on which map, and meanwhile
+                    // shows its default scene, which is Incarnam's. That is why its
+                    // music also played on the character screen.
                     Console.WriteLine("[Game Node] Client confirmed with lqc.");
                     if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, Op.Lqc)) hasSentMapBlock = true;
                 }
@@ -531,16 +536,16 @@ namespace Jondo.Unity.Server.Network
                 // an earlier version of the protocol and this client never sends them.
                 else if (payloadStr.Contains(Op.Uri(Op.Jrw)))
                 {
-                    // Andar es el mismo mensaje dentro y fuera del combate. Peleando lo resuelve el
-                    // manejador de combate, que además gasta puntos de movimiento; si cayera aquí,
-                    // el personaje se movería por el tablero gratis y sin avisar a nadie.
+                    // Walking is the same message inside and outside a fight. While fighting the
+                    // fight handler resolves it, which also spends movement points; if it fell here,
+                    // the character would move around the board for free and without telling anyone.
                     //
-                    // Va por HandleFightMessageAsync y no directo a WalkAsync: ese es el que coge
-                    // el candado de la sesión. Llamando a WalkAsync a pelo, andar era lo ÚNICO del
-                    // combate que se saltaba el candado, así que podía cruzarse con el reloj de
-                    // turno —que también toca el combate y escribe en el socket— y dejar el estado
-                    // a medias. Y de paso hacía inalcanzable la rama del jrw que ya existía dentro
-                    // del manejador de combate.
+                    // It goes through HandleFightMessageAsync and not straight to WalkAsync: that is the one that takes
+                    // the session's lock. Calling WalkAsync bare, walking was the ONLY thing in the
+                    // fight that skipped the lock, so it could cross with the turn
+                    // clock —which also touches the fight and writes to the socket— and leave the state
+                    // half done. And on top of that it made unreachable the jrw branch that already existed inside
+                    // the fight handler.
                     if (GameState.IsInFight) await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                     else await WorldMoveHandler.ConfirmMovementAsync(stream, payload);
                 }
@@ -585,28 +590,39 @@ namespace Jondo.Unity.Server.Network
                             else if (f.FieldNumber == 3 && f.WireType == 0) channel = (int)f.VarIntValue;
                         }
 
-                        // Los comandos de administración se escriben por aquí, por cualquier canal,
-                        // y NO se publican: si el manejador los reconoce, la línea se queda en el
-                        // servidor y nunca llega a salir por el chat. Vale para todos los canales
-                        // porque lo que decide no es el canal, es el texto.
+                        // Administration commands are written through here, on any channel,
+                        // and they are NOT published: if the handler recognises them, the line stays on the
+                        // server and never goes out through the chat. It holds for all channels
+                        // because what decides is not the channel, it is the text.
                         bool consumed = text.Length > 0 &&
                             await CommandHandler.TryHandleAsync(stream, text, channel, sessionAccountId);
 
-                        if (text.Length > 0 && !consumed)
+                        // A prisoner speaks on the general channel only; private messages come by
+                        // ktb and are not stopped. See Managers.Jail.
+                        bool muted = text.Length > 0 && !consumed
+                                     && !Managers.Jail.MaySpeakOn(SessionContext.State.CharacterId, channel);
+                        if (muted)
+                        {
+                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(
+                                    Handlers.CommandTexts.Get("jail.channel"))));
+                        }
+
+                        if (text.Length > 0 && !consumed && !muted)
                         {
                             byte[] linea = ConnectionProtocol.Push(Op.Kti,
                                 ConnectionProtocol.BuildChatLine(GameState.CharacterName,
                                     GameState.CharacterId, sessionAccountId, text, channel));
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, linea);
 
-                            // Y a los demás. Aquí se acababa: la línea volvía a quien la escribía y
-                            // nadie más la veía nunca, que con un solo jugador no se notaba.
+                            // And to the others. It ended here: the line went back to whoever wrote it and
+                            // nobody else ever saw it, which with a single player was not noticed.
                             //
-                            // El canal general es el del MAPA, no el del servidor: lo oye quien
-                            // está delante. La línea es la misma para todos —lleva dentro el
-                            // nombre y el id de quien habla—, así que se reparte tal cual. Los
-                            // demás canales (comercio, reclutamiento) son de servidor entero y
-                            // todavía no se reparten.
+                            // The general channel is the MAP's, not the server's: whoever is
+                            // present hears it. The line is the same for everyone —it carries inside the
+                            // name and id of whoever speaks—, so it is handed out as is. The
+                            // other channels (trade, recruitment) are server-wide and
+                            // are not handed out yet.
                             int oidos = channel == 0
                                 ? await SessionRegistry.BroadcastToMapAsync(
                                       SessionContext.State.MapId, linea, SessionContext.Current.Id)
@@ -616,8 +632,8 @@ namespace Jondo.Unity.Server.Network
                         }
                     }
                 }
-                // Los grupos. Se invita por nombre y se acepta por id de grupo, asi que cada uno
-                // tiene su mensaje; ver Handlers.PartyHandler.
+                // Parties. One invites by name and accepts by party id, so each one
+                // has its message; see Handlers.PartyHandler.
                 else if (payloadStr.Contains(Op.Uri(Op.Ime)))
                 {
                     await Handlers.PartyHandler.InviteAsync(stream, payload);
@@ -662,30 +678,58 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jho)))
                 {
-                    // Abandonar el gremio.
+                    // Leaving the guild.
                     await Handlers.GuildHandler.LeaveAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlx)))
                 {
-                    // La pestaña de candidaturas. Va delante del jml al abrir la ventana.
+                    // The applications tab. It goes before the jml on opening the window.
                     await Handlers.GuildHandler.ApplicationsAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jml)))
                 {
-                    // Abrir la ventana de gremio: pedir rangos, miembros y cabecera.
-                    await Handlers.GuildHandler.OpenWindowAsync(stream, payload);
+                    // The guild window's members.
+                    await Handlers.GuildHandler.MembersAsync(stream, payload);
+                }
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlk)))
+                {
+                    // The guild window opens: the chest's tabs and the header. The window used to
+                    // come out black when the client sent jlk and jii and waited: it was waiting
+                    // for these, and for the jfp's jff as an answer.
+                    await Handlers.GuildHandler.OpenWindowAsync(stream);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jii)))
                 {
-                    // La pestaña de la ventana. Se contesta con lo mismo que al jml, porque el
-                    // cliente NO siempre manda el jml: tras volver a entrar con un gremio ya hecho
-                    // mandaba jlk y jii y se quedaba esperando, y la ventana salía negra. Con
-                    // esto la ventana tiene su cabecera y sus miembros venga o no el jml.
-                    await Handlers.GuildHandler.OpenWindowAsync(stream, payload);
+                    // A tab of the guild window: the real server never answers it (26 of 28
+                    // captured, the other two answered by their neighbours). It was answered with
+                    // the guild again, jgw first, and every tab printed "acabas de unirte".
+                }
+                // The guild window's tabs whose contents this server does not keep, answered empty
+                // as the captures of a new guild answer them (see Op.Jfv to Op.Hxm).
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfv)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jfs, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jeu)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jei, 3);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jga)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jfz, 1);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jgr)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jgq, 1);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jet)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jdb, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfw)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jfr, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hzc)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Ice, 1);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hvx)))
+                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Hxm, 0);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jew)))
+                {
+                    // When the week starts again: asked at world entry too.
+                    await Handlers.GuildHandler.WeeklyResetAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jiy)))
                 {
-                    // La ficha del anuario o las contribuciones que quedan, según la pestaña.
+                    // The directory sheet or the contributions left, depending on the tab.
                     await Handlers.GuildHandler.TabAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfp)))
@@ -726,27 +770,27 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlt)))
                 {
-                    // Ver una candidatura.
+                    // Viewing an application.
                     await Handlers.GuildHandler.ApplicationDetailAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jjn)))
                 {
-                    // Aceptar una candidatura.
+                    // Accepting an application.
                     await Handlers.GuildHandler.AcceptApplicationAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jiz)))
                 {
-                    // Contestar a una invitación de gremio.
+                    // Answering a guild invitation.
                     await Handlers.GuildHandler.AnswerInvitationAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jki)))
                 {
-                    // Abrir la tienda del gremio.
+                    // Opening the guild shop.
                     await Handlers.GuildHandler.OpenShopAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jkw)))
                 {
-                    // Comprar un oráculo.
+                    // Buying an oracle.
                     await Handlers.GuildHandler.BuyOracleAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jky)))
@@ -756,17 +800,17 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlb)))
                 {
-                    // Contribuir al gremio.
+                    // Contributing to the guild.
                     await Handlers.GuildHandler.ContributeAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyc)))
                 {
-                    // El boton de Suenos Infinitos del menu, y la tecla T: al Plano Astral.
+                    // The menu's Infinite Dreams button, and the T key: to the Astral Plane.
                     await DreamHandler.ToAstralPlaneAsync(stream);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixf)))
                 {
-                    // Empezar un sueno, o descartar el que hubiera.
+                    // Starting a dream, or discarding the one there was.
                     await DreamHandler.StartOrDiscardAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iym)))
@@ -786,18 +830,18 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Izh)))
                 {
-                    // La tormenta astral.
+                    // The astral storm.
                     await DreamHandler.AstralStormAsync(stream);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyx)))
                 {
-                    // Salir del sueno.
+                    // Leaving the dream.
                     await DreamHandler.LeaveAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Iwo)))
                 {
-                    // Todos los elementos pasan por el mismo registro; él decide qué acción hay
-                    // detrás sin mezclar datos entre mapas ni entre sockets.
+                    // All the elements go through the same registry; it decides which action is
+                    // behind without mixing data between maps or between sockets.
                     await InteractiveActionHandler.UseAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Izv)))
@@ -832,36 +876,36 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jbn)))
                 {
-                    // El botón del merkasako, y la tecla H.
+                    // The haven bag button, and the H key.
                     hasSentMapBlock = true;
                     await MerkasakoHandler.EnterFromOutsideAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jbl)))
                 {
-                    // Cambiarse de decorado dentro del merkasako.
+                    // Switching theme inside the haven bag.
                     hasSentMapBlock = true;
                     await MerkasakoHandler.ChangeThemeAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/jbv"))
                 {
-                    // Abrir el menú de gestión, para colocar muebles.
+                    // Opening the management menu, to place furniture.
                     await MerkasakoHandler.OpenEditorAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jbg)))
                 {
-                    // Un trozo de la habitación. Se junta y se guarda al cerrar el menú.
+                    // A piece of the room. It is gathered and stored on closing the menu.
                     MerkasakoHandler.CollectFurniture(payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/jbk")
                          || payloadStr.Contains("type.ankama.com/jav")
                          || payloadStr.Contains("type.ankama.com/jaw"))
                 {
-                    // Cerrar el menú de gestión. Los tres llegan seguidos al aceptar.
+                    // Closing the management menu. All three arrive in a row on accepting.
                     await MerkasakoHandler.CloseEditorAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kcr)))
                 {
-                    // Mover un objeto entre la bolsa y el cofre. The same kcr lays a stack on a
+                    // Moving an item between the bag and the chest. The same kcr lays a stack on a
                     // commission's offer, on a workshop's bench, or on a magus table.
                     // And in a marketplace open to sell, it takes a lot back off sale.
                     // And a house chest, a bin or the guild chest.
@@ -991,17 +1035,17 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains("type.ankama.com/lyk"))
                 {
-                    // Abrir la ventana de apariencias.
+                    // Opening the appearance window.
                     await AppearanceHandler.OpenAsync(stream, sessionAccountId);
                 }
                 else if (payloadStr.Contains("type.ankama.com/lyy"))
                 {
-                    // El estado de esa ventana.
+                    // That window's state.
                     await AppearanceHandler.SendStateAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lys)))
                 {
-                    // Ponerse una prenda; el hueco lo resuelve el servidor.
+                    // Putting on a garment; the server resolves the slot.
                     await AppearanceHandler.WearAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lyf)))
@@ -1011,17 +1055,17 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lxg)))
                 {
-                    // Enseñar u ocultar una prenda.
+                    // Showing or hiding a garment.
                     await AppearanceHandler.ToggleAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lxw)))
                 {
-                    // El aura.
+                    // The aura.
                     await AppearanceHandler.AuraAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lze)))
                 {
-                    // Elegir título en la ventana de apariencia. Solo toca el borrador.
+                    // Choosing a title in the appearance window. It only touches the draft.
                     await WardrobeHandler.ChooseTitleAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lwm)))
@@ -1031,7 +1075,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lxs)))
                 {
-                    // El botón Guardar de esa ventana.
+                    // That window's Save button.
                     await WardrobeHandler.SaveAsync(stream, payload, sessionAccountId);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Iuw)))
@@ -1041,23 +1085,23 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
-                    // El botón de cerrar del diálogo. Va vacío y espera respuesta: khd si lo que
-                    // está abierto es el cofre o la tienda de un NPC, kld si es la lista del zaap.
+                    // The dialogue's close button. It goes empty and expects an answer: khd if what
+                    // is open is the chest or an NPC's shop, kld if it is the zaap list.
                     //
-                    // El cliente manda el kla DOS veces seguidas al cerrar una tienda, con menos de
-                    // un milisegundo entre medias, y el servidor real contesta un solo khd. Como el
-                    // primero ya deja la tienda cerrada, el segundo cae en el zaap y se va con un
-                    // kld que el cliente ignora, igual que hoy.
+                    // The client sends the kla TWICE in a row on closing a shop, with less than
+                    // a millisecond in between, and the real server answers a single khd. Since the
+                    // first already leaves the shop closed, the second falls into the zaap and goes off with a
+                    // kld the client ignores, the same as today.
                     //
-                    // Y LA CONVERSACIÓN, que faltaba aquí. Había una segunda rama para el kla más
-                    // abajo, con NpcHandler.CloseAsync, y no se alcanzaba nunca: ésta la atrapa
-                    // primero y se iba por el zaap, que manda el kld con la razón 10. La de cerrar
-                    // una conversación es la 1 —98 de los kld capturados la llevan— y con la 10 el
-                    // cliente deja la ventana puesta. Por eso la equis no cerraba nunca.
+                    // And THE CONVERSATION, which was missing here. There was a second branch for the kla further
+                    // down, with NpcHandler.CloseAsync, and it was never reached: this one catches it
+                    // first and it went off through the zaap, which sends the kld with reason 10. The one for closing
+                    // a conversation is 1 —98 of the captured kld carry it— and with 10 the
+                    // client leaves the window up. That is why the cross never closed.
                     //
-                    // Va DELANTE del zaap porque el zaap es el caso por defecto y no tiene guarda
-                    // propia: con la conversación abierta, cualquier orden que deje el zaap antes
-                    // se queda con la X que era del diálogo.
+                    // It goes BEFORE the zaap because the zaap is the default case and has no guard
+                    // of its own: with the conversation open, any order that puts the zaap first
+                    // takes the X that belonged to the dialogue.
                     if (await CommissionHandler.CloseAsync()) { }
                     else if (await TradeHandler.CloseAsync()) { }
                     else if (MarketplaceHandler.IsOpen) await MarketplaceHandler.CloseAsync();
@@ -1072,23 +1116,23 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Hjc)))
                 {
-                    // Ha elegido destino en la lista del zaap.
-                    hasSentMapBlock = true;   // el bloque del mapa es de entrar al mundo, no de esto
+                    // He has chosen a destination in the zaap list.
+                    hasSentMapBlock = true;   // the map block belongs to entering the world, not to this
                     await ZaapTravelHandler.TravelAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hmt)))
                 {
-                    // Cambiar un hechizo por su variante. Antes caía en la lista de mensajes que
-                    // se ignoran en silencio, que es por lo que elegir una variante no hacía nada.
+                    // Swapping a spell for its variant. Before, it fell into the list of messages that
+                    // are silently ignored, which is why choosing a variant did nothing.
                     await SpellHandler.HandleVariantAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Itz)))
                 {
                     // Editing a slot of the shortcut bar. The server answers with the very same
-                    // entry it was given, y además se apunta dónde quedó: si no, la barra se
-                    // rehace igual en cada sesión y lo que el jugador coloque se pierde al salir.
+                    // entry it was given, and it also records where it ended up: otherwise, the bar is
+                    // rebuilt the same every session and whatever the player places is lost on leaving.
                     //
-                    //   itz: f2 { f2: hueco, f6 { f2: hechizo } }, f3: qué barra
+                    //   itz: f2 { f2: slot, f6 { f2: spell } }, f3: which bar
                     byte[]? itz = ConnectionProtocol.ReadPayload(payload, Op.Itz);
                     if (itz != null)
                     {
@@ -1108,9 +1152,9 @@ namespace Jondo.Unity.Server.Network
                     // goes out on the first kqo of the entry and the heartbeat gets its own answer
                     // from then on. The block already opens with a kqy of its own, which is why the
                     // first one is not answered twice.
-                    // El lqc suele haberlo mandado ya, así que esto no hace nada; sigue aquí porque
-                    // no todo lo que se conecta manda lqc —el cliente de pruebas, sin ir más lejos—
-                    // y sin mapa no hay mundo.
+                    // The lqc has usually sent it already, so this does nothing; it stays here because
+                    // not everything that connects sends lqc —the test client, for one—
+                    // and without a map there is no world.
                     if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, "primer kqo"))
                     {
                         hasSentMapBlock = true;
@@ -1276,40 +1320,40 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Iov)))
                 {
-                    // Ha clicado un NPC: según la acción, se le abre la tienda o el diálogo. With
+                    // He has clicked an NPC: depending on the action, the shop or the dialogue opens for him. With
                     // a marketplace open and no NPC, it is its buy or sell button.
                     if (!await MarketplaceHandler.ModeAsync(payload))
                         await NpcHandler.InteractAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Ioy)))
                 {
-                    // Ha elegido una respuesta del diálogo.
+                    // He has chosen a reply in the dialogue.
                     await NpcHandler.ReplyAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kea)))
                 {
-                    // Comprarle algo al NPC que tiene la tienda abierta.
+                    // Buying something from the NPC with the shop open.
                     await NpcHandler.BuyAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Ieo)))
                 {
-                    // ¿Por qué paso va esta misión? Se contesta con el idu.
+                    // Which step is this quest on? It is answered with the idu.
                     await QuestHandler.StepAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Idw)))
                 {
-                    // El cliente da un objetivo por cumplido. Es él quien lo sabe: los de texto
-                    // libre piden pulsar algo de la interfaz y de eso aquí no se ve nada.
+                    // The client considers an objective met. It is the one who knows: the free-text
+                    // ones ask for pressing something in the interface and nothing of that is seen here.
                     await QuestHandler.ObjectiveAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Iec)))
                 {
-                    // Pregunta por una misión suya, justo después de cogerla.
+                    // He asks about one of his quests, right after taking it.
                     await QuestHandler.DetailAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Mga)))
                 {
-                    // Ha pulsado el botón de cobrar un logro. El -1 es «todos los que me debas».
+                    // He has pressed the button to claim an achievement. -1 is «all the ones you owe me».
                     await AchievementHandler.ClaimAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Mfe)))
@@ -1349,8 +1393,8 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Hqa)))
                 {
-                    // Atacar a un grupo de monstruos. Es lo que manda el cliente de verdad al
-                    // lanzar un combate: lleva el id contextual del grupo.
+                    // Attacking a monster group. It is what the real client sends on
+                    // starting a fight: it carries the group's contextual id.
                     await FightHandler.AttackAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kay)))
@@ -1375,15 +1419,15 @@ namespace Jondo.Unity.Server.Network
                          || payloadStr.Contains(Op.Uri(Op.Kwv)) || payloadStr.Contains(Op.Uri(Op.Kwi))
                          || payloadStr.Contains(Op.Uri(Op.Kwo)) || payloadStr.Contains(Op.Uri(Op.Kxb)))
                 {
-                    // Colocarse, declararse listo, las opciones del combate y los RETOS. Los demás
-                    // que había aquí —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— o no existen en la
-                    // 3.6.10.10 o los manda el servidor, no el cliente.
+                    // Placing, declaring ready, the fight options and the CHALLENGES. The others
+                    // that were here —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— either do not exist in
+                    // 3.6.10.10 or are sent by the server, not the client.
                     //
-                    // Los seis de retos estaban atendidos dentro del manejador de combate pero no
-                    // aquí, así que no llegaban: esta puerta es una lista cerrada. El sintoma era
-                    // que el boton de aceptar el reto no hacia nada y que al empezar el combate
-                    // salia un reto distinto de los dos ofrecidos, porque el kwv de elegir se
-                    // perdia por el camino y el servidor acababa rellenando el hueco el solo.
+                    // The six challenge ones were handled inside the fight handler but not
+                    // here, so they did not arrive: this door is a closed list. The symptom was
+                    // that the accept-challenge button did nothing and that on starting the fight
+                    // a challenge different from the two offered came out, because the choosing kwv
+                    // got lost on the way and the server ended up filling the gap on its own.
                     await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
@@ -1422,11 +1466,11 @@ namespace Jondo.Unity.Server.Network
                         // client saying which spell the pointer is on.
                         cleanPayload.Contains(Op.Kmv) || cleanPayload.Contains(Op.Hnn))
                     {
-                        // Silenciado, pero no perdido. La lista de arriba son diecisiete opcodes
-                        // escritos a mano hace tiempo para que la consola no se inundara, y no hay
-                        // ninguna medida detras de que ninguno de ellos necesite respuesta: lo que
-                        // hay es que un dia molestaban. Apuntarlos aparte permite volver a mirarlos
-                        // sin volver a llenar la pantalla.
+                        // Silenced, but not lost. The list above is seventeen opcodes
+                        // written by hand a while ago so that the console would not flood, and there is
+                        // no measurement behind none of them needing an answer: what there
+                        // is is that one day they were a nuisance. Recording them apart allows looking at them again
+                        // without filling the screen again.
                         UnknownPackets.RecordFrame(payload, UnknownPackets.Kind.Silenced);
                     }
                     else
@@ -1510,10 +1554,10 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Manda el bloque del mapa, una sola vez por entrada al mundo.
+        /// Sends the map block, only once per entry into the world.
         ///
-        /// El bloque lleva un jru, y jru quiere decir "carga este mapa": mandarlo dos veces hace
-        /// que el cliente recargue el mundo una y otra vez. Devuelve si lo ha mandado.
+        /// The block carries a jru, and jru means "load this map": sending it twice makes
+        /// the client reload the world again and again. Returns whether it sent it.
         /// </summary>
         private static async Task<bool> SendMapBlockOnceAsync(NetworkStream stream, bool alreadySent,
                                                               string reason)
@@ -1523,21 +1567,21 @@ namespace Jondo.Unity.Server.Network
             var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (character == null) return false;
 
-            // El personaje y el mapa van en la traza a proposito: cuando dos clientes entran a la
-            // vez, es lo primero que hay que mirar para saber si se han cruzado.
+            // The character and the map go in the trace on purpose: when two clients enter at
+            // once, it is the first thing to look at to know whether they have crossed.
             Console.WriteLine($"[Game Node] Sending the map block ({reason}): " +
                               $"{GameState.CharacterName} en el mapa {GameState.MapId}.");
             await WorldEntry.SendMapAsync(stream, character, GameState.MapId,
                                           GameState.IsInFight ? FightHandler.FightOf(GameState.CharacterId) : null);
 
-            // Y lo que uno tiene de adorno, que el servidor real manda una sola vez, aquí: los
-            // títulos y ornamentos disponibles, y cuál lleva puesto.
+            // And what one has as adornment, which the real server sends only once, here: the
+            // available titles and ornaments, and which one is worn.
             await WardrobeHandler.SendOwnedAsync(stream, SessionContext.Current.AccountId);
 
             // The account's houses (jaa): the capture's no longer travels, this one is ours.
             await HouseHandler.SendAccountHousesAsync(stream);
 
-            // Y su diario de misiones, por lo mismo: el de la captura ya no viaja.
+            // And his quest journal, for the same reason: the capture's no longer travels.
             await Managers.Quests.SendJournalAsync(stream);
 
             // And their emotes and achievements, for the same reason: the replayed block carried
@@ -1545,15 +1589,15 @@ namespace Jondo.Unity.Server.Network
             await Managers.Emotes.SendListAsync(stream);
             await Managers.Achievements.SendListAsync(stream);
 
-            // Y la marca verde sobre quien tenga algo que ofrecer en este mapa.
+            // And the green mark over whoever has something to offer on this map.
             await Managers.Quests.SendMarksAsync(stream, GameState.MapId);
             return true;
         }
 
         /// <summary>
-        /// Dice si un mensaje que no sabemos manejar lleva dentro el id de un hechizo que hace
-        /// pareja con otro. El cambio de variante tiene que ser uno de estos, y así se identifica
-        /// el mensaje la primera vez que alguien cambia una variante en vez de adivinarlo.
+        /// Says whether a message we do not know how to handle carries inside the id of a spell that is
+        /// paired with another. The variant swap has to be one of these, and that way the
+        /// message is identified the first time someone swaps a variant instead of guessing it.
         /// </summary>
         private static void ReportSpellIds(byte[] payload)
         {
@@ -1574,7 +1618,7 @@ namespace Jondo.Unity.Server.Network
             Console.ResetColor();
         }
 
-        /// <summary>Todos los números del mensaje, entrando en los submensajes que lo parezcan.</summary>
+        /// <summary>All the message's numbers, going into the submessages that look like ones.</summary>
         private static IEnumerable<long> AllVarInts(byte[] message, int depth = 0)
         {
             if (depth > 6) yield break;
@@ -1594,14 +1638,14 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Apunta el hueco de la barra que el cliente acaba de mover.
+        /// Records the bar slot the client has just moved.
         ///
-        ///   itz: f2 { f2: hueco, f6 { f2: hechizo } }, f3: qué barra
+        ///   itz: f2 { f2: slot, f6 { f2: spell } }, f3: which bar
         ///
-        /// Leído de una captura real de arrastrar tres hechizos del panel a la barra: el cliente
-        /// manda un itz por cada uno y el servidor devuelve el mismo contenido en un ivk. El hueco
-        /// cero no viaja, como todo cero en proto3, y una entrada sin f6 es un hueco que se vacía.
-        /// Guardarlo es lo que hace que la barra siga igual en la siguiente sesión.
+        /// Read from a real capture of dragging three spells from the panel to the bar: the client
+        /// sends one itz for each and the server returns the same content in an ivk. Slot
+        /// zero does not travel, like every zero in proto3, and an entry without f6 is a slot being emptied.
+        /// Storing it is what keeps the bar the same in the next session.
         /// </summary>
         private static void RememberShortcut(byte[] itz)
         {
@@ -1674,23 +1718,23 @@ namespace Jondo.Unity.Server.Network
         /// Reply to the "go back" request: a session id and a one.
         /// </summary>
         /// <remarks>
-        /// EL ID SE REGISTRA ANTES DE MANDARLO, y esto era lo que dejaba colgado «Cambiar de
-        /// servidor».
+        /// THE ID IS REGISTERED BEFORE SENDING IT, and this was what left «Cambiar de
+        /// servidor» hanging.
         ///
-        /// La forma estaba bien: el servidor real manda aquí un GUID CON GUIONES, 36 caracteres
-        /// —«desde world a eleccion servidor.pcapng» abre con
-        /// <c>kqr (40) 0a24 b00dae9b-e88d-4b5c-9110-e54f3ffaeb40 2001</c>— y nosotros mandábamos
-        /// uno igual. Lo que faltaba es que el nuestro no lo conocía nadie después.
+        /// The shape was right: the real server sends here a GUID WITH HYPHENS, 36 characters
+        /// —«desde world a eleccion servidor.pcapng» opens with
+        /// <c>kqr (40) 0a24 b00dae9b-e88d-4b5c-9110-e54f3ffaeb40 2001</c>— and we sent
+        /// one just like it. What was missing is that nobody knew ours afterwards.
         ///
-        /// Lo que hace el cliente con él está medido en el registro del jugador: cierra la
-        /// conexión, abre otra, y presenta ESE MISMO id como su identidad. El último que mandamos
-        /// fue b52b…16eb y es exactamente el que llegó de vuelta y rechazamos, con
-        /// «The presented token does not match any account». Todos los tokens que este servidor
-        /// acuñaba eran de 32 caracteres —Guid "N" o dieciséis bytes en hexadecimal— así que un
-        /// id de 36 no podía coincidir con ninguno por definición.
+        /// What the client does with it is measured in the player's log: it closes the
+        /// connection, opens another, and presents THAT SAME id as its identity. The last one we sent
+        /// was b52b…16eb and it is exactly the one that came back and we rejected, with
+        /// «The presented token does not match any account». All the tokens this server
+        /// minted were 32 characters —Guid "N" or sixteen bytes in hexadecimal— so an
+        /// id of 36 could not match any of them by definition.
         ///
-        /// Registrarlo no abre nada: lo acuña el servidor, va por el socket ya autenticado de esa
-        /// cuenta, y vale para lo mismo que el token de juego que ya se reparte.
+        /// Registering it opens nothing: the server mints it, it goes through that account's
+        /// already authenticated socket, and it is good for the same as the game token already handed out.
         /// </remarks>
         private static byte[] BuildKqrPayload(long accountId)
         {
@@ -1714,14 +1758,14 @@ namespace Jondo.Unity.Server.Network
                 .Build();
         }
 
-        // Aquí vivía PatchJpvEnteringPacket, que abría el jpv que salía hacia el cliente, buscaba
-        // en él tres ids de personaje de las capturas con las que se arrancó el emulador, escritos
-        // a mano, y los cambiaba por el del jugador. Uno de los tres es de los que el guardia de
-        // RegressionGuardTests tiene prohibidos, así que ni se repiten aquí.
+        // Here lived PatchJpvEnteringPacket, which opened the jpv going out to the client, looked
+        // in it for three character ids from the captures the emulator was started with, written
+        // by hand, and swapped them for the player's. One of the three is among those the
+        // RegressionGuardTests guard forbids, so they are not even repeated here.
         //
-        // No lo llamaba nadie: el jpv hace tiempo que se construye en MapLoadHandler con el id
-        // bueno desde el principio, así que no había nada que parchear. Fuera, junto con los tres
-        // números.
+        // Nobody called it: the jpv has long been built in MapLoadHandler with the right id
+        // from the start, so there was nothing to patch. Out, together with the three
+        // numbers.
 
         private static byte[] PatchJohPacket(byte[] packetPayload, long mapId)
         {

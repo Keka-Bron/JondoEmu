@@ -6,13 +6,13 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Lo que se pone en el suelo: glifos, trampas y runas.
+    /// What is laid on the ground: glyphs, traps and runes.
     /// </summary>
     /// <remarks>
-    /// Las cuatro familias del catálogo —1091 el glifo de aura con 316 hechizos, 401 el de inicio
-    /// de turno con 142, 400 la trampa con 100 y 2022 la runa con 65— tienen la misma forma
-    /// medida y sólo se distinguen en cuándo se disparan. Por eso hay un solo tipo con un enum y
-    /// no cuatro clases con el mismo cuerpo.
+    /// The catalogue's four families —1091 the aura glyph with 316 spells, 401 the turn-start
+    /// one with 142, 400 the trap with 100 and 2022 the rune with 65— have the same
+    /// measured shape and differ only in when they fire. That is why there is a single type with an enum and
+    /// not four classes with the same body.
     /// </remarks>
     public class GlyphTests
     {
@@ -71,7 +71,7 @@ namespace Jondo.Unity.Tests.Combat
             var corto = combate.Poner(Poner(Disparo.AlEmpezarElTurno, caduca: 2, casillas: 20));
             var gastada = combate.Poner(Poner(Disparo.AlPisar, 0, 30));
 
-            // Cada uno el suyo: dos con el mismo número serían uno solo para el cliente.
+            // Each its own: two with the same number would be a single one for the client.
             Assert.Equal(3, new[] { permanente.Id, corto.Id, gastada.Id }.Distinct().Count());
             Assert.Equal(3, combate.Glifos.Count);
 
@@ -81,7 +81,7 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Contains(gastada, caidos);
             Assert.Equal(2, combate.Glifos.Count);
 
-            // El de duración -1 llegó como cero y no se cae; el de dos rondas sí, cuando toque.
+            // The one with duration -1 arrived as zero and does not drop; the two-round one does, when its time comes.
             Assert.Equal(0, permanente.CaducaEnRonda);
             Assert.Contains(permanente, combate.Glifos);
         }
@@ -93,7 +93,7 @@ namespace Jondo.Unity.Tests.Combat
             combate.Poner(Poner(Disparo.AlPisar, 0, 100, 101, 102));
             combate.Poner(Poner(Disparo.AlEmpezarElTurno, 0, 101));
 
-            // Pisar la 101 dispara la trampa, no el de inicio de turno.
+            // Stepping on 101 fires the trap, not the turn-start one.
             Assert.Single(combate.LosQuePisa(101));
             Assert.Single(combate.LosQueEmpiezan(101));
             Assert.Empty(combate.LosQuePisa(500));

@@ -1,15 +1,15 @@
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// Los rótulos que ha traído la interfaz nueva, en los tres idiomas.
+    /// The labels the new interface brought, in the three languages.
     /// </summary>
     /// <remarks>
-    /// Van aparte de <see cref="LauncherTexts"/> a propósito: aquel catálogo lo comparten el
-    /// lanzador y el servidor, y meterle textos que sólo usa una pantalla del lanzador lo
-    /// engordaría para nadie. El día que alguno haga falta en los dos sitios, se muda.
+    /// They go apart from <see cref="LauncherTexts"/> on purpose: that catalogue is shared by the
+    /// launcher and the server, and putting texts in it that only one launcher screen uses would
+    /// fatten it for nobody. The day one of them is needed in both places, it moves.
     ///
-    /// Sin diccionarios ni ficheros: son doce cadenas por idioma y un <c>switch</c> se lee de un
-    /// vistazo y no puede quedarse a medias en un idioma sin que el compilador lo diga.
+    /// No dictionaries nor files: it is twelve strings per language and a <c>switch</c> reads at a
+    /// glance and cannot be left half done in one language without the compiler saying so.
     /// </remarks>
     internal static class Textos
     {
@@ -62,7 +62,7 @@ namespace Jondo.Unity.Launcher.UI
             _ => "Cuentas guardadas",
         };
 
-        /// <summary>Que el idioma manda también sobre el juego, que es lo que no se adivina.</summary>
+        /// <summary>That the language also rules over the game, which is what one does not guess.</summary>
         public static string PieIdioma(Language i) => i switch
         {
             Language.En => "The game starts in this language too.",
@@ -84,7 +84,7 @@ namespace Jondo.Unity.Launcher.UI
             _ => "Quita las cuentas marcadas en la pantalla de jugar. Las que ya están en el juego se quedan.",
         };
 
-        /// <summary>Lo que se enseña cuando todavía no hay ninguna cuenta guardada.</summary>
+        /// <summary>What is shown when there is no stored account yet.</summary>
         public static string EquipoVacio(Language i) => i switch
         {
             Language.En => "No accounts yet. Add one and it will stay here for next time.",
@@ -92,7 +92,7 @@ namespace Jondo.Unity.Launcher.UI
             _ => "Todavía no hay ninguna cuenta. Añade una y se quedará aquí para la próxima vez.",
         };
 
-        /// <summary>Cuántas de las marcadas están ya jugando, dicho de forma que se entienda.</summary>
+        /// <summary>How many of the marked ones are already playing, said in a way that is understood.</summary>
         public static string Resumen(Language i, int marcadas, int enJuego) => i switch
         {
             Language.En => $"{marcadas} ticked · {enJuego} already in game",
@@ -107,7 +107,7 @@ namespace Jondo.Unity.Launcher.UI
             _ => "Nivel",
         };
 
-        /// <summary>El botón de la música dice lo que HACE, no cómo está.</summary>
+        /// <summary>The music button says what it DOES, not how it is.</summary>
         public static string ApagarMusica(Language i) => i switch
         {
             Language.En => "Turn music off",

@@ -55,12 +55,41 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData("{\"personaje\":\"Ty\",\"objeto\":1,\"cantidad\":0}", "objeto-invalido")]
         [InlineData("{\"personaje\":\"Ty\",\"montura\":0}", "montura-invalida")]
         [InlineData("{\"personaje\":\"Ty\",\"mapa\":0}", "mapa-invalido")]
-        // El nivel era el unico que se colaba: llegaba a SetLevelAsync, que lo recorta con
-        // Math.Clamp, asi que un -5 salia con HTTP 200 y el personaje a nivel 1 sin que la
-        // respuesta dijera que se le habia cambiado el numero pedido.
+        // The level was the only one that slipped through: it reached SetLevelAsync, which trims it with
+        // Math.Clamp, so a -5 went out with HTTP 200 and the character at level 1 without the
+        // response saying the requested number had been changed.
         [InlineData("{\"personaje\":\"Ty\",\"nivel\":0}", "nivel-invalido")]
         [InlineData("{\"personaje\":\"Ty\",\"nivel\":-5}", "nivel-invalido")]
         public void Dependent_and_identifier_fields_are_validated(string json, string expected)
+        {
+            bool parsed = LiveCharacterUpdate.TryParse(json, out _, out string error);
+
+            Assert.False(parsed);
+            Assert.Equal(expected, error);
+        }
+
+        [Theory]
+        [InlineData("{\"objeto\":1234}", false)]
+        [InlineData("{\"objeto\":1234,\"modo\":\"max\"}", false)]
+        [InlineData("{\"objeto\":1234,\"modo\":\"aleatorio\"}", true)]
+        [InlineData("{\"objeto\":1234,\"modo\":\"Random\"}", true)]
+        public void An_item_comes_out_at_its_maximum_unless_a_roll_is_asked_for(string json, bool random)
+        {
+            bool parsed = LiveCharacterUpdate.TryParse(json, out var update, out string error);
+
+            Assert.True(parsed, error);
+            Assert.NotNull(update);
+            Assert.Equal(random, update.RandomStats);
+            // No name: the caller's own character.
+            Assert.Equal("", update.Character);
+        }
+
+        [Theory]
+        // A misspelt mode is refused, not read as max: it would hand over a perfect item.
+        [InlineData("{\"objeto\":1234,\"modo\":\"aleatoro\"}", "modo-invalido")]
+        [InlineData("{\"objeto\":1234,\"modo\":1}", "modo-invalido")]
+        [InlineData("{\"kamas\":10,\"modo\":\"aleatorio\"}", "modo-sin-objeto")]
+        public void A_mode_is_one_of_the_known_ones_and_goes_with_an_item(string json, string expected)
         {
             bool parsed = LiveCharacterUpdate.TryParse(json, out _, out string error);
 

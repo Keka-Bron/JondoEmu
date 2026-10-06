@@ -8,7 +8,7 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// El cofre del merkasako.
+    /// The haven bag chest.
     /// </summary>
     /// <remarks>
     /// Measured on "Interactivos varios/abrir cofre de mi merkasako-cambiar cosas entre cofre e
@@ -38,10 +38,10 @@ namespace Jondo.Unity.Server.Handlers
     /// </remarks>
     public static class ChestHandler
     {
-        /// <summary>El cofre que está abierto, para no atender un kcr con el cofre cerrado.</summary>
+        /// <summary>The chest that is open, so as not to serve a kcr with the chest closed.</summary>
         public static bool IsOpen => SessionContext.State.IsChestOpen;
 
-        /// <summary>¿El elemento que ha clicado es el cofre de este mapa?</summary>
+        /// <summary>Is the element he clicked this map's chest?</summary>
         public static bool IsChest(long mapId, int elementId)
         {
             var chest = Merkasako.ChestOf(mapId);
@@ -82,26 +82,26 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Los cuatro mensajes del trasiego, y cuál es cuál.
+        /// The four messages of the shuffling, and which is which.
         ///
-        /// Se ven emparejados en la captura del cofre de una casa: van en grupos de tres, y los dos
-        /// grupos son <c>iua, itc, iun</c> y <c>itd, ium, iun</c>. Cada grupo es UN movimiento, así
-        /// que el que llega y el que se va de cada grupo son los dos extremos del mismo viaje:
+        /// They are seen in pairs in the capture of a house chest: they go in groups of three, and the
+        /// two groups are <c>iua, itc, iun</c> and <c>itd, ium, iun</c>. Each group is ONE move, so the
+        /// one that arrives and the one that leaves in each group are the two ends of the same trip:
         ///
-        ///   itc  se va del cofre        iua  llega a la bolsa      (sacar)
-        ///   ium  se va de la bolsa      itd  llega al cofre        (meter)
+        ///   itc  leaves the chest       iua  arrives in the bag      (take out)
+        ///   ium  leaves the bag         itd  arrives in the chest    (put in)
         ///
-        /// Los tenía cruzados, y por eso el objeto desaparecía del sitio del que salía pero no
-        /// aparecía en el que entraba hasta cerrar y volver a abrir. Y por eso el premio de la
-        /// lotería tampoco se veía llegar al inventario.
+        /// I had them crossed, and that is why the item disappeared from the place it left but did not
+        /// appear in the one it entered until closing and opening again. And that is why the lottery
+        /// prize was not seen arriving in the inventory either.
         ///
-        /// El que llega va con todo —plantilla, efectos, cantidad—; el que se va, solo con su
-        /// identificador.
+        /// The one that arrives goes with everything -- template, effects, quantity --; the one that
+        /// leaves, with just its identifier.
         /// </summary>
         public const string ArrivesInBag = Op.Iua;
         public const string ArrivesInChest = Op.Itd;
 
-        /// <summary>El campo donde va el objeto en cada uno: f3 en el iua, f1 en el itd.</summary>
+        /// <summary>The field the item goes in for each: f3 in the iua, f1 in the itd.</summary>
         public static int FieldOf(string opcode) => opcode == ArrivesInBag ? 3 : 1;
     }
 }

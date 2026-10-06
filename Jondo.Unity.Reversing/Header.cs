@@ -4,27 +4,27 @@ using LibCpp2IL;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// La cabecera de global-metadata.dat, leída del propio LibCpp2IL.
+/// The header of global-metadata.dat, read from LibCpp2IL itself.
 ///
-/// El bloque de 1,7 MB con los nombres reales del protocolo está en el fichero pero no lo referencia
-/// nadie: ni el código lo carga como literal, ni es la tabla de tipos viva. La pregunta que queda es
-/// si es un RESTO de la tabla anterior a la ofuscación y, sobre todo, si conserva el ORDEN. Si lo
-/// conserva, la pareja sale por posición y se acabó el problema.
+/// The 1.7 MB block with the protocol's real names is in the file but nobody
+/// references it: neither does the code load it as a literal, nor is it the live type table. The question left is
+/// whether it is a REMNANT of the table from before the obfuscation and, above all, whether it keeps the ORDER. If it
+/// keeps it, the pairing comes out by position and the problem is over.
 ///
-/// Para responder hay que saber qué región del fichero es cada cosa, y eso lo dice la cabecera.
-/// No se parsea a mano: LibCpp2IL ya la tiene leída, así que se le pregunta. Los campos se sacan por
-/// reflexión a propósito —cambian de nombre y de orden entre versiones de metadatos— y así la sonda
-/// vale igual dentro de tres parches.
+/// To answer it one has to know which region of the file is which, and that is what the header says.
+/// It is not parsed by hand: LibCpp2IL already has it read, so it is asked. The fields are taken by
+/// reflection on purpose —they change name and order between metadata versions— and that way the probe
+/// still works three patches from now.
 /// </summary>
 public static class Header
 {
-    /// <summary>Una región del fichero: dónde empieza y cuánto ocupa.</summary>
+    /// <summary>A region of the file: where it starts and how much it takes up.</summary>
     public sealed record Region(string Name, long Offset, long Size)
     {
         public bool Holds(long position) => position >= Offset && position < Offset + Size;
     }
 
-    /// <summary>Todo lo que la cabecera dice, en crudo.</summary>
+    /// <summary>Everything the header says, raw.</summary>
     public static Dictionary<string, long> Fields()
     {
         var metadata = LibCpp2IlMain.TheMetadata
@@ -39,11 +39,11 @@ public static class Header
     }
 
     /// <summary>
-    /// Los números que lleva un objeto dentro, sean campos o propiedades.
+    /// The numbers an object carries inside, be they fields or properties.
     ///
-    /// Se miran las dos cosas porque adivinar cuál es sale caro: la primera versión sólo leía
-    /// campos públicos y no encontró ni uno, y el resultado —«0 regiones declaradas»— parecía un
-    /// hallazgo cuando era la sonda mirando donde no era.
+    /// Both are looked at because guessing which is costly: the first version only read
+    /// public fields and did not find a single one, and the result —«0 regions declared»— looked like a
+    /// finding when it was the probe looking in the wrong place.
     /// </summary>
     public static Dictionary<string, long> Numbers(object thing)
     {
@@ -73,7 +73,7 @@ public static class Header
         return values;
     }
 
-    /// <summary>Cómo se llama de verdad cada miembro, para dejar de adivinar.</summary>
+    /// <summary>What each member is really called, to stop guessing.</summary>
     public static List<string> Members()
     {
         var metadata = LibCpp2IlMain.TheMetadata!;
@@ -96,16 +96,16 @@ public static class Header
     }
 
     /// <summary>
-    /// Las regiones que declara la cabecera, emparejando cada «…Offset» con su «…Count».
+    /// The regions the header declares, pairing each «…Offset» with its «…Count».
     ///
-    /// El convenio de IL2CPP es que van de dos en dos y con el mismo prefijo. Donde no haya pareja
-    /// se deja fuera en vez de inventarse un tamaño.
+    /// IL2CPP's convention is that they go in twos and with the same prefix. Where there is no pair
+    /// it is left out instead of inventing a size.
     /// </summary>
     public static List<Region> Regions()
     {
-        // Cada región es un objeto Il2CppGlobalMetadataSectionHeader con su desplazamiento y su
-        // tamaño dentro. La primera versión buscaba parejas de enteros «…Offset»/«…Count» sueltos
-        // en la cabecera y no encontró ninguna: en esta versión de metadatos no están así.
+        // Each region is an Il2CppGlobalMetadataSectionHeader object with its offset and its
+        // size inside. The first version looked for loose «…Offset»/«…Count» integer pairs
+        // in the header and did not find any: in this metadata version they are not like that.
         const BindingFlags Todos = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
         var metadata = LibCpp2IlMain.TheMetadata!;
@@ -129,21 +129,21 @@ public static class Header
         return regions.OrderBy(r => r.Offset).ToList();
     }
 
-    /// <summary>Una clase de tres letras y el nombre real que lleva escondido dentro.</summary>
+    /// <summary>A three-letter class and the real name it carries hidden inside.</summary>
     public sealed record Pair(string Opcode, string Real);
 
     /// <summary>
-    /// El enlace: los nombres reales son VALORES POR DEFECTO de campos.
+    /// The link: the real names are DEFAULT VALUES of fields.
     ///
-    /// El bloque de 1,7 MB cae dentro de <c>fieldAndParameterDefaultValueData</c>, y esa tabla no
-    /// está suelta: se indexa por campo. O sea que cada
-    /// <c>Com.Ankama.Dofus.Server.Game.Protocol.Character.CharacterExperienceGainEvent|Types</c> es
-    /// el valor por defecto de un campo concreto, y ese campo pertenece a una clase concreta —la de
-    /// tres letras—. Eso es exactamente la pareja que faltaba.
+    /// The 1.7 MB block falls inside <c>fieldAndParameterDefaultValueData</c>, and that table is not
+    /// loose: it is indexed by field. That is, each
+    /// <c>Com.Ankama.Dofus.Server.Game.Protocol.Character.CharacterExperienceGainEvent|Types</c> is
+    /// the default value of a specific field, and that field belongs to a specific class —the
+    /// three-letter one—. That is exactly the pairing that was missing.
     ///
-    /// Antes probé tres caminos y ninguno valía: no son literales que cargue el código, no son los
-    /// nombres de tipo vivos, y los tipos anidados también están ofuscados. Lo que no había mirado
-    /// es de dónde salen, y salían de aquí.
+    /// Before, I tried three paths and none worked: they are not literals the code loads, they are not the
+    /// live type names, and the nested types are obfuscated too. What I had not looked at
+    /// is where they come from, and they came from here.
     /// </summary>
     public static List<Pair> Pairs(ClientReader client, Action<string>? report = null)
     {
@@ -153,8 +153,8 @@ public static class Header
         const BindingFlags Todos = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         var pairs = new List<Pair>();
 
-        // Las dos tablas que apuntan a esos datos: la de campos y la de parámetros. Se miran las
-        // dos porque la región se llama «fieldAndParameter…» y no dice cuál de las dos la llena.
+        // The two tables pointing to that data: the fields one and the parameters one. Both are
+        // looked at because the region is called «fieldAndParameter…» and does not say which of the two fills it.
         foreach (string table in new[] { "fieldDefaultValues", "parameterDefaultValues" })
         {
             var array = metadata.GetType().GetField(table, Todos)?.GetValue(metadata) as Array;
@@ -184,14 +184,14 @@ public static class Header
         return pairs;
     }
 
-    /// <summary>El nombre que la tabla de tipos le da al tipo, y el índice del que sale.</summary>
+    /// <summary>The name the type table gives the type, and the index it comes from.</summary>
     public sealed record Named(int Index, int NameIndex, string Name, string Namespace);
 
     /// <summary>
-    /// Los tipos en el ORDEN de la tabla, con el índice de cadena del que sale cada nombre.
+    /// The types in the table's ORDER, with the string index each name comes from.
     ///
-    /// Es lo que hace falta para contestar la pregunta: si los índices de nombre de los mensajes van
-    /// seguidos y en el mismo orden que el bloque de restos, la correspondencia es posicional.
+    /// It is what is needed to answer the question: if the messages' name indices go
+    /// in a row and in the same order as the block of remnants, the correspondence is positional.
     /// </summary>
     public static List<Named> Types(int limit = 0)
     {

@@ -5,15 +5,15 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// La familia «haz que se lance otro hechizo»: nueve efectos, una sola mecánica.
+    /// The «make another spell be cast» family: nine effects, a single mechanic.
     /// </summary>
     /// <remarks>
-    /// Cuatro de los nueve no tienen ni descripción en el catálogo del cliente, y por eso
-    /// hicieron falta las capturas. Censadas las 431 —37.947 tramas jwe, 21.307 lanzamientos,
-    /// dos lectores independientes con los mismos totales—, se emparejó cada anuncio de
-    /// lanzamiento con el padre que lo produjo:
+    /// Four of the nine do not even have a description in the client's catalogue, and that is why
+    /// the captures were needed. Counting all 431 —37,947 jwe frames, 21,307 casts,
+    /// two independent readers with the same totals—, each cast announcement was paired
+    /// with the parent that produced it:
     ///
-    ///   efecto   n      mismo lanzador   misma casilla   objetivo==lanzador
+    ///   effect   n      same caster      same cell       target==caster
     ///   792      6332   4447             3560            6269
     ///   1160     3826   3783             1772             918
     ///   2160      332    332               54              18
@@ -22,11 +22,11 @@ namespace Jondo.Unity.Tests.Combat
     ///   2794      235    182              228              79
     ///   2795        6      0                6               0
     ///
-    /// Y el 1017 aparte: el objetivo del hijo es el lanzador del padre en 97 de 97, y el lanzador
-    /// del hijo NO lo es en 97 de 97.
+    /// And 1017 apart: the child's target is the parent's caster in 97 of 97, and the child's
+    /// caster is NOT in 97 of 97.
     ///
-    /// Lo que esta prueba guarda es la TABLA, porque es donde vive el conocimiento. Cambiar una
-    /// fila cambia a quién le pega media clase, y no daría ningún error.
+    /// What this test keeps is the TABLE, because that is where the knowledge lives. Changing a
+    /// row changes whom half a class hits, and it would give no error.
     /// </remarks>
     public class SubcastFamilyTests
     {
@@ -40,24 +40,24 @@ namespace Jondo.Unity.Tests.Combat
                             $"el efecto {efecto} debería estar en la familia");
             }
 
-            // Y que no se cuele nada que no lo sea: el 141 mata, no encadena.
+            // And that nothing that is not one sneaks in: 141 kills, it does not chain.
             Assert.False(EffectEngine.EsDeLaFamiliaDeSublanzar(141));
             Assert.False(EffectEngine.EsDeLaFamiliaDeSublanzar(5));
         }
 
         [Theory]
-        // El 1017 es el único que devuelve el hechizo al lanzador del padre.
+        // 1017 is the only one that returns the spell to the parent's caster.
         [InlineData(1017, true, "AlLanzadorPadre")]
-        // El 792 y sus primos: el candidato se lo lanza a sí mismo.
+        // 792 and its cousins: the candidate casts it on himself.
         [InlineData(792, true, "AlCandidato")]
         [InlineData(2792, true, "AlCandidato")]
         [InlineData(2793, true, "AlCandidato")]
         [InlineData(2795, true, "AlCandidato")]
-        // El 1160 no cambia de lanzador; apunta al candidato.
+        // 1160 does not change caster; it aims at the candidate.
         [InlineData(1160, false, "AlCandidato")]
-        // El 2160 tampoco, y coge al más cercano.
+        // 2160 does not either, and it takes the closest one.
         [InlineData(2160, false, "AlMasCercano")]
-        // Los dos de casilla: el 2794 cambia de lanzador y el 2960 no.
+        // The two cell ones: 2794 changes caster and 2960 does not.
         [InlineData(2794, true, "ALaCasillaDelPadre")]
         [InlineData(2960, false, "ALaCasillaDelPadre")]
         public void Cada_uno_lanza_y_apunta_como_dicen_las_capturas(int efecto, bool lanzaElCandidato,
@@ -74,9 +74,9 @@ namespace Jondo.Unity.Tests.Combat
         [InlineData(3793)]
         public void Los_dos_marcadores_de_guion_no_hacen_nada(int efecto)
         {
-            // Medido en las 164 filas del 3792 que tienen plantilla, sin una excepción: su value
-            // es un id del boundScriptUsageData del propio hechizo, y el resto de la fila está a
-            // cero. No lleva ningún número que aplicar a nadie.
+            // Measured on the 164 rows of 3792 that have a template, without an exception: its value
+            // is an id of the spell's own boundScriptUsageData, and the rest of the row is at
+            // zero. It carries no number to apply to anyone.
             Assert.True(EffectEngine.EsMarcadorDeGuion(efecto));
             Assert.False(EffectEngine.EsDeLaFamiliaDeSublanzar(efecto));
             Assert.False(EffectEngine.EsDeDano(efecto));
@@ -85,10 +85,10 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void El_3793_no_hace_nada_y_esta_bien_que_no_lo_haga()
         {
-            // 430 filas sin texto, sin característica, sin dados y sin duración. El servidor real
-            // lo registra y lo anuncia, pero no arrastra a nadie: los efectos que van con él se
-            // disparan solos, con su propio disparador. Tratarlo como una puerta condicional
-            // sería inventarse una mecánica.
+            // 430 rows with no text, no characteristic, no dice and no duration. The real server
+            // records it and announces it, but it drags nobody along: the effects that go with it
+            // fire on their own, with their own trigger. Treating it as a conditional gate
+            // would be inventing a mechanic.
             Assert.False(EffectEngine.EsDeLaFamiliaDeSublanzar(3793));
         }
     }

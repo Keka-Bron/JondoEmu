@@ -1,0 +1,28 @@
+{
+  "_comment": [
+    "Floor passages: a cell that moves whoever stops on it to another map. For the maps that",
+    "need a way out and have no element to hang a passage off -- the client only lets a",
+    "player click what its own map data has (see teleports.json). Nothing is declared to the",
+    "client, so the cell looks like any other: put one only where the map's drawing already",
+    "says \"a way out\".",
+    "",
+    "  { \"map\", \"cell\", \"toMap\", \"toCell\" }",
+    "",
+    "A cell that already has an element's passage keeps that one. This is a file of its own",
+    "and not a list in teleports.json because Jondo Studio's passage editor rewrites that",
+    "file whole, with only the passages it knows.",
+    "",
+    "THE GM PRISON'S DUNGEON, 105120002, has no element at all. The cage hanging from its",
+    "rope, at the right of the big room, stands on cell 333: stepping into it lifts you to",
+    "the island, 105119744, on 342 in front of its chest. The rest of the round is in",
+    "teleports.json."
+  ],
+  "passages": [
+    {
+      "map": 105120002,
+      "cell": 333,
+      "toMap": 105119744,
+      "toCell": 342
+    }
+  ]
+}

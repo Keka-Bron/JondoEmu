@@ -1,45 +1,45 @@
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El mapeo recorrido parche a parche en vez de un salto largo.
+/// The mapping walked patch by patch instead of one long jump.
 ///
-/// El salto directo de 3.6.4.3 a 3.6.10.10 sale al 11,3%. El techo del emparejador, medido contra
-/// sí mismo con los nombres barajados, es el 68,3%. La distancia entre los dos números son los seis
-/// parches que hay en medio: cada uno mueve un poco la forma y seis movimientos encadenados borran
-/// la señal. Con los clientes intermedios el salto se parte en saltos de uno.
+/// The direct jump from 3.6.4.3 to 3.6.10.10 comes out at 11.3%. The matcher's ceiling, measured against
+/// itself with the names shuffled, is 68.3%. The distance between the two numbers is the six
+/// patches in between: each one moves the shape a little and six chained moves erase
+/// the signal. With the intermediate clients the jump splits into jumps of one.
 ///
-/// ─── Esto es una hipótesis, y por eso mide ──────────────────────────────────────────────
+/// ─── This is a hypothesis, and that is why it measures ──────────────────────────────────
 ///
-/// Encadenar puede salir mal, y conviene decirlo antes de mirar el resultado. Si en cada salto se
-/// pierde una tercera parte y las pérdidas fueran independientes, siete saltos dejarían un 6% —
-/// peor que el salto directo. Sale bien sólo si es siempre el mismo grupo el que se pierde: los
-/// mensajes pequeños y sin vecindad, que no se emparejan en ningún salto. El número dirá cuál de
-/// las dos cosas pasa; no lo damos por sabido.
+/// Chaining can go wrong, and it is worth saying before looking at the result. If on each jump
+/// a third is lost and the losses were independent, seven jumps would leave 6% —
+/// worse than the direct jump. It only works if it is always the same group that gets lost: the
+/// small messages without a neighbourhood, which do not match on any jump. The number will say which of
+/// the two happens; we do not take it as known.
 ///
-/// ─── Lo que se puede comprobar de verdad ────────────────────────────────────────────────
+/// ─── What can really be checked ─────────────────────────────────────────────────────────
 ///
-/// Hasta ahora todo lo medido era sintético: barajar los nombres de una versión y ver cuántos se
-/// recolocan. Aquí hay algo mejor. El emparejador no mira los nombres en ningún momento —sólo
-/// números de campo, clases de campo y vecindad; los nombres son la clave del diccionario y nada
-/// más—, así que un mensaje que se llama igual en las dos versiones es una respuesta conocida que
-/// el emparejador no puede haber copiado.
+/// Until now everything measured was synthetic: shuffling the names of a version and seeing how many
+/// fall back into place. Here there is something better. The matcher does not look at the names at any point —only
+/// field numbers, field kinds and neighbourhood; the names are the dictionary's key and nothing
+/// else—, so a message that has the same name in both versions is a known answer
+/// the matcher cannot have copied.
 ///
-/// De ahí salen los tres números que importan de cada salto: de los que conservan el nombre,
-/// cuántos acierta, cuántos falla y de cuántos no se atreve. Fallar es lo grave —un emparejamiento
-/// equivocado envenena la cadena entera y nadie se entera—; callarse sólo cuesta cobertura.
+/// From there come the three numbers that matter for each jump: of those keeping their name,
+/// how many it gets right, how many it gets wrong and how many it does not dare to call. Getting it wrong is what is serious —a wrong
+/// match poisons the whole chain and nobody notices—; keeping quiet only costs coverage.
 /// </summary>
 public sealed class Relay
 {
-    /// <summary>Lo que pasa en un salto de una versión a la siguiente.</summary>
+    /// <summary>What happens on a jump from one version to the next.</summary>
     /// <param name="Rotated">
-    /// Si Ankama ha vuelto a repartir los nombres en este parche. Se sabe porque deja de estar
-    /// TODO el juego de nombres viejo: mientras no rota, los 2.169 nombres siguen ahí uno a uno.
+    /// Whether Ankama has handed out the names again in this patch. It is known because the WHOLE
+    /// old set of names stops being there: while it does not rotate, the 2,169 names are still there one by one.
     /// </param>
-    /// <param name="SameName">Cuántos nombres del viejo siguen existiendo en el nuevo.</param>
-    /// <param name="SameShape">Cuántas formas del viejo siguen existiendo en el nuevo.</param>
-    /// <param name="Right">Sin rotación: a cuántos los empareja consigo mismos.</param>
-    /// <param name="Wrong">Sin rotación: a cuántos los empareja con otro. Cada uno es veneno.</param>
-    /// <param name="Unsure">Sin rotación: de cuántos no se atreve a decir nada.</param>
+    /// <param name="SameName">How many of the old one's names still exist in the new one.</param>
+    /// <param name="SameShape">How many of the old one's shapes still exist in the new one.</param>
+    /// <param name="Right">Without rotation: how many it matches with themselves.</param>
+    /// <param name="Wrong">Without rotation: how many it matches with another. Each one is poison.</param>
+    /// <param name="Unsure">Without rotation: how many it does not dare to say anything about.</param>
     public sealed record Hop(
         string From, string To,
         int OldCount, int NewCount,
@@ -47,20 +47,19 @@ public sealed class Relay
         bool Rotated, int SameName, int SameShape, int Seeds,
         int Right, int Wrong, int Unsure);
 
-    /// <summary>El resultado de recorrer la cadena entera.</summary>
-    /// <param name="Chain">Del nombre en la primera versión al nombre en la última.</param>
-    /// <param name="Died">Del nombre en la primera versión al salto donde se perdió.</param>
+    /// <summary>The result of walking the whole chain.</summary>
+    /// <param name="Chain">From the name in the first version to the name in the last.</param>
+    /// <param name="Died">From the name in the first version to the jump where it was lost.</param>
     public sealed record Outcome(
         List<Hop> Hops,
         Dictionary<string, string> Chain,
         Dictionary<string, string> Died);
 
     /// <summary>
-    /// Recorre la cadena. Las carpetas tienen que venir en orden, de la vieja a la nueva.
+    /// Walks the chain. The folders have to come in order, from the old to the new.
     ///
-    /// Cada cliente se abre una sola vez aunque participe en dos saltos: reconstruir el ensamblado
-    /// es medio minuto y con ocho versiones eso son cuatro minutos que no hay por qué gastar dos
-    /// veces.
+    /// Each client is opened only once even if it takes part in two jumps: rebuilding the assembly
+    /// is half a minute and with eight versions that is four minutes there is no reason to spend twice.
     /// </summary>
     public Outcome Run(IReadOnlyList<string> clients, Action<string> report)
     {
@@ -76,8 +75,8 @@ public sealed class Relay
 
         var hops = new List<Hop>();
 
-        // La cadena arranca como la identidad sobre la primera versión: al principio cada mensaje
-        // es él mismo, y cada salto la mueve un eslabón o la corta.
+        // The chain starts as the identity on the first version: at the beginning each message
+        // is itself, and each jump moves it one link or cuts it.
         var chain = models[0].Messages.ToDictionary(m => m.Name, m => m.Name, StringComparer.Ordinal);
         var died = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -96,28 +95,28 @@ public sealed class Relay
             var newSet = newShapes.Values.ToHashSet(StringComparer.Ordinal);
             int sameShape = oldShapes.Values.Count(s => newSet.Contains(s));
 
-            // Las formas ÚNICAS a los dos lados: las semillas del emparejador.
+            // The UNIQUE shapes on both sides: the matcher's seeds.
             //
-            // Contar formas a secas engaña. La mitad del protocolo son mensajes de un campo, y
-            // «2:int64» va a existir en cualquier versión por casualidad; esas formas sobreviven
-            // siempre y no sirven para nada. Lo que siembra el emparejamiento es una forma que
-            // señale a un solo mensaje en cada versión, y ésas son las que hay que contar.
+            // Counting shapes plainly is misleading. Half the protocol is single-field messages, and
+            // «2:int64» is going to exist in any version by chance; those shapes always survive
+            // and are of no use at all. What seeds the matching is a shape that
+            // points to a single message in each version, and those are the ones to count.
             var oldOnce = Once(oldShapes);
             var newOnce = Once(newShapes);
             int seeds = oldOnce.Count(s => newOnce.Contains(s));
 
-            // Mientras Ankama no vuelve a repartir los nombres, están TODOS: los 2.169 del viejo
-            // siguen en el nuevo. En cuanto rota deja de estarlo, y ése es el aviso.
+            // While Ankama does not hand out the names again, they are ALL there: the old one's 2,169
+            // are still in the new one. As soon as it rotates they no longer are, and that is the warning.
             bool rotated = sameName < models[i].Messages.Count;
 
-            // Sin rotación hay respuesta conocida y el emparejador no ha podido copiarla, porque no
-            // mira los nombres en ningún momento.
+            // Without rotation there is a known answer and the matcher cannot have copied it, because it does not
+            // look at the names at any point.
             //
-            // Con rotación NO la hay, y ésta fue mi equivocación en la primera medida: conté como
-            // fallo cada vez que un nombre viejo apuntaba a otro mensaje en el nuevo. Pero después
-            // de una rotación eso es justo lo que TIENE que pasar —el nombre se lo ha quedado otro—,
-            // así que aquello no medía aciertos del emparejador sino mi propia suposición. Con
-            // rotación no se puntúa nada: no hay contra qué.
+            // With rotation there is NOT, and this was my mistake in the first measurement: I counted as a
+            // failure every time an old name pointed to another message in the new one. But after
+            // a rotation that is exactly what HAS to happen —the name has been taken by another—,
+            // so that was not measuring the matcher's hits but my own assumption. With
+            // rotation nothing is scored: there is nothing to score against.
             int right = 0, wrong = 0, unsure = 0;
             if (!rotated)
             {
@@ -136,8 +135,8 @@ public sealed class Relay
                 rotated, sameName, sameShape, seeds,
                 right, wrong, unsure));
 
-            // Sólo viaja la certeza. Arrastrar una duda sería multiplicar la duda por la del salto
-            // siguiente, y al final de la cadena nadie sabría de qué se fía.
+            // Only certainty travels. Dragging a doubt along would multiply the doubt by the next
+            // jump's, and at the end of the chain nobody would know what to trust.
             foreach (string start in chain.Keys.ToList())
             {
                 if (result.Pairs.TryGetValue(chain[start], out string? next)) chain[start] = next;
@@ -152,7 +151,7 @@ public sealed class Relay
         return new Outcome(hops, chain, died);
     }
 
-    /// <summary>El salto directo, sin escalas, para tener con qué comparar.</summary>
+    /// <summary>The direct jump, without stops, to have something to compare with.</summary>
     public static Dictionary<string, string> Direct(string oldClient, string newClient, Action<string> report)
     {
         var a = ProtoWriter.Model(Dumper.Protocol(oldClient, report));
@@ -160,7 +159,7 @@ public sealed class Relay
         return Matcher.Match(a, b).Pairs;
     }
 
-    /// <summary>Las formas que sólo tiene un mensaje en toda la versión.</summary>
+    /// <summary>The shapes only one message has in the whole version.</summary>
     private static HashSet<string> Once(Dictionary<string, string> shapes)
     {
         var count = new Dictionary<string, int>(StringComparer.Ordinal);

@@ -9,28 +9,28 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Qué hechizos tiene un personaje, y cuál de cada pareja.
+    /// Which spells a character has, and which one of each pair.
     ///
-    /// Los hechizos no van sueltos: van en PAREJAS de base y variante, y el personaje lleva UNO de
-    /// cada pareja, el que haya elegido. Son 22 parejas por raza más 13 comunes —dominio del arma,
-    /// zanahowia, las invocaciones de pergamino— que no dependen de la raza.
+    /// Spells do not go loose: they go in PAIRS of base and variant, and the character carries ONE of
+    /// each pair, the one he has chosen. There are 22 pairs per breed plus 13 common ones —weapon mastery,
+    /// zanahowia, the scroll summons— that do not depend on the breed.
     ///
-    /// Eso se leyó del hms de la captura, que es lo que zanjó el asunto: un sacrogrito de nivel 154
-    /// recibía 36 hechizos, no los 44 que tiene apuntados su raza, y los 22 que faltaban eran
-    /// exactamente la otra mitad de cada pareja. Mandar las dos mitades es lo que dejaba la barra
-    /// de hechizos vacía.
+    /// That was read from the capture's hms, which is what settled the matter: a level 154 sacrier
+    /// received 36 spells, not the 44 his breed has recorded, and the 22 missing ones were
+    /// exactly the other half of each pair. Sending both halves is what left the spell bar
+    /// empty.
     ///
-    ///   spell_variants.json   { breedId, id, spellIds: [base, variante] }
-    ///   SpellLevels           una fila por hechizo y grado, con el nivel que pide
-    ///   CharacterSpellChoices lo que el jugador ha elegido, que es lo único que no es del cliente
+    ///   spell_variants.json   { breedId, id, spellIds: [base, variant] }
+    ///   SpellLevels           one row per spell and grade, with the level it asks for
+    ///   CharacterSpellChoices what the player has chosen, which is the only thing not from the client
     ///
-    /// Una pareja se abre cuando el nivel alcanza el primer grado de alguno de sus dos hechizos.
-    /// La variante siempre pide más nivel que la base, así que hasta que no se llega a ella lo que
-    /// viaja es la base, se haya elegido lo que se haya elegido.
+    /// A pair unlocks when the level reaches the first grade of either of its two spells.
+    /// The variant always asks for more level than the base, so until it is reached what
+    /// travels is the base, whatever has been chosen.
     /// </summary>
     public static class SpellTable
     {
-        /// <summary>La raza que guarda los hechizos comunes, los que no son de ninguna clase.</summary>
+        /// <summary>The breed that holds the common spells, the ones that belong to no class.</summary>
         private const int CommonBreed = 19;
 
         public sealed class Pair
@@ -43,10 +43,10 @@ namespace Jondo.Unity.Server.Managers
             public bool Holds(int spellId) => spellId == Base || spellId == Variant;
         }
 
-        /// <summary>Las parejas de cada raza, en el orden en que las declara el cliente.</summary>
+        /// <summary>Each breed's pairs, in the order the client declares them.</summary>
         private static readonly Dictionary<int, List<Pair>> _pairsByBreed = new Dictionary<int, List<Pair>>();
 
-        /// <summary>Las comunes, que las lleva todo el mundo.</summary>
+        /// <summary>The common ones, which everyone carries.</summary>
         private static readonly List<Pair> _common = new List<Pair>();
 
         /// <summary>spell id -> (grado -> nivel que pide).</summary>
@@ -130,8 +130,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Las parejas, de spell_variants.json. Se descartan las que el propio cliente marca con
-        /// "[!]" en el nombre, que son las que no están en el juego.
+        /// The pairs, from spell_variants.json. The ones the client itself marks with
+        /// "[!]" in the name are discarded, which are the ones not in the game.
         /// </summary>
         private static void LoadPairs()
         {
@@ -228,7 +228,7 @@ namespace Jondo.Unity.Server.Managers
             return names;
         }
 
-        /// <summary>Un hechizo que el personaje tiene, con el grado que su nivel abre.</summary>
+        /// <summary>A spell the character has, with the grade his level unlocks.</summary>
         public readonly struct KnownSpell
         {
             public KnownSpell(int pairId, int spellId, int grade)
@@ -242,11 +242,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los hechizos del personaje: uno por pareja, al grado más alto que su nivel alcanza.
+        /// The character's spells: one per pair, at the highest grade his level reaches.
         ///
-        /// Primero las de su raza y después las comunes, que es el orden del hms de la captura.
-        /// Una pareja de la que no se alcanza ningún grado no viaja: eso es lo que hace más corto
-        /// el panel de un nivel 50 que el de un nivel 200.
+        /// First those of his breed and then the common ones, which is the order of the capture's hms.
+        /// A pair of which no grade is reached does not travel: that is what makes a level 50's panel
+        /// shorter than a level 200's.
         /// </summary>
         public static List<KnownSpell> KnownFor(int breed, int level, IReadOnlyDictionary<int, int>? chosen = null)
         {
@@ -262,9 +262,9 @@ namespace Jondo.Unity.Server.Managers
 
         private static void Add(List<KnownSpell> into, Pair pair, int level, IReadOnlyDictionary<int, int>? chosen)
         {
-            // Lo elegido manda, y si no hay nada elegido va la base. Si el nivel todavía no llega a
-            // la elegida —la variante siempre pide más— viaja la otra: la pareja está abierta y el
-            // personaje tiene que poder lanzar algo de ella.
+            // What is chosen rules, and if nothing is chosen the base goes. If the level does not yet reach
+            // the chosen one —the variant always asks for more— the other one travels: the pair is open and the
+            // character has to be able to cast something from it.
             int wanted = pair.Base;
             if (chosen != null && chosen.TryGetValue(pair.Id, out int picked) && pair.Holds(picked))
             {
@@ -297,7 +297,7 @@ namespace Jondo.Unity.Server.Managers
             return _pairsByBreed.TryGetValue(breed, out var pairs) ? pairs : new List<Pair>();
         }
 
-        /// <summary>El grado de este hechizo que abre este nivel, o 0 si no abre ninguno.</summary>
+        /// <summary>The grade of this spell this level unlocks, or 0 if it unlocks none.</summary>
         public static int GradeFor(int spellId, int level) => HighestGrade(spellId, level);
 
         private static int HighestGrade(int spellId, int level)
@@ -313,7 +313,7 @@ namespace Jondo.Unity.Server.Managers
             return best;
         }
 
-        /// <summary>La pareja a la que pertenece un hechizo, o null si no es de ninguna.</summary>
+        /// <summary>The pair a spell belongs to, or null if it belongs to none.</summary>
         public static Pair? PairOf(int spellId)
         {
             Ensure();

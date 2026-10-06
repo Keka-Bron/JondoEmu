@@ -5,12 +5,12 @@ using Avalonia.Media;
 namespace Jondo.Unity.Launcher.UI.Widgets
 {
     /// <summary>
-    /// El punto con halo del estado del servidor.
+    /// The server status dot with a halo.
     /// </summary>
     /// <remarks>
-    /// Verde cuando contesta y rojo cuando no, con un halo del mismo color al 27 % por detras. Es
-    /// el bloque <c>.server-status</c> de la web; el rotulo de al lado ya no se pinta aqui, lo pone
-    /// un TextBlock normal, porque Avalonia si sabe alinear texto sin ayuda.
+    /// Green when it answers and red when it does not, with a halo of the same colour at 27 % behind. It is
+    /// the website's <c>.server-status</c> block; the label next to it is no longer painted here, a
+    /// normal TextBlock puts it, because Avalonia does know how to align text without help.
     /// </remarks>
     internal sealed class StatusDot : Control
     {

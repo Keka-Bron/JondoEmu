@@ -5,14 +5,14 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// El lenguaje de criterios del propio cliente, evaluado contra las cadenas que el cliente
-    /// trae escritas, sin tocarles una coma, y la instancia de raid que las contesta.
+    /// The client's own criteria language, evaluated against the strings the client
+    /// brings written, without touching a comma of them, and the raid instance that answers them.
     /// </summary>
     public class RaidCriteriaTests
     {
         /// <summary>
-        /// La que llevan los ocho monstruos de la Sima del Gigalodón en su
-        /// <c>aggressiveImmunityCriterion</c>. Copiada tal cual del volcado del cliente.
+        /// The one the eight monsters of the Sima del Gigalodón carry in their
+        /// <c>aggressiveImmunityCriterion</c>. Copied as is from the client's dump.
         /// </summary>
         private const string MonsterImmunity =
             "(PB=1131&RV!7,n1_worldlight,0)|(PB=1132&RV!7,n2_worldlight,0)|" +
@@ -25,8 +25,8 @@ namespace Jondo.Unity.Tests.World
             runsFor: TimeSpan.FromHours(1));
 
         /// <summary>
-        /// Con luz, el monstruo es inmune a la agresión; con la luz a cero, deja de serlo y se
-        /// echa encima. Es lo que dice su criterio, y es la mecánica de las luminomáquinas.
+        /// With light, the monster is immune to aggression; with the light at zero, it stops being so and
+        /// jumps on you. It is what its criterion says, and it is the mechanic of the luminomachines.
         /// </summary>
         [Fact]
         public void A_monster_stops_being_peaceful_when_its_floor_goes_dark()
@@ -41,8 +41,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Y cada planta lleva la suya: apagar la primera no vuelve agresivos a los de la
-        /// segunda, porque el criterio empareja la subárea con su propia variable.
+        /// And each floor carries its own: switching off the first does not make the second's
+        /// aggressive, because the criterion pairs the subarea with its own variable.
         /// </summary>
         [Fact]
         public void Each_floor_carries_its_own_light()
@@ -54,13 +54,13 @@ namespace Jondo.Unity.Tests.World
             Assert.False(Criterion.Met(MonsterImmunity, raid.ResolverFor(1131)));
             Assert.True(Criterion.Met(MonsterImmunity, raid.ResolverFor(1132)));
 
-            // Y en un mapa que no es de la raid no hay ninguna rama que se cumpla.
+            // And on a map that is not the raid's no branch is met.
             Assert.False(Criterion.Met(MonsterImmunity, raid.ResolverFor(233)));
         }
 
         /// <summary>
-        /// El cofre de la raid cambia de aspecto por puntuación: son cinco escalones y el
-        /// criterio de cada uno sale del propio PNJ 7861.
+        /// The raid chest changes look by score: there are five steps and the
+        /// criterion of each comes from NPC 7861 itself.
         /// </summary>
         [Fact]
         public void The_chest_changes_its_look_by_score()
@@ -83,9 +83,9 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Lo que un criterio NO sabe no se cuenta como que sí ni como que no: el premio de jefe
-        /// mira una alteración («HA!885») que esta instancia no conoce, así que la respuesta es
-        /// que no se sabe -aunque la parte de la puntuación se cumpla-, y quien pregunta decide.
+        /// What a criterion does NOT know is counted neither as yes nor as no: the boss reward
+        /// looks at an alteration («HA!885») this instance does not know, so the answer is
+        /// that it is not known -even though the score part is met-, and whoever asks decides.
         /// </summary>
         [Fact]
         public void What_a_raid_does_not_know_comes_back_unknown()
@@ -98,14 +98,14 @@ namespace Jondo.Unity.Tests.World
             Assert.False(Criterion.Met(premio, raid.ResolverFor(1135)));
             Assert.True(Criterion.Met(premio, raid.ResolverFor(1135), unknownCounts: true));
 
-            // Pero un «no» conocido cierra la puerta aunque lo otro sea un misterio.
+            // But a known «no» closes the door even if the rest is a mystery.
             raid.Set(RaidInstance.ScoreVariable, 10);
             Assert.Equal(Answer.False, Criterion.Evaluate(premio, raid.ResolverFor(1135)));
         }
 
         /// <summary>
-        /// La gramática, sobre criterios de fuera de la raid: un criterio vacío se cumple, la
-        /// «o» se queda con una rama y los paréntesis mandan.
+        /// The grammar, over criteria from outside the raid: an empty criterion is met, the
+        /// «or» keeps one branch and parentheses rule.
         /// </summary>
         [Fact]
         public void The_grammar_is_the_clients_own()
@@ -124,7 +124,7 @@ namespace Jondo.Unity.Tests.World
             Assert.False(Criterion.Met("RV=7,uno,9|(RV=7,uno,1&RV>7,uno,5)", resolver));
         }
 
-        /// <summary>Las dos raids y sus plantas, que son las subáreas del cliente.</summary>
+        /// <summary>The two raids and their floors, which are the client's subareas.</summary>
         [Fact]
         public void The_two_raids_are_the_areas_of_the_client()
         {
@@ -147,8 +147,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// La instancia: quién está dentro, cuánto queda y cómo se acaba. Una raid no se acaba
-        /// dos veces, y el reloj se para donde se acabó.
+        /// The instance: who is inside, how much is left and how it ends. A raid does not end
+        /// twice, and the clock stops where it ended.
         /// </summary>
         [Fact]
         public void A_raid_runs_for_its_hour_and_finishes_once()
@@ -178,7 +178,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(RaidInstance.Ending.Captain, raid.Over);
         }
 
-        /// <summary>La puntuación se suma, que es lo que hace el cofre al depositar tesoros.</summary>
+        /// <summary>The score adds up, which is what the chest does on depositing treasures.</summary>
         [Fact]
         public void The_score_adds_up()
         {

@@ -3,75 +3,75 @@ using System.Collections.Generic;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Lo que cobra el que gana un koliseo.
+    /// What the winner of a koliseo is paid.
     /// </summary>
     /// <remarks>
-    /// Cuatro cosas, y las cuatro salen del jyg de fin de combate de la captura del koliseo
-    /// completo —dos contra dos, con reparto de kolichas—. Las cuatro entradas del jyg:
+    /// Four things, and all four come from the end-of-fight jyg of the capture of the complete
+    /// koliseo —two versus two, with kolichas handed out—. The jyg's four entries:
     ///
     /// <code>
-    ///   GANAN (llevan el f4 = 2)
-    ///     nivel 227   3.400 kamas   260 × 12736   2 × 34478   4.722.600 de experiencia
-    ///     nivel 290   2.800 kamas   230 × 12736   2 × 34478   7.496.344 de experiencia
-    ///   PIERDEN
-    ///     nivel 354   botín de cero bytes, y el bloque de experiencia SIN el f1
-    ///     nivel 447   igual
+    ///   WIN (they carry f4 = 2)
+    ///     level 227   3,400 kamas   260 × 12736   2 × 34478   4,722,600 experience
+    ///     level 290   2,800 kamas   230 × 12736   2 × 34478   7,496,344 experience
+    ///   LOSE
+    ///     level 354   zero-byte loot, and the experience block WITHOUT f1
+    ///     level 447   the same
     /// </code>
     ///
-    /// De ahí sale, MEDIDO: que se paga, qué se paga, y que el que pierde no cobra nada —ni
-    /// experiencia; su bloque va sin el campo de lo ganado, no con un cero—.
+    /// From that comes, MEASURED: that it pays, what it pays, and that the loser gets nothing —not even
+    /// experience; his block goes without the field for what was earned, not with a zero—.
     ///
-    /// Lo que NO sale de ahí es la FÓRMULA, y conviene decirlo claro: son dos ganadores, o sea dos
-    /// puntos. Y los dos puntos ni siquiera van en el sentido que uno esperaría —el de nivel 290
-    /// cobra MENOS kamas y MENOS kolichas que el de 227—, así que ni con la mejor voluntad se
-    /// puede sacar de aquí una función del nivel. Los dos ganaron a los mismos dos rivales, de
-    /// nivel 354 y 447, así que tampoco es el nivel del rival lo que los separa. Se parece a una
-    /// prima por ser el que menos nivel tiene, pero con dos números eso es una corazonada, no una
-    /// medida.
+    /// What does NOT come from there is the FORMULA, and it is worth saying plainly: there are two winners, that is two
+    /// points. And the two points do not even go the way one would expect —the level 290 one
+    /// gets FEWER kamas and FEWER kolichas than the 227 one—, so not even with the best will
+    /// can a function of the level be drawn from here. Both beat the same two rivals, of
+    /// level 354 and 447, so it is not the rival's level that separates them either. It looks like a
+    /// bonus for being the one with the lowest level, but with two numbers that is a hunch, not a
+    /// measurement.
     ///
-    /// Así que los kamas, las kolichas y las vitorichas son CONSTANTES, y la constante es la media
-    /// de lo medido. Es una decisión, no un hallazgo, y está aquí en tres números para que cambiarla
-    /// el día que haya más capturas sea cambiar tres números.
+    /// So the kamas, the kolichas and the vitorichas are CONSTANTS, and the constant is the mean
+    /// of what was measured. It is a decision, not a finding, and it is here in three numbers so that changing it
+    /// the day there are more captures is changing three numbers.
     ///
-    /// La experiencia sí admite algo mejor que una constante. Puesta sobre la banda del nivel
-    /// —lo que va del suelo del nivel al del siguiente— los dos ganadores caen casi en el mismo
-    /// sitio:
+    /// The experience does allow something better than a constant. Placed over the level's band
+    /// —what goes from the level's floor to the next one's— the two winners fall almost in the same
+    /// place:
     ///
     /// <code>
-    ///   227   4.722.600 de 65.410.444    7,22 %
-    ///   290   7.496.344 de 122.431.633   6,12 %
+    ///   227   4,722,600 of 65,410,444    7.22 %
+    ///   290   7,496,344 of 122,431,633   6.12 %
     /// </code>
     ///
-    /// Dos puntos a poco más de un punto porcentual uno de otro. Se usa el 6,67 %, que es la media,
-    /// y con eso la cifra sale razonable en cualquier nivel en vez de ser ridícula abajo y ridícula
-    /// arriba, que es lo que pasaría con una constante.
+    /// Two points a little more than one percentage point apart. 6.67 % is used, which is the mean,
+    /// and with that the figure comes out reasonable at any level instead of being ridiculous at the bottom and ridiculous
+    /// at the top, which is what would happen with a constant.
     /// </remarks>
     public static class KoliseoRewards
     {
-        /// <summary>La Kolicha. El f4 del botín en las dos entradas que ganan.</summary>
+        /// <summary>The Kolicha. The loot's f4 in the two winning entries.</summary>
         public const int Kolicha = 12736;
 
-        /// <summary>La Vitoricha, la otra moneda del koliseo.</summary>
+        /// <summary>The Vitoricha, the koliseo's other currency.</summary>
         public const int Vitoricha = 34478;
 
-        /// <summary>Media de los dos ganadores medidos, 260 y 230.</summary>
+        /// <summary>Mean of the two measured winners, 260 and 230.</summary>
         public const int KolichasPorVictoria = 245;
 
-        /// <summary>Los dos ganadores medidos se llevan dos. Aquí no hay media que hacer.</summary>
+        /// <summary>The two measured winners take two. There is no mean to work out here.</summary>
         public const int VitorichasPorVictoria = 2;
 
-        /// <summary>Media de los dos ganadores medidos, 3.400 y 2.800.</summary>
+        /// <summary>Mean of the two measured winners, 3,400 and 2,800.</summary>
         public const int KamasPorVictoria = 3100;
 
-        /// <summary>Qué parte de la banda del nivel se lleva el que gana, en diezmilésimas.</summary>
+        /// <summary>What part of the level's band the winner takes, in ten-thousandths.</summary>
         /// <remarks>
-        /// 667 de 10.000 es el 6,67 %: la media del 7,22 % y el 6,12 % medidos. En diezmilésimas y
-        /// no en coma flotante para que la cuenta sea entera de principio a fin y dos servidores
-        /// con la misma versión paguen exactamente lo mismo.
+        /// 667 out of 10,000 is 6.67 %: the mean of the 7.22 % and 6.12 % measured. In ten-thousandths and
+        /// not in floating point so that the arithmetic is integer from start to finish and two servers
+        /// with the same version pay exactly the same.
         /// </remarks>
         public const long ParteDeLaBanda = 667;
 
-        /// <summary>Lo que cobra en objetos el que gana.</summary>
+        /// <summary>What the winner is paid in items.</summary>
         public static Dictionary<int, int> Botin() => new Dictionary<int, int>
         {
             [Kolicha] = KolichasPorVictoria,
@@ -79,12 +79,12 @@ namespace Jondo.Unity.Server.Managers
         };
 
         /// <summary>
-        /// La experiencia por ganar, para un personaje de ese nivel.
+        /// The experience for winning, for a character of that level.
         /// </summary>
         /// <remarks>
-        /// De la banda de SU nivel, no de la del rival: en la captura los dos ganadores cobran
-        /// cada uno sobre la suya, y son niveles muy distintos —227 y 290— contra los mismos dos
-        /// rivales.
+        /// From the band of HIS level, not the rival's: in the capture the two winners are each paid
+        /// on their own, and they are very different levels —227 and 290— against the same two
+        /// rivals.
         /// </remarks>
         public static long Experiencia(int nivel)
         {

@@ -14,8 +14,8 @@ namespace Jondo.Unity.Server.Network
     public static class ClientLaunchRegistry
     {
         /// <summary>
-        /// Clientes que puede tener abiertos a la vez UNA misma dirección. Ocho, que es lo que cabe
-        /// en un grupo de Dofus. NO es la capacidad del servidor: esa es Contract.ClientesEnTotal.
+        /// Clients ONE same address can have open at once. Eight, which is what fits
+        /// in a Dofus party. It is NOT the server's capacity: that is Contract.ClientesEnTotal.
         /// </summary>
         public const int MaximumClients = Jondo.Unity.Launcher.Contract.ClientesPorIp;
         public sealed class Launch
@@ -26,29 +26,29 @@ namespace Jondo.Unity.Server.Network
             public string LauncherToken { get; init; } = "";
 
             /// <summary>
-            /// El idioma con el que arranca este cliente. Por defecto el del lanzador, que es
-            /// español salvo que se cambie: aquí ponía "fr" a pelo.
+            /// The language this client starts with. By default the launcher's, which is
+            /// Spanish unless changed: here it used to say "fr" hard-coded.
             /// </summary>
             public string Language { get; init; } = "es";
 
-            /// <summary>Desde dónde se lanzó. Agrupa los clientes de una misma persona.</summary>
+            /// <summary>Where it was launched from. It groups the clients of one same person.</summary>
             public string Ip { get; init; } = "";
             public DateTime CreatedAtUtc { get; init; }
 
             /// <summary>
-            /// La ultima vez que este lanzamiento dio senales de vida.
+            /// The last time this launch gave signs of life.
             /// </summary>
             /// <remarks>
-            /// No es lo mismo que CreatedAtUtc y esa diferencia es todo el arreglo. Antes el
-            /// barrido se saltaba cualquier lanzamiento que tuviera entrada en ByGameSession, y
-            /// esa entrada la pone el handshake de Thrift y no la quita nadie: un cliente que se
-            /// moria DESPUES del handshake -y con el lanzador cerrado tambien- dejaba la cuenta
-            /// marcada como ocupada hasta reiniciar el servidor, y Register rechazaba todos los
-            /// intentos siguientes con "cuenta-ya-abierta".
+            /// It is not the same as CreatedAtUtc and that difference is the whole fix. Before, the
+            /// sweep skipped any launch that had an entry in ByGameSession, and
+            /// that entry is put there by the Thrift handshake and nobody removes it: a client that
+            /// died AFTER the handshake -and with the launcher closed too- left the account
+            /// marked as busy until the server restarted, and Register rejected all the
+            /// following attempts with "cuenta-ya-abierta".
             ///
-            /// Tener entrada ahi prueba que ALGUNA VEZ conecto, no que siga estando. Esto prueba
-            /// lo segundo: se toca cada vez que alguien resuelve su sesion de juego, que es lo que
-            /// hace un cliente vivo una y otra vez.
+            /// Having an entry there proves it connected AT SOME POINT, not that it is still there. This proves
+            /// the second: it is touched every time someone resolves his game session, which is what
+            /// a live client does again and again.
             /// </remarks>
             public DateTime LastSeenUtc { get; set; }
         }
@@ -73,21 +73,21 @@ namespace Jondo.Unity.Server.Network
 
             lock (RegistrationGate)
             {
-                // Los dos rechazos viajan como CÓDIGO, no como frase.
+                // Both rejections travel as a CODE, not as a sentence.
                 //
-                // Estaban en francés escrito a pelo; luego pasaron por el catálogo de textos del
-                // lanzador, y eso dejaba a un trozo de servidor leyendo las preferencias de idioma
-                // del usuario en %APPDATA%. Un servidor no traduce: dice qué ha pasado y quien
-                // tenga una ventana delante decide en qué idioma se lo cuenta a la persona.
+                // They were in hard-coded French; then they went through the launcher's text
+                // catalogue, and that left a piece of the server reading the user's language
+                // preferences in %APPDATA%. A server does not translate: it says what happened and whoever
+                // has a window in front decides in which language to tell the person.
                 if (ByAccount.ContainsKey(accountId))
                     throw new InvalidOperationException(Contract.MotivoCuentaYaAbierta);
 
-                // El tope de ocho es POR DIRECCIÓN, no del servidor entero.
+                // The cap of eight is PER ADDRESS, not for the whole server.
                 //
-                // Contaba ByAccount.Count, o sea todos los clientes de todo el mundo: con el
-                // servidor en una máquina y los jugadores en otras, el noveno cliente del servidor
-                // se rechazaba aunque fuera el primero de esa persona. El ocho viene del grupo de
-                // Dofus y es de una persona, no del servidor.
+                // It counted ByAccount.Count, that is all the clients of everybody: with the
+                // server on one machine and the players on others, the server's ninth client
+                // was rejected even if it was that person's first. The eight comes from the Dofus
+                // party and belongs to a person, not to the server.
                 int suyos = 0;
                 foreach (var otro in ByAccount.Values)
                 {
@@ -135,8 +135,8 @@ namespace Jondo.Unity.Server.Network
             }
             if (!ByGameSession.TryGetValue(gameSession, out launch)) return false;
 
-            // Senal de vida. Un cliente vivo pasa por aqui una y otra vez -cada vez que hay que
-            // resolver de quien es esta sesion-, y uno muerto no vuelve nunca.
+            // Sign of life. A live client goes through here again and again -every time it has to
+            // be resolved whose session this is-, and a dead one never comes back.
             if (launch != null) launch.LastSeenUtc = DateTime.UtcNow;
             return true;
         }
@@ -151,26 +151,26 @@ namespace Jondo.Unity.Server.Network
             if (string.IsNullOrWhiteSpace(token)) return 0;
             if (Tokens.TryGetValue(token, out long accountId)) return accountId;
 
-            // La sesión del lanzador primero: el token de juego se lo rota el cliente cada vez que
-            // arranca, así que el que el lanzador guardó de la vez anterior sólo sigue estando en
-            // su columna.
+            // The launcher's session first: the client rotates its game token every time it
+            // starts, so the one the launcher stored the previous time only remains in
+            // its column.
             long suya = DatabaseManager.GetAccountIdByLauncherToken(token);
             if (suya != 0) return suya;
 
             long juego = DatabaseManager.GetAccountIdByToken(token);
             if (juego != 0) return juego;
 
-            // Se dice CUÁL se ha presentado y dónde se ha buscado, porque «no coincide con ninguna
-            // cuenta» a secas no distingue las tres razones por las que puede pasar —que el token
-            // sea de otro arranque, que la columna se haya sobrescrito, o que el cliente esté
-            // mandando otra cosa— y sin distinguirlas no hay por dónde tirar. Enmascarado: es una
-            // credencial viva y el registro se queda en disco.
+            // It says WHICH one was presented and where it was looked for, because a plain «matches no
+            // account» does not distinguish the three reasons it can happen for —the token
+            // being from another start, the column having been overwritten, or the client
+            // sending something else— and without distinguishing them there is nowhere to go. Masked: it is a
+            // live credential and the log stays on disk.
             Console.WriteLine($"[Lanzamientos] Token {Enmascarar(token)} desconocido: no está entre " +
                               $"los {Tokens.Count} de este arranque, ni en LauncherToken, ni en GameToken.");
             return 0;
         }
 
-        /// <summary>Los cuatro primeros y los cuatro últimos, para poder seguirle la pista sin escribirlo.</summary>
+        /// <summary>The first four and the last four, to be able to follow its trail without writing it.</summary>
         private static string Enmascarar(string token)
             => token.Length <= 12
                 ? new string('x', token.Length)
@@ -202,8 +202,8 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Olvida todos los lanzamientos. Del banco de pruebas: en el servidor nadie debe llamarla,
-        /// porque le soltaria la cuenta a todo el que este jugando.
+        /// Forgets all the launches. For the test bench: on the server nobody must call it,
+        /// because it would release the account of everyone playing.
         /// </summary>
         internal static void ForgetEverything()
         {
@@ -214,26 +214,26 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Quita el lanzamiento de una cuenta sin tener el objeto delante.
+        /// Removes an account's launch without having the object at hand.
         ///
-        /// Hace falta desde que el lanzador es otro proceso: el que ve morir el proceso del cliente
-        /// es él, y por el cable sólo puede mandar el número de la cuenta.
+        /// It is needed since the launcher is another process: the one that sees the client process die
+        /// is the launcher, and over the wire it can only send the account number.
         /// </summary>
         public static void RemoveByAccount(long accountId)
         {
             if (ByAccount.TryGetValue(accountId, out var launch)) Remove(launch);
         }
 
-        /// <summary>Las cuentas que tienen un cliente abierto ahora mismo.</summary>
+        /// <summary>The accounts that have a client open right now.</summary>
         public static IReadOnlyCollection<long> ActiveAccounts => ByAccount.Keys.ToArray();
 
         /// <summary>
-        /// Suelta los lanzamientos que se quedaron colgados: los que se registraron hace rato y
-        /// nunca llegaron a conectar al servidor de juego.
+        /// Releases the launches that were left hanging: the ones registered a while ago that
+        /// never got to connect to the game server.
         ///
-        /// Sin esto, un cliente que arranca y muere antes de llegar al 5555 —o un lanzador que se
-        /// cierra en mal momento— deja la cuenta marcada como ocupada para siempre, y Register la
-        /// rechaza cada vez. El CreatedAtUtc llevaba puesto desde el principio y no lo leía nadie.
+        /// Without this, a client that starts and dies before reaching 5555 —or a launcher that
+        /// closes at a bad moment— leaves the account marked as busy forever, and Register
+        /// rejects it every time. CreatedAtUtc had been set from the start and nobody read it.
         /// </summary>
         public static int SoltarLosCaducados(TimeSpan cuanto)
         {
@@ -243,24 +243,24 @@ namespace Jondo.Unity.Server.Network
             {
                 var launch = pair.Value;
 
-                // Desde la ultima senal, no desde que se anoto. El de antes era "si tiene entrada
-                // en ByGameSession no se toca", y esa entrada la pone el handshake y no la quita
-                // nadie: un cliente que se moria despues del handshake dejaba la cuenta ocupada
-                // hasta reiniciar el servidor.
+                // Since the last sign, not since it was recorded. The earlier one was "if it has an entry
+                // in ByGameSession it is not touched", and that entry is put by the handshake and nobody
+                // removes it: a client that died after the handshake left the account busy
+                // until the server restarted.
                 //
-                // Y NO se suelta al cerrarse un socket, que es la otra forma de arreglar esto y
-                // abre dos agujeros: volver a la pantalla de personajes cierra el socket de juego
-                // -es la flecha de atras, no salir- asi que soltar ahi permite relanzar la misma
-                // cuenta con el cliente anterior todavia vivo, tantas veces como se quiera, y de
-                // paso el recuento por IP nunca pasa de uno y el tope de ocho deja de existir.
+                // And it is NOT released when a socket closes, which is the other way of fixing this and
+                // opens two holes: going back to the character screen closes the game socket
+                // -it is the back arrow, not quitting- so releasing there allows relaunching the same
+                // account with the previous client still alive, as many times as one likes, and on top of that
+                // the per-IP count never goes above one and the cap of eight stops existing.
                 var visto = launch.LastSeenUtc == default ? launch.CreatedAtUtc : launch.LastSeenUtc;
                 if (ahora - visto < cuanto) continue;
 
-                // Y la senal que de verdad zanja: hay un socket de esa cuenta conectado ahora
-                // mismo. Hace falta ADEMAS de la marca de tiempo porque un jugador quieto puede
-                // pasarse los cinco minutos sin que nadie resuelva su sesion, y soltarle el
-                // lanzamiento le dejaria la cuenta libre para que la abriera otro cliente con el
-                // suyo todavia jugando.
+                // And the sign that really settles it: there is a socket of that account connected right
+                // now. It is needed ON TOP of the timestamp because an idle player can
+                // spend the five minutes without anyone resolving his session, and releasing his
+                // launch would leave the account free for another client to open it with his
+                // still playing.
                 if (SessionRegistry.HasConnected(launch.AccountId)) continue;
 
                 Remove(launch);
@@ -302,7 +302,7 @@ namespace Jondo.Unity.Server.Network
             var launches = new List<Launch>();
             try
             {
-                // Los ocho desde la MISMA direccion, que es lo que agrupa a una persona.
+                // The eight from the SAME address, which is what groups one person.
                 const string mismaCasa = "10.0.0.7";
                 for (int i = 0; i < Contract.ClientesPorIp; i++)
                     launches.Add(Register(1000 + i, "", Guid.NewGuid().ToString("N"), "fr", mismaCasa));
@@ -312,9 +312,9 @@ namespace Jondo.Unity.Server.Network
                 catch (InvalidOperationException) { rejected = true; }
                 if (!rejected) throw new InvalidOperationException("The ninth game client was not rejected.");
 
-                // Pero desde OTRA direccion si entra: el tope es de una persona, no del servidor.
-                // Cuando eran la misma constante, este noveno cliente se rechazaba tambien, y con
-                // el servidor en otra maquina eso dejaba el mundo en ocho jugadores como mucho.
+                // But from ANOTHER address it does get in: the cap belongs to a person, not to the server.
+                // When they were the same constant, this ninth client was rejected too, and with
+                // the server on another machine that left the world at eight players at most.
                 var deFuera = Register(8888, "", Guid.NewGuid().ToString("N"), "fr", "10.0.0.99");
                 launches.Add(deFuera);
             }

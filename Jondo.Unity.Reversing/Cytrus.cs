@@ -6,39 +6,39 @@ using System.Text;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El almacén de clientes de Ankama, del que se baja un cliente viejo sin instalarlo.
+/// Ankama's client store, from which an old client is downloaded without installing it.
 ///
-/// El emparejador mide 68,3% con cero errores cuando el protocolo no cambia, y 11,3% en el salto
-/// real de 3.6.4.3 a 3.6.10.10. La diferencia no es el emparejador: son los seis parches que hay en
-/// medio. Cada uno mueve un poco los nombres y seis movimientos encadenados borran la señal.
+/// The matcher measures 68.3% with zero errors when the protocol does not change, and 11.3% on the real
+/// jump from 3.6.4.3 to 3.6.10.10. The difference is not the matcher: it is the six patches in
+/// between. Each one moves the names a little and six chained moves erase the signal.
 ///
-/// La cura es no dar el salto largo. Ankama sigue sirviendo los clientes antiguos en su CDN, así
-/// que el salto se puede partir en saltos de un parche —3.6.4.3, 3.6.5.4, 3.6.6.5, …— cada uno
-/// cerca del techo, arrastrando los nombres por la cadena. Esto es lo que los baja.
+/// The cure is not to make the long jump. Ankama still serves the old clients on its CDN, so
+/// the jump can be split into one-patch jumps —3.6.4.3, 3.6.5.4, 3.6.6.5, …— each one
+/// close to the ceiling, dragging the names along the chain. This is what downloads them.
 ///
-/// ─── Por qué no se baja el cliente entero ───────────────────────────────────────────────
+/// ─── Why the whole client is not downloaded ─────────────────────────────────────────────
 ///
-/// Un cliente son unos 12 GB y de todo eso hacen falta dos ficheros, unos 130 MB. El manifiesto
-/// dice en qué trozos está partido cada fichero y en qué paquete vive cada trozo, y los paquetes
-/// admiten peticiones por rango. Así que se piden los bytes exactos y nada más: por versión se
-/// bajan esos 130 MB en vez de los 12 GB, que es la diferencia entre hacer la cadena y no hacerla.
+/// A client is some 12 GB and of all that two files are needed, some 130 MB. The manifest
+/// says which chunks each file is split into and which bundle each chunk lives in, and the bundles
+/// accept range requests. So the exact bytes are asked for and nothing more: per version
+/// those 130 MB are downloaded instead of the 12 GB, which is the difference between making the chain and not making it.
 ///
-/// ─── El formato ─────────────────────────────────────────────────────────────────────────
+/// ─── The format ─────────────────────────────────────────────────────────────────────────
 ///
-/// El manifiesto es un FlatBuffer sin identificador de fichero. El esquema es público
-/// (dofusdude/ankabuffer) y cabe en cinco tablas, así que el lector va aquí a mano en vez de
-/// arrastrar el paquete de Google y su generador de código para leer cinco tablas.
+/// The manifest is a FlatBuffer without a file identifier. The schema is public
+/// (dofusdude/ankabuffer) and fits in five tables, so the reader goes here by hand instead of
+/// dragging in Google's package and its code generator to read five tables.
 /// </summary>
 public sealed class Cytrus : IDisposable
 {
     private const string Cdn = "https://cytrus.cdn.ankama.com";
 
-    /// <summary>El archivo de dofera/cytrus, que conserva TODAS las versiones publicadas.</summary>
+    /// <summary>dofera/cytrus's archive, which keeps ALL the published versions.</summary>
     ///
-    /// El cytrus.json vivo de Ankama sólo trae las de hoy —3,5 KB— porque lo sobrescribe en cada
-    /// publicación. El de dofera lo fusiona cada minuto en vez de sobrescribirlo, y por eso guarda
-    /// las doscientas versiones de Windows desde la 3.0.1.1. Sin esa lista no se sabe qué pedirle
-    /// a la CDN: los ficheros siguen ahí, pero hay que saber cómo se llaman.
+    /// Ankama's live cytrus.json only brings today's —3.5 KB— because it overwrites it on each
+    /// release. dofera's merges it every minute instead of overwriting it, and that is why it keeps
+    /// the two hundred Windows versions since 3.0.1.1. Without that list one does not know what to ask
+    /// the CDN for: the files are still there, but one has to know what they are called.
     private const string Archive = "https://raw.githubusercontent.com/dofera/cytrus/main/cytrus.json";
 
     private readonly HttpClient _http;
@@ -61,14 +61,14 @@ public sealed class Cytrus : IDisposable
 
     public void Dispose() => _http.Dispose();
 
-    // ─── Las versiones ──────────────────────────────────────────────────────────────────
+    // ─── The versions ───────────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Las versiones publicadas de esta rama, de la más vieja a la más nueva.
+    /// This branch's published versions, from the oldest to the newest.
     ///
-    /// Vienen con el prefijo puesto («6.0_3.6.10.10»), que es como las nombra la CDN. El orden es
-    /// el del archivo, que es el orden en que Ankama las publicó, y ése es justo el que hace falta
-    /// para encadenar: la cadena tiene que recorrer los parches en el orden en que salieron.
+    /// They come with the prefix on («6.0_3.6.10.10»), which is how the CDN names them. The order is
+    /// the archive's, which is the order in which Ankama published them, and that is exactly the one needed
+    /// for chaining: the chain has to walk the patches in the order they came out.
     /// </summary>
     public async Task<List<string>> VersionsAsync(CancellationToken cancel = default)
     {
@@ -100,17 +100,17 @@ public sealed class Cytrus : IDisposable
     }
 
     /// <summary>
-    /// El trozo de cadena que va de una versión a otra, ambas incluidas.
+    /// The stretch of chain that goes from one version to another, both included.
     ///
-    /// Se le dan los extremos tal y como los escribe uno —«3.6.4.3»— y devuelve los nombres que
-    /// entiende la CDN. Las versiones que la CDN ya no sirve se quedan fuera aquí y no más tarde:
-    /// una cadena a la que le falta un eslabón a mitad no es media cadena, es dos cadenas.
+    /// It is given the ends as one writes them —«3.6.4.3»— and it returns the names the
+    /// CDN understands. The versions the CDN no longer serves are left out here and not later:
+    /// a chain missing a link halfway is not half a chain, it is two chains.
     ///
-    /// El orden se calcula, no se hereda. En el archivo las versiones están en el orden en que se
-    /// vieron —y las que alguien rellenó a mano después van al final, fuera de sitio—, así que
-    /// aquí se ordenan por número. Ordenarlas como texto sería peor todavía: pondría 3.6.10.10
-    /// antes que 3.6.9.9, y una cadena recorrida al revés no avisa de nada, simplemente empareja
-    /// mal y da un porcentaje malo que parece del emparejador.
+    /// The order is computed, not inherited. In the archive the versions are in the order they were
+    /// seen —and the ones someone filled in by hand later go at the end, out of place—, so
+    /// here they are sorted by number. Sorting them as text would be even worse: it would put 3.6.10.10
+    /// before 3.6.9.9, and a chain walked backwards gives no warning, it simply matches
+    /// badly and gives a bad percentage that looks like the matcher's.
     /// </summary>
     public async Task<List<string>> ChainAsync(string from, string to, Action<string> report, CancellationToken cancel = default)
     {
@@ -133,14 +133,14 @@ public sealed class Cytrus : IDisposable
         return chain;
     }
 
-    /// <summary>Quita el prefijo de rama: «6.0_3.6.10.10» pasa a ser «3.6.10.10».</summary>
+    /// <summary>Removes the branch prefix: «6.0_3.6.10.10» becomes «3.6.10.10».</summary>
     public static string Tail(string version)
     {
         int bar = version.IndexOf('_');
         return bar < 0 ? version : version[(bar + 1)..];
     }
 
-    /// <summary>Compara dos versiones por sus números, tramo a tramo.</summary>
+    /// <summary>Compares two versions by their numbers, segment by segment.</summary>
     public static int Compare(string a, string b)
     {
         string[] left = a.Split('.'), right = b.Split('.');
@@ -163,14 +163,14 @@ public sealed class Cytrus : IDisposable
     private string ManifestUrl(string version)
         => Cdn + "/" + _game + "/releases/" + _release + "/" + _platform + "/" + version + ".manifest";
 
-    // ─── El manifiesto ──────────────────────────────────────────────────────────────────
+    // ─── The manifest ───────────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// El manifiesto de una versión, cacheado en disco.
+    /// A version's manifest, cached on disk.
     ///
-    /// Son 51 MB por versión y se lee más de una vez, así que se guarda. Se escribe primero a un
-    /// fichero temporal y se mueve al final: un manifiesto a medio bajar que se quedara con el
-    /// nombre bueno haría fallar todas las ejecuciones siguientes sin decir por qué.
+    /// It is 51 MB per version and it is read more than once, so it is kept. It is written first to a
+    /// temporary file and moved at the end: a half-downloaded manifest left with the
+    /// good name would make all the following runs fail without saying why.
     /// </summary>
     public async Task<byte[]> ManifestAsync(string version, Action<string> report, CancellationToken cancel = default)
     {
@@ -186,24 +186,24 @@ public sealed class Cytrus : IDisposable
         return bytes;
     }
 
-    // ─── La bajada ──────────────────────────────────────────────────────────────────────
+    // ─── The download ───────────────────────────────────────────────────────────────────
 
-    /// <summary>Un fichero que se ha bajado y ha pasado la verificación.</summary>
+    /// <summary>A file that has been downloaded and has passed verification.</summary>
     public sealed record Grabbed(string Name, string Path, long Size);
 
-    /// <summary>Un trozo: su huella, dónde empieza dentro del paquete y cuánto ocupa.</summary>
+    /// <summary>A chunk: its hash, where it starts inside the bundle and how much it takes up.</summary>
     private sealed record Piece(string Hash, long Offset, long Size);
 
     /// <summary>
-    /// Baja de una versión sólo los ficheros que casan con alguno de los patrones.
+    /// Downloads from a version only the files matching one of the patterns.
     ///
-    /// Los patrones son los del intérprete de órdenes de toda la vida («*GameAssembly.dll»,
-    /// «*global-metadata.dat») y se comparan contra la ruta entera dentro del cliente.
+    /// The patterns are the good old shell ones («*GameAssembly.dll»,
+    /// «*global-metadata.dat») and they are compared against the whole path inside the client.
     ///
-    /// Lo que se escribe se verifica: la huella SHA-1 del fichero armado tiene que ser la que dice
-    /// el manifiesto o no se escribe nada. Aquí no cabe la tolerancia —un GameAssembly.dll con un
-    /// trozo mal daría un índice de código con pruebas inventadas, y eso ya nos costó diecinueve
-    /// anclas falsas la última vez que dejamos pasar una evidencia sin comprobar.
+    /// What is written is verified: the SHA-1 hash of the assembled file has to be the one the
+    /// manifest says or nothing is written. There is no room for tolerance here —a GameAssembly.dll with one
+    /// bad chunk would give a code index with invented evidence, and that already cost us nineteen
+    /// false anchors the last time we let a piece of evidence through unchecked.
     /// </summary>
     public async Task<List<Grabbed>> FetchAsync(
         string version,
@@ -222,7 +222,7 @@ public sealed class Cytrus : IDisposable
         {
             var fragment = root.Item(0, f);
 
-            // Qué ficheros de este fragmento nos interesan, y qué trozos piden.
+            // Which files of this fragment interest us, and which chunks they ask for.
             var wanted = new List<(string Name, long Size, string Hash, List<string> Chunks)>();
             var needed = new HashSet<string>(StringComparer.Ordinal);
 
@@ -238,7 +238,7 @@ public sealed class Cytrus : IDisposable
                 int count = file.Count(3);
                 if (count == 0)
                 {
-                    // Sin trozos: el fichero entero es un trozo, y su huella es la del fichero.
+                    // No chunks: the whole file is one chunk, and its hash is the file's.
                     pieces.Add(hash);
                 }
                 else
@@ -252,8 +252,8 @@ public sealed class Cytrus : IDisposable
 
             if (wanted.Count == 0) continue;
 
-            // Dónde vive cada trozo que nos hace falta. Un trozo puede estar en varios paquetes;
-            // nos quedamos con el primero que aparezca, que es tan bueno como cualquier otro.
+            // Where each chunk we need lives. A chunk can be in several bundles;
+            // we keep the first one that appears, which is as good as any other.
             var lodging = new Dictionary<string, (string Bundle, Piece Piece)>(StringComparer.Ordinal);
             for (int b = 0; b < fragment.Count(2); b++)
             {
@@ -277,9 +277,9 @@ public sealed class Cytrus : IDisposable
 
             foreach (var (name, size, hash, pieces) in wanted)
             {
-                // La ruta de dentro del cliente se respeta tal cual. No es cosmético: el lector
-                // busca global-metadata.dat en Dofus_Data\il2cpp_data\Metadata\ y no en la raíz,
-                // así que aplanar los nombres daría una carpeta que no se puede abrir.
+                // The path inside the client is kept as is. It is not cosmetic: the reader
+                // looks for global-metadata.dat in Dofus_Data\il2cpp_data\Metadata\ and not in the root,
+                // so flattening the names would give a folder that cannot be opened.
                 string path = Path.Combine(destination, name.Replace('/', Path.DirectorySeparatorChar));
                 Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 
@@ -293,12 +293,12 @@ public sealed class Cytrus : IDisposable
     }
 
     /// <summary>
-    /// Se trae los trozos, agrupando por paquete y juntando los que van seguidos.
+    /// Fetches the chunks, grouping by bundle and joining the ones that go in a row.
     ///
-    /// Los trozos de un mismo fichero suelen ir consecutivos dentro del paquete, así que juntarlos
-    /// convierte cientos de peticiones en unas pocas. Se pide un solo rango por petición a
-    /// propósito: pedir varios de golpe obliga a la respuesta a venir en varias partes, con sus
-    /// separadores y sus cabeceras, y eso es un analizador más que puede equivocarse.
+    /// The chunks of one same file usually go consecutively inside the bundle, so joining them
+    /// turns hundreds of requests into a few. A single range is asked for per request on
+    /// purpose: asking for several at once forces the response to come in several parts, with their
+    /// separators and their headers, and that is one more parser that can get it wrong.
     /// </summary>
     private async Task<Dictionary<string, byte[]>> PullAsync(
         Dictionary<string, (string Bundle, Piece Piece)> lodging,
@@ -337,7 +337,7 @@ public sealed class Cytrus : IDisposable
         return meat;
     }
 
-    /// <summary>Un rango de bytes de un paquete, con tres intentos porque la red es la red.</summary>
+    /// <summary>A byte range of a bundle, with three attempts because the network is the network.</summary>
     private async Task<byte[]> RangeAsync(string bundle, long from, long to, CancellationToken cancel)
     {
         string url = Cdn + "/" + _game + "/bundles/" + bundle[..2] + "/" + bundle;
@@ -364,7 +364,7 @@ public sealed class Cytrus : IDisposable
         }
     }
 
-    /// <summary>Junta los trozos en orden y comprueba la huella antes de dejar el fichero puesto.</summary>
+    /// <summary>Joins the chunks in order and checks the hash before leaving the file in place.</summary>
     private static void Assemble(
         string path, List<string> pieces, Dictionary<string, byte[]> meat, long size, string hash, string name)
     {
@@ -412,7 +412,7 @@ public sealed class Cytrus : IDisposable
         return false;
     }
 
-    /// <summary>El comodín de siempre: «*» vale por cualquier cosa, incluida ninguna.</summary>
+    /// <summary>The usual wildcard: «*» stands for anything, including nothing.</summary>
     private static bool Glob(string text, string pattern)
     {
         int t = 0, p = 0, star = -1, mark = 0;
@@ -445,14 +445,14 @@ public sealed class Cytrus : IDisposable
         _ => bytes + " B",
     };
 
-    // ─── El lector de FlatBuffers ───────────────────────────────────────────────────────
+    // ─── The FlatBuffers reader ─────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Lo justo para leer las cinco tablas del manifiesto.
+    /// Just enough to read the manifest's five tables.
     ///
-    /// Una tabla lleva delante un entero con lo que hay que restar para llegar a su vtable, y la
-    /// vtable dice en qué desplazamiento vive cada campo, o cero si no está. Los índices de campo
-    /// son los del esquema, por orden de declaración:
+    /// A table carries in front an integer with what has to be subtracted to reach its vtable, and the
+    /// vtable says at which offset each field lives, or zero if it is not there. The field indices
+    /// are the schema's, in declaration order:
     ///
     ///   Chunk    { 0 hash[], 1 size, 2 offset, 3 done }
     ///   File     { 0 name, 1 size, 2 hash[], 3 chunks[], 4 executable, 5 symlink }
@@ -467,7 +467,7 @@ public sealed class Cytrus : IDisposable
 
         public static Flat Root(byte[] data) => new(data, BinaryPrimitives.ReadInt32LittleEndian(data));
 
-        /// <summary>Dónde vive el campo, o cero si la vtable dice que no está.</summary>
+        /// <summary>Where the field lives, or zero if the vtable says it is not there.</summary>
         private int Where(int index)
         {
             int vtable = _at - BinaryPrimitives.ReadInt32LittleEndian(_data.AsSpan(_at));
@@ -478,7 +478,7 @@ public sealed class Cytrus : IDisposable
             return offset == 0 ? 0 : _at + offset;
         }
 
-        /// <summary>Las cadenas, los vectores y las tablas se guardan por referencia relativa.</summary>
+        /// <summary>Strings, vectors and tables are stored by relative reference.</summary>
         private int Follow(int position)
             => position + BinaryPrimitives.ReadInt32LittleEndian(_data.AsSpan(position));
 
@@ -497,7 +497,7 @@ public sealed class Cytrus : IDisposable
             return Encoding.UTF8.GetString(_data, vector + 4, length);
         }
 
-        /// <summary>Un vector de bytes leído como hexadecimal, que es como se nombran las huellas.</summary>
+        /// <summary>A byte vector read as hexadecimal, which is how hashes are named.</summary>
         public string Hex(int index)
         {
             int position = Where(index);
@@ -514,7 +514,7 @@ public sealed class Cytrus : IDisposable
             return BinaryPrimitives.ReadInt32LittleEndian(_data.AsSpan(Follow(position)));
         }
 
-        /// <summary>El elemento i de un vector de tablas.</summary>
+        /// <summary>Element i of a vector of tables.</summary>
         public Flat Item(int index, int i)
         {
             int vector = Follow(Where(index));

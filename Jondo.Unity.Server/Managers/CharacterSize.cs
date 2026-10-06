@@ -5,30 +5,31 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Lo que mide el personaje, en tanto por ciento de lo que mide su raza.
+    /// How big the character is, as a percentage of how big his breed is.
     ///
-    /// La escala viaja en el f5 del bloque de aspecto, empaquetada, y es un MULTIPLICADOR: en la
-    /// notación del propio cliente —la que guarda NpcSpawns.Look, "{4907|||130}"— el último número
-    /// es eso mismo. Los NPC van casi todos a 100 y un dragopavo a 120, que es el 20 % más grande.
+    /// The scale travels in the look block's f5, packed, and it is a MULTIPLIER: in the client's own
+    /// notation -- the one NpcSpawns.Look stores, "{4907|||130}" -- the last number is exactly that.
+    /// NPCs are nearly all at 100 and a dragoturkey at 120, which is 20 % bigger.
     ///
-    /// Ojo con el número de partida: las razas NO valen 100. breed_looks.json, que sale del bundle
-    /// del cliente, les da entre 43 y 55 según raza y sexo (un feca macho 53, una feca hembra 52).
-    /// Por eso el comando no manda el número que escribe el jugador tal cual: guarda un porcentaje
-    /// y multiplica por él la escala que declara la raza. Así el 100 es el tamaño normal de ESE
-    /// personaje —sea 43 o 55 lo que valga por dentro— y el 200 es el doble, que es lo pedido.
+    /// Careful with the starting number: breeds are NOT worth 100. breed_looks.json, which comes from
+    /// the client's bundle, gives them between 43 and 55 depending on breed and sex (a male Feca 53, a
+    /// female Feca 52). That is why the command does not send the number the player types as is: it
+    /// stores a percentage and multiplies the scale the breed declares by it. That way 100 is THAT
+    /// character's normal size -- whether it is 43 or 55 inside -- and 200 is double, which is what was
+    /// asked.
     ///
-    /// Vive aquí y no en GameState porque el aspecto se construye también para personajes que no
-    /// se están jugando —la pantalla de selección los pinta todos— y cada uno tiene el suyo.
+    /// It lives here and not in GameState because the look is also built for characters not being
+    /// played -- the selection screen draws them all -- and each has his own.
     /// </summary>
     public static class CharacterSize
     {
-        /// <summary>El tamaño de siempre: el que declara la raza, sin tocar.</summary>
+        /// <summary>The usual size: the one the breed declares, untouched.</summary>
         public const int Normal = 100;
 
         /// <summary>
-        /// Los topes. No son de protocolo, son de sentido común: por debajo de 5 el muñeco
-        /// desaparece de la pantalla y por encima de 1000 tapa el mapa entero, y en los dos casos
-        /// el jugador se queda sin poder verse para arreglarlo.
+        /// The limits. They are not protocol's, they are common sense's: below 5 the figure disappears from
+        /// the screen and above 1000 it covers the whole map, and in both cases the player can no longer see
+        /// himself to fix it.
         /// </summary>
         public const int Minimum = 5;
         public const int Maximum = 1000;
@@ -36,7 +37,7 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Dictionary<long, int> _cache = new Dictionary<long, int>();
         private static readonly object _lock = new object();
 
-        /// <summary>El tamaño de un personaje. Uno que nunca lo haya tocado mide lo normal.</summary>
+        /// <summary>A character's size. One who has never touched it is normal size.</summary>
         public static int Of(long characterId)
         {
             if (characterId <= 0) return Normal;
@@ -56,8 +57,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Cambia el tamaño y lo deja escrito. Devuelve el que ha quedado, que puede no ser el
-        /// pedido si venía fuera de los topes.
+        /// Changes the size and writes it down. Returns the one that ended up set, which may not be the one
+        /// asked for if it came outside the limits.
         /// </summary>
         public static int Set(long characterId, int percent)
         {
@@ -81,8 +82,8 @@ namespace Jondo.Unity.Server.Managers
             }
             catch (Exception ex)
             {
-                // Que no se guarde no puede impedir que se vea: el aspecto ya lleva el tamaño
-                // nuevo en memoria y lo que se pierde es que sobreviva a cerrar el juego.
+                // Failing to save it cannot prevent it from being seen: the look already carries the new
+                // size in memory and what is lost is it surviving the game being closed.
                 Console.WriteLine($"[Tamaño] No se pudo guardar el tamaño de {characterId}: {ex.Message}");
             }
 
@@ -90,11 +91,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Las escalas de la raza ya multiplicadas por el tamaño del personaje.
+        /// The breed's scales already multiplied by the character's size.
         ///
-        /// Se redondea hacia arriba con un suelo de 1: un tamaño pequeño sobre una escala pequeña
-        /// da cero al redondear, y un cero en el f5 es "sin escala", que el cliente dibuja al
-        /// tamaño de por defecto. Es decir, encoger de más devolvía al muñeco a su tamaño normal.
+        /// It is rounded up with a floor of 1: a small size on a small scale gives zero when rounding, and a
+        /// zero in f5 is "no scale", which the client draws at the default size. That is, shrinking too much
+        /// sent the figure back to its normal size.
         /// </summary>
         public static List<long> Applied(IReadOnlyList<long> scales, long characterId)
         {
@@ -130,8 +131,8 @@ namespace Jondo.Unity.Server.Managers
             }
             catch (Exception ex)
             {
-                // Una base sin la columna todavía —o un personaje que no está— no puede dejar al
-                // muñeco sin dibujar: se mide como todo el mundo.
+                // A database without the column yet -- or a character who is not there -- cannot leave
+                // the figure undrawn: he is measured like everybody else.
                 Console.WriteLine($"[Tamaño] No se pudo leer el tamaño de {characterId}: {ex.Message}");
             }
             return Normal;

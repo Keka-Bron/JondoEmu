@@ -7,20 +7,20 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// La pantalla de fin de combate (jyg).
+    /// The end-of-fight screen (jyg).
     /// </summary>
     /// <remarks>
-    /// Medido en el jyg del koliseo 2 contra 2, que es el único final de un combate ENTRE PERSONAS
-    /// que hay capturado. Sus cuatro entradas se parten en dos y dos, y de ahí salen las dos reglas
-    /// que se sujetan aquí:
+    /// Measured on the jyg of the 2 versus 2 koliseo, which is the only end of a fight BETWEEN PEOPLE
+    /// captured. Its four entries split two and two, and from there come the two rules
+    /// held here:
     ///
-    ///   - las cuatro traen su bloque de experiencia con el nivel dentro (227, 354, 447…), ganen o
-    ///     pierdan
-    ///   - las dos que pierden NO traen ni el f3 de dentro ni el f4 de la victoria
+    ///   - all four bring their experience block with the level inside (227, 354, 447…), win or
+    ///     lose
+    ///   - the two that lose bring neither the inner f3 nor the victory's f4
     ///
-    /// La primera es la que importa de verdad: el cliente entiende que una entrada sin nivel es un
-    /// monstruo, y como del rival no tenía monstruo que dibujar, pintaba una interrogación donde
-    /// iba su retrato.
+    /// The first is the one that really matters: the client understands that an entry without a level is a
+    /// monster, and since it had no monster to draw for the rival, it drew a question mark where
+    /// his portrait went.
     /// </remarks>
     public class FightResultsTests
     {
@@ -49,14 +49,14 @@ namespace Jondo.Unity.Tests.Combat
             var ganador = ProtoMessage.Parse(entradas[0].BytesValue);
             var perdedor = ProtoMessage.Parse(entradas[1].BytesValue);
 
-            // El f4 de la victoria.
+            // The victory's f4.
             Assert.True(Tiene(ganador, 4));
             Assert.False(Tiene(perdedor, 4));
 
-            // El f3 de dentro NO distingue: lo llevan los dos. Lo quité creyendo que era del
-            // ganador —en el jyg del koliseo las dos personas que pierden no lo traen— y la
-            // guardia de regresión lo cazó contra una captura contra monstruos, donde el bicho
-            // que pierde sí lo lleva. Qué significa sigue sin saberse.
+            // The inner f3 does NOT distinguish: both carry it. I removed it thinking it was the
+            // winner's —in the koliseo's jyg the two people who lose do not bring it— and the
+            // regression guard caught it against a capture against monsters, where the creature
+            // that loses does carry it. What it means is still unknown.
             Assert.True(Tiene(Dentro(entradas[0], 3), 3));
             Assert.True(Tiene(Dentro(entradas[1], 3), 3));
         }
@@ -64,7 +64,7 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void El_que_pierde_si_lleva_su_nivel()
         {
-            // Ésta es la de la interrogación: sin nivel, el cliente cree que es un monstruo.
+            // This is the question-mark one: without a level, the client believes it is a monster.
             byte[] jyg = FightProtocol.BuildFightResults(new[]
             {
                 new FightProtocol.FightResult { Fighter = 20, Winner = false, Level = 50, Xp = 1 },
@@ -79,7 +79,7 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Un_monstruo_va_sin_ficha()
         {
-            // Nivel cero: sólo quién es y si ganó. Es lo que separa a un bicho de una persona.
+            // Level zero: only who it is and whether it won. It is what separates a creature from a person.
             byte[] jyg = FightProtocol.BuildFightResults(new[]
             {
                 new FightProtocol.FightResult { Fighter = -1, Winner = false },

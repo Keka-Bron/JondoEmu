@@ -10,46 +10,45 @@ using Jondo.Unity.World.Content;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Hablar con un NPC y comprarle.
+    /// Talking to an NPC and buying from him.
     ///
-    /// Todo esto está medido de la captura del servidor de torneos, donde hay cincuenta y un
-    /// vendedores repartidos por siete mapas y la montaña de kamas. Son cuatro opcodes para la
-    /// tienda y cuatro para el diálogo, y el servidor contesta siempre por EMPUJE, sin emparejar
-    /// ids de petición:
+    /// All of this is measured from the tournament server's capture, where there are fifty-one vendors
+    /// spread over seven maps and the kamas mountain. There are four opcodes for the shop and four for
+    /// the dialogue, and the server always answers by PUSH, without pairing request ids:
     ///
-    ///   cliente  iov { f1: acción, f2: mapa, f3: id contextual }   ha clicado al NPC
+    ///   client   iov { f1: action, f2: map, f3: contextual id }    clicked the NPC
     ///
-    ///   si la acción es 1 u 11 (comprar):
-    ///   servidor kbd { f1 (repetido): el catálogo entero, f2: id contextual }
-    ///   cliente  kea { f1: objeto, f2: cantidad }                  comprar
-    ///   servidor lqn, ivf, iua, iun, kdg, ivf, iun
-    ///   cliente  kla (vacío)                                       cerrar
-    ///   servidor khd { f3: 11 }
+    ///   if the action is 1 or 11 (buy):
+    ///   server   kbd { f1 (repeated): the whole catalogue, f2: contextual id }
+    ///   client   kea { f1: item, f2: quantity }                    buy
+    ///   server   lqn, ivf, iua, iun, kdg, ivf, iun
+    ///   client   kla (empty)                                       close
+    ///   server   khd { f3: 11 }
     ///
-    ///   si la acción es 3 (hablar):
-    ///   servidor ioc { f4: mapa, f5: id contextual }
-    ///   servidor ios { f1: pregunta, f2 (repetido): las respuestas }
-    ///   cliente  ioy { f1: la respuesta elegida }
-    ///   servidor kld { f1: 1 }  y lo que dé esa respuesta
+    ///   if the action is 3 (talk):
+    ///   server   ioc { f4: map, f5: contextual id }
+    ///   server   ios { f1: question, f2 (repeated): the answers }
+    ///   client   ioy { f1: the chosen answer }
+    ///   server   kld { f1: 1 }  and whatever that answer gives
     ///
-    /// El f1 del iov no es un tipo de mensaje: es el id de acción de la plantilla del NPC, el mismo
-    /// número que sale en su actions[]. Cuadra en los sesenta y cinco iov de la captura. Un NPC que
-    /// no declare la acción ni siquiera la ofrece en el menú.
+    /// The iov's f1 is not a message type: it is the action id of the NPC's template, the same number
+    /// that comes in its actions[]. It fits the sixty-five iov of the capture. An NPC that does not
+    /// declare the action does not even offer it in the menu.
     /// </summary>
     /// <remarks>
-    /// Lo que había aquí antes era de la 3.6.4.3 y usaba ilr, ilu, ilq, kjl, kjn, lxh y kns. Ni uno
-    /// de esos siete opcodes aparece una sola vez en la captura de la 3.6.10.10.
+    /// What was here before was 3.6.4.3's and used ilr, ilu, ilq, kjl, kjn, lxh and kns. Not one of
+    /// those seven opcodes appears even once in the 3.6.10.10 capture.
     /// </remarks>
     public static class NpcHandler
     {
-        /// <summary>Qué NPC tiene la tienda abierta ahora mismo, o cero.</summary>
+        /// <summary>Which NPC has the shop open right now, or zero.</summary>
         private static long OpenShop
         {
             get => SessionContext.State.OpenNpcShopId;
             set => SessionContext.State.OpenNpcShopId = value;
         }
 
-        /// <summary>Qué vendedor es, para saber si vende lo que el cliente pide.</summary>
+        /// <summary>Which vendor it is, to know whether he sells what the client asks for.</summary>
         private static int OpenShopNpc
         {
             get => SessionContext.State.OpenNpcShopNpcId;
@@ -59,45 +58,44 @@ namespace Jondo.Unity.Server.Handlers
         public static bool IsShopOpen => OpenShop != 0;
 
         /// <summary>
-        /// Si hay una conversación de NPC abierta ahora mismo.
+        /// Whether there is an NPC conversation open right now.
         /// </summary>
         /// <remarks>
-        /// Lo pregunta la cadena del kla para saber de quién es la X que se acaba de pulsar. Sin
-        /// esto, la X de una conversación se la quedaba el zaap —que es el caso por defecto de esa
-        /// cadena— y salía un kld con la razón 10; la de cerrar una conversación es la 1, así que
-        /// el cliente dejaba la ventana puesta y no había forma de salir salvo eligiendo una
-        /// respuesta.
+        /// The kla chain asks it to know whose is the X just pressed. Without this, a conversation's X was
+        /// taken by the zaap -- which is that chain's default case -- and a kld with reason 10 went out;
+        /// the one for closing a conversation is 1, so the client left the window up and there was no way
+        /// out except choosing an answer.
         /// </remarks>
         public static bool IsDialogueOpen => SessionContext.State.OpenDialogueNpcId != 0;
 
         /// <summary>
-        /// Desde dónde se numeran los objetos comprados.
+        /// Where bought items are numbered from.
         ///
-        /// Cada cosa que fabrica objetos tiene su tramo: 900.000.000 el inventario de prueba,
-        /// 950.000.000 la lotería del merkasako y 960.000.000 las apariencias regaladas. Ese último
-        /// tramo lo BORRA entero dotar_apariencias.py cada vez que se relanza, así que lo comprado
-        /// no puede caer ahí o desaparecería sin avisar.
+        /// Each thing that makes items has its band: 900,000,000 the test inventory, 950,000,000 the haven
+        /// bag lottery and 960,000,000 the gifted appearances. That last band is DELETED whole by
+        /// dotar_apariencias.py every time it is run again, so what is bought cannot fall there or it
+        /// would disappear without warning.
         /// </summary>
         private const long FirstUid = 970000000L;
 
         /// <summary>
-        /// Lo que da la montaña de kamas.
+        /// What the kamas mountain gives.
         ///
-        /// La cifra no está en ningún dato del cliente ni en la plantilla del NPC: es una constante
-        /// del servidor. En la captura se cobró tres veces y las tres subió exactamente lo mismo,
-        /// de cero a 50.000.000, de 49.999.998 a 99.999.998 y de ahí a 149.999.998.
+        /// The figure is not in any client data nor in the NPC's template: it is a server constant. In the
+        /// capture it was collected three times and all three went up by exactly the same, from zero to
+        /// 50,000,000, from 49,999,998 to 99,999,998 and from there to 149,999,998.
         /// </summary>
         private const long KamasMountainReward = 50_000_000L;
 
         /// <summary>
-        /// La respuesta que paga. La 70285 es "Hacerte con esos millones de kamas que no sirven a
-        /// nadie" y la 70286, la de al lado, se marcha sin cobrar: el servidor contesta el kld y
-        /// nada más.
+        /// The answer that pays. 70285 is "Hacerte con esos millones de kamas que no sirven a nadie" and
+        /// 70286, the one next to it, leaves without collecting: the server answers the kld and nothing
+        /// else.
         /// </summary>
         private const long KamasMountainReply = 70285;
 
         /// <summary>
-        /// El cliente ha clicado un NPC (iov). Según la acción, se le abre la tienda o el diálogo.
+        /// The client has clicked an NPC (iov). Depending on the action, the shop or the dialogue opens.
         /// </summary>
         public static async Task InteractAsync(NetworkStream stream, byte[] payload)
         {
@@ -136,7 +134,7 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[NPC] Acción {action} sobre el NPC {npc.NpcId}, que no está hecha.");
         }
 
-        /// <summary>El catálogo entero, de una sola vez, que es como lo manda el servidor real.</summary>
+        /// <summary>The whole catalogue, in one go, which is how the real server sends it.</summary>
         private static async Task OpenShopAsync(NetworkStream stream, Npcs.Spawn npc)
         {
             var catalogue = NpcShops.CatalogueOf(npc.NpcId);
@@ -149,8 +147,8 @@ namespace Jondo.Unity.Server.Handlers
             OpenShop = npc.ContextualId;
             OpenShopNpc = npc.NpcId;
 
-            // Si este vendedor cobra en fichas, se le dice al cliente cuál es la moneda. Sin
-            // esto el f3 no viaja y el cliente pinta el precio en kamas, que es lo de siempre.
+            // If this vendor charges in tokens, the client is told which the currency is. Without
+            // this f3 does not travel and the client draws the price in kamas, which is the usual.
             var tokenShop = TokenShops.Of(npc.NpcId);
             byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue, tokenShop);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -162,40 +160,40 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// «Hasta luego.», la despedida que se le pone a quien no trae ninguna respuesta.
+        /// «Hasta luego.» (See you.), the farewell given to whoever carries no answer.
         ///
-        /// No es un número inventado: es la respuesta MÁS USADA de todo el juego, la llevan 62
-        /// NPCs de los 6.467, y su texto en el catálogo del cliente es exactamente «Hasta luego.».
-        /// Se eligió por eso y no por lo que dice: hace falta un id de respuesta que el cliente
-        /// sepa resolver a un texto, y éste lo es en los cinco idiomas.
+        /// It is not a made-up number: it is the MOST USED answer of the whole game, 62 of the 6,467 NPCs
+        /// carry it, and its text in the client's catalogue is exactly «Hasta luego.». It was chosen for
+        /// that and not for what it says: an answer id the client can resolve to a text is needed, and
+        /// this one is, in all five languages.
         /// </summary>
         private const long RespuestaDeDespedida = 7846;
 
         /// <summary>
-        /// La ventana de diálogo y su primera pregunta.
+        /// The dialogue window and its first question.
         ///
-        /// Si hay una conversación escrita para este NPC, se abre por donde ella diga y con las
-        /// respuestas que ella diga. Si no, se hace lo de siempre: la frase de la plantilla y TODAS
-        /// sus respuestas de golpe, que es lo que hace que Snori Nairb ofrezca treinta y nueve.
+        /// If there is a conversation written for this NPC, it opens where it says and with the answers it
+        /// says. If not, the usual is done: the template's sentence and ALL its answers at once, which is
+        /// what makes Snori Nairb offer thirty-nine.
         /// </summary>
         private static async Task OpenDialogAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
         {
-            // ¿Es una luminomáquina? Entonces ni plantilla ni árbol escrito: lo que dice y lo que
-            // ofrece salen de la luz que tenga la planta y de la sal que lleve encima el jugador.
+            // Is it a luminomachine? Then neither template nor written tree: what it says and what it
+            // offers come from the light the floor has and the salt the player carries.
             if (npc.NpcId == Luminomachine.NpcId)
             {
                 await OpenMachineAsync(stream, npc, mapId);
                 return;
             }
 
-            // Y el cofre de la raid tampoco tiene árbol: lo que ofrece depende de si traes tesoros.
+            // And the raid chest has no tree either: what it offers depends on whether you bring treasures.
             if (npc.NpcId == RaidChest.NpcId)
             {
                 await OpenChestAsync(stream, npc, mapId);
                 return;
             }
 
-            // El puch maestro del kanojedo: los seis niveles, y luego cuántos.
+            // The kanojedo's master puch: the six levels, and then how many.
             if (npc.NpcId == Kanojedo.MasterNpc)
             {
                 await OpenMasterAsync(stream, npc, mapId);
@@ -229,21 +227,21 @@ namespace Jondo.Unity.Server.Handlers
                 ? LasQueTocan(primera)
                 : SinArbolEscrito(template!);
 
-            // Y si este NPC guarda la puerta de una mazmorra, sus dos opciones por delante.
+            // And if this NPC guards a dungeon's door, his two options up front.
             //
-            // Sin esto, un guardian sin arbol escrito cae en SinArbolEscrito, que devuelve LA
-            // ULTIMA respuesta de la plantilla y nada mas: Mawy Ingals declara diecinueve y lo
-            // unico que salia en pantalla era "No.". El manojo va siempre que la mazmorra lo
-            // acepte; la llave suelta solo si esta en la bolsa, porque una opcion que no puede
-            // funcionar no se distingue de una puerta rota. Ver DungeonHandler.DoorReplies.
+            // Without this, a guardian without a written tree falls into SinArbolEscrito, which
+            // returns THE LAST answer of the template and nothing else: Mawy Ingals declares nineteen
+            // and the only thing on screen was "No.". The keyring goes whenever the dungeon accepts
+            // it; the loose key only if it is in the bag, because an option that cannot work is not
+            // distinguishable from a broken door. See DungeonHandler.DoorReplies.
             long[] puerta = DungeonHandler.DoorReplies(npc.NpcId, mapId);
             if (puerta.Length > 0)
             {
                 var todas = new List<long>(puerta.Length + respuestas.Length);
                 todas.AddRange(puerta);
 
-                // Detras, lo que ya se iba a decir, sin repetir ninguna. La despedida importa:
-                // sin una salida el jugador se queda con una ventana que no cierra.
+                // After them, whatever was going to be said, without repeating any. The farewell matters:
+                // without a way out the player is left with a window that does not close.
                 foreach (long r in respuestas)
                 {
                     if (!todas.Contains(r)) todas.Add(r);
@@ -257,8 +255,9 @@ namespace Jondo.Unity.Server.Handlers
             var banker = Bankers.Of(npc.NpcId);
             if (banker != null) respuestas = BankHandler.WithTheBankReply(banker, respuestas);
 
-            // Se apunta por dónde va la conversación. Sin esto el ioy que llega después no se puede
-            // situar: trae el id de la respuesta y nada más, ni de qué NPC ni de qué frase venía.
+            // Where the conversation is going is noted. Without this the ioy that comes later cannot be
+            // placed: it carries the answer's id and nothing else, not which NPC nor which sentence it
+            // came from.
             SessionContext.State.OpenDialogueNpcId = npc.NpcId;
             SessionContext.State.OpenDialogueMapId = mapId;
             SessionContext.State.OpenDialogueMessage = pregunta;
@@ -266,7 +265,7 @@ namespace Jondo.Unity.Server.Handlers
             await PreguntarAsync(stream, pregunta, respuestas, template,
                                  escrito?.Line(pregunta), banker);
 
-            // Y si alguna misión en curso pedía justamente venir a ver a éste, ya está.
+            // And if some quest in progress asked precisely to come and see this one, that is done.
             await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
 
             string origen = arbolEscrito ? $" (authored, {escrito!.Lines.Count} lines)"
@@ -277,18 +276,18 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// La ventana de una luminomáquina: lo que le queda por iluminar y lo que cuesta.
+        /// A luminomachine's window: what it has left to light and what it costs.
         /// </summary>
         /// <remarks>
-        /// La máquina no tiene conversación escrita en ninguna parte y no la necesita: sus setenta
-        /// y seis respuestas dicen cada una lo suyo -«Dejar 4 sales de las profundidades para
-        /// iluminar la segunda franja»- y lo único que hay que decidir es cuáles enseñar. Eso lo
-        /// resuelve <see cref="Luminomachine.RepliesFor"/> con dos números: cuánta luz tiene la
-        /// planta y cuánta sal lleva quien pregunta.
+        /// The machine has no conversation written anywhere and does not need one: each of its seventy-six
+        /// answers says its own thing -- «Dejar 4 sales de las profundidades para iluminar la segunda
+        /// franja» -- and the only thing to decide is which ones to show. That is settled by
+        /// <see cref="Luminomachine.RepliesFor"/> with two numbers: how much light the floor has and how
+        /// much salt whoever asks carries.
         ///
-        /// Fuera de una raid la máquina está muerta. No es que se esconda: está en el mapa y se
-        /// puede hablar con ella, pero no hay instancia ninguna que iluminar, así que lo único que
-        /// ofrece es no tocarla. Prometer luz que no se puede encender sería peor que callarse.
+        /// Outside a raid the machine is dead. It is not that it hides: it is on the map and can be talked
+        /// to, but there is no instance at all to light, so the only thing it offers is not touching it.
+        /// Promising light that cannot be switched on would be worse than keeping quiet.
         /// </remarks>
         private static async Task OpenMachineAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
         {
@@ -324,13 +323,13 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Lo que hace una respuesta de la luminomáquina: cobrar la sal y subir la luz.
+        /// What a luminomachine answer does: charge the salt and raise the light.
         /// </summary>
         /// <remarks>
-        /// La sal se cobra ANTES de tocar la luz, y si la luz ha cambiado entre medias se le
-        /// devuelve. Con ocho personas en la misma planta eso no es una rareza teórica: dos que
-        /// hablen a la vez con la misma máquina ven los dos la misma oferta, y el segundo en
-        /// contestar estaría pagando por una franja que ya está encendida.
+        /// The salt is charged BEFORE touching the light, and if the light has changed in between it is
+        /// given back. With eight people on the same floor that is not a theoretical oddity: two who talk
+        /// to the same machine at once both see the same offer, and the second to answer would be paying
+        /// for a band that is already lit.
         /// </remarks>
         private static async Task MachineReplyAsync(NetworkStream stream, long reply)
         {
@@ -341,7 +340,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                     ConnectionProtocol.NpcDialogCloseReason)));
 
-            // No tocarla, o irse a buscar más sal: las dos se van sin pagar nada.
+            // Not touching it, or going off to look for more salt: both leave without paying anything.
             if (elegida == null || !elegida.Value.Buys) return;
 
             var compra = elegida.Value;
@@ -363,12 +362,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El cofre de la raid: soltar los tesoros, acercarse, o dar media vuelta.
+        /// The raid chest: dropping the treasures, getting closer, or turning back.
         /// </summary>
         /// <remarks>
-        /// Soltar los tesoros sólo sale cuando se trae alguno, por lo mismo que en la máquina. Y
-        /// fuera de una raid el cofre no es de nadie: no hay puntuación que subir ni raid que
-        /// acabar, así que lo único que ofrece es retroceder.
+        /// Dropping the treasures only comes up when some are carried, for the same reason as at the
+        /// machine. And outside a raid the chest belongs to nobody: there is no score to raise nor raid to
+        /// finish, so the only thing it offers is stepping back.
         /// </remarks>
         private static async Task OpenChestAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
         {
@@ -385,7 +384,7 @@ namespace Jondo.Unity.Server.Handlers
                               $"{traidos.Count} clases de tesoro encima.");
         }
 
-        /// <summary>La primera pantalla del cofre, que se vuelve a poner después de soltar.</summary>
+        /// <summary>The chest's first screen, which is put up again after dropping.</summary>
         private static async Task PreguntaDelCofreAsync(NetworkStream stream, Npcs.Spawn npc, long mapId,
                                                         long score, bool carrying)
         {
@@ -401,12 +400,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Lo que hace cada respuesta del cofre.
+        /// What each answer of the chest does.
         /// </summary>
         /// <remarks>
-        /// Se cobra lo que DE VERDAD sale de la bolsa, no lo que se ofreció: entre que la ventana
-        /// se abre y llega la respuesta, una pila puede haberse ido a otra parte, y puntuar lo que
-        /// no se entregó sería puntuar el aire.
+        /// What REALLY leaves the bag is charged, not what was offered: between the window opening and the
+        /// answer arriving, a stack may have gone somewhere else, and scoring what was not delivered would
+        /// be scoring thin air.
         /// </remarks>
         private static async Task ChestReplyAsync(NetworkStream stream, long reply)
         {
@@ -439,8 +438,8 @@ namespace Jondo.Unity.Server.Handlers
                                                                 Managers.RaidTreasures.Worth(entregados), ahora));
                 }
 
-                // Y la ventana se queda puesta, ahora sin la opción de soltar: lo normal después de
-                // vaciar la bolsa es acercarse al cofre, no tener que volver a hablarle.
+                // And the window stays up, now without the drop option: the normal thing after emptying
+                // the bag is getting closer to the chest, not having to talk to it again.
                 if (npc != null)
                 {
                     await PreguntaDelCofreAsync(stream, npc, mapa, Managers.RaidChests.ScoreOf(who), false);
@@ -484,11 +483,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El puch maestro: la primera pantalla, con los seis niveles.
+        /// The master puch: the first screen, with the six levels.
         /// </summary>
         /// <remarks>
-        /// Medido en la captura del Hipermago sobre el kanojedo de Amakna: ioc, y un ios con la
-        /// 54965 y las seis respuestas de nivel, de la 200 a la 1, en ese orden.
+        /// Measured in the Hipermago capture on the Amakna kanojedo: ioc, and an ios with 54965 and the six
+        /// level answers, from 200 to 1, in that order.
         /// </remarks>
         private static async Task OpenMasterAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
         {
@@ -529,14 +528,14 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Lo que hace cada respuesta del puch maestro.
+        /// What each answer of the master puch does.
         /// </summary>
         /// <remarks>
-        /// Un nivel lleva a la segunda pantalla, cuyas cuatro respuestas de «Entrenarte con N»
-        /// llevan el parámetro 905 que llevan en la captura -y la de volver, no-. Una cuenta abre
-        /// el combate en el acto: en la captura, tras el ioy vienen el kld y la misma ráfaga que
-        /// al pisar un grupo, con un id de grupo que en el mapa no estaba. Y así se hace: el grupo
-        /// se compone y no se pone en el mapa.
+        /// A level leads to the second screen, whose four «Entrenarte con N» answers carry the parameter
+        /// 905 they carry in the capture -- and the back one does not --. A count opens the fight at once:
+        /// in the capture, after the ioy come the kld and the same burst as when stepping on a group, with
+        /// a group id that was not on the map. And that is how it is done: the group is composed and not
+        /// put on the map.
         /// </remarks>
         private static async Task MasterReplyAsync(NetworkStream stream, long reply)
         {
@@ -589,7 +588,7 @@ namespace Jondo.Unity.Server.Handlers
             await FightHandler.InitiateFightFromMobCollision(stream, grupo, mapa);
         }
 
-        /// <summary>El cofre que hay puesto en un mapa, para volver a preguntarle.</summary>
+        /// <summary>The chest placed on a map, to ask it again.</summary>
         private static Npcs.Spawn CofreDelMapa(long mapId)
         {
             foreach (var puesto in Npcs.Of(mapId))
@@ -600,7 +599,7 @@ namespace Jondo.Unity.Server.Handlers
             return null;
         }
 
-        /// <summary>Una lista de respuestas como el array que espera la trama.</summary>
+        /// <summary>A list of answers as the array the frame expects.</summary>
         private static long[] Lista(IReadOnlyList<long> respuestas)
         {
             var fuera = new long[respuestas.Count];
@@ -614,17 +613,17 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(text)));
 
         /// <summary>
-        /// Manda una pregunta con sus respuestas, y se asegura de que haya al menos una.
+        /// Sends a question with its answers, and makes sure there is at least one.
         /// </summary>
         /// <remarks>
-        /// UN DIÁLOGO SIN RESPUESTAS NO SE PUEDE CERRAR. Cuando la lista va vacía, el cliente pinta
-        /// él solo un «Marcharte.», y ese botón NO manda el ioy: la ventana se queda puesta y no hay
-        /// forma de salir más que reconectando. Se ve con el Bontariano enfadado, que tiene un
-        /// mensaje y cero respuestas en su plantilla.
+        /// A DIALOGUE WITH NO ANSWERS CANNOT BE CLOSED. When the list goes empty, the client draws a
+        /// «Marcharte.» by itself, and that button does NOT send the ioy: the window stays up and there is
+        /// no way out but reconnecting. It shows with the angry Bontarian, who has a message and zero
+        /// answers in his template.
         ///
-        /// Así que siempre va al menos una respuesta de verdad, porque una respuesta de verdad sí
-        /// manda el ioy y entonces contestamos con el kld que cierra. Está aquí y no en los dos
-        /// sitios que preguntan porque ahora hay dos: la primera frase y cada una de las que siguen.
+        /// So at least one real answer always goes, because a real answer does send the ioy and then we
+        /// answer with the kld that closes. It is here and not in the two places that ask because now
+        /// there are two: the first sentence and each of the ones that follow.
         /// </remarks>
         private static async Task PreguntarAsync(NetworkStream stream, long pregunta, long[] respuestas,
                                                  Npcs.Template? plantilla = null,
@@ -633,13 +632,12 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (respuestas.Length == 0)
             {
-                // Una de las suyas, si tiene alguna. El cliente resuelve el texto de una respuesta
-                // desde la plantilla DEL NPC con el que habla, así que mandarle una que ese NPC no
-                // declara le pinta un botón en blanco: es lo que salía con la Brakmariana enfadada.
+                // One of his own, if he has any. The client resolves an answer's text from the template
+                // OF THE NPC it is talking to, so sending one that NPC does not declare draws a blank
+                // button: it is what came out with the angry Brakmarian.
                 //
-                // Y si no tiene ninguna, no se inventa nada: se manda la lista vacía y el cliente
-                // pinta su propio «Marcharte.». Salir de ahí es cosa de la X, que ahora sí se
-                // atiende.
+                // And if he has none, nothing is made up: the empty list is sent and the client draws
+                // its own «Marcharte.». Getting out of there is the X's job, which is now served.
                 respuestas = plantilla != null && plantilla.Replies.Length > 0
                     ? new[] { plantilla.Replies[^1] }
                     : Array.Empty<long>();
@@ -653,7 +651,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Los números que algunas respuestas llevan dentro, si el árbol escrito los dice.
+            // The numbers some answers carry inside, if the written tree says so.
             Dictionary<long, IReadOnlyList<long>>? parametros = null;
             if (frase != null)
             {
@@ -684,31 +682,30 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El jugador ha cerrado la ventana con la X (kla).
+        /// The player has closed the window with the X (kla).
         /// </summary>
         /// <remarks>
-        /// Sin esto la X no cerraba nada. El opcode no estaba ni declarado, así que el paquete
-        /// caía en la rama de desconocidos y el servidor no contestaba; el cliente se queda con la
-        /// ventana puesta hasta que llega el kld. Con los NPCs que no ofrecen ninguna respuesta
-        /// —la Brakmariana enfadada, el Bontariano enfadado— eso dejaba al jugador encerrado en la
-        /// conversación sin más salida que reconectar.
+        /// Without this the X closed nothing. The opcode was not even declared, so the packet fell into the
+        /// unknown branch and the server did not answer; the client keeps the window up until the kld
+        /// arrives. With the NPCs that offer no answer -- the angry Brakmarian, the angry Bontarian -- that
+        /// left the player locked in the conversation with no way out but reconnecting.
         ///
-        /// Sale 192 veces en las 401 capturas y siempre va vacío: no dice de qué NPC viene, así
-        /// que se cierra lo que hubiera abierto, que es lo único que puede haber.
+        /// It comes up 192 times in the 401 captures and always empty: it does not say which NPC it comes
+        /// from, so whatever was open is closed, which is the only thing there can be.
         /// </remarks>
         public static Task CloseAsync(NetworkStream stream, byte[] payload) => CloseAsync(stream);
 
         /// <summary>
-        /// Cierra la conversación abierta, sin que haga falta un mensaje del cliente.
+        /// Closes the open conversation, without needing a message from the client.
         /// </summary>
         /// <remarks>
-        /// El cliente no cierra la ventana por su cuenta: en la captura de hablar con un NPC no
-        /// manda NADA al terminar, se queda esperando el kld del servidor. Por eso una conversación
-        /// que el servidor daba por acabada sin mandarlo se quedaba pegada en pantalla y la equis
-        /// tampoco la quitaba -- no es que la equis fallara, es que también esperaba al kld.
+        /// The client does not close the window by itself: in the capture of talking to an NPC it sends
+        /// NOTHING at the end, it waits for the server's kld. That is why a conversation the server
+        /// considered finished without sending it stayed stuck on screen and the cross did not remove it
+        /// either -- it is not that the cross failed, it was also waiting for the kld.
         ///
-        /// Lo necesita cualquier sitio que termine la conversación por su cuenta, como el guardián
-        /// de una mazmorra que acepta la llave y te mete dentro.
+        /// Any place that ends the conversation on its own needs it, like a dungeon guardian who accepts
+        /// the key and puts you inside.
         /// </remarks>
         public static async Task CloseAsync(NetworkStream stream)
         {
@@ -720,12 +717,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Las respuestas de una frase que este personaje debe ver.
+        /// The answers of a sentence this character should see.
         /// </summary>
         /// <remarks>
-        /// Una respuesta que pertenece a una misión no se le ofrece a quien no la lleva, y una que
-        /// pertenece a un paso no se ofrece antes de estar en ese paso. Lo dice el árbol escrito;
-        /// aquí sólo se le pregunta al diario del personaje.
+        /// An answer that belongs to a quest is not offered to whoever does not carry it, and one that
+        /// belongs to a step is not offered before being at that step. The written tree says so; here
+        /// only the character's journal is asked.
         /// </remarks>
         private static long[] LasQueTocan(DialogueLine linea)
         {
@@ -741,37 +738,36 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Qué ofrecer cuando no hay conversación escrita para este NPC.
+        /// What to offer when there is no written conversation for this NPC.
         /// </summary>
         /// <remarks>
-        /// <b>Una sola respuesta, no las que declare la plantilla.</b> Un NPC declara TODAS las
-        /// respuestas de TODOS sus árboles juntas —Snori Nairb tiene treinta y nueve— y mandarlas
-        /// de golpe le enseña al jugador respuestas de misiones que no ha empezado, de fases a las
-        /// que no ha llegado y de tres conversaciones distintas mezcladas. Y además ninguna lleva a
-        /// ningún sitio, porque sin árbol no hay a dónde llevar: cualquiera de las treinta y nueve
-        /// cierra la ventana igual.
+        /// <b>A single answer, not the ones the template declares.</b> An NPC declares ALL the answers of
+        /// ALL its trees together -- Snori Nairb has thirty-nine -- and sending them at once shows the player
+        /// answers of quests he has not started, of stages he has not reached and of three different
+        /// conversations mixed together. And none of them leads anywhere either, because without a tree
+        /// there is nowhere to lead: any of the thirty-nine closes the window the same.
         ///
-        /// Así que se ofrece una para despedirse y ya está. Es menos de lo que había y es lo único
-        /// que no miente. Lo que hace falta de verdad es el árbol, y eso se escribe en el editor.
+        /// So one is offered to say goodbye and that is it. It is less than there was and it is the only
+        /// thing that does not lie. What is really needed is the tree, and that is written in the editor.
         /// </remarks>
         private static long[] SinArbolEscrito(Npcs.Template plantilla)
             => plantilla.Replies.Length > 0
                 ? new[] { plantilla.Replies[^1] }
                 : Array.Empty<long>();
 
-        /// <summary>Deja de haber conversación abierta.</summary>
+        /// <summary>There stops being an open conversation.</summary>
         /// <summary>
-        /// Lo que una respuesta compra: cobra los kamas y da el objeto.
+        /// What an answer buys: charges the kamas and gives the item.
         /// </summary>
         /// <remarks>
-        /// El precio va escrito en el texto de la respuesta -- «Ponme una limonada. Toma, 1 kama.»
-        /// -- y hasta ahora eso era todo lo que había: una frase que no hacía nada. Pulsarla no
-        /// daba el objeto ni cobraba, y como la limonada es la que hace salir a la rata, la misión
-        /// se quedaba sin manera de avanzar.
+        /// The price is written in the answer's text -- «Ponme una limonada. Toma, 1 kama.» -- and until now
+        /// that was all there was: a sentence that did nothing. Pressing it neither gave the item nor
+        /// charged, and since the lemonade is what makes the rat come out, the quest was left with no way
+        /// to advance.
         ///
-        /// Se cobra ANTES de dar. Al revés, un fallo al descontar dejaría el objeto regalado; así,
-        /// lo peor que puede pasar es que se cobre y la entrega falle, y eso se dice por consola en
-        /// vez de callarlo.
+        /// It is charged BEFORE giving. The other way round, a failure when subtracting would leave the
+        /// item as a gift; this way, the worst that can happen is that it is charged and the delivery
+        /// fails, and that is said on the console instead of kept quiet.
         /// </remarks>
         private static async Task ComprarAsync(NetworkStream stream, DialogueChoice choice)
         {
@@ -779,8 +775,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 Console.WriteLine($"[NPC] No llega para {choice.BuysItem}: cuesta " +
                                   $"{choice.BuysPrice} y tiene {GameState.Kamas}.");
-                // No hay un mensaje medido de «no te llega», asi que se usa el generico de que
-                // falta algo. Inventar un id sin captura detras es peor que decirlo de mas.
+                // There is no measured «you cannot afford it» message, so the generic one about something
+                // missing is used. Making up an id with no capture behind it is worse than over-explaining.
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
                         InfoMessages.Warning, InfoMessages.MissingItem)));
@@ -814,10 +810,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El jugador ha elegido una respuesta (ioy).
+        /// The player has chosen an answer (ioy).
         ///
-        /// El diálogo se cierra siempre, se acepte o se rechace: el kld sale las cuatro veces de la
-        /// captura y va DELANTE de los kamas.
+        /// The dialogue always closes, accepted or refused: the kld goes out all four times in the capture
+        /// and goes AHEAD of the kamas.
         /// </summary>
         public static async Task ReplyAsync(NetworkStream stream, byte[] payload)
         {
@@ -830,8 +826,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (field.FieldNumber == 1 && field.WireType == 0) reply = field.VarIntValue;
             }
 
-            // ¿Ha contestado una luminomáquina? Ni misiones ni árbol escrito: lo que hace cada una
-            // de sus respuestas lo dice la respuesta misma.
+            // Did a luminomachine answer? Neither quests nor written tree: what each of its answers
+            // does is said by the answer itself.
             if (SessionContext.State.OpenDialogueNpcId == Luminomachine.NpcId &&
                 Luminomachine.Owns(reply))
             {
@@ -839,14 +835,14 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Y lo mismo el cofre de la raid.
+            // And the same for the raid chest.
             if (SessionContext.State.OpenDialogueNpcId == RaidChest.NpcId && RaidChest.Owns(reply))
             {
                 await ChestReplyAsync(stream, reply);
                 return;
             }
 
-            // Y el puch maestro del kanojedo.
+            // And the kanojedo's master puch.
             if (SessionContext.State.OpenDialogueNpcId == Kanojedo.MasterNpc && Kanojedo.Owns(reply))
             {
                 await MasterReplyAsync(stream, reply);
@@ -875,9 +871,9 @@ namespace Jondo.Unity.Server.Handlers
                                     ?.Line(SessionContext.State.OpenDialogueMessage);
             var elegidaAhora = frase?.Choice(reply);
 
-            // ¿Es la respuesta con la que se acepta una oferta leída? Entonces no hay NPC de por
-            // medio: la pregunta la hizo un cartel, y aceptarla es lo que deja constancia de
-            // haberla leído. Se mira aquí porque el ioy llega suelto, sin decir de dónde venía.
+            // Is it the answer that accepts an offer that was read? Then there is no NPC involved:
+            // the question was asked by a notice, and accepting it is what records having read it. It
+            // is checked here because the ioy arrives loose, without saying where it came from.
             var oferta = Readables.ByAcceptReply(reply);
             if (oferta != null)
             {
@@ -891,15 +887,15 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // ¿La respuesta compra algo? Antes de la misión, porque una compra que falle no debe
-            // dejar la conversación a medias con la misión ya empezada.
+            // Does the answer buy something? Before the quest, because a purchase that fails must not
+            // leave the conversation halfway with the quest already started.
             if (elegidaAhora != null && elegidaAhora.BuysItem != 0)
             {
                 await ComprarAsync(stream, elegidaAhora);
             }
 
-            // ¿La respuesta toca los puntos del sueño? Es la tienda de la fuente, que no tiene
-            // protocolo propio: es este mismo diálogo, y lo que compra va escrito en la respuesta.
+            // Does the answer touch the dream points? It is the fountain's shop, which has no protocol
+            // of its own: it is this same dialogue, and what it buys is written in the answer.
             if (elegidaAhora != null && elegidaAhora.DreamPointsPercent != 0)
             {
                 var sueno = Managers.Dreams.De(GameState.CharacterId);
@@ -953,8 +949,8 @@ namespace Jondo.Unity.Server.Handlers
                 await Managers.Quests.OnReplyAsync(stream, SessionContext.State.OpenDialogueMessage);
             }
 
-            // ¿Y este NPC guarda la puerta de una mazmorra? Si entra, la conversación ha acabado en
-            // un cambio de mapa y no hay nada más que decirle.
+            // And does this NPC guard a dungeon's door? If he goes in, the conversation has ended in a
+            // map change and there is nothing more to tell him.
             long dondeHabla = SessionContext.State.OpenDialogueMapId;
             if (dondeHabla == 0) dondeHabla = SessionContext.State.MapId;
             if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla, reply))
@@ -963,17 +959,17 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // ¿Esta respuesta mueve al jugador? Va ANTES de seguir la conversación porque una
-            // respuesta que teletransporta la termina: en la captura el servidor manda el kld y
-            // acto seguido el jru, sin una frase más de por medio.
+            // Does this answer move the player? It goes BEFORE following the conversation because an
+            // answer that teleports ends it: in the capture the server sends the kld and right after
+            // the jru, without another sentence in between.
             if (elegidaAhora != null && (elegidaAhora.TeleportsTo != 0 || elegidaAhora.ReturnsHome))
             {
                 long adonde = elegidaAhora.TeleportsTo;
                 if (elegidaAhora.ReturnsHome)
                 {
-                    // De donde salió, que es lo que se apuntó al entrar. Si no hay apunte -alguien
-                    // que llegó por su cuenta, o un servidor recién arrancado- se le deja en la
-                    // entrada del pozo en vez de dejarlo encerrado, que es lo que pasaba antes.
+                    // Where he came from, which is what was noted on entering. If there is no note -- somebody
+                    // who got there on his own, or a freshly started server -- he is left at the well's
+                    // entrance instead of being left locked in, which is what used to happen.
                     adonde = Managers.Dreams.DeDondeViene(GameState.CharacterId).Mapa;
                     if (adonde == 0) adonde = Managers.Dreams.MapaDelPozo;
                 }
@@ -989,9 +985,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // ¿Esta respuesta lleva a otra frase? Es lo único que hace de esto una conversación en
-            // vez de una pregunta suelta, y sólo lo puede decir el árbol escrito a mano: el cliente
-            // trae las frases y las respuestas pero nunca cuál va con cuál.
+            // Does this answer lead to another sentence? It is the only thing that makes this a
+            // conversation instead of a loose question, and only the hand-written tree can say so: the
+            // client carries the sentences and the answers but never which goes with which.
             if (await SeguirLaConversacionAsync(stream, reply)) return;
 
             CerrarConversacion();
@@ -1021,15 +1017,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Si la respuesta elegida lleva a otra frase, la manda y dice que sí.
+        /// If the chosen answer leads to another sentence, sends it and says yes.
         /// </summary>
         /// <remarks>
-        /// Devuelve <c>false</c> cuando la conversación termina aquí, que es lo que pasa con todo
-        /// NPC sin árbol escrito: entonces el que llama cierra con el kld como siempre.
+        /// Returns <c>false</c> when the conversation ends here, which is what happens with every NPC
+        /// without a written tree: then the caller closes with the kld as always.
         ///
-        /// El ioy no dice de qué NPC viene ni de qué frase, así que se sitúa por el estado de
-        /// sesión. Si no cuadra —el jugador tiene otra ventana abierta, o ninguna— se cierra, que
-        /// es lo seguro: dejar la ventana puesta es dejarla sin salida.
+        /// The ioy does not say which NPC it comes from nor which sentence, so it is placed by the session
+        /// state. If it does not fit -- the player has another window open, or none -- it is closed, which is
+        /// the safe thing: leaving the window up is leaving it with no way out.
         /// </remarks>
         private static async Task<bool> SeguirLaConversacionAsync(NetworkStream stream, long reply)
         {
@@ -1044,9 +1040,9 @@ namespace Jondo.Unity.Server.Handlers
             var siguiente = conversacion!.Line(elegida.Next);
             if (siguiente == null)
             {
-                // El editor comprueba esto antes de guardar, así que llegar aquí quiere decir que
-                // el fichero se editó a mano. Se dice y se cierra en vez de dejar al jugador
-                // mirando una ventana que no responde.
+                // The editor checks this before saving, so getting here means the file was edited by
+                // hand. It is said and closed instead of leaving the player looking at a window that does
+                // not respond.
                 Console.WriteLine($"[NPC] La respuesta {reply} del {estado.OpenDialogueNpcId} lleva " +
                                   $"a la frase {elegida.Next}, que no está escrita. Se cierra.");
                 return false;
@@ -1062,8 +1058,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Comprar (kea). El cliente manda sólo el objeto y la cantidad: el precio lo pone el
-        /// servidor, que es el que mandó el catálogo.
+        /// Buying (kea). The client sends only the item and the quantity: the price is set by the server,
+        /// which is the one that sent the catalogue.
         /// </summary>
         public static async Task BuyAsync(NetworkStream stream, byte[] payload)
         {
@@ -1087,17 +1083,17 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Y que el vendedor siga estando donde está el jugador.
+            // And that the vendor is still where the player is.
             //
-            // La tienda se quedaba abierta al cambiar de mapa —Forget() existía pero no lo
-            // llamaba nadie— así que se podía hablar con un vendedor, irse andando tres mapas y
-            // seguir comprando de su catálogo desde el otro lado del mundo. Mirar sólo
-            // «OpenShop != 0» no basta: eso dice que hubo una tienda, no que la haya ahora.
+            // The shop stayed open on changing map -- Forget() existed but nobody called it -- so one
+            // could talk to a vendor, walk three maps away and keep buying from his catalogue from the
+            // other side of the world. Looking only at «OpenShop != 0» is not enough: that says there
+            // was a shop, not that there is one now.
             //
-            // Se comprueba aquí y no sólo al cambiar de mapa a propósito. Acordarse de llamar a
-            // Forget() en los siete sitios desde los que se cambia de mapa —andar, zaap, zaapi,
-            // puerta de mazmorra, casa, anomalía, fin de combate— es acordarse siete veces; esto
-            // es una sola y no depende de por dónde se haya salido.
+            // It is checked here and not only on changing map, on purpose. Remembering to call Forget()
+            // in the seven places a map change comes from -- walking, zaap, zaapi, dungeon door, house,
+            // anomaly, end of fight -- is remembering seven times; this is once and does not depend on
+            // the way out.
             if (Managers.Npcs.Find(SessionContext.State.MapId, OpenShop) == null)
             {
                 Console.WriteLine($"[NPC] El vendedor {OpenShopNpc} no está en el mapa " +
@@ -1106,8 +1102,8 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Que el vendedor que está abierto lo tenga de verdad: el catálogo lo mandamos nosotros,
-            // así que pedir otra cosa no es una compra válida.
+            // That the vendor who is open really has it: the catalogue is sent by us, so asking for
+            // something else is not a valid purchase.
             bool onSale = false;
             foreach (int sold in NpcShops.CatalogueOf(OpenShopNpc))
             {
@@ -1119,14 +1115,14 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Con qué se paga aquí. Sin tienda de fichas es lo de siempre: kamas.
+            // What is paid with here. Without a token shop it is the usual: kamas.
             var tokenShop = TokenShops.Of(OpenShopNpc);
             long price = tokenShop == null
                 ? NpcShops.PriceOf(gid) * quantity
                 : TokenShops.PriceOf(tokenShop, gid) * quantity;
 
-            // La pila de fichas del jugador, si es que la tiene. Se busca por plantilla en el
-            // inventario: una ficha es un recurso y se apila, así que hay una sola.
+            // The player's stack of tokens, if he has one. It is looked up by template in the
+            // inventory: a token is a resource and stacks, so there is only one.
             long tokenUid = 0;
             int tokenLeft = 0;
             if (tokenShop != null)
@@ -1171,8 +1167,8 @@ namespace Jondo.Unity.Server.Handlers
             }
             else
             {
-                // Las fichas se gastan quitándolas del inventario, igual que al destruir parte de
-                // una pila. Si la compra se lleva la última, DestroyCharacterItem borra la fila.
+                // Tokens are spent by removing them from the inventory, the same as when destroying part
+                // of a stack. If the purchase takes the last one, DestroyCharacterItem deletes the row.
                 DatabaseManager.DestroyCharacterItem(GameState.CharacterId, tokenUid, (int)price);
                 Equipment.Remove(tokenUid, (int)price);
                 tokenLeft -= (int)price;
@@ -1187,9 +1183,9 @@ namespace Jondo.Unity.Server.Handlers
                 Effects = effects,
             };
 
-            // El orden es el medido, y las dos tandas de ivf/iun también: el servidor real las manda
-            // idénticas antes y después del kdg. Como las dos llevan el total y no un incremento,
-            // repetirlas no descuadra nada.
+            // The order is the measured one, and the two rounds of ivf/iun too: the real server sends
+            // them identical before and after the kdg. Since both carry the total and not an increment,
+            // repeating them throws nothing off.
             long capacity = 1000 + 5L * GameState.TotalStrength;
 
             if (tokenShop == null)
@@ -1204,9 +1200,9 @@ namespace Jondo.Unity.Server.Handlers
             }
             else
             {
-                // El aviso de la compra en fichas y el nuevo total de la pila. El ivj lleva LO QUE
-                // QUEDA, no lo gastado: se ve en el mercadillo de runas de la captura, donde una
-                // misma pila va 107 -> 117 -> 217 -> 1217.
+                // The notice of the token purchase and the stack's new total. The ivj carries WHAT IS
+                // LEFT, not what was spent: it can be seen in the capture's rune marketplace, where the
+                // same stack goes 107 -> 117 -> 217 -> 1217.
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                         ConnectionProtocol.TokenPurchaseMessage,
@@ -1240,12 +1236,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El botón de cerrar de la tienda (kla vacío).
+        /// The shop's close button (empty kla).
         ///
-        /// El cliente lo manda DOS veces seguidas, separadas menos de un milisegundo, y el servidor
-        /// real contesta un solo khd. Por eso se cierra a la primera y la segunda se cae sola: al
-        /// no haber ya tienda abierta, GameNodeProxy la lleva al zaap y ése tampoco tiene nada
-        /// abierto.
+        /// The client sends it TWICE in a row, less than a millisecond apart, and the real server answers a
+        /// single khd. That is why it closes at the first and the second falls away by itself: with no shop
+        /// open any more, GameNodeProxy takes it to the zaap and that one has nothing open either.
         /// </summary>
         public static async Task CloseShopAsync(NetworkStream stream)
         {
@@ -1257,21 +1252,20 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Al cambiar de mapa no queda nada abierto: ni la tienda ni la conversación.
+        /// On changing map nothing stays open: neither the shop nor the conversation.
         /// </summary>
         /// <remarks>
-        /// La conversación se limpia aquí desde que la X de un diálogo se atiende ANTES que la del
-        /// zaap. Con el estado rancio —el jugador abre una conversación y se va sin cerrarla— la
-        /// siguiente X, la que era del zaap, se la quedaría el diálogo y la lista de destinos no
-        /// se cerraría. Es el mismo fallo que tenía la X del diálogo, del revés.
+        /// The conversation is cleared here since a dialogue's X is served BEFORE the zaap's. With stale
+        /// state -- the player opens a conversation and leaves without closing it -- the next X, the one
+        /// that was the zaap's, would be taken by the dialogue and the destinations list would not close.
+        /// It is the same bug the dialogue's X had, the other way round.
         ///
-        /// Y se llama desde donde se manda la lista de actores, que es por donde pasan las cinco
-        /// maneras de llegar a un mapa. El comentario anterior decía que lo llamaban
-        /// WorldMoveHandler y FightHandler; lo de FightHandler no era cierto, no hay ninguna
-        /// llamada suya en todo el repositorio.
+        /// And it is called from where the actors list is sent, which is where the five ways of reaching a
+        /// map go through. The previous comment said WorldMoveHandler and FightHandler called it; the
+        /// FightHandler part was not true, there is no call of its in the whole repository.
         ///
-        /// BuyAsync vuelve a comprobar que el vendedor esté en el mapa: esto es por orden, no por
-        /// seguridad, y de la seguridad se encarga quien cobra.
+        /// BuyAsync checks again that the vendor is on the map: this is for tidiness, not for security,
+        /// and security is handled by whoever charges.
         /// </remarks>
         public static void Forget()
         {
@@ -1281,12 +1275,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El uid del objeto que se acaba de comprar.
+        /// The uid of the item just bought.
         ///
-        /// Esto leia MAX(Uid) de la base en cada compra, lo cual repartia bien pero no era
-        /// atomico: dos compras a la vez leen el mismo maximo y devuelven el mismo numero, y la
-        /// segunda pisa la fila de la primera. Ahora lo reparte DatabaseManager para todo el
-        /// servidor, de una vez y con un contador.
+        /// This read MAX(Uid) from the database on every purchase, which handed them out fine but was not
+        /// atomic: two purchases at once read the same maximum and return the same number, and the second
+        /// overwrites the first's row. Now DatabaseManager hands them out for the whole server, in one go
+        /// and with a counter.
         /// </summary>
         private static long NextUid() => DatabaseManager.NextItemUid();
     }

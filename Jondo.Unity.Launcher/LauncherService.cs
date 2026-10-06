@@ -77,8 +77,8 @@ namespace Jondo.Unity.Launcher
                 };
             }
 
-            // La sesion queda puesta para todo lo que venga despues: es lo que dice quien pide
-            // las cosas, y de lo que el servidor saca el rol.
+            // The session stays set for everything that comes after: it is what says who asks
+            // for things, and what the server takes the role from.
             Network.ControlClient.Token = cuerpo.Value.GetProperty("token").GetString() ?? "";
             EsAdministrador = cuerpo.Value.TryGetProperty("rol", out var rolDicho) && rolDicho.GetInt32() >= Roles.Administrador;
 
@@ -92,21 +92,21 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Entra con un vale de la web en vez de con usuario y contraseña.
+        /// Logs in with a voucher from the website instead of with username and password.
         /// </summary>
         /// <remarks>
-        /// Es la otra mitad de <see cref="Security.OAuthFlow"/>: la web dice que quien ha entrado
-        /// es de fiar y da un vale, y el servidor de juego es quien traduce ese vale a una cuenta y
-        /// devuelve la credencial de sesión de siempre. De ahí para adelante todo funciona igual,
-        /// que era la idea: el equipo, el botón de jugar y el resto no se enteran de por dónde se
-        /// entró.
+        /// It is the other half of <see cref="Security.OAuthFlow"/>: the website says whoever logged in
+        /// can be trusted and gives a voucher, and the game server is the one that translates that voucher into an account and
+        /// returns the usual session credential. From there on everything works the same,
+        /// which was the idea: the team, the play button and the rest do not notice which way one
+        /// came in.
         ///
-        /// <b>Esto todavía no funciona, y conviene decirlo claro.</b> El verbo <c>entrar-con-vale</c>
-        /// NO está escrito en el servidor, y no puede estarlo: hace falta saber quién firma los
-        /// vales y con qué clave, y eso lo decide la web el día que exista. Mientras
-        /// <see cref="UI.LauncherPreferences.WebSite"/> siga vacío, el lanzador nunca llama aquí.
-        /// Lo que sí está hecho y probado es todo lo de este lado: el servidor de loopback, el
-        /// PKCE, la comprobación del estado y el canje del código.
+        /// <b>This does not work yet, and it is worth saying plainly.</b> The verb <c>entrar-con-vale</c>
+        /// is NOT written on the server, and it cannot be: one needs to know who signs the
+        /// vouchers and with what key, and that is decided by the website the day it exists. While
+        /// <see cref="UI.LauncherPreferences.WebSite"/> stays empty, the launcher never calls here.
+        /// What is done and tested is everything on this side: the loopback server, the
+        /// PKCE, the state check and the code exchange.
         /// </remarks>
         public static SignInResult SignInWithToken(string accessToken)
         {
@@ -141,13 +141,13 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// El área de trabajo de la pantalla principal, sin la barra de tareas.
+        /// The main screen's working area, without the taskbar.
         /// </summary>
         /// <remarks>
-        /// Se pregunta a la ventana del lanzador, que es quien sabe en qué pantalla está. Si
-        /// todavía no hay ventana —o no hay pantallas que preguntar, que pasa al arrancar sin
-        /// sesión gráfica— se devuelve 1920 por 1080, que es el mismo respaldo que tenía la
-        /// versión de Windows Forms.
+        /// The launcher's window is asked, which is what knows which screen it is on. If
+        /// there is no window yet —or no screens to ask, which happens when starting without a
+        /// graphical session— 1920 by 1080 is returned, which is the same fallback the
+        /// Windows Forms version had.
         /// </remarks>
         private static (int Width, int Height) PantallaDeTrabajo()
         {
@@ -166,24 +166,24 @@ namespace Jondo.Unity.Launcher
             }
             catch
             {
-                // Preguntar por la pantalla no puede impedir arrancar el juego.
+                // Asking about the screen cannot stop the game from starting.
             }
 
             return (1920, 1080);
         }
 
         /// <summary>
-        /// Lo que se le dice al usuario cuando el servidor no ha contestado.
+        /// What the user is told when the server has not answered.
         ///
-        /// Se distinguen TRES averías, porque cada una se arregla de una manera y decir la que no
-        /// es manda al usuario a dar vueltas:
+        /// THREE faults are told apart, because each one is fixed differently and naming the wrong
+        /// one sends the user round in circles:
         ///
-        ///   401  la sesión ya no vale: hay que volver a entrar
-        ///   403  el secreto no cuadra: se arregla rearrancando el lanzador
-        ///   nada no hay nadie escuchando: hay que esperar a que el servidor arranque
+        ///   401  the session is no longer valid: one has to log in again
+        ///   403  the secret does not match: it is fixed by restarting the launcher
+        ///   none nobody is listening: one has to wait for the server to start
         ///
-        /// El 401 salía como «el servidor no responde», que era falso y encima despistaba: el
-        /// servidor contestaba de maravilla, y lo que contestaba era que la sesión estaba muerta.
+        /// The 401 came out as «el servidor no responde», which was false and misleading too: the
+        /// server answered wonderfully, and what it answered was that the session was dead.
         /// </summary>
         private static string MensajeDeSilencio(Network.ControlClient.Respuesta respuesta)
             => respuesta.Llego && respuesta.Codigo == 401
@@ -192,7 +192,7 @@ namespace Jondo.Unity.Launcher
                     ? UI.LauncherPreferences.Textos.ControlRechazado
                     : UI.LauncherPreferences.Textos.ServidorSinResponder;
 
-        /// <summary>Crea una cuenta nueva con su apodo. La escribe el servidor, no el lanzador.</summary>
+        /// <summary>Creates a new account with its nickname. The server writes it, not the launcher.</summary>
         public static Result RegisterAccount(string username, string password, string nickname, string clientIp)
         {
             var respuesta = ControlClient.Pedir("crear-cuenta", new
@@ -217,10 +217,10 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Vuelve a dar por buena una sesión que el lanzador tenía guardada de la vez anterior.
+        /// Accepts again a session the launcher had stored from the previous time.
         ///
-        /// El servidor sólo la acepta si el token sigue estando en la base a nombre de esa cuenta:
-        /// el lanzador no puede decir que es quien le apetezca.
+        /// The server only accepts it if the token is still in the base under that account's name:
+        /// the launcher cannot claim to be whoever it fancies.
         /// </summary>
         public static bool RememberSession(long accountId, string token)
         {
@@ -228,16 +228,16 @@ namespace Jondo.Unity.Launcher
             var cuerpo = ControlClient.Pedir("recordar-token",
                 new { cuenta = accountId, token }).Cuerpo();
 
-            // Si el servidor NO ha contestado, no se sabe nada: esto corre en el constructor de la
-            // ventana y el servidor puede estar todavía cargando mapas. Se le da el beneficio de
-            // la duda y ya se verá al pulsar jugar. Sólo se da la sesión por muerta cuando el
-            // servidor contesta que no vale, que es cuando de verdad hay que volver a entrar.
+            // If the server has NOT answered, nothing is known: this runs in the window's
+            // constructor and the server may still be loading maps. It is given the benefit of
+            // the doubt and it will be seen on pressing play. The session is only considered dead when the
+            // server answers that it is not valid, which is when one really has to log in again.
             if (cuerpo == null) return true;
 
             return cuerpo.Value.GetProperty("bien").GetBoolean();
         }
 
-        /// <summary>Un personaje de la cuenta, tal y como lo cuenta el servidor.</summary>
+        /// <summary>A character of the account, as the server tells it.</summary>
         public sealed class Character
         {
             public long Id { get; init; }
@@ -246,20 +246,20 @@ namespace Jondo.Unity.Launcher
             public int Breed { get; init; }
             public int Sex { get; init; }
 
-            /// <summary>La cadena de aspecto, que es lo que el lanzador dibuja.</summary>
+            /// <summary>The look string, which is what the launcher draws.</summary>
             public string Look { get; init; } = "";
         }
 
         /// <summary>
-        /// Los personajes de una cuenta guardada.
+        /// The characters of a stored account.
         /// </summary>
         /// <remarks>
-        /// Lo único que el lanzador no puede sacar de los assets del cliente: la cadena de aspecto
-        /// está en la base de datos y aquí no hay base de datos. El retrato sí se dibuja aquí, con
-        /// los huesos del propio cliente.
+        /// The only thing the launcher cannot take from the client's assets: the look string
+        /// is in the database and here there is no database. The portrait is drawn here, with
+        /// the client's own bones.
         ///
-        /// El servidor devuelve los de la cuenta DEL TOKEN, no los del número que se le mande, así
-        /// que esto no sirve para mirar el equipo de otro.
+        /// The server returns those of the TOKEN's account, not those of the number it is sent, so
+        /// this is no use for looking at someone else's team.
         /// </remarks>
         public static List<Character> CharactersOf(string token)
         {
@@ -284,18 +284,18 @@ namespace Jondo.Unity.Launcher
             return salida;
         }
 
-        /// <summary>Si quien ha entrado es administrador. COSMÉTICO: quien decide es el servidor.</summary>
+        /// <summary>Whether whoever logged in is an administrator. COSMETIC: the server decides.</summary>
         public static bool EsAdministrador { get; private set; }
 
-        /// <summary>Le pide al servidor que se apague. Sólo funciona si la cuenta es administrador.</summary>
+        /// <summary>Asks the server to shut down. It only works if the account is an administrator.</summary>
         public static bool StopServer() => ControlClient.Pedir("apagar").Bien;
 
         /// <summary>
-        /// El código que manda el servidor, dicho en el idioma del lanzador.
+        /// The code the server sends, said in the launcher's language.
         ///
-        /// Ésta es la frontera: el servidor dice QUÉ ha pasado y aquí se decide CÓMO contarlo. Antes
-        /// el servidor construía la frase, y para eso tenía que leer las preferencias de idioma del
-        /// usuario desde %APPDATA%; un servidor no debería saber que existe un escritorio.
+        /// This is the border: the server says WHAT happened and here it is decided HOW to tell it. Before,
+        /// the server built the sentence, and for that it had to read the user's language preferences
+        /// from %APPDATA%; a server should not know that a desktop exists.
         /// </summary>
         private static string EnCristiano(string codigo) => codigo switch
         {
@@ -324,14 +324,14 @@ namespace Jondo.Unity.Launcher
                     };
                 }
 
-                // ANTES de nada, que el servidor esté contestando de verdad.
+                // BEFORE anything, that the server is really answering.
                 //
-                // No es paranoia: el mod del cliente decide una sola vez, al inicializarse, si
-                // redirige al emulador, y lo decide sondeando el 8888 con 100 ms de paciencia
-                // (JondoFix/Class1.cs:471). Si en ese instante no hay nadie, el cliente NO da
-                // ningún error: se conecta a los servidores de Ankama. Con un solo proceso esto no
-                // podía pasar porque los servicios estaban levantados antes de que existiera la
-                // ventana; ahora sí puede, así que se comprueba.
+                // It is not paranoia: the client mod decides only once, on initialising, whether
+                // to redirect to the emulator, and it decides by probing 8888 with 100 ms of patience
+                // (JondoFix/Class1.cs:471). If at that instant nobody is there, the client gives NO
+                // error: it connects to Ankama's servers. With a single process this could not
+                // happen because the services were up before the window existed; now it can,
+                // so it is checked.
                 if (!ControlClient.ServidorVivo())
                 {
                     return new Result
@@ -343,10 +343,10 @@ namespace Jondo.Unity.Launcher
 
                 string language = UI.LauncherTexts.Code(UI.LauncherPreferences.Language);
 
-                // El arranque lo reparte el servidor: él pone el instanceId y el hash, y él los va
-                // a comprobar cuando el cliente se presente al Zaap. Antes se los inventaba el
-                // lanzador y los apuntaba en un diccionario de su propia memoria; ese era el nudo
-                // que hacía imposible separar los procesos.
+                // The start is handed out by the server: it sets the instanceId and the hash, and it is the one that will
+                // check them when the client presents itself to the Zaap. Before, the launcher invented them
+                // and recorded them in a dictionary in its own memory; that was the knot
+                // that made separating the processes impossible.
                 var respuesta = ControlClient.Pedir("lanzamiento", new { token = token ?? "", idioma = language });
                 var cuerpo = respuesta.Cuerpo();
                 if (cuerpo == null) return new Result { Success = false, Message = MensajeDeSilencio(respuesta) };
@@ -369,11 +369,11 @@ namespace Jondo.Unity.Launcher
                 // character choice, world) and reapplies its own saved resolution, so it drops out
                 // of the maximized state and part of the interface ends up off screen.
                 //
-                // La medida la da ahora Avalonia y no System.Windows.Forms.Screen: era lo último
-                // que ataba este fichero al escritorio de Windows. Se pide el área DE TRABAJO, sin
-                // la barra de tareas, que es lo que hacía WorkingArea; si no hay pantalla que
-                // preguntar —arrancado sin sesión gráfica— se cae a 1920 por 1080, que es lo que
-                // había antes de respaldo.
+                // The measure is now given by Avalonia and not System.Windows.Forms.Screen: it was the last thing
+                // tying this file to the Windows desktop. The WORKING area is asked for, without
+                // the taskbar, which is what WorkingArea did; if there is no screen to
+                // ask —started without a graphical session— it falls back to 1920 by 1080, which is what
+                // there was before as a fallback.
                 var area = PantallaDeTrabajo();
 
                 // The optional HD/4K scenery packs: a flag only for a pack the player turned on
@@ -387,6 +387,9 @@ namespace Jondo.Unity.Launcher
                 }
 
                 string arguments = ClientArguments(area.Width, area.Height, instanceId, hash, language, packFlags);
+
+                // The client's mod, as the emulator ships it.
+                InstallMod(clientPath);
 
                 var startInfo = new System.Diagnostics.ProcessStartInfo
                 {
@@ -405,6 +408,11 @@ namespace Jondo.Unity.Launcher
                 // JondoFix uses this only to decide whether item ids may be shown in the client.
                 // It is cosmetic: every administration command is still authorized by the server.
                 startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                // And, to an administrator only, the token the mod's give-item panel presents to
+                // the control API. It is the account's own session, in its own process, and the
+                // server still checks token and role on every request.
+                if (Roles.AlMenos(accountRole, Roles.Administrador))
+                    startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
 
                 System.Diagnostics.Process? client;
                 try
@@ -425,12 +433,12 @@ namespace Jondo.Unity.Launcher
                     return new Result { Success = false, Message = UI.LauncherPreferences.Textos.ClientStartFailed };
                 }
 
-                // Cuando el cliente se cierre hay que decírselo al servidor, que es quien lleva la
-                // cuenta de quién está jugando. Y aunque este aviso se pierda —porque se cierre el
-                // lanzador antes— el servidor tiene dos redes debajo: la baja de la sesión de juego
-                // y la caducidad de los lanzamientos que nunca llegaron a conectar.
-                // Anotado antes de nada, que es lo que hace que el segundo clic no llegue a
-                // pedirle nada al servidor.
+                // When the client closes the server has to be told, which is what keeps
+                // count of who is playing. And even if this notice gets lost —because the
+                // launcher is closed first— the server has two nets underneath: the game session's leaving
+                // and the expiry of launches that never got to connect.
+                // Recorded before anything, which is what keeps the second click from asking
+                // the server for anything.
                 _arrancadosAqui[accountId] = 0;
 
                 client.EnableRaisingEvents = true;
@@ -453,9 +461,9 @@ namespace Jondo.Unity.Launcher
         /// <param name="packFlags">From <see cref="Packs.TexturePackService.LaunchFlags"/>; may be empty.</param>
         internal static string ClientArguments(int width, int height, int instanceId, string hash, string language, string packFlags)
         {
-            // MelonLoader abre su propia consola negra y su pantalla de arranque delante del
-            // juego. Se le dice que no por línea de órdenes además de por Loader.cfg: la orden
-            // manda sobre el fichero, así que da igual que alguien lo reescriba.
+            // MelonLoader opens its own black console and its splash screen in front of the
+            // game. It is told not to on the command line as well as in Loader.cfg: the command
+            // rules over the file, so it does not matter if someone rewrites it.
             string arguments =
                 $"-force-d3d11 -screen-fullscreen 0 -screen-width {width} -screen-height {height} " +
                 "--melonloader.hideconsole --melonloader.disablestartscreen " +
@@ -468,11 +476,53 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Dónde está el Dofus.exe, o cadena vacía si no aparece.
+        /// The emulator's JondoFix into the client's Mods, when it differs from the one there.
+        /// </summary>
+        /// <remarks>
+        /// What the mod changes in the client -- the Koliseo window with the JondoBots' card, among
+        /// the rest -- comes with the emulator, not with a new client: whoever has a client with
+        /// MelonLoader gets it at the next launch. A client without MelonLoader is left alone. A
+        /// client already open holds the file; it is then updated at the next launch.
+        /// </remarks>
+        internal static void InstallMod(string clientPath)
+        {
+            try
+            {
+                string shipped = Path.Combine(Paths.Root, "JondoFix", "JondoFix.dll");
+                string clientDir = Path.GetDirectoryName(clientPath) ?? "";
+                if (!File.Exists(shipped) || !Directory.Exists(Path.Combine(clientDir, "MelonLoader"))) return;
+
+                string mods = Path.Combine(clientDir, "Mods");
+                string installed = Path.Combine(mods, "JondoFix.dll");
+                if (File.Exists(installed) && SameContent(installed, shipped)) return;
+
+                Directory.CreateDirectory(mods);
+                File.Copy(shipped, installed, overwrite: true);
+                Console.WriteLine($"[Launcher] JondoFix updated in {mods}.");
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                Console.WriteLine($"[Launcher] JondoFix could not be updated now (is a client open?): {ex.Message}");
+            }
+        }
+
+        internal static bool SameContent(string a, string b)
+        {
+            var infoA = new FileInfo(a);
+            var infoB = new FileInfo(b);
+            if (infoA.Length != infoB.Length) return false;
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            using var streamA = File.OpenRead(a);
+            using var streamB = File.OpenRead(b);
+            return sha.ComputeHash(streamA).AsSpan().SequenceEqual(sha.ComputeHash(streamB));
+        }
+
+        /// <summary>
+        /// Where Dofus.exe is, or an empty string if it does not show up.
         ///
-        /// Manda lo que se haya elegido a mano, porque el cliente no tiene por qué estar junto al
-        /// emulador: quien lo tenga en otro disco lo señala una vez y se acabó. Si no hay nada
-        /// elegido —o lo elegido ya no existe— se busca donde se ha buscado siempre, al lado.
+        /// What has been chosen by hand rules, because the client need not be next to the
+        /// emulator: whoever has it on another disk points to it once and that is it. If nothing is
+        /// chosen —or what was chosen no longer exists— it is looked for where it has always been looked for, alongside.
         /// </summary>
         public static string ResolveClient()
         {
@@ -530,47 +580,47 @@ namespace Jondo.Unity.Launcher
             });
         }
 
-        /// <summary>Le dice al servidor que el cliente de esa cuenta ya no está.</summary>
+        /// <summary>Tells the server that the client of that account is no longer there.</summary>
         private static void Devolver(long accountId)
         {
             try { ControlClient.Pedir("fin-de-lanzamiento", new { cuenta = accountId }); }
             catch { }
         }
 
-        // ─── Quién está jugando ─────────────────────────────────────────────────
+        // ─── Who is playing ─────────────────────────────────────────────────────
         //
-        // La ventana lo pregunta muchas veces mientras se repinta —el punto de "En juego" de cada
-        // fila, el contador del equipo, si un botón se puede pulsar— y no puede irse por el cable
-        // en cada una. Se guarda lo que dijo el servidor en el último sondeo de estado, que es cada
-        // dos segundos, y las lecturas van contra eso.
+        // The window asks this many times while repainting —each row's "En juego"
+        // dot, the team counter, whether a button can be pressed— and it cannot go over the wire
+        // for each one. What the server said in the last status probe is kept, which is every
+        // two seconds, and the reads go against that.
 
         private static volatile System.Collections.Generic.HashSet<long> _jugando = new();
         private static volatile int _tope = 8;
 
-        /// <summary>Cuántos clientes admite el servidor a la vez.</summary>
+        /// <summary>How many clients the server admits at once.</summary>
         public static int MaximumClients => _tope;
 
         /// <summary>
-        /// Los clientes que ha arrancado ESTE lanzador y siguen vivos.
+        /// The clients THIS launcher has started that are still alive.
         /// </summary>
         /// <remarks>
-        /// El sondeo llega cada dos segundos y un doble clic no espera dos segundos. Pulsar
-        /// «Jugar» dos veces seguidas ejecutaba el arranque dos veces: la segunda todavía veía la
-        /// cuenta libre —porque el sondeo aún no había vuelto—, lanzaba otro cliente, y el
-        /// servidor lo rechazaba con «cuenta-ya-abierta»; el lanzador enseñaba eso como si el
-        /// jugador hubiese hecho algo mal.
+        /// The probe arrives every two seconds and a double click does not wait two seconds. Pressing
+        /// «Jugar» twice in a row ran the start twice: the second still saw the
+        /// account free —because the probe had not come back yet—, launched another client, and the
+        /// server rejected it with «cuenta-ya-abierta»; the launcher showed that as if the
+        /// player had done something wrong.
         ///
-        /// Esto lo sabe en el acto y sin preguntarle a nadie: se anota al arrancar el proceso y se
-        /// quita cuando el proceso muere, que es el mismo evento que ya avisaba al servidor.
+        /// This knows it on the spot and without asking anyone: it is recorded on starting the process and
+        /// removed when the process dies, which is the same event that already told the server.
         /// </remarks>
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, byte> _arrancadosAqui
             = new System.Collections.Concurrent.ConcurrentDictionary<long, byte>();
 
-        /// <summary>Si esa cuenta tiene un cliente abierto: lo que dijo el sondeo, o lo que sabemos ya.</summary>
+        /// <summary>Whether that account has a client open: what the probe said, or what we already know.</summary>
         public static bool IsActive(long accountId)
             => _jugando.Contains(accountId) || _arrancadosAqui.ContainsKey(accountId);
 
-        /// <summary>Cuántas cuentas están jugando, sin contar dos veces a las que salen en los dos sitios.</summary>
+        /// <summary>How many accounts are playing, without counting twice those that appear in both places.</summary>
         public static int ActiveCount
         {
             get
@@ -586,8 +636,8 @@ namespace Jondo.Unity.Launcher
             var cuerpo = ControlClient.Pedir("activos").Cuerpo();
             if (cuerpo == null)
             {
-                // Sin servidor no hay nadie jugando, y sobre todo: no dejar la lista de antes, que
-                // haría que la ventana siguiera pintando cuentas "en juego" de una sesión muerta.
+                // Without a server nobody is playing, and above all: not keeping the previous list, which
+                // would make the window keep painting accounts "en juego" from a dead session.
                 _jugando = new System.Collections.Generic.HashSet<long>();
                 return;
             }
@@ -602,11 +652,11 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Si el servidor está en pie, y de paso quién está jugando.
+        /// Whether the server is up, and in passing who is playing.
         ///
-        /// Miraba dos banderas estáticas —ZaapServer.IsRunning y GameServerProxy.IsRunning— que son
-        /// del proceso que las levantó. En el lanzador valdrían false siempre y el semáforo diría
-        /// "fuera de línea" con el servidor perfectamente vivo.
+        /// It looked at two static flags —ZaapServer.IsRunning and GameServerProxy.IsRunning— which belong
+        /// to the process that raised them. In the launcher they would always be false and the traffic light would say
+        /// "fuera de línea" with the server perfectly alive.
         /// </summary>
         public static ServicesStatus GetStatus()
         {

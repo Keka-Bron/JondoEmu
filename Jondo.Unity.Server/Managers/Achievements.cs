@@ -79,8 +79,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los puntos de logro de un personaje cualquiera, conectado o no: lo que la lista de
-        /// miembros del gremio enseña en su columna «Logros».
+        /// Any character's achievement points, connected or not: what the guild members list shows in its
+        /// «Logros» (Achievements) column.
         /// </summary>
         public static int PointsOf(long characterId)
         {

@@ -3,25 +3,25 @@ using System.Collections.Generic;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los cinco oráculos de la tienda del gremio: qué cuestan y qué alteración ponen.
+    /// The guild shop's five oracles: what they cost and what alteration they set.
     ///
-    /// La tienda (jkh) los manda por su número de 1 a 5 con el precio YA MULTIPLICADO por las
-    /// cuentas activas del gremio: en el gremio de cuatro cuentas de la captura salen 80, 80,
-    /// 800, 200 y 80, y en el de una, 20, 20, 200, 50 y 20. De ahí los precios de aquí.
+    /// The shop (jkh) sends them by their number from 1 to 5 with the price ALREADY MULTIPLIED by the
+    /// guild's active accounts: in the capture's four-account guild they come out 80, 80, 800, 200 and 80,
+    /// and in the one-account guild, 20, 20, 200, 50 and 20. Hence the prices here.
     ///
-    /// Qué alteración pone cada uno está medido en UNO: se compró el 1, se activó, y lo que
-    /// llegó fue la alteración 859, «Oráculo de saber». Los otros cuatro se colocan por su
-    /// precio, que sólo deja libre el orden de los tres que valen 20:
+    /// Which alteration each one sets is measured on ONE: number 1 was bought, activated, and what arrived
+    /// was alteration 859, «Oráculo de saber». The other four are placed by their price, which only leaves
+    /// open the order of the three that cost 20:
     ///
-    ///   859 saber      20    ←  medido
-    ///   860 fortuna    20    ←  inferencia: es uno de los tres de 20
-    ///   862 divino    200    ←  el único de 200
-    ///   861 recolector 50    ←  el único de 50
-    ///   863 gladiador  20    ←  inferencia, como el de fortuna
+    ///   859 knowledge  20    ←  measured
+    ///   860 fortune    20    ←  inference: it is one of the three at 20
+    ///   862 divine    200    ←  the only one at 200
+    ///   861 gatherer   50    ←  the only one at 50
+    ///   863 gladiator  20    ←  inference, like fortune's
     ///
-    /// Los precios de la ficha del juego -saber, fortuna y gladiador a 20, recolector a 50,
-    /// divino a 200- cuadran con los cinco de la captura, así que lo único sin demostrar es si
-    /// fortuna va en el 2 y gladiador en el 5 o al revés.
+    /// The game's sheet prices -- knowledge, fortune and gladiator at 20, gatherer at 50, divine at 200 --
+    /// fit the capture's five, so the only unproven thing is whether fortune goes in 2 and gladiator in 5
+    /// or the other way round.
     /// </summary>
     public static class GuildOracles
     {
@@ -29,10 +29,10 @@ namespace Jondo.Unity.Server.Managers
         {
             public int Id { get; init; }
 
-            /// <summary>Lo que cuesta POR CUENTA activa del gremio, en kamas de gremio.</summary>
+            /// <summary>What it costs PER active account of the guild, in guild kamas.</summary>
             public int PricePerAccount { get; init; }
 
-            /// <summary>La alteración que pone al activarlo.</summary>
+            /// <summary>The alteration it sets on being activated.</summary>
             public int Alteration { get; init; }
         }
 
@@ -45,7 +45,7 @@ namespace Jondo.Unity.Server.Managers
             [5] = new Oracle { Id = 5, PricePerAccount = 20,  Alteration = 863 },
         };
 
-        /// <summary>Los cinco, en el orden en que viajan en la tienda.</summary>
+        /// <summary>The five, in the order they travel in the shop.</summary>
         public static IReadOnlyList<Oracle> All => new List<Oracle>
         {
             Catalogo[1], Catalogo[2], Catalogo[3], Catalogo[4], Catalogo[5],
@@ -53,7 +53,7 @@ namespace Jondo.Unity.Server.Managers
 
         public static Oracle Of(int id) => Catalogo.TryGetValue(id, out var oracle) ? oracle : null;
 
-        /// <summary>Lo que cuesta de verdad: el precio por cuenta por las cuentas que hay.</summary>
+        /// <summary>What it really costs: the price per account times the accounts there are.</summary>
         public static int PriceFor(int id, int accounts)
         {
             var oracle = Of(id);
@@ -61,14 +61,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Lo que dura puesto un oráculo: dos horas. Lo dice su propia descripción -«durante dos
-        /// horas»- y lo confirma la captura, donde el lzs va de 1788304392333 a 1788311580000.
+        /// How long an oracle lasts: two hours. Its own description says so -- «durante dos horas» -- and the
+        /// capture confirms it, where the lzs goes from 1788304392333 to 1788311580000.
         /// </summary>
         public const int HoursActive = 2;
 
         /// <summary>
-        /// Lo que se tiene para activarlo desde que se compra: un día. En la captura el plazo
-        /// que viaja en el jkv cae 24 horas menos unos segundos después de la compra.
+        /// How long one has to activate it from buying it: a day. In the capture the deadline travelling in the
+        /// jkv falls 24 hours minus a few seconds after the purchase.
         /// </summary>
         public const int HoursToActivate = 24;
     }

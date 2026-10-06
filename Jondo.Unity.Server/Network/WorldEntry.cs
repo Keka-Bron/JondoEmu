@@ -31,17 +31,17 @@ namespace Jondo.Unity.Server.Network
     public static class WorldEntry
     {
         /// <summary>
-        /// La etiqueta con la que content/world/entry.json marca la barra de HECHIZOS.
+        /// The tag with which content/world/entry.json marks the SPELL bar.
         /// </summary>
         /// <remarks>
-        /// Hay dos itg en la secuencia y sólo se distinguen por lo que el manifiesto diga: antes se
-        /// miraba dentro del payload —f6 objetos, f9 hechizos— y ese payload ya no viaja. Es una
-        /// cadena y no un enum porque la escribe tools/decode_world_entry.py, que es de otro
-        /// lenguaje; si las dos dejan de coincidir, WorldEntryContentTests lo dice.
+        /// There are two itg in the sequence and they are only told apart by what the manifest says: before,
+        /// the payload was looked inside —f6 items, f9 spells— and that payload no longer travels. It is a
+        /// string and not an enum because tools/decode_world_entry.py writes it, which is in another
+        /// language; if the two stop matching, WorldEntryContentTests says so.
         /// </remarks>
         public const string SpellBarLabel = "ConnectionProtocol.BuildSpellBar";
 
-        /// <summary>Los tres bloques, con el nombre que les da content/world/entry.json.</summary>
+        /// <summary>The three blocks, with the name content/world/entry.json gives them.</summary>
         public const string BlockAfterCharacter = "afterCharacter";
         public const string BlockAfterConfirm = "afterConfirm";
         public const string BlockMap = "map";
@@ -61,11 +61,11 @@ namespace Jondo.Unity.Server.Network
         ///        dropping it is why the spell bar came up empty. The plan was to build it from
         ///        the database and that never happened.
         ///
-        ///        Ese «f6 para objetos y f9 para hechizos» que ponía aquí era falso y estuvo
-        ///        contradiciendo a HoldsSpells, tres metros más abajo, que hacía lo contrario y
-        ///        acertaba. Medido sobre las dos tramas: la de 436 bytes lleva 44 huecos con f6 y
-        ///        los 44 valores son ids de SpellTemplates de verdad, del 350 al 24.017; la de
-        ///        1.208 usa f9 y sus valores llegan a 507.645.866, que son uid de objeto.
+        ///        That «f6 for items and f9 for spells» written here was false and kept
+        ///        contradicting HoldsSpells, a stone's throw further down, which did the opposite and
+        ///        was right. Measured over the two frames: the 436-byte one carries 44 slots with f6 and
+        ///        all 44 values are real SpellTemplates ids, from 350 to 24,017; the
+        ///        1,208-byte one uses f9 and its values reach 507,645,866, which are item uids.
         ///   ife  was labelled the friends list. It is not: the contacts are in kqg. It is the
         ///        alliances, by name and by tag. It came back on the wire for a while and has gone
         ///        out again — not for the reason it was taken out the first time, but because
@@ -119,78 +119,78 @@ namespace Jondo.Unity.Server.Network
             // tools/leak.py checks that no real name reaches the wire. Run it after touching this.
             Op.Kqg, Op.Jhe, Op.Jhh, Op.Jhk, Op.Hol, Op.Jgu, Op.Ihb, Op.Koj, Op.Ife, Op.Jjs, Op.Jaa,
 
-            // Los adornos de la cuenta capturada. No son nombres, pero son suyos igual, y el
-            // emulador ya manda los del personaje que se conecta:
+            // The captured account's adornments. They are not names, but they are its own all the same, and the
+            // emulator already sends those of the character logging in:
             //
-            //   hhy  los títulos y ornamentos que ESA cuenta tiene: 62 y 28. Llegaban al elegir
-            //        personaje y luego el emulador mandaba los suyos —los 539 y los 167— al entrar
-            //        al mapa, así que el cliente recibía dos listas distintas y la primera era de
-            //        otro. Lo manda WardrobeHandler.SendOwnedAsync.
-            //   lyt  los conjuntos guardados del vestuario. Se queda en la lista, aunque en estos
-            //        bloques no hay ninguno: sale 8 veces en las capturas y el dia que se replique
-            //        otra sesion conviene que ya este fuera.
+            //   hhy  the titles and ornaments THAT account has: 62 and 28. They arrived on choosing
+            //        a character and then the emulator sent its own —the 539 and the 167— on entering
+            //        the map, so the client received two different lists and the first was
+            //        someone else's. WardrobeHandler.SendOwnedAsync sends it.
+            //   lyt  the wardrobe's stored outfits. It stays in the list, even though in these
+            //        blocks there are none: it comes out 8 times in the captures and the day another
+            //        session is replicated it had better be out already.
             //
-            // OJO CON ESTA PAREJA. El bloque 1 trae un «lty», que NO es este «lyt»: son dos opcodes
-            // distintos —lty sale 7 veces en las capturas y lyt 8— y durante un tiempo el comentario
-            // de aqui describia el lty creyendo que era el lyt, con lo que esta entrada de la lista
-            // no filtraba absolutamente nada y nadie lo notaba. El lty de verdad son cinco huecos
-            // vacios (todo -1 y 5) con la fecha de creacion de la cuenta, asi que no lleva nada de
-            // nadie y sigue viajando; pero la leccion es que un opcode de tres letras se confunde
-            // con su anagrama sin que salte ningun error.
+            // CAREFUL WITH THIS PAIR. Block 1 brings an «lty», which is NOT this «lyt»: they are two different
+            // opcodes —lty comes out 7 times in the captures and lyt 8— and for a while the comment
+            // here described the lty believing it was the lyt, so this list entry
+            // filtered absolutely nothing and nobody noticed. The real lty is five empty
+            // slots (all -1 and 5) with the account's creation date, so it carries nothing of
+            // anybody and still travels; but the lesson is that a three-letter opcode gets confused
+            // with its anagram without any error firing.
             Op.Hhy, Op.Lyt,
 
-            // El diario de misiones de la cuenta capturada: 261 tramas en el bloque 1 y 4 más en
-            // el del mapa, cada una con una misión, su paso y sus objetivos. Es de otro por partida
-            // doble: son las misiones que llevaba esa cuenta, y además contradicen a lo que el
-            // servidor cree, porque desde que hay motor de misiones el cliente recibiría 261
-            // misiones que su personaje no tiene y ninguna de las que sí.
+            // The captured account's quest journal: 261 frames in block 1 and 4 more in
+            // the map one, each with a quest, its step and its objectives. It is someone else's on two
+            // counts: they are the quests that account was carrying, and on top of that they contradict what the
+            // server believes, because since there is a quest engine the client would receive 261
+            // quests its character does not have and none of those it does.
             //
-            // No es una suposición sobre qué es idu: en las 401 capturas hay 448 tramas suyas y las
-            // 448 nombran un paso que pertenece de verdad a la misión que nombran, con 1.479
-            // objetivos que pertenecen de verdad a ese paso.
+            // It is not an assumption about what idu is: in the 401 captures there are 448 of its frames and all
+            // 448 name a step that really belongs to the quest they name, with 1,479
+            // objectives that really belong to that step.
             //
-            // En su lugar va lo nuestro, desde la base: Managers.Quests.SendJournalAsync.
+            // In its place goes ours, from the base: Managers.Quests.SendJournalAsync.
             Op.Idu,
 
-            // Y la cajita de misiones seguidas de esa misma cuenta, que es otra cosa que el diario
-            // y que se colaba aunque el idu y el idr estuvieran fuera. Una sola trama en el bloque
-            // 1, con las misiones 1869 y 2406 —«El daño de Búril» y «Cuando el despertar no es más
-            // que un sueño»— y sus objetivos.
+            // And the little box of followed quests of that same account, which is something other than the journal
+            // and which slipped in even though the idu and the idr were out. A single frame in block
+            // 1, with quests 1869 and 2406 —«El daño de Búril» and «Cuando el despertar no es más
+            // que un sueño»— and their objectives.
             //
-            // Lo que la hacía dañina es que REEMPLAZA la lista, no la amplía. El diario del
-            // personaje salía bien —«Diario enviado: 1 en curso» en el registro— y aun así la caja
-            // enseñaba dos misiones ajenas y ninguna propia, porque esta trama llegaba después y
-            // se quedaba con la última palabra. Recién empezada una misión sí se veía, porque el
-            // ief en vivo la añade; al volver a entrar, desaparecía.
+            // What made it harmful is that it REPLACES the list, it does not extend it. The character's
+            // journal came out fine —«Diario enviado: 1 en curso» in the log— and even so the box
+            // showed two foreign quests and none of its own, because this frame arrived later and
+            // had the last word. Right after starting a quest it was seen, because the
+            // live ief adds it; on logging in again, it disappeared.
             //
-            // Nada va en su lugar por ahora: un personaje nuevo no sigue ninguna, y el cliente
-            // pone en la caja las que tiene empezadas.
+            // Nothing goes in its place for now: a new character follows none, and the client
+            // puts in the box the ones it has started.
             Op.Iel,
 
-            // Y los contadores de esa cuenta: 9.694 pares de id y valor, con ids del 44 al 34.352 y
-            // valores de cientos de millones. Es lo que el cliente pinta en el panel de estadisticas,
-            // y son las suyas: partidas jugadas, monstruos matados, kamas ganados. 87.878 bytes, el
-            // 88 % de todo lo que quedaba copiandose tal cual. Una cuenta nueva no tiene ninguna.
+            // And that account's counters: 9,694 id and value pairs, with ids from 44 to 34,352 and
+            // values in the hundreds of millions. It is what the client draws in the statistics panel,
+            // and they are that account's: games played, monsters killed, kamas earned. 87,878 bytes,
+            // 88 % of everything that was still being copied as is. A new account has none.
             Op.Ivi,
 
-            // Y EL MISMO DIARIO OTRA VEZ, entero y en una sola trama. Quitar sólo el idu no cambió
-            // nada de lo que el jugador ve, porque el bloque trae las dos cosas: 261 tramas idu
-            // sueltas Y este idr con esas mismas 261 dentro, más 548 misiones dadas por terminadas.
+            // And THE SAME JOURNAL AGAIN, whole and in a single frame. Removing only the idu changed
+            // nothing of what the player sees, because the block brings both things: 261 loose idu
+            // frames AND this idr with those same 261 inside, plus 548 quests considered finished.
             //
-            //   f1 (repetido)  una misión en curso, con la forma del cuerpo del idu
-            //   f3 (repetido)  { f1: 1, f2: id de misión }, una terminada
-            //   f4             uno, vacío
+            //   f1 (repeated)  a quest in progress, with the shape of the idu's body
+            //   f3 (repeated)  { f1: 1, f2: quest id }, a finished one
+            //   f4             one, empty
             //
-            // Los 261 ids del f1 son misiones de verdad, los 261, y los 548 del f3 también: son
-            // exactamente los dos números que el cliente escribe en sus pestañas. Con esto entrando,
-            // el jugador veía todas las de Incarnam y Astrub como hechas, ningún NPC con la marca
-            // verde encima y ninguno dispuesto a dar nada, porque para el cliente ya las tenía.
+            // The 261 ids of f1 are real quests, all 261, and the 548 of f3 too: they are
+            // exactly the two numbers the client writes on its tabs. With this coming in,
+            // the player saw all those of Incarnam and Astrub as done, no NPC with the green
+            // mark above it and none willing to give anything, because for the client he already had them.
             //
-            // En su lugar va el nuestro, con la misma forma, desde CharacterQuests.
+            // In its place goes ours, with the same shape, from CharacterQuests.
             Op.Idr,
 
-            // Los logros de esa cuenta: 954 entradas, y los 954 ids que llevan son logros de verdad.
-            // Es la razón de que el personaje entrara con todos los logros del jugador capturado.
+            // That account's achievements: 954 entries, and the 954 ids they carry are real achievements.
+            // It is the reason the character came in with all of the captured player's achievements.
             // In their place goes the character's own list: Managers.Achievements.SendListAsync.
             Op.Mft,
 
@@ -274,38 +274,38 @@ namespace Jondo.Unity.Server.Network
                 }
             }
 
-            // Y si los bloques no traen ningún kub —que es lo que pasa: ninguno de los tres lo
-            // lleva—, la lista sale del fichero medido.
+            // And if the blocks bring no kub —which is what happens: none of the three
+            // carries one—, the list comes from the measured file.
             AprenderDelFichero();
         }
 
         /// <summary>
-        /// La lista de características y su hueco, sacada de las capturas.
+        /// The list of characteristics and their slot, taken from the captures.
         ///
-        /// Los tres bloques de datos/ NO contienen ni un kub, así que lo de arriba se quedaba
-        /// siempre con la lista vacía y la ficha caía en la de emergencia: seis características
-        /// más las primarias, veinticinco en total en vez de ciento veinte. El personaje aparecía
-        /// sin crítico, sin potencia, sin alcance, sin placaje, sin huida, sin esquivas, sin daños
-        /// elementales y sin resistencias, porque esas entradas sencillamente no viajaban.
+        /// The three data blocks in datos/ do NOT contain a single kub, so the above was always left
+        /// with the empty list and the sheet fell back to the emergency one: six characteristics
+        /// plus the primary ones, twenty-five in total instead of a hundred and twenty. The character appeared
+        /// without critical, without power, without range, without tackle, without flee, without dodges, without
+        /// elemental damage and without resistances, because those entries simply did not travel.
         ///
-        /// No se notaba porque el panel bueno lo pinta la reproducción de los bloques al entrar al
-        /// mundo, y este constructor apenas se usaba. Al empezar a mandarlo también al acabar un
-        /// combate, pasó a pisar la ficha buena.
+        /// It was not noticed because the good panel is drawn by replaying the blocks on entering the
+        /// world, and this builder was hardly used. When it started being sent also at the end of a
+        /// fight, it went on to overwrite the good sheet.
         ///
-        /// El fichero lo genera tools/extraer_caracteristicas_kub.py de los 672 kub reales que hay
-        /// en las capturas. El hueco de cada una importa: tres van en el f2 —29, 47 y 96—, dos en
-        /// el f5 —los puntos de acción y de movimiento— y las 115 restantes en el f4. Mandar una
-        /// en el hueco que no le toca hace que el cliente reviente y pierda la ficha entera.
+        /// The file is generated by tools/extraer_caracteristicas_kub.py from the 672 real kub there are
+        /// in the captures. Each one's slot matters: three go in f2 —29, 47 and 96—, two in
+        /// f5 —the action and movement points— and the remaining 115 in f4. Sending one
+        /// in the wrong slot makes the client blow up and lose the whole sheet.
         /// </summary>
         private static void AprenderDelFichero()
         {
             try
             {
-                // Por Paths y no relativo: relativo sólo funciona si el directorio de trabajo
-                // es la raíz, que es lo que deja el lanzador. Arrancado de cualquier otra forma
-                // —desde el IDE, desde un servicio, desde otra carpeta— el fichero no aparecía,
-                // la ficha se quedaba en 25 entradas de 120, y con ella se iban el crítico, la
-                // potencia, el alcance y todas las resistencias. Sin un solo mensaje de error.
+                // Through Paths and not relative: relative only works if the working directory
+                // is the root, which is what the launcher leaves. Started any other way
+                // —from the IDE, from a service, from another folder— the file did not show up,
+                // the sheet stayed at 25 entries out of 120, and with it went the critical, the
+                // power, the range and all the resistances. Without a single error message.
                 string ruta = Paths.CharacteristicFieldsJson;
                 if (!System.IO.File.Exists(ruta))
                 {
@@ -333,31 +333,31 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Los oficios del personaje, con el progreso que tenga.
+        /// The character's professions, with whatever progress they have.
         ///
-        /// La LISTA de oficios sí se aprovecha de la captura: qué oficios existen y en qué orden
-        /// los quiere el cliente son datos del juego. Lo que no se hereda es el progreso, que era
-        /// del que grabó —tenía una docena al máximo—.
+        /// The LIST of professions is taken from the capture: which professions exist and in what order
+        /// the client wants them are game data. What is not inherited is the progress, which belonged
+        /// to whoever recorded —he had a dozen at the maximum—.
         ///
-        /// Antes esto mandaba todos a nivel 1 y punto, y tenía sentido mientras no hubiera
-        /// experiencia de oficio en ninguna parte. Ahora sí la hay: se guarda en CharacterJobs y
-        /// se carga al elegir personaje, así que aquí se pone la de verdad. Sin esto, pescabas
-        /// hasta subir a Pescador 3 y al volver a entrar te salían los veinte a nivel 1 otra vez.
+        /// Before, this sent all of them at level 1 and that was it, and it made sense while there was no
+        /// profession experience anywhere. Now there is: it is stored in CharacterJobs and
+        /// loaded on choosing a character, so the real one is put here. Without this, you fished
+        /// until reaching Fisher 3 and on logging in again the twenty came out at level 1 once more.
         ///
-        ///   irq: f1 (repeated) { f1: oficio, f2: siguiente nivel, f3: nivel, f4: suelo, f5: total }
+        ///   irq: f1 (repeated) { f1: profession, f2: next level, f3: level, f4: floor, f5: total }
         /// </summary>
         private static byte[] SendJobs(byte[] frame)
         {
             var jobs = Pb.New();
             byte[]? payload = ConnectionProtocol.ReadPayload(frame, Op.Irq);
 
-            // Vacío, no nulo, es el caso que hay que atrapar. ReadPayload devuelve un array de cero
-            // bytes cuando el mensaje no trae cuerpo, y NO puede devolver null porque Rebuilt usa
-            // ese mismo `!= null` para saber a qué opcode pertenece cada trama. Cuando la entrada al
-            // mundo pasó a leerse del manifiesto y esta trama se quedó sin cuerpo, el bucle de abajo
-            // no dio ni una vuelta, count se quedó en cero —lo que además silenciaba la línea de
-            // consola— y el jugador entró sin un solo oficio, con su experiencia guardada intacta en
-            // CharacterJobs y sin nadie a quien enseñársela.
+            // Empty, not null, is the case to catch. ReadPayload returns a zero-byte
+            // array when the message brings no body, and it CANNOT return null because Rebuilt uses
+            // that same `!= null` to know which opcode each frame belongs to. When the world
+            // entry started being read from the manifest and this frame was left without a body, the loop below
+            // did not go round once, count stayed at zero —which also silenced the console
+            // line— and the player came in without a single profession, with his experience stored intact in
+            // CharacterJobs and nobody to show it to.
             if (payload == null || payload.Length == 0)
             {
                 Console.WriteLine("[World] El irq viene sin cuerpo: no se puede saber qué oficios " +
@@ -393,8 +393,8 @@ namespace Jondo.Unity.Server.Network
                 }
             }
 
-            // Siempre, también con cero: un cero en el registro es lo que habría delatado el día
-            // que dejaron de salir, en vez de no imprimir nada y parecer que no había pasado nada.
+            // Always, also with zero: a zero in the log is what would have given away the day
+            // they stopped coming out, instead of printing nothing and seeming that nothing had happened.
             Console.WriteLine($"[World] {count} oficios enviados, {conNivel} con progreso.");
             return jobs.Build();
         }
@@ -410,13 +410,13 @@ namespace Jondo.Unity.Server.Network
         ///   irq  the jobs, which arrived maxed out
         ///   hms  the spells it has
         ///   ivx  the inventory
-        ///   itg  las dos barras: la de hechizos se rehace, la de objetos sale vacía
+        ///   itg  both bars: the spell one is rebuilt, the item one goes out empty
         ///
-        /// Las dos barras van ya, no solo la de hechizos. La de objetos apuntaba a 72 uid de la
-        /// cuenta capturada, y desde que el inventario sale de la base de datos esos objetos no
-        /// existen: el cliente se quedaba con una barra llena de huecos que no sabe resolver.
+        /// Both bars go now, not only the spell one. The item one pointed at 72 uids of the
+        /// captured account, and since the inventory comes from the database those items do not
+        /// exist: the client was left with a bar full of slots it cannot resolve.
         /// </summary>
-        /// <summary>Qué mensaje de información lleva un lqn, o cero.</summary>
+        /// <summary>Which information message an lqn carries, or zero.</summary>
         private static int MessageOf(byte[] lqn)
         {
             foreach (var field in ProtoMessage.Parse(lqn).Fields)
@@ -465,10 +465,10 @@ namespace Jondo.Unity.Server.Network
                 return ConnectionProtocol.Push(Op.Ivx, ConnectionProtocol.BuildInventory());
             }
 
-            // El aviso de la última conexión. El bloque grabado trae el del que capturó —el 9 de
-            // agosto a las 18:53— y eso es de otro. Se cambia por el de este personaje, con su
-            // fecha y la dirección desde la que entró la vez pasada, leídas de la base antes de
-            // pisarlas. Los demás lqn del bloque se dejan pasar tal cual.
+            // The last connection notice. The recorded block brings that of whoever captured —9
+            // August at 18:53— and that is someone else's. It is swapped for this character's, with his
+            // date and the address he logged in from last time, read from the base before
+            // overwriting them. The block's other lqn are let through as is.
             byte[]? lqn = ConnectionProtocol.ReadPayload(frame, Op.Lqn);
             if (lqn != null && MessageOf(lqn) == ConnectionProtocol.LastConnectionMessage)
             {
@@ -482,19 +482,19 @@ namespace Jondo.Unity.Server.Network
             byte[]? itg = ConnectionProtocol.ReadPayload(frame, Op.Itg);
             if (itg != null)
             {
-                // Cuál de las dos barras es lo dice el manifiesto, no el cuerpo. Antes se miraba
-                // dentro del payload —f6 objetos, f9 hechizos— y eso dejó de funcionar en cuanto el
-                // payload dejó de viajar: las dos habrían salido como la de objetos, y la de
-                // hechizos vacía, que es justo el fallo que ya se arregló una vez por otro camino.
+                // Which of the two bars it is, the manifest says, not the body. Before, the payload was
+                // looked inside —f6 items, f9 spells— and that stopped working as soon as the
+                // payload stopped travelling: both would have gone out as the item one, and the spell
+                // one empty, which is exactly the bug already fixed once another way.
                 if (built == SpellBarLabel)
                 {
                     return ConnectionProtocol.Push(Op.Itg,
                         ConnectionProtocol.BuildSpellBar(character.Breed, character.Level));
                 }
 
-                // La otra barra, la de objetos. Iba tal cual y apuntaba a 72 uid de la cuenta
-                // capturada: objetos que en este inventario no existen. Sale vacía, que es lo que
-                // tiene un personaje que todavía no ha puesto nada en ella.
+                // The other bar, the item one. It went as is and pointed at 72 uids of the
+                // captured account: items that do not exist in this inventory. It goes out empty, which is what
+                // a character who has not yet put anything in it has.
                 return ConnectionProtocol.Push(Op.Itg, Array.Empty<byte>());
             }
 
@@ -518,10 +518,10 @@ namespace Jondo.Unity.Server.Network
         /// <summary>Reads the three blocks off disk. Missing files are reported, not thrown.</summary>
         public static void Initialize()
         {
-            // De content/world/entry.json y no de los tres .bin. Son los mismos bytes —lo prueba
-            // WorldEntryContentTests trama a trama— pero escritos campo a campo, de modo que lo que
-            // sale al cable se puede leer y comparar en un diff. Asi es como se encontraron tarde
-            // el diario de misiones y los logros de la cuenta capturada: no habia forma de verlos.
+            // From content/world/entry.json and not from the three .bin. They are the same bytes —
+            // WorldEntryContentTests proves it frame by frame— but written field by field, so that what
+            // goes out on the wire can be read and compared in a diff. That is how the quest journal
+            // and the achievements of the captured account were found late: there was no way to see them.
             WorldEntryContent.Load(Paths.ContentFile(WorldEntryContent.AuthoredFile), Console.WriteLine);
 
             if (WorldEntryContent.Ready)
@@ -582,12 +582,12 @@ namespace Jondo.Unity.Server.Network
                 return;
             }
 
-            // Y esto ya no es un aviso: es lo normal desde que el manifiesto no lleva cuerpo en las
-            // tramas que el servidor rehace, y el kva es una de ellas. La identidad no hace falta
-            // porque el kva se construye entero desde la base —Rebuilt lo cambia por completo— y
-            // porque no queda nada del personaje grabado que sustituir: WorldEntryContentTests lo
-            // comprueba trama a trama. El aviso decía «el cliente se negará a entrar al mundo», que
-            // era falso y salía en cada arranque.
+            // And this is no longer a warning: it is the norm since the manifest carries no body in the
+            // frames the server rebuilds, and the kva is one of them. The identity is not needed
+            // because the kva is built whole from the base —Rebuilt replaces it completely— and
+            // because nothing of the recorded character is left to replace: WorldEntryContentTests
+            // checks it frame by frame. The warning said «el cliente se negará a entrar al mundo», which
+            // was false and came out on every start.
             Console.WriteLine("[World] El manifiesto no trae el kva de la captura, que es lo " +
                               "esperado: el del personaje se construye desde la base de datos.");
         }
@@ -748,9 +748,9 @@ namespace Jondo.Unity.Server.Network
                 // look.
                 byte[]? rehechoAqui = Rebuilt(row.Frame, row.Built, character);
 
-                // Un array vacio quiere decir "este mensaje no se manda": lo usa el aviso de la
-                // ultima conexion cuando el personaje entra por primera vez y no hay anterior que
-                // contar. Mandarlo vacio seria una trama de longitud cero.
+                // An empty array means "this message is not sent": the last connection
+                // notice uses it when the character logs in for the first time and there is no previous one to
+                // tell. Sending it empty would be a zero-length frame.
                 if (rehechoAqui != null && rehechoAqui.Length == 0) { skipped++; continue; }
                 byte[] toSend;
 
@@ -780,14 +780,16 @@ namespace Jondo.Unity.Server.Network
             // database now, so a character who has a guild sees it. Nothing goes out for one who
             // has none, which is what the discard already did. The captured ranks are a fixed
             // default template (jco), reused here.
+            // In the capture's order, "jco jhe jhh": the ranks, then belonging (jhe) -- not the
+            // jgw of joining, which printed "acabas de unirte al gremio" at every login.
             var guild = Managers.GuildStore.GuildOf(character.Id);
             if (guild != null)
             {
                 int rank = Managers.GuildStore.RankOf(character.Id);
                 var members = Managers.GuildStore.Members(guild.Id);
-                await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jgw,
-                    GuildProtocol.BuildGuildJoined(guild, rank)));
                 await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
+                await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jhe,
+                    GuildProtocol.BuildMembership(guild, rank, Managers.GuildStore.ContributedBy(character.Id))));
                 await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jhh,
                     GuildProtocol.BuildGuildInfo(guild, members.Count)));
                 Console.WriteLine($"[World] Guild sent for {character.Name}: {guild.Name} ({members.Count} members).");
@@ -900,9 +902,9 @@ namespace Jondo.Unity.Server.Network
             // keeps: sending it only in the first block left the sheet empty.
             await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
 
-            // Los zaaps descubiertos. No está en los bloques grabados —se comprobó, ninguno de los
-            // cuatro trae un hjk— y sin él la ventana de viaje sale con «Ningún destino» aunque el
-            // hjj le mande los sesenta y tres. El servidor real lo manda justo aquí, al entrar.
+            // The discovered zaaps. It is not in the recorded blocks —it was checked, none of the
+            // four brings an hjk— and without it the travel window comes out with «Ningún destino» even though the
+            // hjj sends it the sixty-three. The real server sends it right here, on entering.
             var descubiertos = new List<long>(Managers.Interactives.DiscoveredZaapMaps());
             await EnviarAsync(stream, ConnectionProtocol.Push(
                 Op.Hjk, ConnectionProtocol.BuildDiscoveredZaaps(descubiertos)));

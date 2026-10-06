@@ -10,87 +10,87 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Crear un personaje.
+    /// Creating a character.
     ///
-    /// De la captura de una creación que sale bien, en un servidor vacío:
+    /// From the capture of a creation that goes well, on an empty server:
     ///
-    ///   cliente  kvz { f1 { f1: nombre, f2: cara, f3: colores, f5: 26, f7: raza } }
-    ///   servidor kvb            VACÍO, que es como se dice que sí
-    ///   servidor kvi            la lista otra vez, ya con el personaje dentro
-    ///   cliente  kvl            "juego con ése"
+    ///   client  kvz { f1 { f1: name, f2: face, f3: colours, f5: 26, f7: breed } }
+    ///   server  kvb            EMPTY, which is how yes is said
+    ///   server  kvi            the list again, now with the character in it
+    ///   client  kvl            "I play with that one"
     ///
-    /// Y de la que sale mal, la del límite de personajes: <c>kvb { f2: 3 }</c>. O sea que el mismo
-    /// mensaje sirve para las dos cosas y lo que distingue es que lleve motivo o no.
+    /// And from the one that goes wrong, the character limit one: <c>kvb { f2: 3 }</c>. So the same
+    /// message serves for both things and what tells them apart is whether it carries a reason.
     ///
-    /// Los colores llegan como varints con signo, y el -1 significa "el que traiga la raza". El
-    /// cliente los manda todos a -1 cuando no se toca la paleta.
+    /// The colours arrive as signed varints, and -1 means "the breed's own". The client sends them
+    /// all as -1 when the palette is not touched.
     /// </summary>
     public static class CharacterCreationHandler
     {
-        /// <summary>Donde empieza todo el mundo: el zaap de la ciudad de Astrub.</summary>
+        /// <summary>Where everybody starts: the zaap of the city of Astrub.</summary>
         public const long StartingMap = 191105026L;
 
-        /// <summary>Con lo que empieza: nivel, kamas y las características de los pergaminos.</summary>
+        /// <summary>What he starts with: level, kamas and the scroll characteristics.</summary>
         public const int StartingLevel = 1;
         public const long StartingKamas = 1_000_000L;
 
         /// <summary>
-        /// Lo que dan los pergaminos en cada característica, y va APARTE de la base.
+        /// What the scrolls give in each characteristic, and it goes APART from the base.
         /// </summary>
         /// <remarks>
-        /// Cien y no ciento uno: en las capturas de personajes reales el f3 de cada característica
-        /// -el campo de los pergaminos- vale 100 en 156 capturas y 4.815 apariciones, y 101 no sale
-        /// ni una vez. Y en su columna y no en la base, porque la base son los puntos repartidos:
-        /// metidos ahí, un nivel 200 recién hecho tenía 183 puntos por repartir en vez de 995.
+        /// A hundred and not a hundred and one: in the captures of real characters each characteristic's
+        /// f3 -- the scrolls field -- is 100 in 156 captures and 4,815 appearances, and 101 does not come
+        /// up once. And in its own column and not in the base, because the base is the points spent: put
+        /// there, a freshly made level 200 had 183 points to spend instead of 995.
         /// </remarks>
         public const int ScrolledStat = 100;
 
         /// <summary>
-        /// El conjunto del aventurero, que es el número 5 del juego: capa, sombrero, anillo, botas,
-        /// cinturón y amuleto.
+        /// The adventurer's set, which is set number 5 of the game: cape, hat, ring, boots, belt and
+        /// amulet.
         /// </summary>
         /// <remarks>
-        /// EN LA BOLSA, no puestos, y es a propósito. Las seis piezas piden entre nivel 4 y nivel
-        /// 9 —el anillo 4, el amuleto 5, el cinturón 6, las botas 7, la capa 8 y el sombrero 9— y
-        /// un personaje nuevo empieza en el 1. Dárselo puesto lo colaba por la puerta de atrás: se
-        /// escribe directo en la base, sin pasar por la comprobación de nivel que hace
-        /// EquipmentHandler, así que el personaje aparecía vistiendo cosas que no puede llevar y
-        /// en cuanto se quitaba una no podía volver a ponérsela.
+        /// IN THE BAG, not worn, and on purpose. The six pieces require between level 4 and level 9 --
+        /// the ring 4, the amulet 5, the belt 6, the boots 7, the cape 8 and the hat 9 -- and a new
+        /// character starts at 1. Giving it worn slipped it in through the back door: it is written
+        /// straight into the database, without going through the level check EquipmentHandler does, so
+        /// the character appeared wearing things he cannot wear and as soon as he took one off he could
+        /// not put it back on.
         ///
-        /// Es un regalo, no un uniforme: está en la bolsa desde el minuto uno y cada pieza se
-        /// pone cuando toca.
+        /// It is a gift, not a uniform: it is in the bag from minute one and each piece is put on when
+        /// its time comes.
         /// </remarks>
         private static readonly (int Gid, int Slot)[] AdventurerSet =
         {
             (2478, Managers.Equipment.Bag),    // amuleto, nivel 5
             (2475, Managers.Equipment.Bag),    // anillo, nivel 4
-            (2477, Managers.Equipment.Bag),    // cinturón, nivel 6
+            (2477, Managers.Equipment.Bag),    // belt, level 6
             (2476, Managers.Equipment.Bag),    // botas, nivel 7
             (2474, Managers.Equipment.Bag),    // sombrero, nivel 9
             (2473, Managers.Equipment.Bag),    // capa, nivel 8
 
-            // Y el manojo de llaves, en la BOLSA y no puesto. En el juego real lo regala el
-            // tutorial -la frase 1111691, «Toma este manojo de llaves magicas: te abrira las
-            // puertas de las mazmorras»- y aqui se da de entrada, que es lo que se ha pedido.
+            // And the keyring, in the BAG and not worn. In the real game the tutorial gives it -- line
+            // 1111691, «Take this magic keyring: it will open the doors of the dungeons for you» -- and
+            // here it is given from the start, which is what was asked for.
             //
-            // No se gasta al usarlo: abre las 107 mazmorras que lo aceptan, una entrada gratis
-            // por mazmorra y semana. Ver DungeonHandler y DungeonKeyring.
+            // It is not spent when used: it opens the 107 dungeons that accept it, one free entry
+            // per dungeon and week. See DungeonHandler and DungeonKeyring.
             (Keyring, Managers.Equipment.Bag),
         };
 
-        /// <summary>El manojo de llaves de mazmorra, objeto 10207.</summary>
+        /// <summary>The dungeon keyring, item 10207.</summary>
         private const int Keyring = DungeonHandler.Keyring;
 
-        /// <summary>Con lo que sale un personaje nuevo. Para los tests, y para poder mirarlo.</summary>
+        /// <summary>What a new character comes out with. For the tests, and to be able to look at it.</summary>
         public static IReadOnlyList<(int Gid, int Slot)> StarterItems => AdventurerSet;
 
         /// <summary>
-        /// El cliente pide un nombre al azar (kvk) y espera el mismo mensaje de vuelta con uno
-        /// dentro. Sin respuesta el botón del dado no hacía nada.
+        /// The client asks for a random name (kvk) and expects the same message back with one inside.
+        /// Without an answer the dice button did nothing.
         ///
-        /// La forma la manda la regla 1 de NamingRules del cliente:
-        /// <c>^([A-Z][a-z]+(\-[a-zA-Z][a-z]*){0,2})$</c> — mayúscula, minúsculas, y hasta dos
-        /// trozos más separados por guión. Aquí se hace con dos.
+        /// The shape is set by rule 1 of the client's NamingRules:
+        /// <c>^([A-Z][a-z]+(\-[a-zA-Z][a-z]*){0,2})$</c> -- a capital, lower case letters, and up to two
+        /// more pieces separated by a hyphen. Here it is done with two.
         /// </summary>
         public static async Task SuggestNameAsync(NetworkStream stream)
         {
@@ -123,16 +123,16 @@ namespace Jondo.Unity.Server.Handlers
             return sb.ToString();
         }
 
-        /// <summary>El cliente ha pulsado JUGAR en la pantalla de creación.</summary>
+        /// <summary>The client has pressed PLAY on the creation screen.</summary>
         public static async Task CreateAsync(NetworkStream stream, byte[] payload, long accountId,
                                              int serverId)
         {
-            // Sin cuenta no se crea nada, y esto faltaba. La rama que llega aquí no mira
-            // isAuthenticated —la de al lado sí, y la de selección rechaza accountId<=0 y además
-            // comprueba el dueño—, CreateAsync no miraba el parámetro, y en la base AccountId es un
-            // INTEGER NOT NULL a secas: sin FOREIGN KEY a Accounts, así que la fila con cuenta 0
-            // entra y la transacción confirma. Un socket que nunca presentó su ticket podía llenar
-            // la tabla de personajes huérfanos.
+            // Without an account nothing is created, and this was missing. The branch that gets here does
+            // not look at isAuthenticated -- the one next to it does, and the selection one refuses
+            // accountId<=0 and checks the owner as well --, CreateAsync did not look at the parameter, and
+            // in the database AccountId is a plain INTEGER NOT NULL: no FOREIGN KEY to Accounts, so the
+            // row with account 0 goes in and the transaction commits. A socket that never presented its
+            // ticket could fill the table with orphan characters.
             if (accountId <= 0)
             {
                 Console.WriteLine("[Game Node] Creación de personaje sin cuenta resuelta: no se ha " +
@@ -183,27 +183,27 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Que sí: el kvb va vacío. Con motivo dentro es que no.
+            // Yes: the kvb goes empty. With a reason inside it is a no.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kvb));
 
-            // La lista entera otra vez, y CON EL RECIÉN CREADO EL PRIMERO.
+            // The whole list again, and WITH THE FRESHLY CREATED ONE FIRST.
             //
-            // Las dos mitades hacen falta y la segunda es la que faltaba. Mandar sólo el kvi
-            // dejaba al cliente con la lista de ANTES de crear; eso ya se arregló. Pero seguía
-            // entrando en el mundo el personaje viejo, y el registro lo enseña sin lugar a dudas:
+            // Both halves are needed and the second is the one that was missing. Sending only the kvi
+            // left the client with the list from BEFORE the creation; that was already fixed. But the old
+            // character still went into the world, and the log shows it beyond doubt:
             //
             //   00:16:05.798  Creado Tymaviejas (id 13825564)
-            //   00:16:05.803  Selected character 13825558     <- cinco milisegundos después
+            //   00:16:05.803  Selected character 13825558     <- five milliseconds later
             //
-            // O sea que el cliente no elige: coge EL PRIMERO de la lista y manda su selección al
-            // instante. Y nuestra lista sale de un ORDER BY Id, así que el recién creado, que
-            // tiene el id más alto, iba el último.
+            // So the client does not choose: it takes THE FIRST one on the list and sends its selection
+            // at once. And our list comes from an ORDER BY Id, so the freshly created one, which has the
+            // highest id, went last.
             //
-            // Que el nuevo va delante está medido en «crear personaje - borrar personaje»: el kvi
-            // que sigue al kvb lleva a «Vos-Xx», el que se acaba de crear, por delante de «Berru»,
-            // que ya estaba. Se reordena sólo aquí y no en GetCharactersByAccountId, porque el
-            // orden de la pantalla de selección normal es otra cosa y no se ha medido.
+            // That the new one goes first is measured in «crear personaje - borrar personaje»: the kvi
+            // that follows the kvb carries «Vos-Xx», the one just created, ahead of «Berru», who was
+            // already there. It is reordered only here and not in GetCharactersByAccountId, because the
+            // order of the normal selection screen is something else and has not been measured.
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
             var elNuevo = characters.Find(c => c.Id == id);
             if (elNuevo != null)
@@ -219,7 +219,7 @@ namespace Jondo.Unity.Server.Handlers
                               $"Astrub, con el conjunto del aventurero y {StartingKamas} kamas.");
         }
 
-        /// <summary>Los motivos que lleva el kvb cuando dice que no. El 3 es el del límite.</summary>
+        /// <summary>The reasons the kvb carries when it says no. 3 is the limit one.</summary>
         private const int CreationRefused = 1;
         private const int NameAlreadyTaken = 2;
 
@@ -229,7 +229,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Kvb, Pb.New().Var(2, reason).Build()));
         }
 
-        /// <summary>Varints seguidos, que es como viajan los colores. El -1 es "el de la raza".</summary>
+        /// <summary>Varints one after another, which is how the colours travel. -1 is "the breed's".</summary>
         private static List<long> Packed(byte[] bytes)
         {
             var values = new List<long>();

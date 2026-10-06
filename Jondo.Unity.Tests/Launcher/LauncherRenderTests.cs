@@ -16,38 +16,38 @@ using Xunit;
 namespace Jondo.Unity.Tests.Launcher
 {
     /// <summary>
-    /// Que el lanzador de Avalonia carga y dibuja de verdad.
+    /// That the Avalonia launcher really loads and draws.
     /// </summary>
     /// <remarks>
-    /// El XAML lo compila el propio Avalonia al construir, así que los nombres de tipo, de
-    /// propiedad y los <c>x:Name</c> ya están comprobados cuando la solución compila. Lo que NO
-    /// comprueba nadie hasta que se abre la ventana son dos cosas, y las dos revientan en tiempo de
-    /// ejecución:
+    /// The XAML is compiled by Avalonia itself on building, so the type names, the
+    /// property names and the <c>x:Name</c>s are already checked when the solution compiles. What NOBODY
+    /// checks until the window is opened are two things, and both blow up at
+    /// run time:
     ///
-    ///   - los <c>{DynamicResource}</c>, que se resuelven por nombre: una errata deja el color sin
-    ///     poner y no lo dice
-    ///   - el dibujo a mano de los cuatro controles propios —el rótulo, la banderita, el punto de
-    ///     estado y el texto espaciado—, que es código nuevo
+    ///   - the <c>{DynamicResource}</c>s, which are resolved by name: a typo leaves the colour
+    ///     unset and does not say so
+    ///   - the hand drawing of the four custom controls —the title, the little flag, the status
+    ///     dot and the spaced text—, which is new code
     ///
-    /// Con esto una errata en un nombre de recurso o un fallo al dibujar salen aquí y no en la cara
-    /// de quien abra el lanzador.
+    /// With this a typo in a resource name or a drawing failure comes out here and not in the face
+    /// of whoever opens the launcher.
     /// </remarks>
     public class LauncherRenderTests
     {
-        /// <summary>La misma aplicación que arranca el lanzador, sin ventana de verdad.</summary>
+        /// <summary>The same application the launcher starts, without a real window.</summary>
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UseSkia()
-                // Con el dibujo de mentira -- lo que trae headless por omision -- Render() no llega
-                // a llamarse nunca y la prueba pasaria sin dibujar nada. Con Skia se pinta de
-                // verdad sobre un lienzo en memoria, que es lo unico que hace util esta prueba.
+                // With the fake drawing -- what headless brings by default -- Render() never gets
+                // called and the test would pass without drawing anything. With Skia it really
+                // paints onto an in-memory canvas, which is the only thing that makes this test useful.
                 .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
 
         [AvaloniaFact]
         public void Los_colores_del_xaml_existen_todos()
         {
-            // Cada nombre que el XAML pide con DynamicResource tiene que estar puesto. Si falta,
-            // Avalonia no protesta: deja la propiedad sin valor y el botón sale gris.
+            // Every name the XAML asks for with DynamicResource has to be set. If one is missing,
+            // Avalonia does not complain: it leaves the property without a value and the button comes out grey.
             string[] pedidos =
             {
                 "GreenTop", "GreenBottom", "GreenTopHover", "GreenBottomHover",
@@ -72,7 +72,7 @@ namespace Jondo.Unity.Tests.Launcher
         [AvaloniaFact]
         public void El_verde_del_boton_de_jugar_es_el_de_la_paleta()
         {
-            // Que los recursos existan no basta: tienen que traer el color bueno.
+            // That the resources exist is not enough: they have to bring the right colour.
             Application.Current!.Resources.TryGetValue("GreenTop", out object? arriba);
             Application.Current!.Resources.TryGetValue("GoldBrush", out object? oro);
 
@@ -100,21 +100,21 @@ namespace Jondo.Unity.Tests.Launcher
         [AvaloniaFact]
         public void El_rotulo_pinta_algo_de_verdad()
         {
-            // No basta con que no reviente. El rótulo estuvo SIN DIBUJARSE desde la migración a
-            // Avalonia y nadie se enteró: la prueba de antes sólo comprobaba que Render() no
-            // lanzaba, y no lanzaba -- se limitaba a no pintar nada. El motivo era que
-            // FormattedText.BuildGeometry devuelve la silueta vacía si el texto no lleva brocha.
+            // Not blowing up is not enough. The title was NOT BEING DRAWN since the move to
+            // Avalonia and nobody noticed: the earlier test only checked that Render() did not
+            // throw, and it did not throw -- it simply painted nothing. The reason was that
+            // FormattedText.BuildGeometry returns an empty outline if the text carries no brush.
             //
-            // Así que aquí se cuentan píxeles: sobre negro, el rótulo tiene que dejar oro.
+            // So here pixels are counted: on black, the title has to leave gold.
             Assert.True(PintaAlgo(new LogoBanner(), 350, 120),
                         "El rótulo no ha pintado un solo píxel.");
 
-            // Y por debajo de cierto tamaño no dibuja nada A PROPÓSITO: la ventana lo encoge
-            // cuando no cabe, y medio rótulo cortado es peor que ninguno.
+            // And below a certain size it draws nothing ON PURPOSE: the window shrinks it
+            // when it does not fit, and half a cut-off title is worse than none.
             Assert.False(PintaAlgo(new LogoBanner(), 40, 10));
         }
 
-        /// <summary>Si el control deja algún píxel distinto del fondo negro.</summary>
+        /// <summary>Whether the control leaves any pixel different from the black background.</summary>
         private static unsafe bool PintaAlgo(Avalonia.Controls.Control control, double ancho, double alto)
         {
             var ventana = new Window
@@ -135,7 +135,7 @@ namespace Jondo.Unity.Tests.Launcher
                 var fila = (byte*)cerrojo.Address + y * cerrojo.RowBytes;
                 for (int x = 0; x < cerrojo.Size.Width; x++)
                 {
-                    // BGRA: basta con que alguno de los tres canales se salga del negro.
+                    // BGRA: it is enough for any of the three channels to step out of black.
                     if (fila[x * 4] > 24 || fila[x * 4 + 1] > 24 || fila[x * 4 + 2] > 24) distintos++;
                 }
             }
@@ -147,8 +147,8 @@ namespace Jondo.Unity.Tests.Launcher
         [AvaloniaFact]
         public void El_texto_espaciado_se_dibuja_con_y_sin_separacion()
         {
-            // Con separación cero se pinta de una vez, y con separación letra a letra: son dos
-            // caminos distintos dentro del mismo método.
+            // With zero spacing it is painted in one go, and with letter-by-letter spacing: they are two
+            // different paths inside the same method.
             Dibujar(new SpacedText
             {
                 Text = "CONECTAR", Spacing = 2, Shadow = true, FontSize = 16,
@@ -161,24 +161,24 @@ namespace Jondo.Unity.Tests.Launcher
                 FontFamily = LauncherSkin.Title, Foreground = Brushes.White,
             }, 300, 46);
 
-            // Y el vacío no se cae.
+            // And the empty one does not fall over.
             Dibujar(new SpacedText { Text = "", FontSize = 16, FontFamily = LauncherSkin.Title }, 300, 46);
         }
 
         [AvaloniaFact]
         public void La_ventana_del_lanzador_se_construye_y_se_pinta()
         {
-            // Lo que el compilador de XAML NO comprueba: que la ventana entera se monta y se pinta
-            // con los estilos puestos. Se puede construir aqui porque el constructor ya no habla
-            // con el servidor -- eso se hace al abrirse, en CargarLasCuentasAsync -- asi que la
-            // prueba no depende de que haya un servidor ni de las cuentas de esta maquina.
+            // What the XAML compiler does NOT check: that the whole window is assembled and painted
+            // with the styles on. It can be built here because the constructor no longer talks
+            // to the server -- that is done on opening, in CargarLasCuentasAsync -- so the
+            // test does not depend on there being a server nor on this machine's accounts.
             var ventana = new MainWindow { Width = 1000, Height = 660 };
             ventana.Show();
             ventana.CaptureRenderedFrame();
             ventana.Close();
         }
 
-        /// <summary>Mete el control en una ventana sin pantalla y le pide que se pinte.</summary>
+        /// <summary>Puts the control in a window with no screen and asks it to paint itself.</summary>
         private static void Dibujar(Avalonia.Controls.Control control, double ancho = 120, double alto = 40)
         {
             var ventana = new Window { Width = ancho, Height = alto, Content = control };

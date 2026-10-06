@@ -10,17 +10,17 @@ namespace Jondo.Unity.Launcher
     /// them in total). Now everything the emulator needs lives inside the emulator folder and the
     /// root is derived at run time from the assembly directory.
     ///
-    /// La raíz no guarda ficheros sueltos: quien se baje el emulador tiene que ver el .exe y poco
-    /// más, sin dudar de qué abrir. Los datos van en <c>datos\</c> y las bases en <c>bases\</c>.
-    /// La búsqueda mira esas carpetas primero y la raíz después, así que una instalación a medio
-    /// mover sigue arrancando igual; y si tampoco está ahí, se cae a la ruta histórica.
+    /// The root keeps no loose files: whoever downloads the emulator has to see the .exe and little
+    /// else, without doubting what to open. The data goes in <c>datos\</c> and the databases in <c>bases\</c>.
+    /// The search looks in those folders first and the root afterwards, so a half-moved
+    /// installation still starts the same; and if it is not there either, it falls back to the historical path.
     /// </summary>
     public static class Paths
     {
         /// <summary>Historical location of the data, used as a fallback.</summary>
         public const string LegacyRoot = @"C:\Jondo 3.6.10.10";
 
-        /// <summary>Dónde se busca cada fichero, en este orden.</summary>
+        /// <summary>Where each file is looked for, in this order.</summary>
         private static readonly string[] SubFolders = { "datos", "bases", "" };
 
         /// <summary>
@@ -30,19 +30,19 @@ namespace Jondo.Unity.Launcher
         public static string Root { get; } = ResolveRoot();
 
         /// <summary>
-        /// Las versiones de cliente con las que este emulador habla, DE LA MÁS NUEVA A LA MÁS
-        /// VIEJA. Se coge la primera que exista.
+        /// The client versions this emulator speaks to, FROM THE NEWEST TO THE
+        /// OLDEST. The first one that exists is taken.
         ///
-        /// Es una lista escrita a mano a propósito, y no «la carpeta de versión más alta que
-        /// haya»: el emulador está atado a una forma concreta del protocolo, y si alguien deja al
-        /// lado un cliente que todavía no sabemos hablar, cogerlo solo sería arrancar contra un
-        /// cliente incompatible sin decir nada. Añadir una versión es una línea.
+        /// It is a hand-written list on purpose, and not «the highest version folder
+        /// there is»: the emulator is tied to a specific shape of the protocol, and if someone leaves
+        /// alongside a client we do not yet know how to speak to, taking it on its own would be starting against an
+        /// incompatible client without a word. Adding a version is one line.
         ///
-        /// La 3.6.10.11 vale porque NO ES OTRO PROTOCOLO: su GameAssembly.dll y su
-        /// global-metadata.dat son byte a byte los mismos que los de la 3.6.10.10 —mismo SHA-256,
-        /// los dos ficheros— y el emparejador estructural lo confirma por su cuenta: 2.169
-        /// mensajes contra 2.169, mapeo identidad, cero dudas. Ese parche sólo movió datos: 182
-        /// bundles de Content/Data.
+        /// 3.6.10.11 is fine because it IS NOT ANOTHER PROTOCOL: its GameAssembly.dll and its
+        /// global-metadata.dat are byte for byte the same as 3.6.10.10's —same SHA-256,
+        /// both files— and the structural matcher confirms it on its own: 2,169
+        /// messages against 2,169, identity mapping, zero doubts. That patch only moved data: 182
+        /// bundles of Content/Data.
         /// </summary>
         private static readonly string[] ClientesQueValen =
         {
@@ -55,8 +55,8 @@ namespace Jondo.Unity.Launcher
         {
             get
             {
-                // Al lado del emulador primero, y la ruta histórica después: una instalación a
-                // medio mover sigue arrancando igual.
+                // Next to the emulator first, and the historical path after: a half-moved
+                // installation still starts the same.
                 foreach (string donde in new[]
                          {
                              Path.GetFullPath(Path.Combine(Root, "..")),
@@ -67,8 +67,8 @@ namespace Jondo.Unity.Launcher
                     {
                         string candidato = Path.Combine(donde, version);
 
-                        // Que exista la carpeta no basta: tiene que llevar el ejecutable dentro.
-                        // Una carpeta a medio descargar existe y no sirve para nada.
+                        // That the folder exists is not enough: it has to carry the executable inside.
+                        // A half-downloaded folder exists and is of no use.
                         if (File.Exists(Path.Combine(candidato, "Dofus.exe"))) return candidato;
                     }
                 }
@@ -78,42 +78,42 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// La carpeta de contenido del cliente: los textos, los iconos, los mapas.
+        /// The client's content folder: the texts, the icons, the maps.
         ///
-        /// Todo lo que el editor necesita para ensenar algo con cara y ojos ya esta ahi dentro, y
-        /// se lee de ahi en vez de copiarse: el cliente ya ocupa lo que ocupa en el disco, y una
-        /// copia nuestra se quedaria vieja el dia del siguiente parche sin que nadie se enterara.
+        /// Everything the editor needs to show something presentable is already in there, and
+        /// it is read from there instead of being copied: the client already takes up what it takes up on disk, and a
+        /// copy of ours would go stale the day of the next patch without anyone noticing.
         /// </summary>
         public static string ClientContentDir
             => Path.Combine(ClientDir, "Dofus_Data", "StreamingAssets", "Content");
 
         /// <summary>
-        /// La tabla de textos del cliente en un idioma, con los 339.342 textos del juego dentro.
+        /// The client's text table in one language, with the game's 339,342 texts inside.
         ///
-        /// Son los nombres de los NPCs, de los monstruos, de los objetos y de los hechizos, y las
-        /// frases de los dialogos. El idioma va en el nombre del fichero: es, en, fr, de, pt.
+        /// They are the names of the NPCs, the monsters, the items and the spells, and the
+        /// dialogues' sentences. The language goes in the file name: es, en, fr, de, pt.
         /// </summary>
         public static string ClientTextFile(string language)
             => Path.Combine(ClientContentDir, "I18n", language + ".bin");
 
-        /// <summary>Los iconos de los monstruos, 64 px, dentro de un bundle de Unity.</summary>
+        /// <summary>The monsters' icons, 64 px, inside a Unity bundle.</summary>
         public static string MonsterIconsBundle
             => Path.Combine(ClientContentDir, "Picto", "Monsters", "monster_assets_1x.bundle");
 
         // ─── Databases ──────────────────────────────────────────────────────────
-        // Las bases se crean solas la primera vez, así que van por ResolveWritable: si todavía no
-        // existen, la ruta que sale es la de bases\ y no la de la raíz.
+        // The databases create themselves the first time, so they go through ResolveWritable: if they do not
+        // exist yet, the path that comes out is that of bases\ and not that of the root.
         public static string WorldDb => ResolveWritable("world.db", DatabaseFolder);
         public static string AuthDb => ResolveWritable("auth.db", DatabaseFolder);
         public static string WorldZip => Resolve("world.zip");
         public static string DatabaseBackupsDir => Path.Combine(Root, DatabaseFolder, "backups");
 
         /// <summary>
-        /// La base de diagnóstico donde se apuntan los paquetes que no sabemos atender.
+        /// The diagnostics database where the packets we do not know how to handle are recorded.
         ///
-        /// Va aparte de world.db y auth.db a propósito: no lleva nada que haga falta para jugar,
-        /// se puede borrar para empezar de cero y se puede copiar a otra máquina para mirarla sin
-        /// llevarse los personajes de nadie.
+        /// It goes apart from world.db and auth.db on purpose: it carries nothing needed to play,
+        /// it can be deleted to start from scratch and it can be copied to another machine to look at it without
+        /// taking anyone's characters along.
         /// </summary>
         public static string PacketTelemetryDb => ResolveWritable("paquetes.db", DatabaseFolder);
 
@@ -143,7 +143,7 @@ namespace Jondo.Unity.Launcher
         // The sets, and what wearing several pieces of one is worth.
         // Generated by extract_item_sets.py from the dofusdude dump.
         public static string ItemSetsJson => Resolve("item_sets.json");
-        // En qué campo del mensaje va el valor de cada efecto de objeto, aprendido de la captura.
+        // Which field of the message each item effect's value goes in, learnt from the capture.
         public static string EffectFieldsJson => Resolve("item_effect_fields.json");
         // The dungeons: their rooms, their entrance and their exit.
         // Generated by extract_dungeons.py from the client bundles.
@@ -158,49 +158,49 @@ namespace Jondo.Unity.Launcher
         // What smithmagic needs of every effect: its weight (effectPowerRate), its category, whether
         // it rolls, and its opposite. Generated by extract_effect_weights.py from the client bundles.
         public static string EffectWeightsJson => Resolve("effect_weights.json");
-        // Lo que se puede clicar en cada mapa, con su casilla y su dibujo, y los zaaps con su
-        // mapa y su subzona. Los genera extract_interactivos.py de los bundles del cliente.
-        /// <summary>Que mapa hay a cada lado de cada mapa. 17.353 filas.</summary>
+        // What can be clicked on each map, with its cell and its drawing, and the zaaps with their
+        // map and their subzone. extract_interactivos.py generates them from the client's bundles.
+        /// <summary>Which map is on each side of each map. 17,353 rows.</summary>
         public static string MapNeighboursJson => Resolve("map_neighbours.json");
 
         public static string InteractiveElementsJson => Resolve("interactive_elements.json");
 
         /// <summary>
-        /// El tipo de interactivo que se ha visto de verdad para cada dibujo, medido de las
-        /// capturas: 415 gfx, de los que 20 no cuadran con lo que declaramos.
+        /// The interactive type really seen for each drawing, measured from the
+        /// captures: 415 gfx, of which 20 do not match what we declare.
         /// </summary>
         public static string InteractiveTypesJson => Resolve("tipos_interactivos_3.6.10.10.json");
 
         /// <summary>
-        /// Los pasos entre mapas, normalizados de la tabla interactive_skills de Giny 2.68. El
-        /// servidor los valida contra sus propios datos y sólo importa los que sobreviven.
+        /// The passages between maps, normalised from Giny 2.68's interactive_skills table. The
+        /// server validates them against its own data and only imports the ones that survive.
         /// </summary>
         public static string InteractiveTeleportsJson => Resolve("interactive_teleports_giny_2.68.json");
 
         /// <summary>
-        /// Los pasos sacados del grafo de navegación del cliente de Dofus 2.73, que los genera
-        /// tools/extraer_world_graph.py. Rellenan los huecos que el catálogo de Giny no cubre.
+        /// The passages taken from the navigation graph of the Dofus 2.73 client, generated by
+        /// tools/extraer_world_graph.py. They fill in the gaps Giny's catalogue does not cover.
         ///
-        /// Van en un fichero aparte y NO mezclados con los de Giny a propósito: éstos traen la
-        /// casilla de llegada aproximada —el grafo no la lleva— y eso tiene que poder distinguirse
-        /// de un vistazo, tanto aquí como en la columna Confidence de la base.
+        /// They go in a separate file and NOT mixed with Giny's on purpose: these bring an
+        /// approximate arrival cell —the graph does not carry it— and that has to be distinguishable
+        /// at a glance, both here and in the base's Confidence column.
         /// </summary>
         public static string WorldGraphTeleportsJson
             => Resolve("interactive_teleports_worldgraph_2.73.json");
         /// <summary>
-        /// Los catálogos de oficios, habilidades y recetas en crudo. Se quedan fuera de
-        /// <c>datos</c> a propósito: el servidor los importa a world.db y nunca los sirve.
+        /// The raw catalogues of professions, skills and recipes. They are left out of
+        /// <c>datos</c> on purpose: the server imports them into world.db and never serves them.
         ///
-        /// Se busca en <c>dofus3_data</c> ANTES que en <c>JsonFromDofusDude</c>, que es donde los
-        /// puso quien escribió esto. Los tres ficheros salen del volcado del cliente y ya vivían en
-        /// dofus3_data desde antes, así que mirando sólo en la carpeta nueva no se encontraban y la
-        /// importación se saltaba sola sin que nadie se enterara: las tablas quedaban creadas y
-        /// vacías. Se sigue mirando en las dos carpetas de antes, porque quien los tenga allí no
-        /// tiene por qué moverlos.
+        /// <c>dofus3_data</c> is searched BEFORE <c>JsonFromDofusDude</c>, which is where whoever
+        /// wrote this put them. The three files come from the client dump and already lived in
+        /// dofus3_data from before, so looking only in the new folder they were not found and the
+        /// import skipped itself without anyone noticing: the tables were left created and
+        /// empty. The two earlier folders are still looked in, because whoever has them there need not
+        /// move them.
         ///
-        /// La comprobación es por FICHERO y no por carpeta: <c>dofus3_data</c> existe en cualquier
-        /// instalación, así que preguntar si existe la carpeta la habría elegido siempre, tuviera
-        /// dentro los catálogos o no.
+        /// The check is per FILE and not per folder: <c>dofus3_data</c> exists in any
+        /// installation, so asking whether the folder exists would always have chosen it, whether it had
+        /// the catalogues inside or not.
         /// </summary>
         public static string DofusDudeJsonDir
         {
@@ -228,36 +228,36 @@ namespace Jondo.Unity.Launcher
         public static string TitlesOrnamentsJson => Resolve("titles_ornaments.json");
         public static string CosmeticsJson => Resolve("cosmetics.json");
         public static string CosmeticSkinsJson => Resolve("cosmetic_skins.json");
-        // El aspecto del EQUIPO DE VERDAD (no las prendas de apariencia), medido sobre las
-        // capturas del servidor de torneos con tools/extraer_equipo_real.py.
+        // The look of the REAL EQUIPMENT (not the appearance garments), measured on the
+        // tournament server's captures with tools/extraer_equipo_real.py.
         public static string EquipmentSkinsJson => Resolve("equipment_skins.json");
 
-        // Las arenas del koliseo con sus casillas de colocacion por bando, sacadas del cliente
-        // con tools/extraer_mapas_koliseo.py. Las tres subareas de koliseo y nada mas.
+        // The koliseo arenas with their placement cells per side, taken from the client
+        // with tools/extraer_mapas_koliseo.py. The three koliseo subareas and nothing else.
         public static string KoliseoMapsJson => Resolve("koliseo_mapas.json");
-        // El aspecto de cada montura, indexado por el objeto que la da. Lo genera
-        // extract_monturas.py de los bundles del cliente.
+        // Each mount's look, indexed by the item that gives it. Generated by
+        // extract_monturas.py from the client's bundles.
         public static string MountsJson => Resolve("mounts.json");
-        // Qué vende cada NPC de tienda y a qué precio, medido del servidor de torneos con
+        // What each shop NPC sells and at what price, measured from the tournament server with
         // tools/extraer_tiendas.py.
         public static string NpcShopsJson => Resolve("npc_shops.json");
 
         /// <summary>
-        /// Las tiendas que cobran en fichas en vez de en kamas. A mano, no generado: lo que vende
-        /// una tienda de fichas y a cuánto es contenido de Jondo y no sale de ninguna captura.
+        /// The shops that charge in tokens instead of kamas. By hand, not generated: what a token shop
+        /// sells and for how much is Jondo's content and does not come from any capture.
         /// </summary>
         public static string TokenShopsJson => Resolve("tiendas_en_fichas.json");
 
         /// <summary>
-        /// Qué vendedores junta Jondo en uno solo y cómo se llaman. También a mano, y lo lee
-        /// además el mod del cliente para que el nombre y el catálogo no se descuadren.
+        /// Which sellers Jondo merges into one and what they are called. Also by hand, and the
+        /// client mod also reads it so that the name and the catalogue do not drift apart.
         /// </summary>
         public static string JondoVendorsJson => Resolve("vendedores_jondo.json");
 
 
         /// <summary>
-        /// Dónde está cada NPC del mundo, sacado de las capturas del servidor de Ankama: 422 en
-        /// 202 mapas. Lo genera tools/extraer_npcs_reales.py.
+        /// Where each NPC of the world is, taken from the captures of Ankama's server: 422 on
+        /// 202 maps. Generated by tools/extraer_npcs_reales.py.
         /// </summary>
         public static string WorldNpcsJson => Resolve("npcs_reales.json");
 
@@ -330,24 +330,24 @@ namespace Jondo.Unity.Launcher
         public static string ContentDir => Path.Combine(Root, "content");
 
         /// <summary>
-        /// El salto que falta para leer un dialogo de NPC: id de mensaje -> clave de traduccion.
+        /// The missing hop to read an NPC dialogue: message id -> translation key.
         ///
-        /// La plantilla de un NPC trae en dialogData un messageId que NO es una traduccion, sino un
-        /// id de NpcMessageData; hay que pasar por NpcMessagesDataRoot, que son 16,8 MB del volcado
-        /// del cliente, para llegar a la clave de verdad. Este fichero es ese paso destilado a un
-        /// numero por entrada. Lo genera tools/extraer_dialogos_npc.py.
+        /// An NPC's template brings in dialogData a messageId that is NOT a translation, but an
+        /// NpcMessageData id; one has to go through NpcMessagesDataRoot, which is 16.8 MB of the client
+        /// dump, to get to the real key. This file is that hop distilled into one
+        /// number per entry. Generated by tools/extraer_dialogos_npc.py.
         ///
-        /// Las respuestas no lo necesitan: dialogReplies ya trae la clave al lado del id.
+        /// The replies do not need it: dialogReplies already brings the key next to the id.
         /// </summary>
         public static string NpcDialoguesJson => Resolve("npc_dialogos_3.6.10.10.json");
 
         /// <summary>
-        /// Los 513 nombres de mensaje que el cliente todavia trae dentro.
+        /// The 513 message names the client still carries inside.
         ///
-        /// El ofuscador renombra las clases a tres letras pero deja estas cadenas en
-        /// global-metadata.dat. Estan huerfanas -nadie las referencia- pero son la lista CERRADA de
-        /// nombres validos de esta version, asi que bautizar un opcode deja de ser inventar y pasa
-        /// a ser elegir de una lista.
+        /// The obfuscator renames the classes to three letters but leaves these strings in
+        /// global-metadata.dat. They are orphaned -nobody references them- but they are the CLOSED list of
+        /// valid names of this version, so naming an opcode stops being inventing and becomes
+        /// choosing from a list.
         /// </summary>
         public static string RealNamesTsv => Resolve("nombres_reales_3.6.10.10.tsv");
 
@@ -392,8 +392,8 @@ namespace Jondo.Unity.Launcher
                 return preferred;
             }
         }
-        // Las parejas de hechizo base/variante, una por cada hueco de la barra. Del volcado del
-        // cliente; el personaje lleva uno de cada pareja, no los dos.
+        // The base/variant spell pairs, one for each bar slot. From the client
+        // dump; the character carries one of each pair, not both.
         public static string SpellVariantsJson
         {
             get
@@ -403,14 +403,14 @@ namespace Jondo.Unity.Launcher
             }
         }
 
-        // Las 120 características con el hueco que le toca a cada una dentro del kub, sacadas
-        // de los 672 kub reales de las capturas por tools/extraer_caracteristicas_kub.py. Se
-        // abría por ruta relativa, y sin ella la ficha cae de 120 entradas a 25 sin decir nada.
+        // The 120 characteristics with the slot each one gets inside the kub, taken
+        // from the 672 real kub of the captures by tools/extraer_caracteristicas_kub.py. It
+        // was opened by relative path, and without it the sheet drops from 120 entries to 25 without a word.
         public static string CharacteristicFieldsJson => Resolve("caracteristicas_kub.json");
 
         /// <summary>
-        /// Lo que hace cada bomba: su explosión, lo que lanza al objetivo y su cadena. Sale del
-        /// cliente con tools/extract_bomb_spells.py, de la clase SpellBombData.
+        /// What each bomb does: its explosion, what it casts at the target and its chain. It comes from the
+        /// client with tools/extract_bomb_spells.py, from the SpellBombData class.
         /// </summary>
         public static string BombsJson => Resolve("bombas.json");
 
@@ -506,9 +506,9 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Busca un fichero en datos\, en bases\ y en la raíz; si no está en ninguna, en la ruta
-        /// histórica. Cuando no aparece por ningún lado devuelve la ruta de <c>datos\</c>, que es
-        /// donde debe crearse.
+        /// Looks for a file in datos\, in bases\ and in the root; if it is in none, in the historical
+        /// path. When it does not show up anywhere it returns the <c>datos\</c> path, which is
+        /// where it must be created.
         /// </summary>
         public static string Resolve(string filename)
         {
@@ -547,28 +547,28 @@ namespace Jondo.Unity.Launcher
             return Combine(Root, Path.Combine(DataFolder, dirname));
         }
 
-        /// <summary>Carpeta de datos. Lo que no exista se creará aquí.</summary>
+        /// <summary>Data folder. Whatever does not exist will be created here.</summary>
         public const string DataFolder = "datos";
 
-        /// <summary>Carpeta de las bases de datos, que son las que el emulador escribe.</summary>
+        /// <summary>Folder of the databases, which are the ones the emulator writes.</summary>
         public const string DatabaseFolder = "bases";
 
         /// <summary>
-        /// Igual que Resolve pero para ficheros que el emulador CREA: si no existe todavía, la
-        /// ruta que devuelve es la de la carpeta que le toca, no la de la raíz.
+        /// Like Resolve but for files the emulator CREATES: if it does not exist yet, the
+        /// path it returns is that of the folder it belongs in, not that of the root.
         /// </summary>
         /// <summary>
-        /// Una base de datos: se busca PRIMERO en su carpeta, bases\, y sólo después en el resto.
+        /// A database: it is looked for FIRST in its folder, bases\, and only then in the rest.
         ///
-        /// Antes usaba el mismo orden que los datos —datos\ primero— y eso costó una tarde. Si por
-        /// lo que sea aparece un world.db en datos\, el servidor se pone a escribir ahí y deja de
-        /// ver el de bases\: el personaje sale donde no lo dejaste, los oficios vuelven a nivel 1,
-        /// y no hay ningún fallo de código que encontrar porque cada mitad es coherente consigo
-        /// misma. Una base no es un dato del juego: datos\ es de sólo lectura y viene del cliente,
-        /// bases\ es lo que el servidor escribe.
+        /// Before, it used the same order as the data —datos\ first— and that cost an afternoon. If for
+        /// whatever reason a world.db shows up in datos\, the server starts writing there and stops
+        /// seeing the one in bases\: the character comes out where you did not leave it, the professions go back to level 1,
+        /// and there is no code bug to find because each half is consistent with
+        /// itself. A database is not game data: datos\ is read-only and comes from the client,
+        /// bases\ is what the server writes.
         ///
-        /// Si queda una copia suelta en otro sitio se avisa por consola, porque es exactamente la
-        /// clase de cosa que no se nota hasta que se ha perdido una partida.
+        /// If a loose copy is left somewhere else a warning goes to the console, because it is exactly the
+        /// kind of thing that is not noticed until a game has been lost.
         /// </summary>
         private static string ResolveWritable(string filename, string folder)
         {
@@ -593,7 +593,7 @@ namespace Jondo.Unity.Launcher
             return Path.Combine(destino, filename);
         }
 
-        /// <summary>Avisa si la misma base existe en dos sitios. Ver ResolveWritable.</summary>
+        /// <summary>Warns if the same database exists in two places. See ResolveWritable.</summary>
         private static void AvisarDeCopias(string filename, string usada)
         {
             foreach (string sub in SubFolders)

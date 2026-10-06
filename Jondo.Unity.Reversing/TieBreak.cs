@@ -5,23 +5,23 @@ using System.Text.Json.Serialization;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// La pregunta que se le hace al modelo cuando la estructura duda.
+/// The question asked of the model when the structure is in doubt.
 ///
-/// Es una pregunta pequeña y cerrada, y en eso está todo. No es «¿cómo se llama este mensaje?»
-/// —que es adivinar— sino «de estos cinco, ¿cuál es?». La diferencia importa:
+/// It is a small, closed question, and that is all there is to it. It is not «what is this message called?»
+/// —which is guessing— but «of these five, which one is it?». The difference matters:
 ///
-///   · el modelo elige de una lista, así que la respuesta se puede COMPROBAR. Si contesta algo que
-///     no está en la lista, se tira. No hay forma de que se invente un opcode.
-///   · se le da lo que la estructura no ve: qué hacía el mensaje viejo —medido contra capturas— y
-///     qué clases del cliente nuevo tocan a cada candidato.
-///   · y se le da lo que la estructura sí ve, para que lo use: la forma exacta de cada uno.
+///   · the model chooses from a list, so the answer can be CHECKED. If it answers something that
+///     is not on the list, it is thrown away. There is no way for it to invent an opcode.
+///   · it is given what the structure does not see: what the old message did —measured against captures— and
+///     which classes of the new client touch each candidate.
+///   · and it is given what the structure does see, so it uses it: each one's exact shape.
 ///
-/// Si los cinco candidatos tienen exactamente la misma forma y ninguno tiene pistas en el código,
-/// no hay nada que elegir y se le pide que lo diga. Callarse es una respuesta correcta.
+/// If the five candidates have exactly the same shape and none has clues in the code,
+/// there is nothing to choose and it is asked to say so. Keeping quiet is a correct answer.
 /// </summary>
 public static class TieBreak
 {
-    /// <summary>Lo que contesta, una vez leído.</summary>
+    /// <summary>What it answers, once read.</summary>
     public sealed record Verdict(
         [property: JsonPropertyName("elegido")] string? Chosen,
         [property: JsonPropertyName("confianza")] string? Confidence,
@@ -55,7 +55,7 @@ public static class TieBreak
            {"elegido": "...", "confianza": "...", "porque": "..."}
         """;
 
-    /// <summary>El expediente de una duda: el viejo, lo que se sabía, y los candidatos.</summary>
+    /// <summary>A doubt's dossier: the old one, what was known, and the candidates.</summary>
     public static string Question(Mapper.Row row, Matcher.Model old, Matcher.Model @new,
                                   IReadOnlyDictionary<string, List<string>> newParents,
                                   IReadOnlyDictionary<string, CodeIndex.Evidence> index,
@@ -128,7 +128,7 @@ public static class TieBreak
         sb.AppendLine("}");
     }
 
-    /// <summary>Saca el JSON de la respuesta aunque venga con adornos.</summary>
+    /// <summary>Extracts the JSON from the answer even if it comes with decorations.</summary>
     public static Verdict? Read(string answer)
     {
         int open = answer.IndexOf('{');

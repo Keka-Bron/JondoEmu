@@ -9,7 +9,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 ## 📑 Contents
 
-| 🖥️ [Launcher](#-launcher) | 🧩 [Server](#-server) | 🛠️ [Jondo Studio](#-jondo-studio) |
+| 🖥️ [Launcher](#%EF%B8%8F-launcher) | 🧩 [Server](#-server) | 🛠️ [Jondo Studio](#%EF%B8%8F-jondo-studio) |
 |:---|:---|:---|
 | The player's window, in Avalonia. A team of up to eight accounts, each with its character drawn from the client's own bones. | The emulator itself. Four listeners in one process, one session per socket, and guards that refuse to boot on bad data. | The world editor. Nine sections over the client's data, writing a reviewable diff instead of a 240 MB binary. |
 
@@ -20,15 +20,17 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 &nbsp;
 
-- 🌍 &nbsp;**World** &nbsp;— &nbsp;[Connection and authentication](#-connection-and-authentication) · [World and movement](#-world-and-movement) · [Travel](#-travel) · [Houses, bins and haven bags](#-houses-bins-and-haven-bags) · [Banks and marketplaces](#-banks-and-marketplaces) · [Social](#-social) · [Guilds and raids](#-guilds-and-raids)
+- 🌍 &nbsp;**World** &nbsp;— &nbsp;[Connection and authentication](#-connection-and-authentication) · [World and movement](#%EF%B8%8F-world-and-movement) · [Travel](#-travel) · [Houses, bins and haven bags](#%EF%B8%8F-houses-bins-and-haven-bags) · [Banks and marketplaces](#-banks-and-marketplaces) · [Social](#-social) · [Guilds and raids](#%EF%B8%8F-guilds-and-raids)
 
-- 🎒 &nbsp;**Character** &nbsp;— &nbsp;[Character and inventory](#-character-and-inventory) · [Appearances](#-appearances) · [Professions](#-professions)
+- 🎒 &nbsp;**Character** &nbsp;— &nbsp;[Character and inventory](#-character-and-inventory) · [Appearances](#-appearances) · [Professions](#%EF%B8%8F-professions)
 
 - 📚 &nbsp;**Content** &nbsp;— &nbsp;[NPCs and monsters](#-npcs-and-monsters) · [Quests](#-quests) · [Achievements](#-achievements) · [Almanax](#-almanax) · [Dungeons](#-dungeons) · [Infinite Dreams](#-infinite-dreams) · [Jondo Coin](#-jondo-coin)
 
-- ⚔️ &nbsp;**Combat** &nbsp;— &nbsp;[One engine, four rulebooks](#-one-engine-four-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#-koliseo) · [Spell effect engine](#-spell-effect-engine) · [Spell check-list](#-spell-check-list) · [Combat challenges](#-combat-challenges)
+- ⚔️ &nbsp;**Combat** &nbsp;— &nbsp;[One engine, four rulebooks](#%EF%B8%8F-one-engine-four-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#%EF%B8%8F-koliseo) · [Spell effect engine](#-spell-effect-engine) · [Spell check-list](#-spell-check-list) · [Combat challenges](#-combat-challenges)
 
-- 🔎 &nbsp;**Tools** &nbsp;— &nbsp;[Jondo Studio](#-jondo-studio) · [Surviving the next patch](#-surviving-the-next-patch)
+- 🔎 &nbsp;**Tools** &nbsp;— &nbsp;[Admin window (F10)](#-admin-window-f10) · [Jondo Studio](#%EF%B8%8F-jondo-studio) · [Surviving the next patch](#-surviving-the-next-patch)
+
+- 🤝 &nbsp;**Community** &nbsp;— &nbsp;[Community projects](#-community-projects)
 
 - 🧱 &nbsp;**Under the hood** &nbsp;— &nbsp;[Tests](#-tests) · [Source layout](#-source-layout) · [Database and persistence](#-database-and-persistence)
 
@@ -62,7 +64,7 @@ The official client talks to Ankama's servers and checks their SSL certificates.
 
 1. Get **MelonLoader 0.7.x** from [its releases page](https://github.com/LavaGang/MelonLoader/releases). 0.7.x is published as *Open-Beta*, so it shows up as a **pre-release** and the page's "Latest" tag points at 0.6.x. **0.6.x does not work with this client** — tick *show pre-releases* and take 0.7.x. This repository is tested against **0.7.3**.
 2. Run the installer and point it at your **`Dofus.exe`**. MelonLoader detects the rest (`Game Type: Il2cpp`, `Game Arch: x64`, `Runtime Type: net6`, Unity `6000.3.16f1`).
-3. Copy **`JondoFix/JondoFix.dll`** from this repository into the **`Mods/`** folder of your Dofus installation, next to `Dofus.exe`. MelonLoader creates that folder the first time the game starts; if it is not there yet, create it yourself.
+3. Nothing to copy: every time the **launcher** starts the client it puts this repository's **`JondoFix/JondoFix.dll`** into the client's **`Mods/`** folder if the one there differs, so a client with MelonLoader gets the mod's changes with the emulator, never with a new client. Only if you start the client some other way, copy that file into `Mods/` yourself (next to `Dofus.exe`; create the folder if it is not there).
 
 > The mod ships **already compiled**; `JondoFix/` also carries its source.
 
@@ -70,7 +72,7 @@ Afterwards:
 * The installer drops a **`version.dll`** next to `Dofus.exe`, which loads MelonLoader. Renaming it to `version.dll.disabled` turns the whole thing off so you can play the official game; renaming it back turns it on again.
 * MelonLoader writes a log per run under **`MelonLoader/Logs/`**. If the client starts but never reaches the emulator, look there first.
 
-What JondoFix does: intercepts sockets, Named Pipes and DNS queries and sends them to `localhost` (ports `8888`, `5555`, `15881`, `6337`); stops HTTPS requests from failing against the local self-signed certificate; and injects the environment variables the client expects (`ZAAP_PORT`, `ZAAP_HASH`, and so on).
+What JondoFix does: intercepts sockets, Named Pipes and DNS queries and sends them to `localhost` (ports `8888`, `5555`, `15881`, `6337`); stops HTTPS requests from failing against the local self-signed certificate; and injects the environment variables the client expects (`ZAAP_PORT`, `ZAAP_HASH`, and so on). In the Koliseo window it makes room for the fourth card, names it after the JondoBots in the client's language and opens their rules in a window of the client's own (see [Koliseo](#%EF%B8%8F-koliseo)).
 
 ### Step 4 — Run it
 
@@ -83,11 +85,17 @@ Account: keka
 Password: test
 ```
 
+`keka` is an **administrator**, so every command and the [admin window (F10)](#-admin-window-f10) can be tried with it, and it comes with its characters already made — `[#KEKA-BRON#]` at level 204, `Test`, `Tymaviejas` and `Bron` — with their equipment. For a player account of your own, use **CREATE ACCOUNT** in the launcher.
+
+> ⚠️ The password of `keka` is published right here. Before opening a server to other machines (`JONDO_PUBLIC_BIND=1`), change it or delete the account: anybody who knows it is an administrator.
+
+`world.zip` is only unpacked when there is no `bases/world.db` yet. To get the characters of a newer download over an older installation, delete `bases/world.db` (and with it the characters made on it) before starting.
+
 By default the emulator looks for the client next to itself, in a `Cliente 3.6.10.11` folder beside the emulator folder — or `Cliente 3.6.10.10`, whichever it finds first. If yours lives somewhere else, set it in **Settings**. The choice is remembered.
 
 The **ES / EN / FR** switch sets the language of the launcher *and* of the game: the client is started with that `--langCode`.
 
-**`Jondo Studio.exe`** is the third executable and needs nothing else running. See [Jondo Studio](#-jondo-studio).
+**`Jondo Studio.exe`** is the third executable and needs nothing else running. See [Jondo Studio](#%EF%B8%8F-jondo-studio).
 
 ---
 
@@ -202,7 +210,8 @@ Built with **Avalonia**, the same toolkit as the Studio.
 <img width="2560" height="1514" alt="image" src="https://github.com/user-attachments/assets/942d4d71-9711-45f1-9156-5381f7ad14b8" />
 
 - ✅ **3,815 interactive teleports** imported, 3,719 active across 2,655 maps
-- ✅ Passages that fire when you step on the cell, hooked to the end of a walk
+- ✅ Passages that fire when you step on the cell, hooked to the end of a walk — and floor passages with no element at all (`content/interactives/floor_passages.json`), for the maps that need a way out and have nothing to click
+- ✅ The GM prison's three maps, all at [66,6] and joined by nothing on the world grid, made one round: the sky jail's trapdoor goes down to the dungeon, the dungeon's hanging cage lifts you to the island, and the island's treasure chest brings you back to the jail at the foot of the trapdoor. The chest wears the placeholder graphic of the olivioleta trees, so it was being offered as a tree to cut; a passage now makes it a door
 - ✅ Each route carries its own interactive type
 - 🟡 Every extracted passage still declares skill 114 (*Utilizar* on a zaap) where the game uses
   184; new passages written in Jondo Studio declare 184
@@ -223,7 +232,7 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - 🟡 Also inferred: the plaque's `f5` read as "locked", getting in or opening a chest with the right code (only a wrong one was captured), and what the rest of the street is told
 - ❌ The other 1,400 doors cannot be owned (no model, no price); houses shared with a guild, kicking someone out, the list of houses on sale
 - ✅ **67 public bins on 63 maps**, shared by everybody and kept in the base: what one player throws in, anybody takes out — one unit per `-1`, the bin's stack sent again with what is left, as in the Bonta capture
-- ✅ Haven bags: entering and leaving, their own zaap, **48 themes**, **4,083 furniture pieces** placed and persisted, chest with the full item flow (its own window kind, `-1` takes one unit, a moved stack gets a new uid), lottery machine, and no monsters inside
+- ✅ Haven bags: entering and leaving — whoever stays on the street stops seeing the one who went in —, their own zaap, **48 themes**, **4,083 furniture pieces** placed and persisted, chest with the full item flow (its own window kind, `-1` takes one unit, a moved stack gets a new uid), lottery machine, and no monsters inside
 <img width="2560" height="1492" alt="image" src="https://github.com/user-attachments/assets/a81a3b24-8559-4ad5-8a27-e6913eef95a8" />
 
 > Which house sits behind which door is not in the client data. The 1,437 doors share **114 genuine interiors**, assigned deterministically within their own neighbourhood; the mapping lives in `datos/casas_mundo_3.6.10.10.json` and can be corrected by hand.
@@ -279,6 +288,13 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ The guild window: header (`jhh`), ranks (`jco`), member list (`jgu`) with class, level,
   achievement points, gremichas, online state and the leader's note; the guild comes with you into
   the world on login, rebuilt from the database
+- ✅ The window answered request by request, as in the captures: opening (`jlk` → the chest's tabs
+  and the header), the members only when `jml` asks for them, the perks' `jff` as an answer, and a
+  tab change (`jii`) not at all. Login says you belong (`jhe`, with your contribution) and never
+  "you have just joined", which only joining says (`jco` before `jgw`, as the client needs)
+- ✅ The tabs this server keeps nothing for — perks, raids, the paged list, the collectors' —
+  answered empty as a new guild's are (`jfv`, `jeu`, `jga`, `jgr`, `jet`, `jfw`, `hzc`, `hvx`), and
+  the week's reset (`jew` → `jez`, Tuesday 05:00 UTC, in all five captures)
 - ✅ Leave from the window (`jho`) or with `.gremio salir`; kick with `.gremio expulsar`
 - ✅ Ranks — open, rename, set rights, create (`jcs`, `jct`, `jck`, `jcv`), each answered with the
   whole `jco`. Rights are stored as they arrive. `.gremio rango <personaje> <n>` assigns one
@@ -353,7 +369,9 @@ Built with **Avalonia**, the same toolkit as the Studio.
   lost fights against monsters; it never drops below 1, so nobody becomes a ghost
 - ❌ Energy coming back — with rest or consumables; no capture measures the rate
 - ✅ Commands — `.teleport [x,y]` or `.teleport <map id>`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`, `.receta`, `.sueno`, `.gremio`, `.raid`; they answer with an information line only their author sees
-- ✅ Live administration over HTTP — `POST /api/personaje` sets characteristics, kamas and level, grants items or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only
+- ✅ The administrator's window, on **F10** in the client: items, a character's level, characteristics and kamas, teleports, NPCs and monsters spawned and removed, and the jail — see **[Admin window (F10)](#-admin-window-f10)**
+- ✅ Monsters at their size: groups on the map and fighters carry the look's colours, scale and skins as the official server sends them, so Conde Kontatrás is as tall as a person and not a doll
+- ✅ Live administration over HTTP — `POST /api/personaje` sets characteristics, kamas and level, grants items (at their maximum or rolled) or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only
 - 🟡 `.level` repaints the in-fight spell bar, but the fighter's own level is not updated until the next fight
 
 ### 👕 Appearances
@@ -534,6 +552,12 @@ Full workings in **`docs/dungeons.md`**.
 ### 🌙 Infinite Dreams
 
 Entered from the Plano Astral's well: a dream of 26 rooms in depth, walked band by band.
+<img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/f33f6c10-6889-41f6-8a25-cc17068b7191" />
+<img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/3bd5a03b-10e0-4dad-8227-627a5f2abf7d" />
+<img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/65ae17bf-b8cc-4b3c-a811-3258e7c9bfd4" />
+<img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/27bdff8a-abac-49da-8e6b-1dc2c72b6095" />
+<img width="2560" height="1496" alt="image" src="https://github.com/user-attachments/assets/002bdcb9-da34-44ff-95c3-b2f84e578c6b" />
+<img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/7b2732db-be45-44a2-b405-282091d35f4a" />
 
 - ✅ Ten difficulties in three families (Sueño, Paradoja, Pesadilla), each with its measured starting bonus, dream points, astral storms and Draconiros arena
 - ✅ Five bands, as the invitation capture measures them: fountains at rows 4, 10, 16 and 25, band IV closed by one fight room alone, and the **Fin du rêve** at row 26
@@ -600,8 +624,10 @@ Three architecture tests enforce it: no lookups that assume one team is the play
 - ✅ Isometric geometry (`MapGeometry`) over a pre-computed O(1) BFS distance matrix, with no diagonal steps
 - ✅ Line of sight traced between cell centres against the arena's own blocker set
 - ✅ Turn protocol, 30-second timers with automatic pass, AP/MP replenishment
+- ✅ Unused turn time is kept: a character who passes keeps half of what was left (the `jyt`'s f1), carried into his next turn (the `jzc`'s f4) and onto its clock, as the captures do — up to a turn of a minute and a half with it (the captures stop at a minute). Monsters, summons and JondoBots keep none
 - ✅ Movement with per-tile MP cost and collision against occupied cells
 - ✅ Loot, victory and defeat screens, experience over **1,889 levels**, level-ups and group respawn
+- ✅ The end waits for the client, as every fight end of the captures does: the last sequence, a `jxh` naming whose turn it was, and the result screen only once the client's `jwz` says it has played it all — so the blows that end a fight are seen, whoever lands them. A poison that kills at its victim's turn start ends the fight there too
 - ✅ End-of-fight statistics — damage dealt by source (own casts, glyphs and walls, summons, turn triggers, pushes), taken, heals given and received, shields, enemies defeated, and the per-turn and per-AP averages, each player getting their own numbers
 - ✅ Monsters and bosses run their own spells' mechanics: the behaviour spell cast at the start, triggered rows armed on every fighter they name, 30+ triggers (damage by element, heals, states on and off, pushes and collisions, thresholds, deaths), state disabling (952), telefrags, delayed sub-casts, life thresholds, revives, glyphs shown in their own colours — Conde Kontatrás's clock works end to end. See **`docs/bosses.md`**
 - ✅ Monster AI that plans its turn: every spell it can pay for, against every target, from every cell its MP reach — the blow against the target's resistance, kills first and the weakest enemy focused, heals for the badly wounded, AP/MP removal, buffs and summons once a turn; cooldowns, casts per turn and per target honoured; then it places itself (ranged at its reach, melee against the weakest to lock him, fleeing when nearly dead). Every cell it plans to leave next to an enemy is charged the tackle it will pay, so a held monster neither plans a retreat its MP will not cover nor a cast the lost AP will not pay for
@@ -623,8 +649,8 @@ Three architecture tests enforce it: no lookups that assume one team is the play
   invisible, the carried and the dead. Monsters tackle and escape with a tenth of their agility plus
   their grade's bonus, as their captured sheets do
 - 🟡 Several tacklers at once each keep their own share of what is left, which no capture shows;
-  summons tackle with none of their own, since their characteristics are not scaled to their
-  summoner yet; the "when tackled" triggers of items are not fired
+  summons tackle with none of their own, since their tackle and escape are not derived from their
+  agility; the "when tackled" triggers of items are not fired
 - ✅ Losing against monsters: energy down by ten per level up to 200 (2,000 at 354, never below 1)
   with its "Has perdido … puntos de energía", half the maximum life missing, and back beside the
   zaap of the save point — a duel, the Koliseo, the kanojedo and a dream cost nothing
@@ -652,10 +678,18 @@ Player against player, on the map, by challenging somebody standing there.
 
 Ranked PvP through a queue. Open the window, pick a format, get matched, fight, get paid.
 
-- ✅ The format table (`lux` → `ltd`) — 1v1, 2v2, 3v3 and a fourth card, **1v1 against a megabot**
-- ✅ **Megabots**, on the Koliseo window's own fourth card (the client's "event" card, open and made a 1v1): enrol and a megabot is drawn at once — a random class, level 200, 12 AP, 6 MP, 1500 in every element, 6666 life, +6 range, 30 % critical, 20 % resistance everywhere, one variant of each spell pair at random at its level-200 grade, and its class's passive. Shown as a character of its class wearing the look of one of the notable NPCs of that class (placed in the world, with dialogue, dressed) when it has any, played by the server's tactics, which weigh every spell against every target and cell; its summons play themselves too. The tactics summon once a turn, on the side the enemy is on, and never aim a damaging spell at one of their own — which the monsters' turns get too. The 1v1's own flow: *searching*, the match-found popup, accept or the sanction for letting it run out. It pays as a Koliseo and does not touch the ladder; the normal modes never meet a bot
+- ✅ The format table (`lux` → `ltd`) — 1v1, 2v2, 3v3 and a fourth card, **1v1 against a JondoBot**
+- ✅ **JondoBots**, on the Koliseo window's own fourth card (the client's "event" card, open and made a 1v1): enrol and a JondoBot is drawn at once — a random class, none of the last eight that player faced, level 200, 12 AP, 6 MP, 1500 in every element, 6666 life, +6 range, 30 % critical (rolled on every cast, as a player's), 20 % resistance everywhere, +3 summons, one variant of each spell pair at random at its level-200 grade, and its class's passive. Shown as a character of its class wearing the look of one of the notable NPCs of that class (placed in the world, with dialogue, dressed) when it has any, half again as big as a character (size 150), dressed in one epic set drawn at random — the hat, cape and shield of a single set of level 100 or more, 81 of them with two or three pieces whose skin is known, each piece in place of whatever the NPC wore on that slot — and riding a mount drawn among the 332 looks of mounts.json and the 272 measured appearance mounts, all of it drawn in the fight; played by the server's tactics; its summons play themselves too The 1v1's own flow: *searching*, the match-found popup, accept or the sanction for letting it run out. It pays as a Koliseo and does not touch the ladder; the normal modes never meet a bot
+<img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/7506287d-71b4-40a6-ad76-d4e67625aeac" />
+<img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/53350da7-e8e9-42b3-85a2-cc8c473a4310" />
+<img width="2560" height="1512" alt="image" src="https://github.com/user-attachments/assets/f468a367-7a7e-485b-a552-2ee143b0f05a" />
+<img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/71b362a6-6893-4652-ad38-e4073343ddb1" />
+
+- ✅ The Koliseo window, through JondoFix: with four cards shown it is widened from 1,328 to 1,760 so each keeps the 416 it is laid out for (read off the client's own UXML), and kept centred; the fourth card is called *JondoBots Mortales* / *JondoBots of Doom* (and in French, Portuguese and German) with its one-line description, in the language the launcher starts the client in; its *view the rules* button, which asked for a guide article this client lacks and showed the Abono's, opens the JondoBots' rules in a WindowFigma — the client's own window, frame, title bar and close button
+- ✅ **The JondoBots' tactics read their spells as the fight will apply them**, row by row: which cells each row covers (lines, crosses, circles) from where the bot would stand, whom it touches there by the engine's own reading of its mask — sides, a template such as the Forjalanza's lance, states, class — and what it does to each: the blows summed per enemy (a kill and a weak enemy worth more), heals to a wounded ally, each point of a characteristic by what it is (an AP is a spell, a hundred of an element a few percent of every blow; points taken only up to the ones the enemy has), a summon once, toward the enemy and only within the fight's summon limit, and the sub-spells a row casts, followed. Poisons and hooks count a little less. A buff that raises the coming blow goes first when it is worth half of it; a ranged bot ends its turn out of the enemy's sight and not stuck to him; defence is worth twice as much under half the life. Every fighter in between blocks its sight, as a pillar does. A trap is worth its own spell on whoever steps on it — only the rows whose zone takes his cell in — times the odds he walks there: best on his way to the bot, then next to it, less anywhere else he can reach, less again for each trap of its side already out, and never two on one cell nor a summon on one of its own. Going invisible is worth a twentieth of the life kept out of reach, half as much again under half the life; the Sram's double goes out as a summon does. A poison or a hook bites once a turn for as long as it lasts, each turn a little less sure. An invisible enemy is not aimed at where he stands: the bot knows only where it last saw him — where he went invisible, then each cell he casts from — and throws its blows there on a guess. What it replaced read every positive number of a spell as a buff — every state became five thousand points — and threw the Forjalanza's lance on the cells next to it, behind itself on its first turn
 - ✅ Enrolling (`lsm`), with the format carried as the client's own enum
 - ✅ The queue state (`lsx`) pushed back, which paints *searching* in the window
+- ✅ Leaving the queue (`lsi`, read from the client): the window's button takes out the party that enrolled together, and each window goes back to *search a fight* (`lsx` with reason 3). On the JondoBot card it withdraws the drawn fight without a sanction
 - ✅ Matchmaking by rating: the oldest in the queue is served first, the closest ratings are taken, and the two sides are split so their average ratings are as even as can be. The rating window starts at 150 points and widens 10 a second of waiting; the queue is looked at again every 5 seconds
 - ✅ Levels kept apart: nobody faces, or fights beside, someone more than 20 levels away — however long the wait — unless both are placed and within 100 rating points, the ladder saying they are even. A party enrolled together is one unit: never split, always one side, exempt from its own gaps
 - ✅ Everybody re-checked as still connected before anyone loses their place in the queue
@@ -663,7 +697,7 @@ Ranked PvP through a queue. Open the window, pick a format, get matched, fight, 
 - ✅ The winner is paid — kamas, Kolichas (item 12736), Vitorichas (34478) and experience. The loser gets nothing
 - 🟡 The amounts are constants, not a formula; experience is 6.67% of the winner's level band
 - 🚧 The *match found* popup with accept and refuse
-- 🚧 Fights are held on an ordinary arena; the real game picks one of the Koliseo maps at random
+- ✅ Fights are held on one of the Koliseo's own arenas, drawn at random among those with room for both sides: 394 of the 441 maps of its three subareas, with the placement cells of the client's map data. The 46 without a name are left out — three of them are no board at all, every one of their 522 cells walkable in a fight where the drawn board has 253, and a fighter walked out into the void on a map the client titled "Amakna 0,0"
 - ✅ The ladder of the current game (the December 2023 rework): one hidden rating per mode, and the league it sets — the client's **26 leagues**, Bronze, Silver, Gold, Platinum and Diamond in five divisions each, and Legend, straight from its `ArenaLeaguesDataRoot`. Each division overlaps the next by 50 points, the official "buffer": a player keeps his division while his rating stays inside it, and goes up or down when it leaves it
 - ✅ Five placement fights per mode before the first league, as the captures show; wins and fights of the season and of the day; the season's best league. All of it in the Koliseo window through `lty`, at world entry and after each fight — the world entry's byte for byte for an unplaced character
 - 🟡 Inferred, the official figures being qualitative: the rating moves on the Elo curve, 45 points for an even fight (K = 90, twice that in placement), so that 3–4 wins change a division as Ankama says; the starting rating is five a level (1000 at 200); a season lasts 91 days and starts everything again. Levels gained outside the Koliseo and a change of class do not move the rating; the season's ornament and title are not given
@@ -698,8 +732,8 @@ with how many spells each touches, is [`docs/effect-coverage.txt`](docs/effect-c
 - ✅ Cooldowns and cast limits — per turn, per target, minimum interval, initial cooldown; a spell that needs an empty cell, or a taken one, is refused before the AP go
 - ✅ Nine sub-cast families, one table — 792 is cast by the target at its own cell, 1160 by the caster at the candidate's, 1017 back at the parent caster, 2160 at the nearest eligible target under a budget, 2794 at the parent cell
 - ✅ Glyphs, traps and runes — 623 spells, one system: the four families share a shape and differ in when they fire, and a glyph that fires goes through the ordinary cast path
-- ✅ Summons as real fighters — own sheet, behaviour spell, lifetime, and they all fall when their summoner dies. Whether one plays is bit 6 of its template's `m_flags`; those that do are driven by their owner from his own client. Capacity is the template's `summonCost` added up
-- ✅ Bombs — a summon that costs nothing against the limit, stays out of the carousel, detonates through its own explosion (1009) once per chain, climbs a combo through spells 20497 and 20500, and lines up into walls of two or three with one to six cells between them, charged on entry and at turn start. The +1 AP per living bomb and the chain reaction are not done
+- ✅ Summons as real fighters — own sheet, behaviour spell, lifetime, and they all fall when their summoner dies. Whether one plays is bit 6 of its template's `m_flags`; those that do are driven by their owner from his own client. Capacity is the template's `summonCost` added up. Their characteristics come from their grade at the summoner's level, as the sheets of the captures read: the grade's own times one plus a hundredth of the level (300 is 900 at level 200), the bonus ones as they are, and three fifths of the bonus damage as power — an Osamodas' Tofu has 50 of agility and 30 of power. They had none, and hit with their spells' bare dice
+- ✅ Bombs — a summon that costs nothing against the limit, stays out of the carousel, detonates through its own explosion (1009) once per chain, climbs a combo through spells 20497 and 20500, and lines up into walls of two or three with one to six cells between them, charged on entry and at turn start. The +1 AP per living bomb (Encendimiento, on the Tymador) goes with the bomb when it dies, as in the capture; it stayed, and by the third turn a second bomb could not be paid for. The chain reaction is not done
 - ✅ Class passives — each class casts its own initial spell before the first turn (*La Astucia del Tymador*, *El Alcance de Ocra*, *La Sombra de Sram*, *El Escudo de Feca*…), kept in `content/fights/class_passives.json`. The initial spells of a character's own choices go with it
 - ✅ Hooked spells fire on every trigger — turn start, turn end, when hit, on death and per step walked — from their original caster, chained spells included, inside one sequence of the bearer's; a hooked row with a delay waits that many rounds (Furor's decay fires at the end of the turn after the cast, and hooks the grade it falls to); every chained cast is announced once per grade before the first thing it does — on the cell it was aimed at and without the f8 of a cast somebody made, as 18,526 chained casts of the captures go —, and a 406 after the rows it takes, with an f5 when its row carries the bit 4 of its flags (17 of 17)
 - ❌ The hooks themselves go out, in the real server, as hidden rows of their own — one per trigger, "jxm 1160 'D'" and "'XD'" on Resonancia's target — that come off with a jya; this server keeps its hooks off the panel. A jxm's state trigger goes out bare, `EON`/`EOFF`/`EK` as in all 581 of the captures
@@ -1601,6 +1635,10 @@ difference left against its capture.
 
 <details><summary><b>Uginak</b> — 0 of 44 seen working, 44 resolve on paper</summary>
 
+> Rage is handled: the spells that give Rage (Moloso and Carroña among them) give it
+> even when their damage kills the target. On the third step the Ouginak takes its bestial
+> form until the end of its following turn.
+
 - ❌ Convergencia
 - ❌ Busca
 - ❌ Presa
@@ -1709,6 +1747,123 @@ difference left against its capture.
 
 ---
 
+## 🔑 Admin window (F10)
+
+An administration panel inside the game. Press **F10** with an administrator's character in the
+world and a window opens over the map, drawn with the client's own pieces — the same window frame,
+tabs, buttons and text fields as Dofus's menus — so it looks like one of them. Press F10 again, or
+its cross, to close it.
+
+It started as [JimmyMtl's item window](https://github.com/Keka-Bron/JondoEmu/pull/49) and grew
+into five tabs.
+
+<img width="2050" height="1426" alt="image" src="https://github.com/user-attachments/assets/e126bd4c-00ef-4266-ab2a-10c57cd872fa" />
+
+### What it needs
+
+- **An administrator account** (role 5, see `docs/role.md`). The test account `keka` / `test` is one;
+  another account is promoted with `POST /api/rol`.
+- **The game started from the Jondo launcher.** The launcher installs the JondoFix mod into the
+  client's `Mods` folder and hands the client the account's token, to administrators only.
+- The server on the same machine, or on another one opened with `JONDO_PUBLIC_BIND=1`: the launcher
+  relays the window's port (8888) along with the game's.
+
+### The window
+
+- Resized from its bottom right corner, down to 960 × 620; it keeps its size between openings.
+- See-through while the pointer is elsewhere, so what happens on the map can be watched; nearly
+  solid while the pointer is on it.
+- Clicks on it never reach the map behind.
+- Wherever a character is chosen, the connected characters are in a drop-down, with their level and
+  whether they are in jail; **Refresh** reads them again.
+- The line at the bottom of each tab says what the server answered: done, or why not — not
+  connected, in a fight, already in jail…
+
+### Items
+
+The client's own item catalogue, with its icons.
+
+- **Search** by name, type, id, or a level range such as `190-200`; filter by category and then by
+  type; pages of 40.
+- Pick an item to see its lines, choose **to whom** (yourself or any connected character) and the
+  **quantity**.
+- **Give · MAX stats** gives it with every characteristic at the top of its range; **Give · RANDOM
+  stats** rolls each one, as a drop would (up to 100 items at a time). `.item <id> [quantity]
+  random` does the same from the chat.
+
+### Character
+
+For yourself or any connected character.
+
+- **Level**, the six base characteristics (vitality, wisdom, strength, intelligence, chance,
+  agility) and **kamas**. When a character is picked, the fields fill in with what they have now;
+  change what you want and press **Apply** — only what changed is sent, and the fields read the
+  result back.
+- **Give mount**: a mount by its item id, put on at once.
+
+Everything changes live, without reconnecting; a fight in progress blocks it.
+
+### Teleport
+
+Moves yourself or the character picked in the drop-down.
+
+- **Find a place**: type part of a name — `bonta`, `astrub`, `barrio de los herreros` — and the
+  maps of that area or subarea are listed with their coordinates, outdoor ones first, as Jondo
+  Studio's map field does. Coordinates (`4,-18`) and map ids work too. Clicking one puts it in the
+  map field.
+- Or type a **map id** or **coordinates `x,y`**, and optionally a **cell**, and press **Teleport**.
+- **Go to them** takes you to the picked player's map and cell; **Bring here** brings them to yours.
+
+### Spawn
+
+NPCs and monsters on the map you stand on, on your own cell, seen at once by everyone on the map.
+
+- Switch between **Monsters** and **NPCs**; search by name, id, or (monsters) a level range such as
+  `1-50`; pages of 30, with each monster's levels.
+- **An NPC**: pick it and press **Spawn NPC here**.
+- **A group of monsters**: pick a monster and click one of its grades (each with its level) to add
+  it; up to eight, mixed as you like. Click a member to take it out, then **Spawn group here**.
+- **On this map** lists every NPC and monster group standing on your map, each with **Remove**.
+
+What you spawn or remove lasts until the server restarts, like everything else that happens on a
+map; a map emptied by hand is not refilled with fresh groups meanwhile.
+
+### Jail
+
+Ten minutes in the game's own GM prison, for a player who needs a break.
+
+- Pick the player and press **Jail**. They go into one of the prison's four cells and you to the
+  corridor beside its bars; a second prisoner gets a cell of their own.
+- While inside, a prisoner cannot leave by any road — zaap, zaapi, haven bag, house, dungeon,
+  Koliseo, teleports, passages — cannot use commands, and cannot speak but on the general channel
+  and in private messages. A lost fight sends them back to their cell, not to their save point.
+- **In jail** lists the prisoners with their time left, counting down, and **Release** lets one out
+  early. The time keeps running while they are offline and survives a server restart. When it is
+  up, or when they are released, they go back exactly where they were taken from — at their next
+  login if they are offline.
+- **Go to the jail** takes you to the corridor alone, to talk to a prisoner.
+
+<img width="2560" height="1498" alt="image" src="https://github.com/user-attachments/assets/1b35bc2b-56b6-41ce-af52-6f43f79cc6d5" />
+
+**The GM prison has three maps**, all at [66,6] and joined by nothing on the world map: the jail in
+the clouds, a dungeon underneath and a desert island. They are linked in a round. The **trapdoor**
+in the middle of the jail's corridor goes down to the dungeon; stepping into the dungeon's
+**hanging cage** lifts you to the island; opening the island's **treasure chest** brings you back
+to the jail, at the foot of the trapdoor. A prisoner cannot use any of them.
+
+### How it works
+
+The window is not a reworked client screen: JondoFix (a MelonLoader mod) builds it at runtime out
+of the client's own interface components — `WindowFigma`, `DofusTabGroup`, `DofusButtonCustom`,
+`TextInput` — and adds it to the client's interface layer, so it takes the game's look by itself.
+
+The window decides nothing. Every button is a request to the server's control API, signed with the
+account's launcher token, and the server checks the token and the administrator's role on every
+one of them. The routes are documented in **[`docs/live-character-admin.md`](docs/live-character-admin.md)**,
+and can be called by any other tool the same way.
+
+---
+
 ## 🛠️ Jondo Studio
 <img width="2560" height="1508" alt="image" src="https://github.com/user-attachments/assets/14ee4541-d473-4bd1-81dd-617d03c8ba82" />
 <img width="2558" height="1502" alt="image" src="https://github.com/user-attachments/assets/21917c8d-4e7a-43a1-a7bc-73dddee31137" />
@@ -1781,7 +1936,7 @@ The full plan is in **`docs/world-editor.md`**.
 
 ## 🧪 Tests
 
-`Jondo.Unity.Tests` — **1,859 xUnit tests**, grouped by domain: `Auth`, `Combat`, `Commands`,
+`Jondo.Unity.Tests` — **1,903 xUnit tests**, grouped by domain: `Auth`, `Combat`, `Commands`,
 `Content`, `Diagnostics`, `Economy`, `Launcher`, `Movement`, `Network`, `Protocol`, `Quests`,
 `Security`, `Sessions`, `Sprites`, `Studio`, `World`. They run in about half a minute.
 
@@ -1837,7 +1992,7 @@ protocolbuilder cadena   clientes                      measure each patch on its
 
 > `proto` also settles what a message carries from the client's own schema: `lth { bool, bool }` is two booleans.
 
-Full write-up in `docs/desofuscacion.md`.
+Full write-up in `docs/deobfuscation.md`.
 
 ---
 
@@ -1865,7 +2020,7 @@ The protocol toolchain, which the emulator does not depend on:
 * **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder` · **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`
 * **`JondoFix`** — the MelonLoader client mod, source plus the compiled dll
 
-Documentation index in `docs/README.md`. Start with `docs/protocol.md` (how a message travels), `docs/opcodes.md` (what each opcode means and where it was seen), `docs/fight.md` (a fight on the wire, opcode by opcode) and `docs/desofuscacion.md` (surviving a patch).
+Documentation index in `docs/README.md`. Start with `docs/protocol.md` (how a message travels), `docs/opcodes.md` (what each opcode means and where it was seen), `docs/fight.md` (a fight on the wire, opcode by opcode) and `docs/deobfuscation.md` (surviving a patch).
 
 ---
 
@@ -1876,8 +2031,20 @@ Three **SQLite** databases in `bases/`, and one folder of text:
 * **`world.db`** — characters, inventories, positions, map persistence, spells, monsters, appearances, wardrobe, haven bags, houses and their chests, bins, guilds, the guild chest and raids, quests, achievements and the tallies they count, learned emotes. Distributed compressed as `datos/world.zip` (24.8 MB) and extracted on first run.
 * **`auth.db`** — accounts and authentication sessions, created on first run.
 * **`paquetes.db`** — the packets the server does not yet know how to answer, deduplicated by protobuf shape. It carries nothing needed to play and can be deleted to start over.
-* **`content/`** — the authored layer, in versioned JSON. The only one edited by hand, and the only one nothing regenerates. See [Jondo Studio](#-jondo-studio).
+* **`content/`** — the authored layer, in versioned JSON. The only one edited by hand, and the only one nothing regenerates. See [Jondo Studio](#%EF%B8%8F-jondo-studio).
 
 Files are looked up in `datos/`, then `bases/`, then the root.
 
 Some regression guards run at startup and throw, so the server refuses to boot when the data it was shipped does not match what the code expects — see [Tests](#-tests).
+
+---
+
+## 🤝 Community projects
+
+Projects other people build on top of Jondo. They live in their own repositories, with their own authors and licences: Jondo does not build, test or review them, and links them here so they can be found.
+
+| Project | Author | What it is |
+|:---|:---|:---|
+| [Jondo.Unity.WebClient](https://github.com/leonardo-spy/Jondo.Unity.WebClient) | [leonardo-spy](https://github.com/leonardo-spy) | The Dofus 3 client running in the browser (Unity, WebGL), connecting to Jondo over WebSocket. |
+
+Building something on Jondo? Open an issue or a pull request adding it to this table.

@@ -17,63 +17,71 @@ namespace Jondo.Unity.World.Fights
     {
         public long FightId { get; set; }
 
-        /// <summary>Las reglas de este combate: qué cambia respecto a pelear contra monstruos.</summary>
+        /// <summary>This fight's rules: what changes compared to fighting monsters.</summary>
         /// <remarks>
-        /// Eran dos banderas, <c>IsDuel</c> e <c>IsKoliseo</c>, y el motor las miraba en dieciséis
-        /// sitios repartidos por cinco métodos. Ver <see cref="FightRules"/> para por qué esto y no
-        /// dos motores.
+        /// They were two flags, <c>IsDuel</c> and <c>IsKoliseo</c>, and the engine looked at them in sixteen
+        /// places spread over five methods. See <see cref="FightRules"/> for why this and not
+        /// two engines.
         /// </remarks>
         public FightRules Reglas { get; set; } = FightRules.ContraMonstruos;
 
-        /// <summary>Si enfrente hay personas y no monstruos. Lo mismo que decía IsDuel.</summary>
+        /// <summary>Whether there are people opposite and not monsters. The same IsDuel said.</summary>
         public bool EsPvp => !Reglas.EnfrenteHayMonstruos;
 
         public long MapId { get; set; }
-        /// <summary>Quiénes de este combate ya han recibido la preparación.</summary>
+        /// <summary>Who in this fight has already received the preparation.</summary>
         /// <remarks>
-        /// Esto era <c>HasLoadedMap</c>, UN booleano para el combate entero, y funcionaba mientras
-        /// sólo hubiera una persona dentro: contra monstruos, el único jugador lo ponía y ya está.
-        /// En un desafío hay dos, y el flujo es el mismo para cada uno por su propio socket:
+        /// This was <c>HasLoadedMap</c>, ONE boolean for the whole fight, and it worked while
+        /// there was only one person inside: against monsters, the only player set it and that was it.
+        /// In a challenge there are two, and the flow is the same for each one through his own socket:
         ///
         /// <code>
-        ///   C-&gt;S  kmv          «ya estoy en el mapa de combate, dame los actores»
-        ///   S-&gt;C  la preparación: jxg de cada combatiente, kba, jzu, kam, kaa, kae...
+        ///   C-&gt;S  kmv          «I am on the fight map now, give me the actors»
+        ///   S-&gt;C  the preparation: jxg of each fighter, kba, jzu, kam, kaa, kae...
         /// </code>
         ///
-        /// Con la bandera compartida, el PRIMERO en mandar el kmv la ponía y al segundo le
-        /// contestaba que ya no había preparación pendiente. Su cliente se quedaba en modo rol —con
-        /// su barra de hechizos, sin combatientes y sin botón de listo— mirando el mapa de antes.
-        /// Que el desafío lo lanzara uno u otro no cambiaba nada: fallaba siempre el segundo en
-        /// cargar el mapa, que es una carrera y no un papel.
+        /// With the shared flag, the FIRST to send the kmv set it and the second was
+        /// answered that there was no preparation pending any more. His client stayed in roleplay mode —with
+        /// his spell bar, without fighters and without a ready button— looking at the previous map.
+        /// Whether one or the other launched the challenge changed nothing: the second to
+        /// load the map always failed, which is a race and not a role.
         ///
-        /// Por combatiente y no por combate, y con candado porque los dos clientes llegan por dos
-        /// conexiones a la vez.
+        /// Per fighter and not per fight, and with a lock because the two clients arrive through two
+        /// connections at once.
         /// </remarks>
         private readonly HashSet<long> _preparados = new HashSet<long>();
 
-        /// <summary>El último turno cuyo «confírmame» ya se atendió, como ronda y posición.</summary>
-        private (int Ronda, int Puesto) _turnoAtendido = (-1, -1);
+        /// <summary>The last turn whose «confirm to me» was already handled, as round and position.</summary>
+        private (int Ronda, int Puesto, long Quien) _turnoAtendido = (-1, -1, -1);
 
-        /// <summary>Su propio candado: no comparte nada con el de la preparacion.</summary>
+        /// <summary>Its own lock: it shares nothing with the preparation's.</summary>
         private readonly object _candadoDelTurno = new object();
 
         /// <summary>
-        /// Deja pasar UNA sola confirmación por turno.
+        /// Lets through ONE single confirmation per turn.
         /// </summary>
         /// <remarks>
-        /// El servidor manda un «confírmame» (jxh) antes de cada turno y el cliente contesta con su
-        /// jwz. Con una sola persona en el combate eso es una pregunta y una respuesta; en un
-        /// desafío la pregunta va a los dos y contestan los dos, y lo que cuelga de la respuesta
-        /// —deshacer invocados vencidos, barrer embrujos cumplidos, devolver puntos— tiene que
-        /// pasar una vez y no dos. Aquí es donde se decide cuál de las dos respuestas hace el
-        /// trabajo; a la otra sólo se le ignora.
+        /// The server sends a «confirm to me» (jxh) before each turn and the client answers with its
+        /// jwz. With a single person in the fight that is one question and one answer; in a
+        /// challenge the question goes to both and both answer, and what hangs from the answer
+        /// —undoing expired summons, sweeping fulfilled buffs, giving back points— has to
+        /// happen once and not twice. This is where it is decided which of the two answers does the
+        /// work; the other is just ignored.
         /// </remarks>
-        public bool AtenderElTurnoUnaVez(int round, int turnIndex)
+        /// <param name="fighterId">
+        /// Whose turn it is. The index alone is not a turn: a death or a summon in the middle of a
+        /// round rebuilds the order and moves everybody's index, and the next turn can land on
+        /// the index of the last one confirmed. Measured: the Ocra's own turn at index 2 of round
+        /// R, a fighter before him gone, his Arakna summoned at index 2 -- and her turn, "round R,
+        /// index 2", was taken for the one already opened. No jzc went out, the fight stood still
+        /// and the client's clock ran into the negatives.
+        /// </param>
+        public bool AtenderElTurnoUnaVez(int round, int turnIndex, long fighterId = 0)
         {
             lock (_candadoDelTurno)
             {
-                if (_turnoAtendido == (round, turnIndex)) return false;
-                _turnoAtendido = (round, turnIndex);
+                if (_turnoAtendido == (round, turnIndex, fighterId)) return false;
+                _turnoAtendido = (round, turnIndex, fighterId);
                 return true;
             }
         }
@@ -85,7 +93,7 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool TurnAwaitingConfirmation
         {
-            get { lock (_candadoDelTurno) return _turnoAtendido != (RoundNumber, CurrentTurnIndex); }
+            get { lock (_candadoDelTurno) return _turnoAtendido != (RoundNumber, CurrentTurnIndex, CurrentFighter?.Id ?? 0); }
         }
 
         /// <summary>
@@ -97,37 +105,38 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public AnnouncedTurn LastAnnouncedTurn { get; set; }
 
+        /// <param name="Carried">The tenths carried from the fighter's last turn, on top of <paramref name="Deciseconds"/>.</param>
         public readonly record struct AnnouncedTurn(long FighterId, int Index, int Round,
-                                                    int Deciseconds, DateTime StartedUtc)
+                                                    int Deciseconds, DateTime StartedUtc, int Carried = 0)
         {
             public bool Announced => FighterId != 0;
 
-            /// <summary>What is left of it, in tenths of a second; never below zero.</summary>
+            /// <summary>What is left of it, carried time and all, in tenths of a second; never below zero.</summary>
             public int RemainingDeciseconds(DateTime nowUtc)
             {
                 if (!Announced) return 0;
                 long gone = (long)(nowUtc - StartedUtc).TotalMilliseconds / 100;
-                return (int)Math.Max(0, Deciseconds - gone);
+                return (int)Math.Max(0, Deciseconds + Carried - gone);
             }
         }
 
-        /// <summary>Si a este ya se le mandó la preparación.</summary>
+        /// <summary>Whether this one has already been sent the preparation.</summary>
         public bool HasPrepared(long fighterId)
         {
             lock (_preparados) return _preparados.Contains(fighterId);
         }
 
-        /// <summary>Lo apunta como preparado. Devuelve false si ya lo estaba.</summary>
+        /// <summary>Records him as prepared. Returns false if he already was.</summary>
         /// <remarks>
-        /// Apuntar y comprobar en la misma llamada es lo que impide que dos tramas del mismo
-        /// cliente —el kmv y el kkr llegan casi juntos— manden la preparación dos veces.
+        /// Recording and checking in the same call is what keeps two frames from the same
+        /// client —the kmv and the kkr arrive almost together— from sending the preparation twice.
         /// </remarks>
         public bool MarkPrepared(long fighterId)
         {
             lock (_preparados) return _preparados.Add(fighterId);
         }
 
-        /// <summary>Lo desapunta, para volver a mandarle la preparación desde cero.</summary>
+        /// <summary>Unrecords him, to send him the preparation again from scratch.</summary>
         public void ForgetPreparation(long fighterId)
         {
             lock (_preparados) _preparados.Remove(fighterId);
@@ -135,25 +144,25 @@ namespace Jondo.Unity.World.Fights
         public FightState State { get; private set; } = FightState.Placement;
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Los dos bandos
+        //  The two sides
         // ═══════════════════════════════════════════════════════════════════
         //
-        // Se llamaban Team0 y Team1, y al lado ponía «// Players» y «// Monsters». Ciento cinco
-        // referencias más adelante eso había dejado de ser un comentario y era una creencia: medio
-        // motor daba por hecho que en el azul está quien juega y en el rojo hay bichos.
+        // They were called Team0 and Team1, and next to them it said «// Players» and «// Monsters». A hundred and five
+        // references later that had stopped being a comment and was a belief: half the
+        // engine took for granted that the one playing is on blue and on red there are creatures.
         //
-        // Contra monstruos es verdad. En un desafío es verdad para uno de los dos, y de ahí salió
-        // una clase entera de fallos -- el del rojo no podía recolocarse, no recibía sus esperas
-        // iniciales, no podía abandonar, y su «listo» no contaba -- que no llevaban ningún «if»
-        // porque nadie sabía que eran supuestos.
+        // Against monsters it is true. In a challenge it is true for one of the two, and from there came
+        // a whole class of bugs -- the red one could not reposition, did not receive his initial
+        // waits, could not abandon, and his «ready» did not count -- that carried no «if»
+        // because nobody knew they were assumptions.
         //
-        // Azul y Rojo son los colores de las casillas de colocación y no prometen nada sobre quién
-        // hay dentro. Debajo están las tres preguntas que el motor hacía a mano en sesenta sitios.
+        // Blue and Red are the colours of the placement cells and promise nothing about who
+        // is inside. Below are the three questions the engine asked by hand in sixty places.
 
-        /// <summary>El bando que empieza: quien provoca el combate, o quien reta.</summary>
+        /// <summary>The side that starts: whoever provokes the fight, or whoever challenges.</summary>
         public const int Azules = 0;
 
-        /// <summary>El otro: los monstruos, o el retado.</summary>
+        /// <summary>The other: the monsters, or the challenged.</summary>
         public const int Rojos = 1;
 
         public List<Fighter> Azul { get; } = new List<Fighter>();
@@ -165,21 +174,21 @@ namespace Jondo.Unity.World.Fights
         public List<int> BluePlacementCells { get; } = new List<int>();
         public List<int> RedPlacementCells { get; } = new List<int>();
 
-        /// <summary>Los del bando que se diga.</summary>
+        /// <summary>Those of the side given.</summary>
         public List<Fighter> Bando(int equipo) => equipo == Rojos ? Rojo : Azul;
 
-        /// <summary>Las casillas de colocación de ese bando.</summary>
+        /// <summary>That side's placement cells.</summary>
         public List<int> CasillasDe(int equipo) => equipo == Rojos ? RedPlacementCells : BluePlacementCells;
 
-        /// <summary>Todos, de los dos bandos.</summary>
+        /// <summary>Everyone, from both sides.</summary>
         public IEnumerable<Fighter> Todos => Azul.Concat(Rojo);
 
-        /// <summary>Cualquiera del combate, del bando que sea. Null si no está.</summary>
+        /// <summary>Anyone in the fight, whichever side. Null if not there.</summary>
         public Fighter Buscar(long fighterId)
             => Azul.FirstOrDefault(f => f.Id == fighterId)
                ?? Rojo.FirstOrDefault(f => f.Id == fighterId);
 
-        /// <summary>En qué bando está, o -1 si no está en el combate.</summary>
+        /// <summary>Which side he is on, or -1 if he is not in the fight.</summary>
         public int EquipoDe(long fighterId)
         {
             if (Azul.Exists(f => f.Id == fighterId)) return Azules;
@@ -187,32 +196,32 @@ namespace Jondo.Unity.World.Fights
             return -1;
         }
 
-        /// <summary>El bando contrario al que se diga.</summary>
+        /// <summary>The side opposite the one given.</summary>
         public static int Contrario(int equipo) => equipo == Rojos ? Azules : Rojos;
 
-        /// <summary>Los de su lado, él incluido. Vacío si no está en el combate.</summary>
+        /// <summary>Those on his side, himself included. Empty if he is not in the fight.</summary>
         public List<Fighter> Aliados(long fighterId)
         {
             int suyo = EquipoDe(fighterId);
             return suyo < 0 ? new List<Fighter>() : Bando(suyo);
         }
 
-        /// <summary>Los del otro lado. Vacío si no está en el combate.</summary>
+        /// <summary>Those on the other side. Empty if he is not in the fight.</summary>
         public List<Fighter> Enemigos(long fighterId)
         {
             int suyo = EquipoDe(fighterId);
             return suyo < 0 ? new List<Fighter>() : Bando(Contrario(suyo));
         }
 
-        /// <summary>Si a ese bando le queda alguien en pie.</summary>
+        /// <summary>Whether that side still has someone standing.</summary>
         /// <remarks>
-        /// Esto se escribía a mano como <c>Team0.Exists(f =&gt; f.IsAlive)</c> y se llamaba
-        /// «alliesAlive», que sólo es verdad si quien pregunta está en el azul. Con el bando por
-        /// delante ya no se puede escribir al revés sin darse cuenta.
+        /// This was written by hand as <c>Team0.Exists(f =&gt; f.IsAlive)</c> and called
+        /// «alliesAlive», which is only true if whoever asks is on blue. With the side
+        /// up front it can no longer be written the wrong way round without noticing.
         /// </remarks>
         public bool SigueVivo(int equipo) => Bando(equipo).Exists(f => f.IsAlive);
 
-        /// <summary>Si ganó quien pregunta. Falso también para quien no estaba.</summary>
+        /// <summary>Whether whoever asks won. Also false for whoever was not there.</summary>
         public bool HaGanado(long fighterId)
         {
             int suyo = EquipoDe(fighterId);
@@ -223,23 +232,23 @@ namespace Jondo.Unity.World.Fights
         public long DefenderLeaderId { get; set; } = -20000;
 
         /// <summary>
-        /// Cuántas veces ha lanzado cada uno cada hechizo en el turno que corre.
+        /// How many times each one has cast each spell in the current turn.
         /// </summary>
         /// <remarks>
-        /// DEL COMBATE, y con el lanzador en la clave. Estaban en dos diccionarios ESTÁTICOS de
-        /// FightHandler indexados sólo por el id del hechizo, así que con dos clientes peleando a la
-        /// vez los lanzamientos de uno contaban contra los del otro en cuanto compartían hechizo
-        /// —los ids de hechizo se repiten entre jugadores—.
+        /// THE FIGHT'S, and with the caster in the key. They were in two STATIC dictionaries of
+        /// FightHandler indexed only by the spell id, so with two clients fighting at
+        /// once one's casts counted against the other's as soon as they shared a spell
+        /// —spell ids repeat between players—.
         ///
-        /// Y peor: no se vaciaban nunca. Lo único que los limpiaba estaba dentro de un método sin un
-        /// solo llamante, así que al tercer lanzamiento del PROCESO —sumando todos los jugadores y
-        /// todos los combates— el hechizo quedaba rechazado con «ya gastado este turno» para todo el
-        /// mundo hasta reiniciar el servidor.
+        /// And worse: they were never emptied. The only thing that cleared them was inside a method with not a
+        /// single caller, so on the PROCESS's third cast —adding up all the players and
+        /// all the fights— the spell was rejected with «already spent this turn» for every-
+        /// body until the server restarted.
         /// </remarks>
         public Dictionary<(long Caster, long Spell), int> CastsThisTurn { get; }
             = new Dictionary<(long, long), int>();
 
-        /// <summary>Lo mismo, por objetivo: el tope de lanzamientos sobre la misma criatura.</summary>
+        /// <summary>The same, per target: the cap on casts on the same creature.</summary>
         public Dictionary<(long Caster, long Spell, long Target), int> CastsPerTargetThisTurn { get; }
             = new Dictionary<(long, long, long), int>();
 
@@ -253,15 +262,15 @@ namespace Jondo.Unity.World.Fights
         public long ArenaMapId { get; set; }
 
         /// <summary>
-        /// Cuándo empezó a pelearse de verdad, para saber lo que ha durado: la pantalla de fin de
-        /// combate lo enseña arriba a la derecha y sin esto salía 00:00.
+        /// When the real fighting started, to know how long it lasted: the end-of-fight
+        /// screen shows it at the top right and without this it came out 00:00.
         /// </summary>
         public DateTime StartedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// El número que le toca al siguiente embrujo. Es del COMBATE, no de cada luchador: en la
-        /// captura los del jugador y los del monstruo van en la misma serie, y es el número con el
-        /// que luego se quita cada uno.
+        /// The number the next buff gets. It belongs to the FIGHT, not to each fighter: in the
+        /// capture the player's and the monster's go in the same series, and it is the number with
+        /// which each one is later removed.
         /// </summary>
         private int _ultimoEmbrujo;
         public int SiguienteEmbrujo() => ++_ultimoEmbrujo;
@@ -348,16 +357,16 @@ namespace Jondo.Unity.World.Fights
             }
         }
 
-        /// <summary>Ocho por bando: por debajo de esto no hay sitio para colocar dos equipos.</summary>
+        /// <summary>Eight per side: below this there is no room to place two teams.</summary>
         public const int PlacesForBothTeams = 16;
 
         /// <summary>
-        /// Las casillas de colocación tal cual, cuando el mapa ya las trae.
+        /// The placement cells as they are, when the map already brings them.
         /// </summary>
         /// <remarks>
-        /// Las arenas de koliseo las marcan en el propio cliente, bando por bando, así que ahí no
-        /// hay nada que repartir: <see cref="GeneratePlacementCells"/> parte una lista de casillas
-        /// pisables por la mitad porque en un arena corriente no hay otra cosa.
+        /// The koliseo arenas mark them in the client itself, side by side, so there
+        /// there is nothing to split: <see cref="GeneratePlacementCells"/> cuts a list of walkable
+        /// cells in half because in an ordinary arena there is nothing else.
         /// </remarks>
         public void SetPlacementCells(IEnumerable<int> blue, IEnumerable<int> red)
         {
@@ -372,11 +381,11 @@ namespace Jondo.Unity.World.Fights
             BluePlacementCells.Clear();
             RedPlacementCells.Clear();
 
-            // Menos de dieciseis no da para dos equipos de ocho, y partirlas por la mitad daria
-            // uno o dos huecos por bando: con una sola casilla roja los cinco monstruos se
-            // colocan encima unos de otros, y golpear esa casilla hiere a uno y a los demas no.
-            // El listón era "cero", que es justo el caso que no pasaba: en el arena 188752387
-            // llegaban DOS, y dos no es cero.
+            // Fewer than sixteen does not give two teams of eight, and cutting them in half would give
+            // one or two slots per side: with a single red cell the five monsters are
+            // placed on top of each other, and hitting that cell wounds one and not the rest.
+            // The bar was "zero", which is exactly the case that did not happen: on arena 188752387
+            // TWO arrived, and two is not zero.
             if (walkableCells == null || walkableCells.Count < PlacesForBothTeams)
             {
                 BluePlacementCells.AddRange(new[] { 286, 298, 326, 271, 285, 299, 312, 313 });
@@ -412,13 +421,13 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Mete a un JUGADOR en el equipo contrario. Es lo que hace de un combate un duelo.
+        /// Puts a PLAYER on the opposing team. It is what makes a fight a duel.
         /// </summary>
         /// <remarks>
-        /// <see cref="AddPlayer"/> fuerza el equipo cero, porque hasta ahora el unico combate que
-        /// existia era uno contra monstruos y todos los jugadores iban del mismo lado. En un
-        /// desafio hay una persona a cada lado, y la casilla sale del lado rojo por lo mismo: dos
-        /// jugadores en las casillas azules empezarian pegados.
+        /// <see cref="AddPlayer"/> forces team zero, because until now the only fight that
+        /// existed was one against monsters and all the players went on the same side. In a
+        /// challenge there is one person on each side, and the cell comes from the red side for the same reason: two
+        /// players on the blue cells would start stuck together.
         /// </remarks>
         public void AddOpponent(Fighter player)
         {
@@ -439,11 +448,11 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// El siguiente identificador libre para un invocado.
+        /// The next free identifier for a summon.
         ///
-        /// Los combatientes que no son jugadores llevan número negativo y se reparten de uno en
-        /// uno: en las capturas del Ocra los pious son -1 y -2 y la primera baliza sale con el -3,
-        /// la segunda con el -4, y así. Se mira lo que ya hay para no pisar a nadie.
+        /// Fighters that are not players carry a negative number and are handed out one by
+        /// one: in the Cra captures the pious are -1 and -2 and the first beacon comes out with -3,
+        /// the second with -4, and so on. What is already there is looked at so as not to step on anyone.
         /// </summary>
         public long SiguienteIdDeInvocado()
         {
@@ -454,8 +463,8 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Mete un invocado en el combate, en el bando del que lo invoca, y rehace el orden de
-        /// turnos para que le toque jugar.
+        /// Puts a summon in the fight, on the summoner's side, and rebuilds the turn
+        /// order so that it gets to play.
         /// </summary>
         /// <summary>
         /// A monster that comes into the fight once it has started -- a wave of the Fin du rêve.
@@ -474,8 +483,8 @@ namespace Jondo.Unity.World.Fights
             invocado.TeamId = dueno.TeamId;
             (dueno.TeamId == 0 ? Azul : Rojo).Add(invocado);
 
-            // El que está jugando ahora mismo sigue jugando: se rehace la lista pero se conserva
-            // a quién le toca, que si no el turno se le va al de al lado en mitad de una acción.
+            // The one playing right now keeps playing: the list is rebuilt but whose turn it is
+            // is kept, otherwise the turn goes to the next one in the middle of an action.
             var jugando = CurrentFighter;
             TurnOrder = BuildAlternatingTurnOrder();
             if (jugando != null && TurnOrder.Contains(jugando))
@@ -504,15 +513,15 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Rehace la lista de turnos conservando a quién le toca ahora mismo.
+        /// Rebuilds the turn list keeping whose turn it is right now.
         /// </summary>
         /// <remarks>
-        /// Lo que hace falta cuando alguien SALE de la lista a media ronda. Agrupar filtra por
-        /// IsAlive, así que rehacerla lo quita y todos los de detrás se corren un hueco; sin
-        /// repuntar CurrentTurnIndex, el turno se le iría al de al lado en mitad de una acción.
+        /// What is needed when someone LEAVES the list mid-round. Grouping filters by
+        /// IsAlive, so rebuilding it removes him and everyone behind shifts one slot; without
+        /// re-pointing CurrentTurnIndex, the turn would go to the next one in the middle of an action.
         ///
-        /// Es lo mismo que ya hacía <see cref="Invocar"/> para el caso contrario, cuando alguien
-        /// ENTRA. Sacado aquí para que las dos direcciones no puedan separarse.
+        /// It is the same <see cref="Invocar"/> already did for the opposite case, when someone
+        /// ENTERS. Taken out here so that the two directions cannot drift apart.
         /// </remarks>
         public void RebuildTurnOrderKeepingCurrent()
         {
@@ -530,11 +539,11 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Un bando en orden de juego: los de siempre por iniciativa, y detrás de cada uno los que
-        /// haya invocado, en el orden en que los sacó.
+        /// A side in playing order: the usual ones by initiative, and behind each one those
+        /// they have summoned, in the order they brought them out.
         ///
-        /// Los invocados que no juegan turno se quedan fuera de la lista, pero siguen estando en
-        /// el combate: se les puede pegar y cuentan para el tablero.
+        /// The summons that play no turn are left out of the list, but they are still in
+        /// the fight: they can be hit and they count for the board.
         /// </summary>
         private static List<List<Fighter>> Agrupar(List<Fighter> bando)
         {
@@ -555,15 +564,15 @@ namespace Jondo.Unity.World.Fights
             return salida;
         }
 
-        /// <summary>Alguien se declara listo. Devuelve si con eso ya lo están todos.</summary>
+        /// <summary>Someone declares himself ready. Returns whether with that everyone is.</summary>
         /// <remarks>
-        /// Miraba sólo el azul, en las dos mitades. En un desafío eso significaba que el combate
-        /// arrancaba en cuanto pulsaba listo el RETADOR, sin esperar al otro —su bando estaba
-        /// entero listo porque era él solo— y que el «listo» del retado no se apuntaba en ninguna
-        /// parte. Es lo que se veía como «uno ya está peleando y el otro sigue en colocación».
+        /// It only looked at blue, in both halves. In a challenge that meant the fight
+        /// started as soon as the CHALLENGER pressed ready, without waiting for the other —his side was
+        /// all ready because it was just him— and that the challenged's «ready» was recorded
+        /// nowhere. It is what was seen as «one is already fighting and the other is still in placement».
         ///
-        /// Un monstruo no pulsa nada, así que para contar sólo cuentan las personas; si en un
-        /// bando no hay ninguna —el caso de siempre contra monstruos— ese bando está listo.
+        /// A monster presses nothing, so for counting only people count; if a
+        /// side has none —the usual case against monsters— that side is ready.
         /// </remarks>
         /// <summary>
         /// Takes the ready flag back. The real server does it for whoever reconnects during the
@@ -773,7 +782,7 @@ namespace Jondo.Unity.World.Fights
             return (removed, added);
         }
 
-        /// <summary>Se recoloca durante la fase de colocación, cada uno en las casillas de su lado.</summary>
+        /// <summary>Repositions during the placement phase, each one on his side's cells.</summary>
         public void ChangePlacementCell(long fighterId, int newCellId)
         {
             if (State != FightState.Placement) return;
@@ -791,20 +800,20 @@ namespace Jondo.Unity.World.Fights
             }
         }
 
-        /// <summary>Si ya se le ha dicho al cliente que deje de regenerar vida.</summary>
+        /// <summary>Whether the client has already been told to stop regenerating life.</summary>
         /// <remarks>
-        /// La pareja lqg + lqt se manda una sola vez por combate, que es como sale en la captura.
-        /// Iba sólo en la rama de «todos listos», así que un combate que arrancara porque se acabó
-        /// el tiempo de colocación —el caso normal contra monstruos si nadie pulsa— se quedaba sin
-        /// ella, y el cliente seguía rellenando la barra de vida de uno en uno dentro de la pelea.
+        /// The lqg + lqt pair is sent only once per fight, which is how it comes out in the capture.
+        /// It went only in the «everyone ready» branch, so a fight that started because the
+        /// placement time ran out —the normal case against monsters if nobody presses— was left without
+        /// it, and the client kept refilling the life bar one by one inside the fight.
         /// </remarks>
         public bool RegeneracionApagada { get; set; }
 
-        /// <summary>Lo que hay puesto en el suelo de esta arena: glifos, trampas y runas.</summary>
+        /// <summary>What is laid on the ground of this arena: glyphs, traps and runes.</summary>
         /// <remarks>
-        /// Vive en el combate y no en un registro global a propósito: dos combates a la vez en la
-        /// misma arena de instancia tendrían glifos distintos, y un registro por mapa los
-        /// mezclaría.
+        /// It lives in the fight and not in a global registry on purpose: two fights at once in the
+        /// same instance arena would have different glyphs, and a per-map registry would
+        /// mix them.
         /// </remarks>
         public List<Glifo> Glifos { get; } = new List<Glifo>();
 
@@ -927,7 +936,7 @@ namespace Jondo.Unity.World.Fights
 
         private int _siguienteGlifo;
 
-        /// <summary>Pone algo en el suelo y le da su identificador.</summary>
+        /// <summary>Lays something on the ground and gives it its identifier.</summary>
         public Glifo Poner(Glifo glifo)
         {
             glifo.Id = ++_siguienteGlifo;
@@ -941,7 +950,7 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public int SiguienteMarca() => ++_siguienteGlifo;
 
-        /// <summary>Lo que se dispara con alguien pisando esa casilla.</summary>
+        /// <summary>What fires with someone stepping on that cell.</summary>
         public List<Glifo> LosQuePisa(int casilla)
         {
             var salen = new List<Glifo>();
@@ -963,7 +972,7 @@ namespace Jondo.Unity.World.Fights
             return salen;
         }
 
-        /// <summary>Lo que se dispara con alguien empezando su turno ahí.</summary>
+        /// <summary>What fires with someone starting his turn there.</summary>
         public List<Glifo> LosQueEmpiezan(int casilla)
         {
             var salen = new List<Glifo>();
@@ -974,7 +983,7 @@ namespace Jondo.Unity.World.Fights
             return salen;
         }
 
-        /// <summary>Quita los que se han gastado o cumplido. Devuelve cuántos se ha llevado.</summary>
+        /// <summary>Removes the ones spent or fulfilled. Returns how many it took away.</summary>
         public List<Glifo> BarrerLosGlifos()
         {
             var caidos = new List<Glifo>();
@@ -1027,12 +1036,12 @@ namespace Jondo.Unity.World.Fights
 
         public List<Fighter> BuildAlternatingTurnOrder()
         {
-            // Los invocados NO se ordenan por iniciativa: van pegados a quien los puso, y sólo los
-            // que tengan algo que hacer al empezar su turno. Es lo que se ve en las capturas, con
-            // la Baliza de Supervivencia jugando siempre justo detrás de su Ocra.
-            // Se intercalan GRUPOS, no combatientes sueltos: cada grupo es uno de los de siempre
-            // con sus invocados detrás. Intercalando de uno en uno, la baliza se separaba de su
-            // Ocra y jugaba después del monstruo, cuando en la captura va inmediatamente detrás.
+            // Summons are NOT ordered by initiative: they go stuck to whoever placed them, and only those
+            // that have something to do at the start of their turn. It is what is seen in the captures, with
+            // the Baliza de Supervivencia always playing right behind its Cra.
+            // GROUPS are interleaved, not loose fighters: each group is one of the usual ones
+            // with their summons behind. Interleaving one by one, the beacon got separated from its
+            // Cra and played after the monster, when in the capture it goes immediately behind.
             var team0Sorted = Agrupar(Azul);
             var team1Sorted = Agrupar(Rojo);
 
@@ -1060,61 +1069,68 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// La ronda en la que va ESTE combate.
+        /// The round THIS fight is on.
         ///
-        /// Vivía como un entero estático del manejador, uno para todo el servidor, así que dos
-        /// jugadores peleando a la vez compartían el contador: al pasar de ronda uno, el otro veía
-        /// caducar sus embrujos. Cada combate lleva el suyo.
+        /// It lived as a static integer of the handler, one for the whole server, so two
+        /// players fighting at once shared the counter: when one moved to the next round, the other saw
+        /// his buffs expire. Each fight carries its own.
         /// </summary>
         public int RoundNumber { get; private set; } = 1;
 
         /// <summary>
-        /// El número de acción, que es lo que el cliente acusa al cerrar cada secuencia. También
-        /// era único para todo el servidor, y el cliente de un jugador acusaba números que había
-        /// gastado el combate de otro.
+        /// The action number, which is what the client acknowledges on closing each sequence. It also
+        /// was single for the whole server, and one player's client acknowledged numbers that
+        /// another's fight had used up.
         /// </summary>
         private int _ultimaAccion;
         public int SiguienteAccion() => System.Threading.Interlocked.Increment(ref _ultimaAccion);
 
-        // ─── Los retos ──────────────────────────────────────────────────────────
+        // ─── The challenges ─────────────────────────────────────────────────────
         //
-        // Van aquí y no en un campo estático del manejador por lo mismo que la ronda: dos
-        // jugadores peleando a la vez tendrían los mismos retos, y el que eligiera uno se lo
-        // cambiaría al otro.
+        // They go here and not in a static field of the handler for the same reason as the round: two
+        // players fighting at once would have the same challenges, and whoever chose one would
+        // change it for the other.
 
-        /// <summary>Cuántos hay que elegir. Uno en un combate normal, dos en mazmorra.</summary>
+        /// <summary>How many have to be chosen. One in a normal fight, two in a dungeon.</summary>
         public int ChallengesToPick { get; set; } = 1;
 
-        /// <summary>Los dos que están sobre la mesa ahora mismo. Vacío si no se ha pedido la lista.</summary>
+        /// <summary>The two on the table right now. Empty if the list has not been asked for.</summary>
         public List<int> ChallengesOffered { get; } = new List<int>();
 
-        /// <summary>Cuál de los dos tiene marcado el jugador, aunque todavía no lo haya validado.</summary>
+        /// <summary>Which of the two the player has marked, even if he has not validated it yet.</summary>
         public int ChallengeMarked { get; set; }
 
-        /// <summary>Los que ya están fijados, con el porcentaje con el que se fijaron.</summary>
+        /// <summary>The ones already fixed, with the percentage they were fixed with.</summary>
         public List<(int Id, int Percent)> ChallengesFixed { get; } = new List<(int, int)>();
 
-        /// <summary>¿Quedan retos por elegir?</summary>
+        /// <summary>Are there challenges left to choose?</summary>
         public bool ChallengesPending => ChallengesFixed.Count < ChallengesToPick;
 
-        // ─── Lo que hace falta para VIGILARLOS ──────────────────────────────────
+        // ─── What is needed to WATCH them ───────────────────────────────────────
 
         /// <summary>
-        /// El final de ESTE combate está esperando a que el cliente acuse una secuencia. Cero
-        /// cuando no hay ninguno esperando.
+        /// THIS fight's end is waiting for the client to acknowledge a sequence. Zero
+        /// when none is waiting.
         ///
-        /// Vivía como un estático del manejador, uno para todo el servidor, y era la avería más
-        /// cara que había: con dos combates a la vez, el acuse de uno cerraba el del otro. Y
-        /// cerrarlo no es cosmético — reparte la experiencia, los kamas y el botín sobre la sesión
-        /// de quien mandó el acuse, y lo escribe en la base. O sea que un jugador cobraba el
-        /// combate de otro, y al dueño no le llegaba nunca su pantalla de fin.
+        /// It lived as a static of the handler, one for the whole server, and it was the most
+        /// expensive fault there was: with two fights at once, one's acknowledgement closed the other's. And
+        /// closing it is not cosmetic — it hands out the experience, the kamas and the loot on the session
+        /// of whoever sent the acknowledgement, and writes it to the base. So one player was paid
+        /// another's fight, and the owner never got his end screen.
         /// </summary>
         public int FinPendiente { get; set; }
 
-        /// <summary>Los que ya se han roto. Se avisa una vez y no se vuelve a mirar.</summary>
+        /// <summary>
+        /// What <see cref="FinPendiente"/> holds when the end waits for the client's jwz, not for
+        /// the jti of a sequence of its own: a monster's blows are not the client's to acknowledge,
+        /// and no jti reaches this number.
+        /// </summary>
+        public const int WaitsForTheJwz = int.MaxValue;
+
+        /// <summary>The ones already broken. It is reported once and not looked at again.</summary>
         public HashSet<int> ChallengesBroken { get; } = new HashSet<int>();
 
-        /// <summary>Dónde y con cuántos PM empezó su turno el que lo tiene ahora.</summary>
+        /// <summary>Where and with how many MP whoever has the turn now started it.</summary>
         public int TurnStartCell { get; set; }
         public int TurnStartMp { get; set; }
 
@@ -1124,41 +1140,41 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public int TurnTackledMp { get; set; }
 
-        /// <summary>A quién hay que rematar antes de pegarle a otro (retos 31 y 32).</summary>
+        /// <summary>Whom to finish off before hitting another (challenges 31 and 32).</summary>
         public long ChallengeFocus { get; set; }
 
-        /// <summary>El nivel del último enemigo que cayó, para el orden de muertes.</summary>
+        /// <summary>The level of the last enemy that fell, for the order of deaths.</summary>
         public int LastKilledLevel { get; set; } = -1;
 
-        /// <summary>Los hechizos ya usados en TODO el combate, para el Ahorrador.</summary>
+        /// <summary>The spells already used in the WHOLE fight, for the Ahorrador.</summary>
         public HashSet<int> SpellsEverUsed { get; } = new HashSet<int>();
 
-        /// <summary>Quiénes han rematado a alguien, para el Reparto.</summary>
+        /// <summary>Who has finished someone off, for the Reparto.</summary>
         public HashSet<long> Killers { get; } = new HashSet<long>();
 
-        /// <summary>El elemento con el que se pegó la primera vez, para el Elemental. Cero, ninguno.</summary>
+        /// <summary>The element hit with the first time, for the Elemental. Zero, none.</summary>
         public int DamageElement { get; set; }
 
-        /// <summary>Enemigos a los que se ha pegado y siguen vivos, para el Blitzkrieg.</summary>
+        /// <summary>Enemies that have been hit and are still alive, for the Blitzkrieg.</summary>
         public HashSet<long> Wounded { get; } = new HashSet<long>();
 
         /// <summary>
-        /// A quién señala cada reto: reto → luchador. Hay retos que exigen matar a uno concreto
-        /// el primero, o el último, o concentrarle los ataques, y ese «uno concreto» lo elige el
-        /// servidor y se lo dice al cliente para que le ponga la marca encima.
+        /// Whom each challenge points at: challenge → fighter. There are challenges that demand killing a specific one
+        /// first, or last, or concentrating the attacks on him, and that «specific one» is chosen by the
+        /// server and told to the client so it puts the mark on him.
         /// </summary>
         public Dictionary<int, long> ChallengeTargets { get; } = new Dictionary<int, long>();
 
-        /// <summary>Quién atacó primero a cada enemigo, para el Duelo.</summary>
+        /// <summary>Who attacked each enemy first, for the Duelo.</summary>
         public Dictionary<long, long> FirstAttacker { get; } = new Dictionary<long, long>();
 
-        /// <summary>En qué ronda cayó cada enemigo, para el Dum.</summary>
+        /// <summary>In which round each enemy fell, for the Dum.</summary>
         public Dictionary<long, int> KilledOnRound { get; } = new Dictionary<long, int>();
 
-        /// <summary>Dónde ha rematado a alguien el que juega, para el Conquistador.</summary>
+        /// <summary>Where the one playing has finished someone off, for the Conquistador.</summary>
         public HashSet<int> KillCells { get; } = new HashSet<int>();
 
-        /// <summary>De dónde salió cada jugador al entrar en combate, para devolverlo ahí.</summary>
+        /// <summary>Where each player came from on entering the fight, to return him there.</summary>
         public Dictionary<long, (long Mapa, int Casilla)> DeDondeVenian { get; }
             = new Dictionary<long, (long, int)>();
         public bool StartsNewRound { get; private set; } = false;
@@ -1168,9 +1184,9 @@ namespace Jondo.Unity.World.Fights
             CancelTurnTimer();
             StartsNewRound = false;
 
-            // Aquí es donde cambia el turno de verdad, así que aquí se vacían los contadores. Antes
-            // se vaciaban en ResetTurnCastCounters, que sólo llama HandleTurnReadyAck, que no llama
-            // nadie: eran la única prueba escrita de una intención que no se cumplía.
+            // This is where the turn really changes, so this is where the counters are emptied. Before,
+            // they were emptied in ResetTurnCastCounters, which only HandleTurnReadyAck calls, which nobody
+            // calls: they were the only written proof of an intention that was not fulfilled.
             CastsThisTurn.Clear();
             CastsPerTargetThisTurn.Clear();
             CheckFightEnd();
@@ -1186,9 +1202,9 @@ namespace Jondo.Unity.World.Fights
                     RoundNumber++;
                     StartsNewRound = true;
 
-                    // Los escudos que ya cumplieron se caen aquí, con el cambio de ronda. Si no
-                    // se caducan, un escudo de dos rondas se queda puesto hasta el final del
-                    // combate y no se nota: sólo se ve en que el jugador aguanta de más.
+                    // The shields that have run their course drop here, with the change of round. If they do not
+                    // expire, a two-round shield stays on until the end of the
+                    // fight and it is not noticed: it only shows in the player holding out too long.
                     foreach (var quien in Azul) quien?.CaducarElEscudo(RoundNumber);
                     foreach (var quien in Rojo) quien?.CaducarElEscudo(RoundNumber);
                 }
@@ -1224,9 +1240,9 @@ namespace Jondo.Unity.World.Fights
 
         public void CheckFightEnd()
         {
-            // Los invocados NO cuentan para saber si un bando sigue en pie: matar la baliza del
-            // rival no gana un combate. Cuando el que las puso se muere se le caen todas en el
-            // acto, así que en la práctica esto es un cinturón además de los tirantes.
+            // Summons do NOT count for knowing whether a side is still standing: killing the rival's
+            // beacon does not win a fight. When whoever placed them dies they all drop on the
+            // spot, so in practice this is a belt on top of the braces.
             bool team0Alive = Azul.Any(f => f.IsAlive && !f.EsInvocado);
             bool team1Alive = Rojo.Any(f => f.IsAlive && !f.EsInvocado);
 

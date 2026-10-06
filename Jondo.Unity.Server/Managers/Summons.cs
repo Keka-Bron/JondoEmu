@@ -7,21 +7,21 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Lo que hay que saber de un bicho invocado: de dónde sale su aspecto, su vida, sus
-    /// resistencias y —lo importante— el hechizo con el que se porta.
+    /// What has to be known about a summoned creature: where its look comes from, its life, its
+    /// resistances and —the important part— the spell it behaves with.
     ///
-    /// Todo sale de <c>MonsterTemplates</c>. La cadena entera es de datos, sin una sola invocación
-    /// escrita a mano:
+    /// Everything comes from <c>MonsterTemplates</c>. The whole chain is data, without a single summon
+    /// written by hand:
     ///
-    ///   el hechizo trae un efecto 181 "Invoca: #1" con la PLANTILLA en su diceNum
-    ///   -> MonsterTemplates.Data.grades[grado] da vida, PA, PM y resistencias
-    ///   -> ese grado trae un startingSpellId, que es un SpellLevels.Id
-    ///   -> ese nivel pertenece a un hechizo, y ESE es el que gobierna al invocado
+    ///   the spell brings a 181 effect "Invoca: #1" with the TEMPLATE in its diceNum
+    ///   -> MonsterTemplates.Data.grades[grade] gives life, AP, MP and resistances
+    ///   -> that grade brings a startingSpellId, which is a SpellLevels.Id
+    ///   -> that level belongs to a spell, and THAT is the one governing the summon
     ///
-    /// Para la Baliza de Supervivencia del Ocra: efecto 181 con diceNum 8348, la plantilla 8348
-    /// grado 3 tiene startingSpellId 85285, que es el hechizo 32477 grado 1, y sus efectos son
-    /// enganches 792 —"al empezar mi turno lanza mi grado 2"— más un 141 que la deshace. Es la
-    /// misma maquinaria de las actitudes que regalan los dofus.
+    /// For the Cra's Baliza de Supervivencia: effect 181 with diceNum 8348, template 8348
+    /// grade 3 has startingSpellId 85285, which is spell 32477 grade 1, and its effects are
+    /// 792 hooks —"at the start of my turn cast my grade 2"— plus a 141 that undoes it. It is the
+    /// same machinery as the attitudes the dofus give away.
     /// </summary>
     public sealed class Summon
     {
@@ -29,15 +29,15 @@ namespace Jondo.Unity.Server.Managers
         public int Grado { get; init; }
         public int Nivel { get; init; }
 
-        /// <summary>La cadena de aspecto, y de qué plantilla se ha sacado.</summary>
+        /// <summary>The look string, and which template it was taken from.</summary>
         public string Look { get; init; } = "";
         public int PlantillaDelAspecto { get; init; }
 
         public int Vida { get; init; }
 
         /// <summary>
-        /// La vida que NO escala con el nivel del que invoca: la del propio grado del monstruo.
-        /// Un monstruo invocado la trae aqui y con el bonus a cero; una baliza de jugador al reves.
+        /// The life that does NOT scale with the summoner's level: the monster's own grade's.
+        /// A summoned monster brings it here with the bonus at zero; a player's beacon the other way round.
         /// </summary>
         public int VidaFija { get; init; }
         public int PuntosDeAccion { get; init; }
@@ -49,7 +49,23 @@ namespace Jondo.Unity.Server.Managers
         public int ResistenciaAgua { get; init; }
         public int ResistenciaAire { get; init; }
 
-        /// <summary>El hechizo que gobierna al bicho, y en qué grado.</summary>
+        /// <summary>
+        /// The grade's four characteristics (<c>strength</c>, <c>intelligence</c>, <c>chance</c>,
+        /// <c>agility</c>) and its <c>bonusCharacteristics</c> ones, and the best of its bonus
+        /// damages: what <see cref="CaracteristicaDelInvocado"/> and
+        /// <see cref="PotenciaDelInvocado"/> make of them at the summoner's level.
+        /// </summary>
+        public int Fuerza { get; init; }
+        public int Inteligencia { get; init; }
+        public int Suerte { get; init; }
+        public int Agilidad { get; init; }
+        public int BonusFuerza { get; init; }
+        public int BonusInteligencia { get; init; }
+        public int BonusSuerte { get; init; }
+        public int BonusAgilidad { get; init; }
+        public int BonusDeDanos { get; init; }
+
+        /// <summary>The spell that governs the creature, and at which grade.</summary>
         public int HechizoPropio { get; init; }
         public int GradoDelHechizoPropio { get; init; }
 
@@ -98,21 +114,48 @@ namespace Jondo.Unity.Server.Managers
         private static readonly object _candado = new object();
 
         /// <summary>
-        /// La escala con la que crece la vida de un invocado según el nivel del que lo invoca.
+        /// The scale a summon's life grows with according to the summoner's level.
         ///
-        /// Medido sobre las 18 invocaciones que hay en TODAS las capturas, de seis lanzadores
-        /// distintos: la vida es siempre <c>bonusCharacteristics.lifePoints</c> del grado por un
-        /// factor que sólo depende del que invoca —17 de las 18 dan 10,5 exacto y la restante,
-        /// de otro jugador, da 8,75—. Con <c>(nivel + 10) / 20</c> salen los dos con niveles
-        /// enteros: 200 y 165.
+        /// Measured over the 18 summons there are in ALL the captures, from six different
+        /// casters: the life is always the grade's <c>bonusCharacteristics.lifePoints</c> times a
+        /// factor that only depends on the summoner —17 of the 18 give exactly 10.5 and the remaining one,
+        /// from another player, gives 8.75—. With <c>(level + 10) / 20</c> both come out with whole
+        /// levels: 200 and 165.
         ///
-        /// Comprobado en: baliza 8348 grado 3 con bonus 100 -> 1050; baliza 8347 grado 2 con
-        /// bonus 200 -> 2100; 262 con 60 -> 630; 246 con 30 -> 315; 7220 con 70 -> 735.
+        /// Checked on: beacon 8348 grade 3 with bonus 100 -> 1050; beacon 8347 grade 2 with
+        /// bonus 200 -> 2100; 262 with 60 -> 630; 246 with 30 -> 315; 7220 with 70 -> 735.
         /// </summary>
         public static int VidaDelInvocado(int bonusDeVida, int nivelDelInvocador, int vidaFija = 0)
             => vidaFija + (int)(bonusDeVida * (Math.Max(1, nivelDelInvocador) + 10) / 20.0);
 
-        // ─── Cuánto vive ────────────────────────────────────────────────────────
+        /// <summary>
+        /// A summon's characteristic at its summoner's level: the grade's own, times one plus a
+        /// hundredth of the level, and its bonus on top as it is.
+        /// </summary>
+        /// <remarks>
+        /// Measured on the sheets the real server sends with every summon (the jwe 181), summoners
+        /// of level 200: the grade's 300 comes out 900 -- Aniripsa's 7370, Hipermago's 5129, the
+        /// Ocra's 2630 --, 220 comes out 660 (246, 262), 400 and 200 come out 1,200 and 600 (the
+        /// Sacrógrito's sword 434), 135 comes out 405 (5845), 350 and 100 come out 1,050 and 300
+        /// (5898), 250 comes out 750 (5840). The Osamodas' animals carry theirs in the bonus only
+        /// and it comes out as it is: the Tofu's 50 of agility is 50, the 75 and 100 of the
+        /// others 75 and 100. They were all zero here, and a JondoBot Osamodas' Tofu pecked for ten.
+        /// </remarks>
+        public static int CaracteristicaDelInvocado(int propia, int bonus, int nivelDelInvocador)
+            => propia * (100 + Math.Max(1, nivelDelInvocador)) / 100 + bonus;
+
+        /// <summary>
+        /// A summon's power: three fifths of the grade's bonus damage.
+        /// </summary>
+        /// <remarks>
+        /// The Osamodas' animals, on the same sheets: 50 of air damage make 30 of power (the Tofu
+        /// 8070), 75 make 45 (8071), 100 make 60 (8078) -- the twelve of them alike. The
+        /// Aniripsa's flask (7371, 100 of earth damage) shows none in its one capture, of another
+        /// player: it goes by what the animals say.
+        /// </remarks>
+        public static int PotenciaDelInvocado(int bonusDeDanos) => bonusDeDanos * 3 / 5;
+
+        // ─── How long it lives ──────────────────────────────────────────────────
         //
         // Nothing here any more: how long a summon lives is the DELAY of the 141 its own spell
         // hangs on it at birth -- two rounds for the Baliza de Supervivencia, three for the
@@ -155,25 +198,33 @@ namespace Jondo.Unity.Server.Managers
                 if (elegido == null) return null;
                 var gr = elegido.Value;
 
-                // LA VIDA SON DOS NÚMEROS, y leer sólo uno dejaba a media invocación en cero.
+                // LIFE IS TWO NUMBERS, and reading only one left half the summons at zero.
                 //
-                // Toda esta tubería se escribió midiendo invocaciones de JUGADOR —las balizas del
-                // Ocra, las tortugas del Steamer, los cofres del Anutrof— y ésas llevan la vida en
-                // «bonusCharacteristics.lifePoints», que escala con el nivel del que invoca.
+                // This whole pipeline was written measuring PLAYER summons —the Cra's
+                // beacons, the Steamer's turtles, the Enutrof's chests— and those carry their life in
+                // «bonusCharacteristics.lifePoints», which scales with the summoner's level.
                 //
-                // Un MONSTRUO invocado la lleva en el «lifePoints» del grado, a secas, y tiene el
-                // bonus a cero. El «Regalo animado» del Minotobola de Nawidad tiene 1000, 1500 y
-                // 2000 según el grado, y bonus 0: leyendo sólo el bonus salía con CERO de vida.
+                // A summoned MONSTER carries it in the grade's «lifePoints», plain, and has the
+                // bonus at zero. Nawidad's Minotobola's «Regalo animado» has 1000, 1500 and
+                // 2000 depending on the grade, and bonus 0: reading only the bonus it came out with ZERO life.
                 //
-                // Y de ahí caía todo lo demás en cascada, porque IsAlive es «CurrentHP > 0»: el
-                // globo pintaba 0/0, no entraba en el orden de turnos, no salía en el carrusel, no
-                // ocupaba casilla —se podía andar a través de él— y no hacía nada.
+                // And from there everything else fell in cascade, because IsAlive is «CurrentHP > 0»: the
+                // balloon showed 0/0, did not enter the turn order, did not appear in the carousel, did not
+                // take up a cell —one could walk through it— and did nothing.
                 int vidaFija = Math.Max(0, Entero(gr, "lifePoints"));
-                int bonusVida = 0;
+                int bonusVida = 0, bonusFuerza = 0, bonusInteligencia = 0, bonusSuerte = 0, bonusAgilidad = 0, bonusDanos = 0;
                 if (gr.TryGetProperty("bonusCharacteristics", out var bonus))
+                {
                     bonusVida = Entero(bonus, "lifePoints");
+                    bonusFuerza = Entero(bonus, "strength");
+                    bonusInteligencia = Entero(bonus, "intelligence");
+                    bonusSuerte = Entero(bonus, "chance");
+                    bonusAgilidad = Entero(bonus, "agility");
+                    bonusDanos = Math.Max(Math.Max(Entero(bonus, "bonusEarthDamage"), Entero(bonus, "bonusFireDamage")),
+                                          Math.Max(Entero(bonus, "bonusWaterDamage"), Entero(bonus, "bonusAirDamage")));
+                }
 
-                // El hechizo con el que se porta: el startingSpellId es un SpellLevels.Id.
+                // The spell it behaves with: the startingSpellId is a SpellLevels.Id.
                 int nivelDelHechizo = Entero(gr, "startingSpellId");
                 var (hechizo, gradoDelHechizo) = HechizoDe(conexion, nivelDelHechizo);
 
@@ -188,8 +239,8 @@ namespace Jondo.Unity.Server.Managers
                     Nivel = Math.Max(1, Entero(gr, "level")),
                     Look = look,
                     PlantillaDelAspecto = deQuien,
-                    // La vida se deja en bruto: quien invoca sabe su nivel y escala la parte que
-                    // escala. La fija no escala con nadie.
+                    // The life is left raw: the summoner knows his level and scales the part that
+                    // scales. The fixed one scales with nobody.
                     Vida = bonusVida,
                     VidaFija = vidaFija,
                     PuntosDeAccion = Math.Max(0, Entero(gr, "actionPoints")),
@@ -199,6 +250,15 @@ namespace Jondo.Unity.Server.Managers
                     ResistenciaFuego = Entero(gr, "fireResistance"),
                     ResistenciaAgua = Entero(gr, "waterResistance"),
                     ResistenciaAire = Entero(gr, "airResistance"),
+                    Fuerza = Math.Max(0, Entero(gr, "strength")),
+                    Inteligencia = Math.Max(0, Entero(gr, "intelligence")),
+                    Suerte = Math.Max(0, Entero(gr, "chance")),
+                    Agilidad = Math.Max(0, Entero(gr, "agility")),
+                    BonusFuerza = Math.Max(0, bonusFuerza),
+                    BonusInteligencia = Math.Max(0, bonusInteligencia),
+                    BonusSuerte = Math.Max(0, bonusSuerte),
+                    BonusAgilidad = Math.Max(0, bonusAgilidad),
+                    BonusDeDanos = Math.Max(0, bonusDanos),
                     HechizoPropio = hechizo,
                     GradoDelHechizoPropio = gradoDelHechizo,
                     Juega = juega,
@@ -264,9 +324,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El aspecto. Una plantilla puede remitir a otra: la de la baliza pone <c>{8152}</c>, que
-        /// no es una cadena de aspecto sino "mírale el aspecto a la 8152". Se sigue el rastro unas
-        /// pocas veces por si hay más de un salto.
+        /// The look. A template can refer to another: the beacon's says <c>{8152}</c>, which
+        /// is not a look string but "look at 8152's look". The trail is followed a
+        /// few times in case there is more than one hop.
         /// </summary>
         private static (string Look, int DeQuien) LookDe(SqliteConnection conexion, int plantilla, int vueltas)
         {
@@ -274,60 +334,60 @@ namespace Jondo.Unity.Server.Managers
             string look = TextoDe(conexion, "SELECT Look FROM MonsterTemplates WHERE Id = $id;", plantilla);
             if (string.IsNullOrEmpty(look)) return ("", plantilla);
 
-            // UN REENVÍO NO ES LO MISMO QUE UN ASPECTO DE VERDAD, y distinguirlos es todo esto.
+            // A REFERRAL IS NOT THE SAME AS A REAL LOOK, and telling them apart is what all this is about.
             //
-            // La cadena es «{hueso|pieles|colores|escala}». Hay tres formas y sólo dos de ellas
-            // mandan a otra plantilla:
+            // The string is «{bone|skins|colours|scale}». There are three forms and only two of them
+            // send to another template:
             //
-            //   {8152}                              reenvío pelado          -> seguir
-            //   {446|||120}                         reenvío con escala      -> seguir
-            //   {1|91,5239,4977|1=#FFFFFF,…|52}     el aspecto de verdad    -> parar aquí
+            //   {8152}                              bare referral           -> follow
+            //   {446|||120}                         referral with scale     -> follow
+            //   {1|91,5239,4977|1=#FFFFFF,…|52}     the real look           -> stop here
             //
-            // Lo que los separa son las pieles y los colores: un reenvío no trae ninguno. La
-            // versión anterior se quedaba con el primer número hubiera lo que hubiera detrás, y
-            // eso rompió la baliza del Ocra. Su rastro es 8348 -> «{8152}» -> «{1|91,…}», y al
-            // llegar ahí se leía el 1 como si fuera otra plantilla y se seguía hasta la 1, que es
-            // otro bicho cualquiera. El cliente se quedaba sin aspecto que dibujar y pintaba un
-            // cuadrado azul.
+            // What separates them are the skins and the colours: a referral brings none. The
+            // previous version kept the first number whatever came after it, and
+            // that broke the Cra's beacon. Its trail is 8348 -> «{8152}» -> «{1|91,…}», and on
+            // getting there the 1 was read as if it were another template and followed to template 1, which is
+            // some other creature. The client was left without a look to draw and drew a
+            // blue square.
             //
-            // Medido en «ocra-baliza de supervivencia»: su jwe manda «f3{f2=3, f3=8152}», o sea
-            // que hay que pararse en la 8152 y es su cadena la que vale.
-            // Y AQUI SE PARA, sin seguir el rastro. Lo que va en el paquete de invocacion es EL
-            // NUMERO DE DENTRO DE LAS LLAVES, no el aspecto al que apunte: medido en la captura
-            // de la Baliza de Supervivencia, cuya plantilla 8348 lleva «{8152}» y cuyo jwe manda
-            // f3{f2=8152}. El cliente resuelve el resto.
+            // Measured in «ocra-baliza de supervivencia»: its jwe sends «f3{f2=3, f3=8152}», that is
+            // one has to stop at 8152 and it is its string that counts.
+            // And HERE IT STOPS, without following the trail. What goes in the summon packet is THE
+            // NUMBER INSIDE THE BRACES, not the look it points to: measured in the capture
+            // of the Baliza de Supervivencia, whose template 8348 carries «{8152}» and whose jwe sends
+            // f3{f2=8152}. The client resolves the rest.
             //
-            // Seguirlo era lo que convertia a la Sismobomba en un fantasma. Su plantilla 5161
-            // lleva «{2865}», y da la casualidad de que 2865 ES otra plantilla -- el Ventozador --
-            // asi que el rastro acababa en su aspecto y el cliente pintaba un Ventozador. Las
-            // otras tres bombas se salvaban de milagro: sus numeros -- 1561, 1562, 1563 -- no son
-            // plantillas de nada, la busqueda no encontraba fila y se quedaba con el numero.
+            // Following it was what turned the Sismobomba into a ghost. Its template 5161
+            // carries «{2865}», and it so happens that 2865 IS another template -- the Ventozador --
+            // so the trail ended at its look and the client drew a Ventozador. The
+            // other three bombs were saved by a miracle: their numbers -- 1561, 1562, 1563 -- are not
+            // templates of anything, the lookup found no row and kept the number.
             if (EsReenvio(look, out int otra) && otra != plantilla)
             {
-                // DOS COSAS DISTINTAS QUE SE RESOLVIAN CON EL MISMO NUMERO, y ahi estaba el fallo.
+                // TWO DIFFERENT THINGS THAT WERE RESOLVED WITH THE SAME NUMBER, and that was the bug.
                 //
-                // La CADENA de aspecto sigue el rastro hasta el final, porque quien la dibuja
-                // -- el lanzador, el estudio -- necesita huesos, pieles y colores de verdad. Eso
-                // es lo que usa la forma bestial del ouginak.
+                // The look STRING follows the trail to the end, because whoever draws it
+                // -- the launcher, the studio -- needs real bones, skins and colours. That
+                // is what the ouginak's beast form uses.
                 //
-                // Pero lo que va en el PAQUETE de invocacion es el numero de dentro de las
-                // llaves, sin seguirlo: medido en la Baliza de Supervivencia, cuya plantilla 8348
-                // lleva «{8152}» y cuyo jwe manda f3{f2=8152}.
+                // But what goes in the summon PACKET is the number inside the
+                // braces, without following it: measured on the Baliza de Supervivencia, whose template 8348
+                // carries «{8152}» and whose jwe sends f3{f2=8152}.
                 //
-                // Seguirlo tambien para el paquete convertia a la Sismobomba en un fantasma: su
-                // «{2865}» apunta a otra plantilla de verdad -- el Ventozador -- y el cliente
-                // acababa pintando un Ventozador. Las otras tres bombas se salvaban de milagro,
-                // porque sus numeros -- 1561, 1562, 1563 -- no son plantillas de nada.
+                // Following it for the packet too turned the Sismobomba into a ghost: its
+                // «{2865}» points to another real template -- the Ventozador -- and the client
+                // ended up drawing a Ventozador. The other three bombs were saved by a miracle,
+                // because their numbers -- 1561, 1562, 1563 -- are not templates of anything.
                 var (cadena, _) = LookDe(conexion, otra, vueltas + 1);
                 return (cadena, otra);
             }
             return (look, plantilla);
         }
 
-        /// <summary>Si esta cadena de aspecto manda a otra plantilla, y a cuál.</summary>
+        /// <summary>Whether this look string sends to another template, and which one.</summary>
         /// <remarks>
-        /// Aparte para poder probarla con las cadenas de verdad de la base sin abrirla: es una
-        /// regla de tres casos y es donde se rompió la baliza.
+        /// Separate so it can be tested with the base's real strings without opening it: it is a
+        /// three-case rule and it is where the beacon broke.
         /// </remarks>
         internal static bool EsReenvio(string look, out int hacia)
         {

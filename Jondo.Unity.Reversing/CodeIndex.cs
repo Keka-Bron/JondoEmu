@@ -7,54 +7,54 @@ using LibCpp2IL;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// Qué código del cliente toca cada mensaje, y qué se le puede sacar a eso.
+/// Which client code touches each message, and what can be got out of that.
 ///
-/// ─── De dónde sale la señal ─────────────────────────────────────────────────────────────
+/// ─── Where the signal comes from ────────────────────────────────────────────────────────
 ///
-/// Ankama rota los nombres del protocolo, pero NO ofusca el cliente entero: lo que Unity necesita
-/// por nombre —los MonoBehaviour, los campos serializados, los espacios de nombres— se queda tal
-/// cual. Medido en 3.6.10.10: de <c>Core.dll</c> sobreviven 3.042 nombres de tipo, 15.759 de método
-/// y 19.930 de campo. Ahí hay clases que se llaman <c>RoleplayIntroductionService</c> o
-/// <c>SmithMagicCoopUi</c>, y lo que toquen dice de qué van.
+/// Ankama rotates the protocol's names, but it does NOT obfuscate the whole client: what Unity needs
+/// by name —the MonoBehaviours, the serialised fields, the namespaces— stays as
+/// it is. Measured in 3.6.10.10: of <c>Core.dll</c> 3,042 type names survive, 15,759 method
+/// and 19,930 field names. There are classes there called <c>RoleplayIntroductionService</c> or
+/// <c>SmithMagicCoopUi</c>, and what they touch says what they are about.
 ///
-/// Un mensaje se relaciona con el código por cuatro caminos, y se anotan los cuatro:
+/// A message relates to the code in four ways, and all four are noted:
 ///
-///   la firma      un método que recibe o devuelve el mensaje. Es el más limpio y no hace falta
-///                 mirar el cuerpo.
-///   la llamada    el ISIL trae el destino ya resuelto, así que se sabe a qué clase pertenece.
-///   el tipo       un uso de metadatos que apunta al tipo del mensaje.
-///   la dirección  lo que queda: una dirección cruda que hay que resolver contra la tabla de
-///                 métodos o contra los metadatos.
+///   the signature a method that receives or returns the message. It is the cleanest and there is no need
+///                 to look at the body.
+///   the call      the ISIL brings the target already resolved, so the class it belongs to is known.
+///   the type      a metadata use that points at the message's type.
+///   the address   what is left: a raw address that has to be resolved against the
+///                 method table or against the metadata.
 ///
-/// ─── Lo que esto da, medido ─────────────────────────────────────────────────────────────
+/// ─── What this gives, measured ──────────────────────────────────────────────────────────
 ///
-/// De los 2.169 mensajes de 3.6.10.10, a 1.598 (74 %) los toca algún método de fuera del protocolo.
-/// De ahí:
+/// Of the 2,169 messages of 3.6.10.10, 1,598 (74 %) are touched by some method outside the protocol.
+/// From there:
 ///
-///   102 (4,7 %)   llegan a un método cuyo NOMBRE se entiende. Arrastrar por el grafo de llamadas
-///                 casi no lo mejora, porque entre la red y la interfaz hay un bus de eventos, y un
-///                 bus no deja aristas que seguir.
-///   524 (24,2 %)  llegan a una clase con HERMANOS legibles, que es lo que de verdad rinde: cinco
-///                 veces más.
-///    23 (1,1 %)   tienen alguna cadena de texto cerca.
+///   102 (4.7 %)   reach a method whose NAME is understandable. Dragging through the call graph
+///                 barely improves it, because between the network and the interface there is an event bus, and a
+///                 bus leaves no edges to follow.
+///   524 (24.2 %)  reach a class with readable SIBLINGS, which is what really pays off: five
+///                 times more.
+///    23 (1.1 %)   have some text string nearby.
 ///
-/// Conviene decirlo claro, porque cambia el plan: esto NO es lo que hace Snowbot. Su código
-/// descompilado enseña que compara el cliente ofuscado contra un <c>gameassemblyNonObfu</c> —una
-/// compilación del cliente SIN ofuscar que ellos tienen y nosotros no—. De ahí sacan los nombres.
-/// Aquí lo que hay son dos versiones ofuscadas, así que este índice no bautiza mensajes: aporta
-/// unas pocas anclas muy buenas y, sobre todo, contexto para desempatar candidatos.
+/// It is worth saying plainly, because it changes the plan: this is NOT what Snowbot does. Its
+/// decompiled code shows that it compares the obfuscated client against a <c>gameassemblyNonObfu</c> —a
+/// build of the client WITHOUT obfuscation that they have and we do not—. That is where they get the names.
+/// Here what there is is two obfuscated versions, so this index does not name messages: it contributes
+/// a few very good anchors and, above all, context to break ties between candidates.
 /// </summary>
 public static class CodeIndex
 {
-    /// <summary>Un sitio del código donde se ve el mensaje.</summary>
+    /// <summary>A place in the code where the message is seen.</summary>
     public sealed record Sighting(string Method, string Assembly, string How, int Hops)
     {
-        /// <summary>Si el nombre dice algo, o es otra ristra de letras rotadas.</summary>
+        /// <summary>Whether the name says something, or is another string of rotated letters.</summary>
         [JsonIgnore]
         public bool Readable => Legible(Method);
     }
 
-    /// <summary>Todo lo que el código sabe de un mensaje.</summary>
+    /// <summary>Everything the code knows about a message.</summary>
     public sealed record Evidence(
         string Message,
         List<Sighting> Sightings,
@@ -68,17 +68,17 @@ public static class CodeIndex
     private const int MaxNearby = 25;
 
     /// <summary>
-    /// Lo que se le escapó al ofuscador dentro de una clase que sí renombró.
+    /// What escaped the obfuscator inside a class it did rename.
     ///
-    /// Ésta es la mejor vena del cliente, y no estaba a la vista. La clase <c>ehl</c> no dice nada,
-    /// pero conserva métodos llamados <c>WaitProcessMapComplementaryInfo</c> y
-    /// <c>WaitForDroppingObjects</c>; <c>fcf</c> conserva <c>get_roleplayEntitiesService</c> y
-    /// <c>get_partyService</c>. Son implementaciones de interfaz, accesores de campos serializados y
-    /// máquinas de estado de <c>async</c>, que Unity y el propio runtime necesitan por nombre.
+    /// This is the client's best vein, and it was not in sight. Class <c>ehl</c> says nothing,
+    /// but it keeps methods called <c>WaitProcessMapComplementaryInfo</c> and
+    /// <c>WaitForDroppingObjects</c>; <c>fcf</c> keeps <c>get_roleplayEntitiesService</c> and
+    /// <c>get_partyService</c>. They are interface implementations, accessors of serialised fields and
+    /// <c>async</c> state machines, which Unity and the runtime itself need by name.
     ///
-    /// Medido en <c>Core.dll</c>: 377 clases ofuscadas conservan al menos un nombre así. Un mensaje
-    /// que sólo lo toca <c>ehl::dsk</c> parece huérfano mirando el método; mirando a sus hermanos
-    /// resulta que vive en la clase que espera la información complementaria del mapa.
+    /// Measured in <c>Core.dll</c>: 377 obfuscated classes keep at least one name like that. A message
+    /// that only <c>ehl::dsk</c> touches looks orphaned looking at the method; looking at its siblings
+    /// it turns out it lives in the class that waits for the map's complementary information.
     /// </summary>
     private static List<string> Profile(TypeAnalysisContext type)
     {
@@ -88,9 +88,9 @@ public static class CodeIndex
         {
             if (name == null || names.Count >= 12) return;
 
-            // Los nombres que el compilador fabrica —<Algo>d__7, <Algo>b__0, <Algo>k__BackingField—
-            // llevan dentro el nombre original, que es justo lo que interesa. Van anidados unos
-            // dentro de otros (<<Algo>b__0>d), así que se coge el de más adentro.
+            // The names the compiler makes up —<Algo>d__7, <Algo>b__0, <Algo>k__BackingField—
+            // carry the original name inside, which is exactly what matters. They go nested one
+            // inside another (<<Algo>b__0>d), so the innermost one is taken.
             var inner = Compiler.Match(name);
             if (inner.Success) name = inner.Groups[1].Value;
             else if (name.Contains('<')) return;
@@ -98,8 +98,8 @@ public static class CodeIndex
             if (name.StartsWith("get_", StringComparison.Ordinal) ||
                 name.StartsWith("set_", StringComparison.Ordinal)) name = name[4..];
 
-            // La comprobación va DESPUÉS de desenvolver: <dpgd>k__BackingField tiene mayúsculas por
-            // fuera y nada dentro, y colaba el nombre rotado como si dijera algo.
+            // The check goes AFTER unwrapping: <dpgd>k__BackingField has capitals on the
+            // outside and nothing inside, and it slipped the rotated name in as if it said something.
             if (name.Length < 4 || !name.Any(char.IsUpper)) return;
             if (Boilerplate.Contains(name) || names.Contains(name)) return;
             names.Add(name);
@@ -113,11 +113,11 @@ public static class CodeIndex
 
     private static string Mensajes(int count) => count == 1 ? "1 mensaje" : $"{count} mensajes";
 
-    /// <summary>El nombre de verdad, dentro de los ángulos que le puso el compilador.</summary>
+    /// <summary>The real name, inside the angle brackets the compiler put on it.</summary>
     private static readonly System.Text.RegularExpressions.Regex Compiler =
         new(@"<([A-Za-z][A-Za-z0-9_]*)>", System.Text.RegularExpressions.RegexOptions.Compiled);
 
-    /// <summary>Lo que lleva cualquier clase y por tanto no distingue a ninguna.</summary>
+    /// <summary>What any class carries and therefore distinguishes none.</summary>
     private static readonly HashSet<string> Boilerplate = new(StringComparer.Ordinal)
     {
         "ToString", "Equals", "GetHashCode", "Dispose", "MoveNext", "SetStateMachine",
@@ -127,12 +127,12 @@ public static class CodeIndex
     };
 
     /// <summary>
-    /// Recorre el cliente entero y anota, mensaje a mensaje, quién lo toca.
+    /// Walks the whole client and notes, message by message, who touches it.
     ///
-    /// El barrido analiza los 366.413 métodos y suelta el análisis de cada uno en cuanto lo ha
-    /// leído: guardarlos todos se come la memoria y no hace falta, porque lo que interesa se resume
-    /// en el momento. Lo único que sobrevive al bucle son las aristas del grafo de llamadas, y ésas
-    /// van como índices enteros.
+    /// The sweep analyses the 366,413 methods and drops each one's analysis as soon as it has
+    /// read it: keeping them all eats the memory and is not needed, because what matters is summarised
+    /// on the spot. The only thing that survives the loop is the call graph's edges, and those
+    /// go as integer indices.
     /// </summary>
     public static Dictionary<string, Evidence> Build(ClientReader client, int hops = 2,
                                                      Action<string>? report = null)
@@ -154,7 +154,7 @@ public static class CodeIndex
         void Note(string? message, int method, string way)
         {
             if (message == null || !messages.Contains(message)) return;
-            if (methods[method].DeclaringType?.DeclaringAssembly == protocol) return;   // el propio mensaje no cuenta
+            if (methods[method].DeclaringType?.DeclaringAssembly == protocol) return;   // the message itself does not count
 
             if (!touches.TryGetValue(message, out var list)) touches[message] = list = new List<int>();
             if (!list.Contains(method)) list.Add(method);
@@ -207,9 +207,9 @@ public static class CodeIndex
             }
             catch
             {
-                // Un método que el levantador no sabe leer no vale la pena perseguirlo: son los de
-                // código nativo puro y los que Cpp2IL marca como no soportados. El resto del
-                // barrido no se entera.
+                // A method the lifter cannot read is not worth chasing: they are the
+                // pure native code ones and those Cpp2IL marks as unsupported. The rest of the
+                // sweep does not notice.
             }
             finally
             {
@@ -223,14 +223,14 @@ public static class CodeIndex
         {
             if (address <= 0x1_0000_0000) return;
 
-            // Una dirección nativa puede ser de muchos métodos a la vez: IL2CPP pliega los cuerpos
-            // idénticos y comparte el de los genéricos. Medido en este cliente: de 261.768
-            // direcciones, 24.227 las comparten dos o más métodos, y una de ellas la comparten
-            // 2.319. Quedarse con el primero de la lista es echarlo a suertes, y cuando toca un
-            // mensaje se le atribuye a quien no era: así acabó `jzd` —que no ha visto una fuente en
-            // su vida— con un expediente entero de TMP_FontAsset, y `heo` con uno de FileStream.
+            // A native address can belong to many methods at once: IL2CPP folds identical
+            // bodies and shares the generics' one. Measured on this client: of 261,768
+            // addresses, 24,227 are shared by two or more methods, and one of them is shared by
+            // 2,319. Keeping the first of the list is drawing lots, and when it touches a
+            // message it is attributed to the wrong one: that is how `jzd` —which has never seen a font in
+            // its life— ended up with a whole dossier of TMP_FontAsset, and `heo` with one of FileStream.
             //
-            // Si la dirección no señala a uno solo, no señala. Ni se anota ni se cuenta la arista.
+            // If the address does not point to a single one, it does not point. It is neither noted nor is the edge counted.
             if (client.App.MethodsByAddress.TryGetValue(address, out var found) && found.Count > 0)
             {
                 if (found.Count > 1) return;
@@ -267,7 +267,7 @@ public static class CodeIndex
 
         report?.Invoke($"  {touches.Count:N0} mensajes tocados desde fuera del protocolo");
 
-        // Quién llama a quién, del revés: para subir del mensaje hacia los nombres que se entienden.
+        // Who calls whom, reversed: to climb from the message to the names that are understandable.
         var callers = new List<int>[methods.Count];
         for (int i = 0; i < methods.Count; i++) callers[i] = new List<int>();
         for (int i = 0; i < methods.Count; i++)
@@ -279,7 +279,7 @@ public static class CodeIndex
             return $"{type?.FullName}::{methods[i].DefaultName}";
         }
 
-        // A cuántos mensajes llega cada clase. Es lo que separa una pista de un ruido.
+        // How many messages each class reaches. It is what separates a clue from noise.
         var reach = new Dictionary<TypeAnalysisContext, HashSet<string>>();
         for (int i = 0; i < methods.Count; i++)
         {
@@ -308,8 +308,8 @@ public static class CodeIndex
                 front = next;
             }
 
-            // Lo legible primero y lo más cercano antes: es lo que se le va a enseñar al modelo, y
-            // en un expediente lo que va arriba es lo que se lee.
+            // The readable first and the closest before: it is what is going to be shown to the model, and
+            // in a dossier what goes at the top is what gets read.
             var sightings = seen
                 .Select(p => new Sighting(Label(p.Key),
                                           methods[p.Key].DeclaringType?.DeclaringAssembly?.Definition?.AssemblyName.Name ?? "?",
@@ -321,13 +321,13 @@ public static class CodeIndex
                 .Take(MaxSightings)
                 .ToList();
 
-            // Los hermanos que se le escaparon al ofuscador, de los más cercanos a los más lejanos.
+            // The siblings that slipped past the obfuscator, from the closest to the furthest.
             //
-            // Con cuántos mensajes comparte cada clase va DENTRO de la línea, y no es adorno: una
-            // clase que toca quince mensajes no distingue a ninguno de los quince. Sin ese número,
-            // «eqq: PresetListEventWhenCharacterInfo» hizo que dos mensajes distintos —el de las
-            // barras de atajos y el de los conjuntos del guardarropa— se llamaran los dos
-            // PresetsMessage. Con el número puesto, esa pista se lee como lo que es.
+            // How many messages each class shares goes INSIDE the line, and it is not decoration: a
+            // class that touches fifteen messages distinguishes none of the fifteen. Without that number,
+            // «eqq: PresetListEventWhenCharacterInfo» made two different messages —the one for the
+            // shortcut bars and the one for the wardrobe outfits— both be called
+            // PresetsMessage. With the number in place, that clue reads as what it is.
             var context = new List<string>();
             var already = new HashSet<TypeAnalysisContext>();
             foreach (var (i, hop) in seen.OrderBy(p => p.Value).Select(p => (p.Key, p.Value)))
@@ -335,19 +335,19 @@ public static class CodeIndex
                 var type = methods[i].DeclaringType;
                 if (type == null || type.DeclaringAssembly == protocol) continue;
 
-                // Una clase, una línea, la de más cerca. La misma clase puede aparecer tocando el
-                // mensaje Y llamando a quien lo toca, y repetirla cambiando sólo los saltos llena
-                // el expediente de ecos.
+                // One class, one line, the closest one. The same class can appear touching the
+                // message AND calling whoever touches it, and repeating it changing only the hops fills
+                // the dossier with echoes.
                 if (!already.Add(type)) continue;
                 if (!profiles.TryGetValue(type, out var names))
                     profiles[type] = names = Profile(type);
                 if (names.Count == 0) continue;
 
-                // «Sólo a éste» sólo se puede decir de una clase que TOCA el mensaje. Las que
-                // llegan por arrastre no están en la cuenta de alcance —ahí sólo entran las que
-                // tocan— y con el valor por defecto puesto a uno salían todas marcadas como la
-                // pista más fuerte del expediente siendo la más floja: 32 casos en el índice, con
-                // ocho clases de Mono.CSharp señalando con el dedo a un mensaje del protocolo.
+                // «Only this one» can only be said of a class that TOUCHES the message. Those that
+                // arrive by dragging are not in the reach count —only those that
+                // touch go in there— and with the default value set to one they all came out marked as the
+                // strongest clue of the dossier while being the weakest: 32 cases in the index, with
+                // eight Mono.CSharp classes pointing the finger at a protocol message.
                 int shared = reach.GetValueOrDefault(type)?.Count ?? 0;
                 string cuantos = hop > 0
                     ? $"a {Mensajes(shared)}, y a éste sólo de refilón, a {hop} salto{(hop == 1 ? "" : "s")}"
@@ -365,8 +365,8 @@ public static class CodeIndex
                 .Take(MaxStrings)
                 .ToList();
 
-            // Los mensajes que se manejan al lado de éste. Un mensaje solo no dice nada; un mensaje
-            // que sale siempre con otros tres es una escena.
+            // The messages handled next to this one. A message alone says nothing; a message
+            // that always comes out with three others is a scene.
             var nearby = (touches.GetValueOrDefault(message) ?? new List<int>())
                 .Select(i => touchedBy[i])
                 .Where(s => s != null)
@@ -392,12 +392,12 @@ public static class CodeIndex
     }
 
     /// <summary>
-    /// Si un nombre dice algo o es otra ristra rotada.
+    /// Whether a name says something or is another rotated string.
     ///
-    /// Ankama reparte nombres de dos a cuatro letras minúsculas. Cualquier cosa con mayúsculas
-    /// dentro y de cuatro letras para arriba se le escapó al ofuscador, y ésos son los que valen.
-    /// Se mira el método, su clase y el último tramo del espacio de nombres: <c>bacr</c> no dice
-    /// nada, pero <c>Core.Services.Roleplay.RoleplayIntroductionService::bacr</c> sí.
+    /// Ankama hands out names of two to four lowercase letters. Anything with capitals
+    /// inside and four letters or more slipped past the obfuscator, and those are the ones that count.
+    /// The method, its class and the last stretch of the namespace are looked at: <c>bacr</c> says
+    /// nothing, but <c>Core.Services.Roleplay.RoleplayIntroductionService::bacr</c> does.
     /// </summary>
     public static bool Legible(string label)
     {

@@ -7,16 +7,16 @@ using Avalonia.Media;
 namespace Jondo.Unity.Launcher.UI.Widgets
 {
     /// <summary>
-    /// Texto con las letras separadas, que es el <c>letter-spacing</c> de la hoja de estilos.
+    /// Text with the letters spaced out, which is the style sheet's <c>letter-spacing</c>.
     /// </summary>
     /// <remarks>
-    /// Ni GDI+ ni Avalonia lo traen de serie, asi que las letras se pintan de una en una. Es el
-    /// mismo apano que hacia DrawSpacedText en la version de Windows Forms y por la misma razon:
-    /// las pestanas y los botones de accion del lanzador van espaciados, y sin esto se ven
-    /// apretados y dejan de parecer los de antes.
+    /// Neither GDI+ nor Avalonia bring it out of the box, so the letters are painted one by one. It is the
+    /// same workaround DrawSpacedText did in the Windows Forms version and for the same reason:
+    /// the launcher's tabs and action buttons are spaced, and without this they look
+    /// cramped and stop looking like the earlier ones.
     ///
-    /// Con separacion cero se pinta de una sola vez a proposito: partirlo letra a letra mueve los
-    /// caracteres por el redondeo a pixel, y se nota en los textos largos.
+    /// With zero spacing it is painted in one go on purpose: splitting it letter by letter moves the
+    /// characters through pixel rounding, and it shows in long texts.
     /// </remarks>
     internal sealed class SpacedText : Control
     {
@@ -29,7 +29,7 @@ namespace Jondo.Unity.Launcher.UI.Widgets
         public static readonly StyledProperty<IBrush?> ForegroundProperty =
             AvaloniaProperty.Register<SpacedText, IBrush?>(nameof(Foreground));
 
-        /// <summary>La sombra de debajo, que en la web era el text-shadow de los botones.</summary>
+        /// <summary>The shadow underneath, which on the website was the buttons' text-shadow.</summary>
         public static readonly StyledProperty<bool> ShadowProperty =
             AvaloniaProperty.Register<SpacedText, bool>(nameof(Shadow));
 

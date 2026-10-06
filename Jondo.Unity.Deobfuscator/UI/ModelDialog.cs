@@ -7,25 +7,25 @@ using Jondo.Unity.Reversing;
 namespace Jondo.Unity.Deobfuscator.UI;
 
 /// <summary>
-/// A qué modelo se le pregunta, y con qué clave.
+/// Which model is asked, and with what key.
 ///
-/// Está detrás de un botón y no en la pantalla principal porque la mayor parte del trabajo no lo
-/// necesita: la estructura resuelve el grueso sin conectarse a nada. El modelo hace falta sólo para
-/// las dudas, y hay quien preferirá no gastar en eso.
+/// It is behind a button and not on the main screen because most of the work does not
+/// need it: the structure resolves the bulk without connecting to anything. The model is only needed for
+/// the doubts, and some will prefer not to spend on that.
 ///
-/// ─── Tres decisiones que se notan al usarlo ─────────────────────────────────────────────
+/// ─── Three decisions that show when using it ────────────────────────────────────────────
 ///
-/// Los proveedores son atajos, no una lista cerrada: elegir «Claude» rellena dirección y dialecto,
-/// pero los dos campos siguen siendo editables, y «Otro» acepta cualquier servidor que hable como
-/// OpenAI, que a estas alturas es casi cualquiera.
+/// The providers are shortcuts, not a closed list: choosing «Claude» fills in address and dialect,
+/// but both fields are still editable, and «Otro» accepts any server that speaks like
+/// OpenAI, which by now is almost any.
 ///
-/// El modelo NO se escribe a mano si se puede evitar. <b>Probar</b> le pregunta al proveedor qué
-/// modelos tiene y llena la lista, con lo que se comprueban de una vez la dirección, la clave y el
-/// nombre del modelo —los tres sitios donde se falla— aquí y no en mitad de un barrido.
+/// The model is NOT typed by hand if it can be avoided. <b>Probar</b> asks the provider which
+/// models it has and fills the list, which checks in one go the address, the key and the
+/// model's name —the three places where things fail— here and not in the middle of a sweep.
 ///
-/// La clave se guarda por proveedor y cifrada contra la cuenta de Windows, en
-/// <c>%APPDATA%\Jondo\</c>. Nunca en el repositorio: no hay ninguna ruta de código que la escriba
-/// dentro de la carpeta del emulador.
+/// The key is stored per provider and encrypted against the Windows account, in
+/// <c>%APPDATA%\Jondo\</c>. Never in the repository: there is no code path that writes it
+/// inside the emulator's folder.
 /// </summary>
 internal sealed class ModelDialog : Form, IBackgroundWindow
 {
@@ -204,8 +204,8 @@ internal sealed class ModelDialog : Form, IBackgroundWindow
 
     private void Pick(Provider provider)
     {
-        // Lo escrito en la clave se guarda ANTES de cambiar: la clave es por proveedor, y si no se
-        // perdería la de Claude en cuanto uno probara Gemini un rato.
+        // What is typed in the key is stored BEFORE changing: the key is per provider, and otherwise
+        // Claude's would be lost as soon as one tried Gemini for a while.
         _settings.Key = _key.Value;
         _settings.Use(provider);
 

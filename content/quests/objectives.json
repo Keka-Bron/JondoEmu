@@ -2,23 +2,23 @@
  "_comment": [
   "What finishes a free-text quest objective. Ankama's catalogue does not say.",
   "",
-  "5.670 de los 15.547 objetivos del juego son de tipo 0: el cliente los llama '#1' y les pone",
-  "una frase, 'Examiner la stele d'un vestige dans les paturages'. Ni mapa, ni elemento, ni",
-  "objeto. Eso lo decidia el servidor de Ankama y nunca salio de ahi. Tampoco lo dice el",
-  "cliente: en las 401 capturas hay 16 tramas idw -el cliente diciendo que un objetivo esta",
-  "hecho- y las 16 son del tutorial.",
+  "5,670 of the game's 15,547 objectives are type 0: the client calls them '#1' and gives them",
+  "a sentence, 'Examiner la stele d'un vestige dans les paturages'. No map, no element, no",
+  "item. Ankama's server decided that and it never left it. Nor does the client say it:",
+  "in the 401 captures there are 16 idw frames -the client saying an objective is",
+  "done- and all 16 are from the tutorial.",
   "",
-  "Asi que esta es la union, y es contenido. Cada fila dice: este objetivo lo cierra pinchar",
-  "este elemento en este mapa. Se comprueba con tools/check_quest_bindings.py, que exige que",
-  "el objetivo exista, que sea del tipo que no se cierra solo, que pertenezca a la mision que",
-  "la fila nombra, y que el elemento este de verdad en el mapa que dice.",
+  "So this is the link, and it is content. Each row says: this objective is closed by clicking",
+  "this element on this map. It is checked with tools/check_quest_bindings.py, which requires",
+  "the objective to exist, to be of the kind that does not close by itself, to belong to the quest",
+  "the row names, and the element to really be on the map it says.",
   "",
-  "'elements' es una LISTA porque los objetivos hablan de 'un vestige', no de 'le vestige':",
-  "donde hay varios en la misma subzona vale cualquiera, y atar uno solo mandaria al que",
-  "pincho el otro a cruzar la subzona sin saber por que.",
+  "'elements' is a LIST because the objectives talk about 'un vestige', not 'le vestige':",
+  "where there are several in the same subarea any of them will do, and tying only one would send whoever",
+  "clicked the other one across the subarea without knowing why.",
   "",
-  "skill 114 es 'Utiliser', la generica del cliente. type -1 es lo que las capturas declaran",
-  "para estos elementos: el grafico 3518 sale 32 veces y lleva -1 las 32."
+  "skill 114 is 'Utiliser', the client's generic one. type -1 is what the captures declare",
+  "for these elements: graphic 3518 shows up 32 times and carries -1 all 32."
  ],
  "bindings": [
   {
@@ -26,7 +26,7 @@
    "quest": 1629,
    "kind": "enter",
    "map": 241440769,
-   "why": "«Entrer dans la salle des métiers». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Entrer dans la salle des métiers». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 9769,
@@ -49,7 +49,7 @@
     "monster": 4113,
     "count": 1
    },
-   "why": "«Haz salir a la rata de su escondite». Mismo elemento que el 9895, el unico prop del sotano; el orden lo impone la limonada, que este pide y aquel no. La Limonada de Incarnam es el objeto 8543 y los textos 534963 y 534964 cuentan la escena: marcas de dientes en el grifo, y el vaso puesto encima del tonel. La Rata Nsiosa (4113) esta en CERO grupos del mundo porque su sitio es este."
+   "why": "«Haz salir a la rata de su escondite». The same element as 9895, the cellar's only prop; the order is imposed by the lemonade, which this one asks for and that one does not. The Limonada de Incarnam is item 8543 and texts 534963 and 534964 tell the scene: tooth marks on the tap, and the glass set on top of the barrel. The Rata Nsiosa (4113) is in ZERO groups of the world because this is its place."
   },
   {
    "objective": 9895,
@@ -61,14 +61,14 @@
      "element": 489505
     }
    ],
-   "why": "«Inspecciona el sotano». El sotano tiene dos elementos y el otro, el 488963, es la ESCALERA: el volcado de teletransportes lo declara como paso a 153357316, asi que atarlo aqui habria cerrado el objetivo al subir. El 489505 es el unico prop de verdad, y su dibujo (701195) no sale en ningun otro mapa del juego."
+   "why": "«Inspecciona el sotano». The cellar has two elements and the other one, 488963, is the STAIRS: the teleports dump declares it as a passage to 153357316, so tying it here would have closed the objective on going up. 489505 is the only real prop, and its drawing (701195) does not appear on any other map of the game."
   },
   {
    "objective": 9784,
    "quest": 1635,
    "kind": "enter",
    "map": 153881600,
-   "why": "«Pénétrer dans l'antre du Milimilou». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Pénétrer dans l'antre du Milimilou». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 9817,
@@ -80,7 +80,7 @@
      "element": 504680
     }
    ],
-   "why": "«Examiner la stele d'un vestige sur la route des ames». El elemento 504680 es el unico de grafico 3518 en la subzona 450, que world.db llama «Route des ames». Mapa [2,-3]."
+   "why": "«Examiner la stele d'un vestige sur la route des ames». Element 504680 is the only one with graphic 3518 in subarea 450, which world.db calls «Route des ames». Map [2,-3]."
   },
   {
    "objective": 9818,
@@ -96,7 +96,7 @@
      "element": 504682
     }
    ],
-   "why": "«Examiner la stele d'un vestige dans les champs». Los dos elementos de grafico 3518 del mapa [0,-4], cuya subzona es la 444 «Champs» -que MapLoadHandler renumera a 20663, y por eso world.db la deja sin nombre-. Valen los dos."
+   "why": "«Examiner la stele d'un vestige dans les champs». The two elements with graphic 3518 on map [0,-4], whose subarea is 444 «Champs» -which MapLoadHandler renumbers to 20663, and that is why world.db leaves it nameless-. Either will do."
   },
   {
    "objective": 9819,
@@ -120,7 +120,7 @@
      "element": 504678
     }
    ],
-   "why": "«Examiner la stele d'un vestige pres du lac». Los cuatro de grafico 3518 de la subzona 442, que world.db llama «Lac». Mapas [0,-2], [0,-1], [-1,-2] y [-2,-2]."
+   "why": "«Examiner la stele d'un vestige pres du lac». The four with graphic 3518 in subarea 442, which world.db calls «Lac». Maps [0,-2], [0,-1], [-1,-2] and [-2,-2]."
   },
   {
    "objective": 9820,
@@ -136,7 +136,7 @@
      "element": 504676
     }
    ],
-   "why": "«Examiner la stele d'un vestige dans les paturages». Los dos de grafico 3518 de la subzona 445, «Paturages». Mapas [1,-4] y [2,-4]."
+   "why": "«Examiner la stele d'un vestige dans les paturages». The two with graphic 3518 in subarea 445, «Paturages». Maps [1,-4] and [2,-4]."
   },
   {
    "objective": 9821,
@@ -148,42 +148,42 @@
      "element": 504673
     }
    ],
-   "why": "«Examiner la stele d'un vestige dans la foret». El unico de grafico 3518 en la subzona 443, «Foret». Mapa [2,-2]."
+   "why": "«Examiner la stele d'un vestige dans la foret». The only one with graphic 3518 in subarea 443, «Foret». Map [2,-2]."
   },
   {
    "objective": 13849,
    "quest": 1958,
    "kind": "enter",
    "map": 192413702,
-   "why": "«Entrer dans la Tour du Conseil d'Astrub». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Entrer dans la Tour du Conseil d'Astrub». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 13851,
    "quest": 1959,
    "kind": "enter",
    "map": 192413696,
-   "why": "«Entrer dans la taverne d'Astrub». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Entrer dans la taverne d'Astrub». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 13946,
    "quest": 1962,
    "kind": "enter",
    "map": 189530630,
-   "why": "«Aller au rendez-vous fixé par Badufron». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Aller au rendez-vous fixé par Badufron». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 14230,
    "quest": 1964,
    "kind": "enter",
    "map": 188482052,
-   "why": "«Entrer dans la mine d'Astrub avec le chienchien fidèle». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Entrer dans la mine d'Astrub avec le chienchien fidèle». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 14110,
    "quest": 1966,
    "kind": "enter",
    "map": 192675848,
-   "why": "«Entrer dans le repaire du maître des Srams». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Entrer dans le repaire du maître des Srams». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 13953,
@@ -191,7 +191,7 @@
    "kind": "talk",
    "npc": 4402,
    "map": 188744194,
-   "why": "Busca el origen de los problemas. Es Didier Jean, en el estanque: la guia lo pone de segundo paso y el objetivo 13955 ya lo situa en el mapa 188744194."
+   "why": "Busca el origen de los problemas. It is Didier Jean, at the pond: the guide puts him as the second step and objective 13955 already places him on map 188744194."
   },
   {
    "objective": 13954,
@@ -199,14 +199,14 @@
    "kind": "talk",
    "npc": 4405,
    "map": 188744194,
-   "why": "Charla con los mercenarios. El Mercenaire agace es el NPC 4405, y sus tres unicas respuestas son de esta mision."
+   "why": "Charla con los mercenarios. The Mercenaire agace is NPC 4405, and his only three replies belong to this quest."
   },
   {
    "objective": 13959,
    "quest": 1975,
    "kind": "talk",
    "npc": 4407,
-   "why": "Busca a Camilo Demolinos. Es el NPC 4407, Camille Demouleur, que el objetivo 13961 nombra a continuacion. Sin mapa porque el catalogo no le pone ninguno."
+   "why": "Busca a Camilo Demolinos. It is NPC 4407, Camille Demouleur, whom objective 13961 names next. No map because the catalogue gives him none."
   },
   {
    "objective": 13960,
@@ -214,35 +214,35 @@
    "kind": "beat",
    "monster": 5250,
    "map": 191104004,
-   "why": "Vence a los canallas. La guia dice dos Iops y un Cra: el Canalla yopuka es el monstruo 5250 y el Canalla ocra el 5249. Se ata al yopuka por ser el que se repite."
+   "why": "Vence a los canallas. The guide says two Iops and a Cra: the Canalla yopuka is monster 5250 and the Canalla ocra 5249. It is tied to the yopuka because it is the one that repeats."
   },
   {
    "objective": 13911,
    "quest": 2007,
    "kind": "enter",
    "map": 190842369,
-   "why": "«Retourner avec Finney sur la tombe où vous avez trouvé l'indice». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Retourner avec Finney sur la tombe où vous avez trouvé l'indice». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 13919,
    "quest": 2007,
    "kind": "enter",
    "map": 190842883,
-   "why": "«Rejoindre Becky devant le caveau». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Rejoindre Becky devant le caveau». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 13921,
    "quest": 2007,
    "kind": "enter",
    "map": 190841344,
-   "why": "«Se rendre à la cabane de Becky». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Se rendre à la cabane de Becky». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
    "objective": 13923,
    "quest": 2007,
    "kind": "enter",
    "map": 190842883,
-   "why": "«Retourner au caveau». Se cierra al pisar el mapa, y el mapa no se adivina: lo trae el propio objetivo."
+   "why": "«Retourner au caveau». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   }
  ]
 }

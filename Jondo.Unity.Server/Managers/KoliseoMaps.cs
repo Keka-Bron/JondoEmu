@@ -7,37 +7,37 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las arenas del koliseo, con sus casillas de colocación por bando.
+    /// The koliseo arenas, with their placement cells per side.
     /// </summary>
     /// <remarks>
-    /// Un koliseo no se pelea en el arena que le tocaría al mapa de rol: se pelea en una de las
-    /// arenas del koliseo, y el juego elige una al azar. Son <b>441 identificadores de mapa</b> en
-    /// tres subáreas, contados sobre <c>MapSubareas</c>:
+    /// A koliseo is not fought in the arena the roleplay map would get: it is fought in one of the
+    /// koliseo arenas, and the game picks one at random. They are <b>441 map identifiers</b> in
+    /// three subareas, counted over <c>MapSubareas</c>:
     ///
     /// <code>
-    ///    885  Koliseo - Duelo            85 mapas
+    ///    885  Koliseo - Duelo            85 maps
     ///   1122  Koliseo - Equipos          88
     ///   1123  Koliseo - Entrenamiento   268
     /// </code>
     ///
-    /// El nombre de la subárea es un identificador numérico que hay que resolver contra
-    /// <c>Translations</c>; por eso buscar el texto «koliseo» en la tabla de subáreas no encuentra
-    /// nada. Y no son 441 arenas distintas: por casillas de colocación se reducen a <b>101 diseños</b>,
-    /// la mayoría con cinco copias.
+    /// The subarea's name is a numeric identifier that has to be resolved against
+    /// <c>Translations</c>; that is why searching the text «koliseo» in the subarea table finds
+    /// nothing. And they are not 441 different arenas: by placement cells they come down to <b>101 designs</b>,
+    /// most with five copies.
     ///
-    /// <b>EL TAMAÑO IMPORTA, y por eso no se elige por subárea.</b> Las de Duelo son pequeñas de
-    /// verdad —37 de 85 sólo tienen una casilla por bando y 77 de 85 no admiten tres— mientras que
-    /// las de Equipos nunca bajan de cuatro. Elegir «la subárea que le toca» pondría un 3 contra 3
-    /// en un mapa con sitio para uno. Se elige por CAPACIDAD, que es el mínimo de las dos listas, y
-    /// entonces el uno contra uno cae solo en las pequeñas y el tres contra tres en las grandes.
+    /// <b>SIZE MATTERS, and that is why it is not picked by subarea.</b> The Duelo ones are really
+    /// small —37 of 85 have only one cell per side and 77 of 85 do not fit three— while
+    /// the Equipos ones never go below four. Picking «the subarea it gets» would put a 3 versus 3
+    /// on a map with room for one. It is picked by CAPACITY, which is the minimum of the two lists, and
+    /// then the one versus one falls on its own on the small ones and the three versus three on the large ones.
     ///
-    /// Las casillas salen del propio cliente, de las banderas <c>red</c> y <c>blue</c> de
-    /// <c>cellsData[]</c>, y están comprobadas contra el kba del servidor real en el mapa
-    /// 233308168 de la captura del 2 contra 2: los mismos dos conjuntos.
+    /// The cells come from the client itself, from the <c>red</c> and <c>blue</c> flags of
+    /// <c>cellsData[]</c>, and are checked against the real server's kba on map
+    /// 233308168 of the 2 versus 2 capture: the same two sets.
     ///
-    /// <b>Ojo con los nombres, que se cruzan.</b> El kba manda el equipo 0 en su f1, y ese f1 es la
-    /// lista que el cliente llama <c>red</c>. Así que las rojas del cliente son nuestro equipo AZUL.
-    /// El fichero guarda los nombres del cliente y la traducción se hace aquí, una sola vez.
+    /// <b>Mind the names, they cross over.</b> The kba sends team 0 in its f1, and that f1 is the
+    /// list the client calls <c>red</c>. So the client's red ones are our BLUE team.
+    /// The file keeps the client's names and the translation is done here, once.
     /// </remarks>
     public static class KoliseoMaps
     {
@@ -47,13 +47,13 @@ namespace Jondo.Unity.Server.Managers
             public int SubAreaId { get; init; }
             public string Name { get; init; } = "";
 
-            /// <summary>Las del equipo azul. Son las que el cliente llama rojas.</summary>
+            /// <summary>The blue team's. They are the ones the client calls red.</summary>
             public List<int> Blue { get; init; } = new List<int>();
 
-            /// <summary>Las del equipo rojo. Las que el cliente llama azules.</summary>
+            /// <summary>The red team's. The ones the client calls blue.</summary>
             public List<int> Red { get; init; } = new List<int>();
 
-            /// <summary>Cuánta gente cabe por bando: lo que decide a qué modalidad sirve.</summary>
+            /// <summary>How many people fit per side: what decides which mode it serves.</summary>
             public int Capacity => Math.Min(Blue.Count, Red.Count);
         }
 
@@ -66,12 +66,15 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static volatile bool _loaded;
 
+        /// <summary>The maps of the file left out for having no name: see the load.</summary>
+        private static int _sinNombre;
+
         public static int Count
         {
             get { EnsureLoaded(); return _arenas.Count; }
         }
 
-        /// <summary>Cuántas arenas admiten esa gente por bando.</summary>
+        /// <summary>How many arenas fit that many people per side.</summary>
         public static int CountFor(int teamSize)
         {
             EnsureLoaded();
@@ -96,7 +99,8 @@ namespace Jondo.Unity.Server.Managers
             if (!first) return;
 
             Console.WriteLine($"[Koliseo] {_arenas.Count} arenas: {CountFor(1)} para uno contra uno, " +
-                              $"{CountFor(2)} para dos contra dos, {CountFor(3)} para tres contra tres.");
+                              $"{CountFor(2)} para dos contra dos, {CountFor(3)} para tres contra tres " +
+                              $"({_sinNombre} sin nombre, fuera).");
         }
 
         private static void EnsureLoaded()
@@ -138,9 +142,16 @@ namespace Jondo.Unity.Server.Managers
                         Name = entrada.TryGetProperty("nombre", out var nm) ? (nm.GetString() ?? "") : "",
                     };
 
-                    // Las rojas del cliente son nuestro azul, y al revés. Ver el comentario de arriba.
+                    // The client's red ones are our blue, and the other way round. See the comment above.
                     Leer(entrada, "rojas", arena.Blue);
                     Leer(entrada, "azules", arena.Red);
+
+                    // Only the named ones are arenas the game fights on. The 46 without a name are
+                    // leftovers, and three of them (230170117, 230432261, 230694405) are not even
+                    // a board: every one of their 522 cells walks in a fight, where the drawn
+                    // board has 253 -- the client itself lights up cells out in the void, and
+                    // titles the map "Amakna 0,0" because it does not know it.
+                    if (arena.Name.Length == 0) { _sinNombre++; continue; }
 
                     if (arena.Capacity > 0) _arenas.Add(arena);
                 }
@@ -171,11 +182,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Un arena al azar con sitio para esa gente por bando, o null si no hay ninguna.
+        /// A random arena with room for that many people per side, or null if there is none.
         /// </summary>
         /// <remarks>
-        /// Null no es un fallo: significa que no está el fichero, y entonces el combate se monta en
-        /// el arena de siempre. Un koliseo en un sitio raro es mejor que un koliseo que no arranca.
+        /// Null is not a failure: it means the file is not there, and then the fight is set up in
+        /// the usual arena. A koliseo in an odd place is better than a koliseo that does not start.
         /// </remarks>
         public static Arena? PickFor(int teamSize)
         {

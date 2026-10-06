@@ -41,17 +41,17 @@ namespace Jondo.Unity.Server
         public static Dictionary<long, HashSet<int>> LosBlockingCells = new Dictionary<long, HashSet<int>>();
 
         /// <summary>
-        /// Los cambios de casilla que ha hecho una persona, encima de los tres ficheros generados.
+        /// The cell changes a person has made, on top of the three generated files.
         /// </summary>
         /// <remarks>
-        /// Sin esto el editor de casillas escribe un fichero que nadie lee. Los tres ficheros de
-        /// datos/ los rehace tools/ cuando le da la gana, asi que un arreglo hecho ahi desaparece
-        /// sin decir nada; por eso lo nuestro vive en content/maps/cells.json y son DELTAS -las
-        /// casillas cambiadas, no las 560- y se ponen encima al arrancar.
+        /// Without this the cell editor writes a file nobody reads. The three files in
+        /// datos/ are remade by tools/ whenever it feels like it, so a fix made there disappears
+        /// without a word; that is why ours lives in content/maps/cells.json and they are DELTAS -the
+        /// changed cells, not the 560- and they are laid on top at start.
         ///
-        /// La mezcla la hace CellContent.Apply, que es el mismo metodo que usa el editor para
-        /// pintar la vista previa. Dos implementaciones de esto se pondrian de acuerdo hasta el dia
-        /// que alguien arreglara una.
+        /// The merge is done by CellContent.Apply, which is the same method the editor uses to
+        /// draw the preview. Two implementations of this would agree with each other until the day
+        /// someone fixed one.
         /// </remarks>
         private static void AplicarLasCasillasNuestras()
         {
@@ -61,8 +61,8 @@ namespace Jondo.Unity.Server
                                                 mensaje => Console.WriteLine("[MapManager] " + mensaje));
                 if (nuestras.Count == 0) return;
 
-                // WalkableCells guarda listas y las otras dos conjuntos, asi que se pasa por
-                // conjunto y se devuelve a lista solo lo que cambia.
+                // WalkableCells stores lists and the other two sets, so it goes through
+                // a set and only what changes is turned back into a list.
                 var pisables = new Dictionary<long, HashSet<int>>();
                 foreach (var par in WalkableCells) pisables[par.Key] = new HashSet<int>(par.Value);
 
@@ -251,9 +251,9 @@ namespace Jondo.Unity.Server
 
         public static long ResolveArenaMapId(long roleplayMapId)
         {
-            // Lo medido manda sobre la regla. Los kanojedos pelean en un mapa a 131.072 ids del
-            // suyo, que ninguna diferencia pequeña encuentra, y la regla caía en «cualquiera de la
-            // subárea» elegido por hash. Ver content/fights/arenas.json.
+            // What is measured rules over the rule. The kanojedos fight on a map 131,072 ids from
+            // theirs, which no small difference finds, and the rule fell into «any one of the
+            // subarea» chosen by hash. See content/fights/arenas.json.
             long medida = Managers.MeasuredArenas.Of(roleplayMapId);
             if (medida != 0 && Maps.ContainsKey(medida)) return medida;
 

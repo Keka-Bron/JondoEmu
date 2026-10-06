@@ -9,28 +9,28 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Usar un zaapi.
+    /// Using a zaapi.
     ///
-    /// Por el cable es EXACTAMENTE el mismo baile que el zaap —iwo, iwn, hjj para la lista; hjc para
-    /// elegir— y por eso el viaje en sí lo hace <see cref="ZaapTravelHandler.TravelAsync"/>: es el
-    /// mismo hjc y el mismo mapa de destino, así que duplicarlo sería tener dos sitios donde
-    /// arreglar el mismo fallo.
+    /// On the wire it is EXACTLY the same dance as the zaap -- iwo, iwn, hjj for the list; hjc for
+    /// choosing -- and that is why the trip itself is done by <see cref="ZaapTravelHandler.TravelAsync"/>:
+    /// it is the same hjc and the same destination map, so duplicating it would mean two places to fix
+    /// the same bug.
     ///
-    /// Lo que cambia es sólo la lista que se ofrece y lo que cuesta:
+    /// The only things that change are the list offered and what it costs:
     ///
-    ///   el zaap    lleva a cualquier zaap activado del mundo, y cobra por distancia
-    ///   el zaapi   lleva a los sitios de SU ciudad, y cobra 20 kamas fijos
+    ///   the zaap    takes you to any activated zaap of the world, and charges by distance
+    ///   the zaapi   takes you to the places of ITS city, and charges a flat 20 kamas
     ///
-    /// Los 20 son de la captura, iguales en los 24 destinos de Bonta y en los 21 de Brakmar.
+    /// The 20 come from the capture, the same in Bonta's 24 destinations and Brakmar's 21.
     /// </summary>
     public static class ZaapiTravelHandler
     {
         /// <summary>
-        /// Ha clicado el zaapi: se le dice que el elemento está en uso y se le manda su lista.
+        /// He has clicked the zaapi: he is told the element is in use and sent its list.
         ///
-        /// Si el mapa no pertenece a ninguna red conocida no se contesta con una lista vacía: se
-        /// escribe por qué y se deja el elemento sin abrir. Una ventana vacía parece un fallo del
-        /// juego; no abrirla al menos se puede leer en el registro.
+        /// If the map belongs to no known network an empty list is not answered: the reason is written and
+        /// the element is left unopened. An empty window looks like a game bug; not opening it can at least
+        /// be read in the log.
         /// </summary>
         public static async Task OpenAsync(NetworkStream stream, Interactives.Element zaapi, int skillId)
         {
@@ -52,8 +52,8 @@ namespace Jondo.Unity.Server.Handlers
             var destinations = new List<ConnectionProtocol.ZaapDestination>();
             foreach (var destination in network.Destinations)
             {
-                // El sitio donde uno ya está sale sin coste, que es lo que hace el servidor real:
-                // proto3 se come el cero y el cliente lo enseña como «estás aquí».
+                // The place one is already at comes out with no cost, which is what the real server does:
+                // proto3 swallows the zero and the client shows it as «you are here».
                 if (MapManager.GetMapInfo(destination.MapId) == null) continue;
                 destinations.Add(new ConnectionProtocol.ZaapDestination(
                     destination.MapId,
@@ -63,12 +63,11 @@ namespace Jondo.Unity.Server.Handlers
                     Zaapis.Kind));
             }
 
-            // Sin el f2: la lista del zaapi no lo lleva en ninguna de las tres capturas, mientras
-            // que la del zaap lo lleva siempre y con el MISMO valor se mueva uno donde se mueva
-            // —73400320 en ocho capturas desde sitios distintos—, o sea que no es «dónde estás»
-            // sino el zaap guardado del personaje. Eso aquí no existe todavía, así que en la lista
-            // del zaap se sigue mandando el mapa de donde sales; en la del zaapi, nada, que es lo
-            // que hace el servidor real.
+            // Without f2: the zaapi's list does not carry it in any of the three captures, while the
+            // zaap's always does and with THE SAME value wherever one moves -- 73400320 in eight
+            // captures from different places --, so it is not «where you are» but the character's
+            // saved zaap. That does not exist here yet, so in the zaap's list the map you leave from
+            // is still sent; in the zaapi's, nothing, which is what the real server does.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Hjj, ConnectionProtocol.BuildZaapList(
                     0, destinations, Zaapis.Teleporter)));

@@ -33,7 +33,7 @@ namespace Jondo.Unity.Server.Network
             if (_isRunning) return;
             _cts = new CancellationTokenSource();
 
-            // Igual que en el Zaap: la bandera, después del bind. Si no, IsRunning miente.
+            // Same as in the Zaap: the flag, after the bind. Otherwise, IsRunning lies.
             _tcpListener = new TcpListener(ServerBinding.TcpAddress, port);
             _tcpListener.Start();
             _isRunning = true;
@@ -111,8 +111,8 @@ namespace Jondo.Unity.Server.Network
         /// character loaded then became the identity/map/look seen while processing every socket.
         /// </summary>
         /// <summary>
-        /// La direccion del otro extremo del socket, sin el puerto. Si no se puede leer se
-        /// devuelve vacio: no saber la IP no es motivo para tirar la conexion.
+        /// The address of the socket's other end, without the port. If it cannot be read
+        /// empty is returned: not knowing the IP is no reason to drop the connection.
         /// </summary>
         private static string RemoteIp(NetworkStream stream)
         {
@@ -138,7 +138,7 @@ namespace Jondo.Unity.Server.Network
                 return;
             }
 
-            // De donde viene, para poder decirselo la proxima vez que entre.
+            // Where he comes from, to be able to tell him the next time he logs in.
             session.State.ClientIp = RemoteIp(stream);
 
             GameNodeProxy.SesionesVivas[session.Id] = session;
@@ -163,8 +163,8 @@ namespace Jondo.Unity.Server.Network
                     }
                     catch { }
 
-                    // Y fuera del grupo, si estaba en uno: a los que se quedan hay que decirselo,
-                    // porque si no ven un miembro que ya no existe.
+                    // And out of the party, if he was in one: the ones who stay have to be told,
+                    // because otherwise they see a member who no longer exists.
                     try
                     {
                         using (SessionContext.Push(session))
@@ -358,34 +358,34 @@ namespace Jondo.Unity.Server.Network
         internal static string BuildAccountTag(long accountId) => (accountId % 10000).ToString("D4");
 
         /// <summary>
-        /// Fin del abono: dentro de un año, contado desde ahora.
+        /// End of the subscription: a year from now.
         /// </summary>
         /// <remarks>
-        /// El formato ya se había arreglado una vez y el síntoma seguía ahí, y este comentario
-        /// contaba media historia. La media buena: si el cliente NO PUEDE LEER esta fecha, trata la
-        /// cuenta como si no tuviera abono, y una cuenta sin abono tiene UN SOLO hueco de personaje
-        /// —de ahí el botón de crear apagado diciendo que ya está lleno, con un personaje—. Aquella
-        /// vez el motivo era la Z; el servidor real manda desplazamiento numérico, 25 caracteres,
+        /// The format had already been fixed once and the symptom was still there, and this comment
+        /// told half the story. The good half: if the client CANNOT READ this date, it treats the
+        /// account as if it had no subscription, and an account without a subscription has A SINGLE character
+        /// slot —hence the create button greyed out saying it is already full, with one character—. That
+        /// time the reason was the Z; the real server sends a numeric offset, 25 characters,
         /// "####-##-##T##:##:##+##:##".
         ///
-        /// La otra media es el AÑO, que se quedó en 2099 y no se puede leer tampoco:
+        /// The other half is the YEAR, which was left at 2099 and cannot be read either:
         ///
-        ///   2026-09-06  de la captura real   1.788.645.600 s   cabe
-        ///   2099-01-01  la nuestra           4.070.901.600 s   SE PASA
-        ///   límite de un entero de 32 bits   2.147.483.647 s = 19 de enero de 2038
+        ///   2026-09-06  from the real capture    1,788,645,600 s   fits
+        ///   2099-01-01  ours                     4,070,901,600 s   OVERFLOWS
+        ///   limit of a 32-bit integer            2,147,483,647 s = 19 January 2038
         ///
-        /// O sea el efecto 2038 de toda la vida. Todas las fechas de abono de las capturas caen a
-        /// unos ocho días vista, o son el centinela "1970-01-01T00:00Z" de la cuenta sin abono;
-        /// ninguna se acerca a 2038.
+        /// That is the good old 2038 problem. All the subscription dates in the captures fall
+        /// about eight days ahead, or are the "1970-01-01T00:00Z" sentinel of the account without a subscription;
+        /// none comes near 2038.
         ///
-        /// Un año desde ahora, y no una constante: está lejos de cualquier sesión, lejos del 2038
-        /// y no hay que acordarse de tocarla. Se ha comprobado en nuestro propio registro que el
-        /// número de huecos que mandamos NO es lo que apaga el botón —a las 10:50 salió con cien
-        /// huecos y cero personajes y el cliente dejó crear uno; con uno ya creado sigue apagado
-        /// tanto con cien como con cinco—, así que lo que decide es el abono.
+        /// A year from now, and not a constant: it is far from any session, far from 2038
+        /// and nobody has to remember to touch it. It has been checked in our own log that the
+        /// number of slots we send is NOT what greys out the button —at 10:50 it went out with a hundred
+        /// slots and zero characters and the client let one be created; with one already created it is still greyed
+        /// with a hundred as with five—, so what decides is the subscription.
         ///
-        /// Queda una inferencia y se dice: que el 2099 no se pueda leer está medido, que ESO sea
-        /// lo que apaga el botón no lo demuestra ninguna captura. Lo demuestra probarlo.
+        /// One inference remains and it is stated: that 2099 cannot be read is measured, that THAT is
+        /// what greys out the button no capture proves. Trying it proves it.
         /// </remarks>
         /// <remarks>
         /// Moved to <see cref="Subscription"/>: the launcher answers the same question over Thrift
@@ -395,16 +395,16 @@ namespace Jondo.Unity.Server.Network
 
 
         /// <summary>
-        /// Una trama, en crudo, al registro de tráfico.
+        /// A frame, raw, to the traffic log.
         ///
-        /// Esto es lo que más veces se llama de todo el servidor: dos veces por trama, una por
-        /// sentido. Y hacía lo más caro que se puede hacer por llamada —abrir el fichero,
-        /// escribir, cerrarlo— más un Directory.Exists de propina, porque la ruta se resolvía
-        /// entera cada vez. Ahora va por LogFile, que se queda con el manejador abierto.
+        /// This is what is called most often in the whole server: twice per frame, once per
+        /// direction. And it did the most expensive thing that can be done per call —open the file,
+        /// write, close it— plus a Directory.Exists thrown in, because the path was resolved
+        /// whole every time. Now it goes through LogFile, which keeps the handle open.
         ///
-        /// Se puede apagar del todo poniendo JONDO_SIN_REGISTRO_DE_TRAFICO=1 en el entorno. Por
-        /// omisión sigue encendido: es la herramienta con la que se saca el protocolo, y apagarla
-        /// por sorpresa sería quitarle a alguien lo que estaba usando.
+        /// It can be switched off entirely by setting JONDO_SIN_REGISTRO_DE_TRAFICO=1 in the environment. By
+        /// default it stays on: it is the tool the protocol is extracted with, and switching it off
+        /// by surprise would take from someone what they were using.
         /// </summary>
         private static readonly bool SeRegistraElTrafico =
             Environment.GetEnvironmentVariable("JONDO_SIN_REGISTRO_DE_TRAFICO") != "1";

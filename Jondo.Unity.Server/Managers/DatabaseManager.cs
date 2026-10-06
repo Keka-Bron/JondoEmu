@@ -20,14 +20,14 @@ namespace Jondo.Unity.Server
 
             // 1. Repair world.db before anything else touches it.
             //
-            // Este bloque estaba DESPUES de la copia de seguridad, y ese orden se cargaba la
-            // auto-reparacion que ya funcionaba: DatabaseBackups.CreateBeforeMigration() abre las
-            // dos bases para verificar la copia, asi que con un world.db corrupto, truncado o a
-            // medio extraer reventaba y abortaba Initialize() entero -y el servidor, que hasta hoy
-            // se curaba solo sacandola otra vez de datos/world.zip, dejaba de arrancar-.
+            // This block was AFTER the backup, and that order broke the self-repair that
+            // already worked: DatabaseBackups.CreateBeforeMigration() opens both databases to
+            // verify the copy, so with a corrupt, truncated or half-extracted world.db it blew
+            // up and aborted the whole Initialize() -- and the server, which until then healed
+            // itself by taking it out of datos/world.zip again, stopped starting --.
             //
-            // Primero se repara, luego se copia, y luego se migra. Asi la copia se hace sobre una
-            // base sana y sigue estando delante de toda migracion, que es lo que la PR queria.
+            // First repair, then copy, and then migrate. That way the copy is made of a healthy
+            // database and still comes before every migration, which is what the PR wanted.
             string dbPath = Paths.WorldDb;
             bool needsExtraction = !File.Exists(dbPath);
             if (!needsExtraction)
@@ -94,11 +94,11 @@ namespace Jondo.Unity.Server
                 ";
                 createAccounts.ExecuteNonQuery();
 
-                // La columna Role, para las bases que ya existían antes de que hubiera roles.
+                // The Role column, for databases that already existed before there were roles.
                 //
-                // SQLite no tiene ADD COLUMN IF NOT EXISTS, así que se mira la tabla primero. Sin
-                // esto, quien ya tuviera su auth.db se quedaba sin poder entrar: todas las
-                // consultas de cuenta piden ya la columna.
+                // SQLite has no ADD COLUMN IF NOT EXISTS, so the table is looked at first. Without
+                // this, whoever already had his auth.db could not sign in: every account query
+                // already asks for the column.
                 bool tieneRol = false;
                 var mirar = authConnection.CreateCommand();
                 mirar.CommandText = "PRAGMA table_info(Accounts);";
@@ -121,17 +121,17 @@ namespace Jondo.Unity.Server
                     Console.WriteLine("[DatabaseManager] Columna Role añadida a Accounts; todos empiezan como jugador.");
                 }
 
-                // La escala de roles se quedaba en el 4, que quería decir administrador. Giny y
-                // los criterios de derechos de Dofus usan la escala entera del 1 al 5: el 3 es
-                // padawan, el 4 game master y el 5 administrador.
+                // The role scale stopped at 4, which meant administrator. Giny and Dofus's rights
+                // criteria use the whole scale from 1 to 5: 3 is padawan, 4 game master and 5
+                // administrator.
                 //
-                // Renumerar cambia lo que significan DOS valores, así que hay que mover a los dos.
-                // El 4 pasa a 5 —los que eran administradores lo siguen siendo— y el 3 pasa a 4,
-                // porque quien era game master con el 3 se quedaría de padawan si no. El orden
-                // importa: primero el 4 y después el 3, o los que suban de 3 volverían a subir.
+                // Renumbering changes what TWO values mean, so both have to be moved. 4 becomes 5 --
+                // those who were administrators still are -- and 3 becomes 4, because whoever was game
+                // master with 3 would otherwise be left as padawan. The order matters: first 4 and then
+                // 3, or those going up from 3 would go up again.
                 //
-                // Y se hace UNA vez, apuntándolo en JondoMigrations. Un UPDATE suelto en cada
-                // arranque ascendería en silencio a administrador a todo game master futuro.
+                // And it is done ONCE, noted in JondoMigrations. A loose UPDATE on every start would
+                // silently promote every future game master to administrator.
                 var createMigrations = authConnection.CreateCommand();
                 createMigrations.CommandText = @"
                     CREATE TABLE IF NOT EXISTS JondoMigrations (
@@ -177,14 +177,14 @@ namespace Jondo.Unity.Server
                                       $"{gameMasters} game master(s) de 3 a 4.");
                 }
 
-                // La sesión del LANZADOR, que hasta ahora era el mismo token que el del juego.
+                // The LAUNCHER's session, which until now was the same token as the game's.
                 //
-                // Y eso se rompía solo: al arrancar un cliente, el Zaap y el HAAPI le dan a la
-                // cuenta un GameToken nuevo, así que el que el lanzador tenía guardado dejaba de
-                // valer. A la vez siguiente el lanzador se abría con la cuenta puesta, el servidor
-                // ya no reconocía su token, y al darle a jugar salía «el servidor no responde»
-                // —que además era mentira, el servidor contestaba perfectamente que la sesión no
-                // valía—. Con una columna propia, rotar el del juego ya no toca al del lanzador.
+                // And that broke by itself: on starting a client, the Zaap and the HAAPI give the
+                // account a new GameToken, so the one the launcher had stored stopped being valid.
+                // The next time the launcher opened with the account set, the server no longer
+                // recognised its token, and on pressing play «the server does not respond» came up --
+                // which was a lie too, the server answered perfectly well that the session was not
+                // valid --. With a column of its own, rotating the game's no longer touches the launcher's.
                 bool tieneSesion = false;
                 var mirarSesion = authConnection.CreateCommand();
                 mirarSesion.CommandText = "PRAGMA table_info(Accounts);";
@@ -207,14 +207,14 @@ namespace Jondo.Unity.Server
                     Console.WriteLine("[DatabaseManager] Columna LauncherToken añadida a Accounts.");
                 }
 
-                // Hasta cuándo está abonada cada cuenta. Antes no existía: la fecha se calculaba al
-                // vuelo, igual para todas, y era lo mismo que tener el dato escrito en el código.
-                // Con columna propia, una cuenta puede caducar y otra no, que es lo que el cliente
-                // espera poder distinguir.
+                // Until when each account is subscribed. It did not exist before: the date was worked
+                // out on the fly, the same for all, and that was the same as having the data written in
+                // the code. With a column of its own, one account can expire and another not, which is
+                // what the client expects to be able to tell apart.
                 //
-                // Se guarda en el formato que viaja —ISO 8601 con desplazamiento numérico, nunca
-                // con Z— para que lo que hay en la base sea exactamente lo que se manda y no haya
-                // una conversión en medio donde perderlo.
+                // It is stored in the format that travels -- ISO 8601 with a numeric offset, never with
+                // Z -- so that what is in the database is exactly what is sent and there is no
+                // conversion in between to lose it in.
                 bool tieneAbono = false;
                 var mirarAbono = authConnection.CreateCommand();
                 mirarAbono.CommandText = "PRAGMA table_info(Accounts);";
@@ -237,9 +237,9 @@ namespace Jondo.Unity.Server
                     Console.WriteLine("[DatabaseManager] Columna SubscriptionEnd añadida a Accounts.");
                 }
 
-                // Y las que no tengan fecha —las de antes de la columna, y las creadas antes de
-                // este arranque— empiezan con un año. Sólo las vacías: una fecha ya escrita, aunque
-                // esté caducada, es un dato y no se pisa.
+                // And those without a date -- the ones from before the column, and those created before
+                // this start -- begin with a year. Only the empty ones: a date already written, even if
+                // expired, is data and is not overwritten.
                 var rellenar = authConnection.CreateCommand();
                 rellenar.CommandText =
                     "UPDATE Accounts SET SubscriptionEnd = $hasta " +
@@ -250,36 +250,33 @@ namespace Jondo.Unity.Server
                     Console.WriteLine($"[DatabaseManager] {puestas} cuenta(s) sin fecha de abono; " +
                                       $"se les pone un año.");
 
-                // Aquí se sembraban 'keka' y 'dragonlord' como ADMINISTRADOR con la clave
-                // 'test'. Toda base recién hecha nacía con dos cuentas de mando y la contraseña
-                // escrita en el código fuente, que además está publicado: quien arrancase el
-                // servidor tal cual lo tenía abierto de par en par sin saberlo.
+                // The test account, keka / test, administrator, on every installation: whoever
+                // downloads the emulator signs in with it, finds keka's characters -- the ones
+                // datos/world.zip carries, at their level and with their items -- and has the
+                // administration commands to try it out. It is created through the same path as
+                // any account -- the password hashed, the subscription written --, under the id
+                // those characters belong to, and only when there is no keka yet, so an existing
+                // one keeps its own password.
                 //
-                // Ya no se siembra nada. Las dos cuentas se dan de alta desde el lanzador como
-                // cualquier otra, con la contraseña que ponga cada uno, y el UPDATE de abajo les
-                // devuelve el rol en cuanto existen. El resultado para nosotros es el mismo; lo
-                // que desaparece es la clave conocida.
-                //
-                // Y si esas dos cuentas ya existían de antes, se les pone el rol: son las de los
-                // dos que llevan el servidor. Al resto no se le toca nada.
-                //
-                // DECIDIDO A PROPÓSITO, 28/08/2026, y anotado aquí porque una revisión lo señala
-                // cada vez que se hace. Lo que se está diciendo con estas dos líneas es: en
-                // CUALQUIER instalación de Jondo, quien consiga registrar el login «keka» o
-                // «dragonlord» es administrador en el arranque siguiente. Y /api/crear-cuenta no
-                // pide autenticación, así que en el servidor de un tercero eso lo hace cualquiera
-                // —y el README publica el nombre, de modo que no hay ni que adivinarlo—.
-                //
-                // Se acepta mientras esto sea una prueba pública en la máquina de casa, donde los
-                // cinco listeners van a loopback salvo que se ponga JONDO_PUBLIC_BIND=1 y las dos
-                // cuentas ya existen, así que el alta se rechaza. El día que alguien más lo
-                // despliegue, o el día que se abra al exterior, esto se quita: el rol se da con
-                // /api/rol desde una cuenta que ya sea administrador, que es el camino que
-                // ControlApi ya ofrece.
-                //
-                // AssertNoSeededCredentials no lo ve, y no es un descuido suyo: busca «INSERT INTO
-                // Accounts» y esto es un UPDATE. Se deja así a posta —cazarlo haría fallar la
-                // guardia por algo que hoy queremos—, pero conviene saber que ese hueco existe.
+                // DECIDED ON PURPOSE, 04/10/2026, and written down here because a review flags it
+                // every time. It was taken out on 28/08/2026 because the password is published in
+                // this repository: on a server reachable from outside, anybody can sign in as
+                // administrator with it. Santiago brought it back: it is a test account, and
+                // without it nobody who downloads the emulator can try the administration
+                // commands. Whoever opens a server to the outside (JONDO_PUBLIC_BIND=1) has to
+                // change that password or delete the account first; the README says so.
+                if (!AccountExists(TestAccountLogin))
+                {
+                    if (RegisterNewAccount(TestAccountLogin, TestAccountPassword, "Keka", "", out string porQue,
+                                           id: TestAccountId))
+                        Console.WriteLine($"[DatabaseManager] Cuenta de prueba creada: {TestAccountLogin} / {TestAccountPassword}.");
+                    else
+                        Console.WriteLine($"[DatabaseManager] No se ha podido crear la cuenta de prueba: {porQue}");
+                }
+
+                // And the two who run the server are administrators: keka, and dragonlord once he
+                // has signed up. In ANY installation, whoever holds one of those two logins is an
+                // administrator at the next start -- the same caveat as the test account's.
                 var duenos = authConnection.CreateCommand();
                 duenos.CommandText = "UPDATE Accounts SET Role = $admin " +
                                      "WHERE Login IN ('keka', 'dragonlord') AND Role < $admin;";
@@ -446,9 +443,9 @@ namespace Jondo.Unity.Server
                     // Already exists.
                 }
 
-                // Migración: lo que mide el personaje, en tanto por ciento de lo que mide su raza.
-                // Cien es el tamaño de siempre, así que los que ya existían no cambian de aspecto
-                // al aparecer la columna.
+                // Migration: how big the character is, as a percentage of how big his breed is.
+                // A hundred is the usual size, so the ones that already existed do not change look
+                // when the column appears.
                 try
                 {
                     var addSizeCmd = worldConnection.CreateCommand();
@@ -461,14 +458,14 @@ namespace Jondo.Unity.Server
                     // Already exists.
                 }
 
-                // Migración: lo que dieron los pergaminos, aparte de los puntos repartidos.
+                // Migration: what the scrolls gave, apart from the points spent.
                 //
-                // Nace a 100 para todo el que ya existía, que es la política de este servidor -todo
-                // personaje se crea con los pergaminos hechos- y lo que las capturas enseñan de los
-                // personajes reales: el f3 de cada característica vale 100 en 156 capturas y 4.815
-                // veces, y 101 no sale ni una. Y luego se sacan de la base los 101 que la creación
-                // metía ahí, que es lo que dejaba a un nivel 200 recién hecho con 183 puntos en vez
-                // de 995: contaba los pergaminos como puntos gastados.
+                // It starts at 100 for everybody who already existed, which is this server's policy --
+                // every character is created with the scrolls done -- and what the captures show of real
+                // characters: each characteristic's f3 is 100 in 156 captures and 4,815 times, and 101
+                // does not come up once. And then the 101 the creation put there are taken out of the
+                // database, which is what left a freshly made level 200 with 183 points instead of
+                // 995: it counted the scrolls as points spent.
                 MoveScrollsOutOfTheBase(worldConnection);
 
                 FillMissingHeads(worldConnection);
@@ -525,11 +522,11 @@ namespace Jondo.Unity.Server
                 ";
                 createItems.ExecuteNonQuery();
 
-                // El cliente guarda el uid de inventario en 32 bits. Los personajes cuyo id es
-                // grande se sembraban con `characterId * 1000`: por ejemplo 13825561032 llegaba
-                // al cliente como 940659144. Al devolver ese número para equipar, el servidor no
-                // encontraba el objeto original y dejaba la ficha sin sus efectos. Reasigna una
-                // vez cualquier uid que no pueda hacer el viaje de ida y vuelta sin truncarse.
+                // The client stores the inventory uid in 32 bits. Characters whose id is large were
+                // seeded with `characterId * 1000`: for example 13825561032 reached the client as
+                // 940659144. On sending that number back to equip, the server did not find the
+                // original item and left the sheet without its effects. Reassigns once any uid that
+                // cannot make the round trip without being truncated.
                 RepairClientItemUids(worldConnection);
 
                 // Migration: Ensure Effects column exists in CharacterItems
@@ -545,9 +542,9 @@ namespace Jondo.Unity.Server
                     // Column already exists, ignore
                 }
 
-                // Cuál de cada pareja de hechizo lleva el personaje. Es lo único de los hechizos
-                // que no sale de los datos del cliente: las parejas y los niveles son suyos, pero
-                // la elección es del jugador y tiene que sobrevivir de una sesión a la siguiente.
+                // Which of each spell pair the character carries. It is the only thing about spells
+                // that does not come from the client's data: the pairs and the levels are its own, but
+                // the choice is the player's and has to survive from one session to the next.
                 var createSpellChoices = worldConnection.CreateCommand();
                 createSpellChoices.CommandText = @"
                     CREATE TABLE IF NOT EXISTS CharacterSpellChoices (
@@ -559,9 +556,9 @@ namespace Jondo.Unity.Server
                 ";
                 createSpellChoices.ExecuteNonQuery();
 
-                // La experiencia de cada oficio. Es lo que el comentario del catálogo llevaba
-                // tiempo prometiendo: los niveles de oficio del personaje van aparte del catálogo,
-                // que es del cliente y no cambia.
+                // Each profession's experience. It is what the catalogue's comment had been promising
+                // for a while: the character's profession levels go apart from the catalogue, which is
+                // the client's and does not change.
                 var createJobs = worldConnection.CreateCommand();
                 createJobs.CommandText = @"
                     CREATE TABLE IF NOT EXISTS CharacterJobs (
@@ -600,9 +597,9 @@ namespace Jondo.Unity.Server
                 ";
                 createDream.ExecuteNonQuery();
 
-                // Los retos de mazmorra que ya se han logrado. Van con logro detrás, y un logro
-                // se hace UNA vez: cumplido el reto, no se le vuelve a ofrecer a ese personaje
-                // nunca más. Los retos normales no pasan por aquí, que ésos salen siempre.
+                // The dungeon challenges already achieved. They carry an achievement, and an achievement
+                // is done ONCE: once the challenge is met, it is never offered to that character again.
+                // Normal challenges do not go through here, those always come up.
                 var createChallenges = worldConnection.CreateCommand();
                 createChallenges.CommandText = @"
                     CREATE TABLE IF NOT EXISTS CharacterChallenges (
@@ -630,9 +627,9 @@ namespace Jondo.Unity.Server
                 ";
                 createQuests.ExecuteNonQuery();
 
-                // Los logros conseguidos, y si ya se ha cobrado lo que dan. Son dos hechos y no
-                // uno: el cliente pide la recompensa con un paquete aparte —la captura de Logros
-                // es exactamente eso— y quien las junte pagaría dos veces o ninguna.
+                // The achievements earned, and whether what they give has already been collected. They
+                // are two facts and not one: the client asks for the reward with a separate packet -- the
+                // Logros capture is exactly that -- and whoever merged them would pay twice or never.
                 var createAchievements = worldConnection.CreateCommand();
                 createAchievements.CommandText = @"
                     CREATE TABLE IF NOT EXISTS CharacterAchievements (
@@ -647,14 +644,14 @@ namespace Jondo.Unity.Server
                 // And the tallies and emotes that go with them, created the same way.
                 EnsureProgressionTables();
 
-                // La entrada gratis del manojo de llaves, gastada o no, por personaje y por
-                // mazmorra. Una fila por las dos cosas porque el manojo da "una entrada gratis en
-                // CADA mazmorra, una vez por semana" -- traduccion 1189621, la pagina de ayuda del
-                // propio cliente-, asi que usarlo en una puerta no cierra las demas.
+                // The keyring's free entry, spent or not, per character and per dungeon. One row for
+                // both because the keyring gives "a free entry in EACH dungeon, once a week" --
+                // translation 1189621, the client's own help page --, so using it at one door does not
+                // close the others.
                 //
-                // Week es el martes en que empieza la semana, no el dia en que se uso: el manojo
-                // "se reinicia todos los martes", que no es lo mismo que siete dias despues. Quien
-                // entra un lunes vuelve a tenerlo al dia siguiente.
+                // Week is the Tuesday the week starts on, not the day it was used: the keyring "resets
+                // every Tuesday", which is not the same as seven days later. Whoever goes in on a Monday
+                // has it again the next day.
                 var createKeyring = worldConnection.CreateCommand();
                 createKeyring.CommandText = @"
                     CREATE TABLE IF NOT EXISTS CharacterKeyring (
@@ -666,16 +663,16 @@ namespace Jondo.Unity.Server
                 ";
                 createKeyring.ExecuteNonQuery();
 
-                // Los interactivos que este personaje ha usado alguna vez.
+                // The interactives this character has ever used.
                 //
-                // Hace falta para las misiones que empiezan leyendo algo. La oferta de trabajo de
-                // la taberna de Incarnam no es un objetivo -- la misión tiene un solo paso y el
-                // cartel no sale en él --, es la CONDICIÓN para que el tabernero ofrezca «He visto
-                // el anuncio que has puesto»: sin haberlo leído esa respuesta no debería existir.
-                // Sin recordarlo no hay manera de saberlo, porque un clic no deja rastro.
+                // It is needed for the quests that start by reading something. The Incarnam tavern's
+                // job offer is not an objective -- the quest has a single step and the notice does not
+                // appear in it --, it is the CONDITION for the tavern keeper to offer «He visto el
+                // anuncio que has puesto»: without having read it that answer should not exist. Without
+                // remembering it there is no way of knowing, because a click leaves no trace.
                 //
-                // Se guarda de todos, no sólo del cartel: cuesta una fila y evita tener que decidir
-                // de antemano cuáles importan, que es una decisión que siempre se toma tarde.
+                // All of them are stored, not just the notice: it costs one row and avoids having to
+                // decide beforehand which ones matter, which is a decision that is always made too late.
                 var createElements = worldConnection.CreateCommand();
                 createElements.CommandText = @"
                     CREATE TABLE IF NOT EXISTS CharacterElements (
@@ -686,18 +683,18 @@ namespace Jondo.Unity.Server
                 ";
                 createElements.ExecuteNonQuery();
 
-                // Los gremios y sus miembros. La base de todo lo del gremio; ver GuildStore.
+                // The guilds and their members. The base of everything about the guild; see GuildStore.
                 Managers.GuildStore.EnsureTables(worldConnection);
 
-                // El manojo de llaves a todo el que ya tuviera personaje. Los nuevos lo reciben
-                // con el conjunto del aventurero -ver CharacterCreationHandler-, pero los que ya
-                // estaban se quedarian sin el, y sin manojo no se entra en ninguna de las 107
-                // mazmorras que lo aceptan salvo fabricando su llave.
+                // The keyring for everybody who already had a character. New ones receive it with the
+                // adventurer's set -- see CharacterCreationHandler --, but those already there would be
+                // left without it, and without the keyring one gets into none of the 107 dungeons that
+                // accept it except by crafting their key.
                 //
-                // Se comprueba antes de dar, asi que arrancar dos veces no reparte dos.
+                // It is checked before giving, so starting twice does not hand out two.
                 DarElManojoALosQueYaEstaban(worldConnection);
 
-                // Y en qué hueco de la barra puso cada hechizo, por lo mismo.
+                // And which bar slot each spell was put in, for the same reason.
                 var createSpellBar = worldConnection.CreateCommand();
                 createSpellBar.CommandText = @"
                     CREATE TABLE IF NOT EXISTS CharacterSpellBar (
@@ -1020,11 +1017,11 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Los pasos entre mapas importados del catálogo normalizado.
+        /// The passages between maps imported from the normalised catalogue.
         ///
-        /// La clave lleva el destino dentro para poder guardar también las candidatas ambiguas
-        /// —las que dan dos destinos para el mismo elemento— que necesariamente quedan apagadas.
-        /// El juego sólo carga las filas con Enabled=1.
+        /// The key carries the destination inside so that the ambiguous candidates can be stored too -- the
+        /// ones that give two destinations for the same element -- which necessarily stay switched off. The
+        /// game only loads the rows with Enabled=1.
         /// </summary>
         private static void EnsureInteractiveTeleportSchema(SqliteConnection connection)
         {
@@ -1320,7 +1317,7 @@ namespace Jondo.Unity.Server
             public string Login { get; set; } = "";
             public string Nickname { get; set; } = "";
 
-            /// <summary>Qué puede hacer esta cuenta. Ver <see cref="Roles"/>.</summary>
+            /// <summary>What this account can do. See <see cref="Roles"/>.</summary>
             public int Role { get; set; } = Roles.PorDefecto;
         }
 
@@ -1361,10 +1358,10 @@ namespace Jondo.Unity.Server
                 using var connection = new SqliteConnection(AuthConnectionString);
                 connection.Open();
 
-                // La clave ya no se compara en el SQL. Antes esto era «AND Password = $pass»,
-                // que obliga a tener la contraseña guardada en claro para poder cotejarla; ahora
-                // se trae lo guardado y lo comprueba Claves, que sabe tanto de las cifradas como
-                // de las de antes.
+                // The password is no longer compared in the SQL. Before this was «AND Password = $pass»,
+                // which forces having the password stored in clear to be able to match it; now what is
+                // stored is fetched and Claves checks it, which knows both the hashed ones and the old
+                // ones.
                 var command = connection.CreateCommand();
                 command.CommandText = "SELECT Id, Login, Nickname, Role, Password FROM Accounts " +
                                       "WHERE LOWER(Login) = $login;";
@@ -1384,9 +1381,9 @@ namespace Jondo.Unity.Server
                             Role = reader.IsDBNull(3) ? Roles.PorDefecto : reader.GetInt32(3),
                         };
 
-                        // Es el único momento en que se tiene la contraseña en la mano y se sabe
-                        // que es la buena, así que es aquí donde se convierte la que estaba en
-                        // claro. La base vieja se va cifrando sola según entra cada uno.
+                        // It is the only moment the password is in hand and it is known to be the right one,
+                        // so this is where the one stored in clear is converted. The old database hashes
+                        // itself as each one signs in.
                         if (reescribir) ReescribirClave(account.Id, password);
 
                         Managers.LoginThrottle.Succeeded(clientIp, login);
@@ -1406,11 +1403,11 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Qué puede hacer esa cuenta.
+        /// What that account can do.
         ///
-        /// Se pregunta a la base cada vez, no se guarda en la sesión: así quitarle el rol a alguien
-        /// tiene efecto en el acto y no cuando le apetezca reconectar. Son cuentas, no millones de
-        /// filas, y la consulta va por clave primaria.
+        /// The database is asked every time, it is not kept in the session: that way taking a role away from
+        /// somebody takes effect at once and not whenever he feels like reconnecting. They are accounts, not
+        /// millions of rows, and the query goes by primary key.
         /// </summary>
         public static int GetAccountRole(long accountId)
         {
@@ -1429,13 +1426,13 @@ namespace Jondo.Unity.Server
             }
             catch (Exception ex)
             {
-                // Si la base no contesta, el que menos puede. Nunca al revés.
+                // If the database does not answer, the one who can do least. Never the other way round.
                 Console.WriteLine($"[DatabaseManager] No se ha podido leer el rol de {accountId}: {ex.Message}");
                 return Roles.PorDefecto;
             }
         }
 
-        /// <summary>Cambia el rol de una cuenta por su nombre. Devuelve falso si no existe.</summary>
+        /// <summary>Changes an account's role by its name. Returns false if it does not exist.</summary>
         public static bool SetAccountRole(string login, int role, out int cuantas)
         {
             cuantas = 0;
@@ -1457,7 +1454,33 @@ namespace Jondo.Unity.Server
             }
         }
 
-        public static bool RegisterNewAccount(string login, string password, string nickname, string clientIp, out string errorMessage)
+        /// <summary>The test account every installation comes with: see where Initialize creates it.</summary>
+        public const string TestAccountLogin = "keka", TestAccountPassword = "test";
+
+        /// <summary>
+        /// Its id: the one the characters of keka that datos/world.zip carries belong to, and the
+        /// one the account always had (the first of the two the old seed wrote, 188940901).
+        /// </summary>
+        public const long TestAccountId = 188940901;
+
+        /// <summary>Whether an account with that login exists, whatever its case.</summary>
+        public static bool AccountExists(string login)
+        {
+            using var connection = new SqliteConnection(AuthConnectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM Accounts WHERE LOWER(Login) = $login;";
+            command.Parameters.AddWithValue("$login", (login ?? "").Trim().ToLowerInvariant());
+            return (long)(command.ExecuteScalar() ?? 0L) > 0;
+        }
+
+        /// <param name="id">
+        /// The account's id, for the test account only: its characters in the shipped world.db
+        /// belong to it. Zero, as for anybody who signs up, lets the table pick; one already taken
+        /// does too.
+        /// </param>
+        public static bool RegisterNewAccount(string login, string password, string nickname, string clientIp, out string errorMessage,
+                                              long id = 0)
         {
             errorMessage = "";
 
@@ -1493,14 +1516,25 @@ namespace Jondo.Unity.Server
                     return false;
                 }
 
-                // El abono se escribe aquí, no se deja para el relleno del arranque siguiente. Una
-                // cuenta creada con el servidor ya en marcha nacía con la columna vacía y tiraba
-                // del valor por defecto hasta que alguien reiniciase: funcionaba, pero entonces la
-                // fecha que el jugador ve no está en ninguna parte y no se le puede cambiar.
+                // The subscription is written here, not left for the next start's filling. An account
+                // created with the server already running was born with the column empty and used the
+                // default value until somebody restarted: it worked, but then the date the player sees
+                // is nowhere and cannot be changed for him.
+                if (id > 0)
+                {
+                    var taken = connection.CreateCommand();
+                    taken.CommandText = "SELECT COUNT(*) FROM Accounts WHERE Id = $id;";
+                    taken.Parameters.AddWithValue("$id", id);
+                    if ((long)(taken.ExecuteScalar() ?? 0L) > 0) id = 0;
+                }
+
                 var insertCmd = connection.CreateCommand();
-                insertCmd.CommandText =
-                    "INSERT INTO Accounts (Login, Password, Nickname, SubscriptionEnd) " +
-                    "VALUES ($login, $pass, $nick, $hasta);";
+                insertCmd.CommandText = id > 0
+                    ? "INSERT INTO Accounts (Id, Login, Password, Nickname, SubscriptionEnd) " +
+                      "VALUES ($id, $login, $pass, $nick, $hasta);"
+                    : "INSERT INTO Accounts (Login, Password, Nickname, SubscriptionEnd) " +
+                      "VALUES ($login, $pass, $nick, $hasta);";
+                if (id > 0) insertCmd.Parameters.AddWithValue("$id", id);
                 insertCmd.Parameters.AddWithValue("$login", login);
                 insertCmd.Parameters.AddWithValue("$pass", Managers.Claves.Cifrar(password));
                 insertCmd.Parameters.AddWithValue("$nick", nickname);
@@ -1517,11 +1551,11 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Vuelve a escribir la contraseña de una cuenta, ya cifrada.
+        /// Writes an account's password again, now hashed.
         ///
-        /// Se llama sólo desde dentro de una entrada que ha salido bien, o sea con la clave
-        /// verificada. Si falla no se dice nada al que entra —ya está dentro— pero se anota:
-        /// que no se pueda convertir es cosa de la base, no suya.
+        /// It is only called from inside a sign-in that went well, that is with the password verified. If it
+        /// fails nothing is said to whoever signs in -- he is already in -- but it is noted: that it cannot
+        /// be converted is the database's business, not his.
         /// </summary>
         private static void ReescribirClave(long cuenta, string clave)
         {
@@ -1544,20 +1578,19 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Guarda la sesión del LANZADOR. Es un token aparte del de juego a propósito: el del
-        /// juego lo rota el cliente cada vez que arranca, y si fueran el mismo, abrir un cliente
-        /// dejaría al lanzador sin sesión para la próxima vez.
+        /// Stores the LAUNCHER's session. It is a token separate from the game's on purpose: the game's is
+        /// rotated by the client every time it starts, and if they were the same, opening a client would
+        /// leave the launcher without a session for the next time.
         /// </summary>
         /// <summary>
-        /// Hasta cuándo está abonada una cuenta, tal cual viaja. Cadena vacía si no hay nada.
+        /// Until when an account is subscribed, as it travels. Empty string if there is nothing.
         /// </summary>
         /// <remarks>
-        /// Con try/catch por la misma razón que sus vecinas: esto se pregunta en el camino de
-        /// autenticación y en cada lanzamiento del cliente, y una base a medio hacer —un primer
-        /// arranque, la integración continua, que sólo descomprime el mundo— contesta «no such
-        /// table: Accounts» lanzando. Esa excepción subiría hasta el manejador de conexiones, que
-        /// es código que corre para TODO el que se presenta. Ya pasó una vez con
-        /// GetAccountIdByToken y tumbó la integración continua entera.
+        /// With try/catch for the same reason as its neighbours: this is asked on the authentication path and
+        /// on every client launch, and a half-made database -- a first start, the continuous integration,
+        /// which only unzips the world -- answers «no such table: Accounts» by throwing. That exception would
+        /// rise up to the connection handler, which is code that runs for EVERYBODY who shows up. It already
+        /// happened once with GetAccountIdByToken and took down the whole continuous integration.
         /// </remarks>
         public static string GetSubscriptionEnd(long accountId)
         {
@@ -1578,7 +1611,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>Cambia la fecha de abono de una cuenta. Devuelve si escribió algo.</summary>
+        /// <summary>Changes an account's subscription date. Returns whether it wrote anything.</summary>
         public static bool SetSubscriptionEnd(long accountId, string endDate)
         {
             if (accountId <= 0) return false;
@@ -1617,7 +1650,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>De quién es esta sesión de lanzador, o cero si no la reconoce nadie.</summary>
+        /// <summary>Whose launcher session this is, or zero if nobody recognises it.</summary>
         public static long GetAccountIdByLauncherToken(string token)
         {
             if (string.IsNullOrWhiteSpace(token)) return 0;
@@ -1638,12 +1671,12 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>Guarda el token de juego de una cuenta, pisando el anterior.</summary>
+        /// <summary>Stores an account's game token, overwriting the previous one.</summary>
         /// <remarks>
-        /// Con su red por lo mismo que <see cref="GetAccountIdByToken"/>: la llaman cuatro sitios
-        /// -HAAPI dos veces, el Zaap y el canal de control-, todos dentro de atender una peticion,
-        /// y sin base de autenticacion SQLite lanza en vez de contestar. Que no se pueda guardar
-        /// el token es malo; que se lleve por delante la peticion entera es peor.
+        /// With its net for the same reason as <see cref="GetAccountIdByToken"/>: four places call it --
+        /// HAAPI twice, the Zaap and the control channel --, all of them while serving a request, and without
+        /// an authentication database SQLite throws instead of answering. Not being able to store the token
+        /// is bad; taking the whole request down with it is worse.
         /// </remarks>
         public static void SetGameToken(long accountId, string token)
         {
@@ -1670,13 +1703,13 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Si ese token es de alguna cuenta. NO LA LLAMA NADIE.
+        /// Whether that token belongs to some account. NOBODY CALLS IT.
         /// </summary>
         /// <remarks>
-        /// Se deja escrito porque un metodo publico que valida credenciales y no se usa se lee
-        /// como si fuera la puerta por la que se entra, y no lo es: quien resuelve un token es
-        /// ClientLaunchRegistry.ResolveToken, que mira tres sitios y no este. Si sigue sin usarse,
-        /// borrarla.
+        /// It is written down because a public method that validates credentials and is not used reads as
+        /// if it were the door one comes in through, and it is not: whoever resolves a token is
+        /// ClientLaunchRegistry.ResolveToken, which looks in three places and not this one. If it stays
+        /// unused, delete it.
         /// </remarks>
         public static bool ValidateGameToken(string token)
         {
@@ -1724,17 +1757,17 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// La cuenta de un token de juego. Cero si no es de nadie.
+        /// A game token's account. Zero if it belongs to nobody.
         /// </summary>
         /// <remarks>
-        /// Con su red, igual que <see cref="GetAccountIdByLauncherToken"/>, que está aquí al lado
-        /// y sí la tenía. Ésta no, y no era un detalle: si la base de autenticación todavía no
-        /// existe —primer arranque, o el fichero borrado— SQLite lanza «no such table: Accounts»
-        /// y la excepción sube por ResolveToken hasta el manejador de la conexión, que es código
-        /// que corre para CADA cliente que se presenta.
+        /// With its net, the same as <see cref="GetAccountIdByLauncherToken"/>, which is right next to it
+        /// and did have one. This one did not, and it was no detail: if the authentication database does not
+        /// exist yet -- first start, or the file deleted -- SQLite throws «no such table: Accounts» and the
+        /// exception rises through ResolveToken up to the connection handler, which is code that runs for
+        /// EVERY client that shows up.
         ///
-        /// Cero significa «no lo conozco», que es la respuesta correcta cuando no hay dónde
-        /// mirar. Lo destapó la integración continua, donde no hay auth.db.
+        /// Zero means «I do not know it», which is the right answer when there is nowhere to look. The
+        /// continuous integration uncovered it, since there is no auth.db there.
         /// </remarks>
         public static long GetAccountIdByToken(string token)
         {
@@ -2109,7 +2142,7 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>Records when a character last entered the world.</summary>
-        /// <summary>Cuando y desde donde se conecto la vez ANTERIOR. Nulo la primera vez.</summary>
+        /// <summary>When and from where he connected the PREVIOUS time. Null the first time.</summary>
         public sealed class LastVisit
         {
             public DateTimeOffset When { get; init; }
@@ -2117,10 +2150,10 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Lo de la vez pasada, LEIDO ANTES de pisarlo.
+        /// Last time's, READ BEFORE overwriting it.
         ///
-        /// El orden importa: si se actualiza primero, lo que se le enseña al jugador es la
-        /// conexion de ahora mismo, que no le dice nada. Por eso esto va antes del Touch.
+        /// The order matters: if it is updated first, what the player is shown is the connection of right
+        /// now, which tells him nothing. That is why this goes before the Touch.
         /// </summary>
         public static LastVisit? ReadLastVisit(long characterId)
         {
@@ -2150,7 +2183,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>La columna es nueva, asi que se anade sola en bases que vienen de antes.</summary>
+        /// <summary>The column is new, so it adds itself in databases that come from before.</summary>
         private static void EnsureLastIpColumn()
         {
             try
@@ -2198,7 +2231,7 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>Checks that a character really does belong to the account asking for it.</summary>
-        /// <summary>Apunta que este personaje ha usado ese interactivo. Repetir no molesta.</summary>
+        /// <summary>Notes that this character has used that interactive. Repeating does no harm.</summary>
         public static void RememberElement(long characterId, int elementId)
         {
             if (characterId <= 0 || elementId == 0) return;
@@ -2220,7 +2253,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>Los interactivos que este personaje ya ha usado.</summary>
+        /// <summary>The interactives this character has already used.</summary>
         public static HashSet<int> LoadElementsUsed(long characterId)
         {
             var usados = new HashSet<int>();
@@ -2424,13 +2457,12 @@ namespace Jondo.Unity.Server
                     Jondo.Unity.Server.Network.SessionContext.State.CellId = StartingCell;
                 }
 
-                // Y la casilla, por lo mismo y por una razon concreta: hasta que se arreglo, el
-                // final de combate guardaba la casilla del ARENA como si fuera la del mapa de rol.
-                // En el taller de Incarnam eso era la 189 sobre un mapa cuyas 34 casillas van de la
-                // 244 a la 414, o sea una casilla que ahi no existe, y el cliente no dibujaba al
-                // personaje en ningun sitio. El arreglo evita que vuelva a pasar; esto limpia las
-                // fichas que ya lo llevan guardado, que si no entrarian invisibles hasta dar un
-                // paso.
+                // And the cell, for the same reason and for a specific one: until it was fixed, the end
+                // of a fight stored the ARENA's cell as if it were the roleplay map's. In the Incarnam
+                // workshop that was 189 on a map whose 34 cells go from 244 to 414, that is a cell that
+                // does not exist there, and the client drew the character nowhere. The fix keeps it
+                // from happening again; this cleans the sheets that already have it stored, which would
+                // otherwise enter invisible until taking a step.
                 var suyo = Jondo.Unity.Server.Network.SessionContext.State;
                 if (suyo.CellId > 0 && MapManager.WalkableCells.Count > 0
                     && !MapManager.IsCellWalkable(suyo.MapId, suyo.CellId))
@@ -2475,8 +2507,8 @@ namespace Jondo.Unity.Server
                 // HumanInformationsMsg has: Field 3 (Name)
                 Jondo.Unity.Server.Network.SessionContext.State.PlayerActorDetails = ReconstructActorDetails(lookBytes, Jondo.Unity.Server.Network.SessionContext.State.CharacterName);
 
-                // Los oficios, que viven en su propia tabla porque son del personaje y no del
-                // catalogo del cliente.
+                // The professions, which live in their own table because they belong to the character
+                // and not to the client's catalogue.
                 var estado = Jondo.Unity.Server.Network.SessionContext.State;
                 estado.Jobs.Clear();
                 foreach (var par in LoadJobExperience(estado.CharacterId))
@@ -2572,17 +2604,17 @@ namespace Jondo.Unity.Server
                     Position = reader.GetInt32(3)
                 };
 
-                // Los efectos se guardan como los manda el cliente, una lista de listas:
-                // [[efecto, valor, dado, cara], ...]. Aquí se leían como si fueran un diccionario
-                // {"138": 80}, que es OTRA cosa: System.Text.Json se atragantaba, el catch se
-                // tragaba la excepción y TODOS los objetos se quedaban sin efectos. Con eso, la
-                // suma del equipo valía cero para todo —potencia, daños, fuerza, crítico, PA y
-                // PM—, y de ahí que el personaje peleara con 6 PA y 3 PM y pegase como si fuera
-                // desnudo, mientras el panel del cliente sí enseñaba los objetos bien, porque ése
-                // los lee por otro lado (Managers.Equipment.ParseEffects).
+                // Effects are stored as the client sends them, a list of lists:
+                // [[effect, value, die, side], ...]. Here they were read as if they were a dictionary
+                // {"138": 80}, which is SOMETHING ELSE: System.Text.Json choked, the catch swallowed
+                // the exception and ALL items were left without effects. With that, the equipment sum
+                // was zero for everything -- power, damage, strength, critical, AP and MP --, which is
+                // why the character fought with 6 AP and 3 MP and hit as if naked, while the client's
+                // panel did show the items fine, because it reads them elsewhere
+                // (Managers.Equipment.ParseEffects).
                 //
-                // Se lee con ese mismo parser, que es el que ya sabía la forma buena. La forma
-                // vieja de diccionario se sigue admitiendo por si quedó algo guardado así.
+                // It is read with that same parser, which is the one that already knew the right shape.
+                // The old dictionary shape is still accepted in case something was left stored that way.
                 string jsonEffects = reader.IsDBNull(4) ? "" : reader.GetString(4);
                 item.RawEffects = jsonEffects;
                 if (!string.IsNullOrEmpty(jsonEffects))
@@ -2592,7 +2624,7 @@ namespace Jondo.Unity.Server
                     {
                         foreach (var effect in parsed)
                         {
-                            // Un objeto puede repetir efecto; se suman, no se pisan.
+                            // An item can repeat an effect; they are added, not overwritten.
                             item.Effects.TryGetValue(effect.Effect, out int already);
                             item.Effects[effect.Effect] = already + (int)effect.Value;
                         }
@@ -2617,11 +2649,11 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Los efectos de un objeto listos para guardar, en la forma que espera todo el mundo:
-        /// [[efecto, valor, dado, cara], ...].
+        /// An item's effects ready to store, in the shape everybody expects:
+        /// [[effect, value, die, side], ...].
         ///
-        /// Si el objeto vino de la base se devuelven tal cual llegaron, sin recomponerlos, para no
-        /// perder los dados por el camino. Sólo se arma la lista cuando el objeto es nuevo.
+        /// If the item came from the database they are returned as they arrived, without rebuilding them, so
+        /// as not to lose the dice along the way. The list is only built when the item is new.
         /// </summary>
         private static string EffectsForStorage(PlayerItem item)
         {
@@ -2650,10 +2682,10 @@ namespace Jondo.Unity.Server
                     Effects = $effects
                 WHERE CharacterItems.CharacterId = $charId;
             ";
-            // El WHERE del final es lo que impide que esto se lleve por delante la fila de OTRO
-            // personaje. Con el repartidor de uid arreglado no deberia chocar nunca, pero si
-            // alguna vez vuelve a chocar, que no pase nada es mucho mejor que convertirle a
-            // alguien su Dofus en una pluma de piwi sin decir ni pio.
+            // The WHERE at the end is what keeps this from taking down ANOTHER character's row.
+            // With the uid allocator fixed it should never collide, but if it ever collides again,
+            // nothing happening is much better than turning somebody's Dofus into a piwi feather
+            // without a peep.
             command.Parameters.AddWithValue("$charId", characterId);
             command.Parameters.AddWithValue("$uid", item.Uid);
             command.Parameters.AddWithValue("$gid", item.ItemId);
@@ -2663,7 +2695,7 @@ namespace Jondo.Unity.Server
             command.ExecuteNonQuery();
         }
 
-        /// <summary>¿Hay ya alguien con ese nombre? Los nombres son únicos en todo el servidor.</summary>
+        /// <summary>Is there already somebody with that name? Names are unique across the whole server.</summary>
         public static bool CharacterNameTaken(string name)
         {
             try
@@ -2680,11 +2712,11 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Crea un personaje con lo que trae puesto de fábrica: nivel 1, el conjunto del aventurero
-        /// equipado, un millón de kamas y las características que dan los pergaminos.
+        /// Creates a character with what comes factory fitted: level 1, the adventurer's set equipped, a
+        /// million kamas and the characteristics the scrolls give.
         ///
-        /// El identificador se saca del mayor que haya más uno. Los uid de sus objetos salen de un
-        /// rango propio por personaje, para que no choquen con los de nadie.
+        /// The identifier is the largest there is plus one. The uids of his items come from a band of their
+        /// own per character, so that they do not collide with anybody's.
         /// </summary>
         public static long CreateCharacter(long accountId, int serverId, string name, int breed,
                                            int sex, int headId, IReadOnlyList<long> colors,
@@ -2700,26 +2732,26 @@ namespace Jondo.Unity.Server
                 siguiente.CommandText = "SELECT IFNULL(MAX(Id), 1000000) + 1 FROM Characters;";
                 long id = siguiente.ExecuteScalar() is long max ? max : 1000001;
 
-                // La casilla: al lado del zaap, no encima.
+                // The cell: next to the zaap, not on it.
                 var zaap = Managers.Interactives.ZaapOf(mapId);
                 int cell = MapManager.GetNearestWalkableCell(mapId, zaap.Cell);
 
-                // Los colores que el cliente manda a -1 son "los de la raza"; se guardan vacíos y
-                // BreedLookTable pone los suyos.
+                // The colours the client sends as -1 are "the breed's"; they are stored empty and
+                // BreedLookTable puts its own.
                 var propios = new List<long>();
                 foreach (long c in colors) if (c >= 0) propios.Add(c);
                 byte[] look = Managers.BreedLookTable.BuildLook(breed, sex, headId,
                                                                propios.Count > 0 ? propios : null);
 
-                // Se reservan antes de abrir la transacción: NextItemUid consulta la misma base
-                // con otra conexión la primera vez y SQLite no debe encontrarla bloqueada aquí.
+                // They are reserved before opening the transaction: NextItemUid queries the same
+                // database with another connection the first time and SQLite must not find it locked here.
                 var starterUids = new List<long>();
                 foreach (var _ in starterSet) starterUids.Add(NextItemUid());
 
                 using var transaction = connection.BeginTransaction();
 
-                // Los pergaminos van en SUS columnas y la base nace a cero: la base son los puntos
-                // que el jugador reparte, y un personaje recién hecho no ha repartido ninguno.
+                // The scrolls go in THEIR columns and the base starts at zero: the base is the points
+                // the player spends, and a freshly made character has spent none.
                 var insertar = connection.CreateCommand();
                 insertar.CommandText = @"
                     INSERT INTO Characters
@@ -2741,8 +2773,8 @@ namespace Jondo.Unity.Server
                 insertar.Parameters.AddWithValue("$map", mapId);
                 insertar.Parameters.AddWithValue("$cell", cell);
                 insertar.Parameters.AddWithValue("$stat", stat);
-                // En hexadecimal, que es como la guardan los que ya estaban. En base64 el cargador
-                // se atraganta: "Additional non-parsable characters are at the end of the string".
+                // In hexadecimal, which is how the ones already there store it. In base64 the loader
+                // chokes: "Additional non-parsable characters are at the end of the string".
                 insertar.Parameters.AddWithValue("$look", Convert.ToHexString(look));
                 insertar.Parameters.AddWithValue("$kamas", kamas);
                 insertar.ExecuteNonQuery();
@@ -2774,7 +2806,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>El servidor y la cara, que sí tienen columna propia.</summary>
+        /// <summary>The server and the face, which do have a column of their own.</summary>
         private static void SetServerAndHead(SqliteConnection connection, long characterId,
                                              int serverId, int headId)
         {
@@ -2787,15 +2819,15 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Los efectos de fábrica de una plantilla, en la forma que guarda CharacterItems.
+        /// A template's factory effects, in the shape CharacterItems stores.
         ///
-        /// No están sueltos: la plantilla trae en su Data una lista de `rid` y cada uno apunta a una
-        /// fila de ItemEffects con el efecto, el valor y el par de dados. Sin esto, el conjunto del
-        /// aventurero saldría sin una sola característica.
+        /// They are not loose: the template carries in its Data a list of `rid` and each one points at an
+        /// ItemEffects row with the effect, the value and the pair of dice. Without this, the adventurer's
+        /// set would come out without a single characteristic.
         ///
-        /// Del sombrero de aventurero salen 118 (fuerza), 126 (inteligencia), 119 (agilidad) y 123
-        /// (suerte), los cuatro con dado 5, que es "de 1 a 5". Se le da el máximo, que es lo que un
-        /// objeto de estreno debería llevar.
+        /// From the adventurer's hat come 118 (strength), 126 (intelligence), 119 (agility) and 123
+        /// (chance), all four with die 5, which is "from 1 to 5". It is given the maximum, which is what a
+        /// brand-new item should carry.
         /// </summary>
         private static string EffectsOfTemplate(SqliteConnection connection, int gid)
         {
@@ -2829,7 +2861,7 @@ namespace Jondo.Unity.Server
                     int value = reader.GetInt32(3);
                     if (id == 0) continue;
 
-                    // El valor de estreno: el tope del dado si lo hay, y si no, el fijo.
+                    // The brand-new value: the die's top if there is one, and if not, the fixed one.
                     int fijo = value != 0 ? value : (diceSide != 0 ? diceSide : diceNum);
                     salida.Add($"[{id},{fijo},0,0]");
                 }
@@ -2844,16 +2876,15 @@ namespace Jondo.Unity.Server
         /// Returning false distinguishes a real effect-less item from an unknown template id.
         /// </summary>
         /// <summary>
-        /// El nivel que hace falta para llevar puesto un objeto. Cero si no se sabe.
+        /// The level needed to wear an item. Zero if it is not known.
         /// </summary>
         /// <remarks>
-        /// Sale del campo <c>level</c> de la plantilla, que lo traen LAS 21.748: no hay que
-        /// adivinarlo para ninguna. El once mil doscientos setenta y cinco piden nivel 1 y el tope
-        /// es 200.
+        /// It comes from the template's <c>level</c> field, which ALL 21,748 carry: it does not have to be
+        /// guessed for any. Eleven thousand two hundred and seventy-five ask for level 1 and the cap is 200.
         ///
-        /// Devuelve cero cuando la plantilla no esta o no se puede leer, y quien llame debe
-        /// tratarlo como "sin requisito": negarse a equipar por no haber podido consultar seria
-        /// dejar a alguien sin su equipo por un fallo de base de datos.
+        /// It returns zero when the template is not there or cannot be read, and whoever calls should treat it
+        /// as "no requirement": refusing to equip because the lookup could not be done would leave somebody
+        /// without his equipment over a database failure.
         /// </remarks>
         public static int ItemLevelRequirement(int gid)
         {
@@ -2909,8 +2940,8 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Mete un objeto nuevo en el inventario de alguien. Lo usa la lotería del merkasako, que es
-        /// lo único que fabrica objetos de la nada.
+        /// Puts a new item into somebody's inventory. The haven bag lottery uses it, which is the only thing
+        /// that makes items out of nothing.
         /// </summary>
         public static bool InsertCharacterItem(long uid, long characterId, int gid, int quantity,
                                                int position, string? effects)
@@ -2968,7 +2999,7 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Destruye un objeto del inventario, entero o por unidades. Devuelve si se ha hecho algo.
+        /// Destroys an inventory item, whole or by units. Returns whether anything was done.
         /// </summary>
         public static bool DestroyCharacterItem(long characterId, long uid, int quantity)
         {
@@ -3006,17 +3037,17 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Mueve un objeto de hueco.
+        /// Moves an item to another slot.
         ///
-        /// Antes esto era «UPDATE CharacterItems SET Position = $pos WHERE Uid = $uid», sin mirar
-        /// de quien es. El uid es unico en todo el servidor —hay indice unico y se reparten con un
-        /// MAX global— asi que no le tocaba el objeto a medio mundo, pero si dejaba mover el de
-        /// OTRO: el uid lo elige el cliente y aqui no se comprobaba nada, de modo que un iuk con
-        /// el numero de un objeto ajeno lo cambiaba de hueco igual. Con el dueno delante, un uid
-        /// que no sea tuyo no encuentra fila y no pasa nada.
+        /// Before this was «UPDATE CharacterItems SET Position = $pos WHERE Uid = $uid», without looking whose
+        /// it is. The uid is unique across the whole server -- there is a unique index and they are handed out
+        /// with a global MAX -- so it did not touch half the world's item, but it did let ANOTHER's be moved:
+        /// the uid is chosen by the client and nothing was checked here, so an iuk with the number of somebody
+        /// else's item moved it to another slot all the same. With the owner in front, a uid that is not yours
+        /// finds no row and nothing happens.
         ///
-        /// El dueno es obligatorio a proposito —no tiene valor por defecto— para que una llamada
-        /// nueva que se olvide de pasarlo no llegue a compilar.
+        /// The owner is required on purpose -- it has no default value -- so that a new call that forgets to
+        /// pass it does not even compile.
         /// </summary>
         public static bool SaveItemPosition(long uid, int position, long characterId)
         {
@@ -3036,18 +3067,17 @@ namespace Jondo.Unity.Server
 
         /// <summary>Reads an item template's realWeight (pods) from the ItemTemplates Data JSON.</summary>
         /// <summary>
-        /// Lo que pesa un objeto, en pods. Se pregunta una vez por plantilla y ya.
+        /// What an item weighs, in pods. It is asked once per template and that is it.
         ///
-        /// El peso de una plantilla no cambia nunca —sale del volcado del cliente— y esto lo
-        /// recalculaba cada vez: abría una conexión a SQLite, hacía la consulta y parseaba el
-        /// JSON entero de la plantilla para sacar UN número. Como quien llama recorre el
-        /// inventario, arrastrar un solo objeto abría 1.737 conexiones y parseaba 1.737 JSON,
-        /// y el jugador notaba el tirón.
+        /// A template's weight never changes -- it comes from the client dump -- and this worked it out every
+        /// time: it opened a SQLite connection, ran the query and parsed the template's whole JSON to get ONE
+        /// number. Since the caller walks the inventory, dragging a single item opened 1,737 connections and
+        /// parsed 1,737 JSONs, and the player felt the jolt.
         ///
-        /// El diccionario es concurrente porque lo tocan varias sesiones a la vez. Puede que dos
-        /// pregunten por la misma plantilla en el mismo instante y las dos vayan a la base: no
-        /// pasa nada, es la misma respuesta y se escribe la misma. Lo que no puede pasar es que
-        /// el diccionario se rompa por dentro, y de eso se encarga ConcurrentDictionary.
+        /// The dictionary is concurrent because several sessions touch it at once. Two may ask for the same
+        /// template at the same instant and both go to the database: no harm, it is the same answer and the
+        /// same is written. What cannot happen is the dictionary breaking inside, and ConcurrentDictionary
+        /// takes care of that.
         /// </summary>
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, int> _pesoPorPlantilla
             = new System.Collections.Concurrent.ConcurrentDictionary<int, int>();
@@ -3797,26 +3827,25 @@ namespace Jondo.Unity.Server
                     stats.WaterResistance = g.TryGetProperty("waterResistance", out var wr) ? wr.GetInt32() : 0;
                     stats.AirResistance = g.TryGetProperty("airResistance", out var ar) ? ar.GetInt32() : 0;
                     stats.GradeXp = g.TryGetProperty("gradeXp", out var xp) ? xp.GetInt32() : 100;
-                    // El startingSpellId NO va aquí, y meterlo costaba los hechizos de 2.051
-                    // monstruos.
+                    // The startingSpellId does NOT go here, and putting it in cost 2,051 monsters their
+                    // spells.
                     //
-                    // Es un SpellLevels.Id —un id de NIVEL de hechizo— y no un Spells.Id. El
-                    // propio repositorio lo tiene bien escrito en Summons.cs:209, que lo traduce
-                    // con «SELECT SpellId, Grade FROM SpellLevels WHERE Id = $id».
+                    // It is a SpellLevels.Id -- a spell LEVEL id -- and not a Spells.Id. The repository
+                    // itself has it written right in Summons.cs:209, which translates it with
+                    // «SELECT SpellId, Grade FROM SpellLevels WHERE Id = $id».
                     //
-                    // Metido crudo pasaban dos cosas, y la segunda es la venenosa: GetSpellCombatData
-                    // no encontraba ese número y devolvía null, y sobre todo la lista dejaba de
-                    // estar vacía, así que el respaldo de más abajo —el que lee los hechizos DE
-                    // VERDAD de MonsterTemplates— ya no corría. Un id que no vale para nada
-                    // cancelaba los que sí valían.
+                    // Put in raw, two things happened, and the second is the poisonous one: GetSpellCombatData
+                    // did not find that number and returned null, and above all the list stopped being
+                    // empty, so the fallback further down -- the one that reads the REAL spells from
+                    // MonsterTemplates -- no longer ran. A useless id cancelled the ones that were good.
                     //
-                    // Medido: 2.133 de 5.134 monstruos traen startingSpellId, y 1.975 de ésos no
-                    // casan con ningún hechizo. En total 2.051 de 5.134 —el 40 %— se quedaban sin
-                    // poder lanzar nada. El Jalamut Real era uno.
+                    // Measured: 2,133 of 5,134 monsters carry startingSpellId, and 1,975 of those match no
+                    // spell. In total 2,051 of 5,134 -- 40% -- were left unable to cast anything. The Royal
+                    // Jalamut was one.
                     //
-                    // Y aunque se tradujera bien, tampoco es su lista de ataque: es el hechizo de
-                    // comportamiento con el que empieza. Los ataques son MonsterTemplates.spells.
-                    // Se guarda aparte por si algún día hace falta, y no se mezcla.
+                    // And even translated properly, it is not its attack list either: it is the behaviour
+                    // spell it starts with. The attacks are MonsterTemplates.spells. It is kept apart in
+                    // case it is ever needed, and not mixed in.
                     if (g.TryGetProperty("startingSpellId", out var ssp) && ssp.GetInt32() > 0)
                     {
                         stats.StartingSpellLevelId = ssp.GetInt32();
@@ -3856,11 +3885,11 @@ namespace Jondo.Unity.Server
             // spellGrades[i] describes the spell spells[i]: one "grade,level" entry per monster
             // grade, separated by ';'.
             //
-            // Se lee SIEMPRE. Antes iba detrás de un «si la lista está vacía», y ese guardián no
-            // protegía nada: Monsters.Spells vale '[]' en los 5.134 monstruos, así que la lista
-            // sólo se podía llenar con el startingSpellId, que no es un hechizo. Lo único que
-            // conseguía el guardián era dejar sin hechizos al monstruo cuyo grado traía ese
-            // número. Repetir sí hay que evitarlo, y de eso se encarga el Contains de abajo.
+            // It is ALWAYS read. It used to sit behind an «if the list is empty», and that guard
+            // protected nothing: Monsters.Spells is '[]' in all 5,134 monsters, so the list could
+            // only be filled with the startingSpellId, which is not a spell. All the guard achieved
+            // was leaving without spells the monster whose grade carried that number. Repeating
+            // does have to be avoided, and the Contains below takes care of that.
             {
                 try
                 {
@@ -3925,17 +3954,17 @@ namespace Jondo.Unity.Server
         private static Dictionary<int, int>? _effectCharacteristics;
 
         /// <summary>
-        /// De cada efecto, qué característica toca y con qué signo, según el catálogo del cliente.
+        /// For each effect, which characteristic it touches and with what sign, according to the client's
+        /// catalogue.
         ///
-        /// El signo sale de la DESCRIPCIÓN, no del BonusType. Parece más basto y es al revés: el
-        /// BonusType no es de fiar. El 1079, que es el que roba PA —"-#1 a -#2 PA"—, lo tiene a
-        /// CERO, igual que el 101; con esa regla Flecha Helada no robaba nada. La descripción, en
-        /// cambio, es la plantilla con la que el propio cliente escribe el efecto en pantalla, y
-        /// los que restan empiezan todos por un guion: el 1079, el 116 del alcance y el 169 de los
-        /// PM.
+        /// The sign comes from the DESCRIPTION, not from the BonusType. It looks cruder and it is the other
+        /// way round: the BonusType cannot be trusted. 1079, which is the one that steals AP -- "-#1 to -#2
+        /// AP" --, has it at ZERO, the same as 101; with that rule Flecha Helada stole nothing. The
+        /// description, on the other hand, is the template the client itself writes the effect on screen
+        /// with, and the ones that subtract all start with a hyphen: 1079, range's 116 and MP's 169.
         ///
-        /// Y se dejan fuera los de categoría 2, que son los del ARMA: el 101 apunta a los puntos de
-        /// acción, pero es lo que cuesta pegar con ella, no puntos que se ganen.
+        /// And category 2 ones are left out, which are the WEAPON's: 101 points at action points, but it is
+        /// what hitting with it costs, not points that are earned.
         /// </summary>
         public static (int Characteristic, int Sign) EffectMeta(int effectId)
         {
@@ -3946,13 +3975,13 @@ namespace Jondo.Unity.Server
         private static Dictionary<int, (int Characteristic, int Sign)>? _effectMeta;
 
         /// <summary>
-        /// La FAMILIA de un efecto: su categoría y si es un bono, tal cual los declara el catálogo
-        /// del cliente.
+        /// An effect's FAMILY: its category and whether it is a bonus, exactly as the client's catalogue
+        /// declares them.
         ///
-        /// Con estos dos números el cliente decide si un embrujo se pinta en el panel de efectos o
-        /// si es maquinaria interna que no se enseña. Van en su propio diccionario, sin filtrar por
-        /// característica, porque los que hacen falta aquí —el 950 que pone un estado, el 792 que
-        /// encadena hechizos, el 293 de los daños básicos— no tienen característica propia.
+        /// With these two numbers the client decides whether a buff is drawn in the effects panel or whether
+        /// it is internal machinery that is not shown. They go in their own dictionary, without filtering by
+        /// characteristic, because the ones needed here -- 950 that sets a state, 792 that chains spells, 293
+        /// of basic damage -- have no characteristic of their own.
         /// </summary>
         public static (int Category, int Boost) EffectFamily(int effectId)
         {
@@ -3984,8 +4013,8 @@ namespace Jondo.Unity.Server
         private static Dictionary<int, (int Category, int Boost)>? _effectFamily;
 
         /// <summary>
-        /// De qué elemento pega un efecto, según el catálogo: 0 neutral, 1 tierra, 2 fuego, 3 agua
-        /// y 4 aire. Menos uno cuando el efecto no pega de ningún elemento.
+        /// Which element an effect hits with, according to the catalogue: 0 neutral, 1 earth, 2 fire, 3
+        /// water and 4 air. Minus one when the effect hits with no element.
         /// </summary>
         public static int EffectElement(int effectId)
         {
@@ -4012,25 +4041,24 @@ namespace Jondo.Unity.Server
 
         private static Dictionary<int, int>? _effectElement;
 
-        /// <summary>La categoría de los efectos que describen el arma, no al personaje.</summary>
+        /// <summary>The category of the effects that describe the weapon, not the character.</summary>
         private const int WeaponEffectCategory = Jondo.Unity.World.Combat.EffectSupport.WeaponCategory;
 
-        // ─── Los que ROBAN puntos ───────────────────────────────────────────────
+        // ─── The ones that STEAL points ────────────────────────────────────────
 
         private static Dictionary<int, int>? _roboDePuntos;
 
         /// <summary>
-        /// Qué característica roba un efecto de robo, o cero si no roba nada.
+        /// Which characteristic a steal effect steals, or zero if it steals nothing.
         ///
-        /// Son una familia aparte y por eso se les hace un hueco: los cuatro —77 y 441 de puntos
-        /// de movimiento, 84 y 440 de puntos de acción— llevan <c>Characteristic = 0</c> y
-        /// <c>Category = 2</c> en la tabla, así que se los comían los dos filtros del catálogo
-        /// general y no llegaban nunca al motor. El resultado en pantalla era que Flecha
-        /// Inmovilizadora, en vez de quitarle un punto de movimiento al pío, le colgaba un
-        /// embrujo llamado literalmente "Roba 1 PM" que no hacía nada.
+        /// They are a family apart and that is why room is made for them: the four -- 77 and 441 for
+        /// movement points, 84 and 440 for action points -- carry <c>Characteristic = 0</c> and
+        /// <c>Category = 2</c> in the table, so both filters of the general catalogue ate them and they never
+        /// reached the engine. The result on screen was that Flecha Inmovilizadora, instead of taking a
+        /// movement point off the piwi, hung on it a buff literally called "Roba 1 PM" that did nothing.
         ///
-        /// Cuál roban lo dice su propia descripción, que es de donde el catálogo ya saca el signo
-        /// de los demás: "Roba #1 a #2 PM" contra "Roba #1 a #2 PA". No hay lista escrita a mano.
+        /// Which one they steal is said by their own description, which is where the catalogue already takes
+        /// the others' sign from: "Roba #1 a #2 PM" against "Roba #1 a #2 PA". There is no hand-written list.
         /// </summary>
         public static int RoboDePuntos(int effectId)
         {
@@ -4066,18 +4094,18 @@ namespace Jondo.Unity.Server
         private const int ActionPointsCharacteristic = 1;
         private const int MovementPointsCharacteristic = 23;
 
-        // ─── Los que MULTIPLICAN ────────────────────────────────────────────────
+        // ─── The ones that MULTIPLY ────────────────────────────────────────────
 
         private static HashSet<int>? _multiplicadores;
 
         /// <summary>
-        /// Si un efecto multiplica en vez de sumar.
+        /// Whether an effect multiplies instead of adding.
         /// </summary>
         /// <remarks>
-        /// Se reconocen por su descripción, que es de la forma "… x#1%": el 1163 es "Daños
-        /// sufridos x#1%" y el 1159 "Curas recibidas x#1%". Ninguno tiene característica en el
-        /// catálogo, porque el cliente los resuelve por su número, y por eso no encajan en el
-        /// camino corriente del motor.
+        /// They are recognised by their description, which has the shape "… x#1%": 1163 is "Daños sufridos
+        /// x#1%" (damage taken) and 1159 "Curas recibidas x#1%" (heals received). Neither has a
+        /// characteristic in the catalogue, because the client resolves them by their number, and that is why
+        /// they do not fit the engine's ordinary path.
         /// </remarks>
         public static bool EsMultiplicador(int effectId)
         {
@@ -4204,33 +4232,32 @@ namespace Jondo.Unity.Server
             }
             catch { }
 
-            // El daño del arma que lleva puesta.
+            // The damage of the weapon he wears.
             //
-            // OJO CON DE DÓNDE SALE. En la instancia guardada, un efecto de daño es
-            // «[96, 0, 9, 13]»: el 96 es el efecto, el 0 es el VALOR —que en los daños va vacío—
-            // y el 9 y el 13 son los DADOS, que es donde está el daño de verdad.
+            // CAREFUL WITH WHERE IT COMES FROM. In the stored instance, a damage effect is
+            // «[96, 0, 9, 13]»: 96 is the effect, 0 is the VALUE -- which for damage goes empty --
+            // and 9 and 13 are the DICE, which is where the real damage is.
             //
-            // Esto leía weapon.Effects, que es un diccionario efecto→valor y por tanto ya ha
-            // perdido los dados por el camino. Con el valor a cero, la condición «kv.Value <= 0»
-            // descartaba TODOS los efectos de daño, el arma se quedaba con cero, y GolpeDelArma
-            // devolvía una lista vacía: por eso al atacar con la espada salía un puñetazo.
+            // This read weapon.Effects, which is an effect→value dictionary and so has already lost
+            // the dice along the way. With the value at zero, the condition «kv.Value <= 0» discarded
+            // ALL the damage effects, the weapon was left with zero, and GolpeDelArma returned an
+            // empty list: that is why attacking with the sword came out as a punch.
             //
-            // Se lee de RawEffects, que es el json tal cual vino, con el mismo parser que ya sabe
-            // su forma.
+            // It is read from RawEffects, which is the json as it came, with the same parser that
+            // already knows its shape.
             //
-            // Y se guardan TODAS las líneas, no sólo la de más daño. Antes había un
-            // «if (maximo <= data.BaseDamageMax) continue;» que se quedaba con la mayor y tiraba
-            // las demás, así que un arma de tres líneas pegaba una sola vez. La Lanzapinza de
-            // Cangrancio tiene [[96,0,9,13],[96,0,9,13],[91,0,27,33]] y sólo sobrevivía la
-            // última: en el chat salía UNA cifra donde tenían que salir tres.
+            // And ALL the lines are kept, not only the one doing most damage. There used to be an
+            // «if (maximo <= data.BaseDamageMax) continue;» that kept the largest and threw away the
+            // others, so a three-line weapon hit only once. Cangrancio's Lanzapinza has
+            // [[96,0,9,13],[96,0,9,13],[91,0,27,33]] and only the last survived: ONE figure came
+            // out in the chat where three should have.
             //
-            // El servidor real manda un golpe por línea, cada uno con SU número de efecto: el
-            // Cocobur crítico manda tres (2822, 91, 93), la Lavacha dos (97, 92) y las Garras dos
-            // (96, 94).
+            // The real server sends one hit per line, each with ITS effect number: the critical
+            // Cocobur sends three (2822, 91, 93), the Lavacha two (97, 92) and the Claws two (96, 94).
             //
-            // Los campos sueltos —Element, BaseDamageMin y BaseDamageMax— se siguen rellenando con
-            // la línea más gorda, porque son los que mira la IA para estimar el daño y para eso
-            // vale la mayor.
+            // The loose fields -- Element, BaseDamageMin and BaseDamageMax -- are still filled with
+            // the biggest line, because they are the ones the AI looks at to estimate damage and the
+            // largest is fine for that.
             foreach (var efecto in Managers.Equipment.ParseEffects(weapon.RawEffects))
             {
                 if (efecto.Effect < 91 || efecto.Effect > 100) continue;
@@ -4376,9 +4403,9 @@ namespace Jondo.Unity.Server
                     if (!e.TryGetProperty("objectId", out var oid)) continue;
                     int objectId = oid.GetInt32();
 
-                    // Filas con objeto -1: no reparten un objeto, reparten una alteración, y de
-                    // eso no hay nada hecho. Se dejan pasar de largo en vez de meter un objeto
-                    // inexistente en la bolsa.
+                    // Rows with item -1: they do not hand out an item, they hand out an alteration, and
+                    // none of that is done. They are passed over instead of putting a nonexistent item in
+                    // the bag.
                     if (objectId <= 0) continue;
 
                     double pct = 0;
@@ -4408,7 +4435,7 @@ namespace Jondo.Unity.Server
         /// Puts an item into the inventory. If one of the same kind is already loose in the bag,
         /// it adds to that stack instead of creating another entry. Returns the resulting item.
         /// </summary>
-        /// <summary>Guarda la experiencia de un oficio. Se llama en cada recolección.</summary>
+        /// <summary>Stores a profession's experience. It is called on every gathering.</summary>
         public static void SaveJobExperience(long characterId, int jobId, long experience)
         {
             try
@@ -4816,7 +4843,7 @@ namespace Jondo.Unity.Server
             return salida;
         }
 
-        /// <summary>Los oficios de un personaje, para dejárselos puestos al entrar.</summary>
+        /// <summary>A character's professions, to leave them in place on entering.</summary>
         public static Dictionary<int, long> LoadJobExperience(long characterId)
         {
             var salida = new Dictionary<int, long>();
@@ -4839,12 +4866,11 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Los retos con logro que este personaje ya ha cumplido, para no volver a ofrecérselos.
+        /// The achievement challenges this character has already met, so as not to offer them again.
         ///
-        /// Hoy devuelve siempre vacío, y es correcto que lo haga: todavía no hay nada que
-        /// compruebe durante el combate si un reto se cumple, así que aún no hay a quién apuntar
-        /// nada. La tabla existe ya para que el día que se implante esa comprobación sólo haya
-        /// que llamar a <see cref="MarkChallengeDone"/>.
+        /// Today it always returns empty, and that is correct: there is still nothing checking during the
+        /// fight whether a challenge is met, so there is nobody to note anything for yet. The table already
+        /// exists so that the day that check is in place only <see cref="MarkChallengeDone"/> has to be called.
         /// </summary>
         public static HashSet<int> LoadChallengesDone(long characterId)
         {
@@ -4867,7 +4893,7 @@ namespace Jondo.Unity.Server
             return salida;
         }
 
-        /// <summary>Apunta un reto con logro como cumplido. No se le volverá a ofrecer.</summary>
+        /// <summary>Notes an achievement challenge as met. It will not be offered to him again.</summary>
         public static void MarkChallengeDone(long characterId, int challengeId)
         {
             try
@@ -4889,7 +4915,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>El mapa que dice la base para un personaje. Solo para diagnostico.</summary>
+        /// <summary>The map the database says for a character. Only for diagnostics.</summary>
         public static long MapOf(long characterId)
         {
             try
@@ -4909,29 +4935,29 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// El siguiente uid libre. Uno para TODO el servidor, y atomico.
+        /// The next free uid. One for the WHOLE server, and atomic.
         ///
-        /// Esto arreglo un bug que se comia objetos. El uid es unico en toda la tabla —hay indice
-        /// unico y SaveInventoryItem hace ON CONFLICT(Uid) DO UPDATE— pero se repartia mirando el
-        /// inventario de UN personaje: «el mayor uid que tengo yo, mas uno». Con dos personajes
-        /// nuevos eso da 1 a los dos, y el segundo en lootear no anade su objeto: PISA el del
-        /// primero. Comprobado sobre una copia de la base: Ana loota una pluma y le queda el uid 1;
-        /// Beto loota una semilla, sale uid 1 otra vez, y la fila pasa a ser «personaje de Ana,
-        /// objeto de Beto». Ana pierde la pluma y Beto se queda sin nada, y no salta ni un error.
+        /// This fixed a bug that ate items. The uid is unique across the whole table -- there is a unique index
+        /// and SaveInventoryItem does ON CONFLICT(Uid) DO UPDATE -- but it was handed out looking at ONE
+        /// character's inventory: «the largest uid I have, plus one». With two new characters that gives 1 to
+        /// both, and the second to loot does not add his item: he OVERWRITES the first one's. Checked on a copy
+        /// of the database: Ana loots a feather and gets uid 1; Beto loots a seed, uid 1 comes out again, and
+        /// the row becomes «Ana's character, Beto's item». Ana loses the feather and Beto gets nothing, and not
+        /// a single error fires.
         ///
-        /// Los otros dos repartidores que habia —NpcHandler y Lottery— leian MAX(Uid) de la base
-        /// cada vez, lo cual era correcto pero tenia su propia carrera: dos compras en el mismo
-        /// instante leen el mismo maximo y devuelven el mismo numero. Ahora los tres pasan por
-        /// aqui, se pregunta a la base UNA vez y a partir de ahi es un contador.
+        /// The other two allocators there were -- NpcHandler and Lottery -- read MAX(Uid) from the database each
+        /// time, which was correct but had its own race: two purchases at the same instant read the same
+        /// maximum and return the same number. Now all three go through here, the database is asked ONCE and
+        /// from then on it is a counter.
         ///
-        /// El suelo es por si la tabla esta vacia; si hay algo, se sigue por encima de lo que ya
-        /// exista, sea del rango que sea.
+        /// The floor is in case the table is empty; if there is something, it carries on above whatever
+        /// exists, whatever band it is in.
         /// </summary>
         private const long PrimerUidRepartido = 1_000_000_000L;
 
         /// <summary>
-        /// El cliente 3.6 reduce el uid de inventario a 32 bits. Nos quedamos además en la mitad
-        /// positiva para que ninguna capa que lo trate como int con signo pueda cambiarlo.
+        /// The 3.6 client reduces the inventory uid to 32 bits. We also stay in the positive half so that no
+        /// layer treating it as a signed int can change it.
         /// </summary>
         public const long MaxClientItemUid = int.MaxValue;
 
@@ -4939,16 +4965,16 @@ namespace Jondo.Unity.Server
         private static readonly object _candadoDelUid = new object();
 
         /// <summary>
-        /// Pone el manojo de llaves en la bolsa de todo personaje que no lo tenga.
+        /// Puts the keyring in the bag of every character who does not have it.
         /// </summary>
         /// <remarks>
-        /// Los personajes nuevos lo reciben con el conjunto del aventurero. Esto es para los que ya
-        /// existian: sin manojo no se entra en ninguna de las 107 mazmorras que lo aceptan si no es
-        /// fabricando su llave suelta, y esa parte del juego se quedaba cerrada para ellos.
+        /// New characters receive it with the adventurer's set. This is for those who already existed: without
+        /// the keyring one gets into none of the 107 dungeons that accept it except by crafting its loose key,
+        /// and that part of the game stayed closed to them.
         ///
-        /// Idempotente a proposito: mira quien NO lo tiene antes de dar nada, asi que arrancar el
-        /// servidor dos veces no reparte dos manojos. Y si alguien lo tira, se lo devuelve el
-        /// siguiente arranque, que para un objeto de mision que no se gasta es lo que toca.
+        /// Idempotent on purpose: it looks at who does NOT have it before giving anything, so starting the
+        /// server twice does not hand out two keyrings. And if somebody throws it away, the next start gives
+        /// it back, which for a quest item that is not spent is the right thing.
         /// </remarks>
         private static void DarElManojoALosQueYaEstaban(SqliteConnection connection)
         {
@@ -5013,7 +5039,7 @@ namespace Jondo.Unity.Server
             return next;
         }
 
-        /// <summary>El mayor uid escrito en la base. Lo usa la guardia de regresion.</summary>
+        /// <summary>The largest uid written in the database. The regression guard uses it.</summary>
         public static long MayorUidGuardado() => MayorUidEnUso();
 
         /// <summary>
@@ -5068,22 +5094,19 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Arregla los uid que salieron de `characterId * 1000` y no caben en los 32 bits que el
-        /// cliente conserva.
+        /// Fixes the uids that came from `characterId * 1000` and do not fit in the 32 bits the client keeps.
         ///
-        /// Medido sobre nuestra propia base: 10 de 1.777 objetos estaban así, todos de los tres
-        /// personajes cuyo id pasa de dos millones. El objeto 13.825.560.000 le llegaba al cliente
-        /// como 940.658.112 —que es el mismo número recortado a 32 bits— y al devolverlo para
-        /// equiparlo el servidor no lo reconocía. La ficha se quedaba sin los efectos de esa
-        /// pieza y en el registro salía «no es de los nuestros».
+        /// Measured on our own database: 10 of 1,777 items were like that, all from the three characters whose
+        /// id goes over two million. Item 13,825,560,000 reached the client as 940,658,112 -- which is the same
+        /// number cut to 32 bits -- and on sending it back to equip it the server did not recognise it. The
+        /// sheet was left without that piece's effects and the log said «not one of ours».
         ///
-        /// Y no era sólo el pasado: como NextItemUid arrancaba en el mayor uid de la tabla, con
-        /// un 13.825.560.013 escrito el siguiente objeto que fabricara el servidor —un botín, una
-        /// compra, el merkasako— nacía ya roto. Por eso la consulta del mayor uid se acota ahora
-        /// al rango del cliente.
+        /// And it was not only the past: since NextItemUid started at the largest uid of the table, with a
+        /// 13,825,560,013 written the next item the server made -- a loot, a purchase, the haven bag -- was born
+        /// already broken. That is why the largest uid query is now bounded to the client's range.
         ///
-        /// La fila no cambia de dueño, ni de plantilla, ni de sitio, ni de efectos: lo único que
-        /// se le cambia es el número con el que viaja.
+        /// The row changes neither owner, nor template, nor place, nor effects: the only thing changed is the
+        /// number it travels with.
         /// </summary>
         private static void RepairClientItemUids(SqliteConnection connection)
         {
@@ -5116,10 +5139,9 @@ namespace Jondo.Unity.Server
             {
                 var update = connection.CreateCommand();
                 update.Transaction = transaction;
-                // El CharacterId se queda en el filtro aunque el Id ya sea único: así toda
-                // escritura de inventario mantiene la condición de propiedad que comprueba la
-                // guardia al arrancar, y nadie que copie esta consulta más adelante puede
-                // olvidarse de ella.
+                // The CharacterId stays in the filter even though the Id is already unique: that way
+                // every inventory write keeps the ownership condition the guard checks at start-up, and
+                // nobody who copies this query later can forget it.
                 update.CommandText = "UPDATE CharacterItems SET Uid = $uid " +
                                      "WHERE Id = $id AND CharacterId = $character;";
                 update.Parameters.AddWithValue("$uid", ++next);
@@ -5129,19 +5151,18 @@ namespace Jondo.Unity.Server
             }
             transaction.Commit();
 
-            // Si el repartidor ya se había consultado, tiene que seguir por detrás de los
-            // números que esta reparación acaba de gastar.
+            // If the allocator had already been queried, it has to carry on behind the numbers this
+            // repair has just used.
             System.Threading.Interlocked.Exchange(ref _ultimoUidRepartido, next);
             Console.WriteLine($"[SQLite] {invalidRows.Count} uid de objeto que no cabían en 32 bits, arreglados.");
         }
 
         /// <summary>
-        /// Cuántos objetos hay escritos con un uid que el cliente no puede devolver entero.
+        /// How many items are written with a uid the client cannot give back whole.
         ///
-        /// Lo usa la guardia de regresión. Tiene que valer cero siempre: los que había los arregló
-        /// <see cref="RepairClientItemUids"/> al arrancar, y los nuevos salen de
-        /// <see cref="NextItemUid"/>, que no reparte por encima del tope. Si esto crece es que
-        /// alguien está escribiendo uid por su cuenta.
+        /// The regression guard uses it. It always has to be zero: the ones there were got fixed by
+        /// <see cref="RepairClientItemUids"/> at start-up, and new ones come from <see cref="NextItemUid"/>,
+        /// which does not hand out above the cap. If this grows, somebody is writing uids on his own.
         /// </summary>
         public static int ObjetosConUidFueraDelCliente()
         {
@@ -5164,13 +5185,12 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Varios objetos de golpe, leyendo el inventario UNA vez.
+        /// Several items at once, reading the inventory ONCE.
         ///
-        /// AddItemToInventory carga el inventario entero para saber si ya tienes uno de esos y
-        /// apilarlo. Eso está bien para un objeto suelto, pero el botín de un combate llama una
-        /// vez por objeto distinto, así que un combate que suelta cinco cosas cargaba cinco veces
-        /// el inventario completo —1.737 filas en la cuenta de la captura— justo en el momento en
-        /// que el jugador está esperando la pantalla de recompensa.
+        /// AddItemToInventory loads the whole inventory to know whether you already have one of those and stack
+        /// it. That is fine for a loose item, but a fight's loot calls once per different item, so a fight that
+        /// drops five things loaded the complete inventory five times -- 1,737 rows on the capture's account --
+        /// right at the moment the player is waiting for the reward screen.
         /// </summary>
         public static List<PlayerItem> AddItemsToInventory(long characterId,
                                                            IReadOnlyDictionary<int, int> items)
@@ -5200,16 +5220,16 @@ namespace Jondo.Unity.Server
                 };
                 SaveInventoryItem(characterId, nuevo);
 
-                // A la lista en memoria también: si el mismo botín trae dos veces el mismo objeto
-                // —no pasa hoy, pero el diccionario no lo impide— la segunda tiene que apilarse
-                // sobre la primera y no crear otra fila.
+                // To the list in memory as well: if the same loot brings the same item twice -- it does
+                // not happen today, but the dictionary does not prevent it -- the second has to stack on
+                // the first and not create another row.
                 inventory.Add(nuevo);
                 tocados.Add(nuevo);
             }
 
-            // Se devuelven con el uid y la cantidad QUE HA QUEDADO, que es lo que hace falta para
-            // decirle al cliente que le han caído: sin el uid no se puede construir el aviso, y
-            // sin él el objeto se queda invisible hasta el siguiente login.
+            // They are returned with the uid and the quantity THAT IS LEFT, which is what is needed
+            // to tell the client they have dropped: without the uid the notice cannot be built, and
+            // without it the item stays invisible until the next login.
             return tocados;
         }
 
@@ -5237,22 +5257,20 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Lo que hace un hechizo en un grado: coste, alcance, daños, efectos.
+        /// What a spell does at a grade: cost, range, damage, effects.
         ///
-        /// Se guarda por (hechizo, grado), igual que ya hacía SpellEffects. La tabla SpellLevels
-        /// no cambia mientras el servidor está levantado, y esto se pregunta MUCHAS veces: cada
-        /// vez que un monstruo decide qué lanzar recorre todos sus hechizos, y cada vuelta abría
-        /// una conexión a SQLite y parseaba dos JSON —el normal y el crítico— para volver a
-        /// obtener exactamente lo mismo.
+        /// It is kept per (spell, grade), as SpellEffects already did. The SpellLevels table does not change
+        /// while the server is up, and this is asked MANY times: every time a monster decides what to cast it
+        /// walks all its spells, and each pass opened a SQLite connection and parsed two JSONs -- the normal one
+        /// and the critical one -- to get exactly the same again.
         ///
-        /// Se guarda también el null: un hechizo que no está en la tabla tampoco va a aparecer
-        /// más tarde, y sin eso el caso malo —el que más veces se pregunta— seguía yendo a la
-        /// base en cada turno.
+        /// The null is kept too: a spell that is not in the table will not appear later either, and without
+        /// that the bad case -- the one asked most often -- kept going to the database on every turn.
         ///
-        /// OJO: lo que sale de aquí lo comparten todos, así que NO SE TOCA. Los cuatro sitios que
-        /// lo usan sólo leen, y hay una guardia (SecurityGuardTests) que salta si alguien empieza
-        /// a escribir en el objeto devuelto: cambiarle el coste a uno se lo cambiaría a todos, en
-        /// todos los combates a la vez, y eso no daría error por ningún lado.
+        /// CAREFUL: what comes out of here is shared by everybody, so it is NOT TOUCHED. The four places that
+        /// use it only read, and there is a guard (SecurityGuardTests) that fires if somebody starts writing to
+        /// the returned object: changing one's cost would change it for everybody, in every fight at once, and
+        /// that would give no error anywhere.
         /// </summary>
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int), SpellCombatData?> _hechizoPorGrado
             = new System.Collections.Concurrent.ConcurrentDictionary<(int, int), SpellCombatData?>();
@@ -5480,12 +5498,12 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// El mapa donde están los vendedores: el que más NPC tiene colocados.
+        /// The map where the vendors are: the one with the most NPCs placed.
         ///
-        /// Se busca en vez de escribirse a pelo. Hoy gana el Pueblo de Amakna (88212759) con 52
-        /// filas en NpcSpawns contra una sola del siguiente, así que no hay empate que deshacer;
-        /// pero si mañana se puebla otro mapa, el que salga de aquí será el bueno sin que haya que
-        /// tocar el comando. Devuelve (0, 0) cuando no hay ningún NPC colocado.
+        /// It is looked up instead of written in. Today the Amakna Village wins (88212759) with 52 rows in
+        /// NpcSpawns against a single one for the next, so there is no tie to break; but if another map is
+        /// populated tomorrow, the one coming out of here will be the right one without having to touch the
+        /// command. It returns (0, 0) when there is no NPC placed.
         /// </summary>
         public static (long MapId, int Npcs) GetMapWithMostNpcSpawns()
         {
@@ -5509,7 +5527,7 @@ namespace Jondo.Unity.Server
             return (0, 0);
         }
 
-        /// <summary>La subárea en la que cae un mapa, o cero. Es lo que pregunta el criterio «PB».</summary>
+        /// <summary>The subarea a map falls in, or zero. It is what the «PB» criterion asks.</summary>
         public static int SubAreaOfMap(long mapId)
         {
             try
@@ -5529,7 +5547,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>Los mapas de una subárea, en orden. Vacío cuando no hay ninguno.</summary>
+        /// <summary>The maps of a subarea, in order. Empty when there are none.</summary>
         public static List<long> MapsOfSubArea(int subAreaId)
         {
             var fuera = new List<long>();
@@ -5551,9 +5569,9 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// El criterio de inmunidad a la agresión de un monstruo, tal y como lo trae su plantilla.
-        /// Es lo que gobierna la luz de las raids: los de la Sima llevan
-        /// <c>(PB=1131&amp;RV!7,n1_worldlight,0)|…</c> y dejan de ser inmunes a oscuras.
+        /// A monster's aggression immunity criterion, as its template carries it. It is what governs the
+        /// raids' light: the Sima's carry <c>(PB=1131&amp;RV!7,n1_worldlight,0)|…</c> and stop being immune
+        /// in the dark.
         /// </summary>
         public static string MonsterAggressiveImmunity(int monsterTemplate)
         {
@@ -5578,11 +5596,11 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// El nombre de una subzona, en el idioma del cliente.
+        /// A subarea's name, in the client's language.
         ///
-        /// Va en dos saltos, igual que los nombres de hechizo: SubAreaTemplates guarda un JSON con
-        /// un nameId dentro, y ese nameId es la clave de Translations. Sale vacío cuando no hay
-        /// traducción, y quien llame decidirá qué enseñar en su lugar.
+        /// It goes in two hops, the same as spell names: SubAreaTemplates stores a JSON with a nameId inside,
+        /// and that nameId is the Translations key. It comes out empty when there is no translation, and
+        /// whoever calls will decide what to show in its place.
         /// </summary>
         public static string GetSubAreaName(int subAreaId)
         {
@@ -5623,9 +5641,9 @@ namespace Jondo.Unity.Server
     public class MonsterGradeStats
     {
         /// <summary>
-        /// El hechizo de comportamiento con el que arranca el monstruo, tal como lo trae el dato
-        /// del cliente: un <c>SpellLevels.Id</c>, NO un <c>Spells.Id</c>. No es su lista de
-        /// ataque y por eso va aparte de <see cref="SpellIds"/>. Hoy no lo lee nadie.
+        /// The behaviour spell the monster starts with, as the client's data carries it: a
+        /// <c>SpellLevels.Id</c>, NOT a <c>Spells.Id</c>. It is not its attack list and that is why it goes
+        /// apart from <see cref="SpellIds"/>. Nobody reads it today.
         /// </summary>
         public int StartingSpellLevelId { get; set; }
 
@@ -5682,12 +5700,11 @@ namespace Jondo.Unity.Server
     public class SpellCombatData
     {
         /// <summary>
-        /// Las lineas de dano de un arma, una por cada efecto: el numero de efecto, su elemento y
-        /// sus dados. Vacia para un hechizo.
+        /// A weapon's damage lines, one per effect: the effect number, its element and its dice. Empty for a
+        /// spell.
         ///
-        /// Un arma pega una vez POR LINEA, y el servidor real manda un golpe por cada una con su
-        /// propio numero de efecto. Los campos sueltos de aqui abajo llevan la linea mas gorda,
-        /// que es lo que le vale a la IA para estimar.
+        /// A weapon hits once PER LINE, and the real server sends one hit for each with its own effect number.
+        /// The loose fields down here carry the biggest line, which is what the AI needs to estimate.
         /// </summary>
         public List<(int Effect, int Element, int Min, int Max)> WeaponLines { get; } =
             new List<(int, int, int, int)>();

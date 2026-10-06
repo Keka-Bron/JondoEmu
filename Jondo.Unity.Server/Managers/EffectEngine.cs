@@ -7,8 +7,8 @@ using Jondo.Unity.World.Fights;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Lo que hay que hacer con un efecto ya resuelto: aplicarlo y contárselo al cliente.
-    /// El motor decide QUÉ pasa; quien lo llama decide cómo se manda por el cable.
+    /// What has to be done with an already resolved effect: apply it and tell the client.
+    /// The engine decides WHAT happens; whoever calls it decides how it is sent on the wire.
     /// </summary>
     public sealed class Outcome
     {
@@ -57,11 +57,11 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public List<Fighter> Ilusiones { get; init; }
 
-        /// <summary>Si el efecto cambia una característica en el acto, cuál y en cuánto.</summary>
+        /// <summary>If the effect changes a characteristic on the spot, which one and by how much.</summary>
         public int Caracteristica { get; init; }
         public int Cuanto { get; init; }
 
-        /// <summary>Si el efecto encadena otro hechizo, cuál y en qué grado.</summary>
+        /// <summary>If the effect chains another spell, which one and at which grade.</summary>
         public int HechizoEncadenado { get; init; }
         public int GradoEncadenado { get; init; }
 
@@ -77,20 +77,20 @@ namespace Jondo.Unity.Server.Managers
         public bool CriticalDamage { get; init; }
 
         /// <summary>
-        /// Si el efecto mueve a alguien, de dónde a dónde. Menos uno cuando no mueve a nadie.
+        /// If the effect moves somebody, from where to where. Minus one when it moves nobody.
         /// </summary>
         public int CasillaDesde { get; init; } = -1;
         public int CasillaHasta { get; init; } = -1;
         public bool Mueve => CasillaHasta >= 0 && CasillaHasta != CasillaDesde;
 
         /// <summary>
-        /// Verdadero cuando el motor no sabe todavía qué hace este efecto pero SÍ sabe que dura y
-        /// que el cliente lo pinta. Se manda igual al panel y se anota en el registro, en vez de
-        /// tirarlo en silencio, que es lo que se hacía antes con catorce familias enteras.
+        /// True when the engine does not know yet what this effect does but DOES know that it lasts and that the
+        /// client draws it. It is sent to the panel all the same and noted in the log, instead of being thrown
+        /// away silently, which is what used to be done with fourteen whole families.
         /// </summary>
         public bool SoloParaElPanel { get; init; }
 
-        /// <summary>La plantilla de bicho que hay que sacar al tablero, si el efecto invoca.</summary>
+        /// <summary>The creature template that has to be brought onto the board, if the effect summons.</summary>
         public int Invoca { get; init; }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The glyphs a 2018 took off the board, for the client to be told.</summary>
         public List<Jondo.Unity.World.Fights.Glifo> GlifosQuitados { get; init; }
 
-        /// <summary>El efecto 141: mata al objetivo, sin cálculo de por medio.</summary>
+        /// <summary>Effect 141: kills the target, with no calculation in between.</summary>
         public bool Fulmina { get; init; }
 
         /// <summary>The double a 180 has just put on the board, for the fight to announce.</summary>
@@ -178,31 +178,30 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public bool FilaEnganchada { get; init; }
 
-        /// <summary>Los puntos de escudo que este efecto ha puesto. Cero cuando no pone ninguno.</summary>
+        /// <summary>The shield points this effect has set. Zero when it sets none.</summary>
         public int Escudo { get; init; }
 
-        /// <summary>Vida que se va sin ser un golpe: el «-N% PdV».</summary>
+        /// <summary>Life that goes without being a hit: the «-N% HP».</summary>
         public int VidaQueSeVa { get; init; }
 
-        /// <summary>Vida que el lanzador le pasa al objetivo.</summary>
+        /// <summary>Life the caster passes to the target.</summary>
         public int VidaTransferida { get; init; }
 
-        /// <summary>Cuántos embrujos se ha llevado por delante un efecto que acorta duraciones.</summary>
+        /// <summary>How many buffs an effect that shortens durations has taken down.</summary>
         public int EmbrujosCaidos { get; init; }
 
-        /// <summary>Que la invocación salga donde estaba el que acaba de morir, y no al lado.</summary>
+        /// <summary>That the summon comes out where the one who has just died was, and not beside him.</summary>
         public bool EnLaCasillaDelMuerto { get; init; }
 
-        /// <summary>Lo que este efecto ha dejado puesto en el suelo, si ha dejado algo.</summary>
+        /// <summary>What this effect has left on the ground, if it left anything.</summary>
         public Jondo.Unity.World.Fights.Glifo Glifo { get; init; }
 
         /// <summary>
-        /// El SEGUNDO desplazamiento, cuando el efecto mueve a dos. Menos uno cuando no.
+        /// The SECOND displacement, when the effect moves two. Minus one when not.
         /// </summary>
         /// <remarks>
-        /// Lo pide el intercambio de posiciones, que es el único que mueve al lanzador y al
-        /// objetivo a la vez. Anunciar sólo uno de los dos deja al cliente con alguien pintado
-        /// donde ya no está.
+        /// The position swap asks for it, which is the only one that moves the caster and the target at once.
+        /// Announcing only one of the two leaves the client with somebody drawn where he no longer is.
         /// </remarks>
         public Fighter Tambien { get; init; }
         public int CasillaDesdeDelOtro { get; init; } = -1;
@@ -210,30 +209,30 @@ namespace Jondo.Unity.Server.Managers
         public bool MueveTambien => Tambien != null && CasillaHastaDelOtro >= 0
                                     && CasillaHastaDelOtro != CasillaDesdeDelOtro;
 
-        /// <summary>Los puntos de vida que se han devuelto, si el efecto cura.</summary>
+        /// <summary>The life points given back, if the effect heals.</summary>
         public int Cura { get; init; }
 
         /// <summary>
-        /// El daño de haberse chocado al empujar, YA CALCULADO PERO SIN APLICAR.
+        /// The damage of having crashed when pushed, ALREADY WORKED OUT BUT NOT APPLIED.
         ///
-        /// Quitar vida es del que lleva el combate: es quien recorta por la vida que queda,
-        /// erosiona, anuncia la muerte y juzga los retos. Aquí sólo se dice cuánto.
+        /// Taking life is the fight driver's job: it is what clips by the remaining life, erodes, announces the
+        /// death and judges the challenges. Here only how much is said.
         /// </summary>
         public int CollisionDamage { get; init; }
 
-        /// <summary>El que hizo de pared, si lo que frenó el empujón fue otro combatiente.</summary>
+        /// <summary>Whoever served as the wall, if what stopped the push was another fighter.</summary>
         public Fighter Blocker { get; init; }
 
         /// <summary>
-        /// Lo que cobra la pared: la MITAD del daño del empujado, redondeando hacia abajo.
+        /// What the wall takes: HALF the pushed one's damage, rounding down.
         ///
-        /// Y es la mitad de ese daño, no una cuenta nueva con las características de la pared:
-        /// medido en el koliseo, la pareja 497/248 sale con la resistencia al empuje de la VÍCTIMA
-        /// metida en el 497. Recalculándolo con lo del bloqueador los números no cuadran.
+        /// And it is half of that damage, not a new calculation with the wall's characteristics: measured in the
+        /// koliseo, the 497/248 pair comes out with the VICTIM's push resistance included in the 497.
+        /// Recalculating it with the blocker's, the numbers do not add up.
         /// </summary>
         public int CollisionDamageToBlocker { get; init; }
 
-        /// <summary>Embrujos retirados par un effet 406 ou par le retrait d'un état.</summary>
+        /// <summary>Buffs removed by an effect 406 or by a state being removed.</summary>
         public IReadOnlyList<Buff> BuffsQuitados { get; init; } = Array.Empty<Buff>();
 
         /// <summary>
@@ -243,7 +242,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public IReadOnlyList<Buff> Relevados { get; set; } = Array.Empty<Buff>();
 
-        /// <summary>Apariencia temporal solicitada por el efecto 335, o cero.</summary>
+        /// <summary>Temporary appearance requested by effect 335, or zero.</summary>
         public int Apariencia { get; init; }
     }
 
@@ -278,46 +277,46 @@ namespace Jondo.Unity.Server.Managers
     }
 
     /// <summary>
-    /// El motor de efectos: coge las entradas del EffectsJson de un hechizo y las convierte en
-    /// cosas que le pasan a alguien.
+    /// The effect engine: it takes the entries of a spell's EffectsJson and turns them into things that
+    /// happen to somebody.
     ///
-    /// No hay ni un hechizo escrito a mano aquí dentro. Todo sale de dos sitios de la base:
+    /// There is not a single hand-written spell in here. Everything comes from two places in the database:
     ///
-    ///   - <c>SpellLevels.EffectsJson</c>, que dice qué efectos tiene el hechizo, con cuánto, a
-    ///     quién (<c>targetMask</c>), cuándo (<c>triggers</c>) y por cuántos turnos.
-    ///   - La tabla <c>Effects</c> del cliente, que dice qué característica toca cada número de
-    ///     efecto y con qué signo (<c>BonusType</c>).
+    ///   - <c>SpellLevels.EffectsJson</c>, which says which effects the spell has, how much, to whom
+    ///     (<c>targetMask</c>), when (<c>triggers</c>) and for how many turns.
+    ///   - The client's <c>Effects</c> table, which says which characteristic each effect number touches
+    ///     and with what sign (<c>BonusType</c>).
     ///
-    /// Con eso salen solas cosas como éstas, que antes había que escribir una por una:
+    /// With that, things like these come out by themselves, which before had to be written one by one:
     ///
-    ///   Flecha Helada  = 1079 (quita 2 PA) + 96 (21-24 de agua) + 293 (+8 de daños básicos de
-    ///                    Flecha Helada, tres turnos, sobre uno mismo)
-    ///   Disparos Lejanos = 280 y 281 repetidos (+3 de alcance mínimo y +6 de máximo) sobre una
-    ///                    lista larga de hechizos, un turno
-    ///   Dofus Ocre     = el objeto regala el "hechizo" 8394 por su efecto 1175; ese hechizo, en su
-    ///                    grado 1, dice "cuando me peguen lanza mi grado 2" y "al empezar el turno
-    ///                    lanza mi grado 3"; el grado 2 pone el estado 519 y el 3 da +1 PA si NO se
-    ///                    tiene ese estado, +20 de huida si sí, y lo quita al acabar el turno.
+    ///   Flecha Helada  = 1079 (removes 2 AP) + 96 (21-24 water) + 293 (+8 basic damage of
+    ///                    Flecha Helada, three turns, on oneself)
+    ///   Disparos Lejanos = 280 and 281 repeated (+3 minimum range and +6 maximum) on a long
+    ///                    list of spells, one turn
+    ///   Ochre Dofus    = the item gives the "spell" 8394 through its effect 1175; that spell, at its
+    ///                    grade 1, says "when I am hit cast my grade 2" and "at the start of the turn
+    ///                    cast my grade 3"; grade 2 sets state 519 and grade 3 gives +1 AP if that state
+    ///                    is NOT present, +20 dodge if it is, and removes it at the end of the turn.
     /// </summary>
     public static class EffectEngine
     {
-        // Los números de efecto que el motor entiende de forma especial. El resto se resuelve por
-        // su característica en el catálogo.
+        // The effect numbers the engine understands in a special way. The rest are resolved by
+        // their characteristic in the catalogue.
         //
-        // Los que pegan son DIEZ, no cinco: del 91 al 95 son los de ROBO DE VIDA y del 96 al 100
-        // los de daño a secas, uno por elemento cada tanda. El emulador sólo miraba del 96 al 100,
-        // así que hechizos como Flecha Voraz —que pega con el 94, robo de fuego— o el Ojo de Topo
-        // —el 91, robo de agua— no encajaban en ningún sitio y el daño salía de donde no debía.
+        // The ones that hit are TEN, not five: 91 to 95 are the LIFE STEAL ones and 96 to 100
+        // the plain damage ones, one per element in each run. The emulator only looked at 96 to
+        // 100, so spells like Flecha Voraz -- which hits with 94, fire steal -- or Ojo de Topo --
+        // 91, water steal -- fitted nowhere and the damage came from where it should not.
         //
-        // Y el elemento no hay que deducirlo del número: lo dice el catálogo en su columna
-        // ElementId, con 0 neutral, 1 tierra, 2 fuego, 3 agua y 4 aire.
+        // And the element does not have to be deduced from the number: the catalogue says it in
+        // its ElementId column, with 0 neutral, 1 earth, 2 fire, 3 water and 4 air.
         private const int DanoPrimero = EffectSupport.FirstDamage;
         private const int DanoUltimo = EffectSupport.LastDamage;
 
         /// <summary>
-        /// Los que pegan en función de lo que el objetivo lleve EROSIONADO. Son cinco, uno por
-        /// elemento, en dos tandas: la del 1092 al 1096 y la del 1118 al 1122. En su descripción
-        /// el dado no es el daño sino el tanto por ciento.
+        /// The ones that hit according to how much the target has ERODED. There are five, one per element, in
+        /// two runs: 1092 to 1096 and 1118 to 1122. In their description the die is not the damage but the
+        /// percentage.
         /// </summary>
         private static readonly HashSet<int> PorLoErosionado
             = new HashSet<int> { 1092, 1093, 1094, 1095, 1096, 1118, 1119, 1120, 1121, 1122 };
@@ -409,7 +408,7 @@ namespace Jondo.Unity.Server.Managers
                 ? Math.Max(0, lanzador.MaxHP - lanzador.CurrentHP)
                 : Math.Max(0, lanzador.CurrentHP);
 
-        /// <summary>¿Este efecto pega?</summary>
+        /// <summary>Does this effect hit?</summary>
         public static bool EsDeDano(int efecto)
             => (efecto >= DanoPrimero && efecto <= DanoUltimo)
                || efecto == DanoDelMejorElemento
@@ -460,12 +459,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los golpes que da un hechizo: uno por cada efecto de daño que le toque al objetivo.
+        /// The blows a spell deals: one for each damage effect that reaches the target.
         ///
-        /// Se resuelve con las mismas máscaras que el resto —de ahí que Flecha Voraz pegue 11-13 o
-        /// 34-38 según el estado que lleve el objetivo— y se devuelve el elemento ya resuelto.
-        /// Si el hechizo no tiene ni un efecto de daño, no devuelve nada: Tiro de Repliegue sólo
-        /// aparta al que lanza y no debe quitarle un solo punto de vida a nadie.
+        /// It is resolved with the same masks as the rest -- hence Flecha Voraz hits 11-13 or 34-38 depending on
+        /// the state the target carries -- and the element is returned already resolved. If the spell has not a
+        /// single damage effect, it returns nothing: Tiro de Repliegue only moves the caster away and must not
+        /// take a single life point off anybody.
         /// </summary>
         /// <param name="efectos">
         /// The cast's own draw of the rows (<see cref="EfectosSorteados"/>), so that the blows
@@ -489,15 +488,14 @@ namespace Jondo.Unity.Server.Managers
                 if (!efecto.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)))
                     continue;
 
-                // El elemento lo dice el propio hechizo en su effectElement; si no lo trae, el
-                // catálogo por el número de efecto.
+                // The element is said by the spell itself in its effectElement; if it does not carry
+                // one, by the catalogue through the effect number.
                 int elemento = efecto.Element >= 0 ? efecto.Element
                                                    : DatabaseManager.EffectElement(efecto.EffectId);
 
-                // El «mejor elemento» no es un elemento: es una pregunta al lanzador. Se resuelve
-                // aquí, con los embrujos puestos, porque un hechizo que te suba la agilidad a
-                // mitad de combate puede cambiar cuál es tu mejor elemento, y eso es justamente
-                // para lo que se lanza.
+                // The «best element» is not an element: it is a question to the caster. It is resolved
+                // here, with the buffs on, because a spell that raises your agility halfway through the
+                // fight can change which is your best element, and that is exactly what it is cast for.
                 if (efecto.EffectId == DanoDelMejorElemento || elemento == ElementoMejor)
                 {
                     elemento = MejorElementoDe(quienLanza, combate.RoundNumber);
@@ -520,8 +518,8 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (sobre == null || !sobre.IsAlive) continue;
 
-                    // A cuántas casillas del centro de la zona está. El daño baja según se aleja,
-                    // y cuánto lo dice el propio hechizo.
+                    // How many cells from the centre of the area he is. Damage drops as he gets further
+                    // away, and the spell itself says by how much.
                     int lejos = celdaApuntada >= 0
                         ? Jondo.Unity.World.Maps.MapGeometry.Distance(celdaApuntada, sobre.CellId)
                         : 0;
@@ -532,14 +530,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El daño que le queda a uno que está a <paramref name="lejos"/> casillas del centro.
+        /// The damage left for somebody <paramref name="lejos"/> cells from the centre.
         ///
-        /// Se pierde un tanto por ciento por casilla, con un tope de pasos, y los dos números los
-        /// trae el hechizo en su <c>zoneDescr</c>: los del Ocra que caen lo hacen al diez por
-        /// ciento con tope de cuatro, o sea que del quinto anillo en adelante ya no baja más.
+        /// A percentage is lost per cell, with a cap on steps, and both numbers come with the spell in its
+        /// <c>zoneDescr</c>: the Cra's that fall off do so at ten per cent with a cap of four, so from the
+        /// fifth ring on it no longer drops.
         ///
-        /// La tirada del dado es UNA para todo el lanzamiento: si de "25 a 30" sale 26, en el
-        /// centro entran 26 y a una casilla, el 90% de eso.
+        /// The die roll is ONE for the whole cast: if "25 to 30" rolls 26, 26 goes in at the centre and at one
+        /// cell, 90% of that.
         /// </summary>
         public static int ConLaCaidaDeLaZona(int dano, SpellEffect efecto, int lejos)
         {
@@ -551,36 +549,36 @@ namespace Jondo.Unity.Server.Managers
         }
         private const int Empujar = EffectSupport.Push;
 
-        /// <summary>La 84, «Empuje»: la suma PLANA del que empuja. El porcentaje es la 158.</summary>
+        /// <summary>84, «Empuje» (push): the pusher's FLAT addition. The percentage is 158.</summary>
         private const int DanoDeEmpuje = 84;
 
-        /// <summary>La 85, «Empuje (fijo)»: la resta PLANA del que lo recibe.</summary>
+        /// <summary>85, «Empuje (fijo)» (fixed push): the receiver's FLAT subtraction.</summary>
         private const int ResistenciaAlEmpuje = 85;
 
-        /// <summary>El estado que clava a uno en el sitio. No confundir con la característica 97.</summary>
+        /// <summary>The state that pins one to the spot. Not to be confused with characteristic 97.</summary>
         private const int Indesplazable = 97;
 
         /// <summary>
-        /// El término fijo de la fórmula del daño de colisión.
+        /// The fixed term of the collision damage formula.
         ///
-        /// No sale de ningún dato del cliente —ni el bundle de constantes ni las 38 fórmulas lua
-        /// tienen nada de combate—: sale de medir. Con un lanzador de nivel 200 sin bonos, el
-        /// paréntesis vale 132 y el daño por casilla 33.
+        /// It comes from no client data -- neither the constants bundle nor the 38 lua formulas have anything
+        /// about fights --: it comes from measuring. With a level 200 caster with no bonuses, the parenthesis
+        /// is 132 and the damage per cell 33.
         /// </summary>
         private const int BaseDelEmpuje = 32;
 
         /// <summary>
-        /// El daño de estamparse al recibir un empujón.
+        /// The damage of crashing when pushed.
         ///
-        ///   daño = casillasSinRecorrer × (nivel/2 + la 84 del que empuja
-        ///                                 − la 85 del que lo recibe + 32) / 4
+        ///   damage = cellsNotCovered × (level/2 + the pusher's 84
+        ///                               − the receiver's 85 + 32) / 4
         ///
-        /// Está en un método aparte para que la guardia de regresión pueda comprobarla contra las
-        /// muestras que la midieron, que están en AssertPushDamageMatchesTheCapture.
+        /// It is in a separate method so that the regression guard can check it against the samples that
+        /// measured it, which are in AssertPushDamageMatchesTheCapture.
         ///
-        /// La división por cuatro va AL FINAL, sobre el producto: con la resistencia dentro del
-        /// paréntesis y una sola división, el koliseo da 331 por dos casillas, que es lo medido.
-        /// Restando fuera saldrían 316.
+        /// The division by four goes AT THE END, on the product: with the resistance inside the parenthesis and
+        /// a single division, the koliseo gives 331 for two cells, which is what was measured. Subtracting
+        /// outside it would give 316.
         /// </summary>
         public static int DanoDeColision(int nivelDelQueEmpuja, int suEmpuje, int laResistencia,
                                          int casillasSinRecorrer)
@@ -590,55 +588,54 @@ namespace Jondo.Unity.Server.Managers
             int porCasilla = nivelDelQueEmpuja / 2 + suEmpuje - laResistencia + BaseDelEmpuje;
             return Math.Max(0, casillasSinRecorrer * porCasilla / 4);
         }
-        /// <summary>«Teletransporta a la casilla objetivo». 425 hechizos lo llevan.</summary>
+        /// <summary>«Teleports to the target cell». 425 spells carry it.</summary>
         /// <remarks>
-        /// No es un empujón de muchas casillas: no recorre el camino, así que ni choca ni hace
-        /// daño de colisión, y no le importa que haya algo en medio. Sólo le importa la casilla
-        /// de destino, que tiene que estar libre y pisable.
+        /// It is not a push of many cells: it does not travel the path, so it neither crashes nor does
+        /// collision damage, and it does not care whether something is in the way. It only cares about the
+        /// destination cell, which has to be free and walkable.
         /// </remarks>
-        /// <summary>«N% del nivel en escudo» (234 hechizos) y «N% de PdV en el escudo» (167).</summary>
+        /// <summary>«N% of the level as a shield» (234 spells) and «N% of HP as a shield» (167).</summary>
         /// <remarks>
-        /// El tanto por ciento va en el DADO, no en el valor: Caparazón lleva diceNum 150 y
-        /// Soldagüino 200 sobre el nivel; Bendición Maravillosa lleva 10 y Coraza de Dopeul 20
-        /// sobre la vida. El value va a cero en los seis que se han leído.
+        /// The percentage goes in the DIE, not in the value: Caparazón carries diceNum 150 and Soldagüino 200 on
+        /// the level; Bendición Maravillosa carries 10 and Coraza de Dopeul 20 on the life. The value is zero in
+        /// the six that were read.
         ///
-        /// El escudo no es vida y no se cura: por eso vive en su propio saco del luchador y no
-        /// en CurrentHP.
+        /// The shield is not life and is not healed: that is why it lives in the fighter's own bag and not in
+        /// CurrentHP.
         /// </remarks>
-        /// <summary>«Devuelve de N PA» (163 hechizos). El número va en el dado, la máscara es «C».</summary>
+        /// <summary>«Gives back N AP» (163 spells). The number goes in the die, the mask is «C».</summary>
         /// <remarks>
-        /// Lo llevan Doom y Matanza, que cuestan 1 PA y lo devuelven, así que se pueden encadenar.
-        /// No es un boost de PA con duración: es una devolución inmediata, y por eso no pasa por
-        /// el embrujo.
+        /// Doom and Matanza carry it, which cost 1 AP and give it back, so they can be chained. It is not an AP
+        /// boost with a duration: it is an immediate refund, and that is why it does not go through the buff.
         /// </remarks>
         /// <summary>
-        /// Lo que se pone en el suelo: glifo de aura, glifo de inicio de turno, trampa y runa.
+        /// What is put on the ground: aura glyph, turn-start glyph, trap and rune.
         /// </summary>
         /// <remarks>
-        /// 623 hechizos entre las cuatro, y las cuatro con la MISMA forma medida:
+        /// 623 spells among the four, and all four with THE SAME measured shape:
         ///
-        ///   diceNum   el hechizo que lanza al dispararse
-        ///   diceSide  su grado
-        ///   value     el color en RGB —el Avispero lleva 16777215, blanco puro—
-        ///   duration  las rondas; el -1 quiere decir que no se cae sola
-        ///   zoneDescr la huella alrededor de la casilla apuntada
+        ///   diceNum   the spell it casts when it fires
+        ///   diceSide  its grade
+        ///   value     the colour in RGB -- the Avispero carries 16777215, pure white --
+        ///   duration  the rounds; -1 means it does not drop by itself
+        ///   zoneDescr the footprint around the aimed cell
         ///
-        /// Lo único que cambia es cuándo se disparan, así que van por un solo camino con cuatro
-        /// disparadores en vez de por cuatro caminos con el mismo cuerpo.
+        /// The only thing that changes is when they fire, so they go by a single road with four triggers
+        /// instead of by four roads with the same body.
         /// </remarks>
-        /// <summary>A qué apunta el hechizo hijo de un sublanzamiento.</summary>
+        /// <summary>What a sub-cast's child spell aims at.</summary>
         private enum Apunta
         {
-            /// <summary>Al candidato que la máscara acaba de elegir.</summary>
+            /// <summary>At the candidate the mask has just picked.</summary>
             AlCandidato,
 
-            /// <summary>De vuelta al que lanzó el hechizo padre.</summary>
+            /// <summary>Back at whoever cast the parent spell.</summary>
             AlLanzadorPadre,
 
-            /// <summary>A la casilla que apuntó el padre, resuelta OTRA VEZ en ese momento.</summary>
+            /// <summary>At the cell the parent aimed at, resolved AGAIN at that moment.</summary>
             ALaCasillaDelPadre,
 
-            /// <summary>Al más cercano de la zona.</summary>
+            /// <summary>At the nearest one in the area.</summary>
             AlMasCercano,
 
             /// <summary>
@@ -648,7 +645,7 @@ namespace Jondo.Unity.Server.Managers
             AlOrigen,
         }
 
-        /// <summary>Una fila de la familia «haz que se lance otro hechizo».</summary>
+        /// <summary>A row of the «make another spell be cast» family.</summary>
         private readonly struct Sublanzamiento
         {
             public Sublanzamiento(bool lanzaElCandidato, Apunta apunta, bool topePorValor,
@@ -667,32 +664,31 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public bool LanzaElOrigen { get; }
 
-            /// <summary>Si el que lanza el hijo es el candidato en vez del lanzador del padre.</summary>
+            /// <summary>Whether whoever casts the child is the candidate instead of the parent's caster.</summary>
             public bool LanzaElCandidato { get; }
 
             public Apunta Apunta { get; }
 
-            /// <summary>Si el campo value limita cuántos candidatos se cogen.</summary>
+            /// <summary>Whether the value field limits how many candidates are taken.</summary>
             public bool TopePorValor { get; }
 
-            /// <summary>Los tres que ya resuelve el código de antes y que no se tocan hoy.</summary>
+            /// <summary>The three the old code already resolves, which are not touched today.</summary>
             public bool YaLoHaceElCaminoViejo { get; }
         }
 
         /// <summary>
-        /// La familia entera de «haz que se lance otro hechizo», en una sola tabla.
+        /// The whole «make another spell be cast» family, in a single table.
         /// </summary>
         /// <remarks>
-        /// Son NUEVE efectos y no nueve mecánicas: la misma resolución con tres parámetros —quién
-        /// lanza el hijo, a qué apunta, y cuántos candidatos coge—. En todos, diceNum es el
-        /// hechizo hijo y diceSide su grado, y en todos el hijo es GRATIS: no cuesta PA.
+        /// They are NINE effects and not nine mechanics: the same resolution with three parameters -- who casts
+        /// the child, what it aims at, and how many candidates it takes --. In all of them, diceNum is the child
+        /// spell and diceSide its grade, and in all of them the child is FREE: it costs no AP.
         ///
-        /// La tabla sale del censo de las 431 capturas del juego real, emparejando cada anuncio de
-        /// lanzamiento con el padre que lo produjo. Dos agentes independientes rehicieron el
-        /// corpus y sacaron los mismos totales —37.947 tramas jwe, 21.307 lanzamientos—, y estas
-        /// son las cuentas:
+        /// The table comes from the census of the real game's 431 captures, pairing each cast announcement with
+        /// the parent that produced it. Two independent agents redid the corpus and got the same totals --
+        /// 37,947 jwe frames, 21,307 casts --, and these are the counts:
         ///
-        ///   efecto   n      mismo lanzador   misma casilla   objetivo==lanzador
+        ///   effect   n      same caster      same cell       target==caster
         ///   792      6332   4447             3560            6269
         ///   1160     3826   3783             1772             918
         ///   2160      332    332               54              18
@@ -701,29 +697,28 @@ namespace Jondo.Unity.Server.Managers
         ///   2794      235    182              228              79
         ///   2795        6      0                6               0
         ///
-        /// Y el 1017 aparte, con 97 encadenamientos y CERO contraejemplos: el objetivo del hijo es
-        /// el lanzador del padre en 97 de 97, y el lanzador del hijo no lo es en 97 de 97.
+        /// And 1017 apart, with 97 chainings and ZERO counterexamples: the child's target is the parent's
+        /// caster in 97 of 97, and the child's caster is not in 97 of 97.
         ///
-        /// El control que lo cierra: con la MISMA máscara «h,P», el 792 no invierte ni una vez en
-        /// 106 y el 1017 invierte las 77. O sea que lo que decide no es la máscara, es el efecto.
-        /// Y en Jormun conviven un 1160 y un 1017 con la misma máscara en el mismo lanzamiento,
-        /// en tramas contiguas, con resultado opuesto.
+        /// The control that settles it: with THE SAME mask «h,P», 792 does not invert once in 106 and 1017
+        /// inverts all 77. So what decides is not the mask, it is the effect. And in Jormun a 1160 and a 1017
+        /// live together with the same mask in the same cast, in adjacent frames, with opposite results.
         ///
-        /// Lo que NO se ha medido y va dicho: que el value sea el tope de candidatos es la mejor
-        /// explicación de por qué 792 y 2792 conviven con la misma máscara y el mismo hechizo
-        /// hijo cambiando sólo ese campo —niveles 80667 y 35952—, pero las diez ejecuciones de
-        /// 2792 del corpus tuvieron siempre un solo candidato, así que no está demostrado.
+        /// What has NOT been measured and is stated: that the value is the cap on candidates is the best
+        /// explanation of why 792 and 2792 live together with the same mask and the same child spell changing
+        /// only that field -- levels 80667 and 35952 --, but the ten executions of 2792 in the corpus always had
+        /// a single candidate, so it is not proven.
         /// </remarks>
         private static readonly Dictionary<int, Sublanzamiento> Familia = new()
         {
-            // Los tres que ya resolvía el motor. Están aquí para que la tabla sea completa y para
-            // poder compararlos, pero su código sigue siendo el de antes: reescribirlos esta
-            // noche, con el servidor en uso, sería cambiar lo que funciona por lo que aún no.
+            // The three the engine already resolved. They are here so that the table is complete
+            // and to be able to compare them, but their code is still the old one: rewriting them
+            // tonight, with the server in use, would be swapping what works for what does not yet.
             [EffectSupport.CastSpell]     = new(true,  Apunta.AlCandidato,        true,  true),
             [EffectSupport.TriggerSpell]  = new(false, Apunta.AlCandidato,        false, true),
             [NearestTargetExecuteSpell]  = new(false, Apunta.AlMasCercano,       false, true),
 
-            // Los cuatro que faltaban, y sus dos primos.
+            // The four that were missing, and their two cousins.
             [1017] = new(true,  Apunta.AlLanzadorPadre,    false),
             [2792] = new(true,  Apunta.AlCandidato,        true),
             [2793] = new(true,  Apunta.AlCandidato,        true),
@@ -871,7 +866,7 @@ namespace Jondo.Unity.Server.Managers
             return false;
         }
 
-        /// <summary>¿Este efecto es de los que hacen lanzar otro hechizo?</summary>
+        /// <summary>Is this effect one of those that make another spell be cast?</summary>
         public static bool EsDeLaFamiliaDeSublanzar(int efecto) => Familia.ContainsKey(efecto);
 
         /// <summary>
@@ -941,48 +936,46 @@ namespace Jondo.Unity.Server.Managers
             return !hayLado || loNombra;
         }
 
-        /// <summary>Quién lanza el hijo y a qué apunta, para poder comprobarlo desde fuera.</summary>
+        /// <summary>Who casts the child and what it aims at, to be able to check it from outside.</summary>
         public static (bool LanzaElCandidato, string Apunta) ComoSublanza(int efecto)
             => Familia.TryGetValue(efecto, out var fila)
                 ? (fila.LanzaElCandidato, fila.Apunta.ToString())
                 : (false, "");
 
         /// <summary>
-        /// El 3793: un marcador, no un efecto. No hay nada que aplicar.
+        /// 3793: a marker, not an effect. There is nothing to apply.
         /// </summary>
         /// <remarks>
-        /// 430 filas en 163 hechizos, sin texto, sin característica, sin dados y sin duración. El
-        /// servidor real lo registra como un embrujo más y lo anuncia cuando salta su disparador,
-        /// pero no arrastra a nadie: los efectos que van con él —el veneno, la cura, el PA
-        /// diferido— se registran por su cuenta, con su propio disparador y su propia máscara, y
-        /// se disparan solos. Coinciden en el tiempo porque comparten el disparador, no porque
-        /// éste los llame.
+        /// 430 rows in 163 spells, with no text, no characteristic, no dice and no duration. The real server
+        /// records it as one more buff and announces it when its trigger fires, but it drags nobody along: the
+        /// effects that go with it -- the poison, the heal, the delayed AP -- are recorded on their own, with
+        /// their own trigger and their own mask, and fire by themselves. They coincide in time because they
+        /// share the trigger, not because this one calls them.
         ///
-        /// O sea que tratarlo como una puerta condicional sería inventarse una mecánica. Va al
-        /// panel como cualquier otro efecto que no se sabe aplicar, que es lo que ya hace el
-        /// camino genérico, y aquí sólo queda dicho por qué está bien que se quede así.
+        /// So treating it as a conditional gate would be making up a mechanic. It goes to the panel like any
+        /// other effect that cannot be applied, which is what the generic road already does, and here it is
+        /// only stated why it is right for it to stay that way.
         /// </remarks>
         internal const int MarcadorDeGuion = 3793;
 
-        /// <summary>El 3792: el hermano inmediato del 3793. Tampoco hay nada que aplicar.</summary>
+        /// <summary>3792: 3793's immediate sibling. Nothing to apply either.</summary>
         /// <remarks>
-        /// 165 filas en 48 hechizos, y son el mismo animal. Medido sobre las 164 filas que tienen
-        /// plantilla de hechizo, sin una sola excepción: el <c>value</c> es un identificador de
-        /// una entrada del <c>boundScriptUsageData</c> DEL PROPIO HECHIZO. Y el resto de la fila
-        /// está vacío en las 165: dado 0, lado 0, duración 0, retardo 0, y el disparador siempre
-        /// inmediato.
+        /// 165 rows in 48 spells, and they are the same animal. Measured over the 164 rows that have a spell
+        /// template, without a single exception: the <c>value</c> is the identifier of an entry of THE SPELL'S
+        /// OWN <c>boundScriptUsageData</c>. And the rest of the row is empty in all 165: die 0, side 0, duration
+        /// 0, delay 0, and the trigger always immediate.
         ///
-        /// O sea que no lleva ningún número que aplicar a nadie. Es el marcador de «aquí corre un
-        /// guion del hechizo», igual que el 3793, y la diferencia entre los dos es sólo que el
-        /// 3793 puede ir con disparador y éste no.
+        /// So it carries no number to apply to anybody. It is the «a script of the spell runs here» marker, the
+        /// same as 3793, and the only difference between the two is that 3793 can go with a trigger and this
+        /// one cannot.
         ///
-        /// Se declara aquí, y no se deja simplemente que caiga en el camino genérico, porque
-        /// entre los dos tocan 39 hechizos de clase: sin decirlo, esos 39 se cuentan para siempre
-        /// como «sin implementar» y alguien vuelve a mirarlos cada vez.
+        /// It is declared here, and not simply left to fall into the generic road, because between the two
+        /// they touch 39 class spells: without saying so, those 39 are counted forever as «not implemented» and
+        /// somebody looks at them again every time.
         /// </remarks>
         private const int MarcadorDeGuionInmediato = 3792;
 
-        /// <summary>¿Es uno de los dos marcadores de guion, que no hacen nada?</summary>
+        /// <summary>Is it one of the two script markers, which do nothing?</summary>
         public static bool EsMarcadorDeGuion(int efecto)
             => efecto == MarcadorDeGuion || efecto == MarcadorDeGuionInmediato;
 
@@ -1025,17 +1018,17 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         internal const int DevuelvePA = 120;
 
-        /// <summary>«Duración de los efectos: -N» (167 hechizos). Le recorta rondas a los embrujos.</summary>
+        /// <summary>«Effect duration: -N» (167 spells). It cuts rounds off the buffs.</summary>
         /// <remarks>
-        /// Grito Terrorífico lleva dado 4 y máscara «A»: le quita cuatro rondas a lo que el
-        /// enemigo tenga encima. Un embrujo al que no le quedan rondas se cae.
+        /// Grito Terrorífico carries die 4 and mask «A»: it takes four rounds off whatever the enemy has on him.
+        /// A buff with no rounds left drops.
         /// </remarks>
         private const int AcortaLosEfectos = 1075;
 
-        /// <summary>«Mata al objetivo y reemplaza por la invocación» (59 hechizos).</summary>
+        /// <summary>«Kills the target and replaces it with the summon» (59 spells).</summary>
         /// <remarks>
-        /// La Siega del Sacrogrito. El dado lleva la plantilla del bicho que sale en su sitio y el
-        /// lado del dado su grado. Son las dos cosas a la vez y en ese orden: matar y luego sacar.
+        /// The Sacrier's Reaping. The die carries the template of the creature that comes out in its place and
+        /// the die's side its grade. It is both things at once and in that order: killing and then bringing out.
         /// </remarks>
         private const int MataYReemplaza = 405;
         private const int MataYReemplazaPorInvocacion = 2796;
@@ -1109,12 +1102,12 @@ namespace Jondo.Unity.Server.Managers
             Sorteo = efecto.Sorteo,
         };
 
-        /// <summary>«N de daños del mejor elemento» (20 hechizos de clase).</summary>
+        /// <summary>«N damage of the best element» (20 class spells).</summary>
         /// <remarks>
-        /// Llamilla, Bilbipo, Apetito de Cocobur. El dado es el daño y el elemento lo pone el
-        /// lanzador: el suyo más alto de los cuatro. El catálogo del cliente ya numera ese caso
-        /// —el 5 de Effects.ElementId es «mejor»—, así que aquí sólo hay que resolverlo mirando
-        /// las cuatro características y quedarse con la mayor.
+        /// Llamilla, Bilbipo, Apetito de Cocobur. The die is the damage and the element is set by the caster:
+        /// his highest of the four. The client's catalogue already numbers that case -- Effects.ElementId's 5
+        /// is «best» --, so here it only has to be resolved by looking at the four characteristics and keeping
+        /// the largest.
         /// </remarks>
         private const int DanoDelMejorElemento = 2822;
 
@@ -1126,7 +1119,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private const int DanoDelPeorElemento = 2832;
 
-        /// <summary>El 5 de Effects.ElementId: «el mejor», que no es un elemento sino una pregunta.</summary>
+        /// <summary>Effects.ElementId's 5: «the best», which is not an element but a question.</summary>
         private const int ElementoMejor = 5;
 
         /// <summary>The two "-N de daños recibidos": a flat cut on the blows the row names.</summary>
@@ -1168,32 +1161,31 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public const int ComparteLosDanos = 1061;
 
-        /// <summary>«-N% PdV» (9 hechizos). El dado es el TANTO POR CIENTO de la vida máxima.</summary>
+        /// <summary>«-N% HP» (9 spells). The die is the PERCENTAGE of the maximum life.</summary>
         private const int QuitaPorcentajeDeVida = 1048;
 
-        /// <summary>«Transfiere N% de su vida» (7 hechizos).</summary>
+        /// <summary>«Transfers N% of his life» (7 spells).</summary>
         /// <remarks>
-        /// El lanzador da y el objetivo recibe. El dado es el tanto por ciento de la vida ACTUAL
-        /// del que la da, que es lo que hace que no puedas transferir lo que ya no tienes.
+        /// The caster gives and the target receives. The die is the percentage of the giver's CURRENT life,
+        /// which is what keeps you from transferring what you no longer have.
         /// </remarks>
         private const int TransfiereVida = 90;
 
         private const int Teletransportar = 4;
 
         /// <summary>
-        /// Los cuatro teletransportes simétricos: al otro lado de un pivote, a la misma distancia.
+        /// The four symmetric teleports: to the other side of a pivot, at the same distance.
         /// </summary>
         /// <remarks>
-        /// 54 hechizos de clase entre los cuatro. Lo que cambia es el pivote, y nada más:
+        /// 54 class spells among the four. What changes is the pivot, and nothing else:
         ///
-        ///   1104  «simétrica con respecto al objetivo»   pivote: el objetivo del efecto
-        ///   1105  «simétrica con respecto al lanzador»   pivote: quien lanza
-        ///   1106  «teletransportación simétrica»         pivote: la casilla apuntada
-        ///   1100  «teletransporta a la posición anterior»  no es simétrica: deshace el movimiento
+        ///   1104  «symmetric with respect to the target»   pivot: the effect's target
+        ///   1105  «symmetric with respect to the caster»   pivot: whoever casts
+        ///   1106  «symmetric teleport»                     pivot: the aimed cell
+        ///   1100  «teleports to the previous position»     not symmetric: it undoes the movement
         ///
-        /// El reflejo se calcula en coordenadas del mapa, no sobre el número de casilla: la
-        /// retícula de Dofus va en diagonal y sumar al índice da un sitio sin relación con el
-        /// reflejo.
+        /// The reflection is worked out in map coordinates, not on the cell number: Dofus's grid is diagonal and
+        /// adding to the index gives a place unrelated to the reflection.
         /// </remarks>
         private const int SimetricoRespectoAlObjetivo = 1104;
         private const int SimetricoRespectoAlLanzador = 1105;
@@ -1291,54 +1283,71 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«Indesplazable», which the catalogue does not flag and every push already honours.</summary>
         private const int IndesplazableEstado = 97;
 
-        /// <summary>«Intercambia las posiciones». 253 hechizos.</summary>
+        /// <summary>«Swaps positions». 253 spells.</summary>
         /// <remarks>
-        /// Dos que se cambian el sitio. Se mueven LOS DOS, así que hay que anunciar los dos
-        /// desplazamientos: con uno solo, el cliente deja a uno de ellos pintado donde estaba y
-        /// a partir de ahí ya no coincide con el servidor en nada.
+        /// Two who swap places. BOTH move, so both displacements have to be announced: with only one, the
+        /// client leaves one of them drawn where he was and from then on it no longer agrees with the server
+        /// on anything.
         /// </remarks>
         private const int IntercambiarPosiciones = 8;
 
         private const int Tirar = EffectSupport.Pull;
 
-        /// <summary>"Retrocede #1 casillas" y "Avanza #1 casillas": mueven al QUE LANZA.</summary>
+        /// <summary>"Moves back #1 cells" and "Moves forward #1 cells": they move WHOEVER CASTS.</summary>
         private const int Retroceder = EffectSupport.StepBack;
         private const int Avanzar = EffectSupport.StepForward;
         private const int PonerEstado = EffectSupport.AddState;
         private const int QuitarEstado = EffectSupport.RemoveState;
 
         /// <summary>
-        /// "Lanza el hechizo del dado en el grado de la cara". Es el enganche con el que las
-        /// actitudes de los objetos encadenan lo que de verdad hacen.
+        /// "Casts the die's spell at the side's grade". It is the hook the items' attitudes chain what they
+        /// really do with.
         /// </summary>
         public const int EfectoQueLanzaHechizo = EffectSupport.CastSpell;
         private const int LanzarHechizo = EfectoQueLanzaHechizo;
 
         /// <summary>
-        /// Variante utilisée par les sorts de classe. Chez l'Ouginak, elle relie notamment
-        /// Molosse/Apaisement aux sous-sorts qui ajoutent ou retirent la Rage.
+        /// Variant used by class spells. For the Ouginak, it links Molosse/Apaisement in particular to the
+        /// sub-spells that add or remove Rage.
         /// </summary>
         private const int DispararHechizo = EffectSupport.TriggerSpell;
         private const int NearestTargetExecuteSpell = EffectSupport.NearestTargetExecuteSpell;
 
+        // The Ouginak's Rage is granted by sub-spells, after the parent spell's damage: 24128
+        // sets the chain up and 13745 moves the Rage from one step to the next. So the target
+        // that was hit must not drop out of these two sub-spells' routing when the blow that
+        // sets them off has just killed it.
+        private const int OuginakRageManager = 13745;
+        private const int OuginakRageRelay = 24128;
+        private const int OuginakBestialFormEnd = 13747;
+
+        private static bool IsOuginakRageChain(SpellEffect efecto)
+            => (efecto.EffectId == LanzarHechizo
+                || efecto.EffectId == DispararHechizo
+                || efecto.EffectId == NearestTargetExecuteSpell)
+               && (efecto.DiceNum == OuginakRageManager
+                   || efecto.DiceNum == OuginakRageRelay);
+
+        private static bool IsDelayedOuginakBestialFormEnd(SpellEffect efecto)
+            => efecto.DiceNum == OuginakBestialFormEnd;
+
         private const int QuitarEfectosDeHechizo = EffectSupport.RemoveSpellEffects;
         private const int CambiarApariencia = EffectSupport.ChangeLook;
 
-        /// <summary>"Invoca: #1". La plantilla del bicho viaja en el dado.</summary>
+        /// <summary>"Summons: #1". The creature's template travels in the die.</summary>
         public const int Invocar = EffectSupport.Summon;
 
         /// <summary>
-        /// Los efectos que colocan algo EN UNA CASILLA en vez de sobre alguien: una invocación,
-        /// una trampa, un glifo. Su objetivo es el suelo, así que no se les busca dueño.
+        /// The effects that place something ON A CELL instead of on somebody: a summon, a trap, a glyph. Their
+        /// target is the ground, so no owner is looked for.
         ///
-        ///   181, 1008, 1011  "Invoca: #1"     400  "Coloca una trampa"
-        ///   401  "Coloca un glifo de inicio de turno"
-        ///   1091 "Coloca un glifo aura"        2022 "Coloca una runa"
+        ///   181, 1008, 1011  "Summons: #1"     400  "Places a trap"
+        ///   401  "Places a turn-start glyph"
+        ///   1091 "Places an aura glyph"        2022 "Places a rune"
         ///
-        /// El 1008 y el 1011 son invocaciones igual que el 181 y con la misma forma —el dado
-        /// lleva la plantilla del bicho y el lado su grado, comprobado: el 3987 es «Gladiador
-        /// aprendiz ocra» y el 3112 «Explobomba»—. Estaban fuera del conjunto y por eso los 22
-        /// hechizos que los llevan no invocaban nada, en silencio.
+        /// 1008 and 1011 are summons just like 181 and with the same shape -- the die carries the creature's
+        /// template and the side its grade, checked: 3987 is «Gladiador aprendiz ocra» and 3112 «Explobomba» --.
+        /// They were outside the set and that is why the 22 spells carrying them summoned nothing, silently.
         /// </summary>
         private static readonly HashSet<int> AlSuelo =
             new HashSet<int> { 181, 1008, 1011, 400, 401, 402, 1091, 1165, 2022, EffectSupport.Illusions, 780, 1034, 147, 1101, InvocaUnDoble,
@@ -1419,7 +1428,7 @@ namespace Jondo.Unity.Server.Managers
                 : Jondo.Unity.World.Maps.Zone.Casillas(efecto.Forma, efecto.Tamano, desde, centro, efecto.TamanoMinimo,
                                                        efecto.ParaEnElObjetivo);
 
-        /// <summary>Los tres efectos que sacan un bicho al tablero.</summary>
+        /// <summary>The three effects that bring a creature onto the board.</summary>
         private static readonly HashSet<int> Invocaciones = new HashSet<int> { 181, 1008, 1011 };
 
         /// <summary>"Activa una bomba". 36 spells carry it, and none of them worked before.</summary>
@@ -1433,12 +1442,12 @@ namespace Jondo.Unity.Server.Managers
         public const int ActivarBomba = 1009;
 
         /// <summary>
-        /// Como de lejos llega una explosion, leido de su propio hechizo.
+        /// How far an explosion reaches, read from its own spell.
         /// </summary>
         /// <remarks>
-        /// No es un dos escrito a mano: el efecto 99 de la Explosion Tymadora lleva
-        /// <c>zoneDescr{shape: 67, param1: 2}</c>, que es un circulo de radio dos, y las cuatro
-        /// explosiones traen el suyo. Si algun dia Ankama lo cambia, cambia solo.
+        /// It is not a two written by hand: the Explosión Tymadora's effect 99 carries
+        /// <c>zoneDescr{shape: 67, param1: 2}</c>, which is a circle of radius two, and the four explosions
+        /// carry their own. If Ankama ever changes it, it changes by itself.
         /// </remarks>
         internal static int RadioDeLaExplosion(int hechizo, int grado)
         {
@@ -1467,18 +1476,17 @@ namespace Jondo.Unity.Server.Managers
         private const int FixedHeal = EffectSupport.FireHeal;
 
         /// <summary>
-        /// Las cinco curas fijas, una por elemento.
+        /// The five fixed heals, one per element.
         /// </summary>
         /// <remarks>
-        /// 108 fuego, 2998 agua, 2999 aire, 3000 tierra, 3001 neutral. Las cuatro que faltaban
-        /// tocan 31 hechizos de clase.
+        /// 108 fire, 2998 water, 2999 air, 3000 earth, 3001 neutral. The four that were missing touch 31 class
+        /// spells.
         ///
-        /// No ha hecho falta escribir nada nuevo para ellas: el cálculo de la cura ya estaba
-        /// escrito sin atarse al elemento —lee el effectElement del propio efecto y busca con él
-        /// la característica que la escala—, y quien lo escribió dejó dicho por qué en un
-        /// comentario: «clavar el 15 aquí es lo que hace que las otras cinco salgan mal el día
-        /// que se implementen». Lo único que ataba al fuego era que la constante era un número
-        /// suelto en vez de un conjunto.
+        /// Nothing new had to be written for them: the heal calculation was already written without being tied
+        /// to the element -- it reads the effect's own effectElement and looks up with it the characteristic that
+        /// scales it --, and whoever wrote it left the reason in a comment: «nailing 15 here is what makes the
+        /// other five come out wrong the day they are implemented». The only thing tying it to fire was that the
+        /// constant was a loose number instead of a set.
         /// </remarks>
         private static readonly HashSet<int> CurasFijas = new()
         {
@@ -1493,7 +1501,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private const int CuraDelMejorElemento = 3002;
 
-        /// <summary>¿Es una de las cinco curas fijas?</summary>
+        /// <summary>Is it one of the five fixed heals?</summary>
         private static bool EsCuraFija(int efecto) => CurasFijas.Contains(efecto);
 
         private const int HealsCharacteristic = 49;
@@ -1532,20 +1540,20 @@ namespace Jondo.Unity.Server.Managers
         };
 
         /// <summary>
-        /// El MEJOR elemento de un combatiente: aquel cuya característica lleva más alta.
+        /// A fighter's BEST element: the one whose characteristic he has highest.
         /// </summary>
         /// <remarks>
-        /// El catálogo del cliente numera este caso —el 5 de Effects.ElementId es «mejor»— y hay
-        /// además un efecto entero para él, el 2822 «N de daños del mejor elemento», que llevan
-        /// veinte hechizos de clase: Llamilla, Bilbipo, Apetito de Cocobur.
+        /// The client's catalogue numbers this case -- Effects.ElementId's 5 is «best» -- and there is also a
+        /// whole effect for it, 2822 «N damage of the best element», which twenty class spells carry: Llamilla,
+        /// Bilbipo, Apetito de Cocobur.
         ///
-        /// Se mira la característica CON LOS EMBRUJOS PUESTOS, no la de la ficha: un hechizo que
-        /// te sube la agilidad puede cambiar cuál es tu mejor elemento a mitad de combate, y eso
-        /// es justamente para lo que se lanza.
+        /// The characteristic is looked at WITH THE BUFFS ON, not the sheet's: a spell that raises your agility
+        /// can change which is your best element halfway through a fight, and that is exactly what it is cast
+        /// for.
         ///
-        /// El empate se rompe por el orden tierra, fuego, agua, aire. No está medido cuál usa el
-        /// juego real; hace falta UN criterio estable para que dos lanzamientos iguales den lo
-        /// mismo, y éste es el orden en que el propio catálogo numera los elementos.
+        /// A tie is broken by the order earth, fire, water, air. Which one the real game uses is not measured;
+        /// ONE stable criterion is needed so that two identical casts give the same, and this is the order the
+        /// catalogue itself numbers the elements in.
         /// </remarks>
         internal static int MejorElementoDe(Fighter quien, int ronda)
         {
@@ -1606,20 +1614,19 @@ namespace Jondo.Unity.Server.Managers
             return Math.Max(0, (int)Math.Round(received));
         }
 
-        /// <summary>"Cura: #1% de los PdV máximos". El dado es el porcentaje.</summary>
+        /// <summary>"Heal: #1% of maximum HP". The die is the percentage.</summary>
         private const int CuraPorcentual = EffectSupport.HealPercent;
 
-        /// <summary>Los dos números de característica de los puntos.</summary>
+        /// <summary>The two characteristic numbers of the points.</summary>
         /// <summary>
-        /// Los efectos que ROBAN vida: pegan y curan al lanzador por la mitad.
+        /// The effects that STEAL life: they hit and heal the caster for half.
         ///
-        /// Salen del catálogo del cliente, tal cual los describe: el 91 es «robo de agua», el 92
-        /// de tierra, el 93 de aire, el 94 de fuego, el 95 neutral y el 82 el neutral fijo. Los
-        /// 2828 y 2890 son «robo del mejor elemento» y «del peor», que eligen el elemento al
-        /// vuelo pero roban igual.
+        /// They come from the client's catalogue, as it describes them: 91 is «water steal», 92 earth, 93 air,
+        /// 94 fire, 95 neutral and 82 the fixed neutral. 2828 and 2890 are «best element steal» and «worst»,
+        /// which choose the element on the fly but steal all the same.
         ///
-        /// No confundirlos con los 96 a 100, que son los daños del mismo elemento y no curan
-        /// nada. Un solo número de diferencia y el comportamiento es otro.
+        /// Not to be confused with 96 to 100, which are the same element's damage and heal nothing. A single
+        /// number of difference and the behaviour is another.
         /// </summary>
         private static readonly HashSet<int> RobosDeVida = new HashSet<int>
         {
@@ -1628,12 +1635,11 @@ namespace Jondo.Unity.Server.Managers
 
         public static bool EsRoboDeVida(int efecto) => RobosDeVida.Contains(efecto);
 
-        /// <summary>«Mata al objetivo», el 141 del catálogo del cliente.</summary>
+        /// <summary>«Kills the target», the client catalogue's 141.</summary>
         /// <remarks>
-        /// Lo trae Doom de Masas (3450), que es de administración: un PA, alcance cero, zona, y un
-        /// efecto 120 detrás que devuelve el PA gastado. Hasta ahora el 141 caía en la rama de
-        /// «no sé aplicarlo pero lo anuncio», que lo pintaba en el panel de embrujos y no mataba
-        /// a nadie.
+        /// Doom de Masas (3450) carries it, which is an administration spell: one AP, range zero, area, and an
+        /// effect 120 behind it that gives back the AP spent. Until now 141 fell into the «I do not know how to
+        /// apply it but I announce it» branch, which drew it on the buff panel and killed nobody.
         /// </remarks>
         internal const int MataAlObjetivo = 141;
 
@@ -1644,21 +1650,21 @@ namespace Jondo.Unity.Server.Managers
         private const int PuntosDeMovimiento = 23;
 
         /// <summary>
-        /// "Mata al objetivo". Es la cuenta atrás de un invocado: al nacer le cuelgan uno de
-        /// éstos con su ronda, y cuando llega, se deshace.
+        /// "Kills the target". It is a summon's countdown: on being born one of these is hung on it with its
+        /// round, and when it comes, it is undone.
         /// </summary>
         public const int MatarAlObjetivo = EffectSupport.Kill;
 
-        /// <summary>Cuántos hechizos encadenados se admiten antes de sospechar de un bucle.</summary>
+        /// <summary>How many chained spells are allowed before suspecting a loop.</summary>
         private const int HondoMaximo = 6;
 
         /// <summary>
-        /// El grado en el que vive el enganche de una actitud. Es siempre el primero: los otros los
-        /// nombra él mismo por su número, así que no hay que preguntarle a nadie cuál toca.
+        /// The grade an attitude's hook lives in. It is always the first: the others are named by the hook itself
+        /// by their number, so there is no need to ask anybody which one is due.
         /// </summary>
         public const int GradoDelEnganche = 1;
 
-        /// <summary>El disparador de "ahora mismo".</summary>
+        /// <summary>The "right now" trigger.</summary>
         public const string AlLanzar = "I";
         public const string AlEmpezarElTurno = "TB";
         public const string AlAcabarElTurno = "TE";
@@ -1681,11 +1687,10 @@ namespace Jondo.Unity.Server.Managers
         public const string AlMorir = "X";
 
         /// <summary>
-        /// Cuando uno ANDA, por cada casilla. Es el disparador del Centinela del Ocra, que da
-        /// alcance y daños a distancia a cambio de quedarse quieto: cada paso se lleva uno de
-        /// alcance y un dos por ciento de daños.
+        /// When one WALKS, per cell. It is the trigger of the Cra's Centinela, which gives range and ranged damage
+        /// in exchange for standing still: each step takes one range and two per cent of damage.
         ///
-        /// Medido en su captura: once movimientos, once bajadas, ninguna excepción.
+        /// Measured in its capture: eleven moves, eleven drops, no exception.
         /// </summary>
         public const string AlAndar = "CCMPARR";
 
@@ -1856,10 +1861,10 @@ namespace Jondo.Unity.Server.Managers
         public const int Desembrujo = Desembrujar;
 
         /// <summary>
-        /// Resuelve un hechizo entero y devuelve lo que hay que hacer, en orden.
+        /// Resolves a whole spell and returns what has to be done, in order.
         ///
-        /// <paramref name="disparador"/> filtra: al lanzar se piden los "I", al empezar el turno los
-        /// "TB", y así. Los efectos con otro disparador se quedan quietos hasta que les toque.
+        /// <paramref name="disparador"/> filters: on casting the "I" ones are asked for, at the start of the turn
+        /// the "TB" ones, and so on. Effects with another trigger stay still until their time comes.
         /// </summary>
         /// <param name="efectosSorteados">
         /// The cast's own draw of the random rows, when the blows of the same cast were dealt
@@ -1972,8 +1977,9 @@ namespace Jondo.Unity.Server.Managers
                     estadosAlEmpezar[luchador] = new HashSet<int>(luchador.Buffs.Estados);
             }
 
-            // Los efectos que van a suertes: se sortean ANTES de recorrer nada, y los que no salen
-            // se quedan fuera de esta resolución. A cast draws once for its blows and its rows.
+            // The effects that go by chance: they are drawn BEFORE walking anything, and the ones
+            // that do not come out are left out of this resolution. A cast draws once for its
+            // blows and its rows.
             var descartados = yaSorteado ? new HashSet<SpellEffect>() : Sortear(effects);
 
             // Whether these rows are the critical list's: only when the cast was critical AND
@@ -2171,16 +2177,16 @@ namespace Jondo.Unity.Server.Managers
                                           : DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value))
                     : int.MinValue;
 
-                // Lo que se pone EN EL SUELO no busca a nadie: va a la casilla, esté quien esté.
+                // What is put ON THE GROUND looks for nobody: it goes to the cell, whoever is there.
                 //
-                // Aquí se caían las balizas. El efecto 181 lleva máscara "a,A" y zona de punto, y
-                // el motor buscaba un combatiente encima de la casilla apuntada para aplicárselo.
-                // Pero una baliza se invoca justamente donde NO hay nadie: no había candidato, la
-                // consecuencia no se creaba y no se pedía invocar nada. El paquete y el reenvío de
-                // la lista estaban bien; lo que no llegaba era la orden.
-                // Una bomba lanzada sobre casilla OCUPADA no se planta: estalla ahí mismo, y con
-                // su otro hechizo. Aquí y no en quien invoca porque la decisión es del efecto:
-                // según a dónde apunte, el mismo 1008 saca una bomba o no saca ninguna.
+                // This is where the beacons fell. Effect 181 carries mask "a,A" and a point zone, and
+                // the engine looked for a fighter on the aimed cell to apply it to. But a beacon is
+                // summoned precisely where there is NOBODY: there was no candidate, the consequence
+                // was not created and no summon was asked for. The packet and the resent list were
+                // fine; what did not arrive was the order.
+                // A bomb cast on a TAKEN cell is not planted: it blows up right there, and with its
+                // other spell. Here and not in the summoner because the decision is the effect's:
+                // depending on where it aims, the same 1008 brings out a bomb or none.
                 int alObjetivo = Bombs.OnTarget(efecto.DiceNum);
                 if (Invocaciones.Contains(efecto.EffectId) && alObjetivo != 0 && aimedCell >= 0)
                 {
@@ -2310,18 +2316,18 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
-                // «Activa una bomba»: la bomba apuntada lanza SU explosión, y la explosión trae
-                // dentro todo lo demás —el daño de su elemento en círculo de radio dos, el 141
-                // que la mata y otro 1009 que enciende a las bombas que pille dentro—.
+                // «Activates a bomb»: the aimed bomb casts ITS explosion, and the explosion carries
+                // everything else inside -- its element's damage in a circle of radius two, the 141
+                // that kills it and another 1009 that sets off the bombs it catches inside --.
                 if (efecto.EffectId == ActivarBomba)
                 {
                     if (depth >= HondoMaximo) continue;
 
-                    // EL MURO PROPAGA. Encender una bomba enciende a las que estan unidas a ella
-                    // por un muro, y a las de aquellas, y asi hasta donde llegue la cadena: «Si
-                    // una bomba esta unida a otras por un muro y explota, hara explotar tambien a
-                    // las otras bombas del muro», dice la ficha de clase. Por eso es una cola y no
-                    // un bucle: cada bomba que estalla mete dentro a sus companeras de muro.
+                    // THE WALL SPREADS. Setting off a bomb sets off the ones joined to it by a wall, and
+                    // theirs, and so on as far as the chain reaches: «Si una bomba esta unida a otras por
+                    // un muro y explota, hara explotar tambien a las otras bombas del muro», says the class
+                    // sheet. That is why it is a queue and not a loop: each bomb that blows up puts its
+                    // wall companions in.
                     var cola = new Queue<Fighter>();
                     foreach (var apuntada in AQuien(combat, caster, target, efecto, aimedCell,
                                                     estadosAlEmpezar, celdasAlEmpezar, soloAlObjetivo: soloAlObjetivo))
@@ -2337,14 +2343,13 @@ namespace Jondo.Unity.Server.Managers
                         int explosion = Bombs.Explosion(bomba.MonsterId);
                         if (explosion == 0) continue;
 
-                        // UNA VEZ POR CADENA. Dos bombas dentro del radio de la otra se encienden
-                        // mutuamente, y sin esto se cobrarían el daño una vez por rebote hasta
-                        // agotar la profundidad.
+                        // ONCE PER CHAIN. Two bombs within each other's radius set each other off, and without
+                        // this they would charge the damage once per bounce until the depth ran out.
                         if (!bombasYaEstalladas.Add(bomba.Id)) continue;
 
-                        // La lanza ella, desde su casilla y en su propio grado. Medido en
-                        // «tymador-detonador»: la bomba -5, invocada en grado 3, lanza el 13455
-                        // en su nivel 41955, que es el grado 3.
+                        // It casts it itself, from its cell and at its own grade. Measured in
+                        // «tymador-detonador»: bomb -5, summoned at grade 3, casts 13455 at its level 41955,
+                        // which is grade 3.
                         fuera.AddRange(Resolver(combat, bomba, explosion,
                                                 Math.Max(1, bomba.GradeIndex),
                                                 bomba, AlLanzar, round, depth + 1,
@@ -2357,11 +2362,10 @@ namespace Jondo.Unity.Server.Managers
                             cola.Enqueue(companera);
                         }
 
-                        // Y LAS QUE PILLE LA EXPLOSION, muro o no muro: «Cuando explota una
-                        // bomba, si hay otras bombas del lanzador en la zona de explosion, estas
-                        // explotaran tambien». Dos bombas pegadas NO hacen muro -- hace falta
-                        // dejar dos casillas -- pero un circulo de radio dos se lleva por delante
-                        // a la de al lado igualmente.
+                        // And THE ONES THE EXPLOSION CATCHES, wall or no wall: «Cuando explota una bomba, si
+                        // hay otras bombas del lanzador en la zona de explosion, estas explotaran tambien».
+                        // Two bombs side by side do NOT make a wall -- two cells have to be left -- but a
+                        // circle of radius two takes the one next to it down all the same.
                         int radio = RadioDeLaExplosion(explosion, Math.Max(1, bomba.GradeIndex));
                         if (radio > 0)
                         {
@@ -2379,9 +2383,9 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
-                // La familia de «haz que se lance otro hechizo», los que no resolvía el camino
-                // viejo. Un solo bloque para los seis, porque son la misma resolución con tres
-                // parámetros: quién lanza, a qué apunta y cuántos candidatos coge.
+                // The «make another spell be cast» family, the ones the old road did not resolve. A
+                // single block for the six, because they are the same resolution with three
+                // parameters: who casts, what it aims at and how many candidates it takes.
                 if (Familia.TryGetValue(efecto.EffectId, out var comoVa)
                     && !comoVa.YaLoHaceElCaminoViejo)
                 {
@@ -2395,12 +2399,12 @@ namespace Jondo.Unity.Server.Managers
                         if (quien != null && quien.IsAlive) candidatos.Add(quien);
                     }
 
-                    // El tope. Con value 0 o 999 no hay tope —así van el 792, el 1160 y el 2794,
-                    // que llegan hasta once hijos en las capturas—; con un número pequeño sí, y
-                    // se respeta: el 2160 saca uno en 251 de 251 y el 2793 con value 6 nunca pasa
-                    // de seis. Es la mejor explicación de por qué el 792 y el 2792 conviven con
-                    // la misma máscara cambiando sólo este campo, pero NO está demostrado: las
-                    // diez ejecuciones de 2792 del corpus tuvieron un solo candidato.
+                    // The cap. With value 0 or 999 there is no cap -- that is how 792, 1160 and 2794 go,
+                    // which reach up to eleven children in the captures --; with a small number there is,
+                    // and it is respected: 2160 brings out one in 251 of 251 and 2793 with value 6 never
+                    // goes above six. It is the best explanation of why 792 and 2792 live together with
+                    // the same mask changing only this field, but it is NOT proven: the ten executions of
+                    // 2792 in the corpus had a single candidate.
                     if (comoVa.TopePorValor && efecto.Value > 0 && efecto.Value < 999
                         && candidatos.Count > efecto.Value)
                     {
@@ -2422,10 +2426,10 @@ namespace Jondo.Unity.Server.Managers
 
                     foreach (var candidato in candidatos)
                     {
-                        // Quién lanza el hijo. En el 1017, el 2792 y sus primos es el CANDIDATO,
-                        // y eso no es cosmético: las máscaras del hijo se resuelven contra él.
-                        // Medido con la lanza del Forjalanza, cuyo hijo lleva un «mata al
-                        // objetivo» con máscara C y acaba matando a la propia lanza.
+                        // Who casts the child. In 1017, 2792 and their cousins it is the CANDIDATE, and that
+                        // is not cosmetic: the child's masks are resolved against him. Measured with the
+                        // Forjalanza's spear, whose child carries a «kill the target» with mask C and ends up
+                        // killing the spear itself.
                         var origen = combat.TriggeringAttacker != null && combat.TriggeringAttacker.IsAlive
                             ? combat.TriggeringAttacker
                             : caster;
@@ -2433,7 +2437,7 @@ namespace Jondo.Unity.Server.Managers
                                         : comoVa.LanzaElCandidato ? candidato
                                         : caster;
 
-                        // Y a qué apunta.
+                        // And what it aims at.
                         Fighter aQuien;
                         int aQueCasilla;
                         switch (comoVa.Apunta)
@@ -2449,10 +2453,9 @@ namespace Jondo.Unity.Server.Managers
                                 break;
 
                             case Apunta.ALaCasillaDelPadre:
-                                // La casilla del padre, y el objetivo se vuelve a resolver AHORA:
-                                // hay hechizos que apuntan a casilla vacía y plantan ahí la
-                                // invocación que el hijo tiene que alcanzar. Congelar el objetivo
-                                // los dejaría sin hacer nada, en silencio.
+                                // The parent's cell, and the target is resolved again NOW: there are spells that aim
+                                // at an empty cell and plant there the summon the child has to reach. Freezing the
+                                // target would leave them doing nothing, silently.
                                 aQueCasilla = aimedCell >= 0 ? aimedCell : candidato.CellId;
                                 aQuien = EnLaCasilla(combat, aQueCasilla);
                                 break;
@@ -2500,14 +2503,16 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
-                // "Retrocede" y "Avanza" mueven al QUE LANZA, y la máscara es una condición sobre
-                // el objetivo, no una lista de destinatarios: se cumple o no se cumple, y el
-                // desplazamiento ocurre UNA VEZ. Si se aplicara por candidato, un hechizo que
-                // alcanzara a tres bichos movería al lanzador tres veces.
+                // "Moves back" and "Moves forward" move WHOEVER CASTS, and the mask is a condition on
+                // the target, not a list of recipients: it is met or not met, and the displacement
+                // happens ONCE. If it were applied per candidate, a spell that reached three
+                // creatures would move the caster three times.
                 bool unaSolaVez = efecto.EffectId == Retroceder || efecto.EffectId == Avanzar;
 
                 foreach (var sobre in AQuien(combat, caster, target, efecto, aimedCell,
-                                             estadosAlEmpezar, celdasAlEmpezar, soloAlObjetivo: soloAlObjetivo))
+                                             estadosAlEmpezar, celdasAlEmpezar,
+                                             soloAlObjetivo: soloAlObjetivo,
+                                             includeDeadTarget: IsOuginakRageChain(efecto)))
                 {
                     var hecho = Aplicar(combat, caster, sobre, spell, grade, efecto, round,
                                         aimedCell, sharedHealRoll);
@@ -2519,7 +2524,7 @@ namespace Jondo.Unity.Server.Managers
                     if (hecho == null) continue;
                     fuera.Add(hecho);
 
-                    // Un efecto puede encadenar otro hechizo: es como se enganchan las actitudes.
+                    // An effect can chain another spell: it is how the attitudes hook on.
                     //
                     // WHO casts the child and WHERE it is aimed come from the table above, the
                     // same way the new path reads it: a 792 is cast BY THE TARGET at itself, a
@@ -2531,10 +2536,14 @@ namespace Jondo.Unity.Server.Managers
                     // capture: "jwe 300 f3=-16" -- the bomb -- casts 20497 on cell 274, its own.
                     if (hecho.HechizoEncadenado != 0)
                     {
-                        // A monster's 792, 1160, 2160 with a delay wait like the rest of the family:
-                        // Conflicto Eterno's imp comes back two turns later, not at once.
+                        // Delayed sub-casts wait like the rest of the family. Most cases in this
+                        // old path are monster spells (Conflicto Eterno's imp), but Ouginak Rage
+                        // also schedules 13747 one round later: it arms the turn-end removal only
+                        // for the following turn, so beast form survives the turn in which it was
+                        // gained and the whole next turn.
                         if (efecto.Delay > 0 && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
-                            && !PlayerSpells.Contains(spell))
+                            && (!PlayerSpells.Contains(spell)
+                                || IsDelayedOuginakBestialFormEnd(efecto)))
                         {
                             var quienLoLanzaraLuego = Familia.TryGetValue(efecto.EffectId, out var comoEsperara)
                                                       && comoEsperara.LanzaElCandidato ? sobre : caster;
@@ -2630,22 +2639,22 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// A quién le toca un efecto, según su máscara.
+        /// Who an effect reaches, according to its mask.
         ///
-        ///   C          a quien lo lanza
-        ///   c          a quien lo lanza, si está en la zona
-        ///   a, A       los del propio bando -- el lanzador incluido -- y los de enfrente
-        ///   g          los del propio bando sin el lanzador
-        ///   i, I  j, J las invocaciones, del propio bando y de enfrente
-        ///   l, L       los jugadores, del propio bando y de enfrente
-        ///   m, M       los monstruos que no son invocación, ídem
-        ///   P, p       (sobre una invocación) del lanzador, de otro
-        ///   h          el invocador del lanzador
+        ///   C          whoever casts it
+        ///   c          whoever casts it, if he is in the zone
+        ///   a, A       those of one's own side -- the caster included -- and those opposite
+        ///   g          those of one's own side without the caster
+        ///   i, I  j, J the summons, of one's own side and opposite
+        ///   l, L       the players, of one's own side and opposite
+        ///   m, M       the monsters that are not summons, likewise
+        ///   P, p       (on a summon) the caster's, somebody else's
+        ///   h          the caster's summoner
         ///   O          the one whose blow set the spell off, wherever he stands
-        ///   e&lt;N&gt;      sólo si NO lleva el estado N
-        ///   E&lt;N&gt;      sólo si SÍ lo lleva
-        ///   F&lt;N&gt; f&lt;N&gt;  sólo si es, o no es, el monstruo N
-        ///   V&lt;N&gt; v&lt;N&gt;  sólo con menos, o no menos, del N % de vida
+        ///   e&lt;N&gt;      only if he does NOT carry state N
+        ///   E&lt;N&gt;      only if he DOES carry it
+        ///   F&lt;N&gt; f&lt;N&gt;  only if he is, or is not, monster N
+        ///   V&lt;N&gt; v&lt;N&gt;  only with less, or not less, than N % life
         ///   H          the enemy characters, as L
         ///   T, W, U    the telefragged, the teleport that found no cell, the one just summoned
         ///   B&lt;N&gt; b&lt;N&gt;  a character of class N, or anybody who is not one
@@ -2662,7 +2671,8 @@ namespace Jondo.Unity.Server.Managers
                                                    int celdaApuntada = -1,
                                                    IReadOnlyDictionary<Fighter, HashSet<int>> estados = null,
                                                    IReadOnlyDictionary<Fighter, int> celdas = null,
-                                                   bool soloAlObjetivo = false)
+                                                   bool soloAlObjetivo = false,
+                                                   bool includeDeadTarget = false)
         {
             var mascara = efecto.TargetMask ?? "";
             bool alLanzador = false, aLosMios = false, aLosDeEnfrente = false, aLosOtrosAliados = false;
@@ -2756,15 +2766,15 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
-                // LA MINÚSCULA Y LA MAYÚSCULA NO SON LO MISMO: la "a" son los del propio bando y
-                // la "A" los de enfrente. Estaban las dos en el mismo cubo, y eso hacía cosas
-                // absurdas. Tiro de Repliegue, por ejemplo, lleva un 1041 "Retrocede" con máscara
-                // "A" y un 1042 "Avanza" con "a": al no distinguirlas se cumplían las dos, el
-                // lanzador se movía dos casillas atrás y otras dos adelante, y el desplazamiento
-                // neto era cero. En el registro se veía tal cual, ida y vuelta a la misma casilla.
+                // LOWER CASE AND UPPER CASE ARE NOT THE SAME: "a" is one's own side and "A" the opposite
+                // one. Both were in the same bucket, and that did absurd things. Tiro de Repliegue, for
+                // instance, carries a 1041 "Moves back" with mask "A" and a 1042 "Moves forward" with
+                // "a": not telling them apart both were met, the caster moved two cells back and two
+                // forward, and the net displacement was zero. In the log it could be seen as it was,
+                // there and back to the same cell.
                 //
-                // Se sostiene en toda la base: los efectos de daño 96-100 llevan sólo "A" o "a,A"
-                // —más de seis mil— y la curación 108 lleva "a", "C" o "g".
+                // It holds across the whole database: damage effects 96-100 carry only "A" or "a,A" --
+                // more than six thousand -- and heal 108 carries "a", "C" or "g".
                 if (t == "a") { aLosMios = true; continue; }
                 if (t == "A") { aLosDeEnfrente = true; continue; }
 
@@ -2998,9 +3008,9 @@ namespace Jondo.Unity.Server.Managers
 
             if (!soloAlObjetivo && (aLosMios || aLosDeEnfrente || aLosOtrosAliados || algunaClase))
             {
-                // La zona: el efecto dice de qué FORMA coge el terreno alrededor de la casilla
-                // apuntada —un punto, un círculo de radio dos, una cruz— y le toca a todo el que
-                // esté encima Y cumpla la máscara.
+                // The zone: the effect says in what SHAPE it takes the ground around the aimed cell --
+                // a point, a circle of radius two, a cross -- and it reaches everybody standing on it
+                // WHO meets the mask.
                 // The telefragged are named by the telefrag, not by the ground: they are the ones
                 // who swapped, wherever the swap left them. Read off Reloj de Bolsillo, whose
                 // "+100 damage" on "a,T" goes, in the guide, to the character the Count swapped
@@ -3009,7 +3019,8 @@ namespace Jondo.Unity.Server.Managers
                     ? combate.Telefrags.Keys.Select(combate.Buscar).Where(f => f != null && f.IsAlive).ToList()
                     : soloTeleportFallido
                         ? combate.TeleportsFallidos.Select(combate.Buscar).Where(f => f != null && f.IsAlive).ToList()
-                        : EnLaZona(combate, quienLanza, objetivo, efecto, celdaApuntada, celdas);
+                        : EnLaZona(combate, quienLanza, objetivo, efecto, celdaApuntada, celdas,
+                                   includeDeadTarget);
                 foreach (var quien in enJuego)
                 {
                     bool suyo = quien.TeamId == quienLanza.TeamId;
@@ -3040,9 +3051,9 @@ namespace Jondo.Unity.Server.Managers
                 candidatos.RemoveAll(c => atacante == null || c != atacante);
             }
 
-            // Sin máscara, al objetivo del lanzamiento. Pero si la máscara dice algo que este motor
-            // todavía no sabe leer —"P" los jugadores, "F434" una familia de bichos— NO se cae al
-            // objetivo: se deja pasar. Cayendo al objetivo, Flecha Voraz pegaba DOS veces.
+            // Without a mask, at the cast's target. But if the mask says something this engine
+            // cannot read yet -- "P" the players, "F434" a family of creatures -- it does NOT fall back
+            // on the target: it is let through. Falling back on the target, Flecha Voraz hit TWICE.
             if (candidatos.Count == 0 && mascara.Trim().Length == 0)
             {
                 candidatos.Add(objetivo ?? quienLanza);
@@ -3089,11 +3100,37 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los combatientes que pisa la zona del efecto.
-        ///
-        /// Si no se sabe a qué casilla se apuntó —las actitudes y los encadenados no apuntan a
-        /// ninguna— se cae al objetivo de siempre, que es lo que se hacía antes de haber zonas.
+        /// Whom a row would reach if <paramref name="caster"/> stood on <paramref name="from"/> and
+        /// aimed at <paramref name="aim"/>: this engine's own reading of its mask and its zone
+        /// (<see cref="AQuien"/>), for the tactics to weigh a cast before making it. Nothing is
+        /// moved or changed; everybody else is where he stands.
         /// </summary>
+        /// <summary>Whether the caster meets the conditions a row puts on him (its starred letters).</summary>
+        internal static bool CasterMeets(Fighter caster, SpellEffect row) => CasterQualifies(caster, row.TargetMask, null);
+
+        internal static List<Fighter> ReachOf(FightInstance fight, Fighter caster, SpellEffect row, int from, int aim)
+        {
+            var cells = new Dictionary<Fighter, int>();
+            Fighter onAim = null;
+            foreach (var fighter in Todos(fight))
+            {
+                if (fighter == null) continue;
+                int cell = fighter == caster ? from : fighter.CellId;
+                cells[fighter] = cell;
+                if (onAim == null && cell == aim && fighter.IsAlive && !fighter.EstaCargado) onAim = fighter;
+            }
+            try
+            {
+                return AQuien(fight, caster, onAim, row, aim, null, cells).Where(f => f != null && f.IsAlive).Distinct().ToList();
+            }
+            catch (Exception)
+            {
+                // A letter that reads the state of a resolution under way -- the telefragged, the
+                // carried -- has none to read outside one: it reaches nobody.
+                return new List<Fighter>();
+            }
+        }
+
         /// <summary>Whether a fighter is under a percentage of his maximum life.</summary>
         /// <remarks>
         /// Strictly under, in integers, without dividing: a bomb of 945 at 189 is exactly 20% and
@@ -3105,7 +3142,7 @@ namespace Jondo.Unity.Server.Managers
             return (long)who.CurrentHP * 100 < (long)who.MaxHP * percent;
         }
 
-        /// <summary>Quién está pisando una casilla, o nadie.</summary>
+        /// <summary>Who is standing on a cell, or nobody.</summary>
         private static Fighter EnLaCasilla(FightInstance combate, int casilla)
         {
             if (casilla < 0) return null;
@@ -3116,6 +3153,12 @@ namespace Jondo.Unity.Server.Managers
             return null;
         }
 
+        /// <summary>
+        /// The fighters the effect's zone covers.
+        ///
+        /// If it is not known which cell was aimed at -- attitudes and chained spells aim at none -- it falls
+        /// back on the usual target, which is what was done before there were zones.
+        /// </summary>
         /// <param name="celdas">
         /// Where everybody stood as the spell landed, when the caller took note: a row after a
         /// push or a pull still reaches whoever was in the zone at the cast.
@@ -3123,7 +3166,8 @@ namespace Jondo.Unity.Server.Managers
         private static IEnumerable<Fighter> EnLaZona(FightInstance combate, Fighter quienLanza,
                                                      Fighter objetivo, SpellEffect efecto,
                                                      int celdaApuntada,
-                                                     IReadOnlyDictionary<Fighter, int> celdas = null)
+                                                     IReadOnlyDictionary<Fighter, int> celdas = null,
+                                                     bool includeDeadTarget = false)
         {
             bool fijas = efecto.Forma == FormaDeCeldasFijas && efecto.CeldasFijas.Count > 0;
             if (celdaApuntada < 0 && !fijas)
@@ -3145,12 +3189,13 @@ namespace Jondo.Unity.Server.Managers
             var dentro = new HashSet<int>(casillas);
             foreach (var quien in Todos(combate))
             {
-                if (quien == null || !quien.IsAlive || quien.EstaCargado) continue;
+                if (quien == null || quien.EstaCargado) continue;
+                if (!quien.IsAlive && !(includeDeadTarget && quien == objetivo)) continue;
                 if (dentro.Contains(CeldaDe(quien))) yield return quien;
             }
         }
 
-        /// <summary>Si uno pisa la zona de un efecto.</summary>
+        /// <summary>Whether somebody is in an effect's zone.</summary>
         private static bool EstaEnLaZona(Fighter quien, FightInstance combate, Fighter objetivo,
                                          SpellEffect efecto, int celdaApuntada)
         {
@@ -3243,7 +3288,7 @@ namespace Jondo.Unity.Server.Managers
                                                 int celdaApuntada = -1,
                                                 int sharedHealRoll = int.MinValue)
         {
-            // El daño lo lleva quien ya lo llevaba; aquí no se toca.
+            // The damage is carried by whoever already carried it; it is not touched here.
             if (efecto.EffectId >= DanoPrimero && efecto.EffectId <= DanoUltimo) return null;
 
             if (efecto.EffectId == MataAlObjetivo)
@@ -3455,8 +3500,8 @@ namespace Jondo.Unity.Server.Managers
                 || efecto.EffectId == Trampa || efecto.EffectId == Runa
                 || efecto.EffectId == GlifoDeFinDeTurno || efecto.EffectId == GlifoCorriente)
             {
-                // Se pone UNA vez por lanzamiento, no una por cada uno al que pille la zona: la
-                // zona del efecto es la HUELLA del glifo, no su lista de víctimas.
+                // It is put ONCE per cast, not once for each one the zone catches: the effect's zone is
+                // the glyph's FOOTPRINT, not its list of victims.
                 if (sobre != quienLanza && celdaApuntada >= 0) return null;
                 if (celdaApuntada < 0) return null;
                 if (efecto.DiceNum <= 0) return null;
@@ -3494,8 +3539,8 @@ namespace Jondo.Unity.Server.Managers
                 int porciento = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (porciento <= 0) return null;
 
-                // Sobre el TOPE, no sobre lo que le queda: si fuera sobre lo que le queda, un
-                // noventa por ciento nunca mataría a nadie por muchas veces que se lanzara.
+                // On the MAXIMUM, not on what he has left: if it were on what he has left, ninety per
+                // cent would never kill anybody however many times it was cast.
                 int quita = Math.Max(1, sobre.MaxHP * porciento / 100);
 
                 return new Outcome
@@ -3515,8 +3560,8 @@ namespace Jondo.Unity.Server.Managers
                 int porciento = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (porciento <= 0) return null;
 
-                // De la vida QUE LE QUEDA al que la da: no se puede regalar lo que ya no se
-                // tiene. Y nunca hasta matarse: se queda con uno.
+                // From the life the giver HAS LEFT: one cannot give away what one no longer has. And
+                // never to the point of killing oneself: he keeps one.
                 int cuanto = Math.Min(quienLanza.CurrentHP - 1, quienLanza.CurrentHP * porciento / 100);
                 if (cuanto <= 0) return null;
 
@@ -3768,9 +3813,9 @@ namespace Jondo.Unity.Server.Managers
                 int porciento = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (porciento <= 0) return null;
 
-                // El 1020 va sobre el nivel DEL QUE LANZA y el 1039 sobre la vida DEL QUE LO
-                // RECIBE. Son dos bases distintas y confundirlas da escudos de otro orden: un
-                // 150% de nivel son 300 puntos a nivel 200, y un 150% de vida serían miles.
+                // 1020 goes on the CASTER's level and 1039 on the RECEIVER's life. They are two
+                // different bases and confusing them gives shields of another order: 150% of the level
+                // is 300 points at level 200, and 150% of life would be thousands.
                 int base_ = efecto.EffectId == EscudoPorNivel ? quienLanza.Level : sobre.MaxHP;
                 int cuanto = base_ * porciento / 100;
                 if (cuanto <= 0) return null;
@@ -3834,8 +3879,8 @@ namespace Jondo.Unity.Server.Managers
             if (efecto.EffectId == ALaPosicionAnterior || efecto.EffectId == AlInicioDelTurno
                 || efecto.EffectId == AlInicioDelCombate)
             {
-                // Sin memoria de dónde estaba no hay nada que deshacer, y devolver a cualquier
-                // sitio sería peor que no hacer nada.
+                // Without a memory of where he was there is nothing to undo, and sending him anywhere
+                // would be worse than doing nothing.
                 int antes = efecto.EffectId switch
                 {
                     AlInicioDelTurno => sobre.CasillaAlEmpezarTurno,
@@ -3850,9 +3895,9 @@ namespace Jondo.Unity.Server.Managers
                 if (celdaApuntada < 0) return null;
                 if (sobre.CellId == celdaApuntada) return null;
 
-                // El suelo manda. Una casilla que no se puede pisar, o que ya tiene a alguien
-                // encima, deja el teletransporte sin hacer: es preferible a mandar a nadie a un
-                // agujero, que es lo que pasaba con los empujones antes de mirar el suelo.
+                // The ground rules. A cell that cannot be stepped on, or that already has somebody on
+                // it, leaves the teleport undone: that is better than sending anybody into a hole,
+                // which is what happened with pushes before the ground was looked at.
                 var pisables = MapManager.GetFightWalkable(combate.ArenaMapId);
                 if (pisables != null && !pisables.Contains(celdaApuntada)) return null;
 
@@ -3877,9 +3922,9 @@ namespace Jondo.Unity.Server.Managers
                 if (sobre == quienLanza) return null;
                 if (sobre.CellId == quienLanza.CellId) return null;
 
-                // Aquí no se mira el suelo: las dos casillas ya las está pisando alguien, así que
-                // por definición se pueden pisar. Y tampoco se mira si están ocupadas, porque lo
-                // están las dos y justamente por eso el cambio es posible.
+                // The ground is not looked at here: both cells are already being stood on by somebody,
+                // so by definition they can be stood on. And whether they are taken is not looked at
+                // either, because both are, and that is precisely why the swap is possible.
                 int delObjetivo = sobre.CellId;
                 int delLanzador = quienLanza.CellId;
 
@@ -3903,7 +3948,7 @@ namespace Jondo.Unity.Server.Managers
                 efecto.EffectId == Tirar || efecto.EffectId == Retroceder || efecto.EffectId == Avanzar ||
                 hastaLaCasilla)
             {
-                // Cuántas casillas: el dado, y si no, el valor. "Hasta la casilla objetivo" is
+                // How many cells: the die, and if not, the value. "Hasta la casilla objetivo" is
                 // as many as separate the one moved from the aimed cell, and the direction is
                 // the caster's line, not the aimed cell's: the aimed cell is where it ENDS.
                 int cuantas = hastaLaCasilla
@@ -3914,10 +3959,10 @@ namespace Jondo.Unity.Server.Managers
                     || efecto.EffectId == TironForzado) cuantas = -cuantas;
                 int centroDelEmpuje = hastaLaCasilla ? quienLanza.CellId : celdaApuntada;
 
-                // "Retrocede" y "Avanza" mueven AL QUE LANZA, no al objetivo. Es lo que hace Tiro
-                // de Repliegue, que da alcance y da un paso atrás; el objetivo sólo sirve para
-                // saber de dónde se aleja. Medido en su captura: el Ocra estaba en la 411, lanzó
-                // a la 410 y acabó en la 412, alejándose de la casilla apuntada.
+                // "Moves back" and "Moves forward" move THE CASTER, not the target. It is what Tiro de
+                // Repliegue does, which gives range and takes a step back; the target only serves to
+                // know what he moves away from. Measured in its capture: the Cra was on 411, cast at
+                // 410 and ended up on 412, moving away from the aimed cell.
                 bool alLanzador = efecto.EffectId == Retroceder || efecto.EffectId == Avanzar;
                 if (alLanzador)
                 {
@@ -3925,19 +3970,19 @@ namespace Jondo.Unity.Server.Managers
                     if (efecto.EffectId == Avanzar) cuantas = -cuantas;
                 }
 
-                // INDESPLAZABLE: no se mueve, y por tanto TAMPOCO recibe daño de colisión.
+                // UNMOVABLE: he does not move, and therefore does NOT take collision damage EITHER.
                 //
-                // La diferencia importa y es fácil de equivocar: no es que el daño se reduzca a
-                // cero, es que sin desplazamiento no hay choque, aunque tenga el muro pegado a la
-                // espalda. Un empujado al que le falta sitio SÍ cobra; éste no.
+                // The difference matters and is easy to get wrong: it is not that the damage is reduced
+                // to zero, it is that without displacement there is no crash, even with the wall right
+                // at his back. A pushed one lacking room DOES pay; this one does not.
                 //
-                // El número del estado está medido: de los 25 hechizos cuya descripción en español
-                // nombra el estado Indesplazable, 21 aplican el 97 y el siguiente candidato sale en
-                // 1. Y los 155 hechizos que lo ponen se leen solos: Remache, Atracción
-                // Estabilizadora, Bombinmóvil, Patinaje.
+                // The state's number is measured: of the 25 spells whose Spanish description names the
+                // Unmovable state, 21 apply 97 and the next candidate comes up in 1. And the 155 spells
+                // that set it read by themselves: Remache, Atracción Estabilizadora, Bombinmóvil,
+                // Patinaje.
                 //
-                // Ojo: el ESTADO 97 no tiene nada que ver con la CARACTERÍSTICA 97, que es la vida
-                // que le falta al jugador. Mismo número, dos espacios distintos.
+                // Careful: STATE 97 has nothing to do with CHARACTERISTIC 97, which is the life the
+                // player is missing. Same number, two different spaces.
                 // And the catalogue names the 97 among 22 states with cantBeMoved and 25 with
                 // cantBePushed -- Arraigado, Pesadilla, Cénit... -- which the client's own
                 // SpellStateData flags; those are read from datos/spell_states.json.
@@ -3949,10 +3994,10 @@ namespace Jondo.Unity.Server.Managers
                     if (otro != null && otro.IsAlive && !otro.EstaCargado && otro != sobre) ocupadas.Add(otro.CellId);
 
                 int desde = sobre.CellId;
-                // Las casillas que se pueden pisar en la arena. Iban a null, que quiere decir "no
-                // mires el suelo", y por eso los pious acababan en un agujero o fuera del mapa:
-                // la única frontera que quedaba era el borde de la retícula de 560 celdas, que es
-                // mucho mayor que el suelo de un mapa.
+                // The cells that can be stepped on in the arena. They went as null, which means "do not
+                // look at the ground", and that is why the piwis ended up in a hole or off the map: the
+                // only border left was the edge of the 560-cell grid, which is much larger than a map's
+                // floor.
                 var pisables = MapManager.GetFightWalkable(combate.ArenaMapId);
                 // AND A BOMB WALL STOPS IT. "Desplazar una entidad a un muro detendra su
                 // desplazamiento y le infligira danos", says the class sheet; it steps onto the
@@ -3965,27 +4010,27 @@ namespace Jondo.Unity.Server.Managers
 
                 sobre.MoverA(empujon.ToCell);
 
-                // EL DAÑO DE COLISIÓN, que no se hacía en absoluto.
+                // COLLISION DAMAGE, which was not done at all.
                 //
-                // Sale de las casillas que NO se recorrieron, y la fórmula está medida sobre los
-                // 127 mensajes de daño de empuje de las 401 capturas:
+                // It comes from the cells NOT covered, and the formula is measured on the 127 push
+                // damage messages of the 401 captures:
                 //
-                //   daño = casillasSinRecorrer × (nivel/2 + la 84 del que empuja
-                //                                 − la 85 del que la recibe + 32) / 4
+                //   damage = cellsNotCovered × (level/2 + the pusher's 84
+                //                               − the receiver's 85 + 32) / 4
                 //
-                // Las tres anclas: un lanzador de nivel 200 sin bonos pega 33 por casilla —132/4—
-                // y sólo salen 33, 66, 99 y 132, ni un valor intermedio; el Zurkarak «Daddy», que
-                // es de NIVEL 165, pega 57 por dos casillas, que es floor(2 × 114,5 / 4) y que
-                // ninguna constante fija puede dar; y un Zobal con 100 de empuje de equipo y
-                // máscaras de 0, 40, 80 y 120 pega 58, 68, 78 y 88 por casilla.
+                // The three anchors: a level 200 caster with no bonuses hits 33 per cell -- 132/4 -- and
+                // only 33, 66, 99 and 132 come out, not one value in between; the Zurkarak «Daddy», who
+                // is LEVEL 165, hits 57 for two cells, which is floor(2 × 114.5 / 4) and which no fixed
+                // constant can give; and a Zobal with 100 push from equipment and masks of 0, 40, 80
+                // and 120 hits 58, 68, 78 and 88 per cell.
                 //
-                // La resistencia va DENTRO del cuarto: en el koliseo, 561 de empuje contra 30 de
-                // resistencia dan 331 por dos casillas. Restándola fuera saldría 316.
+                // The resistance goes INSIDE the quarter: in the koliseo, 561 push against 30
+                // resistance give 331 for two cells. Subtracting it outside would give 316.
                 //
-                // Y sólo lo hace el empujón: el catálogo tiene un efecto aparte, «Empuja (sin
-                // daños)», que 54 hechizos usan justamente para no hacerlo, lo que es la prueba de
-                // que el 5 normal sí. Del TIRÓN no hay ni un caso bloqueado en las 401 capturas,
-                // así que se queda a cero hasta que se mida.
+                // And only the push does it: the catalogue has a separate effect, «Pushes (no damage)»,
+                // which 54 spells use precisely so as not to do it, which is the proof that the normal
+                // 5 does. Of the PULL there is not a single blocked case in the 401 captures, so it
+                // stays at zero until it is measured.
                 int colision = 0, aLaPared = 0;
                 Fighter pared = null;
 
@@ -4005,8 +4050,7 @@ namespace Jondo.Unity.Server.Managers
                     colision = DanoDeColision(quienLanza.Level, deEmpuje, resiste,
                                               empujon.BlockedCells);
 
-                    // Y si lo que lo frenó fue otro combatiente, ése cobra la mitad. Los muros no
-                    // cobran.
+                    // And if what stopped him was another fighter, that one pays half. Walls do not pay.
                     if (colision > 0 && empujon.Stop == Jondo.Unity.World.Maps.Zone.PushStop.Fighter)
                     {
                         foreach (var otro in Todos(combate))
@@ -4020,9 +4064,9 @@ namespace Jondo.Unity.Server.Managers
                     }
                 }
 
-                // Se sale sin nada SÓLO si además no hay daño: cuando al empujado no le queda ni
-                // una casilla libre no se mueve, pero se lleva el golpe entero. Medido: en ese
-                // caso el servidor real no manda el desplazamiento, sólo el daño.
+                // It leaves with nothing ONLY if there is no damage either: when the pushed one has not
+                // a single free cell he does not move, but he takes the whole blow. Measured: in that
+                // case the real server does not send the displacement, only the damage.
                 if (empujon.ToCell == desde && colision <= 0) return null;
 
                 return new Outcome
@@ -4038,9 +4082,9 @@ namespace Jondo.Unity.Server.Managers
 
             if (Invocaciones.Contains(efecto.EffectId))
             {
-                // "Invoca: #1", con la plantilla del bicho en el dado. No lo saca al tablero el
-                // motor: hace falta repartir identificador, rehacer el orden de turnos y avisar
-                // al cliente, y eso es del que lleva el combate.
+                // "Summons: #1", with the creature's template in the die. The engine does not bring it
+                // onto the board: an identifier has to be handed out, the turn order rebuilt and the
+                // client told, and that belongs to whoever drives the fight.
                 if (efecto.DiceNum <= 0) return null;
                 return new Outcome
                 {
@@ -4054,9 +4098,8 @@ namespace Jondo.Unity.Server.Managers
             if (efecto.EffectId == LanzarHechizo || efecto.EffectId == DispararHechizo ||
                 efecto.EffectId == NearestTargetExecuteSpell)
             {
-                // "Lanza el hechizo del dado en el grado de la cara". Es el enganche de las
-                // actitudes: el grado 1 del Amarillo Ocre no hace nada por sí mismo, sólo dice
-                // cuándo lanzar sus grados 2 y 3.
+                // "Casts the die's spell at the side's grade". It is the attitudes' hook: Amarillo
+                // Ocre's grade 1 does nothing by itself, it only says when to cast its grades 2 and 3.
                 if (efecto.DiceNum <= 0) return null;
                 return new Outcome
                 {
@@ -4111,22 +4154,22 @@ namespace Jondo.Unity.Server.Managers
                     return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
                 var barridos = new List<Buff>();
 
-                // EL COMBO NO ES UN ESTADO CUALQUIERA, y tratarlo como tal rompia tres cosas a la
-                // vez. Es una escalera de peldanos excluyentes que solo puede llevar una bomba,
-                // asi que aqui se le imponen sus tres reglas antes de tocar nada:
+                // THE COMBO IS NOT JUST ANY STATE, and treating it as one broke three things at once.
+                // It is a ladder of mutually exclusive rungs that only a bomb can carry, so here its
+                // three rules are imposed before touching anything:
                 //
-                //   1. SOLO A UNA BOMBA. Polvora y Mosquete encadenan el hechizo del combo con
-                //      mascaras que este motor no sabe estrechar -- "P", "h" --, y sin saber a
-                //      quien apuntar caia en el lanzador: el tymador acababa con Combo IV en su
-                //      propio panel y la bomba sin subir.
-                //   2. UN PELDANO Y NO DOS. La escalera del hechizo vuelve a poner el primero en
-                //      cada vuelta -- su mascara excluye del 2485 en adelante pero no el 2484 --
-                //      y se lo anunciabamos al cliente antes de quitarlo, asi que la bomba se
-                //      veia siempre en Combo I por mucho que el servidor la subiera.
-                //   3. NADA POR ENCIMA DEL QUINCE. "El combo aumenta de 1 a 15 maximo", dice la
-                //      ficha de clase. La escalera del hechizo tiene dieciocho peldanos y las
-                //      bombas llegaban al 18; los tres de arriba pagan lo mismo que el quince,
-                //      asi que subir mas no daba nada y el cliente no sabe pintarlos.
+                //   1. ONLY ON A BOMB. Polvora and Mosquete chain the combo spell with masks this
+                //      engine cannot narrow -- "P", "h" --, and not knowing whom to aim at it fell
+                //      on the caster: the Rogue ended up with Combo IV on his own panel and the bomb
+                //      did not go up.
+                //   2. ONE RUNG AND NOT TWO. The spell's ladder sets the first one again on every
+                //      pass -- its mask excludes 2485 onwards but not 2484 -- and we announced it to
+                //      the client before removing it, so the bomb always looked like Combo I however
+                //      much the server raised it.
+                //   3. NOTHING ABOVE FIFTEEN. "El combo aumenta de 1 a 15 maximo", says the class
+                //      sheet. The spell's ladder has eighteen rungs and the bombs reached 18; the
+                //      three at the top pay the same as fifteen, so going higher gave nothing and the
+                //      client cannot draw them.
                 if (Combo.EsPeldano(estado))
                 {
                     if (efecto.EffectId == PonerEstado)
@@ -4136,33 +4179,31 @@ namespace Jondo.Unity.Server.Managers
                         int ahora = Combo.LevelOf(sobre);
                         int sube = Combo.NivelDelPeldano(estado);
 
-                        // BAJAR NO, REPETIR SI. El servidor real vuelve a poner el peldano en el
-                        // que ya esta antes de subirlo -- medido en «tymador-explobomba
-                        // resiliente», donde los frames 248 y 249 mandan 2484 y 2485 seguidos, sin
-                        // nada en medio -- y al refusarselo nuestro flujo dejaba de parecerse al
-                        // suyo justo en el sitio que el cliente usa para pintar el numero romano.
-                        // Refusar de verdad hace falta en dos casos y solo en dos: bajar de
-                        // peldano, y pasar del quince.
+                        // NOT DOWN, BUT REPEATING IS FINE. The real server sets the rung it is already on
+                        // again before raising it -- measured in «tymador-explobomba resiliente», where frames
+                        // 248 and 249 send 2484 and 2485 in a row, with nothing in between -- and refusing it,
+                        // our flow stopped looking like theirs exactly where the client draws the Roman
+                        // numeral. Really refusing is needed in two cases and only two: going down a rung, and
+                        // going past fifteen.
                         if (sube < ahora) return null;
                         if (sube > ahora && ahora >= Combo.Tope) return null;
 
-                        // Y LOS VIEJOS SE ANUNCIAN. Quitarlos en silencio era lo que dejaba a la
-                        // bomba en Combo I para siempre: el servidor la subia -- se ve en el
-                        // registro, «-5 esta en el nivel 13, +280%» -- pero el cliente seguia con
-                        // el peldano 1 puesto porque nadie le habia dicho que se lo quitara, y es
-                        // el que pintaba.
+                        // AND THE OLD ONES ARE ANNOUNCED. Removing them silently is what left the bomb at Combo
+                        // I forever: the server raised it -- it can be seen in the log, «-5 is at level 13,
+                        // +280%» -- but the client still had rung 1 on because nobody had told it to remove it,
+                        // and that is the one it drew.
                         foreach (int viejo in Combo.Ladder())
                         {
                             if (viejo == estado) continue;
                             barridos.AddRange(sobre.Buffs.QuitarEstadoConEmbrujos(viejo));
                         }
                     }
-                    // SI NO SE HA SUBIDO, TAMPOCO SE BARRE. Cada peldano de la escalera lleva
-                    // detras un 951 que quita el anterior, y con el tope puesto pasaba esto: al
-                    // llegar al quince se rechazaba el 950 del dieciseis pero su 951 seguia
-                    // quitando el quince, la bomba se quedaba sin combo y volvia a empezar por
-                    // abajo. Se veia clavado en la prueba: veinticinco lanzamientos y la bomba
-                    // en el nivel 9, que es quince arriba, cero, y nueve otra vez.
+                    // IF IT HAS NOT GONE UP, NOTHING IS SWEPT EITHER. Each rung of the ladder carries a 951
+                    // behind it that removes the previous one, and with the cap in place this happened: on
+                    // reaching fifteen the 950 of sixteen was refused but its 951 still removed fifteen, the
+                    // bomb was left without combo and started again from the bottom. It showed plainly in
+                    // the test: twenty-five casts and the bomb at level 9, which is fifteen up, zero, and
+                    // nine again.
                     else if (Combo.LevelOf(sobre) == Combo.NivelDelPeldano(estado))
                     {
                         return null;
@@ -4304,9 +4345,9 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
-            // Los que afinan un hechizo concreto: daño básico y alcance, and the rest of the
-            // catalogue's category 3 (SpellModifiers). El hechizo va en el dado y lo que se suma,
-            // en el valor. A pin is a value even at zero: Bestialidad's "2905 on 13791, value 0"
+            // The ones that tune a specific spell: basic damage and range, and the rest of the
+            // catalogue's category 3 (SpellModifiers). The spell goes in the die and what is added,
+            // in the value. A pin is a value even at zero: Bestialidad's "2905 on 13791, value 0"
             // goes out in the molosse capture as a row with no f10, and holds the spell to 0.
             if (Enum.IsDefined(typeof(SpellAspect), efecto.EffectId) && efecto.EffectId != 0)
             {
@@ -4389,9 +4430,9 @@ namespace Jondo.Unity.Server.Managers
                     : 0;
                 baseHeal = ConLaCaidaDeLaZona(baseHeal, efecto, distance);
 
-                // La característica del ELEMENTO del efecto. Ya no es siempre inteligencia: con
-                // las cinco curas activas, el agua escala con suerte, el aire con agilidad y la
-                // tierra con fuerza. Por eso esto era una búsqueda y no un 15 clavado.
+                // The characteristic of the effect's ELEMENT. It is no longer always intelligence: with
+                // the five heals active, water scales with chance, air with agility and earth with
+                // strength. That is why this was a lookup and not a nailed-in 15.
                 // 3002 heals in the caster's best element -- the catalogue's element 5, "the
                 // best", which is a question to the caster, the same one 2822 asks for a blow.
                 int elementOfHeal = efecto.Element >= 0
@@ -4412,9 +4453,9 @@ namespace Jondo.Unity.Server.Managers
                                     ronda, points);
             }
 
-            // Las curaciones por tanto por ciento de la vida máxima. El dado es el PORCENTAJE, no
-            // los puntos: la Baliza de Supervivencia cura un siete por ciento del tope de quien
-            // recibe, y en el cable eso viaja ya resuelto en puntos.
+            // Heals as a percentage of maximum life. The die is the PERCENTAGE, not the points: the
+            // Survival Beacon heals seven per cent of the receiver's maximum, and on the wire that
+            // already travels resolved into points.
             if (efecto.EffectId == CuraPorcentual)
             {
                 if (sobre == null || !sobre.IsAlive) return null;
@@ -4426,9 +4467,9 @@ namespace Jondo.Unity.Server.Managers
                                     ronda, puntos);
             }
 
-            // Los que MULTIPLICAN: "daños sufridos x110%", "curas recibidas x50%". No tocan
-            // ninguna característica, así que se guardan con su porcentaje en el embrujo y quien
-            // calcula el golpe los busca por su número de efecto.
+            // The ones that MULTIPLY: "damage taken x110%", "heals received x50%". They touch no
+            // characteristic, so they are stored with their percentage in the buff and whoever
+            // works out the blow looks them up by their effect number.
             if (DatabaseManager.EsMultiplicador(efecto.EffectId))
             {
                 int cuanto = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
@@ -4463,21 +4504,21 @@ namespace Jondo.Unity.Server.Managers
             if (efecto.EffectId == EffectSupport.Visibility && efecto.DiceNum == 0 && efecto.Value == 0)
                 efecto = ComoSePinta(efecto, efecto.EffectId, 1);
 
-            // Y todo lo demás: lo que toque una característica, con el signo que diga el catálogo.
+            // And everything else: whatever touches a characteristic, with the sign the catalogue says.
             //
-            // El dado se TIRA. En el catálogo, diceNum es el mínimo y diceSide el máximo —hay
-            // efectos de «uno o dos PA» (1 y 2) y de «dos o tres» (2 y 3)—, y aquí se cogía
-            // siempre el mínimo, así que un hechizo que puede quitar hasta tres quitaba dos
-            // siempre. Cuando diceSide vale cero, la cantidad es fija y no hay nada que tirar.
+            // The die is ROLLED. In the catalogue, diceNum is the minimum and diceSide the maximum --
+            // there are effects of «one or two AP» (1 and 2) and of «two or three» (2 and 3) --, and
+            // here the minimum was always taken, so a spell that can remove up to three always
+            // removed two. When diceSide is zero, the quantity is fixed and there is nothing to roll.
             var (caracteristica, signo) = DatabaseManager.EffectMeta(efecto.EffectId);
             int cantidad = caracteristica != 0 && signo != 0
                 ? DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value) * signo
                 : 0;
 
-            // Y nunca más de los que le quedan. Es lo mismo que ya hacía la rama de ROBAR puntos
-            // unas líneas más arriba, y aquí faltaba: por eso un hechizo podía dejar a un bicho
-            // sin sus seis puntos de movimiento de una vez. Además, lo que se anuncia tiene que
-            // ser lo que de verdad se ha quitado, no lo que se pretendía quitar.
+            // And never more than he has left. It is the same the STEAL points branch a few lines
+            // above already did, and it was missing here: that is why a spell could leave a
+            // creature without its six movement points at once. Also, what is announced has to be
+            // what was really removed, not what was meant to be removed.
             //
             // And a "retira" is ROLLED, point by point, against the target's dodge: what he
             // dodges goes out as a 308/309 and what lands as a "-N PA/PM" row with the N that
@@ -4510,17 +4551,17 @@ namespace Jondo.Unity.Server.Managers
             // out as a row of 100 on a monster with three in its capture, and the points in
             // hand simply stop at zero. Cut to what he had, a puch with no MP got no row at all.
 
-            // Y si NO toca ninguna característica, tampoco se tira.
+            // And if it touches NO characteristic, it is not thrown away either.
             //
-            // Aquí estaba el panel vacío. Este método acababa en un "si no hay característica,
-            // nada", y con eso desaparecían CATORCE familias enteras de las que el servidor real
-            // sí anuncia: el 1160 y el 1163 de las balizas, el 792 que encadena, el 141 que mata,
-            // el 406 que quita los efectos de un hechizo, el 3793, el 1159 de las curas, el 289 de
-            // la línea de visión… todas las que en el catálogo tienen Characteristic 0, que son
-            // justamente las de clase. Contado sobre las capturas del Ocra: de los treinta y dos
-            // efectos que el servidor manda al panel, catorce se perdían por esta línea.
+            // This is where the empty panel was. This method ended in an "if there is no
+            // characteristic, nothing", and with that FOURTEEN whole families disappeared that the
+            // real server does announce: the beacons' 1160 and 1163, the chaining 792, the killing
+            // 141, 406 that removes a spell's effects, 3793, the heals' 1159, line of sight's 289…
+            // all the ones that have Characteristic 0 in the catalogue, which are precisely the class
+            // ones. Counted on the Cra captures: of the thirty-two effects the server sends to the
+            // panel, fourteen were lost through this line.
             //
-            // Ahora el que no se sepa aplicar se anota y SE MANDA igual, con lo que trae puesto.
+            // Now the one that cannot be applied is noted and SENT all the same, with what it carries.
             bool soloPanel = caracteristica == 0 || signo == 0 || cantidad == 0;
 
             // Points that come LATER wait: "aumenta los PM del lanzador en el siguiente turno"
@@ -4793,12 +4834,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// La lista de efectos que toca, según haya salido crítico o no.
+        /// The list of effects that applies, depending on whether it was critical or not.
         ///
-        /// Un hechizo trae DOS listas en la base y la crítica no es "la normal multiplicada": es
-        /// otra tanda entera con sus propios números. Flecha Helada pega de 21 a 24 y en crítico
-        /// de 25 a 29; Tiros Potentes da 250 de potencia y en crítico 300. Si la lista crítica
-        /// viene vacía —hay hechizos que no la tienen— se usa la de siempre.
+        /// A spell carries TWO lists in the database and the critical one is not "the normal one multiplied": it
+        /// is a whole other set with its own numbers. Flecha Helada hits 21 to 24 and on a critical 25 to 29;
+        /// Tiros Potentes gives 250 power and on a critical 300. If the critical list comes empty -- there are
+        /// spells that do not have one -- the usual one is used.
         /// </summary>
         public static IReadOnlyList<SpellEffect> EfectosDeLaTirada(int hechizo, int grado, bool critico)
         {
@@ -4808,19 +4849,19 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El sorteo de los efectos que van a suertes, y devuelve LOS QUE NO SALEN.
+        /// The draw of the effects that go by chance, and it returns THE ONES THAT DO NOT COME OUT.
         ///
-        /// Un efecto puede traer una probabilidad en su campo <c>random</c>, y los que la traen se
-        /// agrupan por su campo <c>group</c>. Hay dos maneras, y se distinguen por lo que suman:
+        /// An effect can carry a probability in its <c>random</c> field, and those that carry one are grouped by
+        /// their <c>group</c> field. There are two ways, and they are told apart by what they add up to:
         ///
-        ///   suman 100  -> es un sorteo: sale UNO, con el peso de cada uno. Es lo que hace
-        ///                 Invocación de Arakna, que trae dos efectos 181 —la plantilla 246 al
-        ///                 ochenta por ciento y la 2630, la Arakna mayor, al veinte—. Sin esto
-        ///                 salían las dos a la vez, que es lo que estaba pasando.
-        ///   no suman 100 -> cada uno va por su cuenta y ocurre con su propia probabilidad.
+        ///   add up to 100  -> it is a draw: ONE comes out, with each one's weight. It is what
+        ///                     Invocación de Arakna does, which carries two 181 effects -- template 246
+        ///                     at eighty per cent and 2630, the big Arakna, at twenty --. Without this
+        ///                     both came out at once, which is what was happening.
+        ///   do not add up to 100 -> each goes on its own and happens with its own probability.
         ///
-        /// Contado sobre la base entera: hay 1.335 niveles de hechizo con efectos de este tipo, y
-        /// en 1.129 de sus grupos la suma es exactamente cien.
+        /// Counted over the whole database: there are 1,335 spell levels with effects of this kind, and in
+        /// 1,129 of their groups the sum is exactly a hundred.
         /// </summary>
         /// <summary>
         /// The effects of a cast that really run: the rows of the grade with the random ones
@@ -4895,11 +4936,11 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Random _azar = new Random();
 
         /// <summary>
-        /// Lo que sale del dado de un efecto.
+        /// What comes out of an effect's die.
         ///
-        /// En el catálogo del cliente, <c>diceNum</c> es el mínimo y <c>diceSide</c> el máximo:
-        /// hay efectos de «uno o dos puntos de acción» (1 y 2) y de «dos o tres» (2 y 3). Con
-        /// diceSide a cero la cantidad es fija, y con los dos a cero se usa el valor suelto.
+        /// In the client's catalogue, <c>diceNum</c> is the minimum and <c>diceSide</c> the maximum: there are
+        /// effects of «one or two action points» (1 and 2) and of «two or three» (2 and 3). With diceSide at
+        /// zero the quantity is fixed, and with both at zero the loose value is used.
         /// </summary>
         private static int DelDado(int minimo, int maximo, int valor)
         {
@@ -4990,11 +5031,11 @@ namespace Jondo.Unity.Server.Managers
         public const int EsquivaPM = 28;
 
         /// <summary>
-        /// Si lo que deja este efecto se acumula en vez de sustituir a lo que ya hubiera.
+        /// Whether what this effect leaves piles up instead of replacing whatever was there.
         ///
-        /// Se acumula lo que salta CADA VEZ QUE PASA ALGO, o sea lo que no tiene el disparador de
-        /// "al lanzar": el Centinela se come uno de alcance por paso, y tres pasos son tres menos.
-        /// Lo que sí es de "al lanzar" se refresca, que es lo que hace Flecha Helada al repetirse.
+        /// What piles up is what fires EVERY TIME SOMETHING HAPPENS, that is what does not have the "on cast"
+        /// trigger: the Sentinel takes one range per step, and three steps are three less. What is "on cast"
+        /// is refreshed, which is what Flecha Helada does when repeated.
         /// </summary>
         private static bool SeApila(SpellEffect efecto)
         {
@@ -5006,18 +5047,17 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// En qué ronda se cae un efecto. Duración negativa quiere decir "mientras dure el
-        /// combate"; cero, que es de un vistazo y no deja embrujo que dure.
+        /// The round in which an effect drops. A negative duration means "for as long as the fight lasts";
+        /// zero, that it is instant and leaves no lasting buff.
         /// </summary>
         private static int Caduca(SpellEffect efecto, int ronda)
             => efecto.Duration < 0 ? -1 : ronda + efecto.Delay + Math.Max(1, efecto.Duration);
 
         /// <summary>
-        /// La ronda en la que un efecto empieza a valer: la del lanzamiento más su retardo.
+        /// The round in which an effect starts to count: the cast's plus its delay.
         ///
-        /// Comprobado contra la captura de la Flecha Castigadora, lanzada en la ronda 4: el
-        /// embrujo de retardo 1 vive la ronda 5 y se cae al entrar en la 6, y el de retardo 2 vive
-        /// la 6.
+        /// Checked against the Flecha Castigadora capture, cast in round 4: the buff with delay 1 lives round 5
+        /// and drops on entering 6, and the one with delay 2 lives 6.
         /// </summary>
         private static int Empieza(SpellEffect efecto, int ronda) => ronda + efecto.Delay;
     }

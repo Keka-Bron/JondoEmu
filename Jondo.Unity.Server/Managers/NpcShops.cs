@@ -8,25 +8,25 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Qué vende cada NPC.
+    /// What each NPC sells.
     ///
-    /// No está inventado: sale de los cincuenta y seis catálogos que el servidor de torneos mandó
-    /// en la captura, emparejando cada `kbd` con el `iov` que lo pidió y sacando la plantilla del
-    /// NPC del `jss` de ese mapa. Son cincuenta y un vendedores y 5.508 objetos distintos, y el
-    /// reparto es por tipo de objeto y tramo de nivel: "Armas 1 - 49", "Capas 200", "Escudos"...
+    /// It is not invented: it comes from the fifty-six catalogues the tournament server sent
+    /// in the capture, pairing each `kbd` with the `iov` that asked for it and taking the
+    /// NPC's template from that map's `jss`. They are fifty-one sellers and 5,508 distinct items, and the
+    /// split is by item type and level bracket: "Armas 1 - 49", "Capas 200", "Escudos"...
     ///
-    /// El precio también es el medido. El servidor de torneos pone casi todo a un kama, las
-    /// monturas a cero y deja cuatro excepciones con su precio de catálogo. Lo que NO vale es el
-    /// precio de la plantilla del objeto: de los 5.508, sólo 1.508 coinciden con él.
+    /// The price is also the measured one. The tournament server puts almost everything at one kama, the
+    /// mounts at zero and leaves four exceptions with their catalogue price. What does NOT hold is the
+    /// item template's price: of the 5,508, only 1,508 match it.
     ///
-    /// Lo genera tools/extraer_tiendas.py.
+    /// tools/extraer_tiendas.py generates it.
     /// </summary>
     public static class NpcShops
     {
-        /// <summary>Lo que cuesta un objeto si el catálogo medido no dice otra cosa.</summary>
+        /// <summary>What an item costs if the measured catalogue does not say otherwise.</summary>
         public const long DefaultPrice = 1;
 
-        /// <summary>Los catálogos escritos a mano, relativo a la raíz de contenido.</summary>
+        /// <summary>The hand-written catalogues, relative to the content root.</summary>
         public const string AuthoredFile = "npcs/shops.json";
 
         private static readonly Dictionary<int, int[]> _byNpc = new();
@@ -101,16 +101,16 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Junta en uno solo los vendedores que Ankama parte por tramos de nivel.
+        /// Merges into one the sellers Ankama splits by level brackets.
         ///
-        /// El catálogo del que se queda pasa a ser el suyo más el de todos los que absorbe, sin
-        /// repetidos y conservando el orden: primero lo suyo y después lo de los otros en el orden
-        /// en que estén escritos. El orden importa porque es el que ve el jugador en la lista.
+        /// The catalogue of the one kept becomes its own plus that of all it absorbs, with no
+        /// duplicates and keeping the order: first its own and then the others' in the order
+        /// they are written. The order matters because it is the one the player sees in the list.
         ///
-        /// Y se avisa si algún catálogo pasa de 444 entradas, que es el mayor kbd que manda el
-        /// servidor real —26.902 bytes— y por tanto lo único que sabemos que el cliente digiere.
-        /// El mensaje no está paginado y no hay ni un caso en las capturas de dos kbd para una
-        /// misma tienda, así que por encima de esa cifra estamos en terreno sin medir.
+        /// And a warning is given if any catalogue goes over 444 entries, which is the biggest kbd the
+        /// real server sends —26,902 bytes— and therefore the only thing we know the client digests.
+        /// The message is not paginated and there is not a single case in the captures of two kbd for one
+        /// same shop, so above that figure we are on unmeasured ground.
         /// </summary>
         private static void JuntarVendedores()
         {
@@ -143,21 +143,21 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El catálogo más grande que manda el servidor real, en entradas: 444, y 26.902 bytes.
-        /// Por encima de ahí no hay medida que lo respalde.
+        /// The biggest catalogue the real server sends, in entries: 444, and 26,902 bytes.
+        /// Above that there is no measurement to back it.
         /// </summary>
         private const int CatalogoMedidoMayor = 444;
 
         /// <summary>
-        /// Los efectos de cada objeto que se vende, en la forma que entiende
-        /// <see cref="Equipment.ParseEffects"/>.
+        /// The effects of each item sold, in the shape
+        /// <see cref="Equipment.ParseEffects"/> understands.
         ///
-        /// Se cargan todos de una vez y no objeto a objeto: un catálogo son hasta 444 entradas y
-        /// cada una tiene sus efectos, así que ir a la base por cada una serían miles de consultas
-        /// cada vez que alguien abre una tienda. Aquí son dos lecturas enteras y luego memoria.
+        /// They are all loaded at once and not item by item: a catalogue is up to 444 entries and
+        /// each one has its effects, so going to the database for each one would be thousands of queries
+        /// every time someone opens a shop. Here it is two whole reads and then memory.
         ///
-        /// El valor de estreno es el tope del dado, igual que hace la creación de personaje con el
-        /// conjunto del aventurero: un objeto recién comprado sale con lo mejor de su horquilla.
+        /// The brand-new value is the top of the die, just as character creation does with the
+        /// adventurer's set: a freshly bought item comes out with the best of its range.
         /// </summary>
         private static void LoadEffects(HashSet<int> gids)
         {
@@ -166,7 +166,7 @@ namespace Jondo.Unity.Server.Managers
             using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
             connection.Open();
 
-            // Rid -> "[efecto,valor,0,0]", de una sola pasada por ItemEffects.
+            // Rid -> "[effect,value,0,0]", in a single pass over ItemEffects.
             var byRid = new Dictionary<long, string>();
             var effects = connection.CreateCommand();
             effects.CommandText = "SELECT Rid, EffectId, DiceNum, DiceSide, Value FROM ItemEffects;";
@@ -215,13 +215,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los vendedores escritos a mano, encima de los medidos.
+        /// The hand-written sellers, on top of the measured ones.
         /// </summary>
         /// <remarks>
-        /// datos/npc_shops.json lo rehace una herramienta, así que un vendedor añadido ahí se
-        /// pierde en la siguiente pasada sin decir nada; lo nuestro vive en content/npcs/shops.json
-        /// y se pone ENCIMA al arrancar. Un vendedor escrito sustituye su catálogo entero -es lo
-        /// que se ha decidido que venda- y un precio escrito es el de ese objeto donde se venda.
+        /// datos/npc_shops.json is remade by a tool, so a seller added there is
+        /// lost on the next pass without a word; ours lives in content/npcs/shops.json
+        /// and is laid ON TOP at start. A written seller replaces its whole catalogue -it is
+        /// what has been decided it sells- and a written price is that item's wherever it is sold.
         /// </remarks>
         internal static void ApplyAuthored(string path)
         {
@@ -260,7 +260,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Para las pruebas: un catálogo en memoria sin pasar por el fichero.</summary>
+        /// <summary>For the tests: an in-memory catalogue without going through the file.</summary>
         internal static void Forget()
         {
             _byNpc.Clear();
@@ -268,20 +268,20 @@ namespace Jondo.Unity.Server.Managers
             _effects.Clear();
         }
 
-        /// <summary>Los efectos de fábrica de un objeto que se vende, o "[]" si no tiene.</summary>
+        /// <summary>The factory effects of an item that is sold, or "[]" if it has none.</summary>
         public static string EffectsOf(int gid)
             => _effects.TryGetValue(gid, out string? json) ? json : "[]";
 
-        /// <summary>Lo que tiene a la venta ese NPC, en el orden en que lo mandaba el servidor real.</summary>
+        /// <summary>What that NPC has for sale, in the order the real server sent it.</summary>
         public static IReadOnlyList<int> CatalogueOf(int npcId)
             => _byNpc.TryGetValue(npcId, out var gids) ? gids : (IReadOnlyList<int>)Array.Empty<int>();
 
         public static bool Sells(int npcId) => _byNpc.ContainsKey(npcId);
 
         /// <summary>
-        /// Lo que cuesta. El fichero sólo apunta los 317 precios que NO son un kama —313 de ellos
-        /// a cero, que son las monturas, los arreos y un sombrero— porque los otros 5.191 valían
-        /// todos lo mismo y no hacía falta repetirlo.
+        /// What it costs. The file only records the 317 prices that are NOT one kama —313 of them
+        /// at zero, which are the mounts, the harnesses and a hat— because the other 5,191 were
+        /// all worth the same and there was no need to repeat it.
         /// </summary>
         public static long PriceOf(int gid)
             => _prices.TryGetValue(gid, out long price) ? price : DefaultPrice;

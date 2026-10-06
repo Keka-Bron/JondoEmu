@@ -102,8 +102,8 @@ namespace Jondo.Unity.Launcher.UI
         /// </summary>
         private void PaintClippedBackground(Graphics g)
         {
-            // El fondo se pide por la interfaz —para que sirva en las tres ventanas que ya hay— pero
-            // las coordenadas se piden al Form, que es quien las tiene. Son la misma instancia.
+            // The background is asked for through the interface —so that it works in the three windows there already are— but
+            // the coordinates are asked of the Form, which is what has them. They are the same instance.
             var form = FindForm();
             var background = (form as IBackgroundWindow)?.ComposedBackground;
             if (form == null || background == null)

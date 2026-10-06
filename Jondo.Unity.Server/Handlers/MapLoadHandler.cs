@@ -104,20 +104,19 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El jpv de un mapa: la subzona, el jugador, los NPCs y los grupos de monstruos.
+        /// A map's jpv: the subarea, the player, the NPCs and the monster groups.
         ///
-        /// Está separado del envío a propósito, para que el banco de pruebas pueda construirlo sin
-        /// socket y comprobar que los ids que salen de aquí son EXACTAMENTE los mismos que salen
-        /// del jss. Que no lo fueran es lo que rompía el ataque: el jss daba a un grupo su MobId
-        /// —un -1000000 y bajando— y esto le daba el número que le tocara detrás de los NPCs del
-        /// mapa, porque los numeraba por su posición en la lista. En el mapa de los NPCs de Amakna,
-        /// medido: -1011567 en el jss y -20052 en el jpv, para el mismo grupo. El cliente se
-        /// quedaba con el último que le llegase y devolvía ése al clicar, y el servidor no
-        /// encontraba a nadie.
+        /// It is separated from the sending on purpose, so that the test bench can build it without a
+        /// socket and check that the ids coming out of here are EXACTLY the same as those coming out of
+        /// the jss. That they were not is what broke attacking: the jss gave a group its MobId -- a
+        /// -1000000 and going down -- and this gave it whatever number it got after the map's NPCs,
+        /// because it numbered them by their position in the list. On the Amakna NPC map, measured:
+        /// -1011567 in the jss and -20052 in the jpv, for the same group. The client kept the last one
+        /// that reached it and sent that back on clicking, and the server found nobody.
         ///
-        /// Ahora ningún id se calcula aquí: el del grupo es su MobId y el del NPC es el que le puso
-        /// <see cref="Managers.Npcs"/> al arrancar. Numerar por posición además renumeraba a los de
-        /// detrás cada vez que moría un grupo.
+        /// Now no id is worked out here: the group's is its MobId and the NPC's is the one
+        /// <see cref="Managers.Npcs"/> gave it at start-up. Numbering by position also renumbered the
+        /// ones behind every time a group died.
         /// </summary>
         public static ProtoMessage ConstruirJpv(long mapId, int spawnCell, int subAreaId)
         {
@@ -146,14 +145,13 @@ namespace Jondo.Unity.Server.Handlers
 
             // Details (Field 2)
             //
-            // El aspecto se REHACE aquí, no se coge el que se guardó al entrar. El de
-            // GameState.PlayerActorDetails sale de la columna Characters.Look, que es un aspecto
-            // del protocolo VIEJO y que además está congelado desde el inicio de sesión: no lleva
-            // la montura, ni la ropa que uno se haya puesto después. Por eso al equiparse una
-            // Mulagua se veía montado —eso lo manda el jsn de equipar— y al cambiar de mapa volvía
-            // a aparecer a pie.
+            // The look is REBUILT here, the one stored on entering is not taken. The one in
+            // GameState.PlayerActorDetails comes from the Characters.Look column, which is a look of
+            // the OLD protocol and is also frozen since the login: it carries neither the mount nor
+            // the clothes one has put on since. That is why on equipping a Mulagua he was seen
+            // mounted -- the equip jsn sends that -- and on changing map he appeared on foot again.
             //
-            // BuildLook es el mismo que usa el jss, que sí sabe de monturas y de apariencias.
+            // BuildLook is the same one the jss uses, which does know about mounts and appearances.
             var quien = DatabaseManager.GetCharacterById(GameState.CharacterId);
             byte[] aspecto = quien != null
                 ? Managers.BreedLookTable.BuildLook(quien.Breed, quien.Sex, quien.HeadId,
@@ -189,12 +187,12 @@ namespace Jondo.Unity.Server.Handlers
                 totalActors++;
             }
 
-            // B. Los NPCs, con el id que ya llevan puesto desde el arranque.
+            // B. The NPCs, with the id they have carried since start-up.
             //
-            // Salen de Managers.Npcs y no de una consulta propia: eran dos listas de las mismas
-            // filas, una ordenada por Id y la otra sin ORDER BY ninguno, y de ahí salían los ids.
-            // Que coincidieran era suerte del plan que eligiera SQLite. De paso se ahorra un
-            // recorrido entero de NpcSpawns en CADA carga de mapa.
+            // They come from Managers.Npcs and not from a query of their own: there were two lists
+            // of the same rows, one ordered by Id and the other with no ORDER BY at all, and the ids
+            // came from there. That they matched was down to the plan SQLite happened to choose. A
+            // whole walk of NpcSpawns on EVERY map load is saved along the way.
             var spawns = Managers.Npcs.Of(mapId);
             LogDebug($"[Game Node] Building dynamic jpv for Map ID: {mapId} containing {spawns.Count} database NPCs.");
 
@@ -285,8 +283,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El grupo de monstruos como actor del mapa. Su id contextual es su MobId, el mismo con el
-        /// que viaja en el jss y el mismo que el cliente devuelve al clicarlo para atacar.
+        /// The monster group as a map actor. Its contextual id is its MobId, the same one it travels with
+        /// in the jss and the same one the client sends back on clicking it to attack.
         /// </summary>
         private static byte[] BuildMobGroupActorMsgBytes(Managers.MobSpawnManager.MobGroup mob, long contextualId)
         {
@@ -414,11 +412,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// La escala como lista empaquetada de varints, que es lo que espera el cliente.
+        /// The scale as a packed list of varints, which is what the client expects.
         ///
-        /// Escribirla como un byte suelto sólo funciona por debajo de 128: la montaña de kamas va a
-        /// 200 y eso deja un varint a medias que revienta el parseo del mensaje entero. Lo mismo le
-        /// pasaba a los cincuenta y dos NPCs de Astrub cuando iban inflados.
+        /// Writing it as a loose byte only works below 128: the kamas mountain is at 200 and that leaves a
+        /// half varint that blows up parsing of the whole message. The same happened to Astrub's fifty-two
+        /// NPCs when they were inflated.
         /// </summary>
         private static byte[] EscalaEmpaquetada(int escala)
         {

@@ -1,145 +1,145 @@
-# Mazmorras
+# Dungeons
 
-Entrar, avanzar de sala, matar al jefe y salir. Medido sobre
-`Mazmorras\mazmorra de los jalatós completa`, que es alguien recorriendo la Corte del Jalató Real
-de punta a punta, y sobre el volcado del cliente.
+Going in, moving from room to room, killing the boss and leaving. Measured on
+`Mazmorras\mazmorra de los jalatós completa`, which is someone walking the Corte del Jalató Real
+from end to end, and on the client dump.
 
 ---
 
-## 1. Lo que hace Ankama
+## 1. What Ankama does
 
-La captura enseña la mazmorra 1 entera. Once mapas y cinco combates, con un patrón que se repite
-exacto cinco veces:
-
-```
-120063489   entrada, con el guardián (NPC 173, «Rotabla, el pastor»)
-121373185   sala 0   ┐
-121373190   pasillo  ┘ combate
-121374209   sala 1   ┐
-121374214   pasillo  ┘ combate
-121375233   sala 2   ...
-121373187   sala 3
-121374211   sala 4   ← última: el jefe
-121374216   pasillo
-121375235   pasillo
-120063489   de vuelta a la entrada, que en ésta es también la salida
-```
-
-**Y el orden de `DungeonRooms` es el orden real.** Eso llevaba años en duda —el propio
-`DungeonManager` lo dice: la Biblioteca del Maestro Cuerbok lista sus salas en x = -14, -13, -15,
-que no es un avance— y ahora hay una mazmorra contra la que comprobarlo. Las cinco salas de la
-captura salen en el orden que da la tabla. Una de 187, así que la duda sigue en pie para las otras
-186; pero ya no es sólo una suposición.
-
-### La puerta
+The capture shows dungeon 1 whole. Eleven maps and five fights, with a pattern that repeats
+exactly five times:
 
 ```
-C->S  iov  {1:3, 2:120063489, 3:actor}     clica al guardián, acción «hablar»
-S->C  ioc                                  se abre el diálogo
-S->C  ios  {1: 646, ...}                   el guardián se queja de sus jalatós
-C->S  ioy                                  el jugador contesta
+120063489   entrance, with the guardian (NPC 173, «Rotabla, el pastor»)
+121373185   room 0   ┐
+121373190   corridor ┘ fight
+121374209   room 1   ┐
+121374214   corridor ┘ fight
+121375233   room 2   ...
+121373187   room 3
+121374211   room 4   ← last one: the boss
+121374216   corridor
+121375235   corridor
+120063489   back at the entrance, which in this one is also the exit
+```
+
+**And the order of `DungeonRooms` is the real order.** That had been in doubt for years —
+`DungeonManager` itself says so: the Biblioteca del Maestro Cuerbok lists its rooms at x = -14, -13, -15,
+which is not a progression— and now there is a dungeon to check it against. The five rooms of the
+capture come out in the order the table gives. One out of 187, so the doubt still stands for the other
+186; but it is no longer only an assumption.
+
+### The door
+
+```
+C->S  iov  {1:3, 2:120063489, 3:actor}     clicks the guardian, «talk» action
+S->C  ioc                                  the dialog opens
+S->C  ios  {1: 646, ...}                   the guardian complains about his jalatós
+C->S  ioy                                  the player answers
 S->C  ios  {1: 17040, ...}                 «¿Seguro que quieres utilizar el manojo de llaves
                                             para entrar?»
-C->S  ioy                                  contesta que sí
-S->C  kld                                  se cierra el diálogo
-S->C  iun                                  se gasta la llave
-S->C  jru  {2: 121373185}                  dentro, sala 0
+C->S  ioy                                  answers yes
+S->C  kld                                  the dialog closes
+S->C  iun                                  the key is spent
+S->C  jru  {2: 121373185}                  inside, room 0
 ```
 
-La frase 17040 no la declara ningún NPC: la pone el servidor, igual que las de misión.
+Line 17040 is not declared by any NPC: the server puts it there, just like the quest ones.
 
 ---
 
-## 2. Los datos que faltaban
+## 2. The missing data
 
-`tools/extract_dungeons.py` **tiraba la mitad de lo que hacía falta**. El volcado del cliente traía
-desde el principio `availableOnKeyring`, `requiredObjects`, `achievements`,
-`availableInAutomaticGroupSearch` y `availableInLobby`, y el extractor se quedaba con ocho campos y
-descartaba el resto. Por eso no había forma de cerrar una mazmorra con llave: el dato existía y no
-llegaba.
+`tools/extract_dungeons.py` **threw away half of what was needed**. The client dump carried
+`availableOnKeyring`, `requiredObjects`, `achievements`,
+`availableInAutomaticGroupSearch` and `availableInLobby` from the start, and the extractor kept eight fields and
+discarded the rest. That is why there was no way to lock a dungeon with a key: the data existed and did not
+get through.
 
-Ampliado el extractor, de las 187:
+With the extractor extended, out of the 187:
 
 | | |
 |---|---|
-| piden una llave | **126** |
-| aceptan además el manojo | **107** |
-| declaran jefe | **126** |
-| objetos distintos usados como llave | 129 |
+| ask for a key | **126** |
+| also accept the keyring | **107** |
+| declare a boss | **126** |
+| distinct items used as keys | 129 |
 
-La 1 pide el objeto **1568, «Llave de la Corte del Jalató Real»**, y el manojo es el **10207,
+Number 1 asks for item **1568, «Llave de la Corte del Jalató Real»**, and the keyring is **10207,
 «Manojo de llaves»**.
 
 ---
 
-## 3. Lo que hace este servidor
+## 3. What this server does
 
-`DungeonManager` existía —226 líneas— y **no lo llamaba nadie**; su propio comentario lo decía.
-Ahora está conectado.
+`DungeonManager` existed —226 lines— and **nobody called it**; its own comment said so.
+It is now wired in.
 
-**Entrar.** Hablar con un NPC que esté en el mapa de entrada de una mazmorra y contestarle:
-comprueba el nivel mínimo, busca la llave en la bolsa —la suya primero, el manojo después—, se la
-gasta y teletransporta a la primera sala. 53 de las 187 entradas tienen ya un guardián colocado, y
-los nombres cantan: «Guawdia wabbit», «Guardián koalak», «Discípulo de Ugah».
+**Going in.** Talking to an NPC standing on a dungeon's entrance map and answering it:
+it checks the minimum level, looks for the key in the bag —its own key first, the keyring after—, spends it
+and teleports to the first room. 53 of the 187 entrances already have a guardian placed, and
+the names give it away: «Guawdia wabbit», «Guardián koalak», «Discípulo de Ugah».
 
-**Avanzar.** Ganar un combate en una sala mueve a la siguiente. En la última, a la salida.
+**Moving on.** Winning a fight in a room moves to the next one. In the last one, to the exit.
 
-**Los grupos.** Cada sala tiene UN grupo de ocho, compuesto al arrancar con los monstruos propios
-de la subzona de la sala (`Subareas.Monsters`, sin los jefes de la mazmorra), y el combate coge los
-primeros `clamp(jugadores, 4, 8)`: cuatro para uno a cuatro jugadores, y uno más por cada jugador
-desde el quinto. Es lo que enseña la captura `Mazmorras/mazmorra de los jalatós completa`: el `jss`
-de cada sala lleva el grupo de ocho y sus alternativas por número de jugadores (1 → 4, 5 → 5 … 8 → 8),
-cada una los primeros N de los ocho, y el sacrógrito que entró solo peleó contra cuatro en las cinco
-salas. Los cuatro primeros son cuatro especies distintas; los monstruos de la sala k van al grado k
-(de 1 a 5 en esa mazmorra; en las demás, repartidos linealmente entre los grados). El mapa manda el
-grupo con sus alternativas, idénticas byte a byte a las de la captura (`DungeonGroupSizeTests`).
+**The groups.** Each room has ONE group of eight, built at startup from the monsters belonging
+to the room's subarea (`Subareas.Monsters`, without the dungeon's bosses), and the fight takes the
+first `clamp(players, 4, 8)`: four for one to four players, and one more for each player
+from the fifth on. That is what the capture `Mazmorras/mazmorra de los jalatós completa` shows: the `jss`
+of each room carries the group of eight and its alternatives by number of players (1 → 4, 5 → 5 … 8 → 8),
+each one the first N of the eight, and the sacrier who went in alone fought four in all five
+rooms. The first four are four different species; the monsters of room k are at grade k
+(1 to 5 in that dungeon; in the others, spread linearly across the grades). The map sends the
+group with its alternatives, identical byte for byte to those in the capture (`DungeonGroupSizeTests`).
 
-**El jefe.** En la última sala de las 126 mazmorras con jefe declarado, el jefe encabeza el grupo, una
-sola vez y a su grado más alto, con siete de los monstruos de la mazmorra detrás.
+**The boss.** In the last room of the 126 dungeons with a declared boss, the boss leads the group, a
+single time and at its highest grade, with seven of the dungeon's monsters behind it.
 
-**Al ganar**, la sala se vuelve a componer igual —su jefe incluido— en vez de repoblarse al azar.
-
----
-
-## 4. En qué se diferencia de Ankama, y por qué
-
-**No hay pasillos y no se anda entre salas: se teletransporta al ganar.** No es una elección de
-diseño, es lo único que la topología aguanta: **ninguna de las 187 mazmorras tiene ni uno solo de
-sus pasajes internos**, ni en la tabla extraída ni en el propio grafo de mundo de Ankama. A un
-jugador puesto en la sala 0 no le quedaría por dónde salir.
-
-**Cualquier combate ganado en una sala avanza.** Cada sala tiene un solo grupo, así que ganarlo es
-limpiarla.
-
-**Cualquier respuesta al guardián entra**, porque el árbol de diálogo de esos NPCs no está escrito.
-La frase de confirmación existe y es suya; ponerla es trabajo del editor.
-
-**El grupo crece durante la colocación**, como en el juego. Cada vez que alguien entra al combate de
-una sala, el bando de los monstruos se rehace entero con los primeros `clamp(jugadores, 4, 8)` de sus
-ocho y con ids nuevos, aunque el número no cambie: es lo que enseña `Busqueda grupo/busqueda
-automatica de grupo...`, cuatro jugadores entrando uno a uno al combate 471, con los -1..-4 quitados
-(jzw) y los -5..-8 puestos (kae) a la segunda llegada, y así hasta los -13..-16. Ver
-`Handlers/FightJoin.cs` y `docs/fight.md`.
+**On winning**, the room is rebuilt the same way —its boss included— instead of being repopulated at random.
 
 ---
 
-## 5. Un fallo que había y ya no
+## 4. How it differs from Ankama, and why
 
-`MobSpawnManager` arrancaba **antes** que `DungeonManager`, y lee `DungeonRooms` para no vaciar las
-mazmorras con el veto de «no hay monstruos bajo techo» —753 de las 763 salas están marcadas así—.
-Como `DungeonManager` es quien escribe esa tabla, lo que el sembrador leía era **lo que dejó escrito
-el arranque anterior**. En un mundo estable no se nota; el día que cambia la lista de salas, sí.
-Ahora van en el orden correcto.
+**There are no corridors and no walking between rooms: winning teleports you.** It is not a design
+choice, it is the only thing the topology allows: **none of the 187 dungeons has a single one of
+its internal passages**, neither in the extracted table nor in Ankama's own world graph. A
+player put in room 0 would have no way out.
+
+**Any fight won in a room moves on.** Each room has a single group, so winning it is
+clearing it.
+
+**Any answer to the guardian lets you in**, because the dialog tree of those NPCs is not written.
+The confirmation line exists and is theirs; putting it in is the editor's job.
+
+**The group grows during placement**, as in the game. Each time someone joins the fight of
+a room, the monsters' side is rebuilt whole with the first `clamp(players, 4, 8)` of its
+eight and with new ids, even if the number does not change: that is what `Busqueda grupo/busqueda
+automatica de grupo...` shows, four players joining fight 471 one by one, with -1..-4 removed
+(jzw) and -5..-8 added (kae) on the second arrival, and so on up to -13..-16. See
+`Handlers/FightJoin.cs` and `docs/fight.md`.
 
 ---
 
-## 6. Lo que falta
+## 5. A bug there was and no longer is
 
-- **Los pasajes internos.** Es lo que separa esto de la mazmorra de verdad. Son ~1.800 puertas y el
-  editor de pasajes ya sabe ponerlas; lo que no hay es de dónde sacarlas automáticamente.
-- **El árbol de diálogo del guardián**, con la confirmación y un «no, gracias» que no entre.
-- **Las oleadas** de algunas mazmorras nuevas (Despedazadora, Venerable, Bzupervibzor) y el altar de caza.
-- **Los retos de mazmorra**: 684 de los 842 están marcados `solo_mazmorra` y no se ofrecen nunca,
-  porque nada le dice al combate que está dentro de una. Ahora `DungeonHandler.IsBossRoom` y
-  `DungeonManager.OfRoom` sí lo saben.
-- **El emparejamiento automático** y el vestíbulo. No hay nada, y los datos ya traen las banderas.
+`MobSpawnManager` started **before** `DungeonManager`, and it reads `DungeonRooms` so as not to empty the
+dungeons with the «no monsters indoors» veto —753 of the 763 rooms are flagged that way—.
+Since `DungeonManager` is the one that writes that table, what the spawner read was **what the previous
+startup left written**. In a stable world it does not show; the day the list of rooms changes, it does.
+They now go in the right order.
+
+---
+
+## 6. What is missing
+
+- **The internal passages.** That is what separates this from the real dungeon. They are ~1,800 doors and the
+  passage editor already knows how to place them; what there is not is somewhere to take them from automatically.
+- **The guardian's dialog tree**, with the confirmation and a «no, thanks» that does not let you in.
+- **The waves** of some new dungeons (Despedazadora, Venerable, Bzupervibzor) and the hunting altar.
+- **Dungeon challenges**: 684 of the 842 are flagged `solo_mazmorra` and are never offered,
+  because nothing tells the fight it is inside one. `DungeonHandler.IsBossRoom` and
+  `DungeonManager.OfRoom` now do know it.
+- **Automatic matchmaking** and the lobby. There is nothing, and the data already carries the flags.

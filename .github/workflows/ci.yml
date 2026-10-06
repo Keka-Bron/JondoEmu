@@ -29,10 +29,10 @@ jobs:
           cache: true
           cache-dependency-path: '**/*.csproj'
 
-      # Sin esto el verde miente. Unas 64 pruebas se saltan solas cuando no encuentran
-      # bases/world.db —que no se versiona— y xunit las cuenta como PASADAS, no como omitidas:
-      # el tick sale verde habiendo comprobado bastante menos de lo que parece. datos/world.zip
-      # sí está en git y lleva dentro world.db, así que se descomprime antes de nada.
+      # Without this the green lies. Some 64 tests skip themselves when they do not find
+      # bases/world.db —which is not versioned— and xunit counts them as PASSED, not as skipped:
+      # the tick comes out green having checked a good deal less than it seems. datos/world.zip
+      # is in git and carries world.db inside, so it is unzipped before anything else.
       - name: Unpack world.db
         shell: pwsh
         run: |

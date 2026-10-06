@@ -6,76 +6,76 @@ using System.Threading;
 namespace Jondo.Unity.Launcher
 {
     /// <summary>
-    /// El contrato entre el servidor y el lanzador. Es lo ÚNICO que los dos conocen.
+    /// The contract between the server and the launcher. It is the ONLY thing both know.
     ///
-    /// El lanzador se reparte a los jugadores, así que no puede llevar dentro el servidor: ni la
-    /// base de datos, ni los mapas, ni los manejadores de protocolo, ni el catálogo de efectos.
-    /// Son dos ejecutables de verdad y esta biblioteca es la única pieza que viaja en los dos.
+    /// The launcher is handed out to the players, so it cannot carry the server inside: neither the
+    /// database, nor the maps, nor the protocol handlers, nor the effects catalogue.
+    /// They are two real executables and this library is the only piece that travels in both.
     ///
-    /// Por eso aquí no hay lógica: nombres de rutas, el sitio del secreto y los códigos con los que
-    /// el servidor dice qué ha pasado. Todo lo que se le añada a este fichero acaba en el
-    /// ordenador de todos los jugadores, así que conviene que sea poco.
+    /// That is why there is no logic here: route names, where the secret lives and the codes with which
+    /// the server says what happened. Everything added to this file ends up on
+    /// every player's computer, so it had better be little.
     /// </summary>
     public static class Contract
     {
-        /// <summary>La versión que se publica en el estado.</summary>
+        /// <summary>The version published in the status.</summary>
         public const string Version = "3.6.10.10";
 
-        /// <summary>La dirección de origen cuando la petición sale de esta misma máquina.</summary>
+        /// <summary>The source address when the request comes from this same machine.</summary>
         public const string LocalIp = "127.0.0.1";
 
         /// <summary>
-        /// El puerto por el que se manda.
+        /// The port it is sent through.
         ///
-        /// Es el del HAAPI a propósito: es el que el mod del cliente sondea para decidir si redirige
-        /// al emulador, así que «este puerto contesta» es exactamente la señal de vida que el
-        /// lanzador necesita antes de arrancar un cliente.
+        /// It is the HAAPI's on purpose: it is the one the client mod probes to decide whether to redirect
+        /// to the emulator, so «this port answers» is exactly the sign of life the
+        /// launcher needs before starting a client.
         /// </summary>
         public const int Puerto = 8888;
 
-        /// <summary>El prefijo de todas las rutas de mando.</summary>
+        /// <summary>The prefix of all the control routes.</summary>
         public const string Prefijo = "/api/";
 
-        // ─── Cuántos caben ──────────────────────────────────────────────────────────────────
+        // ─── How many fit ───────────────────────────────────────────────────────────────────
         //
-        // Son DOS cosas distintas y durante un tiempo fueron el mismo número, que es lo que hacía
-        // que el servidor entero no admitiera más de ocho conexiones:
+        // They are TWO different things and for a while they were the same number, which is what made
+        // the whole server admit no more than eight connections:
         //
-        //   * cuántos clientes puede tener abiertos UNA persona a la vez. Ocho, que es lo que cabe
-        //     en un grupo de Dofus, y es de donde salió el número: del lanzador multicuenta.
-        //   * cuántos jugadores admite el servidor EN TOTAL, que no tiene nada que ver con lo
-        //     anterior y que antes valía ocho por accidente de compartir constante.
+        //   * how many clients ONE person can have open at once. Eight, which is what fits
+        //     in a Dofus party, and it is where the number came from: from the multi-account launcher.
+        //   * how many players the server admits IN TOTAL, which has nothing to do with the
+        //     above and which used to be eight by the accident of sharing a constant.
         //
-        // El primero se cuenta por dirección: quien juega con varias cuentas lo hace desde su
-        // ordenador, así que la IP es lo que agrupa a una misma persona.
+        // The first is counted per address: whoever plays with several accounts does so from their
+        // computer, so the IP is what groups one same person.
 
-        /// <summary>Clientes que puede tener abiertos a la vez una misma dirección.</summary>
+        /// <summary>Clients one same address can have open at once.</summary>
         public const int ClientesPorIp = 8;
 
-        /// <summary>Jugadores conectados que admite el servidor en total.</summary>
+        /// <summary>Connected players the server admits in total.</summary>
         public const int ClientesEnTotal = 500;
 
-        /// <summary>La cabecera por la que viaja el secreto.</summary>
+        /// <summary>The header the secret travels in.</summary>
         public const string Cabecera = "X-Jondo-Control";
 
-        // ─── Los códigos ────────────────────────────────────────────────────────────────────
+        // ─── The codes ──────────────────────────────────────────────────────────────────────
         //
-        // El servidor dice QUÉ ha pasado; el lanzador decide CÓMO contárselo a la persona y en qué
-        // idioma. Si el servidor mandara la frase hecha tendría que saber el idioma del usuario, y
-        // para eso tendría que leer un fichero de preferencias del escritorio de alguien.
+        // The server says WHAT happened; the launcher decides HOW to tell the person and in which
+        // language. If the server sent the ready-made sentence it would have to know the user's language, and
+        // for that it would have to read a preferences file from someone's desktop.
 
         public const string MotivoSesionCaducada = "sesion-caducada";
         public const string MotivoCuentaYaAbierta = "cuenta-ya-abierta";
         public const string MotivoTopeDeClientes = "tope-de-clientes";
 
-        // ─── El secreto ─────────────────────────────────────────────────────────────────────
+        // ─── The secret ─────────────────────────────────────────────────────────────────────
         //
-        // El canal está en localhost, pero en localhost está cualquier cosa que corra en la
-        // máquina, y por aquí se crean cuentas y se arrancan clientes. Quien borró estas rutas la
-        // primera vez habló de «una puerta abierta encima», y tenía razón.
+        // The channel is on localhost, but on localhost is anything that runs on the
+        // machine, and through here accounts are created and clients started. Whoever deleted these routes the
+        // first time spoke of «una puerta abierta encima», and was right.
         //
-        // El servidor se inventa un secreto en cada arranque y lo deja escrito en el perfil del
-        // usuario; el lanzador lo lee de ahí. Nadie lo teclea y no sale de la máquina.
+        // The server invents a secret on each start and leaves it written in the user's
+        // profile; the launcher reads it from there. Nobody types it and it does not leave the machine.
         //
         // CAREFUL: this is NOT checked today. The launcher sends the header and ControlApi never
         // reads it -- see ControlApi.Autorizada, which is written and has no callers -- so the two
@@ -84,12 +84,12 @@ namespace Jondo.Unity.Launcher
         // because taking this section at its word led to believing the channel was shut when what
         // shuts it is something else entirely.
 
-        /// <summary>Dónde vive el secreto: en el perfil, junto a las preferencias del lanzador.</summary>
+        /// <summary>Where the secret lives: in the profile, next to the launcher's preferences.</summary>
         public static string FicheroDelSecreto => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "Jondo", "control.secreto");
 
-        /// <summary>Reparte un secreto nuevo y lo deja escrito. Lo llama el servidor al arrancar.</summary>
+        /// <summary>Hands out a new secret and leaves it written. The server calls it on starting.</summary>
         public static string NuevoSecreto()
         {
             string secreto = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
@@ -105,7 +105,7 @@ namespace Jondo.Unity.Launcher
             return secreto;
         }
 
-        /// <summary>El secreto que dejó escrito el servidor, o cadena vacía si no hay ninguno.</summary>
+        /// <summary>The secret the server left written, or an empty string if there is none.</summary>
         public static string LeerSecreto()
         {
             try
@@ -115,22 +115,22 @@ namespace Jondo.Unity.Launcher
             catch { return ""; }
         }
 
-        /// <summary>Compara dos secretos sin que el tiempo de la comparación diga nada.</summary>
+        /// <summary>Compares two secrets without the comparison's timing saying anything.</summary>
         public static bool MismoSecreto(string? uno, string? otro)
             => !string.IsNullOrEmpty(uno) && !string.IsNullOrEmpty(otro) &&
                CryptographicOperations.FixedTimeEquals(
                    System.Text.Encoding.UTF8.GetBytes(uno),
                    System.Text.Encoding.UTF8.GetBytes(otro));
 
-        // ─── Uno de cada, y sólo uno ────────────────────────────────────────────────────────
+        // ─── One of each, and only one ──────────────────────────────────────────────────────
         //
-        // No había ningún guardia de instancia: dos servidores se peleaban por el 8888 y por la
-        // tubería con nombre "15881", y el segundo se moría escribiendo el error en una consola que
-        // en un WinExe no existe. Doble clic que no hacía nada y nadie sabía por qué.
+        // There was no instance guard: two servers fought over 8888 and over the
+        // named pipe "15881", and the second died writing the error to a console that
+        // does not exist in a WinExe. A double click that did nothing and nobody knew why.
 
         private static Mutex? _candado;
 
-        /// <summary>Coge el sitio de este programa. Falso si ya lo tenía otro.</summary>
+        /// <summary>Takes this program's place. False if another already had it.</summary>
         public static bool CogerElSitio(string nombre)
         {
             try
@@ -145,8 +145,8 @@ namespace Jondo.Unity.Launcher
             }
             catch
             {
-                // Si el candado no se puede coger, mejor dejar arrancar que impedirlo: el fallo de
-                // los puertos avisa después, y ahora avisa bien.
+                // If the lock cannot be taken, better to let it start than prevent it: the ports'
+                // failure warns afterwards, and now it warns well.
                 return true;
             }
         }

@@ -18,12 +18,12 @@ namespace Jondo.Unity.Server
         private static readonly object LogLock = new object();
 
         /// <summary>
-        /// El servidor. Sin ventanas: desde que el lanzador es otro ejecutable, aquí dentro no
-        /// queda ni una línea de WinForms.
+        /// The server. No windows: since the launcher is another executable, not a single
+        /// line of WinForms is left in here.
         ///
-        /// Antes esto arrancaba los cinco servicios y después abría la ventana del lanzador, y la
-        /// vida del proceso quedaba enchufada al ciclo de vida de un Form: cerrar la ventana
-        /// llamaba a RequestShutdown y se apagaba todo, con los jugadores que hubiera dentro.
+        /// Before, this started the five services and then opened the launcher window, and the
+        /// process's life was plugged into a Form's life cycle: closing the window
+        /// called RequestShutdown and everything shut down, with whatever players were inside.
         /// </summary>
         static async Task Main(string[] args)
         {
@@ -75,11 +75,11 @@ namespace Jondo.Unity.Server
             DatabaseManager.Initialize();
 
             Console.WriteLine("[+] Initializing MobSpawnManager...");
-            // Delante de los monstruos a proposito, y esto era un fallo de verdad: el
-            // sembrador lee DungeonRooms para no vaciar las mazmorras con el veto de
-            // interiores, y quien escribe esa tabla es DungeonManager. Estando detras, lo
-            // que leia era lo que dejo escrito el arranque ANTERIOR. Ahora ademas pone al
-            // jefe en su ultima sala, que sin esto no existe.
+            // In front of the monsters on purpose, and this was a real bug: the
+            // seeder reads DungeonRooms so as not to empty the dungeons with the indoor
+            // ban, and whoever writes that table is DungeonManager. Being behind, what
+            // it read was what the PREVIOUS start had left written. Now it also puts the
+            // boss in his last room, which without this does not exist.
             Managers.DungeonManager.Initialize();
             Managers.MobSpawnManager.InitializeAndSpawnAll();
 
@@ -103,6 +103,8 @@ namespace Jondo.Unity.Server
             Managers.Cosmetics.Initialize();
             Managers.EquipmentSkins.Initialize();
             Managers.KoliseoMaps.Initialize();
+            // The jail's sentences still running, and the clock that ends them.
+            Managers.Jail.Initialize();
             Managers.Dreams.Initialize();
             Managers.Merkasako.Initialize();
             Managers.Zaapis.Initialize();
@@ -111,8 +113,8 @@ namespace Jondo.Unity.Server
             Managers.Houses.Initialize();
             Managers.HouseStore.Initialize();
             Managers.GuildChests.Initialize();
-            // Detrás de Houses a propósito: TeleportManager rechaza las rutas que caen sobre una
-            // puerta de casa, y para eso las casas tienen que estar ya cargadas.
+            // After Houses on purpose: TeleportManager rejects the routes that fall on a
+            // house door, and for that the houses have to be loaded already.
             Managers.TeleportManager.Initialize();
             Managers.Resources.Initialize();
             Managers.Workshops.Initialize();
@@ -127,24 +129,24 @@ namespace Jondo.Unity.Server
             Managers.Challenges.OnlyOffer(Handlers.ChallengeWatcher.Watched);
             Managers.InteractiveRegistry.Initialize();
             Managers.Mounts.Initialize();
-            // Vendors va PRIMERO: Npcs necesita saber ya a quien no debe sembrar, y NpcShops a
-            // quien le echa encima el catalogo de quien.
+            // Vendors goes FIRST: Npcs already needs to know whom not to seed, and NpcShops
+            // on whom to pile whose catalogue.
             Network.UnknownPackets.Initialize();
             Managers.Vendors.Initialize();
             Managers.Npcs.Initialize();
 
-            // Detras de los NPCs a proposito: lee sus plantillas para saber con que respuesta
-            // ofrece cada guardian el manojo y con cual la llave.
+            // After the NPCs on purpose: it reads their templates to know with which reply
+            // each guardian offers the bundle and with which the key.
             Managers.DungeonDoor.Initialize();
             // Behind the NPCs too, and for the same reason: the bankers are found in their templates.
             Managers.Bankers.Initialize();
             Managers.NpcShops.Initialize();
-            // Detras de Npcs porque las misiones cuelgan de sus dialogos, y el catalogo es de
-            // Ankama y no cambia: se lee una vez y lo comparten todas las sesiones.
+            // After Npcs because the quests hang from their dialogues, and the catalogue is
+            // Ankama's and does not change: it is read once and all the sessions share it.
             Managers.Quests.Load();
             Managers.Readables.Load();
-            // Detras de las misiones: 259 logros se ganan acabando una, y el catalogo se indexa
-            // por mision al cargarse.
+            // After the quests: 259 achievements are earned by finishing one, and the catalogue is indexed
+            // by quest when loaded.
             Managers.Achievements.Load();
             // Behind the quests as well: the Almanax offerings are quests, and the calendar finds
             // their giver in the quest catalogue.
@@ -174,8 +176,8 @@ namespace Jondo.Unity.Server
                     Console.WriteLine("[!] Public binding does not encrypt traffic. Use it only on " +
                                       "a trusted network or behind a VPN/tunnel.");
                 }
-                // La llave con la que el lanzador podrá hablarle a este servidor. Una por arranque:
-                // así un lanzador de una sesión anterior no se queda con llave de la de ahora.
+                // The key the launcher will be able to talk to this server with. One per start:
+                // that way a launcher from a previous session does not keep a key to the current one.
                 ControlApi.NuevoSecreto();
                 Console.WriteLine($"[+] Llave del canal de mando en {Contract.FicheroDelSecreto}");
                 HaapiServer.Start(haapiPort);
@@ -196,10 +198,10 @@ namespace Jondo.Unity.Server
             Console.WriteLine("\n[+] ALL EMULATION SERVICES ONLINE AND READY!");
             Console.ResetColor();
 
-            // Aquí también se invitaba a escribir /help. No hay dónde: esto es un WinExe sin
-            // consola y nadie lee la entrada estándar —no queda un solo Console.ReadLine en el
-            // servidor—. Los comandos de verdad son los del chat del juego, y los reparte
-            // CommandHandler según el rol de quien los escribe.
+            // Here too one was invited to type /help. There is nowhere to: this is a WinExe with no
+            // console and nobody reads standard input —not a single Console.ReadLine is left in the
+            // server—. The real commands are those of the game chat, and
+            // CommandHandler hands them out according to the role of whoever types them.
 
             AppDomain.CurrentDomain.ProcessExit += (s, e) => StopServices();
             Console.CancelKeyPress += (s, e) =>
@@ -208,12 +210,12 @@ namespace Jondo.Unity.Server
                 RequestShutdown("Ctrl+C");
             };
 
-            // Los lanzamientos que se quedan colgados.
+            // The launches that are left hanging.
             //
-            // Un cliente que arranca y nunca llega a conectar al 5555 —o un lanzador que se cierra
-            // justo en medio— dejaba la cuenta marcada como ocupada PARA SIEMPRE, y el registro la
-            // rechazaba en cada intento posterior. El CreatedAtUtc llevaba puesto desde el principio
-            // sin que lo leyera nadie; ahora es lo que las suelta.
+            // A client that starts and never gets to connect to 5555 —or a launcher that closes
+            // right in the middle— left the account marked as busy FOREVER, and the registry
+            // rejected it on every later attempt. CreatedAtUtc had been set from the start
+            // without anyone reading it; now it is what releases them.
             var barrendero = new System.Threading.Timer(
                 _ => { try { Network.ClientLaunchRegistry.SoltarLosCaducados(TimeSpan.FromMinutes(5)); } catch { } },
                 null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
@@ -228,15 +230,15 @@ namespace Jondo.Unity.Server
                 },
                 null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
 
-            // Y su ventana: el registro y las cifras. Si no se pudiera abrir —sin escritorio, por
-            // ejemplo— el servidor sigue funcionando igual: la ventana es para mirar, no para que
-            // las cosas pasen.
+            // And its window: the log and the figures. If it could not be opened —no desktop, for
+            // example— the server keeps working the same: the window is for looking, not for
+            // things to happen.
             UI.ServerWindow.Abrir();
 
-            // Aquí se anunciaba «el servidor está en marcha, Ctrl+C para pararlo» y «cerrar el
-            // lanzador ya no apaga esto». Eran avisos para quien miraba una consola de texto:
-            // ahora hay una ventana con un botón de parar, y lo que el registro tiene que contar
-            // es lo que pasa en el servidor, no cómo se maneja.
+            // Here «el servidor está en marcha, Ctrl+C para pararlo» and «cerrar el
+            // lanzador ya no apaga esto» used to be announced. They were notices for whoever watched a text console:
+            // now there is a window with a stop button, and what the log has to tell
+            // is what happens on the server, not how it is operated.
 
             await _shutdown.Task;
             await barrendero.DisposeAsync();
@@ -257,7 +259,7 @@ namespace Jondo.Unity.Server
         private static readonly TaskCompletionSource _shutdown =
             new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        /// <summary>Si ya se ha pedido el apagado, para que la ventana no vuelva a preguntar.</summary>
+        /// <summary>Whether shutdown has already been asked for, so the window does not ask again.</summary>
         public static bool ApagandoYa => _shutdownRequested != 0;
 
     private static int _shutdownRequested;
@@ -287,13 +289,13 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Una línea en el registro de depuración.
+        /// A line in the debug log.
         ///
-        /// Escribía con File.AppendAllText, que abre el fichero, escribe y lo cierra, en CADA
-        /// línea; y la ruta se resolvía cada vez, con su Directory.Exists dentro. Esto se llama
-        /// constantemente durante un combate. Ahora el manejador se queda abierto y la ruta se
-        /// resuelve una sola vez, pero se sigue vaciando línea a línea: un registro de depuración
-        /// tiene que tener escrito lo último que pasó justo cuando el servidor se muere.
+        /// It wrote with File.AppendAllText, which opens the file, writes and closes it, on EVERY
+        /// line; and the path was resolved every time, with its Directory.Exists inside. This is called
+        /// constantly during a fight. Now the handle stays open and the path is
+        /// resolved only once, but it is still flushed line by line: a debug log
+        /// has to have written the last thing that happened right when the server dies.
         /// </summary>
         public static void LogDebug(string message)
         {

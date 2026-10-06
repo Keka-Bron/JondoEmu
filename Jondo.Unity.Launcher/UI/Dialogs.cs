@@ -6,12 +6,12 @@ using Avalonia.Media;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// El aviso modal del lanzador, con la cara del lanzador.
+    /// The launcher's modal notice, with the launcher's face.
     /// </summary>
     /// <remarks>
-    /// Avalonia no trae caja de mensaje, y eso resulta ser una ventaja: la de Windows Forms era la
-    /// del sistema y aparecía en medio de la tarjeta de madera y oro con su gris de siempre. Ésta
-    /// se pinta con la misma paleta que el resto.
+    /// Avalonia brings no message box, and that turns out to be an advantage: the Windows Forms one was the
+    /// system's and appeared in the middle of the wood and gold card with its usual grey. This one
+    /// is painted with the same palette as the rest.
     /// </remarks>
     internal static class Dialogs
     {

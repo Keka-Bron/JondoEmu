@@ -6,24 +6,24 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Doom de Masas, el hechizo de administración con el que se salta una pelea.
+    /// Doom de Masas, the administration spell used to skip a fight.
     /// </summary>
     /// <remarks>
-    /// No es inventado: está en el catálogo del propio cliente con el nombre «Doom de Masas» y el
-    /// adminName «Doom de masse». Un solo grado, 1 PA, alcance 0, y dos efectos:
+    /// It is not invented: it is in the client's own catalogue with the name «Doom de Masas» and the
+    /// adminName «Doom de masse». A single grade, 1 AP, range 0, and two effects:
     ///
-    ///   141  «Mata al objetivo»   máscara «A» —los de enfrente—  zona 65, que es todo el mapa
-    ///   120  devuelve PA          máscara «C» —quien lanza—
+    ///   141  «Mata al objetivo»   mask «A» —the opponents—  zone 65, which is the whole map
+    ///   120  gives back AP        mask «C» —the caster—
     ///
-    /// Las dos máscaras importan: la «A» es la que hace que no te mates a ti mismo, y el 120 es
-    /// lo que deja encadenarlo sin quedarse sin puntos.
+    /// Both masks matter: «A» is what keeps you from killing yourself, and 120 is
+    /// what lets you chain it without running out of points.
     /// </remarks>
     public class AdminSpellTests
     {
         [Fact]
         public void El_hechizo_existe_en_los_datos_del_cliente()
         {
-            // Un PA y un solo grado, tal cual está en SpellLevels.
+            // One AP and a single grade, just as it is in SpellLevels.
             var (grado, nivelId, coste) = SpellEffects.GradoDe(AdminSpells.DoomDeMasas, 200);
 
             Assert.Equal(AdminSpells.GradoDeDoom, grado);
@@ -40,11 +40,11 @@ namespace Jondo.Unity.Tests.Combat
             var mata = efectos.FirstOrDefault(e => e.EffectId == 141);
             Assert.NotNull(mata);
 
-            // «A» son los de enfrente y «a» los del propio bando. Si esto se convirtiera en «a»,
-            // o en «a,A», el administrador se fulminaría a sí mismo al pulsar.
+            // «A» are the opponents and «a» one's own side. If this turned into «a»,
+            // or into «a,A», the administrator would strike himself down on pressing.
             Assert.Equal("A", mata!.TargetMask);
 
-            // Y la zona es todo el mapa, que es lo que hace que el alcance cero no importe.
+            // And the zone is the whole map, which is what makes the zero range not matter.
             Assert.Equal(Jondo.Unity.World.Maps.Zone.WholeMap, mata.Forma);
         }
 
@@ -53,7 +53,7 @@ namespace Jondo.Unity.Tests.Combat
         {
             Assert.Equal(Roles.Administrador, AdminSpells.HaceFalta);
 
-            // Y una cuenta que no existe no lo tiene: Para() no puede dar verdadero por defecto.
+            // And an account that does not exist does not have it: Para() cannot default to true.
             Assert.False(AdminSpells.Para(0));
             Assert.False(AdminSpells.Para(-1));
         }

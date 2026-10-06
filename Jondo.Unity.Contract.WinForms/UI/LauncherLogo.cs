@@ -7,22 +7,22 @@ using System.Windows.Forms;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// El rótulo de "JONDO EMU" que va encima de la tarjeta de acceso.
+    /// The "JONDO EMU" sign that goes above the login card.
     ///
-    /// Está dibujado aquí, no es una imagen: el trazo del logotipo de Ankama no se puede reletrar,
-    /// así que lo que se hace es un rótulo propio con el mismo aire —oro con degradado, contorno
-    /// oscuro grueso, un poco de arco y una sombra debajo— usando la tipografía del launcher.
+    /// It is drawn here, not an image: Ankama's logo lettering cannot be re-lettered,
+    /// so what is done is a sign of our own with the same feel —gold with a gradient, a thick dark
+    /// outline, a little arc and a shadow underneath— using the launcher's typeface.
     ///
-    /// Se pinta sobre el fondo recortado de la ventana, igual que los paneles, para que el dibujo
-    /// de detrás se vea a través de los huecos de las letras.
+    /// It is painted over the window's cropped background, just like the panels, so that the drawing
+    /// behind shows through the gaps in the letters.
     /// </summary>
     public sealed class LauncherLogo : Panel
     {
-        /// <summary>Las dos palabras del rotulo. El lanzador pone JONDO EMU y el servidor JONDO SERVER.</summary>
+        /// <summary>The sign's two words. The launcher puts JONDO EMU and the server JONDO SERVER.</summary>
         public string Primera { get; set; } = "JONDO";
         public string Segunda { get; set; } = "EMU";
 
-        /// <summary>Cuánto se arquea el rótulo, en grados de giro de la primera y la última letra.</summary>
+        /// <summary>How much the sign arches, in degrees of rotation of the first and last letter.</summary>
         private const float Arco = 7f;
 
         public LauncherLogo()
@@ -35,12 +35,12 @@ namespace Jondo.Unity.Launcher.UI
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
-            // El fondo se pinta entero en OnPaint, igual que en los paneles.
+            // The background is painted whole in OnPaint, just as in the panels.
         }
 
         /// <summary>
-        /// Recorta del fondo ya compuesto por la ventana el trozo que hay detrás, que es como los
-        /// paneles consiguen verse translúcidos. WinForms no tiene transparencia de verdad.
+        /// Cuts out of the background already composed by the window the piece behind it, which is how the
+        /// panels manage to look translucent. WinForms has no real transparency.
         /// </summary>
         private void PintarFondo(Graphics g)
         {
@@ -84,7 +84,7 @@ namespace Jondo.Unity.Launcher.UI
                 LineAlignment = StringAlignment.Center,
             };
 
-            // JONDO grande y arqueado, EMU debajo y a la derecha, como una segunda línea.
+            // JONDO big and arched, EMU underneath and to the right, like a second line.
             float centro = Width / 2f;
             camino.AddString(Primera, new FontFamily(LauncherTheme.TitleFamily), (int)FontStyle.Bold,
                              alto, new PointF(centro, Height * 0.36f), formato);
@@ -94,13 +94,13 @@ namespace Jondo.Unity.Launcher.UI
             var caja = camino.GetBounds();
             if (caja.Width <= 0 || caja.Height <= 0) return;
 
-            // El arco: se inclina un pelín el conjunto, que es lo que le da el aire de rótulo.
+            // The arc: the whole is tilted a touch, which is what gives it the look of a sign.
             using var giro = new Matrix();
             giro.RotateAt(-Arco * 0.35f, new PointF(centro, Height / 2f));
             camino.Transform(giro);
             caja = camino.GetBounds();
 
-            // La sombra.
+            // The shadow.
             using (var sombra = new GraphicsPath())
             {
                 sombra.AddPath(camino, false);
@@ -111,7 +111,7 @@ namespace Jondo.Unity.Launcher.UI
                 g.FillPath(pincelSombra, sombra);
             }
 
-            // El contorno, en dos pasadas: una marrón muy oscura y ancha y otra dorada fina.
+            // The outline, in two passes: a very dark, wide brown one and a thin golden one.
             using (var fuera = new Pen(Color.FromArgb(235, 38, 20, 6), Math.Max(5f, alto * 0.17f))
                    { LineJoin = LineJoin.Round })
             {
@@ -123,7 +123,7 @@ namespace Jondo.Unity.Launcher.UI
                 g.DrawPath(dentro, camino);
             }
 
-            // El relleno: oro claro arriba, ámbar abajo, con un destello a un tercio de altura.
+            // The fill: light gold on top, amber below, with a glint at a third of the height.
             using (var oro = new LinearGradientBrush(
                        new RectangleF(caja.X, caja.Y, caja.Width, caja.Height + 1),
                        Color.FromArgb(255, 255, 236, 160),
@@ -144,7 +144,7 @@ namespace Jondo.Unity.Launcher.UI
                 g.FillPath(oro, camino);
             }
 
-            // Y un brillo por encima de la mitad de arriba de las letras.
+            // And a shine over the top half of the letters.
             var mitad = new RectangleF(caja.X, caja.Y, caja.Width, caja.Height * 0.42f);
             using (var recorte = new Region(camino))
             {

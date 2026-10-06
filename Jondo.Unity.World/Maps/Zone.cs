@@ -4,40 +4,40 @@ using System.Collections.Generic;
 namespace Jondo.Unity.World.Maps
 {
     /// <summary>
-    /// Las casillas que coge un efecto de hechizo alrededor de la que se apunta.
+    /// The cells a spell effect takes around the one targeted.
     ///
-    /// La forma viene en el <c>zoneDescr</c> del EffectsJson y es una LETRA guardada como su
-    /// código: 'P' un punto, 'C' un círculo, 'X' una cruz, 'L' una línea… El tamaño es el
-    /// <c>param1</c> y significa una cosa u otra según la forma —radio en el círculo, largo en la
-    /// línea—.
+    /// The shape comes in the EffectsJson's <c>zoneDescr</c> and it is a LETTER stored as its
+    /// code: 'P' a point, 'C' a circle, 'X' a cross, 'L' a line… The size is the
+    /// <c>param1</c> and means one thing or another depending on the shape —radius in the circle, length in the
+    /// line—.
     ///
-    /// Las que usa el Ocra, contadas sobre sus 44 hechizos:
+    /// The ones the Cra uses, counted over its 44 spells:
     ///
-    ///   'P' x534   un punto: sólo la casilla apuntada. Es la de casi todo.
-    ///   'C' x49    círculo de radio param1. El Ojo de Topo es 'C' de 2.
-    ///   'X' x18    cruz: los cuatro rayos rectos, medido contra las capturas.
-    ///   'T' x9     la barra: el centro y param1 casillas a cada lado, ATRAVESADA al
-    ///              lanzamiento. Medida en siete impactos con posiciones: Cencerro (T2),
-    ///              Magmacha Calcinada (T1), Flecha de Pelea (T2, dos veces), Impacto
-    ///              Aplastante (T1), Espora Dyka (T5, dos veces): todas las víctimas en la
-    ///              perpendicular del eje del lanzamiento o en el centro, ninguna detrás
-    ///              ni delante. Era una cruz, y Espada Destructora le pegaba al Yopuka que
-    ///              la lanzaba desde al lado.
-    ///   'a' x8     TODO el mapa.
-    ///   'L' x9     línea recta desde el lanzador.
-    ///   'V' x6     media línea.
-    ///   'F' x6     la casilla y sus vecinas en la dirección.
-    ///   'Q' x10    cruz recta, como la 'X', con param2 de radio interior. Las fichas la
-    ///              llaman cruz -- "en una cruz de 2 casillas" Transposición Amenazadora,
-    ///              "en una cruz de 1 casilla" Llave de Contacto -- y en las capturas Palabra
-    ///              Turbulenta (Q1) empuja a (0,-1), (1,0) y (-1,0) del centro, Palabra
-    ///              Entretenida (Q3) atrae desde (1,0), (2,0) y (3,0), y Flecha Asaltante y
-    ///              Flecha Evasiva ponen su "950 mask c" (Q1) en el Ocra a una casilla recta
-    ///              del centro. Era un anillo, que es la 'O'.
+    ///   'P' x534   a point: only the targeted cell. It is the one for almost everything.
+    ///   'C' x49    circle of radius param1. Ojo de Topo is 'C' of 2.
+    ///   'X' x18    cross: the four straight rays, measured against the captures.
+    ///   'T' x9     the bar: the centre and param1 cells to each side, ACROSS the
+    ///              cast. Measured in seven impacts with positions: Cencerro (T2),
+    ///              Magmacha Calcinada (T1), Flecha de Pelea (T2, twice), Impacto
+    ///              Aplastante (T1), Espora Dyka (T5, twice): all the victims on the
+    ///              perpendicular of the cast's axis or at the centre, none behind
+    ///              nor in front. It was a cross, and Espada Destructora hit the Iop who
+    ///              cast it from right beside.
+    ///   'a' x8     the WHOLE map.
+    ///   'L' x9     straight line from the caster.
+    ///   'V' x6     half line.
+    ///   'F' x6     the cell and its neighbours in the direction.
+    ///   'Q' x10    straight cross, like 'X', with param2 as inner radius. The sheets
+    ///              call it a cross -- "en una cruz de 2 casillas" Transposición Amenazadora,
+    ///              "en una cruz de 1 casilla" Llave de Contacto -- and in the captures Palabra
+    ///              Turbulenta (Q1) pushes (0,-1), (1,0) and (-1,0) from the centre, Palabra
+    ///              Entretenida (Q3) pulls from (1,0), (2,0) and (3,0), and Flecha Asaltante and
+    ///              Flecha Evasiva put their "950 mask c" (Q1) on the Cra one straight cell
+    ///              from the centre. It was a ring, which is 'O'.
     ///   'U' x3     'G' x3   '+' x2   '#' x2
     ///
-    /// Lo que no está medido NO se inventa: una forma desconocida devuelve la casilla apuntada y
-    /// se anota, que es lo que hacía el emulador con todas.
+    /// What is not measured is NOT invented: an unknown shape returns the targeted cell and
+    /// is noted, which is what the emulator did with all of them.
     ///
     /// The letters are the client's own: its zone factory (gru::blgy in the 3.6.10 GameAssembly)
     /// turns each one into a shape class, and that is what the constants below follow. P X Q + # *
@@ -119,10 +119,10 @@ namespace Jondo.Unity.World.Maps
         public const int LineaPerpendicular = '-';
 
         /// <summary>
-        /// Las casillas que toca el efecto.
+        /// The cells the effect touches.
         ///
-        /// <paramref name="desde"/> es la casilla del que lanza, que hace falta para las formas
-        /// que tienen dirección (las líneas); <paramref name="centro"/> es a la que se apunta.
+        /// <paramref name="desde"/> is the caster's cell, which is needed for the shapes
+        /// that have a direction (the lines); <paramref name="centro"/> is the one targeted.
         /// </summary>
         /// <param name="minimo">
         /// The <c>param2</c> of the zone. For the circle, the inner edge in distance: "Venganza
@@ -226,7 +226,7 @@ namespace Jondo.Unity.World.Maps
                     return fuera;
 
                 case Circulo:
-                    // Todo lo que esté a `tamano` pasos o menos, con la distancia del combate.
+                    // Everything `tamano` steps away or less, with the fight's distance.
                     for (int c = 0; c < MapGeometry.MaxCells; c++)
                         if (MapGeometry.Distance(centro, c) <= tamano) fuera.Add(c);
                     return fuera;
@@ -269,18 +269,18 @@ namespace Jondo.Unity.World.Maps
                     return fuera;
 
                 case Aspa:
-                    // La 'X' son los cuatro rayos RECTOS, los mismos por los que se anda, y no las
-                    // diagonales.
+                    // 'X' is the four STRAIGHT rays, the same ones walked along, and not the
+                    // diagonals.
                     //
-                    // Estaba al revés, y era lo que dejaba a Flecha de Dispersión pegando a uno
-                    // solo. Con las diagonales, una 'X' de radio dos sólo genera casillas a
-                    // distancia PAR —el centro, cuatro a distancia dos y cuatro a distancia
-                    // cuatro— y ninguna a distancia uno, que es justo donde se ponen los bichos.
+                    // It was the other way round, and it was what left Flecha de Dispersión hitting only
+                    // one. With the diagonals, an 'X' of radius two only generates cells at an
+                    // EVEN distance —the centre, four at distance two and four at distance
+                    // four— and none at distance one, which is exactly where the creatures stand.
                     //
-                    // Medido: doce impactos de zona 'X' en las capturas —cinco en Flecha de
-                    // Dispersión, cinco en Vendetta y dos lanzamientos de Ojo por Ojo—, todos en
-                    // línea recta y ninguno en diagonal. Cinco de ellos caen a distancia IMPAR,
-                    // que con el aspa es geométricamente imposible.
+                    // Measured: twelve 'X' zone impacts in the captures —five in Flecha de
+                    // Dispersión, five in Vendetta and two casts of Ojo por Ojo—, all in a
+                    // straight line and none diagonal. Five of them fall at an ODD distance,
+                    // which with the saltire is geometrically impossible.
                     Rays(fuera, centro, tamano, minimo, withCentre: true, Walking);
                     return fuera;
 
@@ -479,7 +479,7 @@ namespace Jondo.Unity.World.Maps
                 case Linea:
                 case DiagonalLine:
                 {
-                    // Siguen recto en la dirección en la que se lanzó.
+                    // They carry on straight in the direction it was cast in.
                     fuera.Add(centro);
                     var d = DireccionEntre(desde, centro);
                     if (d.HasValue) Estirar(fuera, centro, d.Value.Dx, d.Value.Dy, tamano);
@@ -509,7 +509,7 @@ namespace Jondo.Unity.World.Maps
                 }
 
                 default:
-                    // Sin medir: la casilla apuntada y nada más.
+                    // Unmeasured: the targeted cell and nothing else.
                     fuera.Add(centro);
                     return fuera;
             }
@@ -527,8 +527,8 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
-        /// Las OCHO direcciones de Dofus en coordenadas de mapa, numeradas como las numera el
-        /// cliente. Las impares son las cuatro por las que se anda; las pares, las diagonales.
+        /// Dofus's EIGHT directions in map coordinates, numbered as the client numbers
+        /// them. The odd ones are the four walked along; the even ones, the diagonals.
         /// </summary>
         public static readonly (int Dx, int Dy)[] Direcciones =
         {
@@ -536,8 +536,8 @@ namespace Jondo.Unity.World.Maps
         };
 
         /// <summary>
-        /// Cuál de las ocho se parece más al camino de una casilla a otra. Es lo que decide hacia
-        /// dónde sale volando el que recibe un empujón.
+        /// Which of the eight best resembles the path from one cell to another. It is what decides which way
+        /// whoever receives a push goes flying.
         /// </summary>
         public static (int Dx, int Dy)? DireccionEntre(int desde, int hasta)
         {
@@ -560,8 +560,8 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
-        /// Si un desplazamiento ALEJA del sitio del que sale o acerca a él. Es lo que decide con
-        /// qué número viaja por el cable: el 5 alejarse, el 6 acercarse.
+        /// Whether a displacement moves AWAY from the place it starts from or towards it. It is what decides with
+        /// which number it travels on the wire: 5 moving away, 6 moving closer.
         /// </summary>
         public static bool SeAleja(int desde, int hasta, int centro, int deQuienLanza)
         {
@@ -595,38 +595,38 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
-        /// Adónde va a parar el que recibe un empujón (o un tirón, con las casillas en negativo).
+        /// Where whoever receives a push ends up (or a pull, with the cells as a negative).
         ///
-        /// La dirección sale de la casilla a la que se lanzó el hechizo —el centro de su zona—
-        /// hacia el que sale volando; si es el que está justo en esa casilla, no hay vector y
-        /// entonces manda la casilla del que lanza. Medido sobre los 76 desplazamientos de las
-        /// capturas del Ocra.
+        /// The direction comes from the cell the spell was cast at —its zone's centre—
+        /// towards whoever goes flying; if it is the one right on that cell, there is no vector and
+        /// then the caster's cell rules. Measured over the 76 displacements of the
+        /// Cra captures.
         ///
-        /// Se para en lo primero que encuentre: borde, obstáculo u otro combatiente.
+        /// It stops at the first thing it meets: edge, obstacle or another fighter.
         /// </summary>
         public static int Empujar(int centro, int deQuienLanza, int aQuien, int casillas,
                                   HashSet<int> pisables, HashSet<int> ocupadas)
             => Push(centro, deQuienLanza, aQuien, casillas, pisables, ocupadas).ToCell;
 
-        /// <summary>Contra qué se paró un empujón.</summary>
+        /// <summary>What a push stopped against.</summary>
         /// <remarks>
-        /// La distinción NO es cosmética: chocar contra otro combatiente hace daño A LOS DOS —el
-        /// empujado entero y la pared la mitad—, y chocar contra el borde o contra un muro se lo
-        /// come sólo el empujado. Medido en las 401 capturas: 9 parejas de dos mensajes de daño de
-        /// empuje seguidos, y las 9 con el segundo valiendo exactamente la mitad del primero.
+        /// The distinction is NOT cosmetic: colliding with another fighter hurts BOTH —the
+        /// pushed one fully and the wall half—, and colliding with the edge or a wall only
+        /// the pushed one takes it. Measured in the 401 captures: 9 pairs of two push damage
+        /// messages in a row, and all 9 with the second worth exactly half the first.
         /// </remarks>
         public enum PushStop
         {
-            /// <summary>Recorrió las casillas que le tocaban. No hay daño.</summary>
+            /// <summary>It covered the cells it had to. There is no damage.</summary>
             None = 0,
 
-            /// <summary>El borde de la retícula.</summary>
+            /// <summary>The grid's edge.</summary>
             Edge,
 
-            /// <summary>Casilla que no se pisa: muro, agujero o fuera del suelo del mapa.</summary>
+            /// <summary>A cell not stepped on: wall, hole or off the map's floor.</summary>
             Obstacle,
 
-            /// <summary>Otro combatiente. El único caso en el que el daño va a dos.</summary>
+            /// <summary>Another fighter. The only case in which the damage goes to two.</summary>
             Fighter,
 
             /// <summary>
@@ -642,35 +642,35 @@ namespace Jondo.Unity.World.Maps
             Wall,
         }
 
-        /// <summary>Cómo acabó un empujón.</summary>
+        /// <summary>How a push ended.</summary>
         /// <remarks>
-        /// Lo que faltaba es <see cref="BlockedCells"/>. El daño de colisión sale de LAS CASILLAS
-        /// QUE NO SE RECORRIERON, no de las recorridas ni de las que declara el hechizo, y la
-        /// versión de antes devolvía sólo la casilla final: tiraba ese número a la basura.
+        /// What was missing is <see cref="BlockedCells"/>. The collision damage comes from THE CELLS
+        /// NOT COVERED, not from the ones covered nor from the ones the spell declares, and the
+        /// earlier version returned only the final cell: it threw that number away.
         /// </remarks>
         public readonly struct PushResult
         {
-            /// <summary>Dónde acabó.</summary>
+            /// <summary>Where it ended.</summary>
             public int ToCell { get; init; }
 
-            /// <summary>Cuántas casillas se quedaron sin recorrer. Cero si llegó entero.</summary>
+            /// <summary>How many cells were left uncovered. Zero if it arrived whole.</summary>
             public int BlockedCells { get; init; }
 
-            /// <summary>Contra qué se paró.</summary>
+            /// <summary>What it stopped against.</summary>
             public PushStop Stop { get; init; }
 
-            /// <summary>La casilla del que hizo de pared, si fue un combatiente. Menos uno si no.</summary>
+            /// <summary>The cell of whoever acted as the wall, if it was a fighter. Minus one if not.</summary>
             public int BlockerCell { get; init; }
         }
 
         /// <summary>
-        /// Adónde va a parar el que recibe un empujón (o un tirón, con las casillas en negativo), y
-        /// contra qué se para.
+        /// Where whoever receives a push ends up (or a pull, with the cells as a negative), and
+        /// what it stops against.
         ///
-        /// La dirección sale de la casilla a la que se lanzó el hechizo —el centro de su zona—
-        /// hacia el que sale volando; si es el que está justo en esa casilla, no hay vector y
-        /// entonces manda la casilla del que lanza. Medido sobre los 76 desplazamientos de las
-        /// capturas del Ocra.
+        /// The direction comes from the cell the spell was cast at —its zone's centre—
+        /// towards whoever goes flying; if it is the one right on that cell, there is no vector and
+        /// then the caster's cell rules. Measured over the 76 displacements of the
+        /// Cra captures.
         /// </summary>
         public static PushResult Push(int centro, int deQuienLanza, int aQuien, int casillas,
                                       HashSet<int> pisables, HashSet<int> ocupadas,
@@ -685,7 +685,7 @@ namespace Jondo.Unity.World.Maps
             if (d == null) return quieto;
 
             int dx = d.Value.Dx, dy = d.Value.Dy;
-            if (casillas < 0) { dx = -dx; dy = -dy; }   // atraer es lo mismo del revés
+            if (casillas < 0) { dx = -dx; dy = -dy; }   // pulling is the same the other way round
 
             int pedidas = Math.Abs(casillas);
             var (x, y) = MapGeometry.CellToPoint(aQuien);
@@ -708,16 +708,16 @@ namespace Jondo.Unity.World.Maps
                     freno = PushStop.Fighter; paredEn = siguiente; break;
                 }
 
-                // UN TIRON NO SE PASA DE LARGO. Atraer camina hacia el centro, y sin esto lo
-                // cruzaba y salia por el otro lado: la Imantacion del tymador tira de sus bombas
-                // seis casillas, asi que una bomba a dos del punto acababa cuatro casillas mas
-                // alla, en la direccion contraria. Y como el hechizo tira DOS veces -- una en su
-                // propio efecto 6 y otra en el 18652 que encadena --, la segunda la traia de
-                // vuelta: en el registro se ve el baile, la bomba -5 de la 272 a la 185 y de la
-                // 185 otra vez a la 272.
+                // A PULL DOES NOT OVERSHOOT. Pulling walks towards the centre, and without this it
+                // crossed it and came out the other side: the Rogue's Imantación pulls his bombs
+                // six cells, so a bomb two from the point ended up four cells
+                // beyond, in the opposite direction. And since the spell pulls TWICE -- once in its
+                // own effect 6 and again in the 18652 it chains --, the second brought it
+                // back: in the log the dance is seen, bomb -5 from 272 to 185 and from
+                // 185 back to 272.
                 //
-                // Lo que se para es en cuanto pisaria el centro, que es donde para un tiron en
-                // el juego: pegado a quien tira.
+                // What it stops at is as soon as it would step on the centre, which is where a pull stops in
+                // the game: stuck to whoever pulls.
                 if (casillas < 0 && siguiente == centro)
                 {
                     freno = PushStop.Fighter; paredEn = siguiente; break;

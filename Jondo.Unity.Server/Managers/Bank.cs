@@ -266,7 +266,7 @@ namespace Jondo.Unity.Server.Managers
         /// with "1397", frame 81 -- and the content it then sends, frame 84, is 1,397 entries:
         /// 1,300 templates, 43,449 units. It is the stacks that are counted, not the units nor the
         /// templates. The banker's own sentence says the same in words: "El precio de las
-        /// consultas dependerÃ¡ de la cantidad de objetos que metas dentro".
+        /// consultas dependerá de la cantidad de objetos que metas dentro".
         /// </remarks>
         public static long FeeOf(long accountId) => ItemsOf(accountId).Count;
 

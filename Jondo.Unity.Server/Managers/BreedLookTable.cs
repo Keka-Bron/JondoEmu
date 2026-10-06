@@ -33,9 +33,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Constant value of field 2 of the look block in every 3.6.10.10 capture.</summary>
         private const int LookType = 3;
 
-        // Los huecos de EQUIPO —no los de la ventana de apariencias, que son otros— de las tres
-        // familias que llevan piel. Salen de mirar qué tipo de objeto ocupa cada hueco en la base:
-        // el 6 lo ocupan los del tipo 16, el 7 los del 17 y el 15 los del 82.
+        // The EQUIPMENT slots -- not the appearance window's, which are others -- of the three
+        // families that carry a skin. They come from looking at which item type takes each slot
+        // in the database: slot 6 is taken by type 16, 7 by type 17 and 15 by type 82.
         private const int SlotSombrero = 6;
         private const int SlotCapa = 7;
         private const int SlotEscudo = 15;
@@ -162,28 +162,28 @@ namespace Jondo.Unity.Server.Managers
         /// and without the second one the client draws it with no face.
         /// </summary>
         /// <param name="paraLaVentana">
-        /// Cierto solo para la vista previa del panel de apariencias. Cambia una cosa: montado, la
-        /// MASCOTA de apariencia no sale al mundo —no se puede llevar montura y mascota a la vez,
-        /// porque comparten hueco de equipo— pero el panel sí la enseña, para que se vea lo que se
-        /// ha elegido. Está medido: en las capturas hay 49 kmb del personaje montado y ninguno
-        /// lleva mascota, mientras que 502 lxc montados sí la llevan. A pie sale en los dos.
+        /// True only for the appearance panel's preview. It changes one thing: mounted, the appearance
+        /// PET does not go out to the world -- a mount and a pet cannot be carried at once, because they
+        /// share an equipment slot -- but the panel does show it, so that what was chosen is seen. It is
+        /// measured: in the captures there are 49 kmb of the mounted character and none carries a pet,
+        /// while 502 mounted lxc do. On foot it goes out in both.
         /// </param>
         public static byte[] BuildLook(int breedId, int sex, int headId = 0,
                                        IReadOnlyList<long>? customColors = null,
                                        long characterId = 0,
                                        bool paraLaVentana = false)
         {
-            // Con id se pregunta por ese personaje, que es lo que hace falta en la pantalla de
-            // selección; sin él, por el que está jugando.
+            // With an id that character is asked about, which is what is needed on the selection
+            // screen; without it, the one playing.
             var mount = characterId != 0 ? Mounts.RiddenBy(characterId) : Mounts.Ridden();
 
             long quien = characterId != 0 ? characterId : Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
             var prendas = Wardrobe.AppearanceOf(quien);
 
-            // Montado, la raíz es la montura; una MASCOTURA o una MONTURA DE APARIENCIA mandan
-            // sobre esa raíz, que es lo que hace que el dragopavo se vea como otra cosa. Las dos
-            // van al mismo hueco y las dos pueden traer huesos, escala, color y —solo las de
-            // apariencia— una piel propia.
+            // Mounted, the root is the mount; a PETSMOUNT or an APPEARANCE MOUNT rules over that root,
+            // which is what makes the dragoturkey look like something else. Both go to the same slot
+            // and both can bring bones, scale, colour and -- only the appearance ones -- a skin of
+            // their own.
             Cosmetics.PieceLook? impuesto = null;
             foreach (var prenda in prendas)
             {
@@ -192,10 +192,10 @@ namespace Jondo.Unity.Server.Managers
                 if (suyo != null) impuesto = suyo;
             }
 
-            // Una mascotura de verdad ocupa el hueco 8 y se monta, pero su aspecto no está en
-            // mounts.json, que solo trae dragopavos, mulaguas y vuelocerontes. Así que se dibuja
-            // montado solo si hay de dónde sacar los huesos: los de la montura, o los de la prenda
-            // de apariencia. Sin ninguno de los dos, mejor a pie que un esqueleto vacío.
+            // A real petsmount takes slot 8 and is ridden, but its look is not in mounts.json, which
+            // only carries dragoturkeys, muldos and flyhorns. So it is drawn mounted only if there is
+            // somewhere to take the bones from: the mount's, or the appearance garment's. With
+            // neither of the two, better on foot than an empty skeleton.
             int huesosRaiz = (impuesto != null && impuesto.Bones != 0) ? impuesto.Bones
                                                                       : (mount?.Bones ?? 0);
             bool montado = mount != null && huesosRaiz != 0;
@@ -203,7 +203,7 @@ namespace Jondo.Unity.Server.Managers
             var colores = ColorsFor(breedId, sex, customColors);
             var cuerpo = BuildBodyLook(breedId, sex, headId, customColors, montado, prendas, quien);
 
-            // A pie la raíz es el propio personaje, así que la mascota se le cuelga a él.
+            // On foot the root is the character himself, so the pet hangs off him.
             if (!montado)
             {
                 AddPets(cuerpo, prendas, colores);
@@ -215,12 +215,38 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El personaje montado: el cuerpo que se dibuja es el de la montura y el jinete va dentro.
+        /// A look put together from its parts, for a fighter the server dresses itself -- a
+        /// JondoBot: the body (its bones, its skins, its colours already indexed, its scales) and,
+        /// when it rides, the mount -- one of mounts.json, or an appearance one -- with the body
+        /// inside as the rider, on the rider's bones.
+        /// </summary>
+        public static byte[] Composed(long bones, IReadOnlyList<long> skins, IReadOnlyList<long> colors,
+                                      IReadOnlyList<long> scales, Mounts.Look? mount = null,
+                                      Cosmetics.PieceLook? appearanceMount = null)
+        {
+            bool riding = mount != null || (appearanceMount != null && appearanceMount.Bones != 0);
+            var body = Pb.New();
+            if (colors.Count > 0) body.Packed(1, colors);
+            body.Var(2, LookType);
+            body.Var(3, riding ? Mounts.RiderBones : bones);
+            if (scales.Count > 0) body.Packed(5, scales);
+            if (skins.Count > 0) body.Packed(6, skins);
+            if (!riding) return body.Build();
+
+            var root = mount ?? new Mounts.Look { Bones = appearanceMount!.Bones, Scale = appearanceMount.Scale };
+            return Mounted(body.Build(), root, appearanceMount, null, colors);
+        }
+
+        /// <summary>A breed's colours as they travel, each with its index in the high byte.</summary>
+        public static List<long> IndexedColors(int breedId, int sex) => ColorsFor(breedId, sex, null);
+
+        /// <summary>
+        /// The mounted character: the body drawn is the mount's and the rider goes inside.
         ///
-        ///   f1: los colores de la montura   f2: 3   f3: sus huesos   f5: [su escala]
-        ///   f7 { f1: el aspecto del jinete, f4: dónde se engancha }
+        ///   f1: the mount's colours   f2: 3   f3: its bones   f5: [its scale]
+        ///   f7 { f1: the rider's look, f4: where it attaches }
         ///
-        /// Sale tal cual de una captura de equipar un dragopavo sin ningún cosmético puesto.
+        /// It comes as is from a capture of equipping a dragoturkey with no cosmetic on.
         /// </summary>
         private static byte[] Mounted(byte[] rider, Mounts.Look mount,
                                       Cosmetics.PieceLook? cosmetico = null,
@@ -238,10 +264,10 @@ namespace Jondo.Unity.Server.Managers
             long escala = (cosmetico != null && cosmetico.Scale > 0) ? cosmetico.Scale : mount.Scale;
             if (escala > 0) pb.Packed(5, new long[] { escala });
 
-            // Solo las monturas de apariencia traen piel propia; las mascoturas no tocan el f6.
+            // Only appearance mounts carry a skin of their own; petsmounts do not touch f6.
             if (cosmetico != null && cosmetico.Skin > 0) pb.Packed(6, new long[] { cosmetico.Skin });
 
-            // La mascota va antes que el jinete, como en la captura.
+            // The pet goes before the rider, as in the capture.
             if (prendas != null) AddPets(pb, prendas, coloresDelPortador ?? new List<long>());
 
             pb.Msg(7, Pb.New()
@@ -252,14 +278,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El aspecto del propio personaje, sin montura ni mascota. Devuelve el constructor a medio
-        /// hacer y no los bytes, porque a pie hay que colgarle todavía la mascota.
+        /// The character's own look, without mount or pet. It returns the half-built builder and not the
+        /// bytes, because on foot the pet still has to be hung on it.
         /// </summary>
         /// <param name="quien">
-        /// De quién es el cuerpo. Hace falta para el TAMAÑO: el f5 es un multiplicador y lo que
-        /// declara la raza —entre 43 y 55 según raza y sexo— es su cien por cien, así que el
-        /// porcentaje que guarda <see cref="CharacterSize"/> se aplica sobre eso y no sustituye al
-        /// número. Cero significa "nadie en concreto" y entonces se dibuja al tamaño de la raza.
+        /// Whose body it is. It is needed for the SIZE: f5 is a multiplier and what the breed declares --
+        /// between 43 and 55 depending on breed and sex -- is its hundred per cent, so the percentage
+        /// <see cref="CharacterSize"/> stores is applied on top of that and does not replace the number.
+        /// Zero means "nobody in particular" and then it is drawn at the breed's size.
         /// </param>
         private static Pb BuildBodyLook(int breedId, int sex, int headId,
                                         IReadOnlyList<long>? customColors, bool riding,
@@ -273,9 +299,9 @@ namespace Jondo.Unity.Server.Managers
 
             if (colors.Count > 0) pb.Packed(1, colors);
             pb.Var(2, LookType);
-            // Montado, el jinete cambia de huesos: el cliente tiene una tabla RiderBones y el 2 es
-            // el normal. En la captura se ve el mismo personaje con huesos 1 a pie y 2 encima del
-            // dragopavo.
+            // Mounted, the rider changes bones: the client has a RiderBones table and 2 is the normal
+            // one. In the capture the same character is seen with bones 1 on foot and 2 on top of the
+            // dragoturkey.
             pb.Var(3, riding ? Mounts.RiderBones : (baseLook?.Bones ?? 1));
             if (baseLook != null && baseLook.Scales.Count > 0)
             {
@@ -314,53 +340,53 @@ namespace Jondo.Unity.Server.Managers
             int headSkin = HeadTable.SkinFor(headId, breedId, sex);
             if (headSkin > 0) skins.Add(headSkin);
 
-            // Qué huecos de equipo quedan TAPADOS por un cosmético. En el juego real la prenda de
-            // apariencia no se suma a la de verdad: la sustituye —quita la 3637 de la capa y pone
-            // la 5044 de la capa cosmética—, así que la de debajo no puede salir en el f6.
+            // Which equipment slots are COVERED by a cosmetic. In the real game the appearance garment
+            // is not added to the real one: it replaces it -- it removes the cape's 3637 and puts the
+            // cosmetic cape's 5044 --, so the one underneath cannot come out in f6.
             //
-            // Mientras no se supo la piel de la pieza real esto no se podía hacer y se sumaban las
-            // dos; con equipment_skins.json ya se puede. Los tres huecos son los tres tipos que
-            // tienen piel: sombrero (6), capa (7) y escudo (15).
+            // While the real piece's skin was not known this could not be done and both were added;
+            // with equipment_skins.json it now can. The three slots are the three types that have a
+            // skin: hat (6), cape (7) and shield (15).
             var tapados = new HashSet<int>();
             if (appearance != null)
             {
                 foreach (var prenda in appearance)
                 {
-                    if (prenda.Hidden) continue;      // con el ojo cerrado no tapa nada
+                    if (prenda.Hidden) continue;      // with the eye closed it covers nothing
                     if (prenda.Slot == Cosmetics.SlotHat) tapados.Add(SlotSombrero);
                     else if (prenda.Slot == Cosmetics.SlotCape) tapados.Add(SlotCapa);
                     else if (prenda.Slot == Cosmetics.SlotShield) tapados.Add(SlotEscudo);
                 }
             }
 
-            // El equipo de verdad, el que da las características. Sale de WornOf y no de
-            // Equipment.All: aquel lee la sesión, así que sólo sabía del personaje que estaba
-            // jugando y a todos los demás —los de la pantalla de selección, los otros jugadores
-            // del mapa, el rival del combate— los dibujaba sin nada puesto.
+            // The real equipment, the one that gives the characteristics. It comes from WornOf and not
+            // from Equipment.All: that one reads the session, so it only knew about the character
+            // playing and drew all the others -- those of the selection screen, the other players on
+            // the map, the rival in a fight -- with nothing on.
             //
-            // Sólo se sabe la piel de lo medido en equipment_skins.json; lo demás no viste.
+            // Only the skin of what is measured in equipment_skins.json is known; the rest does not dress.
             foreach (var (hueco, plantilla) in Equipment.WornOf(quien))
             {
-                if (tapados.Contains(hueco)) continue;   // lo tapa un cosmético
+                if (tapados.Contains(hueco)) continue;   // a cosmetic covers it
 
                 int piel = EquipmentSkins.SkinOf(plantilla);
                 if (piel > 0 && !skins.Contains(piel)) skins.Add(piel);
             }
 
-            // Y las prendas de apariencia, que entran en lugar de la que acaba de quedarse fuera.
+            // And the appearance garments, which go in place of the one just left out.
             if (appearance != null)
             {
                 foreach (var prenda in appearance)
                 {
-                    // La montura manda en la raíz y la mascota cuelga de ella: ninguna de las dos
-                    // toca las pieles del cuerpo, y de las dos se encarga BuildLook.
+                    // The mount rules the root and the pet hangs from it: neither touches the body's skins,
+                    // and BuildLook takes care of both.
                     if (prenda.Slot == Cosmetics.SlotMount || prenda.Slot == Cosmetics.SlotPet) continue;
 
-                    // Con el ojo cerrado la prenda sigue puesta pero no se dibuja.
+                    // With the eye closed the garment is still on but is not drawn.
                     if (prenda.Hidden) continue;
 
-                    // La variante viaja dentro del uid que compuso la ventana (gid*1000+variante),
-                    // y hace falta: un objeto viviente imita una prenda u otra según cuál se elija.
+                    // The variant travels inside the uid the window composed (gid*1000+variant), and it is
+                    // needed: a living item imitates one garment or another depending on which is chosen.
                     foreach (int piel in Cosmetics.SkinsOf(prenda.Gid, VarianteDe(prenda)))
                     {
                         if (piel > 0 && !skins.Contains(piel)) skins.Add(piel);
@@ -406,8 +432,8 @@ namespace Jondo.Unity.Server.Managers
                 colours.Add($"{i + 1}=#{plain[i] & 0xFFFFFF:X6}");
             }
 
-            // El tamaño de verdad, el mismo que va al f5: lo que declara la raza con el porcentaje
-            // del personaje ya aplicado.
+            // The real size, the same that goes to f5: what the breed declares with the character's
+            // percentage already applied.
             long scale = 100;
             if (baseLook.Scales.Count > 0)
             {
@@ -419,11 +445,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Cuelga las mascotas de apariencia del enganche 1 de la raíz.
+        /// Hangs the appearance pets from attachment 1 of the root.
         ///
-        /// Cuarenta y cuatro de las medidas mandan un color idéntico byte a byte al del propio
-        /// personaje: no es una paleta suya, es el tinte de quien la lleva, así que se copia. Y la
-        /// escala ausente es la de por defecto, no cero.
+        /// Forty-four of the measured ones send a colour identical byte for byte to the character's own:
+        /// it is not a palette of their own, it is the tint of whoever carries them, so it is copied. And
+        /// a missing scale is the default one, not zero.
         /// </summary>
         private static void AddPets(Pb raiz, IReadOnlyList<Wardrobe.Worn> prendas,
                                     IReadOnlyList<long> coloresDelPortador)
@@ -449,19 +475,19 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Los colores que lleva el personaje, ya indexados como van por el cable.</summary>
+        /// <summary>The colours the character wears, already indexed as they go on the wire.</summary>
         private static List<long> ColorsFor(int breedId, int sex, IReadOnlyList<long>? customColors)
             => (customColors != null && customColors.Count > 0)
                 ? new List<long>(customColors)
                 : IndexColors(Get(breedId, sex)?.Colors);
 
         /// <summary>
-        /// Los mismos colores pero SIN el índice, que es como los quiere el vestuario.
+        /// The same colours but WITHOUT the index, which is how the wardrobe wants them.
         ///
-        /// En el aspecto cada color viaja con su hueco en el byte alto (0x01e1b99d, 0x02b4a1bb...);
-        /// en un conjunto guardado van pelados (0xe1b99d, 0xb4a1bb...). Son los mismos seis y en el
-        /// mismo orden —comprobado sobre el lyt de la captura—, pero si se mandan indexados el
-        /// cliente no construye su ColorSet y la ventana de cosméticos se cae al abrirse.
+        /// In the look each colour travels with its slot in the high byte (0x01e1b99d, 0x02b4a1bb...); in a
+        /// saved set they go bare (0xe1b99d, 0xb4a1bb...). They are the same six and in the same order --
+        /// checked on the capture's lyt --, but if they are sent indexed the client does not build its
+        /// ColorSet and the cosmetics window falls over on opening.
         /// </summary>
         public static List<long> PlainColors(int breedId, int sex, IReadOnlyList<long>? customColors)
         {
@@ -475,13 +501,13 @@ namespace Jondo.Unity.Server.Managers
             return salida;
         }
 
-        /// <summary>Dónde se enganchan las mascotas. El 2 es el jinete y el 6 el aura.</summary>
+        /// <summary>Where pets attach. 2 is the rider and 6 the aura.</summary>
         private const int PetBindingPoint = 1;
 
         /// <summary>
-        /// La variante que se eligió para una prenda. La ventana de apariencias no manda uid de
-        /// inventario sino el número de plantilla, así que AppearanceHandler compone uno con la
-        /// variante dentro (gid*1000+variante); aquí se deshace.
+        /// The variant chosen for a garment. The appearance window does not send an inventory uid but the
+        /// template number, so AppearanceHandler composes one with the variant inside (gid*1000+variant);
+        /// here it is undone.
         /// </summary>
         private static int VarianteDe(Wardrobe.Worn prenda)
         {

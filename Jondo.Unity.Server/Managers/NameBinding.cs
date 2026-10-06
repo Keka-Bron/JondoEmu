@@ -8,29 +8,29 @@ using System.Text;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Ligar un opcode de tres letras a su nombre de verdad, a mano y con el paquete delante.
+    /// Binding a three-letter opcode to its real name, by hand and with the packet in front.
     ///
-    /// Los nombres reales están en el cliente —513 de ellos, en <c>datos/nombres_reales_*.tsv</c>—
-    /// pero HUÉRFANOS: nada dentro del cliente dice cuál va con cuál. Se comprobó de cuatro maneras
-    /// distintas y ninguna dio el enlace, así que no hay forma automática de saberlo.
+    /// The real names are in the client —513 of them, in <c>datos/nombres_reales_*.tsv</c>—
+    /// but ORPHANED: nothing inside the client says which goes with which. It was checked four
+    /// different ways and none gave the link, so there is no automatic way of knowing it.
     ///
-    /// Lo que sí se puede es reconocerlo mirando. El registro enseña el paquete con sus campos y
-    /// hacia dónde va; con eso delante, elegir de una lista cerrada de 513 nombres no es adivinar,
-    /// es identificar. Lo que se elige se guarda y ya no se vuelve a preguntar.
+    /// What can be done is recognise it by looking. The log shows the packet with its fields and
+    /// which way it goes; with that in front, choosing from a closed list of 513 names is not guessing,
+    /// it is identifying. What is chosen is stored and never asked again.
     ///
-    /// ─── Por qué esto vive aquí y no en Jondo.Unity.Reversing ───────────────────────────────
+    /// ─── Why this lives here and not in Jondo.Unity.Reversing ───────────────────────────────
     ///
-    /// Leer y escribir dos ficheros de texto no justifica que el servidor dependa de la biblioteca
-    /// de ingeniería inversa, que arrastra Cpp2IL y 110 MB de análisis de binarios. El formato es de
-    /// dos columnas separadas por tabulador; que lo lean los dos por su cuenta sale más barato que
-    /// atarlos.
+    /// Reading and writing two text files does not justify the server depending on the reverse
+    /// engineering library, which drags along Cpp2IL and 110 MB of binary analysis. The format is
+    /// two tab-separated columns; having both read it on their own comes cheaper than
+    /// tying them together.
     /// </summary>
     public static class NameBinding
     {
         private static List<string>? _real;
         private static Dictionary<string, string>? _bound;
 
-        /// <summary>La versión del cliente que se está emulando, que es la que nombra los ficheros.</summary>
+        /// <summary>The version of the client being emulated, which is what names the files.</summary>
         public const string Version = "3.6.10.10";
 
         private static string Real => Paths.Resolve($"nombres_reales_{Version}.tsv");
@@ -38,7 +38,7 @@ namespace Jondo.Unity.Server.Managers
 
         private static Dictionary<string, string>? _domain;
 
-        /// <summary>Los nombres que el cliente lleva dentro, para elegir de ahí.</summary>
+        /// <summary>The names the client carries inside, to choose from.</summary>
         public static IReadOnlyList<string> Catalogue()
         {
             if (_real != null) return _real;
@@ -57,9 +57,9 @@ namespace Jondo.Unity.Server.Managers
 
                     _real.Add(name);
 
-                    // El dominio sale de la ruta: de «…Protocol.Group.Search.LobbyApplyResponse»
-                    // queda «groupsearch». Se quitan los puntos y las mayúsculas porque el cliente
-                    // lo escribe junto —UILogic.GroupSearch— y así las dos formas se encuentran.
+                    // The domain comes from the path: «…Protocol.Group.Search.LobbyApplyResponse»
+                    // leaves «groupsearch». The dots and capitals are removed because the client
+                    // writes it together —UILogic.GroupSearch— and that way both forms meet.
                     if (parts.Length < 2) continue;
                     string full = parts[1].Trim();
                     int protocolo = full.IndexOf(".Protocol.", StringComparison.Ordinal);
@@ -78,7 +78,7 @@ namespace Jondo.Unity.Server.Managers
             return _real;
         }
 
-        /// <summary>De qué familia es este nombre: «inventory», «fight», «groupsearch»…</summary>
+        /// <summary>Which family this name belongs to: «inventory», «fight», «groupsearch»…</summary>
         public static string Domain(string name)
         {
             Catalogue();
@@ -88,15 +88,15 @@ namespace Jondo.Unity.Server.Managers
         private static Dictionary<string, HashSet<string>>? _hints;
 
         /// <summary>
-        /// De qué va este opcode, según el código del cliente que lo toca.
+        /// What this opcode is about, according to the client code that touches it.
         ///
-        /// El índice de la etapa 3 anota qué métodos del cliente mencionan cada mensaje, y algunos
-        /// conservan el espacio de nombres legible: <c>Core.UILogic.Inventory.Inventory::AddObjectItem</c>.
-        /// Ese «Inventory» es la misma palabra que usa el protocolo para agrupar sus mensajes, así que
-        /// sirve de pista para ordenar la lista.
+        /// The stage 3 index notes which client methods mention each message, and some
+        /// keep the readable namespace: <c>Core.UILogic.Inventory.Inventory::AddObjectItem</c>.
+        /// That «Inventory» is the same word the protocol uses to group its messages, so it
+        /// serves as a hint to sort the list.
         ///
-        /// No decide nada —una pista no es una respuesta— pero pone delante la docena de nombres de
-        /// la familia correcta en vez de los 513 por orden alfabético.
+        /// It decides nothing —a hint is not an answer— but it puts in front the dozen names of
+        /// the right family instead of the 513 in alphabetical order.
         /// </summary>
         public static IReadOnlyCollection<string> Hints(string opcode)
         {
@@ -132,22 +132,22 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Saca las palabras legibles de un nombre como «Core.UILogic.Inventory.X::Y».</summary>
+        /// <summary>Extracts the readable words from a name like «Core.UILogic.Inventory.X::Y».</summary>
         private static void Harvest(string? method, HashSet<string> into)
         {
             if (method == null) return;
 
             foreach (string piece in method.Split(new[] { '.', ':', '+', '<', '>' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                // Se exige mayúscula inicial y cinco letras.
+                // An initial capital and five letters are required.
                 //
-                // Los nombres que el ofuscador ha tocado son tiras cortas y en minúscula —bkii,
-                // bgmh, baze—, y sin este filtro entraban a puñados: eran las «pistas» más
-                // frecuentes de todas y no distinguen nada. Un identificador que el ofuscador
-                // respetó conserva su mayúscula.
+                // The names the obfuscator has touched are short lowercase strings —bkii,
+                // bgmh, baze—, and without this filter they came in by the handful: they were the most
+                // frequent «hints» of all and they distinguish nothing. An identifier the obfuscator
+                // respected keeps its capital.
                 if (piece.Length < 5 || !char.IsUpper(piece[0])) continue;
 
-                // Y las que lleva medio cliente tampoco dicen de qué va el mensaje.
+                // And the ones half the client carries do not say what the message is about either.
                 if (piece is "Core" or "UILogic" or "Services" or "Update" or "Initialize"
                           or "Manager" or "Handler" or "Component") continue;
 
@@ -155,7 +155,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Lo que ya está ligado.</summary>
+        /// <summary>What is already bound.</summary>
         public static IReadOnlyDictionary<string, string> All()
         {
             if (_bound != null) return _bound;
@@ -176,19 +176,19 @@ namespace Jondo.Unity.Server.Managers
             return _bound;
         }
 
-        /// <summary>El nombre de este opcode si alguien lo ha ligado, o cadena vacía.</summary>
+        /// <summary>This opcode's name if someone has bound it, or an empty string.</summary>
         public static string Of(string opcode)
             => All().TryGetValue(opcode, out string? name) ? name : "";
 
         private static Dictionary<string, string>? _meaning;
 
         /// <summary>
-        /// Qué hace este mensaje, según las anclas.
+        /// What this message does, according to the anchors.
         ///
-        /// Esto es lo único de las anclas que se sigue usando: el significado está MEDIDO contra 242
-        /// capturas y es cierto. Los nombres que las anclas proponían no, y por eso no se leen de
-        /// aquí. Delante de la lista de 513 nombres, saber qué hace el mensaje es lo que convierte
-        /// elegir en reconocer.
+        /// This is the only thing from the anchors still in use: the meaning is MEASURED against 242
+        /// captures and it is true. The names the anchors proposed are not, and that is why they are not read from
+        /// here. In front of the list of 513 names, knowing what the message does is what turns
+        /// choosing into recognising.
         /// </summary>
         public static string Meaning(string opcode)
         {
@@ -212,7 +212,7 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Guarda una ligadura. Con el nombre vacío se deshace, que también hace falta.
+        /// Stores a binding. With an empty name it is undone, which is also needed.
         /// </summary>
         public static void Bind(string opcode, string name)
         {
@@ -231,9 +231,9 @@ namespace Jondo.Unity.Server.Managers
             foreach (var pair in bound.OrderBy(p => p.Key, StringComparer.Ordinal))
                 text.AppendLine($"{pair.Key}\t{pair.Value}");
 
-            // Se escribe a un temporal y se mueve: si el disco falla a mitad, el fichero de antes
-            // sigue entero. Son ligaduras hechas a mano y perder una tarde de trabajo por una
-            // escritura a medias no tiene ninguna gracia.
+            // It is written to a temporary file and moved: if the disk fails halfway, the previous file
+            // is still whole. These are bindings made by hand and losing an afternoon of work to a
+            // half-done write is no fun at all.
             string path = Bound;
             string half = path + ".parcial";
             File.WriteAllText(half, text.ToString(), new UTF8Encoding(true));

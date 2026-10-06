@@ -9,16 +9,16 @@ using Jondo.Unity.Server.Managers;
 namespace Jondo.Unity.Server.UI
 {
     /// <summary>
-    /// Elegir el nombre de un opcode de entre los que el cliente lleva dentro.
+    /// Choosing an opcode's name from among those the client carries inside.
     ///
-    /// No es un campo de texto a propósito. Escribir a mano es lo que nos metió en el lío anterior:
-    /// los 99 nombres que proponían las anclas los escribimos nosotros por analogía con Dofus 2 y
-    /// ninguno era el de Ankama. Aquí sólo se puede elegir de la lista real, así que lo que salga es
-    /// un nombre que existe de verdad; lo único que hay que acertar es cuál.
+    /// It is not a text field on purpose. Typing by hand is what got us into the previous mess:
+    /// the 99 names the anchors proposed were written by us by analogy with Dofus 2 and
+    /// none was Ankama's. Here one can only choose from the real list, so whatever comes out is
+    /// a name that really exists; the only thing to get right is which one.
     ///
-    /// El filtro va por trozos sueltos: escribir «map mov» encuentra
-    /// <c>MapMovementConfirmResponse</c> sin tener que recordar el orden ni la mayúscula. Con 513
-    /// nombres, buscar por prefijo sería inservible.
+    /// The filter goes by loose pieces: typing «map mov» finds
+    /// <c>MapMovementConfirmResponse</c> without having to remember the order or the capitals. With 513
+    /// names, searching by prefix would be useless.
     /// </summary>
     internal sealed class NamePicker : Form, IBackgroundWindow
     {
@@ -26,10 +26,10 @@ namespace Jondo.Unity.Server.UI
         private readonly ListBox _list;
         private readonly float _escala;
 
-        /// <summary>Las familias que sugiere el código del cliente para este opcode.</summary>
+        /// <summary>The families the client code suggests for this opcode.</summary>
         private readonly HashSet<string> _hints;
 
-        /// <summary>El nombre elegido, o cadena vacía si se ha soltado la ligadura.</summary>
+        /// <summary>The chosen name, or an empty string if the binding has been released.</summary>
         public string Chosen { get; private set; } = "";
 
         public Image? ComposedBackground => null;
@@ -60,8 +60,8 @@ namespace Jondo.Unity.Server.UI
                 BackColor = Color.Transparent,
             };
 
-            // El significado medido va delante de la lista: es lo que permite reconocer el mensaje.
-            // Sin él esto sería elegir un nombre bonito de entre quinientos.
+            // The measured meaning goes before the list: it is what allows recognising the message.
+            // Without it this would be choosing a pretty name from among five hundred.
             var contexto = new Label
             {
                 Text = (meaning.Length > 0 ? meaning : "(no hay significado medido para este opcode)") +
@@ -128,12 +128,12 @@ namespace Jondo.Unity.Server.UI
         };
 
         /// <summary>
-        /// Si el código del cliente apunta a este nombre.
+        /// Whether the client code points to this name.
         ///
-        /// Vale por dos vías: que la FAMILIA coincida —el mensaje lo toca Core.UILogic.Inventory y
-        /// el nombre vive en el dominio «inventory»— o que la pista aparezca dentro del propio
-        /// nombre. Lo segundo pesca lo que el ofuscador dejó escapar en las máquinas de estado:
-        /// «&lt;WaitProcessMapComplementaryInfo&gt;d__31» lleva dentro media respuesta.
+        /// It holds in two ways: the FAMILY matches —Core.UILogic.Inventory touches the message and
+        /// the name lives in the «inventory» domain— or the hint appears inside the name
+        /// itself. The second catches what the obfuscator let slip in the state machines:
+        /// «&lt;WaitProcessMapComplementaryInfo&gt;d__31» carries half an answer inside.
         /// </summary>
         private bool Suggested(string name)
         {
@@ -144,19 +144,19 @@ namespace Jondo.Unity.Server.UI
             return _hints.Any(h => h.Length >= 6 && plain.Contains(h, StringComparison.Ordinal));
         }
 
-        /// <summary>Rellena la lista con lo que case con todos los trozos del filtro.</summary>
+        /// <summary>Fills the list with whatever matches all the filter's pieces.</summary>
         private void Fill()
         {
             string[] parts = _filter.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            // El orden tiene tres criterios, y en este orden:
+            // The order has three criteria, in this order:
             //
-            //   1. la FAMILIA que sugiere el código del cliente. Si al mensaje lo toca
-            //      Core.UILogic.Inventory, los nombres del dominio «inventory» van arriba. Es lo que
-            //      convierte elegir entre 513 en confirmar entre una docena.
-            //   2. los que EMPIEZAN por lo escrito. Buscar por dentro hace falta —«mov» tiene que
-            //      encontrar MapMovementEvent— pero la mano escribe esperando un prefijo.
-            //   3. alfabético, para que la lista no baile entre pulsaciones.
+            //   1. the FAMILY the client code suggests. If
+            //      Core.UILogic.Inventory touches the message, the names of the «inventory» domain go on top. It is what
+            //      turns choosing among 513 into confirming among a dozen.
+            //   2. the ones STARTING with what was typed. Searching inside is needed —«mov» has to
+            //      find MapMovementEvent— but the hand types expecting a prefix.
+            //   3. alphabetical, so that the list does not jump around between keystrokes.
             var matches = NameBinding.Catalogue()
                 .Where(n => parts.All(p => n.Contains(p, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(n => Suggested(n) ? 0 : 1)

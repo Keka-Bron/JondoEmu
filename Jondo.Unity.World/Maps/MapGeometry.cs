@@ -73,18 +73,18 @@ namespace Jondo.Unity.World.Maps
             => CellByPoint.TryGetValue((x, y), out int c) ? c : -1;
 
         /// <summary>
-        /// La casilla simétrica de otra respecto a un pivote: el otro lado, a la misma distancia.
+        /// The cell symmetric to another relative to a pivot: the other side, at the same distance.
         /// </summary>
         /// <remarks>
-        /// Lo piden los cuatro teletransportes simétricos del catálogo —1104 respecto al objetivo,
-        /// 1105 respecto al lanzador, 1106 y 1100—, que entre ellos tocan 54 hechizos de clase.
+        /// The catalogue's four symmetric teleports ask for it —1104 relative to the target,
+        /// 1105 relative to the caster, 1106 and 1100—, which between them touch 54 class spells.
         ///
-        /// Se hace en coordenadas del mapa y no sobre el número de casilla: la retícula de Dofus
-        /// va en diagonal, así que sumar o restar al índice de la casilla da un sitio que no tiene
-        /// nada que ver con el reflejo. Con (x, y) es una resta y ya.
+        /// It is done in map coordinates and not on the cell number: the Dofus grid
+        /// runs diagonally, so adding to or subtracting from the cell's index gives a place that has
+        /// nothing to do with the reflection. With (x, y) it is a subtraction and that is it.
         ///
-        /// Devuelve -1 cuando el reflejo cae fuera del tablero, para que quien llame decida qué
-        /// hacer en vez de mandar a alguien a una casilla que no existe.
+        /// Returns -1 when the reflection falls off the board, so that the caller decides what to
+        /// do instead of sending someone to a cell that does not exist.
         /// </remarks>
         public static int Reflejar(int casilla, int pivote)
         {
@@ -123,6 +123,15 @@ namespace Jondo.Unity.World.Maps
         public static bool HasLineOfSight(int fromCell, int toCell, HashSet<int> blockers)
         {
             if (blockers == null || blockers.Count == 0) return true;
+            return HasLineOfSight(fromCell, toCell, blockers.Contains);
+        }
+
+        /// <summary>
+        /// The same walk, with whatever blocks sight asked cell by cell: the map's opaque cells
+        /// and, in a fight, the fighters standing between.
+        /// </summary>
+        public static bool HasLineOfSight(int fromCell, int toCell, Func<int, bool> opaque)
+        {
             if (!IsValid(fromCell) || !IsValid(toCell) || fromCell == toCell) return true;
 
             int x0 = PointX[fromCell], y0 = PointY[fromCell];
@@ -154,7 +163,7 @@ namespace Jondo.Unity.World.Maps
                         int cell = PointToCell(gx, gy);
                         if (cell < 0 || cell == fromCell || cell == toCell) continue;
                         anyCell = true;
-                        if (!blockers.Contains(cell)) anyOpen = true;
+                        if (!opaque(cell)) anyOpen = true;
                     }
                 }
 
@@ -267,8 +276,8 @@ namespace Jondo.Unity.World.Maps
                 int fromCell = vertices[i];
                 int toCell = vertices[i + 1];
 
-                // Las casillas ocupadas también cortan: sin pasarlas, el camino atraviesa a los
-                // demás combatientes y además sale más corto de lo que de verdad se anda.
+                // Occupied cells cut too: without stepping over them, the path goes through the
+                // other fighters and also comes out shorter than what is really walked.
                 var stepPath = FindShortestPath(fromCell, toCell, walkableCells, occupiedCells);
                 if (stepPath.Count > 1)
                 {

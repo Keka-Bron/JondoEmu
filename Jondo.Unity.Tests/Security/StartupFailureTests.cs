@@ -40,14 +40,14 @@ namespace Jondo.Unity.Tests.Security
             try
             {
                 log.WriteLine(Program.StartupFailure(new InvalidOperationException("no arranca")));
-                // Sin Flush: LogFile abre con AutoFlush, cada linea va al disco al escribirla.
+                // No Flush: LogFile opens with AutoFlush, each line goes to disk as it is written.
 
                 Assert.True(File.Exists(path), "el fallo de arranque no ha llegado a ningún fichero");
 
-                // Compartiendo, y no con File.ReadAllText: LogFile deja el fichero abierto con
-                // FileShare.ReadWrite mientras el servidor vive, así que abrirlo en exclusiva —que
-                // es lo que hace ReadAllText— falla con «lo está usando otro proceso». Es lo mismo
-                // que le pasa a quien intenta mirar logs/debug.log con el servidor levantado.
+                // Shared, and not with File.ReadAllText: LogFile leaves the file open with
+                // FileShare.ReadWrite while the server lives, so opening it exclusively —which
+                // is what ReadAllText does— fails with «lo está usando otro proceso». It is the same
+                // that happens to whoever tries to look at logs/debug.log with the server up.
                 using var stream = new FileStream(path, FileMode.Open, FileAccess.Read,
                                                   FileShare.ReadWrite);
                 using var reader = new StreamReader(stream);

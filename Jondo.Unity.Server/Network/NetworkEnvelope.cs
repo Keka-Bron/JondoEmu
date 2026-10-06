@@ -389,13 +389,13 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Salta el campo que hay en pos.
+        /// Skips the field at pos.
         ///
-        /// Todos los saltos acaban al final del buffer como muy lejos. Antes «pos += (int)len»
-        /// con una longitud inventada podia dejar pos NEGATIVO, y quien llama recorre con
-        /// «while (pos < bytes.Length)»: el bucle no terminaba nunca. Y un tipo de cable de los
-        /// que no se usan lanzaba una excepcion en mitad del enrutado. Las dos cosas terminan
-        /// ahora poniendo pos al final, que es lo que se hace con lo que no se entiende.
+        /// All the skips end at the end of the buffer at the furthest. Before, Â«pos += (int)lenÂ»
+        /// with an invented length could leave pos NEGATIVE, and the caller walks with
+        /// Â«while (pos < bytes.Length)Â»: the loop never ended. And one of the unused wire
+        /// types threw an exception in the middle of routing. Both things now end
+        /// by putting pos at the end, which is what is done with what is not understood.
         /// </summary>
         public static void SkipField(byte[] bytes, int wireType, ref int pos)
         {
@@ -500,12 +500,12 @@ namespace Jondo.Unity.Server.Network
             string expectedTypeUrl,
             int depth)
         {
-            // Protection contre une récursion foireuse
+            // Guard against runaway recursion
             if (depth > 8)
                 return null;
 
             /*
-             * Cherche d'abord si CE message est directement un google.protobuf.Any :
+             * First checks whether THIS message is directly a google.protobuf.Any:
              *
              * field1 = type_url
              * field2 = value
@@ -545,13 +545,13 @@ namespace Jondo.Unity.Server.Network
                 }
                 catch
                 {
-                    // Ce field1 n'était simplement pas une string.
+                    // This field1 simply was not a string.
                 }
             }
 
             /*
-             * Sinon on descend dans tous les fields protobuf
-             * length-delimited.
+             * Otherwise go down into every length-delimited
+             * protobuf field.
              */
 
             foreach (
@@ -582,9 +582,9 @@ namespace Jondo.Unity.Server.Network
                 catch
                 {
                     /*
-                     * Normal :
-                     * certains wire type 2 sont des strings
-                     * ou des bytes quelconques et non des protobuf.
+                     * Expected:
+                     * some wire type 2 fields are strings
+                     * or arbitrary bytes, not protobuf.
                      */
                 }
             }

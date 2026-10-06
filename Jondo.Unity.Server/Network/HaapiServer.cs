@@ -39,9 +39,9 @@ namespace Jondo.Unity.Server.Network
                     {
                         var ctx = await _listener.GetContextAsync();
 
-                        // Con techo. Antes se despachaba a pelo con «_ = ...», sin cola ni límite,
-                        // así que N peticiones simultáneas sumaban sus cuerpos en memoria y sus
-                        // PBKDF2 en hilos. El semáforo no rechaza a nadie: hace esperar.
+                        // With a ceiling. Before, it was dispatched bare with «_ = ...», with no queue or limit,
+                        // so N simultaneous requests added up their bodies in memory and their
+                        // PBKDF2 in threads. The semaphore rejects nobody: it makes them wait.
                         _ = AtenderConTechoAsync(ctx);
                     }
                     catch (Exception ex)
@@ -63,25 +63,25 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El latido del lanzador: «¿estás ahí?» y «¿quién tiene cliente abierto?».
+        /// The launcher's heartbeat: «are you there?» and «who has a client open?».
         ///
-        /// La ventana del lanzador lo pregunta cada dos segundos, y cada vuelta escribía cuatro
-        /// líneas —la petición y el cuerpo, por dos rutas—. Eso son ciento veinte líneas por
-        /// minuto que no cuentan nada, y ahora que el registro sólo se ve en el servidor entierran
-        /// lo que sí importa: quién entra, qué mapa se carga, qué pelea empieza. Se atienden
-        /// exactamente igual; simplemente no se anotan.
+        /// The launcher window asks it every two seconds, and each round wrote four
+        /// lines —the request and the body, for two routes—. That is a hundred and twenty lines per
+        /// minute that say nothing, and now that the log is only seen on the server they bury
+        /// what does matter: who logs in, which map is loaded, which fight starts. They are handled
+        /// exactly the same; they are simply not logged.
         /// </summary>
         private static bool EsLatido(string path)
             => path == Contract.Prefijo + "estado" || path == Contract.Prefijo + "activos";
 
-        /// <summary>Lo más grande que se acepta como cuerpo. El JSON mayor de estas rutas no llega a 1 KB.</summary>
+        /// <summary>The largest thing accepted as a body. The biggest JSON of these routes does not reach 1 KB.</summary>
         private const int TopeDelCuerpo = 64 * 1024;
 
-        /// <summary>Cuántas peticiones se atienden a la vez.</summary>
+        /// <summary>How many requests are handled at once.</summary>
         /// <remarks>
-        /// Cada una puede costar un PBKDF2 —210.000 vueltas, unos 400 ms medidos— así que sin techo
-        /// un puñado de peticiones simultáneas se lleva el hilo de todos. Ocho es holgado para un
-        /// canal de mando que usa un lanzador.
+        /// Each one can cost a PBKDF2 —210,000 rounds, some 400 ms measured— so without a ceiling
+        /// a handful of simultaneous requests takes everyone's thread. Eight is ample for a
+        /// control channel used by a launcher.
         /// </remarks>
         private static readonly SemaphoreSlim _aLaVez = new SemaphoreSlim(8, 8);
 
@@ -93,12 +93,12 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El cuerpo, sin pasar de <see cref="TopeDelCuerpo"/>. Cadena vacía si se pasa.
+        /// The body, without going over <see cref="TopeDelCuerpo"/>. Empty string if it goes over.
         /// </summary>
         /// <remarks>
-        /// No basta con mirar Content-Length: una petición con Transfer-Encoding: chunked no lo
-        /// trae, y entonces el tope de arriba no ve nada que comparar. Aquí se cuenta lo leído de
-        /// verdad y se corta.
+        /// Looking at Content-Length is not enough: a request with Transfer-Encoding: chunked does not
+        /// bring it, and then the ceiling above sees nothing to compare. Here what is really read
+        /// is counted and cut.
         /// </remarks>
         private static async Task<string> LeerAcotadoAsync(HttpListenerRequest req)
         {
@@ -136,13 +136,13 @@ namespace Jondo.Unity.Server.Network
                 return;
             }
 
-            // El cuerpo, con tope y ANTES de decidir si la ruta pide token. Ese orden no se puede
-            // cambiar —hay rutas que no piden ninguno, como /api/estado— así que el tope es la única
-            // defensa: sin él, ReadToEndAsync se traga lo que le manden. HttpListener no acota el
-            // cuerpo por su cuenta (el MaxRequestBytes de http.sys es para la línea de petición y
-            // las cabeceras, no para la entidad), y ReadToEndAsync acumula en un StringBuilder y
-            // luego hace ToString(), o sea que el pico de memoria es del orden de cuatro veces lo
-            // enviado. 64 KB sobra para el JSON más grande de estas rutas.
+            // The body, with a ceiling and BEFORE deciding whether the route asks for a token. That order cannot be
+            // changed —there are routes that ask for none, like /api/estado— so the ceiling is the only
+            // defence: without it, ReadToEndAsync swallows whatever it is sent. HttpListener does not bound the
+            // body on its own (http.sys's MaxRequestBytes is for the request line and
+            // the headers, not for the entity), and ReadToEndAsync accumulates in a StringBuilder and
+            // then does ToString(), so the memory peak is on the order of four times what was
+            // sent. 64 KB is more than enough for the biggest JSON of these routes.
             string body = "";
             if (req.HasEntityBody)
             {
@@ -167,9 +167,9 @@ namespace Jondo.Unity.Server.Network
                     Console.WriteLine($"[HAAPI]  body: {Censura.Cuerpo(body)}");
             }
 
-            // Las rutas de mando del lanzador. Estuvieron aquí, se borraron al pasar a la ventana
-            // nativa —"peso muerto con una puerta abierta encima"— y vuelven ahora que el lanzador
-            // es otro proceso y no puede llamar a nadie por memoria.
+            // The launcher's control routes. They were here, were deleted when moving to the native
+            // window —"dead weight with an open door on top"— and come back now that the launcher
+            // is another process and cannot call anyone through memory.
             //
             // What closes the door is ConRol, inside ControlApi: a token the database recognises plus
             // the administrator role, checked server-side on every request. It is NOT the secret --
@@ -435,21 +435,21 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Elegir servidor: devuelve el token con el que el cliente se conectara al de juego.
+        /// Choosing a server: returns the token the client will connect to the game server with.
         /// </summary>
         /// <remarks>
-        /// EL TOKEN SE REGISTRA, que es lo que aqui faltaba. Es el mismo fallo que tenia el kqr de
-        /// la vuelta atras: se acunaba un identificador, se le mandaba al cliente y no se guardaba
-        /// en ningun sitio, asi que cuando el cliente lo presentaba no lo reconocia nadie y se le
-        /// cerraba la conexion.
+        /// THE TOKEN IS REGISTERED, which is what was missing here. It is the same bug the kqr of
+        /// going back had: an identifier was minted, sent to the client and not stored
+        /// anywhere, so when the client presented it nobody recognised it and its
+        /// connection was closed.
         ///
-        /// Aquella se descubrio porque el jugador la pisaba; esta no la pisa NADIE con este
-        /// cliente -en las 6.803 lineas del registro y sus veinte arranques, esta ruta y la de
-        /// GameToken tienen cero visitas; las unicas /json/ que pide son Cms/PollInGame/Get,
-        /// Cms/Items/GetFeeds y Game/SendEvent-. O sea que es la misma puerta rota esperando a que
-        /// alguien la abra, no un fallo que se este viendo. Se arregla igual.
+        /// That one was discovered because the player stepped on it; this one NOBODY steps on with this
+        /// client -in the 6,803 lines of the log and its twenty starts, this route and the
+        /// GameToken one have zero visits; the only /json/ it asks for are Cms/PollInGame/Get,
+        /// Cms/Items/GetFeeds and Game/SendEvent-. So it is the same broken door waiting for
+        /// someone to open it, not a bug being seen. It is fixed the same way.
         ///
-        /// Con la cuenta a cero no se registra nada: seria dejar un token valido sin dueno.
+        /// With the account at zero nothing is registered: it would be leaving a valid token with no owner.
         /// </remarks>
         private static string SelectServerResponse(long accountId)
         {

@@ -25,14 +25,14 @@ namespace Jondo.Unity.Server.Handlers
     /// they are 9 to 14 -- six slots, not three. Measured in the same session: the weapon is 1
     /// (and 0x3f, the bag, when taken off), the hat 6, the two rings 2 and 4, and the dragoturkey 8.
     ///
-    /// En cada hueco cabe una cosa, y eso lo hace cumplir este handler: lo que ya estuviera puesto
-    /// sale a la bolsa con su propio ivq antes de que entre lo nuevo.
+    /// Each slot holds one thing, and this handler enforces it: whatever was already worn goes to
+    /// the bag with its own ivq before the new one goes in.
     ///
-    /// Al mover algo se actualiza tambien la cache de lo que se lleva puesto, que es la que
-    /// alimenta StatsHandler.GetEquipBonus y con ella la ficha de COMBATE -vida maxima,
-    /// iniciativa-. No la de caracteristicas: esa se construye con Equipment.Bonuses() sobre el
-    /// inventario de verdad y nunca estuvo vieja por esta ruta. Antes la cache si lo estaba, y los
-    /// bonus de combate no llegaban hasta la siguiente seleccion de personaje.
+    /// Moving something also updates the cache of what is worn, which feeds
+    /// StatsHandler.GetEquipBonus and with it the FIGHT sheet -- maximum life, initiative --. Not the
+    /// characteristics one: that one is built with Equipment.Bonuses() over the real inventory and
+    /// was never stale through this road. The cache was, before, and the fight bonuses did not
+    /// arrive until the next character selection.
     /// </summary>
     public static class EquipmentHandler
     {
@@ -59,14 +59,14 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (uid == 0) return;
 
-            // NO SE PONE LO QUE NO SE PUEDE LLEVAR. El servidor no miraba el nivel del objeto, asi
-            // que un personaje de nivel 1 se equipaba un arma de nivel 110 y se quedaba con sus
-            // bonus: el cliente lo pinta en gris y no deja arrastrarlo, pero un cliente tocado
-            // manda el iuk igual y aqui se aceptaba sin preguntar.
+            // WHAT CANNOT BE WORN IS NOT PUT ON. The server did not look at the item's level, so a
+            // level 1 character equipped a level 110 weapon and kept its bonuses: the client draws it
+            // grey and does not let it be dragged, but a tampered client sends the iuk anyway and here
+            // it was accepted without asking.
             //
-            // El nivel sale del campo level de la plantilla, que lo traen LAS 21.748 -no hay que
-            // adivinarlo para ninguna-. Solo se comprueba al PONER: sacar algo a la bolsa siempre
-            // se puede, que si no un personaje que perdiera nivel se quedaria sin poder desnudarse.
+            // The level comes from the template's level field, which ALL 21,748 carry -- it does not
+            // have to be guessed for any --. It is only checked when PUTTING ON: taking something to
+            // the bag is always allowed, otherwise a character who lost levels could not undress.
             if (position != Bag)
             {
                 var loSuyo = Managers.Equipment.ByUid(uid);
@@ -81,8 +81,8 @@ namespace Jondo.Unity.Server.Handlers
                         ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
                             Managers.InfoMessages.Warning, Managers.InfoMessages.LevelTooLow)));
 
-                    // Y se le devuelve a donde estaba, que si no el cliente lo deja dibujado en el
-                    // hueco nuevo hasta que algo le refresque el inventario.
+                    // And it is put back where it was, otherwise the client leaves it drawn in the new slot
+                    // until something refreshes its inventory.
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Ivq,
                             Pb.New().Var(1, uid).Var(2, loSuyo!.Position).Build()));
@@ -90,10 +90,9 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            // En un hueco cabe uno. Lo que hubiera puesto sale a la bolsa antes de que entre lo
-            // nuevo, y se le manda su propio ivq: sin eso las dos cosas se quedaban en el mismo
-            // hueco a la vez y el aspecto lo decidía la primera que se encontrase, no la que el
-            // jugador acababa de ponerse.
+            // A slot holds one. Whatever was worn goes to the bag before the new one goes in, and its
+            // own ivq is sent: without that both things stayed in the same slot at once and the look
+            // was decided by the first one found, not by the one the player had just put on.
             var evictedUids = new System.Collections.Generic.List<long>();
             foreach (var evicted in Managers.Equipment.Occupants(position, uid))
             {
@@ -116,11 +115,11 @@ namespace Jondo.Unity.Server.Handlers
             DatabaseManager.SaveItemPosition(uid, position, SessionContext.State.CharacterId);
             bool known = Managers.Equipment.Move(uid, position);
 
-            // Sin condicionarlo a `known`, y eso importa. Managers.Equipment.LoadFrom se traga su
-            // propia excepcion, asi que si esa lectura falla Items queda vacio mientras la cache
-            // SI se lleno al elegir personaje, que lee por otra via. A partir de ahi `known` seria
-            // false en todos los iuk y el jugador podria quitarse la ropa entera y seguir peleando
-            // con las estadisticas puestas hasta cerrar sesion.
+            // Without making it depend on `known`, and that matters. Managers.Equipment.LoadFrom
+            // swallows its own exception, so if that read fails Items stays empty while the cache DID
+            // fill when the character was chosen, which reads by another road. From then on `known`
+            // would be false on every iuk and the player could take off all his clothes and keep
+            // fighting with the stats on until logging out.
             Managers.Equipment.RememberWorn(uid, position, Managers.Equipment.ByUid(uid)?.Effects);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -139,10 +138,10 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Iun,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.TotalStrength)));
 
-            // Y el aspecto, que es lo que hace que el personaje se suba a la montura sin tener que
-            // recargar el mapa. Son dos mensajes y hacen falta los dos: el jsn redibuja al muñeco
-            // del mapa y el lxc actualiza el de la ficha. En la captura salen en este orden, entre
-            // los tres de arriba y el peso.
+            // And the look, which is what makes the character get on the mount without having to
+            // reload the map. It is two messages and both are needed: the jsn redraws the figure on
+            // the map and the lxc updates the one on the sheet. In the capture they come in this
+            // order, between the three above and the weight.
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (character != null)
             {

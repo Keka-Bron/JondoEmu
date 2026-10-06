@@ -4,37 +4,37 @@ using System.Text;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// Emparejar el protocolo de una versión con el de la siguiente, cuando los nombres han cambiado.
+/// Matching one version's protocol with the next one's, when the names have changed.
 ///
-/// El problema, dicho corto: Ankama rota los nombres de tres letras en cada parche. El jsd de hoy
-/// se llamará otra cosa mañana, y hay dos mil mensajes. Emparejar a mano es inviable.
+/// The problem, put short: Ankama rotates the three-letter names on every patch. Today's jsd
+/// will be called something else tomorrow, and there are two thousand messages. Matching by hand is unfeasible.
 ///
-/// ─── Por qué no basta con mirar cada mensaje ────────────────────────────────────────────
+/// ─── Why looking at each message is not enough ──────────────────────────────────────────
 ///
-/// Un mensaje de { int64 f2 } es idéntico a otros trescientos. Comparando mensajes de uno en uno,
-/// los grandes se emparejan solos y los pequeños son imposibles: es la conclusión a la que llega
-/// el hilo de Cadernis, y es correcta MIENTRAS se miren sueltos.
+/// A message of { int64 f2 } is identical to three hundred others. Comparing messages one by one,
+/// the big ones match on their own and the small ones are impossible: it is the conclusion
+/// the Cadernis thread reaches, and it is correct AS LONG AS they are looked at in isolation.
 ///
-/// Pero un mensaje no está suelto: es un nodo de un grafo. Lo que identifica a un { int64 } no es
-/// su forma, es QUIÉN LE APUNTA. Si sólo aparece como campo 7 de un mensaje enorme que ya está
-/// emparejado con certeza, queda determinado aunque por dentro no tenga nada distintivo.
+/// But a message is not isolated: it is a node of a graph. What identifies an { int64 } is not
+/// its shape, it is WHO POINTS TO IT. If it only appears as field 7 of a huge message already
+/// matched with certainty, it is determined even though inside it has nothing distinctive.
 ///
-/// ─── Cómo ───────────────────────────────────────────────────────────────────────────────
+/// ─── How ────────────────────────────────────────────────────────────────────────────────
 ///
-/// Refinamiento por rondas, que es lo que se hace para comparar grafos:
+/// Refinement by rounds, which is what is done to compare graphs:
 ///
-///   ronda 0   la huella de un mensaje son sus campos: número, tipo y si es lista. De los que
-///             apuntan a otro mensaje sólo se anota que apuntan, no a quién.
-///   ronda k   la huella pasa a ser la de la ronda anterior MÁS las huellas de aquellos a los que
-///             apunta. Así la información de los vecinos se va propagando.
+///   round 0   a message's fingerprint is its fields: number, type and whether it is a list. Of those
+///             pointing to another message only that they point is noted, not to whom.
+///   round k   the fingerprint becomes the previous round's PLUS the fingerprints of those it
+///             points to. That way the neighbours' information spreads.
 ///
-/// Al cabo de unas rondas, dos mensajes tienen la misma huella sólo si tienen la misma forma Y la
-/// misma vecindad hasta esa distancia. Los que quedan solos con su huella en las dos versiones se
-/// emparejan sin dudar.
+/// After a few rounds, two messages have the same fingerprint only if they have the same shape AND the
+/// same neighbourhood up to that distance. The ones left alone with their fingerprint in both versions
+/// are matched without hesitation.
 ///
-/// Después se propaga por los campos: si a y b están emparejados y su campo 7 apunta a ta y a tb,
-/// entonces ta y tb son el mismo mensaje. Eso arrastra a los pequeños, que es donde estaba el
-/// problema.
+/// Then it is propagated through the fields: if a and b are matched and their field 7 points to ta and tb,
+/// then ta and tb are the same message. That drags the small ones along, which is where the
+/// problem was.
 /// </summary>
 public static class Matcher
 {
@@ -46,7 +46,7 @@ public static class Matcher
         List<string> Alone,
         Dictionary<string, List<string>> Candidates);
 
-    /// <summary>Empareja los mensajes de las dos versiones.</summary>
+    /// <summary>Matches the messages of the two versions.</summary>
     public static Result Match(Model a, Model b, int rounds = 5)
     {
         var pairs = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -55,10 +55,10 @@ public static class Matcher
         var signA = Signatures(a, rounds);
         var signB = Signatures(b, rounds);
 
-        // ─── Las semillas: huella única a los dos lados ─────────────────────────────────
+        // ─── The seeds: a unique fingerprint on both sides ──────────────────────────────
         //
-        // Se va de la ronda más profunda a la más superficial: cuanta más vecindad lleva dentro
-        // una huella, menos casualidad es que coincida.
+        // It goes from the deepest round to the shallowest: the more neighbourhood a fingerprint carries
+        // inside, the less of a coincidence it is that it matches.
         for (int round = rounds; round >= 0; round--)
         {
             var byA = Group(signA, round);
@@ -77,33 +77,33 @@ public static class Matcher
             }
         }
 
-        // ─── El riego: parecido, no igualdad ────────────────────────────────────────────
+        // ─── The watering: resemblance, not equality ────────────────────────────────────
         //
-        // Las semillas de arriba exigen que la huella coincida EXACTAMENTE, y eso sólo pasa cuando
-        // el mensaje no ha cambiado nada entre versiones. Entre 3.6.4.3 y 3.6.10.10 la mitad han
-        // cambiado —un campo nuevo aquí, un tipo cambiado allá— y con igualdad exacta se emparejó
-        // un mísero 5%.
+        // The seeds above require the fingerprint to match EXACTLY, and that only happens when
+        // the message has not changed at all between versions. Between 3.6.4.3 and 3.6.10.10 half have
+        // changed —a new field here, a changed type there— and with exact equality a measly
+        // 5% was matched.
         //
-        // Así que a partir de las semillas se riega: cada mensaje sin pareja se puntúa contra los
-        // candidatos que se le parezcan, sumando dos cosas —cuánto se parecen por dentro y cuántos
-        // de sus vecinos ya están emparejados entre sí— y se acepta el mejor si le saca ventaja al
-        // segundo. Cada ronda produce parejas nuevas que mejoran la puntuación de la siguiente,
-        // hasta que deja de moverse.
+        // So from the seeds on it is watered: each message without a pair is scored against the
+        // candidates that resemble it, adding two things —how much they resemble each other inside and how many
+        // of their neighbours are already matched with each other— and the best is accepted if it beats the
+        // second by a margin. Each round produces new pairs that improve the next one's score,
+        // until it stops moving.
         var messagesA = a.Messages.ToDictionary(m => m.Name, StringComparer.Ordinal);
         var messagesB = b.Messages.ToDictionary(m => m.Name, StringComparer.Ordinal);
 
         for (int round = 0; round < 12; round++)
         {
-            // ─── Arrastre por los padres ────────────────────────────────────────────────
+            // ─── Dragging through the parents ───────────────────────────────────────────
             //
-            // Ésta es la parte que de verdad mueve la aguja, y la que faltaba. Si a y b son el
-            // mismo mensaje y los dos tienen un campo 3 que apunta a otro mensaje, entonces esos
-            // dos son el mismo mensaje también, se parezcan a lo que se parezcan por dentro.
+            // This is the part that really moves the needle, and the one that was missing. If a and b are the
+            // same message and both have a field 3 pointing to another message, then those
+            // two are the same message too, however they resemble each other inside.
             //
-            // Sin esto, un mensaje de un solo campo es indistinguible de otros cuatrocientos: su
-            // forma no dice nada y su vecindad tampoco, porque no apunta a nadie. Lo que lo
-            // identifica es QUIÉN LE APUNTA, y eso sólo se sabe yendo de los padres a los hijos.
-            // De ahí que la primera versión emparejara un 5%: miraba únicamente hacia abajo.
+            // Without this, a single-field message is indistinguishable from four hundred others: its
+            // shape says nothing and neither does its neighbourhood, because it points to nobody. What
+            // identifies it is WHO POINTS TO IT, and that is only known going from the parents to the children.
+            // Hence the first version matched 5%: it only looked downwards.
             bool dragged = true;
             while (dragged)
             {
@@ -122,8 +122,8 @@ public static class Matcher
                         if (pairs.ContainsKey(field.Type) || takenB.Contains(twin.Type)) continue;
                         if (field.Repeated != twin.Repeated) continue;
 
-                        // Un mínimo de parecido, para que un campo que cambió de tipo entre
-                        // versiones no arrastre a una pareja falsa y ésta a otra detrás.
+                        // A minimum of resemblance, so that a field that changed type between
+                        // versions does not drag in a false pair and that one another behind it.
                         if (Similar(childA, childB, messagesA, messagesB, pairs) < 0.3 &&
                             childA.Fields.Count != childB.Fields.Count) continue;
 
@@ -152,8 +152,8 @@ public static class Matcher
                     else if (score > second) second = score;
                 }
 
-                // Dos listones a la vez: parecerse bastante, y parecerse MÁS QUE NINGÚN OTRO. Sin
-                // el segundo, los mensajes de un solo campo se emparejarían al azar entre ellos.
+                // Two bars at once: resembling enough, and resembling it MORE THAN ANY OTHER. Without
+                // the second, single-field messages would match each other at random.
                 if (winner != null && best >= 0.55 && best - second >= 0.08)
                 {
                     found.Add((one.Name, winner, best));
@@ -162,7 +162,7 @@ public static class Matcher
 
             if (found.Count == 0) break;
 
-            // Los mejores primero: si dos aspiran al mismo, se lo lleva el que más se parece.
+            // The best first: if two aim for the same one, the one that resembles it most gets it.
             foreach (var (from, to, _) in found.OrderByDescending(f => f.Score))
             {
                 if (pairs.ContainsKey(from) || takenB.Contains(to)) continue;
@@ -171,15 +171,15 @@ public static class Matcher
             }
         }
 
-        // ─── Los candidatos de cada duda ────────────────────────────────────────────────
+        // ─── Each doubt's candidates ────────────────────────────────────────────────────
         //
-        // Antes esto sólo contaba cuántos quedaban sin resolver. Contarlos no sirve de nada: lo que
-        // hace falta es la LISTA de a quién se parecen, porque un mensaje ambiguo no es un misterio,
-        // es una elección entre tres o cinco. Con esa lista corta —y sólo con ella— tiene sentido
-        // preguntarle a un modelo cuál es; con los dos mil candidatos delante, no.
+        // Before, this only counted how many were left unresolved. Counting them is no use: what
+        // is needed is the LIST of whom they resemble, because an ambiguous message is not a mystery,
+        // it is a choice among three or five. With that short list —and only with it— it makes sense
+        // to ask a model which it is; with the two thousand candidates in front, it does not.
         //
-        // Se descartan los que ya están cogidos por otra pareja: si el candidato tiene dueño, no es
-        // candidato.
+        // The ones already taken by another pair are discarded: if the candidate has an owner, it is not a
+        // candidate.
         var ambiguous = new List<string>();
         var alone = new List<string>();
         var candidates = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -208,26 +208,26 @@ public static class Matcher
     }
 
     /// <summary>
-    /// Cuánto se parecen dos mensajes, entre 0 y 1.
+    /// How much two messages resemble each other, between 0 and 1.
     ///
-    /// Mitad y mitad:
+    /// Half and half:
     ///
-    ///   la forma     qué campos tiene: número, clase y si es lista. Un campo que coincide en las
-    ///                dos suma; los que sobran a un lado o al otro restan.
-    ///   la vecindad  de los campos que apuntan a otro mensaje, cuántos apuntan a mensajes que ya
-    ///                están emparejados ENTRE SÍ. Esto es lo que salva a los pequeños: un mensaje
-    ///                de un solo campo no se distingue de otros trescientos por su forma, pero sí
-    ///                por quién le apunta.
+    ///   the shape        which fields it has: number, class and whether it is a list. A field matching in
+    ///                    both adds; the ones left over on one side or the other subtract.
+    ///   the neighbourhood of the fields pointing to another message, how many point to messages already
+    ///                    matched WITH EACH OTHER. This is what saves the small ones: a message
+    ///                    of a single field is not told apart from three hundred others by its shape, but it is
+    ///                    by who points to it.
     ///
-    /// Cuando ninguno de los dos apunta a nadie, la vecindad no dice nada y se puntúa sólo por la
-    /// forma; por eso las hojas del grafo son las que se quedan ambiguas, y es inevitable.
+    /// When neither points to anyone, the neighbourhood says nothing and it is scored only by the
+    /// shape; that is why the graph's leaves are the ones left ambiguous, and it is unavoidable.
     /// </summary>
     private static double Similar(ProtoWriter.Message one, ProtoWriter.Message other,
                                   Dictionary<string, ProtoWriter.Message> messagesA,
                                   Dictionary<string, ProtoWriter.Message> messagesB,
                                   Dictionary<string, string> pairs)
     {
-        if (one.Fields.Count == 0 && other.Fields.Count == 0) return 0;   // vacíos: nada que decir
+        if (one.Fields.Count == 0 && other.Fields.Count == 0) return 0;   // empty: nothing to say
 
         int shared = 0;
         int neighbours = 0, agree = 0;
@@ -240,7 +240,7 @@ public static class Matcher
             bool oneIsMessage = messagesA.ContainsKey(field.Type);
             bool otherIsMessage = messagesB.ContainsKey(twin.Type);
 
-            // Mismo número y misma clase de contenido.
+            // Same number and same kind of content.
             if (oneIsMessage != otherIsMessage) continue;
             if (!oneIsMessage && field.Type != twin.Type) continue;
             if (field.Repeated != twin.Repeated) continue;
@@ -258,14 +258,14 @@ public static class Matcher
         return 0.5 * shape + 0.5 * neighbourhood;
     }
 
-    /// <summary>La huella de cada mensaje en cada ronda.</summary>
+    /// <summary>Each message's fingerprint in each round.</summary>
     /// <summary>
-    /// La forma de cada mensaje sin mirar a los vecinos: la ronda 0 de la huella.
+    /// Each message's shape without looking at the neighbours: round 0 of the fingerprint.
     ///
-    /// Es lo que hay que contar para saber si entre dos versiones ha cambiado el PROTOCOLO o sólo
-    /// los nombres. Si las formas siguen ahí y lo que baila son los nombres, el emparejador debería
-    /// funcionar; si las formas también se han ido, es que el parche cambió los mensajes de verdad
-    /// y no hay nombre que valga.
+    /// It is what has to be counted to know whether between two versions the PROTOCOL has changed or only
+    /// the names. If the shapes are still there and what dances around are the names, the matcher should
+    /// work; if the shapes have gone too, the patch really changed the messages
+    /// and no name will do.
     /// </summary>
     public static Dictionary<string, string> Shapes(Model model)
         => Signatures(model, 0).ToDictionary(p => p.Key, p => p.Value[0], StringComparer.Ordinal);
@@ -276,8 +276,8 @@ public static class Matcher
         var enums = model.Enums.ToDictionary(e => e.Name, StringComparer.Ordinal);
         var signatures = new Dictionary<string, string[]>(StringComparer.Ordinal);
 
-        // Ronda 0: sólo lo propio. De un campo que apunta a otro mensaje se anota que apunta, no a
-        // quién: el nombre está rotado y no dice nada.
+        // Round 0: only its own. Of a field pointing to another message it is noted that it points, not to
+        // whom: the name is rotated and says nothing.
         foreach (var message in model.Messages)
         {
             var parts = message.Fields
@@ -287,8 +287,8 @@ public static class Matcher
             signatures[message.Name][0] = Hash(string.Join(",", parts));
         }
 
-        // Un enumerado no cambia de forma entre versiones —sus valores son los mismos— así que su
-        // huella se puede calcular una vez y sirve de ancla para quien lo use.
+        // An enum does not change shape between versions —its values are the same— so its
+        // fingerprint can be computed once and serves as an anchor for whoever uses it.
         var enumSignature = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var e in model.Enums)
         {
@@ -318,14 +318,14 @@ public static class Matcher
         return signatures;
     }
 
-    /// <summary>De qué clase es un campo, sin mirar nombres rotados.</summary>
+    /// <summary>What kind a field is, without looking at rotated names.</summary>
     private static string Kind(ProtoWriter.Field field,
                                Dictionary<string, ProtoWriter.Message> messages,
                                Dictionary<string, ProtoWriter.Enumeration> enums)
     {
         if (messages.ContainsKey(field.Type)) return "M";
         if (enums.ContainsKey(field.Type)) return "E";
-        return field.Type;      // los tipos de siempre —int64, string— no cambian de nombre
+        return field.Type;      // the usual types —int64, string— do not change name
     }
 
     private static Dictionary<string, List<string>> Group(Dictionary<string, string[]> signatures, int round)

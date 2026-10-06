@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <!--
-      Deja RESTAURAR en Linux los proyectos que apuntan a Windows.
+      Lets the projects that target Windows be RESTORED on Linux.
 
-      Cinco de los nuestros son net10.0-windows -el servidor, las pruebas, el lanzador, el
-      deobfuscador y la contrata de Windows Forms- y eso esta bien: se ejecutan en Windows y ahi
-      es donde corren. Lo que no esta bien es que ni siquiera se puedan RESTAURAR fuera, porque
-      GitHub pasa por el repo un trabajo suyo -el de la grafica de dependencias, submit-nuget- que
-      corre en Linux y restaura la solucion entera. Sin esto se para en el primer proyecto de
-      Windows con NETSDK1100 y el check sale en rojo aunque no haya nada roto.
+      Five of ours are net10.0-windows -the server, the tests, the launcher, the
+      deobfuscator and the Windows Forms contract- and that is fine: they run on Windows and that
+      is where they run. What is not fine is that they cannot even be RESTORED elsewhere, because
+      GitHub runs a job of its own over the repo -the dependency graph one, submit-nuget- that
+      runs on Linux and restores the whole solution. Without this it stops at the first Windows
+      project with NETSDK1100 and the check goes red even though nothing is broken.
 
-      Esto NO compila Windows Forms en Linux ni lo pretende: solo permite resolver las referencias
-      del framework para poder restaurar. Compilar de verdad sigue queriendo Windows.
+      This does NOT build Windows Forms on Linux nor does it try to: it only allows resolving the
+      framework references so as to be able to restore. Really building still wants Windows.
     -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>

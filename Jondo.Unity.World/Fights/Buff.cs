@@ -5,10 +5,10 @@ using System.Linq;
 namespace Jondo.Unity.World.Fights
 {
     /// <summary>
-    /// A qué afecta un embrujo que no toca una característica suelta.
+    /// What a buff that does not touch a single characteristic affects.
     ///
-    /// Los tres salen del catálogo de efectos del cliente y comparten forma: el hechizo afectado
-    /// viaja en el <c>diceNum</c> y lo que se le suma, en el <c>value</c>.
+    /// The three come from the client's effects catalogue and share a shape: the affected spell
+    /// travels in the <c>diceNum</c> and what is added to it, in the <c>value</c>.
     ///
     ///   293  "#1: +#3 de daños básicos"     280  "+#3 de alcance mínimo"
     ///   281  "#1: +#3 de alcance máximo"
@@ -76,34 +76,34 @@ namespace Jondo.Unity.World.Fights
     }
 
     /// <summary>
-    /// Un embrujo: lo que un hechizo deja puesto sobre alguien, y hasta cuándo.
+    /// A buff: what a spell leaves placed on someone, and until when.
     ///
-    /// No hay ninguna lista de hechizos escrita a mano detrás de esto. Cada embrujo sale de una
-    /// entrada del <c>EffectsJson</c> del hechizo, y lo que significa el número de efecto lo dice
-    /// la tabla <c>Effects</c> del cliente. Aquí sólo se guarda lo ya resuelto.
+    /// There is no hand-written spell list behind this. Each buff comes from an
+    /// entry of the spell's <c>EffectsJson</c>, and what the effect number means is said by
+    /// the client's <c>Effects</c> table. Here only what is already resolved is kept.
     /// </summary>
     public sealed class Buff
     {
-        /// <summary>El número correlativo con el que viaja al cliente, empezando por uno.</summary>
+        /// <summary>The consecutive number it travels to the client with, starting at one.</summary>
         public int Numero { get; set; }
 
         public int EffectId { get; set; }
         public int EffectUid { get; set; }
 
-        /// <summary>La característica que toca, o cero si lo suyo va por otro lado.</summary>
+        /// <summary>The characteristic it touches, or zero if its thing goes another way.</summary>
         public int Caracteristica { get; set; }
 
-        /// <summary>Cuánto, ya con su signo.</summary>
+        /// <summary>How much, already with its sign.</summary>
         public int Cuanto { get; set; }
 
-        /// <summary>Si afecta a un hechizo concreto, cuál y de qué manera.</summary>
+        /// <summary>If it affects a specific spell, which one and in what way.</summary>
         public SpellAspect Sobre { get; set; }
         public int HechizoAfectado { get; set; }
 
-        /// <summary>El estado que pone o quita, si es de los que hacen eso.</summary>
+        /// <summary>The state it sets or removes, if it is one of those that do that.</summary>
         public int Estado { get; set; }
 
-        /// <summary>La apariencia temporal impuesta por el efecto 335, o cero.</summary>
+        /// <summary>The temporary appearance imposed by effect 335, or zero.</summary>
         public int Apariencia { get; set; }
 
         public int HechizoOrigen { get; set; }
@@ -111,21 +111,21 @@ namespace Jondo.Unity.World.Fights
         public long Quien { get; set; }
         public string Disparador { get; set; } = "I";
 
-        /// <summary>La ronda en la que se cae. Menos uno es "hasta que acabe el combate".</summary>
+        /// <summary>The round in which it drops. Minus one is "until the fight ends".</summary>
         public int CaducaEnRonda { get; set; }
 
         /// <summary>
-        /// La ronda en la que EMPIEZA a valer. Para casi todos es la del lanzamiento; para los
-        /// retardados, tantas rondas después como diga el retardo del efecto.
+        /// The round in which it STARTS to count. For almost all it is the cast's; for the
+        /// delayed ones, that many rounds later as the effect's delay says.
         ///
-        /// Sin esto no había manera de expresar «esto empieza dentro de dos turnos», que es lo que
-        /// hace la Flecha Castigadora, y el embrujo se aplicaba entero en el acto.
+        /// Without this there was no way of expressing «this starts in two turns», which is what
+        /// the Flecha Castigadora does, and the buff was applied whole on the spot.
         /// </summary>
         public int EmpiezaEnRonda { get; set; }
 
         /// <summary>
-        /// Si se suma al que ya hubiera igual en vez de sustituirlo. Lo llevan los que un hechizo
-        /// va poniendo cada vez que pasa algo —cada paso, cada golpe recibido—, que se acumulan.
+        /// Whether it is added to an identical one already there instead of replacing it. Carried by the ones a spell
+        /// keeps putting every time something happens —each step, each hit taken—, which pile up.
         /// </summary>
         public bool Apila { get; set; }
 
@@ -195,10 +195,10 @@ namespace Jondo.Unity.World.Fights
     }
 
     /// <summary>
-    /// Los embrujos y los estados que uno lleva encima, y las actitudes que le dan sus objetos.
+    /// The buffs and states one carries, and the attitudes one's items give.
     ///
-    /// Va aparte del <see cref="Fighter"/> para que se pueda mirar de un vistazo qué hay puesto y
-    /// quién lo puso, que es justo lo que el cliente pinta en el panel de embrujos.
+    /// It goes apart from the <see cref="Fighter"/> so that one can see at a glance what is on and
+    /// who put it there, which is exactly what the client draws in the buffs panel.
     /// </summary>
     public sealed class Buffs
     {
@@ -206,9 +206,9 @@ namespace Jondo.Unity.World.Fights
         private readonly HashSet<int> _estados = new HashSet<int>();
 
         /// <summary>
-        /// Los hechizos que los objetos regalan: las actitudes de los dofus y de los trofeos, que
-        /// vienen del efecto 1175 de cada objeto. Se registran al empezar el combate y son las que
-        /// se disparan al principio y al final de cada turno.
+        /// The spells the items give away: the attitudes of the dofus and the trophies, which
+        /// come from each item's effect 1175. They are registered on starting the fight and are the ones
+        /// that fire at the start and at the end of each turn.
         /// </summary>
         public List<int> Actitudes { get; } = new List<int>();
 
@@ -230,20 +230,20 @@ namespace Jondo.Unity.World.Fights
             => _gradosDeActitud.TryGetValue(hechizo, out int grado) ? grado : 1;
 
         /// <summary>
-        /// Los hechizos que uno lleva puestos y que TODAVÍA TIENEN ALGO QUE HACER más adelante.
+        /// The spells one has on that STILL HAVE SOMETHING TO DO later.
         ///
-        /// Un hechizo no se acaba al lanzarlo: sus efectos con disparador distinto de "I" quedan a
-        /// la espera de que pase lo suyo. El Centinela del Ocra es el caso claro: al lanzarlo da
-        /// diez de alcance y un veinte por ciento de daños a distancia, y luego, POR CADA PASO que
-        /// se anda, se come uno de alcance y un dos por ciento. Ese "por cada paso" es el
-        /// disparador CCMPARR, y para poder dispararlo hay que acordarse de que el hechizo sigue
-        /// puesto.
+        /// A spell does not end on being cast: its effects with a trigger other than "I" stay
+        /// waiting for their thing to happen. The Cra's Centinela is the clear case: on casting it, it gives
+        /// ten range and twenty per cent ranged damage, and then, FOR EACH STEP
+        /// walked, it eats one range and two per cent. That "for each step" is the
+        /// CCMPARR trigger, and to be able to fire it one has to remember the spell is still
+        /// on.
         ///
-        /// Es lo mismo que las actitudes de los objetos, pero con fecha de caducidad.
+        /// It is the same as the items' attitudes, but with an expiry date.
         /// </summary>
         public List<ActiveSpell> ActiveSpells { get; } = new List<ActiveSpell>();
 
-        /// <summary>Un hechizo que sigue puesto y en qué grado, hasta que se caiga.</summary>
+        /// <summary>A spell still on and at what grade, until it drops.</summary>
         public sealed class ActiveSpell
         {
             public int Hechizo { get; set; }
@@ -323,7 +323,7 @@ namespace Jondo.Unity.World.Fights
             return quitados;
         }
 
-        /// <summary>Deja apuntado que este hechizo sigue puesto, o alarga el que ya estaba.</summary>
+        /// <summary>Records that this spell is still on, or extends the one already there.</summary>
         public void Enganchar(int hechizo, int grado, int caducaEnRonda, long lanzador = 0, int puestoEnRonda = 0,
                               bool critico = false)
         {
@@ -347,7 +347,7 @@ namespace Jondo.Unity.World.Fights
         private ActiveSpell _enganchesPorHechizo(int hechizo)
             => ActiveSpells.FirstOrDefault(e => e.Hechizo == hechizo && e.Filas == null);
 
-        /// <summary>Quita los enganches cumplidos.</summary>
+        /// <summary>Removes the hooks already fulfilled.</summary>
         public void BarrerEnganches(int ronda) => ActiveSpells.RemoveAll(e => !e.Vivo(ronda));
 
         /// <summary>A spell's hooks go, and nothing else of it: for a hook that lives for one cast.</summary>
@@ -380,19 +380,19 @@ namespace Jondo.Unity.World.Fights
         public void QuitarEstado(int estado) => _estados.Remove(estado);
 
         /// <summary>
-        /// Quita un estado y los embrujos que lo representaban en el panel. Devolverlos permite
-        /// que la capa de red mande un <c>jya</c> por cada uno.
+        /// Removes a state and the buffs that represented it in the panel. Returning them lets
+        /// the network layer send a <c>jya</c> for each one.
         /// </summary>
         /// <summary>
-        /// Le recorta rondas a todos los embrujos y devuelve cuántos se han caído del todo.
+        /// Trims rounds off all the buffs and returns how many have dropped entirely.
         /// </summary>
         /// <remarks>
-        /// Es el efecto 1075, «Duración de los efectos: -N», que llevan 167 hechizos —el Grito
-        /// Terrorífico del Ouginak con cuatro rondas, por ejemplo—.
+        /// It is effect 1075, «Duración de los efectos: -N», which 167 spells carry —the Ouginak's
+        /// Grito Terrorífico with four rounds, for example—.
         ///
-        /// Los que NO caducan por ronda se quedan como están: un embrujo permanente no se acorta,
-        /// porque no tiene nada que acortar, y restarle rondas a un cero lo dejaría caducado en la
-        /// ronda pasada y se caería entero.
+        /// Those that do NOT expire by round stay as they are: a permanent buff is not shortened,
+        /// because it has nothing to shorten, and subtracting rounds from a zero would leave it expired in the
+        /// past round and it would drop entirely.
         /// </remarks>
         public int Acortar(int rondas, int ahora)
         {
@@ -444,7 +444,7 @@ namespace Jondo.Unity.World.Fights
             return true;
         }
 
-        /// <summary>Retira todo lo que dejó un hechizo, incluidos sus estados y sus enganches.</summary>
+        /// <summary>Removes everything a spell left, including its states and its hooks.</summary>
         /// <remarks>
         /// The hooks go with the rows: Furor's 406 on 28604 takes the hooked "1160 under TE"
         /// away with the state and the +N -- jya 36, 37 AND 38 in the capture -- and a hook
@@ -493,10 +493,10 @@ namespace Jondo.Unity.World.Fights
         public List<Buff> Relevados { get; } = new List<Buff>();
 
         /// <summary>
-        /// Añade un embrujo con el número que le toque. El número NO es de cada luchador: es
-        /// correlativo del combate entero, y el que se usa luego para quitarlo con el jya. En la
-        /// captura los del jugador van del 19 al 25 y los del monstruo siguen del 26 al 32, misma
-        /// serie.
+        /// Adds a buff with the number it gets. The number is NOT each fighter's: it is
+        /// consecutive for the whole fight, and the one used later to remove it with the jya. In the
+        /// capture the player's go from 19 to 25 and the monster's follow from 26 to 32, same
+        /// series.
         /// </summary>
         /// <remarks>
         /// How many equivalent rows may live together is the spell level's <c>maxStack</c>, in
@@ -544,7 +544,7 @@ namespace Jondo.Unity.World.Fights
             return embrujo;
         }
 
-        /// <summary>Lo que suman los embrujos a una característica.</summary>
+        /// <summary>What the buffs add to a characteristic.</summary>
         public int De(int caracteristica, int ronda)
         {
             int total = 0;
@@ -556,14 +556,14 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Lo que MULTIPLICAN los embrujos de un número de efecto, en tanto por ciento.
+        /// What the buffs of an effect number MULTIPLY, as a percentage.
         ///
-        /// Hay una familia que no suma sino que multiplica: el 1163 es "daños sufridos x#1%" y el
-        /// 1159 "curas recibidas x#1%". No tienen característica en el catálogo —el cliente los
-        /// resuelve por su número—, así que no valen los mismos caminos que el resto.
+        /// There is a family that does not add but multiplies: 1163 is "daños sufridos x#1%" and
+        /// 1159 "curas recibidas x#1%". They have no characteristic in the catalogue —the client
+        /// resolves them by their number—, so the same paths as the rest do not work.
         ///
-        /// Devuelve cien cuando no hay ninguno, o sea "por uno". Varios se encadenan: dos del
-        /// ciento diez dan un ciento veintiuno.
+        /// Returns a hundred when there are none, that is "times one". Several chain: two of
+        /// a hundred and ten give a hundred and twenty-one.
         /// </summary>
         /// <summary>
         /// The flat "-N de daños recibidos" (105, 265) the bearer holds against a blow of the
@@ -647,7 +647,7 @@ namespace Jondo.Unity.World.Fights
             return fuera;
         }
 
-        /// <summary>Lo que suman los embrujos a un hechizo concreto: daño base o alcance.</summary>
+        /// <summary>What the buffs add to a specific spell: base damage or range.</summary>
         public int DelHechizo(int hechizo, SpellAspect que, int ronda)
         {
             int total = 0;
@@ -676,7 +676,7 @@ namespace Jondo.Unity.World.Fights
         public bool TieneDelHechizo(int hechizo, SpellAspect que, int ronda)
             => FijadoDelHechizo(hechizo, que, ronda).HasValue;
 
-        /// <summary>La última apariencia temporal que siga activa, o cero.</summary>
+        /// <summary>The last temporary appearance still active, or zero.</summary>
         public int AparienciaEn(int ronda)
         {
             for (int i = _puestos.Count - 1; i >= 0; i--)
@@ -687,7 +687,7 @@ namespace Jondo.Unity.World.Fights
             return 0;
         }
 
-        /// <summary>Se lleva los que ya han caducado y devuelve cuáles eran.</summary>
+        /// <summary>Takes away the ones that have already expired and returns which they were.</summary>
         /// <param name="leTocaCaer">
         /// Which of the expired rows fall NOW. Without it, all of them. The turn start passes
         /// the rule the captures show: a row falls at the start of its caster's turn, not at
@@ -698,22 +698,22 @@ namespace Jondo.Unity.World.Fights
         /// </param>
         public List<Buff> Barrer(int ronda, Func<Buff, bool> leTocaCaer = null)
         {
-            // Se barre lo que ha CADUCADO, no lo que «no esta vivo».
+            // What has EXPIRED is swept away, not what «is not alive».
             //
-            // No es lo mismo desde que existen los embrujos retardados: uno que todavia no ha
-            // empezado tampoco esta vivo, y con la condicion de antes lo barria la primera vez que
-            // pasaba la escoba, o sea el turno siguiente a lanzarlo.
+            // It is not the same since delayed buffs exist: one that has not yet
+            // started is not alive either, and with the earlier condition the broom swept it the first time
+            // it went by, that is the turn after casting it.
             //
-            // Eso es justo lo que se veia con la Flecha Castigadora: sus dos bonos aparecian con
-            // su cuenta atras -el 3 y el 2- y al turno siguiente desaparecian dejando la cadena
-            // vacia, sin llegar a aplicarse nunca. Nacian y se los llevaba la escoba antes de que
-            // les tocara empezar.
+            // That is exactly what was seen with the Flecha Castigadora: its two bonuses appeared with
+            // their countdown -the 3 and the 2- and on the next turn they disappeared leaving the chain
+            // empty, without ever getting applied. They were born and the broom took them before it was
+            // their turn to start.
             bool cae(Buff e) => Caducado(e, ronda) && (leTocaCaer == null || leTocaCaer(e));
             var caidos = _puestos.FindAll(cae);
             _puestos.RemoveAll(cae);
 
-            // Un estado temporal no puede sobrevivir al embrujo que lo puso. Se conserva si
-            // todavía queda otro embrujo vivo que represente el mismo estado.
+            // A temporary state cannot outlive the buff that set it. It is kept if
+            // there is still another live buff representing the same state.
             // A 952 falling puts nothing back and takes nothing away: the state it switched off
             // simply counts again.
             foreach (var caido in caidos)
@@ -755,7 +755,7 @@ namespace Jondo.Unity.World.Fights
             return due;
         }
 
-        /// <summary>Si a un embrujo se le ha pasado la hora. Uno que aun no ha empezado, NO.</summary>
+        /// <summary>Whether a buff's time is up. One that has not started yet, is NOT.</summary>
         /// <remarks>A pending row never expires on its own: it goes when it goes off.</remarks>
         private static bool Caducado(Buff embrujo, int ronda)
             => !embrujo.Pendiente && embrujo.CaducaEnRonda >= 0 && ronda >= embrujo.CaducaEnRonda;

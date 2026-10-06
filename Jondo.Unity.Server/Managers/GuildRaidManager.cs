@@ -11,27 +11,26 @@ using Jondo.Unity.World.Content;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las raids de gremio en marcha: comprarlas, lanzarlas, el reloj, y contestar a los
-    /// criterios del contenido que ya está en la base.
+    /// Guild raids in progress: buying them, launching them, the clock, and answering the criteria of the
+    /// content already in the database.
     ///
-    /// Una raid comprada se guarda -sobrevive al reinicio-, pero una EN MARCHA no: vive en
-    /// memoria y se cae con el servidor, y el que estuviera dentro se queda en el mapa donde
-    /// estaba. Es lo honesto mientras el reloj y la puntuación no se hayan medido en ninguna
-    /// captura: guardar a medias una raid a medio jugar sería peor que no guardarla.
+    /// A bought raid is stored -- it survives a restart --, but one IN PROGRESS is not: it lives in memory
+    /// and goes down with the server, and whoever was inside stays on the map he was on. It is the honest
+    /// thing while the clock and the score have not been measured in any capture: storing half of a
+    /// half-played raid would be worse than not storing it.
     ///
-    /// Lo que NO se puede hacer todavía, y va dicho: el panel de la raid -el reloj, la
-    /// puntuación y la sal en pantalla- necesita sus propios mensajes, y ninguna captura los
-    /// trae. Mientras tanto lo que hay se cuenta por el chat.
+    /// What CANNOT be done yet, and is stated: the raid panel -- the clock, the score and the salt on screen
+    /// -- needs its own messages, and no capture carries them. Meanwhile what there is is told in the chat.
     /// </summary>
     public static class GuildRaidManager
     {
-        /// <summary>Las que están corriendo, una por gremio como mucho.</summary>
+        /// <summary>The ones running, one per guild at most.</summary>
         private static readonly ConcurrentDictionary<long, RaidInstance> _running = new();
 
-        /// <summary>De dónde salió cada uno, para devolverlo ahí cuando se acabe.</summary>
+        /// <summary>Where each one came from, to send him back there when it ends.</summary>
         private static readonly ConcurrentDictionary<long, (long MapId, int CellId)> _cameFrom = new();
 
-        /// <summary>El reloj de cada raid, para poder pararlo si acaba antes.</summary>
+        /// <summary>Each raid's clock, to be able to stop it if it ends early.</summary>
         private static readonly ConcurrentDictionary<long, CancellationTokenSource> _clocks = new();
 
         private static long _nextId;
@@ -39,8 +38,8 @@ namespace Jondo.Unity.Server.Managers
         // ─── Comprar ────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Compra una raid con los kamas del gremio. Devuelve la clave de por qué no se pudo, o
-        /// null cuando sí.
+        /// Buys a raid with the guild's kamas. Returns the key of why it could not be done, or null when it
+        /// could.
         /// </summary>
         public static string Buy(long characterId, int raidId)
         {
@@ -55,9 +54,9 @@ namespace Jondo.Unity.Server.Managers
             return null;
         }
 
-        // ─── Lanzar y entrar ────────────────────────────────────────────────────
+        // ─── Launching and entering ────────────────────────────────────────────
 
-        /// <summary>La raid que está jugando el gremio de este personaje, o null.</summary>
+        /// <summary>The raid this character's guild is playing, or null.</summary>
         public static RaidInstance RunningOf(long characterId)
         {
             var guild = GuildStore.GuildOf(characterId);
@@ -65,7 +64,7 @@ namespace Jondo.Unity.Server.Managers
             return _running.TryGetValue(guild.Id, out var raid) && raid.Running ? raid : null;
         }
 
-        /// <summary>La raid en la que está METIDO este personaje, que no es lo mismo.</summary>
+        /// <summary>The raid this character is IN, which is not the same.</summary>
         public static RaidInstance RaidOf(long characterId)
         {
             var raid = RunningOf(characterId);
@@ -73,13 +72,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Lanza la raid: la instancia, el capitán dentro, y a la primera planta.
+        /// Launches the raid: the instance, the captain inside, and to the first floor.
         /// </summary>
         /// <remarks>
-        /// El mínimo de ocho jugadores de la ficha del juego NO se exige aquí. Con ocho clientes
-        /// haría falta un gremio entero conectado para probar una línea de código, y lo que se
-        /// gana exigiéndolo es cero: el mínimo protege el equilibrio de un servidor con gente, no
-        /// la corrección de esto. Queda escrito para el día que haya gente.
+        /// The game sheet's minimum of eight players is NOT required here. With eight clients a whole guild
+        /// connected would be needed to test a line of code, and what is gained by requiring it is zero: the
+        /// minimum protects the balance of a server with people on it, not the correctness of this. It is
+        /// written down for the day there are people.
         /// </remarks>
         public static async Task<string> LaunchAsync(long captainId, int raidId)
         {
@@ -94,7 +93,7 @@ namespace Jondo.Unity.Server.Managers
             var raid = new RaidInstance(id, raidId, guild.Id, captainId, DateTimeOffset.UtcNow, kind.RunsFor);
             _running[guild.Id] = raid;
 
-            // Se gasta al lanzarla: una raid comprada es un uso, no una llave permanente.
+            // It is spent on launching: a bought raid is one use, not a permanent key.
             GuildStore.DropRaid(guild.Id, raidId);
 
             StartClock(raid, kind);
@@ -102,7 +101,7 @@ namespace Jondo.Unity.Server.Managers
             return fallo ?? null;
         }
 
-        /// <summary>Mete a alguien en la raid de su gremio y lo lleva a la primera planta.</summary>
+        /// <summary>Puts someone into his guild's raid and takes him to the first floor.</summary>
         public static async Task<string> EnterAsync(long characterId)
         {
             var raid = RunningOf(characterId);
@@ -119,7 +118,7 @@ namespace Jondo.Unity.Server.Managers
             return null;
         }
 
-        /// <summary>Saca a alguien de la raid y lo devuelve a donde estaba.</summary>
+        /// <summary>Takes someone out of the raid and sends him back to where he was.</summary>
         public static async Task<string> LeaveAsync(long characterId)
         {
             var raid = RaidOf(characterId);
@@ -130,8 +129,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Cierra la raid: por el reloj, porque el capitán la cierra o porque se ha ganado. Todo
-        /// el que esté dentro vuelve a donde estaba y se queda la puntuación.
+        /// Closes the raid: because of the clock, because the captain closes it, or because it has been won.
+        /// Everyone inside goes back to where he was and the score is kept.
         /// </summary>
         public static async Task FinishAsync(RaidInstance raid, RaidInstance.Ending how)
         {
@@ -139,8 +138,9 @@ namespace Jondo.Unity.Server.Managers
             var now = DateTimeOffset.UtcNow;
             raid.Finish(how, now);
 
-            // Y a la clasificación de la semana, como acabara: una raid que se corta por el reloj
-            // con veinte mil puntos vale esos veinte mil. Lo que no cuenta es no haber jugado.
+            // And to the week's ranking, however it ended: a raid cut short by the clock with
+            // twenty thousand points is worth those twenty thousand. What does not count is not
+            // having played.
             if (raid.Score > 0)
             {
                 GuildStore.RecordRaidScore(raid.GuildId, raid.RaidId, raid.Score, now);
@@ -164,7 +164,7 @@ namespace Jondo.Unity.Server.Managers
                               (puesto > 0 ? $", puesto {puesto} de la semana." : "."));
         }
 
-        /// <summary>El capitán la cierra antes de tiempo, que es lo que le deja hacer su ficha.</summary>
+        /// <summary>The captain closes it early, which is what his sheet lets him do.</summary>
         public static async Task<string> CloseAsync(long characterId)
         {
             var raid = RunningOf(characterId);
@@ -174,11 +174,11 @@ namespace Jondo.Unity.Server.Managers
             return null;
         }
 
-        // ─── El reloj ───────────────────────────────────────────────────────────
+        // ─── The clock ──────────────────────────────────────────────────────────
 
         /// <summary>
-        /// El reloj de la raid: una hora la del Gigalodón, dos la del Santuario. Cuando salta,
-        /// la raid se acaba con la puntuación que tenga.
+        /// The raid's clock: one hour for the Gigalodón's, two for the Santuario's. When it goes
+        /// off, the raid ends with whatever score it has.
         /// </summary>
         private static void StartClock(RaidInstance raid, RaidKind kind)
         {
@@ -205,12 +205,12 @@ namespace Jondo.Unity.Server.Managers
             });
         }
 
-        // ─── El resolvedor ──────────────────────────────────────────────────────
+        // ─── The resolver ───────────────────────────────────────────────────────
 
         /// <summary>
-        /// Lo que contesta a los criterios del contenido para este personaje: las variables de su
-        /// raid y la subárea donde está. Sin raid no contesta a nada, que es lo correcto: fuera
-        /// de una raid, un criterio de raid no se cumple ni se incumple, no se sabe.
+        /// What answers the content's criteria for this character: his raid's variables and the
+        /// subarea he is in. With no raid it answers nothing, which is right: outside a raid, a
+        /// raid criterion is neither met nor failed, it is unknown.
         /// </summary>
         public static Criterion.Resolver ResolverFor(long characterId)
         {
@@ -220,38 +220,38 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Si los monstruos de donde está este personaje le van a saltar encima, leyendo el
-        /// criterio QUE TRAE EL PROPIO MONSTRUO en la base.
+        /// Whether the monsters where this character is are going to jump on him, reading the
+        /// criterion THE MONSTER ITSELF CARRIES in the database.
         /// </summary>
         /// <remarks>
-        /// Los ocho de la Sima llevan escrito
-        /// <c>(PB=1131&amp;RV!7,n1_worldlight,0)|…</c>: son inmunes a la agresión mientras la luz
-        /// de su planta no sea cero. Aquí no hay ninguna regla de raid escrita a mano -la regla
-        /// está en la base, como todo lo demás-, sólo quien contesta a sus preguntas.
+        /// The eight of the Sima carry written
+        /// <c>(PB=1131&amp;RV!7,n1_worldlight,0)|…</c>: they are immune to aggression while the light
+        /// of their floor is not zero. There is no raid rule written by hand here -- the rule
+        /// is in the database, like everything else --, only whoever answers its questions.
         ///
-        /// El emulador todavía no tiene monstruos que agredan, así que de momento esto sólo se
-        /// consulta y se cuenta; el día que los tenga, esta es la puerta.
+        /// The emulator does not yet have monsters that aggress, so for now this is only
+        /// queried and counted; the day it has them, this is the door.
         /// </remarks>
         public static bool MonsterWouldAggress(long characterId, int monsterTemplate)
         {
             string criterion = DatabaseManager.MonsterAggressiveImmunity(monsterTemplate);
             if (string.IsNullOrWhiteSpace(criterion)) return false;
 
-            // El criterio dice cuándo es INMUNE: agrede justo cuando no se cumple. Y lo que no se
-            // sabe no agrede, que es el lado por el que conviene equivocarse.
+            // The criterion says when it is IMMUNE: it aggresses exactly when it is not met. And
+            // what is not known does not aggress, which is the side it pays to be wrong on.
             return Criterion.Evaluate(criterion, ResolverFor(characterId)) == Answer.False;
         }
 
-        // ─── Los mapas ──────────────────────────────────────────────────────────
+        // ─── The maps ───────────────────────────────────────────────────────────
 
         /// <summary>
-        /// El mapa por donde se entra a una raid.
+        /// The map a raid is entered through.
         /// </summary>
         /// <remarks>
-        /// NO está medido: ninguna captura entra en una raid, y ni los PNJ ni los interactivos de
-        /// esas plantas están en la base, así que no hay una puerta que señalar. Se coge el
-        /// primero de la primera planta, por número, que es determinista y se puede andar desde
-        /// ahí. El día que se mida, se cambia esta línea.
+        /// It is NOT measured: no capture enters a raid, and neither the NPCs nor the interactives
+        /// of those floors are in the database, so there is no door to point at. The first one
+        /// of the first floor is taken, by number, which is deterministic and can be walked from
+        /// there. The day it is measured, this line changes.
         /// </remarks>
         public static long EntryMapOf(RaidKind kind)
         {
@@ -260,7 +260,7 @@ namespace Jondo.Unity.Server.Managers
             return maps.Count == 0 ? 0 : maps.Min();
         }
 
-        /// <summary>La subárea de un mapa, que es lo que pregunta el criterio «PB».</summary>
+        /// <summary>A map's subarea, which is what the «PB» criterion asks for.</summary>
         public static int SubAreaOf(long mapId) => DatabaseManager.SubAreaOfMap(mapId);
 
         /// <summary>Lleva a alguien a un mapa, en su propia sesión.</summary>
@@ -277,7 +277,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Lo devuelve al mapa del que salió, si se sabe cuál era y sigue conectado.</summary>
+        /// <summary>Sends him back to the map he left, if it is known which one and he is still connected.</summary>
         private static async Task SendHomeAsync(long characterId)
         {
             if (!_cameFrom.TryRemove(characterId, out var where)) return;
@@ -289,7 +289,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Para las pruebas: olvida todo lo que haya en marcha.</summary>
+        /// <summary>For the tests: forgets everything in progress.</summary>
         internal static void Forget()
         {
             foreach (var clock in _clocks.Values)
@@ -301,7 +301,7 @@ namespace Jondo.Unity.Server.Managers
             _cameFrom.Clear();
         }
 
-        /// <summary>Para las pruebas: mete una raid ya montada.</summary>
+        /// <summary>For the tests: puts in a raid already set up.</summary>
         internal static void Remember(RaidInstance raid) => _running[raid.GuildId] = raid;
     }
 }

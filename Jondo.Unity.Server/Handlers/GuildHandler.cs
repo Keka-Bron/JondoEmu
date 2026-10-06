@@ -8,36 +8,36 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// El gremio: crearlo, mostrarlo y abandonarlo. La base sobre la que irán la tienda, el cofre
-    /// y las raids.
+    /// The guild: creating it, showing it and leaving it. The base the shop, the chest and the raids
+    /// will go on.
     ///
-    /// Medido en las 12 capturas de Gremio/. Al crear (jjg) el servidor real contesta con el
-    /// gremio al que ahora perteneces (jgw), sus rangos (jco), su cabecera (jhh) y tu ficha de
-    /// miembro (jgu); al abrir la ventana repite jco, jgu y jhh; al salir (jho) confirma con khj.
-    /// Lo que aún no se toca -candidaturas, permisos, contribuciones- se deja dicho.
+    /// Measured in the 12 captures in Gremio/. On creating (jjg) the real server answers with the
+    /// guild you now belong to (jgw), its ranks (jco), its header (jhh) and your member sheet (jgu);
+    /// on opening the window it repeats jco, jgu and jhh; on leaving (jho) it confirms with khj.
+    /// What is not touched yet -- applications, permissions, contributions -- is said so.
     /// </summary>
     public static class GuildHandler
     {
-        /// <summary>La gremialogema, el objeto que se gasta al fundar. «Gremialogema» en el catálogo del cliente.</summary>
+        /// <summary>The guildalogem, the item spent on founding. «Gremialogema» in the client's catalogue.</summary>
         public const int GuildalogemTemplate = 1575;
 
         /// <summary>
-        /// El Templo de los Gremios y su altar, donde empieza la fundación.
+        /// The Guild Temple and its altar, where founding starts.
         /// </summary>
         /// <remarks>
-        /// Medido en la captura de fundar «Jondo»: el jugador pulsa el elemento 480310 del mapa
-        /// 106169344 -«The Guild Temple», al norte del pueblo de Amakna, casilla 326 en los datos
-        /// del mapa-, el servidor contesta iwn con la habilidad 184 y un jjc vacío, y el cliente
-        /// abre su editor de nombre y emblema. Sin ese jjc el editor no se abre nunca, que es lo
-        /// que llevó a escribir el comando.
+        /// Measured in the capture of founding «Jondo»: the player presses element 480310 of map
+        /// 106169344 -- «The Guild Temple», north of the Amakna village, cell 326 in the map's data --,
+        /// the server answers iwn with skill 184 and an empty jjc, and the client opens its name and
+        /// emblem editor. Without that jjc the editor never opens, which is what led to writing the
+        /// command.
         /// </remarks>
         public const long FoundingMap = 106169344;
         public const int FoundingAltar = 480310;
         public const int FoundingSkill = 184;
         public const int FoundingType = -1;
 
-        // El emblema con el que funda el COMANDO, que no tiene editor: el de la captura de «Jondo».
-        // Por el altar el emblema lo elige el jugador y esto no se usa.
+        // The emblem the COMMAND founds with, since it has no editor: the one of the «Jondo» capture.
+        // Through the altar the player chooses the emblem and this is not used.
         private const int DefaultEmblemSymbol = 165;
         private const int DefaultEmblemSymbolColor = 8;
         private const int DefaultEmblemBackground = 16744448;
@@ -47,12 +47,12 @@ namespace Jondo.Unity.Server.Handlers
             => await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
 
         /// <summary>
-        /// El altar del templo: se ha pulsado, y se le abre al jugador el editor de fundación.
+        /// The temple's altar: it has been pressed, and the founding editor is opened for the player.
         /// </summary>
         /// <remarks>
-        /// Se abre aunque no lleve gremialogema ni pueda fundar: la captura no enseña qué hace el
-        /// servidor real en ese caso, y lo que sí enseña es que la gremialogema se gasta en el jjg,
-        /// no aquí. Quien no la tenga se enterará al firmar, que es donde se comprueba.
+        /// It opens even if he carries no guildalogem or cannot found: the capture does not show what the
+        /// real server does in that case, and what it does show is that the guildalogem is spent in the
+        /// jjg, not here. Whoever does not have it will find out on signing, which is where it is checked.
         /// </remarks>
         public static async Task OpenFoundingAsync(NetworkStream stream, int elementId, int skillId)
         {
@@ -63,8 +63,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Crear un gremio (jjg): f1 el emblema {símbolo, color símbolo, fondo, color fondo}, f2
-        /// el nombre, tal como los deja el editor. Pasa por <see cref="FoundAsync"/>.
+        /// Creating a guild (jjg): f1 the emblem {symbol, symbol colour, background, background colour},
+        /// f2 the name, as the editor leaves them. It goes through <see cref="FoundAsync"/>.
         /// </summary>
         public static async Task CreateAsync(NetworkStream stream, byte[] frame)
         {
@@ -96,8 +96,8 @@ namespace Jondo.Unity.Server.Handlers
                                             symbol, symbolColor, background, symbolRgb);
             if (fallo != null)
             {
-                // No hay trama medida con la que decirle al editor que no: la captura sólo tiene
-                // el caso bueno. It is told as an information line, which only they see.
+                // There is no measured frame to tell the editor no: the capture only has the good case.
+                // It is told as an information line, which only they see.
                 Console.WriteLine($"[Gremio] Fundación de «{name}» rechazada: {fallo}.");
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildNotice(CommandTexts.Get(fallo, name))));
@@ -105,26 +105,26 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Funda por el comando, sin editor: el mismo camino con el emblema de la captura.
-        /// Devuelve la clave del mensaje de error, o null si se ha creado.
+        /// Founds through the command, without an editor: the same road with the capture's emblem.
+        /// Returns the error message's key, or null if it was created.
         /// </summary>
         public static Task<string> CreateFromCommandAsync(NetworkStream stream, long founderCharacterId, string name)
             => FoundAsync(stream, founderCharacterId, name, DefaultEmblemSymbol, DefaultEmblemSymbolColor,
                           DefaultEmblemBackground, DefaultEmblemSymbolRgb);
 
         /// <summary>
-        /// La fundación, una sola para el editor y para el comando: se comprueba todo, se gasta
-        /// la gremialogema, se guarda el gremio y se le manda al fundador lo suyo.
+        /// The founding, a single one for the editor and for the command: everything is checked, the
+        /// guildalogem is spent, the guild is stored and the founder is sent his part.
         /// </summary>
         /// <remarks>
-        /// Lo que sale después del jjg, en el orden de la captura: ium (la gremialogema que se
-        /// va), jjs, jhq, jco, jgw, khi, jgu, jhh y un jsn que redibuja al fundador ya con el
-        /// nombre del gremio debajo del suyo. El ium lo manda Equipment.TakeAsync, que es lo que
-        /// quita el objeto; el iun de los pods que va detrás en la captura no se manda, que la
-        /// gremialogema no pesa nada aquí; y el khi, con su 97 sin significado, tampoco.
+        /// What goes out after the jjg, in the capture's order: ium (the guildalogem leaving), jjs, jhq,
+        /// jco, jgw, khi, jgu, jhh and a jsn that redraws the founder with the guild's name under his.
+        /// The ium is sent by Equipment.TakeAsync, which is what removes the item; the iun of the pods
+        /// that follows in the capture is not sent, since the guildalogem weighs nothing here; and the
+        /// khi, with its meaningless 97, neither.
         ///
-        /// La gremialogema se gasta la ÚLTIMA, cuando todo lo demás ha pasado: una fundación que
-        /// falle por el nombre no puede dejar al jugador sin la piedra.
+        /// The guildalogem is spent LAST, once everything else has happened: a founding that fails over
+        /// the name cannot leave the player without the stone.
         /// </remarks>
         private static async Task<string> FoundAsync(NetworkStream stream, long founderCharacterId, string name,
                                                      int symbol, int symbolColor, int background, int symbolRgb)
@@ -140,7 +140,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var guild = GuildStore.Create(founderCharacterId, name, symbol, symbolColor, background, symbolRgb);
 
-            // jjs, jhq, jco, jgw, khi, jgu, jhh: el orden de la captura.
+            // jjs, jhq, jco, jgw, khi, jgu, jhh: the capture's order.
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jjs, System.Array.Empty<byte>()));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhq, System.Array.Empty<byte>()));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
@@ -165,12 +165,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Lo que se admite como nombre de gremio.
+        /// What is accepted as a guild name.
         /// </summary>
         /// <remarks>
-        /// NO está medido: la captura sólo funda «Jondo». Por el altar el nombre lo filtra el
-        /// editor del propio cliente antes de mandarlo; esto es lo que se le pide a un nombre
-        /// escrito a mano por el comando, y es la regla que trajo la PR #43.
+        /// It is NOT measured: the capture only founds «Jondo». Through the altar the name is filtered by
+        /// the client's own editor before sending it; this is what is asked of a name typed by hand
+        /// through the command, and it is the rule PR #43 brought.
         /// </remarks>
         internal static bool IsValidGuildName(string name)
         {
@@ -185,24 +185,31 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Le manda a un personaje todo lo de su gremio: pertenencia, rangos, cabecera y la lista
-        /// de miembros. Se usa al crear, al abrir la ventana y al entrar al mundo.
+        /// Sends whoever has just joined a guild everything of his: ranks, membership, the member list
+        /// and the header.
         /// </summary>
+        /// <remarks>
+        /// Only on joining: the jgw is "you have just joined", with its chat line and its popup.
+        /// It went out too on opening the window and on every tab of it (jml, jii), and that was
+        /// the "acabas de unirte al gremio" at every click. The ranks go first, as in the capture
+        /// ("jco jgw"): the client's jgw handler looks the rank up among them and does not ask
+        /// whether it is there.
+        /// </remarks>
         public static async Task SendGuildToOwnerAsync(NetworkStream stream, GuildStore.Guild guild, long characterId)
         {
             int rank = GuildStore.RankOf(characterId);
             var members = GuildStore.Members(guild.Id);
 
+            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jgw,
                 GuildProtocol.BuildGuildJoined(guild, rank)));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
             foreach (var frame in MemberFrames(members))
                 await WriteAsync(stream, frame);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhh,
                 GuildProtocol.BuildGuildInfo(guild, members.Count)));
         }
 
-        /// <summary>Una trama jgu por miembro, con el nombre, el nivel y la cuenta de cada uno.</summary>
+        /// <summary>One jgu frame per member, with each one's name, level and account.</summary>
         public static List<byte[]> MemberFrames(List<GuildStore.Member> members)
         {
             var fuera = new List<byte[]>();
@@ -220,26 +227,63 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Abrir la ventana de gremio (jml / jii). El cliente la pide con una ráfaga de mensajes
-        /// vacíos; el servidor real responde con los rangos, los miembros y la cabecera. Si el
-        /// personaje no tiene gremio, no hay nada que mandar.
+        /// The guild window opening (jlk): the chest's tabs (ivl) and the window's header (jhh).
         /// </summary>
-        public static async Task OpenWindowAsync(NetworkStream stream, byte[] frame)
+        /// <remarks>
+        /// The window opens with a burst -- jlk, jiy{4}, jii{1}, jfp, jiy, then jiy{1}, jml{1},
+        /// jlx{8} -- and the real server answers ivl, jci, jff, jhh, jla, jgu, jmf, in all six
+        /// captures of it. In the invitation's one the client waits for the first half's answers
+        /// before sending the second, and the header comes with the first: the jlk's, since the
+        /// jii is never answered anywhere (26 of 28).
+        /// </remarks>
+        public static async Task OpenWindowAsync(NetworkStream stream)
         {
             long who = SessionContext.State.CharacterId;
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
             if (guild == null) return;
-            await SendGuildToOwnerAsync(stream, guild, who);
+            await WriteAsync(stream, ConnectionProtocol.Push(Op.Ivl,
+                StorageProtocol.BuildGuildChestTabs(GuildChests.TabsOfGuild(guild.Id))));
+            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhh,
+                GuildProtocol.BuildGuildInfo(guild, GuildStore.Members(guild.Id).Count)));
         }
 
-        /// <summary>El f2 del jiy que pide la ficha del anuario.</summary>
+        /// <summary>
+        /// The members (jml {f1: true}): one jgu per member. The jml of the perks tab and of
+        /// closing the window come empty, and the capture answers them nothing.
+        /// </summary>
+        public static async Task MembersAsync(NetworkStream stream, byte[] frame)
+        {
+            byte[] jml = ConnectionProtocol.ReadPayload(frame, Op.Jml);
+            if (jml == null || FieldValue(jml, 1) == 0) return;
+
+            long who = SessionContext.State.CharacterId;
+            var guild = who == 0 ? null : GuildStore.GuildOf(who);
+            if (guild == null) return;
+            foreach (var member in MemberFrames(GuildStore.Members(guild.Id))) await WriteAsync(stream, member);
+        }
+
+        /// <summary>
+        /// A tab whose contents this server does not keep -- the perks, the raids, the paged
+        /// list, the collectors' -- answered as the captures answer it for a guild that has none:
+        /// its empty message, on root 3 with the request's id.
+        /// </summary>
+        public static async Task EmptyTabAsync(NetworkStream stream, byte[] frame, string answer, int field)
+            => await WriteAsync(stream, ConnectionProtocol.Answer(answer, GuildProtocol.BuildEmptyTab(field),
+                                                                  ConnectionProtocol.RequestId(frame)));
+
+        /// <summary>When the week starts again (jew → jez), on root 3 with the request's id.</summary>
+        public static async Task WeeklyResetAsync(NetworkStream stream, byte[] frame)
+            => await WriteAsync(stream, ConnectionProtocol.Answer(Op.Jez, GuildProtocol.BuildWeeklyReset(DateTime.UtcNow),
+                                                                  ConnectionProtocol.RequestId(frame)));
+
+        /// <summary>The f2 of the jiy that asks for the directory sheet.</summary>
         public const int ProfileTab = 4;
 
         /// <summary>
-        /// Una pestaña de la ventana (jiy). Con f2 = 4 se contesta la ficha del anuario (jci),
-        /// que es el único par de la apertura medido suelto -dos veces en la captura de fundar
-        /// «Jondo»-; sin f2, las contribuciones que quedan (jla), que es lo que ocupa su sitio en
-        /// la ráfaga de apertura: cinco peticiones, cinco respuestas, y ésa es la que queda.
+        /// A tab of the window (jiy). With f2 = 4 the directory sheet (jci) is answered, which is the
+        /// only pair of the opening measured on its own -- twice in the capture of founding «Jondo» --;
+        /// without f2, the remaining contributions (jla), which is what takes its place in the opening
+        /// burst: five requests, five answers, and that is the one left.
         /// </summary>
         public static async Task TabAsync(NetworkStream stream, byte[] frame)
         {
@@ -267,7 +311,7 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>La ficha del anuario de un gremio, con el nombre de su jefe puesto.</summary>
+        /// <summary>A guild's directory sheet, with its leader's name in it.</summary>
         private static byte[] ProfileOf(GuildStore.Guild guild)
         {
             var leader = GuildStore.LeaderOf(guild.Id);
@@ -275,17 +319,22 @@ namespace Jondo.Unity.Server.Handlers
             return GuildProtocol.BuildProfile(guild, GuildStore.ProfileOf(guild.Id), leaderName);
         }
 
-        /// <summary>El jfp de la apertura: se contesta con el jff de un gremio nuevo.</summary>
+        /// <summary>The opening's jfp: it is answered with a new guild's jff.</summary>
+        /// <remarks>
+        /// As an answer, root 3 with the request's id, as in all eight captured: it went out as a
+        /// push, and the window waits for its answer before asking for the members.
+        /// </remarks>
         public static async Task BenefitsAsync(NetworkStream stream, byte[] frame)
         {
             long who = SessionContext.State.CharacterId;
             if (who == 0 || GuildStore.GuildOf(who) == null) return;
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jff, GuildProtocol.BuildNoBenefits()));
+            await WriteAsync(stream, ConnectionProtocol.Answer(Op.Jff, GuildProtocol.BuildNoBenefits(),
+                                                               ConnectionProtocol.RequestId(frame)));
         }
 
-        // ─── Los rangos ─────────────────────────────────────────────────────────
+        // ─── Ranks ─────────────────────────────────────────────────────────────
 
-        /// <summary>Abrir la gestión de rangos (jcs): el jco con los del gremio.</summary>
+        /// <summary>Opening rank management (jcs): the jco with the guild's ranks.</summary>
         public static async Task RanksAsync(NetworkStream stream, byte[] frame)
         {
             long who = SessionContext.State.CharacterId;
@@ -297,7 +346,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task SendRanksAsync(NetworkStream stream, GuildStore.Guild guild)
             => await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildRanks(GuildStore.Ranks(guild.Id))));
 
-        /// <summary>Sólo el jefe toca los rangos. Devuelve su gremio, o null si no toca.</summary>
+        /// <summary>Only the leader touches the ranks. Returns his guild, or null if he may not.</summary>
         private static GuildStore.Guild GuildIfLeader(long who)
         {
             if (who == 0 || GuildStore.RankOf(who) != GuildStore.RankLeader) return null;
@@ -305,11 +354,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Editar un rango (jct): el rango entero como lo deja el editor, y el jco de vuelta.
+        /// Editing a rank (jct): the whole rank as the editor leaves it, and the jco back.
         /// </summary>
         /// <remarks>
-        /// Medido dos veces en «muchas acciones»: renombrar el rango 1 a «Tesorero» con su f4
-        /// vacío -y el servidor le deja el icono 116 que tenía- y renombrar el 2 a «Test rango».
+        /// Measured twice in «muchas acciones»: renaming rank 1 to «Tesorero» with its f4 empty -- and the
+        /// server keeps the icon 116 it had -- and renaming rank 2 to «Test rango».
         /// </remarks>
         public static async Task EditRankAsync(NetworkStream stream, byte[] frame)
         {
@@ -364,7 +413,7 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Gremio] Rango {id} de «{guild.Name}» editado: «{rank.Name}».");
         }
 
-        /// <summary>Los permisos de un rango (jck): f1 la lista tal cual, f2 el rango. La marca se queda.</summary>
+        /// <summary>A rank's permissions (jck): f1 the list as it is, f2 the rank. The mark stays.</summary>
         public static async Task SetRightsAsync(NetworkStream stream, byte[] frame)
         {
             byte[] jck = ConnectionProtocol.ReadPayload(frame, Op.Jck);
@@ -388,7 +437,7 @@ namespace Jondo.Unity.Server.Handlers
             await SendRanksAsync(stream, guild);
         }
 
-        /// <summary>Crear un rango (jcv): f1 el orden, f4 el nombre, f5 el icono.</summary>
+        /// <summary>Creating a rank (jcv): f1 the order, f4 the name, f5 the icon.</summary>
         public static async Task CreateRankAsync(NetworkStream stream, byte[] frame)
         {
             byte[] jcv = ConnectionProtocol.ReadPayload(frame, Op.Jcv);
@@ -411,8 +460,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El rango de un miembro, por el comando: no hay captura de la petición con la que el
-        /// cliente lo cambia. Devuelve la clave del error, o null si se ha cambiado.
+        /// A member's rank, through the command: there is no capture of the request the client changes
+        /// it with. Returns the error's key, or null if it was changed.
         /// </summary>
         public static async Task<string> SetMemberRankAsync(long leaderCharacterId, string targetName, int rankId)
         {
@@ -435,16 +484,16 @@ namespace Jondo.Unity.Server.Handlers
             return "guild.kick.notmember";
         }
 
-        // ─── La nota, el diario y el anuario ────────────────────────────────────
+        // ─── The note, the log and the directory ────────────────────────────────
 
-        /// <summary>La entrada de un miembro puesta al día (jgz), con todo lo que se sabe de él.</summary>
+        /// <summary>A member's entry brought up to date (jgz), with everything known about him.</summary>
         private static byte[] MemberUpdated(GuildStore.Member member, DatabaseManager.DbCharacter character)
             => GuildProtocol.BuildMemberUpdated(member, character.Name, character.Level, character.AccountId,
                                                 character.Breed, Achievements.PointsOf(member.CharacterId),
                                                 GuildStore.ContributedBy(member.CharacterId),
                                                 SessionRegistry.FindByCharacter(member.CharacterId) != null);
 
-        /// <summary>Una trama para todos los del gremio que estén conectados.</summary>
+        /// <summary>A frame for everybody in the guild who is connected.</summary>
         private static async Task TellEveryoneAsync(GuildStore.Guild guild, byte[] frame)
         {
             foreach (var member in GuildStore.Members(guild.Id))
@@ -455,9 +504,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// La nota de un miembro (jjj): f1 el texto, f3 el personaje. Medido en «muchas
-        /// acciones»: «hola» sobre el propio jefe, y de vuelta su entrada entera con la nota y
-        /// la hora en el f7.f8.
+        /// A member's note (jjj): f1 the text, f3 the character. Measured in «muchas acciones»: «hola»
+        /// on the leader himself, and back his whole entry with the note and the time in f7.f8.
         /// </summary>
         public static async Task NoteAsync(NetworkStream stream, byte[] frame)
         {
@@ -483,7 +531,7 @@ namespace Jondo.Unity.Server.Handlers
             await TellEveryoneAsync(guild, ConnectionProtocol.Push(Op.Jgz, MemberUpdated(updated, character)));
         }
 
-        /// <summary>El diario (jim → jil).</summary>
+        /// <summary>The log (jim → jil).</summary>
         public static async Task LogAsync(NetworkStream stream, byte[] frame)
         {
             long who = SessionContext.State.CharacterId;
@@ -493,9 +541,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Escribir la ficha del anuario (jcc): se guarda como llega y se devuelve el jci con la
-        /// hora y el jefe puestos. Medido en la captura de fundar «Jondo» y otra vez en la de
-        /// contribuir, con la misma ficha.
+        /// Writing the directory sheet (jcc): it is stored as it arrives and the jci is returned with the
+        /// time and the leader filled in. Measured in the capture of founding «Jondo» and again in the
+        /// contributing one, with the same sheet.
         /// </summary>
         public static async Task SetProfileAsync(NetworkStream stream, byte[] frame)
         {
@@ -528,12 +576,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Buscar en el anuario (jjm): el acuse vacío (jme) y la lista de gremios (jiv).
+        /// Searching the directory (jjm): the empty acknowledgement (jme) and the list of guilds (jiv).
         /// </summary>
         /// <remarks>
-        /// Los filtros del jjm -niveles, actividades- no se aplican: con los gremios que hay en un
-        /// servidor de estas dimensiones, la lista entera es la respuesta útil. Van todos los que
-        /// tienen ficha escrita y también los que no, con la vacía.
+        /// The jjm's filters -- levels, activities -- are not applied: with the guilds there are on a
+        /// server of this size, the whole list is the useful answer. All those with a written sheet go,
+        /// and also those without one, with the empty one.
         /// </remarks>
         public static async Task SearchAsync(NetworkStream stream, byte[] frame)
         {
@@ -557,13 +605,13 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Abandonar el gremio (jho): f1 el personaje. Se saca y se confirma con khj, que es como
-        /// el cliente vacía la ventana. Medido en «salir de mi gremio».
+        /// Leaving the guild (jho): f1 the character. He is taken out and it is confirmed with khj,
+        /// which is how the client empties the window. Measured in «salir de mi gremio».
         /// </summary>
         public static Task LeaveAsync(NetworkStream stream, byte[] frame)
             => LeaveAsync(stream, SessionContext.State.CharacterId);
 
-        /// <summary>Salir, venga del jho o del comando.</summary>
+        /// <summary>Leaving, whether from the jho or from the command.</summary>
         public static async Task LeaveAsync(NetworkStream stream, long who)
         {
             if (who == 0) return;
@@ -576,10 +624,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Lo que recibe quien se queda sin gremio, salga o lo echen: la captura «salir de mi
-        /// gremio» tras el jho es khj {f1: 97}, jhc vacío y un jsn que lo redibuja ya sin el
-        /// nombre del gremio debajo del suyo. Se manda por la sesión que se pase, que puede no
-        /// ser la que ha hablado: al expulsado se le avisa desde la sesión del que expulsa.
+        /// What whoever is left without a guild receives, whether he leaves or is thrown out: the capture
+        /// «salir de mi gremio» after the jho is khj {f1: 97}, an empty jhc and a jsn that redraws him
+        /// without the guild's name under his. It is sent through the session passed, which may not be
+        /// the one that spoke: the expelled player is told from the session of whoever expels him.
         /// </summary>
         private static async Task GoneAsync(NetworkStream stream, long characterId)
         {
@@ -596,15 +644,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Expulsar a un miembro. Devuelve la clave del mensaje de error, o null si ha salido.
+        /// Expelling a member. Returns the error message's key, or null if he is out.
         /// </summary>
         /// <remarks>
-        /// Sin captura: la petición con la que el cliente expulsa a alguien no está en ninguna, así
-        /// que se hace por el comando. Lo que SÍ está medido es cómo queda cada uno: el expulsado
-        /// recibe lo mismo que quien sale por su pie -khj, jhc y su jsn sin gremio-, y a los demás
-        /// se les pone al día la lista y la cabecera.
+        /// Without a capture: the request the client expels somebody with is in none, so it is done
+        /// through the command. What IS measured is how each one ends up: the expelled player receives
+        /// the same as whoever leaves of his own accord -- khj, jhc and his jsn without a guild --, and
+        /// the others get the list and the header brought up to date.
         ///
-        /// Sólo expulsa el jefe, y no a sí mismo: para irse está el jho.
+        /// Only the leader expels, and not himself: the jho is there for leaving.
         /// </remarks>
         public static async Task<string> KickAsync(long kickerCharacterId, string targetName)
         {
@@ -643,8 +691,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Le pone al día la ventana a todos los del gremio que estén conectados: la lista de
-        /// miembros y la cabecera con cuántos son. Es lo que hace falta cuando entra o sale uno.
+        /// Brings the window up to date for everybody in the guild who is connected: the member list and
+        /// the header with how many they are. It is what is needed when somebody joins or leaves.
         /// </summary>
         private static async Task RefreshEveryoneAsync(GuildStore.Guild guild, long exceptCharacter = 0)
         {
@@ -662,11 +710,11 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        // ─── La tienda del gremio ───────────────────────────────────────────────
+        // ─── The guild shop ─────────────────────────────────────────────────────
 
         /// <summary>
-        /// Abrir la tienda (jki) y contestar con sus cinco oráculos (jkh), con el precio ya
-        /// multiplicado por las cuentas del gremio.
+        /// Opening the shop (jki) and answering with its five oracles (jkh), with the price already
+        /// multiplied by the guild's accounts.
         /// </summary>
         public static async Task OpenShopAsync(NetworkStream stream, byte[] frame)
         {
@@ -677,8 +725,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Las cuentas distintas que tiene el gremio, que es por lo que se multiplica el precio:
-        /// cuatro cuentas, precios por cuatro. Dos personajes de la misma cuenta cuentan una vez.
+        /// The guild's distinct accounts, which is what the price is multiplied by: four accounts,
+        /// prices times four. Two characters of the same account count once.
         /// </summary>
         private static int AccountsIn(GuildStore.Guild guild)
         {
@@ -692,9 +740,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Comprar un oráculo (jkw): si llegan los kamas de gremio se apunta y se contesta con el
-        /// acuse, los kamas que quedan y lo que falta por activar; si no llegan, el acuse VACÍO,
-        /// que es lo que manda el servidor real cuando lo rechaza.
+        /// Buying an oracle (jkw): if the guild kamas are enough it is noted and answered with the
+        /// acknowledgement, the kamas left and what remains to be activated; if they are not, the EMPTY
+        /// acknowledgement, which is what the real server sends when it refuses.
         /// </summary>
         public static async Task BuyOracleAsync(NetworkStream stream, byte[] frame)
         {
@@ -728,8 +776,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Activar un oráculo comprado (jky): el acuse y la alteración, que dura dos horas. Sólo
-        /// si el gremio lo tiene comprado y el plazo no se ha pasado.
+        /// Activating a bought oracle (jky): the acknowledgement and the alteration, which lasts two
+        /// hours. Only if the guild has it bought and the deadline has not passed.
         /// </summary>
         public static async Task ActivateOracleAsync(NetworkStream stream, byte[] frame)
         {
@@ -747,7 +795,7 @@ namespace Jondo.Unity.Server.Handlers
             if (DateTimeOffset.TryParse(deadline, null, System.Globalization.DateTimeStyles.AdjustToUniversal,
                                         out var cuando) && cuando < DateTimeOffset.UtcNow)
             {
-                return;   // se pasó el plazo de un día
+                return;   // the one-day deadline passed
             }
 
             long from = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -761,9 +809,9 @@ namespace Jondo.Unity.Server.Handlers
         // ─── Contribuir ─────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Contribuir (jlb): diez mil kamas del personaje por diez de gremio, cinco veces por
-        /// semana como mucho. Se contesta con la contribución hecha, los kamas del gremio y los
-        /// del personaje.
+        /// Contributing (jlb): ten thousand kamas of the character for ten of the guild, five times a
+        /// week at most. It is answered with the contribution made, the guild's kamas and the
+        /// character's.
         /// </summary>
         public static async Task ContributeAsync(NetworkStream stream, byte[] frame)
         {
@@ -773,12 +821,12 @@ namespace Jondo.Unity.Server.Handlers
             if (GameState.Kamas < GuildStore.ContributionKamas) return;
 
             int left = GuildStore.Contribute(who, guild.Id);
-            if (left < 0) return;   // ya no le quedaban esta semana
+            if (left < 0) return;   // he had none left this week
 
             GameState.Kamas -= GuildStore.ContributionKamas;
             DatabaseManager.SaveCurrentCharacter();
 
-            // El orden de la captura: ivf, jgz, (ivj), jia, (iun, khd), jle.
+            // The capture's order: ivf, jgz, (ivj), jia, (iun, khd), jle.
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Ivf,
                 ConnectionProtocol.BuildKamas(GameState.Kamas)));
             var me = GuildStore.MemberOf(who);
@@ -796,7 +844,7 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── Candidaturas ───────────────────────────────────────────────────────
 
-        /// <summary>Lo que hace falta de cada candidato para armar su bloque.</summary>
+        /// <summary>What is needed of each applicant to build his block.</summary>
         private static List<(GuildStore.Application, string, int, long, string, string)> Detailed(
             IEnumerable<GuildStore.Application> applications)
         {
@@ -810,7 +858,7 @@ namespace Jondo.Unity.Server.Handlers
             return fuera;
         }
 
-        /// <summary>La pestaña de candidaturas (jlx/jml → jmf).</summary>
+        /// <summary>The applications tab (jlx/jml → jmf).</summary>
         public static async Task ApplicationsAsync(NetworkStream stream, byte[] frame)
         {
             long who = SessionContext.State.CharacterId;
@@ -822,10 +870,10 @@ namespace Jondo.Unity.Server.Handlers
                 GuildProtocol.BuildApplications(tab, Detailed(GuildStore.Applications(guild.Id)))));
         }
 
-        /// <summary>La pestaña que pide el cliente al abrir las candidaturas, medida en la captura.</summary>
+        /// <summary>The tab the client asks for when opening the applications, measured in the capture.</summary>
         public const int ApplicationsTab = 8;
 
-        /// <summary>Ver una candidatura (jlt → jly).</summary>
+        /// <summary>Viewing an application (jlt → jly).</summary>
         public static async Task ApplicationDetailAsync(NetworkStream stream, byte[] frame)
         {
             byte[] jlt = ConnectionProtocol.ReadPayload(frame, Op.Jlt);
@@ -847,9 +895,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Aceptar una candidatura (jjn): el candidato entra de rango 4 y al que la acepta le
-        /// llegan los dos avisos que salen en la captura, el de aceptada y el de que ya está
-        /// dentro. Al que entra se le manda su gremio entero.
+        /// Accepting an application (jjn): the applicant joins at rank 4 and whoever accepts it gets the
+        /// two notices that come out in the capture, the accepted one and the one that he is already
+        /// in. The one joining is sent his whole guild.
         /// </summary>
         public static async Task AcceptApplicationAsync(NetworkStream stream, byte[] frame)
         {
@@ -861,7 +909,7 @@ namespace Jondo.Unity.Server.Handlers
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
             if (guild == null) return;
             if (GuildStore.ApplicationOf(guild.Id, applicant) == null) return;
-            if (GuildStore.GuildOf(applicant) != null) return;   // ya está en otro
+            if (GuildStore.GuildOf(applicant) != null) return;   // he is already in another
 
             var character = DatabaseManager.GetCharacterById(applicant);
             if (character == null) return;
@@ -881,10 +929,10 @@ namespace Jondo.Unity.Server.Handlers
         // ─── Invitaciones ───────────────────────────────────────────────────────
 
         /// <summary>
-        /// Invitar a alguien. El botón del cliente no aparece en ninguna captura -las que hay son
-        /// del lado de quien la recibe-, así que de momento se dispara desde el comando de chat
-        /// y lo que viaja es lo medido: al invitado le llega el jiq con el gremio y el nombre de
-        /// quien invita, y él contesta con el jiz.
+        /// Inviting somebody. The client's button appears in no capture -- the ones there are come from
+        /// the receiving side --, so for now it is fired from the chat command and what travels is what
+        /// was measured: the invited player gets the jiq with the guild and the inviter's name, and he
+        /// answers with the jiz.
         /// </summary>
         public static async Task<string> InviteAsync(long inviterCharacterId, string targetName)
         {
@@ -902,12 +950,12 @@ namespace Jondo.Unity.Server.Handlers
             return null;
         }
 
-        /// <summary>A qué gremio se ha invitado a cada personaje, mientras no conteste.</summary>
+        /// <summary>Which guild each character has been invited to, while he does not answer.</summary>
         private static readonly Dictionary<long, long> _invitations = new();
 
         /// <summary>
-        /// La respuesta a la invitación (jiz): vacío la rechaza, f1 = 1 la acepta. Medido en la
-        /// captura de recibirla, donde al aceptar llegan el gremio entero y el jij.
+        /// The answer to the invitation (jiz): empty refuses it, f1 = 1 accepts it. Measured in the
+        /// capture of receiving it, where on accepting the whole guild and the jij arrive.
         /// </summary>
         public static async Task AnswerInvitationAsync(NetworkStream stream, byte[] frame)
         {
@@ -929,7 +977,7 @@ namespace Jondo.Unity.Server.Handlers
             await RefreshEveryoneAsync(guild, who);
         }
 
-        /// <summary>Le manda el gremio entero a quien acaba de entrar, si está conectado.</summary>
+        /// <summary>Sends the whole guild to whoever has just joined, if he is connected.</summary>
         private static async Task SendGuildToNewMemberAsync(long characterId, GuildStore.Guild guild)
         {
             var session = SessionRegistry.FindByCharacter(characterId);
@@ -937,8 +985,8 @@ namespace Jondo.Unity.Server.Handlers
             int rank = GuildStore.RankOf(characterId);
             var members = GuildStore.Members(guild.Id);
 
-            await session.SendAsync(ConnectionProtocol.Push(Op.Jgw, GuildProtocol.BuildGuildJoined(guild, rank)));
             await session.SendAsync(ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
+            await session.SendAsync(ConnectionProtocol.Push(Op.Jgw, GuildProtocol.BuildGuildJoined(guild, rank)));
             foreach (var frame in MemberFrames(members)) await session.SendAsync(frame);
             await session.SendAsync(ConnectionProtocol.Push(Op.Jhh,
                 GuildProtocol.BuildGuildInfo(guild, members.Count)));
@@ -946,9 +994,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Echar una candidatura a un gremio. Como con la invitación, el botón del cliente no
-        /// está medido: se manda desde el comando de chat y lo que sí viaja medido es el aviso
-        /// al gremio (jma).
+        /// Sending an application to a guild. As with the invitation, the client's button is not
+        /// measured: it is sent from the chat command, and what does travel measured is the notice to
+        /// the guild (jma).
         /// </summary>
         public static async Task<string> ApplyAsync(long characterId, string guildName, string message)
         {
@@ -969,7 +1017,7 @@ namespace Jondo.Unity.Server.Handlers
             return null;
         }
 
-        /// <summary>El primer varint de un campo, o cero.</summary>
+        /// <summary>A field's first varint, or zero.</summary>
         private static long FieldValue(byte[] payload, int number)
         {
             foreach (var field in ProtoMessage.Parse(payload).Fields)

@@ -1,176 +1,176 @@
-# Misiones
+# Quests
 
-Cómo se coge una misión, cómo avanza y cómo termina. Todo lo que hay aquí sale de medir las 401
-capturas de Wireshark y el volcado del cliente; lo que no está medido se dice que no lo está.
+How a quest is taken, how it progresses and how it ends. Everything here comes from measuring the 401
+Wireshark captures and the client dump; what is not measured is said not to be.
 
 ---
 
-## 1. Los seis opcodes
+## 1. The six opcodes
 
 ```
-S->C  ief  {1: mision}                                   arranca
-C->S  ieo  {2: mision}                    ->  S->C  idu  el paso y sus objetivos
-C->S  idw  {1: mision, 2: objetivo}                      el cliente da un objetivo por hecho
-S->C  idz  {1: mision, 2: paso}                          el servidor valida el paso
-C->S  iec  {1: mision}                                   pregunta por una misión suya
+S->C  ief  {1: quest}                                    starts
+C->S  ieo  {2: quest}                     ->  S->C  idu  the step and its objectives
+C->S  idw  {1: quest, 2: objective}                      the client takes an objective as done
+S->C  idz  {1: quest, 2: step}                           the server validates the step
+C->S  iec  {1: quest}                                    asks about one of its quests
 ```
 
-Las direcciones están comprobadas **por puertos**, no sólo por el campo raíz del sobre.
+The directions are checked **by ports**, not only by the envelope's root field.
 
-### Por qué se sabe que son misiones y no otra cosa
+### Why it is known they are quests and not something else
 
-Los documentos de este repositorio archivaban `ieo`/`idu` como la pareja de elementos interactivos
-y `idz`/`idw` como «extras de conexión». Era una suposición vieja, del mismo tipo que la que puso
-nombres de misiones a `lry`, `isf`, `lol` e `izu`, que **no aparecen en ninguna de las tres capturas
-de misiones**.
+This repository's documents filed `ieo`/`idu` as the interactive elements pair
+and `idz`/`idw` as «connection extras». It was an old assumption, of the same kind as the one that gave
+quest names to `lry`, `isf`, `lol` and `izu`, which **do not appear in any of the three quest
+captures**.
 
-Lo que lo zanja no es que los números «parezcan» ids de misión —un número pequeño lo parece por
-casualidad— sino que **cuadran entre sí**:
+What settles it is not that the numbers «look like» quest ids —a small number looks like one by
+chance— but that **they match each other**:
 
 | | |
 |---|---|
-| Tramas `idu` en las 401 capturas | 448 |
-| …cuyo paso pertenece de verdad a la misión que nombran | **448 de 448** |
-| Objetivos dentro de ellas | 1.479 |
-| …que pertenecen de verdad a ese paso | **1.479 de 1.479** |
-| Tramas `idz` coherentes | 21 de 21 |
-| Tramas `idw` coherentes | 16 de 16 |
+| `idu` frames in the 401 captures | 448 |
+| …whose step really belongs to the quest they name | **448 of 448** |
+| Objectives inside them | 1,479 |
+| …that really belong to that step | **1,479 of 1,479** |
+| Coherent `idz` frames | 21 of 21 |
+| Coherent `idw` frames | 16 of 16 |
 
-448 parejas (misión, paso) sacadas de una lectura equivocada del formato no salen coherentes.
+448 (quest, step) pairs taken from a wrong reading of the format do not come out coherent.
 
-### El campo que significa lo contrario de lo que parece
+### The field that means the opposite of what it seems
 
-En cada objetivo de un `idu`, el campo 4 vale 1 o no está. Lo obvio sería que 1 fuese «hecho». Es al
-revés. Siguiendo el paso 2249 a lo largo de la captura del tutorial:
+In each objective of an `idu`, field 4 is 1 or absent. The obvious thing would be for 1 to be «done». It is the
+other way round. Following step 2249 through the tutorial capture:
 
 ```
-[(9655, 1)]                                        9655 es lo que hay que hacer
-[(9655, ·), (9656, 1)]                             9655 hecho, ahora el 9656
-[(9655, ·), (9656, ·), (9657..9661, 1)]            los dos hechos, cinco más
+[(9655, 1)]                                        9655 is what has to be done
+[(9655, ·), (9656, 1)]                             9655 done, now 9656
+[(9655, ·), (9656, ·), (9657..9661, 1)]            both done, five more
 ```
 
-**La marca abandona al objetivo que se cumple.** Y varios pueden estar pendientes a la vez, así que
-un paso no se puede modelar como un puntero dentro de una lista.
+**The mark leaves the objective that is met.** And several can be pending at once, so
+a step cannot be modelled as a pointer into a list.
 
-`Jondo.Unity.Tests/Protocol/QuestProtocolTests.cs` compara byte a byte lo que construye este
-servidor con esas tramas.
+`Jondo.Unity.Tests/Protocol/QuestProtocolTests.cs` compares byte for byte what this
+server builds with those frames.
 
-### Una diferencia a propósito
+### A difference on purpose
 
-El servidor de Ankama manda un **prefijo creciente** de los objetivos del paso: el 3183 declara
-cuatro y la captura enseña dos, luego cuatro. Éste los manda todos de una vez, porque cuáles
-considera Ankama «revelados» no está en ningún dato que tengamos, y enseñar de más es menos malo que
-esconder un objetivo que hace falta.
+Ankama's server sends a **growing prefix** of the step's objectives: 3183 declares
+four and the capture shows two, then four. This one sends them all at once, because which ones
+Ankama considers «revealed» is not in any data we have, and showing too much is less bad than
+hiding an objective that is needed.
 
 ---
 
-## 2. Cómo se coge
+## 2. How it is taken
 
-El enganche es el diálogo, y está en los datos del propio cliente: **un paso de misión declara la
-frase de NPC con la que se entrega**.
+The hook is the dialog, and it is in the client's own data: **a quest step declares the
+NPC line it is handed out with**.
 
 ```
-quest.startPosition  ->  npcId + mapId     quién la reparte y dónde
-step.dialogId        ->  id de frase       la frase exacta con la que se da
+quest.startPosition  ->  npcId + mapId     who hands it out and where
+step.dialogId        ->  line id           the exact line it is given with
 ```
 
-**1.260 de los 2.225 pasos** traen `dialogId`, y **los 1.260 resuelven a texto de verdad**. De ésos,
-1.177 pertenecen a una misión que arranca en un NPC con nombre y mapa.
+**1,260 of the 2,225 steps** carry `dialogId`, and **all 1,260 resolve to real text**. Of those,
+1,177 belong to a quest that starts at an NPC with a name and a map.
 
-La captura `Misiones\hablar con NPC y aceptar una mision` enseña la cadena entera: el cliente abre
-el diálogo en el mapa 212863492, el servidor lo baja hasta la frase 50071, el jugador elige la
-respuesta 66788, y **entonces** sale `ief {2432}`. La misión 2432 dice que la reparte el NPC 6617 en
-el mapa 212863492 y su único paso declara `dialogId 50071`. Tres números independientes, una sola
-historia.
+The capture `Misiones\hablar con NPC y aceptar una mision` shows the whole chain: the client opens
+the dialog on map 212863492, the server takes it down to line 50071, the player picks
+answer 66788, and **then** `ief {2432}` comes out. Quest 2432 says it is handed out by NPC 6617 on
+map 212863492 and its only step declares `dialogId 50071`. Three independent numbers, a single
+story.
 
-**Después de elegir la respuesta, no al llegar a la frase.** Ése es el orden de la captura y es el
-que copia el motor.
+**After picking the answer, not on reaching the line.** That is the capture's order and it is the
+one the engine copies.
 
-### Cuál de las respuestas es la que acepta
+### Which of the answers is the one that accepts
 
-**No se puede sacar de las capturas.** La respuesta que daba la misión llevaba un campo extra, pero
-ese campo sale en **184 de las 429 respuestas capturadas** y casi ninguna es de misión: no es una
-marca de misión.
+**It cannot be taken from the captures.** The answer that gave the quest carried an extra field, but
+that field shows up in **184 of the 429 captured answers** and almost none of them are quest ones: it is not a
+quest mark.
 
-Lo dice el árbol, con `startsQuest`. Antes de eso, cualquier respuesta de la frase arrancaba la
-misión —también «No, gracias»—, que es lo que pasa todavía en las frases sin árbol escrito. Ver la
-sección 7.
+The tree says it, with `startsQuest`. Before that, any answer of the line started the
+quest —«No, gracias» too—, which is what still happens on lines without a written tree. See
+section 7.
 
 ---
 
-## 3. La condición de arranque
+## 3. The start condition
 
-Ankama la escribe como una cadena por misión. La gramática está medida sobre las 1.976:
+Ankama writes it as one string per quest. The grammar is measured over all 1,976:
 
 ```
-condicion := termino | condicion '&' condicion | condicion '|' condicion | '(' condicion ')'
-termino   := OP CMP VALOR (',' VALOR)*
-OP        := dos letras            29 distintos
+condition := term | condition '&' condition | condition '|' condition | '(' condition ')'
+term      := OP CMP VALUE (',' VALUE)*
+OP        := two letters           29 distinct
 CMP       := '=' | '!' | '>' | '<'
 ```
 
-Tres cosas fáciles de equivocar, y las tres comprobadas:
+Three things easy to get wrong, and all three checked:
 
-- **«Distinto» es `!` a secas, nunca `!=`.** `Qa!496` es «la misión 496 no está en curso». No hay ni
-  un `!=` en todo el fichero, y tratar el `!` como ruido invertiría 236 condiciones.
-- **Hay paréntesis y anidan hasta tres niveles.** 170 misiones los usan.
-- **La precedencia da igual en la práctica.** 168 condiciones mezclan `&` y `|` y todas las mezclas
-  van entre paréntesis. `&` liga más fuerte, como en C, que es la lectura que concuerda con las 168.
+- **«Not equal» is a bare `!`, never `!=`.** `Qa!496` is «quest 496 is not in progress». There is not
+  a single `!=` in the whole file, and treating the `!` as noise would invert 236 conditions.
+- **There are parentheses and they nest up to three levels.** 170 quests use them.
+- **Precedence does not matter in practice.** 168 conditions mix `&` and `|` and every mix
+  goes in parentheses. `&` binds tighter, as in C, which is the reading that agrees with all 168.
 
-Y dos rarezas de Ankama que hay que leer sin atragantarse: **`E` como quinto comparador** (2 usos,
-`POE14271` y `POE11563`) y **un valor con letra**, `PJ>a,199` (1 uso).
+And two Ankama oddities to read without choking: **`E` as a fifth comparator** (2 uses,
+`POE14271` and `POE11563`) and **a value with a letter**, `PJ>a,199` (1 use).
 
-### Lo que sabe juzgar y lo que no
+### What it knows how to judge and what not
 
-Seis operadores: `PL` nivel, `Qf` misión terminada, `Qa` misión en curso, `Qc` terminada también,
-`Qo` objetivo cumplido, `Pm` mapa actual. Cubren **todos** los términos de 935 de las 1.976
-condiciones.
+Six operators: `PL` level, `Qf` quest finished, `Qa` quest in progress, `Qc` finished as well,
+`Qo` objective met, `Pm` current map. They cover **every** term of 935 of the 1,976
+conditions.
 
-`Qc` se lee como «terminada» por lo que aparece a su lado: `(Qa=890|Qc=890)` es «la 890 está en curso
-o ya se hizo». `Qo` lleva ids de objetivo, 116 de 116.
+`Qc` is read as «finished» because of what appears next to it: `(Qa=890|Qc=890)` is «890 is in progress
+or already done». `Qo` carries objective ids, 116 of 116.
 
-Lo que no entiende —alineamiento, gremio, banderas de servidor— **lo deja pasar y lo dice**.
-Rechazarlo dejaría el 53% de las misiones fuera del alcance de cualquiera, que es peor respuesta que
-ofrecerlas antes de tiempo. Los términos que sí entiende se siguen exigiendo.
+What it does not understand —alignment, guild, server flags— **it lets through and says so**.
+Rejecting it would leave 53% of the quests out of anyone's reach, which is a worse answer than
+offering them early. The terms it does understand are still required.
 
-### La cadena
+### The chain
 
-990 misiones exigen otra antes, y ahí está la cadena de Astrub tal cual:
+990 quests require another one before, and there is the Astrub chain as it is:
 
 ```
-mision 56  Ps=1&Pa=1&PL>29&Qf=55
-mision 57  Ps=1&Pa=2&PL>29&Qf=56
-mision 58  Ps=1&Pa=3&PL>29&Qf=57
+quest 56  Ps=1&Pa=1&PL>29&Qf=55
+quest 57  Ps=1&Pa=2&PL>29&Qf=56
+quest 58  Ps=1&Pa=3&PL>29&Qf=57
 ```
 
 ---
 
-## 4. Cómo se cumple un objetivo
+## 4. How an objective is met
 
-Hay 18 tipos. El motor los cierra por dos caminos:
+There are 18 types. The engine closes them in two ways:
 
-**Lo dice el cliente** (`idw`). Los de tipo 0 son texto libre —5.670 de los 15.547— y piden pulsar
-algo de la interfaz, de lo que el servidor no se entera nunca. Se le cree, y el riesgo se acota en
-`QuestLog.Tick`: sólo acepta un objetivo **del paso en el que el personaje está de verdad**, así que
-lo peor que puede hacer un cliente mentiroso es terminarse una misión que ya tiene, en el orden en
-que esa misión está escrita.
+**The client says so** (`idw`). Type 0 ones are free text —5,670 of the 15,547— and ask for clicking
+something in the interface, which the server never hears about. It is believed, and the risk is bounded in
+`QuestLog.Tick`: it only accepts an objective **of the step the character is really on**, so
+the worst a lying client can do is finish a quest it already has, in the order in
+which that quest is written.
 
-**Lo cuenta el servidor** (fin de combate). Tres tipos nombran un monstruo, y en los tres
-`parameter0` es el monstruo y `parameter1` cuántos:
+**The server counts it** (end of fight). Three types name a monster, and in all three
+`parameter0` is the monster and `parameter1` how many:
 
-| Tipo | Qué | Cuántos |
+| Type | What | How many |
 |---|---|---|
-| 6 | vencer N en un solo combate | 776 de 788 con monstruo real |
-| 14 | vencer N, acumulando entre combates | 143 de 143 |
-| 16 | vencer N en un mapa concreto, en un combate | 88 de 88 |
+| 6 | defeat N in a single fight | 776 of 788 with a real monster |
+| 14 | defeat N, accumulating across fights | 143 of 143 |
+| 16 | defeat N on a specific map, in one fight | 88 of 88 |
 
-Las invocaciones no cuentan. Están en el bando contrario con `IsMonster` puesto, y este proyecto ya
-tropezó dos veces con eso: un monstruo invocador estaba pagando kamas por criaturas que se fabricaba
-él mismo.
+Summons do not count. They are on the opposing side with `IsMonster` set, and this project already
+tripped over that twice: a summoning monster was paying kamas for creatures it made
+itself.
 
 ---
 
-## 5. Lo que se guarda
+## 5. What is stored
 
 ```sql
 CREATE TABLE CharacterQuests (
@@ -183,175 +183,175 @@ CREATE TABLE CharacterQuests (
 );
 ```
 
-`Objectives` son dos mitades separadas por una barra: los objetivos ya hechos, y luego los que van a
-medias con su cuenta. `18390,18391|18392:3`.
+`Objectives` is two halves split by a bar: the objectives already done, and then the ones half
+way with their count. `18390,18391|18392:3`.
 
-Se escribe **en el momento del cambio**, no al salir. En este servidor no hay guardado periódico y
-`SaveCurrentCharacter` sólo escribe la fila de `Characters`, así que lo que espere al logout se
-pierde en un cierre feo — y perder una misión de una tarde es peor que perder unos kamas.
-
----
-
-## 6. El diario de otro
-
-El bloque que el servidor reproduce al entrar al mundo llevaba **261 tramas `idu`**: el diario de
-misiones entero de la cuenta que se capturó. Todo el que entraba veía las misiones de un
-desconocido, y desde que hay motor además contradecían a lo que el servidor cree.
-
-`idu` está ya en `WorldEntry.NotReplayed`, y en su lugar va el diario del personaje que se conecta.
+It is written **at the moment of the change**, not on leaving. On this server there is no periodic save and
+`SaveCurrentCharacter` only writes the `Characters` row, so whatever waits for logout is
+lost in an ugly shutdown — and losing an afternoon's quest is worse than losing a few kamas.
 
 ---
 
-## 7. Los árboles de diálogo
+## 6. Someone else's journal
 
-Sin árbol, el servidor sólo sabe mandar **la primera frase que declara la plantilla del NPC**, con
-todas sus respuestas de golpe. Snori Nairb ofrece las treinta y nueve suyas a la vez, ninguna lleva
-a ningún sitio, y la frase donde se entrega la misión no se alcanza nunca.
+The block the server replays on entering the world carried **261 `idu` frames**: the whole quest
+journal of the captured account. Everyone who entered saw a stranger's
+quests, and since there has been an engine they also contradicted what the server believes.
 
-De los 1.260 pasos que se entregan hablando:
+`idu` is now in `WorldEntry.NotReplayed`, and in its place goes the journal of the character connecting.
 
-| | |
-|---|---|
-| Alcanzables sin árbol (la frase es la primera de la plantilla) | **21** |
-| La frase existe en la plantilla pero no es la primera | 64 |
-| **La frase ni siquiera está en la plantilla** | **1.092** |
+---
 
-### De dónde salen: dos fuentes, y la segunda es mejor
+## 7. The dialog trees
 
-Hay dos maneras de recuperar el emparejamiento «qué respuesta va en qué frase», que es lo único que
-nunca salió del servidor de Ankama.
+Without a tree, the server only knows how to send **the first line the NPC's template declares**, with
+all its answers at once. Snori Nairb offers its thirty-nine at the same time, none of them lead
+anywhere, and the line where the quest is handed out is never reached.
 
-#### a) Las guías de dofuspourlesnoobs — sirvió para Astrub
-
-Escriben las respuestas del jugador en francés, entre comillas francesas. Funciona por dos cosas
-medidas, no supuestas:
-
-- **Dentro de un mismo NPC, el 98,3% de sus frases se identifican por su texto.** En todo el juego
-  sólo es el 70% —«Hasta luego.» lo dicen cientos— pero una conversación es con un NPC.
-- **Los ids de respuesta no tienen que ser los de Ankama.** El 36,4% de las respuestas de un NPC
-  comparten texto con otra suya, y da igual: el servidor manda los ids y el cliente devuelve el que
-  le dieron. Vale cualquiera con el texto bueno mientras el árbol sea coherente consigo mismo.
-
-`tools/dialogue_from_guide.py` empareja frase → id. `tools/build_dialogue_trees.py` monta el árbol
-y lo escribe. Los hechos a mano llevan `_byHand` y no se pisan.
-
-**Cuidado con la caché de la web:** se la pilló sirviendo la página de otra misión bajo la misma
-URL, dos respuestas del mismo tamaño y distinto contenido, **y el cambiazo depende del
-user-agent** — con curl pelado sale una misión y con user-agent de Chrome otra. Se llegó a ver una
-respuesta cuyo `<title>` era el bueno y cuyo encabezado del cuerpo era de otra misión, así que
-comparar títulos no basta: hay que mirar el encabezado del cuerpo. La protección de fondo es que
-las respuestas se emparejan contra el NPC que da la misión: si la página es otra, no casa ninguna.
-
-#### b) La conversación del propio cliente — hizo falta para Incarnam
-
-**Para Incarnam la guía no vale.** Se bajaron las 24 páginas y se leyeron dos veces cada una: las
-24 existen, pero **21 no imprimen ni una sola opción de respuesta** —son prosa narrativa, «Parlez à
-Berb Nhin», «Ramenez les Orties»— y de las tres que sí, dos atribuyen las respuestas a un NPC
-distinto del que da la misión. No es un fallo de extracción: se buscó en el HTML crudo las comillas
-francesas, `<i>`, `<em>` y `font-style:italic`.
-
-La fuente buena estaba en casa. El cliente trae:
+Of the 1,260 steps handed out by talking:
 
 | | |
 |---|---|
-| las frases que declara la plantilla del NPC | con su texto |
-| **todas** las respuestas que ese NPC puede dar | con su texto |
-| **el texto de la frase que nombra cada paso** | aunque la plantilla no la declare |
+| Reachable without a tree (the line is the template's first) | **21** |
+| The line exists in the template but is not the first | 64 |
+| **The line is not even in the template** | **1,092** |
 
-O sea todo menos el emparejamiento. Y los textos se contestan entre sí en francés corriente: la
-frase 20877 dice que la caporal Mynerve espera en lo alto de la torre, y la respuesta 25045 dice
-«Accepter d'être mis à l'épreuve et se diriger vers l'escalier». Eso se lee y se escribe.
+### Where they come from: two sources, and the second is better
 
-`tools/npc_conversation.py <npc>` vuelca eso, y `--category 19` lo hace de todos los que reparten
-misiones de una categoría. `tools/merge_authored_trees.py` comprueba el árbol escrito contra la
-plantilla y el catálogo antes de dejarlo entrar, porque escribir a mano gana en fidelidad y pierde
-lo único que da un generador: no poder equivocarse de lectura. Comprueba que la respuesta sea del
-NPC, que no se repita, que todo `next` caiga en una frase del árbol, que la frase sea real, que la
-entrega esté donde el paso dice, que ninguna respuesta se esconda a sí misma, que quede una salida,
-y que colocadas + descartadas den todas las del NPC.
+There are two ways of recovering the «which answer goes on which line» pairing, which is the only thing
+that never came out of Ankama's server.
 
-Estos árboles se guardan con `_byHand`, como los escritos con el editor.
+#### a) The dofuspourlesnoobs guides — it worked for Astrub
 
-### Para qué es cada respuesta
+They write the player's answers in French, in French quotation marks. It works because of two things
+measured, not assumed:
+
+- **Within one NPC, 98.3% of its lines are identified by their text.** Across the whole game
+  it is only 70% —«Hasta luego.» is said by hundreds— but a conversation is with one NPC.
+- **The answer ids do not have to be Ankama's.** 36.4% of an NPC's answers
+  share text with another of its own, and it does not matter: the server sends the ids and the client returns the one
+  it was given. Any one with the right text will do as long as the tree is coherent with itself.
+
+`tools/dialogue_from_guide.py` pairs line → id. `tools/build_dialogue_trees.py` builds the tree
+and writes it. The hand-made ones carry `_byHand` and are not overwritten.
+
+**Beware of the website's cache:** it was caught serving another quest's page under the same
+URL, two responses of the same size and different content, **and the swap depends on the
+user-agent** — with bare curl one quest comes out and with a Chrome user-agent another. A
+response was even seen whose `<title>` was the right one and whose body heading was another quest's, so
+comparing titles is not enough: the body heading has to be looked at. The underlying protection is that
+the answers are paired against the NPC that gives the quest: if the page is another one, none match.
+
+#### b) The client's own conversation — it was needed for Incarnam
+
+**For Incarnam the guide is no good.** The 24 pages were downloaded and each one was read twice: all
+24 exist, but **21 do not print a single answer option** —they are narrative prose, «Parlez à
+Berb Nhin», «Ramenez les Orties»— and of the three that do, two attribute the answers to an NPC
+other than the one giving the quest. It is not an extraction failure: the raw HTML was searched for French
+quotation marks, `<i>`, `<em>` and `font-style:italic`.
+
+The good source was at home. The client carries:
 
 | | |
 |---|---|
-| `startsQuest` | esta respuesta **da** la misión |
-| `quest` | sólo se ofrece con esa misión en curso |
-| `step` | y sólo en ese paso |
-| `afterQuest` | sólo una vez terminada |
+| the lines the NPC's template declares | with their text |
+| **all** the answers that NPC can give | with their text |
+| **the text of the line each step names** | even if the template does not declare it |
 
-`startsQuest` va aparte de `quest` y tiene que estarlo: marcar como «de la misión» la respuesta que
-la **empieza** la escondería hasta tenerla, y entonces no la podría coger nadie.
+That is, everything but the pairing. And the texts answer each other in plain French: line
+20877 says Corporal Mynerve is waiting at the top of the tower, and answer 25045 says
+«Accepter d'être mis à l'épreuve et se diriger vers l'escalier». That can be read and written.
 
-Antes de esto, **cualquier** respuesta de la frase daba la misión, así que «No, gracias» también.
+`tools/npc_conversation.py <npc>` dumps that, and `--category 19` does it for all the ones who hand out
+quests of a category. `tools/merge_authored_trees.py` checks the written tree against the
+template and the catalogue before letting it in, because writing by hand gains in fidelity and loses
+the one thing a generator gives: not being able to misread. It checks that the answer belongs to the
+NPC, that it is not repeated, that every `next` lands on a line of the tree, that the line is real, that the
+handing out is where the step says, that no answer hides itself, that there is an exit left,
+and that placed + discarded add up to all of the NPC's.
 
-## 8. La marca verde sobre el NPC
+These trees are stored with `_byHand`, like the ones written with the editor.
 
-Es el opcode `iom`:
+### What each answer is for
+
+| | |
+|---|---|
+| `startsQuest` | this answer **gives** the quest |
+| `quest` | only offered with that quest in progress |
+| `step` | and only on that step |
+| `afterQuest` | only once finished |
+
+`startsQuest` is separate from `quest` and has to be: marking as «of the quest» the answer that
+**starts** it would hide it until having it, and then nobody could take it.
+
+Before this, **any** answer of the line gave the quest, so «No, gracias» did too.
+
+## 8. The green mark over the NPC
+
+It is the `iom` opcode:
 
 ```
-1 { 2 (repetido) { 2: <ids de misión empaquetados>, 4: actor }, 3: mapa }
+1 { 2 (repeated) { 2: <packed quest ids>, 4: actor }, 3: map }
 ```
 
-Los **294 números** que llevan las 380 tramas capturadas son ids de misión, los 294. Y se ve
-apagarse: en el tutorial un actor llega con `[2511]` y más tarde el mismo actor llega con la lista
-vacía, que es justo cuando se coge. **235 de las 380 van vacías** — así se borra la marca.
+The **294 numbers** the 380 captured frames carry are quest ids, all 294. And it can be seen
+going out: in the tutorial an actor arrives with `[2511]` and later the same actor arrives with the list
+empty, which is exactly when it is taken. **235 of the 380 are empty** — that is how the mark is erased.
 
-Se manda al llegar a un mapa y otra vez al coger una misión. **Todos los NPCs del mapa se nombran**,
-también los que no tienen nada: dejar uno fuera no dice nada de él y el cliente seguiría pintando lo
-de la última vez.
+It is sent on arriving at a map and again on taking a quest. **Every NPC on the map is named**,
+also the ones that have nothing: leaving one out says nothing about it and the client would keep painting what
+it had last time.
 
-### Se marca lo que se puede coger, no lo que el catálogo promete
+### What can be taken is marked, not what the catalogue promises
 
-El catálogo nombra repartidor en **1.958** parejas misión/NPC. De ésas, sólo **70** se pueden
-entregar con una conversación que este servidor sepa tener: 43 porque hay un árbol escrito que las
-da, y 27 porque la frase que el paso nombra resulta ser la de apertura de la plantilla. Marcar las
-otras 1.888 pondría una marca verde sobre casi todo el mundo que **no se apaga nunca**, por mucho
-que hable el jugador, porque a esa frase no se llega.
+The catalogue names a giver in **1,958** quest/NPC pairs. Of those, only **70** can be
+handed out with a conversation this server knows how to have: 43 because there is a written tree that gives
+them, and 27 because the line the step names turns out to be the template's opening one. Marking the
+other 1,888 would put a green mark over almost everybody that **never goes out**, however much
+the player talks, because that line is never reached.
 
-Así que la marca sale de `QuestsOfferedBy`, no del catálogo. Y va en los dos sentidos: el árbol
-también puede ofrecer una misión que el catálogo no le asigna a nadie —hay **155 sin repartidor**, y
-«Mort au rat !» es una de ellas aunque el tabernero Grobid declare la respuesta «Dire que vous avez
-vu l'affiche placardée dehors», que es justo el cartel con el que empieza.
+So the mark comes from `QuestsOfferedBy`, not from the catalogue. And it goes both ways: the tree
+can also offer a quest the catalogue assigns to nobody —there are **155 without a giver**, and
+«Mort au rat !» is one of them even though the innkeeper Grobid declares the answer «Dire que vous avez
+vu l'affiche placardée dehors», which is exactly the poster it starts with.
 
-Cuidado con una consecuencia que muerde: **escribir un árbol le quita al NPC las misiones que no
-marques en él.** Sin árbol vale cualquier respuesta de la frase que el paso nombra; en cuanto hay
-árbol, `NpcHandler` deja de preguntarle al catálogo y sólo da lo que lleve `startsQuest`. Un árbol
-que se lleve la frase de entrega sin marcar nada en ella deja una conversación impecable que no
-entrega nada. Lo vigila `AuthoredDialoguesTests`.
+Watch out for a consequence that bites: **writing a tree takes away from the NPC the quests you do not
+mark in it.** Without a tree any answer of the line the step names will do; as soon as there is
+a tree, `NpcHandler` stops asking the catalogue and only gives what carries `startsQuest`. A tree
+that takes the handing-out line without marking anything on it leaves a flawless conversation that
+hands out nothing. `AuthoredDialoguesTests` watches over it.
 
-## 9. Las recompensas
+## 9. The rewards
 
-La experiencia y los kamas son **multiplicadores** —2, o 1,2, o 0,035— y la base sobre la que
-multiplican está en el código del cliente, que la enseña antes de dar la recompensa: clase `lg` de
-Core, la misma fórmula para misiones y logros, con el nivel óptimo del paso y su duración. Ver
-`docs/achievements.md` §4 y `RewardFormula`. Medido: la misión 1629 del tutorial paga 141 a nivel 2
-en la captura, y eso es lo que paga aquí (con el 5 % de bonus que tenía ese personaje).
+Experience and kamas are **multipliers** —2, or 1.2, or 0.035— and the base they
+multiply is in the client's code, which shows it before giving the reward: Core's class `lg`,
+the same formula for quests and achievements, with the step's optimal level and its duration. See
+`docs/achievements.md` §4 and `RewardFormula`. Measured: tutorial quest 1629 pays 141 at level 2
+in the capture, and that is what it pays here (with the 5 % bonus that character had).
 
-Sólo se paga la recompensa del **tramo de nivel** del personaje: 4.555 de las 6.707 llevan
-`levelMin`/`levelMax`, y las ofrendas del Almanax declaran diez, de 9-29 a 190-200. Antes se
-pagaban todas juntas. Las actitudes de la recompensa se enseñan con `khi`.
+Only the reward of the character's **level band** is paid: 4,555 of the 6,707 carry
+`levelMin`/`levelMax`, and the Almanax offerings declare ten, from 9-29 to 190-200. They used to be
+paid all together. The reward's attitudes are taught with `khi`.
 
-## 10. El Almanax
+## 10. The Almanax
 
-INFERIDO entero: ninguna captura pisa el santuario. Cada uno de los 376 días del calendario del
-cliente lleva a una misión corriente, «Ofrenda para …», con la condición `PL>19&Ad=<día>`. `Ad` lo
-contesta `Managers.Almanax`: la entrada del día de hoy. Las 376 las da Ontoral Zo (NPC 1625) y
-ningún paso nombra una frase suya, así que se le aplica la regla de los NPCs sin árbol: su
-conversación de apertura entrega la de hoy. Una vez al día.
+INFERRED entirely: no capture sets foot in the sanctuary. Each of the 376 days of the client's calendar
+leads to an ordinary quest, «Ofrenda para …», with the condition `PL>19&Ad=<day>`. `Ad` is
+answered by `Managers.Almanax`: today's entry. All 376 are given by Ontoral Zo (NPC 1625) and
+no step names a line of his, so the rule for NPCs without a tree applies: his
+opening conversation hands out today's. Once a day.
 
-Qué día es hoy: cada fecha del año la nombran dos entradas, el santo del mes (sólo ese día) y Bryss
-(31 a 34 días, «se encargará de reemplazar lo irremplazable»), y seis días al año una fiesta móvil
-con su año. Gana la más precisa: la fecha con año, y si no la entrada que nombra menos días.
+Which day it is today: each date of the year is named by two entries, the month's saint (only that day) and Bryss
+(31 to 34 days, «se encargará de reemplazar lo irremplazable»), and six days a year a moveable feast
+with its year. The most precise one wins: the date with a year, and otherwise the entry that names the fewest days.
 
-El santo de hoy sólo está donde el cliente lo pone: 80 de los 373 tienen mapa en los datos, así que
-los demás días el objetivo «ve a ver a …» no se puede cerrar. De los bonus del día se aplican los que
-no llevan condición y tocan misiones u oficios (experiencia y kamas de misión, experiencia de
-oficio); los demás llevan condiciones cuyos tipos el cliente no explica, y no se aplican.
+Today's saint is only where the client puts it: 80 of the 373 have a map in the data, so
+on the other days the «go and see …» objective cannot be closed. Of the day's bonuses, the ones applied are those that
+carry no condition and touch quests or jobs (quest experience and kamas, job
+experience); the others carry conditions whose types the client does not explain, and are not applied.
 
-## 11. Lo que falta
+## 11. What is missing
 
-- **Editar misiones.** El Studio las enseña; no las escribe.
-- **Los objetivos de recolectar, fabricar y escoltar.** Tipos 2, 3, 12 y 17.
-- **`repeatLimit`**, que necesita contar cuántas veces se ha hecho una misión y eso no se guarda.
+- **Editing quests.** Studio shows them; it does not write them.
+- **The gathering, crafting and escorting objectives.** Types 2, 3, 12 and 17.
+- **`repeatLimit`**, which needs counting how many times a quest has been done and that is not stored.

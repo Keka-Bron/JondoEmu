@@ -7,25 +7,25 @@ using Xunit;
 namespace Jondo.Unity.Tests.Sessions
 {
     /// <summary>
-    /// El personaje recién creado va EL PRIMERO de la lista que se manda después.
+    /// The freshly created character goes FIRST in the list sent afterwards.
     /// </summary>
     /// <remarks>
-    /// El cliente no pregunta cuál quieres: coge el primero de la lista y manda su selección al
-    /// instante. En el registro se ve con cinco milisegundos de diferencia:
+    /// The client does not ask which one you want: it takes the first of the list and sends its selection
+    /// instantly. In the log it is seen with five milliseconds of difference:
     ///
     ///   00:16:05.798  Creado Tymaviejas (id 13825564)
-    ///   00:16:05.803  Selected character 13825558     <- el anterior
+    ///   00:16:05.803  Selected character 13825558     <- the previous one
     ///
-    /// Nuestra lista sale de un «ORDER BY Id», así que el recién creado —el id más alto— iba el
-    /// último y el cliente entraba al mundo con el viejo. Había que volver a la pantalla de
-    /// selección y elegirlo a mano.
+    /// Our list comes from an «ORDER BY Id», so the freshly created one —the highest id— went
+    /// last and the client entered the world with the old one. One had to go back to the selection
+    /// screen and pick it by hand.
     ///
-    /// Que el nuevo va delante está medido en «crear personaje - borrar personaje»: el kvi que
-    /// sigue al kvb lleva a «Vos-Xx», el que se acaba de crear, por delante de «Berru».
+    /// That the new one goes in front is measured in «crear personaje - borrar personaje»: the kvi that
+    /// follows the kvb carries «Vos-Xx», the one just created, ahead of «Berru».
     /// </remarks>
     public class NewCharacterFirstTests
     {
-        /// <summary>Lo mismo que hace el manejador al mandar la lista tras crear.</summary>
+        /// <summary>The same the handler does when sending the list after creating.</summary>
         private static List<DbCharacter> ConElNuevoDelante(
             List<DbCharacter> lista, long recienCreado)
         {
@@ -44,7 +44,7 @@ namespace Jondo.Unity.Tests.Sessions
         [Fact]
         public void El_recien_creado_encabeza_la_lista()
         {
-            // Los ids salen ordenados de la base; el nuevo es el más alto y sin esto iba último.
+            // The ids come sorted from the base; the new one is the highest and without this it went last.
             var lista = ConElNuevoDelante(Lista(13825558, 13825560, 13825564), 13825564);
 
             Assert.Equal(13825564, lista[0].Id);
@@ -62,8 +62,8 @@ namespace Jondo.Unity.Tests.Sessions
         [Fact]
         public void Si_el_nuevo_no_esta_la_lista_se_queda_como_estaba()
         {
-            // No debe romperse ni reordenar por su cuenta: mejor una lista intacta que una
-            // barajada por un id que no existe.
+            // It must not break nor reorder on its own: better an intact list than one
+            // shuffled by an id that does not exist.
             var lista = ConElNuevoDelante(Lista(100, 200), 999);
 
             Assert.Equal(new long[] { 100, 200 }, lista.Select(c => c.Id).ToArray());

@@ -1,7 +1,7 @@
-# Lo que se publica es lo justo para ejecutar el emulador sin recompilarlo: el .exe de la raíz,
-# datos/ con lo que lee, launcher_assets/, docs/ y el código fuente. Todo lo demás fuera.
+# What is published is just what is needed to run the emulator without recompiling it: the .exe in the root,
+# datos/ with what it reads, launcher_assets/, docs/ and the source code. Everything else out.
 
-# ─── Compilación ────────────────────────────────────────────────────────────
+# ─── Build ──────────────────────────────────────────────────────────────────
 [Bb]in/
 [Oo]bj/
 publish/
@@ -9,92 +9,92 @@ runtimes/
 *.pdb
 *.deps.json
 *.runtimeconfig.json
-# Las dll van dentro del .exe de un solo fichero; ninguna suelta.
+# The dlls go inside the single-file .exe; none loose.
 *.dll
 
-# ─── Bases de datos ─────────────────────────────────────────────────────────
-# world.db son 240 MB: se distribuye comprimida en datos/world.zip y el emulador la extrae sola
-# la primera vez. auth.db la crea él con su cuenta de prueba.
+# ─── Databases ──────────────────────────────────────────────────────────────
+# world.db is 240 MB: it is distributed compressed in datos/world.zip and the emulator extracts it on its own
+# the first time. auth.db it creates itself with its test account.
 bases/
 *.db
 *.db-shm
 *.db-wal
 
-# ─── Datos extraídos del cliente ────────────────────────────────────────────
-# 436 MB de volcado en crudo. No hace falta para ejecutar: lo que el emulador lee ya está en
-# datos/, y lo genera tools/ a partir de esta carpeta.
+# ─── Data extracted from the client ─────────────────────────────────────────
+# 436 MB of raw dump. It is not needed to run: what the emulator reads is already in
+# datos/, and tools/ generates it from this folder.
 dofus3_data/
 Dofus3 Defuscated Data/
 DofusClient/
 
-# ─── Herramientas ───────────────────────────────────────────────────────────
-# Los scripts de Python generan los json de datos/ y auditan el tráfico. No se necesitan para
-# ejecutar el emulador.
+# ─── Tools ──────────────────────────────────────────────────────────────────
+# The Python scripts generate the json files of datos/ and audit the traffic. They are not needed to
+# run the emulator.
 tools/
 *.py
 __pycache__/
 
-# ─── Registros y capturas ───────────────────────────────────────────────────
-# Nunca. Llevan nombres de cuentas reales.
+# ─── Logs and captures ──────────────────────────────────────────────────────
+# Never. They carry real account names.
 logs/
 *.log
 *.csv
 *.pcapng
 *.hex
 
-# ─── Datos que el emulador no lee ───────────────────────────────────────────
-# Están en el disco por referencia, pero Paths no los resuelve.
+# ─── Data the emulator does not read ────────────────────────────────────────
+# They are on disk for reference, but Paths does not resolve them.
 datos/world_entering_3_6_10_10.bin
 datos/characteristics.json
 datos/dofus3_mappings.json
 datos/effects.json
-# map_neighbours.json SÍ se lee desde el 27/08/2026: es lo que le da a Jondo Studio los cuatro
-# mapas de al lado, que es como se recorre el mundo de verdad en vez de a golpe de id de ocho
-# cifras. Son 2,6 MB y es el único fichero que este cambio añade al repositorio.
+# map_neighbours.json IS read since 27/08/2026: it is what gives Jondo Studio the four
+# neighbouring maps, which is how the world is really walked instead of by eight-digit
+# ids. It is 2.6 MB and it is the only file this change adds to the repository.
 
-# ─── Restos de versiones anteriores ─────────────────────────────────────────
-# La especificación técnica es una crónica de 3.893 líneas de cómo se fue descubriendo cada cosa,
-# arrastrada desde la versión 3.6.4.3. Tiene valor para quien la escribió, pero no es una
-# referencia y mezcla cosas que ya no valen, así que se queda en local y no se publica. Lo que
-# sirve para consultar está en los demás documentos de docs/.
+# ─── Leftovers from earlier versions ────────────────────────────────────────
+# The technical specification is a 3,893-line chronicle of how each thing was discovered,
+# carried over from version 3.6.4.3. It is valuable to whoever wrote it, but it is not a
+# reference and it mixes things that no longer hold, so it stays local and is not published. What
+# is useful to look up is in the other documents of docs/.
 docs/EspecificacionTecnica.md
-# Y este no es documentación de Jondo: es el README de UnityInspectorStandalone, una herramienta
-# externa que se usó para inspeccionar el cliente en tiempo de ejecución. Se queda en local como
-# referencia de trabajo, pero en el repositorio solo despista.
+# And this is not Jondo documentation: it is the README of UnityInspectorStandalone, an external
+# tool used to inspect the client at run time. It stays local as a working
+# reference, but in the repository it only misleads.
 docs/UnityInspectorReadme.md
 out.txt
 mock_server.db
 *_old.cs
 scratch_*
 
-# ─── Entornos de desarrollo ─────────────────────────────────────────────────
+# ─── Development environments ───────────────────────────────────────────────
 .vs/
 .idea/
 .vscode/
 *.user
 *.suo
 
-# ─── Desofuscador ───────────────────────────────────────────────────────────
-# Las respuestas del modelo son caché: se pueden volver a pedir, ocupan un fichero por pregunta y
-# no dicen nada que no esté ya en datos/propuestas_*.tsv. Los expedientes son 2.169 ficheros que
-# «expediente --todos» regenera en un segundo a partir del índice.
+# ─── Deobfuscator ───────────────────────────────────────────────────────────
+# The model's answers are a cache: they can be asked for again, they take a file per question and
+# say nothing that is not already in datos/propuestas_*.tsv. The dossiers are 2,169 files that
+# «expediente --todos» regenerates in a second from the index.
 datos/respuestas/
 expedientes/
 
-# ─── Clientes bajados de la CDN ─────────────────────────────────────────────
-# Los manifiestos de Cytrus son 51 MB por versión y son caché pura: «protocolbuilder bajar» los
-# vuelve a traer, y verifica cada fichero contra su huella. Los clientes en sí son 183 MB por
-# versión y tampoco se publican: son de Ankama.
+# ─── Clients downloaded from the CDN ────────────────────────────────────────
+# The Cytrus manifests are 51 MB per version and are pure cache: «protocolbuilder bajar» fetches
+# them again, and checks each file against its hash. The clients themselves are 183 MB per
+# version and are not published either: they are Ankama's.
 datos/cytrus/
 clientes/
 
-# El proyecto de tests compila como cualquier otro
+# The tests project builds like any other
 TestResults/
 Jondo.Unity.Tests/bin/
 Jondo.Unity.Tests/obj/
 Jondo.Unity.Studio/bin/
 Jondo.Unity.Studio/obj/
 
-# Las fotos de la ventana del lanzador: son de trabajo, no del proyecto.
+# The photos of the launcher window: they are working files, not part of the project.
 capturas-lanzador/
 README.bbcode.txt

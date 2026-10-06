@@ -25,7 +25,26 @@
     "The two doors out - 504555 and 504556, landing on 343 - were already in Giny's catalogue;",
     "the way IN was in nobody's. The landing cell 457 is NOT measured: no capture walks through",
     "this door. It is the walkable cell between the two doors out, so whoever comes in stands",
-    "where whoever goes out starts from."
+    "where whoever goes out starts from.",
+    "",
+    "THE GM PRISON. Its three maps, all at [66,6] in subarea 751 and joined by nothing on the",
+    "world grid, made into one round: the sky jail -> the dungeon -> the island -> the jail.",
+    "Where Ankama's own server sends them is not in the client and no capture goes there, so",
+    "the round is ours; what each end hangs off is the client's map data (bundle world_401):",
+    "",
+    "  105121026, the sky jail. Its one stair: the trapdoor 479454 in the middle of the",
+    "    corridor, gfx 19649, drawn over cells 300, 314, 315 and 328. Down it goes to the",
+    "    dungeon, landing on 370 in its big room -- the one with the cage, 92 cells; the 40",
+    "    behind the bars are walled off from it.",
+    "  105120002, the dungeon. Not one element on it, so its way out is a FLOOR passage, in",
+    "    floor_passages.json: the cage hanging from its rope, cell 333, lifts you to the island.",
+    "  105119744, the island. Its one element is the treasure chest 479462 on cell 300 (gfx",
+    "    682, the chest's sprite). Opening it puts you back in the jail, on 342 at the foot of",
+    "    the trapdoor.",
+    "",
+    "Type -1 and skill 184, the pair every measured passage uses (TeleportContent.DefaultType",
+    "and DefaultSkill). A prisoner goes through none of them: every passage ends in",
+    "TeleportHandler.ToMapAsync, which asks the jail first."
   ],
   "passages": [
     {
@@ -87,6 +106,26 @@
       "skill": 184,
       "toMap": 99090957,
       "toCell": 457
+    },
+    {
+      "map": 105121026,
+      "element": 479454,
+      "cell": 314,
+      "gfx": 19649,
+      "type": -1,
+      "skill": 184,
+      "toMap": 105120002,
+      "toCell": 370
+    },
+    {
+      "map": 105119744,
+      "element": 479462,
+      "cell": 300,
+      "gfx": 682,
+      "type": -1,
+      "skill": 184,
+      "toMap": 105121026,
+      "toCell": 342
     }
   ]
 }

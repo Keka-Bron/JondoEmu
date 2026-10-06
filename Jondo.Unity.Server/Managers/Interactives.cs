@@ -7,74 +7,74 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los elementos interactivos de cada mapa, y los zaaps.
+    /// Each map's interactive elements, and the zaaps.
     ///
-    /// Un elemento interactivo es lo que se puede clicar en el mapa: un zaap, una puerta, un cofre.
-    /// El cliente ya sabe dónde está cada uno y con qué dibujo, porque va en los datos del mapa; lo
-    /// que espera del servidor es que le diga cuáles existen, con qué número, y qué habilidad
-    /// ofrecen. Eso viaja en el jss:
+    /// An interactive element is what can be clicked on the map: a zaap, a door, a chest.
+    /// The client already knows where each one is and with which drawing, because it goes in the map data; what
+    /// it expects from the server is to be told which ones exist, with what number, and what skill
+    /// they offer. That travels in the jss:
     ///
-    ///   f11 { f1: 1, f4 { f1: uid de la habilidad, f2: habilidad }, f5: elemento, f6: tipo }
-    ///   f15 { f1: estado, f2: casilla, f3: elemento }
+    ///   f11 { f1: 1, f4 { f1: skill uid, f2: skill }, f5: element, f6: type }
+    ///   f15 { f1: state, f2: cell, f3: element }
     ///
-    /// El número del elemento no lo inventamos: es el `m_interactionId` de los datos del cliente,
-    /// comprobado contra un jss real del Castillo de Amakna, donde los tres elementos del mensaje
-    /// y el zaap salen con ese mismo número y esa misma casilla.
+    /// The element's number is not invented by us: it is the `m_interactionId` of the client's data,
+    /// checked against a real jss of Amakna Castle, where the message's three elements
+    /// and the zaap come out with that same number and that same cell.
     ///
-    /// De momento solo se declaran los zaaps. Del resto se sabe dónde están y qué dibujo tienen,
-    /// pero no qué habilidad ofrece cada uno —el tipo de elemento no está en los datos del cliente,
-    /// lo pone el servidor— y declarar una puerta sin saber qué hace no lleva a ninguna parte.
+    /// For now only the zaaps are declared. For the rest it is known where they are and what drawing they have,
+    /// but not which skill each one offers —the element type is not in the client's data,
+    /// the server puts it— and declaring a door without knowing what it does leads nowhere.
     /// </summary>
     public static class Interactives
     {
-        /// <summary>Tipo de elemento del zaap, de la tabla de interactivos del cliente.</summary>
+        /// <summary>The zaap's element type, from the client's interactives table.</summary>
         public const int ZaapType = 16;
 
-        /// <summary>La habilidad "Utilizar", que es la que ofrece un zaap.</summary>
+        /// <summary>The "Utilizar" skill, which is the one a zaap offers.</summary>
         public const int UseSkill = 114;
 
         /// <summary>
-        /// El tipo del VESTIGIO de zaap, que no es el del zaap.
+        /// The type of the zaap VESTIGE, which is not the zaap's.
         ///
-        /// El dibujo 74685 estaba declarado con tipo 16, el del zaap, y las capturas dicen 359: el
-        /// único elemento con ese dibujo que sale en un jss lo lleva las cinco veces, y el 16 no
-        /// aparece nunca para él. La habilidad sí es la misma 114, y el cliente contesta con su
-        /// iwo igual, así que el 359 no lo hace inclicable: lo llama por su nombre.
+        /// Drawing 74685 was declared with type 16, the zaap's, and the captures say 359: the
+        /// only element with that drawing that appears in a jss carries it all five times, and 16 never
+        /// appears for it. The skill is indeed the same 114, and the client answers with its
+        /// iwo all the same, so 359 does not make it unclickable: it calls it by its name.
         ///
-        /// Un vestigio no es un zaap apagado. Es el sitio donde aparece una anomalía temporal; ver
+        /// A vestige is not a switched-off zaap. It is the place where a temporal anomaly appears; see
         /// <see cref="Anomalies"/>.
         /// </summary>
         public const int VestigeType = 359;
 
-        /// <summary>El dibujo del vestigio.</summary>
+        /// <summary>The vestige's drawing.</summary>
         public const int VestigeGfx = 74685;
 
         /// <summary>
-        /// Los dibujos del zaap, que es lo que lo distingue del resto de elementos del mapa.
+        /// The zaap's drawings, which is what tells it apart from the map's other elements.
         ///
-        /// Son dos porque hay dos modelos: el de siempre y el de las zonas nuevas. No están
-        /// escritos a mano, salen de cruzar los 62 mapas con zaap contra sus elementos: 46 llevan
-        /// el primero y 15 el segundo. Al que queda, el 62, no se le encuentra por aquí.
+        /// There are two because there are two models: the usual one and the one of the new zones. They are not
+        /// written by hand, they come from crossing the 62 maps with a zaap against their elements: 46 carry
+        /// the first and 15 the second. The remaining one, the 62nd, is not found this way.
         /// </summary>
         private static readonly int[] ZaapGfx = { 301199, 74685 };
 
         /// <summary>
-        /// Dibujos que abren la lista de zaaps pero a los que no se llega nunca.
+        /// Drawings that open the zaap list but that are never arrived at.
         ///
-        /// El 37493 sale en tres mapas y en ninguno de los tres dice la tabla de zaaps del cliente
-        /// que haya zaap. Como <see cref="ZaapOf"/> exige estar en esa tabla, el elemento no se
-        /// declaraba: tres zaaps donde el jugador clicaba y no pasaba nada.
+        /// 37493 appears on three maps and on none of the three does the client's zaap table say
+        /// there is a zaap. Since <see cref="ZaapOf"/> requires being in that table, the element was not
+        /// declared: three zaaps where the player clicked and nothing happened.
         ///
-        /// Que son zaaps lo dicen las capturas, no una suposición: el recibidor de gremio —mapa
-        /// 99093249, elemento 540375, casilla 227— sale seis veces con el par 114 / 16, que es
-        /// exactamente el del zaap de siempre. Los otros dos, la salida de la Dimensión de Jelifica
-        /// y un mapa de la Jungla de Osamodas, llevan el mismo dibujo y no aparecen en ninguna
-        /// captura; se reconocen por el dibujo igual que los 106 del 301199, que es como se
-        /// identifica aquí todo lo demás.
+        /// That they are zaaps is said by the captures, not by a guess: the guild hall —map
+        /// 99093249, element 540375, cell 227— appears six times with the pair 114 / 16, which is
+        /// exactly that of the usual zaap. The other two, the exit of the Jelifica Dimension
+        /// and a map of the Osamodas Jungle, carry the same drawing and appear in no
+        /// capture; they are recognised by the drawing just like the 106 of 301199, which is how
+        /// everything else is identified here.
         ///
-        /// Van aparte de <see cref="ZaapGfx"/> a propósito: de estos se SALE, pero no se LLEGA. Al
-        /// no estar en la tabla de zaaps, la lista de destinos del viaje no los ofrece nunca, y así
-        /// debe ser. Es el mismo trato que ya tiene el zaap del merkasako.
+        /// They go apart from <see cref="ZaapGfx"/> on purpose: from these one LEAVES, but one does not ARRIVE. Not
+        /// being in the zaap table, the travel's destination list never offers them, and so it
+        /// should be. It is the same treatment the haven bag zaap already has.
         /// </summary>
         private static readonly int[] DepartureOnlyGfx = { 37493 };
 
@@ -99,10 +99,10 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Dictionary<long, Waypoint> _waypoints = new Dictionary<long, Waypoint>();
         private static readonly List<Waypoint> _ordered = new List<Waypoint>();
 
-        /// <summary>El nivel de cada subzona, que es lo que la lista de zaaps enseña por destino.</summary>
+        /// <summary>Each subzone's level, which is what the zaap list shows per destination.</summary>
         private static readonly Dictionary<int, int> _subAreaLevels = new Dictionary<int, int>();
 
-        /// <summary>Mapas cuyo zaap hay que decir a mano porque no se reconoce por el dibujo.</summary>
+        /// <summary>Maps whose zaap has to be stated by hand because it is not recognised by the drawing.</summary>
         private static readonly Dictionary<long, int> _overrides = new Dictionary<long, int>();
 
         public static int MapCount => _byMap.Count;
@@ -210,8 +210,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El nivel de cada subzona, del bloque JSON que guarda SubAreaTemplates. Es lo que el
-        /// cliente pinta al lado de cada destino en la lista del zaap.
+        /// Each subzone's level, from the JSON block SubAreaTemplates stores. It is what the
+        /// client draws next to each destination in the zaap list.
         /// </summary>
         private static void LoadSubAreaLevels()
         {
@@ -246,8 +246,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los zaaps dichos a mano. El fichero lleva además un "_comentario" con el porqué de cada
-        /// uno, que se salta por no ser un número.
+        /// The zaaps stated by hand. The file also carries a "_comentario" with the reason for each
+        /// one, which is skipped for not being a number.
         /// </summary>
         private static void LoadOverrides()
         {
@@ -276,30 +276,30 @@ namespace Jondo.Unity.Server.Managers
         public static int LevelOfSubArea(int subAreaId)
             => _subAreaLevels.TryGetValue(subAreaId, out int level) ? level : 0;
 
-        /// <summary>¿Este mapa tiene zaap?</summary>
+        /// <summary>Does this map have a zaap?</summary>
         public static bool HasZaap(long mapId) => _waypoints.ContainsKey(mapId);
 
         public static Waypoint? WaypointOf(long mapId)
             => _waypoints.TryGetValue(mapId, out var waypoint) ? waypoint : null;
 
         /// <summary>
-        /// El elemento que es el zaap de este mapa, o uno vacío si no lo hay.
+        /// The element that is this map's zaap, or an empty one if there is none.
         ///
-        /// Se reconoce por el dibujo: el zaap es siempre el mismo. Si el mapa tiene zaap según la
-        /// tabla pero ninguno de sus elementos lleva ese dibujo, no se declara ninguno: colocarlo
-        /// en una casilla inventada deja al jugador clicando donde no hay nada.
+        /// It is recognised by the drawing: the zaap is always the same. If the map has a zaap according to the
+        /// table but none of its elements carries that drawing, none is declared: placing it
+        /// on an invented cell leaves the player clicking where there is nothing.
         /// </summary>
         public static Element ZaapOf(long mapId)
             => _waypoints.ContainsKey(mapId) ? ZaapByGfx(mapId) : default;
 
         /// <summary>
-        /// El elemento de este mapa que tiene dibujo de zaap, lo tenga la tabla de zaaps por zaap o
-        /// no. Los mapas del merkasako llevan uno y no están en esa tabla: son sitios desde los que
-        /// se viaja, no a los que se viaja.
+        /// The element of this map that has a zaap drawing, whether the zaap table has it as a zaap or
+        /// not. The haven bag maps carry one and are not in that table: they are places one
+        /// travels from, not to.
         /// </summary>
         public static Element ZaapByGfx(long mapId)
         {
-            // Por orden: el modelo de siempre primero, y el de las zonas nuevas después.
+            // In order: the usual model first, and the one of the new zones after.
             foreach (int gfx in ZaapGfx)
             {
                 var element = ElementByGfx(mapId, gfx);
@@ -309,8 +309,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El zaap de salida de este mapa, si lo tiene. Ver <see cref="DepartureOnlyGfx"/> para por
-        /// qué no basta con meter el dibujo en <see cref="ZaapGfx"/>.
+        /// This map's departure zaap, if it has one. See <see cref="DepartureOnlyGfx"/> for
+        /// why putting the drawing in <see cref="ZaapGfx"/> is not enough.
         /// </summary>
         public static Element DepartureZaapOf(long mapId)
         {
@@ -323,21 +323,21 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Con qué tipo se declara este elemento: el del zaap o el del vestigio.
+        /// Which type this element is declared with: the zaap's or the vestige's.
         ///
-        /// Dentro de un merkasako el 74685 NO es un vestigio: es el zaap de salida, con el modelo
-        /// que le toca al decorado. Se comprobó uno a uno —los cinco decorados que lo llevan no
-        /// tienen ningún elemento con el dibujo 301199— así que ahí es el único zaap que hay y
-        /// retiparlo dejaría al jugador encerrado en su casa.
+        /// Inside a haven bag 74685 is NOT a vestige: it is the departure zaap, with the model
+        /// that goes with the theme. It was checked one by one —the five themes that carry it do not
+        /// have any element with drawing 301199— so there it is the only zaap there is and
+        /// retyping it would leave the player locked in his house.
         /// </summary>
         public static int TypeOfZaap(long mapId, Element element)
             => element.Gfx == VestigeGfx && !Merkasako.IsHavenBag(mapId) ? VestigeType : ZaapType;
 
-        /// <summary>¿Esto es un vestigio y no un zaap? Ver <see cref="TypeOfZaap"/>.</summary>
+        /// <summary>Is this a vestige and not a zaap? See <see cref="TypeOfZaap"/>.</summary>
         public static bool IsVestige(long mapId, Element element)
             => element.Gfx == VestigeGfx && !Merkasako.IsHavenBag(mapId);
 
-        /// <summary>El elemento de un mapa que lleva un dibujo dado, si es que lo hay.</summary>
+        /// <summary>The element of a map that carries a given drawing, if there is one.</summary>
         public static Element ElementByGfx(long mapId, int gfx)
         {
             if (!_byMap.TryGetValue(mapId, out var elements)) return default;
@@ -349,9 +349,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Type vu dans les captures 3.6 pour chaque dessin. Le fichier encode le type -1 avec
-        /// la sentinelle protobuf non signée ulong.MaxValue; il ne faut surtout pas la remplacer
-        /// par zéro, car les soleils de sortie sont justement déclarés en type -1 par Ankama.
+        /// Type seen in the 3.6 captures for each drawing. The file encodes type -1 with
+        /// the unsigned protobuf sentinel ulong.MaxValue; it must never be replaced
+        /// by zero, because the exit suns are precisely declared as type -1 by Ankama.
         /// </summary>
         private static void LoadMeasuredTypes()
         {
@@ -381,29 +381,29 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Type de déclaration d'un dessin qui n'a pas encore de comportement serveur. -1 est le
-        /// type neutre mesuré pour les sorties; il conserve le dessin sans inventer une action.
+        /// Declaration type of a drawing that has no server behaviour yet. -1 is the
+        /// neutral type measured for exits; it keeps the drawing without inventing an action.
         /// </summary>
         public static int TypeOfGfx(int gfx)
             => _measuredTypes.TryGetValue(gfx, out int type) ? type : -1;
 
         /// <summary>
-        /// Los elementos de un mapa que abren la lista de zaaps. Uno como mucho.
+        /// The elements of a map that open the zaap list. One at most.
         ///
-        /// Casi siempre es el que se reconoce por el dibujo. Para los mapas donde ese dibujo no
-        /// aparece —hoy solo el Templo de las alianzas— el elemento se dice a mano en
-        /// zaap_overrides.json, con el razonamiento escrito dentro.
+        /// Almost always it is the one recognised by the drawing. For the maps where that drawing does not
+        /// appear —today only the Temple of alliances— the element is stated by hand in
+        /// zaap_overrides.json, with the reasoning written inside.
         ///
-        /// Antes, en esos mapas se declaraban TODOS los elementos como zaap para que el jugador no
-        /// se quedara encerrado. Funcionaba, pero convertía las puertas del templo en zaaps, que es
-        /// mentira: cada elemento tiene lo suyo y no todo es viajar.
+        /// Before, on those maps ALL the elements were declared as a zaap so that the player would not
+        /// be locked in. It worked, but it turned the temple's doors into zaaps, which is
+        /// a lie: each element has its own thing and not everything is travelling.
         /// </summary>
         /// <summary>
-        /// TODO lo que hay en este mapa, sin filtrar por lo que sea.
+        /// EVERYTHING on this map, without filtering by what it is.
         ///
-        /// Los accesos de aquí arriba buscan una cosa concreta —el zaap, el del merkasako— y eso
-        /// sirve mientras se conozcan de uno en uno. Las papeleras y los zaapis se reconocen por su
-        /// gráfico y son decenas, así que necesitan mirar la lista entera y quedarse con los suyos.
+        /// The accessors up here look for one concrete thing —the zaap, the haven bag one— and that
+        /// works while they are known one by one. The bins and the zaapis are recognised by their
+        /// graphic and there are dozens, so they need to look at the whole list and keep theirs.
         /// </summary>
         public static IReadOnlyList<Element> ElementsOf(long mapId)
             => _byMap.TryGetValue(mapId, out var found)
@@ -417,15 +417,15 @@ namespace Jondo.Unity.Server.Managers
             var zaap = ZaapOf(mapId);
             if (zaap.Id != 0) { salida.Add(zaap); return salida; }
 
-            // El del merkasako, que no está en la tabla de zaaps pero se usa igual.
+            // The haven bag one, which is not in the zaap table but is used all the same.
             var propio = Merkasako.ZaapOf(mapId);
             if (propio.Id != 0) { salida.Add(propio); return salida; }
 
-            // Y el de los sitios desde los que sólo se sale, que no están en la tabla de zaaps.
+            // And the one of the places one can only leave from, which are not in the zaap table.
             var deSalida = DepartureZaapOf(mapId);
             if (deSalida.Id != 0) { salida.Add(deSalida); return salida; }
 
-            // Y el dicho a mano, para los que no se reconocen por el dibujo.
+            // And the one stated by hand, for those not recognised by the drawing.
             if (_overrides.TryGetValue(mapId, out int elementId))
             {
                 var elegido = ByElementId(mapId, elementId);
@@ -435,17 +435,17 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// ¿Se puede salir de este mapa por su zaap? Si no, no se ofrece como destino: llevar a
-        /// alguien a un sitio del que no puede volver es peor que no llevarlo.
+        /// Can this map be left through its zaap? If not, it is not offered as a destination: taking
+        /// someone to a place he cannot come back from is worse than not taking him.
         /// </summary>
         public static bool CanLeaveFrom(long mapId) => ZaapElements(mapId).Count > 0;
 
         /// <summary>
-        /// Los zaaps que se le dicen al cliente como descubiertos al entrar al mundo.
+        /// The zaaps the client is told are discovered on entering the world.
         ///
-        /// Aquí el personaje los tiene todos, así que son todos los activados de los que además
-        /// se sabe dónde está su elemento. Sin esta lista la ventana de viaje sale vacía por mucho
-        /// que el hjj traiga destinos; ver ConnectionProtocol.BuildDiscoveredZaaps.
+        /// Here the character has them all, so they are all the activated ones for which it is also
+        /// known where their element is. Without this list the travel window comes out empty however
+        /// many destinations the hjj brings; see ConnectionProtocol.BuildDiscoveredZaaps.
         /// </summary>
         public static IEnumerable<long> DiscoveredZaapMaps()
         {
@@ -458,13 +458,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El identificador de la instancia de habilidad, que es lo que el cliente devuelve al
-        /// usar el elemento. El servidor real reparte números sin patrón visible; aquí se deriva
-        /// del elemento para que sea estable entre sesiones y no haya que guardarlo.
+        /// The skill instance identifier, which is what the client returns on
+        /// using the element. The real server hands out numbers with no visible pattern; here it is derived
+        /// from the element so that it is stable between sessions and does not have to be stored.
         /// </summary>
         public static int SkillInstanceOf(int elementId) => (elementId % 900000) + 10000;
 
-        /// <summary>El elemento al que pertenece un identificador de instancia de habilidad.</summary>
+        /// <summary>The element a skill instance identifier belongs to.</summary>
         public static Element ByElementId(long mapId, int elementId)
         {
             if (!_byMap.TryGetValue(mapId, out var elements)) return default;

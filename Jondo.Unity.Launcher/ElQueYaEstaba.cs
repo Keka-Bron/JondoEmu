@@ -5,18 +5,18 @@ using System.Runtime.InteropServices;
 namespace Jondo.Unity.Launcher
 {
     /// <summary>
-    /// Cuando ya hay un lanzador abierto: en vez de no hacer nada, se le pone delante.
+    /// When there is already a launcher open: instead of doing nothing, it is brought to the front.
     /// </summary>
     /// <remarks>
-    /// El lanzador se reparte como <c>WinExe</c>, o sea sin consola. Cuando el sitio estaba cogido,
-    /// el proceso escribía «ya hay un lanzador abierto» y se cerraba: en pantalla eso es
-    /// exactamente nada, y quien acaba de hacer doble clic sólo ve que no pasa nada. Con la ventana
-    /// del primero escondida detrás del navegador, el resultado es «el lanzador no arranca».
+    /// The launcher is handed out as a <c>WinExe</c>, that is without a console. When the place was taken,
+    /// the process wrote «ya hay un lanzador abierto» and closed: on screen that is
+    /// exactly nothing, and whoever has just double-clicked only sees that nothing happens. With the window
+    /// of the first one hidden behind the browser, the result is «the launcher does not start».
     ///
-    /// Lo que espera cualquiera al abrir por segunda vez algo que ya está abierto es que se le
-    /// ponga delante, así que eso es lo que se hace. Fuera de Windows no se intenta —esto es
-    /// user32— y entonces sí queda sólo la línea de registro, que es lo honrado: no hay nada mejor
-    /// que hacer sin meter una dependencia por una comodidad.
+    /// What anyone expects on opening a second time something already open is that it gets
+    /// brought to the front, so that is what is done. Outside Windows it is not attempted —this is
+    /// user32— and then indeed only the log line remains, which is the honest thing: there is nothing better
+    /// to do without adding a dependency for a convenience.
     /// </remarks>
     internal static class ElQueYaEstaba
     {
@@ -26,10 +26,10 @@ namespace Jondo.Unity.Launcher
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr ventana, int como);
 
-        /// <summary>SW_RESTORE: si está minimizada, la levanta sin cambiarle el tamaño.</summary>
+        /// <summary>SW_RESTORE: if it is minimised, it raises it without changing its size.</summary>
         private const int Restaurar = 9;
 
-        /// <summary>Busca el lanzador que ya estaba y lo pone delante. Devuelve si lo consiguió.</summary>
+        /// <summary>Finds the launcher that was already there and brings it to the front. Returns whether it managed to.</summary>
         public static bool PonerloDelante()
         {
             if (!OperatingSystem.IsWindows()) return false;

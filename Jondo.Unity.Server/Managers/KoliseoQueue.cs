@@ -146,6 +146,21 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// Takes out the whole unit a player waits in -- a party that enrolled together leaves
+        /// together. Returns its mode and members, or -1 and nobody.
+        /// </summary>
+        public static (int Mode, List<long> Members) LeaveWithUnit(long characterId)
+        {
+            lock (_gate)
+            {
+                var unit = FindUnit(characterId, out int mode, out var units);
+                if (unit == null) return (-1, new List<long>());
+                units!.Remove(unit);
+                return (mode, unit.Members.Select(m => m.CharacterId).ToList());
+            }
+        }
+
+        /// <summary>
         /// A match, if the queue has one: two sides of <paramref name="teamSize"/>, out of the queue
         /// already, so that two calls at once cannot take the same player to two fights.
         /// </summary>

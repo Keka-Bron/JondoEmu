@@ -6,19 +6,19 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Lo que cobra el que gana un koliseo, contra el jyg de la captura.
+    /// What the winner of a koliseo is paid, against the capture's jyg.
     /// </summary>
     /// <remarks>
-    /// Las cuatro entradas del jyg de «koliseo completo con invitacion-koli 2vs2», medidas:
+    /// The four entries of the jyg of «koliseo completo con invitacion-koli 2vs2», measured:
     ///
-    ///   ganan    nivel 227  3.400 kamas  260 × 12736  2 × 34478  4.722.600 de experiencia
-    ///            nivel 290  2.800 kamas  230 × 12736  2 × 34478  7.496.344 de experiencia
-    ///   pierden  nivel 354 y nivel 447, botín vacío y sin experiencia ganada
+    ///   win      level 227  3,400 kamas  260 × 12736  2 × 34478  4,722,600 experience
+    ///            level 290  2,800 kamas  230 × 12736  2 × 34478  7,496,344 experience
+    ///   lose     level 354 and level 447, empty loot and no experience earned
     ///
-    /// De dos ganadores no sale una fórmula, así que los kamas y las monedas son constantes y la
-    /// experiencia es una parte de la banda del nivel. Lo que estas pruebas fijan es que las
-    /// constantes sigan siendo las medidas y que la experiencia siga cayendo donde caía en los dos
-    /// puntos que hay: entre el 6 % y el 7,3 % de la banda.
+    /// No formula comes out of two winners, so the kamas and the coins are constants and the
+    /// experience is a part of the level's band. What these tests pin is that the
+    /// constants stay the measured ones and that the experience keeps falling where it fell at the two
+    /// points there are: between 6 % and 7.3 % of the band.
     /// </remarks>
     public class KoliseoRewardsTests
     {
@@ -32,7 +32,7 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(KoliseoRewards.KolichasPorVictoria, botin[KoliseoRewards.Kolicha]);
             Assert.Equal(2, botin[KoliseoRewards.Vitoricha]);
 
-            // Las kolichas medidas son 260 y 230; la constante tiene que quedarse entre las dos.
+            // The measured kolichas are 260 and 230; the constant has to stay between the two.
             Assert.InRange(KoliseoRewards.KolichasPorVictoria, 230, 260);
             Assert.InRange(KoliseoRewards.KamasPorVictoria, 2800, 3400);
         }
@@ -44,16 +44,16 @@ namespace Jondo.Unity.Tests.Combat
         [InlineData(200)]
         public void La_experiencia_cae_donde_la_medida(int nivel)
         {
-            // La tabla se lee sola la primera vez que se le pregunta, así que aquí ya no hay que
-            // arrancarla: antes hacía falta, y arrancarla desde aquí se la vaciaba por debajo a
-            // FightResultsTests, que la lee a través de FightProtocol y corre en paralelo.
+            // The table loads itself the first time it is asked, so here it no longer has to be
+            // started: before it was needed, and starting it from here emptied it under
+            // FightResultsTests, which reads it through FightProtocol and runs in parallel.
             long suelo = ExperienceTable.LevelFloor(nivel);
             long banda = ExperienceTable.NextLevelFloor(nivel) - suelo;
             Assert.True(banda > 0, $"el nivel {nivel} no tiene banda");
 
             long gana = KoliseoRewards.Experiencia(nivel);
 
-            // 7,22 % y 6,12 % son los dos puntos medidos. Se deja el margen justo alrededor.
+            // 7.22 % and 6.12 % are the two measured points. Just the right margin is left around them.
             Assert.InRange(gana, banda * 60 / 10000, banda * 730 / 10000);
         }
 
@@ -64,7 +64,7 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(FightRules.Desafio.PagaElKoliseo);
             Assert.False(FightRules.ContraMonstruos.PagaElKoliseo);
 
-            // Y no por eso reparte las tablas de los monstruos: enfrente no hay monstruos.
+            // And that does not make it hand out the monsters' tables: there are no monsters opposite.
             Assert.False(FightRules.Koliseo.ReparteBotin);
         }
     }

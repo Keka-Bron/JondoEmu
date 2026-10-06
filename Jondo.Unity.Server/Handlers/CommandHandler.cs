@@ -13,40 +13,40 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Los comandos de administración que el jugador escribe por el chat.
+    /// The administration commands the player types in the chat.
     ///
-    /// Entran por donde entra cualquier línea de chat —el ktm, con su canal dentro— así que valen
-    /// en general, en gremio, en comercio o donde sea: el canal solo decide en qué pestaña sale la
-    /// respuesta, no si el comando se atiende. Y no se publican: quien los reconoce
-    /// (<see cref="TryHandleAsync"/>) devuelve cierto y el eco no llega a salir, que es lo que
-    /// impide que un ".kamas 10000" acabe escrito en el chat del gremio.
+    /// They come in where any chat line comes in -- the ktm, with its channel inside -- so they work
+    /// in general, guild, trade or wherever: the channel only decides which tab the answer appears
+    /// in, not whether the command is served. And they are not published: whoever recognises them
+    /// (<see cref="TryHandleAsync"/>) returns true and the echo never goes out, which is what keeps a
+    /// ".kamas 10000" from ending up written in the guild chat.
     ///
-    /// La respuesta va en un kti, que es la línea de chat de la captura —la misma con la que el
-    /// servidor devuelve lo que uno dice— y no en el csm que se usaba antes: csm no aparece en
-    /// ninguna de las capturas ni en la tabla de mensajes del cliente, así que no hay forma de
-    /// saber que el jugador lo esté viendo. Con kti se ve seguro.
+    /// The answer goes in a kti, which is the capture's chat line -- the same one the server uses to
+    /// send back what somebody says -- and not in the csm that was used before: csm does not appear
+    /// in any of the captures nor in the client's message table, so there is no way of knowing the
+    /// player is seeing it. With kti it is seen for sure.
     ///
-    /// Lo que cada comando manda después de tocar el personaje sale de mensajes que ya existen en
-    /// el emulador y están medidos contra capturas:
+    /// What each command sends after touching the character comes from messages that already exist
+    /// in the emulator and are measured against captures:
     ///
-    ///   kub, iun   la hoja y los pods, igual que al repartir características (CharacteristicsHandler)
-    ///   ivf        las kamas, igual que al pagar un viaje en zaap (ZaapTravelHandler)
-    ///   jsd/jru/lqu/hjk   el cambio de mapa, igual que el zaap y el borde (TeleportHandler)
-    ///   hms, itg   los hechizos y su barra, igual que al entrar al mundo (WorldEntry)
-    ///   jsn, lxc   el aspecto, igual que al equiparse algo (EquipmentHandler)
+    ///   kub, iun   the sheet and the pods, as when spending characteristics (CharacteristicsHandler)
+    ///   ivf        the kamas, as when paying for a zaap trip (ZaapTravelHandler)
+    ///   jsd/jru/lqu/hjk   the map change, as the zaap and the edge do (TeleportHandler)
+    ///   hms, itg   the spells and their bar, as on entering the world (WorldEntry)
+    ///   jsn, lxc   the look, as when equipping something (EquipmentHandler)
     ///
-    /// Los bvr, bcy y krd/kri/krb que ya había se dejan como estaban por no romper lo que el
-    /// jugador ya tiene funcionando, pero no vienen de ninguna captura: van en el sobre de
-    /// RESPUESTA (campo 3 de la raíz) y sin id de petición, que no es como el servidor real empuja
-    /// nada. Lo nuevo va todo por Push, que es el campo 1, el de los mensajes que el servidor manda
-    /// por su cuenta.
+    /// The bvr, bcy and krd/kri/krb that were already there are left as they were so as not to break
+    /// what the player already has working, but they do not come from any capture: they go in the
+    /// ANSWER envelope (root field 3) and without a request id, which is not how the real server
+    /// pushes anything. Everything new goes through Push, which is field 1, the one for the messages
+    /// the server sends on its own.
     /// </summary>
     public static class CommandHandler
     {
         /// <summary>
-        /// Los comandos que existen y la clave de su texto de uso. Manda en dos sitios: decide qué
-        /// líneas se traga el servidor en vez de publicarlas, y lleva al catálogo que contesta al
-        /// jugador en el idioma de su sesión cuando se equivoca escribiéndolas.
+        /// The commands that exist and the key of their usage text. It rules in two places: it decides
+        /// which lines the server swallows instead of publishing them, and it leads to the catalogue
+        /// that answers the player in his session's language when he gets one wrong.
         /// </summary>
         private static readonly Dictionary<string, string> Uso =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -75,13 +75,13 @@ namespace Jondo.Unity.Server.Handlers
             };
 
         /// <summary>
-        /// Qué rol hace falta para cada comando.
+        /// Which role each command requires.
         ///
-        /// El reparto: moverse por el mundo es de moderador, porque es lo que hace falta para ir a
-        /// atender a alguien; tocar el personaje —kamas, nivel, tamaño— o abrirse una tienda es de
-        /// game master. Un comando que no esté en esta tabla se trata como de administrador, que es
-        /// el lado seguro por el que equivocarse: añadir uno nuevo y olvidarse de ponerle permiso
-        /// lo deja cerrado, no abierto.
+        /// The split: moving around the world is a moderator's, because it is what is needed to go and
+        /// help somebody; touching the character -- kamas, level, size -- or opening a shop is a game
+        /// master's. A command missing from this table is treated as an administrator's, which is the
+        /// safe side to be wrong on: adding a new one and forgetting to give it a permission leaves it
+        /// closed, not open.
         /// </summary>
         private static readonly Dictionary<string, int> HaceFalta =
             new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
@@ -114,19 +114,19 @@ namespace Jondo.Unity.Server.Handlers
         internal static int RequiredRole(string command)
             => HaceFalta.TryGetValue(command, out int role) ? role : Roles.Administrador;
 
-        /// <summary>El nivel al que se acaba el juego normal; de ahí para arriba es Omega.</summary>
+        /// <summary>The level at which the normal game ends; from there up it is Omega.</summary>
         private const int MaxNormalLevel = 200;
 
         /// <summary>
-        /// Atiende la línea. Devuelve cierto cuando era un comando y por tanto NO hay que
-        /// publicarla por el chat.
+        /// Serves the line. Returns true when it was a command and so it must NOT be published in the
+        /// chat.
         ///
-        /// Se traga solo los comandos que EXISTEN: un mensaje que empiece por punto y no sea
-        /// ninguno de ellos es una línea de chat como otra cualquiera y sigue su camino.
+        /// It swallows only the commands that EXIST: a message that starts with a dot and is none of
+        /// them is a chat line like any other and goes on its way.
         ///
-        /// Cierto también cuando el comando existe pero viene mal escrito: en ese caso lo que se
-        /// hace es contestar cómo se escribe. Publicar un comando a medio escribir sería enseñarle
-        /// a todo el mundo lo que el jugador quería hacer, que es justo lo que no puede pasar.
+        /// True as well when the command exists but is written wrong: in that case what is done is
+        /// answering how it is written. Publishing a half-written command would be showing everybody
+        /// what the player wanted to do, which is exactly what cannot happen.
         /// </summary>
         public static async Task<bool> TryHandleAsync(NetworkStream stream, string text,
                                                       int channel = 0, long accountId = 0)
@@ -134,10 +134,19 @@ namespace Jondo.Unity.Server.Handlers
             string? command = CommandOf(text);
             if (command == null) return false;
 
+            // In jail, no command of any kind -- an administrator's neither: see Managers.Jail.
+            // Swallowed, not echoed, so it does not go out on the general channel either.
+            if (Managers.Jail.IsJailed(Network.SessionContext.State.CharacterId)
+                && (Uso.ContainsKey(command) || LooksLikeCommand(command)))
+            {
+                await NotifyAsync(stream, T("jail.no_commands"), channel, accountId);
+                return true;
+            }
+
             if (!Uso.ContainsKey(command))
             {
-                // No es nuestro. Se avisa —solo si tiene pinta de comando, para no contestar a
-                // quien escribe "...bueno"— pero la línea sigue su camino normal.
+                // Not ours. A notice is given -- only if it looks like a command, so as not to answer
+                // whoever writes "...well" -- but the line goes on its normal way.
                 if (LooksLikeCommand(command))
                 {
                     await NotifyAsync(stream, T("command.unknown", command,
@@ -146,14 +155,14 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
-            // ¿Puede esta persona escribir este comando?
+            // May this person type this command?
             //
-            // Hasta ahora no lo comprobaba NADIE: cualquier jugador podía escribir ".kamas 10000"
-            // o ".level 200" y el servidor se lo daba. Se mira aquí, en el servidor, y contra la
-            // base, cada vez que se escribe el comando; no se guarda en la sesión, así que quitarle
-            // el rol a alguien tiene efecto en el acto.
+            // Until now NOBODY checked it: any player could type ".kamas 10000" or ".level 200" and
+            // the server gave it to him. It is looked up here, on the server, and against the
+            // database, every time the command is typed; it is not kept in the session, so taking a
+            // role away from somebody takes effect at once.
             //
-            // La cuenta sale de la sesión de este socket, no de nada que mande el cliente.
+            // The account comes from this socket's session, not from anything the client sends.
             long quien = accountId > 0 ? accountId : Network.SessionContext.Current.AccountId;
             int rol = DatabaseManager.GetAccountRole(quien);
             int haceFalta = RequiredRole(command);
@@ -165,7 +174,7 @@ namespace Jondo.Unity.Server.Handlers
                 ActivityJournal.Current.Write("command.denied", quien, GameState.CharacterId,
                     new { command, role = rol, requiredRole = haceFalta });
                 await NotifyAsync(stream, T("command.denied", command), channel, accountId);
-                return true;   // se lo traga: ni se ejecuta ni se publica en el chat
+                return true;   // swallowed: neither run nor published in the chat
             }
 
             string rest = RestOf(text);
@@ -228,13 +237,13 @@ namespace Jondo.Unity.Server.Handlers
             GameState.Kamas = Math.Max(0, before + amount);
             DatabaseManager.SaveCurrentCharacter();
 
-            // El de siempre, que no viene de ninguna captura pero lleva aquí desde el principio.
+            // The usual one, which comes from no capture but has been here since the beginning.
             await NetworkMessage.WriteFrameAsync(stream, NetworkEnvelope.BuildGameNodePacket(
                 "type.ankama.com/bvr", Pb.New().Var(1, GameState.Kamas).Build()));
 
-            // Y el que sí está medido: es el que manda el servidor real al cobrar un viaje en
-            // zaap. Lleva la cifra ENTERA, no la diferencia, así que mandar los dos no descuadra
-            // nada — el segundo dice lo mismo que el primero.
+            // And the one that is measured: it is what the real server sends when charging for a zaap
+            // trip. It carries the WHOLE figure, not the difference, so sending both does not throw
+            // anything off -- the second says the same as the first.
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
@@ -249,20 +258,20 @@ namespace Jondo.Unity.Server.Handlers
         // ─── .level ─────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Poner el nivel, y con él todo lo que cuelga del nivel: la experiencia, los puntos de
-        /// característica y los hechizos.
+        /// Setting the level, and with it everything that hangs off the level: experience,
+        /// characteristic points and spells.
         ///
-        /// La experiencia se pone en el SUELO del nivel (ExperienceTable.LevelFloor). Sin eso el
-        /// personaje quedaba a nivel 150 con la experiencia de un nivel 40, y el cliente pinta la
-        /// barra con lo que le manda el kub: barra desbordada o vacía según se subiera o se bajara.
+        /// Experience is set at the level's FLOOR (ExperienceTable.LevelFloor). Without that the
+        /// character stayed at level 150 with a level 40's experience, and the client draws the bar
+        /// with what the kub sends it: an overflowing or empty bar depending on going up or down.
         ///
-        /// Los hechizos se recalculan enteros y se mandan otra vez: SpellTable ya sabe qué pareja
-        /// abre cada nivel y a qué grado, leyendo MinPlayerLevel de SpellLevels, que es lo mismo
-        /// que se le manda al entrar al mundo. Se mandan la lista (hms) y la barra (itg) porque la
-        /// lista sola deja huecos apuntando a hechizos que ya no se tienen al BAJAR de nivel.
+        /// The spells are recalculated whole and sent again: SpellTable already knows which pair each
+        /// level unlocks and at which grade, reading MinPlayerLevel from SpellLevels, which is the same
+        /// as what is sent on entering the world. The list (hms) and the bar (itg) are sent because the
+        /// list alone leaves slots pointing at spells no longer owned when going DOWN a level.
         ///
-        /// Por encima de 200 —los niveles Omega— no se tocan los puntos de característica: el
-        /// capital se queda en el del 200, que es lo que da el juego.
+        /// Above 200 -- the Omega levels -- characteristic points are not touched: the capital stays at
+        /// level 200's, which is what the game gives.
         /// </summary>
         private static async Task LevelAsync(NetworkStream stream, string rest, int channel, long accountId)
         {
@@ -409,8 +418,8 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task<LevelChange> SetLevelAsync(NetworkStream stream, int wanted)
         {
 
-            // El techo lo pone la tabla de experiencia del cliente, que llega al 1889. Sin ella
-            // cargada no hay suelo de experiencia que poner y no se pasa del 200.
+            // The ceiling is set by the client's experience table, which goes up to 1889. Without it
+            // loaded there is no experience floor to set and it does not go past 200.
             int ceiling = ExperienceTable.IsLoaded ? ExperienceTable.MaxLevel : MaxNormalLevel;
             int newLevel = Math.Clamp(wanted, 1, ceiling);
 
@@ -419,38 +428,38 @@ namespace Jondo.Unity.Server.Handlers
 
             GameState.CharacterLevel = newLevel;
 
-            // La ventana de subida, con el nivel de destino. Va ANTES de las características
-            // nuevas porque es de ahí de donde el cliente saca lo que enseña dentro, y ése es el
-            // orden de la captura. Se manda también al BAJAR de nivel: el mensaje sólo lleva el
-            // nivel al que se va, así que sirve igual, y ver la ventana es la forma de saber que
-            // el comando ha hecho algo.
+            // The level-up window, with the target level. It goes BEFORE the new characteristics
+            // because that is where the client takes what it shows inside from, and that is the
+            // capture's order. It is also sent when going DOWN a level: the message only carries the
+            // level being reached, so it works the same, and seeing the window is the way to know the
+            // command did something.
             if (newLevel != oldLevel)
             {
                 await NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kua, ConnectionProtocol.BuildLevelUp(newLevel)));
             }
 
-            // La experiencia solo se toca si hay tabla con la que ponerla donde toca: sin ella
-            // LevelFloor devuelve cero para todo, y eso no es "el suelo del nivel", es borrarle al
-            // personaje la experiencia que tenía.
+            // Experience is only touched if there is a table to put it where it belongs: without it
+            // LevelFloor returns zero for everything, and that is not "the level's floor", it is
+            // wiping the character's experience.
             if (ExperienceTable.IsLoaded)
             {
                 GameState.Experience = ExperienceTable.LevelFloor(newLevel);
             }
 
-            // El capital es de cinco por nivel desde el segundo, que es como lo cuentan
-            // StatsHandler y CharacteristicsHandler. Por encima de 200 se congela: los niveles
-            // Omega no reparten puntos.
+            // The capital is five per level from the second, which is how StatsHandler and
+            // CharacteristicsHandler count it. Above 200 it freezes: Omega levels give no
+            // points.
             int capital = StatsHandler.TotalCapitalForLevel(Math.Min(newLevel, MaxNormalLevel));
             GameState.CharacterRemainingPoints = Math.Max(0, capital - SpentCapital(capital));
 
             DatabaseManager.SaveCurrentCharacter();
 
-            // Lo que ya mandaba este comando, tal cual estaba. No se quita —lleva aquí desde el
-            // principio y no hay forma de comprobar desde fuera si el cliente lo mira— pero tampoco
-            // se cuenta con ello: kri, krb y krd salen por el campo 3 de la raíz, que es el sobre
-            // de las RESPUESTAS, y sin id de petición dentro. Lo que de verdad refresca la ficha es
-            // el kub de más abajo.
+            // What this command already sent, as it was. It is not removed -- it has been here since the
+            // beginning and there is no way to check from outside whether the client looks at it -- but it
+            // is not relied on either: kri, krb and krd go out through root field 3, which is the
+            // ANSWERS envelope, and without a request id inside. What really refreshes the sheet is
+            // the kub further down.
             byte[]? kri = StatsHandler.BuildUpdatedKriPacket();
             if (kri != null) await NetworkMessage.WriteFrameAsync(stream, kri);
 
@@ -459,8 +468,8 @@ namespace Jondo.Unity.Server.Handlers
             await NetworkMessage.WriteFrameAsync(stream,
                 NetworkEnvelope.BuildGameNodePacket("type.ankama.com/krd", Array.Empty<byte>()));
 
-            // El bcy solo tiene sentido subiendo: es el mensaje de "has subido de nivel". Bajando
-            // no se manda, que sus dos campos de puntos irían en negativo.
+            // The bcy only makes sense going up: it is the "you went up a level" message. Going down
+            // it is not sent, since its two point fields would go negative.
             if (newLevel > oldLevel)
             {
                 await NetworkMessage.WriteFrameAsync(stream, NetworkEnvelope.BuildGameNodePacket(
@@ -472,9 +481,9 @@ namespace Jondo.Unity.Server.Handlers
                         .Build()));
             }
 
-            // Y la hoja de verdad: el kub lleva el nivel, la vida que da el nivel, la experiencia
-            // con su suelo y su techo, y los puntos que quedan. Es el mismo par de mensajes que
-            // manda CharacteristicsHandler al repartir puntos.
+            // And the real sheet: the kub carries the level, the life the level gives, the experience
+            // with its floor and ceiling, and the points left. It is the same pair of messages
+            // CharacteristicsHandler sends when spending points.
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
                     ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.TotalStrength)));
@@ -498,17 +507,17 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Lo que le ha costado al personaje la ficha que tiene puesta.
+        /// What the sheet the character is wearing has cost him.
         ///
-        /// Con los precios del cliente (<see cref="BreedStatCost"/>), que es lo que usa el reparto
-        /// de puntos de verdad: el panel calcula el coste por su cuenta antes de mandar el kum, y
-        /// un servidor que cuente distinto le devuelve al jugador un número de puntos que la
-        /// ventana acaba de prometerle que no era. Sumar los puntos a pelo —que es lo que hacía
-        /// este comando— dejaba libres de más a cualquiera que hubiera pasado de cien en algo,
-        /// porque a partir de ahí cada punto cuesta dos.
+        /// With the client's prices (<see cref="BreedStatCost"/>), which is what real point spending
+        /// uses: the panel works out the cost by itself before sending the kum, and a server that counts
+        /// differently gives the player back a number of points the window has just promised him it was
+        /// not. Adding the points up plainly -- which is what this command did -- left too many free for
+        /// anybody who had gone over a hundred in something, because from there on each point costs
+        /// two.
         ///
-        /// Sin esa tabla cargada se cae al modelo por tramos de StatsHandler, que da lo mismo para
-        /// las razas cuyo precio conocemos.
+        /// Without that table loaded it falls back to StatsHandler's banded model, which gives the same
+        /// for the breeds whose price we know.
         /// </summary>
         private static int SpentCapital(int stopAfter = int.MaxValue)
         {
@@ -544,7 +553,7 @@ namespace Jondo.Unity.Server.Handlers
             return spent;
         }
 
-        /// <summary>Los hechizos que tiene el personaje a un nivel dado, por id y grado.</summary>
+        /// <summary>The spells the character has at a given level, by id and grade.</summary>
         private static Dictionary<int, int> Spells(int level)
         {
             var spells = new Dictionary<int, int>();
@@ -558,12 +567,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Le manda al cliente los hechizos del nivel nuevo y devuelve qué ha cambiado, para
-        /// contárselo por el chat.
+        /// Sends the client the spells of the new level and returns what changed, to tell him in the
+        /// chat.
         ///
-        /// Si la tabla de hechizos no está cargada no se manda nada: un hms vacío no dice "no ha
-        /// cambiado nada", dice "no tienes hechizos", y dejaría el panel en blanco por un problema
-        /// de datos que no tiene nada que ver con el comando.
+        /// If the spell table is not loaded nothing is sent: an empty hms does not say "nothing has
+        /// changed", it says "you have no spells", and it would leave the panel blank because of a data
+        /// problem that has nothing to do with the command.
         /// </summary>
         private static async Task<string> RefreshSpellsAsync(NetworkStream stream,
                                                              Dictionary<int, int> before)
@@ -605,9 +614,9 @@ namespace Jondo.Unity.Server.Handlers
 
         private static async Task TeleportAsync(NetworkStream stream, string rest, int channel, long accountId)
         {
-            // Un solo número es un id de mapa, y va directo: es la forma de llegar a un interior
-            // concreto cuando hay cuatro mapas en la misma coordenada, como en el Templo de los
-            // Gremios. Sólo si el mapa existe; un número que no es un mapa es un error de uso.
+            // A single number is a map id, and goes straight there: it is the way to reach a specific
+            // interior when there are four maps at the same coordinate, as in the Guild Temple.
+            // Only if the map exists; a number that is not a map is a usage error.
             bool byId = long.TryParse((rest ?? "").Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out long mapId)
                         && mapId > 0;
             var info = byId ? MapManager.GetMapInfo(mapId) : null;
@@ -660,9 +669,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Cuando había varios se dice por qué se ha elegido ese: son coordenadas compartidas
-            // por casas, interiores y mundos aparte, y el jugador tiene que poder saber a cuál de
-            // todos ha ido a parar.
+            // When there were several, it is said why that one was chosen: they are coordinates shared
+            // by houses, interiors and separate worlds, and the player has to be able to know which of
+            // them he ended up in.
             string chosen = match.Candidates > 1
                 ? T("teleport.multiple", match.Candidates, match.SubAreaCells)
                 : "";
@@ -727,10 +736,10 @@ namespace Jondo.Unity.Server.Handlers
         // ─── .shop ──────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Al mapa de los vendedores, que se busca en vez de escribirse: el que más filas tiene en
-        /// NpcSpawns. Hoy son las 52 del Pueblo de Amakna (88212759, [-1,0]) contra una sola del
-        /// segundo, así que no hay empate posible; y si un día se puebla otro mapa, el comando
-        /// sigue llevando donde están los vendedores sin que haya que tocarlo.
+        /// To the vendors' map, which is looked up instead of written: the one with the most rows in
+        /// NpcSpawns. Today that is the 52 of the Amakna Village (88212759, [-1,0]) against a single one
+        /// on the second, so a tie is not possible; and if another map is populated one day, the command
+        /// still takes you where the vendors are without having to be touched.
         /// </summary>
         private static async Task ShopAsync(NetworkStream stream, int channel, long accountId)
         {
@@ -766,10 +775,10 @@ namespace Jondo.Unity.Server.Handlers
         // ─── .size ──────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// El tamaño del muñeco. Se guarda en el personaje y lo aplica BreedLookTable al construir
-        /// el aspecto; aquí solo hay que hacer que se vuelva a construir, que son los dos mensajes
-        /// que ya manda EquipmentHandler al cambiarse de ropa: el jsn redibuja al del mapa y el lxc
-        /// al de la ficha.
+        /// The size of the figure. It is stored on the character and BreedLookTable applies it when
+        /// building the look; here it only has to be rebuilt, which is the two messages
+        /// EquipmentHandler already sends when changing clothes: the jsn redraws the one on the map
+        /// and the lxc the one on the sheet.
         /// </summary>
         private static async Task SizeAsync(NetworkStream stream, string rest, int channel, long accountId)
         {
@@ -824,10 +833,10 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>The same, saying what it handed over. Lives in <see cref="Equipment"/> too.</summary>
         /// <remarks>
-        /// La PR #22 traia aqui una copia entera de GiveAsync que solo se diferenciaba en devolver
-        /// el objeto. Dos copias de «dar algo a alguien» es como acaban discrepando sobre si al
-        /// cliente se le ha avisado, asi que lo que se hizo fue darle esa capacidad a la que ya
-        /// existia.
+        /// PR #22 brought here a whole copy of GiveAsync that only differed in returning the item. Two
+        /// copies of «give something to somebody» is how they end up disagreeing about whether the
+        /// client was told, so what was done was giving that ability to the one that already
+        /// existed.
         /// </remarks>
         public static Task<HavenBagStore.StoredItem?> GrantItemAsync(NetworkStream stream,
                                                                      int gid, int quantity)
@@ -837,6 +846,16 @@ namespace Jondo.Unity.Server.Handlers
                                             int channel, long accountId)
         {
             string[] parts = rest.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+
+            // A last word of "random" rolls each characteristic in its range, the way a craft
+            // does; "max", or nothing, is the top of every one, as it has always been.
+            bool random = false;
+            if (parts.Length > 1 && TryParseStatMode(parts[^1], out bool asked))
+            {
+                random = asked;
+                parts = parts[..^1];
+            }
+
             if (parts.Length < 1 || parts.Length > 2 ||
                 !int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int gid) ||
                 (parts.Length == 2 && !int.TryParse(parts[1], NumberStyles.Integer,
@@ -856,7 +875,16 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (await GrantItemAsync(stream, gid, quantity) == null)
+            if (random && TooManyRolled(gid, quantity))
+            {
+                await NotifyAsync(stream, T("item.too_many_rolled", MaxRolledItems), channel, accountId);
+                return;
+            }
+
+            bool given = random
+                ? await WorkshopHandler.GiveAsync(stream, gid, quantity)
+                : await GrantItemAsync(stream, gid, quantity) != null;
+            if (!given)
             {
                 await NotifyAsync(stream, T("item.template_missing", gid), channel, accountId);
                 return;
@@ -866,9 +894,37 @@ namespace Jondo.Unity.Server.Handlers
             ActivityJournal.Current.Write("item.granted",
                 accountId > 0 ? accountId : SessionContext.Current.AccountId,
                 GameState.CharacterId,
-                new { source = "command", gid, quantity });
+                new { source = "command", gid, quantity, random });
             await NotifyAsync(stream, T("item.added", gid, quantity),
                               channel, accountId);
+        }
+
+        /// <summary>
+        /// The most items that roll one gift hands over, by command or by the control API: each is
+        /// a row of its own and a message to the client, and ".item 2469 1000000 random" was a
+        /// million of both. What rolls nothing joins one stack and has no such cost.
+        /// </summary>
+        internal const int MaxRolledItems = 100;
+
+        /// <summary>Whether rolling that many of this item is over <see cref="MaxRolledItems"/>.</summary>
+        internal static bool TooManyRolled(int gid, long quantity)
+            => quantity > MaxRolledItems
+               && Managers.Forgemagic.TemplateOf(gid) is { } template
+               && !Managers.Forgemagic.Stacks(template);
+
+        /// <summary>"max" or "random" (and "aleatorio", "aléatoire"): how an item given comes out.</summary>
+        internal static bool TryParseStatMode(string word, out bool random)
+        {
+            random = false;
+            switch ((word ?? "").Trim().ToLowerInvariant())
+            {
+                case "max": return true;
+                case "random":
+                case "aleatorio":
+                case "aléatoire":
+                case "aleatoire": random = true; return true;
+                default: return false;
+            }
         }
 
         private static async Task ItemSetAsync(NetworkStream stream, string rest,
@@ -1043,15 +1099,16 @@ namespace Jondo.Unity.Server.Handlers
         // ─── .packets ──────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Lo que el cliente nos manda y no sabemos atender, de lo que más pasa a lo que menos.
+        /// What the client sends us and we do not know how to handle, from the most frequent to the
+        /// least.
         ///
-        /// Va agrupado por FORMA y no por opcode, que es lo que hace que la lista sirva: un mismo
-        /// opcode puede llevar cargas distintas según lo que el jugador esté haciendo, y contarlas
-        /// juntas esconde justo lo que hay que ver.
+        /// It is grouped by SHAPE and not by opcode, which is what makes the list useful: the same
+        /// opcode can carry different payloads depending on what the player is doing, and counting them
+        /// together hides exactly what has to be seen.
         ///
-        /// Esto no descifra nada. Dice dónde mirar; lo que se mire se mide contra una captura como
-        /// todo lo demás, y hasta entonces no se contesta nada, porque una respuesta inventada deja
-        /// al cliente con un estado que el servidor no tiene.
+        /// This deciphers nothing. It says where to look; whatever is looked at is measured against a
+        /// capture like everything else, and until then nothing is answered, because a made-up answer
+        /// leaves the client with a state the server does not have.
         /// </summary>
         private static async Task PacketsAsync(NetworkStream stream, string rest,
                                                int channel, long accountId)
@@ -1107,12 +1164,12 @@ namespace Jondo.Unity.Server.Handlers
         private static string Usage(string command) => T(Uso[command]);
 
         /// <summary>
-        /// Las raids de gremio: comprarla, lanzarla, entrar, salir, cerrarla, y ver cómo va.
+        /// Guild raids: buying one, launching it, going in, leaving, closing it, and seeing how it goes.
         ///
-        /// Comando y no botones por lo mismo que la invitación: la pestaña de raids de la tienda
-        /// del gremio sale en las capturas VACÍA -el gremio grabado no tenía ninguna-, así que no
-        /// se sabe con qué mensaje se compra ni con cuál se lanza. Lo que hay debajo sí es de
-        /// verdad: la instancia, el reloj y las variables que el contenido del cliente lee.
+        /// A command and not buttons for the same reason as the invitation: the raids tab of the guild
+        /// shop comes out EMPTY in the captures -- the recorded guild had none --, so it is not known
+        /// which message buys one or which launches it. What lies underneath is real: the instance, the
+        /// clock and the variables the client's content reads.
         /// </summary>
         private static async Task RaidAsync(NetworkStream stream, string rest, int channel, long accountId)
         {
@@ -1155,16 +1212,16 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// La clasificación semanal de una raid.
+        /// A raid's weekly ranking.
         /// </summary>
         /// <remarks>
-        /// Por el chat, como todo lo de las raids, y por lo mismo: la ventana de clasificaciones
-        /// existe en el cliente -«Acceder a las clasificaciones», «Ver la clasificación»- pero
-        /// ninguna captura la abre, así que no se sabe con qué mensaje se llena.
+        /// Through the chat, like everything about raids, and for the same reason: the rankings window
+        /// exists in the client -- «Acceder a las clasificaciones», «Ver la clasificación» -- but no
+        /// capture opens it, so it is not known which message fills it.
         ///
-        /// El ornamento del podio se NOMBRA y no se entrega. Hoy el guardarropa ofrece los 167 a
-        /// todo el mundo, así que «darlo» no sería dar nada; el día que haya ornamentos por ganar,
-        /// aquí está a quién le tocan.
+        /// The podium ornament is NAMED and not handed out. Today the wardrobe offers all 167 to
+        /// everybody, so «giving it» would give nothing; the day there are ornaments to win, here is
+        /// who they go to.
         /// </remarks>
         private static async Task LadderAsync(NetworkStream stream, string[] partes, int channel, long accountId)
         {
@@ -1200,7 +1257,7 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>Cómo va la raid del gremio, que es lo que el panel del cliente enseñaría.</summary>
+        /// <summary>How the guild's raid is going, which is what the client's panel would show.</summary>
         private static string RaidStatus(long characterId)
         {
             var guild = Managers.GuildStore.GuildOf(characterId);
@@ -1225,8 +1282,8 @@ namespace Jondo.Unity.Server.Handlers
                               running.Score.ToString(), running.Members.Count.ToString(),
                               planta > 0 ? planta.ToString() : "-");
 
-            // Y la luz, que no tiene otro sitio donde salir. El panel de la raid la pintaría, pero
-            // ese panel necesita mensajes que ninguna captura trae; hasta entonces, aquí.
+            // And the light, which has nowhere else to show. The raid panel would draw it, but that
+            // panel needs messages no capture carries; until then, here.
             if (!kind.HasLight) return estado;
 
             var luces = new List<string>();
@@ -1242,13 +1299,14 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Invitar a alguien al gremio, o echar una candidatura a uno.
+        /// Inviting somebody to the guild, or sending an application to one.
         ///
-        /// Esto es un comando y no un botón porque el botón NO ESTÁ MEDIDO: las capturas de
-        /// gremio son del lado de quien recibe la invitación y del líder que lee la candidatura,
-        /// así que se sabe lo que el servidor manda -el jiq y el jma- y lo que el cliente
-        /// contesta -el jiz y el jjn-, pero no con qué mensaje se piden. El día que aparezca en
-        /// una captura, el botón llama a los mismos dos métodos y el comando sobra.
+        /// This is a command and not a button because the button IS NOT MEASURED: the guild captures
+        /// are from the side of whoever receives the invitation and of the leader who reads the
+        /// application, so it is known what the server sends -- the jiq and the jma -- and what the
+        /// client answers -- the jiz and the jjn --, but not which message asks for them. The day it
+        /// shows up in a capture, the button calls the same two methods and the command is no longer
+        /// needed.
         /// </summary>
         private static async Task GremioAsync(NetworkStream stream, string rest, int channel, long accountId)
         {
@@ -1275,7 +1333,7 @@ namespace Jondo.Unity.Server.Handlers
             string[] partes = entrada.Split(' ', 3, StringSplitOptions.RemoveEmptyEntries);
             long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
 
-            // Salir por el chat es lo mismo que salir por la ventana: el jho, sin el jho.
+            // Leaving through the chat is the same as leaving through the window: the jho, without the jho.
             if (partes.Length == 1 && partes[0].Equals("salir", StringComparison.OrdinalIgnoreCase))
             {
                 var dejado = Managers.GuildStore.GuildOf(who);
@@ -1336,15 +1394,14 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El aviso al jugador, por el canal donde escribió para que le salga en la pestaña que
-        /// está mirando. Es un kti, la línea de chat de la captura.
+        /// The notice to the player, on the channel he wrote in so that it shows in the tab he is
+        /// looking at. It is a kti, the capture's chat line.
         ///
-        /// OJO: esto es la EXCEPCIÓN, no la norma. Un kti sale por el canal general y lo lee todo
-        /// el mundo. Para decirle algo al jugador —«no tienes nivel», «has ganado kamas»— va un
-        /// lqn con su número de mensaje; ver <see cref="Managers.InfoMessages"/>. Aquí se usa el
-        /// chat porque la respuesta de un comando es texto libre que no está en la tabla del
-        /// cliente, y porque el jugador acaba de escribir en esa misma pestaña y espera la
-        /// respuesta ahí.
+        /// CAREFUL: this is the EXCEPTION, not the rule. A kti goes out on the general channel and
+        /// everybody reads it. To tell the player something -- «you do not have the level», «you won
+        /// kamas» -- an lqn with its message number goes; see <see cref="Managers.InfoMessages"/>. The
+        /// chat is used here because a command's answer is free text that is not in the client's table,
+        /// and because the player has just written in that same tab and expects the answer there.
         /// </summary>
         /// <summary>
         /// A command's answer: an information line only its author sees. The channel and the
@@ -1357,7 +1414,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(text)));
         }
 
-        /// <summary>La primera palabra en minúsculas, o null si la línea no empieza por punto.</summary>
+        /// <summary>The first word in lower case, or null if the line does not start with a dot.</summary>
         private static string? CommandOf(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return null;
@@ -1370,7 +1427,7 @@ namespace Jondo.Unity.Server.Handlers
             return word.ToLowerInvariant();
         }
 
-        /// <summary>Lo que va detrás del comando, sin tocar.</summary>
+        /// <summary>What comes after the command, untouched.</summary>
         private static string RestOf(string text)
         {
             string trimmed = text.TrimStart();
@@ -1379,9 +1436,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Si una palabra que empieza por punto TIENE PINTA de comando: punto y letras, nada más.
-        /// Sirve para no contestar "ese comando no existe" a quien escribe "...bueno" o ".", que
-        /// son líneas de chat normales y corrientes.
+        /// Whether a word starting with a dot LOOKS LIKE a command: a dot and letters, nothing else.
+        /// It is there so as not to answer "that command does not exist" to whoever writes "...well"
+        /// or ".", which are perfectly ordinary chat lines.
         /// </summary>
         private static bool LooksLikeCommand(string word)
         {
@@ -1394,19 +1451,19 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Las coordenadas, escritas como sea: [-1,0], -1 0, -1,0 o (-1;0). Los corchetes y los
-        /// separadores se cambian por espacios y lo que queda tienen que ser dos números.
+        /// Coordinates, written however: [-1,0], -1 0, -1,0 or (-1;0). Brackets and separators are
+        /// turned into spaces and what is left has to be two numbers.
         /// </summary>
         /// <summary>
-        /// Las coordenadas de un comando, tal como el cliente las manda.
+        /// A command's coordinates, as the client sends them.
         /// </summary>
         /// <remarks>
-        /// Y no es como el jugador las escribe. Al teclear <c>[0,-8]</c> en el chat, el cliente lo
-        /// convierte en un enlace de mapa antes de enviarlo, y lo que llega al servidor es
-        /// <c>.teleport {{map,0,-8,1}}</c> -medido en el registro, tres veces seguidas-. Con el
-        /// parser de antes eso eran cuatro trozos y no dos, así que el comando contestaba con su
-        /// uso a quien lo había escrito bien. Ahora se lee el enlace: la palabra «map» y el mundo
-        /// de detrás se descartan y quedan las dos cifras.
+        /// And that is not how the player types them. On typing <c>[0,-8]</c> in the chat, the client
+        /// turns it into a map link before sending it, and what reaches the server is
+        /// <c>.teleport {{map,0,-8,1}}</c> -- measured in the log, three times in a row --. With the old
+        /// parser that was four pieces and not two, so the command answered with its usage to whoever
+        /// had written it right. Now the link is read: the word «map» and the world after it are
+        /// dropped and the two figures are left.
         /// </remarks>
         internal static bool ParseCoordinates(string rest, out int x, out int y)
         {
@@ -1425,7 +1482,7 @@ namespace Jondo.Unity.Server.Handlers
             var parts = new List<string>(cleaned.ToString().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
             if (parts.Count > 0 && parts[0].Equals("map", StringComparison.OrdinalIgnoreCase))
             {
-                // {{map,x,y,mundo}}: fuera la palabra, y el mundo del final sobra.
+                // {{map,x,y,world}}: the word goes, and the world at the end is not needed.
                 parts.RemoveAt(0);
                 if (parts.Count == 3) parts.RemoveAt(2);
             }
@@ -1436,7 +1493,7 @@ namespace Jondo.Unity.Server.Handlers
                 && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out y);
         }
 
-        /// <summary>El nombre de la subzona, y si no se sabe, su número.</summary>
+        /// <summary>The subarea's name, and if it is not known, its number.</summary>
         private static string SubAreaName(int subAreaId)
         {
             string name = DatabaseManager.GetSubAreaName(subAreaId);

@@ -12,53 +12,54 @@ using Jondo.Unity.World.Fights;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Los Sueños Infinitos: abrir la ventana, empezar, moverse de sala y salir.
+    /// The Infinite Dreams: opening the window, starting, moving between rooms and leaving.
     /// </summary>
     /// <remarks>
-    /// El ciclo entero, medido sobre las trece capturas de <c>Sueños Infinitos/</c>:
+    /// The whole cycle, measured on the thirteen captures in <c>Sueños Infinitos/</c>:
     ///
     /// <code>
-    ///   C-&gt;S  iwo          usar el pozo, que es un interactivo corriente
-    ///   S-&gt;C  iyj          el mapa del sueño: once salas y el grafo que las une
-    ///   C-&gt;S  ixf { f1 }   empezar en la dificultad que lleva dentro
-    ///   S-&gt;C  izg + jru    el estado, y el cambio de mapa a la primera sala
-    ///   S-&gt;C  ixa          el acuse, vacío y por la raíz 3
-    ///   C-&gt;S  iwo          elegir puerta
-    ///   S-&gt;C  izg + jru    estado nuevo, y a la sala siguiente
-    ///   C-&gt;S  iyx          salir
-    ///   S-&gt;C  jru + ixg + iom  y el iyb «0801» por la raíz 3
+    ///   C-&gt;S  iwo          using the well, which is an ordinary interactive
+    ///   S-&gt;C  iyj          the dream's map: eleven rooms and the graph that joins them
+    ///   C-&gt;S  ixf { f1 }   starting at the difficulty it carries inside
+    ///   S-&gt;C  izg + jru    the state, and the map change to the first room
+    ///   S-&gt;C  ixa          the acknowledgement, empty and through root 3
+    ///   C-&gt;S  iwo          choosing a door
+    ///   S-&gt;C  izg + jru    new state, and on to the next room
+    ///   C-&gt;S  iyx          leaving
+    ///   S-&gt;C  jru + ixg + iom  and the iyb «0801» through root 3
     /// </code>
     ///
-    /// Lo bueno de esto es cuánto se apoya en lo que ya hay: el pozo y cada puerta son
-    /// <c>iwo</c>, el interactivo de toda la vida; las salas se pueblan con filas de
-    /// <see cref="Dreams"/> sacadas de MapMobs; y la modificación de cada sala es un efecto del
-    /// mismo catálogo que mueve el motor de hechizos.
+    /// The good thing about this is how much it rests on what already exists: the well and each
+    /// door are <c>iwo</c>, the good old interactive; the rooms are populated with rows of
+    /// <see cref="Dreams"/> taken from MapMobs; and each room's modifier is an effect from the
+    /// same catalogue that drives the spell engine.
     /// </remarks>
     public static class DreamHandler
     {
         /// <summary>
-        /// El Plano Astral, que es a donde lleva el boton del menu.
+        /// The Astral Plane, which is where the menu button leads.
         /// </summary>
         /// <remarks>
-        /// Medido: el jru que sigue al iyc va al 238551040, que en nuestra propia base es la
-        /// subarea 938, «Dominios de Draconiros». Es el vestibulo de los Suenos, no una sala.
+        /// Measured: the jru that follows the iyc goes to 238551040, which in our own database is
+        /// subarea 938, «Dominios de Draconiros». It is the Dreams' lobby, not a room.
         /// </remarks>
         public const long PlanoAstral = 238551040;
 
         // ═══════════════════════════════════════════════════════════════════
-        //  El boton del menu
+        //  The menu button
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// El boton de Suenos Infinitos del menu, y la tecla T (iyc).
+        /// The Infinite Dreams button of the menu, and the T key (iyc).
         /// </summary>
         /// <remarks>
-        /// No abre la ventana: TELETRANSPORTA al Plano Astral, y alli el pozo es el que la abre.
-        /// Medido en la captura, donde al iyc le siguen un jru al plano y el iom de siempre.
+        /// It does not open the window: it TELEPORTS to the Astral Plane, and there the well is what
+        /// opens it. Measured in the capture, where the iyc is followed by a jru to the plane and the
+        /// usual iom.
         ///
-        /// Se apunta de donde viene para poder devolverlo: si ya esta en el plano no se hace nada,
-        /// que si no un segundo toque a la tecla se guardaria el plano como sitio de vuelta y el
-        /// jugador se quedaria alli para siempre.
+        /// Where he comes from is noted so he can be sent back: if he is already on the plane nothing is
+        /// done, otherwise a second press of the key would store the plane as the place to return to and
+        /// the player would stay there forever.
         /// </remarks>
         public static async Task ToAstralPlaneAsync(NetworkStream stream)
         {
@@ -75,10 +76,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Abrir la ventana
+        //  Opening the window
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>Enseña el mapa del sueño. Es lo que contesta al usar el pozo.</summary>
+        /// <summary>Shows the dream's map. It is what answers using the well.</summary>
         public static async Task ShowAsync(NetworkStream stream)
         {
             var yo = GameState.CharacterId;
@@ -89,16 +90,16 @@ namespace Jondo.Unity.Server.Handlers
             // of a capture's: 5 points and 1 MP that were nobody's.
             var sueno = Dreams.De(yo);
 
-            // Primero soltar el elemento. En la captura de Pesadilla II el orden es exacto:
+            // Release the element first. In the Nightmare II capture the order is exact:
             //
             //   C->S iwo  0887a20110e0f720
             //   S->C iwn  080110e0f72020b80128a28280c8e708
             //   S->C iyj  (618 B)
             //
-            // Y el orden importa: sin el iwn el cliente sigue teniendo el pozo por ocupado y no
-            // abre la ventana que le llega detrás. No da ningún error; simplemente no pasa nada,
-            // que es lo que se vio al pulsarlo. El f4 de ese iwn es 184, la misma habilidad que
-            // ya se anuncia en el f11.
+            // And the order matters: without the iwn the client still considers the well busy and
+            // does not open the window that arrives after it. It gives no error; simply nothing
+            // happens, which is what was seen when pressing it. The f4 of that iwn is 184, the same
+            // skill already announced in the f11.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
                     Dreams.ElementoDelPozo, Dreams.HabilidadDelPozo, yo)));
@@ -113,24 +114,24 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  Empezar y descartar
+        //  Starting and discarding
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>Empezar un sueño (ixf f1) o entrar en el que ya hay (ixf f2).</summary>
+        /// <summary>Starting a dream (ixf f1) or going into the existing one (ixf f2).</summary>
         /// <remarks>
-        /// El f2 se leyó mal durante un tiempo: se tomó por «descartar» porque las capturas donde
-        /// aparece se llaman «descartar el sueño en curso». Los bytes dicen otra cosa. En
-        /// «continuar sueño infinito» y en «Sueño II-descartar», el mismo «12020801» va seguido de
-        /// un izg y de un jru A UNA SALA: el jugador ENTRA.
+        /// f2 was misread for a while: it was taken for «discard» because the captures where it
+        /// appears are called «descartar el sueño en curso». The bytes say something else. In
+        /// «continuar sueño infinito» and in «Sueño II-descartar», the same «12020801» is followed by
+        /// an izg and a jru TO A ROOM: the player GOES IN.
         ///
         ///   C->S ixf  12020801
         ///   S->C izg  (1150 B)
-        ///   S->C jru  108080b071      -> 237764608, la sala en la que estaba
-        ///   S->C ixa  (raíz 3, vacío)
+        ///   S->C jru  108080b071      -> 237764608, the room he was in
+        ///   S->C ixa  (root 3, empty)
         ///
-        /// Y descartar no tiene mensaje propio: en «Sueño III-descartar» y «paradoja I-descartar»
-        /// el cliente manda directamente el f1 con la dificultad nueva. La ventana de «ya tienes
-        /// un sueño en curso» se resuelve en el cliente; al servidor sólo le llega el comienzo.
+        /// And discarding has no message of its own: in «Sueño III-descartar» and «paradoja I-descartar»
+        /// the client directly sends f1 with the new difficulty. The «you already have a dream in
+        /// progress» window is settled in the client; only the start reaches the server.
         /// </remarks>
         public static async Task StartOrDiscardAsync(NetworkStream stream, byte[] payload)
         {
@@ -146,7 +147,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 if (field.FieldNumber == 1)
                 {
-                    // Empezar: la dificultad va en el f3 de dentro.
+                    // Starting: the difficulty goes in the inner f3.
                     foreach (var dentro in ProtoMessage.Parse(field.BytesValue).Fields)
                     {
                         if (dentro.FieldNumber == 3 && dentro.WireType == 0)
@@ -198,7 +199,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await EntrarEnSalaAsync(stream, sueno, 0);
 
-            // El acuse va por la raíz 3, vacío, con el id de la petición.
+            // The acknowledgement goes through root 3, empty, with the request id.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Ixa, null, ConnectionProtocol.RequestId(payload)));
         }
@@ -208,12 +209,12 @@ namespace Jondo.Unity.Server.Handlers
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// Una puerta del sueño, pulsada. Devuelve falso si esa habilidad no es de ninguna puerta.
+        /// A dream door, pressed. Returns false if that skill belongs to no door.
         /// </summary>
         /// <remarks>
-        /// Se llama desde el manejador de interactivos, antes de que trate el iwo como lo que trata
-        /// siempre: dentro de un sueño las puertas son interactivos que no existen en el mapa de
-        /// rol, así que el camino normal no sabría qué hacer con ellas.
+        /// It is called from the interactives handler, before it treats the iwo as it always does:
+        /// inside a dream the doors are interactives that do not exist on the roleplay map, so the
+        /// normal path would not know what to do with them.
         /// </remarks>
         public static async Task<bool> TryDoorAsync(NetworkStream stream, int elementId)
         {
@@ -233,12 +234,12 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
-            // Y no se sale de una sala sin haberla limpiado. La guía lo dice de la única manera
-            // que importa: «es absolutamente imposible volver atrás» una vez entras, y se avanza
-            // sala a sala peleando. Con las puertas abiertas desde el principio se podía recorrer
-            // el sueño entero sin dar un golpe, cobrando los puntos de todas las salas.
+            // And a room is not left without clearing it. The guide says it the only way that
+            // matters: «it is absolutely impossible to go back» once you go in, and you advance room
+            // by room fighting. With the doors open from the start the whole dream could be walked
+            // through without striking a blow, collecting the points of every room.
             //
-            // La entrada y la fuente no tienen grupo, así que no bloquean; a favour does until
+            // The entrance and the fountain have no group, so they do not block; a favour does until
             // one of its three is chosen.
             if (!Dreams.CanLeave(actual))
             {
@@ -248,23 +249,23 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
-            // Las puertas son los elementos del propio mapa de la sala, en su orden: la primera
-            // lleva a la primera salida, la segunda a la segunda. Los mapas de la subárea 904
-            // traen tres, que es también el máximo de salidas que se ha medido en una sala.
+            // The doors are the elements of the room's own map, in their order: the first leads to
+            // the first exit, the second to the second. The maps of subarea 904 carry three, which is
+            // also the most exits measured in a room.
             for (int cual = 0; cual < actual.Salidas.Count; cual++)
             {
                 if (Dreams.PuertaDe(actual, cual) != elementId) continue;
 
-                // Soltar la puerta ANTES del izg y del jru. Medido en la captura de Sueño III:
+                // Release the door BEFORE the izg and the jru. Measured in the Dream III capture:
                 //
-                //   C->S iwo  08d0a59f0310f7f620          el elemento 539511
-                //   S->C iwn  080110f7f62020b80128…       con la habilidad 184
+                //   C->S iwo  08d0a59f0310f7f620          element 539511
+                //   S->C iwn  080110f7f62020b80128…       with skill 184
                 //   S->C izg  (833 B)
                 //   S->C jru  108090b071
                 //
-                // Es el mismo orden que el del pozo, y saltárselo tiene el mismo precio: el
-                // cliente se queda con la puerta por ocupada y no pasa nada de lo que venga
-                // detrás. Sin un solo error.
+                // It is the same order as the well's, and skipping it has the same price: the
+                // client keeps the door as busy and nothing of what comes after happens.
+                // Without a single error.
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
                         elementId, Dreams.HabilidadDelPozo, GameState.CharacterId)));
@@ -276,7 +277,7 @@ namespace Jondo.Unity.Server.Handlers
             return false;
         }
 
-        /// <summary>Mete al jugador en una sala: el estado y el cambio de mapa.</summary>
+        /// <summary>Puts the player in a room: the state and the map change.</summary>
         private static async Task EntrarEnSalaAsync(NetworkStream stream, Dreams.Sueno sueno,
                                                     int salaId)
         {
@@ -285,7 +286,7 @@ namespace Jondo.Unity.Server.Handlers
             if (sala == null) return;
             _enElSueno[GameState.CharacterId] = true;
 
-            // El potenciador y los puntos se cobran AL ENTRAR, antes de pelear, y una sola vez por sala.
+            // The booster and the points are collected ON ENTERING, before fighting, and only once per room.
             if (gained != null || sueno.DreamPoints != pointsBefore)
             {
                 Console.WriteLine($"[Sueños] Sala {sala.Id}: +{sueno.DreamPoints - pointsBefore} dream points, " +
@@ -294,10 +295,10 @@ namespace Jondo.Unity.Server.Handlers
                                                     $"{sueno.Ganados.Count} so far." : "."));
             }
 
-            // Pisar la Fuente abre la franja siguiente, porque la fuente es a la vez la última
-            // sala de ésta y la primera de la que viene: «Chaque palier commencera toujours par
-            // une Fontaine Onirique». Si no se añade aquí, el jugador entra en una sala sin
-            // salidas y se queda encerrado, que es lo que pasaba.
+            // Stepping on the Fountain opens the next band, because the fountain is both the last
+            // room of this one and the first of the next: «Chaque palier commencera toujours par
+            // une Fontaine Onirique». If it is not added here, the player goes into a room with no
+            // exits and is locked in, which is what used to happen.
             if (Dreams.Closes(sala) && sala.Salidas.Count == 0)
             {
                 Dreams.AnadirFranja(sueno);
@@ -310,9 +311,9 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
 
-            // Y el cambio de mapa: al mapa DE LA SALA, que es uno de los 484 de la subárea 904
-            // hechos para esto, no al del grupo de monstruos. Mandarle al del grupo es lo que le
-            // dejaba de pie en Frigost, andando por el mundo y sin minimapa.
+            // And the map change: to the ROOM's map, which is one of the 484 of subarea 904 made
+            // for this, not the monster group's. Sending him to the group's is what left him
+            // standing in Frigost, walking around the world without a minimap.
             long mapa = sala.MapaDeLaSala;
             if (mapa == 0)
             {
@@ -320,9 +321,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // El grupo se planta ANTES del cambio de mapa: el jss que el cliente pide justo
-            // después es el que lleva los actores, y un grupo plantado un instante tarde no
-            // aparece hasta que se vuelve a entrar.
+            // The group is placed BEFORE the map change: the jss the client asks for right after
+            // is the one carrying the actors, and a group placed a moment late does not appear
+            // until the room is entered again.
             if (sala.EsFuente) { if (sala.HasReyGob) PlantarLaTienda(sala); }
             else if (sala.EsFavor) PlantFavorNpc(sala);
             else PlantarElGrupo(sala);
@@ -336,12 +337,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Pone al vendedor en la Fuente Onírica.
+        /// Puts the vendor on the Dream Fountain.
         /// </summary>
         /// <remarks>
-        /// No hace falta protocolo nuevo: la fuente de los Sueños es un NPC y punto. Se coloca
-        /// como cualquier otro y el motor de diálogos hace el resto; lo que ofrece va escrito en
-        /// su respuesta, con el porcentaje de puntos que da.
+        /// No new protocol is needed: the Dreams' fountain is an NPC, full stop. It is placed like
+        /// any other and the dialogue engine does the rest; what it offers is written in its answer,
+        /// with the percentage of points it gives.
         /// </remarks>
         private static void PlantarLaTienda(Dreams.Sala sala)
         {
@@ -404,21 +405,22 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Pone en la sala los monstruos que le tocan, si no están ya.
+        /// Puts in the room the monsters that belong to it, if they are not there already.
         /// </summary>
         /// <remarks>
-        /// Sin esto la sala está vacía y no hay nada que atacar: el cliente pide la pelea con un
-        /// hqa que lleva el id contextual de un grupo del mapa, así que si no hay grupo no hay
-        /// manera de empezar. En la captura de Sueño III se ve el hqa con ese negativo justo antes
-        /// del kub, y hasta ahí llega la sala sin dar ningún error: simplemente no se puede pelear.
+        /// Without this the room is empty and there is nothing to attack: the client asks for the
+        /// fight with an hqa carrying the contextual id of a group on the map, so if there is no group
+        /// there is no way to start. In the Dream III capture the hqa with that negative can be seen
+        /// just before the kub, and that is as far as the room gets without giving any error: there is
+        /// simply no fighting.
         ///
-        /// La entrada y la última no llevan grupo, que es lo que dicen las nueve capturas.
+        /// The entrance and the last one carry no group, which is what the nine captures say.
         /// </remarks>
         private static void PlantarElGrupo(Dreams.Sala sala)
         {
             if (sala.Miembros.Count == 0 || sala.MapaDeLaSala == 0) return;
 
-            // Ya plantado: se vuelve a entrar en la misma sala al continuar un sueño.
+            // Already placed: the same room is entered again when continuing a dream.
             if (sala.Plantado != 0
                 && MobSpawnManager.GetMobGroupById(sala.Plantado) != null) return;
 
@@ -433,11 +435,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Se ha ganado la pelea de una sala: la marca hecha.
+        /// A room's fight has been won: it is marked done.
         /// </summary>
         /// <remarks>
-        /// Devuelve verdadero si el grupo derrotado era el de una sala, que es lo que le dice al
-        /// motor de combate que NO reponga otro en su sitio.
+        /// Returns true if the defeated group was a room's, which is what tells the fight engine NOT to
+        /// put another one in its place.
         ///
         /// Winning pays nothing: the room paid its dream points when it was entered. In the long
         /// capture the izg that follows a win carries the same f11 as the one of the entrance,
@@ -468,7 +470,7 @@ namespace Jondo.Unity.Server.Handlers
             return false;
         }
 
-        /// <summary>Vuelve a mandar el estado del sueño, si es que hay uno y se está en él.</summary>
+        /// <summary>Sends the dream's state again, if there is one and he is in it.</summary>
         /// <remarks>
         /// Only on one of the dream's maps. The izg is what turns the client's dream interface on
         /// -- the panel, and the band and depth in place of the map's name and coordinates -- and
@@ -691,12 +693,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        //  La tormenta y la salida
+        //  The storm and leaving
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>La tormenta astral (izh): another group for the room, on another map.</summary>
+        /// <summary>The astral storm (izh): another group for the room, on another map.</summary>
         /// <remarks>
-        /// Medido: el cliente lo manda vacío y vuelven un izg, un jru y un izj «1001». And what it
+        /// Measured: the client sends it empty and an izg, a jru and an izj «1001» come back. And what it
         /// does is measured too, in the Paradoja II capture that uses two: the room stays "1", its
         /// bestiary changes, the jru goes to another map, and f7 -- the storms left -- goes from 2
         /// to 1 to nothing. The guide says the same: "changer un groupe de monstres d'une salle".
@@ -755,15 +757,15 @@ namespace Jondo.Unity.Server.Handlers
                               $"{sueno.Tormentas} left.");
         }
 
-        /// <summary>Salir del sueño (iyx) y volver a donde se estaba.</summary>
+        /// <summary>Leaving the dream (iyx) and going back to where he was.</summary>
         public static async Task LeaveAsync(NetworkStream stream, byte[] payload)
         {
             var sueno = Dreams.De(GameState.CharacterId);
             if (sueno == null) return;
 
-            // A donde estaba ANTES DE PULSAR EL BOTON, no al mapa desde el que empezo el sueno:
-            // a esas alturas ese mapa ya es el propio Plano Astral, y devolverlo alli lo dejaria
-            // dando vueltas por el vestibulo.
+            // To where he was BEFORE PRESSING THE BUTTON, not to the map the dream was started
+            // from: by then that map is the Astral Plane itself, and sending him back there would
+            // leave him going round in circles in the lobby.
             var (mapa, casilla) = Dreams.DeDondeViene(sueno.CharacterId);
             if (mapa == 0) { mapa = sueno.MapaDeVuelta; casilla = sueno.CasillaDeVuelta; }
 
@@ -773,7 +775,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             else
             {
-                // Sin sitio conocido, al plano: es de donde se entro y siempre existe.
+                // With no known place, to the plane: it is where he went in from and it always exists.
                 await TeleportHandler.ToMapAsync(stream, PlanoAstral, 0);
             }
 

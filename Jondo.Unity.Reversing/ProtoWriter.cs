@@ -4,24 +4,24 @@ using System.Text;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El .proto del cliente, reconstruido de sus propias clases.
+/// The client's .proto, rebuilt from its own classes.
 ///
-/// El descriptor serializado no está por ninguna parte —ni en los metadatos ni en el binario— pero
-/// no hace falta: el generador de C# de protobuf deja en cada clase todo lo necesario, y Cpp2IL lo
-/// vuelca tal cual. Una clase de mensaje se reconoce así:
+/// The serialised descriptor is nowhere to be found —neither in the metadata nor in the binary— but
+/// it is not needed: protobuf's C# generator leaves in each class everything necessary, and Cpp2IL
+/// dumps it as is. A message class is recognised like this:
 ///
 ///     class jsd : IMessage&lt;jsd&gt;, IBufferMessage
-///         const int  epvu = 1   epvw = 2   epvy = 3     ← los números de campo
-///         static MessageParser&lt;jsd&gt; epvs                ← el analizador
-///         UnknownFieldSet epvt                          ← lo que no reconoce
-///         lbo epvv     Int64 epvx     lbo epvz          ← un campo por número, en orden
+///         const int  epvu = 1   epvw = 2   epvy = 3     ← the field numbers
+///         static MessageParser&lt;jsd&gt; epvs                ← the parser
+///         UnknownFieldSet epvt                          ← what it does not recognise
+///         lbo epvv     Int64 epvx     lbo epvz          ← one field per number, in order
 ///
-/// Los nombres están rotados —epvu, epvv— y eso da igual: lo que hace falta para emparejar dos
-/// versiones y para descodificar el cable son los NÚMEROS y los TIPOS, y ésos están enteros.
+/// The names are rotated —epvu, epvv— and that does not matter: what is needed to match two
+/// versions and to decode the wire are the NUMBERS and the TYPES, and those are whole.
 ///
-/// El emparejamiento es por posición: el generador emite siempre la constante del número justo
-/// antes del campo que la usa, así que el enésimo número va con el enésimo campo. Cuando las
-/// cuentas no cuadran, el mensaje se marca y no se inventa nada.
+/// The matching is by position: the generator always emits the number's constant right
+/// before the field that uses it, so the nth number goes with the nth field. When the
+/// counts do not add up, the message is flagged and nothing is invented.
 /// </summary>
 public static class ProtoWriter
 {
@@ -34,10 +34,10 @@ public static class ProtoWriter
                                             BindingFlags.DeclaredOnly;
 
     /// <summary>
-    /// El protocolo de un ensamblado, mensajes y enumerados, listo para emparejar.
+    /// An assembly's protocol, messages and enums, ready to match.
     ///
-    /// Abre, lee y cierra. Es lo que necesita todo el que quiera trabajar con una versión —la
-    /// línea de comandos, el emparejador, la interfaz— y estaba escrito tres veces.
+    /// It opens, reads and closes. It is what everyone who wants to work with a version needs —the
+    /// command line, the matcher, the interface— and it was written three times.
     /// </summary>
     public static Matcher.Model Model(string assemblyPath)
     {
@@ -45,7 +45,7 @@ public static class ProtoWriter
         return new Matcher.Model(Messages(reader), Enums(reader));
     }
 
-    /// <summary>Los mensajes de protobuf que hay en el ensamblado.</summary>
+    /// <summary>The protobuf messages in the assembly.</summary>
     public static List<Message> Messages(AssemblyReader reader)
     {
         var messages = new List<Message>();
@@ -54,23 +54,23 @@ public static class ProtoWriter
         {
             if (!IsMessage(type)) continue;
 
-            // El tipo del literal viene del contexto de metadatos, no del runtime de aquí, así que
-            // se compara por nombre y no con typeof.
+            // The literal's type comes from the metadata context, not from the runtime here, so
+            // it is compared by name and not with typeof.
             var numbers = type.GetFields(Everything)
                               .Where(f => f.IsLiteral && f.FieldType.Name == "Int32")
                               .ToList();
 
-            // Los números se emparejan con las PROPIEDADES, no con los campos de respaldo.
+            // The numbers are paired with the PROPERTIES, not with the backing fields.
             //
-            // Con un mensaje normal da igual: hay un campo por propiedad. Pero en cuanto aparece
-            // un oneof deja de haberlo, porque protobuf guarda todos sus casos en UN solo campo
-            // Object más un enumerado con el que esté puesto. Ahí los campos son dos y los números
-            // tres, cuatro o los que sean, y por eso doscientos cuarenta y dos mensajes salían
-            // descuadrados: eran los que tienen oneof, no los que estaban mal leídos.
+            // With a normal message it makes no difference: there is one field per property. But as soon as
+            // a oneof appears there no longer is, because protobuf keeps all its cases in ONE single
+            // Object field plus an enum saying which one is set. There the fields are two and the numbers
+            // three, four or however many, and that is why two hundred and forty-two messages came out
+            // mismatched: they were the ones with a oneof, not the ones misread.
             //
-            // Las propiedades sí van una por número, y encima llevan el tipo bueno de cada caso.
-            // Delante están siempre las tres de oficio —el analizador y los dos descriptores— y
-            // detrás, cuando hay oneof, sobra una: la que dice cuál está puesto.
+            // The properties do go one per number, and on top of that they carry each case's right type.
+            // In front there are always the three standard ones —the parser and the two descriptors— and
+            // behind, when there is a oneof, one is left over: the one saying which is set.
             var properties = type.GetProperties(Everything)
                                  .Where(p => p.PropertyType.Name is not "MessageDescriptor" &&
                                              !p.PropertyType.Name.StartsWith("MessageParser",
@@ -92,7 +92,7 @@ public static class ProtoWriter
         return messages.OrderBy(m => m.Name, StringComparer.Ordinal).ToList();
     }
 
-    /// <summary>Los enumerados, que es donde acaban las direcciones, los estados y los motivos.</summary>
+    /// <summary>The enums, which is where the directions, the states and the reasons end up.</summary>
     public static List<Enumeration> Enums(AssemblyReader reader)
     {
         var enums = new List<Enumeration>();
@@ -125,7 +125,7 @@ public static class ProtoWriter
         return false;
     }
 
-    /// <summary>Cómo se llama ese tipo en un .proto, y si es una lista.</summary>
+    /// <summary>What that type is called in a .proto, and whether it is a list.</summary>
     private static (string Name, bool Repeated) Describe(Type type)
     {
         if (type.IsGenericType)
@@ -153,7 +153,7 @@ public static class ProtoWriter
         }, false);
     }
 
-    /// <summary>Lo escribe todo como un .proto que se puede leer y comparar.</summary>
+    /// <summary>Writes it all as a .proto that can be read and compared.</summary>
     public static string Write(IEnumerable<Message> messages, IEnumerable<Enumeration> enums,
                                string source)
     {

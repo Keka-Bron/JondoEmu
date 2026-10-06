@@ -98,12 +98,12 @@ namespace Jondo.Unity.Server.Network
                 serversList.Msg(1, entry);
             }
 
-            // Cuántos personajes caben por tipo de servidor. Siete entradas, tipos 0 a 6.
+            // How many characters fit per server type. Seven entries, types 0 to 6.
             //
-            // La captura real de la pantalla de creación de personaje trae cinco en los siete, con
-            // una cuenta que tenía cuatro personajes en su servidor y el botón activo. Así que esto
-            // es el tope, no la cuenta, y subirlo es lo correcto; lo que tenía el botón apagado era
-            // otra cosa (la fecha de abono, en GameServerProxy).
+            // The real capture of the character creation screen brings five in all seven, with
+            // an account that had four characters on its server and the button active. So this
+            // is the cap, not the count, and raising it is right; what had the button greyed out was
+            // something else (the subscription date, in GameServerProxy).
             for (int type = 0; type <= 6; type++)
             {
                 var slots = Pb.New();
@@ -128,16 +128,16 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Cuántos personajes caben por servidor.
+        /// How many characters fit per server.
         /// </summary>
         /// <remarks>
-        /// CINCO, que es lo que manda el servidor real y no una cifra elegida. Medido sobre el
-        /// crudo de «desde launcher a eleccion servidor.pcapng»: la pareja de bytes 1005 —el campo
-        /// f2 con valor 5— aparece ocho veces en esa respuesta, y el 100 (1064) no aparece ni una.
+        /// FIVE, which is what the real server sends and not a chosen figure. Measured on the
+        /// raw data of «desde launcher a eleccion servidor.pcapng»: the byte pair 1005 —field
+        /// f2 with value 5— appears eight times in that response, and 100 (1064) does not appear once.
         ///
-        /// Aquí ponía 100, subido a mano con el razonamiento de que «no hay nada que limitar».
-        /// Mandar un número que el cliente no ve nunca es justo lo que este proyecto no hace: no se
-        /// sabe qué hace con él, y el botón de crear personaje seguía en gris igual.
+        /// Here it said 100, raised by hand with the reasoning that «there is nothing to limit».
+        /// Sending a number the client never sees is exactly what this project does not do: it is not
+        /// known what it does with it, and the create character button was still grey all the same.
         /// </remarks>
         public const int MaxCharactersPerServer = 5;
 
@@ -270,24 +270,24 @@ namespace Jondo.Unity.Server.Network
                 Push(Op.Krs),
                 Push(Op.Mgz, Pb.New().Var(1, CatalogMark).Build()),
 
-                // AQUÍ NO VA UN kvd, y mandarlo era lo que tenía muerta media pantalla.
+                // A kvd DOES NOT GO HERE, and sending it was what had half the screen dead.
                 //
-                // Se metió a ojo, con el razonamiento de que «cierra la lista de personajes» y de
-                // que el botón de crear estaba apagado porque a la pantalla le faltaba el final.
-                // Suena bien y es al revés. Medido sobre las capturas: el kvd sale en TRES, y las
-                // tres son de entrar directo al mundo sin pasar por la pantalla —reconexión a un
-                // combate y koliseo—, con esta pinta:
+                // It was put in by eye, with the reasoning that «it closes the character list» and
+                // that the create button was greyed out because the screen was missing its ending.
+                // It sounds right and it is the other way round. Measured on the captures: the kvd appears in THREE, and the
+                // three are of entering the world directly without going through the screen —reconnection to a
+                // fight and koliseo—, looking like this:
                 //
-                //   kvi(381)  kvd(0)  ipc  kva  mft        vuelve a un combate
-                //   kra  kqu  kvd(0)  kva  ivx  hlm        koliseo, y ni siquiera hay kvi
+                //   kvi(381)  kvd(0)  ipc  kva  mft        back to a fight
+                //   kra  kqu  kvd(0)  kva  ivx  hlm        koliseo, and there is not even a kvi
                 //
-                // Y en la ráfaga de la pantalla de personajes de verdad NO ESTÁ: ni en la de la
-                // cuenta con cuatro personajes y el botón activo, ni en la de la cuenta vacía que
-                // crea uno, ni en la que falla por límite máximo. Las tres van kvi y detrás jtg.
+                // And in the burst of the real character screen it IS NOT THERE: neither in the one of the
+                // account with four characters and the button active, nor in the one of the empty account that
+                // creates one, nor in the one that fails on the maximum limit. All three go kvi and then jtg.
                 //
-                // O sea que el kvd significa «no te pares aquí». Mandándolo siempre, el cliente
-                // montaba la pantalla como si fuera de paso: el botón de crear personaje sin vida
-                // y el de cambiar de servidor sin llevar a ninguna parte.
+                // That is, the kvd means «do not stop here». Sending it always, the client
+                // built the screen as if it were passing through: the create character button lifeless
+                // and the change server one leading nowhere.
             };
 
             // The list closes the burst, framed the way it always travels.
@@ -322,13 +322,13 @@ namespace Jondo.Unity.Server.Network
             { 3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150 };
 
         /// <summary>
-        /// El saludo del servidor de juego, con los mismos valores que la captura.
+        /// The game server's greeting, with the same values as the capture.
         ///
-        ///   f1: 30   f2: 1   f3: 1   f6: idioma   f7: 200
+        ///   f1: 30   f2: 1   f3: 1   f6: language   f7: 200
         ///
-        /// Sin f5. Mandábamos un f5 = 2 que no está en ninguna de las tres capturas del arranque, y
-        /// el idioma iba en inglés cuando el cliente arranca en español. Son las dos únicas
-        /// diferencias que quedaban entre nuestra ráfaga de bienvenida y la real.
+        /// Without f5. We were sending an f5 = 2 that is in none of the three startup captures, and
+        /// the language went in English when the client starts in Spanish. They are the only two
+        /// differences that remained between our welcome burst and the real one.
         /// </summary>
         /// <summary>
         /// The frame that carries, among other things, what the account is entitled to.
@@ -363,7 +363,7 @@ namespace Jondo.Unity.Server.Network
 
 
 
-        /// <summary>El idioma con el que se lanza el cliente.</summary>
+        /// <summary>The language the client is launched with.</summary>
         public const string ClientLanguage = "es";
 
         // ─── Character list (kvi) ───────────────────────────────────────────────
@@ -420,8 +420,8 @@ namespace Jondo.Unity.Server.Network
                 traits.Str(4, DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"));
             }
 
-            // Con el id, para que en la pantalla de selección salga montado si lo está. Sin él la
-            // montura solo se sabía del personaje que ya estuviera jugando.
+            // With the id, so that on the selection screen he comes out mounted if he is. Without it the
+            // mount was only known for the character already playing.
             traits.Bytes(6, BreedLookTable.BuildLook(
                 character.Breed, character.Sex, character.HeadId, null, character.Id));
             traits.VarIfNotZero(7, character.Breed);
@@ -920,7 +920,7 @@ namespace Jondo.Unity.Server.Network
             if (where != null) jss.VarIfNotZero(6, where.SubAreaId);
 
             // The houses, between the subarea and the elements as in both house captures: f7 the
-            // one the viewer is inside, f9 those on this street that have an owner.
+            // one the viewer is inside, f9 those on this street that can be owned.
             Handlers.HouseHandler.AddToMap(jss, mapId);
 
             AddInteractiveElements(jss, mapId, accountId);
@@ -949,9 +949,7 @@ namespace Jondo.Unity.Server.Network
                 creatures.Msg(1, Pb.New()
                     .Var(1, member.Monster.Id)
                     .VarIfNotZero(2, LevelOf(member))
-                    .Msg(3, Pb.New()
-                        .Var(2, LookKind)
-                        .VarIfNotZero(3, BonesOf(member.Monster.Look)))
+                    .Msg(3, MonsterLook(member.Monster.Look))
                     .VarIfNotZero(4, GradeOf(member)));
             }
 
@@ -970,32 +968,58 @@ namespace Jondo.Unity.Server.Network
                         .Var(1, 1)
                         .Msg(2, creatures)
                         .Var(5, -1)))
-                    .Msg(3, Pb.New()
-                        .Var(2, LookKind)
-                        .VarIfNotZero(3, BonesOf(leader.Monster.Look))))
+                    .Msg(3, MonsterLook(leader.Monster.Look)))
                 .Var(3, group.MobId);
         }
 
         /// <summary>
-        /// Los NPCs del mapa.
+        /// A monster's look as a group carries it: its colours, bones, scale and skins, the same
+        /// block an NPC's look is (<see cref="BuildNpcLook"/>).
+        /// </summary>
+        /// <remarks>
+        /// It used to be the bones alone, read off a belief that the captures sent nothing else.
+        /// They do: of the 2,372 monster groups in the 756 captures' jss, 1,799 carry their scale
+        /// (f5) and 113 their colours (f1) -- "{706|...|115}" goes out with f5 = 115. Without it the
+        /// client draws every monster at 100: the Conde Kontatrás, "{2069|||150}", came out a third
+        /// smaller than a person, and 2,478 other monsters with a scale of their own were drawn off
+        /// it too.
+        /// </remarks>
+        internal static Pb MonsterLook(string look)
+        {
+            var variants = string.IsNullOrEmpty(look) ? null : Managers.Npcs.Variantes(look);
+            if (variants == null || variants.Count == 0)
+                return Pb.New().Var(2, LookKind).VarIfNotZero(3, BonesOf(look));
+
+            var first = variants[0];
+            var pb = Pb.New();
+            if (first.Colors.Length > 0) pb.Packed(1, first.Colors);
+            pb.Var(2, LookKind);
+            pb.VarIfNotZero(3, first.Bones);
+            if (first.Scales.Length > 0) pb.Packed(5, first.Scales);
+            if (first.Skins.Length > 0) pb.Packed(6, first.Skins);
+            return pb;
+        }
+
+        /// <summary>
+        /// The map's NPCs.
         ///
-        /// Van con la misma envoltura que el jugador y que los grupos de monstruos, y lo único que
-        /// los distingue es que dentro de f2.f1 aparece el f7 —el jugador usa el f5 y un grupo de
-        /// monstruos el f4—:
+        /// They go with the same envelope as the player and the monster groups, and the only thing
+        /// telling them apart is that inside f2.f1 the f7 appears —the player uses f5 and a monster
+        /// group f4—:
         ///
-        ///   f1 { f1: casilla, f2: orientación }
-        ///   f2 { f1 { f7 { f3: género, f5: plantilla } }
-        ///        f3 { f1: colores, f2: 3, f3: huesos, f5: escalas, f6: pieles } }
-        ///   f3: id contextual, negativo
+        ///   f1 { f1: cell, f2: orientation }
+        ///   f2 { f1 { f7 { f3: gender, f5: template } }
+        ///        f3 { f1: colours, f2: 3, f3: bones, f5: scales, f6: skins } }
+        ///   f3: contextual id, negative
         ///
-        /// El nombre no se manda: el cliente lo saca de sus datos a partir de la plantilla. Y el
-        /// bloque de aspecto es la cadena Look de NpcTemplates troceada, comprobado en los
-        /// cincuenta y seis NPCs de la captura sin una sola discrepancia.
+        /// The name is not sent: the client takes it from its data based on the template. And the
+        /// look block is NpcTemplates's Look string split up, checked on the
+        /// fifty-six NPCs of the capture without a single discrepancy.
         ///
-        /// Ojo con la escala: el f5 es una lista EMPAQUETADA de varints, no un byte suelto. Una
-        /// escala de 200 son dos bytes (c8 01), y escribir el 0xC8 a pelo deja un varint a medias
-        /// que revienta el parseo del jss entero en el cliente —con él, el mapa se queda sin
-        /// dibujar del todo, ni NPCs ni monstruos ni personaje—.
+        /// Mind the scale: f5 is a PACKED list of varints, not a loose byte. A
+        /// scale of 200 is two bytes (c8 01), and writing the bare 0xC8 leaves a half varint
+        /// that blows up the parsing of the whole jss in the client —with it, the map is left
+        /// not drawn at all, neither NPCs nor monsters nor character—.
         /// </summary>
         private const int NpcFemale = 1;
 
@@ -1026,9 +1050,9 @@ namespace Jondo.Unity.Server.Network
 
         private static void AddNpcs(Pb jss, long mapId)
         {
-            // Quién pregunta, para los NPCs que se pintan de varias maneras. Se arma UNA vez por
-            // mapa y sólo si hace falta: el resolvedor mira el gremio en la base, y hacerlo por
-            // cada NPC sería una consulta por actor en cada carga de mapa.
+            // Who is asking, for the NPCs drawn in several ways. It is built ONCE per
+            // map and only if needed: the resolver looks up the guild in the base, and doing it for
+            // each NPC would be one query per actor on each map load.
             Jondo.Unity.World.Content.Criterion.Resolver quien = null;
 
             foreach (var npc in Managers.Npcs.Of(mapId))
@@ -1058,43 +1082,43 @@ namespace Jondo.Unity.Server.Network
                 if (scales.Length > 0) look.Packed(5, scales);
                 if (skins.Length > 0) look.Packed(6, skins);
 
-                // El género sólo viaja cuando vale 1. Comprobado en las cincuenta y seis plantillas
-                // de la captura: las veinte con género 1 lo mandan, las treinta y cinco con género
-                // 0 lo omiten —eso es proto3— y la única con género 2, que es la montaña de kamas,
-                // tampoco manda nada. O sea que el campo no es el género de la plantilla tal cual,
-                // sino que sólo se pone cuando es exactamente 1.
+                // The gender only travels when it is 1. Checked on the fifty-six templates
+                // of the capture: the twenty with gender 1 send it, the thirty-five with gender
+                // 0 omit it —that is proto3— and the only one with gender 2, which is the kama mountain,
+                // does not send anything either. So the field is not the template's gender as is,
+                // but is only set when it is exactly 1.
                 var template = Managers.Npcs.TemplateOf(npc.NpcId);
                 bool female = template != null && template.Gender == NpcFemale;
 
-                // LA MARCA DE LA CABEZA VA AQUI DENTRO, y esto es lo que faltaba para que no
-                // saliera nunca la exclamacion verde.
+                // THE HEAD MARK GOES IN HERE, and this is what was missing for the green
+                // exclamation mark to ever come out.
                 //
-                // No la dibuja el iom. Se diferenciaron las dos cosas comparando byte a byte el
-                // mismo mapa y el mismo actor: en el jss de Ankama del mapa 154010883, actor
-                // -20000 (el NPC 2892), hay seis bytes que en el nuestro no estaban:
+                // The iom does not draw it. The two things were told apart by comparing byte by byte the
+                // same map and the same actor: in Ankama's jss of map 154010883, actor
+                // -20000 (NPC 2892), there are six bytes that were not in ours:
                 //
                 //   Ankama  ...1217 0a0b3a09 12041a02e00c 28cc16 1a08...
                 //   Jondo   ...1211 0a053a03            28cc16 1a08...
                 //                            ^^^^^^^^^^^^
                 //                            f2 { f3: packed[1632] }
                 //
-                // 1632 es justo la mision que ese NPC reparte en ese mapa. Fuera de esos seis
-                // bytes -y de los dos largos que crecen con ellos- las tramas son identicas. Lo
-                // mismo en el 154010371 con el NPC 2905 y la mision 1639.
+                // 1632 is exactly the quest that NPC hands out on that map. Outside those six
+                // bytes -and the two lengths that grow with them- the frames are identical. The
+                // same on 154010371 with NPC 2905 and quest 1639.
                 //
-                // Y hay una captura, "sin apariencias equipar un escudo", que NO lleva ni un iom
-                // en todo el flujo y sin embargo sus NPCs salen marcados: la marca no puede venir
-                // del iom. El iom es otra cosa -un indice de toda la SUBZONA, que nombra mapas en
-                // los que el jugador no esta-, y por eso el que sigue a aceptar la mision 2432
-                // nombra la 2427: son dos mapas distintos de la misma subzona 980.
+                // And there is a capture, "sin apariencias equipar un escudo", that does NOT carry a single iom
+                // in the whole flow and yet its NPCs come out marked: the mark cannot come
+                // from the iom. The iom is something else -an index of the whole SUBZONE, which names maps
+                // the player is not on-, and that is why the one following accepting quest 2432
+                // names 2427: they are two different maps of the same subzone 980.
                 //
-                //   f3  las que OFRECE      -> la exclamacion. 21 de 21 ids medidos son misiones
-                //                              cuyo catalogo nombra a ESE npc en ESE mapa.
-                //   f1  las que tiene EN CURSO y quieren algo de el.
+                //   f3  the ones it OFFERS   -> the exclamation mark. 21 of 21 measured ids are quests
+                //                              whose catalogue names THAT npc on THAT map.
+                //   f1  the ones IN PROGRESS that want something from it.
                 //
-                // Va delante del genero, que es el orden de todas las capturas: 12041a02e70c 1801
-                // 28d916. Y cuando no hay nada que decir no se manda el bloque: la pareja de bytes
-                // 1200 no aparece ni una vez en las 145 tramas iom reales.
+                // It goes before the gender, which is the order of all the captures: 12041a02e70c 1801
+                // 28d916. And when there is nothing to say the block is not sent: the byte pair
+                // 1200 does not appear once in the 145 real iom frames.
                 var offered = Managers.Quests.OfferedRightNowBy(npc.NpcId, mapId);
                 var doing = Managers.Quests.InProgressWith(npc.NpcId, mapId);
 
@@ -1112,17 +1136,17 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Les éléments graphiques de la carte et, lorsqu'elle existe, leur action serveur.
+        /// The map's graphic elements and, when there is one, their server action.
         ///
-        ///   f11 { f1: 1, f4 { f1: uid de la habilidad, f2: habilidad }, f5: elemento, f6: tipo }
-        ///   f15 { f1: estado, f2: casilla, f3: elemento }
+        ///   f11 { f1: 1, f4 { f1: skill uid, f2: skill }, f5: element, f6: type }
+        ///   f15 { f1: state, f2: cell, f3: element }
         ///
-        /// Le f11 dit quel élément existe et ce que l'on peut faire avec lui. Le f15 est réservé
-        /// au sous-ensemble qui possède un état dynamique. Le numéro de l'élément sort
-        /// de los datos del propio cliente (<see cref="Managers.Interactives"/>), así que el
-        /// cliente ya sabe qué dibujo ponerle y dónde.
+        /// f11 says which element exists and what can be done with it. f15 is reserved
+        /// for the subset that has a dynamic state. The element's number comes
+        /// from the client's own data (<see cref="Managers.Interactives"/>), so the
+        /// client already knows which drawing to give it and where.
         ///
-        /// Van al final, detrás de la subzona, que es donde los pone la captura real.
+        /// They go at the end, after the subzone, which is where the real capture puts them.
         /// </summary>
         private static void AddInteractiveElements(Pb jss, long mapId, long viewerAccountId)
         {
@@ -1134,33 +1158,33 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Lo que sólo ve quien lleva la misión: la estela, el catalejo, el cartel.
+        /// What only whoever carries the quest sees: the trail, the spyglass, the sign.
         ///
-        /// Va aparte del registro a propósito. El registro es del mundo y es igual para todos —el
-        /// zaap está para cualquiera—, y esto es de UN jugador: la estela aparece al coger la
-        /// misión y se va al cumplir su objetivo. Meterlo en el registro habría hecho falso lo
-        /// primero.
+        /// It goes apart from the registry on purpose. The registry belongs to the world and is the same for everyone —the
+        /// zaap is there for anyone—, and this belongs to ONE player: the trail appears on taking the
+        /// quest and goes away on meeting its objective. Putting it in the registry would have made the
+        /// first false.
         ///
-        /// Que se pueda preguntar por jugador aquí no es nuevo: <see cref="Declare"/> ya mira el
-        /// nivel de oficio de quien mira el mapa para decidir si un recurso se le ofrece o se le
-        /// pinta en rojo. Este jss se construye una vez por jugador y por llegada al mapa.
+        /// Being able to ask per player here is not new: <see cref="Declare"/> already looks at the
+        /// profession level of whoever looks at the map to decide whether a resource is offered to him or
+        /// drawn in red. This jss is built once per player and per arrival on the map.
         ///
-        /// La habilidad va en el f4 y sin estado, como todo lo que no es recurso. El 114 es
-        /// «Utiliser», la misma que el cliente usa para el vestigio de anomalía, y de ella dicen
-        /// las capturas que el cliente contesta con su iwo igual.
+        /// The skill goes in f4 and without state, like everything that is not a resource. 114 is
+        /// «Utiliser», the same one the client uses for the anomaly vestige, and of it the
+        /// captures say the client answers with its iwo all the same.
         /// </summary>
         /// <summary>
-        /// Los carteles y libros de este mapa, declarados como pulsables.
+        /// This map's signs and books, declared as pressable.
         /// </summary>
         /// <remarks>
-        /// Hace falta decirlo. El servidor puede contestar de maravilla al clic de un cartel y no
-        /// servir de nada: si el elemento no viaja en la lista de actores con su habilidad, el
-        /// cliente no lo pinta como interactivo y no hay clic que contestar. Eso es exactamente lo
-        /// que pasaba con la oferta de trabajo de la taberna.
+        /// It has to be said. The server can answer a sign's click wonderfully and be
+        /// of no use: if the element does not travel in the actor list with its skill, the
+        /// client does not draw it as interactive and there is no click to answer. That is exactly what
+        /// happened with the tavern's job offer.
         ///
-        /// Va aparte de los de misión porque no dependen de ninguna: un cartel se lee con o sin
-        /// ella, y por eso aquí no se pregunta nada al diario. La habilidad es la misma «Utiliser»
-        /// genérica que usan los elementos de misión.
+        /// It goes apart from the quest ones because they depend on none: a sign is read with or without
+        /// one, and that is why nothing is asked of the journal here. The skill is the same generic «Utiliser»
+        /// the quest elements use.
         /// </remarks>
         private static void AddReadableElements(Pb jss, long mapId)
         {
@@ -1208,18 +1232,18 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Un élément de carte : son identité, son type et ses éventuelles actions.
+        /// A map element: its identity, its type and its possible actions.
         ///
-        /// Los RECURSOS de oficio se declaran distinto según estén llenos o no, y hay que
-        /// respetarlo o el cliente ofrece segar un trigo ya segado:
+        /// Profession RESOURCES are declared differently depending on whether they are full or not, and it has to be
+        /// respected or the client offers to reap an already reaped wheat:
         ///
-        ///   lleno     f11 { f1:1, f2:0, f4 { uid, habilidad }, ... }   f15 sin f4
-        ///   agotado   f11 { f1:1,       f3 { uid, habilidad }, ... }   f15 f4 = 1
-        ///   en uso    igual que agotado                                f15 f4 = 2
+        ///   full      f11 { f1:1, f2:0, f4 { uid, skill }, ... }   f15 without f4
+        ///   depleted  f11 { f1:1,       f3 { uid, skill }, ... }   f15 f4 = 1
+        ///   in use    same as depleted                             f15 f4 = 2
         ///
-        /// Es decir, la habilidad se muda del campo 4 al 3 cuando deja de poder usarse. Medido en
-        /// los veinticinco fresnos de un mismo mapa, sin una excepción. Todo lo que no es recurso
-        /// —zaaps, cofres, puertas— va siempre en el 4 y sin estado, como hasta ahora.
+        /// That is, the skill moves from field 4 to 3 when it can no longer be used. Measured on
+        /// the twenty-five ash trees of one same map, without an exception. Everything that is not a resource
+        /// —zaaps, chests, doors— always goes in 4 and without state, as until now.
         /// </summary>
         private static void Declare(Pb jss, Managers.RegisteredInteractive interactive, long viewerAccountId)
         {
@@ -1228,9 +1252,9 @@ namespace Jondo.Unity.Server.Network
                 ? Managers.Resources.StateOf(interactive.MapId, interactive.Element.Id)
                 : Managers.ResourceState.Full;
 
-            // Y el nivel de oficio de QUIEN esté mirando el mapa. Un recurso que le queda grande
-            // se declara igual que uno agotado, y el cliente lo pinta en rojo y no deja clicarlo:
-            // es como lo hace el juego real, sin decirle nada a nadie por el chat.
+            // And the profession level of WHOEVER is looking at the map. A resource that is beyond him
+            // is declared just like a depleted one, and the client draws it red and does not let it be clicked:
+            // it is how the real game does it, without telling anybody anything through the chat.
             bool alcanza = !gathering || Managers.Resources.WithinReach(
                 interactive.MapId, interactive.Element.Id);
 
@@ -1238,9 +1262,9 @@ namespace Jondo.Unity.Server.Network
 
             var declaration = Pb.New().Var(1, 1);
 
-            // El f2 sale a cero en la madera, el trigo y la salvia, y a 1 o 3 en los dos
-            // caladeros. No se ha sabido qué lo distingue, así que va el cero, que es lo medido
-            // en tres de los cuatro oficios.
+            // f2 comes out at zero for wood, wheat and sage, and at 1 or 3 for the two
+            // fishing spots. What distinguishes it has not been worked out, so zero goes, which is what was measured
+            // in three of the four professions.
             if (gathering && usable) declaration.Var(2, 0);
 
             // A house's door and chests offer each viewer his own skills: the owner sells, a
@@ -1256,18 +1280,18 @@ namespace Jondo.Unity.Server.Network
                 .Var(5, interactive.Element.Id)
                 .Var(6, interactive.Type));
 
-            // Dans la capture officielle, les sorties 515742/gfx3520 et 515801 n'ont aucun f15.
-            // Le f15 est un état dynamique, pas la déclaration du dessin. Les éléments passifs et
-            // les routes sont visibles par leur f11 et ne doivent donc pas recevoir cet état
-            // artificiel qui empêchait le client d'associer le soleil à ses données de carte.
-            // Rien de ce qui appartient aux Songes non plus. Mesuré et sans exception: les 22 jss
-            // réels de la carte 238551040 et les 36 des salles n'ont AUCUN f15 — ni pour le puits,
-            // ni pour les quatre arcades, ni pour les trois portes de chaque salle.
+            // In the official capture, exits 515742/gfx3520 and 515801 have no f15.
+            // f15 is a dynamic state, not the drawing's declaration. Passive elements and
+            // routes are visible through their f11 and must therefore not receive this artificial
+            // state, which kept the client from associating the sun with its map data.
+            // Nothing belonging to the Dreams either. Measured and without exception: the 22 real jss
+            // of map 238551040 and the 36 of the rooms have NO f15 — not for the well,
+            // nor for the four arches, nor for the three doors of each room.
             //
-            // Et ce n'est pas un détail cosmétique: le commentaire ci-dessus le dit déjà pour les
-            // soleils de sortie — un f15 artificiel empêche le client de rattacher l'élément au
-            // dessin de ses propres données de carte. C'est ce qui laissait les portes invisibles
-            // tant qu'on ne tenait pas la touche des interactifs enfoncée.
+            // And it is not a cosmetic detail: the comment above already says so for the
+            // exit suns — an artificial f15 keeps the client from attaching the element to the
+            // drawing of its own map data. That is what left the doors invisible
+            // as long as the interactives key was not held down.
             //
             // A marketplace counter has none either: 22 declarations of 17 counters in the
             // captures, 212600837's equipment to 207625216's cosmetics, and not one f15 among them.
@@ -1286,21 +1310,21 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Dónde está un elemento y en qué estado (f15).
+        /// Where an element is and in what state (f15).
         ///
-        /// El f15 acompaña SIEMPRE a un f11 y nunca va solo. Medido sobre las 305 capturas del
-        /// juego real: en los 834 jss que llevan elementos hay 4.493 f11 y sólo 2.685 f15, y un
-        /// f15 cuyo elemento no tenga su f11 aparece 3 veces —una sola vez en cada uno—, o sea
-        /// el 0,36 %. Al revés pasa en 615 de los 834: un elemento con acción al que el servidor
-        /// no le manda colocación.
+        /// f15 ALWAYS accompanies an f11 and never goes alone. Measured over the 305 captures of the
+        /// real game: in the 834 jss carrying elements there are 4,493 f11 and only 2,685 f15, and an
+        /// f15 whose element has no f11 appears 3 times —only once in each—, that is
+        /// 0.36 %. The other way round happens in 615 of the 834: an element with an action for which the server
+        /// sends no placement.
         ///
-        /// Es decir: el f15 es un SUBCONJUNTO del f11, no un superconjunto. Declarar uno por cada
-        /// elemento del mapa —los 46.309 de interactive_elements.json, repartidos en 9.840 mapas,
-        /// hasta 71 en el peor— pondría a Jondo a mandar lo contrario de lo que manda Ankama.
+        /// That is: f15 is a SUBSET of f11, not a superset. Declaring one for each
+        /// element of the map —the 46,309 of interactive_elements.json, spread over 9,840 maps,
+        /// up to 71 in the worst— would have Jondo sending the opposite of what Ankama sends.
         ///
-        /// El f1 dice que el elemento es de este mapa. La ausencia del f4 es el estado activo, que
-        /// por eso no se escribe. El dibujo no viaja: el cliente lo saca de sus propios datos de
-        /// mapa a partir del número del elemento.
+        /// f1 says the element belongs to this map. The absence of f4 is the active state, which
+        /// is why it is not written. The drawing does not travel: the client takes it from its own map
+        /// data based on the element's number.
         /// </summary>
         private static void DeclarePlacement(Pb jss, Managers.Interactives.Element element,
                                              Managers.ResourceState state)
@@ -1373,21 +1397,21 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El grado de un monstruo, de 1 a 5, o hasta 6 si el monstruo declara seis.
+        /// A monster's grade, from 1 to 5, or up to 6 if the monster declares six.
         ///
-        /// El tope de cinco es lo que importa: en trescientos y pico monstruos silvestres de las
-        /// capturas reales el grado sale 1, 2, 3, 4 o 5 y nunca más. Nuestros datos no se portan
-        /// igual —4.098 monstruos tienen cinco grados, pero 479 tienen seis, 169 tienen diez y uno
-        /// tiene veinte— y el generador elegía cualquiera, así que salían grados 6 y más arriba.
+        /// The cap of five is what matters: in three hundred-odd wild monsters of the
+        /// real captures the grade comes out 1, 2, 3, 4 or 5 and never more. Our data does not behave
+        /// the same —4,098 monsters have five grades, but 479 have six, 169 have ten and one
+        /// has twenty— and the generator picked any of them, so grades 6 and higher came out.
         ///
-        /// Al cliente eso le sienta mal en silencio: el grupo se dibuja, pero pasarle el ratón por
-        /// encima no enseña nada y la tecla W lo salta. Por eso solo se veía la información de uno
-        /// o dos grupos de los cuatro del mapa.
+        /// The client takes that badly in silence: the group is drawn, but hovering over
+        /// it shows nothing and the W key skips it. That is why the information was only seen for one
+        /// or two of the four groups on the map.
         ///
-        /// Y el sexto, medido después: el Puch Ingball de nivel 200 del kanojedo viaja como
-        /// <c>f2=200 f4=6</c> en dos capturas, y el cliente lo pinta y lo deja mirar, porque sus
-        /// propios datos le dan seis grados. El sexto sólo sale cuando el monstruo lo tiene, y a
-        /// los generados nadie se lo reparte; lo que se ve más arriba de eso sigue sin medir.
+        /// And the sixth, measured later: the kanojedo's level 200 Puch Ingball travels as
+        /// <c>f2=200 f4=6</c> in two captures, and the client draws it and lets it be inspected, because its
+        /// own data gives it six grades. The sixth only comes out when the monster has it, and
+        /// nobody hands it to the generated ones; what is seen above that is still unmeasured.
         /// </summary>
         private const int MaxGrade = 5;
         private const int MaxDeclaredGrade = 6;
@@ -1428,23 +1452,23 @@ namespace Jondo.Unity.Server.Network
         /// data through <see cref="SpellTable"/>; only the breed and the level are ours.
         /// </summary>
         /// <summary>
-        /// De dónde sale el hechizo: 1 los de la clase, 2 los que no lo son —el cuerpo a cuerpo,
-        /// los de objeto, los de montura—.
+        /// Where the spell comes from: 1 the class ones, 2 the ones that are not —melee,
+        /// item ones, mount ones—.
         /// </summary>
         private const int OrigenQueNoEsDeClase = 2;
 
         /// <summary>
-        /// El cuerpo a cuerpo es el HECHIZO CERO, y no hay que inventárselo: está en la base como
-        /// <c>SpellTemplates.Id 0</c>, con el nombre 64658 —"Puñetazo"— y un único grado, el
-        /// <c>SpellLevels.Id 10461</c>, de 3 PA y alcance 1.
+        /// Melee is SPELL ZERO, and it does not have to be invented: it is in the base as
+        /// <c>SpellTemplates.Id 0</c>, with name 64658 —"Puñetazo"— and a single grade,
+        /// <c>SpellLevels.Id 10461</c>, of 3 AP and range 1.
         ///
-        /// El servidor real lo manda como una entrada más de la lista de hechizos, con el número
-        /// omitido —proto3 no escribe los ceros— y el origen a 2: los bytes son <c>08 01 20 02</c>.
-        /// Está en las nueve capturas que traen un hms, desde el personaje de nivel 1 del tutorial
-        /// hasta el de nivel 200. Sin ella el cliente no tiene ficha que poner en la casilla del
-        /// arma: fuera de combate no la dibuja, y en combate la dibuja pero sin nada que lanzar
-        /// —de ahí que saliera apagada y con el texto de objeto sin resolver, con las filas de
-        /// "[QUANTITÉ EN INVENTAIRE]" y "[Valeurs théoriques]"—.
+        /// The real server sends it as one more entry of the spell list, with the number
+        /// omitted —proto3 does not write zeros— and the origin at 2: the bytes are <c>08 01 20 02</c>.
+        /// It is in the nine captures that bring an hms, from the tutorial's level 1 character
+        /// to the level 200 one. Without it the client has no token to put in the weapon
+        /// slot: out of combat it does not draw it, and in combat it draws it but with nothing to cast
+        /// —hence it came out greyed and with the item text unresolved, with the rows
+        /// "[QUANTITÉ EN INVENTAIRE]" and "[Valeurs théoriques]"—.
         /// </summary>
         private const int GradoDelCuerpoACuerpo = 1;
 
@@ -1459,9 +1483,9 @@ namespace Jondo.Unity.Server.Network
                 hms.Msg(1, Pb.New().Var(1, spell.Grade).Var(3, spell.SpellId).Var(4, 1));
             }
 
-            // Y los de administración, que van detrás y sólo para quien lo es. El rol se mira
-            // contra la base cada vez: quitárselo a alguien tiene efecto en cuanto vuelva a
-            // entrar, sin nada guardado en la sesión que se quede desfasado.
+            // And the administration ones, which go after and only for whoever is one. The role is checked
+            // against the base each time: taking it away from someone takes effect as soon as he comes back
+            // in, with nothing stored in the session going stale.
             if (Managers.AdminSpells.Para(accountId))
             {
                 hms.Msg(1, Pb.New()
@@ -1470,16 +1494,16 @@ namespace Jondo.Unity.Server.Network
                     .Var(4, 1));
             }
 
-            // El f2 suelto del final, que es el mismo tipo de descuido que tuvo la barra de
-            // hechizos con su itg: va detrás de la lista, parece un hueco más y sin él vale cero.
+            // The loose f2 at the end, which is the same kind of oversight the spell bar
+            // had with its itg: it goes after the list, looks like one more slot and without it is zero.
             //
-            // Está en las NUEVE capturas que traen un hms, desde el personaje de nivel 1 del
-            // tutorial hasta el de nivel 200, y no salía en ninguno de los 138 que ha mandado este
-            // emulador. Lo que se sospecha que apaga es la previsualización de daños: el cliente
-            // lleva dentro un interruptor que se llama isDamagePreviewEnabled, y el texto de ayuda
-            // del propio juego describe con una sola frase las dos mitades que faltaban —el daño
-            // estimado y el desplazamiento—. No está demostrado que sea éste el interruptor; lo que
-            // sí está medido es que el servidor real lo manda siempre y nosotros nunca.
+            // It is in the NINE captures that bring an hms, from the tutorial's level 1
+            // character to the level 200 one, and it did not come out in any of the 138 this
+            // emulator has sent. What it is suspected to switch off is the damage preview: the client
+            // carries inside a switch called isDamagePreviewEnabled, and the game's own help
+            // text describes in a single sentence the two halves that were missing —the estimated
+            // damage and the displacement—. It is not proven that this is the switch; what
+            // is measured is that the real server always sends it and we never did.
             return hms.Var(2, 1).Build();
         }
 
@@ -1488,16 +1512,16 @@ namespace Jondo.Unity.Server.Network
         /// for the items; this is the spell one.
         ///
         ///   f1 (repeated) { f2: slot, f6 { f2: spell id } }
-        ///   f2: 1        ← QUÉ BARRA ES
+        ///   f2: 1        ← WHICH BAR IT IS
         ///
-        /// Ese f2 del final es lo que tenía la barra vacía. Va suelto al terminar la lista y no se
-        /// ve leyendo el árbol por encima, porque parece un hueco más; es el tipo de barra, y sin
-        /// él vale cero, que es la de objetos. El cliente recibía treinta y cuatro hechizos
-        /// declarados como atajos de la barra de objetos y no los pintaba en ninguna de las dos.
-        /// La de objetos, que es la que sí es del tipo cero, no lo lleva.
+        /// That f2 at the end is what had the bar empty. It goes loose at the end of the list and is not
+        /// seen reading the tree at a glance, because it looks like one more slot; it is the bar type, and without
+        /// it it is zero, which is the item one. The client received thirty-four spells
+        /// declared as shortcuts of the item bar and drew them in neither of the two.
+        /// The item one, which really is type zero, does not carry it.
         ///
         /// The slot is left out when it is zero, as proto3 does everywhere else. The client edits
-        /// a slot with itz —f2 el atajo, f3 la barra— and the server echoes it in ivk.
+        /// a slot with itz —f2 the shortcut, f3 the bar— and the server echoes it in ivk.
         /// </summary>
         public static byte[] BuildSpellBar(int breed, int level, long accountId = 0)
         {
@@ -1523,20 +1547,20 @@ namespace Jondo.Unity.Server.Network
             return itg.Var(2, SpellBar).Build();
         }
 
-        /// <summary>Qué barra es: 0 la de objetos, 1 la de hechizos.</summary>
+        /// <summary>Which bar it is: 0 the item one, 1 the spell one.</summary>
         public const int SpellBar = 1;
 
         /// <summary>
-        /// El hechizo que sustituye a su pareja (hng), y el hueco de la barra donde queda (iuq).
+        /// The spell that replaces its pair (hng), and the bar slot where it ends up (iuq).
         ///
-        /// Leído de cuatro capturas reales de cambiar de variante, desde el panel y desde la barra:
+        /// Read from four real captures of changing variant, from the panel and from the bar:
         ///
-        ///   cliente  hmt { f1: el hechizo que quiere }
-        ///   servidor iuq { f2 { f2: hueco, f6 { f2: hechizo } }, f3: qué barra }   uno por hueco
-        ///   servidor hng { f2: hechizo, f3: grado }
+        ///   client   hmt { f1: the spell it wants }
+        ///   server   iuq { f2 { f2: slot, f6 { f2: spell } }, f3: which bar }   one per slot
+        ///   server   hng { f2: spell, f3: grade }
         ///
-        /// Los iuq van primero y hay uno por cada hueco que tuviera la mitad vieja: en la captura
-        /// de Liberación por Magnetismo salieron dos, porque el hechizo estaba puesto dos veces.
+        /// The iuq go first and there is one for each slot the old half had: in the capture
+        /// of Liberación por Magnetismo two came out, because the spell was placed twice.
         /// </summary>
         public static byte[] BuildSpellSwapped(int spellId, int grade)
             => Pb.New().Var(2, spellId).Var(3, grade).Build();
@@ -1562,13 +1586,13 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildPods(long carried, long capacity)
             => Pb.New().VarIfNotZero(1, carried).VarIfNotZero(3, capacity).Build();
 
-        // ─── Recolección ────────────────────────────────────────────────────────
+        // ─── Gathering ──────────────────────────────────────────────────────────
 
         /// <summary>
-        /// El estado de un recurso (iwf): { f1 { f2: casilla, f3: elemento, f4: estado } }.
+        /// A resource's state (iwf): { f1 { f2: cell, f3: element, f4: state } }.
         ///
-        /// Cero es lleno y el servidor real no manda el campo; 1 agotado y 2 en uso. Son los
-        /// mismos números de campo que el f15 del jss, sin el f1 de aquél.
+        /// Zero is full and the real server does not send the field; 1 depleted and 2 in use. They are the
+        /// same field numbers as the jss's f15, without its f1.
         /// </summary>
         public static byte[] BuildElementState(int cell, int elementId, int state)
             => Pb.New().Msg(1, Pb.New()
@@ -1577,10 +1601,10 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(4, state)).Build();
 
         /// <summary>
-        /// Vuelve a declarar un recurso (iwm) para que su habilidad deje de poder usarse, o
-        /// vuelva a poder: { f3 { la misma forma que el f11 del jss } }.
+        /// Declares a resource again (iwm) so that its skill can no longer be used, or
+        /// can again: { f3 { the same shape as the jss's f11 } }.
         ///
-        /// Es el mensaje que apaga el trigo recién segado sin tener que reenviar el mapa entero.
+        /// It is the message that switches off the freshly reaped wheat without having to resend the whole map.
         /// </summary>
         public static byte[] BuildElementRedeclared(int skillInstanceId, int skillId,
                                                     int elementId, int type, bool usable)
@@ -1592,12 +1616,12 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El gesto de recolectar (iwn): { f2: elemento, f3: décimas, f4: habilidad, f5: quién }.
+        /// The gathering gesture (iwn): { f2: element, f3: tenths, f4: skill, f5: who }.
         ///
-        /// OJO, no es el mismo iwn que el de usar un zaap o un taller. Aquél lleva f1 = 1 y no
-        /// lleva duración; éste es al revés: sin f1 y con el f3. Medido en las cuatro capturas de
-        /// oficio, y el f3 vale 30 en las cuatro —tres segundos— con el tiempo real entre este
-        /// mensaje y el de fin midiendo 2.996, 2.999, 3.037 y 3.064 milisegundos.
+        /// CAREFUL, it is not the same iwn as that of using a zaap or a workshop. That one carries f1 = 1 and does not
+        /// carry a duration; this one is the other way round: without f1 and with f3. Measured in the four profession
+        /// captures, and f3 is 30 in all four —three seconds— with the real time between this
+        /// message and the end one measuring 2,996, 2,999, 3,037 and 3,064 milliseconds.
         /// </summary>
         public static byte[] BuildGatherStarted(int elementId, int tenths, int skillId,
                                                 long characterId)
@@ -1608,20 +1632,20 @@ namespace Jondo.Unity.Server.Network
                 .Var(5, characterId)
                 .Build();
 
-        /// <summary>Se acabó el gesto (iwi): { f1: elemento, f3: habilidad }.</summary>
+        /// <summary>The gesture is over (iwi): { f1: element, f3: skill }.</summary>
         public static byte[] BuildGatherFinished(int elementId, int skillId)
             => Pb.New().Var(1, elementId).Var(3, skillId).Build();
 
-        /// <summary>Lo recogido en esta pasada (itn): { f1: objeto, f2: cantidad }.</summary>
+        /// <summary>What was gathered in this pass (itn): { f1: item, f2: quantity }.</summary>
         public static byte[] BuildGathered(int itemId, int quantity)
             => Pb.New().Var(1, itemId).Var(2, quantity).Build();
 
         /// <summary>
-        /// La experiencia de un oficio (irq): { f1 { f1: oficio, f2: siguiente nivel, f3: nivel,
-        /// f4: suelo del nivel, f5: acumulada } }.
+        /// A profession's experience (irq): { f1 { f1: profession, f2: next level, f3: level,
+        /// f4: level floor, f5: accumulated } }.
         ///
-        /// Manda TOTALES, no incrementos. El f2 desaparece cuando el oficio está al tope, que es
-        /// como salía el leñador de nivel 200 en la captura de la madera.
+        /// It sends TOTALS, not increments. f2 disappears when the profession is at the cap, which is
+        /// how the level 200 lumberjack came out in the wood capture.
         /// </summary>
         public static byte[] BuildJobExperience(int jobId, long next, int level, long floor,
                                                 long experience)
@@ -1649,34 +1673,34 @@ namespace Jondo.Unity.Server.Network
             return irq.Build();
         }
 
-        /// <summary>Cambia la cantidad de un objeto que ya estaba en la bolsa (ivj).</summary>
+        /// <summary>Changes the quantity of an item that was already in the bag (ivj).</summary>
         public static byte[] BuildItemQuantity(long uid, int total)
             => Pb.New().Msg(3, Pb.New().Var(2, uid).Var(3, total)).Build();
 
         // ─── World: apariencia ──────────────────────────────────────────────────
 
         /// <summary>
-        /// El bloque de un personaje dentro del mapa: dónde está, quién es y qué aspecto tiene.
+        /// A character's block within the map: where he is, who he is and what he looks like.
         ///
-        ///   f1 { f1: casilla, f2: hacia dónde mira }
-        ///   f2 { f1 { f5: nombre y cuenta }, f3: el aspecto }
-        ///   f3: el identificador
+        ///   f1 { f1: cell, f2: which way he faces }
+        ///   f2 { f1 { f5: name and account }, f3: the look }
+        ///   f3: the identifier
         ///
-        /// Es el mismo bloque en dos sitios: repetido en el f5 del jss, que es el mapa entero, y
-        /// suelto dentro del jsn, que es un solo actor. Por eso está aquí y no dentro de ninguno de
-        /// los dos.
+        /// It is the same block in two places: repeated in the jss's f5, which is the whole map, and
+        /// loose inside the jsn, which is a single actor. That is why it is here and not inside either of
+        /// the two.
         /// </summary>
         private static Pb PlayerActor(DatabaseManager.DbCharacter character, int cell, int facing,
                                      long accountId)
         {
-            // El orden y los campos son los de un jsn real con título puesto:
+            // The order and the fields are those of a real jsn with a title on:
             //
-            //   f1 { f2: 3, f5: nivel }      f3: la cuenta
-            //   f5 (repetido): las opciones — gremio, título, ornamento, y el f7:1 que va siempre
+            //   f1 { f2: 3, f5: level }      f3: the account
+            //   f5 (repeated): the options — guild, title, ornament, and the f7:1 that always goes
             //   f6: 1                        f7: 0x0b
             //
-            // Faltaban el f1, el f5{f7:1} y el f7, y sin ellos el cliente no pintaba el título ni
-            // el ornamento al pasar el ratón por encima.
+            // f1, f5{f7:1} and f7 were missing, and without them the client did not draw the title nor
+            // the ornament on hovering over.
             var cuerpo = Pb.New()
                 .Msg(1, Pb.New().Var(2, HumanKind).VarIfNotZero(5, character.Level))
                 .Var(3, accountId);
@@ -1706,21 +1730,21 @@ namespace Jondo.Unity.Server.Network
             => PlayerActor(character, cell, facing, accountId).Build();
 
         /// <summary>
-        /// "Este actor ha cambiado" (jsn), que es lo que redibuja al personaje en el mapa.
+        /// "This actor has changed" (jsn), which is what redraws the character on the map.
         ///
-        /// El lxc no vale para esto. En la captura de equipar un dragopavo salen los dos, y son
-        /// cosas distintas: el lxc lleva un UUID que no aparece en ningún otro sitio del flujo —ni
-        /// en el jss, ni en ningún jsn— mientras que el jsn lleva el bloque del actor completo, con
-        /// su casilla, su identificador y el aspecto nuevo con los huesos de la montura. El cliente
-        /// dibuja lo que le diga el jsn.
+        /// The lxc does not do for this. In the capture of equipping a dragoturkey both come out, and they are
+        /// different things: the lxc carries a UUID that appears nowhere else in the flow —neither
+        /// in the jss, nor in any jsn— while the jsn carries the complete actor block, with
+        /// its cell, its identifier and the new look with the mount's bones. The client
+        /// draws what the jsn tells it.
         ///
-        /// Mandando solo el lxc, la muñeca del inventario se enteraba y el muñeco del mapa no: uno
-        /// se quedaba montado en el dragopavo de antes por mucho que se cambiara de montura o se
-        /// quitaran todas.
+        /// Sending only the lxc, the inventory doll found out and the map figure did not: one
+        /// stayed mounted on the previous dragoturkey however much the mount was changed or
+        /// all of them were taken off.
         ///
-        ///   jsn f1 { el bloque del actor }
+        ///   jsn f1 { the actor block }
         ///
-        /// El servidor real manda tres seguidos; con uno basta.
+        /// The real server sends three in a row; one is enough.
         /// </summary>
         public static byte[] BuildActorRefreshed(DatabaseManager.DbCharacter character, int cell,
                                                  int facing, long accountId)
@@ -1729,16 +1753,16 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// "Tu aspecto ha cambiado" (lxc), que es lo que el servidor manda al equipar algo.
+        /// "Your look has changed" (lxc), which is what the server sends on equipping something.
         ///
-        ///   f1: un identificador con forma de UUID
-        ///   f2: el aspecto nuevo
+        ///   f1: an identifier shaped like a UUID
+        ///   f2: the new look
         ///
-        /// El UUID sale igual en todos los lxc de una misma sesión y cambia entre personajes, así
-        /// que parece identificar al dueño del aspecto. No se ha encontrado dónde lo aprende el
-        /// cliente —en el jss el único UUID que hay es el de una alianza, no éste— así que aquí se
-        /// deriva del id del personaje: constante para él y distinto del de cualquier otro. Si el
-        /// cliente no lo comprueba, da igual; si lo comprueba, al menos es coherente.
+        /// The UUID comes out the same in all the lxc of one same session and changes between characters, so
+        /// it seems to identify the look's owner. Where the client learns it has not been found
+        /// —in the jss the only UUID there is is an alliance's, not this one— so here it is
+        /// derived from the character's id: constant for him and different from anyone else's. If the
+        /// client does not check it, it does not matter; if it checks it, at least it is consistent.
         /// </summary>
         public static byte[] BuildLookChanged(DatabaseManager.DbCharacter character)
             => Pb.New()
@@ -1749,23 +1773,23 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// El estado de la ventana de apariencias (lxo), la respuesta al lyy.
+        /// The appearance window's state (lxo), the answer to the lyy.
         ///
         ///   f1: 1
-        ///   f3 { f3: cuándo, f5: raza, f7: uuid de la vista previa, f8: 3, f10: título,
-        ///        f11: nivel, f12: el aspecto, f15: -1, f16: ornamento,
-        ///        f17 (repetido) { f1: hueco, f2 { f2: prenda } } }
+        ///   f3 { f3: when, f5: breed, f7: preview uuid, f8: 3, f10: title,
+        ///        f11: level, f12: the look, f15: -1, f16: ornament,
+        ///        f17 (repeated) { f1: slot, f2 { f2: garment } } }
         ///
-        /// El f7 es el mismo uuid que lleva el lxc de la vista previa, y el f12 su mismo aspecto:
-        /// así es como el panel sabe que lo que le llega es lo suyo.
+        /// f7 is the same uuid the preview's lxc carries, and f12 its same look:
+        /// that is how the panel knows that what reaches it is its own.
         /// </summary>
         public static byte[] BuildAppearanceState(DatabaseManager.DbCharacter character, string draftId)
             => Pb.New().Var(1, 1).Bytes(3, AppearanceBody(character, draftId)).Build();
 
         /// <summary>
-        /// Un CONJUNTO del vestuario: el mismo bloque que va dentro del lxo, y por eso está aquí
-        /// aparte. El lyt lo repite —uno por conjunto guardado en el f1, y en el f2 el que está
-        /// puesto— y es lo que el panel de apariencias necesita para poder abrirse.
+        /// A wardrobe OUTFIT: the same block that goes inside the lxo, and that is why it is here
+        /// apart. The lyt repeats it —one per outfit stored in f1, and in f2 the one that is
+        /// on— and it is what the appearance panel needs to be able to open.
         /// </summary>
         private static byte[] AppearanceBody(DatabaseManager.DbCharacter character, string draftId)
         {
@@ -1773,9 +1797,9 @@ namespace Jondo.Unity.Server.Network
 
             var body = Pb.New();
 
-            // Los colores del conjunto, pelados y sin índice. Sin esto el cliente revienta al abrir
-            // la ventana de cosméticos: su propio registro lo dice, ColorSet..ctor con la lista
-            // nula, dentro del manejador del lyt.
+            // The outfit's colours, bare and without an index. Without this the client blows up on opening
+            // the cosmetics window: its own log says so, ColorSet..ctor with the null
+            // list, inside the lyt handler.
             var colores = BreedLookTable.PlainColors(character.Breed, character.Sex, null);
             if (colores.Count > 0) body.Msg(1, Pb.New().Packed(2, colores));
 
@@ -1803,16 +1827,16 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Los conjuntos del vestuario (lyt), que llegan al entrar al mundo.
+        /// The wardrobe outfits (lyt), which arrive on entering the world.
         ///
-        ///   f1 (repetido): cada conjunto guardado     f2: el que se lleva puesto
+        ///   f1 (repeated): each stored outfit     f2: the one being worn
         ///
-        /// HAY QUE MANDARLO SÍ O SÍ. Sin él, el cliente abre la ventana de cosméticos, suena, y se
-        /// queda sin dibujar: revienta en CosmeticUi.DisplayOutfit con una referencia nula porque no
-        /// tiene ningún conjunto que enseñar. Se vio en su propio Player.log.
+        /// IT HAS TO BE SENT NO MATTER WHAT. Without it, the client opens the cosmetics window, makes its sound, and is
+        /// left undrawn: it blows up in CosmeticUi.DisplayOutfit with a null reference because it does not
+        /// have any outfit to show. It was seen in its own Player.log.
         ///
-        /// Aquí va uno solo, el del personaje que juega, con su aspecto y sus prendas de verdad. La
-        /// captura traía dos, pero eran los de la cuenta grabada y por eso dejó de reenviarse.
+        /// Only one goes here, that of the character playing, with his real look and garments. The
+        /// capture brought two, but they were the recorded account's and that is why it stopped being resent.
         /// </summary>
         public static byte[] BuildOutfits(DatabaseManager.DbCharacter character)
         {
@@ -1820,13 +1844,13 @@ namespace Jondo.Unity.Server.Network
             return Pb.New().Bytes(1, conjunto).Bytes(2, conjunto).Build();
         }
 
-        /// <summary>Un uuid propio del conjunto, distinto del de la vista previa.</summary>
+        /// <summary>The outfit's own uuid, different from the preview's.</summary>
         private static string OutfitIdOf(long characterId) => LookIdOf(characterId * 17 + 3);
 
-        /// <summary>El f8 del estado, constante en las veinte capturas donde sale.</summary>
+        /// <summary>The state's f8, constant in the twenty captures where it appears.</summary>
         private const int AppearanceStateKind = 3;
 
-        /// <summary>Un UUID estable a partir del id del personaje.</summary>
+        /// <summary>A stable UUID from the character's id.</summary>
         public static string LookIdOf(long characterId)
         {
             var bytes = new byte[16];
@@ -1838,18 +1862,18 @@ namespace Jondo.Unity.Server.Network
         // ─── World: zaaps ───────────────────────────────────────────────────────
 
         /// <summary>
-        /// "Ese elemento está en uso" (iwn), la respuesta inmediata al clic sobre un zaap.
+        /// "That element is in use" (iwn), the immediate answer to the click on a zaap.
         ///
-        ///   f1: 1, f2: EL ELEMENTO, f4: la habilidad, f5: quién lo usa
+        ///   f1: 1, f2: THE ELEMENT, f4: the skill, f5: who uses it
         ///
-        /// El f2 es el elemento, no el identificador de la instancia de habilidad. Se ve cruzando
-        /// el iwn con el iwo que lo provoca en la misma captura:
+        /// f2 is the element, not the skill instance identifier. It is seen by crossing
+        /// the iwn with the iwo that causes it in the same capture:
         ///
         ///   iwo  f1: 14110  f2: 538795
         ///   iwn  f1: 1      f2: 538795   f4: 114
         ///
-        /// El cliente manda los dos números y el servidor le devuelve el segundo. Mandarle el
-        /// primero deja al cliente marcando como ocupado un elemento que no existe.
+        /// The client sends both numbers and the server returns the second. Sending it the
+        /// first leaves the client marking as busy an element that does not exist.
         /// </summary>
         public static byte[] BuildElementInUse(int elementId, int skillId, long who)
             => Pb.New()
@@ -1860,17 +1884,17 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// Se acabó de usar un interactivo (iwi). Misma forma que el fin de recolección: el f1 es
-        /// el elemento y el f3 la habilidad.
+        /// An interactive has finished being used (iwi). Same shape as the end of gathering: f1 is
+        /// the element and f3 the skill.
         ///
-        /// Un teleport es instantáneo, pero hay que soltarlo igual ANTES del jru: si no, el
-        /// cliente se puede quedar con el elemento marcado como ocupado en su caché y al volver
-        /// al mapa su gráfico ya no aparece.
+        /// A teleport is instant, but it has to be released all the same BEFORE the jru: otherwise, the
+        /// client can be left with the element marked as busy in its cache and on coming back
+        /// to the map its graphic no longer appears.
         /// </summary>
         public static byte[] BuildInteractiveUseEnded(int elementId, int skillId)
             => Pb.New().Var(1, elementId).Var(3, skillId).Build();
 
-        /// <summary>Un destino de la lista de zaaps.</summary>
+        /// <summary>A destination of the zaap list.</summary>
         public readonly struct ZaapDestination
         {
             public ZaapDestination(long mapId, int subAreaId, int level, long cost,
@@ -1886,54 +1910,54 @@ namespace Jondo.Unity.Server.Network
             public long Cost { get; }
 
             /// <summary>
-            /// En qué pestaña lo pone el cliente: 0 el zaap, 1 el zaapi, 4 la anomalía.
+            /// Which tab the client puts it in: 0 the zaap, 1 the zaapi, 4 the anomaly.
             ///
-            /// El zaap normal no manda el campo —proto3 se come el cero— y por eso durante un
-            /// tiempo pareció que no existía. Sale en las 69 entradas de las capturas de zaapi
-            /// con valor 1 y en las 27 de anomalía con valor 4.
+            /// The normal zaap does not send the field —proto3 swallows the zero— and that is why for a
+            /// while it seemed not to exist. It appears in the 69 entries of the zaapi captures
+            /// with value 1 and in the 27 anomaly ones with value 4.
             /// </summary>
             public int Kind { get; }
 
-            /// <summary>Minutos que le quedan a la anomalía. Sólo lo llevan las anomalías.</summary>
+            /// <summary>Minutes the anomaly has left. Only anomalies carry it.</summary>
             public int MinutesLeft { get; }
 
-            /// <summary>Minutos que dura. Cero en todo lo que no sea una anomalía.</summary>
+            /// <summary>Minutes it lasts. Zero in everything that is not an anomaly.</summary>
             public int Duration { get; }
         }
 
         /// <summary>
-        /// La lista de zaaps (hjj).
+        /// The zaap list (hjj).
         ///
-        ///   f2: el mapa donde está el zaap que se ha abierto
-        ///   f3 (repetido) { f1: nivel de la zona, f2: lo que cuesta, f3: pestaña,
-        ///                   f4 { f2: minutos que quedan, f3: minutos que dura },
-        ///                   f5: mapa, f6: subzona }
+        ///   f2: the map where the opened zaap is
+        ///   f3 (repeated) { f1: zone level, f2: what it costs, f3: tab,
+        ///                   f4 { f2: minutes left, f3: minutes it lasts },
+        ///                   f5: map, f6: subzone }
         ///
-        /// El destino en el que uno ya está viaja sin f2, que en proto3 es cero: ir a donde ya
-        /// estás no cuesta nada. Comprobado contra las veinticinco entradas de la captura, donde
-        /// el f6 cuadra con la subzona de MapPositions en todas.
+        /// The destination one is already at travels without f2, which in proto3 is zero: going where you already
+        /// are costs nothing. Checked against the twenty-five entries of the capture, where
+        /// f6 matches MapPositions's subzone in all of them.
         ///
-        /// Las tres pestañas van en esta misma lista, no en mensajes distintos: el f3 dice en cuál
-        /// cae cada entrada y el f4 de la entrada sólo lo llevan las anomalías, que caducan. Ver
+        /// The three tabs go in this same list, not in different messages: f3 says which one
+        /// each entry falls in and the entry's f4 is only carried by anomalies, which expire. See
         /// <see cref="Managers.Anomalies"/>.
         ///
-        /// ─── El f4 de la RAÍZ: qué ventana abre el cliente ──────────────────────────────────
+        /// ─── The ROOT's f4: which window the client opens ───────────────────────────────────
         ///
-        /// No basta con mandar los destinos buenos: el cliente decide QUÉ VENTANA pinta por este
-        /// campo, y no por el tipo del elemento que se ha clicado. Vale 0 el zaap —proto3 se lo
-        /// come y no viaja—, 1 el zaapi y 3 el barco. Sale igual en las doce listas capturadas:
+        /// Sending the right destinations is not enough: the client decides WHICH WINDOW it draws by this
+        /// field, and not by the type of the element clicked. It is 0 for the zaap —proto3 swallows
+        /// it and it does not travel—, 1 the zaapi and 3 the boat. It comes out the same in the twelve captured lists:
         ///
-        ///   3 capturas de zaapi   f4 = 1, y sin f2
-        ///   8 capturas de zaap    sin f4, y con f2
-        ///   1 captura de barco    f4 = 3 Y f2: los dos campos son independientes
+        ///   3 zaapi captures      f4 = 1, and without f2
+        ///   8 zaap captures       without f4, and with f2
+        ///   1 boat capture        f4 = 3 AND f2: the two fields are independent
         ///
-        /// Sin este 1, al clicar un zaapi el cliente abre la ventana del ZAAP —pestañas Zaap,
-        /// Anomalía y Prisma— y como todos los destinos que le llegan son de zaapi, ninguna de
-        /// esas pestañas los recoge y la ventana sale con «Ningún destino». La del zaapi es otra:
-        /// se titula «Zaapi» y sus pestañas son Talleres, Mercadillos y Varios.
+        /// Without this 1, on clicking a zaapi the client opens the ZAAP window —tabs Zaap,
+        /// Anomalía and Prisma— and since all the destinations reaching it are zaapi ones, none of
+        /// those tabs picks them up and the window comes out with «Ningún destino». The zaapi one is different:
+        /// it is titled «Zaapi» and its tabs are Talleres, Mercadillos and Varios.
         ///
-        /// Va al FINAL del mensaje, detrás de todos los destinos, que es donde lo pone el
-        /// servidor real.
+        /// It goes at the END of the message, after all the destinations, which is where the
+        /// real server puts it.
         /// </summary>
         public static byte[] BuildZaapList(long here, IEnumerable<ZaapDestination> destinations,
                                            int teleporter = 0)
@@ -1946,7 +1970,7 @@ namespace Jondo.Unity.Server.Network
                     .VarIfNotZero(2, destination.Cost)
                     .VarIfNotZero(3, destination.Kind);
 
-                // El reloj, sólo si lo tiene: al zaap y al zaapi el servidor real no se lo manda.
+                // The clock, only if it has one: the real server does not send it for the zaap and the zaapi.
                 if (destination.Duration > 0)
                 {
                     entry.Msg(4, Pb.New()
@@ -1962,16 +1986,16 @@ namespace Jondo.Unity.Server.Network
             return hjj.VarIfNotZero(4, teleporter).Build();
         }
 
-        /// <summary>Los kamas que le quedan al personaje (ivf).</summary>
+        /// <summary>The kamas the character has left (ivf).</summary>
         public static byte[] BuildKamas(long kamas) => Pb.New().Var(1, kamas).Build();
 
         /// <summary>
-        /// "Cierra el diálogo" (kld).
+        /// "Close the dialogue" (kld).
         ///
-        /// El cliente NO cierra la ventana del zaap por su cuenta: espera que el servidor se lo
-        /// diga. En las capturas sale dos veces con el mismo valor —al llegar al destino, justo
-        /// antes del jss, y como respuesta al kla vacío que manda el botón de cerrar— así que el
-        /// f1 es una razón fija y no algo que haya que calcular.
+        /// The client does NOT close the zaap window on its own: it waits for the server to tell it
+        /// to. In the captures it appears twice with the same value —on reaching the destination, right
+        /// before the jss, and as the answer to the empty kla the close button sends— so
+        /// f1 is a fixed reason and not something that has to be computed.
         /// </summary>
         public static byte[] BuildDialogClosed(int reason = DialogCloseReason)
             => Pb.New().Var(1, reason).Build();
@@ -1979,53 +2003,53 @@ namespace Jondo.Unity.Server.Network
         private const int DialogCloseReason = 10;
 
         /// <summary>
-        /// La razón con la que se cierra el diálogo de un NPC, que no es la del zaap.
+        /// The reason an NPC's dialogue is closed with, which is not the zaap's.
         ///
-        /// En la captura del servidor de torneos el kld que cierra la conversación con la montaña
-        /// de kamas lleva f1: 1, y sale las cuatro veces —tanto al aceptar como al rechazar—. El 10
-        /// es el del zaap y hay un 5 midiendo otra ventana, así que son razones distintas de cierre
-        /// y no un valor fijo; la regla que las separa no está descifrada.
+        /// In the tournament server capture the kld that closes the conversation with the kama
+        /// mountain carries f1: 1, and it appears all four times —both on accepting and on declining—. 10
+        /// is the zaap's and there is a 5 measuring another window, so they are different closing reasons
+        /// and not a fixed value; the rule that separates them has not been deciphered.
         /// </summary>
         public const int NpcDialogCloseReason = 1;
 
         // ─── World: NPCs, their dialogue and their shops ────────────────────────
 
         /// <summary>
-        /// El servidor abre la ventana de diálogo (ioc). Sólo devuelve a quién se le está hablando
-        /// y dónde; no lleva ni f1 ni f2 ni f3.
+        /// The server opens the dialogue window (ioc). It only returns who is being spoken to
+        /// and where; it carries neither f1 nor f2 nor f3.
         ///
-        ///   f4: mapa      f5: id contextual del NPC
+        ///   f4: map      f5: the NPC's contextual id
         /// </summary>
         public static byte[] BuildNpcDialog(long mapId, long contextualId)
             => Pb.New().Var(4, mapId).Var(5, contextualId).Build();
 
         /// <summary>
-        /// La pregunta y sus respuestas (ios).
+        /// The question and its replies (ios).
         ///
-        ///   f1: id del mensaje
-        ///   f2 (repetido) { f1: id de respuesta, f3 (repetido) { f1: id de efecto } }
+        ///   f1: message id
+        ///   f2 (repeated) { f1: reply id, f3 (repeated) { f1: effect id } }
         ///
-        /// El f3 de cada respuesta es lo que la respuesta promete: en la montaña de kamas la que
-        /// paga anuncia los efectos 194 ("+#1{{~1~2 a }}#2 kamas"), 193 y 351, y la que rechaza va
-        /// sin ninguno. Aquí se manda sin f3, que es como viaja la respuesta de rechazo en la
-        /// captura: se pierde el iconito del premio y nada más. Los ids de efecto no están en
-        /// NpcTemplates, así que ponerlos sería inventárselos.
+        /// Each reply's f3 is what the reply promises: at the kama mountain the one that
+        /// pays announces effects 194 ("+#1{{~1~2 a }}#2 kamas"), 193 and 351, and the one that declines goes
+        /// with none. Here it is sent without f3, which is how the decline reply travels in the
+        /// capture: the little prize icon is lost and nothing else. The effect ids are not in
+        /// NpcTemplates, so putting them would be inventing them.
         /// </summary>
         public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies)
             => BuildNpcQuestion(messageId, replies, null);
 
         /// <summary>
-        /// La misma pregunta, con los PARÁMETROS que algunas respuestas llevan dentro.
+        /// The same question, with the PARAMETERS some replies carry inside.
         /// </summary>
         /// <remarks>
-        /// Una respuesta no es siempre sólo un identificador: puede traer números que el cliente
-        /// mete en su texto. La fuente de los Sueños Infinitos es el caso claro —el Rey Gob—, y en
-        /// la captura larga su respuesta viaja así:
+        /// A reply is not always just an identifier: it can bring numbers the client
+        /// puts in its text. The fountain of the Infinite Dreams is the clear case —the Rey Gob—, and in
+        /// the long capture its reply travels like this:
         ///
         ///   f2 { f1: 82314, f3 { f1: 4037 }, f3 { f1: 4035 } }
         ///
-        /// El f3 es repetido y lleva un número cada uno. Sin ellos la respuesta se ofrece igual,
-        /// pero pelada: el cliente pinta el hueco del número vacío.
+        /// f3 is repeated and each one carries a number. Without them the reply is offered all the same,
+        /// but bare: the client draws the number's slot empty.
         /// </remarks>
         public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies,
                                               IReadOnlyDictionary<long, IReadOnlyList<long>> parametros)
@@ -2046,42 +2070,42 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El catálogo entero de una tienda (kbd), de una sola vez.
+        /// A shop's whole catalogue (kbd), in one go.
         ///
-        ///   f1 (repetido) { f1: objeto
-        ///                   f3 { f2: precio, f3: -1, f4: criterio }
-        ///                   f4 (repetido): un efecto, con el id en f11 }
-        ///   f2: el mismo id contextual que pidió el iov
+        ///   f1 (repeated) { f1: item
+        ///                   f3 { f2: price, f3: -1, f4: criterion }
+        ///                   f4 (repeated): an effect, with the id in f11 }
+        ///   f2: the same contextual id the iov asked for
         ///
-        /// No está paginado: en la captura hay cincuenta y seis iov de tienda y cincuenta y seis
-        /// kbd, uno a uno, y el mayor son 26.902 bytes con 444 entradas. Como no hay ni un caso de
-        /// dos kbd para una misma tienda, tampoco hay prueba de que el cliente sepa juntarlos, así
-        /// que el reparto en vendedores pequeños que hace el servidor real es también lo seguro.
+        /// It is not paginated: in the capture there are fifty-six shop iov and fifty-six
+        /// kbd, one to one, and the biggest is 26,902 bytes with 444 entries. Since there is not a single case of
+        /// two kbd for one same shop, there is no proof either that the client knows how to join them, so
+        /// the split into small sellers the real server does is also the safe thing.
         ///
-        /// El f3.f3 vale -1 en las 6.106 entradas medidas. Se manda igual aunque no se sepa qué
-        /// significa exactamente: lo único seguro es que el cliente lo recibe siempre así.
+        /// f3.f3 is -1 in the 6,106 measured entries. It is sent all the same even though what it
+        /// means exactly is not known: the only sure thing is that the client always receives it that way.
         ///
-        /// El criterio de texto —"(SC=3|Sc=3500)" en el servidor de torneos— NO se manda. El SC=3
-        /// es "servidor de torneo" y el propio servidor lo valida: las catorce entradas con el
-        /// criterio más duro dieron error 243 al comprarlas. Aquí no somos un servidor de torneo, y
-        /// hay doce entradas medidas que viajan sin criterio ninguno, así que se omite.
+        /// The text criterion —"(SC=3|Sc=3500)" on the tournament server— is NOT sent. SC=3
+        /// is "tournament server" and the server itself validates it: the fourteen entries with the
+        /// hardest criterion gave error 243 on buying them. Here we are not a tournament server, and
+        /// there are twelve measured entries travelling with no criterion at all, so it is omitted.
         ///
-        /// El f3 es LA MONEDA, y con él una tienda cobra en un objeto en vez de en kamas. No hay
-        /// que inventar nada: el cliente ya lo sabe hacer. Medido sobre las 305 capturas, hay 60
-        /// kbd y 58 llevan sólo f1 y f2 —ésos cobran en kamas—; los otros dos llevan además el
-        /// f3, con el id del objeto que hace de moneda:
+        /// f3 is THE CURRENCY, and with it a shop charges in an item instead of in kamas. Nothing
+        /// has to be invented: the client already knows how to do it. Measured over the 305 captures, there are 60
+        /// kbd and 58 carry only f1 and f2 —those charge in kamas—; the other two also carry
+        /// f3, with the id of the item acting as currency:
         ///
-        ///   f3 = 13052   «Sebuscalón»   (la tienda de la Torre de los Viajeros)
-        ///   f3 = 30529   «Fidelicha»    (una de Pandala)
+        ///   f3 = 13052   «Sebuscalón»   (the Travellers' Tower shop)
+        ///   f3 = 30529   «Fidelicha»    (one in Pandala)
         ///
-        /// Si el f3 no está, se cobra en kamas, que es por lo que va con VarIfNotZero: una tienda
-        /// normal sigue mandando exactamente los mismos bytes que antes.
+        /// If f3 is not there, it charges in kamas, which is why it goes with VarIfNotZero: a normal
+        /// shop still sends exactly the same bytes as before.
         ///
-        /// OJO CON EL PRECIO. Se recibe la tienda entera y no sólo el id de la moneda, y es a
-        /// propósito: la primera versión mandaba el f3 con la ficha pero seguía poniendo en cada
-        /// entrada el precio EN KAMAS, así que el cliente enseñaba una capa a «1 ficha» y al
-        /// comprarla el servidor cobraba 150. El precio que se enseña y el que se cobra tienen
-        /// que salir del mismo sitio, y por eso salen los dos de aquí.
+        /// MIND THE PRICE. The whole shop is received and not only the currency's id, and it is on
+        /// purpose: the first version sent f3 with the token but kept putting in each
+        /// entry the price IN KAMAS, so the client showed a cape at «1 token» and on
+        /// buying it the server charged 150. The price shown and the price charged have
+        /// to come from the same place, and that is why both come from here.
         /// </summary>
         public static byte[] BuildShop(long contextualId, IEnumerable<int> gids,
                                        Managers.TokenShops.Shop? tokenShop = null)
@@ -2108,27 +2132,27 @@ namespace Jondo.Unity.Server.Network
             return kbd.Var(2, contextualId).VarIfNotZero(3, tokenShop?.TokenGid ?? 0).Build();
         }
 
-        /// <summary>Las existencias de la tienda. Constante en las 6.106 entradas de la captura.</summary>
+        /// <summary>The shop's stock. Constant in the 6,106 entries of the capture.</summary>
         private const int ShopUnlimited = -1;
 
         /// <summary>
-        /// La tienda se ha cerrado (khd). El f3 vale 11 en las cincuenta y seis de la captura.
+        /// The shop has been closed (khd). f3 is 11 in all fifty-six of the capture.
         /// </summary>
         public static byte[] BuildShopClosed() => Pb.New().Var(3, ShopClosedKind).Build();
 
         private const int ShopClosedKind = 11;
 
         /// <summary>
-        /// Un mensaje de información (lqn), que es COMO SE LE HABLA AL JUGADOR.
+        /// An information message (lqn), which is HOW THE PLAYER IS SPOKEN TO.
         ///
-        ///   f1: el tipo           f2: qué mensaje       f4 (repetido): sus parámetros
+        ///   f1: the type          f2: which message     f4 (repeated): its parameters
         ///
-        /// El servidor no manda texto: manda dos números y el cliente pone la frase, ya traducida,
-        /// sacándola de InfoMessagesDataRoot. El tipo decide cómo la pinta —0 información, 1 aviso—
-        /// y proto3 se come el cero, que es por lo que en las capturas unos lqn llevan f1 y otros
-        /// no. Ver <see cref="Managers.InfoMessages"/>.
+        /// The server does not send text: it sends two numbers and the client supplies the sentence, already translated,
+        /// taking it from InfoMessagesDataRoot. The type decides how it draws it —0 information, 1 warning—
+        /// and proto3 swallows the zero, which is why in the captures some lqn carry f1 and others
+        /// do not. See <see cref="Managers.InfoMessages"/>.
         ///
-        /// Esto y no una línea de chat: el chat sale por el canal general y lo lee todo el mundo.
+        /// This and not a chat line: the chat goes out through the general channel and everybody reads it.
         /// </summary>
         public static byte[] BuildSystemMessage(int messageId, params string[] parameters)
             => BuildInfoMessage(Managers.InfoMessages.Info, messageId, parameters);
@@ -2150,7 +2174,7 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildBackInTheFight(string name)
             => BuildInfoMessage(Managers.InfoMessages.Warning, Managers.InfoMessages.BackInTheFight, name);
 
-        /// <summary>El mismo, diciendo de qué tipo es.</summary>
+        /// <summary>The same, saying what type it is.</summary>
         public static byte[] BuildInfoMessage(int type, int messageId, params string[] parameters)
         {
             var lqn = Pb.New().VarIfNotZero(1, type).VarIfNotZero(2, messageId);
@@ -2159,19 +2183,19 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El aviso de la última conexión, con su fecha y la dirección desde la que se hizo.
+        /// The last connection notice, with its date and the address it was made from.
         ///
-        /// El cliente tiene dos plantillas y la diferencia es la IP:
+        /// The client has two templates and the difference is the IP:
         ///
         ///   193  «Última conexión a esta cuenta realizada el {2}/{1}/{0} a las {3}:{4}»
-        ///   152  la misma «… mediante la dirección IP {5}»
+        ///   152  the same «… mediante la dirección IP {5}»
         ///
-        /// Los parámetros van en orden año, mes, día, hora, minuto y dirección — el orden de la
-        /// plantilla no es el de lectura, y el bloque grabado lo confirma: manda el 193 con
-        /// ["2026","08","09","18","53"] y el cliente pinta «09/08/2026 a las 18:53».
+        /// The parameters go in the order year, month, day, hour, minute and address — the template's
+        /// order is not the reading order, and the recorded block confirms it: it sends 193 with
+        /// ["2026","08","09","18","53"] and the client draws «09/08/2026 a las 18:53».
         ///
-        /// Sin IP se manda el 193, que es exactamente lo que hace el servidor real cuando no la
-        /// tiene: enseñar una dirección vacía queda peor que no enseñarla.
+        /// Without an IP 193 is sent, which is exactly what the real server does when it does not
+        /// have it: showing an empty address looks worse than not showing it.
         /// </summary>
         public static byte[] BuildLastConnection(DateTimeOffset when, string ip)
         {
@@ -2193,40 +2217,40 @@ namespace Jondo.Unity.Server.Network
             return BuildSystemMessage(LastConnectionWithIpMessage, conIp);
         }
 
-        /// <summary>«Última conexión… a las {3}:{4}», sin dirección.</summary>
+        /// <summary>«Última conexión… a las {3}:{4}», without an address.</summary>
         public const int LastConnectionMessage = 193;
 
-        /// <summary>La misma, «… mediante la dirección IP {5}».</summary>
+        /// <summary>The same, «… mediante la dirección IP {5}».</summary>
         public const int LastConnectionWithIpMessage = 152;
 
-        /// <summary>El mensaje de "has recibido kamas", con la cifra como parámetro.</summary>
+        /// <summary>The "you have received kamas" message, with the figure as a parameter.</summary>
         public const int KamasReceivedMessage = 45;
 
-        /// <summary>El de "comprado": objeto, uid, cantidad y precio.</summary>
+        /// <summary>The "bought" one: item, uid, quantity and price.</summary>
         public const int PurchaseMessage = 252;
 
         /// <summary>
-        /// El mismo aviso pero cuando se ha pagado en fichas. Medido en la tienda de la Torre de
-        /// los Viajeros: seis parámetros, «798, 1055401001, 1, 20, 13052, 0», que son el objeto
-        /// comprado y su uid, la cantidad, el precio, y el id y el uid de la moneda.
+        /// The same notice but when it was paid in tokens. Measured in the Travellers' Tower
+        /// shop: six parameters, «798, 1055401001, 1, 20, 13052, 0», which are the item
+        /// bought and its uid, the quantity, the price, and the currency's id and uid.
         /// </summary>
         public const int TokenPurchaseMessage = 364;
 
         // ─── World: changing map ────────────────────────────────────────────────
 
         /// <summary>
-        /// Saca a un actor del mapa (jsd): quién se va y POR DÓNDE.
+        /// Removes an actor from the map (jsd): who is leaving and WHICH WAY.
         ///
-        /// El por dónde faltaba, y es lo que dejaba al personaje plantado en el borde en la
-        /// pantalla de los demás en vez de desaparecer. Le llegaba el aviso —está medido en el
-        /// registro del servidor— y el cliente no hacía nada con él.
+        /// The which way was missing, and it is what left the character standing on the edge on the
+        /// others' screens instead of disappearing. The notice reached them —it is measured in the
+        /// server log— and the client did nothing with it.
         ///
-        /// La captura de un grupo siguiendo al líder por mapas cercanos lo enseña claro, con
-        /// veinticinco de estos: el campo 3 sólo vale 2, 4 ó 6, que son las direcciones
-        /// cardinales de Dofus (0 derecha, 2 abajo, 4 izquierda, 6 arriba). El cliente saca al
-        /// muñeco andando hacia ese lado y entonces lo borra.
+        /// The capture of a party following the leader through nearby maps shows it clearly, with
+        /// twenty-five of these: field 3 is only 2, 4 or 6, which are Dofus's cardinal
+        /// directions (0 right, 2 down, 4 left, 6 up). The client takes the
+        /// figure out walking towards that side and then deletes it.
         ///
-        ///   10 a282f0a6c408 18 06     quién, y se fue por arriba
+        ///   10 a282f0a6c408 18 06     who, and he left through the top
         ///   10 a282f0a6c408           who, and he left to the east (0, off the wire)
         /// </summary>
         /// <remarks>
@@ -2276,17 +2300,17 @@ namespace Jondo.Unity.Server.Network
                 .Build());
 
         /// <summary>
-        /// Los zaaps que el personaje lleva DESCUBIERTOS (hjk), en una lista empaquetada.
+        /// The zaaps the character has DISCOVERED (hjk), in a packed list.
         ///
-        /// Esto no es «qué mapas has visto»: es la única razón por la que el cliente enseña algo
-        /// en la ventana de viaje. El servidor real manda esta lista entera al entrar al mundo
-        /// —182 bytes con 45 mapas, y los 45 son zaaps activados— y luego uno suelto cada vez que
-        /// se pisa un zaap nuevo. Sin ella el cliente no da por descubierto ninguno y la ventana
-        /// sale con «Ningún destino» por muchos destinos que traiga el hjj.
+        /// This is not «which maps you have seen»: it is the only reason the client shows anything
+        /// in the travel window. The real server sends this whole list on entering the world
+        /// —182 bytes with 45 maps, and all 45 are activated zaaps— and then a single one each time
+        /// a new zaap is stepped on. Without it the client considers none discovered and the window
+        /// comes out with «Ningún destino» however many destinations the hjj brings.
         ///
-        /// El emulador no guarda descubrimientos por personaje —aquí se tienen todos— así que la
-        /// lista es siempre la misma: todos los zaaps activados de los que además se sabe dónde
-        /// está su elemento, que son de los que se puede salir.
+        /// The emulator does not store discoveries per character —here one has them all— so the
+        /// list is always the same: all the activated zaaps for which it is also known where
+        /// their element is, which are the ones that can be left from.
         /// </summary>
         public static byte[] BuildDiscoveredZaaps(IEnumerable<long> mapIds)
             => Pb.New().Packed(1, mapIds).Build();
@@ -2341,13 +2365,13 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Una entrada de efecto: el id en f11 y el valor en el campo que le toque.
+        /// An effect entry: the id in f11 and the value in whichever field it belongs.
         ///
-        /// El campo no es un hueco cualquiera, es el que dice de qué tipo es el efecto. f4 lleva un
-        /// número suelto, f5 un rango y f6 tres números, y los dos últimos son SUBMENSAJES. Meter
-        /// un varint donde el cliente espera un submensaje no es un valor raro, es un tipo de
-        /// alambre que no cuadra: el cliente no encuentra los parámetros y pinta el arma sin daños
-        /// y el dofus con "{spellNoLvl,,}" en lugar del nombre del hechizo.
+        /// The field is not just any slot, it is the one saying what type the effect is. f4 carries a
+        /// loose number, f5 a range and f6 three numbers, and the last two are SUBMESSAGES. Putting
+        /// a varint where the client expects a submessage is not an odd value, it is a wire
+        /// type that does not match: the client does not find the parameters and draws the weapon without damage
+        /// and the dofus with "{spellNoLvl,,}" instead of the spell's name.
         /// </summary>
         private static Pb? EffectEntry(Managers.Equipment.ItemEffect effect)
         {
@@ -2355,8 +2379,8 @@ namespace Jondo.Unity.Server.Network
             // it lives with the item and never goes on the wire.
             if (effect.Effect <= 0) return null;
 
-            // Los que no son un número van con su texto en f1: el 988 es "Fabricado por: #4" y el
-            // #4 es esta cadena. Sin texto no van, porque la etiqueta saldría vacía.
+            // The ones that are not a number go with their text in f1: 988 is "Fabricado por: #4" and the
+            // #4 is this string. Without text they do not go, because the label would come out empty.
             if (!string.IsNullOrEmpty(effect.Text))
             {
                 return Pb.New().Str(1, effect.Text).Var(11, effect.Effect);
@@ -2384,23 +2408,23 @@ namespace Jondo.Unity.Server.Network
             return entry.Var(11, effect.Effect);
         }
 
-        // ─── World: títulos y ornamentos ────────────────────────────────────────
+        // ─── World: titles and ornaments ────────────────────────────────────────
 
         /// <summary>
-        /// Lo que uno TIENE (hhy). El cliente ya lleva el catálogo entero dentro; lo que no esté en
-        /// esta lista lo pinta en gris.
+        /// What one HAS (hhy). The client already carries the whole catalogue inside; what is not in
+        /// this list it draws in grey.
         ///
-        ///   f1: [títulos]   f2: [ornamentos]   los dos empaquetados
+        ///   f1: [titles]   f2: [ornaments]   both packed
         ///
-        /// Sale una sola vez, en la entrada al mundo. En la captura de un personaje recién creado
-        /// llega con cero bytes: no tiene ninguno todavía.
+        /// It goes out only once, on entering the world. In the capture of a freshly created character
+        /// it arrives with zero bytes: he has none yet.
         /// </summary>
         public static byte[] BuildTitlesOwned(IEnumerable<long> titles, IEnumerable<long> ornaments)
             => Pb.New().Packed(1, titles).Packed(2, ornaments).Build();
 
         /// <summary>
-        /// El título puesto (hid) y el ornamento puesto (hif). Sin nada equipado el mensaje va
-        /// VACÍO —no con un cero dentro—, que es como el servidor real dice "ninguno".
+        /// The title worn (hid) and the ornament worn (hif). With nothing equipped the message goes
+        /// EMPTY —not with a zero inside—, which is how the real server says "none".
         /// </summary>
         public static byte[] BuildTitleUpdated(int titleId)
             => titleId == Managers.Wardrobe.None ? Array.Empty<byte>()
@@ -2411,21 +2435,21 @@ namespace Jondo.Unity.Server.Network
                                                     : Pb.New().Var(1, ornamentId).Build();
 
         /// <summary>
-        /// Las "opciones" del personaje dentro del bloque del actor: el título y el ornamento.
+        /// The character's "options" within the actor block: the title and the ornament.
         ///
-        ///   f5 { f2 { f2: título } }
-        ///   f5 { f9 { f1: contador, f4: ornamento } }
+        ///   f5 { f2 { f2: title } }
+        ///   f5 { f9 { f1: counter, f4: ornament } }
         ///
-        /// Van repetidas dentro del mismo f3 que ya lleva la cuenta, y la que no se tiene no se
-        /// emite. El f9.f1 es un contador propio del personaje que el servidor real reparte sin
-        /// patrón visible; aquí se deriva del id para que sea estable.
+        /// They go repeated inside the same f3 that already carries the account, and the one not held is not
+        /// emitted. f9.f1 is a counter of the character's own that the real server hands out with no
+        /// visible pattern; here it is derived from the id so that it is stable.
         /// </summary>
         private static void AddCharacterOptions(Pb humanoidBody, long characterId)
         {
-            // El gremio, el primero de las opciones. Medido en el jsn del fundador nada más fundar
-            // «Jondo»: f5 { f4 { f1{f3 emblema}, f2 id, f3 nombre, f4 nivel } }, delante del
-            // ornamento y del f7:1. Sin esto un personaje con gremio no lleva su nombre en el
-            // mapa, ni para él ni para los demás.
+            // The guild, the first of the options. Measured in the founder's jsn right after founding
+            // «Jondo»: f5 { f4 { f1{f3 emblem}, f2 id, f3 name, f4 level } }, before the
+            // ornament and the f7:1. Without this a character with a guild does not carry its name on the
+            // map, neither for him nor for the others.
             var guild = Managers.GuildStore.GuildOf(characterId);
             if (guild != null)
             {
@@ -2449,21 +2473,21 @@ namespace Jondo.Unity.Server.Network
 
         private static long OrnamentCounterOf(long characterId) => (characterId % 300) + 174;
 
-        /// <summary>El f2 del bloque de identidad. Vale 3 en los jugadores de las capturas.</summary>
+        /// <summary>The identity block's f2. It is 3 for the players in the captures.</summary>
         private const int HumanKind = 3;
 
-        /// <summary>El f7 que cierra el bloque, un solo byte con el mismo valor en toda captura.</summary>
+        /// <summary>The f7 that closes the block, a single byte with the same value in every capture.</summary>
         private static readonly byte[] HumanTrailer = { 0x0b };
 
         // ─── World: merkasako ───────────────────────────────────────────────────
 
         /// <summary>
-        /// Los muebles colocados en la habitación (jbu), que el cliente espera detrás del mapa.
+        /// The furniture placed in the room (jbu), which the client expects after the map.
         ///
-        ///   f1 (repetido) { f1: casilla, f2: mueble, f3: giro }
+        ///   f1 (repeated) { f1: cell, f2: furniture, f3: rotation }
         ///
-        /// Es la misma forma que el jbg con el que el cliente los guarda, solo que en f1 en vez de
-        /// en f2. En la captura de alguien que lo tiene decorado son mil y pico bytes.
+        /// It is the same shape as the jbg the client stores them with, only in f1 instead of
+        /// in f2. In the capture of someone who has it decorated it is a thousand-odd bytes.
         /// </summary>
         public static byte[] BuildHavenBagFurniture(IEnumerable<Managers.HavenBagStore.Furniture> pieces)
         {
@@ -2484,8 +2508,8 @@ namespace Jondo.Unity.Server.Network
         // bin's nor the haven bag's -- in StorageProtocol.BuildOpened.
 
         /// <summary>
-        /// Lo que hay dentro del cofre (iwb). Misma forma que el inventario, con la bolsa como
-        /// posición de todo: dentro de un cofre no hay nada equipado.
+        /// What is inside the chest (iwb). Same shape as the inventory, with the bag as
+        /// the position of everything: inside a chest nothing is equipped.
         /// </summary>
         public static byte[] BuildStorageContent(IEnumerable<Managers.HavenBagStore.StoredItem> items)
         {
@@ -2552,21 +2576,21 @@ namespace Jondo.Unity.Server.Network
             return target;
         }
 
-        /// <summary>Un objeto que se va (itc del cofre, ium de la bolsa): solo su identificador.</summary>
+        /// <summary>An item that leaves (itc from the chest, ium from the bag): only its identifier.</summary>
         public static byte[] BuildItemGone(long uid) => Pb.New().Var(1, uid).Build();
 
         /// <summary>
-        /// Lo que contesta la máquina de la lotería (jbs).
+        /// What the lottery machine answers (jbs).
         ///
-        ///   f2: el premio       f3: el motivo del rechazo
+        ///   f2: the prize       f3: the reason for refusal
         ///
-        /// De las dos capturas: una sale con f2 y otra, la del "ya la has usado hoy", con f3: 1.
-        /// Aquí siempre toca, así que siempre va el f2.
+        /// From the two captures: one comes out with f2 and the other, the "you have already used it today" one, with f3: 1.
+        /// Here one always wins, so f2 always goes.
         /// </summary>
         public static byte[] BuildLotteryResult(long prizeUid)
             => Pb.New().Var(2, prizeUid).Build();
 
-        /// <summary>El cofre cerrado (khd). En la captura lleva f3: 11.</summary>
+        /// <summary>The chest closed (khd). In the capture it carries f3: 11.</summary>
         public static byte[] BuildStorageClosed() => Pb.New().Var(3, StorageCloseReason).Build();
 
         private const int StorageCloseReason = 11;
@@ -2605,15 +2629,15 @@ namespace Jondo.Unity.Server.Network
         // ─── Grupos ─────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Te han invitado a un grupo (ijz): saca la ventanita.
+        /// You have been invited to a party (ijz): it brings up the little window.
         ///
-        ///   f1: a quién invitan   f2: quién invita   f3: plazas
-        ///   f5: el grupo          f6: ¿?             f7: el nombre de quien invita
+        ///   f1: who is invited    f2: who invites   f3: places
+        ///   f5: the party         f6: ?             f7: the inviter's name
         ///
-        /// Medido: 08a28280c8e708 10a282f0a6c408 1808 28e8ac04 3001 3a064861726d6f6f, o sea
-        /// invitado 302677754146, anfitrión 293213045026, ocho plazas, grupo 71272, y «Harmoo».
-        /// El f6 vale 1 en una captura y 2 en otra y no se ha sabido qué distingue; se manda 1,
-        /// que es el de la invitación que se acepta.
+        /// Measured: 08a28280c8e708 10a282f0a6c408 1808 28e8ac04 3001 3a064861726d6f6f, that is
+        /// invitee 302677754146, host 293213045026, eight places, party 71272, and «Harmoo».
+        /// f6 is 1 in one capture and 2 in another and what distinguishes them has not been worked out; 1 is sent,
+        /// which is that of the invitation that gets accepted.
         /// </summary>
         public static byte[] BuildPartyInvitation(long guestId, long hostId, string hostName,
                                                   int partyId, int seats)
@@ -2626,42 +2650,42 @@ namespace Jondo.Unity.Server.Network
                 .Str(7, hostName ?? "")
                 .Build();
 
-        /// <summary>Se acabó la invitación, para quien la rechaza (ilo): { f1: grupo, f2: quién invitaba }.</summary>
+        /// <summary>The invitation is over, for whoever declines it (ilo): { f1: party, f2: who was inviting }.</summary>
         public static byte[] BuildInvitationClosed(int partyId, long hostId)
             => Pb.New().Var(1, partyId).Var(2, hostId).Build();
 
-        /// <summary>Quita al invitado de la lista, para quien invitó (iko): { f1: invitado, f2: grupo }.</summary>
+        /// <summary>Removes the invitee from the list, for whoever invited (iko): { f1: invitee, f2: party }.</summary>
         public static byte[] BuildInvitationWithdrawn(long guestId, int partyId)
             => Pb.New().Var(1, guestId).Var(2, partyId).Build();
 
-        /// <summary>El grupo se ha deshecho (imy): { f1: grupo }.</summary>
+        /// <summary>The party has broken up (imy): { f1: party }.</summary>
         public static byte[] BuildPartyDissolved(int partyId) => Pb.New().Var(1, partyId).Build();
 
         /// <summary>Te has salido (ils): { f1: grupo }.</summary>
         public static byte[] BuildPartyLeft(int partyId) => Pb.New().Var(1, partyId).Build();
 
         /// <summary>
-        /// Hay jefe nuevo (ilx): { f1: el nuevo jefe, f2: el grupo }.
+        /// There is a new leader (ilx): { f1: the new leader, f2: the party }.
         ///
-        /// Once bytes, y NO se reenvía el grupo entero: se comprobó comparando la ficha del mismo
-        /// grupo antes y después del cambio, y lo único que cambia es su campo 4.
+        /// Eleven bytes, and the whole party is NOT resent: it was checked by comparing the sheet of the same
+        /// party before and after the change, and the only thing that changes is its field 4.
         /// </summary>
         public static byte[] BuildPartyLeader(long leaderId, int partyId)
             => Pb.New().Var(1, leaderId).Var(2, partyId).Build();
 
         /// <summary>
-        /// Un mensaje privado (kth): { f1: fecha, f4: vacío, f5: id del otro, f6: su nombre,
-        /// f7: el texto }.
+        /// A private message (kth): { f1: date, f4: empty, f5: the other's id, f6: his name,
+        /// f7: the text }.
         ///
-        /// Medido de la captura del gremio, donde el susurro a «Hiierbita-Xx» SÍ llegó:
+        /// Measured from the guild capture, where the whisper to «Hiierbita-Xx» DID arrive:
         ///
         ///   0a19 «2026-08-12T22:54:29+02:00»  2200  28 a282acfea805
         ///   320c «Hiierbita-Xx»  3a04 «hola»
         ///
-        /// Ojo con dos cosas. No lleva CANAL: el cliente sabe que es privado por el propio
-        /// mensaje, y por eso mandarlo como un kti por el canal 9 no pinta nada. Y lo que lleva no
-        /// es quién habla sino EL OTRO —en tu copia, a quién se lo dices—, así que el mismo
-        /// mensaje sirve para los dos lados cambiando de quién se pone la identidad.
+        /// Mind two things. It carries no CHANNEL: the client knows it is private by the message
+        /// itself, and that is why sending it as a kti through channel 9 draws nothing. And what it carries is
+        /// not who speaks but THE OTHER —in your copy, whom you are saying it to—, so the same
+        /// message serves both sides by changing whose identity is put in.
         /// </summary>
         public static byte[] BuildPrivateMessage(string when, long otherId, string otherName,
                                                  string text)
@@ -2674,26 +2698,26 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// La ventana de subida de nivel (kua): { f1: el nivel nuevo }.
+        /// The level-up window (kua): { f1: the new level }.
         ///
-        /// Dos bytes, y con eso el cliente saca la ventana entera —música, animación y los datos
-        /// del nivel— y la deja abierta hasta que el jugador la cierra. No contesta nada al
-        /// cerrarla, así que no hay nada que escuchar.
+        /// Two bytes, and with that the client brings up the whole window —music, animation and the level's
+        /// data— and leaves it open until the player closes it. It answers nothing on
+        /// closing it, so there is nothing to listen for.
         ///
-        /// Sale exactamente dos veces en las 305 capturas, las dos en el tutorial y en el
-        /// milisegundo justo de cada subida: 0802 al pasar a nivel 2 y 0803 al pasar a nivel 3.
-        /// Detrás van iun, kub y kfe, pero esos tres salen también al entrar al mundo sin subir
-        /// nada, así que el único mensaje propio de la subida es éste.
+        /// It appears exactly twice in the 305 captures, both in the tutorial and in the exact
+        /// millisecond of each level-up: 0802 on reaching level 2 and 0803 on reaching level 3.
+        /// After it go iun, kub and kfe, but those three also come out on entering the world without levelling
+        /// up, so the only message belonging to the level-up is this one.
         ///
-        /// Lo que la ventana enseña —puntos ganados, vida, hechizos— lo saca el cliente del kub
-        /// que va detrás, no de aquí. Por eso hay que mandar el kua ANTES de las características
-        /// nuevas, que es el orden de la captura.
+        /// What the window shows —points earned, life, spells— the client takes from the kub
+        /// that comes after, not from here. That is why the kua has to be sent BEFORE the new
+        /// characteristics, which is the order of the capture.
         /// </summary>
         public static byte[] BuildLevelUp(int level) => Pb.New().Var(1, level).Build();
 
         /// <summary>
-        /// El chat no ha podido con algo (ktl), con el motivo en su unico campo. Medido: 0802 es
-        /// lo que contesta el servidor real al susurrarse a uno mismo.
+        /// The chat could not manage something (ktl), with the reason in its only field. Measured: 0802 is
+        /// what the real server answers on whispering to oneself.
         /// </summary>
         public static byte[] BuildChatError(int reason) => Pb.New().Var(1, reason).Build();
 

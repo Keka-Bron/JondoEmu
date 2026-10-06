@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <!-- Ya no es net10.0-windows. El lanzador era Windows Forms y ahora es Avalonia, igual que
-         Studio, asi que no hay nada que lo ate al escritorio de Windows salvo la musica, que va
-         detras de una comprobacion de sistema operativo. Se sigue publicando para win-x64 porque
-         es donde estan los jugadores, no porque el codigo no sepa hacer otra cosa. -->
+    <!-- It is no longer net10.0-windows. The launcher was Windows Forms and is now Avalonia, like
+         Studio, so there is nothing tying it to the Windows desktop except the music, which goes
+         behind an operating system check. It is still published for win-x64 because
+         that is where the players are, not because the code cannot do anything else. -->
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Jondo Emulator Launcher</AssemblyName>
     <RootNamespace>Jondo.Unity.Launcher</RootNamespace>
@@ -13,9 +13,9 @@
     <Nullable>annotations</Nullable>
     <ApplicationIcon>..\Jondo.Unity.Server\icon.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <!-- ESTE es el que se reparte a los jugadores. Referencia el contrato y NADA MAS: ni base de
-         datos, ni mapas, ni manejadores de protocolo, ni catalogo de efectos. Un solo fichero,
-         igual que antes, para que quien se lo baje vea un .exe y no una carpeta de dll. -->
+    <!-- THIS is the one handed out to the players. It references the contract and NOTHING ELSE: no
+         database, no maps, no protocol handlers, no effects catalogue. A single file,
+         as before, so that whoever downloads it sees an .exe and not a folder of dlls. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
@@ -28,9 +28,9 @@
     <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
-    <!-- Avalonia.Desktop arrastra Tmds.DBus.Protocol 0.20.0 para su parte de Linux, y esa version
-         tiene un aviso de seguridad de gravedad alta (GHSA-xrw6-gwf8-vvr9). Se sube a mano, que es
-         lo mismo que ya hacia Studio por lo mismo. -->
+    <!-- Avalonia.Desktop drags in Tmds.DBus.Protocol 0.20.0 for its Linux part, and that version
+         has a high-severity security advisory (GHSA-xrw6-gwf8-vvr9). It is raised by hand, which is
+         the same Studio already did for the same reason. -->
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
   </ItemGroup>
 

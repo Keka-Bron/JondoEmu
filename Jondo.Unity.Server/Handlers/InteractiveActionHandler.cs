@@ -7,7 +7,7 @@ using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Server.Handlers
 {
-    /// <summary>Puerta unica de las peticiones <c>iwo</c> que manda el cliente.</summary>
+    /// <summary>Single door for the <c>iwo</c> requests the client sends.</summary>
     public static class InteractiveActionHandler
     {
         public static async Task UseAsync(NetworkStream stream, byte[] payload)
@@ -29,39 +29,39 @@ namespace Jondo.Unity.Server.Handlers
                 else if (field.FieldNumber == 2) elementId = (int)field.VarIntValue;
             }
 
-            // Dentro de un sueno, las puertas son interactivos que no existen en el mapa de rol,
-            // asi que se prueban ANTES: el registro de siempre no sabria que hacer con ellas y las
-            // dejaria en «uso desconocido».
+            // Inside a dream, the doors are interactives that do not exist on the roleplay map,
+            // so they are tried FIRST: the usual registry would not know what to do with them and
+            // would leave them as «unknown use».
             if (await DreamHandler.TryDoorAsync(stream, elementId)) return;
 
             long mapId = SessionContext.State.MapId;
 
             var lectura = Readables.Of(mapId, elementId);
 
-            // Queda apuntado antes de decidir que hace, y a proposito: hay conversaciones que
-            // dependen de haber leido algo, y si esto fuera detras del despacho un elemento que
-            // acabe en «uso desconocido» -como el cartel de la taberna, que no es zaap ni recurso
-            // ni objetivo- no dejaria rastro nunca.
+            // It is noted before deciding what it does, and on purpose: there are conversations
+            // that depend on having read something, and if this went after the dispatch an element
+            // that ends up in «unknown use» -- like the tavern's notice, which is neither a zaap nor
+            // a resource nor an objective -- would never leave a trace.
             //
-            // SALVO si la lectura pregunta. Entonces el apunte espera a que se acepte: un cartel
-            // con boton de aceptar en el que mirarlo bastase para haberlo aceptado convertiria el
-            // boton en un adorno.
+            // UNLESS the reading asks something. Then the note waits for it to be accepted: a notice
+            // with an accept button where looking at it were enough to have accepted it would turn
+            // the button into decoration.
             bool apuntaAhora = lectura == null || !lectura.Asks;
             if (apuntaAhora && elementId != 0 && SessionContext.State.ElementsUsed.Add(elementId))
             {
                 DatabaseManager.RememberElement(GameState.CharacterId, elementId);
             }
 
-            // ¿Es algo que se lee? Va antes de las misiones porque un cartel no es un objetivo:
-            // la oferta de trabajo de la taberna no sale en ningún paso de la misión que abre, y
-            // aun así hay que enseñarla.
+            // Is it something to be read? It goes before quests because a notice is not an
+            // objective: the tavern's job offer does not appear in any step of the quest it opens,
+            // and it still has to be shown.
             if (lectura != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kkt, Pb.New().Var(2, lectura.Document).Build()));
 
-                // Y detrás, si pregunta, la pregunta. Después del documento porque primero se lee
-                // y luego se decide, que es el orden en que lo hace una persona.
+                // And after it, if it asks, the question. After the document because first one reads
+                // and then decides, which is the order a person does it in.
                 if (lectura.Asks)
                 {
                     var respuestas = new System.Collections.Generic.List<long> { lectura.Accept };
@@ -77,11 +77,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // ¿Es algo que una misión pide pinchar? Se mira ANTES del registro, porque una estela
-            // no es un zaap ni un recurso: no está en el registro y su única razón de existir es la
-            // misión. Es lo que hace la captura del tutorial —seis clics en los elementos
-            // 541424-541429 y detrás de cada uno el cliente preguntando «ieo {1629}»—, y lo que no
-            // hacía nadie: hasta ahora un clic así caía en la rama de «uso desconocido».
+            // Is it something a quest asks to click? It is looked at BEFORE the registry, because a
+            // stele is neither a zaap nor a resource: it is not in the registry and its only reason
+            // to exist is the quest. It is what the tutorial capture does -- six clicks on elements
+            // 541424-541429 and after each one the client asking «ieo {1629}» --, and what nobody did:
+            // until now a click like that fell into the «unknown use» branch.
             if (await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId)) return;
 
             if (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId,
@@ -107,10 +107,10 @@ namespace Jondo.Unity.Server.Handlers
                     await DreamHandler.ShowAsync(stream);
                     break;
                 case InteractiveActionKind.DreamDoor:
-                    // TryDoorAsync ya se ha probado más arriba, antes del despacho normal. Si se
-                    // llega aquí es que esa puerta no es de la sala en la que está: puede ser una
-                    // de las otras dos del mapa, o alguien que pulsa una puerta sin sueño en
-                    // curso. No se hace nada, que es mejor que llevarle a una sala que no le toca.
+                    // TryDoorAsync has already been tried further up, before the normal dispatch. If
+                    // it gets here, that door does not belong to the room he is in: it may be one of
+                    // the other two on the map, or somebody pressing a door with no dream in progress.
+                    // Nothing is done, which is better than taking him to a room that is not his.
                     Console.WriteLine($"[Sueños] Puerta {interactive.Element.Id} pulsada y no " +
                                       "lleva a ninguna salida de la sala actual.");
                     break;

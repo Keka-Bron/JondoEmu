@@ -23,13 +23,13 @@ namespace Jondo.Unity.Server
         public int Orientation { get; set; } = 1;
 
         /// <summary>
-        /// Destination du dernier déplacement <c>jrw</c>, en attente de sa confirmation
-        /// <c>jqi</c>. Une valeur de map nulle signifie qu'il n'y a rien à confirmer.
+        /// Destination of the last <c>jrw</c> movement, awaiting its
+        /// <c>jqi</c> confirmation. A null map value means there is nothing to confirm.
         /// </summary>
         /// <remarks>
-        /// Le client ne demande pas un <c>iwo</c> pour certaines sorties posées au sol : il marche
-        /// jusqu'à leur cellule puis confirme la fin du mouvement. Cet état doit rester propre à
-        /// la session, sinon la confirmation d'un joueur pourrait déclencher la sortie d'un autre.
+        /// The client does not ask for an <c>iwo</c> for some exits laid on the ground: it walks
+        /// to their cell and then confirms the end of the movement. This state must stay specific to
+        /// the session, otherwise one player's confirmation could trigger another's exit.
         /// </remarks>
         public long PendingMovementMapId { get; set; }
         public int PendingMovementCellId { get; set; } = -1;
@@ -56,11 +56,11 @@ namespace Jondo.Unity.Server
         public bool FightRejoinPending { get; set; }
 
         /// <summary>
-        /// De dónde salió este jugador al entrar en combate, para devolverlo ahí al acabar.
+        /// Where this player came from on entering a fight, to return him there at the end.
         ///
-        /// Eran dos estáticos del manejador de combate, uno para todo el servidor: el segundo que
-        /// entrara a pelear pisaba el sitio del primero, y al terminar los dos aparecían donde
-        /// estaba el último.
+        /// They were two statics of the fight handler, one for the whole server: the second to
+        /// start fighting overwrote the first's place, and at the end both appeared where
+        /// the last one was.
         /// </summary>
         public long RoleplayMapId { get; set; }
         public int RoleplayCellId { get; set; }
@@ -88,42 +88,42 @@ namespace Jondo.Unity.Server
         public int StatWisdom { get; set; }
         public int StatStrength { get; set; }
 
-        /// <summary>Desde donde se ha conectado esta sesion. Se guarda para la proxima vez.</summary>
+        /// <summary>Where this session connected from. It is kept for next time.</summary>
         public string ClientIp { get; set; } = "";
 
-        /// <summary>Cuando y desde donde se conecto la vez anterior, leido antes de pisarlo.</summary>
+        /// <summary>When and where he connected from last time, read before overwriting it.</summary>
         public DatabaseManager.LastVisit? PreviousVisit { get; set; }
 
         /// <summary>
-        /// La experiencia de cada oficio de este personaje, cargada al entrar y guardada en la
-        /// base cada vez que sube. Vive aquí y no en un estático porque dos jugadores a la vez
-        /// tienen oficios distintos.
+        /// The experience of each of this character's professions, loaded on entering and saved in the
+        /// base every time it goes up. It lives here and not in a static because two players at once
+        /// have different professions.
         /// </summary>
         public Dictionary<int, Managers.JobExperience.Progress> Jobs { get; } = new();
 
         /// <summary>
-        /// Las misiones de este personaje: cuáles lleva, por qué paso va y qué ha cumplido.
+        /// This character's quests: which ones he carries, which step he is on and what he has met.
         /// </summary>
         /// <remarks>
-        /// Aquí y no en un estático, por lo mismo que los oficios y con más motivo: una misión se
-        /// consulta en cada frase de cada diálogo, así que un diccionario compartido haría que
-        /// hablar con un NPC le moviese la misión al de al lado.
+        /// Here and not in a static, for the same reason as the professions and with more cause: a quest is
+        /// checked on every sentence of every dialogue, so a shared dictionary would make
+        /// talking to an NPC move the quest of the one next to you.
         ///
-        /// <summary>Los interactivos que este personaje ha usado alguna vez.</summary>
+        /// <summary>The interactives this character has ever used.</summary>
         /// <remarks>
-        /// Se llena al entrar al mundo y crece con cada uso. Lo lee el filtro de respuestas de los
-        /// NPCs: hay conversaciones cuya opcion no debe existir hasta haber leido algo, como la
-        /// oferta de trabajo de la taberna de Incarnam.
+        /// It is filled on entering the world and grows with each use. The NPCs' reply filter
+        /// reads it: there are conversations whose option must not exist until something has been read, like the
+        /// job offer of the Incarnam tavern.
         /// </remarks>
         public HashSet<int> ElementsUsed { get; set; } = new HashSet<int>();
 
-        /// Es <c>null</c> hasta que se entra al mundo. Lo pone <c>Managers.Quests.LoadFrom</c>,
-        /// porque necesita el catálogo, que es de otro proyecto y pesa 3 MB: construirlo aquí
-        /// obligaría a cargarlo también en las sesiones que nunca llegan a jugar.
+        /// It is <c>null</c> until entering the world. <c>Managers.Quests.LoadFrom</c> sets it,
+        /// because it needs the catalogue, which is from another project and weighs 3 MB: building it here
+        /// would force loading it also in the sessions that never get to play.
         /// </remarks>
         public World.Quests.QuestLog? Quests { get; set; }
 
-        /// <summary>Los logros de este personaje. Null hasta entrar al mundo, como las misiones.</summary>
+        /// <summary>This character's achievements. Null until entering the world, like the quests.</summary>
         public World.Achievements.AchievementLog? Achievements { get; set; }
 
         /// <summary>
@@ -150,11 +150,11 @@ namespace Jondo.Unity.Server
         /// <summary>When the last smiley went up, for the same gap.</summary>
         public DateTime LastSmileyUtc { get; set; } = DateTime.MinValue;
 
-        /// <summary>En qué nivel va un oficio. Cero experiencia es nivel 1, no nivel cero.</summary>
+        /// <summary>What level a profession is at. Zero experience is level 1, not level zero.</summary>
         public int JobLevel(int jobId)
             => Jobs.TryGetValue(jobId, out var progress) ? progress.Level : 1;
 
-        /// <summary>Suma experiencia a un oficio y dice si ha subido.</summary>
+        /// <summary>Adds experience to a profession and says whether it went up.</summary>
         public bool AddJobExperience(int jobId, long amount, out long total, out int level)
         {
             bool sube = Managers.JobExperience.Add(Jobs, jobId, amount, out var progress);
@@ -197,15 +197,15 @@ namespace Jondo.Unity.Server
         public long OpenZaapMapId { get; set; }
 
         /// <summary>
-        /// Por dónde se entró en la casa en la que se está, para salir por ahí mismo.
+        /// Which door the house one is in was entered through, to leave through that same one.
         ///
-        /// Varias puertas del mundo pueden llevar al mismo interior, así que sin esto se sale por
-        /// la primera que lleve allí y el jugador aparece en otro barrio. Si no hay nada —porque
-        /// se desconectó dentro— se tira de la puerta que dicen los datos, que al menos existe.
+        /// Several doors in the world can lead to the same interior, so without this one leaves through
+        /// the first that leads there and the player appears in another neighbourhood. If there is nothing —because
+        /// he disconnected inside— the door the data says is used, which at least exists.
         /// </summary>
         public long HouseEntryMapId { get; set; }
 
-        /// <summary>La casilla de la calle desde la que se entró.</summary>
+        /// <summary>The street cell it was entered from.</summary>
         public int HouseEntryCell { get; set; }
 
         /// <summary>
@@ -221,22 +221,22 @@ namespace Jondo.Unity.Server
         public Handlers.StorageHandler.Window? Storage { get; set; }
 
         /// <summary>
-        /// Desde qué mapa se entró al merkasako, para volver ahí con la misma tecla.
+        /// Which map the haven bag was entered from, to go back there with the same key.
         /// </summary>
         /// <remarks>
-        /// Hace falta porque el cliente manda EL MISMO mensaje para entrar y para salir: en
-        /// «Movimiento/ir al merkasako y volver.pcapng» las dos peticiones del jugador, la #1 y la
-        /// #8, son un jbn con el cuerpo 10a28280c8e708 byte a byte, y el servidor contesta a la
-        /// primera con el mapa de la bolsa y a la segunda con un mapa del mundo. O sea que quién
-        /// decide la dirección es el servidor, mirando dónde está el jugador, y para eso hay que
-        /// saber de dónde vino.
+        /// It is needed because the client sends THE SAME message to enter and to leave: in
+        /// «Movimiento/ir al merkasako y volver.pcapng» the player's two requests, #1 and
+        /// #8, are a jbn with the body 10a28280c8e708 byte for byte, and the server answers the
+        /// first with the bag's map and the second with a world map. So whoever
+        /// decides the direction is the server, looking at where the player is, and for that one has to
+        /// know where he came from.
         ///
-        /// Aparte de RoleplayMapId, que es del combate: se puede entrar al merkasako y pelear
-        /// dentro, y compartir el campo dejaría al que sale de la pelea en la calle.
+        /// Separate from RoleplayMapId, which belongs to the fight: one can enter the haven bag and fight
+        /// inside, and sharing the field would leave whoever leaves the fight in the street.
         /// </remarks>
         public long HavenBagEntryMapId { get; set; }
 
-        /// <summary>La casilla del mundo desde la que se entró al merkasako.</summary>
+        /// <summary>The world cell the haven bag was entered from.</summary>
         public int HavenBagEntryCell { get; set; }
         public bool IsChestOpen { get; set; }
 
@@ -282,21 +282,21 @@ namespace Jondo.Unity.Server
         public int OpenNpcShopNpcId { get; set; }
 
         /// <summary>
-        /// Qué conversación hay abierta y por dónde va.
+        /// Which conversation is open and where it is at.
         ///
-        /// Hace falta guardarlo porque el cliente, al elegir una respuesta, manda el ioy con el id
-        /// de la respuesta Y NADA MÁS: ni de qué NPC ni de qué frase venía. Sin esto no hay manera
-        /// de saber a qué línea lleva, y por eso el diálogo sólo podía tener una frase.
+        /// It has to be stored because the client, on choosing a reply, sends the ioy with the
+        /// reply's id AND NOTHING ELSE: neither which NPC nor which sentence it came from. Without this there is no way
+        /// of knowing which line it leads to, and that is why the dialogue could only have one sentence.
         ///
-        /// Va en el estado de sesión y no en un estático como todo lo demás: con ocho clientes a la
-        /// vez, uno estático haría que la respuesta de un jugador avanzara la conversación de otro.
+        /// It goes in the session state and not in a static like everything else: with eight clients at
+        /// once, a static one would make one player's reply advance another's conversation.
         /// </summary>
         public int OpenDialogueNpcId { get; set; }
 
-        /// <summary>El mapa donde se abrió, que es parte de qué conversación es.</summary>
+        /// <summary>The map where it was opened, which is part of which conversation it is.</summary>
         public long OpenDialogueMapId { get; set; }
 
-        /// <summary>En qué frase está ahora mismo.</summary>
+        /// <summary>Which sentence it is on right now.</summary>
         public long OpenDialogueMessage { get; set; }
 
         // Per-character manager caches. These must never be static: loading the second account
@@ -400,5 +400,5 @@ namespace Jondo.Unity.Server
         }
     }
 
-    // PlayerItem y EquippedItemInfo viven en GameState.cs: la copia de aqui perdia RawEffects.
+    // PlayerItem and EquippedItemInfo live in GameState.cs: the copy here lost RawEffects.
 }

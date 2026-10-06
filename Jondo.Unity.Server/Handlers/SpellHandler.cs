@@ -8,18 +8,18 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Cambiar un hechizo por su variante.
+    /// Swapping a spell for its variant.
     ///
-    /// Los hechizos van en parejas y el personaje lleva una de las dos mitades. Cuando el jugador
-    /// elige la otra —desde el panel o con el botón derecho sobre la barra— el cliente manda un
-    /// hmt con el hechizo que quiere, y el servidor contesta dos cosas:
+    /// Spells come in pairs and the character carries one of the two halves. When the player chooses the
+    /// other -- from the panel or with a right click on the bar -- the client sends an hmt with the spell
+    /// it wants, and the server answers two things:
     ///
-    ///   iuq   por cada hueco de la barra que tuviera la mitad vieja, con la nueva dentro
-    ///   hng   el hechizo nuevo y el grado que le corresponde al nivel del personaje
+    ///   iuq   for each slot of the bar that had the old half, with the new one inside
+    ///   hng   the new spell and the grade the character's level gives it
     ///
-    /// Sacado de cuatro capturas reales: absorción por furia y la vuelta, liberación por magnetismo
-    /// y llamilla por llamita. En la de magnetismo salieron dos iuq porque el hechizo viejo estaba
-    /// puesto en dos huecos de la barra, lo que confirma que va uno por hueco y no uno por cambio.
+    /// Taken from four real captures: absorción for furia and back, liberación for magnetismo and
+    /// llamilla for llamita. In the magnetismo one two iuq came out because the old spell was on two
+    /// slots of the bar, which confirms it goes one per slot and not one per swap.
     /// </summary>
     public static class SpellHandler
     {
@@ -52,7 +52,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // El hueco de la barra lo tenía la otra mitad, que es la que se va.
+            // The bar slot was held by the other half, which is the one leaving.
             int leaving = wanted == pair.Base ? pair.Variant : pair.Base;
             var slots = SpellChoices.SlotsHolding(leaving);
 

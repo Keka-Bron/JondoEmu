@@ -7,28 +7,28 @@ using Xunit;
 namespace Jondo.Unity.Tests.Sprites
 {
     /// <summary>
-    /// Que el retrato salga de frente y con cara.
+    /// That the portrait comes out facing front and with a face.
     /// </summary>
     /// <remarks>
-    /// Los dos fallos que vigila esta clase tenían el mismo síntoma: NINGUNO. Salía un dibujo, se
-    /// guardaba sin quejarse y pasaba por bueno; sólo mirándolo se veía que el personaje estaba de
-    /// espaldas y que no tenía cabeza. Comprobar que el dibujo no es nulo no habría cazado ni uno.
+    /// The two bugs this class watches had the same symptom: NONE. A drawing came out, was
+    /// stored without complaint and passed as good; only by looking at it could one see that the character had
+    /// his back turned and had no head. Checking that the drawing is not null would not have caught either.
     ///
-    ///   DE ESPALDAS — el regex que elegía la pose, <c>^AnimStatique_(\d+)$</c>, no casa con
-    ///   ningún rig humanoide salvo el de la raza 12, así que se caía por la escalera de reserva y
-    ///   salía la primera animación del array. En 13 de las 19 razas ésa es la dirección 6, el
-    ///   norte, o sea la espalda.
+    ///   BACK TURNED — the regex that chose the pose, <c>^AnimStatique_(\d+)$</c>, does not match
+    ///   any humanoid rig except breed 12's, so it fell down the fallback ladder and
+    ///   the array's first animation came out. In 13 of the 19 breeds that is direction 6, the
+    ///   north, that is the back.
     ///
-    ///   SIN CABEZA — los registros de símbolo -1 se tiraban junto a los de -99. El -99 sí sobra;
-    ///   el -1 es el que trae Tete, Thorax y la sombra.
+    ///   NO HEAD — the symbol -1 records were thrown away together with the -99 ones. -99 is indeed superfluous;
+    ///   -1 is the one bringing Tete, Thorax and the shadow.
     ///
-    /// Hace falta el cliente de Dofus para dibujar. Donde no esté, la prueba se calla: es lo mismo
-    /// que ya hacen las fotos de trabajo del lanzador, y una prueba que no puede medir es mejor
-    /// callada que verde por defecto.
+    /// The Dofus client is needed to draw. Where it is not, the test keeps quiet: it is the same
+    /// the launcher's working photos already do, and a test that cannot measure is better
+    /// quiet than green by default.
     /// </remarks>
     public class PortraitFacingTests
     {
-        /// <summary>Una Ocra hembra con su cabeza, su escudo y su capa. De la base de pruebas.</summary>
+        /// <summary>A female Cra with her head, her shield and her cape. From the test base.</summary>
         private const string Ocra =
             "{1|91,2148,462,461|1=#E59B68,2=#DB7933,3=#756F2B,4=#8F5203,5=#8F5203,6=#FA950F|52}";
 
@@ -44,7 +44,7 @@ namespace Jondo.Unity.Tests.Sprites
             using var pintor = new NpcSprites();
             Assert.NotNull(pintor.Of(Ocra));
 
-            // El 2 es el sur, el único de los cinco que trae el rig que mira a cámara.
+            // 2 is south, the only one of the five the rig brings that looks at the camera.
             Assert.EndsWith("_2", pintor.LastAnimation);
             Assert.True(pintor.LastDirectionFound,
                 $"la dirección de frente no se ha encontrado; se dibujó con «{pintor.LastAnimation}»");
@@ -58,9 +58,9 @@ namespace Jondo.Unity.Tests.Sprites
             using var pintor = new NpcSprites();
             Assert.NotNull(pintor.Of(Ocra));
 
-            // El hueco de la cabeza de la dirección 2, lleno por la piel 2148. Contar los
-            // triángulos y no sólo mirar que el hueco exista: un hueco que nadie llena también
-            // aparece en la lista, con cero.
+            // The head slot of direction 2, filled by skin 2148. Counting the
+            // triangles and not just looking that the slot exists: a slot nobody fills also
+            // appears on the list, with zero.
             Assert.True(pintor.LastSlots.TryGetValue("Tete_2", out int cabeza) && cabeza > 0,
                         $"la cabeza no se ha dibujado. Huecos: {pintor.LastMakeup}");
 
@@ -71,9 +71,9 @@ namespace Jondo.Unity.Tests.Sprites
         [AvaloniaFact]
         public void Un_monstruo_se_queda_como_estaba()
         {
-            // Un hueso que no es el 1 no lleva las animaciones de los humanoides, así que pedirle
-            // la dirección de frente no vale de nada. Tiene que seguir dibujándose igual que antes:
-            // Studio saca cientos de éstos en una rejilla.
+            // A bone that is not 1 does not carry the humanoids' animations, so asking it for
+            // the front direction is of no use. It has to keep being drawn the same as before:
+            // Studio brings out hundreds of these in a grid.
             var monstruo = NpcLook.Parse("{58|||90}");
             Assert.True(monstruo.Valid);
             Assert.False(monstruo.Humanoid);
@@ -96,8 +96,8 @@ namespace Jondo.Unity.Tests.Sprites
         {
             if (!HayCliente) return;
 
-            // La caché va por cadena de aspecto, y la altura y la dirección cambian el dibujo sin
-            // cambiar la cadena. El lanzador dibuja a 256 y Studio a 96 en el mismo proceso.
+            // The cache goes by look string, and the height and the direction change the drawing without
+            // changing the string. The launcher draws at 256 and Studio at 96 in the same process.
             using var pintor = new NpcSprites();
 
             var pequeno = pintor.Of(Ocra);

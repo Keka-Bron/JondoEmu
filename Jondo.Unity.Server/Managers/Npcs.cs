@@ -2,26 +2,27 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los NPCs de cada mapa: dónde están, qué se puede hacer con ellos y qué dicen.
+    /// Each map's NPCs: where they are, what can be done with them and what they say.
     ///
-    /// Un NPC es un actor más del jss, con la misma envoltura que el jugador o que un grupo de
-    /// monstruos. Lo único que cambia es qué campo aparece dentro de f2.f1: f5 el jugador, f4 un
-    /// grupo de monstruos y f7 un NPC. Medido sobre noventa actores de NPC en trece mapas de la
-    /// captura del servidor de torneos.
+    /// An NPC is one more actor of the jss, with the same envelope as the player or a group of
+    /// monsters. The only thing that changes is which field appears inside f2.f1: f5 the player, f4 a
+    /// monster group and f7 an NPC. Measured over ninety NPC actors on thirteen maps of the
+    /// tournament server's capture.
     ///
-    /// El nombre NO viaja. En todo el hilo no va ni un solo nombre de NPC: el actor lleva sólo el
-    /// id de plantilla y el cliente saca de sus propios datos el nombre, el dibujo, el diálogo y
-    /// las acciones. Por eso basta con elegir una plantilla que el cliente ya conozca.
+    /// The name does NOT travel. In the whole thread not a single NPC name goes: the actor only carries the
+    /// template id and the client takes from its own data the name, the drawing, the dialogue and
+    /// the actions. That is why choosing a template the client already knows is enough.
     ///
-    /// El id contextual es negativo y local al mapa. El servidor real reparte -20000, -20001... en
-    /// orden, y el mismo número se repite en mapas distintos sin problema. Aquí se hace igual. No
-    /// choca con los monstruos porque esos usan su propio rango, de -1000000 para abajo.
+    /// The contextual id is negative and local to the map. The real server hands out -20000, -20001... in
+    /// order, and the same number repeats on different maps without a problem. Here it is done the same. It does not
+    /// clash with the monsters because those use their own range, from -1000000 downwards.
     /// </summary>
     public static class Npcs
     {
@@ -33,26 +34,26 @@ namespace Jondo.Unity.Server.Managers
             public int Cell;
             public int Orientation;
 
-            /// <summary>El negativo con el que el cliente se refiere a él dentro de este mapa.</summary>
+            /// <summary>The negative the client refers to it by within this map.</summary>
             public long ContextualId;
 
-            /// <summary>El hueso de la columna BoneId, que es lo que usa el jpv de la carga de mapa.</summary>
+            /// <summary>The bone in the BoneId column, which is what the map load's jpv uses.</summary>
             public int BoneId;
 
-            /// <summary>El Look de la fila tal cual, sin la vuelta a la plantilla. Lo pide el jpv.</summary>
+            /// <summary>The row's Look as is, without falling back to the template. The jpv asks for it.</summary>
             public string RawLook = "";
 
-            /// <summary>El aspecto, ya troceado: "{5949|||200}". Es el del primer variante.</summary>
+            /// <summary>The look, already split up: "{5949|||200}". It is the first variant's.</summary>
             public long Bones;
             public long[] Skins = Array.Empty<long>();
             public long[] Colors = Array.Empty<long>();
             public long[] Scales = Array.Empty<long>();
 
-            /// <summary>Todos los aspectos que puede tener, con su condición. Casi siempre uno.</summary>
+            /// <summary>All the looks it can have, with their condition. Almost always one.</summary>
             public List<LookVariant> Variants = new();
         }
 
-        /// <summary>Uno de los aspectos de un NPC, con lo que hace falta para verlo así.</summary>
+        /// <summary>One of an NPC's looks, with what is needed to see it that way.</summary>
         public sealed class LookVariant
         {
             public long Bones;
@@ -60,24 +61,24 @@ namespace Jondo.Unity.Server.Managers
             public long[] Colors = Array.Empty<long>();
             public long[] Scales = Array.Empty<long>();
 
-            /// <summary>Vacío en el de por defecto, que es el que se lleva quien no cumpla otro.</summary>
+            /// <summary>Empty in the default one, which is the one whoever meets no other gets.</summary>
             public string Criterion = "";
         }
 
-        /// <summary>Lo que la plantilla del NPC dice de él.</summary>
+        /// <summary>What the NPC's template says about it.</summary>
         public sealed class Template
         {
             public int Id;
             public string Look = "";
             public int Gender;
 
-            /// <summary>Qué se le puede hacer. Es el número que el cliente manda en el f1 del iov.</summary>
+            /// <summary>What can be done to it. It is the number the client sends in the iov's f1.</summary>
             public int[] Actions = Array.Empty<int>();
 
-            /// <summary>La pregunta que abre, si tiene diálogo.</summary>
+            /// <summary>The question it opens with, if it has dialogue.</summary>
             public long DialogMessageId;
 
-            /// <summary>Las respuestas que se le ofrecen al jugador.</summary>
+            /// <summary>The replies offered to the player.</summary>
             public long[] Replies = Array.Empty<long>();
 
             /// <summary>
@@ -93,13 +94,13 @@ namespace Jondo.Unity.Server.Managers
             public long[] ReplyTexts = Array.Empty<long>();
         }
 
-        /// <summary>Comprar y vender: la acción que contesta con el catálogo.</summary>
+        /// <summary>Buy and sell: the action that answers with the catalogue.</summary>
         public const int Trade = 1;
 
-        /// <summary>Hablar: la que abre el diálogo.</summary>
+        /// <summary>Talk: the one that opens the dialogue.</summary>
         public const int Talk = 3;
 
-        /// <summary>La tienda de apariencias, que en el cable se comporta igual que la normal.</summary>
+        /// <summary>The appearance shop, which on the wire behaves just like the normal one.</summary>
         public const int TradeCosmetics = 11;
 
         private static readonly Dictionary<long, List<Spawn>> _byMap = new();
@@ -133,9 +134,9 @@ namespace Jondo.Unity.Server.Managers
             {
                 while (reader.Read())
                 {
-                    // Los vendedores que otro ha absorbido no se ponen en el mapa: su catálogo ya
-                    // está en el que se queda, y dejarlos ahí sería el mismo escaparate dos veces
-                    // en dos casillas contiguas.
+                    // The sellers another has absorbed are not placed on the map: their catalogue already
+                    // is in the one kept, and leaving them there would be the same shop window twice
+                    // on two adjacent cells.
                     if (Vendors.IsAbsorbed(reader.GetInt32(1))) continue;
 
                     long mapId = reader.GetInt64(0);
@@ -145,13 +146,13 @@ namespace Jondo.Unity.Server.Managers
                         _byMap[mapId] = here;
                     }
 
-                    // Donde lo pone Jondo manda sobre lo que diga la tabla.
+                    // Where Jondo puts it rules over what the table says.
                     //
-                    // La colocacion de NpcSpawns se genero para 52 vendedores en bloques
-                    // contiguos de cinco por familia, y al juntarlos por categoria dejaron de
-                    // sembrarse 29 sin recalcular nada: de cada bloque quedaba el primero y
-                    // cuatro huecos seguidos detras. Las casillas buenas estan en
-                    // datos/vendedores_jondo.json, que si se versiona.
+                    // NpcSpawns's placement was generated for 52 sellers in
+                    // contiguous blocks of five per family, and when they were merged by category 29
+                    // stopped being seeded without recalculating anything: of each block the first remained and
+                    // four gaps in a row behind it. The good cells are in
+                    // datos/vendedores_jondo.json, which is versioned.
                     int npcId = reader.GetInt32(1);
                     var sitio = Vendors.PlacementOf(npcId);
 
@@ -166,16 +167,16 @@ namespace Jondo.Unity.Server.Managers
                         BoneId = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
                     };
 
-                    // El Look de la fila manda, y si viene vacío se usa el de la plantilla.
+                    // The row's Look rules, and if it comes empty the template's is used.
                     ReadLook(spawn.RawLook, spawn);
                     here.Add(spawn);
                 }
             }
 
-            // Sólo las plantillas que hacen falta: son 6.468 en la base y aquí se usan unas pocas.
-            // Los del mundo se siembran AQUÍ, antes de recoger las plantillas: si fueran después
-            // se quedarían sin aspecto, porque lo que se lee de NpcTemplates es sólo lo que hace
-            // falta para los que ya están puestos.
+            // Only the templates that are needed: there are 6,468 in the base and a few are used here.
+            // The world's ones are seeded HERE, before gathering the templates: if they came after
+            // they would be left without a look, because what is read from NpcTemplates is only what is
+            // needed for the ones already placed.
             SembrarLosDelMundo();
             SembrarLasLuminomaquinas();
             NpcDialogues.Load();
@@ -203,7 +204,7 @@ namespace Jondo.Unity.Server.Managers
                 _templates[npcId] = read;
             }
 
-            // Los que no traían aspecto propio lo heredan de su plantilla.
+            // Those that did not bring a look of their own inherit their template's.
             foreach (var here in _byMap.Values)
             {
                 foreach (var spawn in here)
@@ -220,25 +221,25 @@ namespace Jondo.Unity.Server.Managers
                               $"{_templates.Count} plantillas.");
         }
 
-        /// <summary>Los mapas que tienen algún NPC puesto.</summary>
+        /// <summary>The maps that have some NPC placed.</summary>
         /// <summary>
-        /// Los NPCs del mundo, con la casilla y la orientación que tenían en el servidor de Ankama.
+        /// The world's NPCs, with the cell and the orientation they had on Ankama's server.
         ///
-        /// No están colocados a ojo. Cada vez que el jugador entraba en un mapa, el servidor real
-        /// le declaraba en el jss los NPCs que había; barriendo las 305 capturas salen 422 en 202
-        /// mapas, de 327 plantillas distintas, y esto es ese barrido tal cual.
+        /// They are not placed by eye. Each time the player entered a map, the real server
+        /// declared in the jss the NPCs there were; sweeping the 305 captures gives 422 on 202
+        /// maps, of 327 distinct templates, and this is that sweep as is.
         ///
-        /// El aspecto no viene en el fichero porque sale de la plantilla —las 327 tienen Look— y
-        /// el diálogo tampoco: 246 de las 327 traen uno escrito en NpcTemplates y el manejador de
-        /// NPCs ya lo sabe leer. Las otras 81 se quedan calladas.
+        /// The look does not come in the file because it comes from the template —all 327 have a Look— and
+        /// the dialogue does not either: 246 of the 327 bring one written in NpcTemplates and the NPC
+        /// handler already knows how to read it. The other 81 stay silent.
         ///
-        /// NO se comprueba que la casilla sea andable, y es a propósito: un NPC puede estar de pie
-        /// sobre una casilla que el jugador no pisa, y de hecho sólo 151 de las 422 lo son. Lo que
-        /// manda es la captura.
+        /// It is NOT checked that the cell is walkable, and on purpose: an NPC can be standing
+        /// on a cell the player does not step on, and in fact only 151 of the 422 are. What
+        /// rules is the capture.
         ///
-        /// Si un mapa ya tenía NPCs sembrados de NpcSpawns —el del zaap de Amakna, con nuestros
-        /// vendedores— se deja como está y no se le añade nada. En las capturas ese mapa no tiene
-        /// ni un NPC, así que hoy no se pisa nada, pero la regla vale para el día que sí.
+        /// If a map already had NPCs seeded from NpcSpawns —the Amakna zaap one, with our
+        /// sellers— it is left as it is and nothing is added to it. In the captures that map does not have
+        /// a single NPC, so today nothing is overwritten, but the rule holds for the day it does.
         /// </summary>
         /// <summary>
         /// Seeds the NPCs that Ankama places around the world, through the content layers.
@@ -281,13 +282,13 @@ namespace Jondo.Unity.Server.Managers
                     long mapId = entrada.MapId;
                     if (nuestros.Contains(mapId)) { saltados++; continue; }
 
-                    // Un vendedor absorbido tampoco se siembra AQUI, no solo en NpcSpawns.
+                    // An absorbed seller is not seeded HERE either, not only in NpcSpawns.
                     //
-                    // Los mapas de vendedores del servidor de torneos de Ankama estan en las
-                    // capturas -de ahi salio el catalogo- asi que los 29 absorbidos volvian a
-                    // aparecer por esta puerta. Y con la tienda vacia, porque su catalogo se lo
-                    // quedo el que los absorbio: al abrirlos el servidor dice «tiene accion de
-                    // tienda pero no vende nada» y al jugador no le sale nada.
+                    // The seller maps of Ankama's tournament server are in the
+                    // captures -that is where the catalogue came from- so the 29 absorbed ones came back
+                    // in through this door. And with an empty shop, because their catalogue went to
+                    // the one that absorbed them: on opening them the server says «has a shop
+                    // action but sells nothing» and the player gets nothing.
                     int quien = entrada.NpcId;
                     if (Vendors.IsAbsorbed(quien)) { absorbidos++; continue; }
 
@@ -297,8 +298,8 @@ namespace Jondo.Unity.Server.Managers
                         _byMap[mapId] = aqui;
                     }
 
-                    // Sin aspecto: se lo pone el paso de más abajo, el que hereda el Look de la
-                    // plantilla. Por eso esto tiene que correr antes de cargar las plantillas.
+                    // Without a look: the step further down gives it one, the one that inherits the
+                    // template's Look. That is why this has to run before loading the templates.
                     aqui.Add(new Spawn
                     {
                         MapId = mapId,
@@ -326,16 +327,16 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Las luminomáquinas de la Sima, una por planta con luz.
+        /// The Sima's luminomachines, one per lit floor.
         /// </summary>
         /// <remarks>
-        /// No van por la capa escrita a mano porque no hay nada que escribir: su sitio se CALCULA
-        /// de la base -la planta, su mapa más bajo, la casilla andable más cercana al centro- y
-        /// dejarlo en un fichero serían cinco números mágicos que envejecen mal. Dónde y por qué
-        /// está en <see cref="Luminomachines.Place"/>, que es quien lo decide.
+        /// They do not go through the hand-written layer because there is nothing to write: their place is WORKED OUT
+        /// from the base -the floor, its lowest map, the walkable cell closest to the centre- and
+        /// leaving it in a file would be five magic numbers that age badly. Where and why
+        /// is in <see cref="Luminomachines.Place"/>, which is what decides it.
         ///
-        /// Aquí, como los del mundo: sin aspecto, que lo hereda de la plantilla en el paso de más
-        /// abajo. Por eso esto corre antes de cargar las plantillas y no después.
+        /// Here, like the world's ones: without a look, which it inherits from the template in the step further
+        /// down. That is why this runs before loading the templates and not after.
         /// </remarks>
         private static void SembrarLasLuminomaquinas()
         {
@@ -359,7 +360,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Un NPC del mobiliario de las raids, en su mapa.</summary>
+        /// <summary>An NPC of the raids' furniture, on its map.</summary>
         private static void Poner(long mapId, int npcId, int cell)
         {
             if (mapId <= 0) return;
@@ -379,20 +380,20 @@ namespace Jondo.Unity.Server.Managers
             });
         }
 
-        /// <summary>Mirando al sureste, que es lo que le toca a quien no dice otra cosa.</summary>
+        /// <summary>Facing south-east, which is what whoever does not say otherwise gets.</summary>
         private const int DefaultOrientation = 1;
 
         /// <summary>
-        /// Pone un NPC en un mapa de sala de sueño, si no está ya.
+        /// Places an NPC on a dream room map, if it is not there already.
         /// </summary>
         /// <remarks>
-        /// Aparte de las tres capas normales a propósito. Aquéllas describen el mundo, que es
-        /// igual para todos; esto es de UNA partida: el Rey Gob aparece en la fuente, y el
-        /// Dispensador de favores en el favor, del sueño de quien la abrió y no tiene por qué
-        /// estar ahí para nadie más.
+        /// Apart from the three normal layers on purpose. Those describe the world, which is
+        /// the same for everyone; this belongs to ONE run: the Rey Gob appears at the fountain, and the
+        /// Dispensador de favores at the favour, of the dream of whoever opened it, and it has no reason to
+        /// be there for anybody else.
         ///
-        /// Se hereda el aspecto de la plantilla igual que en la carga normal, porque si no el
-        /// cliente recibe un actor sin nada que dibujar.
+        /// The look is inherited from the template just like in the normal load, because otherwise the
+        /// client receives an actor with nothing to draw.
         /// </remarks>
         public static void PonerDelSueno(long mapId, int npcId, int cell, int orientation)
         {
@@ -447,8 +448,8 @@ namespace Jondo.Unity.Server.Managers
         public static IReadOnlyList<Spawn> Of(long mapId)
             => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
 
-        /// <summary>Quién es el negativo que el cliente acaba de clicar.</summary>
-        /// <summary>Los NPCs que hay en un mapa. Vacio si no hay ninguno.</summary>
+        /// <summary>Who the negative the client has just clicked is.</summary>
+        /// <summary>The NPCs on a map. Empty if there are none.</summary>
         public static IReadOnlyList<Spawn> OnMap(long mapId)
             => _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
 
@@ -467,33 +468,119 @@ namespace Jondo.Unity.Server.Managers
         private static readonly int[] PlacedLater = { Dreams.ReyGob, Dreams.FavorNpc };
 
         public static Template? TemplateOf(int npcId)
-            => _templates.TryGetValue(npcId, out var template) ? template : null;
+            => _templates.TryGetValue(npcId, out var template) ? template
+               : _onDemand.TryGetValue(npcId, out var later) ? later : null;
+
+        /// <summary>
+        /// The templates read after the start, for NPCs an administrator puts on a map: kept apart
+        /// from the ones read at boot, which nothing writes to once the server is up and so can be
+        /// read from every socket without a lock.
+        /// </summary>
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, Template> _onDemand = new();
+
+        /// <summary>This NPC's template, read from the base if no NPC of it stood anywhere at boot.</summary>
+        public static Template? EnsureTemplate(int npcId)
+        {
+            var known = TemplateOf(npcId);
+            if (known != null) return known;
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Look, Data FROM NpcTemplates WHERE Id = $id;";
+                command.Parameters.AddWithValue("$id", npcId);
+                using var reader = command.ExecuteReader();
+                if (!reader.Read()) return null;
+                var read = new Template { Id = npcId, Look = reader.IsDBNull(0) ? "" : reader.GetString(0) };
+                ReadData(reader.IsDBNull(1) ? "" : reader.GetString(1), read);
+                return _onDemand.GetOrAdd(npcId, read);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NPCs] No se ha podido leer la plantilla {npcId}: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Puts an NPC on a map while the server runs -- an administrator's, on the cell he stands
+        /// on -- until the server stops. Null when the NPC has no template, or one of it already
+        /// stands on that cell.
+        /// </summary>
+        /// <remarks>
+        /// The map's list is replaced, never changed in place: the actor list of the map is built
+        /// on other sockets by walking it, and a list that changes under a walk throws.
+        /// </remarks>
+        public static Spawn? PlaceAtRuntime(long mapId, int npcId, int cell, int orientation)
+        {
+            var template = EnsureTemplate(npcId);
+            if (template == null || mapId <= 0) return null;
+
+            lock (_byMap)
+            {
+                var here = _byMap.TryGetValue(mapId, out var list) ? new List<Spawn>(list) : new List<Spawn>();
+                if (here.Any(s => s.NpcId == npcId && s.Cell == cell)) return null;
+
+                // A contextual id nobody on the map has: after a removal the count no longer is one.
+                int position = here.Count;
+                while (here.Any(s => s.ContextualId == ActorIds.NpcDelMapa(position))) position++;
+
+                var spawn = new Spawn
+                {
+                    MapId = mapId,
+                    NpcId = npcId,
+                    Cell = cell,
+                    Orientation = orientation,
+                    ContextualId = ActorIds.NpcDelMapa(position),
+                    RawLook = template.Look,
+                };
+                ReadLook(spawn.RawLook, spawn);
+                spawn.BoneId = (int)spawn.Bones;
+                here.Add(spawn);
+                _byMap[mapId] = here;
+                return spawn;
+            }
+        }
+
+        /// <summary>Takes an NPC off its map until the server stops. False when it was not there.</summary>
+        public static bool RemoveAtRuntime(long mapId, long contextualId)
+        {
+            lock (_byMap)
+            {
+                if (!_byMap.TryGetValue(mapId, out var list)) return false;
+                var here = new List<Spawn>(list);
+                if (here.RemoveAll(s => s.ContextualId == contextualId) == 0) return false;
+                _byMap[mapId] = here;
+                return true;
+            }
+        }
 
         /// <summary>Every template that has been read, for the passes that have to look at all of them.</summary>
         public static IEnumerable<Template> Templates => _templates.Values;
 
         /// <summary>
-        /// El aspecto en la notación del propio cliente: "{huesos|pieles|colores|escalas}".
+        /// The look in the client's own notation: "{bones|skins|colours|scales}".
         ///
-        /// Cada hueco puede llevar varios números separados por comas, y casi todos van vacíos: de
-        /// los cincuenta y seis NPCs de la captura ninguno lleva pieles y sólo cinco llevan colores.
+        /// Each slot can carry several comma-separated numbers, and almost all go empty: of
+        /// the fifty-six NPCs of the capture none carries skins and only five carry colours.
         /// </summary>
         /// <summary>
-        /// El aspecto de un NPC, que puede ser VARIOS con una condición cada uno.
+        /// An NPC's look, which can be SEVERAL with a condition each.
         /// </summary>
         /// <remarks>
-        /// Cuarenta y ocho plantillas de las 6.467 traen el aspecto escrito como una lista separada
-        /// por comas, cada uno con su criterio detrás de un dólar:
+        /// Forty-eight templates of the 6,467 bring the look written as a comma-separated
+        /// list, each one with its criterion behind a dollar sign:
         ///
         ///   {10152|||95$1;0;0;RV&lt;7,Raid_Score,5000},{10151|||95$1;0;0;RV&gt;7,Raid_Score,4999&amp;...}
         ///
-        /// Eso es el cofre de la raid, que se va llenando según la puntuación. Antes esto cortaba
-        /// por el PRIMER corchete y el ÚLTIMO, así que en una plantilla de varias se tragaba los
-        /// cinco de una vez y salía un aspecto imposible; ahora se leen uno a uno.
+        /// That is the raid's chest, which fills up according to the score. Before, this cut
+        /// at the FIRST bracket and the LAST, so in a template with several it swallowed the
+        /// five at once and an impossible look came out; now they are read one by one.
         ///
-        /// El primero manda mientras nadie elija otro: en 47 de las 48 el primero no lleva criterio
-        /// —es el de siempre— y quien sí lo lleva es este cofre, cuyo primero es el del cofre
-        /// vacío. Las dos cosas quieren lo mismo: sin nada que preguntar, el de por defecto.
+        /// The first rules while nobody picks another: in 47 of the 48 the first carries no criterion
+        /// —it is the usual one— and the one that does carry it is this chest, whose first is the empty
+        /// chest's. Both things want the same: with nothing to ask, the default one.
         /// </remarks>
         private static void ReadLook(string look, Spawn spawn)
         {
@@ -509,10 +596,10 @@ namespace Jondo.Unity.Server.Managers
             spawn.Scales = variants[0].Scales;
         }
 
-        /// <summary>Los aspectos de arriba, separados por su nivel de corchete y no por comas.</summary>
+        /// <summary>The looks above, split by their bracket level and not by commas.</summary>
         /// <remarks>
-        /// Por el nivel de corchete porque un aspecto puede llevar otro dentro —la montura de un
-        /// NPC es <c>1@0={195|||110}</c>— y las comas de dentro no separan nada.
+        /// By bracket level because a look can carry another inside —an NPC's mount
+        /// is <c>1@0={195|||110}</c>— and the commas inside separate nothing.
         /// </remarks>
         internal static List<LookVariant> Variantes(string look)
         {
@@ -541,7 +628,7 @@ namespace Jondo.Unity.Server.Managers
             return fuera;
         }
 
-        /// <summary>Un aspecto suelto: los números delante del dólar y el criterio detrás.</summary>
+        /// <summary>A single look: the numbers in front of the dollar sign and the criterion behind.</summary>
         private static LookVariant Variante(string contenido)
         {
             string criterio = "";
@@ -557,8 +644,8 @@ namespace Jondo.Unity.Server.Managers
 
             if (dolar >= 0)
             {
-                // Detrás del dólar van «orden;?;?;criterio», y el criterio es todo lo que queda
-                // después del tercer punto y coma: puede llevar los suyos dentro.
+                // Behind the dollar sign go «order;?;?;criterion», and the criterion is everything left
+                // after the third semicolon: it can carry its own inside.
                 string cola = contenido.Substring(dolar + 1);
                 contenido = contenido.Substring(0, dolar);
 
@@ -584,15 +671,15 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Cuál de los aspectos de un NPC le toca ver a quien pregunta, o null para el de siempre.
+        /// Which of an NPC's looks whoever asks gets to see, or null for the usual one.
         /// </summary>
         /// <remarks>
-        /// El de por defecto es el primero, y se devuelve null en vez de él para que quien llame no
-        /// tenga que copiar nada: si nadie gana, se queda lo que el spawn ya traía.
+        /// The default is the first, and null is returned instead of it so that the caller does not
+        /// have to copy anything: if nobody wins, what the spawn already brought stays.
         ///
-        /// Los que NO llevan criterio no se eligen, se heredan: son el de siempre, y preguntarles
-        /// daría que sí antes de mirar los demás. Y lo que no se sabe contestar tampoco gana, que
-        /// es lo que deja al cofre vacío para quien no está en ninguna raid.
+        /// The ones that carry NO criterion are not chosen, they are inherited: they are the usual one, and asking them
+        /// would give yes before looking at the rest. And what cannot be answered does not win either, which
+        /// is what leaves the empty chest for whoever is in no raid.
         /// </remarks>
         public static LookVariant VariantFor(Spawn spawn, Jondo.Unity.World.Content.Criterion.Resolver resolver)
         {
@@ -614,23 +701,23 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los colores de un aspecto, en la forma que espera el cliente.
+        /// A look's colours, in the shape the client expects.
         ///
-        /// La sección de color de un look NO es una lista de números: son pares
-        /// «índice=valor», y el valor viene en decimal o en hexadecimal con almohadilla. El
-        /// Bontariano enfadado es {1|90,2140|2=16305204,3=3772345,4=14024699,6=#8F5203|53}.
+        /// The colour section of a look is NOT a list of numbers: they are
+        /// «index=value» pairs, and the value comes in decimal or in hexadecimal with a hash. The
+        /// angry Bontarian is {1|90,2140|2=16305204,3=3772345,4=14024699,6=#8F5203|53}.
         ///
-        /// Se leía con Numbers(), que espera números sueltos separados por comas: no parseaba ni
-        /// uno, no llegaba ni un color, y el cliente pintaba el aspecto sin tintes, o sea GRIS.
-        /// Medido sobre los 6.468 NPCs del catálogo: 2.045 llevan colores y LOS 2.045 usan la
-        /// forma de pares. Ni uno usa una lista plana, así que estaban saliendo grises todos.
+        /// It was read with Numbers(), which expects loose comma-separated numbers: it did not parse
+        /// a single one, not one colour arrived, and the client drew the look without tints, that is GREY.
+        /// Measured over the 6,468 NPCs of the catalogue: 2,045 carry colours and ALL 2,045 use the
+        /// pair form. Not one uses a flat list, so they were all coming out grey.
         ///
-        /// Por el cable el color va con su índice metido en el byte alto —(índice &lt;&lt; 24) | rgb—,
-        /// que es la misma cuenta que hace BreedLookTable.IndexColors para el personaje del
-        /// jugador. La diferencia está en de dónde sale el índice: allí es la posición en la
-        /// lista, y aquí viene ESCRITO y no es correlativo. El Bontariano usa el 2, el 3, el 4 y
-        /// el 6, y se salta el 1 y el 5; numerándolos por posición, sus tintes irían a las
-        /// ranuras equivocadas.
+        /// On the wire the colour goes with its index in the high byte —(index &lt;&lt; 24) | rgb—,
+        /// which is the same arithmetic BreedLookTable.IndexColors does for the player's
+        /// character. The difference is where the index comes from: there it is the position in the
+        /// list, and here it comes WRITTEN and is not consecutive. The Bontarian uses 2, 3, 4 and
+        /// 6, and skips 1 and 5; numbering them by position, his tints would go to the
+        /// wrong slots.
         /// </summary>
         private static long[] Colores(string parte)
         {
@@ -644,8 +731,8 @@ namespace Jondo.Unity.Server.Managers
                 if (p.Length == 0) continue;
                 posicion++;
 
-                // Sin el «índice=» delante se numera por posición, que es lo que hace el aspecto
-                // del jugador. Hoy no lo usa ni un NPC; queda por si algún día cambia el dato.
+                // Without the «index=» in front it is numbered by position, which is what the player's
+                // look does. Today not one NPC uses it; it stays in case the data ever changes.
                 long indice = posicion;
                 string valor = p;
 
@@ -662,7 +749,7 @@ namespace Jondo.Unity.Server.Managers
             return fuera.ToArray();
         }
 
-        /// <summary>Un color, en decimal o en hexadecimal con almohadilla delante.</summary>
+        /// <summary>A colour, in decimal or in hexadecimal with a hash in front.</summary>
         private static bool LeerColor(string texto, out long rgb)
         {
             rgb = 0;
@@ -691,12 +778,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Lo que hace falta del Data de la plantilla: las acciones y el diálogo.
+        /// What is needed from the template's Data: the actions and the dialogue.
         ///
-        /// Las acciones importan porque el f1 que el cliente manda en el iov es exactamente el
-        /// actions[0] de la plantilla —comprobado en los cincuenta y un NPCs de tienda de la
-        /// captura, cincuenta y uno de cincuenta y uno— así que un NPC que no declare la acción ni
-        /// siquiera ofrece la opción en el menú del botón derecho.
+        /// The actions matter because the f1 the client sends in the iov is exactly the
+        /// template's actions[0] —checked on the fifty-one shop NPCs of the
+        /// capture, fifty-one out of fifty-one— so an NPC that does not declare the action does not
+        /// even offer the option in the right-click menu.
         /// </summary>
         private static void ReadData(string json, Template template)
         {
@@ -713,7 +800,7 @@ namespace Jondo.Unity.Server.Managers
                     template.Gender = gender.GetInt32();
                 }
 
-                // dialogData es una lista de bloques y de cada uno interesa el messageId.
+                // dialogData is a list of blocks and of each one the messageId is what matters.
                 if (root.TryGetProperty("dialogData", out var dialog)
                     && dialog.TryGetProperty("Array", out var blocks)
                     && blocks.ValueKind == JsonValueKind.Array)
@@ -729,9 +816,9 @@ namespace Jondo.Unity.Server.Managers
                     }
                 }
 
-                // dialogReplies es una lista de pares [idDeRespuesta, idDeTexto]. Se guardan LOS
-                // DOS: el id es con lo que se contesta, y la clave de texto es lo único que dice
-                // qué respuesta es. Ver Template.ReplyTexts.
+                // dialogReplies is a list of [replyId, textId] pairs. BOTH are
+                // kept: the id is what one answers with, and the text key is the only thing saying
+                // which reply it is. See Template.ReplyTexts.
                 if (root.TryGetProperty("dialogReplies", out var replies)
                     && replies.TryGetProperty("Array", out var list)
                     && list.ValueKind == JsonValueKind.Array)

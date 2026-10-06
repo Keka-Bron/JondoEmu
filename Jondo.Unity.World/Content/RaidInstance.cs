@@ -61,7 +61,7 @@ namespace Jondo.Unity.World.Content
         public bool Remove(long characterId) => _members.Remove(characterId);
         public bool Has(long characterId) => _members.Contains(characterId);
 
-        // ─── Los contadores ─────────────────────────────────────────────────────
+        // ─── The counters ───────────────────────────────────────────────────────
 
         /// <summary>
         /// The namespace the raid's variables live in. Every RV criterion of the client's data
@@ -189,10 +189,10 @@ namespace Jondo.Unity.World.Content
 
     public static class Raids
     {
-        /// <summary>La Sima del Gigalodón: seis plantas, una hora, de ocho a doce.</summary>
+        /// <summary>The Sima del Gigalodón: six floors, one hour, eight to twelve players.</summary>
         public const int Gigalodon = 1;
 
-        /// <summary>El Santuario de los Jardines Eternos: cinco zonas, dos horas, de ocho a dieciséis.</summary>
+        /// <summary>The Santuario de los Jardines Eternos: five zones, two hours, eight to sixteen players.</summary>
         public const int EternalGardens = 2;
 
         private static readonly Dictionary<int, RaidKind> Catalogue = new()
@@ -204,7 +204,7 @@ namespace Jondo.Unity.World.Content
                 Area = 103,
                 // -1 Puesto avanzado de los exploradores, -2 Meseta de la Morreina,
                 // -3 Acantilado sumergido, -4 Madriguera de Cangrancio, -5 Osario abisal,
-                // -6 Fosombrío de Willorca. Los seis, con sus 73 mapas, están en world.db.
+                // -6 Fosombrío de Willorca. All six, with their 73 maps, are in world.db.
                 Floors = new[] { 1131, 1132, 1133, 1134, 1135, 1136 },
                 Price = 360,
                 RunsFor = TimeSpan.FromHours(1),
@@ -219,7 +219,7 @@ namespace Jondo.Unity.World.Content
                 Name = "Santuario de los Jardines Eternos",
                 Area = 102,
                 // Obra monocromática, Enclave de los protectores, Reserva de Belladona,
-                // Patio de Efedra y el Castillo del santuario. 51 mapas, todos en world.db.
+                // Patio de Efedra and the Castillo del santuario. 51 maps, all in world.db.
                 Floors = new[] { 1126, 1127, 1128, 1129, 1130 },
                 Price = 480,
                 RunsFor = TimeSpan.FromHours(2),

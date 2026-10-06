@@ -7,61 +7,61 @@ using System.Text.Json;
 
 namespace Jondo.Unity.Server.Managers
 {
-    /// <summary>En qué estado está un recurso. Es el f4 del f15 del jss.</summary>
+    /// <summary>What state a resource is in. It is the f4 of the jss's f15.</summary>
     public enum ResourceState
     {
-        /// <summary>Lleno. El servidor real no manda el campo.</summary>
+        /// <summary>Full. The real server does not send the field.</summary>
         Full = 0,
 
         /// <summary>Agotado: alguien acaba de recogerlo.</summary>
         Depleted = 1,
 
-        /// <summary>Alguien lo está recogiendo ahora mismo.</summary>
+        /// <summary>Someone is harvesting it right now.</summary>
         Busy = 2,
     }
 
     /// <summary>
-    /// Los recursos recolectables del mundo: trigo, fresnos, caladeros, minerales.
+    /// The world's harvestable resources: wheat, ash trees, fishing spots, minerals.
     ///
-    /// ─── Cómo se reconoce un recurso ────────────────────────────────────────────────────────
+    /// ─── How a resource is recognised ───────────────────────────────────────────────────────
     ///
-    /// El cliente sabe dónde está cada elemento y con qué dibujo, pero no qué es: el TIPO y la
-    /// HABILIDAD los pone el servidor. Así que se cruzan las 305 capturas con el volcado del
-    /// cliente —lo hace tools/recursos_recoleccion.py— y sale dibujo → (tipo, habilidad). De la
-    /// habilidad, el catálogo del cliente da el oficio y qué objeto se saca, porque
-    /// <c>gatheredRessourceItem</c> está en skills.json.
+    /// The client knows where each element is and with which drawing, but not what it is: the TYPE and the
+    /// SKILL are put by the server. So the 305 captures are crossed with the client's
+    /// dump —tools/recursos_recoleccion.py does it— and out comes drawing → (type, skill). From the
+    /// skill, the client's catalogue gives the profession and which item is obtained, because
+    /// <c>gatheredRessourceItem</c> is in skills.json.
     ///
-    /// Salen 60 dibujos, que son 25.090 recursos en 4.507 mapas y los seis oficios de recolección.
-    /// Minero y Cazador salen flojos —415 y 325— porque las capturas apenas pisaron minas ni
-    /// zonas de caza; con más capturas suben solos, sin tocar código.
+    /// 60 drawings come out, which are 25,090 resources on 4,507 maps and the six gathering professions.
+    /// Miner and Hunter come out weak —415 and 325— because the captures barely set foot in mines or
+    /// hunting zones; with more captures they go up on their own, without touching code.
     ///
-    /// ─── Cómo se declara en el jss ──────────────────────────────────────────────────────────
+    /// ─── How it is declared in the jss ──────────────────────────────────────────────────────
     ///
-    /// Con una vuelta de tuerca que hay que respetar o el cliente lo pinta mal:
+    /// With a twist that has to be respected or the client draws it wrong:
     ///
-    ///   lleno     f11 { f1:1, f2:0, f4 { uid, habilidad }, f5: elemento, f6: tipo }   f15 sin f4
-    ///   agotado   f11 { f1:1,       f3 { uid, habilidad }, f5: elemento, f6: tipo }   f15 f4 = 1
-    ///   en uso    igual que agotado, pero el f15 lleva f4 = 2
+    ///   full      f11 { f1:1, f2:0, f4 { uid, skill }, f5: element, f6: type }   f15 without f4
+    ///   depleted  f11 { f1:1,       f3 { uid, skill }, f5: element, f6: type }   f15 f4 = 1
+    ///   in use    same as depleted, but the f15 carries f4 = 2
     ///
-    /// O sea que la habilidad cambia de campo: va en el 4 cuando se puede usar y en el 3 cuando
-    /// no. Comprobado en los 25 fresnos de un mismo mapa, sin una sola excepción.
+    /// That is, the skill changes field: it goes in 4 when it can be used and in 3 when
+    /// it cannot. Checked on the 25 ash trees of one same map, without a single exception.
     ///
-    /// El f2 del elemento lleno vale 0 en la madera, el trigo y la salvia, y 1 o 3 en los dos
-    /// caladeros. No se ha sabido qué distingue esos valores, así que se manda 0: es lo medido en
-    /// tres de los cuatro oficios y el cliente lo pinta bien igual.
+    /// The f2 of the full element is 0 for wood, wheat and sage, and 1 or 3 for the two
+    /// fishing spots. What distinguishes those values has not been worked out, so 0 is sent: it is what was measured in
+    /// three of the four professions and the client draws it right all the same.
     ///
-    /// ─── El estado no se guarda ─────────────────────────────────────────────────────────────
+    /// ─── The state is not stored ────────────────────────────────────────────────────────────
     ///
-    /// Vive en memoria y es del servidor entero, no de cada jugador: si uno siega un trigo, el de
-    /// al lado lo ve segado. Al reiniciar vuelven todos llenos, que es lo mismo que pasaría tras
-    /// el tiempo de rebrote.
+    /// It lives in memory and belongs to the whole server, not to each player: if one reaps a wheat, the one
+    /// next to him sees it reaped. On restarting they all come back full, which is the same that would happen after
+    /// the regrowth time.
     /// </summary>
     public static class Resources
     {
-        /// <summary>Lo que tarda un recurso en volver a estar lleno.</summary>
+        /// <summary>How long a resource takes to be full again.</summary>
         public static readonly TimeSpan Regrowth = TimeSpan.FromMinutes(5);
 
-        /// <summary>Lo que dura el gesto de recoger. Del f3 del iwn: 30 décimas.</summary>
+        /// <summary>How long the harvesting gesture lasts. From the iwn's f3: 30 tenths.</summary>
         public const int GatherTenths = 30;
 
         /// <summary>Un recurso concreto puesto en un mapa.</summary>
@@ -91,10 +91,10 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Dictionary<long, List<Resource>> _byMap = new();
         private static readonly Dictionary<(long, int), Resource> _byElement = new();
 
-        /// <summary>Cuándo vuelve a estar lleno cada recurso agotado. Sin entrada = lleno.</summary>
+        /// <summary>When each depleted resource is full again. No entry = full.</summary>
         private static readonly ConcurrentDictionary<(long, int), DateTime> _spent = new();
 
-        /// <summary>Los que alguien está recogiendo ahora mismo.</summary>
+        /// <summary>The ones someone is harvesting right now.</summary>
         private static readonly ConcurrentDictionary<(long, int), bool> _busy = new();
 
         public static int Count => _byElement.Count;
@@ -148,6 +148,11 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (element.Cell == 0) continue;
                     if (!_byGfx.TryGetValue(element.Gfx, out var kind)) continue;
+                    // A passage hung off it makes it a door, whatever its graphic says: the GM
+                    // island's chest, 479462, has the placeholder graphic 682 every olivioleta
+                    // tree has, and as a tree it asked for woodcutting 90 to be opened.
+                    // TeleportManager is read first (Program), so its passages are known here.
+                    if (TeleportManager.TryGet(mapId, element.Id, out _)) continue;
 
                     var resource = new Resource
                     {
@@ -192,8 +197,8 @@ namespace Jondo.Unity.Server.Managers
         public static bool Is(long mapId, int elementId) => _byElement.ContainsKey((mapId, elementId));
 
         /// <summary>
-        /// En qué estado está. Un recurso agotado vuelve solo cuando pasa el rebrote, así que no
-        /// hace falta ningún temporizador: se mira la hora cuando alguien pregunta.
+        /// What state it is in. A depleted resource comes back on its own when the regrowth passes, so no
+        /// timer is needed: the time is checked when someone asks.
         /// </summary>
         public static ResourceState StateOf(long mapId, int elementId)
         {
@@ -208,14 +213,14 @@ namespace Jondo.Unity.Server.Managers
             return ResourceState.Depleted;
         }
 
-        /// <summary>Coge el recurso para recogerlo. Devuelve falso si otro llegó antes.</summary>
+        /// <summary>Takes the resource to harvest it. Returns false if another got there first.</summary>
         public static bool TryHold(long mapId, int elementId)
         {
             if (StateOf(mapId, elementId) != ResourceState.Full) return false;
             return _busy.TryAdd((mapId, elementId), true);
         }
 
-        /// <summary>Se ha recogido: queda agotado hasta que rebrote.</summary>
+        /// <summary>It has been harvested: it stays depleted until it regrows.</summary>
         public static void Spend(long mapId, int elementId)
         {
             var clave = (mapId, elementId);
@@ -224,13 +229,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// ¿Le da el nivel de oficio al jugador que está mirando este mapa?
+        /// Is the profession level of the player looking at this map enough?
         ///
-        /// Se mira aquí y no sólo al clicar porque el juego real no deja ni intentarlo: al pasar
-        /// el ratón por un recurso que te queda grande, el icono sale en rojo igual que si
-        /// estuviera agotado. Eso lo hace el cliente solo, con que el servidor declare la
-        /// habilidad como no pulsable. Avisar por el chat estaba mal por dos motivos: no es lo
-        /// que hace el juego, y esa línea sale por el canal general y la lee todo el mundo.
+        /// It is checked here and not only on clicking because the real game does not even let you try: on hovering
+        /// over a resource that is beyond you, the icon comes out red just as if it
+        /// were depleted. The client does that on its own, as long as the server declares the
+        /// skill as not pressable. Warning through the chat was wrong for two reasons: it is not
+        /// what the game does, and that line goes out through the general channel and everybody reads it.
         /// </summary>
         public static bool WithinReach(long mapId, int elementId)
         {
@@ -238,7 +243,7 @@ namespace Jondo.Unity.Server.Managers
             return Network.SessionContext.State.JobLevel(resource.JobId) >= resource.LevelMin;
         }
 
-        /// <summary>Se ha soltado sin recoger —el jugador se fue, o falló algo—.</summary>
+        /// <summary>It has been let go without harvesting —the player left, or something failed—.</summary>
         public static void Release(long mapId, int elementId)
             => _busy.TryRemove((mapId, elementId), out _);
     }

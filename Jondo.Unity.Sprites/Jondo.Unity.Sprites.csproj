@@ -4,12 +4,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
-    <!-- Dibujar un personaje a partir de su cadena de aspecto, sacandolo de los huesos del
-         propio cliente de Dofus. Estaba dentro de Studio y ahora lo usan los dos: Studio para
-         los NPC de los mapas y el lanzador para los retratos del equipo.
+    <!-- Drawing a character from its look string, taking it from the Dofus client's own
+         bones. It was inside Studio and now both use it: Studio for
+         the maps' NPCs and the launcher for the team's portraits.
 
-         Aqui no hay ni base de datos ni protocolo: se le da una cadena de aspecto y devuelve un
-         mapa de bits. Lo que decide QUE aspecto dibujar es cosa de quien llame. -->
+         Here there is neither database nor protocol: it is given a look string and returns a
+         bitmap. WHICH look to draw is the caller's business. -->
   </PropertyGroup>
 
   <ItemGroup>

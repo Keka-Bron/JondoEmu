@@ -1,34 +1,34 @@
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// Cuándo dos nombres de mensaje son el mismo nombre.
+/// When two message names are the same name.
 ///
-/// Parece una tontería y es la pieza que decide si una medición vale algo. El nombre esperado es
-/// una propuesta —Ankama no publica los del protocolo Unity— así que exigir la cadena exacta
-/// mediría la puntería en un concurso de sinónimos: <c>MapComplementaryInformationsDataMessage</c>
-/// y <c>MapComplementaryInformationsMessage</c> son el mismo mensaje escrito por dos personas.
+/// It looks like nonsense and it is the piece that decides whether a measurement is worth anything. The expected name is
+/// a proposal —Ankama does not publish the Unity protocol's— so requiring the exact string
+/// would measure aim in a synonyms contest: <c>MapComplementaryInformationsDataMessage</c>
+/// and <c>MapComplementaryInformationsMessage</c> are the same message written by two people.
 ///
-/// ─── Tres listones que se cayeron ───────────────────────────────────────────────────────
+/// ─── Three bars that fell ───────────────────────────────────────────────────────────────
 ///
-/// Van escritos porque el error es tentador y lo he cometido tres veces seguidas:
+/// They are written down because the mistake is tempting and I have made it three times in a row:
 ///
-///   perdonar una palabra a partir de tres      «AppearanceSlotSetRequest» pasaba por
+///   forgiving one word from three on           «AppearanceSlotSetRequest» passed as
 ///                                              «AppearanceSlotSetResult»
-///   que el corto quepa entero en el largo      «TitleSelect» pasaba por «TitleSelectRequest»
-///   ...y perdonar sólo lo que no sea «papel»   «AuthenticationTicket» pasaba por
+///   the short one fitting whole in the long    «TitleSelect» passed as «TitleSelectRequest»
+///   ...and forgiving only what is not «role»   «AuthenticationTicket» passed as
 ///                                              «AuthenticationTicketAccepted»
 ///
-/// El tercero es el instructivo: perdonar lo que sobra obliga a saber qué palabras son relleno, y
-/// esa lista hay que alargarla a mano cada vez que aparece un «Accepted», un «End» o un «Storage».
-/// Con igualdad no hay lista que mantener.
+/// The third is the instructive one: forgiving what is left over forces knowing which words are filler, and
+/// that list has to be extended by hand every time an «Accepted», an «End» or a «Storage» shows up.
+/// With equality there is no list to maintain.
 ///
-/// Lo que queda: las MISMAS palabras, ni una más, perdonando el orden, los plurales y el «Message»
-/// del final. Rechaza sinónimos legítimos —Teleport frente a Zaap— y por tanto mide por lo bajo.
-/// En una medición, quedarse corto se nota y pasarse no.
+/// What remains: the SAME words, not one more, forgiving the order, the plurals and the final
+/// «Message». It rejects legitimate synonyms —Teleport versus Zaap— and therefore measures low.
+/// In a measurement, falling short shows and overshooting does not.
 /// </summary>
 public static class Naming
 {
-    /// <summary>Si dos nombres designan el mismo mensaje.</summary>
+    /// <summary>Whether two names designate the same message.</summary>
     public static bool Same(string one, string other)
     {
         var a = Words(one);
@@ -37,11 +37,11 @@ public static class Naming
     }
 
     /// <summary>
-    /// Las palabras de un nombre en PascalCase, en minúsculas, sin plurales y sin el «Message».
+    /// The words of a PascalCase name, lowercase, without plurals and without the «Message».
     ///
-    /// Se quita también la «s» suelta, que aparece cuando alguien escribe «Informations» separando
-    /// mal, y se recorta la del final de cada palabra: «Informations» y «Information» son la misma
-    /// palabra en dos manos distintas.
+    /// The loose «s» is also removed, which appears when someone writes «Informations» splitting
+    /// badly, and the final one of each word is trimmed: «Informations» and «Information» are the same
+    /// word in two different hands.
     /// </summary>
     public static HashSet<string> Words(string name)
     {

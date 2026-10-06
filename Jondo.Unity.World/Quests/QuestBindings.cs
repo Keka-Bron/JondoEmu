@@ -113,31 +113,31 @@ namespace Jondo.Unity.World.Quests
         public IReadOnlyList<(int Item, int Count)> Gives { get; init; }
             = Array.Empty<(int, int)>();
 
-        /// <summary>Lo que hay que llevar encima para que el elemento responda.</summary>
+        /// <summary>What has to be carried for the element to respond.</summary>
         /// <remarks>
-        /// Se comprueba antes de cerrar nada: sin ello, «pulsar el tirador con la limonada» y
-        /// «pulsar el tirador» son lo mismo, y la mitad de la misión se salta sola.
+        /// It is checked before closing anything: without it, «pressing the tap with the lemonade» and
+        /// «pressing the tap» are the same, and half the quest skips itself.
         /// </remarks>
         public IReadOnlyList<(int Item, int Count)> Requires { get; init; }
             = Array.Empty<(int, int)>();
 
-        /// <summary>Si lo exigido se gasta al usarlo. Por omisión no: basta con llevarlo.</summary>
+        /// <summary>Whether what is required is spent on using it. By default not: carrying it is enough.</summary>
         public bool SpendsRequired { get; init; }
 
-        /// <summary>El monstruo que sale al pulsarlo, y cuántos. Cero cuando no sale ninguno.</summary>
+        /// <summary>The monster that comes out on pressing it, and how many. Zero when none comes out.</summary>
         /// <remarks>
-        /// «Haz salir a la rata de su escondite» no es una frase decorativa: el objetivo siguiente
-        /// es vencerla, y sin esto no hay nada contra lo que pelear. La Rata Nsiosa está en cero
-        /// grupos del mundo porque no debe estar puesta -- aparece cuando se la hace aparecer.
+        /// «Haz salir a la rata de su escondite» is not a decorative sentence: the next objective
+        /// is to beat it, and without this there is nothing to fight against. The Rata Nsiosa is in zero
+        /// groups of the world because it must not be placed -- it appears when it is made to appear.
         /// </remarks>
         public int SpawnsMonster { get; init; }
         public int SpawnsCount { get; init; } = 1;
 
-        /// <summary>La misión que ENTREGA este elemento, cuando no la da un NPC.</summary>
+        /// <summary>The quest this element HANDS OUT, when an NPC does not give it.</summary>
         /// <remarks>
-        /// Hay misiones que empiezan pulsando algo, no hablando: «Mort au rat» arranca en el
-        /// anuncio de la fachada de la taberna. Cambia además cuándo se ve el elemento -- se
-        /// enseña mientras la misión NO se ha cogido, que es lo contrario de todos los demás.
+        /// There are quests that start by pressing something, not by talking: «Mort au rat» starts at the
+        /// notice on the tavern's front. It also changes when the element is seen -- it is
+        /// shown while the quest has NOT been taken, which is the opposite of all the others.
         /// </remarks>
         public int Starts { get; init; }
 
@@ -271,9 +271,9 @@ namespace Jondo.Unity.World.Quests
                 }
             }
 
-            // Lo que hay que llevar encima para que el elemento responda. Sin esto no se puede
-            // escribir «el tirador sólo funciona si llevas la limonada», que es la mitad de las
-            // misiones que encadenan comprar algo con usarlo en un sitio.
+            // What has to be carried for the element to respond. Without this one cannot
+            // write «the tap only works if you carry the lemonade», which is half of the
+            // quests that chain buying something with using it somewhere.
             var requires = new List<(int, int)>();
             if (row.TryGetProperty("requires", out var needed) && needed.ValueKind == JsonValueKind.Array)
             {

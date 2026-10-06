@@ -7,13 +7,13 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// El aspecto del EQUIPO DE VERDAD que se lleva puesto: qué piel mete cada objeto real
-    /// (arma, sombrero, capa...) en el f6 del aspecto del personaje.
+    /// The look of the REAL EQUIPMENT worn: which skin each real item (weapon, hat, cape...) puts into the
+    /// f6 of the character's look.
     ///
-    /// No confundir con <see cref="Cosmetics"/>, que es de las prendas de apariencia (Merkasako):
-    /// aquellas se indexan por el gid de la prenda cosmética, y esto por el ID DE PLANTILLA del
-    /// objeto real (ItemTemplates.Id), medido sobre las capturas del servidor de torneos con
-    /// tools/extraer_equipo_real.py. Ver equipment_skins.json.
+    /// Not to be confused with <see cref="Cosmetics"/>, which is about appearance garments (Merkasako):
+    /// those are indexed by the cosmetic garment's gid, and this by the real item's TEMPLATE ID
+    /// (ItemTemplates.Id), measured on the tournament server's captures with
+    /// tools/extraer_equipo_real.py. See equipment_skins.json.
     /// </summary>
     public static class EquipmentSkins
     {
@@ -115,7 +115,30 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>La piel que mete ese objeto real, o cero si no la tenemos medida.</summary>
+        /// <summary>The item type -- hat 16, cape 17, shield 82 -- whose piece puts this skin on, or zero.</summary>
+        public static int TypeOfSkin(int skin)
+        {
+            EnsureLoaded();
+            var byType = _typeOfSkin;
+            if (byType == null)
+            {
+                byType = new Dictionary<int, int>();
+                foreach (var (template, itsSkin) in _skins)
+                {
+                    int type = Forgemagic.TemplateOf(template)?.Type ?? 0;
+                    if (type != 0) byType.TryAdd(itsSkin, type);
+                }
+                _typeOfSkin = byType;
+            }
+            return byType.TryGetValue(skin, out int found) ? found : 0;
+        }
+
+        private static Dictionary<int, int>? _typeOfSkin;
+
+        /// <summary>Every real item with its skin measured.</summary>
+        public static IReadOnlyDictionary<int, int> All { get { EnsureLoaded(); return _skins; } }
+
+        /// <summary>The skin that real item puts in, or zero if we do not have it measured.</summary>
         public static int SkinOf(int templateId)
         {
             EnsureLoaded();

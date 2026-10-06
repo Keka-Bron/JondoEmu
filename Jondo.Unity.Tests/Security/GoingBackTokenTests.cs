@@ -30,11 +30,11 @@ namespace Jondo.Unity.Tests.Security
     /// characters — <c>Guid "N"</c> or sixteen bytes of hex — and the auth database confirms it,
     /// with a maximum stored length of 32 in both token columns.
     ///
-    /// Esta clase y <c>GoingBackTokenTests</c> comparten colección, y hace falta: las dos vacían y
-    /// rellenan el MISMO registro estático de lanzamientos —que es estático porque tiene que
-    /// serlo— y xUnit corre las clases en paralelo. Aquí se cruzaban sin romperse por suerte de
-    /// tiempos; en la integración continua no. Verde en d703636 y rojo en el commit siguiente,
-    /// que es justo el que añadió la segunda clase.
+    /// This class and <c>StaleLaunchTests</c> share a collection, and they have to: both empty and
+    /// refill the SAME static launch registry —which is static because it has to
+    /// be— and xUnit runs the classes in parallel. Here they crossed without breaking by luck of
+    /// timing; in continuous integration they did not. Green at d703636 and red at the next commit,
+    /// which is exactly the one that added the second class.
     /// </remarks>
     [Collection("ClientLaunchRegistry")]
     public class GoingBackTokenTests : IDisposable

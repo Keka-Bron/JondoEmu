@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <!-- La mitad de Windows Forms de lo compartido: los controles pintados a mano que usan el
-         servidor y el desobfuscador. Estaban dentro de Jondo.Unity.Contract, y eso obligaba a
-         Contract a ser net10.0-windows con Windows Forms dentro; como Contract lo referencian
-         TODOS, Windows Forms viajaba tambien al lanzador y a Studio, que son de Avalonia.
+    <!-- The Windows Forms half of what is shared: the hand-painted controls the
+         server and the deobfuscator use. They were inside Jondo.Unity.Contract, and that forced
+         Contract to be net10.0-windows with Windows Forms inside; since EVERYONE references
+         Contract, Windows Forms also travelled to the launcher and to Studio, which are Avalonia.
 
-         Al separarlo, Contract vuelve a ser net10.0 puro y lo que arrastra Windows Forms es solo
-         quien de verdad lo usa. La paleta no se ha quedado aqui: vive en Contract, en
-         LauncherPalette, para que los dos aspectos -este y el de Avalonia- salgan de los mismos
-         numeros y no de una copia a mano. -->
+         With it split off, Contract is pure net10.0 again and only whoever really uses Windows Forms
+         drags it along. The palette has not stayed here: it lives in Contract, in
+         LauncherPalette, so that both looks -this one and Avalonia's- come from the same
+         numbers and not from a hand copy. -->
     <UseWindowsForms>true</UseWindowsForms>
     <NoWarn>$(NoWarn);WFO1000</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>

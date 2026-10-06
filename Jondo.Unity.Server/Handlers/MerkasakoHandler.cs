@@ -9,47 +9,47 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Entrar al merkasako, cambiarse de decorado y colocar los muebles.
+    /// Entering the haven bag, changing the decor and placing the furniture.
     ///
-    /// De las capturas:
+    /// From the captures:
     ///
-    ///   cliente  jbn { f2: de quién }     el botón y la tecla H
-    ///   cliente  jbl { f1: tema }         cambiarse de decorado
-    ///   servidor jru { f2: el mapa } + el mapa entero + jbu (muebles) + jaz (permisos)
+    ///   client   jbn { f2: whose }        the button and the H key
+    ///   client   jbl { f1: theme }        changing the decor
+    ///   server   jru { f2: the map } + the whole map + jbu (furniture) + jaz (permissions)
     ///
-    ///   cliente  jbv          servidor jbm        abrir el modo de colocar
-    ///   cliente  jbg { f2 (rep): {f1: casilla, f2: mueble, f3: giro} }   aceptar
-    ///   cliente  jbk / jav / jaw   servidor jba                          cerrar el modo
+    ///   client   jbv          server jbm        opening placement mode
+    ///   client   jbg { f2 (rep): {f1: cell, f2: piece, f3: rotation} }   accept
+    ///   client   jbk / jav / jaw   server jba                            closing the mode
     ///
-    /// El jbg llega troceado —en la captura son tres seguidos— y trae la habitación ENTERA, no las
-    /// diferencias. Por eso se juntan los trozos y se escriben de una vez al cerrar: guardando cada
-    /// trozo por separado, el primero borraría lo que traen los otros dos.
+    /// The jbg arrives in pieces -- in the capture there are three in a row -- and carries the WHOLE
+    /// room, not the differences. That is why the pieces are put together and written at once on
+    /// closing: saving each piece separately, the first would delete what the other two carry.
     /// </summary>
     public static class MerkasakoHandler
     {
-        /// <summary>Los muebles que van llegando mientras el modo de colocar está abierto.</summary>
+        /// <summary>The furniture arriving while placement mode is open.</summary>
         /// <summary>
-        /// El botón y la tecla H, que es un mensaje distinto del de cambiar de decorado:
+        /// The button and the H key, which is a different message from changing the decor:
         ///
-        ///   cliente  jbn { f2: de quién es el merkasako }
+        ///   client   jbn { f2: whose haven bag it is }
         ///
-        /// Lleva un personaje porque se puede visitar el de otro. Aquí solo hay uno, así que se
-        /// entra al propio, al decorado que se dejó puesto la última vez.
+        /// It carries a character because somebody else's can be visited. Here there is only one, so one
+        /// goes into one's own, with the decor left on the last time.
         ///
-        /// Y ES UN INTERRUPTOR: el mismo mensaje entra y sale, y decide el servidor por dónde
-        /// está el jugador. Medido en «Movimiento/ir al merkasako y volver.pcapng»: las
-        /// peticiones #1 y #8 del jugador son el mismo jbn con el cuerpo 10a28280c8e708 byte a
-        /// byte; a la primera contesta con el mapa 162795538 —subzona 851, la de las bolsas— y a
-        /// la segunda con el 217056262, un mapa normal del mundo. No hay un tercer opcode: un
-        /// barrido de las capturas encuentra jbn en cinco ficheros y jbl en uno, y el jbl vacío es
-        /// el decorado 0, no la salida.
+        /// And IT IS A TOGGLE: the same message goes in and out, and the server decides by where the
+        /// player is. Measured in «Movimiento/ir al merkasako y volver.pcapng»: the player's requests #1
+        /// and #8 are the same jbn with the body 10a28280c8e708 byte for byte; to the first it answers
+        /// with map 162795538 -- subarea 851, the bags' one -- and to the second with 217056262, a normal
+        /// world map. There is no third opcode: a sweep of the captures finds jbn in five files and jbl in
+        /// one, and the empty jbl is decor 0, not the exit.
         ///
-        /// Antes esto llamaba a GoToThemeAsync sin mirar nada, así que la segunda H volvía a
-        /// meter al jugador en la misma habitación de la que quería salir.
+        /// Before, this called GoToThemeAsync without looking at anything, so the second H put the player
+        /// back in the same room he wanted to leave.
         /// </summary>
         public static async Task EnterFromOutsideAsync(NetworkStream stream, byte[] payload)
         {
             if (ConnectionProtocol.ReadPayload(payload, Op.Jbn) == null) return;
+            if (await Managers.Jail.KeepsInAsync(stream)) return;
 
             var state = Jondo.Unity.Server.Network.SessionContext.State;
 
@@ -66,15 +66,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// De vuelta al mundo, por donde se entró.
+        /// Back to the world, the way he came in.
         /// </summary>
         /// <remarks>
-        /// Las mismas tramas que la salida de una casa y en el mismo orden, que es lo que hay en
-        /// la captura: tras el jru de salida no aparece ni jbf, ni jbu, ni jaz —los tres que sí
-        /// van al ENTRAR—, sólo lqu, lva, lva, iom y el jss.
+        /// The same frames as leaving a house and in the same order, which is what the capture has: after
+        /// the exit jru neither jbf, nor jbu, nor jaz appear -- the three that do go on ENTERING --, only
+        /// lqu, lva, lva, iom and the jss.
         ///
-        /// Si no se sabe de dónde se vino —se desconectó dentro, o se entró antes de que esto
-        /// existiera— se le devuelve al punto de partida en vez de dejarlo encerrado.
+        /// If it is not known where he came from -- he disconnected inside, or went in before this
+        /// existed -- he is sent back to the starting point instead of being left locked in.
         /// </remarks>
         private static async Task LeaveAsync(NetworkStream stream)
         {
@@ -112,13 +112,13 @@ namespace Jondo.Unity.Server.Handlers
                               $"casilla {state.CellId}.");
         }
 
-        /// <summary>Cambiarse de decorado desde dentro.</summary>
+        /// <summary>Changing the decor from inside.</summary>
         public static async Task ChangeThemeAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? jbl = ConnectionProtocol.ReadPayload(payload, Op.Jbl);
             if (jbl == null) return;
 
-            // Sin f1 —proto3 se come el cero— se entiende el de siempre.
+            // Without f1 -- proto3 swallows the zero -- the usual one is meant.
             int theme = Merkasako.DefaultTheme;
             foreach (var field in ProtoMessage.Parse(jbl).Fields)
             {
@@ -145,12 +145,19 @@ namespace Jondo.Unity.Server.Handlers
 
             HavenBagStore.SaveTheme(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, Merkasako.ThemeOfMap(target));
 
+            long left = Jondo.Unity.Server.Network.SessionContext.State.MapId;
             Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
 
-            // Al lado del zaap, que es donde deja a uno el juego al entrar.
+            // Next to the zaap, which is where the game leaves one on entering.
             var zaap = Merkasako.ZaapOf(target);
             Jondo.Unity.Server.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(target, zaap.Cell);
             DatabaseManager.SaveCurrentCharacter();
+
+            // Whoever stays on the map he left stops seeing him there. This was missing: going
+            // into the haven bag left him standing on the street, drawn, for everybody on it.
+            // Only the leaving is told -- a haven bag is nobody else's to be told about.
+            if (left != target)
+                await SessionRegistry.RemoveFromMapAsync(left, SessionContext.Current.CharacterId, SessionContext.Current.Id);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildActorLeft(Jondo.Unity.Server.Network.SessionContext.State.CharacterId));
@@ -165,9 +172,9 @@ namespace Jondo.Unity.Server.Handlers
                               $"casilla {Jondo.Unity.Server.Network.SessionContext.State.CellId} (zaap en la {zaap.Cell}).");
         }
 
-        // ─── El modo de colocar muebles ─────────────────────────────────────────
+        // ─── Furniture placement mode ───────────────────────────────────────────
 
-        /// <summary>El cliente abre el menú de gestión. Contesta un jbm vacío y ya le deja colocar.</summary>
+        /// <summary>The client opens the management menu. An empty jbm is answered and it lets him place.</summary>
         public static async Task OpenEditorAsync(NetworkStream stream)
         {
             SessionContext.State.IsHavenBagEditing = true;
@@ -179,7 +186,7 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine("[Merkasako] Modo de colocar muebles abierto.");
         }
 
-        /// <summary>Un trozo de la habitación. Se apunta y se espera al cierre para escribirla.</summary>
+        /// <summary>A piece of the room. It is noted and the closing is waited for to write it.</summary>
         public static void CollectFurniture(byte[] payload)
         {
             byte[]? jbg = ConnectionProtocol.ReadPayload(payload, Op.Jbg);
@@ -199,8 +206,8 @@ namespace Jondo.Unity.Server.Handlers
                     else if (inner.FieldNumber == 3) orientation = (int)inner.VarIntValue;
                 }
 
-                // Un mueble que no está en el catálogo del cliente no se guarda: el cliente no
-                // sabría dibujarlo y la habitación quedaría con un hueco invisible que bloquea.
+                // A piece of furniture that is not in the client's catalogue is not stored: the client
+                // would not know how to draw it and the room would be left with an invisible blocking gap.
                 if (typeId == 0 || !Merkasako.IsFurniture(typeId)) continue;
 
                 SessionContext.State.PendingHavenBagFurniture.Add(new HavenBagStore.Furniture
@@ -213,8 +220,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El cliente cierra el menú. Aquí es donde la habitación se escribe en la base de datos y
-        /// se le devuelve tal como ha quedado.
+        /// The client closes the menu. This is where the room is written to the database and sent back to
+        /// him as it ended up.
         /// </summary>
         public static async Task CloseEditorAsync(NetworkStream stream)
         {
@@ -237,8 +244,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Los muebles y los permisos, que el cliente espera detrás del mapa. Los permisos van
-        /// vacíos: aquí no hay nadie a quien invitar.
+        /// The furniture and the permissions, which the client expects after the map. The permissions go
+        /// empty: there is nobody here to invite.
         /// </summary>
         public static async Task SendFurnitureAsync(NetworkStream stream)
         {

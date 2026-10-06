@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -272,6 +274,61 @@ namespace Jondo.Unity.Tests.Combat
             KoliseoQueue.Enrol(5, 1);
             Assert.Null(KoliseoQueue.TryMatch(1, 2));
             Assert.Equal(3, KoliseoQueue.Count);
+        }
+
+        // ─── Leaving the queue ──────────────────────────────────────────────────────────────
+
+        [Fact]
+        public void A_party_that_enrolled_together_leaves_together()
+        {
+            KoliseoQueue.Clock = () => new DateTime(2026, 9, 27, 10, 0, 0, DateTimeKind.Utc);
+            Profiles(new Dictionary<long, KoliseoQueue.Profile>
+            {
+                [1] = new(200, 1000, false),
+                [2] = new(200, 1000, false),
+                [3] = new(200, 1000, false),
+            });
+            KoliseoQueue.EnrolUnit(new long[] { 1, 2 }, 1);
+            KoliseoQueue.Enrol(3, 1);
+
+            var (mode, members) = KoliseoQueue.LeaveWithUnit(2);
+            Assert.Equal(1, mode);
+            Assert.Equal(new long[] { 1, 2 }, members.OrderBy(i => i).ToArray());
+            Assert.False(KoliseoQueue.Waits(1));
+            Assert.True(KoliseoQueue.Waits(3));
+
+            Assert.Equal(-1, KoliseoQueue.LeaveWithUnit(99).Mode);
+        }
+
+        /// <summary>
+        /// The window's leave button (lsi) takes the party out and tells each of them with the lsx
+        /// of leaving: f1 absent -- not searching -- and reason 3, which the client's window reads
+        /// as "search a fight" again. For the 2v2 it is the capture's "18032001" byte for byte.
+        /// </summary>
+        [Fact]
+        public async Task The_leave_button_puts_every_window_of_the_party_back_to_search()
+        {
+            const long leader = 8_950_000_201, partner = 8_950_000_202;
+            Profiles(new Dictionary<long, KoliseoQueue.Profile>
+            {
+                [leader] = new(200, 1000, false),
+                [partner] = new(200, 1000, false),
+            });
+            await using var mine = await PortalTests.Wire.Open(leader);
+            await using var theirs = await PortalTests.Wire.Open(partner);
+            KoliseoQueue.EnrolUnit(new[] { leader, partner }, 1);
+
+            using (SessionContext.Push(mine.Session))
+                await KoliseoHandler.LeaveQueueAsync(null!);
+
+            foreach (var wire in new[] { mine, theirs })
+            {
+                var (op, payload) = Assert.Single(await wire.Drain());
+                Assert.Equal(Op.Lsx, op);
+                Assert.Equal(Hex("18032001"), payload);
+            }
+            Assert.False(KoliseoQueue.Waits(leader));
+            Assert.False(KoliseoQueue.Waits(partner));
         }
     }
 }

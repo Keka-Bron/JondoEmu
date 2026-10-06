@@ -4,25 +4,25 @@ using System.Collections.Concurrent;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los desafíos entre jugadores que están pendientes de respuesta.
+    /// The challenges between players awaiting an answer.
     ///
-    /// Se llama Duels y no Challenges porque en este código «reto» ya es otra cosa: los retos de
-    /// combate con logro detrás, que lleva Managers.Challenges. Dos cosas distintas con el mismo
-    /// nombre en español es justo como se cuelan los errores que nadie encuentra.
+    /// It is called Duels and not Challenges because in this code «reto» (challenge) is already something
+    /// else: the fight challenges with an achievement behind them, which Managers.Challenges handles. Two
+    /// different things with the same name is exactly how the bugs nobody finds slip in.
     /// </summary>
     /// <remarks>
-    /// Un desafío es un id y dos personajes, y vive desde que alguien reta hasta que el otro
-    /// contesta. Medido en las cuatro capturas de desafío: el servidor reparte ids crecientes
-    /// (489, 490, 492, 494 en la misma sesión) y los usa como única referencia en las tres tramas
-    /// siguientes, así que el estado tiene que estar aquí y no en ninguna de las dos sesiones.
+    /// A challenge is an id and two characters, and it lives from when somebody challenges until the other
+    /// answers. Measured in the four challenge captures: the server hands out increasing ids (489, 490, 492,
+    /// 494 in the same session) and uses them as the only reference in the three following frames, so the
+    /// state has to be here and not in either of the two sessions.
     ///
-    /// Es estático a propósito, como el registro de lanzamientos: un desafío cruza DOS conexiones
-    /// —quien reta y quien contesta son sockets distintos— y guardarlo en la sesión de uno lo
-    /// dejaría invisible para el otro.
+    /// It is static on purpose, like the launch registry: a challenge crosses TWO connections -- whoever
+    /// challenges and whoever answers are different sockets -- and storing it in one's session would leave
+    /// it invisible to the other.
     /// </remarks>
     public static class Duels
     {
-        /// <summary>Un desafío pendiente.</summary>
+        /// <summary>A pending challenge.</summary>
         public sealed class Duel
         {
             public int Id { get; init; }
@@ -37,18 +37,18 @@ namespace Jondo.Unity.Server.Managers
         private static int _siguiente;
 
         /// <summary>
-        /// Desde dónde se numeran. Las capturas empiezan en el 489, que es de una sesión larga del
-        /// servidor real: el número en sí no significa nada, sólo tiene que ser único y creciente.
+        /// Where they are numbered from. The captures start at 489, which comes from a long session of the
+        /// real server: the number itself means nothing, it only has to be unique and increasing.
         /// </summary>
         private const int PrimerId = 1;
 
         public static int Pending => _pendientes.Count;
 
-        /// <summary>Abre un desafío y devuelve su id.</summary>
+        /// <summary>Opens a challenge and returns its id.</summary>
         /// <remarks>
-        /// El mapa se guarda con él porque un desafío es entre dos que están en el mismo sitio: si
-        /// uno se marcha antes de contestar, aceptarlo montaría un combate en un mapa donde ya no
-        /// está. Eso se comprueba al aceptar, no aquí.
+        /// The map is stored with it because a challenge is between two who are in the same place: if one
+        /// leaves before answering, accepting it would set up a fight on a map where he no longer is. That is
+        /// checked on accepting, not here.
         /// </remarks>
         public static Duel Open(long challengerId, long targetId, long mapId)
         {
@@ -65,25 +65,25 @@ namespace Jondo.Unity.Server.Managers
             return desafio;
         }
 
-        /// <summary>El desafío con ese id, o null si no lo hay o ya se contestó.</summary>
+        /// <summary>The challenge with that id, or null if there is none or it has been answered.</summary>
         public static Duel? Get(int id)
             => _pendientes.TryGetValue(id, out var desafio) ? desafio : null;
 
-        /// <summary>Lo saca de la lista. Devuelve null si otro llegó antes.</summary>
+        /// <summary>Takes it off the list. Returns null if somebody else got there first.</summary>
         /// <remarks>
-        /// Devolver el desafío al quitarlo, y no un bool, es lo que hace que dos respuestas a la
-        /// vez no monten dos combates: sólo una de las dos se lleva el objeto.
+        /// Returning the challenge on removing it, and not a bool, is what keeps two simultaneous answers from
+        /// setting up two fights: only one of the two takes the object.
         /// </remarks>
         public static Duel? Take(int id)
             => _pendientes.TryRemove(id, out var desafio) ? desafio : null;
 
         /// <summary>
-        /// Si alguno de los dos ya está metido en un desafío pendiente.
+        /// Whether either of the two is already in a pending challenge.
         /// </summary>
         /// <remarks>
-        /// Sin esto se puede retar cien veces al mismo y llenarle la pantalla de ventanas, o retar
-        /// a diez a la vez y aceptar todos. Un desafío por persona a la vez, en cualquiera de los
-        /// dos papeles.
+        /// Without this the same player can be challenged a hundred times and have his screen filled with
+        /// windows, or ten can be challenged at once and all of them accepted. One challenge per person at a
+        /// time, in either role.
         /// </remarks>
         public static bool Busy(long characterId)
         {
@@ -95,10 +95,10 @@ namespace Jondo.Unity.Server.Managers
             return false;
         }
 
-        /// <summary>Cierra los desafíos en los que ande este personaje. Devuelve cuántos.</summary>
+        /// <summary>Closes the challenges this character is in. Returns how many.</summary>
         /// <remarks>
-        /// Al desconectarse, o al cambiar de mapa. Un desafío cuyo retador ya no está es una
-        /// ventana que no se puede contestar: aceptarla no encontraría a nadie.
+        /// On disconnecting, or on changing map. A challenge whose challenger is gone is a window that cannot be
+        /// answered: accepting it would find nobody.
         /// </remarks>
         public static int ForgetThoseOf(long characterId)
         {
@@ -111,7 +111,7 @@ namespace Jondo.Unity.Server.Managers
             return cerrados;
         }
 
-        /// <summary>Sólo para los tests: deja la lista vacía.</summary>
+        /// <summary>Only for tests: leaves the list empty.</summary>
         internal static void ForgetEverything()
         {
             _pendientes.Clear();

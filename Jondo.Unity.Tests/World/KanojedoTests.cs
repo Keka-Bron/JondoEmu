@@ -14,14 +14,14 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// El kanojedo contra la captura del Hipermago y los datos del cliente: la conversación del
-    /// puch maestro, los puchs que puede mandar, los sacos fijos y el libro de reglas.
+    /// The kanojedo against the Hipermago capture and the client's data: the puch
+    /// master's conversation, the puchs he can send, the fixed bags and the rule book.
     /// </summary>
     public class KanojedoTests
     {
         /// <summary>
-        /// La aritmética de las respuestas, contra los textos del 7416 en world.db: el id que
-        /// mandamos para «nivel 50» dice nivel 50, y el de «tres puchs» dice tres.
+        /// The replies' arithmetic, against the texts of 7416 in world.db: the id we
+        /// send for «nivel 50» says level 50, and the one for «tres puchs» says three.
         /// </summary>
         [Fact]
         public void The_masters_replies_say_what_the_client_will_draw()
@@ -40,7 +40,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(i, Kanojedo.LevelIndexOf(levels[i]));
                 Assert.Contains("nivel " + expected[i] + ".", replies[levels[i]]);
 
-                // La segunda pantalla: una, dos, tres, cuatro y volver.
+                // The second screen: one, two, three, four and back.
                 var counts = Kanojedo.CountReplies(i);
                 Assert.Equal(5, counts.Count);
                 Assert.StartsWith("Entrenarte con 1 puch", replies[counts[0]]);
@@ -59,13 +59,13 @@ namespace Jondo.Unity.Tests.World
                 Assert.True(Kanojedo.IsBack(counts[4]));
                 Assert.Null(Kanojedo.ReadCount(counts[4]));
 
-                // Y todas las frases son las tres puntos que el maestro dice.
+                // And all the sentences are the ellipsis the master says.
                 Assert.Equal("...", messages[Kanojedo.MessageFor(i)]);
             }
 
             Assert.Equal("...", messages[Kanojedo.FirstMessage]);
 
-            // Los dos ramales que la captura recorre de verdad.
+            // The two branches the capture really walks.
             Assert.Equal(54969, Kanojedo.MessageFor(Kanojedo.LevelIndexOf(73825)));   // nivel 50
             Assert.Equal(new long[] { 73820, 73821, 73822, 73823, 73824 },
                          Kanojedo.CountReplies(Kanojedo.LevelIndexOf(73825)));
@@ -77,8 +77,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Los puchs que el maestro puede mandar salen de la base: raza 250 y un nombre que el
-        /// cliente sepa pintar. Seis, y al nivel 200 sólo el Ingball.
+        /// The puchs the master can send come from the base: breed 250 and a name the
+        /// client knows how to draw. Six, and at level 200 only the Ingball.
         /// </summary>
         [Fact]
         public void The_puchs_come_out_of_the_database()
@@ -92,7 +92,7 @@ namespace Jondo.Unity.Tests.World
             Assert.DoesNotContain(puchs, p => p.Name.StartsWith("[!]"));
             Assert.Contains(puchs, p => p.Name == "Puch Cráneo Rosa");
 
-            // Al 50 los seis, a grado 2; al 200 sólo el Ingball, a grado 5, el sexto.
+            // At 50 all six, at grade 2; at 200 only the Ingball, at grade 5, the sixth.
             var at50 = Kanojedo.PoolAt(50);
             Assert.Equal(6, at50.Count);
             Assert.All(at50, p => Assert.Equal(2, p.Grade));
@@ -103,7 +103,7 @@ namespace Jondo.Unity.Tests.World
 
             Assert.Empty(Kanojedo.PoolAt(42));
 
-            // Elegir: tantos como se pidan, todos del pozo, y con repetición cuando no hay más.
+            // Choosing: as many as asked for, all from the pool, and with repetition when there are no more.
             var dice = new Random(7);
             var four = Kanojedo.Pick(50, 4, dice);
             Assert.Equal(4, four.Count);
@@ -113,7 +113,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Single(Kanojedo.Pick(1, 1, dice));
             Assert.Equal(4, Kanojedo.Pick(25, 9, dice).Count);
 
-            // Y con el dado repetible, dos sesiones de a cuatro no salen iguales: son temáticos.
+            // And with the repeatable die, two sessions of four do not come out the same: they are themed.
             var many = new HashSet<int>();
             for (int i = 0; i < 40; i++)
             {
@@ -123,8 +123,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Los seis sacos de cada kanojedo, tal cual los pone la captura: casilla, orientación y
-        /// grado, con el de nivel 200 al sexto grado.
+        /// The six bags of each kanojedo, just as the capture puts them: cell, orientation and
+        /// grade, with the level 200 one at the sixth grade.
         /// </summary>
         [Fact]
         public void The_punching_bags_stand_where_the_capture_put_them()
@@ -146,16 +146,16 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(expected[i].Grade, amakna[i].Members[0].Grade);
             }
 
-            // Una por grado, ninguna repetida.
+            // One per grade, none repeated.
             Assert.Equal(new[] { 0, 1, 2, 3, 4, 5 }, amakna.Select(g => g.Members[0].Grade).OrderBy(x => x));
 
-            // Y el dojo de los testeadores, de la captura del Ocra.
+            // And the testers' dojo, from the Cra capture.
             var tester = groups.Values.Where(g => g.MapId == 146801922).ToList();
             Assert.Equal(6, tester.Count);
             Assert.Contains(tester, g => g.Cell == 456 && g.Members[0].Grade == 5);
         }
 
-        /// <summary>El libro del entrenamiento: contra monstruos, pero sin nada en juego.</summary>
+        /// <summary>The training book: against monsters, but with nothing at stake.</summary>
         [Fact]
         public void Training_is_a_monster_fight_with_nothing_at_stake()
         {
@@ -172,7 +172,7 @@ namespace Jondo.Unity.Tests.World
             Assert.False(rules.AvanzaDeSala);
         }
 
-        /// <summary>Las arenas medidas: cuatro kanojedos, cada uno con la suya.</summary>
+        /// <summary>The measured arenas: four kanojedos, each with its own.</summary>
         [Fact]
         public void The_measured_arenas_are_the_captures()
         {
@@ -186,9 +186,9 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// La puerta: del 88212247 al kanojedo, por el elemento 472901 de la casilla 315, que
-        /// es el que el jss del mapa declara con la habilidad 184 y el mapa pone al lado del
-        /// guardián.
+        /// The door: from 88212247 to the kanojedo, through element 472901 on cell 315, which
+        /// is the one the map's jss declares with skill 184 and the map puts next to the
+        /// guardian.
         /// </summary>
         [Fact]
         public void The_door_into_the_kanojedo_is_written()
@@ -236,7 +236,7 @@ namespace Jondo.Unity.Tests.World
     }
 
     /// <summary>
-    /// Lo que toca el estado estático de MapManager: la arena medida gana a la regla.
+    /// What touches MapManager's static state: the measured arena beats the rule.
     /// </summary>
     [Collection("MapManager")]
     public class KanojedoArenaTests
@@ -256,7 +256,7 @@ namespace Jondo.Unity.Tests.World
 
                 Assert.Equal(99222029, MapManager.ResolveArenaMapId(99090957));
 
-                // Sin el arena medida en el mundo, la regla de siempre.
+                // Without the measured arena in the world, the usual rule.
                 MapManager.Maps.Remove(99222029);
                 Assert.NotEqual(99222029, MapManager.ResolveArenaMapId(99090957));
             }

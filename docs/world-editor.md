@@ -1,482 +1,482 @@
-# World Editor — planificación de arquitectura
+# World Editor — architecture planning
 
-> Documento de arquitectura. Empezó como exploración, antes de que hubiera una línea escrita; las
-> fases 0, 1, 2 y 3 ya están hechas y lo que aprendieron está anotado abajo, junto a lo que este
-> documento decía y no se cumplió.
+> Architecture document. It started as an exploration, before a single line was written; phases
+> 0, 1, 2 and 3 are already done and what they taught is noted below, next to what this
+> document said and did not come true.
 >
-> **Decidido:** el armazón es **Avalonia**, el editor es un **ejecutable propio** que funciona sin
-> servidor, la capa nuestra son **ficheros de texto en `content/`**, y el **lanzador hereda ese
-> mismo armazón**.
+> **Decided:** the framework is **Avalonia**, the editor is an **executable of its own** that works without a
+> server, our layer is **text files in `content/`**, and the **launcher inherits that
+> same framework**.
 
 ---
 
-## 1. Qué se quiere
+## 1. What is wanted
 
-Una herramienta que permita **crear contenido para el emulador sin tocar código ni regenerar
-ficheros a mano**. En concreto:
+A tool that allows **creating content for the emulator without touching code or regenerating
+files by hand**. Specifically:
 
 | | |
 |---|---|
-| **Tráfico** | esnifar, ver el diálogo cliente-servidor en vivo, y registrar los paquetes que no sabemos atender |
-| **Mapas** | pintar casillas —pisable, visión, bloqueada en combate—, ver vecinos, editar el decorado |
-| **Interactivos** | crear elementos de cualquier tipo, sobre todo **teletransportes**, y **atarlos a otro mapa** (las casas) |
-| **NPCs** | colocarlos, darles aspecto, acciones y **diálogos** |
-| **Misiones** | crearlas de cero, con sus etapas, objetivos y recompensas |
-| **Hechizos** | editar hechizos y sus efectos |
-| **Monstruos** | colocar grupos, editar plantillas |
-| **Lanzador** | y de paso, uno más profesional |
+| **Traffic** | sniff, see the client-server dialog live, and record the packets we do not know how to handle |
+| **Maps** | paint cells —walkable, line of sight, blocked in fights—, see neighbours, edit the scenery |
+| **Interactives** | create elements of any type, above all **teleports**, and **tie them to another map** (houses) |
+| **NPCs** | place them, give them a look, actions and **dialogs** |
+| **Quests** | create them from scratch, with their steps, objectives and rewards |
+| **Spells** | edit spells and their effects |
+| **Monsters** | place groups, edit templates |
+| **Launcher** | and while at it, a more professional one |
 
 ---
 
-## 2. El problema de fondo, que hay que resolver antes que nada
+## 2. The underlying problem, which has to be solved before anything else
 
-Hoy los datos del emulador viven en **tres sitios que no se hablan entre sí**:
+Today the emulator's data lives in **three places that do not talk to each other**:
 
 ```
-dofus3_data/          436 MB de volcado crudo del cliente. Verdad de Ankama. Sólo lectura.
+dofus3_data/          436 MB of raw client dump. Ankama's truth. Read only.
    ↓  tools/*.py
-datos/*.json          63 ficheros GENERADOS. Se pueden rehacer en cualquier momento.
-bases/world.db        240 MB, 41 tablas. GENERADA. Se distribuye comprimida.
+datos/*.json          63 GENERATED files. They can be redone at any moment.
+bases/world.db        240 MB, 41 tables. GENERATED. Distributed compressed.
 ```
 
-**Ninguno de los tres es editable a mano de forma segura.** Si alguien edita `datos/npcs_reales.json`
-y mañana se vuelve a correr `tools/extraer_npcs_reales.py`, el trabajo desaparece sin avisar. Y
-`world.db` es un binario de 240 MB: editarla es invisible en git, no se puede revisar en una pull
-request y no se puede fusionar si dos personas tocan cosas distintas.
+**None of the three can be safely edited by hand.** If someone edits `datos/npcs_reales.json`
+and tomorrow `tools/extraer_npcs_reales.py` is run again, the work disappears without warning. And
+`world.db` is a 240 MB binary: editing it is invisible in git, cannot be reviewed in a pull
+request and cannot be merged if two people touch different things.
 
-Esto ya ha pasado: la advertencia del README sobre el daño de empuje se perdió en un commit que
-reescribía una sección, y nadie se enteró hasta que se buscó a propósito catorce días después.
+This has already happened: the README's warning about push damage was lost in a commit that
+rewrote a section, and nobody noticed until it was looked for on purpose fourteen days later.
 
-### La decisión que lo desbloquea todo: tres capas y procedencia por fila
-
-```
-  capa 1   BASE        generada del cliente          se puede rehacer, nadie la edita
-  capa 2   MEDIDA      aprendida de las capturas     se puede rehacer, nadie la edita
-  capa 3   NUESTRA     decidida por una persona      SÓLO ESTO escribe el editor
-                                                     nunca se regenera, siempre gana
-```
-
-Se fusionan al arrancar, en ese orden. Y **cada fila lleva de dónde vino**, que es exactamente lo
-que hay que enseñar en la interfaz:
+### The decision that unblocks everything: three layers and per-row provenance
 
 ```
-  MAPA         CASILLA  ORIENTACIÓN  PROCEDENCIA
-  241438721    260      3            captura banque-20260820-091807
-  241439745    246      3            decidido aquí, 24/08/2026
+  layer 1   BASE        generated from the client       can be redone, nobody edits it
+  layer 2   MEASURED    learnt from the captures        can be redone, nobody edits it
+  layer 3   OURS        decided by a person             ONLY THIS is written by the editor
+                                                        never regenerated, always wins
 ```
 
-Sin esa columna, en seis meses nadie sabrá si un número es una medición o una invención, y ése es
-justo el error que este proyecto lleva un año evitando.
-
-### Dónde vive la capa nuestra
-
-**Propuesta: ficheros de texto en un `contenido/` nuevo, versionado en git.** No en `world.db`.
-
-Razones:
-
-- Un diff de git legible es lo que permite que DragonLord —o cualquiera— mande contenido por pull
-  request y se pueda revisar. Un blob de 240 MB, no.
-- Dos personas pueden tocar mapas distintos sin pisarse.
-- Es pequeño: lo que se decide a mano son cientos de filas, no millones.
-- Si algo sale mal, se revierte un commit en vez de restaurar una base entera.
-
-Formato sugerido, un fichero por dominio y por zona para que los diffs sean chicos:
+They are merged at startup, in that order. And **each row carries where it came from**, which is exactly what
+has to be shown in the interface:
 
 ```
-contenido/
-  npcs/         spawns.json, dialogos.json
-  mapas/        celdas.json          (sólo las casillas CAMBIADAS, no las 560)
-  interactivos/ elementos.json, teleports.json
-  misiones/     *.json
-  hechizos/     retoques.json
-  monstruos/    grupos.json
+  MAP          CELL     DIRECTION    PROVENANCE
+  241438721    260      3            capture banque-20260820-091807
+  241439745    246      3            decided here, 24/08/2026
 ```
 
-**Regla dura: la capa nuestra guarda DELTAS, no copias.** Si un mapa tiene 560 casillas y se cambian
-tres, el fichero lleva tres. Copiar el mapa entero hace que la próxima regeneración de la base no
-llegue nunca a ese mapa.
+Without that column, in six months nobody will know whether a number is a measurement or an invention, and that is
+exactly the mistake this project has spent a year avoiding.
+
+### Where our layer lives
+
+**Proposal: text files in a new `content/`, versioned in git.** Not in `world.db`.
+
+Reasons:
+
+- A readable git diff is what lets DragonLord —or anyone— send content by pull
+  request and have it reviewed. A 240 MB blob, no.
+- Two people can touch different maps without treading on each other.
+- It is small: what is decided by hand is hundreds of rows, not millions.
+- If something goes wrong, a commit is reverted instead of restoring a whole database.
+
+Suggested format, one file per domain and per area so the diffs are small:
+
+```
+content/
+  npcs/         spawns.json, dialogues.json
+  maps/         cells.json           (only the CHANGED cells, not all 560)
+  interactives/ elements.json, teleports.json
+  quests/       *.json
+  spells/       tweaks.json
+  monsters/     groups.json
+```
+
+**Hard rule: our layer stores DELTAS, not copies.** If a map has 560 cells and three are
+changed, the file carries three. Copying the whole map means the next regeneration of the database never
+reaches that map.
 
 ---
 
-## 3. Dónde vive el editor
+## 3. Where the editor lives
 
-**Decidido: un ejecutable propio, que sabe trabajar sin servidor y que llama a la puerta si lo hay.**
+**Decided: an executable of its own, that knows how to work without a server and knocks on the door if there is one.**
 
-Es el tercer ejecutable de la casa, junto al lanzador y al servidor:
+It is the house's third executable, next to the launcher and the server:
 
 ```
-  Jondo Emulator Launcher.exe   la ventana del jugador
-  Jondo Server.exe              el mundo
-  Jondo Studio.exe              el editor            <- nuevo
+  Jondo Emulator Launcher.exe   the player's window
+  Jondo Server.exe              the world
+  Jondo Studio.exe              the editor           <- new
 ```
 
-Y funciona en **dos modos**, que es lo que lo hace cómodo:
+And it works in **two modes**, which is what makes it comfortable:
 
-| modo | qué hace | cuándo |
+| mode | what it does | when |
 |---|---|---|
-| **suelto** | abre `contenido/` y las bases, edita y guarda. No necesita que haya nada corriendo. | la mayor parte del tiempo |
-| **enganchado** | además avisa a un servidor vivo de que recargue lo que acabas de tocar | cuando quieres verlo en el juego sin reiniciar |
+| **standalone** | opens `content/` and the databases, edits and saves. It does not need anything running. | most of the time |
+| **attached** | also tells a live server to reload what you have just touched | when you want to see it in the game without restarting |
 
-El canal de administración es **fino a propósito**: no lleva la API de edición entera, sólo
-«recarga este dominio». Todo lo que se edita pasa por los ficheros, y el servidor los relee. Eso
-mantiene la superficie mínima y hace que el editor no pueda dejar al servidor en un estado que los
-ficheros no expliquen.
+The admin channel is **thin on purpose**: it does not carry the whole editing API, only
+«reload this domain». Everything edited goes through the files, and the server rereads them. That
+keeps the surface minimal and means the editor cannot leave the server in a state the
+files do not explain.
 
-Condiciones no negociables para ese canal:
+Non-negotiable conditions for that channel:
 
-- **Sólo `127.0.0.1`.** Nada de `0.0.0.0`, ni siquiera detrás de un cortafuegos.
-- **Un testigo por arranque**, escrito en la consola del servidor, que el editor tiene que
-  presentar.
-- **Apagado por defecto**, y se enciende con un argumento (`--estudio`) o desde la ventana del
-  servidor.
-- **Puerto distinto del juego**, y ni una ruta de administración colgando del socket del juego.
-- La guardia de regresión que ya barre el código buscando marcas de seguridad debería aprender una
-  novena: que ninguna ruta de administración se registre sin comprobación de testigo.
+- **Only `127.0.0.1`.** No `0.0.0.0`, not even behind a firewall.
+- **One token per startup**, written in the server's console, which the editor has to
+  present.
+- **Off by default**, and turned on with an argument (`--studio`) or from the server's
+  window.
+- **A port different from the game's**, and not a single admin route hanging from the game's socket.
+- The regression guard that already sweeps the code looking for security marks should learn a
+  ninth: that no admin route is registered without a token check.
 
 ---
 
-## 4. Con qué se dibuja
+## 4. What it is drawn with
 
-El editor tiene que pintar **retículas isométricas de 560 casillas con capas de color, arrastre para
-pintar en tandas, y grafos de diálogo**. Eso descarta WinForms, que es lo que hay hoy.
+The editor has to paint **isometric grids of 560 cells with colour layers, drag to
+paint in batches, and dialog graphs**. That rules out WinForms, which is what there is today.
 
-| | mapa isométrico | grafo de diálogo | multiplataforma | curva |
+| | isometric map | dialog graph | cross-platform | learning curve |
 |---|---|---|---|---|
-| **WinForms** | a mano sobre `Graphics`, doloroso | a mano, muy doloroso | no | ya se conoce |
-| **WPF** | decente | decente | no | media |
-| **Avalonia** | decente | decente | sí | media |
-| **Web local** | `<canvas>`, es su terreno | librerías hechas | sí, gratis | media, pero conocida |
+| **WinForms** | by hand over `Graphics`, painful | by hand, very painful | no | already known |
+| **WPF** | decent | decent | no | medium |
+| **Avalonia** | decent | decent | yes | medium |
+| **Local web** | `<canvas>`, its home ground | ready-made libraries | yes, free | medium, but known |
 
-**Decidido: Avalonia.** Y la razón de peso no es el dibujo, es otra:
+**Decided: Avalonia.** And the weighty reason is not the drawing, it is another one:
 
-**No hay frontera de serialización.** El editor referencia `Jondo.Unity.World` y
-`Jondo.Unity.Contract` como proyectos y usa `MapGeometry`, `Fighter`, `SpellEffect` y `Outcome`
-**directamente**. Con una interfaz web, cada uno de esos tipos hay que espejarlo en JSON a mano y
-mantener los dos lados sincronizados para siempre: el día que `SpellEffect` gane un campo —como
-ganó `Delay` esta semana—, el editor se entera al ejecutarse, no al compilar.
+**There is no serialisation boundary.** The editor references `Jondo.Unity.World` and
+`Jondo.Unity.Contract` as projects and uses `MapGeometry`, `Fighter`, `SpellEffect` and `Outcome`
+**directly**. With a web interface, each of those types has to be mirrored in JSON by hand and
+both sides kept in sync forever: the day `SpellEffect` gains a field —as it
+gained `Delay` this week—, the editor finds out when it runs, not when it compiles.
 
-Y de los ocho módulos de este documento, **siete manipulan objetos del dominio** y sólo uno pinta
-píxeles. No compensa montar una capa HTTP entera por un módulo de ocho.
+And of this document's eight modules, **seven handle domain objects** and only one paints
+pixels. It does not pay to build a whole HTTP layer for one module out of eight.
 
-Lo que se pierde, y conviene saberlo de antemano:
+What is lost, and worth knowing beforehand:
 
-- El pintado isométrico y el grafo de diálogos son **más verbosos** que en un `<canvas>`. Se hacen
-  con `DrawingContext` sobre Skia y 560 rombos no son ningún problema de rendimiento, pero hay que
-  escribirlos.
-- **No hay herramientas de desarrollo de navegador** para inspeccionar la interfaz.
-- Añade una dependencia de unos 30-40 MB al despliegue.
+- The isometric painting and the dialog graph are **more verbose** than in a `<canvas>`. They are done
+  with `DrawingContext` over Skia and 560 rhombuses are no performance problem at all, but they have to be
+  written.
+- **There are no browser developer tools** to inspect the interface.
+- It adds a dependency of some 30-40 MB to the deployment.
 
-Lo que se gana además de los tipos: un solo lenguaje, una sola solución, un solo `dotnet build`, y
-**el mismo armazón sirve para el lanzador**, que es la otra mitad del encargo.
+What is gained besides the types: a single language, a single solution, a single `dotnet build`, and
+**the same framework serves the launcher**, which is the other half of the job.
 
-Sobre el estilo: Avalonia admite XAML y también construir la interfaz **desde código**, que es como
-está hecho el lanzador de hoy. Se puede empezar por ahí y no aprender XAML hasta que haga falta.
+About style: Avalonia supports XAML and also building the interface **from code**, which is how
+today's launcher is made. One can start there and not learn XAML until it is needed.
 
 ---
 
-## 5. Los módulos, uno a uno
+## 5. The modules, one by one
 
-Para cada uno: **qué hay ya** —que es más de lo que parece— y **qué falta**.
+For each one: **what there already is** —which is more than it seems— and **what is missing**.
 
-### 5.1 Tráfico y paquetes desconocidos
+### 5.1 Traffic and unknown packets
 
-**Ya hay.** `GameNodeProxy` ve todas las tramas. `Op.cs` sabe el nombre de cada opcode.
-`Network/UnknownPackets.cs` ya deduplica lo desconocido por **firma de forma** del protobuf.
-`logs/gameserver_traffic.log` guarda 108 MB de tráfico con hexadecimal. `tools/pcap.py` decodifica
-capturas de Wireshark. `tools/timeline.py` pinta cronologías.
+**There already is.** `GameNodeProxy` sees every frame. `Op.cs` knows each opcode's name.
+`Network/UnknownPackets.cs` already deduplicates the unknown by the protobuf's **shape signature**.
+`logs/gameserver_traffic.log` keeps 108 MB of traffic with hexadecimal. `tools/pcap.py` decodes
+Wireshark captures. `tools/timeline.py` draws timelines.
 
-**Falta.** Un grifo en el proxy que emita cada trama por *server-sent events* al navegador, y una
-vista de cronología con filtro por opcode, dirección y sesión. Y que el registro de desconocidos
-pase de ser una lista en memoria a una tabla con: forma, cuántas veces, primera y última vez,
-muestra en crudo, y un **estado** — desconocido → nombrado → documentado → atendido.
+**Missing.** A tap in the proxy that emits each frame as *server-sent events* to the browser, and a
+timeline view filtered by opcode, direction and session. And for the unknowns registry to
+go from being an in-memory list to a table with: shape, how many times, first and last time,
+raw sample, and a **status** — unknown → named → documented → handled.
 
-**La idea que hace esto valioso a largo plazo: la clave es la FORMA, no las tres letras.** Ankama
-renombra los opcodes en algunos parches. Si el registro se guarda por `jxw`, todo el conocimiento
-acumulado se evapora el día del parche. Guardado por firma de forma, **sobrevive**, y de hecho se
-convierte en una entrada más para el emparejador de `protocolbuilder`: un mensaje que ya sabemos
-identificar por su forma es un ancla gratis. Ese código ya existe y ya calcula la firma.
+**The idea that makes this valuable in the long run: the key is the SHAPE, not the three letters.** Ankama
+renames the opcodes in some patches. If the registry is stored by `jxw`, all the accumulated
+knowledge evaporates on patch day. Stored by shape signature, **it survives**, and in fact it
+becomes one more input for `protocolbuilder`'s matcher: a message we already know how to
+identify by its shape is a free anchor. That code already exists and already computes the signature.
 
-Y comparar en vivo contra una captura real: coger un opcode nuestro y el mismo de las capturas y
-enseñarlos campo a campo. Es exactamente lo que se ha hecho a mano cinco veces esta semana.
+And comparing live against a real capture: taking one of our opcodes and the same one from the captures and
+showing them field by field. It is exactly what has been done by hand five times this week.
 
-### 5.2 Mapas y casillas
+### 5.2 Maps and cells
 
-**Ya hay.** `MapGeometry` con la retícula, los vecinos y las distancias precalculadas.
-`datos/map_walkable_cells.json` con 17.211 mapas, `map_fight_cells.json` con 17.222,
-`map_neighbours.json` con las conexiones. `MapManager` los sirve.
+**There already is.** `MapGeometry` with the grid, the neighbours and the precomputed distances.
+`datos/map_walkable_cells.json` with 17,211 maps, `map_fight_cells.json` with 17,222,
+`map_neighbours.json` with the connections. `MapManager` serves them.
 
-**Falta.** Pintar. Cuatro capas independientes sobre la misma retícula —pisable, visión, bloqueada
-en combate, bloqueada fuera de combate—, clic para alternar y arrastre para pintar una tirada. Y
-saltar a los cuatro vecinos, que es como se recorre el mundo de verdad.
+**Missing.** Painting. Four independent layers over the same grid —walkable, line of sight, blocked
+in fights, blocked outside fights—, click to toggle and drag to paint a run. And
+jumping to the four neighbours, which is how the world is really walked.
 
-**Aviso**: el decorado —los 2.181 elementos de un mapa, cada uno con su gráfico y su matriz— es un
-módulo aparte y mucho más caro. **No entra en la primera versión.** Se puede ver sin poder editarlo.
+**Warning**: the scenery —a map's 2,181 elements, each one with its graphic and its matrix— is a
+separate module and much more expensive. **It does not go into the first version.** It can be seen without being editable.
 
-### 5.3 Interactivos y teleports
+### 5.3 Interactives and teleports
 
-Éste es, con diferencia, **el de mayor valor por hora invertida**, y el que el propio emulador está
-pidiendo a gritos: hoy declaramos los 3.719 pasajes con la habilidad del zaap (114) y tipo 0,
-cuando el servidor real usa 184, 339 y 361 con sus propios tipos; y 1.010 de 1.124 pasajes que
-faltan se descartan por no tener elemento de vuelta.
+This is, by far, **the one with the most value per hour invested**, and the one the emulator itself is
+crying out for: today we declare the 3,719 passages with the zaap skill (114) and type 0,
+when the real server uses 184, 339 and 361 with their own types; and 1,010 of the 1,124 missing passages
+are discarded for not having a return element.
 
-**Ya hay.** La tabla `InteractiveTeleports` con 3.815 filas, `TeleportManager`,
-`datos/interactive_elements.json` con 9.840 mapas, `datos/tipos_interactivos_3.6.10.10.json`, y dos
-catálogos de grafo de navegación.
+**There already is.** The `InteractiveTeleports` table with 3,815 rows, `TeleportManager`,
+`datos/interactive_elements.json` with 9,840 maps, `datos/tipos_interactivos_3.6.10.10.json`, and two
+navigation graph catalogues.
 
-**Falta.** Una vista de dos mapas lado a lado: elegir una casilla en uno, otra en el otro, elegir el
-tipo y la habilidad, y **atarlos** — con la vuelta creada automáticamente, que es justo lo que falta
-en los 1.010 descartados. Ésa es la pieza que hace posibles las casas con interior propio, los
-pasajes nuevos y cualquier contenido personalizado que no exista en el mapa de Ankama.
+**Missing.** A view of two maps side by side: pick a cell on one, another on the other, pick the
+type and the skill, and **tie them** — with the return created automatically, which is exactly what is missing
+in the 1,010 discarded. That is the piece that makes possible houses with their own interior, new
+passages and any custom content that does not exist on Ankama's map.
 
-### 5.4 NPCs, acciones y diálogos
+### 5.4 NPCs, actions and dialogs
 
-**Ya hay.** 6.468 plantillas, 422 colocados donde los tiene Ankama en 202 mapas con casilla y
-orientación de las capturas, `Npcs.cs`, `Vendors.cs`, `TokenShops.cs`, y `datos/npc_shops.json`.
+**There already is.** 6,468 templates, 422 placed where Ankama has them on 202 maps with the cell and
+direction from the captures, `Npcs.cs`, `Vendors.cs`, `TokenShops.cs`, and `datos/npc_shops.json`.
 
-**Falta.** Colocar uno nuevo con el ratón. Cambiarle la acción — y ahí hay algo que ya se aprendió
-en este proyecto: **un mismo NPC se puede spawnear con acciones distintas**, así que la acción es
-del *spawn*, no de la plantilla, y el modelo de datos tiene que reflejarlo.
+**Missing.** Placing a new one with the mouse. Changing its action — and there is something already learnt
+in this project there: **the same NPC can be spawned with different actions**, so the action belongs
+to the *spawn*, not to the template, and the data model has to reflect it.
 
-Y los diálogos, que tienen un matiz importante y que la propia herramienta rival señala bien: **el
-cliente guarda todas las frases que un NPC puede decir y todas las respuestas que se le pueden dar,
-pero nunca cuál va con cuál.** Ese emparejamiento siempre ha sido del servidor. Es decir: el editor
-de diálogos no es un lujo, es el único sitio donde ese dato puede existir.
+And the dialogs, which have an important nuance that the rival tool itself points out well: **the
+client keeps every line an NPC can say and every answer that can be given to it,
+but never which goes with which.** That pairing has always belonged to the server. That is: the dialog
+editor is not a luxury, it is the only place where that data can exist.
 
-Además, **la frase de apertura es por mapa**: el mismo personaje en dos sitios no tiene por qué
-decir lo mismo.
+Besides, **the opening line is per map**: the same character in two places need not
+say the same.
 
-### 5.5 Misiones
+### 5.5 Quests
 
-**Ya hay.** Los catálogos: `quests.json`, `quest_steps.json`, `quest_objectives.json`,
+**There already is.** The catalogues: `quests.json`, `quest_steps.json`, `quest_objectives.json`,
 `quest_objective_types.json`, `quest_step_rewards.json`, `quest_categories.json`.
 
-**Falta.** Todo lo demás. No hay ni motor de misiones ni tabla de progreso por personaje. Esto **no
-es un módulo del editor, es una funcionalidad del servidor** que además necesita editor. Es el
-apartado más caro de la lista y conviene tratarlo como proyecto propio, no como una pestaña más.
+**Missing.** Everything else. There is neither a quest engine nor a per-character progress table. This **is not
+an editor module, it is a server feature** that also needs an editor. It is the
+most expensive item on the list and it is better treated as a project of its own, not as one more tab.
 
-### 5.6 Hechizos y efectos
+### 5.6 Spells and effects
 
-**Ya hay.** 17.113 hechizos, 34.823 niveles, `SpellLevels.EffectsJson`, el catálogo de efectos, y un
-motor que no tiene ni un hechizo escrito a mano: todo sale de los datos.
+**There already is.** 17,113 spells, 34,823 levels, `SpellLevels.EffectsJson`, the effects catalogue, and an
+engine that does not have a single hand-written spell: everything comes from the data.
 
-**Falta.** Editar el `EffectsJson` con una interfaz en vez de a mano, y —lo realmente útil— una
-vista que diga **qué efectos sabe aplicar el motor y cuáles caen en la rama de «sólo para el
-panel»**. Hoy eso sólo se sabe leyendo `EffectEngine.cs`, y es la información que decide si un
-hechizo funciona de verdad. El efecto 108, la curación, es el ejemplo: parece que funciona y no cura
-a nadie.
+**Missing.** Editing `EffectsJson` with an interface instead of by hand, and —the really useful part— a
+view that says **which effects the engine knows how to apply and which fall into the «only for the
+panel» branch**. Today that is only known by reading `EffectEngine.cs`, and it is the information that decides whether a
+spell really works. Effect 108, healing, is the example: it seems to work and heals
+nobody.
 
-Un simulador —lanzar un hechizo contra un objetivo de prueba y ver las consecuencias sin montar un
-combate— vale más que el propio editor.
+A simulator —casting a spell at a test target and seeing the consequences without setting up a
+fight— is worth more than the editor itself.
 
-### 5.7 Monstruos y grupos
+### 5.7 Monsters and groups
 
-**Ya hay.** 5.134 monstruos, 38.744 grupos colocados, respawn, validación de radio 2 al aparecer.
+**There already is.** 5,134 monsters, 38,744 placed groups, respawn, radius-2 validation on appearing.
 
-**Falta.** Colocar un grupo a mano en un mapa concreto y elegir sus miembros. Y algo que la
-medición de esta semana dejó claro: una vista de **qué monstruos no pueden hacer nada** —los 401 sin
-hechizos, y los que tienen todo su arsenal fuera de alcance— porque son bugs de contenido que no se
-ven jugando hasta que te toca uno.
-
----
-
-## 6. El lanzador
-
-Va aparte. Hoy es WinForms dibujado a mano, sólo Windows, y hace su trabajo: cadena de identidad por
-cliente, ocho cuentas, registro embebido, tres idiomas.
-
-Qué significaría «más profesional», en concreto y por orden de valor:
-
-1. **Multiplataforma.** Hoy no arranca fuera de Windows.
-2. **Actualización automática.** Hoy se distribuye a mano.
-3. **Clasificación y estado del mundo** — cuánta gente hay conectada, quién va primero. Datos que el
-   servidor ya tiene y no expone.
-4. **Noticias o parte del servidor**, para contar qué ha cambiado sin escribirlo por Discord.
-5. **Gestión de cuentas** decente: recuperación, cambio de contraseña, roles.
-
-Con Avalonia decidido para el editor, el lanzador **hereda el armazón**: los mismos controles, el
-mismo tema, el mismo modelo de ventana. Portarlo deja de ser un proyecto y pasa a ser una tarde,
-porque lo difícil —la cadena de identidad, el arranque de ocho clientes, el registro embebido— ya
-está escrito y no es código de interfaz.
-
-Y resuelve el punto 1 de la lista de arriba de golpe: Avalonia corre en macOS y en Linux.
-
-**No es urgente.** El lanzador actual funciona; el editor no existe. Va el último, pero cuando
-llegue será barato.
+**Missing.** Placing a group by hand on a specific map and picking its members. And something this week's
+measurement made clear: a view of **which monsters cannot do anything** —the 401 without
+spells, and the ones with their whole arsenal out of range— because they are content bugs that are not
+seen while playing until you get one.
 
 ---
 
-## 7. Por dónde empezar
+## 6. The launcher
 
-Ordenado por *lo que desbloquea*, no por lo que apetece.
+It goes separately. Today it is hand-drawn WinForms, Windows only, and it does its job: identity chain per
+client, eight accounts, embedded log, three languages.
 
-| Fase | Qué | Por qué ahí |
+What «more professional» would mean, specifically and in order of value:
+
+1. **Cross-platform.** Today it does not start outside Windows.
+2. **Automatic updates.** Today it is distributed by hand.
+3. **Ranking and world status** — how many people are connected, who is first. Data the
+   server already has and does not expose.
+4. **News or server bulletin**, to tell what has changed without writing it on Discord.
+5. **Decent account management**: recovery, password change, roles.
+
+With Avalonia decided for the editor, the launcher **inherits the framework**: the same controls, the
+same theme, the same window model. Porting it stops being a project and becomes an afternoon,
+because the hard part —the identity chain, starting eight clients, the embedded log— is already
+written and is not interface code.
+
+And it settles point 1 of the list above in one go: Avalonia runs on macOS and Linux.
+
+**It is not urgent.** The current launcher works; the editor does not exist. It goes last, but when it
+comes it will be cheap.
+
+---
+
+## 7. Where to start
+
+Ordered by *what it unblocks*, not by what one feels like doing.
+
+| Phase | What | Why there |
 |---|---|---|
-| **0** ✅ | La capa de contenido y la procedencia por fila. Sin interfaz: sólo el cargador que fusiona las tres capas y un par de ficheros de ejemplo escritos a mano. | Nada de lo demás se puede guardar hasta que esto exista. Si se hace después, hay que reescribir todos los módulos. |
-| **1** ✅ | El armazón y vistas de **sólo lectura** de mapas y NPCs. | Riesgo cero, valor inmediato: hoy para ver por qué un bicho no ataca hay que escribir un script de Python. Y valida el armazón antes de dejarle escribir nada. |
-| **2** ✅ | Tráfico en vivo y registro de desconocidos por forma. | Reutiliza lo que ya existe y es lo que más acelera el trabajo del día a día. |
-| **3** ✅ | Escritura: spawns de NPC, diálogos, grupos de monstruos. Las acciones, no: ver abajo. | El contenido más barato de crear y el que más se nota jugando. |
-| **4** ✅ | Interactivos y teleports, con la vuelta automática. | Desbloquea casas y contenido propio. Podría adelantarse si eso pesa más. |
-| **5** ✅ | Casillas de mapa. | Útil, pero sólo cuando ya haya contenido que colocar encima. |
-| **6** ✅ | Hechizos, con el simulador. | |
-| **7** | Misiones. | Proyecto propio: necesita motor de servidor, no sólo editor. |
-| **8** | Lanzador. | |
+| **0** ✅ | The content layer and per-row provenance. No interface: only the loader that merges the three layers and a couple of example files written by hand. | Nothing else can be saved until this exists. If done afterwards, every module has to be rewritten. |
+| **1** ✅ | The framework and **read-only** views of maps and NPCs. | Zero risk, immediate value: today, to see why a creature does not attack, a Python script has to be written. And it validates the framework before letting it write anything. |
+| **2** ✅ | Live traffic and the unknowns registry by shape. | It reuses what already exists and it is what speeds up day-to-day work the most. |
+| **3** ✅ | Writing: NPC spawns, dialogs, monster groups. Not the actions: see below. | The cheapest content to create and the one most noticed while playing. |
+| **4** ✅ | Interactives and teleports, with the automatic return. | Unblocks houses and custom content. It could be brought forward if that weighs more. |
+| **5** ✅ | Map cells. | Useful, but only once there is content to place on top. |
+| **6** ✅ | Spells, with the simulator. | |
+| **7** | Quests. | A project of its own: it needs a server engine, not just an editor. |
+| **8** | Launcher. | |
 
 ---
 
-## 7 bis. Lo que la fase 2 enseñó
+## 7 bis. What phase 2 taught
 
-Tres cosas que este documento daba por buenas y no lo eran.
+Three things this document took as good and were not.
 
-### El registro de desconocidos llevaba meses sin apuntar nada
+### The unknowns registry had not noted anything down for months
 
-El apartado 5.1 decía «`Network/UnknownPackets.cs` ya deduplica lo desconocido por firma de forma».
-Deduplicaba, sí, pero sobre nada: abría el sobre con `ExtractGameNodePayload`, que **sólo mira el
-campo 3 de la raíz**, y con `GetMessageTypeUrl`, que mira el 1 y el 3. Las tramas del cliente van en
-el campo **2**. Medido sobre las 72.879 tramas del registro de tráfico:
+Section 5.1 said «`Network/UnknownPackets.cs` already deduplicates the unknown by shape signature».
+It deduplicated, yes, but over nothing: it opened the envelope with `ExtractGameNodePayload`, which **only looks at
+the root's field 3**, and with `GetMessageTypeUrl`, which looks at 1 and 3. The client's frames go in
+field **2**. Measured over the 72,879 frames of the traffic log:
 
 ```
-  raíz 1 → 1 → 1     56.073   el servidor diciendo algo
-  raíz 2 → 1 → 1      8.974   el cliente pidiendo
-  raíz 3 → 1 → 1        481   el servidor contestando
-  raíz 1, suelto      4.605   un Any registrado sin su sobre exterior
-  raíz 1 → 1             41   lo mismo, una capa más abajo
+  root 1 → 1 → 1     56,073   the server saying something
+  root 2 → 1 → 1      8,974   the client asking
+  root 3 → 1 → 1        481   the server answering
+  root 1, loose       4,605   an Any recorded without its outer envelope
+  root 1 → 1             41   the same, one layer further down
 ```
 
-Así que cada paquete que pasaba por ahí entraba sin opcode y con el cuerpo vacío. Después de semanas
-de juego la tabla tenía **dos filas, las dos «(sin opcode)» sobre un cuerpo vacío**. El despachador
-no se enteró nunca porque él busca los opcodes como *texto* dentro de la trama, y eso funciona sea
-cual sea el sobre.
+So every packet going through there came in without an opcode and with an empty body. After weeks
+of play the table had **two rows, both «(sin opcode)» over an empty body**. The dispatcher
+never noticed because it looks for the opcodes as *text* inside the frame, and that works whatever
+the envelope.
 
-La lección no es el fallo, es cómo se escondió: la única prueba que había era que el código hacía lo
-que estaba escrito. Ahora hay cinco que corren contra el fichero de tráfico de verdad, y una de
-ellas comprueba las dos direcciones por separado, que es justo lo que una cuenta total tapaba.
+The lesson is not the bug, it is how it hid: the only test there was checked that the code did
+what was written. Now there are five that run against the real traffic file, and one of
+them checks the two directions separately, which is exactly what a total count covered up.
 
-### La clave no puede ser sólo la forma
+### The key cannot be only the shape
 
-El apartado 5.1 decía «la clave es la FORMA, no las tres letras». Medido, no se sostiene tal cual.
-Sobre las mismas 72.879 tramas: **834 parejas (opcode, forma)** entre **242 opcodes** y **664
-formas**.
+Section 5.1 said «the key is the SHAPE, not the three letters». Measured, it does not hold as is.
+Over the same 72,879 frames: **834 (opcode, shape) pairs** across **242 opcodes** and **664
+shapes**.
 
-- **Sólo con la forma no vale.** Nada más 10 de las 664 formas las comparten varios opcodes — pero
-  son las triviales (`(empty)`, `1:v`, `1:v,2:v`…) y entre ellas se llevan **180 de los 242
-  opcodes**. Archivar por forma volcaría media protocolo en diez cajones.
-- **Sólo con el opcode tampoco.** **59 de los 242** aparecen con más de una forma, y `jss` solo
-  tiene **185**. Archivar por opcode escondería justo la variedad que se abre la lista para ver.
+- **Shape alone will not do.** Only 10 of the 664 shapes are shared by several opcodes — but
+  they are the trivial ones (`(empty)`, `1:v`, `1:v,2:v`…) and between them they take **180 of the 242
+  opcodes**. Filing by shape would dump half the protocol into ten drawers.
+- **Opcode alone will not do either.** **59 of the 242** appear with more than one shape, and `jss` alone
+  has **185**. Filing by opcode would hide exactly the variety the list is opened to see.
 
-La clave es **opcode + forma**. Lo que la forma hace de verdad es *sobrevivir al parche*, pero no
-siendo la clave: cuando Ankama rota los nombres, el emparejador estructural de `protocolbuilder`
-saca la tabla de viejo a nuevo —de ahí salió `datos/mapeo_3.6.10.10_a_3.6.10.11.tsv`— y las claves
-se reescriben con ella. Que una forma cuadre a los dos lados es lo que hace fiable ese mapeo.
+The key is **opcode + shape**. What the shape really does is *survive the patch*, but not by
+being the key: when Ankama rotates the names, `protocolbuilder`'s structural matcher
+produces the old-to-new table —that is where `datos/mapeo_3.6.10.10_a_3.6.10.11.tsv` came from— and the keys
+are rewritten with it. A shape matching on both sides is what makes that mapping reliable.
 
-Y hay una válvula: forma `*` significa «esto es sobre el opcode, lleve lo que lleve», que es la
-manera sensata de decir algo sobre las 185 formas de `jss` de una vez.
+And there is a valve: shape `*` means «this is about the opcode, whatever it carries», which is the
+sensible way of saying something about the 185 shapes of `jss` at once.
 
-### El grifo de tramas por HTTP no hacía falta
+### The HTTP frame tap was not needed
 
-El apartado 5.1 pedía «un grifo en el proxy que emita cada trama por *server-sent events*». Es la
-respuesta correcta cuando quien mira es un navegador. Aquí no lo es: el servidor **ya escribe todas
-las tramas** en `logs/gameserver_traffic.log` —de ahí salen los 110 MB—, así que el grifo sería una
-segunda copia de los mismos bytes, más un socket que asegurar, más un protocolo que mantener a
-juego, más depender de que el servidor esté levantado.
+Section 5.1 asked for «a tap in the proxy that emits each frame as *server-sent events*». It is the
+right answer when the one looking is a browser. Here it is not: the server **already writes every
+frame** to `logs/gameserver_traffic.log` —that is where the 110 MB come from—, so the tap would be a
+second copy of the same bytes, plus a socket to secure, plus a protocol to keep in
+step, plus depending on the server being up.
 
-Leer el fichero da tres cosas gratis que el grifo no tiene: **funciona con el servidor parado**,
-**puede mirar lo que pasó antes de abrir el editor**, y **no añade superficie**. Lo que cuesta es un
-sondeo en vez de un empujón, que para una persona leyendo una lista da igual.
+Reading the file gives three things for free that the tap does not have: **it works with the server stopped**,
+**it can look at what happened before the editor was opened**, and **it adds no surface**. What it costs is
+polling instead of a push, which for a person reading a list makes no difference.
 
-Detalle medido y necesario: el registro se escribe desde dos sitios que no se ponen de acuerdo.
-**27.565 de las 72.879 filas llevan prefijo de longitud** y el resto no. Leer sólo una de las dos
-formas tira un tercio del fichero.
+A measured and necessary detail: the log is written from two places that do not agree.
+**27,565 of the 72,879 rows carry a length prefix** and the rest do not. Reading only one of the two
+forms throws away a third of the file.
 
 ---
 
-## 7 ter. Lo que la fase 3 enseñó
+## 7 ter. What phase 3 taught
 
-### Los textos SÍ se pueden leer, y eso cambia el editor de diálogos
+### The texts CAN be read, and that changes the dialog editor
 
-El apartado 5.4 daba por hecho que un editor de diálogos trabajaría con números. Con números no
-sirve: nadie puede decidir que la respuesta 6016 va debajo de la frase 3312 sin leer ninguna de las
-dos. Resulta que el texto está a mano, por dos caminos distintos porque Ankama guarda las dos
-mitades de forma distinta:
+Section 5.4 took for granted that a dialog editor would work with numbers. With numbers it is of
+no use: nobody can decide that answer 6016 goes under line 3312 without reading either of the
+two. It turns out the text is at hand, by two different paths because Ankama keeps the two
+halves differently:
 
 ```
-  una respuesta   dialogReplies [6016, 23739]  ->  Translations[23739]  ->  "Informarse sobre..."
-  una frase       dialogData    messageId 6169 ->  NpcMessagesDataRoot  ->  Translations[...]
+  an answer   dialogReplies [6016, 23739]  ->  Translations[23739]  ->  "Informarse sobre..."
+  a line      dialogData    messageId 6169 ->  NpcMessagesDataRoot  ->  Translations[...]
 ```
 
-`world.db` ya lleva **339.175 traducciones** en la tabla `Translations`. La respuesta trae su clave
-al lado del id y se resuelve sola. La frase no: su `messageId` es un id de `NpcMessageData`, y hace
-falta pasar por `NpcMessagesDataRoot`, que son 16,8 MB del volcado. `tools/extraer_dialogos_npc.py`
-lo destila a **55.037 parejas, 1 MB**, que sí se puede repartir.
+`world.db` already carries **339,175 translations** in the `Translations` table. The answer carries its key
+next to the id and resolves on its own. The line does not: its `messageId` is a `NpcMessageData` id, and it
+has to go through `NpcMessagesDataRoot`, which is 16.8 MB of the dump. `tools/extraer_dialogos_npc.py`
+distils it to **55,037 pairs, 1 MB**, which can be handed out.
 
-Con eso, Snori Nairb deja de ser «3 mensajes y 39 respuestas» y pasa a ser una lista legible:
-*«¡Alto ahí! Yo soy el que vigila esta ciudad...»* con *«¿Qué puedes contarme del conflicto entre
-Bonta y Brakmar?»* debajo. Ahí ya se puede decidir.
+With that, Snori Nairb stops being «3 messages and 39 answers» and becomes a readable list:
+*«¡Alto ahí! Yo soy el que vigila esta ciudad...»* with *«¿Qué puedes contarme del conflicto entre
+Bonta y Brakmar?»* under it. Now it can be decided.
 
-### El árbol necesitaba estado de sesión, no sólo un fichero
+### The tree needed session state, not just a file
 
-El `ioy` con el que el cliente elige una respuesta trae **el id de la respuesta y nada más**: ni de
-qué NPC viene ni de qué frase. Sin apuntar por dónde va la conversación no hay manera de saber a
-qué línea lleva, y por eso el diálogo sólo podía tener una frase por mucho árbol que hubiera
-escrito.
+The `ioy` with which the client picks an answer carries **the answer's id and nothing else**: neither which
+NPC it comes from nor which line. Without noting down where the conversation is, there is no way of knowing which
+line it leads to, and that is why the dialog could only have one line however much tree had been
+written.
 
-Va en el estado de sesión y no en un estático: con ocho clientes a la vez, un estático haría que la
-respuesta de un jugador avanzara la conversación de otro.
+It goes in the session state and not in a static: with eight clients at once, a static would make one
+player's answer advance another's conversation.
 
-### Las acciones por spawn no son lo que este documento decía
+### Per-spawn actions are not what this document said
 
-El apartado 5.4 sostenía que «un mismo NPC se puede spawnear con acciones distintas, así que la
-acción es del *spawn*». Medido contra el cable, eso **no se puede hacer desde el servidor tal cual
-está**: el menú del botón derecho lo pinta el cliente con el `actions[]` de la *plantilla*, y el
-`f1` del `iov` es uno de esos números —cuadra en los 51 NPCs de tienda de la captura, 51 de 51—.
-Un NPC que no declare la acción ni siquiera la ofrece.
+Section 5.4 held that «the same NPC can be spawned with different actions, so the
+action belongs to the *spawn*». Measured against the wire, that **cannot be done from the server as it
+is**: the right-click menu is painted by the client with the *template*'s `actions[]`, and the
+`iov`'s `f1` is one of those numbers —it matches in the capture's 51 shop NPCs, 51 of 51—.
+An NPC that does not declare the action does not even offer it.
 
-O sea que una acción por spawn sólo puede **quitar** de lo que la plantilla ya declara, no añadir.
-Añadir requeriría que la carga de mapa llevara acciones por actor, y eso hay que medirlo en una
-captura antes de escribir una línea. Queda pendiente y marcado como tal, en vez de implementado a
-medias.
+So a per-spawn action can only **remove** from what the template already declares, not add.
+Adding would require the map load to carry per-actor actions, and that has to be measured in a
+capture before writing a line. It is left pending and marked as such, instead of half
+implemented.
 
-### Los grupos de monstruos: dos números, no la resta
+### Monster groups: two numbers, not the difference
 
-Detalle pequeño y real. El arranque decía «N grupos de content/» con la resta de puestos menos
-quitados, y en la primera prueba de verdad —un grupo puesto y otro quitado— la resta dio cero y la
-línea no salió. Justo el arranque en el que más falta hace ver que `content/` ha tocado algo.
+A small and real detail. Startup said «N groups from content/» with placed minus
+removed, and in the first real test —one group placed and another removed— the difference came out zero and the
+line did not show. Exactly the startup where it is most needed to see that `content/` has touched something.
 
 ---
 
-## 8. Riesgos, y qué los desactiva
+## 8. Risks, and what defuses them
 
-| Riesgo | Qué lo desactiva |
+| Risk | What defuses it |
 |---|---|
-| Una regeneración borra el trabajo a mano | La capa nuestra nunca se regenera, y guarda deltas |
-| `world.db` se convierte en el sitio donde se edita | Regla explícita: el editor **no escribe en `world.db`** |
-| Se mezcla lo medido con lo inventado | Procedencia por fila, visible en la interfaz, no en un comentario |
-| El editor queda expuesto | Localhost, testigo, apagado por defecto, guardia de regresión |
-| El registro de opcodes muere en el próximo parche | Clave por **forma**, no por las tres letras |
-| El editor se vuelve un segundo emulador | Sólo lee el estado del servidor; no reimplementa reglas de juego |
-| Dos personas editan a la vez | Fuera de alcance: un solo usuario, y git resuelve los choques |
-| Se empieza por lo vistoso —el decorado, el mapa— y se abandona | La fase 0 y la 1 no tienen nada vistoso, y son las que sostienen el resto |
+| A regeneration wipes the hand work | Our layer is never regenerated, and it stores deltas |
+| `world.db` becomes the place where things are edited | Explicit rule: the editor **does not write to `world.db`** |
+| The measured gets mixed with the invented | Per-row provenance, visible in the interface, not in a comment |
+| The editor is left exposed | Localhost, token, off by default, regression guard |
+| The opcode registry dies with the next patch | Keyed by **shape**, not by the three letters |
+| The editor becomes a second emulator | It only reads the server's state; it does not reimplement game rules |
+| Two people edit at once | Out of scope: a single user, and git resolves the clashes |
+| One starts with the flashy part —the scenery, the map— and abandons it | Phases 0 and 1 have nothing flashy, and they are the ones holding up the rest |
 
 ---
 
-## 9. Lo que NO debe hacer
+## 9. What it must NOT do
 
-- **No reimplementar el catálogo del cliente.** Los 21.748 objetos, los 17.113 hechizos y los 5.134
-  monstruos son de Ankama y se leen. El editor edita **decisiones**, no hechos.
-- **No convertirse en un panel de administración del juego en marcha** —dar kamas, teletransportar
-  jugadores—. Eso son comandos, ya existen, y mezclarlo hace del editor un blanco.
-- **No sustituir a `tools/`.** Los scripts de Python que extraen del volcado del cliente siguen
-  siendo la forma de rehacer la capa base. El editor es la capa de encima.
-- **No inventar datos que se pueden medir.** Si algo está en las capturas, se mide; el editor es para
-  lo que Ankama no dice.
+- **Not reimplement the client's catalogue.** The 21,748 items, the 17,113 spells and the 5,134
+  monsters are Ankama's and are read. The editor edits **decisions**, not facts.
+- **Not become an admin panel for the running game** —giving kamas, teleporting
+  players—. Those are commands, they already exist, and mixing them in makes the editor a target.
+- **Not replace `tools/`.** The Python scripts that extract from the client dump are still
+  the way to redo the base layer. The editor is the layer on top.
+- **Not make up data that can be measured.** If something is in the captures, it is measured; the editor is for
+  what Ankama does not say.
 
 ---
 
-## 10. Lo que hay que decidir antes de escribir código
+## 10. What has to be decided before writing code
 
-1. ~~¿Web local o Avalonia?~~ **Avalonia**, por los tipos compartidos. Lo único que lo giraría:
-   querer abrir el editor desde otra máquina, o pasárselo a alguien sin instalarle nada.
-2. ~~¿El lanzador comparte armazón?~~ **Sí**, se cae solo de la decisión anterior.
-3. **¿La capa de contenido en JSON versionado o en una `estudio.db`?** La recomendación es JSON, por
-   las pull requests.
-4. **¿Interactivos antes que NPCs?** Depende de si pesa más poder construir casas o poblar el mundo.
-5. **¿Las misiones entran en este proyecto o son otro?** Aquí se sostiene que son otro.
+1. ~~Local web or Avalonia?~~ **Avalonia**, because of the shared types. The only thing that would turn it:
+   wanting to open the editor from another machine, or handing it to someone without installing anything.
+2. ~~Does the launcher share the framework?~~ **Yes**, it falls out of the previous decision.
+3. **The content layer in versioned JSON or in a `studio.db`?** The recommendation is JSON, because of
+   the pull requests.
+4. **Interactives before NPCs?** It depends on whether being able to build houses or populating the world weighs more.
+5. **Do quests go into this project or are they another one?** Here it is held that they are another one.

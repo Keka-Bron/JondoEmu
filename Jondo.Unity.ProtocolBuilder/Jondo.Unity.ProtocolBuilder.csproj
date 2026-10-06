@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- La línea de comandos. Conserva carpeta, nombre y AssemblyName a propósito: la
-         documentación cita trece órdenes que empiezan por «dotnet run» con este proyecto, y
-         siguen valiendo letra por letra. Lo que se ha ido a Jondo.Unity.Reversing es el dominio;
-         aquí sólo queda la fachada. -->
+    <!-- The command line. It keeps folder, name and AssemblyName on purpose: the
+         documentation cites thirteen commands starting with «dotnet run» with this project, and
+         they still hold letter for letter. What went to Jondo.Unity.Reversing is the domain;
+         only the façade is left here. -->
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Jondo.Unity.ProtocolBuilder</RootNamespace>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Program.cs lee FileDescriptorSet para el comando «volcar», que es el camino muerto del §3.1. -->
+    <!-- Program.cs reads FileDescriptorSet for the «volcar» command, which is the dead path of §3.1. -->
     <PackageReference Include="Google.Protobuf" Version="3.35.1" />
   </ItemGroup>
 

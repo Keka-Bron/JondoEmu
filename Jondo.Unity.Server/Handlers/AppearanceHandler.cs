@@ -9,41 +9,41 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// La ventana de apariencias: ponerse y quitarse prendas cosméticas.
+    /// The appearance window: putting on and taking off cosmetic garments.
     ///
-    /// Funciona por BORRADOR, y eso es lo que hay que respetar para que se vea bien:
+    /// It works as a DRAFT, and that is what has to be respected for it to look right:
     ///
-    ///   cliente  lyk                    abre la ventana
-    ///   cliente  lyy { f1: uuid }       pide el estado         → servidor lxo
-    ///   cliente  lys { f1: objeto, f2: variante }              → servidor lxc + lwz { f1:1, f3: hueco }
-    ///   cliente  lyf { f2: objeto, f3: hueco }                 → servidor lxc + lyj { f3: 1 }
-    ///   cliente  lyf { f3: hueco }      quitar del hueco       → servidor lxc + lyj { f3: 1 }
-    ///   cliente  lxg { f1: hueco, f3: 1 }  ocultar             → servidor lxc + lxk { f1: 1 }
-    ///   cliente  lxs                    GUARDAR                → servidor jsn + kmb + lxc, y lyu
+    ///   client  lyk                     opens the window
+    ///   client  lyy { f1: uuid }        asks for the state       → server lxo
+    ///   client  lys { f1: item, f2: variant }                    → server lxc + lwz { f1:1, f3: slot }
+    ///   client  lyf { f2: item, f3: slot }                       → server lxc + lyj { f3: 1 }
+    ///   client  lyf { f3: slot }        take off the slot        → server lxc + lyj { f3: 1 }
+    ///   client  lxg { f1: slot, f3: 1 } hide                     → server lxc + lxk { f1: 1 }
+    ///   client  lxs                     SAVE                     → server jsn + kmb + lxc, and lyu
     ///
-    /// La diferencia entre los dos de poner: el `lys` deja que el servidor decida el hueco —y se lo
-    /// devuelve en el `lwz`— y admite variante, que es lo que usan los "objevivos" para imitar una
-    /// prenda u otra. El `lyf` dice el hueco directamente y no tiene variante.
+    /// The difference between the two ways of putting on: `lys` lets the server choose the slot --
+    /// and gives it back in the `lwz` -- and accepts a variant, which is what the "living items" use
+    /// to imitate one garment or another. `lyf` names the slot directly and has no variant.
     ///
-    /// Y lo importante: mientras se toquetea, el servidor manda SOLO `lxc`, que es la vista previa
-    /// del panel y no la ve nadie más. Hasta que no llega el `lxs` no salen el `jsn` ni el `kmb`,
-    /// que son los que enseñan el aspecto nuevo al resto del mapa. Comprobado en las catorce
-    /// capturas que acaban guardando.
+    /// And the important part: while it is being fiddled with, the server sends ONLY `lxc`, which is
+    /// the panel's preview and nobody else sees. Until the `lxs` arrives neither the `jsn` nor the
+    /// `kmb` go out, which are the ones that show the new look to the rest of the map. Checked in the
+    /// fourteen captures that end up saving.
     /// </summary>
     public static class AppearanceHandler
     {
-        /// <summary>El lyy trae un uuid de personaje; el lxo devuelve uno de vista previa.</summary>
+        /// <summary>The lyy carries a character uuid; the lxo returns a preview one.</summary>
         private static string DraftIdOf(long characterId)
             => ConnectionProtocol.LookIdOf(characterId * 31 + 7);
 
-        /// <summary>Abrir la ventana. El lyk va solo y no lleva respuesta propia.</summary>
+        /// <summary>Opening the window. The lyk comes alone and has no answer of its own.</summary>
         public static async Task OpenAsync(NetworkStream stream, long accountId)
         {
             await PreviewAsync(stream);
             await Task.CompletedTask;
         }
 
-        /// <summary>El estado completo de la ventana.</summary>
+        /// <summary>The window's whole state.</summary>
         public static async Task SendStateAsync(NetworkStream stream, byte[] frame)
         {
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
@@ -57,7 +57,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.RequestId(frame)));
         }
 
-        /// <summary>Ponerse una prenda dejando que el servidor resuelva el hueco.</summary>
+        /// <summary>Putting on a garment and letting the server work out the slot.</summary>
         public static async Task WearAsync(NetworkStream stream, byte[] frame)
         {
             byte[]? lys = ConnectionProtocol.ReadPayload(frame, Op.Lys);
@@ -88,7 +88,7 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Apariencias] Prenda {gid} (variante {variant}) al hueco {slot}.");
         }
 
-        /// <summary>Poner o quitar en un hueco concreto. Sin objeto, se vacía.</summary>
+        /// <summary>Putting on or taking off in a specific slot. With no item, it is emptied.</summary>
         public static async Task AssignAsync(NetworkStream stream, byte[] frame)
         {
             byte[]? lyf = ConnectionProtocol.ReadPayload(frame, Op.Lyf);
@@ -121,14 +121,14 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Enseñar u ocultar lo que hay en un hueco.
+        /// Showing or hiding what is in a slot.
         ///
-        ///   lxg { f1: hueco, f3: 1 }   ocultar
-        ///   lxg { f1: hueco }          enseñar
+        ///   lxg { f1: slot, f3: 1 }   hide
+        ///   lxg { f1: slot }          show
         ///
-        /// Sale de la captura de jugar con mostrar/ocultar: con el f3 puesto, la piel de ese hueco
-        /// desaparece de la lista del lxc siguiente; sin él, vuelve. La prenda no se quita, solo
-        /// deja de dibujarse.
+        /// It comes from the capture of playing with show/hide: with f3 set, that slot's skin
+        /// disappears from the next lxc's list; without it, it comes back. The garment is not taken
+        /// off, it just stops being drawn.
         /// </summary>
         public static async Task ToggleAsync(NetworkStream stream, byte[] frame)
         {
@@ -157,7 +157,7 @@ namespace Jondo.Unity.Server.Handlers
                                           ConnectionProtocol.RequestId(frame)));
         }
 
-        /// <summary>El aura, que es una subentidad del enganche 6.</summary>
+        /// <summary>The aura, which is a subentity of attachment 6.</summary>
         public static async Task AuraAsync(NetworkStream stream, byte[] frame)
         {
             byte[]? lxw = ConnectionProtocol.ReadPayload(frame, Op.Lxw);
@@ -182,8 +182,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// La vista previa: solo el lxc, que es lo que ve el panel. Nadie más se entera hasta que
-        /// se guarda.
+        /// The preview: only the lxc, which is what the panel sees. Nobody else finds out until it is
+        /// saved.
         /// </summary>
         private static async Task PreviewAsync(NetworkStream stream)
         {
@@ -195,8 +195,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Guardar: aquí es donde el aspecto sale al mundo. El título y el ornamento se guardan en
-        /// el mismo botón, así que esto llama también a lo suyo.
+        /// Saving: this is where the look goes out to the world. The title and the ornament are saved
+        /// with the same button, so this calls their part as well.
         /// </summary>
         public static async Task SaveAsync(NetworkStream stream, byte[] frame, long accountId)
         {
@@ -204,8 +204,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Un identificador para la prenda puesta. La ventana no manda uid de inventario —manda el
-        /// número de plantilla—, así que se compone uno con la variante dentro para no perderla.
+        /// An identifier for the garment worn. The window does not send an inventory uid -- it sends
+        /// the template number --, so one is composed with the variant inside so as not to lose it.
         /// </summary>
         private static long VariantUid(int gid, int variant) => gid * 1000L + variant;
     }

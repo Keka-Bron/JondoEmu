@@ -27,7 +27,7 @@ namespace Jondo.Unity.Tests.Combat
 
         private const int DanoAgua = 96, DanoTierra = 97, DanoAire = 98, DanoFuego = 99;
 
-        /// <summary>Las cuatro del tymador, de las diez que trae la tabla del cliente.</summary>
+        /// <summary>The Rogue's four, of the ten the client's table brings.</summary>
         private static readonly int[] DelTymador = { 3112, 3113, 3114, 5161 };
 
         private static Fighter Vivo(long id, int team, int cell) => new()
@@ -66,8 +66,8 @@ namespace Jondo.Unity.Tests.Combat
             var activar = Assert.Single(SpellEffects.De(Detonador, 3),
                 e => e.EffectId == EffectEngine.ActivarBomba);
 
-            // Sólo las CUATRO del tymador. La tabla del cliente trae diez bombas -- hay más
-            // por el mundo, de monstruos y de mazmorra -- y el Detonador nombra las suyas.
+            // Only the Rogue's FOUR. The client's table brings ten bombs -- there are more
+            // around the world, from monsters and dungeons -- and the Detonador names its own.
             foreach (int template in DelTymador)
             {
                 Assert.Contains("F" + template, activar.TargetMask);
@@ -82,7 +82,7 @@ namespace Jondo.Unity.Tests.Combat
             {
                 int explosion = Bombs.Explosion(template);
                 var efectos = SpellEffects.De(explosion, 3);
-                Assert.Contains(efectos, e => e.EffectId == 141);        // se mata sola
+                Assert.Contains(efectos, e => e.EffectId == 141);        // kills itself
                 Assert.Contains(efectos, e => e.Forma == Zone.Circulo && e.Tamano == 2);
                 // The explosion's own "activa una bomba" is the sheet's copy, for the client
                 // only, and is not read: the chain reaction is the queue behind the 1009 that
@@ -118,11 +118,11 @@ namespace Jondo.Unity.Tests.Combat
                                                EffectEngine.AlLanzar, fight.RoundNumber,
                                                celdaApuntada: bomba.CellId);
 
-            // La bomba lanza SU explosión y se muere en ella.
+            // The bomb casts ITS explosion and dies in it.
             Assert.Contains(salida, o => o.HechizoOrigen == ExplosionTymadora);
             Assert.Contains(salida, o => o.Fulmina && o.Sobre == bomba);
 
-            // Y quema a los dos que caen dentro del círculo, pero no al de fuera.
+            // And it burns the two who fall inside the circle, but not the one outside.
             var quemados = salida
                 .Where(o => o.Efecto.EffectId == DanoFuego && o.HechizoOrigen == ExplosionTymadora)
                 .Select(o => o.Sobre)
@@ -132,9 +132,9 @@ namespace Jondo.Unity.Tests.Combat
             foreach (var e in dentro) Assert.Contains(e, quemados);
             Assert.DoesNotContain(fuera, quemados);
 
-            // Y sale por el camino de daño ANIDADO, que es el que le manda al cliente la
-            // animación del lanzamiento desde la bomba. Por el camino de raíz el golpe se
-            // aplicaría igual pero nadie vería explotar nada.
+            // And it goes out through the NESTED damage path, which is the one that sends the client the
+            // cast animation from the bomb. Through the root path the hit would be
+            // applied all the same but nobody would see anything explode.
             Assert.All(salida.Where(o => o.Efecto.EffectId == DanoFuego),
                        o => Assert.True(o.NestedDamage, "el daño de la explosión no es anidado"));
             Assert.All(salida.Where(o => o.Efecto.EffectId == DanoFuego),
@@ -144,8 +144,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void A_bomb_never_goes_off_twice_in_the_same_chain()
         {
-            // Dos bombas a una casilla la una de la otra: cada explosión alcanza a la otra, y sin
-            // freno se encenderían la una a la otra hasta agotar la profundidad del motor.
+            // Two bombs one cell apart: each explosion reaches the other, and without a
+            // brake they would set each other off until the engine's depth ran out.
             int centro = 270;
             int vecina = ADistancia(centro, 1, 1)[0];
 
@@ -187,7 +187,7 @@ namespace Jondo.Unity.Tests.Combat
                                                EffectEngine.AlLanzar, fight.RoundNumber,
                                                celdaApuntada: celda);
 
-            // Ni una bomba puesta, y sí la explosión del objetivo.
+            // Not one bomb placed, and yet the target's explosion.
             Assert.DoesNotContain(salida, o => o.Invoca != 0);
             Assert.Contains(salida, o => o.HechizoOrigen == ExplosionAlObjetivo);
 
@@ -197,8 +197,8 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Contains(victima, quemados);
             Assert.Contains(alLado, quemados);
 
-            // Y el tymador sigue vivo: la explosión del objetivo NO lleva el 141 con máscara C
-            // que sí lleva la que se lanza a sí misma la bomba.
+            // And the Rogue is still alive: the target's explosion does NOT carry the 141 with mask C
+            // that the one the bomb casts on itself does carry.
             Assert.DoesNotContain(salida, o => o.Fulmina && o.Sobre == tymador);
         }
 
@@ -220,9 +220,9 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Detonating_one_bomb_of_a_wall_sets_off_the_whole_chain()
         {
-            // Cuatro bombas en fila, cada una a tres casillas de la anterior. Un muro coge tres
-            // como mucho, asi que hay dos muros y la tercera bomba esta en los dos: la cadena
-            // tiene que cruzar por ella y llegar a la cuarta.
+            // Four bombs in a row, each three cells from the previous one. A wall takes three
+            // at most, so there are two walls and the third bomb is in both: the chain
+            // has to cross through it and reach the fourth.
             var fight = new FightInstance(1, 1);
             var tymador = Vivo(10, team: 0, cell: 20);
             fight.AddPlayer(tymador);
@@ -242,7 +242,7 @@ namespace Jondo.Unity.Tests.Combat
                                                EffectEngine.AlLanzar, fight.RoundNumber,
                                                celdaApuntada: bombas[0].CellId);
 
-            // Las cuatro se han matado, y cada una UNA sola vez.
+            // All four have killed themselves, and each ONCE only.
             foreach (var bomba in bombas)
             {
                 Assert.Equal(1, salida.Count(o => o.Fulmina && o.Sobre == bomba));
@@ -252,8 +252,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void A_bomb_next_door_goes_off_even_without_a_wall()
         {
-            // Dos pegadas NO hacen muro -- hace falta dejar dos casillas -- pero el circulo de
-            // radio dos de la explosion se la lleva igual.
+            // Two side by side do NOT make a wall -- two cells have to be left -- but the explosion's
+            // radius-two circle takes it down all the same.
             var fight = new FightInstance(1, 1);
             var tymador = Vivo(10, team: 0, cell: 20);
             fight.AddPlayer(tymador);
@@ -311,7 +311,7 @@ namespace Jondo.Unity.Tests.Combat
             var tymador = Vivo(10, team: 0, cell: 300);
             var bicho = Vivo(-2, team: 1, cell: 270);
             bicho.IsMonster = true;
-            bicho.MonsterId = 8070;                 // un tofu, que no es bomba
+            bicho.MonsterId = 8070;                 // a tofu, which is not a bomb
             fight.AddPlayer(tymador);
             fight.AddMonster(bicho);
 

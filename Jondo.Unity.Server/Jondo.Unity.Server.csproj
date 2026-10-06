@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- La ventana del servidor: el registro y las cifras. Es SU ventana, no la del lanzador. -->
+    <!-- The server's window: the log and the figures. It is ITS window, not the launcher's. -->
     <UseWindowsForms>true</UseWindowsForms>
     <NoWarn>$(NoWarn);WFO1000</NoWarn>
   </PropertyGroup>
@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <!-- EL SERVIDOR. Una consola, no una ventana: desde que el lanzador es otro ejecutable, aqui
-         dentro no queda ni una linea de WinForms. -->
+    <!-- THE SERVER. A console, not a window: since the launcher is another executable, not a
+         single line of WinForms is left in here. -->
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <AssemblyName>Jondo Server</AssemblyName>
@@ -21,8 +21,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <ApplicationIcon>icono_servidor.ico</ApplicationIcon>
-    <!-- Un solo fichero: las doce dll (Google.Protobuf, Thrift, Sqlite y compania) se meten dentro
-         del .exe, y la nativa e_sqlite3.dll tambien. Sigue dependiendo del runtime de .NET 10. -->
+    <!-- A single file: the twelve dlls (Google.Protobuf, Thrift, Sqlite and company) are put inside
+         the .exe, and the native e_sqlite3.dll too. It still depends on the .NET 10 runtime. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
@@ -38,11 +38,11 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
-    <!-- Microsoft.Data.Sqlite 10.0.9 arrastra SQLitePCLRaw 2.1.11, y esa lleva dentro una SQLite
-         con CVE-2025-6965: gravedad alta, alcance «<= 2.1.11». No hay Microsoft.Data.Sqlite estable
-         mas nueva que la arregle —la 11.0.0 va por preview.7—, asi que se fija aqui el paquete de
-         abajo, que es lo que de verdad trae la biblioteca nativa. Cuando salga la 11 estable esto
-         se puede quitar y comprobar que NU1903 sigue sin aparecer. -->
+    <!-- Microsoft.Data.Sqlite 10.0.9 drags in SQLitePCLRaw 2.1.11, and that carries a SQLite
+         with CVE-2025-6965: high severity, range «<= 2.1.11». There is no newer stable Microsoft.Data.Sqlite
+         that fixes it —11.0.0 is at preview.7—, so the package
+         underneath is pinned here, which is what really brings the native library. When 11 stable comes out this
+         can be removed, checking that NU1903 still does not appear. -->
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
   </ItemGroup>
 
@@ -87,8 +87,8 @@
     <Message Text="[Tests] Green. Publishing." Importance="high" />
   </Target>
 
-  <!-- Auto-deploy: a la raiz solo el .exe. Si quedaba alguna dll suelta de una publicacion
-       anterior, se borra para que la carpeta no se quede a medias. -->
+  <!-- Auto-deploy: only the .exe to the root. If some loose dll was left from an earlier
+       publish, it is deleted so that the folder is not left half done. -->
   <Target Name="DeployServer" AfterTargets="Publish" Condition="'$(SkipRootDeploy)' != 'true'">
     <ItemGroup>
       <SueltasDeAntes Include="$(MSBuildProjectDirectory)\..\Google.Protobuf.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Thrift.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Microsoft.Data.Sqlite.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.core.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.provider.e_sqlite3.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.batteries_v2.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\System.Net.Http.WinHttpHandler.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\e_sqlite3.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Core.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Core.pdb;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.pdb;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.World.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.World.pdb" />

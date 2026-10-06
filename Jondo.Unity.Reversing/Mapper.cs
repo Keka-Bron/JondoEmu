@@ -3,66 +3,66 @@ using System.Text;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El mapeo de una versión a la siguiente: dos protocolos entran, una tabla sale.
+/// The mapping from one version to the next: two protocols go in, one table comes out.
 ///
-/// Es lo único que hace falta el día del parche. Le das el cliente que ya conocías y el que acaba
-/// de salir, y te dice qué mensaje es ahora cada uno de los que sabías, con lo que sabías de él.
+/// It is the only thing needed on patch day. You give it the client you already knew and the one just
+/// released, and it tells you which message each of the ones you knew now is, with what you knew about it.
 ///
-/// ─── Quién hace qué, y en qué orden ─────────────────────────────────────────────────────
+/// ─── Who does what, and in what order ───────────────────────────────────────────────────
 ///
-///   1. la estructura   compara las dos versiones por la forma de cada mensaje y por quién apunta
-///                      a quién. Resuelve el grueso y NO se equivoca: medido sobre 3.6.10.10 con
-///                      los nombres barajados, 1.481 aciertos y CERO fallos. Lo que no tiene claro
-///                      lo deja en duda en vez de adivinar.
-///   2. el significado  viaja solo. Si de `jsd` se sabía que saca un actor del mapa y la estructura
-///                      dice que ahora es `xyz`, entonces `xyz` saca un actor del mapa. No hay que
-///                      volver a averiguar nada.
-///   3. el modelo       sólo para las dudas, y sólo con la lista corta de candidatos delante. Un
-///                      mensaje ambiguo no es un misterio: es elegir entre tres o cinco que tienen
-///                      la misma forma. Ahí un modelo aporta lo que la estructura no ve —el
-///                      significado del viejo y las pistas del código del nuevo—; con dos mil
-///                      candidatos delante no aportaría más que ruido con formato.
+///   1. the structure   compares the two versions by each message's shape and by who points
+///                      to whom. It solves the bulk and does NOT get it wrong: measured on 3.6.10.10 with
+///                      the names shuffled, 1,481 hits and ZERO misses. What it is not sure of
+///                      it leaves in doubt instead of guessing.
+///   2. the meaning     travels on its own. If it was known of `jsd` that it removes an actor from the map and the structure
+///                      says it is now `xyz`, then `xyz` removes an actor from the map. Nothing has to be
+///                      found out again.
+///   3. the model       only for the doubts, and only with the short list of candidates in front. An
+///                      ambiguous message is not a mystery: it is choosing among three or five that have
+///                      the same shape. There a model contributes what the structure does not see —the
+///                      old one's meaning and the new one's code clues—; with two thousand
+///                      candidates in front it would contribute nothing but formatted noise.
 ///
-/// Lo que ni así se resuelve sale marcado como «a mano». Nunca inventado.
+/// What not even that resolves comes out marked as «by hand». Never invented.
 /// </summary>
 public sealed class Mapper
 {
-    /// <summary>De dónde ha salido cada pareja, que es lo que dice si uno se puede fiar.</summary>
+    /// <summary>Where each pair came from, which is what says whether one can trust it.</summary>
     public enum How
     {
-        /// <summary>La estructura lo resolvió sola. Es la buena.</summary>
+        /// <summary>The structure resolved it on its own. It is the good one.</summary>
         Structure,
 
-        /// <summary>Había varios candidatos y el modelo eligió.</summary>
+        /// <summary>There were several candidates and the model chose.</summary>
         Model,
 
-        /// <summary>Hay candidatos y nadie ha elegido todavía.</summary>
+        /// <summary>There are candidates and nobody has chosen yet.</summary>
         Doubt,
 
-        /// <summary>Ni siquiera hay candidatos: o es nuevo, o lo han retirado.</summary>
+        /// <summary>There are not even candidates: either it is new, or it has been withdrawn.</summary>
         Gone,
     }
 
-    /// <summary>Una línea del mapeo.</summary>
+    /// <summary>A line of the mapping.</summary>
     public sealed class Row
     {
         public required string Old { get; init; }
         public string New { get; set; } = "";
         public How How { get; set; }
 
-        /// <summary>Lo que se sabía del viejo, y que ahora vale para el nuevo.</summary>
+        /// <summary>What was known about the old one, and which now holds for the new one.</summary>
         public string Meaning { get; set; } = "";
 
-        /// <summary>El nombre que se le había puesto al viejo, si lo tenía.</summary>
+        /// <summary>The name the old one had been given, if it had one.</summary>
         public string Name { get; set; } = "";
 
-        /// <summary>Lo usa el emulador: de éstos depende que arranque tras el parche.</summary>
+        /// <summary>The emulator uses it: whether it starts after the patch depends on these.</summary>
         public bool Mine { get; set; }
 
-        /// <summary>Cuando hay duda, entre quiénes.</summary>
+        /// <summary>When there is doubt, among whom.</summary>
         public List<string> Candidates { get; } = new();
 
-        /// <summary>Si lo eligió el modelo, por qué.</summary>
+        /// <summary>If the model chose it, why.</summary>
         public string Because { get; set; } = "";
     }
 
@@ -77,19 +77,19 @@ public sealed class Mapper
     private Dictionary<string, List<string>> _newParents = new(StringComparer.Ordinal);
 
     /// <summary>
-    /// El mapeo entero, salvo las dudas.
+    /// The whole mapping, except the doubts.
     ///
-    /// Tarda unos segundos: lo que cuesta es abrir los dos ensamblados, y el emparejamiento en sí
-    /// son dos segundos y medio para dos mil mensajes.
+    /// It takes a few seconds: what costs is opening the two assemblies, and the matching itself
+    /// is two and a half seconds for two thousand messages.
     /// </summary>
     public void Build(string oldPath, string newPath, string dataFolder,
                       IReadOnlyCollection<string> mine, Action<string>? report = null)
     {
-        // La versión sale de lo que escribió el usuario —«Cliente 3.6.10.10»— y no de la ruta del
-        // ensamblado ya resuelta, que acaba en «Ankama.Dofus.Protocol.Game.dll» y no lleva ninguna
-        // versión dentro. Con la resuelta se buscaban las anclas de una versión llamada
-        // «Ankama.Dofus.Protocol.Game», no se encontraban, y el mapeo salía sin significados y sin
-        // una sola duda que preguntar.
+        // The version comes from what the user wrote —«Cliente 3.6.10.10»— and not from the
+        // already resolved assembly path, which ends in «Ankama.Dofus.Protocol.Game.dll» and carries no
+        // version inside. With the resolved one the anchors of a version called
+        // «Ankama.Dofus.Protocol.Game» were looked for, they were not found, and the mapping came out without meanings and without
+        // a single doubt to ask.
         OldVersion = VersionOf(oldPath);
         NewVersion = VersionOf(newPath);
 
@@ -100,22 +100,22 @@ public sealed class Mapper
         _new = ProtoWriter.Model(ProtocolDll(newPath));
         _newParents = Dossier.Parents(_new);
 
-        // Las anclas son del VIEJO: es de él de quien se sabe algo. Lo que hace este programa es
-        // llevar ese conocimiento al nuevo.
+        // The anchors are the OLD one's: it is the one something is known about. What this program does is
+        // carry that knowledge to the new one.
         _anchors = Dossier.Anchors(Path.Combine(dataFolder, $"anclas_{OldVersion}.tsv"));
         string index = Path.Combine(dataFolder, $"indice_{NewVersion}.json");
         _index = File.Exists(index) ? CodeIndex.Load(index) : new(StringComparer.Ordinal);
 
-        // ─── Lo primero: ¿ha rotado Ankama los nombres en este parche? ──────────────────
+        // ─── First of all: has Ankama rotated the names in this patch? ──────────────────
         //
-        // Medido sobre ocho versiones seguidas (§2.6 de la documentación): en 3 de los 7 parches NO
-        // rota. Los 2.169 nombres siguen ahí uno a uno y el mapeo es la identidad. Sin esta
-        // comprobación se emparejaba igualmente y salía el 71%, dejando seiscientas dudas que no
-        // eran dudas de nada.
+        // Measured over eight versions in a row (§2.6 of the documentation): in 3 of the 7 patches it does NOT
+        // rotate. The 2,169 names are still there one by one and the mapping is the identity. Without this
+        // check it was matched all the same and came out at 71%, leaving six hundred doubts that
+        // were doubts about nothing.
         //
-        // Se comprueba por el juego entero de nombres y no por unos cuantos: que cien nombres
-        // sobrevivan no dice nada —después de rotar siguen existiendo mil trescientos, en manos de
-        // otros mensajes—. Lo que sólo pasa cuando no ha rotado es que estén TODOS.
+        // It is checked by the whole set of names and not by a few: that a hundred names
+        // survive says nothing —after rotating thirteen hundred still exist, in the hands of
+        // other messages—. What only happens when it has not rotated is that they are ALL there.
         var newShapes = Matcher.Shapes(_new);
         bool rotated = _old.Messages.Any(m => !newShapes.ContainsKey(m.Name));
 
@@ -127,10 +127,10 @@ public sealed class Mapper
 
         var result = Matcher.Match(_old, _new);
 
-        // La identidad no se da por buena sólo porque el nombre siga ahí: se exige además que el
-        // mensaje tenga la misma forma. Un nombre que sobrevive con otro contenido detrás sería
-        // justo la clase de pareja falsa que envenena todo lo que venga después, y sale barato
-        // negarse a darla.
+        // The identity is not taken as good just because the name is still there: it is also required that the
+        // message has the same shape. A name surviving with other content behind it would be
+        // exactly the kind of false pair that poisons everything that comes after, and it is cheap
+        // to refuse to give it.
         var oldShapes = rotated ? null : Matcher.Shapes(_old);
         int quarrel = 0;
 
@@ -174,11 +174,11 @@ public sealed class Mapper
     }
 
     /// <summary>
-    /// Las dudas por las que merece la pena preguntar.
+    /// The doubts worth asking about.
     ///
-    /// Sólo las que sabemos qué son. Preguntar por un mensaje viejo del que tampoco sabíamos nada
-    /// es pedirle al modelo que elija entre cinco desconocidos sin ninguna pista: contestaría
-    /// igual, y no habría forma de saber si acierta.
+    /// Only the ones we know what they are. Asking about an old message we did not know anything about either
+    /// is asking the model to choose among five unknowns without any clue: it would answer
+    /// all the same, and there would be no way of knowing whether it gets it right.
     /// </summary>
     public IReadOnlyList<Row> Doubts(bool onlyMine = false)
         => Rows.Where(r => r.How == How.Doubt && r.Meaning.Length > 0 && (!onlyMine || r.Mine))
@@ -186,15 +186,15 @@ public sealed class Mapper
                .ThenBy(r => r.Candidates.Count)
                .ToList();
 
-    // ─── El desempate ───────────────────────────────────────────────────────────────────
+    // ─── The tie-break ──────────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Le pasa las dudas al modelo, una a una, y se queda con lo que elija.
+    /// Passes the doubts to the model, one by one, and keeps what it chooses.
     ///
-    /// Cada pregunta es pequeña y cerrada: un mensaje viejo del que se sabe qué hace, y de tres a
-    /// cinco candidatos del cliente nuevo con su forma. Eso es lo que un modelo puede resolver
-    /// bien. Si contesta algo que no está entre los candidatos, se descarta sin más: no está para
-    /// inventar nombres, está para elegir uno de los que se le dan.
+    /// Each question is small and closed: an old message whose function is known, and three to
+    /// five candidates of the new client with their shape. That is what a model can solve
+    /// well. If it answers something not among the candidates, it is simply discarded: it is not there to
+    /// invent names, it is there to choose one of those it is given.
     /// </summary>
     public async Task ResolveAsync(Llm llm, IReadOnlyList<Row> doubts, Action<string> report,
                                    CancellationToken cancel = default)
@@ -217,8 +217,8 @@ public sealed class Mapper
             asked++;
             var verdict = TieBreak.Read(answer);
 
-            // La red de seguridad: si lo que dice no está entre los candidatos, no vale. Es la
-            // diferencia entre elegir y alucinar.
+            // The safety net: if what it says is not among the candidates, it does not count. It is the
+            // difference between choosing and hallucinating.
             if (verdict?.Chosen is not { Length: > 0 } || !row.Candidates.Contains(verdict.Chosen))
             {
                 report($"{row.Old}: sin elegir");
@@ -235,9 +235,9 @@ public sealed class Mapper
         report($"{asked:N0} preguntadas, {chosen:N0} resueltas");
     }
 
-    // ─── Lo que se lleva uno ────────────────────────────────────────────────────────────
+    // ─── What one takes away ────────────────────────────────────────────────────────────
 
-    /// <summary>La tabla, para leerla y para meterla en el repositorio.</summary>
+    /// <summary>The table, to read it and to put it in the repository.</summary>
     public string Export(string dataFolder)
     {
         string path = Path.Combine(dataFolder, $"mapeo_{OldVersion}_a_{NewVersion}.tsv");
@@ -265,11 +265,11 @@ public sealed class Mapper
     }
 
     /// <summary>
-    /// El mismo mapeo en el formato del sniffer de tikkamasala, que lo recarga en caliente.
+    /// The same mapping in the format of tikkamasala's sniffer, which reloads it hot.
     ///
-    /// Con esto se puede jugar con el sniffer delante y ver los nombres de verdad pasar por el
-    /// cable en vez de tres letras. Es la única verificación que existe contra el juego real, y
-    /// sale gratis: es el mismo dato escrito de otra manera.
+    /// With this one can play with the sniffer in front and see the real names go by on the
+    /// wire instead of three letters. It is the only verification there is against the real game, and
+    /// it comes free: it is the same data written another way.
     /// </summary>
     public string ExportSniffer(string dataFolder)
     {
@@ -292,7 +292,7 @@ public sealed class Mapper
         return path;
     }
 
-    // ─── Las cuentas ────────────────────────────────────────────────────────────────────
+    // ─── The figures ────────────────────────────────────────────────────────────────────
 
     public string Tally()
     {
@@ -321,13 +321,13 @@ public sealed class Mapper
     };
 
     /// <summary>
-    /// La versión que dice la ruta: vale la carpeta del cliente o el propio ensamblado.
+    /// The version the path says: the client folder or the assembly itself will do.
     ///
-    /// Se mira el ÚLTIMO tramo de la ruta antes que la ruta entera, y por un motivo que costó un
-    /// rato ver: los clientes de la cadena viven en <c>C:\Jondo 3.6.10.10\clientes\Cliente 3.6.9.9</c>,
-    /// y buscando en toda la ruta el primero que aparece es el 3.6.10.10 del nombre de la carpeta
-    /// madre. Con eso los ocho clientes decían llamarse igual, se buscaban las anclas de una versión
-    /// equivocada y los ocho mapeos se escribían encima del mismo fichero.
+    /// The LAST stretch of the path is looked at before the whole path, and for a reason that took a
+    /// while to see: the chain's clients live in <c>C:\Jondo 3.6.10.10\clientes\Cliente 3.6.9.9</c>,
+    /// and searching the whole path the first one to appear is the 3.6.10.10 of the parent
+    /// folder's name. With that the eight clients claimed the same name, the anchors of a wrong
+    /// version were looked for and the eight mappings were written over the same file.
     /// </summary>
     public static string VersionOf(string path)
     {
@@ -341,7 +341,7 @@ public sealed class Mapper
         return Path.GetFileNameWithoutExtension(path);
     }
 
-    /// <summary>El ensamblado del protocolo, se le dé la carpeta del cliente o el fichero.</summary>
+    /// <summary>The protocol assembly, whether it is given the client folder or the file.</summary>
     public static string ProtocolDll(string path)
     {
         if (File.Exists(path)) return path;

@@ -29,9 +29,9 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Y además a disco. La consola vive en una ventana que se cierra con el emulador, y lo
-        /// que más falta hace después —el volcado de un paquete del cliente que no sabemos manejar—
-        /// se perdía con ella. Ahora queda en logs/emulator_console.log.
+        /// And to disk as well. The console lives in a window that closes with the emulator, and what
+        /// is most needed afterwards -- the dump of a client packet we do not know how to handle --
+        /// went with it. Now it stays in logs/emulator_console.log.
         /// </summary>
         private static readonly object FileLock = new object();
 

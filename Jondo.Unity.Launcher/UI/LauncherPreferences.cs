@@ -5,18 +5,18 @@ using System.IO;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// Lo que el lanzador recuerda entre una vez y la siguiente.
+    /// What the launcher remembers from one time to the next.
     ///
-    /// Vive en <c>%APPDATA%\Jondo\lanzador.cfg</c>, fuera de la carpeta del emulador a propósito:
-    /// son preferencias de quien lo usa, no datos del emulador, y así ni ensucian el directorio ni
-    /// se van al repositorio. El formato es <c>clave=valor</c>, una por línea, para poder abrirlo y
-    /// arreglarlo a mano si algo se tuerce.
+    /// It lives in <c>%APPDATA%\Jondo\lanzador.cfg</c>, outside the emulator's folder on purpose:
+    /// they are the user's preferences, not the emulator's data, and that way they neither dirty the directory nor
+    /// go to the repository. The format is <c>key=value</c>, one per line, so it can be opened and
+    /// fixed by hand if something goes wrong.
     ///
-    ///   idioma=es|en|fr     el idioma del lanzador, que es también con el que arranca el juego
-    ///   cliente=C:\...\Dofus.exe   dónde está el cliente, si no está donde se supone
-    ///   servidor=host-or-ip  el servidor remoto; vacío significa esta misma máquina
-    ///   web=https://...      la web donde se entra; vacío significa que todavía no hay
-    ///   cuentas=...          las cuentas guardadas, CIFRADAS (ver SecretStore)
+    ///   idioma=es|en|fr     the launcher's language, which is also the one the game starts with
+    ///   cliente=C:\...\Dofus.exe   where the client is, if it is not where it is supposed to be
+    ///   servidor=host-or-ip  the remote server; empty means this same machine
+    ///   web=https://...      the website one logs in on; empty means there is none yet
+    ///   cuentas=...          the stored accounts, ENCRYPTED (see SecretStore)
     ///   packHd=0|1           start the client with --hdReady when the HD pack is installed
     ///   pack4k=0|1           start the client with --4kReady when the 4K pack is installed
     /// </summary>
@@ -35,15 +35,15 @@ namespace Jondo.Unity.Launcher.UI
             public string Token { get; set; } = "";
             public bool Selected { get; set; }
 
-            /// <summary>El vale de renovación de la web, cuando se entró por ahí.</summary>
+            /// <summary>The website's refresh token, when one logged in that way.</summary>
             /// <remarks>
-            /// Vacío mientras se entre con usuario y contraseña, que es lo que se hace hoy. Existe
-            /// ya para que el día que haya web no haya que cambiar el formato de lo guardado y
-            /// echar del lanzador a todo el que tuviera cuentas recordadas.
+            /// Empty while logging in with username and password, which is what is done today. It exists
+            /// already so that the day there is a website the stored format does not have to change and
+            /// throw out of the launcher everyone who had remembered accounts.
             /// </remarks>
             public string RefreshToken { get; set; } = "";
 
-            /// <summary>Cuándo caduca el vale de acceso, en segundos Unix. Cero si no se sabe.</summary>
+            /// <summary>When the access token expires, in Unix seconds. Zero if not known.</summary>
             public long ExpiresAtUnix { get; set; }
         }
 
@@ -99,14 +99,14 @@ namespace Jondo.Unity.Launcher.UI
             set => Escribir(ClaveIdioma, LauncherTexts.Code(value));
         }
 
-        // ─── Dónde está el cliente ──────────────────────────────────────────────
+        // ─── Where the client is ────────────────────────────────────────────────
 
         /// <summary>
-        /// El Dofus.exe elegido a mano, o cadena vacía si no se ha elegido ninguno.
+        /// The Dofus.exe chosen by hand, or an empty string if none has been chosen.
         ///
-        /// Se comprueba que siga existiendo cada vez: si alguien mueve o borra el cliente, lo
-        /// guardado deja de valer y se vuelve a buscar donde se busca por defecto, en vez de fallar
-        /// con una ruta que ya no lleva a ninguna parte.
+        /// It is checked that it still exists every time: if someone moves or deletes the client, what was
+        /// stored stops being valid and it is looked for again in the default place, instead of failing
+        /// with a path that no longer leads anywhere.
         /// </summary>
         public static string ClientExecutable
         {
@@ -118,19 +118,19 @@ namespace Jondo.Unity.Launcher.UI
             set => Escribir(ClaveCliente, value ?? "");
         }
 
-        /// <summary>Lo guardado tal cual, exista o no. Para poder avisar de que ya no está.</summary>
+        /// <summary>What is stored as is, whether it exists or not. To be able to warn that it is no longer there.</summary>
         public static string ClientExecutableRaw
             => Leer().TryGetValue(ClaveCliente, out string? v) ? v : "";
 
-        // ─── Dónde está el servidor ────────────────────────────────────────────
+        // ─── Where the server is ───────────────────────────────────────────────
         //
-        // Por defecto, esta misma máquina: el caso de jugar en local, que es el de siempre. La otra
-        // opción es escribir una dirección —la del ordenador de un amigo por Hamachi, o la de una
-        // VPS— y entonces el lanzador no arranca ningún servidor: se conecta al que haya allí.
+        // By default, this same machine: the case of playing locally, which is the usual one. The other
+        // option is to write an address —that of a friend's computer over Hamachi, or that of a
+        // VPS— and then the launcher starts no server: it connects to whatever is there.
 
         private const string ClaveServidor = "servidor";
 
-        /// <summary>La dirección del servidor. Vacío o "127.0.0.1" significa aquí mismo.</summary>
+        /// <summary>The server's address. Empty or "127.0.0.1" means right here.</summary>
         public static string ServerHost
         {
             get
@@ -142,15 +142,15 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         /// <summary>
-        /// Los textos en el idioma que tenga puesto el lanzador.
+        /// The texts in the language the launcher has set.
         ///
-        /// Vive aquí y no en LauncherTexts porque el catálogo lo comparten el lanzador y el
-        /// servidor, y cada uno recuerda su idioma por su cuenta: pueden estar en máquinas
-        /// distintas y de personas distintas.
+        /// It lives here and not in LauncherTexts because the catalogue is shared by the launcher and the
+        /// server, and each remembers its language on its own: they can be on different machines
+        /// and belong to different people.
         /// </summary>
         public static LauncherTexts Textos => LauncherTexts.Get(Language);
 
-        /// <summary>Si el servidor es el de esta máquina, que es lo que decide si se puede arrancar.</summary>
+        /// <summary>Whether the server is this machine's, which is what decides whether it can be started.</summary>
         public static bool ServerIsLocal
         {
             get
@@ -181,13 +181,13 @@ namespace Jondo.Unity.Launcher.UI
             set => Escribir(KeyPack4k, value ? "1" : "0");
         }
 
-        // ─── Dónde se entra ────────────────────────────────────────────────────
+        // ─── Where one logs in ─────────────────────────────────────────────────
 
-        /// <summary>La web donde se inicia sesión. Vacío mientras no exista.</summary>
+        /// <summary>The website where one signs in. Empty while it does not exist.</summary>
         /// <remarks>
-        /// En cuanto tenga valor, el lanzador deja de pedir la contraseña en su propia ventana y
-        /// abre el navegador: ver <see cref="Security.OAuthFlow"/>. Es una preferencia y no una
-        /// constante para poder apuntar a una web de pruebas sin recompilar.
+        /// As soon as it has a value, the launcher stops asking for the password in its own window and
+        /// opens the browser: see <see cref="Security.OAuthFlow"/>. It is a preference and not a
+        /// constant to be able to point to a test website without recompiling.
         /// </remarks>
         public static string WebSite
         {
@@ -195,11 +195,11 @@ namespace Jondo.Unity.Launcher.UI
             set => Escribir(ClaveWeb, (value ?? "").Trim());
         }
 
-        /// <summary>Si ya hay web contra la que entrar.</summary>
+        /// <summary>Whether there is already a website to log in against.</summary>
         /// <remarks>
-        /// Se exige https, salvo en loopback para poder probar contra una web local. Mandar a la
-        /// gente a escribir su contraseña por http sería peor que la caja de texto que esto viene
-        /// a sustituir.
+        /// https is required, except on loopback to be able to test against a local website. Sending
+        /// people to type their password over http would be worse than the text box this is here
+        /// to replace.
         /// </remarks>
         public static bool HasWebSite
         {
@@ -212,12 +212,12 @@ namespace Jondo.Unity.Launcher.UI
             }
         }
 
-        // ─── El equipo multicuenta ─────────────────────────────────────────────
+        // ─── The multi-account team ────────────────────────────────────────────
 
-        /// <summary>Cuántas cuentas se recuerdan como mucho.</summary>
+        /// <summary>How many accounts are remembered at most.</summary>
         /// <remarks>
-        /// Ocho, que es el tope del lanzador multicuenta. Estaba escrito a mano en cuatro sitios de
-        /// este mismo fichero; con una constante no puede quedarse uno de los cuatro atrás.
+        /// Eight, which is the multi-account launcher's cap. It was written by hand in four places of
+        /// this same file; with a constant one of the four cannot be left behind.
         /// </remarks>
         public const int MaxAccounts = 8;
 
@@ -228,9 +228,9 @@ namespace Jondo.Unity.Launcher.UI
                 if (!Leer().TryGetValue(ClaveCuentas, out string? guardado) ||
                     string.IsNullOrWhiteSpace(guardado)) return new List<SavedAccount>();
 
-                // Lo de la versión anterior era Base64 a secas —o sea, nada— y se sigue leyendo
-                // una vez para no echar del lanzador a quien ya lo tenía. En cuanto se guarde,
-                // vuelve cifrado.
+                // The previous version's was plain Base64 —that is, nothing— and it is still read
+                // once so as not to throw out of the launcher whoever already had it. As soon as it is saved,
+                // it comes back encrypted.
                 bool sinCifrar = Security.SecretStore.LooksUnprotected(guardado);
                 string json = Security.SecretStore.Unprotect(guardado);
                 if (json.Length == 0) return new List<SavedAccount>();
@@ -264,9 +264,9 @@ namespace Jondo.Unity.Launcher.UI
 
             string json = System.Text.Json.JsonSerializer.Serialize(seguras);
 
-            // Si no se ha podido cifrar, Protect devuelve vacío y aquí se borra lo que hubiera. No
-            // se guarda en claro: vale más volver a pedir la sesión que dejar credenciales
-            // legibles en el perfil de quien juega.
+            // If it could not be encrypted, Protect returns empty and here whatever was there is erased. It is not
+            // stored in the clear: it is better to ask for the session again than to leave credentials
+            // readable in the player's profile.
             Escribir(ClaveCuentas, Security.SecretStore.Protect(json));
         }
     }

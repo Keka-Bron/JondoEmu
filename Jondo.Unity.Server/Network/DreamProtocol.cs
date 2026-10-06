@@ -8,46 +8,46 @@ using Jondo.Unity.Server.Managers;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// Las tramas de los Sueños Infinitos, con la forma que traen las capturas.
+    /// The frames of the Infinite Dreams, with the shape the captures bring.
     /// </summary>
     /// <remarks>
-    /// Dos mensajes llevan el peso, y los dos identifican las salas <b>por cadena</b> — «0», «1»,
-    /// «2» — no por número. Eso no es un detalle de estilo: mandarlas como varint deja al cliente
-    /// sin mapa y sin un solo error.
+    /// Two messages carry the weight, and both identify the rooms <b>by string</b> — «0», «1»,
+    /// «2» — not by number. That is not a matter of style: sending them as a varint leaves the client
+    /// without a map and without a single error.
     /// </remarks>
     public static class DreamProtocol
     {
         /// <summary>
-        /// El iyj: la ventana del sueño — cabecera, salas y grafo.
+        /// The iyj: the dream's window — header, rooms and graph.
         /// </summary>
         /// <remarks>
-        /// Toda la partida va DENTRO del f17. Ése es el detalle que importa y el que se tuvo mal:
-        /// mandando las salas como f17 repetidos del padre y el grafo como f4 hermanos, el
-        /// servidor contestaba, el cliente no se quejaba y no se abría nada.
+        /// The whole run goes INSIDE f17. That is the detail that matters and the one that was wrong:
+        /// sending the rooms as repeated f17 of the parent and the graph as sibling f4, the
+        /// server answered, the client did not complain and nothing opened.
         ///
         /// <code>
         ///   f1 {  the dream saved to continue -- none, zero bytes, when there is none
-        ///     f1   arenas left       f2   dream points        f3   el nombre
-        ///     f4   storms left       f7 (repeated)  the bonuses gained     f8   el nivel
+        ///     f1   arenas left       f2   dream points        f3   the name
+        ///     f4   storms left       f7 (repeated)  the bonuses gained     f8   the level
         ///     f13  the difficulty    f14  1     f15  1     f16  the room it is in, as a string
         ///     f17 {
-        ///       f1 (repetido)  una SALA:  f1 su número como cadena
+        ///       f1 (repeated)  a ROOM:    f1 its number as a string
         ///                                 f2 { f1 score, f3 dream points, f4 { the reward },
-        ///                                      f5 1, f6 la fila, f7 señalada }
+        ///                                      f5 1, f6 the row, f7 marked }
         ///       f2   the band, from 0, left out for the first
         ///       f3 (repeated)  the rooms behind, as strings
-        ///       f4 (repetido)  una ARISTA: f1 el origen, f2 { f1 cada destino }
+        ///       f4 (repeated)  an EDGE:   f1 the origin, f2 { f1 each destination }
         ///     }
         ///   }
         /// </code>
         ///
-        /// Las tres formas de sala, contadas sobre las 89 de las nueve capturas:
+        /// The three room shapes, counted over the 89 of the nine captures:
         ///
-        ///   la entrada (9 de 9)    f2 { f7: 0 } y nada más
-        ///   las de pelea (71)      f1 4..40, f3 5 ó 15, f4 el grupo, f5 1, f6 la fila, f7 0 ó 1
-        ///   la última (9 de 9)     f2 { f5: 3, f6: 4, f7: 0 }
+        ///   the entrance (9 of 9)  f2 { f7: 0 } and nothing else
+        ///   the fight ones (71)    f1 4..40, f3 5 or 15, f4 the group, f5 1, f6 the row, f7 0 or 1
+        ///   the last (9 of 9)      f2 { f5: 3, f6: 4, f7: 0 }
         ///
-        /// Y las cinco filas siempre: una sala, luego dos a cuatro por fila, luego una.
+        /// And always the five rows: one room, then two to four per row, then one.
         /// </remarks>
         public static byte[] BuildDreamMap(Dreams.Sueno? sueno)
         {
@@ -72,10 +72,10 @@ namespace Jondo.Unity.Server.Network
         /// One band of the dream: its rooms, the rooms behind and its edges.
         /// </summary>
         /// <remarks>
-        /// Viaja DOS veces y con la misma forma: como f17 del iyj —la ventana que ofrece el
-        /// sueño— y como f16 del izg —el estado de dentro—. Que se repita no es un descuido de
-        /// Ankama: son dos momentos distintos y el segundo es el que alimenta el mapa del sueño y
-        /// los paneles mientras se juega.
+        /// It travels TWICE and with the same shape: as the iyj's f17 —the window offering the
+        /// dream— and as the izg's f16 —the state inside—. That it repeats is not an oversight by
+        /// Ankama: they are two different moments and the second is the one that feeds the dream's map and
+        /// the panels while playing.
         ///
         /// ONE PER BAND, measured in the long capture once its first fountain is reached: two f16,
         /// the first with rooms 0 to 9 and the second with 9 to 24 and an f2 of 1. The fountain
@@ -246,19 +246,19 @@ namespace Jondo.Unity.Server.Network
         private const int TipoDeFinal = 4;
 
         /// <summary>
-        /// El izg: el estado del sueño en curso.
+        /// The izg: the state of the dream in progress.
         /// </summary>
         /// <remarks>
         /// Measured over the 57 izg of the captures, field by field:
         ///
         /// <code>
-        ///   f1 { f1 el nombre, f3 el id del personaje, f4 its breed }
-        ///   f2   la dificultad
-        ///   f4 (repetido)  una PUERTA:  f1 la sala a la que lleva, como cadena
-        ///                               f2 el elemento interactivo que el cliente pulsara
+        ///   f1 { f1 the name, f3 the character's id, f4 its breed }
+        ///   f2   the difficulty
+        ///   f4 (repeated)  a DOOR:      f1 the room it leads to, as a string
+        ///                               f2 the interactive element the client will press
         ///   f7   astral storms left          f8   the bonus to xp and loot, in percent
         ///   f11  the dream points            f12  the band, from 0
-        ///   f13  la sala en la que se está, como cadena        f14  the dreamer levels gained
+        ///   f13  the room one is in, as a string               f14  the dreamer levels gained
         ///   f15 (repeated)  the bonuses gained      f16 (repeated)  one graph per band
         ///   f17  Draconiros arenas left      f18  1: the room's fight is still to be won
         ///   f19  1: the room is clear        f20  the level     f22  the difficulty's bonus
@@ -299,16 +299,16 @@ namespace Jondo.Unity.Server.Network
             if (fightPending && bestiary != null)
                 foreach (var beast in bestiary) izg.Msg(3, BeastEntry(beast));
 
-            // LAS TRES PUERTAS, no sólo las que llevan a algún sitio. En la captura de Pesadilla
-            // II la sala de entrada lista las tres y la de en medio va sin destino:
+            // THE THREE DOORS, not only the ones leading somewhere. In the Pesadilla
+            // II capture the entrance room lists all three and the middle one goes with no destination:
             //
             //   f4 { f1: "1", f2: 539509,          f5: 3 }
-            //   f4 {          f2: 539510, f4: 1          }   ← ésta no lleva a ninguna parte
+            //   f4 {          f2: 539510, f4: 1          }   ← this one leads nowhere
             //   f4 { f1: "2", f2: 539511, f4: 2,   f5: 3 }
             //
-            // El f4 de dentro es el número de puerta, y el cero no se escribe. Mandando sólo las
-            // que tienen destino, el cliente no sabe cuál de las tres está muerta y las pinta a
-            // las tres igual: pulsas una y no pasa nada, sin saber por qué.
+            // The inner f4 is the door number, and zero is not written. Sending only the
+            // ones with a destination, the client does not know which of the three is dead and draws
+            // all three the same: you press one and nothing happens, without knowing why.
             var actual = sueno.SalaActual;
             if (actual != null)
             {
@@ -336,9 +336,9 @@ namespace Jondo.Unity.Server.Network
             if ((fountain || favourPending) && room!.Offers != null)
                 foreach (var offer in room.Offers) izg.Msg(6, RewardEntry(offer));
 
-            // El f7 es el número de TORMENTAS ASTRALES que quedan: en la captura larga va 1, luego
-            // desaparece —cero no se escribe— y más tarde vuelve como 2, que es el número que el
-            // cliente pinta en su botón. Sigue sin ganarse; se gasta al usarla.
+            // f7 is the number of ASTRAL STORMS left: in the long capture it goes 1, then
+            // disappears —zero is not written— and later comes back as 2, which is the number the
+            // client draws on its button. It is still not earned; it is spent on using it.
             izg.VarIfNotZero(7, sueno.Tormentas)
                .Var(8, sueno.Bonus)
                .VarIfNotZero(11, sueno.DreamPoints)
@@ -346,9 +346,9 @@ namespace Jondo.Unity.Server.Network
                .Str(13, Texto(sueno.Actual))
                .VarIfNotZero(14, sueno.DreamerLevels);
 
-            // LOS POTENCIADORES ACUMULADOS, uno por f15. Medidos 196 en las capturas, con dos
-            // formas y ninguna más -- see BonusEntry. Se acumulan los de las salas ya pisadas: el
-            // bono se cobra AL ENTRAR en la sala, antes de pelear.
+            // THE ACCUMULATED BONUSES, one per f15. 196 measured in the captures, with two
+            // shapes and no more -- see BonusEntry. Those of the rooms already stepped in accumulate: the
+            // bonus is collected ON ENTERING the room, before fighting.
             foreach (var bono in sueno.Ganados) izg.Msg(15, BonusEntry(bono));
 
             for (int franja = 1; franja <= sueno.Franja; franja++) izg.Msg(16, Graph(sueno, franja));
@@ -424,18 +424,18 @@ namespace Jondo.Unity.Server.Network
                     .Packed(2, defenders.Select(c => (long)c)))
                 .Build();
 
-        /// <summary>El izj que acompaña a la tormenta astral: «1001» de la captura.</summary>
+        /// <summary>The izj accompanying the astral storm: «1001» from the capture.</summary>
         public static byte[] BuildStorm() => Pb.New().Var(2, 1).Build();
 
-        /// <summary>El iyb de la salida: «0801» de la captura.</summary>
+        /// <summary>The exit's iyb: «0801» from the capture.</summary>
         public static byte[] BuildLeft() => Pb.New().Var(1, 1).Build();
 
         /// <summary>
-        /// Los números de sala viajan como CADENA, y por eso pasan por aquí.
+        /// Room numbers travel as a STRING, and that is why they go through here.
         /// </summary>
         /// <remarks>
-        /// Con la cultura invariante a propósito: con una cultura que use otro separador, un
-        /// número de sala saldría escrito de otra forma y el cliente no lo casaría con su grafo.
+        /// With the invariant culture on purpose: with a culture that uses another separator, a
+        /// room number would come out written differently and the client would not match it with its graph.
         /// </remarks>
         private static string Texto(int n) => n.ToString(CultureInfo.InvariantCulture);
 

@@ -8,29 +8,29 @@ using Xunit;
 namespace Jondo.Unity.Tests.Launcher
 {
     /// <summary>
-    /// El lanzador después de pasarlo a Avalonia.
+    /// The launcher after moving it to Avalonia.
     /// </summary>
     /// <remarks>
-    /// Dos cosas que hay que sujetar con pruebas y que antes no existían:
+    /// Two things that have to be held by tests and that did not exist before:
     ///
-    ///   - <b>La paleta es una sola.</b> El lanzador pinta con Avalonia y el servidor con Windows
-    ///     Forms, y los dos leen de LauncherPalette. Si alguien escribe un color a mano en
-    ///     cualquiera de los dos lados, esta prueba lo caza; sin ella, los dos ejecutables se van
-    ///     separando y nadie se entera hasta que se ven juntos.
+    ///   - <b>The palette is a single one.</b> The launcher draws with Avalonia and the server with Windows
+    ///     Forms, and both read from LauncherPalette. If someone writes a colour by hand on
+    ///     either side, this test catches it; without it, the two executables keep
+    ///     drifting apart and nobody notices until they are seen together.
     ///
-    ///   - <b>Lo guardado va cifrado.</b> Antes las credenciales de las ocho cuentas se guardaban
-    ///     pasadas por Base64, que no es cifrar. Un cifrado sin pruebas es una promesa.
+    ///   - <b>What is stored is encrypted.</b> Before, the credentials of the eight accounts were stored
+    ///     run through Base64, which is not encrypting. Encryption without tests is a promise.
     /// </remarks>
     public class LauncherAvaloniaTests
     {
-        // ─────────────────────────────────────────────────── la paleta compartida
+        // ─────────────────────────────────────────────────── the shared palette
 
         [Fact]
         public void El_tema_de_windows_forms_no_tiene_ni_un_color_propio()
         {
-            // Cada color público del tema de Windows Forms tiene que salir, byte por byte, de la
-            // constante del mismo nombre en la paleta.
-            var tema = typeof(global::Jondo.Unity.Launcher.UI.LauncherTheme);   // el de Windows Forms
+            // Each public colour of the Windows Forms theme has to come, byte for byte, from the
+            // constant of the same name in the palette.
+            var tema = typeof(global::Jondo.Unity.Launcher.UI.LauncherTheme);   // the Windows Forms one
             var paleta = typeof(LauncherPalette);
 
             int comprobados = 0;
@@ -49,22 +49,22 @@ namespace Jondo.Unity.Tests.Launcher
                 comprobados++;
             }
 
-            // Que no se quede en cero por haber renombrado el tipo: la prueba pasaría sin mirar nada.
+            // That it does not stay at zero for having renamed the type: the test would pass without looking at anything.
             Assert.Equal(45, comprobados);
         }
 
         [Fact]
         public void La_paleta_guarda_el_alfa_de_las_tarjetas()
         {
-            // Las tarjetas van translúcidas a propósito -- de 0,84 a 0,52 -- para que se vea el
-            // dibujo del fondo. Si alguien las deja opacas al tocar la paleta, se nota aquí y no
-            // en una captura de pantalla.
+            // The cards are translucent on purpose -- from 0.84 to 0.52 -- so that the
+            // background drawing shows. If someone leaves them opaque when touching the palette, it shows here and not
+            // in a screenshot.
             Assert.Equal(133u, LauncherPalette.CardFill >> 24);
             Assert.Equal(191u, LauncherPalette.BarFill >> 24);
             Assert.Equal(255u, LauncherPalette.Background >> 24);
         }
 
-        // ─────────────────────────────────────────────────── el cifrado en reposo
+        // ─────────────────────────────────────────────────── encryption at rest
 
         [Fact]
         public void Lo_cifrado_vuelve_igual()
@@ -80,8 +80,8 @@ namespace Jondo.Unity.Tests.Launcher
         [Fact]
         public void Lo_cifrado_no_deja_ver_el_contenido()
         {
-            // Lo que se guarda no puede llevar dentro el texto en claro, ni siquiera en Base64:
-            // eso era exactamente lo que pasaba antes.
+            // What is stored cannot carry the plain text inside, not even in Base64:
+            // that was exactly what happened before.
             const string secreto = "token-secretisimo-de-la-cuenta";
 
             string guardado = SecretStore.Protect(secreto);
@@ -94,8 +94,8 @@ namespace Jondo.Unity.Tests.Launcher
         [Fact]
         public void Lo_de_la_version_anterior_se_sigue_leyendo_una_vez()
         {
-            // Base64 pelado, que es lo que escribía la versión anterior. Se lee para no echar del
-            // lanzador a quien ya lo tenía guardado.
+            // Bare Base64, which is what the previous version wrote. It is read so as not to throw out of the
+            // launcher whoever already had it stored.
             const string antes = "[{\"AccountId\":7}]";
             string comoEstaba = Convert.ToBase64String(Encoding.UTF8.GetBytes(antes));
 
@@ -114,8 +114,8 @@ namespace Jondo.Unity.Tests.Launcher
         [Fact]
         public void Lo_que_no_se_descifra_se_descarta_en_vez_de_reventar()
         {
-            // Un fichero traído de otra máquina, o un perfil recreado. Devolver vacío hace que se
-            // vuelva a pedir la sesión; lanzar dejaría el lanzador sin abrir.
+            // A file brought from another machine, or a recreated profile. Returning empty makes the
+            // session be asked for again; throwing would leave the launcher unopened.
             Assert.Equal("", SecretStore.Unprotect("dpapi:esto-no-es-base64-valido!!"));
             Assert.Equal("", SecretStore.Unprotect("aesgcm:AAAA"));
             Assert.Equal("", SecretStore.Unprotect(""));
@@ -127,13 +127,13 @@ namespace Jondo.Unity.Tests.Launcher
             Assert.Equal("", SecretStore.Protect(""));
         }
 
-        // ─────────────────────────────────────────────────── la web que vendrá
+        // ─────────────────────────────────────────────────── the website to come
 
         [Fact]
         public void Sin_web_configurada_no_se_entra_por_el_navegador()
         {
-            // Mientras esto sea falso, el lanzador pide usuario y contraseña como siempre. Es el
-            // interruptor entero del flujo OAuth.
+            // While this is false, the launcher asks for username and password as always. It is the
+            // whole switch of the OAuth flow.
             Assert.False(LauncherPreferences.HasWebSite || LauncherPreferences.WebSite.Length > 0);
         }
 
@@ -145,8 +145,8 @@ namespace Jondo.Unity.Tests.Launcher
         [InlineData("", false)]
         public void La_web_tiene_que_ir_por_https_salvo_en_local(string donde, bool vale)
         {
-            // Mandar a la gente a escribir su contraseña por http sería peor que la caja de texto
-            // que esto viene a sustituir. En loopback se permite para poder probar.
+            // Sending people to type their password over http would be worse than the text box
+            // this is here to replace. On loopback it is allowed so it can be tested.
             bool bien = donde.Length > 0
                         && Uri.TryCreate(donde, UriKind.Absolute, out var uri)
                         && (uri.Scheme == Uri.UriSchemeHttps || uri.IsLoopback);
@@ -162,8 +162,8 @@ namespace Jondo.Unity.Tests.Launcher
             Assert.Equal("https://jondo.example/oauth/authorize", puntos.Authorize);
             Assert.Equal("https://jondo.example/oauth/token", puntos.Token);
 
-            // Sin secreto de cliente: en algo que se reparte a los jugadores no hay secreto que
-            // valga, porque viaja dentro del ejecutable. Eso es lo que PKCE viene a sustituir.
+            // No client secret: in something handed out to the players there is no secret that
+            // holds, because it travels inside the executable. That is what PKCE is here to replace.
             Assert.Equal("jondo-launcher", puntos.ClientId);
         }
     }

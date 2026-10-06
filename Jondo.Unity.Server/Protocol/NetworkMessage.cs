@@ -14,13 +14,13 @@ namespace Jondo.Protocol
             = new ConditionalWeakTable<Stream, SemaphoreSlim>();
 
         /// <summary>
-        /// Lo mas grande que se acepta en una trama, en bytes.
+        /// The largest thing accepted in a frame, in bytes.
         ///
-        /// El varint de longitud no tenia tope: cinco bytes «FF FF FF FF 07» pedian un array de
-        /// 2 GB antes de leer un solo byte de contenido, y ocho conexiones bastaban para tumbar
-        /// el servidor sin autenticarse. El tope tiene que dejar pasar lo mas gordo que mandamos
-        /// de verdad, que es el bloque de entrada al mundo (unos 737 KB), asi que 8 MB va de
-        /// sobra y sigue siendo 256 veces menos que lo que se podia pedir antes.
+        /// The length varint had no ceiling: five bytes «FF FF FF FF 07» asked for a
+        /// 2 GB array before reading a single byte of content, and eight connections were enough to bring
+        /// down the server without authenticating. The ceiling has to let through the biggest thing we really
+        /// send, which is the world entry block (some 737 KB), so 8 MB is plenty
+        /// and is still 256 times less than what could be asked for before.
         /// </summary>
         public const int MaxFrameLength = 8 * 1024 * 1024;
 
@@ -40,13 +40,13 @@ namespace Jondo.Protocol
                 if ((b & 0x80) == 0) break;
                 shift += 7;
 
-                // Un varint de longitud no pasa de cinco bytes. Sin este corte, una ristra de
-                // 0xFF deja el bucle leyendo de uno en uno para siempre.
+                // A length varint does not go beyond five bytes. Without this cut, a string of
+                // 0xFF leaves the loop reading one by one forever.
                 if (shift > 28) return null;
             }
 
-            // Y lo que pida tiene que caber en el tope. El desbordamiento del or de arriba puede
-            // dejar length negativo, asi que se comprueban los dos lados.
+            // And what it asks for has to fit under the ceiling. The overflow of the or above can
+            // leave length negative, so both sides are checked.
             if (length < 0 || length > MaxFrameLength) return null;
 
             // Read payload
@@ -146,11 +146,11 @@ namespace Jondo.Protocol
             return WriteSerializedAsync(stream, frame);
         }
 
-        // ─── El tráfico que pasa por aquí ────────────────────────────────────────────────────
+        // ─── The traffic going through here ─────────────────────────────────────────────────
         //
-        // Dos pares de contadores: paquetes y bytes, de salida y de entrada. Los pinta la ventana
-        // del servidor, y son la forma más directa de ver de un vistazo si está pasando algo o si
-        // el servidor está mudo. Van con Interlocked porque los tocan todos los sockets a la vez.
+        // Two pairs of counters: packets and bytes, outgoing and incoming. The server window
+        // draws them, and they are the most direct way of seeing at a glance whether something is happening or whether
+        // the server is silent. They go with Interlocked because all the sockets touch them at once.
 
         private static long _paquetesFuera, _bytesFuera, _paquetesDentro, _bytesDentro;
 
@@ -159,7 +159,7 @@ namespace Jondo.Protocol
         public static long PaquetesDentro => Interlocked.Read(ref _paquetesDentro);
         public static long BytesDentro => Interlocked.Read(ref _bytesDentro);
 
-        /// <summary>Lo que acaba de llegar por un socket. Lo llama quien lee tramas.</summary>
+        /// <summary>What has just arrived through a socket. Whoever reads frames calls it.</summary>
         public static void ApuntarEntrada(int bytes)
         {
             Interlocked.Increment(ref _paquetesDentro);
@@ -208,37 +208,37 @@ namespace Jondo.Protocol
         /// <summary>The streams that have already failed a write. Weakly held, like the locks.</summary>
         private static readonly ConditionalWeakTable<Stream, object> DeadStreams = new();
 
-        /// <summary>Cuántos paquetes llevamos, que es lo que numera cada renglón.</summary>
+        /// <summary>How many packets so far, which is what numbers each line.</summary>
         private static int _packetCount;
 
         /// <summary>
-        /// Un paquete, un renglón.
+        /// One packet, one line.
         ///
-        /// Antes cada paquete ocupaba veinte líneas: la cabecera de colores, el volcado en
-        /// hexadecimal y el árbol de campos con sus emojis. Con el juego andando eso son cientos de
-        /// líneas por segundo y no se lee nada; el registro pasaba de largo antes de que te diera
-        /// tiempo a mirarlo.
+        /// Before, each packet took twenty lines: the coloured header, the hexadecimal
+        /// dump and the field tree with its emojis. With the game running that is hundreds of
+        /// lines per second and nothing can be read; the log went past before you had
+        /// time to look at it.
         ///
-        /// Ahora sale así, que es como lo enseña un sniffer:
+        /// Now it comes out like this, which is how a sniffer shows it:
         ///
         ///   1579 [server&gt;client] kuf (CharacterExperienceGainEvent) { 1: 453 }        3 B
         ///
-        /// No se pierde nada: el hexadecimal completo lo sigue escribiendo
-        /// <see cref="GameServerProxy.LogTraffic"/> en gameserver_traffic.log, y el árbol de campos
-        /// sigue estando en <c>ProtoMessage.DumpFieldsToString</c> para mirar un paquete concreto.
-        /// Lo que cambia es qué se enseña EN VIVO, que es otra cosa.
+        /// Nothing is lost: the full hexadecimal is still written by
+        /// <see cref="GameServerProxy.LogTraffic"/> in gameserver_traffic.log, and the field tree
+        /// is still in <c>ProtoMessage.DumpFieldsToString</c> to look at a specific packet.
+        /// What changes is what is shown LIVE, which is something else.
         ///
-        /// El nombre sale primero de la capa Op, que se genera de las anclas medidas, y sólo si ahí
-        /// no está se cae a la tabla escrita a mano. Ese orden importa: una tabla a mano se queda
-        /// vieja en cuanto Ankama rota los nombres y la generada no.
+        /// The name comes first from the Op layer, which is generated from the measured anchors, and only if it is not
+        /// there does it fall back to the hand-written table. That order matters: a hand-written table goes
+        /// stale as soon as Ankama rotates the names and the generated one does not.
         /// </summary>
         private static void LogTrafficEnriched(string direction, string typeUrl, byte[] payload)
         {
             string opcode = typeUrl.Replace("type.ankama.com/", "").Trim();
             int number = System.Threading.Interlocked.Increment(ref _packetCount);
 
-            // Primero lo que alguien haya ligado a mano, que es lo unico verificado. Op.Label queda
-            // como respaldo y hoy esta vacio a proposito: los nombres inventados se quitaron.
+            // First what someone has bound by hand, which is the only verified thing. Op.Label stays
+            // as a backup and today it is empty on purpose: the invented names were removed.
             string name = Jondo.Unity.Server.Managers.NameBinding.Of(opcode);
             if (name.Length == 0) name = Op.Label(opcode);
             if (name.Length == 0)
@@ -247,22 +247,22 @@ namespace Jondo.Protocol
                 int paren = description.IndexOf(" (", StringComparison.Ordinal);
                 string candidate = paren > 0 ? description[..paren] : description;
 
-                // El caso por defecto de la tabla devuelve «Utility message (xxx)», que no es un
-                // nombre: es la manera de decir que no se sabe. Enseñarlo llenaría el registro de
-                // una etiqueta que no distingue un paquete de otro.
+                // The table's default case returns «Utility message (xxx)», which is not a
+                // name: it is the way of saying it is not known. Showing it would fill the log with
+                // a label that does not tell one packet from another.
                 name = candidate.StartsWith("Utility message", StringComparison.Ordinal) ? "" : candidate;
             }
 
-            // Lo que se enseña es el MENSAJE, no el sobre.
+            // What is shown is the MESSAGE, not the envelope.
             //
-            // Lo que llega aquí es la trama entera, y volcarla tal cual da
-            // «{ 3: { 1: { 1: "type.ankama.com/jsq" } 2: -1 } }», que es fontanería: el campo raíz
-            // que dice si va o viene, el Any con su url repetida y el id de petición. De los campos
-            // del mensaje, que es lo único que se quiere leer, no se ve ni uno.
+            // What arrives here is the whole frame, and dumping it as is gives
+            // «{ 3: { 1: { 1: "type.ankama.com/jsq" } 2: -1 } }», which is plumbing: the root field
+            // saying whether it goes or comes, the Any with its repeated url and the request id. Of the
+            // message's fields, which are the only thing one wants to read, not one is seen.
             //
-            // ReadPayload busca la url dentro de la trama y devuelve lo que hay detrás, que es el
-            // mensaje de verdad. El tamaño que se enseña también es el suyo y no el de la trama:
-            // con el del sobre, un mensaje vacío parecía pesar treinta y seis bytes.
+            // ReadPayload looks for the url inside the frame and returns what is behind it, which is the
+            // real message. The size shown is also its own and not the frame's:
+            // with the envelope's, an empty message seemed to weigh thirty-six bytes.
             byte[] dentro = Jondo.Unity.Server.Network.ConnectionProtocol.ReadPayload(payload, opcode)
                             ?? payload;
 
@@ -273,8 +273,8 @@ namespace Jondo.Protocol
             string where = direction.StartsWith("Client", StringComparison.Ordinal)
                 ? "client>server" : "server>client";
 
-            // El cuerpo se rellena a un ancho fijo para que el tamaño caiga siempre en la misma
-            // columna: leyendo hacia abajo se ve de un vistazo qué paquete abulta.
+            // The body is padded to a fixed width so that the size always falls in the same
+            // column: reading downwards one sees at a glance which packet is bulky.
             string body = $"{number,5} [{where}] {opcode}" +
                           (name.Length > 0 ? $" ({name})" : "") +
                           (fields.Length > 0 ? $" {fields}" : "");

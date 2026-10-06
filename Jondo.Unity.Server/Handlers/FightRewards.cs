@@ -165,7 +165,7 @@ namespace Jondo.Unity.Server.Handlers
         private static void RecordLadder(FightInstance fight)
         {
             if (!fight.Reglas.PagaElKoliseo || fight.KoliseoMode < 0) return;
-            // Against megabots it is training: the ladder is not touched.
+            // Against JondoBots it is training: the ladder is not touched.
             if (fight.Todos.Any(f => f.IsBot)) return;
             var players = fight.Azul.Concat(fight.Rojo)
                                .Where(f => !f.IsMonster && !f.EsInvocado && !f.EsIlusion)

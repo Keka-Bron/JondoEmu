@@ -3,15 +3,15 @@ using System.Drawing;
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// Una ventana que ya tiene su fondo compuesto y deja que sus paneles lo recorten.
+    /// A window that already has its background composed and lets its panels cut it out.
     ///
-    /// WinForms no tiene transparencia de verdad: un panel "transparente" pinta lo que haya en su
-    /// padre, no lo que haya detrás en la pantalla. Así que la ventana compone su fondo una vez
-    /// —la foto recortada como haría un background-size: cover— y cada panel se recorta el trozo
-    /// que le toca.
+    /// WinForms has no real transparency: a "transparent" panel paints whatever is in its
+    /// parent, not whatever is behind it on screen. So the window composes its background once
+    /// —the photo cropped as a background-size: cover would— and each panel cuts out the piece
+    /// that belongs to it.
     ///
-    /// Existe como interfaz, y no como una clase concreta, porque ahora hay DOS ventanas que lo
-    /// hacen: la del lanzador y la del servidor. El logo se dibuja igual en las dos.
+    /// It exists as an interface, and not as a concrete class, because there are now TWO windows that
+    /// do it: the launcher's and the server's. The logo is drawn the same in both.
     /// </summary>
     public interface IBackgroundWindow
     {

@@ -98,8 +98,8 @@ namespace Jondo.Unity.Tests.Protocol
             };
 
             return ConnectionProtocol.BuildAuthenticationAccepted(
-                // Cuenta, apodo y tag de relleno: nada de esto se comprueba aqui, y los de una
-                // cuenta real no pintan nada en un repositorio publico.
+                // Filler account, nickname and tag: none of this is checked here, and those of a
+                // real account have no business in a public repository.
                 "es", 100_000_001, "Cuenta", "0001", "2027-08-29T15:54:43+02:00",
                 servers, new List<DatabaseManager.DbCharacter>());
         }

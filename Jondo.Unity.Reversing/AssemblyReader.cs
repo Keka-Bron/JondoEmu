@@ -3,16 +3,16 @@ using System.Reflection;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// Los ensamblados del cliente, leídos sin ejecutar nada.
+/// The client's assemblies, read without running anything.
 ///
-/// MelonLoader deja en Il2CppAssemblies unos ensamblados de C# que reflejan lo que hay dentro del
-/// cliente: las clases de los mensajes, con su nombre de tres letras y sus propiedades. Son
-/// fachadas —por dentro llaman al código nativo— pero sus METADATOS son de verdad, y eso es lo
-/// que se lee aquí.
+/// MelonLoader leaves in Il2CppAssemblies some C# assemblies that mirror what is inside the
+/// client: the message classes, with their three-letter name and their properties. They are
+/// façades —inside they call the native code— but their METADATA is real, and that is what
+/// is read here.
 ///
-/// Se abren con MetadataLoadContext y no con Assembly.Load a propósito: cargarlos de verdad
-/// significaría ejecutar sus inicializadores, que buscan un runtime de Il2Cpp que aquí no existe.
-/// Así se leen como lo que son: ficheros.
+/// They are opened with MetadataLoadContext and not with Assembly.Load on purpose: really loading them
+/// would mean running their initialisers, which look for an Il2Cpp runtime that does not exist here.
+/// This way they are read as what they are: files.
 /// </summary>
 public sealed class AssemblyReader : IDisposable
 {
@@ -22,16 +22,16 @@ public sealed class AssemblyReader : IDisposable
     {
         string folder = Path.GetDirectoryName(Path.GetFullPath(assemblyPath))!;
 
-        // El resolvedor necesita ver TODO lo que el ensamblado referencia —el resto de los del
-        // cliente y las bibliotecas de .NET— o al preguntar por un tipo devuelve una excepción en
-        // vez del tipo.
+        // The resolver needs to see EVERYTHING the assembly references —the rest of the
+        // client's and the .NET libraries— or when asked for a type it returns an exception instead
+        // of the type.
         var paths = new List<string>(Directory.GetFiles(folder, "*.dll"));
         string runtime = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
         paths.AddRange(Directory.GetFiles(runtime, "*.dll"));
 
-        // Las fachadas de Il2Cpp heredan de tipos que viven en el propio MelonLoader —una carpeta
-        // más allá, en net6—, así que sin ella el tipo se encuentra pero no se puede ni preguntar
-        // de qué hereda.
+        // The Il2Cpp façades inherit from types that live in MelonLoader itself —one folder
+        // further, in net6—, so without it the type is found but one cannot even ask
+        // what it inherits from.
         string? padre = Path.GetDirectoryName(folder);
         if (padre != null)
         {
@@ -39,10 +39,10 @@ public sealed class AssemblyReader : IDisposable
             if (Directory.Exists(net6)) paths.AddRange(Directory.GetFiles(net6, "*.dll"));
         }
 
-        // Sin quitar los repetidos no arranca: el volcado de Cpp2IL trae su propio mscorlib —crea
-        // uno de mentira para todo lo que el juego usa del runtime— y el cargador se planta en
-        // cuanto ve dos ensamblados con el mismo nombre. Gana el que esté al lado del que se abre,
-        // que es el que de verdad describe a este cliente.
+        // Without removing the duplicates it does not start: the Cpp2IL dump brings its own mscorlib —it creates
+        // a fake one for everything the game uses from the runtime— and the loader stops dead as soon
+        // as it sees two assemblies with the same name. The one next to the one being opened wins,
+        // which is the one that really describes this client.
         var unicos = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (string ruta in paths)
         {
@@ -56,7 +56,7 @@ public sealed class AssemblyReader : IDisposable
 
     public Assembly Assembly { get; }
 
-    /// <summary>Los tipos que hay dentro, sin que un tipo roto se lleve por delante a los demás.</summary>
+    /// <summary>The types inside, without a broken type taking the others down with it.</summary>
     public IEnumerable<Type> Types()
     {
         Type?[] types;
@@ -66,10 +66,10 @@ public sealed class AssemblyReader : IDisposable
     }
 
     /// <summary>
-    /// Los mensajes del protocolo: los que se llaman con tres letras minúsculas.
+    /// The protocol's messages: the ones named with three lowercase letters.
     ///
-    /// Es lo que viaja por el cable —type.ankama.com/jsd— y lo que Ankama rota en cada parche.
-    /// El resto de clases del ensamblado son ayudas, fábricas y enumerados.
+    /// It is what travels on the wire —type.ankama.com/jsd— and what Ankama rotates on every patch.
+    /// The rest of the assembly's classes are helpers, factories and enums.
     /// </summary>
     public IEnumerable<Type> ProtocolMessages()
         => Types().Where(t => t.Name.Length == 3 && t.Name.All(char.IsLower));

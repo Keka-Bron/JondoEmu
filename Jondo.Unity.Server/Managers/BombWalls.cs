@@ -90,10 +90,10 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static readonly IReadOnlyDictionary<int, int> WallSpell = new Dictionary<int, int>
         {
-            [3112] = 13458,   // Explobomba     -> Muro de Fuego
-            [3113] = 13461,   // Tornabomba     -> Muro de Aire
-            [3114] = 13465,   // Bomba de agua  -> Muro de Agua
-            [5161] = 13501,   // Sismobomba     -> Muro de Tierra
+            [3112] = 13458,   // Explobomba     -> Fire Wall
+            [3113] = 13461,   // Tornabomba     -> Air Wall
+            [3114] = 13465,   // Bomba de agua  -> Water Wall
+            [5161] = 13501,   // Sismobomba     -> Earth Wall
         };
 
         /// <summary>Whether this glyph on the ground is one of the four bomb walls.</summary>

@@ -6,7 +6,7 @@ with another.
 This document describes the session model introduced in August 2026. It covers the launcher-to-game
 identity chain, the game protocol on port 5555 and the socket/session lifecycle after the connection
 server issues a ticket. The team UI is described in `launcher.md`; authentication and framing are
-described separately in `NOTAS_MIGRACION_AUTH.md` and `protocol.md`.
+described separately in `auth-migration-notes.md` and `protocol.md`.
 
 ---
 

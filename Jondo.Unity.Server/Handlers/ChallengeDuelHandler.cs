@@ -8,27 +8,28 @@ using Jondo.Unity.Server.Network;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Retar a otro jugador: ofrecer, aceptar y rechazar.
+    /// Challenging another player: offering, accepting and refusing.
     /// </summary>
     /// <remarks>
-    /// Medido en las cuatro capturas de desafío de la carpeta Combate, que entre las cuatro cubren
-    /// los dos finales desde los dos lados. El intercambio entero son cuatro tramas:
+    /// Measured on the four challenge captures in the Combate folder, which between them cover
+    /// both endings from both sides. The whole exchange is four frames:
     ///
     /// <code>
-    ///   C-&gt;S  hph { f1: a quien se reta, f2: 1, f3: n }
-    ///   S-&gt;C  hqc { f1: retador, f2: retado, f3: id }        a los dos
-    ///   C-&gt;S  hpu { f1: id }                                 rechazar
-    ///   C-&gt;S  hpu { f1: id, f2: 1 }                          aceptar
-    ///   S-&gt;C  hpv { f1: retador, f2: id, f3: 1 si se acepto, f4: retado }
+    ///   C-&gt;S  hph { f1: who is challenged, f2: 1, f3: n }
+    ///   S-&gt;C  hqc { f1: challenger, f2: challenged, f3: id }   to both
+    ///   C-&gt;S  hpu { f1: id }                                    refuse
+    ///   C-&gt;S  hpu { f1: id, f2: 1 }                             accept
+    ///   S-&gt;C  hpv { f1: challenger, f2: id, f3: 1 if accepted, f4: challenged }
     /// </code>
     ///
-    /// Lo que separa aceptar de rechazar es ese <c>f2</c> del hpu, y no hay dos opcodes: las dos
-    /// capturas de rechazo mandan «08e903» y «08ea03» a secas, y la de aceptar «08ec031001». El
-    /// hpv lo repite en su f3, que está en las dos aceptadas y en ninguna de las rechazadas.
+    /// What separates accepting from refusing is that <c>f2</c> of the hpu, and there are not two
+    /// opcodes: the two refusal captures send just «08e903» and «08ea03», and the accepting one
+    /// «08ec031001». The hpv repeats it in its f3, which is in both accepted ones and in none of
+    /// the refused.
     ///
-    /// El <c>f3</c> del hph vale 146 en una captura y 106 en otra para el mismo par de personajes,
-    /// así que no es ni el mapa ni una modalidad: se ignora. Decirlo es mejor que inventarle un
-    /// significado.
+    /// The hph's <c>f3</c> is 146 in one capture and 106 in another for the same pair of
+    /// characters, so it is neither the map nor a mode: it is ignored. Saying so is better than
+    /// making up a meaning for it.
     /// </remarks>
     public static class ChallengeDuelHandler
     {
@@ -54,16 +55,16 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // En el mismo mapa. Un desafío es entre dos que se ven: retar desde otro mapa dejaría
-            // al aceptar un combate que no se sabe dónde montar.
+            // On the same map. A challenge is between two who see each other: challenging from another
+            // map would leave, on accepting, a fight with no known place to set it up.
             if (otro.MapId != SessionContext.State.MapId)
             {
                 Console.WriteLine($"[Desafío] {challengerId} reta a {targetId}, que está en otro mapa.");
                 return;
             }
 
-            // Uno a la vez, en cualquiera de los dos papeles. Sin esto se puede retar cien veces al
-            // mismo y llenarle la pantalla, o retar a diez y aceptarlos todos.
+            // One at a time, in either role. Without this the same player can be challenged a hundred
+            // times and have his screen filled, or ten can be challenged and all of them accepted.
             if (Duels.Busy(challengerId) || Duels.Busy(targetId))
             {
                 Console.WriteLine($"[Desafío] {challengerId} o {targetId} ya andan en uno.");
@@ -74,14 +75,14 @@ namespace Jondo.Unity.Server.Handlers
             byte[] aviso = ConnectionProtocol.Push(Op.Hqc,
                 FightProtocol.BuildChallengeOffered(challengerId, targetId, desafio.Id));
 
-            // A los dos: el que reta también lo recibe, que es lo que le dibuja la espera.
+            // To both: the challenger receives it too, which is what draws the wait for him.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, aviso);
             await otro.SendAsync(aviso);
 
             Console.WriteLine($"[Desafío] #{desafio.Id}: {challengerId} reta a {targetId}.");
         }
 
-        /// <summary>La respuesta del retado (hpu): con f2 acepta, sin él rechaza.</summary>
+        /// <summary>The challenged player's answer (hpu): with f2 he accepts, without it he refuses.</summary>
         public static async Task AnswerAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? hpu = ConnectionProtocol.ReadPayload(payload, Op.Hpu);
@@ -96,13 +97,14 @@ namespace Jondo.Unity.Server.Handlers
                 else if (field.FieldNumber == 2) accepted = field.VarIntValue != 0;
             }
 
-            // Se saca de la lista al contestar, y de ahí sale la exclusión: dos respuestas a la vez
-            // -- el hpu llega repetido en dos de las capturas -- y sólo una se lleva el desafío.
+            // It is taken off the list on answering, and that is where the exclusion comes from: two
+            // answers at once -- the hpu arrives twice in two of the captures -- and only one takes the
+            // challenge.
             var desafio = id == 0 ? null : Duels.Take(id);
             if (desafio == null) return;
 
-            // Contesta el retado, o nadie. El id viaja por el cable y sin esto un tercero podría
-            // aceptar por él con sólo acertar el número.
+            // The challenged player answers, or nobody. The id travels on the wire and without this a
+            // third player could accept for him just by guessing the number.
             if (GameState.CharacterId != desafio.TargetId)
             {
                 Console.WriteLine($"[Desafío] #{id}: contesta {GameState.CharacterId} y no le toca.");
@@ -121,9 +123,9 @@ namespace Jondo.Unity.Server.Handlers
 
             if (!accepted) return;
 
-            // Y el combate. Se comprueba otra vez que los dos siguen ahí y en el mismo mapa: entre
-            // el reto y la respuesta cabe una desconexión o un cambio de mapa, y montar un duelo
-            // con alguien que ya no está deja a uno solo en una arena.
+            // And the fight. It is checked again that both are still there and on the same map: a
+            // disconnection or a map change fits between the challenge and the answer, and setting up a
+            // duel with somebody who is no longer there leaves one alone in an arena.
             var retador = SessionRegistry.FindByCharacter(desafio.ChallengerId);
             var retado = SessionRegistry.FindByCharacter(desafio.TargetId);
 

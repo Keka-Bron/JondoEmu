@@ -9,29 +9,29 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// El mapa de un sueño, contra el grafo que trae la captura.
+    /// A dream's map, against the graph the capture brings.
     /// </summary>
     /// <remarks>
-    /// Contadas las nueve capturas que traen un iyj, siempre son CINCO filas: una sala de entrada,
-    /// tres filas de entre dos y cuatro salas, y una sala final. El total va de nueve a once.
+    /// Counting the nine captures that bring an iyj, there are always FIVE rows: an entrance room,
+    /// three rows of between two and four rooms, and a final room. The total goes from nine to eleven.
     ///
     ///   1 2 2 4 1   1 2 3 2 1   1 3 3 3 1   1 2 3 2 1   1 3 3 3 1
     ///   1 2 3 3 1   1 2 2 3 1   1 3 2 2 1   1 2 3 4 1
     ///
-    /// El de Pesadilla II, que es el que se usa aquí de patrón, reparte 1 3 3 3 1:
+    /// The Pesadilla II one, which is the one used as the pattern here, splits 1 3 3 3 1:
     ///
     ///   0 -> 1,2,3   1 -> 4   2 -> 5,6   3 -> 6   4 -> 7   5 -> 8   6 -> 9   7..9 -> 10
     ///
-    /// Y no es un árbol: a la 6 se llega desde la 2 y desde la 3, que es lo que hace que elegir
-    /// camino signifique algo.
+    /// And it is not a tree: room 6 is reached from 2 and from 3, which is what makes choosing
+    /// a path mean something.
     /// </remarks>
     [Collection("MapManager")]
     public class DreamsTests
     {
         private static Dreams.Sueno Uno(int nivel = 200, int dificultad = 9)
         {
-            // Las salas necesitan los elementos del mapa para tener puertas, y el orden en que
-            // xUnit corre las pruebas no está garantizado.
+            // The rooms need the map's elements to have doors, and the order in which
+            // xUnit runs the tests is not guaranteed.
             Interactives.Initialize();
             Dreams.OlvidarTodo();
             return Dreams.Crear(1, "Prueba", nivel, dificultad, 100, 200);
@@ -59,8 +59,8 @@ namespace Jondo.Unity.Tests.World
             int ultima = s.Salas.Max(x => x.Id);
             int ultimaFila = s.Salas.Max(x => x.Fila);
 
-            // Toda sala que no sea la última abre camino, y siempre a la fila de abajo. Un solo
-            // callejón sin salida en medio deja el sueño sin terminar y no da ningún error.
+            // Every room that is not the last opens a way, and always to the row below. A single
+            // dead end in the middle leaves the dream unfinished and gives no error.
             foreach (var sala in s.Salas)
             {
                 if (sala.Id == ultima)
@@ -76,14 +76,14 @@ namespace Jondo.Unity.Tests.World
                 }
             }
 
-            // Y a todas se llega desde algún sitio, menos a la entrada.
+            // And every one is reached from somewhere, except the entrance.
             foreach (var sala in s.Salas)
             {
                 if (sala.Id == 0) continue;
                 Assert.Contains(s.Salas, x => x.Salidas.Contains(sala.Id));
             }
 
-            // La última la ofrece toda la fila de encima, como en las nueve capturas.
+            // The last one is offered by the whole row above, as in the nine captures.
             foreach (var sala in s.Salas.Where(x => x.Fila == ultimaFila - 1))
             {
                 Assert.Contains(ultima, sala.Salidas);
@@ -93,9 +93,9 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void A_la_sala_de_en_medio_se_llega_por_dos_caminos()
         {
-            // Lo que distingue un rombo de un árbol, y está medido: en Pesadilla II a la sala 6 la
-            // ofrecen la 2 y la 3. Aquí se comprueba que ALGUNA sala tenga dos padres, que es la
-            // propiedad de la que depende que elegir camino signifique algo.
+            // What tells a diamond from a tree, and it is measured: in Pesadilla II room 6 is
+            // offered by 2 and 3. Here it is checked that SOME room has two parents, which is the
+            // property on which choosing a path meaning something depends.
             var s = Uno();
 
             int conDosPadres = s.Salas.Count(
@@ -107,9 +107,9 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Ninguna_sala_ofrece_mas_salidas_que_puertas_tiene()
         {
-            // Los mapas de la subárea 904 traen exactamente tres elementos interactivos. Una
-            // cuarta salida sería una sala que se dibuja en el mapa del sueño y a la que no hay
-            // manera de entrar: el fallo callado de siempre.
+            // The maps of subarea 904 bring exactly three interactive elements. A
+            // fourth exit would be a room drawn on the dream's map with no
+            // way to enter it: the usual silent bug.
             for (int intento = 0; intento < 50; intento++)
             {
                 Dreams.OlvidarTodo();
@@ -126,7 +126,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void La_entrada_y_el_final_no_llevan_grupo()
         {
-            // En la captura la entrada viaja con un solo campo y la última sin el f9 del grupo.
+            // In the capture the entrance travels with a single field and the last without the group's f9.
             var s = Uno();
 
             Assert.Equal(0, s.Buscar(0)!.Grupo);
@@ -158,8 +158,8 @@ namespace Jondo.Unity.Tests.World
         [InlineData(200)]
         public void Se_puebla_a_cualquier_nivel(int nivel)
         {
-            // La banda de nivel se abre si no hay grupos cerca: hay tramos del mundo sin grupos
-            // del nivel exacto, y una sala sin grupo es una sala que no se puede jugar.
+            // The level band widens if there are no groups nearby: there are stretches of the world without groups
+            // of the exact level, and a room without a group is a room that cannot be played.
             var s = Uno(nivel);
 
             Assert.All(s.Salas.Where(x => x.Id != 0 && x.Fila != 4),
@@ -169,9 +169,9 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Las_puertas_de_una_sala_no_se_repiten()
         {
-            // El cliente las distingue por su elemento: dos puertas con el mismo número serían
-            // una sola, y una de las dos ramas quedaría inalcanzable. Ya no se inventa un número:
-            // son los elementos del propio mapa de la sala, que en la subárea 904 son tres.
+            // The client tells them apart by their element: two doors with the same number would be
+            // a single one, and one of the two branches would be unreachable. A number is no longer invented:
+            // they are the elements of the room's own map, which in subarea 904 are three.
             Interactives.Initialize();
             var s = Uno();
 
@@ -194,8 +194,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void El_estado_lleva_la_dificultad_que_se_pidio()
         {
-            // El f2 del izg es la dificultad, y en la captura de Pesadilla II vale 9: el mismo
-            // número que se mandó en el ixf. Eso es lo que ata los dos mensajes.
+            // The izg's f2 is the difficulty, and in the Pesadilla II capture it is 9: the same
+            // number that was sent in the ixf. That is what ties the two messages.
             var s = Uno(dificultad: 9);
             byte[] izg = DreamProtocol.BuildDreamState(s);
 
@@ -209,8 +209,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void El_mapa_del_sueno_nombra_las_salas_como_cadena()
         {
-            // No es un capricho: en la captura viajan como «0», «1», «2». Mandarlas como número
-            // deja al cliente sin mapa y sin un solo error.
+            // It is not a whim: in the capture they travel as «0», «1», «2». Sending them as a number
+            // leaves the client without a map and without a single error.
             var s = Uno();
             byte[] iyj = DreamProtocol.BuildDreamMap(s);
             string crudo = System.Text.Encoding.ASCII.GetString(iyj);
@@ -226,13 +226,13 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Los_once_ixf_de_las_capturas_son_diez_comienzos_y_una_continuacion()
         {
-            // Censadas las 613 capturas del árbol entero: hay once ixf y nada más. Diez llevan la
-            // dificultad —una por peldaño, del 1 al 10— y el que queda es «12020801».
+            // Counting the 613 captures of the whole tree: there are eleven ixf and nothing else. Ten carry the
+            // difficulty —one per rung, from 1 to 10— and the remaining one is «12020801».
             //
-            // Ese último se leyó como «descartar» durante un tiempo, por el nombre del fichero en
-            // el que aparecía. Los bytes que le siguen dicen lo contrario: un izg y un jru a una
-            // sala, o sea que el jugador ENTRA. Descartar no tiene mensaje: se descarta empezando
-            // otro. Esta prueba está aquí para que nadie vuelva a leerlo por el nombre.
+            // That last one was read as «discard» for a while, from the name of the file in
+            // which it appeared. The bytes that follow it say the opposite: an izg and a jru to a
+            // room, that is the player ENTERS. Discarding has no message: one discards by starting
+            // another. This test is here so that nobody reads it by the name again.
             var comienzos = new List<byte[]>();
             for (int dificultad = 1; dificultad <= Dreams.MaximaDificultad; dificultad++)
             {
@@ -243,7 +243,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal("0a0418012001", Convert.ToHexString(comienzos[0]).ToLowerInvariant());
             Assert.Equal("0a04180a2001", Convert.ToHexString(comienzos[9]).ToLowerInvariant());
 
-            // Y el de continuar, que es f2 { f1: 1 } y no lleva dificultad ninguna.
+            // And the continue one, which is f2 { f1: 1 } and carries no difficulty at all.
             byte[] continuar = new byte[] { 0x12, 0x02, 0x08, 0x01 };
             var campos = ProtoMessage.Parse(continuar).Fields;
             var f2 = Assert.Single(campos);
@@ -253,10 +253,10 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Cada_sala_de_pelea_sabe_contra_quien_se_pelea()
         {
-            // No basta con el nivel del grupo: para plantarlo en la sala hacen falta los monstruos
-            // que lo componen. Los grupos del mundo son mezclados —cinco especies distintas en el
-            // primero de la base— y plantar cinco copias del primero cambiaría la pelea sin que
-            // se notase en ningún sitio.
+            // The group's level is not enough: to plant it in the room the monsters
+            // composing it are needed. The world's groups are mixed —five different species in the
+            // base's first one— and planting five copies of the first would change the fight without
+            // it showing anywhere.
             var s = Uno();
             int ultimaFila = s.Salas.Max(x => x.Fila);
 
@@ -266,7 +266,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.All(sala.Miembros, m => Assert.True(m.Monstruo > 0));
             }
 
-            // Y la entrada y la última no pelean.
+            // And the entrance and the last do not fight.
             Assert.Empty(s.Buscar(0)!.Miembros);
             Assert.Empty(s.Salas[s.Salas.Count - 1].Miembros);
         }
@@ -274,8 +274,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Cada_sala_tiene_su_propio_mapa_de_la_zona_de_los_suenos()
         {
-            // La entrada es siempre la misma y las demás no se repiten: dos salas en el mismo mapa
-            // compartirían puertas, y el camino dejaría de significar nada.
+            // The entrance is always the same and the rest do not repeat: two rooms on the same map
+            // would share doors, and the path would stop meaning anything.
             var s = Uno();
 
             Assert.Equal(Dreams.MapaDeEntrada, s.Buscar(0)!.MapaDeLaSala);
@@ -288,8 +288,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void El_estado_lista_las_TRES_puertas_y_repite_el_grafo()
         {
-            // Medido en el izg de Pesadilla II: las tres puertas de la sala, con la que no lleva a
-            // ninguna parte incluida, y el grafo entero otra vez en el f16.
+            // Measured in the Pesadilla II izg: the room's three doors, the one leading
+            // nowhere included, and the whole graph again in f16.
             var s = Uno();
             byte[] izg = DreamProtocol.BuildDreamState(s);
             var campos = ProtoMessage.Parse(izg).Fields;
@@ -297,15 +297,15 @@ namespace Jondo.Unity.Tests.World
             int puertas = campos.Count(f => f.FieldNumber == 4);
             Assert.Equal(3, puertas);
 
-            // El grafo va en el f16, y no es pequeño: sin él el cliente se queda dentro de la sala
-            // sin mapa del sueño, sin lista de bonos y sin bestiario.
+            // The graph goes in f16, and it is not small: without it the client stays inside the room
+            // without the dream's map, without the bonus list and without the bestiary.
             var grafo = campos.FirstOrDefault(f => f.FieldNumber == 16);
             Assert.NotNull(grafo);
             Assert.NotNull(grafo!.BytesValue);
             Assert.True(grafo.BytesValue!.Length > 50,
                         "el f16 del estado ha salido demasiado corto para llevar el grafo");
 
-            // Y el nivel, que va en el f20.
+            // And the level, which goes in f20.
             var nivel = campos.FirstOrDefault(f => f.FieldNumber == 20);
             Assert.NotNull(nivel);
             Assert.Equal(200, (int)nivel!.VarIntValue);
@@ -340,8 +340,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void La_fuente_es_la_ultima_de_la_franja_y_abre_la_siguiente()
         {
-            // Censadas las 665 salas de las quince capturas: filas 1, 2 y 3 son de pelea en las
-            // 529, y la fila 4 es Fuente en las 68. Ni una de jefe.
+            // Counting the 665 rooms of the fifteen captures: rows 1, 2 and 3 are fights in all
+            // 529, and row 4 is a Fountain in all 68. Not one boss room.
             var s = Uno();
 
             var fuentes = s.Salas.Where(x => x.EsFuente).ToList();
@@ -349,8 +349,8 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(s.Salas.Max(x => x.Fila), fuente.Fila);
             Assert.Empty(fuente.Miembros);
 
-            // Y las de en medio SÍ pelean, todas. Marcar una de Favor en la franja I era doble
-            // error: contradecía esas 529 y la guía dice que los Favores no salen en el primer
+            // And the middle ones DO fight, all of them. Marking one as a Favour in band I was a double
+            // error: it contradicted those 529 and the guide says the Favours do not appear in the first
             // palier.
             int ultima = s.Salas.Max(x => x.Fila);
             foreach (var sala in s.Salas.Where(x => x.Fila != 0 && x.Fila != ultima))
@@ -358,7 +358,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.NotEmpty(sala.Miembros);
             }
 
-            // Pisar la fuente encadena: «Chaque palier commencera toujours par une Fontaine».
+            // Stepping on the fountain chains: «Chaque palier commencera toujours par une Fontaine».
             int antes = s.Salas.Count;
             Dreams.AnadirFranja(s);
 
@@ -373,7 +373,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(2, fountains.Count);
             Assert.Empty(fountains.Single(x => x != fuente).Salidas);
 
-            // Y nadie se queda sin poder llegar.
+            // And nobody is left unable to get there.
             foreach (var sala in s.Salas)
             {
                 if (sala.Id == 0) continue;
@@ -387,8 +387,8 @@ namespace Jondo.Unity.Tests.World
             var s = Uno();
             Assert.Empty(s.Ganados);
 
-            // Se cobra al ENTRAR, no al ganar: lo dice la guía y encaja con que la ventana los
-            // enseñe antes de pelear.
+            // It is collected on ENTERING, not on winning: the guide says so and it fits with the window
+            // showing them before fighting.
             var primera = s.Salas.First(x => x.Regalo != null);
             s.Ganados.Add(primera.Regalo!);
             s.Actual = primera.Id;
@@ -403,8 +403,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Las_dos_formas_del_potenciador_son_las_medidas()
         {
-            // Los bytes NO son de mi aritmética: están copiados de los f15 de las capturas, que
-            // es lo único que vale como referencia.
+            // The bytes are NOT from my arithmetic: they are copied from the captures' f15, which
+            // is the only thing that counts as a reference.
             //
             //   (111, 1)   0a042001586f1001            f1 { f4: 1, f11: 111 }, f2: 1
             //   (281, 2)   0a07320208025899021001      f1 { f6 { f1: 2 }, f11: 281 }, f2: 1

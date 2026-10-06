@@ -7,75 +7,75 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los zaapis de Bonta y Brakmar: el transporte corto dentro de la ciudad.
+    /// The zaapis of Bonta and Brakmar: the short transport inside the city.
     ///
-    /// Por fuera funcionan igual que un zaap —se clica, el servidor manda la lista de destinos y se
-    /// elige— pero son otra cosa: cuestan 20 kamas fijos, no hay que activarlos y sólo llevan a
-    /// sitios de su propia ciudad, sobre todo talleres y mercadillos.
+    /// On the outside they work just like a zaap —it is clicked, the server sends the destination list and one
+    /// chooses— but they are something else: they cost a fixed 20 kamas, they do not have to be activated and they only lead to
+    /// places in their own city, mostly workshops and marketplaces.
     ///
-    /// ─── De dónde sale cada número ──────────────────────────────────────────────────────────
+    /// ─── Where each number comes from ───────────────────────────────────────────────────────
     ///
-    /// El TIPO (106) y la HABILIDAD (157) salen de las capturas: el servidor real los manda en cada
-    /// jss y en cada iwn. Los GRÁFICOS salen de cruzar las 304 capturas con el volcado del cliente
-    /// —lo hace tools/tipos_interactivos.py— y ahí apareció lo que una sola captura no enseñaba:
-    /// Bonta usa DOS gráficos distintos, no uno.
+    /// The TYPE (106) and the SKILL (157) come from the captures: the real server sends them in every
+    /// jss and every iwn. The GRAPHICS come from crossing the 304 captures with the client's dump
+    /// —tools/tipos_interactivos.py does it— and there appeared what a single capture did not show:
+    /// Bonta uses TWO different graphics, not one.
     ///
-    /// ─── Por qué los destinos vienen de una captura ─────────────────────────────────────────
+    /// ─── Why the destinations come from a capture ───────────────────────────────────────────
     ///
-    /// La red no se puede deducir del cliente. Se comprobó: de cada seis destinos, cuatro son mapas
-    /// que no tienen zaapi propio —son el taller o el mercadillo al que te lleva—, así que la lista
-    /// no es «los mapas donde hay uno». El servidor la manda entera al usar el elemento, y de ahí
-    /// está sacada, igual que se hicieron los zaaps.
+    /// The network cannot be deduced from the client. It was checked: of every six destinations, four are maps
+    /// that have no zaapi of their own —they are the workshop or marketplace it takes you to—, so the list
+    /// is not «the maps where there is one». The server sends it whole on using the element, and that is where
+    /// it is taken from, just as the zaaps were done.
     ///
-    /// Sólo están Bonta y Brakmar porque sólo hay capturas de esas dos. Los otros 33 mapas con
-    /// gráfico de tipo 106 —34925 y 70914— no pertenecen a ninguna de las dos redes: son los
-    /// transportadores saltadorillos y los frigosteños, que se mueven igual pero tienen su propia
-    /// red. Se quedan fuera a propósito hasta que se saquen sus destinos de la captura que hay:
-    /// registrarlos ahora daría un elemento que se puede clicar y no hace nada, que es peor que no
-    /// tenerlo. Añadirlos es meter su ciudad en el .json y su gráfico en <see cref="GraphicsOf"/>.
+    /// Only Bonta and Brakmar are there because there are only captures of those two. The other 33 maps with a
+    /// type 106 graphic —34925 and 70914— belong to neither of the two networks: they are the
+    /// Saltadorillo and Frigost transporters, which move the same but have their own
+    /// network. They are left out on purpose until their destinations are taken from the capture there is:
+    /// registering them now would give an element that can be clicked and does nothing, which is worse than not
+    /// having it. Adding them is putting their city in the .json and their graphic in <see cref="GraphicsOf"/>.
     /// </summary>
     public static class Zaapis
     {
-        /// <summary>El tipo con el que el cliente dibuja un zaapi. Medido del jss real.</summary>
+        /// <summary>The type the client draws a zaapi with. Measured from the real jss.</summary>
         public const int Type = 106;
 
-        /// <summary>La habilidad de «usar», que el servidor devuelve en el iwn.</summary>
+        /// <summary>The «use» skill, which the server returns in the iwn.</summary>
         public const int UseSkill = 157;
 
-        /// <summary>Lo que cuesta un salto, fijo. Sale igual en las tres capturas.</summary>
+        /// <summary>What one hop costs, fixed. It comes out the same in all three captures.</summary>
         public const int Cost = 20;
 
         /// <summary>
-        /// La pestaña donde el cliente pone estos destinos: 1.
+        /// The tab where the client puts these destinations: 1.
         ///
-        /// Va en el f3 de cada entrada del hjj y el cliente lo devuelve en el f2 del hjc. Sale en
-        /// las 69 entradas de las dos capturas de zaapi. Nosotros no lo mandábamos, y por eso el
-        /// cliente los trataba como zaaps normales.
+        /// It goes in the f3 of each hjj entry and the client returns it in the hjc's f2. It appears in
+        /// the 69 entries of the two zaapi captures. We did not send it, and that is why the
+        /// client treated them as normal zaaps.
         /// </summary>
         public const int Kind = 1;
 
         /// <summary>
-        /// Qué teletransportador es, para el f4 de la RAÍZ del hjj: 0 el zaap, 1 el zaapi, 3 el
-        /// barco. Es lo que decide qué ventana abre el cliente.
+        /// Which teleporter it is, for the f4 of the hjj's ROOT: 0 the zaap, 1 the zaapi, 3 the
+        /// boat. It is what decides which window the client opens.
         ///
-        /// Vale lo mismo que <see cref="Kind"/> por casualidad: aquél va en cada destino y dice en
-        /// qué pestaña cae, éste va una sola vez y dice qué ventana se abre. Son dos campos
-        /// distintos y se dejan separados para que nadie los confunda el día que dejen de coincidir
-        /// —el barco ya no coincide: su ventana es la 3 y sus destinos no llevan pestaña—.
+        /// It has the same value as <see cref="Kind"/> by chance: that one goes in each destination and says which
+        /// tab it falls in, this one goes only once and says which window opens. They are two different
+        /// fields and are kept separate so that nobody confuses them the day they stop matching
+        /// —the boat already does not match: its window is 3 and its destinations carry no tab—.
         /// </summary>
         public const int Teleporter = 1;
 
-        /// <summary>El nivel de zona que acompaña a cada destino en la lista.</summary>
+        /// <summary>The zone level that accompanies each destination in the list.</summary>
         private const int Level = 10;
 
-        /// <summary>Una red: la de una ciudad.</summary>
+        /// <summary>A network: a city's.</summary>
         public sealed class Network
         {
             public string City { get; init; } = "";
             public IReadOnlyList<Destination> Destinations { get; init; } = Array.Empty<Destination>();
         }
 
-        /// <summary>Un sitio al que lleva el zaapi.</summary>
+        /// <summary>A place the zaapi leads to.</summary>
         public readonly struct Destination
         {
             public Destination(long mapId, int subAreaId) { MapId = mapId; SubAreaId = subAreaId; }
@@ -90,10 +90,10 @@ namespace Jondo.Unity.Server.Managers
         public static IReadOnlyDictionary<int, Network> Networks => _byGfx;
 
         /// <summary>
-        /// Carga las redes y averigua en qué mapas hay zaapi.
+        /// Loads the networks and works out which maps have a zaapi.
         ///
-        /// Un mapa pertenece a una red por el GRÁFICO de su elemento, no por estar en la lista de
-        /// destinos: desde un zaapi se puede salir aunque ese mapa no sea destino de nadie.
+        /// A map belongs to a network by the GRAPHIC of its element, not by being in the destination
+        /// list: one can leave from a zaapi even if that map is nobody's destination.
         /// </summary>
         public static void Initialize()
         {
@@ -149,11 +149,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Qué gráficos usa cada ciudad.
+        /// Which graphics each city uses.
         ///
-        /// Va a mano y con la lista delante porque es lo que se ha medido, no una regla: Bonta usa
-        /// dos —70520 y 70521— y Brakmar uno. Deducirlo del nombre de la ciudad sería inventarse
-        /// una correspondencia que nadie ha comprobado.
+        /// It goes by hand and with the list in front because it is what was measured, not a rule: Bonta uses
+        /// two —70520 and 70521— and Brakmar one. Deducing it from the city's name would be inventing
+        /// a correspondence nobody has checked.
         /// </summary>
         private static int[] GraphicsOf(string city) => city switch
         {
@@ -168,7 +168,7 @@ namespace Jondo.Unity.Server.Managers
             foreach (var n in _byGfx.Values) if (seen.Add(n.City)) yield return n.City;
         }
 
-        /// <summary>Los zaapis que hay en este mapa.</summary>
+        /// <summary>The zaapis on this map.</summary>
         public static List<Interactives.Element> ElementsOn(long mapId)
         {
             var found = new List<Interactives.Element>();
@@ -179,7 +179,7 @@ namespace Jondo.Unity.Server.Managers
             return found;
         }
 
-        /// <summary>La red a la que pertenece este mapa, o null si no hay zaapi.</summary>
+        /// <summary>The network this map belongs to, or null if there is no zaapi.</summary>
         public static Network? NetworkOn(long mapId)
             => _byMap.TryGetValue(mapId, out var network) ? network : null;
     }

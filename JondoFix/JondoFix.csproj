@@ -4,13 +4,13 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <!-- Donde esta el cliente de Dofus. Antes iba la ruta absoluta de una maquina concreta,
-         asi que aqui se busca sola y se puede mandar desde fuera:
+    <!-- Where the Dofus client is. It used to carry the absolute path of one specific machine,
+         so here it finds itself and can be passed from outside:
 
-           dotnet build JondoFix -p:DofusClientDir="D:\loquesea\Dofus"
+           dotnet build JondoFix -p:DofusClientDir="D:\whatever\Dofus"
 
-         o con la variable de entorno DOFUS_CLIENT_DIR. Si no se dice nada se prueban los nombres
-         conocidos al lado del repositorio; el primero es el de este proyecto. -->
+         or with the DOFUS_CLIENT_DIR environment variable. If nothing is said the known
+         names next to the repository are tried; the first is this project's. -->
     <DofusClientDir Condition="'$(DofusClientDir)' == '' And '$(DOFUS_CLIENT_DIR)' != ''">$(DOFUS_CLIENT_DIR)</DofusClientDir>
     <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11'))</DofusClientDir>
     <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10'))</DofusClientDir>
@@ -28,9 +28,16 @@
     </Reference>
   </ItemGroup>
 
-  <!-- El mod no sirve de nada en bin/: MelonLoader lo carga de la carpeta Mods del cliente. Se
-       copia solo al compilar, igual que el .exe del servidor va solo a la raiz. Se salta con
-       -p:SkipModDeploy=true, y si no hay cliente delante tampoco pasa nada. -->
+  <!-- The mod is of no use in bin/: MelonLoader loads it from the client's Mods folder. It is
+       copied on its own when building, just as the server's .exe goes on its own to the root. It is skipped with
+       -p:SkipModDeploy=true, and if there is no client at hand nothing happens either. -->
+  <!-- And beside the project, where it is kept in the repository: the launcher installs that one
+       in every client's Mods (LauncherService.InstallMod), so whoever has a client with
+       MelonLoader gets the mod's changes with the emulator, not with a new client. -->
+  <Target Name="GuardarMod" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)" OverwriteReadOnlyFiles="true" />
+  </Target>
+
   <Target Name="DesplegarMod" AfterTargets="Build"
           Condition="'$(SkipModDeploy)' != 'true' And Exists('$(DofusClientDir)\Mods')">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DofusClientDir)\Mods"

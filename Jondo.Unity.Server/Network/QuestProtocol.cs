@@ -129,19 +129,19 @@ namespace Jondo.Unity.Server.Network
             var inner = Pb.New();
             foreach (var (actor, quests) in actors)
             {
-                // Nombrado solo si tiene algo. Pb.Packed con una lista vacia escribe 1200 -f2 con
-                // longitud cero- y esa pareja de bytes no aparece ni una vez en las 145 tramas iom
-                // reales. Se quita una marca desapareciendo del indice, no figurando en el con cero.
+                // Named only if it has something. Pb.Packed with an empty list writes 1200 -f2 with
+                // zero length- and that byte pair does not appear once in the 145 real iom
+                // frames. A mark is removed by disappearing from the index, not by figuring in it with zero.
                 if (quests.Count == 0) continue;
 
                 var block = Pb.New();
 
                 // Packed, which is how the captures carry them: one length-delimited field with the
                 // varints end to end, not one field per quest.
-                // Sin lista vacia. Un actor que no tiene nada no se nombra: la pareja de bytes
-                // 1200 -f2 con longitud cero- no aparece ni una vez en las 145 tramas iom reales
-                // medidas, y quitar una marca se hace mandando el iom entero vacio, no nombrando
-                // al actor con una lista de cero.
+                // No empty list. An actor that has nothing is not named: the byte pair
+                // 1200 -f2 with zero length- does not appear once in the 145 real iom frames
+                // measured, and removing a mark is done by sending the whole iom empty, not by naming
+                // the actor with a list of zero.
                 var packed = new List<long>(quests.Count);
                 foreach (int quest in quests) packed.Add(quest);
                 block.Packed(2, packed);

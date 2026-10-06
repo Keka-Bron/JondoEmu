@@ -4,16 +4,16 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
-    <!-- Lo poco que el servidor y el lanzador tienen que saber el uno del otro. Ni base de datos,
-         ni protocolo, ni ventanas: rutas de fichero, el contrato del canal de mando, los textos y
-         la paleta. Es la unica pieza que viaja en los DOS ejecutables, asi que cuanto menos tenga,
-         mejor.
+    <!-- The little the server and the launcher have to know about each other. No database,
+         no protocol, no windows: file paths, the control channel's contract, the texts and
+         the palette. It is the only piece that travels in BOTH executables, so the less it has,
+         the better.
 
-         Ya NO lleva Windows Forms. Los controles pintados a mano se fueron a
-         Jondo.Unity.Contract.WinForms, que es quien los necesita; asi el lanzador y Studio, que
-         son de Avalonia, no arrastran el escritorio de Windows solo por compartir los textos. Lo
-         que si se queda es LauncherPalette: los colores son numeros y no dependen de con que se
-         pinten. -->
+         It NO longer carries Windows Forms. The hand-painted controls went to
+         Jondo.Unity.Contract.WinForms, which is what needs them; that way the launcher and Studio, which
+         are Avalonia, do not drag in the Windows desktop just for sharing the texts. What
+         does stay is LauncherPalette: colours are numbers and do not depend on what they are
+         painted with. -->
   </PropertyGroup>
 
   <ItemGroup>

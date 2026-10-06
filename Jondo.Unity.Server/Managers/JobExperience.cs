@@ -4,46 +4,46 @@ using System.Collections.Generic;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// La experiencia de oficio: cuánta lleva cada personaje y en qué nivel va.
+    /// Profession experience: how much each character has and what level he is at.
     ///
-    /// ─── La curva, que sale de tres puntos medidos ──────────────────────────────────────────
+    /// ─── The curve, which comes from three measured points ──────────────────────────────────
     ///
-    /// El cliente NO trae tabla de experiencia de oficio. La suya, CharacterXpMappings, sólo tiene
-    /// una columna y es la del personaje: 110 para el nivel 2, 650 para el 3. Los oficios van por
-    /// otro lado y ese lado no viaja en los datos.
+    /// The client does NOT bring a profession experience table. Its own, CharacterXpMappings, only has
+    /// one column and it is the character's: 110 for level 2, 650 for level 3. Professions go a
+    /// different way and that way does not travel in the data.
     ///
-    /// Pero el <c>irq</c> de las capturas lo enseña sin querer, porque manda TOTALES y no
-    /// incrementos: f2 es lo que hace falta para el nivel siguiente, f3 el nivel, f4 el suelo del
-    /// nivel actual y f5 la experiencia acumulada. De ahí salen tres puntos:
+    /// But the captures' <c>irq</c> shows it by accident, because it sends TOTALS and not
+    /// increments: f2 is what is needed for the next level, f3 the level, f4 the floor of the
+    /// current level and f5 the accumulated experience. Three points come out of that:
     ///
-    ///     nivel   2  ->      20     (subida de campesino, captura del trigo)
-    ///     nivel   3  ->      60     (el f2 de esa misma subida)
-    ///     nivel 200  -> 398.000     (el f4 del leñador, que está al tope)
+    ///     level   2  ->      20     (farmer level-up, wheat capture)
+    ///     level   3  ->      60     (the f2 of that same level-up)
+    ///     level 200  -> 398,000     (the lumberjack's f4, who is at the cap)
     ///
-    /// Y los tres los cuadra la misma fórmula:
+    /// And the same formula fits all three:
     ///
-    ///     experiencia(nivel) = 10 · nivel · (nivel − 1)
+    ///     experience(level) = 10 · level · (level − 1)
     ///
-    ///     10·2·1 = 20 ✔      10·3·2 = 60 ✔      10·200·199 = 398.000 ✔
+    ///     10·2·1 = 20 ✔      10·3·2 = 60 ✔      10·200·199 = 398,000 ✔
     ///
-    /// Tres de tres, incluido el extremo. No es una curva inventada que pase por dos puntos: es
-    /// una fórmula sencilla que acierta en todos los que hay, y el del nivel 200 es el que
-    /// difícilmente saldría por casualidad.
+    /// Three out of three, the extreme included. It is not an invented curve passing through two points: it is
+    /// a simple formula that hits every one there is, and the level 200 one is the one that would
+    /// hardly come out by chance.
     ///
-    /// ─── Cuánta se gana ─────────────────────────────────────────────────────────────────────
+    /// ─── How much is earned ─────────────────────────────────────────────────────────────────
     ///
-    /// Diez por recogida, y es FIJO: se midió con 20, 14 y 17 unidades de madera y las tres veces
-    /// fueron +10. No va por unidades.
+    /// Ten per harvest, and it is FIXED: it was measured with 20, 14 and 17 units of wood and all three times
+    /// it was +10. It does not go by units.
     /// </summary>
     public static class JobExperience
     {
-        /// <summary>El nivel al que llega un oficio.</summary>
+        /// <summary>The level a profession reaches.</summary>
         public const int MaxLevel = 200;
 
-        /// <summary>Lo que da una recogida. Medido tres veces con cantidades distintas.</summary>
+        /// <summary>What one harvest gives. Measured three times with different quantities.</summary>
         public const int PerGather = 10;
 
-        /// <summary>La experiencia acumulada con la que empieza un nivel.</summary>
+        /// <summary>The accumulated experience a level starts with.</summary>
         public static long Floor(int level)
         {
             if (level <= 1) return 0;
@@ -51,15 +51,15 @@ namespace Jondo.Unity.Server.Managers
             return 10L * level * (level - 1);
         }
 
-        /// <summary>Lo que hace falta para el nivel siguiente, o cero si ya está al tope.</summary>
+        /// <summary>What is needed for the next level, or zero if already at the cap.</summary>
         public static long Next(int level) => level >= MaxLevel ? 0 : Floor(level + 1);
 
-        /// <summary>En qué nivel va alguien con esta experiencia.</summary>
+        /// <summary>What level someone with this experience is at.</summary>
         public static int LevelOf(long experience)
         {
             if (experience < 20) return 1;
-            // Se despeja de 10·n·(n−1) y luego se ajusta a mano, que es más corto que iterar
-            // doscientas veces y no se fía de la aritmética en coma flotante para el borde.
+            // It is solved from 10·n·(n−1) and then adjusted by hand, which is shorter than iterating
+            // two hundred times and does not trust floating-point arithmetic for the edge.
             int level = (int)Math.Floor((1 + Math.Sqrt(1 + 0.4 * experience)) / 2);
             if (level < 1) level = 1;
             if (level > MaxLevel) level = MaxLevel;
@@ -68,7 +68,7 @@ namespace Jondo.Unity.Server.Managers
             return level;
         }
 
-        /// <summary>Lo que lleva un personaje en un oficio.</summary>
+        /// <summary>What a character has in a profession.</summary>
         public sealed class Progress
         {
             public int JobId { get; init; }
@@ -77,9 +77,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Suma experiencia y dice si ha subido de nivel.
+        /// Adds experience and says whether it levelled up.
         ///
-        /// El estado vive en la sesión del personaje, que es quien lo guarda en la base.
+        /// The state lives in the character's session, which is what stores it in the database.
         /// </summary>
         public static bool Add(IDictionary<int, Progress> jobs, int jobId, long amount,
                                out Progress progress)

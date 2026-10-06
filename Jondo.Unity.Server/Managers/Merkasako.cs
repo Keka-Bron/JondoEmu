@@ -7,39 +7,39 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// El merkasako, que es el havre-sac: el espacio propio al que se entra desde cualquier sitio.
+    /// The merkasako, which is the haven bag: one's own space, entered from anywhere.
     ///
-    /// Sus mapas están todos en la subzona 851 y no tienen coordenadas —salen como (0,0) en
-    /// MapPositions— porque no están en el mundo. Cada uno es un DECORADO, y la tabla
-    /// HavenBagThemes del cliente da los 48 con su mapa: el tema 1 es el de Kerubim, el 4 el de
-    /// Allister, y así.
+    /// Its maps are all in subzone 851 and have no coordinates —they come out as (0,0) in
+    /// MapPositions— because they are not in the world. Each one is a THEME, and the client's
+    /// HavenBagThemes table gives the 48 with their map: theme 1 is Kerubim's, 4 is
+    /// Allister's, and so on.
     ///
-    /// Casi todos llevan además un zaap del normal, con el mismo dibujo que los del mundo, un cofre
-    /// (dibujo 12367, el mismo que en las casas) y la lotería (dibujo 51031, que solo está aquí).
+    /// Almost all of them also carry a normal zaap, with the same drawing as the world's, a chest
+    /// (drawing 12367, the same as in houses) and the lottery (drawing 51031, which is only here).
     ///
-    /// Lo que se habla con el cliente, de las capturas:
+    /// What is spoken with the client, from the captures:
     ///
-    ///   jbn { f2: de quién }        el botón y la tecla H
-    ///   jbl { f1: tema }            cambiarse de decorado
-    ///   jbv -> jbm                  abrir el modo de colocar muebles
-    ///   jbg { f2 (rep): {f1: casilla, f2: mueble, f3: giro} }   guardar la habitación
-    ///   jbu { f1 (rep): {f1: casilla, f2: mueble, f3: giro} }   lo que hay puesto
+    ///   jbn { f2: whose }           the button and the H key
+    ///   jbl { f1: theme }           switch theme
+    ///   jbv -> jbm                  open furniture placing mode
+    ///   jbg { f2 (rep): {f1: cell, f2: furniture, f3: rotation} }   store the room
+    ///   jbu { f1 (rep): {f1: cell, f2: furniture, f3: rotation} }   what is placed
     /// </summary>
     public static class Merkasako
     {
-        /// <summary>La subzona donde viven todos los mapas del merkasako.</summary>
+        /// <summary>The subzone where all the haven bag maps live.</summary>
         public const int SubArea = 851;
 
-        /// <summary>El dibujo del cofre, el mismo que el de las casas.</summary>
+        /// <summary>The chest's drawing, the same as the houses'.</summary>
         public const int ChestGfx = 12367;
 
-        /// <summary>El tipo de elemento "Cofre", de la tabla de interactivos del cliente.</summary>
+        /// <summary>The "Cofre" element type, from the client's interactives table.</summary>
         public const int ChestType = 85;
 
-        /// <summary>La habilidad que ofrece un cofre. En la captura de la casa el iwn lleva f4: 104.</summary>
+        /// <summary>The skill a chest offers. In the house capture the iwn carries f4: 104.</summary>
         public const int ChestSkill = 104;
 
-        /// <summary>El decorado con el que empieza uno, el de Kerubim.</summary>
+        /// <summary>The theme one starts with, Kerubim's.</summary>
         public const int DefaultTheme = 1;
 
         private static readonly Dictionary<int, long> _themes = new Dictionary<int, long>();
@@ -112,7 +112,7 @@ namespace Jondo.Unity.Server.Managers
                     {
                         if (!int.TryParse(entry.Name, out int id)) continue;
                         long mapId = entry.Value.GetInt64();
-                        // Un tema cuyo mapa no está en el mundo no sirve: llevaría a la nada.
+                        // A theme whose map is not in the world is no use: it would lead to nothing.
                         if (!_maps.Contains(mapId)) continue;
 
                         _themes[id] = mapId;
@@ -136,10 +136,10 @@ namespace Jondo.Unity.Server.Managers
 
         public static bool IsHavenBag(long mapId) => _maps.Contains(mapId);
 
-        /// <summary>¿Existe ese mueble en el catálogo del cliente?</summary>
+        /// <summary>Does that piece of furniture exist in the client's catalogue?</summary>
         public static bool IsFurniture(long typeId) => _furniture.Contains(typeId);
 
-        /// <summary>El mapa de un decorado. Si el número no existe, el de siempre.</summary>
+        /// <summary>A theme's map. If the number does not exist, the usual one.</summary>
         public static long MapOfTheme(int theme)
         {
             if (_themes.TryGetValue(theme, out long mapId)) return mapId;
@@ -149,21 +149,21 @@ namespace Jondo.Unity.Server.Managers
             return 0;
         }
 
-        /// <summary>De qué decorado es este mapa.</summary>
+        /// <summary>Which theme this map belongs to.</summary>
         public static int ThemeOfMap(long mapId)
             => _themeOfMap.TryGetValue(mapId, out int theme) ? theme : DefaultTheme;
 
         /// <summary>
-        /// El zaap de un mapa del merkasako, reconocido por el dibujo igual que los del mundo.
+        /// The zaap of a haven bag map, recognised by the drawing just like the world's.
         ///
-        /// No se puede usar <see cref="Interactives.ZaapOf"/> tal cual porque aquélla exige que el
-        /// mapa esté en la tabla de zaaps del cliente, y estos no lo están: son destinos a los que
-        /// no se viaja, sino desde los que se viaja.
+        /// <see cref="Interactives.ZaapOf"/> cannot be used as is because that one requires the
+        /// map to be in the client's zaap table, and these are not: they are not destinations
+        /// travelled to, but travelled from.
         /// </summary>
         public static Interactives.Element ZaapOf(long mapId)
             => _maps.Contains(mapId) ? Interactives.ZaapByGfx(mapId) : default;
 
-        /// <summary>El cofre de un mapa del merkasako.</summary>
+        /// <summary>The chest of a haven bag map.</summary>
         public static Interactives.Element ChestOf(long mapId)
             => _maps.Contains(mapId) ? Interactives.ElementByGfx(mapId, ChestGfx) : default;
     }

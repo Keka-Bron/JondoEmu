@@ -362,7 +362,7 @@ namespace Jondo.Unity.Server.Handlers
             // Field 5: Stat ID
             statMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = statId });
 
-            // Field 3: las sub-message (Field 2 = base value, Field 3 = scrolls, Field 7 = equip bonus)
+            // Field 3: the sub-messages (Field 2 = base value, Field 3 = scrolls, Field 7 = equip bonus)
             var lasMsg = new ProtoMessage();
             if (baseValue != 0)
                 lasMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = baseValue });
@@ -414,26 +414,26 @@ namespace Jondo.Unity.Server.Handlers
         };
 
         /// <summary>
-        /// Lo que el equipo suma a una característica.
+        /// What the equipment adds to a characteristic.
         ///
-        /// Se cuenta POR CARACTERÍSTICA y CON SIGNO, no por un único efecto. Antes se traducía la
-        /// característica a un solo número de efecto —los PM al 128— y se sumaba ése y nada más,
-        /// así que se perdían dos cosas: los efectos que RESTAN, como el 169 del Collar de
-        /// Gargandias, que quita un PM, y cualquier otro efecto que toque la misma característica.
-        /// Con el 169 fuera de la cuenta salían 6 PM donde el cliente pinta 5.
+        /// It is counted PER CHARACTERISTIC and WITH SIGN, not by a single effect. The characteristic used to
+        /// be translated into a single effect number -- MP to 128 -- and that one was added and nothing else,
+        /// so two things were lost: the effects that SUBTRACT, like the 169 of the Collar de Gargandias,
+        /// which takes away an MP, and any other effect touching the same characteristic. With 169 left out
+        /// of the count 6 MP came out where the client draws 5.
         ///
-        /// Quién toca qué y con qué signo lo dice el catálogo del cliente (tabla Effects,
-        /// Characteristic y BonusType), no una lista escrita aquí. El signo cero es importante: el
-        /// efecto 101 apunta a los PA pero es lo que cuesta el arma, y no se cuenta.
+        /// Who touches what and with what sign is said by the client's catalogue (Effects table,
+        /// Characteristic and BonusType), not by a list written here. Sign zero is important: effect 101
+        /// points at AP but it is what the weapon costs, and it is not counted.
         ///
-        /// Comprobado contra la ficha entera de un personaje: fuerza 468, inteligencia 170, suerte
-        /// 150, agilidad 70, sabiduría 425, prospección 150, vida 4803, 10 PA y 5 PM.
+        /// Checked against a character's whole sheet: strength 468, intelligence 170, chance 150, agility
+        /// 70, wisdom 425, prospecting 150, life 4803, 10 AP and 5 MP.
         /// </summary>
         public static int GetEquipBonus(int statId)
         {
             int bonus = 0;
-            // El efecto con el que se traducía antes, que se sigue admitiendo para las
-            // características que el catálogo no sepa colocar.
+            // The effect it used to be translated with, which is still accepted for the
+            // characteristics the catalogue does not know where to place.
             int legacyEffect = EffectActionIdByStatId.TryGetValue(statId, out int mapped) ? mapped : statId;
 
             foreach (var equipped in GameState.GetEquippedItemsCopy().Values)
@@ -460,63 +460,60 @@ namespace Jondo.Unity.Server.Handlers
             return baseHp + equipHp;
         }
 
-        /// <summary>Los puntos de acción y de movimiento con los que nace todo el mundo.</summary>
+        /// <summary>The action and movement points everybody is born with.</summary>
         public const int PlayerBaseAp = 6;
         public const int PlayerBaseMp = 3;
 
-        /// <summary>El nivel al que se gana el séptimo punto de acción.</summary>
+        /// <summary>The level at which the seventh action point is earned.</summary>
         public const int LevelForSeventhAp = 100;
 
         /// <summary>
-        /// Los puntos de acción de nacimiento, que son seis hasta el nivel 100 y siete a partir de
-        /// ahí.
+        /// The starting action points, which are six up to level 100 and seven from there on.
         ///
-        /// No es un número escogido a ojo: es el único que cuadra. Del equipo de este personaje
-        /// salen +3 de PA —el Collar de Gargandias da 2 y el Dofus Ocre 1, y eso está comprobado
-        /// contra los efectos canónicos del cliente, resolviendo las referencias de
-        /// ItemTemplates.possibleEffects contra la tabla ItemEffects— y su ficha pinta 10. Con base
-        /// seis saldrían nueve.
+        /// It is not a number picked by eye: it is the only one that fits. This character's equipment gives
+        /// +3 AP -- the Collar de Gargandias gives 2 and the Ochre Dofus 1, and that is checked against the
+        /// client's canonical effects, resolving ItemTemplates.possibleEffects' references against the
+        /// ItemEffects table -- and his sheet draws 10. With base six it would come out nine.
         /// </summary>
         public static int PlayerInnateAp()
             => PlayerBaseAp + (GameState.CharacterLevel >= LevelForSeventhAp ? 1 : 0);
 
         /// <summary>
-        /// Los puntos de acción del personaje, base más equipo (característica 1).
+        /// The character's action points, base plus equipment (characteristic 1).
         ///
-        /// Existe por lo mismo que GetPlayerMaxHp: la ficha que ve el jugador y la que usa el
-        /// combate tienen que salir del MISMO sitio. El combate se los ponía a 6 y a 3 a pelo,
-        /// así que un personaje con +4 PA y +2 PM de equipo veía 10 y 5 en pantalla y peleaba con
-        /// 6 y 3.
+        /// It exists for the same reason as GetPlayerMaxHp: the sheet the player sees and the one the fight
+        /// uses have to come from THE SAME place. The fight put them at 6 and 3 flat, so a character with
+        /// +4 AP and +2 MP from equipment saw 10 and 5 on screen and fought with 6 and 3.
         /// </summary>
         public static int GetPlayerMaxAp() => PlayerInnateAp() + GetEquipBonus(1);
 
-        /// <summary>Los puntos de movimiento del personaje, base más equipo (característica 23).</summary>
+        /// <summary>The character's movement points, base plus equipment (characteristic 23).</summary>
         public static int GetPlayerMaxMp() => PlayerBaseMp + GetEquipBonus(23);
 
-        /// <summary>Las cuatro elementales del personaje, puntos y pergaminos, que es lo que cuenta la iniciativa.</summary>
+        /// <summary>The character's four elementals, points and scrolls, which is what initiative counts.</summary>
         public static int IniciativaInvertida()
             => GameState.TotalStrength + GameState.TotalIntelligence
              + GameState.TotalChance + GameState.TotalAgility;
 
         /// <summary>
-        /// Lo que el equipo le suma a la iniciativa: las CUATRO elementales de los objetos y además
-        /// la característica 44, la iniciativa propiamente dicha.
+        /// What the equipment adds to initiative: the FOUR elementals of the items and also
+        /// characteristic 44, initiative proper.
         ///
-        /// Las elementales del equipo faltaban, y son casi todo: en el personaje de pruebas el
-        /// equipo pone +730 de fuerza y +760 de agilidad. Sin ellas, un nivel 200 sacaba menos
-        /// iniciativa que un pío de nivel 14 —el monstruo sí suma las cinco características que
-        /// trae de la base— y el bicho jugaba primero.
+        /// The equipment's elementals were missing, and they are nearly everything: on the test
+        /// character the equipment gives +730 strength and +760 agility. Without them, a level 200 got
+        /// less initiative than a level 14 piwi -- the monster does add the five characteristics it
+        /// brings from the base -- and the creature played first.
         /// </summary>
         public static int IniciativaDelEquipo()
             => GetEquipBonus(10) + GetEquipBonus(15) + GetEquipBonus(13)
              + GetEquipBonus(14) + GetEquipBonus(44);
 
         /// <summary>
-        /// La iniciativa del personaje, que es la que decide quién empieza el combate. Ni la
-        /// vitalidad ni la sabiduría cuentan.
+        /// The character's initiative, which is what decides who starts the fight. Neither vitality nor
+        /// wisdom counts.
         ///
-        /// Existe por lo mismo que <see cref="GetPlayerMaxHp"/>: la ficha que ve el jugador y el
-        /// reparto de turnos tienen que salir del MISMO sitio.
+        /// It exists for the same reason as <see cref="GetPlayerMaxHp"/>: the sheet the player sees and
+        /// the turn order have to come from THE SAME place.
         /// </summary>
         public static int GetPlayerInitiative() => IniciativaInvertida() + IniciativaDelEquipo();
 

@@ -6,78 +6,78 @@ using System.Text.Json;
 namespace Jondo.Unity.Launcher.Network
 {
     /// <summary>
-    /// El lado del lanzador del canal de mando: le habla al servidor por HTTP.
+    /// The launcher's side of the control channel: it talks to the server over HTTP.
     ///
-    /// Todo va por aquí, incluso cuando el servidor es este mismo proceso. Un solo camino en vez de
-    /// dos —«si está en local llamo al método, y si no, por el cable»— porque el camino que sólo se
-    /// usa a veces es el que se rompe sin que nadie se entere.
+    /// Everything goes through here, even when the server is this same process. A single path instead of
+    /// two —«if it is local I call the method, and if not, over the wire»— because the path only
+    /// used sometimes is the one that breaks without anyone noticing.
     ///
-    /// Las llamadas son SÍNCRONAS a propósito: quien llama es la ventana, que ya las hacía
-    /// síncronas cuando eran métodos normales, y así no hay que reescribirla entera. Por eso el
-    /// tiempo de espera es corto: con el servidor caído la ventana no se puede quedar pillada.
+    /// The calls are SYNCHRONOUS on purpose: the caller is the window, which already made them
+    /// synchronously when they were normal methods, and that way it does not have to be rewritten whole. That is why the
+    /// timeout is short: with the server down the window cannot be left stuck.
     /// </summary>
     public static class ControlClient
     {
-        // ─── Los plazos, cada uno con su nombre y su razón ──────────────────────
+        // ─── The timeouts, each with its name and its reason ────────────────────
         //
-        // Había uno solo, de cuatro segundos, para todo. Cuatro segundos son de sobra para
-        // preguntar el estado y son POCOS para entrar cuando el servidor está leyendo los mapas:
-        // ese era el «el servidor no responde» que salía al entrar justo después de arrancarlo,
-        // con un servidor que estaba perfectamente. Un plazo sin nombre acaba usándose para todo y
-        // quedándose mal para casi todo.
+        // There was a single one, of four seconds, for everything. Four seconds are plenty to
+        // ask for the status and are TOO FEW to log in while the server is reading the maps:
+        // that was the «el servidor no responde» that came out when logging in right after starting it,
+        // with a server that was perfectly fine. A timeout without a name ends up used for everything and
+        // being wrong for almost everything.
 
-        /// <summary>Sondear si hay alguien. Corto a propósito: sólo se pregunta y se cuelga.</summary>
+        /// <summary>Probing whether anyone is there. Short on purpose: it only asks and hangs up.</summary>
         public static readonly TimeSpan PlazoDeSondeo = TimeSpan.FromSeconds(2);
 
-        /// <summary>Una orden normal —entrar, crear cuenta, lanzar—, que toca la base de datos.</summary>
+        /// <summary>A normal order —log in, create an account, launch—, which touches the database.</summary>
         public static readonly TimeSpan PlazoDeOrden = TimeSpan.FromSeconds(15);
 
         /// <summary>
-        /// Lo que se espera a que un servidor recién arrancado conteste por primera vez.
+        /// How long to wait for a freshly started server to answer for the first time.
         /// </summary>
         /// <remarks>
-        /// Noventa segundos, que es lo que tarda en frío: lee la base, los managers y los mapas
-        /// antes de abrir un solo puerto. No es el plazo de una petición sino el del bucle que
-        /// insiste; cada intento por dentro usa <see cref="PlazoDeSondeo"/>.
+        /// Ninety seconds, which is what it takes from cold: it reads the base, the managers and the maps
+        /// before opening a single port. It is not the timeout of a request but that of the loop that
+        /// insists; each attempt inside uses <see cref="PlazoDeSondeo"/>.
         /// </remarks>
         public static readonly TimeSpan PlazoDeArranque = TimeSpan.FromSeconds(90);
 
         /// <summary>
-        /// Cada plazo, su cliente.
+        /// Each timeout, its client.
         /// </summary>
         /// <remarks>
-        /// HttpClient fija el tiempo de espera al construirse y no deja cambiarlo una vez que se ha
-        /// mandado algo, así que hay uno por plazo. Son dos objetos para toda la vida del proceso,
-        /// no uno por petición, que es lo que hay que evitar con HttpClient.
+        /// HttpClient fixes the timeout on being built and does not allow changing it once
+        /// something has been sent, so there is one per timeout. They are two objects for the whole life of the process,
+        /// not one per request, which is what has to be avoided with HttpClient.
         /// </remarks>
         private static readonly HttpClient ClienteDeSondeo = new HttpClient { Timeout = PlazoDeSondeo };
         private static readonly HttpClient ClienteDeOrden = new HttpClient { Timeout = PlazoDeOrden };
 
-        /// <summary>Los verbos que sólo preguntan, y que por eso van con el plazo corto.</summary>
+        /// <summary>The verbs that only ask, and that is why they go with the short timeout.</summary>
         private static readonly System.Collections.Generic.HashSet<string> SóloPreguntan =
             new(StringComparer.OrdinalIgnoreCase) { "estado", "recordar-token" };
 
         private static string _secreto = "";
 
         /// <summary>
-        /// La sesión con la que se habla, o cadena vacía si todavía no ha entrado nadie.
+        /// The session one talks with, or an empty string if nobody has logged in yet.
         ///
-        /// Va en cada petición: desde que el servidor comprueba roles, es lo que dice QUIÉN pide
-        /// las cosas. Antes esto lo hacía un secreto de la máquina, que no sirve en cuanto el
-        /// lanzador está en el ordenador de otro.
+        /// It goes in every request: since the server checks roles, it is what says WHO asks
+        /// for things. Before, this was done by a machine secret, which is no use as soon as the
+        /// launcher is on someone else's computer.
         /// </summary>
         public static string Token { get; set; } = "";
 
         /// <summary>
-        /// A qué servidor se le habla.
+        /// Which server one talks to.
         ///
-        /// Sale de las preferencias, no de un literal: por defecto esta misma máquina —jugar en
-        /// local— y si no, la dirección que se haya puesto en el desplegable, que puede ser la de
-        /// otro ordenador por Hamachi o la de una VPS.
+        /// It comes from the preferences, not from a literal: by default this same machine —playing
+        /// locally— and if not, the address put in the drop-down, which can be that of
+        /// another computer over Hamachi or that of a VPS.
         /// </summary>
         public static string Base => $"http://{UI.LauncherPreferences.ServerHost}:{Contract.Puerto}";
 
-        /// <summary>Lo que ha contestado el servidor, o el silencio si no había nadie.</summary>
+        /// <summary>What the server answered, or silence if nobody was there.</summary>
         public readonly struct Respuesta
         {
             public Respuesta(bool llego, int codigo, string json)
@@ -85,7 +85,7 @@ namespace Jondo.Unity.Launcher.Network
                 Llego = llego; Codigo = codigo; Json = json;
             }
 
-            /// <summary>Falso cuando no hubo respuesta: no hay servidor, o no contesta a tiempo.</summary>
+            /// <summary>False when there was no answer: there is no server, or it does not answer in time.</summary>
             public bool Llego { get; }
             public int Codigo { get; }
             public string Json { get; }
@@ -101,9 +101,9 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// Manda una orden. Si se la rechazan por el secreto, lo vuelve a leer del fichero y lo
-        /// intenta una vez más: el servidor reparte un secreto nuevo en cada arranque, así que un
-        /// lanzador que llevara rato abierto se queda con el viejo en cuanto el servidor rearranca.
+        /// Sends an order. If it is rejected because of the secret, it reads it again from the file and
+        /// tries once more: the server hands out a new secret on each start, so a
+        /// launcher that had been open for a while keeps the old one as soon as the server restarts.
         /// </summary>
         public static Respuesta Pedir(string verbo, object? cuerpo = null)
         {
@@ -140,19 +140,19 @@ namespace Jondo.Unity.Launcher.Network
             }
             catch
             {
-                // No hay servidor al otro lado, o no ha contestado a tiempo. No es un error a
-                // gritos: es la situación normal mientras el servidor arranca.
+                // There is no server on the other side, or it has not answered in time. It is not an error to
+                // shout about: it is the normal situation while the server starts.
                 return new Respuesta(false, 0, "");
             }
         }
 
         /// <summary>
-        /// El cuerpo de la petición, con el token de la sesión metido dentro.
+        /// The request's body, with the session token put inside.
         ///
-        /// Se pone aquí y no en cada llamada para que no se pueda olvidar en ninguna: si falta, el
-        /// servidor contesta 401 y el lanzador se queda tonto sin decir por qué. Si quien llama ya
-        /// trae su propio token —el caso de arrancar un cliente de una cuenta concreta del
-        /// equipo— manda el suyo, que no tiene por qué ser el de la sesión de la ventana.
+        /// It is put here and not in each call so that it cannot be forgotten in any: if it is missing, the
+        /// server answers 401 and the launcher is left dumbfounded without saying why. If the caller already
+        /// brings its own token —the case of starting a client of a specific account of the
+        /// team— it sends its own, which need not be the window's session one.
         /// </summary>
         private static string ConElToken(object? cuerpo)
         {
@@ -181,12 +181,12 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// ¿Hay alguien al otro lado? Es la comprobación previa a arrancar un cliente.
+        /// Is anyone on the other side? It is the check before starting a client.
         ///
-        /// Importa más de lo que parece: el mod del cliente decide UNA sola vez, al arrancar, si
-        /// redirige al emulador, y lo decide sondeando este mismo puerto con 100 ms de paciencia.
-        /// Si no contesta, el cliente no da ningún error: se va a los servidores de Ankama. Así que
-        /// antes de lanzar hay que saber que el 8888 está contestando de verdad.
+        /// It matters more than it seems: the client mod decides ONLY once, on starting, whether
+        /// to redirect to the emulator, and it decides by probing this very port with 100 ms of patience.
+        /// If it does not answer, the client gives no error: it goes to Ankama's servers. So
+        /// before launching one has to know that 8888 is really answering.
         /// </summary>
         public static bool ServidorVivo()
         {
@@ -194,7 +194,7 @@ namespace Jondo.Unity.Launcher.Network
             return estado.Bien;
         }
 
-        /// <summary>Espera a que el servidor conteste, hasta un tope. Devuelve si llegó a hacerlo.</summary>
+        /// <summary>Waits for the server to answer, up to a cap. Returns whether it managed to.</summary>
         public static bool EsperarAlServidor(TimeSpan tope)
         {
             var hasta = DateTime.UtcNow + tope;

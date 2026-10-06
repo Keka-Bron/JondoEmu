@@ -53,7 +53,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         public const int Keyring = 10207;
 
-        /// <summary>"No tienes el nivel requerido."</summary>
+        /// <summary>"No tienes el nivel requerido." (You do not have the required level.)</summary>
         /// <remarks>
         /// This used to be <c>InfoMessages.JobLevelTooLow</c>, which is a different sentence: "No
         /// tienes el nivel <b>de oficio</b> necesario." A player turned away from a level 10 door
@@ -113,6 +113,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             var dungeon = DungeonManager.AtEntrance(mapId);
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
+            // Before the key is spent.
+            if (await Managers.Jail.KeepsInAsync(stream)) return false;
 
             var state = SessionContext.State;
 
@@ -205,11 +207,11 @@ namespace Jondo.Unity.Server.Handlers
                                   $"gratis vuelve el {DungeonKeyring.NextReset(DateTime.Now):dd/MM}.");
             }
 
-            // La ventana del guardián se cierra antes de mover a nadie. El cliente no la cierra por
-            // su cuenta -- no manda nada al terminar una conversación, espera el kld --, así que
-            // sin esto se quedaba abierta encima de la mazmorra y ni la equis la quitaba. Antes del
-            // teletransporte y no después, que es el orden de la captura: el kld sale delante de lo
-            // que cambia el mapa.
+            // The guardian's window is closed before anybody is moved. The client does not close it
+            // by itself -- it sends nothing when a conversation ends, it waits for the kld --, so
+            // without this it stayed open over the dungeon and not even the cross removed it. Before
+            // the teleport and not after, which is the capture's order: the kld goes out ahead of
+            // what changes the map.
             await NpcHandler.CloseAsync(stream);
 
             Console.WriteLine($"[Mazmorra] Entra en {dungeon.Name}, sala 1 de {dungeon.Rooms.Count}.");
@@ -336,12 +338,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Una frase cualquiera al jugador, por el canal de información y sólo para él.
+        /// Any sentence to the player, on the information channel and only for him.
         /// </summary>
         /// <remarks>
-        /// Por la plantilla vacía del cliente — <see cref="InfoMessages.FreeText"/>, cuyo texto es
-        /// <c>{0}</c> — porque lo que hay que decir aquí, cuándo vuelve la entrada gratis, no lo
-        /// dice ninguna de las frases que el cliente trae escritas.
+        /// Through the client's empty template -- <see cref="InfoMessages.FreeText"/>, whose text is
+        /// <c>{0}</c> -- because what has to be said here, when the free entry comes back, is said by
+        /// none of the sentences the client carries written.
         /// </remarks>
         private static Task TellAsync(NetworkStream stream, string text)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

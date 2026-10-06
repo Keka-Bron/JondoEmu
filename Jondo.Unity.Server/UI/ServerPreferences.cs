@@ -6,11 +6,11 @@ using System.IO;
 namespace Jondo.Unity.Server.UI
 {
     /// <summary>
-    /// Lo que la ventana del servidor recuerda entre un arranque y el siguiente.
+    /// What the server window remembers from one start to the next.
     ///
-    /// Aparte de las del lanzador a propósito: pueden estar en máquinas distintas y de personas
-    /// distintas, y el idioma en el que quiere ver su consola quien lleva el servidor no tiene por
-    /// qué ser el mismo en el que juega nadie.
+    /// Separate from the launcher's on purpose: they can be on different machines and belong to different
+    /// people, and the language in which whoever runs the server wants to see his console need not
+    /// be the same one anybody plays in.
     /// </summary>
     internal static class ServerPreferences
     {

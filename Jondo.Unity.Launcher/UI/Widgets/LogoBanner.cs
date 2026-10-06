@@ -8,67 +8,67 @@ using Avalonia.Threading;
 namespace Jondo.Unity.Launcher.UI.Widgets
 {
     /// <summary>
-    /// El rótulo de «JONDO EMU», encendido como un tubo de neón.
+    /// The «JONDO EMU» sign, lit like a neon tube.
     /// </summary>
     /// <remarks>
-    /// Está dibujado, no es una imagen: el trazo del logotipo de Ankama no se puede reletrar, así
-    /// que lo que se hace es un rótulo propio con el mismo aire —oro con degradado, contorno oscuro
-    /// grueso y un poco de arco— usando la tipografía del lanzador. El contorno sale de la
-    /// geometría del texto: <c>BuildGeometry</c> da la silueta de las letras, y se rellena y se
-    /// traza en la misma pasada.
+    /// It is drawn, not an image: Ankama's logo lettering cannot be re-lettered, so
+    /// what is done is a sign of our own with the same feel —gold with a gradient, a thick dark
+    /// outline and a little arc— using the launcher's typeface. The outline comes from the
+    /// text's geometry: <c>BuildGeometry</c> gives the letters' silhouette, and it is filled and
+    /// stroked in the same pass.
     ///
-    /// <b>Ojo con la brocha.</b> <c>FormattedText.BuildGeometry</c> devuelve la silueta VACÍA si el
-    /// texto no lleva brocha puesta. Con <c>null</c> no lanza, no avisa y no pinta: el rótulo estuvo
-    /// invisible desde que el lanzador pasó a Avalonia y nadie se enteró.
+    /// <b>Mind the brush.</b> <c>FormattedText.BuildGeometry</c> returns an EMPTY silhouette if the
+    /// text has no brush set. With <c>null</c> it does not throw, does not warn and does not paint: the sign was
+    /// invisible since the launcher moved to Avalonia and nobody noticed.
     /// </remarks>
     internal sealed class LogoBanner : Control
     {
-        /// <summary>Las dos palabras. El lanzador pone JONDO EMU y el servidor JONDO SERVER.</summary>
+        /// <summary>The two words. The launcher puts JONDO EMU and the server JONDO SERVER.</summary>
         public string First { get; init; } = "JONDO";
         public string Second { get; init; } = "EMU";
 
-        /// <summary>Cuánto se arquea el rótulo, en grados de giro de la primera y la última letra.</summary>
+        /// <summary>How much the sign arches, in degrees of rotation of the first and last letter.</summary>
         private const double Arc = 7;
 
-        /// <summary>Si al aparecer hace el arranque del tubo. Falso: sale ya encendido.</summary>
+        /// <summary>Whether on appearing it does the tube's start-up. False: it comes out already lit.</summary>
         /// <remarks>
-        /// Existe para poder fotografiarlo encendido sin esperar segundo y pico, que es lo que se
-        /// hace al trabajar el diseño. En la ventana no se toca.
+        /// It exists to be able to photograph it lit without waiting a second and a bit, which is what is
+        /// done when working on the design. In the window it is not touched.
         /// </remarks>
         public bool ConArranque { get; init; } = true;
 
         // ═══════════════════════════════════════════════════════════════════
-        //  El neón
+        //  The neon
         // ═══════════════════════════════════════════════════════════════════
         //
-        // Un tubo de neón no se enciende: ARRANCA. Da un fogonazo, se apaga, tartamudea unas
-        // cuantas veces cada vez más seguidas y acaba quedándose. Ya encendido no está quieto del
-        // todo: tiembla un poco y de tarde en tarde se va un instante.
+        // A neon tube does not switch on: it STARTS UP. It flashes, goes off, stutters a
+        // few times ever closer together and ends up staying on. Once lit it is not completely
+        // still: it trembles a little and now and then it goes for an instant.
         //
-        // El arranque va escrito a mano en una tabla y no sale de ningún azar, porque es una
-        // COREOGRAFÍA: los tiempos y el orden de los fogonazos son lo que lo hace parecer un tubo
-        // de verdad, y dejarlos al azar lo convierte en una luz estropeada. Lo que sí es al azar es
-        // el parpadeo de después, que tiene que ser impredecible.
+        // The start-up is written by hand in a table and does not come from any randomness, because it is a
+        // CHOREOGRAPHY: the timings and the order of the flashes are what make it look like a real
+        // tube, and leaving them to chance turns it into a broken light. What is random is
+        // the flickering afterwards, which has to be unpredictable.
 
-        /// <summary>El arranque: hasta qué segundo dura cada tramo, y con cuánta luz.</summary>
+        /// <summary>The start-up: until which second each stretch lasts, and with how much light.</summary>
         private static readonly (double Hasta, double Luz)[] Arranque =
         {
             (0.12, 0.00),   // un instante a oscuras antes de nada
-            (0.20, 1.00),   // el primer fogonazo
+            (0.20, 1.00),   // the first flash
             (0.32, 0.04),
             (0.38, 0.85),
             (0.46, 0.02),
-            (0.58, 0.00),   // parece que no arranca
+            (0.58, 0.00),   // it looks like it will not start
             (0.66, 1.00),
             (0.72, 0.08),
             (0.80, 0.95),
             (0.86, 0.14),
             (0.94, 1.00),
-            (1.00, 0.32),   // el último tartamudeo, ya flojo
-            (1.20, 1.00),   // y se queda
+            (1.00, 0.32),   // the last stutter, already weak
+            (1.20, 1.00),   // and it stays
         };
 
-        /// <summary>Cuántas capas de halo. Seis es donde deja de notarse añadir más.</summary>
+        /// <summary>How many halo layers. Six is where adding more stops being noticeable.</summary>
         private const int Capas = 6;
 
         private readonly DispatcherTimer _reloj = new() { Interval = TimeSpan.FromMilliseconds(33) };
@@ -87,7 +87,7 @@ namespace Jondo.Unity.Launcher.UI.Widgets
         {
             base.OnAttachedToVisualTree(e);
 
-            // El arranque empieza cada vez que el rótulo entra en pantalla, no una vez por proceso.
+            // The start-up begins every time the sign comes on screen, not once per process.
             _tiempo = ConArranque ? 0 : Arranque[Arranque.Length - 1].Hasta;
             _brillo = ConArranque ? 0 : 1;
             _apagonHasta = -1;
@@ -118,16 +118,16 @@ namespace Jondo.Unity.Launcher.UI.Widgets
 
         private double LuzYaEncendido()
         {
-            // El parpadeo de régimen: raro, corto, y nunca a oscuras del todo. Un tubo que se
-            // apagara entero cada poco estaría estropeado, no encendido.
+            // The steady flicker: rare, short, and never fully dark. A tube that
+            // went off entirely every so often would be broken, not lit.
             if (_tiempo > _apagonHasta && _azar.NextDouble() < 0.004)
             {
                 _apagonHasta = _tiempo + 0.05 + _azar.NextDouble() * 0.10;
             }
             if (_tiempo < _apagonHasta) return 0.30;
 
-            // Y el temblor: dos senos de periodos que no encajan. Uno solo se ve mecánico a los
-            // tres segundos de mirarlo.
+            // And the tremble: two sines with periods that do not fit together. A single one looks mechanical
+            // after three seconds of looking at it.
             double lento = (1 + Math.Sin(_tiempo * 1.9)) / 2;
             double rapido = (1 + Math.Sin(_tiempo * 13.7 + 1.1)) / 2;
             return 0.86 + 0.10 * lento + 0.04 * rapido;
@@ -143,8 +143,8 @@ namespace Jondo.Unity.Launcher.UI.Widgets
 
             var face = new Typeface(LauncherSkin.Title, FontStyle.Normal, FontWeight.Bold);
 
-            // El relleno sube de oro apagado a casi blanco con la luz; apagado del todo se queda en
-            // el marrón del contorno, que es un tubo sin gas.
+            // The fill goes up from dim gold to almost white with the light; fully off it stays at
+            // the outline's brown, which is a tube without gas.
             var relleno = new LinearGradientBrush
             {
                 StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
@@ -156,8 +156,8 @@ namespace Jondo.Unity.Launcher.UI.Widgets
                     new GradientStop(Mezclar(LauncherSkin.BorderBrown, LauncherSkin.Gold, _brillo), 1),
                 },
             };
-            // Fino a proposito: es el filo oscuro que separa la letra del halo, no un borde. Grueso
-            // se comia el oro de dentro y el rotulo se leia como un contorno hueco.
+            // Thin on purpose: it is the dark edge separating the letter from the halo, not a border. Thick,
+            // it ate the gold inside and the sign read as a hollow outline.
             var contorno = new Pen(new SolidColorBrush(Color.FromRgb(38, 22, 10)), Math.Max(1.5, size / 18))
             {
                 LineJoin = PenLineJoin.Round,
@@ -196,14 +196,14 @@ namespace Jondo.Unity.Launcher.UI.Widgets
                             context.DrawGeometry(sombra, null, geometria);
                         }
 
-                        // El resplandor: la misma silueta trazada seis veces, cada una más gorda y
-                        // más transparente. Es un halo de pobre, y a este tamaño no se distingue de
-                        // uno de verdad, que costaría un desenfoque por fotograma.
+                        // The glow: the same silhouette stroked six times, each one fatter and
+                        // more transparent. It is a poor man's halo, and at this size it cannot be told from
+                        // a real one, which would cost a blur per frame.
                         for (int capa = Capas; capa >= 1; capa--)
                         {
-                            // Cae con el CUADRADO de la capa: así la de fuera es un velo y la de
-                            // dentro es el filo. Cayendo lineal, las de fuera pesaban tanto como
-                            // las de dentro y el halo se comía las letras.
+                            // It falls off with the layer's SQUARE: that way the outer one is a veil and the
+                            // inner one is the edge. Falling off linearly, the outer ones weighed as much as
+                            // the inner ones and the halo ate the letters.
                             double alfa = _brillo * 0.26 / (capa * capa);
                             if (alfa < 0.004) continue;
 
@@ -211,9 +211,9 @@ namespace Jondo.Unity.Launcher.UI.Widgets
                             var halo = new Pen(new SolidColorBrush(color, alfa),
                                                contorno.Thickness + capa * size * 0.11)
                             {
-                                // REDONDO, las dos cosas. Por omisión un trazo grueso une en pico,
-                                // y en las esquinas de una letra eso son pinchos: el resplandor
-                                // salía como una estrella de picos en vez de un halo.
+                                // ROUND, both things. By default a thick stroke joins with a point,
+                                // and at a letter's corners those are spikes: the glow
+                                // came out like a spiky star instead of a halo.
                                 LineJoin = PenLineJoin.Round,
                                 LineCap = PenLineCap.Round,
                             };
@@ -222,7 +222,7 @@ namespace Jondo.Unity.Launcher.UI.Widgets
 
                         context.DrawGeometry(relleno, contorno, geometria);
 
-                        // Y el filo interior, que es lo que en un neón de verdad se ve casi blanco.
+                        // And the inner edge, which is what in a real neon looks almost white.
                         if (_brillo > 0.4)
                         {
                             var filo = new Pen(new SolidColorBrush(Color.FromRgb(255, 250, 228),
@@ -237,7 +237,7 @@ namespace Jondo.Unity.Launcher.UI.Widgets
             }
         }
 
-        /// <summary>Un color entre los dos, con <paramref name="cuanto"/> de 0 a 1.</summary>
+        /// <summary>A colour between the two, with <paramref name="cuanto"/> from 0 to 1.</summary>
         private static Color Mezclar(Color a, Color b, double cuanto)
         {
             double t = Math.Clamp(cuanto, 0, 1);

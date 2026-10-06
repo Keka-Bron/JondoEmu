@@ -31,12 +31,12 @@ namespace Jondo.Unity.Server.Managers
     public static class Equipment
     {
         /// <summary>
-        /// Un efecto tal y como lo declara el objeto: el valor fijo y el par de dados.
+        /// An effect as the item declares it: the fixed value and the pair of dice.
         ///
-        /// Son tres números y no uno porque el protocolo distingue entre ellos. Un daño de arma
-        /// viaja como rango, el hechizo que da un dofus viaja como dos ids, y una vitalidad viaja
-        /// como un número suelto; guardar solo "el valor" era lo que dejaba a las armas sin daños.
-        /// <see cref="EffectFields.Shape"/> decide con estos tres cómo sale al cable.
+        /// They are three numbers and not one because the protocol tells them apart. A weapon damage travels as a
+        /// range, the spell a dofus gives travels as two ids, and a vitality travels as a loose number; storing
+        /// only "the value" was what left weapons without damage. <see cref="EffectFields.Shape"/> decides with
+        /// these three how it goes out on the wire.
         /// </summary>
         public readonly struct ItemEffect
         {
@@ -51,12 +51,12 @@ namespace Jondo.Unity.Server.Managers
             public long DiceSide { get; }
 
             /// <summary>
-            /// Lo que llevan los efectos que no son un número: "Fabricado por: #4" (el 988) y los
-            /// dos que se le parecen. El cliente los pinta metiendo esta cadena donde va el #4.
+            /// What the effects that are not a number carry: "Fabricado por: #4" (988) and the two that resemble
+            /// it. The client draws them by putting this string where the #4 goes.
             /// </summary>
             public string? Text { get; }
 
-            /// <summary>Lo que suma a la ficha, que no es lo mismo que lo que viaja.</summary>
+            /// <summary>What it adds to the sheet, which is not the same as what travels.</summary>
             public long Sheet => EffectFields.SheetValue(Effect, Value, DiceNum, DiceSide);
         }
 
@@ -66,7 +66,7 @@ namespace Jondo.Unity.Server.Managers
             public int Template { get; set; }
             public int Position { get; set; }
             public int Quantity { get; set; } = 1;
-            /// <summary>Los efectos que el objeto declara, con sus tres números.</summary>
+            /// <summary>The effects the item declares, with their three numbers.</summary>
             public List<ItemEffect> Effects { get; } = new List<ItemEffect>();
         }
 
@@ -116,10 +116,10 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (IsWorn(item.Position)) worn.Add((item.Position, item.Template));
                 }
-                // Por hueco. No porque ninguna captura lo pida -- no se ha medido en qué orden
-                // salen -- sino para que salgan SIEMPRE en el mismo: el diccionario de la sesión no
-                // promete orden, así que el mismo personaje podía componer dos listas distintas
-                // entre una sesión y otra.
+                // By slot. Not because any capture asks for it -- the order they come out in has not
+                // been measured -- but so that they ALWAYS come out in the same one: the session's
+                // dictionary promises no order, so the same character could compose two different
+                // lists between one session and another.
                 worn.Sort((a, b) => a.Slot.CompareTo(b.Slot));
                 return worn;
             }
@@ -206,14 +206,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los efectos de un objeto, como los guarda la base de datos.
+        /// An item's effects, as the database stores them.
         ///
-        ///   [[efecto, valor, diceNum, diceSide], ...]
+        ///   [[effect, value, diceNum, diceSide], ...]
         ///
-        /// Se admite también la forma vieja de dos números, [[efecto, valor]], que es como se
-        /// guardaban antes de que se supiera que el protocolo distingue entre valor y dados.
+        /// The old two-number shape, [[effect, value]], is also accepted, which is how they were stored before
+        /// it was known that the protocol distinguishes between value and dice.
         /// </summary>
-        /// <summary>Los efectos de una cadena guardada, sueltos, sin objeto que los sostenga.</summary>
+        /// <summary>The effects of a stored string, loose, with no item to hold them.</summary>
         public static IReadOnlyList<ItemEffect> ParseEffects(string? json)
         {
             if (string.IsNullOrEmpty(json)) return Array.Empty<ItemEffect>();
@@ -238,8 +238,8 @@ namespace Jondo.Unity.Server.Managers
                     string? text = null;
                     foreach (var number in entry.EnumerateArray())
                     {
-                        // Un quinto elemento de texto: lo llevan los efectos que no son un número,
-                        // como el 988, "Fabricado por".
+                        // A fifth text element: the effects that are not a number carry it, like 988,
+                        // "Fabricado por".
                         if (number.ValueKind == JsonValueKind.String) { text = number.GetString(); continue; }
                         if (n >= 4) break;
                         numbers[n++] = number.TryGetInt64(out long v) ? v : 0;
@@ -263,7 +263,7 @@ namespace Jondo.Unity.Server.Managers
         {
             if (ivx == null || ivx.Length == 0) return;
 
-            if (Items.Count > 0) return;   // la base de datos manda sobre la captura
+            if (Items.Count > 0) return;   // the database rules over the capture
             var found = new Dictionary<long, Item>();
             foreach (var entry in ProtoMessage.Parse(ivx).Fields)
             {
@@ -306,7 +306,7 @@ namespace Jondo.Unity.Server.Managers
                         else if (g.FieldNumber == 4 && g.WireType == 0) value = g.VarIntValue;
                         else if (g.FieldNumber == EffectFields.AsRange && g.WireType == 2)
                         {
-                            // f5 { f1: máximo, f2: mínimo }: se guarda como el rango que es.
+                            // f5 { f1: maximum, f2: minimum }: it is stored as the range it is.
                             foreach (var h in ProtoMessage.Parse(g.BytesValue).Fields)
                             {
                                 if (h.WireType != 0) continue;
@@ -338,12 +338,12 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
-        /// <summary>El objeto con ese identificador, si lo tenemos.</summary>
+        /// <summary>The item with that identifier, if we have it.</summary>
         public static Item? ByUid(long uid) => Items.TryGetValue(uid, out var item) ? item : null;
 
         /// <summary>
-        /// Quita del inventario en memoria lo que se ha ido a otro sitio —al cofre del merkasako,
-        /// por ejemplo—. Si quedan unidades, se resta; si no, desaparece.
+        /// Removes from the in-memory inventory what has gone somewhere else -- into the haven bag chest, for
+        /// instance --. If units remain, they are subtracted; if not, it disappears.
         /// </summary>
         public static void Remove(long uid, int quantity)
         {
@@ -353,7 +353,7 @@ namespace Jondo.Unity.Server.Managers
             else item.Quantity -= quantity;
         }
 
-        /// <summary>Mete en el inventario en memoria algo que viene de fuera.</summary>
+        /// <summary>Puts into the in-memory inventory something that comes from outside.</summary>
         public static Item Add(long uid, int template, int quantity, int position, string? effects)
         {
             if (Items.TryGetValue(uid, out var existing))
@@ -376,15 +376,15 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Lo que ya ocupa un hueco, sin contar el objeto que va a entrar en él.
+        /// What already takes a slot, not counting the item about to go into it.
         ///
-        /// En un hueco cabe una cosa. Mover algo a un hueco ocupado tiene que echar lo que hubiera,
-        /// y eso no se hacía: se guardaba la posición nueva y punto, así que dos monturas —o tres—
-        /// acababan las dos en el hueco 8 a la vez. Como el aspecto se decide mirando quién está en
-        /// el 8, el que mandaba era siempre el primero que se encontrase, y de ahí que cambiar de
-        /// montura no cambiara nada y que quitárselas todas no bajara al personaje al suelo.
+        /// A slot holds one thing. Moving something into a taken slot has to throw out whatever was there, and
+        /// that was not done: the new position was stored and that was it, so two mounts -- or three -- both
+        /// ended up in slot 8 at once. Since the look is decided by looking at who is in 8, the one ruling was
+        /// always the first one found, which is why changing mount changed nothing and taking them all off did
+        /// not bring the character down to the ground.
         ///
-        /// La bolsa no cuenta: ahí caben las mil y pico.
+        /// The bag does not count: a thousand-odd fit there.
         /// </summary>
         public static List<Item> Occupants(int position, long exceptUid = 0)
         {
@@ -399,12 +399,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Deja un solo objeto por hueco, y devuelve los que ha tenido que mandar a la bolsa.
+        /// Leaves a single item per slot, and returns the ones it had to send to the bag.
         ///
-        /// Es para reparar lo que quedó guardado mientras el hueco no se vaciaba: quien tenga tres
-        /// monturas puestas en el 8 no las va a poder quitar de una en una, porque el cliente solo
-        /// sabe de la última. Se hace al cargar el inventario y se escribe en la base de datos, así
-        /// que se paga una vez.
+        /// It is to repair what was left stored while the slot was not being emptied: whoever has three mounts
+        /// on in slot 8 will not be able to take them off one by one, because the client only knows about the
+        /// last. It is done when loading the inventory and written to the database, so it is paid once.
         /// </summary>
         private static List<Item> RepairDoubledSlots()
         {
@@ -448,8 +447,8 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (!EffectTable.TryGet(entry.Effect, out var what)) continue;
 
-                    // Lo que suma a la ficha no es lo que viaja: un efecto compuesto —el hechizo de
-                    // un dofus, un título— nombra algo, no mueve una característica.
+                    // What adds to the sheet is not what travels: a compound effect -- a dofus's spell, a
+                    // title -- names something, it does not move a characteristic.
                     long value = entry.Sheet;
                     if (value == 0) continue;
 

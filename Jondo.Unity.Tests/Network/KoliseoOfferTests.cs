@@ -6,11 +6,11 @@ using Xunit;
 namespace Jondo.Unity.Tests.Network
 {
     /// <summary>
-    /// El cartel de partida encontrada, contra los bytes de las dos capturas.
+    /// The match-found pop-up, against the bytes of the two captures.
     /// </summary>
     /// <remarks>
-    /// Las dos son del servidor real y de modalidades distintas, que es lo que hace que se puedan
-    /// contrastar: «koliseo completo con invitacion-koli 2vs2…» y «koliseo 3 vs 3 recibir mensaje
+    /// Both are from the real server and of different modes, which is what allows comparing
+    /// them: «koliseo completo con invitacion-koli 2vs2…» and «koliseo 3 vs 3 recibir mensaje
     /// aceptar koliseo-esperar timeout-comprobar sancion».
     /// </remarks>
     public class KoliseoOfferTests
@@ -18,8 +18,8 @@ namespace Jondo.Unity.Tests.Network
         [Fact]
         public void El_cartel_lleva_el_plazo_en_segundos()
         {
-            // «103b» en las DOS capturas: f2 = 59. Que son segundos lo dice el reloj de la del
-            // 3 contra 3, donde entre el cartel y el vencimiento pasan 60.014 ms.
+            // «103b» in BOTH captures: f2 = 59. That they are seconds is said by the clock of the
+            // 3 versus 3 one, where 60,014 ms pass between the pop-up and the expiry.
             Assert.Equal("103b",
                 Convert.ToHexString(KoliseoHandler.BuildOffer(KoliseoOffers.Segundos)).ToLowerInvariant());
             Assert.Equal(59, KoliseoOffers.Segundos);
@@ -28,19 +28,19 @@ namespace Jondo.Unity.Tests.Network
         [Fact]
         public void El_acuse_de_aceptar_es_un_booleano()
         {
-            // «1001» de la captura del 2 contra 2. El campo 2 del lth es un bool, no un indice:
-            // lo dice el esquema del propio cliente, lth { bool gdak = 1; bool gdal = 2; }.
+            // «1001» from the 2 versus 2 capture. The lth's field 2 is a bool, not an index:
+            // the client's own schema says so, lth { bool gdak = 1; bool gdal = 2; }.
             Assert.Equal("1001", Convert.ToHexString(KoliseoHandler.BuildAccepted(true)).ToLowerInvariant());
 
-            // Y un falso de proto3 no viaja, asi que decir que no son cero bytes.
+            // And a proto3 false does not travel, so saying no is zero bytes.
             Assert.Empty(KoliseoHandler.BuildAccepted(false));
         }
 
         [Fact]
         public void Salir_de_la_cola_lleva_la_modalidad()
         {
-            // «18032001» en la captura del 2 contra 2 y «18032002» en la del 3 contra 3: mismo
-            // mensaje, misma forma, y la modalidad en el f4.
+            // «18032001» in the 2 versus 2 capture and «18032002» in the 3 versus 3 one: same
+            // message, same shape, and the mode in f4.
             Assert.Equal("18032001", Convert.ToHexString(KoliseoHandler.BuildLeftQueue(1)).ToLowerInvariant());
             Assert.Equal("18032002", Convert.ToHexString(KoliseoHandler.BuildLeftQueue(2)).ToLowerInvariant());
         }
@@ -48,8 +48,8 @@ namespace Jondo.Unity.Tests.Network
         [Fact]
         public void La_sancion_es_la_de_la_captura()
         {
-            // «080110f703220a31373838323136393936»: f1 = 1, f2 = 503, y el f4 la marca de tiempo
-            // en segundos COMO CADENA — 1788216996.
+            // «080110f703220a31373838323136393936»: f1 = 1, f2 = 503, and f4 the timestamp
+            // in seconds AS A STRING — 1788216996.
             Assert.Equal("080110f703220a31373838323136393936",
                 Convert.ToHexString(KoliseoHandler.BuildSanction(1788216996L)).ToLowerInvariant());
         }
@@ -73,7 +73,7 @@ namespace Jondo.Unity.Tests.Network
             Assert.False(KoliseoOffers.Accept(oferta, 3));
             Assert.True(KoliseoOffers.Accept(oferta, 4));
 
-            // Y ya cerrada, un si que llegue tarde no la vuelve a arrancar.
+            // And once closed, a yes arriving late does not start it again.
             Assert.False(KoliseoOffers.Accept(oferta, 4));
         }
 
@@ -86,8 +86,8 @@ namespace Jondo.Unity.Tests.Network
             KoliseoOffers.Accept(oferta, 7);
             Assert.True(KoliseoOffers.Accept(oferta, 8));   // completa: queda cerrada
 
-            // El reloj llega despues y tiene que encontrarsela cerrada, o montaria el combate y
-            // lo desharia a la vez.
+            // The clock arrives afterwards and has to find it closed, or it would set up the fight and
+            // undo it at the same time.
             Assert.False(KoliseoOffers.Close(oferta));
         }
 
@@ -108,15 +108,15 @@ namespace Jondo.Unity.Tests.Network
         {
             KoliseoOffers.ForgetEverything();
 
-            // Cinco minutos justos: quedan cinco, no cuatro y pico.
+            // Exactly five minutes: five are left, not four and a bit.
             KoliseoOffers.Ban(11, DateTime.UtcNow.AddMinutes(5));
             Assert.Equal(5, KoliseoOffers.MinutesLeft(11));
 
-            // Tres minutos y medio se leen como cuatro, que es lo que enseña la captura.
+            // Three and a half minutes read as four, which is what the capture shows.
             KoliseoOffers.Ban(12, DateTime.UtcNow.AddSeconds(210));
             Assert.Equal(4, KoliseoOffers.MinutesLeft(12));
 
-            // Y un castigo vencido no es castigo.
+            // And an expired penalty is not a penalty.
             KoliseoOffers.Ban(13, DateTime.UtcNow.AddSeconds(-1));
             Assert.Equal(0, KoliseoOffers.MinutesLeft(13));
             Assert.Null(KoliseoOffers.BannedUntil(13));
@@ -125,7 +125,7 @@ namespace Jondo.Unity.Tests.Network
         [Fact]
         public void Al_abrir_la_oferta_se_recuerda_la_modalidad()
         {
-            // El lsx de volver del koliseo la necesita, y al volver ya no hay ni cola ni oferta.
+            // The lsx of coming back from the koliseo needs it, and on coming back there is neither queue nor offer.
             KoliseoOffers.ForgetEverything();
             KoliseoOffers.Open(2, 1, new long[] { 21 }, new long[] { 22 });
 

@@ -5,25 +5,25 @@ using Avalonia.Media;
 namespace Jondo.Unity.Launcher.UI.Widgets
 {
     /// <summary>
-    /// La banderita de los botones de idioma.
+    /// The little flag of the language buttons.
     /// </summary>
     /// <remarks>
-    /// España y Francia son tres franjas y no tienen misterio. La del Reino Unido sí: es la Union
-    /// Jack y lleva DOS aspas además de la cruz. La primera versión la dibujaba con una cruz blanca
-    /// y otra roja sobre azul y nada más, o sea la bandera de otro país; se notaba a simple vista.
+    /// Spain and France are three stripes and have no mystery. The United Kingdom's does: it is the Union
+    /// Jack and carries TWO saltires on top of the cross. The first version drew it with a white cross
+    /// and a red one on blue and nothing else, that is another country's flag; it showed at a glance.
     ///
-    /// El orden de las capas es el de la bandera de verdad y hay que respetarlo, porque cada una
-    /// tapa parte de la anterior:
+    /// The order of the layers is that of the real flag and it has to be respected, because each one
+    /// covers part of the previous one:
     ///
-    ///   1. el campo azul
-    ///   2. el aspa blanca  (San Andrés, Escocia)
-    ///   3. el aspa roja    (San Patricio, Irlanda) -- más fina, va encima de la blanca
-    ///   4. la cruz blanca  (el borde de la de San Jorge)
-    ///   5. la cruz roja    (San Jorge, Inglaterra)
+    ///   1. the blue field
+    ///   2. the white saltire  (Saint Andrew, Scotland)
+    ///   3. the red saltire    (Saint Patrick, Ireland) -- thinner, it goes on top of the white
+    ///   4. the white cross    (the edge of Saint George's)
+    ///   5. the red cross      (Saint George, England)
     ///
-    /// A veinte por catorce píxeles no cabe el contracambiado de las diagonales -- el desplazamiento
-    /// que hace que el aspa roja no esté centrada en la blanca -- y no se dibuja: a este tamaño no
-    /// se distinguiría y complicaría el trazado para nada.
+    /// At twenty by fourteen pixels the counterchange of the diagonals does not fit -- the offset
+    /// that makes the red saltire not centred on the white one -- and it is not drawn: at this size it
+    /// would not be distinguishable and it would complicate the drawing for nothing.
     /// </remarks>
     internal sealed class FlagIcon : Control
     {
@@ -58,7 +58,7 @@ namespace Jondo.Unity.Launcher.UI.Widgets
             context.DrawRectangle(new Pen(new SolidColorBrush(Color.FromArgb(120, 0, 0, 0))), r);
         }
 
-        /// <summary>Rojo, amarillo el doble de ancho, y rojo.</summary>
+        /// <summary>Red, yellow twice as wide, and red.</summary>
         private static void Espana(DrawingContext context, Rect r)
         {
             context.FillRectangle(new SolidColorBrush(Color.FromRgb(198, 11, 30)), r);
@@ -82,8 +82,8 @@ namespace Jondo.Unity.Launcher.UI.Widgets
 
             context.FillRectangle(azul, r);
 
-            // Las dos aspas. El grosor sale de la altura para que la bandera aguante si algún día
-            // se dibuja más grande.
+            // The two saltires. The thickness comes from the height so that the flag holds up if some day
+            // it is drawn bigger.
             var aspaBlanca = new Pen(Brushes.White, r.Height * 0.30);
             var aspaRoja = new Pen(rojo, r.Height * 0.14);
 
@@ -96,7 +96,7 @@ namespace Jondo.Unity.Launcher.UI.Widgets
                 }
             }
 
-            // Y la cruz encima, con su borde blanco.
+            // And the cross on top, with its white edge.
             var cruzBlanca = new Pen(Brushes.White, r.Height * 0.42);
             var cruzRoja = new Pen(rojo, r.Height * 0.24);
 

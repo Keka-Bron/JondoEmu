@@ -627,6 +627,9 @@ namespace Jondo.Unity.Tests.Combat
             private GameSession _session;
             private System.IO.Stream _fromServer;
 
+            /// <summary>The session, for pushing it as the one being served.</summary>
+            public GameSession Session => _session;
+
             public static async Task<Wire> Open(long characterId)
             {
                 var wire = new Wire { _listener = new TcpListener(IPAddress.Loopback, 0) };

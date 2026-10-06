@@ -11,7 +11,7 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// El muro de bombas: quien lo sostiene, qué casillas coge y cómo se le cuenta al cliente.
+    /// The bomb wall: who holds it up, which cells it takes and how the client is told.
     /// </summary>
     public class BombWallTests
     {
@@ -27,7 +27,7 @@ namespace Jondo.Unity.Tests.Combat
             SummonCost = 0, JuegaTurno = false,
         };
 
-        /// <summary>Una casilla a N pasos de otra, en línea recta por el eje que se pida.</summary>
+        /// <summary>A cell N steps from another, in a straight line along the axis asked for.</summary>
         private static int EnLinea(int desde, int pasos, bool porY)
         {
             var (x, y) = MapGeometry.CellToPoint(desde);
@@ -47,7 +47,7 @@ namespace Jondo.Unity.Tests.Combat
             var muro = Assert.Single(muros);
             Assert.Equal(2, muro.Bombs.Count);
             Assert.Equal(3, muro.Cells.Count);          // cuatro de separación, tres en medio
-            Assert.DoesNotContain(a, muro.Cells);       // las suyas no son del muro
+            Assert.DoesNotContain(a, muro.Cells);       // its own are not part of the wall
             Assert.DoesNotContain(b, muro.Cells);
         }
 
@@ -172,7 +172,7 @@ namespace Jondo.Unity.Tests.Combat
                 owner: 53721497699, glyphId: 1, cell: 260, spell: 13458, grade: 3,
                 size: 2, colour: FightProtocol.GlyphRed);
 
-            // Lo que de verdad importa: los números que lleva dentro.
+            // What really matters: the numbers it carries inside.
             var campos = ProtoMessage.Parse(paquete).Fields;
             Assert.Contains(campos, f => f.FieldNumber == 3 && f.VarIntValue == 53721497699);
             Assert.Contains(campos, f => f.FieldNumber == 14 && f.VarIntValue == 401);
@@ -194,9 +194,9 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
-        /// Empezar el turno encima del muro, byte a byte contra el frame 4272 de
+        /// Starting the turn on top of the wall, byte for byte against frame 4272 of
         /// «explobomba-tornabomba-bomba de agua-en glifo-en objetivo-dejando que crezcan-
-        /// explotandolas.pcapng»: el glifo 6 del tymador salta sobre el -1 en la casilla 274.
+        /// explotandolas.pcapng»: the Rogue's glyph 6 goes off on -1 on cell 274.
         /// </summary>
         [Fact]
         public void Empezar_el_turno_en_el_muro_se_avisa_con_el_307()
@@ -209,8 +209,8 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
-        /// Y entrar en él, contra el frame 110 de «glifo de bombas sismobomba.pcapng»: el glifo 1
-        /// en la casilla 289 le salta al -4. Mismo cuerpo, el 306 en vez del 307.
+        /// And entering it, against frame 110 of «glifo de bombas sismobomba.pcapng»: glyph 1
+        /// on cell 289 goes off on -4. Same body, 306 instead of 307.
         /// </summary>
         [Fact]
         public void Entrar_en_el_muro_se_avisa_con_el_306()
@@ -336,12 +336,12 @@ namespace Jondo.Unity.Tests.Combat
             var pisables = new HashSet<int>();
             for (int c = 0; c < 560; c++) pisables.Add(c);
 
-            // Sin muro: recorre las cuatro casillas que le piden.
+            // No wall: it covers the four cells it is asked to.
             var libre = Zone.Push(centro: 300, deQuienLanza: 300, aQuien: 301, casillas: 4,
                                   pisables: pisables, ocupadas: new HashSet<int>());
             Assert.Equal(Zone.PushStop.None, libre.Stop);
 
-            // Con muro en la segunda: entra en ella y ahi se queda.
+            // With a wall on the second: it goes into it and stays there.
             int segunda = Zone.Push(centro: 300, deQuienLanza: 300, aQuien: 301, casillas: 2,
                                     pisables: pisables, ocupadas: new HashSet<int>()).ToCell;
             var frenado = Zone.Push(centro: 300, deQuienLanza: 300, aQuien: 301, casillas: 4,

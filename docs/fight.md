@@ -301,6 +301,12 @@ metadata (`Core.DataCenter.Metadata.Effect.EffectInstanceFlags`).
   18,526 chained casts without it, 3,171 of 3,171 cast from a `jwh` with it --
   and names the cell it was aimed at, where its caster stood even if a row of the
   same cast has moved him since (Estela's 31021 on 371, frame 10).
+- Ouginak Rage is resolved by chained spells after the parent spell's damage.
+  The struck target remains a routing candidate for the Rage manager even when
+  that damage killed it; Molosse, Carroña and the other Rage-generating spells
+  therefore grant Rage on lethal hits too. Other effects still ignore dead fighters.
+  Its third point schedules the beast-form cleanup for the following round: the
+  form stays active through the Ouginak's next turn and ends with that turn.
 - `Devuelve N PA` (120): the AP sheet in its short sequence, then `jwe 120
   f20{f1: N, f2: who}` in the caster's name, 117 times in 35 captures.
 - A cast on an empty cell names nobody: no `f2` in its `jwe 300`.

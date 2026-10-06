@@ -4,15 +4,15 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// La tabla de lo que cambia de un tipo de combate a otro.
+    /// The table of what changes from one fight type to another.
     /// </summary>
     /// <remarks>
-    /// Estas siete respuestas estaban disueltas en dieciséis <c>if</c> repartidos por cinco métodos
-    /// del motor. Juntas caben en una pantalla, y aquí es donde se comprueba que siguen diciendo lo
-    /// que dicen las capturas.
+    /// These seven answers were dissolved in sixteen <c>if</c>s spread over five methods
+    /// of the engine. Together they fit on one screen, and this is where it is checked that they still say
+    /// what the captures say.
     ///
-    /// Los números no son elegidos: el 4, el 0 y el 7 son el f2 del kam, y el 592 es el f5 del kaa
-    /// del koliseo.
+    /// The numbers are not chosen: 4, 0 and 7 are the kam's f2, and 592 is the koliseo kaa's
+    /// f5.
     /// </remarks>
     public class FightRulesTests
     {
@@ -35,8 +35,8 @@ namespace Jondo.Unity.Tests.Combat
         {
             var r = FightRules.Desafio;
 
-            // El combate empieza cuando los dos pulsan listo, no cuando se acaba un tiempo: el
-            // servidor real no manda ninguno, y su kaa son seis bytes sin el f5.
+            // The fight starts when both press ready, not when some time runs out: the
+            // real server sends none, and its kaa is six bytes without f5.
             Assert.Equal(0, r.RelojDeColocacion);
             Assert.False(r.KaaConCuentaAtras);
 
@@ -44,8 +44,8 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(r.HayRetos);
             Assert.False(r.EnfrenteHayMonstruos);
 
-            // Nada de botín: ganar un desafío llegó a pagar kamas por el nivel del rival, como si
-            // lo hubieras cazado.
+            // No loot: winning a challenge once paid kamas for the rival's level, as if
+            // you had hunted him.
             Assert.False(r.ReparteBotin);
             Assert.False(r.BorraElGrupoAlGanar);
             Assert.False(r.AvanzaDeSala);
@@ -56,8 +56,8 @@ namespace Jondo.Unity.Tests.Combat
         {
             var r = FightRules.Koliseo;
 
-            // Ésta es la razón de que sean tres reglas y no dos: el koliseo es PvP en todo salvo
-            // en el reloj, que lo tiene como un combate normal.
+            // This is the reason there are three rules and not two: the koliseo is PvP in everything except
+            // the clock, which it has like a normal fight.
             Assert.False(r.EnfrenteHayMonstruos);
             Assert.Equal(592, r.RelojDeColocacion);
             Assert.True(r.KaaConCuentaAtras);
@@ -70,8 +70,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Un_combate_nace_contra_monstruos()
         {
-            // Lo de siempre es lo de siempre sin decir nada: quien monte un combate nuevo sin
-            // pensar en esto se lleva las reglas de pelear contra bichos.
+            // The usual is the usual without saying anything: whoever sets up a new fight without
+            // thinking about this gets the rules of fighting creatures.
             var fight = new FightInstance(1, 100);
 
             Assert.Same(FightRules.ContraMonstruos, fight.Reglas);
@@ -88,8 +88,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void El_reloj_y_la_cuenta_atras_del_kaa_dicen_lo_mismo()
         {
-            // Eran dos decisiones sueltas y podían contradecirse: un kaa con cuenta atrás y ningún
-            // temporizador detrás, o al revés. Ahora la segunda se deduce de la primera.
+            // They were two loose decisions and could contradict each other: a kaa with a countdown and no
+            // timer behind it, or the other way round. Now the second is deduced from the first.
             foreach (var r in new[] { FightRules.ContraMonstruos, FightRules.Desafio, FightRules.Koliseo })
             {
                 Assert.Equal(r.RelojDeColocacion > 0, r.KaaConCuentaAtras);

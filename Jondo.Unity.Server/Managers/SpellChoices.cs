@@ -6,19 +6,19 @@ using Jondo.Unity.Server.Network;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Lo que el jugador ha elegido de sus hechizos: qué mitad de cada pareja lleva, y en qué hueco
-    /// de la barra puso cada uno.
+    /// What the player has chosen of his spells: which half of each pair he carries, and in which slot
+    /// of the bar he put each one.
     ///
-    /// Es lo único de los hechizos que no sale de los datos del cliente. Las parejas y los niveles
-    /// que pide cada grado son suyos y se leen de ahí (<see cref="SpellTable"/>); esto es del
-    /// jugador, y por eso vive en world.db y sobrevive a cerrar el juego.
+    /// It is the only thing about spells that does not come from the client's data. The pairs and the levels
+    /// each grade asks for are the client's and are read from there (<see cref="SpellTable"/>); this is the
+    /// player's, and that is why it lives in world.db and survives closing the game.
     /// </summary>
     public static class SpellChoices
     {
         /// <summary>pareja -> hechizo elegido.</summary>
         private static Dictionary<int, int> ChosenStore => SessionContext.State.ChosenSpells;
 
-        /// <summary>hueco de la barra -> hechizo.</summary>
+        /// <summary>bar slot -> spell.</summary>
         private static Dictionary<int, int> BarStore => SessionContext.State.SpellBar;
 
         public static IReadOnlyDictionary<int, int> Chosen => ChosenStore;
@@ -61,8 +61,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Guarda que de esta pareja el personaje lleva este hechizo. Se comprueba que el hechizo
-        /// sea de verdad uno de los dos: un id que no lo sea dejaría al personaje sin ese hueco.
+        /// Stores that of this pair the character carries this spell. It is checked that the spell
+        /// really is one of the two: an id that is not would leave the character without that slot.
         /// </summary>
         public static bool Choose(int spellId)
         {
@@ -76,7 +76,7 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
-        /// <summary>Los huecos de la barra que tienen puesto este hechizo.</summary>
+        /// <summary>The bar slots that have this spell in them.</summary>
         public static List<int> SlotsHolding(int spellId)
         {
             var slots = new List<int>();
@@ -88,7 +88,7 @@ namespace Jondo.Unity.Server.Managers
             return slots;
         }
 
-        /// <summary>Recuerda en qué hueco de la barra quedó un hechizo.</summary>
+        /// <summary>Remembers which bar slot a spell ended up in.</summary>
         public static void PutInBar(int slot, int spellId)
         {
             if (spellId == 0)
@@ -106,9 +106,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Deja apuntada la barra que se le acaba de mandar al cliente, para que la próxima sesión
-        /// la encuentre igual. Solo se escribe la primera vez: si el jugador ya la ha tocado, lo
-        /// que manda es lo suyo.
+        /// Records the bar just sent to the client, so that the next session
+        /// finds it the same. It is only written the first time: if the player has already touched it, what
+        /// rules is his.
         /// </summary>
         public static void RememberBar(IEnumerable<(int Slot, int SpellId)> slots)
         {

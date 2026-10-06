@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- La ingeniería inversa del protocolo, sin ninguna cara.
-         Aquí vive todo lo que sabe leer un cliente de Dofus y sacarle el protocolo: los
-         ensamblados, las huellas, el emparejador, el índice del código y el trato con el modelo de
-         lenguaje. Ni una línea de Console ni de WinForms, y por eso lo pueden conducir igual la
-         línea de comandos (Jondo.Unity.ProtocolBuilder) y la ventana (Jondo.Unity.Deobfuscator).
+    <!-- The protocol's reverse engineering, without any face.
+         Here lives everything that knows how to read a Dofus client and take the protocol out of it: the
+         assemblies, the fingerprints, the matcher, the code index and dealing with the language
+         model. Not a single line of Console or WinForms, and that is why both the
+         command line (Jondo.Unity.ProtocolBuilder) and the window (Jondo.Unity.Deobfuscator) can drive it the same.
 
-         Se queda en net10.0 a secas, sin -windows: lo único atado a Windows es DPAPI, y eso vive
-         en la ventana. Si algún día sale un aviso de plataforma, la cura es anotar el método, no
-         arrastrar el marco entero. -->
+         It stays plain net10.0, without -windows: the only thing tied to Windows is DPAPI, and that lives
+         in the window. If some day a platform warning comes up, the cure is to annotate the method, not
+         to drag in the whole framework. -->
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>

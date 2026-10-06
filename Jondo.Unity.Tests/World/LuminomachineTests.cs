@@ -12,22 +12,22 @@ using Xunit;
 namespace Jondo.Unity.Tests.World
 {
     /// <summary>
-    /// La luminomáquina, contra el catálogo del propio cliente: la escalera de sal, qué respuestas
-    /// se ofrecen con cuánta luz, y que cada id que se manda dibuja en pantalla la frase que
-    /// decimos que dibuja.
+    /// The luminomachine, against the client's own catalogue: the salt ladder, which replies
+    /// are offered with how much light, and that each id sent draws on screen the sentence
+    /// we say it draws.
     /// </summary>
     public class LuminomachineTests
     {
-        /// <summary>Cómo llama el cliente a cada franja de luz.</summary>
+        /// <summary>What the client calls each band of light.</summary>
         private static readonly string[] Bands = { "", "primera", "segunda", "tercera", "última" };
 
         /// <summary>
-        /// La escalera: una franja más cuesta 1, 3, 6 y 10, y un salto paga la suma.
+        /// The ladder: one more band costs 1, 3, 6 and 10, and a jump pays the sum.
         /// </summary>
         /// <remarks>
-        /// No es una tabla inventada. Va escrita en el aviso del propio objeto —«Cada tramo de luz
-        /// adicional requiere más sal (1-3-6-10)»— y las diez respuestas de depósito de la máquina
-        /// dicen exactamente estas diez sumas.
+        /// It is not an invented table. It is written in the item's own notice —«Cada tramo de luz
+        /// adicional requiere más sal (1-3-6-10)»— and the machine's ten deposit replies
+        /// say exactly these ten sums.
         /// </remarks>
         [Fact]
         public void The_ladder_is_one_three_six_ten()
@@ -45,14 +45,14 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(16, Luminomachine.Cost(2, 4));
             Assert.Equal(10, Luminomachine.Cost(3, 4));
 
-            // Hacia atrás no se va, y de la última no se pasa.
+            // One does not go backwards, and one does not go beyond the last.
             Assert.Equal(0, Luminomachine.Cost(2, 1));
             Assert.Equal(0, Luminomachine.Cost(3, 5));
         }
 
         /// <summary>
-        /// Sólo se ofrece lo que se puede pagar: un botón que no puede funcionar es peor que no
-        /// tener botón. Y cuando no llega ni para una franja, la máquina dice cuánta sal falta.
+        /// Only what can be paid is offered: a button that cannot work is worse than not
+        /// having a button. And when it does not reach even one band, the machine says how much salt is missing.
         /// </summary>
         [Fact]
         public void Only_what_can_be_paid_is_offered()
@@ -67,10 +67,10 @@ namespace Jondo.Unity.Tests.World
                 Luminomachine.DontTouchReply,
             }, Luminomachine.RepliesFor(1, 0, 4));
 
-            // Con veinte sales caben las cuatro franjas de golpe.
+            // With twenty salts the four bands fit in one go.
             Assert.Equal(5, Luminomachine.RepliesFor(1, 0, 20).Count);
 
-            // Desde la segunda sólo quedan dos saltos, y con nueve sales entran los dos.
+            // From the second only two jumps are left, and with nine salts both go in.
             Assert.Equal(new[]
             {
                 Luminomachine.DepositReply(4, 2, 3),
@@ -78,7 +78,7 @@ namespace Jondo.Unity.Tests.World
                 Luminomachine.DontTouchReply,
             }, Luminomachine.RepliesFor(4, 2, 16));
 
-            // Encendida del todo no pide nada, y lo dice con la frase de la que ya arde.
+            // Fully lit it asks for nothing, and says so with the already-burning sentence.
             Assert.Equal(new[] { Luminomachine.DontTouchReply }, Luminomachine.RepliesFor(1, 4, 100));
             Assert.Equal(Luminomachine.LitMessage, Luminomachine.MessageAt(1, 4));
             Assert.Equal(60276, Luminomachine.MessageAt(1, 0));
@@ -86,9 +86,9 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Una respuesta dice de qué máquina viene y qué salto compra, y las que no compran nada
-        /// también se reconocen: hace falta para cerrar la conversación en vez de dejarla caer en
-        /// el camino normal, que buscaría un árbol de diálogo que esta máquina no tiene.
+        /// A reply says which machine it comes from and which jump it buys, and the ones that buy nothing
+        /// are recognised too: it is needed to close the conversation instead of letting it fall into
+        /// the normal path, which would look for a dialogue tree this machine does not have.
         /// </summary>
         [Fact]
         public void A_reply_says_which_machine_and_which_jump()
@@ -117,19 +117,19 @@ namespace Jondo.Unity.Tests.World
 
             Assert.False(Luminomachine.Read(Luminomachine.DontTouchReply)!.Value.Buys);
 
-            // «Hasta luego.», la despedida que llevan sesenta y dos NPCs, no es suya.
+            // «Hasta luego.», the farewell sixty-two NPCs carry, is not its own.
             Assert.Null(Luminomachine.Read(7846));
             Assert.False(Luminomachine.Owns(7846));
         }
 
         /// <summary>
-        /// Y la de verdad: cada id que mandamos dibuja en pantalla la frase que decimos.
+        /// And the real one: each id we send draws on screen the sentence we say.
         /// </summary>
         /// <remarks>
-        /// El cliente resuelve una respuesta a un texto por su id, así que una tabla desplazada una
-        /// casilla no da error en ninguna parte: el jugador lee «Dejar 10 sales» y se le cobran 4.
-        /// Esto vuelve a leer las setenta y seis respuestas de la plantilla del 8007 en world.db y
-        /// las compara con lo que dice el código.
+        /// The client resolves a reply to a text by its id, so a table shifted by one
+        /// slot gives an error nowhere: the player reads «Dejar 10 sales» and is charged 4.
+        /// This reads again the seventy-six replies of 8007's template in world.db and
+        /// compares them with what the code says.
         /// </remarks>
         [Fact]
         public void The_reply_table_matches_what_the_client_will_draw()
@@ -158,8 +158,8 @@ namespace Jondo.Unity.Tests.World
 
             Assert.Equal("No tocar la máquina.", replies[Luminomachine.DontTouchReply]);
 
-            // Y las frases: la de la que ya arde es la única distinta de las seis, que es lo que
-            // la hace ser la de una planta a la que no le falta sal.
+            // And the sentences: the already-burning one is the only one different from the six, which is what
+            // makes it the one of a floor that lacks no salt.
             Assert.Contains("alimentada por la energía de la sal", messages[Luminomachine.LitMessage]);
             for (int floor = 1; floor <= Luminomachine.Machines; floor++)
             {
@@ -168,8 +168,8 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// El botín de la raid no está en la tabla del monstruo, está en la GLOBAL: la Madrepeora
-        /// no tiene ni una fila propia y tiene nueve ahí, con la sal al 30 % y las siete gemas.
+        /// The raid's loot is not in the monster's table, it is in the GLOBAL one: the Madrepeora
+        /// has not a single row of its own and has nine there, with the salt at 30 % and the seven gems.
         /// </summary>
         [Fact]
         public void The_raid_loot_lives_in_the_global_table()
@@ -185,20 +185,20 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(30, salt.PercentDrop);
             Assert.Equal("", salt.ReceiverCriterion);
 
-            // Las siete gemas, de la más común a la más rara, sin criterio ninguna.
+            // The seven gems, from the most common to the rarest, with no criterion at all.
             Assert.Equal(new[] { 30.0, 20.0, 10.0, 5.0, 1.0, 0.1, 0.5 },
                          new[] { 32465, 32466, 32467, 32468, 32469, 32470, 32471 }
                              .Select(id => global.Single(d => d.ObjectId == id).PercentDrop));
 
-            // El Willorque, que guarda la última planta, la suelta siempre.
+            // The Willorque, who guards the last floor, always drops it.
             var guard = DatabaseManager.GetMonsterGlobalDrops(8252);
             Assert.Equal(100, guard.Single(d => d.ObjectId == Luminomachine.SaltItem).PercentDrop);
         }
 
         /// <summary>
-        /// Y lo que NO se sabe no cae. El fragmento de anomalía lo lleva casi todo el juego en la
-        /// misma tabla, con un criterio del que no sabemos contestar una letra; sin esta regla, el
-        /// día que se leyó la tabla global empezaría a caer en todas partes.
+        /// And what is NOT known does not drop. Almost the whole game carries the anomaly fragment in the
+        /// same table, with a criterion of which we cannot answer a single letter; without this rule, the
+        /// day the global table was read it would start dropping everywhere.
         /// </summary>
         [Fact]
         public void What_cannot_be_answered_does_not_drop()
@@ -213,7 +213,7 @@ namespace Jondo.Unity.Tests.World
             Assert.False(Criterion.Met(fragment.ReceiverCriterion, _ => Answer.Unknown));
         }
 
-        /// <summary>Las frases y las respuestas del 8007, tal cual las tiene la base.</summary>
+        /// <summary>8007's sentences and replies, just as the base has them.</summary>
         private static (Dictionary<long, string> Messages, Dictionary<long, string> Replies) MachineTexts()
         {
             using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
@@ -251,8 +251,8 @@ namespace Jondo.Unity.Tests.World
     }
 
     /// <summary>
-    /// Dónde acaban puestas las máquinas. Toca el estado estático de MapManager, así que va con
-    /// los demás que lo tocan.
+    /// Where the machines end up placed. It touches MapManager's static state, so it goes with
+    /// the others that touch it.
     /// </summary>
     [Collection("MapManager")]
     public class LuminomachinePlacementTests
@@ -267,8 +267,8 @@ namespace Jondo.Unity.Tests.World
             {
                 var sima = Raids.Of(Raids.Gigalodon);
 
-                // Casillas que NO incluyen el centro, para que se vea que se busca la más cercana
-                // y no se da por buena la que se pidió.
+                // Cells that do NOT include the centre, so that it shows the closest one is looked for
+                // and the one asked for is not taken as good.
                 var casillas = new Dictionary<long, List<int>>();
                 foreach (int floor in sima.Floors)
                 {
@@ -289,7 +289,7 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(i + 1, Luminomachines.FloorOn(machine.MapId));
                 }
 
-                // La sexta planta, la del Gigalodón, no tiene variable de luz y no tiene máquina.
+                // The sixth floor, the Gigalodón's, has no light variable and has no machine.
                 Assert.Equal(6, sima.Floors.Count);
                 Assert.Equal(0, Luminomachines.FloorOn(DatabaseManager.MapsOfSubArea(sima.Floors[5]).Min()));
             }
@@ -301,8 +301,8 @@ namespace Jondo.Unity.Tests.World
     }
 
     /// <summary>
-    /// Echar la sal: la luz que compra es la de la INSTANCIA, así que hace falta una raid en
-    /// marcha y estar dentro de ella.
+    /// Pouring the salt: the light it buys is the INSTANCE's, so a raid in
+    /// progress is needed and being inside it.
     /// </summary>
     [Collection("guild raids")]
     public class LuminomachineDepositTests : IDisposable
@@ -340,21 +340,21 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(2, Luminomachines.LightOn(7001, 1));
             Assert.Equal(2, raid.Get(RaidInstance.LightVariable(1)));
 
-            // Y ya no se puede pagar desde donde la planta ya no está: es la carrera de dos que
-            // hablan a la vez con la misma máquina.
+            // And it can no longer be paid from where the floor is no longer there: it is the race of two who
+            // talk to the same machine at once.
             Assert.Equal(-1, Luminomachines.Deposit(7001, 1, 0, 2));
             Assert.Equal(-1, Luminomachines.Deposit(7001, 1, 2, 2));
 
             Assert.Equal(4, Luminomachines.Deposit(7001, 1, 2, 4));
             Assert.Equal(-1, Luminomachines.Deposit(7001, 1, 4, 4));
 
-            // Cada planta lleva la suya: encender la primera no enciende la segunda.
+            // Each floor carries its own: lighting the first does not light the second.
             Assert.Equal(0, Luminomachines.LightOn(7001, 2));
             Assert.Equal(0, raid.Get(RaidInstance.LightVariable(2)));
 
-            // Y la luz que se compró es la que ven los criterios del contenido. La Madrepeora anda
-            // por las dos plantas con el mismo criterio escrito en world.db: en la primera, ya
-            // iluminada, deja de agredir; en la segunda, a oscuras, sigue saltando encima.
+            // And the light bought is the one the content's criteria see. The Madrepeora roams
+            // both floors with the same criterion written in world.db: on the first, already
+            // lit, it stops aggressing; on the second, in the dark, it keeps jumping on you.
             if (File.Exists(Jondo.Unity.Launcher.Paths.WorldDb))
             {
                 string criterion = DatabaseManager.MonsterAggressiveImmunity(8324);
@@ -371,7 +371,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(-1, Luminomachines.LightOn(7001, 1));
             Assert.Equal(-1, Luminomachines.Deposit(7001, 1, 0, 1));
 
-            // Ni siquiera con gremio: sin raid en marcha no hay instancia que iluminar.
+            // Not even with a guild: without a raid in progress there is no instance to light.
             Assert.Equal(-1, Luminomachines.LightOn(9999, 1));
         }
     }

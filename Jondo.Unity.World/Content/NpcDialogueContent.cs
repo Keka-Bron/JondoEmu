@@ -53,27 +53,27 @@ namespace Jondo.Unity.World.Content
         /// <summary>True when the reply is for somebody who has already finished the quest.</summary>
         public bool AfterQuest { get; init; }
 
-        /// <summary>El objetivo que hay que llevar cumplido para que la respuesta se ofrezca.</summary>
+        /// <summary>The objective that has to have been met for the reply to be offered.</summary>
         /// <remarks>
-        /// El paso no basta. Una mision de un solo paso con cuatro objetivos --«Matarratas» lo es--
-        /// esta siempre en ese paso, asi que condicionar por paso no distingue nada y el tabernero
-        /// ofrecia «He neutralizado a la rata» desde el minuto uno, con la rata viva.
+        /// The step is not enough. A single-step quest with four objectives --«Matarratas» is one--
+        /// is always on that step, so conditioning by step distinguishes nothing and the innkeeper
+        /// offered «He neutralizado a la rata» from minute one, with the rat alive.
         /// </remarks>
         public int AfterObjective { get; init; }
 
-        /// <summary>El interactivo que hay que haber usado para que la respuesta se ofrezca.</summary>
+        /// <summary>The interactive that has to have been used for the reply to be offered.</summary>
         /// <remarks>
-        /// «He visto el anuncio que has puesto» no puede existir antes de haber leido el anuncio.
-        /// No es un objetivo -- la mision no ha empezado todavia, la empieza esta misma respuesta --
-        /// asi que la condicion no puede venir del diario: viene de haber pulsado el cartel.
+        /// «He visto el anuncio que has puesto» cannot exist before having read the notice.
+        /// It is not an objective -- the quest has not started yet, this very reply starts it --
+        /// so the condition cannot come from the journal: it comes from having pressed the sign.
         /// </remarks>
         public int AfterElement { get; init; }
 
-        /// <summary>Lo que esta respuesta compra, y por cuanto. Cero cuando no compra nada.</summary>
+        /// <summary>What this reply buys, and for how much. Zero when it buys nothing.</summary>
         /// <remarks>
-        /// El precio va en el texto de la respuesta --«Ponme una limonada. Toma, 1 kama.»-- y
-        /// hasta ahora eso era todo: una frase. Sin esto, pulsarla no daba el objeto ni cobraba,
-        /// y la mision que necesita esa limonada no se podia terminar.
+        /// The price goes in the reply's text --«Ponme una limonada. Toma, 1 kama.»-- and
+        /// until now that was all: a sentence. Without this, pressing it neither gave the item nor charged,
+        /// and the quest that needs that lemonade could not be finished.
         /// </remarks>
         public int BuysItem { get; init; }
         public int BuysCount { get; init; } = 1;
@@ -190,9 +190,9 @@ namespace Jondo.Unity.World.Content
             var replies = new List<long>(Choices.Count);
             foreach (var choice in Choices)
             {
-                // El interactivo se mira antes que nada, porque vale igual para una respuesta que
-                // pertenece a una mision y para una que la empieza -- y la que la empieza es
-                // «Always» a ojos del filtro, asi que si esto fuera despues no se comprobaria.
+                // The interactive is checked before anything else, because it holds the same for a reply that
+                // belongs to a quest and for one that starts it -- and the one that starts it is
+                // «Always» in the filter's eyes, so if this came later it would not be checked.
                 if (choice.AfterElement != 0
                     && (elementUsed == null || !elementUsed(choice.AfterElement))) continue;
 
@@ -207,9 +207,9 @@ namespace Jondo.Unity.World.Content
                 if (!active(choice.Quest)) continue;
                 if (choice.Step != 0 && !onStep(choice.Quest, choice.Step)) continue;
 
-                // Y el objetivo, cuando la fila lo pide. Sin la llamada -- que es opcional para no
-                // obligar a quien no la tenga -- una respuesta atada a un objetivo no se ofrece,
-                // que es el lado prudente: mejor no verla que verla antes de tiempo.
+                // And the objective, when the row asks for it. Without the call -- which is optional so as not to
+                // force whoever does not have it -- a reply tied to an objective is not offered,
+                // which is the prudent side: better not to see it than to see it too early.
                 if (choice.AfterObjective != 0
                     && (objectiveDone == null || !objectiveDone(choice.Quest, choice.AfterObjective)))
                     continue;

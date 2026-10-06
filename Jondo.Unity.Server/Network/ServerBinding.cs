@@ -4,24 +4,24 @@ using System.Net;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// A qué se atan los puertos del emulador: sólo a esta máquina, o a toda la red.
+    /// What the emulator's ports are bound to: only this machine, or the whole network.
     ///
-    /// De los cinco servicios que abre el servidor, el proxy de juego, el zaap y el HAAPI estaban
-    /// atados a <c>127.0.0.1</c>, mientras que el chat y el nodo de juego usaban
-    /// <c>IPAddress.Any</c>. No era una decisión de despliegue: eran listeners escritos en momentos
-    /// distintos. Los cinco siguen cerrados por defecto y se abren juntos cuando se pide el modo
-    /// remoto.
+    /// Of the five services the server opens, the game proxy, the zaap and the HAAPI were
+    /// bound to <c>127.0.0.1</c>, while the chat and the game node used
+    /// <c>IPAddress.Any</c>. It was not a deployment decision: they were listeners written at different
+    /// times. All five remain closed by default and open together when remote
+    /// mode is asked for.
     ///
-    /// Así que ahora los cuatro van igual, y para abrirlos hay que pedirlo a propósito con
-    /// <c>JONDO_PUBLIC_BIND=1</c>. Hace falta cuando el servidor vive en otra máquina; mientras
-    /// tanto, cerrado.
+    /// So now the four go the same, and to open them one has to ask for it on purpose with
+    /// <c>JONDO_PUBLIC_BIND=1</c>. It is needed when the server lives on another machine; until
+    /// then, closed.
     ///
-    /// La idea es de la pull request de Raphaël, que traía un fichero equivalente. El código es
-    /// nuestro: aquí sólo hacen falta las dos líneas que de verdad se usan.
+    /// The idea comes from Raphaël's pull request, which brought an equivalent file. The code is
+    /// ours: here only the two lines really used are needed.
     /// </summary>
     public static class ServerBinding
     {
-        /// <summary>¿Se han pedido los puertos abiertos a la red?</summary>
+        /// <summary>Have the ports been asked to be open to the network?</summary>
         public static bool Public
         {
             get
@@ -33,10 +33,10 @@ namespace Jondo.Unity.Server.Network
             }
         }
 
-        /// <summary>La dirección a la que atarse. Cerrado salvo que se pida lo contrario.</summary>
+        /// <summary>The address to bind to. Closed unless asked otherwise.</summary>
         public static IPAddress TcpAddress => Public ? IPAddress.Any : IPAddress.Loopback;
 
-        /// <summary>Para el registro del servidor, que diga con qué puerta ha arrancado.</summary>
+        /// <summary>For the server log, so it says which door it started with.</summary>
         public static string Description => Public ? "toda la red" : "sólo esta máquina";
     }
 }

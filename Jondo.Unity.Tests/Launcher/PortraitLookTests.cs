@@ -4,25 +4,25 @@ using Xunit;
 namespace Jondo.Unity.Tests.Launcher
 {
     /// <summary>
-    /// La cadena de aspecto que el servidor manda al lanzador para el retrato del equipo.
+    /// The look string the server sends the launcher for the team portrait.
     /// </summary>
     /// <remarks>
-    /// Son DOS formas distintas y confundirlas es lo que hace que no se dibuje nada:
+    /// They are TWO different forms and confusing them is what makes nothing get drawn:
     ///
-    ///   - la columna <c>Look</c> de la base es el protobuf en hexadecimal, que es lo que viaja al
-    ///     cliente de juego —«0801120CF5B7CB34…»—
-    ///   - lo que sabe dibujar el lector de huesos es la de las llaves,
-    ///     <c>{hueso|pieles|colores|escala}</c>
+    ///   - the base's <c>Look</c> column is the protobuf in hexadecimal, which is what travels to the
+    ///     game client —«0801120CF5B7CB34…»—
+    ///   - what the bone reader knows how to draw is the braces one,
+    ///     <c>{bone|skins|colours|scale}</c>
     ///
-    /// Mandar la primera creyendo que es la segunda no falla: <c>NpcLook.Parse</c> la da por
-    /// inválida y el retrato sale vacío, sin un solo error por ninguna parte.
+    /// Sending the first believing it is the second does not fail: <c>NpcLook.Parse</c> takes it as
+    /// invalid and the portrait comes out empty, without a single error anywhere.
     /// </remarks>
     public class PortraitLookTests
     {
         [Fact]
         public void El_hexadecimal_de_la_base_NO_se_puede_dibujar()
         {
-            // Tal cual está en la columna Look de un personaje de verdad.
+            // Just as it is in a real character's Look column.
             const string deLaBase = "0801120CF5B7CB34888CA02892A6C82018032218A28B9B0FCBE5F615A4E1B919";
 
             Assert.False(NpcLook.Parse(deLaBase).Valid);
@@ -31,8 +31,8 @@ namespace Jondo.Unity.Tests.Launcher
         [Fact]
         public void La_de_llaves_si()
         {
-            // La que compone el servidor: hueso 1 —el rig humanoide, el de los jugables—, sus
-            // pieles, los seis colores y la escala.
+            // The one the server composes: bone 1 —the humanoid rig, the playable ones'—, its
+            // skins, the six colours and the scale.
             var look = NpcLook.Parse("{1|90,91|1=#FFFFFF,2=#62A1C9|53}");
 
             Assert.True(look.Valid);
@@ -45,9 +45,9 @@ namespace Jondo.Unity.Tests.Launcher
         [Fact]
         public void La_que_compone_el_servidor_lleva_el_cuerpo_delante_y_la_cabeza_detras()
         {
-            // Ocra hembra con la cabeza 137, que es la que tienen los personajes de prueba. El id
-            // en cero es "nadie": sin personaje en la base no hay equipo ni cosméticos que añadir,
-            // así que lo que queda es exactamente el cuerpo y la cara.
+            // Female Cra with head 137, which is the one the test characters have. The id
+            // at zero is "nobody": without a character in the base there is no equipment or cosmetics to add,
+            // so what is left is exactly the body and the face.
             var quien = new Jondo.Unity.Server.DatabaseManager.DbCharacter
             {
                 Id = 0, Name = "prueba", Breed = 9, Sex = 1, Level = 200, HeadId = 137,
@@ -58,15 +58,15 @@ namespace Jondo.Unity.Tests.Launcher
             Assert.True(look.Valid);
             Assert.True(look.Humanoid);
 
-            // LA PRIMERA PIEL ES EL CUERPO: es de donde sale la raza para elegir el rig. Poniendo
-            // cualquier otra cosa delante -- la cabeza, un sombrero -- no se encuentra el rig y no
-            // se dibuja nada, sin un solo error.
+            // THE FIRST SKIN IS THE BODY: it is where the breed for choosing the rig comes from. Putting
+            // anything else in front -- the head, a hat -- the rig is not found and
+            // nothing is drawn, without a single error.
             var suyo = Jondo.Unity.Server.Managers.BreedLookTable.Get(9, 1);
             Assert.NotNull(suyo);
             Assert.Equal((int)suyo!.Skins[0], look.Skins[0]);
             Assert.Equal(9, Breeds.Of(look.Skins[0]));
 
-            // Y la cabeza va detrás, añadida. Sin ella el personaje sale sin cara.
+            // And the head goes after, added. Without it the character comes out without a face.
             int cabeza = Jondo.Unity.Server.Managers.HeadTable.SkinFor(137, 9, 1);
             Assert.True(cabeza > 0, "la cabeza 137 tiene que tener piel en heads.json");
             Assert.Contains(cabeza, look.Skins);
@@ -76,8 +76,8 @@ namespace Jondo.Unity.Tests.Launcher
         [Fact]
         public void Sin_raza_conocida_no_hay_cadena()
         {
-            // Una raza que no existe no puede componer nada, y tiene que devolver vacío en vez de
-            // una cadena a medias que el lector daría por válida.
+            // A breed that does not exist cannot compose anything, and has to return empty instead of
+            // a half string the reader would take as valid.
             var quien = new Jondo.Unity.Server.DatabaseManager.DbCharacter
             {
                 Id = 0, Name = "prueba", Breed = 999, Sex = 0,
@@ -89,8 +89,8 @@ namespace Jondo.Unity.Tests.Launcher
         [Fact]
         public void Sin_aspecto_no_hay_retrato_y_no_pasa_nada()
         {
-            // Una cuenta cuyo personaje el servidor no sepa componer manda cadena vacía. Tiene que
-            // quedarse sin retrato, no reventar: la ficha se lee igual con la inicial.
+            // An account whose character the server cannot compose sends an empty string. It has to
+            // be left without a portrait, not blow up: the card reads the same with the initial.
             Assert.False(NpcLook.Parse("").Valid);
             Assert.False(NpcLook.Parse(null).Valid);
         }

@@ -13,41 +13,41 @@ using System.Threading.Tasks;
 namespace Jondo.Unity.Launcher.Security
 {
     /// <summary>
-    /// Entrar por la web, con el navegador de por medio y sin que la contraseña pase por aquí.
+    /// Logging in through the website, with the browser in between and without the password going through here.
     /// </summary>
     /// <remarks>
-    /// <b>Por qué.</b> Hoy el lanzador pide usuario y contraseña en su propia ventana. Mientras eso
-    /// sea así, la contraseña pasa por nuestro proceso y respondemos de ella: de que no se quede en
-    /// memoria, de que no acabe en un registro, de que nadie ponga un lanzador falso con la misma
-    /// cara. Con el navegador de por medio, la contraseña se escribe en la web y aquí sólo llega un
-    /// código de un solo uso.
+    /// <b>Why.</b> Today the launcher asks for username and password in its own window. While that
+    /// is so, the password goes through our process and we answer for it: that it does not stay in
+    /// memory, that it does not end up in a log, that nobody puts up a fake launcher with the same
+    /// face. With the browser in between, the password is typed on the website and here only a
+    /// single-use code arrives.
     ///
-    /// <b>El flujo, que es el estándar para aplicaciones de escritorio</b> (RFC 8252, código de
-    /// autorización con PKCE y redirección a loopback):
+    /// <b>The flow, which is the standard for desktop applications</b> (RFC 8252, authorisation code
+    /// with PKCE and loopback redirect):
     ///
     /// <code>
-    ///   1. se abre un servidor HTTP en 127.0.0.1, en un puerto libre que elige el sistema
-    ///   2. se genera un verificador al azar y su reto = BASE64URL(SHA-256(verificador))
-    ///   3. se abre el navegador en  .../authorize?...&amp;code_challenge=RETO&amp;state=ESTADO
-    ///   4. la persona entra en la web; la web redirige a  http://127.0.0.1:PUERTO/?code=...&amp;state=...
-    ///   5. se comprueba que el estado es el que se mandó y se cambia el código por los vales,
-    ///      enviando el VERIFICADOR: sin él, un código robado no vale para nada
+    ///   1. an HTTP server is opened on 127.0.0.1, on a free port the system chooses
+    ///   2. a random verifier is generated and its challenge = BASE64URL(SHA-256(verifier))
+    ///   3. the browser is opened at  .../authorize?...&amp;code_challenge=CHALLENGE&amp;state=STATE
+    ///   4. the person logs in on the website; the website redirects to  http://127.0.0.1:PORT/?code=...&amp;state=...
+    ///   5. it is checked that the state is the one sent and the code is exchanged for the tokens,
+    ///      sending the VERIFIER: without it, a stolen code is worth nothing
     /// </code>
     ///
-    /// Nada de secreto de cliente: en algo que se reparte a los jugadores no hay secreto que valga,
-    /// porque va dentro del ejecutable. Eso es justo lo que PKCE viene a sustituir.
+    /// No client secret: in something handed out to the players there is no secret that holds,
+    /// because it goes inside the executable. That is exactly what PKCE is here to replace.
     ///
-    /// <b>Estado.</b> Está escrito y probado contra su propio bucle, pero <b>todavía no hay web</b>
-    /// contra la que hablar: mientras <see cref="UI.LauncherPreferences.WebSite"/> esté vacío, el
-    /// lanzador entra por el camino de siempre. El día que exista el sitio, se rellena esa
-    /// preferencia y esto entra en funcionamiento sin tocar nada más.
+    /// <b>Status.</b> It is written and tested against its own loop, but <b>there is no website yet</b>
+    /// to talk to: while <see cref="UI.LauncherPreferences.WebSite"/> is empty, the
+    /// launcher logs in the usual way. The day the site exists, that
+    /// preference is filled in and this comes into operation without touching anything else.
     /// </remarks>
     internal static class OAuthFlow
     {
-        /// <summary>Dónde vive la web y con qué identidad se presenta el lanzador.</summary>
+        /// <summary>Where the website lives and with what identity the launcher presents itself.</summary>
         public sealed record Endpoints(string Authorize, string Token, string ClientId, string Scope)
         {
-            /// <summary>Los de un sitio en <paramref name="site"/> con las rutas de siempre.</summary>
+            /// <summary>Those of a site at <paramref name="site"/> with the usual paths.</summary>
             public static Endpoints For(string site)
             {
                 string raiz = site.TrimEnd('/');
@@ -56,7 +56,7 @@ namespace Jondo.Unity.Launcher.Security
             }
         }
 
-        /// <summary>Lo que devuelve la web cuando todo ha ido bien.</summary>
+        /// <summary>What the website returns when everything has gone well.</summary>
         public sealed class Session
         {
             public string AccessToken { get; init; } = "";
@@ -64,16 +64,16 @@ namespace Jondo.Unity.Launcher.Security
             public DateTimeOffset ExpiresAt { get; init; }
 
             /// <summary>
-            /// Si conviene renovar ya.
+            /// Whether it is time to renew.
             /// </summary>
             /// <remarks>
-            /// Con un minuto de margen: renovar justo al vencer deja la petición siguiente a merced
-            /// de que el reloj de las dos máquinas coincida, y no coinciden.
+            /// With a minute's margin: renewing right on expiry leaves the next request at the mercy
+            /// of the two machines' clocks matching, and they do not.
             /// </remarks>
             public bool NeedsRefresh => DateTimeOffset.UtcNow >= ExpiresAt.AddMinutes(-1);
         }
 
-        /// <summary>Lo que falla, con el motivo dicho de forma que se pueda enseñar.</summary>
+        /// <summary>What fails, with the reason said in a way that can be shown.</summary>
         public sealed class OAuthException : Exception
         {
             public OAuthException(string message) : base(message) { }
@@ -81,13 +81,13 @@ namespace Jondo.Unity.Launcher.Security
 
         private static readonly HttpClient _http = new HttpClient
         {
-            // Los mismos cinco segundos que usa el cliente de Bubble para conectar. Una web que no
-            // contesta en cinco segundos no va a contestar, y dejar la ventana colgada mientras
-            // tanto es peor que decirlo.
+            // The same five seconds Bubble's client uses to connect. A website that does not
+            // answer in five seconds is not going to answer, and leaving the window hanging meanwhile
+            // is worse than saying so.
             Timeout = TimeSpan.FromSeconds(20),
         };
 
-        /// <summary>Abre el navegador y espera a que la web devuelva el código.</summary>
+        /// <summary>Opens the browser and waits for the website to return the code.</summary>
         public static async Task<Session> SignInAsync(Endpoints endpoints, CancellationToken ct = default)
         {
             string verificador = Base64Url(RandomNumberGenerator.GetBytes(32));
@@ -125,7 +125,7 @@ namespace Jondo.Unity.Launcher.Security
             }
         }
 
-        /// <summary>Renueva con el vale de renovación, sin volver a molestar a nadie.</summary>
+        /// <summary>Renews with the refresh token, without bothering anyone again.</summary>
         public static async Task<Session> RefreshAsync(Endpoints endpoints, string refreshToken,
                                                        CancellationToken ct = default)
         {
@@ -140,14 +140,14 @@ namespace Jondo.Unity.Launcher.Security
             }, ct).ConfigureAwait(false);
         }
 
-        // ─── Las piezas ─────────────────────────────────────────────────────────
+        // ─── The pieces ─────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Un puerto que esté libre ahora mismo.
+        /// A port that is free right now.
         /// </summary>
         /// <remarks>
-        /// Se pide el 0 y el sistema da uno suyo. Fijar un puerto haría que dos lanzadores abiertos
-        /// a la vez se pelearan por él, y en esta casa eso pasa: ocho clientes multicuenta.
+        /// 0 is asked for and the system gives one of its own. Fixing a port would make two launchers open
+        /// at once fight over it, and in this house that happens: eight multi-account clients.
         /// </remarks>
         private static int PuertoLibre()
         {
@@ -161,9 +161,9 @@ namespace Jondo.Unity.Launcher.Security
         private static async Task<string> EsperarElCodigo(HttpListener escucha, string estado,
                                                           CancellationToken ct)
         {
-            // Cinco minutos: lo que tarda alguien en entrar en la web, escribir la contraseña y
-            // pasar por el segundo factor si lo hay. Sin tope, un lanzador con la pestaña cerrada
-            // se queda esperando para siempre.
+            // Five minutes: what it takes someone to go to the website, type the password and
+            // go through the second factor if there is one. Without a cap, a launcher whose tab was closed
+            // stays waiting forever.
             using var plazo = CancellationTokenSource.CreateLinkedTokenSource(ct);
             plazo.CancelAfter(TimeSpan.FromMinutes(5));
 
@@ -183,7 +183,7 @@ namespace Jondo.Unity.Launcher.Security
 
                     var consulta = contexto.Request.QueryString;
 
-                    // El navegador pide también el icono; eso no es la respuesta.
+                    // The browser also asks for the icon; that is not the answer.
                     if (consulta["code"] == null && consulta["error"] == null)
                     {
                         Responder(contexto, 404, "");
@@ -200,8 +200,8 @@ namespace Jondo.Unity.Launcher.Security
                         throw new OAuthException($"La web ha rechazado la entrada: {error}");
                     }
 
-                    // El estado es lo que ata esta respuesta a esta petición. Sin compararlo, otra
-                    // página abierta en el mismo navegador podría colar aquí su propio código.
+                    // The state is what ties this answer to this request. Without comparing it, another
+                    // page open in the same browser could slip its own code in here.
                     if (!FixedTimeEquals(devuelto, estado))
                     {
                         Responder(contexto, 400, Pagina("Respuesta inesperada",
@@ -300,7 +300,7 @@ namespace Jondo.Unity.Launcher.Security
             }
         }
 
-        /// <summary>Comparación sin fugas por tiempo, que es como se comparan los secretos.</summary>
+        /// <summary>Comparison without timing leaks, which is how secrets are compared.</summary>
         private static bool FixedTimeEquals(string? a, string? b)
         {
             if (a == null || b == null) return false;

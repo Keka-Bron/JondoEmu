@@ -10,14 +10,14 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Los desafíos entre jugadores, y las modalidades del koliseo.
+    /// Challenges between players, and the koliseo modes.
     /// </summary>
     /// <remarks>
-    /// Medido en las cinco capturas de la carpeta Combate: cuatro de desafío, que entre ellas
-    /// cubren aceptar y rechazar desde los dos lados, y una de koliseo 2 contra 2.
+    /// Measured in the five captures of the Combate folder: four of challenges, which between them
+    /// cover accepting and declining from both sides, and one of a 2 versus 2 koliseo.
     ///
-    /// Lo que más importa fijar aquí es que aceptar y rechazar NO son dos opcodes distintos: los
-    /// separa un solo campo del hpu, y confundirlos haría que rechazar montase el combate.
+    /// What matters most to pin here is that accepting and declining are NOT two different opcodes: they are
+    /// separated by a single field of the hpu, and confusing them would make declining set up the fight.
     /// </remarks>
     [Collection("koliseo")]
     public class PvpTests
@@ -28,12 +28,12 @@ namespace Jondo.Unity.Tests.Combat
             KoliseoQueue.ForgetEverything();
         }
 
-        // ------------------------------------------------------------------------ los desafíos
+        // ------------------------------------------------------------------------ the challenges
 
         [Fact]
         public void El_desafio_ofrecido_lleva_a_los_dos_y_su_id()
         {
-            // 08a28280c8e708 10a282f0a6c408 18ee03 de la captura, con los ids de aquel par.
+            // 08a28280c8e708 10a282f0a6c408 18ee03 from the capture, with that pair's ids.
             byte[] hqc = FightProtocol.BuildChallengeOffered(302677754146L, 293213045026L, 494);
 
             Assert.Equal("08a28280c8e70810a282f0a6c40818ee03",
@@ -43,8 +43,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Aceptar_y_rechazar_solo_se_diferencian_en_un_campo()
         {
-            // Los dos hpv de la captura, byte por byte. El f3 está en el aceptado y no en el otro,
-            // y el retado va en el CUATRO: en el rechazado el 20 va pegado al id.
+            // The capture's two hpv, byte for byte. f3 is in the accepted one and not in the other,
+            // and the challenged goes in FOUR: in the declined one the 20 goes stuck to the id.
             byte[] aceptado = FightProtocol.BuildChallengeAnswered(302677754146L, 494, true, 293213045026L);
             byte[] rechazado = FightProtocol.BuildChallengeAnswered(302677754146L, 489, false, 293213045026L);
 
@@ -57,8 +57,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Un_desafio_se_contesta_una_sola_vez()
         {
-            // El hpu llega repetido en dos de las capturas. Sacarlo de la lista al contestar es lo
-            // que impide que dos respuestas monten dos combates.
+            // The hpu arrives repeated in two of the captures. Taking it off the list on answering is what
+            // keeps two answers from setting up two fights.
             var desafio = Duels.Open(1, 2, 100);
 
             Assert.NotNull(Duels.Take(desafio.Id));
@@ -68,7 +68,7 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Nadie_anda_en_dos_a_la_vez()
         {
-            // Sin esto se puede retar cien veces al mismo y llenarle la pantalla de ventanas.
+            // Without this the same one can be challenged a hundred times and his screen filled with windows.
             Duels.Open(1, 2, 100);
 
             Assert.True(Duels.Busy(1));
@@ -79,7 +79,7 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Al_desconectarse_se_le_cierran_los_suyos()
         {
-            // Un desafío cuyo retador ya no está es una ventana que no se puede contestar.
+            // A challenge whose challenger is no longer there is a window that cannot be answered.
             Duels.Open(1, 2, 100);
             Duels.Open(3, 4, 100);
 
@@ -88,13 +88,13 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(Duels.Busy(3));
         }
 
-        // --------------------------------------------------------------------------- el koliseo
+        // --------------------------------------------------------------------------- the koliseo
 
         [Fact]
         public void Las_tres_modalidades_estan_abiertas()
         {
-            // Lo que se pedía: 1 contra 1, 2 contra 2 y 3 contra 3; y la cuarta tarjeta, 1 contra 1
-            // contra un megabot.
+            // What was asked for: 1 versus 1, 2 versus 2 and 3 versus 3; and the fourth card, 1 versus 1
+            // against a JondoBot.
             Assert.Equal(4, KoliseoHandler.CountOpen());
 
             foreach (int equipos in new[] { 1, 2, 3 })
@@ -107,9 +107,9 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void La_tabla_es_la_de_la_captura()
         {
-            // Byte por byte el ltd de «koliseo completo con invitacion-koli 2vs2» en las tres
-            // primeras. La cuarta llega cerrada, un 3 contra 3; aquí es la tarjeta de los megabots,
-            // abierta y de 1 contra 1 (ver KoliseoBotTests).
+            // Byte for byte the ltd of «koliseo completo con invitacion-koli 2vs2» in the first
+            // three. The fourth arrives closed, a 3 versus 3; here it is the JondoBots' card,
+            // open and 1 versus 1 (see KoliseoBotTests).
             byte[] ltd = KoliseoHandler.BuildModes(KoliseoHandler.Modes);
 
             Assert.StartsWith("0a0812040801200118010a0a080112040801200218010a0a0802120408012003" +
@@ -117,21 +117,21 @@ namespace Jondo.Unity.Tests.Combat
                               Convert.ToHexString(ltd).ToLowerInvariant());
         }
 
-        // ------------------------------------------------------ la preparación de cada cliente
+        // ------------------------------------------------------ each client's preparation
 
         [Fact]
         public void La_preparacion_se_recuerda_por_combatiente_y_no_por_combate()
         {
-            // Esto era un solo booleano del combate —HasLoadedMap— y por eso en un desafío el
-            // segundo cliente en cargar el mapa se quedaba sin combatientes y sin botón de listo:
-            // el primero en mandar su kmv ponía la bandera y al otro se le contestaba que ya no
-            // había preparación pendiente. Es una carrera, así que no fallaba siempre el mismo.
+            // This was a single boolean of the fight —HasLoadedMap— and that is why in a challenge the
+            // second client to load the map was left without fighters and without a ready button:
+            // the first to send its kmv set the flag and the other was answered that there was no
+            // preparation pending any more. It is a race, so it was not always the same one that failed.
             var combate = new FightInstance(1, 100, 200);
 
             Assert.True(combate.MarkPrepared(10));
-            Assert.False(combate.MarkPrepared(10));   // el mismo, otra vez: ya está servido
+            Assert.False(combate.MarkPrepared(10));   // the same one, again: it is already served
 
-            // Y el otro tiene la suya, que es justo lo que faltaba.
+            // And the other has his, which is exactly what was missing.
             Assert.True(combate.MarkPrepared(20));
 
             Assert.True(combate.HasPrepared(10));
@@ -155,44 +155,58 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Los_dos_clientes_pueden_prepararse_a_la_vez()
         {
-            // Llegan por dos conexiones distintas y se atienden en dos hilos. Sin candado, dos
-            // MarkPrepared simultáneos pueden perder uno de los dos y dejar a alguien sin
-            // preparación —o mandársela dos veces—.
+            // They arrive through two different connections and are handled on two threads. Without a lock, two
+            // simultaneous MarkPrepared can lose one of the two and leave someone without
+            // preparation —or send it to him twice—.
             var combate = new FightInstance(1, 100, 200);
             var concedidos = new System.Collections.Concurrent.ConcurrentBag<bool>();
 
             System.Threading.Tasks.Parallel.For(0, 64, i =>
                 concedidos.Add(combate.MarkPrepared(i % 2 == 0 ? 10 : 20)));
 
-            // Sesenta y cuatro intentos sobre dos combatientes: exactamente dos se lo llevan.
+            // Sixty-four attempts over two fighters: exactly two get it.
             Assert.Equal(2, concedidos.Count(c => c));
         }
 
         [Fact]
         public void El_turno_se_abre_una_sola_vez_aunque_contesten_los_dos()
         {
-            // El «confírmame» va a los dos clientes y contestan los dos. Lo que cuelga de esa
-            // respuesta —deshacer invocados vencidos, barrer embrujos, devolver puntos— tiene que
-            // pasar una vez: con dos, los puntos se devolvían dos veces.
+            // The «confirm to me» goes to both clients and both answer. What hangs from that
+            // answer —undoing expired summons, sweeping buffs, giving back points— has to
+            // happen once: with two, the points were given back twice.
             var combate = new FightInstance(1, 100, 200);
 
             Assert.True(combate.AtenderElTurnoUnaVez(1, 0));
             Assert.False(combate.AtenderElTurnoUnaVez(1, 0));
 
-            // Y el turno siguiente vuelve a abrirse, que si no el combate se para en el primero.
+            // And the next turn opens again, otherwise the fight stops at the first.
             Assert.True(combate.AtenderElTurnoUnaVez(1, 1));
             Assert.True(combate.AtenderElTurnoUnaVez(2, 0));
         }
 
-        // -------------------------------------------------------- apuntarse y el emparejamiento
+        /// <summary>
+        /// The same index of the same round is somebody else's turn once the order is rebuilt: the
+        /// Ocra at index 2, a fighter before him gone, his Arakna summoned at index 2. Her turn
+        /// opens; taken for his, it never did.
+        /// </summary>
+        [Fact]
+        public void A_turn_at_an_index_already_confirmed_opens_when_it_is_somebody_elses()
+        {
+            var combate = new FightInstance(1, 100, 200);
+            Assert.True(combate.AtenderElTurnoUnaVez(3, 2, 13825558));
+            Assert.False(combate.AtenderElTurnoUnaVez(3, 2, 13825558));
+            Assert.True(combate.AtenderElTurnoUnaVez(3, 2, -3));
+        }
+
+        // -------------------------------------------------------- signing up and matchmaking
 
         [Fact]
         public void El_estado_de_la_cola_es_el_lsx_de_la_captura()
         {
-            // «08012001», el lsx que el servidor real empuja a los 27 segundos de entrar sin que
-            // el cliente pida nada: f1 cierto, f4 uno. El esquema del cliente dice
-            // lsx { bool gcyt = 1; ... lsg gcyw = 4; }, o sea «buscando» y «en cual», y el lsg es
-            // el enumerado de las cuatro modalidades. El 1 es el dos contra dos.
+            // «08012001», the lsx the real server pushes 27 seconds after entering without
+            // the client asking for anything: f1 true, f4 one. The client's schema says
+            // lsx { bool gcyt = 1; ... lsg gcyw = 4; }, that is «searching» and «in which», and lsg is
+            // the enum of the four modes. 1 is the two versus two.
             Assert.Equal("08012001",
                          Convert.ToHexString(KoliseoHandler.BuildQueueState(1, true)).ToLowerInvariant());
         }
@@ -200,8 +214,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void La_modalidad_cero_no_viaja_en_el_lsx()
         {
-            // El uno contra uno es el valor cero del enumerado, y protobuf no manda los ceros.
-            // Buscando en el uno contra uno son dos bytes: solo el «si».
+            // The one versus one is the enum's zero value, and protobuf does not send zeros.
+            // Searching in the one versus one is two bytes: only the «yes».
             Assert.Equal("0801",
                          Convert.ToHexString(KoliseoHandler.BuildQueueState(0, true)).ToLowerInvariant());
         }
@@ -209,16 +223,16 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Dejar_de_buscar_no_lleva_el_si()
         {
-            // Falso es el valor por omision de un bool y tampoco viaja.
+            // False is a bool's default value and does not travel either.
             Assert.Empty(KoliseoHandler.BuildQueueState(0, false));
         }
 
         [Fact]
         public void El_lsx_de_la_vuelta_es_el_de_la_captura()
         {
-            // «18032001», el que contesta al lte a los 80 ms.
-            // La modalidad va en el f4, igual que en el lsx de estar buscando: «18032001» en la
-            // captura del 2 contra 2 y «18032002» en la del 3 contra 3.
+            // «18032001», the one that answers the lte after 80 ms.
+            // The mode goes in f4, the same as in the lsx of being searching: «18032001» in the
+            // 2 versus 2 capture and «18032002» in the 3 versus 3 one.
             Assert.Equal("18032001", Convert.ToHexString(KoliseoHandler.BuildLeftQueue(1)).ToLowerInvariant());
             Assert.Equal("18032002", Convert.ToHexString(KoliseoHandler.BuildLeftQueue(2)).ToLowerInvariant());
         }
@@ -229,7 +243,7 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(KoliseoQueue.Enrol(1, 1));
             Assert.False(KoliseoQueue.Enrol(1, 1));
 
-            // Ni cambiando de modalidad: si valiera, uno solo llenaría las tres colas.
+            // Not even by changing mode: if it were allowed, a single one would fill the three queues.
             Assert.False(KoliseoQueue.Enrol(1, 2));
             Assert.Equal(1, KoliseoQueue.Count);
         }
@@ -240,7 +254,7 @@ namespace Jondo.Unity.Tests.Combat
             KoliseoQueue.Enrol(1, 0);
             KoliseoQueue.Enrol(2, 1);
 
-            // Quien espera un 3 contra 3 no sirve para llenar un 1 contra 1.
+            // Whoever waits for a 3 versus 3 is no use to fill a 1 versus 1.
             Assert.Equal(1, KoliseoQueue.CountIn(0));
             Assert.Equal(1, KoliseoQueue.CountIn(1));
             Assert.Equal(0, KoliseoQueue.CountIn(2));
@@ -251,7 +265,7 @@ namespace Jondo.Unity.Tests.Combat
         {
             for (int i = 1; i <= 3; i++) KoliseoQueue.Enrol(i, 1);
 
-            // Tres para un dos contra dos son tres, no una partida y medio.
+            // Three for a two versus two are three, not a match and a half.
             Assert.Null(KoliseoQueue.TryMatch(1, 2));
             Assert.Equal(3, KoliseoQueue.CountIn(1));
         }
@@ -266,7 +280,7 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(new long[] { 1, 2 }, partida!.Value.Blue);
             Assert.Equal(new long[] { 3, 4 }, partida.Value.Red);
 
-            // Y salen de la cola: el quinto se queda esperando al siguiente.
+            // And they leave the queue: the fifth stays waiting for the next.
             Assert.Equal(1, KoliseoQueue.CountIn(1));
             Assert.False(KoliseoQueue.Waits(1));
             Assert.True(KoliseoQueue.Waits(5));
@@ -280,15 +294,15 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(2, KoliseoQueue.Leave(7));
             Assert.Equal(0, KoliseoQueue.Count);
 
-            // Y el que no estaba no sale de ninguna.
+            // And whoever was not there leaves none.
             Assert.Equal(-1, KoliseoQueue.Leave(7));
         }
 
         [Fact]
         public void El_koliseo_se_anuncia_como_tipo_siete_y_con_reloj()
         {
-            // «1801200128d0043007» de la captura: f3=1 f4=1 f5=592 f6=7. El desafío no trae ni el
-            // f5 ni el f6, y ésa es justo la diferencia entre los dos.
+            // «1801200128d0043007» from the capture: f3=1 f4=1 f5=592 f6=7. The challenge brings neither
+            // f5 nor f6, and that is exactly the difference between the two.
             byte[] kaa = FightProtocol.BuildFightSummary(
                 FightProtocol.Koliseo, FightProtocol.KoliseoPlacementDeciseconds);
 

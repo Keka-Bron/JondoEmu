@@ -5,49 +5,49 @@ using System.Text;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// La lotería del merkasako: la máquina que hay al lado del cofre, con el dibujo 51031, que solo
-    /// existe dentro del merkasako y en un mapa más de todo el mundo.
+    /// The haven bag lottery: the machine next to the chest, with drawing 51031, which only
+    /// exists inside the haven bag and on one more map in the whole world.
     ///
-    /// Aquí no tiene límite de tiradas, y lo que suelta no es basura: coge una pieza de equipo real
-    /// del catálogo del juego y la saca con los efectos exagerados. Un anillo con +3 PA y +3 PM, una
-    /// capa con 500 de un elemento, ese tipo de cosas. Los efectos son los de verdad —111 es PA,
-    /// 128 PM, 118 fuerza y así— con valores que ningún objeto del juego lleva.
+    /// Here it has no limit on rolls, and what it drops is not junk: it takes a real piece of equipment
+    /// from the game's catalogue and brings it out with exaggerated effects. A ring with +3 AP and +3 MP, a
+    /// cape with 500 of an element, that sort of thing. The effects are the real ones —111 is AP,
+    /// 128 MP, 118 strength and so on— with values no item of the game carries.
     ///
-    /// El objeto que sale es NUESTRO: se le da un uid del rango alto para que no choque con nada de
-    /// la base de datos, y se escribe en el inventario como cualquier otro.
+    /// The item that comes out is OURS: it is given a uid from the high range so it does not clash with anything in
+    /// the database, and it is written to the inventory like any other.
     /// </summary>
     public static class Lottery
     {
-        /// <summary>El dibujo de la máquina.</summary>
+        /// <summary>The machine's drawing.</summary>
         public const int Gfx = 51031;
 
         /// <summary>
-        /// El tipo con el que se declara, y la habilidad que ofrece. Los dos salen de las capturas
-        /// reales de usar la máquina, no de suponer:
+        /// The type it is declared with, and the skill it offers. Both come from the real captures
+        /// of using the machine, not from guessing:
         ///
-        ///   cliente  iwo { f1: uid de habilidad, f2: 516925 }
-        ///   servidor iwn { f1: 1, f2: 516925, f4: 184, f5: quién }
+        ///   client   iwo { f1: skill uid, f2: 516925 }
+        ///   server   iwn { f1: 1, f2: 516925, f4: 184, f5: who }
         ///
-        /// La habilidad es la 184. Y el tipo es -1: cruzando todos los jss de las capturas, los
-        /// elementos que ofrecen la 184 salen siempre con el tipo a -1, 198 veces entre todos.
-        /// Poniéndole el 85 el cliente la llamaba "Cofre" y ofrecía "Abrir", que es lo que hay al
-        /// lado, no ella.
+        /// The skill is 184. And the type is -1: crossing all the jss of the captures, the
+        /// elements offering 184 always come out with the type at -1, 198 times among them all.
+        /// Giving it 85, the client called it "Cofre" and offered "Abrir", which is what is next
+        /// to it, not it.
         /// </summary>
         public const int Type = -1;
 
         public const int Skill = 184;
 
-        /// <summary>Desde dónde se numeran los objetos que salen, para no pisar los de nadie.</summary>
+        /// <summary>Where the items that come out are numbered from, so as not to step on anyone's.</summary>
         private const long FirstUid = 950000000L;
 
         private static readonly Random _rand = new Random();
 
-        /// <summary>Un premio: qué efecto y entre qué valores, todos por encima de lo que existe.</summary>
+        /// <summary>A prize: which effect and between which values, all above what exists.</summary>
         private readonly record struct Prize(int Effect, int Min, int Max);
 
         /// <summary>
-        /// Los efectos gordos, con sus identificadores de verdad. Los dos primeros son los que hacen
-        /// que un objeto sea impensable: PA y PM no suben de +1 en el juego real.
+        /// The big effects, with their real identifiers. The first two are the ones that make
+        /// an item unthinkable: AP and MP do not go above +1 in the real game.
         /// </summary>
         private static readonly Prize[] Exotic =
         {
@@ -55,31 +55,31 @@ namespace Jondo.Unity.Server.Managers
             new Prize(128, 3, 3),      // PM
             new Prize(158, 200, 400),  // poder
             new Prize(138, 300, 600),  // potencia
-            new Prize(115, 50, 100),   // % crítico
+            new Prize(115, 50, 100),   // % critical
             new Prize(182, 5, 8),      // invocaciones
         };
 
-        /// <summary>Las cinco características, que salen a lo bestia.</summary>
+        /// <summary>The five characteristics, which come out over the top.</summary>
         private static readonly Prize[] Elemental =
         {
             new Prize(118, 400, 700),   // fuerza
             new Prize(123, 400, 700),   // suerte
             new Prize(126, 400, 700),   // inteligencia
             new Prize(119, 400, 700),   // agilidad
-            new Prize(124, 200, 400),   // sabiduría
+            new Prize(124, 200, 400),   // wisdom
             new Prize(125, 1000, 2500), // vitalidad
         };
 
-        /// <summary>Los huecos de equipo de los que se saca la pieza: anillos, capa, sombrero, cinturón, botas, amuleto.</summary>
+        /// <summary>The equipment slots the piece is taken from: rings, cape, hat, belt, boots, amulet.</summary>
         private static readonly int[] WearableTypes = { 1, 9, 10, 11, 16, 17 };
 
         /// <summary>
-        /// Quién firma lo que sale. Un objeto exomagueado lleva el nombre del forjamago, y el efecto
-        /// que lo pinta es el 988: "Fabricado por: #4", donde el #4 es esta cadena.
+        /// Who signs what comes out. An exomaged item carries the smithmage's name, and the effect
+        /// that draws it is 988: "Fabricado por: #4", where the #4 is this string.
         /// </summary>
         public const string Forgemage = "#LOTTERY#";
 
-        /// <summary>El efecto que lleva ese nombre.</summary>
+        /// <summary>The effect that carries that name.</summary>
         private const int SignatureEffect = 988;
 
         public static Interactives.Element Of(long mapId)
@@ -92,8 +92,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Una tirada. Devuelve el objeto ya escrito en la base de datos y en el inventario, o null
-        /// si no se ha podido.
+        /// One roll. Returns the item already written to the database and to the inventory, or null
+        /// if it could not be done.
         /// </summary>
         public static HavenBagStore.StoredItem? Draw(long characterId)
         {
@@ -102,7 +102,7 @@ namespace Jondo.Unity.Server.Managers
 
             var effects = new List<int[]>();
 
-            // Uno o dos de los imposibles, y dos o tres características a lo grande.
+            // One or two of the impossible ones, and two or three characteristics in a big way.
             var exotic = new List<Prize>(Exotic);
             int howManyExotic = _rand.Next(1, 3);
             for (int i = 0; i < howManyExotic && exotic.Count > 0; i++)
@@ -143,18 +143,18 @@ namespace Jondo.Unity.Server.Managers
         private static int[] Roll(Prize prize)
         {
             int value = prize.Min >= prize.Max ? prize.Min : _rand.Next(prize.Min, prize.Max + 1);
-            // [efecto, valor, dado, cara]: sin dados, que es lo que lleva un bonus fijo.
+            // [effect, value, die, side]: without dice, which is what a fixed bonus carries.
             return new[] { prize.Effect, value, 0, 0 };
         }
 
         /// <summary>
-        /// Los efectos como los guarda la base de datos, y al final la firma.
+        /// The effects as the database stores them, and the signature at the end.
         ///
         ///   [[118,650,0,0], ..., [988,0,0,0,"#LOTTERY#"]]
         ///
-        /// El quinto elemento de la firma es la cadena: es lo que distingue a un efecto de texto de
-        /// uno de número, y lo que hace que el objeto se vea exomagueado y no recién salido de un
-        /// taller anónimo.
+        /// The signature's fifth element is the string: it is what tells a text effect apart from
+        /// a number one, and what makes the item look exomaged and not freshly out of an
+        /// anonymous workshop.
         /// </summary>
         private static string Serialise(List<int[]> effects)
         {
@@ -169,7 +169,7 @@ namespace Jondo.Unity.Server.Managers
             return sb.Append(']').ToString();
         }
 
-        /// <summary>Una pieza de equipo cualquiera del catálogo, para colgarle los efectos.</summary>
+        /// <summary>Any piece of equipment from the catalogue, to hang the effects on.</summary>
         private static int PickWearable()
         {
             try
@@ -191,7 +191,7 @@ namespace Jondo.Unity.Server.Managers
             return 0;
         }
 
-        /// <summary>El uid del premio. Lo reparte DatabaseManager, uno para todo el servidor.</summary>
+        /// <summary>The prize's uid. DatabaseManager hands it out, one for the whole server.</summary>
         private static long NextUid() => DatabaseManager.NextItemUid();
     }
 }

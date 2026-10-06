@@ -2,18 +2,18 @@ using System.Windows.Forms;
 using Jondo.Unity.Deobfuscator;
 using Jondo.Unity.Deobfuscator.UI;
 
-// ─── El desofuscador ────────────────────────────────────────────────────────────────────
+// ─── The deobfuscator ───────────────────────────────────────────────────────────────────
 //
-// La cara de lo que hasta ahora eran nueve comandos en un orden que había que saberse. Lleva paso a
-// paso: pide el cliente nuevo, pide la versión que ya se conocía, lee el código del juego, empareja
-// las dos, pregunta a un modelo por lo que quede en duda y deja revisar propuesta a propuesta.
+// The face of what until now were nine commands in an order one had to know by heart. It guides step by
+// step: it asks for the new client, asks for the version already known, reads the game's code, matches
+// the two, asks a model about whatever remains in doubt and lets one review proposal by proposal.
 //
-// La línea de comandos sigue existiendo y hace exactamente lo mismo llamando a las mismas clases de
-// Jondo.Unity.Reversing: quien prefiera un guión no pierde nada, y lo que se mida por un lado vale
-// por el otro.
+// The command line still exists and does exactly the same calling the same classes of
+// Jondo.Unity.Reversing: whoever prefers a script loses nothing, and what is measured one way holds
+// the other.
 //
-// A diferencia del servidor y del lanzador, aquí no hay nada más que atender: no hace falta abrir
-// la ventana en un hilo aparte, el hilo principal es el de la interfaz y punto.
+// Unlike the server and the launcher, here there is nothing else to attend to: there is no need to open
+// the window on a separate thread, the main thread is the interface's and that is it.
 
 ApplicationConfiguration.Initialize();
 Application.SetHighDpiMode(HighDpiMode.SystemAware);

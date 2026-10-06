@@ -8,26 +8,26 @@ using Avalonia;
 namespace Jondo.Unity.Launcher
 {
     /// <summary>
-    /// El lanzador: una ventana y nada más.
+    /// The launcher: a window and nothing else.
     ///
-    /// Es el ejecutable que se reparte a los jugadores, así que lo que NO lleva dentro importa
-    /// tanto como lo que lleva: ni base de datos, ni mapas, ni manejadores de protocolo, ni
-    /// catálogo de efectos. Sólo la interfaz, el arranque del cliente de Dofus y el cliente del
-    /// canal de mando.
+    /// It is the executable handed out to the players, so what it does NOT carry inside matters
+    /// as much as what it carries: no database, no maps, no protocol handlers, no
+    /// effects catalogue. Only the interface, starting the Dofus client and the
+    /// control channel's client.
     ///
-    /// Y sobre todo: cerrarlo no apaga nada. El servidor es otro proceso, con su propia vida y con
-    /// los jugadores que tenga dentro.
+    /// And above all: closing it shuts nothing down. The server is another process, with its own life and with
+    /// whatever players it has inside.
     /// </summary>
     /// <remarks>
-    /// Ya no abre la ventana en un hilo aparte. Con Windows Forms hacía falta un hilo STA propio
-    /// para que el bucle de mensajes no se enredara con el arranque asíncrono; Avalonia tiene su
-    /// propio bucle y lo correcto es dárselo al hilo principal. Lo que había antes de abrirla
-    /// —comprobar que no hay otro lanzador, levantar el relé si el servidor es remoto y arrancar
-    /// el servidor de al lado si hace falta— sigue igual y sigue yendo primero.
+    /// It no longer opens the window on a separate thread. With Windows Forms a thread of its own was needed, STA,
+    /// so that the message loop did not get tangled with the asynchronous start; Avalonia has its
+    /// own loop and the right thing is to give it the main thread. What there was before opening it
+    /// —checking there is no other launcher, raising the relay if the server is remote and starting
+    /// the server alongside if needed— stays the same and still goes first.
     /// </remarks>
     internal static class Program
     {
-        /// <summary>Cómo se llama el ejecutable del servidor, que vive al lado.</summary>
+        /// <summary>What the server's executable, which lives alongside, is called.</summary>
         public const string EjecutableDelServidor = "Jondo Server.exe";
 
         [STAThread]
@@ -35,9 +35,9 @@ namespace Jondo.Unity.Launcher
         {
             if (!Contract.CogerElSitio("JondoEmuLanzador"))
             {
-                // Y se le pone delante, que es lo que espera quien acaba de hacer doble clic.
-                // Escribir en una consola que no existe -- esto es un WinExe -- era lo mismo que
-                // cerrarse sin decir nada.
+                // And it is brought to the front, which is what whoever has just double-clicked expects.
+                // Writing to a console that does not exist -- this is a WinExe -- was the same as
+                // closing without a word.
                 bool traido = ElQueYaEstaba.PonerloDelante();
                 Console.WriteLine(traido
                     ? "[Lanzador] Ya había uno abierto; se le pone delante."
@@ -63,10 +63,10 @@ namespace Jondo.Unity.Launcher
                                       $"{UI.LauncherPreferences.ServerHost}.");
                 }
 
-                // Sólo cuando el servidor es el de esta máquina. En remoto el relé ya está
-                // escuchando en 5555, 6337, 8888 y 15881, así que arrancar aquí un servidor local
-                // deja a los dos peleándose por los mismos cuatro puertos: el que ate el segundo
-                // falla, y cuál de los dos sea depende del reloj.
+                // Only when the server is this machine's. In remote mode the relay is already
+                // listening on 5555, 6337, 8888 and 15881, so starting a local server here
+                // leaves both fighting over the same four ports: whichever binds second
+                // fails, and which of the two it is depends on the clock.
                 if (UI.LauncherPreferences.ServerIsLocal) AsegurarQueHayServidor().GetAwaiter().GetResult();
 
                 BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
@@ -87,12 +87,12 @@ namespace Jondo.Unity.Launcher
                 .LogToTrace();
 
         /// <summary>
-        /// Si no hay servidor escuchando, arranca el de al lado y espera a que conteste.
+        /// If no server is listening, starts the one alongside and waits for it to answer.
         ///
-        /// Esperar importa: el mod del cliente decide UNA sola vez, al inicializarse, si redirige al
-        /// emulador, sondeando el puerto de mando con 100 ms de paciencia. Si en ese instante no hay
-        /// nadie, el cliente no da ningún error —se conecta a los servidores de Ankama—, así que más
-        /// vale que la ventana no se abra hasta que haya alguien al otro lado.
+        /// Waiting matters: the client mod decides ONLY once, on initialising, whether to redirect to the
+        /// emulator, probing the control port with 100 ms of patience. If at that instant nobody is
+        /// there, the client gives no error —it connects to Ankama's servers—, so the window had better
+        /// not open until there is someone on the other side.
         /// </summary>
         private static async Task AsegurarQueHayServidor()
         {
@@ -106,9 +106,9 @@ namespace Jondo.Unity.Launcher
             string servidor = Path.Combine(aquí ?? "", EjecutableDelServidor);
             if (!File.Exists(servidor))
             {
-                // Que no esté no es un error del que haya que morirse: un jugador con sólo el
-                // lanzador es el caso normal el día que el servidor esté en otra máquina. La
-                // ventana ya sabe enseñar «fuera de línea» y dejar los botones apagados.
+                // That it is not there is not an error to die of: a player with only the
+                // launcher is the normal case the day the server is on another machine. The
+                // window already knows how to show «fuera de línea» and leave the buttons greyed out.
                 Console.WriteLine($"[Lanzador] No hay {EjecutableDelServidor} al lado y no responde ninguno.");
                 return;
             }
@@ -116,9 +116,9 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[Lanzador] No hay servidor escuchando; arrancando el de al lado.");
             try
             {
-                // Suelto de verdad: lo arranca el sistema, sin heredar la consola ni los
-                // descriptores del lanzador, así que cerrar el lanzador después no se lo lleva por
-                // delante.
+                // Truly detached: the system starts it, without inheriting the launcher's console nor
+                // descriptors, so closing the launcher afterwards does not take it down with
+                // it.
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = servidor,
@@ -132,23 +132,23 @@ namespace Jondo.Unity.Launcher
                 return;
             }
 
-            // Con paciencia: el servidor lee la base, los managers y los mapas antes de abrir un
-            // solo puerto, y eso son varios segundos en frío.
+            // With patience: the server reads the base, the managers and the maps before opening a
+            // single port, and that is several seconds from cold.
             if (!await Task.Run(() => Network.ControlClient.EsperarAlServidor(Network.ControlClient.PlazoDeArranque)))
             {
                 Console.WriteLine("[Lanzador] El servidor no ha llegado a contestar.");
             }
         }
 
-        // ─── El cierre ──────────────────────────────────────────────────────────────────────
+        // ─── The closing ────────────────────────────────────────────────────────────────────
 
         private static int _yaPedido;
 
         /// <summary>
-        /// La ventana avisa de que se ha cerrado. Ya no apaga nada.
+        /// The window reports that it has closed. It no longer shuts anything down.
         ///
-        /// Aquí estaba el cable. Esto llamaba a un RequestShutdown que paraba los cinco servicios,
-        /// así que cerrar la ventana echaba del juego a todo el que estuviera dentro.
+        /// Here was the wire. This called a RequestShutdown that stopped the five services,
+        /// so closing the window threw everyone who was inside out of the game.
         /// </summary>
         public static void RequestShutdown(string motivo)
         {
@@ -156,7 +156,7 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine($"[Lanzador] Cerrando el lanzador ({motivo}).");
         }
 
-        /// <summary>El registro de depuración del lanzador, que es corto y va a su consola.</summary>
+        /// <summary>The launcher's debug log, which is short and goes to its console.</summary>
         public static void LogDebug(string mensaje)
             => Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {mensaje}");
     }

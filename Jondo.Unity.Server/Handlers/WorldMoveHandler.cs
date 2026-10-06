@@ -169,9 +169,9 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Jsq, null, request));
 
-            // Toujours répondre avant de changer de map. L'ancien branchement retournait dès
-            // qu'il trouvait une route sur la cellule et privait donc les sorties de bord de leur
-            // jsq. Ici une cellule sans passage continue exactement vers le jqk habituel.
+            // Always answer before changing map. The old branch returned as soon as it found a route
+            // on the cell and so deprived edge exits of their jsq. Here a cell without a passage
+            // goes on exactly to the usual jqk.
             if (!TryTakeCompletedMovement(SessionContext.State, out long mapId, out int cellId))
                 return;
             if (!Managers.TeleportManager.TryGetCellTrigger(mapId, cellId, out var route))
@@ -187,8 +187,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Consomme une fin de mouvement une seule fois et seulement si la session se trouve
-        /// encore exactement à la destination annoncée par le dernier <c>jrw</c>.
+        /// Takes a movement end only once and only if the session is still exactly at the destination
+        /// announced by the last <c>jrw</c>.
         /// </summary>
         internal static bool TryTakeCompletedMovement(SessionState state, out long mapId,
                                                       out int cellId)
@@ -208,6 +208,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             byte[]? jqk = ConnectionProtocol.ReadPayload(payload, Op.Jqk);
             if (jqk == null || jqk.Length == 0) return;
+            if (await Managers.Jail.KeepsInAsync(stream)) return;
 
             long asked = 0;
             foreach (var f in ProtoMessage.Parse(jqk).Fields)
@@ -238,7 +239,7 @@ namespace Jondo.Unity.Server.Handlers
             int arrival = Landing(target, Jondo.Unity.Server.Network.SessionContext.State.CellId, way);
             long oldMapId = SessionContext.State.MapId;
 
-            // El mapa cambia: lo que estuviera abierto en el anterior deja de estarlo.
+            // The map changes: whatever was open on the previous one stops being open.
             NpcHandler.Forget();
             WorkshopHandler.Forget();
             MarketplaceHandler.Forget();
@@ -277,6 +278,7 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task<int?> TeleportAsync(NetworkStream stream, long targetMapId)
         {
             if (targetMapId <= 0 || MapManager.GetMapInfo(targetMapId) == null) return null;
+            if (await Managers.Jail.KeepsInAsync(stream)) return null;
 
             IReadOnlyCollection<int> walkable;
             if (MapManager.WalkableCells.TryGetValue(targetMapId, out var roleplayCells) &&

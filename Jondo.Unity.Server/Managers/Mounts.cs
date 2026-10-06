@@ -7,33 +7,33 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// El aspecto de cada montura, y cómo se monta uno encima.
+    /// Each mount's look, and how one gets on top of it.
     ///
-    /// Una montura equipada no añade nada al personaje: lo SUSTITUYE. El cuerpo que se dibuja pasa
-    /// a ser el de la montura, y el jinete viaja dentro, como subentidad. Leído de una captura real
-    /// de equipar un dragopavo sin ningún cosmético puesto:
+    /// An equipped mount adds nothing to the character: it REPLACES it. The body drawn becomes
+    /// the mount's, and the rider travels inside, as a subentity. Read from a real capture
+    /// of equipping a dragoturkey with no cosmetic on:
     ///
-    ///   lxc  f2 { f1: colores de la montura
+    ///   lxc  f2 { f1: the mount's colours
     ///             f2: 3
-    ///             f3: 639        ← los huesos del dragopavo
-    ///             f5: [120]      ← su escala
-    ///             f7 { f1: { ...el aspecto del jinete, con huesos 2... }, f4: 2 } }
+    ///             f3: 639        ← the dragoturkey's bones
+    ///             f5: [120]      ← its scale
+    ///             f7 { f1: { ...the rider's look, with bones 2... }, f4: 2 } }
     ///
-    /// Dos detalles que no se ven a simple vista: el jinete cambia sus huesos de 1 a 2 —el cliente
-    /// tiene una tabla RiderBones con cuatro entradas y el 2 es el normal— y la montura va al
-    /// hueco 8, el mismo que las mascotas.
+    /// Two details not visible at first sight: the rider changes his bones from 1 to 2 —the client
+    /// has a RiderBones table with four entries and 2 is the normal one— and the mount goes to
+    /// slot 8, the same as pets.
     ///
-    /// Los datos salen de MountsDataRoot del cliente, con tools/extract_monturas.py.
+    /// The data comes from the client's MountsDataRoot, with tools/extract_monturas.py.
     /// </summary>
     public static class Mounts
     {
-        /// <summary>El hueco donde va una montura o una mascota.</summary>
+        /// <summary>The slot where a mount or a pet goes.</summary>
         public const int Slot = 8;
 
-        /// <summary>Los huesos del jinete cuando va montado. Sin montura son los de su raza.</summary>
+        /// <summary>The rider's bones when mounted. Without a mount they are his breed's.</summary>
         public const int RiderBones = 2;
 
-        /// <summary>Dónde se engancha el jinete a la montura.</summary>
+        /// <summary>Where the rider hooks onto the mount.</summary>
         public const int RiderBindingPoint = 2;
 
         public sealed class Look
@@ -47,6 +47,10 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Dictionary<int, Look> _byItem = new Dictionary<int, Look>();
 
         public static int Count => _byItem.Count;
+
+        /// <summary>Every mount's look, once each: a dragoturkey of each colour, a seemum, a rhineetle...</summary>
+        public static IReadOnlyList<Look> AllLooks
+            => _byItem.Values.GroupBy(l => (l.Bones, string.Join(",", l.Colors))).Select(g => g.First()).ToList();
 
         public static void Initialize()
         {
@@ -99,41 +103,41 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los tipos de objeto que se montan.
+        /// The item types that are ridden.
         ///
-        /// Aquí estaba el fallo por el que no se veía NADA al equiparse una montura. Decía
-        /// { 121, 311 } y ninguno de los dos vale: en la base no hay un solo objeto de tipo 311, y
-        /// esos dos números salían de leer mal docs/appearances.md, donde "121" y "311" son
-        /// RECUENTOS de prendas medidas, no tipos de objeto.
+        /// Here was the bug for which NOTHING was seen on equipping a mount. It said
+        /// { 121, 311 } and neither of them is right: in the base there is not a single item of type 311, and
+        /// those two numbers came from misreading docs/appearances.md, where "121" and "311" are
+        /// COUNTS of measured garments, not item types.
         ///
-        /// Los de verdad son seis, tres especies con su tipo viejo y su tipo nuevo:
+        /// The real ones are six, three species with their old type and their new type:
         ///
-        ///    97 y 331   dragopavo       196 y 332   mulagua       207 y 333   vueloceronte
+        ///    97 and 331   dragoturkey     196 and 332   mulagua       207 and 333   vueloceronte
         ///
-        /// La Mulagua del usuario, la 33306, es del 332. Con el conjunto de antes, IsRideable le
-        /// decía que no, Ridden() devolvía null y el personaje se dibujaba a pie.
+        /// The user's Mulagua, 33306, is of 332. With the earlier set, IsRideable told
+        /// it no, Ridden() returned null and the character was drawn on foot.
         ///
-        /// Las MASCOTURAS, tipo 121, también ocupan el hueco 8, pero de sus veinticinco objetos no
-        /// hay ni uno con aspecto conocido, así que se quedan fuera a propósito: es mejor no
-        /// montarlas que dibujar un esqueleto vacío.
+        /// The PETSMOUNTS, type 121, also take slot 8, but of their twenty-five items there is
+        /// not one with a known look, so they are left out on purpose: it is better not to
+        /// ride them than to draw an empty skeleton.
         /// </summary>
         private static readonly HashSet<int> RideableTypes = new HashSet<int>
         {
             97, 196, 207, 331, 332, 333, Mascotura
         };
 
-        /// <summary>El tipo de objeto de las mascoturas.</summary>
+        /// <summary>The petsmounts' item type.</summary>
         public const int Mascotura = 121;
 
         /// <summary>
-        /// El aspecto de las mascoturas, que no está en ningún bundle y hay que medirlo.
+        /// The petsmounts' look, which is in no bundle and has to be measured.
         ///
-        /// extract_monturas.py sólo encuentra dragopavos, mulaguas y vuelocerontes: las mascoturas
-        /// no salen ni en MountsDataRoot ni en RidesDataRoot. Los suyos salen de verlas puestas en
-        /// la captura del servidor de torneos, y de eso se encarga tools/extraer_mascoturas.py.
+        /// extract_monturas.py only finds dragoturkeys, mulaguas and vuelocerontes: the petsmounts
+        /// come out neither in MountsDataRoot nor in RidesDataRoot. Theirs come from seeing them worn in
+        /// the tournament server's capture, and tools/extraer_mascoturas.py takes care of that.
         ///
-        /// Va en su propio fichero y no dentro de mounts.json porque aquél lo regenera
-        /// extract_monturas.py de los bundles y se llevaría esto por delante.
+        /// It goes in its own file and not inside mounts.json because that one is regenerated by
+        /// extract_monturas.py from the bundles and would wipe this out.
         /// </summary>
         private static void LeerMascoturas()
         {
@@ -179,25 +183,25 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los colores de las monturas que no vienen en MountsDataRoot.
+        /// The colours of the mounts that do not come in MountsDataRoot.
         ///
-        /// De las ciento veinte mulaguas de tipo 332, mounts.json sólo trae sesenta y seis: los
-        /// cuatro colores nuevos —ámbar, coral, azur y aguamarina— no tienen `look` en ningún sitio
-        /// de esa tabla, y con ellos se caen sus cuatro mulaguas sueltas y las cincuenta parejas en
-        /// las que participan. La 33306, "Mulagua aguamarina y turquesa", es una de ellas: salía con
-        /// huesos y escala buenos pero sin colores, y el cliente pintaba entonces su paleta por
-        /// defecto, que tira a salmón.
+        /// Of the hundred and twenty mulaguas of type 332, mounts.json only brings sixty-six: the
+        /// four new colours —amber, coral, azure and aquamarine— have no `look` anywhere
+        /// in that table, and with them fall their four single-colour mulaguas and the fifty pairs
+        /// they take part in. 33306, "Mulagua aguamarina y turquesa", is one of them: it came out with
+        /// good bones and scale but without colours, and the client then drew its default palette,
+        /// which tends to salmon.
         ///
-        /// Los que faltaban se han recuperado de otras dos fuentes del propio cliente, no de la
-        /// imaginación: los PNJ decorativos "Muldo &lt;color&gt;" de NpcsDataRoot, que llevan el
-        /// aspecto entero y cuyos once colores viejos cuadran exactamente con los de mounts.json; y
-        /// el icono del objeto, que dice cuál de los dos colores de una pareja va a los huecos 1 y 3
-        /// —el que cubre más píxeles— con ciento diez aciertos de ciento diez sobre las parejas que
-        /// sí se conocen. Lo hace tools/extraer_colores_monturas.py, que lo mide en cada pasada.
+        /// The missing ones have been recovered from two other sources of the client itself, not from
+        /// imagination: the decorative NPCs "Muldo &lt;color&gt;" of NpcsDataRoot, which carry the
+        /// whole look and whose eleven old colours match those of mounts.json exactly; and
+        /// the item's icon, which says which of a pair's two colours goes to slots 1 and 3
+        /// —the one covering more pixels— with a hundred and ten hits out of a hundred and ten on the pairs that
+        /// are known. tools/extraer_colores_monturas.py does it, and measures it on each pass.
         ///
-        /// Va en su propio fichero, como mascoturas.json, porque mounts.json lo regenera
-        /// extract_monturas.py de los bundles y se llevaría esto por delante. Y NO pisa lo que ya
-        /// venía de allí: sólo rellena los huecos.
+        /// It goes in its own file, like mascoturas.json, because mounts.json is regenerated by
+        /// extract_monturas.py from the bundles and would wipe this out. And it does NOT overwrite what already
+        /// came from there: it only fills the gaps.
         /// </summary>
         private static void LeerColoresQueFaltaban()
         {
@@ -219,7 +223,7 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (!int.TryParse(entry.Name, out int itemGid)) continue;
 
-                    // lo de mounts.json manda; esto sólo rellena
+                    // mounts.json's rules; this only fills in
                     if (_byItem.ContainsKey(itemGid)) { yaEstaban++; continue; }
 
                     var colors = new List<long>();
@@ -249,18 +253,18 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El aspecto de reserva de cada TIPO, sacado de los objetos de ese tipo que sí lo tienen.
+        /// Each TYPE's fallback look, taken from the items of that type that do have it.
         ///
-        /// mounts.json no está completo: de las 120 mulaguas nuevas sólo trae 66, y la 33306 no es
-        /// una de ellas. Pero el aspecto no varía dentro de una especie —los 71 objetos de tipo 196
-        /// y los 66 del 332 llevan TODOS huesos 3588 y escala 115, los del 207 y el 333 llevan 5023
-        /// y 85, y los del 97 y el 331, 639 y 120—, así que para los que faltan se toma el de sus
-        /// hermanos. No va escrito a mano: se cuenta al arrancar, sobre el propio fichero.
+        /// mounts.json is not complete: of the 120 new mulaguas it only brings 66, and 33306 is not
+        /// one of them. But the look does not vary within a species —the 71 items of type 196
+        /// and the 66 of 332 ALL carry bones 3588 and scale 115, those of 207 and 333 carry 5023
+        /// and 85, and those of 97 and 331, 639 and 120—, so for the missing ones their
+        /// siblings' is taken. It is not hand-written: it is counted at start, over the file itself.
         ///
-        /// Sin colores, que ésos sí son de cada montura. Con monturas_colores.json esas 54 ya no
-        /// llegan aquí —vienen con huesos, escala y colores—, así que esto queda de red por si
-        /// apareciera algún objeto de montura nuevo; y sigue sin inventarse colores, que es lo que
-        /// hace el propio cliente cuando la raíz no los trae.
+        /// Without colours, which are indeed each mount's own. With monturas_colores.json those 54 no longer
+        /// get here —they come with bones, scale and colours—, so this remains as a safety net in case
+        /// some new mount item appeared; and it still does not invent colours, which is what
+        /// the client itself does when the root does not bring them.
         /// </summary>
         private static readonly Dictionary<int, Look> _porTipo = new Dictionary<int, Look>();
 
@@ -284,12 +288,12 @@ namespace Jondo.Unity.Server.Managers
 
                     int tipo = Convert.ToInt32(valor);
 
-                    // Las mascoturas NO entran en esto. En una especie de montura el esqueleto es
-                    // el mismo para las ciento veinte mulaguas, así que a la que falte se le puede
-                    // poner el de sus hermanas; pero cada mascotura es un bicho distinto —un
-                    // kolifante no se parece a un murciélago— y ponerle el esqueleto de otra sería
-                    // dibujar un animal que no es. Las tres que no están medidas se quedan sin
-                    // montar, que es lo honrado.
+                    // Petsmounts do NOT go into this. In a mount species the skeleton is
+                    // the same for all hundred and twenty mulaguas, so the one that is missing can be
+                    // given its sisters'; but each petsmount is a different creature —a
+                    // kolifante does not look like a bat— and giving it another's skeleton would be
+                    // drawing an animal it is not. The three that are not measured stay unridden,
+                    // which is the honest thing.
                     if (tipo == Mascotura) continue;
                     if (!cuentas.TryGetValue(tipo, out var deEsteTipo))
                     {
@@ -333,14 +337,14 @@ namespace Jondo.Unity.Server.Managers
             if (_byItem.TryGetValue(itemGid, out var look)) return look;
             if (!IsRideable(itemGid)) return null;
 
-            // Se monta pero no está en el fichero: se le pone el aspecto de los de su tipo. Antes
-            // aquí se devolvía un Look vacío, y como BreedLookTable exige huesos distintos de cero
-            // para dar a alguien por montado, daba igual reconocerla: seguía saliendo a pie.
+            // It is ridden but it is not in the file: it is given the look of those of its type. Before,
+            // an empty Look was returned here, and since BreedLookTable requires non-zero bones
+            // to consider someone mounted, recognising it made no difference: he still came out on foot.
             int tipo = TypeOf(itemGid);
             return tipo != 0 && _porTipo.TryGetValue(tipo, out var deSuTipo) ? deSuTipo : null;
         }
 
-        /// <summary>El tipo de un objeto, cacheado.</summary>
+        /// <summary>An item's type, cached.</summary>
         private static readonly Dictionary<int, int> _tipos = new Dictionary<int, int>();
 
         private static int TypeOf(int itemGid)
@@ -368,7 +372,7 @@ namespace Jondo.Unity.Server.Managers
             return tipo;
         }
 
-        /// <summary>¿Es un objeto de los que se montan, aunque no sepamos dibujarlo?</summary>
+        /// <summary>Is it an item of the ridden kind, even if we do not know how to draw it?</summary>
         public static bool IsRideable(int itemGid)
         {
             if (_rideable.TryGetValue(itemGid, out bool known)) return known;
@@ -379,10 +383,10 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// La montura que el personaje lleva puesta ahora mismo, o null si va a pie.
+        /// The mount the character has on right now, or null if he is on foot.
         ///
-        /// En el hueco 8 caben también las mascotas, así que no vale con mirar que haya algo: hay
-        /// que comprobar que ese objeto sea de verdad una montura.
+        /// Pets also fit in slot 8, so looking for something there is not enough: one
+        /// has to check that the item really is a mount.
         /// </summary>
         public static Look? Ridden()
         {
@@ -396,11 +400,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// La montura de un personaje cualquiera, preguntándoselo a la base de datos.
+        /// Any character's mount, asking the database.
         ///
-        /// <see cref="Ridden"/> solo sabe del que está jugando, porque mira el inventario cargado en
-        /// memoria. En la pantalla de selección no hay ninguno cargado todavía y hay que enseñar el
-        /// aspecto de todos, así que ahí se pregunta por id.
+        /// <see cref="Ridden"/> only knows about the one playing, because it looks at the inventory loaded in
+        /// memory. On the selection screen none is loaded yet and everyone's look has to be
+        /// shown, so there it is asked by id.
         /// </summary>
         public static Look? RiddenBy(long characterId)
         {

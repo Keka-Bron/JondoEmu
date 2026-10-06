@@ -3,38 +3,38 @@ using System.Text;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El expediente de un mensaje: todo lo que se sabe de él, junto y por escrito.
+/// A message's dossier: everything known about it, together and in writing.
 ///
-/// Es lo que se le pone delante al modelo en la etapa 4, y también lo que se le pondría delante a
-/// una persona. Ésa es la prueba de que está bien hecho: si un expediente no le llega a un humano
-/// para decidir, tampoco le llega al modelo, y lo que salga será una invención con formato.
+/// It is what is put in front of the model in stage 4, and also what would be put in front of
+/// a person. That is the proof that it is well made: if a dossier is not enough for a human
+/// to decide, it is not enough for the model either, and what comes out will be an invention with formatting.
 ///
-/// ─── Qué lleva dentro, y por qué ────────────────────────────────────────────────────────
+/// ─── What it carries inside, and why ────────────────────────────────────────────────────
 ///
-///   la forma        los campos con su número y su tipo. Es lo único exacto: los números no se
-///                   barajan entre versiones.
-///   quién le apunta un mensaje de un solo campo es idéntico a otros cuatrocientos; lo que lo
-///                   distingue es de quién es campo. Va con el número de campo, que es lo que se
-///                   conserva.
-///   el código       las clases que lo tocan y los nombres que se le escaparon al ofuscador
-///                   dentro de ellas. Aquí es donde aparece que <c>jss</c> vive al lado de
+///   the shape       the fields with their number and their type. It is the only exact thing: the numbers are not
+///                   shuffled between versions.
+///   who points to it a single-field message is identical to four hundred others; what
+///                   distinguishes it is whose field it is. It goes with the field number, which is what is
+///                   kept.
+///   the code        the classes that touch it and the names that slipped past the obfuscator
+///                   inside them. This is where it shows that <c>jss</c> lives next to
 ///                   <c>WaitProcessMapComplementaryInfo</c>.
-///   las capturas    para los que están medidos: dirección, qué hace y con qué forma llegó. Son
-///                   pocos —99 de 2.169— pero son verdad comprobada, no deducción.
+///   the captures    for the measured ones: direction, what it does and with what shape it arrived. They are
+///                   few —99 of 2,169— but they are checked truth, not deduction.
 ///
-/// ─── Lo que NO lleva ────────────────────────────────────────────────────────────────────
+/// ─── What it does NOT carry ─────────────────────────────────────────────────────────────
 ///
-/// Nada de la versión vieja. El expediente describe una versión y se basta sola: bautizar el
-/// mensaje es un problema distinto de emparejarlo con el de otro parche, y mezclarlos hace que un
-/// error de emparejamiento se convierta en un nombre equivocado que luego nadie revisa.
+/// Nothing from the old version. The dossier describes one version and is self-sufficient: naming the
+/// message is a different problem from matching it with another patch's, and mixing them makes a
+/// matching error turn into a wrong name that nobody reviews afterwards.
 /// </summary>
 public static class Dossier
 {
-    /// <summary>Un opcode del que se sabe algo porque se ha visto pasar.</summary>
+    /// <summary>An opcode something is known about because it has been seen going by.</summary>
     public sealed record Anchor(string Opcode, string Direction, string Name, string Meaning,
                                 string Handler, string Shape);
 
-    /// <summary>Lee la tabla de lo medido. Las líneas que empiezan por almohadilla son prosa.</summary>
+    /// <summary>Reads the table of what was measured. Lines starting with a hash are prose.</summary>
     public static Dictionary<string, Anchor> Anchors(string path)
     {
         var anchors = new Dictionary<string, Anchor>(StringComparer.Ordinal);
@@ -50,7 +50,7 @@ public static class Dossier
         return anchors;
     }
 
-    /// <summary>De quién es campo cada mensaje, y con qué número.</summary>
+    /// <summary>Whose field each message is, and with which number.</summary>
     public static Dictionary<string, List<string>> Parents(Matcher.Model model)
     {
         var parents = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -69,7 +69,7 @@ public static class Dossier
         return parents;
     }
 
-    /// <summary>El expediente entero, en texto, listo para leer o para mandar.</summary>
+    /// <summary>The whole dossier, as text, ready to read or to send.</summary>
     public static string Build(string message, Matcher.Model model,
                                CodeIndex.Evidence? evidence,
                                IReadOnlyDictionary<string, Anchor> anchors,
@@ -83,7 +83,7 @@ public static class Dossier
         sb.AppendLine($"# Mensaje {message}   (Dofus Unity {version})");
         sb.AppendLine();
 
-        // ─── La forma ───────────────────────────────────────────────────────────────────
+        // ─── The shape ──────────────────────────────────────────────────────────────────
         sb.AppendLine("## Forma");
         sb.AppendLine();
         sb.AppendLine("```proto");
@@ -91,7 +91,7 @@ public static class Dossier
         sb.AppendLine("```");
         sb.AppendLine();
 
-        // ─── Quién le apunta ────────────────────────────────────────────────────────────
+        // ─── Who points to it ───────────────────────────────────────────────────────────
         if (parents.TryGetValue(message, out var mine) && mine.Count > 0)
         {
             sb.AppendLine("## De quién es campo");
@@ -101,7 +101,7 @@ public static class Dossier
             sb.AppendLine();
         }
 
-        // ─── Lo medido ──────────────────────────────────────────────────────────────────
+        // ─── What was measured ──────────────────────────────────────────────────────────
         if (anchors.TryGetValue(message, out var anchor))
         {
             sb.AppendLine("## Medido en el juego real");
@@ -113,7 +113,7 @@ public static class Dossier
             sb.AppendLine();
         }
 
-        // ─── El código ──────────────────────────────────────────────────────────────────
+        // ─── The code ───────────────────────────────────────────────────────────────────
         if (evidence != null)
         {
             if (evidence.Context.Count > 0)
@@ -161,7 +161,7 @@ public static class Dossier
         return sb.ToString();
     }
 
-    /// <summary>El mensaje escrito como .proto, con los que cuelgan de él un nivel más abajo.</summary>
+    /// <summary>The message written as .proto, with those hanging from it one level down.</summary>
     private static void Shape(StringBuilder sb, string name,
                               Dictionary<string, ProtoWriter.Message> shapes,
                               Dictionary<string, ProtoWriter.Enumeration> enums,
@@ -180,8 +180,8 @@ public static class Dossier
             string kind = enums.ContainsKey(field.Type) ? " // enumerado" : "";
             sb.AppendLine($"{pad}  {(field.Repeated ? "repeated " : "")}{field.Type} f{field.Number} = {field.Number};{kind}");
 
-            // Un nivel de profundidad y no más: el que quiera saber del hijo abre su expediente. Con
-            // dos niveles el expediente de un mensaje grande se vuelve ilegible y el modelo se pierde.
+            // One level deep and no more: whoever wants to know about the child opens its dossier. With
+            // two levels a big message's dossier becomes unreadable and the model gets lost.
             if (depth == 0 && shapes.ContainsKey(field.Type)) Shape(sb, field.Type, shapes, enums, depth + 2);
         }
         sb.AppendLine($"{pad}}}");

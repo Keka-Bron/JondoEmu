@@ -4,14 +4,14 @@ using Xunit;
 namespace Jondo.Unity.Tests.Commands
 {
     /// <summary>
-    /// Las coordenadas de .teleport, tal como llegan de verdad: el cliente convierte lo que el
-    /// jugador teclea en un enlace de mapa antes de mandarlo.
+    /// The coordinates of .teleport, as they really arrive: the client turns what the
+    /// player types into a map link before sending it.
     /// </summary>
     public class TeleportCoordinatesTests
     {
         /// <summary>
-        /// Medido en el registro: se teclea «.teleport [0,-8]» y el servidor recibe
-        /// «.teleport {{map,0,-8,1}}». Tres veces seguidas contestó con su uso.
+        /// Measured in the log: «.teleport [0,-8]» is typed and the server receives
+        /// «.teleport {{map,0,-8,1}}». Three times in a row it answered with its usage.
         /// </summary>
         [Theory]
         [InlineData("{{map,0,-8,1}}", 0, -8)]
@@ -27,7 +27,7 @@ namespace Jondo.Unity.Tests.Commands
             Assert.Equal(y, gotY);
         }
 
-        /// <summary>Un solo número no son coordenadas: es un id de mapa, y lo atiende otra rama.</summary>
+        /// <summary>A single number is not coordinates: it is a map id, and another branch handles it.</summary>
         [Theory]
         [InlineData("")]
         [InlineData("106169344")]

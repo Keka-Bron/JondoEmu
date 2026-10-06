@@ -9,9 +9,9 @@
         Background="{DynamicResource BackgroundBrush}"
         FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif">
 
-  <!-- El dibujo del fondo se ve entero: el panel ocupa una franja a la izquierda y el resto queda
-       despejado. Antes la tarjeta era de 350 y llevaba dentro TODO — entrar, el equipo, el idioma,
-       la ruta del cliente y el estado — apilado en una columna. -->
+  <!-- The background drawing is seen whole: the panel takes a strip on the left and the rest is left
+       clear. Before, the card was 350 wide and carried EVERYTHING inside — logging in, the team, the language,
+       the client path and the status — stacked in one column. -->
   <Panel>
     <Image x:Name="Fondo" Stretch="UniformToFill" />
 
@@ -24,8 +24,8 @@
       </Border.Background>
     </Border>
 
-    <!-- Las chispas van por delante del dibujo y por detrás del panel: se ven caer alrededor de
-         la tarjeta sin estorbar nada de lo que hay que leer. -->
+    <!-- The sparks go in front of the drawing and behind the panel: they are seen falling around
+         the card without getting in the way of anything that has to be read. -->
     <w:StarField />
 
     <Border x:Name="Panel" Width="440" Margin="56,44"
@@ -36,15 +36,15 @@
             ClipToBounds="True">
       <DockPanel>
 
-        <!-- ═══ La cabecera: quién eres y si el servidor contesta ═══════════ -->
+        <!-- ═══ The header: who you are and whether the server answers ════ -->
         <Border DockPanel.Dock="Top" Background="{DynamicResource BarFillBrush}"
                 BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LightBrownBrush}"
                 Padding="20,14">
           <StackPanel Spacing="10">
             <w:LogoBanner Height="62" HorizontalAlignment="Stretch" />
 
-            <!-- El estado, arriba y con su punto. Estaba abajo del todo en letra pequeña, y es lo
-                 primero que hay que saber: si no contesta, nada de lo demás sirve. -->
+            <!-- The status, at the top and with its dot. It was at the very bottom in small print, and it is the
+                 first thing one has to know: if it does not answer, nothing else is of use. -->
             <Border CornerRadius="20" Padding="12,5" HorizontalAlignment="Center"
                     Background="#40000000">
               <StackPanel Orientation="Horizontal" Spacing="7">
@@ -56,7 +56,7 @@
           </StackPanel>
         </Border>
 
-        <!-- ═══ Las secciones ══════════════════════════════════════════════ -->
+        <!-- ═══ The sections ═══════════════════════════════════════════════ -->
         <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*" Height="42">
           <Button x:Name="SeccionJugar" Classes="seccion" Grid.Column="0" Click="AlPulsarSeccion" Tag="jugar" />
           <Button x:Name="SeccionCuentas" Classes="seccion" Grid.Column="1" Click="AlPulsarSeccion" Tag="cuentas" />
@@ -64,7 +64,7 @@
         </Grid>
         <Border DockPanel.Dock="Top" Height="2" Background="{DynamicResource LightBrownBrush}" />
 
-        <!-- ═══ El aviso, cuando lo hay ════════════════════════════════════ -->
+        <!-- ═══ The notice, when there is one ══════════════════════════════ -->
         <Border x:Name="Aviso" DockPanel.Dock="Top" IsVisible="False"
                 CornerRadius="5" BorderThickness="1" Padding="12" Margin="20,16,20,0"
                 Background="{DynamicResource AlertBackgroundBrush}"
@@ -73,10 +73,10 @@
                      FontSize="12.5" Foreground="{DynamicResource AlertTextBrush}" />
         </Border>
 
-        <!-- ═══ El cuerpo ══════════════════════════════════════════════════ -->
+        <!-- ═══ The body ═══════════════════════════════════════════════════ -->
         <Panel Margin="20" MinHeight="360">
 
-          <!-- ─── JUGAR ─────────────────────────────────────────────────── -->
+          <!-- ─── PLAY ──────────────────────────────────────────────────── -->
           <DockPanel x:Name="PanelJugar">
             <StackPanel DockPanel.Dock="Top" Spacing="3">
               <TextBlock x:Name="TituloEquipo" FontSize="17"
@@ -85,17 +85,17 @@
                          Foreground="{DynamicResource MutedGoldBrush}" Margin="0,0,0,12" />
             </StackPanel>
 
-            <!-- El botón grande abajo del todo, siempre en el mismo sitio caiga lo que caiga
-                 encima: es lo que se viene a pulsar. -->
+            <!-- The big button at the very bottom, always in the same place whatever falls
+                 above it: it is what one comes to press. -->
             <StackPanel DockPanel.Dock="Bottom" Spacing="10" Margin="0,14,0,0">
               <Button x:Name="BotonJugar" Classes="launcher green" Height="52"
                       HorizontalAlignment="Stretch" Click="AlPulsarJugar">
                 <w:SpacedText x:Name="TextoJugar" Spacing="2" Shadow="True" FontSize="17"
                               FontWeight="Bold" Foreground="White" />
               </Button>
-              <!-- Las dos acciones de al lado, en una fila. La de añadir cuenta estaba sólo en la
-                   pestaña de CUENTAS, y con el equipo delante nada decía cómo meter otra: había
-                   que deducir que el sitio era la pestaña de al lado. -->
+              <!-- The two actions alongside, in a row. The add-account one was only on the
+                   ACCOUNTS tab, and with the team in front nothing said how to add another: one had
+                   to deduce that the place was the tab next door. -->
               <Grid ColumnDefinitions="*,Auto">
                 <Button x:Name="BotonTodas" Classes="link" Grid.Column="0"
                         HorizontalContentAlignment="Left" Click="AlPulsarTodas">
@@ -110,7 +110,7 @@
               </Grid>
             </StackPanel>
 
-            <!-- Si no hay cuentas todavía, aquí va el atajo en vez de una lista vacía. -->
+            <!-- If there are no accounts yet, the shortcut goes here instead of an empty list. -->
             <Panel>
               <ScrollViewer x:Name="ListaDeCuentas" VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="FilasDeCuentas" Spacing="8" />
@@ -130,7 +130,7 @@
             </Panel>
           </DockPanel>
 
-          <!-- ─── CUENTAS ───────────────────────────────────────────────── -->
+          <!-- ─── ACCOUNTS ──────────────────────────────────────────────── -->
           <DockPanel x:Name="PanelCuentas" IsVisible="False">
             <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*" Height="34" Margin="0,0,0,18">
               <Button x:Name="PestanaEntrar" Classes="tab" Grid.Column="0"
@@ -173,7 +173,7 @@
             </Panel>
           </DockPanel>
 
-          <!-- ─── AJUSTES ───────────────────────────────────────────────── -->
+          <!-- ─── SETTINGS ──────────────────────────────────────────────── -->
           <ScrollViewer x:Name="PanelAjustes" IsVisible="False" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="20">
 

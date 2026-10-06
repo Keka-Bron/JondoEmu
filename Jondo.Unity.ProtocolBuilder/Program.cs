@@ -3,15 +3,15 @@ using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Jondo.Unity.Reversing;
 
-// ─── El constructor de protocolos ───────────────────────────────────────────────────────
+// ─── The protocol builder ───────────────────────────────────────────────────────────────
 //
-// Ankama rota los nombres de tres letras en cada parche: el jsd de hoy es otra cosa mañana. Las
-// capturas que no se hagan ahora no se pueden hacer luego, y las que ya hay dejan de servir en
-// cuanto cambie el cliente... salvo que se sepa traducir de una versión a la siguiente.
+// Ankama rotates the three-letter names on every patch: today's jsd is something else tomorrow. The
+// captures not made now cannot be made later, and the ones there are stop being useful as
+// soon as the client changes... unless one knows how to translate from one version to the next.
 //
-// Esto es lo primero de esa cadena: sacar del cliente su descriptor, que es lo que dice qué
-// mensajes hay, cómo se llaman y qué campos lleva cada uno. Lo demás —huellas, emparejado entre
-// versiones, traducción de capturas viejas— cuelga de tener esto completo.
+// This is the first link of that chain: taking the client's descriptor out of it, which is what says which
+// messages there are, what they are called and which fields each one carries. The rest —fingerprints, matching between
+// versions, translation of old captures— hangs on having this complete.
 
 if (args.Length == 0)
 {
@@ -73,11 +73,11 @@ switch (args[0])
 }
 
 /// <summary>
-/// Qué forma tienen las clases de los mensajes dentro del cliente.
+/// What shape the message classes have inside the client.
 ///
-/// Antes de emparejar dos versiones hay que saber de dónde se saca la forma de un mensaje. Esto
-/// enseña un tipo por dentro —sus propiedades, sus constantes, sus campos— para decidirlo mirando
-/// y no adivinando.
+/// Before matching two versions one has to know where a message's shape is taken from. This
+/// shows a type from the inside —its properties, its constants, its fields— to decide it by looking
+/// and not by guessing.
 /// </summary>
 static int Mirar(string[] args)
 {
@@ -139,11 +139,11 @@ static int Mirar(string[] args)
 }
 
 /// <summary>
-/// El protocolo entero, reconstruido de las clases del cliente y escrito como .proto.
+/// The whole protocol, rebuilt from the client's classes and written as .proto.
 ///
-/// Es la mitad que faltaba: los números de campo. El descriptor serializado no está en el cliente,
-/// pero las clases que genera protobuf llevan cada número en una constante, y el volcado que deja
-/// Cpp2IL las conserva enteras.
+/// It is the half that was missing: the field numbers. The serialised descriptor is not in the client,
+/// but the classes protobuf generates carry each number in a constant, and the dump Cpp2IL
+/// leaves keeps them whole.
 /// </summary>
 static int Proto(string[] args)
 {
@@ -174,12 +174,12 @@ static int Proto(string[] args)
 static Matcher.Model Leer(string assembly) => ProtoWriter.Model(assembly);
 
 /// <summary>
-/// El techo del emparejador, medido contra sí mismo.
+/// The matcher's ceiling, measured against itself.
 ///
-/// Se coge el protocolo de ahora, se le rotan los nombres como haría Ankama y se le pide que
-/// reconstruya la correspondencia. La respuesta correcta se conoce entera, así que sale un
-/// porcentaje exacto. No simula un parche de verdad —ahí también hay mensajes nuevos y campos
-/// añadidos— pero dice cuánto se puede esperar como mucho.
+/// Today's protocol is taken, its names are rotated as Ankama would and it is asked to
+/// rebuild the correspondence. The correct answer is known whole, so an exact
+/// percentage comes out. It does not simulate a real patch —there there are also new messages and fields
+/// added— but it says how much can be expected at most.
 /// </summary>
 static int Probar(string[] args)
 {
@@ -203,9 +203,9 @@ static int Probar(string[] args)
     Console.WriteLine($"  ambiguos         : {resultado.Ambiguous.Count:N0}");
     Console.WriteLine($"  sin pareja       : {resultado.Alone.Count:N0}");
 
-    // El porcentaje sobre los dos mil mensajes es una curiosidad. El número que decide si el
-    // emulador arranca el día del parche es otro: de los que el emulador usa de verdad, cuántos
-    // sobreviven. Son los mensajes grandes y con vecindad, así que la cifra no se parece a la otra.
+    // The percentage over the two thousand messages is a curiosity. The number that decides whether the
+    // emulator starts on patch day is another: of the ones the emulator really uses, how many
+    // survive. They are the big messages with a neighbourhood, so the figure does not resemble the other.
     if (args.Length > 2 && File.Exists(args[2]))
     {
         var suyos = Emulador(args[2]);
@@ -228,7 +228,7 @@ static int Probar(string[] args)
 }
 
 /// <summary>
-/// Qué región del fichero de metadatos es cada cosa, y si el bloque de restos cae dentro de alguna.
+/// Which region of the metadata file is which, and whether the block of remnants falls inside any.
 /// </summary>
 static int Cabecera(string[] args)
 {
@@ -240,7 +240,7 @@ static int Cabecera(string[] args)
 
     using var client = new ClientReader(args[1]);
 
-    // Dónde empieza el bloque con los nombres reales, medido con grep sobre el fichero.
+    // Where the block with the real names starts, measured with grep over the file.
     long buscada = args.Length > 2 && long.TryParse(args[2], out long p) ? p : 21_607_975;
 
     foreach (string miembro in Header.Members()) Console.WriteLine(miembro);
@@ -264,7 +264,7 @@ static int Cabecera(string[] args)
         ? $"  La posición {buscada:N0} NO cae en ninguna región declarada: es un resto no referenciado."
         : $"  La posición {buscada:N0} cae en: {string.Join(", ", dentro.Select(r => r.Name))}");
 
-    // Y el orden: los mensajes del protocolo, tal y como los enumera la tabla de tipos.
+    // And the order: the protocol's messages, as the types table enumerates them.
     Console.WriteLine();
     Crudo(args[1]);
     var unTipo = client.Protocol.Types.First(t => t.Fields.Count > 0);
@@ -296,7 +296,7 @@ static int Cabecera(string[] args)
 }
 
 /// <summary>
-/// Los nombres de verdad, sacados del cliente. La sonda de <see cref="Names"/>.
+/// The real names, taken from the client. The <see cref="Names"/> probe.
 /// </summary>
 static int Nombres(string[] args)
 {
@@ -323,7 +323,7 @@ static int Nombres(string[] args)
         if (sitio.Types.Count > 0) Console.WriteLine($"      mensaje[0]: {sitio.Types[0]}");
     }
 
-    // El caso que lo resolvería todo: un método con UN nombre y UN mensaje es una pareja directa.
+    // The case that would solve everything: a method with ONE name and ONE message is a direct pair.
     var parejas = sitios.Where(s => s.Texts.Count == 1 && s.Types.Count == 1).ToList();
     Console.WriteLine();
     Console.WriteLine($"  métodos con exactamente un nombre y un mensaje: {parejas.Count:N0}");
@@ -334,10 +334,10 @@ static int Nombres(string[] args)
 }
 
 /// <summary>
-/// La capa Op: un nombre por opcode, generado del cliente y de las anclas.
+/// The Op layer: one name per opcode, generated from the client and from the anchors.
 ///
-/// Es el último eslabón que faltaba. Sin esto el mapeo se queda en un fichero bonito: aplicarlo
-/// significa editar a mano cientos de literales de tres letras repartidos por el emulador.
+/// It is the last link that was missing. Without this the mapping stays a pretty file: applying it
+/// means editing by hand hundreds of three-letter literals spread around the emulator.
 /// </summary>
 static int Capa(string[] args)
 {
@@ -348,14 +348,14 @@ static int Capa(string[] args)
         return 1;
     }
 
-    // El protocolo son DOS ensamblados —el del juego y el de la conexión— y los opcodes del
-    // emulador salen de los dos. Con uno solo, 37 mensajes de conexión parecerían no existir y el
-    // barrido los daría por basura.
+    // The protocol is TWO assemblies —the game one and the connection one— and the emulator's opcodes
+    // come from both. With only one, 37 connection messages would seem not to exist and the
+    // sweep would take them for garbage.
     var ahora = Messages(args[1]);
     Console.WriteLine($"{ahora.Count:N0} mensajes en el protocolo de {Mapper.VersionOf(args[1])}");
 
-    // Los de la versión anterior sirven para distinguir un resto de un error. Sin ellos, un opcode
-    // que ya no existe se confundiría con «esto no era un opcode», que son cosas muy distintas.
+    // Those of the previous version serve to tell a remnant from an error. Without them, an opcode
+    // that no longer exists would be confused with «this was not an opcode», which are very different things.
     var antes = args.Length > 4 ? Messages(args[4]) : new HashSet<string>(StringComparer.Ordinal);
 
     var anclas = Dossier.Anchors(args[2]);
@@ -370,9 +370,9 @@ static int Capa(string[] args)
 
     if (barrido.Stale.Count > 0)
     {
-        // Esto es un hallazgo, no un aviso de forma: son opcodes que el emulador usa y que en esta
-        // versión del cliente NO EXISTEN. No pueden casar con nada; el código que los usa está
-        // muerto y nadie lo sabía.
+        // This is a finding, not a formality: they are opcodes the emulator uses and that in this
+        // client version DO NOT EXIST. They cannot match anything; the code using them is
+        // dead and nobody knew.
         Console.WriteLine();
         Console.WriteLine($"  {barrido.Stale.Count:N0} literales son de una versión anterior y aquí ya no existen:");
         foreach (var trozo in barrido.Stale.Chunk(16))
@@ -390,8 +390,8 @@ static int Capa(string[] args)
     Console.WriteLine();
     Console.WriteLine($"  escrito en {Layer.Write(barrido, Mapper.VersionOf(args[1]), salida)}");
 
-    // Sin --aplicar sólo se enseña lo que cambiaría. Tocar cuarenta ficheros del emulador no es
-    // algo que deba pasar por escribir una orden de más.
+    // Without --aplicar only what would change is shown. Touching forty emulator files is not
+    // something that should happen for typing one command too many.
     bool aplicar = args.Contains("--aplicar");
     var cambios = Layer.Apply(args[3], barrido, aplicar);
 
@@ -411,7 +411,7 @@ static int Capa(string[] args)
 
 static string Recorta(string linea) => linea.Length <= 96 ? linea : linea[..93] + "...";
 
-/// <summary>Los nombres de mensaje de los dos ensamblados del protocolo.</summary>
+/// <summary>The message names of the protocol's two assemblies.</summary>
 static HashSet<string> Messages(string clientOrDll)
 {
     var names = new HashSet<string>(StringComparer.Ordinal);
@@ -431,10 +431,10 @@ static HashSet<string> Messages(string clientOrDll)
 }
 
 /// <summary>
-/// La cadena recorrida, parche a parche, contra el salto directo.
+/// The chain walked, patch by patch, against the direct jump.
 ///
-/// Es el experimento entero: mide cada salto por separado, compone la cadena, y pone el resultado
-/// al lado del salto de un tirón para que se vea si encadenar sirve de algo o no.
+/// It is the whole experiment: it measures each jump separately, composes the chain, and puts the result
+/// next to the one-go jump so that it shows whether chaining is of any use or not.
 /// </summary>
 static int Cadena(string[] args)
 {
@@ -476,9 +476,9 @@ static int Cadena(string[] args)
             $" {salto.Paired,8:N0} {salto.Doubtful,6:N0} {salto.Gone,6:N0} │{medida}");
     }
 
-    // Lo que decide si el emparejador vale: cuántos empareja MAL cuando se sabe la respuesta. Un
-    // fallo no se nota al mirar el resultado y envenena todo lo que venga detrás. Sólo cuentan los
-    // saltos sin rotación, que son los únicos donde hay respuesta que saber.
+    // What decides whether the matcher is any good: how many it matches WRONGLY when the answer is known. A
+    // failure is not noticed when looking at the result and poisons everything that comes after. Only the
+    // jumps without rotation count, which are the only ones where there is an answer to know.
     var limpios = salida.Hops.Where(h => !h.Rotated).ToList();
     if (limpios.Count > 0)
     {
@@ -501,7 +501,7 @@ static int Cadena(string[] args)
         }
     }
 
-    // Y ahora lo que se quería saber: la cadena entera contra el salto de un tirón.
+    // And now what was wanted: the whole chain against the one-go jump.
     string primero = clientes[0], ultimo = clientes[^1];
     Console.WriteLine();
     Console.WriteLine($"  {Mapper.VersionOf(Path.GetFileName(primero))} → {Mapper.VersionOf(Path.GetFileName(ultimo))}:");
@@ -512,12 +512,12 @@ static int Cadena(string[] args)
 
     if (args.Length > 2 && File.Exists(args[2]))
     {
-        // El porcentaje sobre los dos mil mensajes es una curiosidad. El número que decide si el
-        // emulador arranca el día del parche es cuántos de los que usa de verdad sobreviven.
-        // El barrido del emulador saca más opcodes de los que son: hay falsos positivos que no
-        // corresponden a ningún mensaje del protocolo. Como denominador hay que usar los que sí
-        // existen en la versión nueva, o el porcentaje sale rebajado por comparar contra opcodes
-        // que no podía acertar nadie.
+        // The percentage over the two thousand messages is a curiosity. The number that decides whether the
+        // emulator starts on patch day is how many of the ones it really uses survive.
+        // The emulator sweep brings out more opcodes than there are: there are false positives that do not
+        // correspond to any protocol message. As the denominator one has to use the ones that do
+        // exist in the new version, or the percentage comes out lowered by comparing against opcodes
+        // nobody could get right.
         var protocolo = ProtoWriter.Model(Dumper.Protocol(ultimo, _ => { }))
             .Messages.Select(m => m.Name).ToHashSet(StringComparer.Ordinal);
         var suyos = Emulador(args[2]).Where(protocolo.Contains).ToHashSet(StringComparer.Ordinal);
@@ -534,16 +534,16 @@ static int Cadena(string[] args)
 }
 
 /// <summary>
-/// Los clientes de en medio, traídos de la CDN de Ankama.
+/// The clients in between, fetched from Ankama's CDN.
 ///
-/// El salto de 3.6.4.3 a 3.6.10.10 sale al 11,3% porque hay seis parches por medio. Con los
-/// clientes intermedios el salto se parte en saltos de uno, y de cada uno sólo hacen falta tres
-/// ficheros —el binario, los metadatos y el reproductor— unos 130 MB de los 12 GB que ocupa la
-/// instalación. El resto no se pide siquiera.
+/// The jump from 3.6.4.3 to 3.6.10.10 comes out at 11.3% because there are six patches in between. With the
+/// intermediate clients the jump splits into jumps of one, and of each only three
+/// files are needed —the binary, the metadata and the player— some 130 MB of the 12 GB the
+/// installation takes. The rest is not even asked for.
 /// </summary>
 static async Task<int> Bajar(string[] args)
 {
-    // Lo que necesita ClientReader para abrir un cliente, y nada más.
+    // What ClientReader needs to open a client, and nothing more.
     string[] queremos =
     [
         "*GameAssembly.dll",
@@ -583,8 +583,8 @@ static async Task<int> Bajar(string[] args)
         string corta = Cytrus.Tail(version);
         string destino = Path.Combine(carpeta, "Cliente " + corta);
 
-        // Un cliente ya bajado no se vuelve a pedir. La cadena se hace en varias sesiones y no
-        // tiene sentido gastar otros 130 MB por reanudarla.
+        // An already downloaded client is not asked for again. The chain is done over several sessions and it
+        // makes no sense to spend another 130 MB to resume it.
         if (File.Exists(Path.Combine(destino, "GameAssembly.dll")))
         {
             Console.WriteLine($"{corta}: ya está en {destino}");
@@ -602,10 +602,10 @@ static async Task<int> Bajar(string[] args)
 }
 
 /// <summary>
-/// El mapeo de una versión a la siguiente, que es lo que hace la ventana con su botón.
+/// The mapping from one version to the next, which is what the window does with its button.
 ///
-/// Está aquí además de en la ventana porque es la misma llamada, y porque un mapeo que se puede
-/// lanzar desde un guión se puede meter en un proceso automático el día del parche.
+/// It is here as well as in the window because it is the same call, and because a mapping that can be
+/// launched from a script can be put into an automatic process on patch day.
 /// </summary>
 static int Mapear(string[] args)
 {
@@ -628,8 +628,8 @@ static int Mapear(string[] args)
     var dudas = mapper.Doubts();
     Console.WriteLine($"  {dudas.Count:N0} dudas por las que merece la pena preguntar al modelo");
 
-    // Cuántos candidatos tiene cada duda es lo que dice si el modelo lo va a tener fácil o
-    // imposible. Elegir entre dos es casi gratis; elegir entre quince es lo que de verdad cuesta.
+    // How many candidates each doubt has is what says whether the model will find it easy or
+    // impossible. Choosing between two is almost free; choosing among fifteen is what really costs.
     Console.WriteLine($"    con un solo candidato: {dudas.Count(d => d.Candidates.Count == 1):N0}");
     Console.WriteLine($"    entre dos o tres     : {dudas.Count(d => d.Candidates.Count is 2 or 3):N0}");
     Console.WriteLine($"    entre cuatro o más   : {dudas.Count(d => d.Candidates.Count > 3):N0}");
@@ -642,7 +642,7 @@ static int Mapear(string[] args)
     return 0;
 }
 
-/// <summary>Los opcodes que el emulador usa de verdad, sin los falsos positivos del barrido.</summary>
+/// <summary>The opcodes the emulator really uses, without the sweep's false positives.</summary>
 static List<string> Emulador(string path)
 {
     var opcodes = new List<string>();
@@ -656,7 +656,7 @@ static List<string> Emulador(string path)
     return opcodes;
 }
 
-/// <summary>Empareja dos versiones de verdad, la vieja y la nueva.</summary>
+/// <summary>Matches two real versions, the old and the new.</summary>
 static int Emparejar(string[] args)
 {
     if (args.Length < 3)
@@ -673,8 +673,8 @@ static int Emparejar(string[] args)
 
     var resultado = Matcher.Match(vieja, nueva);
 
-    // Cuántos conservan el nombre: si Ankama no hubiera rotado nada, esto sería el 100% y el
-    // emparejador no haría falta. Sirve para saber a qué se enfrenta uno de verdad.
+    // How many keep their name: if Ankama had not rotated anything, this would be 100% and the
+    // matcher would not be needed. It serves to know what one is really up against.
     int iguales = resultado.Pairs.Count(p => p.Key == p.Value);
 
     Console.WriteLine();
@@ -707,10 +707,10 @@ static int Emparejar(string[] args)
 }
 
 /// <summary>
-/// El código del cliente, indexado por mensaje.
+/// The client's code, indexed by message.
 ///
-/// Es la etapa 3: dejar de mirar la forma del mensaje y empezar a mirar quién lo usa. Tarda medio
-/// minuto y deja un fichero que las etapas siguientes leen sin volver a abrir el cliente.
+/// It is stage 3: stop looking at the message's shape and start looking at who uses it. It takes half a
+/// minute and leaves a file the following stages read without opening the client again.
 /// </summary>
 static int Indexar(string[] args)
 {
@@ -735,7 +735,7 @@ static int Indexar(string[] args)
     return 0;
 }
 
-/// <summary>Lo que hace falta para armar expedientes, cargado una vez.</summary>
+/// <summary>What is needed to put dossiers together, loaded once.</summary>
 static (Matcher.Model Model, Dictionary<string, CodeIndex.Evidence> Index,
         Dictionary<string, Dossier.Anchor> Anchors, Dictionary<string, List<string>> Parents)
     Papeles(string dll, string indice, string anclas)
@@ -750,10 +750,10 @@ static (Matcher.Model Model, Dictionary<string, CodeIndex.Evidence> Index,
 }
 
 /// <summary>
-/// El expediente de un mensaje, escrito para que lo lea alguien.
+/// A message's dossier, written for someone to read.
 ///
-/// Antes de gastarse un céntimo en preguntarle al modelo conviene mirar un expediente y decidir si
-/// uno mismo sabría contestarlo. Si no, el problema no es el modelo.
+/// Before spending a cent on asking the model it is worth looking at a dossier and deciding whether
+/// one would know how to answer it oneself. If not, the problem is not the model.
 /// </summary>
 static int Expediente(string[] args)
 {
@@ -767,9 +767,9 @@ static int Expediente(string[] args)
     string version = Path.GetFileNameWithoutExtension(args[2]).Replace("indice_", "");
     string que = args[4];
 
-    // A ciegas se le tapa al expediente lo que ya se sabe de SU mensaje, y sólo de ése. Es la única
-    // manera de medir honradamente cuánta señal lleva: con el ancla dentro, la respuesta está en la
-    // pregunta.
+    // Blind, the dossier has hidden from it what is already known about ITS message, and only that one. It is the only
+    // way of measuring honestly how much signal it carries: with the anchor inside, the answer is in the
+    // question.
     bool ciego = args.Contains("--ciego");
     Dictionary<string, Dossier.Anchor> Vistas(string mensaje) => Tapando(anclas, ciego ? mensaje : null);
 
@@ -797,11 +797,11 @@ static int Expediente(string[] args)
 }
 
 /// <summary>
-/// Puntúa una tabla de propuestas contra lo que está medido.
+/// Scores a table of proposals against what is measured.
 ///
-/// Da igual quién las haya escrito —el modelo, una persona, otro programa—: si hay un nombre
-/// medido para ese mensaje, se puede decir si acierta. Es lo que separa una tubería de un generador
-/// de nombres bonitos.
+/// It does not matter who wrote them —the model, a person, another program—: if there is a measured
+/// name for that message, one can say whether it gets it right. It is what separates a pipeline from a generator
+/// of pretty names.
 /// </summary>
 static int Evaluar(string[] args)
 {
@@ -822,9 +822,9 @@ static int Evaluar(string[] args)
         string[] celdas = linea.Split('\t');
         if (celdas.Length < 2) continue;
 
-        // Callarse no es fallar, pero tampoco es gratis: si el porcentaje se calcula sólo sobre las
-        // que se mojan, una tubería que conteste una sola pregunta y acierte marca un 100 %. Van
-        // contadas aparte y se imprimen al lado.
+        // Keeping quiet is not failing, but it is not free either: if the percentage is computed only over the
+        // ones that commit, a pipeline that answers a single question and gets it right scores 100 %. They are
+        // counted apart and printed alongside.
         if (celdas[1].Length == 0) { calladas++; continue; }
 
         if (!anclas.TryGetValue(celdas[0], out var verdad) || verdad.Name.Length == 0) { sinMedir++; continue; }
@@ -868,12 +868,12 @@ static int Evaluar(string[] args)
 }
 
 /// <summary>
-/// La etapa 4: el expediente delante del modelo, y la respuesta a una tabla.
+/// Stage 4: the dossier in front of the model, and the answer into a table.
 ///
-/// Con <c>--evaluar</c> no barre el protocolo entero: coge los mensajes de los que YA se sabe el
-/// nombre, le tapa al modelo justo ése —el resto de anclas se quedan, porque en el barrido de
-/// verdad también estarán— y compara. Es la única forma de saber si lo que sale sirve, y sale
-/// barato: noventa y nueve preguntas.
+/// With <c>--evaluar</c> it does not sweep the whole protocol: it takes the messages whose name is ALREADY
+/// known, hides exactly that one from the model —the rest of the anchors stay, because in the real
+/// sweep they will be there too— and compares. It is the only way of knowing whether what comes out is any good, and it comes
+/// cheap: ninety-nine questions.
 /// </summary>
 static async Task<int> Preguntar(string[] args)
 {
@@ -892,9 +892,9 @@ static async Task<int> Preguntar(string[] args)
     int donde = Array.IndexOf(args, "--limite");
     if (donde > 0 && donde + 1 < args.Length && int.TryParse(args[donde + 1], out int n)) limite = n;
 
-    // A quién se le pregunta. Evaluando, sólo a los que tienen nombre conocido; si no, a todo el
-    // que tenga algo que contar, porque preguntar por un mensaje sin evidencia es pagar por un
-    // «no lo sé» que ya sabíamos.
+    // Whom one asks. When evaluating, only those with a known name; if not, everyone
+    // who has something to tell, because asking about a message without evidence is paying for an
+    // «I do not know» we already knew.
     var cola = evaluando
         ? modelo.Messages.Where(m => anclas.TryGetValue(m.Name, out var a) && a.Name.Length > 0)
                          .Select(m => m.Name).ToList()
@@ -903,16 +903,16 @@ static async Task<int> Preguntar(string[] args)
                          .Select(m => m.Name).ToList();
     cola = cola.Take(limite).ToList();
 
-    // La caché vive al lado de la salida a propósito: dos experimentos con tablas distintas no
-    // deben compartirla. El precio es que cambiar de sitio la salida deja atrás lo ya pagado, así
-    // que se dice dónde está en vez de que se descubra al ver la factura.
+    // The cache lives next to the output on purpose: two experiments with different tables must not
+    // share it. The price is that moving the output leaves behind what was already paid for, so
+    // where it is gets said instead of being discovered on seeing the bill.
     string cache = Path.Combine(Path.GetDirectoryName(salida) is { Length: > 0 } d ? d : ".",
                                 "respuestas");
     using var llm = new Llm(cache);
 
-    // Uno fuera cada vez: al preguntar por un mensaje se le tapa SÓLO ése, en el expediente y en los
-    // ejemplos. Tapar los noventa y nueve a la vez mediría una tubería que no es la que va a correr,
-    // porque el día del barrido de verdad los ejemplos estarán todos.
+    // One out each time: on asking about a message ONLY that one is hidden, in the dossier and in the
+    // examples. Hiding all ninety-nine at once would measure a pipeline that is not the one that will run,
+    // because on the day of the real sweep the examples will all be there.
     string Instrucciones(string mensaje)
         => Llm.System(anclas.Values.Where(a => !evaluando || a.Opcode != mensaje));
 
@@ -955,10 +955,10 @@ static async Task<int> Preguntar(string[] args)
         }
     }
 
-    // Una tanda estéril no machaca la buena. Escribir sin mirar convierte cualquier barrido que no
-    // conteste nada —la clave caducada, un «--limite 0», unas anclas de otra versión donde no casa
-    // ni un opcode— en un borrado silencioso: la tabla de ayer se queda en la línea de cabecera y
-    // el proceso se va diciendo que todo ha ido bien.
+    // A barren batch does not overwrite the good one. Writing without looking turns any sweep that does not
+    // answer anything —an expired key, a «--limite 0», anchors from another version where not even
+    // one opcode matches— into a silent deletion: yesterday's table is left at the header line and
+    // the process leaves saying all went well.
     if (filas.Count == 0)
     {
         Console.WriteLine();
@@ -979,7 +979,7 @@ static async Task<int> Preguntar(string[] args)
     return 0;
 }
 
-/// <summary>Las anclas menos la del mensaje que se está preguntando, cuando se evalúa.</summary>
+/// <summary>The anchors minus that of the message being asked about, when evaluating.</summary>
 static Dictionary<string, Dossier.Anchor> Tapando(Dictionary<string, Dossier.Anchor> anclas, string? oculto)
 {
     if (oculto == null) return anclas;
@@ -1061,7 +1061,7 @@ static void Contar(DescriptorProto message, ref int mensajes, ref int campos)
     foreach (var anidado in message.NestedType) Contar(anidado, ref mensajes, ref campos);
 }
 
-/// <summary>Las tablas de valores por defecto, leídas del fichero a pelo.</summary>
+/// <summary>The default value tables, read raw from the file.</summary>
 static void Crudo(string clientFolder)
 {
     string path = Path.Combine(clientFolder, "Dofus_Data", "il2cpp_data", "Metadata", "global-metadata.dat");
@@ -1081,8 +1081,8 @@ static void Crudo(string clientFolder)
         int dentro = entradas.Count(e => e.Data >= desde && e.Data <= hasta);
         Console.WriteLine("   CRUDO " + tabla + ": indices que APUNTAN al bloque de nombres = " + dentro);
         Console.WriteLine("   CRUDO " + tabla + ": rango de indices " + entradas.Min(e => e.Data) + " .. " + entradas.Max(e => e.Data) + "  (bloque en " + desde + ".." + hasta + ")");
-        // El cruce definitivo: cada posición donde empieza un nombre real, contra cada índice de la
-        // tabla. Sin decodificar cadenas ni suponer formatos: sólo números.
+        // The definitive cross-check: each position where a real name starts, against each index of the
+        // table. Without decoding strings or assuming formats: only numbers.
         var posiciones = new Dictionary<long, long>();
         int cuantos = 0;
         for (int i = 0; i + 10 < file.Length; i++)

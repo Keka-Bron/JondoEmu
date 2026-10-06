@@ -5,38 +5,38 @@ using System.Text;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las contraseñas, cifradas.
+    /// Passwords, hashed.
     ///
-    /// Hasta ahora se guardaban tal cual se escribían, y la comparación la hacía el propio SQL
-    /// («AND Password = $pass»). Eso quiere decir que cualquiera con el fichero auth.db delante
-    /// —una copia de seguridad, el zip que se pasa a un amigo, un volcado por error— tenía las
-    /// claves de todo el mundo, y como la gente repite contraseña, no sólo las de aquí.
+    /// Until now they were stored as typed, and the comparison was done by the SQL itself («AND
+    /// Password = $pass»). That means anybody with the auth.db file in front of him -- a backup, the zip
+    /// passed to a friend, a dump by mistake -- had everybody's passwords, and since people reuse
+    /// passwords, not only the ones for here.
     ///
-    /// El formato es de una sola línea y lleva dentro todo lo que hace falta para comprobarla:
+    /// The format is a single line and carries inside everything needed to check it:
     ///
-    ///     pbkdf2$&lt;vueltas&gt;$&lt;sal en base64&gt;$&lt;resumen en base64&gt;
+    ///     pbkdf2$&lt;rounds&gt;$&lt;salt in base64&gt;$&lt;hash in base64&gt;
     ///
-    /// Guardar las vueltas dentro es lo que permite subirlas más adelante sin romper lo ya
-    /// guardado: cada clave se comprueba con las suyas, y la siguiente vez que alguien entra se
-    /// vuelve a escribir con las de ahora.
+    /// Storing the rounds inside is what allows raising them later without breaking what is already
+    /// stored: each password is checked with its own, and the next time somebody signs in it is written
+    /// again with today's.
     ///
-    /// Lo que ya estaba escrito en claro SIGUE VALIENDO: se reconoce porque no empieza por
-    /// «pbkdf2$», se compara como antes y, si acierta, se reescribe cifrada en ese momento. Así
-    /// la base vieja se convierte sola según entra cada uno, sin dejar a nadie fuera y sin tener
-    /// que pedirle a nadie que cambie la suya.
+    /// What was already written in clear IS STILL VALID: it is recognised because it does not start with
+    /// «pbkdf2$», it is compared as before and, if it matches, it is rewritten hashed at that moment.
+    /// That way the old database converts itself as each one signs in, without locking anybody out and
+    /// without having to ask anybody to change theirs.
     /// </summary>
     public static class Claves
     {
         private const string Marca = "pbkdf2$";
-        private const int Vueltas = 210_000;   // lo que recomienda OWASP para PBKDF2-SHA256
+        private const int Vueltas = 210_000;   // what OWASP recommends for PBKDF2-SHA256
         private const int BytesDeSal = 16;
         private const int BytesDeResumen = 32;
 
-        /// <summary>¿Está esto ya cifrado, o es de las de antes?</summary>
+        /// <summary>Is this already hashed, or one of the old ones?</summary>
         public static bool EstaCifrada(string? guardado)
             => !string.IsNullOrEmpty(guardado) && guardado.StartsWith(Marca, StringComparison.Ordinal);
 
-        /// <summary>Lo que hay que meter en la columna Password.</summary>
+        /// <summary>What has to go into the Password column.</summary>
         public static string Cifrar(string clave)
         {
             byte[] sal = RandomNumberGenerator.GetBytes(BytesDeSal);
@@ -45,8 +45,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// ¿Es ésta la contraseña? Devuelve además si hay que reescribirla, o porque estaba en
-        /// claro o porque se cifró con menos vueltas de las que se usan hoy.
+        /// Is this the password? Also returns whether it has to be rewritten, either because it was in clear
+        /// or because it was hashed with fewer rounds than are used today.
         /// </summary>
         public static bool Comprueba(string clave, string? guardado, out bool hayQueReescribir)
         {
@@ -55,7 +55,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (!EstaCifrada(guardado))
             {
-                // De las de antes. Se compara en tiempo fijo igual, que cuesta lo mismo.
+                // One of the old ones. It is compared in constant time all the same, which costs the same.
                 bool acierta = IgualesSinDelatar(
                     Encoding.UTF8.GetBytes(clave), Encoding.UTF8.GetBytes(guardado));
                 hayQueReescribir = acierta;
@@ -91,8 +91,8 @@ namespace Jondo.Unity.Server.Managers
                    Encoding.UTF8.GetBytes(clave), sal, vueltas, HashAlgorithmName.SHA256, largo);
 
         /// <summary>
-        /// Comparación que tarda lo mismo acierte o falle. Con «==» se puede averiguar la clave
-        /// letra a letra midiendo cuánto tarda en contestar.
+        /// A comparison that takes the same time whether it matches or fails. With «==» the password can be
+        /// found letter by letter by measuring how long it takes to answer.
         /// </summary>
         private static bool IgualesSinDelatar(byte[] a, byte[] b)
             => a.Length == b.Length && CryptographicOperations.FixedTimeEquals(a, b);

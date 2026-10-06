@@ -10,7 +10,7 @@ using Jondo.Unity.World.Content;
 
 namespace Jondo.Unity.Server.Managers
 {
-    /// <summary>Un paso instantáneo de un mapa a otro, colgado de un elemento del mapa.</summary>
+    /// <summary>An instant passage from one map to another, hanging from a map element.</summary>
     public sealed class InteractiveTeleport
     {
         public long SourceMapId { get; init; }
@@ -26,24 +26,24 @@ namespace Jondo.Unity.Server.Managers
     }
 
     /// <summary>
-    /// Importa, valida e indexa los pasos sacados de Giny 2.68.
+    /// Imports, validates and indexes the passages taken from Giny 2.68.
     ///
-    /// El json normalizado es la fuente que se versiona; SQLite es la copia de trabajo que el
-    /// servidor consulta. Se reimporta en CADA arranque, así que tocar la tabla a mano no sirve
-    /// de nada: lo que manda es el json.
+    /// The normalised json is the source that is versioned; SQLite is the working copy the
+    /// server queries. It is reimported on EVERY start, so touching the table by hand is of no
+    /// use: what rules is the json.
     ///
-    /// Las casas se rechazan aquí a propósito: su protocolo jqw y su estado de vuelta son de
-    /// <see cref="Houses"/> y de HouseHandler, y meterlas por aquí las rompería.
+    /// Houses are rejected here on purpose: their jqw protocol and their return state belong to
+    /// <see cref="Houses"/> and HouseHandler, and putting them through here would break them.
     ///
-    /// De 1.678 candidatas quedan 1.586 activas. Las que se caen lo hacen por lo que dice
-    /// Validate: 55 son ambiguas —dos destinos para el mismo elemento— y 37 apuntan a un mapa
-    /// que no existe en 3.6.10.10. Ese filtro es lo que hace utilizable un volcado de Dofus 2.
+    /// Of 1,678 candidates 1,586 remain active. The ones that drop do so for what
+    /// Validate says: 55 are ambiguous —two destinations for the same element— and 37 point to a map
+    /// that does not exist in 3.6.10.10. That filter is what makes a Dofus 2 dump usable.
     /// </summary>
     public static class TeleportManager
     {
         public const int UseSkill = 114;
         public const int ExitSkill = 339;
-        /// <summary>Type de repli pour les routes dont la source ne fournit aucune mesure.</summary>
+        /// <summary>Fallback type for routes whose source provides no measurement.</summary>
         public const int GenericTeleportType = 0;
         private static IReadOnlyDictionary<(long MapId, int ElementId), InteractiveTeleport> _byElement =
             new Dictionary<(long, int), InteractiveTeleport>();
@@ -59,9 +59,9 @@ namespace Jondo.Unity.Server.Managers
         {
             ImportIfAvailable();
             LoadFromDatabase();
-            // L'indice par case détecte les doublons et sert aussi aux passages au sol. Ceux-ci
-            // sont déclenchés après la confirmation du dernier jrw, tout en répondant toujours au
-            // jqi : les sorties normales par le bord conservent ainsi leur échange jsq/jqk.
+            // The per-cell index detects duplicates and also serves the floor passages. Those
+            // are triggered after the last jrw is confirmed, while still answering the
+            // jqi: normal exits through the edge thus keep their jsq/jqk exchange.
             Console.WriteLine($"[Teleport] {_byElement.Count} rutas cargadas, en " +
                               $"{_byMap.Count} mapas.");
         }
@@ -86,14 +86,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Junta los catálogos y los deja en la base.
+        /// Merges the catalogues and leaves them in the base.
         ///
-        /// Son DOS y el orden importa: primero el de Giny, que trae la casilla de llegada medida,
-        /// y después el del grafo de 2.73, que sólo la sabe aproximar. Cuando los dos hablan del
-        /// mismo elemento gana el primero, y el segundo queda apagado con el motivo escrito.
+        /// They are TWO and the order matters: first Giny's, which brings the measured arrival cell,
+        /// and then the 2.73 graph's, which can only approximate it. When both speak of the
+        /// same element the first wins, and the second is left switched off with the reason written.
         ///
-        /// Todo lo que se descarta se guarda igual, con su ValidationStatus, para que una ruta que
-        /// desaparece se pueda mirar en vez de adivinar por qué no está.
+        /// Everything discarded is stored all the same, with its ValidationStatus, so that a route that
+        /// disappears can be looked at instead of guessing why it is not there.
         /// </summary>
         private static void ImportIfAvailable()
         {
@@ -148,8 +148,8 @@ namespace Jondo.Unity.Server.Managers
                     return;
                 }
 
-                // Dos destinos para el mismo elemento dentro del MISMO catálogo: no se puede elegir
-                // por nosotros, así que no se activa ninguno.
+                // Two destinations for the same element within the SAME catalogue: it cannot be chosen
+                // for us, so none is activated.
                 var ambiguous = rows
                     .Where(x => x.RequestedEnabled)
                     .GroupBy(x => (x.Route.SourceMapId, x.Route.ElementId, x.Route.SourceVersion))
@@ -157,9 +157,9 @@ namespace Jondo.Unity.Server.Managers
                     .Select(x => (x.Key.SourceMapId, x.Key.ElementId))
                     .ToHashSet();
 
-                // Lo que ya se ha activado, para que el segundo catálogo no pise al primero. Se
-                // vigilan las dos claves: el elemento, y la casilla —dos pasos en la misma casilla
-                // dejarían el índice por casilla sin saber a cuál ir—.
+                // What has already been activated, so that the second catalogue does not overwrite the first. Both
+                // keys are watched: the element, and the cell —two passages on the same cell
+                // would leave the per-cell index not knowing which to go to—.
                 var elementoTomado = new HashSet<(long, int)>();
                 var celdaTomada = new HashSet<(long, int)>();
 
@@ -212,10 +212,10 @@ namespace Jondo.Unity.Server.Managers
                 ElementId = entry.GetProperty("elementId").GetInt32(),
                 SourceCellId = entry.GetProperty("sourceCellId").GetInt32(),
                 GfxId = entry.GetProperty("gfxId").GetInt32(),
-                // Le type fait partie de l'identité de l'élément côté client. 538 routes Giny
-                // portent une mesure directe de Dofus 3.6, notamment le gfx 3507 avec le type -1.
-                // L'écraser par zéro laisse bien f11/f15 sur le fil, mais le client ne rattache
-                // plus la déclaration au dessin de sortie.
+                // The type is part of the element's identity on the client side. 538 Giny routes
+                // carry a direct Dofus 3.6 measurement, notably gfx 3507 with type -1.
+                // Overwriting it with zero does leave f11/f15 on the wire, but the client no longer
+                // attaches the declaration to the exit drawing.
                 InteractiveType = ReadInteractiveType(entry),
                 SkillId = entry.GetProperty("skillId").GetInt32(),
                 DestinationMapId = destinationMapId,
@@ -241,8 +241,8 @@ namespace Jondo.Unity.Server.Managers
             if (route.SourceMapId <= 0 || route.DestinationMapId <= 0) errors.Add("invalid-map");
             if (route.ElementId <= 0) errors.Add("invalid-element");
             if (route.DestinationCellId < 0 || route.DestinationCellId > 559) errors.Add("invalid-cell");
-            // -1 est un type proto valide et mesuré : sur le fil il devient ulong.MaxValue.
-            // Les valeurs positives viennent également des captures (portes, transports, etc.).
+            // -1 is a valid, measured proto type: on the wire it becomes ulong.MaxValue.
+            // The positive values also come from the captures (doors, transports, etc.).
             if (route.InteractiveType < -1) errors.Add("invalid-type");
             if (route.SkillId != UseSkill && route.SkillId != ExitSkill) errors.Add("unexpected-skill");
             if (IsReservedInteractive(route.SourceMapId, route.ElementId))
@@ -266,9 +266,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Un «Teleport» de los viejos de Giny puede ser en realidad un zaap, un zaapi o algún
-        /// otro elemento cuyo protocolo de verdad ya conocemos. Ésos se quedan en su manager, que
-        /// sabe hacerlo bien; aquí sólo entran los pasos genéricos.
+        /// One of Giny's old «Teleport» entries may really be a zaap, a zaapi or some
+        /// other element whose real protocol we already know. Those stay in their manager, which
+        /// knows how to do it right; only the generic passages come in here.
         /// </summary>
         private static bool IsReservedInteractive(long mapId, int elementId)
         {
@@ -365,6 +365,7 @@ namespace Jondo.Unity.Server.Managers
             }
 
             AplicarLosNuestros(byElement, byMap, byCell);
+            AddFloorPassages(byCell);
 
             _byElement = byElement;
             _byMap = byMap.ToDictionary(x => x.Key, x => (IReadOnlyList<InteractiveTeleport>)x.Value);
@@ -372,18 +373,18 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los pasajes que ha decidido una persona, encima de los 3.815 extraidos.
+        /// The passages a person has decided, on top of the 3,815 extracted ones.
         /// </summary>
         /// <remarks>
-        /// Sin esto el editor escribe un fichero que nadie lee. La tabla InteractiveTeleports se
-        /// reconstruye cada vez que se rehace world.db, asi que un pasaje anadido ahi desaparece
-        /// en la siguiente regeneracion sin decir nada; por eso lo nuestro vive en
-        /// content/interactives/teleports.json y se pone ENCIMA al arrancar.
+        /// Without this the editor writes a file nobody reads. The InteractiveTeleports table is
+        /// rebuilt every time world.db is remade, so a passage added there disappears
+        /// on the next regeneration without a word; that is why ours lives in
+        /// content/interactives/teleports.json and is laid ON TOP at start.
         ///
-        /// Se sustituye por elemento, no se suma: un elemento es una puerta y una puerta lleva a un
-        /// sitio. Y si nuestra version cambia la casilla de origen, hay que quitar la entrada vieja
-        /// del indice por casilla o quedan dos rutas para la misma casilla y el arranque revienta,
-        /// que es justo lo que comprueba la excepcion de arriba.
+        /// It is replaced per element, not added: an element is a door and a door leads to one
+        /// place. And if our version changes the origin cell, the old entry has to be removed
+        /// from the per-cell index or two routes remain for the same cell and the start blows up,
+        /// which is exactly what the exception above checks.
         /// </remarks>
         private static void AplicarLosNuestros(Dictionary<(long, int), InteractiveTeleport> byElement,
                                                Dictionary<long, List<InteractiveTeleport>> byMap,
@@ -402,8 +403,8 @@ namespace Jondo.Unity.Server.Managers
                 byElement.Remove((mapa, elemento));
                 if (byMap.TryGetValue(mapa, out var lista)) lista.RemoveAll(r => r.ElementId == elemento);
 
-                // Solo si la casilla sigue apuntando a ESTA ruta: dos elementos pueden compartir
-                // casilla y borrar a ciegas se llevaria por delante la del otro.
+                // Only if the cell still points to THIS route: two elements can share a
+                // cell and deleting blindly would wipe out the other's.
                 if (byCell.TryGetValue((mapa, vieja.SourceCellId), out var enLaCasilla) &&
                     ReferenceEquals(enLaCasilla, vieja))
                 {
@@ -447,8 +448,8 @@ namespace Jondo.Unity.Server.Managers
 
                 lista.Add(ruta);
 
-                // Otro elemento en la misma casilla se queda sin su atajo por casilla, y es lo
-                // correcto: el que manda es el que se ha decidido a mano.
+                // Another element on the same cell is left without its per-cell shortcut, and that is
+                // right: the one that rules is the one decided by hand.
                 byCell[(ruta.SourceMapId, ruta.SourceCellId)] = ruta;
                 puestos++;
             }
@@ -458,6 +459,49 @@ namespace Jondo.Unity.Server.Managers
                 Console.WriteLine($"[Teleports] {puestos} pasaje(s) puestos a mano y {quitados} quitado(s), " +
                                   "de content/interactives/teleports.json.");
             }
+        }
+
+        /// <summary>
+        /// The floor passages (<see cref="FloorPassages"/>): cells that move whoever stops on
+        /// them, with no element.
+        /// </summary>
+        /// <remarks>
+        /// Only in the index by cell, which is what WorldMoveHandler asks when a walk ends; not by
+        /// element nor by map, so nothing is declared to the client for them. A cell that already
+        /// has an element's passage keeps it: the element is what the map shows. And one leading to
+        /// a map the world does not have is left out, as Validate leaves out an element's.
+        /// </remarks>
+        private static void AddFloorPassages(Dictionary<(long, int), InteractiveTeleport> byCell)
+        {
+            int added = 0;
+            foreach (var floor in FloorPassages.Load(Paths.ContentFile(FloorPassages.AuthoredFile),
+                                                     message => Console.WriteLine("[Teleports] " + message)))
+            {
+                if (byCell.ContainsKey((floor.SourceMapId, floor.SourceCell)))
+                {
+                    Console.WriteLine($"[Teleports] Floor passage {floor}: the cell has an element's passage already; left out.");
+                    continue;
+                }
+                if (MapManager.GetMapInfo(floor.DestinationMapId) == null)
+                {
+                    Console.WriteLine($"[Teleports] Floor passage {floor}: the world has no map {floor.DestinationMapId}; left out.");
+                    continue;
+                }
+
+                byCell[(floor.SourceMapId, floor.SourceCell)] = new InteractiveTeleport
+                {
+                    SourceMapId = floor.SourceMapId,
+                    SourceCellId = floor.SourceCell,
+                    DestinationMapId = floor.DestinationMapId,
+                    DestinationCellId = floor.DestinationCell,
+                    SourceVersion = "floor",
+                    Confidence = "authored",
+                };
+                added++;
+            }
+
+            if (added > 0)
+                Console.WriteLine($"[Teleports] {added} floor passage(s), from content/interactives/floor_passages.json.");
         }
     }
 }

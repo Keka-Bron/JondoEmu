@@ -3,26 +3,26 @@ using System.Collections.Generic;
 
 namespace Jondo.Unity.Server.Managers
 {
-    /// <summary>La acción de juego que hay detrás de una habilidad interactiva.</summary>
+    /// <summary>The game action behind an interactive skill.</summary>
     public enum InteractiveActionKind
     {
         Zaap,
         Chest,
         Lottery,
 
-        /// <summary>El transporte corto dentro de Bonta y Brakmar.</summary>
+        /// <summary>The short transport inside Bonta and Brakmar.</summary>
         Zaapi,
 
-        /// <summary>La papelera: el almacén público de lo que la gente tira.</summary>
+        /// <summary>The bin: the public store of what people throw away.</summary>
         Bin,
 
-        /// <summary>La puerta de la calle de una casa.</summary>
+        /// <summary>A house's street door.</summary>
         HouseDoor,
 
-        /// <summary>La puerta de dentro, la que devuelve a la calle.</summary>
+        /// <summary>The inside door, the one leading back to the street.</summary>
         HouseExit,
 
-        /// <summary>Un paso instantáneo entre dos mapas, fuera del sistema de casas.</summary>
+        /// <summary>An instant passage between two maps, outside the house system.</summary>
         Teleport,
 
         /// <summary>Un recurso de oficio: trigo, fresno, caladero, mineral.</summary>
@@ -34,13 +34,13 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         Workshop,
 
-        /// <summary>El pozo de los Suenos Infinitos, que abre la ventana del sueno.</summary>
+        /// <summary>The Well of Infinite Dreams, which opens the dream window.</summary>
         Dream,
 
-        /// <summary>Una de las tres puertas de una sala, que lleva a la fila de abajo.</summary>
+        /// <summary>One of a room's three doors, which leads to the row below.</summary>
         DreamDoor,
 
-        /// <summary>El altar del Templo de los Gremios, que abre el editor de fundación.</summary>
+        /// <summary>The altar of the Guild Temple, which opens the founding editor.</summary>
         GuildFounding,
 
         /// <summary>A marketplace counter: it opens the marketplace to buy (kdw).</summary>
@@ -53,7 +53,7 @@ namespace Jondo.Unity.Server.Managers
         GuildChest,
     }
 
-    /// <summary>Una habilidad ofrecida por un elemento interactivo.</summary>
+    /// <summary>A skill offered by an interactive element.</summary>
     public sealed class InteractiveAction
     {
         internal InteractiveAction(InteractiveActionKind kind, int skillId, int skillInstanceId)
@@ -69,8 +69,8 @@ namespace Jondo.Unity.Server.Managers
     }
 
     /// <summary>
-    /// Un elemento interactivo registrado en un mapa, con todas las habilidades que ofrece.
-    /// Aunque los tres interactivos actuales solo tienen una, el protocolo admite varias.
+    /// An interactive element registered on a map, with all the skills it offers.
+    /// Although the three current interactives only have one, the protocol allows several.
     /// </summary>
     public sealed class RegisteredInteractive
     {
@@ -90,8 +90,8 @@ namespace Jondo.Unity.Server.Managers
 
         internal void Add(InteractiveActionKind kind, int skillId)
         {
-            // La première action garde exactement l'uid historique. Si un futur élément en offre
-            // plusieurs, les suivantes reçoivent les uid contigus encore libres.
+            // The first action keeps exactly the historical uid. If a future element offers
+            // several, the following ones get the contiguous uids still free.
             int instance = Interactives.SkillInstanceOf(Element.Id);
             while (ContainsInstance(instance)) instance++;
             _actions.Add(new InteractiveAction(kind, skillId, instance));
@@ -120,11 +120,11 @@ namespace Jondo.Unity.Server.Managers
     }
 
     /// <summary>
-    /// Registro único de los interactivos que Jondo sabe declarar y ejecutar.
+    /// Single registry of the interactives Jondo knows how to declare and execute.
     ///
-    /// La clave real es (mapa, elemento); la instancia de habilidad sirve para comprobar la
-    /// petición <c>iwo</c>. Los proveedores concretos (zaap, cofre y lotería por ahora) solo se
-    /// usan durante <see cref="Initialize"/>. A partir de ahí, la red no necesita conocerlos.
+    /// The real key is (map, element); the skill instance serves to check the
+    /// <c>iwo</c> request. The concrete providers (zaap, chest and lottery for now) are only
+    /// used during <see cref="Initialize"/>. From then on, the network does not need to know them.
     /// </summary>
     public static class InteractiveRegistry
     {
@@ -140,7 +140,7 @@ namespace Jondo.Unity.Server.Managers
             _byMap.Clear();
             _byElement.Clear();
 
-            // Este orden conserva exactamente el orden histórico dentro del jss.
+            // This order keeps exactly the historical order inside the jss.
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var element in Interactives.ZaapElements(mapId))
@@ -164,13 +164,13 @@ namespace Jondo.Unity.Server.Managers
                         InteractiveActionKind.Lottery, Lottery.Skill);
             }
 
-            // El pozo de los Suenos. Esta en los datos del cliente como un elemento mas -el 539616,
-            // grafico 90166, casilla 370 del mapa del Plano Astral- pero sin una accion declarada
-            // el cliente ni siquiera deja pulsarlo: es un adorno.
+            // The Well of Dreams. It is in the client's data as one more element -539616,
+            // graphic 90166, cell 370 of the Astral Plane map- but without a declared action
+            // the client does not even let it be clicked: it is an ornament.
             //
-            // El elemento y la habilidad salen del f11 del jss real de ese mapa, no del iwo: el
-            // iwo devuelve el UID de instancia, y tomarlo por la habilidad es lo que dejó el pozo
-            // sin pulsar. Véase Dreams.HabilidadDelPozo.
+            // The element and the skill come from the f11 of that map's real jss, not from the iwo: the
+            // iwo returns the instance UID, and taking it for the skill is what left the well
+            // unclickable. See Dreams.HabilidadDelPozo.
             foreach (var pozo in Interactives.ElementsOf(Dreams.MapaDelPozo))
             {
                 if (pozo.Id != Dreams.ElementoDelPozo) continue;
@@ -180,13 +180,13 @@ namespace Jondo.Unity.Server.Managers
                          InteractiveActionKind.Dream, Dreams.SegundaHabilidadDelPozo);
             }
 
-            // Y las puertas de las salas. Sin esto pasa lo mismo que pasaba con el pozo: el
-            // cliente las dibuja —están en sus propios datos de mapa— y no deja pulsarlas, así
-            // que el jugador entra en el sueño, se planta en la sala de entrada y no tiene por
-            // dónde seguir. Ningún error, otra vez.
+            // And the rooms' doors. Without this the same happens as happened with the well: the
+            // client draws them -they are in its own map data- and does not let them be clicked, so
+            // the player enters the dream, stands in the entrance room and has nowhere to go
+            // on. No error, again.
             //
-            // Medido en las ocho salas que salen en las capturas, 48 declaraciones y todas
-            // iguales: f11 { f1: 1, f4 { uid, 184 }, f5: el elemento, f6: -1 }.
+            // Measured on the eight rooms that appear in the captures, 48 declarations and all
+            // alike: f11 { f1: 1, f4 { uid, 184 }, f5: the element, f6: -1 }.
             int puertas = 0;
             foreach (long sala in Dreams.TodosLosMapasDeSala())
             {
@@ -205,8 +205,8 @@ namespace Jondo.Unity.Server.Managers
 
             if (puertas > 0) Console.WriteLine($"[Sueños] {puertas} puerta(s) de sala declaradas.");
 
-            // Los zaapis y las papeleras se reconocen por su GRÁFICO y son decenas, así que se
-            // registran en bloque en vez de uno a uno como el zaap o la lotería.
+            // The zaapis and the bins are recognised by their GRAPHIC and there are dozens, so they
+            // are registered in bulk instead of one by one like the zaap or the lottery.
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var element in Zaapis.ElementsOn(mapId))
@@ -219,8 +219,8 @@ namespace Jondo.Unity.Server.Managers
                     Register(mapId, element, Bins.Type, InteractiveActionKind.Bin, Bins.UseSkill);
             }
 
-            // Las casas van en dos vueltas: las puertas de la calle, que están en mapas del mundo,
-            // y las de dentro, que están en interiores que no aparecen en Interactives.MapIds.
+            // Houses go in two rounds: the street doors, which are on world maps,
+            // and the inside ones, which are on interiors that do not appear in Interactives.MapIds.
             // A door of a house that can be owned carries all five door skills, each with its own
             // instance; who is offered which is decided per viewer when the map is sent
             // (HouseHandler.VisibleActions). Any other door enters, as it always did.
@@ -272,11 +272,11 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
-            // El altar del Templo de los Gremios. Como el pozo: está en los datos del cliente como
-            // un elemento más -el 480310, casilla 326 del mapa 106169344- y sin una acción
-            // declarada es un adorno. La habilidad y el elemento salen del iwo/iwn de la captura
-            // de fundar «Jondo»: iwo {3597, 480310} → iwn {1, 480310, f4 184} y detrás el jjc que
-            // abre el editor. Véase GuildHandler.OpenFoundingAsync.
+            // The altar of the Guild Temple. Like the well: it is in the client's data as
+            // one more element -480310, cell 326 of map 106169344- and without a declared
+            // action it is an ornament. The skill and the element come from the iwo/iwn of the capture
+            // of founding «Jondo»: iwo {3597, 480310} → iwn {1, 480310, f4 184} and behind it the jjc that
+            // opens the editor. See GuildHandler.OpenFoundingAsync.
             foreach (var altar in Interactives.ElementsOf(Handlers.GuildHandler.FoundingMap))
             {
                 if (altar.Id != Handlers.GuildHandler.FoundingAltar) continue;
@@ -284,11 +284,11 @@ namespace Jondo.Unity.Server.Managers
                          InteractiveActionKind.GuildFounding, Handlers.GuildHandler.FoundingSkill);
             }
 
-            // Los pasos entre mapas. Las casas ya han pasado por arriba con su protocolo jqw;
-            // aquí sólo entran los genéricos que TeleportManager ha validado y dejado activos.
+            // The passages between maps. Houses have already gone through above with their jqw protocol;
+            // only the generic ones TeleportManager has validated and left active come in here.
             //
-            // Regla de Giny: todo elemento con teleport es clicable, sea el gráfico un sol, una
-            // escalera o una puerta. Todos se declaran igual y se resuelven por su ElementId.
+            // Giny's rule: every element with a teleport is clickable, be the graphic a sun, a
+            // staircase or a door. All are declared alike and resolved by their ElementId.
             foreach (var route in TeleportManager.All)
             {
                 Register(route.SourceMapId,
@@ -312,14 +312,21 @@ namespace Jondo.Unity.Server.Managers
             }
             if (counters > 0) Console.WriteLine($"[Marketplaces] {counters} counter declarations on the maps.");
 
-            // Y los recursos de oficio, que son con diferencia lo mas numeroso: veinticinco mil.
-            // Se reconocen por su grafico igual que todo lo demas.
+            // And the profession resources, which are by far the most numerous: twenty-five thousand.
+            // They are recognised by their graphic just like everything else.
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var resource in Resources.On(mapId))
+                {
+                    // An element with a passage was declared above as the passage, and declaring
+                    // it again with a resource's type is the incoherent declaration that stops
+                    // the start. Resources leaves those out already; this holds should it have
+                    // been read before TeleportManager.
+                    if (TeleportManager.TryGet(mapId, resource.ElementId, out _)) continue;
                     Register(mapId, new Interactives.Element(resource.ElementId, resource.Cell,
                                                              resource.Gfx),
                              resource.Type, InteractiveActionKind.Gather, resource.SkillId);
+                }
             }
 
             // And the workshop stations, by their graphic too. One element can offer several
@@ -353,11 +360,11 @@ namespace Jondo.Unity.Server.Managers
             }
             if (books > 0) Console.WriteLine($"[Workshops] {books} artisans' books declared.");
 
-            // Le jss officiel de l'atelier 192937990 déclare les huit éléments présents dans les
-            // données de carte, y compris ceux dont le serveur n'offre aucune route. Sans f11 le
-            // client ne rattache pas certains dessins (notamment les soleils) à la carte. On
-            // déclare donc tous les éléments, mais sans leur inventer de compétence : seuls les
-            // fournisseurs passés ci-dessus restent cliquables et résolubles par iwo.
+            // The official jss of workshop 192937990 declares the eight elements present in the
+            // map data, including those for which the server offers no route. Without f11 the
+            // client does not attach some drawings (notably the suns) to the map. So all the
+            // elements are declared, but without inventing a skill for them: only the
+            // providers passed above stay clickable and resolvable by iwo.
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var element in Interactives.ElementsOf(mapId))
@@ -373,9 +380,9 @@ namespace Jondo.Unity.Server.Managers
                 : Array.Empty<RegisteredInteractive>();
 
         /// <summary>
-        /// Resuelve una petición del cliente. Con elemento e instancia presentes deben coincidir.
-        /// Se conservan las dos tolerancias anteriores: un campo proto3 ausente puede valer cero,
-        /// y un zaap único sigue pudiéndose usar si ambos campos llegan a cero.
+        /// Resolves a client request. With element and instance present they must match.
+        /// The two earlier tolerances are kept: an absent proto3 field may be zero,
+        /// and a single zaap can still be used if both fields arrive as zero.
         /// </summary>
         public static bool TryResolveUse(long mapId, int elementId, int skillInstanceId,
                                          out RegisteredInteractive interactive,
@@ -399,7 +406,7 @@ namespace Jondo.Unity.Server.Managers
                     foreach (var candidateAction in candidate.Actions)
                     {
                         if (candidateAction.SkillInstanceId != skillInstanceId) continue;
-                        if (action != null) return false; // instancia ambigua: no se adivina
+                        if (action != null) return false; // ambiguous instance: no guessing
                         interactive = candidate;
                         action = candidateAction;
                     }
@@ -407,7 +414,7 @@ namespace Jondo.Unity.Server.Managers
                 return action != null;
             }
 
-            // Compatibilidad con el viejo fallback del zaap cuando proto3 omitía los ceros.
+            // Compatibility with the old zaap fallback for when proto3 omitted the zeros.
             foreach (var candidate in entries)
             {
                 foreach (var candidateAction in candidate.Actions)

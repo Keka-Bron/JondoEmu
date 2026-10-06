@@ -8,37 +8,37 @@ using System.Text.Json.Serialization;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El modelo, con correa.
+/// The model, on a leash.
 ///
-/// La etapa 4 son miles de llamadas a un modelo de lenguaje, y eso trae tres problemas que no son
-/// de inteligencia sino de fontanería: cuesta dinero, falla a ratos, y si no se guarda lo que
-/// contesta hay que volver a pagarlo. Así que:
+/// Stage 4 is thousands of calls to a language model, and that brings three problems that are not
+/// of intelligence but of plumbing: it costs money, it fails now and then, and if what it answers is not kept
+/// one has to pay for it again. So:
 ///
-///   caché      cada pregunta se guarda en disco por su huella. Repetir un barrido entero después
-///              de tocar el formato de salida no cuesta nada.
-///   reintentos con espera creciente, y respetando el <c>retry-after</c> cuando lo manda. Un 429 a
-///              mitad de un barrido de dos mil mensajes no puede tirar el barrido.
-///   límite     de cuántas van a la vez, porque el proveedor lo tiene y prefiero llegar yo primero.
+///   cache      each question is stored on disk by its hash. Repeating a whole sweep after
+///              touching the output format costs nothing.
+///   retries    with growing waits, and respecting <c>retry-after</c> when it is sent. A 429
+///              halfway through a sweep of two thousand messages cannot bring the sweep down.
+///   limit      on how many go at once, because the provider has one and I prefer to get there first.
 ///
-/// El proveedor no está escrito a fuego, y hay dos motivos para eso. Uno es el dinero: un barrido
-/// entero son dos mil preguntas largas y conviene poder elegir a quién pagárselas. El otro es que
-/// un modelo que corre en la propia máquina —Ollama, LM Studio, llama.cpp— no cuesta nada y para
-/// desbrozar los mil mensajes sin evidencia puede sobrar.
+/// The provider is not set in stone, and there are two reasons for that. One is money: a whole
+/// sweep is two thousand long questions and it is worth being able to choose whom to pay for them. The other is that
+/// a model running on the machine itself —Ollama, LM Studio, llama.cpp— costs nothing and for
+/// clearing the thousand messages with no evidence it may be more than enough.
 ///
-/// De hablarle a cada proveedor se encarga <see cref="Wire"/>, que sabe los tres dialectos que hay
-/// —Anthropic, OpenAI y Gemini—. Aquí sólo está lo que da igual con quién se hable: la caché, los
-/// reintentos, el límite y lo que se le pide.
+/// Talking to each provider is handled by <see cref="Wire"/>, which knows the three dialects there are
+/// —Anthropic, OpenAI and Gemini—. Here is only what does not depend on whom one talks to: the cache, the
+/// retries, the limit and what is asked.
 ///
-/// Sin configuración se lee del entorno, que es como lo usa la línea de comandos:
+/// Without configuration it is read from the environment, which is how the command line uses it:
 ///
-///   JONDO_LLM_URL       por defecto https://api.anthropic.com
-///   JONDO_LLM_MODEL     por defecto claude-sonnet-5
-///   JONDO_LLM_KEY       o, si no está, ANTHROPIC_API_KEY
-///   JONDO_LLM_DIALECTO  anthropic (por defecto), openai o gemini
+///   JONDO_LLM_URL       by default https://api.anthropic.com
+///   JONDO_LLM_MODEL     by default claude-sonnet-5
+///   JONDO_LLM_KEY       or, if it is not there, ANTHROPIC_API_KEY
+///   JONDO_LLM_DIALECTO  anthropic (by default), openai or gemini
 /// </summary>
 public sealed class Llm : IDisposable
 {
-    /// <summary>Los tres idiomas en que se le puede pedir algo a un modelo por HTTP.</summary>
+    /// <summary>The three languages in which something can be asked of a model over HTTP.</summary>
     public enum Dialect
     {
         Anthropic,
@@ -46,10 +46,10 @@ public sealed class Llm : IDisposable
         Gemini,
     }
 
-    /// <summary>A quién se le pregunta, con qué y de cuántas en cuántas.</summary>
+    /// <summary>Whom one asks, with what and how many at a time.</summary>
     public sealed record Endpoint(string Url, string Model, string Key, Dialect Dialect, int AtOnce = 4)
     {
-        /// <summary>Lo que dice el entorno, que es como lo usa la línea de comandos.</summary>
+        /// <summary>What the environment says, which is how the command line uses it.</summary>
         public static Endpoint FromEnvironment()
         {
             string dialect = Environment.GetEnvironmentVariable("JONDO_LLM_DIALECTO") ?? "";
@@ -67,11 +67,11 @@ public sealed class Llm : IDisposable
         }
 
         /// <summary>
-        /// Si se le puede llamar.
+        /// Whether it can be called.
         ///
-        /// Un servidor de casa habla el dialecto de OpenAI y no pide clave, así que exigirla siempre
-        /// dejaría fuera justo el caso que no cuesta dinero. Lo que hace falta siempre es adónde ir
-        /// y con qué modelo.
+        /// A home server speaks the OpenAI dialect and asks for no key, so always requiring it
+        /// would leave out exactly the case that costs no money. What is always needed is where to go
+        /// and with which model.
         /// </summary>
         public bool Usable => Url.Length > 0 && Model.Length > 0 &&
                               (Dialect == Dialect.OpenAi || Key.Length > 0);
@@ -92,19 +92,19 @@ public sealed class Llm : IDisposable
 
     public string Model => _endpoint.Model;
 
-    /// <summary>Si hay con qué llamar. Sin eso, el barrido sólo puede volcar los expedientes.</summary>
+    /// <summary>Whether there is something to call with. Without that, the sweep can only dump the dossiers.</summary>
     public bool Ready => _endpoint.Usable;
 
-    /// <summary>Cuántas respuestas hay ya guardadas, de una tanda de preguntas.</summary>
+    /// <summary>How many answers are already stored, from a batch of questions.</summary>
     public int Cached(IEnumerable<(string Prompt, string System)> questions)
         => questions.Count(q => File.Exists(Path.Combine(_cache, Fingerprint(q.Prompt, q.System) + ".txt")));
 
     /// <summary>
-    /// Pregunta, o devuelve lo que ya se preguntó.
+    /// Asks, or returns what was already asked.
     ///
-    /// La huella incluye el modelo y las instrucciones, no sólo el expediente: cambiar el modelo o
-    /// afinar las instrucciones tiene que invalidar lo guardado, porque si no se estarían mezclando
-    /// respuestas de dos criterios distintos en la misma tabla.
+    /// The hash includes the model and the instructions, not only the dossier: changing the model or
+    /// fine-tuning the instructions has to invalidate what is stored, because otherwise one would be mixing
+    /// answers from two different criteria in the same table.
     /// </summary>
     public async Task<string> AskAsync(string prompt, string system, CancellationToken cancel = default)
     {
@@ -119,16 +119,16 @@ public sealed class Llm : IDisposable
         {
             string answer = await CallAsync(prompt, system, cancel);
 
-            // A la caché sólo va lo que se puede volver a leer. Un 200 con el cuerpo vacío, o con
-            // el JSON cortado porque se agotó el presupuesto de salida, es una respuesta perdida:
-            // guardarla la vuelve permanente, y a partir de ahí ese mensaje queda mudo para siempre
-            // sin que nadie sepa por qué. Que se vuelva a preguntar la próxima vez.
+            // Only what can be read again goes to the cache. A 200 with an empty body, or with
+            // the JSON cut because the output budget ran out, is a lost answer:
+            // storing it makes it permanent, and from then on that message stays mute forever
+            // without anyone knowing why. Let it be asked again next time.
             if (Read(answer) == null) return answer;
 
-            // Se escribe al lado y se mueve encima. Un barrido de dos mil preguntas se interrumpe
-            // —se corta la luz, se cansa uno y le da a control-C— y un fichero a medio escribir se
-            // lee luego como una respuesta buena y truncada, que es la peor clase de error: no
-            // falla, miente.
+            // It is written alongside and moved on top. A sweep of two thousand questions gets interrupted
+            // —the power goes, one gets tired and hits control-C— and a half-written file is
+            // later read as a good, truncated answer, which is the worst kind of error: it does not
+            // fail, it lies.
             string half = path + ".escribiendo";
             await File.WriteAllTextAsync(half, answer, cancel);
             File.Move(half, path, overwrite: true);
@@ -138,12 +138,12 @@ public sealed class Llm : IDisposable
     }
 
     /// <summary>
-    /// Le pregunta al proveedor qué modelos tiene.
+    /// Asks the provider which models it has.
     ///
-    /// Sirve para dos cosas a la vez, y por eso está: llena la lista para no tener que escribir a
-    /// mano un identificador, y de paso comprueba que la dirección es correcta y que la clave vale.
-    /// Si algo está mal, aquí se ve —con el mensaje que devuelva el proveedor— y no tres pantallas
-    /// más adelante, en mitad de un barrido de dos mil preguntas.
+    /// It serves two things at once, and that is why it is here: it fills the list so as not to have to type
+    /// an identifier by hand, and in passing it checks that the address is correct and the key is valid.
+    /// If something is wrong, it shows here —with the message the provider returns— and not three screens
+    /// later, in the middle of a sweep of two thousand questions.
     /// </summary>
     public async Task<IReadOnlyList<string>> CatalogueAsync(CancellationToken cancel = default)
     {
@@ -161,7 +161,7 @@ public sealed class Llm : IDisposable
         return await wire.ReadCatalogueAsync(response.Content, cancel);
     }
 
-    /// <summary>Lo que quepa del error, que algunos contestan con una página entera.</summary>
+    /// <summary>As much of the error as fits, since some answer with a whole page.</summary>
     private static string Short(string text)
         => text.Length <= 300 ? text : text[..300] + "…";
 
@@ -185,8 +185,8 @@ public sealed class Llm : IDisposable
 
             if (response.IsSuccessStatusCode) return await wire.ReadAsync(response.Content, cancel);
 
-            // Un servidor que no sepa pedir JSON por contrato contesta 400. Se le quita y se repite
-            // en el acto, sin contar el intento: no es que esté ocupado, es que no habla eso.
+            // A server that cannot ask for JSON by contract answers 400. It is removed and repeated
+            // at once, without counting the attempt: it is not that it is busy, it is that it does not speak that.
             if (response.StatusCode == HttpStatusCode.BadRequest && strictJson)
             {
                 strictJson = false;
@@ -219,14 +219,14 @@ public sealed class Llm : IDisposable
         _gate.Dispose();
     }
 
-    // ─── Lo que se le pide, y lo que se le prohíbe ──────────────────────────────────────
+    // ─── What is asked of it, and what it is forbidden ──────────────────────────────────
     //
-    // El principio que no se negocia: una propuesta sin en-qué-se-basa no entra en la tabla. Por eso
-    // el formato obliga a citar la evidencia, y por eso «no lo sé» es una respuesta válida y con
-    // premio: una fila vacía cuesta cero y una fila inventada cuesta una tarde de depuración
-    // persiguiendo un mensaje que nunca fue eso.
+    // The non-negotiable principle: a proposal without what-it-rests-on does not go into the table. That is why
+    // the format forces citing the evidence, and that is why «I do not know» is a valid answer and a
+    // rewarded one: an empty row costs zero and an invented row costs an afternoon of debugging
+    // chasing a message that was never that.
 
-    /// <summary>Las instrucciones, iguales para todos los expedientes del barrido.</summary>
+    /// <summary>The instructions, the same for all the sweep's dossiers.</summary>
     public static string System(IEnumerable<Dossier.Anchor> resolved)
     {
         var sb = new StringBuilder();
@@ -279,17 +279,17 @@ public sealed class Llm : IDisposable
         return sb.ToString();
     }
 
-    /// <summary>Lo que contesta el modelo, una vez leído.</summary>
+    /// <summary>What the model answers, once read.</summary>
     public sealed record Proposal(
         [property: JsonPropertyName("nombre")] string? Name,
         [property: JsonPropertyName("confianza")] string? Confidence,
         [property: JsonPropertyName("porque")] string? Because);
 
     /// <summary>
-    /// Saca el JSON de la respuesta aunque venga con adornos.
+    /// Extracts the JSON from the answer even if it comes with decorations.
     ///
-    /// Se le pide sin vallas de código y aun así a veces las pone. Antes que reintentar la llamada
-    /// —que cuesta— sale más barato buscar las llaves.
+    /// It is asked for without code fences and even so sometimes it puts them. Rather than retrying the call
+    /// —which costs— it is cheaper to look for the braces.
     /// </summary>
     public static Proposal? Read(string answer)
     {

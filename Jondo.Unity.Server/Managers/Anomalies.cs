@@ -7,45 +7,45 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las anomalías temporales: la pestaña que sale al lado de la lista de zaaps.
+    /// The temporal anomalies: the tab that appears next to the zaaps list.
     ///
-    /// ─── No son zaaps sin activar ───────────────────────────────────────────────────────────
+    /// ─── They are not unactivated zaaps ─────────────────────────────────────────────────────
     ///
-    /// Lo parecen: la tabla del cliente trae 62 zaaps y marca 15 como no activados, y esos 15 son
-    /// justo los que llevan el dibujo 74685 en vez del 301199. Pero el dibujo no es «otro modelo de
-    /// zaap», es el VESTIGIO, y el servidor real lo declara con tipo 359, no 16. Lo que hay en esos
-    /// mapas no es un zaap apagado: es el sitio donde puede aparecer una anomalía.
+    /// They look like it: the client's table carries 62 zaaps and marks 15 as not activated, and those
+    /// 15 are exactly the ones carrying drawing 74685 instead of 301199. But the drawing is not «another
+    /// zaap model», it is the VESTIGE, and the real server declares it with type 359, not 16. What
+    /// there is on those maps is not a switched-off zaap: it is the place where an anomaly can appear.
     ///
-    /// ─── Cómo viajan por el cable ───────────────────────────────────────────────────────────
+    /// ─── How they travel on the wire ────────────────────────────────────────────────────────
     ///
-    /// En el MISMO hjj que los zaaps y en el mismo campo repetido. Lo que las distingue son dos
-    /// campos que el zaap normal no manda:
+    /// In the SAME hjj as the zaaps and in the same repeated field. What tells them apart are two fields
+    /// the normal zaap does not send:
     ///
-    ///   f3 = 4          la pestaña. 1 es el zaapi, 4 la anomalía, y el zaap no manda el campo.
-    ///   f4 { f2, f3 }   el reloj: f2 minutos que le quedan, f3 los que dura.
+    ///   f3 = 4          the tab. 1 is the zaapi, 4 the anomaly, and the zaap does not send the field.
+    ///   f4 { f2, f3 }   the clock: f2 minutes it has left, f3 how long it lasts.
     ///
-    /// Y al elegirla el cliente contesta <c>hjc { f2: 4, f3: subzona }</c> — la SUBZONA, no el
-    /// mapa, que es al revés que el zaap y el zaapi. Por eso se indexan por subzona.
+    /// And on choosing it the client answers <c>hjc { f2: 4, f3: subarea }</c> -- the SUBAREA, not the
+    /// map, which is the reverse of the zaap and the zaapi. That is why they are indexed by subarea.
     ///
-    /// ─── Qué está medido y qué es nuestro ───────────────────────────────────────────────────
+    /// ─── What is measured and what is ours ──────────────────────────────────────────────────
     ///
-    /// Medido: los 120 minutos de duración (sale así en las 27 entradas), que el f2 baja de minuto
-    /// en minuto —entre dos capturas separadas 70,9 segundos, cinco de las seis anomalías activas
-    /// bajaron exactamente 1—, que el nivel es el de la subzona (16 de 16), que cuesta lo mismo que
-    /// ir a ese mapa en zaap, y que se aterriza en el mapa 196085762, de la subzona 916,
+    /// Measured: the 120 minutes of duration (it comes out like that in the 27 entries), that f2 goes
+    /// down minute by minute -- between two captures 70.9 seconds apart, five of the six active
+    /// anomalies went down exactly 1 --, that the level is the subarea's (16 of 16), that it costs the
+    /// same as going to that map by zaap, and that one lands on map 196085762, of subarea 916,
     /// «Anomalías temporales».
     ///
-    /// Nuestro: CUÁLES están activas. El servidor de Ankama rota unas seis cada dos horas y esa
-    /// rotación no está en ningún dato del cliente. Aquí se ofrecen las dieciséis medidas, todas a
-    /// la vez, cada una con su reloj. Es la decisión honesta: inventarse una rotación no la haría
-    /// más real, sólo escondería la mitad de las anomalías la mitad del tiempo.
+    /// Ours: WHICH ones are active. Ankama's server rotates about six every two hours and that rotation
+    /// is in no client data. Here the sixteen measured ones are offered, all at once, each with its
+    /// clock. It is the honest decision: making up a rotation would not make it more real, it would
+    /// only hide half the anomalies half the time.
     /// </summary>
     public static class Anomalies
     {
-        /// <summary>La pestaña donde el cliente las pone. 1 es el zaapi, 4 la anomalía.</summary>
+        /// <summary>The tab where the client puts them. 1 is the zaapi, 4 the anomaly.</summary>
         public const int Kind = 4;
 
-        /// <summary>Una anomalía: dónde está su vestigio y de qué zona es.</summary>
+        /// <summary>An anomaly: where its vestige is and which zone it belongs to.</summary>
         public readonly struct Anomaly
         {
             public Anomaly(long mapId, int subAreaId, int level, string name)
@@ -53,10 +53,10 @@ namespace Jondo.Unity.Server.Managers
                 MapId = mapId; SubAreaId = subAreaId; Level = level; Name = name;
             }
 
-            /// <summary>El mapa donde está el vestigio. Es lo que se cobra, como un zaap.</summary>
+            /// <summary>The map where the vestige is. It is what is charged, like a zaap.</summary>
             public long MapId { get; }
 
-            /// <summary>De qué zona es la anomalía. Es lo que el cliente manda en el hjc.</summary>
+            /// <summary>Which zone the anomaly belongs to. It is what the client sends in the hjc.</summary>
             public int SubAreaId { get; }
 
             public int Level { get; }
@@ -77,10 +77,10 @@ namespace Jondo.Unity.Server.Managers
         private static int _duration = 120;
         private static long _arrivalMap;
 
-        /// <summary>Cuántos minutos vive una anomalía. Del f4.f3 del hjj.</summary>
+        /// <summary>How many minutes an anomaly lives. From the hjj's f4.f3.</summary>
         public static int Duration { get { Ensure(); return _duration; } }
 
-        /// <summary>Dónde deja el servidor al viajar a una. Medido de la única captura que lo hace.</summary>
+        /// <summary>Where the server leaves one on travelling to one. Measured from the only capture that does it.</summary>
         /// <remarks>
         /// EVERY reader here goes through Ensure, this one above all: ZaapTravelHandler asks for
         /// the arrival map BEFORE it asks for the list, and bails out when GetMapInfo cannot find
@@ -164,9 +164,8 @@ namespace Jondo.Unity.Server.Managers
                 return;
             }
 
-            // Si no hay mapa de destino no se ofrece ninguna: una anomalía que no lleva a ningún
-            // sitio es una entrada en la lista que al clicarla no hace nada, y eso es peor que no
-            // enseñarla.
+            // If there is no destination map none is offered: an anomaly that leads nowhere is an
+            // entry in the list that does nothing when clicked, and that is worse than not showing it.
             if (_arrivalMap == 0 && _all.Count > 0)
             {
                 Console.WriteLine("[Anomalías] La lista no dice a qué mapa se viaja; no se ofrecen.");
@@ -186,13 +185,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Los minutos que le quedan a una anomalía.
+        /// The minutes an anomaly has left.
         ///
-        /// El reloj de verdad lo lleva el servidor de Ankama y no está en ningún dato del cliente,
-        /// así que éste es nuestro: baja de minuto en minuto hasta uno y vuelve a empezar, igual
-        /// que se ve en las capturas. El desfase por subzona es para que no caduquen todas a la vez
-        /// —en las capturas cada una llevaba su cuenta— y sale de la propia subzona para que sea
-        /// estable entre arranques sin tener que guardarlo en ningún sitio.
+        /// The real clock is kept by Ankama's server and is in no client data, so this one is ours: it goes
+        /// down minute by minute to one and starts again, the same as seen in the captures. The per-subarea
+        /// offset is so that they do not all expire at once -- in the captures each kept its own count --
+        /// and it comes from the subarea itself so that it is stable between starts without having to be
+        /// stored anywhere.
         /// </summary>
         public static int MinutesLeft(int subAreaId)
         {

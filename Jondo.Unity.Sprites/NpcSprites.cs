@@ -60,24 +60,24 @@ namespace Jondo.Unity.Sprites
     /// </remarks>
     public sealed class NpcSprites : IDisposable
     {
-        /// <summary>Lo alto que sale el dibujo, en píxeles. El ancho lo pone la figura.</summary>
+        /// <summary>How tall the drawing comes out, in pixels. The width is set by the figure.</summary>
         /// <remarks>
-        /// Era constante, y 96 se le quedaba corto al retrato del lanzador: el rasterizador toma
-        /// UNA muestra por píxel, sin suavizar nada, así que a 96 los bordes salen dentados y la
-        /// cara —que ocupa una docena de píxeles— se pierde. Dibujando más alto y dejando que
-        /// Avalonia lo reduzca al pintarlo, la reducción hace de supermuestreo y sale limpio.
+        /// It was a constant, and 96 fell short for the launcher's portrait: the rasteriser takes
+        /// ONE sample per pixel, without smoothing anything, so at 96 the edges come out jagged and the
+        /// face —which takes a dozen pixels— gets lost. Drawing taller and letting
+        /// Avalonia shrink it when painting, the shrinking acts as supersampling and it comes out clean.
         ///
-        /// Studio no lo toca: dibuja miles de NPCs en una rejilla y le sobra con los 96 de antes.
+        /// Studio does not touch it: it draws thousands of NPCs in a grid and the earlier 96 are plenty for it.
         /// </remarks>
         public int Height { get; set; } = 96;
 
-        /// <summary>La dirección que mira a cámara, medida mirando las cinco que trae el cliente.</summary>
+        /// <summary>The direction facing the camera, measured by looking at the five the client brings.</summary>
         /// <remarks>
-        /// La numeración del emulador —medida sobre las capturas, ver WorldMoveHandler— es
-        /// 0 este, 1 sureste, 2 sur, 3 suroeste, 4 oeste, 5 noroeste, 6 norte, 7 noreste. De las
-        /// ocho, un rig humanoide sólo trae cinco: {0,1,2,5,6}. Dibujadas las cinco y mirándolas,
-        /// la 2 es la única que enseña la cara y el cuerpo enteros; la 0 y la 1 salen de tres
-        /// cuartos con el escudo por delante, y la 5 y la 6 son la espalda.
+        /// The emulator's numbering —measured on the captures, see WorldMoveHandler— is
+        /// 0 east, 1 south-east, 2 south, 3 south-west, 4 west, 5 north-west, 6 north, 7 north-east. Of the
+        /// eight, a humanoid rig only brings five: {0,1,2,5,6}. Drawing all five and looking at them,
+        /// 2 is the only one showing the whole face and body; 0 and 1 come out in three-
+        /// quarter view with the shield in front, and 5 and 6 are the back.
         /// </remarks>
         private const int DeFrente = 2;
 
@@ -89,57 +89,57 @@ namespace Jondo.Unity.Sprites
         /// </remarks>
         private static readonly Regex Standing = new Regex(@"^AnimStatique_(\d+)$", RegexOptions.Compiled);
 
-        /// <summary>Cualquier postura estática de una dirección: lo que va detrás del último «_».</summary>
+        /// <summary>Any static pose of a direction: what goes after the last «_».</summary>
         /// <remarks>
-        /// Los rigs humanoides NO traen <c>AnimStatique_&lt;dir&gt;</c> a secas: de las 19 razas sólo
-        /// la 12 lo trae (medido abriendo los 19
-        /// <c>bones_assets_bone_1-&lt;raza&gt;-static.bundle</c> del cliente 3.6.10.11). Lo que traen
-        /// todas es la raza metida dentro del nombre y la dirección de sufijo:
+        /// Humanoid rigs do NOT bring a bare <c>AnimStatique_&lt;dir&gt;</c>: of the 19 breeds only
+        /// 12 brings it (measured by opening the 19
+        /// <c>bones_assets_bone_1-&lt;breed&gt;-static.bundle</c> of client 3.6.10.11). What they
+        /// all bring is the breed put inside the name and the direction as a suffix:
         /// <c>AnimStatiqueExploRetro9_6</c>, <c>AnimStatiqueExploNewAge4_1</c>,
-        /// <c>AnimStatiqueCombat9a_5</c>. Por eso pedir una dirección no puede casar sólo contra
-        /// <see cref="Standing"/>: no encontraría nunca nada en un personaje.
+        /// <c>AnimStatiqueCombat9a_5</c>. That is why asking for a direction cannot match only against
+        /// <see cref="Standing"/>: it would never find anything on a character.
         ///
-        /// Las transiciones —<c>AnimStatiqueExplo0_to_AnimStatiqueExploRetro13_5</c>— llevan también
-        /// el sufijo y hay que echarlas fuera a mano, que es lo que hace el <c>(?!.*_to_)</c>.
+        /// The transitions —<c>AnimStatiqueExplo0_to_AnimStatiqueExploRetro13_5</c>— also carry
+        /// the suffix and have to be thrown out by hand, which is what the <c>(?!.*_to_)</c> does.
         /// </remarks>
         private static readonly Regex Facing = new Regex(@"^AnimStatique(?!.*_to_).*_(\d+)$", RegexOptions.Compiled);
 
         private readonly Dictionary<string, Bitmap?> _drawn = new Dictionary<string, Bitmap?>();
 
         /// <summary>
-        /// La dirección que se quiere dibujar, o <c>null</c> para el reparto de siempre.
+        /// The direction to draw, or <c>null</c> for the usual distribution.
         /// </summary>
         /// <remarks>
-        /// Está aquí para poder MIRAR, no para cambiar nada: con <c>null</c> —que es lo que trae de
-        /// fábrica y lo que usan todos los llamantes de hoy— <see cref="StandingFrames"/> se
-        /// comporta exactamente igual que antes de existir esta propiedad.
+        /// It is here to be able to LOOK, not to change anything: with <c>null</c> —which is what it brings
+        /// by default and what all today's callers use— <see cref="StandingFrames"/>
+        /// behaves exactly as before this property existed.
         ///
-        /// El motivo: los retratos salen de espaldas. Ningún rig humanoide casa la expresión
-        /// <see cref="Standing"/>, así que <see cref="StandingFrames"/> cae siempre por su escalera
-        /// de reserva, que se queda con la PRIMERA animación del array — y esa primera es de
-        /// dirección 5 o 6 en 18 de las 19 razas (medido). O sea que la dirección no se está
-        /// eligiendo: sale la que el bundle puso delante.
+        /// The reason: the portraits come out from behind. No humanoid rig matches the expression
+        /// <see cref="Standing"/>, so <see cref="StandingFrames"/> always falls down its
+        /// fallback ladder, which keeps the FIRST animation of the array — and that first one is of
+        /// direction 5 or 6 in 18 of the 19 breeds (measured). That is, the direction is not being
+        /// chosen: the one the bundle put in front comes out.
         ///
-        /// Con <c>null</c>, que es lo normal, un HUMANOIDE se dibuja de frente
-        /// (<see cref="DeFrente"/>) y un monstruo se queda exactamente como estaba. Se separan
-        /// porque un hueso de monstruo no tiene las mismas animaciones y pedirle una dirección que
-        /// no trae sólo sirve para moverle la pose sin ganar nada.
+        /// With <c>null</c>, which is the normal case, a HUMANOID is drawn facing front
+        /// (<see cref="DeFrente"/>) and a monster stays exactly as it was. They are separated
+        /// because a monster bone does not have the same animations and asking it for a direction it does
+        /// not bring only moves its pose without gaining anything.
         ///
-        /// Poner un número aquí manda sobre las dos cosas, y es como se dibujaron las cinco para
-        /// poder compararlas.
+        /// Putting a number here rules over both things, and it is how the five were drawn to
+        /// be able to compare them.
         /// </remarks>
         public int? Direction { get; set; }
 
-        /// <summary>El nombre de la animación con la que se dibujó lo último. Para poder comprobarlo.</summary>
+        /// <summary>The name of the animation the last thing was drawn with. To be able to check it.</summary>
         public string LastAnimation { get; private set; } = "";
 
         /// <summary>
-        /// Si se pidió una <see cref="Direction"/> y el rig la traía de verdad.
+        /// Whether a <see cref="Direction"/> was asked for and the rig really brought it.
         /// </summary>
         /// <remarks>
-        /// Falso también cuando no se pidió ninguna. Hace falta porque la escalera de reserva no
-        /// deja nunca un hueco: sin este dato, una dirección que el rig no tiene devolvería un dibujo
-        /// —el de siempre— y pasaría por buena.
+        /// Also false when none was asked for. It is needed because the fallback ladder never
+        /// leaves a gap: without this datum, a direction the rig does not have would return a drawing
+        /// —the usual one— and would pass as good.
         /// </remarks>
         public bool LastDirectionFound { get; private set; }
 
@@ -153,7 +153,7 @@ namespace Jondo.Unity.Sprites
         /// <summary>What the last drawing was made of. For the self test, and for finding out why.</summary>
         public string LastMakeup { get; private set; } = "";
 
-        /// <summary>La dirección resuelta para el dibujo en curso. La pone <see cref="Draw"/>.</summary>
+        /// <summary>The direction resolved for the drawing in progress. <see cref="Draw"/> sets it.</summary>
         private int? _queMira;
 
 
@@ -173,14 +173,14 @@ namespace Jondo.Unity.Sprites
         public readonly Dictionary<string, int> Why = new Dictionary<string, int>(StringComparer.Ordinal);
 
         /// <summary>
-        /// Cuántos triángulos ha puesto cada hueco en el último dibujo, y cero para el que el rig
-        /// pidió y ninguna piel supo llenar.
+        /// How many triangles each slot put in the last drawing, and zero for the one the rig
+        /// asked for and no skin managed to fill.
         /// </summary>
         /// <remarks>
-        /// Hermano de <see cref="Why"/> y por el mismo motivo: aquí no falla nada nunca. Un hueco
-        /// vacío no lanza, no avisa y devuelve un dibujo — uno al que le falta la cara. Contarlos es
-        /// lo único que lo enseña, y es de lo que se agarra la prueba que vigila que la cabeza siga
-        /// dibujándose.
+        /// Sibling of <see cref="Why"/> and for the same reason: here nothing ever fails. An
+        /// empty slot does not throw, does not warn and returns a drawing — one that is missing the face. Counting them is
+        /// the only thing that shows it, and it is what the test that watches that the head keeps
+        /// being drawn holds on to.
         /// </remarks>
         public readonly Dictionary<string, int> LastSlots = new Dictionary<string, int>(StringComparer.Ordinal);
 
@@ -205,9 +205,9 @@ namespace Jondo.Unity.Sprites
             string look = (lookString ?? "").Trim();
             if (look.Length == 0) return null;
 
-            // La dirección Y LA ALTURA entran en la clave. Sin eso, el primero que pidiera una se
-            // la quedaba para todos: el lanzador dibuja a 256 y Studio a 96, y comparten proceso en
-            // las pruebas.
+            // The direction AND THE HEIGHT go into the key. Without that, the first to ask for one
+            // kept it for everyone: the launcher draws at 256 and Studio at 96, and they share a process in
+            // the tests.
             string key = $"{look}#{Direction?.ToString() ?? "-"}#{Height}";
 
             if (_drawn.TryGetValue(key, out var already)) return already;
@@ -257,8 +257,8 @@ namespace Jondo.Unity.Sprites
             string path = look.Humanoid ? HumanoidBundleFor(look) : BundleFor(look.Bone);
             if (path.Length == 0 || !File.Exists(path)) { Blame("no bone bundle"); return null; }
 
-            // Lo pedido manda; si no se pide nada, el humanoide mira de frente y el monstruo se
-            // queda como estaba.
+            // What is asked for rules; if nothing is asked for, the humanoid faces front and the monster
+            // stays as it was.
             _queMira = Direction ?? (look.Humanoid ? DeFrente : (int?)null);
 
             var manager = new AssetsManager();
@@ -323,7 +323,7 @@ namespace Jondo.Unity.Sprites
                         continue;
                     }
 
-                    // Símbolo negativo: la pieza la pone una PIEL, y el hueco va por nombre.
+                    // Negative symbol: a SKIN puts the piece in, and the slot goes by name.
                     if (piece.Name < 0 || piece.Name >= slots.Children.Count) continue;
 
                     string slot = slots.Children[piece.Name].AsString ?? "";
@@ -469,7 +469,7 @@ namespace Jondo.Unity.Sprites
 
 
 
-        /// <summary>DIAGNOSTICO TEMPORAL: nombre referenciado, profundidad, si se resolvio.</summary>
+        /// <summary>TEMPORARY DIAGNOSTIC: referenced name, depth, whether it was resolved.</summary>
         public static Action<string, int, bool>? RefWatch;
 
         private static void Walk(List<Piece> into, AssetTypeValueField mesh, AssetTypeValueField part,
@@ -650,19 +650,19 @@ namespace Jondo.Unity.Sprites
         /// Only five of the eight directions are ever authored, and 26 of 53 bones ship exactly
         /// one. There is no eight-way sprite set in this data to build a rotation control on.
         ///
-        /// Con <see cref="Direction"/> puesta se antepone un peldaño a la escalera: la animación
-        /// estática que acabe en esa dirección. Se prueba en este orden, y el orden es el que dice
-        /// la medición sobre el cliente, no una preferencia:
+        /// With <see cref="Direction"/> set, a rung is put in front of the ladder: the static
+        /// animation ending in that direction. It is tried in this order, and the order is the one the
+        /// measurement on the client says, not a preference:
         ///
         /// <code>
-        ///   1. AnimStatique_&lt;dir&gt;            el nombre pelado — monstruos, y la raza 12
-        ///   2. AnimStatiqueExplo...&lt;raza&gt;_&lt;dir&gt;  la postura de paseo — las 19 razas
-        ///   3. AnimStatique*_&lt;dir&gt;           lo que quede, p. ej. la de combate
+        ///   1. AnimStatique_&lt;dir&gt;            the bare name — monsters, and breed 12
+        ///   2. AnimStatiqueExplo...&lt;breed&gt;_&lt;dir&gt;  the walking pose — the 19 breeds
+        ///   3. AnimStatique*_&lt;dir&gt;           whatever is left, e.g. the combat one
         /// </code>
         ///
-        /// Si el rig no trae esa dirección se sigue por la escalera de siempre, para que pedirla no
-        /// pueda dejar sin dibujo a nadie que hoy sí se dibuja. Que se haya conseguido o no lo dice
-        /// <see cref="LastDirectionFound"/>, y con qué animación exacta, <see cref="LastAnimation"/>.
+        /// If the rig does not bring that direction it carries on down the usual ladder, so that asking for it
+        /// cannot leave without a drawing anyone who is drawn today. Whether it was achieved or not is said by
+        /// <see cref="LastDirectionFound"/>, and with which exact animation, <see cref="LastAnimation"/>.
         /// </remarks>
         private byte[]? StandingFrames(AssetTypeValueField rig)
         {
@@ -673,7 +673,7 @@ namespace Jondo.Unity.Sprites
 
             byte[]? asked = null;      // AnimStatique_<dir>
             byte[]? walking = null;    // AnimStatiqueExplo...<raza>_<dir>
-            byte[]? any = null;        // cualquier otra estática que acabe en _<dir>
+            byte[]? any = null;        // any other static one ending in _<dir>
 
             string standingName = "", nearlyName = "", anythingName = "";
             string askedName = "", walkingName = "", anyName = "";
@@ -707,11 +707,11 @@ namespace Jondo.Unity.Sprites
                         }
                         else if (name.StartsWith("AnimStatiqueExplo", StringComparison.Ordinal))
                         {
-                            // NewAge manda sobre Retro. Cada raza trae las dos posturas de reposo
-                            // y son distintas: la Retro sale encorvada y con los brazos abiertos, y
-                            // la NewAge de pie y con los brazos caídos, que es como se ve el
-                            // personaje en el juego. Sin esto ganaba la que el bundle pusiera
-                            // primero, que es la Retro en las 19 razas.
+                            // NewAge rules over Retro. Each breed brings both resting poses
+                            // and they are different: the Retro one comes out hunched and with open arms, and
+                            // the NewAge one standing with the arms down, which is how the
+                            // character is seen in the game. Without this the one the bundle put
+                            // first won, which is Retro in all 19 breeds.
                             if (name.Contains("NewAge", StringComparison.Ordinal))
                             {
                                 if (!yaEsNueva) { walking = raw; walkingName = name; yaEsNueva = true; }
@@ -767,10 +767,10 @@ namespace Jondo.Unity.Sprites
         /// One piece of the drawing, placed.
         /// </summary>
         /// <remarks>
-        /// <paramref name="Symbol"/> de cero para arriba indexa los gráficos del propio rig.
-        /// NEGATIVO —el menos uno incluido, que es donde viene la cabeza— quiere decir que la pieza
-        /// la pone una piel, y entonces <paramref name="Name"/> indexa <c>exposedNodeNames</c> para
-        /// decir qué hueco es.
+        /// <paramref name="Symbol"/> from zero upwards indexes the rig's own graphics.
+        /// NEGATIVE —minus one included, which is where the head comes— means that the piece
+        /// is put in by a skin, and then <paramref name="Name"/> indexes <c>exposedNodeNames</c> to
+        /// say which slot it is.
         /// </remarks>
         private readonly record struct Placed(int Symbol, int Name,
                                               float A, float B, float Tx, float C, float D, float Ty);
@@ -846,12 +846,12 @@ namespace Jondo.Unity.Sprites
 
                 // Everything drawable carries a matrix, and everything without one is a container.
                 //
-                // EL MENOS UNO CUENTA, y tirarlo era lo que dejaba a los personajes sin cara. El
-                // -99 es "este registro no nombra símbolo" y ése sí sobra; el -1 estaba metido en
-                // el mismo saco por parecido, y no es lo mismo: medido sobre la Ocra hembra, los
-                // registros de símbolo -1 son los que traen Tete_2 (91 triángulos), Thorax_2 (20) y
-                // la sombra. Sin ellos sale un cuerpo entero, vestido y decapitado, y no falla
-                // nada: por eso llevaba tanto ahí.
+                // MINUS ONE COUNTS, and throwing it away was what left the characters without a face. The
+                // -99 is "this record names no symbol" and that one is indeed superfluous; -1 had been put in
+                // the same bag for looking alike, and it is not the same: measured on the female Cra, the
+                // symbol -1 records are the ones bringing Tete_2 (91 triangles), Thorax_2 (20) and
+                // the shadow. Without them a whole body comes out, dressed and beheaded, and nothing
+                // fails: that is why it had been there so long.
                 if ((flags & 0x10) != 0 && symbol != -99)
                 {
                     placed.Add(new Placed(
@@ -911,55 +911,55 @@ namespace Jondo.Unity.Sprites
         private const int Untinted = -1;
 
         /// <summary>
-        /// El gris que vale por «este píxel sale con el color tal cual», al teñir.
+        /// The grey that counts as «this pixel comes out with the colour as is», when tinting.
         /// </summary>
         /// <remarks>
-        /// Aquí se dividía entre 255, y eso es tratar el BLANCO como neutro: entonces todo lo que
-        /// no fuera blanco salía más oscuro que el color pedido, y la piel —#E59B68, un tostado
-        /// claro— acababa en (96,65,44), un marrón de barro. Era el «los personajes salen muy
-        /// oscuros».
+        /// Here it divided by 255, and that is treating WHITE as neutral: then everything that
+        /// was not white came out darker than the colour asked for, and the skin —#E59B68, a light
+        /// tan— ended up at (96,65,44), a mud brown. It was the «the characters come out very
+        /// dark».
         ///
-        /// El arte gris no está pintada alrededor del blanco sino alrededor del gris medio, que es
-        /// la convención de siempre para una capa que se va a multiplicar. Medido sobre los 10.951
-        /// texels con tinte de la Ocra hembra vestida: mediana 106, media 107,6, con el 10 % en 71
-        /// y el 90 % en 140. O sea repartida alrededor de 128 y un pelo por debajo, que es lo que
-        /// se espera de un dibujo que además lleva su sombreado dentro.
+        /// The grey art is not painted around white but around mid grey, which is
+        /// the usual convention for a layer that is going to be multiplied. Measured over the 10,951
+        /// tinted texels of the dressed female Cra: median 106, mean 107.6, with the 10 % at 71
+        /// and the 90 % at 140. That is spread around 128 and a hair below, which is what
+        /// is expected of a drawing that also carries its shading inside.
         ///
-        /// Con 128, un texel neutro sale exactamente del color pedido y el sombreado lo baja desde
-        /// ahí. Lo que quede por encima se recorta, que es lo que hace el propio cliente con sus
-        /// brillos.
+        /// With 128, a neutral texel comes out exactly at the colour asked for and the shading lowers it from
+        /// there. Whatever is left above is clipped, which is what the client itself does with its
+        /// highlights.
         /// </remarks>
         private const int GrisNeutro = 128;
 
-        /// <summary>Un canal del arte gris, teñido con el color que pide el aspecto.</summary>
+        /// <summary>A channel of the grey art, tinted with the colour the look asks for.</summary>
         /// <remarks>
-        /// Superposición, no multiplicación. Multiplicar es lo que había y no vale para esta arte:
-        /// el gris no es una máscara de opacidad sino un DIBUJO con sus sombras y sus brillos
-        /// dentro, y multiplicar trata el blanco como neutro, así que todo lo que no fuera blanco
-        /// salía más oscuro que el color pedido. La piel —#E59B68, un tostado claro— acababa en
-        /// (96,65,44), un marrón de barro: era el «los personajes salen muy oscuros».
+        /// Overlay, not multiplication. Multiplying is what there was and it does not work for this art:
+        /// the grey is not an opacity mask but a DRAWING with its shadows and its highlights
+        /// inside, and multiplying treats white as neutral, so everything that was not white
+        /// came out darker than the colour asked for. The skin —#E59B68, a light tan— ended up at
+        /// (96,65,44), a mud brown: it was the «the characters come out very dark».
         ///
-        /// Dividir entre 128 en vez de entre 255 arregla la piel y rompe lo demás: el oro y el
-        /// blanco se van de rango y se aplastan todos en el mismo blanco, y el personaje sale
-        /// lavado.
+        /// Dividing by 128 instead of 255 fixes the skin and breaks the rest: the gold and the
+        /// white go out of range and all get flattened into the same white, and the character comes out
+        /// washed out.
         ///
-        /// Con superposición el gris medio da el color EXACTO, por debajo sombrea y por encima sube
-        /// hacia el blanco sin aplastarse.
+        /// With overlay mid grey gives the EXACT colour, below it shades and above it rises
+        /// towards white without flattening.
         ///
-        /// Que es lo que pide el dato. Medidos los texels de la Ocra hembra vestida, hueco a hueco
-        /// y separados por el color que piden:
+        /// Which is what the data asks for. Measuring the dressed female Cra's texels, slot by slot
+        /// and separated by the colour they ask for:
         ///
         /// <code>
-        ///   piel      #E59B68   3.967 texels   p10  89   mediana 107   p90 140
-        ///   pelo      #DB7933     960          p10 109   mediana 156   p90 158
-        ///   ropa      #756F2B   2.479          p10  71   mediana  90   p90 140
-        ///   cuero     #8F5203   1.991          p10  57   mediana  92   p90 109
-        ///   oro       #FA950F   1.145          p10  89   mediana 115   p90 147
+        ///   skin      #E59B68   3,967 texels   p10  89   median 107   p90 140
+        ///   hair      #DB7933     960          p10 109   median 156   p90 158
+        ///   clothes   #756F2B   2,479          p10  71   median  90   p90 140
+        ///   leather   #8F5203   1,991          p10  57   median  92   p90 109
+        ///   gold      #FA950F   1,145          p10  89   median 115   p90 147
         /// </code>
         ///
-        /// Las cinco reparten alrededor del gris medio, ninguna alrededor del blanco. Con la piel
-        /// se ve mejor que con ninguna porque es la que más superficie ocupa: multiplicando salía
-        /// en (96,65,44) y así sale en (192,130,87), que es el tostado que pide el aspecto.
+        /// All five are spread around mid grey, none around white. With the skin
+        /// it shows better than with any because it is the one covering most surface: multiplying it came out
+        /// at (96,65,44) and this way it comes out at (192,130,87), which is the tan the look asks for.
         /// </remarks>
         private static int Tenir(int gris, int color)
             => gris < 128
@@ -990,8 +990,8 @@ namespace Jondo.Unity.Sprites
             int height = Math.Max(16, Height);
             float scale = height / (top - bottom);
 
-            // El tope del ancho sube con la altura: era 512 fijo, y con 96 de alto no lo tocaba
-            // nadie, pero a 256 una figura ancha se habría quedado cortada por la derecha.
+            // The width cap goes up with the height: it was a fixed 512, and with 96 tall nobody
+            // reached it, but at 256 a wide figure would have been cut off on the right.
             int width = Math.Max(1, Math.Min(height * 8, (int)MathF.Ceiling((right - left) * scale)));
 
             var canvas = new byte[width * height * 4];

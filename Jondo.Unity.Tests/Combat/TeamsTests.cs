@@ -5,20 +5,20 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Los dos bandos de un combate, y las preguntas que el motor les hace.
+    /// The two sides of a fight, and the questions the engine asks them.
     /// </summary>
     /// <remarks>
-    /// Se llamaban <c>Team0</c> y <c>Team1</c>, con «// Players» y «// Monsters» al lado. Ciento
-    /// cinco referencias más adelante eso había dejado de ser un comentario y era una creencia:
-    /// medio motor daba por hecho que en el azul está quien juega y enfrente hay bichos.
+    /// They were called <c>Team0</c> and <c>Team1</c>, with «// Players» and «// Monsters» next to them. A hundred
+    /// and five references later that had stopped being a comment and was a belief:
+    /// half the engine took for granted that the one playing is on blue and opposite there are creatures.
     ///
-    /// Contra monstruos es verdad. En un desafío es verdad para UNO de los dos, y de ahí salió una
-    /// clase entera de fallos que no llevaban ningún «if» porque nadie sabía que eran supuestos.
-    /// Esto sujeta las preguntas que los sustituyen.
+    /// Against monsters it is true. In a challenge it is true for ONE of the two, and from there came a
+    /// whole class of bugs that carried no «if» because nobody knew they were assumptions.
+    /// This holds the questions that replace them.
     /// </remarks>
     public class TeamsTests
     {
-        /// <summary>Un desafío: una persona en cada lado.</summary>
+        /// <summary>A challenge: one person on each side.</summary>
         private static FightInstance UnDesafio()
         {
             var fight = new FightInstance(1, 100, 200) { Reglas = FightRules.Desafio };
@@ -28,7 +28,7 @@ namespace Jondo.Unity.Tests.Combat
             return fight;
         }
 
-        // ───────────────────────────────────────────── quién está en qué lado
+        // ───────────────────────────────────────────── who is on which side
 
         [Fact]
         public void Cada_uno_sabe_de_que_bando_es()
@@ -38,7 +38,7 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(FightInstance.Azules, fight.EquipoDe(10));
             Assert.Equal(FightInstance.Rojos, fight.EquipoDe(20));
 
-            // Y quien no está en el combate no es de ningún bando, que no es lo mismo que ser azul.
+            // And whoever is not in the fight belongs to no side, which is not the same as being blue.
             Assert.Equal(-1, fight.EquipoDe(999));
         }
 
@@ -65,14 +65,14 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Quien_no_esta_no_tiene_ni_aliados_ni_enemigos()
         {
-            // Devolver el bando azul por descarte es justo el fallo que esto viene a impedir.
+            // Returning the blue side by elimination is exactly the bug this is here to prevent.
             var fight = UnDesafio();
 
             Assert.Empty(fight.Aliados(999));
             Assert.Empty(fight.Enemigos(999));
         }
 
-        // ───────────────────────────────────────────── quién ha ganado
+        // ───────────────────────────────────────────── who has won
 
         [Fact]
         public void Ganar_depende_del_lado_en_el_que_estuvieras()
@@ -83,9 +83,9 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(fight.HaGanado(10));
             Assert.False(fight.HaGanado(20));
 
-            // «Sigue vivo el azul» es un hecho del combate; «he ganado» es del que pregunta. Se
-            // escribían con el mismo booleano y por eso el perdedor de un desafío recibía la lista
-            // de resultados con los bandos cambiados.
+            // «Blue is still alive» is a fact of the fight; «I have won» belongs to whoever asks. They
+            // were written with the same boolean and that is why the loser of a challenge received the list
+            // of results with the sides swapped.
             Assert.True(fight.SigueVivo(FightInstance.Azules));
             Assert.False(fight.SigueVivo(FightInstance.Rojos));
         }
@@ -96,15 +96,15 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(UnDesafio().HaGanado(999));
         }
 
-        // ───────────────────────────────────────────── el «listo»
+        // ───────────────────────────────────────────── the «ready»
 
         [Fact]
         public void El_combate_no_empieza_hasta_que_los_dos_estan_listos()
         {
-            // Esto miraba SOLO el azul, en sus dos mitades: el combate arrancaba en cuanto pulsaba
-            // listo el retador —su bando estaba entero listo porque era él solo— y el «listo» del
-            // retado no se apuntaba en ninguna parte. Es lo que se veía como «uno ya está peleando
-            // y el otro sigue en colocación».
+            // This looked ONLY at blue, in both its halves: the fight started as soon as the challenger
+            // pressed ready —his side was all ready because it was just him— and the challenged's
+            // «ready» was recorded nowhere. It is what was seen as «one is already fighting
+            // and the other is still in placement».
             var fight = UnDesafio();
 
             Assert.False(fight.SetFighterReady(10));
@@ -117,8 +117,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Contra_monstruos_basta_con_que_pulse_el_jugador()
         {
-            // Un bicho no pulsa nada, así que no cuenta para esperar. Sin esta parte, el arreglo
-            // de arriba dejaría todos los combates contra monstruos sin empezar jamás.
+            // A creature presses nothing, so it does not count for waiting. Without this part, the fix
+            // above would leave every fight against monsters never starting.
             var fight = new FightInstance(2, 100, 200);
             fight.GeneratePlacementCells(Enumerable.Range(200, 40).ToList());
             fight.AddPlayer(new Fighter { Id = 10, MaxHP = 500, CurrentHP = 500 });
@@ -147,8 +147,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Nadie_se_coloca_en_las_casillas_del_otro()
         {
-            // Se comprobaba siempre contra las azules, que contra monstruos da igual porque en el
-            // azul sólo hay una persona. En un desafío dejaba al retado sin poder recolocarse.
+            // It was always checked against the blue ones, which against monsters does not matter because on
+            // blue there is only one person. In a challenge it left the challenged unable to reposition.
             var fight = UnDesafio();
             int suya = fight.Buscar(20).CellId;
 

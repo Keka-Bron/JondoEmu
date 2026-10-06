@@ -6,21 +6,21 @@ using System.Text.Json.Serialization;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// Cómo se le habla a un proveedor por HTTP.
+/// How to talk to a provider over HTTP.
 ///
-/// Los tres grandes piden lo mismo con formas distintas, y ninguno se parece lo bastante a otro
-/// como para poder tratarlos con un <c>if</c>:
+/// The three big ones ask for the same thing with different shapes, and none resembles another enough
+/// to be able to treat them with an <c>if</c>:
 ///
-///   Anthropic   POST /v1/messages          las instrucciones en su propio hueco, clave en x-api-key
-///   OpenAI      POST /v1/chat/completions  las instrucciones como un mensaje con papel «system»,
-///                                          clave como Bearer. Es el que hablan también DeepSeek,
-///                                          Ollama, LM Studio, vLLM y casi todo lo que se pueda
-///                                          levantar en casa.
-///   Gemini      POST /v1beta/models/{modelo}:generateContent   el modelo va en la RUTA, no en el
-///                                          cuerpo; clave en x-goog-api-key
+///   Anthropic   POST /v1/messages          the instructions in their own slot, key in x-api-key
+///   OpenAI      POST /v1/chat/completions  the instructions as a message with role «system»,
+///                                          key as Bearer. It is the one DeepSeek,
+///                                          Ollama, LM Studio, vLLM and almost anything that can be
+///                                          run at home also speak.
+///   Gemini      POST /v1beta/models/{model}:generateContent   the model goes in the PATH, not in the
+///                                          body; key in x-goog-api-key
 ///
-/// Cada uno en su clase y el resto del código sin enterarse. Añadir un cuarto es escribir una clase
-/// de treinta líneas, no tocar el que ya funciona.
+/// Each in its class and the rest of the code none the wiser. Adding a fourth is writing a
+/// thirty-line class, not touching the one that already works.
 /// </summary>
 public abstract class Wire
 {
@@ -31,50 +31,50 @@ public abstract class Wire
         _ => new OpenAiWire(),
     };
 
-    /// <summary>La dirección completa a la que se pregunta.</summary>
+    /// <summary>The full address asked.</summary>
     public abstract string Address(string baseUrl, string model);
 
-    /// <summary>El cuerpo de la pregunta.</summary>
+    /// <summary>The question's body.</summary>
     public abstract object Body(string model, string system, string prompt, bool strictJson);
 
-    /// <summary>Cómo se acredita uno. Sin clave no se pone nada: un servidor de casa no la pide.</summary>
+    /// <summary>How one authenticates. Without a key nothing is set: a home server does not ask for one.</summary>
     public abstract void Authorize(HttpRequestMessage request, string key);
 
-    /// <summary>El texto que ha contestado, sacado de donde lo ponga cada uno.</summary>
+    /// <summary>The text it answered, taken from wherever each one puts it.</summary>
     public abstract Task<string> ReadAsync(HttpContent content, CancellationToken cancel);
 
     /// <summary>
-    /// Si se le puede pedir el JSON por contrato.
+    /// Whether JSON can be asked for by contract.
     ///
-    /// Anthropic no tiene esa palanca —se le pide en las instrucciones y ya— pero los otros dos sí,
-    /// y con ella el modelo no puede contestar con vallas de código ni con un párrafo de cortesía
-    /// delante. Es lo único que merece la pena copiarle al cliente de Snowbot.
+    /// Anthropic does not have that lever —it is asked for in the instructions and that is it— but the other two do,
+    /// and with it the model cannot answer with code fences nor with a courtesy paragraph
+    /// in front. It is the only thing worth copying from Snowbot's client.
     /// </summary>
     public virtual bool SupportsStrictJson => true;
 
     /// <summary>
-    /// Dónde preguntar qué modelos hay.
+    /// Where to ask which models there are.
     ///
-    /// Los tres tienen una lista y los tres la dan por GET, así que no hay por qué hacer escribir a
-    /// mano un identificador como <c>claude-sonnet-5</c> o <c>qwen2.5-coder:14b</c> y descubrir la
-    /// errata cuando falle la primera pregunta. Con un servidor de casa es todavía más útil: nadie
-    /// se acuerda de cómo se llamaba exactamente lo que se bajó.
+    /// All three have a list and all three give it by GET, so there is no reason to make anyone type
+    /// an identifier like <c>claude-sonnet-5</c> or <c>qwen2.5-coder:14b</c> by hand and discover the
+    /// typo when the first question fails. With a home server it is even more useful: nobody
+    /// remembers exactly what the thing they downloaded was called.
     /// </summary>
     public abstract string Catalogue(string baseUrl);
 
-    /// <summary>Los nombres de modelo que devuelve esa lista.</summary>
+    /// <summary>The model names that list returns.</summary>
     public abstract Task<List<string>> ReadCatalogueAsync(HttpContent content, CancellationToken cancel);
 
     protected static string Trim(string url) => url.TrimEnd('/');
 
-    /// <summary>La raíz con su /v1 puesto una sola vez, la traiga ya el usuario o no.</summary>
+    /// <summary>The root with its /v1 put only once, whether the user brings it or not.</summary>
     protected static string WithVersion(string baseUrl, string version)
     {
         string root = Trim(baseUrl);
         return root.EndsWith("/" + version, StringComparison.Ordinal) ? root : root + "/" + version;
     }
 
-    /// <summary>La forma en que OpenAI y Anthropic dan su catálogo: {"data":[{"id":...}]}.</summary>
+    /// <summary>The way OpenAI and Anthropic give their catalogue: {"data":[{"id":...}]}.</summary>
     protected static async Task<List<string>> ReadDataIdsAsync(HttpContent content, CancellationToken cancel)
     {
         var list = await content.ReadFromJsonAsync<Catalogued>(cancel);
@@ -124,14 +124,14 @@ public abstract class Wire
                                     [property: JsonPropertyName("text")] string? Text);
     }
 
-    // ─── OpenAI y todo lo que le copia ──────────────────────────────────────────────────
+    // ─── OpenAI and everything that copies it ───────────────────────────────────────────
 
     private sealed class OpenAiWire : Wire
     {
         public override string Address(string baseUrl, string model)
         {
-            // Muchos proveedores dan la dirección con el /v1 puesto y otros sin él. Poner uno de más
-            // da un 404 que no dice por qué, así que se mira antes de añadirlo.
+            // Many providers give the address with the /v1 on and others without it. Adding one too many
+            // gives a 404 that does not say why, so it is checked before adding it.
             string root = Trim(baseUrl);
             return root.EndsWith("/v1", StringComparison.Ordinal)
                 ? root + "/chat/completions"
@@ -157,8 +157,8 @@ public abstract class Wire
 
         public override void Authorize(HttpRequestMessage request, string key)
         {
-            // Mandar «Bearer » a secas hace que algunos se quejen de una credencial mal formada en
-            // vez de atender, así que sin clave no se manda cabecera ninguna.
+            // Sending a bare «Bearer » makes some complain about a malformed credential instead
+            // of serving, so without a key no header at all is sent.
             if (key.Length == 0) return;
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
         }
@@ -193,8 +193,8 @@ public abstract class Wire
         }
 
         /// <summary>
-        /// Google los da con el prefijo puesto: «models/gemini-…». Se le quita, porque el nombre que
-        /// hay que volver a mandarle en la ruta es el de después de la barra.
+        /// Google gives them with the prefix on: «models/gemini-…». It is removed, because the name that
+        /// has to be sent back to it in the path is the one after the slash.
         /// </summary>
         public override async Task<List<string>> ReadCatalogueAsync(HttpContent content, CancellationToken cancel)
         {
@@ -222,8 +222,8 @@ public abstract class Wire
 
         public override void Authorize(HttpRequestMessage request, string key)
         {
-            // En la cabecera y no en la URL a propósito: una clave en la barra de direcciones
-            // acaba en los registros del servidor y en el historial de quien depure con curl.
+            // In the header and not in the URL on purpose: a key in the address bar
+            // ends up in the server's logs and in the history of whoever debugs with curl.
             if (key.Length > 0) request.Headers.Add("x-goog-api-key", key);
         }
 

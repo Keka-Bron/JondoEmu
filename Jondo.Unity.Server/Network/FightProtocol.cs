@@ -6,61 +6,61 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// Los mensajes del combate de la 3.6.10.10, medidos de las quince capturas de
+    /// The fight messages of 3.6.10.10, measured from the fifteen captures of
     /// <c>Wireshark captures from real game\Combate</c>.
     ///
-    /// Hacía falta empezar de cero: de los cuarenta y ocho opcodes que usaba el manejador de
-    /// combate sólo siete siguen existiendo en esta versión, y en las capturas salen doscientos
-    /// setenta y uno que el código no nombraba. Lo que sí se aprovecha es la máquina de estados
-    /// —equipos, colocación, turnos, botín—: lo que estaba mal era el cable, no el diseño.
+    /// It was necessary to start from scratch: of the forty-eight opcodes the fight handler
+    /// used only seven still exist in this version, and in the captures two hundred and
+    /// seventy-one appear that the code did not name. What is reused is the state machine
+    /// —teams, placement, turns, loot—: what was wrong was the wire, not the design.
     ///
-    /// Esta clase cubre de momento la PREPARACIÓN, que es de lo que hay medida completa. El resto
-    /// del combate está a medio descifrar y se irá añadiendo aquí; lo que falta está apuntado en
+    /// This class covers for now the PREPARATION, which is what there is a complete measurement of. The rest
+    /// of the fight is half deciphered and will be added here; what is missing is noted in
     /// docs/fight.md.
     ///
-    /// El hilo de la preparación, leído del orden real de la captura (tools/hilo.py mezcla los dos
-    /// sentidos por reloj, que es lo que `pcap.streams` no sabe hacer):
+    /// The preparation thread, read from the real order of the capture (tools/hilo.py merges both
+    /// directions by clock, which is what `pcap.streams` cannot do):
     ///
-    ///   cliente  hqa { f1: id del grupo de monstruos }   atacar
-    ///   servidor jsq                                     vacío, enterado
-    ///   servidor ...el cambio de mapa normal: kub, jru, lva...
-    ///   servidor jxg   una por combatiente
-    ///   servidor kba   las casillas azules y las rojas
-    ///   servidor jzu   quién va en cada equipo
-    ///   servidor jwq   vacío
-    ///   servidor jrk { f2: 10, f4: mapa }
-    ///   cliente  jzy { f1: quién, f2: casilla }          se coloca
-    ///   servidor kmk { f1: casilla, f2: orientación, f3: quién }
-    ///   cliente  kaq { f1: 1 }                           el botón de listo
-    ///   servidor kah { f1: quién, f3: 1 }
+    ///   client   hqa { f1: monster group id }            attack
+    ///   server   jsq                                     empty, acknowledged
+    ///   server   ...the normal map change: kub, jru, lva...
+    ///   server   jxg   one per fighter
+    ///   server   kba   the blue cells and the red ones
+    ///   server   jzu   who goes in each team
+    ///   server   jwq   empty
+    ///   server   jrk { f2: 10, f4: map }
+    ///   client   jzy { f1: who, f2: cell }               places himself
+    ///   server   kmk { f1: cell, f2: orientation, f3: who }
+    ///   client   kaq { f1: 1 }                           the ready button
+    ///   server   kah { f1: who, f3: 1 }
     ///
-    /// Un detalle que ahorra trabajo: entre las casillas y el botón de listo el servidor NO manda
-    /// ningún temporizador —sólo los latidos del kqo—, así que la cuenta atrás de la colocación la
-    /// lleva el cliente por su cuenta. Al servidor le toca únicamente empezar el combate cuando se
-    /// le acaba el tiempo.
+    /// A detail that saves work: between the cells and the ready button the server sends NO
+    /// timer —only the kqo heartbeats—, so the placement countdown is kept by
+    /// the client on its own. The server only has to start the fight when the
+    /// time runs out.
     /// </summary>
     public static class FightProtocol
     {
         /// <summary>
-        /// El id con el que viaja "aquí no hay nadie" o "todavía no se sabe quién".
+        /// The id "nobody here" or "not known yet who" travels with.
         ///
-        /// Durante la colocación el bando enemigo viaja entero como -1: el grupo de monstruos no se
-        /// ha partido en combatientes hasta que el combate empieza de verdad. Y en el kmk una
-        /// casilla que se deja libre se manda con este mismo -1.
+        /// During placement the enemy side travels whole as -1: the monster group has not
+        /// been split into fighters until the fight really starts. And in the kmk a
+        /// cell that is vacated is sent with this same -1.
         /// </summary>
         public const long Nobody = -1;
 
-        /// <summary>Lo que lleva el jrk en su f2 en las quince capturas.</summary>
+        /// <summary>What the jrk carries in its f2 in the fifteen captures.</summary>
         private const int FightMapKind = 10;
 
         // ─── Empezar ────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// A qué grupo de monstruos ataca el cliente (hqa).
+        /// Which monster group the client attacks (hqa).
         ///
-        ///   f1: el id contextual del grupo, negativo
+        ///   f1: the group's contextual id, negative
         ///
-        /// Devuelve cero si el mensaje no trae grupo.
+        /// Returns zero if the message brings no group.
         /// </summary>
         public static long ReadFightRequest(byte[] payload)
         {
@@ -74,38 +74,38 @@ namespace Jondo.Unity.Server.Network
             return 0;
         }
 
-        /// <summary>Enterado del ataque (jsq). Va vacío.</summary>
+        /// <summary>Attack acknowledged (jsq). It goes empty.</summary>
         public static byte[] BuildFightAccepted() => Array.Empty<byte>();
 
         /// <summary>
-        /// "El mapa que viene es de combate" (kmp).
+        /// "The coming map is a fight one" (kmp).
         ///
-        /// Esta es LA marca, y va dentro del cambio de mapa, antes de cargarlo. Es lo que hace que
-        /// el cliente pida el combate con un ijm vacío en vez de pedir el contenido de un mapa
-        /// normal con jrh.
+        /// This is THE mark, and it goes inside the map change, before loading it. It is what makes
+        /// the client ask for the fight with an empty ijm instead of asking for the contents of a normal
+        /// map with jrh.
         ///
-        /// La correlación no deja lugar a dudas: en las treinta y nueve entradas a combate de las
-        /// veintitrés capturas, el último kmp antes del kam llevaba f1: 1 —treinta y nueve de
-        /// treinta y nueve— y en las setecientas dieciocho cargas de mapa corrientes iba vacío o no
-        /// iba, sin una sola excepción.
+        /// The correlation leaves no room for doubt: in the thirty-nine fight entries of the
+        /// twenty-three captures, the last kmp before the kam carried f1: 1 —thirty-nine out of
+        /// thirty-nine— and in the seven hundred and eighteen ordinary map loads it went empty or did not
+        /// go, without a single exception.
         ///
-        /// Sin esto el cliente carga el mapa táctico pero se queda en modo mapa normal, y todo lo
-        /// que llega detrás —los combatientes, las casillas, los equipos— le entra sin un combate
-        /// al que pertenecer. Lo que se ve entonces es el tablero dibujado y nada encima.
+        /// Without this the client loads the tactical map but stays in normal map mode, and everything
+        /// that comes after —the fighters, the cells, the teams— reaches it without a fight
+        /// to belong to. What is seen then is the board drawn and nothing on it.
         /// </summary>
         public static byte[] BuildFightMapComing() => Pb.New().Var(1, 1).Build();
 
         /// <summary>
-        /// Contra quién se va a pelear (kmu), al principio de la carga del mapa táctico.
+        /// Who is going to be fought (kmu), at the start of loading the tactical map.
         ///
-        ///   f2: el id contextual del grupo, el mismo negativo que llevará luego el kam
+        ///   f2: the group's contextual id, the same negative the kam will carry later
         ///
-        /// Comprobado en cuatro capturas contra monstruos: el número del kmu y el del kam.f3 son
-        /// el mismo.
+        /// Checked in four captures against monsters: the kmu's number and the kam.f3's are
+        /// the same.
         /// </summary>
         public static byte[] BuildFightAgainst(long defender) => Pb.New().Var(2, defender).Build();
 
-        /// <summary>Fin de la tanda de preparación (jwq). También va vacío.</summary>
+        /// <summary>End of the preparation batch (jwq). It also goes empty.</summary>
         public static byte[] BuildPlacementDone() => Array.Empty<byte>();
 
         /// <summary>
@@ -122,48 +122,48 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// En qué mapa se pelea (jrk).
+        /// Which map the fight is on (jrk).
         ///
-        ///   f2: 10      f3: vacío      f4: el mapa
+        ///   f2: 10      f3: empty      f4: the map
         ///
-        /// El f3 va presente y vacío en las capturas, así que se manda igual: es un submensaje sin
-        /// campos, que no es lo mismo que no mandarlo.
+        /// f3 goes present and empty in the captures, so it is sent the same: it is a submessage with no
+        /// fields, which is not the same as not sending it.
         /// </summary>
         public static byte[] BuildFightMap(long mapId)
             => Pb.New().Var(2, FightMapKind).EmptyMsg(3).Var(4, mapId).Build();
 
-        // ─── El combate existe ──────────────────────────────────────────────────
+        // ─── The fight exists ───────────────────────────────────────────────────
 
         /// <summary>
-        /// El mapa está listo (ijq). Va vacío y sale justo antes de que se anuncie el combate.
+        /// The map is ready (ijq). It goes empty and goes out right before the fight is announced.
         /// </summary>
         public static byte[] BuildMapReady() => Array.Empty<byte>();
 
         /// <summary>
-        /// Aquí hay un combate (kam). Es EL mensaje que le crea el combate al cliente.
+        /// There is a fight here (kam). It is THE message that creates the fight for the client.
         ///
-        ///   f2: de qué tipo         f3: contra quién
-        ///   f4: [las plantillas de los monstruos]
-        ///   f5: el id del combate   f6: quién lo empezó
+        ///   f2: what type           f3: against whom
+        ///   f4: [the monsters' templates]
+        ///   f5: the fight's id      f6: who started it
         ///
-        /// Sin esto no hay combate del que hablar y todo lo que va detrás cae en saco roto. Se ve
-        /// en el propio registro del cliente: al llegarle el jwq revienta con
+        /// Without this there is no fight to speak of and everything that comes after falls on deaf ears. It is seen
+        /// in the client's own log: on receiving the jwq it blows up with
         ///
         ///   NullReferenceException
         ///     at gum.blww (Google.Protobuf.Collections.RepeatedField`1[T] a)
         ///     at guk.blvw (jwq a)
         ///
-        /// que es el cliente recorriendo la lista de combatientes de un combate que no existe.
+        /// which is the client walking the fighter list of a fight that does not exist.
         ///
-        /// Lo que lleva cada campo, medido en las catorce aperturas de las capturas:
+        /// What each field carries, measured in the fourteen openings of the captures:
         ///
-        ///   f2  4 contra monstruos, 7 en el koliseo, y ausente en un desafío entre jugadores.
-        ///   f3  el grupo de monstruos, con su id contextual NEGATIVO, tal cual viaja en el jss.
-        ///       En un desafío es el id del otro jugador, positivo.
-        ///   f4  una lista empaquetada con una entrada POR MONSTRUO: contra un poutch va [494] y
-        ///       contra cuatro va [494, 494, 494, 494]. En un grupo de ocho salen ocho números
-        ///       distintos, y cuadran con las plantillas de los bichos.
-        ///   f5  el id del combate, que se repite luego en el kae y en cada kau.
+        ///   f2  4 against monsters, 7 in the koliseo, and absent in a challenge between players.
+        ///   f3  the monster group, with its NEGATIVE contextual id, just as it travels in the jss.
+        ///       In a challenge it is the other player's id, positive.
+        ///   f4  a packed list with one entry PER MONSTER: against one poutch it goes [494] and
+        ///       against four it goes [494, 494, 494, 494]. In a group of eight, eight different numbers
+        ///       come out, and they match the creatures' templates.
+        ///   f5  the fight's id, which is repeated later in the kae and in each kau.
         /// </summary>
         public static byte[] BuildFightAnnounced(int kind, long defender, IEnumerable<long> monsters,
                                                  long fightId, long starter)
@@ -178,45 +178,45 @@ namespace Jondo.Unity.Server.Network
             return kam.Var(5, fightId).VarIfNotZero(6, starter).Build();
         }
 
-        /// <summary>Contra monstruos. El koliseo es 7 y un desafío entre jugadores no lleva tipo.</summary>
+        /// <summary>Against monsters. The koliseo is 7 and a challenge between players carries no type.</summary>
         public const int AgainstMonsters = 4;
 
-        /// <summary>El koliseo. Medido: su kam llega «100728ee0a», o sea f2=7.</summary>
+        /// <summary>The koliseo. Measured: its kam arrives «100728ee0a», that is f2=7.</summary>
         public const int Koliseo = 7;
 
         /// <summary>
-        /// Lo que dura la colocación en el koliseo, en décimas.
+        /// How long placement lasts in the koliseo, in tenths.
         /// </summary>
         /// <remarks>
-        /// El 592 del kaa de la captura, tal cual. Son los sesenta segundos menos lo que tardó en
-        /// llegar la trama, igual que el 445 de un combate corriente son los cuarenta y cinco.
+        /// The 592 of the capture's kaa, as is. It is the sixty seconds minus what the frame took to
+        /// arrive, just as the 445 of an ordinary fight is the forty-five.
         /// </remarks>
         public const int KoliseoPlacementDeciseconds = 592;
 
         /// <summary>
-        /// Lo que acompaña al anuncio (kaa).
+        /// What accompanies the announcement (kaa).
         ///
-        ///   f3: 1      f4: 1      f5: ?      f6: el tipo de combate
+        ///   f3: 1      f4: 1      f5: ?      f6: the fight type
         ///
-        /// El f3 y el f4 valen 1 en las treinta y nueve aperturas y el f6 repite el tipo del kam.
+        /// f3 and f4 are 1 in the thirty-nine openings and f6 repeats the kam's type.
         ///
-        /// El f5 es LA CUENTA ATRÁS DE LA COLOCACIÓN, en décimas de segundo. Se sacó con el reloj
-        /// de la captura: en una vale 445 y veintisiete segundos y pico después vale 173, o sea 272
-        /// unidades en 27,4 segundos, 9,92 por segundo. Cuadra con los valores que se ven —442,
-        /// 444, 445, 446, que son los cuarenta y cinco segundos menos lo que tardó en llegar— y con
-        /// el 592 del koliseo, que da sus sesenta. Va ausente cuando el combate ya pasó de la
-        /// colocación.
+        /// f5 is THE PLACEMENT COUNTDOWN, in tenths of a second. It was worked out with the capture's
+        /// clock: in one it is 445 and twenty-seven-odd seconds later it is 173, that is 272
+        /// units in 27.4 seconds, 9.92 per second. It matches the values seen —442,
+        /// 444, 445, 446, which are the forty-five seconds minus what it took to arrive— and
+        /// the koliseo's 592, which gives its sixty. It goes absent when the fight is already past
+        /// placement.
         ///
-        /// Aquí se manda el tiempo que de verdad va a esperar el servidor antes de empezar solo,
-        /// para que el reloj del cliente y el del servidor cuenten lo mismo.
+        /// Here the time the server will really wait before starting on its own is sent,
+        /// so that the client's clock and the server's count the same.
         /// </summary>
         /// <summary>
-        /// El kaa de un desafio: seis bytes y SIN cuenta atras.
+        /// A challenge's kaa: six bytes and NO countdown.
         /// </summary>
         /// <remarks>
-        /// Medido en «enviar desafio y el otro acepta»: llega «f2=1 f3=1 f4=1» y nada mas. Ni el
-        /// f5 del tiempo ni el f6 del tipo. Por eso en un duelo no sale reloj de colocacion: no es
-        /// que se esconda, es que el servidor real no manda ninguno.
+        /// Measured in «enviar desafio y el otro acepta»: «f2=1 f3=1 f4=1» arrives and nothing else. Neither
+        /// the time's f5 nor the type's f6. That is why no placement clock appears in a duel: it is not
+        /// that it is hidden, it is that the real server sends none.
         /// </remarks>
         public static byte[] BuildDuelSummary()
             => Pb.New().Var(2, 1).Var(3, 1).Var(4, 1).Build();
@@ -238,11 +238,11 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// Una opción del combate (kau): bloquear a los mirones, cerrarlo al grupo y demás.
+        /// A fight option (kau): locking out spectators, closing it to the party and so on.
         ///
-        ///   f3: cuál       f5: el id del combate
+        ///   f3: which one   f5: the fight's id
         ///
-        /// Salen cuatro seguidas en cada apertura, con f3 valiendo 2, 1, 3 y la cuarta sin f3.
+        /// Four come out in a row at each opening, with f3 being 2, 1, 3 and the fourth without f3.
         /// </summary>
         public static byte[] BuildFightOption(int option, long fightId)
             => BuildFightOption(0, option, false, fightId);
@@ -255,32 +255,32 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildFightOption(int team, int option, bool on, long fightId)
             => Pb.New().VarIfNotZero(1, team).VarIfNotZero(3, option).VarIfNotZero(4, on ? 1 : 0).Var(5, fightId).Build();
 
-        /// <summary>Las cuatro que manda el servidor real, en su orden.</summary>
+        /// <summary>The four the real server sends, in their order.</summary>
         public static readonly int[] FightOptions = { 2, 1, 3, 0 };
 
-        // ─── Quién pelea ────────────────────────────────────────────────────────
+        // ─── Who fights ─────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Un combatiente (jxg).
+        /// A fighter (jxg).
         ///
-        ///   f2 { f1 { f1: casilla, f2: orientación, f4: 0 }
-        ///        f2 { f2: la ficha, f3: el aspecto }
-        ///        f3: quién es }
+        ///   f2 { f1 { f1: cell, f2: orientation, f4: 0 }
+        ///        f2 { f2: the sheet, f3: the look }
+        ///        f3: who it is }
         ///
-        /// Ojo con el f2 de fuera, que envuelve TODO y es fácil pasarlo por alto: sin él el cliente
-        /// parsea el mensaje, no encuentra ningún combatiente dentro y no dibuja nada. El tablero
-        /// sale con sus casillas azules y rojas y encima no hay nadie.
+        /// Mind the outer f2, which wraps EVERYTHING and is easy to overlook: without it the client
+        /// parses the message, finds no fighter inside and draws nothing. The board
+        /// comes out with its blue and red cells and there is nobody on it.
         ///
-        /// El sobre es EL MISMO que el de un actor del mapa en el jss: casilla y orientación
-        /// delante, el cuerpo en medio y el id detrás. Por eso el cliente sabe dibujar un
-        /// combatiente con el código que ya tiene, y por eso aquí se le puede pasar el bloque de
-        /// aspecto que ya construye el mapa sin tocarlo.
+        /// The envelope is THE SAME as that of a map actor in the jss: cell and orientation
+        /// in front, the body in the middle and the id behind. That is why the client knows how to draw a
+        /// fighter with the code it already has, and why here it can be passed the look
+        /// block the map already builds without touching it.
         ///
-        /// La ficha es una lista de características con la misma numeración que usa el emulador en
-        /// datos/characteristics.json: 0 vida, 1 PA, 23 PM, 27 y 28 esquivas, 33 a 37 las
-        /// resistencias. Durante la colocación casi todas viajan vacías —el valor de verdad no
-        /// llega hasta que empieza el combate—, así que replicarlo es mandar el hueco puesto y sin
-        /// número dentro.
+        /// The sheet is a list of characteristics with the same numbering the emulator uses in
+        /// datos/characteristics.json: 0 life, 1 AP, 23 MP, 27 and 28 dodges, 33 to 37 the
+        /// resistances. During placement almost all travel empty —the real value does not
+        /// arrive until the fight starts—, so replicating it is sending the slot set and with no
+        /// number inside.
         /// </summary>
         public static byte[] BuildFighter(int cell, int orientation, long fighterId,
                                           IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
@@ -290,16 +290,16 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// Todos los combatientes de golpe, con la ficha llena (jxb).
+        /// All the fighters at once, with the sheet full (jxb).
         ///
-        ///   f1 (repetido): un combatiente, el MISMO bloque que va dentro de la jxg
+        ///   f1 (repeated): a fighter, the SAME block that goes inside the jxg
         ///
-        /// Es lo que se manda al empezar el combate de verdad, y otra vez entero al reconectarse a
-        /// uno en curso. La diferencia con la colocación no es la forma sino lo que llevan dentro
-        /// las características: en la jxg de un monstruo van vacías y aquí llegan sus valores.
+        /// It is what is sent on starting the real fight, and again whole on reconnecting to
+        /// one in progress. The difference from placement is not the shape but what the
+        /// characteristics carry inside: in a monster's jxg they go empty and here their values arrive.
         ///
-        /// El orden en el que van NO es el de iniciativa —salen por bandos, los monstruos y luego
-        /// el jugador—, así que el carrusel no se ordena por aquí.
+        /// The order they go in is NOT the initiative one —they come out by side, the monsters and then
+        /// the player—, so the carousel is not ordered from here.
         /// </summary>
         public static byte[] BuildAllFighters(IEnumerable<Pb> fighters)
         {
@@ -308,70 +308,70 @@ namespace Jondo.Unity.Server.Network
             return jxb.Build();
         }
 
-        /// <summary>El bloque de un combatiente, que se reutiliza en la jxg y en el jxb.</summary>
+        /// <summary>A fighter's block, which is reused in the jxg and in the jxb.</summary>
         /// <summary>
-        /// Una característica de la ficha, con el valor en el hueco que le toca.
+        /// A sheet characteristic, with the value in the slot it belongs to.
         ///
-        /// Aquí estaba el motivo de que no se viera la previsualización de daños. El emulador metía
-        /// TODAS las características en el mismo molde, <c>f5 { f1: valor }</c>, que es el de los
-        /// puntos de acción y de movimiento —por eso ésos dos se pintaban bien y nada más—. El
-        /// servidor real usa tres moldes distintos, y se ve byte a byte en el jxb de la captura:
+        /// Here was the reason the damage preview was not seen. The emulator put
+        /// ALL the characteristics in the same mould, <c>f5 { f1: value }</c>, which is that of the
+        /// action and movement points —that is why those two were drawn right and nothing else—. The
+        /// real server uses three different moulds, and it is seen byte by byte in the capture's jxb:
         ///
-        ///   monstruo, todas          f2 { f2: valor }         y un f2 vacío si es cero
-        ///   jugador, PA(1) y PM(23)  f5 { f1: base, f5: del equipo }
-        ///   jugador, las demás       f4 { f2: base, f3: 100, f7: del equipo }   f4 vacío si cero
+        ///   monster, all             f2 { f2: value }         and an empty f2 if it is zero
+        ///   player, AP(1) and MP(23) f5 { f1: base, f5: from equipment }
+        ///   player, the rest         f4 { f2: base, f3: 100, f7: from equipment }   f4 empty if zero
         ///
-        /// La potencia del personaje de la captura viaja como <c>2a 07 08 19 22 03 38 96 01</c>, o
-        /// sea f5 { f1: 25, f4 { f7: 150 } }; la forma que emitía el emulador para eso mismo,
-        /// <c>2a 07 08 19 2a 03 08 96 01</c>, no aparece ni una vez en toda la captura.
+        /// The capture character's power travels as <c>2a 07 08 19 22 03 38 96 01</c>, that
+        /// is f5 { f1: 25, f4 { f7: 150 } }; the shape the emulator emitted for that same thing,
+        /// <c>2a 07 08 19 2a 03 08 96 01</c>, does not appear once in the whole capture.
         ///
-        /// El f3 con el cien sólo lo llevan las cinco que se reparten con puntos —fuerza,
-        /// vitalidad, suerte, agilidad e inteligencia—, tal cual se midió.
+        /// The f3 with the hundred is only carried by the five that are distributed with points —strength,
+        /// vitality, chance, agility and intelligence—, just as it was measured.
         /// </summary>
         private static readonly HashSet<int> ConMultiplicadorBase = new HashSet<int> { 10, 11, 13, 14, 15 };
 
-        /// <summary>Las dos que van en el molde de los puntos.</summary>
+        /// <summary>The two that go in the points mould.</summary>
         private const int ActionPoints = 1;
         private const int MovementPoints = 23;
 
         /// <summary>
-        /// «Malus de vida temporal»: LA VIDA QUE LE FALTA AL PERSONAJE QUE MANEJA EL CLIENTE.
+        /// «Malus de vida temporal»: THE LIFE THE CHARACTER THE CLIENT CONTROLS IS MISSING.
         ///
-        /// Y es la única forma que tiene el cliente de saberla. A los monstruos y al jugador de
-        /// enfrente les va descontando la vida de los golpes que ve pasar; la SUYA no, la suya la
-        /// saca del tope más esta característica. Está medido sin una sola excepción: de las 23
-        /// veces que aparece en las 305 capturas, las 23 van dirigidas al personaje propio. Ni una
-        /// a un monstruo, ni una al rival del duelo, que recibe golpes toda la pelea.
+        /// And it is the only way the client has of knowing it. For the monsters and the player
+        /// opposite it keeps subtracting the life of the hits it sees go by; ITS OWN no, its own it
+        /// takes from the cap plus this characteristic. It is measured without a single exception: of the 23
+        /// times it appears in the 305 captures, all 23 are addressed to one's own character. Not one
+        /// to a monster, not one to the duel's rival, who takes hits the whole fight.
         ///
-        /// Lleva dos números:
+        /// It carries two numbers:
         ///
-        ///   f2 = vida actual menos vida máxima ORIGINAL   (sube con las curas, baja con los golpes)
-        ///   f8 = no es la erosión
+        ///   f2 = current life minus ORIGINAL maximum life   (goes up with heals, down with hits)
+        ///   f8 = it is not the erosion
         ///
-        /// Comprobado contra una captura entera: −104 tras recibir 104, −5 tras curarse 99,
-        /// +128 tras curarse otros 133. La cuenta cuadra al punto las tres veces.
+        /// Checked against a whole capture: −104 after taking 104, −5 after healing 99,
+        /// +128 after healing another 133. The arithmetic matches to the point all three times.
         ///
-        /// Y con el desafío completo: f2 = −1567 con 1567 de daño acumulado y el tope ya
-        /// erosionado en 159, o sea que el tope de la resta es el de SALIDA, no el de ahora. El
-        /// f8 que aquí se leía como erosión vale −1122 en ese mismo mensaje y −3324 en el
-        /// siguiente, con 236 de erosión: no es eso. En la mazmorra de los jalatós sale en las
-        /// ocho 97 con valores entre −114 y −338 y el f2 llega a ser POSITIVO (+220) tras una
-        /// racha de curas. Es el hueco de embrujo del molde general y no se manda hasta saber
-        /// qué va dentro.
+        /// And with the complete challenge: f2 = −1567 with 1567 of accumulated damage and the cap already
+        /// eroded by 159, that is the cap of the subtraction is the STARTING one, not the current one. The
+        /// f8 that was read here as erosion is −1122 in that same message and −3324 in the
+        /// next, with 236 of erosion: it is not that. In the jalatós dungeon it comes out in all
+        /// eight 97 with values between −114 and −338 and f2 even becomes POSITIVE (+220) after a
+        /// streak of heals. It is the general mould's buff slot and it is not sent until it is known
+        /// what goes inside.
         ///
-        /// El emulador la mandaba una vez, vacía, al empezar el combate, y no la volvía a tocar:
-        /// por eso al jugador le pegaban toda la pelea y su barra seguía llena.
+        /// The emulator sent it once, empty, on starting the fight, and did not touch it again:
+        /// that is why the player was hit the whole fight and his bar stayed full.
         /// </summary>
         public const int TemporaryLifeMalus = 97;
 
         /// <param name="delEmbrujo">
-        /// EL HUECO DEL EMBRUJO, el f8. Es lo que los hechizos ponen y quitan durante el combate, y
-        /// va SEPARADO de la base y del equipo: el cliente guarda los tres y los suma él.
+        /// THE BUFF SLOT, f8. It is what spells set and remove during the fight, and it
+        /// goes SEPARATE from the base and the equipment: the client keeps all three and adds them itself.
         ///
-        /// Sin esto no había manera de refrescar una característica sin pisar lo demás, y era la
-        /// causa de que la previsualización de daño saliera mal. Medido sobre las 401 capturas:
-        /// 2.830 de las 3.279 entradas de jxw con molde detallado (86,3 %) lo llevan, y nosotros no
-        /// lo escribimos ni una vez en 1.713.
+        /// Without this there was no way to refresh a characteristic without trampling the rest, and it was the
+        /// cause of the damage preview coming out wrong. Measured over the 401 captures:
+        /// 2,830 of the 3,279 jxw entries with a detailed mould (86.3 %) carry it, and we did not
+        /// write it once in 1,713.
         /// </param>
         public static Pb SheetEntry(int characteristic, long baseValue, long fromGear, bool isMonster,
                                     long delEmbrujo = 0)
@@ -391,9 +391,9 @@ namespace Jondo.Unity.Server.Network
                 return entry.Msg(5, Pb.New().VarIfNotZero(1, baseValue).VarIfNotZero(5, fromGear));
             }
 
-            // La 97 tiene molde propio: f4 { f2, f8 }, y no f4 { f2, f7 } como las demás. Medido
-            // en las 23 apariciones que hay en las 305 capturas, y tres de ellas llevan SÓLO el
-            // f8. Ver TemporaryLifeMalus.
+            // 97 has its own mould: f4 { f2, f8 }, and not f4 { f2, f7 } like the rest. Measured
+            // on the 23 appearances in the 305 captures, and three of them carry ONLY
+            // f8. See TemporaryLifeMalus.
             if (characteristic == TemporaryLifeMalus)
             {
                 if (baseValue == 0 && fromGear == 0) return entry.EmptyMsg(4);
@@ -405,10 +405,10 @@ namespace Jondo.Unity.Server.Network
                 return entry.EmptyMsg(4);
             }
 
-            // El f3 con el cien NO se manda, aunque el servidor real lo lleve en cinco de ellas.
-            // Este cliente lo SUMA en vez de tomarlo como porcentaje: con él puesto, la ficha
-            // enseñaba 568 de fuerza donde hay 468, y cien de más en inteligencia, suerte y
-            // agilidad. Hasta saber qué espera exactamente, mejor no mandarlo.
+            // The f3 with the hundred is NOT sent, even though the real server carries it in five of them.
+            // This client ADDS it instead of taking it as a percentage: with it set, the sheet
+            // showed 568 strength where there are 468, and a hundred too many in intelligence, chance and
+            // agility. Until it is known what exactly it expects, better not to send it.
             var valor = Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(7, fromGear)
                           .VarIfNotZero(8, delEmbrujo);
             return entry.Msg(4, valor);
@@ -424,15 +424,15 @@ namespace Jondo.Unity.Server.Network
                 stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster));
             }
 
-            // Quién es, con su sitio repetido. Sale en los dos, con f2 sólo en los monstruos.
+            // Who it is, with its place repeated. It appears in both, with f2 only in the monsters.
             var where = Pb.New().Var(1, cell).VarIfNotZero(2, orientation).Var(4, 0);
             var again = Pb.New()
                 .VarIfNotZero(2, isMonster ? 1 : 0)
                 .Var(3, 1)
                 .Msg(4, Pb.New().Msg(1, where).Var(3, fighterId));
 
-            // El bloque del luchador: el identificador delante, la ficha, lo que dice qué es —f3 en
-            // un monstruo, f6 en un jugador— y el sitio otra vez en f7.
+            // The fighter's block: the identifier in front, the sheet, what says what it is —f3 in
+            // a monster, f6 in a player— and the place again in f7.
             var fighter = Pb.New()
                 .Var(1, isMonster ? 0 : fighterId)
                 .Msg(2, stats);
@@ -448,28 +448,28 @@ namespace Jondo.Unity.Server.Network
                 .Var(3, fighterId);
         }
 
-        // ─── El combate de verdad ───────────────────────────────────────────────
+        // ─── The real fight ─────────────────────────────────────────────────────
 
         /// <summary>
-        /// "Se acabó la colocación" (kai). Va vacío en las diez veces que sale.
+        /// "Placement is over" (kai). It goes empty all ten times it appears.
         ///
-        /// Es el único corte limpio entre las dos fases: todo lo de delante es colocación y todo lo
-        /// de detrás —jyy, jxz, jxc, jto, jxb, jwi— es la carga del combate ya empezado.
+        /// It is the only clean cut between the two phases: everything before is placement and everything
+        /// after —jyy, jxz, jxc, jto, jxb, jwi— is the loading of the fight already started.
         /// </summary>
         public static byte[] BuildFightBegins() => Array.Empty<byte>();
 
-        /// <summary>En qué ronda vamos (jxz). <c>f2</c> es el número de ronda, empezando por 1.</summary>
+        /// <summary>Which round we are on (jxz). <c>f2</c> is the round number, starting at 1.</summary>
         public static byte[] BuildRound(int round) => Pb.New().Var(2, round).Build();
 
         /// <summary>
-        /// Cuánto le falta a cada hechizo para poder relanzarse (jxc).
+        /// How long each spell has left until it can be cast again (jxc).
         ///
-        ///   f1 (repetido) { f1: el hechizo, f2: rondas que faltan }
-        ///   f4: de quién es la lista
+        ///   f1 (repeated) { f1: the spell, f2: rounds left }
+        ///   f4: whose list it is
         ///
-        /// No es el orden de iniciativa, aunque lo parezca por llevar una lista. Al empezar el
-        /// combate sólo salen los hechizos que nacen con espera, y cuadran con el InitialCooldown
-        /// de SpellLevels. En monstruos e invocaciones la lista va vacía y sólo viaja el f4.
+        /// It is not the initiative order, even though it looks like it for carrying a list. On starting the
+        /// fight only the spells born with a wait come out, and they match SpellLevels's
+        /// InitialCooldown. For monsters and summons the list goes empty and only f4 travels.
         /// </summary>
         public static byte[] BuildCooldowns(long fighterId,
                                             IEnumerable<(int Spell, int Rounds)> cooldowns)
@@ -483,67 +483,87 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Abre una secuencia (jto): <c>f1</c> quién la provoca y <c>f2</c> de qué tipo.
+        /// Opens a sequence (jto): <c>f1</c> who causes it and <c>f2</c> what type.
         ///
-        /// Todo lo que pasa en un combate va metido entre un jto y su jwi. Salen 2.229 de cada uno
-        /// en las quince capturas, exactamente los mismos, que es lo que delata que son pareja.
+        /// Everything that happens in a fight goes between a jto and its jwi. 2,229 of each come out
+        /// in the fifteen captures, exactly the same, which is what gives them away as a pair.
         /// </summary>
         public static byte[] BuildSequenceStart(long author, int kind)
             => Pb.New().Var(1, author).Var(2, kind).Build();
 
         /// <summary>
-        /// Cierra una secuencia (jwi): <c>f1</c> el número de acción, <c>f2</c> quién y <c>f3</c>
-        /// el mismo tipo con el que se abrió. El cliente acusa cada cierre con un jti.
+        /// Closes a sequence (jwi): <c>f1</c> the action number, <c>f2</c> who and <c>f3</c>
+        /// the same type it was opened with. The client acknowledges each closing with a jti.
         /// </summary>
         public static byte[] BuildSequenceEnd(int actionId, long author, int kind)
             => Pb.New().Var(1, actionId).Var(2, author).Var(3, kind).Build();
 
         /// <summary>
-        /// La secuencia con la que se abandona el combate.
+        /// The sequence a fight is abandoned with.
         /// </summary>
         /// <remarks>
-        /// Medida en las tres capturas que llevan un kme, y no es la de accion normal. En
-        /// «combate contra poutch nivel 75 ... hechizos sacro-rendirse.pcapng» el jto que contesta
-        /// al kme es 08a28280c8e7081005 —f2 = 5— y su jwi es 080410a28280c8e7081805 —f3 = 5—; en
-        /// «aceptar desafio-combate completo-abandonar al final.pcapng», 08a282f0a6c4081005 y
-        /// 080210a282f0a6c4081805. El 5 aparece exactamente una vez por captura y solo ahi.
+        /// Measured in the three captures carrying a kme, and it is not the normal action one. In
+        /// «combate contra poutch nivel 75 ... hechizos sacro-rendirse.pcapng» the jto answering
+        /// the kme is 08a28280c8e7081005 —f2 = 5— and its jwi is 080410a28280c8e7081805 —f3 = 5—; in
+        /// «aceptar desafio-combate completo-abandonar al final.pcapng», 08a282f0a6c4081005 and
+        /// 080210a282f0a6c4081805. The 5 appears exactly once per capture and only there.
         /// </remarks>
         public const int SurrenderSequence = 5;
 
-        /// <summary>La secuencia de arranque del combate.</summary>
+        /// <summary>The fight's start sequence.</summary>
         public const int OpeningSequence = 8;
 
-        /// <summary>La de cierre de turno.</summary>
+        /// <summary>The end-of-turn one.</summary>
         public const int TurnEndSequence = 7;
 
         /// <summary>
-        /// "Confírmame" (jxh). El servidor lo manda antes de cada turno y espera el jwz del cliente
-        /// para seguir.
+        /// "Confirm to me" (jxh). The server sends it before each turn and waits for the client's jwz
+        /// to go on.
         /// </summary>
         public static byte[] BuildConfirmTurn(long fighterId) => Pb.New().Var(2, fighterId).Build();
 
         /// <summary>
-        /// De quién es el turno (jzc).
+        /// Whose turn it is (jzc).
         ///
-        ///   f1: quién      f2: lo que dura, en DÉCIMAS de segundo
-        ///   f4: lo que arrastra del turno anterior      f7: qué puesto ocupa en la ronda
-        ///   f8: la ronda
+        ///   f1: who        f2: how long it lasts, in TENTHS of a second
+        ///   f4: what it carries over from the previous turn      f7: what position it holds in the round
+        ///   f8: the round
         ///
-        /// La duración se comprobó contra el reloj de las capturas: con f2 = 410 pasan 41,002
-        /// segundos hasta el fin de turno, con 350 pasan 35,001 y con 420, 42,002. Y no es la misma
-        /// para todos: los personajes van entre 350 y 430, los monstruos a 290 en las doce capturas
-        /// sin excepción, y las invocaciones a 150.
+        /// The duration was checked against the captures' clock: with f2 = 410, 41.002
+        /// seconds pass until the end of the turn, with 350, 35.001 and with 420, 42.002. And it is not the same
+        /// for everyone: characters go between 350 and 430, monsters at 290 in the twelve captures
+        /// without exception, and summons at 150.
         ///
-        /// El f7 es lo que ordena el carrusel: no hay ninguna lista de iniciativa aparte, cada
-        /// turno dice qué puesto ocupa el que lo juega.
+        /// f7 is what orders the carousel: there is no separate initiative list, each
+        /// turn says what position whoever plays it holds.
         /// </summary>
-        public static byte[] BuildTurnStart(long fighterId, int deciseconds, int index, int round)
+        /// <param name="carried">The tenths he kept from his last turn (f4): see <see cref="SavedAfter"/>.</param>
+        public static byte[] BuildTurnStart(long fighterId, int deciseconds, int index, int round, int carried = 0)
             => Pb.New()
                 .Var(1, fighterId)
                 .Var(2, deciseconds)
+                .VarIfNotZero(4, carried)
                 .VarIfNotZero(7, index)
                 .VarIfNotZero(8, round)
                 .Build();
+
+        /// <summary>
+        /// What a character keeps of the turn he passes: half of what was left of it, and never so
+        /// much that his next turn, with it, goes beyond <see cref="MaxTurnDeciseconds"/>.
+        /// </summary>
+        /// <remarks>
+        /// Measured in "bastante pelea con hipermago", a turn of 360 after another: he passes with
+        /// 83 tenths left and the jyt keeps 41, the next jzc carries them in its f4; 401 to use,
+        /// 158 used, 121 kept; 481, 137, 172. Across the captures f2 + f4 never goes beyond 600 --
+        /// a turn of 370 carries 230 at most, one of 430 carries 170 -- and this server goes to
+        /// 900, a minute and a half, which is what its owner asked for. Passed by the clock,
+        /// nothing is left and nothing is kept.
+        /// </remarks>
+        public static int SavedAfter(int remainingDeciseconds, int baseDeciseconds)
+            => Math.Max(0, Math.Min(remainingDeciseconds / 2, MaxTurnDeciseconds - baseDeciseconds));
+
+        /// <summary>The longest a character's turn can be, carried time and all: a minute and a half.</summary>
+        public const int MaxTurnDeciseconds = 900;
 
         /// <summary>
         /// The same jzc for somebody who comes back in the middle of the turn: f6 is what is
@@ -551,44 +571,45 @@ namespace Jondo.Unity.Server.Network
         /// capture the turn of 350 had started 21.8 seconds before the burst and f6 says 132.
         /// That frame carries no f7, so neither does this one.
         /// </summary>
-        public static byte[] BuildTurnResumed(long fighterId, int deciseconds, int remaining, int round)
+        public static byte[] BuildTurnResumed(long fighterId, int deciseconds, int remaining, int round, int carried = 0)
             => Pb.New()
                 .Var(1, fighterId)
                 .Var(2, deciseconds)
+                .VarIfNotZero(4, carried)
                 .VarIfNotZero(6, remaining)
                 .VarIfNotZero(8, round)
                 .Build();
 
-        /// <summary>Lo que dura un turno, en décimas: un personaje, un monstruo y una invocación.</summary>
+        /// <summary>How long a turn lasts, in tenths: a character, a monster and a summon.</summary>
         public const int PlayerTurnDeciseconds = 400;
         public const int MonsterTurnDeciseconds = 290;
 
         /// <summary>
-        /// Lo que dura el turno de un invocado. Es más corto que el de un monstruo, y está medido:
-        /// en las capturas del Ocra la baliza recibe un jzc con 150 donde los pious llevan 290 y
-        /// el jugador 370.
+        /// How long a summon's turn lasts. It is shorter than a monster's, and it is measured:
+        /// in the Cra captures the beacon receives a jzc with 150 where the pious carry 290 and
+        /// the player 370.
         /// </summary>
         public const int SummonTurnDeciseconds = 150;
 
         /// <summary>
-        /// "Ya puedes jugar" (jyj). Va vacío, y SÓLO se manda si el que juega es de los que maneja
-        /// ese cliente: en el turno de un monstruo este paso no existe.
+        /// "You can play now" (jyj). It goes empty, and is ONLY sent if whoever plays is one of those
+        /// that client controls: in a monster's turn this step does not exist.
         /// </summary>
         public static byte[] BuildYourTurn() => Array.Empty<byte>();
 
-        // ─── Moverse y lanzar ───────────────────────────────────────────────────
+        // ─── Moving and casting ─────────────────────────────────────────────────
 
         /// <summary>
-        /// A dónde quiere andar el jugador (jrw).
+        /// Where the player wants to walk (jrw).
         ///
-        ///   f1: el mapa
-        ///   f2: varints empaquetados, cada uno <c>(dirección &lt;&lt; 12) | casilla</c>
+        ///   f1: the map
+        ///   f2: packed varints, each one <c>(direction &lt;&lt; 12) | cell</c>
         ///
-        /// Y ojo, que no es el camino entero: sólo van los PUNTOS DONDE SE TUERCE. El primero es
-        /// desde dónde sale y el último es a dónde va, y la dirección de ese último es hacia dónde
-        /// quiere acabar mirando. Un camino recto son dos números.
+        /// And careful, it is not the whole path: only the POINTS WHERE IT TURNS go. The first is
+        /// where it starts from and the last is where it goes, and that last one's direction is which way it
+        /// wants to end up facing. A straight path is two numbers.
         ///
-        /// Es el mismo mensaje con el que se anda por el mapa fuera del combate.
+        /// It is the same message used to walk around the map outside a fight.
         /// </summary>
         public static (long MapId, List<int> Corners, int Facing) ReadMove(byte[] payload)
         {
@@ -635,9 +656,9 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// A qué casilla se lanza y con qué (jwh).
+        /// Which cell is cast at and with what (jwh).
         ///
-        ///   f1: la casilla objetivo      f4: el hechizo, y si no viene es un golpe de arma
+        ///   f1: the target cell          f4: the spell, and if it does not come it is a weapon hit
         /// </summary>
         public static (int Cell, int Spell) ReadCast(byte[] payload)
         {
@@ -655,14 +676,14 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Lanzar apuntando DESDE EL CARRUSEL (jwn): { f1: a quién, f2: el hechizo }.
+        /// Casting by targeting FROM THE CAROUSEL (jwn): { f1: at whom, f2: the spell }.
         ///
-        /// El id viene CON SIGNO —los monstruos lo tienen negativo— y en complemento a dos de
-        /// sesenta y cuatro bits, así que hay que leerlo como <c>long</c> y no como <c>int</c>:
-        /// dos de las cuatro muestras reales valen menos uno.
+        /// The id comes WITH A SIGN —monsters have it negative— and in sixty-four-bit two's
+        /// complement, so it has to be read as a <c>long</c> and not as an <c>int</c>:
+        /// two of the four real samples are minus one.
         ///
-        ///   08ffffffffffffffffff01 10ca63   =  al combatiente −1, hechizo 12746
-        ///   08a28280c8e708 10b21b           =  a uno mismo, hechizo 3506
+        ///   08ffffffffffffffffff01 10ca63   =  at fighter −1, spell 12746
+        ///   08a28280c8e708 10b21b           =  at oneself, spell 3506
         /// </summary>
         public static (long Fighter, int Spell) ReadCastAtFighter(byte[] payload)
         {
@@ -681,41 +702,41 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Un embrujo puesto sobre alguien (jxm), que es lo que llena el panel de "Efectos".
+        /// A buff placed on someone (jxm), which is what fills the "Efectos" panel.
         ///
-        ///   f1 { f1 { f1: el dado del efecto, si lo trae
-        ///             f2: sobre quién       f3: el número de embrujo, correlativo desde uno
-        ///             f4: 1                 f6 { f2: -1 }
-        ///             f7: el disparador     f8: el identificador del efecto (effectUid)
-        ///             f10: el valor         f12 { f2: -1, f3: -1 }
-        ///             f13: 1, sólo los que traen dado
-        ///             f14: el hechizo que lo puso
-        ///             f15: 7 los que traen dado, 2 el resto      f16: 2 }
-        ///        f2: sobre quién            f3: el número de efecto }
+        ///   f1 { f1 { f1: the effect's die, if it brings one
+        ///             f2: on whom          f3: the buff number, consecutive from one
+        ///             f4: 1                f6 { f2: -1 }
+        ///             f7: the trigger      f8: the effect's identifier (effectUid)
+        ///             f10: the value       f12 { f2: -1, f3: -1 }
+        ///             f13: 1, only those bringing a die
+        ///             f14: the spell that placed it
+        ///             f15: 7 those bringing a die, 2 the rest     f16: 2 }
+        ///        f2: on whom               f3: the effect number }
         ///
-        /// Todo esto está medido contra la captura del poutch de nivel 50 y cuadra con los datos:
-        /// el f8 es exactamente el <c>effectUid</c> que el hechizo lleva en su EffectsJson —299043
-        /// para el 950 de Transposición, 220298 para el 792 de La Sangre de Sacrogrito—, el f10 es
-        /// su <c>value</c> y el f7 su <c>triggers</c>. Y cuando un efecto trae varios disparadores
-        /// separados por barras, el servidor manda UN jxm por cada uno; en la captura salen nueve
-        /// seguidos para el mismo efecto, con "TB", "D", "TE", "VE", "VM", "PD", "LPU", "DV" y "V".
+        /// All this is measured against the level 50 poutch capture and matches the data:
+        /// f8 is exactly the <c>effectUid</c> the spell carries in its EffectsJson —299043
+        /// for Transposición's 950, 220298 for La Sangre de Sacrogrito's 792—, f10 is
+        /// its <c>value</c> and f7 its <c>triggers</c>. And when an effect brings several triggers
+        /// separated by bars, the server sends ONE jxm for each; in the capture nine come out
+        /// in a row for the same effect, with "TB", "D", "TE", "VE", "VM", "PD", "LPU", "DV" and "V".
         /// </summary>
         /// <summary>
-        /// La FAMILIA del embrujo, que va en el f15 y decide si el cliente lo PINTA o no.
+        /// The buff's FAMILY, which goes in f15 and decides whether the client DRAWS it or not.
         ///
-        /// Aquí estaba la razón de que el panel saliera siempre vacío teniendo los bytes bien. El
-        /// constructor se calibró contra un único ejemplar —el efecto 950 de Transposición, que es
-        /// un estado— y de ahí salió un "siete si trae dado, dos si no", que es justo lo contrario
-        /// de lo que hace falta: el SIETE es el de la maquinaria interna, la que el panel no
-        /// enseña. Todos los boosts salían etiquetados como maquinaria.
+        /// Here was the reason the panel always came out empty with the bytes right. The
+        /// builder was calibrated against a single specimen —Transposición's effect 950, which is
+        /// a state— and from there came a "seven if it brings a die, two if not", which is exactly the opposite
+        /// of what is needed: SEVEN is the internal machinery one, the one the panel does not
+        /// show. All the boosts came out labelled as machinery.
         ///
-        /// La regla sale del catálogo del cliente, de dos columnas de la tabla Effects:
+        /// The rule comes from the client's catalogue, from two columns of the Effects table:
         ///
-        ///   Category == 3           -> 4          modificador de un hechizo concreto, SE PINTA
+        ///   Category == 3           -> 4          modifier of a specific spell, IT IS DRAWN
         ///                                         ("Flecha Helada: +8 de daños básicos")
-        ///   el efecto 950           -> 2          pone un estado, se pinta como icono
-        ///   Boost == 0              -> 7          maquinaria interna, NO se pinta
-        ///   Boost == 1, Category 0  -> no va      bono de característica, SE PINTA
+        ///   effect 950              -> 2          sets a state, drawn as an icon
+        ///   Boost == 0              -> 7          internal machinery, NOT drawn
+        ///   Boost == 1, Category 0  -> not sent   characteristic bonus, IT IS DRAWN
         /// </summary>
         public static int FamiliaDelEmbrujo(int efecto, int categoria, int boost)
         {
@@ -728,7 +749,7 @@ namespace Jondo.Unity.Server.Network
             // drawn with them. No capture shows one; the family is the reading, not a measure.
             if (efecto == PoneEstado || efecto == DesactivaEstado) return 2;
             if (boost == 0) return HiddenFamily;
-            return 0;                 // bono de característica: el f15 no viaja
+            return 0;                 // characteristic bonus: f15 does not travel
         }
 
         /// <summary>
@@ -738,13 +759,13 @@ namespace Jondo.Unity.Server.Network
         public const int HiddenFamily = 7;
 
         /// <param name="grado">
-        /// El grado del hechizo que lo pone. Iba clavado a uno; medido contra los 1.297 jxm de las
-        /// capturas del Ocra, el campo es el grado y cuadra en los 1.297.
+        /// The grade of the spell that places it. It was nailed to one; measured against the 1,297 jxm of the
+        /// Cra captures, the field is the grade and it matches in all 1,297.
         /// </param>
         /// <param name="rondas">
-        /// La ronda EN LA QUE SE CAE, contada desde el principio del combate, no lo que le queda.
-        /// Flecha Helada deja tres turnos de daños básicos: lanzada en la ronda 5 el servidor real
-        /// manda un ocho, y en la 6, un nueve. Menos uno es "hasta que acabe el combate".
+        /// The round IN WHICH IT DROPS, counted from the start of the fight, not what it has left.
+        /// Flecha Helada leaves three turns of basic damage: cast in round 5 the real server
+        /// sends an eight, and in round 6, a nine. Minus one is "until the fight ends".
         /// </param>
         /// <param name="padre">
         /// The waiting row this one came out of, in f11, for the rows a delayed effect turns
@@ -769,9 +790,9 @@ namespace Jondo.Unity.Server.Network
                 .Msg(6, Pb.New().Var(2, rondas))
                 .Str(7, WireTrigger(disparador))
                 .VarIfNotZero(8, effectUid)
-                // Uno si el lanzamiento salió crítico. Medido en la captura de Flecha Helada: los
-                // seis embrujos del efecto 293 son idénticos salvo el del lanzamiento crítico, que
-                // es el único que trae este campo.
+                // One if the cast was critical. Measured in the Flecha Helada capture: the
+                // six buffs of effect 293 are identical except the one of the critical cast, which
+                // is the only one bringing this field.
                 .VarIfNotZero(9, critico ? 1 : 0)
                 .VarIfNotZero(10, valor)
                 .VarIfNotZero(11, padre)
@@ -781,13 +802,13 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(13, cara)
                 .Var(14, hechizo)
                 .VarIfNotZero(15, familia)
-                // Si se puede disipar, y cuánto: es el dispellable del propio efecto menos uno.
+                // Whether it can be dispelled, and how much: it is the effect's own dispellable minus one.
                 .VarIfNotZero(16, Math.Max(0, dispellable - 1));
 
-            // El de dentro es QUIEN LO LLEVA y el de fuera QUIEN LO PUSO. No son el mismo salvo
-            // cuando uno se embruja a sí mismo, y por eso el fallo no se vio con la primera
-            // captura que se midió. En el Ojo de Topo del Ocra, que le quita tres de alcance al
-            // enemigo, el servidor real manda el pío dentro y al jugador fuera.
+            // The inner one is WHO CARRIES IT and the outer one WHO PLACED IT. They are not the same except
+            // when one buffs oneself, and that is why the bug was not seen with the first
+            // capture measured. In the Cra's Ojo de Topo, which removes three range from the
+            // enemy, the real server sends the pío inside and the player outside.
             return Pb.New()
                 .Msg(1, Pb.New()
                     .Msg(1, dentro)
@@ -812,20 +833,20 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Se cae un embrujo (jya): <c>f1</c> de quién y <c>f2</c> el número del embrujo, el mismo
-        /// que se le dio en el jxm. Va uno por cada uno que caduca.
+        /// A buff drops (jya): <c>f1</c> from whom and <c>f2</c> the buff number, the same
+        /// it was given in the jxm. One goes for each that expires.
         /// </summary>
         public static byte[] BuildBuffGone(long dequien, int numero)
             => Pb.New().Var(1, dequien).Var(2, numero).Build();
 
         /// <summary>
-        /// El aviso gemelo de que un embrujo se ha caído (jwe con f14 = 514):
+        /// The twin notice that a buff has dropped (jwe with f14 = 514):
         ///
-        ///   f3: de quién     f23 { f1: el número del embrujo, f5: de quién otra vez }
+        ///   f3: from whom    f23 { f1: the buff number, f5: from whom again }
         ///
-        /// Va inmediatamente detrás del jya y con el mismo número. Medido en la captura de Flecha
-        /// Helada, donde cada relanzamiento retira el embrujo anterior: jya {f1: quién, f2: 6} y
-        /// acto seguido este jwe con f23 { f1: 6, f5: quién }.
+        /// It goes immediately after the jya and with the same number. Measured in the Flecha
+        /// Helada capture, where each recast removes the previous buff: jya {f1: who, f2: 6} and
+        /// right after it this jwe with f23 { f1: 6, f5: who }.
         /// </summary>
         public static byte[] BuildBuffExpired(long dequien, int numero)
             => Pb.New()
@@ -866,8 +887,8 @@ namespace Jondo.Unity.Server.Network
         public const int SpellEffectsRemoved = 406;
 
         /// <summary>
-        /// Qué secuencia acusa el cliente (jti): <c>f2</c> lleva el mismo número de acción con el
-        /// que se cerró, el del <c>f1</c> del jwi. Devuelve cero si no viene.
+        /// Which sequence the client acknowledges (jti): <c>f2</c> carries the same action number it
+        /// was closed with, that of the jwi's <c>f1</c>. Returns zero if it does not come.
         /// </summary>
         public static int ReadSequenceAck(byte[] payload)
         {
@@ -882,13 +903,13 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Lo que pasa (jwe). El <c>f14</c> dice de qué se trata:
+        /// What happens (jwe). <c>f14</c> says what it is about:
         ///
-        ///   129  ha andado, y el f20 lleva los pasos gastados en negativo
-        ///   300  ha lanzado algo (303 si es el arma), con el f7 diciendo qué y dónde
-        ///   102  ha gastado puntos de acción, otra vez en el f20 y en negativo
-        ///   89 a 100  daños, con el f40 diciendo a quién, cuánto y de qué elemento
-        ///   103  alguien se ha muerto
+        ///   129  has walked, and f20 carries the steps spent as a negative
+        ///   300  has cast something (303 if it is the weapon), with f7 saying what and where
+        ///   102  has spent action points, again in f20 and as a negative
+        ///   89 to 100  damage, with f40 saying to whom, how much and of what element
+        ///   103  someone has died
         /// </summary>
         public static byte[] BuildAction(long author, int kind, Pb? detail = null,
                                          int detailField = 0)
@@ -899,26 +920,26 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Lo que se planta en el suelo (el f32 de un jwe con f14 = 401).
+        /// What is planted on the ground (the f32 of a jwe with f14 = 401).
         ///
-        ///   f1 { f1 { f1 { f2: el color en RGB, f3: la casilla }
-        ///             f4: el numero del glifo    f5: el tamano de la huella
-        ///             f6: el grado del hechizo   f9: el hechizo que lanza
-        ///             f10: la casilla otra vez   f11: 1
-        ///             f12: de quien es } }
+        ///   f1 { f1 { f1 { f2: the colour in RGB, f3: the cell }
+        ///             f4: the glyph's number     f5: the size of the footprint
+        ///             f6: the spell's grade      f9: the spell it casts
+        ///             f10: the cell again        f11: 1
+        ///             f12: whose it is } }
         /// </summary>
         /// <remarks>
-        /// Medido en las capturas del tymador: los hechizos de muro salen 143 veces y las 143 van
-        /// dentro de un jwe f14 = 401, UNA POR CASILLA. Dos seguidas del muro de fuego:
+        /// Measured in the Rogue captures: the wall spells come out 143 times and all 143 go
+        /// inside a jwe f14 = 401, ONE PER CELL. Two in a row of the fire wall:
         ///
         /// <code>
         ///   f3=53721497699 f14=401 f32{f1{f1{f2=16711680 f3=260} f4=1 f5=2 f6=3
         ///                                 f9=13458 f10=260 f11=1 f12=53721497699}}
-        ///   ... la siguiente igual con f3=274, f4=2 y f10=274
+        ///   ... the next one the same with f3=274, f4=2 and f10=274
         /// </code>
         ///
-        /// El color 16711680 es 0xFF0000, rojo puro, y el f6 vale 3, que es el grado con el que
-        /// pega el muro -- lo unico de todo esto que ya se habia supuesto bien.
+        /// The colour 16711680 is 0xFF0000, pure red, and f6 is 3, which is the grade the
+        /// wall hits with -- the only thing in all this that had already been guessed right.
         /// </remarks>
         public static byte[] BuildGlyph(long owner, int glyphId, int cell, int spell, int grade,
                                         int size, int colour)
@@ -935,15 +956,15 @@ namespace Jondo.Unity.Server.Network
                 detailField: 32);
 
         /// <summary>
-        /// Y como se quita (el f22 de un jwe con f14 = 310): sólo el número del glifo.
+        /// And how it is removed (the f22 of a jwe with f14 = 310): only the glyph's number.
         /// </summary>
         /// <remarks>
-        /// Medido en la misma captura que el 401, y es tan corto como parece: quince bytes con el
-        /// dueño en el f3 y <c>f22{f1 = 1}</c>, y el siguiente igual con el 2. Los números son los
-        /// mismos que repartieron los 401 al ponerlos.
+        /// Measured in the same capture as the 401, and it is as short as it looks: fifteen bytes with the
+        /// owner in f3 and <c>f22{f1 = 1}</c>, and the next the same with 2. The numbers are the
+        /// same ones the 401s handed out on placing them.
         ///
-        /// Sin esto el muro se quedaba pintado para siempre: el servidor lo quitaba de su lista
-        /// -- se ve en el registro, «se cae el glifo 4» -- y al cliente no se lo decía nadie.
+        /// Without this the wall stayed drawn forever: the server removed it from its list
+        /// -- it is seen in the log, «se cae el glifo 4» -- and nobody told the client.
         /// </remarks>
         public static byte[] BuildGlyphGone(long owner, int glyphId)
             => BuildAction(owner, RemovedGlyph, Pb.New().Var(1, glyphId), detailField: 22);
@@ -1084,7 +1105,7 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public const int GlyphSequence = 2;
 
-        /// <summary>El rojo puro con el que sale el muro de bombas.</summary>
+        /// <summary>The pure red the bomb wall comes out with.</summary>
         public const int GlyphRed = 16711680;
 
         public const int PlacedGlyph = 401;
@@ -1111,14 +1132,14 @@ namespace Jondo.Unity.Server.Network
                 .Msg(25, Pb.New().Var(2, grade).Var(3, cell).Var(4, spell).Var(5, value))
                 .Build();
 
-        /// <summary>El campo donde va el detalle de cada cosa dentro del jwe.</summary>
+        /// <summary>The field where the detail of each thing goes inside the jwe.</summary>
         public const int CastDetail = 7;
         public const int PointsDetail = 20;
         public const int DamageDetail = 40;
 
         /// <summary>
-        /// Cambia el aspecto de un combatiente (jwe, f14 = 149). Esta acción de combate es la que
-        /// hace que el cliente anime la transformación; un refresco de actor jsn sólo lo redibuja.
+        /// Changes a fighter's look (jwe, f14 = 149). This fight action is the one that
+        /// makes the client animate the transformation; a jsn actor refresh only redraws it.
         /// </summary>
         public static byte[] BuildLookChanged(long fighter, byte[] look)
             => Pb.New()
@@ -1127,7 +1148,7 @@ namespace Jondo.Unity.Server.Network
                 .Msg(26, Pb.New().Var(1, fighter).Bytes(3, look))
                 .Build();
 
-        /// <summary>Copia un EntityLook sustituyendo únicamente los huesos de su raíz.</summary>
+        /// <summary>Copies an EntityLook replacing only its root's bones.</summary>
         public static byte[] WithRootBones(byte[] look, int bones)
         {
             if (look == null || look.Length == 0 || bones <= 0) return look ?? Array.Empty<byte>();
@@ -1213,42 +1234,42 @@ namespace Jondo.Unity.Server.Network
                 .Var(14, Cast)
                 .Build();
 
-        /// <summary>Los puntos gastados, en negativo, como los manda el servidor real.</summary>
+        /// <summary>The points spent, as a negative, as the real server sends them.</summary>
         public static Pb Spent(long fighterId, int amount)
             => Pb.New().Var(1, -amount).Var(2, fighterId);
 
         /// <summary>
-        /// Qué se ha lanzado y dónde: el f7 del jwe con f14 = 300 (o 303 si es el arma).
+        /// What was cast and where: the f7 of the jwe with f14 = 300 (or 303 if it is the weapon).
         ///
-        ///   f2: a quién va         f4 { f4: quién lo lanza }
-        ///   f5: 1 si es crítico    f6: la casilla
-        ///   f7 { f2: el hechizo, f3: el nivel de ese hechizo }
+        ///   f2: at whom            f4 { f4: who casts it }
+        ///   f5: 1 if critical      f6: the cell
+        ///   f7 { f2: the spell, f3: that spell's level }
         ///   f8: 1
         ///
-        /// El hechizo va en el f7, EN DOS NÚMEROS, y no en el f8. Eso último es lo que se hacía
-        /// aquí y por eso el cliente pintaba un puñetazo en vez del hechizo: le llegaba un
-        /// lanzamiento sin decir de qué, y el puñetazo es a lo que echa mano cuando no lo sabe. El
-        /// f8 vale 1 siempre en las capturas, no es el hechizo.
+        /// The spell goes in f7, IN TWO NUMBERS, and not in f8. The latter is what was done
+        /// here and that is why the client drew a punch instead of the spell: it received a
+        /// cast without saying of what, and the punch is what it falls back on when it does not know. The
+        /// f8 is always 1 in the captures, it is not the spell.
         ///
-        /// Los dos números del f7 salen de la base tal cual: el f2 es SpellTemplates.Id y el f3 es
-        /// el SpellLevels.Id de su grado. Comprobado contra cinco lanzamientos de la captura del
-        /// poutch de nivel 50: (25188, 63926), (21976, 57060), (18647, 51206), (12718, 43038) y
-        /// (6828, 28035); en la base, SpellLevels.Id 63926 es del hechizo 25188, y así los cinco.
+        /// The two numbers of f7 come from the base as is: f2 is SpellTemplates.Id and f3 is
+        /// the SpellLevels.Id of its grade. Checked against five casts of the level 50
+        /// poutch capture: (25188, 63926), (21976, 57060), (18647, 51206), (12718, 43038) and
+        /// (6828, 28035); in the base, SpellLevels.Id 63926 belongs to spell 25188, and so on for all five.
         ///
-        /// El golpe de arma no lleva f7: lleva un f10 con el arma y ya.
+        /// The weapon hit carries no f7: it carries an f10 with the weapon and that is it.
         /// </summary>
         /// <param name="sobreEseObjetivo">
-        /// Cuántas veces lleva lanzado sobre ese objetivo. Sólo viaja si el hechizo tiene tope por
-        /// objetivo.
+        /// How many times it has been cast on that target. It only travels if the spell has a per-target
+        /// cap.
         /// </param>
         /// <param name="esteTurno">
-        /// Cuántas lleva este turno. Sólo si el hechizo tiene tope por turno.
+        /// How many this turn. Only if the spell has a per-turn cap.
         /// </param>
         /// <param name="intervalo">
-        /// Las rondas de espera que se acaban de poner. Es el <c>MinCastInterval</c> del grado, y
-        /// está medido: Agudeza Absoluta manda un 4 y su columna vale 4; Represalias un 3 y vale
-        /// 3; Paso de Cacería, Disparos Lejanos, Tiros Potentes y Flecha de Expiación mandan un 2
-        /// y valen 2 en el grado que juega el personaje de la captura.
+        /// The waiting rounds just set. It is the grade's <c>MinCastInterval</c>, and
+        /// it is measured: Agudeza Absoluta sends a 4 and its column is 4; Represalias a 3 and it is
+        /// 3; Paso de Cacería, Disparos Lejanos, Tiros Potentes and Flecha de Expiación send a 2
+        /// and are 2 at the grade the capture's character plays.
         /// </param>
         /// <param name="noTarget">
         /// A cast on an empty cell names nobody: no f2 at all, where a target of zero otherwise
@@ -1284,9 +1305,9 @@ namespace Jondo.Unity.Server.Network
                 .Var(6, cell);
             if (spell != 0)
             {
-                // Un HECHIZO lleva el hechizo y NO lleva el campo del arma. Escribirlo aunque
-                // fuera a cero cambiaba los bytes, y el auto-test del protocolo lo cazó a la
-                // primera comparando contra la captura: por eso el if envuelve a los dos.
+                // A SPELL carries the spell and does NOT carry the weapon field. Writing it even
+                // at zero changed the bytes, and the protocol self-test caught it at the
+                // first go comparing against the capture: that is why the if wraps both.
                 var delHechizo = Pb.New();
                 if (portals != null && portals.Count > 0) delHechizo.Packed(1, portals.Select(p => (long)p));
                 detalle.Msg(7, delHechizo.Var(2, spell).VarIfNotZero(3, spellLevel));
@@ -1294,29 +1315,29 @@ namespace Jondo.Unity.Server.Network
                 return chained ? detalle : detalle.Var(8, 1);
             }
 
-            // Y un golpe CUERPO A CUERPO lleva lo contrario: sin hechizo, y con el arma.
+            // And a MELEE hit carries the opposite: no spell, and with the weapon.
             //
-            // Es lo único que distingue un espadazo de un puñetazo, y por eso el chat decía
-            // «Puñetazo» al atacar con la espada. Mandar hechizo 0 estaba bien —el servidor real
-            // tampoco manda ningún hechizo de arma—; lo que faltaba era esto.
+            // It is the only thing telling a sword blow from a punch, and that is why the chat said
+            // «Puñetazo» on attacking with the sword. Sending spell 0 was right —the real server
+            // does not send any weapon spell either—; what was missing was this.
             //
-            // El f10 lleva el Id de ItemTemplates del arma equipada, y el puñetazo es el mismo
-            // mensaje con el f10 a CERO ESCRITO, no ausente: por eso va con Var y no con
-            // VarIfNotZero. Medido en las capturas: Lavacha 19593, Cocobur 20353, Garras de la
-            // Despedazadora 31759, Garra de Gargandias 31786; y el puñetazo, «5000» en el cable,
-            // que es la etiqueta del campo 10 seguida de un cero.
+            // f10 carries the ItemTemplates Id of the equipped weapon, and the punch is the same
+            // message with f10 at a WRITTEN ZERO, not absent: that is why it goes with Var and not with
+            // VarIfNotZero. Measured in the captures: Lavacha 19593, Cocobur 20353, Garras de la
+            // Despedazadora 31759, Garra de Gargandias 31786; and the punch, «5000» on the wire,
+            // which is field 10's tag followed by a zero.
             return detalle.Var(8, 1).Var(10, arma);
         }
 
         /// <summary>
-        /// La ficha de uno, para refrescarla suelta (jxw).
+        /// One's sheet, to refresh it on its own (jxw).
         ///
-        ///   f1: quién      f3 { f3: 2, f5 x N: las características }
+        ///   f1: who        f3 { f3: 2, f5 x N: the characteristics }
         ///
-        /// Es la misma ficha que va dentro del jxg y del jxb, aquí sola. Se usa para actualizar los
-        /// puntos de movimiento y de acción según se gastan.
+        /// It is the same sheet that goes inside the jxg and the jxb, alone here. It is used to update the
+        /// movement and action points as they are spent.
         /// </summary>
-        /// <summary>Las dos características que van en el molde de los puntos, y sólo ellas.</summary>
+        /// <summary>The two characteristics that go in the points mould, and only them.</summary>
         private const int PuntosDeAccion = 1;
         private const int PuntosDeMovimiento = 23;
 
@@ -1325,29 +1346,29 @@ namespace Jondo.Unity.Server.Network
                                                             long Gear, long Buff)> sheet,
                                                bool esElPersonajeControlado)
         {
-            // UNA ENTRADA DE jxw SUSTITUYE A LA DEL jxb, NO SE SUMA A ELLA. De ahí sale todo.
+            // A jxw ENTRY REPLACES THE jxb ONE, IT IS NOT ADDED TO IT. Everything follows from that.
             //
-            // Aquí se mandaba un VALOR ABSOLUTO metido en el hueco de la base, y con eso cada
-            // refresco borraba el equipo y el resto de huecos que el jxb había mandado bien. El
-            // servidor real hace lo contrario: vuelve a escribir la entrada COMPLETA —los mismos
-            // campos que en el jxb, repetidos aunque no hayan cambiado— y añade el embrujo en su
-            // hueco propio, el f8.
+            // Here an ABSOLUTE VALUE was sent put in the base slot, and with that each
+            // refresh erased the equipment and the rest of the slots the jxb had sent right. The
+            // real server does the opposite: it writes the COMPLETE entry again —the same
+            // fields as in the jxb, repeated even if they have not changed— and adds the buff in its
+            // own slot, f8.
             //
-            // Medido en la captura del Zobal, sobre el mismo luchador y las mismas características:
+            // Measured in the Zobal capture, on the same fighter and the same characteristics:
             //
             //   jxb   107: f4 { f2: 100 }          25: f4 { f7: 740 }
             //   jxw   107: f4 { f2: 100, f8: +1 }  25: f4 { f7: 740, f8: +100 }
-            //   jxw   107: f4 { f2: 100 }          25: f4 { f7: 740 }      al caducar el embrujo
+            //   jxw   107: f4 { f2: 100 }          25: f4 { f7: 740 }      on the buff expiring
             //
-            // El 100 de la base NO se toca en ninguna de las 1.699 entradas detalladas de las
-            // capturas. Nosotros mandábamos «f4 { f2: 10 }» —sólo el embrujo, y en el hueco que no
-            // es— cincuenta y cinco milisegundos después de haber mandado el 100 bueno. Y el 107 es
-            // un MULTIPLICADOR de daño: el cliente estima el golpe multiplicando por él, así que
-            // dejarlo en 10 donde vale 100 es la previsualización dividida por diez. Ése era el
-            // fallo que se veía jugando.
+            // The base's 100 is NOT touched in any of the 1,699 detailed entries of the
+            // captures. We sent «f4 { f2: 10 }» —only the buff, and in the wrong
+            // slot— fifty-five milliseconds after having sent the good 100. And 107 is
+            // a damage MULTIPLIER: the client estimates the hit by multiplying by it, so
+            // leaving it at 10 where it is 100 is the preview divided by ten. That was the
+            // bug seen while playing.
             //
-            // El molde de los puntos —f5— sigue siendo sólo para la 1 y la 23; ninguna otra
-            // característica lo usa jamás en las capturas.
+            // The points mould —f5— is still only for 1 and 23; no other
+            // characteristic ever uses it in the captures.
             var stats = Pb.New().Var(3, SheetKind);
             foreach (var (characteristic, baseValue, gear, buff) in sheet)
             {
@@ -1358,14 +1379,14 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// La ficha con la vida que le falta al personaje (jxw con la característica 97).
+        /// The sheet with the life the character is missing (jxw with characteristic 97).
         ///
-        /// Va aparte de <see cref="BuildFighterSheet"/> porque ésa sólo sabe escribir el molde de
-        /// los puntos —f5 { f1 }— y la 97 usa el suyo. Sólo se le manda al personaje que maneja
-        /// el cliente; ver <see cref="TemporaryLifeMalus"/>.
+        /// It goes apart from <see cref="BuildFighterSheet"/> because that one only knows how to write the
+        /// points mould —f5 { f1 }— and 97 uses its own. It is only sent to the character the
+        /// client controls; see <see cref="TemporaryLifeMalus"/>.
         ///
         ///   08a28280c8e708 1a1e 1802 2a1a 0861 2216 1098ffffffffffffffff01 40b0feffffffffffffff01
-        ///   = al jugador, le faltan 104 de vida y lleva 208 erosionados
+        ///   = to the player, he is missing 104 life and carries 208 eroded
         /// </summary>
         public static byte[] BuildLifeSheet(long fighterId, long deficit, long erosion)
             => Pb.New()
@@ -1375,40 +1396,40 @@ namespace Jondo.Unity.Server.Network
                     .Msg(5, SheetEntry(TemporaryLifeMalus, deficit, -Math.Abs(erosion), false)))
                 .Build();
 
-        /// <summary>La secuencia de andar y la de una acción cualquiera.</summary>
+        /// <summary>The walking sequence and that of any action.</summary>
         public const int WalkSequence = 4;
         public const int ActionSequence = 3;
 
         /// <summary>
-        /// La secuencia corta en la que el servidor real mete cada ficha suelta: en la captura,
-        /// alrededor de todos los jxw hay un jto con f2 = 3 y su jwi con f3 = 3.
+        /// The short sequence the real server wraps each loose sheet in: in the capture,
+        /// around all the jxw there is a jto with f2 = 3 and its jwi with f3 = 3.
         /// </summary>
         public const int SheetSequence = 3;
 
         /// <summary>
-        /// La secuencia con la que empieza cada turno, la de devolver los puntos: en la captura,
-        /// detrás del jzc va un jto con f2 = 7 que envuelve las dos fichas —primero los puntos de
-        /// movimiento, luego los de acción— y se cierra con un jwi de f3 = 7.
+        /// The sequence each turn starts with, that of giving back the points: in the capture,
+        /// after the jzc goes a jto with f2 = 7 that wraps the two sheets —first the movement
+        /// points, then the action ones— and is closed with a jwi of f3 = 7.
         /// </summary>
         public const int TurnSequence = 7;
 
         /// <summary>
-        /// Un golpe (jwe con el f14 entre 89 y 100).
+        /// A hit (jwe with f14 between 89 and 100).
         ///
-        ///   f3: quién pega      f14: de qué elemento
-        ///   f40 { f2: a quién, f3: cuánto }
+        ///   f3: who hits        f14: of what element
+        ///   f40 { f2: at whom, f3: how much }
         ///
-        /// Medido: con f14 = 91 el f40 lleva { -1, 134 } y con f14 = 93, { -1, 121 }. El f40 tiene
-        /// además un f4 y un f5 que cambian de un golpe a otro y que no están descifrados; se dejan
-        /// fuera, porque lo que el cliente pinta —a quién y cuánto— sí está.
+        /// Measured: with f14 = 91 f40 carries { -1, 134 } and with f14 = 93, { -1, 121 }. f40 also has
+        /// an f4 and an f5 that change from one hit to another and are not deciphered; they are left
+        /// out, because what the client draws —at whom and how much— is there.
         /// </summary>
         /// <param name="efecto">
-        /// El NÚMERO DE EFECTO del golpe, que es lo que va en el f14: el 91 es robo de agua, el 96
-        /// daños de agua, el 99 daños de fuego. No es un código de elemento aparte.
+        /// The hit's EFFECT NUMBER, which is what goes in f14: 91 is water steal, 96
+        /// water damage, 99 fire damage. It is not a separate element code.
         /// </param>
         /// <param name="elemento">
-        /// El elemento, que va en el f4 del detalle. Medido: los golpes de agua llevan un 3 ahí y
-        /// los de tierra un 1, los mismos números que la columna ElementId del catálogo.
+        /// The element, which goes in the detail's f4. Measured: water hits carry a 3 there and
+        /// earth ones a 1, the same numbers as the catalogue's ElementId column.
         /// </param>
         public static byte[] BuildDamage(long author, int efecto, long victim, int amount,
                                          int elemento = -1, int erosion = 0)
@@ -1418,14 +1439,14 @@ namespace Jondo.Unity.Server.Network
             var detalle = Pb.New().Var(2, victim).VarIfNotZero(3, amount);
             if (elemento >= 0) detalle.Var(4, elemento);
 
-            // La EROSIÓN, que faltaba. Va en el f5 y es lo que el golpe se lleva del TOPE de vida,
-            // no de la de ahora. Sale en 977 de los 986 bloques de daño de las capturas, y en 727
-            // de ellos vale exactamente la décima parte del daño:
+            // The EROSION, which was missing. It goes in f5 and is what the hit takes from the life CAP,
+            // not from the current life. It appears in 977 of the 986 damage blocks of the captures, and in 727
+            // of them it is exactly a tenth of the damage:
             //
-            //   c2020e 10a28280c8e708 18ce03 2003 282e   =  462 de daño, 46 de erosión
+            //   c2020e 10a28280c8e708 18ce03 2003 282e   =  462 damage, 46 erosion
             //
-            // El servidor ya la calculaba —está en Fighter.Erosionar— y no la mandaba, así que el
-            // cliente nunca se enteraba de que el tope había bajado.
+            // The server already computed it —it is in Fighter.Erosionar— and did not send it, so the
+            // client never found out that the cap had gone down.
             detalle.VarIfNotZero(5, erosion);
 
             return Pb.New()
@@ -1436,29 +1457,29 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El número de efecto del DAÑO DE COLISIÓN al empujar.
+        /// The effect number of the COLLISION DAMAGE on pushing.
         ///
-        /// En el catálogo del cliente se llama <c>CharacterLifePointsLostFromPush</c>, tiene la
-        /// descripción vacía en los cinco idiomas y no lo usa ni uno de los 34.685 niveles de
-        /// hechizo: no lo escribe ningún hechizo, lo fabrica el motor. La pantalla de fin de
-        /// combate lo contabiliza aparte, en su propio renglón.
+        /// In the client's catalogue it is called <c>CharacterLifePointsLostFromPush</c>, it has an
+        /// empty description in all five languages and not one of the 34,685 spell levels uses it:
+        /// no spell writes it, the engine makes it. The end-of-fight screen
+        /// counts it separately, on its own line.
         /// </summary>
         public const int PushDamage = 80;
 
         /// <summary>
-        /// El daño de haberse chocado al empujar (jwe con el f14 en 80).
+        /// The damage of having collided on being pushed (jwe with f14 at 80).
         ///
-        ///   f3: quién empujó      f14: 80
-        ///   f40 { f2: a quién, f3: la vida perdida, f4: -1, f5: la erosión }
+        ///   f3: who pushed        f14: 80
+        ///   f40 { f2: at whom, f3: the life lost, f4: -1, f5: the erosion }
         ///
-        /// Va aparte de <see cref="BuildDamage"/> porque aquél tiene el convenio de «si el elemento
-        /// es menor que cero, no escribas el f4», y aquí el f4 tiene que ir Y valer MENOS UNO: es
-        /// así en los 127 mensajes de las 401 capturas, sin una excepción. Menos uno quiere decir
-        /// «sin elemento», que no es lo mismo que el cero del neutral.
+        /// It goes apart from <see cref="BuildDamage"/> because that one has the convention «if the element
+        /// is less than zero, do not write f4», and here f4 has to go AND be MINUS ONE: it is
+        /// so in the 127 messages of the 401 captures, without an exception. Minus one means
+        /// «no element», which is not the same as neutral's zero.
         ///
-        /// Se manda dentro de la misma secuencia del lanzamiento y justo detrás del desplazamiento;
-        /// y cuando al empujado no le queda ni una casilla, el desplazamiento no se manda y éste va
-        /// solo.
+        /// It is sent within the same sequence as the cast and right after the displacement;
+        /// and when the pushed one has not a single cell left, the displacement is not sent and this one goes
+        /// alone.
         /// </summary>
         public static byte[] BuildPushDamage(long author, long victim, int amount, int erosion = 0)
             => Pb.New()
@@ -1472,13 +1493,13 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// RETIRARLE puntos de acción a otro. No confundir con el 102, que es el gasto propio de
-        /// lanzar un hechizo: en las 1.796 muestras de las capturas, el 102 y el 129 llevan
-        /// SIEMPRE el mismo id como autor y como víctima, y aquí el autor es otro.
+        /// REMOVING action points from someone else. Not to be confused with 102, which is one's own cost of
+        /// casting a spell: in the 1,796 samples of the captures, 102 and 129 ALWAYS carry
+        /// the same id as author and as victim, and here the author is someone else.
         /// </summary>
         public const int ActionPointsLost = 101;
 
-        /// <summary>Retirarle puntos de movimiento a otro. El 129 es andar, que es cosa suya.</summary>
+        /// <summary>Removing movement points from someone else. 129 is walking, which is one's own business.</summary>
         public const int MovementPointsLost = 127;
 
         /// <summary>
@@ -1510,16 +1531,16 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// Se le han quitado puntos a alguien (jwe): { f3: quién, f14: cuál, f20 { f1: cuántos,
-        /// f2: a quién } }.
+        /// Points have been removed from someone (jwe): { f3: who, f14: which, f20 { f1: how many,
+        /// f2: from whom } }.
         ///
-        /// La cantidad va en NEGATIVO, en complemento a dos de 64 bits:
+        /// The quantity goes as a NEGATIVE, in 64-bit two's complement:
         ///
-        ///   a20112 08fcffffffffffffffff01 10a282f0a6c408   =  menos cuatro PA
+        ///   a20112 08fcffffffffffffffff01 10a282f0a6c408   =  minus four AP
         ///
-        /// Esto es lo que hace salir el numerito flotando encima del combatiente, igual que con la
-        /// vida. Sin él, el servidor le quitaba los puntos por dentro y en pantalla no se movía
-        /// nada: el jugador veía al bicho quedarse sin PA sin que nada se lo dijera.
+        /// This is what brings up the little number floating over the fighter, just like with
+        /// life. Without it, the server removed the points internally and on screen nothing
+        /// moved: the player saw the creature run out of AP without anything telling him.
         /// </summary>
         public static byte[] BuildPointsLost(long author, int efecto, long victim, int cuantos)
             => Pb.New()
@@ -1529,30 +1550,30 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// Los dos códigos de elemento que están medidos. Los demás caen en el rango 89 a 100 pero
-        /// no se ha podido saber cuál es cuál, así que se usa el 91 mientras tanto.
+        /// The two element codes that are measured. The rest fall in the 89 to 100 range but
+        /// which is which could not be worked out, so 91 is used meanwhile.
         /// </summary>
         public const int SomeDamage = 91;
         public const int OtherDamage = 93;
 
         /// <summary>
-        /// Una curación (jwe con f14 = 3001, "curas neutrales"):
+        /// A heal (jwe with f14 = 3001, "neutral heals"):
         ///
-        ///   f3: quién cura     f6 { f1: cuánto, f4: A QUIÉN }
+        ///   f3: who heals      f6 { f1: how much, f4: WHOM }
         ///
-        /// El f4 es el CURADO, y esto corrige lo que decía aquí antes. El comentario anterior
-        /// sostenía que el menos dos de la captura de la Baliza no era ninguno de los tres
-        /// combatientes y que por tanto no era el destinatario; era mentira, el menos dos es el id
-        /// de un monstruo de esa pelea. Contadas las 94 curaciones de las 305 capturas: el f4
-        /// lleva siempre un identificador de combatiente de verdad —el jugador 52 veces, otros
-        /// jugadores 19, monstruos el resto— y en 40 de las 94 NO coincide con quien cura.
+        /// f4 is the HEALED one, and this corrects what was said here before. The earlier comment
+        /// held that the minus two of the Beacon capture was none of the three
+        /// fighters and therefore not the recipient; it was false, minus two is the id
+        /// of a monster in that fight. Counting the 94 heals of the 305 captures: f4
+        /// always carries a real fighter identifier —the player 52 times, other
+        /// players 19, monsters the rest— and in 40 of the 94 it does NOT match the healer.
         ///
-        /// Mandarlo clavado a menos dos hacía que toda cura se pintara encima del combatiente
-        /// menos dos, que en la mayoría de los combates existe y es un bicho cualquiera.
+        /// Sending it nailed to minus two made every heal be drawn on top of fighter
+        /// minus two, which in most fights exists and is some random creature.
         ///
-        /// La curación llega al cable ya resuelta en puntos: en la base el efecto es el 1109,
-        /// "Cura: #1% de los PdV máximos", y aquí viaja el número concreto. Es el mismo apaño que
-        /// con el robo de puntos, donde el 1080 se anuncia como 169 con la cantidad que salió.
+        /// The heal reaches the wire already resolved into points: in the base the effect is 1109,
+        /// "Cura: #1% de los PdV máximos", and here the concrete number travels. It is the same workaround as
+        /// with the point steal, where 1080 is announced as 169 with the quantity that came out.
         /// </summary>
         public static byte[] BuildHeal(long author, int cuanto, long curado)
             => Pb.New()
@@ -1564,24 +1585,24 @@ namespace Jondo.Unity.Server.Network
         public const int Curacion = 3001;
 
         /// <summary>
-        /// Sale un invocado al tablero (jwe con f14 = 181, "Invoca: #1").
+        /// A summon comes out onto the board (jwe with f14 = 181, "Invoca: #1").
         ///
-        /// El efecto no lleva un número: lleva UN COMBATIENTE ENTERO, con tres envoltorios de f1
-        /// encima. Medido byte a byte contra la Baliza de Supervivencia del Ocra:
+        /// The effect does not carry a number: it carries A WHOLE FIGHTER, with three f1 wrappers
+        /// on top. Measured byte by byte against the Cra's Baliza de Supervivencia:
         ///
         ///   f1 { f1 { f1 {
-        ///     f1 { f3: 1, f4 { f1 { f1: casilla, f2: orientación, f4: 0 }, f3: quién es } }
-        ///     f2: 0                          el hueco del identificador, cero como en un monstruo
-        ///     f3 { f2: 3, f3: la plantilla del ASPECTO }
-        ///     f5 { f3 { f2: la plantilla del BICHO, f3: su grado } }
-        ///     f6 { f1: de quién es, f3: 2, f4: 1, f5 x N: la ficha }
+        ///     f1 { f3: 1, f4 { f1 { f1: cell, f2: orientation, f4: 0 }, f3: who it is } }
+        ///     f2: 0                          the identifier slot, zero as in a monster
+        ///     f3 { f2: 3, f3: the LOOK template }
+        ///     f5 { f3 { f2: the CREATURE template, f3: its grade } }
+        ///     f6 { f1: whose it is, f3: 2, f4: 1, f5 x N: the sheet }
         ///   } } }
         ///
-        /// Las dos plantillas no son la misma: la baliza es la 8348 y su aspecto sale de la 8152,
-        /// porque en la tabla de bichos el Look de la 8348 es literalmente "{8152}".
+        /// The two templates are not the same: the beacon is 8348 and its look comes from 8152,
+        /// because in the creature table 8348's Look is literally "{8152}".
         ///
-        /// La ficha va con el molde de los monstruos, <c>f2 { f2: valor }</c>, que es el que ya
-        /// arma <see cref="SheetEntry"/> con <c>isMonster</c>.
+        /// The sheet goes with the monsters' mould, <c>f2 { f2: value }</c>, which is the one
+        /// <see cref="SheetEntry"/> already builds with <c>isMonster</c>.
         /// </summary>
         /// <param name="efecto">
         /// The effect that summoned it, which is the f14: 181 for an ordinary summon, 1008 for
@@ -1619,7 +1640,7 @@ namespace Jondo.Unity.Server.Network
                 .Build();
         }
 
-        /// <summary>El número de efecto de "Invoca: #1" en el catálogo.</summary>
+        /// <summary>The effect number of "Invoca: #1" in the catalogue.</summary>
         public const int Invoca = 181;
 
         /// <summary>
@@ -1668,16 +1689,16 @@ namespace Jondo.Unity.Server.Network
         public const int InvocaUnDoble = 180;
 
         /// <summary>
-        /// A alguien lo mueven de sitio sin que ande (jwe con el f14 al número del efecto):
+        /// Someone is moved without walking (jwe with f14 at the effect's number):
         ///
-        ///   f3: quién lo provoca    f14: 5 si empuja, 6 si atrae
-        ///   f38 { f1: de qué casilla, f2: a quién, f3: a cuál }
+        ///   f3: who causes it      f14: 5 if pushing, 6 if pulling
+        ///   f38 { f1: from which cell, f2: whom, f3: to which }
         ///
-        /// Medido sobre los 76 desplazamientos de las capturas del Ocra. El <c>f14</c> no es un
-        /// código del motor: es el número de efecto del catálogo tal cual, el mismo 5 de
+        /// Measured over the 76 displacements of the Cra captures. <c>f14</c> is not an
+        /// engine code: it is the catalogue's effect number as is, the same 5 as
         /// "Empuja #1 casilla".
         /// </summary>
-        /// <summary>Los dos números con los que viaja un desplazamiento.</summary>
+        /// <summary>The two numbers a displacement travels with.</summary>
         public const int Alejarse = 5;
         public const int Acercarse = 6;
 
@@ -1836,7 +1857,7 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// Uno se ha muerto (jwe con f14 = 103): <c>f4 { f1: quién }</c>.
+        /// Someone has died (jwe with f14 = 103): <c>f4 { f1: who }</c>.
         /// </summary>
         public static byte[] BuildDeath(long author, long victim)
             => Pb.New()
@@ -1845,38 +1866,38 @@ namespace Jondo.Unity.Server.Network
                 .Var(14, Died)
                 .Build();
 
-        // ─── Se acabó ───────────────────────────────────────────────────────────
+        // ─── It is over ─────────────────────────────────────────────────────────
 
-        /// <summary>Se acabó el combate (kuf). Va vacío.</summary>
+        /// <summary>The fight is over (kuf). It goes empty.</summary>
         public static byte[] BuildFightOver() => Array.Empty<byte>();
 
         /// <summary>
-        /// Cómo ha quedado (jyg), uno por combatiente.
+        /// How it ended (jyg), one per fighter.
         ///
-        ///   f2 (repetido) { f3 { f1: quién, f3: 1 si vivo }, f4: el resultado }
+        ///   f2 (repeated) { f3 { f1: who, f3: 1 if alive }, f4: the result }
         ///
-        /// El de verdad lleva bastante más dentro —el nivel, la experiencia, la cuenta— y de eso
-        /// sólo está descifrada la envoltura, así que aquí va lo mínimo con lo que el cliente puede
-        /// cerrar el combate y devolver al jugador al mapa. El panel de recompensas quedará pobre
-        /// hasta que se mida entero.
+        /// The real one carries quite a lot more inside —the level, the experience, the account— and of that
+        /// only the wrapper is deciphered, so here goes the minimum with which the client can
+        /// close the fight and return the player to the map. The rewards panel will stay poor
+        /// until it is measured whole.
         /// </summary>
-        /// <summary>Lo que se lleva uno del combate.</summary>
+        /// <summary>What one takes from the fight.</summary>
         public sealed class Spoils
         {
             public long Kamas { get; set; }
             public List<(int Quantity, int Gid)> Items { get; } = new List<(int, int)>();
         }
 
-        /// <summary>Cómo acaba uno el combate: una fila de la pantalla de fin de combate.</summary>
+        /// <summary>How one ends the fight: a row of the end-of-fight screen.</summary>
         public sealed class FightResult
         {
             public long Fighter { get; set; }
             public bool Winner { get; set; }
 
-            /// <summary>Su nivel. En cero se entiende que es un monstruo y no lleva ficha.</summary>
+            /// <summary>His level. At zero it is understood to be a monster and carries no sheet.</summary>
             public int Level { get; set; }
 
-            /// <summary>La experiencia acumulada DESPUÉS del combate, y la que se acaba de ganar.</summary>
+            /// <summary>The experience accumulated AFTER the fight, and the one just earned.</summary>
             public long Xp { get; set; }
             public long XpGained { get; set; }
 
@@ -1884,37 +1905,37 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Cómo ha quedado cada uno (jyg), que es lo que llena la pantalla de fin de combate.
+        /// How each one ended (jyg), which is what fills the end-of-fight screen.
         ///
-        ///   f2 (repetido, uno por combatiente) {
-        ///       f2 { f1: los kamas, f2 { f1 { f2: cuántos, f4: el objeto } ... } }   el botín
-        ///       f3 { f1: quién
-        ///            f2 { f1 { f2 { f1: la experiencia ganada
-        ///                           f2: la que hace falta para el nivel siguiente
-        ///                           f5: la que tiene ahora
-        ///                           f6: la del nivel en el que está
-        ///                           f3, f4, f7, f8, f9: unos } }
-        ///                 f2: su nivel }
+        ///   f2 (repeated, one per fighter) {
+        ///       f2 { f1: the kamas, f2 { f1 { f2: how many, f4: the item } ... } }   the loot
+        ///       f3 { f1: who
+        ///            f2 { f1 { f2 { f1: the experience earned
+        ///                           f2: what is needed for the next level
+        ///                           f5: what he has now
+        ///                           f6: that of the level he is at
+        ///                           f3, f4, f7, f8, f9: ones } }
+        ///                 f2: his level }
         ///            f3: 1 }
-        ///       f4: 2, y sólo en las filas del bando que gana }
-        ///   f4: lo que ha durado, en milésimas      f8: -1
+        ///       f4: 2, and only in the rows of the winning side }
+        ///   f4: how long it lasted, in milliseconds      f8: -1
         ///
-        /// El bloque de la experiencia no está adivinado. Salen cuatro personajes de las capturas
-        /// y en los cuatro cuadra con la tabla del cliente (character_xp.json): con f2 = 354, el
-        /// f6 vale 23.700.657.518, que es justo lo que pide el nivel 354, y el f2 de dentro vale
-        /// 23.932.109.854, que es lo que pide el 355; el f5 cae entre los dos. Igual con 227, 447
-        /// y 290. En el duelo, donde no se gana experiencia, el bloque entero no va y sólo queda
-        /// el nivel.
+        /// The experience block is not guessed. Four characters come out of the captures
+        /// and in all four it matches the client's table (character_xp.json): with f2 = 354,
+        /// f6 is 23,700,657,518, which is exactly what level 354 asks for, and the inner f2 is
+        /// 23,932,109,854, which is what 355 asks for; f5 falls between the two. The same with 227, 447
+        /// and 290. In the duel, where no experience is earned, the whole block does not go and only
+        /// the level remains.
         ///
-        /// El botín también: en la captura del koliseo el ganador se lleva f1 { f2: 260, f4: 12736 }
-        /// y f1 { f2: 2, f4: 34478 }, y 12736 y 34478 son la Kolicha y la Vitoricha, así que el f4
-        /// es el objeto y el f2 cuántos. Ojo, que eso es lo ÚNICO que se saca de ahí: cuál es cada
-        /// campo. Las kolichas y las vitorichas son del koliseo, del PvP, y no se reparten aquí;
-        /// contra monstruos lo que va en esta lista es lo que suelten sus tablas de drop, y los
-        /// kamas en el f1.
+        /// The loot too: in the koliseo capture the winner takes f1 { f2: 260, f4: 12736 }
+        /// and f1 { f2: 2, f4: 34478 }, and 12736 and 34478 are the Kolicha and the Vitoricha, so f4
+        /// is the item and f2 how many. Careful, that is the ONLY thing taken from there: which
+        /// field is which. The kolichas and vitorichas belong to the koliseo, to PvP, and are not handed out here;
+        /// against monsters what goes in this list is what their drop tables release, and the
+        /// kamas in f1.
         ///
-        /// El f2 del botín va SIEMPRE, aunque esté vacío: en las capturas los monstruos llevan un
-        /// f2 de cero bytes, no se lo saltan.
+        /// The loot's f2 ALWAYS goes, even if empty: in the captures the monsters carry a
+        /// zero-byte f2, they do not skip it.
         /// </summary>
         public static byte[] BuildFightResults(IEnumerable<FightResult> results, int durationMs)
         {
@@ -1957,16 +1978,16 @@ namespace Jondo.Unity.Server.Network
                         .Msg(1, Pb.New().Msg(2, experiencia))
                         .Var(2, result.Level));
                 }
-                // Este f3 va SIEMPRE, gane o pierda.
+                // This f3 ALWAYS goes, win or lose.
                 //
-                // Lo quite creyendo que era del ganador: en el jyg del koliseo sus cuatro entradas
-                // se parten en dos y dos, y las dos PERSONAS que pierden no lo traen. Pero la
-                // guardia de regresion lo caza contra una captura de combate contra monstruos, y
-                // ahi el monstruo que pierde SI lo lleva -- el servidor no arrancaba por esto.
+                // I removed it thinking it was the winner's: in the koliseo's jyg its four entries
+                // split two and two, and the two PEOPLE who lose do not bring it. But the
+                // regression guard catches it against a capture of a fight against monsters, and
+                // there the monster that loses DOES carry it -- the server would not start because of this.
                 //
-                // O sea que el f3 no significa «ha ganado». Que significa no lo se, y con dos
-                // capturas que se contradicen bajo mi lectura, la lectura que sobra es la mia: se
-                // deja como estaba, que es lo unico medido de punta a punta.
+                // So f3 does not mean «has won». What it means I do not know, and with two
+                // captures contradicting each other under my reading, the reading that has to go is mine: it is
+                // left as it was, which is the only thing measured end to end.
                 quien.Var(3, 1);
                 entrada.Msg(3, quien);
 
@@ -1976,7 +1997,7 @@ namespace Jondo.Unity.Server.Network
             return jyg.VarIfNotZero(4, durationMs).Var(8, Nobody).Build();
         }
 
-        /// <summary>El resultado que lleva el jyg en la captura de una victoria.</summary>
+        /// <summary>The result the jyg carries in the capture of a victory.</summary>
         public const int Victory = 2;
 
         /// <summary>
@@ -2063,21 +2084,21 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Se acabó el turno (jyt).
+        /// The turn is over (jyt).
         ///
-        ///   f1: las décimas que sobraron, que se guardan para su siguiente turno (se omite si es
-        ///       cero)      f2: de quién era
+        ///   f1: the tenths left over, which are kept for his next turn (omitted if
+        ///       zero)      f2: whose it was
         /// </summary>
         public static byte[] BuildTurnEnd(long fighterId, int savedDeciseconds = 0)
             => Pb.New().VarIfNotZero(1, savedDeciseconds).Var(2, fighterId).Build();
 
-        /// <summary>Lo que lleva el f3 de la ficha en los combatientes de las capturas.</summary>
+        /// <summary>What the sheet's f3 carries in the captures' fighters.</summary>
         private const int SheetKind = 2;
 
         /// <summary>
-        /// Qué monstruo es: <c>f2 { f1: grado, f2: la plantilla, f3: el nivel }</c>.
+        /// Which monster it is: <c>f2 { f1: grade, f2: the template, f3: the level }</c>.
         ///
-        /// Del poutch de la captura salen 3, 494 y 50, y ese 50 es justamente su nivel.
+        /// From the capture's poutch come 3, 494 and 50, and that 50 is precisely its level.
         /// </summary>
         public static Pb MonsterIdentity(int grade, int monsterId, int level)
             => Pb.New().Msg(2, Pb.New()
@@ -2086,14 +2107,14 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(3, level));
 
         /// <summary>
-        /// Quién es el jugador: la raza, su nombre y poco más.
+        /// Who the player is: the breed, his name and little else.
         ///
-        ///   f2 { f1: la raza, f3: ?, f4 { f1: 100, f2: 3, f5: 200 } }
-        ///   f4: -1        f7: el nombre        f8 { f1: 1 }
+        ///   f2 { f1: the breed, f3: ?, f4 { f1: 100, f2: 3, f5: 200 } }
+        ///   f4: -1        f7: the name        f8 { f1: 1 }
         ///
-        /// El f3 del bloque interior valía 354 en la captura y no se ha conseguido explicar; va
-        /// fuera. El f4 tiene pinta de bloque de aspecto por ese 3 en medio, pero tampoco está
-        /// descifrado, así que se manda tal cual se midió.
+        /// The inner block's f3 was 354 in the capture and could not be explained; it is
+        /// left out. f4 looks like a look block because of that 3 in the middle, but it is not
+        /// deciphered either, so it is sent just as it was measured.
         /// </summary>
         public static Pb PlayerIdentity(int breed, string name, int sex = 0, int level = 0)
             => Pb.New()
@@ -2107,8 +2128,8 @@ namespace Jondo.Unity.Server.Network
                 .Msg(8, Pb.New().Var(1, 1));
 
         /// <summary>
-        /// Las características que el servidor real manda en la ficha de la colocación, en su
-        /// orden. Casi todas van a cero ahí: lo que importa en esta fase es que el hueco exista.
+        /// The characteristics the real server sends in the placement sheet, in their
+        /// order. Almost all go at zero there: what matters in this phase is that the slot exists.
         /// </summary>
         public static readonly int[] PlacementSheet =
         {
@@ -2124,16 +2145,16 @@ namespace Jondo.Unity.Server.Network
         };
 
         /// <summary>
-        /// Quiénes pelean (jzu).
+        /// Who fights (jzu).
         ///
-        ///   f2 (repetido, uno por COMBATIENTE) { f3 { f2: quién } }
+        ///   f2 (repeated, one per FIGHTER) { f3 { f2: who } }
         ///
-        /// Ojo, que esto es fácil de leer al revés: el f2 repetido NO es un equipo, es un
-        /// combatiente. Contra un solo monstruo salen dos bloques y parece un equipo cada uno;
-        /// contra cuatro poutchs salen CINCO, con el jugador y luego -1, -2, -3 y -4. Los
-        /// monstruos llevan su propio identificador negativo, no todos el mismo.
+        /// Careful, this is easy to read the wrong way round: the repeated f2 is NOT a team, it is a
+        /// fighter. Against a single monster two blocks come out and each looks like a team;
+        /// against four poutchs FIVE come out, with the player and then -1, -2, -3 and -4. The
+        /// monsters carry their own negative identifier, not all the same one.
         ///
-        /// El orden es el del jugador primero y los monstruos detrás.
+        /// The order is the player first and the monsters after.
         /// </summary>
         public static byte[] BuildTeams(IEnumerable<long> fighters)
         {
@@ -2146,11 +2167,11 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Dónde se puede uno colocar (kba).
+        /// Where one can be placed (kba).
         ///
-        ///   f1 { f1: [las casillas del equipo 0], f2: [las del equipo 1] }
+        ///   f1 { f1: [team 0's cells], f2: [team 1's] }
         ///
-        /// Las dos listas van empaquetadas, y en las capturas son dieciséis casillas por bando.
+        /// Both lists go packed, and in the captures they are sixteen cells per side.
         /// </summary>
         public static byte[] BuildPlacementCells(IEnumerable<long> blue, IEnumerable<long> red)
             => Pb.New()
@@ -2160,9 +2181,9 @@ namespace Jondo.Unity.Server.Network
         // ─── Colocarse ──────────────────────────────────────────────────────────
 
         /// <summary>
-        /// A qué casilla se quiere mover el jugador durante la colocación (jzy).
+        /// Which cell the player wants to move to during placement (jzy).
         ///
-        ///   f1: quién      f2: la casilla
+        ///   f1: who        f2: the cell
         /// </summary>
         public static (long Fighter, int Cell) ReadPlacementMove(byte[] payload)
         {
@@ -2181,13 +2202,13 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Quién está en qué casilla (kmk).
+        /// Who is on which cell (kmk).
         ///
-        ///   f2 (repetido) { f1: casilla, f2: orientación, f3: quién }
+        ///   f2 (repeated) { f1: cell, f2: orientation, f3: who }
         ///
-        /// Moverse durante la colocación viaja como DOS entradas en un solo mensaje: la casilla que
-        /// se deja, con <see cref="Nobody"/>, y la que se ocupa, con quién la ocupa. Mandar sólo la
-        /// nueva deja al que mira viendo dos veces al mismo.
+        /// Moving during placement travels as TWO entries in a single message: the cell
+        /// left, with <see cref="Nobody"/>, and the one taken, with who takes it. Sending only the
+        /// new one leaves the onlooker seeing the same one twice.
         /// </summary>
         public static byte[] BuildFightersPlaced(IEnumerable<(int Cell, int Orientation, long Fighter)> spots)
         {
@@ -2202,19 +2223,19 @@ namespace Jondo.Unity.Server.Network
             return kmk.Build();
         }
 
-        /// <summary>Uno solo, que es el caso corriente.</summary>
+        /// <summary>A single one, which is the ordinary case.</summary>
         public static byte[] BuildFighterPlaced(int cell, int orientation, long fighter)
             => BuildFightersPlaced(new[] { (cell, orientation, fighter) });
 
         // ─── Listo ──────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// El botón de listo (kaq).
+        /// The ready button (kaq).
         ///
         ///   f1: 1
         ///
-        /// Devuelve si el jugador se declara listo. En las capturas siempre llega con 1; el cero
-        /// sería retirar el listo, pero eso no está medido.
+        /// Returns whether the player declares himself ready. In the captures it always arrives with 1; zero
+        /// would be withdrawing ready, but that is not measured.
         /// </summary>
         public static bool ReadReady(byte[] payload)
         {
@@ -2229,35 +2250,35 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Enterado del listo (kah).
+        /// Ready acknowledged (kah).
         ///
-        ///   f1: quién      f3: 1
+        ///   f1: who        f3: 1
         ///
-        /// El f2 no aparece en ninguna de las capturas.
+        /// f2 does not appear in any of the captures.
         /// </summary>
         /// <summary>
-        /// El desafio que se ofrece (hqc): quien reta, a quien, y el id.
+        /// The challenge offered (hqc): who challenges, whom, and the id.
         /// </summary>
         /// <remarks>
-        /// Byte por byte de las cuatro capturas de desafio. Los cuatro hqc medidos tienen la misma
-        /// forma y sus tres campos siempre puestos:
+        /// Byte by byte from the four challenge captures. The four measured hqc have the same
+        /// shape and their three fields always set:
         ///
-        ///   08a28280c8e708 10a282f0a6c408 18ee03    retador, retado, 494
+        ///   08a28280c8e708 10a282f0a6c408 18ee03    challenger, challenged, 494
         /// </remarks>
         public static byte[] BuildChallengeOffered(long challengerId, long targetId, int challengeId)
             => Pb.New().Var(1, challengerId).Var(2, targetId).Var(3, challengeId).Build();
 
         /// <summary>
-        /// Como acabo el desafio (hpv). El f3 solo viaja cuando se acepto.
+        /// How the challenge ended (hpv). f3 only travels when it was accepted.
         /// </summary>
         /// <remarks>
-        /// Y esa es la diferencia entera entre los dos finales, medida en las cuatro capturas:
+        /// And that is the whole difference between the two endings, measured in the four captures:
         ///
-        ///   aceptado   08a28280c8e708 10ee03 1801 20a282f0a6c408
-        ///   rechazado  08a28280c8e708 10e903      20a282f0a6c408
+        ///   accepted   08a28280c8e708 10ee03 1801 20a282f0a6c408
+        ///   declined   08a28280c8e708 10e903      20a282f0a6c408
         ///
-        /// El campo del retado es el CUATRO, no el tres, y eso no es un despiste de la lectura: en
-        /// las dos rechazadas el 20 va justo detras del id, sin nada en medio.
+        /// The challenged one's field is FOUR, not three, and that is not a misreading: in
+        /// the two declined ones the 20 goes right after the id, with nothing in between.
         /// </remarks>
         public static byte[] BuildChallengeAnswered(long challengerId, int challengeId,
                                                     bool accepted, long targetId)
@@ -2270,27 +2291,27 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildReadyAck(long fighterId, bool ready = true)
             => Pb.New().Var(1, fighterId).Var(3, ready ? 1 : 0).Build();
 
-        // ─── La barra de hechizos ───────────────────────────────────────────────
+        // ─── The spell bar ──────────────────────────────────────────────────────
 
         /// <summary>
-        /// Los hechizos con los que se pelea (jyy).
+        /// The spells one fights with (jyy).
         ///
-        ///   f3: quién      f4: quién (el mismo)
-        ///   f6 (repetido) { f1: el grado, f3: el hechizo, f4: 1 }
+        ///   f3: who        f4: who (the same)
+        ///   f6 (repeated) { f1: the grade, f3: the spell, f4: 1 }
         ///
-        /// El f3 y el f4 llevan el mismo combatiente en las capturas; lo que los separa no se sabe,
-        /// porque nunca se han visto distintos.
+        /// f3 and f4 carry the same fighter in the captures; what separates them is not known,
+        /// because they have never been seen different.
         /// </summary>
-        /// <summary>El origen del hechizo: 1 los de clase, 2 los que no —el cuerpo a cuerpo—.</summary>
+        /// <summary>The spell's origin: 1 the class ones, 2 the ones that are not —melee—.</summary>
         private const int OrigenQueNoEsDeClase = 2;
         private const int GradoDelCuerpoACuerpo = 1;
 
-        /// <summary>El cuerpo a cuerpo es el hechizo CERO, "Puñetazo".</summary>
+        /// <summary>Melee is spell ZERO, "Puñetazo".</summary>
         public const int HechizoCuerpoACuerpo = 0;
 
         /// <param name="conArma">
-        /// Si lleva la entrada del cuerpo a cuerpo. La llevan las barras de los JUGADORES, las 27
-        /// de las capturas; las de los invocados, que traen una o dos entradas, no.
+        /// Whether it carries the melee entry. The PLAYERS' bars carry it, all 27
+        /// of the captures; the summons', which bring one or two entries, do not.
         /// </param>
         /// <summary>
         /// The spell bar of a summon, for the player who controls it (jyy): f3 the summon, f4
@@ -2322,16 +2343,16 @@ namespace Jondo.Unity.Server.Network
         {
             var jyy = Pb.New().Var(3, fighterId).Var(4, fighterId);
 
-            // El cuerpo a cuerpo va el primero de la lista, con el número omitido —es el hechizo
-            // CERO, "Puñetazo", que está en la base como SpellTemplates.Id 0— y el origen a 2.
-            // Los bytes son 08 01 20 02, y salen en las 27 barras de jugador de las capturas; las
-            // de los invocados no la llevan.
+            // Melee goes first in the list, with the number omitted —it is spell
+            // ZERO, "Puñetazo", which is in the base as SpellTemplates.Id 0— and the origin at 2.
+            // The bytes are 08 01 20 02, and they appear in the 27 player bars of the captures; those
+            // of summons do not carry it.
             if (conArma)
             {
                 jyy.Msg(6, Pb.New().Var(1, GradoDelCuerpoACuerpo).Var(4, OrigenQueNoEsDeClase));
             }
 
-            // Qué hechizos tiene.
+            // Which spells it has.
             foreach (var (spell, grade) in spells)
             {
                 jyy.Msg(6, Pb.New()
@@ -2340,21 +2361,21 @@ namespace Jondo.Unity.Server.Network
                     .Var(4, 1));
             }
 
-            // Y DÓNDE están puestos, que es otra lista y va aparte. Mandando sólo la primera, el
-            // cliente sabe qué hechizos tienes pero deja el panel de "Mis hechizos" en blanco, y
-            // sin iconos no hay manera de lanzar nada.
+            // And WHERE they are placed, which is another list and goes separately. Sending only the first, the
+            // client knows which spells you have but leaves the "Mis hechizos" panel blank, and
+            // without icons there is no way to cast anything.
             //
-            // Y los huecos. El cuerpo a cuerpo tiene que ir en LOS DOS SITIOS: en la lista de
-            // arriba, para que el cliente sepa qué es, y aquí en la barra, para que tenga dónde
-            // pintarlo. Los tres intentos anteriores mandaron siempre uno de los dos y nunca los
-            // dos, y por eso salía apagado, o no salía.
+            // And the slots. Melee has to go in BOTH PLACES: in the list
+            // above, so the client knows what it is, and here in the bar, so it has somewhere to
+            // draw it. The three previous attempts always sent one of the two and never
+            // both, and that is why it came out greyed, or did not come out.
             //
-            // Su entrada en la barra es un f6 PRESENTE Y VACÍO —los bytes 3a 02 32 00—, que es
-            // exactamente como proto3 escribe "el hechizo cero". Se leyó en su día como "un hueco
-            // que el jugador dejó sin llenar", y eso es falso: un hueco sin llenar sencillamente
-            // no se manda. Está en el 100% de las barras de jugador —13 de 13 itg y 51 de 51 jyy—
-            // y en el 0% de las de invocado, 0 de 24. Y el personaje del tutorial, con el
-            // inventario vacío y sin arma ninguna, la lleva igual: la casilla es del puño.
+            // Its entry in the bar is a PRESENT AND EMPTY f6 —bytes 3a 02 32 00—, which is
+            // exactly how proto3 writes "spell zero". It was read at the time as "a slot
+            // the player left unfilled", and that is false: an unfilled slot is simply
+            // not sent. It is in 100% of the player bars —13 of 13 itg and 51 of 51 jyy—
+            // and in 0% of the summon ones, 0 of 24. And the tutorial character, with an
+            // empty inventory and no weapon at all, carries it the same: the slot belongs to the fist.
             foreach (var (slot, spell) in bar)
             {
                 var hueco = Pb.New().VarIfNotZero(2, slot);
@@ -2366,33 +2387,33 @@ namespace Jondo.Unity.Server.Network
             return jyy.Build();
         }
 
-        // ─── Los retos ──────────────────────────────────────────────────────────
+        // ─── The challenges ─────────────────────────────────────────────────────
 
         /// <summary>
-        /// El estado que lleva todo reto por el cable. Vale dos en el cien por cien de los que
-        /// se han visto —en la propuesta, en la lista definitiva y en los de mitad de combate—,
-        /// así que de los otros dos valores del enumerado no se sabe nada.
+        /// The state every challenge carries on the wire. It is two in one hundred per cent of those
+        /// seen —in the proposal, in the final list and in the mid-fight ones—,
+        /// so nothing is known about the enum's other two values.
         /// </summary>
         public const int ChallengeState = 2;
 
         /// <summary>
-        /// Cuánto dura la propuesta. Vale quince en las nueve apariciones y no se le ha visto
-        /// cambiar; el cliente tiene un <c>OnChallengeProposalUpdateTimer</c>, así que es un
-        /// temporizador, pero por lo que se ve podría ser cualquier constante.
+        /// How long the proposal lasts. It is fifteen in all nine appearances and has not been seen
+        /// to change; the client has an <c>OnChallengeProposalUpdateTimer</c>, so it is a
+        /// timer, but from what is seen it could be any constant.
         /// </summary>
         public const int ChallengeTimer = 15;
 
         /// <summary>
-        /// Un reto (ldd): { f1: %, f2: cuál, f3 (repetido): objetivos, f4: %, f5: estado }.
+        /// A challenge (ldd): { f1: %, f2: which, f3 (repeated): targets, f4: %, f5: state }.
         ///
-        /// Los dos porcentajes son el de experiencia y el de botín, y en los veintisiete retos
-        /// distintos de las capturas SIEMPRE valen lo mismo, así que no hay forma de saber cuál
-        /// es cuál. El cliente tampoco ayuda: su ventana pinta un solo número.
+        /// The two percentages are the experience one and the loot one, and in the twenty-seven
+        /// different challenges of the captures they ALWAYS have the same value, so there is no way of knowing which
+        /// is which. The client does not help either: its window draws a single number.
         ///
-        /// Cuando el extra es cero los dos campos desaparecen —proto3 no manda el cero—, que es
-        /// lo que pasa con los retos que impone una anomalía.
+        /// When the extra is zero both fields disappear —proto3 does not send zero—, which is
+        /// what happens with the challenges an anomaly imposes.
         ///
-        ///   085f1011205f2802   =   95 %, reto 17, 95 %, estado 2
+        ///   085f1011205f2802   =   95 %, challenge 17, 95 %, state 2
         /// </summary>
         public static byte[] BuildChallenge(int id, int percent, IEnumerable<(int Cell, long Fighter)>? targets = null)
         {
@@ -2402,8 +2423,8 @@ namespace Jondo.Unity.Server.Network
             {
                 foreach (var (cell, fighter) in targets)
                 {
-                    // Sin objetivo todavía va la casilla a menos uno: en la preparación, un reto
-                    // que apunta a dónde acabas el turno no sabe aún dónde vas a estar.
+                    // With no target yet the cell goes at minus one: in the preparation, a challenge
+                    // pointing at where you end the turn does not yet know where you will be.
                     ldd.Msg(3, Pb.New().Var(2, cell).VarIfNotZero(3, fighter));
                 }
             }
@@ -2411,14 +2432,14 @@ namespace Jondo.Unity.Server.Network
             return ldd.VarIfNotZero(4, percent).Var(5, ChallengeState).Build();
         }
 
-        /// <summary>Cuántos retos hay que elegir (kxa): { f1: n }. Uno fuera de mazmorra.</summary>
+        /// <summary>How many challenges have to be chosen (kxa): { f1: n }. One outside a dungeon.</summary>
         public static byte[] BuildChallengeCount(int howMany) => Pb.New().Var(1, howMany).Build();
 
         /// <summary>
-        /// La lista de candidatos (kwx): { f1: el temporizador, f2 (repetido): los retos }.
+        /// The candidate list (kwx): { f1: the timer, f2 (repeated): the challenges }.
         ///
-        /// Siempre son dos, y son alternativas: en las capturas se ofrecieron juntos dos que la
-        /// tabla del cliente marca como incompatibles entre sí.
+        /// There are always two, and they are alternatives: in the captures two were offered together that the
+        /// client's table marks as incompatible with each other.
         /// </summary>
         public static byte[] BuildChallengeList(IEnumerable<byte[]> challenges)
         {
@@ -2431,7 +2452,7 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildChallengeChosen(byte[] challenge)
             => Pb.New().Bytes(1, challenge).Build();
 
-        /// <summary>La lista definitiva (kwu): { f2 (repetido): los retos }. Va pegada al jyy.</summary>
+        /// <summary>The final list (kwu): { f2 (repeated): the challenges }. It goes stuck to the jyy.</summary>
         public static byte[] BuildChallengeFinalList(IEnumerable<byte[]> challenges)
         {
             var kwu = Pb.New();
@@ -2439,49 +2460,49 @@ namespace Jondo.Unity.Server.Network
             return kwu.Build();
         }
 
-        /// <summary>La confirmación del ajuste del panel (kwn), con el mismo valor que llegó.</summary>
+        /// <summary>The confirmation of the panel setting (kwn), with the same value that arrived.</summary>
         public static byte[] BuildChallengeSettings(long value)
             => Pb.New().VarIfNotZero(1, value).Build();
 
         /// <summary>
-        /// El OBJETIVO de un reto (kwm): { f2: el reto, con su objetivo dentro }.
+        /// A challenge's TARGET (kwm): { f2: the challenge, with its target inside }.
         ///
-        /// Es el único mensaje que lleva a quién hay que matar, y su f1 no ha viajado nunca. En
-        /// las capturas sale tres veces, las tres pegadas al jyy que arranca el combate; volver a
-        /// mandarlo cuando el objetivo cambia es la lectura natural —no hay otro mensaje que
-        /// pueda llevarlo— pero eso ya no está medido.
+        /// It is the only message carrying whom to kill, and its f1 has never travelled. In
+        /// the captures it appears three times, all three stuck to the jyy that starts the fight; sending
+        /// it again when the target changes is the natural reading —there is no other message that
+        /// could carry it— but that is no longer measured.
         ///
         ///   1218084610231a0e10860218fdffffffffffffffff0120462802
-        ///   = reto 35 al 70 %, objetivo en la casilla 262, luchador −3
+        ///   = challenge 35 at 70 %, target on cell 262, fighter −3
         /// </summary>
         public static byte[] BuildChallengeObjective(byte[] challenge)
             => Pb.New().Bytes(2, challenge).Build();
 
         /// <summary>
-        /// El RESULTADO de un reto (kwl): { f1: cuál, f2: cumplido }.
+        /// A challenge's RESULT (kwl): { f1: which, f2: met }.
         ///
-        /// Sin el f2 está FALLADO, que es como proto3 escribe un booleano falso. El cliente lo
-        /// pinta en verde o en rojo, y hasta que no le llega esto lo tiene por vivo: si no se
-        /// manda nunca, el reto se queda para siempre en marcha en la pantalla del jugador.
+        /// Without f2 it is FAILED, which is how proto3 writes a false boolean. The client
+        /// draws it green or red, and until this reaches it, it considers it alive: if it is never
+        /// sent, the challenge stays running forever on the player's screen.
         ///
-        ///   08111001   =   reto 17 cumplido
-        ///   0801       =   reto 1 fallado
+        ///   08111001   =   challenge 17 met
+        ///   0801       =   challenge 1 failed
         /// </summary>
         public static byte[] BuildChallengeResult(int id, bool completed)
             => Pb.New().Var(1, id).VarIfNotZero(2, completed ? 1 : 0).Build();
 
         /// <summary>
-        /// Lo que un modificador vale AHORA para un hechizo concreto (hnd).
+        /// What a modifier is worth RIGHT NOW for a specific spell (hnd).
         ///
-        /// El cliente no calcula el alcance de un hechizo a partir de los embrujos del panel: lo
-        /// coge de aquí. Sin este mensaje, Disparos Lejanos salía en la lista de efectos con su
-        /// «+6 de alcance máximo» y las casillas iluminadas seguían siendo las mismas, porque el
-        /// jxm es para pintar y esto es para calcular.
+        /// The client does not compute a spell's range from the panel's buffs: it
+        /// takes it from here. Without this message, Disparos Lejanos came out in the effects list with its
+        /// «+6 de alcance máximo» and the lit cells stayed the same, because the
+        /// jxm is for drawing and this is for computing.
         ///
-        ///   f1 { f2: 1, f3: cuánto, f4: qué modificador, f5: el hechizo }   f2: de quién
+        ///   f1 { f2: 1, f3: how much, f4: which modifier, f5: the spell }   f2: whose
         ///
-        /// Medido en «ocra-disparos lejanos»: f4 = 13 con f3 = 3, y f4 = 12 con f3 = 6, que son
-        /// justo el «+3 de alcance mínimo» y el «+6 de alcance máximo» de ese hechizo.
+        /// Measured in «ocra-disparos lejanos»: f4 = 13 with f3 = 3, and f4 = 12 with f3 = 6, which are
+        /// exactly that spell's «+3 de alcance mínimo» and «+6 de alcance máximo».
         /// </summary>
         /// <param name="accion">
         /// Add (1), take away (2) or set (3): Bestialidad's pinned ranges go out as
@@ -2500,11 +2521,11 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// La declaración que va con el <see cref="BuildSpellModifier"/> (hnk): dice que ese
-        /// hechizo tiene ese modificador puesto. Van los dos, uno detrás de otro y en el mismo
-        /// número: 272 y 272 en la captura.
+        /// The declaration that goes with <see cref="BuildSpellModifier"/> (hnk): it says that
+        /// spell has that modifier on. Both go, one after the other and in the same
+        /// number: 272 and 272 in the capture.
         ///
-        ///   f1: qué modificador     f2: 1     f3: el hechizo     f5: de quién
+        ///   f1: which modifier      f2: 1     f3: the spell     f5: whose
         /// </summary>
         public static byte[] BuildSpellModifierDeclared(long quien, int modificador, int hechizo,
                                                         int accion = Managers.SpellModifiers.Add)
@@ -2515,10 +2536,10 @@ namespace Jondo.Unity.Server.Network
                 .Var(5, quien)
                 .Build();
 
-        /// <summary>El alcance máximo de un hechizo, tal como lo numera el hnd/hnk.</summary>
+        /// <summary>A spell's maximum range, as the hnd/hnk numbers it.</summary>
         public const int SpellMaxRange = 12;
 
-        /// <summary>Y el mínimo. OJO: el mínimo es el 13 y el máximo el 12, no al revés.</summary>
+        /// <summary>And the minimum. CAREFUL: the minimum is 13 and the maximum 12, not the other way round.</summary>
         public const int SpellMinRange = 13;
     }
 }

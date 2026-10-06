@@ -143,7 +143,7 @@ namespace Jondo.Unity.Server.Handlers
                 DatabaseManager.SaveItemPosition(itemUid, newPosition,
                     Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
 
-                // La cache de lo que se lleva puesto, por el unico sitio que la escribe.
+                // The cache of what is worn, through the only place that writes it.
                 Managers.Equipment.RememberWorn(itemUid, newPosition, item.RawEffects);
             }
         }

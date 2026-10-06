@@ -9,27 +9,27 @@ namespace Jondo.Unity.Server.Managers
     public static class MobSpawnManager
     {
         /// <summary>
-        /// Los mapas donde NO se pone un monstruo, por mucho que la tabla los tenga.
+        /// The maps where a monster is NOT placed, however much the table has them.
         ///
-        /// Se ven jugando: pios dentro de una casa, dentro de un banco, dentro de una tienda y
-        /// plantados encima del zaap del pueblo. Medido sobre los 38.744 grupos colocados: 9.331
-        /// —el 24,1 %— están en un mapa bajo techo.
+        /// They are seen while playing: pios inside a house, inside a bank, inside a shop and
+        /// standing on top of the village zaap. Measured over the 38,744 placed groups: 9,331
+        /// —24.1 %— are on an indoor map.
         ///
-        /// La regla son dos listas y una excepción, y la excepción es la importante:
+        /// The rule is two lists and one exception, and the exception is the important one:
         ///
-        ///   BAJO TECHO      MapPositions.Outdoor = 0, que son 4.165 mapas
-        ///   CON ZAAP        los 62 del catálogo de puntos de viaje; 53 tenían monstruos encima
-        ///   SALVO MAZMORRA  753 de las 763 salas de mazmorra están marcadas «bajo techo»
+        ///   INDOORS         MapPositions.Outdoor = 0, which is 4,165 maps
+        ///   WITH A ZAAP     the 62 of the travel point catalogue; 53 had monsters on top
+        ///   EXCEPT DUNGEON  753 of the 763 dungeon rooms are marked «indoors»
         ///
-        /// Sin esa excepción, prohibir el interior VACIARÍA LAS MAZMORRAS ENTERAS: son 2.290
-        /// grupos, y una mazmorra sin bichos no es una mazmorra. Con ella, se retiran 7.214 grupos
-        /// (el 18,6 %) repartidos por 2.393 mapas, y las 763 salas se quedan como están.
+        /// Without that exception, banning indoors WOULD EMPTY THE WHOLE DUNGEONS: they are 2,290
+        /// groups, and a dungeon without creatures is not a dungeon. With it, 7,214 groups are removed
+        /// (18.6 %) spread over 2,393 maps, and the 763 rooms stay as they are.
         ///
-        /// Se filtra AL CARGAR y no borrando filas de la base a propósito: world.db se regenera y
-        /// se distribuye comprimida, así que un borrado se perdería en la próxima regeneración y
-        /// habría que acordarse de repetirlo. Esto no hay que acordarse de nada.
+        /// It is filtered ON LOADING and not by deleting rows from the database on purpose: world.db is regenerated and
+        /// distributed compressed, so a deletion would be lost in the next regeneration and
+        /// one would have to remember to repeat it. With this there is nothing to remember.
         /// </summary>
-        /// <summary>Los mapas vetados, guardados para que el repoblador también los respete.</summary>
+        /// <summary>The banned maps, kept so that the repopulator respects them too.</summary>
         private static HashSet<long> _vetados = new HashSet<long>();
 
         private static HashSet<long> MapasSinMonstruos(Microsoft.Data.Sqlite.SqliteConnection connection)
@@ -56,9 +56,9 @@ namespace Jondo.Unity.Server.Managers
                 return new HashSet<long>();
             }
 
-            // Los zaaps salen del catálogo de puntos de viaje. Se lee aquí el fichero en vez de
-            // preguntarle a Interactives porque ése se inicializa DESPUÉS que el spawner, y
-            // preguntárselo ahora devolvería una lista vacía sin dar ningún error.
+            // The zaaps come from the travel point catalogue. The file is read here instead of
+            // asking Interactives because that one is initialised AFTER the spawner, and
+            // asking it now would return an empty list without giving any error.
             try
             {
                 string ruta = Paths.WaypointsJson;
@@ -79,7 +79,7 @@ namespace Jondo.Unity.Server.Managers
                 Program.LogDebug($"[MobSpawnManager] No he podido leer los zaaps: {ex.Message}");
             }
 
-            // Y la mazmorra manda sobre todo lo demás.
+            // And the dungeon rules over everything else.
             vetados.ExceptWith(salas);
             return vetados;
         }
@@ -102,17 +102,17 @@ namespace Jondo.Unity.Server.Managers
             public MonsterData Monster { get; set; }
             public int GradeIndex { get; set; }
 
-            /// <summary>Cuántos grados se reparten a los grupos generados: del 1 al 5, ni uno más.</summary>
+            /// <summary>How many grades are handed out to generated groups: 1 to 5, not one more.</summary>
             public const int MaxGradesPerMonster = 5;
 
             /// <summary>
-            /// Y hasta el sexto para un grupo escrito o compuesto a mano, si el monstruo lo tiene.
+            /// And up to the sixth for a group written or composed by hand, if the monster has it.
             /// </summary>
             /// <remarks>
-            /// Medido: el Puch Ingball de nivel 200 del kanojedo viaja como <c>f2=200 f4=6</c> en
-            /// dos capturas y el cliente lo dibuja y lo deja mirar. El tope de cinco se midió en
-            /// grupos silvestres, que nunca pasaban de ahí; no es que el sexto no exista, es que
-            /// no se había visto.
+            /// Measured: the kanojedo's level 200 Puch Ingball travels as <c>f2=200 f4=6</c> in
+            /// two captures and the client draws it and lets it be inspected. The cap of five was measured on
+            /// wild groups, which never went beyond that; it is not that the sixth does not exist, it is that
+            /// it had not been seen.
             /// </remarks>
             public const int MaxWrittenGrades = 6;
             public int Level { get; set; }
@@ -123,7 +123,7 @@ namespace Jondo.Unity.Server.Managers
             public long MobId { get; set; }
             public int CellId { get; set; }
 
-            /// <summary>Hacia dónde mira, de 1 a 7. Los generados miran al sureste.</summary>
+            /// <summary>Which way it faces, 1 to 7. Generated ones face south-east.</summary>
             public int Orientation { get; set; } = 1;
 
             public List<MobMember> Members { get; set; } = new List<MobMember>();
@@ -136,19 +136,22 @@ namespace Jondo.Unity.Server.Managers
         }
 
         private static Dictionary<int, MonsterData> _monsters = new Dictionary<int, MonsterData>();
+
+        /// <summary>Every monster the server knows, with its grades: what the admin window lists levels from.</summary>
+        public static IReadOnlyCollection<MonsterData> AllMonsters => _monsters.Values;
         private static Dictionary<long, List<MobGroup>> _mapMobs = new Dictionary<long, List<MobGroup>>();
 
         /// <summary>
-        /// El candado de los grupos por mapa.
+        /// The lock on the groups per map.
         ///
-        /// <see cref="_mapMobs"/> es un Dictionary pelado y se toca desde el hilo de cada jugador:
-        /// dos entrando a la vez a mapas sin grupos escritos hacían los dos un <c>_mapMobs[id] =</c>
-        /// sobre la misma tabla, que es como se rompe un Dictionary de verdad —bucle infinito
-        /// dentro del propio .NET, no una excepción—. Con un jugador no se notaba nunca.
+        /// <see cref="_mapMobs"/> is a bare Dictionary and it is touched from each player's thread:
+        /// two entering at once maps with no written groups both did a <c>_mapMobs[id] =</c>
+        /// on the same table, which is how a Dictionary really breaks —an infinite loop
+        /// inside .NET itself, not an exception—. With one player it was never noticed.
         ///
-        /// Esto NO es la fase de monstruos compartidos: sigue faltando marcar un grupo como
-        /// ocupado cuando ya está en un combate. Es sólo que el reparto de ids toca este mismo
-        /// diccionario y dejarlo sin candado sería empeorarlo.
+        /// This is NOT the shared monsters phase: marking a group as busy when it is already in a
+        /// fight is still missing. It is just that handing out ids touches this same
+        /// dictionary and leaving it without a lock would make it worse.
         /// </summary>
         private static readonly object _candado = new object();
 
@@ -234,7 +237,7 @@ namespace Jondo.Unity.Server.Managers
             // Who lives in each subarea, which is who a dungeon room is made of.
             _subareaRosters = LoadSubareaRosters(connection);
 
-            // Y dónde NO se pone un monstruo por mucho que la tabla lo diga.
+            // And where a monster is NOT placed however much the table says so.
             _vetados = MapasSinMonstruos(connection);
             var vetados = _vetados;
 
@@ -249,7 +252,7 @@ namespace Jondo.Unity.Server.Managers
                 {
                     long mapId = reader.GetInt64(0);
 
-                    // Ni en una casa, ni en un banco, ni en una tienda, ni encima de un zaap.
+                    // Not in a house, not in a bank, not in a shop, not on top of a zaap.
                     if (vetados.Contains(mapId)) { bajoTecho++; continue; }
 
                     long mobId = reader.GetInt64(1);
@@ -283,8 +286,8 @@ namespace Jondo.Unity.Server.Managers
 
                             for (int i = 0; i < ids.Count; i++) {
                                 if (_monsters.TryGetValue(ids[i], out var mData)) {
-                                    // Lo mismo que arriba: la base de datos guarda grados que el
-                                    // cliente no acepta, y hay que recortarlos aquí también.
+                                    // Same as above: the database stores grades the
+                                    // client does not accept, and they have to be trimmed here too.
                                     int grade = Math.Clamp(grades[i], 0, MobMember.MaxGradesPerMonster - 1);
                                     group.Members.Add(new MobMember {
                                         Monster = mData,
@@ -305,18 +308,18 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
-            // Los jefes de mazmorra, antes de lo escrito a mano para que una persona pueda
-            // cambiarlos de sitio o quitarlos.
+            // The dungeon bosses, before what is written by hand so that a person can
+            // move them or remove them.
             int jefes = ComposeDungeonRooms();
 
-            // Y lo que haya decidido una persona, encima de todo lo anterior.
+            // And whatever a person has decided, on top of everything before.
             var deLaMano = AplicarLosEscritos();
 
-            // Los grupos escritos traen su id puesto desde la siembra. El repartidor tiene que
-            // apartarse por debajo del más bajo de todos ellos antes de dar el primero suyo, o el
-            // primer grupo generado al vuelo se llevaría un número que ya está ocupado en otro
-            // mapa —y entonces GetMobGroupById devolvería el equivocado—. Los puestos a mano
-            // cuentan igual: sus ids arrancan en el -2.000.000 y son los más bajos de todos.
+            // The written groups bring their id set from the seeding. The dispenser has to
+            // step below the lowest of all of them before handing out its first one, or the
+            // first group generated on the fly would take a number already taken on another
+            // map —and then GetMobGroupById would return the wrong one—. The hand-placed ones
+            // count the same: their ids start at -2,000,000 and are the lowest of all.
             long menor = ActorIds.PrimerMonstruo;
             foreach (var lista in _mapMobs.Values)
             {
@@ -337,9 +340,9 @@ namespace Jondo.Unity.Server.Managers
                               "los que se generen al vuelo siguen por debajo.");
             Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
                               $"({100.0 * archmonsters / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
-            // Los dos números por separado, no la resta. Con un grupo puesto y otro quitado la
-            // resta da cero y la línea no sale, que es justo el arranque en el que más falta hace
-            // ver que content/ ha tocado algo.
+            // The two numbers separately, not the subtraction. With one group placed and another removed the
+            // subtraction gives zero and the line does not come out, which is exactly the start where it is most needed
+            // to see that content/ has touched something.
             if (deLaMano.Puestos != 0 || deLaMano.Quitados != 0)
             {
                 Console.WriteLine($"[MobSpawnManager] Desde content/: {deLaMano.Puestos} grupo(s) " +
@@ -347,7 +350,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Desde donde se numeran los grupos de jefe. Por debajo de los escritos a mano.</summary>
+        /// <summary>Where the boss groups are numbered from. Below the hand-written ones.</summary>
         private const long PrimerJefe = -3_000_000;
 
         /// <summary>
@@ -583,22 +586,22 @@ namespace Jondo.Unity.Server.Managers
 
 
         /// <summary>
-        /// Pone los grupos que ha decidido una persona y quita los que ha decidido quitar.
+        /// Places the groups a person has decided and removes the ones they decided to remove.
         /// </summary>
         /// <remarks>
-        /// Los 38.744 grupos de la base son la colocación de Ankama y se regeneran con ella, así
-        /// que ni añadir ni quitar se puede hacer ahí: el trabajo desaparecería la próxima vez que
-        /// alguien rehiciera la base, sin avisar. Por eso esto va en <c>content/</c>, en texto y
-        /// versionado.
+        /// The base's 38,744 groups are Ankama's placement and are regenerated with it, so
+        /// neither adding nor removing can be done there: the work would disappear the next time
+        /// someone remade the base, without warning. That is why this goes in <c>content/</c>, in text and
+        /// versioned.
         ///
-        /// Los quitados se borran DESPUÉS de haber cargado la base a propósito. Al revés habría que
-        /// consultar la lista de lápidas dentro del bucle de lectura, y esa lista está vacía casi
-        /// siempre: así se paga una vez por lápida en vez de 38.744 veces por nada.
+        /// The removed ones are deleted AFTER the base has been loaded on purpose. The other way round the list of
+        /// tombstones would have to be checked inside the reading loop, and that list is empty almost
+        /// always: this way it is paid once per tombstone instead of 38,744 times for nothing.
         ///
-        /// El nivel de cada miembro no viene escrito: sale del monstruo y del grado, que es de
-        /// donde sale para los de la base. Guardarlo sería una segunda copia de un número derivado.
+        /// Each member's level is not written: it comes from the monster and the grade, which is where
+        /// it comes from for the base's ones. Storing it would be a second copy of a derived number.
         ///
-        /// Devuelve los dos números, para el registro.
+        /// Returns the two numbers, for the log.
         /// </remarks>
         private static (int Puestos, int Quitados) AplicarLosEscritos()
         {
@@ -634,9 +637,9 @@ namespace Jondo.Unity.Server.Managers
                             continue;
                         }
 
-                        // Hasta el sexto grado si el monstruo lo declara: el Puch Ingball de nivel
-                        // 200 viaja como grado 6 en las capturas del kanojedo y el cliente lo
-                        // pinta. El tope de cinco se queda para lo generado, que es donde se midió.
+                        // Up to the sixth grade if the monster declares it: the level 200 Puch Ingball
+                        // travels as grade 6 in the kanojedo captures and the client
+                        // draws it. The cap of five stays for the generated ones, which is where it was measured.
                         int grado = Math.Clamp(miembro.Grade, 0,
                                                Math.Min(datos.Grades.Count, MobMember.MaxWrittenGrades) - 1);
                         grupo.Members.Add(new MobMember
@@ -647,8 +650,8 @@ namespace Jondo.Unity.Server.Managers
                         });
                     }
 
-                    // Un grupo sin nadie dentro no se pone: el cliente pinta un grupo vacío y
-                    // atacarlo abre un combate sin enemigos del que no se sale.
+                    // A group with nobody inside is not placed: the client draws an empty group and
+                    // attacking it opens a fight without enemies that cannot be left.
                     if (grupo.Members.Count == 0) continue;
 
                     if (!_mapMobs.TryGetValue(escrito.MapId, out var aqui))
@@ -657,9 +660,9 @@ namespace Jondo.Unity.Server.Managers
                         _mapMobs[escrito.MapId] = aqui;
                     }
 
-                    // Uno escrito para un mapa vetado se pone igual, y a propósito: el veto es una
-                    // regla sobre lo que Ankama colocó por su cuenta, no sobre lo que alguien pone
-                    // aquí a sabiendas.
+                    // One written for a banned map is placed all the same, and on purpose: the ban is a
+                    // rule about what Ankama placed on its own, not about what someone places
+                    // here knowingly.
                     aqui.RemoveAll(otro => otro.MobId == escrito.GroupId);
                     aqui.Add(grupo);
                     puestos++;
@@ -676,23 +679,23 @@ namespace Jondo.Unity.Server.Managers
         private static Random _rand = new Random();
 
         /// <summary>
-        /// Los grupos de un mapa, en una lista APARTE.
+        /// A map's groups, in a SEPARATE list.
         ///
-        /// Devolvía la lista de dentro tal cual, y quien la recibía la recorría ya fuera del
-        /// candado: el jpv de una carga de mapa, el jss de una entrada, la búsqueda del grupo al
-        /// atacar. Mientras tanto, otro jugador que ganase su combate en ese mismo mapa hacía un
-        /// RemoveAll y un Add sobre esa misma lista, y el foreach del primero moría con un
-        /// «Collection was modified» que el try/catch de MapLoadHandler se traga sin decir nada:
-        /// el jpv no salía, y el jugador entraba a un mapa vacío —sin su personaje, sin NPCs y sin
-        /// monstruos— sin ningún error por ninguna parte.
+        /// It used to return the inner list as is, and whoever received it walked it already outside the
+        /// lock: the jpv of a map load, the jss of an entry, the group lookup on
+        /// attacking. Meanwhile, another player winning his fight on that same map did a
+        /// RemoveAll and an Add on that same list, and the first one's foreach died with a
+        /// «Collection was modified» that MapLoadHandler's try/catch swallows without a word:
+        /// the jpv did not go out, and the player entered an empty map —without his character, without NPCs and without
+        /// monsters— with no error anywhere.
         ///
-        /// Los MobGroup de dentro siguen siendo los mismos objetos; lo que se copia es la lista.
+        /// The MobGroups inside are still the same objects; what is copied is the list.
         /// </summary>
         public static List<MobGroup> GetMobsForMap(long mapId)
         {
             lock (_candado)
             {
-                if (_mapMobs.TryGetValue(mapId, out var mobs) && mobs.Count > 0)
+                if (_mapMobs.TryGetValue(mapId, out var mobs) && (mobs.Count > 0 || _emptiedByHand.Contains(mapId)))
                     return new List<MobGroup>(mobs);
 
                 mobs = GenerateDynamicMobsForMap(mapId);
@@ -702,17 +705,17 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Qué monstruos pueden salir en un mapa que no tiene grupos escritos.
+        /// Which monsters can come out on a map that has no written groups.
         ///
-        /// Los de su zona, y nadie más. Antes esto devolvía una lista fija de pios —491, 492, 493,
-        /// 463 y los 234x— para cualquier mapa del mundo, así que al pie de la torre de la clepsidra
-        /// de Frigost, que no tiene grupos en la tabla, salían pios de Astrub. Y dentro del
-        /// merkasako también.
+        /// Those of its zone, and nobody else. Before, this returned a fixed list of pios —491, 492, 493,
+        /// 463 and the 234x— for any map in the world, so at the foot of Frigost's clepsydra
+        /// tower, which has no groups in the table, Astrub pios came out. And inside the
+        /// haven bag too.
         ///
-        /// La zona se sabe por la subzona del mapa, y lo que vive en ella por los grupos que sí
-        /// están escritos en los otros mapas de esa misma subzona: 12.907 mapas los tienen, así que
-        /// casi siempre hay de dónde sacarlo. Si no lo hay, no sale nadie, que es mejor que sacar a
-        /// quien no toca.
+        /// The zone is known by the map's subzone, and what lives in it by the groups that are
+        /// written on the other maps of that same subzone: 12,907 maps have them, so
+        /// there is almost always somewhere to take it from. If there is not, nobody comes out, which is better than bringing out
+        /// whoever does not belong.
         /// </summary>
         private static List<int> GetSpawnableMonsterIds(long mapId)
         {
@@ -743,7 +746,7 @@ namespace Jondo.Unity.Server.Managers
             return salida;
         }
 
-        /// <summary>Los monstruos de cada subzona, que se calculan una vez y se guardan.</summary>
+        /// <summary>Each subzone's monsters, which are worked out once and kept.</summary>
         private static readonly Dictionary<int, List<int>> _bySubArea = new Dictionary<int, List<int>>();
 
         private static MobGroup? BuildRandomGroup(long mapId, List<int> availableMonsters, List<int> validCells, HashSet<int> usedCells)
@@ -774,11 +777,11 @@ namespace Jondo.Unity.Server.Managers
                 int lvl = 1;
                 if (mData.Grades.Count > 0)
                 {
-                    // Solo los cinco primeros. El grado que viaja al cliente va de 1 a 5 y ningún
-                    // monstruo de las capturas reales pasa de ahí, pero nuestros datos traen
-                    // monstruos con seis, diez y hasta veinte grados. Elegir uno de los de más
-                    // arriba mandaba un grado que el cliente no sabe resolver, y ese grupo se
-                    // quedaba sin información al pasarle el ratón.
+                    // Only the first five. The grade that travels to the client goes from 1 to 5 and no
+                    // monster in the real captures goes beyond that, but our data brings
+                    // monsters with six, ten and even twenty grades. Picking one of the higher
+                    // ones sent a grade the client cannot resolve, and that group
+                    // was left without information on hovering over it.
                     gradeIdx = _rand.Next(Math.Min(mData.Grades.Count, MobMember.MaxGradesPerMonster));
                     lvl = mData.Grades[gradeIdx].Level;
                 }
@@ -799,26 +802,26 @@ namespace Jondo.Unity.Server.Managers
             var result = new List<MobGroup>();
             if (_monsters.Count == 0) return result;
 
-            // BAJO TECHO Y ENCIMA DE UN ZAAP NO SE PONE A NADIE, lo mismo que al cargar. Sin esta
-            // linea el veto se mordia la cola, y esa es toda la explicacion del bicho dentro del
-            // taller de herreros y de los que salian encima del zaap de Astrub:
+            // INDOORS AND ON TOP OF A ZAAP NOBODY IS PLACED, same as on loading. Without this
+            // line the ban bit its own tail, and that is the whole explanation of the creature inside the
+            // blacksmiths' workshop and of the ones that came out on top of the Astrub zaap:
             //
-            //   al arrancar se descartan los grupos de la base de los 3.472 mapas vetados
-            //     -> esos mapas se quedan SIN CLAVE en _mapMobs
-            //       -> GetMobsForMap no encuentra nada y los toma por mapas vacios
-            //         -> los repuebla al vuelo con 2 a 4 grupos de la subzona
+            //   on start the base's groups of the 3,472 banned maps are discarded
+            //     -> those maps are left WITHOUT A KEY in _mapMobs
+            //       -> GetMobsForMap finds nothing and takes them for empty maps
+            //         -> it repopulates them on the fly with 2 to 4 groups of the subzone
             //
-            // O sea que quitar los grupos era exactamente lo que provocaba que aparecieran otros.
-            // El primero que entrara en cualquiera de esos 3.472 mapas se los encontraba.
+            // So removing the groups was exactly what caused others to appear.
+            // The first one to enter any of those 3,472 maps found them.
             //
-            // Va AQUI dentro y no en GetMobsForMap a proposito: los grupos escritos a mano si
-            // ignoran el veto -para eso estan- y viven ya en _mapMobs, asi que comprobarlo mas
-            // arriba los escondiria. Con la comprobacion aqui, un grupo de mision bajo techo se
-            // sigue sirviendo, y cuando el jugador lo mata el mapa se queda vacio en vez de
-            // volver a llenarse de bichos de la zona.
+            // It goes IN HERE and not in GetMobsForMap on purpose: the groups written by hand do
+            // ignore the ban -that is what they are for- and already live in _mapMobs, so checking it higher
+            // up would hide them. With the check here, an indoor quest group is
+            // still served, and when the player kills it the map stays empty instead of
+            // filling up again with creatures of the zone.
             if (_vetados.Contains(mapId)) return result;
 
-            // En el merkasako no se pelea con nadie: es la casa de uno.
+            // In the haven bag one fights nobody: it is one's home.
             if (Merkasako.IsHavenBag(mapId)) return result;
 
             // A dungeon room is its own composition, not the subarea's background.
@@ -855,9 +858,9 @@ namespace Jondo.Unity.Server.Managers
         {
             if (_monsters.Count == 0) return null;
 
-            // La misma regla que al cargar. Hoy no debería llegar aquí un mapa vetado -si no se
-            // pone un grupo, no hay pelea que reponer-, pero ésta es la otra puerta por la que
-            // aparecen monstruos y más vale que las dos digan lo mismo.
+            // The same rule as on loading. Today a banned map should not get here -if no
+            // group is placed, there is no fight to replenish-, but this is the other door through which
+            // monsters appear and both had better say the same.
             if (_vetados.Contains(mapId)) return null;
 
             lock (_candado)
@@ -877,25 +880,25 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Desde donde se numeran los grupos que saca una misión.</summary>
+        /// <summary>Where the groups a quest brings out are numbered from.</summary>
         /// <remarks>
-        /// Su propio tramo, por debajo del de los jefes, para que los tres repartos de ids -- los
-        /// escritos a mano, los jefes y éstos -- no se pisen nunca.
+        /// Their own bracket, below the bosses', so that the three id dispensers -- the
+        /// hand-written ones, the bosses and these -- never step on each other.
         /// </remarks>
         private const long PrimerGrupoDeMision = -4_000_000;
         private static long _siguienteDeMision;
 
         /// <summary>
-        /// Pone en el mapa un grupo de un monstruo concreto, el que pida una misión.
+        /// Places on the map a group of one specific monster, the one a quest asks for.
         /// </summary>
         /// <remarks>
-        /// No pasa por el veto ni por el reparto de la subzona: aquí no se está poblando un mapa,
-        /// se está sacando a un bicho de su escondite porque alguien ha pulsado algo. La Rata
-        /// Nsiosa está en cero grupos del mundo justamente porque su sitio es éste y no el mapa.
+        /// It goes through neither the ban nor the subzone's distribution: a map is not being populated here,
+        /// a creature is being brought out of its hiding place because someone has pressed something. The Rata
+        /// Nsiosa is in zero groups of the world precisely because its place is this and not the map.
         ///
-        /// Devuelve null cuando el monstruo no está en la base o el mapa no tiene donde ponerlo,
-        /// y quien llama tiene que contarlo: un objetivo que dice «hazla salir» y no la saca deja
-        /// la misión encallada sin decir por qué.
+        /// Returns null when the monster is not in the base or the map has nowhere to put it,
+        /// and the caller has to report it: an objective that says «make it come out» and does not bring it out leaves
+        /// the quest stuck without saying why.
         /// </remarks>
         public static MobGroup? SpawnNamed(long mapId, int monsterId, int howMany)
         {
@@ -947,18 +950,22 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Planta un grupo con una composición dada, para las salas de los Sueños Infinitos.
+        /// Plants a group with a given composition, for the rooms of the Infinite Dreams.
         /// </summary>
         /// <remarks>
-        /// <see cref="SpawnNamed"/> planta N copias de un mismo monstruo, que sirve para lo que
-        /// se hizo —un objetivo de misión— y no para esto: la sala de un sueño reproduce un grupo
-        /// del mundo, y esos grupos son mezclados. Plantar cinco copias del primero cambiaría la
-        /// pelea sin decírselo a nadie.
+        /// <see cref="SpawnNamed"/> plants N copies of one same monster, which serves what
+        /// it was made for —a quest objective— and not this: a dream's room reproduces a group
+        /// of the world, and those groups are mixed. Planting five copies of the first would change the
+        /// fight without telling anyone.
         ///
-        /// El grupo va con un identificador de los negativos, igual que los de misión, para que no
-        /// choque con los del mundo ni sobreviva a un respawn.
+        /// The group goes with one of the negative identifiers, just like the quest ones, so that it does not
+        /// clash with the world's nor survive a respawn.
         /// </remarks>
-        public static MobGroup? SpawnComposed(long mapId, IEnumerable<(int Monstruo, int Grado)> miembros)
+        /// <param name="cell">
+        /// The cell to put it on -- the one an administrator stands on --, or -1 for the first free
+        /// one inside the map.
+        /// </param>
+        public static MobGroup? SpawnComposed(long mapId, IEnumerable<(int Monstruo, int Grado)> miembros, int cell = -1)
         {
             var quienes = Componer(miembros);
             if (quienes.Count == 0) return null;
@@ -972,8 +979,8 @@ namespace Jondo.Unity.Server.Managers
                 }
 
                 var ocupadas = new HashSet<int>(mobs.Select(m => m.CellId));
-                int celda = 0;
-                foreach (int libre in GetInnerWalkableCells(mapId))
+                int celda = cell >= 0 ? cell : 0;
+                foreach (int libre in cell >= 0 ? (IEnumerable<int>)Array.Empty<int>() : GetInnerWalkableCells(mapId))
                 {
                     if (ocupadas.Contains(libre)) continue;
                     celda = libre;
@@ -996,7 +1003,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Los miembros de un grupo compuesto a mano, hasta el sexto grado.</summary>
+        /// <summary>The members of a hand-composed group, up to the sixth grade.</summary>
         private static List<MobMember> Componer(IEnumerable<(int Monstruo, int Grado)> miembros)
         {
             var quienes = new List<MobMember>();
@@ -1019,14 +1026,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Un grupo compuesto a mano que NO se pone en ningún mapa: sólo existe para el combate
-        /// que se va a abrir con él.
+        /// A hand-composed group that is NOT placed on any map: it only exists for the fight
+        /// about to be opened with it.
         /// </summary>
         /// <remarks>
-        /// Es lo que hace el puch maestro del kanojedo: en la captura el combate empieza con un
-        /// grupo de id nuevo -el kmu lleva un -23597 que no estaba en el jss- y ningún jsn lo
-        /// pinta antes en el mapa. Ponerlo en el mapa como hace <see cref="SpawnComposed"/> lo
-        /// dejaría a la vista y clicable para los demás mientras dura la pelea.
+        /// It is what the kanojedo's puch master does: in the capture the fight starts with a
+        /// group with a new id -the kmu carries a -23597 that was not in the jss- and no jsn
+        /// draws it on the map beforehand. Placing it on the map as <see cref="SpawnComposed"/> does would
+        /// leave it visible and clickable for the others while the fight lasts.
         /// </remarks>
         public static MobGroup? ComposeOffMap(IEnumerable<(int Monstruo, int Grado)> miembros)
         {
@@ -1087,16 +1094,16 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
-            // Si no hay ninguna casilla suficientemente interior, se conserva el antiguo repli
-            // sur les cases marchables. Il faut le choisir AVANT de retirer les interactifs :
-            // sinon, lorsque toutes les cases intérieures sont occupées, le repli remet exactement
-            // les cases cliquables que l'on vient d'écarter.
+            // If there is no cell far enough inside, the old fallback
+            // to walkable cells is kept. It has to be chosen BEFORE removing the interactives:
+            // otherwise, when all the inside cells are taken, the fallback puts back exactly
+            // the clickable cells that have just been set aside.
             var candidatas = innerCells.Count > 0 ? innerCells : new List<int>(cells);
 
-            // Y fuera las casillas que tienen algo encima que se pueda clicar. Un grupo plantado
-            // sobre el zaap lo tapa: el clic se lo lleva el monstruo y ya no hay forma de viajar.
-            // El veto de mapas ya deja fuera los 62 mapas de zaap enteros, pero las puertas, los
-            // talleres y los recursos estan en mapas que no estan vetados y valen igual.
+            // And out with the cells that have something clickable on top. A group planted
+            // on the zaap covers it: the click goes to the monster and there is no longer a way to travel.
+            // The map ban already leaves out the 62 zaap maps entirely, but the doors, the
+            // workshops and the resources are on maps that are not banned and count just the same.
             var ocupadas = new HashSet<int>();
             foreach (var elemento in Interactives.ElementsOf(mapId))
             {
@@ -1131,6 +1138,28 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// The maps an administrator emptied by hand. An empty map is otherwise filled again with
+        /// fresh groups the next time somebody loads it (<see cref="GetMobsForMap"/>), which is
+        /// right after a fight and wrong after "take these monsters away".
+        /// </summary>
+        private static readonly HashSet<long> _emptiedByHand = new();
+
+        /// <summary>
+        /// An administrator takes a group off its map, until the server stops; an emptied map stays
+        /// empty. False when the group was not there.
+        /// </summary>
+        public static bool RemoveByHand(long mapId, long mobId)
+        {
+            lock (_candado)
+            {
+                if (!_mapMobs.TryGetValue(mapId, out var mobs) || mobs.RemoveAll(m => m.MobId == mobId) == 0)
+                    return false;
+                if (mobs.Count == 0) _emptiedByHand.Add(mapId);
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Removes a mob group from the map after it is defeated in combat.
         /// </summary>
         public static void RemoveMobGroup(long mapId, long mobId)
@@ -1157,7 +1186,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Cuantos grupos de monstruos hay puestos en todo el mundo. Lo pinta el servidor.</summary>
+        /// <summary>How many monster groups are placed in the whole world. The server prints it.</summary>
         public static int TotalGrupos
         {
             get

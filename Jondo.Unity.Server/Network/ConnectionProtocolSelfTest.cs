@@ -16,16 +16,16 @@ namespace Jondo.Unity.Server.Network
     public static class ConnectionProtocolSelfTest
     {
         /// <summary>
-        /// Los mensajes de la preparación del combate, contra los bytes de verdad.
+        /// The fight preparation messages, against the real bytes.
         ///
-        /// Esto no comprueba la forma a ojo: compara byte a byte con lo que mandó el servidor real
-        /// en la captura *combate contra poutch nivel 50…*, con las mismas casillas, el mismo
-        /// combatiente y el mismo mapa que salen ahí. Si un constructor cambia de campo o de orden,
-        /// aquí se ve; en el cliente lo único que se vería es un combate que no arranca.
+        /// This does not check the shape by eye: it compares byte by byte with what the real server sent
+        /// in the capture *combate contra poutch nivel 50…*, with the same cells, the same
+        /// fighter and the same map that appear there. If a builder changes field or order,
+        /// it shows here; in the client the only thing seen would be a fight that does not start.
         /// </summary>
         private static void CheckFightPreparation(List<string> failures)
         {
-            const long fighter = 302677754146L;   // el personaje de la captura
+            const long fighter = 302677754146L;   // the capture's character
             const long mapId = 99222029L;
 
             long[] blue = { 285, 273, 317, 373, 413, 411, 368, 312, 271, 288, 298, 302, 382, 386, 397, 400 };
@@ -40,8 +40,8 @@ namespace Jondo.Unity.Server.Network
                  "12091a0710a28280c8e708120d1a0b10ffffffffffffffffff01",
                  FightProtocol.BuildTeams(new[] { fighter, FightProtocol.Nobody }));
 
-            // Y con cuatro monstruos son CINCO bloques, cada uno con su propio negativo, que es lo
-            // que desmonta la lectura de "un bloque por equipo".
+            // And with four monsters there are FIVE blocks, each with its own negative, which is what
+            // takes apart the "one block per team" reading.
             Same(failures, "jzu (cuatro monstruos)",
                  "12091a0710a28280c8e708120d1a0b10ffffffffffffffffff01120d1a0b10feffffffffffffffff01"
                  + "120d1a0b10fdffffffffffffffff01120d1a0b10fcffffffffffffffff01",
@@ -51,10 +51,10 @@ namespace Jondo.Unity.Server.Network
 
             Same(failures, Op.Kmp, "0801", FightProtocol.BuildFightMapComing());
 
-            // La jxg entera son cientos de bytes de ficha, así que aquí se comprueba el
-            // ENVOLTORIO, que es donde estaba el fallo: todo va dentro de un f2, y dentro de él la
-            // casilla en f1, el cuerpo en f2 y quién es en f3. Sin ese f2 de fuera el cliente pinta
-            // el tablero y ni un solo combatiente encima.
+            // The whole jxg is hundreds of bytes of sheet, so here the
+            // WRAPPER is checked, which is where the bug was: everything goes inside an f2, and inside it the
+            // cell in f1, the body in f2 and who it is in f3. Without that outer f2 the client draws
+            // the board and not a single fighter on it.
             byte[] fighterMsg = FightProtocol.BuildFighter(
                 270, 1, -1, new[] { (1, 6L, 0L) }, new byte[] { 0x10, 0x03 },
                 FightProtocol.MonsterIdentity(3, 494, 50), isMonster: true);
@@ -77,9 +77,9 @@ namespace Jondo.Unity.Server.Network
 
             Same(failures, Op.Kah, "08a28280c8e7081801", FightProtocol.BuildReadyAck(fighter));
 
-            // Un lanzamiento, byte a byte. Lo que importa aquí es el f7 de dentro: el hechizo va
-            // en DOS números, el 25188 (el hechizo) y el 63926 (su grado), y el f8 vale uno y no
-            // es el hechizo. Cuando esto se mandaba mal, el cliente pintaba un puñetazo.
+            // A cast, byte by byte. What matters here is the inner f7: the spell goes
+            // in TWO numbers, 25188 (the spell) and 63926 (its grade), and f8 is one and is not
+            // the spell. When this was sent wrong, the client drew a punch.
             Same(failures, "jwe (lanzar un hechizo)",
                  "18a28280c8e7083a1f10a28280c8e708220720a28280c8e708308f023a0810e4c40118b6f303"
                  + "400170ac02",
@@ -88,7 +88,7 @@ namespace Jondo.Unity.Server.Network
                      FightProtocol.CastAt(fighter, 0, 271, 25188, 63926, critical: false),
                      FightProtocol.CastDetail));
 
-            // Colocarse: la casilla que se deja va con -1 y la que se ocupa, con quién la ocupa.
+            // Placing: the cell left goes with -1 and the one taken, with who takes it.
             Same(failures, Op.Kmk,
                  "1210088e02100118ffffffffffffffffff01120c088f02100518a28280c8e708",
                  FightProtocol.BuildFightersPlaced(new[]
@@ -97,18 +97,18 @@ namespace Jondo.Unity.Server.Network
                      (271, 5, fighter),
                  }));
 
-            // El golpe, con su erosión, y la retirada de puntos. Los dos de la captura del duelo.
+            // The hit, with its erosion, and the point removal. Both from the duel capture.
             Same(failures, "jwe (daño con erosión)",
                  "18a282f0a6c4087060c2020e10a28280c8e70818ce032003282e",
                  FightProtocol.BuildDamage(293213045026, 96, 302677754146, 462, 3, 46));
 
-            // El gasto propio de lanzar, que es el 102 y va con el mismo id de autor y de víctima.
+            // The cast's own cost, which is 102 and goes with the same author and victim id.
             Same(failures, "jwe (gasta cuatro PA al lanzar)",
                  "18a282f0a6c4087066a2011208fcffffffffffffffff0110a282f0a6c408",
                  FightProtocol.BuildPointsLost(293213045026, 102, 293213045026, -4));
 
-            // La ficha con la vida que le falta al jugador, de la captura del poutch de nivel 75:
-            // le faltan 104 y lleva 208 erosionados.
+            // The sheet with the life the player is missing, from the level 75 poutch capture:
+            // he is missing 104 and carries 208 eroded.
             Same(failures, "jxw (vida que le falta al jugador)",
                  "08a28280c8e7081a1e18022a1a086122161098ffffffffffffffff0140b0feffffffffffffff01",
                  FightProtocol.BuildLifeSheet(302677754146, -104, 208));
@@ -118,13 +118,13 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Los retos de la preparación, contra los bytes de las capturas donde salen.
+        /// The preparation challenges, against the bytes of the captures where they appear.
         ///
-        /// El reto 17 «Intocable» al 95 % es el de «entrar a combate con listo automático...
-        /// victoria»; el 37 «Pegajoso» al 75 % le acompaña en la misma lista. El 772 «Duelo» sin
-        /// porcentaje sale en la anomalía, y es la prueba de que cuando el extra es cero los dos
-        /// campos desaparecen. El 35 «Asesino a sueldo» con objetivo viene del kwm de la captura
-        /// de reconexión, y lleva dentro la casilla 262 y el luchador menos tres.
+        /// Challenge 17 «Intocable» at 95 % is the one from «entrar a combate con listo automático...
+        /// victoria»; 37 «Pegajoso» at 75 % accompanies it in the same list. 772 «Duelo» without
+        /// a percentage appears in the anomaly, and it is the proof that when the extra is zero both
+        /// fields disappear. 35 «Asesino a sueldo» with a target comes from the kwm of the
+        /// reconnection capture, and carries inside it cell 262 and fighter minus three.
         /// </summary>
         private static void CheckChallenges(List<string> failures)
         {
@@ -162,8 +162,8 @@ namespace Jondo.Unity.Server.Network
             Same(failures, Op.Kwu, "1208085f1011205f2802",
                  FightProtocol.BuildChallengeFinalList(new[] { intocable }));
 
-            // El resultado. Sin el f2 está fallado, que es como proto3 escribe el booleano falso;
-            // los cuatro salen de las capturas de la mazmorra y de la victoria del grupo.
+            // The result. Without f2 it is failed, which is how proto3 writes the false boolean;
+            // the four come from the dungeon captures and the party's victory.
             Same(failures, "kwl (reto 17 cumplido)", "08111001",
                  FightProtocol.BuildChallengeResult(17, true));
 
@@ -176,13 +176,13 @@ namespace Jondo.Unity.Server.Network
             Same(failures, "kwl (reto 35 fallado)", "0823",
                  FightProtocol.BuildChallengeResult(35, false));
 
-            // El aviso que acompaña al fallo, de la mazmorra: llega en la misma milésima que el
-            // kwl y dice por culpa de quién.
+            // The notice accompanying the failure, from the dungeon: it arrives in the same millisecond as the
+            // kwl and says whose fault it was.
             Same(failures, "lqn (reto fallado por culpa de alguien)",
                  "10bc01220c53616372692d4d6173746572" + "22023335",
                  ConnectionProtocol.BuildSystemMessage(188, "Sacri-Master", "35"));
 
-            // El objetivo señalado (kwm), con su casilla y su luchador dentro.
+            // The marked target (kwm), with its cell and its fighter inside.
             Same(failures, Op.Kwm,
                  "1218084610231a0e10860218fdffffffffffffffff0120462802",
                  FightProtocol.BuildChallengeObjective(
@@ -190,12 +190,12 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// La pantalla de fin de combate (jyg), contra los 86 bytes de la victoria del poutch.
+        /// The end-of-fight screen (jyg), against the 86 bytes of the poutch victory.
         ///
-        /// El personaje de la captura está en el nivel 354 con 23.793.534.387 de experiencia y no
-        /// gana nada en ese combate; el poutch, muerto, va sin ficha. Los dos números que el
-        /// mensaje no lleva —lo que pide el nivel 354 y lo que pide el 355— los pone la tabla del
-        /// cliente, así que esto comprueba de paso que la tabla está cargada y cuadra.
+        /// The capture's character is at level 354 with 23,793,534,387 experience and does not
+        /// earn anything in that fight; the poutch, dead, goes without a sheet. The two numbers the
+        /// message does not carry —what level 354 asks for and what 355 asks for— are put by the
+        /// client's table, so this checks in passing that the table is loaded and matches.
         /// </summary>
         private static void CheckFightResults(List<string> failures, long fighter)
         {
@@ -252,11 +252,11 @@ namespace Jondo.Unity.Server.Network
 
             if (failures.Count > 0)
             {
-                // Esto hacía «return», o sea que el servidor arrancaba igual con el protocolo
-                // roto. Era la única de las ocho guardias que no paraba, y precisamente la que
-                // vigila la fase donde un fallo NO da error: el cliente se queda con la pantalla
-                // en blanco, sin mensaje, sin registro y sin nada que mirar. Arrancar así no
-                // ayuda a nadie; se ven los fallos y se para.
+                // This did a «return», that is the server started all the same with the protocol
+                // broken. It was the only one of the eight guards that did not stop, and precisely the one
+                // watching the phase where a failure gives NO error: the client is left with a blank
+                // screen, with no message, no log and nothing to look at. Starting like that does not
+                // help anyone; the failures are shown and it stops.
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("[Protocol] The connection message check failed:");
                 foreach (string f in failures) Console.WriteLine("    - " + f);
@@ -271,22 +271,22 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Las tres pestañas de la lista de viaje (hjj), contra los bytes de verdad.
+        /// The three tabs of the travel list (hjj), against the real bytes.
         ///
-        /// Las tres viajan en el mismo mensaje y en el mismo campo repetido, y lo único que las
-        /// separa es el f3 de cada entrada. Eso es fácil de romper sin enterarse, y el síntoma en
-        /// el cliente no es un error: es una pestaña vacía, o un destino que aparece donde no toca.
-        /// Por eso se compara byte a byte con lo que mandó el servidor real.
+        /// All three travel in the same message and in the same repeated field, and the only thing
+        /// separating them is each entry's f3. That is easy to break without noticing, and the symptom in
+        /// the client is not an error: it is an empty tab, or a destination that appears where it should not.
+        /// That is why it is compared byte by byte with what the real server sent.
         ///
-        /// Cada cadena es UNA entrada sacada de su captura, con sus valores exactos:
+        /// Each string is ONE entry taken from its capture, with its exact values:
         ///
-        ///   zaap      Castillo de Amakna, sin f3            «zaap desde castillo de amakna a bonta…»
-        ///   zaapi     taller forjamagos de Bonta, f3 = 1    «usar zaapi en bonta a taller forjamagos»
-        ///   anomalía  Cuna de Alma, f3 = 4 y su reloj       «entrar a mapa con vestigio de zaap…»
+        ///   zaap      Amakna Castle, without f3              «zaap desde castillo de amakna a bonta…»
+        ///   zaapi     Bonta smithmages' workshop, f3 = 1     «usar zaapi en bonta a taller forjamagos»
+        ///   anomaly   Cuna de Alma, f3 = 4 and its clock     «entrar a mapa con vestigio de zaap…»
         ///
-        /// El de la anomalía llegó con 43 minutos por delante de 120 y sin coste, porque el
-        /// personaje estaba de pie en el mapa del vestigio. Los 43 van escritos a mano a propósito:
-        /// aquí se comprueba el constructor, no el reloj.
+        /// The anomaly one arrived with 43 minutes to go out of 120 and with no cost, because the
+        /// character was standing on the vestige's map. The 43 are written by hand on purpose:
+        /// here the builder is checked, not the clock.
         /// </summary>
         private static void CheckTravelList(List<string> failures)
         {
@@ -297,8 +297,8 @@ namespace Jondo.Unity.Server.Network
                      new ConnectionProtocol.ZaapDestination(84806401, 178, 40, 190),
                  }));
 
-            // El 2001 del final es el f4 de la raíz: sin él el cliente abre la ventana del zaap
-            // y la deja vacía. Sale así en las tres capturas de zaapi y en ninguna de zaap.
+            // The 2001 at the end is the root's f4: without it the client opens the zaap window
+            // and leaves it empty. It comes out like that in the three zaapi captures and in none of the zaap ones.
             Same(failures, "hjj (zaapi)",
                  "1a0e080a10141801288180806930cf072001",
                  ConnectionProtocol.BuildZaapList(0, new[]
@@ -307,14 +307,14 @@ namespace Jondo.Unity.Server.Network
                                                             Managers.Zaapis.Kind),
                  }, Managers.Zaapis.Teleporter));
 
-            // Los grupos, con los bytes de la captura de "recibir invitacion de grupo y aceptar":
-            // Harmoo (293213045026) invita a Sacri-Master (302677754146) al grupo 71272.
+            // The parties, with the bytes of the "recibir invitacion de grupo y aceptar" capture:
+            // Harmoo (293213045026) invites Sacri-Master (302677754146) to party 71272.
             Same(failures, "ijz (te invitan)",
                  "08a28280c8e70810a282f0a6c408180828e8ac0430013a064861726d6f6f",
                  ConnectionProtocol.BuildPartyInvitation(
                      302677754146, 293213045026, "Harmoo", 71272, 8));
 
-            // Y los del rechazo, de la captura del koliseo y la del que invita.
+            // And the decline ones, from the koliseo capture and the inviter's.
             Same(failures, "ilo (invitacion cerrada)", "08d8af0410a28280c8e708",
                  ConnectionProtocol.BuildInvitationClosed(71640, 302677754146));
             Same(failures, "iko (invitado fuera)", "08a282a8ffa40e10999c04",
@@ -326,38 +326,38 @@ namespace Jondo.Unity.Server.Network
             Same(failures, "ilx (jefe nuevo)", "08a282acf7bd1a10a69c04",
                  ConnectionProtocol.BuildPartyLeader(909978042658, 69158));
 
-            // El aviso de la ultima conexion. Sin IP tiene que salir byte a byte igual al que
-            // trae el bloque grabado: 9 de agosto de 2026 a las 18:53. Es lo que fija el orden de
-            // los parametros, que no es el de lectura.
+            // The last connection notice. Without an IP it has to come out byte for byte the same as the one
+            // the recorded block brings: 9 August 2026 at 18:53. It is what pins the order of
+            // the parameters, which is not the reading order.
             Same(failures, "lqn (ultima conexion, sin IP)",
                  "10c101220432303236220230382202303922023138220235 33".Replace(" ", ""),
                  ConnectionProtocol.BuildLastConnection(
                      new DateTimeOffset(2026, 8, 9, 18, 53, 0, TimeSpan.Zero), ""));
 
-            // Y con IP, que anade el sexto parametro y cambia de plantilla.
+            // And with an IP, which adds the sixth parameter and changes template.
             Same(failures, "lqn (ultima conexion, con IP)",
                  "1098012204323032362202303822023039220231382202353322093132372e302e302e31",
                  ConnectionProtocol.BuildLastConnection(
                      new DateTimeOffset(2026, 8, 9, 18, 53, 0, TimeSpan.Zero), "127.0.0.1"));
 
-            // El mensaje privado, tal cual lo mando el servidor real al susurrar a Hiierbita-Xx.
+            // The private message, just as the real server sent it on whispering to Hiierbita-Xx.
             Same(failures, "kth (mensaje privado)",
                  "0a19323032362d30382d31325432323a35343a32392b30323a3030220028a282acfea805"
                  + "320c4869696572626974612d58783a04686f6c61",
                  ConnectionProtocol.BuildPrivateMessage(
                      "2026-08-12T22:54:29+02:00", 182801072418, "Hiierbita-Xx", "hola"));
 
-            // La ventana de subida de nivel, tal cual sale en el tutorial.
+            // The level-up window, just as it comes out in the tutorial.
             Same(failures, "kua (nivel 2)", "0802", ConnectionProtocol.BuildLevelUp(2));
             Same(failures, "kua (nivel 3)", "0803", ConnectionProtocol.BuildLevelUp(3));
 
-            // El rechazo de un susurro. 0802 es lo que contesta el servidor real al susurrarse
-            // a uno mismo, en la captura de la lista de artesanos.
+            // The refusal of a whisper. 0802 is what the real server answers on whispering
+            // to oneself, in the capture of the craftsmen list.
             Same(failures, "ktl (susurro rechazado)", "0802",
                  ConnectionProtocol.BuildChatError(Handlers.PrivateMessageHandler.CannotWhisper));
 
-            // Los mensajes de información, que es como se le habla al jugador. El tipo 0 no se
-            // manda —proto3 se come el cero— y el 1 sí; los cuatro salen de capturas distintas.
+            // The information messages, which is how the player is spoken to. Type 0 is not
+            // sent —proto3 swallows the zero— and 1 is; the four come from different captures.
             Same(failures, "lqn (bienvenida, tipo 1)", "08011059",
                  ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Warning, 89));
             Same(failures, "lqn (hechizo imposible, tipo 1)", "080110af01",
@@ -367,8 +367,8 @@ namespace Jondo.Unity.Server.Network
             Same(failures, "lqn (objeto conseguido, tipo 0)", "101522013122053130373834",
                  ConnectionProtocol.BuildSystemMessage(Managers.InfoMessages.ItemGained, "1", "10784"));
 
-            // Y la lista de zaaps descubiertos, que es lo que hace que la ventana no salga vacía.
-            // Son los 45 del personaje de la captura, en su orden, y tienen que dar sus 182 bytes.
+            // And the list of discovered zaaps, which is what keeps the window from coming out empty.
+            // They are the 45 of the capture's character, in their order, and they have to give their 182 bytes.
             Same(failures, "hjk (zaaps descubiertos)",
                  "0ab3018196b82892b8098880e060a9baea198290d8208184d0588380d0209b96903c8488b00d858a"
                  + "b0498388a039808cb0498386b849838cb0658180c0558388c0658490c02d8084e05581a6802a81"
@@ -634,8 +634,8 @@ namespace Jondo.Unity.Server.Network
             if (jsq != CapturedJsq)
                 failures.Add($"jsq: the answer to jqi does not match the capture ({jsq})");
 
-            // Un teleport suelta su uso antes de irse del mapa. Sin ese iwi el cliente puede
-            // dejar el elemento ocupado y no volver a dibujar su gráfico al regresar.
+            // A teleport releases its use before leaving the map. Without that iwi the client can
+            // leave the element busy and not draw its graphic again on coming back.
             var ended = ProtoMessage.Parse(
                 ConnectionProtocol.BuildInteractiveUseEnded(515742, 114));
             if (Varint(ended, 1) != 515742 || Varint(ended, 3) != 114)

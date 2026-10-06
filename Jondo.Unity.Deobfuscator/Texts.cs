@@ -3,22 +3,22 @@ using Jondo.Unity.Launcher.UI;
 namespace Jondo.Unity.Deobfuscator;
 
 /// <summary>
-/// Lo que dice la ventana, en los tres idiomas del emulador.
+/// What the window says, in the emulator's three languages.
 ///
-/// Mismo mecanismo que <see cref="LauncherTexts"/> —un catálogo por idioma con propiedades de sólo
-/// lectura— y por los mismos motivos: lo comprueba el compilador, no hace falta ningún fichero al
-/// lado del ejecutable, y una cadena que falte sale vacía en vez de tirar la ventana.
+/// Same mechanism as <see cref="LauncherTexts"/> —a catalogue per language with read-only
+/// properties— and for the same reasons: the compiler checks it, no file is needed next to
+/// the executable, and a missing string comes out empty instead of bringing the window down.
 ///
-/// Va en este proyecto y no en el contrato a propósito. Son noventa cadenas que sólo usa esta
-/// herramienta, y el contrato lo cargan también el servidor y el lanzador, que se reparten a la
-/// gente: no tienen por qué llevar dentro la explicación de qué es un ensamblado de Cpp2IL.
+/// It goes in this project and not in the contract on purpose. It is ninety strings only this
+/// tool uses, and the contract is also loaded by the server and the launcher, which are handed out to
+/// people: they have no reason to carry inside the explanation of what a Cpp2IL assembly is.
 ///
-/// El idioma de partida es el español, que es en el que se piensa este proyecto; el inglés y el
-/// francés son traducción. Cuando haya duda, manda el español.
+/// The starting language is Spanish, which is the one this project is thought in; English and
+/// French are translations. When in doubt, Spanish rules.
 /// </summary>
 public sealed class Texts
 {
-    // ─── La ventana ─────────────────────────────────────────────────────────────────────
+    // ─── The window ─────────────────────────────────────────────────────────────────────
     public string Title { get; init; } = "";
     public string Subtitle { get; init; } = "";
     public string Next { get; init; } = "";
@@ -32,13 +32,13 @@ public sealed class Texts
     public string Failed { get; init; } = "";
     public string StepFormat { get; init; } = "";
 
-    // ─── Paso 1: de qué va esto ─────────────────────────────────────────────────────────
+    // ─── Step 1: what this is about ─────────────────────────────────────────────────────
     public string WelcomeStep { get; init; } = "";
     public string WelcomeTitle { get; init; } = "";
     public string WelcomeBody { get; init; } = "";
     public string WelcomeStart { get; init; } = "";
 
-    // ─── Paso 2: el cliente nuevo ───────────────────────────────────────────────────────
+    // ─── Step 2: the new client ─────────────────────────────────────────────────────────
     public string ClientStep { get; init; } = "";
     public string ClientTitle { get; init; } = "";
     public string ClientBody { get; init; } = "";
@@ -49,7 +49,7 @@ public sealed class Texts
     public string ClientNoProtocol { get; init; } = "";
     public string ClientNoDump { get; init; } = "";
 
-    // ─── Paso 3: el protocolo viejo ─────────────────────────────────────────────────────
+    // ─── Step 3: the old protocol ───────────────────────────────────────────────────────
     public string OldStep { get; init; } = "";
     public string OldTitle { get; init; } = "";
     public string OldBody { get; init; } = "";
@@ -58,7 +58,7 @@ public sealed class Texts
     public string OldMissing { get; init; } = "";
     public string OldSkip { get; init; } = "";
 
-    // ─── Paso 4: leer el código ─────────────────────────────────────────────────────────
+    // ─── Step 4: reading the code ───────────────────────────────────────────────────────
     public string IndexStep { get; init; } = "";
     public string IndexTitle { get; init; } = "";
     public string IndexBody { get; init; } = "";
@@ -73,7 +73,7 @@ public sealed class Texts
     public string MatchRun { get; init; } = "";
     public string MatchDone { get; init; } = "";
 
-    // ─── Paso 6: el modelo ──────────────────────────────────────────────────────────────
+    // ─── Step 6: the model ──────────────────────────────────────────────────────────────
     public string ModelStep { get; init; } = "";
     public string ModelTitle { get; init; } = "";
     public string ModelBody { get; init; } = "";
@@ -125,7 +125,7 @@ public sealed class Texts
     public string ExportDoneFormat { get; init; } = "";
     public string ExportOpen { get; init; } = "";
 
-    // ─── La pantalla única: dos protocolos y un botón ───────────────────────────────────
+    // ─── The single screen: two protocols and a button ──────────────────────────────────
     public string MapOld { get; init; } = "";
     public string MapNew { get; init; } = "";
     public string MapRun { get; init; } = "";
@@ -139,7 +139,7 @@ public sealed class Texts
     public string MapDoubtFormat { get; init; } = "";
     public string MapGone { get; init; } = "";
 
-    // ─── Las confianzas, tal como las declara el modelo ─────────────────────────────────
+    // ─── The confidences, as the model declares them ────────────────────────────────────
     public string ConfidenceMeasured { get; init; } = "";
     public string ConfidenceSure { get; init; } = "";
     public string ConfidenceLikely { get; init; } = "";

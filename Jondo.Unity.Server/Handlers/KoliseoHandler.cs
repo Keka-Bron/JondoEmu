@@ -10,95 +10,95 @@ using Jondo.Unity.World.Fights;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// El koliseo: por ahora, qué modalidades hay y cuáles están abiertas.
+    /// The koliseo: for now, which modes there are and which are open.
     /// </summary>
     /// <remarks>
-    /// Medido en «koliseo completo con invitacion-koli 2vs2». El cliente pide la tabla con un
-    /// <c>lux</c> vacío y el servidor contesta con un <c>ltd</c> de cuatro entradas:
+    /// Measured in «koliseo completo con invitacion-koli 2vs2». The client asks for the table with an
+    /// empty <c>lux</c> and the server answers with an <c>ltd</c> of four entries:
     ///
     /// <code>
-    ///   f1{      f2{f1=1 f4=1} f3=1 }    1 contra 1, abierta
-    ///   f1{f1=1  f2{f1=1 f4=2} f3=1 }    2 contra 2, abierta
-    ///   f1{f1=2  f2{f1=1 f4=3} f3=1 }    3 contra 3, abierta
-    ///   f1{f1=3  f2{     f4=3}      }    otra de tres, sin el f3: cerrada
+    ///   f1{      f2{f1=1 f4=1} f3=1 }    1 against 1, open
+    ///   f1{f1=1  f2{f1=1 f4=2} f3=1 }    2 against 2, open
+    ///   f1{f1=2  f2{f1=1 f4=3} f3=1 }    3 against 3, open
+    ///   f1{f1=3  f2{     f4=3}      }    another of three, without f3: closed
     /// </code>
     ///
-    /// El <c>f4</c> es cuántos van por equipo y el <c>f3</c> es el interruptor. Las tres primeras
-    /// se replican tal cual, que es lo que pedía abrir las tres modalidades; la cuarta se manda
-    /// igual de cerrada que en la captura, porque no se sabe qué es y encenderla sería inventar.
+    /// <c>f4</c> is how many go per team and <c>f3</c> is the switch. The first three are replicated
+    /// as they are, which is what opening the three modes required; the fourth is sent as closed as
+    /// in the capture, because it is not known what it is and switching it on would be making it up.
     ///
-    /// <b>Apuntarse.</b> Ordenando las dos mitades de la conexión por marca de tiempo, que es lo
-    /// que hacía falta para leer esto bien, el intercambio entero es:
+    /// <b>Enrolling.</b> Ordering the two halves of the connection by timestamp, which is what was
+    /// needed to read this right, the whole exchange is:
     ///
     /// <code>
-    ///   109,6 s  C-&gt;S  luy { f2 = índice de modalidad }     «1001», y la captura es un 2 contra 2
-    ///   109,7 s  S-&gt;C  lth { f2 = el mismo índice }         38 ms después
-    ///        ... siete segundos de espera ...
-    ///   116,9 s  S-&gt;C  ilw                                  el grupo, con el nombre del compañero
-    ///   116,9 s  S-&gt;C  lst { host, ip, billete }            A OTRO SERVIDOR
-    ///   446,0 s  C-&gt;S  lte                                  de vuelta, ya acabado el combate
-    ///   446,1 s  S-&gt;C  lty, lsr, lsx                        en 80 ms
+    ///   109.6 s  C-&gt;S  luy { f2 = mode index }              «1001», and the capture is a 2 against 2
+    ///   109.7 s  S-&gt;C  lth { f2 = the same index }          38 ms later
+    ///        ... seven seconds of waiting ...
+    ///   116.9 s  S-&gt;C  ilw                                  the party, with the teammate's name
+    ///   116.9 s  S-&gt;C  lst { host, ip, ticket }             TO ANOTHER SERVER
+    ///   446.0 s  C-&gt;S  lte                                  back, the fight already over
+    ///   446.1 s  S-&gt;C  lty, lsr, lsx                        within 80 ms
     /// </code>
     ///
-    /// <b>Lo que esto cambia.</b> El koliseo de verdad NO pelea en el servidor de mundo: el
-    /// <c>lst</c> manda al cliente a «dofus2-ko-tynril.ankama-games.com» con un billete de 32
-    /// bytes, el cliente abre una segunda conexión y el combate entero —kam, kaa, los cuatro jxg,
-    /// el reparto— viaja por ahí. Jondo es un solo servidor y monta el combate en el mismo sitio.
-    /// Es una diferencia de arquitectura y está dicha, no disimulada.
+    /// <b>What this changes.</b> The real koliseo does NOT fight on the world server: the
+    /// <c>lst</c> sends the client to «dofus2-ko-tynril.ankama-games.com» with a 32-byte ticket, the
+    /// client opens a second connection and the whole fight -- kam, kaa, the four jxg, the payout --
+    /// travels through there. Jondo is a single server and sets up the fight in the same place. It
+    /// is a difference of architecture and it is stated, not hidden.
     ///
-    /// <b>Lo que sigue sin estar hecho.</b> El <c>ilw</c> del grupo formado, la invitación entre
-    /// compañeros (<c>ijz</c>, <c>ilo</c>, <c>ing</c>, <c>iki</c>, <c>ijx</c>), las clasificaciones
-    /// (<c>iqt</c> e <c>irc</c>, dos listas de más de tres mil bytes) y el reparto de kolichas. Y
-    /// el emparejamiento de aquí es por orden de llegada, no por puntuación: ver
+    /// <b>What is still not done.</b> The <c>ilw</c> of the formed party, the invitation between
+    /// teammates (<c>ijz</c>, <c>ilo</c>, <c>ing</c>, <c>iki</c>, <c>ijx</c>), the rankings
+    /// (<c>iqt</c> and <c>irc</c>, two lists of more than three thousand bytes) and the payout of
+    /// kolichas. And matchmaking here is by order of arrival, not by rating: see
     /// <see cref="KoliseoQueue"/>.
     /// </remarks>
     public static class KoliseoHandler
     {
-        /// <summary>Una modalidad: cuántos por equipo y si está abierta.</summary>
+        /// <summary>A mode: how many per team and whether it is open.</summary>
         public readonly record struct Mode(int Index, int TeamSize, bool Open, bool Inner);
 
         /// <summary>
-        /// Las cuatro de la captura, con las tres de verdad abiertas.
+        /// The capture's four, with the three real ones open.
         /// </summary>
         /// <remarks>
-        /// La cuarta lleva <c>Inner = false</c> porque su <c>f2</c> no trae el <c>f1</c> que
-        /// llevan las otras tres. Es una diferencia de un byte y se respeta: replicar lo que se
-        /// midió cuesta lo mismo que aproximarlo.
+        /// The fourth carries <c>Inner = false</c> because its <c>f2</c> does not carry the <c>f1</c> the
+        /// other three carry. It is a one-byte difference and it is respected: replicating what was
+        /// measured costs the same as approximating it.
         /// </remarks>
         public static readonly IReadOnlyList<Mode> Modes = new[]
         {
             new Mode(0, 1, true, true),
             new Mode(1, 2, true, true),
             new Mode(2, 3, true, true),
-            new Mode(MegabotMode, 1, true, false),
+            new Mode(JondoBotMode, 1, true, false),
         };
 
         /// <summary>
-        /// The fourth card of the Koliseo window: 1v1 against a megabot (<see cref="KoliseoBots"/>).
+        /// The fourth card of the Koliseo window: 1v1 against a JondoBot (<see cref="KoliseoBots"/>).
         /// </summary>
         /// <remarks>
         /// The client's window has a fourth card besides 1v1, 2v2 and 3v3, its "event" one
         /// (ctr_pvpEventLeagueInfo, UpdateEventMode): the entry of the ltd whose settings are
         /// not the default ones (no f1 in its lsz). It shows when that mode is open and its
         /// texts are the client's own. Measured closed, as a 3v3, in the capture; here it is open,
-        /// a 1v1, and every enrolment in it is a fight against a megabot at once -- the 1v1's own
+        /// a 1v1, and every enrolment in it is a fight against a JondoBot at once -- the 1v1's own
         /// "searching", its match-found popup, its accept, its sanction for letting it run out.
         /// It pays as a Koliseo and leaves the ladder alone.
         /// </remarks>
-        public const int MegabotMode = 3;
+        public const int JondoBotMode = 3;
 
-        /// <summary>El cliente pide la tabla (lux). Se le contesta con el ltd.</summary>
+        /// <summary>The client asks for the table (lux). It is answered with the ltd.</summary>
         /// <remarks>
-        /// Va por la raíz 3 y con el id de la petición, no por la 1. Estaba mal: se mandaba con
-        /// Push, que envuelve en la raíz 1 —«esto lo dice el servidor por su cuenta»— y el cliente
-        /// no tenía con qué emparejarlo. En la captura las cinco parejas cuadran una a una:
+        /// It goes through root 3 and with the request's id, not through root 1. It was wrong: it was sent
+        /// with Push, which wraps in root 1 -- «the server says this on its own» -- and the client had
+        /// nothing to pair it with. In the capture the five pairs match one by one:
         ///
         /// <code>
-        ///   C-&gt;S  12 19 {…lux…} 10 0e        el 14 va en el f2 de la raíz
-        ///   S-&gt;C  1a 45 {…ltd…} 10 0e        y vuelve el mismo 14
+        ///   C-&gt;S  12 19 {…lux…} 10 0e        the 14 goes in the root's f2
+        ///   S-&gt;C  1a 45 {…ltd…} 10 0e        and the same 14 comes back
         /// </code>
         ///
-        /// Y siguen: 15, 16, 17 y 18. Es un contador del cliente, no el -1 de siempre.
+        /// And they go on: 15, 16, 17 and 18. It is a counter of the client, not the usual -1.
         /// </remarks>
         public static async Task SendModesAsync(NetworkStream stream, byte[] payload)
         {
@@ -117,26 +117,28 @@ namespace Jondo.Unity.Server.Handlers
             return abiertas;
         }
 
-        /// <summary>Se apunta un GRUPO entero (lsm).</summary>
+        /// <summary>A whole PARTY enrols (lsm).</summary>
         /// <remarks>
-        /// El mismo botón que el <see cref="EnrolAsync"/>, pero con gente detrás. Con un grupo
-        /// formado el cliente deja de mandar el luy y manda el lsm, y el índice se le mueve del
-        /// campo 2 al 1: medido sobre nuestro propio cliente, «0801» al pulsar en un 2 contra 2,
-        /// que es la entrada 1 del ltd — el mismo índice que lleva el luy en la captura.
+        /// The same button as <see cref="EnrolAsync"/>, but with people behind it. With a party formed
+        /// the client stops sending the luy and sends the lsm, and the index moves from field 2 to 1:
+        /// measured on our own client, «0801» when pressing a 2 against 2, which is entry 1 of the ltd --
+        /// the same index the luy carries in the capture.
         ///
-        /// Se apunta a TODO EL GRUPO y no sólo a quien pulsa, que es lo que quiere decir apuntarse
-        /// en grupo; los que ya estuvieran en una cola se quedan donde estaban. El grupo es el
-        /// normal, el de <see cref="Parties"/>: el equipo de koliseo lo monta el koliseo después
-        /// del emparejamiento, y en la captura el ilw del equipo aparece justo ahí, no antes.
+        /// THE WHOLE PARTY is enrolled and not only whoever presses, which is what enrolling as a party
+        /// means; those already in a queue stay where they were. The party is the normal one, that of
+        /// <see cref="Parties"/>: the koliseo team is set up by the koliseo after matchmaking, and in the
+        /// capture the team's ilw appears right there, not before.
         ///
-        /// SIN MEDIR: qué contesta el servidor de verdad a un lsm. No hay captura del camino en
-        /// grupo. Se le manda el lth, que es el acuse que saca a la ventana de su estado de espera
-        /// y lo que contesta al luy a los 38 ms.
+        /// NOT MEASURED: what the real server answers to an lsm. There is no capture of the party road.
+        /// It is sent the lth, which is the acknowledgement that puts the window in its waiting state and
+        /// what answers the luy within 38 ms.
         /// </remarks>
         public static async Task EnrolPartyAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? lsm = ConnectionProtocol.ReadPayload(payload, Op.Lsm);
             if (lsm == null) return;
+            // A Koliseo fight is a trip to an arena: none for a prisoner.
+            if (await Managers.Jail.KeepsInAsync(stream)) return;
 
             int indice = IndiceDeModalidad(lsm, 1);
 
@@ -149,8 +151,8 @@ namespace Jondo.Unity.Server.Handlers
 
             long yo = GameState.CharacterId;
 
-            // El castigo por dejar vencer un cartel. El servidor real contesta con el lqn 642 y
-            // los minutos que faltan, y no te apunta.
+            // The penalty for letting a poster expire. The real server answers with lqn 642 and
+            // the minutes left, and does not enrol you.
             int faltan = KoliseoOffers.MinutesLeft(yo);
             if (faltan > 0)
             {
@@ -163,15 +165,15 @@ namespace Jondo.Unity.Server.Handlers
             var grupo = Parties.Of(yo);
             var quienes = grupo != null ? Parties.MembersOf(grupo) : new List<long> { yo };
 
-            // The megabot card: each of them against a megabot of his own, now.
-            if (indice == MegabotMode)
+            // The JondoBot card: each of them against a JondoBot of his own, now.
+            if (indice == JondoBotMode)
             {
                 foreach (long miembro in quienes)
                 {
                     var suya = SessionRegistry.FindByCharacter(miembro);
                     if (suya == null || !suya.IsInWorld || KoliseoOffers.Of(miembro) != null) continue;
                     if (suya.State.IsInFight || KoliseoQueue.Waits(miembro)) continue;
-                    await StartMegabotAsync(suya);
+                    await StartJondoBotAsync(suya);
                 }
                 return;
             }
@@ -182,10 +184,10 @@ namespace Jondo.Unity.Server.Handlers
             if (quienes.Count <= modo.Value.TeamSize) nuevos = KoliseoQueue.EnrolUnit(quienes, indice);
             else foreach (long miembro in quienes) if (KoliseoQueue.Enrol(miembro, indice)) nuevos++;
 
-            // Va SIEMPRE, aunque no se haya apuntado nadie nuevo: sin esto la ventana se queda
-            // como si no hubiera pasado nada, que es exactamente el fallo que trae aqui.
-            // EL ESTADO DE LA COLA, que es lo que pinta el «buscando». No es un acuse a la
-            // peticion: es un empujon del servidor con como esta el jugador ahora mismo.
+            // It ALWAYS goes, even if nobody new enrolled: without this the window stays as if
+            // nothing had happened, which is exactly the bug that brings us here.
+            // THE QUEUE STATE, which is what draws the «searching». It is not an acknowledgement
+            // of the request: it is a push from the server with how the player stands right now.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Lsx, BuildQueueState(indice, true)));
 
@@ -196,15 +198,16 @@ namespace Jondo.Unity.Server.Handlers
             await TryMatchAsync(indice, modo.Value.TeamSize);
         }
 
-        /// <summary>El jugador acepta o rechaza la partida (luy).</summary>
+        /// <summary>The player accepts or refuses the match (luy).</summary>
         /// <remarks>
-        /// El luy es <c>{ map&lt;string,string&gt;, bool }</c> leido del propio cliente: el campo 2 es
-        /// un BOOLEANO, no un indice de modalidad. Aceptar llega como «1001» y el servidor real
-        /// contesta un lth identico por la raiz 3 con el id de la peticion, a 38 ms.
+        /// The luy is <c>{ map&lt;string,string&gt;, bool }</c> read off the client itself: field 2 is a
+        /// BOOLEAN, not a mode index. Accepting arrives as «1001» and the real server answers with an
+        /// identical lth through root 3 with the request's id, within 38 ms.
         ///
-        /// SIN MEDIR el rechazo: en la captura se dejo vencer el plazo. Un bool de proto3 en falso
-        /// no viaja, asi que un «no» tendria que llegar con la carga vacia, y asi se trata. El
-        /// desafio pvp hace exactamente lo mismo -- aceptar «08ec031001», rechazar «08e903» --.
+        /// The refusal is NOT MEASURED: in the capture the deadline was left to run out. A proto3 bool
+        /// set to false does not travel, so a «no» would have to arrive with an empty payload, and that
+        /// is how it is treated. The pvp challenge does exactly the same -- accept «08ec031001», refuse
+        /// «08e903» --.
         /// </remarks>
         public static async Task AnswerOfferAsync(NetworkStream stream, byte[] payload)
         {
@@ -225,7 +228,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (field.FieldNumber == 2 && field.WireType == 0) acepta = field.VarIntValue != 0;
             }
 
-            // El acuse va siempre, se diga que si o que no: es la respuesta a SU peticion.
+            // The acknowledgement always goes, yes or no: it is the answer to HIS request.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Lth, BuildAccepted(acepta),
                                           ConnectionProtocol.RequestId(payload)));
@@ -244,12 +247,12 @@ namespace Jondo.Unity.Server.Handlers
             await EmpezarAsync(oferta);
         }
 
-        /// <summary>Espera el plazo y, si no han dicho que si todos, la deshace.</summary>
+        /// <summary>Waits for the deadline and, if not everybody has said yes, undoes it.</summary>
         private static async Task VencerAsync(KoliseoOffers.Offer oferta)
         {
             await Task.Delay(TimeSpan.FromSeconds(KoliseoOffers.Segundos + 1));
 
-            // Si alguien la acepto entera por los pelos, Close devuelve falso y aqui no se toca.
+            // If somebody accepted it in full by a hair, Close returns false and it is not touched here.
             if (!KoliseoOffers.Close(oferta)) return;
 
             Console.WriteLine($"[Koliseo] Vence el plazo de la partida {oferta.Id}.");
@@ -257,13 +260,13 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Deshace una partida: castiga a quien no dijo que si y devuelve a los demas a la cola.
+        /// Undoes a match: punishes whoever did not say yes and sends the others back to the queue.
         /// </summary>
         /// <remarks>
-        /// Medido al vencer el plazo: lqn con el aviso y la marca de tiempo, ltk vacio, y el lsx
-        /// diciendo que ya no se busca. El lty de la clasificacion tambien viaja ahi y NO se manda:
-        /// son 144 bytes con un bloque de coma flotante dentro que no se ha descifrado, y mandar
-        /// bytes inventados es peor que no mandarlos.
+        /// Measured when the deadline runs out: lqn with the notice and the timestamp, an empty ltk, and
+        /// the lsx saying the search is over. The rating's lty also travels there and is NOT sent: it is
+        /// 144 bytes with a floating-point block inside that has not been deciphered, and sending made-up
+        /// bytes is worse than not sending them.
         /// </remarks>
         private static async Task DeshacerAsync(KoliseoOffers.Offer oferta, List<long> culpables,
                                                 bool yaCerrada = false)
@@ -291,9 +294,9 @@ namespace Jondo.Unity.Server.Handlers
                             BuildSanction(new DateTimeOffset(hasta).ToUnixTimeSeconds())));
                     }
                 }
-                else if (oferta.Mode != MegabotMode)
+                else if (oferta.Mode != JondoBotMode)
                 {
-                    // El que si dijo que si no pierde el sitio por culpa de otro.
+                    // Whoever did say yes does not lose his place because of somebody else.
                     KoliseoQueue.Enrol(quien, oferta.Mode);
                 }
 
@@ -305,12 +308,12 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Koliseo] Partida deshecha: {castigados.Count} castigado(s) " +
                               $"{KoliseoOffers.Castigo} minuto(s).");
 
-            // Los que se quedaron pueden emparejarse con otros que estuvieran esperando.
+            // Those who stayed can be matched with others who were waiting.
             var modo = FindMode(oferta.Mode);
-            if (modo != null && oferta.Mode != MegabotMode) await TryMatchAsync(oferta.Mode, modo.Value.TeamSize);
+            if (modo != null && oferta.Mode != JondoBotMode) await TryMatchAsync(oferta.Mode, modo.Value.TeamSize);
         }
 
-        /// <summary>Todos han dicho que si: se monta el combate.</summary>
+        /// <summary>Everybody has said yes: the fight is set up.</summary>
         private static async Task EmpezarAsync(KoliseoOffers.Offer oferta)
         {
             var azul = new List<GameSession>();
@@ -335,7 +338,7 @@ namespace Jondo.Unity.Server.Handlers
                                                 blueBots: azulBots, redBots: rojoBots);
         }
 
-        /// <summary>One of an offer's fighters: his session, or the megabot built for the fight.</summary>
+        /// <summary>One of an offer's fighters: his session, or the JondoBot built for the fight.</summary>
         private static void Juntar(long id, List<GameSession> sesiones, List<Fighter> bots)
         {
             if (KoliseoBots.IsBot(id))
@@ -349,7 +352,7 @@ namespace Jondo.Unity.Server.Handlers
             if (sesion != null && sesion.IsInWorld) sesiones.Add(sesion);
         }
 
-        /// <summary>Escribe a una sesion sin que un socket caido se lleve por delante a los demas.</summary>
+        /// <summary>Writes to a session without a dropped socket taking the others down with it.</summary>
         private static async Task Escribir(GameSession sesion, byte[] frame)
         {
             try
@@ -362,16 +365,16 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>El cliente vuelve del koliseo (lte).</summary>
+        /// <summary>The client comes back from the koliseo (lte).</summary>
         /// <remarks>
-        /// No es salirse de la cola, aunque lo pareciera: en la captura el luy y el lte van a
-        /// cinco minutos y medio uno del otro, con el combate entero en medio. Lo que se contesta
-        /// son tres tramas en 80 ms —lty, lsr y lsx—; aquí sólo va la última, que es la única de
-        /// las tres cuyos cuatro bytes se pueden repetir sin fingir que se entienden. El lty son
-        /// 151 bytes sin descifrar y mandar 151 bytes inventados es peor que no mandarlos.
+        /// It is not leaving the queue, although it might look like it: in the capture the luy and the
+        /// lte are five and a half minutes apart, with the whole fight in between. What is answered is
+        /// three frames within 80 ms -- lty, lsr and lsx --; only the last goes here, which is the only one
+        /// of the three whose four bytes can be repeated without pretending to understand them. The lty is
+        /// 151 undeciphered bytes and sending 151 made-up bytes is worse than not sending them.
         ///
-        /// Por si acaso se le quita también el sitio en la cola: volver del koliseo y seguir
-        /// apuntado no tendría sentido, y si no estaba, no cuesta nada.
+        /// Just in case, his place in the queue is taken away too: coming back from the koliseo and still
+        /// being enrolled would make no sense, and if he was not, it costs nothing.
         /// </remarks>
         public static async Task ReturnAsync(NetworkStream stream, byte[]? payload = null)
         {
@@ -392,19 +395,63 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El índice de modalidad que trae una petición de apuntarse.
+        /// The window's "leave the queue" (lsi): out of the queue with the unit he enrolled with --
+        /// a party leaves together -- and each of them told with the lsx of leaving, which puts
+        /// the window back to "search a fight" (see <see cref="Op.Lsi"/>).
         /// </summary>
         /// <remarks>
-        /// CERO CUANDO NO VIENE, y ahí estaba el fallo. El campo no viaja cuando vale cero —es el
-        /// valor por omisión de protobuf, y lo dice nuestro propio Op.cs sobre este mismo ltd: «el
-        /// índice cero no viaja»— así que un uno contra uno llega con la carga vacía. Empezando en
-        /// menos uno, esa carga vacía se leía como «modalidad -1», caía en «no está abierta», y el
-        /// cliente se quedaba esperando un acuse que no llegaba sin un solo aviso por ninguna
-        /// parte. El dos contra dos funcionaba porque su índice es el uno y sí viaja.
+        /// On the JondoBot card the search is the offer itself, drawn at once: leaving withdraws it,
+        /// with no sanction, since nothing was refused. A normal mode's offer is answered from its
+        /// popup, not from here.
+        /// </remarks>
+        public static async Task LeaveQueueAsync(NetworkStream stream)
+        {
+            long yo = GameState.CharacterId;
+
+            var oferta = KoliseoOffers.Of(yo);
+            if (oferta != null && oferta.Mode == JondoBotMode)
+            {
+                Console.WriteLine($"[Koliseo] {yo} deja la tarjeta de JondoBots antes de aceptar.");
+                await DeshacerAsync(oferta, new List<long>());
+                return;
+            }
+
+            var (mode, members) = KoliseoQueue.LeaveWithUnit(yo);
+            if (mode < 0)
+            {
+                // Not waiting anywhere: the window is set straight all the same, so that it does
+                // not stay "searching" for a search the server does not have.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lsx, BuildLeftQueue(KoliseoOffers.LastMode(yo))));
+                Console.WriteLine($"[Koliseo] {yo} deja una cola en la que no estaba.");
+                return;
+            }
+
+            byte[] left = ConnectionProtocol.Push(Op.Lsx, BuildLeftQueue(mode));
+            foreach (long id in members)
+            {
+                var sesion = SessionRegistry.FindByCharacter(id);
+                if (sesion != null) await Escribir(sesion, left);
+            }
+            Console.WriteLine($"[Koliseo] {yo} deja la cola del modo {mode}" +
+                              (members.Count > 1 ? $" con su grupo ({members.Count})." : ".") +
+                              $" Quedan {KoliseoQueue.CountIn(mode)} esperando.");
+        }
+
+        /// <summary>
+        /// The mode index an enrolment request carries.
+        /// </summary>
+        /// <remarks>
+        /// ZERO WHEN IT DOES NOT COME, and that was the bug. The field does not travel when it is zero --
+        /// it is protobuf's default value, and our own Op.cs says so about this same ltd: «index zero
+        /// does not travel» -- so a one against one arrives with an empty payload. Starting at minus one,
+        /// that empty payload was read as «mode -1», fell into «it is not open», and the client was left
+        /// waiting for an acknowledgement that never came without a single notice anywhere. Two against
+        /// two worked because its index is one and it does travel.
         ///
-        /// El número de campo cambia según por dónde entre —el luy lo trae en el 2 y el lsm en el
-        /// 1— pero la numeración es la misma en los dos, y es el orden de las entradas del ltd:
-        /// 0 uno contra uno, 1 dos contra dos, 2 tres contra tres.
+        /// The field number changes depending on where it comes in -- the luy carries it in 2 and the lsm
+        /// in 1 -- but the numbering is the same in both, and it is the order of the ltd's entries:
+        /// 0 one against one, 1 two against two, 2 three against three.
         /// </remarks>
         internal static int IndiceDeModalidad(byte[] carga, int campo)
         {
@@ -416,12 +463,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Si ya hay gente para los dos equipos, monta el combate.
+        /// If there are already people for both teams, sets up the fight.
         /// </summary>
         /// <remarks>
-        /// Se comprueba que sigan todos conectados ANTES de sacarlos de la cola del todo: entre
-        /// apuntarse y llenar la partida cabe una desconexión, y montar un koliseo con un hueco
-        /// vacío es peor que esperar al siguiente.
+        /// It is checked that they are all still connected BEFORE taking them out of the queue for good:
+        /// a disconnection fits between enrolling and filling the match, and setting up a koliseo with an
+        /// empty slot is worse than waiting for the next one.
         /// </remarks>
         private static async Task TryMatchAsync(int mode, int teamSize)
         {
@@ -444,8 +491,8 @@ namespace Jondo.Unity.Server.Handlers
 
             if (azul.Count != teamSize || rojo.Count != teamSize)
             {
-                // Alguno se fue por el camino. Los que quedan vuelven a la cola en vez de perder
-                // el sitio por culpa de otro.
+                // Somebody left along the way. Those remaining go back to the queue instead of losing
+                // their place because of somebody else.
                 foreach (var sesion in azul) KoliseoQueue.Enrol(sesion.State.CharacterId, mode);
                 foreach (var sesion in rojo) KoliseoQueue.Enrol(sesion.State.CharacterId, mode);
                 Console.WriteLine($"[Koliseo] Faltó alguien al formar la partida; los demás " +
@@ -453,8 +500,8 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Y AQUI NO EMPIEZA EL COMBATE, empieza el cartel. El servidor real manda un lsh
-            // con el plazo y espera; medido en dos capturas, y el plazo son 59 segundos.
+            // And THE FIGHT DOES NOT START HERE, the poster does. The real server sends an lsh
+            // with the deadline and waits; measured in two captures, and the deadline is 59 seconds.
             var oferta = KoliseoOffers.Open(mode, teamSize, pareja.Value.Blue, pareja.Value.Red);
 
             byte[] aviso = ConnectionProtocol.Push(Op.Lsh, BuildOffer(KoliseoOffers.Segundos));
@@ -475,7 +522,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             foreach (var modo in Modes)
             {
-                if (!modo.Open || modo.Index == MegabotMode || KoliseoQueue.CountIn(modo.Index) < modo.TeamSize * 2) continue;
+                if (!modo.Open || modo.Index == JondoBotMode || KoliseoQueue.CountIn(modo.Index) < modo.TeamSize * 2) continue;
                 int before;
                 do
                 {
@@ -533,21 +580,21 @@ namespace Jondo.Unity.Server.Handlers
             => DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'",
                                                                       System.Globalization.CultureInfo.InvariantCulture);
 
-        // ─── The megabots ───────────────────────────────────────────────────────────────────
+        // ─── The JondoBots ───────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Enrolled on the megabot card: a megabot drawn for him and the 1v1's match-found popup,
-        /// the megabot's yes already given. What follows is the Koliseo's own: his accept starts
+        /// Enrolled on the JondoBot card: a JondoBot drawn for him and the 1v1's match-found popup,
+        /// the JondoBot's yes already given. What follows is the Koliseo's own: his accept starts
         /// the fight (<see cref="EmpezarAsync"/>), his no or the clock undoes it.
         /// </summary>
-        private static async Task StartMegabotAsync(GameSession human)
+        private static async Task StartJondoBotAsync(GameSession human)
         {
-            var bot = KoliseoBots.Create();
-            var oferta = KoliseoOffers.Open(MegabotMode, 1, new List<long> { human.State.CharacterId },
+            var bot = KoliseoBots.Create(against: human.State.CharacterId);
+            var oferta = KoliseoOffers.Open(JondoBotMode, 1, new List<long> { human.State.CharacterId },
                                             new List<long> { bot.Id });
             KoliseoOffers.Accept(oferta, bot.Id);
 
-            await Escribir(human, ConnectionProtocol.Push(Op.Lsx, BuildQueueState(MegabotMode, true)));
+            await Escribir(human, ConnectionProtocol.Push(Op.Lsx, BuildQueueState(JondoBotMode, true)));
             await Escribir(human, ConnectionProtocol.Push(Op.Lsh, BuildOffer(KoliseoOffers.Segundos)));
             Console.WriteLine($"[Koliseo] {human.State.CharacterId} against {bot.Name} (level {KoliseoBots.Level}): " +
                               $"{KoliseoOffers.Segundos} s to accept.");
@@ -561,73 +608,73 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El lsx: en qué cola está el jugador, que es lo que pinta el «buscando».
+        /// The lsx: which queue the player is in, which is what draws the «searching».
         /// </summary>
         /// <remarks>
-        /// Esto estuvo mal leído desde el principio y merece quedar escrito. Se le contestaba un
-        /// lth con el índice dentro, y el lth no es eso: el esquema del propio cliente dice
-        /// <c>lth { bool gdak = 1; bool gdal = 2; }</c>, dos booleanos, y es la respuesta a un luy
-        /// —<c>{ map&lt;string,string&gt;, bool }</c>—, que no es apuntarse a nada. La ventana
-        /// recibía una cosa que no entendía y se quedaba igual que estaba, sin un solo error.
+        /// This was misread from the start and deserves to stay written. It used to be answered with an
+        /// lth with the index inside, and the lth is not that: the client's own schema says
+        /// <c>lth { bool gdak = 1; bool gdal = 2; }</c>, two booleans, and it is the answer to a luy --
+        /// <c>{ map&lt;string,string&gt;, bool }</c> --, which is not enrolling in anything. The window
+        /// received something it did not understand and stayed as it was, without a single error.
         ///
-        /// El que lleva el estado es el lsx, y el esquema lo deja claro:
+        /// The one carrying the state is the lsx, and the schema makes it clear:
         ///
         /// <code>
-        ///   enum lsg { 0, 1, 2, 3 }                          las cuatro modalidades
-        ///   message lsm { lsg gcxp = 1; }                    apuntarse: la modalidad y ya
-        ///   message lsx { bool gcyt = 1; … lsg gcyw = 4; }   ¿buscando?, y en cuál
+        ///   enum lsg { 0, 1, 2, 3 }                          the four modes
+        ///   message lsm { lsg gcxp = 1; }                    enrolling: the mode and that is all
+        ///   message lsx { bool gcyt = 1; … lsg gcyw = 4; }   searching?, and in which
         /// </code>
         ///
-        /// Y la captura lo confirma byte a byte: el lsx que el servidor empuja a los 27 segundos
-        /// de entrar, sin que el cliente pida nada, es «08012001» — f1 cierto, f4 uno. O sea
-        /// «estás buscando, en la modalidad 1», que es el dos contra dos. Ese jugador ya estaba
-        /// apuntado de antes, y por eso en la captura no sale el apuntarse por ningún lado: pasó
-        /// antes de empezar a grabar. Buscar el lsm en las 37 carpetas de capturas no lo encuentra
-        /// ni una vez.
+        /// And the capture confirms it byte for byte: the lsx the server pushes 27 seconds after entering,
+        /// without the client asking for anything, is «08012001» -- f1 true, f4 one. That is «you are
+        /// searching, in mode 1», which is the two against two. That player was already enrolled from
+        /// before, and that is why the enrolment does not appear anywhere in the capture: it happened
+        /// before recording started. Searching for the lsm in the 37 capture folders does not find it
+        /// even once.
         ///
-        /// La modalidad cero no viaja, como en todo lo demás de aquí.
+        /// Mode zero does not travel, as with everything else here.
         /// </remarks>
         public static byte[] BuildQueueState(int modeIndex, bool searching)
             => Pb.New().VarIfNotZero(1, searching ? 1 : 0).VarIfNotZero(4, modeIndex).Build();
 
-        /// <summary>El lsh: el cartel de partida encontrada, con el plazo en segundos.</summary>
+        /// <summary>The lsh: the match-found poster, with the deadline in seconds.</summary>
         public static byte[] BuildOffer(int seconds) => Pb.New().VarIfNotZero(2, seconds).Build();
 
-        /// <summary>El lth: el acuse de la respuesta. El campo 2 es un booleano.</summary>
+        /// <summary>The lth: the answer's acknowledgement. Field 2 is a boolean.</summary>
         public static byte[] BuildAccepted(bool accepted)
             => Pb.New().VarIfNotZero(2, accepted ? 1 : 0).Build();
 
         /// <summary>
-        /// El lsx de salir de la cola: «18032002» de la captura del 3 contra 3.
+        /// The lsx for leaving the queue: «18032002» from the 3 against 3 capture.
         /// </summary>
         /// <remarks>
-        /// Llevaba la modalidad clavada a uno, que es la de la otra captura. Es el f4, igual que en
-        /// el lsx de estar buscando, y la del 3 contra 3 lo enseña con un dos.
+        /// It carried the mode nailed at one, which is the other capture's. It is f4, the same as in the
+        /// searching lsx, and the 3 against 3 one shows it with a two.
         /// </remarks>
         public static byte[] BuildLeftQueue(int modeIndex)
             => Pb.New().Var(3, 3).VarIfNotZero(4, modeIndex).Build();
 
         /// <summary>
-        /// El lqn del castigo: «prohibido participar», con la marca de tiempo en que se levanta.
+        /// The penalty's lqn: «banned from taking part», with the timestamp at which it is lifted.
         /// </summary>
         /// <remarks>
-        /// «080110f703220a31373838323136393936» de la captura: f1 = 1, f2 = 503 —la plantilla del
-        /// cliente— y el f4 la marca de tiempo en segundos, COMO CADENA. Es la misma forma de
-        /// mensaje informativo que ya se usa en todo el emulador.
+        /// «080110f703220a31373838323136393936» from the capture: f1 = 1, f2 = 503 -- the client's
+        /// template -- and f4 the timestamp in seconds, AS A STRING. It is the same informative message
+        /// shape already used throughout the emulator.
         /// </remarks>
         public static byte[] BuildSanction(long epochSeconds)
             => Pb.New().Var(1, 1).Var(2, 503)
                        .Str(4, epochSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture))
                        .Build();
 
-        /// <summary>El lqn de «todavia no puedes», con los minutos que faltan.</summary>
+        /// <summary>The «you cannot yet» lqn, with the minutes left.</summary>
         /// <remarks>«0801108205220134»: f1 = 1, f2 = 642, f4 = «4».</remarks>
         public static byte[] BuildStillBanned(int minutes)
             => Pb.New().Var(1, 1).Var(2, 642)
                        .Str(4, minutes.ToString(System.Globalization.CultureInfo.InvariantCulture))
                        .Build();
 
-        /// <summary>El ltd, byte por byte como la captura.</summary>
+        /// <summary>The ltd, byte for byte as the capture.</summary>
         public static byte[] BuildModes(IReadOnlyList<Mode> modes)
         {
             var ltd = Pb.New();
@@ -647,8 +694,8 @@ namespace Jondo.Unity.Server.Handlers
                 dentro.Var(4, modo.TeamSize);
 
                 var entrada = Pb.New();
-                // El índice cero no viaja: es el valor por omisión de protobuf y la captura lo
-                // deja fuera en la primera entrada y sólo en ella.
+                // Index zero does not travel: it is protobuf's default value and the capture leaves it
+                // out in the first entry and only in it.
                 entrada.VarIfNotZero(1, modo.Index);
                 entrada.Msg(2, dentro);
                 if (modo.Open) entrada.Var(3, 1);

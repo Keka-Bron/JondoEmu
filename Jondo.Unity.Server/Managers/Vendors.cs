@@ -7,41 +7,41 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los vendedores que Jondo junta en uno solo.
+    /// The sellers Jondo merges into one.
     ///
-    /// El catálogo de tiendas está medido del servidor de torneos de Ankama, y allí cada categoría
-    /// va partida por tramos de nivel: «Sombreros 1 - 49», «Sombreros 50 - 99», «Sombreros 100 -
-    /// 149»... cinco vendedores para lo mismo, en fila y todos en el mapa del zaap de Amakna. Ocho
-    /// categorías están así, y suman 38 NPCs que aquí se convierten en 9.
+    /// The shop catalogue is measured from Ankama's tournament server, and there each category
+    /// goes split by level brackets: «Sombreros 1 - 49», «Sombreros 50 - 99», «Sombreros 100 -
+    /// 149»... five sellers for the same thing, in a row and all on the Amakna zaap map. Eight
+    /// categories are like that, and they add up to 38 NPCs that here become 9.
     ///
-    /// Lo que se junta y cómo se llama sale de datos/vendedores_jondo.json, que lee también el mod
-    /// del cliente: el nombre y el catálogo salen del mismo sitio y no se pueden descuadrar.
+    /// What is merged and what it is called comes from datos/vendedores_jondo.json, which the client
+    /// mod also reads: the name and the catalogue come from the same place and cannot drift apart.
     ///
-    /// EL LÍMITE que manda en todo esto: el mensaje que lleva el catálogo —el kbd— no está
-    /// paginado, y no hay ni un caso en las capturas de dos kbd para una misma tienda, así que no
-    /// hay prueba de que el cliente sepa juntarlos. El mayor que Ankama manda son 444 entradas y
-    /// 26.902 bytes. Siete de las ocho categorías caben de sobra; las armas juntas serían 683
-    /// objetos, un 54 % por encima de nada medido, y por eso van en dos vendedores de 355 y 333.
+    /// THE LIMIT that rules all this: the message carrying the catalogue —the kbd— is not
+    /// paginated, and there is not a single case in the captures of two kbd for one same shop, so there
+    /// is no proof that the client knows how to join them. The biggest Ankama sends is 444 entries and
+    /// 26,902 bytes. Seven of the eight categories fit easily; the weapons together would be 683
+    /// items, 54 % above anything measured, and that is why they go in two sellers of 355 and 333.
     /// </summary>
     public static class Vendors
     {
-        /// <summary>Un vendedor que se queda, con lo que se le echa encima.</summary>
+        /// <summary>A seller that stays, with what is piled onto it.</summary>
         public sealed class Merge
         {
-            /// <summary>El que sobrevive: conserva su casilla y su tienda.</summary>
+            /// <summary>The survivor: it keeps its cell and its shop.</summary>
             public int Keeps;
 
-            /// <summary>Cómo se llamará en la pantalla del jugador.</summary>
+            /// <summary>What it will be called on the player's screen.</summary>
             public string Name = "";
 
-            /// <summary>Su clave de texto, la que sustituye el mod del cliente.</summary>
+            /// <summary>Its text key, the one the client mod replaces.</summary>
             public int NameId;
 
-            /// <summary>Los que desaparecen.</summary>
+            /// <summary>The ones that disappear.</summary>
             public List<int> Absorbs = new List<int>();
         }
 
-        /// <summary>Dónde se planta un vendedor: su casilla y hacia dónde mira.</summary>
+        /// <summary>Where a seller stands: its cell and which way it faces.</summary>
         public readonly struct Placement
         {
             public Placement(int cell, int orientation) { Cell = cell; Orientation = orientation; }
@@ -54,7 +54,7 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Dictionary<int, Placement> _placements =
             new Dictionary<int, Placement>();
 
-        /// <summary>Los que ya no se siembran porque otro se ha quedado con su catálogo.</summary>
+        /// <summary>The ones no longer seeded because another has taken their catalogue.</summary>
         public static IReadOnlyCollection<int> Absorbed => _absorbed;
 
         public static IReadOnlyList<Merge> All => _merges;
@@ -100,9 +100,9 @@ namespace Jondo.Unity.Server.Managers
                         {
                             int id = otro.GetInt32();
 
-                            // Un vendedor no puede absorberse a sí mismo ni ser absorbido dos
-                            // veces: lo primero borraría su propia tienda al quitarlo del mapa, y
-                            // lo segundo dejaría su catálogo repetido en dos sitios.
+                            // A seller cannot absorb itself nor be absorbed twice:
+                            // the first would delete its own shop when removing it from the map, and
+                            // the second would leave its catalogue repeated in two places.
                             if (id == keeps)
                             {
                                 Console.WriteLine($"[Vendedores] El {keeps} se absorbe a sí mismo; " +
@@ -122,7 +122,7 @@ namespace Jondo.Unity.Server.Managers
                     _merges.Add(merge);
                 }
 
-                // Y ninguno de los que se quedan puede estar en la lista de los que desaparecen.
+                // And none of the ones that stay can be on the list of the ones that disappear.
                 foreach (var merge in _merges)
                 {
                     if (!_absorbed.Contains(merge.Keeps)) continue;
@@ -131,11 +131,11 @@ namespace Jondo.Unity.Server.Managers
                     _absorbed.Remove(merge.Keeps);
                 }
 
-                // Y dónde se planta cada uno.
+                // And where each one stands.
                 //
-                // Va aquí y no en la tabla NpcSpawns a propósito: bases/ no se versiona, así que
-                // una colocación escrita en world.db se pierde en cuanto alguien vuelve a
-                // descomprimir world.zip. Esto sí viaja con el repositorio.
+                // It goes here and not in the NpcSpawns table on purpose: bases/ is not versioned, so
+                // a placement written in world.db is lost as soon as someone
+                // unzips world.zip again. This does travel with the repository.
                 if (doc.RootElement.TryGetProperty("colocacion", out var colocacion))
                 {
                     foreach (var entrada in colocacion.EnumerateObject())
@@ -157,10 +157,10 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Si a ese vendedor lo ha absorbido otro y por tanto ya no se siembra.</summary>
+        /// <summary>Whether that seller has been absorbed by another and is therefore no longer seeded.</summary>
         public static bool IsAbsorbed(int npcTemplateId) => _absorbed.Contains(npcTemplateId);
 
-        /// <summary>Dónde va ese vendedor, si Jondo lo coloca a mano.</summary>
+        /// <summary>Where that seller goes, if Jondo places it by hand.</summary>
         public static Placement? PlacementOf(int npcTemplateId)
             => _placements.TryGetValue(npcTemplateId, out var sitio) ? sitio : null;
     }

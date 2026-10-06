@@ -338,9 +338,9 @@ namespace Jondo.Unity.Server.Managers
             var log = Log;
             if (log == null || _book == null) return false;
 
-            // Lo que hay que llevar encima. Va lo primero de todo: si no se cumple, el elemento no
-            // hace NADA -- ni entrega, ni marca, ni saca al bicho --, que es la diferencia entre
-            // «pulsar el tirador con la limonada» y «pulsar el tirador».
+            // What has to be carried. It goes first of all: if it is not met, the element does
+            // NOTHING -- neither hands out, nor marks, nor brings out the creature --, which is the difference between
+            // «pressing the tap with the lemonade» and «pressing the tap».
             foreach (var (item, count) in binding.Requires)
             {
                 if (Equipment.HowMany(item) >= count) continue;
@@ -353,8 +353,8 @@ namespace Jondo.Unity.Server.Managers
                 return false;
             }
 
-            // Un elemento que entrega la misión: se coge aquí y se acaba: no hay objetivo que
-            // marcar todavía, porque el primer paso empieza justo ahora.
+            // An element that hands out the quest: it is taken here and that is it: there is no objective to
+            // mark yet, because the first step starts right now.
             if (binding.Starts != 0)
             {
                 if (log.Run(binding.Starts) != null) return false;
@@ -389,8 +389,8 @@ namespace Jondo.Unity.Server.Managers
                 return false;
             }
 
-            // Y lo exigido se gasta, si la fila lo dice. Después de la entrega y antes de marcar,
-            // por lo mismo: gastar la limonada y que luego falle el resto sería lo peor de todo.
+            // And what is required is spent, if the row says so. After handing out and before marking,
+            // for the same reason: spending the lemonade and then having the rest fail would be the worst of all.
             if (binding.SpendsRequired)
             {
                 foreach (var (item, count) in binding.Requires)
@@ -406,15 +406,15 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Saca al monstruo que un elemento hace aparecer, y hace que el cliente lo vea.
+        /// Brings out the monster an element makes appear, and makes the client see it.
         /// </summary>
         /// <remarks>
-        /// Hay que reenviar la lista de actores. El grupo se dibuja cuando se carga el mapa, y aquí
-        /// el jugador ya está plantado en él: sin esto el bicho existe para el servidor y no está
-        /// en la pantalla, que es la peor de las dos mitades.
+        /// The actor list has to be sent again. The group is drawn when the map is loaded, and here
+        /// the player is already standing on it: without this the creature exists for the server and is not
+        /// on the screen, which is the worse of the two halves.
         ///
-        /// Se manda sólo a quien lo ha provocado. Es su misión, su elemento y su bicho; a los demás
-        /// no les aparece nada en mitad del mapa.
+        /// It is only sent to whoever triggered it. It is his quest, his element and his creature; nothing
+        /// appears for the others in the middle of the map.
         /// </remarks>
         private static async Task SpawnAsync(NetworkStream stream, QuestBinding binding)
         {
@@ -456,10 +456,10 @@ namespace Jondo.Unity.Server.Managers
             var log = Log;
             if (log == null || _book == null) return false;
 
-            // Un elemento que ENTREGA la misión va al revés que todos los demás: se enseña
-            // mientras no se tiene, y desaparece en cuanto se coge. El anuncio de la taberna no
-            // puede pedir que la misión esté en curso para dejarse pulsar, porque es él quien la
-            // pone en curso.
+            // An element that HANDS OUT the quest goes the other way round from all the rest: it is shown
+            // while one does not have it, and disappears as soon as it is taken. The tavern notice
+            // cannot ask for the quest to be in progress to let itself be pressed, because it is the one that
+            // puts it in progress.
             if (binding.Starts != 0)
             {
                 var yaVa = log.Run(binding.Starts);
@@ -580,7 +580,7 @@ namespace Jondo.Unity.Server.Managers
 
             await SendStepAsync(stream, questId);
 
-            // Y se apaga la marca verde del que la acaba de dar.
+            // And the green mark of the one who just gave it is switched off.
             await SendMarksAsync(stream, SessionContext.State.MapId);
 
             Console.WriteLine($"[Misiones] Empieza la {questId}, por el paso {run.StepId}.");
@@ -648,9 +648,9 @@ namespace Jondo.Unity.Server.Managers
                 return;
             }
 
-            // Solo los que tienen algo. El iom es un indice, no un censo: en las 145 tramas
-            // reales no hay ni un actor nombrado con la lista vacia. Quien deja de tener nada
-            // desaparece del indice, y eso es lo que le quita la marca.
+            // Only the ones that have something. The iom is an index, not a census: in the 145 real
+            // frames there is not one named actor with an empty list. Whoever stops having anything
+            // disappears from the index, and that is what removes his mark.
             var marks = new List<(long Actor, IReadOnlyList<int> Quests)>(here.Count);
             foreach (var npc in here)
             {
@@ -658,8 +658,8 @@ namespace Jondo.Unity.Server.Managers
                 if (offers.Count > 0) marks.Add((npc.ContextualId, offers));
             }
 
-            // Y si en este mapa no queda nadie con nada, la trama vacia, que es como lo dice
-            // Ankama al entrar en un mapa sin marcas: "iom (0)", cero bytes de cuerpo.
+            // And if on this map nobody is left with anything, the empty frame, which is how
+            // Ankama says it on entering a map with no marks: "iom (0)", zero bytes of body.
             byte[] cuerpo = marks.Count > 0
                 ? QuestProtocol.BuildQuestMarks(mapId, marks)
                 : Array.Empty<byte>();
@@ -667,10 +667,10 @@ namespace Jondo.Unity.Server.Managers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iom, cuerpo));
 
-            // Se dice en voz alta porque la ausencia de marca tiene DOS causas que se ven igual —no
-            // se ha mandado nada, o se ha mandado la lista vacía— y distinguirlas costaba abrir el
-            // registro de tráfico y decodificar el iom a mano. Con esta línea se ve de un vistazo si
-            // el NPC no tiene nada que ofrecer o si es el envío el que no llega.
+            // It is said out loud because the absence of a mark has TWO causes that look the same —nothing
+            // has been sent, or the empty list has been sent— and telling them apart meant opening the
+            // traffic log and decoding the iom by hand. With this line one sees at a glance whether
+            // the NPC has nothing to offer or whether it is the sending that does not arrive.
             int conMarca = 0, ofrecidas = 0;
             foreach (var (_, quests) in marks)
             {
@@ -994,8 +994,8 @@ namespace Jondo.Unity.Server.Managers
                     Achievements.SetTally(Almanax.OfferingKind, questId, Almanax.DayKey(Almanax.Clock()));
                 }
 
-                // Y lo que esa misión acabada haya ganado. 259 logros cuelgan de terminar una, y
-                // el 8518 «Primer tiempo» del tutorial es literalmente (Qf=2511).
+                // And whatever that finished quest has earned. 259 achievements hang from finishing one, and
+                // the tutorial's 8518 «Primer tiempo» is literally (Qf=2511).
                 await Achievements.AfterQuestAsync(stream, questId);
             }
         }

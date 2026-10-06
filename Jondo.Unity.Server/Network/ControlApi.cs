@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Jondo.Unity.Protocol;
@@ -10,39 +11,39 @@ using Jondo.Unity.Server.Handlers;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// Por dónde le habla el lanzador al servidor.
+    /// Where the launcher speaks to the server through.
     ///
-    /// Esto existió y se borró. Lo dice el comentario que quedó en <see cref="HaapiServer"/>: las
-    /// rutas /api/login, /api/register, /api/launch, /api/status y /api/logs vivían ahí y se
-    /// quitaron al pasar de la interfaz web a la ventana nativa, porque la ventana llamaba a
-    /// LauncherService directamente y aquello era peso muerto. En cuanto el lanzador y el servidor
-    /// son dos procesos vuelve a hacer falta, así que vuelve.
+    /// This existed and was deleted. The comment left in <see cref="HaapiServer"/> says so: the
+    /// routes /api/login, /api/register, /api/launch, /api/status and /api/logs lived there and were
+    /// removed when moving from the web interface to the native window, because the window called
+    /// LauncherService directly and that was dead weight. As soon as the launcher and the server
+    /// are two processes it is needed again, so it comes back.
     ///
-    /// Va colgada del HAAPI, en el 8888, y no en un puerto nuevo, por tres razones:
+    /// It hangs off the HAAPI, on 8888, and not on a new port, for three reasons:
     ///
-    ///   * es el puerto que el mod del cliente sondea para decidir si redirige al emulador
-    ///     (JondoFix/Class1.cs:471), así que «el 8888 contesta» es exactamente la señal de vida que
-    ///     el lanzador necesita antes de arrancar un cliente;
-    ///   * el HAAPI ya es un HttpListener atado a localhost y a 127.0.0.1, y a nada más;
-    ///   * es donde estaba.
+    ///   * it is the port the client mod probes to decide whether to redirect to the emulator
+    ///     (JondoFix/Class1.cs:471), so «8888 answers» is exactly the sign of life the
+    ///     launcher needs before starting a client;
+    ///   * the HAAPI is already an HttpListener bound to localhost and 127.0.0.1, and nothing else;
+    ///   * it is where it was.
     ///
-    /// LO QUE AQUÍ SE DECIDE ES DEL SERVIDOR. Este fichero no sabe nada de ventanas: recibe texto,
-    /// llama a la base y al registro de lanzamientos, y devuelve texto. Los mensajes para el
-    /// usuario NO se traducen aquí —viajan como código— porque el idioma es del lanzador.
+    /// WHAT IS DECIDED HERE BELONGS TO THE SERVER. This file knows nothing about windows: it receives text,
+    /// calls the base and the launch registry, and returns text. The messages for the
+    /// user are NOT translated here —they travel as a code— because the language belongs to the launcher.
     /// </summary>
-    public static class ControlApi
+    public static partial class ControlApi
     {
-        /// <summary>Las rutas y la cabecera salen del contrato, que es lo que comparten los dos.</summary>
+        /// <summary>The routes and the header come from the contract, which is what both share.</summary>
         public const string Prefijo = Jondo.Unity.Launcher.Contract.Prefijo;
 
-        // ─── El secreto ─────────────────────────────────────────────────────────────────────
+        // ─── The secret ─────────────────────────────────────────────────────────────────────
         //
-        // Uno por arranque: así un lanzador de una sesión anterior no se queda con llave de la de
-        // ahora. Lo guarda el contrato, que es quien sabe dónde se escribe y quién lo lee.
+        // One per start: that way a launcher from a previous session does not keep a key to the
+        // current one. The contract keeps it, which is what knows where it is written and who reads it.
 
         private static string _secreto = "";
 
-        /// <summary>Reparte un secreto nuevo y lo deja escrito. Lo llama el servidor al arrancar.</summary>
+        /// <summary>Hands out a new secret and leaves it written. The server calls it on starting.</summary>
         public static void NuevoSecreto() => _secreto = Contract.NuevoSecreto();
 
         /// <summary>
@@ -65,9 +66,9 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         private static bool Autorizada(string? traido) => Contract.MismoSecreto(traido, _secreto);
 
-        // ─── Las respuestas ─────────────────────────────────────────────────────────────────
+        // ─── The responses ──────────────────────────────────────────────────────────────────
 
-        /// <summary>Lo que sale por el cable: un código de estado y un cuerpo JSON.</summary>
+        /// <summary>What goes out on the wire: a status code and a JSON body.</summary>
         public readonly struct Respuesta
         {
             public Respuesta(int codigo, string json) { Codigo = codigo; Json = json; }
@@ -82,8 +83,8 @@ namespace Jondo.Unity.Server.Network
             => new Respuesta(codigo, JsonSerializer.Serialize(new { error = motivo }));
 
         /// <summary>
-        /// Contesta una petición de mando. Devuelve null si la ruta no es de aquí, para que el
-        /// HAAPI siga con lo suyo.
+        /// Answers a control request. Returns null if the route is not from here, so that the
+        /// HAAPI carries on with its own.
         /// </summary>
         public static Respuesta? Responder(string ruta, string metodo, string cuerpo, string? secreto,
                                            string ip = "")
@@ -94,16 +95,16 @@ namespace Jondo.Unity.Server.Network
             {
                 switch (ruta)
                 {
-                    // ─── Abiertas ───────────────────────────────────────────────────────────
-                    // Cualquiera puede llamarlas, porque hay que poder entrar antes de tener con
-                    // qué demostrar quién eres.
+                    // ─── Open ───────────────────────────────────────────────────────────────
+                    // Anyone can call them, because one has to be able to log in before having anything
+                    // to prove who one is with.
                     case Prefijo + "estado": return Estado();
                     case Prefijo + "entrar": return Entrar(cuerpo, ip);
                     case Prefijo + "crear-cuenta": return CrearCuenta(cuerpo, ip);
 
-                    // ─── Con sesión ─────────────────────────────────────────────────────────
-                    // Hace falta un token que la base reconozca. Da igual el rol: son cosas que
-                    // cualquier jugador hace con su propia cuenta.
+                    // ─── With a session ─────────────────────────────────────────────────────
+                    // A token the base recognises is needed. The role does not matter: they are things
+                    // any player does with his own account.
                     case Prefijo + "activos": return ConSesion(cuerpo, _ => Activos());
                     case Prefijo + "personajes": return ConSesion(cuerpo, Personajes);
                     case Prefijo + "recordar-token": return RecordarToken(cuerpo);
@@ -111,14 +112,28 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "fin-de-lanzamiento":
                         return ConSesion(cuerpo, cuenta => FinDeLanzamiento(cuenta));
 
-                    // ─── De administración ──────────────────────────────────────────────────
-                    // Mandan sobre el servidor, no sobre una cuenta. Rol 4 y se comprueba aquí,
-                    // en el servidor, cada vez. Que el lanzador enseñe o no el botón es cosmético:
-                    // el lanzador está en el ordenador del jugador y ahí no se confía en nada.
+                    // ─── Administration ─────────────────────────────────────────────────────
+                    // They command the server, not an account. Role 4 and it is checked here,
+                    // on the server, every time. Whether the launcher shows the button or not is cosmetic:
+                    // the launcher is on the player's computer and nothing is trusted there.
                     case Prefijo + "registro": return ConRol(cuerpo, Roles.Administrador, _ => Registro(cuerpo));
                     case Prefijo + "apagar": return ConRol(cuerpo, Roles.Administrador, Apagar);
                     case Prefijo + "rol": return ConRol(cuerpo, Roles.Administrador,
                         cuenta => CambiarRol(cuerpo, cuenta));
+                    case Prefijo + "conectados": return ConRol(cuerpo, Roles.Administrador, Conectados);
+                    // The administrator's window: his map, what he puts on it and takes off it,
+                    // and the jail. See ControlApiWorld.cs.
+                    case Prefijo + "mapa": return ConRol(cuerpo, Roles.Administrador, Mapa);
+                    case Prefijo + "invocar": return ConRol(cuerpo, Roles.Administrador, cuenta => Invocar(cuerpo, cuenta));
+                    case Prefijo + "quitar": return ConRol(cuerpo, Roles.Administrador, cuenta => Quitar(cuerpo, cuenta));
+                    case Prefijo + "carcel": return ConRol(cuerpo, Roles.Administrador, cuenta => Carcel(cuerpo, cuenta));
+                    case Prefijo + "liberar": return ConRol(cuerpo, Roles.Administrador, cuenta => Liberar(cuerpo, cuenta));
+                    case Prefijo + "presos": return ConRol(cuerpo, Roles.Administrador, Presos);
+                    case Prefijo + "coordenadas": return ConRol(cuerpo, Roles.Administrador, _ => Coordenadas(cuerpo));
+                    case Prefijo + "buscar-mapas": return ConRol(cuerpo, Roles.Administrador, _ => BuscarMapas(cuerpo));
+                    case Prefijo + "ficha": return ConRol(cuerpo, Roles.Administrador, cuenta => Ficha(cuerpo, cuenta));
+                    case Prefijo + "visitar-carcel": return ConRol(cuerpo, Roles.Administrador, VisitarCarcel);
+                    case Prefijo + "niveles-monstruos": return ConRol(cuerpo, Roles.Administrador, _ => NivelesMonstruos());
                     case Prefijo + "personaje":
                         return !metodo.Equals("POST", StringComparison.OrdinalIgnoreCase)
                             ? Mal(405, "metodo")
@@ -135,15 +150,15 @@ namespace Jondo.Unity.Server.Network
             }
         }
 
-        // ─── Quién llama ────────────────────────────────────────────────────────────────────
+        // ─── Who is calling ─────────────────────────────────────────────────────────────────
         //
-        // Antes esto lo guardaba un secreto que el servidor escribía en %APPDATA% y el lanzador
-        // leía de ahí. Servía mientras los dos estaban en la misma máquina, y deja de servir en
-        // cuanto el lanzador se reparte: en el ordenador de otro jugador ese fichero no existe.
+        // Before, this was guarded by a secret the server wrote in %APPDATA% and the launcher
+        // read from there. It worked while both were on the same machine, and stops working as
+        // soon as the launcher is handed out: on another player's computer that file does not exist.
         //
-        // Ahora manda la CUENTA. El token que el lanzador ya tiene de haber entrado dice quién es,
-        // y la base dice qué puede hacer. Funciona igual en local que por Hamachi que contra una
-        // VPS, y no hay ningún secreto que repartir.
+        // Now the ACCOUNT rules. The token the launcher already has from logging in says who it is,
+        // and the base says what it can do. It works the same locally as over Hamachi as against a
+        // VPS, and there is no secret to hand out.
 
         private static Respuesta ConSesion(string cuerpo, Func<long, Respuesta> hacer)
         {
@@ -169,7 +184,7 @@ namespace Jondo.Unity.Server.Network
             return hacer(cuenta);
         }
 
-        /// <summary>Sube o baja el rol de una cuenta. Sólo un administrador llega aquí.</summary>
+        /// <summary>Raises or lowers an account's role. Only an administrator gets here.</summary>
         private static Respuesta CambiarRol(string cuerpo, long administrador)
         {
             string quien = Texto(cuerpo, "cuenta");
@@ -182,12 +197,12 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Cambia las caracteristicas base y los kamas de un personaje conectado, los guarda y
-        /// refresca la ficha sin obligarle a salir ni a reiniciar el servidor.
+        /// Changes the base characteristics and the kamas of a connected character, stores them and
+        /// refreshes the sheet without forcing him to leave or restarting the server.
         ///
-        /// La ruta pasa por <see cref="ConRol"/> y solo admite administradores. El turno de la
-        /// sesion evita que una orden HTTP pise un movimiento, un combate o cualquier otro paquete
-        /// que el cliente este atendiendo a la vez.
+        /// The route goes through <see cref="ConRol"/> and only admits administrators. The session's
+        /// turn keeps an HTTP order from trampling a movement, a fight or any other packet
+        /// the client is handling at the same time.
         /// </summary>
         private static Respuesta AdministrarPersonaje(string cuerpo, long administrador)
         {
@@ -196,7 +211,11 @@ namespace Jondo.Unity.Server.Network
                 return Mal(400, error);
             if (!update.HasChanges) return Mal(400, "sin-cambios");
 
-            var sesion = SessionRegistry.FindByName(update.Character);
+            // No name is the caller's own character: the in-game panel gives to oneself without
+            // having to know what the client calls its character.
+            var sesion = update.Character.Length > 0
+                ? SessionRegistry.FindByName(update.Character)
+                : SessionRegistry.InWorld().FirstOrDefault(s => s.AccountId == administrador);
             if (sesion == null || !sesion.HasCharacter || !sesion.IsInWorld)
                 return Mal(404, "personaje-desconectado");
             if (sesion.Stream == null) return Mal(404, "personaje-desconectado");
@@ -208,6 +227,11 @@ namespace Jondo.Unity.Server.Network
             if (update.ItemGid.HasValue
                 && !DatabaseManager.TryGetItemTemplateEffects((int)update.ItemGid.Value, out _))
                 return Mal(400, "objeto-desconocido");
+            // A rolled item is one row each, so a careless quantity is that many inserts and that
+            // many messages to the client: the same cap as the .item command's.
+            if (update.ItemGid.HasValue && update.RandomStats
+                && CommandHandler.TooManyRolled((int)update.ItemGid.Value, update.Quantity ?? 1))
+                return Mal(400, "cantidad-excesiva");
             if (update.MountGid.HasValue
                 && (!Managers.Mounts.IsRideable((int)update.MountGid.Value)
                     || !DatabaseManager.TryGetItemTemplateEffects((int)update.MountGid.Value, out _)))
@@ -255,20 +279,34 @@ namespace Jondo.Unity.Server.Network
                             .GetAwaiter().GetResult();
                     }
 
-                    // Un fallo de entrega tiene que decirse. GrantItemAsync devuelve null cuando
-                    // la plantilla no existe o el INSERT falla, y ese null no se miraba: la
-                    // respuesta salia con HTTP 200 y bien=true, sólo que con objetoUid a null, y
-                    // quien llamaba se quedaba creyendo que habia entregado algo.
+                    // A delivery failure has to be stated. GrantItemAsync returns null when
+                    // the template does not exist or the INSERT fails, and that null was not checked: the
+                    // response went out with HTTP 200 and bien=true, only with objetoUid null, and
+                    // the caller was left believing it had delivered something.
                     Managers.HavenBagStore.StoredItem? granted = null;
                     if (update.ItemGid.HasValue)
                     {
-                        granted = CommandHandler.GrantItemAsync(sesion.Stream,
-                            (int)update.ItemGid.Value, (int)(update.Quantity ?? 1))
-                            .GetAwaiter().GetResult();
-                        if (granted == null) return Mal(422, "objeto-no-entregado");
+                        int gid = (int)update.ItemGid.Value;
+                        int quantity = (int)(update.Quantity ?? 1);
+                        if (update.RandomStats)
+                        {
+                            // Rolled the way a craft rolls it, and by the same code.
+                            if (!WorkshopHandler.GiveAsync(sesion.Stream, gid, quantity)
+                                    .GetAwaiter().GetResult())
+                                return Mal(422, "objeto-no-entregado");
+                        }
+                        else
+                        {
+                            granted = CommandHandler.GrantItemAsync(sesion.Stream, gid, quantity)
+                                .GetAwaiter().GetResult();
+                            if (granted == null) return Mal(422, "objeto-no-entregado");
+                        }
+                        ActivityJournal.Current.Write("item.granted", administrador,
+                            estado.CharacterId,
+                            new { source = "control", gid, quantity, random = update.RandomStats });
 
-                        // Y el peso, como hace el comando .item: sin esto la barra de pods se
-                        // queda vieja hasta el siguiente movimiento de inventario.
+                        // And the weight, as the .item command does: without this the pods bar
+                        // stays stale until the next inventory movement.
                         sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
                             ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
                             .GetAwaiter().GetResult();
@@ -336,6 +374,9 @@ namespace Jondo.Unity.Server.Network
                         celda = estado.CellId,
                         llegada = landed,
                         objetoUid = granted?.Uid,
+                        objeto = update.ItemGid,
+                        cantidad = update.ItemGid.HasValue ? update.Quantity ?? 1 : (long?)null,
+                        aleatorio = update.RandomStats,
                         monturaUid = mount?.Uid,
                     });
                 }
@@ -362,6 +403,29 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         private const int TopeDeCaracteristica = 10_000_000;
 
+        /// <summary>
+        /// Who is in the world, for whoever is about to give something to one of them: the name
+        /// /api/personaje takes, the level, and which of them is the caller's own.
+        /// </summary>
+        private static Respuesta Conectados(long administrador)
+        {
+            var conectados = new List<object>();
+            foreach (var sesion in SessionRegistry.InWorld())
+            {
+                conectados.Add(new
+                {
+                    nombre = sesion.State.CharacterName ?? "",
+                    nivel = sesion.State.CharacterLevel,
+                    propio = sesion.AccountId == administrador,
+                    // Where he is, for "go to him" and "bring him here", and whether he is in jail.
+                    mapa = sesion.State.MapId,
+                    celda = sesion.State.CellId,
+                    preso = Managers.Jail.IsJailed(sesion.CharacterId),
+                });
+            }
+            return Bien(new { conectados });
+        }
+
         /// <summary>How long to wait for the session's turn before giving up on it.</summary>
         private static readonly TimeSpan PlazoDelTurno = TimeSpan.FromSeconds(5);
 
@@ -379,11 +443,11 @@ namespace Jondo.Unity.Server.Network
             return true;
         }
 
-        // ─── Cada verbo ─────────────────────────────────────────────────────────────────────
+        // ─── Each verb ──────────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Si esto contesta, el servidor está vivo. Aun así se dice lo que hay dentro, porque una
-        /// base a medias con los puertos abiertos también es un problema.
+        /// If this answers, the server is alive. Even so what is inside is stated, because a
+        /// half-done base with the ports open is also a problem.
         /// </summary>
         private static Respuesta Estado() => Bien(new
         {
@@ -398,7 +462,7 @@ namespace Jondo.Unity.Server.Network
 
         private static bool ServiciosEnPie() => ZaapServer.IsRunning && GameServerProxy.IsRunning;
 
-        /// <summary>Quién tiene cliente abierto ahora mismo, y cuántos caben.</summary>
+        /// <summary>Who has a client open right now, and how many fit.</summary>
         private static Respuesta Activos()
         {
             var cuentas = new List<long>(ClientLaunchRegistry.ActiveAccounts);
@@ -412,18 +476,18 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Los personajes de la cuenta que llama, para que el lanzador pinte su equipo.
+        /// The calling account's characters, so that the launcher draws its team.
         /// </summary>
         /// <remarks>
-        /// El lanzador dibuja el retrato de cada personaje sacándolo de los huesos del propio
-        /// cliente de Dofus, igual que hace Studio con los NPC. Pero para eso necesita saber QUÉ
-        /// dibujar, y la cadena de aspecto vive en la base de datos: el lanzador no la toca a
-        /// propósito —es lo que se reparte a los jugadores y sólo lleva el contrato—, así que se
-        /// la damos aquí.
+        /// The launcher draws each character's portrait taking it from the bones of the Dofus
+        /// client itself, just as Studio does with the NPCs. But for that it needs to know WHAT
+        /// to draw, and the look string lives in the database: the launcher does not touch it on
+        /// purpose —it is what is handed out to players and only carries the contract—, so we
+        /// give it here.
         ///
-        /// De su PROPIA cuenta y de ninguna otra: la cuenta sale del token que valida
-        /// <see cref="ConSesion"/>, no de nada que venga escrito en el cuerpo. Con la del cuerpo,
-        /// cualquiera podría pedir los personajes del vecino con sólo cambiar un número.
+        /// From its OWN account and no other: the account comes from the token
+        /// <see cref="ConSesion"/> validates, not from anything written in the body. With the body's,
+        /// anyone could ask for the neighbour's characters just by changing a number.
         /// </remarks>
         private static Respuesta Personajes(long cuenta)
         {
@@ -444,7 +508,7 @@ namespace Jondo.Unity.Server.Network
             return Bien(new { personajes = suyos });
         }
 
-        /// <summary>Las líneas de consola desde la que ya tenga el lanzador.</summary>
+        /// <summary>The console lines from the one the launcher already has.</summary>
         private static Respuesta Registro(string cuerpo)
         {
             long desde = Numero(cuerpo, "desde");
@@ -452,14 +516,14 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Entrar con usuario y contraseña.
+        /// Log in with username and password.
         ///
-        /// La IP es la DEL SOCKET, no la que venga escrita en el cuerpo. Con la del cuerpo, el
-        /// freno de la base —cinco intentos fallidos y un minuto de espera, y lleva la cuenta por
-        /// IP— se saltaba cambiando un campo del JSON en cada intento, así que no frenaba nada.
-        /// Esto sólo se podía aprovechar desde la propia máquina, porque el HAAPI escucha en
-        /// localhost y en 127.0.0.1 y en nada más, pero un freno que no frena es peor que ninguno:
-        /// hace creer que hay uno.
+        /// The IP is THE SOCKET'S, not the one written in the body. With the body's, the
+        /// base's brake —five failed attempts and a minute's wait, and it counts per
+        /// IP— was skipped by changing a field of the JSON on each attempt, so it braked nothing.
+        /// This could only be exploited from the machine itself, because the HAAPI listens on
+        /// localhost and 127.0.0.1 and nothing else, but a brake that does not brake is worse than none:
+        /// it makes one believe there is one.
         /// </summary>
         private static Respuesta Entrar(string cuerpo, string ip)
         {
@@ -476,9 +540,9 @@ namespace Jondo.Unity.Server.Network
             string token = Guid.NewGuid().ToString("N");
             DatabaseManager.SetGameToken(cuenta.Id, token);
 
-            // Y el mismo, aparte, como sesión del lanzador. Van a la par ahora y se separan en
-            // cuanto el jugador arranque un cliente, que le rota el del juego: si no hubiera esta
-            // segunda copia, esa rotación dejaría al lanzador sin sesión para la próxima vez.
+            // And the same one, separately, as the launcher's session. They go together now and split as
+            // soon as the player starts a client, which rotates the game one: without this
+            // second copy, that rotation would leave the launcher without a session for next time.
             DatabaseManager.SetLauncherToken(cuenta.Id, token);
             ClientLaunchRegistry.RegisterToken(cuenta.Id, token);
 
@@ -492,7 +556,7 @@ namespace Jondo.Unity.Server.Network
             });
         }
 
-        /// <summary>Crear cuenta. La IP, otra vez la del socket y no la que diga el cuerpo.</summary>
+        /// <summary>Create an account. The IP, again the socket's and not whatever the body says.</summary>
         private static Respuesta CrearCuenta(string cuerpo, string ip)
         {
             string usuario = Texto(cuerpo, "usuario");
@@ -505,9 +569,9 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// El lanzador recuerda una sesión de la vez anterior y quiere que el servidor vuelva a
-        /// dar por bueno ese token. Sólo se acepta si la base lo reconoce: el lanzador no puede
-        /// inventarse la cuenta que quiera.
+        /// The launcher remembers a session from the previous time and wants the server to accept
+        /// that token again. It is only accepted if the base recognises it: the launcher cannot
+        /// invent whatever account it likes.
         /// </summary>
         private static Respuesta RecordarToken(string cuerpo)
         {
@@ -515,13 +579,13 @@ namespace Jondo.Unity.Server.Network
             string token = Texto(cuerpo, "token");
             if (cuenta <= 0 || token.Length == 0) return Bien(new { bien = false });
 
-            // Vale tanto la sesión del lanzador como el token de juego: las bases de antes de que
-            // hubiera columna propia sólo tienen el segundo.
+            // Both the launcher's session and the game token are valid: the bases from before there
+            // was a column of its own only have the second.
             long deLaBase = DatabaseManager.GetAccountIdByLauncherToken(token);
             if (deLaBase == 0) deLaBase = DatabaseManager.GetAccountIdByToken(token);
             if (deLaBase != cuenta) return Bien(new { bien = false });
 
-            // Y se le da por buena para lo que venga, aunque el del juego ya se haya rotado.
+            // And it is accepted for whatever comes, even if the game one has already been rotated.
             DatabaseManager.SetLauncherToken(cuenta, token);
 
             ClientLaunchRegistry.RegisterToken(cuenta, token);
@@ -529,11 +593,11 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Le da al lanzador el instanceId y el hash con los que arrancar un cliente.
+        /// Gives the launcher the instanceId and the hash to start a client with.
         ///
-        /// Aquí estaba el nudo: el hash se lo inventaba el lanzador y lo apuntaba en un diccionario
-        /// en memoria que luego lee el Zaap. Con dos procesos, el lanzador apuntaba en su memoria y
-        /// el Zaap miraba en la suya. Ahora lo reparte quien lo va a comprobar.
+        /// Here was the knot: the launcher invented the hash and recorded it in an in-memory
+        /// dictionary that the Zaap then reads. With two processes, the launcher recorded in its memory and
+        /// the Zaap looked in its own. Now whoever is going to check it hands it out.
         /// </summary>
         private static Respuesta Lanzamiento(string cuerpo, long cuenta, string ip)
         {
@@ -556,28 +620,28 @@ namespace Jondo.Unity.Server.Network
             }
             catch (InvalidOperationException ex)
             {
-                // Register rechaza por dos motivos y los dos son mensajes para el usuario. Viajan
-                // como código; la frase la pone el lanzador en su idioma.
+                // Register rejects for two reasons and both are messages for the user. They travel
+                // as a code; the launcher puts the sentence in its language.
                 return Bien(new { bien = false, motivo = ex.Message });
             }
         }
 
-        /// <summary>El lanzador avisa de que el cliente de esa cuenta se ha cerrado.</summary>
+        /// <summary>The launcher reports that the client of that account has closed.</summary>
         private static Respuesta FinDeLanzamiento(long cuenta)
         {
-            // La cuenta sale del token, no del cuerpo: si viniera en el cuerpo, cualquiera podria
-            // echar del registro a la cuenta de otro con solo escribir su numero.
+            // The account comes from the token, not from the body: if it came in the body, anyone could
+            // throw someone else's account out of the registry just by writing its number.
             if (cuenta > 0) ClientLaunchRegistry.RemoveByAccount(cuenta);
             return Bien(new { bien = true });
         }
 
         /// <summary>
-        /// Apaga el servidor, pero DESPUÉS de haber contestado.
+        /// Shuts the server down, but AFTER having answered.
         ///
-        /// Llamando a RequestShutdown aquí mismo, el proceso se moría —y con él el HttpListener—
-        /// antes de que la respuesta saliera por el cable: el lanzador se quedaba esperando y daba
-        /// el apagado por fallido justo cuando había funcionado. Medido: la petición volvía con el
-        /// cuerpo vacío.
+        /// Calling RequestShutdown right here, the process died —and with it the HttpListener—
+        /// before the response went out on the wire: the launcher was left waiting and considered
+        /// the shutdown failed just when it had worked. Measured: the request came back with an
+        /// empty body.
         /// </summary>
         private static Respuesta Apagar(long administrador)
         {
@@ -591,12 +655,12 @@ namespace Jondo.Unity.Server.Network
             return Bien(new { bien = true });
         }
 
-        /// <summary>Códigos de motivo. Son códigos, no frases: el idioma lo pone el lanzador.</summary>
+        /// <summary>Reason codes. They are codes, not sentences: the launcher supplies the language.</summary>
         public const string MotivoSesionCaducada = "sesion-caducada";
         public const string MotivoCuentaYaAbierta = "cuenta-ya-abierta";
         public const string MotivoTopeDeClientes = "tope-de-clientes";
 
-        // ─── Leer el cuerpo sin ceremonia ───────────────────────────────────────────────────
+        // ─── Reading the body without ceremony ──────────────────────────────────────────────
 
         private static string Texto(string json, string campo)
         {

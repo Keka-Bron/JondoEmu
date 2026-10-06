@@ -9,44 +9,45 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Los grupos: invitar, aceptar, rechazar, salirse y ceder el mando.
+    /// Parties: inviting, accepting, refusing, leaving and handing over the lead.
     ///
-    /// ─── El baile, medido en las seis capturas ──────────────────────────────────────────────
+    /// ─── The dance, measured in the six captures ────────────────────────────────────────────
     ///
-    /// Con los dos puntos de vista, que es lo que hacía falta: en unas capturas graba quien
-    /// invita y en otras el invitado, y los mensajes no son los mismos.
+    /// With both points of view, which is what was needed: in some captures the inviter records and in
+    /// others the invited player, and the messages are not the same.
     ///
-    ///   invitar    C→S ime { nombre }        →  S→C ing (el grupo, contigo solo) + imf
-    ///   te invitan                              S→C ijz { yo, quién, plazas, grupo, nombre }
-    ///   detalles   C→S imd { grupo }         →  S→C ilb   (NO implementado: el botón
-    ///                                                      «Detalles» de la ventanita no
-    ///                                                      contesta nada todavía)
-    ///   aceptar    C→S ijx { grupo }         →  S→C ing (el grupo entero)
-    ///                                           y al que invitó: ink
-    ///   seguir     C→S imh / imo             →  ver <see cref="PartyFollowHandler"/>
-    ///   rechazar   C→S iki { grupo }         →  a ti ilo; al que invitó iko + imy
-    ///   salir      C→S inh { grupo }         →  S→C ils { grupo }
-    ///   ceder      C→S ima { quién, grupo }  →  S→C imk (vacío) + ilx { quién, grupo }
-    ///   echar      C→S ili { grupo, quién }  →  al echado ils; ver <see cref="KickAsync"/>
+    ///   invite     C→S ime { name }          →  S→C ing (the party, you alone) + imf
+    ///   invited                                 S→C ijz { me, who, slots, party, name }
+    ///   details    C→S imd { party }         →  S→C ilb   (NOT implemented: the little window's
+    ///                                                      «Detalles» button does not answer
+    ///                                                      anything yet)
+    ///   accept     C→S ijx { party }         →  S→C ing (the whole party)
+    ///                                           and to the inviter: ink
+    ///   follow     C→S imh / imo             →  see <see cref="PartyFollowHandler"/>
+    ///   refuse     C→S iki { party }         →  to you ilo; to the inviter iko + imy
+    ///   leave      C→S inh { party }         →  S→C ils { party }
+    ///   hand over  C→S ima { who, party }    →  S→C imk (empty) + ilx { who, party }
+    ///   kick       C→S ili { party, who }    →  to the kicked one ils; see <see cref="KickAsync"/>
     ///
-    /// El <c>ili</c> es el único que no sale de las capturas sino del cliente en marcha: en las
-    /// 34 carpetas no hay ni una vez que alguien expulse a nadie.
+    /// The <c>ili</c> is the only one that does not come from the captures but from the running
+    /// client: in the 34 folders there is not a single time anybody kicks anybody.
     ///
-    /// Dos cosas que despistan y conviene tener presentes. Se invita por NOMBRE y se acepta por
-    /// ID DE GRUPO: el ime lleva «Uber-Black» en texto y el ijx lleva 71272. Y el grupo se crea
-    /// AL INVITAR, antes de que el otro conteste, por eso el ing con un solo miembro llega
-    /// enseguida; si el otro dice que no, se deshace solo.
+    /// Two misleading things worth keeping in mind. One invites by NAME and accepts by PARTY ID: the
+    /// ime carries «Uber-Black» in text and the ijx carries 71272. And the party is created ON INVITING,
+    /// before the other answers, which is why the ing with a single member arrives right away; if the
+    /// other says no, it undoes itself.
     ///
-    /// El cambio de jefe NO reenvía el grupo: manda un ilx de once bytes. Se comprobó comparando
-    /// la ficha del mismo grupo antes y después, y lo único que cambia es su campo 4.
+    /// The change of leader does NOT resend the party: it sends an eleven-byte ilx. It was checked by
+    /// comparing the sheet of the same party before and after, and the only thing that changes is its
+    /// field 4.
     ///
-    /// ─── Por qué no se formaba el grupo ─────────────────────────────────────────────────────
+    /// ─── Why the party did not form ─────────────────────────────────────────────────────────
     ///
-    /// La primera versión mandaba una hoja de miembro con el nombre, el nivel y la raza y nada
-    /// más. La invitación salía y el aceptar viajaba, pero en pantalla no aparecía el grupo, y
-    /// además el que invitaba ya no podía invitar a nadie más: el servidor daba el grupo por
-    /// hecho y el cliente no. Faltaba el ASPECTO, que es con lo que dibuja el retrato de cada
-    /// miembro. Ahora la hoja va entera; ver <see cref="MemberSheet"/>.
+    /// The first version sent a member sheet with the name, the level and the breed and nothing else.
+    /// The invitation went out and the accept travelled, but the party did not appear on screen, and
+    /// on top of that the inviter could no longer invite anybody else: the server considered the party
+    /// done and the client did not. The LOOK was missing, which is what it draws each member's portrait
+    /// with. Now the sheet goes whole; see <see cref="MemberSheet"/>.
     /// </summary>
     public static class PartyHandler
     {
@@ -82,7 +83,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // El grupo se crea al invitar, no al aceptar: es lo que hace el servidor real.
+            // The party is created on inviting, not on accepting: it is what the real server does.
             var party = Parties.Of(meId);
             bool nuevo = party == null;
             party ??= Parties.Create(meId);
@@ -100,7 +101,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
             }
 
-            // Y el invitado, en la lista de quien invita, con el letrero de que está pendiente.
+            // And the invited player, in the inviter's list, with the label saying he is pending.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Imf, BuildPending(guest.State.CharacterId, meId, party.Id)));
 
@@ -128,11 +129,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // A quien acepta, el grupo entero.
+            // To whoever accepts, the whole party.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
 
-            // Y a los demás, sólo el que entra: el grupo entero no se reenvía.
+            // And to the others, only the one joining: the whole party is not resent.
             //
             // The 1663 («... sigue tu desplazamiento») that used to go with it belongs to the imh
             // the new member's client may send next, not to joining: two other captures add a
@@ -173,8 +174,8 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Ilo,
                     ConnectionProtocol.BuildInvitationClosed(partyId, hostId)));
 
-            // Al que invitó: quítale de la lista. Y si el grupo se queda con uno, se deshace —los
-            // dos mensajes llegan pegados en el servidor real, en el mismo segmento.
+            // To the inviter: take him off the list. And if the party is left with one, it is undone --
+            // both messages arrive together on the real server, in the same segment.
             var host = SessionRegistry.FindByCharacter(hostId);
             if (host != null)
             {
@@ -218,20 +219,20 @@ namespace Jondo.Unity.Server.Handlers
         // ─── Expulsar ───────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Echar a alguien del grupo. El cliente lo pide con
+        /// Kicking somebody out of the party. The client asks for it with
         ///
-        ///   ili { f1: el grupo, f2: a quién }
+        ///   ili { f1: the party, f2: whom }
         ///
-        /// que es lo único de todo esto que está medido del cliente de verdad: no hay ninguna
-        /// captura en la que se expulse a nadie, ni siquiera entre las 34 carpetas.
+        /// which is the only thing of all this measured from the real client: there is no capture where
+        /// anybody is kicked, not even among the 34 folders.
         ///
-        /// Por eso al que se queda dentro NO se le manda un mensaje propio de «a fulano lo han
-        /// echado». Existe —el cliente tiene su manejador para el <c>inc</c>—, pero su forma no
-        /// está medida y el .proto se equivoca de numeración lo bastante a menudo como para no
-        /// fiarse. Se manda el grupo entero, que sí está medido y dice la verdad.
+        /// That is why whoever stays inside is NOT sent a message of his own saying «so-and-so has been
+        /// kicked». It exists -- the client has its handler for the <c>inc</c> --, but its shape is not
+        /// measured and the .proto gets the numbering wrong often enough not to be trusted. The whole
+        /// party is sent, which is measured and tells the truth.
         ///
-        /// Con dos personas, que es el caso normal, ni se plantea: el grupo se queda con uno y se
-        /// deshace, y el <c>imy</c> de deshacerlo sí está medido.
+        /// With two people, which is the normal case, the question does not even arise: the party is left
+        /// with one and is undone, and the <c>imy</c> for undoing it is measured.
         /// </summary>
         public static async Task KickAsync(NetworkStream stream, byte[] payload)
         {
@@ -246,7 +247,7 @@ namespace Jondo.Unity.Server.Handlers
             long meId = SessionContext.State.CharacterId;
             string meName = SessionContext.State.CharacterName;
 
-            // Sólo el jefe echa, y para irse uno mismo está el inh.
+            // Only the leader kicks, and for leaving oneself there is the inh.
             if (party.LeaderId != meId)
             {
                 Console.WriteLine($"[Grupo] {meName} intenta echar del grupo {partyId} sin mandarlo.");
@@ -254,7 +255,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (quien == meId) return;
 
-            // Si todavía no había contestado a la invitación, no se le echa: se le retira.
+            // If he had not answered the invitation yet, he is not kicked: it is withdrawn.
             long host = Parties.Refuse(party, quien);
             if (host != 0)
             {
@@ -282,9 +283,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Retirar una invitación que aún no se había contestado. Es lo mismo que manda el
-        /// servidor real cuando el invitado dice que no, pero al revés: aquí lo corta quien
-        /// invitó.
+        /// Withdrawing an invitation that had not been answered yet. It is the same the real server sends
+        /// when the invited player says no, but the other way round: here the inviter cuts it off.
         /// </summary>
         private static async Task WithdrawAsync(NetworkStream stream, Managers.Parties.Party party,
                                                 int partyId, long guestId, long hostId)
@@ -309,10 +309,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// A los que se quedan: o el grupo se ha deshecho, o hay jefe nuevo y una lista nueva.
+        /// To those who stay: either the party has been undone, or there is a new leader and a new list.
         ///
-        /// Lo usan los tres caminos por los que alguien deja de estar —irse, que le echen y
-        /// desconectarse— porque lo que ve el resto es lo mismo en los tres.
+        /// The three roads by which somebody stops being in it -- leaving, being kicked and disconnecting --
+        /// use it, because what the rest see is the same in all three.
         /// </summary>
         private static async Task AnnounceGoneAsync(
             Managers.Parties.Party party, int partyId,
@@ -330,8 +330,8 @@ namespace Jondo.Unity.Server.Handlers
                     continue;
                 }
 
-                // Si el que se iba mandaba, el mando pasa al siguiente que entró: un grupo sin
-                // jefe no lo entiende el cliente.
+                // If the one leaving was in charge, the lead passes to the next one who joined: the
+                // client does not understand a party without a leader.
                 if (salida.NewLeader != 0)
                 {
                     await sesion.SendAsync(ConnectionProtocol.Push(Op.Ilx,
@@ -345,7 +345,7 @@ namespace Jondo.Unity.Server.Handlers
                 await PartyFollowHandler.LeaderChangedAsync(party);
         }
 
-        // ─── Ceder el mando ─────────────────────────────────────────────────────
+        // ─── Handing over the lead ─────────────────────────────────────────────
 
         public static async Task PromoteAsync(NetworkStream stream, byte[] payload)
         {
@@ -358,7 +358,7 @@ namespace Jondo.Unity.Server.Handlers
             if (party == null || party.LeaderId != SessionContext.State.CharacterId) return;
             if (!Parties.Promote(party, nuevo)) return;
 
-            // El imk va vacío del todo: ni siquiera lleva carga.
+            // The imk goes completely empty: it does not even carry a payload.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Imk));
 
@@ -377,7 +377,7 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Grupo] El grupo {partyId} pasa a mandarlo {nuevo}.");
         }
 
-        /// <summary>Alguien se ha desconectado: sale del grupo sin decir nada.</summary>
+        /// <summary>Somebody has disconnected: he leaves the party without a word.</summary>
         public static async Task DisconnectedAsync(long characterId)
         {
             var party = Parties.Of(characterId);
@@ -390,11 +390,11 @@ namespace Jondo.Unity.Server.Handlers
         // ─── Piezas ─────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// El grupo entero (ing): { f1 (repetido): miembro, f4: el jefe, f5: 1, f6: 1,
-        /// f7: el grupo, f10: plazas }.
+        /// The whole party (ing): { f1 (repeated): member, f4: the leader, f5: 1, f6: 1,
+        /// f7: the party, f10: slots }.
         ///
-        /// El orden en que van los miembros da igual: el cliente los pinta de arriba abajo
-        /// ordenados por iniciativa, no por como lleguen.
+        /// The order of the members makes no difference: the client draws them top to bottom sorted by
+        /// initiative, not by how they arrive.
         /// </summary>
         private static byte[] BuildParty(Managers.Parties.Party party)
         {
@@ -410,35 +410,35 @@ namespace Jondo.Unity.Server.Handlers
                 .Build();
         }
 
-        /// <summary>Un miembro: { f1: su hoja, f2: su id }. Igual dentro del ing que del ink.</summary>
+        /// <summary>A member: { f1: his sheet, f2: his id }. The same inside the ing as in the ink.</summary>
         private static Pb BuildMember(long characterId)
             => Pb.New().Bytes(1, MemberSheet(characterId)).Var(2, characterId);
 
         /// <summary>
-        /// La hoja de un miembro. Es la MISMA que la de la lista de personajes —nombre, nivel,
-        /// sexo, aspecto y raza— más lo que el grupo añade:
+        /// A member's sheet. It is THE SAME as the character list's -- name, level, sex, look and breed --
+        /// plus what the party adds:
         ///
-        ///   f2: nombre   f3: nivel
-        ///   f4 { f2 { f1: lo del grupo, f3: sexo }, f6: el aspecto, f7: la raza }
+        ///   f2: name   f3: level
+        ///   f4 { f2 { f1: the party's part, f3: sex }, f6: the look, f7: the breed }
         ///
-        /// y lo del grupo, que se mete en el mismo hueco donde iba el sexo:
+        /// and the party's part, which goes into the same slot the sex went in:
         ///
         ///   f2 { f1: 1 }
-        ///   f4 { f1: mapa, f2: x, f4: subzona, f5: y }
-        ///   f7 { f1: 5, f3: prospección, f4: vida, f6: vida máxima }
-        ///   f8: iniciativa
+        ///   f4 { f1: map, f2: x, f4: subarea, f5: y }
+        ///   f7 { f1: 5, f3: prospecting, f4: life, f6: maximum life }
+        ///   f8: initiative
         ///
-        /// La posición está COMPROBADA contra la base: los cuatro mapas que salen en las capturas
-        /// —130286592, 217056262, 212600322 y 88212757— dan en MapPositions exactamente las x, las
-        /// y y las subzonas que llevan los mensajes, hasta la última cifra. Las coordenadas
-        /// negativas viajan en complemento a dos de 64 bits, no en zigzag.
+        /// The position is CHECKED against the database: the four maps in the captures -- 130286592,
+        /// 217056262, 212600322 and 88212757 -- give in MapPositions exactly the x, the y and the subareas
+        /// the messages carry, down to the last digit. Negative coordinates travel in 64-bit two's
+        /// complement, not in zigzag.
         ///
-        /// ─── Esto es lo que faltaba ─────────────────────────────────────────────────────────
+        /// ─── This is what was missing ───────────────────────────────────────────────────────
         ///
-        /// La hoja que se mandaba antes llevaba nombre, nivel y raza y nada más. Sin el aspecto el
-        /// cliente no tiene con qué dibujar el retrato del miembro, y el grupo no llegaba a
-        /// formarse: la invitación salía, el aceptar viajaba, el servidor daba el grupo por hecho
-        /// —y por eso ya no dejaba invitar a nadie más— pero en pantalla no aparecía nada.
+        /// The sheet sent before carried name, level and breed and nothing else. Without the look the client
+        /// has nothing to draw the member's portrait with, and the party never got to form: the invitation
+        /// went out, the accept travelled, the server considered the party done -- and that is why it no
+        /// longer let anybody else be invited -- but nothing appeared on screen.
         /// </summary>
         private static byte[] MemberSheet(long characterId)
         {
@@ -447,8 +447,8 @@ namespace Jondo.Unity.Server.Handlers
 
             var session = SessionRegistry.FindByCharacter(characterId);
 
-            // El bloque del sexo es el mismo hueco donde el grupo mete lo suyo: el sexo en su f3
-            // y lo del grupo en su f1.
+            // The sex block is the same slot where the party puts its part: the sex in its f3
+            // and the party's part in its f1.
             var enElGrupo = Pb.New();
             if (session != null) enElGrupo.Bytes(1, PartyInfo(session));
             enElGrupo.VarIfNotZero(3, character.Sex);
@@ -467,13 +467,13 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El invitado que todavía no ha contestado, para la lista de quien invita (imf):
+        /// The invited player who has not answered yet, for the inviter's list (imf):
         ///
-        ///   f2: el grupo
-        ///   f3 { f1: su aspecto, f2: su nombre, f3: su id, f5: quien invita, f6 { f1: 1 }, f8: su raza }
+        ///   f2: the party
+        ///   f3 { f1: his look, f2: his name, f3: his id, f5: who invites, f6 { f1: 1 }, f8: his breed }
         ///
-        /// El aspecto que va aquí es el MISMO que luego lleva su hoja al entrar: en la captura del
-        /// que invita, los bytes del imf y los del ink son idénticos.
+        /// The look that goes here is THE SAME his sheet carries later on joining: in the inviter's capture,
+        /// the bytes of the imf and those of the ink are identical.
         /// </summary>
         private static byte[] BuildPending(long guestId, long hostId, int partyId)
         {
@@ -493,27 +493,26 @@ namespace Jondo.Unity.Server.Handlers
                 .Build();
         }
 
-        /// <summary>Prospección de partida, antes de la suerte y del equipo.</summary>
+        /// <summary>Starting prospecting, before chance and equipment.</summary>
         private const int BaseProspecting = 100;
 
         /// <summary>
-        /// El f1 del bloque de vida, que vale 5 en las cuatro fichas capturadas —dos personajes
-        /// distintos, tres capturas— y no cambia con el nivel ni con la raza. No sabemos qué es,
-        /// así que va el número que manda el juego: dejarlo fuera no es lo mismo que mandarlo.
+        /// The life block's f1, which is 5 in the four captured sheets -- two different characters, three
+        /// captures -- and does not change with level or breed. We do not know what it is, so the number the
+        /// game sends goes: leaving it out is not the same as sending it.
         /// </summary>
         private const int UnknownLifeF1 = 5;
 
         /// <summary>
-        /// Lo que el grupo añade a la hoja: dónde está, cuánta vida tiene y con qué iniciativa.
+        /// What the party adds to the sheet: where he is, how much life he has and with what initiative.
         ///
-        /// La vida, la prospección y la iniciativa son las DEL MIEMBRO, no las de quien pregunta,
-        /// así que se calculan dentro de su sesión. Vida y vida máxima van iguales porque fuera de
-        /// combate el emulador no lleva la cuenta de la que le falta a nadie; en las cuatro fichas
-        /// capturadas también salen iguales.
+        /// Life, prospecting and initiative are THE MEMBER's, not the asker's, so they are worked out inside
+        /// his session. Life and maximum life go equal because outside a fight the emulator does not keep
+        /// track of anybody's missing life; in the four captured sheets they come out equal too.
         ///
-        /// Hay un quinto campo, el f5, que vale 2, 3 o 4 y no cambia para un mismo personaje entre
-        /// capturas. No se ha podido averiguar qué es —no es la raza, ni el nivel, ni el mapa— así
-        /// que no se manda: mejor el cero de proto3 que un número inventado.
+        /// There is a fifth field, f5, which is 2, 3 or 4 and does not change for the same character between
+        /// captures. It has not been possible to find out what it is -- it is not the breed, nor the level,
+        /// nor the map -- so it is not sent: better proto3's zero than a made-up number.
         /// </summary>
         private static byte[] PartyInfo(GameSession session)
         {
@@ -545,7 +544,7 @@ namespace Jondo.Unity.Server.Handlers
                 .Build();
         }
 
-        /// <summary>El nombre que lleva un ime: va en f1.f4.f1, tres capas dentro.</summary>
+        /// <summary>The name an ime carries: it goes in f1.f4.f1, three layers inside.</summary>
         private static string NameIn(byte[] ime)
         {
             foreach (var uno in ProtoMessage.Parse(ime).Fields)

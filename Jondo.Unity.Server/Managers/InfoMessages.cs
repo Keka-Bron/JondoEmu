@@ -7,32 +7,32 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los mensajes de información del juego: los que salen en el chat sin que nadie los escriba.
+    /// The game's information messages: the ones that come out in the chat without anyone writing them.
     ///
-    /// ─── Cómo funcionan de verdad ───────────────────────────────────────────────────────────
+    /// ─── How they really work ───────────────────────────────────────────────────────────────
     ///
     /// «Última conexión a esta cuenta realizada el…», «Has ganado 320 kamas», «Misión actualizada»
-    /// o «No tienes el nivel de oficio necesario» NO los manda el servidor como texto. El servidor
-    /// manda un NÚMERO y el texto lo pone el cliente, ya traducido al idioma del jugador:
+    /// or «No tienes el nivel de oficio necesario» are NOT sent by the server as text. The server
+    /// sends a NUMBER and the client supplies the text, already translated into the player's language:
     ///
-    ///   lqn { f1: tipo, f2: mensaje, f4 (repetido): los parámetros, como cadenas }
+    ///   lqn { f1: type, f2: message, f4 (repeated): the parameters, as strings }
     ///
-    /// El par (tipo, mensaje) sale de InfoMessagesDataRoot —2.557 entradas— y da un textId que se
-    /// resuelve contra Translations. El texto lleva huecos que rellenan los parámetros:
+    /// The (type, message) pair comes from InfoMessagesDataRoot —2,557 entries— and gives a textId that is
+    /// resolved against Translations. The text carries holes the parameters fill:
     ///
-    ///   tipo 0, id  45  →  «Has ganado $quantity{0} kamas.»
-    ///   tipo 0, id  21  →  «Has conseguido {0} '$item{1}'.»
-    ///   tipo 1, id 284  →  «No tienes el nivel de oficio necesario.»
+    ///   type 0, id  45  →  «Has ganado $quantity{0} kamas.»
+    ///   type 0, id  21  →  «Has conseguido {0} '$item{1}'.»
+    ///   type 1, id 284  →  «No tienes el nivel de oficio necesario.»
     ///
-    /// El TIPO no es decorativo: decide cómo lo pinta el cliente. Sale 0 en 1.722 mensajes
-    /// —información normal— y 1 en 691 —avisos y errores—, más unos pocos de tipos 2, 4, 6, 7 y 9.
-    /// Proto3 se come el cero, y por eso en las capturas unos lqn llevan f1 y otros no.
+    /// The TYPE is not decorative: it decides how the client draws it. It is 0 in 1,722 messages
+    /// —normal information— and 1 in 691 —warnings and errors—, plus a few of types 2, 4, 6, 7 and 9.
+    /// Proto3 swallows the zero, and that is why in the captures some lqn carry f1 and others do not.
     ///
-    /// ─── La regla ───────────────────────────────────────────────────────────────────────────
+    /// ─── The rule ───────────────────────────────────────────────────────────────────────────
     ///
-    /// ESTO es lo que hay que usar para decirle algo al jugador. Una línea de chat en su lugar
-    /// sale por el CANAL GENERAL y la lee todo el mundo, que es un fallo que ya hubo que quitar
-    /// de la recolección.
+    /// THIS is what must be used to tell the player something. A chat line instead goes out
+    /// through the GENERAL CHANNEL and everybody reads it, which is a bug that already had to be removed
+    /// from gathering.
     ///
     /// Free text that is in no row of the table -- what a command answers, like <c>.teleport</c>
     /// -- goes this way too, through <see cref="FreeText"/>. None of the 452 lqn of the captures
@@ -40,16 +40,16 @@ namespace Jondo.Unity.Server.Managers
     /// </summary>
     public static class InfoMessages
     {
-        /// <summary>Información normal. Proto3 no manda el campo.</summary>
+        /// <summary>Normal information. Proto3 does not send the field.</summary>
         public const int Info = 0;
 
-        /// <summary>Aviso o error: el cliente lo pinta distinto.</summary>
+        /// <summary>Warning or error: the client draws it differently.</summary>
         public const int Warning = 1;
 
-        /// <summary>«{0} acaba de volver a conectarse al combate.» Va con <see cref="Warning"/>.</summary>
+        /// <summary>«{0} acaba de volver a conectarse al combate.» Goes with <see cref="Warning"/>.</summary>
         public const int BackInTheFight = 184;
 
-        // ─── Los que usa el emulador, con su texto al lado ──────────────────────
+        // ─── The ones the emulator uses, with their text alongside ──────────────
 
         /// <summary>«Has ganado $quantity{0} kamas.»</summary>
         public const int KamasGained = 45;
@@ -66,7 +66,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«Has conseguido {0} '$item{1}'.»</summary>
         public const int ItemGained = 21;
 
-        /// <summary>«$quantity{2} x {{item,{0},{1}}} ($quantity{3} kamas)», la compra.</summary>
+        /// <summary>«$quantity{2} x {{item,{0},{1}}} ($quantity{3} kamas)», the purchase.</summary>
         public const int Purchase = 252;
 
         // ─── The marketplaces' ────────────────────────────────────────────────────
@@ -105,10 +105,10 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public const int MarketplaceSoldLinked = 65;
 
-        /// <summary>«No tienes el nivel de oficio necesario.» Va con <see cref="Warning"/>.</summary>
+        /// <summary>«No tienes el nivel de oficio necesario.» Goes with <see cref="Warning"/>.</summary>
         public const int JobLevelTooLow = 284;
 
-        /// <summary>«No tienes el nivel requerido.» Va con <see cref="Warning"/>.</summary>
+        /// <summary>«No tienes el nivel requerido.» Goes with <see cref="Warning"/>.</summary>
         /// <remarks>
         /// Not the same sentence as <see cref="JobLevelTooLow"/>, and the difference is the whole
         /// point of having both: 284 says "de oficio". The dungeon door was sending 284 for a
@@ -118,37 +118,37 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public const int LevelTooLow = 3;
 
-        /// <summary>«No tienes el objeto necesario.» Va con <see cref="Warning"/>.</summary>
+        /// <summary>«No tienes el objeto necesario.» Goes with <see cref="Warning"/>.</summary>
         public const int MissingItem = 4;
 
         /// <summary>
-        /// La plantilla vacía: su texto es literalmente <c>{0}</c>, o sea el parámetro tal cual.
+        /// The empty template: its text is literally <c>{0}</c>, that is the parameter as is.
         /// </summary>
         /// <remarks>
-        /// Es el hueco por el que se le puede decir al jugador algo que el cliente no trae escrito,
-        /// y existe en su propia tabla — tipo 0, id 0 —, así que no es un truco: es el canal que
-        /// hay para eso. Sirve para lo que no tiene plantilla, como «la entrada gratis del manojo
-        /// vuelve el martes 1/9», que ninguna de las 339.175 frases del cliente dice.
+        /// It is the hole through which the player can be told something the client does not bring written,
+        /// and it exists in its own table — type 0, id 0 —, so it is not a trick: it is the channel there
+        /// is for that. It serves for what has no template, like «la entrada gratis del manojo
+        /// vuelve el martes 1/9», which none of the client's 339,175 sentences says.
         ///
-        /// Va con <see cref="Info"/> o con <see cref="Warning"/>, que es lo único que cambia cómo
-        /// lo pinta. Y no es una línea de chat: el chat sale por el canal del mapa y lo lee todo
-        /// el mundo.
+        /// It goes with <see cref="Info"/> or with <see cref="Warning"/>, which is the only thing that changes how
+        /// it is drawn. And it is not a chat line: the chat goes out through the map's channel and everybody
+        /// reads it.
         ///
-        /// Lo que NO hay que hacer con esto es sustituir una plantilla que sí existe. El cliente
-        /// está traducido a cinco idiomas y la plantilla lo está con él; lo que se mande por aquí
-        /// va en el idioma en que lo escribió quien programó esta línea, y ahí se queda.
+        /// What must NOT be done with this is replace a template that does exist. The client
+        /// is translated into five languages and the template is translated with it; what is sent this way
+        /// goes in the language whoever programmed this line wrote it in, and there it stays.
         /// </remarks>
         public const int FreeText = 0;
 
         /// <summary>
-        /// «No puedes tener más de <b>{0}</b> invocación(es) al mismo tiempo.» El parámetro 0
-        /// es el tope. Va con <see cref="Warning"/>.
+        /// «No puedes tener más de <b>{0}</b> invocación(es) al mismo tiempo.» Parameter 0
+        /// is the cap. Goes with <see cref="Warning"/>.
         /// </summary>
         /// <remarks>
-        /// El tipo importa más de lo normal en éste: en datos/mensajes_3.6.10.10.json el id 203 de
-        /// la tabla 0 es «No tienes el nivel requerido», otra frase completamente distinta. Es el
-        /// mismo número diciendo dos cosas según con qué tipo se mande, así que mandarlo con
-        /// <see cref="Info"/> por descuido le diría al jugador que le falta nivel.
+        /// The type matters more than usual in this one: in datos/mensajes_3.6.10.10.json id 203 of
+        /// table 0 is «No tienes el nivel requerido», a completely different sentence. It is the
+        /// same number saying two things depending on the type it is sent with, so sending it with
+        /// <see cref="Info"/> by mistake would tell the player he lacks level.
         /// </remarks>
         public const int SummonLimitReached = 203;
 
@@ -231,8 +231,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Qué dice un mensaje. No se le manda al cliente —él ya lo tiene— pero sirve para que el
-        /// registro del servidor diga qué se acaba de enviar en vez de un par de números sueltos.
+        /// What a message says. It is not sent to the client —it already has it— but it lets the
+        /// server's log say what has just been sent instead of a couple of loose numbers.
         /// </summary>
         public static string Text(int type, int id)
         {
@@ -240,7 +240,7 @@ namespace Jondo.Unity.Server.Managers
             return _texts.TryGetValue((type, id), out string? text) ? text : $"({type}, {id})";
         }
 
-        /// <summary>¿Existe ese mensaje en el cliente? Mandar uno que no existe no enseña nada.</summary>
+        /// <summary>Does that message exist in the client? Sending one that does not exist shows nothing.</summary>
         public static bool Exists(int type, int id)
         {
             Ensure();

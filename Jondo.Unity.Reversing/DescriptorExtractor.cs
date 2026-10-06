@@ -4,31 +4,31 @@ using Google.Protobuf.Reflection;
 namespace Jondo.Unity.Reversing;
 
 /// <summary>
-/// El descriptor del protocolo, sacado del propio cliente.
+/// The protocol descriptor, taken from the client itself.
 ///
-/// Esto es el cimiento de todo lo demás. Sin descriptor completo no hay huellas, y sin huellas no
-/// hay forma de emparejar los mensajes de una versión con los de la siguiente cuando Ankama les
-/// rota los nombres de tres letras.
+/// This is the foundation of everything else. Without a complete descriptor there are no fingerprints, and without fingerprints there is
+/// no way to match one version's messages with the next one's when Ankama
+/// rotates their three-letter names.
 ///
-/// No hace falta desofuscar nada ni arrancar el juego: protobuf necesita el descriptor para
-/// funcionar, así que el cliente lo lleva dentro. Está en global-metadata.dat, que es donde IL2CPP
-/// guarda los literales, y está EN CRUDO: los bytes del FileDescriptorProto tal cual, no en base64
-/// como los deja el generador de C# de escritorio. Se reconoce porque el campo 1 de un descriptor
-/// es el nombre del fichero y ahí se leen en claro «com.ankama.dofus.proto», «network.proto».
+/// Nothing has to be deobfuscated nor the game started: protobuf needs the descriptor to
+/// work, so the client carries it inside. It is in global-metadata.dat, which is where IL2CPP
+/// keeps the literals, and it is RAW: the FileDescriptorProto's bytes as they are, not in base64
+/// as the desktop C# generator leaves them. It is recognised because a descriptor's field 1
+/// is the file's name and there one reads in the clear «com.ankama.dofus.proto», «network.proto».
 ///
-/// ─── Por qué se comprueba con una ida y vuelta ──────────────────────────────────────────
+/// ─── Why it is checked with a round trip ────────────────────────────────────────────────
 ///
-/// Un lector de protobuf es MUY permisivo: casi cualquier montón de bytes se deja parsear sin
-/// quejarse, dejando lo que no entiende en campos desconocidos. Así que "ha parseado" no prueba
-/// nada. Lo que sí prueba es que al volver a serializarlo salgan los MISMOS bytes: eso sólo pasa
-/// si cada byte de la entrada cayó en un campo que el descriptor conoce, y es lo que decide dónde
-/// termina el bloque, que es el dato que no viene escrito en ninguna parte.
+/// A protobuf reader is VERY permissive: almost any heap of bytes lets itself be parsed without
+/// complaining, leaving what it does not understand in unknown fields. So "it parsed" proves
+/// nothing. What does prove it is that serialising it again gives the SAME bytes: that only happens
+/// if every input byte fell into a field the descriptor knows, and it is what decides where
+/// the block ends, which is the datum written nowhere.
 /// </summary>
 public static class DescriptorExtractor
 {
     public sealed record Blob(int Offset, int Length, FileDescriptorProto File);
 
-    /// <summary>Los descriptores que hay dentro del fichero de metadatos del cliente.</summary>
+    /// <summary>The descriptors inside the client's metadata file.</summary>
     public static List<Blob> FindIn(string metadataPath)
     {
         byte[] data = File.ReadAllBytes(metadataPath);
@@ -37,7 +37,7 @@ public static class DescriptorExtractor
 
         foreach (int start in Starts(data))
         {
-            if (start < lastEnd) continue;   // ya iba dentro del anterior
+            if (start < lastEnd) continue;   // it was already inside the previous one
 
             var blob = ReadAt(data, start);
             if (blob == null) continue;
@@ -50,9 +50,9 @@ public static class DescriptorExtractor
     }
 
     /// <summary>
-    /// Dónde puede empezar uno: en el 0x0A del campo 1, seguido de la longitud del nombre y de un
-    /// nombre que acabe en «.proto». Se busca por el final —el «.proto»— y se retrocede, que es
-    /// mucho más rápido que probar en cada byte del fichero.
+    /// Where one can start: at the 0x0A of field 1, followed by the name's length and a
+    /// name ending in «.proto». It is searched for by the end —the «.proto»— and backed up, which is
+    /// much faster than trying at every byte of the file.
     /// </summary>
     private static IEnumerable<int> Starts(byte[] data)
     {
@@ -63,8 +63,8 @@ public static class DescriptorExtractor
             if (data[i] != needle[0]) continue;
             if (!data.AsSpan(i, needle.Length).SequenceEqual(needle)) continue;
 
-            // El nombre puede tener cualquier longitud, así que se prueba a retroceder hasta un
-            // encabezado 0x0A <longitud> que cuadre exactamente con lo que hay hasta el «.proto».
+            // The name can be of any length, so backing up is tried until a
+            // 0x0A <length> header that fits exactly with what there is up to the «.proto».
             int end = i + needle.Length;
             for (int nameLength = needle.Length; nameLength <= 120; nameLength++)
             {
@@ -76,11 +76,11 @@ public static class DescriptorExtractor
     }
 
     /// <summary>
-    /// Lee un descriptor completo desde ahí, si lo hay.
+    /// Reads a complete descriptor from there, if there is one.
     ///
-    /// La longitud no viene dada: se recorre campo a campo mientras lo que se lee tenga sentido
-    /// para un FileDescriptorProto, y cada vez que el trozo leído hasta ese punto sobrevive a la
-    /// ida y vuelta se anota como el mejor final conocido. Se devuelve el más largo que cuadre.
+    /// The length is not given: it walks field by field while what is read makes sense
+    /// for a FileDescriptorProto, and each time the piece read up to that point survives the
+    /// round trip it is noted as the best known end. The longest that fits is returned.
     /// </summary>
     private static Blob? ReadAt(byte[] data, int start)
     {
@@ -105,7 +105,7 @@ public static class DescriptorExtractor
         return best == null ? null : new Blob(start, bestLength, best);
     }
 
-    /// <summary>Un campo de nivel superior: avanza el cursor si es plausible.</summary>
+    /// <summary>A top-level field: advances the cursor if it is plausible.</summary>
     private static bool TryField(byte[] data, ref int at)
     {
         if (!TryVarint(data, ref at, out ulong key)) return false;
@@ -113,7 +113,7 @@ public static class DescriptorExtractor
         int field = (int)(key >> 3);
         int wire = (int)(key & 7);
 
-        // Un FileDescriptorProto llega al campo 12. Más allá es que ya nos salimos del bloque.
+        // A FileDescriptorProto goes up to field 12. Beyond that we have already left the block.
         if (field is < 1 or > 12) return false;
 
         switch (wire)
@@ -124,7 +124,7 @@ public static class DescriptorExtractor
                 if (len > int.MaxValue || at + (int)len > data.Length) return false;
                 at += (int)len;
                 return true;
-            default: return false;    // un descriptor no usa ni 32 ni 64 bits fijos
+            default: return false;    // a descriptor uses neither fixed 32 nor 64 bits
         }
     }
 
@@ -142,7 +142,7 @@ public static class DescriptorExtractor
         return false;
     }
 
-    /// <summary>Descodifica y comprueba. Devuelve null a la mínima duda.</summary>
+    /// <summary>Decodes and checks. Returns null at the slightest doubt.</summary>
     public static FileDescriptorProto? TryParse(byte[] raw)
     {
         try
@@ -156,7 +156,7 @@ public static class DescriptorExtractor
         catch (InvalidProtocolBufferException) { return null; }
     }
 
-    /// <summary>Junta lo encontrado en un solo FileDescriptorSet, que es lo que se guarda.</summary>
+    /// <summary>Joins what was found into a single FileDescriptorSet, which is what is stored.</summary>
     public static FileDescriptorSet AsSet(IEnumerable<Blob> blobs)
     {
         var set = new FileDescriptorSet();

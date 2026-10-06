@@ -40,9 +40,9 @@
     <PackageReference Include="Avalonia" Version="11.2.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
-    <!-- Avalonia arrastra Tmds.DBus.Protocol 0.20.0, que lleva GHSA-xrw6-gwf8-vvr9 (gravedad
-         alta). Es la pieza de DBus de Linux y aqui no se usa, pero viaja igual en el paquete, asi
-         que se fija la version corregida (0.21.3: la 0.21.2 que habia sigue marcada, y de la 0.22 en adelante tambien). Mismo remedio que con SQLitePCLRaw en el servidor. -->
+    <!-- Avalonia drags in Tmds.DBus.Protocol 0.20.0, which carries GHSA-xrw6-gwf8-vvr9 (high
+         severity). It is Linux's DBus piece and it is not used here, but it travels in the package all the same, so
+         the fixed version is pinned (0.21.3: the 0.21.2 there was is still flagged, and from 0.22 onwards too). The same remedy as with SQLitePCLRaw in the server. -->
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
 
     <!-- To read bases/paquetes.db, which is where the server writes what it could not handle.
@@ -51,11 +51,11 @@
          server so the two never end up carrying two native SQLite builds. -->
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
 
-    <!-- Para leer los bundles del propio cliente: los iconos de los monstruos estan en
-         Picto/Monsters/monster_assets_1x.bundle, 2.395 texturas de 64x64. Se leen de ahi en vez de
-         copiarse a datos/: el cliente ya ocupa lo que ocupa, y una copia nuestra se quedaria vieja
-         el dia del siguiente parche sin que nadie se enterara. La segunda hace falta porque las
-         texturas van en BC7 y hay que descomprimirlas. -->
+    <!-- To read the client's own bundles: the monsters' icons are in
+         Picto/Monsters/monster_assets_1x.bundle, 2,395 textures of 64x64. They are read from there instead of
+         being copied to datos/: the client already takes up what it takes up, and a copy of ours would go stale
+         the day of the next patch without anyone noticing. The second is needed because the
+         textures are in BC7 and have to be decompressed. -->
     <PackageReference Include="AssetsTools.NET" Version="3.0.5" />
     <PackageReference Include="AssetsTools.NET.Texture" Version="3.0.2" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />

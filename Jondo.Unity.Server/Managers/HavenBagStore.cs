@@ -5,16 +5,16 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Lo que el merkasako guarda de una sesión a otra: el decorado elegido, los muebles que se han
-    /// colocado y lo que hay dentro del cofre.
+    /// What the haven bag keeps from one session to another: the chosen theme, the furniture that has been
+    /// placed and what is inside the chest.
     ///
-    /// Tres tablas, todas por personaje. Los muebles se guardan por decorado, porque cada uno tiene
-    /// su propia habitación y sus propias casillas: cambiarse de tema y volver tiene que devolver la
-    /// habitación tal como se dejó.
+    /// Three tables, all per character. Furniture is stored per theme, because each one has its own
+    /// room and its own cells: switching theme and coming back has to give back the room just as it
+    /// was left.
     ///
-    /// El cofre guarda objetos igual que CharacterItems, con su uid, su cantidad y sus efectos, para
-    /// que un objeto guardado y sacado vuelva idéntico. Lo que se mete en el cofre se BORRA del
-    /// inventario y al revés: un objeto está en un sitio o en el otro, nunca en los dos.
+    /// The chest stores items just like CharacterItems, with their uid, their quantity and their effects, so
+    /// that an item stored and taken out comes back identical. What goes into the chest is DELETED from the
+    /// inventory and vice versa: an item is in one place or the other, never in both.
     ///
     /// Moving items in and out is <see cref="StorageStacks"/>'s, as for every other storage: a
     /// stack changes uid when it changes side, and the highest uid in the chest is kept out of the
@@ -75,7 +75,7 @@ namespace Jondo.Unity.Server.Managers
             StorageStacks.EnsureTables();
         }
 
-        // ─── El decorado ────────────────────────────────────────────────────────
+        // ─── The theme ──────────────────────────────────────────────────────────
 
         public static int ThemeOf(long characterId)
         {
@@ -116,7 +116,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        // ─── Los muebles ────────────────────────────────────────────────────────
+        // ─── The furniture ──────────────────────────────────────────────────────
 
         public static List<Furniture> FurnitureOf(long characterId, int theme)
         {
@@ -151,9 +151,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Guarda la habitación entera. El cliente manda SIEMPRE la lista completa al aceptar, no
-        /// las diferencias, así que se borra lo que había de ese decorado y se escribe lo nuevo: si
-        /// no, un mueble quitado no se iba nunca.
+        /// Stores the whole room. The client ALWAYS sends the complete list on accepting, not
+        /// the differences, so whatever that theme had is deleted and the new one written: if
+        /// not, a removed piece of furniture would never go away.
         /// </summary>
         public static void SaveFurniture(long characterId, int theme, IEnumerable<Furniture> pieces)
         {
@@ -191,13 +191,13 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        // ─── El cofre ───────────────────────────────────────────────────────────
+        // ─── The chest ──────────────────────────────────────────────────────────
 
         /// <summary>What is in this character's chest, oldest uid first.</summary>
         public static List<StoredItem> ChestOf(long characterId)
             => StorageStacks.ItemsOf(StorageStacks.HavenBag(characterId));
 
-        /// <summary>Un objeto del inventario, leído igual que los del cofre.</summary>
+        /// <summary>An inventory item, read just like the chest's.</summary>
         public static StoredItem? FromInventory(long characterId, long uid)
         {
             try

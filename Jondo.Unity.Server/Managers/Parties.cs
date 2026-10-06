@@ -6,46 +6,46 @@ using System.Linq;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Los grupos: quién va con quién y quién manda.
+    /// The parties: who goes with whom and who leads.
     ///
-    /// ─── El identificador ───────────────────────────────────────────────────────────────────
+    /// ─── The identifier ─────────────────────────────────────────────────────────────────────
     ///
-    /// Un grupo tiene número propio, y no es el de nadie: en las cuatro capturas salen 69145,
-    /// 69158, 69186 y 71272, seguidos y bajos, o sea un contador del servidor. Aquí se hace igual
-    /// y se empieza donde ellos, para que los números tengan la pinta que el cliente espera.
+    /// A party has its own number, and it is nobody's: in the four captures 69145,
+    /// 69158, 69186 and 71272 come out, consecutive and low, that is a server counter. Here it is done the same
+    /// and it starts where they do, so that the numbers look the way the client expects.
     ///
-    /// ─── No se guarda en la base ────────────────────────────────────────────────────────────
+    /// ─── It is not stored in the database ───────────────────────────────────────────────────
     ///
-    /// Un grupo dura lo que dura la sesión: si se cae el servidor, no hay grupo que recuperar,
-    /// igual que en el juego real. Por eso vive en memoria y no en SQLite.
+    /// A party lasts as long as the session: if the server goes down, there is no party to recover,
+    /// just like in the real game. That is why it lives in memory and not in SQLite.
     ///
-    /// ─── Las reglas que salen de las capturas ───────────────────────────────────────────────
+    /// ─── The rules that come from the captures ──────────────────────────────────────────────
     ///
-    /// Un grupo con UNA persona se deshace: al rechazar la invitación, el servidor real manda el
-    /// <c>iko</c> y el <c>imy</c> pegados, en el mismo segmento TCP. O sea que invitar crea el
-    /// grupo antes de que el otro conteste, y si dice que no, se deshace solo.
+    /// A party with ONE person breaks up: on declining the invitation, the real server sends the
+    /// <c>iko</c> and the <c>imy</c> stuck together, in the same TCP segment. That is, inviting creates the
+    /// party before the other answers, and if he says no, it breaks up on its own.
     ///
-    /// Y las plazas son ocho, que es lo que lleva el f10 del ing y el f3 del ijz.
+    /// And the places are eight, which is what the ing's f10 and the ijz's f3 carry.
     /// </summary>
     public static class Parties
     {
-        /// <summary>Cuánta gente cabe. Del f10 del ing y del f3 del ijz.</summary>
+        /// <summary>How many people fit. From the ing's f10 and the ijz's f3.</summary>
         public const int MaxMembers = 8;
 
-        /// <summary>Por dónde empiezan los números, para que se parezcan a los de verdad.</summary>
+        /// <summary>Where the numbers start, so that they look like the real ones.</summary>
         private const int FirstId = 69000;
 
         public sealed class Party
         {
             public int Id { get; init; }
 
-            /// <summary>Quién manda. Es el f4 del ing.</summary>
+            /// <summary>Who leads. It is the ing's f4.</summary>
             public long LeaderId { get; set; }
 
-            /// <summary>Los que ya están dentro, en el orden en que entraron.</summary>
+            /// <summary>The ones already inside, in the order they joined.</summary>
             public List<long> Members { get; } = new();
 
-            /// <summary>Los que tienen la invitación abierta: invitado → quién le invitó.</summary>
+            /// <summary>The ones with the invitation open: invitee → who invited him.</summary>
             public Dictionary<long, long> Pending { get; } = new();
 
             /// <summary>
@@ -61,18 +61,18 @@ namespace Jondo.Unity.Server.Managers
         private static int _next = FirstId;
         private static readonly ConcurrentDictionary<int, Party> _parties = new();
 
-        /// <summary>En qué grupo está cada personaje, ya sea dentro o invitado.</summary>
+        /// <summary>Which party each character is in, whether inside or invited.</summary>
         private static readonly ConcurrentDictionary<long, int> _of = new();
 
         public static int Count => _parties.Count;
 
         public static Party? Get(int id) => _parties.TryGetValue(id, out var p) ? p : null;
 
-        /// <summary>El grupo de un personaje, esté dentro o tenga una invitación abierta.</summary>
+        /// <summary>A character's party, whether he is inside or has an open invitation.</summary>
         public static Party? Of(long characterId)
             => _of.TryGetValue(characterId, out int id) ? Get(id) : null;
 
-        /// <summary>¿Está DENTRO de un grupo? Tener una invitación abierta no cuenta.</summary>
+        /// <summary>Is he INSIDE a party? Having an open invitation does not count.</summary>
         public static bool IsInParty(long characterId)
         {
             var party = Of(characterId);
@@ -81,8 +81,8 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Crea el grupo alrededor de quien invita. El servidor real lo crea al mandar el ime,
-        /// antes de que el otro conteste: por eso el ing con un solo miembro llega enseguida.
+        /// Creates the party around whoever invites. The real server creates it on sending the ime,
+        /// before the other answers: that is why the ing with a single member arrives at once.
         /// </summary>
         public static Party Create(long leaderId)
         {
@@ -94,11 +94,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Deja la invitación abierta. Falso si el invitado ya está en algún grupo.
+        /// Leaves the invitation open. False if the invitee is already in some party.
         ///
-        /// Si ya la tenía abierta y le vuelve a invitar el mismo, vale igual y se le manda otra
-        /// vez: cerrar la ventanita por la equis no avisa al servidor, y si esto no valiera, el
-        /// invitado se quedaría atascado para siempre sin poder volver a ser invitado.
+        /// If he already had it open and the same one invites him again, it is fine all the same and it is sent to him
+        /// again: closing the little window with the cross does not tell the server, and if this were not allowed, the
+        /// invitee would be stuck forever, unable to be invited again.
         /// </summary>
         public static bool Invite(Party party, long guestId, long hostId)
         {
@@ -127,7 +127,7 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
-        /// <summary>Rechaza. Devuelve quién había invitado, o cero si no había tal invitación.</summary>
+        /// <summary>Declines. Returns who had invited, or zero if there was no such invitation.</summary>
         public static long Refuse(Party party, long guestId)
         {
             long host;
@@ -141,10 +141,10 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Se va del grupo. Devuelve a quién hay que avisar y si el grupo se ha deshecho.
+        /// Leaves the party. Returns who has to be told and whether the party has broken up.
         ///
-        /// Si el que se va era el jefe, manda el siguiente que entró: un grupo sin jefe no lo
-        /// entiende el cliente, y dejar el mando en alguien que ya no está es peor.
+        /// If the one leaving was the leader, the next one who joined leads: a party without a leader the
+        /// client does not understand, and leaving the lead with someone who is no longer there is worse.
         /// </summary>
         public static (IReadOnlyList<long> Remaining, bool Dissolved, long NewLeader) Leave(
             Party party, long characterId)
@@ -174,7 +174,7 @@ namespace Jondo.Unity.Server.Managers
             return (remaining, dissolved, newLeader);
         }
 
-        /// <summary>Cede el mando. Falso si el destinatario no está dentro.</summary>
+        /// <summary>Hands over the lead. False if the recipient is not inside.</summary>
         public static bool Promote(Party party, long newLeaderId)
         {
             lock (party.Gate)
@@ -185,7 +185,7 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
-        /// <summary>Deshace el grupo y suelta a todos.</summary>
+        /// <summary>Breaks up the party and lets everyone go.</summary>
         public static void Dissolve(Party party)
         {
             long[] todos;
@@ -200,7 +200,7 @@ namespace Jondo.Unity.Server.Managers
             _parties.TryRemove(party.Id, out _);
         }
 
-        /// <summary>Los miembros, para mandarles algo a todos.</summary>
+        /// <summary>The members, to send something to all of them.</summary>
         public static IReadOnlyList<long> MembersOf(Party party)
         {
             lock (party.Gate) return new List<long>(party.Members);

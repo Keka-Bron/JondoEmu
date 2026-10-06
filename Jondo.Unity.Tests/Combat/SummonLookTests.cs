@@ -4,23 +4,23 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// El aspecto de una invocación, y cuándo una cadena manda a otra plantilla.
+    /// A summon's look, and when a string sends to another template.
     /// </summary>
     /// <remarks>
-    /// La cadena de la base es <c>{hueso|pieles|colores|escala}</c> y hay tres formas. Sólo dos son
-    /// reenvíos, y confundirlas es lo que dejó a la Baliza de Supervivencia del Ocra pintada como
-    /// un cuadrado azul: su rastro es 8348 → «{8152}» → «{1|91,…}», y al llegar a la tercera se
-    /// leía el 1 como si fuera otra plantilla y se seguía hasta la 1, que es otro bicho cualquiera.
+    /// The base's string is <c>{bone|skins|colours|scale}</c> and there are three forms. Only two are
+    /// referrals, and confusing them is what left the Cra's Baliza de Supervivencia drawn as
+    /// a blue square: its trail is 8348 → «{8152}» → «{1|91,…}», and on reaching the third
+    /// the 1 was read as if it were another template and followed to template 1, which is some other creature.
     ///
-    /// Lo que dice dónde parar está medido en «ocra-baliza de supervivencia»: su jwe manda
-    /// «f3{f2=3, f3=8152}», o sea que la buena es la 8152.
+    /// What says where to stop is measured in «ocra-baliza de supervivencia»: its jwe sends
+    /// «f3{f2=3, f3=8152}», that is the good one is 8152.
     /// </remarks>
     public class SummonLookTests
     {
         [Fact]
         public void Una_cadena_pelada_manda_a_otra_plantilla()
         {
-            // Lo que tiene la 8348, la baliza.
+            // What 8348, the beacon, has.
             Assert.True(Summons.EsReenvio("{8152}", out int hacia));
             Assert.Equal(8152, hacia);
         }
@@ -28,8 +28,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void Un_reenvio_con_escala_tambien_manda()
         {
-            // Lo que tiene el «Regalo animado», la 3106. Sin pieles y sin colores: no es un
-            // aspecto, es un reenvío que además cambia el tamaño.
+            // What the «Regalo animado», 3106, has. No skins and no colours: it is not a
+            // look, it is a referral that also changes the size.
             Assert.True(Summons.EsReenvio("{446|||120}", out int hacia));
             Assert.Equal(446, hacia);
         }
@@ -37,8 +37,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void El_aspecto_de_verdad_no_manda_a_ninguna_parte()
         {
-            // La cadena de la 8152, que es donde hay que pararse. Su primer número es el HUESO, no
-            // una plantilla; seguirlo lleva a la 1 y de ahí al cuadrado azul.
+            // 8152's string, which is where to stop. Its first number is the BONE, not
+            // a template; following it leads to template 1 and from there to the blue square.
             Assert.False(Summons.EsReenvio(
                 "{1|91,5239,4977|1=#FFFFFF,2=#62A1C9,3=#4482A0,4=#2F374D,5=#C4CFD3,6=#E9CE99|52}",
                 out _));
@@ -58,10 +58,10 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void La_referencia_pelada_de_una_bomba_es_su_aspecto_y_no_otra_plantilla()
         {
-            // Las cuatro bombas del tymador llevan una referencia pelada, y lo que va en el
-            // paquete es el numero de dentro. Tres de ellas -- 1561, 1562, 1563 -- no son
-            // plantillas de nada; la cuarta, la Sismobomba, lleva «{2865}», y la 2865 SI es una
-            // plantilla: el Ventozador. Seguir el rastro la pintaba como un Ventozador.
+            // The Rogue's four bombs carry a bare reference, and what goes in the
+            // packet is the number inside. Three of them -- 1561, 1562, 1563 -- are not
+            // templates of anything; the fourth, the Sismobomba, carries «{2865}», and 2865 IS a
+            // template: the Ventozador. Following the trail drew it as a Ventozador.
             foreach (var (cadena, numero) in new[]
                      {
                          ("{1562}", 1562),   // Explobomba

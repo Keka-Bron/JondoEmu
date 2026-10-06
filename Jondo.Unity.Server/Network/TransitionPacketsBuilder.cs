@@ -15,7 +15,7 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildKltMessage() => BuildEmptyMessage("type.ankama.com/klt");
         public static byte[] BuildKlpMessage() => BuildEmptyMessage(Op.Uri(Op.Klp));
 
-        /// <summary>Un mensaje con un unico varint en el f1.</summary>
+        /// <summary>A message with a single varint in f1.</summary>
         private static byte[] BuildSingleVarIntMessage(string typeUrl, int value)
         {
             using var ms = new MemoryStream();

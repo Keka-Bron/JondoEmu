@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Las papeleras: el almacén público donde va lo que la gente tira.
+    /// The bins: the public storage where what people throw away goes.
     ///
     /// In the real game they keep what others have thrown away. Here they start EMPTY on purpose:
     /// nobody has thrown anything on this server yet, and filling them with invented items would
@@ -12,29 +12,29 @@ namespace Jondo.Unity.Server.Managers
     /// through restarts: each bin is a storage of its own in <see cref="StorageStacks"/>, and
     /// <see cref="Handlers.BinHandler"/> opens it.
     ///
-    /// ─── De dónde sale cada número ──────────────────────────────────────────────────────────
+    /// ─── Where each number comes from ───────────────────────────────────────────────────────
     ///
-    /// El TIPO (105) y la HABILIDAD (153) salen de la captura de la papelera de delante del banco de
-    /// Bonta: el servidor real los manda en el jss y en el iwn.
+    /// The TYPE (105) and the SKILL (153) come from the capture of the bin in front of Bonta's bank:
+    /// the real server sends them in the jss and the iwn.
     ///
-    /// Los GRÁFICOS salen de cruzar las 304 capturas con el volcado del cliente
-    /// —tools/tipos_interactivos.py—, y ahí está el motivo de no fiarse de una sola captura: la de
-    /// Bonta enseñaba el gráfico 260022 y con él salían 31 papeleras. Hay cuatro gráficos
-    /// distintos, y en total son <b>67</b> repartidas por 63 mapas.
+    /// The GRAPHICS come from crossing the 304 captures with the client dump
+    /// -- tools/tipos_interactivos.py --, and that is the reason for not trusting a single capture:
+    /// Bonta's showed graphic 260022 and with it 31 bins came out. There are four different
+    /// graphics, and in total there are <b>67</b> spread over 63 maps.
     /// </summary>
     public static class Bins
     {
-        /// <summary>El tipo con el que el cliente dibuja una papelera. Medido del jss real.</summary>
+        /// <summary>The type the client draws a bin with. Measured from the real jss.</summary>
         public const int Type = 105;
 
-        /// <summary>La habilidad de «usar», que el servidor devuelve en el iwn.</summary>
+        /// <summary>The «use» skill, which the server returns in the iwn.</summary>
         public const int UseSkill = 153;
 
         /// <summary>
-        /// Los cuatro aspectos que tiene una papelera.
+        /// The four looks a bin has.
         ///
-        /// No son variantes de adorno: cada ciudad usa el suyo, y con uno solo se quedaban fuera 36
-        /// de las 67.
+        /// They are not decorative variants: each city uses its own, and with only one 36 of the 67
+        /// were left out.
         /// </summary>
         private static readonly HashSet<int> Graphics = new() { 8438, 46529, 63081, 260022 };
 
@@ -63,7 +63,7 @@ namespace Jondo.Unity.Server.Managers
             Console.WriteLine($"[Papeleras] {Count} en {_byMap.Count} mapas.");
         }
 
-        /// <summary>Las papeleras que hay en este mapa.</summary>
+        /// <summary>The bins on this map.</summary>
         public static IReadOnlyList<Interactives.Element> On(long mapId)
             => _byMap.TryGetValue(mapId, out var found)
                 ? found

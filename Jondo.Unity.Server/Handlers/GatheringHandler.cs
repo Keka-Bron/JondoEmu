@@ -9,75 +9,75 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
-    /// Recolectar: segar trigo, talar un fresno, pescar, minar.
+    /// Gathering: reaping wheat, felling an ash, fishing, mining.
     ///
-    /// ─── El ciclo, medido en cuatro capturas ────────────────────────────────────────────────
+    /// ─── The cycle, measured in four captures ───────────────────────────────────────────────
     ///
-    /// El cliente manda UN solo <c>iwo</c> y no vuelve a hablar. Todo lo demás lo pone el
-    /// servidor, en dos tandas separadas por tres segundos exactos:
+    /// The client sends ONE single <c>iwo</c> and does not speak again. Everything else is put by
+    /// the server, in two bursts separated by exactly three seconds:
     ///
-    ///   al momento   iwf  el recurso pasa a «en uso»
-    ///                iwm  se vuelve a declarar con la habilidad ya no pulsable
-    ///                iwn  arranca el gesto, con su duración
-    ///   a los 3 s    iwi  se acabó el gesto
-    ///                iua o ivj  el objeto: iua si es pila nueva, ivj si ya la tenías
-    ///                iun  los pods
-    ///                itn  cuánto se ha sacado
-    ///                irq  la experiencia de oficio
-    ///                iwf  el recurso queda agotado
-    ///                iwm  y se declara por última vez, apagado
+    ///   at once      iwf  the resource goes to «in use»
+    ///                iwm  it is declared again with the skill no longer clickable
+    ///                iwn  the gesture starts, with its duration
+    ///   after 3 s    iwi  the gesture is over
+    ///                iua or ivj  the item: iua if it is a new stack, ivj if you already had it
+    ///                iun  the pods
+    ///                itn  how much was gathered
+    ///                irq  the profession experience
+    ///                iwf  the resource is left exhausted
+    ///                iwm  and it is declared one last time, switched off
     ///
-    /// Los tres segundos no son un número redondo elegido por nosotros: el <c>iwn</c> los manda
-    /// en su campo 3 como 30 décimas, y el tiempo real entre ese mensaje y el <c>iwi</c> midió
-    /// 2.987, 2.996, 2.999, 3.008, 3.038, 3.064 y 3.091 milisegundos en las siete recolecciones
-    /// capturadas.
+    /// The three seconds are not a round number chosen by us: the <c>iwn</c> sends them in its field
+    /// 3 as 30 tenths, and the real time between that message and the <c>iwi</c> measured 2,987,
+    /// 2,996, 2,999, 3,008, 3,038, 3,064 and 3,091 milliseconds in the seven captured gatherings.
     ///
-    /// ─── Cuánto se saca ─────────────────────────────────────────────────────────────────────
+    /// ─── How much is gathered ───────────────────────────────────────────────────────────────
     ///
-    /// Esto NO está en el cliente. Se buscó en skills.json (dieciséis campos, ninguno de
-    /// cantidad), en InteractivesDataRoot (sólo id y nombre), en JobsDataRoot (cuatro campos) y en
-    /// CollectablesDataRoot (que va de mascotas). Es regla de servidor, como el coste del zaap.
+    /// This is NOT in the client. It was looked for in skills.json (sixteen fields, none of
+    /// quantity), in InteractivesDataRoot (only id and name), in JobsDataRoot (four fields) and in
+    /// CollectablesDataRoot (which is about pets). It is a server rule, like the zaap's cost.
     ///
-    /// Pero las capturas dejan seis medidas, y una regla sencilla las cuadra las seis:
+    /// But the captures leave six measurements, and a simple rule fits all six:
     ///
-    ///   Madera de fresno  nivel del recurso   1, oficio 200  ->  20, 17, 14
-    ///   Lucio             nivel del recurso  80, oficio 200  ->  13, 12
-    ///   Perca             nivel del recurso 120, oficio 200  ->   8
-    ///   Trigo             nivel del recurso   1, oficio   1  ->   4
+    ///   Ash wood          resource level   1, profession 200  ->  20, 17, 14
+    ///   Pike              resource level  80, profession 200  ->  13, 12
+    ///   Perch             resource level 120, profession 200  ->   8
+    ///   Wheat             resource level   1, profession   1  ->   4
     ///
-    ///   techo = max(4, 1 + (nivel del oficio − nivel del recurso) / 10)
+    ///   ceiling = max(4, 1 + (profession level − resource level) / 10)
     ///
-    /// que da 20,9 · 13 · 9 · 4, y lo observado cae siempre entre el 70 % de ese techo y el techo.
-    /// Así que se tira un número en ese margen. Sube con el nivel del oficio y baja con lo exigente
-    /// que sea el recurso, que es lo que se ve en el juego.
+    /// which gives 20.9 · 13 · 9 · 4, and what is observed always falls between 70 % of that ceiling
+    /// and the ceiling. So a number is drawn in that range. It goes up with the profession's level
+    /// and down with how demanding the resource is, which is what is seen in the game.
     ///
-    /// ─── Lo que hace falta para recolectar ──────────────────────────────────────────────────
+    /// ─── What is needed to gather ───────────────────────────────────────────────────────────
     ///
-    /// Nivel de oficio suficiente. Un pescador de nivel 10 no saca una perca, que pide 120, y aquí
-    /// ni se le deja intentarlo: se le dice por el chat y no se toca el recurso. Los niveles suben
-    /// solos recolectando, y al subir se sacan más unidades por la fórmula de arriba.
+    /// A high enough profession level. A level 10 fisherman does not get a perch, which asks for 120,
+    /// and here he is not even allowed to try: he is told in the chat and the resource is not
+    /// touched. Levels go up by themselves when gathering, and on going up more units are gathered by
+    /// the formula above.
     /// </summary>
     public static class GatheringHandler
     {
-        /// <summary>Lo que se saca como poco, en tanto por ciento del techo.</summary>
+        /// <summary>The least that is gathered, as a percentage of the ceiling.</summary>
         private const int FloorPercent = 70;
 
-        /// <summary>Suelo del techo: por debajo de esto no baja ni con un oficio recién empezado.</summary>
+        /// <summary>The ceiling's floor: it does not go below this even with a freshly started profession.</summary>
         private const int MinimumYield = 4;
 
         /// <summary>
-        /// El azar de la cantidad. Va sembrado por personaje y elemento para que dos jugadores
-        /// que siegan a la vez no saquen lo mismo, pero sin depender de un estático compartido.
+        /// The randomness of the quantity. It is seeded per character and element so that two players
+        /// reaping at the same time do not get the same, but without depending on a shared static.
         /// </summary>
         [ThreadStatic] private static Random? _random;
 
         private static Random Dice => _random ??= new Random();
 
-        /// <summary>El techo de unidades para un oficio de este nivel sobre este recurso.</summary>
+        /// <summary>The ceiling of units for a profession of this level on this resource.</summary>
         public static int Ceiling(int jobLevel, int resourceLevel)
             => Math.Max(MinimumYield, 1 + (jobLevel - resourceLevel) / 10);
 
-        /// <summary>Cuánto se saca esta vez.</summary>
+        /// <summary>How much is gathered this time.</summary>
         public static int Roll(int jobLevel, int resourceLevel)
         {
             int techo = Ceiling(jobLevel, resourceLevel);
@@ -86,11 +86,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// El cliente ha clicado un recurso.
+        /// The client has clicked a resource.
         ///
-        /// El gesto dura tres segundos y durante ellos el jugador puede irse, así que la segunda
-        /// tanda se manda desde una tarea aparte y comprueba antes que siga donde estaba. No se
-        /// bloquea el hilo de red: bloquearlo dejaría al jugador sin poder ni andar.
+        /// The gesture lasts three seconds and during them the player can leave, so the second burst is
+        /// sent from a separate task that first checks he is still where he was. The network thread is
+        /// not blocked: blocking it would leave the player unable even to walk.
         /// </summary>
         public static async Task GatherAsync(NetworkStream stream, int elementId, int skillId)
         {
@@ -101,11 +101,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // El nivel ya lo ha filtrado el jss: un recurso que le queda grande le llega con la
-            // habilidad apagada y el cliente ni deja clicarlo, igual que si estuviera agotado.
-            // Esto es la red de seguridad por si llega un iwo de todas formas, y contesta con el
-            // mensaje que el propio cliente tiene para esto —«No tienes el nivel de oficio
-            // necesario»— y no con una línea de chat, que saldría por el canal general.
+            // The level has already been filtered by the jss: a resource beyond him reaches him with
+            // the skill switched off and the client does not even let him click it, the same as if it
+            // were exhausted. This is the safety net in case an iwo arrives anyway, and it answers
+            // with the message the client itself has for this -- «No tienes el nivel de oficio
+            // necesario» -- and not with a chat line, which would go out on the general channel.
             int jobLevel = SessionContext.State.JobLevel(resource.JobId);
             if (jobLevel < resource.LevelMin)
             {
@@ -153,9 +153,9 @@ namespace Jondo.Unity.Server.Handlers
 
                 using var _ = SessionContext.Push(session);
 
-                // Si se ha ido del mapa, el recurso se suelta y no se le da nada: el cliente ya
-                // no tiene ese elemento en pantalla y le llegarían mensajes de un sitio donde no
-                // está.
+                // If he has left the map, the resource is released and he is given nothing: the client
+                // no longer has that element on screen and he would get messages from a place where he
+                // is not.
                 if (SessionContext.State.MapId != resource.MapId)
                 {
                     Resources.Release(resource.MapId, resource.ElementId);
@@ -171,7 +171,8 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.Push(Op.Iwi, ConnectionProtocol.BuildGatherFinished(
                         resource.ElementId, skillId)));
 
-                // Al inventario de quien lo ha recogido, y a la base, que si no se pierde al salir.
+                // Into the inventory of whoever gathered it, and into the database, otherwise it is lost
+                // on logging out.
                 var item = DatabaseManager.AddItemToInventory(characterId, resource.ItemId, cuantos);
                 bool pilaNueva = item.Quantity == cuantos;
 

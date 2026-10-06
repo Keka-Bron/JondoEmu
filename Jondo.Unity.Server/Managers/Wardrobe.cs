@@ -5,22 +5,22 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// Lo que el personaje lleva de adorno: el título, el ornamento y las prendas de apariencia.
+    /// What the character wears as adornment: the title, the ornament and the appearance garments.
     ///
-    /// Son tres cosas distintas aunque el juego las enseñe en la misma ventana:
+    /// They are three different things even though the game shows them in the same window:
     ///
-    ///   El TÍTULO es el texto que sale bajo el nombre. Uno a la vez, o ninguno.
-    ///   El ORNAMENTO es el marco que rodea al nombre. Uno a la vez, o ninguno.
-    ///   Las APARIENCIAS son prendas que tapan lo que llevas puesto de verdad: un sombrero
-    ///   cosmético se dibuja en lugar del sombrero que da las características.
+    ///   The TITLE is the text shown under the name. One at a time, or none.
+    ///   The ORNAMENT is the frame around the name. One at a time, or none.
+    ///   The APPEARANCES are garments that cover what you really have on: a cosmetic
+    ///   hat is drawn in place of the hat that gives the characteristics.
     ///
-    /// Las tres se guardan por personaje y sobreviven a la sesión, que es lo que se pide. La
-    /// apariencia se guarda por hueco, porque cada prenda tapa un hueco concreto y hay que poder
-    /// quitarla sola.
+    /// All three are stored per character and survive the session, which is what is asked. The
+    /// appearance is stored per slot, because each garment covers a specific slot and it has to be possible to
+    /// take it off on its own.
     /// </summary>
     public static class Wardrobe
     {
-        /// <summary>Ninguno. El cliente manda cero para quitarse el título o el ornamento.</summary>
+        /// <summary>None. The client sends zero to take off the title or the ornament.</summary>
         public const int None = 0;
 
         public static void Initialize()
@@ -45,10 +45,10 @@ namespace Jondo.Unity.Server.Managers
                         PRIMARY KEY (CharacterId, Slot));";
                 command.ExecuteNonQuery();
 
-                // El ojo de mostrar/ocultar de la ventana: se puede llevar una prenda puesta y que
-                // no se dibuje. Va aparte de quitarla, porque al volver a enseñarla sigue ahí. Se
-                // añade con un ALTER porque la tabla ya existía sin él en las instalaciones de
-                // antes.
+                // The window's show/hide eye: a garment can be worn and
+                // not drawn. It is separate from taking it off, because on showing it again it is still there. It is
+                // added with an ALTER because the table already existed without it in the earlier
+                // installations.
                 try
                 {
                     var añadir = connection.CreateCommand();
@@ -58,7 +58,7 @@ namespace Jondo.Unity.Server.Managers
                 }
                 catch (Microsoft.Data.Sqlite.SqliteException)
                 {
-                    // ya estaba
+                    // it was already there
                 }
             }
             catch (Exception ex)
@@ -67,7 +67,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        // ─── Título y ornamento ─────────────────────────────────────────────────
+        // ─── Title and ornament ─────────────────────────────────────────────────
 
         public static (int Title, int Ornament) Of(long characterId)
         {
@@ -118,9 +118,9 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        // ─── Las prendas de apariencia ──────────────────────────────────────────
+        // ─── The appearance garments ────────────────────────────────────────────
 
-        /// <summary><c>Hidden</c> es el ojo de la ventana: la prenda sigue puesta pero no se dibuja.</summary>
+        /// <summary><c>Hidden</c> is the window's eye: the garment is still on but is not drawn.</summary>
         public readonly record struct Worn(int Slot, long Uid, int Gid, bool Hidden);
 
         public static List<Worn> AppearanceOf(long characterId)
@@ -150,7 +150,7 @@ namespace Jondo.Unity.Server.Managers
             return salida;
         }
 
-        /// <summary>Pone una prenda en su hueco, echando la que hubiera.</summary>
+        /// <summary>Puts a garment in its slot, throwing out whatever was there.</summary>
         public static void Wear(long characterId, int slot, long uid, int gid)
         {
             try
@@ -159,7 +159,7 @@ namespace Jondo.Unity.Server.Managers
                 connection.Open();
 
                 var command = connection.CreateCommand();
-                // Al poner una prenda nueva el ojo vuelve a abrirse: lo que acabas de elegir se ve.
+                // On putting on a new garment the eye opens again: what you have just chosen is seen.
                 command.CommandText = "INSERT INTO CharacterAppearance (CharacterId, Slot, Uid, Gid, Hidden) " +
                                       "VALUES ($id, $slot, $uid, $gid, 0) " +
                                       "ON CONFLICT(CharacterId, Slot) DO UPDATE SET " +
@@ -177,11 +177,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// El ojo de mostrar/ocultar. La prenda se queda puesta; solo deja de dibujarse.
+        /// The show/hide eye. The garment stays on; it only stops being drawn.
         ///
-        /// El cliente lo pide con <c>lxg { f1: hueco, f3: 1 }</c> para ocultar y con el f3 ausente
-        /// para volver a enseñarla. Medido en la captura de jugar con mostrar/ocultar: al ocultar,
-        /// la piel de ese hueco desaparece de la lista y al mostrar vuelve.
+        /// The client asks for it with <c>lxg { f1: slot, f3: 1 }</c> to hide and with f3 absent
+        /// to show it again. Measured in the capture of playing with show/hide: on hiding,
+        /// that slot's skin disappears from the list and on showing it comes back.
         /// </summary>
         public static void SetHidden(long characterId, int slot, bool hidden)
         {
@@ -205,7 +205,7 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        /// <summary>Quita lo que hubiera en un hueco. Con hueco negativo, lo quita todo.</summary>
+        /// <summary>Removes whatever was in a slot. With a negative slot, it removes everything.</summary>
         public static void TakeOff(long characterId, int slot)
         {
             try

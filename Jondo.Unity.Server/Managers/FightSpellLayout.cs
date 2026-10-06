@@ -20,12 +20,12 @@ namespace Jondo.Unity.Server.Managers
             => Current(breed, level, 0);
 
         /// <summary>
-        /// La barra de dentro del combate, con los hechizos de administración si la cuenta lo es.
+        /// The in-fight bar, with the administration spells if the account is one.
         /// </summary>
         /// <remarks>
-        /// Va aparte de la lista de fuera del combate: son dos mensajes distintos —el hms de la
-        /// entrada al mundo y el jyy del arranque de la pelea— y añadir el hechizo sólo al primero
-        /// lo deja visible en el panel de paseo y ausente justo donde hace falta.
+        /// It goes apart from the list outside the fight: they are two different messages -- the hms of entering
+        /// the world and the jyy of the fight's start -- and adding the spell only to the first leaves it visible
+        /// on the walking panel and missing exactly where it is needed.
         /// </remarks>
         public static Layout Current(int breed, int level, long accountId)
         {
@@ -68,8 +68,8 @@ namespace Jondo.Unity.Server.Managers
                 placedSpells.Add(saved.Value);
             }
 
-            // Empezando por el UNO: el hueco cero es donde el cliente dibuja el arma, y en 37 de
-            // las 51 barras de las capturas va vacío por eso mismo.
+            // Starting at ONE: slot zero is where the client draws the weapon, and in 37 of the
+            // 51 bars of the captures it is empty for that very reason.
             int next = 1;
             foreach (var spell in layout.Spells)
             {
@@ -83,14 +83,14 @@ namespace Jondo.Unity.Server.Managers
                 next++;
             }
 
-            // El cuerpo a cuerpo, en el primer hueco libre y SIEMPRE. Está en las 13 barras de
-            // jugador de las capturas, incluida la del personaje del tutorial, que no lleva ni un
-            // objeto: la casilla es la del puño y no depende de tener arma.
+            // The melee, in the first free slot and ALWAYS. It is in the 13 player bars of the
+            // captures, including the tutorial character's, who carries not a single item: the
+            // slot is the fist's and does not depend on having a weapon.
             //
-            // Sin tope, que es como estaba antes de esta clase. Cortar en SlotCount lo dejaba
-            // fuera cuando los cuarenta huecos estaban ocupados, y entonces el jugador entra al
-            // combate sin poder pegar un puñetazo. La barra capturada llega hasta el 48, asi que
-            // hay sitio de sobra por encima de los cuarenta que se rellenan solos.
+            // With no cap, which is how it was before this class. Cutting at SlotCount left it out
+            // when the forty slots were taken, and then the player goes into the fight unable to
+            // throw a punch. The captured bar goes up to 48, so there is plenty of room above the
+            // forty that fill themselves.
             int weaponSlot = 0;
             while (occupiedSlots.Contains(weaponSlot)) weaponSlot++;
             layout.Bar.Add((weaponSlot, Network.FightProtocol.HechizoCuerpoACuerpo));

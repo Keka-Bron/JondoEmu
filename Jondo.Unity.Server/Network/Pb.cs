@@ -32,10 +32,10 @@ namespace Jondo.Unity.Server.Network
         /// <summary>Variable-length integer, but only when the value is not zero (proto3 omits zeros).</summary>
         public Pb VarIfNotZero(int field, long value) => value == 0 ? this : Var(field, value);
 
-        /// <summary>Una cadena sólo si tiene algo: lo que hace proto3 con una vacía.</summary>
+        /// <summary>A string only if it has something: what proto3 does with an empty one.</summary>
         public Pb StrIfNotEmpty(int field, string value) => string.IsNullOrEmpty(value) ? this : Str(field, value);
 
-        /// <summary>Unos bytes sólo si hay alguno.</summary>
+        /// <summary>Some bytes only if there are any.</summary>
         public Pb BytesIfNotEmpty(int field, byte[] value) => value == null || value.Length == 0 ? this : Bytes(field, value);
 
         public Pb Str(int field, string value) => Bytes(field, Encoding.UTF8.GetBytes(value ?? ""));
