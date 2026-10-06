@@ -82,5 +82,20 @@ namespace Jondo.Unity.Server.Managers
             Ensure();
             return NpcDialogueContent.For(_dialogues, npcId, mapId);
         }
+
+        /// <summary>
+        /// The conversation used when the player talks: an authored tree, or the accept/refuse
+        /// fallback when this NPC can hand a quest over and nothing is written yet.
+        /// </summary>
+        public static NpcDialogue? ForTalk(int npcId, long mapId)
+        {
+            var written = For(npcId, mapId);
+            if (written != null) return written;
+
+            var template = Npcs.TemplateOf(npcId);
+            if (template == null) return null;
+
+            return FallbackQuestDialogue.Build(npcId, mapId, template);
+        }
     }
 }

@@ -210,7 +210,9 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             var template = Npcs.TemplateOf(npc.NpcId);
-            var escrito = NpcDialogues.For(npc.NpcId, mapId);
+            // Authored tree first; otherwise accept/refuse for quests this NPC can hand over now.
+            bool arbolEscrito = NpcDialogues.For(npc.NpcId, mapId) != null;
+            var escrito = NpcDialogues.ForTalk(npc.NpcId, mapId);
             var primera = escrito?.First();
 
             if (primera == null && (template == null || template.DialogMessageId == 0))
@@ -267,9 +269,11 @@ namespace Jondo.Unity.Server.Handlers
             // Y si alguna misión en curso pedía justamente venir a ver a éste, ya está.
             await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
 
+            string origen = arbolEscrito ? $" (escrito, {escrito!.Lines.Count} frases)"
+                : escrito != null ? " (fallback aceptar/rechazar)"
+                : " (de la plantilla)";
             Console.WriteLine($"[NPC] Diálogo del {npc.NpcId}: pregunta {pregunta}, " +
-                              $"{Math.Max(respuestas.Length, 1)} respuestas" +
-                              (escrito != null ? $" (escrito, {escrito.Lines.Count} frases)" : " (de la plantilla)") + ".");
+                              $"{Math.Max(respuestas.Length, 1)} respuestas{origen}.");
         }
 
         /// <summary>
@@ -865,10 +869,11 @@ namespace Jondo.Unity.Server.Handlers
             // Va después de elegir y no al llegar a la frase porque así está en la captura: el
             // servidor baja la conversación hasta la 50071, el jugador elige la 66788, y sólo
             // entonces sale el ief con la misión 2432.
-            // ¿Esta respuesta concreta da una misión? Lo dice el árbol escrito. Si no hay árbol,
-            // se cae en la regla vieja: cualquier respuesta de la frase que el paso nombra.
-            var frase = NpcDialogues.For(SessionContext.State.OpenDialogueNpcId,
-                                         SessionContext.State.OpenDialogueMapId)
+            // ¿Esta respuesta concreta da una misión? Lo dice el árbol (escrito o el fallback
+            // aceptar/rechazar). Si no hay ninguno, se cae en la regla vieja: cualquier respuesta
+            // de la frase que el paso nombra.
+            var frase = NpcDialogues.ForTalk(SessionContext.State.OpenDialogueNpcId,
+                                             SessionContext.State.OpenDialogueMapId)
                                     ?.Line(SessionContext.State.OpenDialogueMessage);
             var elegidaAhora = frase?.Choice(reply);
 

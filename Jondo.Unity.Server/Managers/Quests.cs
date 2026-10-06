@@ -819,11 +819,11 @@ namespace Jondo.Unity.Server.Managers
         ///                       own dialogId is not consulted, which is deliberate — a written
         ///                       tree is meant to be exact — and it is also how a quest whose
         ///                       first step names no line can be given at all.
-        ///   nothing is written  the old rule: any reply on the line the step names. The only line
-        ///                       anybody can reach is then the template's opening, since every
-        ///                       reply is dumped underneath it, so the quest is takeable exactly
-        ///                       when that opening happens to be the line its step declares. That
-        ///                       is 70 quests in the whole game.
+        ///   nothing is written  the accept/refuse fallback can hand the quest over from the
+        ///                       catalogue giver, as long as the NPC has an opening line and at
+        ///                       least one reply the client can draw. (Before that fallback, only
+        ///                       the seventy quests whose first step was the template opening were
+        ///                       takeable without a tree.)
         ///
         /// So a tree that carries the declared line without marking a reply on it loses the quest,
         /// silently. <c>AuthoredDialoguesTests</c> refuses that combination for the trees on disk.
@@ -857,7 +857,9 @@ namespace Jondo.Unity.Server.Managers
             }
 
             var template = Npcs.TemplateOf(npcId);
-            return declared != 0 && template != null && template.DialogMessageId == declared;
+            return template != null
+                && template.DialogMessageId != 0
+                && template.Replies.Length > 0;
         }
 
         /// <summary>Which quests an NPC hands out, on that map or anywhere.</summary>
