@@ -4,10 +4,10 @@
     "",
     "The client ships every line an NPC can say and every reply it can be given, and nowhere does",
     "it say which goes with which - measured across all 6,467 of them. That pairing has always",
-    "lived on Ankama's server, so it cannot be extracted or measured. It has to be decided, and",
+    "lived on Ankama\u0027s server, so it cannot be extracted or measured. It has to be decided, and",
     "this is where the decision goes.",
     "",
-    "  npc         the NPC's id",
+    "  npc         the NPC\u0027s id",
     "  map         0 for wherever it stands; a map id to say something different there",
     "  opening     which line it starts on; the first one when left out",
     "  lines       one per thing it says, each with what can be said back",
@@ -15,24 +15,24 @@
     "",
     "And what a reply is FOR, which is what stops a conversation offering everything at once:",
     "",
-    "  startsQuest  this reply hands that quest over. Not the same as `quest`: this one is how a",
+    "  startsQuest  this reply hands that quest over. Not the same as \u0060quest\u0060: this one is how a",
     "               quest begins, so it is offered to somebody who has NOT got it.",
     "  quest        only offered while that quest is under way.",
     "  step         and only while it is on that step.",
     "  afterQuest   only offered once the quest is finished.",
     "",
-    "  { \"npc\": 1088, \"map\": 0, \"opening\": 3312, \"lines\": [",
-    "      { \"message\": 3312, \"choices\": [ { \"reply\": 6016, \"next\": 6047 }, { \"reply\": 7846 } ] },",
-    "      { \"message\": 6047, \"choices\": [ { \"reply\": 7846 } ] } ] }",
+    "  { \u0022npc\u0022: 1088, \u0022map\u0022: 0, \u0022opening\u0022: 3312, \u0022lines\u0022: [",
+    "      { \u0022message\u0022: 3312, \u0022choices\u0022: [ { \u0022reply\u0022: 6016, \u0022next\u0022: 6047 }, { \u0022reply\u0022: 7846 } ] },",
+    "      { \u0022message\u0022: 6047, \u0022choices\u0022: [ { \u0022reply\u0022: 7846 } ] } ] }",
     "",
     "A line with no replies is fine now: the client draws its own Leave button and the X closes the",
     "window, because the server answers the kla it sends. It did not before, which is why an NPC",
     "with nothing to say back used to trap you in the conversation.",
     "",
-    "WHERE THESE COME FROM. The ids are the client's own. The wiring - which reply leads where -",
+    "WHERE THESE COME FROM. The ids are the client\u0027s own. The wiring - which reply leads where -",
     "is read off the walkthroughs at dofuspourlesnoobs, which write the reply options out in",
     "French, and matched back to ids with tools/dialogue_from_guide.py. Inside one NPC the text",
-    "identifies its lines 98.3% of the time, and the reply ids do not have to be Ankama's: the",
+    "identifies its lines 98.3% of the time, and the reply ids do not have to be Ankama\u0027s: the",
     "server sends the ids and the client sends back what it was given, so any id with the right",
     "text works as long as the tree agrees with itself."
   ],
@@ -128,7 +128,7 @@
         }
       ],
       "_byHand": true,
-      "_note2": "«Consejo de clase» (2009). The guide gives it to the Conseillere Archie at [4,-19] with the requirement «On marche sur des oeufs», which is our 1959. Its step 2631 carries dialogId 0, so there is NO measured hand-over line: it hangs off her opening line with reply 36990 «Demander la raison de sa convocation», which is the only one of her 59 that talks about a summons and fits a class council. The reconstruction is ours; the requirement and the NPC are the guide's."
+      "_note2": "\u00ABConsejo de clase\u00BB (2009). The guide gives it to the Conseillere Archie at [4,-19] with the requirement \u00ABOn marche sur des oeufs\u00BB, which is our 1959. Its step 2631 carries dialogId 0, so there is NO measured hand-over line: it hangs off her opening line with reply 36990 \u00ABDemander la raison de sa convocation\u00BB, which is the only one of her 59 that talks about a summons and fits a class council. The reconstruction is ours; the requirement and the NPC are the guide\u0027s."
     },
     {
       "npc": 1088,
@@ -1178,14 +1178,14 @@
           ]
         }
       ],
-      "_note": "«He visto el anuncio que has puesto» requires having clicked 489412, the tavern building on the outdoor map 153878787. The guide says «Cliquez pour accepter l offre», and the element carries the SAME id on the two adjacent maps [0,-3] and [1,-3], which is what a building that spans both does. It is the oddest one on the map that is not the door: the other two candidates were discarded because 32613 is the phoenix rocks and 42509 is the entrance door."
+      "_note": "\u00ABHe visto el anuncio que has puesto\u00BB requires having clicked 489412, the tavern building on the outdoor map 153878787. The guide says \u00ABCliquez pour accepter l offre\u00BB, and the element carries the SAME id on the two adjacent maps [0,-3] and [1,-3], which is what a building that spans both does. It is the oddest one on the map that is not the door: the other two candidates were discarded because 32613 is the phoenix rocks and 42509 is the entrance door."
     },
     {
       "npc": 4314,
       "map": 0,
       "opening": 30748,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 30748,
@@ -1216,7 +1216,7 @@
       "map": 0,
       "opening": 30933,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 30933,
@@ -1243,7 +1243,7 @@
       "map": 0,
       "opening": 31058,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 31058,
@@ -1270,7 +1270,7 @@
       "map": 0,
       "opening": 20915,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20915,
@@ -1338,7 +1338,7 @@
       "map": 0,
       "opening": 20873,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20873,
@@ -1465,7 +1465,7 @@
       "map": 0,
       "opening": 20974,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20974,
@@ -1505,7 +1505,7 @@
       "map": 0,
       "opening": 21196,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 21196,
@@ -1530,7 +1530,7 @@
       "map": 0,
       "opening": 20776,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20776,
@@ -1573,7 +1573,7 @@
       "map": 0,
       "opening": 20861,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20861,
@@ -1687,7 +1687,7 @@
       "map": 0,
       "opening": 20795,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20795,
@@ -1759,7 +1759,7 @@
       "map": 0,
       "opening": 20830,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20830,
@@ -1780,7 +1780,7 @@
       "map": 0,
       "opening": 57132,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "_source": "written from the NPC\u0027s own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 57132,
@@ -2214,6 +2214,1065 @@
         }
       ],
       "_byHand": true
+    },
+    {
+      "npc": 1577,
+      "map": 0,
+      "opening": 11439,
+      "lines": [
+        {
+          "message": 11439,
+          "choices": [
+            {
+              "reply": 36714,
+              "next": 30449
+            },
+            {
+              "reply": 12718,
+              "quest": 896
+            },
+            {
+              "reply": 36728,
+              "quest": 2003
+            },
+            {
+              "reply": 12725,
+              "quest": 897
+            },
+            {
+              "reply": 75702,
+              "quest": 2504
+            },
+            {
+              "reply": 12732,
+              "quest": 898
+            },
+            {
+              "reply": 12739,
+              "quest": 899
+            },
+            {
+              "reply": 36720,
+              "next": 30452,
+              "quest": 896,
+              "afterQuest": true
+            },
+            {
+              "reply": 12719,
+              "next": 11449,
+              "quest": 2003,
+              "afterQuest": true
+            },
+            {
+              "reply": 12726,
+              "next": 11454,
+              "quest": 897,
+              "afterQuest": true
+            },
+            {
+              "reply": 75706,
+              "next": 56080,
+              "quest": 2504,
+              "afterQuest": true
+            },
+            {
+              "reply": 12733,
+              "next": 11457,
+              "quest": 898,
+              "afterQuest": true
+            },
+            {
+              "reply": 12716
+            }
+          ]
+        },
+        {
+          "message": 30449,
+          "choices": [
+            {
+              "reply": 36713,
+              "next": 11444
+            },
+            {
+              "reply": 36712
+            }
+          ]
+        },
+        {
+          "message": 11444,
+          "choices": [
+            {
+              "reply": 36711,
+              "startsQuest": 896
+            },
+            {
+              "reply": 36712
+            }
+          ]
+        },
+        {
+          "message": 30452,
+          "choices": [
+            {
+              "reply": 36719,
+              "next": 30453
+            },
+            {
+              "reply": 36716
+            }
+          ]
+        },
+        {
+          "message": 30453,
+          "choices": [
+            {
+              "reply": 36718,
+              "next": 30454
+            },
+            {
+              "reply": 36716
+            }
+          ]
+        },
+        {
+          "message": 30454,
+          "choices": [
+            {
+              "reply": 36715,
+              "next": 30455
+            },
+            {
+              "reply": 36716
+            }
+          ]
+        },
+        {
+          "message": 30455,
+          "choices": [
+            {
+              "reply": 36721,
+              "startsQuest": 2003
+            },
+            {
+              "reply": 36722
+            }
+          ]
+        },
+        {
+          "message": 11449,
+          "choices": [
+            {
+              "reply": 12722,
+              "startsQuest": 897
+            },
+            {
+              "reply": 12723
+            }
+          ]
+        },
+        {
+          "message": 11454,
+          "choices": [
+            {
+              "reply": 75703,
+              "startsQuest": 2504
+            },
+            {
+              "reply": 75704
+            }
+          ]
+        },
+        {
+          "message": 56080,
+          "choices": [
+            {
+              "reply": 12729,
+              "startsQuest": 898
+            },
+            {
+              "reply": 12730
+            }
+          ]
+        },
+        {
+          "message": 11457,
+          "choices": [
+            {
+              "reply": 12736,
+              "startsQuest": 899
+            },
+            {
+              "reply": 12737
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Premi\u00E8re \u00E9dition: 896?2003?897?2504?898?899 (Penelop Ulgar / Emma). Guides dofuspourlesnoobs \u002B template replies."
+    },
+    {
+      "npc": 1578,
+      "map": 0,
+      "opening": 11462,
+      "lines": [
+        {
+          "message": 11462,
+          "choices": [
+            {
+              "reply": 12740,
+              "next": 11463
+            },
+            {
+              "reply": 12754,
+              "quest": 2505
+            },
+            {
+              "reply": 12775,
+              "quest": 904
+            },
+            {
+              "reply": 12786,
+              "quest": 905
+            },
+            {
+              "reply": 75483,
+              "quest": 2506
+            },
+            {
+              "reply": 12774,
+              "next": 11466,
+              "quest": 899,
+              "afterQuest": true
+            },
+            {
+              "reply": 12746,
+              "next": 11484,
+              "quest": 2505,
+              "afterQuest": true
+            },
+            {
+              "reply": 12760,
+              "next": 11489,
+              "quest": 904,
+              "afterQuest": true
+            },
+            {
+              "reply": 75486,
+              "next": 55959,
+              "quest": 905,
+              "afterQuest": true
+            },
+            {
+              "reply": 12773
+            }
+          ]
+        },
+        {
+          "message": 11463,
+          "choices": [
+            {
+              "reply": 12774,
+              "next": 11466
+            },
+            {
+              "reply": 12773
+            }
+          ]
+        },
+        {
+          "message": 11466,
+          "choices": [
+            {
+              "reply": 12742,
+              "startsQuest": 2505
+            },
+            {
+              "reply": 12743
+            }
+          ]
+        },
+        {
+          "message": 11484,
+          "choices": [
+            {
+              "reply": 12758,
+              "startsQuest": 904
+            },
+            {
+              "reply": 12759
+            }
+          ]
+        },
+        {
+          "message": 11489,
+          "choices": [
+            {
+              "reply": 12765,
+              "startsQuest": 905
+            },
+            {
+              "reply": 12766
+            }
+          ]
+        },
+        {
+          "message": 55959,
+          "choices": [
+            {
+              "reply": 75484,
+              "startsQuest": 2506
+            },
+            {
+              "reply": 75485
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Donjons avanc\u00E9s (Alain): 2505?904?905?2506. Puis Yoko pour 906\u002B."
+    },
+    {
+      "npc": 1579,
+      "map": 0,
+      "opening": 11495,
+      "lines": [
+        {
+          "message": 11495,
+          "choices": [
+            {
+              "reply": 12787,
+              "next": 11496
+            },
+            {
+              "reply": 75487,
+              "quest": 906
+            },
+            {
+              "reply": 75494,
+              "quest": 907
+            },
+            {
+              "reply": 12810,
+              "quest": 908
+            },
+            {
+              "reply": 12817,
+              "quest": 909
+            },
+            {
+              "reply": 75497,
+              "quest": 1431
+            },
+            {
+              "reply": 75506,
+              "quest": 2507
+            },
+            {
+              "reply": 12795,
+              "next": 55946,
+              "quest": 2506,
+              "afterQuest": true
+            },
+            {
+              "reply": 75475,
+              "next": 55952,
+              "quest": 906,
+              "afterQuest": true
+            },
+            {
+              "reply": 12809,
+              "next": 11500,
+              "quest": 907,
+              "afterQuest": true
+            },
+            {
+              "reply": 19458,
+              "next": 11514,
+              "quest": 908,
+              "afterQuest": true
+            },
+            {
+              "reply": 75501,
+              "next": 16358,
+              "quest": 909,
+              "afterQuest": true
+            },
+            {
+              "reply": 75510,
+              "next": 55966,
+              "quest": 1431,
+              "afterQuest": true
+            },
+            {
+              "reply": 12790
+            }
+          ]
+        },
+        {
+          "message": 11496,
+          "choices": [
+            {
+              "reply": 12795,
+              "next": 55946
+            },
+            {
+              "reply": 12790
+            }
+          ]
+        },
+        {
+          "message": 55946,
+          "choices": [
+            {
+              "reply": 75472,
+              "startsQuest": 906
+            },
+            {
+              "reply": 75473
+            }
+          ]
+        },
+        {
+          "message": 55952,
+          "choices": [
+            {
+              "reply": 75480,
+              "startsQuest": 907
+            },
+            {
+              "reply": 75481
+            }
+          ]
+        },
+        {
+          "message": 11500,
+          "choices": [
+            {
+              "reply": 12807,
+              "startsQuest": 908
+            },
+            {
+              "reply": 12808
+            }
+          ]
+        },
+        {
+          "message": 11514,
+          "choices": [
+            {
+              "reply": 19453,
+              "startsQuest": 909
+            },
+            {
+              "reply": 19454
+            }
+          ]
+        },
+        {
+          "message": 16358,
+          "choices": [
+            {
+              "reply": 75498,
+              "startsQuest": 1431
+            },
+            {
+              "reply": 75499
+            }
+          ]
+        },
+        {
+          "message": 55966,
+          "choices": [
+            {
+              "reply": 75504,
+              "startsQuest": 2507
+            },
+            {
+              "reply": 75505
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Yoko: 906?907?908?909?1431?2507. Puis Dana pour 2508\u002B."
+    },
+    {
+      "npc": 1580,
+      "map": 0,
+      "opening": 11519,
+      "lines": [
+        {
+          "message": 11519,
+          "choices": [
+            {
+              "reply": 19463,
+              "next": 11520
+            },
+            {
+              "reply": 19459,
+              "quest": 2508
+            },
+            {
+              "reply": 75529,
+              "quest": 2509
+            },
+            {
+              "reply": 75513,
+              "quest": 2510
+            },
+            {
+              "reply": 12825,
+              "quest": 910
+            },
+            {
+              "reply": 12832,
+              "quest": 911
+            },
+            {
+              "reply": 12839,
+              "quest": 912
+            },
+            {
+              "reply": 19466,
+              "next": 55970,
+              "quest": 2507,
+              "afterQuest": true
+            },
+            {
+              "reply": 75520,
+              "next": 16364,
+              "quest": 2508,
+              "afterQuest": true
+            },
+            {
+              "reply": 12824,
+              "next": 55983,
+              "quest": 2509,
+              "afterQuest": true
+            },
+            {
+              "reply": 12831,
+              "next": 11521,
+              "quest": 2510,
+              "afterQuest": true
+            },
+            {
+              "reply": 12838,
+              "next": 11526,
+              "quest": 910,
+              "afterQuest": true
+            },
+            {
+              "reply": 12845,
+              "next": 11531,
+              "quest": 911,
+              "afterQuest": true
+            },
+            {
+              "reply": 19461
+            }
+          ]
+        },
+        {
+          "message": 11520,
+          "choices": [
+            {
+              "reply": 19466,
+              "next": 55970
+            },
+            {
+              "reply": 19461
+            }
+          ]
+        },
+        {
+          "message": 55970,
+          "choices": [
+            {
+              "reply": 75507,
+              "startsQuest": 2508
+            },
+            {
+              "reply": 75508
+            }
+          ]
+        },
+        {
+          "message": 16364,
+          "choices": [
+            {
+              "reply": 75518,
+              "startsQuest": 2509
+            },
+            {
+              "reply": 75519
+            }
+          ]
+        },
+        {
+          "message": 55983,
+          "choices": [
+            {
+              "reply": 75531,
+              "startsQuest": 2510
+            },
+            {
+              "reply": 75532
+            }
+          ]
+        },
+        {
+          "message": 11521,
+          "choices": [
+            {
+              "reply": 12827,
+              "startsQuest": 910
+            },
+            {
+              "reply": 12828
+            }
+          ]
+        },
+        {
+          "message": 11526,
+          "choices": [
+            {
+              "reply": 12834,
+              "startsQuest": 911
+            },
+            {
+              "reply": 12835
+            }
+          ]
+        },
+        {
+          "message": 11531,
+          "choices": [
+            {
+              "reply": 12841,
+              "startsQuest": 912
+            },
+            {
+              "reply": 12842
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Dana: 2508?2509?2510?910?911?912. Puis Miriam/Tornade."
+    },
+    {
+      "npc": 1581,
+      "map": 0,
+      "opening": 11541,
+      "lines": [
+        {
+          "message": 11541,
+          "choices": [
+            {
+              "reply": 12847,
+              "next": 11542
+            },
+            {
+              "reply": 75647,
+              "quest": 913
+            },
+            {
+              "reply": 12854,
+              "quest": 914
+            },
+            {
+              "reply": 12861,
+              "quest": 915
+            },
+            {
+              "reply": 19561,
+              "quest": 916
+            },
+            {
+              "reply": 19569,
+              "quest": 917
+            },
+            {
+              "reply": 19573,
+              "quest": 918
+            },
+            {
+              "reply": 12853,
+              "next": 11543,
+              "quest": 912,
+              "afterQuest": true
+            },
+            {
+              "reply": 75646,
+              "next": 56050,
+              "quest": 913,
+              "afterQuest": true
+            },
+            {
+              "reply": 12855,
+              "next": 11548,
+              "quest": 914,
+              "afterQuest": true
+            },
+            {
+              "reply": 12862,
+              "next": 11553,
+              "quest": 915,
+              "afterQuest": true
+            },
+            {
+              "reply": 19560,
+              "next": 16427,
+              "quest": 916,
+              "afterQuest": true
+            },
+            {
+              "reply": 19572,
+              "next": 16433,
+              "quest": 917,
+              "afterQuest": true
+            },
+            {
+              "reply": 12852
+            }
+          ]
+        },
+        {
+          "message": 11542,
+          "choices": [
+            {
+              "reply": 12853,
+              "next": 11543
+            },
+            {
+              "reply": 12852
+            }
+          ]
+        },
+        {
+          "message": 11543,
+          "choices": [
+            {
+              "reply": 75651,
+              "startsQuest": 913
+            },
+            {
+              "reply": 75652
+            }
+          ]
+        },
+        {
+          "message": 56050,
+          "choices": [
+            {
+              "reply": 75648,
+              "startsQuest": 914
+            },
+            {
+              "reply": 75649
+            }
+          ]
+        },
+        {
+          "message": 11548,
+          "choices": [
+            {
+              "reply": 12858,
+              "startsQuest": 915
+            },
+            {
+              "reply": 12859
+            }
+          ]
+        },
+        {
+          "message": 11553,
+          "choices": [
+            {
+              "reply": 12865,
+              "startsQuest": 916
+            },
+            {
+              "reply": 12866
+            }
+          ]
+        },
+        {
+          "message": 16427,
+          "choices": [
+            {
+              "reply": 19566,
+              "startsQuest": 917
+            },
+            {
+              "reply": 19567
+            }
+          ]
+        },
+        {
+          "message": 16433,
+          "choices": [
+            {
+              "reply": 19557,
+              "startsQuest": 918
+            },
+            {
+              "reply": 19558
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Tornade: 913?914?915?916?917?918 (Miriam He\u00F1ique / Lorie Cul\u00E8re)."
+    },
+    {
+      "npc": 4370,
+      "map": 0,
+      "opening": 30437,
+      "lines": [
+        {
+          "message": 30437,
+          "choices": [
+            {
+              "reply": 36701,
+              "next": 30438
+            },
+            {
+              "reply": 36699,
+              "next": 30439
+            },
+            {
+              "reply": 36703,
+              "quest": 2005
+            },
+            {
+              "reply": 36709,
+              "quest": 2006
+            },
+            {
+              "reply": 36707,
+              "next": 30444,
+              "quest": 2005,
+              "afterQuest": true
+            },
+            {
+              "reply": 36731,
+              "next": 30463,
+              "quest": 2006,
+              "afterQuest": true
+            },
+            {
+              "reply": 36737,
+              "next": 11406,
+              "quest": 157,
+              "afterQuest": true
+            },
+            {
+              "reply": 36734,
+              "quest": 893
+            },
+            {
+              "reply": 37026
+            }
+          ]
+        },
+        {
+          "message": 30438,
+          "choices": [
+            {
+              "reply": 36698,
+              "next": 30440
+            },
+            {
+              "reply": 37026
+            }
+          ]
+        },
+        {
+          "message": 30439,
+          "choices": [
+            {
+              "reply": 36698,
+              "next": 30440
+            },
+            {
+              "reply": 37026
+            }
+          ]
+        },
+        {
+          "message": 30440,
+          "choices": [
+            {
+              "reply": 36698,
+              "next": 30441
+            },
+            {
+              "reply": 36702
+            }
+          ]
+        },
+        {
+          "message": 30441,
+          "choices": [
+            {
+              "reply": 36696,
+              "startsQuest": 2005
+            },
+            {
+              "reply": 36697
+            }
+          ]
+        },
+        {
+          "message": 30444,
+          "choices": [
+            {
+              "reply": 36707,
+              "next": 30445
+            },
+            {
+              "reply": 36705
+            }
+          ]
+        },
+        {
+          "message": 30445,
+          "choices": [
+            {
+              "reply": 36704,
+              "startsQuest": 2006
+            },
+            {
+              "reply": 36705
+            }
+          ]
+        },
+        {
+          "message": 30463,
+          "choices": [
+            {
+              "reply": 36729,
+              "startsQuest": 153
+            },
+            {
+              "reply": 36730
+            }
+          ]
+        },
+        {
+          "message": 11406,
+          "choices": [
+            {
+              "reply": 36735,
+              "startsQuest": 893
+            },
+            {
+              "reply": 36736
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Tour du monde: 2005?2006?153 handoff; 893 Le tracas (inquietud). Mega Jug\u0027Onh / Metag Robill."
+    },
+    {
+      "npc": 813,
+      "map": 0,
+      "opening": 3371,
+      "lines": [
+        {
+          "message": 3371,
+          "choices": [
+            {
+              "reply": 36732
+            },
+            {
+              "reply": 3023,
+              "next": 3408,
+              "quest": 153,
+              "afterQuest": true
+            },
+            {
+              "reply": 3024
+            }
+          ]
+        },
+        {
+          "message": 3408,
+          "choices": [
+            {
+              "reply": 3023
+            },
+            {
+              "reply": 3024
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Amo de las llaves: steps of 153 and 157 (talk objectives complete on open; Accept continues)."
+    },
+    {
+      "npc": 814,
+      "map": 0,
+      "opening": 3380,
+      "lines": [
+        {
+          "message": 3380,
+          "choices": [
+            {
+              "reply": 3018
+            },
+            {
+              "reply": 3019
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Pat Adekabra \u2014 Los esbirros (154)."
+    },
+    {
+      "npc": 815,
+      "map": 0,
+      "opening": 3389,
+      "lines": [
+        {
+          "message": 3389,
+          "choices": [
+            {
+              "reply": 3020
+            },
+            {
+              "reply": 3021
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Chrisis Denervios \u2014 Un juez hist\u00E9rico (155)."
+    },
+    {
+      "npc": 817,
+      "map": 0,
+      "opening": 3398,
+      "lines": [
+        {
+          "message": 3398,
+          "choices": [
+            {
+              "reply": 3022
+            },
+            {
+              "reply": 3034
+            }
+          ]
+        }
+      ],
+      "_byHand": true,
+      "_note": "Kal Vicie \u2014 Mazmorras y m\u00E1s mazmorras (156)."
     }
   ]
 }
