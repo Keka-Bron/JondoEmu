@@ -2408,7 +2408,8 @@
         }
       ],
       "_byHand": true,
-      "_note": "Premi\u00E8re \u00E9dition: 896?2003?897?2504?898?899 (Penelop Ulgar / Emma). Guides dofuspourlesnoobs \u002B template replies."
+      "_source": "Emma Tompouce / Penelop Ulgar chain (896→2003→897→2504→898→899). map 0 so Astrub [1,-15] is not shadowed by a start-only stub.",
+      "_note": "Must stay map 0 (or include quest/afterQuest replies on every map-specific copy). A start-only tree on 188743687 hid «Faire un rapport» for Donjon en mousse."
     },
     {
       "npc": 1578,
@@ -3175,7 +3176,8 @@
         }
       ],
       "_byHand": true,
-      "_note": "Tour du monde: 2005?2006?153 handoff; 893 Le tracas (inquietud). Mega Jug\u0027Onh / Metag Robill."
+      "_source": "Tour du monde / Mega Jug'Onh (2005→2006→153; 893). map 0 so the farmer workshop is not shadowed by a start-only stub.",
+      "_note": "Must stay map 0 (or copy quest/afterQuest replies onto every map-specific tree). Same class of bug as Emma's Donjon en mousse stub."
     },
     {
       "npc": 813,

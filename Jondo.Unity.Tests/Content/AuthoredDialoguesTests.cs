@@ -234,5 +234,103 @@ namespace Jondo.Unity.Tests.Content
                 }
             }
         }
+
+        [Fact]
+        public void Emma_on_Astrub_offers_the_Donjon_en_mousse_report_while_the_quest_is_active()
+        {
+            if (!Available) return;
+
+            // A start-only tree keyed to map 188743687 used to shadow the map-0 chain tree, so
+            // returning after Sandy Castle never showed «Faire un rapport» (reply 12718).
+            const int emma = 1577;
+            const long astrub = 188743687;
+            const int mousse = 896;
+            const long report = 12718;
+
+            var store = NpcDialogueContent.Load(Path);
+            var tree = NpcDialogueContent.For(store, emma, astrub);
+            Assert.NotNull(tree);
+
+            var opening = tree!.First();
+            Assert.NotNull(opening);
+
+            long[] shown = opening!.RepliesFor(
+                q => q == mousse,
+                _ => false,
+                (_, _) => true);
+
+            Assert.Contains(report, shown);
+        }
+
+        [Fact]
+        public void Mega_JugOnh_offers_the_Tour_du_monde_report_on_the_farmer_workshop_map()
+        {
+            if (!Available) return;
+
+            const int mega = 4370;
+            const long workshop = 192937992;
+            const int tour = 2005;
+            const long report = 36703;
+
+            var store = NpcDialogueContent.Load(Path);
+            var tree = NpcDialogueContent.For(store, mega, workshop);
+            Assert.NotNull(tree);
+
+            var opening = tree!.First();
+            Assert.NotNull(opening);
+
+            long[] shown = opening!.RepliesFor(
+                q => q == tour,
+                _ => false,
+                (_, _) => true);
+
+            Assert.Contains(report, shown);
+        }
+
+        [Fact]
+        public void A_map_specific_tree_never_has_fewer_quest_hooks_than_that_npcs_map_zero_tree()
+        {
+            if (!Available) return;
+
+            // NpcDialogueContent.For prefers (npc, thisMap) over (npc, 0). A short "start quest"
+            // stub on the giver's map therefore hides every quest / afterQuest reply of the full
+            // chain tree — Emma (896) and Mega Jug'Onh (2005) both hit that. This check is the
+            // whole class of bug, not those two NPCs alone.
+            var byNpc = Trees().GroupBy(t => t.NpcId);
+            var wrong = new List<string>();
+
+            foreach (var group in byNpc)
+            {
+                var anywhere = group.FirstOrDefault(t => t.MapId == 0);
+                if (anywhere == null) continue;
+
+                int anywhereHooks = QuestHooks(anywhere);
+                foreach (var specific in group.Where(t => t.MapId != 0))
+                {
+                    int hooks = QuestHooks(specific);
+                    if (hooks < anywhereHooks)
+                    {
+                        wrong.Add($"npc {group.Key}@{specific.MapId}: {hooks} quest hooks, but " +
+                                  $"map 0 has {anywhereHooks} — the stub will shadow the chain");
+                    }
+                }
+            }
+
+            Assert.True(wrong.Count == 0, string.Join("\n", wrong));
+        }
+
+        private static int QuestHooks(NpcDialogue tree)
+        {
+            int n = 0;
+            foreach (var line in tree.Lines)
+            {
+                foreach (var choice in line.Choices)
+                {
+                    if (choice.Quest != 0 || choice.StartsQuest != 0) n++;
+                }
+            }
+
+            return n;
+        }
     }
 }
