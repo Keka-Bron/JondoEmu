@@ -5556,6 +5556,27 @@ namespace Jondo.Unity.Server.Handlers
             });
         }
 
+        /// <summary>Absorbs damage with shield points, reports how much was consumed and refreshes the total.</summary>
+        private static async Task<(int Remaining, int ShieldLoss)> AbsorberElGolpeAsync(
+            FightInstance fight, Fighter target, int damage)
+        {
+            int before = target.PuntosDeEscudo;
+            int remaining = target.PasarPorElEscudo(damage);
+            int shieldLoss = before - target.PuntosDeEscudo;
+            if (shieldLoss == 0) return (remaining, 0);
+
+            // The damage event carries shieldLoss for the purple floating number. Keep publishing
+            // characteristic 96 as well so the fighter sheet has the authoritative remaining total.
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(target.Id, Network.FightProtocol.SheetSequence)));
+            await FichaATodosAsync(fight, target.Id,
+                Refresco(target, Managers.EffectEngine.ShieldCharacteristic, fight.RoundNumber));
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), target.Id,
+                    Network.FightProtocol.SheetSequence)));
+            return (remaining, shieldLoss);
+        }
+
         /// <summary>
         /// Whoever is on the aimed cell, on whichever side.
         ///
@@ -5929,7 +5950,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (c.VidaQueSeVa > 0)
                 {
                     int leQuedaba = c.Sobre.CurrentHP;
-                    c.Sobre.TakeDamage(c.Sobre.PasarPorElEscudo(c.VidaQueSeVa));
+                    var absorcion = await AbsorberElGolpeAsync(fight, c.Sobre, c.VidaQueSeVa);
+                    c.Sobre.TakeDamage(absorcion.Remaining);
                     Program.LogDebug($"[Fight] {c.Sobre.Id} loses {c.VidaQueSeVa} life " +
                                      $"({leQuedaba} -> {c.Sobre.CurrentHP}) to effect " +
                                      $"{c.Efecto.EffectId}.");
@@ -7380,10 +7402,13 @@ namespace Jondo.Unity.Server.Handlers
             // THE SHIELD eats the hit before the life, and does not stop it all: what is left over
             // goes on its way. It goes before the clip to the remaining life, because a hit of two
             // hundred against a shield of one hundred and fifty is fifty of life, not two hundred.
+            int escudoPerdido = 0;
             if (!fulmina && target.PuntosDeEscudo > 0)
             {
                 int antesDelEscudo = damage;
-                damage = target.PasarPorElEscudo(damage);
+                var absorcion = await AbsorberElGolpeAsync(fight, target, damage);
+                damage = absorcion.Remaining;
+                escudoPerdido = absorcion.ShieldLoss;
                 Program.LogDebug($"[Fight] {target.Id}'s shield eats " +
                                  $"{antesDelEscudo - damage} of {antesDelEscudo}; " +
                                  $"{target.PuntosDeEscudo} shield left.");
@@ -7460,7 +7485,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId,
-                                                      target.Id, aplicado, elemento, erosionado)));
+                                                       target.Id, aplicado, elemento, erosionado,
+                                                       escudoPerdido)));
             }
 
             // LIFE STEAL. Effects 91 to 95 are not plain damage: they are «water steal», «earth
@@ -7632,7 +7658,8 @@ namespace Jondo.Unity.Server.Handlers
                                                         int efecto, int elemento, Fighter quien, int dano)
         {
             if (quien == null || !quien.IsAlive || dano <= 0) return;
-            if (quien.PuntosDeEscudo > 0) dano = quien.PasarPorElEscudo(dano);
+            var absorcion = await AbsorberElGolpeAsync(fight, quien, dano);
+            dano = absorcion.Remaining;
 
             int aplicado = Math.Min(dano, quien.CurrentHP);
             if (aplicado >= quien.CurrentHP && !quien.Muriendo)
@@ -7647,7 +7674,8 @@ namespace Jondo.Unity.Server.Handlers
             int erosionado = quien.Erosionar(dano, porciento);
             await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, caster, elemento);
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                Network.FightProtocol.BuildDamage(caster.Id, efecto, quien.Id, aplicado, elemento, erosionado)));
+                Network.FightProtocol.BuildDamage(caster.Id, efecto, quien.Id, aplicado, elemento,
+                                                  erosionado, absorcion.ShieldLoss)));
             await RefrescarLaVidaAsync(stream, fight, quien, caster);
             if (quien.IsAlive) return;
 
@@ -7687,7 +7715,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A single collision hit, against a single target.</summary>
-        private static async Task UnEstampadoAsync(NetworkStream stream, FightInstance fight,
+        internal static async Task UnEstampadoAsync(NetworkStream stream, FightInstance fight,
                                                    Fighter quienEmpuja, Fighter quien, int dano,
                                                    bool indirecto = false)
         {
@@ -7725,6 +7753,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            var absorcion = await AbsorberElGolpeAsync(fight, quien, dano);
+            dano = absorcion.Remaining;
+
             // What is announced can never go beyond the life he has left, the same as in a normal
             // hit: above that there is no life to take.
             int aplicado = Math.Min(dano, quien.CurrentHP);
@@ -7746,7 +7777,8 @@ namespace Jondo.Unity.Server.Handlers
             await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, quienEmpuja, -1);
 
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                Network.FightProtocol.BuildPushDamage(quienEmpuja.Id, quien.Id, aplicado, erosionado)));
+                Network.FightProtocol.BuildPushDamage(quienEmpuja.Id, quien.Id, aplicado, erosionado,
+                                                      absorcion.ShieldLoss)));
 
             if (aplicado > 0 && quienEmpuja.TeamId != quien.TeamId) quien.LeHanPegado = true;
 
