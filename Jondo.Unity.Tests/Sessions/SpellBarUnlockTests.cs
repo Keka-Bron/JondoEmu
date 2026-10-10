@@ -60,6 +60,33 @@ namespace Jondo.Unity.Tests.Sessions
             }
         }
 
+        /// <summary>
+        /// A level taken back down takes the bar's level with it -- .level 1000 then .level 200 left
+        /// the Yopuka's at 1000 -- so the next level-up places what it opens.
+        /// </summary>
+        [Fact]
+        public void A_level_taken_down_lowers_the_bar_s_level()
+        {
+            if (!SpellTable.IsLoaded) return;
+            var session = GameSession.SinSocket();
+            using (SessionContext.Push(session))
+            {
+                var at50 = SpellTable.KnownFor(Yopuka, 50).Select(k => k.SpellId).ToList();
+                int slot = 1;
+                foreach (int spell in at50) SpellChoices.PutInBar(slot++, spell);
+                session.State.SpellBarLevel = 1000;
+
+                SpellChoices.PlaceNewlyUnlocked(Yopuka, 50);
+                Assert.Equal(50, SpellChoices.BarLevel);
+                Assert.Equal(at50.Count, SpellChoices.Bar.Count);
+
+                SpellChoices.PlaceNewlyUnlocked(Yopuka, 100);
+                var opened = SpellTable.KnownFor(Yopuka, 100).Select(k => k.SpellId).Except(at50).ToList();
+                Assert.NotEmpty(opened);
+                Assert.All(opened, spell => Assert.Contains(spell, SpellChoices.Bar.Values));
+            }
+        }
+
         /// <summary>An empty bar is filled whole when it is drawn; here it only gets its level.</summary>
         [Fact]
         public void An_empty_bar_only_records_its_level()

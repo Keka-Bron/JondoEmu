@@ -144,6 +144,14 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static void PlaceNewlyUnlocked(int breed, int level)
         {
+            // A level taken back down -- .level 1000 and then .level 200 -- takes the bar's level
+            // with it, or the spells the next level-ups open would never be placed. The spells of
+            // the levels left keep their slots: the bar is not touched.
+            if (level < BarLevel && level > 0)
+            {
+                SaveBarLevel(level);
+                return;
+            }
             if (level <= BarLevel) return;
 
             if (BarStore.Count > 0)
@@ -163,6 +171,12 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
+            SaveBarLevel(level);
+        }
+
+        /// <summary>The level the bar has been given its spells up to, in the session and the base.</summary>
+        private static void SaveBarLevel(int level)
+        {
             SessionContext.State.SpellBarLevel = level;
             Write("INSERT INTO CharacterSpellBarLevel (CharacterId, Level) VALUES ($c, $l) " +
                   "ON CONFLICT(CharacterId) DO UPDATE SET Level = $l;",

@@ -44,6 +44,12 @@ namespace Jondo.Unity.Server.Network
                     try
                     {
                         var client = await _tcpListener.AcceptTcpClientAsync(_cts.Token);
+                        // NAGLE OFF. A cast goes out as a burst of a dozen small frames written in
+                        // five milliseconds -- jto, jwe 300, the sheet, the AP, the blows, jwi --
+                        // and with Nagle on, the first left at once and the rest waited for its ACK,
+                        // which Windows holds back up to 200 ms: the animation and the damage came
+                        // that much after the click, against the bots and the monsters alike.
+                        client.NoDelay = true;
                         _ = HandleGameNodeConnection(client);
                     }
                     catch (Exception ex)

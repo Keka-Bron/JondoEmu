@@ -106,142 +106,144 @@
     }
   },
   "_comentario_colocacion": [
-    "Donde se planta cada vendedor en el mapa 88212759, el del zaap del pueblo de Amakna.",
+    "Where each vendor stands on map 88212759, the Amakna village zaap's.",
     "",
-    "Estaba feo por un motivo concreto: la colocacion se genero para 52 vendedores en bloques",
-    "CONTIGUOS de cinco por familia (129-130-131-132-133, 157-158-159-160-161...), y al juntarlos",
-    "por categoria dejamos de sembrar 29 sin recalcular las casillas. De cada bloque sobrevivia el",
-    "primero y quedaban cuatro huecos seguidos detras.",
+    "Three blocks, each a zigzag over two map rows with a vendor every 86 px across: the equipment",
+    "along the north edge (rows 7 and 9); the mounts and pets across the south square (rows 27 and",
+    "29); the looks, the trophies and the pile of kamas in front of them (rows 31 and 33). The",
+    "longest names go at the ends of their rows, where no other name runs into them.",
     "",
-    "Y de paso el bloque contiguo tampoco era lo que hace Ankama. Medido sobre 396 NPCs de 202",
-    "mapas de las capturas: solo 16 de 512 parejas del mismo mapa son vecinas (3,1 %), la distancia",
-    "tipica al mas cercano es de 2 a 4 casillas, y nunca hay mas de 10 en un mapa (media 1,96).",
+    "The grid before stood them three a row, two rows apart, on cells of the same column, so on",
+    "screen every column was a stack of three, one behind the other, and the tree of the north",
+    "square hid Sombreros and Cinturones whole. Each cell here is checked against the map's own",
+    "drawing: what the client draws in front of an NPC there covers at most 13 % of him (Armas 1 -",
+    "99 at the edge of a crown, 10 %; Arreos at the foot of the tree on the right, 13 %), and two",
+    "vendors overlap only by the 19 px of a head over the feet of the one four rows behind.",
     "",
-    "Aqui van de tres en tres con dos casillas de separacion, agrupados por familia: equipo en la",
-    "plaza norte (filas 9, 11, 13 y 15), monturas y bichos en la sur (21 y 25), apariencias en el",
-    "rincon sur (29 y 31) y el monton de kamas solo, centrado, en la 33. Ni una pareja pegada.",
+    "Ankama does not put NPCs side by side either: over 396 NPCs of 202 maps of the captures only 16",
+    "of 512 pairs on one map are neighbours (3.1 %). Here no two are: the nearest are two cells",
+    "apart.",
     "",
-    "La ORIENTACION tampoco es libre: el juego real solo usa la 1 y la 3 (el 94,9 % entre las dos)",
-    "y las reparte por columna, la 1 en las columnas 0-6 y la 3 en las 7-13. Se respeta.",
+    "ORIENTATION is not free: the real game uses only 1 and 3 (94.9 % between the two) and splits",
+    "them by column, 1 in columns 0-6 and 3 in columns 7-13. Kept.",
     "",
-    "Verificado antes de escribirlo: las 23 casillas son andables, ninguna cae encima de un",
-    "interactivo (el zaap esta en la 196) ni de un grupo de monstruos (312 y 344), y no se repite",
-    "ninguna."
+    "All 23 cells are walkable, none repeats, none is an interactive's (the well on 272, the zaap on",
+    "196) and none is next to the map's two groups of Pios, on 312 and 344."
   ],
   "colocacion": {
-    "5542": {
-      "casilla": 130,
-      "orientacion": 1,
-      "_quien": "Armas 1 - 99"
-    },
-    "5528": {
-      "casilla": 133,
-      "orientacion": 3,
-      "_quien": "Armas 100 - 200"
-    },
-    "5517": {
-      "casilla": 136,
-      "orientacion": 3,
-      "_quien": "Escudos"
-    },
     "5548": {
-      "casilla": 158,
+      "casilla": 100,
       "orientacion": 1,
       "_quien": "Sombreros"
     },
-    "5546": {
-      "casilla": 161,
-      "orientacion": 3,
-      "_quien": "Capas"
-    },
-    "5545": {
-      "casilla": 164,
-      "orientacion": 3,
-      "_quien": "Botas"
+    "5543": {
+      "casilla": 102,
+      "orientacion": 1,
+      "_quien": "Amuletos"
     },
     "5547": {
-      "casilla": 186,
+      "casilla": 104,
       "orientacion": 1,
       "_quien": "Cinturones"
     },
-    "5543": {
-      "casilla": 189,
+    "5517": {
+      "casilla": 106,
       "orientacion": 3,
-      "_quien": "Amuletos"
+      "_quien": "Escudos"
+    },
+    "5528": {
+      "casilla": 108,
+      "orientacion": 3,
+      "_quien": "Armas 100 - 200"
+    },
+    "5546": {
+      "casilla": 129,
+      "orientacion": 1,
+      "_quien": "Capas"
     },
     "5544": {
-      "casilla": 192,
-      "orientacion": 3,
+      "casilla": 131,
+      "orientacion": 1,
       "_quien": "Anillos"
     },
-    "5520": {
-      "casilla": 216,
-      "orientacion": 1,
-      "_quien": "Trofeos"
+    "5545": {
+      "casilla": 133,
+      "orientacion": 3,
+      "_quien": "Botas"
+    },
+    "5542": {
+      "casilla": 135,
+      "orientacion": 3,
+      "_quien": "Armas 1 - 99"
     },
     "7377": {
-      "casilla": 298,
+      "casilla": 382,
       "orientacion": 1,
       "_quien": "Calado Peul"
     },
     "7378": {
-      "casilla": 301,
-      "orientacion": 3,
+      "casilla": 384,
+      "orientacion": 1,
       "_quien": "Ada Babbage"
     },
-    "7374": {
-      "casilla": 304,
-      "orientacion": 3,
-      "_quien": "Gustavo Hifel"
-    },
-    "5549": {
-      "casilla": 354,
-      "orientacion": 1,
-      "_quien": "Ruben Paket Hado"
-    },
     "5550": {
-      "casilla": 357,
+      "casilla": 386,
       "orientacion": 3,
       "_quien": "Alain Bombardas"
     },
+    "7374": {
+      "casilla": 411,
+      "orientacion": 1,
+      "_quien": "Gustavo Hifel"
+    },
     "5551": {
-      "casilla": 360,
+      "casilla": 413,
       "orientacion": 3,
       "_quien": "Stiff Yob"
     },
-    "7562": {
-      "casilla": 410,
-      "orientacion": 1,
-      "_quien": "Roukairol de Nairouze"
+    "5549": {
+      "casilla": 415,
+      "orientacion": 3,
+      "_quien": "Ruben Paket Hado"
     },
     "7565": {
-      "casilla": 413,
-      "orientacion": 3,
+      "casilla": 438,
+      "orientacion": 1,
       "_quien": "Yaimes Kooc"
     },
-    "7564": {
-      "casilla": 416,
-      "orientacion": 3,
-      "_quien": "Mago Llanes"
-    },
     "7563": {
-      "casilla": 439,
+      "casilla": 440,
       "orientacion": 1,
       "_quien": "Ness Ogal"
     },
+    "5520": {
+      "casilla": 442,
+      "orientacion": 3,
+      "_quien": "Trofeos"
+    },
     "7566": {
-      "casilla": 441,
+      "casilla": 444,
       "orientacion": 3,
       "_quien": "Krisadam"
     },
+    "7562": {
+      "casilla": 465,
+      "orientacion": 1,
+      "_quien": "Roukairol de Nairouze"
+    },
+    "7564": {
+      "casilla": 467,
+      "orientacion": 1,
+      "_quien": "Mago Llanes"
+    },
     "7574": {
-      "casilla": 443,
+      "casilla": 469,
       "orientacion": 3,
       "_quien": "Stayfun Bonnawa"
     },
     "7025": {
-      "casilla": 468,
-      "orientacion": 1,
+      "casilla": 471,
+      "orientacion": 3,
       "_quien": "Monton de kamas"
     }
   }

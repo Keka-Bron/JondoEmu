@@ -226,16 +226,18 @@ namespace JondoFix
             scroll.style.paddingRight = new StyleLength(28f);
             scroll.style.paddingTop = new StyleLength(20f);
             string[] paragraphs = Rules.TryGetValue(Language, out var own) ? own : Rules["en"];
-            foreach (string paragraph in paragraphs)
-            {
-                var label = new DofusLabel();
-                label.text = paragraph;
-                label.AddToClassList("textShort_largeRegular");
-                label.AddToClassList("textColor_white_white100");
-                label.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.Normal);
-                label.style.marginBottom = new StyleLength(14f);
-                scroll.Add(label);
-            }
+            // ONE label, the paragraphs a blank line apart. One label each, every paragraph was
+            // laid out a line or two shorter than it was drawn -- with the one-line class
+            // textShort_largeRegular and with the client's own paragraph class, textLong_largeRegular,
+            // alike -- and the next one went down over its last lines. The lines of one text are
+            // laid out together and cannot cross.
+            var label = new DofusLabel();
+            label.text = string.Join("\n\n", paragraphs);
+            label.AddToClassList("textLong_largeRegular");
+            label.AddToClassList("textColor_white_white100");
+            label.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.Normal);
+            label.style.flexShrink = new StyleFloat(0f);
+            scroll.Add(label);
             window.Add(scroll);
 
             var footer = new VisualElement();

@@ -48,6 +48,7 @@ namespace Jondo.Unity.Server.Network
                     try
                     {
                         var client = await _tcpListener.AcceptTcpClientAsync(_cts.Token);
+                        client.NoDelay = true;   // see GameNodeProxy: no frame waits on an ACK
                         _ = HandleGameClient(client);
                     }
                     catch (Exception ex)

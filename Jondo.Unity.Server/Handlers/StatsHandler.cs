@@ -235,7 +235,11 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>Stats whose values are computed from the database/GameState;
         /// every other entry uses the official defaults below.</summary>
-        private static readonly HashSet<int> DynamicStatIds = new HashSet<int> { 10, 11, 12, 13, 14, 15, 17, 18, 44 };
+        private static readonly HashSet<int> DynamicStatIds = new HashSet<int>
+        {
+            10, 11, 12, 13, 14, 15, 17, 18, 44,
+            120, 121, 122, 123, 124, 125, 141, 142,
+        };
 
         /// <summary>
         /// Default stat entries reproduced verbatim from the official level-2 kri:
@@ -339,6 +343,12 @@ namespace Jondo.Unity.Server.Handlers
                 larMsg.Fields.Add(CreateStatField(18, 0,                          GetEquipBonus(18))); // Critical
 
                 larMsg.Fields.Add(CreateStatField(44, IniciativaInvertida(), IniciativaDelEquipo())); // Initiative
+
+                // The damage percentages, base 100 and the gear beside it: "100 % daños a los
+                // hechizos" on a cape is 123 at 100 + 100, which the window draws as 100 %. They
+                // went out at their bare base, so the window drew 0 % whatever was worn.
+                foreach (int percentage in Managers.DamagePercentages.All)
+                    larMsg.Fields.Add(CreateStatField(percentage, 100, GetEquipBonus(percentage)));
 
                 var kriMsg = new ProtoMessage();
                 kriMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = larMsg.ToByteArray() });

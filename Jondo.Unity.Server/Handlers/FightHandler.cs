@@ -1145,6 +1145,13 @@ namespace Jondo.Unity.Server.Handlers
             return (baseDelPersonaje, delEquipo, ficha.Buffs.De(caracteristica, ronda));
         }
 
+        /// <summary>
+        /// One of a fighter's damage percentages as the blow reads it: the base of 100, what his
+        /// gear moves it by and what his states do (DamagePercentages). Never below zero.
+        /// </summary>
+        private static int PercentageOf(Fighter fighter, int characteristic, int round)
+            => Math.Max(0, 100 + ConBonos(fighter, characteristic, fighter.Otra(characteristic), round));
+
         private static int ConBonos(Fighter quien, int caracteristica, int loQueYaTiene, int ronda)
         {
             if (caracteristica <= 0) return loQueYaTiene;
@@ -1375,6 +1382,8 @@ namespace Jondo.Unity.Server.Handlers
             // showed 130 in the resistance column.
             Poner(84, 0);
             Poner(85, 0);
+            // The damage percentages, as the gear moves their base of 100 (DamagePercentages).
+            foreach (int percentage in Managers.DamagePercentages.All) Poner(percentage, 0);
         }
 
         /// <summary>
@@ -1481,7 +1490,8 @@ namespace Jondo.Unity.Server.Handlers
                 (102, 0, fighter.Otra(102)),
             };
 
-            foreach (int cual in Multiplicadores) ficha.Add((cual, 100, 0));
+            // At a hundred, and the eight damage percentages with what the gear moves them by.
+            foreach (int cual in Multiplicadores) ficha.Add((cual, 100, fighter.Otra(cual)));
 
             // TRACE of the sheet: it is WHAT THE CLIENT SEES to work out its damage preview. If
             // power, damages and elementals come out there with their right numbers and the preview
@@ -7286,6 +7296,28 @@ namespace Jondo.Unity.Server.Handlers
                                  $"{finalInfligido}%: {antes} is left at {damage}.");
             }
 
+            // The damage percentages: the striker's for a spell's or a weapon's blow and for one
+            // at melee or at range, then the target's the same two ways (DamagePercentages). They
+            // were sent to the client and never read here, so "100 % daños a los hechizos" on a
+            // cape changed nothing. Two multipliers more, each on top of the others: INFERRED, as
+            // no capture holds the same blow with and without them.
+            if (damage > 0 && !fulmina)
+            {
+                bool bySpell = spell != 0, atMelee = lejos <= 1;
+                var dealt = Managers.DamagePercentages.Dealt(bySpell, atMelee);
+                var taken = Managers.DamagePercentages.Taken(bySpell, atMelee);
+                long outgoing = (long)PercentageOf(fuente, dealt.Kind, fight.RoundNumber) * PercentageOf(fuente, dealt.Reach, fight.RoundNumber);
+                long incoming = (long)PercentageOf(target, taken.Kind, fight.RoundNumber) * PercentageOf(target, taken.Reach, fight.RoundNumber);
+                if (outgoing != 100 * 100 || incoming != 100 * 100)
+                {
+                    int before = damage;
+                    damage = (int)Math.Max(0, Math.Round(damage * (outgoing / 10000.0) * (incoming / 10000.0)));
+                    Program.LogDebug($"[Fight] {(bySpell ? "Spell" : "Weapon")} blow at {(atMelee ? "melee" : "range")}: " +
+                                     $"{caster.Id} deals {outgoing / 100.0:0.##}% and {target.Id} takes {incoming / 100.0:0.##}%: " +
+                                     $"{before} becomes {damage}.");
+                }
+            }
+
             // Through portals, the blow grows with the network it crossed: "+#3% daños, +#1% de
             // daños por casilla que separe entre 2 portales" (PortalNetwork.BonusPercent).
             // INFERRED as one more final multiplier: no capture holds the same blow both ways.
@@ -8230,6 +8262,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var fallen = fight.Rojo.LastOrDefault();
             int joined = 0;
+            long author = 0;
             foreach (var member in group.Members)
             {
                 int cell = fight.RedPlacementCells.Where(c => !Occupied(fight, c)).DefaultIfEmpty(-1).First();
@@ -8241,11 +8274,26 @@ namespace Jondo.Unity.Server.Handlers
                 fight.Join(monster);
                 joined++;
 
+                // INSIDE A SEQUENCE OF ITS OWN, as every one of the 663 summons of the captures
+                // comes. The wave went out bare, behind the closed sequence of the blow that ended
+                // the last one, and the client put the new monsters in the turns and drew none.
+                if (author == 0)
+                {
+                    author = fallen?.Id ?? monster.Id;
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
+                        Network.FightProtocol.BuildSequenceStart(author, Network.FightProtocol.ActionSequence)));
+                }
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildSummon(
-                        fallen?.Id ?? monster.Id, monster.Id, cell, FacingOf(fight, monster),
+                        author, monster.Id, cell, FacingOf(fight, monster),
                         monster.MonsterId, monster.MonsterId, monster.GradeIndex + 1, FullSheetOf(monster),
-                        Network.FightProtocol.Invoca)));
+                        Network.FightProtocol.Invoca, summoned: false)));
+            }
+            if (author != 0)
+            {
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author,
+                                                           Network.FightProtocol.ActionSequence)));
             }
             if (joined == 0) return false;
 

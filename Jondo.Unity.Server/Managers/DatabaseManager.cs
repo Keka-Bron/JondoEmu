@@ -4171,7 +4171,11 @@ namespace Jondo.Unity.Server
 
                     string description = rd.IsDBNull(3) ? "" : rd.GetString(3);
                     int sign = description.TrimStart().StartsWith("-") ? -1 : 1;
-                    meta[rd.GetInt32(0)] = (rd.GetInt32(1), sign);
+                    int characteristic = rd.GetInt32(1);
+                    // A resistance in percent to spells, weapons, melee or range LOWERS the
+                    // multiplier the fighter takes damage by (DamagePercentages).
+                    if (Managers.DamagePercentages.IsTaken(characteristic)) sign = -sign;
+                    meta[rd.GetInt32(0)] = (characteristic, sign);
                 }
             }
             catch (Exception ex)

@@ -998,6 +998,10 @@ namespace Jondo.Unity.Server.Managers
             82 or 83 => 1,             // AP and MP withdrawal
             96 => 0.8,                 // shield points
             >= 33 and <= 37 => 3,      // resistance in percent: a point off every blow taken
+            // The damage percentages, a point on every blow dealt; and the ones taken, which a
+            // resistance lowers (DamagePercentages), a point on every blow taken.
+            120 or 122 or 123 or 125 => 3,
+            121 or 124 or 141 or 142 => -3,
             44 => 0.02,                // initiative
             0 or 97 => 0,              // life and its loss go by the blows and heals
             71 => 0,                   // a state: what it does is in the rows that read it

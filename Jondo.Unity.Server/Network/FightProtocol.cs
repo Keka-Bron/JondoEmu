@@ -1613,15 +1613,20 @@ namespace Jondo.Unity.Server.Network
         /// The effect that summoned it, which is the f14: 181 for an ordinary summon, 1008 for
         /// a bomb, 1011 for one the owner plays. Every summon went out as 181 until now.
         /// </param>
+        /// <param name="summoned">
+        /// False for a monster that comes on with nobody's summon to it -- a dream's next wave --:
+        /// its sheet then goes as any fighter's (<see cref="FighterBlock"/>), with no summoner and
+        /// no summoned mark. With them it was the summon of the last of the wave before, already
+        /// dead, and the client listed the wave in the turns but drew none of it.
+        /// </param>
         public static byte[] BuildSummon(long quienInvoca, long quienEs, int celda, int orientacion,
                                          int plantillaDelAspecto, int plantillaDelBicho, int grado,
                                          IEnumerable<(int Characteristic, long Base, long Gear)> ficha,
-                                         int efecto = Invoca)
+                                         int efecto = Invoca, bool summoned = true)
         {
-            var stats = Pb.New()
-                .Var(1, quienInvoca)
-                .Var(3, SheetKind)
-                .Var(4, 1);
+            var stats = summoned
+                ? Pb.New().Var(1, quienInvoca).Var(3, SheetKind).Var(4, 1)
+                : Pb.New().Var(3, SheetKind);
             foreach (var (caracteristica, valor, equipo) in ficha)
             {
                 stats.Msg(5, SheetEntry(caracteristica, valor, equipo, isMonster: true));
