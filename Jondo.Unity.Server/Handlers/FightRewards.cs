@@ -44,6 +44,9 @@ namespace Jondo.Unity.Server.Handlers
             public long Xp { get; set; }
             public long Kamas { get; set; }
             public Dictionary<int, int> Loot { get; set; } = new();
+
+            /// <summary>The perfect pieces of the random loot inside <see cref="Loot"/>, with their exo.</summary>
+            public List<RandomLoot.Drop> Perfect { get; set; } = new();
         }
 
         /// <summary>The group bonus to experience, by how many players count for it.</summary>
@@ -119,8 +122,10 @@ namespace Jondo.Unity.Server.Handlers
 
             var paying = fight.Rojo.Where(m => m.IsMonster && !m.EsInvocado).ToList();
             int extra = ChallengeWatcher.EndBonus(fight, won: true);
-            long xpAlone = ConElExtra(paying.Sum(m => (long)m.XpReward), extra);
-            long kamasAlone = ConElExtra(paying.Sum(m => 10L + (m.Level * 5L)), extra);
+            long xpAlone = ServerSettings.WithBonus(ConElExtra(paying.Sum(m => (long)m.XpReward), extra),
+                                                    ServerSettings.Current.ExperienceBonusPercent);
+            long kamasAlone = ServerSettings.WithBonus(ConElExtra(paying.Sum(m => 10L + (m.Level * 5L)), extra),
+                                                       ServerSettings.Current.KamasBonusPercent);
             int strongest = paying.Count == 0 ? 1 : paying.Max(m => m.Level);
             bool shared = !Dreams.IsDreamMap(fight.RoleplayMapId);
 
@@ -132,15 +137,19 @@ namespace Jondo.Unity.Server.Handlers
             {
                 var (fighter, session) = winners[i];
                 Dictionary<int, int> loot;
+                var perfect = new List<RandomLoot.Drop>();
                 if (dream != null) loot = DreamLootOf(fight, dream);
-                else using (SessionContext.Push(session)) loot = RollLoot(fight, extra);
+                else using (SessionContext.Push(session)) loot = RollLoot(fight, extra, perfect);
                 plan[fighter.Id] = new Reward
                 {
                     Xp = shared ? XpShare(xpAlone, levels[i], levels, strongest) : xpAlone,
                     Kamas = dream != null ? 0 : shared ? KamasShare(kamasAlone, prospectings[i], prospectings) : kamasAlone,
                     Loot = loot,
+                    Perfect = perfect,
                 };
             }
+            // A Gigalodón fight's salt goes into the raid's pool, the same amount for every winner.
+            if (dream == null) GuildRaidManager.ShareFightSalt(fight.FightId, plan.ToDictionary(p => p.Key, p => p.Value.Loot));
             _rewards[fight.FightId] = plan;
 
             if (dream != null)

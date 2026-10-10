@@ -28,12 +28,11 @@ namespace Jondo.Unity.Server.Managers
         /// Works out where each raid's chest goes.
         /// </summary>
         /// <remarks>
-        /// NOT MEASURED, like everything else about where things stand in a raid. The rule is the
-        /// far end of the descent: the LAST floor of the raid, its lowest map by number, and the
-        /// walkable cell nearest the middle. For the Abyss that is the Fosombrío de Willorca, the
-        /// sixth floor -- the one with no light of its own, which is the data's way of saying it is
-        /// not a floor you light, it is the one you end on -- and for the Sanctuary the Castillo
-        /// del santuario. One line to change the day somebody measures it.
+        /// NOT MEASURED, like everything else about where things stand in a raid. The Abyss's is in
+        /// its outpost, where the raid comes in: the guides have the treasures "deposited in the
+        /// outpost chest" and the Gigalodón coming out "from the chest". Any other raid's, at the far
+        /// end of it: the LAST floor, its lowest map by number -- for the Sanctuary, the Castillo del
+        /// santuario. The walkable cell nearest the middle, beside the floor's machine if it is there.
         /// </remarks>
         public static void Place()
         {
@@ -42,13 +41,20 @@ namespace Jondo.Unity.Server.Managers
             foreach (var kind in Raids.All)
             {
                 if (kind.Floors.Count == 0) continue;
-                int subArea = kind.Floors[^1];
+                long mapId = kind.ChestAtEntry ? GuildRaidManager.EntryMapOf(kind) : 0;
+                if (mapId == 0)
+                {
+                    var maps = DatabaseManager.MapsOfSubArea(kind.Floors[^1]);
+                    if (maps.Count == 0) continue;
+                    mapId = maps.Min();
+                }
+                int subArea = DatabaseManager.SubAreaOfMap(mapId);
 
-                var maps = DatabaseManager.MapsOfSubArea(subArea);
-                if (maps.Count == 0) continue;
-
-                long mapId = maps.Min();
+                // Near the middle, and not on the floor's machine when it stands on the same map.
+                var machineCells = Luminomachines.Placed.Where(m => m.MapId == mapId).Select(m => m.Cell).ToHashSet();
                 int cell = MapManager.GetNearestWalkableCell(mapId, Handlers.TeleportHandler.MapCentre);
+                for (int step = 2; machineCells.Contains(cell) && step < 60; step += 2)
+                    cell = MapManager.GetNearestWalkableCell(mapId, Handlers.TeleportHandler.MapCentre + step);
                 _placed.Add(new Placement(kind.Id, subArea, mapId, cell));
             }
 

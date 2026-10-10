@@ -510,10 +510,12 @@ namespace Jondo.Unity.Server.Handlers
         /// uses have to come from THE SAME place. The fight put them at 6 and 3 flat, so a character with
         /// +4 AP and +2 MP from equipment saw 10 and 5 on screen and fought with 6 and 3.
         /// </summary>
-        public static int GetPlayerMaxAp() => PlayerInnateAp() + GetEquipBonus(1);
+        public static int GetPlayerMaxAp()
+            => ServerSettings.Capped(PlayerInnateAp() + GetEquipBonus(1), ServerSettings.Current.MaxActionPoints);
 
         /// <summary>The character's movement points, base plus equipment (characteristic 23).</summary>
-        public static int GetPlayerMaxMp() => PlayerBaseMp + GetEquipBonus(23);
+        public static int GetPlayerMaxMp()
+            => ServerSettings.Capped(PlayerBaseMp + GetEquipBonus(23), ServerSettings.Current.MaxMovementPoints);
 
         /// <summary>The character's four elementals, points and scrolls, which is what initiative counts.</summary>
         public static int IniciativaInvertida()

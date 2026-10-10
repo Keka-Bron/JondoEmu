@@ -1086,14 +1086,19 @@ namespace Jondo.Unity.Server.Managers
             bool suyo = quien.TeamId == desde.TeamId;
             bool esInvocado = quien.EsInvocado, esMonstruo = quien.IsMonster && !esInvocado, esJugador = !quien.IsMonster && !esInvocado;
             bool hayLado = false, loNombra = false;
-            foreach (var trozo in (mascara ?? "").Split(','))
+            var trozos = (mascara ?? "").Split(',').Select(t => t.Trim()).ToList();
+
+            // A scene's sides are Def and Atq; its "a" and "A" name nobody (see AQuien).
+            bool deEscena = trozos.Contains("Def") || trozos.Contains("Atq");
+            foreach (var t in trozos)
             {
-                string t = trozo.Trim();
                 if (t.Length == 0) continue;
                 bool? lado = t switch
                 {
-                    "a" => suyo,
-                    "A" => !suyo,
+                    "a" => deEscena ? null : suyo,
+                    "A" => deEscena ? null : !suyo,
+                    "Def" => quien.TeamId == FightInstance.Rojos,
+                    "Atq" => quien.TeamId == FightInstance.Azules,
                     "g" => suyo && quien != desde,
                     "c" or "C" => quien == desde,
                     "i" or "j" or "d" => esInvocado && suyo,
@@ -2951,6 +2956,7 @@ namespace Jondo.Unity.Server.Managers
             bool withShield = false, withoutShield = false;
             bool throughPortal = false, notThroughPortal = false;
             bool theCarried = false, theAttackerInTheZone = false;
+            bool theScene = false, theDefenders = false, theAttackers = false;
 
             foreach (var trozo in mascara.Split(','))
             {
@@ -2961,6 +2967,15 @@ namespace Jondo.Unity.Server.Managers
                 // judged apart, in CasterQualifies.
                 if (t[0] == '*') continue;
                 if (t == "C") { alLanzador = true; continue; }
+
+                // Sce, Def, Atq: the letters of the fights scripted from their SCENE, a carrier of
+                // neither side (FightInstance.SceneStandIn). Sce is the scene, wherever the zone
+                // looks, like C; Def and Atq are the defenders' and the attackers' sides. The
+                // Santuario's Vigilante watches "EK:Def,A,F8285" and frees itself on "Def,A,F8318";
+                // its "Atq,A" ends the fight for the players and "a,A,Atq,Def" is everybody.
+                if (t == "Sce") { theScene = true; continue; }
+                if (t == "Def") { theDefenders = true; continue; }
+                if (t == "Atq") { theAttackers = true; continue; }
 
                 // PB / pb: the target holds shield points, or holds none. Flecha Percutiente
                 // writes its two dice so -- 31-34 on "A,pb", 35-39 on "A,PB" -- and its sheet
@@ -3173,6 +3188,10 @@ namespace Jondo.Unity.Server.Managers
             // Against the same snapshot as the targets' states: Pinzas carries the pick-up and
             // the throw in one grade, "*e3" and "*E3", and judged live the throw would fire in
             // the very cast that picked the bomb up.
+            // A scene's "a" and "A" are read against a carrier of neither side: with Def or Atq
+            // there, the side letters are those, and "a" and "A" add nobody.
+            if (theDefenders || theAttackers) aLosMios = aLosDeEnfrente = false;
+
             if (!CasterQualifies(quienLanza, mascara, estados)) yield break;
             if (soloLoInvocado && !soloAlObjetivo) yield break;
             if (throughPortal && !combate.CastThroughPortal) yield break;
@@ -3199,6 +3218,7 @@ namespace Jondo.Unity.Server.Managers
                 aLosMios = aLosDeEnfrente = aLosOtrosAliados = alLanzador = alInvocador = false;
                 alLanzadorEnLaZona = aInvocacionesAliadas = aInvocacionesEnemigas = false;
                 aJugadoresAliados = aJugadoresEnemigos = aMonstruosAliados = aMonstruosEnemigos = false;
+                theScene = theDefenders = theAttackers = false;
             }
 
             // An ARMED row going off: it is the bearer's -- or, with an O, the one who set it
@@ -3210,6 +3230,7 @@ namespace Jondo.Unity.Server.Managers
                 aLosMios = aLosDeEnfrente = aLosOtrosAliados = alLanzador = alInvocador = alAtacante = false;
                 alLanzadorEnLaZona = aInvocacionesAliadas = aInvocacionesEnemigas = false;
                 aJugadoresAliados = aJugadoresEnemigos = aMonstruosAliados = aMonstruosEnemigos = false;
+                theScene = theDefenders = theAttackers = false;
             }
 
             // With an O the candidate is the attacker and nobody else; without an attacker at
@@ -3231,6 +3252,7 @@ namespace Jondo.Unity.Server.Managers
                 aLosMios = aLosDeEnfrente = aLosOtrosAliados = alLanzador = alInvocador = false;
                 alLanzadorEnLaZona = aInvocacionesAliadas = aInvocacionesEnemigas = false;
                 aJugadoresAliados = aJugadoresEnemigos = aMonstruosAliados = aMonstruosEnemigos = false;
+                theScene = theDefenders = theAttackers = false;
             }
 
             // Whether one of the kind letters names this fighter, on his side.
@@ -3259,7 +3281,11 @@ namespace Jondo.Unity.Server.Managers
                 if (invocador != null && invocador.IsAlive && !candidatos.Contains(invocador)) candidatos.Add(invocador);
             }
 
-            if (!soloAlObjetivo && (aLosMios || aLosDeEnfrente || aLosOtrosAliados || algunaClase))
+            if (theScene && combate.SceneStandIn is { IsAlive: true } escena && !candidatos.Contains(escena))
+                candidatos.Add(escena);
+
+            if (!soloAlObjetivo && (aLosMios || aLosDeEnfrente || aLosOtrosAliados || algunaClase
+                                    || theDefenders || theAttackers))
             {
                 // The zone: the effect says in what SHAPE it takes the ground around the aimed cell --
                 // a point, a circle of radius two, a cross -- and it reaches everybody standing on it
@@ -3281,6 +3307,8 @@ namespace Jondo.Unity.Server.Managers
                     bool leToca = (aLosMios && suyo)
                                || (aLosDeEnfrente && !suyo)
                                || (aLosOtrosAliados && suyo && quien != quienLanza)
+                               || (theDefenders && quien.TeamId == FightInstance.Rojos)
+                               || (theAttackers && quien.TeamId == FightInstance.Azules)
                                || EsDeLaClase(quien, suyo);
                     if (!leToca) continue;
 
@@ -4014,7 +4042,8 @@ namespace Jondo.Unity.Server.Managers
             }
 
             if (efecto.EffectId == EffectSupport.VitalityPercentMalus
-                || efecto.EffectId == EffectSupport.VitalityPercentBonus)
+                || efecto.EffectId == EffectSupport.VitalityPercentBonus
+                || efecto.EffectId == EffectSupport.VitalityPercentBoost)
             {
                 int porciento = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (porciento <= 0) return null;
@@ -4033,6 +4062,7 @@ namespace Jondo.Unity.Server.Managers
                 if (efecto.EffectId == EffectSupport.VitalityPercentMalus) puntos = -puntos;
 
                 sobre.MaxHP = Math.Max(1, sobre.MaxHP + puntos);
+                if (efecto.EffectId == EffectSupport.VitalityPercentBoost) sobre.CurrentHP += puntos;
                 if (sobre.CurrentHP > sobre.MaxHP) sobre.CurrentHP = sobre.MaxHP;
 
                 int comoSePinta = puntos < 0 ? EffectSupport.VitalityFlatMalus : EffectSupport.VitalityFlatBonus;
@@ -4315,6 +4345,9 @@ namespace Jondo.Unity.Server.Managers
                 // "Casts the die's spell at the side's grade". It is the attitudes' hook: Amarillo
                 // Ocre's grade 1 does nothing by itself, it only says when to cast its grades 2 and 3.
                 if (efecto.DiceNum <= 0) return null;
+                // A few spells list every candidate and the server picks one (ChosenCasts).
+                if ((efecto.EffectId == LanzarHechizo || efecto.EffectId == DispararHechizo)
+                    && !ChosenCasts.Allows(combate, hechizo, efecto.DiceNum)) return null;
                 return new Outcome
                 {
                     Sobre = sobre,

@@ -5421,6 +5421,17 @@ namespace Jondo.Unity.Server
             return tocados;
         }
 
+        /// <summary>
+        /// A worn item into the bag as a piece of its own, with the effects given: it never stacks,
+        /// because two pieces of the same hat roll differently.
+        /// </summary>
+        public static PlayerItem AddPieceToInventory(long characterId, int gid, string effects)
+        {
+            long uid = NextItemUid();
+            if (!InsertCharacterItem(uid, characterId, gid, 1, 63, effects)) return null;
+            return new PlayerItem { Uid = uid, ItemId = gid, Quantity = 1, Position = 63, RawEffects = effects };
+        }
+
         public static PlayerItem AddItemToInventory(long characterId, int itemGid, int quantity)
         {
             var inventory = LoadInventory(characterId);

@@ -41,6 +41,12 @@ namespace Jondo.Unity.World.Content
         /// <summary>What feeds it: "Sal de las profundidades", a raid resource (item type 315).</summary>
         public const int SaltItem = 32464;
 
+        /// <summary>
+        /// The Gigalodón raid's variable 1 in the client's data, "Sel des profondeurs": the salt, as
+        /// the raid's tracking panel counts it.
+        /// </summary>
+        public const int SaltVariable = 1;
+
         /// <summary>The brightest a floor gets: the fourth band, the one the replies call "última".</summary>
         public const int MostLight = 4;
 

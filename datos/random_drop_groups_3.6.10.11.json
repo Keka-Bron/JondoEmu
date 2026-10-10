@@ -1,0 +1,6305 @@
+{
+ "version": "3.6.10.11",
+ "groups": [
+  {
+   "id": 42,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 15551,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 43,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 15478,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 90,
+     "maxQuantity": 90
+    }
+   ]
+  },
+  {
+   "id": 44,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 15485,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 840,
+     "maxQuantity": 840
+    }
+   ]
+  },
+  {
+   "id": 48,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 15541,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 540,
+     "maxQuantity": 540
+    }
+   ]
+  },
+  {
+   "id": 59,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 60,
+     "maxQuantity": 60
+    },
+    {
+     "itemId": 15793,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 63,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 540,
+     "maxQuantity": 540
+    },
+    {
+     "itemId": 16010,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 64,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    },
+    {
+     "itemId": 16008,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 65,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 180,
+     "maxQuantity": 180
+    },
+    {
+     "itemId": 16009,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 66,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    },
+    {
+     "itemId": 17118,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 67,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    },
+    {
+     "itemId": 17117,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 68,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 840,
+     "maxQuantity": 840
+    },
+    {
+     "itemId": 17116,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 69,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 720,
+     "maxQuantity": 720
+    },
+    {
+     "itemId": 17115,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 70,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 660,
+     "maxQuantity": 660
+    },
+    {
+     "itemId": 17114,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 71,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    },
+    {
+     "itemId": 17641,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 72,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    },
+    {
+     "itemId": 32256,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 109,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 24979,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24980,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24981,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24982,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24983,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24984,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 110,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 289,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2018,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 111,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 400,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2032,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 112,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 533,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2036,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 113,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 401,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2021,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 114,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 423,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2026,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 115,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 421,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16378,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 116,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 428,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16379,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 117,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 395,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16380,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 118,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 380,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16381,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 119,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 593,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16382,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 120,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1782,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1790,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 121,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 598,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1786,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 122,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1844,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1846,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 123,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1757,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1759,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 124,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 603,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1762,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 125,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1750,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1754,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 126,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1794,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1796,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 127,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1805,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1807,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 128,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1847,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1849,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 129,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 600,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1799,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 130,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 303,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16909,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 131,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 473,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16910,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 132,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 476,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16911,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 133,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 460,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16912,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 134,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 2358,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16913,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 135,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 471,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16914,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 136,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 2357,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16915,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 137,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 312,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 312,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 138,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 441,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 441,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 139,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 442,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 442,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 140,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 443,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 443,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 141,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 445,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 445,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 142,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 24601,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24726,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24734,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24752,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24753,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24754,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24755,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24778,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24785,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24787,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24789,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24799,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24801,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24807,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 24808,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 143,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 532,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2029,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 144,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7018,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16452,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 145,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 405,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16453,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 146,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 425,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2035,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 147,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16454,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16455,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 148,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16456,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16457,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 149,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11109,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 11499,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 150,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16383,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 594,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 151,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16384,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 7059,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 152,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16386,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 16385,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 153,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16388,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 16387,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 154,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16390,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 16389,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 155,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11501,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 11102,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 156,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16461,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16462,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 157,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16463,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16464,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 158,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1801,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1803,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 159,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1784,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1788,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 160,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16465,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16466,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 161,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 602,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1853,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 162,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1779,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1792,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 163,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16467,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16468,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 164,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16469,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16470,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 165,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16471,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16472,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 166,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11106,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 11500,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 167,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 461,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16916,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 168,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7013,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16917,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 169,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 474,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16918,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 170,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16488,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16919,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 171,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 449,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16920,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 172,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7925,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16921,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 173,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 472,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16922,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 174,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7016,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16923,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 175,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 470,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16924,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 176,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7014,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16925,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 177,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11107,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16926,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 178,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7032,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 7032,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 179,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 444,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 444,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 180,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 350,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 350,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 181,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 446,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 446,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 182,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 313,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 313,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 183,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7033,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 7033,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 184,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11110,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 11110,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 185,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17995,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17995,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 186,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23902,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 23902,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 187,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23903,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 23903,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 188,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23825,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 23825,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 189,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23824,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    },
+    {
+     "itemId": 23824,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 190,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16663,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17421,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 191,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17421,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17123,
+     "weight": 49.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17124,
+     "weight": 49.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17125,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 193,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17126,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17127,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 194,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17128,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17129,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 195,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17130,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17131,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 196,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17132,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17133,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 197,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17134,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17135,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 198,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17136,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17137,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 199,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17138,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17139,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 200,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17140,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17141,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 201,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17142,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17143,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 202,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17144,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17145,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 203,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17146,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17147,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 204,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17148,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17149,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 205,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17150,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17151,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 206,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17152,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17153,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 207,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17154,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17155,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 208,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17156,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17157,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 209,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17158,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17159,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 210,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17160,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17161,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 229,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 27008,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27009,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27010,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27011,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27012,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27013,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30124,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30125,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30123,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 230,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 26994,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 26995,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 26996,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 26997,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 26998,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 26999,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 231,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 27000,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27001,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27002,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27003,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27004,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27005,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27006,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27007,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30122,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30126,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 232,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 27014,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27015,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27016,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27017,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27018,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27019,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 27020,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 253,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 27375,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 254,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 27621,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 27621,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 316,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 21517,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30113,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 21488,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30168,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30226,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 322,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 30203,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30205,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30206,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30208,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 323,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 29466,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 29467,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 29465,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 29472,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30236,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30237,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 324,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 303,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16909,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 325,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 473,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16910,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 326,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 476,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16911,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 327,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 460,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16912,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 328,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 2358,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16913,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 329,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 471,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16914,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 330,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 2357,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16915,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 331,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 27375,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 332,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 461,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16916,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 333,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7013,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16917,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 334,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 474,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16918,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 335,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16488,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16919,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 336,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 449,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16920,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 337,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7925,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16921,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 338,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 472,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16922,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 339,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7016,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16923,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 340,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 470,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16924,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 341,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7014,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16925,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 342,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11107,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16926,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 343,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17991,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17991,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 344,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 312,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 312,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 345,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 441,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 441,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 346,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 442,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 442,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 347,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 443,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 443,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 348,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 445,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 445,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 349,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 444,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 444,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 350,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7032,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 7032,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 351,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 350,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 350,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 352,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 446,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 446,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 353,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 313,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 313,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 354,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7033,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 7033,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 355,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 27621,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 27621,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 356,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11110,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 11110,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 357,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17995,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17995,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 358,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23902,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 23902,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 359,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23903,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 23903,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 360,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 421,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16378,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 361,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 428,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16379,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 362,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 395,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16380,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 363,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 380,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16381,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 364,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 593,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16382,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 365,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16383,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 594,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 366,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16384,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 7059,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 367,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16386,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 16385,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 368,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16388,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 16387,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 369,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16390,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 16389,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 370,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11501,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 11102,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 371,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17992,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17992,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 372,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23824,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    },
+    {
+     "itemId": 23824,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    }
+   ]
+  },
+  {
+   "id": 373,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 289,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2018,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 374,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 400,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2032,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 375,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 533,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2036,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 376,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 401,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2021,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 377,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 423,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2026,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 378,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 532,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2029,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 379,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 7018,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16452,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 380,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 405,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16453,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 381,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 425,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 2035,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 382,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16454,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16455,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 383,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16456,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16457,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 384,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11109,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 11499,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 385,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17993,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17993,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 386,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1782,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1790,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 387,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 598,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1786,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 388,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1844,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1846,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 389,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1757,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1759,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 390,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 603,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1762,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 391,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1750,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1754,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 392,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1794,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1796,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 393,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1805,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1807,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 394,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1847,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1849,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 395,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 600,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1799,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 396,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16461,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16462,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 397,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16463,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16464,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 398,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1801,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1803,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 399,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1784,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1788,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 400,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16465,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16466,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 401,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 602,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1853,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 402,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 1779,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 1792,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 403,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16467,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16468,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 404,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16469,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16470,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 405,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16471,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 16472,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 406,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 11106,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 11500,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 407,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17994,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17994,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 408,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 23825,
+     "weight": 90.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 23825,
+     "weight": 10.0,
+     "minQuantity": 20,
+     "maxQuantity": 20
+    }
+   ]
+  },
+  {
+   "id": 409,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 16663,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17421,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 410,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17421,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17123,
+     "weight": 49.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17124,
+     "weight": 49.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17125,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 411,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17126,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17127,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 412,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17128,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17129,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 413,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17130,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17131,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 414,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17132,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17133,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 415,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17134,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17135,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 416,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17136,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17137,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 417,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17138,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17139,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 418,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17140,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17141,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 419,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17142,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17143,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 420,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17144,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17145,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 421,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17146,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17147,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 422,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17148,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17149,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 423,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17150,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17151,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 424,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17152,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17153,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 425,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17154,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17155,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 426,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17156,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17157,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 427,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17158,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17159,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 428,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 17160,
+     "weight": 99.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 17161,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 429,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 29550,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 29551,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 29552,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 30423,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31506,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31507,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31492,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 435,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 31908,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31910,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31907,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31909,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31906,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 31911,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 442,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 20658,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20649,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 22415,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20655,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20657,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20652,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20661,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20659,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32132,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20654,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20648,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32135,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20650,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20651,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32133,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 22418,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32131,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20653,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32130,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32134,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20656,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20660,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 22416,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32129,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 22417,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32162,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 443,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 20967,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20964,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20966,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 20965,
+     "weight": 1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 444,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32171,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32170,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32169,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32172,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 445,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32174,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32173,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 446,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32176,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 32175,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 447,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 480,
+     "maxQuantity": 480
+    },
+    {
+     "itemId": 32246,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 448,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 540,
+     "maxQuantity": 540
+    },
+    {
+     "itemId": 32247,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 449,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 600,
+     "maxQuantity": 600
+    },
+    {
+     "itemId": 32248,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 450,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 660,
+     "maxQuantity": 660
+    },
+    {
+     "itemId": 32249,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 451,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 720,
+     "maxQuantity": 720
+    },
+    {
+     "itemId": 32250,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 452,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 780,
+     "maxQuantity": 780
+    },
+    {
+     "itemId": 32251,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 453,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 900,
+     "maxQuantity": 900
+    },
+    {
+     "itemId": 32252,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 454,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 900,
+     "maxQuantity": 900
+    },
+    {
+     "itemId": 32253,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 455,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 900,
+     "maxQuantity": 900
+    },
+    {
+     "itemId": 32254,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 456,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 900,
+     "maxQuantity": 900
+    },
+    {
+     "itemId": 32255,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 457,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    },
+    {
+     "itemId": 32257,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 458,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    },
+    {
+     "itemId": 32258,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 459,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32259,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 460,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32260,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 461,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32378,
+     "weight": 1.0,
+     "minQuantity": 5,
+     "maxQuantity": 5
+    }
+   ]
+  },
+  {
+   "id": 473,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32567,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 150,
+     "maxQuantity": 150
+    }
+   ]
+  },
+  {
+   "id": 474,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32568,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 180,
+     "maxQuantity": 180
+    }
+   ]
+  },
+  {
+   "id": 475,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32569,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 210,
+     "maxQuantity": 210
+    }
+   ]
+  },
+  {
+   "id": 476,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32570,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 240,
+     "maxQuantity": 240
+    }
+   ]
+  },
+  {
+   "id": 477,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32571,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 240,
+     "maxQuantity": 240
+    }
+   ]
+  },
+  {
+   "id": 478,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32572,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 240,
+     "maxQuantity": 240
+    }
+   ]
+  },
+  {
+   "id": 479,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32573,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 300,
+     "maxQuantity": 300
+    }
+   ]
+  },
+  {
+   "id": 480,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32574,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 300,
+     "maxQuantity": 300
+    }
+   ]
+  },
+  {
+   "id": 481,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32575,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 360,
+     "maxQuantity": 360
+    }
+   ]
+  },
+  {
+   "id": 482,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32576,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 360,
+     "maxQuantity": 360
+    }
+   ]
+  },
+  {
+   "id": 483,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32577,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 360,
+     "maxQuantity": 360
+    }
+   ]
+  },
+  {
+   "id": 484,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32578,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 480,
+     "maxQuantity": 480
+    }
+   ]
+  },
+  {
+   "id": 485,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32579,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 540,
+     "maxQuantity": 540
+    }
+   ]
+  },
+  {
+   "id": 486,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32580,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 600,
+     "maxQuantity": 600
+    }
+   ]
+  },
+  {
+   "id": 487,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32581,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 840,
+     "maxQuantity": 840
+    }
+   ]
+  },
+  {
+   "id": 488,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32582,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 930,
+     "maxQuantity": 930
+    }
+   ]
+  },
+  {
+   "id": 489,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32583,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 90,
+     "maxQuantity": 90
+    }
+   ]
+  },
+  {
+   "id": 490,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32584,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 180,
+     "maxQuantity": 180
+    }
+   ]
+  },
+  {
+   "id": 491,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32593,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 240,
+     "maxQuantity": 240
+    }
+   ]
+  },
+  {
+   "id": 492,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32586,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 360,
+     "maxQuantity": 360
+    }
+   ]
+  },
+  {
+   "id": 493,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32587,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 480,
+     "maxQuantity": 480
+    }
+   ]
+  },
+  {
+   "id": 494,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32594,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 540,
+     "maxQuantity": 540
+    }
+   ]
+  },
+  {
+   "id": 495,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32585,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 600,
+     "maxQuantity": 600
+    }
+   ]
+  },
+  {
+   "id": 496,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32588,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 660,
+     "maxQuantity": 660
+    }
+   ]
+  },
+  {
+   "id": 497,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32589,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 780,
+     "maxQuantity": 780
+    }
+   ]
+  },
+  {
+   "id": 498,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32595,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 780,
+     "maxQuantity": 780
+    }
+   ]
+  },
+  {
+   "id": 499,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32590,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 500,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32591,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 501,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32596,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 502,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32597,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 503,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32599,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 504,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32598,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 1020,
+     "maxQuantity": 1020
+    }
+   ]
+  },
+  {
+   "id": 505,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32592,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 13052,
+     "weight": -1.0,
+     "minQuantity": 840,
+     "maxQuantity": 840
+    }
+   ]
+  },
+  {
+   "id": 506,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32600,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 507,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32601,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 508,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32602,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 2,
+     "maxQuantity": 2
+    }
+   ]
+  },
+  {
+   "id": 509,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32603,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 2,
+     "maxQuantity": 2
+    }
+   ]
+  },
+  {
+   "id": 510,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32604,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 3,
+     "maxQuantity": 3
+    }
+   ]
+  },
+  {
+   "id": 511,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32605,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 3,
+     "maxQuantity": 3
+    }
+   ]
+  },
+  {
+   "id": 512,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32606,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 4,
+     "maxQuantity": 4
+    }
+   ]
+  },
+  {
+   "id": 513,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32607,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 4,
+     "maxQuantity": 4
+    }
+   ]
+  },
+  {
+   "id": 514,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32608,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 5,
+     "maxQuantity": 5
+    }
+   ]
+  },
+  {
+   "id": 515,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32609,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 5,
+     "maxQuantity": 5
+    }
+   ]
+  },
+  {
+   "id": 516,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32610,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 6,
+     "maxQuantity": 6
+    }
+   ]
+  },
+  {
+   "id": 517,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32611,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 6,
+     "maxQuantity": 6
+    }
+   ]
+  },
+  {
+   "id": 518,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32612,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 7,
+     "maxQuantity": 7
+    }
+   ]
+  },
+  {
+   "id": 519,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32613,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 7,
+     "maxQuantity": 7
+    }
+   ]
+  },
+  {
+   "id": 520,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32614,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 8,
+     "maxQuantity": 8
+    }
+   ]
+  },
+  {
+   "id": 521,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32615,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 8,
+     "maxQuantity": 8
+    }
+   ]
+  },
+  {
+   "id": 522,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32616,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 9,
+     "maxQuantity": 9
+    }
+   ]
+  },
+  {
+   "id": 523,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 32617,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 9,
+     "maxQuantity": 9
+    }
+   ]
+  },
+  {
+   "id": 524,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 17019,
+     "weight": -1.0,
+     "minQuantity": 10,
+     "maxQuantity": 10
+    },
+    {
+     "itemId": 32618,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 526,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 33547,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 33546,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 33545,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 33544,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 33548,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 33549,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 527,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 33514,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 530,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 34261,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34260,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34259,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34265,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34264,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 531,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 33035,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 532,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 33000,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 534,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 34337,
+     "weight": 100.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34338,
+     "weight": 100.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34340,
+     "weight": 690.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34352,
+     "weight": 10.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34339,
+     "weight": 100.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 535,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 34323,
+     "weight": 80.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34324,
+     "weight": 905.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34327,
+     "weight": 5.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34343,
+     "weight": 10.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 536,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 34343,
+     "weight": 100.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34329,
+     "weight": 25.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34325,
+     "weight": 4925.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34328,
+     "weight": 25.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34326,
+     "weight": 4925.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 537,
+   "displayChances": true,
+   "items": [
+    {
+     "itemId": 34337,
+     "weight": 325.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34352,
+     "weight": 10.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34338,
+     "weight": 325.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34339,
+     "weight": 325.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34330,
+     "weight": 5.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34331,
+     "weight": 5.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34332,
+     "weight": 5.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  },
+  {
+   "id": 567,
+   "displayChances": false,
+   "items": [
+    {
+     "itemId": 34480,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34483,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34481,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34484,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    },
+    {
+     "itemId": 34482,
+     "weight": -1.0,
+     "minQuantity": 1,
+     "maxQuantity": 1
+    }
+   ]
+  }
+ ]
+}

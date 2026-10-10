@@ -53,6 +53,7 @@ namespace Jondo.Unity.Server.Managers
         public static async Task<bool> GiveExperienceAsync(NetworkStream stream, long experience)
         {
             if (experience <= 0) return false;
+            experience = ServerSettings.WithBonus(experience, ServerSettings.Current.ExperienceBonusPercent);
 
             var state = SessionContext.State;
             state.Experience += experience;

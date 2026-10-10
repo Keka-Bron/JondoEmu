@@ -172,10 +172,14 @@ namespace Jondo.Unity.Server.Handlers
             Jondo.Unity.Server.Network.SessionContext.State.Kamas -= cost;
             Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
 
-            // One arrives next to the zaap, not on it: the zaap's cell is not walkable.
-            var arrival = Interactives.ZaapElements(target);
-            Jondo.Unity.Server.Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(
-                target, arrival.Count > 0 ? arrival[0].Cell : 0);
+            // One arrives beside the zaap -- or the zaapi -- one travels to, in front of it, as the
+            // captures land: the nearest walkable cell by row and column put the traveller to its
+            // side or behind it, hidden by its drawing, and beside cell 0 where the map has none.
+            var zaap = Interactives.ZaapElements(target);
+            var arrival = zaap.Count > 0 ? zaap[0] : Zaapis.ElementsOn(target).FirstOrDefault();
+            Jondo.Unity.Server.Network.SessionContext.State.CellId = arrival.Id != 0
+                ? FightHandler.CellBeside(target, arrival.Cell)
+                : MapManager.GetNearestWalkableCell(target, TeleportHandler.MapCentre);
             DatabaseManager.SaveCurrentCharacter();
 
             // A zaap ends the party following him, and his followers are told before the old map

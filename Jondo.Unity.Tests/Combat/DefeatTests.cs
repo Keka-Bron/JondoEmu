@@ -197,6 +197,23 @@ namespace Jondo.Unity.Tests.Combat
                 Assert.Equal(cell, FightHandler.ZaapArrivalCell(map));
             }
 
+            /// <summary>
+            /// Travelling by zaap lands by the same rule, in front of the zaap: at the Pueblo de
+            /// Amakna, 219 by its 205, where the nearest walkable cell by row and column was 204, at
+            /// its side and hidden by its drawing.
+            /// </summary>
+            [Fact]
+            public void A_zaap_traveller_lands_in_front_of_it()
+            {
+                Interactives.Initialize();
+                LoadWalkable(88213271);
+
+                Assert.Equal(205, Interactives.ZaapElements(88213271)[0].Cell);
+                Assert.Equal(204, MapManager.GetNearestWalkableCell(88213271, 205));
+                Assert.Equal(219, FightHandler.CellBeside(88213271, 205));
+                Assert.True(219 / 14 > 205 / 14);           // a row further down the screen
+            }
+
             /// <summary>The walkable cells of one map, the ones MapManager.Initialize would load for it.</summary>
             private static void LoadWalkable(long map)
             {

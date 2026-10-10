@@ -57,6 +57,25 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// The list goes whole, every member an f1 of ONE jgu: the client replaces its list with
+        /// each jgu, and one per member left it holding only the last.
+        /// </summary>
+        [Fact]
+        public void The_member_list_goes_in_one_message()
+        {
+            var second = new GuildStore.Member { CharacterId = 302677754147, GuildId = 42043, Rank = 4, JoinedUtcMs = 1786567999999 };
+            byte[] list = GuildProtocol.BuildMembers(new[]
+            {
+                new GuildProtocol.MemberRow(SacriMaster(), "Sacri-Master", 354, 65924386, 11, 8094, 0, true),
+                new GuildProtocol.MemberRow(second, "Hiierbita-Xx", 200, 65924387, 10, 55, 0, false),
+            });
+            var entries = ProtoMessage.Parse(list).Fields.Where(f => f.FieldNumber == 1).ToList();
+            Assert.Equal(2, entries.Count);
+            Assert.StartsWith(Hex(GuildProtocol.BuildMember(SacriMaster(), "Sacri-Master", 354, 65924386, breed: 11,
+                                                            achievementPoints: 8094)), Hex(list));
+        }
+
+        /// <summary>
         /// And the same, brought up to date after a contribution and the note «hola»: the jgz of «muchas
         /// acciones», with the guild coins {10, 10} and the note with its time.
         /// </summary>
@@ -152,7 +171,7 @@ namespace Jondo.Unity.Tests.World
         {
             Assert.Equal("0805", Hex(GuildProtocol.BuildContributionsLeft(5)));
             Assert.Equal("", Hex(GuildProtocol.BuildContributionsLeft(0)));
-            Assert.Equal("1a00", Hex(GuildProtocol.BuildNoBenefits()));
+            Assert.Equal("1a00", Hex(GuildProtocol.BuildWeek(null, 250, 0)));
         }
 
         /// <summary>
@@ -190,9 +209,10 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Opening the window answers the chest's tabs and the header, and the members only when
-        /// the jml asks for them -- never the jgw of joining, which printed "acabas de unirte al
-        /// gremio" at every tab.
+        /// Opening the window answers the chest's tabs, the bare jiy the header and the
+        /// contributions left, as the captures pair them, and the members only when the jml asks
+        /// for them -- never the jgw of joining, which printed "acabas de unirte al gremio" at
+        /// every tab.
         /// </summary>
         [Fact]
         public async Task Opening_the_window_never_says_you_have_just_joined()
@@ -202,11 +222,12 @@ namespace Jondo.Unity.Tests.World
             using (SessionContext.Push(wire.Session))
             {
                 await GuildHandler.OpenWindowAsync(wire.Session.Stream!);
+                await GuildHandler.TabAsync(wire.Session.Stream!, ConnectionProtocol.Push(Op.Jiy, Array.Empty<byte>()));
                 await GuildHandler.MembersAsync(wire.Session.Stream!, ConnectionProtocol.Push(Op.Jml, Array.Empty<byte>()));
             }
 
             var ops = (await wire.Drain()).Select(f => f.Op).ToList();
-            Assert.Equal(new[] { Op.Ivl, Op.Jhh }, ops);
+            Assert.Equal(new[] { Op.Ivl, Op.Jhh, Op.Jla }, ops);
         }
 
         /// <summary>The guild coins come from the contributions: ten for each one, in total.</summary>

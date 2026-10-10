@@ -39,6 +39,7 @@ namespace Jondo.Unity.Server.UI
         private readonly CheckBox _seguir;
         private readonly LauncherButton _parar;
         private readonly LauncherButton _limpiar;
+        private readonly LauncherButton _ajustes;
         private readonly List<LauncherButton> _idiomas = new();
 
         private long _ultimaLinea;
@@ -220,6 +221,15 @@ namespace Jondo.Unity.Server.UI
             _limpiar.Click += (s, e) => _registro.Wipe();
             barra.Controls.Add(_limpiar);
 
+            // The server's settings: rates, caps and modes, applied at the next start.
+            _ajustes = Boton("", LauncherTheme.LightGold);
+            _ajustes.Click += (s, e) =>
+            {
+                using var ventana = new ServerSettingsWindow(_idioma);
+                ventana.ShowDialog(this);
+            };
+            barra.Controls.Add(_ajustes);
+
             _parar = Boton("", LauncherTheme.Red);
             _parar.Click += PararloTodo;
             barra.Controls.Add(_parar);
@@ -228,6 +238,7 @@ namespace Jondo.Unity.Server.UI
             {
                 _parar.Location = new Point(barra.Width - _parar.Width - E(2), E(7));
                 _limpiar.Location = new Point(_parar.Left - _limpiar.Width - E(10), E(7));
+                _ajustes.Location = new Point(_limpiar.Left - _ajustes.Width - E(10), E(7));
                 int x = _seguir.Right + E(18);
                 foreach (var boton in _idiomas)
                 {
@@ -265,6 +276,8 @@ namespace Jondo.Unity.Server.UI
         {
             _seguir.Text = _textos.AutoScroll;
             _limpiar.Text = _textos.ClearButton;
+            _ajustes.Text = _textos.ServerSettingsButton;
+            Redimensionar(_ajustes);
             _parar.Text = _textos.StopServer;
             Redimensionar(_limpiar);
             Redimensionar(_parar);

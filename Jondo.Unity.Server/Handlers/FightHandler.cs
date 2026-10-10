@@ -39,7 +39,9 @@ namespace Jondo.Unity.Server.Handlers
         /// Called by MapChangeHandler when the player's movement path terminates on a mob's cell.
         /// Builds the FightInstance from real mob data and sends placement bursts 1 and 2.
         /// </summary>
-        public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId, long mobContextId = 0)
+        public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId,
+                                                               long mobContextId = 0, FightRules rules = null,
+                                                               long arenaMapId = 0)
         {
             // A group already being fought went off the map with a kmu: it is nobody's to attack
             // a second time. Its fight is joined by its swords (kay), not by clicking the group.
@@ -65,7 +67,7 @@ namespace Jondo.Unity.Server.Handlers
             GameState.CurrentFightMobId = mobGroup.MobId;
 
             long fightId = System.Threading.Interlocked.Increment(ref _nextFightId);
-            long arenaMapId = MapManager.ResolveArenaMapId(mapId);
+            if (arenaMapId <= 0) arenaMapId = MapManager.ResolveArenaMapId(mapId);
             var fight = new FightInstance(fightId, mapId, arenaMapId);
 
             // In a kanojedo the fight follows the training rulebook: no challenges, no loot and
@@ -73,6 +75,7 @@ namespace Jondo.Unity.Server.Handlers
             // and not the monster, because the bag that gets hit and the one the master composes
             // are the same creatures and it makes no difference which way you go in.
             if (Managers.Kanojedo.IsDojo(mapId)) fight.Reglas = FightRules.Entrenamiento;
+            if (rules != null) fight.Reglas = rules;
 
             // The group's contextual id IS its MobId, the same one that travels in the jss and the
             // jpv and the same one the client sends back when clicking it. The mobContextId parameter
@@ -123,6 +126,12 @@ namespace Jondo.Unity.Server.Handlers
 
             // On a dream's last room this is the Fin du rêve: its first wave at its level.
             DreamHandler.OnFightCreated(fight);
+
+            // In the Gigalodón's abyss, the darkness of the floor makes its monsters stronger.
+            Managers.GuildRaidDarkness.Boost(fight, GameState.CharacterId);
+
+            // The Santuario's guardians are fought by four players at most.
+            Managers.GuildRaidGuardians.OnFightCreated(fight);
 
             _activeFights[fightId] = fight;
             Program.LogDebug($"[FightHandler] Fight #{fightId} created on map {mapId}:");
@@ -604,14 +613,31 @@ namespace Jondo.Unity.Server.Handlers
                     MonsterLook(fighter),
                     Network.FightProtocol.MonsterIdentity(fighter.GradeIndex + 1, fighter.MonsterId,
                                                           fighter.Level),
-                    isMonster: true);
+                    isMonster: true, wave: fighter.Wave, alive: fighter.IsAlive);
             }
 
             var (look, breed, sex) = CharacterLookOf(fighter);
             return Network.FightProtocol.FighterBlock(
                 fighter.CellId, FacingOf(fight, fighter), fighter.Id, FullSheetOf(fighter), look,
                 Network.FightProtocol.PlayerIdentity(breed, fighter.Name, sex, fighter.Level),
-                isMonster: false);
+                isMonster: false, alive: fighter.IsAlive);
+        }
+
+        /// <summary>
+        /// Every fighter's jxb block, each once: in play order -- the order of the jzu, which the
+        /// client's carousel is indexed against -- and then whoever the turn order has not caught
+        /// up with. The list of the fight-start jxb, sent again on reconnecting and when a wave comes on.
+        /// </summary>
+        private static List<Network.Pb> FighterBlocksInPlayOrder(FightInstance fight)
+        {
+            var blocks = new List<Network.Pb>();
+            var listed = new HashSet<long>();
+            foreach (var fighter in fight.TurnOrder.Concat(TodosLosCombatientes(fight)))
+            {
+                if (fighter == null || !listed.Add(fighter.Id)) continue;
+                blocks.Add(BloqueDe(fight, fighter));
+            }
+            return blocks;
         }
 
         /// <summary>
@@ -1247,6 +1273,17 @@ namespace Jondo.Unity.Server.Handlers
                 // same figure the client shows when hovering over the group.
                 XpReward = dbStats?.GradeXp ?? 0
             };
+            // Hardcore (the server's settings): three times the life and the characteristics.
+            if (ServerSettings.Current.Hardcore)
+            {
+                int factor = ServerSettings.HardcoreStatsFactor;
+                monsterFighter.MaxHP *= factor;
+                monsterFighter.Strength *= factor;
+                monsterFighter.Intelligence *= factor;
+                monsterFighter.Chance *= factor;
+                monsterFighter.Agility *= factor;
+                monsterFighter.Initiative *= factor;
+            }
             monsterFighter.CurrentHP = monsterFighter.MaxHP;
             monsterFighter.Otras[Fighter.CaracteristicaDeErosion] = Fighter.ErosionBase;
             monsterFighter.CurrentAP = monsterFighter.MaxAP;
@@ -2385,20 +2422,8 @@ namespace Jondo.Unity.Server.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk,
                 Network.FightProtocol.BuildFightersPlaced(spots)));
 
-            var everyone = new List<Network.Pb>();
-            var listados = new HashSet<long>();
-            foreach (var fighter in fight.TurnOrder)
-            {
-                if (fighter == null || !listados.Add(fighter.Id)) continue;
-                everyone.Add(BloqueDe(fight, fighter));
-            }
-            foreach (var fighter in TodosLosCombatientes(fight))
-            {
-                if (fighter == null || !listados.Add(fighter.Id)) continue;
-                everyone.Add(BloqueDe(fight, fighter));
-            }
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxb,
-                Network.FightProtocol.BuildAllFighters(everyone)));
+                Network.FightProtocol.BuildAllFighters(FighterBlocksInPlayOrder(fight))));
 
             // The turn the fight is on. The last one announced, with what is left of it; and if
             // none was announced yet -- the fight had just started when he left -- the one that
@@ -2703,18 +2728,7 @@ namespace Jondo.Unity.Server.Handlers
             // placement.
             // In PLAY ORDER, the same order as the jzu: the real fight-start jxb lists the first
             // player first, and the client indexes its carousel against that.
-            var everyone = new List<Network.Pb>();
-            var listados = new HashSet<long>();
-            foreach (var fighter in fight.TurnOrder)
-            {
-                if (fighter == null || !listados.Add(fighter.Id)) continue;
-                everyone.Add(BloqueDe(fight, fighter));
-            }
-            foreach (var fighter in TodosLosCombatientes(fight))
-            {
-                if (fighter == null || !listados.Add(fighter.Id)) continue;
-                everyone.Add(BloqueDe(fight, fighter));
-            }
+            var everyone = FighterBlocksInPlayOrder(fight);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxb,
                 Network.FightProtocol.BuildAllFighters(everyone)));
@@ -6715,6 +6729,35 @@ namespace Jondo.Unity.Server.Handlers
                 // And a monster's behaviour spell.
                 if (quien.Conducta.Spell != 0) await LanzarLaConductaAsync(stream, fight, quien);
             }
+
+            // And what a raid's guardian lays on the board: the Guardián's glyphs.
+            await Managers.GuildRaidGuardians.OnFightStartedAsync(stream, fight);
+        }
+
+        /// <summary>
+        /// A spell cast at a cell outside anybody's turn, in its own sequence with the attitudes'
+        /// shape: jto, the cast's jwe and whatever comes out, and jwi.
+        /// </summary>
+        internal static async Task CastAtAsync(NetworkStream stream, FightInstance fight, Fighter caster,
+                                               int spell, int grade, int cell)
+        {
+            int levelId = LimitesDeGrado(spell, grade).LevelId;
+            if (levelId <= 0) (_, levelId, _) = Managers.SpellEffects.GradoDe(spell, caster.Level);
+            var target = TodosLosCombatientes(fight).FirstOrDefault(f => f != null && f.IsAlive && f.CellId == cell);
+
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(caster.Id, Network.FightProtocol.ActionSequence)));
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildAction(
+                    caster.Id, Network.FightProtocol.Cast,
+                    Network.FightProtocol.CastAt(caster.Id, target?.Id ?? 0, cell, spell, levelId, critical: false,
+                                                 noTarget: target == null),
+                    Network.FightProtocol.CastDetail)));
+            await AplicarEfectosAsync(stream, fight, caster, spell, grade, target, Managers.EffectEngine.AlLanzar,
+                                      cell, armar: false);
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), caster.Id,
+                                                       Network.FightProtocol.ActionSequence)));
         }
 
         /// <summary>
@@ -8214,12 +8257,15 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The next wave of a Fin du rêve, on the board: each of its monsters built as any fight
-        /// builds them, brought to the wave's level, placed on a free defender cell, and announced
-        /// the way a summon is -- the one way the client knows to take a fighter in mid-fight --
-        /// in the name of the last of the wave that fell. Then the list of fighters again.
+        /// builds them, brought to the wave's level, placed on a free defender cell and marked with
+        /// the wave's number. Then what the client expects of a wave: the jyb that makes it the
+        /// current wave, and the fighters list (jxb) inside a sequence of its own, as at the
+        /// fight's start. The client takes the newcomers' sheets without drawing them, and when
+        /// that sequence ends draws them one by one, each with the light falling on its cell
+        /// (see <see cref="Network.FightProtocol.BuildNewWave"/>).
         /// False when there is no next wave, and the fight is over.
         /// </summary>
-        private static async Task<bool> NextDreamWaveAsync(NetworkStream stream, FightInstance fight)
+        internal static async Task<bool> NextDreamWaveAsync(NetworkStream stream, FightInstance fight)
         {
             var next = DreamHandler.NextWave(fight);
             if (next == null) return false;
@@ -8229,8 +8275,7 @@ namespace Jondo.Unity.Server.Handlers
             if (group == null || group.Members.Count == 0) return false;
 
             var fallen = fight.Rojo.LastOrDefault();
-            int joined = 0;
-            long author = 0;
+            var arrivals = new List<Fighter>();
             foreach (var member in group.Members)
             {
                 int cell = fight.RedPlacementCells.Where(c => !Occupied(fight, c)).DefaultIfEmpty(-1).First();
@@ -8239,43 +8284,41 @@ namespace Jondo.Unity.Server.Handlers
 
                 var monster = BuildMonsterFighter(member, fight.SiguienteIdDeInvocado(), cell);
                 Managers.Dreams.ScaleTo(monster, level);
+                monster.Wave = wave;
                 fight.Join(monster);
-                joined++;
+                arrivals.Add(monster);
+            }
+            if (arrivals.Count == 0) return false;
 
-                // INSIDE A SEQUENCE OF ITS OWN, as every one of the 663 summons of the captures
-                // comes. The wave went out bare, behind the closed sequence of the blow that ended
-                // the last one, and the client put the new monsters in the turns and drew none.
-                if (author == 0)
-                {
-                    author = fallen?.Id ?? monster.Id;
-                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
-                        Network.FightProtocol.BuildSequenceStart(author, Network.FightProtocol.ActionSequence)));
-                }
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildSummon(
-                        author, monster.Id, cell, FacingOf(fight, monster),
-                        monster.MonsterId, monster.MonsterId, monster.GradeIndex + 1, FullSheetOf(monster),
-                        Network.FightProtocol.Invoca, summoned: false)));
-            }
-            if (author != 0)
-            {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
-                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author,
-                                                           Network.FightProtocol.ActionSequence)));
-            }
-            if (joined == 0) return false;
+            // The wave first: the client compares each newcomer's wave with the current one when
+            // the sequence below ends, so it must already hold this one by then.
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jyb,
+                Network.FightProtocol.BuildNewWave(arrivals[0].TeamId, wave, turnsBeforeNext: 0)));
+
+            // The list inside a sequence of its own. Not as summons: the client draws a summon at
+            // once, and the wave came on with no arrival. And not bare: behind the closed sequence
+            // of the blow that ended the last wave, the client listed the newcomers in the turns
+            // and drew none of them.
+            long author = fallen?.Id ?? arrivals[0].Id;
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(author, Network.FightProtocol.ActionSequence)));
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxb,
+                Network.FightProtocol.BuildAllFighters(FighterBlocksInPlayOrder(fight))));
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author,
+                                                       Network.FightProtocol.ActionSequence)));
 
             await ReenviarLaListaAsync(stream, fight);
 
             // And their behaviour spells, now that the client knows them, as at a fight's start.
-            foreach (var recien in fight.Rojo.Skip(fight.Rojo.Count - joined).ToList())
+            foreach (var arrival in arrivals)
             {
-                recien.CasillaAlEmpezarCombate = recien.CellId;
-                await LanzarLaConductaAsync(stream, fight, recien);
+                arrival.CasillaAlEmpezarCombate = arrival.CellId;
+                await LanzarLaConductaAsync(stream, fight, arrival);
             }
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqn,
                 ConnectionProtocol.BuildNotice(CommandTexts.Get("dream.wave", wave, level))));
-            Program.LogDebug($"[Dreams] Wave {wave}: {joined} monster(s) at level {level}.");
+            Program.LogDebug($"[Dreams] Wave {wave}: {arrivals.Count} monster(s) at level {level}.");
             return true;
         }
 
@@ -8635,6 +8678,9 @@ namespace Jondo.Unity.Server.Handlers
             // And what the achievements count, set aside until the character is back on the map.
             AchievementWatcher.FightEnded(fight, won);
 
+            // And the goals of the guild raid he is in, when it was fought on one of its floors.
+            await Managers.GuildRaidManager.FightEndedAsync(fight, GameState.CharacterId, won);
+
             // And this is where it is applied. On the wire it does NOT travel broken down: the
             // percentage only exists inside the placement's ldd, and the final figure arrives with
             // the bonus already added. The 68 jyg of the captures were reviewed and there is no slot
@@ -8648,8 +8694,10 @@ namespace Jondo.Unity.Server.Handlers
             var quePagan = fight.Reglas.ReparteBotin
                 ? fight.Rojo.Where(m => !m.EsInvocado).ToList()
                 : new List<Fighter>();
-            long xpGained = won ? ConElExtra(quePagan.Sum(m => (long)m.XpReward), extraDeRetos) : 0;
-            long kamas = won ? ConElExtra(quePagan.Sum(m => 10L + (m.Level * 5L)), extraDeRetos) : 0;
+            long xpGained = won ? ServerSettings.WithBonus(ConElExtra(quePagan.Sum(m => (long)m.XpReward), extraDeRetos),
+                                                           ServerSettings.Current.ExperienceBonusPercent) : 0;
+            long kamas = won ? ServerSettings.WithBonus(ConElExtra(quePagan.Sum(m => 10L + (m.Level * 5L)), extraDeRetos),
+                                                        ServerSettings.Current.KamasBonusPercent) : 0;
             var caidos = new List<PlayerItem>();
             Dictionary<int, int> loot;
 
@@ -8662,7 +8710,7 @@ namespace Jondo.Unity.Server.Handlers
                 xpGained = suyo.Xp;
                 kamas = suyo.Kamas;
                 loot = suyo.Loot;
-                EntregarBotin(loot, out caidos);
+                EntregarBotin(Managers.GuildRaidManager.ForTheBag(GameState.CharacterId, loot), out caidos, suyo.Perfect);
             }
             else
             {
@@ -8840,7 +8888,10 @@ namespace Jondo.Unity.Server.Handlers
                 // In a dream room it is NOT replaced: the room is cleared and stays cleared, which
                 // is what makes advancing mean something. Replacing it would leave the player fighting
                 // the same room forever.
-                if (!DreamHandler.SalaLimpiada(muerto, fight.RoleplayMapId))
+                // Nor on a guild raid's floor: inside a raid what is beaten stays beaten (the guides),
+                // and the floors stand again only when the next raid starts.
+                if (!DreamHandler.SalaLimpiada(muerto, fight.RoleplayMapId)
+                    && !Managers.GuildRaidManager.IsRaidMap(fight.RoleplayMapId))
                 {
                     // A dungeon room comes back as itself -- its eight, its boss -- and not as a
                     // random group of the subarea, which could have the boss in it.
@@ -8873,6 +8924,20 @@ namespace Jondo.Unity.Server.Handlers
                 Network.SessionContext.State.MapId = defeat.SavePointMap;
                 Network.SessionContext.State.CellId = defeat.SavePointCell;
                 DatabaseManager.SaveCurrentCharacter();
+            }
+
+            // Lost inside the Gigalodón: back to the top of the abyss, without the treasures he
+            // carried, rather than to his save point (the guides).
+            if (defeat != null)
+            {
+                long top = await Managers.GuildRaidManager.DefeatedAsync(stream, GameState.CharacterId, fight.RoleplayMapId);
+                if (top > 0 && MapManager.GetMapInfo(top) != null)
+                {
+                    back = top;
+                    Network.SessionContext.State.MapId = top;
+                    Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(top, TeleportHandler.MapCentre);
+                    DatabaseManager.SaveCurrentCharacter();
+                }
             }
 
             // Was the fight inside a dungeon? Then winning moves: to the next room, or out if it
@@ -9775,16 +9840,21 @@ namespace Jondo.Unity.Server.Handlers
         private static Dictionary<int, int> RollFightLoot(FightInstance fight, int extra,
                                                           out List<PlayerItem> caidos)
         {
-            var loot = RollLoot(fight, extra);
-            EntregarBotin(loot, out caidos);
+            var perfect = new List<Managers.RandomLoot.Drop>();
+            var loot = RollLoot(fight, extra, perfect);
+            Managers.GuildRaidManager.ShareFightSalt(fight.FightId, new Dictionary<long, Dictionary<int, int>> { [GameState.CharacterId] = loot });
+            EntregarBotin(Managers.GuildRaidManager.ForTheBag(GameState.CharacterId, loot), out caidos, perfect);
             return loot;
         }
 
         /// <summary>
         /// The roll alone, for the player of this session, delivering nothing: what
         /// <see cref="PlanRewards"/> rolls for each winner before anybody is shown the end.
+        /// The random loot's perfect pieces, which are in the loot too, are also listed in
+        /// <paramref name="perfect"/>, so the delivery gives them their exo.
         /// </summary>
-        private static Dictionary<int, int> RollLoot(FightInstance fight, int extra)
+        private static Dictionary<int, int> RollLoot(FightInstance fight, int extra,
+                                                     List<Managers.RandomLoot.Drop> perfect = null)
         {
             var loot = new Dictionary<int, int>();
 
@@ -9809,6 +9879,7 @@ namespace Jondo.Unity.Server.Handlers
                     double probabilidad = extra > 0
                         ? Math.Min(100.0, drop.PercentDrop * (100.0 + extra) / 100.0)
                         : drop.PercentDrop;
+                    probabilidad = ServerSettings.ChanceWithBonus(probabilidad, ServerSettings.Current.DropBonusPercent);
                     if (TirarPorcentaje() >= probabilidad) continue;
                     loot.TryGetValue(drop.ObjectId, out int q);
                     loot[drop.ObjectId] = q + 1;
@@ -9825,9 +9896,25 @@ namespace Jondo.Unity.Server.Handlers
                     double probabilidad = extra > 0
                         ? Math.Min(100.0, drop.PercentDrop * (100.0 + extra) / 100.0)
                         : drop.PercentDrop;
+                    probabilidad = ServerSettings.ChanceWithBonus(probabilidad, ServerSettings.Current.DropBonusPercent);
                     if (TirarPorcentaje() >= probabilidad) continue;
                     loot.TryGetValue(drop.ObjectId, out int q);
                     loot[drop.ObjectId] = q + 1;
+                }
+
+                // And the server's random loot (its settings), which the challenges and the drop
+                // bonus make likelier like any other drop: a handful of items around its level.
+                if (ServerSettings.Current.RandomLoot)
+                {
+                    double chance = ServerSettings.Current.RandomLootChancePercent;
+                    if (extra > 0) chance = Math.Min(100.0, chance * (100.0 + extra) / 100.0);
+                    chance = ServerSettings.ChanceWithBonus(chance, ServerSettings.Current.DropBonusPercent);
+                    foreach (var drop in Managers.RandomLoot.Roll(monster.Level, chance, Random.Shared))
+                    {
+                        loot.TryGetValue(drop.Gid, out int q);
+                        loot[drop.Gid] = q + 1;
+                        if (drop.Exo != 0) perfect?.Add(drop);
+                    }
                 }
             }
 
@@ -9868,9 +9955,39 @@ namespace Jondo.Unity.Server.Handlers
         /// All at once and not one by one: each AddItemToInventory loaded the whole inventory to see
         /// whether the item was already there, so five different items were five reads.
         /// </remarks>
-        private static void EntregarBotin(Dictionary<int, int> loot, out List<PlayerItem> caidos)
+        private static void EntregarBotin(Dictionary<int, int> loot, out List<PlayerItem> caidos,
+                                          IReadOnlyList<Managers.RandomLoot.Drop> perfect = null)
         {
-            caidos = DatabaseManager.AddItemsToInventory(GameState.CharacterId, loot);
+            // What is worn -- equipment, a dofus, a pet, a cosmetic -- drops as pieces of its own,
+            // each with its effects rolled as a crafted one is (Forgemagic.Roll), or at its best with
+            // an exo for the random loot's perfect pieces. Stacked with no effects, as it went
+            // before, a dropped hat carried no characteristics at all. The rest stacks.
+            var stacked = new Dictionary<int, int>();
+            var pieces = new List<PlayerItem>();
+            var exos = perfect?.ToList() ?? new List<Managers.RandomLoot.Drop>();
+            foreach (var kv in loot)
+            {
+                var template = Managers.Forgemagic.TemplateOf(kv.Key);
+                if (template == null || template.Lines.Count == 0 || !Managers.RandomLoot.IsWorn(template.Type))
+                {
+                    stacked[kv.Key] = kv.Value;
+                    continue;
+                }
+                for (int n = 0; n < kv.Value; n++)
+                {
+                    int at = exos.FindIndex(d => d.Gid == kv.Key);
+                    int exo = at >= 0 ? exos[at].Exo : 0;
+                    if (at >= 0) exos.RemoveAt(at);
+                    var effects = Managers.RandomLoot.EffectsOf(template, exo, Random.Shared);
+                    var piece = DatabaseManager.AddPieceToInventory(GameState.CharacterId, kv.Key,
+                                                                    Managers.Forgemagic.Serialize(effects));
+                    if (piece != null) pieces.Add(piece);
+                    if (exo != 0)
+                        Program.LogDebug($"[FightHandler] Loot: a perfect item {kv.Key} with an exo {exo}.");
+                }
+            }
+            caidos = DatabaseManager.AddItemsToInventory(GameState.CharacterId, stacked);
+            caidos.AddRange(pieces);
             foreach (var kv in loot)
                 Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
 

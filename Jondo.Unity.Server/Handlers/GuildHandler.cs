@@ -148,7 +148,7 @@ namespace Jondo.Unity.Server.Handlers
                 GuildProtocol.BuildGuildJoined(guild, GuildStore.RankOf(founderCharacterId))));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Khi, GuildProtocol.BuildGoneNotice()));
             var members = GuildStore.Members(guild.Id);
-            foreach (var frame in MemberFrames(members)) await WriteAsync(stream, frame);
+            await WriteAsync(stream, MembersFrame(members));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhh, GuildProtocol.BuildGuildInfo(guild, members.Count)));
 
             var character = DatabaseManager.GetCharacterById(founderCharacterId);
@@ -203,38 +203,37 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jgw,
                 GuildProtocol.BuildGuildJoined(guild, rank)));
-            foreach (var frame in MemberFrames(members))
-                await WriteAsync(stream, frame);
+            await WriteAsync(stream, MembersFrame(members));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhh,
                 GuildProtocol.BuildGuildInfo(guild, members.Count)));
         }
 
-        /// <summary>One jgu frame per member, with each one's name, level and account.</summary>
-        public static List<byte[]> MemberFrames(List<GuildStore.Member> members)
+        /// <summary>
+        /// The member list, ONE jgu with every member's name, level and account: the client takes
+        /// each jgu as the whole list (<see cref="GuildProtocol.BuildMembers"/>).
+        /// </summary>
+        public static byte[] MembersFrame(List<GuildStore.Member> members)
         {
-            var fuera = new List<byte[]>();
+            var rows = new List<GuildProtocol.MemberRow>();
             foreach (var member in members)
             {
                 var character = DatabaseManager.GetCharacterById(member.CharacterId);
                 if (character == null) continue;
-                fuera.Add(ConnectionProtocol.Push(Op.Jgu,
-                    GuildProtocol.BuildMember(member, character.Name, character.Level, character.AccountId,
-                                              character.Breed, Achievements.PointsOf(member.CharacterId),
-                                              GuildStore.ContributedBy(member.CharacterId),
-                                              SessionRegistry.FindByCharacter(member.CharacterId) != null)));
+                rows.Add(new GuildProtocol.MemberRow(member, character.Name, character.Level, character.AccountId,
+                                                     character.Breed, Achievements.PointsOf(member.CharacterId),
+                                                     GuildStore.ContributedBy(member.CharacterId),
+                                                     SessionRegistry.FindByCharacter(member.CharacterId) != null));
             }
-            return fuera;
+            return ConnectionProtocol.Push(Op.Jgu, GuildProtocol.BuildMembers(rows));
         }
 
-        /// <summary>
-        /// The guild window opening (jlk): the chest's tabs (ivl) and the window's header (jhh).
-        /// </summary>
+        /// <summary>The guild window opening (jlk): the chest's tabs (ivl).</summary>
         /// <remarks>
         /// The window opens with a burst -- jlk, jiy{4}, jii{1}, jfp, jiy, then jiy{1}, jml{1},
         /// jlx{8} -- and the real server answers ivl, jci, jff, jhh, jla, jgu, jmf, in all six
-        /// captures of it. In the invitation's one the client waits for the first half's answers
-        /// before sending the second, and the header comes with the first: the jlk's, since the
-        /// jii is never answered anywhere (26 of 28).
+        /// captures of it: ivl the jlk, jci the jiy{4}, jff the jfp, jhh and jla the bare jiy, jgu
+        /// the jml and jmf the jlx; the jii is never answered anywhere (26 of 28). The header went
+        /// out with the jlk, ahead of the window that shows it, and its experience bar read 0 / 0.
         /// </remarks>
         public static async Task OpenWindowAsync(NetworkStream stream)
         {
@@ -243,9 +242,11 @@ namespace Jondo.Unity.Server.Handlers
             if (guild == null) return;
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Ivl,
                 StorageProtocol.BuildGuildChestTabs(GuildChests.TabsOfGuild(guild.Id))));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhh,
-                GuildProtocol.BuildGuildInfo(guild, GuildStore.Members(guild.Id).Count)));
         }
+
+        /// <summary>The window's header (jhh), with the guild as it stands.</summary>
+        public static byte[] HeaderFrame(GuildStore.Guild guild)
+            => ConnectionProtocol.Push(Op.Jhh, GuildProtocol.BuildGuildInfo(guild, GuildStore.Members(guild.Id).Count));
 
         /// <summary>
         /// The members (jml {f1: true}): one jgu per member. The jml of the perks tab and of
@@ -259,7 +260,7 @@ namespace Jondo.Unity.Server.Handlers
             long who = SessionContext.State.CharacterId;
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
             if (guild == null) return;
-            foreach (var member in MemberFrames(GuildStore.Members(guild.Id))) await WriteAsync(stream, member);
+            await WriteAsync(stream, MembersFrame(GuildStore.Members(guild.Id)));
         }
 
         /// <summary>
@@ -282,8 +283,8 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// A tab of the window (jiy). With f2 = 4 the directory sheet (jci) is answered, which is the
         /// only pair of the opening measured on its own -- twice in the capture of founding «Jondo» --;
-        /// without f2, the remaining contributions (jla), which is what takes its place in the opening
-        /// burst: five requests, five answers, and that is the one left.
+        /// without f2, the header (jhh) and the remaining contributions (jla), the two the opening
+        /// burst's captures have between the jfp's jff and the jml's jgu.
         /// </summary>
         public static async Task TabAsync(NetworkStream stream, byte[] frame)
         {
@@ -306,6 +307,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             else if (tab == 0)
             {
+                await WriteAsync(stream, HeaderFrame(guild));
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Jla,
                     GuildProtocol.BuildContributionsLeft(GuildStore.ContributionsLeft(who))));
             }
@@ -319,17 +321,61 @@ namespace Jondo.Unity.Server.Handlers
             return GuildProtocol.BuildProfile(guild, GuildStore.ProfileOf(guild.Id), leaderName);
         }
 
-        /// <summary>The opening's jfp: it is answered with a new guild's jff.</summary>
+        /// <summary>The opening's jfp: the guild's week (jff), its tier or none.</summary>
         /// <remarks>
         /// As an answer, root 3 with the request's id, as in all eight captured: it went out as a
         /// push, and the window waits for its answer before asking for the members.
         /// </remarks>
-        public static async Task BenefitsAsync(NetworkStream stream, byte[] frame)
+        public static async Task WeekAsync(NetworkStream stream, byte[] frame)
         {
             long who = SessionContext.State.CharacterId;
-            if (who == 0 || GuildStore.GuildOf(who) == null) return;
-            await WriteAsync(stream, ConnectionProtocol.Answer(Op.Jff, GuildProtocol.BuildNoBenefits(),
-                                                               ConnectionProtocol.RequestId(frame)));
+            var guild = who == 0 ? null : GuildStore.GuildOf(who);
+            if (guild == null) return;
+            var now = DateTimeOffset.UtcNow;
+            await WriteAsync(stream, ConnectionProtocol.Answer(Op.Jff,
+                GuildProtocol.BuildWeek(GuildActivity.Of(guild.Id, now), GuildActivity.TokenCapOf(guild),
+                                        GuildActivity.TokensOf(who, now)),
+                ConnectionProtocol.RequestId(frame)));
+        }
+
+        /// <summary>
+        /// Choosing the guild's tier (jet {f1 the tier, f4 the mission preferences}), answered with
+        /// the week as it is left (jdb). Only the leader and the ranks with the right "Gestionar la
+        /// franja de actividad"; to anybody else the week goes back unchanged.
+        /// </summary>
+        /// <remarks>
+        /// The client builds the jet in one place (ffr, four identical copies): f1 the tier it was
+        /// given, f4 the preferences' two lists. The capture of choosing tier 1: "jet {f1 1, f4 {}}"
+        /// and back "jdb {f2 {f1 {}, f2 {f1 1, f3 250}, f3 {the missions}}}".
+        /// </remarks>
+        public static async Task ChooseTierAsync(NetworkStream stream, byte[] frame)
+        {
+            byte[] jet = ConnectionProtocol.ReadPayload(frame, Op.Jet);
+            long who = SessionContext.State.CharacterId;
+            var guild = jet == null || who == 0 ? null : GuildStore.GuildOf(who);
+            if (guild == null) return;
+
+            int tier = 0;
+            byte[] preferences = Array.Empty<byte>();
+            foreach (var field in ProtoMessage.Parse(jet).Fields)
+            {
+                if (field.FieldNumber == 1 && field.WireType == 0) tier = (int)field.VarIntValue;
+                if (field.FieldNumber == 4 && field.WireType == 2) preferences = field.BytesValue ?? Array.Empty<byte>();
+            }
+
+            var now = DateTimeOffset.UtcNow;
+            var week = GuildStore.HasRight(who, GuildActivity.ManageActivityRight)
+                ? GuildActivity.Choose(guild.Id, tier, preferences, now)
+                : null;
+            if (week != null)
+                Console.WriteLine($"[Guild] «{guild.Name}» chooses activity tier {tier}" +
+                                  (week.PendingActivityId != 0 ? " for next week." : "."));
+            week ??= GuildActivity.Of(guild.Id, now);
+            if (!week.HasActivity) return;
+
+            await WriteAsync(stream, ConnectionProtocol.Answer(Op.Jdb,
+                GuildProtocol.BuildTierChosen(week, GuildActivity.TokenCapOf(guild), GuildActivity.TokensOf(who, now)),
+                ConnectionProtocol.RequestId(frame)));
         }
 
         // ─── Ranks ─────────────────────────────────────────────────────────────
@@ -697,7 +743,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task RefreshEveryoneAsync(GuildStore.Guild guild, long exceptCharacter = 0)
         {
             var members = GuildStore.Members(guild.Id);
-            var frames = MemberFrames(members);
+            byte[] list = MembersFrame(members);
             byte[] header = ConnectionProtocol.Push(Op.Jhh, GuildProtocol.BuildGuildInfo(guild, members.Count));
 
             foreach (var member in members)
@@ -705,7 +751,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (member.CharacterId == exceptCharacter) continue;
                 var session = SessionRegistry.FindByCharacter(member.CharacterId);
                 if (session == null) continue;
-                foreach (var frame in frames) await session.SendAsync(frame);
+                await session.SendAsync(list);
                 await session.SendAsync(header);
             }
         }
@@ -810,21 +856,30 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// Contributing (jlb): ten thousand kamas of the character for ten of the guild, five times a
-        /// week at most. It is answered with the contribution made, the guild's kamas and the
-        /// character's.
+        /// week at most, and with them ten tokens for him and a hundred activity points for the guild
+        /// (<see cref="GuildActivity"/>). It is answered with the contribution made, the guild's
+        /// kamas and the character's.
         /// </summary>
+        /// <remarks>
+        /// Only with a tier chosen, as the client has it: without one its button says to choose a
+        /// tier in the missions tab first.
+        /// </remarks>
         public static async Task ContributeAsync(NetworkStream stream, byte[] frame)
         {
             long who = SessionContext.State.CharacterId;
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
             if (guild == null) return;
             if (GameState.Kamas < GuildStore.ContributionKamas) return;
+            var now = DateTimeOffset.UtcNow;
+            if (!GuildActivity.Of(guild.Id, now).HasActivity) return;
 
             int left = GuildStore.Contribute(who, guild.Id);
             if (left < 0) return;   // he had none left this week
 
             GameState.Kamas -= GuildStore.ContributionKamas;
             DatabaseManager.SaveCurrentCharacter();
+            var credited = GuildActivity.Credit(guild, who, GuildActivity.ContributionTokens,
+                                                GuildActivity.ContributionActivityPoints, now);
 
             // The capture's order: ivf, jgz, (ivj), jia, (iun, khd), jle.
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Ivf,
@@ -840,6 +895,9 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jle,
                 GuildProtocol.BuildContribution(GuildStore.ContributionKamas, left)));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jla, GuildProtocol.BuildContributionsLeft(left)));
+
+            // A milestone reached moves the guild's experience, and maybe its level: everybody's header.
+            if (credited.Experience > 0) await TellEveryoneAsync(guild, HeaderFrame(GuildStore.GuildOf(who)));
         }
 
         // ─── Applications ───────────────────────────────────────────────────────
@@ -987,7 +1045,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await session.SendAsync(ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
             await session.SendAsync(ConnectionProtocol.Push(Op.Jgw, GuildProtocol.BuildGuildJoined(guild, rank)));
-            foreach (var frame in MemberFrames(members)) await session.SendAsync(frame);
+            await session.SendAsync(MembersFrame(members));
             await session.SendAsync(ConnectionProtocol.Push(Op.Jhh,
                 GuildProtocol.BuildGuildInfo(guild, members.Count)));
             await session.SendAsync(ConnectionProtocol.Push(Op.Jij, GuildProtocol.BuildJoinDone()));

@@ -257,6 +257,18 @@ namespace Jondo.Unity.Tests.World
     [Collection("MapManager")]
     public class LuminomachinePlacementTests
     {
+        /// <summary>A map's position on its world map, from world.db.</summary>
+        private static (int X, int Y) Position(long mapId)
+        {
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseManager.WorldConnectionString);
+            connection.Open();
+            var query = connection.CreateCommand();
+            query.CommandText = "SELECT PosX, PosY FROM MapPositions WHERE MapId = $m;";
+            query.Parameters.AddWithValue("$m", mapId);
+            using var reader = query.ExecuteReader();
+            return reader.Read() ? (reader.GetInt32(0), reader.GetInt32(1)) : (0, 0);
+        }
+
         [Fact]
         public void One_machine_on_every_floor_that_has_light()
         {
@@ -272,19 +284,26 @@ namespace Jondo.Unity.Tests.World
                 var casillas = new Dictionary<long, List<int>>();
                 foreach (int floor in sima.Floors)
                 {
-                    casillas[DatabaseManager.MapsOfSubArea(floor).Min()] = new List<int> { 7, 296 };
+                    foreach (long map in DatabaseManager.MapsOfSubArea(floor)) casillas[map] = new List<int> { 7, 296 };
                 }
 
                 MapManager.WalkableCells = casillas;
                 Luminomachines.Place();
 
+                // Each on the map its floor is reached by: the outpost, then where the way down
+                // from the floor above arrives -- never one of the floor's arenas, which have no
+                // position on the raid's world map.
+                var routes = GuildRaidPassages.Derive();
                 Assert.Equal(5, Luminomachines.Placed.Count);
+                Assert.Equal(GuildRaidManager.EntryMapOf(sima), Luminomachines.Placed[0].MapId);
                 for (int i = 0; i < Luminomachines.Placed.Count; i++)
                 {
                     var machine = Luminomachines.Placed[i];
                     Assert.Equal(i + 1, machine.Floor);
                     Assert.Equal(sima.Floors[i], machine.SubArea);
                     Assert.Equal(sima.Floors[i], DatabaseManager.SubAreaOfMap(machine.MapId));
+                    Assert.Equal(GuildRaidPassages.ArrivalMapOf(sima, i + 1, routes), machine.MapId);
+                    Assert.NotEqual((0, 0), Position(machine.MapId));
                     Assert.Contains(machine.Cell, casillas[machine.MapId]);
                     Assert.Equal(i + 1, Luminomachines.FloorOn(machine.MapId));
                 }

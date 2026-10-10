@@ -259,6 +259,23 @@ namespace Jondo.Unity.World.Fights
         public int WinnerTeamId { get; private set; } = -1;
 
         public long RoleplayMapId { get; set; }
+
+        /// <summary>
+        /// The Gigalodón's darkness: the tier spell of Pensamientos Oscuros this fight's floor gives
+        /// its monsters, or 0 for none. The dispatcher casts all its tiers; only this one goes through.
+        /// </summary>
+        public int DarknessTier { get; set; }
+
+        /// <summary>The most people a side may have in this fight, or 0 for the usual (the Santuario's guardians: 4).</summary>
+        public int PeopleCap { get; set; }
+
+        /// <summary>
+        /// Who stands for the fight's SCENE, or null. Some monster fights are scripted from the scene
+        /// itself, a carrier on neither side: their rows aim at it with "Sce" and at the sides with
+        /// "Def" and "Atq". This server has no such carrier, so a fighter of the fight carries the
+        /// scene's spells and is the one "Sce" names (the Santuario's Vigilante and Guardián).
+        /// </summary>
+        public Fighter SceneStandIn { get; set; }
         public long ArenaMapId { get; set; }
 
         /// <summary>
@@ -1236,6 +1253,14 @@ namespace Jondo.Unity.World.Fights
                     CurrentTurnIndex = 0;
                     RoundNumber++;
                     StartsNewRound = true;
+
+                    // A fight that ends at a set round (FightRules.EndsAtRound): its players' side falls.
+                    if (Reglas.EndsAtRound > 0 && RoundNumber >= Reglas.EndsAtRound)
+                    {
+                        foreach (var quien in Azul) if (quien != null && !quien.IsMonster) quien.CurrentHP = 0;
+                        CheckFightEnd();
+                        if (State == FightState.Ended) return null;
+                    }
 
                     // The shields that have run their course drop here, with the change of round. If they do not
                     // expire, a two-round shield stays on until the end of the

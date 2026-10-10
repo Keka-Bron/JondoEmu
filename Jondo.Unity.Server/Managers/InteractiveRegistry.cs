@@ -51,6 +51,12 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>The guild chest, in the banks: "Utilizar" (184) opens the guild's.</summary>
         GuildChest,
+
+        /// <summary>A guild raid's Luminarium lantern fish (GuildRaidLuminarium).</summary>
+        RaidLantern,
+
+        /// <summary>The Cangrancio's statues, levers of its enigma (GuildRaidExecrabe).</summary>
+        RaidStatue,
     }
 
     /// <summary>A skill offered by an interactive element.</summary>
@@ -365,6 +371,28 @@ namespace Jondo.Unity.Server.Managers
             // client does not attach some drawings (notably the suns) to the map. So all the
             // elements are declared, but without inventing a skill for them: only the
             // providers passed above stay clickable and resolvable by iwo.
+            // The guild raids' Luminarium: its sixteen lantern fish (GuildRaidLuminarium).
+            foreach (var (boardMap, fish) in GuildRaidLuminarium.Boards())
+            {
+                foreach (var element in fish)
+                {
+                    if (_byElement.ContainsKey((boardMap, element.Id))) continue;
+                    Register(boardMap, element, GuildRaidLuminarium.FishType, InteractiveActionKind.RaidLantern,
+                             GuildRaidLuminarium.FishSkill);
+                }
+            }
+
+            // And the Cangrancio's four statues, levers worked in the order of its forms.
+            if (GuildRaidExecrabe.StatuesOf(Jondo.Unity.World.Content.Raids.Of(Jondo.Unity.World.Content.Raids.Gigalodon)) is { } statues)
+            {
+                foreach (var (statue, _) in statues.Statues)
+                {
+                    if (_byElement.ContainsKey((statues.MapId, statue.Id))) continue;
+                    Register(statues.MapId, statue, GuildRaidExecrabe.StatueType, InteractiveActionKind.RaidStatue,
+                             GuildRaidExecrabe.StatueSkill);
+                }
+            }
+
             foreach (long mapId in Interactives.MapIds)
             {
                 foreach (var element in Interactives.ElementsOf(mapId))

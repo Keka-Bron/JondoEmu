@@ -219,6 +219,8 @@ namespace Jondo.Unity.Server.Handlers
 
             Way way = WayOut(Jondo.Unity.Server.Network.SessionContext.State.MapId, Jondo.Unity.Server.Network.SessionContext.State.CellId, asked);
             long target = Neighbour(Jondo.Unity.Server.Network.SessionContext.State.MapId, way, asked);
+            if (target > 0 && await Managers.GuildRaidManager.KeepsOutAsync(stream,
+                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId, target)) return;
 
             if (target <= 0 || target == Jondo.Unity.Server.Network.SessionContext.State.MapId)
             {
@@ -279,6 +281,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (targetMapId <= 0 || MapManager.GetMapInfo(targetMapId) == null) return null;
             if (await Managers.Jail.KeepsInAsync(stream)) return null;
+            if (await Managers.GuildRaidManager.KeepsOutAsync(stream,
+                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId, targetMapId)) return null;
 
             IReadOnlyCollection<int> walkable;
             if (MapManager.WalkableCells.TryGetValue(targetMapId, out var roleplayCells) &&

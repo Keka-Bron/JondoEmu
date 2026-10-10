@@ -414,9 +414,21 @@ namespace Jondo.Unity.Server.Network
             return entry.Msg(4, valor);
         }
 
+        /// <param name="wave">
+        /// The wave a monster came in with, in f4 of the fighter (the client's monster info keeps
+        /// it there and copies it to the entity's wave). Zero, and absent, for the rest. A fighter
+        /// sent with the current wave -- the last jyb -- and with no entity yet is drawn by the
+        /// client at the end of the sequence with gfx 2715 falling on its cell.
+        /// </param>
+        /// <param name="alive">
+        /// Whether the fighter is alive, f3 of the place block. The client draws, at the end of
+        /// every sequence, each fighter it holds as alive with no entity; a jxb sent in mid-fight
+        /// with the dead marked alive brings them back onto the board.
+        /// </param>
         public static Pb FighterBlock(int cell, int orientation, long fighterId,
                                       IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
-                                      byte[] look, Pb identity, bool isMonster)
+                                      byte[] look, Pb identity, bool isMonster, int wave = 0,
+                                      bool alive = true)
         {
             var stats = Pb.New().Var(3, SheetKind);
             foreach (var (characteristic, baseValue, gear) in sheet)
@@ -428,7 +440,7 @@ namespace Jondo.Unity.Server.Network
             var where = Pb.New().Var(1, cell).VarIfNotZero(2, orientation).Var(4, 0);
             var again = Pb.New()
                 .VarIfNotZero(2, isMonster ? 1 : 0)
-                .Var(3, 1)
+                .VarIfNotZero(3, alive ? 1 : 0)
                 .Msg(4, Pb.New().Msg(1, where).Var(3, fighterId));
 
             // The fighter's block: the identifier in front, the sheet, what says what it is —f3 in
@@ -438,6 +450,7 @@ namespace Jondo.Unity.Server.Network
                 .Msg(2, stats);
             if (isMonster) fighter.Msg(3, identity);
             else fighter.Msg(6, identity);
+            fighter.VarIfNotZero(4, wave);
             fighter.Msg(7, again);
 
             return Pb.New()
@@ -1608,20 +1621,15 @@ namespace Jondo.Unity.Server.Network
         /// The effect that summoned it, which is the f14: 181 for an ordinary summon, 1008 for
         /// a bomb, 1011 for one the owner plays. Every summon went out as 181 until now.
         /// </param>
-        /// <param name="summoned">
-        /// False for a monster that comes on with nobody's summon to it -- a dream's next wave --:
-        /// its sheet then goes as any fighter's (<see cref="FighterBlock"/>), with no summoner and
-        /// no summoned mark. With them it was the summon of the last of the wave before, already
-        /// dead, and the client listed the wave in the turns but drew none of it.
-        /// </param>
         public static byte[] BuildSummon(long quienInvoca, long quienEs, int celda, int orientacion,
                                          int plantillaDelAspecto, int plantillaDelBicho, int grado,
                                          IEnumerable<(int Characteristic, long Base, long Gear)> ficha,
-                                         int efecto = Invoca, bool summoned = true)
+                                         int efecto = Invoca)
         {
-            var stats = summoned
-                ? Pb.New().Var(1, quienInvoca).Var(3, SheetKind).Var(4, 1)
-                : Pb.New().Var(3, SheetKind);
+            var stats = Pb.New()
+                .Var(1, quienInvoca)
+                .Var(3, SheetKind)
+                .Var(4, 1);
             foreach (var (caracteristica, valor, equipo) in ficha)
             {
                 stats.Msg(5, SheetEntry(caracteristica, valor, equipo, isMonster: true));
@@ -1647,6 +1655,24 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>The effect number of "Invoca: #1" in the catalogue.</summary>
         public const int Invoca = 181;
+
+        /// <summary>
+        /// A new wave (jyb): f1 the team, f2 the wave number, f3 the turns before the next one.
+        ///
+        /// In no capture; read from the client. Its handler keeps the number as the
+        /// FightBattleService's current wave, sets the timeline's wave counters (the next one shown
+        /// as Max(turns, 0)) and counts the turns down at each round. At the end of every
+        /// sequence ("Sequence finished.") the same service draws each living fighter that has no
+        /// entity yet, and to those whose wave -- f4 of their block -- is the current one it gives
+        /// the arrival: hidden, then gfx 2715 falling on its cell, 300 ms apart one from the next,
+        /// then shown. A summon does not get it: the summon creates its entity at once.
+        /// </summary>
+        public static byte[] BuildNewWave(int team, int wave, int turnsBeforeNext)
+            => Pb.New()
+                .VarIfNotZero(1, team)
+                .Var(2, wave)
+                .VarIfNotZero(3, turnsBeforeNext)
+                .Build();
 
         /// <summary>
         /// A double of a character comes out (jwe 180): the summon's block, with the character's

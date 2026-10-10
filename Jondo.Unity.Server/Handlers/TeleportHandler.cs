@@ -88,6 +88,9 @@ namespace Jondo.Unity.Server.Handlers
             // ends in a teleport ends here, so this is the one that cannot be forgotten.
             if (await Managers.Jail.KeepsInAsync(stream)) return -1;
 
+            // A guild raid's floor that its goals have not opened yet (see GuildRaidManager).
+            if (await Managers.GuildRaidManager.KeepsOutAsync(stream, SessionContext.State.CharacterId, mapId)) return -1;
+
             // A map that is not in the world data is a map the client cannot load either: it gets
             // the jru, finds nothing and the character appears nowhere. It is the same check the
             // zaap and the map change by the edge do.

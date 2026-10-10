@@ -69,15 +69,59 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// The window header (jhh) of a freshly created guild: the founding date, the
-        /// level 1, the 50 members that fit and the only one there is.
+        /// The window header (jhh) of a freshly created guild: the founding date, the level 1, the
+        /// 50 experience level 2 starts at and the only member there is.
         /// </summary>
         [Fact]
         public void The_guild_header_is_the_capture()
         {
             Assert.Equal("0a1e323032362d30382d31325432303a35333a30322e3138373531353334325a180148325001",
                          Hex(GuildProtocol.BuildGuildInfo(Jondo(), memberCount: 1)));
-            Assert.Equal(50, GuildStore.MaxMembers(1));
+        }
+
+        /// <summary>
+        /// And with guild kamas: the capture's header after a contribution, "f3 1, f7 10, f9 50, f10 2".
+        /// </summary>
+        [Fact]
+        public void The_guild_header_carries_the_guild_kamas()
+        {
+            var guild = Jondo();
+            guild.GuildKamas = 10;
+            Assert.Equal("0a1e323032362d30382d31325432303a35333a30322e3138373531353334325a1801380a48325002",
+                         Hex(GuildProtocol.BuildGuildInfo(guild, memberCount: 2)));
+        }
+
+        /// <summary>
+        /// A level 4 guild's experience bar, as the capture of leaving a guild shows it: the level
+        /// starting at 150, 181 gathered, the next level at 210.
+        /// </summary>
+        [Fact]
+        public void The_guild_header_carries_the_experience_bar()
+        {
+            var guild = Jondo();
+            guild.Level = 4;
+            guild.Experience = 181;
+            var fields = ProtoMessage.Parse(GuildProtocol.BuildGuildInfo(guild, memberCount: 16)).Fields
+                                     .ToDictionary(f => f.FieldNumber, f => f.VarIntValue);
+            Assert.Equal(150, fields[5]);
+            Assert.Equal(181, fields[6]);
+            Assert.Equal(210, fields[9]);
+            Assert.False(fields.ContainsKey(7));
+        }
+
+        /// <summary>The guild levels' curve, where the captures meet it and at its ends.</summary>
+        [Fact]
+        public void The_guild_levels_follow_the_curve()
+        {
+            Assert.Equal(0, GuildLevels.FloorOf(1));
+            Assert.Equal(50, GuildLevels.NextFloorOf(1));
+            Assert.Equal(340, GuildLevels.FloorOf(7));
+            Assert.Equal(410, GuildLevels.NextFloorOf(7));
+            Assert.Equal(4, GuildLevels.LevelFor(181));
+            Assert.Equal(1, GuildLevels.LevelFor(49));
+            Assert.Equal(2, GuildLevels.LevelFor(50));
+            Assert.Equal(20, GuildLevels.LevelFor(5000));
+            Assert.Equal(1890, GuildLevels.NextFloorOf(20));
         }
 
         /// <summary>The four default ranks (jco), the whole mould of a new guild.</summary>
@@ -202,14 +246,15 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Contributions are counted per week and the week starts on Tuesday, which is when
-        /// the game resets the weekly things.
+        /// Contributions are counted per week and the week starts at the weekly reset the
+        /// captures measure, Tuesday 05:00 UTC.
         /// </summary>
         [Fact]
         public void The_week_starts_on_tuesday()
         {
             Assert.Equal("2026-09-15", GuildStore.WeekOf(new DateTimeOffset(2026, 9, 17, 10, 0, 0, TimeSpan.Zero)));
-            Assert.Equal("2026-09-15", GuildStore.WeekOf(new DateTimeOffset(2026, 9, 15, 0, 0, 0, TimeSpan.Zero)));
+            Assert.Equal("2026-09-15", GuildStore.WeekOf(new DateTimeOffset(2026, 9, 15, 5, 0, 0, TimeSpan.Zero)));
+            Assert.Equal("2026-09-08", GuildStore.WeekOf(new DateTimeOffset(2026, 9, 15, 4, 59, 0, TimeSpan.Zero)));
             Assert.Equal("2026-09-08", GuildStore.WeekOf(new DateTimeOffset(2026, 9, 14, 23, 0, 0, TimeSpan.Zero)));
         }
 

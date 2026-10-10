@@ -29,6 +29,9 @@ namespace Jondo.Unity.Server
         {
             ConsoleLogBuffer.Initialize();
 
+            // Started again by the one before it, to apply its settings: it waits for that one to be gone.
+            WaitForThePreviousRun(args);
+
             if (!Contract.CogerElSitio("JondoEmuServidor"))
             {
                 Console.WriteLine("[!] There is already a Jondo server running in this session. This one closes.");
@@ -246,6 +249,9 @@ namespace Jondo.Unity.Server
 
             StopServices();
 
+            // A restart asked for from the Settings window: the next run starts as this one ends.
+            if (_restartRequested != 0) StartTheNextRun();
+
             // Safety net: if something gets stuck and the process does not end on its own, force
             // the exit. It used to have to be killed by hand from the task manager.
             _ = Task.Run(async () =>
@@ -269,6 +275,54 @@ namespace Jondo.Unity.Server
         /// Requests a graceful shutdown of the emulator. The launcher window calls it when closing.
         /// It is idempotent: it does not matter how many times it is called.
         /// </summary>
+        /// <summary>
+        /// Shuts down like <see cref="RequestShutdown"/> and starts the server again, which is how
+        /// the settings saved from the window take effect.
+        /// </summary>
+        public static void RequestRestart(string reason)
+        {
+            Interlocked.Exchange(ref _restartRequested, 1);
+            RequestShutdown(reason);
+        }
+
+        private static int _restartRequested;
+
+        /// <summary>The argument a restarted run gets: the process id of the run it replaces.</summary>
+        private const string RestartAfter = "--restart-after";
+
+        private static void StartTheNextRun()
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = Environment.ProcessPath!,
+                    Arguments = $"{RestartAfter} {Environment.ProcessId}",
+                    UseShellExecute = false,
+                    WorkingDirectory = Environment.CurrentDirectory,
+                });
+                Console.WriteLine("[+] The server starts again with its new settings.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[!] The server could not start again: {ex.Message}");
+            }
+        }
+
+        /// <summary>Waits, for half a minute at most, for the run this one replaces to end.</summary>
+        private static void WaitForThePreviousRun(string[] args)
+        {
+            int at = Array.IndexOf(args, RestartAfter);
+            if (at < 0 || at + 1 >= args.Length || !int.TryParse(args[at + 1], out int previous)) return;
+            try
+            {
+                using var process = System.Diagnostics.Process.GetProcessById(previous);
+                process.WaitForExit(30_000);
+            }
+            catch (ArgumentException) { }       // already gone
+            catch (InvalidOperationException) { }
+        }
+
         public static void RequestShutdown(string reason)
         {
             if (Interlocked.Exchange(ref _shutdownRequested, 1) != 0) return;

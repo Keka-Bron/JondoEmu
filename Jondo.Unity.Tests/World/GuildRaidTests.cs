@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
@@ -33,39 +33,10 @@ namespace Jondo.Unity.Tests.World
 
         private static GuildStore.Guild Guild() => GuildStore.Create(7001, "Jondo", 165, 8, 16744448, 9476018);
 
-        /// <summary>
-        /// Buying costs the guild's kamas, and one does not buy twice nor without having them. The
-        /// prices are those of the game's sheet: 360 the Sima and 480 the Santuario.
-        /// </summary>
+        /// <summary>Without a raid there is nothing running to be in.</summary>
         [Fact]
-        public void Buying_a_raid_costs_the_guild_its_kamas()
+        public void With_no_raid_nothing_is_running()
         {
-            var guild = Guild();
-            Assert.Equal("raid.nokamas", GuildRaidManager.Buy(7001, Raids.Gigalodon));
-
-            for (int i = 0; i < 5; i++) GuildStore.Contribute(7001, guild.Id);   // 50 guild kamas
-            Assert.Equal("raid.nokamas", GuildRaidManager.Buy(7001, Raids.Gigalodon));
-
-            // By hand, which is what 36 contributions would cost.
-            GuildStore.SpendGuildKamas(guild.Id, -400);
-            Assert.Equal(450, GuildStore.GuildOf(7001).GuildKamas);
-
-            Assert.Null(GuildRaidManager.Buy(7001, Raids.Gigalodon));
-            Assert.Equal(90, GuildStore.GuildOf(7001).GuildKamas);      // 450 - 360
-            Assert.True(GuildStore.OwnsRaid(guild.Id, Raids.Gigalodon));
-            Assert.Equal(new[] { Raids.Gigalodon }, GuildStore.OwnedRaids(guild.Id));
-
-            Assert.Equal("raid.owned", GuildRaidManager.Buy(7001, Raids.Gigalodon));
-            Assert.Equal("raid.unknown", GuildRaidManager.Buy(7001, 99));
-            Assert.Equal(360, Raids.Of(Raids.Gigalodon).Price);
-            Assert.Equal(480, Raids.Of(Raids.EternalGardens).Price);
-        }
-
-        /// <summary>Without a guild there is no raid to buy or to launch.</summary>
-        [Fact]
-        public void With_no_guild_there_is_no_raid()
-        {
-            Assert.Equal("raid.noguild", GuildRaidManager.Buy(7001, Raids.Gigalodon));
             Assert.Null(GuildRaidManager.RunningOf(7001));
             Assert.Null(GuildRaidManager.RaidOf(7001));
         }
@@ -77,8 +48,8 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void The_clock_runs_for_what_the_raid_lasts()
         {
-            Assert.Equal(TimeSpan.FromHours(1), Raids.Of(Raids.Gigalodon).RunsFor);
-            Assert.Equal(TimeSpan.FromHours(2), Raids.Of(Raids.EternalGardens).RunsFor);
+            Assert.Equal(TimeSpan.FromHours(1), GuildRaidCatalogue.Of(Raids.Gigalodon).Duration);
+            Assert.Equal(TimeSpan.FromHours(2), GuildRaidCatalogue.Of(Raids.EternalGardens).Duration);
 
             var empezo = DateTimeOffset.UtcNow;
             var raid = new RaidInstance(1, Raids.Gigalodon, 42043, 7001, empezo, TimeSpan.FromHours(1));
@@ -153,7 +124,10 @@ namespace Jondo.Unity.Tests.World
             Guild();
             var resolver = GuildRaidManager.ResolverFor(7001);
             Assert.Equal(Answer.Unknown, Criterion.Evaluate("RV<7,Raid_Score,5000", resolver));
-            Assert.False(GuildRaidManager.MonsterWouldAggress(7001, 8324));
+            // And so the abyss's monsters do not jump on him: their immunity is not known to fail.
+            var group = new MobSpawnManager.MobGroup { MobId = -1, CellId = 300 };
+            var threat = new MonsterAggression.Threat(group, 10, 200, DatabaseManager.MonsterAggressiveImmunity(8324), 3000);
+            Assert.False(MonsterAggression.Jumps(threat, 200, 300, c => Criterion.Evaluate(c, resolver) != Answer.False));
         }
     }
 }

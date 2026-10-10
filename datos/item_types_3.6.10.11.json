@@ -1,0 +1,1917 @@
+{
+ "version": "3.6.10.11",
+ "types": [
+  {
+   "id": 1,
+   "name": "Amuleto",
+   "superTypeId": 1,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 2,
+   "name": "Arco",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 3,
+   "name": "Varita",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 4,
+   "name": "Bastón",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 5,
+   "name": "Daga",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 6,
+   "name": "Espada",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 7,
+   "name": "Martillo",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 8,
+   "name": "Pala",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 9,
+   "name": "Anillo",
+   "superTypeId": 3,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 10,
+   "name": "Cinturón",
+   "superTypeId": 4,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 11,
+   "name": "Bota",
+   "superTypeId": 5,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 12,
+   "name": "Pócima",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 13,
+   "name": "Pergamino de experiencia",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 14,
+   "name": "Objeto de dones",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 15,
+   "name": "Recurso variado",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 16,
+   "name": "Sombrero",
+   "superTypeId": 10,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 17,
+   "name": "Capa",
+   "superTypeId": 11,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 18,
+   "name": "Mascota",
+   "superTypeId": 12,
+   "categoryId": 0,
+   "evolutiveTypeId": 1,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 19,
+   "name": "Hacha",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 20,
+   "name": "Herramienta",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 21,
+   "name": "Pico",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 22,
+   "name": "Guadaña",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 23,
+   "name": "Dofus",
+   "superTypeId": 13,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 24,
+   "name": "Diversos",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 25,
+   "name": "Documento",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 26,
+   "name": "Pócima de forjamagia",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 27,
+   "name": "Objeto de mutación",
+   "superTypeId": 15,
+   "categoryId": 4,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 28,
+   "name": "Alimento boost",
+   "superTypeId": 16,
+   "categoryId": 4,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 29,
+   "name": "Bendición",
+   "superTypeId": 17,
+   "categoryId": 4,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 30,
+   "name": "Maldición",
+   "superTypeId": 18,
+   "categoryId": 4,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 31,
+   "name": "Roleplay buffs",
+   "superTypeId": 19,
+   "categoryId": 4,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 32,
+   "name": "Personaje seguidor",
+   "superTypeId": 20,
+   "categoryId": 4,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 33,
+   "name": "Pan",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 34,
+   "name": "Cereal",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 35,
+   "name": "Flor",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 36,
+   "name": "Planta",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 37,
+   "name": "Cerveza",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 38,
+   "name": "Madera",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 39,
+   "name": "Mineral",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 40,
+   "name": "Aleación",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 41,
+   "name": "Pescado",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 42,
+   "name": "Golosina",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 43,
+   "name": "Pócima de teletransportación",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 46,
+   "name": "Fruta",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 47,
+   "name": "Hueso",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 48,
+   "name": "Polvo",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 49,
+   "name": "Pescado comestible",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 50,
+   "name": "Piedra preciosa",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 51,
+   "name": "Piedra bruta",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 53,
+   "name": "Pluma",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 54,
+   "name": "Pelo",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 55,
+   "name": "Tejido",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 56,
+   "name": "Cuero",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 57,
+   "name": "Lana",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 58,
+   "name": "Semilla",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 59,
+   "name": "Piel",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 60,
+   "name": "Aceite",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 61,
+   "name": "Peluche",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 63,
+   "name": "Carne",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 65,
+   "name": "Cola",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 66,
+   "name": "Metaria:",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 68,
+   "name": "Legumbre",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 69,
+   "name": "Carne comestible",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 70,
+   "name": "Tinte",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 71,
+   "name": "Material de alquimia",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 74,
+   "name": "Hada artificial",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 75,
+   "name": "Pergamino con un hechizo",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 76,
+   "name": "Pergamino de característica",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 78,
+   "name": "Runa de forjamagia",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 79,
+   "name": "Bebida",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 80,
+   "name": "Objeto de misión",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 82,
+   "name": "Escudo",
+   "superTypeId": 7,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 83,
+   "name": "Piedra de alma",
+   "superTypeId": 70,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 84,
+   "name": "Llave",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 85,
+   "name": "Piedra de alma llena",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 87,
+   "name": "Pergamino de búsqueda",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 88,
+   "name": "Piedra mágica",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 89,
+   "name": "Regalo",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 94,
+   "name": "Objeto utilizable",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 95,
+   "name": "Tabla",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 96,
+   "name": "Corteza",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 97,
+   "name": "Certificado de dragopavo",
+   "superTypeId": 27,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 98,
+   "name": "Raíz",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 99,
+   "name": "Red de captura",
+   "superTypeId": 70,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 100,
+   "name": "Saco de recursos",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 103,
+   "name": "Pata",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 104,
+   "name": "Ala",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 105,
+   "name": "Huevo",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 106,
+   "name": "Oreja",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 107,
+   "name": "Caparazón",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 108,
+   "name": "Brote",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 109,
+   "name": "Ojo",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 110,
+   "name": "Gelatina",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 111,
+   "name": "Cáscara",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 112,
+   "name": "Prisma",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 113,
+   "name": "Objeto viviente",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 114,
+   "name": "Arma mágica",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 119,
+   "name": "Hongo",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 121,
+   "name": "Mascotura",
+   "superTypeId": 12,
+   "categoryId": 0,
+   "evolutiveTypeId": 1,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 125,
+   "name": "Recuerdo",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 126,
+   "name": "Misiones principales",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 127,
+   "name": "Misiones de templo",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 128,
+   "name": "Cartel de busca y captura",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 129,
+   "name": "Alineamiento",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 131,
+   "name": "Eventos",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 132,
+   "name": "Archipielago de Vulkania",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 133,
+   "name": "Astrub",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 136,
+   "name": "Campamentos de los bworks y de los goblins",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 137,
+   "name": "Cania",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 139,
+   "name": "Isla de Frigost",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 140,
+   "name": "Isla de Otomai",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 141,
+   "name": "Isla de Nawidad",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 142,
+   "name": "Incarnam",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 143,
+   "name": "Montaña de los koalaks",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 144,
+   "name": "Pandala",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 146,
+   "name": "Reino de Amakna",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 147,
+   "name": "Krosmoz",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 148,
+   "name": "Fichas",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 149,
+   "name": "Isla de Moon",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 150,
+   "name": "Archipiélago wabbit",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 151,
+   "name": "Trofeo",
+   "superTypeId": 13,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 152,
+   "name": "Guijarro",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 153,
+   "name": "Nawidad",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 154,
+   "name": "Caja",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 155,
+   "name": "Sufokia",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 156,
+   "name": "Almanax",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 157,
+   "name": "Figura",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 164,
+   "name": "Ropaje",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 165,
+   "name": "Pócima de conquista",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 166,
+   "name": "Mimobionte",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 167,
+   "name": "Esencia de guardián de mazmorra",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 168,
+   "name": "Justicieros",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 169,
+   "name": "Compañero",
+   "superTypeId": 23,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 171,
+   "name": "Dimensiones divinas",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 172,
+   "name": "Cofre",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 173,
+   "name": "Pergamino de actitud",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 174,
+   "name": "Mapa",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 175,
+   "name": "Fragmento de mapa",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 176,
+   "name": "Caja de fragmentos",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 179,
+   "name": "Preparación",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 183,
+   "name": "Concentrado",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 184,
+   "name": "Contenedor",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 185,
+   "name": "Savia",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 187,
+   "name": "Carne primitiva",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 188,
+   "name": "Pergamino de emoticonos",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 189,
+   "name": "Orbe de forjamagia",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 195,
+   "name": "Material de exploración",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 196,
+   "name": "Certificado de mulagua",
+   "superTypeId": 27,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 197,
+   "name": "Garantía",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 198,
+   "name": "Picahari",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 199,
+   "name": "Traje",
+   "superTypeId": 25,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 200,
+   "name": "Pergamino de título",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 201,
+   "name": "Animatopía",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 202,
+   "name": "Sidimote",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 203,
+   "name": "Objeto invisible",
+   "superTypeId": 26,
+   "categoryId": 4,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 205,
+   "name": "Torres de la Hermandad",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 206,
+   "name": "Pócima de montura",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 207,
+   "name": "Certificado de vueloceronte",
+   "superTypeId": 27,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 209,
+   "name": "Comida para mascotas",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 211,
+   "name": "Runa de trascendencia",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 213,
+   "name": "Isla de Pazcuak",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 214,
+   "name": "Pócima de actitud",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 215,
+   "name": "Archipiélago de las Escamas",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 216,
+   "name": "Bolsa",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 217,
+   "name": "Prismaradita",
+   "superTypeId": 13,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 218,
+   "name": "Bosillito de merkasako",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 219,
+   "name": "Recurso de los Sueños",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 220,
+   "name": "Selocalipsis",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 222,
+   "name": "Pergamino de ornamento",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 225,
+   "name": "Temporis",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 226,
+   "name": "Objeto utilizable de Temporis",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 228,
+   "name": "Líquido",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 229,
+   "name": "Recurso de combate",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 230,
+   "name": "Obsoleto",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 231,
+   "name": "Lotachistoso",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 232,
+   "name": "Haiku",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 233,
+   "name": "Runa astral",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 236,
+   "name": "Palabras de haiku",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 241,
+   "name": "Recurso de Temporis",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 242,
+   "name": "Atolón de los poseídos",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 245,
+   "name": "Recurso obsoleto",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 246,
+   "name": "Sombrero de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 247,
+   "name": "Capa de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 248,
+   "name": "Escudo de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 249,
+   "name": "Mascota de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 250,
+   "name": "Mascotura de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 251,
+   "name": "Arma de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 252,
+   "name": "Objeto diverso de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 253,
+   "name": "Pesadilla de los Devastadores",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 254,
+   "name": "Bonta y Brakmar",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 258,
+   "name": "Grabado de forjamagia",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 259,
+   "name": "Kajaklón",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 260,
+   "name": "Bosque Maléfico",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 262,
+   "name": "Material de megalteración",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 266,
+   "name": "Recurso de las anomalías temporales",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 268,
+   "name": "Expediciones",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 271,
+   "name": "Lanza",
+   "superTypeId": 2,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 272,
+   "name": "Archipiélago de Valonia",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 273,
+   "name": "Herraduras de recaudador",
+   "superTypeId": 69,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 274,
+   "name": "Cotas de recaudador",
+   "superTypeId": 69,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 275,
+   "name": "Estandarte de recaudador",
+   "superTypeId": 69,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 276,
+   "name": "Puñales de recaudador",
+   "superTypeId": 69,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 277,
+   "name": "Túnica de recaudador",
+   "superTypeId": 69,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 278,
+   "name": "Recurso de recaudador",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 279,
+   "name": "Cofres de recaudador",
+   "superTypeId": 69,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 280,
+   "name": "Alforjas de recaudador",
+   "superTypeId": 69,
+   "categoryId": 0,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 284,
+   "name": "Reliquia de encarnación",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 287,
+   "name": "Portaseñal de compañero",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 289,
+   "name": "Ídolos de misiones",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 297,
+   "name": "Esfera de luz",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 299,
+   "name": "Hombrera",
+   "superTypeId": 25,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 300,
+   "name": "Alas",
+   "superTypeId": 25,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 301,
+   "name": "Montura domada",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 302,
+   "name": "Tatuaje de la Feria del Trool",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 303,
+   "name": "Globo",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 304,
+   "name": "Set cosmético",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 305,
+   "name": "Feria del Trool",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 306,
+   "name": "Cara",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 307,
+   "name": "Piedra de alma especial",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 308,
+   "name": "Piedra de alma especial llena",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 309,
+   "name": "Piedra de alma especial no transformada",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 310,
+   "name": "Esquíritu",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 311,
+   "name": "Montura",
+   "superTypeId": 12,
+   "categoryId": 0,
+   "evolutiveTypeId": 2,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 312,
+   "name": "Recurso de misión",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 314,
+   "name": "Consumible obsoleto de los Sueños",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 315,
+   "name": "Recurso de raid",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 322,
+   "name": "Esquirlas",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 323,
+   "name": "Mákina",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 324,
+   "name": "Montura de apariencia",
+   "superTypeId": 22,
+   "categoryId": 5,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 325,
+   "name": "La fuente: el legado de los dofus",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  },
+  {
+   "id": 326,
+   "name": "Carburante de cercados",
+   "superTypeId": 9,
+   "categoryId": 2,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 327,
+   "name": "Alma de guardián de mazmorra",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 328,
+   "name": "Alma de archimonstruo",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 329,
+   "name": "Cuerpo",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 330,
+   "name": "Poses",
+   "superTypeId": 6,
+   "categoryId": 1,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 331,
+   "name": "Dragopavo",
+   "superTypeId": 12,
+   "categoryId": 0,
+   "evolutiveTypeId": 2,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 332,
+   "name": "Mulagua",
+   "superTypeId": 12,
+   "categoryId": 0,
+   "evolutiveTypeId": 2,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 333,
+   "name": "Vueloceronte",
+   "superTypeId": 12,
+   "categoryId": 0,
+   "evolutiveTypeId": 2,
+   "isInEncyclopedia": true
+  },
+  {
+   "id": 334,
+   "name": "Fichas de evento",
+   "superTypeId": 14,
+   "categoryId": 3,
+   "evolutiveTypeId": 0,
+   "isInEncyclopedia": false
+  }
+ ]
+}

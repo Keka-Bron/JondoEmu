@@ -72,6 +72,12 @@
         /// </summary>
         public abstract bool DefeatCosts { get; }
 
+        /// <summary>
+        /// The round at whose start the fight is over, everyone of the players' side falling: zero
+        /// for a fight that runs until a side is beaten.
+        /// </summary>
+        public virtual int EndsAtRound => 0;
+
         /// <summary>Whether the kaa carries a countdown. It is deduced from the clock: it is not another decision.</summary>
         public bool KaaConCuentaAtras => RelojDeColocacion > 0;
 
@@ -91,6 +97,28 @@
 
         /// <summary>The kanojedo: hitting a puch, which is a fight against monsters with nothing at stake.</summary>
         public static readonly FightRules Entrenamiento = new Kanojedo();
+
+        /// <summary>
+        /// The Gigalodón's: taking the guild raid's chest and running. Three minutes to place, three
+        /// rounds, and the Gigalodoom at the start of the fourth ends it (the guides); what counts is
+        /// the damage dealt, so losing it costs nothing.
+        /// </summary>
+        public static readonly FightRules GigalodonEscape = new Gigalodon();
+
+        private sealed class Gigalodon : FightRules
+        {
+            public override bool HayRetos => false;
+            public override int RelojDeColocacion => 1800;
+            public override int TipoDelKam => 4;
+            public override bool EnfrenteHayMonstruos => true;
+            public override bool ReparteBotin => true;
+            public override bool PagaElKoliseo => false;
+            public override bool BorraElGrupoAlGanar => true;
+            public override bool AvanzaDeSala => false;
+            public override bool DefeatCosts => false;
+            public override int EndsAtRound => 4;
+            public override string Nombre => "the Gigalodon's escape";
+        }
 
         private sealed class Monstruos : FightRules
         {

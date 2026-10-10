@@ -984,18 +984,26 @@ namespace Jondo.Unity.Server.Network
         /// smaller than a person, and 2,478 other monsters with a scale of their own were drawn off
         /// it too.
         /// </remarks>
-        internal static Pb MonsterLook(string look)
+        internal static Pb MonsterLook(string look) => MonsterLook(look, ServerSettings.Current.Hardcore);
+
+        /// <summary>The same, with Hardcore (the server's settings) putting every monster at twice its size.</summary>
+        internal static Pb MonsterLook(string look, bool hardcore)
         {
             var variants = string.IsNullOrEmpty(look) ? null : Managers.Npcs.Variantes(look);
             if (variants == null || variants.Count == 0)
-                return Pb.New().Var(2, LookKind).VarIfNotZero(3, BonesOf(look));
+            {
+                var bare = Pb.New().Var(2, LookKind).VarIfNotZero(3, BonesOf(look));
+                if (hardcore) bare.Packed(5, new long[] { ServerSettings.HardcoreScale });
+                return bare;
+            }
 
             var first = variants[0];
             var pb = Pb.New();
             if (first.Colors.Length > 0) pb.Packed(1, first.Colors);
             pb.Var(2, LookKind);
             pb.VarIfNotZero(3, first.Bones);
-            if (first.Scales.Length > 0) pb.Packed(5, first.Scales);
+            if (hardcore) pb.Packed(5, new long[] { ServerSettings.HardcoreScale });
+            else if (first.Scales.Length > 0) pb.Packed(5, first.Scales);
             if (first.Skins.Length > 0) pb.Packed(6, first.Skins);
             return pb;
         }
@@ -1304,6 +1312,22 @@ namespace Jondo.Unity.Server.Network
                     || action.Kind == Managers.InteractiveActionKind.Marketplace) sinColocacion = true;
             }
             if (interactive.Actions.Count == 0 || sinColocacion) return;
+
+            // The Cangrancio's statues: lit once the viewer's raid has seen their form.
+            if (interactive.Actions.Any(a => a.Kind == Managers.InteractiveActionKind.RaidStatue))
+            {
+                DeclarePlacement(jss, interactive.Element, (Managers.ResourceState)Managers.GuildRaidExecrabe.StateFor(
+                    Network.SessionContext.State.CharacterId, interactive.MapId, interactive.Element.Id));
+                return;
+            }
+
+            // A guild raid's lantern fish shows how it stands on the viewer's raid's board.
+            if (interactive.Actions.Any(a => a.Kind == Managers.InteractiveActionKind.RaidLantern))
+            {
+                DeclarePlacement(jss, interactive.Element, (Managers.ResourceState)Managers.GuildRaidLuminarium.StateFor(
+                    Network.SessionContext.State.CharacterId, interactive.MapId, interactive.Element.Id));
+                return;
+            }
 
             DeclarePlacement(jss, interactive.Element,
                 gathering && !usable ? state : Managers.ResourceState.Full);

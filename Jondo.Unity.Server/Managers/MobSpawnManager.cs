@@ -315,6 +315,9 @@ namespace Jondo.Unity.Server.Managers
             // And whatever a person has decided, on top of everything before.
             var deLaMano = AplicarLosEscritos();
 
+            // What every map had once loaded, to put a map back as it was (RestoreMap).
+            lock (_candado) _asLoaded = _mapMobs.ToDictionary(kv => kv.Key, kv => kv.Value.Select(CloneOf).ToList());
+
             // The written groups bring their id set from the seeding. The dispenser has to
             // step below the lowest of all of them before handing out its first one, or the
             // first group generated on the fly would take a number already taken on another
@@ -695,7 +698,14 @@ namespace Jondo.Unity.Server.Managers
         {
             lock (_candado)
             {
-                if (_mapMobs.TryGetValue(mapId, out var mobs) && (mobs.Count > 0 || _emptiedByHand.Contains(mapId)))
+                // A map with written groups that has been emptied stays empty: what fills a map on
+                // the fly is for maps that have none written (GetSpawnableMonsterIds). Where a beaten
+                // group is replaced, its fight already put one back; where it is not -- a dream room,
+                // a guild raid's floor --, refilling the map with the subarea's monsters undid the
+                // clearing, and the Gigalodón's first floor could never be cleared.
+                if (_mapMobs.TryGetValue(mapId, out var mobs)
+                    && (mobs.Count > 0 || _emptiedByHand.Contains(mapId)
+                        || (_asLoaded.TryGetValue(mapId, out var written) && written.Count > 0)))
                     return new List<MobGroup>(mobs);
 
                 mobs = GenerateDynamicMobsForMap(mapId);
@@ -878,6 +888,50 @@ namespace Jondo.Unity.Server.Managers
                 mobs.Add(group);
                 return group;
             }
+        }
+
+        /// <summary>The groups each map had when the world was loaded.</summary>
+        private static Dictionary<long, List<MobGroup>> _asLoaded = new Dictionary<long, List<MobGroup>>();
+
+        private static MobGroup CloneOf(MobGroup group) => new MobGroup
+        {
+            MobId = group.MobId,
+            CellId = group.CellId,
+            Orientation = group.Orientation,
+            Modular = group.Modular,
+            Members = group.Members.Select(m => new MobMember { Monster = m.Monster, GradeIndex = m.GradeIndex, Level = m.Level }).ToList(),
+        };
+
+        /// <summary>
+        /// Puts a map's monster groups back as the world was loaded, the groups beaten since
+        /// standing again and the ones that came in their place gone: what a guild raid's floors
+        /// are when a raid starts, since inside a raid nothing comes back.
+        /// </summary>
+        public static int RestoreMap(long mapId)
+        {
+            lock (_candado)
+            {
+                var groups = _asLoaded.TryGetValue(mapId, out var loaded) ? loaded.Select(CloneOf).ToList() : new List<MobGroup>();
+                _mapMobs[mapId] = groups;
+                _emptiedByHand.Remove(mapId);
+                return groups.Count;
+            }
+        }
+
+        /// <summary>Empties a map for good, until something puts groups back (RestoreMap).</summary>
+        public static void ClearMap(long mapId)
+        {
+            lock (_candado)
+            {
+                _mapMobs[mapId] = new List<MobGroup>();
+                _emptiedByHand.Add(mapId);
+            }
+        }
+
+        /// <summary>How many groups a map had when the world was loaded.</summary>
+        public static int LoadedGroups(long mapId)
+        {
+            lock (_candado) return _asLoaded.TryGetValue(mapId, out var loaded) ? loaded.Count : 0;
         }
 
         /// <summary>Where the groups a quest brings out are numbered from.</summary>

@@ -63,6 +63,10 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public const int MaxPeoplePerTeam = Parties.MaxMembers;
 
+        /// <summary>The most people a side of this fight takes: its own cap, never above the usual.</summary>
+        internal static int CapOf(FightInstance fight)
+            => fight.PeopleCap > 0 ? Math.Min(fight.PeopleCap, MaxPeoplePerTeam) : MaxPeoplePerTeam;
+
         /// <summary>What a fight keeps for the map: its flags, and its group while there is one.</summary>
         private sealed class OnTheMap
         {
@@ -442,7 +446,7 @@ namespace Jondo.Unity.Server.Handlers
                 : fight.EquipoDe(named);
             if (team < 0) return "the fighter named is not in the fight";
 
-            var refusal = fight.CanJoin(team, MaxPeoplePerTeam);
+            var refusal = fight.CanJoin(team, CapOf(fight));
             return refusal == FightInstance.JoinRefusal.None ? null : refusal.ToString();
         }
 
@@ -476,7 +480,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 fighter = BuildPlayerFighter(fight);
                 bool joined;
-                lock (fight) joined = fight.JoinTeam(fighter, team, MaxPeoplePerTeam);
+                lock (fight) joined = fight.JoinTeam(fighter, team, CapOf(fight));
                 if (!joined) return false;
 
                 var suyo = SessionContext.State;
@@ -691,7 +695,7 @@ namespace Jondo.Unity.Server.Handlers
             int team = fight.EquipoDe(person.Id);
             if (team < 0) return followers;
 
-            int room = MaxPeoplePerTeam - fight.PeopleIn(team);
+            int room = CapOf(fight) - fight.PeopleIn(team);
             foreach (long member in Parties.MembersOf(party))
             {
                 if (followers.Count >= room) break;
@@ -781,7 +785,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var fight = FightById(pending.FightId);
             if (fight == null || WhyNotFollow(fight, me.State) != null) return;
-            if (fight.CanJoin(pending.Team, MaxPeoplePerTeam) != FightInstance.JoinRefusal.None) return;
+            if (fight.CanJoin(pending.Team, CapOf(fight)) != FightInstance.JoinRefusal.None) return;
 
             await JoinFightAsync(me, fight, pending.Team, followingLeader: true);
         }

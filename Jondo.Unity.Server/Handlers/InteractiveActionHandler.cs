@@ -147,6 +147,14 @@ namespace Jondo.Unity.Server.Handlers
                 case InteractiveActionKind.Marketplace:
                     await MarketplaceHandler.OpenAsync(interactive.Element.Id, action.SkillId);
                     break;
+                case InteractiveActionKind.RaidLantern:
+                    await GuildRaidLuminarium.PressAsync(stream, GameState.CharacterId, mapId,
+                                                         interactive.Element.Id, action.SkillId);
+                    break;
+                case InteractiveActionKind.RaidStatue:
+                    await GuildRaidExecrabe.PressAsync(stream, GameState.CharacterId, mapId,
+                                                       interactive.Element.Id, action.SkillId);
+                    break;
                 default:
                     throw new InvalidOperationException($"Unhandled interactive action: {action.Kind}.");
             }

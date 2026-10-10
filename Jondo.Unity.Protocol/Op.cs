@@ -239,10 +239,10 @@ public static class Op
     /// <summary>Unidentified. 2 uses in the emulator.</summary>
     public const string Hqa = "hqa";
 
-    /// <summary>Unidentified. 2 uses in the emulator.</summary>
+    /// <summary>S→C: a guild raid invitation, to the invited player. f2 the raid's guild, f3 the raid, f4 who invites.</summary>
     public const string Ibo = "ibo";
 
-    /// <summary>Unidentified. 2 uses in the emulator.</summary>
+    /// <summary>S→C: a guild raid's start asked of a participant. f1 the raid, f2 the deadline (ISO).</summary>
     public const string Idf = "idf";
 
     /// <summary>
@@ -715,6 +715,9 @@ public static class Op
     /// <summary>One for each bar slot the spell's old half had; it is sent before hng.</summary>
     public const string Iuq = "iuq";
 
+    /// <summary>Using an item from the bag, a double click: { f3: uid }. ItemUseHandler.</summary>
+    public const string Iuu = "iuu";
+
     /// <summary>Destroying an item; the client removes nothing on its own and without an answer the item stays. Observed against the real client in the emulator's traffic log, not in the pcapng set.</summary>
     public const string Iuw = "iuw";
 
@@ -1104,11 +1107,174 @@ public static class Op
     /// <summary>S→C: answer to the hzc.</summary>
     public const string Ice = "ice";
 
-    /// <summary>C→S: sent with the jfw, and alone. Answered with <see cref="Hxm"/>, empty.</summary>
+    /// <summary>C→S: PlayerRaidShowAndListenRequest, sent with the jfw and when the raid screens open. Answered with <see cref="Hxm"/>.</summary>
     public const string Hvx = "hvx";
 
-    /// <summary>S→C: answer to the hvx.</summary>
+    /// <summary>S→C: PlayerRaidShowAndListenResponse: the player's finished raids, frieze, current raid and claims.</summary>
     public const string Hxm = "hxm";
+
+    // ─── Guild raids (Com.Ankama.Dofus.Server.Game.Protocol.Raid.*), read from the client ─────
+    // No capture carries a raid: the real names come from the obfuscator's names tables in
+    // global-metadata.dat, the fields from the client's raid frame and Raids tab.
+
+    /// <summary>C→S: RaidPurchaseRequest, from the guild shop. f1 the raid, f2 the group if chosen.</summary>
+    public const string Idm = "idm";
+
+    /// <summary>S→C: RaidPurchaseResponse. f1 the result (0 bought).</summary>
+    public const string Hwe = "hwe";
+
+    /// <summary>S→C: RaidPurchasedEvent. f2 the raid in constitution, f3 its uuid.</summary>
+    public const string Hya = "hya";
+
+    /// <summary>S→C: a raid changed. f2 its uuid, then the raid in its state's case (5 in constitution, 3 starting, 1 running, 4 over).</summary>
+    public const string Iai = "iai";
+
+    /// <summary>S→C: a participant's connection changed. f1 the raid's uuid, f2 his id, f3 his state.</summary>
+    public const string Iav = "iav";
+
+    /// <summary>C→S: RaidJoinRequest. f3 the raid's uuid, and the group if chosen.</summary>
+    public const string Hzi = "hzi";
+
+    /// <summary>S→C: RaidJoinResponse. f1 the result.</summary>
+    public const string Hwk = "hwk";
+
+    /// <summary>C→S: RaidLeaveRequest, leaving one's raid in constitution.</summary>
+    public const string Hym = "hym";
+
+    /// <summary>S→C: RaidLeaveResponse. f1 the result.</summary>
+    public const string Hvs = "hvs";
+
+    /// <summary>C→S: RaidUpdateCaptainRequest. The raid's uuid and the new captain's id, as texts.</summary>
+    public const string Hxu = "hxu";
+
+    /// <summary>S→C: RaidUpdateCaptainResponse. f1 the result.</summary>
+    public const string Idi = "idi";
+
+    /// <summary>C→S: RaidUpdateDescriptionRequest. The raid's uuid and the note's text.</summary>
+    public const string Hzk = "hzk";
+
+    /// <summary>C→S: RaidRemoveParticipantRequest. The raid's uuid, the participant's id, f3 bar him.</summary>
+    public const string Hyb = "hyb";
+
+    /// <summary>S→C: RaidRemoveParticipantResponse. f1 the result.</summary>
+    public const string Hwa = "hwa";
+
+    /// <summary>C→S: RaidRemovePlayerFromBlockListRequest. The raid's uuid and the player's id.</summary>
+    public const string Ida = "ida";
+
+    /// <summary>C→S: RaidMoveGroupRequest. f1 the group.</summary>
+    public const string Hyt = "hyt";
+
+    /// <summary>C→S: RaidStartRequest, the captain starts his raid. Sent empty (its fields are decoys).</summary>
+    public const string Ibr = "ibr";
+
+    /// <summary>S→C: RaidStartResponse. Oneof: f2 success {uuid}, f3 participants not connected, f4 an error.</summary>
+    public const string Hxt = "hxt";
+
+    /// <summary>C→S: RaidStartAnswerRequest. f1 accept.</summary>
+    public const string Hzd = "hzd";
+
+    /// <summary>S→C: RaidStartAnswerResponse. f2 the result (0 fine, 1 occupied).</summary>
+    public const string Hxx = "hxx";
+
+    /// <summary>S→C: RaidStartCanceledEvent. Case 3 {who refused}, case 4 {who did not answer, how many}.</summary>
+    public const string Icz = "icz";
+
+    // The running raid and its tracking panel (RaidTrackingUI).
+
+    /// <summary>S→C: the running raid one takes part in. f1 the raid (ibj), f2 its uuid. Opens the tracking panel.</summary>
+    public const string Hvt = "hvt";
+
+    /// <summary>C→S: ShowAndListenRunningRaidRequest, from the guild's tab. f1 the raid's uuid.</summary>
+    public const string Iaz = "iaz";
+
+    /// <summary>S→C: ShowAndListenRunningRaidResponse. f1 {f1 the raid}, or f2 an error.</summary>
+    public const string Icj = "icj";
+
+    /// <summary>C→S: StopListeningRunningRaidRequest.</summary>
+    public const string Hvw = "hvw";
+
+    /// <summary>S→C: the running raid's state changed. f1 the state (iau), f3 the raid's uuid.</summary>
+    public const string Hzg = "hzg";
+
+    /// <summary>S→C: a participant's state in the running raid. f1 his key, f2 the raid's uuid, f3 the state.</summary>
+    public const string Hwo = "hwo";
+
+    /// <summary>S→C: the running raid's new captain. f1 his key, f2 the raid's uuid.</summary>
+    public const string Hzh = "hzh";
+
+    /// <summary>C→S: RunningRaidFinishRequest, the captain ends it.</summary>
+    public const string Icm = "icm";
+
+    /// <summary>S→C: RunningRaidFinishResponse. f1 the result.</summary>
+    public const string Hzn = "hzn";
+
+    /// <summary>C→S: RunningRaidRestartRequest, the captain starts it over.</summary>
+    public const string Ibz = "ibz";
+
+    /// <summary>S→C: RunningRaidRestartResponse. f2 the result.</summary>
+    public const string Hzv = "hzv";
+
+    /// <summary>S→C: the running raid started over. f1 its uuid, f2 the raid.</summary>
+    public const string Ibv = "ibv";
+
+    /// <summary>C→S: RunningRaidLeaveRequest. f1 the reason.</summary>
+    public const string Ibf = "ibf";
+
+    /// <summary>S→C: the answer to leaving the running raid. f2 the result (0 closes the panel).</summary>
+    public const string Ide = "ide";
+
+    /// <summary>C→S: RunningRaidUpdateCaptainRequest. f1 the new captain's key.</summary>
+    public const string Iaj = "iaj";
+
+    /// <summary>S→C: RunningRaidUpdateCaptainResponse. f1 the result.</summary>
+    public const string Hyw = "hyw";
+
+    /// <summary>S→C: the raid is over. f1 seconds, f2 score, f5 goals met, f6 best of the week, f7 rewards.</summary>
+    public const string Hyg = "hyg";
+
+    // The weekly frieze of rewards.
+
+    /// <summary>C→S: PlayerRaidStopListeningRequest.</summary>
+    public const string Icn = "icn";
+
+    /// <summary>S→C: RaidPendingRewardEvent. f2 the raids, f4 the frieze steps waiting to be claimed.</summary>
+    public const string Iac = "iac";
+
+    /// <summary>C→S: RaidClaimRewardsRequest. f1 the raid whose steps are claimed.</summary>
+    public const string Ibw = "ibw";
+
+    /// <summary>S→C: RaidClaimRewardResponse. f1 the result, f2 the steps paid.</summary>
+    public const string Hyj = "hyj";
+
+    // The weekly ladder (the raids tab of the ladder window, RaidLadderTabUI).
+
+    /// <summary>C→S: ShowAndListenRaidLadderRequest, sent empty when the raids tab of the ladder opens.</summary>
+    public const string Hzq = "hzq";
+
+    /// <summary>C→S: StopListeningRaidLadderRequest.</summary>
+    public const string Ibl = "ibl";
+
+    /// <summary>S→C: ShowAndListenRaidLadderResponse. Per raid: f1 this week, f2 last week, f3/f4 the guild's line.</summary>
+    public const string Hwu = "hwu";
+
+    /// <summary>S→C: the ladder rewards obtained. f1 { f4 the raid }: a chat line per raid.</summary>
+    public const string Ibs = "ibs";
+
+    // Invitations into a guild raid, the way outsiders come in.
+
+    /// <summary>C→S: RaidInvitationRequest. f1 the invited character's id.</summary>
+    public const string Hwg = "hwg";
+
+    /// <summary>S→C: RaidInvitationResponse. f1 the result.</summary>
+    public const string Ibc = "ibc";
+
+
+    /// <summary>C→S: RaidInvitationAnswerRequest. f1 accept.</summary>
+    public const string Iag = "iag";
+
+    /// <summary>S→C: RaidInvitationAnswerResponse. f1 the result, f3 the raid on success.</summary>
+    public const string Hzb = "hzb";
 
     /// <summary>C→S: leaving the guild. f1 the character.</summary>
     public const string Jho = "jho";
@@ -1378,6 +1544,14 @@ public static class Op
 
     /// <summary>Only reachable from the dead fight dispatch. 3962 messages in 20 files.</summary>
     public const string Jya = "jya";
+
+    /// <summary>
+    /// A new wave: f1 the team (lbl), f2 the wave number, f3 the turns before the next one. The
+    /// client's FightBattleService keeps the number as the current wave and fills the timeline's
+    /// wave counters; at the end of the next sequence it draws the fighters of that wave that have
+    /// no entity yet, each with gfx 2715 falling on its cell. In no capture; read from the client.
+    /// </summary>
+    public const string Jyb = "jyb";
 
     /// <summary>Only reachable from the dead fight dispatch. 36 messages in 22 files.</summary>
     public const string Jyg = "jyg";

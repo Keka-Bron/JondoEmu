@@ -28,7 +28,7 @@ namespace Jondo.Unity.Server.Network
                 .Var(4, guild.Level);
 
         /// <summary>The emblem, the four numbers of the creation jjg in its fields 1, 2, 3 and 5.</summary>
-        private static Pb Emblem(GuildStore.Guild guild)
+        internal static Pb Emblem(GuildStore.Guild guild)
             => Pb.New()
                 .Var(1, guild.EmblemSymbol)
                 .Var(2, guild.EmblemSymbolColor)
@@ -89,16 +89,26 @@ namespace Jondo.Unity.Server.Network
             => field == 0 ? Array.Empty<byte>() : Pb.New().Bytes(field, Array.Empty<byte>()).Build();
 
         /// <summary>
-        /// The guild window's header (jhh): f1 the founding date, f3 the level, f9
-        /// the member maximum and f10 how many there are. A freshly created level 1 guild sends
-        /// exactly those four fields -without the experience bars f5/f6/f7 that only appear
-        /// in guilds with experience-, and that is how it is reproduced.
+        /// The guild window's header (jhh): f1 the founding date, f3 the level, f5 the experience
+        /// the level starts at, f6 the guild's experience, f7 its guild kamas, f9 the experience
+        /// the next level starts at and f10 how many members it has.
         /// </summary>
+        /// <remarks>
+        /// Read off the client (fft::wm builds the header's hook btm from f5, f6, f9 and f3, which
+        /// GuildUI.OnGuildInformationGeneral puts in m_expLevelFloor, m_experience,
+        /// m_expNextLevelFloor and m_level; f7 goes to the guild service's kamas). f9 was taken
+        /// for the member maximum: a level 1 guild's 50 is level 2's floor. The captures: a level 1
+        /// guild "f3 1, f7 10, f9 50, f10 2", 20 kamas after a contribution; a level 4 one "f5 150,
+        /// f6 181, f9 210". Its f2 (7, then 6) is not read by that handler and does not go.
+        /// </remarks>
         public static byte[] BuildGuildInfo(GuildStore.Guild guild, int memberCount)
             => Pb.New()
                 .Str(1, guild.FoundedUtc)
                 .Var(3, guild.Level)
-                .Var(9, GuildStore.MaxMembers(guild.Level))
+                .VarIfNotZero(5, GuildLevels.FloorOf(guild.Level))
+                .VarIfNotZero(6, guild.Experience)
+                .VarIfNotZero(7, guild.GuildKamas)
+                .Var(9, GuildLevels.NextFloorOf(guild.Level))
                 .Var(10, memberCount)
                 .Build();
 
@@ -163,7 +173,29 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         public static byte[] BuildMember(GuildStore.Member member, string name, int level, long accountId,
                                          int breed, int achievementPoints, int contributed = 0, bool online = true)
-            => Pb.New().Msg(1, MemberEntry(member, name, level, accountId, breed, achievementPoints, contributed, online)).Build();
+            => BuildMembers(new[] { new MemberRow(member, name, level, accountId, breed, achievementPoints, contributed, online) });
+
+        /// <summary>One member's row of the list, with what the entry needs besides the membership.</summary>
+        public readonly record struct MemberRow(GuildStore.Member Member, string Name, int Level, long AccountId,
+                                                int Breed, int AchievementPoints, int Contributed, bool Online);
+
+        /// <summary>
+        /// The member list (jgu): EVERY member in one message, an f1 each.
+        /// </summary>
+        /// <remarks>
+        /// The client takes a jgu as the whole list and replaces the one it had (fft::begz sets
+        /// the guild service's list from it), so a jgu per member left only the last one. The
+        /// captures agree: sixteen members in one jgu ("salir de mi gremio", "recibir
+        /// invitacion"), two in one ("muchas acciones"), never one each.
+        /// </remarks>
+        public static byte[] BuildMembers(IEnumerable<MemberRow> rows)
+        {
+            var list = Pb.New();
+            foreach (var r in rows)
+                list.Msg(1, MemberEntry(r.Member, r.Name, r.Level, r.AccountId, r.Breed, r.AchievementPoints,
+                                        r.Contributed, r.Online));
+            return list.Build();
+        }
 
         /// <summary>
         /// A member brought up to date (jgz): the same entry as the jgu, in f2. It is what
@@ -310,8 +342,48 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static byte[] BuildContributionsLeft(int left) => Pb.New().VarIfNotZero(1, left).Build();
 
-        /// <summary>The jff of a freshly founded guild: f3 empty. What fills a guild with a history is not understood.</summary>
-        public static byte[] BuildNoBenefits() => Pb.New().Str(3, "").Build();
+        /// <summary>
+        /// The guild's week (jfl): f1 its tier, f2 its activity points, f3 the member's token cap,
+        /// f4 his tokens of the week and f5 the tier waiting for next week.
+        /// </summary>
+        /// <remarks>
+        /// Read off the client: jn(jfl) keeps f1, f5, f2, f4 and f3; the missions tab shows the tier
+        /// by f1 and the member's tokens as "min(f4, f3) / f3", and the tier window takes f5 for
+        /// its next tier (GuildMissionTierOption.m_nextGuildMissionActivityData). The captures:
+        /// "f1 1, f3 250" right after choosing tier 1, "f1 1, f2 100, f3 250, f4 10" after one
+        /// contribution and "200 / 20" after two. f5 is optional, so it only goes when it says
+        /// something.
+        /// </remarks>
+        public static Pb WeekBlock(GuildActivity.Week week, int tokenCap, int tokens)
+            => Pb.New()
+                .Var(1, week.ActivityId)
+                .VarIfNotZero(2, week.Points)
+                .Var(3, tokenCap)
+                .VarIfNotZero(4, tokens)
+                .VarIfNotZero(5, week.PendingActivityId);
+
+        /// <summary>
+        /// The guild's week as the jfp asks for it (jff): f2 { f1 the week } with a tier, f3 empty
+        /// without one -- what a freshly founded guild gets, and what makes the client ask for a tier
+        /// before contributing.
+        /// </summary>
+        public static byte[] BuildWeek(GuildActivity.Week week, int tokenCap, int tokens)
+            => week == null || !week.HasActivity
+                ? Pb.New().Str(3, "").Build()
+                : Pb.New().Msg(2, Pb.New().Msg(1, WeekBlock(week, tokenCap, tokens))).Build();
+
+        /// <summary>
+        /// The answer to choosing a tier (jdb): f2 { f1 the mission preferences, f2 the week, f3 the
+        /// missions }. The capture of choosing tier 1: "f2 { f1 {}, f2 { f1 1, f3 250 }, f3 { twelve
+        /// missions } }". The client reads f3 without asking whether it is there, so it always goes,
+        /// empty until missions are drawn.
+        /// </summary>
+        public static byte[] BuildTierChosen(GuildActivity.Week week, int tokenCap, int tokens)
+            => Pb.New().Msg(2, Pb.New()
+                    .Bytes(1, week.Preferences ?? Array.Empty<byte>())
+                    .Msg(2, WeekBlock(week, tokenCap, tokens))
+                    .Bytes(3, Array.Empty<byte>()))
+                .Build();
 
         /// <summary>
         /// The guild's message (jci), empty: what the real server answers to the jiy {f2: 4} of

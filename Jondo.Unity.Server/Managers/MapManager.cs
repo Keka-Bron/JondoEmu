@@ -249,6 +249,12 @@ namespace Jondo.Unity.Server
             return null;
         }
 
+        /// <summary>The arenas' flags in the world's map data.</summary>
+        public const int ArenaFlags = 69262589;
+
+        /// <summary>A raid floor's arenas: <see cref="ArenaFlags"/> plus bit 17.</summary>
+        public const int RaidArenaFlags = 69393661;
+
         public static long ResolveArenaMapId(long roleplayMapId)
         {
             // What is measured rules over the rule. The kanojedos fight on a map 131,072 ids from
@@ -258,6 +264,21 @@ namespace Jondo.Unity.Server
             if (medida != 0 && Maps.ContainsKey(medida)) return medida;
 
             if (!Maps.TryGetValue(roleplayMapId, out var info)) return roleplayMapId;
+
+            // A map that is an arena already is fought on as it is.
+            if (info.PosX == 0 && info.PosY == 0 && (info.Flags == ArenaFlags || info.Flags == RaidArenaFlags))
+                return roleplayMapId;
+
+            // A raid floor's own arenas: its maps without a position and with the arena flags plus
+            // bit 17 -- five on each of the Gigalodón's floors, fight layouts drawn for it. The plain
+            // rule below took the floor's other two arena-flagged maps instead, one of them a bare
+            // test grid on grey (239077654): the fight showed no scenery and the map as Amakna's.
+            var raidArenas = Maps.Values
+                .Where(m => m.SubAreaId == info.SubAreaId && m.PosX == 0 && m.PosY == 0 && m.Flags == RaidArenaFlags)
+                .Select(m => m.MapId)
+                .OrderBy(id => id)
+                .ToList();
+            if (raidArenas.Count > 0) return raidArenas[(int)(Math.Abs(roleplayMapId) % raidArenas.Count)];
 
             // Do NOT return the roleplay map here for outdoor maps: the reference capture proves
             // the opposite. The Incarnam fight at (-2,-3) -- an OUTDOOR map with real coordinates,

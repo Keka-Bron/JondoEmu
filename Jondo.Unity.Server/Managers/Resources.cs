@@ -175,6 +175,18 @@ namespace Jondo.Unity.Server.Managers
                 if (here != null) _byMap.Add(mapId, here);
             }
 
+            // And the Gigalodón's salt deposits, which no capture shows: by the client's own names.
+            int deposits = 0;
+            foreach (var deposit in GuildRaidSaltDeposits.Read())
+            {
+                if (TeleportManager.TryGet(deposit.MapId, deposit.ElementId, out _)) continue;
+                if (!_byElement.TryAdd((deposit.MapId, deposit.ElementId), deposit)) continue;
+                if (!_byMap.TryGetValue(deposit.MapId, out var list)) _byMap[deposit.MapId] = list = new List<Resource>();
+                list.Add(deposit);
+                deposits++;
+            }
+            if (deposits > 0) Console.WriteLine($"[Resources] {deposits} salt deposits in the Gigalodón's abyss.");
+
             var oficios = new SortedDictionary<int, int>();
             foreach (var r in _byElement.Values)
             {
@@ -224,7 +236,11 @@ namespace Jondo.Unity.Server.Managers
         public static void Spend(long mapId, int elementId)
         {
             var clave = (mapId, elementId);
-            _spent[clave] = DateTime.UtcNow + Regrowth;
+            // A salt deposit has its own time, five to ten minutes (the guides).
+            var regrowth = _byElement.TryGetValue(clave, out var resource) && GuildRaidSaltDeposits.IsDeposit(resource)
+                ? GuildRaidSaltDeposits.Regrowth(Random.Shared)
+                : Regrowth;
+            _spent[clave] = DateTime.UtcNow + regrowth;
             _busy.TryRemove(clave, out _);
         }
 

@@ -219,8 +219,8 @@ namespace Jondo.Unity.Tests.World
                 var casillas = new Dictionary<long, List<int>>();
                 foreach (var kind in Raids.All)
                 {
-                    long map = DatabaseManager.MapsOfSubArea(kind.Floors[^1]).Min();
-                    casillas[map] = new List<int> { 11, 300 };
+                    foreach (int floor in kind.Floors)
+                        foreach (long map in DatabaseManager.MapsOfSubArea(floor)) casillas[map] = new List<int> { 11, 300 };
                 }
 
                 MapManager.WalkableCells = casillas;
@@ -229,18 +229,18 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(2, RaidChests.Placed.Count);
                 foreach (var chest in RaidChests.Placed)
                 {
-                    var kind = Raids.Of(chest.RaidId);
-                    Assert.Equal(kind.Floors[^1], chest.SubArea);
                     Assert.Equal(chest.SubArea, DatabaseManager.SubAreaOfMap(chest.MapId));
                     Assert.Contains(chest.Cell, casillas[chest.MapId]);
                     Assert.Equal(chest.RaidId, RaidChests.RaidOn(chest.MapId));
                 }
 
-                // The Sima's is on the sixth floor, the only one without light: the one that ends it, not the
-                // one that gets lit.
+                // The Sima's is in its outpost, where the raid comes in: the guides' "outpost chest",
+                // the one the Gigalodón comes out of. The Sanctuary's, at its far end, the castle.
                 var sima = RaidChests.Placed.Single(c => c.RaidId == Raids.Gigalodon);
-                Assert.Equal(1136, sima.SubArea);
-                Assert.Equal(0, Luminomachines.FloorOn(sima.MapId));
+                Assert.Equal(GuildRaidManager.EntryMapOf(Raids.Of(Raids.Gigalodon)), sima.MapId);
+                Assert.Equal(1131, sima.SubArea);
+                var sanctuary = RaidChests.Placed.Single(c => c.RaidId == Raids.EternalGardens);
+                Assert.Equal(Raids.Of(Raids.EternalGardens).Floors[^1], sanctuary.SubArea);
             }
             finally
             {
@@ -273,7 +273,7 @@ namespace Jondo.Unity.Tests.World
             try { File.Delete(_file); } catch (IOException) { }
         }
 
-        private static RaidInstance Running(long characterId, string name, int raidId = 1)
+        private static RaidInstance Running(long characterId, string name, int raidId = Raids.Gigalodon)
         {
             var guild = GuildStore.Create(characterId, name, 165, 8, 16744448, 9476018);
             var raid = new RaidInstance(characterId, raidId, guild.Id, characterId,

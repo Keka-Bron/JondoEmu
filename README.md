@@ -158,6 +158,32 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ Runs on another machine: every listener honours `JONDO_PUBLIC_BIND`, and the launcher runs a
   loopback relay so the client reaches it (HAAPI and the chat server hand the client `127.0.0.1`)
 - ✅ Unanswerable packets are recorded in their own database, deduplicated by protobuf shape
+- ✅ A **Settings** window (the *SETTINGS* button) for what the game itself does not decide. The
+  values live inside the emulator's folder, in `config\server_settings.json`, and are read once at
+  start: *SAVE AND RESTART* tells every player in the world in their own language, counts down a
+  minute (three seconds when nobody is in), and starts the server again with the new values.
+  Every setting at its default leaves the game as it is.
+
+  | Setting | What it does |
+  |:---|:---|
+  | Fewest players to start a raid | Below the client's eight, for small guilds |
+  | Most AP / most MP | A cap on what a character can stack |
+  | Experience, drop and kamas bonus | A percent on top, for everybody |
+  | Hardcore mode | Monsters at twice their size, with three times their life and characteristics |
+  | Dying costs no energy | A lost fight keeps the energy |
+  | Random loot | See below |
+  | Welcome message | A line in the chat on coming into the world |
+
+  **Random loot.** Besides its own table, each monster beaten has a chance (10 % by default, raised
+  by challenges and the drop bonus) of dropping two to five items around its level. Each item is a
+  roll on a rarity table: ordinary equipment 25 %, cosmetics 15 %, mounts and pets 10 %, dofus 5 %,
+  legendary equipment 0.5 %, and 0.05 % a perfect piece — every line at its best — with an exo AP or
+  MP it does not normally roll; the rest, 44.45 %, consumables. Equipment and consumables come
+  within ten levels of the monster, dofus within twenty (they come in steps), and mounts, pets and
+  cosmetics, which do not grow with level, up to ten above it. The families are the client's own
+  item types (`datos/item_types_3.6.10.11.json`) and its *IsLegendary* flag, which only 25 pieces
+  carry, all at level 200. Every piece of equipment that drops, from this or from a monster's table,
+  comes with its characteristics rolled in its range, as a crafted one does.
 
 ### 🔐 Connection and authentication
 
@@ -286,15 +312,22 @@ Built with **Avalonia**, the same toolkit as the Studio.
   for 500 and the guild shield for 100,000 (`content/npcs/shops.json`)
 - ✅ The guild block travels in every map actor (`f5 { f4 { emblem, id, name, level } }`), so a
   guilded character shows the guild under their name to everyone
-- ✅ The guild window: header (`jhh`), ranks (`jco`), member list (`jgu`) with class, level,
-  achievement points, gremichas, online state and the leader's note; the guild comes with you into
-  the world on login, rebuilt from the database
-- ✅ The window answered request by request, as in the captures: opening (`jlk` → the chest's tabs
-  and the header), the members only when `jml` asks for them, the perks' `jff` as an answer, and a
-  tab change (`jii`) not at all. Login says you belong (`jhe`, with your contribution) and never
-  "you have just joined", which only joining says (`jco` before `jgw`, as the client needs)
-- ✅ The tabs this server keeps nothing for — perks, raids, the paged list, the collectors' —
-  answered empty as a new guild's are (`jfv`, `jeu`, `jga`, `jgr`, `jet`, `jfw`, `hzc`, `hvx`), and
+- ✅ The guild window: header (`jhh`: level, experience bar, guild kamas), ranks (`jco`), member list
+  (`jgu`, the whole list in one message, as the client replaces it with each one) with class, level,
+  achievement points, gremichas, online state and the leader's note; the guild and its member list
+  come with you into the world on login, rebuilt from the database
+- ✅ The window answered request by request, as in the captures: opening (`jlk` → the chest's tabs),
+  the header and the contributions left with the bare `jiy`, the members only when `jml` asks for
+  them, the week's `jff` as an answer, and a tab change (`jii`) not at all. Login says you belong
+  (`jhe`, with your contribution) and never "you have just joined", which only joining says (`jco`
+  before `jgw`, as the client needs)
+- ✅ Guild levels 1 to 20 on the guilds guide's experience curve (the captures agree where they reach)
+- ✅ The weekly activity tier (*franja de actividad*, `jet` → `jdb`, `jfp` → `jff`): chosen by the
+  leader or the right *Gestionar la franja de actividad*, at once the first time and from next week
+  afterwards; the week's activity points stop at the tier's last milestone, each milestone giving the
+  guild its experience (the client's data); a member's tokens stop at 250 a week, 300 from level 13
+- ✅ The tabs this server keeps nothing for yet — the missions themselves, the paged list, the
+  collectors' — answered empty as a new guild's are (`jfv`, `jeu`, `jga`, `jgr`, `jfw`, `hvx`), and
   the week's reset (`jew` → `jez`, Tuesday 05:00 UTC, in all five captures)
 - ✅ Leave from the window (`jho`) or with `.gremio salir`; kick with `.gremio expulsar`
 - ✅ Ranks — open, rename, set rights, create (`jcs`, `jct`, `jck`, `jcv`), each answered with the
@@ -303,41 +336,153 @@ Built with **Avalonia**, the same toolkit as the Studio.
   directory profile the leader writes (`jcc` → `jci`: description, level range, tags and title) and
   the directory search (`jjm` → `jme` + `jiv`: every guild with its leader, size and emblem)
 - ✅ Applications and invitations both ways — apply, list, read one, accept
-- ✅ Contributions — 10,000 kamas buy 10 guild kamas, five a week, the week turning on Tuesday
+- ✅ Contributions — 10,000 kamas buy 10 guild kamas, 10 tokens and 100 activity points, five a week,
+  the week turning on Tuesday, once the guild has a tier
 - ✅ The oracle shop, five oracles, priced by how many accounts the guild has
-- ❌ The client's own requests for applying, inviting, kicking, assigning a rank and buying a raid
-  are not handled; `.gremio` and `.raid` stand in
+- ❌ The client's own requests for applying, inviting, kicking and assigning a rank are not
+  handled; `.gremio` stands in
 - ✅ The guild chest, in the banks — see [Banks and marketplaces](#-banks-and-marketplaces)
-- ❌ The *Encargos* and *Casas* tabs
+- ❌ The missions of the *Encargos* tab — the twelve a week, their progress, rerolls and the
+  milestones' acknowledgments — and the *Casas* tab
 
-**Raids** — the Gigalodón Abyss and the Eternal Gardens Sanctuary — are bought with guild kamas
-(360 and 480), launched by a captain and run against a clock: an hour the first, two the second.
+**Raids** — the Eternal Gardens Sanctuary (id 1) and the Gigalodón Abyss (id 2) — run entirely on
+the client's own screens. No capture has a raid: every message was read from the client's code
+(its raid frame, the Raids tab, the tracking panel, the rewards screen and the ladder tab), and the
+prices, durations, team sizes, goals and rewards come from its data (`datos/guild_raids_*.json`).
+
+- ✅ Buying from the guild shop with guild kamas (480 and 360) and the right *Administrar las raids*;
+  the buyer is the captain
+- ✅ The guild window's Raids tab: join, leave, move group, the note, handing on the captaincy,
+  removing and barring a participant, unbarring. Every change reaches whoever sees the raid
+- ✅ Outsiders come in by invitation: the raid's guild invites, the invited player gets the
+  client's popup and accepts or refuses
+- ✅ Starting: the captain starts it with the raid's minimum of players all connected
+  (`JONDO_RAID_MIN_PLAYERS` lowers the minimum of eight, for small servers and tests); everyone else
+  gets the countdown popup, a refusal or the deadline calls it off naming who, and when all accept
+  everyone connected is taken to the first floor
+- ✅ With the settings' minimum below the client's eight, the client never lights its start button
+  (it checks its own data), so the server starts the raid itself once it has that minimum: on buying,
+  on someone joining, or when the captain opens the Raids tab. Everyone, the captain too, gets the
+  popup to accept
+- ✅ The tracking panel opens by itself on entering and on reconnecting: participants and their
+  state (present, offline, fighting, left), the countdown, the captain, the score, the goals and
+  the Abyss's salt. Finish and restart (captain only, where the raid's data allows it: the
+  Sanctuary), leave, and handing on the captaincy while it runs
+- ✅ Goals: a goal met adds its score — the Sanctuary's 50,000 are its eleven goals added up.
+  A goal's monsters come from its own name, matched in Spanish and French when the data is
+  extracted: the Sanctuary's guardians, Princesa and Reina, Belladona, the Mureine and the Exécrabe
+  move their goals when beaten on the raid's floors; the castle's corridor counts its sixty monsters;
+  the Abyss's floor -1 is cleared when no group is left on it
+- ✅ Floors open by their goals, as their names say ("para acceder a la planta -2"); a closed floor
+  keeps the raid out on every road, naming the goal that opens it
+- ✅ The Abyss's lifts and passages between floors, read off the client's maps since the world's data
+  has no route there: each lift (graphic 142037, where the guides put them) goes to the nearest lift
+  of the next floor — "Ascensor", and the "Jaula de buceo" down to the last floor —, and the
+  passages join floors -3/-4 and -4/-5
+- ✅ The Abyss starts in its outpost, [3,1], where the hatch from the surface comes out; the
+  outpost stands on legs and is left by its ladder (graphic 42043, "Escalera"), down to [3,2], and
+  come back to by the ladder under the building
+- ✅ The Abyss's fights go to each floor's own arenas, the maps without a position the client
+  draws for fighting (five a floor); the Gigalodón's, to the outpost redrawn with the floor broken
+  open. They went to a bare test grid, with no scenery and the map named as Amakna's
+- ✅ A floor's map whose groups were beaten stays empty for the rest of the raid (it was refilled
+  with the subarea's monsters when looked at again); the floors' arenas hold no groups, and the
+  "clear floor -1" goal counts the floor's world maps only — the outpost's hatch reaches the
+  surface platform, whose two groups count
+- ❌ The light bands do not show: each light of a floor is a map staging (`Light_0` … `Light_4`),
+  and this client plays stagings only in fights. The light still works underneath — the darkness's
+  monster boost and the aggression follow it
+- ✅ The Luminarium (floor -3): its sixteen lantern fish, a 4×4 board where a click switches a fish
+  and its neighbours, shuffled per raid so that it can always be solved; all lit, the wall goes and
+  floor -4 opens
+- ✅ The key fragments, as the client's alterations: the second from the Mureine and the third from
+  the Exécrabe to everyone in the fight, the first by chance from any monster (1 % to 20 % by the
+  score), the fourth from the Krak'Haine; the four open floor -6
+- ✅ Inside a raid a beaten group stays beaten; each raid starts with its floors as the world has them
+- ✅ The Abyss's light fades a band every two minutes; floor -1 starts at four, an opened floor at
+  one. Its salt is the raid's shared pool, shown in the panel: a fight's salt goes in once, the same
+  for every winner, and the luminomachines burn it
+- ✅ Losing a fight in the Abyss sends you back to the top without the treasures you carried
+- ✅ Taking the Abyss's chest brings out the Gigalodón: three minutes to place, three rounds, the
+  fourth ends it; the damage dealt scores its highest damage goal (55,006 is worth 3,000), and the
+  raid is over
+- ✅ The Sanctuary's 20 health: a fight lost costs one per character, at none the raid ends; beating
+  its two final bosses ends it too
+- ✅ The Sanctuary is walked through its hub, the castle's [15,17], where the raid starts: a round
+  portal to each zone — which one is drawn on the portal itself — and in each zone a way back
+- ✅ The Sanctuary's four guardians stand in the middle of their zones with one monster of each kind
+  (the Centinela with its four obelisks too), in fights of four players at most. The Centinela's
+  colour is drawn per raid, and its obelisks and spells follow it through the client's own colour
+  versions: the players read it off the element it hits with
+- ✅ The Vigilante and the Guardián are unlocked by the client's own scripts, written for the fight's
+  scene (`Sce`, with `Def` and `Atq` for the sides, now read by the engine): the guardian itself
+  stands for the scene. The Vigilante's "Check Mob" frees it when a companion falls — no longer
+  invulnerable, +20 % damage taken and +10 % for its companions —; the Guardián lays its eight
+  glyphs across the board and its counter frees it at the fourth one stepped on, taking the rest
+  away. As the enigmas cannot tell which companion and which glyphs are right, any of them is
+  right: the scripts' failing branches, which end the fight, never go through
+- ✅ The final score screen: duration, score, best of the week, goals met and the frieze steps
+  unlocked
+- ✅ The weekly frieze: a raid's best score of the week unlocks its steps (experience and items),
+  claimed from the rewards screen, one raid a week; pending rewards are announced at world entry
+- ✅ The ladder window's raids tab: this week's and last week's ladder per raid, with each guild's
+  score and duration and the player's guild's line. Last week's places are paid at world entry —
+  the items to each player who scored, the guild experience once
+- ✅ The week turns at the weekly reset the captures measure, Tuesday 05:00 UTC
 
 - ✅ The instance carries the raid's named variables, `Raid_Score` and `n1..n5_worldlight`, which
   the content the client ships reads through its own criteria
 - ✅ A criterion evaluator over the client's criterion language — `&`, `|`, parentheses — with a
   tri-state answer, so an unknown term is not read as false
-- ✅ Monster aggression follows the monsters' own criteria in `world.db`: the Abyss monsters are
-  immune while their floor has light
-- ✅ The clock returns everyone to the map and cell they came from, and the captain can close the
-  raid early
+- ✅ Monster aggression by the client's own rule (the one that draws a group's zone): the map must
+  allow it, the zone is the group's widest aggressor's, a player above the group's level is left
+  alone, and each monster's immunity criterion is read from `world.db`. In the Abyss its monsters
+  jump from ten cells after three seconds once their floor is dark, and Willorque from fifty
+  always. A sweep looks at the raids' players every second while a raid runs, so the dark falling
+  on someone standing still counts too. Only inside the raids for now
+- ✅ The light's monster boost, *Pensamientos Oscuros* ("Idées noires"): the client's spell casts a
+  tier per light — +20 % to +200 % vitality, +100 to +1000 power, up to +2 MP — and the server
+  gives each fight the tier of its floor's light, to the monsters bound to that light; Willorque
+  and the Gigalodón are not, as the guides say
+- ✅ The salt deposits, 34 crystals on floors -1 to -5: the client's interactive "Sal de las
+  profundidades" with its skill "Recolectar sal de las profundidades". Each gives one salt to the
+  raid's pool and grows back in five to ten minutes
+- ✅ The Exécrabe (Cangrancio), from the client's data: life thresholds at 80/60/40/20 %, at each a
+  form of four — Oursin reflects damage, Coquillage a 5000 shield, Perle takes range away, Poulpe
+  pulls —, each with its own look, chosen at random without repeating, as the data lists all four
+  and leaves the choice to the server. Its four statues on floor -4 are levers worked in the order
+  the fight showed the forms: a mistake costs 1000 score and starts over, the fourth opens floor -5
+- ✅ The clock returns everyone to the map and cell they came from
 - ✅ Raid loot from the monsters' global loot table: depths salt at 30% (100% from the three floor
   guardians) and the seven gems, each monster with its own rates. A global loot row whose criterion
   cannot be evaluated does not drop
-- ✅ The luminomachine, NPC 8007, one on each of the five lit floors: it offers the light bands the
+- ✅ The luminomachine, NPC 8007, one on each of the five lit floors, on the map the floor is
+  reached by (the outpost, then where the lift or passage from above arrives): it offers the light bands the
   player can pay for, takes the salt and raises that floor's `nX_worldlight`. One more band costs 1,
   3, 6 and 10 salt; a jump pays the sum
-- ✅ The chest at the far end, NPC 7861, with its two screens: drop every treasure in, or take it
-  and end the raid for the whole team. Anyone may take it
+- ✅ The chest, NPC 7861, in the Abyss's outpost, with its two screens: drop every treasure in, or
+  take it and bring out the Gigalodón. Anyone may take it
 - ✅ A treasure is any item carrying effect 4063, *Valor de un objeto*: the gems from Quartz at 2 to
   Ónix at 30, the three guardians' trophies at 1000, 5000 and 10000, and the salt at 1
 - ✅ The chest fills up as the score rises, through the five looks of its template (5000, 13000,
   27000 and 45000 points). NPC templates with several looks and a criterion each pick the right one
   per player
-- ✅ The weekly ladder, per raid, keeping each guild's best run of the week, ties broken by who got
-  there first; `.raid clasificacion` prints it with the podium ornament of each place
-- ❌ The podium ornaments are named, not granted: the wardrobe offers all 167 to everybody
-- ❌ The raid panel — timer, score and light on screen; `.raid` prints them instead
+- ✅ The weekly ladder keeps each guild's best run of the week, ties broken by the faster run
+- ❌ The podium ornaments and titles are not granted: the wardrobe offers all 167 ornaments to
+  everybody, and titles have no store yet. Guild experience is stored but moves no level
+- ❌ The Sanctuary's four enigmas cannot be done with this client: everything they show — the
+  pedestals' objects, the flowers, the boards, the colours — is a map staging, and the client plays
+  stagings only inside fights. So the guardians stand from the start, without waiting for them
+- ❌ The Defensor's double turn is not done yet, nor the corridor's and the bosses' rules. Neither
+  is the second luminomachine of each floor: the client places no machine in the Abyss
+- ❌ The guardians' rule texts (the scripts' combat notifications, effects 3400 and 3401) are not
+  shown: they go to the buff panel as rows with no text
+- ❌ Inferred, not measured: which statue stands for which Exécrabe form (the forms' own order,
+  which matches the drawings) and that a statue is lit with state 1
+- ❌ Not measured: which "Utilizar" the lantern fish carry and which of their graphic's states is
+  lit (taken as 1)
+- ❌ Not measured, and said so in the code: the minute to accept a start and the five minutes an
+  invitation waits
 - ❌ The Gigalodón fight when the clock beats you to the chest; the clock closes the raid
 - ❌ The entry map and the positions of machines and chests are not taken from captures: the lowest
   map of each floor and the walkable cell nearest the middle are used
@@ -346,6 +491,11 @@ Built with **Avalonia**, the same toolkit as the Studio.
 
 - ✅ **21,748 item templates** and **66,294 item effects** — spawning, equipping, bags, destruction, persistence
 - ✅ **929 item sets** with their bonuses
+- ✅ Boxes open with a double click (`iuu`): an item whose effect 222 says *¿Qué hay ahí dentro?*
+  draws from its group of the client's random drops (`datos/random_drop_groups_*.json`, 314
+  groups) by weight — the chances its window shows — or gives all of a group that lists every item
+  at -1; one box is spent and each item arrives with its chat line. ❌ Other item uses (potions,
+  scrolls, books) are not handled yet
 - ✅ **520 mounts** with their look, swapped and unequipped correctly
 <img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/375da573-ab61-4bf0-83fd-6f2a8f872cde" />
 <img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/581b105c-9569-4f54-ab77-01e122b8ce06" />
@@ -369,7 +519,7 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ Energy, out of the gauge of 10,000 (characteristics 29 and 47), kept per character and spent by
   lost fights against monsters; it never drops below 1, so nobody becomes a ghost
 - ❌ Energy coming back — with rest or consumables; no capture measures the rate
-- ✅ Commands — `.teleport [x,y]` or `.teleport <map id>`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`, `.receta`, `.sueno`, `.gremio`, `.raid`; they answer with an information line only their author sees
+- ✅ Commands — `.teleport [x,y]` or `.teleport <map id>`, `.kamas`, `.shop`, `.size`, `.level`, `.item`, `.itemset`, `.receta`, `.sueno`, `.gremio`; they answer with an information line only their author sees
 - ✅ The administrator's window, on **F10** in the client: items, a character's level, characteristics and kamas, teleports, NPCs and monsters spawned and removed, and the jail — see **[Admin window (F10)](#-admin-window-f10)**
 - ✅ Monsters at their size: groups on the map and fighters carry the look's colours, scale and skins as the official server sends them, so Conde Kontatrás is as tall as a person and not a doll
 - ✅ Live administration over HTTP — `POST /api/personaje` sets characteristics, kamas and level, grants items (at their maximum or rolled) or a mount, and teleports a connected character without a reconnect. `POST /api/rol` changes account roles. Administrator only, loopback only

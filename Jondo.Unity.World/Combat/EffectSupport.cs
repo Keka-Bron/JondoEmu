@@ -127,6 +127,14 @@ namespace Jondo.Unity.World.Combat
         /// </summary>
         public const int VitalityPercentMalus = 1033;
         public const int VitalityPercentBonus = 1078;
+
+        /// <summary>
+        /// 2844, "#1% vitalidad" on characteristic 130: the Gigalodón's Pensamientos Oscuros, +20 %
+        /// to +200 %. Applied as 1078, a percentage of the maximum life, but it raises the life the
+        /// monster has as well: it is cast on a monster at full life, and the guides' "+200 %
+        /// vitality" is a monster with three times the life, not one at a third of it.
+        /// </summary>
+        public const int VitalityPercentBoost = 2844;
         public const int VitalityFlatMalus = 153;
 
         /// <summary>

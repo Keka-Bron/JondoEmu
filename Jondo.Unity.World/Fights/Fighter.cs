@@ -15,6 +15,13 @@ namespace Jondo.Unity.World.Fights
         public int GradeIndex { get; set; } = 0;
 
         /// <summary>
+        /// The wave a monster came in with, from 1; zero for whoever was on the board from the start.
+        /// It travels in f4 of the monster's block, and the client draws a fighter whose wave is the
+        /// current one -- the last jyb -- with gfx 2715 falling on its cell.
+        /// </summary>
+        public int Wave { get; set; }
+
+        /// <summary>
         /// A character's class, the breed of its record: what the masks' B and b ask. Zero for a
         /// monster or a summon, which are of no class.
         /// </summary>

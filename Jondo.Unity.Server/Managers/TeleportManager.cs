@@ -365,6 +365,7 @@ namespace Jondo.Unity.Server.Managers
             }
 
             AplicarLosNuestros(byElement, byMap, byCell);
+            AddRaidPassages(byElement, byMap, byCell);
             AddFloorPassages(byCell);
 
             _byElement = byElement;
@@ -471,6 +472,29 @@ namespace Jondo.Unity.Server.Managers
         /// has an element's passage keeps it: the element is what the map shows. And one leading to
         /// a map the world does not have is left out, as Validate leaves out an element's.
         /// </remarks>
+        /// <summary>
+        /// The guild raids' lifts and floor passages, read off the client's maps (GuildRaidPassages):
+        /// the world's data has no route between those floors. A route the data already has wins.
+        /// </summary>
+        private static void AddRaidPassages(Dictionary<(long, int), InteractiveTeleport> byElement,
+                                            Dictionary<long, List<InteractiveTeleport>> byMap,
+                                            Dictionary<(long, int), InteractiveTeleport> byCell)
+        {
+            int added = 0;
+            foreach (var route in GuildRaidPassages.Derive())
+            {
+                if (byElement.ContainsKey((route.SourceMapId, route.ElementId))) continue;
+                if (MapManager.GetMapInfo(route.DestinationMapId) == null) continue;
+                byElement[(route.SourceMapId, route.ElementId)] = route;
+                if (!byMap.TryGetValue(route.SourceMapId, out var list))
+                    byMap.Add(route.SourceMapId, list = new List<InteractiveTeleport>());
+                list.Add(route);
+                byCell.TryAdd((route.SourceMapId, route.SourceCellId), route);
+                added++;
+            }
+            if (added > 0) Console.WriteLine($"[Teleports] {added} guild raid lift(s) and passage(s) between floors.");
+        }
+
         private static void AddFloorPassages(Dictionary<(long, int), InteractiveTeleport> byCell)
         {
             int added = 0;

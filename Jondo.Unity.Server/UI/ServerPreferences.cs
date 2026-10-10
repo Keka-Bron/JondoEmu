@@ -14,31 +14,25 @@ namespace Jondo.Unity.Server.UI
     /// </summary>
     internal static class ServerPreferences
     {
-        private static string Fichero => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo", "servidor.cfg");
-
+        /// <summary>
+        /// The window's language, kept in the server's settings file inside the emulator's folder
+        /// (config\server_settings.json). Changing it takes effect at once and needs no restart.
+        /// </summary>
         public static Language Language
         {
-            get
+            get => ServerSettings.Load().WindowLanguage?.Trim().ToLowerInvariant() switch
             {
-                try
-                {
-                    if (!File.Exists(Fichero)) return Language.Es;
-                    return File.ReadAllText(Fichero).Trim().ToLowerInvariant() switch
-                    {
-                        "en" => Language.En,
-                        "fr" => Language.Fr,
-                        _ => Language.Es,
-                    };
-                }
-                catch { return Language.Es; }
-            }
+                "en" => Language.En,
+                "fr" => Language.Fr,
+                _ => Language.Es,
+            };
             set
             {
                 try
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(Fichero)!);
-                    File.WriteAllText(Fichero, LauncherTexts.Code(value));
+                    var saved = ServerSettings.Load();
+                    saved.WindowLanguage = LauncherTexts.Code(value);
+                    saved.Save();
                 }
                 catch { }
             }

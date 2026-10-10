@@ -62,7 +62,6 @@ namespace Jondo.Unity.Server.Handlers
                 [".receta"] = "usage.recipe",
                 [".packets"] = "usage.packets",
                 [".gremio"] = "usage.guild",
-                [".raid"] = "usage.raid",
                 [".oficio"] = "usage.job",
                 [".oficios"] = "usage.jobs",
                 [".forjadios"] = "usage.forgegod",
@@ -198,7 +197,6 @@ namespace Jondo.Unity.Server.Handlers
                     case ".receta": await RecipeAsync(stream, rest, channel, accountId); break;
                     case ".packets": await PacketsAsync(stream, rest, channel, accountId); break;
                     case ".gremio": await GremioAsync(stream, rest, channel, accountId); break;
-                    case ".raid": await RaidAsync(stream, rest, channel, accountId); break;
                     case ".oficio": await JobAsync(stream, rest, channel, accountId); break;
                     case ".oficios": await AllJobsAsync(stream, rest, channel, accountId); break;
                     case ".forjadios":
@@ -1156,141 +1154,6 @@ namespace Jondo.Unity.Server.Handlers
             => CommandTexts.Get(key, values);
 
         private static string Usage(string command) => T(Uso[command]);
-
-        /// <summary>
-        /// Guild raids: buying one, launching it, going in, leaving, closing it, and seeing how it goes.
-        ///
-        /// A command and not buttons for the same reason as the invitation: the raids tab of the guild
-        /// shop comes out EMPTY in the captures -- the recorded guild had none --, so it is not known
-        /// which message buys one or which launches it. What lies underneath is real: the instance, the
-        /// clock and the variables the client's content reads.
-        /// </summary>
-        private static async Task RaidAsync(NetworkStream stream, string rest, int channel, long accountId)
-        {
-            long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
-            string[] partes = (rest ?? "").Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-            string que = partes.Length > 0 ? partes[0].ToLowerInvariant() : "";
-
-            if (que.Length == 0)
-            {
-                await NotifyAsync(stream, RaidStatus(who), channel, accountId);
-                return;
-            }
-
-            if (que == "entrar" || que == "salir" || que == "fin")
-            {
-                string fallo = que == "entrar" ? await Managers.GuildRaidManager.EnterAsync(who)
-                             : que == "salir" ? await Managers.GuildRaidManager.LeaveAsync(who)
-                             : await Managers.GuildRaidManager.CloseAsync(who);
-                await NotifyAsync(stream, fallo == null ? RaidStatus(who) : T(fallo), channel, accountId);
-                return;
-            }
-
-            if ((que == "comprar" || que == "lanzar") && partes.Length > 1
-                && int.TryParse(partes[1].Trim(), out int cual))
-            {
-                string fallo = que == "comprar"
-                    ? Managers.GuildRaidManager.Buy(who, cual)
-                    : await Managers.GuildRaidManager.LaunchAsync(who, cual);
-                await NotifyAsync(stream, fallo == null ? RaidStatus(who) : T(fallo), channel, accountId);
-                return;
-            }
-
-            if (que == "clasificacion" || que == "clasificación")
-            {
-                await LadderAsync(stream, partes, channel, accountId);
-                return;
-            }
-
-            await NotifyAsync(stream, Usage(".raid"), channel, accountId);
-        }
-
-        /// <summary>
-        /// A raid's weekly ranking.
-        /// </summary>
-        /// <remarks>
-        /// Through the chat, like everything about raids, and for the same reason: the rankings window
-        /// exists in the client -- «Acceder a las clasificaciones», «Ver la clasificación» -- but no
-        /// capture opens it, so it is not known which message fills it.
-        ///
-        /// The podium ornament is NAMED and not handed out. Today the wardrobe offers all 167 to
-        /// everybody, so «giving it» would give nothing; the day there are ornaments to win, here is
-        /// who they go to.
-        /// </remarks>
-        private static async Task LadderAsync(NetworkStream stream, string[] partes, int channel, long accountId)
-        {
-            int cual = Jondo.Unity.World.Content.Raids.Gigalodon;
-            if (partes.Length > 1 && int.TryParse(partes[1].Trim(), out int pedida)) cual = pedida;
-
-            var kind = Jondo.Unity.World.Content.Raids.Of(cual);
-            if (kind == null)
-            {
-                await NotifyAsync(stream, T("raid.unknown"), channel, accountId);
-                return;
-            }
-
-            var ahora = DateTimeOffset.UtcNow;
-            var tabla = Managers.GuildStore.Ladder(cual, ahora);
-            if (tabla.Count == 0)
-            {
-                await NotifyAsync(stream, T("raid.ladder.empty", kind.Name), channel, accountId);
-                return;
-            }
-
-            await NotifyAsync(stream, T("raid.ladder.head", kind.Name,
-                                        Managers.GuildStore.WeekOf(ahora)), channel, accountId);
-
-            foreach (var fila in tabla)
-            {
-                string premio = fila.Place <= kind.Podium.Count
-                    ? T("raid.ladder.podium", kind.Podium[fila.Place - 1].ToString())
-                    : "";
-                await NotifyAsync(stream, T("raid.ladder.row", fila.Place.ToString(), fila.Name,
-                                            fila.Score.ToString(), fila.Runs.ToString(), premio),
-                                  channel, accountId);
-            }
-        }
-
-        /// <summary>How the guild's raid is going, which is what the client's panel would show.</summary>
-        private static string RaidStatus(long characterId)
-        {
-            var guild = Managers.GuildStore.GuildOf(characterId);
-            if (guild == null) return T("raid.noguild");
-
-            var running = Managers.GuildRaidManager.RunningOf(characterId);
-            if (running == null)
-            {
-                var compradas = Managers.GuildStore.OwnedRaids(guild.Id);
-                string tiene = compradas.Count == 0
-                    ? T("raid.status.none")
-                    : string.Join(", ", compradas.Select(r =>
-                        Jondo.Unity.World.Content.Raids.Of(r)?.Name + " (" + r + ")"));
-                return T("raid.status.idle", tiene, guild.GuildKamas.ToString());
-            }
-
-            var kind = Jondo.Unity.World.Content.Raids.Of(running.RaidId);
-            var queda = running.Left(DateTimeOffset.UtcNow);
-            int planta = kind.FloorOf(Managers.GuildRaidManager.SubAreaOf(
-                Jondo.Unity.Server.Network.SessionContext.State.MapId));
-            string estado = T("raid.status.running", kind.Name, ((int)queda.TotalMinutes).ToString(),
-                              running.Score.ToString(), running.Members.Count.ToString(),
-                              planta > 0 ? planta.ToString() : "-");
-
-            // And the light, which has nowhere else to show. The raid panel would draw it, but that
-            // panel needs messages no capture carries; until then, here.
-            if (!kind.HasLight) return estado;
-
-            var luces = new List<string>();
-            for (int planta2 = 1; planta2 <= Jondo.Unity.World.Content.Luminomachine.Machines; planta2++)
-            {
-                luces.Add($"{planta2}:{running.Get(Jondo.Unity.World.Content.RaidInstance.LightVariable(planta2))}" +
-                          $"/{Jondo.Unity.World.Content.Luminomachine.MostLight}");
-            }
-
-            return estado + T("raid.status.light", string.Join(" ", luces),
-                              Managers.Equipment.HowMany(
-                                  Jondo.Unity.World.Content.Luminomachine.SaltItem).ToString());
-        }
 
         /// <summary>
         /// Inviting somebody to the guild, or sending an application to one.

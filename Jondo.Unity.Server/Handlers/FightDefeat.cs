@@ -67,7 +67,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             long character = GameState.CharacterId;
             int energy = Energy.Of(character);
-            int lost = DefeatPenalty.EnergyLost(GameState.CharacterLevel, energy);
+            int lost = ServerSettings.Current.NoEnergyLoss ? 0 : DefeatPenalty.EnergyLost(GameState.CharacterLevel, energy);
             Energy.Set(character, energy - lost);
 
             int missing = DefeatPenalty.MissingLifeAfter(StatsHandler.GetPlayerMaxHp());
@@ -99,15 +99,24 @@ namespace Jondo.Unity.Server.Handlers
         {
             var zaaps = Interactives.ZaapElements(mapId);
             if (zaaps.Count == 0) return MapManager.GetNearestWalkableCell(mapId, TeleportHandler.MapCentre);
+            return CellBeside(mapId, zaaps[0].Cell);
+        }
 
-            int zaap = zaaps[0].Cell;
-            var (x, y) = MapGeometry.CellToPoint(zaap);
+        /// <summary>
+        /// The cell beside an element one lands on, in the measured order: (0, -1) and (1, 0) are the
+        /// two cells in front of it, a row further down the screen, so whoever lands is drawn before
+        /// the element and not hidden behind it; (-1, 0) and (0, 1), behind, only when neither in
+        /// front is floor.
+        /// </summary>
+        internal static int CellBeside(long mapId, int anchor)
+        {
+            var (x, y) = MapGeometry.CellToPoint(anchor);
             foreach (var (dx, dy) in new[] { (0, -1), (1, 0), (-1, 0), (0, 1) })
             {
                 int cell = MapGeometry.PointToCell(x + dx, y + dy);
                 if (cell >= 0 && MapManager.IsCellWalkable(mapId, cell)) return cell;
             }
-            return MapManager.GetNearestWalkableCell(mapId, zaap);
+            return MapManager.GetNearestWalkableCell(mapId, anchor);
         }
     }
 }

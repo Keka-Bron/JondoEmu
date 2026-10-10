@@ -80,6 +80,7 @@ namespace Jondo.Unity.Launcher.UI
         public string StatMemory { get; init; } = "";
         public string StatUptime { get; init; } = "";
         public string StopServer { get; init; } = "";
+        public string ServerSettingsButton { get; init; } = "";
         public string StopServerConfirm { get; init; } = "";
         public string StopServerWithPlayers { get; init; } = "";
 
@@ -156,6 +157,7 @@ namespace Jondo.Unity.Launcher.UI
                 StatMemory = "Memoria",
                 StatUptime = "En marcha",
                 StopServer = "DETENER EL SERVIDOR",
+                ServerSettingsButton = "AJUSTES",
                 StopServerConfirm = "¿Parar el servidor?",
                 StopServerWithPlayers = "Hay {0} jugador(es) conectado(s) y perderán la conexión.\n\n¿Parar el servidor?",
                 GroupWorld = "MUNDO",
@@ -228,6 +230,7 @@ namespace Jondo.Unity.Launcher.UI
                 StatMemory = "Memory",
                 StatUptime = "Uptime",
                 StopServer = "STOP THE SERVER",
+                ServerSettingsButton = "SETTINGS",
                 StopServerConfirm = "Stop the server?",
                 StopServerWithPlayers = "{0} player(s) are connected and will lose their connection.\n\nStop the server?",
                 GroupWorld = "WORLD",
@@ -300,6 +303,7 @@ namespace Jondo.Unity.Launcher.UI
                 StatMemory = "Mémoire",
                 StatUptime = "En ligne",
                 StopServer = "ARRÊTER LE SERVEUR",
+                ServerSettingsButton = "RÉGLAGES",
                 StopServerConfirm = "Arrêter le serveur ?",
                 StopServerWithPlayers = "{0} joueur(s) sont connectés et perdront leur connexion.\n\nArrêter le serveur ?",
                 GroupWorld = "MONDE",

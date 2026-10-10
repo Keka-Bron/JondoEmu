@@ -341,7 +341,7 @@ namespace Jondo.Protocol
                 case Op.Isf: return ("World Loading", "Sync", "QuestListMessage (Notification of the active quests)");
                 case Op.Lol: return ("World Loading", "Interfaces", "NotificationListMessage (Quest notifications)");
                 case "icg": return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
-                case Op.Ibo: return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Quick spell bar)");
+                case Op.Ibo: return ("Guild", "Raids", "RaidInvitation (an invitation into a guild raid)");
                 case Op.Hmj: return ("World Loading", "Interfaces", "SocialGroupStatus (The player's guild status)");
                 case Op.Lxs: return ("World Loading", "Sync", "AlignmentSubAreaUpdate (PvP and sub-area alignment)");
                 case "hnq": return ("World Loading", "Sync", "SpouseStatusMessage (Marital status / marriage)");
@@ -362,7 +362,7 @@ namespace Jondo.Protocol
                 case Op.Hhh: return ("World Loading", "Interfaces", "SocialGroupDetails (Descriptive sheet of the guild)");
                 case Op.Luq: return ("World Loading", "Interfaces", "JobCrafterDirectorySettings (Job directory visibility settings)");
                 case "hhi": return ("World Loading", "Interfaces", "SocialGroupAlliance (Sheet of the alliance)");
-                case Op.Idf: return ("World Loading", "Inventory", "InventoryPreview (Quick preview of the items)");
+                case Op.Idf: return ("Guild", "Raids", "RaidStartPrompt (the start asked of a participant)");
                 case Op.Izu: return ("World Loading", "Sync", "QuestStepProgress (Current quest progress)");
 
                 // === Context: World Loading - kkn Burst ===

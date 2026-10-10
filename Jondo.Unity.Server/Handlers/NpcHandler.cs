@@ -289,7 +289,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             int floor = Luminomachines.FloorOn(mapId);
             int light = floor == 0 ? -1 : Luminomachines.LightOn(GameState.CharacterId, floor);
-            int salt = Managers.Equipment.HowMany(Luminomachine.SaltItem);
+            // The salt is the raid's pool, not the bag (the guides): what the whole team gathered.
+            int salt = (int)Math.Max(0, Managers.GuildRaidManager.SaltOf(GameState.CharacterId));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
@@ -340,7 +341,7 @@ namespace Jondo.Unity.Server.Handlers
             if (elegida == null || !elegida.Value.Buys) return;
 
             var compra = elegida.Value;
-            if (!await Managers.Equipment.TakeAsync(stream, Luminomachine.SaltItem, compra.Cost))
+            if (!Managers.GuildRaidManager.SpendSalt(GameState.CharacterId, compra.Cost))
             {
                 await DecirleAsync(stream, CommandTexts.Get("light.nosalt", compra.Cost));
                 return;
@@ -349,12 +350,13 @@ namespace Jondo.Unity.Server.Handlers
             int luz = Luminomachines.Deposit(GameState.CharacterId, compra.Floor, compra.From, compra.To);
             if (luz < 0)
             {
-                await Managers.Equipment.GiveAsync(stream, Luminomachine.SaltItem, compra.Cost);
+                Managers.GuildRaidManager.RefundSalt(GameState.CharacterId, compra.Cost);
                 await DecirleAsync(stream, CommandTexts.Get("light.changed"));
                 return;
             }
 
             await DecirleAsync(stream, CommandTexts.Get("light.lit", compra.Floor, luz, compra.Cost));
+            await GuildRaidHandler.TellRunningStateAsync(GameState.CharacterId);
         }
 
         /// <summary>
@@ -422,6 +424,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
 
                 long ahora = Managers.RaidChests.Drop(who, entregados);
+                if (ahora >= 0) await GuildRaidHandler.TellRunningStateAsync(who);
                 if (entregados.Count == 0 || ahora < 0)
                 {
                     await DecirleAsync(stream, CommandTexts.Get("chest.gone"));
@@ -457,6 +460,10 @@ namespace Jondo.Unity.Server.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                         ConnectionProtocol.NpcDialogCloseReason)));
+
+                // The Gigalodón comes out for whoever takes the chest (the guides); the raid ends
+                // with its fight. Only where there is no Gigalodón to fight does taking it end the raid.
+                if (await Managers.GuildRaidManager.StartGigalodonAsync(stream, who, mapa)) return;
 
                 long guild = raid?.GuildId ?? 0;
                 long puntos = await Managers.RaidChests.TakeAsync(who);

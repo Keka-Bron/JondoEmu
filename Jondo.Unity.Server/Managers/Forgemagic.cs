@@ -267,6 +267,32 @@ namespace Jondo.Unity.Server.Managers
             return effects;
         }
 
+        /// <summary>
+        /// The effects of an item at its perfect jet: every characteristic at its best, the top of
+        /// its range for a bonus and the bottom for a malus. Weapon damage keeps its range and a
+        /// compound effect its three numbers, as in <see cref="Roll"/>.
+        /// </summary>
+        public static List<Equipment.ItemEffect> Perfect(Template template)
+        {
+            var effects = new List<Equipment.ItemEffect>();
+            foreach (var line in template.Lines)
+            {
+                var info = InfoOf(line.Effect);
+                if (info.IsWeaponDamage && line.Max != line.Min)
+                {
+                    effects.Add(new Equipment.ItemEffect(line.Effect, 0, line.Min, line.Max));
+                    continue;
+                }
+                if (info.UseDice || info.Weight != 0)
+                {
+                    effects.Add(new Equipment.ItemEffect(line.Effect, info.IsMalus ? line.Min : line.Max, 0, 0));
+                    continue;
+                }
+                effects.Add(new Equipment.ItemEffect(line.Effect, line.Value, line.Min, line.Max));
+            }
+            return effects;
+        }
+
         /// <summary>Whether two copies of this template can share a stack: nothing in it rolls.</summary>
         public static bool Stacks(Template template)
             => template.Lines.All(l => l.Min == l.Max || InfoOf(l.Effect).IsWeaponDamage);

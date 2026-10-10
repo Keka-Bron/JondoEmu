@@ -31,12 +31,12 @@ namespace Jondo.Unity.Server.Managers
         /// Works out where the five machines go and remembers it.
         /// </summary>
         /// <remarks>
-        /// NOT MEASURED, and it cannot be: no capture goes into a raid, the Abyss carries no NPC
-        /// placement in the client's data and none of its seventy-three maps has an interactive
-        /// either, so there is nothing to point at and say "the machine was here". The rule chosen
-        /// is the same one the raid entrance uses -- the lowest map of the floor, by number -- on
-        /// the walkable cell nearest the middle of it. It is deterministic, it is reachable, and
-        /// it is one line to change the day somebody measures it.
+        /// NOT MEASURED: no capture goes into a raid and the Abyss carries no NPC placement in the
+        /// client's data. But its maps draw the machine where each floor is reached -- in the
+        /// outpost, beside the lift's cage on floor -2 -- so each machine stands on the map its floor
+        /// is reached by (GuildRaidPassages.ArrivalMapOf): the outpost, then where the way down from
+        /// the floor above arrives; on the walkable cell nearest the middle of it. It used to be the
+        /// floor's lowest map by number, which on floor -1 is a fight arena nobody walks.
         ///
         /// The sixth floor of the Abyss gets none: it has no light variable of its own, which is
         /// the data's way of saying the boss's floor is not lit with salt.
@@ -48,13 +48,15 @@ namespace Jondo.Unity.Server.Managers
             var abyss = Raids.Of(Raids.Gigalodon);
             if (abyss == null || !abyss.HasLight) return;
 
+            var routes = GuildRaidPassages.Derive();
             for (int floor = 1; floor <= Luminomachine.Machines && floor <= abyss.Floors.Count; floor++)
             {
                 int subArea = abyss.Floors[floor - 1];
                 var maps = DatabaseManager.MapsOfSubArea(subArea);
                 if (maps.Count == 0) continue;
 
-                long mapId = maps.Min();
+                long mapId = GuildRaidPassages.ArrivalMapOf(abyss, floor, routes);
+                if (mapId == 0) mapId = maps.Min();
                 int cell = MapManager.GetNearestWalkableCell(mapId, Handlers.TeleportHandler.MapCentre);
                 if (cell < 0) continue;
 
@@ -83,7 +85,7 @@ namespace Jondo.Unity.Server.Managers
         {
             var raid = GuildRaidManager.RaidOf(characterId);
             if (raid == null) return -1;
-            return (int)Math.Clamp(raid.Get(RaidInstance.LightVariable(floor)), 0, Luminomachine.MostLight);
+            return Math.Clamp(raid.LightAt(floor, DateTimeOffset.UtcNow), 0, Luminomachine.MostLight);
         }
 
         /// <summary>
@@ -99,11 +101,11 @@ namespace Jondo.Unity.Server.Managers
             var raid = GuildRaidManager.RaidOf(characterId);
             if (raid == null) return -1;
 
-            string variable = RaidInstance.LightVariable(floor);
-            if (raid.Get(variable) != from) return -1;
+            var now = DateTimeOffset.UtcNow;
+            if (raid.LightAt(floor, now) != from) return -1;
             if (to <= from || to > Luminomachine.MostLight) return -1;
 
-            raid.Set(variable, to);
+            raid.SetLight(floor, to, now);
             Console.WriteLine($"[Luminomachines] Floor {floor} from {from} to {to} bands of light, " +
                               $"{Luminomachine.Cost(from, to)} salts from {characterId}.");
             return to;

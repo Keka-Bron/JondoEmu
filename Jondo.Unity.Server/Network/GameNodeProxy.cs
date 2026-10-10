@@ -152,7 +152,13 @@ namespace Jondo.Unity.Server.Network
                         }
 
                         SesionesVivas.TryRemove(sesion.Id, out _);
+                        long gone = sesion.State.CharacterId;
                         SessionRegistry.Unregister(sesion);
+                        if (gone != 0)
+                        {
+                            try { await Handlers.GuildRaidHandler.OnLeaveWorldAsync(gone); }
+                            catch (Exception ex) { Console.WriteLine($"[Raids] Could not tell the raid {gone} left: {ex.Message}"); }
+                        }
                         Console.WriteLine($"[Game Node] Session {sesion.Id} closed; " +
                                           $"{SesionesVivas.Count} still connected.");
                     }
@@ -721,13 +727,58 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jgr)))
                     await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jgq, 1);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jet)))
-                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jdb, 0);
+                    await Handlers.GuildHandler.ChooseTierAsync(stream, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfw)))
                     await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Jfr, 0);
+                // The Raids tab and the raids' own requests (see GuildRaidHandler).
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hzc)))
-                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Ice, 1);
+                    await Handlers.GuildRaidHandler.ShowAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Idm)))
+                    await Handlers.GuildRaidHandler.PurchaseAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hzi)))
+                    await Handlers.GuildRaidHandler.JoinAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hym)))
+                    await Handlers.GuildRaidHandler.LeaveAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hxu)))
+                    await Handlers.GuildRaidHandler.UpdateCaptainAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hzk)))
+                    await Handlers.GuildRaidHandler.UpdateDescriptionAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hyb)))
+                    await Handlers.GuildRaidHandler.RemoveParticipantAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ida)))
+                    await Handlers.GuildRaidHandler.UnblockAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hyt)))
+                    await Handlers.GuildRaidHandler.MoveGroupAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ibr)))
+                    await Handlers.GuildRaidHandler.StartAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hzd)))
+                    await Handlers.GuildRaidHandler.AnswerAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iaz)))
+                    await Handlers.GuildRaidHandler.ShowRunningAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hvw)))
+                    await Handlers.GuildRaidHandler.StopListeningAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Icm)))
+                    await Handlers.GuildRaidHandler.FinishAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ibz)))
+                    await Handlers.GuildRaidHandler.RestartAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ibf)))
+                    await Handlers.GuildRaidHandler.RunningLeaveAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iaj)))
+                    await Handlers.GuildRaidHandler.RunningCaptainAsync(stream, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hvx)))
-                    await Handlers.GuildHandler.EmptyTabAsync(stream, payload, Op.Hxm, 0);
+                    await Handlers.GuildRaidHandler.PlayerRaidsAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Icn)))
+                    await Handlers.GuildRaidHandler.StopListeningPlayerAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ibw)))
+                    await Handlers.GuildRaidHandler.ClaimRewardsAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hzq)))
+                    await Handlers.GuildRaidHandler.LadderAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ibl)))
+                    await Handlers.GuildRaidHandler.StopLadderAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hwg)))
+                    await Handlers.GuildRaidHandler.InviteAsync(stream, payload);
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iag)))
+                    await Handlers.GuildRaidHandler.InvitationAnswerAsync(stream, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jew)))
                 {
                     // When the week starts again: asked at world entry too.
@@ -740,7 +791,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfp)))
                 {
-                    await Handlers.GuildHandler.BenefitsAsync(stream, payload);
+                    await Handlers.GuildHandler.WeekAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jcs)))
                 {
@@ -1088,6 +1139,11 @@ namespace Jondo.Unity.Server.Network
                 {
                     // Destroying an inventory item.
                     await DestroyItemHandler.DestroyAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri(Op.Iuu)))
+                {
+                    // Using an item: opening a box, for now.
+                    await ItemUseHandler.UseAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
@@ -1576,6 +1632,14 @@ namespace Jondo.Unity.Server.Network
             // digested block 1, by which time ours has already sent block 2. Waiting for it
             // would leave the client without the catalogues for no reason.
             await WorldEntry.SendAfterConfirmAsync(stream, chosen);
+
+            // His guild raid sees him connected, and a running one comes back with its panel.
+            await Handlers.GuildRaidHandler.OnEnterWorldAsync(chosen.Id);
+
+            // And the server's welcome line, if its settings have one.
+            if (!string.IsNullOrWhiteSpace(ServerSettings.Current.WelcomeMessage))
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildNotice(ServerSettings.Current.WelcomeMessage.Trim())));
             return true;
         }
 

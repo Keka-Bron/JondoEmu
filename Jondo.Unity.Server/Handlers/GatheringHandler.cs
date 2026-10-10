@@ -142,6 +142,19 @@ namespace Jondo.Unity.Server.Handlers
             _ = Task.Run(() => FinishAsync(session, stream, resource, skillId, instance, jobLevel));
         }
 
+        /// <summary>The resource spent, and drawn depleted with its skill switched off.</summary>
+        private static async Task DepletedAsync(NetworkStream stream, Resources.Resource resource, int skillId, int instance)
+        {
+            Resources.Spend(resource.MapId, resource.ElementId);
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwf, ConnectionProtocol.BuildElementState(
+                    resource.Cell, resource.ElementId, (int)ResourceState.Depleted)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwm, ConnectionProtocol.BuildElementRedeclared(
+                    instance, skillId, resource.ElementId, resource.Type, usable: false)));
+        }
+
         /// <summary>La segunda tanda, tres segundos después.</summary>
         private static async Task FinishAsync(GameSession session, NetworkStream stream,
                                               Resources.Resource resource, int skillId,
@@ -164,12 +177,25 @@ namespace Jondo.Unity.Server.Handlers
                     return;
                 }
 
-                int cuantos = Roll(jobLevel, resource.LevelMin);
+                // A Gigalodón salt deposit gives its one salt to the raid's pool, not to the bag.
+                bool deposit = GuildRaidSaltDeposits.IsDeposit(resource);
+                int cuantos = deposit ? GuildRaidSaltDeposits.SaltPerDeposit : Roll(jobLevel, resource.LevelMin);
                 long characterId = SessionContext.State.CharacterId;
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Iwi, ConnectionProtocol.BuildGatherFinished(
                         resource.ElementId, skillId)));
+
+                if (deposit)
+                {
+                    GuildRaidSaltDeposits.IntoThePool(characterId, cuantos);
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Itn, ConnectionProtocol.BuildGathered(resource.ItemId, cuantos)));
+                    await GuildRaidHandler.TellRunningStateAsync(characterId);
+                    await DepletedAsync(stream, resource, skillId, instance);
+                    Console.WriteLine($"[Raids] {characterId} gathers {cuantos} salt into the raid's pool, map {resource.MapId}.");
+                    return;
+                }
 
                 // Into the inventory of whoever gathered it, and into the database, otherwise it is lost
                 // on logging out.
@@ -220,14 +246,7 @@ namespace Jondo.Unity.Server.Handlers
                 // The job achievements: "Alcanzar el nivel 10 en 1 oficio" and its kind.
                 if (subeNivel) await Managers.Achievements.AfterJobLevelAsync(stream);
 
-                Resources.Spend(resource.MapId, resource.ElementId);
-
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Iwf, ConnectionProtocol.BuildElementState(
-                        resource.Cell, resource.ElementId, (int)ResourceState.Depleted)));
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Iwm, ConnectionProtocol.BuildElementRedeclared(
-                        instance, skillId, resource.ElementId, resource.Type, usable: false)));
+                await DepletedAsync(stream, resource, skillId, instance);
 
                 Console.WriteLine($"[Jobs] Job {resource.JobId}: {cuantos} of {resource.ItemId}, " +
                                   $"+{JobExperience.PerGather} exp, level {nivel}" +

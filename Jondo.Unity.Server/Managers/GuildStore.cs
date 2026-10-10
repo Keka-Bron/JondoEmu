@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Server.Managers
@@ -109,13 +110,6 @@ namespace Jondo.Unity.Server.Managers
             public string Title { get; set; } = "";
         }
 
-        /// <summary>
-        /// The maximum number of members per guild level. Measured at two points -- a level 1
-        /// guild says 50 (jhh f9=50) and a level 7 one says 410 --; between them it is an inference
-        /// and is stated as such. The rest of the curve is not measured, so outside those two
-        /// levels the closest known one is returned.
-        /// </summary>
-        public static int MaxMembers(int level) => level <= 1 ? 50 : level >= 7 ? 410 : 50 + (level - 1) * 60;
 
         public static void EnsureTables(SqliteConnection world)
         {
@@ -154,11 +148,21 @@ namespace Jondo.Unity.Server.Managers
                     DeadlineUtc TEXT NOT NULL DEFAULT '',
                     PRIMARY KEY (GuildId, Oracle)
                 );
-                CREATE TABLE IF NOT EXISTS GuildOwnedRaids (
+                CREATE TABLE IF NOT EXISTS GuildActivityWeeks (
                     GuildId INTEGER NOT NULL,
-                    RaidId INTEGER NOT NULL,
-                    BoughtUtcMs INTEGER NOT NULL DEFAULT 0,
-                    PRIMARY KEY (GuildId, RaidId)
+                    Week TEXT NOT NULL,
+                    ActivityId INTEGER NOT NULL DEFAULT 0,
+                    NextActivityId INTEGER NOT NULL DEFAULT 0,
+                    Points INTEGER NOT NULL DEFAULT 0,
+                    Preferences BLOB,
+                    NextPreferences BLOB,
+                    PRIMARY KEY (GuildId, Week)
+                );
+                CREATE TABLE IF NOT EXISTS GuildTokenWeeks (
+                    CharacterId INTEGER NOT NULL,
+                    Week TEXT NOT NULL,
+                    Tokens INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY (CharacterId, Week)
                 );
                 CREATE TABLE IF NOT EXISTS GuildContributions (
                     CharacterId INTEGER NOT NULL,
@@ -220,12 +224,24 @@ namespace Jondo.Unity.Server.Managers
                     // It was already there.
                 }
             }
+
+            // How long each guild's best raid of the week took, for the ladder's duration column.
+            try
+            {
+                var add = world.CreateCommand();
+                add.CommandText = "ALTER TABLE GuildRaidScores ADD COLUMN BestDurationMs INTEGER NOT NULL DEFAULT 0;";
+                add.ExecuteNonQuery();
+            }
+            catch (SqliteException)
+            {
+                // It was already there.
+            }
         }
 
         /// <summary>A connection string a test can point at a temp database; null uses world.db.</summary>
         internal static string ConnectionStringOverride { get; set; }
 
-        private static SqliteConnection Open()
+        internal static SqliteConnection Open()
         {
             var conexion = new SqliteConnection(ConnectionStringOverride ?? DatabaseManager.WorldConnectionString);
             conexion.Open();
@@ -298,6 +314,28 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
+        /// <summary>A guild by its id, or null.</summary>
+        public static Guild ById(long guildId)
+        {
+            using var conexion = Open();
+            var query = conexion.CreateCommand();
+            query.CommandText = @"
+                SELECT Id, Name, Level, Experience, EmblemSymbol, EmblemSymbolColor,
+                       EmblemBackground, EmblemSymbolRgb, FoundedUtc, GuildKamas
+                FROM Guilds WHERE Id = $g;";
+            query.Parameters.AddWithValue("$g", guildId);
+            using var lector = query.ExecuteReader();
+            if (!lector.Read()) return null;
+            return new Guild
+            {
+                Id = lector.GetInt64(0), Name = lector.GetString(1), Level = lector.GetInt32(2),
+                Experience = lector.GetInt64(3), EmblemSymbol = lector.GetInt32(4),
+                EmblemSymbolColor = lector.GetInt32(5), EmblemBackground = lector.GetInt32(6),
+                EmblemSymbolRgb = lector.GetInt32(7), FoundedUtc = lector.GetString(8),
+                GuildKamas = lector.GetInt64(9),
+            };
+        }
+
         /// <summary>A guild by its name, case-insensitive. Null if there is none like that.</summary>
         public static Guild ByName(string name)
         {
@@ -329,6 +367,24 @@ namespace Jondo.Unity.Server.Managers
             query.Parameters.AddWithValue("$c", characterId);
             var value = query.ExecuteScalar();
             return value == null || value is DBNull ? 0 : Convert.ToInt32(value);
+        }
+
+        /// <summary>Guild right 43 of the client's data: "Administrar las raids".</summary>
+        public const int ManageRaidsRight = 43;
+
+        /// <summary>
+        /// Whether a member's rank carries a right of the client's guild rights table. Rank 1, the
+        /// guild master, has them all; the rest have what their rank's list says, which is the list
+        /// of right ids as the client sends it (one byte each: none passes 127).
+        /// </summary>
+        public static bool HasRight(long characterId, int right)
+        {
+            var guild = GuildOf(characterId);
+            if (guild == null) return false;
+            int rank = RankOf(characterId);
+            if (rank == 1) return true;
+            var rights = Ranks(guild.Id).Find(r => r.Id == rank)?.Rights;
+            return rights != null && Array.IndexOf(rights, (byte)right) >= 0;
         }
 
         /// <summary>A guild's members, by their character and their rank.</summary>
@@ -739,10 +795,7 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>The Tuesday the week starts on, which is when the game resets the weekly things.</summary>
         public static string WeekOf(DateTimeOffset when)
-        {
-            int back = ((int)when.UtcDateTime.DayOfWeek - (int)DayOfWeek.Tuesday + 7) % 7;
-            return when.UtcDateTime.Date.AddDays(-back).ToString("yyyy-MM-dd");
-        }
+            => Network.GuildProtocol.NextWeeklyReset(when.UtcDateTime).AddDays(-7).ToString("yyyy-MM-dd");
 
         /// <summary>How many contributions a character has left this week.</summary>
         public static int ContributionsLeft(long characterId)
@@ -814,56 +867,6 @@ namespace Jondo.Unity.Server.Managers
             return query.ExecuteScalar() as string;
         }
 
-        // ─── Bought raids ───────────────────────────────────────────────────────
-
-        /// <summary>Records a raid bought by the guild, waiting to be launched.</summary>
-        public static void BuyRaid(long guildId, int raidId)
-        {
-            using var conexion = Open();
-            var insert = conexion.CreateCommand();
-            insert.CommandText = @"
-                INSERT OR REPLACE INTO GuildOwnedRaids (GuildId, RaidId, BoughtUtcMs)
-                VALUES ($g, $r, $ms);";
-            insert.Parameters.AddWithValue("$g", guildId);
-            insert.Parameters.AddWithValue("$r", raidId);
-            insert.Parameters.AddWithValue("$ms", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-            insert.ExecuteNonQuery();
-        }
-
-        public static bool OwnsRaid(long guildId, int raidId)
-        {
-            using var conexion = Open();
-            var query = conexion.CreateCommand();
-            query.CommandText = "SELECT 1 FROM GuildOwnedRaids WHERE GuildId = $g AND RaidId = $r;";
-            query.Parameters.AddWithValue("$g", guildId);
-            query.Parameters.AddWithValue("$r", raidId);
-            return query.ExecuteScalar() != null;
-        }
-
-        /// <summary>The raids the guild has bought and not spent.</summary>
-        public static List<int> OwnedRaids(long guildId)
-        {
-            using var conexion = Open();
-            var query = conexion.CreateCommand();
-            query.CommandText = "SELECT RaidId FROM GuildOwnedRaids WHERE GuildId = $g ORDER BY RaidId;";
-            query.Parameters.AddWithValue("$g", guildId);
-            using var lector = query.ExecuteReader();
-            var fuera = new List<int>();
-            while (lector.Read()) fuera.Add(lector.GetInt32(0));
-            return fuera;
-        }
-
-        /// <summary>It is spent on launching: a bought raid is one use, not a permanent key.</summary>
-        public static void DropRaid(long guildId, int raidId)
-        {
-            using var conexion = Open();
-            var borra = conexion.CreateCommand();
-            borra.CommandText = "DELETE FROM GuildOwnedRaids WHERE GuildId = $g AND RaidId = $r;";
-            borra.Parameters.AddWithValue("$g", guildId);
-            borra.Parameters.AddWithValue("$r", raidId);
-            borra.ExecuteNonQuery();
-        }
-
         // ─── The weekly ranking ─────────────────────────────────────────────────
 
         /// <summary>A row of the ranking: a guild, its best score of the week.</summary>
@@ -878,6 +881,9 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>The position, counting from one.</summary>
             public int Place;
+
+            /// <summary>How long the best raid took, in milliseconds.</summary>
+            public long DurationMs;
         }
 
         /// <summary>
@@ -890,7 +896,7 @@ namespace Jondo.Unity.Server.Managers
         /// that does it best. No client data says which of the two it is. The number of times it
         /// went in is recorded anyway, which is what is needed to change our mind without losing anything.
         /// </remarks>
-        public static long RecordRaidScore(long guildId, int raidId, long score, DateTimeOffset when)
+        public static long RecordRaidScore(long guildId, int raidId, long score, DateTimeOffset when, long durationMs = 0)
         {
             string week = WeekOf(when);
             using var conexion = Open();
@@ -907,39 +913,56 @@ namespace Jondo.Unity.Server.Managers
             bool better = score > best;
             var apunta = conexion.CreateCommand();
             apunta.CommandText = @"
-                INSERT INTO GuildRaidScores (GuildId, RaidId, Week, Score, Runs, BestUtcMs)
-                VALUES ($g, $r, $w, $s, 1, $ms)
+                INSERT INTO GuildRaidScores (GuildId, RaidId, Week, Score, Runs, BestUtcMs, BestDurationMs)
+                VALUES ($g, $r, $w, $s, 1, $ms, $d)
                 ON CONFLICT(GuildId, RaidId, Week) DO UPDATE SET
                     Runs = Runs + 1,
-                    Score = CASE WHEN $s > Score THEN $s ELSE Score END,
-                    BestUtcMs = CASE WHEN $s > Score THEN $ms ELSE BestUtcMs END;";
+                    BestUtcMs = CASE WHEN $s > Score THEN $ms ELSE BestUtcMs END,
+                    BestDurationMs = CASE WHEN $s > Score THEN $d ELSE BestDurationMs END,
+                    Score = CASE WHEN $s > Score THEN $s ELSE Score END;";
             apunta.Parameters.AddWithValue("$g", guildId);
             apunta.Parameters.AddWithValue("$r", raidId);
             apunta.Parameters.AddWithValue("$w", week);
             apunta.Parameters.AddWithValue("$s", score);
             apunta.Parameters.AddWithValue("$ms", when.ToUnixTimeMilliseconds());
+            apunta.Parameters.AddWithValue("$d", durationMs);
             apunta.ExecuteNonQuery();
 
             return better ? score : best;
+        }
+
+        /// <summary>The guild's best score in a raid this week, or 0.</summary>
+        public static long BestRaidScore(long guildId, int raidId, DateTimeOffset when)
+        {
+            using var conexion = Open();
+            var query = conexion.CreateCommand();
+            query.CommandText = "SELECT Score FROM GuildRaidScores WHERE GuildId = $g AND RaidId = $r AND Week = $w;";
+            query.Parameters.AddWithValue("$g", guildId);
+            query.Parameters.AddWithValue("$r", raidId);
+            query.Parameters.AddWithValue("$w", WeekOf(when));
+            var had = query.ExecuteScalar();
+            return had == null || had is DBNull ? 0 : Convert.ToInt64(had);
         }
 
         /// <summary>
         /// A raid's ranking in a week, from most to least.
         /// </summary>
         /// <remarks>
-        /// On equal score, whoever did it first wins, which is what every table of this game does
-        /// and the only thing that leaves a stable order: without it, two tied guilds would swap
-        /// places every time the list is drawn.
+        /// On equal score the faster run wins -- the Sanctuary's 50,000 is a ceiling many guilds reach,
+        /// and the guides' readers were told ties are broken by time --, and on equal time whoever
+        /// did it first. A run whose duration was not recorded counts as the slowest.
         /// </remarks>
         public static List<LadderRow> Ladder(int raidId, DateTimeOffset when, int most = 20)
         {
             using var conexion = Open();
             var query = conexion.CreateCommand();
             query.CommandText = @"
-                SELECT s.GuildId, g.Name, s.Score, s.Runs
+                SELECT s.GuildId, g.Name, s.Score, s.Runs, s.BestDurationMs
                 FROM GuildRaidScores s LEFT JOIN Guilds g ON g.Id = s.GuildId
                 WHERE s.RaidId = $r AND s.Week = $w AND s.Score > 0
-                ORDER BY s.Score DESC, s.BestUtcMs ASC
+                ORDER BY s.Score DESC,
+                         CASE WHEN s.BestDurationMs > 0 THEN s.BestDurationMs ELSE 9223372036854775807 END ASC,
+                         s.BestUtcMs ASC
                 LIMIT $n;";
             query.Parameters.AddWithValue("$r", raidId);
             query.Parameters.AddWithValue("$w", WeekOf(when));
@@ -956,6 +979,7 @@ namespace Jondo.Unity.Server.Managers
                     Score = lector.GetInt64(2),
                     Runs = lector.GetInt32(3),
                     Place = rows.Count + 1,
+                    DurationMs = lector.GetInt64(4),
                 });
             }
 
@@ -964,13 +988,50 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>A guild's position this week in a raid, or zero if it is not there.</summary>
         public static int PlaceOf(long guildId, int raidId, DateTimeOffset when)
-        {
-            foreach (var row in Ladder(raidId, when, int.MaxValue))
-            {
-                if (row.GuildId == guildId) return row.Place;
-            }
+            => LadderRowOf(guildId, raidId, when)?.Place ?? 0;
 
-            return 0;
+        /// <summary>A guild's line in a raid's ranking of a week, or null when it did not score.</summary>
+        public static LadderRow LadderRowOf(long guildId, int raidId, DateTimeOffset when)
+            => Ladder(raidId, when, int.MaxValue).FirstOrDefault(row => row.GuildId == guildId);
+
+        /// <summary>How many guilds scored in a raid in a week: what the ladder's percentages are of.</summary>
+        public static int LadderCount(int raidId, DateTimeOffset when)
+        {
+            using var conexion = Open();
+            var query = conexion.CreateCommand();
+            query.CommandText = "SELECT COUNT(*) FROM GuildRaidScores WHERE RaidId = $r AND Week = $w AND Score > 0;";
+            query.Parameters.AddWithValue("$r", raidId);
+            query.Parameters.AddWithValue("$w", WeekOf(when));
+            return Convert.ToInt32(query.ExecuteScalar());
+        }
+
+        /// <summary>
+        /// Adds experience to a guild, and the level follows it (<see cref="GuildLevels"/>).
+        /// Returns the guild's level after it.
+        /// </summary>
+        public static int AddGuildExperience(long guildId, long amount)
+        {
+            using var conexion = Open();
+            if (amount > 0)
+            {
+                var add = conexion.CreateCommand();
+                add.CommandText = "UPDATE Guilds SET Experience = Experience + $x WHERE Id = $g;";
+                add.Parameters.AddWithValue("$x", amount);
+                add.Parameters.AddWithValue("$g", guildId);
+                add.ExecuteNonQuery();
+            }
+            var read = conexion.CreateCommand();
+            read.CommandText = "SELECT Experience FROM Guilds WHERE Id = $g;";
+            read.Parameters.AddWithValue("$g", guildId);
+            var experience = read.ExecuteScalar();
+            if (experience == null || experience is DBNull) return 0;
+            int level = GuildLevels.LevelFor(Convert.ToInt64(experience));
+            var set = conexion.CreateCommand();
+            set.CommandText = "UPDATE Guilds SET Level = $l WHERE Id = $g AND Level < $l;";
+            set.Parameters.AddWithValue("$l", level);
+            set.Parameters.AddWithValue("$g", guildId);
+            set.ExecuteNonQuery();
+            return level;
         }
 
         /// <summary>Takes a character out of his guild. Returns the guild he left, or null if he had none.</summary>

@@ -39,5 +39,13 @@ namespace Jondo.Unity.Tests
                 }
             }
         }
+
+        /// <summary>
+        /// The server's settings at their defaults, whatever the machine's config/server_settings.json
+        /// says: a raid minimum of one saved from the settings window made the raid board's test start
+        /// a raid of three, which CI, with no such file, would never see.
+        /// </summary>
+        [ModuleInitializer]
+        internal static void DefaultSettings() => Jondo.Unity.Server.ServerSettings.UseForTests(new Jondo.Unity.Server.ServerSettings());
     }
 }

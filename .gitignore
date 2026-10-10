@@ -12,6 +12,10 @@ runtimes/
 # The dlls go inside the single-file .exe; none loose.
 *.dll
 
+# ─── Server settings ────────────────────────────────────────────────────────
+# What each server sets in its Settings window: its own, not the repository's.
+config/
+
 # ─── Databases ──────────────────────────────────────────────────────────────
 # world.db is 240 MB: it is distributed compressed in datos/world.zip and the emulator extracts it on its own
 # the first time. auth.db it creates itself with its test account.

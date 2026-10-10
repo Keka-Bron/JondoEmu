@@ -780,8 +780,11 @@ namespace Jondo.Unity.Server.Network
             // database now, so a character who has a guild sees it. Nothing goes out for one who
             // has none, which is what the discard already did. The captured ranks are a fixed
             // default template (jco), reused here.
-            // In the capture's order, "jco jhe jhh": the ranks, then belonging (jhe) -- not the
-            // jgw of joining, which printed "acabas de unirte al gremio" at every login.
+            // In the capture's order, "jco jhe jhh jgu": the ranks, then belonging (jhe) -- not the
+            // jgw of joining, which printed "acabas de unirte al gremio" at every login --, the
+            // header and the member list. Without the list the client cannot find its own member
+            // when the guild window opens (GuildUI.PlayerCanAccessToGuildMission), throws, and the
+            // window stays empty.
             var guild = Managers.GuildStore.GuildOf(character.Id);
             if (guild != null)
             {
@@ -792,6 +795,7 @@ namespace Jondo.Unity.Server.Network
                     GuildProtocol.BuildMembership(guild, rank, Managers.GuildStore.ContributedBy(character.Id))));
                 await EnviarAsync(stream, ConnectionProtocol.Push(Op.Jhh,
                     GuildProtocol.BuildGuildInfo(guild, members.Count)));
+                await EnviarAsync(stream, Handlers.GuildHandler.MembersFrame(members));
                 Console.WriteLine($"[World] Guild sent for {character.Name}: {guild.Name} ({members.Count} members).");
             }
 

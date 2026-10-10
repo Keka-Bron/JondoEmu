@@ -40,6 +40,12 @@ namespace Jondo.Unity.World.Content
         /// <summary>The NPC the chest is, "Cofre de la raid" in the client's catalogue.</summary>
         public const int NpcId = 7861;
 
+        /// <summary>
+        /// The Gigalodón raid's goal 12 in the client's data: "Escapar con el cofre antes de que se
+        /// agote el tiempo". Taking the chest out meets it.
+        /// </summary>
+        public const int EscapeGoal = 12;
+
         /// <summary>"*emite una extraña vibración*", the first screen and the ambient bubble.</summary>
         public const long Vibrating = 59741;
 

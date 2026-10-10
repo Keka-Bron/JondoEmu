@@ -28,6 +28,9 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Raised when Enter is pressed inside the field.</summary>
         public event EventHandler? SubmitRequested;
 
+        /// <summary>Raised whenever the text changes, typed or set.</summary>
+        public event EventHandler? ValueChanged;
+
         public LauncherField()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer
@@ -45,6 +48,7 @@ namespace Jondo.Unity.Launcher.UI
             _box.GotFocus += (s, e) => { _focused = true; Invalidate(); };
             _box.LostFocus += (s, e) => { _focused = false; Invalidate(); };
             _box.KeyDown += BoxKeyDown;
+            _box.TextChanged += (s, e) => ValueChanged?.Invoke(this, EventArgs.Empty);
             Controls.Add(_box);
         }
 
@@ -60,6 +64,13 @@ namespace Jondo.Unity.Launcher.UI
         {
             get => _box.PlaceholderText;
             set => _box.PlaceholderText = value;
+        }
+
+        /// <summary>The most characters that can be typed.</summary>
+        public int MaxLength
+        {
+            get => _box.MaxLength;
+            set => _box.MaxLength = value;
         }
 
         /// <summary>Masks what is typed with dots.</summary>
