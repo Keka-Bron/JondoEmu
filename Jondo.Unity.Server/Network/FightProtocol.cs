@@ -1417,7 +1417,7 @@ namespace Jondo.Unity.Server.Network
         /// A hit (jwe with f14 between 89 and 100).
         ///
         ///   f3: who hits        f14: of what element
-        ///   f40 { f2: at whom, f3: how much }
+        ///   f40 { f1: shield lost, f2: at whom, f3: life lost, f4: element, f5: erosion }
         ///
         /// Measured: with f14 = 91 f40 carries { -1, 134 } and with f14 = 93, { -1, 121 }. f40 also has
         /// an f4 and an f5 that change from one hit to another and are not deciphered; they are left
@@ -1432,11 +1432,14 @@ namespace Jondo.Unity.Server.Network
         /// earth ones a 1, the same numbers as the catalogue's ElementId column.
         /// </param>
         public static byte[] BuildDamage(long author, int efecto, long victim, int amount,
-                                         int elemento = -1, int erosion = 0)
+                                         int elemento = -1, int erosion = 0, int shieldLoss = 0)
         {
             // No amount is no field: the blow on an invulnerable target travels as f40 with the
             // victim and the element only (Influencia's capture), the way proto3 leaves a zero.
-            var detalle = Pb.New().Var(2, victim).VarIfNotZero(3, amount);
+            var detalle = Pb.New()
+                .VarIfNotZero(1, shieldLoss)
+                .Var(2, victim)
+                .VarIfNotZero(3, amount);
             if (elemento >= 0) detalle.Var(4, elemento);
 
             // The EROSION, which was missing. It goes in f5 and is what the hit takes from the life CAP,
@@ -1470,7 +1473,7 @@ namespace Jondo.Unity.Server.Network
         /// The damage of having collided on being pushed (jwe with f14 at 80).
         ///
         ///   f3: who pushed        f14: 80
-        ///   f40 { f2: at whom, f3: the life lost, f4: -1, f5: the erosion }
+        ///   f40 { f1: shield lost, f2: at whom, f3: life lost, f4: -1, f5: erosion }
         ///
         /// It goes apart from <see cref="BuildDamage"/> because that one has the convention «if the element
         /// is less than zero, do not write f4», and here f4 has to go AND be MINUS ONE: it is
@@ -1481,11 +1484,13 @@ namespace Jondo.Unity.Server.Network
         /// and when the pushed one has not a single cell left, the displacement is not sent and this one goes
         /// alone.
         /// </summary>
-        public static byte[] BuildPushDamage(long author, long victim, int amount, int erosion = 0)
+        public static byte[] BuildPushDamage(long author, long victim, int amount, int erosion = 0,
+                                             int shieldLoss = 0)
             => Pb.New()
                 .Var(3, author)
                 .Var(14, PushDamage)
                 .Msg(40, Pb.New()
+                    .VarIfNotZero(1, shieldLoss)
                     .Var(2, victim)
                     .Var(3, amount)
                     .Var(4, -1)
