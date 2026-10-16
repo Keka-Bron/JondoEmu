@@ -346,7 +346,11 @@ namespace Jondo.Unity.Launcher
                     };
                 }
 
-                string language = UI.LauncherTexts.Code(UI.LauncherPreferences.Language);
+                // The game's language, which may be one the launcher has no texts for: the server
+                // keeps it for the Zaap's "language" setting and answers its own messages in the
+                // closest it has.
+                string language = UI.GameLanguages.ForLaunch(
+                    UI.LauncherPreferences.Language, UI.LauncherPreferences.GameLanguage, clientPath);
 
                 // The start is handed out by the server: it sets the instanceId and the hash, and it is the one that will
                 // check them when the client presents itself to the Zaap. Before, the launcher invented them

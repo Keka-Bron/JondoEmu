@@ -41,7 +41,8 @@ Preferences live outside the emulator installation:
 
 The file remembers:
 
-- launcher/game language (`es`, `en` or `fr`);
+- the launcher language (`es`, `en` or `fr`);
+- the game language (`idiomaJuego`): any pack the client ships, empty to follow the launcher;
 - an explicitly selected client executable (`Dofus.exe` on Windows, `Dofus.x64` on Linux);
 - the Linux client's shared preferences directory (`clientConfig`, passed as `XDG_CONFIG_HOME`);
 - at most eight account profiles;
@@ -120,8 +121,14 @@ Important arguments include:
 --hash <random per-launch hash>
 --port 15881
 --connectionPort 5555
---langCode <es|en|fr>
+--langCode <es|en|fr|de|pt|...>
 ```
+
+`--langCode` is the game language from Settings → Game language. The dropdown lists every text
+pack in the client's `Dofus_Data/StreamingAssets/Content/I18n/` (`es`, `en`, `fr`, `de` and `pt`
+in 3.6), so it can be one the launcher itself has no texts for. A remembered choice the selected
+client does not have falls back to the launcher language. The server keeps the code for the Zaap
+`language` setting and answers its own messages in English when it has no texts in that language.
 
 The texture-pack arguments (`--hdReady`, `--4kReady`) follow the connection arguments, and only for a
 pack the player turned on in Settings → Graphics that is installed and verified for the client's

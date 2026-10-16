@@ -5,7 +5,7 @@ using Avalonia.Media;
 namespace Jondo.Unity.Launcher.UI.Widgets
 {
     /// <summary>
-    /// The little flag of the language buttons.
+    /// The little flag of the language buttons, and of the game languages' dropdown.
     /// </summary>
     /// <remarks>
     /// Spain and France are three stripes and have no mystery. The United Kingdom's does: it is the Union
@@ -52,7 +52,12 @@ namespace Jondo.Unity.Launcher.UI.Widgets
             {
                 case "es": Espana(context, r); break;
                 case "fr": Francia(context, r); break;
-                default: ReinoUnido(context, r); break;
+                case "en": ReinoUnido(context, r); break;
+                case "de": Alemania(context, r); break;
+                case "pt": Brasil(context, r); break;
+                // A pack the client brings some day and this does not know: a blank flag rather
+                // than another country's, which would be telling a lie.
+                default: context.FillRectangle(new SolidColorBrush(Color.FromRgb(96, 84, 70)), r); break;
             }
 
             context.DrawRectangle(new Pen(new SolidColorBrush(Color.FromArgb(120, 0, 0, 0))), r);
@@ -73,6 +78,52 @@ namespace Jondo.Unity.Launcher.UI.Widgets
             context.FillRectangle(new SolidColorBrush(Color.FromRgb(0, 85, 164)), new Rect(0, 0, tercio, r.Height));
             context.FillRectangle(Brushes.White, new Rect(tercio, 0, tercio, r.Height));
             context.FillRectangle(new SolidColorBrush(Color.FromRgb(239, 65, 53)), new Rect(tercio * 2, 0, tercio, r.Height));
+        }
+
+        /// <summary>Black, red and gold, in horizontal thirds.</summary>
+        private static void Alemania(DrawingContext context, Rect r)
+        {
+            double tercio = r.Height / 3;
+            context.FillRectangle(Brushes.Black, new Rect(0, 0, r.Width, tercio));
+            context.FillRectangle(new SolidColorBrush(Color.FromRgb(221, 0, 0)), new Rect(0, tercio, r.Width, tercio));
+            context.FillRectangle(new SolidColorBrush(Color.FromRgb(255, 206, 0)), new Rect(0, tercio * 2, r.Width, tercio));
+        }
+
+        /// <summary>
+        /// Brazil for Portuguese: the green field, the yellow rhombus and the blue globe with its band.
+        /// </summary>
+        /// <remarks>
+        /// The pt pack is shown with Brazil's flag rather than Portugal's.
+        /// The globe's stars and motto do not fit in fourteen pixels: what is left is the white
+        /// band, an arc of a circle whose centre lies below the globe, clipped to it.
+        /// </remarks>
+        private static void Brasil(DrawingContext context, Rect r)
+        {
+            context.FillRectangle(new SolidColorBrush(Color.FromRgb(0, 155, 58)), r);
+
+            // The rhombus stops 1.7 units short of each edge on a 20 by 14 flag.
+            double margenX = r.Width * 1.7 / 20, margenY = r.Height * 1.7 / 14;
+            var rombo = new StreamGeometry();
+            using (var g = rombo.Open())
+            {
+                g.BeginFigure(new Point(r.Width / 2, margenY), true);
+                g.LineTo(new Point(r.Width - margenX, r.Height / 2));
+                g.LineTo(new Point(r.Width / 2, r.Height - margenY));
+                g.LineTo(new Point(margenX, r.Height / 2));
+                g.EndFigure(true);
+            }
+            context.DrawGeometry(new SolidColorBrush(Color.FromRgb(254, 223, 0)), null, rombo);
+
+            var centro = new Point(r.Width / 2, r.Height / 2);
+            double radio = r.Height * 0.25;
+            context.DrawEllipse(new SolidColorBrush(Color.FromRgb(0, 39, 118)), null, centro, radio, radio);
+
+            var arco = new Point(centro.X - radio * 0.5, centro.Y + radio * 2.6);
+            double radioArco = radio * 2.65;
+            using (context.PushGeometryClip(new EllipseGeometry(new Rect(centro.X - radio, centro.Y - radio, radio * 2, radio * 2))))
+            {
+                context.DrawEllipse(null, new Pen(Brushes.White, radio * 0.3), arco, radioArco, radioArco);
+            }
         }
 
         private static void ReinoUnido(DrawingContext context, Rect r)

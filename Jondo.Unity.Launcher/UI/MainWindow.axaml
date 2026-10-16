@@ -202,6 +202,15 @@
                 <TextBlock x:Name="PieIdioma" Classes="pie" />
               </StackPanel>
 
+              <!-- The game's language, apart from the launcher's: every pack the client brings.
+                   The options are filled in MainWindow.axaml.cs, from the client's I18n folder. -->
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="RotuloIdiomaJuego" Classes="label" />
+                <ComboBox x:Name="SelectorIdiomaJuego" Classes="field"
+                          SelectionChanged="AlElegirIdiomaDelJuego" />
+                <TextBlock x:Name="PieIdiomaJuego" Classes="pie" />
+              </StackPanel>
+
               <StackPanel Spacing="8">
                 <TextBlock x:Name="RotuloMusica" Classes="label" />
                 <Button x:Name="BotonMusica" Classes="chip" HorizontalAlignment="Left"
